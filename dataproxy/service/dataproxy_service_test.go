@@ -7,9 +7,13 @@ import (
 	"testing"
 	"time"
 
+	"net/http"
+	"net/http/httptest"
+
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"k8s.io/apimachinery/pkg/api/resource"
 
@@ -20,7 +24,10 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	workflowMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect/mocks"
 )
 
 func TestCreateUploadLocation(t *testing.T) {
@@ -97,7 +104,7 @@ func TestCreateUploadLocation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStore(t)
-			service := NewService(cfg, mockStore, nil, nil, nil)
+			service := NewService(cfg, mockStore, nil, nil, nil, nil)
 
 			req := &connect.Request[dataproxy.CreateUploadLocationRequest]{
 				Msg: tt.req,
@@ -218,7 +225,7 @@ func TestCheckFileExists(t *testing.T) {
 				mockStore = setupMockDataStoreWithExistingFile(t, tt.existingFileMD5)
 			}
 
-			service := NewService(cfg, mockStore, nil, nil, nil)
+			service := NewService(cfg, mockStore, nil, nil, nil, nil)
 			storagePath := storage.DataReference("s3://test-bucket/uploads/test-project/test-domain/test-root/test-file.txt")
 
 			err := service.checkFileExists(ctx, storagePath, tt.req)
@@ -296,7 +303,7 @@ func TestConstructStoragePath(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStore(t)
-			service := NewService(cfg, mockStore, nil, nil, nil)
+			service := NewService(cfg, mockStore, nil, nil, nil, nil)
 
 			path, err := service.constructStoragePath(ctx, tt.req)
 
@@ -389,7 +396,7 @@ func TestUploadInputs(t *testing.T) {
 						Name:    "test-run",
 					},
 				},
-				Task:   &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
+				Task: &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
 				Inputs: &task.Inputs{
 					Literals: []*task.NamedLiteral{
 						{Name: "x", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 42}}}}}}},
@@ -414,7 +421,7 @@ func TestUploadInputs(t *testing.T) {
 						Domain:       "test-domain",
 					},
 				},
-				Task:   &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
+				Task: &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
 				Inputs: &task.Inputs{
 					Literals: []*task.NamedLiteral{
 						{Name: "y", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "hello"}}}}}}},
@@ -435,7 +442,7 @@ func TestUploadInputs(t *testing.T) {
 						Org: "org", Project: "proj", Domain: "dom", Name: "run1",
 					},
 				},
-				Task:   &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpecWithIgnoredVars},
+				Task: &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpecWithIgnoredVars},
 				Inputs: &task.Inputs{
 					Literals: []*task.NamedLiteral{
 						{Name: "x", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 1}}}}}}},
@@ -453,7 +460,7 @@ func TestUploadInputs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStoreWithWriteProtobuf(t)
-			svc := NewService(cfg, mockStore, nil, nil, nil)
+			svc := NewService(cfg, mockStore, nil, nil, nil, nil)
 
 			req := &connect.Request[dataproxy.UploadInputsRequest]{
 				Msg: tt.req,
@@ -490,6 +497,162 @@ func setupMockDataStoreWithWriteProtobuf(t *testing.T) *storage.DataStore {
 	}
 }
 
+func TestGetActionData(t *testing.T) {
+	ctx := context.Background()
+	cfg := config.DataProxyConfig{}
+
+	actionID := &common.ActionIdentifier{
+		Name: "a0",
+		Run: &common.RunIdentifier{
+			Org: "org", Project: "proj", Domain: "dom", Name: "run1",
+		},
+	}
+
+	storedInputs := &task.Inputs{
+		Literals: []*task.NamedLiteral{
+			{Name: "x", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 1}}}}}}},
+		},
+	}
+	storedOutputs := &task.Inputs{
+		Literals: []*task.NamedLiteral{
+			{Name: "o", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "result"}}}}}}},
+		},
+	}
+
+	tests := []struct {
+		name             string
+		inputsURI        string
+		outputsURI       string
+		runClientErr     error
+		readInputsErr    error
+		readOutputsErr   error
+		wantErr          bool
+		expectInputsLen  int
+		expectOutputsLen int
+	}{
+		{
+			name:             "success with both inputs and outputs",
+			inputsURI:        "s3://test-bucket/inputs-dir",
+			outputsURI:       "s3://test-bucket/outputs/outputs.pb",
+			expectInputsLen:  1,
+			expectOutputsLen: 1,
+		},
+		{
+			name:             "success with only inputs",
+			inputsURI:        "s3://test-bucket/inputs-dir",
+			outputsURI:       "",
+			expectInputsLen:  1,
+			expectOutputsLen: 0,
+		},
+		{
+			name:             "success with only outputs",
+			inputsURI:        "",
+			outputsURI:       "s3://test-bucket/outputs/outputs.pb",
+			expectInputsLen:  0,
+			expectOutputsLen: 1,
+		},
+		{
+			name:             "success with neither inputs nor outputs",
+			inputsURI:        "",
+			outputsURI:       "",
+			expectInputsLen:  0,
+			expectOutputsLen: 0,
+		},
+		{
+			name:         "RunService error propagates",
+			runClientErr: connect.NewError(connect.CodeNotFound, assertErr("not found")),
+			wantErr:      true,
+		},
+		{
+			name:          "read inputs error propagates",
+			inputsURI:     "s3://test-bucket/inputs-dir",
+			readInputsErr: assertErr("read failed"),
+			wantErr:       true,
+		},
+		{
+			name:           "read outputs error propagates",
+			outputsURI:     "s3://test-bucket/outputs/outputs.pb",
+			readOutputsErr: assertErr("read failed"),
+			wantErr:        true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			runClient := workflowMocks.NewRunServiceClient(t)
+			if tt.runClientErr != nil {
+				runClient.EXPECT().GetActionDataURIs(mock.Anything, mock.Anything).Return(nil, tt.runClientErr)
+			} else {
+				runClient.EXPECT().GetActionDataURIs(mock.Anything, mock.Anything).Return(
+					connect.NewResponse(&workflow.GetActionDataURIsResponse{
+						InputsUri:  tt.inputsURI,
+						OutputsUri: tt.outputsURI,
+					}), nil)
+			}
+
+			mockComposedStore := storageMocks.NewComposedProtobufStore(t)
+
+			if tt.inputsURI != "" {
+				expectedInputRef := storage.DataReference(tt.inputsURI + "/inputs.pb")
+				call := mockComposedStore.On("ReadProtobuf", mock.Anything, expectedInputRef, mock.Anything)
+				if tt.readInputsErr != nil {
+					call.Return(tt.readInputsErr).Maybe()
+				} else {
+					call.Run(func(args mock.Arguments) {
+						msg := args.Get(2).(proto.Message)
+						proto.Reset(msg)
+						proto.Merge(msg, storedInputs)
+					}).Return(nil).Maybe()
+				}
+			}
+
+			if tt.outputsURI != "" {
+				expectedOutputRef := storage.DataReference(tt.outputsURI)
+				call := mockComposedStore.On("ReadProtobuf", mock.Anything, expectedOutputRef, mock.Anything)
+				if tt.readOutputsErr != nil {
+					call.Return(tt.readOutputsErr).Maybe()
+				} else {
+					call.Run(func(args mock.Arguments) {
+						msg := args.Get(2).(proto.Message)
+						proto.Reset(msg)
+						proto.Merge(msg, storedOutputs)
+					}).Return(nil).Maybe()
+				}
+			}
+
+			ds := &storage.DataStore{
+				ComposedProtobufStore: mockComposedStore,
+				ReferenceConstructor:  &simpleRefConstructor{},
+			}
+			svc := NewService(cfg, ds, nil, nil, runClient, nil)
+
+			resp, err := svc.GetActionData(ctx, connect.NewRequest(&dataproxy.GetActionDataRequest{
+				ActionId: actionID,
+			}))
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, resp)
+				return
+			}
+			assert.NoError(t, err)
+			assert.NotNil(t, resp)
+			assert.Len(t, resp.Msg.GetInputs().GetLiterals(), tt.expectInputsLen)
+			assert.Len(t, resp.Msg.GetOutputs().GetLiterals(), tt.expectOutputsLen)
+			if tt.expectInputsLen > 0 {
+				assert.Equal(t, "x", resp.Msg.GetInputs().GetLiterals()[0].GetName())
+			}
+			if tt.expectOutputsLen > 0 {
+				assert.Equal(t, "o", resp.Msg.GetOutputs().GetLiterals()[0].GetName())
+			}
+		})
+	}
+}
+
+type assertErr string
+
+func (e assertErr) Error() string { return string(e) }
+
 func setupMockDataStoreWithExistingFile(t *testing.T, contentMD5 string) *storage.DataStore {
 	mockComposedStore := storageMocks.NewComposedProtobufStore(t)
 
@@ -506,4 +669,159 @@ func setupMockDataStoreWithExistingFile(t *testing.T, contentMD5 string) *storag
 		ComposedProtobufStore: mockComposedStore,
 		ReferenceConstructor:  &simpleRefConstructor{},
 	}
+}
+
+// mockLogStreamer implements logs.LogStreamer for tests.
+type mockLogStreamer struct {
+	mock.Mock
+}
+
+func (m *mockLogStreamer) TailLogs(ctx context.Context, logContext *core.LogContext, stream *connect.ServerStream[dataproxy.TailLogsResponse]) error {
+	args := m.Called(ctx, logContext, stream)
+	return args.Error(0)
+}
+
+func newTailLogsTestClient(t *testing.T, svc *Service) dataproxyconnect.DataProxyServiceClient {
+	path, handler := dataproxyconnect.NewDataProxyServiceHandler(svc)
+	mux := http.NewServeMux()
+	mux.Handle(path, handler)
+	server := httptest.NewServer(mux)
+	t.Cleanup(server.Close)
+	return dataproxyconnect.NewDataProxyServiceClient(http.DefaultClient, server.URL)
+}
+
+func TestTailLogs(t *testing.T) {
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org: "test-org", Project: "test-project", Domain: "test-domain", Name: "rtest12345",
+		},
+		Name: "a0",
+	}
+
+	logContext := &core.LogContext{
+		PrimaryPodName: "my-pod",
+		Pods: []*core.PodLogContext{
+			{PodName: "my-pod", Namespace: "ns"},
+		},
+	}
+
+	t.Run("happy path streams a message", func(t *testing.T) {
+		runClient := workflowMocks.NewRunServiceClient(t)
+		runClient.EXPECT().GetActionLogContext(mock.Anything, mock.Anything).Return(
+			connect.NewResponse(&workflow.GetActionLogContextResponse{
+				LogContext: logContext,
+				Cluster:    "c1",
+			}), nil)
+
+		streamer := &mockLogStreamer{}
+		streamer.On("TailLogs", mock.Anything, logContext, mock.Anything).Run(func(args mock.Arguments) {
+			stream := args.Get(2).(*connect.ServerStream[dataproxy.TailLogsResponse])
+			_ = stream.Send(&dataproxy.TailLogsResponse{})
+		}).Return(nil)
+
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
+		client := newTailLogsTestClient(t, svc)
+
+		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+		assert.NoError(t, err)
+
+		assert.True(t, stream.Receive())
+		assert.NotNil(t, stream.Msg())
+		assert.False(t, stream.Receive())
+		assert.NoError(t, stream.Err())
+
+		streamer.AssertExpectations(t)
+	})
+
+	t.Run("GetActionLogContext error propagates", func(t *testing.T) {
+		runClient := workflowMocks.NewRunServiceClient(t)
+		runClient.EXPECT().GetActionLogContext(mock.Anything, mock.Anything).Return(
+			nil, connect.NewError(connect.CodeNotFound, assertErr("action missing")))
+
+		streamer := &mockLogStreamer{}
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
+		client := newTailLogsTestClient(t, svc)
+
+		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+		assert.NoError(t, err)
+		assert.False(t, stream.Receive())
+		assert.Error(t, stream.Err())
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(stream.Err()))
+
+		streamer.AssertNotCalled(t, "TailLogs", mock.Anything, mock.Anything, mock.Anything)
+	})
+
+	t.Run("nil log context returns NotFound", func(t *testing.T) {
+		runClient := workflowMocks.NewRunServiceClient(t)
+		runClient.EXPECT().GetActionLogContext(mock.Anything, mock.Anything).Return(
+			connect.NewResponse(&workflow.GetActionLogContextResponse{
+				LogContext: nil,
+			}), nil)
+
+		streamer := &mockLogStreamer{}
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
+		client := newTailLogsTestClient(t, svc)
+
+		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+		assert.NoError(t, err)
+		assert.False(t, stream.Receive())
+		assert.Error(t, stream.Err())
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(stream.Err()))
+
+		streamer.AssertNotCalled(t, "TailLogs", mock.Anything, mock.Anything, mock.Anything)
+	})
+
+	t.Run("streamer error propagates", func(t *testing.T) {
+		runClient := workflowMocks.NewRunServiceClient(t)
+		runClient.EXPECT().GetActionLogContext(mock.Anything, mock.Anything).Return(
+			connect.NewResponse(&workflow.GetActionLogContextResponse{LogContext: logContext}), nil)
+
+		streamer := &mockLogStreamer{}
+		streamer.On("TailLogs", mock.Anything, logContext, mock.Anything).Return(
+			connect.NewError(connect.CodeInternal, assertErr("streamer boom")))
+
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
+		client := newTailLogsTestClient(t, svc)
+
+		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+		assert.NoError(t, err)
+		assert.False(t, stream.Receive())
+		assert.Error(t, stream.Err())
+		assert.Equal(t, connect.CodeInternal, connect.CodeOf(stream.Err()))
+
+		streamer.AssertExpectations(t)
+	})
+
+	t.Run("passes action_id and attempt to RunService", func(t *testing.T) {
+		runClient := workflowMocks.NewRunServiceClient(t)
+		runClient.EXPECT().GetActionLogContext(mock.Anything, mock.MatchedBy(func(r *connect.Request[workflow.GetActionLogContextRequest]) bool {
+			return proto.Equal(r.Msg.GetActionId(), actionID) && r.Msg.GetAttempt() == 3
+		})).Return(connect.NewResponse(&workflow.GetActionLogContextResponse{LogContext: logContext}), nil)
+
+		streamer := &mockLogStreamer{}
+		streamer.On("TailLogs", mock.Anything, logContext, mock.Anything).Return(nil)
+
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
+		client := newTailLogsTestClient(t, svc)
+
+		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
+			ActionId: actionID,
+			Attempt:  3,
+		}))
+		assert.NoError(t, err)
+		assert.False(t, stream.Receive())
+		assert.NoError(t, stream.Err())
+	})
 }

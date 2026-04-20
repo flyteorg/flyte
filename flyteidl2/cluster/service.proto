@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package flyteidl2.cluster;
+
+import "flyteidl2/cluster/payload.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster";
+
+service ClusterService {
+  rpc SelectCluster(SelectClusterRequest) returns (SelectClusterResponse) {}
+}

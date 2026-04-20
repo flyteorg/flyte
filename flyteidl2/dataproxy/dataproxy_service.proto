@@ -3,14 +3,14 @@ syntax = "proto3";
 package flyteidl2.dataproxy;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/app/app_definition.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/run.proto";
+import "flyteidl2/logs/dataplane/payload.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/task_definition.proto";
-import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
-import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy";
 
@@ -19,47 +19,27 @@ enum ArtifactType {
   ARTIFACT_TYPE_UNSPECIFIED = 0;
   // ARTIFACT_TYPE_REPORT refers to the HTML report file optionally generated after a task finishes executing.
   ARTIFACT_TYPE_REPORT = 1;
+  // ARTIFACT_TYPE_CODE_BUNDLE refers to the code bundle (tarball) generated for an action.
+  ARTIFACT_TYPE_CODE_BUNDLE = 2;
 }
 
 // DataProxyService provides an interface for managing data uploads and downloads.
 service DataProxyService {
   // CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
-  rpc CreateUploadLocation(CreateUploadLocationRequest) returns (CreateUploadLocationResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/dataproxy/artifact_urn"
-      body: "*"
-      additional_bindings: {
-        post: "/api/v1/org/dataproxy/artifact_urn"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {description: "Creates a write-only http location that is accessible for tasks at runtime."};
-  }
+  rpc CreateUploadLocation(CreateUploadLocationRequest) returns (CreateUploadLocationResponse) {}
 
-  rpc UploadInputs(UploadInputsRequest) returns (UploadInputsResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/dataproxy/inputs"
-      body: "*"
-      additional_bindings: {
-        post: "/api/v1/org/dataproxy/inputs"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {description: "Uploads inputs for a given run or project and returns a URI and cache key that can be used to reference these inputs at runtime."};
-  }
+  rpc UploadInputs(UploadInputsRequest) returns (UploadInputsResponse) {}
 
   // CreateDownloadLink generates signed URL(s) for downloading a given artifact.
-  rpc CreateDownloadLink(CreateDownloadLinkRequest) returns (CreateDownloadLinkResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/dataproxy/artifact_urn/download"
-      body: "*"
-      additional_bindings: {
-        post: "/api/v1/org/dataproxy/artifact_urn/download"
-        body: "*"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {description: "Creates signed URL(s) for downloading an artifact associated with a run action."};
+  rpc CreateDownloadLink(CreateDownloadLinkRequest) returns (CreateDownloadLinkResponse) {}
+
+  // Get input and output data for an action.
+  rpc GetActionData(GetActionDataRequest) returns (GetActionDataResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
   }
+
+  // Stream logs for an action attempt.
+  rpc TailLogs(TailLogsRequest) returns (stream TailLogsResponse) {}
 }
 
 // CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.
@@ -178,22 +158,60 @@ message CreateDownloadLinkRequest {
     not_in: [0]
   }];
 
+  // ExpiresIn defines the requested expiration duration for the generated URLs. The request will be
+  // rejected if this exceeds the platform's configured maximum.
+  // +optional. The default value comes from the global config.
+  google.protobuf.Duration expires_in = 2;
+
   // Source identifies the action attempt whose artifact is to be downloaded.
   oneof source {
     option (buf.validate.oneof).required = true;
 
     // ActionAttemptId identifies the specific attempt of a run action that produced the artifact.
-    common.ActionAttemptIdentifier action_attempt_id = 2;
+    common.ActionAttemptIdentifier action_attempt_id = 3;
+    flyteidl2.app.Identifier app_id = 4;
+    flyteidl2.task.TaskIdentifier task_id = 5;
   }
-
-  // ExpiresIn defines the requested expiration duration for the generated URLs. The request will be
-  // rejected if this exceeds the platform's configured maximum.
-  // +optional. The default value comes from the global config.
-  google.protobuf.Duration expires_in = 3;
 }
 
 // CreateDownloadLinkResponse specifies the response for the CreateDownloadLink API.
 message CreateDownloadLinkResponse {
   // PreSignedUrls contains the signed URLs and their expiration time.
   PreSignedURLs pre_signed_urls = 1;
+}
+
+// Request message for querying action data.
+message GetActionDataRequest {
+  // Action to query.
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for querying action data.
+message GetActionDataResponse {
+  // Inputs for the action.
+  task.Inputs inputs = 1;
+
+  // Outputs for the action.
+  task.Outputs outputs = 2;
+}
+
+// Request message for tailing logs.
+message TailLogsRequest {
+  // The action id.
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // The attempt number.
+  uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
+}
+
+// Reponse message for tailing logs.
+message TailLogsResponse {
+  // A batch of logs.
+  message Logs {
+    // Structured log lines.
+    repeated flyteidl2.logs.dataplane.LogLine lines = 1;
+  }
+
+  // One or more batches of logs.
+  repeated Logs logs = 1;
 }

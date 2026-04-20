@@ -1488,3 +1488,313 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 	store.AssertNumberOfCalls(t, "ReadProtobuf", 0)
 	store.AssertNumberOfCalls(t, "WriteProtobuf", 0)
 }
+
+func TestGetActionDataURIs(t *testing.T) {
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org: "test-org", Project: "test-project", Domain: "test-domain", Name: "rtest12345",
+		},
+		Name: "a0",
+	}
+
+	mustMarshalRunInfo := func(info *workflow.RunInfo) []byte {
+		b, err := proto.Marshal(info)
+		require.NoError(t, err)
+		return b
+	}
+
+	mustMarshalEvent := func(event *workflow.ActionEvent) []byte {
+		b, err := proto.Marshal(event)
+		require.NoError(t, err)
+		return b
+	}
+
+	t.Run("action not found returns NotFound", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(nil, errors.New("missing"))
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		assert.Nil(t, resp)
+		assert.Error(t, err)
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	})
+
+	t.Run("missing detailed_info returns NotFound", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:        int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+			DetailedInfo: nil,
+		}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		assert.Nil(t, resp)
+		assert.Error(t, err)
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	})
+
+	t.Run("non-terminal phase returns inputs only", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+			ActionType: int32(workflow.ActionType_ACTION_TYPE_TASK),
+			DetailedInfo: mustMarshalRunInfo(&workflow.RunInfo{
+				InputsUri:  "s3://bucket/inputs",
+				OutputsUri: "s3://bucket/outputs",
+			}),
+		}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		require.NoError(t, err)
+		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
+		assert.Empty(t, resp.Msg.GetOutputsUri())
+	})
+
+	t.Run("trace action returns outputs uri from RunInfo", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			ActionType: int32(workflow.ActionType_ACTION_TYPE_TRACE),
+			DetailedInfo: mustMarshalRunInfo(&workflow.RunInfo{
+				InputsUri:  "s3://bucket/inputs",
+				OutputsUri: "s3://bucket/trace-outputs",
+			}),
+		}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		require.NoError(t, err)
+		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
+		assert.Equal(t, "s3://bucket/trace-outputs", resp.Msg.GetOutputsUri())
+	})
+
+	t.Run("succeeded task returns outputs from latest attempt", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			ActionType: int32(workflow.ActionType_ACTION_TYPE_TASK),
+			DetailedInfo: mustMarshalRunInfo(&workflow.RunInfo{
+				InputsUri: "s3://bucket/inputs",
+			}),
+		}, nil)
+
+		eventBytes := mustMarshalEvent(&workflow.ActionEvent{
+			Id:      actionID,
+			Attempt: 0,
+			Phase:   common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+			Outputs: &task.OutputReferences{
+				OutputUri: "s3://bucket/outputs/0/outputs.pb",
+			},
+		})
+		actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{
+			{Attempt: 0, Phase: int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED), Info: eventBytes},
+		}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		require.NoError(t, err)
+		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
+		assert.Equal(t, "s3://bucket/outputs/0/outputs.pb", resp.Msg.GetOutputsUri())
+	})
+
+	t.Run("succeeded task with no attempts returns NotFound", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			ActionType: int32(workflow.ActionType_ACTION_TYPE_TASK),
+			DetailedInfo: mustMarshalRunInfo(&workflow.RunInfo{
+				InputsUri: "s3://bucket/inputs",
+			}),
+		}, nil)
+		actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		assert.Nil(t, resp)
+		assert.Error(t, err)
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	})
+
+	t.Run("succeeded task with empty output_uri returns NotFound", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			ActionType: int32(workflow.ActionType_ACTION_TYPE_TASK),
+			DetailedInfo: mustMarshalRunInfo(&workflow.RunInfo{
+				InputsUri: "s3://bucket/inputs",
+			}),
+		}, nil)
+
+		eventBytes := mustMarshalEvent(&workflow.ActionEvent{
+			Id:      actionID,
+			Attempt: 0,
+			Phase:   common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		})
+		actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{
+			{Attempt: 0, Phase: int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED), Info: eventBytes},
+		}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		assert.Nil(t, resp)
+		assert.Error(t, err)
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	})
+
+	t.Run("succeeded task uses last attempt outputs when multiple attempts", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:        int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			ActionType:   int32(workflow.ActionType_ACTION_TYPE_TASK),
+			DetailedInfo: mustMarshalRunInfo(&workflow.RunInfo{InputsUri: "s3://bucket/inputs"}),
+		}, nil)
+
+		now := time.Now()
+		event0 := mustMarshalEvent(&workflow.ActionEvent{
+			Id: actionID, Attempt: 0,
+			Phase:        common.ActionPhase_ACTION_PHASE_FAILED,
+			ReportedTime: timestamppb.New(now),
+			Outputs:      &task.OutputReferences{OutputUri: "s3://bucket/outputs/0/outputs.pb"},
+		})
+		event1 := mustMarshalEvent(&workflow.ActionEvent{
+			Id: actionID, Attempt: 1,
+			Phase:        common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+			ReportedTime: timestamppb.New(now.Add(time.Second)),
+			Outputs:      &task.OutputReferences{OutputUri: "s3://bucket/outputs/1/outputs.pb"},
+		})
+		actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{
+			{Attempt: 0, Info: event0},
+			{Attempt: 1, Info: event1},
+		}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		require.NoError(t, err)
+		assert.Equal(t, "s3://bucket/outputs/1/outputs.pb", resp.Msg.GetOutputsUri())
+	})
+}
+
+func TestGetActionLogContext(t *testing.T) {
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org: "test-org", Project: "test-project", Domain: "test-domain", Name: "rtest12345",
+		},
+		Name: "a0",
+	}
+
+	logContext := &core.LogContext{
+		PrimaryPodName: "my-pod",
+		Pods: []*core.PodLogContext{
+			{PodName: "my-pod", Namespace: "ns"},
+		},
+	}
+
+	mustMarshalEvent := func(event *workflow.ActionEvent) []byte {
+		b, err := proto.Marshal(event)
+		require.NoError(t, err)
+		return b
+	}
+
+	t.Run("success returns log context and cluster", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(&models.ActionEvent{
+			Info: mustMarshalEvent(&workflow.ActionEvent{
+				Id:         actionID,
+				Attempt:    1,
+				LogContext: logContext,
+				Cluster:    "c1",
+			}),
+		}, nil)
+
+		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+
+		require.NoError(t, err)
+		assert.Equal(t, "c1", resp.Msg.GetCluster())
+		assert.Equal(t, "my-pod", resp.Msg.GetLogContext().GetPrimaryPodName())
+	})
+
+	t.Run("no event found returns NotFound", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(nil, sql.ErrNoRows)
+
+		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+
+		assert.Nil(t, resp)
+		assert.Error(t, err)
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	})
+
+	t.Run("repo error returns Internal", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(nil, errors.New("db blew up"))
+
+		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+
+		assert.Nil(t, resp)
+		assert.Error(t, err)
+		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
+	})
+
+	t.Run("event without log context returns NotFound", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(&models.ActionEvent{
+			Info: mustMarshalEvent(&workflow.ActionEvent{
+				Id:      actionID,
+				Attempt: 1,
+				Cluster: "c1",
+			}),
+		}, nil)
+
+		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+
+		assert.Nil(t, resp)
+		assert.Error(t, err)
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	})
+
+	t.Run("undeserializable event returns Internal", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(&models.ActionEvent{
+			Info: []byte("not-a-proto"),
+		}, nil)
+
+		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+			ActionId: actionID,
+			Attempt:  1,
+		}))
+
+		assert.Nil(t, resp)
+		assert.Error(t, err)
+		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
+	})
+}

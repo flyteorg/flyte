@@ -21,6 +21,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"k8s.io/client-go/util/retry"
 	"reflect"
 	"strings"
 	"time"
@@ -362,6 +363,19 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 		}
 	}
 
+	abortTime := time.Now()
+	abortPhaseInfo := pluginsCore.PhaseInfoAborted(abortTime, pluginsCore.DefaultPhaseVersion, "aborted")
+	actionEvent := r.buildActionEvent(ctx, taskAction, abortPhaseInfo)
+	// buildActionEvent derives UpdatedTime from PhaseHistory, which doesn't include the
+	// abort transition. Override it so mergeEvents uses the actual abort time as end_time.
+	actionEvent.UpdatedTime = timestamppb.New(abortTime)
+	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
+		Events: []*workflow.ActionEvent{actionEvent},
+	})); err != nil {
+		logger.Error(err, "failed to emit abort event, will retry")
+		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	}
+
 	return r.removeFinalizer(ctx, taskAction)
 }
 
@@ -402,7 +416,16 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 		return err
 	}
 
-	if err := r.Status().Update(ctx, newTaskAction); err != nil {
+	// The retry.RetryOnConflict will refetch the k8s resource to get the latest resource version
+	// This will resovle the conflict error caused by k8s optimistic lock when 2 reconcile loops updating the same CRD
+	if err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		latest := &flyteorgv1.TaskAction{}
+		if getErr := r.Get(ctx, client.ObjectKeyFromObject(newTaskAction), latest); getErr != nil {
+			return getErr
+		}
+		latest.Status = newTaskAction.Status
+		return r.Status().Update(ctx, latest)
+	}); err != nil {
 		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
 		return err
 	}
@@ -480,8 +503,10 @@ func outputRefs(ctx context.Context, taskAction *flyteorgv1.TaskAction) *task.Ou
 	if err != nil {
 		return nil
 	}
+	base := strings.TrimRight(string(prefix), "/")
 	return &task.OutputReferences{
-		OutputUri: strings.TrimRight(string(prefix), "/") + "/outputs.pb",
+		OutputUri: base + "/outputs.pb",
+		ReportUri: base + "/report.html",
 	}
 }
 

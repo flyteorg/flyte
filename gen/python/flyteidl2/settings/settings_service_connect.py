@@ -35,40 +35,40 @@ class SettingsServiceASGIApplication(ConnectASGIApplication[SettingsService]):
         super().__init__(
             service=service,
             endpoints=lambda svc: {
-                "/flyteidl2.org.SettingsService/GetSettings": Endpoint.unary(
+                "/flyteidl2.settings.SettingsService/GetSettings": Endpoint.unary(
                     method=MethodInfo(
                         name="GetSettings",
-                        service_name="flyteidl2.org.SettingsService",
+                        service_name="flyteidl2.settings.SettingsService",
                         input=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsRequest,
                         output=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsResponse,
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.get_settings,
                 ),
-                "/flyteidl2.org.SettingsService/GetSettingsForEdit": Endpoint.unary(
+                "/flyteidl2.settings.SettingsService/GetSettingsForEdit": Endpoint.unary(
                     method=MethodInfo(
                         name="GetSettingsForEdit",
-                        service_name="flyteidl2.org.SettingsService",
+                        service_name="flyteidl2.settings.SettingsService",
                         input=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsForEditRequest,
                         output=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsForEditResponse,
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.get_settings_for_edit,
                 ),
-                "/flyteidl2.org.SettingsService/CreateSettings": Endpoint.unary(
+                "/flyteidl2.settings.SettingsService/CreateSettings": Endpoint.unary(
                     method=MethodInfo(
                         name="CreateSettings",
-                        service_name="flyteidl2.org.SettingsService",
+                        service_name="flyteidl2.settings.SettingsService",
                         input=flyteidl2_dot_settings_dot_settings__service__pb2.CreateSettingsRequest,
                         output=flyteidl2_dot_settings_dot_settings__service__pb2.CreateSettingsResponse,
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.create_settings,
                 ),
-                "/flyteidl2.org.SettingsService/UpdateSettings": Endpoint.unary(
+                "/flyteidl2.settings.SettingsService/UpdateSettings": Endpoint.unary(
                     method=MethodInfo(
                         name="UpdateSettings",
-                        service_name="flyteidl2.org.SettingsService",
+                        service_name="flyteidl2.settings.SettingsService",
                         input=flyteidl2_dot_settings_dot_settings__service__pb2.UpdateSettingsRequest,
                         output=flyteidl2_dot_settings_dot_settings__service__pb2.UpdateSettingsResponse,
                         idempotency_level=IdempotencyLevel.UNKNOWN,
@@ -84,7 +84,7 @@ class SettingsServiceASGIApplication(ConnectASGIApplication[SettingsService]):
     @property
     def path(self) -> str:
         """Returns the URL path to mount the application to when serving multiple applications."""
-        return "/flyteidl2.org.SettingsService"
+        return "/flyteidl2.settings.SettingsService"
 
 
 class SettingsServiceClient(ConnectClient):
@@ -100,7 +100,7 @@ class SettingsServiceClient(ConnectClient):
             request=request,
             method=MethodInfo(
                 name="GetSettings",
-                service_name="flyteidl2.org.SettingsService",
+                service_name="flyteidl2.settings.SettingsService",
                 input=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsRequest,
                 output=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsResponse,
                 idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
@@ -122,7 +122,7 @@ class SettingsServiceClient(ConnectClient):
             request=request,
             method=MethodInfo(
                 name="GetSettingsForEdit",
-                service_name="flyteidl2.org.SettingsService",
+                service_name="flyteidl2.settings.SettingsService",
                 input=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsForEditRequest,
                 output=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsForEditResponse,
                 idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
@@ -143,7 +143,7 @@ class SettingsServiceClient(ConnectClient):
             request=request,
             method=MethodInfo(
                 name="CreateSettings",
-                service_name="flyteidl2.org.SettingsService",
+                service_name="flyteidl2.settings.SettingsService",
                 input=flyteidl2_dot_settings_dot_settings__service__pb2.CreateSettingsRequest,
                 output=flyteidl2_dot_settings_dot_settings__service__pb2.CreateSettingsResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
@@ -163,7 +163,7 @@ class SettingsServiceClient(ConnectClient):
             request=request,
             method=MethodInfo(
                 name="UpdateSettings",
-                service_name="flyteidl2.org.SettingsService",
+                service_name="flyteidl2.settings.SettingsService",
                 input=flyteidl2_dot_settings_dot_settings__service__pb2.UpdateSettingsRequest,
                 output=flyteidl2_dot_settings_dot_settings__service__pb2.UpdateSettingsResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
@@ -188,40 +188,40 @@ class SettingsServiceWSGIApplication(ConnectWSGIApplication):
     def __init__(self, service: SettingsServiceSync, interceptors: Iterable[InterceptorSync]=(), read_max_bytes: int | None = None, compressions: Iterable[Compression] | None = None) -> None:
         super().__init__(
             endpoints={
-                "/flyteidl2.org.SettingsService/GetSettings": EndpointSync.unary(
+                "/flyteidl2.settings.SettingsService/GetSettings": EndpointSync.unary(
                     method=MethodInfo(
                         name="GetSettings",
-                        service_name="flyteidl2.org.SettingsService",
+                        service_name="flyteidl2.settings.SettingsService",
                         input=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsRequest,
                         output=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsResponse,
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.get_settings,
                 ),
-                "/flyteidl2.org.SettingsService/GetSettingsForEdit": EndpointSync.unary(
+                "/flyteidl2.settings.SettingsService/GetSettingsForEdit": EndpointSync.unary(
                     method=MethodInfo(
                         name="GetSettingsForEdit",
-                        service_name="flyteidl2.org.SettingsService",
+                        service_name="flyteidl2.settings.SettingsService",
                         input=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsForEditRequest,
                         output=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsForEditResponse,
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.get_settings_for_edit,
                 ),
-                "/flyteidl2.org.SettingsService/CreateSettings": EndpointSync.unary(
+                "/flyteidl2.settings.SettingsService/CreateSettings": EndpointSync.unary(
                     method=MethodInfo(
                         name="CreateSettings",
-                        service_name="flyteidl2.org.SettingsService",
+                        service_name="flyteidl2.settings.SettingsService",
                         input=flyteidl2_dot_settings_dot_settings__service__pb2.CreateSettingsRequest,
                         output=flyteidl2_dot_settings_dot_settings__service__pb2.CreateSettingsResponse,
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.create_settings,
                 ),
-                "/flyteidl2.org.SettingsService/UpdateSettings": EndpointSync.unary(
+                "/flyteidl2.settings.SettingsService/UpdateSettings": EndpointSync.unary(
                     method=MethodInfo(
                         name="UpdateSettings",
-                        service_name="flyteidl2.org.SettingsService",
+                        service_name="flyteidl2.settings.SettingsService",
                         input=flyteidl2_dot_settings_dot_settings__service__pb2.UpdateSettingsRequest,
                         output=flyteidl2_dot_settings_dot_settings__service__pb2.UpdateSettingsResponse,
                         idempotency_level=IdempotencyLevel.UNKNOWN,
@@ -237,7 +237,7 @@ class SettingsServiceWSGIApplication(ConnectWSGIApplication):
     @property
     def path(self) -> str:
         """Returns the URL path to mount the application to when serving multiple applications."""
-        return "/flyteidl2.org.SettingsService"
+        return "/flyteidl2.settings.SettingsService"
 
 
 class SettingsServiceClientSync(ConnectClientSync):
@@ -253,7 +253,7 @@ class SettingsServiceClientSync(ConnectClientSync):
             request=request,
             method=MethodInfo(
                 name="GetSettings",
-                service_name="flyteidl2.org.SettingsService",
+                service_name="flyteidl2.settings.SettingsService",
                 input=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsRequest,
                 output=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsResponse,
                 idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
@@ -275,7 +275,7 @@ class SettingsServiceClientSync(ConnectClientSync):
             request=request,
             method=MethodInfo(
                 name="GetSettingsForEdit",
-                service_name="flyteidl2.org.SettingsService",
+                service_name="flyteidl2.settings.SettingsService",
                 input=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsForEditRequest,
                 output=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsForEditResponse,
                 idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
@@ -296,7 +296,7 @@ class SettingsServiceClientSync(ConnectClientSync):
             request=request,
             method=MethodInfo(
                 name="CreateSettings",
-                service_name="flyteidl2.org.SettingsService",
+                service_name="flyteidl2.settings.SettingsService",
                 input=flyteidl2_dot_settings_dot_settings__service__pb2.CreateSettingsRequest,
                 output=flyteidl2_dot_settings_dot_settings__service__pb2.CreateSettingsResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
@@ -316,7 +316,7 @@ class SettingsServiceClientSync(ConnectClientSync):
             request=request,
             method=MethodInfo(
                 name="UpdateSettings",
-                service_name="flyteidl2.org.SettingsService",
+                service_name="flyteidl2.settings.SettingsService",
                 input=flyteidl2_dot_settings_dot_settings__service__pb2.UpdateSettingsRequest,
                 output=flyteidl2_dot_settings_dot_settings__service__pb2.UpdateSettingsResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,

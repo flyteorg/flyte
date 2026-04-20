@@ -59,6 +59,12 @@ class RunService(Protocol):
     def watch_groups(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest, ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def get_action_data_u_r_is(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def get_action_log_context(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
 
 class RunServiceASGIApplication(ConnectASGIApplication[RunService]):
     def __init__(self, service: RunService | AsyncGenerator[RunService], *, interceptors: Iterable[Interceptor]=(), read_max_bytes: int | None = None, compressions: Iterable[Compression] | None = None) -> None:
@@ -204,6 +210,26 @@ class RunServiceASGIApplication(ConnectASGIApplication[RunService]):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.watch_groups,
+                ),
+                "/flyteidl2.workflow.RunService/GetActionDataURIs": Endpoint.unary(
+                    method=MethodInfo(
+                        name="GetActionDataURIs",
+                        service_name="flyteidl2.workflow.RunService",
+                        input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest,
+                        output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.get_action_data_u_r_is,
+                ),
+                "/flyteidl2.workflow.RunService/GetActionLogContext": Endpoint.unary(
+                    method=MethodInfo(
+                        name="GetActionLogContext",
+                        service_name="flyteidl2.workflow.RunService",
+                        input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest,
+                        output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.get_action_log_context,
                 ),
             },
             interceptors=interceptors,
@@ -508,6 +534,50 @@ class RunServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    async def get_action_data_u_r_is(
+        self,
+        request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetActionDataURIs",
+                service_name="flyteidl2.workflow.RunService",
+                input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest,
+                output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    async def get_action_log_context(
+        self,
+        request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetActionLogContext",
+                service_name="flyteidl2.workflow.RunService",
+                input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest,
+                output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
 
 class RunServiceSync(Protocol):
     def create_run(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.CreateRunRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.CreateRunResponse:
@@ -537,6 +607,10 @@ class RunServiceSync(Protocol):
     def abort_action(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def watch_groups(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsResponse]:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def get_action_data_u_r_is(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def get_action_log_context(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
@@ -683,6 +757,26 @@ class RunServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.watch_groups,
+                ),
+                "/flyteidl2.workflow.RunService/GetActionDataURIs": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="GetActionDataURIs",
+                        service_name="flyteidl2.workflow.RunService",
+                        input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest,
+                        output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.get_action_data_u_r_is,
+                ),
+                "/flyteidl2.workflow.RunService/GetActionLogContext": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="GetActionLogContext",
+                        service_name="flyteidl2.workflow.RunService",
+                        input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest,
+                        output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.get_action_log_context,
                 ),
             },
             interceptors=interceptors,
@@ -985,4 +1079,48 @@ class RunServiceClientSync(ConnectClientSync):
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+        )
+
+    def get_action_data_u_r_is(
+        self,
+        request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetActionDataURIs",
+                service_name="flyteidl2.workflow.RunService",
+                input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest,
+                output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def get_action_log_context(
+        self,
+        request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetActionLogContext",
+                service_name="flyteidl2.workflow.RunService",
+                input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest,
+                output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
         )

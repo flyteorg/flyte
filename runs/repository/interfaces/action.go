@@ -13,6 +13,9 @@ import (
 type ActionRepo interface {
 	// Run operations
 	GetRun(ctx context.Context, runID *common.RunIdentifier) (*models.Run, error)
+	// AbortRun marks only the root action as ABORTED and sets abort_requested_at on it.
+	// K8s cascades CRD deletion to child actions via OwnerReferences; the action service
+	// informer handles marking them ABORTED in DB when their CRDs are deleted.
 	AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error
 
 	// Action operations
@@ -24,6 +27,8 @@ type ActionRepo interface {
 	GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error)
 	ListActions(ctx context.Context, input ListResourceInput) ([]*models.Action, error)
 	UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time) error
+	// AbortAction marks only the targeted action as ABORTED and sets abort_requested_at.
+	// K8s cascades CRD deletion to descendants via OwnerReferences.
 	AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error
 
 	// Abort reconciliation — used by the background AbortReconciler.

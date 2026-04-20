@@ -28,5 +28,3 @@ namespace: flyte
 resources:
 - ../namespace.yaml
 - ../embedded-postgres-service.yaml
-patches:
-- path: ../minio-patch.yaml

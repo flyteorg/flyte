@@ -82,22 +82,32 @@ func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*
 	return &run, nil
 }
 
-// AbortRun aborts a run and all its actions
+// AbortRun marks only the root action as ABORTED and sets abort_requested_at on it.
+// K8s cascades CRD deletion to child actions via OwnerReferences; the action service
+// informer handles marking them ABORTED in DB when their CRDs are deleted.
 func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
 	now := time.Now()
 
-	_, err := r.db.ExecContext(ctx,
-		`UPDATE actions SET phase = $1, updated_at = $2, abort_requested_at = $3, abort_attempt_count = $4, abort_reason = $5
-		 WHERE project = $6 AND domain = $7 AND run_name = $8 AND parent_action_name IS NULL`,
+	var rootName string
+	err := r.db.QueryRowxContext(ctx,
+		`UPDATE actions SET phase = $1, updated_at = $2, abort_requested_at = $3, abort_attempt_count = $4, abort_reason = $5,
+		                    ended_at = COALESCE(ended_at, GREATEST($2, created_at)),
+		                    duration_ms = EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST($2, created_at)) - created_at)) * 1000
+		 WHERE project = $6 AND domain = $7 AND run_name = $8 AND parent_action_name IS NULL
+		 RETURNING name`,
 		int32(common.ActionPhase_ACTION_PHASE_ABORTED), now, now, 0, reason,
-		runID.Project, runID.Domain, runID.Name)
-
+		runID.Project, runID.Domain, runID.Name,
+	).Scan(&rootName)
+	if errors.Is(err, sql.ErrNoRows) {
+		return fmt.Errorf("run not found: %w", sql.ErrNoRows)
+	}
 	if err != nil {
 		return fmt.Errorf("failed to abort run: %w", err)
 	}
 
-	// Notify run subscribers.
+	rootID := &common.ActionIdentifier{Run: runID, Name: rootName}
 	r.notifyRunUpdate(ctx, runID)
+	r.notifyActionUpdate(ctx, rootID)
 
 	logger.Infof(ctx, "Aborted run: %s/%s/%s", runID.Project, runID.Domain, runID.Name)
 	return nil
@@ -206,14 +216,21 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, up
 	}
 	defer func() { _ = tx.Rollback() }()
 
+	// Use the model's CreatedAt if set (e.g. trace actions use start_time so parents
+	// sort before children), otherwise fall back to the current time.
+	createdAt := action.CreatedAt
+	if createdAt.IsZero() {
+		createdAt = time.Now()
+	}
+
 	result, err := tx.ExecContext(ctx,
-		`INSERT INTO actions (project, domain, run_name, name, parent_action_name, phase, run_source, action_type, action_group, task_project, task_domain, task_name, task_version, task_type, task_short_name, function_name, environment_name, action_spec, action_details, detailed_info, run_spec, attempts, cache_status, trigger_name, trigger_task_name, trigger_revision)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26)
+		`INSERT INTO actions (project, domain, run_name, name, parent_action_name, phase, run_source, action_type, action_group, task_project, task_domain, task_name, task_version, task_type, task_short_name, function_name, environment_name, action_spec, action_details, detailed_info, run_spec, attempts, cache_status, trigger_name, trigger_task_name, trigger_revision, created_at, ended_at, duration_ms)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, CASE WHEN $28::timestamptz IS NOT NULL THEN EXTRACT(EPOCH FROM (GREATEST($28::timestamptz, $27) - $27)) * 1000 ELSE NULL END)
 		 ON CONFLICT DO NOTHING`,
 		action.Project, action.Domain, action.RunName, action.Name, action.ParentActionName, action.Phase, action.RunSource, action.ActionType, action.ActionGroup,
 		action.TaskProject, action.TaskDomain, action.TaskName, action.TaskVersion, action.TaskType, action.TaskShortName, action.FunctionName, action.EnvironmentName,
 		action.ActionSpec, action.ActionDetails, action.DetailedInfo, action.RunSpec, action.Attempts, action.CacheStatus,
-		action.TriggerName, action.TriggerTaskName, action.TriggerRevision)
+		action.TriggerName, action.TriggerTaskName, action.TriggerRevision, createdAt, action.EndedAt)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create action: %w", err)
 	}
@@ -371,7 +388,6 @@ func (r *actionRepo) UpdateActionPhase(
 		return err
 	}
 	if rowsAffected > 0 {
-		// Notify subscribers of the action update
 		r.notifyActionUpdate(ctx, actionID)
 	}
 
@@ -384,24 +400,29 @@ func (r *actionRepo) UpdateActionPhase(
 	return nil
 }
 
-// AbortAction aborts a specific action
+// AbortAction marks only the targeted action as ABORTED and sets abort_requested_at.
+// K8s cascades CRD deletion to descendants via OwnerReferences; the action service
+// informer handles marking them ABORTED in DB when their CRDs are deleted.
 func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
 	now := time.Now()
 
-	_, err := r.db.ExecContext(ctx,
-		`UPDATE actions SET phase = $1, updated_at = $2, abort_requested_at = $3, abort_attempt_count = $4, abort_reason = $5
+	result, err := r.db.ExecContext(ctx,
+		`UPDATE actions SET phase = $1, updated_at = $2, abort_requested_at = $3, abort_attempt_count = $4, abort_reason = $5,
+		                    ended_at = COALESCE(ended_at, GREATEST($2, created_at)),
+		                    duration_ms = EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST($2, created_at)) - created_at)) * 1000
 		 WHERE project = $6 AND domain = $7 AND run_name = $8 AND name = $9`,
 		int32(common.ActionPhase_ACTION_PHASE_ABORTED), now, now, 0, reason,
 		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
-
 	if err != nil {
 		return fmt.Errorf("failed to abort action: %w", err)
 	}
+	if n, _ := result.RowsAffected(); n == 0 {
+		return fmt.Errorf("action not found: %w", sql.ErrNoRows)
+	}
 
-	// Notify action subscribers.
 	r.notifyActionUpdate(ctx, actionID)
 
-	logger.Infof(ctx, "Aborted action: %s", actionID.Name)
+	logger.Infof(ctx, "AbortAction: aborted %s", actionID.Name)
 	return nil
 }
 
@@ -435,7 +456,7 @@ func (r *actionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.Acti
 // ClearAbortRequest clears abort_requested_at (and resets counters) once the pod is confirmed terminated.
 func (r *actionRepo) ClearAbortRequest(ctx context.Context, actionID *common.ActionIdentifier) error {
 	_, err := r.db.ExecContext(ctx,
-		`UPDATE actions SET abort_requested_at = NULL, abort_attempt_count = 0, abort_reason = NULL, updated_at = $1
+		`UPDATE actions SET abort_requested_at = NULL, abort_attempt_count = 0, updated_at = $1
 		 WHERE project = $2 AND domain = $3 AND run_name = $4 AND name = $5`,
 		time.Now(), actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 	if err != nil {
@@ -796,7 +817,7 @@ func (r *actionRepo) processNotifications() {
 					select {
 					case ch <- notif.Extra:
 					default:
-						logger.Warnf(context.Background(), "Action subscriber channel full, dropping notification")
+						logger.Warnf(context.Background(), "Action subscriber channel full, dropping notification payload=%s", notif.Extra)
 					}
 				}
 				r.mu.RUnlock()

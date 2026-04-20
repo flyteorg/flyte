@@ -60,7 +60,7 @@ RUN set -ex; \
     rm -rf /tmp/pg-tmp
 
 
-FROM rancher/k3s:v1.29.0-k3s1
+FROM rancher/k3s:v1.34.6-k3s1
 
 ARG TARGETARCH
 

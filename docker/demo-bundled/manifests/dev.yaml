@@ -291,20 +291,6 @@ spec:
       status: {}
 ---
 apiVersion: v1
-automountServiceAccountToken: true
-kind: ServiceAccount
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-demo
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: minio
-    helm.sh/chart: minio-12.6.7
-  name: minio
-  namespace: flyte
-secrets:
-- name: minio
----
-apiVersion: v1
 data:
   config.yml: |-
     health:
@@ -357,16 +343,17 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  root-password: bWluaW9zdG9yYWdl
-  root-user: bWluaW8=
+  access-key: cnVzdGZz
+  secret-key: cnVzdGZzc3RvcmFnZQ==
 kind: Secret
 metadata:
   labels:
     app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: minio
-    helm.sh/chart: minio-12.6.7
-  name: minio
+    app.kubernetes.io/name: flyte-demo
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-demo-0.1.0
+  name: rustfs
   namespace: flyte
 type: Opaque
 ---
@@ -475,31 +462,6 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app.kubernetes.io/instance: flyte-demo
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: minio
-    helm.sh/chart: minio-12.6.7
-  name: minio
-  namespace: flyte
-spec:
-  externalTrafficPolicy: Cluster
-  ports:
-  - name: minio-api
-    nodePort: 30002
-    port: 9000
-    targetPort: minio-api
-  - name: minio-console
-    port: 9001
-    targetPort: minio-console
-  selector:
-    app.kubernetes.io/instance: flyte-demo
-    app.kubernetes.io/name: minio
-  type: NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
     app.kubernetes.io/name: embedded-postgresql
   name: postgresql
   namespace: flyte
@@ -512,6 +474,28 @@ spec:
   type: NodePort
 ---
 apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-demo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-demo
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-demo-0.1.0
+  name: rustfs
+  namespace: flyte
+spec:
+  ports:
+  - name: rustfs-api
+    nodePort: 30002
+    port: 9000
+    targetPort: rustfs-api
+  selector:
+    app.kubernetes.io/instance: flyte-demo
+    app.kubernetes.io/name: rustfs
+  type: NodePort
+---
+apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
@@ -520,7 +504,7 @@ metadata:
     app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-demo-0.1.0
-  name: flyte-demo-minio-storage
+  name: flyte-demo-rustfs-storage
   namespace: flyte
 spec:
   accessModes:
@@ -528,7 +512,7 @@ spec:
   capacity:
     storage: 1Gi
   hostPath:
-    path: /var/lib/flyte/storage/minio
+    path: /var/lib/flyte/storage/rustfs
   storageClassName: manual
 ---
 apiVersion: v1
@@ -540,7 +524,7 @@ metadata:
     app.kubernetes.io/name: flyte-demo
     app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-demo-0.1.0
-  name: flyte-demo-minio-storage
+  name: flyte-demo-rustfs-storage
   namespace: flyte
 spec:
   accessModes:
@@ -549,7 +533,7 @@ spec:
     requests:
       storage: 1Gi
   storageClassName: manual
-  volumeName: flyte-demo-minio-storage
+  volumeName: flyte-demo-rustfs-storage
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -671,134 +655,87 @@ metadata:
   labels:
     app.kubernetes.io/instance: flyte-demo
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: minio
-    helm.sh/chart: minio-12.6.7
-  name: minio
+    app.kubernetes.io/name: flyte-demo
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-demo-0.1.0
+  name: rustfs
   namespace: flyte
 spec:
   selector:
     matchLabels:
       app.kubernetes.io/instance: flyte-demo
-      app.kubernetes.io/name: minio
+      app.kubernetes.io/name: rustfs
   strategy:
     type: Recreate
   template:
     metadata:
-      annotations:
-        checksum/credentials-secret: 70a50b2590b643d9455442f95a5505c0dc0931c95f5a5593efed8afd4035aa2a
       labels:
         app.kubernetes.io/instance: flyte-demo
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: minio
-        helm.sh/chart: minio-12.6.7
+        app.kubernetes.io/name: rustfs
     spec:
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/instance: flyte-demo
-                  app.kubernetes.io/name: minio
-              topologyKey: kubernetes.io/hostname
-            weight: 1
       containers:
-      - command:
-        - minio
-        - server
-        - /data
-        - --console-address
-        - :9001
-        env:
-        - name: BITNAMI_DEBUG
-          value: "false"
-        - name: MINIO_SCHEME
-          value: http
-        - name: MINIO_FORCE_NEW_KEYS
-          value: "no"
-        - name: MINIO_ROOT_USER
+      - env:
+        - name: RUSTFS_ADDRESS
+          value: 0.0.0.0:9000
+        - name: RUSTFS_VOLUMES
+          value: /data
+        - name: RUSTFS_ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              key: root-user
-              name: minio
-        - name: MINIO_ROOT_PASSWORD
+              key: access-key
+              name: rustfs
+        - name: RUSTFS_SECRET_KEY
           valueFrom:
             secretKeyRef:
-              key: root-password
-              name: minio
-        - name: MINIO_DEFAULT_BUCKETS
-          value: flyte-data
-        - name: MINIO_BROWSER
-          value: "on"
-        - name: MINIO_PROMETHEUS_AUTH_TYPE
-          value: public
-        - name: MINIO_CONSOLE_PORT_NUMBER
-          value: "9001"
-        - name: MINIO_BROWSER_REDIRECT_URL
-          value: http://localhost:30080/minio
-        image: docker.io/bitnami/minio:sandbox
+              key: secret-key
+              name: rustfs
+        image: rustfs/rustfs:sandbox
         imagePullPolicy: Never
         livenessProbe:
           failureThreshold: 5
-          httpGet:
-            path: /minio/health/live
-            port: minio-api
-            scheme: HTTP
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          successThreshold: 1
-          timeoutSeconds: 5
-        name: minio
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          tcpSocket:
+            port: rustfs-api
+        name: rustfs
         ports:
         - containerPort: 9000
-          name: minio-api
-          protocol: TCP
-        - containerPort: 9001
-          name: minio-console
+          name: rustfs-api
           protocol: TCP
         readinessProbe:
           failureThreshold: 5
           initialDelaySeconds: 5
           periodSeconds: 5
-          successThreshold: 1
           tcpSocket:
-            port: minio-api
-          timeoutSeconds: 1
-        resources:
-          limits: {}
-          requests: {}
+            port: rustfs-api
         securityContext:
           runAsNonRoot: true
-          runAsUser: 1001
+          runAsUser: 10001
         volumeMounts:
         - mountPath: /data
           name: data
       initContainers:
       - command:
-        - /bin/bash
+        - /bin/sh
         - -ec
         - |
-          chown -R 1001:1001 /data
+          chown -R 10001:10001 /data
           mkdir -p /data/flyte-data
-          chown 1001:1001 /data/flyte-data
-        image: docker.io/bitnami/os-shell:sandbox
-        imagePullPolicy: Never
+          chown 10001:10001 /data/flyte-data
+        image: busybox:latest
+        imagePullPolicy: IfNotPresent
         name: volume-permissions
-        resources:
-          limits: {}
-          requests: {}
         securityContext:
           runAsUser: 0
         volumeMounts:
         - mountPath: /data
           name: data
       securityContext:
-        fsGroup: 1001
-      serviceAccountName: minio
+        fsGroup: 10001
       volumes:
       - name: data
         persistentVolumeClaim:
-          claimName: flyte-demo-minio-storage
+          claimName: flyte-demo-rustfs-storage
 ---
 apiVersion: helm.cattle.io/v1
 kind: HelmChartConfig
@@ -883,44 +820,3 @@ spec:
               number: 8090
         path: /flyteidl2.
         pathType: Prefix
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: flyte-strip-minio@kubernetescrd
-  labels:
-    app.kubernetes.io/instance: flyte-demo
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-demo
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-demo-0.1.0
-  name: flyte-demo-minio
-  namespace: flyte
-spec:
-  rules:
-  - http:
-      paths:
-      - backend:
-          service:
-            name: minio
-            port:
-              number: 9001
-        path: /minio
-        pathType: Prefix
----
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-demo
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-demo
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-demo-0.1.0
-  name: strip-minio
-  namespace: flyte
-spec:
-  stripPrefix:
-    prefixes:
-    - /minio
