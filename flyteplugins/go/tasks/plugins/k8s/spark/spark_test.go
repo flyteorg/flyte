@@ -25,6 +25,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
 )
@@ -98,8 +99,10 @@ func TestGetEventInfo(t *testing.T) {
 			},
 		},
 	}))
-	taskCtx := dummySparkTaskContext(dummySparkTaskTemplateContainer("blah-1", dummySparkConf), false, k8s.PluginState{})
-	info, err := getEventInfoForSpark(taskCtx, dummySparkApplication(sj.RunningState))
+
+	taskTemplate := dummySparkTaskTemplateContainer("blah-1", dummySparkConf)
+	taskCtx := dummySparkTaskContext(taskTemplate, false, k8s.PluginState{})
+	info, err := getEventInfoForSpark(taskCtx, dummySparkApplication(sj.RunningState), taskTemplate)
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 6)
 	assert.Equal(t, "https://spark-ui.flyte", info.CustomInfo.GetFields()[sparkDriverUI].GetStringValue())
@@ -119,7 +122,7 @@ func TestGetEventInfo(t *testing.T) {
 
 	assert.Equal(t, expectedLinks, generatedLinks)
 
-	info, err = getEventInfoForSpark(taskCtx, dummySparkApplication(sj.SubmittedState))
+	info, err = getEventInfoForSpark(taskCtx, dummySparkApplication(sj.SubmittedState), taskTemplate)
 	assert.NoError(t, err)
 
 	generatedLinks = make([]string, 0, len(info.Logs))
@@ -150,7 +153,7 @@ func TestGetEventInfo(t *testing.T) {
 		},
 	}))
 
-	info, err = getEventInfoForSpark(taskCtx, dummySparkApplication(sj.FailedState))
+	info, err = getEventInfoForSpark(taskCtx, dummySparkApplication(sj.FailedState), taskTemplate)
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 5)
 	assert.Equal(t, "spark-history.flyte/history/app-id", info.CustomInfo.GetFields()[sparkHistoryUI].GetStringValue())
@@ -1139,6 +1142,41 @@ func TestBuildResourceCustomK8SPod(t *testing.T) {
 	assert.Equal(t, intPtr(int32(instances)), sparkApp.Spec.Executor.Instances)
 	assert.Equal(t, intPtr(int32(cores)), sparkApp.Spec.Executor.Cores)
 	assert.Equal(t, dummySparkConf["spark.executor.memory"], *sparkApp.Spec.Executor.Memory)
+}
+
+func TestGetEventInfo_DynamicLogLinks(t *testing.T) {
+	dynamicLinks := map[string]tasklog.TemplateLogPlugin{
+		"test-dynamic-link": {
+			TemplateURIs: []tasklog.TemplateURI{"https://some-service.com/{{.taskConfig.dynamicParam}}"},
+		},
+	}
+
+	assert.NoError(t, setSparkConfig(&Config{
+		LogConfig: LogConfig{
+			Mixed: logs.LogConfig{
+				DynamicLogLinks: dynamicLinks,
+			},
+		},
+	}))
+
+	taskTemplate := dummySparkTaskTemplateContainer("blah-1", dummySparkConf)
+	taskTemplate.Config = map[string]string{
+		"link_type":    "test-dynamic-link",
+		"dynamicParam": "dynamic-value",
+	}
+
+	taskCtx := dummySparkTaskContext(taskTemplate, false, k8s.PluginState{})
+	info, err := getEventInfoForSpark(taskCtx, dummySparkApplication(sj.RunningState), taskTemplate)
+	assert.NoError(t, err)
+
+	var dynamicLog *core.TaskLog
+	for _, l := range info.Logs {
+		if l.GetUri() == "https://some-service.com/dynamic-value" {
+			dynamicLog = l
+			break
+		}
+	}
+	assert.NotNil(t, dynamicLog, "expected dynamic log link in task logs")
 }
 
 func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {

@@ -1181,6 +1181,10 @@ func newPluginContext(pluginState k8s.PluginState) k8s.PluginContext {
 
 	plg.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 
+	taskReader := &mocks.TaskReader{}
+	taskReader.EXPECT().Read(mock.Anything).Return(&core.TaskTemplate{}, nil)
+	plg.EXPECT().TaskReader().Return(taskReader)
+
 	return plg
 }
 
@@ -1362,10 +1366,12 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
 			ti, err := getEventInfoForRayJob(
 				logs.LogConfig{Templates: []tasklog.TemplateLogPlugin{tc.logPlugin}},
 				pluginCtx,
 				&tc.rayJob,
+				taskTemplate,
 			)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
@@ -1461,10 +1467,13 @@ func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+
 			ti, err := getEventInfoForRayJob(
 				logs.LogConfig{Templates: []tasklog.TemplateLogPlugin{tc.logPlugin}},
 				pluginCtx,
 				&tc.rayJob,
+				taskTemplate,
 			)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
@@ -1516,8 +1525,9 @@ func TestGetEventInfo_DashboardURL(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
 			assert.NoError(t, SetConfig(&Config{DashboardURLTemplate: &tc.dashboardURLTemplate}))
-			ti, err := getEventInfoForRayJob(logs.LogConfig{}, pluginCtx, &tc.rayJob)
+			ti, err := getEventInfoForRayJob(logs.LogConfig{}, pluginCtx, &tc.rayJob, taskTemplate)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
 		})
@@ -1568,12 +1578,46 @@ func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+
 			assert.NoError(t, SetConfig(&Config{DashboardURLTemplate: &tc.dashboardURLTemplate}))
-			ti, err := getEventInfoForRayJob(logs.LogConfig{}, pluginCtx, &tc.rayJob)
+			ti, err := getEventInfoForRayJob(logs.LogConfig{}, pluginCtx, &tc.rayJob, taskTemplate)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
 		})
 	}
+}
+
+func TestGetEventInfo_DynamicLogLinks(t *testing.T) {
+	pluginCtx := newPluginContext(k8s.PluginState{})
+
+	dynamicLinks := map[string]tasklog.TemplateLogPlugin{
+		"test-dynamic-link": {
+			TemplateURIs: []tasklog.TemplateURI{"https://some-service.com/{{.taskConfig.dynamicParam}}"},
+		},
+	}
+
+	taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+	taskTemplate.Config = map[string]string{
+		"link_type":    "test-dynamic-link",
+		"dynamicParam": "dynamic-value",
+	}
+
+	rayJob := rayv1.RayJob{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: "test-namespace",
+		},
+	}
+
+	ti, err := getEventInfoForRayJob(
+		logs.LogConfig{DynamicLogLinks: dynamicLinks},
+		pluginCtx,
+		&rayJob,
+		taskTemplate,
+	)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(ti.Logs))
+	assert.Equal(t, "https://some-service.com/dynamic-value", ti.Logs[0].GetUri())
 }
 
 func TestGetPropertiesRay(t *testing.T) {
