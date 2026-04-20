@@ -935,7 +935,12 @@ func (s *RunService) ListActions(
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
-	listInput.Filter = impl.NewRunActionsFilter(req.Msg.RunId)
+	runFilter := interfaces.Filter(impl.NewRunActionsFilter(req.Msg.RunId))
+	if listInput.Filter == nil {
+		listInput.Filter = runFilter
+	} else {
+		listInput.Filter = runFilter.And(listInput.Filter)
+	}
 
 	actions, err := s.repo.ActionRepo().ListActions(ctx, listInput)
 	if err != nil {
