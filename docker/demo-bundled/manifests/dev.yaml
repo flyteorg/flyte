@@ -629,7 +629,7 @@ spec:
         app.kubernetes.io/name: flyte-demo
     spec:
       containers:
-      - image: ghcr.io/flyteorg/flyte-client-v2:latest
+      - image: docker.io/unionai-oss/flyteconsole-v2:sandbox
         imagePullPolicy: Never
         livenessProbe:
           httpGet:
