@@ -15,22 +15,22 @@ class SettingsServiceStub(object):
             channel: A grpc.Channel.
         """
         self.GetSettings = channel.unary_unary(
-                '/flyteidl2.org.SettingsService/GetSettings',
+                '/flyteidl2.settings.SettingsService/GetSettings',
                 request_serializer=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsResponse.FromString,
                 )
         self.GetSettingsForEdit = channel.unary_unary(
-                '/flyteidl2.org.SettingsService/GetSettingsForEdit',
+                '/flyteidl2.settings.SettingsService/GetSettingsForEdit',
                 request_serializer=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsForEditRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsForEditResponse.FromString,
                 )
         self.CreateSettings = channel.unary_unary(
-                '/flyteidl2.org.SettingsService/CreateSettings',
+                '/flyteidl2.settings.SettingsService/CreateSettings',
                 request_serializer=flyteidl2_dot_settings_dot_settings__service__pb2.CreateSettingsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_settings_dot_settings__service__pb2.CreateSettingsResponse.FromString,
                 )
         self.UpdateSettings = channel.unary_unary(
-                '/flyteidl2.org.SettingsService/UpdateSettings',
+                '/flyteidl2.settings.SettingsService/UpdateSettings',
                 request_serializer=flyteidl2_dot_settings_dot_settings__service__pb2.UpdateSettingsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_settings_dot_settings__service__pb2.UpdateSettingsResponse.FromString,
                 )
@@ -97,7 +97,7 @@ def add_SettingsServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl2.org.SettingsService', rpc_method_handlers)
+            'flyteidl2.settings.SettingsService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -116,7 +116,7 @@ class SettingsService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.org.SettingsService/GetSettings',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.settings.SettingsService/GetSettings',
             flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsRequest.SerializeToString,
             flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsResponse.FromString,
             options, channel_credentials,
@@ -133,7 +133,7 @@ class SettingsService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.org.SettingsService/GetSettingsForEdit',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.settings.SettingsService/GetSettingsForEdit',
             flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsForEditRequest.SerializeToString,
             flyteidl2_dot_settings_dot_settings__service__pb2.GetSettingsForEditResponse.FromString,
             options, channel_credentials,
@@ -150,7 +150,7 @@ class SettingsService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.org.SettingsService/CreateSettings',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.settings.SettingsService/CreateSettings',
             flyteidl2_dot_settings_dot_settings__service__pb2.CreateSettingsRequest.SerializeToString,
             flyteidl2_dot_settings_dot_settings__service__pb2.CreateSettingsResponse.FromString,
             options, channel_credentials,
@@ -167,7 +167,7 @@ class SettingsService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.org.SettingsService/UpdateSettings',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.settings.SettingsService/UpdateSettings',
             flyteidl2_dot_settings_dot_settings__service__pb2.UpdateSettingsRequest.SerializeToString,
             flyteidl2_dot_settings_dot_settings__service__pb2.UpdateSettingsResponse.FromString,
             options, channel_credentials,

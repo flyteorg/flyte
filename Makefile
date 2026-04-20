@@ -83,9 +83,10 @@ sep:
 # Helper to time a step: $(call timed,step_name,command)
 define timed
 	@start=$$(date +%s); \
-	$(2); \
+	$(2); rc=$$?; \
 	elapsed=$$((  $$(date +%s) - $$start )); \
-	echo "⏱  $(1) completed in $${elapsed}s"
+	echo "⏱  $(1) completed in $${elapsed}s"; \
+	exit $$rc
 endef
 
 .PHONY: buf-dep

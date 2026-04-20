@@ -152,20 +152,13 @@ jobs:
             type=raw,value=nightly,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/v2' }}
             type=sha,format=long,
       - name: Login to GitHub Container Registry
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
-      - name: Save console image tarballs
-        run: |
-          mkdir -p docker/demo-bundled/images/tar/amd64 docker/demo-bundled/images/tar/arm64
-          docker pull --platform linux/amd64 ghcr.io/flyteorg/flyte-client-v2:latest
-          docker save ghcr.io/flyteorg/flyte-client-v2:latest -o docker/demo-bundled/images/tar/amd64/flyte-client-v2.tar
-          docker pull --platform linux/arm64 ghcr.io/flyteorg/flyte-client-v2:latest
-          docker save ghcr.io/flyteorg/flyte-client-v2:latest -o docker/demo-bundled/images/tar/arm64/flyte-client-v2.tar
       - name: Build and push multi-arch image
-        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: docker/build-push-action@v6
         with:
           context: docker/demo-bundled
@@ -173,4 +166,4 @@ jobs:
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
           build-args: "FLYTE_DEMO_VERSION=${{ env.FLYTE_DEMO_VERSION }}"
-          push: true
+          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}

@@ -274,6 +274,12 @@ func PhaseInfoSuccess(info *TaskInfo) PhaseInfo {
 	return phaseInfo(PhaseSuccess, DefaultPhaseVersion, nil, info, false)
 }
 
+func PhaseInfoAborted(t time.Time, version uint32, reason string) PhaseInfo {
+	pi := phaseInfo(PhaseAborted, version, nil, &TaskInfo{OccurredAt: &t}, false)
+	pi.reason = reason
+	return pi
+}
+
 func PhaseInfoSystemFailure(code, reason string, info *TaskInfo) PhaseInfo {
 	return phaseInfoFailed(PhasePermanentFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_SYSTEM}, info, false)
 }

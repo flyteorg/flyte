@@ -7,6 +7,3 @@ deps:
   - name: buf.build/googleapis/googleapis
     commit: 62f35d8aed1149c291d606d958a7ce32
     digest: b5:d66bf04adc77a0870bdc9328aaf887c7188a36fb02b83a480dc45ef9dc031b4d39fc6e9dc6435120ccf4fe5bfd5c6cb6592533c6c316595571f9a31420ab47fe
-  - name: buf.build/grpc-ecosystem/grpc-gateway
-    commit: 4836b6d552304e1bbe47e66a523f0daa
-    digest: b5:c3fefd4d3dfa9b0478bbb1a4ad87d7b38146e3ce6eff4214e32f2c5834c2e4afc3be218316f0fbd53e925a001c3ed1e2fc99fb76b3121ede642989f0d0d7c71c

@@ -3,12 +3,13 @@ package dataproxy
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"net/http"
 
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+
 	"github.com/flyteorg/flyte/v2/dataproxy/config"
-	"github.com/flyteorg/flyte/v2/dataproxy/service"
 	"github.com/flyteorg/flyte/v2/dataproxy/logs"
+	"github.com/flyteorg/flyte/v2/dataproxy/service"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster/clusterconnect"
@@ -42,7 +43,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted DataProxyService at %s", path)
 
-	clusterSvc := service.NewClusterService(baseURL)
+	clusterSvc := service.NewClusterService()
 	clusterPath, clusterHandler := clusterconnect.NewClusterServiceHandler(clusterSvc)
 	sc.Mux.Handle(clusterPath, clusterHandler)
 	logger.Infof(ctx, "Mounted ClusterService at %s", clusterPath)
