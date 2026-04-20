@@ -92,7 +92,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(authMetadataPath, authMetadataHandler)
 	logger.Infof(ctx, "Mounted AuthMetadataService at %s", authMetadataPath)
 
-	triggerSvc := service.NewTriggerService()
+	triggerSvc := service.NewTriggerService(repo)
 	triggerPath, triggerHandler := triggerconnect.NewTriggerServiceHandler(triggerSvc)
 	sc.Mux.Handle(triggerPath, triggerHandler)
 	logger.Infof(ctx, "Mounted TriggerService at %s", triggerPath)

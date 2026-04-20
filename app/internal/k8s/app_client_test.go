@@ -283,7 +283,7 @@ func TestList(t *testing.T) {
 		},
 	}
 
-	apps, nextToken, err := c.List(context.Background(), "proj", "dev", 0, "")
+	apps, nextToken, err := c.List(context.Background(), "proj", "dev", "", 0, "")
 	require.NoError(t, err)
 	assert.Empty(t, nextToken)
 	require.Len(t, apps, 1)
