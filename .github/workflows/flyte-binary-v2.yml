@@ -167,3 +167,24 @@ jobs:
           tags: ${{ steps.image-names.outputs.tags }}
           build-args: "FLYTE_DEMO_VERSION=${{ env.FLYTE_DEMO_VERSION }}"
           push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+      - name: Prepare GPU Image Names
+        id: gpu-image-names
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flyte-demo
+            ghcr.io/${{ github.repository_owner }}/flyte-sandbox-v2
+          tags: |
+            type=raw,value=gpu-latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/v2' }}
+            type=raw,value=gpu-nightly,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/v2' }}
+            type=sha,format=long,prefix=gpu-
+      - name: Build and push GPU multi-arch image
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/demo-bundled
+          file: docker/demo-bundled/Dockerfile.gpu
+          allow: "security.insecure"
+          platforms: linux/arm64, linux/amd64
+          tags: ${{ steps.gpu-image-names.outputs.tags }}
+          build-args: "FLYTE_DEMO_VERSION=${{ env.FLYTE_DEMO_VERSION }}"
+          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
