@@ -772,9 +772,8 @@ func TestListRuns(t *testing.T) {
 		})
 	}
 	type mockListRes struct {
-		runs  []*models.Run
-		token string
-		err   error
+		runs []*models.Run
+		err  error
 	}
 	testCases := []struct {
 		name    string
@@ -791,20 +790,20 @@ func TestListRuns(t *testing.T) {
 		{
 			"list with limit 2 and token",
 			&common.ListRequest{Limit: 2, Token: "5"},
-			mockListRes{runs: sqlRes[5:7], token: "7", err: nil},
+			mockListRes{runs: sqlRes[5:7], err: nil},
 			&workflow.ListRunsResponse{Runs: runs[5:7], Token: "7"},
 		},
 		{
 			"list with limit 3 and token",
 			&common.ListRequest{Limit: 3, Token: "8"},
-			mockListRes{runs: sqlRes[8:10], token: "", err: nil},
+			mockListRes{runs: sqlRes[8:10], err: nil},
 			&workflow.ListRunsResponse{Runs: runs[8:10], Token: ""},
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			req := connect.NewRequest(&workflow.ListRunsRequest{Request: tc.req})
-			actionRepo.On("ListRuns", mock.Anything, req.Msg).Return(tc.mockRes.runs, tc.mockRes.token, tc.mockRes.err)
+			actionRepo.On("ListActions", mock.Anything, mock.Anything).Return(tc.mockRes.runs, tc.mockRes.err).Once()
 			got, err := svc.ListRuns(context.Background(), req)
 			assert.NoError(t, err)
 			assert.Equal(t, len(tc.expect.Runs), len(got.Msg.Runs))
