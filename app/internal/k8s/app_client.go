@@ -53,9 +53,10 @@ type AppK8sClientInterface interface {
 	GetStatus(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.Status, error)
 
 	// List returns apps for the given project/domain scope with optional pagination.
+	// If appName is non-empty, only the app with that name is returned.
 	// limit=0 means no limit. token is the K8s continue token from a previous call.
 	// Returns the apps, the continue token for the next page (empty if last page), and any error.
-	List(ctx context.Context, project, domain string, limit uint32, token string) ([]*flyteapp.App, string, error)
+	List(ctx context.Context, project, domain, appName string, limit uint32, token string) ([]*flyteapp.App, string, error)
 
 	// Delete removes the KService CRD entirely. The app must be re-created from scratch.
 	// Use Stop to scale to zero while preserving the KService.
@@ -269,12 +270,16 @@ func (c *AppK8sClient) GetStatus(ctx context.Context, appID *flyteapp.Identifier
 }
 
 // List returns apps for the given project/domain scope with optional pagination.
-func (c *AppK8sClient) List(ctx context.Context, project, domain string, limit uint32, token string) ([]*flyteapp.App, string, error) {
+func (c *AppK8sClient) List(ctx context.Context, project, domain, appName string, limit uint32, token string) ([]*flyteapp.App, string, error) {
 	ns := appNamespace(project, domain)
 
+	matchLabels := client.MatchingLabels{labelAppManaged: "true"}
+	if appName != "" {
+		matchLabels[labelAppName] = strings.ToLower(appName)
+	}
 	listOpts := []client.ListOption{
 		client.InNamespace(ns),
-		client.MatchingLabels{labelAppManaged: "true"},
+		matchLabels,
 	}
 	if limit > 0 {
 		listOpts = append(listOpts, client.Limit(int64(limit)))
