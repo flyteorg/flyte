@@ -9,14 +9,12 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class TailLogsRequest(_message.Message):
-    __slots__ = ["action_id", "attempt", "pod_name"]
+    __slots__ = ["action_id", "attempt"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     ATTEMPT_FIELD_NUMBER: _ClassVar[int]
-    POD_NAME_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     attempt: int
-    pod_name: str
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., pod_name: _Optional[str] = ...) -> None: ...
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ...) -> None: ...
 
 class TailLogsResponse(_message.Message):
     __slots__ = ["logs"]

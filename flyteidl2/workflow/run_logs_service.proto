@@ -24,9 +24,6 @@ message TailLogsRequest {
 
   // The attempt number.
   uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
-
-  // The pod name to tail logs from. If not provided, attempt to find the primary pod, else assume the first pod.
-  string pod_name = 3;
 }
 
 // Reponse message for tailing logs.
