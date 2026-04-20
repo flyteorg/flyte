@@ -9,7 +9,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
-"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
 	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
@@ -91,7 +91,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(authMetadataPath, authMetadataHandler)
 	logger.Infof(ctx, "Mounted AuthMetadataService at %s", authMetadataPath)
 
-triggerSvc := service.NewTriggerService()
+	triggerSvc := service.NewTriggerService()
 	triggerPath, triggerHandler := triggerconnect.NewTriggerServiceHandler(triggerSvc)
 	sc.Mux.Handle(triggerPath, triggerHandler)
 	logger.Infof(ctx, "Mounted TriggerService at %s", triggerPath)
