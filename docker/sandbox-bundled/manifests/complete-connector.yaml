@@ -516,7 +516,7 @@ data:
         - FLYTE_AWS_ACCESS_KEY_ID: minio
         - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
         - FLYTE_PLATFORM_URL: 'flyte-sandbox-grpc.flyte:8089'
-        - FLYTE_PLATFORM_INSECURE: true
+        - FLYTE_PLATFORM_INSECURE: 'true'
     storage:
       signedURL:
         stowConfigOverride:
