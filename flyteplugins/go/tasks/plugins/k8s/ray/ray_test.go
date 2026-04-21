@@ -1649,7 +1649,7 @@ func TestConvertResourceEntriesToResourceList(t *testing.T) {
 	}
 }
 
-func TestNewAutoscalerOptions(t *testing.T) {
+func TestBuildAutoscalerOptions(t *testing.T) {
 	t.Run("nil input returns nil", func(t *testing.T) {
 		assert.Nil(t, buildAutoscalerOptions(nil))
 	})
@@ -1681,6 +1681,12 @@ func TestNewAutoscalerOptions(t *testing.T) {
 		assert.Equal(t, "my-image:latest", *result.Image)
 	})
 
+	t.Run("idle timeout zero should not be set", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{})
+		require.NotNil(t, result)
+		assert.Nil(t, result.IdleTimeoutSeconds)
+	})
+
 	t.Run("image nil when empty", func(t *testing.T) {
 		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{Image: ""})
 		require.NotNil(t, result)
@@ -1710,7 +1716,7 @@ func TestNewAutoscalerOptions(t *testing.T) {
 
 	t.Run("env literal value", func(t *testing.T) {
 		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{
-			Env: []*core.KeyValuePair{{Key: "FOO", Value: "bar"}},
+			Env: []*core.KeyValuePair{{Key: "FOO", Value: "bar"}, {Key: "NULL", Value: ""}},
 		})
 		require.NotNil(t, result)
 		require.Len(t, result.Env, 1)

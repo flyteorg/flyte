@@ -131,11 +131,12 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 }
 
 func buildAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.AutoscalerOptions {
-	var autoScalarOptions *rayv1.AutoscalerOptions
+	var autoScalerOptions *rayv1.AutoscalerOptions
 	if options != nil {
-		autoScalarOptions = &rayv1.AutoscalerOptions{}
-		idleTimeoutTime := options.GetIdleTimeoutSeconds()
-		autoScalarOptions.IdleTimeoutSeconds = &idleTimeoutTime
+		autoScalerOptions = &rayv1.AutoscalerOptions{}
+		if idleTimeoutTime := options.GetIdleTimeoutSeconds(); idleTimeoutTime > 0 {
+			autoScalerOptions.IdleTimeoutSeconds = &idleTimeoutTime
+		}
 		if upscalingMode := options.GetUpscalingMode(); upscalingMode != plugins.AutoscalerOptions_UPSCALING_MODE_UNSPECIFIED {
 			var mode rayv1.UpscalingMode
 			switch upscalingMode {
@@ -146,10 +147,10 @@ func buildAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.Autoscale
 			case plugins.AutoscalerOptions_UPSCALING_MODE_AGGRESSIVE:
 				mode = rayv1.UpscalingMode("Aggressive")
 			}
-			autoScalarOptions.UpscalingMode = &mode
+			autoScalerOptions.UpscalingMode = &mode
 		}
 		if image := options.GetImage(); image != "" {
-			autoScalarOptions.Image = &image
+			autoScalerOptions.Image = &image
 		}
 		if res := options.GetResources(); res != nil {
 			resourceRequirements := v1.ResourceRequirements{}
@@ -159,14 +160,14 @@ func buildAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.Autoscale
 			if limits := res.GetLimits(); len(limits) > 0 {
 				resourceRequirements.Limits = convertResourceEntriesToResourceList(limits)
 			}
-			autoScalarOptions.Resources = &resourceRequirements
+			autoScalerOptions.Resources = &resourceRequirements
 		}
 		if envs := options.GetEnv(); len(envs) > 0 {
-			autoScalarOptions.Env = []v1.EnvVar{}
+			autoScalerOptions.Env = []v1.EnvVar{}
 			for _, env := range envs {
 				name := env.GetKey()
 				if val := env.GetValue(); val != "" {
-					autoScalarOptions.Env = append(autoScalarOptions.Env, v1.EnvVar{
+					autoScalerOptions.Env = append(autoScalerOptions.Env, v1.EnvVar{
 						Name:  name,
 						Value: val,
 					})
@@ -174,7 +175,7 @@ func buildAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.Autoscale
 			}
 		}
 	}
-	return autoScalarOptions
+	return autoScalerOptions
 }
 
 func convertResourceEntriesToResourceList(entries []*core.Resources_ResourceEntry) v1.ResourceList {
