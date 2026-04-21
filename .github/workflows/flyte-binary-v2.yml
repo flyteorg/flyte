@@ -151,6 +151,7 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/flyte-sandbox-v2
           tags: |
             type=raw,value=nightly,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/v2' }}
+            type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' }}
             type=sha,format=long,
       - name: Login to GitHub Container Registry
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
@@ -197,8 +198,8 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/flyte-demo
             ghcr.io/${{ github.repository_owner }}/flyte-sandbox-v2
           tags: |
-            type=raw,value=gpu-latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/v2' }}
             type=raw,value=gpu-nightly,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/v2' }}
+            type=raw,value=gpu-latest,enable=${{ github.event_name == 'workflow_dispatch' }}
             type=sha,format=long,prefix=gpu-
       - name: Build and push GPU multi-arch image
         uses: docker/build-push-action@v6

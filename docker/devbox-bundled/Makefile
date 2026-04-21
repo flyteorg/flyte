@@ -64,7 +64,8 @@ build: sync-crds flyte dep_update manifests
 build-gpu: build
 	docker buildx build --builder flyte-devbox --allow security.insecure --load \
 		--file Dockerfile.gpu \
-		--build-arg BASE_IMAGE=flyte-devbox:latest \
+		--build-context base=docker-image://flyte-devbox:latest \
+		--build-arg BASE_IMAGE=base \
 		--tag flyte-devbox:gpu-latest .
 
 # Port map
