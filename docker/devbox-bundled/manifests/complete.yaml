@@ -843,8 +843,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 2cb0adc9177b7c3b9677313b445701d8b4406e274b237c51fc71ee46ab96041f
-        checksum/secret: 45f39b1784cf14be20440fb8059d730c1d00e2d1c34e9329b76f021c0be8cfdd
+        checksum/config: 6b06ba712a995bdcc044732aa5e5b9d56ce24061c6ad5c2b7f35508a00c7863b
+        checksum/secret: 8f6b14d94a45833195baa1b863e43296aa157e65ef50c983e672c34648d36c50
       labels:
         app: docker-registry
         release: flyte-devbox
@@ -913,8 +913,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 7086d439a183c1c3cf2549a609143ac5e81a9f4dddd67c7059b969f8c6615a7e
-        checksum/configuration-secret: 4bd6625ca25de370120c59fb11b5f6d5fb70b1314b13d18f3850d76d2e452869
+        checksum/configuration: 646d21c3d7efb87ed1de45515bf092b575b364810dd9264a2d9b2e7b26ddbbcb
+        checksum/configuration-secret: e70194084619f4a1d4017093aac6367047167107fd0222513a32a61734629cac
       labels:
         app.kubernetes.io/component: flyte-binary
         app.kubernetes.io/instance: flyte-devbox

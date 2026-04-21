@@ -555,8 +555,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 2cb0adc9177b7c3b9677313b445701d8b4406e274b237c51fc71ee46ab96041f
-        checksum/secret: 45f39b1784cf14be20440fb8059d730c1d00e2d1c34e9329b76f021c0be8cfdd
+        checksum/config: 6b06ba712a995bdcc044732aa5e5b9d56ce24061c6ad5c2b7f35508a00c7863b
+        checksum/secret: 8f6b14d94a45833195baa1b863e43296aa157e65ef50c983e672c34648d36c50
       labels:
         app: docker-registry
         release: flyte-devbox
