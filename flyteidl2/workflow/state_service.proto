@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/phase.proto";
 import "flyteidl2/core/execution.proto";
+import "flyteidl2/core/literals.proto";
 import "google/rpc/status.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
@@ -104,4 +105,7 @@ message ActionUpdate {
 
   // the output uri for the action
   string output_uri = 4;
+
+  // The output literal for the action (used by condition actions).
+  optional flyteidl2.core.Literal output = 5;
 }

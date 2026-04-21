@@ -8,6 +8,7 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
 //
 // Phase transitions follow this typical flow:
 // QUEUED -> WAITING_FOR_RESOURCES -> INITIALIZING -> RUNNING -> {SUCCEEDED|FAILED|ABORTED|TIMED_OUT}
+// Condition actions: PAUSED -> {SUCCEEDED(signal)|TIMED_OUT(timeout)|ABORTED(abort)}
 enum ActionPhase {
   // Default/unknown phase
   ACTION_PHASE_UNSPECIFIED = 0;
@@ -35,4 +36,7 @@ enum ActionPhase {
 
   // Action exceeded its execution time limit
   ACTION_PHASE_TIMED_OUT = 8;
+
+  // Action is paused and waiting for an external signal (condition actions)
+  ACTION_PHASE_PAUSED = 9;
 }
