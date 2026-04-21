@@ -60,6 +60,13 @@ build: sync-crds flyte dep_update manifests
 	docker buildx build --builder flyte-demo --allow security.insecure --load \
 		--tag flyte-demo:latest .
 
+.PHONY: build-gpu
+build-gpu: build
+	docker buildx build --builder flyte-demo --allow security.insecure --load \
+		--file Dockerfile.gpu \
+		--build-arg BASE_IMAGE=flyte-demo:latest \
+		--tag flyte-demo:gpu-latest .
+
 # Port map
 # 6443 - k8s API server
 # 30000 - Docker Registry
