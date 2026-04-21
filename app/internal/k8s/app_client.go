@@ -18,7 +18,7 @@ import (
 	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/flyteorg/flyte/v2/app/config"
+	"github.com/flyteorg/flyte/v2/app/internal/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 )
@@ -78,11 +78,11 @@ type AppK8sClientInterface interface {
 type AppK8sClient struct {
 	k8sClient client.WithWatch
 	cache     ctrlcache.Cache
-	cfg       *config.AppConfig
+	cfg       *config.InternalAppConfig
 }
 
 // NewAppK8sClient creates a new AppK8sClient.
-func NewAppK8sClient(k8sClient client.WithWatch, cache ctrlcache.Cache, cfg *config.AppConfig) *AppK8sClient {
+func NewAppK8sClient(k8sClient client.WithWatch, cache ctrlcache.Cache, cfg *config.InternalAppConfig) *AppK8sClient {
 	return &AppK8sClient{
 		k8sClient: k8sClient,
 		cache:     cache,
@@ -423,7 +423,7 @@ func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 }
 
 // buildAutoscalingAnnotations returns the Knative autoscaling annotations for the revision template.
-func buildAutoscalingAnnotations(spec *flyteapp.Spec, cfg *config.AppConfig) map[string]string {
+func buildAutoscalingAnnotations(spec *flyteapp.Spec, cfg *config.InternalAppConfig) map[string]string {
 	annotations := map[string]string{}
 	autoscaling := spec.GetAutoscaling()
 	if autoscaling == nil {
