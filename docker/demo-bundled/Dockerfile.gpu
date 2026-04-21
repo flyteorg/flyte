@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.4-labs
+# syntax=docker/dockerfile:1.7-labs
 #
 # GPU-capable demo cluster image. Layers NVIDIA Container Toolkit + the
 # k8s device-plugin on top of the CPU demo image so everything that ships
