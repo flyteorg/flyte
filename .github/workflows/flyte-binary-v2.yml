@@ -170,6 +170,8 @@ jobs:
           platforms: linux/arm64, linux/amd64
           build-args: "FLYTE_DEMO_VERSION=${{ env.FLYTE_DEMO_VERSION }}"
           outputs: type=oci,dest=/tmp/cpu-oci.tar
+          cache-from: type=gha,scope=demo-cpu
+          cache-to: type=gha,mode=max,scope=demo-cpu
       - name: Extract CPU OCI layout for GPU build
         run: |
           mkdir -p /tmp/cpu-oci
@@ -184,6 +186,7 @@ jobs:
           tags: ${{ steps.image-names.outputs.tags }}
           build-args: "FLYTE_DEMO_VERSION=${{ env.FLYTE_DEMO_VERSION }}"
           push: true
+          cache-from: type=gha,scope=demo-cpu
       - name: Prepare GPU Image Names
         id: gpu-image-names
         uses: docker/metadata-action@v3
@@ -210,3 +213,5 @@ jobs:
             FLYTE_DEMO_VERSION=${{ env.FLYTE_DEMO_VERSION }}
             BASE_IMAGE=base
           push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          cache-from: type=gha,scope=demo-gpu
+          cache-to: type=gha,mode=max,scope=demo-gpu
