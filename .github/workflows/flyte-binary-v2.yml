@@ -146,6 +146,7 @@ jobs:
           # Push to both flyte-devbox and flyte-sandbox-v2 (legacy name)
           #  so existing users pulling the old image continue to work.
           images: |
+            ghcr.io/${{ github.repository_owner }}/flyte-demo
             ghcr.io/${{ github.repository_owner }}/flyte-devbox
             ghcr.io/${{ github.repository_owner }}/flyte-sandbox-v2
           tags: |
@@ -193,6 +194,7 @@ jobs:
         with:
           images: |
             ghcr.io/${{ github.repository_owner }}/flyte-devbox
+            ghcr.io/${{ github.repository_owner }}/flyte-demo
             ghcr.io/${{ github.repository_owner }}/flyte-sandbox-v2
           tags: |
             type=raw,value=gpu-latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/v2' }}
