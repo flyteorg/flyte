@@ -114,6 +114,18 @@ kubeconfig:
 	sed -i -e "/server:/ s/: .*/: https:\/\/127.0.0.1:$(shell docker port flyte-devbox | grep ^6443 | awk '{print $$3}' | awk -F: '{print $$2}')/" .kube/kubeconfig
 	echo "export KUBECONFIG=$(PWD)/.kube/kubeconfig"
 
+.PHONY: setup-knative
+setup-knative:
+	kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.21.2/serving-crds.yaml
+	kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.21.2/serving-core.yaml
+	kubectl apply -f https://github.com/knative-extensions/net-kourier/releases/download/knative-v1.21.0/kourier.yaml
+	kubectl patch configmap/config-network -n knative-serving --type merge \
+		--patch '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
+	kubectl patch configmap/config-network -n knative-serving --type merge \
+		--patch '{"data":{"domain-template":"{{.Name}}-{{.Namespace}}.{{.Domain}}"}}'
+	kubectl patch configmap/config-domain -n knative-serving --type merge \
+		--patch '{"data":{"local.flyte.app":""}}'
+
 .PHONY: stop
 stop:
 	docker stop --time 5 flyte-devbox

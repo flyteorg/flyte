@@ -536,6 +536,27 @@ data:
           auth_type: accesskey
       container: flyte-data
   100-inline-config.yaml: |
+    manager:
+      internalApps:
+        baseDomain: local.flyte.app
+        defaultEnvVars:
+        - name: FLYTE_AWS_ENDPOINT
+          value: http://rustfs.flyte:9000
+        - name: FLYTE_AWS_ACCESS_KEY_ID
+          value: rustfs
+        - name: FLYTE_AWS_SECRET_ACCESS_KEY
+          value: rustfsstorage
+        - name: _U_EP_OVERRIDE
+          value: flyte-binary-http.flyte:8090
+        - name: _U_INSECURE
+          value: "true"
+        - name: _U_USE_ACTIONS
+          value: "1"
+        enabled: true
+        ingressBaseUrl: http://localhost:30080
+        ingressEnabled: true
+        ingressEntryPoint: web
+        scheme: http
     plugins:
       k8s:
         default-env-vars:
@@ -913,7 +934,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 646d21c3d7efb87ed1de45515bf092b575b364810dd9264a2d9b2e7b26ddbbcb
+        checksum/configuration: b923ff0f82e769435cfba822a87e33bfa00a205d47bf39c4dd395fa07d77160a
         checksum/configuration-secret: e70194084619f4a1d4017093aac6367047167107fd0222513a32a61734629cac
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1146,6 +1167,11 @@ spec:
             readTimeout: 0
       websecure:
         expose: false
+    providers:
+      kubernetesCRD:
+        allowExternalNameServices: true
+      kubernetesIngress:
+        allowExternalNameServices: true
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

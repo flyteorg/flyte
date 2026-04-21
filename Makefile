@@ -32,22 +32,22 @@ build: verify ## Build all Go service binaries
 	$(MAKE) -C executor build
 
 # =============================================================================
-# Sandbox Commands
+# Devbox Commands
 # =============================================================================
 
-.PHONY: sandbox-build
-sandbox-build: ## Build and start the flyte sandbox (docker/sandbox-bundled)
-	$(MAKE) -C docker/sandbox-bundled build
+.PHONY: devbox-build
+devbox-build: ## Build the flyte devbox image (docker/devbox-bundled)
+	$(MAKE) -C docker/devbox-bundled build
 
 # Run in dev mode with extra arg FLYTE_DEV=True
-.PHONY: sandbox-run
-sandbox-run: ## Start the flyte sandbox and install Knative with app routing config
-	$(MAKE) -C docker/sandbox-bundled start FLYTE_DEV=$(FLYTE_DEV)
-	$(MAKE) -C docker/sandbox-bundled setup-knative
+.PHONY: devbox-run
+devbox-run: ## Start the flyte devbox and install Knative with app routing config
+	$(MAKE) -C docker/devbox-bundled start FLYTE_DEV=$(FLYTE_DEV)
+	$(MAKE) -C docker/devbox-bundled setup-knative
 
-.PHONY: sandbox-stop
-sandbox-stop: ## Stop the flyte sandbox
-	$(MAKE) -C docker/sandbox-bundled stop
+.PHONY: devbox-stop
+devbox-stop: ## Stop the flyte devbox
+	$(MAKE) -C docker/devbox-bundled stop
 
 .PHONY: help
 help: ## Show this help message
