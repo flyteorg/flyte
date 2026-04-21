@@ -58,6 +58,7 @@ func uniqueProjects(seedProjects []string, seedProjectsWithDetails []SeedProject
 // Returns a function to seed the database with default values.
 func SeedProjects(db *gorm.DB, projects []SeedProject) error {
 	tx := db.Begin()
+	defer tx.Rollback()
 	for _, project := range projects {
 		projectModel := models.Project{
 			Identifier:  project.Name,
@@ -66,7 +67,6 @@ func SeedProjects(db *gorm.DB, projects []SeedProject) error {
 		}
 		if err := tx.Where(models.Project{Identifier: project.Name}).Omit("id").FirstOrCreate(&projectModel).Error; err != nil {
 			logger.Warningf(context.Background(), "failed to save project [%s]", project)
-			tx.Rollback()
 			return err
 		}
 	}

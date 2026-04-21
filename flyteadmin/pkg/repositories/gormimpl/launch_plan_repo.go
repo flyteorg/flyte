@@ -85,12 +85,12 @@ func (r *LaunchPlanRepo) SetActive(
 	defer timer.Stop()
 	// Use a transaction to guarantee no partial updates.
 	tx := r.db.WithContext(ctx).Begin()
+	defer tx.Rollback()
 
 	// There is a launch plan to disable as part of this transaction
 	if toDisable != nil {
 		tx.Model(&toDisable).UpdateColumns(toDisable)
 		if err := tx.Error; err != nil {
-			tx.Rollback()
 			return r.errorTransformer.ToFlyteAdminError(err)
 		}
 	}
@@ -98,7 +98,6 @@ func (r *LaunchPlanRepo) SetActive(
 	// And update the desired version.
 	tx.Model(&toEnable).UpdateColumns(toEnable)
 	if err := tx.Error; err != nil {
-		tx.Rollback()
 		return r.errorTransformer.ToFlyteAdminError(err)
 	}
 	if err := tx.Commit().Error; err != nil {
