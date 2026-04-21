@@ -13,13 +13,39 @@ manager:
     namespace: "flyte"
     kubeconfig: "~/.kube/config"
 
+  apps:
+    cacheTtl: 30s
+
+  internalApps:
+    enabled: true
+    baseDomain: "local.flyte.app"
+    scheme: "http"
+    defaultRequestTimeout: 300s
+    maxRequestTimeout: 3600s
+    ingressEnabled: true
+    ingressEntryPoint: "web"
+    ingressBaseUrl: "http://localhost:30080"
+    defaultEnvVars:
+      - name: FLYTE_AWS_ENDPOINT
+        value: "http://flyte-sandbox-minio.flyte.svc.cluster.local:9000"
+      - name: FLYTE_AWS_ACCESS_KEY_ID
+        value: "minio"
+      - name: FLYTE_AWS_SECRET_ACCESS_KEY
+        value: "miniostorage"
+      - name: _U_EP_OVERRIDE
+        value: "flyte-sandbox-local.flyte.svc.cluster.local:8090"
+      - name: _U_INSECURE
+        value: "true"
+      - name: _U_USE_ACTIONS
+        value: "1"
+
 
 # Webhook configuration
 # localCert: true writes the generated TLS cert to disk so the webhook server can read it.
 webhook:
   localCert: true
   certDir: /tmp/flyte/webhook/certs
-  serviceName: flyte-devbox-local
+  serviceName: flyte-sandbox-local
   servicePort: 9443
 
 # Executor configuration
@@ -61,10 +87,10 @@ dataproxy:
 plugins:
   k8s:
     default-env-vars:
-      - FLYTE_AWS_ENDPOINT: "http://rustfs.flyte.svc.cluster.local:9000"
-      - FLYTE_AWS_ACCESS_KEY_ID: "rustfs"
-      - FLYTE_AWS_SECRET_ACCESS_KEY: "rustfsstorage"
-      - _U_EP_OVERRIDE: "flyte-devbox-local.flyte.svc.cluster.local:8090"
+      - FLYTE_AWS_ENDPOINT: "http://flyte-sandbox-minio.flyte.svc.cluster.local:9000"
+      - FLYTE_AWS_ACCESS_KEY_ID: "minio"
+      - FLYTE_AWS_SECRET_ACCESS_KEY: "miniostorage"
+      - _U_EP_OVERRIDE: "flyte-sandbox-local.flyte.svc.cluster.local:8090"
       - _U_INSECURE: "true"
       - _U_USE_ACTIONS: "1"
 
@@ -79,8 +105,8 @@ storage:
     kind: "s3"
     config:
       auth_type: "accesskey"
-      access_key_id: "rustfs"
-      secret_key: "rustfsstorage"
+      access_key_id: "minio"
+      secret_key: "miniostorage"
       region: "us-east-1"
       endpoint: "http://localhost:30002"
       disable_ssl: "true"

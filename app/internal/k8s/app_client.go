@@ -13,7 +13,10 @@ import (
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	k8sresource "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	k8swatch "k8s.io/apimachinery/pkg/watch"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
@@ -21,8 +24,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/v2/app/internal/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
+	flytecore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const (
@@ -40,6 +45,11 @@ const (
 	maxKServiceNameLen = 63
 )
 
+var (
+	traefikIngressRouteGVK = schema.GroupVersionKind{Group: "traefik.io", Version: "v1alpha1", Kind: "IngressRoute"}
+	traefikMiddlewareGVK   = schema.GroupVersionKind{Group: "traefik.io", Version: "v1alpha1", Kind: "Middleware"}
+)
+
 // AppK8sClientInterface defines the KService lifecycle operations for the App service.
 type AppK8sClientInterface interface {
 	// Deploy creates or updates the KService for the given app. Idempotent — skips
@@ -55,10 +65,9 @@ type AppK8sClientInterface interface {
 	GetStatus(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.Status, error)
 
 	// List returns apps for the given project/domain scope with optional pagination.
-	// If appName is non-empty, only the app with that name is returned.
 	// limit=0 means no limit. token is the K8s continue token from a previous call.
 	// Returns the apps, the continue token for the next page (empty if last page), and any error.
-	List(ctx context.Context, project, domain, appName string, limit uint32, token string) ([]*flyteapp.App, string, error)
+	List(ctx context.Context, project, domain string, limit uint32, token string) ([]*flyteapp.App, string, error)
 
 	// Delete removes the KService CRD entirely. The app must be re-created from scratch.
 	// Use Stop to scale to zero while preserving the KService.
@@ -104,6 +113,10 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 	name := kserviceName(appID)
 
+	if err := k8s.EnsureNamespaceExists(ctx, c.k8sClient, ns); err != nil {
+		return fmt.Errorf("failed to ensure namespace %s: %w", ns, err)
+	}
+
 	ksvc, err := c.buildKService(app)
 	if err != nil {
 		return fmt.Errorf("failed to build KService for app %s: %w", name, err)
@@ -116,26 +129,40 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 			return fmt.Errorf("failed to create KService %s: %w", name, err)
 		}
 		logger.Infof(ctx, "Created KService %s/%s", ns, name)
-		return nil
+		return c.deployIngress(ctx, app)
 	}
 	if err != nil {
 		return fmt.Errorf("failed to get KService %s: %w", name, err)
 	}
 
-	// Skip update if spec has not changed.
+	// Skip KService update if spec has not changed, but still ensure ingress exists
+	// (it may be missing if the app was deployed before ingress support was added).
 	if existing.Annotations[annotationSpecSHA] == ksvc.Annotations[annotationSpecSHA] {
 		logger.Debugf(ctx, "KService %s/%s spec unchanged, skipping update", ns, name)
-		return nil
+		return c.deployIngress(ctx, app)
 	}
 
 	existing.Spec = ksvc.Spec
-	existing.Labels = ksvc.Labels
-	existing.Annotations = ksvc.Annotations
+	// Merge labels and annotations rather than replacing them wholesale.
+	// Knative sets immutable annotations (e.g. serving.knative.dev/creator)
+	// on creation; overwriting them causes the admission webhook to reject the update.
+	if existing.Labels == nil {
+		existing.Labels = make(map[string]string)
+	}
+	for k, v := range ksvc.Labels {
+		existing.Labels[k] = v
+	}
+	if existing.Annotations == nil {
+		existing.Annotations = make(map[string]string)
+	}
+	for k, v := range ksvc.Annotations {
+		existing.Annotations[k] = v
+	}
 	if err := c.k8sClient.Update(ctx, existing); err != nil {
 		return fmt.Errorf("failed to update KService %s: %w", name, err)
 	}
 	logger.Infof(ctx, "Updated KService %s/%s", ns, name)
-	return nil
+	return c.deployIngress(ctx, app)
 }
 
 // Stop sets max-scale=0 on the KService, scaling it to zero without deleting it.
@@ -166,11 +193,13 @@ func (c *AppK8sClient) Delete(ctx context.Context, appID *flyteapp.Identifier) e
 	ksvc.Namespace = ns
 	if err := c.k8sClient.Delete(ctx, ksvc); err != nil {
 		if k8serrors.IsNotFound(err) {
+			c.deleteIngress(ctx, appID)
 			return nil
 		}
 		return fmt.Errorf("failed to delete KService %s: %w", name, err)
 	}
 	logger.Infof(ctx, "Deleted KService %s/%s", ns, name)
+	c.deleteIngress(ctx, appID)
 	return nil
 }
 
@@ -232,17 +261,18 @@ func (c *AppK8sClient) Watch(ctx context.Context, project, domain, appName strin
 }
 
 // openWatch starts a K8s watch from resourceVersion (empty = watch from now).
-// AllowWatchBookmarks is always set so K8s sends Bookmark events on every session,
-// keeping lastResourceVersion current even when no objects change.
 func (c *AppK8sClient) openWatch(ctx context.Context, ns string, labels map[string]string, resourceVersion string) (k8swatch.Interface, error) {
-	rawOpts := &metav1.ListOptions{AllowWatchBookmarks: true}
-	if resourceVersion != "" {
-		rawOpts.ResourceVersion = resourceVersion
-	}
 	opts := []client.ListOption{
 		client.InNamespace(ns),
 		client.MatchingLabels(labels),
-		&client.ListOptions{Raw: rawOpts},
+	}
+	if resourceVersion != "" {
+		opts = append(opts, &client.ListOptions{
+			Raw: &metav1.ListOptions{
+				ResourceVersion:     resourceVersion,
+				AllowWatchBookmarks: true,
+			},
+		})
 	}
 	watcher, err := c.k8sClient.Watch(ctx, &servingv1.ServiceList{}, opts...)
 	if err != nil {
@@ -252,9 +282,7 @@ func (c *AppK8sClient) openWatch(ctx context.Context, ns string, labels map[stri
 }
 
 // watchLoop is the reconnect loop. It drains watcher until it closes, then
-// reopens. Exponential backoff is applied only on K8s Error events; normal
-// watch timeouts (clean channel close) reconnect immediately. Closes ch only
-// when ctx is cancelled.
+// reopens with exponential backoff. Closes ch only when ctx is cancelled.
 func (c *AppK8sClient) watchLoop(
 	ctx context.Context,
 	ns string,
@@ -268,27 +296,21 @@ func (c *AppK8sClient) watchLoop(
 	state := &watchState{backoff: watchBackoffInitial}
 
 	for {
-		reconnect, isError := c.drainWatcher(ctx, watcher, ch, state)
+		reconnect := c.drainWatcher(ctx, watcher, ch, state)
 		if !reconnect {
 			return // ctx cancelled
 		}
 
 		watcher.Stop()
+		state.consecutiveErrors++
+		delay := state.nextBackoff()
+		logger.Warnf(ctx, "KService watch in namespace %s closed unexpectedly (attempt %d); reconnecting in %v",
+			ns, state.consecutiveErrors, delay)
 
-		if isError {
-			state.consecutiveErrors++
-			delay := state.nextBackoff()
-			logger.Warnf(ctx, "KService watch in namespace %s closed with error (attempt %d); reconnecting in %v",
-				ns, state.consecutiveErrors, delay)
-			select {
-			case <-ctx.Done():
-				return
-			case <-time.After(delay):
-			}
-		} else {
-			// Normal K8s watch timeout — reconnect immediately, no backoff.
-			state.resetBackoff()
-			logger.Debugf(ctx, "KService watch in namespace %s timed out naturally; reconnecting", ns)
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(delay):
 		}
 
 		newWatcher, err := c.openWatch(ctx, ns, labels, state.lastResourceVersion)
@@ -303,22 +325,23 @@ func (c *AppK8sClient) watchLoop(
 }
 
 // drainWatcher processes events from watcher until the channel closes or ctx is done.
-// Returns (reconnect, isError): reconnect=false means ctx was cancelled (stop the loop);
-// isError=true means a K8s Error event triggered the close and backoff should be applied.
+// Returns true if reconnect is needed, false if ctx was cancelled.
 func (c *AppK8sClient) drainWatcher(
 	ctx context.Context,
 	watcher k8swatch.Interface,
 	ch chan<- *flyteapp.WatchResponse,
 	state *watchState,
-) (bool, bool) {
+) bool {
 	for {
 		select {
 		case <-ctx.Done():
-			return false, false
+			return false
 		case event, ok := <-watcher.ResultChan():
 			if !ok {
-				return true, false // normal K8s watch timeout
+				return true
 			}
+
+			c.updateResourceVersion(event, state)
 
 			switch event.Type {
 			case k8swatch.Error:
@@ -328,24 +351,20 @@ func (c *AppK8sClient) drainWatcher(
 				} else {
 					logger.Warnf(ctx, "KService watch received error event (type %T); will reconnect", event.Object)
 				}
-				return true, true // error — apply backoff on reconnect
+				return true
 			case k8swatch.Bookmark:
-				// Update RV immediately — there is no delivery to confirm.
-				c.updateResourceVersion(event, state)
+				// resourceVersion already updated — nothing to forward.
 				state.resetBackoff()
 			default:
 				resp := c.kserviceEventToWatchResponse(ctx, event)
 				if resp == nil {
 					continue
 				}
+				state.resetBackoff()
 				select {
 				case ch <- resp:
-					// Advance RV only after confirmed delivery so a failed send
-					// doesn't silently skip the event on the next reconnect.
-					c.updateResourceVersion(event, state)
-					state.resetBackoff()
 				case <-ctx.Done():
-					return false, false
+					return false
 				}
 			}
 		}
@@ -353,7 +372,7 @@ func (c *AppK8sClient) drainWatcher(
 }
 
 // updateResourceVersion extracts and stores the latest resourceVersion from a watch event.
-// For Bookmark events it is called immediately; for data events only after successful delivery.
+// Called before event type dispatch so both normal events and Bookmarks checkpoint the position.
 func (c *AppK8sClient) updateResourceVersion(event k8swatch.Event, state *watchState) {
 	switch event.Type {
 	case k8swatch.Added, k8swatch.Modified, k8swatch.Deleted, k8swatch.Bookmark:
@@ -416,16 +435,12 @@ func (c *AppK8sClient) GetStatus(ctx context.Context, appID *flyteapp.Identifier
 }
 
 // List returns apps for the given project/domain scope with optional pagination.
-func (c *AppK8sClient) List(ctx context.Context, project, domain, appName string, limit uint32, token string) ([]*flyteapp.App, string, error) {
+func (c *AppK8sClient) List(ctx context.Context, project, domain string, limit uint32, token string) ([]*flyteapp.App, string, error) {
 	ns := appNamespace(project, domain)
 
-	matchLabels := client.MatchingLabels{labelAppManaged: "true"}
-	if appName != "" {
-		matchLabels[labelAppName] = strings.ToLower(appName)
-	}
 	listOpts := []client.ListOption{
 		client.InNamespace(ns),
-		matchLabels,
+		client.MatchingLabels{labelAppManaged: "true"},
 	}
 	if limit > 0 {
 		listOpts = append(listOpts, client.Limit(int64(limit)))
@@ -449,6 +464,156 @@ func (c *AppK8sClient) List(ctx context.Context, project, domain, appName string
 		apps = append(apps, a)
 	}
 	return apps, list.Continue, nil
+}
+
+// publicIngress returns the deterministic public URL for an app using the same
+// logic as the service layer so GetStatus/List/Watch are consistent with Create.
+func (c *AppK8sClient) publicIngress(id *flyteapp.Identifier) *flyteapp.Ingress {
+	if c.cfg.IngressEnabled && c.cfg.IngressBaseURL != "" {
+		return &flyteapp.Ingress{
+			PublicUrl: fmt.Sprintf("%s/%s/%s/%s",
+				strings.TrimRight(c.cfg.IngressBaseURL, "/"),
+				id.GetProject(), id.GetDomain(), id.GetName(),
+			),
+		}
+	}
+	if c.cfg.BaseDomain == "" {
+		return nil
+	}
+	scheme := c.cfg.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
+		id.GetName(), id.GetProject(), id.GetDomain(), c.cfg.BaseDomain))
+	return &flyteapp.Ingress{PublicUrl: scheme + "://" + host}
+}
+
+// deployIngress creates or updates the Traefik resources for the given app:
+//   - strip-<name>  Middleware: strips /<project>/<domain>/<app> prefix
+//   - host-<name>   Middleware: rewrites Host to the Knative hostname so Kourier
+//     can route the request (Knative's K8s service is ExternalName → Kourier)
+//   - app-<name>    IngressRoute: matches PathPrefix and chains both middlewares
+//
+// No-ops when IngressEnabled is false.
+func (c *AppK8sClient) deployIngress(ctx context.Context, app *flyteapp.App) error {
+	if !c.cfg.IngressEnabled {
+		return nil
+	}
+	appID := app.GetMetadata().GetId()
+	ns := appNamespace(appID.GetProject(), appID.GetDomain())
+	ksvcName := kserviceName(appID)
+	stripName := "strip-" + ksvcName
+	hostName := "host-" + ksvcName
+	routeName := "app-" + ksvcName
+	pathPrefix := fmt.Sprintf("/%s/%s/%s", appID.GetProject(), appID.GetDomain(), appID.GetName())
+	entryPoint := c.cfg.IngressEntryPoint
+	if entryPoint == "" {
+		entryPoint = "web"
+	}
+
+	// Knative's K8s service is ExternalName → kourier-internal. Kourier routes by
+	// Host header, so we must rewrite it to the deterministic Knative hostname.
+	// hostname pattern matches the configured domain-template: {name}-{namespace}.{domain}
+	knativeHost := fmt.Sprintf("%s-%s.%s", ksvcName, ns, c.cfg.BaseDomain)
+
+	stripMW := &unstructured.Unstructured{}
+	stripMW.SetGroupVersionKind(traefikMiddlewareGVK)
+	stripMW.SetName(stripName)
+	stripMW.SetNamespace(ns)
+	stripMW.Object["spec"] = map[string]interface{}{
+		"stripPrefix": map[string]interface{}{
+			"prefixes": []interface{}{pathPrefix},
+		},
+	}
+
+	hostMW := &unstructured.Unstructured{}
+	hostMW.SetGroupVersionKind(traefikMiddlewareGVK)
+	hostMW.SetName(hostName)
+	hostMW.SetNamespace(ns)
+	hostMW.Object["spec"] = map[string]interface{}{
+		"headers": map[string]interface{}{
+			"customRequestHeaders": map[string]interface{}{
+				"Host": knativeHost,
+			},
+		},
+	}
+
+	ir := &unstructured.Unstructured{}
+	ir.SetGroupVersionKind(traefikIngressRouteGVK)
+	ir.SetName(routeName)
+	ir.SetNamespace(ns)
+	ir.Object["spec"] = map[string]interface{}{
+		"entryPoints": []interface{}{entryPoint},
+		"routes": []interface{}{
+			map[string]interface{}{
+				"match": fmt.Sprintf("PathPrefix(`%s`)", pathPrefix),
+				"kind":  "Rule",
+				"middlewares": []interface{}{
+					map[string]interface{}{"name": stripName},
+					map[string]interface{}{"name": hostName},
+				},
+				"services": []interface{}{
+					map[string]interface{}{
+						"name": ksvcName,
+						"port": int64(80),
+					},
+				},
+			},
+		},
+	}
+
+	for _, obj := range []*unstructured.Unstructured{stripMW, hostMW, ir} {
+		existing := &unstructured.Unstructured{}
+		existing.SetGroupVersionKind(obj.GroupVersionKind())
+		err := c.k8sClient.Get(ctx, client.ObjectKey{Name: obj.GetName(), Namespace: obj.GetNamespace()}, existing)
+		if k8serrors.IsNotFound(err) {
+			if createErr := c.k8sClient.Create(ctx, obj); createErr != nil {
+				return fmt.Errorf("failed to create %s %s/%s: %w", obj.GetKind(), ns, obj.GetName(), createErr)
+			}
+			logger.Infof(ctx, "Created %s %s/%s", obj.GetKind(), ns, obj.GetName())
+		} else if err != nil {
+			return fmt.Errorf("failed to get %s %s/%s: %w", obj.GetKind(), ns, obj.GetName(), err)
+		} else {
+			obj.SetResourceVersion(existing.GetResourceVersion())
+			if updateErr := c.k8sClient.Update(ctx, obj); updateErr != nil {
+				return fmt.Errorf("failed to update %s %s/%s: %w", obj.GetKind(), ns, obj.GetName(), updateErr)
+			}
+			logger.Infof(ctx, "Updated %s %s/%s", obj.GetKind(), ns, obj.GetName())
+		}
+	}
+	return nil
+}
+
+// deleteIngress removes the Traefik IngressRoute and both Middlewares for the given app.
+// Errors are logged as warnings — ingress cleanup failure does not block app deletion.
+func (c *AppK8sClient) deleteIngress(ctx context.Context, appID *flyteapp.Identifier) {
+	if !c.cfg.IngressEnabled {
+		return
+	}
+	ns := appNamespace(appID.GetProject(), appID.GetDomain())
+	ksvcName := kserviceName(appID)
+
+	type resource struct {
+		gvk  schema.GroupVersionKind
+		name string
+	}
+	resources := []resource{
+		{traefikIngressRouteGVK, "app-" + ksvcName},
+		{traefikMiddlewareGVK, "strip-" + ksvcName},
+		{traefikMiddlewareGVK, "host-" + ksvcName},
+	}
+	for _, r := range resources {
+		obj := &unstructured.Unstructured{}
+		obj.SetGroupVersionKind(r.gvk)
+		obj.SetName(r.name)
+		obj.SetNamespace(ns)
+		if err := c.k8sClient.Delete(ctx, obj); err != nil && !k8serrors.IsNotFound(err) {
+			logger.Warnf(ctx, "Failed to delete %s %s/%s: %v", r.gvk.Kind, ns, r.name, err)
+		} else {
+			logger.Infof(ctx, "Deleted %s %s/%s", r.gvk.Kind, ns, r.name)
+		}
+	}
 }
 
 // --- Helpers ---
@@ -494,6 +659,15 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	podSpec, err := buildPodSpec(spec)
 	if err != nil {
 		return nil, err
+	}
+	// Inject cluster-level default env vars (e.g. _U_EP_OVERRIDE) before user vars
+	// so they can be overridden by app-specific env vars if needed.
+	if len(c.cfg.DefaultEnvVars) > 0 && len(podSpec.Containers) > 0 {
+		defaults := make([]corev1.EnvVar, 0, len(c.cfg.DefaultEnvVars))
+		for _, e := range c.cfg.DefaultEnvVars {
+			defaults = append(defaults, corev1.EnvVar{Name: e.Name, Value: e.Value})
+		}
+		podSpec.Containers[0].Env = append(defaults, podSpec.Containers[0].Env...)
 	}
 
 	templateAnnotations := buildAutoscalingAnnotations(spec, c.cfg)
@@ -546,9 +720,10 @@ func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 	case *flyteapp.Spec_Container:
 		c := p.Container
 		container := corev1.Container{
-			Name:  "app",
-			Image: c.GetImage(),
-			Args:  c.GetArgs(),
+			Name:    "app",
+			Image:   c.GetImage(),
+			Command: c.GetCommand(),
+			Args:    c.GetArgs(),
 		}
 		for _, e := range c.GetEnv() {
 			container.Env = append(container.Env, corev1.EnvVar{
@@ -556,7 +731,17 @@ func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 				Value: e.GetValue(),
 			})
 		}
-		return corev1.PodSpec{Containers: []corev1.Container{container}}, nil
+		for _, p := range c.GetPorts() {
+			container.Ports = append(container.Ports, corev1.ContainerPort{
+				ContainerPort: int32(p.GetContainerPort()),
+				Name:          p.GetName(),
+			})
+		}
+		container.Resources = buildResourceRequirements(c.GetResources())
+		return corev1.PodSpec{
+			Containers:         []corev1.Container{container},
+			EnableServiceLinks: boolPtr(false),
+		}, nil
 
 	case *flyteapp.Spec_Pod:
 		// K8sPod payloads are not yet supported — the pod spec serialization
@@ -567,6 +752,49 @@ func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 		return corev1.PodSpec{}, fmt.Errorf("app spec has no payload (container or pod required)")
 	}
 }
+
+// buildResourceRequirements maps flyteidl2 Resources to corev1.ResourceRequirements.
+func buildResourceRequirements(res *flytecore.Resources) corev1.ResourceRequirements {
+	if res == nil {
+		return corev1.ResourceRequirements{}
+	}
+	reqs := corev1.ResourceRequirements{}
+	if len(res.GetRequests()) > 0 {
+		reqs.Requests = make(corev1.ResourceList)
+		for _, e := range res.GetRequests() {
+			if name, ok := protoResourceName(e.GetName()); ok {
+				reqs.Requests[name] = k8sresource.MustParse(e.GetValue())
+			}
+		}
+	}
+	if len(res.GetLimits()) > 0 {
+		reqs.Limits = make(corev1.ResourceList)
+		for _, e := range res.GetLimits() {
+			if name, ok := protoResourceName(e.GetName()); ok {
+				reqs.Limits[name] = k8sresource.MustParse(e.GetValue())
+			}
+		}
+	}
+	return reqs
+}
+
+// protoResourceName maps a flyteidl2 ResourceName to the equivalent corev1.ResourceName.
+func protoResourceName(name flytecore.Resources_ResourceName) (corev1.ResourceName, bool) {
+	switch name {
+	case flytecore.Resources_CPU:
+		return corev1.ResourceCPU, true
+	case flytecore.Resources_MEMORY:
+		return corev1.ResourceMemory, true
+	case flytecore.Resources_STORAGE:
+		return corev1.ResourceStorage, true
+	case flytecore.Resources_EPHEMERAL_STORAGE:
+		return corev1.ResourceEphemeralStorage, true
+	default:
+		return "", false
+	}
+}
+
+func boolPtr(b bool) *bool { return &b }
 
 // buildAutoscalingAnnotations returns the Knative autoscaling annotations for the revision template.
 func buildAutoscalingAnnotations(spec *flyteapp.Spec, cfg *config.InternalAppConfig) map[string]string {
@@ -644,10 +872,13 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 
 	status := statusWithPhase(phase, message)
 
-	// Populate ingress URL from KService route status.
-	if url := ksvc.Status.URL; url != nil {
-		status.Ingress = &flyteapp.Ingress{
-			PublicUrl: url.String(),
+	// Populate ingress URL from the app annotation so the URL is consistent
+	// with the Create response regardless of Knative route readiness.
+	if appIDStr := ksvc.Annotations[annotationAppID]; appIDStr != "" {
+		parts := strings.SplitN(appIDStr, "/", 3)
+		if len(parts) == 3 {
+			appID := &flyteapp.Identifier{Project: parts[0], Domain: parts[1], Name: parts[2]}
+			status.Ingress = c.publicIngress(appID)
 		}
 	}
 

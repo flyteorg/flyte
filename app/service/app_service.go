@@ -3,10 +3,10 @@ package service
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"connectrpc.com/connect"
-	"github.com/hashicorp/golang-lru/v2/expirable"
 
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
@@ -18,20 +18,15 @@ import (
 type AppService struct {
 	appconnect.UnimplementedAppServiceHandler
 	internalClient appconnect.AppServiceClient
-	// cache is nil when cacheTTL=0 (caching disabled).
-	cache *expirable.LRU[string, *flyteapp.App]
+	cache          *appCache
 }
 
 // NewAppService creates a new AppService.
 // cacheTTL=0 disables caching (every Get calls InternalAppService).
 func NewAppService(internalClient appconnect.AppServiceClient, cacheTTL time.Duration) *AppService {
-	var cache *expirable.LRU[string, *flyteapp.App]
-	if cacheTTL > 0 {
-		cache = expirable.NewLRU[string, *flyteapp.App](0, nil, cacheTTL)
-	}
 	return &AppService{
 		internalClient: internalClient,
-		cache:          cache,
+		cache:          newAppCache(cacheTTL),
 	}
 }
 
@@ -47,9 +42,7 @@ func (s *AppService) Create(
 	if err != nil {
 		return nil, err
 	}
-	if s.cache != nil {
-		s.cache.Remove(cacheKey(req.Msg.GetApp().GetMetadata().GetId()))
-	}
+	s.cache.invalidate(cacheKey(req.Msg.GetApp().GetMetadata().GetId()))
 	return resp, nil
 }
 
@@ -59,8 +52,8 @@ func (s *AppService) Get(
 	req *connect.Request[flyteapp.GetRequest],
 ) (*connect.Response[flyteapp.GetResponse], error) {
 	appID, ok := req.Msg.GetIdentifier().(*flyteapp.GetRequest_AppId)
-	if ok && appID.AppId != nil && s.cache != nil {
-		if app, hit := s.cache.Get(cacheKey(appID.AppId)); hit {
+	if ok && appID.AppId != nil {
+		if app, hit := s.cache.get(cacheKey(appID.AppId)); hit {
 			return connect.NewResponse(&flyteapp.GetResponse{App: app}), nil
 		}
 	}
@@ -69,8 +62,8 @@ func (s *AppService) Get(
 	if err != nil {
 		return nil, err
 	}
-	if ok && appID.AppId != nil && s.cache != nil {
-		s.cache.Add(cacheKey(appID.AppId), resp.Msg.GetApp())
+	if ok && appID.AppId != nil {
+		s.cache.set(cacheKey(appID.AppId), resp.Msg.GetApp())
 	}
 	return resp, nil
 }
@@ -84,9 +77,7 @@ func (s *AppService) Update(
 	if err != nil {
 		return nil, err
 	}
-	if s.cache != nil {
-		s.cache.Remove(cacheKey(req.Msg.GetApp().GetMetadata().GetId()))
-	}
+	s.cache.invalidate(cacheKey(req.Msg.GetApp().GetMetadata().GetId()))
 	return resp, nil
 }
 
@@ -99,9 +90,7 @@ func (s *AppService) Delete(
 	if err != nil {
 		return nil, err
 	}
-	if s.cache != nil {
-		s.cache.Remove(cacheKey(req.Msg.GetAppId()))
-	}
+	s.cache.invalidate(cacheKey(req.Msg.GetAppId()))
 	return resp, nil
 }
 
@@ -130,6 +119,57 @@ func (s *AppService) Watch(
 		}
 	}
 	return clientStream.Err()
+}
+
+// --- Cache ---
+
+type cacheEntry struct {
+	app       *flyteapp.App
+	expiresAt time.Time
+}
+
+type appCache struct {
+	mu    sync.RWMutex
+	items map[string]*cacheEntry
+	ttl   time.Duration
+}
+
+func newAppCache(ttl time.Duration) *appCache {
+	return &appCache{
+		items: make(map[string]*cacheEntry),
+		ttl:   ttl,
+	}
+}
+
+// get returns the cached App for key, or (nil, false) if missing or expired.
+func (c *appCache) get(key string) (*flyteapp.App, bool) {
+	if c.ttl == 0 {
+		return nil, false
+	}
+	c.mu.RLock()
+	entry, ok := c.items[key]
+	c.mu.RUnlock()
+	if !ok || time.Now().After(entry.expiresAt) {
+		return nil, false
+	}
+	return entry.app, true
+}
+
+// set writes the App to the cache with the configured TTL.
+func (c *appCache) set(key string, app *flyteapp.App) {
+	if c.ttl == 0 {
+		return
+	}
+	c.mu.Lock()
+	c.items[key] = &cacheEntry{app: app, expiresAt: time.Now().Add(c.ttl)}
+	c.mu.Unlock()
+}
+
+// invalidate removes the cache entry for key.
+func (c *appCache) invalidate(key string) {
+	c.mu.Lock()
+	delete(c.items, key)
+	c.mu.Unlock()
 }
 
 // cacheKey returns a stable string key for an app identifier.

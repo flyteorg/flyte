@@ -130,7 +130,7 @@ func TestGet_CacheHit_SkipsInternal(t *testing.T) {
 
 	// Pre-populate cache.
 	appID := testAppID()
-	svc.cache.Add(cacheKey(appID), testApp())
+	svc.cache.set(cacheKey(appID), testApp())
 
 	// Internal should NOT be called.
 	resp, err := svc.Get(context.Background(), connect.NewRequest(&flyteapp.GetRequest{
@@ -146,7 +146,7 @@ func TestGet_CacheExpired_CallsInternal(t *testing.T) {
 	svc := NewAppService(internal, 1*time.Millisecond)
 
 	appID := testAppID()
-	svc.cache.Add(cacheKey(appID), testApp())
+	svc.cache.set(cacheKey(appID), testApp())
 	time.Sleep(5 * time.Millisecond) // let TTL expire
 
 	app := testApp()
@@ -169,7 +169,7 @@ func TestCreate_InvalidatesCache(t *testing.T) {
 
 	app := testApp()
 	// Pre-populate cache so we can confirm it's cleared.
-	svc.cache.Add(cacheKey(app.Metadata.Id), app)
+	svc.cache.set(cacheKey(app.Metadata.Id), app)
 
 	internal.On("Create", mock.Anything, mock.Anything).Return(
 		connect.NewResponse(&flyteapp.CreateResponse{App: app}), nil,
@@ -178,7 +178,7 @@ func TestCreate_InvalidatesCache(t *testing.T) {
 	_, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{App: app}))
 	require.NoError(t, err)
 
-	_, hit := svc.cache.Get(cacheKey(app.Metadata.Id))
+	_, hit := svc.cache.get(cacheKey(app.Metadata.Id))
 	assert.False(t, hit, "cache should be invalidated after Create")
 	internal.AssertExpectations(t)
 }
@@ -188,7 +188,7 @@ func TestUpdate_InvalidatesCache(t *testing.T) {
 	svc := NewAppService(internal, 30*time.Second)
 
 	app := testApp()
-	svc.cache.Add(cacheKey(app.Metadata.Id), app)
+	svc.cache.set(cacheKey(app.Metadata.Id), app)
 
 	internal.On("Update", mock.Anything, mock.Anything).Return(
 		connect.NewResponse(&flyteapp.UpdateResponse{App: app}), nil,
@@ -197,7 +197,7 @@ func TestUpdate_InvalidatesCache(t *testing.T) {
 	_, err := svc.Update(context.Background(), connect.NewRequest(&flyteapp.UpdateRequest{App: app}))
 	require.NoError(t, err)
 
-	_, hit := svc.cache.Get(cacheKey(app.Metadata.Id))
+	_, hit := svc.cache.get(cacheKey(app.Metadata.Id))
 	assert.False(t, hit, "cache should be invalidated after Update")
 	internal.AssertExpectations(t)
 }
@@ -207,7 +207,7 @@ func TestDelete_InvalidatesCache(t *testing.T) {
 	svc := NewAppService(internal, 30*time.Second)
 
 	appID := testAppID()
-	svc.cache.Add(cacheKey(appID), testApp())
+	svc.cache.set(cacheKey(appID), testApp())
 
 	internal.On("Delete", mock.Anything, mock.Anything).Return(
 		connect.NewResponse(&flyteapp.DeleteResponse{}), nil,
@@ -216,7 +216,7 @@ func TestDelete_InvalidatesCache(t *testing.T) {
 	_, err := svc.Delete(context.Background(), connect.NewRequest(&flyteapp.DeleteRequest{AppId: appID}))
 	require.NoError(t, err)
 
-	_, hit := svc.cache.Get(cacheKey(appID))
+	_, hit := svc.cache.get(cacheKey(appID))
 	assert.False(t, hit, "cache should be invalidated after Delete")
 	internal.AssertExpectations(t)
 }

@@ -36,33 +36,18 @@ build: verify ## Build all Go service binaries
 # =============================================================================
 
 .PHONY: sandbox-build
-sandbox-build: ## Build and start the flyte sandbox (docker/devbox-bundled)
-	$(MAKE) -C docker/devbox-bundled build
+sandbox-build: ## Build and start the flyte sandbox (docker/sandbox-bundled)
+	$(MAKE) -C docker/sandbox-bundled build
 
 # Run in dev mode with extra arg FLYTE_DEV=True
 .PHONY: sandbox-run
-sandbox-run: ## Start the flyte sandbox without rebuilding the image
-	$(MAKE) -C docker/devbox-bundled start
+sandbox-run: ## Start the flyte sandbox and install Knative with app routing config
+	$(MAKE) -C docker/sandbox-bundled start FLYTE_DEV=$(FLYTE_DEV)
+	$(MAKE) -C docker/sandbox-bundled setup-knative
 
 .PHONY: sandbox-stop
 sandbox-stop: ## Stop the flyte sandbox
-	$(MAKE) -C docker/devbox-bundled stop
-
-# =============================================================================
-# Devbox Commands
-# =============================================================================
-
-.PHONY: devbox-build
-devbox-build: ## Build and start the flyte devbox cluster (docker/devbox-bundled)
-	$(MAKE) -C docker/devbox-bundled build
-
-.PHONY: devbox-run
-devbox-run: ## Start the flyte devbox cluster without rebuilding the image
-	$(MAKE) -C docker/devbox-bundled start
-
-.PHONY: devbox-stop
-devbox-stop: ## Stop the flyte devbox cluster
-	$(MAKE) -C docker/devbox-bundled stop
+	$(MAKE) -C docker/sandbox-bundled stop
 
 .PHONY: help
 help: ## Show this help message
@@ -83,10 +68,9 @@ sep:
 # Helper to time a step: $(call timed,step_name,command)
 define timed
 	@start=$$(date +%s); \
-	$(2); rc=$$?; \
+	$(2); \
 	elapsed=$$((  $$(date +%s) - $$start )); \
-	echo "⏱  $(1) completed in $${elapsed}s"; \
-	exit $$rc
+	echo "⏱  $(1) completed in $${elapsed}s"
 endef
 
 .PHONY: buf-dep
@@ -169,11 +153,6 @@ mocks:
 gen-local: buf mocks go-tidy ## Generate everything using local tools (requires buf, go, cargo, uv)
 	@echo '⚡  Finished generating everything in the gen directory (local)'
 	@$(MAKE) sep
-
-.PHONY: check-crate
-check-crate: ## Verify Rust crate compiles using local cargo (faster, no artifacts)
-	@echo 'Cargo check the generated rust code (local)'
-	cd gen/rust && cargo check
 
 .PHONY: build-crate
 build-crate: ## Build Rust crate using local cargo

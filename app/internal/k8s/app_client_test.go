@@ -285,7 +285,7 @@ func TestList(t *testing.T) {
 		},
 	}
 
-	apps, nextToken, err := c.List(context.Background(), "proj", "dev", "", 0, "")
+	apps, nextToken, err := c.List(context.Background(), "proj", "dev", 0, "")
 	require.NoError(t, err)
 	assert.Empty(t, nextToken)
 	require.Len(t, apps, 1)
@@ -682,14 +682,15 @@ func TestWatch_ExponentialBackoff(t *testing.T) {
 		watchBackoffMax = 30 * time.Second
 	})
 
-	// Four watchers that each emit an Error event — only Error events trigger backoff.
-	// NewFakeWithChanSize(1,...) gives a buffer of 1 so pre-sends don't block before
-	// the consumer goroutine starts (NewFake() is unbuffered).
-	calls := make([]watchCall, 4)
-	for i := range calls {
-		w := k8swatch.NewFakeWithChanSize(1, false)
-		calls[i] = watchCall{watcher: w}
-		w.Error(&metav1.Status{Code: 410, Reason: metav1.StatusReasonExpired, Message: "resource version too old"})
+	// Four watchers that each close immediately.
+	calls := []watchCall{
+		{watcher: k8swatch.NewFake()},
+		{watcher: k8swatch.NewFake()},
+		{watcher: k8swatch.NewFake()},
+		{watcher: k8swatch.NewFake()},
+	}
+	for _, wc := range calls {
+		wc.watcher.(*k8swatch.FakeWatcher).Stop()
 	}
 
 	c, mwc := newMultiClient(t, calls)
@@ -710,51 +711,10 @@ func TestWatch_ExponentialBackoff(t *testing.T) {
 
 	elapsed := time.Since(start)
 	// With 10ms+20ms+40ms backoffs before 4th call, minimum elapsed ≈ 70ms.
-	assert.GreaterOrEqual(t, elapsed, 60*time.Millisecond, "backoff should accumulate across error reconnects")
+	assert.GreaterOrEqual(t, elapsed, 60*time.Millisecond, "backoff should accumulate across reconnects")
 
 	cancel()
-	for range ch {
-	}
-}
-
-func TestWatch_CleanCloseNoBackoff(t *testing.T) {
-	watchBackoffInitial = 50 * time.Millisecond
-	watchBackoffMax = 200 * time.Millisecond
-	t.Cleanup(func() {
-		watchBackoffInitial = 1 * time.Second
-		watchBackoffMax = 30 * time.Second
-	})
-
-	// Three watchers that close immediately (clean channel close, no Error event).
-	calls := []watchCall{
-		{watcher: k8swatch.NewFake()},
-		{watcher: k8swatch.NewFake()},
-		{watcher: k8swatch.NewFake()},
-	}
-	for _, wc := range calls {
-		wc.watcher.(*k8swatch.FakeWatcher).Stop()
-	}
-
-	c, mwc := newMultiClient(t, calls)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
-
-	start := time.Now()
-	ch, err := c.Watch(ctx, "proj", "dev", "")
-	require.NoError(t, err)
-
-	require.Eventually(t, func() bool {
-		mwc.mu.Lock()
-		defer mwc.mu.Unlock()
-		return len(mwc.capturedRVs) >= 3
-	}, 500*time.Millisecond, 5*time.Millisecond)
-
-	elapsed := time.Since(start)
-	// Clean closes must not apply backoff — all 3 reconnects should be nearly instant.
-	assert.Less(t, elapsed, 30*time.Millisecond, "clean closes should not apply backoff delay")
-
-	cancel()
+	// Drain the channel to let the goroutine exit.
 	for range ch {
 	}
 }
