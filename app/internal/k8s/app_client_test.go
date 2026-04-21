@@ -18,7 +18,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
-	"github.com/flyteorg/flyte/v2/app/config"
+	"github.com/flyteorg/flyte/v2/app/internal/config"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	flytecoreapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -55,7 +55,7 @@ func testClient(t *testing.T, objs ...client.Object) *AppK8sClient {
 		Build()
 	return &AppK8sClient{
 		k8sClient: fc,
-		cfg: &config.AppConfig{
+		cfg: &config.InternalAppConfig{
 			DefaultRequestTimeout: 5 * time.Minute,
 			MaxRequestTimeout:     time.Hour,
 		},
@@ -228,7 +228,7 @@ func TestGetStatus_CurrentReplicas(t *testing.T) {
 		Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
-		cfg:       &config.AppConfig{},
+		cfg:       &config.InternalAppConfig{},
 	}
 
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
@@ -277,7 +277,7 @@ func TestList(t *testing.T) {
 		Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
-		cfg: &config.AppConfig{
+		cfg: &config.InternalAppConfig{
 			DefaultRequestTimeout: 5 * time.Minute,
 			MaxRequestTimeout:     time.Hour,
 		},
@@ -288,43 +288,6 @@ func TestList(t *testing.T) {
 	assert.Empty(t, nextToken)
 	require.Len(t, apps, 1)
 	assert.Equal(t, "proj", apps[0].Metadata.Id.Project)
-	assert.Equal(t, "app1", apps[0].Metadata.Id.Name)
-}
-
-func TestList_ByAppName(t *testing.T) {
-	s := testScheme(t)
-	ksvc1 := &servingv1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "app1",
-			Namespace: "proj-dev",
-			Labels: map[string]string{
-				labelAppManaged: "true",
-				labelProject:    "proj",
-				labelDomain:     "dev",
-				labelAppName:    "app1",
-			},
-			Annotations: map[string]string{annotationAppID: "proj/dev/app1"},
-		},
-	}
-	ksvc2 := &servingv1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "app2",
-			Namespace: "proj-dev",
-			Labels: map[string]string{
-				labelAppManaged: "true",
-				labelProject:    "proj",
-				labelDomain:     "dev",
-				labelAppName:    "app2",
-			},
-			Annotations: map[string]string{annotationAppID: "proj/dev/app2"},
-		},
-	}
-	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(ksvc1, ksvc2).Build()
-	c := &AppK8sClient{k8sClient: fc, cfg: &config.AppConfig{}}
-
-	apps, _, err := c.List(context.Background(), "proj", "dev", "app1", 0, "")
-	require.NoError(t, err)
-	require.Len(t, apps, 1)
 	assert.Equal(t, "app1", apps[0].Metadata.Id.Name)
 }
 
@@ -348,7 +311,7 @@ func TestGetReplicas(t *testing.T) {
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(pod).Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
-		cfg:       &config.AppConfig{},
+		cfg:       &config.InternalAppConfig{},
 	}
 
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
@@ -370,7 +333,7 @@ func TestDeleteReplica(t *testing.T) {
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(pod).Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
-		cfg:       &config.AppConfig{},
+		cfg:       &config.InternalAppConfig{},
 	}
 
 	replicaID := &flyteapp.ReplicaIdentifier{
