@@ -72,8 +72,9 @@ flyte-binary:
           baseDomain: "local.flyte.app"
           scheme: "http"
           ingressEnabled: true
-          ingressEntryPoint: "web"
-          ingressBaseUrl: "http://localhost:30080"
+          ingressEntryPoint: "apps"
+          ingressAppsDomain: "localhost"
+          ingressAppsPort: 30081
           defaultEnvVars:
             - name: FLYTE_AWS_ENDPOINT
               value: 'http://rustfs.{{ .Release.Namespace }}:9000'

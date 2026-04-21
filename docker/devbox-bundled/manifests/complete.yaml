@@ -553,9 +553,10 @@ data:
         - name: _U_USE_ACTIONS
           value: "1"
         enabled: true
-        ingressBaseUrl: http://localhost:30080
+        ingressAppsDomain: localhost
+        ingressAppsPort: 30081
         ingressEnabled: true
-        ingressEntryPoint: web
+        ingressEntryPoint: apps
         scheme: http
     plugins:
       k8s:
@@ -934,7 +935,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: b923ff0f82e769435cfba822a87e33bfa00a205d47bf39c4dd395fa07d77160a
+        checksum/configuration: 709f0513c6d5a65b47f3e9d42696c92cecfdc3073acac33c7ad32340a645bef4
         checksum/configuration-secret: e70194084619f4a1d4017093aac6367047167107fd0222513a32a61734629cac
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1162,6 +1163,14 @@ spec:
     ports:
       web:
         nodePort: 30080
+        transport:
+          respondingTimeouts:
+            readTimeout: 0
+      apps:
+        port: 30081
+        nodePort: 30081
+        expose:
+          default: true
         transport:
           respondingTimeouts:
             readTimeout: 0

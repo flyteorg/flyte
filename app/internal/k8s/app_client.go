@@ -469,13 +469,18 @@ func (c *AppK8sClient) List(ctx context.Context, project, domain string, limit u
 // publicIngress returns the deterministic public URL for an app using the same
 // logic as the service layer so GetStatus/List/Watch are consistent with Create.
 func (c *AppK8sClient) publicIngress(id *flyteapp.Identifier) *flyteapp.Ingress {
-	if c.cfg.IngressEnabled && c.cfg.IngressBaseURL != "" {
-		return &flyteapp.Ingress{
-			PublicUrl: fmt.Sprintf("%s/%s/%s/%s",
-				strings.TrimRight(c.cfg.IngressBaseURL, "/"),
-				id.GetProject(), id.GetDomain(), id.GetName(),
-			),
+	if c.cfg.IngressEnabled && c.cfg.IngressAppsDomain != "" {
+		scheme := c.cfg.Scheme
+		if scheme == "" {
+			scheme = "http"
 		}
+		host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
+			id.GetName(), id.GetProject(), id.GetDomain(), c.cfg.IngressAppsDomain))
+		url := scheme + "://" + host
+		if c.cfg.IngressAppsPort != 0 {
+			url += fmt.Sprintf(":%d", c.cfg.IngressAppsPort)
+		}
+		return &flyteapp.Ingress{PublicUrl: url}
 	}
 	if c.cfg.BaseDomain == "" {
 		return nil
@@ -490,10 +495,9 @@ func (c *AppK8sClient) publicIngress(id *flyteapp.Identifier) *flyteapp.Ingress 
 }
 
 // deployIngress creates or updates the Traefik resources for the given app:
-//   - strip-<name>  Middleware: strips /<project>/<domain>/<app> prefix
 //   - host-<name>   Middleware: rewrites Host to the Knative hostname so Kourier
 //     can route the request (Knative's K8s service is ExternalName → Kourier)
-//   - app-<name>    IngressRoute: matches PathPrefix and chains both middlewares
+//   - app-<name>    IngressRoute: matches Host header and applies the middleware
 //
 // No-ops when IngressEnabled is false.
 func (c *AppK8sClient) deployIngress(ctx context.Context, app *flyteapp.App) error {
@@ -503,29 +507,19 @@ func (c *AppK8sClient) deployIngress(ctx context.Context, app *flyteapp.App) err
 	appID := app.GetMetadata().GetId()
 	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 	ksvcName := kserviceName(appID)
-	stripName := "strip-" + ksvcName
 	hostName := "host-" + ksvcName
 	routeName := "app-" + ksvcName
-	pathPrefix := fmt.Sprintf("/%s/%s/%s", appID.GetProject(), appID.GetDomain(), appID.GetName())
+	appHost := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
+		appID.GetName(), appID.GetProject(), appID.GetDomain(), c.cfg.IngressAppsDomain))
 	entryPoint := c.cfg.IngressEntryPoint
 	if entryPoint == "" {
-		entryPoint = "web"
+		entryPoint = "apps"
 	}
 
 	// Knative's K8s service is ExternalName → kourier-internal. Kourier routes by
 	// Host header, so we must rewrite it to the deterministic Knative hostname.
 	// hostname pattern matches the configured domain-template: {name}-{namespace}.{domain}
 	knativeHost := fmt.Sprintf("%s-%s.%s", ksvcName, ns, c.cfg.BaseDomain)
-
-	stripMW := &unstructured.Unstructured{}
-	stripMW.SetGroupVersionKind(traefikMiddlewareGVK)
-	stripMW.SetName(stripName)
-	stripMW.SetNamespace(ns)
-	stripMW.Object["spec"] = map[string]interface{}{
-		"stripPrefix": map[string]interface{}{
-			"prefixes": []interface{}{pathPrefix},
-		},
-	}
 
 	hostMW := &unstructured.Unstructured{}
 	hostMW.SetGroupVersionKind(traefikMiddlewareGVK)
@@ -535,6 +529,10 @@ func (c *AppK8sClient) deployIngress(ctx context.Context, app *flyteapp.App) err
 		"headers": map[string]interface{}{
 			"customRequestHeaders": map[string]interface{}{
 				"Host": knativeHost,
+				// Rewrite Origin to match the Knative host so that apps with
+				// XSRF/CORS origin checks (e.g. Streamlit) accept the connection.
+				// Safe for devbox — XSRF provides no value in a local environment.
+				"Origin": "http://" + knativeHost,
 			},
 		},
 	}
@@ -547,10 +545,9 @@ func (c *AppK8sClient) deployIngress(ctx context.Context, app *flyteapp.App) err
 		"entryPoints": []interface{}{entryPoint},
 		"routes": []interface{}{
 			map[string]interface{}{
-				"match": fmt.Sprintf("PathPrefix(`%s`)", pathPrefix),
+				"match": fmt.Sprintf("Host(`%s`)", appHost),
 				"kind":  "Rule",
 				"middlewares": []interface{}{
-					map[string]interface{}{"name": stripName},
 					map[string]interface{}{"name": hostName},
 				},
 				"services": []interface{}{
@@ -563,7 +560,7 @@ func (c *AppK8sClient) deployIngress(ctx context.Context, app *flyteapp.App) err
 		},
 	}
 
-	for _, obj := range []*unstructured.Unstructured{stripMW, hostMW, ir} {
+	for _, obj := range []*unstructured.Unstructured{hostMW, ir} {
 		existing := &unstructured.Unstructured{}
 		existing.SetGroupVersionKind(obj.GroupVersionKind())
 		err := c.k8sClient.Get(ctx, client.ObjectKey{Name: obj.GetName(), Namespace: obj.GetNamespace()}, existing)
@@ -600,7 +597,6 @@ func (c *AppK8sClient) deleteIngress(ctx context.Context, appID *flyteapp.Identi
 	}
 	resources := []resource{
 		{traefikIngressRouteGVK, "app-" + ksvcName},
-		{traefikMiddlewareGVK, "strip-" + ksvcName},
 		{traefikMiddlewareGVK, "host-" + ksvcName},
 	}
 	for _, r := range resources {

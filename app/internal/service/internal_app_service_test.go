@@ -77,7 +77,9 @@ func (m *mockAppK8sClient) Watch(ctx context.Context, project, domain, appName s
 func testCfg() *appconfig.InternalAppConfig {
 	return &appconfig.InternalAppConfig{
 		Enabled:               true,
-		BaseDomain:            "apps.example.com",
+		IngressEnabled:        true,
+		IngressAppsDomain:     "example.com",
+		Scheme:                "https",
 		DefaultRequestTimeout: 5 * time.Minute,
 		MaxRequestTimeout:     time.Hour,
 	}
@@ -128,7 +130,7 @@ func TestCreate_Success(t *testing.T) {
 	resp, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{App: app}))
 	require.NoError(t, err)
 	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_PENDING, resp.Msg.App.Status.Conditions[0].DeploymentStatus)
-	assert.Equal(t, "https://myapp-proj-dev.apps.example.com", resp.Msg.App.Status.Ingress.PublicUrl)
+	assert.Equal(t, "https://myapp-proj-dev.example.com", resp.Msg.App.Status.Ingress.PublicUrl)
 	k8s.AssertExpectations(t)
 }
 
@@ -165,9 +167,26 @@ func TestCreate_MissingPayload(t *testing.T) {
 	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 }
 
+func TestCreate_IngressWithPort(t *testing.T) {
+	k8s := &mockAppK8sClient{}
+	cfg := testCfg()
+	cfg.IngressAppsPort = 30081
+	svc := NewInternalAppService(k8s, cfg)
+
+	app := testApp()
+	k8s.On("Deploy", mock.Anything, app).Return(nil)
+
+	resp, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{App: app}))
+	require.NoError(t, err)
+	assert.Equal(t, "https://myapp-proj-dev.example.com:30081", resp.Msg.App.Status.Ingress.PublicUrl)
+	k8s.AssertExpectations(t)
+}
+
 func TestCreate_NoBaseDomain_NoIngress(t *testing.T) {
 	k8s := &mockAppK8sClient{}
 	cfg := testCfg()
+	cfg.IngressEnabled = false
+	cfg.IngressAppsDomain = ""
 	cfg.BaseDomain = ""
 	svc := NewInternalAppService(k8s, cfg)
 

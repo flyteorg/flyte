@@ -23,8 +23,9 @@ manager:
     defaultRequestTimeout: 300s
     maxRequestTimeout: 3600s
     ingressEnabled: true
-    ingressEntryPoint: "web"
-    ingressBaseUrl: "http://localhost:30080"
+    ingressEntryPoint: "apps"
+    ingressAppsDomain: "localhost"
+    ingressAppsPort: 30081
     defaultEnvVars:
       - name: FLYTE_AWS_ENDPOINT
         value: "http://rustfs.flyte.svc.cluster.local:9000"

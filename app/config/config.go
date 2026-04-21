@@ -42,19 +42,23 @@ type InternalAppConfig struct {
 
 	// IngressEnabled controls whether a Traefik IngressRoute and Middleware are
 	// created for each deployed app so it is reachable at
-	// /<project>/<domain>/<app> through the Traefik ingress controller.
+	// {name}-{project}-{domain}.{IngressAppsDomain}:{IngressAppsPort} through Traefik.
 	// Enable this for sandbox/local setups where Traefik is the ingress controller.
 	IngressEnabled bool `json:"ingressEnabled" pflag:",Create Traefik IngressRoute for each app"`
 
 	// IngressEntryPoint is the Traefik entry point name that app routes are
-	// attached to (default: "web").
+	// attached to (default: "apps").
 	IngressEntryPoint string `json:"ingressEntryPoint" pflag:",Traefik entry point name for app ingress routes"`
 
-	// IngressBaseURL is the externally reachable base URL of the ingress controller
-	// (e.g. "http://localhost:30080"). When set, the public URL surfaced for each app
-	// is built as {IngressBaseURL}/{project}/{domain}/{app} instead of the Knative
-	// host-based URL. Only used when IngressEnabled is true.
-	IngressBaseURL string `json:"ingressBaseUrl" pflag:",Base URL of the ingress controller for app public URLs"`
+	// IngressAppsDomain is the domain suffix for subdomain-based app URLs.
+	// Apps are exposed at {name}-{project}-{domain}.{IngressAppsDomain}.
+	// Use "localhost" for local devbox (resolves without /etc/hosts on macOS/Linux).
+	// Windows users can override to e.g. "localtest.me".
+	IngressAppsDomain string `json:"ingressAppsDomain" pflag:",Domain suffix for app subdomain URLs"`
+
+	// IngressAppsPort is the port appended to the public app URL (e.g. 30081).
+	// Set to 0 to omit the port when behind a standard 80/443 proxy.
+	IngressAppsPort int `json:"ingressAppsPort" pflag:",Port for app subdomain URLs (0 = omit)"`
 
 	// DefaultEnvVars is a list of environment variables injected into every KService
 	// pod at deploy time, in addition to any env vars specified in the app spec.

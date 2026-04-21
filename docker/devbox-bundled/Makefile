@@ -74,6 +74,7 @@ build-gpu: build
 # 30001 - DB
 # 30002 - RustFS
 # 30080 - Flyte Proxy
+# 30081 - Flyte Apps
 .PHONY: start
 start: FLYTE_DEVBOX_IMAGE := flyte-devbox:latest
 start: FLYTE_DEV := False
@@ -93,6 +94,7 @@ start:
 			--publish "30001:5432" \
 			--publish "30002:30002" \
 			--publish "30080:30080" \
+			--publish "30081:30081" \
 			$(FLYTE_DEVBOX_IMAGE); \
 	fi
 	@echo "Waiting for kubeconfig..."
