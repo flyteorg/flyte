@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7-labs
 #
-# GPU-capable demo cluster image. Layers NVIDIA Container Toolkit + the
-# k8s device-plugin on top of the CPU demo image so everything that ships
+# GPU-capable debox cluster image. Layers NVIDIA Container Toolkit + the
+# k8s device-plugin on top of the CPU debox image so everything that ships
 # in the base (flyte-binary, embedded postgres, auto-apply manifests) is
 # inherited verbatim. CI builds the CPU image first and passes its tag in
 # via BASE_IMAGE.
