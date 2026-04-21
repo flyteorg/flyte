@@ -59,7 +59,7 @@ flyte-core-components:
   secret:
     kubernetes:
       namespace: "flyte"
-      clusterName: "flyte-demo"
+      clusterName: "flyte-devbox"
       kubeconfig: ""
       qps: 100
       burst: 200

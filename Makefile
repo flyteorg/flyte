@@ -36,33 +36,33 @@ build: verify ## Build all Go service binaries
 # =============================================================================
 
 .PHONY: sandbox-build
-sandbox-build: ## Build and start the flyte sandbox (docker/demo-bundled)
-	$(MAKE) -C docker/demo-bundled build
+sandbox-build: ## Build and start the flyte sandbox (docker/devbox-bundled)
+	$(MAKE) -C docker/devbox-bundled build
 
 # Run in dev mode with extra arg FLYTE_DEV=True
 .PHONY: sandbox-run
 sandbox-run: ## Start the flyte sandbox without rebuilding the image
-	$(MAKE) -C docker/demo-bundled start
+	$(MAKE) -C docker/devbox-bundled start
 
 .PHONY: sandbox-stop
 sandbox-stop: ## Stop the flyte sandbox
-	$(MAKE) -C docker/demo-bundled stop
+	$(MAKE) -C docker/devbox-bundled stop
 
 # =============================================================================
-# Demo Commands
+# Devbox Commands
 # =============================================================================
 
-.PHONY: demo-build
-demo-build: ## Build and start the flyte demo cluster (docker/demo-bundled)
-	$(MAKE) -C docker/demo-bundled build
+.PHONY: devbox-build
+devbox-build: ## Build and start the flyte devbox cluster (docker/devbox-bundled)
+	$(MAKE) -C docker/devbox-bundled build
 
-.PHONY: demo-run
-demo-run: ## Start the flyte demo cluster without rebuilding the image
-	$(MAKE) -C docker/demo-bundled start
+.PHONY: devbox-run
+devbox-run: ## Start the flyte devbox cluster without rebuilding the image
+	$(MAKE) -C docker/devbox-bundled start
 
-.PHONY: demo-stop
-demo-stop: ## Stop the flyte demo cluster
-	$(MAKE) -C docker/demo-bundled stop
+.PHONY: devbox-stop
+devbox-stop: ## Stop the flyte devbox cluster
+	$(MAKE) -C docker/devbox-bundled stop
 
 .PHONY: help
 help: ## Show this help message
