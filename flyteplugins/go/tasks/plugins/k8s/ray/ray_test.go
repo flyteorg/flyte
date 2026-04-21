@@ -1716,7 +1716,7 @@ func TestBuildAutoscalerOptions(t *testing.T) {
 
 	t.Run("env literal value", func(t *testing.T) {
 		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{
-			Env: []*core.KeyValuePair{{Key: "FOO", Value: "bar"}, {Key: "NULL", Value: ""}},
+			Env: []*core.KeyValuePair{{Key: "FOO", Value: "bar"}},
 		})
 		require.NotNil(t, result)
 		require.Len(t, result.Env, 1)

@@ -152,28 +152,10 @@ func buildAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.Autoscale
 		if image := options.GetImage(); image != "" {
 			autoScalerOptions.Image = &image
 		}
-		if res := options.GetResources(); res != nil {
-			resourceRequirements := v1.ResourceRequirements{}
-			if requests := res.GetRequests(); len(requests) > 0 {
-				resourceRequirements.Requests = convertResourceEntriesToResourceList(requests)
-			}
-			if limits := res.GetLimits(); len(limits) > 0 {
-				resourceRequirements.Limits = convertResourceEntriesToResourceList(limits)
-			}
-			autoScalerOptions.Resources = &resourceRequirements
+		if res, err := flytek8s.ToK8sResourceRequirements(options.GetResources()); err == nil {
+			autoScalerOptions.Resources = res
 		}
-		if envs := options.GetEnv(); len(envs) > 0 {
-			autoScalerOptions.Env = []v1.EnvVar{}
-			for _, env := range envs {
-				name := env.GetKey()
-				if val := env.GetValue(); val != "" {
-					autoScalerOptions.Env = append(autoScalerOptions.Env, v1.EnvVar{
-						Name:  name,
-						Value: val,
-					})
-				}
-			}
-		}
+		autoScalerOptions.Env = flytek8s.ToK8sEnvVar(options.GetEnv())
 	}
 	return autoScalerOptions
 }
