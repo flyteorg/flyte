@@ -1,64 +1,17 @@
 # syntax=docker/dockerfile:1.4-labs
-FROM --platform=${BUILDPLATFORM} mgoltzsche/podman:minimal AS builder
+#
+# GPU-capable demo cluster image. Layers NVIDIA Container Toolkit + the
+# k8s device-plugin on top of the CPU demo image so everything that ships
+# in the base (flyte-binary, embedded postgres, auto-apply manifests) is
+# inherited verbatim. CI builds the CPU image first and passes its tag in
+# via BASE_IMAGE.
 
-ARG TARGETARCH
-ENV TARGETARCH "${TARGETARCH}"
-
-WORKDIR /build
-
-COPY images/manifest.txt images/preload ./
-RUN --security=insecure ./preload manifest.txt
-
-
-FROM --platform=${BUILDPLATFORM} golang:1.24-bullseye AS bootstrap
-
-ARG TARGETARCH
-ENV CGO_ENABLED 0
-ENV GOARCH "${TARGETARCH}"
-ENV GOOS linux
-
-WORKDIR /flyteorg/build
-COPY bootstrap/go.mod bootstrap/go.sum ./
-RUN go mod download
-COPY bootstrap/ ./
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
-    go build -o dist/flyte-demo-bootstrap cmd/bootstrap/main.go && \
-    go build -o dist/embedded-postgres cmd/embedded-postgres/main.go
+ARG BASE_IMAGE=ghcr.io/flyteorg/flyte-demo:nightly
 
 
-# Pre-download PostgreSQL binaries from Maven for the embedded-postgres library.
-# The library expects a cached .txz file; we also extract the dynamic linker since
-# the K3s base image has no libc.
-FROM debian:bookworm-slim AS pg-cache
-
-ARG TARGETARCH
-
-RUN apt-get update && apt-get install -y --no-install-recommends curl unzip xz-utils ca-certificates && rm -rf /var/lib/apt/lists/*
-
-RUN set -ex; \
-    ARCH=$([ "$TARGETARCH" = "arm64" ] && echo "arm64v8" || echo "amd64"); \
-    PG_VERSION="16.9.0"; \
-    CACHE_FILE="embedded-postgres-binaries-linux-${ARCH}-${PG_VERSION}.txz"; \
-    mkdir -p /cache /glibc-libs; \
-    curl -fL "https://repo1.maven.org/maven2/io/zonky/test/postgres/embedded-postgres-binaries-linux-${ARCH}/${PG_VERSION}/embedded-postgres-binaries-linux-${ARCH}-${PG_VERSION}.jar" -o /tmp/pg.jar; \
-    unzip -p /tmp/pg.jar "*.txz" > "/cache/${CACHE_FILE}"; \
-    rm -f /tmp/pg.jar; \
-    mkdir -p /tmp/pg-tmp && tar xJf "/cache/${CACHE_FILE}" -C /tmp/pg-tmp/; \
-    for bin in /tmp/pg-tmp/bin/*; do \
-        ldd "$bin" 2>/dev/null | grep "=>" | awk '{print $3}' | while read lib; do \
-            [ -f "$lib" ] && cp -n "$lib" /glibc-libs/ 2>/dev/null || true; \
-        done; \
-    done; \
-    cp /lib/ld-linux-aarch64.so.1 /glibc-libs/ 2>/dev/null || true; \
-    cp /lib/aarch64-linux-gnu/ld-linux-aarch64.so.1 /glibc-libs/ 2>/dev/null || true; \
-    cp /lib64/ld-linux-x86-64.so.2 /glibc-libs/ 2>/dev/null || true; \
-    cp /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /glibc-libs/ 2>/dev/null || true; \
-    rm -rf /tmp/pg-tmp
-
-
-# Stage NVIDIA Container Toolkit + libnvidia-container from NVIDIA's apt repo.
-# k3s auto-registers a "nvidia" containerd runtime at startup if
-# `nvidia-container-runtime` is on PATH in the final image.
+# Stage NVIDIA Container Toolkit binaries + supporting libs + ldconfig.
+# k3s auto-registers a `nvidia` containerd runtime at startup if
+# /usr/bin/nvidia-container-runtime is on PATH in the final image.
 FROM debian:bookworm-slim AS nvidia-toolkit
 
 ARG TARGETARCH
@@ -80,9 +33,9 @@ RUN curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
     rm -rf /var/lib/apt/lists/*
 
 # Collect binaries, their shared-lib deps, and the dynamic linker so they run
-# inside the minimal rancher/k3s image (which has no libc of its own). Also
-# stage /sbin/ldconfig — the nvidia-container-runtime OCI hook bind-mounts it
-# into workload pods to refresh /etc/ld.so.cache, so it must exist on the node.
+# inside the minimal rancher/k3s base (no libc of its own). Also stage
+# /sbin/ldconfig — the toolkit's update-ldcache OCI hook bind-mounts it
+# into workload pods.
 RUN set -ex; \
     mkdir -p /nvidia-staging/bin /nvidia-staging/lib /nvidia-staging/sbin; \
     for bin in nvidia-ctk nvidia-container-runtime nvidia-container-runtime.cdi \
@@ -99,31 +52,12 @@ RUN set -ex; \
     cp /sbin/ldconfig /nvidia-staging/sbin/ldconfig
 
 
-FROM rancher/k3s:v1.34.6-k3s1
-
-ARG TARGETARCH
-
-ARG FLYTE_DEMO_VERSION
-ENV FLYTE_DEMO_VERSION "${FLYTE_DEMO_VERSION}"
-
-COPY --from=builder /build/images/ /var/lib/rancher/k3s/agent/images/
-COPY images/tar/${TARGETARCH}/ /var/lib/rancher/k3s/agent/images/
-COPY manifests/ /var/lib/rancher/k3s/server/manifests-staging/
-COPY bin/ /bin/
-
-# Install bootstrap and embedded postgres
-COPY --from=bootstrap /flyteorg/build/dist/flyte-demo-bootstrap /bin/
-COPY --from=bootstrap /flyteorg/build/dist/embedded-postgres /bin/
-
-# Install pre-cached PostgreSQL binaries and glibc libraries
-COPY --from=pg-cache /cache/ /var/cache/embedded-postgres/
-COPY --from=pg-cache /glibc-libs/ /usr/lib/pg-glibc/
+FROM ${BASE_IMAGE}
 
 # Install NVIDIA Container Toolkit binaries + supporting libs. The libs go
-# into a default linker search path (/usr/lib/x86_64-linux-gnu) because the
+# into a default linker search path (/usr/lib/<arch-triple>/) because the
 # nvidia-ctk OCI hook is invoked by containerd without inheriting
-# LD_LIBRARY_PATH. The statically-linked ldconfig at /sbin/ldconfig is
-# required by the toolkit's update-ldcache hook.
+# LD_LIBRARY_PATH.
 COPY --from=nvidia-toolkit /nvidia-staging/bin/ /usr/bin/
 COPY --from=nvidia-toolkit /nvidia-staging/lib/ /usr/lib/nvidia/
 COPY --from=nvidia-toolkit /nvidia-staging/sbin/ldconfig /sbin/ldconfig
@@ -138,28 +72,11 @@ COPY nvidia-device-plugin.yaml /var/lib/rancher/k3s/server/manifests/nvidia-devi
 # Sets nvidia as the default runtime so GPU pods don't need runtimeClassName.
 COPY containerd-config.toml.tmpl /var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl
 
-# Create dynamic linker symlinks and add postgres user/group
-RUN for f in /usr/lib/pg-glibc/ld-linux-aarch64*; do \
-      [ -f "$f" ] && ln -sf "$f" /lib/$(basename "$f"); \
-    done 2>/dev/null; \
-    for f in /usr/lib/pg-glibc/ld-linux-x86-64*; do \
-      [ -f "$f" ] && mkdir -p /lib64 && ln -sf "$f" /lib64/$(basename "$f"); \
-    done 2>/dev/null; \
-    echo "postgres:x:999:999:PostgreSQL:/tmp:/bin/sh" >> /etc/passwd && \
-    echo "postgres:x:999:" >> /etc/group
-
-# Expose pg-glibc + nvidia libs to the dynamic linker.
+# Append nvidia libs to the base image's LD_LIBRARY_PATH (which already
+# includes /usr/lib/pg-glibc for embedded postgres).
 ENV LD_LIBRARY_PATH="/usr/lib/pg-glibc:/usr/lib/nvidia"
 
 # Propagate host GPUs into containers scheduled on this node. These env vars
 # are consumed by nvidia-container-runtime.
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
-
-VOLUME /var/lib/flyte/storage
-
-# Set environment variable for picking up additional CA certificates
-ENV SSL_CERT_DIR /var/lib/flyte/config/ca-certificates
-
-ENTRYPOINT [ "/bin/k3d-entrypoint.sh" ]
-CMD [ "server", "--disable=servicelb", "--disable=metrics-server" ]
