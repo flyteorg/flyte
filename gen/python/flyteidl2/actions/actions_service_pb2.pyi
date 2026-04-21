@@ -1,5 +1,6 @@
 from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
+from flyteidl2.core import literals_pb2 as _literals_pb2
 from flyteidl2.task import run_pb2 as _run_pb2
 from flyteidl2.workflow import run_definition_pb2 as _run_definition_pb2
 from flyteidl2.workflow import state_service_pb2 as _state_service_pb2
@@ -96,5 +97,19 @@ class AbortRequest(_message.Message):
     def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., reason: _Optional[str] = ...) -> None: ...
 
 class AbortResponse(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class SignalRequest(_message.Message):
+    __slots__ = ["action_id", "parent_action_name", "output"]
+    ACTION_ID_FIELD_NUMBER: _ClassVar[int]
+    PARENT_ACTION_NAME_FIELD_NUMBER: _ClassVar[int]
+    OUTPUT_FIELD_NUMBER: _ClassVar[int]
+    action_id: _identifier_pb2.ActionIdentifier
+    parent_action_name: str
+    output: _literals_pb2.Literal
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., output: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ...) -> None: ...
+
+class SignalResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...

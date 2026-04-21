@@ -2,6 +2,7 @@ from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import phase_pb2 as _phase_pb2
 from flyteidl2.core import execution_pb2 as _execution_pb2
+from flyteidl2.core import literals_pb2 as _literals_pb2
 from google.rpc import status_pb2 as _status_pb2
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -64,13 +65,15 @@ class ControlMessage(_message.Message):
     def __init__(self, sentinel: bool = ...) -> None: ...
 
 class ActionUpdate(_message.Message):
-    __slots__ = ["action_id", "phase", "error", "output_uri"]
+    __slots__ = ["action_id", "phase", "error", "output_uri", "output"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_URI_FIELD_NUMBER: _ClassVar[int]
+    OUTPUT_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     phase: _phase_pb2.ActionPhase
     error: _execution_pb2.ExecutionError
     output_uri: str
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_uri: _Optional[str] = ...) -> None: ...
+    output: _literals_pb2.Literal
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_uri: _Optional[str] = ..., output: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ...) -> None: ...

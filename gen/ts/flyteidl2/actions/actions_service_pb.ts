@@ -7,6 +7,8 @@ import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
 import type { ActionIdentifier } from "../common/identifier_pb.ts";
 import { file_flyteidl2_common_identifier } from "../common/identifier_pb.ts";
+import type { Literal } from "../core/literals_pb.ts";
+import { file_flyteidl2_core_literals } from "../core/literals_pb.ts";
 import type { RunSpec } from "../task/run_pb.ts";
 import { file_flyteidl2_task_run } from "../task/run_pb.ts";
 import type { ActionStatus, ConditionAction, TaskAction, TraceAction } from "../workflow/run_definition_pb.ts";
@@ -19,7 +21,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/actions/actions_service.proto.
  */
 export const file_flyteidl2_actions_actions_service: GenFile = /*@__PURE__*/
-  fileDesc("CidmbHl0ZWlkbDIvYWN0aW9ucy9hY3Rpb25zX3NlcnZpY2UucHJvdG8SEWZseXRlaWRsMi5hY3Rpb25zIogDCgZBY3Rpb24SPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESHwoScGFyZW50X2FjdGlvbl9uYW1lGAIgASgJSAGIAQESGgoJaW5wdXRfdXJpGAMgASgJQge6SARyAhABEiAKD3J1bl9vdXRwdXRfYmFzZRgEIAEoCUIHukgEcgIQARINCgVncm91cBgFIAEoCRIPCgdzdWJqZWN0GAYgASgJEi4KBHRhc2sYByABKAsyHi5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza0FjdGlvbkgAEjAKBXRyYWNlGAggASgLMh8uZmx5dGVpZGwyLndvcmtmbG93LlRyYWNlQWN0aW9uSAASOAoJY29uZGl0aW9uGAkgASgLMiMuZmx5dGVpZGwyLndvcmtmbG93LkNvbmRpdGlvbkFjdGlvbkgAQg0KBHNwZWMSBbpIAggBQhUKE19wYXJlbnRfYWN0aW9uX25hbWUibgoORW5xdWV1ZVJlcXVlc3QSMQoGYWN0aW9uGAEgASgLMhkuZmx5dGVpZGwyLmFjdGlvbnMuQWN0aW9uQga6SAPIAQESKQoIcnVuX3NwZWMYAiABKAsyFy5mbHl0ZWlkbDIudGFzay5SdW5TcGVjIhEKD0VucXVldWVSZXNwb25zZSKxAQoNVXBkYXRlUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAEjgKBnN0YXR1cxgDIAEoCzIgLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25TdGF0dXNCBrpIA8gBARINCgVzdGF0ZRgEIAEoCSIQCg5VcGRhdGVSZXNwb25zZSJwChVHZXRMYXRlc3RTdGF0ZVJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESGAoHYXR0ZW1wdBgCIAEoDUIHukgEKgIgACIwChZHZXRMYXRlc3RTdGF0ZVJlc3BvbnNlEhYKBXN0YXRlGAEgASgJQge6SARyAhABImkKFldhdGNoRm9yVXBkYXRlc1JlcXVlc3QSPgoQcGFyZW50X2FjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckgAQg8KBmZpbHRlchIFukgCCAEingEKF1dhdGNoRm9yVXBkYXRlc1Jlc3BvbnNlEjkKDWFjdGlvbl91cGRhdGUYASABKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uVXBkYXRlSAASPQoPY29udHJvbF9tZXNzYWdlGAIgASgLMiIuZmx5dGVpZGwyLndvcmtmbG93LkNvbnRyb2xNZXNzYWdlSABCCQoHbWVzc2FnZSJtCgxBYm9ydFJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESEwoGcmVhc29uGAIgASgJSACIAQFCCQoHX3JlYXNvbiIPCg1BYm9ydFJlc3BvbnNlMtoDCg5BY3Rpb25zU2VydmljZRJSCgdFbnF1ZXVlEiEuZmx5dGVpZGwyLmFjdGlvbnMuRW5xdWV1ZVJlcXVlc3QaIi5mbHl0ZWlkbDIuYWN0aW9ucy5FbnF1ZXVlUmVzcG9uc2UiABJnCg5HZXRMYXRlc3RTdGF0ZRIoLmZseXRlaWRsMi5hY3Rpb25zLkdldExhdGVzdFN0YXRlUmVxdWVzdBopLmZseXRlaWRsMi5hY3Rpb25zLkdldExhdGVzdFN0YXRlUmVzcG9uc2UiABJsCg9XYXRjaEZvclVwZGF0ZXMSKS5mbHl0ZWlkbDIuYWN0aW9ucy5XYXRjaEZvclVwZGF0ZXNSZXF1ZXN0GiouZmx5dGVpZGwyLmFjdGlvbnMuV2F0Y2hGb3JVcGRhdGVzUmVzcG9uc2UiADABEk8KBlVwZGF0ZRIgLmZseXRlaWRsMi5hY3Rpb25zLlVwZGF0ZVJlcXVlc3QaIS5mbHl0ZWlkbDIuYWN0aW9ucy5VcGRhdGVSZXNwb25zZSIAEkwKBUFib3J0Eh8uZmx5dGVpZGwyLmFjdGlvbnMuQWJvcnRSZXF1ZXN0GiAuZmx5dGVpZGwyLmFjdGlvbnMuQWJvcnRSZXNwb25zZSIAQsoBChVjb20uZmx5dGVpZGwyLmFjdGlvbnNCE0FjdGlvbnNTZXJ2aWNlUHJvdG9IAlABWjVnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvYWN0aW9uc6ICA0ZBWKoCEUZseXRlaWRsMi5BY3Rpb25zygIRRmx5dGVpZGwyXEFjdGlvbnPiAh1GbHl0ZWlkbDJcQWN0aW9uc1xHUEJNZXRhZGF0YeoCEkZseXRlaWRsMjo6QWN0aW9uc2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_task_run, file_flyteidl2_workflow_run_definition, file_flyteidl2_workflow_state_service]);
+  fileDesc("CidmbHl0ZWlkbDIvYWN0aW9ucy9hY3Rpb25zX3NlcnZpY2UucHJvdG8SEWZseXRlaWRsMi5hY3Rpb25zIogDCgZBY3Rpb24SPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESHwoScGFyZW50X2FjdGlvbl9uYW1lGAIgASgJSAGIAQESGgoJaW5wdXRfdXJpGAMgASgJQge6SARyAhABEiAKD3J1bl9vdXRwdXRfYmFzZRgEIAEoCUIHukgEcgIQARINCgVncm91cBgFIAEoCRIPCgdzdWJqZWN0GAYgASgJEi4KBHRhc2sYByABKAsyHi5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza0FjdGlvbkgAEjAKBXRyYWNlGAggASgLMh8uZmx5dGVpZGwyLndvcmtmbG93LlRyYWNlQWN0aW9uSAASOAoJY29uZGl0aW9uGAkgASgLMiMuZmx5dGVpZGwyLndvcmtmbG93LkNvbmRpdGlvbkFjdGlvbkgAQg0KBHNwZWMSBbpIAggBQhUKE19wYXJlbnRfYWN0aW9uX25hbWUibgoORW5xdWV1ZVJlcXVlc3QSMQoGYWN0aW9uGAEgASgLMhkuZmx5dGVpZGwyLmFjdGlvbnMuQWN0aW9uQga6SAPIAQESKQoIcnVuX3NwZWMYAiABKAsyFy5mbHl0ZWlkbDIudGFzay5SdW5TcGVjIhEKD0VucXVldWVSZXNwb25zZSKxAQoNVXBkYXRlUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAEjgKBnN0YXR1cxgDIAEoCzIgLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25TdGF0dXNCBrpIA8gBARINCgVzdGF0ZRgEIAEoCSIQCg5VcGRhdGVSZXNwb25zZSJwChVHZXRMYXRlc3RTdGF0ZVJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESGAoHYXR0ZW1wdBgCIAEoDUIHukgEKgIgACIwChZHZXRMYXRlc3RTdGF0ZVJlc3BvbnNlEhYKBXN0YXRlGAEgASgJQge6SARyAhABImkKFldhdGNoRm9yVXBkYXRlc1JlcXVlc3QSPgoQcGFyZW50X2FjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckgAQg8KBmZpbHRlchIFukgCCAEingEKF1dhdGNoRm9yVXBkYXRlc1Jlc3BvbnNlEjkKDWFjdGlvbl91cGRhdGUYASABKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uVXBkYXRlSAASPQoPY29udHJvbF9tZXNzYWdlGAIgASgLMiIuZmx5dGVpZGwyLndvcmtmbG93LkNvbnRyb2xNZXNzYWdlSABCCQoHbWVzc2FnZSJtCgxBYm9ydFJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESEwoGcmVhc29uGAIgASgJSACIAQFCCQoHX3JlYXNvbiIPCg1BYm9ydFJlc3BvbnNlIqQBCg1TaWduYWxSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBEiMKEnBhcmVudF9hY3Rpb25fbmFtZRgCIAEoCUIHukgEcgIQARIvCgZvdXRwdXQYAyABKAsyFy5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsQga6SAPIAQEiEAoOU2lnbmFsUmVzcG9uc2UyqwQKDkFjdGlvbnNTZXJ2aWNlElIKB0VucXVldWUSIS5mbHl0ZWlkbDIuYWN0aW9ucy5FbnF1ZXVlUmVxdWVzdBoiLmZseXRlaWRsMi5hY3Rpb25zLkVucXVldWVSZXNwb25zZSIAEmcKDkdldExhdGVzdFN0YXRlEiguZmx5dGVpZGwyLmFjdGlvbnMuR2V0TGF0ZXN0U3RhdGVSZXF1ZXN0GikuZmx5dGVpZGwyLmFjdGlvbnMuR2V0TGF0ZXN0U3RhdGVSZXNwb25zZSIAEmwKD1dhdGNoRm9yVXBkYXRlcxIpLmZseXRlaWRsMi5hY3Rpb25zLldhdGNoRm9yVXBkYXRlc1JlcXVlc3QaKi5mbHl0ZWlkbDIuYWN0aW9ucy5XYXRjaEZvclVwZGF0ZXNSZXNwb25zZSIAMAESTwoGVXBkYXRlEiAuZmx5dGVpZGwyLmFjdGlvbnMuVXBkYXRlUmVxdWVzdBohLmZseXRlaWRsMi5hY3Rpb25zLlVwZGF0ZVJlc3BvbnNlIgASTAoFQWJvcnQSHy5mbHl0ZWlkbDIuYWN0aW9ucy5BYm9ydFJlcXVlc3QaIC5mbHl0ZWlkbDIuYWN0aW9ucy5BYm9ydFJlc3BvbnNlIgASTwoGU2lnbmFsEiAuZmx5dGVpZGwyLmFjdGlvbnMuU2lnbmFsUmVxdWVzdBohLmZseXRlaWRsMi5hY3Rpb25zLlNpZ25hbFJlc3BvbnNlIgBCygEKFWNvbS5mbHl0ZWlkbDIuYWN0aW9uc0ITQWN0aW9uc1NlcnZpY2VQcm90b0gCUAFaNWdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9hY3Rpb25zogIDRkFYqgIRRmx5dGVpZGwyLkFjdGlvbnPKAhFGbHl0ZWlkbDJcQWN0aW9uc+ICHUZseXRlaWRsMlxBY3Rpb25zXEdQQk1ldGFkYXRh6gISRmx5dGVpZGwyOjpBY3Rpb25zYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_core_literals, file_flyteidl2_task_run, file_flyteidl2_workflow_run_definition, file_flyteidl2_workflow_state_service]);
 
 /**
  * Action represents a unit of work to be executed. Theses can be task executions, traces, or conditions.
@@ -365,6 +367,58 @@ export const AbortResponseSchema: GenMessage<AbortResponse> = /*@__PURE__*/
   messageDesc(file_flyteidl2_actions_actions_service, 10);
 
 /**
+ * SignalRequest is the request message for resolving a condition action.
+ *
+ * @generated from message flyteidl2.actions.SignalRequest
+ */
+export type SignalRequest = Message<"flyteidl2.actions.SignalRequest"> & {
+  /**
+   * The unique identifier for the condition action to signal.
+   *
+   * @generated from field: flyteidl2.common.ActionIdentifier action_id = 1;
+   */
+  actionId?: ActionIdentifier;
+
+  /**
+   * The name of the parent action that owns this condition. Required for
+   * state store lookup and partition routing in the middleware.
+   *
+   * @generated from field: string parent_action_name = 2;
+   */
+  parentActionName: string;
+
+  /**
+   * The output literal to signal the condition with. Must match the
+   * ConditionAction.type declared at enqueue time.
+   *
+   * @generated from field: flyteidl2.core.Literal output = 3;
+   */
+  output?: Literal;
+};
+
+/**
+ * Describes the message flyteidl2.actions.SignalRequest.
+ * Use `create(SignalRequestSchema)` to create a new message.
+ */
+export const SignalRequestSchema: GenMessage<SignalRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_actions_actions_service, 11);
+
+/**
+ * SignalResponse is the response message for resolving a condition action.
+ *
+ * @generated from message flyteidl2.actions.SignalResponse
+ */
+export type SignalResponse = Message<"flyteidl2.actions.SignalResponse"> & {
+};
+
+/**
+ * Describes the message flyteidl2.actions.SignalResponse.
+ * Use `create(SignalResponseSchema)` to create a new message.
+ */
+export const SignalResponseSchema: GenMessage<SignalResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_actions_actions_service, 12);
+
+/**
  * ActionsService provides an interface for managing the state and execution of actions.
  * This service is intended to replace StateService and QueueService, providing a single interface for managing both
  * the state and execution of actions.
@@ -425,6 +479,21 @@ export const ActionsService: GenService<{
     methodKind: "unary";
     input: typeof AbortRequestSchema;
     output: typeof AbortResponseSchema;
+  },
+  /**
+   * Signal resolves a ConditionAction by providing its signal value.
+   * On success, transitions the condition to SUCCEEDED with the provided
+   * value as its output.
+   * Returns FAILED_PRECONDITION if the action is not a condition or is
+   * already terminal. Returns NOT_FOUND if the action does not exist.
+   * Returns ABORTED if the action has a write in-flight (retry).
+   *
+   * @generated from rpc flyteidl2.actions.ActionsService.Signal
+   */
+  signal: {
+    methodKind: "unary";
+    input: typeof SignalRequestSchema;
+    output: typeof SignalResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_flyteidl2_actions_actions_service, 0);
