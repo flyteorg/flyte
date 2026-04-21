@@ -106,6 +106,6 @@ message ActionUpdate {
   // the output uri for the action
   string output_uri = 4;
 
-  // The output literal for the action (used by condition actions).
-  optional flyteidl2.core.Literal output = 5;
+  // The value literal for the action (used by condition actions).
+  optional flyteidl2.core.Literal value = 5;
 }

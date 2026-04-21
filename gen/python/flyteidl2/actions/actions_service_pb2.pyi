@@ -101,14 +101,14 @@ class AbortResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class SignalRequest(_message.Message):
-    __slots__ = ["action_id", "parent_action_name", "output"]
+    __slots__ = ["action_id", "parent_action_name", "value"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     PARENT_ACTION_NAME_FIELD_NUMBER: _ClassVar[int]
-    OUTPUT_FIELD_NUMBER: _ClassVar[int]
+    VALUE_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     parent_action_name: str
-    output: _literals_pb2.Literal
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., output: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ...) -> None: ...
+    value: _literals_pb2.Literal
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ...) -> None: ...
 
 class SignalResponse(_message.Message):
     __slots__ = []

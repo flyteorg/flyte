@@ -191,9 +191,9 @@ message SignalRequest {
   // state store lookup and partition routing in the middleware.
   string parent_action_name = 2 [(buf.validate.field).string.min_len = 1];
 
-  // The output literal to signal the condition with. Must match the
+  // The value literal to signal the condition with. Must match the
   // ConditionAction.type declared at enqueue time.
-  flyteidl2.core.Literal output = 3 [(buf.validate.field).required = true];
+  flyteidl2.core.Literal value = 3 [(buf.validate.field).required = true];
 }
 
 // SignalResponse is the response message for resolving a condition action.

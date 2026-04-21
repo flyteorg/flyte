@@ -65,15 +65,15 @@ class ControlMessage(_message.Message):
     def __init__(self, sentinel: bool = ...) -> None: ...
 
 class ActionUpdate(_message.Message):
-    __slots__ = ["action_id", "phase", "error", "output_uri", "output"]
+    __slots__ = ["action_id", "phase", "error", "output_uri", "value"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_URI_FIELD_NUMBER: _ClassVar[int]
-    OUTPUT_FIELD_NUMBER: _ClassVar[int]
+    VALUE_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     phase: _phase_pb2.ActionPhase
     error: _execution_pb2.ExecutionError
     output_uri: str
-    output: _literals_pb2.Literal
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_uri: _Optional[str] = ..., output: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ...) -> None: ...
+    value: _literals_pb2.Literal
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_uri: _Optional[str] = ..., value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ...) -> None: ...

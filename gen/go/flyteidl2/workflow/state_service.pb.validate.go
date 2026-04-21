@@ -1139,14 +1139,14 @@ func (m *ActionUpdate) validate(all bool) error {
 
 	}
 
-	if m.Output != nil {
+	if m.Value != nil {
 
 		if all {
-			switch v := interface{}(m.GetOutput()).(type) {
+			switch v := interface{}(m.GetValue()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, ActionUpdateValidationError{
-						field:  "Output",
+						field:  "Value",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -1154,16 +1154,16 @@ func (m *ActionUpdate) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, ActionUpdateValidationError{
-						field:  "Output",
+						field:  "Value",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetOutput()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetValue()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ActionUpdateValidationError{
-					field:  "Output",
+					field:  "Value",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
