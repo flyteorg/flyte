@@ -179,7 +179,6 @@ jobs:
             type=raw,value=gpu-nightly,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/v2' }}
             type=sha,format=long,prefix=gpu-
       - name: Build and push GPU multi-arch image
-        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: docker/build-push-action@v6
         with:
           context: docker/demo-bundled
@@ -190,4 +189,4 @@ jobs:
           build-args: |
             FLYTE_DEMO_VERSION=${{ env.FLYTE_DEMO_VERSION }}
             BASE_IMAGE=ghcr.io/${{ github.repository_owner }}/flyte-demo:sha-${{ github.sha }}
-          push: true
+          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
