@@ -158,7 +158,24 @@ jobs:
           registry: ghcr.io
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
-      - name: Build and push multi-arch image
+      - name: Build CPU multi-arch image to OCI archive
+        # Produce an OCI archive locally so the GPU build below can use it as a
+        # named build context. This avoids the PR-gated push chicken-and-egg:
+        # on pull_request events we don't push to ghcr, so the GPU build can't
+        # resolve a ghcr-hosted FROM.
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/demo-bundled
+          allow: "security.insecure"
+          platforms: linux/arm64, linux/amd64
+          build-args: "FLYTE_DEMO_VERSION=${{ env.FLYTE_DEMO_VERSION }}"
+          outputs: type=oci,dest=/tmp/cpu-oci.tar
+      - name: Extract CPU OCI layout for GPU build
+        run: |
+          mkdir -p /tmp/cpu-oci
+          tar -xf /tmp/cpu-oci.tar -C /tmp/cpu-oci
+      - name: Push CPU multi-arch image
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: docker/build-push-action@v6
         with:
           context: docker/demo-bundled
@@ -166,7 +183,7 @@ jobs:
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
           build-args: "FLYTE_DEMO_VERSION=${{ env.FLYTE_DEMO_VERSION }}"
-          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          push: true
       - name: Prepare GPU Image Names
         id: gpu-image-names
         uses: docker/metadata-action@v3
@@ -183,10 +200,13 @@ jobs:
         with:
           context: docker/demo-bundled
           file: docker/demo-bundled/Dockerfile.gpu
+          # Point Dockerfile.gpu's `FROM ${BASE_IMAGE}` at the OCI archive
+          # produced above — no registry round-trip needed.
+          build-contexts: base=oci-layout:///tmp/cpu-oci
           allow: "security.insecure"
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.gpu-image-names.outputs.tags }}
           build-args: |
             FLYTE_DEMO_VERSION=${{ env.FLYTE_DEMO_VERSION }}
-            BASE_IMAGE=ghcr.io/${{ github.repository_owner }}/flyte-demo:sha-${{ github.sha }}
+            BASE_IMAGE=base
           push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
