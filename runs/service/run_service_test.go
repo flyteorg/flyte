@@ -22,6 +22,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	storageMocks "github.com/flyteorg/flyte/v2/flytestdlib/storage/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
+	actionsconnectmocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
@@ -31,55 +32,10 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-// mockActionsClient implements actionsconnect.ActionsServiceClient for testing.
-type mockActionsClient struct {
-	mock.Mock
-}
-
-func (m *mockActionsClient) Enqueue(ctx context.Context, req *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error) {
-	args := m.Called(ctx, req)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*connect.Response[actions.EnqueueResponse]), args.Error(1)
-}
-
-func (m *mockActionsClient) GetLatestState(ctx context.Context, req *connect.Request[actions.GetLatestStateRequest]) (*connect.Response[actions.GetLatestStateResponse], error) {
-	args := m.Called(ctx, req)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*connect.Response[actions.GetLatestStateResponse]), args.Error(1)
-}
-
-func (m *mockActionsClient) WatchForUpdates(ctx context.Context, req *connect.Request[actions.WatchForUpdatesRequest]) (*connect.ServerStreamForClient[actions.WatchForUpdatesResponse], error) {
-	args := m.Called(ctx, req)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*connect.ServerStreamForClient[actions.WatchForUpdatesResponse]), args.Error(1)
-}
-
-func (m *mockActionsClient) Update(ctx context.Context, req *connect.Request[actions.UpdateRequest]) (*connect.Response[actions.UpdateResponse], error) {
-	args := m.Called(ctx, req)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*connect.Response[actions.UpdateResponse]), args.Error(1)
-}
-
-func (m *mockActionsClient) Abort(ctx context.Context, req *connect.Request[actions.AbortRequest]) (*connect.Response[actions.AbortResponse], error) {
-	args := m.Called(ctx, req)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*connect.Response[actions.AbortResponse]), args.Error(1)
-}
-
-func newTestService(t *testing.T) (*repoMocks.ActionRepo, *mockActionsClient, *RunService) {
+func newTestService(t *testing.T) (*repoMocks.ActionRepo, *actionsconnectmocks.ActionsServiceClient, *RunService) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
 	repo.On("TaskRepo").Maybe().Return(taskRepo)
@@ -90,7 +46,6 @@ func newTestService(t *testing.T) (*repoMocks.ActionRepo, *mockActionsClient, *R
 		repo.AssertExpectations(t)
 		actionRepo.AssertExpectations(t)
 		taskRepo.AssertExpectations(t)
-		actionsClient.AssertExpectations(t)
 	})
 
 	return actionRepo, actionsClient, svc
@@ -122,7 +77,7 @@ func newRunServiceTestClient(t *testing.T, svc *RunService) workflowconnect.RunS
 func TestGetRunDetails_WithTaskSpec(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
 	repo.On("TaskRepo").Maybe().Return(taskRepo)
@@ -339,7 +294,7 @@ func TestWatchClusterEvents_StreamsNewPersistedClusterEventsWithoutReplay(t *tes
 func TestGetRunDetails_ReturnsRunSpecEnvVars(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
 	repo.On("TaskRepo").Maybe().Return(taskRepo)
@@ -402,7 +357,7 @@ func TestGetRunDetails_ReturnsRunSpecEnvVars(t *testing.T) {
 func TestGetRunDetails_UsesActionCacheStatus(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
 	repo.On("TaskRepo").Maybe().Return(taskRepo)
@@ -459,7 +414,7 @@ func TestGetRunDetails_UsesActionCacheStatus(t *testing.T) {
 func TestGetRunDetails_TaskSpecLookupFails(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
 	repo.On("TaskRepo").Maybe().Return(taskRepo)
@@ -569,7 +524,7 @@ func TestFillDefaultInputsForCreateRun(t *testing.T) {
 func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1043,7 +998,7 @@ func TestInputsProtoCompat(t *testing.T) {
 func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1100,7 +1055,7 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1157,7 +1112,7 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1206,7 +1161,7 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1274,7 +1229,7 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 
 func TestGetActionData_ReadsOutputFromAttempts(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1420,7 +1375,7 @@ func TestGetActionData_NonSucceededSkipsOutputs(t *testing.T) {
 func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}

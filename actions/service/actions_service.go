@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -18,6 +19,10 @@ import (
 // ActionsService implements the ActionsService gRPC API.
 type ActionsService struct {
 	client ActionsClientInterface
+}
+
+func (s *ActionsService) Signal(ctx context.Context, c *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("endpoint Signal not implemented"))
 }
 
 // NewActionsService creates a new ActionsService.

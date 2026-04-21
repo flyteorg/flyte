@@ -12,19 +12,20 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
+	actionsconnectmocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
 // newTestReconciler builds a reconciler wired to mocks with fast timing for tests.
-func newTestReconciler(t *testing.T) (*repoMocks.ActionRepo, *mockActionsClient, *AbortReconciler) {
+func newTestReconciler(t *testing.T) (*repoMocks.ActionRepo, *actionsconnectmocks.ActionsServiceClient, *AbortReconciler) {
 	t.Helper()
 	actionRepo := repoMocks.NewActionRepo(t)
 	repo := repoMocks.NewRepository(t)
 	repo.On("ActionRepo").Return(actionRepo).Maybe()
 
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 
 	reconciler := NewAbortReconciler(repo, actionsClient, AbortReconcilerConfig{
 		Workers:      2,

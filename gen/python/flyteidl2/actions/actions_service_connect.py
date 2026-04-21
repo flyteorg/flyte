@@ -32,6 +32,9 @@ class ActionsService(Protocol):
     async def abort(self, request: flyteidl2_dot_actions_dot_actions__service__pb2.AbortRequest, ctx: RequestContext) -> flyteidl2_dot_actions_dot_actions__service__pb2.AbortResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def signal(self, request: flyteidl2_dot_actions_dot_actions__service__pb2.SignalRequest, ctx: RequestContext) -> flyteidl2_dot_actions_dot_actions__service__pb2.SignalResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
 
 class ActionsServiceASGIApplication(ConnectASGIApplication[ActionsService]):
     def __init__(self, service: ActionsService | AsyncGenerator[ActionsService], *, interceptors: Iterable[Interceptor]=(), read_max_bytes: int | None = None, compressions: Iterable[Compression] | None = None) -> None:
@@ -87,6 +90,16 @@ class ActionsServiceASGIApplication(ConnectASGIApplication[ActionsService]):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.abort,
+                ),
+                "/flyteidl2.actions.ActionsService/Signal": Endpoint.unary(
+                    method=MethodInfo(
+                        name="Signal",
+                        service_name="flyteidl2.actions.ActionsService",
+                        input=flyteidl2_dot_actions_dot_actions__service__pb2.SignalRequest,
+                        output=flyteidl2_dot_actions_dot_actions__service__pb2.SignalResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.signal,
                 ),
             },
             interceptors=interceptors,
@@ -201,6 +214,26 @@ class ActionsServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    async def signal(
+        self,
+        request: flyteidl2_dot_actions_dot_actions__service__pb2.SignalRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_actions_dot_actions__service__pb2.SignalResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="Signal",
+                service_name="flyteidl2.actions.ActionsService",
+                input=flyteidl2_dot_actions_dot_actions__service__pb2.SignalRequest,
+                output=flyteidl2_dot_actions_dot_actions__service__pb2.SignalResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
 
 class ActionsServiceSync(Protocol):
     def enqueue(self, request: flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueRequest, ctx: RequestContext) -> flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueResponse:
@@ -212,6 +245,8 @@ class ActionsServiceSync(Protocol):
     def update(self, request: flyteidl2_dot_actions_dot_actions__service__pb2.UpdateRequest, ctx: RequestContext) -> flyteidl2_dot_actions_dot_actions__service__pb2.UpdateResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def abort(self, request: flyteidl2_dot_actions_dot_actions__service__pb2.AbortRequest, ctx: RequestContext) -> flyteidl2_dot_actions_dot_actions__service__pb2.AbortResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def signal(self, request: flyteidl2_dot_actions_dot_actions__service__pb2.SignalRequest, ctx: RequestContext) -> flyteidl2_dot_actions_dot_actions__service__pb2.SignalResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
@@ -268,6 +303,16 @@ class ActionsServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.abort,
+                ),
+                "/flyteidl2.actions.ActionsService/Signal": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="Signal",
+                        service_name="flyteidl2.actions.ActionsService",
+                        input=flyteidl2_dot_actions_dot_actions__service__pb2.SignalRequest,
+                        output=flyteidl2_dot_actions_dot_actions__service__pb2.SignalResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.signal,
                 ),
             },
             interceptors=interceptors,
@@ -376,6 +421,26 @@ class ActionsServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.actions.ActionsService",
                 input=flyteidl2_dot_actions_dot_actions__service__pb2.AbortRequest,
                 output=flyteidl2_dot_actions_dot_actions__service__pb2.AbortResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def signal(
+        self,
+        request: flyteidl2_dot_actions_dot_actions__service__pb2.SignalRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_actions_dot_actions__service__pb2.SignalResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="Signal",
+                service_name="flyteidl2.actions.ActionsService",
+                input=flyteidl2_dot_actions_dot_actions__service__pb2.SignalRequest,
+                output=flyteidl2_dot_actions_dot_actions__service__pb2.SignalResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
             ),
             headers=headers,
