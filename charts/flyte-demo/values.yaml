@@ -145,6 +145,6 @@ sandbox:
   console:
     enabled: true
     image:
-      repository: ghcr.io/flyteorg/flyte-client-v2
-      tag: latest
+      repository: docker.io/unionai-oss/flyteconsole-v2
+      tag: sandbox
       pullPolicy: Never
