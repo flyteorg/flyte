@@ -232,18 +232,17 @@ func (c *AppK8sClient) Watch(ctx context.Context, project, domain, appName strin
 }
 
 // openWatch starts a K8s watch from resourceVersion (empty = watch from now).
+// AllowWatchBookmarks is always set so K8s sends Bookmark events on every session,
+// keeping lastResourceVersion current even when no objects change.
 func (c *AppK8sClient) openWatch(ctx context.Context, ns string, labels map[string]string, resourceVersion string) (k8swatch.Interface, error) {
+	rawOpts := &metav1.ListOptions{AllowWatchBookmarks: true}
+	if resourceVersion != "" {
+		rawOpts.ResourceVersion = resourceVersion
+	}
 	opts := []client.ListOption{
 		client.InNamespace(ns),
 		client.MatchingLabels(labels),
-	}
-	if resourceVersion != "" {
-		opts = append(opts, &client.ListOptions{
-			Raw: &metav1.ListOptions{
-				ResourceVersion:     resourceVersion,
-				AllowWatchBookmarks: true,
-			},
-		})
+		&client.ListOptions{Raw: rawOpts},
 	}
 	watcher, err := c.k8sClient.Watch(ctx, &servingv1.ServiceList{}, opts...)
 	if err != nil {
@@ -253,7 +252,9 @@ func (c *AppK8sClient) openWatch(ctx context.Context, ns string, labels map[stri
 }
 
 // watchLoop is the reconnect loop. It drains watcher until it closes, then
-// reopens with exponential backoff. Closes ch only when ctx is cancelled.
+// reopens. Exponential backoff is applied only on K8s Error events; normal
+// watch timeouts (clean channel close) reconnect immediately. Closes ch only
+// when ctx is cancelled.
 func (c *AppK8sClient) watchLoop(
 	ctx context.Context,
 	ns string,
@@ -267,21 +268,27 @@ func (c *AppK8sClient) watchLoop(
 	state := &watchState{backoff: watchBackoffInitial}
 
 	for {
-		reconnect := c.drainWatcher(ctx, watcher, ch, state)
+		reconnect, isError := c.drainWatcher(ctx, watcher, ch, state)
 		if !reconnect {
 			return // ctx cancelled
 		}
 
 		watcher.Stop()
-		state.consecutiveErrors++
-		delay := state.nextBackoff()
-		logger.Warnf(ctx, "KService watch in namespace %s closed unexpectedly (attempt %d); reconnecting in %v",
-			ns, state.consecutiveErrors, delay)
 
-		select {
-		case <-ctx.Done():
-			return
-		case <-time.After(delay):
+		if isError {
+			state.consecutiveErrors++
+			delay := state.nextBackoff()
+			logger.Warnf(ctx, "KService watch in namespace %s closed with error (attempt %d); reconnecting in %v",
+				ns, state.consecutiveErrors, delay)
+			select {
+			case <-ctx.Done():
+				return
+			case <-time.After(delay):
+			}
+		} else {
+			// Normal K8s watch timeout — reconnect immediately, no backoff.
+			state.resetBackoff()
+			logger.Debugf(ctx, "KService watch in namespace %s timed out naturally; reconnecting", ns)
 		}
 
 		newWatcher, err := c.openWatch(ctx, ns, labels, state.lastResourceVersion)
@@ -296,23 +303,22 @@ func (c *AppK8sClient) watchLoop(
 }
 
 // drainWatcher processes events from watcher until the channel closes or ctx is done.
-// Returns true if reconnect is needed, false if ctx was cancelled.
+// Returns (reconnect, isError): reconnect=false means ctx was cancelled (stop the loop);
+// isError=true means a K8s Error event triggered the close and backoff should be applied.
 func (c *AppK8sClient) drainWatcher(
 	ctx context.Context,
 	watcher k8swatch.Interface,
 	ch chan<- *flyteapp.WatchResponse,
 	state *watchState,
-) bool {
+) (bool, bool) {
 	for {
 		select {
 		case <-ctx.Done():
-			return false
+			return false, false
 		case event, ok := <-watcher.ResultChan():
 			if !ok {
-				return true
+				return true, false // normal K8s watch timeout
 			}
-
-			c.updateResourceVersion(event, state)
 
 			switch event.Type {
 			case k8swatch.Error:
@@ -322,20 +328,24 @@ func (c *AppK8sClient) drainWatcher(
 				} else {
 					logger.Warnf(ctx, "KService watch received error event (type %T); will reconnect", event.Object)
 				}
-				return true
+				return true, true // error — apply backoff on reconnect
 			case k8swatch.Bookmark:
-				// resourceVersion already updated — nothing to forward.
+				// Update RV immediately — there is no delivery to confirm.
+				c.updateResourceVersion(event, state)
 				state.resetBackoff()
 			default:
 				resp := c.kserviceEventToWatchResponse(ctx, event)
 				if resp == nil {
 					continue
 				}
-				state.resetBackoff()
 				select {
 				case ch <- resp:
+					// Advance RV only after confirmed delivery so a failed send
+					// doesn't silently skip the event on the next reconnect.
+					c.updateResourceVersion(event, state)
+					state.resetBackoff()
 				case <-ctx.Done():
-					return false
+					return false, false
 				}
 			}
 		}
@@ -343,7 +353,7 @@ func (c *AppK8sClient) drainWatcher(
 }
 
 // updateResourceVersion extracts and stores the latest resourceVersion from a watch event.
-// Called before event type dispatch so both normal events and Bookmarks checkpoint the position.
+// For Bookmark events it is called immediately; for data events only after successful delivery.
 func (c *AppK8sClient) updateResourceVersion(event k8swatch.Event, state *watchState) {
 	switch event.Type {
 	case k8swatch.Added, k8swatch.Modified, k8swatch.Deleted, k8swatch.Bookmark:
