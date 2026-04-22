@@ -24,6 +24,8 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
+	projectMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
@@ -74,6 +76,14 @@ func (m *mockActionsClient) Abort(ctx context.Context, req *connect.Request[acti
 		return nil, args.Error(1)
 	}
 	return args.Get(0).(*connect.Response[actions.AbortResponse]), args.Error(1)
+}
+
+// newMockProjectClientAlwaysOK returns a mock ProjectServiceClient whose GetProject always succeeds.
+func newMockProjectClientAlwaysOK(t *testing.T) *projectMocks.ProjectServiceClient {
+	pc := projectMocks.NewProjectServiceClient(t)
+	pc.EXPECT().GetProject(mock.Anything, mock.Anything).
+		Return(connect.NewResponse(&project.GetProjectResponse{}), nil).Maybe()
+	return pc
 }
 
 func newTestService(t *testing.T) (*repoMocks.ActionRepo, *mockActionsClient, *RunService) {
@@ -580,6 +590,7 @@ func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
 	svc := &RunService{
 		repo:          repo,
 		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1054,6 +1065,7 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	svc := &RunService{
 		repo:          repo,
 		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1111,6 +1123,7 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	svc := &RunService{
 		repo:          repo,
 		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1168,6 +1181,7 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 	svc := &RunService{
 		repo:          repo,
 		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1217,6 +1231,7 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 	svc := &RunService{
 		repo:          repo,
 		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1431,6 +1446,7 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 	svc := &RunService{
 		repo:          repo,
 		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}

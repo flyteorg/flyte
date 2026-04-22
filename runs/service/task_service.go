@@ -8,6 +8,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	commonpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	flyteTask "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
@@ -21,14 +22,17 @@ import (
 
 type taskService struct {
 	taskconnect.UnimplementedTaskServiceHandler
-	db interfaces.Repository
+	db            interfaces.Repository
+	projectClient projectconnect.ProjectServiceClient
 }
 
-func NewTaskService(repo interfaces.Repository) taskconnect.TaskServiceHandler {
+func NewTaskService(repo interfaces.Repository, projectClient projectconnect.ProjectServiceClient) taskconnect.TaskServiceHandler {
 	return &taskService{
-		db: repo,
+		db:            repo,
+		projectClient: projectClient,
 	}
 }
+
 
 func (s *taskService) DeployTask(ctx context.Context, c *connect.Request[task.DeployTaskRequest]) (*connect.Response[task.DeployTaskResponse], error) {
 	request := c.Msg
@@ -36,6 +40,10 @@ func (s *taskService) DeployTask(ctx context.Context, c *connect.Request[task.De
 	if err := request.Validate(); err != nil {
 		logger.Errorf(ctx, "Invalid DeployTask request: %v", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	if err := validateProjectExists(ctx, s.projectClient, request.GetTaskId().GetProject()); err != nil {
+		return nil, err
 	}
 
 	taskSpec := request.GetSpec()
