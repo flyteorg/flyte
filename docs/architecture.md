@@ -40,7 +40,8 @@ Flyte 2 is a Kubernetes-native workflow orchestration platform. The backend is a
 
 ```mermaid
 flowchart TB
-    Client["User / SDK / CLI"]
+    Dev["Developer<br/>(Python code / CLI)"]
+    SDK["flyte SDK (Python)<br/>• controlplane client<br/>• ControllerClient"]
 
     subgraph ControlPlane["Control Plane"]
         Runs["Runs<br/>Service"]
@@ -57,18 +58,21 @@ flowchart TB
     subgraph DataPlane["Data Plane (Kubernetes)"]
         Executor["Executor<br/>(K8s Controller + Plugins)"]
         subgraph Pod["Task Pod"]
-            User["User<br/>Container"]
+            User["User Container<br/>(embeds flyte SDK)"]
             Copilot["Copilot sidecar<br/>(raw-container only)"]
         end
     end
 
-    Client -- "gRPC: RunService<br/>DataProxyService<br/>TriggerService" --> Runs
+    Dev --> SDK
+    SDK -- "gRPC: RunService / TaskService<br/>DataProxyService / TriggerService" --> Runs
+    SDK -- "upload code bundle + inputs" --> Storage
     Runs <--> DB
     Actions <--> DB
     Cache <--> DB
     DataProxy <--> Storage
     Actions -- "K8s API: TaskAction CRDs" --> Executor
     Executor -- "K8s API: create Pod" --> Pod
+    User -- "gRPC: ActionsService.Enqueue<br/>(spawn child actions)" --> Actions
     User <-- "S3/GCS/Azure:<br/>read inputs / write outputs" --> Storage
     Copilot -- "S3/GCS/Azure:<br/>upload outputs" --> Storage
     Actions -- "gRPC: InternalRunService<br/>RecordAction / UpdateActionStatus" --> Runs
@@ -80,7 +84,8 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    Client["User / SDK / CLI"]
+    Dev["Developer / CLI<br/>(Python code)"]
+    SDK["flyte SDK (Python)<br/>— controlplane client (remote/_client/controlplane.py)<br/>— ControllerClient (_internal/controllers/remote/_client.py)"]
 
     Runs["Runs Service (port 8090)<br/>• RunService (public)<br/>• InternalRunService<br/>• TaskService<br/>• TriggerService<br/>• ProjectService<br/>• RunLogsService"]
 
@@ -104,10 +109,12 @@ flowchart TB
         AppSvc["App Service<br/>App metadata"]
     end
 
-    Client -- "gRPC: RunService.CreateRun<br/>AbortRun / GetRunDetails / ListRuns" --> Runs
-    Client -- "gRPC: RunService.WatchRuns<br/>WatchRunDetails (server-stream)" --> Runs
-    Client -- "gRPC: DataProxyService.CreateUploadLocation<br/>CreateDownloadLink / GetActionData" --> DataProxy
-    Client -- "gRPC: TaskService.DeployTask / GetTaskDetails<br/>TriggerService.DeployTrigger / ListTriggers<br/>ProjectService.CreateProject / GetProject" --> Runs
+    Dev --> SDK
+    SDK -- "gRPC: RunService.CreateRun<br/>AbortRun / GetRunDetails / ListRuns" --> Runs
+    SDK -- "gRPC: RunService.WatchRuns<br/>WatchRunDetails (server-stream)" --> Runs
+    SDK -- "gRPC: DataProxyService.CreateUploadLocation<br/>CreateDownloadLink / GetActionData" --> DataProxy
+    SDK -- "gRPC: TaskService.DeployTask / GetTaskDetails<br/>TriggerService.DeployTrigger / ListTriggers<br/>ProjectService.CreateProject / GetProject" --> Runs
+    PodUser -- "gRPC: ActionsService.Enqueue<br/>(via SDK ControllerClient —<br/>spawn child actions)" --> ActionsSvc
 
     Runs -- "SQL (pgx)" --> DB
     Runs -- "gRPC: ActionsService.Enqueue<br/>Update / Abort / WatchForUpdates" --> ActionsSvc
@@ -124,7 +131,8 @@ flowchart TB
     ActionsSvc -- "gRPC: InternalRunService.RecordAction<br/>UpdateActionStatus" --> Internal
     EventsSvc -- "gRPC: InternalRunService.RecordActionEvents" --> Internal
     Internal -- "SQL (pgx)" --> DB
-    DB -. "LISTEN/NOTIFY → gRPC stream<br/>WatchRunDetails" .-> Client
+    DB -. "LISTEN/NOTIFY → gRPC stream<br/>WatchRunDetails" .-> SDK
+    SDK -. "status / outputs" .-> Dev
 ```
 
 ### gRPC Calls Between Components
@@ -155,6 +163,67 @@ Summary of the gRPC wiring shown in the diagram above:
 | DataProxy | Object Storage | S3 / GCS / Azure | Sign URL | REST |
 
 All gRPC traffic uses **buf connect** (HTTP/2 with HTTP/1.1 fallback).
+
+### SDK ↔ Backend
+
+The [**flyte SDK**](https://github.com/flyteorg/flyte-sdk) (Python) is how users interact with the backend. It exposes two distinct client surfaces — the **same SDK package** acts differently depending on whether it's running on a developer's machine or inside a task pod.
+
+```mermaid
+flowchart LR
+    subgraph Local["Developer machine / CLI"]
+        Dev["user's Python code"]
+        CP["controlplane client<br/>(flyte/remote/_client/<br/>controlplane.py)"]
+        Dev --> CP
+    end
+
+    subgraph PodCtx["Inside a running Task Pod"]
+        UserCode["user's task code"]
+        CC["ControllerClient<br/>(flyte/_internal/controllers/<br/>remote/_client.py)"]
+        UserCode --> CC
+    end
+
+    CP -- "RunService / TaskService<br/>DataProxyService / TriggerService<br/>ProjectService / SecretService<br/>AppService / RunLogsService" --> Backend["Flyte Backend"]
+    CC -- "ActionsService.Enqueue<br/>(+ legacy QueueService /<br/>StateService)" --> Backend
+```
+
+**1. Control-plane client** — `src/flyte/remote/_client/controlplane.py`
+
+Used by developers on their laptop (or in CI) and by the `flyte` CLI. Responsible for:
+
+| Action | RPC(s) |
+|--------|--------|
+| Register a task with the backend | `TaskService.DeployTask` |
+| Upload task inputs + code bundle | `DataProxyService.CreateUploadLocation` / `UploadInputs` |
+| Trigger a run | `RunService.CreateRun` |
+| Stream run status | `RunService.WatchRunDetails` (server-stream) |
+| List / get runs, actions | `RunService.ListRuns`, `GetRunDetails`, `GetActionDetails` |
+| Manage triggers / projects / secrets / apps | `TriggerService`, `ProjectService`, `SecretService`, `AppService` |
+| Tail logs | `RunLogsService.TailLogs` |
+
+Client instances created via `RunServiceClient`, `TaskServiceClient`, `DataProxyServiceClient`, etc. — see imports in `controlplane.py`.
+
+**2. ControllerClient** — `src/flyte/_internal/controllers/remote/_client.py`
+
+Used **inside a running task pod** when the user's code spawns child tasks or sub-actions. The SDK is embedded in the user container (via the auto-generated image). When user code calls `task.aio(...)`, the SDK's ControllerClient submits the child action directly to the Actions Service without going through RunService:
+
+| Action | RPC |
+|--------|-----|
+| Spawn a child task / trace / condition | `ActionsService.Enqueue` |
+| Poll latest state | `ActionsService.GetLatestState` (or legacy `StateService.Get`) |
+| Watch child action updates | `ActionsService.WatchForUpdates` |
+
+This is why nested / fanout workflows scale: the parent task pod talks directly to Actions Service, not through the RunService hot path.
+
+**Deploy flow (what `flyte run` does under the hood):**
+
+```
+1. SDK builds a code bundle (wheel / tar) from the user's Python module
+2. SDK calls DataProxyService.CreateUploadLocation → gets signed URL
+3. SDK uploads the bundle + serialized inputs to object storage
+4. SDK calls TaskService.DeployTask to register the task definition
+5. SDK calls RunService.CreateRun to launch
+6. SDK opens a WatchRunDetails stream to report back to the developer
+```
 
 ---
 
