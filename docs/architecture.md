@@ -165,8 +165,8 @@ The following describes what happens when a user submits a workflow:
  ────   ────────────────────────────────────────────────────     ─────────────────
   1     User calls RunService.CreateRun()                       Client → Runs Service
   2     Run record + root action written to PostgreSQL          Runs Service → DB
-  3     Actions controller detects new action                   Actions Service
-  4     TaskAction CRD created in Kubernetes                    Actions Service → K8s
+  3     Runs Service calls ActionsService.CreateAction()        Runs Service → Actions Service
+  4     Actions Service creates TaskAction CRD in Kubernetes    Actions Service → K8s
   5     Executor controller sees the CRD                        Executor
   6     Plugin resolves task spec, creates Pod + Copilot        Executor → K8s
   7     Copilot init-container downloads inputs from storage    Copilot → Object Storage
