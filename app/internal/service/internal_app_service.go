@@ -67,24 +67,10 @@ func (s *InternalAppService) Create(
 	return connect.NewResponse(&flyteapp.CreateResponse{App: app}), nil
 }
 
-// publicIngress builds the deterministic public URL for an app.
-// Prefers IngressAppsDomain when set; otherwise falls back to BaseDomain
-// (which matches Knative's default domain template so Kourier serves the URL directly).
-// Returns nil if neither domain is configured.
+// publicIngress builds the deterministic public URL for an app using
+// BaseDomain — which must match Knative's domain-template so Kourier
+// serves the URL directly. Returns nil if BaseDomain is unset.
 func publicIngress(id *flyteapp.Identifier, cfg *appconfig.InternalAppConfig) *flyteapp.Ingress {
-	if cfg.IngressAppsDomain != "" {
-		scheme := cfg.Scheme
-		if scheme == "" {
-			scheme = "http"
-		}
-		host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
-			id.GetName(), id.GetProject(), id.GetDomain(), cfg.IngressAppsDomain))
-		url := scheme + "://" + host
-		if cfg.IngressAppsPort != 0 {
-			url += fmt.Sprintf(":%d", cfg.IngressAppsPort)
-		}
-		return &flyteapp.Ingress{PublicUrl: url}
-	}
 	if cfg.BaseDomain == "" {
 		return nil
 	}

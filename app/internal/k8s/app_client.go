@@ -468,19 +468,6 @@ func (c *AppK8sClient) List(ctx context.Context, project, domain string, limit u
 // publicIngress returns the deterministic public URL for an app using the same
 // logic as the service layer so GetStatus/List/Watch are consistent with Create.
 func (c *AppK8sClient) publicIngress(id *flyteapp.Identifier) *flyteapp.Ingress {
-	if c.cfg.IngressAppsDomain != "" {
-		scheme := c.cfg.Scheme
-		if scheme == "" {
-			scheme = "http"
-		}
-		host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
-			id.GetName(), id.GetProject(), id.GetDomain(), c.cfg.IngressAppsDomain))
-		url := scheme + "://" + host
-		if c.cfg.IngressAppsPort != 0 {
-			url += fmt.Sprintf(":%d", c.cfg.IngressAppsPort)
-		}
-		return &flyteapp.Ingress{PublicUrl: url}
-	}
 	if c.cfg.BaseDomain == "" {
 		return nil
 	}
