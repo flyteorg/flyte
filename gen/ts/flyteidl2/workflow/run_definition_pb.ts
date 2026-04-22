@@ -24,14 +24,14 @@ import { file_flyteidl2_task_run } from "../task/run_pb.ts";
 import type { TaskIdentifier, TaskSpec, TraceSpec } from "../task/task_definition_pb.ts";
 import { file_flyteidl2_task_task_definition } from "../task/task_definition_pb.ts";
 import type { Duration, Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_duration, file_google_protobuf_timestamp, file_google_protobuf_wrappers } from "@bufbuild/protobuf/wkt";
-import type { Message } from "@bufbuild/protobuf";
+import { file_google_protobuf_duration, file_google_protobuf_struct, file_google_protobuf_timestamp, file_google_protobuf_wrappers } from "@bufbuild/protobuf/wkt";
+import type { JsonObject, Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file flyteidl2/workflow/run_definition.proto.
  */
 export const file_flyteidl2_workflow_run_definition: GenFile = /*@__PURE__*/
-  fileDesc("CidmbHl0ZWlkbDIvd29ya2Zsb3cvcnVuX2RlZmluaXRpb24ucHJvdG8SEmZseXRlaWRsMi53b3JrZmxvdyIxCgNSdW4SKgoGYWN0aW9uGAEgASgLMhouZmx5dGVpZGwyLndvcmtmbG93LkFjdGlvbiJqCgpSdW5EZXRhaWxzEikKCHJ1bl9zcGVjGAEgASgLMhcuZmx5dGVpZGwyLnRhc2suUnVuU3BlYxIxCgZhY3Rpb24YAiABKAsyIS5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uRGV0YWlscyKqAQoKVGFza0FjdGlvbhIqCgJpZBgBIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVyEi4KBHNwZWMYAiABKAsyGC5mbHl0ZWlkbDIudGFzay5UYXNrU3BlY0IGukgDyAEBEi8KCWNhY2hlX2tleRgDIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIPCgdjbHVzdGVyGAQgASgJIqYCCgtUcmFjZUFjdGlvbhIVCgRuYW1lGAEgASgJQge6SARyAhABEiwKBXBoYXNlGAIgASgOMh0uZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25QaGFzZRIuCgpzdGFydF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIxCghlbmRfdGltZRgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBIAIgBARIxCgdvdXRwdXRzGAUgASgLMiAuZmx5dGVpZGwyLnRhc2suT3V0cHV0UmVmZXJlbmNlcxIvCgRzcGVjGAYgASgLMhkuZmx5dGVpZGwyLnRhc2suVHJhY2VTcGVjQga6SAPIAQFCCwoJX2VuZF90aW1lItMBCg9Db25kaXRpb25BY3Rpb24SFQoEbmFtZRgBIAEoCUIHukgEcgIQARIZCgZydW5faWQYAiABKAlCB7pIBHICEAFIABIcCglhY3Rpb25faWQYAyABKAlCB7pIBHICEAFIABIQCgZnbG9iYWwYBCABKAhIABIpCgR0eXBlGAYgASgLMhsuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbFR5cGUSDgoGcHJvbXB0GAcgASgJEhMKC2Rlc2NyaXB0aW9uGAggASgJQg4KBXNjb3BlEgW6SAIIASJnChJUYXNrQWN0aW9uTWV0YWRhdGESKgoCaWQYASABKAsyHi5mbHl0ZWlkbDIudGFzay5UYXNrSWRlbnRpZmllchIRCgl0YXNrX3R5cGUYAiABKAkSEgoKc2hvcnRfbmFtZRgDIAEoCSIjChNUcmFjZUFjdGlvbk1ldGFkYXRhEgwKBG5hbWUYASABKAkiggEKF0NvbmRpdGlvbkFjdGlvbk1ldGFkYXRhEgwKBG5hbWUYASABKAkSGQoGcnVuX2lkGAIgASgJQge6SARyAhABSAASHAoJYWN0aW9uX2lkGAMgASgJQge6SARyAhABSAASEAoGZ2xvYmFsGAQgASgISABCDgoFc2NvcGUSBbpIAggBIsQECg5BY3Rpb25NZXRhZGF0YRIOCgZwYXJlbnQYAyABKAkSDQoFZ3JvdXAYBSABKAkSNwoLZXhlY3V0ZWRfYnkYBiABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkVucmljaGVkSWRlbnRpdHkSNgoEdGFzaxgHIAEoCzImLmZseXRlaWRsMi53b3JrZmxvdy5UYXNrQWN0aW9uTWV0YWRhdGFIABI4CgV0cmFjZRgIIAEoCzInLmZseXRlaWRsMi53b3JrZmxvdy5UcmFjZUFjdGlvbk1ldGFkYXRhSAASQAoJY29uZGl0aW9uGAkgASgLMisuZmx5dGVpZGwyLndvcmtmbG93LkNvbmRpdGlvbkFjdGlvbk1ldGFkYXRhSAASMwoLYWN0aW9uX3R5cGUYCiABKA4yHi5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uVHlwZRI3Cgp0cmlnZ2VyX2lkGAsgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5UcmlnZ2VySWRlbnRpZmllchIYChBlbnZpcm9ubWVudF9uYW1lGAwgASgJEhQKDGZ1bnRpb25fbmFtZRgNIAEoCRIUCgx0cmlnZ2VyX25hbWUYDiABKAkSOwoMdHJpZ2dlcl90eXBlGA8gASgLMiUuZmx5dGVpZGwyLnRhc2suVHJpZ2dlckF1dG9tYXRpb25TcGVjEi0KBnNvdXJjZRgQIAEoDjIdLmZseXRlaWRsMi53b3JrZmxvdy5SdW5Tb3VyY2VCBgoEc3BlYyKrAgoMQWN0aW9uU3RhdHVzEiwKBXBoYXNlGAEgASgOMh0uZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25QaGFzZRIuCgpzdGFydF90aW1lGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIxCghlbmRfdGltZRgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBIAIgBARIZCghhdHRlbXB0cxgEIAEoDUIHukgEKgIgABI4CgxjYWNoZV9zdGF0dXMYBSABKA4yIi5mbHl0ZWlkbDIuY29yZS5DYXRhbG9nQ2FjaGVTdGF0dXMSGAoLZHVyYXRpb25fbXMYBiABKARIAYgBAUILCglfZW5kX3RpbWVCDgoMX2R1cmF0aW9uX21zIqABCgZBY3Rpb24SLgoCaWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXISNAoIbWV0YWRhdGEYAiABKAsyIi5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uTWV0YWRhdGESMAoGc3RhdHVzGAMgASgLMiAuZmx5dGVpZGwyLndvcmtmbG93LkFjdGlvblN0YXR1cyLqAQoORW5yaWNoZWRBY3Rpb24SKgoGYWN0aW9uGAEgASgLMhouZmx5dGVpZGwyLndvcmtmbG93LkFjdGlvbhIUCgxtZWV0c19maWx0ZXIYAiABKAgSWgoVY2hpbGRyZW5fcGhhc2VfY291bnRzGAMgAygLMjsuZmx5dGVpZGwyLndvcmtmbG93LkVucmljaGVkQWN0aW9uLkNoaWxkcmVuUGhhc2VDb3VudHNFbnRyeRo6ChhDaGlsZHJlblBoYXNlQ291bnRzRW50cnkSCwoDa2V5GAEgASgFEg0KBXZhbHVlGAIgASgFOgI4ASKMAQoJRXJyb3JJbmZvEg8KB21lc3NhZ2UYASABKAkSMAoEa2luZBgCIAEoDjIiLmZseXRlaWRsMi53b3JrZmxvdy5FcnJvckluZm8uS2luZCI8CgRLaW5kEhQKEEtJTkRfVU5TUEVDSUZJRUQQABINCglLSU5EX1VTRVIQARIPCgtLSU5EX1NZU1RFTRACIlMKCUFib3J0SW5mbxIOCgZyZWFzb24YASABKAkSNgoKYWJvcnRlZF9ieRgCIAEoCzIiLmZseXRlaWRsMi5jb21tb24uRW5yaWNoZWRJZGVudGl0eSKuAwoNQWN0aW9uRGV0YWlscxIuCgJpZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllchI0CghtZXRhZGF0YRgCIAEoCzIiLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25NZXRhZGF0YRIwCgZzdGF0dXMYAyABKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uU3RhdHVzEjMKCmVycm9yX2luZm8YBCABKAsyHS5mbHl0ZWlkbDIud29ya2Zsb3cuRXJyb3JJbmZvSAASMwoKYWJvcnRfaW5mbxgFIAEoCzIdLmZseXRlaWRsMi53b3JrZmxvdy5BYm9ydEluZm9IABIoCgR0YXNrGAYgASgLMhguZmx5dGVpZGwyLnRhc2suVGFza1NwZWNIARIqCgV0cmFjZRgIIAEoCzIZLmZseXRlaWRsMi50YXNrLlRyYWNlU3BlY0gBEjMKCGF0dGVtcHRzGAcgAygLMiEuZmx5dGVpZGwyLndvcmtmbG93LkFjdGlvbkF0dGVtcHRCCAoGcmVzdWx0QgYKBHNwZWMi+gQKDUFjdGlvbkF0dGVtcHQSLAoFcGhhc2UYASABKA4yHS5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvblBoYXNlEi4KCnN0YXJ0X3RpbWUYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjEKCGVuZF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBEjYKCmVycm9yX2luZm8YBCABKAsyHS5mbHl0ZWlkbDIud29ya2Zsb3cuRXJyb3JJbmZvSAGIAQESGAoHYXR0ZW1wdBgFIAEoDUIHukgEKgIgABIpCghsb2dfaW5mbxgGIAMoCzIXLmZseXRlaWRsMi5jb3JlLlRhc2tMb2cSMQoHb3V0cHV0cxgHIAEoCzIgLmZseXRlaWRsMi50YXNrLk91dHB1dFJlZmVyZW5jZXMSFgoObG9nc19hdmFpbGFibGUYCCABKAgSOAoMY2FjaGVfc3RhdHVzGAkgASgOMiIuZmx5dGVpZGwyLmNvcmUuQ2F0YWxvZ0NhY2hlU3RhdHVzEjgKDmNsdXN0ZXJfZXZlbnRzGAogAygLMiAuZmx5dGVpZGwyLndvcmtmbG93LkNsdXN0ZXJFdmVudBI+ChFwaGFzZV90cmFuc2l0aW9ucxgLIAMoCzIjLmZseXRlaWRsMi53b3JrZmxvdy5QaGFzZVRyYW5zaXRpb24SDwoHY2x1c3RlchgMIAEoCRIvCgtsb2dfY29udGV4dBgNIAEoCzIaLmZseXRlaWRsMi5jb3JlLkxvZ0NvbnRleHRCCwoJX2VuZF90aW1lQg0KC19lcnJvcl9pbmZvIlAKDENsdXN0ZXJFdmVudBIvCgtvY2N1cnJlZF9hdBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDwoHbWVzc2FnZRgCIAEoCSKvAQoPUGhhc2VUcmFuc2l0aW9uEiwKBXBoYXNlGAEgASgOMh0uZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25QaGFzZRIuCgpzdGFydF90aW1lGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIxCghlbmRfdGltZRgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBIAIgBAUILCglfZW5kX3RpbWUi1gUKC0FjdGlvbkV2ZW50EjYKAmlkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESGAoHYXR0ZW1wdBgCIAEoDUIHukgEKgIgABIsCgVwaGFzZRgDIAEoDjIdLmZseXRlaWRsMi5jb21tb24uQWN0aW9uUGhhc2USDwoHdmVyc2lvbhgEIAEoDRIyCgpzdGFydF90aW1lGAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEICGAESMAoMdXBkYXRlZF90aW1lGAYgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBI1CghlbmRfdGltZRgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCAhgBSACIAQESNgoKZXJyb3JfaW5mbxgIIAEoCzIdLmZseXRlaWRsMi53b3JrZmxvdy5FcnJvckluZm9IAYgBARIpCghsb2dfaW5mbxgJIAMoCzIXLmZseXRlaWRsMi5jb3JlLlRhc2tMb2cSLwoLbG9nX2NvbnRleHQYCiABKAsyGi5mbHl0ZWlkbDIuY29yZS5Mb2dDb250ZXh0Eg8KB2NsdXN0ZXIYCyABKAkSMQoHb3V0cHV0cxgMIAEoCzIgLmZseXRlaWRsMi50YXNrLk91dHB1dFJlZmVyZW5jZXMSOAoMY2FjaGVfc3RhdHVzGA0gASgOMiIuZmx5dGVpZGwyLmNvcmUuQ2F0YWxvZ0NhY2hlU3RhdHVzEjgKDmNsdXN0ZXJfZXZlbnRzGA4gAygLMiAuZmx5dGVpZGwyLndvcmtmbG93LkNsdXN0ZXJFdmVudBIxCg1yZXBvcnRlZF90aW1lGA8gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEILCglfZW5kX3RpbWVCDQoLX2Vycm9yX2luZm8ipgMKCkFjdGlvblNwZWMSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESHwoScGFyZW50X2FjdGlvbl9uYW1lGAIgASgJSAGIAQESKQoIcnVuX3NwZWMYAyABKAsyFy5mbHl0ZWlkbDIudGFzay5SdW5TcGVjEhoKCWlucHV0X3VyaRgEIAEoCUIHukgEcgIQARIgCg9ydW5fb3V0cHV0X2Jhc2UYBSABKAlCB7pIBHICEAESLgoEdGFzaxgGIAEoCzIeLmZseXRlaWRsMi53b3JrZmxvdy5UYXNrQWN0aW9uSAASOAoJY29uZGl0aW9uGAcgASgLMiMuZmx5dGVpZGwyLndvcmtmbG93LkNvbmRpdGlvbkFjdGlvbkgAEjAKBXRyYWNlGAogASgLMh8uZmx5dGVpZGwyLndvcmtmbG93LlRyYWNlQWN0aW9uSAASDQoFZ3JvdXAYCCABKAlCDQoEc3BlYxIFukgCCAFCFQoTX3BhcmVudF9hY3Rpb25fbmFtZSLkBgoJVGFza0dyb3VwEhEKCXRhc2tfbmFtZRgBIAEoCRIYChBlbnZpcm9ubWVudF9uYW1lGAIgASgJEhIKCnRvdGFsX3J1bnMYAyABKAMSMwoPbGF0ZXN0X3J1bl90aW1lGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBJDCg9yZWNlbnRfc3RhdHVzZXMYBSADKAsyKi5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza0dyb3VwLlJlY2VudFN0YXR1cxIcChRhdmVyYWdlX2ZhaWx1cmVfcmF0ZRgGIAEoARIzChBhdmVyYWdlX2R1cmF0aW9uGAcgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEjgKFGxhdGVzdF9maW5pc2hlZF90aW1lGAggASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBI2CgpjcmVhdGVkX2J5GAkgAygLMiIuZmx5dGVpZGwyLmNvbW1vbi5FbnJpY2hlZElkZW50aXR5EhUKDXNob3VsZF9kZWxldGUYCiABKAgSEgoKc2hvcnRfbmFtZRgLIAEoCRI/CgxlcnJvcl9jb3VudHMYDCABKAsyKS5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza0dyb3VwLkVycm9yQ291bnRzEj8KDHBoYXNlX2NvdW50cxgNIAMoCzIpLmZseXRlaWRsMi53b3JrZmxvdy5UYXNrR3JvdXAuUGhhc2VDb3VudHMSOgoXYXZlcmFnZV90aW1lX3RvX3J1bm5pbmcYDiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24aTgoMUmVjZW50U3RhdHVzEhAKCHJ1bl9uYW1lGAEgASgJEiwKBXBoYXNlGAIgASgOMh0uZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25QaGFzZRpSCgtFcnJvckNvdW50cxISCgp1c2VyX2Vycm9yGAEgASgDEhQKDHN5c3RlbV9lcnJvchgCIAEoAxIZChF1bnNwZWNpZmllZF9lcnJvchgDIAEoAxpKCgtQaGFzZUNvdW50cxIsCgVwaGFzZRgBIAEoDjIdLmZseXRlaWRsMi5jb21tb24uQWN0aW9uUGhhc2USDQoFY291bnQYAiABKAMqcQoKQWN0aW9uVHlwZRIbChdBQ1RJT05fVFlQRV9VTlNQRUNJRklFRBAAEhQKEEFDVElPTl9UWVBFX1RBU0sQARIVChFBQ1RJT05fVFlQRV9UUkFDRRACEhkKFUFDVElPTl9UWVBFX0NPTkRJVElPThADKnAKCVJ1blNvdXJjZRIaChZSVU5fU09VUkNFX1VOU1BFQ0lGSUVEEAASEgoOUlVOX1NPVVJDRV9XRUIQARISCg5SVU5fU09VUkNFX0NMSRACEh8KG1JVTl9TT1VSQ0VfU0NIRURVTEVfVFJJR0dFUhADQs8BChZjb20uZmx5dGVpZGwyLndvcmtmbG93QhJSdW5EZWZpbml0aW9uUHJvdG9IAlABWjZnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvd29ya2Zsb3eiAgNGV1iqAhJGbHl0ZWlkbDIuV29ya2Zsb3fKAhJGbHl0ZWlkbDJcV29ya2Zsb3fiAh5GbHl0ZWlkbDJcV29ya2Zsb3dcR1BCTWV0YWRhdGHqAhNGbHl0ZWlkbDI6OldvcmtmbG93YgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_identity, file_flyteidl2_common_phase, file_flyteidl2_core_catalog, file_flyteidl2_core_execution, file_flyteidl2_core_types, file_flyteidl2_task_common, file_flyteidl2_task_run, file_flyteidl2_task_task_definition, file_google_protobuf_duration, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("CidmbHl0ZWlkbDIvd29ya2Zsb3cvcnVuX2RlZmluaXRpb24ucHJvdG8SEmZseXRlaWRsMi53b3JrZmxvdyIxCgNSdW4SKgoGYWN0aW9uGAEgASgLMhouZmx5dGVpZGwyLndvcmtmbG93LkFjdGlvbiJqCgpSdW5EZXRhaWxzEikKCHJ1bl9zcGVjGAEgASgLMhcuZmx5dGVpZGwyLnRhc2suUnVuU3BlYxIxCgZhY3Rpb24YAiABKAsyIS5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uRGV0YWlscyKqAQoKVGFza0FjdGlvbhIqCgJpZBgBIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVyEi4KBHNwZWMYAiABKAsyGC5mbHl0ZWlkbDIudGFzay5UYXNrU3BlY0IGukgDyAEBEi8KCWNhY2hlX2tleRgDIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIPCgdjbHVzdGVyGAQgASgJIqYCCgtUcmFjZUFjdGlvbhIVCgRuYW1lGAEgASgJQge6SARyAhABEiwKBXBoYXNlGAIgASgOMh0uZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25QaGFzZRIuCgpzdGFydF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIxCghlbmRfdGltZRgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBIAIgBARIxCgdvdXRwdXRzGAUgASgLMiAuZmx5dGVpZGwyLnRhc2suT3V0cHV0UmVmZXJlbmNlcxIvCgRzcGVjGAYgASgLMhkuZmx5dGVpZGwyLnRhc2suVHJhY2VTcGVjQga6SAPIAQFCCwoJX2VuZF90aW1lIsYCCg9Db25kaXRpb25BY3Rpb24SFQoEbmFtZRgBIAEoCUIHukgEcgIQARIpCgR0eXBlGAYgASgLMhsuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbFR5cGUSDgoGcHJvbXB0GAcgASgJEhMKC2Rlc2NyaXB0aW9uGAggASgJEjwKC3Byb21wdF90eXBlGAkgASgOMicuZmx5dGVpZGwyLndvcmtmbG93LkNvbmRpdGlvblByb21wdFR5cGUSKgoHdGltZW91dBgKIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhI1Cgd3ZWJob29rGAsgASgLMiQuZmx5dGVpZGwyLndvcmtmbG93LkNvbmRpdGlvbldlYmhvb2tKBAgCEANKBAgDEARKBAgEEAVSBnJ1bl9pZFIJYWN0aW9uX2lkUgZnbG9iYWwiSQoQQ29uZGl0aW9uV2ViaG9vaxILCgN1cmwYASABKAkSKAoHcGF5bG9hZBgCIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3QiZwoSVGFza0FjdGlvbk1ldGFkYXRhEioKAmlkGAEgASgLMh4uZmx5dGVpZGwyLnRhc2suVGFza0lkZW50aWZpZXISEQoJdGFza190eXBlGAIgASgJEhIKCnNob3J0X25hbWUYAyABKAkiIwoTVHJhY2VBY3Rpb25NZXRhZGF0YRIMCgRuYW1lGAEgASgJIlQKF0NvbmRpdGlvbkFjdGlvbk1ldGFkYXRhEgwKBG5hbWUYASABKAlKBAgCEANKBAgDEARKBAgEEAVSBnJ1bl9pZFIJYWN0aW9uX2lkUgZnbG9iYWwixAQKDkFjdGlvbk1ldGFkYXRhEg4KBnBhcmVudBgDIAEoCRINCgVncm91cBgFIAEoCRI3CgtleGVjdXRlZF9ieRgGIAEoCzIiLmZseXRlaWRsMi5jb21tb24uRW5yaWNoZWRJZGVudGl0eRI2CgR0YXNrGAcgASgLMiYuZmx5dGVpZGwyLndvcmtmbG93LlRhc2tBY3Rpb25NZXRhZGF0YUgAEjgKBXRyYWNlGAggASgLMicuZmx5dGVpZGwyLndvcmtmbG93LlRyYWNlQWN0aW9uTWV0YWRhdGFIABJACgljb25kaXRpb24YCSABKAsyKy5mbHl0ZWlkbDIud29ya2Zsb3cuQ29uZGl0aW9uQWN0aW9uTWV0YWRhdGFIABIzCgthY3Rpb25fdHlwZRgKIAEoDjIeLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25UeXBlEjcKCnRyaWdnZXJfaWQYCyABKAsyIy5mbHl0ZWlkbDIuY29tbW9uLlRyaWdnZXJJZGVudGlmaWVyEhgKEGVudmlyb25tZW50X25hbWUYDCABKAkSFAoMZnVudGlvbl9uYW1lGA0gASgJEhQKDHRyaWdnZXJfbmFtZRgOIAEoCRI7Cgx0cmlnZ2VyX3R5cGUYDyABKAsyJS5mbHl0ZWlkbDIudGFzay5UcmlnZ2VyQXV0b21hdGlvblNwZWMSLQoGc291cmNlGBAgASgOMh0uZmx5dGVpZGwyLndvcmtmbG93LlJ1blNvdXJjZUIGCgRzcGVjIqsCCgxBY3Rpb25TdGF0dXMSLAoFcGhhc2UYASABKA4yHS5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvblBoYXNlEi4KCnN0YXJ0X3RpbWUYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjEKCGVuZF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBEhkKCGF0dGVtcHRzGAQgASgNQge6SAQqAiAAEjgKDGNhY2hlX3N0YXR1cxgFIAEoDjIiLmZseXRlaWRsMi5jb3JlLkNhdGFsb2dDYWNoZVN0YXR1cxIYCgtkdXJhdGlvbl9tcxgGIAEoBEgBiAEBQgsKCV9lbmRfdGltZUIOCgxfZHVyYXRpb25fbXMioAEKBkFjdGlvbhIuCgJpZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllchI0CghtZXRhZGF0YRgCIAEoCzIiLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25NZXRhZGF0YRIwCgZzdGF0dXMYAyABKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uU3RhdHVzIuoBCg5FbnJpY2hlZEFjdGlvbhIqCgZhY3Rpb24YASABKAsyGi5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uEhQKDG1lZXRzX2ZpbHRlchgCIAEoCBJaChVjaGlsZHJlbl9waGFzZV9jb3VudHMYAyADKAsyOy5mbHl0ZWlkbDIud29ya2Zsb3cuRW5yaWNoZWRBY3Rpb24uQ2hpbGRyZW5QaGFzZUNvdW50c0VudHJ5GjoKGENoaWxkcmVuUGhhc2VDb3VudHNFbnRyeRILCgNrZXkYASABKAUSDQoFdmFsdWUYAiABKAU6AjgBIowBCglFcnJvckluZm8SDwoHbWVzc2FnZRgBIAEoCRIwCgRraW5kGAIgASgOMiIuZmx5dGVpZGwyLndvcmtmbG93LkVycm9ySW5mby5LaW5kIjwKBEtpbmQSFAoQS0lORF9VTlNQRUNJRklFRBAAEg0KCUtJTkRfVVNFUhABEg8KC0tJTkRfU1lTVEVNEAIiUwoJQWJvcnRJbmZvEg4KBnJlYXNvbhgBIAEoCRI2CgphYm9ydGVkX2J5GAIgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5FbnJpY2hlZElkZW50aXR5Iq4DCg1BY3Rpb25EZXRhaWxzEi4KAmlkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyEjQKCG1ldGFkYXRhGAIgASgLMiIuZmx5dGVpZGwyLndvcmtmbG93LkFjdGlvbk1ldGFkYXRhEjAKBnN0YXR1cxgDIAEoCzIgLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25TdGF0dXMSMwoKZXJyb3JfaW5mbxgEIAEoCzIdLmZseXRlaWRsMi53b3JrZmxvdy5FcnJvckluZm9IABIzCgphYm9ydF9pbmZvGAUgASgLMh0uZmx5dGVpZGwyLndvcmtmbG93LkFib3J0SW5mb0gAEigKBHRhc2sYBiABKAsyGC5mbHl0ZWlkbDIudGFzay5UYXNrU3BlY0gBEioKBXRyYWNlGAggASgLMhkuZmx5dGVpZGwyLnRhc2suVHJhY2VTcGVjSAESMwoIYXR0ZW1wdHMYByADKAsyIS5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uQXR0ZW1wdEIICgZyZXN1bHRCBgoEc3BlYyL6BAoNQWN0aW9uQXR0ZW1wdBIsCgVwaGFzZRgBIAEoDjIdLmZseXRlaWRsMi5jb21tb24uQWN0aW9uUGhhc2USLgoKc3RhcnRfdGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMQoIZW5kX3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSACIAQESNgoKZXJyb3JfaW5mbxgEIAEoCzIdLmZseXRlaWRsMi53b3JrZmxvdy5FcnJvckluZm9IAYgBARIYCgdhdHRlbXB0GAUgASgNQge6SAQqAiAAEikKCGxvZ19pbmZvGAYgAygLMhcuZmx5dGVpZGwyLmNvcmUuVGFza0xvZxIxCgdvdXRwdXRzGAcgASgLMiAuZmx5dGVpZGwyLnRhc2suT3V0cHV0UmVmZXJlbmNlcxIWCg5sb2dzX2F2YWlsYWJsZRgIIAEoCBI4CgxjYWNoZV9zdGF0dXMYCSABKA4yIi5mbHl0ZWlkbDIuY29yZS5DYXRhbG9nQ2FjaGVTdGF0dXMSOAoOY2x1c3Rlcl9ldmVudHMYCiADKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuQ2x1c3RlckV2ZW50Ej4KEXBoYXNlX3RyYW5zaXRpb25zGAsgAygLMiMuZmx5dGVpZGwyLndvcmtmbG93LlBoYXNlVHJhbnNpdGlvbhIPCgdjbHVzdGVyGAwgASgJEi8KC2xvZ19jb250ZXh0GA0gASgLMhouZmx5dGVpZGwyLmNvcmUuTG9nQ29udGV4dEILCglfZW5kX3RpbWVCDQoLX2Vycm9yX2luZm8iUAoMQ2x1c3RlckV2ZW50Ei8KC29jY3VycmVkX2F0GAEgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIPCgdtZXNzYWdlGAIgASgJIq8BCg9QaGFzZVRyYW5zaXRpb24SLAoFcGhhc2UYASABKA4yHS5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvblBoYXNlEi4KCnN0YXJ0X3RpbWUYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjEKCGVuZF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBQgsKCV9lbmRfdGltZSLWBQoLQWN0aW9uRXZlbnQSNgoCaWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAEiwKBXBoYXNlGAMgASgOMh0uZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25QaGFzZRIPCgd2ZXJzaW9uGAQgASgNEjIKCnN0YXJ0X3RpbWUYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQgIYARIwCgx1cGRhdGVkX3RpbWUYBiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjUKCGVuZF90aW1lGAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEICGAFIAIgBARI2CgplcnJvcl9pbmZvGAggASgLMh0uZmx5dGVpZGwyLndvcmtmbG93LkVycm9ySW5mb0gBiAEBEikKCGxvZ19pbmZvGAkgAygLMhcuZmx5dGVpZGwyLmNvcmUuVGFza0xvZxIvCgtsb2dfY29udGV4dBgKIAEoCzIaLmZseXRlaWRsMi5jb3JlLkxvZ0NvbnRleHQSDwoHY2x1c3RlchgLIAEoCRIxCgdvdXRwdXRzGAwgASgLMiAuZmx5dGVpZGwyLnRhc2suT3V0cHV0UmVmZXJlbmNlcxI4CgxjYWNoZV9zdGF0dXMYDSABKA4yIi5mbHl0ZWlkbDIuY29yZS5DYXRhbG9nQ2FjaGVTdGF0dXMSOAoOY2x1c3Rlcl9ldmVudHMYDiADKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuQ2x1c3RlckV2ZW50EjEKDXJlcG9ydGVkX3RpbWUYDyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQgsKCV9lbmRfdGltZUINCgtfZXJyb3JfaW5mbyKmAwoKQWN0aW9uU3BlYxI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIfChJwYXJlbnRfYWN0aW9uX25hbWUYAiABKAlIAYgBARIpCghydW5fc3BlYxgDIAEoCzIXLmZseXRlaWRsMi50YXNrLlJ1blNwZWMSGgoJaW5wdXRfdXJpGAQgASgJQge6SARyAhABEiAKD3J1bl9vdXRwdXRfYmFzZRgFIAEoCUIHukgEcgIQARIuCgR0YXNrGAYgASgLMh4uZmx5dGVpZGwyLndvcmtmbG93LlRhc2tBY3Rpb25IABI4Cgljb25kaXRpb24YByABKAsyIy5mbHl0ZWlkbDIud29ya2Zsb3cuQ29uZGl0aW9uQWN0aW9uSAASMAoFdHJhY2UYCiABKAsyHy5mbHl0ZWlkbDIud29ya2Zsb3cuVHJhY2VBY3Rpb25IABINCgVncm91cBgIIAEoCUINCgRzcGVjEgW6SAIIAUIVChNfcGFyZW50X2FjdGlvbl9uYW1lIuQGCglUYXNrR3JvdXASEQoJdGFza19uYW1lGAEgASgJEhgKEGVudmlyb25tZW50X25hbWUYAiABKAkSEgoKdG90YWxfcnVucxgDIAEoAxIzCg9sYXRlc3RfcnVuX3RpbWUYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEkMKD3JlY2VudF9zdGF0dXNlcxgFIAMoCzIqLmZseXRlaWRsMi53b3JrZmxvdy5UYXNrR3JvdXAuUmVjZW50U3RhdHVzEhwKFGF2ZXJhZ2VfZmFpbHVyZV9yYXRlGAYgASgBEjMKEGF2ZXJhZ2VfZHVyYXRpb24YByABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SOAoUbGF0ZXN0X2ZpbmlzaGVkX3RpbWUYCCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjYKCmNyZWF0ZWRfYnkYCSADKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkVucmljaGVkSWRlbnRpdHkSFQoNc2hvdWxkX2RlbGV0ZRgKIAEoCBISCgpzaG9ydF9uYW1lGAsgASgJEj8KDGVycm9yX2NvdW50cxgMIAEoCzIpLmZseXRlaWRsMi53b3JrZmxvdy5UYXNrR3JvdXAuRXJyb3JDb3VudHMSPwoMcGhhc2VfY291bnRzGA0gAygLMikuZmx5dGVpZGwyLndvcmtmbG93LlRhc2tHcm91cC5QaGFzZUNvdW50cxI6ChdhdmVyYWdlX3RpbWVfdG9fcnVubmluZxgOIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhpOCgxSZWNlbnRTdGF0dXMSEAoIcnVuX25hbWUYASABKAkSLAoFcGhhc2UYAiABKA4yHS5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvblBoYXNlGlIKC0Vycm9yQ291bnRzEhIKCnVzZXJfZXJyb3IYASABKAMSFAoMc3lzdGVtX2Vycm9yGAIgASgDEhkKEXVuc3BlY2lmaWVkX2Vycm9yGAMgASgDGkoKC1BoYXNlQ291bnRzEiwKBXBoYXNlGAEgASgOMh0uZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25QaGFzZRINCgVjb3VudBgCIAEoAyqAAQoTQ29uZGl0aW9uUHJvbXB0VHlwZRIlCiFDT05ESVRJT05fUFJPTVBUX1RZUEVfVU5TUEVDSUZJRUQQABIeChpDT05ESVRJT05fUFJPTVBUX1RZUEVfVEVYVBABEiIKHkNPTkRJVElPTl9QUk9NUFRfVFlQRV9NQVJLRE9XThACKnEKCkFjdGlvblR5cGUSGwoXQUNUSU9OX1RZUEVfVU5TUEVDSUZJRUQQABIUChBBQ1RJT05fVFlQRV9UQVNLEAESFQoRQUNUSU9OX1RZUEVfVFJBQ0UQAhIZChVBQ1RJT05fVFlQRV9DT05ESVRJT04QAypwCglSdW5Tb3VyY2USGgoWUlVOX1NPVVJDRV9VTlNQRUNJRklFRBAAEhIKDlJVTl9TT1VSQ0VfV0VCEAESEgoOUlVOX1NPVVJDRV9DTEkQAhIfChtSVU5fU09VUkNFX1NDSEVEVUxFX1RSSUdHRVIQA0LPAQoWY29tLmZseXRlaWRsMi53b3JrZmxvd0ISUnVuRGVmaW5pdGlvblByb3RvSAJQAVo2Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3dvcmtmbG93ogIDRldYqgISRmx5dGVpZGwyLldvcmtmbG93ygISRmx5dGVpZGwyXFdvcmtmbG934gIeRmx5dGVpZGwyXFdvcmtmbG93XEdQQk1ldGFkYXRh6gITRmx5dGVpZGwyOjpXb3JrZmxvd2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_identity, file_flyteidl2_common_phase, file_flyteidl2_core_catalog, file_flyteidl2_core_execution, file_flyteidl2_core_types, file_flyteidl2_task_common, file_flyteidl2_task_run, file_flyteidl2_task_task_definition, file_google_protobuf_duration, file_google_protobuf_struct, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
 
 /**
  * @generated from message flyteidl2.workflow.Run
@@ -183,64 +183,55 @@ export const TraceActionSchema: GenMessage<TraceAction> = /*@__PURE__*/
  */
 export type ConditionAction = Message<"flyteidl2.workflow.ConditionAction"> & {
   /**
-   * Name is the unique identifier for the action. It must be unique within the defined scope below.
+   * Name is the unique identifier for the action.
    *
    * @generated from field: string name = 1;
    */
   name: string;
 
   /**
-   * @generated from oneof flyteidl2.workflow.ConditionAction.scope
-   */
-  scope: {
-    /**
-     * RunId is the unique identifier for the run this action is associated with.
-     *
-     * @generated from field: string run_id = 2;
-     */
-    value: string;
-    case: "runId";
-  } | {
-    /**
-     * ActionId is the unique identifier for the action this action is associated with.
-     *
-     * @generated from field: string action_id = 3;
-     */
-    value: string;
-    case: "actionId";
-  } | {
-    /**
-     * Global indicates the condition is global and can be used across all runs and actions.
-     *
-     * @generated from field: bool global = 4;
-     */
-    value: boolean;
-    case: "global";
-  } | { case: undefined; value?: undefined };
-
-  /**
-   * Type is the type of the value the condition is expected. This can be used to properly render
-   * a UI element for the condition or validate when a value is received that it is of the expected
-   * type.
+   * Type is the expected value type for the condition.
    *
    * @generated from field: flyteidl2.core.LiteralType type = 6;
    */
   type?: LiteralType;
 
   /**
-   * Prompt is the prompt that will be shown to the user when the condition is awaited.
+   * Prompt shown to the user when the condition is awaited.
    *
    * @generated from field: string prompt = 7;
    */
   prompt: string;
 
   /**
-   * Description is a description of the condition. This can be used to provide additional
-   * information to the user about the condition.
+   * Description of the condition.
    *
    * @generated from field: string description = 8;
    */
   description: string;
+
+  /**
+   * How to render the prompt.
+   *
+   * @generated from field: flyteidl2.workflow.ConditionPromptType prompt_type = 9;
+   */
+  promptType: ConditionPromptType;
+
+  /**
+   * Optional timeout duration. If the condition is not signaled within this
+   * duration after creation, it transitions to TIMED_OUT with a timeout error.
+   * Must be strictly positive when set; zero or negative values are ignored.
+   *
+   * @generated from field: google.protobuf.Duration timeout = 10;
+   */
+  timeout?: Duration;
+
+  /**
+   * Optional webhook to fire when the condition action is created.
+   *
+   * @generated from field: flyteidl2.workflow.ConditionWebhook webhook = 11;
+   */
+  webhook?: ConditionWebhook;
 };
 
 /**
@@ -249,6 +240,33 @@ export type ConditionAction = Message<"flyteidl2.workflow.ConditionAction"> & {
  */
 export const ConditionActionSchema: GenMessage<ConditionAction> = /*@__PURE__*/
   messageDesc(file_flyteidl2_workflow_run_definition, 4);
+
+/**
+ * @generated from message flyteidl2.workflow.ConditionWebhook
+ */
+export type ConditionWebhook = Message<"flyteidl2.workflow.ConditionWebhook"> & {
+  /**
+   * The HTTP endpoint to POST to when the condition action is created.
+   *
+   * @generated from field: string url = 1;
+   */
+  url: string;
+
+  /**
+   * Optional JSON payload. String values may contain "{callback_uri}"
+   * which the backend replaces with the signal URI for this condition.
+   *
+   * @generated from field: google.protobuf.Struct payload = 2;
+   */
+  payload?: JsonObject;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.ConditionWebhook.
+ * Use `create(ConditionWebhookSchema)` to create a new message.
+ */
+export const ConditionWebhookSchema: GenMessage<ConditionWebhook> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_run_definition, 5);
 
 /**
  * @generated from message flyteidl2.workflow.TaskActionMetadata
@@ -281,7 +299,7 @@ export type TaskActionMetadata = Message<"flyteidl2.workflow.TaskActionMetadata"
  * Use `create(TaskActionMetadataSchema)` to create a new message.
  */
 export const TaskActionMetadataSchema: GenMessage<TaskActionMetadata> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 5);
+  messageDesc(file_flyteidl2_workflow_run_definition, 6);
 
 /**
  * @generated from message flyteidl2.workflow.TraceActionMetadata
@@ -298,7 +316,7 @@ export type TraceActionMetadata = Message<"flyteidl2.workflow.TraceActionMetadat
  * Use `create(TraceActionMetadataSchema)` to create a new message.
  */
 export const TraceActionMetadataSchema: GenMessage<TraceActionMetadata> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 6);
+  messageDesc(file_flyteidl2_workflow_run_definition, 7);
 
 /**
  * @generated from message flyteidl2.workflow.ConditionActionMetadata
@@ -308,35 +326,6 @@ export type ConditionActionMetadata = Message<"flyteidl2.workflow.ConditionActio
    * @generated from field: string name = 1;
    */
   name: string;
-
-  /**
-   * @generated from oneof flyteidl2.workflow.ConditionActionMetadata.scope
-   */
-  scope: {
-    /**
-     * RunId is the unique identifier for the run this action is associated with.
-     *
-     * @generated from field: string run_id = 2;
-     */
-    value: string;
-    case: "runId";
-  } | {
-    /**
-     * ActionId is the unique identifier for the action this action is associated with.
-     *
-     * @generated from field: string action_id = 3;
-     */
-    value: string;
-    case: "actionId";
-  } | {
-    /**
-     * Global indicates the condition is global and can be used across all runs and actions.
-     *
-     * @generated from field: bool global = 4;
-     */
-    value: boolean;
-    case: "global";
-  } | { case: undefined; value?: undefined };
 };
 
 /**
@@ -344,7 +333,7 @@ export type ConditionActionMetadata = Message<"flyteidl2.workflow.ConditionActio
  * Use `create(ConditionActionMetadataSchema)` to create a new message.
  */
 export const ConditionActionMetadataSchema: GenMessage<ConditionActionMetadata> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 7);
+  messageDesc(file_flyteidl2_workflow_run_definition, 8);
 
 /**
  * Static, lightweight metadata about an action.
@@ -457,7 +446,7 @@ export type ActionMetadata = Message<"flyteidl2.workflow.ActionMetadata"> & {
  * Use `create(ActionMetadataSchema)` to create a new message.
  */
 export const ActionMetadataSchema: GenMessage<ActionMetadata> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 8);
+  messageDesc(file_flyteidl2_workflow_run_definition, 9);
 
 /**
  * Lightweight status of an action. For more detailed status see ActionDetails.
@@ -513,7 +502,7 @@ export type ActionStatus = Message<"flyteidl2.workflow.ActionStatus"> & {
  * Use `create(ActionStatusSchema)` to create a new message.
  */
 export const ActionStatusSchema: GenMessage<ActionStatus> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 9);
+  messageDesc(file_flyteidl2_workflow_run_definition, 10);
 
 /**
  * Lightweight representation of an action.
@@ -548,7 +537,7 @@ export type Action = Message<"flyteidl2.workflow.Action"> & {
  * Use `create(ActionSchema)` to create a new message.
  */
 export const ActionSchema: GenMessage<Action> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 10);
+  messageDesc(file_flyteidl2_workflow_run_definition, 11);
 
 /**
  * EnrichedAction is a wrapper around Action that contains additional information
@@ -584,7 +573,7 @@ export type EnrichedAction = Message<"flyteidl2.workflow.EnrichedAction"> & {
  * Use `create(EnrichedActionSchema)` to create a new message.
  */
 export const EnrichedActionSchema: GenMessage<EnrichedAction> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 11);
+  messageDesc(file_flyteidl2_workflow_run_definition, 12);
 
 /**
  * ErrorInfo captures details of an error.
@@ -612,7 +601,7 @@ export type ErrorInfo = Message<"flyteidl2.workflow.ErrorInfo"> & {
  * Use `create(ErrorInfoSchema)` to create a new message.
  */
 export const ErrorInfoSchema: GenMessage<ErrorInfo> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 12);
+  messageDesc(file_flyteidl2_workflow_run_definition, 13);
 
 /**
  * @generated from enum flyteidl2.workflow.ErrorInfo.Kind
@@ -638,7 +627,7 @@ export enum ErrorInfo_Kind {
  * Describes the enum flyteidl2.workflow.ErrorInfo.Kind.
  */
 export const ErrorInfo_KindSchema: GenEnum<ErrorInfo_Kind> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_workflow_run_definition, 12, 0);
+  enumDesc(file_flyteidl2_workflow_run_definition, 13, 0);
 
 /**
  * AbortInfo captures details of an aborted run.
@@ -666,7 +655,7 @@ export type AbortInfo = Message<"flyteidl2.workflow.AbortInfo"> & {
  * Use `create(AbortInfoSchema)` to create a new message.
  */
 export const AbortInfoSchema: GenMessage<AbortInfo> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 13);
+  messageDesc(file_flyteidl2_workflow_run_definition, 14);
 
 /**
  * ActionDetails is the full details of an action.
@@ -748,7 +737,7 @@ export type ActionDetails = Message<"flyteidl2.workflow.ActionDetails"> & {
  * Use `create(ActionDetailsSchema)` to create a new message.
  */
 export const ActionDetailsSchema: GenMessage<ActionDetails> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 14);
+  messageDesc(file_flyteidl2_workflow_run_definition, 15);
 
 /**
  * ActionAttempt is a single attempt of an action.
@@ -854,7 +843,7 @@ export type ActionAttempt = Message<"flyteidl2.workflow.ActionAttempt"> & {
  * Use `create(ActionAttemptSchema)` to create a new message.
  */
 export const ActionAttemptSchema: GenMessage<ActionAttempt> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 15);
+  messageDesc(file_flyteidl2_workflow_run_definition, 16);
 
 /**
  * @generated from message flyteidl2.workflow.ClusterEvent
@@ -880,7 +869,7 @@ export type ClusterEvent = Message<"flyteidl2.workflow.ClusterEvent"> & {
  * Use `create(ClusterEventSchema)` to create a new message.
  */
 export const ClusterEventSchema: GenMessage<ClusterEvent> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 16);
+  messageDesc(file_flyteidl2_workflow_run_definition, 17);
 
 /**
  * @generated from message flyteidl2.workflow.PhaseTransition
@@ -913,7 +902,7 @@ export type PhaseTransition = Message<"flyteidl2.workflow.PhaseTransition"> & {
  * Use `create(PhaseTransitionSchema)` to create a new message.
  */
 export const PhaseTransitionSchema: GenMessage<PhaseTransition> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 17);
+  messageDesc(file_flyteidl2_workflow_run_definition, 18);
 
 /**
  * Event payload for an action
@@ -1034,7 +1023,7 @@ export type ActionEvent = Message<"flyteidl2.workflow.ActionEvent"> & {
  * Use `create(ActionEventSchema)` to create a new message.
  */
 export const ActionEventSchema: GenMessage<ActionEvent> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 18);
+  messageDesc(file_flyteidl2_workflow_run_definition, 19);
 
 /**
  * @generated from message flyteidl2.workflow.ActionSpec
@@ -1112,7 +1101,7 @@ export type ActionSpec = Message<"flyteidl2.workflow.ActionSpec"> & {
  * Use `create(ActionSpecSchema)` to create a new message.
  */
 export const ActionSpecSchema: GenMessage<ActionSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 19);
+  messageDesc(file_flyteidl2_workflow_run_definition, 20);
 
 /**
  * TaskGroup represents a group of runs for a specific task.
@@ -1219,7 +1208,7 @@ export type TaskGroup = Message<"flyteidl2.workflow.TaskGroup"> & {
  * Use `create(TaskGroupSchema)` to create a new message.
  */
 export const TaskGroupSchema: GenMessage<TaskGroup> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 20);
+  messageDesc(file_flyteidl2_workflow_run_definition, 21);
 
 /**
  * @generated from message flyteidl2.workflow.TaskGroup.RecentStatus
@@ -1241,7 +1230,7 @@ export type TaskGroup_RecentStatus = Message<"flyteidl2.workflow.TaskGroup.Recen
  * Use `create(TaskGroup_RecentStatusSchema)` to create a new message.
  */
 export const TaskGroup_RecentStatusSchema: GenMessage<TaskGroup_RecentStatus> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 20, 0);
+  messageDesc(file_flyteidl2_workflow_run_definition, 21, 0);
 
 /**
  * @generated from message flyteidl2.workflow.TaskGroup.ErrorCounts
@@ -1268,7 +1257,7 @@ export type TaskGroup_ErrorCounts = Message<"flyteidl2.workflow.TaskGroup.ErrorC
  * Use `create(TaskGroup_ErrorCountsSchema)` to create a new message.
  */
 export const TaskGroup_ErrorCountsSchema: GenMessage<TaskGroup_ErrorCounts> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 20, 1);
+  messageDesc(file_flyteidl2_workflow_run_definition, 21, 1);
 
 /**
  * @generated from message flyteidl2.workflow.TaskGroup.PhaseCounts
@@ -1290,7 +1279,33 @@ export type TaskGroup_PhaseCounts = Message<"flyteidl2.workflow.TaskGroup.PhaseC
  * Use `create(TaskGroup_PhaseCountsSchema)` to create a new message.
  */
 export const TaskGroup_PhaseCountsSchema: GenMessage<TaskGroup_PhaseCounts> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_definition, 20, 2);
+  messageDesc(file_flyteidl2_workflow_run_definition, 21, 2);
+
+/**
+ * @generated from enum flyteidl2.workflow.ConditionPromptType
+ */
+export enum ConditionPromptType {
+  /**
+   * @generated from enum value: CONDITION_PROMPT_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: CONDITION_PROMPT_TYPE_TEXT = 1;
+   */
+  TEXT = 1,
+
+  /**
+   * @generated from enum value: CONDITION_PROMPT_TYPE_MARKDOWN = 2;
+   */
+  MARKDOWN = 2,
+}
+
+/**
+ * Describes the enum flyteidl2.workflow.ConditionPromptType.
+ */
+export const ConditionPromptTypeSchema: GenEnum<ConditionPromptType> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_workflow_run_definition, 0);
 
 /**
  * @generated from enum flyteidl2.workflow.ActionType
@@ -1321,7 +1336,7 @@ export enum ActionType {
  * Describes the enum flyteidl2.workflow.ActionType.
  */
 export const ActionTypeSchema: GenEnum<ActionType> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_workflow_run_definition, 0);
+  enumDesc(file_flyteidl2_workflow_run_definition, 1);
 
 /**
  * @generated from enum flyteidl2.workflow.RunSource
@@ -1352,5 +1367,5 @@ export enum RunSource {
  * Describes the enum flyteidl2.workflow.RunSource.
  */
 export const RunSourceSchema: GenEnum<RunSource> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_workflow_run_definition, 1);
+  enumDesc(file_flyteidl2_workflow_run_definition, 2);
 

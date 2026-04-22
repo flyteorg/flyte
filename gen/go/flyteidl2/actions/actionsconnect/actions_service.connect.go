@@ -45,6 +45,8 @@ const (
 	ActionsServiceUpdateProcedure = "/flyteidl2.actions.ActionsService/Update"
 	// ActionsServiceAbortProcedure is the fully-qualified name of the ActionsService's Abort RPC.
 	ActionsServiceAbortProcedure = "/flyteidl2.actions.ActionsService/Abort"
+	// ActionsServiceSignalProcedure is the fully-qualified name of the ActionsService's Signal RPC.
+	ActionsServiceSignalProcedure = "/flyteidl2.actions.ActionsService/Signal"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -55,6 +57,7 @@ var (
 	actionsServiceWatchForUpdatesMethodDescriptor = actionsServiceServiceDescriptor.Methods().ByName("WatchForUpdates")
 	actionsServiceUpdateMethodDescriptor          = actionsServiceServiceDescriptor.Methods().ByName("Update")
 	actionsServiceAbortMethodDescriptor           = actionsServiceServiceDescriptor.Methods().ByName("Abort")
+	actionsServiceSignalMethodDescriptor          = actionsServiceServiceDescriptor.Methods().ByName("Signal")
 )
 
 // ActionsServiceClient is a client for the flyteidl2.actions.ActionsService service.
@@ -73,6 +76,13 @@ type ActionsServiceClient interface {
 	// Abort aborts a single action that was previously queued or is currently being processed by a worker.
 	// Note that this will cascade aborts to all descendant actions of the specified action.
 	Abort(context.Context, *connect.Request[actions.AbortRequest]) (*connect.Response[actions.AbortResponse], error)
+	// Signal resolves a ConditionAction by providing its signal value.
+	// On success, transitions the condition to SUCCEEDED with the provided
+	// value as its output.
+	// Returns FAILED_PRECONDITION if the action is not a condition or is
+	// already terminal. Returns NOT_FOUND if the action does not exist.
+	// Returns ABORTED if the action has a write in-flight (retry).
+	Signal(context.Context, *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error)
 }
 
 // NewActionsServiceClient constructs a client for the flyteidl2.actions.ActionsService service. By
@@ -115,6 +125,12 @@ func NewActionsServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithSchema(actionsServiceAbortMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		signal: connect.NewClient[actions.SignalRequest, actions.SignalResponse](
+			httpClient,
+			baseURL+ActionsServiceSignalProcedure,
+			connect.WithSchema(actionsServiceSignalMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -125,6 +141,7 @@ type actionsServiceClient struct {
 	watchForUpdates *connect.Client[actions.WatchForUpdatesRequest, actions.WatchForUpdatesResponse]
 	update          *connect.Client[actions.UpdateRequest, actions.UpdateResponse]
 	abort           *connect.Client[actions.AbortRequest, actions.AbortResponse]
+	signal          *connect.Client[actions.SignalRequest, actions.SignalResponse]
 }
 
 // Enqueue calls flyteidl2.actions.ActionsService.Enqueue.
@@ -152,6 +169,11 @@ func (c *actionsServiceClient) Abort(ctx context.Context, req *connect.Request[a
 	return c.abort.CallUnary(ctx, req)
 }
 
+// Signal calls flyteidl2.actions.ActionsService.Signal.
+func (c *actionsServiceClient) Signal(ctx context.Context, req *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error) {
+	return c.signal.CallUnary(ctx, req)
+}
+
 // ActionsServiceHandler is an implementation of the flyteidl2.actions.ActionsService service.
 type ActionsServiceHandler interface {
 	// Enqueue queues a new action for execution.
@@ -168,6 +190,13 @@ type ActionsServiceHandler interface {
 	// Abort aborts a single action that was previously queued or is currently being processed by a worker.
 	// Note that this will cascade aborts to all descendant actions of the specified action.
 	Abort(context.Context, *connect.Request[actions.AbortRequest]) (*connect.Response[actions.AbortResponse], error)
+	// Signal resolves a ConditionAction by providing its signal value.
+	// On success, transitions the condition to SUCCEEDED with the provided
+	// value as its output.
+	// Returns FAILED_PRECONDITION if the action is not a condition or is
+	// already terminal. Returns NOT_FOUND if the action does not exist.
+	// Returns ABORTED if the action has a write in-flight (retry).
+	Signal(context.Context, *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error)
 }
 
 // NewActionsServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -206,6 +235,12 @@ func NewActionsServiceHandler(svc ActionsServiceHandler, opts ...connect.Handler
 		connect.WithSchema(actionsServiceAbortMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	actionsServiceSignalHandler := connect.NewUnaryHandler(
+		ActionsServiceSignalProcedure,
+		svc.Signal,
+		connect.WithSchema(actionsServiceSignalMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.actions.ActionsService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ActionsServiceEnqueueProcedure:
@@ -218,6 +253,8 @@ func NewActionsServiceHandler(svc ActionsServiceHandler, opts ...connect.Handler
 			actionsServiceUpdateHandler.ServeHTTP(w, r)
 		case ActionsServiceAbortProcedure:
 			actionsServiceAbortHandler.ServeHTTP(w, r)
+		case ActionsServiceSignalProcedure:
+			actionsServiceSignalHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -245,4 +282,8 @@ func (UnimplementedActionsServiceHandler) Update(context.Context, *connect.Reque
 
 func (UnimplementedActionsServiceHandler) Abort(context.Context, *connect.Request[actions.AbortRequest]) (*connect.Response[actions.AbortResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.actions.ActionsService.Abort is not implemented"))
+}
+
+func (UnimplementedActionsServiceHandler) Signal(context.Context, *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.actions.ActionsService.Signal is not implemented"))
 }

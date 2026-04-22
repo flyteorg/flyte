@@ -1,0 +1,82 @@
+# syntax=docker/dockerfile:1.7-labs
+#
+# GPU-capable debox cluster image. Layers NVIDIA Container Toolkit + the
+# k8s device-plugin on top of the CPU debox image so everything that ships
+# in the base (flyte-binary, embedded postgres, auto-apply manifests) is
+# inherited verbatim. CI builds the CPU image first and passes its tag in
+# via BASE_IMAGE.
+
+ARG BASE_IMAGE=ghcr.io/flyteorg/flyte-devbox:nightly
+
+
+# Stage NVIDIA Container Toolkit binaries + supporting libs + ldconfig.
+# k3s auto-registers a `nvidia` containerd runtime at startup if
+# /usr/bin/nvidia-container-runtime is on PATH in the final image.
+FROM debian:bookworm-slim AS nvidia-toolkit
+
+ARG TARGETARCH
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl gnupg ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
+        | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg && \
+    curl -fsSL https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
+        | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \
+        > /etc/apt/sources.list.d/nvidia-container-toolkit.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        nvidia-container-toolkit-base \
+        libnvidia-container1 \
+        libnvidia-container-tools && \
+    rm -rf /var/lib/apt/lists/*
+
+# Collect binaries, their shared-lib deps, and the dynamic linker so they run
+# inside the minimal rancher/k3s base (no libc of its own). Also stage
+# /sbin/ldconfig — the toolkit's update-ldcache OCI hook bind-mounts it
+# into workload pods.
+RUN set -ex; \
+    mkdir -p /nvidia-staging/bin /nvidia-staging/lib /nvidia-staging/sbin; \
+    for bin in nvidia-ctk nvidia-container-runtime nvidia-container-runtime.cdi \
+               nvidia-container-runtime.legacy nvidia-container-cli; do \
+        [ -f "/usr/bin/$bin" ] && cp -a "/usr/bin/$bin" /nvidia-staging/bin/ || true; \
+    done; \
+    for bin in /nvidia-staging/bin/*; do \
+        ldd "$bin" 2>/dev/null | grep "=>" | awk '{print $3}' | while read lib; do \
+            [ -f "$lib" ] && cp -n "$lib" /nvidia-staging/lib/ 2>/dev/null || true; \
+        done; \
+    done; \
+    cp /lib64/ld-linux-x86-64.so.2 /nvidia-staging/lib/ 2>/dev/null || true; \
+    cp /lib/ld-linux-aarch64.so.1 /nvidia-staging/lib/ 2>/dev/null || true; \
+    cp /sbin/ldconfig /nvidia-staging/sbin/ldconfig
+
+
+FROM ${BASE_IMAGE}
+
+# Install NVIDIA Container Toolkit binaries + supporting libs. The libs go
+# into a default linker search path (/usr/lib/<arch-triple>/) because the
+# nvidia-ctk OCI hook is invoked by containerd without inheriting
+# LD_LIBRARY_PATH.
+COPY --from=nvidia-toolkit /nvidia-staging/bin/ /usr/bin/
+COPY --from=nvidia-toolkit /nvidia-staging/lib/ /usr/lib/nvidia/
+COPY --from=nvidia-toolkit /nvidia-staging/sbin/ldconfig /sbin/ldconfig
+RUN ARCH_TRIPLE=$([ "$(uname -m)" = "aarch64" ] && echo "aarch64-linux-gnu" || echo "x86_64-linux-gnu") && \
+    mkdir -p "/usr/lib/${ARCH_TRIPLE}" && \
+    cp -a /usr/lib/nvidia/*.so* "/usr/lib/${ARCH_TRIPLE}/" 2>/dev/null || true
+
+# NVIDIA device-plugin DaemonSet + RuntimeClass (auto-applied by k3s at startup).
+COPY nvidia-device-plugin.yaml /var/lib/rancher/k3s/server/manifests/nvidia-device-plugin.yaml
+
+# k3s reads this template at startup to generate containerd's config.
+# Sets nvidia as the default runtime so GPU pods don't need runtimeClassName.
+COPY containerd-config.toml.tmpl /var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl
+
+# Append nvidia libs to the base image's LD_LIBRARY_PATH (which already
+# includes /usr/lib/pg-glibc for embedded postgres).
+ENV LD_LIBRARY_PATH="/usr/lib/pg-glibc:/usr/lib/nvidia"
+
+# Propagate host GPUs into containers scheduled on this node. These env vars
+# are consumed by nvidia-container-runtime.
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility

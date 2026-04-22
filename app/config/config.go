@@ -2,18 +2,21 @@ package config
 
 import "time"
 
-// AppConfig holds configuration for the App deployment controller.
+// AppConfig holds configuration for the control plane AppService.
 type AppConfig struct {
-	// Enabled controls whether the app deployment controller is started.
-	Enabled bool `json:"enabled" pflag:",Enable app deployment controller"`
+	// InternalAppServiceURL is the base URL of the InternalAppService (data plane).
+	// In unified mode this is overridden by the shared mux BaseURL.
+	InternalAppServiceURL string `json:"internalAppServiceUrl" pflag:",URL of the internal app service"`
 
-	// BaseDomain is the base domain used to generate public URLs for apps.
-	// Apps are exposed at "{name}-{project}-{domain}.{base_domain}".
-	BaseDomain string `json:"baseDomain" pflag:",Base domain for app public URLs"`
+	// CacheTTL is the TTL for the in-memory app status cache.
+	// Defaults to 30s. Set to 0 to disable caching.
+	CacheTTL time.Duration `json:"cacheTtl" pflag:",TTL for app status cache"`
+}
 
-	// DefaultRequestTimeout is the request timeout applied to apps that don't specify one.
-	DefaultRequestTimeout time.Duration `json:"defaultRequestTimeout" pflag:",Default request timeout for apps"`
-
-	// MaxRequestTimeout is the hard cap on request timeout (Knative max is 3600s).
-	MaxRequestTimeout time.Duration `json:"maxRequestTimeout" pflag:",Maximum allowed request timeout for apps"`
+// DefaultAppConfig returns the default control plane AppConfig.
+func DefaultAppConfig() *AppConfig {
+	return &AppConfig{
+		InternalAppServiceURL: "http://localhost:8091",
+		CacheTTL:              30 * time.Second,
+	}
 }

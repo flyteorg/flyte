@@ -9,7 +9,6 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
-	flyteappconnect "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
 	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
@@ -101,11 +100,6 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	authMetadataPath, authMetadataHandler := authconnect.NewAuthMetadataServiceHandler(authMetadataSvc)
 	sc.Mux.Handle(authMetadataPath, authMetadataHandler)
 	logger.Infof(ctx, "Mounted AuthMetadataService at %s", authMetadataPath)
-
-	appSvc := service.NewAppService()
-	appPath, appHandler := flyteappconnect.NewAppServiceHandler(appSvc)
-	sc.Mux.Handle(appPath, appHandler)
-	logger.Infof(ctx, "Mounted AppService at %s", appPath)
 
 	triggerSvc := service.NewTriggerService(repo)
 	triggerPath, triggerHandler := triggerconnect.NewTriggerServiceHandler(triggerSvc)

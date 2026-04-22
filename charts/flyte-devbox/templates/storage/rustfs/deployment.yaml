@@ -1,0 +1,85 @@
+{{- if .Values.rustfs.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rustfs
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "flyte-devbox.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rustfs
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rustfs
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      initContainers:
+      - name: volume-permissions
+        image: busybox:latest
+        imagePullPolicy: IfNotPresent
+        command:
+        - /bin/sh
+        - -ec
+        - |
+          chown -R 10001:10001 /data
+          mkdir -p /data/flyte-data
+          chown 10001:10001 /data/flyte-data
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      containers:
+      - name: rustfs
+        image: rustfs/rustfs:sandbox
+        imagePullPolicy: Never
+        env:
+        - name: RUSTFS_ADDRESS
+          value: "0.0.0.0:9000"
+        - name: RUSTFS_VOLUMES
+          value: "/data"
+        - name: RUSTFS_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: rustfs
+              key: access-key
+        - name: RUSTFS_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: rustfs
+              key: secret-key
+        ports:
+        - containerPort: 9000
+          name: rustfs-api
+          protocol: TCP
+        livenessProbe:
+          tcpSocket:
+            port: rustfs-api
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 5
+        readinessProbe:
+          tcpSocket:
+            port: rustfs-api
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 5
+        securityContext:
+          runAsUser: 10001
+          runAsNonRoot: true
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      securityContext:
+        fsGroup: 10001
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ include "flyte-devbox.persistence.rustfsVolumeName" . }}
+{{- end }}

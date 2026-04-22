@@ -24,6 +24,7 @@ const (
 	ActionsService_WatchForUpdates_FullMethodName = "/flyteidl2.actions.ActionsService/WatchForUpdates"
 	ActionsService_Update_FullMethodName          = "/flyteidl2.actions.ActionsService/Update"
 	ActionsService_Abort_FullMethodName           = "/flyteidl2.actions.ActionsService/Abort"
+	ActionsService_Signal_FullMethodName          = "/flyteidl2.actions.ActionsService/Signal"
 )
 
 // ActionsServiceClient is the client API for ActionsService service.
@@ -44,6 +45,13 @@ type ActionsServiceClient interface {
 	// Abort aborts a single action that was previously queued or is currently being processed by a worker.
 	// Note that this will cascade aborts to all descendant actions of the specified action.
 	Abort(ctx context.Context, in *AbortRequest, opts ...grpc.CallOption) (*AbortResponse, error)
+	// Signal resolves a ConditionAction by providing its signal value.
+	// On success, transitions the condition to SUCCEEDED with the provided
+	// value as its output.
+	// Returns FAILED_PRECONDITION if the action is not a condition or is
+	// already terminal. Returns NOT_FOUND if the action does not exist.
+	// Returns ABORTED if the action has a write in-flight (retry).
+	Signal(ctx context.Context, in *SignalRequest, opts ...grpc.CallOption) (*SignalResponse, error)
 }
 
 type actionsServiceClient struct {
@@ -122,6 +130,15 @@ func (c *actionsServiceClient) Abort(ctx context.Context, in *AbortRequest, opts
 	return out, nil
 }
 
+func (c *actionsServiceClient) Signal(ctx context.Context, in *SignalRequest, opts ...grpc.CallOption) (*SignalResponse, error) {
+	out := new(SignalResponse)
+	err := c.cc.Invoke(ctx, ActionsService_Signal_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ActionsServiceServer is the server API for ActionsService service.
 // All implementations should embed UnimplementedActionsServiceServer
 // for forward compatibility
@@ -140,6 +157,13 @@ type ActionsServiceServer interface {
 	// Abort aborts a single action that was previously queued or is currently being processed by a worker.
 	// Note that this will cascade aborts to all descendant actions of the specified action.
 	Abort(context.Context, *AbortRequest) (*AbortResponse, error)
+	// Signal resolves a ConditionAction by providing its signal value.
+	// On success, transitions the condition to SUCCEEDED with the provided
+	// value as its output.
+	// Returns FAILED_PRECONDITION if the action is not a condition or is
+	// already terminal. Returns NOT_FOUND if the action does not exist.
+	// Returns ABORTED if the action has a write in-flight (retry).
+	Signal(context.Context, *SignalRequest) (*SignalResponse, error)
 }
 
 // UnimplementedActionsServiceServer should be embedded to have forward compatible implementations.
@@ -160,6 +184,9 @@ func (UnimplementedActionsServiceServer) Update(context.Context, *UpdateRequest)
 }
 func (UnimplementedActionsServiceServer) Abort(context.Context, *AbortRequest) (*AbortResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Abort not implemented")
+}
+func (UnimplementedActionsServiceServer) Signal(context.Context, *SignalRequest) (*SignalResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Signal not implemented")
 }
 
 // UnsafeActionsServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -266,6 +293,24 @@ func _ActionsService_Abort_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ActionsService_Signal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SignalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ActionsServiceServer).Signal(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ActionsService_Signal_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ActionsServiceServer).Signal(ctx, req.(*SignalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ActionsService_ServiceDesc is the grpc.ServiceDesc for ActionsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -288,6 +333,10 @@ var ActionsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Abort",
 			Handler:    _ActionsService_Abort_Handler,
+		},
+		{
+			MethodName: "Signal",
+			Handler:    _ActionsService_Signal_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
