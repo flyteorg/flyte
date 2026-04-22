@@ -128,7 +128,7 @@ jobs:
 
       - name: Install mockery
         run: |
-          go install "github.com/vektra/mockery/v2@v${{ needs.setup.outputs.mockery }}"
+          go install "github.com/vektra/mockery/v3@v${{ needs.setup.outputs.mockery }}"
 
       - name: Run mockery and check
         run: |
