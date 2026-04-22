@@ -11,10 +11,24 @@ jobs:
     with:
       pr_number: ${{ github.event.pull_request.number }}
       base_ref: ${{ github.base_ref }}
+
   check-generate-local:
     if: github.event.pull_request.head.repo.fork == true
     uses: ./.github/workflows/check-generate-local.yml
-  check-results:
+
+  check-generate:
+    needs: [check-generate-container, check-generate-local]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check results
+        run: |
+          if [[ "${{ needs.check-generate-container.result }}" == "failure" ||
+                "${{ needs.check-generate-local.result }}" == "failure" ]]; then
+              exit 1
+          fi
+
+  check-mocks:
     needs: [check-generate-container, check-generate-local]
     if: always()
     runs-on: ubuntu-latest
