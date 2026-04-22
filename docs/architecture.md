@@ -72,7 +72,7 @@ flowchart TB
     DataProxy <--> Storage
     Actions -- "K8s API: TaskAction CRDs" --> Executor
     Executor -- "K8s API: create Pod" --> Pod
-    User -- "gRPC: ActionsService.Enqueue<br/>(spawn child actions)" --> Actions
+    User -- "gRPC: ActionsService<br/>Enqueue / WatchForUpdates / Abort<br/>(via SDK ControllerClient)" --> Actions
     User <-- "S3/GCS/Azure:<br/>read inputs / write outputs" --> Storage
     Copilot -- "S3/GCS/Azure:<br/>upload outputs" --> Storage
     Actions -- "gRPC: InternalRunService<br/>RecordAction / UpdateActionStatus" --> Runs
@@ -114,7 +114,7 @@ flowchart TB
     SDK -- "gRPC: RunService.WatchRuns<br/>WatchRunDetails (server-stream)" --> Runs
     SDK -- "gRPC: DataProxyService.CreateUploadLocation<br/>CreateDownloadLink / GetActionData" --> DataProxy
     SDK -- "gRPC: TaskService.DeployTask / GetTaskDetails<br/>TriggerService.DeployTrigger / ListTriggers<br/>ProjectService.CreateProject / GetProject" --> Runs
-    PodUser -- "gRPC: ActionsService.Enqueue<br/>(via SDK ControllerClient —<br/>spawn child actions)" --> ActionsSvc
+    PodUser -- "gRPC: ActionsService.Enqueue<br/>ActionsService.WatchForUpdates<br/>ActionsService.Abort<br/>(via SDK ControllerClient)" --> ActionsSvc
 
     Runs -- "SQL (pgx)" --> DB
     Runs -- "gRPC: ActionsService.Enqueue<br/>Update / Abort / WatchForUpdates" --> ActionsSvc
@@ -151,6 +151,8 @@ Summary of the gRPC wiring shown in the diagram above:
 | Client / SDK | DataProxy | `DataProxyService` | TailLogs | server-stream |
 | Runs Service | Actions Service | `ActionsService` | Enqueue, Update, Abort, Signal, GetLatestState | unary |
 | Runs Service | Actions Service | `ActionsService` | WatchForUpdates | server-stream |
+| In-pod SDK (ControllerClient) | Actions Service | `ActionsService` | Enqueue, Abort | unary |
+| In-pod SDK (ControllerClient) | Actions Service | `ActionsService` | WatchForUpdates | server-stream |
 | Runs Service | Cache Service | `CacheService` | Get, Put, Delete, GetOrExtendReservation, ReleaseReservation | unary |
 | Runs Service | Events Service | `EventsProxyService` | Record | unary |
 | Runs Service | Secret Service | `SecretService` | CreateSecret, UpdateSecret, GetSecret, DeleteSecret, ListSecrets | unary |
@@ -204,15 +206,24 @@ Client instances created via `RunServiceClient`, `TaskServiceClient`, `DataProxy
 
 **2. ControllerClient** — `src/flyte/_internal/controllers/remote/_client.py`
 
-Used **inside a running task pod** when the user's code spawns child tasks or sub-actions. The SDK is embedded in the user container (via the auto-generated image). When user code calls `task.aio(...)`, the SDK's ControllerClient submits the child action directly to the Actions Service without going through RunService:
+Used **inside a running task pod** when the user's code spawns child tasks or sub-actions. The SDK is embedded in the user container (via the auto-generated image). When user code calls `task.aio(...)`, the SDK's ControllerClient submits the child action directly to the Actions Service without going through RunService.
 
-| Action | RPC |
-|--------|-----|
-| Spawn a child task / trace / condition | `ActionsService.Enqueue` |
-| Poll latest state | `ActionsService.GetLatestState` (or legacy `StateService.Get`) |
-| Watch child action updates | `ActionsService.WatchForUpdates` |
+The service surface is defined in [`_service_protocol.py`](https://github.com/flyteorg/flyte-sdk/blob/main/src/flyte/_internal/controllers/remote/_service_protocol.py) — the unified `ActionsService` exposes three methods:
 
-This is why nested / fanout workflows scale: the parent task pod talks directly to Actions Service, not through the RunService hot path.
+| Method | RPC | Purpose |
+|--------|-----|---------|
+| `enqueue()` | `ActionsService.Enqueue` | Submit a new child action for execution |
+| `watch_for_updates()` | `ActionsService.WatchForUpdates` (server-stream) | Stream state updates for all child actions of a parent |
+| `abort()` | `ActionsService.Abort` | Cancel a previously queued/running action (cascades to descendants) |
+
+Feature-flagged via the `_U_USE_ACTIONS` env var. When disabled, the SDK falls back to the legacy split:
+
+| Legacy service | RPCs used |
+|----------------|-----------|
+| `QueueService` | `EnqueueAction`, `AbortQueuedRun`, `AbortQueuedAction` |
+| `StateService` | `Put`, `Get`, `Watch` |
+
+This direct SDK → ActionsService path is why nested / fanout workflows scale — the parent task pod talks to Actions Service directly, not through the RunService hot path.
 
 **Deploy flow (what `flyte run` does under the hood):**
 
