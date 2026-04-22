@@ -106,14 +106,14 @@ flowchart TB
 
     Client -- "gRPC: RunService.CreateRun<br/>AbortRun / GetRunDetails / ListRuns" --> Runs
     Client -- "gRPC: RunService.WatchRuns<br/>WatchRunDetails (server-stream)" --> Runs
-    Client -- "gRPC: DataProxyService.GetUploadURL<br/>GetDownloadURL" --> DataProxy
-    Client -- "gRPC: TriggerService / ProjectService<br/>TaskService" --> Runs
+    Client -- "gRPC: DataProxyService.CreateUploadLocation<br/>CreateDownloadLink / GetActionData" --> DataProxy
+    Client -- "gRPC: TaskService.DeployTask / GetTaskDetails<br/>TriggerService.DeployTrigger / ListTriggers<br/>ProjectService.CreateProject / GetProject" --> Runs
 
     Runs -- "SQL (pgx)" --> DB
-    Runs -- "gRPC: ActionsService.CreateAction<br/>WatchAction / GetAction" --> ActionsSvc
-    Runs -- "gRPC: CacheService.Get / Put<br/>GetOrExtendReservation" --> CacheSvc
-    Runs -- "gRPC: SecretService" --> SecretSvc
-    Runs -- "gRPC: EventsProxyService.WatchClusterEvents" --> EventsSvc
+    Runs -- "gRPC: ActionsService.Enqueue<br/>Update / Abort / WatchForUpdates" --> ActionsSvc
+    Runs -- "gRPC: CacheService.Get / Put<br/>GetOrExtendReservation / ReleaseReservation" --> CacheSvc
+    Runs -- "gRPC: SecretService.GetSecret / CreateSecret" --> SecretSvc
+    Runs -- "gRPC: EventsProxyService.Record" --> EventsSvc
 
     ActionsSvc -- "K8s API: create/watch<br/>TaskAction CRD" --> Executor
     Executor -- "K8s API: create Pod" --> TaskPod
@@ -133,21 +133,24 @@ Summary of the gRPC wiring shown in the diagram above:
 
 | From | To | Service | Key RPCs | Direction |
 |------|----|---------|----------|-----------|
-| Client / SDK | Runs Service | `RunService` | CreateRun, AbortRun, GetRunDetails, ListRuns | unary |
-| Client / SDK | Runs Service | `RunService` | WatchRuns, WatchRunDetails | server-stream |
-| Client / SDK | Runs Service | `TaskService` | GetTask, ListTasks | unary |
-| Client / SDK | Runs Service | `TriggerService` | CreateTrigger, GetTrigger, ListTriggers | unary |
-| Client / SDK | Runs Service | `ProjectService` | GetProject, ListProjects | unary |
+| Client / SDK | Runs Service | `RunService` | CreateRun, AbortRun, GetRunDetails, ListRuns, ListActions, GetActionDetails, GetActionData, AbortAction | unary |
+| Client / SDK | Runs Service | `RunService` | WatchRuns, WatchRunDetails, WatchActions, WatchActionDetails, WatchGroups, WatchClusterEvents | server-stream |
+| Client / SDK | Runs Service | `TaskService` | DeployTask, GetTaskDetails, ListTasks, ListVersions | unary |
+| Client / SDK | Runs Service | `TriggerService` | DeployTrigger, GetTriggerDetails, ListTriggers, UpdateTriggers, DeleteTriggers | unary |
+| Client / SDK | Runs Service | `ProjectService` | CreateProject, UpdateProject, GetProject, ListProjects | unary |
 | Client / SDK | Runs Service | `RunLogsService` | TailLogs | server-stream |
-| Client / SDK | DataProxy | `DataProxyService` | GetUploadURL, GetDownloadURL, GetArtifact | unary |
-| Runs Service | Actions Service | `ActionsService` | CreateAction, GetAction, WatchAction | unary / stream |
-| Runs Service | Cache Service | `CacheService` | Get, Put, Delete, GetOrExtendReservation | unary |
-| Runs Service | Events Service | `EventsProxyService` | WatchClusterEvents | server-stream |
-| Runs Service | Secret Service | `SecretService` | Get, Put | unary |
+| Client / SDK | DataProxy | `DataProxyService` | CreateUploadLocation, CreateDownloadLink, UploadInputs, GetActionData | unary |
+| Client / SDK | DataProxy | `DataProxyService` | TailLogs | server-stream |
+| Runs Service | Actions Service | `ActionsService` | Enqueue, Update, Abort, Signal, GetLatestState | unary |
+| Runs Service | Actions Service | `ActionsService` | WatchForUpdates | server-stream |
+| Runs Service | Cache Service | `CacheService` | Get, Put, Delete, GetOrExtendReservation, ReleaseReservation | unary |
+| Runs Service | Events Service | `EventsProxyService` | Record | unary |
+| Runs Service | Secret Service | `SecretService` | CreateSecret, UpdateSecret, GetSecret, DeleteSecret, ListSecrets | unary |
 | Executor / Copilot | Runs Service | `InternalRunService` | RecordAction, UpdateActionStatus, RecordActionEvents | unary |
-| Actions Service | Kubernetes | K8s API | Create/Watch `TaskAction` CRD | watch |
-| Executor | Kubernetes | K8s API | Create/Watch Pods | watch |
-| User container / Copilot | Object Storage | S3 / GCS / Azure | Get/Put object | REST |
+| Executor / Copilot | Runs Service | `InternalRunService` | RecordActionStream, UpdateActionStatusStream, RecordActionEventStream | bidi-stream |
+| Actions Service | Kubernetes | K8s API | Create / Watch `TaskAction` CRD | watch |
+| Executor | Kubernetes | K8s API | Create / Watch Pods | watch |
+| User container / Copilot | Object Storage | S3 / GCS / Azure | Get / Put object | REST |
 | DataProxy | Object Storage | S3 / GCS / Azure | Sign URL | REST |
 
 All gRPC traffic uses **buf connect** (HTTP/2 with HTTP/1.1 fallback).
@@ -165,7 +168,7 @@ The following describes what happens when a user submits a workflow:
  ────   ────────────────────────────────────────────────────     ─────────────────
   1     User calls RunService.CreateRun()                       Client → Runs Service
   2     Run record + root action written to PostgreSQL          Runs Service → DB
-  3     Runs Service calls ActionsService.CreateAction()        Runs Service → Actions Service
+  3     Runs Service calls ActionsService.Enqueue()             Runs Service → Actions Service
   4     Actions Service creates TaskAction CRD in Kubernetes    Actions Service → K8s
   5     Executor controller sees the CRD                        Executor
   6     Plugin resolves task spec, creates Pod + Copilot        Executor → K8s
@@ -214,15 +217,15 @@ Executor ──put(task_key, output)──▶ Cache Service
 The central control-plane service. It owns the **run lifecycle**: creation, monitoring, abort, and streaming of status updates. It exposes both public APIs (for users/SDKs) and internal APIs (for the Executor).
 
 **Public gRPC services:**
-- `RunService` — CreateRun, AbortRun, GetRunDetails, WatchRunDetails, ListRuns, WatchRuns
-- `TaskService` — GetTask, ListTasks
-- `TriggerService` — manage triggers for scheduled/event-driven runs
-- `ProjectService` — project and domain management
-- `RunLogsService` — stream pod logs from Kubernetes
+- `RunService` — CreateRun, AbortRun, GetRunDetails, WatchRunDetails, ListRuns, WatchRuns, ListActions, WatchActions, GetActionDetails, GetActionData, AbortAction, WatchGroups, WatchClusterEvents
+- `TaskService` — DeployTask, GetTaskDetails, ListTasks, ListVersions
+- `TriggerService` — DeployTrigger, GetTriggerDetails, ListTriggers, UpdateTriggers, DeleteTriggers
+- `ProjectService` — CreateProject, UpdateProject, GetProject, ListProjects
+- `RunLogsService` — TailLogs (stream pod logs from Kubernetes)
 
 **Internal gRPC services:**
-- `InternalRunService` — RecordAction, UpdateActionStatus, RecordActionEvents (used by the Executor)
-- `TranslatorService` — convert between execution models
+- `InternalRunService` — RecordAction, UpdateActionStatus, RecordActionEvents (+ streaming variants) — used by the Executor
+- `TranslatorService` — convert literals ↔ JSON launch-form representations
 
 ---
 
@@ -256,7 +259,7 @@ A **Kubernetes controller** that watches `TaskAction` CRDs and executes them as 
 
 Bridges the Runs Service and Kubernetes. It watches `TaskAction` CRDs and provides CRUD operations and streaming status updates on actions.
 
-**gRPC service:** `ActionsService` — GetAction, WatchAction, CreateAction
+**gRPC service:** `ActionsService` — Enqueue, Update, Abort, Signal, GetLatestState, WatchForUpdates
 
 ---
 
@@ -270,8 +273,7 @@ Bridges the Runs Service and Kubernetes. It watches `TaskAction` CRDs and provid
 Manages **artifact storage and data access**. Generates time-limited signed URLs so clients can upload/download data directly from object storage without exposing credentials.
 
 **gRPC services:**
-- `DataProxyService` — GetUploadURL, GetDownloadURL, GetArtifact
-- `ClusterService` — cluster capability queries
+- `DataProxyService` — CreateUploadLocation, CreateDownloadLink, UploadInputs, GetActionData, TailLogs
 
 ---
 
@@ -283,7 +285,7 @@ Manages **artifact storage and data access**. Generates time-limited signed URLs
 
 Provides **deterministic task deduplication**. When a task with identical inputs has already run, the cache returns the stored output instead of re-executing.
 
-**gRPC service:** `CacheService` — Get, Put, Delete, GetOrExtendReservation
+**gRPC service:** `CacheService` — Get, Put, Delete, GetOrExtendReservation, ReleaseReservation
 
 ---
 
@@ -295,7 +297,9 @@ Provides **deterministic task deduplication**. When a task with identical inputs
 
 Aggregates execution events from all sources and streams them to subscribers. Useful for building dashboards, audit logs, and external integrations.
 
-**gRPC service:** `EventsProxyService` — WatchClusterEvents
+**gRPC service:** `EventsProxyService` — Record
+
+> Note: `WatchClusterEvents` is a server-streaming RPC on `RunService`, not on `EventsProxyService`.
 
 ---
 
@@ -318,8 +322,8 @@ Centralized secret management. Stores and retrieves secrets, with optional integ
 Serves application metadata and configurations for long-running services (model serving, apps).
 
 **gRPC services:**
-- `AppService` — GetApp, ListApps
-- `AppLogsService` — stream app logs
+- `AppService` — Create, Get, Update, UpdateStatus, Delete, List, Watch, Lease
+- `AppLogsService` — TailLogs (server-stream)
 
 ---
 
@@ -486,23 +490,25 @@ All APIs use **buf connect** (gRPC over HTTP/2 and HTTP/1.1).
 
 | Service | Proto Path | Key RPCs |
 |---------|-----------|----------|
-| RunService | `flyteidl2.workflow.RunService` | CreateRun, AbortRun, GetRunDetails, WatchRunDetails, ListRuns, WatchRuns |
-| TaskService | `flyteidl2.task.TaskService` | GetTask, ListTasks |
-| DataProxyService | `flyteidl2.dataproxy.DataProxyService` | GetUploadURL, GetDownloadURL, GetArtifact |
-| CacheService | `flyteidl2.cacheservice.CacheService` | Get, Put, Delete, GetOrExtendReservation |
-| TriggerService | `flyteidl2.trigger.TriggerService` | CreateTrigger, GetTrigger, ListTriggers |
-| ProjectService | `flyteidl2.project.ProjectService` | GetProject, ListProjects |
-| AuthService | `flyteidl2.auth.AuthService` | OAuth/OIDC endpoints |
+| RunService | `flyteidl2.workflow.RunService` | CreateRun, AbortRun, GetRunDetails, WatchRunDetails, ListRuns, WatchRuns, ListActions, WatchActions, GetActionDetails, WatchActionDetails, GetActionData, AbortAction, WatchGroups, WatchClusterEvents |
+| TaskService | `flyteidl2.task.TaskService` | DeployTask, GetTaskDetails, ListTasks, ListVersions |
+| DataProxyService | `flyteidl2.dataproxy.DataProxyService` | CreateUploadLocation, CreateDownloadLink, UploadInputs, GetActionData, TailLogs |
+| CacheService | `flyteidl2.cacheservice.CacheService` | Get, Put, Delete, GetOrExtendReservation, ReleaseReservation |
+| TriggerService | `flyteidl2.trigger.TriggerService` | DeployTrigger, GetTriggerDetails, ListTriggers, UpdateTriggers, DeleteTriggers |
+| ProjectService | `flyteidl2.project.ProjectService` | CreateProject, UpdateProject, GetProject, ListProjects |
+| SecretService | `flyteidl2.secret.SecretService` | CreateSecret, UpdateSecret, GetSecret, DeleteSecret, ListSecrets |
+| RunLogsService | `flyteidl2.workflow.RunLogsService` | TailLogs |
 
 ### Internal APIs (component-to-component)
 
 | Service | Proto Path | Key RPCs |
 |---------|-----------|----------|
-| InternalRunService | `flyteidl2.workflow.InternalRunService` | RecordAction, UpdateActionStatus, RecordActionEvents |
-| ActionsService | `flyteidl2.actions.ActionsService` | GetAction, WatchAction, CreateAction |
-| EventsProxyService | `flyteidl2.workflow.EventsProxyService` | WatchClusterEvents |
-| AppService | `flyteidl2.app.AppService` | GetApp, GetAppLogs |
-| ClusterService | `flyteidl2.cluster.ClusterService` | GetCluster |
+| InternalRunService | `flyteidl2.workflow.InternalRunService` | RecordAction, UpdateActionStatus, RecordActionEvents (+ streaming variants) |
+| ActionsService | `flyteidl2.actions.ActionsService` | Enqueue, Update, Abort, Signal, GetLatestState, WatchForUpdates |
+| EventsProxyService | `flyteidl2.workflow.EventsProxyService` | Record |
+| AppService | `flyteidl2.app.AppService` | Create, Get, Update, UpdateStatus, Delete, List, Watch, Lease |
+| AppLogsService | `flyteidl2.app.AppLogsService` | TailLogs |
+| TranslatorService | `flyteidl2.workflow.TranslatorService` | LiteralsToLaunchFormJson, LaunchFormJsonToLiterals, TaskSpecToLaunchFormJson, JsonValuesToLiterals |
 
 ### Communication Patterns
 
