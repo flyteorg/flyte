@@ -76,8 +76,8 @@ func (m *mockAppK8sClient) Watch(ctx context.Context, project, domain, appName s
 
 func testCfg() *appconfig.InternalAppConfig {
 	return &appconfig.InternalAppConfig{
-		Enabled:           true,
-		IngressAppsDomain: "example.com",
+		Enabled:               true,
+		BaseDomain:            "example.com",
 		Scheme:                "https",
 		DefaultRequestTimeout: 5 * time.Minute,
 		MaxRequestTimeout:     time.Hour,
@@ -184,7 +184,7 @@ func TestCreate_IngressWithPort(t *testing.T) {
 func TestCreate_NoBaseDomain_NoIngress(t *testing.T) {
 	k8s := &mockAppK8sClient{}
 	cfg := testCfg()
-	cfg.IngressAppsDomain = ""
+	cfg.BaseDomain = ""
 	svc := NewInternalAppService(k8s, cfg)
 
 	app := testApp()

@@ -40,16 +40,6 @@ type InternalAppConfig struct {
 	// MaxRequestTimeout is the hard cap on request timeout (Knative max is 3600s).
 	MaxRequestTimeout time.Duration `json:"maxRequestTimeout" pflag:",Maximum allowed request timeout for apps"`
 
-	// IngressEntryPoint is the Traefik entry point name that app routes are
-	// attached to (default: "apps").
-	IngressEntryPoint string `json:"ingressEntryPoint" pflag:",Traefik entry point name for app ingress routes"`
-
-	// IngressAppsDomain is the domain suffix for subdomain-based app URLs.
-	// Apps are exposed at {name}-{project}-{domain}.{IngressAppsDomain}.
-	// Use "localhost" for local devbox (resolves without /etc/hosts on macOS/Linux).
-	// Windows users can override to e.g. "localtest.me".
-	IngressAppsDomain string `json:"ingressAppsDomain" pflag:",Domain suffix for app subdomain URLs"`
-
 	// IngressAppsPort is the port appended to the public app URL (e.g. 30081).
 	// Set to 0 to omit the port when behind a standard 80/443 proxy.
 	IngressAppsPort int `json:"ingressAppsPort" pflag:",Port for app subdomain URLs (0 = omit)"`

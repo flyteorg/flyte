@@ -758,14 +758,6 @@ spec:
         transport:
           respondingTimeouts:
             readTimeout: 0
-      apps:
-        port: 30081
-        nodePort: 30081
-        expose:
-          default: true
-        transport:
-          respondingTimeouts:
-            readTimeout: 0
       websecure:
         expose: false
     providers:

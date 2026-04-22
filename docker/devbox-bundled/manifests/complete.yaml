@@ -538,25 +538,15 @@ data:
   100-inline-config.yaml: |
     manager:
       internalApps:
-        baseDomain: local.flyte.app
+        baseDomain: localhost
         defaultEnvVars:
-        - name: FLYTE_AWS_ENDPOINT
-          value: http://rustfs.flyte:9000
-        - name: FLYTE_AWS_ACCESS_KEY_ID
-          value: rustfs
-        - name: FLYTE_AWS_SECRET_ACCESS_KEY
-          value: rustfsstorage
-        - name: _U_EP_OVERRIDE
-          value: flyte-binary-http.flyte:8090
-        - name: _U_INSECURE
-          value: "true"
-        - name: _U_USE_ACTIONS
-          value: "1"
+        - FLYTE_AWS_ENDPOINT: http://rustfs.flyte:9000
+        - FLYTE_AWS_ACCESS_KEY_ID: rustfs
+        - FLYTE_AWS_SECRET_ACCESS_KEY: rustfsstorage
+        - _U_EP_OVERRIDE: flyte-binary-http.flyte:8090
+        - _U_INSECURE: "true"
+        - _U_USE_ACTIONS: "1"
         enabled: true
-        ingressAppsDomain: localhost
-        ingressAppsPort: 30081
-        ingressEnabled: true
-        ingressEntryPoint: apps
         scheme: http
     plugins:
       k8s:
@@ -935,7 +925,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 709f0513c6d5a65b47f3e9d42696c92cecfdc3073acac33c7ad32340a645bef4
+        checksum/configuration: 67ff4767c65e0e994c1cdc6dc435705ad04f001488a986711b4c3704abea0404
         checksum/configuration-secret: e70194084619f4a1d4017093aac6367047167107fd0222513a32a61734629cac
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1163,14 +1153,6 @@ spec:
     ports:
       web:
         nodePort: 30080
-        transport:
-          respondingTimeouts:
-            readTimeout: 0
-      apps:
-        port: 30081
-        nodePort: 30081
-        expose:
-          default: true
         transport:
           respondingTimeouts:
             readTimeout: 0
