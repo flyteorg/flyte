@@ -58,7 +58,7 @@ flowchart TB
         Executor["Executor<br/>(K8s Controller + Plugins)"]
         subgraph Pod["Task Pod"]
             User["User<br/>Container"]
-            Copilot["Copilot<br/>(sidecar)"]
+            Copilot["Copilot sidecar<br/>(raw-container only)"]
         end
     end
 
@@ -71,7 +71,7 @@ flowchart TB
     Executor -- "K8s API: create Pod" --> Pod
     User <-- "S3/GCS/Azure:<br/>read inputs / write outputs" --> Storage
     Copilot -- "S3/GCS/Azure:<br/>upload outputs" --> Storage
-    Executor -- "gRPC: InternalRunService<br/>UpdateActionStatus" --> Runs
+    Actions -- "gRPC: InternalRunService<br/>RecordAction / UpdateActionStatus" --> Runs
 ```
 
 ---
@@ -92,7 +92,7 @@ flowchart TB
     Executor["Executor (K8s Controller)<br/>• Watches CRDs<br/>• Provisions Pods<br/>• Runs plugins"]
     subgraph TaskPod["Task Pod"]
         PodUser["User Container"]
-        PodCopilot["Copilot (sidecar)"]
+        PodCopilot["Copilot sidecar<br/>(raw-container only)"]
     end
 
     Internal["InternalRunService<br/>(UpdateActionStatus)"]
@@ -121,8 +121,8 @@ flowchart TB
     PodCopilot -- "S3/GCS/Azure API<br/>upload outputs" --> Storage
     DataProxy -- "S3/GCS/Azure API<br/>signed URLs" --> Storage
 
-    PodCopilot -- "gRPC: InternalRunService.RecordAction<br/>UpdateActionStatus / RecordActionEvents" --> Internal
-    Executor -- "gRPC: InternalRunService<br/>UpdateActionStatus" --> Internal
+    ActionsSvc -- "gRPC: InternalRunService.RecordAction<br/>UpdateActionStatus" --> Internal
+    EventsSvc -- "gRPC: InternalRunService.RecordActionEvents" --> Internal
     Internal -- "SQL (pgx)" --> DB
     DB -. "LISTEN/NOTIFY → gRPC stream<br/>WatchRunDetails" .-> Client
 ```
@@ -146,11 +146,12 @@ Summary of the gRPC wiring shown in the diagram above:
 | Runs Service | Cache Service | `CacheService` | Get, Put, Delete, GetOrExtendReservation, ReleaseReservation | unary |
 | Runs Service | Events Service | `EventsProxyService` | Record | unary |
 | Runs Service | Secret Service | `SecretService` | CreateSecret, UpdateSecret, GetSecret, DeleteSecret, ListSecrets | unary |
-| Executor / Copilot | Runs Service | `InternalRunService` | RecordAction, UpdateActionStatus, RecordActionEvents | unary |
-| Executor / Copilot | Runs Service | `InternalRunService` | RecordActionStream, UpdateActionStatusStream, RecordActionEventStream | bidi-stream |
+| Actions Service | Runs Service | `InternalRunService` | RecordAction, UpdateActionStatus | unary |
+| Events Service | Runs Service | `InternalRunService` | RecordActionEvents | unary |
 | Actions Service | Kubernetes | K8s API | Create / Watch `TaskAction` CRD | watch |
 | Executor | Kubernetes | K8s API | Create / Watch Pods | watch |
-| User container / Copilot | Object Storage | S3 / GCS / Azure | Get / Put object | REST |
+| User container | Object Storage | S3 / GCS / Azure | Get / Put object (Python SDK does I/O directly) | REST |
+| Copilot (raw-container only) | Object Storage | S3 / GCS / Azure | Download inputs / upload outputs | REST |
 | DataProxy | Object Storage | S3 / GCS / Azure | Sign URL | REST |
 
 All gRPC traffic uses **buf connect** (HTTP/2 with HTTP/1.1 fallback).
@@ -171,13 +172,18 @@ The following describes what happens when a user submits a workflow:
   3     Runs Service calls ActionsService.Enqueue()             Runs Service → Actions Service
   4     Actions Service creates TaskAction CRD in Kubernetes    Actions Service → K8s
   5     Executor controller sees the CRD                        Executor
-  6     Plugin resolves task spec, creates Pod + Copilot        Executor → K8s
-  7     Copilot init-container downloads inputs from storage    Copilot → Object Storage
+  6     Plugin resolves task spec, creates Pod (+ Copilot       Executor → K8s
+        sidecar for raw-container tasks only)
+  7     For raw-container: Copilot init downloads inputs        Copilot → Object Storage
   8     User container executes; reads inputs / writes outputs  User container ↔ Object Storage
-  9     Copilot sidecar uploads remaining outputs to storage    Copilot → Object Storage
- 10     Executor calls InternalRunService.UpdateActionStatus()  Executor → Runs Service
- 11     Action status updated in PostgreSQL                     Runs Service → DB
- 12     Client receives update via WatchRunDetails() stream     Runs Service → Client
+        directly (Python SDK handles I/O; raw-container
+        delegates I/O to Copilot)
+  9     For raw-container: Copilot sidecar uploads outputs      Copilot → Object Storage
+ 10     Executor updates TaskAction CRD status                  Executor → K8s
+ 11     Actions Service (CRD watcher) calls InternalRunService  Actions Service → Runs Service
+        .RecordAction / .UpdateActionStatus
+ 12     Action status updated in PostgreSQL                     Runs Service → DB
+ 13     Client receives update via WatchRunDetails() stream     Runs Service → Client
 ```
 
 ### Data Access (Artifacts)
@@ -243,9 +249,10 @@ A **Kubernetes controller** that watches `TaskAction` CRDs and executes them as 
 - Watch TaskAction custom resources
 - Resolve task specifications and select the appropriate plugin
 - Create Pods with the user container + Flyte Copilot sidecar
-- Monitor pod lifecycle and capture execution status
-- Report results back to the Runs Service via `InternalRunService`
+- Monitor pod lifecycle and update TaskAction CRD status
 - Handle admission webhooks for pod validation/mutation
+
+Status is propagated back to the Runs Service by the **Actions Service** (which watches TaskAction CRDs), not by the Executor directly.
 
 **CRD:** `TaskAction` — defined in `executor/api/v1/taskaction_types.go`
 
@@ -332,8 +339,11 @@ Serves application metadata and configurations for long-running services (model 
 | | |
 |---|---|
 | **Source** | `/flytecopilot` |
+| **Used by** | `raw-container` task type only |
 
-A **sidecar binary** injected into every task pod. Operates in two modes:
+A **sidecar binary** injected into pods for the `raw-container` task type — i.e., when a user brings an arbitrary container image that isn't Flyte-aware. Regular Python tasks do **not** use Copilot; the Python SDK reads inputs and writes outputs to object storage directly from inside the user code.
+
+For raw-container tasks, Copilot operates in two modes:
 
 | Mode | Phase | What it does |
 |------|-------|--------------|
@@ -514,7 +524,7 @@ All APIs use **buf connect** (gRPC over HTTP/2 and HTTP/1.1).
 
 | Pattern | Example |
 |---------|---------|
-| **Synchronous gRPC** | Client → RunService.CreateRun, Executor → InternalRunService.UpdateActionStatus |
+| **Synchronous gRPC** | Client → RunService.CreateRun, Actions Service → InternalRunService.UpdateActionStatus |
 | **Server-streaming gRPC** | RunService.WatchRunDetails, EventsProxyService.WatchClusterEvents |
 | **K8s Watch** | Executor watches TaskAction CRDs, Actions Service watches TaskAction CRDs |
 
