@@ -15,8 +15,6 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	k8sresource "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	k8swatch "k8s.io/apimachinery/pkg/watch"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
@@ -43,11 +41,6 @@ const (
 
 	// maxKServiceNameLen is the Kubernetes DNS label limit.
 	maxKServiceNameLen = 63
-)
-
-var (
-	traefikIngressRouteGVK = schema.GroupVersionKind{Group: "traefik.io", Version: "v1alpha1", Kind: "IngressRoute"}
-	traefikMiddlewareGVK   = schema.GroupVersionKind{Group: "traefik.io", Version: "v1alpha1", Kind: "Middleware"}
 )
 
 // AppK8sClientInterface defines the KService lifecycle operations for the App service.
@@ -129,17 +122,15 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 			return fmt.Errorf("failed to create KService %s: %w", name, err)
 		}
 		logger.Infof(ctx, "Created KService %s/%s", ns, name)
-		return c.deployIngress(ctx, app)
+		return nil
 	}
 	if err != nil {
 		return fmt.Errorf("failed to get KService %s: %w", name, err)
 	}
 
-	// Skip KService update if spec has not changed, but still ensure ingress exists
-	// (it may be missing if the app was deployed before ingress support was added).
 	if existing.Annotations[annotationSpecSHA] == ksvc.Annotations[annotationSpecSHA] {
 		logger.Debugf(ctx, "KService %s/%s spec unchanged, skipping update", ns, name)
-		return c.deployIngress(ctx, app)
+		return nil
 	}
 
 	existing.Spec = ksvc.Spec
@@ -162,7 +153,7 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 		return fmt.Errorf("failed to update KService %s: %w", name, err)
 	}
 	logger.Infof(ctx, "Updated KService %s/%s", ns, name)
-	return c.deployIngress(ctx, app)
+	return nil
 }
 
 // Stop sets max-scale=0 on the KService, scaling it to zero without deleting it.
@@ -193,13 +184,11 @@ func (c *AppK8sClient) Delete(ctx context.Context, appID *flyteapp.Identifier) e
 	ksvc.Namespace = ns
 	if err := c.k8sClient.Delete(ctx, ksvc); err != nil {
 		if k8serrors.IsNotFound(err) {
-			c.deleteIngress(ctx, appID)
 			return nil
 		}
 		return fmt.Errorf("failed to delete KService %s: %w", name, err)
 	}
 	logger.Infof(ctx, "Deleted KService %s/%s", ns, name)
-	c.deleteIngress(ctx, appID)
 	return nil
 }
 
@@ -501,118 +490,11 @@ func (c *AppK8sClient) publicIngress(id *flyteapp.Identifier) *flyteapp.Ingress 
 	}
 	host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
 		id.GetName(), id.GetProject(), id.GetDomain(), c.cfg.BaseDomain))
-	return &flyteapp.Ingress{PublicUrl: scheme + "://" + host}
-}
-
-// deployIngress creates or updates the Traefik resources for the given app:
-//   - host-<name>   Middleware: rewrites Host to the Knative hostname so Kourier
-//     can route the request (Knative's K8s service is ExternalName → Kourier)
-//   - app-<name>    IngressRoute: matches Host header and applies the middleware
-//
-func (c *AppK8sClient) deployIngress(ctx context.Context, app *flyteapp.App) error {
-	appID := app.GetMetadata().GetId()
-	ns := appNamespace(appID.GetProject(), appID.GetDomain())
-	ksvcName := kserviceName(appID)
-	hostName := "host-" + ksvcName
-	routeName := "app-" + ksvcName
-	appHost := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
-		appID.GetName(), appID.GetProject(), appID.GetDomain(), c.cfg.IngressAppsDomain))
-	entryPoint := c.cfg.IngressEntryPoint
-	if entryPoint == "" {
-		entryPoint = "apps"
+	url := scheme + "://" + host
+	if c.cfg.IngressAppsPort != 0 {
+		url += fmt.Sprintf(":%d", c.cfg.IngressAppsPort)
 	}
-
-	// Knative's K8s service is ExternalName → kourier-internal. Kourier routes by
-	// Host header, so we must rewrite it to the deterministic Knative hostname.
-	// hostname pattern matches the configured domain-template: {name}-{namespace}.{domain}
-	knativeHost := fmt.Sprintf("%s-%s.%s", ksvcName, ns, c.cfg.BaseDomain)
-
-	hostMW := &unstructured.Unstructured{}
-	hostMW.SetGroupVersionKind(traefikMiddlewareGVK)
-	hostMW.SetName(hostName)
-	hostMW.SetNamespace(ns)
-	hostMW.Object["spec"] = map[string]interface{}{
-		"headers": map[string]interface{}{
-			"customRequestHeaders": map[string]interface{}{
-				"Host": knativeHost,
-				// Rewrite Origin to match the Knative host so that apps with
-				// XSRF/CORS origin checks (e.g. Streamlit) accept the connection.
-				// Safe for devbox — XSRF provides no value in a local environment.
-				"Origin": "http://" + knativeHost,
-			},
-		},
-	}
-
-	ir := &unstructured.Unstructured{}
-	ir.SetGroupVersionKind(traefikIngressRouteGVK)
-	ir.SetName(routeName)
-	ir.SetNamespace(ns)
-	ir.Object["spec"] = map[string]interface{}{
-		"entryPoints": []interface{}{entryPoint},
-		"routes": []interface{}{
-			map[string]interface{}{
-				"match": fmt.Sprintf("Host(`%s`)", appHost),
-				"kind":  "Rule",
-				"middlewares": []interface{}{
-					map[string]interface{}{"name": hostName},
-				},
-				"services": []interface{}{
-					map[string]interface{}{
-						"name": ksvcName,
-						"port": int64(80),
-					},
-				},
-			},
-		},
-	}
-
-	for _, obj := range []*unstructured.Unstructured{hostMW, ir} {
-		existing := &unstructured.Unstructured{}
-		existing.SetGroupVersionKind(obj.GroupVersionKind())
-		err := c.k8sClient.Get(ctx, client.ObjectKey{Name: obj.GetName(), Namespace: obj.GetNamespace()}, existing)
-		if k8serrors.IsNotFound(err) {
-			if createErr := c.k8sClient.Create(ctx, obj); createErr != nil {
-				return fmt.Errorf("failed to create %s %s/%s: %w", obj.GetKind(), ns, obj.GetName(), createErr)
-			}
-			logger.Infof(ctx, "Created %s %s/%s", obj.GetKind(), ns, obj.GetName())
-		} else if err != nil {
-			return fmt.Errorf("failed to get %s %s/%s: %w", obj.GetKind(), ns, obj.GetName(), err)
-		} else {
-			obj.SetResourceVersion(existing.GetResourceVersion())
-			if updateErr := c.k8sClient.Update(ctx, obj); updateErr != nil {
-				return fmt.Errorf("failed to update %s %s/%s: %w", obj.GetKind(), ns, obj.GetName(), updateErr)
-			}
-			logger.Infof(ctx, "Updated %s %s/%s", obj.GetKind(), ns, obj.GetName())
-		}
-	}
-	return nil
-}
-
-// deleteIngress removes the Traefik IngressRoute and both Middlewares for the given app.
-// Errors are logged as warnings — ingress cleanup failure does not block app deletion.
-func (c *AppK8sClient) deleteIngress(ctx context.Context, appID *flyteapp.Identifier) {
-	ns := appNamespace(appID.GetProject(), appID.GetDomain())
-	ksvcName := kserviceName(appID)
-
-	type resource struct {
-		gvk  schema.GroupVersionKind
-		name string
-	}
-	resources := []resource{
-		{traefikIngressRouteGVK, "app-" + ksvcName},
-		{traefikMiddlewareGVK, "host-" + ksvcName},
-	}
-	for _, r := range resources {
-		obj := &unstructured.Unstructured{}
-		obj.SetGroupVersionKind(r.gvk)
-		obj.SetName(r.name)
-		obj.SetNamespace(ns)
-		if err := c.k8sClient.Delete(ctx, obj); err != nil && !k8serrors.IsNotFound(err) {
-			logger.Warnf(ctx, "Failed to delete %s %s/%s: %v", r.gvk.Kind, ns, r.name, err)
-		} else {
-			logger.Infof(ctx, "Deleted %s %s/%s", r.gvk.Kind, ns, r.name)
-		}
-	}
+	return &flyteapp.Ingress{PublicUrl: url}
 }
 
 // --- Helpers ---

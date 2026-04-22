@@ -74,7 +74,7 @@ build-gpu: build
 # 30001 - DB
 # 30002 - RustFS
 # 30080 - Flyte Proxy
-# 30081 - Flyte Apps
+# 30081 - Kourier (Knative apps)
 .PHONY: start
 start: FLYTE_DEVBOX_IMAGE := flyte-devbox:latest
 start: FLYTE_DEV := False
@@ -126,7 +126,9 @@ setup-knative:
 	kubectl patch configmap/config-network -n knative-serving --type merge \
 		--patch '{"data":{"domain-template":"{{.Name}}-{{.Namespace}}.{{.Domain}}"}}'
 	kubectl patch configmap/config-domain -n knative-serving --type merge \
-		--patch '{"data":{"local.flyte.app":""}}'
+		--patch '{"data":{"local.flyte.app":null,"localhost":""}}'
+	kubectl patch svc/kourier -n kourier-system --type merge \
+		--patch '{"spec":{"type":"NodePort","ports":[{"name":"http2","port":80,"targetPort":8080,"nodePort":30081}]}}'
 
 .PHONY: stop
 stop:

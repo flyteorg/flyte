@@ -18,12 +18,10 @@ manager:
 
   internalApps:
     enabled: true
-    baseDomain: "local.flyte.app"
+    baseDomain: "localhost"
     scheme: "http"
     defaultRequestTimeout: 300s
     maxRequestTimeout: 3600s
-    ingressEntryPoint: "apps"
-    ingressAppsDomain: "localhost"
     ingressAppsPort: 30081
     defaultEnvVars:
       - FLYTE_AWS_ENDPOINT: "http://rustfs.flyte.svc.cluster.local:9000"
