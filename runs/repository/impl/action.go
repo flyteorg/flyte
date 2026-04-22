@@ -315,6 +315,21 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 		args = append(args, expr.Args...)
 	}
 
+	if input.CursorToken != "" {
+		if t, err := time.Parse(time.RFC3339Nano, input.CursorToken); err == nil {
+			// If a filter was already applied above, the WHERE clause is already open
+			// and we extend it with AND. Otherwise we open a new WHERE clause.
+			// Use < because the default sort is DESC (newest first): each page
+			// continues from rows older than the last row of the previous page.
+			if input.Filter != nil {
+				queryBuilder.WriteString(" AND created_at < ?")
+			} else {
+				queryBuilder.WriteString(" WHERE created_at < ?")
+			}
+			args = append(args, t)
+		}
+	}
+
 	if len(input.SortParameters) > 0 {
 		queryBuilder.WriteString(" ORDER BY ")
 		for i, sp := range input.SortParameters {
@@ -324,11 +339,12 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 			queryBuilder.WriteString(sp.GetOrderExpr())
 		}
 	} else {
-		queryBuilder.WriteString(" ORDER BY created_at ASC")
+		// Default sorting non-terminal runs at the top, then by most recent start time.
+		queryBuilder.WriteString(" ORDER BY phase ASC, created_at DESC")
 	}
 
-	queryBuilder.WriteString(" LIMIT ? OFFSET ?")
-	args = append(args, input.Limit, input.Offset)
+	queryBuilder.WriteString(" LIMIT ?")
+	args = append(args, input.Limit+1)
 
 	query := sqlx.Rebind(sqlx.DOLLAR, queryBuilder.String())
 

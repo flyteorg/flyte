@@ -2,7 +2,14 @@ package interfaces
 
 // ListResourceInput contains parameters for querying collections of resources.
 type ListResourceInput struct {
-	Limit  int
+	Limit int
+
+	// CursorToken is a keyset pagination cursor encoded as a RFC3339Nano timestamp.
+	// When set, the query returns rows with created_at strictly greater than the cursor value.
+	// Mutually exclusive with Offset.
+	CursorToken string
+
+	// Offset is an integer offset for offset-based pagination.
 	Offset int
 
 	Filter Filter
