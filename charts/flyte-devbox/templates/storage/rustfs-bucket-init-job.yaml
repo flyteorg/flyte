@@ -1,6 +1,7 @@
 {{- if and .Values.rustfs.enabled .Values.rustfs.bucketInit.enabled }}
 {{- $accessKey := .Values.rustfsupstream.secret.rustfs.access_key }}
 {{- $secretKey := .Values.rustfsupstream.secret.rustfs.secret_key }}
+{{- $endpoint := tpl .Values.rustfs.bucketInit.endpoint . }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -29,7 +30,7 @@ spec:
         - /bin/sh
         - -ec
         - |
-          until mc alias set local '{{ .Values.rustfs.bucketInit.endpoint }}' '{{ $accessKey }}' '{{ $secretKey }}'; do
+          until mc alias set local '{{ $endpoint }}' '{{ $accessKey }}' '{{ $secretKey }}'; do
             echo "waiting for rustfs endpoint..."
             sleep 2
           done

@@ -8402,7 +8402,7 @@ spec:
         - /bin/sh
         - -ec
         - |
-          until mc alias set local 'http://rustfs-svc:9000' 'rustfs' 'rustfsstorage'; do
+          until mc alias set local 'http://rustfs-svc.flyte:9000' 'rustfs' 'rustfsstorage'; do
             echo "waiting for rustfs endpoint..."
             sleep 2
           done
