@@ -4,6 +4,8 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -499,4 +501,291 @@ func TestPodDeploymentStatus(t *testing.T) {
 			assert.Equal(t, tt.wantReason, reason)
 		})
 	}
+}
+
+// --- Watch reconnect tests ---
+
+// watchCall is a pre-programmed response for one call to multiWatchClient.Watch.
+type watchCall struct {
+	watcher k8swatch.Interface
+	err     error
+}
+
+// multiWatchClient wraps the fake client but intercepts Watch() calls, returning
+// pre-programmed watchers in sequence. All other methods delegate to the embedded fake.
+type multiWatchClient struct {
+	client.WithWatch
+	mu      sync.Mutex
+	calls   []watchCall
+	callIdx int
+	// capturedRVs records the ResourceVersion passed to each Watch() call (for assertions).
+	capturedRVs []string
+}
+
+func (m *multiWatchClient) Watch(ctx context.Context, list client.ObjectList, opts ...client.ListOption) (k8swatch.Interface, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	// Extract ResourceVersion from Raw options if present.
+	lo := &client.ListOptions{}
+	for _, o := range opts {
+		o.ApplyToList(lo)
+	}
+	rv := ""
+	if lo.Raw != nil {
+		rv = lo.Raw.ResourceVersion
+	}
+	m.capturedRVs = append(m.capturedRVs, rv)
+
+	if m.callIdx >= len(m.calls) {
+		// No more programmed calls — return a watcher that blocks until ctx is cancelled.
+		return k8swatch.NewFakeWithChanSize(0, false), nil
+	}
+	c := m.calls[m.callIdx]
+	m.callIdx++
+	if c.err != nil {
+		return nil, c.err
+	}
+	return c.watcher, nil
+}
+
+// newMultiClient builds an AppK8sClient backed by a multiWatchClient.
+func newMultiClient(t *testing.T, calls []watchCall, objs ...client.Object) (*AppK8sClient, *multiWatchClient) {
+	t.Helper()
+	s := testScheme(t)
+	base := fake.NewClientBuilder().WithScheme(s).WithObjects(objs...).Build()
+	mwc := &multiWatchClient{WithWatch: base, calls: calls}
+	return &AppK8sClient{
+		k8sClient: mwc,
+		cfg:       &config.InternalAppConfig{},
+	}, mwc
+}
+
+// testKsvc builds a minimal KService that kserviceToApp can parse.
+func testKsvc(name, ns, rv string) *servingv1.Service {
+	return &servingv1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            name,
+			Namespace:       ns,
+			ResourceVersion: rv,
+			Annotations:     map[string]string{annotationAppID: "proj/dev/" + name},
+			Labels:          map[string]string{labelAppManaged: "true"},
+		},
+	}
+}
+
+func TestWatch_ReconnectsOnChannelClose(t *testing.T) {
+	watchBackoffInitial = 0
+	t.Cleanup(func() { watchBackoffInitial = 1 * time.Second })
+
+	w1 := k8swatch.NewFake()
+	w2 := k8swatch.NewFake()
+
+	c, _ := newMultiClient(t, []watchCall{{watcher: w1}, {watcher: w2}})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	ch, err := c.Watch(ctx, "proj", "dev", "")
+	require.NoError(t, err)
+
+	// Send one event on w1 then close it (simulates K8s timeout/disconnect).
+	w1.Add(testKsvc("myapp", "proj-dev", "100"))
+	w1.Stop()
+
+	recv1 := <-ch
+	require.NotNil(t, recv1.GetCreateEvent(), "expected CreateEvent from first watcher")
+
+	// After reconnect, send an event on w2.
+	go func() {
+		time.Sleep(10 * time.Millisecond)
+		w2.Add(testKsvc("myapp", "proj-dev", "200"))
+	}()
+
+	recv2 := <-ch
+	require.NotNil(t, recv2.GetCreateEvent(), "expected CreateEvent from second watcher after reconnect")
+}
+
+func TestWatch_ReconnectsOnErrorEvent(t *testing.T) {
+	watchBackoffInitial = 0
+	t.Cleanup(func() { watchBackoffInitial = 1 * time.Second })
+
+	w1 := k8swatch.NewFake()
+	w2 := k8swatch.NewFake()
+
+	c, _ := newMultiClient(t, []watchCall{{watcher: w1}, {watcher: w2}})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	ch, err := c.Watch(ctx, "proj", "dev", "")
+	require.NoError(t, err)
+
+	// Send a K8s Error event — should trigger reconnect.
+	w1.Error(&metav1.Status{Code: 410, Reason: metav1.StatusReasonExpired, Message: "too old resource version"})
+
+	go func() {
+		time.Sleep(10 * time.Millisecond)
+		w2.Add(testKsvc("myapp", "proj-dev", "300"))
+	}()
+
+	resp := <-ch
+	require.NotNil(t, resp.GetCreateEvent(), "expected CreateEvent from second watcher after error-triggered reconnect")
+}
+
+func TestWatch_BookmarkUpdatesResourceVersion(t *testing.T) {
+	watchBackoffInitial = 0
+	t.Cleanup(func() { watchBackoffInitial = 1 * time.Second })
+
+	w1 := k8swatch.NewFake()
+	w2 := k8swatch.NewFake()
+
+	c, mwc := newMultiClient(t, []watchCall{{watcher: w1}, {watcher: w2}})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	ch, err := c.Watch(ctx, "proj", "dev", "")
+	require.NoError(t, err)
+
+	// Send a Bookmark with RV=999 then close w1.
+	w1.Action(k8swatch.Bookmark, &servingv1.Service{
+		ObjectMeta: metav1.ObjectMeta{ResourceVersion: "999"},
+	})
+	w1.Stop()
+
+	// Deliver an event from w2 after reconnect.
+	go func() {
+		time.Sleep(10 * time.Millisecond)
+		w2.Add(testKsvc("myapp", "proj-dev", "1000"))
+	}()
+
+	resp := <-ch
+	require.NotNil(t, resp.GetCreateEvent())
+
+	// The second Watch() call should have been made with ResourceVersion="999".
+	mwc.mu.Lock()
+	rvs := append([]string(nil), mwc.capturedRVs...)
+	mwc.mu.Unlock()
+
+	require.GreaterOrEqual(t, len(rvs), 2, "expected at least 2 Watch calls")
+	assert.Equal(t, "", rvs[0], "first Watch call should have no resourceVersion")
+	assert.Equal(t, "999", rvs[1], "second Watch call should use Bookmark resourceVersion")
+}
+
+func TestWatch_ExponentialBackoff(t *testing.T) {
+	watchBackoffInitial = 10 * time.Millisecond
+	watchBackoffMax = 80 * time.Millisecond
+	watchBackoffFactor = 2.0
+	t.Cleanup(func() {
+		watchBackoffInitial = 1 * time.Second
+		watchBackoffMax = 30 * time.Second
+	})
+
+	// Four watchers that each emit an Error event — only Error events trigger backoff.
+	// NewFakeWithChanSize(1,...) gives a buffer of 1 so pre-sends don't block before
+	// the consumer goroutine starts (NewFake() is unbuffered).
+	calls := make([]watchCall, 4)
+	for i := range calls {
+		w := k8swatch.NewFakeWithChanSize(1, false)
+		calls[i] = watchCall{watcher: w}
+		w.Error(&metav1.Status{Code: 410, Reason: metav1.StatusReasonExpired, Message: "resource version too old"})
+	}
+
+	c, mwc := newMultiClient(t, calls)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	start := time.Now()
+	ch, err := c.Watch(ctx, "proj", "dev", "")
+	require.NoError(t, err)
+
+	// Wait until at least 4 Watch() calls have been made.
+	require.Eventually(t, func() bool {
+		mwc.mu.Lock()
+		defer mwc.mu.Unlock()
+		return len(mwc.capturedRVs) >= 4
+	}, 2*time.Second, 5*time.Millisecond)
+
+	elapsed := time.Since(start)
+	// With 10ms+20ms+40ms backoffs before 4th call, minimum elapsed ≈ 70ms.
+	assert.GreaterOrEqual(t, elapsed, 60*time.Millisecond, "backoff should accumulate across error reconnects")
+
+	cancel()
+	for range ch {
+	}
+}
+
+func TestWatch_CleanCloseNoBackoff(t *testing.T) {
+	watchBackoffInitial = 50 * time.Millisecond
+	watchBackoffMax = 200 * time.Millisecond
+	t.Cleanup(func() {
+		watchBackoffInitial = 1 * time.Second
+		watchBackoffMax = 30 * time.Second
+	})
+
+	// Three watchers that close immediately (clean channel close, no Error event).
+	calls := []watchCall{
+		{watcher: k8swatch.NewFake()},
+		{watcher: k8swatch.NewFake()},
+		{watcher: k8swatch.NewFake()},
+	}
+	for _, wc := range calls {
+		wc.watcher.(*k8swatch.FakeWatcher).Stop()
+	}
+
+	c, mwc := newMultiClient(t, calls)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	start := time.Now()
+	ch, err := c.Watch(ctx, "proj", "dev", "")
+	require.NoError(t, err)
+
+	require.Eventually(t, func() bool {
+		mwc.mu.Lock()
+		defer mwc.mu.Unlock()
+		return len(mwc.capturedRVs) >= 3
+	}, 500*time.Millisecond, 5*time.Millisecond)
+
+	elapsed := time.Since(start)
+	// Clean closes must not apply backoff — all 3 reconnects should be nearly instant.
+	assert.Less(t, elapsed, 30*time.Millisecond, "clean closes should not apply backoff delay")
+
+	cancel()
+	for range ch {
+	}
+}
+
+func TestWatch_ContextCancelStopsLoop(t *testing.T) {
+	watchBackoffInitial = 0
+	t.Cleanup(func() { watchBackoffInitial = 1 * time.Second })
+
+	w1 := k8swatch.NewFake()
+	c, _ := newMultiClient(t, []watchCall{{watcher: w1}})
+
+	ctx, cancel := context.WithCancel(context.Background())
+	ch, err := c.Watch(ctx, "proj", "dev", "")
+	require.NoError(t, err)
+
+	cancel()
+
+	select {
+	case _, ok := <-ch:
+		assert.False(t, ok, "channel should be closed after ctx cancel")
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("channel not closed within 500ms of ctx cancel")
+	}
+}
+
+func TestWatch_InitialWatchErrorReturnsError(t *testing.T) {
+	c, _ := newMultiClient(t, []watchCall{
+		{watcher: nil, err: fmt.Errorf("RBAC denied")},
+	})
+
+	ch, err := c.Watch(context.Background(), "proj", "dev", "")
+	require.Error(t, err)
+	assert.Nil(t, ch)
 }
