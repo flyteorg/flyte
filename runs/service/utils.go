@@ -1,16 +1,21 @@
 package service
 
 import (
+	"context"
 	"crypto/sha256"
 	"database/sql"
 	"encoding/base64"
 	"fmt"
 	"slices"
 
+	"connectrpc.com/connect"
 	"github.com/pkg/errors"
 
 	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -100,4 +105,18 @@ func hashInputs(inputs *task.Inputs) (string, error) {
 
 	hash := sha256.Sum256(marshaledInputs)
 	return base64.StdEncoding.EncodeToString(hash[:]), nil
+}
+
+// validateProjectExists checks that the given project ID exists by calling the ProjectService.
+func validateProjectExists(ctx context.Context, projectClient projectconnect.ProjectServiceClient, projectID string) error {
+	if _, err := projectClient.GetProject(ctx, connect.NewRequest(&project.GetProjectRequest{
+		Id: projectID,
+	})); err != nil {
+		if connect.CodeOf(err) == connect.CodeNotFound {
+			return connect.NewError(connect.CodeNotFound, fmt.Errorf("project %q not found", projectID))
+		}
+		logger.Errorf(ctx, "Failed to validate project %q: %v", projectID, err)
+		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to validate project: %w", err))
+	}
+	return nil
 }

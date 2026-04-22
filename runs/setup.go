@@ -51,6 +51,15 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		actionsURL,
 	)
 
+	projectsURL := sc.BaseURL
+	if projectsURL == "" {
+		projectsURL = cfg.ActionsServiceURL
+	}
+	projectClient := projectconnect.NewProjectServiceClient(
+		http.DefaultClient,
+		projectsURL,
+	)
+
 	abortReconciler := service.NewAbortReconciler(repo, actionsClient, service.AbortReconcilerConfig{
 		Workers:      5,
 		MaxAttempts:  10,
@@ -62,8 +71,8 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return abortReconciler.Run(ctx)
 	})
 
-	runsSvc := service.NewRunService(repo, actionsClient, cfg.StoragePrefix, sc.DataStore, abortReconciler)
-	taskSvc := service.NewTaskService(repo)
+	runsSvc := service.NewRunService(repo, actionsClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler)
+	taskSvc := service.NewTaskService(repo, projectClient)
 
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc)
 	sc.Mux.Handle(runsPath, runsHandler)

@@ -54,6 +54,11 @@ packages:
       all: true
       dir: gen/go/flyteidl2/service/mocks
       include-auto-generated: true
+  github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect:
+    config:
+      all: true
+      dir: gen/go/flyteidl2/project/projectconnect/mocks
+      include-auto-generated: true
   github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect:
     config:
       all: true
