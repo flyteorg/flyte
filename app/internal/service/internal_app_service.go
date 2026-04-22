@@ -68,36 +68,23 @@ func (s *InternalAppService) Create(
 }
 
 // publicIngress builds the deterministic public URL for an app.
-// When Traefik ingress is enabled (IngressEnabled + IngressAppsDomain), the URL is
-// subdomain-based: {scheme}://{name}-{project}-{domain}.{IngressAppsDomain}[:{IngressAppsPort}].
-// Otherwise falls back to the Knative host pattern: {scheme}://{name}-{project}-{domain}.{base_domain}.
-// Returns nil if neither is configured.
+// URL is subdomain-based: {scheme}://{name}-{project}-{domain}.{IngressAppsDomain}[:{IngressAppsPort}].
+// Returns nil if IngressAppsDomain is not configured.
 func publicIngress(id *flyteapp.Identifier, cfg *appconfig.InternalAppConfig) *flyteapp.Ingress {
-	if cfg.IngressEnabled && cfg.IngressAppsDomain != "" {
-		scheme := cfg.Scheme
-		if scheme == "" {
-			scheme = "http"
-		}
-		host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
-			id.GetName(), id.GetProject(), id.GetDomain(), cfg.IngressAppsDomain))
-		url := scheme + "://" + host
-		if cfg.IngressAppsPort != 0 {
-			url += fmt.Sprintf(":%d", cfg.IngressAppsPort)
-		}
-		return &flyteapp.Ingress{PublicUrl: url}
-	}
-	if cfg.BaseDomain == "" {
+	if cfg.IngressAppsDomain == "" {
 		return nil
 	}
 	scheme := cfg.Scheme
 	if scheme == "" {
-		scheme = "https"
+		scheme = "http"
 	}
 	host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
-		id.GetName(), id.GetProject(), id.GetDomain(), cfg.BaseDomain))
-	return &flyteapp.Ingress{
-		PublicUrl: scheme + "://" + host,
+		id.GetName(), id.GetProject(), id.GetDomain(), cfg.IngressAppsDomain))
+	url := scheme + "://" + host
+	if cfg.IngressAppsPort != 0 {
+		url += fmt.Sprintf(":%d", cfg.IngressAppsPort)
 	}
+	return &flyteapp.Ingress{PublicUrl: url}
 }
 
 // Get retrieves an app and its live status from the KService CRD.

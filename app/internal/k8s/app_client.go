@@ -479,7 +479,7 @@ func (c *AppK8sClient) List(ctx context.Context, project, domain string, limit u
 // publicIngress returns the deterministic public URL for an app using the same
 // logic as the service layer so GetStatus/List/Watch are consistent with Create.
 func (c *AppK8sClient) publicIngress(id *flyteapp.Identifier) *flyteapp.Ingress {
-	if c.cfg.IngressEnabled && c.cfg.IngressAppsDomain != "" {
+	if c.cfg.IngressAppsDomain != "" {
 		scheme := c.cfg.Scheme
 		if scheme == "" {
 			scheme = "http"
@@ -509,11 +509,7 @@ func (c *AppK8sClient) publicIngress(id *flyteapp.Identifier) *flyteapp.Ingress 
 //     can route the request (Knative's K8s service is ExternalName → Kourier)
 //   - app-<name>    IngressRoute: matches Host header and applies the middleware
 //
-// No-ops when IngressEnabled is false.
 func (c *AppK8sClient) deployIngress(ctx context.Context, app *flyteapp.App) error {
-	if !c.cfg.IngressEnabled {
-		return nil
-	}
 	appID := app.GetMetadata().GetId()
 	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 	ksvcName := kserviceName(appID)
@@ -595,9 +591,6 @@ func (c *AppK8sClient) deployIngress(ctx context.Context, app *flyteapp.App) err
 // deleteIngress removes the Traefik IngressRoute and both Middlewares for the given app.
 // Errors are logged as warnings — ingress cleanup failure does not block app deletion.
 func (c *AppK8sClient) deleteIngress(ctx context.Context, appID *flyteapp.Identifier) {
-	if !c.cfg.IngressEnabled {
-		return
-	}
 	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 	ksvcName := kserviceName(appID)
 
@@ -670,8 +663,8 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	// so they can be overridden by app-specific env vars if needed.
 	if len(c.cfg.DefaultEnvVars) > 0 && len(podSpec.Containers) > 0 {
 		defaults := make([]corev1.EnvVar, 0, len(c.cfg.DefaultEnvVars))
-		for _, e := range c.cfg.DefaultEnvVars {
-			defaults = append(defaults, corev1.EnvVar{Name: e.Name, Value: e.Value})
+		for k, v := range c.cfg.DefaultEnvVars {
+			defaults = append(defaults, corev1.EnvVar{Name: k, Value: v})
 		}
 		podSpec.Containers[0].Env = append(defaults, podSpec.Containers[0].Env...)
 	}

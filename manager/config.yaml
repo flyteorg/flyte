@@ -22,23 +22,16 @@ manager:
     scheme: "http"
     defaultRequestTimeout: 300s
     maxRequestTimeout: 3600s
-    ingressEnabled: true
     ingressEntryPoint: "apps"
     ingressAppsDomain: "localhost"
     ingressAppsPort: 30081
     defaultEnvVars:
-      - name: FLYTE_AWS_ENDPOINT
-        value: "http://rustfs.flyte.svc.cluster.local:9000"
-      - name: FLYTE_AWS_ACCESS_KEY_ID
-        value: "rustfs"
-      - name: FLYTE_AWS_SECRET_ACCESS_KEY
-        value: "rustfsstorage"
-      - name: _U_EP_OVERRIDE
-        value: "flyte-binary-http.flyte.svc.cluster.local:8090"
-      - name: _U_INSECURE
-        value: "true"
-      - name: _U_USE_ACTIONS
-        value: "1"
+      - FLYTE_AWS_ENDPOINT: "http://rustfs.flyte.svc.cluster.local:9000"
+      - FLYTE_AWS_ACCESS_KEY_ID: "rustfs"
+      - FLYTE_AWS_SECRET_ACCESS_KEY: "rustfsstorage"
+      - _U_EP_OVERRIDE: "flyte-binary-http.flyte.svc.cluster.local:8090"
+      - _U_INSECURE: "true"
+      - _U_USE_ACTIONS: "1"
 
 
 # Webhook configuration
