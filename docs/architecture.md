@@ -69,6 +69,7 @@ flowchart TB
     DataProxy <--> Storage
     Actions -- "TaskAction CRDs" --> Executor
     Executor --> Pod
+    User <-- "Read inputs / write outputs" --> Storage
     Copilot -- "Upload outputs" --> Storage
     Executor -- "Status updates" --> Runs
 ```
@@ -89,8 +90,10 @@ flowchart TB
     Storage[("Object Storage<br/>S3 / GCS / Azure / RustFS")]
 
     Executor["Executor (K8s Controller)<br/>• Watches CRDs<br/>• Provisions Pods<br/>• Runs plugins"]
-    Pod["Task Pod<br/>User Container"]
-    Copilot["Copilot<br/>(sidecar)"]
+    subgraph TaskPod["Task Pod"]
+        PodUser["User Container"]
+        PodCopilot["Copilot (sidecar)"]
+    end
 
     Internal["InternalRunService<br/>(UpdateActionStatus)"]
 
@@ -106,11 +109,11 @@ flowchart TB
     Runs --> ActionsSvc
     Runs --> DataProxy
     ActionsSvc -- "TaskAction CRD" --> Executor
-    Executor --> Pod
-    Pod --> Copilot
-    Copilot -- "Upload outputs" --> Storage
+    Executor --> TaskPod
+    PodUser <-- "Read inputs / write outputs" --> Storage
+    PodCopilot -- "Upload outputs" --> Storage
     DataProxy --> Storage
-    Pod -- "Status update (gRPC)" --> Internal
+    PodCopilot -- "Status update (gRPC)" --> Internal
     Internal --> DB
     DB -. "WatchRunDetails stream" .-> Client
 ```
@@ -133,8 +136,8 @@ The following describes what happens when a user submits a workflow:
   5     Executor controller sees the CRD                        Executor
   6     Plugin resolves task spec, creates Pod + Copilot        Executor → K8s
   7     Copilot init-container downloads inputs from storage    Copilot → Object Storage
-  8     User container executes                                 K8s Pod
-  9     Copilot sidecar uploads outputs to object storage       Copilot → Object Storage
+  8     User container executes; reads inputs / writes outputs  User container ↔ Object Storage
+  9     Copilot sidecar uploads remaining outputs to storage    Copilot → Object Storage
  10     Executor calls InternalRunService.UpdateActionStatus()  Executor → Runs Service
  11     Action status updated in PostgreSQL                     Runs Service → DB
  12     Client receives update via WatchRunDetails() stream     Runs Service → Client
