@@ -38,125 +38,81 @@ This document describes the backend architecture of Flyte 2: its major component
 
 Flyte 2 is a Kubernetes-native workflow orchestration platform. The backend is a collection of Go microservices that communicate over **gRPC (buf connect)**, persist state in **PostgreSQL**, execute tasks as **Kubernetes Pods**, and store artifacts in **object storage** (S3 / GCS / Azure Blob / RustFS).
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│                         User / SDK / CLI                             │
-└───────────────────────────────┬──────────────────────────────────────┘
-                                │  gRPC (buf connect)
-                                ▼
-┌──────────────────────────────────────────────────────────────────────┐
-│                        Control Plane                                 │
-│  ┌────────────┐ ┌─────────┐ ┌───────────┐ ┌───────┐ ┌────────────┐ │
-│  │   Runs     │ │ Actions │ │ DataProxy │ │ Cache │ │   Events   │ │
-│  │  Service   │ │ Service │ │  Service  │ │Service│ │   Service  │ │
-│  └─────┬──────┘ └────┬────┘ └─────┬─────┘ └───┬───┘ └─────┬──────┘ │
-│        │              │            │            │            │        │
-│        └──────────────┼────────────┼────────────┼────────────┘        │
-│                       │            │            │                     │
-│                  ┌────▼────┐  ┌────▼─────┐  ┌──▼───┐                 │
-│                  │PostgreSQL│  │  Object  │  │Secret│                 │
-│                  │         │  │  Storage  │  │ Svc  │                 │
-│                  └─────────┘  └──────────┘  └──────┘                 │
-└──────────────────────────────────────────────────────────────────────┘
-                                │
-                     TaskAction CRDs
-                                │
-                                ▼
-┌──────────────────────────────────────────────────────────────────────┐
-│                         Data Plane (Kubernetes)                      │
-│                                                                      │
-│  ┌────────────────┐      ┌──────────────────────────────────┐        │
-│  │    Executor     │      │          Task Pod                │        │
-│  │  (K8s Controller│─────▶│  ┌──────────┐  ┌─────────────┐  │        │
-│  │   + Plugins)    │      │  │   User    │  │   Copilot   │  │        │
-│  └────────────────┘      │  │ Container │  │  (sidecar)  │  │        │
-│                           │  └──────────┘  └──────┬──────┘  │        │
-│                           └───────────────────────┼─────────┘        │
-│                                                   │                  │
-│                                          Upload outputs              │
-│                                                   │                  │
-│                                            ┌──────▼──────┐           │
-│                                            │   Object    │           │
-│                                            │   Storage   │           │
-│                                            └─────────────┘           │
-└──────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    Client["User / SDK / CLI"]
+
+    subgraph ControlPlane["Control Plane"]
+        Runs["Runs<br/>Service"]
+        Actions["Actions<br/>Service"]
+        DataProxy["DataProxy<br/>Service"]
+        Cache["Cache<br/>Service"]
+        Events["Events<br/>Service"]
+        Secret["Secret<br/>Service"]
+    end
+
+    DB[("PostgreSQL")]
+    Storage[("Object Storage<br/>S3 / GCS / Azure / RustFS")]
+
+    subgraph DataPlane["Data Plane (Kubernetes)"]
+        Executor["Executor<br/>(K8s Controller + Plugins)"]
+        subgraph Pod["Task Pod"]
+            User["User<br/>Container"]
+            Copilot["Copilot<br/>(sidecar)"]
+        end
+    end
+
+    Client -- "gRPC (buf connect)" --> Runs
+    Runs <--> DB
+    Actions <--> DB
+    Cache <--> DB
+    DataProxy <--> Storage
+    Actions -- "TaskAction CRDs" --> Executor
+    Executor --> Pod
+    Copilot -- "Upload outputs" --> Storage
+    Executor -- "Status updates" --> Runs
 ```
 
 ---
 
 ## System Architecture Diagram
 
-```
-                           ┌───────────────────────┐
-                           │   User / SDK / CLI     │
-                           └───────────┬───────────┘
-                                       │
-                              CreateRun │ WatchRuns
-                              (gRPC)    │ (streaming)
-                                       ▼
-                        ┌──────────────────────────┐
-                        │      Runs Service         │
-                        │      (port 8090)          │
-                        │                           │
-                        │  • RunService (public)    │
-                        │  • InternalRunService     │
-                        │  • TaskService            │
-                        │  • TriggerService         │
-                        │  • ProjectService         │
-                        │  • RunLogsService         │
-                        └──┬───────┬───────┬───────┘
-                           │       │       │
-            ┌──────────────┘       │       └─────────────────┐
-            ▼                      ▼                         ▼
-   ┌─────────────────┐   ┌─────────────────┐     ┌──────────────────┐
-   │   PostgreSQL     │   │ Actions Service  │     │  DataProxy       │
-   │                  │   │                  │     │  Service         │
-   │ • runs           │   │ • Watch          │     │  (port 8088)     │
-   │ • actions        │   │   TaskAction     │     │                  │
-   │ • action_attempts│   │   CRDs           │     │ • Signed URLs    │
-   │ • cache entries  │   │ • CRUD on        │     │ • Artifact mgmt  │
-   └─────────────────┘   │   actions         │     │ • Log streaming  │
-                          └────────┬─────────┘     └────────┬─────────┘
-                                   │                        │
-                          TaskAction CRD                    │
-                          created in K8s             ┌──────▼──────┐
-                                   │                 │   Object     │
-                                   ▼                 │   Storage    │
-                        ┌──────────────────┐         │ (S3/GCS/    │
-                        │    Executor       │         │  Azure/     │
-                        │  (K8s Controller) │         │  RustFS)    │
-                        │                   │         └─────────────┘
-                        │ • Watches CRDs    │                ▲
-                        │ • Provisions Pods │                │
-                        │ • Runs plugins    │                │
-                        └────────┬─────────┘          Upload outputs
-                                 │                          │
-                        ┌────────▼─────────┐         ┌──────┴──────┐
-                        │   Task Pod        │         │   Copilot    │
-                        │                   │────────▶│  (sidecar)   │
-                        │  User Container   │         │              │
-                        └──────────────────┘         └──────────────┘
-                                 │
-                        Status update (gRPC)
-                                 │
-                                 ▼
-                        ┌──────────────────┐
-                        │ InternalRunService│──▶ PostgreSQL ──▶ WatchRunDetails
-                        │ (UpdateAction     │                   stream to client
-                        │  Status)          │
-                        └──────────────────┘
+```mermaid
+flowchart TB
+    Client["User / SDK / CLI"]
 
-  ┌─────────────────────────────────────────────────────────┐
-  │                   Supporting Services                    │
-  │                                                         │
-  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────┐ │
-  │  │  Cache    │  │  Events  │  │  Secret  │  │  App   │ │
-  │  │  Service  │  │  Service │  │  Service │  │ Service│ │
-  │  │          │  │          │  │          │  │        │ │
-  │  │ Dedup    │  │ Event    │  │ Secret   │  │ App    │ │
-  │  │ caching  │  │ streaming│  │ storage  │  │ meta   │ │
-  │  └──────────┘  └──────────┘  └──────────┘  └────────┘ │
-  └─────────────────────────────────────────────────────────┘
+    Runs["Runs Service (port 8090)<br/>• RunService (public)<br/>• InternalRunService<br/>• TaskService<br/>• TriggerService<br/>• ProjectService<br/>• RunLogsService"]
+
+    DB[("PostgreSQL<br/>• runs<br/>• actions<br/>• action_attempts<br/>• cache entries")]
+    ActionsSvc["Actions Service<br/>• Watch TaskAction CRDs<br/>• CRUD on actions"]
+    DataProxy["DataProxy Service (port 8088)<br/>• Signed URLs<br/>• Artifact mgmt<br/>• Log streaming"]
+    Storage[("Object Storage<br/>S3 / GCS / Azure / RustFS")]
+
+    Executor["Executor (K8s Controller)<br/>• Watches CRDs<br/>• Provisions Pods<br/>• Runs plugins"]
+    Pod["Task Pod<br/>User Container"]
+    Copilot["Copilot<br/>(sidecar)"]
+
+    Internal["InternalRunService<br/>(UpdateActionStatus)"]
+
+    subgraph Support["Supporting Services"]
+        CacheSvc["Cache Service<br/>Dedup caching"]
+        EventsSvc["Events Service<br/>Event streaming"]
+        SecretSvc["Secret Service<br/>Secret storage"]
+        AppSvc["App Service<br/>App metadata"]
+    end
+
+    Client -- "CreateRun / WatchRuns (gRPC)" --> Runs
+    Runs --> DB
+    Runs --> ActionsSvc
+    Runs --> DataProxy
+    ActionsSvc -- "TaskAction CRD" --> Executor
+    Executor --> Pod
+    Pod --> Copilot
+    Copilot -- "Upload outputs" --> Storage
+    DataProxy --> Storage
+    Pod -- "Status update (gRPC)" --> Internal
+    Internal --> DB
+    DB -. "WatchRunDetails stream" .-> Client
 ```
 
 ---
@@ -466,26 +422,14 @@ Plugin reports status → InternalRunService
 
 ## Infrastructure Dependencies
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                       Infrastructure                              │
-│                                                                   │
-│  ┌──────────────┐   ┌──────────────┐   ┌──────────────────────┐  │
-│  │  Kubernetes   │   │  PostgreSQL   │   │   Object Storage     │  │
-│  │              │   │              │   │                      │  │
-│  │ • API server │   │ • Run state  │   │ • S3 / GCS / Azure  │  │
-│  │ • Pod exec   │   │ • Actions    │   │ • Task inputs/       │  │
-│  │ • CRDs       │   │ • Cache      │   │   outputs            │  │
-│  │ • RBAC       │   │ • Migrations │   │ • Artifacts          │  │
-│  │ • Volumes    │   │              │   │ • Logs               │  │
-│  └──────────────┘   └──────────────┘   └──────────────────────┘  │
-│                                                                   │
-│  ┌──────────────────────────────────────┐                         │
-│  │  (Optional) Secret Managers          │                         │
-│  │  AWS Secrets Manager / GCP Secret    │                         │
-│  │  Manager / Azure Key Vault           │                         │
-│  └──────────────────────────────────────┘                         │
-└──────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Infra["Infrastructure"]
+        K8s["Kubernetes<br/>• API server<br/>• Pod exec<br/>• CRDs<br/>• RBAC<br/>• Volumes"]
+        DB[("PostgreSQL<br/>• Run state<br/>• Actions<br/>• Cache<br/>• Migrations")]
+        Storage[("Object Storage<br/>• S3 / GCS / Azure<br/>• Task inputs/outputs<br/>• Artifacts<br/>• Logs")]
+        Secrets["(Optional) Secret Managers<br/>AWS Secrets Manager /<br/>GCP Secret Manager /<br/>Azure Key Vault"]
+    end
 ```
 
 | Dependency | Role | Required? |
@@ -564,17 +508,15 @@ Client ──▶ Runs:8090
 
 Executors run on multiple Kubernetes clusters, all reporting to a central Runs Service. TaskAction CRDs include a `cluster` field to route execution.
 
-```
-                 ┌──────────────┐
-                 │ Runs Service  │  (central)
-                 └──────┬───────┘
-                        │
-            ┌───────────┼───────────┐
-            ▼           ▼           ▼
-      ┌──────────┐ ┌──────────┐ ┌──────────┐
-      │Executor A│ │Executor B│ │Executor C│
-      │(Cluster 1)│ │(Cluster 2)│ │(Cluster 3)│
-      └──────────┘ └──────────┘ └──────────┘
+```mermaid
+flowchart TB
+    Runs["Runs Service<br/>(central)"]
+    ExA["Executor A<br/>(Cluster 1)"]
+    ExB["Executor B<br/>(Cluster 2)"]
+    ExC["Executor C<br/>(Cluster 3)"]
+    Runs --> ExA
+    Runs --> ExB
+    Runs --> ExC
 ```
 
 ### Helm Chart
