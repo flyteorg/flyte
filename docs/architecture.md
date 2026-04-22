@@ -62,16 +62,16 @@ flowchart TB
         end
     end
 
-    Client -- "gRPC (buf connect)" --> Runs
+    Client -- "gRPC: RunService<br/>DataProxyService<br/>TriggerService" --> Runs
     Runs <--> DB
     Actions <--> DB
     Cache <--> DB
     DataProxy <--> Storage
-    Actions -- "TaskAction CRDs" --> Executor
-    Executor --> Pod
-    User <-- "Read inputs / write outputs" --> Storage
-    Copilot -- "Upload outputs" --> Storage
-    Executor -- "Status updates" --> Runs
+    Actions -- "K8s API: TaskAction CRDs" --> Executor
+    Executor -- "K8s API: create Pod" --> Pod
+    User <-- "S3/GCS/Azure:<br/>read inputs / write outputs" --> Storage
+    Copilot -- "S3/GCS/Azure:<br/>upload outputs" --> Storage
+    Executor -- "gRPC: InternalRunService<br/>UpdateActionStatus" --> Runs
 ```
 
 ---
@@ -104,19 +104,53 @@ flowchart TB
         AppSvc["App Service<br/>App metadata"]
     end
 
-    Client -- "CreateRun / WatchRuns (gRPC)" --> Runs
-    Runs --> DB
-    Runs --> ActionsSvc
-    Runs --> DataProxy
-    ActionsSvc -- "TaskAction CRD" --> Executor
-    Executor --> TaskPod
-    PodUser <-- "Read inputs / write outputs" --> Storage
-    PodCopilot -- "Upload outputs" --> Storage
-    DataProxy --> Storage
-    PodCopilot -- "Status update (gRPC)" --> Internal
-    Internal --> DB
-    DB -. "WatchRunDetails stream" .-> Client
+    Client -- "gRPC: RunService.CreateRun<br/>AbortRun / GetRunDetails / ListRuns" --> Runs
+    Client -- "gRPC: RunService.WatchRuns<br/>WatchRunDetails (server-stream)" --> Runs
+    Client -- "gRPC: DataProxyService.GetUploadURL<br/>GetDownloadURL" --> DataProxy
+    Client -- "gRPC: TriggerService / ProjectService<br/>TaskService" --> Runs
+
+    Runs -- "SQL (pgx)" --> DB
+    Runs -- "gRPC: ActionsService.CreateAction<br/>WatchAction / GetAction" --> ActionsSvc
+    Runs -- "gRPC: CacheService.Get / Put<br/>GetOrExtendReservation" --> CacheSvc
+    Runs -- "gRPC: SecretService" --> SecretSvc
+    Runs -- "gRPC: EventsProxyService.WatchClusterEvents" --> EventsSvc
+
+    ActionsSvc -- "K8s API: create/watch<br/>TaskAction CRD" --> Executor
+    Executor -- "K8s API: create Pod" --> TaskPod
+    PodUser <-- "S3/GCS/Azure API<br/>read inputs / write outputs" --> Storage
+    PodCopilot -- "S3/GCS/Azure API<br/>upload outputs" --> Storage
+    DataProxy -- "S3/GCS/Azure API<br/>signed URLs" --> Storage
+
+    PodCopilot -- "gRPC: InternalRunService.RecordAction<br/>UpdateActionStatus / RecordActionEvents" --> Internal
+    Executor -- "gRPC: InternalRunService<br/>UpdateActionStatus" --> Internal
+    Internal -- "SQL (pgx)" --> DB
+    DB -. "LISTEN/NOTIFY → gRPC stream<br/>WatchRunDetails" .-> Client
 ```
+
+### gRPC Calls Between Components
+
+Summary of the gRPC wiring shown in the diagram above:
+
+| From | To | Service | Key RPCs | Direction |
+|------|----|---------|----------|-----------|
+| Client / SDK | Runs Service | `RunService` | CreateRun, AbortRun, GetRunDetails, ListRuns | unary |
+| Client / SDK | Runs Service | `RunService` | WatchRuns, WatchRunDetails | server-stream |
+| Client / SDK | Runs Service | `TaskService` | GetTask, ListTasks | unary |
+| Client / SDK | Runs Service | `TriggerService` | CreateTrigger, GetTrigger, ListTriggers | unary |
+| Client / SDK | Runs Service | `ProjectService` | GetProject, ListProjects | unary |
+| Client / SDK | Runs Service | `RunLogsService` | TailLogs | server-stream |
+| Client / SDK | DataProxy | `DataProxyService` | GetUploadURL, GetDownloadURL, GetArtifact | unary |
+| Runs Service | Actions Service | `ActionsService` | CreateAction, GetAction, WatchAction | unary / stream |
+| Runs Service | Cache Service | `CacheService` | Get, Put, Delete, GetOrExtendReservation | unary |
+| Runs Service | Events Service | `EventsProxyService` | WatchClusterEvents | server-stream |
+| Runs Service | Secret Service | `SecretService` | Get, Put | unary |
+| Executor / Copilot | Runs Service | `InternalRunService` | RecordAction, UpdateActionStatus, RecordActionEvents | unary |
+| Actions Service | Kubernetes | K8s API | Create/Watch `TaskAction` CRD | watch |
+| Executor | Kubernetes | K8s API | Create/Watch Pods | watch |
+| User container / Copilot | Object Storage | S3 / GCS / Azure | Get/Put object | REST |
+| DataProxy | Object Storage | S3 / GCS / Azure | Sign URL | REST |
+
+All gRPC traffic uses **buf connect** (HTTP/2 with HTTP/1.1 fallback).
 
 ---
 
