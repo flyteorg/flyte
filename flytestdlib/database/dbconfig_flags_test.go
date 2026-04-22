@@ -281,18 +281,4 @@ func TestDbConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_sqlite.file", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("sqlite.file", testValue)
-			if vString, err := cmdFlags.GetString("sqlite.file"); err == nil {
-				testDecodeJson_DbConfig(t, fmt.Sprintf("%v", vString), &actual.SQLite.File)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 }

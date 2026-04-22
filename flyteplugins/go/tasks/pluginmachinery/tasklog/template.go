@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
@@ -135,7 +136,7 @@ func (input Input) templateVars() []TemplateVar {
 			},
 			TemplateVar{
 				defaultRegexes.GeneratedName,
-				input.TaskExecutionID.GetGeneratedName(),
+				utils.ConvertToDNS1123SubdomainCompatibleString(input.TaskExecutionID.GetGeneratedName()),
 			},
 			TemplateVar{
 				defaultRegexes.TaskRetryAttempt,

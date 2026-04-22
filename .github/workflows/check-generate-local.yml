@@ -4,20 +4,24 @@ on:
   workflow_call:
 
 jobs:
-  # Check generation locally when the PR is from fork repo
-  check-generate-local:
+  setup:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      actions: read
-      packages: read
+    outputs:
+      go: ${{ steps.versions.outputs.go }}
+      python: ${{ steps.versions.outputs.python }}
+      node: ${{ steps.versions.outputs.node }}
+      rust: ${{ steps.versions.outputs.rust }}
+      uv: ${{ steps.versions.outputs.uv }}
+      buf: ${{ steps.versions.outputs.buf }}
+      mockery: ${{ steps.versions.outputs.mockery }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # for fork PR - get the version of tools from gen.Dockerfile
       - name: Extract tool versions from gen.Dockerfile
         id: versions
         run: |
@@ -30,49 +34,104 @@ jobs:
           echo "buf=$(extract BUF_VERSION)" >> $GITHUB_OUTPUT
           echo "mockery=$(extract MOCKERY_VERSION)" >> $GITHUB_OUTPUT
 
-      # for fork PR - install tools in runner
+  check-generate:
+    needs: setup
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      packages: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ steps.versions.outputs.go }}
+          go-version: ${{ needs.setup.outputs.go }}
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ steps.versions.outputs.python }}
+          python-version: ${{ needs.setup.outputs.python }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: ${{ steps.versions.outputs.node }}
+          node-version: ${{ needs.setup.outputs.node }}
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: ${{ steps.versions.outputs.rust }}
+          toolchain: ${{ needs.setup.outputs.rust }}
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v6
         with:
-          version: ${{ steps.versions.outputs.uv }}
+          version: ${{ needs.setup.outputs.uv }}
 
-      - name: Install Buf and Mockery
+      - name: Install Buf
         run: |
-          BUF_VERSION="${{ steps.versions.outputs.buf }}"
+          BUF_VERSION="${{ needs.setup.outputs.buf }}"
           curl -fsSL "https://github.com/bufbuild/buf/releases/download/v${BUF_VERSION}/buf-Linux-x86_64.tar.gz" | tar -xzC /tmp
           sudo mv /tmp/buf/bin/buf /usr/local/bin/buf
           sudo mv /tmp/buf/bin/protoc-gen-buf-breaking /usr/local/bin/
           sudo mv /tmp/buf/bin/protoc-gen-buf-lint /usr/local/bin/
           npm install -g pnpm
-          go install "github.com/vektra/mockery/v2@v${{ steps.versions.outputs.mockery }}"
 
-      # for fork PR - Check make gen locally
-      - name: Run check locally (fork PR)
+      - name: Run buf generation and check
         env:
           SETUPTOOLS_SCM_PRETEND_VERSION: "0.0.0"
           UV_PROJECT_ENVIRONMENT: /tmp/flyte-venv
         run: |
           cd gen/python && uv sync --all-groups --frozen && cd ../..
-          make gen-local
-          git diff --exit-code || (echo 'Generated files are out of date. Run \`make gen\` and commit changes.' && exit 1)
-          make build-crate
+          make buf
+          git diff --exit-code -- ':!gen/rust/Cargo.lock' ':!*/mocks/*' ':!*/gocachemocks/*' ':!go.mod' ':!go.sum' || \
+            (echo 'Generated files are out of date. Run `make buf` and commit changes.' && exit 1)
+          make check-crate
+
+  check-go-tidy:
+    needs: setup
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ needs.setup.outputs.go }}
+
+      - name: Run go mod tidy and check
+        run: |
+          make go-tidy
+          git diff --exit-code -- go.mod go.sum || \
+            (echo 'go.mod/go.sum are out of date. Run `go mod tidy` and commit changes.' && exit 1)
+
+  check-mocks:
+    needs: setup
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ needs.setup.outputs.go }}
+
+      - name: Install mockery
+        run: |
+          go install "github.com/vektra/mockery/v2@v${{ needs.setup.outputs.mockery }}"
+
+      - name: Run mockery and check
+        run: |
+          make mocks
+          git diff --exit-code -- '*/mocks/*' '*/gocachemocks/*' || \
+            (echo 'Mock files are out of date. Run `make mocks` and commit changes.' && exit 1)

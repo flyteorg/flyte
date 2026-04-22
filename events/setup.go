@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/flyteorg/flyte/v2/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/events/config"
 	"github.com/flyteorg/flyte/v2/events/service"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"

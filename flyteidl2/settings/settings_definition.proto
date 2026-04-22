@@ -1,0 +1,192 @@
+syntax = "proto3";
+
+package flyteidl2.settings;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings";
+
+// desc is a field option that attaches a human-readable description to a
+// setting field. Clients can read it at runtime via proto reflection without
+// needing a server round-trip.
+//
+// Go:
+//   import (
+//     "google.golang.org/protobuf/proto"
+//     org "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/org"
+//   )
+//   field := (&org.RunSettings{}).ProtoReflect().Descriptor().Fields().ByName("default_queue")
+//   desc := proto.GetExtension(field.Options(), org.E_Desc).(string)
+//
+// TypeScript (protobuf-es):
+//   import { RunSettings } from "./settings_definition_pb";
+//   import { desc } from "./settings_definition_pb"; // the extension
+//   const field = RunSettings.fields.find(f => f.name === "default_queue");
+//   const description = getExtension(field.proto.options, desc);
+//
+// Python:
+//   from flyteidl2.org import settings_definition_pb2
+//   field = settings_definition_pb2.RunSettings.DESCRIPTOR.fields_by_name["default_queue"]
+//   description = field.GetOptions().Extensions[settings_definition_pb2.desc]
+
+extend google.protobuf.FieldOptions {
+  string desc = 50000;
+}
+
+// SettingState controls how a setting at a given scope behaves.
+// The zero value INHERIT is the safe default for any unset field.
+enum SettingState {
+  // Delegate to the parent scope. This is the default.
+  SETTING_STATE_INHERIT = 0;
+
+  // Explicitly no value at this scope. Stops the inheritance chain without
+  // providing a value. Child scopes may still override with a real value.
+  SETTING_STATE_UNSET = 1;
+
+  // A real typed value is present in the accompanying value field.
+  SETTING_STATE_VALUE = 2;
+}
+
+// ScopeLevel identifies which scope level a resolved setting came from.
+enum ScopeLevel {
+  SCOPE_LEVEL_ORG = 0;
+  SCOPE_LEVEL_DOMAIN = 1;
+  SCOPE_LEVEL_PROJECT = 2;
+}
+
+// StringValues is a wrapper for a list of strings.
+// Required because proto3 does not allow repeated fields directly in a oneof.
+message StringValues {
+  repeated string values = 1;
+}
+
+// StringMap is a wrapper for a string-to-string map.
+// Required because proto3 does not allow map fields directly in a oneof.
+message StringMap {
+  map<string, string> entries = 1;
+}
+
+// SettingsKey is the storage key for a settings record.
+// domain and project are empty for org-scope and org/domain-scope records
+// respectively.
+message SettingsKey {
+  string org = 1 [(buf.validate.field).string.min_len = 1];
+  string domain = 2;
+  string project = 3;
+}
+
+// ---------------------------------------------------------------------------
+// Typed setting wrappers
+//
+// Each wrapper has two parallel fields: state and the typed value.
+// state = INHERIT (0, default): delegate to parent scope.
+// state = UNSET: explicitly no value; stops inheritance without providing one.
+// state = VALUE: the typed value field contains a meaningful value.
+// scope_level is populated in GetSettings responses only; it is not stored.
+// ---------------------------------------------------------------------------
+
+// A setting that holds a plain string.
+message StringSetting {
+  // INHERIT, UNSET, or VALUE. Defaults to INHERIT.
+  SettingState state = 1;
+  // Meaningful only when state = VALUE.
+  string string_value = 2;
+  // Indicates the scope at which this value was resolved. Populated in
+  // GetSettings responses only; not stored.
+  ScopeLevel scope_level = 3;
+}
+
+// A setting that holds an int64.
+message Int64Setting {
+  SettingState state = 1;
+  // Meaningful only when state = VALUE.
+  int64 int_value = 2;
+  ScopeLevel scope_level = 3;
+}
+
+// A setting that holds a bool.
+message BoolSetting {
+  SettingState state = 1;
+  // Meaningful only when state = VALUE.
+  bool bool_value = 2;
+  ScopeLevel scope_level = 3;
+}
+
+// A setting that holds a list of strings.
+// Merge behavior: additive (parent-first concatenation). UNSET clears
+// accumulated values from parent scopes.
+message StringListSetting {
+  SettingState state = 1;
+  // Meaningful only when state = VALUE.
+  StringValues list_value = 2;
+  ScopeLevel scope_level = 3;
+}
+
+// A setting that holds a string-to-string map.
+// Merge behavior: child entries override parent on key conflict. UNSET clears
+// accumulated entries from parent scopes.
+message StringMapSetting {
+  SettingState state = 1;
+  // Meaningful only when state = VALUE.
+  StringMap map_value = 2;
+  ScopeLevel scope_level = 3;
+}
+
+// A setting that holds a Kubernetes resource quantity string
+// (e.g. "500m", "128Mi", "2").
+// The service validates values with resource.ParseQuantity.
+message QuantitySetting {
+  SettingState state = 1;
+  // Meaningful only when state = VALUE.
+  string quantity_value = 2;
+  ScopeLevel scope_level = 3;
+}
+
+// ---------------------------------------------------------------------------
+// Domain messages
+// ---------------------------------------------------------------------------
+
+// RunSettings controls workflow execution behavior.
+message RunSettings {
+  StringSetting default_queue = 1 [(flyteidl2.settings.desc) = "Default queue for task runs"];
+  Int64Setting run_concurrency = 2 [(flyteidl2.settings.desc) = "Maximum number of concurrent runs. 0 means unlimited."];
+  Int64Setting action_concurrency = 3 [(flyteidl2.settings.desc) = "Maximum number of concurrent actions per run. 0 means unlimited."];
+}
+
+// SecuritySettings controls security-related configuration.
+message SecuritySettings {
+  StringSetting service_account = 1 [(flyteidl2.settings.desc) = "Kubernetes service account for task pods"];
+}
+
+// StorageSettings controls data storage configuration.
+message StorageSettings {
+  StringSetting raw_data_path = 1 [(flyteidl2.settings.desc) = "Base path for raw data storage (e.g. s3://my-bucket/prefix)"];
+}
+
+// TaskResourceDefaults holds resource quantity settings for a single bound
+// (min or max) across all supported resource dimensions.
+message TaskResourceDefaults {
+  QuantitySetting cpu = 1 [(flyteidl2.settings.desc) = "CPU resource quantity (e.g. \"500m\", \"2\")"];
+  QuantitySetting gpu = 2 [(flyteidl2.settings.desc) = "GPU resource quantity (e.g. \"1\")"];
+  QuantitySetting memory = 3 [(flyteidl2.settings.desc) = "Memory resource quantity (e.g. \"256Mi\", \"4Gi\")"];
+  QuantitySetting storage = 4 [(flyteidl2.settings.desc) = "Ephemeral storage quantity (e.g. \"10Gi\")"];
+}
+
+// TaskResourceSettings controls task resource configuration.
+message TaskResourceSettings {
+  TaskResourceDefaults min = 1 [(flyteidl2.settings.desc) = "Minimum resource requests applied to task pods"];
+  TaskResourceDefaults max = 2 [(flyteidl2.settings.desc) = "Maximum resource limits applied to task pods"];
+  BoolSetting mirror_limits_request = 3 [(flyteidl2.settings.desc) = "When true, resource limits mirror requests"];
+}
+
+// Settings holds all configurable settings for a scope.
+message Settings {
+  RunSettings run = 1;
+  SecuritySettings security = 2;
+  StorageSettings storage = 3;
+  TaskResourceSettings task_resource = 4;
+  StringListSetting labels = 5 [(flyteidl2.settings.desc) = "Kubernetes labels applied to task pods. Additive across scopes."];
+  StringMapSetting annotations = 6 [(flyteidl2.settings.desc) = "Kubernetes annotations applied to task pods. Child overrides parent on key conflict."];
+  StringMapSetting environment_variables = 7 [(flyteidl2.settings.desc) = "Environment variables injected into task pods. Child overrides parent on key conflict."];
+}

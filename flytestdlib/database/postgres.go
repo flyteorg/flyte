@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
+	_ "github.com/jackc/pgx/v5/stdlib"
+
 	oldPgConn "github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v5/pgconn"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/jmoiron/sqlx"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
@@ -30,7 +30,7 @@ func resolvePassword(ctx context.Context, passwordVal, passwordPath string) stri
 			logger.Fatalf(ctx,
 				"missing database password at specified path [%s]", passwordPath)
 		}
-		passwordVal, err := ioutil.ReadFile(passwordPath)
+		passwordVal, err := os.ReadFile(passwordPath)
 		if err != nil {
 			logger.Fatalf(ctx, "failed to read database password from path [%s] with err: %v",
 				passwordPath, err)
@@ -67,25 +67,38 @@ func getPostgresReadDsn(ctx context.Context, pgConfig PostgresConfig) string {
 }
 
 // CreatePostgresDbIfNotExists creates DB if it doesn't exist for the passed in config
-func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, pgConfig PostgresConfig) (*gorm.DB, error) {
-	dialector := postgres.Open(GetPostgresDsn(ctx, pgConfig))
-	gormDb, err := gorm.Open(dialector, gormConfig)
-	if err == nil {
-		return gormDb, nil
-	}
-	if !IsPgErrorWithCode(err, PqInvalidDBCode) {
-		logger.Errorf(ctx, "Unhandled error connecting to postgres, pg [%v], gorm [%v]: %v", pgConfig, gormConfig, err)
+func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig) (*sqlx.DB, error) {
+	dsn := GetPostgresDsn(ctx, pgConfig)
+	db, err := sqlx.Open("pgx", dsn)
+	if err != nil {
 		return nil, err
 	}
+
+	// sqlx.Open doesn't actually connect; we need to ping to verify the connection.
+	if err = db.PingContext(ctx); err == nil {
+		return db, nil
+	}
+
+	if !IsPgErrorWithCode(err, PqInvalidDBCode) {
+		logger.Errorf(ctx, "Unhandled error connecting to postgres, pg [%v]: %v", pgConfig, err)
+		db.Close()
+		return nil, err
+	}
+	db.Close()
 	logger.Warningf(ctx, "Database [%v] does not exist", pgConfig.DbName)
 
 	// Every postgres installation includes a 'postgres' database by default. We connect to that now in order to
 	// initialize the user-specified database.
 	defaultDbPgConfig := pgConfig
 	defaultDbPgConfig.DbName = defaultDB
-	defaultDBDialector := postgres.Open(GetPostgresDsn(ctx, defaultDbPgConfig))
-	gormDb, err = gorm.Open(defaultDBDialector, gormConfig)
+	defaultDsn := GetPostgresDsn(ctx, defaultDbPgConfig)
+	defaultDb, err := sqlx.Open("pgx", defaultDsn)
 	if err != nil {
+		return nil, err
+	}
+	defer defaultDb.Close()
+
+	if err = defaultDb.PingContext(ctx); err != nil {
 		return nil, err
 	}
 
@@ -94,22 +107,43 @@ func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 
 	// NOTE: golang sql drivers do not support parameter injection for CREATE calls
 	createDBStatement := fmt.Sprintf("CREATE DATABASE %s", pgConfig.DbName)
-	result := gormDb.Exec(createDBStatement)
+	_, err = defaultDb.ExecContext(ctx, createDBStatement)
 
-	if result.Error != nil {
-		if !IsPgErrorWithCode(result.Error, PqDbAlreadyExistsCode) {
-			return nil, result.Error
+	if err != nil {
+		if !IsPgErrorWithCode(err, PqDbAlreadyExistsCode) {
+			return nil, err
 		}
 		logger.Warningf(ctx, "Got DB already exists error for [%s], skipping...", pgConfig.DbName)
 	}
+
 	// Now try connecting to the db again
-	return gorm.Open(dialector, gormConfig)
+	db, err = sqlx.Open("pgx", dsn)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = db.PingContext(ctx); err != nil {
+		db.Close()
+		return nil, err
+	}
+
+	return db, nil
 }
 
-// CreatePostgresReadOnlyDbConnection creates readonly DB connection and returns the gorm.DB object and error
-func CreatePostgresReadOnlyDbConnection(ctx context.Context, gormConfig *gorm.Config, pgConfig PostgresConfig) (*gorm.DB, error) {
-	dialector := postgres.Open(getPostgresReadDsn(ctx, pgConfig))
-	return gorm.Open(dialector, gormConfig)
+// CreatePostgresReadOnlyDbConnection creates readonly DB connection and returns the sqlx.DB object and error
+func CreatePostgresReadOnlyDbConnection(ctx context.Context, pgConfig PostgresConfig) (*sqlx.DB, error) {
+	dsn := getPostgresReadDsn(ctx, pgConfig)
+	db, err := sqlx.Open("pgx", dsn)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = db.PingContext(ctx); err != nil {
+		db.Close()
+		return nil, err
+	}
+
+	return db, nil
 }
 
 func IsPgErrorWithCode(err error, code string) bool {

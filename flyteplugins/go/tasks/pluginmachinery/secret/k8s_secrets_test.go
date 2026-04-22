@@ -145,15 +145,22 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 		},
 	}
 
+	// successPodFileAllKeys: when group is not set, group falls back to MD5("hello") = "5d41402abc4b2a76b9719d911017c592"
 	successPodFileAllKeys := corev1.Pod{
 		Spec: corev1.PodSpec{
 			Volumes: []corev1.Volume{
 				{
-					Name: "hello",
+					Name: "gvsdimjugazgcytdgrrdeyjxgzrdsnzrhfsdsmjrgaytoyzvhezf5",
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							SecretName: "hello",
-							Optional:   &optional,
+							SecretName: "5d41402abc4b2a76b9719d911017c592",
+							Items: []corev1.KeyToPath{
+								{
+									Key:  "hello",
+									Path: "hello",
+								},
+							},
+							Optional: &optional,
 						},
 					},
 				},
@@ -164,8 +171,8 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 					Name: "container1",
 					VolumeMounts: []corev1.VolumeMount{
 						{
-							Name:      "hello",
-							MountPath: "/etc/flyte/secrets/hello",
+							Name:      "gvsdimjugazgcytdgrrdeyjxgzrdsnzrhfsdsmjrgaytoyzvhezf5",
+							MountPath: "/etc/flyte/secrets/5d41402abc4b2a76b9719d911017c592",
 							ReadOnly:  true,
 						},
 					},
@@ -180,6 +187,14 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 					},
 				},
 			},
+		},
+	}
+
+	// noGroupFallbackPod: when group is not set and pod has no containers, result is empty container slices
+	noGroupFallbackPod := corev1.Pod{
+		Spec: corev1.PodSpec{
+			InitContainers: []corev1.Container{},
+			Containers:     []corev1.Container{},
 		},
 	}
 
@@ -283,8 +298,8 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 		want    *corev1.Pod
 		wantErr bool
 	}{
-		{name: "require group", args: args{secret: &coreIdl.Secret{Key: "HELLO", MountRequirement: coreIdl.Secret_ENV_VAR}, p: &corev1.Pod{}},
-			want: &corev1.Pod{}, wantErr: true},
+		{name: "no group falls back to md5 key", args: args{secret: &coreIdl.Secret{Key: "HELLO", MountRequirement: coreIdl.Secret_ENV_VAR}, p: &corev1.Pod{}},
+			want: &noGroupFallbackPod, wantErr: false},
 		{name: "simple", args: args{secret: &coreIdl.Secret{Group: "grOUP", Key: "HELLO", MountRequirement: coreIdl.Secret_ENV_VAR}, p: inputPod.DeepCopy()},
 			want: &successPodEnv, wantErr: false},
 		{name: "simple with env_name", args: args{secret: &coreIdl.Secret{Group: "grOUP", Key: "HELLO", MountRequirement: coreIdl.Secret_ENV_VAR, EnvVar: "MY_CUSTOM_ENV"}, p: inputPod.DeepCopy()},
@@ -300,7 +315,7 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 			want: &successPodMultiFiles, wantErr: false},
 		{name: "require file all keys", args: args{secret: &coreIdl.Secret{Key: "hello", MountRequirement: coreIdl.Secret_FILE},
 			p: inputPod.DeepCopy()},
-			want: &successPodFileAllKeys, wantErr: true},
+			want: &successPodFileAllKeys, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

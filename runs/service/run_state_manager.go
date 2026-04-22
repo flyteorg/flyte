@@ -310,10 +310,10 @@ func (rsm *runStateManager) GetActionTreeNodeByName(name string) *node {
 }
 
 func getParentActionName(actionNode *node) string {
-	if actionNode == nil || actionNode.Action == nil || actionNode.Action.ParentActionName == nil {
+	if actionNode == nil || actionNode.Action == nil || actionNode.Action.ParentActionName.Valid == false {
 		return ""
 	}
-	return *actionNode.Action.ParentActionName
+	return actionNode.Action.ParentActionName.String
 }
 
 func validateAndTransformFilters(filters []*common.Filter) (map[common.ActionPhase]struct{}, string, error) {

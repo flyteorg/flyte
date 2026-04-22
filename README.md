@@ -1,173 +1,149 @@
 # Flyte 2
 
-[Flyte 2](https://github.com/flyteorg/flyte-sdk) is a Python framework that lets you reliably orchestrate ML pipelines, models, and agents at scale — in pure Python. It provides type-safe, async-first orchestration with built-in support for distributed execution, real-time serving, and local development.
+**Reliably orchestrate ML pipelines, models, and agents at scale — in pure Python.**
 
-**If you're looking to use Flyte on a single machine**, you don't need this repository — just install the [flyte-sdk](https://github.com/flyteorg/flyte-sdk). It's incredibly useful on its own for orchestrating workflows, running ML pipelines, and serving models locally.
+[![Version](https://img.shields.io/pypi/v/flyte?label=version&color=blue)](https://pypi.org/project/flyte/)
+[![Python](https://img.shields.io/pypi/pyversions/flyte?color=brightgreen)](https://pypi.org/project/flyte/)
+[![License](https://img.shields.io/badge/license-Apache%202.0-orange)](LICENSE)
+[![Try in Browser](https://img.shields.io/badge/Try%20in%20Browser-Live%20Demo-7652a2)](https://flyte2intro.apps.demo.hosted.unionai.cloud/)
+[![Docs](https://img.shields.io/badge/Docs-flyte-blue)](https://www.union.ai/docs/v2/flyte/user-guide/running-locally/)
+[![SDK Reference](https://img.shields.io/badge/SDK%20Reference-API-brightgreen)](https://www.union.ai/docs/v2/byoc/api-reference/flyte-sdk/)
+[![CLI Reference](https://img.shields.io/badge/CLI%20Reference-API-brightgreen)](https://www.union.ai/docs/v2/byoc/api-reference/flyte-cli/)
 
-**This repository** is the backend infrastructure for deploying a distributed, multi-node version of Flyte 2. The backend is **Kubernetes-native** — it orchestrates workflow execution using Kubernetes primitives, scheduling tasks as pods across clusters with built-in support for multi-cluster routing, service account–based identity, and pod-level log tracking. The core architecture consists of gRPC services (QueueService, RunService, StateService) backed by PostgreSQL, using async processing and real-time streaming via PostgreSQL LISTEN/NOTIFY. See the full [Implementation Spec](https://github.com/flyteorg/flyte/blob/v2/IMPLEMENTATION_SPEC.md) for details.
-
-This repo also defines the protocol buffer schemas for Flyte's APIs and generates client libraries for Go, TypeScript, Python, and Rust. Deploy this when you need Flyte running as a scalable, distributed service across your organization.
-
-**⚠️ This backend is a work in progress and not yet ready for production use.** If you need an enterprise-ready, highly scalable, production-grade backend for Flyte 2, it is available today on [Union.ai](https://www.union.ai/try-flyte-2). You can also try the [in-browser demo](https://flyte2intro.apps.demo.hosted.unionai.cloud/) of Flyte's local TUI to get a feel for the experience.
-
-**Want to contribute?** Join us on [slack.flyte.org](https://slack.flyte.org) to get involved.
-
-## Repository Structure
-
-```
-flyte/
-├── flyteidl2/           # Protocol buffer definitions
-│   ├── common/          # Common types and utilities
-│   ├── core/            # Core Flyte types (tasks, workflows, literals)
-│   ├── imagebuilder/    # Image builder service definitions
-│   ├── logs/            # Logging types
-│   ├── secret/          # Secret management types
-│   ├── task/            # Task execution types
-│   ├── trigger/         # Trigger service definitions
-│   ├── workflow/        # Workflow types
-│   └── gen_utils/       # Language-specific generation utilities
-├── gen/                 # Generated code (not checked into version control)
-│   ├── go/              # Generated Go code
-│   ├── ts/              # Generated TypeScript code
-│   ├── python/          # Generated Python code
-│   └── rust/            # Generated Rust code
-├── buf.yaml             # Buf configuration
-├── buf.gen.*.yaml       # Language-specific generation configs
-└── Makefile             # Build automation
-```
-
-## Prerequisites
-
-- [Buf CLI](https://buf.build/docs/installation) - Protocol buffer tooling
-- Go 1.24.6 or later
-- Node.js/npm (for TypeScript generation)
-- Python 3.9+ with `uv` package manager (for Python generation)
-- Rust toolchain (for Rust generation)
-
-## Quick Start
-
-### Generate All Code
-
-To generate code for all supported languages:
+## Install
 
 ```bash
-make gen
+uv pip install flyte
 ```
 
-This will:
-1. Update buf dependencies
-2. Format and lint proto files
-3. Generate code for Go, TypeScript, Python, and Rust
-4. Generate mocks for Go
-5. Run `go mod tidy`
+For the full SDK and development tools, see the [flyte-sdk](https://github.com/flyteorg/flyte-sdk) repository.
 
-### Generate for Specific Languages Locally
+## Example
+
+```python
+import asyncio
+import flyte
+
+env = flyte.TaskEnvironment(
+    name="hello_world",
+    image=flyte.Image.from_debian_base(python_version=(3, 12)),
+)
+
+@env.task
+def calculate(x: int) -> int:
+    return x * 2 + 5
+
+@env.task
+async def main(numbers: list[int]) -> float:
+    results = await asyncio.gather(*[
+        calculate.aio(num) for num in numbers
+    ])
+    return sum(results) / len(results)
+
+if __name__ == "__main__":
+    flyte.init()
+    run = flyte.run(main, numbers=list(range(10)))
+    print(f"Result: {run.result}")
+```
+
+<table>
+<tr><td><b>Python</b></td><td><b>Flyte CLI</b></td></tr>
+<tr>
+<td>
 
 ```bash
-make buf-go      # Generate Go code only
-make buf-ts      # Generate TypeScript code only
-make buf-python  # Generate Python code only
-make buf-rust    # Generate Rust code only
+python hello.py
 ```
 
-## Making Changes
-
-### 1. Modify Protocol Buffers
-
-Edit `.proto` files in the `flyteidl2/` directory following these guidelines:
-- Follow the existing naming conventions
-- Use proper protobuf style (snake_case for fields, PascalCase for messages)
-- Add appropriate comments and documentation
-- Ensure backward compatibility when modifying existing messages
-
-### 2. Generate Code
-
-After modifying proto files:
+</td>
+<td>
 
 ```bash
-make docker-pull   # Pull the docker image for generation
-make gen
+flyte run hello.py main --numbers '[1,2,3]'
 ```
 
-### 3. Verify Your Changes
+</td>
+</tr>
+</table>
 
-Run the following to ensure everything builds correctly:
+## Serve a Model
+
+```python
+# serving.py
+from fastapi import FastAPI
+import flyte
+from flyte.app.extras import FastAPIAppEnvironment
+
+app = FastAPI()
+env = FastAPIAppEnvironment(
+    name="my-model",
+    app=app,
+    image=flyte.Image.from_debian_base(python_version=(3, 12)).with_pip_packages(
+        "fastapi", "uvicorn"
+    ),
+)
+
+@app.get("/predict")
+async def predict(x: float) -> dict:
+    return {"result": x * 2 + 5}
+
+if __name__ == "__main__":
+    flyte.init_from_config()
+    flyte.serve(env)
+```
+
+<table>
+<tr><td><b>Python</b></td><td><b>Flyte CLI</b></td></tr>
+<tr>
+<td>
 
 ```bash
-# For Go
-make go-tidy
-go build ./...
-
-# For Rust
-make build-crate
-
-# For Python
-cd gen/python && uv lock
-
-# For TypeScript
-cd gen/ts && npm install
+python serving.py
 ```
 
-### 4. Generate Mocks (Go only)
-
-If you've added or modified Go interfaces:
+</td>
+<td>
 
 ```bash
-make gen
+flyte serve serving.py env
 ```
 
-## Development Workflow
+</td>
+</tr>
+</table>
 
-1. **Format proto files**: `make buf-format`
-2. **Lint proto files**: `make buf-lint`
-3. **Generate code**: `make buf` or `make gen`
-4. **Verify builds**: Build generated code in your target language
-5. **Commit changes**: Commit both proto files and generated code
+## Local Development Experience
 
-## Common Tasks
-
-### Update Buf Dependencies
+Install the TUI for a rich local development experience:
 
 ```bash
-make gen
+uv pip install flyte[tui]
 ```
 
-### View Available Commands
+[![Watch the local development experience](https://img.youtube.com/vi/lsfy-7DbbRM/maxresdefault.jpg)](https://www.youtube.com/watch?v=lsfy-7DbbRM)
 
-```bash
-make help
-```
+**[Try the hosted demo in your browser](https://flyte2intro.apps.demo.hosted.unionai.cloud/)** — no installation required.
 
-## Versioning and Releases
+## Open Source Backend
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed release instructions.
+The open source backend for Flyte 2 is **coming soon**. This repository will contain the Kubernetes-native backend infrastructure for deploying Flyte 2 as a distributed, multi-node service. See the [Backend README](BACKEND_README.md) for the current state of the backend, protocol buffer definitions, and contribution guide.
 
-## Generated Code
+If you need an enterprise-ready, production-grade backend for Flyte 2 today, it is available on [Union.ai](https://www.union.ai/try-flyte-2).
 
-The `gen/` directory contains auto-generated code and should not be manually edited. Changes to generated code should be made by:
-1. Modifying the source `.proto` files in `flyteidl2/`
-2. Updating generation utilities in `flyteidl2/gen_utils/` if needed
-3. Running `make gen` to regenerate all code
+## Learn More
 
-## Troubleshooting
-
-### Buf Errors
-- Ensure you have the latest version of Buf: `buf --version`
-- Update dependencies: `make buf-dep`
-- Check `buf.lock` for dependency conflicts
-
-### Go Module Issues
-- Run `make go-tidy` to clean up dependencies
-- Ensure you're using Go 1.24.6 or later
-
-### Python Generation Issues
-- Ensure `uv` is installed: `pip install uv`
-- Set the environment variable: `export SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0`
-
-### Rust Build Issues
-- Update Rust toolchain: `rustup update`
-- Navigate to `gen/rust` and run `cargo update`
+- **[Live Demo](https://flyte2intro.apps.demo.hosted.unionai.cloud/)** — Try Flyte 2 in your browser
+- **[Documentation](https://www.union.ai/docs/v2/flyte/user-guide/running-locally/)** — Get started running locally
+- **[SDK Reference](https://www.union.ai/docs/v2/byoc/api-reference/flyte-sdk/)** — API reference docs
+- **[CLI Reference](https://www.union.ai/docs/v2/byoc/api-reference/flyte-cli/)** — CLI docs
+- **[flyte-sdk](https://github.com/flyteorg/flyte-sdk)** — The Flyte 2 Python SDK repository
+- **[Join the Flyte 2 Production Preview](https://www.union.ai/try-flyte-2)** — Get early access
+- **[Slack](https://slack.flyte.org/)** | **[GitHub Discussions](https://github.com/flyteorg/flyte/discussions)** | **[Issues](https://github.com/flyteorg/flyte/issues)**
 
 ## Contributing
 
-We welcome contributions to Flyte 2! Please follow the guide [here](CONTRIBUTING.md).
+We welcome contributions! See the [Backend README](BACKEND_README.md) for backend development, or join us on [slack.flyte.org](https://slack.flyte.org).
+
+## License
+
+Apache 2.0 — see [LICENSE](LICENSE).

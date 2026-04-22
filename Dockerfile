@@ -9,7 +9,6 @@ ENV CGO_ENABLED=0
 
 WORKDIR /flyteorg/build
 
-COPY app app
 COPY dataproxy dataproxy
 COPY executor executor
 COPY flytecopilot flytecopilot
@@ -20,6 +19,8 @@ COPY gen/go gen/go
 COPY actions actions
 COPY events events
 COPY runs runs
+COPY cache_service cache_service
+COPY secret secret
 
 COPY go.mod go.sum ./
 RUN go mod download

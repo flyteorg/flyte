@@ -1,6 +1,8 @@
 package config
 
 import (
+	"time"
+
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 )
@@ -22,6 +24,13 @@ var defaultConfig = &Config{
 		{ID: "development", Name: "Development"},
 		{ID: "production", Name: "Production"},
 		{ID: "staging", Name: "Staging"},
+	},
+	TriggerScheduler: TriggerSchedulerConfig{
+		Enabled:               true,
+		ResyncInterval:        30 * time.Second,
+		MaxCatchupRunsPerLoop: 100,
+		ExecutionQPS:          10.0,
+		ExecutionBurst:        20,
 	},
 }
 
@@ -50,6 +59,10 @@ type Config struct {
 
 	// Domains are injected into project responses (not stored per project row).
 	Domains []DomainConfig `json:"domains"`
+
+	// TriggerScheduler configures the cron-based trigger scheduler worker.
+	TriggerScheduler TriggerSchedulerConfig `json:"triggerScheduler"`
+
 }
 
 // ServerConfig holds HTTP server configuration
@@ -62,6 +75,24 @@ type ServerConfig struct {
 type DomainConfig struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+}
+
+// TriggerSchedulerConfig controls the cron-based scheduler worker.
+type TriggerSchedulerConfig struct {
+	// Enabled turns the scheduler worker on or off.
+	Enabled bool `json:"enabled" pflag:",Enable the trigger scheduler worker"`
+
+	// ResyncInterval is how often the scheduler re-reads active triggers from the DB.
+	ResyncInterval time.Duration `json:"resyncInterval" pflag:",How often to resync active triggers from the database"`
+
+	// MaxCatchupRunsPerLoop caps how many catchup runs are fired per resync loop.
+	MaxCatchupRunsPerLoop int `json:"maxCatchupRunsPerLoop" pflag:",Maximum catchup runs fired per resync loop"`
+
+	// ExecutionQPS is the token-bucket rate for CreateRun calls (tokens/second).
+	ExecutionQPS float64 `json:"executionQps" pflag:",Rate limit for CreateRun calls (requests per second)"`
+
+	// ExecutionBurst is the token-bucket burst size.
+	ExecutionBurst int `json:"executionBurst" pflag:",Burst size for CreateRun rate limiter"`
 }
 
 // GetConfig returns the parsed runs configuration

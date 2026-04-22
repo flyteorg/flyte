@@ -1314,6 +1314,18 @@ func (m *ListTasksRequest_KnownFilter) validate(all bool) error {
 			errors = append(errors, err)
 		}
 		// no validation rules for DeployedBy
+	case *ListTasksRequest_KnownFilter_IsEntrypoint:
+		if v == nil {
+			err := ListTasksRequest_KnownFilterValidationError{
+				field:  "FilterBy",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for IsEntrypoint
 	default:
 		_ = v // ensures v is used
 	}

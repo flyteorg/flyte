@@ -12,8 +12,10 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
+	projectMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect/mocks"
 	mocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
@@ -21,11 +23,15 @@ func TestDeployTask(t *testing.T) {
 	ctx := context.Background()
 	mockRepo := mocks.NewRepository(t)
 	mockTaskRepo := mocks.NewTaskRepo(t)
+	mockProjectClient := projectMocks.NewProjectServiceClient(t)
 
 	mockRepo.EXPECT().TaskRepo().Return(mockTaskRepo)
-	mockTaskRepo.EXPECT().CreateTask(ctx, mock.AnythingOfType("*models.Task")).Return(nil)
+	mockTaskRepo.EXPECT().CreateTask(ctx, mock.AnythingOfType("*models.Task"), mock.Anything).Return(nil)
+	mockProjectClient.EXPECT().GetProject(ctx, mock.MatchedBy(func(req *connect.Request[project.GetProjectRequest]) bool {
+		return req.Msg.GetId() == "test-project"
+	})).Return(connect.NewResponse(&project.GetProjectResponse{}), nil)
 
-	service := NewTaskService(mockRepo)
+	service := NewTaskService(mockRepo, mockProjectClient)
 
 	req := &task.DeployTaskRequest{
 		TaskId: &task.TaskIdentifier{
@@ -59,7 +65,6 @@ func TestGetTaskDetails(t *testing.T) {
 
 	taskModel := &models.Task{
 		TaskKey: models.TaskKey{
-			Org:     "test-org",
 			Project: "test-project",
 			Domain:  "test-domain",
 			Name:    "test-task",
@@ -74,7 +79,7 @@ func TestGetTaskDetails(t *testing.T) {
 	mockRepo.EXPECT().TaskRepo().Return(mockTaskRepo)
 	mockTaskRepo.EXPECT().GetTask(ctx, mock.AnythingOfType("models.TaskKey")).Return(taskModel, nil)
 
-	service := NewTaskService(mockRepo)
+	service := NewTaskService(mockRepo, nil)
 
 	req := &task.GetTaskDetailsRequest{
 		TaskId: &task.TaskIdentifier{
@@ -90,7 +95,7 @@ func TestGetTaskDetails(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotNil(t, resp)
 	assert.NotNil(t, resp.Msg.Details)
-	assert.Equal(t, "test-org", resp.Msg.Details.TaskId.Org)
+	assert.Equal(t, "", resp.Msg.Details.TaskId.Org)
 }
 
 func TestListTasks(t *testing.T) {
@@ -101,7 +106,6 @@ func TestListTasks(t *testing.T) {
 	taskModels := []*models.Task{
 		{
 			TaskKey: models.TaskKey{
-				Org:     "test-org",
 				Project: "test-project",
 				Domain:  "test-domain",
 				Name:    "task1",
@@ -121,7 +125,7 @@ func TestListTasks(t *testing.T) {
 	mockRepo.EXPECT().TaskRepo().Return(mockTaskRepo)
 	mockTaskRepo.EXPECT().ListTasks(ctx, mock.AnythingOfType("interfaces.ListResourceInput")).Return(result, nil)
 
-	service := NewTaskService(mockRepo)
+	service := NewTaskService(mockRepo, nil)
 
 	req := &task.ListTasksRequest{
 		ScopeBy: &task.ListTasksRequest_Org{
@@ -160,7 +164,7 @@ func TestListVersions(t *testing.T) {
 	mockRepo.EXPECT().TaskRepo().Return(mockTaskRepo)
 	mockTaskRepo.EXPECT().ListVersions(ctx, mock.AnythingOfType("interfaces.ListResourceInput")).Return(versions, nil)
 
-	service := NewTaskService(mockRepo)
+	service := NewTaskService(mockRepo, nil)
 
 	req := &task.ListVersionsRequest{
 		TaskName: &task.TaskName{

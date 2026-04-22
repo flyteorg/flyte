@@ -1,0 +1,17 @@
+{{- if .Values.rustfs.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "flyte-devbox.persistence.rustfsVolumeName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "flyte-devbox.labels" . | nindent 4 }}
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: "/var/lib/flyte/storage/rustfs"
+{{- end }}

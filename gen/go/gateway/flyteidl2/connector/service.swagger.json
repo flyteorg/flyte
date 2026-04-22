@@ -1455,7 +1455,7 @@
           "$ref": "#/definitions/coreBinary"
         },
         "schema": {
-          "$ref": "#/definitions/flyteidl2coreSchema"
+          "$ref": "#/definitions/coreSchema"
         },
         "none_type": {
           "$ref": "#/definitions/coreVoid"
@@ -1473,6 +1473,18 @@
           "$ref": "#/definitions/coreUnion"
         }
       }
+    },
+    "coreSchema": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/coreSchemaType"
+        }
+      },
+      "description": "A strongly typed schema that defines the interface of data retrieved from the underlying storage medium."
     },
     "coreSchemaType": {
       "type": "object",
@@ -2039,18 +2051,6 @@
       ],
       "default": "OTHER"
     },
-    "flyteidl2coreSchema": {
-      "type": "object",
-      "properties": {
-        "uri": {
-          "type": "string"
-        },
-        "type": {
-          "$ref": "#/definitions/coreSchemaType"
-        }
-      },
-      "description": "A strongly typed schema that defines the interface of data retrieved from the underlying storage medium."
-    },
     "flyteidl2coreSecret": {
       "type": "object",
       "properties": {
@@ -2182,6 +2182,14 @@
         "image_build_run": {
           "$ref": "#/definitions/commonRunIdentifier",
           "description": "RunIdentifier of the remote image build run that produced the container image for this task."
+        },
+        "is_entrypoint": {
+          "type": "boolean",
+          "description": "IsEntryPoint indicates whether this task will launch additional actions as it runs."
+        },
+        "code_bundle_uri": {
+          "type": "string",
+          "description": "Remote URI pointing to the code bundle used to build this task."
         }
       },
       "title": "Task Metadata"

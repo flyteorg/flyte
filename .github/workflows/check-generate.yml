@@ -14,7 +14,7 @@ jobs:
   check-generate-local:
     if: github.event.pull_request.head.repo.fork == true
     uses: ./.github/workflows/check-generate-local.yml
-  check-generate:
+  check-results:
     needs: [check-generate-container, check-generate-local]
     if: always()
     runs-on: ubuntu-latest

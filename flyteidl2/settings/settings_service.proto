@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package flyteidl2.settings;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/settings/settings_definition.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings";
+
+// SettingsRecord is a single scope level's stored settings paired with its key
+// and version. Used in GetSettingsForEdit responses so the caller can see what
+// is set at each level and which version to supply on a subsequent update.
+// The key is a partial key identifying exactly this level (e.g. org-only for
+// the org level, org+domain for domain level, etc.).
+message SettingsRecord {
+  // Partial key identifying this scope level.
+  SettingsKey key = 1;
+
+  // All settings fields at this level.
+  // Fields not explicitly set appear with no value (INHERIT).
+  Settings settings = 2;
+
+  // Current version for optimistic locking. Zero when no record exists at
+  // this level; use CreateSettings rather than UpdateSettings in that case.
+  uint64 version = 3;
+}
+
+// GetSettingsRequest fetches resolved effective settings at the scope implied
+// by the key. Scope is inferred from which key fields are populated:
+//   org only               → org scope
+//   org + domain           → domain scope
+//   org + domain + project → project scope
+// Settings are inherited from parent scopes where not explicitly overridden.
+message GetSettingsRequest {
+  SettingsKey key = 1 [(buf.validate.field).required = true];
+}
+
+// GetSettingsResponse contains resolved effective settings.
+// Each setting's scope_level field indicates which scope provided its value.
+message GetSettingsResponse {
+  SettingsRecord settingsRecord = 1;
+}
+
+// GetSettingsForEditRequest fetches unmerged settings at all scope levels
+// for display in an edit form.
+message GetSettingsForEditRequest {
+  SettingsKey key = 1 [(buf.validate.field).required = true];
+}
+
+// GetSettingsForEditResponse returns one SettingsRecord per scope level
+// covered by the request key, ordered from broadest to most specific
+// (org first, project last). Inheritance is not applied — each record shows
+// only what is explicitly stored at that level.
+message GetSettingsForEditResponse {
+  // The original request key.
+  SettingsKey requestedKey = 1;
+
+  // One entry per scope level, each with a partial key, full settings schema,
+  // and version for optimistic locking.
+  repeated SettingsRecord levels = 2;
+}
+
+// CreateSettingsRequest creates a new settings record at the scope implied
+// by the key. Fails if a record already exists at that scope.
+message CreateSettingsRequest {
+  SettingsKey key = 1 [(buf.validate.field).required = true];
+  Settings settings = 2 [(buf.validate.field).required = true];
+}
+
+// CreateSettingsResponse contains the created settings and initial version.
+message CreateSettingsResponse {
+  SettingsRecord settingsRecord = 1;
+}
+
+// UpdateSettingsRequest upserts strongly-typed settings at the scope implied
+// by the key. Version must match the current stored version (optimistic locking).
+message UpdateSettingsRequest {
+  SettingsKey key = 1 [(buf.validate.field).required = true];
+  Settings settings = 2 [(buf.validate.field).required = true];
+
+  // Current version of the settings record. Must match the server version.
+  uint64 version = 3;
+}
+
+// UpdateSettingsResponse contains the updated settings and new version.
+message UpdateSettingsResponse {
+  SettingsRecord settingsRecord = 1;
+}
+
+service SettingsService {
+  // GetSettings returns resolved effective settings at the scope implied by
+  // the key, incorporating inherited values from parent scopes.
+  rpc GetSettings(GetSettingsRequest) returns (GetSettingsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // GetSettingsForEdit returns unmerged settings at all scope levels,
+  // for use in an edit form. One SettingsRecord per level, ordered broadest
+  // to most specific.
+  rpc GetSettingsForEdit(GetSettingsForEditRequest) returns (GetSettingsForEditResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // CreateSettings creates a new settings record at the scope implied by the key.
+  // Fails if a record already exists at that scope.
+  rpc CreateSettings(CreateSettingsRequest) returns (CreateSettingsResponse) {}
+
+  // UpdateSettings upserts strongly-typed settings at the scope implied by
+  // the key. Uses optimistic locking via the version field.
+  rpc UpdateSettings(UpdateSettingsRequest) returns (UpdateSettingsResponse) {}
+}

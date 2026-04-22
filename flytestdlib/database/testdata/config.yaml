@@ -12,5 +12,3 @@ postgres:
   host: postgres
   dbname: postgres
   options: "sslmode=disable"
-sqlite:
-  file: admin.db

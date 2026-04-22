@@ -20,6 +20,10 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	DataProxyService_CreateUploadLocation_FullMethodName = "/flyteidl2.dataproxy.DataProxyService/CreateUploadLocation"
+	DataProxyService_UploadInputs_FullMethodName         = "/flyteidl2.dataproxy.DataProxyService/UploadInputs"
+	DataProxyService_CreateDownloadLink_FullMethodName   = "/flyteidl2.dataproxy.DataProxyService/CreateDownloadLink"
+	DataProxyService_GetActionData_FullMethodName        = "/flyteidl2.dataproxy.DataProxyService/GetActionData"
+	DataProxyService_TailLogs_FullMethodName             = "/flyteidl2.dataproxy.DataProxyService/TailLogs"
 )
 
 // DataProxyServiceClient is the client API for DataProxyService service.
@@ -28,6 +32,13 @@ const (
 type DataProxyServiceClient interface {
 	// CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
 	CreateUploadLocation(ctx context.Context, in *CreateUploadLocationRequest, opts ...grpc.CallOption) (*CreateUploadLocationResponse, error)
+	UploadInputs(ctx context.Context, in *UploadInputsRequest, opts ...grpc.CallOption) (*UploadInputsResponse, error)
+	// CreateDownloadLink generates signed URL(s) for downloading a given artifact.
+	CreateDownloadLink(ctx context.Context, in *CreateDownloadLinkRequest, opts ...grpc.CallOption) (*CreateDownloadLinkResponse, error)
+	// Get input and output data for an action.
+	GetActionData(ctx context.Context, in *GetActionDataRequest, opts ...grpc.CallOption) (*GetActionDataResponse, error)
+	// Stream logs for an action attempt.
+	TailLogs(ctx context.Context, in *TailLogsRequest, opts ...grpc.CallOption) (DataProxyService_TailLogsClient, error)
 }
 
 type dataProxyServiceClient struct {
@@ -47,12 +58,78 @@ func (c *dataProxyServiceClient) CreateUploadLocation(ctx context.Context, in *C
 	return out, nil
 }
 
+func (c *dataProxyServiceClient) UploadInputs(ctx context.Context, in *UploadInputsRequest, opts ...grpc.CallOption) (*UploadInputsResponse, error) {
+	out := new(UploadInputsResponse)
+	err := c.cc.Invoke(ctx, DataProxyService_UploadInputs_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dataProxyServiceClient) CreateDownloadLink(ctx context.Context, in *CreateDownloadLinkRequest, opts ...grpc.CallOption) (*CreateDownloadLinkResponse, error) {
+	out := new(CreateDownloadLinkResponse)
+	err := c.cc.Invoke(ctx, DataProxyService_CreateDownloadLink_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dataProxyServiceClient) GetActionData(ctx context.Context, in *GetActionDataRequest, opts ...grpc.CallOption) (*GetActionDataResponse, error) {
+	out := new(GetActionDataResponse)
+	err := c.cc.Invoke(ctx, DataProxyService_GetActionData_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dataProxyServiceClient) TailLogs(ctx context.Context, in *TailLogsRequest, opts ...grpc.CallOption) (DataProxyService_TailLogsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &DataProxyService_ServiceDesc.Streams[0], DataProxyService_TailLogs_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &dataProxyServiceTailLogsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type DataProxyService_TailLogsClient interface {
+	Recv() (*TailLogsResponse, error)
+	grpc.ClientStream
+}
+
+type dataProxyServiceTailLogsClient struct {
+	grpc.ClientStream
+}
+
+func (x *dataProxyServiceTailLogsClient) Recv() (*TailLogsResponse, error) {
+	m := new(TailLogsResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // DataProxyServiceServer is the server API for DataProxyService service.
 // All implementations should embed UnimplementedDataProxyServiceServer
 // for forward compatibility
 type DataProxyServiceServer interface {
 	// CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
 	CreateUploadLocation(context.Context, *CreateUploadLocationRequest) (*CreateUploadLocationResponse, error)
+	UploadInputs(context.Context, *UploadInputsRequest) (*UploadInputsResponse, error)
+	// CreateDownloadLink generates signed URL(s) for downloading a given artifact.
+	CreateDownloadLink(context.Context, *CreateDownloadLinkRequest) (*CreateDownloadLinkResponse, error)
+	// Get input and output data for an action.
+	GetActionData(context.Context, *GetActionDataRequest) (*GetActionDataResponse, error)
+	// Stream logs for an action attempt.
+	TailLogs(*TailLogsRequest, DataProxyService_TailLogsServer) error
 }
 
 // UnimplementedDataProxyServiceServer should be embedded to have forward compatible implementations.
@@ -61,6 +138,18 @@ type UnimplementedDataProxyServiceServer struct {
 
 func (UnimplementedDataProxyServiceServer) CreateUploadLocation(context.Context, *CreateUploadLocationRequest) (*CreateUploadLocationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUploadLocation not implemented")
+}
+func (UnimplementedDataProxyServiceServer) UploadInputs(context.Context, *UploadInputsRequest) (*UploadInputsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UploadInputs not implemented")
+}
+func (UnimplementedDataProxyServiceServer) CreateDownloadLink(context.Context, *CreateDownloadLinkRequest) (*CreateDownloadLinkResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDownloadLink not implemented")
+}
+func (UnimplementedDataProxyServiceServer) GetActionData(context.Context, *GetActionDataRequest) (*GetActionDataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetActionData not implemented")
+}
+func (UnimplementedDataProxyServiceServer) TailLogs(*TailLogsRequest, DataProxyService_TailLogsServer) error {
+	return status.Errorf(codes.Unimplemented, "method TailLogs not implemented")
 }
 
 // UnsafeDataProxyServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -92,6 +181,81 @@ func _DataProxyService_CreateUploadLocation_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DataProxyService_UploadInputs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UploadInputsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataProxyServiceServer).UploadInputs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DataProxyService_UploadInputs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataProxyServiceServer).UploadInputs(ctx, req.(*UploadInputsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DataProxyService_CreateDownloadLink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDownloadLinkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataProxyServiceServer).CreateDownloadLink(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DataProxyService_CreateDownloadLink_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataProxyServiceServer).CreateDownloadLink(ctx, req.(*CreateDownloadLinkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DataProxyService_GetActionData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetActionDataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataProxyServiceServer).GetActionData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DataProxyService_GetActionData_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataProxyServiceServer).GetActionData(ctx, req.(*GetActionDataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DataProxyService_TailLogs_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(TailLogsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(DataProxyServiceServer).TailLogs(m, &dataProxyServiceTailLogsServer{stream})
+}
+
+type DataProxyService_TailLogsServer interface {
+	Send(*TailLogsResponse) error
+	grpc.ServerStream
+}
+
+type dataProxyServiceTailLogsServer struct {
+	grpc.ServerStream
+}
+
+func (x *dataProxyServiceTailLogsServer) Send(m *TailLogsResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // DataProxyService_ServiceDesc is the grpc.ServiceDesc for DataProxyService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -103,7 +267,25 @@ var DataProxyService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "CreateUploadLocation",
 			Handler:    _DataProxyService_CreateUploadLocation_Handler,
 		},
+		{
+			MethodName: "UploadInputs",
+			Handler:    _DataProxyService_UploadInputs_Handler,
+		},
+		{
+			MethodName: "CreateDownloadLink",
+			Handler:    _DataProxyService_CreateDownloadLink_Handler,
+		},
+		{
+			MethodName: "GetActionData",
+			Handler:    _DataProxyService_GetActionData_Handler,
+		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "TailLogs",
+			Handler:       _DataProxyService_TailLogs_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "flyteidl2/dataproxy/dataproxy_service.proto",
 }

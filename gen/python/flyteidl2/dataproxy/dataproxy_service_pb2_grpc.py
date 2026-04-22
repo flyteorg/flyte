@@ -20,6 +20,26 @@ class DataProxyServiceStub(object):
                 request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse.FromString,
                 )
+        self.UploadInputs = channel.unary_unary(
+                '/flyteidl2.dataproxy.DataProxyService/UploadInputs',
+                request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse.FromString,
+                )
+        self.CreateDownloadLink = channel.unary_unary(
+                '/flyteidl2.dataproxy.DataProxyService/CreateDownloadLink',
+                request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse.FromString,
+                )
+        self.GetActionData = channel.unary_unary(
+                '/flyteidl2.dataproxy.DataProxyService/GetActionData',
+                request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse.FromString,
+                )
+        self.TailLogs = channel.unary_stream(
+                '/flyteidl2.dataproxy.DataProxyService/TailLogs',
+                request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse.FromString,
+                )
 
 
 class DataProxyServiceServicer(object):
@@ -33,6 +53,33 @@ class DataProxyServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def UploadInputs(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CreateDownloadLink(self, request, context):
+        """CreateDownloadLink generates signed URL(s) for downloading a given artifact.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetActionData(self, request, context):
+        """Get input and output data for an action.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def TailLogs(self, request, context):
+        """Stream logs for an action attempt.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_DataProxyServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -40,6 +87,26 @@ def add_DataProxyServiceServicer_to_server(servicer, server):
                     servicer.CreateUploadLocation,
                     request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationRequest.FromString,
                     response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse.SerializeToString,
+            ),
+            'UploadInputs': grpc.unary_unary_rpc_method_handler(
+                    servicer.UploadInputs,
+                    request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest.FromString,
+                    response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse.SerializeToString,
+            ),
+            'CreateDownloadLink': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateDownloadLink,
+                    request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest.FromString,
+                    response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse.SerializeToString,
+            ),
+            'GetActionData': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetActionData,
+                    request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest.FromString,
+                    response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse.SerializeToString,
+            ),
+            'TailLogs': grpc.unary_stream_rpc_method_handler(
+                    servicer.TailLogs,
+                    request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest.FromString,
+                    response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -66,5 +133,73 @@ class DataProxyService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.dataproxy.DataProxyService/CreateUploadLocation',
             flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationRequest.SerializeToString,
             flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def UploadInputs(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.dataproxy.DataProxyService/UploadInputs',
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsRequest.SerializeToString,
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadInputsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def CreateDownloadLink(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.dataproxy.DataProxyService/CreateDownloadLink',
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest.SerializeToString,
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetActionData(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.dataproxy.DataProxyService/GetActionData',
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest.SerializeToString,
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def TailLogs(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.dataproxy.DataProxyService/TailLogs',
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest.SerializeToString,
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

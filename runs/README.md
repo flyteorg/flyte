@@ -409,8 +409,13 @@ No code changes needed, just update `config.yaml`!
 
 ### Database migration
 
-We are using gorm for auto migration, please ensure addding `gorm` tags in `/runs/repository/models/` when you
-add any more columns/models.
+Runs schema changes are managed through versioned gormigrate migrations.
+
+Migrations run automatically during service startup.
+
+```bash
+make run
+```
 
 ### Adding new features
 

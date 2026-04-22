@@ -13,7 +13,7 @@ ARG NODE_VERSION=20.18.3
 ARG RUST_VERSION=1.85.0
 ARG UV_VERSION=0.8.4
 ARG BUF_VERSION=1.58.0
-ARG MOCKERY_VERSION=2.53.5
+ARG MOCKERY_VERSION=3.7.0
 
 # Stage 1: Download Go (parallel)
 FROM golang:${GO_VERSION}-alpine AS go-source
@@ -108,7 +108,7 @@ COPY --from=buf-downloader /tmp/buf/bin/protoc-gen-buf-lint /usr/local/bin/proto
 # Install Go tools with cache mount
 RUN --mount=type=cache,target=/root/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
-    go install "github.com/vektra/mockery/v2@v${MOCKERY_VERSION}"
+    go install "github.com/vektra/mockery/v3@v${MOCKERY_VERSION}"
 
 # Set working directory
 WORKDIR /workspace

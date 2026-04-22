@@ -18,11 +18,14 @@ package controller
 
 import (
 	"context"
+	"sync"
+	"time"
 
 	"connectrpc.com/connect"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -32,6 +35,7 @@ import (
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	k8sPlugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
@@ -41,6 +45,27 @@ type fakeEventsClient struct{}
 
 func (f *fakeEventsClient) Record(_ context.Context, _ *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
 	return connect.NewResponse(&workflow.RecordResponse{}), nil
+}
+
+// recordingEventsClient captures all recorded ActionEvents for assertion in tests.
+type recordingEventsClient struct {
+	mu     sync.Mutex
+	events []*workflow.ActionEvent
+}
+
+func (r *recordingEventsClient) Record(_ context.Context, req *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.events = append(r.events, req.Msg.GetEvents()...)
+	return connect.NewResponse(&workflow.RecordResponse{}), nil
+}
+
+func (r *recordingEventsClient) RecordedEvents() []*workflow.ActionEvent {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	out := make([]*workflow.ActionEvent, len(r.events))
+	copy(out, r.events)
+	return out
 }
 
 // buildTaskTemplateBytes creates a minimal protobuf-serialized TaskTemplate
@@ -96,7 +121,6 @@ var _ = Describe("TaskAction Controller", func() {
 					},
 					Spec: flyteorgv1.TaskActionSpec{
 						RunName:       "test-run",
-						Org:           "test-org",
 						Project:       "test-project",
 						Domain:        "test-domain",
 						ActionName:    "test-action",
@@ -175,7 +199,6 @@ var _ = Describe("TaskAction Controller", func() {
 				},
 				Spec: flyteorgv1.TaskActionSpec{
 					RunName:       "test-run",
-					Org:           "test-org",
 					Project:       "test-project",
 					Domain:        "test-domain",
 					ActionName:    "test-action",
@@ -227,6 +250,162 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(updatedTaskAction.GetLabels()).To(HaveKeyWithValue(LabelTerminationStatus, LabelValueTerminated))
 			Expect(updatedTaskAction.GetLabels()).To(HaveKey(LabelCompletedTime))
+		})
+	})
+
+	Context("mapPhaseToConditions", func() {
+		It("should keep PhaseHistory using controller time, not pod time", func() {
+			ta := &flyteorgv1.TaskAction{}
+			podTime := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC) // far in the past
+			info := pluginsCore.PhaseInfoRunning(0, &pluginsCore.TaskInfo{
+				OccurredAt: &podTime,
+			})
+			before := time.Now().Add(-time.Second)
+			mapPhaseToConditions(ta, info)
+			after := time.Now().Add(time.Second)
+
+			Expect(ta.Status.PhaseHistory).To(HaveLen(1))
+			phTime := ta.Status.PhaseHistory[0].OccurredAt.Time
+			Expect(phTime.After(before)).To(BeTrue(), "PhaseHistory should use controller time, not pod time")
+			Expect(phTime.Before(after)).To(BeTrue(), "PhaseHistory should use controller time, not pod time")
+		})
+	})
+
+	Context("taskActionStatusChanged", func() {
+		It("should detect PhaseHistory changes", func() {
+			oldStatus := flyteorgv1.TaskActionStatus{
+				PhaseHistory: []flyteorgv1.PhaseTransition{
+					{Phase: "Queued", OccurredAt: metav1.Now()},
+				},
+			}
+			newStatus := flyteorgv1.TaskActionStatus{
+				PhaseHistory: []flyteorgv1.PhaseTransition{
+					{Phase: "Queued", OccurredAt: metav1.Now()},
+					{Phase: "Executing", OccurredAt: metav1.Now()},
+				},
+			}
+			Expect(taskActionStatusChanged(oldStatus, newStatus)).To(BeTrue())
+		})
+
+		It("should return false when nothing changed", func() {
+			now := metav1.Now()
+			status := flyteorgv1.TaskActionStatus{
+				PhaseHistory: []flyteorgv1.PhaseTransition{
+					{Phase: "Queued", OccurredAt: now},
+				},
+			}
+			Expect(taskActionStatusChanged(status, status)).To(BeFalse())
+		})
+
+		It("should detect PhaseHistory addition from empty", func() {
+			oldStatus := flyteorgv1.TaskActionStatus{}
+			newStatus := flyteorgv1.TaskActionStatus{
+				PhaseHistory: []flyteorgv1.PhaseTransition{
+					{Phase: "Queued", OccurredAt: metav1.Now()},
+				},
+			}
+			Expect(taskActionStatusChanged(oldStatus, newStatus)).To(BeTrue())
+		})
+	})
+
+	Context("When a TaskAction is deleted (abort flow)", func() {
+		const abortResourceName = "abort-test-resource"
+
+		ctx := context.Background()
+
+		typeNamespacedName := types.NamespacedName{
+			Name:      abortResourceName,
+			Namespace: "default",
+		}
+
+		BeforeEach(func() {
+			resource := &flyteorgv1.TaskAction{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      abortResourceName,
+					Namespace: "default",
+					Finalizers: []string{taskActionFinalizer},
+				},
+				Spec: flyteorgv1.TaskActionSpec{
+					RunName:       "abort-run",
+					Project:       "abort-project",
+					Domain:        "abort-domain",
+					ActionName:    "abort-action",
+					InputURI:      "/tmp/input",
+					RunOutputBase: "/tmp/output",
+					TaskType:      "python-task",
+					TaskTemplate:  buildTaskTemplateBytes("python-task", "python:3.11"),
+				},
+			}
+			Expect(k8sClient.Create(ctx, resource)).To(Succeed())
+			Expect(k8sClient.Delete(ctx, resource)).To(Succeed())
+		})
+
+		AfterEach(func() {
+			resource := &flyteorgv1.TaskAction{}
+			err := k8sClient.Get(ctx, typeNamespacedName, resource)
+			if err == nil {
+				resource.Finalizers = nil
+				Expect(k8sClient.Update(ctx, resource)).To(Succeed())
+			}
+		})
+
+		It("should emit an ACTION_PHASE_ABORTED event before removing the finalizer", func() {
+			recorder := &recordingEventsClient{}
+			reconciler := &TaskActionReconciler{
+				Client:         k8sClient,
+				Scheme:         k8sClient.Scheme(),
+				Recorder:       record.NewFakeRecorder(10),
+				PluginRegistry: pluginRegistry,
+				DataStore:      dataStore,
+				eventsClient:   recorder,
+			}
+
+			result, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: typeNamespacedName})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.RequeueAfter).To(BeZero())
+
+			// Finalizer should have been removed — object is gone.
+			deleted := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, typeNamespacedName, deleted)).NotTo(Succeed())
+
+			// An ABORTED event must have been emitted.
+			recorded := recorder.RecordedEvents()
+			Expect(recorded).NotTo(BeEmpty())
+			phases := make([]interface{}, len(recorded))
+			for i, e := range recorded {
+				phases[i] = e.GetPhase()
+			}
+			Expect(phases).To(ContainElement(common.ActionPhase_ACTION_PHASE_ABORTED))
+		})
+	})
+
+	Context("toClusterEvents", func() {
+		It("should include both phase reason and additional reasons", func() {
+			phaseOccurredAt := time.Date(2026, 4, 2, 10, 0, 0, 0, time.UTC)
+			eventOccurredAt := phaseOccurredAt.Add(2 * time.Minute)
+			fallbackTime := metav1.NewTime(phaseOccurredAt.Add(5 * time.Minute))
+
+			phaseInfo := pluginsCore.PhaseInfoQueuedWithTaskInfo(
+				phaseOccurredAt,
+				pluginsCore.DefaultPhaseVersion,
+				"cluster is creating",
+				&pluginsCore.TaskInfo{
+					OccurredAt: &phaseOccurredAt,
+					AdditionalReasons: []pluginsCore.ReasonInfo{
+						{
+							Reason:     "Head pod pending",
+							OccurredAt: &eventOccurredAt,
+						},
+					},
+				},
+			)
+
+			events := toClusterEvents(phaseInfo, timestamppb.New(fallbackTime.Time))
+			Expect(events).To(HaveLen(2))
+			Expect(events[0].GetMessage()).To(Equal("cluster is creating"))
+			Expect(events[0].GetOccurredAt().AsTime()).To(Equal(phaseOccurredAt))
+			Expect(events[1].GetMessage()).To(Equal("Head pod pending"))
+			Expect(events[1].GetOccurredAt().AsTime()).To(Equal(eventOccurredAt))
 		})
 	})
 })

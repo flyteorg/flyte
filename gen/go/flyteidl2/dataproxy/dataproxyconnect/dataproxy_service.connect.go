@@ -36,18 +36,41 @@ const (
 	// DataProxyServiceCreateUploadLocationProcedure is the fully-qualified name of the
 	// DataProxyService's CreateUploadLocation RPC.
 	DataProxyServiceCreateUploadLocationProcedure = "/flyteidl2.dataproxy.DataProxyService/CreateUploadLocation"
+	// DataProxyServiceUploadInputsProcedure is the fully-qualified name of the DataProxyService's
+	// UploadInputs RPC.
+	DataProxyServiceUploadInputsProcedure = "/flyteidl2.dataproxy.DataProxyService/UploadInputs"
+	// DataProxyServiceCreateDownloadLinkProcedure is the fully-qualified name of the DataProxyService's
+	// CreateDownloadLink RPC.
+	DataProxyServiceCreateDownloadLinkProcedure = "/flyteidl2.dataproxy.DataProxyService/CreateDownloadLink"
+	// DataProxyServiceGetActionDataProcedure is the fully-qualified name of the DataProxyService's
+	// GetActionData RPC.
+	DataProxyServiceGetActionDataProcedure = "/flyteidl2.dataproxy.DataProxyService/GetActionData"
+	// DataProxyServiceTailLogsProcedure is the fully-qualified name of the DataProxyService's TailLogs
+	// RPC.
+	DataProxyServiceTailLogsProcedure = "/flyteidl2.dataproxy.DataProxyService/TailLogs"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
 	dataProxyServiceServiceDescriptor                    = dataproxy.File_flyteidl2_dataproxy_dataproxy_service_proto.Services().ByName("DataProxyService")
 	dataProxyServiceCreateUploadLocationMethodDescriptor = dataProxyServiceServiceDescriptor.Methods().ByName("CreateUploadLocation")
+	dataProxyServiceUploadInputsMethodDescriptor         = dataProxyServiceServiceDescriptor.Methods().ByName("UploadInputs")
+	dataProxyServiceCreateDownloadLinkMethodDescriptor   = dataProxyServiceServiceDescriptor.Methods().ByName("CreateDownloadLink")
+	dataProxyServiceGetActionDataMethodDescriptor        = dataProxyServiceServiceDescriptor.Methods().ByName("GetActionData")
+	dataProxyServiceTailLogsMethodDescriptor             = dataProxyServiceServiceDescriptor.Methods().ByName("TailLogs")
 )
 
 // DataProxyServiceClient is a client for the flyteidl2.dataproxy.DataProxyService service.
 type DataProxyServiceClient interface {
 	// CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
 	CreateUploadLocation(context.Context, *connect.Request[dataproxy.CreateUploadLocationRequest]) (*connect.Response[dataproxy.CreateUploadLocationResponse], error)
+	UploadInputs(context.Context, *connect.Request[dataproxy.UploadInputsRequest]) (*connect.Response[dataproxy.UploadInputsResponse], error)
+	// CreateDownloadLink generates signed URL(s) for downloading a given artifact.
+	CreateDownloadLink(context.Context, *connect.Request[dataproxy.CreateDownloadLinkRequest]) (*connect.Response[dataproxy.CreateDownloadLinkResponse], error)
+	// Get input and output data for an action.
+	GetActionData(context.Context, *connect.Request[dataproxy.GetActionDataRequest]) (*connect.Response[dataproxy.GetActionDataResponse], error)
+	// Stream logs for an action attempt.
+	TailLogs(context.Context, *connect.Request[dataproxy.TailLogsRequest]) (*connect.ServerStreamForClient[dataproxy.TailLogsResponse], error)
 }
 
 // NewDataProxyServiceClient constructs a client for the flyteidl2.dataproxy.DataProxyService
@@ -66,12 +89,41 @@ func NewDataProxyServiceClient(httpClient connect.HTTPClient, baseURL string, op
 			connect.WithSchema(dataProxyServiceCreateUploadLocationMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		uploadInputs: connect.NewClient[dataproxy.UploadInputsRequest, dataproxy.UploadInputsResponse](
+			httpClient,
+			baseURL+DataProxyServiceUploadInputsProcedure,
+			connect.WithSchema(dataProxyServiceUploadInputsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		createDownloadLink: connect.NewClient[dataproxy.CreateDownloadLinkRequest, dataproxy.CreateDownloadLinkResponse](
+			httpClient,
+			baseURL+DataProxyServiceCreateDownloadLinkProcedure,
+			connect.WithSchema(dataProxyServiceCreateDownloadLinkMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		getActionData: connect.NewClient[dataproxy.GetActionDataRequest, dataproxy.GetActionDataResponse](
+			httpClient,
+			baseURL+DataProxyServiceGetActionDataProcedure,
+			connect.WithSchema(dataProxyServiceGetActionDataMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
+		tailLogs: connect.NewClient[dataproxy.TailLogsRequest, dataproxy.TailLogsResponse](
+			httpClient,
+			baseURL+DataProxyServiceTailLogsProcedure,
+			connect.WithSchema(dataProxyServiceTailLogsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // dataProxyServiceClient implements DataProxyServiceClient.
 type dataProxyServiceClient struct {
 	createUploadLocation *connect.Client[dataproxy.CreateUploadLocationRequest, dataproxy.CreateUploadLocationResponse]
+	uploadInputs         *connect.Client[dataproxy.UploadInputsRequest, dataproxy.UploadInputsResponse]
+	createDownloadLink   *connect.Client[dataproxy.CreateDownloadLinkRequest, dataproxy.CreateDownloadLinkResponse]
+	getActionData        *connect.Client[dataproxy.GetActionDataRequest, dataproxy.GetActionDataResponse]
+	tailLogs             *connect.Client[dataproxy.TailLogsRequest, dataproxy.TailLogsResponse]
 }
 
 // CreateUploadLocation calls flyteidl2.dataproxy.DataProxyService.CreateUploadLocation.
@@ -79,10 +131,37 @@ func (c *dataProxyServiceClient) CreateUploadLocation(ctx context.Context, req *
 	return c.createUploadLocation.CallUnary(ctx, req)
 }
 
+// UploadInputs calls flyteidl2.dataproxy.DataProxyService.UploadInputs.
+func (c *dataProxyServiceClient) UploadInputs(ctx context.Context, req *connect.Request[dataproxy.UploadInputsRequest]) (*connect.Response[dataproxy.UploadInputsResponse], error) {
+	return c.uploadInputs.CallUnary(ctx, req)
+}
+
+// CreateDownloadLink calls flyteidl2.dataproxy.DataProxyService.CreateDownloadLink.
+func (c *dataProxyServiceClient) CreateDownloadLink(ctx context.Context, req *connect.Request[dataproxy.CreateDownloadLinkRequest]) (*connect.Response[dataproxy.CreateDownloadLinkResponse], error) {
+	return c.createDownloadLink.CallUnary(ctx, req)
+}
+
+// GetActionData calls flyteidl2.dataproxy.DataProxyService.GetActionData.
+func (c *dataProxyServiceClient) GetActionData(ctx context.Context, req *connect.Request[dataproxy.GetActionDataRequest]) (*connect.Response[dataproxy.GetActionDataResponse], error) {
+	return c.getActionData.CallUnary(ctx, req)
+}
+
+// TailLogs calls flyteidl2.dataproxy.DataProxyService.TailLogs.
+func (c *dataProxyServiceClient) TailLogs(ctx context.Context, req *connect.Request[dataproxy.TailLogsRequest]) (*connect.ServerStreamForClient[dataproxy.TailLogsResponse], error) {
+	return c.tailLogs.CallServerStream(ctx, req)
+}
+
 // DataProxyServiceHandler is an implementation of the flyteidl2.dataproxy.DataProxyService service.
 type DataProxyServiceHandler interface {
 	// CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
 	CreateUploadLocation(context.Context, *connect.Request[dataproxy.CreateUploadLocationRequest]) (*connect.Response[dataproxy.CreateUploadLocationResponse], error)
+	UploadInputs(context.Context, *connect.Request[dataproxy.UploadInputsRequest]) (*connect.Response[dataproxy.UploadInputsResponse], error)
+	// CreateDownloadLink generates signed URL(s) for downloading a given artifact.
+	CreateDownloadLink(context.Context, *connect.Request[dataproxy.CreateDownloadLinkRequest]) (*connect.Response[dataproxy.CreateDownloadLinkResponse], error)
+	// Get input and output data for an action.
+	GetActionData(context.Context, *connect.Request[dataproxy.GetActionDataRequest]) (*connect.Response[dataproxy.GetActionDataResponse], error)
+	// Stream logs for an action attempt.
+	TailLogs(context.Context, *connect.Request[dataproxy.TailLogsRequest], *connect.ServerStream[dataproxy.TailLogsResponse]) error
 }
 
 // NewDataProxyServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -97,10 +176,43 @@ func NewDataProxyServiceHandler(svc DataProxyServiceHandler, opts ...connect.Han
 		connect.WithSchema(dataProxyServiceCreateUploadLocationMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	dataProxyServiceUploadInputsHandler := connect.NewUnaryHandler(
+		DataProxyServiceUploadInputsProcedure,
+		svc.UploadInputs,
+		connect.WithSchema(dataProxyServiceUploadInputsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	dataProxyServiceCreateDownloadLinkHandler := connect.NewUnaryHandler(
+		DataProxyServiceCreateDownloadLinkProcedure,
+		svc.CreateDownloadLink,
+		connect.WithSchema(dataProxyServiceCreateDownloadLinkMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	dataProxyServiceGetActionDataHandler := connect.NewUnaryHandler(
+		DataProxyServiceGetActionDataProcedure,
+		svc.GetActionData,
+		connect.WithSchema(dataProxyServiceGetActionDataMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
+	dataProxyServiceTailLogsHandler := connect.NewServerStreamHandler(
+		DataProxyServiceTailLogsProcedure,
+		svc.TailLogs,
+		connect.WithSchema(dataProxyServiceTailLogsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.dataproxy.DataProxyService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case DataProxyServiceCreateUploadLocationProcedure:
 			dataProxyServiceCreateUploadLocationHandler.ServeHTTP(w, r)
+		case DataProxyServiceUploadInputsProcedure:
+			dataProxyServiceUploadInputsHandler.ServeHTTP(w, r)
+		case DataProxyServiceCreateDownloadLinkProcedure:
+			dataProxyServiceCreateDownloadLinkHandler.ServeHTTP(w, r)
+		case DataProxyServiceGetActionDataProcedure:
+			dataProxyServiceGetActionDataHandler.ServeHTTP(w, r)
+		case DataProxyServiceTailLogsProcedure:
+			dataProxyServiceTailLogsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -112,4 +224,20 @@ type UnimplementedDataProxyServiceHandler struct{}
 
 func (UnimplementedDataProxyServiceHandler) CreateUploadLocation(context.Context, *connect.Request[dataproxy.CreateUploadLocationRequest]) (*connect.Response[dataproxy.CreateUploadLocationResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.dataproxy.DataProxyService.CreateUploadLocation is not implemented"))
+}
+
+func (UnimplementedDataProxyServiceHandler) UploadInputs(context.Context, *connect.Request[dataproxy.UploadInputsRequest]) (*connect.Response[dataproxy.UploadInputsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.dataproxy.DataProxyService.UploadInputs is not implemented"))
+}
+
+func (UnimplementedDataProxyServiceHandler) CreateDownloadLink(context.Context, *connect.Request[dataproxy.CreateDownloadLinkRequest]) (*connect.Response[dataproxy.CreateDownloadLinkResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.dataproxy.DataProxyService.CreateDownloadLink is not implemented"))
+}
+
+func (UnimplementedDataProxyServiceHandler) GetActionData(context.Context, *connect.Request[dataproxy.GetActionDataRequest]) (*connect.Response[dataproxy.GetActionDataResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.dataproxy.DataProxyService.GetActionData is not implemented"))
+}
+
+func (UnimplementedDataProxyServiceHandler) TailLogs(context.Context, *connect.Request[dataproxy.TailLogsRequest], *connect.ServerStream[dataproxy.TailLogsResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.dataproxy.DataProxyService.TailLogs is not implemented"))
 }

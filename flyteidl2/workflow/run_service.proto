@@ -5,6 +5,8 @@ package flyteidl2.workflow;
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/list.proto";
+import "flyteidl2/common/run.proto";
+import "flyteidl2/core/execution.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/run.proto";
 import "flyteidl2/task/task_definition.proto";
@@ -37,8 +39,9 @@ service RunService {
   // Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
   rpc WatchActionDetails(WatchActionDetailsRequest) returns (stream WatchActionDetailsResponse) {}
 
-  // Get input and output for an action.
+  // Deprecated: Use DataProxyService.GetActionData instead.
   rpc GetActionData(GetActionDataRequest) returns (GetActionDataResponse) {
+    option deprecated = true;
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
@@ -68,6 +71,16 @@ service RunService {
 
   // Stream updates for task groups based on the provided filter criteria.
   rpc WatchGroups(WatchGroupsRequest) returns (stream WatchGroupsResponse) {}
+
+  // Get the storage URIs for an action's input and output data.
+  rpc GetActionDataURIs(GetActionDataURIsRequest) returns (GetActionDataURIsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Get the logging context (pod name, namespace, cluster) for an action attempt.
+  rpc GetActionLogContext(GetActionLogContextRequest) returns (GetActionLogContextResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 // Request message for creating a run.
@@ -97,13 +110,19 @@ message CreateRunRequest {
   }
 
   // Inputs to use.
-  task.Inputs inputs = 4;
+  oneof input_wrapper {
+    task.Inputs inputs = 4;
+
+    common.OffloadedInputData offloaded_input_data = 9;
+  }
 
   // The run spec to use.
   task.RunSpec run_spec = 5;
 
   // Indicates client that created this run.
   RunSource source = 8;
+
+  // Next field number: 10
 }
 
 // Response message for creating a run.
@@ -184,6 +203,39 @@ message GetActionDataResponse {
 
   // Outputs for the action.
   task.Outputs outputs = 2;
+}
+
+// Request message for getting action data URIs.
+message GetActionDataURIsRequest {
+  // Action to query.
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for getting action data URIs.
+message GetActionDataURIsResponse {
+  // URI for the action's input data.
+  string inputs_uri = 1;
+
+  // URI for the action's output data. Empty if action hasn't succeeded or has no outputs.
+  string outputs_uri = 2;
+}
+
+// Request message for getting action log context.
+message GetActionLogContextRequest {
+  // Action to query.
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // The attempt number.
+  uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
+}
+
+// Response message for getting action log context.
+message GetActionLogContextResponse {
+  // The logging context for the action attempt.
+  flyteidl2.core.LogContext log_context = 1;
+
+  // The cluster where the action attempt is running.
+  string cluster = 2;
 }
 
 // Request message for listing runs.

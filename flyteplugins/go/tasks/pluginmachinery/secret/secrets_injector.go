@@ -17,7 +17,6 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
-//go:generate mockery --output=./mocks --case=underscore --name=SecretsInjector
 type SecretsInjector interface {
 	Type() config.SecretManagerType
 	Inject(ctx context.Context, secrets *core.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error)

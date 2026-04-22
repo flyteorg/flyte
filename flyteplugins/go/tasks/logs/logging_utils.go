@@ -105,9 +105,11 @@ func InitializeLogPlugins(cfg *LogConfig, taskTemplate *core.TaskTemplate) (task
 	if taskTemplate != nil && taskTemplate.GetMetadata() != nil {
 		for _, logLink := range taskTemplate.GetMetadata().GetLogLinks() {
 			plugins = append(plugins, tasklog.TemplateLogPlugin{
-				DisplayName:  logLink.GetName(),
-				TemplateURIs: []tasklog.TemplateURI{logLink.GetUri()},
-				IconUri:      logLink.GetIconUri(),
+				DisplayName:   logLink.GetName(),
+				TemplateURIs:  []tasklog.TemplateURI{logLink.GetUri()},
+				MessageFormat: logLink.GetMessageFormat(),
+				LinkType:      core.TaskLog_DASHBOARD.String(),
+				IconUri:       logLink.GetIconUri(),
 			})
 		}
 	}
@@ -147,6 +149,7 @@ func InitializeLogPlugins(cfg *LogConfig, taskTemplate *core.TaskTemplate) (task
 				ShowWhilePending:    dynamicLogLink.ShowWhilePending,
 				HideOnceFinished:    dynamicLogLink.HideOnceFinished,
 				LinkType:            dynamicLogLink.LinkType,
+				IconUri:             dynamicLogLink.IconUri,
 			})
 	}
 
