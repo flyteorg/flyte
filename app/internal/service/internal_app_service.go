@@ -7,6 +7,7 @@ import (
 
 	"connectrpc.com/connect"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
 	appconfig "github.com/flyteorg/flyte/v2/app/internal/config"
 	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
@@ -112,6 +113,9 @@ func (s *InternalAppService) Get(
 
 	status, err := s.k8s.GetStatus(ctx, appID.AppId)
 	if err != nil {
+		if k8serrors.IsNotFound(err) {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -230,7 +234,13 @@ func (s *InternalAppService) Watch(
 		return connect.NewError(connect.CodeUnimplemented, fmt.Errorf("org and cluster_id watch targets are not supported by the data plane"))
 	}
 
-	// Send initial snapshot so the client has current state before watching for changes.
+	// Start watch before listing so no events are lost between the two calls.
+	ch, err := s.k8s.Watch(ctx, project, domain, appName)
+	if err != nil {
+		return connect.NewError(connect.CodeInternal, err)
+	}
+
+	// Send initial snapshot so the client has current state before streaming changes.
 	snapshot, _, err := s.k8s.List(ctx, project, domain, 0, "")
 	if err != nil {
 		return connect.NewError(connect.CodeInternal, err)
@@ -246,11 +256,6 @@ func (s *InternalAppService) Watch(
 		}); err != nil {
 			return err
 		}
-	}
-
-	ch, err := s.k8s.Watch(ctx, project, domain, appName)
-	if err != nil {
-		return connect.NewError(connect.CodeInternal, err)
 	}
 
 	for {
