@@ -74,6 +74,7 @@ build-gpu: build
 # 30001 - DB
 # 30002 - RustFS
 # 30080 - Flyte Proxy
+# 30081 - Kourier (Knative apps)
 .PHONY: start
 start: FLYTE_DEVBOX_IMAGE := flyte-devbox:latest
 start: FLYTE_DEV := False
@@ -93,6 +94,7 @@ start:
 			--publish "30001:5432" \
 			--publish "30002:30002" \
 			--publish "30080:30080" \
+			--publish "30081:30081" \
 			$(FLYTE_DEVBOX_IMAGE); \
 	fi
 	@echo "Waiting for kubeconfig..."
@@ -113,6 +115,20 @@ start:
 kubeconfig:
 	sed -i -e "/server:/ s/: .*/: https:\/\/127.0.0.1:$(shell docker port flyte-devbox | grep ^6443 | awk '{print $$3}' | awk -F: '{print $$2}')/" .kube/kubeconfig
 	echo "export KUBECONFIG=$(PWD)/.kube/kubeconfig"
+
+.PHONY: setup-knative
+setup-knative:
+	kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.21.2/serving-crds.yaml
+	kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.21.2/serving-core.yaml
+	kubectl apply -f https://github.com/knative-extensions/net-kourier/releases/download/knative-v1.21.0/kourier.yaml
+	kubectl patch configmap/config-network -n knative-serving --type merge \
+		--patch '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
+	kubectl patch configmap/config-network -n knative-serving --type merge \
+		--patch '{"data":{"domain-template":"{{.Name}}-{{.Namespace}}.{{.Domain}}"}}'
+	kubectl patch configmap/config-domain -n knative-serving --type merge \
+		--patch '{"data":{"local.flyte.app":null,"localhost":""}}'
+	kubectl patch svc/kourier -n kourier-system --type merge \
+		--patch '{"spec":{"type":"NodePort","ports":[{"name":"http2","port":80,"targetPort":8080,"nodePort":30081}]}}'
 
 .PHONY: stop
 stop:

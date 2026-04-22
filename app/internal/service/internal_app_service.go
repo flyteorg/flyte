@@ -61,24 +61,30 @@ func (s *InternalAppService) Create(
 				LastTransitionTime: timestamppb.Now(),
 			},
 		},
-		Ingress: publicIngress(app.GetMetadata().GetId(), s.cfg.BaseDomain),
+		Ingress: publicIngress(app.GetMetadata().GetId(), s.cfg),
 	}
 
 	return connect.NewResponse(&flyteapp.CreateResponse{App: app}), nil
 }
 
-// publicIngress builds the deterministic public URL for an app.
-// Pattern: "https://{name}-{project}-{domain}.{base_domain}"
-// Returns nil if BaseDomain is not configured.
-func publicIngress(id *flyteapp.Identifier, baseDomain string) *flyteapp.Ingress {
-	if baseDomain == "" {
+// publicIngress builds the deterministic public URL for an app using
+// BaseDomain — which must match Knative's domain-template so Kourier
+// serves the URL directly. Returns nil if BaseDomain is unset.
+func publicIngress(id *flyteapp.Identifier, cfg *appconfig.InternalAppConfig) *flyteapp.Ingress {
+	if cfg.BaseDomain == "" {
 		return nil
 	}
-	host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
-		id.GetName(), id.GetProject(), id.GetDomain(), baseDomain))
-	return &flyteapp.Ingress{
-		PublicUrl: "https://" + host,
+	scheme := cfg.Scheme
+	if scheme == "" {
+		scheme = "https"
 	}
+	host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
+		id.GetName(), id.GetProject(), id.GetDomain(), cfg.BaseDomain))
+	url := scheme + "://" + host
+	if cfg.IngressAppsPort != 0 {
+		url += fmt.Sprintf(":%d", cfg.IngressAppsPort)
+	}
+	return &flyteapp.Ingress{PublicUrl: url}
 }
 
 // Get retrieves an app and its live status from the KService CRD.
@@ -186,7 +192,7 @@ func (s *InternalAppService) List(
 		token = r.GetToken()
 	}
 
-	apps, nextToken, err := s.k8s.List(ctx, project, domain, "", limit, token)
+	apps, nextToken, err := s.k8s.List(ctx, project, domain, limit, token)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -222,11 +228,14 @@ func (s *InternalAppService) Watch(
 	}
 
 	// Send initial snapshot so the client has current state before streaming changes.
-	snapshot, _, err := s.k8s.List(ctx, project, domain, appName, 0, "")
+	snapshot, _, err := s.k8s.List(ctx, project, domain, 0, "")
 	if err != nil {
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	for _, app := range snapshot {
+		if appName != "" && app.GetMetadata().GetId().GetName() != appName {
+			continue
+		}
 		if err := stream.Send(&flyteapp.WatchResponse{
 			Event: &flyteapp.WatchResponse_CreateEvent{
 				CreateEvent: &flyteapp.CreateEvent{App: app},
