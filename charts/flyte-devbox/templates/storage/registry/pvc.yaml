@@ -12,6 +12,6 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 10Gi
+      storage: 20Gi
   volumeName: {{ include "flyte-devbox.persistence.registryVolumeName" . }}
 {{- end }}

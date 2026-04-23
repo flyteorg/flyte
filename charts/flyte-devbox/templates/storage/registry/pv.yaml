@@ -11,7 +11,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   capacity:
-    storage: 10Gi
+    storage: 20Gi
   hostPath:
     path: "/var/lib/flyte/storage/registry"
 {{- end }}
