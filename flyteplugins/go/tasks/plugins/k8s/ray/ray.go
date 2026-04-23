@@ -13,7 +13,6 @@ import (
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
 	"gopkg.in/yaml.v2"
 	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/ptr"
@@ -158,25 +157,6 @@ func buildAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.Autoscale
 		autoScalerOptions.Env = flytek8s.ToK8sEnvVar(options.GetEnv())
 	}
 	return autoScalerOptions
-}
-
-func convertResourceEntriesToResourceList(entries []*core.Resources_ResourceEntry) v1.ResourceList {
-	resourceList := v1.ResourceList{}
-	for _, entry := range entries {
-		var name v1.ResourceName
-		switch entry.GetName() {
-		case core.Resources_CPU:
-			name = v1.ResourceCPU
-		case core.Resources_MEMORY:
-			name = v1.ResourceMemory
-		default:
-			continue
-		}
-		if q, err := resource.ParseQuantity(entry.GetValue()); err == nil {
-			resourceList[name] = q
-		}
-	}
-	return resourceList
 }
 
 func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.RayJob, objectMeta *metav1.ObjectMeta, taskPodSpec v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {

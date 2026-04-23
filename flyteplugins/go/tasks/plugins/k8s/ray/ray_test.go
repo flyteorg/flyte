@@ -1593,62 +1593,6 @@ func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
 	return s
 }
 
-func TestConvertResourceEntriesToResourceList(t *testing.T) {
-	tests := []struct {
-		name     string
-		entries  []*core.Resources_ResourceEntry
-		wantKeys []corev1.ResourceName
-		wantLen  int
-	}{
-		{
-			name: "cpu entry",
-			entries: []*core.Resources_ResourceEntry{
-				{Name: core.Resources_CPU, Value: "500m"},
-			},
-			wantKeys: []corev1.ResourceName{corev1.ResourceCPU},
-			wantLen:  1,
-		},
-		{
-			name: "memory entry",
-			entries: []*core.Resources_ResourceEntry{
-				{Name: core.Resources_MEMORY, Value: "1Gi"},
-			},
-			wantKeys: []corev1.ResourceName{corev1.ResourceMemory},
-			wantLen:  1,
-		},
-		{
-			name: "unknown resource skipped",
-			entries: []*core.Resources_ResourceEntry{
-				{Name: core.Resources_ResourceName(99), Value: "1"},
-			},
-			wantLen: 0,
-		},
-		{
-			name: "invalid quantity skipped",
-			entries: []*core.Resources_ResourceEntry{
-				{Name: core.Resources_CPU, Value: "not-a-quantity"},
-			},
-			wantLen: 0,
-		},
-		{
-			name:    "empty input",
-			entries: []*core.Resources_ResourceEntry{},
-			wantLen: 0,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := convertResourceEntriesToResourceList(tt.entries)
-			require.NotNil(t, result)
-			assert.Len(t, result, tt.wantLen)
-			for _, key := range tt.wantKeys {
-				_, ok := result[key]
-				assert.True(t, ok, "expected key %s in result", key)
-			}
-		})
-	}
-}
-
 func TestBuildAutoscalerOptions(t *testing.T) {
 	t.Run("nil input returns nil", func(t *testing.T) {
 		assert.Nil(t, buildAutoscalerOptions(nil))
