@@ -8,9 +8,16 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 
 	appconfig "github.com/flyteorg/flyte/v2/app/config"
+	appinternal "github.com/flyteorg/flyte/v2/app/internal"
 	"github.com/flyteorg/flyte/v2/app/service"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
 )
+
+// SetupInternal registers the data plane InternalAppService on the SetupContext mux.
+// It must be called before Setup so the proxy can reach /internal/... on the same mux.
+func SetupInternal(ctx context.Context, sc *stdlibapp.SetupContext, cfg *appconfig.InternalAppConfig) error {
+	return appinternal.Setup(ctx, sc, cfg)
+}
 
 // Setup registers the control plane AppService handler on the SetupContext mux.
 // In unified mode (sc.BaseURL set), the proxy routes to InternalAppService on

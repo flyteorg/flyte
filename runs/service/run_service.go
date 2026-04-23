@@ -29,6 +29,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"github.com/flyteorg/flyte/v2/runs/repository/transformers"
@@ -877,26 +878,58 @@ func (s *RunService) ListRuns(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	// List runs from database
-	runs, nextToken, err := s.repo.ActionRepo().ListRuns(ctx, req.Msg)
+	// Build scope filter: always restrict to root actions (runs).
+	scopeFilter := interfaces.Filter(impl.NewIsRootActionFilter())
+	switch scope := req.Msg.ScopeBy.(type) {
+	case *workflow.ListRunsRequest_ProjectId:
+		scopeFilter = scopeFilter.And(impl.NewProjectIdFilter(scope.ProjectId))
+	case *workflow.ListRunsRequest_TriggerName:
+		scopeFilter = scopeFilter.And(impl.NewTriggerNameFilter(scope.TriggerName))
+	case *workflow.ListRunsRequest_TaskName:
+		scopeFilter = scopeFilter.And(impl.NewRunTaskNameFilter(scope.TaskName))
+	case *workflow.ListRunsRequest_TaskId:
+		scopeFilter = scopeFilter.And(impl.NewRunTaskIdFilter(scope.TaskId))
+	}
+
+	// Parse pagination, sort, and user-supplied filters from the common ListRequest.
+	listInput, err := impl.NewListResourceInputFromProto(req.Msg.Request, models.ActionColumnsSet)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	// Merge: scope filter always takes precedence, user filters are ANDed on top.
+	if listInput.Filter == nil {
+		listInput.Filter = scopeFilter
+	} else {
+		listInput.Filter = scopeFilter.And(listInput.Filter)
+	}
+
+	actions, err := s.repo.ActionRepo().ListActions(ctx, listInput)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to list runs: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// Convert to proto format
-	protoRuns := make([]*workflow.Run, len(runs))
-	for i, run := range runs {
+	// We fetch Limit+1 rows to detect whether a next page exists without a
+	// separate COUNT query. If we got more than Limit rows back, there is at
+	// least one more page: trim the slice and encode the last returned row's
+	// created_at as the keyset cursor for the next request.
+	var nextToken string
+	if len(actions) > listInput.Limit {
+		actions = actions[:listInput.Limit]
+		nextToken = actions[len(actions)-1].CreatedAt.UTC().Format(time.RFC3339Nano)
+	}
+
+	protoRuns := make([]*workflow.Run, len(actions))
+	for i, run := range actions {
 		protoRuns[i] = s.convertRunToProto(run)
 	}
 
-	resp := &workflow.ListRunsResponse{
+	logger.Debugf(ctx, "Listed %d runs", len(actions))
+	return connect.NewResponse(&workflow.ListRunsResponse{
 		Runs:  protoRuns,
 		Token: nextToken,
-	}
-
-	logger.Debugf(ctx, "Listed %d runs", len(runs))
-	return connect.NewResponse(resp), nil
+	}), nil
 }
 
 // ListActions lists actions for a run
@@ -906,37 +939,48 @@ func (s *RunService) ListActions(
 ) (*connect.Response[workflow.ListActionsResponse], error) {
 	logger.Infof(ctx, "Received ListActions request")
 
-	// Validate request
 	if err := req.Msg.Validate(); err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	// List actions from database
-	limit := 50
-	if req.Msg.Request != nil && req.Msg.Request.Limit > 0 {
-		limit = int(req.Msg.Request.Limit)
+	listInput, err := impl.NewListResourceInputFromProto(req.Msg.Request, models.ActionColumnsSet)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+	runFilter := interfaces.Filter(impl.NewRunActionsFilter(req.Msg.RunId))
+	if listInput.Filter == nil {
+		listInput.Filter = runFilter
+	} else {
+		listInput.Filter = runFilter.And(listInput.Filter)
 	}
 
-	actions, nextToken, err := s.repo.ActionRepo().ListActions(ctx, req.Msg.RunId, limit, "")
+	actions, err := s.repo.ActionRepo().ListActions(ctx, listInput)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to list actions: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// Convert to proto format
+	// We fetch Limit+1 rows to detect whether a next page exists without a
+	// separate COUNT query. If we got more than Limit rows back, there is at
+	// least one more page: trim the slice and encode the last returned row's
+	// created_at as the keyset cursor for the next request.
+	var nextToken string
+	if len(actions) > listInput.Limit {
+		actions = actions[:listInput.Limit]
+		nextToken = actions[len(actions)-1].CreatedAt.UTC().Format(time.RFC3339Nano)
+	}
+
 	protoActions := make([]*workflow.Action, len(actions))
 	for i, action := range actions {
 		ea := s.convertActionToEnrichedProto(action)
 		protoActions[i] = ea.Action
 	}
 
-	resp := &workflow.ListActionsResponse{
+	logger.Infof(ctx, "Listed %d actions", len(actions))
+	return connect.NewResponse(&workflow.ListActionsResponse{
 		Actions: protoActions,
 		Token:   nextToken,
-	}
-
-	logger.Infof(ctx, "Listed %d actions", len(actions))
-	return connect.NewResponse(resp), nil
+	}), nil
 }
 
 func (s *RunService) GetActionDataURIs(
@@ -1162,9 +1206,9 @@ func (s *RunService) WatchRuns(
 	go s.repo.ActionRepo().WatchAllRunUpdates(ctx, updatesCh, errsCh)
 
 	// Step 2: Send existing runs that match filter
-	listReq := s.convertWatchRequestToListRequest(req.Msg)
+	listInput := s.convertWatchRequestToListInput(req.Msg)
 
-	runs, _, err := s.repo.ActionRepo().ListRuns(ctx, listReq)
+	runs, err := s.repo.ActionRepo().ListActions(ctx, listInput)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to list runs: %v", err)
 		// Continue even if list fails - still watch for new updates
@@ -1256,9 +1300,14 @@ func (s *RunService) listAndSendAllActions(
 	rsm *runStateManager,
 	stream *connect.ServerStream[workflow.WatchActionsResponse],
 ) error {
-	token := ""
+	const pageSize = 100
+	offset := 0
 	for {
-		batch, nextToken, err := s.repo.ActionRepo().ListActions(ctx, runID, 100, token)
+		batch, err := s.repo.ActionRepo().ListActions(ctx, interfaces.ListResourceInput{
+			Filter: impl.NewRunActionsFilter(runID),
+			Limit:  pageSize,
+			Offset: offset,
+		})
 		if err != nil {
 			return err
 		}
@@ -1272,10 +1321,10 @@ func (s *RunService) listAndSendAllActions(
 			return err
 		}
 
-		if nextToken == "" {
+		if len(batch) < pageSize {
 			return nil
 		}
-		token = nextToken
+		offset += pageSize
 	}
 }
 
@@ -2055,22 +2104,17 @@ func taskIdFromTaskSpec(taskSpec *task.TaskSpec) *task.TaskIdentifier {
 	}
 }
 
-// convertWatchRequestToListRequest converts a WatchRunsRequest to a ListRunsRequest
-func (s *RunService) convertWatchRequestToListRequest(req *workflow.WatchRunsRequest) *workflow.ListRunsRequest {
-	listReq := &workflow.ListRunsRequest{
-		Request: &common.ListRequest{
-			Limit: 100,
-		},
-	}
-
+// convertWatchRequestToListInput converts a WatchRunsRequest to a ListResourceInput for the initial run snapshot.
+func (s *RunService) convertWatchRequestToListInput(req *workflow.WatchRunsRequest) interfaces.ListResourceInput {
+	scopeFilter := interfaces.Filter(impl.NewIsRootActionFilter())
 	switch target := req.Target.(type) {
 	case *workflow.WatchRunsRequest_ProjectId:
-		listReq.ScopeBy = &workflow.ListRunsRequest_ProjectId{
-			ProjectId: target.ProjectId,
-		}
+		scopeFilter = scopeFilter.And(impl.NewProjectIdFilter(target.ProjectId))
 	}
-
-	return listReq
+	return interfaces.ListResourceInput{
+		Limit:  100,
+		Filter: scopeFilter,
+	}
 }
 
 // runMatchesFilter checks if a run matches the WatchRunsRequest filter criteria

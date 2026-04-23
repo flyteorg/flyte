@@ -16,3 +16,8 @@ spec:
             readTimeout: 0
       websecure:
         expose: false
+    providers:
+      kubernetesCRD:
+        allowExternalNameServices: true
+      kubernetesIngress:
+        allowExternalNameServices: true

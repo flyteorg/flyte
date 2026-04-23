@@ -13,6 +13,7 @@ import (
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	k8sresource "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	k8swatch "k8s.io/apimachinery/pkg/watch"
@@ -21,8 +22,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/v2/app/internal/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
+	flytecore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const (
@@ -55,10 +58,9 @@ type AppK8sClientInterface interface {
 	GetStatus(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.Status, error)
 
 	// List returns apps for the given project/domain scope with optional pagination.
-	// If appName is non-empty, only the app with that name is returned.
 	// limit=0 means no limit. token is the K8s continue token from a previous call.
 	// Returns the apps, the continue token for the next page (empty if last page), and any error.
-	List(ctx context.Context, project, domain, appName string, limit uint32, token string) ([]*flyteapp.App, string, error)
+	List(ctx context.Context, project, domain string, limit uint32, token string) ([]*flyteapp.App, string, error)
 
 	// Delete removes the KService CRD entirely. The app must be re-created from scratch.
 	// Use Stop to scale to zero while preserving the KService.
@@ -104,6 +106,10 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 	name := kserviceName(appID)
 
+	if err := k8s.EnsureNamespaceExists(ctx, c.k8sClient, ns); err != nil {
+		return fmt.Errorf("failed to ensure namespace %s: %w", ns, err)
+	}
+
 	ksvc, err := c.buildKService(app)
 	if err != nil {
 		return fmt.Errorf("failed to build KService for app %s: %w", name, err)
@@ -122,15 +128,27 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 		return fmt.Errorf("failed to get KService %s: %w", name, err)
 	}
 
-	// Skip update if spec has not changed.
 	if existing.Annotations[annotationSpecSHA] == ksvc.Annotations[annotationSpecSHA] {
 		logger.Debugf(ctx, "KService %s/%s spec unchanged, skipping update", ns, name)
 		return nil
 	}
 
 	existing.Spec = ksvc.Spec
-	existing.Labels = ksvc.Labels
-	existing.Annotations = ksvc.Annotations
+	// Merge labels and annotations rather than replacing them wholesale.
+	// Knative sets immutable annotations (e.g. serving.knative.dev/creator)
+	// on creation; overwriting them causes the admission webhook to reject the update.
+	if existing.Labels == nil {
+		existing.Labels = make(map[string]string)
+	}
+	for k, v := range ksvc.Labels {
+		existing.Labels[k] = v
+	}
+	if existing.Annotations == nil {
+		existing.Annotations = make(map[string]string)
+	}
+	for k, v := range ksvc.Annotations {
+		existing.Annotations[k] = v
+	}
 	if err := c.k8sClient.Update(ctx, existing); err != nil {
 		return fmt.Errorf("failed to update KService %s: %w", name, err)
 	}
@@ -416,16 +434,12 @@ func (c *AppK8sClient) GetStatus(ctx context.Context, appID *flyteapp.Identifier
 }
 
 // List returns apps for the given project/domain scope with optional pagination.
-func (c *AppK8sClient) List(ctx context.Context, project, domain, appName string, limit uint32, token string) ([]*flyteapp.App, string, error) {
+func (c *AppK8sClient) List(ctx context.Context, project, domain string, limit uint32, token string) ([]*flyteapp.App, string, error) {
 	ns := appNamespace(project, domain)
 
-	matchLabels := client.MatchingLabels{labelAppManaged: "true"}
-	if appName != "" {
-		matchLabels[labelAppName] = strings.ToLower(appName)
-	}
 	listOpts := []client.ListOption{
 		client.InNamespace(ns),
-		matchLabels,
+		client.MatchingLabels{labelAppManaged: "true"},
 	}
 	if limit > 0 {
 		listOpts = append(listOpts, client.Limit(int64(limit)))
@@ -449,6 +463,25 @@ func (c *AppK8sClient) List(ctx context.Context, project, domain, appName string
 		apps = append(apps, a)
 	}
 	return apps, list.Continue, nil
+}
+
+// publicIngress returns the deterministic public URL for an app using the same
+// logic as the service layer so GetStatus/List/Watch are consistent with Create.
+func (c *AppK8sClient) publicIngress(id *flyteapp.Identifier) *flyteapp.Ingress {
+	if c.cfg.BaseDomain == "" {
+		return nil
+	}
+	scheme := c.cfg.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
+		id.GetName(), id.GetProject(), id.GetDomain(), c.cfg.BaseDomain))
+	url := scheme + "://" + host
+	if c.cfg.IngressAppsPort != 0 {
+		url += fmt.Sprintf(":%d", c.cfg.IngressAppsPort)
+	}
+	return &flyteapp.Ingress{PublicUrl: url}
 }
 
 // --- Helpers ---
@@ -494,6 +527,15 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	podSpec, err := buildPodSpec(spec)
 	if err != nil {
 		return nil, err
+	}
+	// Inject cluster-level default env vars (e.g. _U_EP_OVERRIDE) before user vars
+	// so they can be overridden by app-specific env vars if needed.
+	if len(c.cfg.DefaultEnvVars) > 0 && len(podSpec.Containers) > 0 {
+		defaults := make([]corev1.EnvVar, 0, len(c.cfg.DefaultEnvVars))
+		for k, v := range c.cfg.DefaultEnvVars {
+			defaults = append(defaults, corev1.EnvVar{Name: k, Value: v})
+		}
+		podSpec.Containers[0].Env = append(defaults, podSpec.Containers[0].Env...)
 	}
 
 	templateAnnotations := buildAutoscalingAnnotations(spec, c.cfg)
@@ -546,9 +588,10 @@ func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 	case *flyteapp.Spec_Container:
 		c := p.Container
 		container := corev1.Container{
-			Name:  "app",
-			Image: c.GetImage(),
-			Args:  c.GetArgs(),
+			Name:    "app",
+			Image:   c.GetImage(),
+			Command: c.GetCommand(),
+			Args:    c.GetArgs(),
 		}
 		for _, e := range c.GetEnv() {
 			container.Env = append(container.Env, corev1.EnvVar{
@@ -556,7 +599,17 @@ func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 				Value: e.GetValue(),
 			})
 		}
-		return corev1.PodSpec{Containers: []corev1.Container{container}}, nil
+		for _, p := range c.GetPorts() {
+			container.Ports = append(container.Ports, corev1.ContainerPort{
+				ContainerPort: int32(p.GetContainerPort()),
+				Name:          p.GetName(),
+			})
+		}
+		container.Resources = buildResourceRequirements(c.GetResources())
+		return corev1.PodSpec{
+			Containers:         []corev1.Container{container},
+			EnableServiceLinks: boolPtr(false),
+		}, nil
 
 	case *flyteapp.Spec_Pod:
 		// K8sPod payloads are not yet supported — the pod spec serialization
@@ -567,6 +620,49 @@ func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 		return corev1.PodSpec{}, fmt.Errorf("app spec has no payload (container or pod required)")
 	}
 }
+
+// buildResourceRequirements maps flyteidl2 Resources to corev1.ResourceRequirements.
+func buildResourceRequirements(res *flytecore.Resources) corev1.ResourceRequirements {
+	if res == nil {
+		return corev1.ResourceRequirements{}
+	}
+	reqs := corev1.ResourceRequirements{}
+	if len(res.GetRequests()) > 0 {
+		reqs.Requests = make(corev1.ResourceList)
+		for _, e := range res.GetRequests() {
+			if name, ok := protoResourceName(e.GetName()); ok {
+				reqs.Requests[name] = k8sresource.MustParse(e.GetValue())
+			}
+		}
+	}
+	if len(res.GetLimits()) > 0 {
+		reqs.Limits = make(corev1.ResourceList)
+		for _, e := range res.GetLimits() {
+			if name, ok := protoResourceName(e.GetName()); ok {
+				reqs.Limits[name] = k8sresource.MustParse(e.GetValue())
+			}
+		}
+	}
+	return reqs
+}
+
+// protoResourceName maps a flyteidl2 ResourceName to the equivalent corev1.ResourceName.
+func protoResourceName(name flytecore.Resources_ResourceName) (corev1.ResourceName, bool) {
+	switch name {
+	case flytecore.Resources_CPU:
+		return corev1.ResourceCPU, true
+	case flytecore.Resources_MEMORY:
+		return corev1.ResourceMemory, true
+	case flytecore.Resources_STORAGE:
+		return corev1.ResourceStorage, true
+	case flytecore.Resources_EPHEMERAL_STORAGE:
+		return corev1.ResourceEphemeralStorage, true
+	default:
+		return "", false
+	}
+}
+
+func boolPtr(b bool) *bool { return &b }
 
 // buildAutoscalingAnnotations returns the Knative autoscaling annotations for the revision template.
 func buildAutoscalingAnnotations(spec *flyteapp.Spec, cfg *config.InternalAppConfig) map[string]string {
@@ -644,10 +740,13 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 
 	status := statusWithPhase(phase, message)
 
-	// Populate ingress URL from KService route status.
-	if url := ksvc.Status.URL; url != nil {
-		status.Ingress = &flyteapp.Ingress{
-			PublicUrl: url.String(),
+	// Populate ingress URL from the app annotation so the URL is consistent
+	// with the Create response regardless of Knative route readiness.
+	if appIDStr := ksvc.Annotations[annotationAppID]; appIDStr != "" {
+		parts := strings.SplitN(appIDStr, "/", 3)
+		if len(parts) == 3 {
+			appID := &flyteapp.Identifier{Project: parts[0], Domain: parts[1], Name: parts[2]}
+			status.Ingress = c.publicIngress(appID)
 		}
 	}
 

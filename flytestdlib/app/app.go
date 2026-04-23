@@ -1,12 +1,15 @@
 package app
 
 import (
+	"compress/gzip"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -111,6 +114,7 @@ func (a *App) serve(ctx context.Context) error {
 		if sc.Middleware != nil {
 			handler = sc.Middleware(handler)
 		}
+		handler = requestGzipDecompressMiddleware(handler)
 
 		addr := fmt.Sprintf("%s:%d", sc.Host, sc.Port)
 		server = &http.Server{
@@ -191,6 +195,35 @@ func (a *App) serve(ctx context.Context) error {
 		logger.Warnf(ctx, "%s: graceful shutdown timed out after %v, forcing exit", a.Name, shutdownTimeout)
 	}
 	return shutdownErr
+}
+
+// requestGzipDecompressMiddleware pre-decompresses request bodies that carry
+// Content-Encoding: gzip before they reach the connect-rpc handler.
+//
+// Some HTTP clients (e.g. pyqwest used by the Python connectrpc SDK) compress
+// the request body at the application level and set Content-Encoding: gzip,
+// but also use chunked transfer encoding for larger payloads.  Go's h2c
+// framing delivers the body in chunks, so by the time connect-go calls
+// gzip.NewReader on the raw body stream the first bytes it receives may be a
+// chunk-size line rather than the gzip magic bytes, causing "gzip: invalid
+// header".  Pre-reading and fully decompressing the body here, before h2c
+// framing is involved, sidesteps the problem entirely.
+func requestGzipDecompressMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.EqualFold(r.Header.Get("Content-Encoding"), "gzip") {
+			gr, err := gzip.NewReader(r.Body)
+			if err == nil {
+				r2 := r.Clone(r.Context())
+				r2.Body = struct {
+					io.Reader
+					io.Closer
+				}{gr, r.Body}
+				r2.Header.Del("Content-Encoding")
+				r = r2
+			}
+		}
+		next.ServeHTTP(w, r)
+	})
 }
 
 func initConfig(cmd *cobra.Command) error {

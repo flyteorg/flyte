@@ -14,6 +14,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -329,67 +330,40 @@ func TestListRuns(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	// Table-driven list tests for ListRuns
-	type listTestCase struct {
-		name           string
-		req            *workflow.ListRunsRequest
-		expectLen      int
-		expectTokenNil bool
-		verify         func(t *testing.T, runs []*models.Run)
+	// List all runs (root actions only)
+	runs, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter: NewIsRootActionFilter(),
+		Limit:  50,
+	})
+	require.NoError(t, err)
+	assert.Len(t, runs, 3)
+	runNames := map[string]bool{}
+	for _, r := range runs {
+		runNames[r.RunName] = true
 	}
+	assert.True(t, runNames["run-1"])
+	assert.True(t, runNames["run-2"])
+	assert.True(t, runNames["run-3"])
 
-	listTests := []listTestCase{
-		{
-			name:           "List by org should return 3 runs",
-			req:            &workflow.ListRunsRequest{ScopeBy: &workflow.ListRunsRequest_Org{Org: "org1"}},
-			expectLen:      3,
-			expectTokenNil: true,
-			verify: func(t *testing.T, runs []*models.Run) {
-				runNames := map[string]bool{}
-				for _, r := range runs {
-					runNames[r.RunName] = true
-				}
-				assert.True(t, runNames["run-1"])
-				assert.True(t, runNames["run-2"])
-				assert.True(t, runNames["run-3"])
-			},
-		},
-	}
-
-	for _, tt := range listTests {
-		t.Run(tt.name, func(t *testing.T) {
-			runs, nextToken, err := actionRepo.ListRuns(ctx, tt.req)
-			require.NoError(t, err)
-			assert.Len(t, runs, tt.expectLen)
-			if tt.expectTokenNil {
-				assert.Empty(t, nextToken)
-			} else {
-				assert.NotEmpty(t, nextToken)
-			}
-			if tt.verify != nil {
-				tt.verify(t, runs)
-			}
-		})
-	}
-
-	// Pagination with limit and token results
-	runsPage1, token1, err := actionRepo.ListRuns(ctx, &workflow.ListRunsRequest{
-		Request: &common.ListRequest{Limit: 2},
-		ScopeBy: &workflow.ListRunsRequest_Org{Org: "org1"},
+	// Pagination: page 1
+	runsPage1, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter: NewIsRootActionFilter(),
+		Limit:  2,
+		Offset: 0,
 	})
 	require.NoError(t, err)
 	assert.Len(t, runsPage1, 2)
-	require.NotEmpty(t, token1)
 
-	runsPage2, token2, err := actionRepo.ListRuns(ctx, &workflow.ListRunsRequest{
-		Request: &common.ListRequest{Token: token1, Limit: 2},
-		ScopeBy: &workflow.ListRunsRequest_Org{Org: "org1"},
+	// Pagination: page 2
+	runsPage2, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter: NewIsRootActionFilter(),
+		Limit:  2,
+		Offset: 2,
 	})
 	require.NoError(t, err)
 	assert.Len(t, runsPage2, 1)
-	assert.Empty(t, token2)
 
-	// Test project scope filtering doesn't include other org/project/domain
+	// Test project scope filtering doesn't include other project
 	_, err = actionRepo.CreateAction(ctx, &models.Run{
 		Project: "other-proj",
 		Domain:  "domain1",
@@ -399,12 +373,11 @@ func TestListRuns(t *testing.T) {
 	}, false)
 	require.NoError(t, err)
 
-	runsFiltered, _, err := actionRepo.ListRuns(ctx, &workflow.ListRunsRequest{
-		ScopeBy: &workflow.ListRunsRequest_ProjectId{ProjectId: &common.ProjectIdentifier{
-			Organization: "org1",
-			Name:         "proj1",
-			Domain:       "domain1",
-		}},
+	runsFiltered, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter: NewIsRootActionFilter().
+			And(NewEqualFilter("project", "proj1")).
+			And(NewEqualFilter("domain", "domain1")),
+		Limit: 50,
 	})
 	require.NoError(t, err)
 	assert.Len(t, runsFiltered, 3)

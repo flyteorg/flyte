@@ -66,6 +66,19 @@ flyte-binary:
             dbName: runs
             user: postgres
             password: postgres
+      manager:
+        internalApps:
+          enabled: true
+          baseDomain: "localhost"
+          scheme: "http"
+          ingressAppsPort: 30081
+          defaultEnvVars:
+            - FLYTE_AWS_ENDPOINT: 'http://rustfs.{{ .Release.Namespace }}:9000'
+            - FLYTE_AWS_ACCESS_KEY_ID: rustfs
+            - FLYTE_AWS_SECRET_ACCESS_KEY: rustfsstorage
+            - _U_EP_OVERRIDE: 'flyte-binary-http.{{ .Release.Namespace }}:8090'
+            - _U_INSECURE: "true"
+            - _U_USE_ACTIONS: "1"
     inlineConfigMap: '{{ include "flyte-devbox.configuration.inlineConfigMap" . }}'
   clusterResourceTemplates:
     inlineConfigMap: '{{ include "flyte-devbox.clusterResourceTemplates.inlineConfigMap" . }}'

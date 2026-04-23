@@ -32,36 +32,21 @@ build: verify ## Build all Go service binaries
 	$(MAKE) -C executor build
 
 # =============================================================================
-# Sandbox Commands
-# =============================================================================
-
-.PHONY: sandbox-build
-sandbox-build: ## Build and start the flyte sandbox (docker/devbox-bundled)
-	$(MAKE) -C docker/devbox-bundled build
-
-# Run in dev mode with extra arg FLYTE_DEV=True
-.PHONY: sandbox-run
-sandbox-run: ## Start the flyte sandbox without rebuilding the image
-	$(MAKE) -C docker/devbox-bundled start
-
-.PHONY: sandbox-stop
-sandbox-stop: ## Stop the flyte sandbox
-	$(MAKE) -C docker/devbox-bundled stop
-
-# =============================================================================
 # Devbox Commands
 # =============================================================================
 
 .PHONY: devbox-build
-devbox-build: ## Build and start the flyte devbox cluster (docker/devbox-bundled)
+devbox-build: ## Build the flyte devbox image (docker/devbox-bundled)
 	$(MAKE) -C docker/devbox-bundled build
 
+# Run in dev mode with extra arg FLYTE_DEV=True
 .PHONY: devbox-run
-devbox-run: ## Start the flyte devbox cluster without rebuilding the image
-	$(MAKE) -C docker/devbox-bundled start
+devbox-run: ## Start the flyte devbox and install Knative with app routing config
+	$(MAKE) -C docker/devbox-bundled start FLYTE_DEV=$(FLYTE_DEV)
+	$(MAKE) -C docker/devbox-bundled setup-knative
 
 .PHONY: devbox-stop
-devbox-stop: ## Stop the flyte devbox cluster
+devbox-stop: ## Stop the flyte devbox
 	$(MAKE) -C docker/devbox-bundled stop
 
 .PHONY: help
@@ -83,10 +68,9 @@ sep:
 # Helper to time a step: $(call timed,step_name,command)
 define timed
 	@start=$$(date +%s); \
-	$(2); rc=$$?; \
+	$(2); \
 	elapsed=$$((  $$(date +%s) - $$start )); \
-	echo "⏱  $(1) completed in $${elapsed}s"; \
-	exit $$rc
+	echo "⏱  $(1) completed in $${elapsed}s"
 endef
 
 .PHONY: buf-dep
