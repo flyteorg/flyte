@@ -18,8 +18,10 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -124,6 +126,24 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		defer func() {
 			// Restore unrendered template for subsequent renders.
 			taskTemplate.GetContainer().Args = argTemplate
+		}()
+	} else if taskTemplate.GetK8SPod() != nil {
+		coreTCtx, ok := taskCtx.(core.TaskExecutionContext)
+		if !ok {
+			return nil, nil, fmt.Errorf("failed to cast taskCtx to core.TaskExecutionContext for K8sPod rendering")
+		}
+		podSpec, _, _, err := flytek8s.ToK8sPodSpec(ctx, coreTCtx)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to build K8s pod spec: %v", err)
+		}
+		renderedPodSpecStruct, err := utils.MarshalObjToStruct(podSpec)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to marshal rendered pod spec: %v", err)
+		}
+		originalPodSpec := taskTemplate.GetK8SPod().GetPodSpec()
+		taskTemplate.GetK8SPod().PodSpec = renderedPodSpecStruct
+		defer func() {
+			taskTemplate.GetK8SPod().PodSpec = originalPodSpec
 		}()
 	}
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
