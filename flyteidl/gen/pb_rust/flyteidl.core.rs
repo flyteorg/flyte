@@ -2540,6 +2540,12 @@ pub struct ArrayNode {
     /// +optional. Specifies input bindings that are not mapped over for the node.
     #[prost(string, repeated, tag="8")]
     pub bound_inputs: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// +optional. If set to true, the ArrayNode will continue to run all sub-nodes even after the
+    /// failure threshold has been met (i.e. it is no longer possible to meet min_successes or
+    /// min_success_ratio). This is useful when you want to ensure all sub-nodes complete execution
+    /// even if the overall array node will fail.
+    #[prost(bool, tag="9")]
+    pub run_all_sub_nodes: bool,
     #[prost(oneof="array_node::ParallelismOption", tags="2")]
     pub parallelism_option: ::core::option::Option<array_node::ParallelismOption>,
     #[prost(oneof="array_node::SuccessCriteria", tags="3, 4")]

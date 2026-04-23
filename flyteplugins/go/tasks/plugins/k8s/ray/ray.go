@@ -130,8 +130,9 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 }
 
 func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.RayJob, objectMeta *metav1.ObjectMeta, taskPodSpec v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
-	enableIngress := true
 	cfg := GetConfig()
+
+	enableIngress := cfg.EnableIngress
 
 	headPodSpec := taskPodSpec.DeepCopy()
 	headPodTemplate, err := buildHeadPodTemplate(
@@ -223,6 +224,17 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		runtimeEnvYaml, err = convertBase64RuntimeEnvToYaml(rayJob.GetRuntimeEnv())
 		if err != nil {
 			return nil, err
+		}
+	}
+
+	// We mustn't drop empty string arguments when converting from the yaml
+	// array representation of K8s container args to the single string representation
+	// of RayJobSpec's Entrypoint field.
+	//
+	// Example: ["--resolver", "ArrayNodeMapTaskResolver", "--", "vars", "", "resolver", "DefaultResolver"]
+	for i, arg := range primaryContainer.Args {
+		if arg == "" {
+			primaryContainer.Args[i] = "''"
 		}
 	}
 
@@ -546,7 +558,7 @@ func (rayJobResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx 
 	}, nil
 }
 
-func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginContext, rayJob *rayv1.RayJob) (*pluginsCore.TaskInfo, error) {
+func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginContext, rayJob *rayv1.RayJob, taskTemplate *core.TaskTemplate) (*pluginsCore.TaskInfo, error) {
 	logPlugin, err := logs.InitializeLogPlugins(&logConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize log plugins. Error: %w", err)
@@ -572,6 +584,7 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 		PodUnixStartTime:     startTime,
 		PodUnixFinishTime:    finishTime,
 		ExtraTemplateVars:    []tasklog.TemplateVar{},
+		TaskTemplate:         taskTemplate,
 	}
 	if rayJob.Status.JobId != "" {
 		input.ExtraTemplateVars = append(
@@ -617,7 +630,12 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 
 func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 	rayJob := resource.(*rayv1.RayJob)
-	info, err := getEventInfoForRayJob(GetConfig().Logs, pluginContext, rayJob)
+	taskTemplate, err := pluginContext.TaskReader().Read(ctx)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+
+	info, err := getEventInfoForRayJob(GetConfig().Logs, pluginContext, rayJob, taskTemplate)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
@@ -642,7 +660,7 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		phaseInfo, err = pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "Suspending", info), nil
 	case rayv1.JobDeploymentStatusFailed:
 		failInfo := fmt.Sprintf("Failed to run Ray job %s with error: [%s] %s", rayJob.Name, rayJob.Status.Reason, rayJob.Status.Message)
-		phaseInfo, err = pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, failInfo, info), nil
+		phaseInfo, err = pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(flyteerr.TaskFailedWithError, failInfo, info), nil
 	default:
 		// We already handle all known deployment status, so this should never happen unless a future version of ray
 		// introduced a new job status.

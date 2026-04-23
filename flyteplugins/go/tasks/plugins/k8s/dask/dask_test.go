@@ -18,12 +18,14 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
 )
@@ -865,4 +867,42 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
+}
+
+func TestGetTaskPhase_DynamicLogLinks(t *testing.T) {
+	daskResourceHandler := daskResourceHandler{}
+	ctx := context.TODO()
+
+	dynamicLinks := map[string]tasklog.TemplateLogPlugin{
+		"test-dynamic-link": {
+			TemplateURIs: []tasklog.TemplateURI{"https://some-service.com/{{.taskConfig.dynamicParam}}"},
+		},
+	}
+
+	assert.NoError(t, SetConfig(&Config{
+		Logs: logs.LogConfig{
+			DynamicLogLinks: dynamicLinks,
+		},
+	}))
+
+	taskTemplate := dummyDaskTaskTemplate("", nil, "")
+	taskTemplate.Config = map[string]string{
+		"link_type":    "test-dynamic-link",
+		"dynamicParam": "dynamic-value",
+	}
+	taskCtx := dummyDaskTaskContext(taskTemplate, &v1.ResourceRequirements{}, nil, false, k8s.PluginState{})
+
+	taskPhase, err := daskResourceHandler.GetTaskPhase(ctx, taskCtx, dummyDaskJob(daskAPI.DaskJobRunning))
+	assert.NoError(t, err)
+	assert.NotNil(t, taskPhase.Info())
+	assert.NotNil(t, taskPhase.Info().Logs)
+
+	var dynamicLog *core.TaskLog
+	for _, l := range taskPhase.Info().Logs {
+		if l.GetUri() == "https://some-service.com/dynamic-value" {
+			dynamicLog = l
+			break
+		}
+	}
+	assert.NotNil(t, dynamicLog, "expected dynamic log link in task logs")
 }

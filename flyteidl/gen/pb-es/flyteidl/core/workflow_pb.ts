@@ -575,6 +575,16 @@ export class ArrayNode extends Message<ArrayNode> {
    */
   boundInputs: string[] = [];
 
+  /**
+   * +optional. If set to true, the ArrayNode will continue to run all sub-nodes even after the
+   * failure threshold has been met (i.e. it is no longer possible to meet min_successes or
+   * min_success_ratio). This is useful when you want to ensure all sub-nodes complete execution
+   * even if the overall array node will fail.
+   *
+   * @generated from field: bool run_all_sub_nodes = 9;
+   */
+  runAllSubNodes = false;
+
   constructor(data?: PartialMessage<ArrayNode>) {
     super();
     proto3.util.initPartial(data, this);
@@ -591,6 +601,7 @@ export class ArrayNode extends Message<ArrayNode> {
     { no: 6, name: "is_original_sub_node_interface", kind: "message", T: BoolValue },
     { no: 7, name: "data_mode", kind: "enum", T: proto3.getEnumType(ArrayNode_DataMode) },
     { no: 8, name: "bound_inputs", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 9, name: "run_all_sub_nodes", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ArrayNode {

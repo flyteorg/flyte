@@ -336,9 +336,75 @@ func TestBranchHandler_AbortNode(t *testing.T) {
 			mock.Anything,
 			mock.Anything, mock.Anything, mock.Anything).Return(nil)
 		mockNodeLookup.EXPECT().GetNode(*s.s.FinalizedNodeID).Return(n, true)
+		childNodeStatus := &mocks2.ExecutableNodeStatus{}
+		childNodeStatus.EXPECT().GetAttempts().Return(0)
+		childNodeStatus.On("SetDataDir", storage.DataReference("/output-dir/n2")).Once()
+		childNodeStatus.On("SetOutputDir", storage.DataReference("/output-dir/n2/0")).Once()
+		mockNodeLookup.EXPECT().GetNodeExecutionStatus(ctx, n2).Return(childNodeStatus)
 		branch := New(mockNodeExecutor, eventConfig, promutils.NewTestScope())
 		err := branch.Abort(ctx, nCtx, "")
 		assert.NoError(t, err)
+		childNodeStatus.AssertExpectations(t)
+	})
+}
+
+func TestBranchHandler_FinalizeNode(t *testing.T) {
+	ctx := context.TODO()
+	n1 := "n1"
+	n2 := "n2"
+
+	exp, _ := getComparisonExpression(1.0, core.ComparisonExpression_EQ, 1.0)
+	branchNode := &v1alpha1.BranchNodeSpec{
+		If: v1alpha1.IfBlock{
+			Condition: v1alpha1.BooleanExpression{
+				BooleanExpression: &core.BooleanExpression{
+					Expr: &core.BooleanExpression_Comparison{
+						Comparison: exp,
+					},
+				},
+			},
+			ThenNode: &n1,
+		},
+	}
+
+	n := &v1alpha1.NodeSpec{
+		ID:         n2,
+		BranchNode: branchNode,
+	}
+
+	t.Run("NoBranchNode", func(t *testing.T) {
+		mockNodeExecutor := &mocks.Node{}
+		eCtx := &execMocks.ExecutionContext{}
+		eCtx.EXPECT().GetParentInfo().Return(nil)
+		nCtx, _ := createNodeContext(v1alpha1.BranchNodeError, nil, n, nil, nil, eCtx)
+		branch := New(mockNodeExecutor, eventConfig, promutils.NewTestScope())
+		err := branch.Finalize(ctx, nCtx)
+		assert.NoError(t, err)
+	})
+
+	t.Run("BranchNodeSuccess", func(t *testing.T) {
+		mockNodeExecutor := &mocks.Node{}
+		mockNodeLookup := &execMocks.NodeLookup{}
+		mockNodeLookup.EXPECT().ToNode(mock.Anything).Return(nil, nil)
+		eCtx := &execMocks.ExecutionContext{}
+		eCtx.EXPECT().GetParentInfo().Return(parentInfo{})
+		nCtx, s := createNodeContext(v1alpha1.BranchNodeSuccess, &n1, n, nil, mockNodeLookup, eCtx)
+		newParentInfo, _ := common.CreateParentInfo(parentInfo{}, nCtx.NodeID(), nCtx.CurrentAttempt(), false)
+		expectedExecContext := executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo)
+		mockNodeExecutor.EXPECT().FinalizeHandler(mock.Anything,
+			mock.MatchedBy(func(e executors.ExecutionContext) bool { return assert.Equal(t, e, expectedExecContext) }),
+			mock.Anything,
+			mock.Anything, mock.Anything).Return(nil)
+		mockNodeLookup.EXPECT().GetNode(*s.s.FinalizedNodeID).Return(n, true)
+		childNodeStatus := &mocks2.ExecutableNodeStatus{}
+		childNodeStatus.EXPECT().GetAttempts().Return(0)
+		childNodeStatus.On("SetDataDir", storage.DataReference("/output-dir/n2")).Once()
+		childNodeStatus.On("SetOutputDir", storage.DataReference("/output-dir/n2/0")).Once()
+		mockNodeLookup.EXPECT().GetNodeExecutionStatus(ctx, n2).Return(childNodeStatus)
+		branch := New(mockNodeExecutor, eventConfig, promutils.NewTestScope())
+		err := branch.Finalize(ctx, nCtx)
+		assert.NoError(t, err)
+		childNodeStatus.AssertExpectations(t)
 	})
 }
 

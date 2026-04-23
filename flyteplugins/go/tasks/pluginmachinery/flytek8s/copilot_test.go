@@ -595,4 +595,27 @@ func TestAddCoPilotToPod(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Empty(t, primaryInitContainerName)
 	})
+
+	t.Run("grace-period", func(t *testing.T) {
+		cfgWithTimeout := cfg
+		cfgWithTimeout.Timeout = config2.Duration{Duration: time.Hour}
+
+		pod := v1.PodSpec{}
+		// TerminationGracePeriodSeconds is only set when the copilot sidecar is added,
+		// which requires outputs in the interface and an enabled DataLoadingConfig.
+		iface := &core.TypedInterface{
+			Outputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{
+					"o": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+				},
+			},
+		}
+		pilot := &core.DataLoadingConfig{
+			Enabled:    true,
+			OutputPath: "out",
+		}
+		_, err := AddCoPilotToPod(ctx, cfgWithTimeout, &pod, iface, taskMetadata, inputPaths, opath, pilot)
+		assert.NoError(t, err)
+		assert.Equal(t, int64(3600), *pod.TerminationGracePeriodSeconds)
+	})
 }

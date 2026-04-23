@@ -1,3 +1,13 @@
+> [!IMPORTANT]
+> ## Looking for Flyte 2?
+>
+> - **Use Flyte locally?** Head to **[flyte-sdk](https://github.com/flyteorg/flyte-sdk)** — the new Python SDK for Flyte 2.
+> - **Want to contribute to the distributed backend?** See the **[`v2` branch](https://github.com/flyteorg/flyte/tree/v2)** of this repo.
+>
+> **The README below is for Flyte 1.x.**
+
+---
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/readme/flyte_and_lf.png" alt="Flyte and LF AI & Data Logo" width="250">
 </p>

@@ -38,6 +38,8 @@ Flyte Admin Configuration
 
 - `plugins <#section-plugins>`_
 
+- `prof <#section-prof>`_
+
 - `propeller <#section-propeller>`_
 
 - `qualityofservice <#section-qualityofservice>`_
@@ -2703,6 +2705,36 @@ Use offloaded inputs for workflows.
   "false"
   
 
+injectIdentityAnnotations (bool)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+identityAnnotationPrefix (string)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+identityAnnotationKeys ([]string)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
 interfaces.FeatureGates
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -5306,6 +5338,19 @@ templates ([]tasklog.TemplateLogPlugin)
 .. code-block:: yaml
 
   null
+  
+
+Section: prof
+========================================================================================================================
+
+DisableConfigEndpoint (bool)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 Section: propeller

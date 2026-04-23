@@ -16,6 +16,8 @@ Flyte Propeller Configuration
 
 - `plugins <#section-plugins>`_
 
+- `prof <#section-prof>`_
+
 - `propeller <#section-propeller>`_
 
 - `secrets <#section-secrets>`_
@@ -3833,6 +3835,16 @@ serviceType (string)
   NodePort
   
 
+enableIngress (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 includeDashboard (bool)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -4304,6 +4316,19 @@ Indicates the amount of time before transitioning to success
 .. code-block:: yaml
 
   0s
+  
+
+Section: prof
+========================================================================================================================
+
+DisableConfigEndpoint (bool)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 Section: propeller

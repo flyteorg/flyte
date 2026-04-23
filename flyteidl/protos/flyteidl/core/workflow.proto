@@ -170,6 +170,12 @@ message ArrayNode {
 
     //+optional. Specifies input bindings that are not mapped over for the node.
     repeated string bound_inputs = 8;
+
+    // +optional. If set to true, the ArrayNode will continue to run all sub-nodes even after the
+    // failure threshold has been met (i.e. it is no longer possible to meet min_successes or
+    // min_success_ratio). This is useful when you want to ensure all sub-nodes complete execution
+    // even if the overall array node will fail.
+    bool run_all_sub_nodes = 9;
 }
 
 // Defines extra information about the Node.
