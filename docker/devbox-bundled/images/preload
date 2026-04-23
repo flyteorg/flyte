@@ -1,19 +1,37 @@
 #!/bin/sh
 
-set -ex
+set -e
 
 __save_image() {
   local dest="$1"
   local tar="$(echo ${dest} | cut -d: -f1 | tr / -).tar"
   local src="$( [ -n "$2" ] && echo "$2" || echo ${dest} )"
-  podman pull --arch ${TARGETARCH} ${src}
-  podman tag ${src} ${dest}
-  podman save -o ${tar} ${dest}
+  local log="${tar}.log"
+  if ! ( podman pull --arch ${TARGETARCH} ${src} && \
+         podman tag ${src} ${dest} && \
+         podman save -o ${tar} ${dest} ) >"${log}" 2>&1; then
+    echo "=== FAILED: ${dest} ===" >&2
+    cat "${log}" >&2
+    return 1
+  fi
+  echo "=== OK: ${dest} ===" >&2
 }
 
 MANIFEST="$(realpath "$1")"
 mkdir -p images
 cd images
+
+PIDS=""
 while read line; do
-  __save_image $(echo ${line} | tr = ' ')
+  [ -z "$line" ] && continue
+  __save_image $(echo ${line} | tr = ' ') &
+  PIDS="$PIDS $!"
 done < ${MANIFEST}
+
+FAIL=0
+for pid in $PIDS; do
+  wait "$pid" || FAIL=1
+done
+
+rm -f *.log
+exit $FAIL
