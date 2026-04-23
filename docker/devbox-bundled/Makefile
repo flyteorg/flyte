@@ -1,3 +1,27 @@
+# Optional buildx remote cache configuration. Values are passed verbatim to
+# `docker buildx build --cache-from/--cache-to`. Examples:
+#
+#   # Registry-backed cache (works anywhere):
+#   make build \
+#     BUILDX_CACHE_FROM="type=registry,ref=ghcr.io/<org>/flyte-devbox-cache:buildcache" \
+#     BUILDX_CACHE_TO="type=registry,ref=ghcr.io/<org>/flyte-devbox-cache:buildcache,mode=max"
+#
+#   # GitHub Actions cache:
+#   make build BUILDX_CACHE_FROM=type=gha BUILDX_CACHE_TO=type=gha,mode=max
+#
+# Leaving these empty preserves the previous no-cache behavior.
+#
+# Note: the flyte-binary build runs once per arch (amd64 and arm64) using the
+# same flags, so a shared registry cache ref will have the later arch overwrite
+# the earlier one. For CI that caches both arches, either run each arch in a
+# separate job or include an arch-specific suffix in the ref you pass.
+BUILDX_CACHE_FROM ?=
+BUILDX_CACHE_TO ?=
+
+BUILDX_CACHE_FLAGS = \
+	$(if $(BUILDX_CACHE_FROM),--cache-from=$(BUILDX_CACHE_FROM)) \
+	$(if $(BUILDX_CACHE_TO),--cache-to=$(BUILDX_CACHE_TO))
+
 define FLYTE_BINARY_BUILD
 mkdir -p images/tar/$(1)
 
@@ -6,6 +30,7 @@ docker buildx build \
 	--builder flyte-devbox \
 	--platform linux/$(1) \
 	--tag flyte-binary-v2:sandbox \
+	$(BUILDX_CACHE_FLAGS) \
 	--output type=docker,dest=images/tar/$(1)/flyte-binary.tar \
 	../..
 
@@ -58,11 +83,13 @@ sync-crds:
 .PHONY: build
 build: sync-crds flyte dep_update manifests
 	docker buildx build --builder flyte-devbox --allow security.insecure --load \
+		$(BUILDX_CACHE_FLAGS) \
 		--tag flyte-devbox:latest .
 
 .PHONY: build-gpu
 build-gpu: build
 	docker buildx build --builder flyte-devbox --allow security.insecure --load \
+		$(BUILDX_CACHE_FLAGS) \
 		--file Dockerfile.gpu \
 		--build-context base=docker-image://flyte-devbox:latest \
 		--build-arg BASE_IMAGE=base \
