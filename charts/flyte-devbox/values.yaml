@@ -71,7 +71,6 @@ flyte-binary:
           enabled: true
           baseDomain: "localhost"
           scheme: "http"
-          ingressAppsPort: 30081
           defaultEnvVars:
             - FLYTE_AWS_ENDPOINT: 'http://rustfs.{{ .Release.Namespace }}:9000'
             - FLYTE_AWS_ACCESS_KEY_ID: rustfs

@@ -345,20 +345,22 @@ func TestListRuns(t *testing.T) {
 	assert.True(t, runNames["run-2"])
 	assert.True(t, runNames["run-3"])
 
-	// Pagination: page 1
+	// ListActions uses a keyset cursor: it returns up to Limit+1 rows so the
+	// caller can detect whether another page exists. Page 1 asks for Limit=2
+	// and gets all 3 rows back (limit+1 probe). The caller trims to Limit and
+	// uses the last kept row's created_at as the CursorToken for page 2.
 	runsPage1, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
 		Filter: NewIsRootActionFilter(),
 		Limit:  2,
-		Offset: 0,
 	})
 	require.NoError(t, err)
-	assert.Len(t, runsPage1, 2)
+	assert.Len(t, runsPage1, 3)
 
-	// Pagination: page 2
+	page1 := runsPage1[:2]
 	runsPage2, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
-		Filter: NewIsRootActionFilter(),
-		Limit:  2,
-		Offset: 2,
+		Filter:      NewIsRootActionFilter(),
+		Limit:       2,
+		CursorToken: page1[len(page1)-1].CreatedAt.UTC().Format(time.RFC3339Nano),
 	})
 	require.NoError(t, err)
 	assert.Len(t, runsPage2, 1)
