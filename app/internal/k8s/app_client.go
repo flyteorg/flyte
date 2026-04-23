@@ -40,6 +40,11 @@ const (
 	// onto Knative-generated pods.
 	labelKnativeService = "serving.knative.dev/service"
 
+	// labelKnativeRevision is set by Knative on every pod and identifies the
+	// Revision that pod belongs to. Used to restrict log queries to pods of
+	// the latest revision during/after a rollout.
+	labelKnativeRevision = "serving.knative.dev/revision"
+
 	annotationSpecSHA = "flyte.org/spec-sha"
 	annotationAppID   = "flyte.org/app-id"
 
@@ -772,13 +777,30 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 	return status
 }
 
-// GetReplicas lists the pods currently backing the given app.
+// GetReplicas lists the pods currently backing the given app. When the KService
+// has a latest ready revision, only pods from that revision are returned — old
+// revision pods terminating during a rollout are filtered out. If the KService
+// has no ready revision yet (initial rollout), all pods for the service are
+// returned.
 func (c *AppK8sClient) GetReplicas(ctx context.Context, appID *flyteapp.Identifier) ([]*flyteapp.Replica, error) {
 	ns := appNamespace(appID.GetProject(), appID.GetDomain())
+	name := kserviceName(appID)
+
+	labels := client.MatchingLabels{labelKnativeService: name}
+	ksvc := &servingv1.Service{}
+	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: ns}, ksvc); err != nil {
+		if !k8serrors.IsNotFound(err) {
+			return nil, fmt.Errorf("failed to get KService for app %s/%s/%s: %w",
+				appID.GetProject(), appID.GetDomain(), appID.GetName(), err)
+		}
+	} else if rev := ksvc.Status.LatestReadyRevisionName; rev != "" {
+		labels[labelKnativeRevision] = rev
+	}
+
 	podList := &corev1.PodList{}
 	if err := c.k8sClient.List(ctx, podList,
 		client.InNamespace(ns),
-		client.MatchingLabels{labelKnativeService: kserviceName(appID)},
+		labels,
 	); err != nil {
 		return nil, fmt.Errorf("failed to list pods for app %s/%s/%s: %w",
 			appID.GetProject(), appID.GetDomain(), appID.GetName(), err)

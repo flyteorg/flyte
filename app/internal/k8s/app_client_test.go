@@ -324,6 +324,48 @@ func TestGetReplicas(t *testing.T) {
 	assert.Equal(t, "ACTIVE", replicas[0].Status.DeploymentStatus)
 }
 
+func TestGetReplicas_FiltersToLatestRevision(t *testing.T) {
+	s := testScheme(t)
+	ksvc := &servingv1.Service{
+		ObjectMeta: metav1.ObjectMeta{Name: "myapp", Namespace: "proj-dev"},
+		Status: servingv1.ServiceStatus{
+			ConfigurationStatusFields: servingv1.ConfigurationStatusFields{
+				LatestReadyRevisionName: "myapp-00002",
+			},
+		},
+	}
+	newPod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "myapp-new",
+			Namespace: "proj-dev",
+			Labels: map[string]string{
+				labelKnativeService:  "myapp",
+				labelKnativeRevision: "myapp-00002",
+			},
+		},
+		Status: corev1.PodStatus{Phase: corev1.PodRunning, ContainerStatuses: []corev1.ContainerStatus{{Ready: true}}},
+	}
+	oldPod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "myapp-old",
+			Namespace: "proj-dev",
+			Labels: map[string]string{
+				labelKnativeService:  "myapp",
+				labelKnativeRevision: "myapp-00001",
+			},
+		},
+		Status: corev1.PodStatus{Phase: corev1.PodRunning},
+	}
+	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(ksvc, newPod, oldPod).Build()
+	c := &AppK8sClient{k8sClient: fc, cfg: &config.InternalAppConfig{}}
+
+	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
+	replicas, err := c.GetReplicas(context.Background(), id)
+	require.NoError(t, err)
+	require.Len(t, replicas, 1)
+	assert.Equal(t, "myapp-new", replicas[0].Metadata.Id.Name)
+}
+
 func TestDeleteReplica(t *testing.T) {
 	s := testScheme(t)
 	pod := &corev1.Pod{
