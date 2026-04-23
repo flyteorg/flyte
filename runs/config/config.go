@@ -16,9 +16,10 @@ var defaultConfig = &Config{
 		Port: 8090,
 		Host: "0.0.0.0",
 	},
-	WatchBufferSize:   100,
-	ActionsServiceURL: "http://localhost:8090",
-	StoragePrefix:     "file:///tmp/flyte/data",
+	WatchBufferSize:     100,
+	ActionsServiceURL:   "http://localhost:8090",
+	DataProxyServiceURL: "http://localhost:8088",
+	StoragePrefix:       "file:///tmp/flyte/data",
 	SeedProjects:      []string{"flytesnacks"},
 	Domains: []DomainConfig{
 		{ID: "development", Name: "Development"},
@@ -49,6 +50,9 @@ type Config struct {
 
 	// Actions service URL for enqueuing actions
 	ActionsServiceURL string `json:"actionsServiceUrl" pflag:",URL of the actions service"`
+
+	// DataProxyServiceURL is the URL of the DataProxy service, used by RunLogsService to delegate log streaming.
+	DataProxyServiceURL string `json:"dataProxyServiceUrl" pflag:",URL of the DataProxy service"`
 
 	// StoragePrefix is the base URI for storing run data (inputs, outputs)
 	// e.g. "s3://my-bucket" or "gs://my-bucket" or "file:///tmp/flyte/data"
