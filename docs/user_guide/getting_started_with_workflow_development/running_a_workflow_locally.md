@@ -147,7 +147,7 @@ The demo cluster ships with a local Docker registry on `localhost:30000`. When y
 
 7. Run the workflow on the Flyte cluster with `pyflyte run` using the `--remote` flag and additional parameters for the project name and domain. In this example, you can also optionally pass a `name` parameter to the workflow:
 ```{prompt} bash $
-pyflyte run --remote --env FLYTE_IMAGE_REGISTRY=localhost:30000 -p my-project -d development example.py wf --name Ada
+pyflyte run --remote -p my-project -d development example.py wf --name Ada
 ```
 
 You should see a URL to the workflow execution on your demo Flyte cluster, where `<execution_name>` is a unique identifier for the workflow execution:
