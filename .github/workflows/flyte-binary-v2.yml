@@ -220,7 +220,10 @@ jobs:
           cache-to: type=gha,mode=max,scope=demo-gpu
 
   integration-test:
-    runs-on: ubuntu-latest
+    # k3s-in-docker + flannel is fragile on Ubuntu 24.04 GH runners (flannel
+    # silently fails to populate /run/flannel/subnet.env). Pin to 22.04 where
+    # the kernel + iptables combo is known to work.
+    runs-on: ubuntu-22.04
     needs: [build-and-push-single-binary-image]
     steps:
       - name: Checkout
