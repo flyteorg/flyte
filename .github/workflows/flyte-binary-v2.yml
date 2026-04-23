@@ -82,6 +82,8 @@ jobs:
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
           outputs: type=docker,dest=docker/devbox-bundled/images/tar/arm64/flyte-binary.tar
+          cache-from: type=gha,scope=flyte-binary-arm64
+          cache-to: type=gha,mode=max,scope=flyte-binary-arm64
       - name: Export AMD64 Image
         uses: docker/build-push-action@v6
         with:
@@ -93,6 +95,8 @@ jobs:
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
           outputs: type=docker,dest=docker/devbox-bundled/images/tar/amd64/flyte-binary.tar
+          cache-from: type=gha,scope=flyte-binary-amd64
+          cache-to: type=gha,mode=max,scope=flyte-binary-amd64
       - name: Upload single binary image
         uses: actions/upload-artifact@v4
         with:
@@ -117,6 +121,9 @@ jobs:
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
           push: true
+          cache-from: |
+            type=gha,scope=flyte-binary-arm64
+            type=gha,scope=flyte-binary-amd64
 
   build-and-push-devbox-bundled-image:
     runs-on: ubuntu-latest
