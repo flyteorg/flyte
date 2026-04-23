@@ -1,26 +1,58 @@
-# Optional buildx remote cache configuration. Values are passed verbatim to
-# `docker buildx build --cache-from/--cache-to`. Examples:
+# Buildx remote cache configuration.
 #
+# Defaults (can be overridden by setting BUILDX_CACHE_FROM / BUILDX_CACHE_TO):
+#   - Inside GitHub Actions ($(GITHUB_ACTIONS) == true): use `type=gha`, so the
+#     build cache is persisted in the Actions cache service across runs.
+#   - Locally: use `type=local` under $(BUILDX_CACHE_DIR) so repeated local
+#     builds reuse the previous build's layers.
+#
+# Override examples:
 #   # Registry-backed cache (works anywhere):
 #   make build \
 #     BUILDX_CACHE_FROM="type=registry,ref=ghcr.io/<org>/flyte-devbox-cache:buildcache" \
 #     BUILDX_CACHE_TO="type=registry,ref=ghcr.io/<org>/flyte-devbox-cache:buildcache,mode=max"
 #
-#   # GitHub Actions cache:
-#   make build BUILDX_CACHE_FROM=type=gha BUILDX_CACHE_TO=type=gha,mode=max
+#   # Disable caching entirely:
+#   make build BUILDX_CACHE_FROM= BUILDX_CACHE_TO=
 #
-# Leaving these empty preserves the previous no-cache behavior.
-#
-# Note: the flyte-binary build runs once per arch (amd64 and arm64) using the
-# same flags, so a shared registry cache ref will have the later arch overwrite
-# the earlier one. For CI that caches both arches, either run each arch in a
-# separate job or include an arch-specific suffix in the ref you pass.
-BUILDX_CACHE_FROM ?=
-BUILDX_CACHE_TO ?=
+# Note: the flyte-binary build runs once per arch (amd64 and arm64); we
+# auto-scope each arch's cache separately so amd64 and arm64 don't clobber
+# each other. Custom overrides apply as-is and do not get arch scoping.
+BUILDX_CACHE_DIR ?= $(HOME)/.cache/flyte-devbox-buildx
+
+ifeq ($(GITHUB_ACTIONS),true)
+  _DEVBOX_CACHE_FROM := type=gha,scope=flyte-devbox
+  _DEVBOX_CACHE_TO   := type=gha,scope=flyte-devbox,mode=max
+  _BINARY_CACHE_FROM  = type=gha,scope=flyte-binary-$(1)
+  _BINARY_CACHE_TO    = type=gha,scope=flyte-binary-$(1),mode=max
+else
+  _DEVBOX_CACHE_FROM := type=local,src=$(BUILDX_CACHE_DIR)/devbox
+  _DEVBOX_CACHE_TO   := type=local,dest=$(BUILDX_CACHE_DIR)/devbox,mode=max
+  _BINARY_CACHE_FROM  = type=local,src=$(BUILDX_CACHE_DIR)/flyte-binary-$(1)
+  _BINARY_CACHE_TO    = type=local,dest=$(BUILDX_CACHE_DIR)/flyte-binary-$(1),mode=max
+endif
+
+# Track whether the user overrode the cache knobs (command line / environment)
+# so we can keep per-arch scoping for the binary build when they haven't.
+_CACHE_FROM_USER_SET := $(filter command environment override,$(origin BUILDX_CACHE_FROM))
+_CACHE_TO_USER_SET   := $(filter command environment override,$(origin BUILDX_CACHE_TO))
+
+BUILDX_CACHE_FROM ?= $(_DEVBOX_CACHE_FROM)
+BUILDX_CACHE_TO   ?= $(_DEVBOX_CACHE_TO)
 
 BUILDX_CACHE_FLAGS = \
 	$(if $(BUILDX_CACHE_FROM),--cache-from=$(BUILDX_CACHE_FROM)) \
 	$(if $(BUILDX_CACHE_TO),--cache-to=$(BUILDX_CACHE_TO))
+
+# Per-arch cache flags for the flyte-binary build. User overrides apply as-is;
+# otherwise the arch-scoped defaults keep amd64 and arm64 caches separate.
+binary_cache_flags = \
+	$(if $(_CACHE_FROM_USER_SET),\
+		$(if $(BUILDX_CACHE_FROM),--cache-from=$(BUILDX_CACHE_FROM)),\
+		--cache-from=$(call _BINARY_CACHE_FROM,$(1))) \
+	$(if $(_CACHE_TO_USER_SET),\
+		$(if $(BUILDX_CACHE_TO),--cache-to=$(BUILDX_CACHE_TO)),\
+		--cache-to=$(call _BINARY_CACHE_TO,$(1)))
 
 define FLYTE_BINARY_BUILD
 mkdir -p images/tar/$(1)
@@ -30,7 +62,7 @@ docker buildx build \
 	--builder flyte-devbox \
 	--platform linux/$(1) \
 	--tag flyte-binary-v2:sandbox \
-	$(BUILDX_CACHE_FLAGS) \
+	$(call binary_cache_flags,$(1)) \
 	--output type=docker,dest=images/tar/$(1)/flyte-binary.tar \
 	../..
 
