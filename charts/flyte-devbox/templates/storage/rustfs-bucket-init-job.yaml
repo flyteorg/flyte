@@ -8,18 +8,15 @@ metadata:
   name: {{ printf "%s-rustfs-bucket-init" .Release.Name | trunc 63 | trimSuffix "-" }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    {{- include "flyte-demo.labels" . | nindent 4 }}
+    {{- include "flyte-devbox.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-weight": "10"
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-
 spec:
   backoffLimit: 6
+  ttlSecondsAfterFinished: 60
   template:
-    metadata:
-      labels:
-        {{- include "flyte-demo.selectorLabels" . | nindent 8 }}
-        app.kubernetes.io/component: rustfs-bucket-init
     spec:
       restartPolicy: OnFailure
       containers:

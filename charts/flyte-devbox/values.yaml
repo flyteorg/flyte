@@ -164,6 +164,8 @@ rustfsupstream:
     rustfs:
       access_key: rustfs
       secret_key: rustfsstorage
+  test:
+    enabled: false
 
 postgresql:
   fullnameOverride: postgresql
