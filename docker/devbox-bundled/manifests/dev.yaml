@@ -8311,7 +8311,7 @@ spec:
           periodSeconds: 5
           successThreshold: 1
           timeoutSeconds: 3
-        name: rustfsUpstream
+        name: rustfsupstream
         ports:
         - containerPort: 9000
           name: endpoint
@@ -8380,24 +8380,19 @@ kind: Job
 metadata:
   annotations:
     helm.sh/hook: post-install,post-upgrade
-    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-delete-policy: before-hook-creation,hook-
     helm.sh/hook-weight: "10"
   labels:
-    app.kubernetes.io/instance: flyte-demo
+    app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-demo
+    app.kubernetes.io/name: flyte-devbox
     app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-demo-0.1.0
-  name: flyte-demo-rustfs-bucket-init
+    helm.sh/chart: flyte-devbox-0.1.0
+  name: flyte-devbox-rustfs-bucket-init
   namespace: flyte
 spec:
   backoffLimit: 6
   template:
-    metadata:
-      labels:
-        app.kubernetes.io/component: rustfs-bucket-init
-        app.kubernetes.io/instance: flyte-demo
-        app.kubernetes.io/name: flyte-demo
     spec:
       containers:
       - command:

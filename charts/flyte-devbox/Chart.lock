@@ -13,5 +13,5 @@ generated: "2026-04-23T12:14:59.242727-07:00"
 - name: rustfs
   repository: https://rustfs.github.io/helm
   version: 0.0.94
-digest: sha256:9bdbd39953aa90c13d03384b1273125aa8e944fc1f1fccb7070f581d078a7db1
-generated: "2026-04-18T19:21:38.284835-05:00"
+digest: sha256:6d04f6eb6b492af372a3a935f4586a53a261035783be2683338e009be04a12cd
+generated: "2026-04-17T23:08:41.627655-05:00"
