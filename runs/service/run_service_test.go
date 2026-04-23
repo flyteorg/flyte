@@ -30,6 +30,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
@@ -777,6 +778,33 @@ func TestListRuns(t *testing.T) {
 			assert.Equal(t, tc.expect.Token, got.Msg.Token)
 		})
 	}
+}
+
+// TestListAndSendAllActionsUsesAscendingSort guards against regressing the
+// default repo sort order leaking into the WatchActions seed path. Children
+// have a later created_at than their parents; if ListActions returns rows in
+// descending order, the run state manager's insertAction fails because the
+// parent node is not yet in the tree. This test asserts we always pass an
+// ascending created_at sort parameter.
+func TestListAndSendAllActionsUsesAscendingSort(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+
+	runID := &common.RunIdentifier{Project: "p", Domain: "d", Name: "run-1"}
+
+	var captured interfaces.ListResourceInput
+	actionRepo.On("ListActions", mock.Anything, mock.MatchedBy(func(input interfaces.ListResourceInput) bool {
+		captured = input
+		return true
+	})).Return([]*models.Action{}, nil).Once()
+
+	rsm, err := newRunStateManager(nil)
+	require.NoError(t, err)
+
+	err = svc.listAndSendAllActions(context.Background(), runID, rsm, nil)
+	require.NoError(t, err)
+
+	require.Len(t, captured.SortParameters, 1)
+	assert.Equal(t, "created_at ASC", captured.SortParameters[0].GetOrderExpr())
 }
 
 func TestGenerateRunName(t *testing.T) {
