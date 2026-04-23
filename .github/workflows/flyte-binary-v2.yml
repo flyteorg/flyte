@@ -250,9 +250,11 @@ jobs:
         run: |
           # Ubuntu runners default to nftables-backed iptables; flannel/kube-proxy
           # inside k3s-in-docker hit silent rule failures (subnet.env never gets
-          # written). Pin to legacy iptables for both host and containers.
+          # written). Pin to legacy iptables for both host and containers, then
+          # restart docker so the daemon picks up the new backend.
           sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
           sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+          sudo systemctl restart docker
           sudo modprobe br_netfilter
           sudo modprobe overlay
           sudo modprobe nf_conntrack
