@@ -34,6 +34,12 @@ const (
 	labelDomain     = "flyte.org/domain"
 	labelAppName    = "flyte.org/app-name"
 
+	// labelKnativeService is set by Knative on every Deployment/Pod it creates
+	// from a KService. Its value equals the KService name. We use this to find
+	// replica pods, since our own labels on the KService aren't propagated
+	// onto Knative-generated pods.
+	labelKnativeService = "serving.knative.dev/service"
+
 	annotationSpecSHA = "flyte.org/spec-sha"
 	annotationAppID   = "flyte.org/app-id"
 
@@ -772,7 +778,7 @@ func (c *AppK8sClient) GetReplicas(ctx context.Context, appID *flyteapp.Identifi
 	podList := &corev1.PodList{}
 	if err := c.k8sClient.List(ctx, podList,
 		client.InNamespace(ns),
-		client.MatchingLabels{labelAppName: appID.GetName()},
+		client.MatchingLabels{labelKnativeService: kserviceName(appID)},
 	); err != nil {
 		return nil, fmt.Errorf("failed to list pods for app %s/%s/%s: %w",
 			appID.GetProject(), appID.GetDomain(), appID.GetName(), err)

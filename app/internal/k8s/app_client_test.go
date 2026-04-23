@@ -300,7 +300,7 @@ func TestGetReplicas(t *testing.T) {
 			Name:      "myapp-abc",
 			Namespace: "proj-dev",
 			Labels: map[string]string{
-				labelAppName: "myapp",
+				labelKnativeService: "myapp",
 			},
 		},
 		Status: corev1.PodStatus{
