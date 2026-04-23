@@ -234,13 +234,6 @@ jobs:
         with:
           driver-opts: image=moby/buildkit:master
           buildkitd-flags: "--allow-insecure-entitlement security.insecure"
-      - name: Install helm and kustomize
-        run: |
-          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-          curl -fsSL "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
-          sudo mv kustomize /usr/local/bin/
-      - name: Build devbox manifests
-        run: make -C docker/devbox-bundled manifests
       - name: Build devbox image (amd64, load into docker)
         uses: docker/build-push-action@v6
         env:
