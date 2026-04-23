@@ -1303,10 +1303,16 @@ func (s *RunService) listAndSendAllActions(
 	const pageSize = 100
 	offset := 0
 	for {
+		// Sort ascending by created_at so parent actions are inserted into the
+		// run state manager before their children. insertAction requires the
+		// parent node to already exist in the tree when a child is processed.
 		batch, err := s.repo.ActionRepo().ListActions(ctx, interfaces.ListResourceInput{
 			Filter: impl.NewRunActionsFilter(runID),
 			Limit:  pageSize,
 			Offset: offset,
+			SortParameters: []interfaces.SortParameter{
+				impl.NewSortParameter("created_at", interfaces.SortOrderAscending),
+			},
 		})
 		if err != nil {
 			return err
