@@ -246,11 +246,19 @@ jobs:
           build-args: FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}
           load: true
           cache-from: type=gha,scope=demo-cpu
-      - name: Preload kernel modules for k3s/flannel
+      - name: Prepare host for k3s (legacy iptables + kernel modules)
         run: |
+          # Ubuntu runners default to nftables-backed iptables; flannel/kube-proxy
+          # inside k3s-in-docker hit silent rule failures (subnet.env never gets
+          # written). Pin to legacy iptables for both host and containers.
+          sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+          sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
           sudo modprobe br_netfilter
           sudo modprobe overlay
-          sudo sysctl -w net.bridge.bridge-nf-call-iptables=1
+          sudo modprobe nf_conntrack
+          sudo modprobe iptable_nat || true
+          sudo modprobe iptable_filter || true
+          sudo sysctl -w net.bridge.bridge-nf-call-iptables=1 || true
           sudo sysctl -w net.ipv4.ip_forward=1
       - name: Start devbox cluster
         working-directory: docker/devbox-bundled
