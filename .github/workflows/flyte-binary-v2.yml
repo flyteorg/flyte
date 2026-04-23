@@ -218,3 +218,97 @@ jobs:
           push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
           cache-from: type=gha,scope=demo-gpu
           cache-to: type=gha,mode=max,scope=demo-gpu
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: [build-and-push-single-binary-image]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: single-binary-image
+          path: docker/devbox-bundled/images/tar
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: "--allow-insecure-entitlement security.insecure"
+      - name: Install helm and kustomize
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          curl -fsSL "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
+      - name: Build devbox manifests
+        run: make -C docker/devbox-bundled manifests
+      - name: Build devbox image (amd64, load into docker)
+        uses: docker/build-push-action@v6
+        env:
+          FLYTE_DEVBOX_VERSION: ${{ github.sha }}
+        with:
+          context: docker/devbox-bundled
+          allow: "security.insecure"
+          platforms: linux/amd64
+          tags: flyte-devbox:latest
+          build-args: FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}
+          load: true
+          cache-from: type=gha,scope=demo-cpu
+      - name: Start devbox cluster
+        working-directory: docker/devbox-bundled
+        run: make start FLYTE_DEVBOX_IMAGE=flyte-devbox:latest
+      - name: Wait for flyte endpoint
+        run: |
+          echo "Waiting for flyte-proxy on :30080..."
+          for i in $(seq 1 120); do
+            if curl -fsS --max-time 2 http://localhost:30080/healthcheck >/dev/null 2>&1 \
+               || curl -fsS --max-time 2 http://localhost:30080 >/dev/null 2>&1; then
+              echo "endpoint is up"; exit 0
+            fi
+            sleep 5
+          done
+          echo "flyte endpoint did not become ready in time"
+          docker logs flyte-devbox | tail -200 || true
+          exit 1
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install flyte SDK
+        run: pip install flyte
+      - name: Write hello world task and config
+        run: |
+          mkdir -p /tmp/hello
+          cat > /tmp/hello/config.yaml <<'EOF'
+          admin:
+            endpoint: dns:///localhost:30080
+            insecure: true
+            authType: Pkce
+          EOF
+          cat > /tmp/hello/hello.py <<'EOF'
+          import asyncio
+          import flyte
+
+          env = flyte.TaskEnvironment(
+              name="hello_world_ci",
+              image=flyte.Image.from_debian_base(python_version=(3, 12)),
+          )
+
+          @env.task
+          def calculate(x: int) -> int:
+              return x * 2 + 5
+
+          @env.task
+          async def main(numbers: list[int]) -> float:
+              results = await asyncio.gather(*[calculate.aio(n) for n in numbers])
+              return sum(results) / len(results)
+          EOF
+      - name: Run hello world via flyte CLI
+        working-directory: /tmp/hello
+        run: flyte --config config.yaml run hello.py main --numbers '[1,2,3]'
+      - name: Dump devbox logs on failure
+        if: failure()
+        run: docker logs flyte-devbox | tail -500 || true
+      - name: Stop devbox
+        if: always()
+        working-directory: docker/devbox-bundled
+        run: make stop || true
