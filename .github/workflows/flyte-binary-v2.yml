@@ -246,6 +246,12 @@ jobs:
           build-args: FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}
           load: true
           cache-from: type=gha,scope=demo-cpu
+      - name: Preload kernel modules for k3s/flannel
+        run: |
+          sudo modprobe br_netfilter
+          sudo modprobe overlay
+          sudo sysctl -w net.bridge.bridge-nf-call-iptables=1
+          sudo sysctl -w net.ipv4.ip_forward=1
       - name: Start devbox cluster
         working-directory: docker/devbox-bundled
         run: make start FLYTE_DEVBOX_IMAGE=flyte-devbox:latest
