@@ -755,14 +755,18 @@ func TestListRuns(t *testing.T) {
 			&workflow.ListRunsResponse{Runs: []*workflow.Run{}, Token: ""},
 		},
 		{
+			// Service fetches Limit+1 rows to detect another page. With 3 rows
+			// returned for a limit of 2, the slice is trimmed to the first 2
+			// runs and the cursor token is the trimmed last row's created_at.
 			"list with limit 2 and token",
-			&common.ListRequest{Limit: 2, Token: "5"},
-			mockListRes{runs: sqlRes[5:7], err: nil},
-			&workflow.ListRunsResponse{Runs: runs[5:7], Token: "7"},
+			&common.ListRequest{Limit: 2, Token: sqlRes[5].CreatedAt.UTC().Format(time.RFC3339Nano)},
+			mockListRes{runs: sqlRes[5:8], err: nil},
+			&workflow.ListRunsResponse{Runs: runs[5:7], Token: sqlRes[6].CreatedAt.UTC().Format(time.RFC3339Nano)},
 		},
 		{
+			// Only 2 rows returned for limit 3 means no next page — token empty.
 			"list with limit 3 and token",
-			&common.ListRequest{Limit: 3, Token: "8"},
+			&common.ListRequest{Limit: 3, Token: sqlRes[8].CreatedAt.UTC().Format(time.RFC3339Nano)},
 			mockListRes{runs: sqlRes[8:10], err: nil},
 			&workflow.ListRunsResponse{Runs: runs[8:10], Token: ""},
 		},
