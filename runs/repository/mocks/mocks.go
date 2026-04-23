@@ -10,7 +10,6 @@ import (
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	mock "github.com/stretchr/testify/mock"
@@ -646,37 +645,31 @@ func (_c *ActionRepo_InsertEvents_Call) RunAndReturn(run func(ctx context.Contex
 }
 
 // ListActions provides a mock function for the type ActionRepo
-func (_mock *ActionRepo) ListActions(ctx context.Context, runID *common.RunIdentifier, limit int, token string) ([]*models.Action, string, error) {
-	ret := _mock.Called(ctx, runID, limit, token)
+func (_mock *ActionRepo) ListActions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Action, error) {
+	ret := _mock.Called(ctx, input)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListActions")
 	}
 
 	var r0 []*models.Action
-	var r1 string
-	var r2 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.RunIdentifier, int, string) ([]*models.Action, string, error)); ok {
-		return returnFunc(ctx, runID, limit, token)
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, interfaces.ListResourceInput) ([]*models.Action, error)); ok {
+		return returnFunc(ctx, input)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.RunIdentifier, int, string) []*models.Action); ok {
-		r0 = returnFunc(ctx, runID, limit, token)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, interfaces.ListResourceInput) []*models.Action); ok {
+		r0 = returnFunc(ctx, input)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*models.Action)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *common.RunIdentifier, int, string) string); ok {
-		r1 = returnFunc(ctx, runID, limit, token)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, interfaces.ListResourceInput) error); ok {
+		r1 = returnFunc(ctx, input)
 	} else {
-		r1 = ret.Get(1).(string)
+		r1 = ret.Error(1)
 	}
-	if returnFunc, ok := ret.Get(2).(func(context.Context, *common.RunIdentifier, int, string) error); ok {
-		r2 = returnFunc(ctx, runID, limit, token)
-	} else {
-		r2 = ret.Error(2)
-	}
-	return r0, r1, r2
+	return r0, r1
 }
 
 // ActionRepo_ListActions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListActions'
@@ -686,47 +679,35 @@ type ActionRepo_ListActions_Call struct {
 
 // ListActions is a helper method to define mock.On call
 //   - ctx context.Context
-//   - runID *common.RunIdentifier
-//   - limit int
-//   - token string
-func (_e *ActionRepo_Expecter) ListActions(ctx interface{}, runID interface{}, limit interface{}, token interface{}) *ActionRepo_ListActions_Call {
-	return &ActionRepo_ListActions_Call{Call: _e.mock.On("ListActions", ctx, runID, limit, token)}
+//   - input interfaces.ListResourceInput
+func (_e *ActionRepo_Expecter) ListActions(ctx interface{}, input interface{}) *ActionRepo_ListActions_Call {
+	return &ActionRepo_ListActions_Call{Call: _e.mock.On("ListActions", ctx, input)}
 }
 
-func (_c *ActionRepo_ListActions_Call) Run(run func(ctx context.Context, runID *common.RunIdentifier, limit int, token string)) *ActionRepo_ListActions_Call {
+func (_c *ActionRepo_ListActions_Call) Run(run func(ctx context.Context, input interfaces.ListResourceInput)) *ActionRepo_ListActions_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *common.RunIdentifier
+		var arg1 interfaces.ListResourceInput
 		if args[1] != nil {
-			arg1 = args[1].(*common.RunIdentifier)
-		}
-		var arg2 int
-		if args[2] != nil {
-			arg2 = args[2].(int)
-		}
-		var arg3 string
-		if args[3] != nil {
-			arg3 = args[3].(string)
+			arg1 = args[1].(interfaces.ListResourceInput)
 		}
 		run(
 			arg0,
 			arg1,
-			arg2,
-			arg3,
 		)
 	})
 	return _c
 }
 
-func (_c *ActionRepo_ListActions_Call) Return(actions []*models.Action, s string, err error) *ActionRepo_ListActions_Call {
-	_c.Call.Return(actions, s, err)
+func (_c *ActionRepo_ListActions_Call) Return(actions []*models.Action, err error) *ActionRepo_ListActions_Call {
+	_c.Call.Return(actions, err)
 	return _c
 }
 
-func (_c *ActionRepo_ListActions_Call) RunAndReturn(run func(ctx context.Context, runID *common.RunIdentifier, limit int, token string) ([]*models.Action, string, error)) *ActionRepo_ListActions_Call {
+func (_c *ActionRepo_ListActions_Call) RunAndReturn(run func(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Action, error)) *ActionRepo_ListActions_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1047,80 +1028,6 @@ func (_c *ActionRepo_ListRootActions_Call) Return(actions []*models.Action, err 
 }
 
 func (_c *ActionRepo_ListRootActions_Call) RunAndReturn(run func(ctx context.Context, project string, domain string, startDate *time.Time, endDate *time.Time, limit int) ([]*models.Action, error)) *ActionRepo_ListRootActions_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// ListRuns provides a mock function for the type ActionRepo
-func (_mock *ActionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest) ([]*models.Run, string, error) {
-	ret := _mock.Called(ctx, req)
-
-	if len(ret) == 0 {
-		panic("no return value specified for ListRuns")
-	}
-
-	var r0 []*models.Run
-	var r1 string
-	var r2 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *workflow.ListRunsRequest) ([]*models.Run, string, error)); ok {
-		return returnFunc(ctx, req)
-	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *workflow.ListRunsRequest) []*models.Run); ok {
-		r0 = returnFunc(ctx, req)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*models.Run)
-		}
-	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *workflow.ListRunsRequest) string); ok {
-		r1 = returnFunc(ctx, req)
-	} else {
-		r1 = ret.Get(1).(string)
-	}
-	if returnFunc, ok := ret.Get(2).(func(context.Context, *workflow.ListRunsRequest) error); ok {
-		r2 = returnFunc(ctx, req)
-	} else {
-		r2 = ret.Error(2)
-	}
-	return r0, r1, r2
-}
-
-// ActionRepo_ListRuns_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListRuns'
-type ActionRepo_ListRuns_Call struct {
-	*mock.Call
-}
-
-// ListRuns is a helper method to define mock.On call
-//   - ctx context.Context
-//   - req *workflow.ListRunsRequest
-func (_e *ActionRepo_Expecter) ListRuns(ctx interface{}, req interface{}) *ActionRepo_ListRuns_Call {
-	return &ActionRepo_ListRuns_Call{Call: _e.mock.On("ListRuns", ctx, req)}
-}
-
-func (_c *ActionRepo_ListRuns_Call) Run(run func(ctx context.Context, req *workflow.ListRunsRequest)) *ActionRepo_ListRuns_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		var arg1 *workflow.ListRunsRequest
-		if args[1] != nil {
-			arg1 = args[1].(*workflow.ListRunsRequest)
-		}
-		run(
-			arg0,
-			arg1,
-		)
-	})
-	return _c
-}
-
-func (_c *ActionRepo_ListRuns_Call) Return(vs []*models.Run, s string, err error) *ActionRepo_ListRuns_Call {
-	_c.Call.Return(vs, s, err)
-	return _c
-}
-
-func (_c *ActionRepo_ListRuns_Call) RunAndReturn(run func(ctx context.Context, req *workflow.ListRunsRequest) ([]*models.Run, string, error)) *ActionRepo_ListRuns_Call {
 	_c.Call.Return(run)
 	return _c
 }

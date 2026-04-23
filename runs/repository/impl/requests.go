@@ -32,18 +32,6 @@ func NewListResourceInputFromProto(request *common.ListRequest, allowedColumns s
 		return interfaces.ListResourceInput{}, fmt.Errorf("invalid limit: %d (exceeds maximum of %d)", limit, maxLimit)
 	}
 
-	// Parse token as offset
-	var offset int
-	if request.Token != "" {
-		_, err := fmt.Sscanf(request.Token, "%d", &offset)
-		if err != nil {
-			return interfaces.ListResourceInput{}, fmt.Errorf("invalid token format: %s", request.Token)
-		}
-		if offset < 0 {
-			return interfaces.ListResourceInput{}, fmt.Errorf("invalid offset: %d (must be non-negative)", offset)
-		}
-	}
-
 	sortParameters, err := GetSortByFieldsV2(request, allowedColumns)
 	if err != nil {
 		return interfaces.ListResourceInput{}, err
@@ -57,7 +45,7 @@ func NewListResourceInputFromProto(request *common.ListRequest, allowedColumns s
 	return interfaces.ListResourceInput{
 		Limit:          limit,
 		Filter:         combinedFilter,
-		Offset:         offset,
+		CursorToken:    request.Token,
 		SortParameters: sortParameters,
 	}, nil
 }
