@@ -60,6 +60,75 @@ RUN set -ex; \
     rm -rf /tmp/pg-tmp
 
 
+FROM debian:bookworm-slim AS knative-manifests
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl python3 python3-yaml ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /knative
+
+RUN set -ex; \
+    curl -fsSL "https://github.com/knative/serving/releases/download/knative-v1.21.2/serving-crds.yaml" \
+        -o 00-serving-crds.yaml; \
+    curl -fsSL "https://github.com/knative/serving/releases/download/knative-v1.21.2/serving-core.yaml" \
+        -o 01-serving-core.yaml; \
+    curl -fsSL "https://github.com/knative-extensions/net-kourier/releases/download/knative-v1.21.0/kourier.yaml" \
+        -o /tmp/kourier-orig.yaml
+
+# Patch kourier Service: change type to NodePort and assign nodePort 30081 on the http2 port.
+# We load and re-dump the full manifest so the selector and other fields are preserved exactly.
+# Outer <<'DOCKEREOF' is the Dockerfile-level heredoc (becomes the shell script).
+# Inner << 'PYEOF' is a shell-level heredoc piping Python code to python3's stdin.
+RUN <<'DOCKEREOF'
+python3 - << 'PYEOF'
+import yaml
+
+with open('/tmp/kourier-orig.yaml') as f:
+    docs = [d for d in yaml.safe_load_all(f) if d is not None]
+
+for doc in docs:
+    meta = doc.get('metadata', {})
+    if (doc.get('kind') == 'Service'
+            and meta.get('name') == 'kourier'
+            and meta.get('namespace') == 'kourier-system'):
+        doc['spec']['type'] = 'NodePort'
+        for port in doc['spec'].get('ports', []):
+            if port.get('name') == 'http2':
+                port['nodePort'] = 30081
+
+with open('02-kourier.yaml', 'w') as f:
+    yaml.dump_all(docs, f, default_flow_style=False)
+PYEOF
+DOCKEREOF
+
+# ConfigMap overrides applied after the knative manifests above.
+# Alphabetical ordering (03/04) ensures these win over the defaults in 01/02.
+RUN <<'DOCKEREOF'
+cat > 03-config-network.yaml << 'EOF'
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-network
+  namespace: knative-serving
+data:
+  ingress-class: kourier.ingress.networking.knative.dev
+  domain-template: "{{.Name}}-{{.Namespace}}.{{.Domain}}"
+EOF
+DOCKEREOF
+
+RUN <<'DOCKEREOF'
+cat > 04-config-domain.yaml << 'EOF'
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-domain
+  namespace: knative-serving
+data:
+  "localhost": ""
+EOF
+DOCKEREOF
+
+
 FROM rancher/k3s:v1.34.6-k3s1
 
 ARG TARGETARCH
@@ -70,6 +139,7 @@ ENV FLYTE_DEVBOX_VERSION "${FLYTE_DEVBOX_VERSION}"
 COPY --from=builder /build/images/ /var/lib/rancher/k3s/agent/images/
 COPY images/tar/${TARGETARCH}/ /var/lib/rancher/k3s/agent/images/
 COPY manifests/ /var/lib/rancher/k3s/server/manifests-staging/
+COPY --from=knative-manifests /knative/ /var/lib/rancher/k3s/server/manifests/knative/
 COPY bin/ /bin/
 
 # Install bootstrap and embedded postgres

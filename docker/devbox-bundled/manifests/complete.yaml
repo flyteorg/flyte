@@ -547,6 +547,7 @@ data:
         - _U_INSECURE: "true"
         - _U_USE_ACTIONS: "1"
         enabled: true
+        ingressAppsPort: 30081
         scheme: http
     plugins:
       k8s:
@@ -925,7 +926,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 67ff4767c65e0e994c1cdc6dc435705ad04f001488a986711b4c3704abea0404
+        checksum/configuration: 057bc8cd8f198da64d01b746859585efb371b57b3215ffea2e46a7b83ad7b820
         checksum/configuration-secret: e70194084619f4a1d4017093aac6367047167107fd0222513a32a61734629cac
       labels:
         app.kubernetes.io/component: flyte-binary
