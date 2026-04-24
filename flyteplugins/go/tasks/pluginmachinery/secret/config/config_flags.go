@@ -77,6 +77,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int32(fmt.Sprintf("%v%v", prefix, "kubeClientConfig.qps"), DefaultConfig.KubeClientConfig.QPS, "Max QPS to the master for requests to KubeAPI. 0 defaults to 5.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "kubeClientConfig.burst"), DefaultConfig.KubeClientConfig.Burst, "Max burst rate for throttle. 0 defaults to 10")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubeClientConfig.timeout"), DefaultConfig.KubeClientConfig.Timeout.String(), "Max duration allowed for every request to KubeAPI before giving up. 0 implies no timeout.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "secretEnvVarPrefix"), DefaultConfig.SecretEnvVarPrefix, "The prefix for secret environment variables. Used by K8s,  Global,  and Embedded secret managers. Defaults to _UNION_")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "secretEnvVarPrefix"), DefaultConfig.SecretEnvVarPrefix, "The prefix for secret environment variables. Used by K8s,  Global,  and Embedded secret managers. Defaults to _FLYTE_")
 	return cmdFlags
 }

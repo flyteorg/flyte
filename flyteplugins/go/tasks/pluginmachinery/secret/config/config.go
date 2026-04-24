@@ -18,7 +18,7 @@ import (
 
 const (
 	EmbeddedSecretsFileMountInitContainerName = "init-embedded-secret"
-	DefaultSecretEnvVarPrefix                 = "_UNION_"
+	DefaultSecretEnvVarPrefix                 = "_FLYTE_"
 )
 
 var (
@@ -173,7 +173,7 @@ type Config struct {
 	WebhookTimeout                     int32              `json:"webhookTimeout" pflag:",Timeout for webhook calls in seconds. Defaults to 30 seconds."`
 	DisableCreateMutatingWebhookConfig bool               `json:"disableCreateMutatingWebhookConfig"`
 	KubeClientConfig                   KubeClientConfig   `json:"kubeClientConfig" pflag:",Configuration to control the Kubernetes client used by the webhook"`
-	SecretEnvVarPrefix                 string             `json:"secretEnvVarPrefix" pflag:",The prefix for secret environment variables. Used by K8s, Global, and Embedded secret managers. Defaults to _UNION_"`
+	SecretEnvVarPrefix                 string             `json:"secretEnvVarPrefix" pflag:",The prefix for secret environment variables. Used by K8s, Global, and Embedded secret managers. Defaults to _FLYTE_"`
 }
 
 //go:generate enumer --type=EmbeddedSecretManagerType -json -yaml -trimprefix=EmbeddedSecretManagerType
