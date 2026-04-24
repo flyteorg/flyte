@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"math"
@@ -36,6 +37,7 @@ const (
 
 	annotationSpecSHA = "flyte.org/spec-sha"
 	annotationAppID   = "flyte.org/app-id"
+	annotationSpec    = "flyte.org/spec"
 
 	maxScaleZero = "0"
 
@@ -53,9 +55,9 @@ type AppK8sClientInterface interface {
 	// is kept so the app can be restarted later.
 	Stop(ctx context.Context, appID *flyteapp.Identifier) error
 
-	// GetStatus reads the KService and maps its conditions to a DeploymentStatus.
+	// GetApp reads the KService and returns the full App including reconstructed Spec and live Status.
 	// Returns a not-found error (checkable with k8serrors.IsNotFound) if the KService does not exist.
-	GetStatus(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.Status, error)
+	GetApp(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.App, error)
 
 	// List returns apps for the given project/domain scope with optional pagination.
 	// limit=0 means no limit. token is the K8s continue token from a previous call.
@@ -419,8 +421,8 @@ func (c *AppK8sClient) kserviceEventToWatchResponse(ctx context.Context, event k
 	}
 }
 
-// GetStatus reads the KService and maps its conditions to a flyteapp.Status proto.
-func (c *AppK8sClient) GetStatus(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.Status, error) {
+// GetApp reads the KService and returns the full App including reconstructed Spec and live Status.
+func (c *AppK8sClient) GetApp(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.App, error) {
 	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 	name := kserviceName(appID)
 	ksvc := &servingv1.Service{}
@@ -430,7 +432,25 @@ func (c *AppK8sClient) GetStatus(ctx context.Context, appID *flyteapp.Identifier
 		}
 		return nil, fmt.Errorf("failed to get KService %s: %w", name, err)
 	}
-	return c.kserviceToStatus(ctx, ksvc), nil
+	return c.kserviceToApp(ctx, ksvc)
+}
+
+// specFromAnnotation deserializes the Spec stored in the flyte.org/spec annotation.
+// Returns nil if the annotation is absent or malformed.
+func specFromAnnotation(ksvc *servingv1.Service) *flyteapp.Spec {
+	b64, ok := ksvc.Annotations[annotationSpec]
+	if !ok {
+		return nil
+	}
+	b, err := base64.StdEncoding.DecodeString(b64)
+	if err != nil {
+		return nil
+	}
+	spec := &flyteapp.Spec{}
+	if err := proto.Unmarshal(b, spec); err != nil {
+		return nil
+	}
+	return spec
 }
 
 // List returns apps for the given project/domain scope with optional pagination.
@@ -502,14 +522,19 @@ func kserviceName(id *flyteapp.Identifier) string {
 	return name[:maxKServiceNameLen-9] + "-" + suffix
 }
 
-// specSHA computes a SHA256 digest of the serialized App Spec proto.
-func specSHA(spec *flyteapp.Spec) (string, error) {
+// marshalSpec serializes the App Spec proto and returns the raw bytes.
+func marshalSpec(spec *flyteapp.Spec) ([]byte, error) {
 	b, err := proto.Marshal(spec)
 	if err != nil {
-		return "", fmt.Errorf("failed to marshal spec: %w", err)
+		return nil, fmt.Errorf("failed to marshal spec: %w", err)
 	}
-	sum := sha256.Sum256(b)
-	return hex.EncodeToString(sum[:8]), nil // 8 bytes = 16 hex chars, enough for change detection
+	return b, nil
+}
+
+// specSHA computes a SHA256 digest of the serialized App Spec proto.
+func specSHA(specBytes []byte) string {
+	sum := sha256.Sum256(specBytes)
+	return hex.EncodeToString(sum[:8]) // 8 bytes = 16 hex chars, enough for change detection
 }
 
 // buildKService constructs a Knative Service manifest from an App proto.
@@ -519,10 +544,11 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	name := kserviceName(appID)
 	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 
-	sha, err := specSHA(spec)
+	specBytes, err := marshalSpec(spec)
 	if err != nil {
 		return nil, err
 	}
+	sha := specSHA(specBytes)
 
 	podSpec, err := buildPodSpec(spec)
 	if err != nil {
@@ -562,6 +588,7 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 			Annotations: map[string]string{
 				annotationSpecSHA: sha,
 				annotationAppID:   fmt.Sprintf("%s/%s/%s", appID.GetProject(), appID.GetDomain(), appID.GetName()),
+				annotationSpec:    base64.StdEncoding.EncodeToString(specBytes),
 			},
 		},
 		Spec: servingv1.ServiceSpec{
@@ -763,6 +790,10 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 		Namespace: ksvc.Namespace,
 	}
 
+	if !ksvc.CreationTimestamp.IsZero() {
+		status.CreatedAt = timestamppb.New(ksvc.CreationTimestamp.Time)
+	}
+
 	return status
 }
 
@@ -878,6 +909,7 @@ func (c *AppK8sClient) kserviceToApp(ctx context.Context, ksvc *servingv1.Servic
 		Metadata: &flyteapp.Meta{
 			Id: appID,
 		},
+		Spec:   specFromAnnotation(ksvc),
 		Status: c.kserviceToStatus(ctx, ksvc),
 	}, nil
 }

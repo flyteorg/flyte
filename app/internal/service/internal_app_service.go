@@ -98,7 +98,7 @@ func (s *InternalAppService) Get(
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("app_id is required"))
 	}
 
-	status, err := s.k8s.GetStatus(ctx, appID.AppId)
+	app, err := s.k8s.GetApp(ctx, appID.AppId)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
@@ -106,12 +106,7 @@ func (s *InternalAppService) Get(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	return connect.NewResponse(&flyteapp.GetResponse{
-		App: &flyteapp.App{
-			Metadata: &flyteapp.Meta{Id: appID.AppId},
-			Status:   status,
-		},
-	}), nil
+	return connect.NewResponse(&flyteapp.GetResponse{App: app}), nil
 }
 
 // Update modifies an app's spec or desired state.
@@ -143,11 +138,11 @@ func (s *InternalAppService) Update(
 		}
 	}
 
-	status, err := s.k8s.GetStatus(ctx, appID)
+	freshApp, err := s.k8s.GetApp(ctx, appID)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
-	app.Status = status
+	app.Status = freshApp.Status
 
 	return connect.NewResponse(&flyteapp.UpdateResponse{App: app}), nil
 }
