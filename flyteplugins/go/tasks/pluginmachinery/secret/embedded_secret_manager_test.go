@@ -510,6 +510,64 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T)
 	assert.True(t, podHasSecretInjected(pod, "secret1", "fruits @ project", ""))
 }
 
+// TestEmbeddedSecretManagerInjector_LookUpSecret_StaleOrgCacheDoesNotMaskProjectScope
+// locks in the cache-then-fetch-per-scope fix. Previously a cached org-scoped
+// value would short-circuit the entire lookup when the project+domain cache
+// missed, masking a newly created project+domain secret. The fix checks the
+// cache and fetches per scope so lower (more specific) scopes win when they
+// exist in the backend.
+func TestEmbeddedSecretManagerInjector_LookUpSecret_StaleOrgCacheDoesNotMaskProjectScope(t *testing.T) {
+	ctx := context.Background()
+	secret := &core.Secret{Key: "secret1"}
+	pod := &corev1.Pod{
+		Spec: corev1.PodSpec{Containers: []corev1.Container{{}}},
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"organization": "o-apple",
+				"domain":       "d-cherry",
+				"project":      "p-banana",
+			},
+		},
+	}
+
+	projectDomainID := "u__org__o-apple__domain__d-cherry__project__p-banana__key__secret1"
+	orgID := "u__org__o-apple__domain____project____key__secret1"
+
+	// Cache mock: project+domain MISS, but a stale org-scoped entry exists.
+	// The fix must *not* return the org entry when a project+domain fetch
+	// would succeed.
+	secretCache := cacheMocks.NewCacheInterface[SecretValue](t)
+	secretCache.EXPECT().Get(mock.Anything, projectDomainID).Return(SecretValue{}, fmt.Errorf("cache miss")).Maybe()
+	secretCache.EXPECT().Get(mock.Anything, orgID).Return(SecretValue{StringValue: "stale org value"}, nil).Maybe()
+	secretCache.EXPECT().Set(mock.Anything, projectDomainID, mock.Anything).Return(nil).Maybe()
+
+	// image pull mirroring path calls Get on the controller-runtime client for
+	// the org-scoped image-pull Secret; return NotFound so the happy path runs.
+	mockClient := &mocks.MockableControllerRuntimeClient{}
+	orgImagePullName := ToImagePullK8sName(SecretNameComponents{Org: "o-apple", Name: "secret1"})
+	mockClient.
+		On("Get", ctx, types.NamespacedName{Name: orgImagePullName, Namespace: testReferenceNamespace}, &corev1.Secret{}).
+		Return(k8sError.NewNotFound(corev1.Resource("secret"), orgImagePullName)).Maybe()
+
+	injector := NewEmbeddedSecretManagerInjector(
+		config.EmbeddedSecretManagerConfig{},
+		[]SecretFetcher{secretFetcherMock{
+			Secrets: map[string]SecretValue{
+				projectDomainID: {StringValue: "fresh project value"},
+				orgID:           {StringValue: "stale org value"},
+			},
+		}},
+		mockClient, testReferenceNamespace, secretCache,
+		&config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix},
+	)
+
+	pod, injected, err := injector.Inject(ctx, secret, pod)
+	assert.NoError(t, err)
+	assert.True(t, injected)
+	// Must pick up the newly-created project+domain value, not the stale cached org value.
+	assert.True(t, podHasSecretInjected(pod, "secret1", "fresh project value", ""))
+}
+
 func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 	ctx = context.Background()
 
@@ -712,22 +770,20 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 }
 
 func podHasSecretInjected(pod *corev1.Pod, secretKey string, secretValue string, envVar string) bool {
+	// When Secret.EnvVar is set the injector emits a single value env var with
+	// that name; otherwise it emits the auto-generated _UNION_<KEY> name.
+	expectedName := "_UNION_" + strings.ToUpper(secretKey)
+	if envVar != "" {
+		expectedName = envVar
+	}
 	return lo.EveryBy(pod.Spec.Containers, func(container corev1.Container) bool {
 		hasValueEnvVar := lo.ContainsBy(container.Env, func(env corev1.EnvVar) bool {
-			return env.Name == ("_UNION_"+strings.ToUpper(secretKey)) &&
-				env.Value == secretValue
+			return env.Name == expectedName && env.Value == secretValue
 		})
 		hasPrefixEnvVar := lo.ContainsBy(container.Env, func(env corev1.EnvVar) bool {
 			return env.Name == "FLYTE_SECRETS_ENV_PREFIX" && env.Value == "_UNION_"
 		})
-		hasCustomEnvVar := true
-		if envVar != "" {
-			hasCustomEnvVar = lo.ContainsBy(container.Env, func(env corev1.EnvVar) bool {
-				return env.Name == envVar && env.Value == secretValue
-			})
-		}
-
-		return hasValueEnvVar && hasPrefixEnvVar && hasCustomEnvVar
+		return hasValueEnvVar && hasPrefixEnvVar
 	})
 }
 

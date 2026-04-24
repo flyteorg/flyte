@@ -321,21 +321,19 @@ func (i *EmbeddedSecretManagerInjector) Inject(
 }
 
 func (i *EmbeddedSecretManagerInjector) injectAsEnvVar(secret *core.Secret, secretValue string, pod *corev1.Pod) {
+	valueEnvVarName := i.parentCfg.SecretEnvVarPrefix + strings.ToUpper(secret.GetKey())
+	if secret.GetEnvVar() != "" {
+		valueEnvVarName = secret.EnvVar
+	}
 	envVars := []corev1.EnvVar{
 		{
 			Name:  SecretEnvVarPrefix,
 			Value: i.parentCfg.SecretEnvVarPrefix,
 		},
 		{
-			Name:  i.parentCfg.SecretEnvVarPrefix + strings.ToUpper(secret.GetKey()),
+			Name:  valueEnvVarName,
 			Value: secretValue,
 		},
-	}
-	if secret.GetEnvVar() != "" {
-		envVars = append(envVars, corev1.EnvVar{
-			Name:  secret.EnvVar,
-			Value: secretValue,
-		})
 	}
 	pod.Spec.InitContainers = AppendEnvVars(pod.Spec.InitContainers, envVars...)
 	pod.Spec.Containers = AppendEnvVars(pod.Spec.Containers, envVars...)
