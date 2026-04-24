@@ -103,6 +103,10 @@ packages:
       dir: actions/service/mocks
     interfaces:
       ActionsClientInterface:
+  github.com/flyteorg/flyte/v2/app/internal/repository/interfaces:
+    config:
+      all: true
+      dir: app/internal/repository/mocks
   github.com/eko/gocache/lib/v4/cache:
     config:
       all: false

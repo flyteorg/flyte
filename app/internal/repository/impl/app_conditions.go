@@ -11,6 +11,7 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/app/internal/repository/interfaces"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 )
 
@@ -56,6 +57,8 @@ func (r *AppConditionsRepo) AppendCondition(ctx context.Context, appID *flyteapp
 	// Append and trim.
 	conditions = append(conditions, cond)
 	if maxConditions > 0 && len(conditions) > maxConditions {
+		logger.Debugf(ctx, "Trimming conditions for app %s/%s/%s from %d to %d",
+			appID.GetProject(), appID.GetDomain(), appID.GetName(), len(conditions), maxConditions)
 		conditions = conditions[len(conditions)-maxConditions:]
 	}
 

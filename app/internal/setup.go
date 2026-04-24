@@ -10,6 +10,8 @@ import (
 
 	appconfig "github.com/flyteorg/flyte/v2/app/internal/config"
 	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
+	"github.com/flyteorg/flyte/v2/app/internal/migrations"
+	repoimpl "github.com/flyteorg/flyte/v2/app/internal/repository/impl"
 	"github.com/flyteorg/flyte/v2/app/internal/service"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
 	knativeapp "github.com/flyteorg/flyte/v2/flytestdlib/app"
@@ -28,8 +30,13 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext, cfg *appconfig.Inter
 		return fmt.Errorf("internalapp: failed to register Knative scheme: %w", err)
 	}
 
+	if err := migrations.RunMigrations(ctx, sc.DB); err != nil {
+		return fmt.Errorf("internalapp: failed to run migrations: %w", err)
+	}
+
 	appK8sClient := appk8s.NewAppK8sClient(sc.K8sClient, sc.K8sCache, cfg)
-	internalAppSvc := service.NewInternalAppService(appK8sClient, cfg)
+	conditionRepo := repoimpl.NewAppConditionsRepo(sc.DB)
+	internalAppSvc := service.NewInternalAppService(appK8sClient, conditionRepo, cfg)
 
 	path, handler := appconnect.NewAppServiceHandler(internalAppSvc)
 	sc.Mux.Handle("/internal"+path, http.StripPrefix("/internal", handler))

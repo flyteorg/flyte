@@ -2,7 +2,11 @@ package config
 
 import "time"
 
-// AppConfig holds configuration for the control plane AppService.
+var defaultConfig = &InternalAppConfig{
+	MaxConditions: 40,
+}
+
+// AppConfig holds configuration for the AppService.
 type AppConfig struct {
 	// InternalAppServiceURL is the base URL of the InternalAppService (data plane).
 	// In unified mode this is overridden by the shared mux BaseURL.
@@ -49,4 +53,8 @@ type InternalAppConfig struct {
 	// Use this to inject cluster-internal endpoints (e.g. _U_EP_OVERRIDE) that app
 	// processes need to connect back to the Flyte manager.
 	DefaultEnvVars map[string]string `json:"defaultEnvVars" pflag:"-,Default env vars injected into every app pod"`
+
+	// MaxConditions is the maximum number of conditions to retain per app.
+	// Oldest entries are trimmed when this limit is exceeded. Defaults to 40.
+	MaxConditions int `json:"maxConditions" pflag:",Maximum number of conditions to retain per app"`
 }
