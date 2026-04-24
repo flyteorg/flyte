@@ -177,16 +177,16 @@ func TestDelete_NotFound(t *testing.T) {
 	require.NoError(t, c.Delete(context.Background(), id))
 }
 
-func TestGetStatus_NotFound(t *testing.T) {
+func TestGetApp_NotFound(t *testing.T) {
 	c := testClient(t)
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "missing"}
-	status, err := c.GetStatus(context.Background(), id)
+	app, err := c.GetApp(context.Background(), id)
 	require.Error(t, err)
 	assert.True(t, k8serrors.IsNotFound(err))
-	assert.Nil(t, status)
+	assert.Nil(t, app)
 }
 
-func TestGetStatus_Stopped(t *testing.T) {
+func TestGetApp_Stopped(t *testing.T) {
 	c := testClient(t)
 	app := testApp("proj", "dev", "myapp", "nginx:latest")
 	require.NoError(t, c.Deploy(context.Background(), app))
@@ -194,13 +194,13 @@ func TestGetStatus_Stopped(t *testing.T) {
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
 	require.NoError(t, c.Stop(context.Background(), id))
 
-	status, err := c.GetStatus(context.Background(), id)
+	result, err := c.GetApp(context.Background(), id)
 	require.NoError(t, err)
-	require.Len(t, status.Conditions, 1)
-	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_STOPPED, status.Conditions[0].DeploymentStatus)
+	require.Len(t, result.Status.Conditions, 1)
+	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_STOPPED, result.Status.Conditions[0].DeploymentStatus)
 }
 
-func TestGetStatus_CurrentReplicas(t *testing.T) {
+func TestGetApp_CurrentReplicas(t *testing.T) {
 	s := testScheme(t)
 	// Pre-populate a KService with LatestReadyRevisionName already set in status,
 	// and the corresponding Revision with ActualReplicas=4.
@@ -234,9 +234,32 @@ func TestGetStatus_CurrentReplicas(t *testing.T) {
 	}
 
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
-	status, err := c.GetStatus(context.Background(), id)
+	result, err := c.GetApp(context.Background(), id)
 	require.NoError(t, err)
-	assert.Equal(t, uint32(4), status.CurrentReplicas)
+	assert.Equal(t, uint32(4), result.Status.CurrentReplicas)
+}
+
+func TestGetApp_SpecRoundTrip(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	app.Spec.Profile = &flyteapp.Profile{
+		Type:             "FastAPI",
+		Name:             "My App",
+		ShortDescription: "A test app",
+	}
+	app.Spec.Autoscaling = &flyteapp.AutoscalingConfig{
+		Replicas: &flyteapp.Replicas{Min: 1, Max: 5},
+	}
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
+	result, err := c.GetApp(context.Background(), id)
+	require.NoError(t, err)
+	require.NotNil(t, result.Spec)
+	assert.Equal(t, "FastAPI", result.Spec.Profile.Type)
+	assert.Equal(t, "My App", result.Spec.Profile.Name)
+	assert.Equal(t, uint32(1), result.Spec.Autoscaling.Replicas.Min)
+	assert.Equal(t, uint32(5), result.Spec.Autoscaling.Replicas.Max)
 }
 
 func TestList(t *testing.T) {
