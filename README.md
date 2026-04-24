@@ -1,8 +1,9 @@
 > [!IMPORTANT]
 > ## Looking for Flyte 2?
 >
-> - **Use Flyte locally?** Head to **[flyte-sdk](https://github.com/flyteorg/flyte-sdk)** — the new Python SDK for Flyte 2.
-> - **Want to contribute to the distributed backend?** See the **[`v2` branch](https://github.com/flyteorg/flyte/tree/v2)** of this repo.
+> - **⭐️ Flyte 2 Devbox is now available!** Check out the guide [here](https://www.union.ai/docs/v2/flyte/user-guide/run-modes/running-devbox/)
+> - **Use Flyte 2 locally?** Head to **[flyte-sdk](https://github.com/flyteorg/flyte-sdk)** — the new Python SDK for Flyte 2.
+> - **Want to contribute to the Flyte 2 distributed backend?** See the **[`main` branch](https://github.com/flyteorg/flyte/tree/main)** of this repo.
 >
 > **The README below is for Flyte 1.x.**
 
