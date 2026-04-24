@@ -90,10 +90,10 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 		return err
 	}
 	// InternalAppService must be mounted before AppService so the proxy can reach it.
-	if err := flyteapp.SetupInternal(ctx, sc, &cfg.InternalApps); err != nil {
+	if err := flyteapp.SetupInternal(ctx, sc); err != nil {
 		return err
 	}
-	if err := flyteapp.Setup(ctx, sc, &cfg.Apps); err != nil {
+	if err := flyteapp.Setup(ctx, sc); err != nil {
 		return err
 	}
 	if err := dataproxy.Setup(ctx, sc); err != nil {
