@@ -29,6 +29,16 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext, cfg *appconfig.Inter
 	}
 
 	appK8sClient := appk8s.NewAppK8sClient(sc.K8sClient, sc.K8sCache, cfg)
+
+	if err := appK8sClient.StartWatching(ctx); err != nil {
+		return fmt.Errorf("internalapp: failed to start KService watcher: %w", err)
+	}
+	sc.AddWorker("app-kservice-watcher", func(ctx context.Context) error {
+		<-ctx.Done()
+		appK8sClient.StopWatching()
+		return nil
+	})
+
 	internalAppSvc := service.NewInternalAppService(appK8sClient, cfg)
 
 	path, handler := appconnect.NewAppServiceHandler(internalAppSvc)
