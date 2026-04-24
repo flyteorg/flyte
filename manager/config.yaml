@@ -20,6 +20,7 @@ manager:
     enabled: true
     baseDomain: "localhost"
     scheme: "http"
+    ingressAppsPort: 30081
     defaultRequestTimeout: 300s
     maxRequestTimeout: 3600s
     defaultEnvVars:
