@@ -181,7 +181,7 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 						{
 							Env: []corev1.EnvVar{
 								{
-									Name:  "_FLYTE_SECRETID",
+									Name:  "_UNION_SECRETID",
 									Value: secretValue,
 								},
 								{
@@ -771,8 +771,8 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 
 func podHasSecretInjected(pod *corev1.Pod, secretKey string, secretValue string, envVar string) bool {
 	// When Secret.EnvVar is set the injector emits a single value env var with
-	// that name; otherwise it emits the auto-generated _FLYTE_<KEY> name.
-	expectedName := config.DefaultSecretEnvVarPrefix + strings.ToUpper(secretKey)
+	// that name; otherwise it emits the auto-generated _UNION_<KEY> name.
+	expectedName := "_UNION_" + strings.ToUpper(secretKey)
 	if envVar != "" {
 		expectedName = envVar
 	}
@@ -781,7 +781,7 @@ func podHasSecretInjected(pod *corev1.Pod, secretKey string, secretValue string,
 			return env.Name == expectedName && env.Value == secretValue
 		})
 		hasPrefixEnvVar := lo.ContainsBy(container.Env, func(env corev1.EnvVar) bool {
-			return env.Name == SecretEnvVarPrefix && env.Value == config.DefaultSecretEnvVarPrefix
+			return env.Name == "FLYTE_SECRETS_ENV_PREFIX" && env.Value == "_UNION_"
 		})
 		return hasValueEnvVar && hasPrefixEnvVar
 	})

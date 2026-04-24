@@ -27,7 +27,7 @@ var (
 // a single key from the referenced secret object.
 // The secret.Group will be used to reference the k8s secret object, the Secret.Key will be used to reference a key inside
 // and the secret.Version will be ignored.
-// Environment variables will be named _FLYTE_<SecretGroup>_<SecretKey>. Files will be mounted on
+// Environment variables will be named _UNION_<SecretGroup>_<SecretKey>. Files will be mounted on
 // /etc/flyte/secrets/<SecretGroup>/<SecretKey>
 type K8sSecretInjector struct {
 	cfg *config.Config
