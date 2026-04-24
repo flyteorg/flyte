@@ -589,7 +589,7 @@ func (rayJobResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx 
 	}, nil
 }
 
-func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginContext, rayJob *rayv1.RayJob) (*pluginsCore.TaskInfo, error) {
+func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginContext, rayJob *rayv1.RayJob, taskTemplate *core.TaskTemplate) (*pluginsCore.TaskInfo, error) {
 	logPlugin, err := logs.InitializeLogPlugins(&logConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize log plugins. Error: %w", err)
@@ -615,6 +615,7 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 		PodUnixStartTime:     startTime,
 		PodUnixFinishTime:    finishTime,
 		ExtraTemplateVars:    []tasklog.TemplateVar{},
+		TaskTemplate:         taskTemplate,
 	}
 	if rayJob.Status.JobId != "" {
 		input.ExtraTemplateVars = append(
@@ -660,7 +661,12 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 
 func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 	rayJob := resource.(*rayv1.RayJob)
-	info, err := getEventInfoForRayJob(GetConfig().Logs, pluginContext, rayJob)
+	taskTemplate, err := pluginContext.TaskReader().Read(ctx)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+
+	info, err := getEventInfoForRayJob(GetConfig().Logs, pluginContext, rayJob, taskTemplate)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}

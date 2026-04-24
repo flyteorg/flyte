@@ -505,7 +505,7 @@ func TestHydrateNode(t *testing.T) {
 	t.Run("Failed hydrate node", func(t *testing.T) {
 		registerFilesSetup()
 		node := &core.Node{}
-		err := hydrateNode(node, rconfig.DefaultFilesConfig.Version, true)
+		err := hydrateNode(node, rconfig.DefaultFilesConfig.Version, true, "", "")
 		assert.NotNil(t, err)
 	})
 
@@ -540,7 +540,7 @@ func TestHydrateArrayNode(t *testing.T) {
 			},
 		},
 	}
-	err := hydrateNode(node, rconfig.DefaultFilesConfig.Version, true)
+	err := hydrateNode(node, rconfig.DefaultFilesConfig.Version, true, "", "")
 	assert.Nil(t, err)
 }
 
@@ -561,7 +561,7 @@ func TestHydrateGateNode(t *testing.T) {
 				},
 			},
 		}
-		err := hydrateNode(node, rconfig.DefaultFilesConfig.Version, true)
+		err := hydrateNode(node, rconfig.DefaultFilesConfig.Version, true, "", "")
 		assert.Nil(t, err)
 	})
 
@@ -579,7 +579,7 @@ func TestHydrateGateNode(t *testing.T) {
 				},
 			},
 		}
-		err := hydrateNode(node, rconfig.DefaultFilesConfig.Version, true)
+		err := hydrateNode(node, rconfig.DefaultFilesConfig.Version, true, "", "")
 		assert.Nil(t, err)
 	})
 
@@ -597,7 +597,7 @@ func TestHydrateGateNode(t *testing.T) {
 				},
 			},
 		}
-		err := hydrateNode(node, rconfig.DefaultFilesConfig.Version, true)
+		err := hydrateNode(node, rconfig.DefaultFilesConfig.Version, true, "", "")
 		assert.Nil(t, err)
 	})
 }
@@ -652,6 +652,66 @@ func TestHydrateTaskSpec(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, hydratedPodSpec.Containers[1].Args, 2)
 	assert.Contains(t, hydratedPodSpec.Containers[1].Args[1], "somewhere")
+}
+
+func TestHydrateNodeTaskOverridePodTemplate(t *testing.T) {
+	testScope := promutils.NewTestScope()
+	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
+	s, err := storage.NewDataStore(&storage.Config{
+		Type: storage.TypeMemory,
+	}, testScope.NewSubScope("flytectl"))
+	assert.Nil(t, err)
+	Client = s
+
+	podSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			{
+				Name: "primary",
+				Args: []string{
+					"pyflyte-fast-execute",
+					"--additional-distribution",
+					registrationRemotePackagePattern,
+					"--dest-dir",
+					registrationDestDirPattern,
+				},
+			},
+		},
+	}
+	podSpecStruct, err := utils.MarshalObjToStruct(podSpec)
+	assert.Nil(t, err)
+
+	node := &core.Node{
+		Target: &core.Node_TaskNode{
+			TaskNode: &core.TaskNode{
+				Reference: &core.TaskNode_ReferenceId{
+					ReferenceId: &core.Identifier{
+						ResourceType: core.ResourceType_TASK,
+						Project:      "flytesnacks",
+						Domain:       "development",
+						Name:         "n1",
+						Version:      "v1",
+					},
+				},
+				Overrides: &core.TaskNodeOverrides{
+					PodTemplate: &core.K8SPod{
+						PodSpec: podSpecStruct,
+					},
+				},
+			},
+		},
+	}
+
+	err = hydrateNode(node, rconfig.DefaultFilesConfig.Version, true, "s3://my-bucket/fast/archive.tar.gz", "/code/")
+	assert.NoError(t, err)
+
+	taskNode := node.GetTaskNode()
+	assert.NotNil(t, taskNode.GetOverrides().GetPodTemplate())
+	var hydratedPodSpec v1.PodSpec
+	err = utils.UnmarshalStructToObj(taskNode.GetOverrides().GetPodTemplate().GetPodSpec(), &hydratedPodSpec)
+	assert.NoError(t, err)
+	args := hydratedPodSpec.Containers[0].Args
+	assert.Equal(t, "s3://my-bucket/fast/archive.tar.gz", args[2])
+	assert.Equal(t, "/code/", args[4])
 }
 
 func TestLeftDiff(t *testing.T) {
