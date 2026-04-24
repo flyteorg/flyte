@@ -1694,8 +1694,10 @@ func literalMapToOutputs(m *core.LiteralMap) *task.Outputs {
 }
 
 // buildRunOutputBase generates the output base path for the run.
+// The returned path has no trailing slash so that callers that append
+// "/<segment>" produce a clean single-slash separator (avoiding "//").
 func buildRunOutputBase(storagePrefix, project, domain, name string) string {
-	return fmt.Sprintf("%s/%s/%s/%s/",
+	return fmt.Sprintf("%s/%s/%s/%s",
 		strings.TrimRight(storagePrefix, "/"),
 		project, domain, name)
 }

@@ -277,3 +277,27 @@ func TestGenerateCacheKeyForTask(t *testing.T) {
 		assert.NotEmpty(t, key)
 	})
 }
+
+func TestBuildRunOutputBase(t *testing.T) {
+	t.Run("does not end with trailing slash", func(t *testing.T) {
+		// Regression: a trailing slash caused SDK consumers doing
+		// f"{run_output_base}/{action_name}/..." to produce a doubled slash like
+		// "s3://bucket/proj/dev/run//action/1/error.pb".
+		got := buildRunOutputBase("s3://flyte-data", "flytesnacks", "development", "r782")
+		assert.Equal(t, "s3://flyte-data/flytesnacks/development/r782", got)
+		assert.False(t, strings.HasSuffix(got, "/"), "run output base must not end in '/', got %q", got)
+	})
+
+	t.Run("storagePrefix with trailing slash is normalized", func(t *testing.T) {
+		got := buildRunOutputBase("s3://flyte-data/", "flytesnacks", "development", "r782")
+		assert.Equal(t, "s3://flyte-data/flytesnacks/development/r782", got)
+	})
+
+	t.Run("appending an action segment yields single slash separator", func(t *testing.T) {
+		base := buildRunOutputBase("s3://flyte-data", "flytesnacks", "development", "r782")
+		// Simulate the SDK's f-string construction: f"{run_output_base}/{action_name}/1/error.pb"
+		errorPath := base + "/action-0/1/error.pb"
+		rest := strings.TrimPrefix(errorPath, "s3://")
+		assert.NotContains(t, rest, "//", "constructed error path must not contain '//', got %q", errorPath)
+	})
+}
