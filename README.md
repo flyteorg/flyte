@@ -1,3 +1,10 @@
+> [!IMPORTANT]
+> ## Flyte 2 Devbox is now available!
+>
+> Check out the guide [here](https://www.union.ai/docs/v2/flyte/user-guide/run-modes/running-devbox/) to get started.
+
+---
+
 # Flyte 2
 
 **Reliably orchestrate ML pipelines, models, and agents at scale — in pure Python.**
