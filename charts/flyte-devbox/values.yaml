@@ -11,7 +11,6 @@ docker-registry:
   service:
     type: NodePort
     nodePort: 30000
-
 flyte-binary:
   fullnameOverride: flyte-binary
   enabled: true
@@ -71,6 +70,7 @@ flyte-binary:
           enabled: true
           baseDomain: "localhost"
           scheme: "http"
+          ingressAppsPort: 30081
           defaultEnvVars:
             - FLYTE_AWS_ENDPOINT: 'http://rustfs.{{ .Release.Namespace }}:9000'
             - FLYTE_AWS_ACCESS_KEY_ID: rustfs
@@ -120,12 +120,10 @@ flyte-binary:
         - '*'
         verbs:
         - '*'
-
 rustfs:
   enabled: true
   accessKey: rustfs
   secretKey: rustfsstorage
-
 postgresql:
   fullnameOverride: postgresql
   enabled: true
@@ -149,7 +147,6 @@ postgresql:
     image:
       tag: sandbox
       pullPolicy: Never
-
 sandbox:
   # dev Routes requests to an instance of Flyte running locally on a developer's
   # development environment. This is only usable if the flyte-binary chart is disabled.

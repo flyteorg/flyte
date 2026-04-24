@@ -32,3 +32,7 @@ dependencies:
     version: v0.2.0
     repository: file://../flyte-binary
     condition: flyte-binary.enabled
+  - name: knative-serving
+    version: 1.18.3
+    repository: https://deeploy-knative-serving-charts.storage.googleapis.com/
+    condition: knative-serving.enabled
