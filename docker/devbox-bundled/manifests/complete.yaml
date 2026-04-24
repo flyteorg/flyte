@@ -437,6 +437,16 @@ data:
       secretName: flyte-binary-webhook-secret
       serviceName: flyte-binary-webhook
       servicePort: 443
+      # Use the Embedded injector with a K8s backend so the webhook reads the
+      # secret value at admission time from the k8s Secret written by
+      # SecretService and inlines the value into the pod spec.
+      secretManagerTypes:
+        - Embedded
+      embeddedSecretManagerConfig:
+        type: K8s
+        k8sConfig:
+          # Must match secret.kubernetes.namespace / manager.kubernetes.namespace.
+          namespace: flyte
 
     actions:
       kubernetes:
