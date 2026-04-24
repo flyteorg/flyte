@@ -117,7 +117,7 @@ func (s *SecretService) UpdateSecret(ctx context.Context, req *connect.Request[s
 	existing := &corev1.Secret{}
 	if err := s.k8sClient.Get(ctx, client.ObjectKey{Name: k8sSecretName, Namespace: secretNamespace()}, existing); err != nil {
 		if k8sErrors.IsNotFound(err) {
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", encodedName))
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", req.Msg.GetId().GetName()))
 		}
 		logger.Errorf(ctx, "failed to get secret %v: %v", encodedName, err)
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -136,7 +136,7 @@ func (s *SecretService) UpdateSecret(ctx context.Context, req *connect.Request[s
 
 	if err := s.k8sClient.Update(ctx, existing); err != nil {
 		if k8sErrors.IsNotFound(err) {
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", encodedName))
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", req.Msg.GetId().GetName()))
 		}
 		logger.Errorf(ctx, "failed to update secret %v: %v", encodedName, err)
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -161,7 +161,7 @@ func (s *SecretService) GetSecret(ctx context.Context, req *connect.Request[secr
 	k8sSecret := &corev1.Secret{}
 	if err := s.k8sClient.Get(ctx, client.ObjectKey{Name: k8sSecretName, Namespace: secretNamespace()}, k8sSecret); err != nil {
 		if k8sErrors.IsNotFound(err) {
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", encodedName))
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", req.Msg.GetId().GetName()))
 		}
 		logger.Errorf(ctx, "failed to get secret %v: %v", encodedName, err)
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -200,7 +200,7 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 
 	if err := s.k8sClient.Delete(ctx, k8sSecret); err != nil {
 		if k8sErrors.IsNotFound(err) {
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", encodedName))
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", req.Msg.GetId().GetName()))
 		}
 		logger.Errorf(ctx, "failed to delete secret %v: %v", encodedName, err)
 		return nil, connect.NewError(connect.CodeInternal, err)
