@@ -22,6 +22,13 @@ import (
 const (
 	managedSecretLabelKey   = "app.flyte.org/managed"
 	managedSecretLabelValue = "true"
+	projectLabelKey         = "app.flyte.org/project"
+	domainLabelKey          = "app.flyte.org/domain"
+
+	// defaultOrganization is a placeholder org used in the encoded secret ID
+	// because Flyte OSS v2 has no organization concept. It must match the
+	// organization label stamped on task pods by the executor.
+	defaultOrganization = "flyte"
 )
 
 // Ensure SecretService implements SecretServiceHandler at compile time.
@@ -37,25 +44,31 @@ func NewSecretService(k8sClient client.Client) *SecretService {
 	return &SecretService{k8sClient: k8sClient}
 }
 
-// getK8sSecretName returns the secret name and its k8s-safe MD5-hashed name.
-func getK8sSecretName(_ context.Context, id *secretpb.SecretIdentifier) (string, string, error) {
-	secretName := id.GetName()
-	// We need to encode to make sure it is a valid secret name
-	k8sSecretName := flytesecret.EncodeK8sSecretName(secretName)
-	return secretName, k8sSecretName, nil
+// validateScope enforces the valid scope combinations supported by the secret
+// fetcher: global, domain-only, or domain+project. Project is only valid when
+// a domain is also set.
+func validateScope(domain, project string) error {
+	if domain == "" && project != "" {
+		return fmt.Errorf("project-scoped secrets must also specify a domain, got project=%q domain=%q", project, domain)
+	}
+	return nil
 }
 
-// resolveSecretNamespace returns the Kubernetes namespace for a secret based on its project and domain.
-// If both project and domain are empty, it falls back to the configured default namespace.
-// If only one of them is set, it returns an error.
-func resolveSecretNamespace(project, domain string) (string, error) {
-	if project == "" && domain == "" {
-		return config.GetConfig().Kubernetes.Namespace, nil
+// getK8sSecretName returns the encoded secret ID (used as the data key inside
+// the Kubernetes Secret and as input to EncodeK8sSecretName) and the k8s-safe
+// hashed resource name. The encoding matches what the secret fetcher looks up
+// when a task pod is admitted.
+func getK8sSecretName(_ context.Context, id *secretpb.SecretIdentifier) (string, string, error) {
+	if err := validateScope(id.GetDomain(), id.GetProject()); err != nil {
+		return "", "", err
 	}
-	if project == "" || domain == "" {
-		return "", fmt.Errorf("project and domain must both be set or both be empty, got project=%q domain=%q", project, domain)
-	}
-	return fmt.Sprintf("%s-%s", project, domain), nil
+	encoded := flytesecret.EncodeSecretName(defaultOrganization, id.GetDomain(), id.GetProject(), id.GetName())
+	return encoded, flytesecret.EncodeK8sSecretName(encoded), nil
+}
+
+// secretNamespace returns the single namespace used for all flyte-managed secrets.
+func secretNamespace() string {
+	return config.GetConfig().Kubernetes.Namespace
 }
 
 func (s *SecretService) CreateSecret(ctx context.Context, req *connect.Request[secretpb.CreateSecretRequest]) (*connect.Response[secretpb.CreateSecretResponse], error) {
@@ -65,17 +78,13 @@ func (s *SecretService) CreateSecret(ctx context.Context, req *connect.Request[s
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	secretName, k8sSecretName, err := getK8sSecretName(ctx, req.Msg.GetId())
-	if err != nil {
-		return nil, err
-	}
-	logger.Debugf(ctx, "decoded secret name %v, k8s secret name %v", secretName, k8sSecretName)
-
-	namespace, err := resolveSecretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	encodedName, k8sSecretName, err := getK8sSecretName(ctx, req.Msg.GetId())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
-	k8sSecret, err := buildK8sSecret(secretName, k8sSecretName, namespace, req.Msg.GetSecretSpec())
+	logger.Debugf(ctx, "encoded secret name %v, k8s secret name %v", encodedName, k8sSecretName)
+
+	k8sSecret, err := buildK8sSecret(encodedName, k8sSecretName, secretNamespace(), req.Msg.GetId(), req.Msg.GetSecretSpec())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
@@ -84,7 +93,7 @@ func (s *SecretService) CreateSecret(ctx context.Context, req *connect.Request[s
 		if k8sErrors.IsAlreadyExists(err) {
 			return nil, connect.NewError(connect.CodeAlreadyExists, err)
 		}
-		logger.Errorf(ctx, "failed to create secret %v: %v", secretName, err)
+		logger.Errorf(ctx, "failed to create secret %v: %v", encodedName, err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -98,32 +107,28 @@ func (s *SecretService) UpdateSecret(ctx context.Context, req *connect.Request[s
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	secretName, k8sSecretName, err := getK8sSecretName(ctx, req.Msg.GetId())
-	if err != nil {
-		return nil, err
-	}
-	logger.Debugf(ctx, "decoded secret name %v, k8s secret name %v", secretName, k8sSecretName)
-
-	// Get the existing secret first to obtain the ResourceVersion required by controller-runtime Update.
-	namespace, err := resolveSecretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	encodedName, k8sSecretName, err := getK8sSecretName(ctx, req.Msg.GetId())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
+	logger.Debugf(ctx, "encoded secret name %v, k8s secret name %v", encodedName, k8sSecretName)
+
+	// Get the existing secret first to obtain the ResourceVersion required by controller-runtime Update.
 	existing := &corev1.Secret{}
-	if err := s.k8sClient.Get(ctx, client.ObjectKey{Name: k8sSecretName, Namespace: namespace}, existing); err != nil {
+	if err := s.k8sClient.Get(ctx, client.ObjectKey{Name: k8sSecretName, Namespace: secretNamespace()}, existing); err != nil {
 		if k8sErrors.IsNotFound(err) {
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", secretName))
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", req.Msg.GetId().GetName()))
 		}
-		logger.Errorf(ctx, "failed to get secret %v: %v", secretName, err)
+		logger.Errorf(ctx, "failed to get secret %v: %v", encodedName, err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	switch v := req.Msg.GetSecretSpec().GetValue().(type) {
 	case *secretpb.SecretSpec_StringValue:
-		existing.StringData = map[string]string{secretName: v.StringValue}
+		existing.StringData = map[string]string{encodedName: v.StringValue}
 		existing.Data = nil
 	case *secretpb.SecretSpec_BinaryValue:
-		existing.Data = map[string][]byte{secretName: v.BinaryValue}
+		existing.Data = map[string][]byte{encodedName: v.BinaryValue}
 		existing.StringData = nil
 	default:
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("string or binary value expected, got %T", v))
@@ -131,9 +136,9 @@ func (s *SecretService) UpdateSecret(ctx context.Context, req *connect.Request[s
 
 	if err := s.k8sClient.Update(ctx, existing); err != nil {
 		if k8sErrors.IsNotFound(err) {
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", secretName))
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", req.Msg.GetId().GetName()))
 		}
-		logger.Errorf(ctx, "failed to update secret %v: %v", secretName, err)
+		logger.Errorf(ctx, "failed to update secret %v: %v", encodedName, err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -147,22 +152,18 @@ func (s *SecretService) GetSecret(ctx context.Context, req *connect.Request[secr
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	secretName, k8sSecretName, err := getK8sSecretName(ctx, req.Msg.GetId())
-	if err != nil {
-		return nil, err
-	}
-	logger.Debugf(ctx, "decoded secret name %v, k8s secret name %v", secretName, k8sSecretName)
-
-	namespace, err := resolveSecretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	encodedName, k8sSecretName, err := getK8sSecretName(ctx, req.Msg.GetId())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
+	logger.Debugf(ctx, "encoded secret name %v, k8s secret name %v", encodedName, k8sSecretName)
+
 	k8sSecret := &corev1.Secret{}
-	if err := s.k8sClient.Get(ctx, client.ObjectKey{Name: k8sSecretName, Namespace: namespace}, k8sSecret); err != nil {
+	if err := s.k8sClient.Get(ctx, client.ObjectKey{Name: k8sSecretName, Namespace: secretNamespace()}, k8sSecret); err != nil {
 		if k8sErrors.IsNotFound(err) {
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", secretName))
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", req.Msg.GetId().GetName()))
 		}
-		logger.Errorf(ctx, "failed to get secret %v: %v", secretName, err)
+		logger.Errorf(ctx, "failed to get secret %v: %v", encodedName, err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -184,28 +185,24 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	secretName, k8sSecretName, err := getK8sSecretName(ctx, req.Msg.GetId())
-	if err != nil {
-		return nil, err
-	}
-	logger.Debugf(ctx, "decoded secret name %v, k8s secret name %v", secretName, k8sSecretName)
-
-	namespace, err := resolveSecretNamespace(req.Msg.GetId().GetProject(), req.Msg.GetId().GetDomain())
+	encodedName, k8sSecretName, err := getK8sSecretName(ctx, req.Msg.GetId())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
+	logger.Debugf(ctx, "encoded secret name %v, k8s secret name %v", encodedName, k8sSecretName)
+
 	k8sSecret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      k8sSecretName,
-			Namespace: namespace,
+			Namespace: secretNamespace(),
 		},
 	}
 
 	if err := s.k8sClient.Delete(ctx, k8sSecret); err != nil {
 		if k8sErrors.IsNotFound(err) {
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", secretName))
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", req.Msg.GetId().GetName()))
 		}
-		logger.Errorf(ctx, "failed to delete secret %v: %v", secretName, err)
+		logger.Errorf(ctx, "failed to delete secret %v: %v", encodedName, err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -216,16 +213,26 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 func (s *SecretService) ListSecrets(ctx context.Context, req *connect.Request[secretpb.ListSecretsRequest]) (*connect.Response[secretpb.ListSecretsResponse], error) {
 	logger.Debugf(ctx, "SecretService.ListSecrets called")
 
-	namespace, err := resolveSecretNamespace(req.Msg.GetProject(), req.Msg.GetDomain())
-	if err != nil {
+	reqProject := req.Msg.GetProject()
+	reqDomain := req.Msg.GetDomain()
+	if err := validateScope(reqDomain, reqProject); err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
+
+	matchLabels := client.MatchingLabels{managedSecretLabelKey: managedSecretLabelValue}
+	if reqDomain != "" {
+		matchLabels[domainLabelKey] = reqDomain
+	}
+	if reqProject != "" {
+		matchLabels[projectLabelKey] = reqProject
+	}
+
 	k8sSecretList := &corev1.SecretList{}
 	listOpts := []client.ListOption{
-		client.InNamespace(namespace),
+		client.InNamespace(secretNamespace()),
 		client.Limit(int64(req.Msg.GetLimit())),
 		client.Continue(req.Msg.GetToken()),
-		client.MatchingLabels{managedSecretLabelKey: managedSecretLabelValue},
+		matchLabels,
 	}
 
 	if err := s.k8sClient.List(ctx, k8sSecretList, listOpts...); err != nil {
@@ -239,17 +246,21 @@ func (s *SecretService) ListSecrets(ctx context.Context, req *connect.Request[se
 			logger.Errorf(ctx, "unexpected number of keys in secret %v: %d", k8sSecret.Name, len(k8sSecret.Data))
 			continue
 		}
-		var secretName string
+		var encodedKey string
 		for key := range k8sSecret.Data {
-			secretName = key
+			encodedKey = key
 			break
+		}
+		components, err := flytesecret.DecodeSecretName(encodedKey)
+		if err != nil {
+			logger.Errorf(ctx, "failed to decode secret key %q in %v: %v", encodedKey, k8sSecret.Name, err)
+			continue
 		}
 		rawSecrets = append(rawSecrets, &secretpb.Secret{
 			Id: &secretpb.SecretIdentifier{
-				Organization: req.Msg.GetOrganization(),
-				Project:      req.Msg.GetProject(),
-				Domain:       req.Msg.GetDomain(),
-				Name:         secretName,
+				Project: components.Project,
+				Domain:  components.Domain,
+				Name:    components.Name,
 			},
 			SecretMetadata: &secretpb.SecretMetadata{
 				CreatedTime:  timestamppb.New(k8sSecret.GetCreationTimestamp().Time),
@@ -280,23 +291,32 @@ func fullyPresentStatus() *secretpb.SecretStatus {
 	}
 }
 
-// buildK8sSecret constructs a Kubernetes Secret object from the decoded secret name and spec.
-func buildK8sSecret(secretName, k8sSecretName, namespace string, spec *secretpb.SecretSpec) (*corev1.Secret, error) {
+// buildK8sSecret constructs a Kubernetes Secret object. The encoded secret ID
+// (full org/domain/project/name form produced by flytesecret.EncodeSecretName)
+// is used as the data map key so the fetcher can read it back by the same key.
+func buildK8sSecret(encodedName, k8sSecretName, namespace string, id *secretpb.SecretIdentifier, spec *secretpb.SecretSpec) (*corev1.Secret, error) {
+	labels := map[string]string{
+		managedSecretLabelKey: managedSecretLabelValue,
+	}
+	if id.GetDomain() != "" {
+		labels[domainLabelKey] = id.GetDomain()
+	}
+	if id.GetProject() != "" {
+		labels[projectLabelKey] = id.GetProject()
+	}
 	k8sSecret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      k8sSecretName,
 			Namespace: namespace,
-			Labels: map[string]string{
-				managedSecretLabelKey: managedSecretLabelValue,
-			},
+			Labels:    labels,
 		},
 	}
 
 	switch v := spec.GetValue().(type) {
 	case *secretpb.SecretSpec_StringValue:
-		k8sSecret.StringData = map[string]string{secretName: v.StringValue}
+		k8sSecret.StringData = map[string]string{encodedName: v.StringValue}
 	case *secretpb.SecretSpec_BinaryValue:
-		k8sSecret.Data = map[string][]byte{secretName: v.BinaryValue}
+		k8sSecret.Data = map[string][]byte{encodedName: v.BinaryValue}
 	default:
 		return nil, fmt.Errorf("string or binary value expected, got %T", v)
 	}

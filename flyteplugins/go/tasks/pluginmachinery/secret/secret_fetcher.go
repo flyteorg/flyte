@@ -8,7 +8,6 @@ import (
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	awssm "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -49,7 +48,7 @@ func NewSecretFetcher(ctx context.Context, cfg config.EmbeddedSecretManagerConfi
 		return NewAzureSecretFetcher(client), nil
 	case config.EmbeddedSecretManagerTypeK8s:
 		logger.Infof(ctx, "use k8s secret manager service")
-		kubeConfig, err := rest.InClusterConfig()
+		kubeConfig, err := resolveKubeConfig(ctx)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to get kubernetes config: %v", err)
 			return nil, fmt.Errorf("failed to start secret manager service due to %v", err)

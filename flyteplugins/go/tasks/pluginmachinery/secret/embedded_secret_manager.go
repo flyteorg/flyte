@@ -115,74 +115,51 @@ func encodeSecretName(components *SecretNameComponents) string {
 func (i *EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, components *SecretNameComponents) (*SecretValue, string, error) {
 	componentsCopy := *components // Create a copy to avoid modifying the original
 
-	// Attempt to lookup from the cache
+	// Compute encoded IDs for each scope in priority order.
 	projectDomainScopedSecret := encodeSecretName(&componentsCopy)
 	projectDomainScopedImagePullSecretName := ToImagePullK8sName(componentsCopy)
-	if cachedValue, err := i.secretCache.Get(ctx, projectDomainScopedSecret); err == nil {
-		logger.Debugf(ctx, "Found secret [%s] in cache.", projectDomainScopedSecret)
-		return &cachedValue, projectDomainScopedImagePullSecretName, nil
-	}
 
 	componentsCopy.Project = EmptySecretScope
 	domainScopedSecret := encodeSecretName(&componentsCopy)
 	domainScopedImagePullSecretName := ToImagePullK8sName(componentsCopy)
-	if cachedValue, err := i.secretCache.Get(ctx, domainScopedSecret); err == nil {
-		logger.Debugf(ctx, "Found secret [%s] in cache.", domainScopedSecret)
-		return &cachedValue, domainScopedImagePullSecretName, nil
-	}
 
 	componentsCopy.Domain = EmptySecretScope
 	orgScopedSecret := encodeSecretName(&componentsCopy)
 	orgScopedImagePullSecretName := ToImagePullK8sName(componentsCopy)
-	if cachedValue, err := i.secretCache.Get(ctx, orgScopedSecret); err == nil {
-		logger.Debugf(ctx, "Found secret [%s] in cache.", orgScopedSecret)
-		return &cachedValue, orgScopedImagePullSecretName, nil
+
+	scopes := []struct {
+		secretID            string
+		imagePullSecretName string
+	}{
+		{projectDomainScopedSecret, projectDomainScopedImagePullSecretName},
+		{domainScopedSecret, domainScopedImagePullSecretName},
+		{orgScopedSecret, orgScopedImagePullSecretName},
 	}
 
-	logger.Infof(ctx, "Secret [%s] not found in cache. Fetching from secret fetchers.", components)
+	// Walk scopes in priority order (project+domain → domain → org). For each
+	// scope, check the cache first; on miss, fall through to the fetchers for
+	// that same scope. Only move to the next broader scope when the current
+	// one is confirmed absent (cache miss AND fetchers return NotFound).
+	for _, scope := range scopes {
+		if cachedValue, err := i.secretCache.Get(ctx, scope.secretID); err == nil {
+			logger.Debugf(ctx, "Found secret [%s] in cache.", scope.secretID)
+			return &cachedValue, scope.imagePullSecretName, nil
+		}
 
-	for _, secretFetcher := range i.secretFetchers {
-		// Fetch project-domain scoped secret
-		secretValue, err := secretFetcher.GetSecretValue(ctx, projectDomainScopedSecret)
-		if err == nil {
-			if err := i.secretCache.Set(ctx, projectDomainScopedSecret, *secretValue); err != nil {
-				logger.Warnf(ctx, "Failed to cache secret [%s]: %v", projectDomainScopedSecret, err)
+		for _, secretFetcher := range i.secretFetchers {
+			secretValue, err := secretFetcher.GetSecretValue(ctx, scope.secretID)
+			if err == nil {
+				if cacheErr := i.secretCache.Set(ctx, scope.secretID, *secretValue); cacheErr != nil {
+					logger.Warnf(ctx, "Failed to cache secret [%s]: %v", scope.secretID, cacheErr)
+				}
+				return secretValue, scope.imagePullSecretName, nil
 			}
-
-			return secretValue, projectDomainScopedImagePullSecretName, nil
-		}
-
-		if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
-			return nil, "", err
-		}
-
-		// Fetch domain scoped secret
-		secretValue, err = secretFetcher.GetSecretValue(ctx, domainScopedSecret)
-		if err == nil {
-			if err := i.secretCache.Set(ctx, domainScopedSecret, *secretValue); err != nil {
-				logger.Warnf(ctx, "Failed to cache secret [%s]: %v", domainScopedSecret, err)
+			if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
+				return nil, "", err
 			}
-
-			return secretValue, domainScopedImagePullSecretName, nil
+			// NotFound from this fetcher — try the next fetcher at the same scope.
 		}
-
-		if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
-			return nil, "", err
-		}
-
-		// Fetch organization scoped secret
-		secretValue, err = secretFetcher.GetSecretValue(ctx, orgScopedSecret)
-		if err == nil {
-			if err := i.secretCache.Set(ctx, orgScopedSecret, *secretValue); err != nil {
-				logger.Warnf(ctx, "Failed to cache secret [%s]: %v", orgScopedSecret, err)
-			}
-
-			return secretValue, orgScopedImagePullSecretName, err
-		}
-
-		if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
-			return nil, "", err
-		}
+		// All fetchers reported NotFound at this scope — fall through to the next broader scope.
 	}
 
 	return nil, "", stdlibErrors.Errorf(ErrCodeSecretNotFoundAcrossAllScopes, SecretSecretNotFoundAcrossAllScopes)
@@ -344,21 +321,19 @@ func (i *EmbeddedSecretManagerInjector) Inject(
 }
 
 func (i *EmbeddedSecretManagerInjector) injectAsEnvVar(secret *core.Secret, secretValue string, pod *corev1.Pod) {
+	valueEnvVarName := i.parentCfg.SecretEnvVarPrefix + strings.ToUpper(secret.GetKey())
+	if secret.GetEnvVar() != "" {
+		valueEnvVarName = secret.EnvVar
+	}
 	envVars := []corev1.EnvVar{
 		{
 			Name:  SecretEnvVarPrefix,
 			Value: i.parentCfg.SecretEnvVarPrefix,
 		},
 		{
-			Name:  i.parentCfg.SecretEnvVarPrefix + strings.ToUpper(secret.GetKey()),
+			Name:  valueEnvVarName,
 			Value: secretValue,
 		},
-	}
-	if secret.GetEnvVar() != "" {
-		envVars = append(envVars, corev1.EnvVar{
-			Name:  secret.EnvVar,
-			Value: secretValue,
-		})
 	}
 	pod.Spec.InitContainers = AppendEnvVars(pod.Spec.InitContainers, envVars...)
 	pod.Spec.Containers = AppendEnvVars(pod.Spec.Containers, envVars...)
