@@ -93,7 +93,7 @@ func TestDeploy_Create(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	err = c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: "proj-dev"}, ksvc)
+		client.ObjectKey{Name: "myapp", Namespace: appNamespace}, ksvc)
 	require.NoError(t, err)
 	assert.Equal(t, "proj", ksvc.Labels[labelProject])
 	assert.Equal(t, "dev", ksvc.Labels[labelDomain])
@@ -113,7 +113,7 @@ func TestDeploy_UpdateOnSpecChange(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: "proj-dev"}, ksvc))
+		client.ObjectKey{Name: "myapp", Namespace: appNamespace}, ksvc))
 	assert.Equal(t, "nginx:2.0", ksvc.Spec.Template.Spec.Containers[0].Image)
 }
 
@@ -125,14 +125,14 @@ func TestDeploy_SkipUpdateWhenUnchanged(t *testing.T) {
 	// Get initial resource version.
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: "proj-dev"}, ksvc))
+		client.ObjectKey{Name: "myapp", Namespace: appNamespace}, ksvc))
 	initialRV := ksvc.ResourceVersion
 
 	// Deploy same spec — should be a no-op.
 	require.NoError(t, c.Deploy(context.Background(), app))
 
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: "proj-dev"}, ksvc))
+		client.ObjectKey{Name: "myapp", Namespace: appNamespace}, ksvc))
 	assert.Equal(t, initialRV, ksvc.ResourceVersion, "resource version should not change on no-op deploy")
 }
 
@@ -146,7 +146,7 @@ func TestStop(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: "proj-dev"}, ksvc))
+		client.ObjectKey{Name: "myapp", Namespace: appNamespace}, ksvc))
 	assert.Equal(t, "0", ksvc.Spec.Template.Annotations["autoscaling.knative.dev/max-scale"])
 }
 
@@ -167,7 +167,7 @@ func TestDelete(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	err := c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: "proj-dev"}, ksvc)
+		client.ObjectKey{Name: "myapp", Namespace: appNamespace}, ksvc)
 	assert.True(t, k8serrors.IsNotFound(err))
 }
 
@@ -207,7 +207,7 @@ func TestGetStatus_CurrentReplicas(t *testing.T) {
 	ksvc := &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "myapp",
-			Namespace: "proj-dev",
+			Namespace: appNamespace,
 			Labels: map[string]string{
 				labelAppManaged: "true",
 				labelProject:    "proj",
@@ -221,7 +221,7 @@ func TestGetStatus_CurrentReplicas(t *testing.T) {
 	}
 	ksvc.Status.LatestReadyRevisionName = "myapp-00001"
 
-	rev := testRevision("myapp-00001", "proj-dev", 4)
+	rev := testRevision("myapp-00001", appNamespace, 4)
 
 	fc := fake.NewClientBuilder().
 		WithScheme(s).
@@ -245,7 +245,7 @@ func TestList(t *testing.T) {
 	ksvc1 := &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "app1",
-			Namespace: "proj-dev",
+			Namespace: appNamespace,
 			Labels: map[string]string{
 				labelAppManaged: "true",
 				labelProject:    "proj",
@@ -298,7 +298,7 @@ func TestGetReplicas(t *testing.T) {
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "myapp-abc",
-			Namespace: "proj-dev",
+			Namespace: appNamespace,
 			Labels: map[string]string{
 				labelAppName: "myapp",
 			},
@@ -329,7 +329,7 @@ func TestDeleteReplica(t *testing.T) {
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "myapp-abc",
-			Namespace: "proj-dev",
+			Namespace: appNamespace,
 		},
 	}
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(pod).Build()
@@ -345,7 +345,7 @@ func TestDeleteReplica(t *testing.T) {
 	require.NoError(t, c.DeleteReplica(context.Background(), replicaID))
 
 	err := fc.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-abc", Namespace: "proj-dev"}, &corev1.Pod{})
+		client.ObjectKey{Name: "myapp-abc", Namespace: appNamespace}, &corev1.Pod{})
 	assert.True(t, k8serrors.IsNotFound(err))
 }
 
@@ -353,7 +353,7 @@ func TestKserviceEventToWatchResponse(t *testing.T) {
 	ksvc := &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "myapp",
-			Namespace: "proj-dev",
+			Namespace: appNamespace,
 			Annotations: map[string]string{
 				annotationAppID: "proj/dev/myapp",
 			},
@@ -590,7 +590,7 @@ func TestWatch_ReconnectsOnChannelClose(t *testing.T) {
 	require.NoError(t, err)
 
 	// Send one event on w1 then close it (simulates K8s timeout/disconnect).
-	w1.Add(testKsvc("myapp", "proj-dev", "100"))
+	w1.Add(testKsvc("myapp", appNamespace, "100"))
 	w1.Stop()
 
 	recv1 := <-ch
@@ -599,7 +599,7 @@ func TestWatch_ReconnectsOnChannelClose(t *testing.T) {
 	// After reconnect, send an event on w2.
 	go func() {
 		time.Sleep(10 * time.Millisecond)
-		w2.Add(testKsvc("myapp", "proj-dev", "200"))
+		w2.Add(testKsvc("myapp", appNamespace, "200"))
 	}()
 
 	recv2 := <-ch
@@ -626,7 +626,7 @@ func TestWatch_ReconnectsOnErrorEvent(t *testing.T) {
 
 	go func() {
 		time.Sleep(10 * time.Millisecond)
-		w2.Add(testKsvc("myapp", "proj-dev", "300"))
+		w2.Add(testKsvc("myapp", appNamespace, "300"))
 	}()
 
 	resp := <-ch
@@ -657,7 +657,7 @@ func TestWatch_BookmarkUpdatesResourceVersion(t *testing.T) {
 	// Deliver an event from w2 after reconnect.
 	go func() {
 		time.Sleep(10 * time.Millisecond)
-		w2.Add(testKsvc("myapp", "proj-dev", "1000"))
+		w2.Add(testKsvc("myapp", appNamespace, "1000"))
 	}()
 
 	resp := <-ch
