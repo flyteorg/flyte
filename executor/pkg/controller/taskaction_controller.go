@@ -21,10 +21,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"k8s.io/client-go/util/retry"
 	"reflect"
 	"strings"
 	"time"
+
+	"k8s.io/client-go/util/retry"
 
 	"connectrpc.com/connect"
 	corev1 "k8s.io/api/core/v1"
@@ -549,8 +550,7 @@ func toActionErrorInfo(err *core.ExecutionError) *workflow.ErrorInfo {
 }
 
 // errorStateFromExecError converts a plugin core.ExecutionError into the
-// CR-persisted ErrorState. The Code (e.g. "OOMKilled") would otherwise be
-// dropped by toActionErrorInfo, since workflow.ErrorInfo has no Code field.
+// CR-persisted ErrorState.
 func errorStateFromExecError(err *core.ExecutionError) *flyteorgv1.ErrorState {
 	if err == nil {
 		return nil
