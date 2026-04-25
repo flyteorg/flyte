@@ -40,6 +40,7 @@ type ActionUpdate struct {
 	IsDeleted        bool
 	TaskType         string
 	ShortName        string
+	ErrorState       *executorv1.ErrorState
 }
 
 const labelTerminalStatusRecorded = "flyte.org/terminal-status-recorded"
@@ -527,6 +528,7 @@ func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, e
 		IsDeleted:        eventType == watch.Deleted,
 		TaskType:         taskAction.Spec.TaskType,
 		ShortName:        shortName,
+		ErrorState:       taskAction.Status.ErrorState,
 	}
 }
 
