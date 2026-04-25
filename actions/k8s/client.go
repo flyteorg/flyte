@@ -40,6 +40,10 @@ type ActionUpdate struct {
 	IsDeleted        bool
 	TaskType         string
 	ShortName        string
+	// ErrorState carries the structured error (Code/Kind/Message) for failed
+	// attempts, projected from TaskAction.Status.ErrorState. nil when there is
+	// no recorded error.
+	ErrorState *executorv1.ErrorState
 }
 
 const labelTerminalStatusRecorded = "flyte.org/terminal-status-recorded"
@@ -527,6 +531,7 @@ func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, e
 		IsDeleted:        eventType == watch.Deleted,
 		TaskType:         taskAction.Spec.TaskType,
 		ShortName:        shortName,
+		ErrorState:       taskAction.Status.ErrorState,
 	}
 }
 

@@ -548,6 +548,27 @@ func toActionErrorInfo(err *core.ExecutionError) *workflow.ErrorInfo {
 	return out
 }
 
+// errorStateFromExecError converts a plugin core.ExecutionError into the
+// CR-persisted ErrorState. The Code (e.g. "OOMKilled") would otherwise be
+// dropped by toActionErrorInfo, since workflow.ErrorInfo has no Code field.
+func errorStateFromExecError(err *core.ExecutionError) *flyteorgv1.ErrorState {
+	if err == nil {
+		return nil
+	}
+	kind := ""
+	switch err.GetKind() {
+	case core.ExecutionError_USER:
+		kind = "USER"
+	case core.ExecutionError_SYSTEM:
+		kind = "SYSTEM"
+	}
+	return &flyteorgv1.ErrorState{
+		Code:    err.GetCode(),
+		Kind:    kind,
+		Message: err.GetMessage(),
+	}
+}
+
 func toClusterEvents(phaseInfo pluginsCore.PhaseInfo, fallbackTime *timestamppb.Timestamp) []*workflow.ClusterEvent {
 	info := phaseInfo.Info()
 	if phaseInfo.Reason() == "" && (info == nil || len(info.AdditionalReasons) == 0) {
@@ -658,6 +679,7 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 		msg = info.Reason()
 		if info.Err() != nil {
 			msg = info.Err().GetMessage()
+			ta.Status.ErrorState = errorStateFromExecError(info.Err())
 		}
 		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
 			flyteorgv1.ConditionReasonPermanentFailure, msg)
@@ -669,6 +691,7 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 		msg = info.Reason()
 		if info.Err() != nil {
 			msg = info.Err().GetMessage()
+			ta.Status.ErrorState = errorStateFromExecError(info.Err())
 		}
 		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
 			flyteorgv1.ConditionReasonRetryableFailure, msg)
