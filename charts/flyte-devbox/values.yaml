@@ -78,6 +78,13 @@ flyte-binary:
             - _U_EP_OVERRIDE: 'flyte-binary-http.{{ .Release.Namespace }}:8090'
             - _U_INSECURE: "true"
             - _U_USE_ACTIONS: "1"
+      webhook:
+        secretManagerTypes:
+          - Embedded
+        embeddedSecretManagerConfig:
+          type: K8s
+          k8sConfig:
+            namespace: '{{ .Release.Namespace }}'
     inlineConfigMap: '{{ include "flyte-devbox.configuration.inlineConfigMap" . }}'
   clusterResourceTemplates:
     inlineConfigMap: '{{ include "flyte-devbox.clusterResourceTemplates.inlineConfigMap" . }}'
