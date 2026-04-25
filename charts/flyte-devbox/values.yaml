@@ -12,6 +12,12 @@ docker-registry:
   service:
     type: NodePort
     nodePort: 30000
+  # Run as root so the registry can write to the hostPath PV mount, which
+  # is created as root:root 755 by the node and cannot be chowned via fsGroup.
+  securityContext:
+    runAsUser: 0
+  containerSecurityContext:
+    runAsUser: 0
 flyte-binary:
   fullnameOverride: flyte-binary
   enabled: true

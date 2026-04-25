@@ -8482,7 +8482,7 @@ spec:
           name: data
       securityContext:
         fsGroup: 1000
-        runAsUser: 1000
+        runAsUser: 0
       volumes:
       - configMap:
           name: docker-registry-config
