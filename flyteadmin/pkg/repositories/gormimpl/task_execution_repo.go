@@ -88,6 +88,11 @@ func (r *TaskExecutionRepo) Update(ctx context.Context, execution models.TaskExe
 	if err := tx.Error; err != nil {
 		return r.errorTransformer.ToFlyteAdminError(err)
 	}
+
+	if tx.RowsAffected == 0 {
+		return flyteAdminDbErrors.GetMissingEntityError("task execution", nil)
+	}
+
 	return nil
 }
 
