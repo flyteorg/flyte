@@ -7774,6 +7774,13 @@ data:
         ephemeralStorage: 0
         gpu: 0
         memory: 0
+    webhook:
+      embeddedSecretManagerConfig:
+        k8sConfig:
+          namespace: 'flyte'
+        type: K8s
+      secretManagerTypes:
+      - Embedded
 kind: ConfigMap
 metadata:
   labels:
@@ -8344,6 +8351,26 @@ metadata:
     app.kubernetes.io/name: flyte-devbox
     app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-devbox-0.1.0
+  name: flyte-devbox-registry-storage
+  namespace: flyte
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 20Gi
+  hostPath:
+    path: /var/lib/flyte/storage/registry
+  storageClassName: manual
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-devbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-devbox-0.1.0
   name: flyte-devbox-rustfs-storage
   namespace: flyte
 spec:
@@ -8354,6 +8381,26 @@ spec:
   hostPath:
     path: /var/lib/flyte/storage/rustfs
   storageClassName: manual
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-devbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-devbox-0.1.0
+  name: flyte-devbox-registry-storage
+  namespace: flyte
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: manual
+  volumeName: flyte-devbox-registry-storage
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -8444,46 +8491,6 @@ spec:
         persistentVolumeClaim:
           claimName: flyte-devbox-registry-storage
 ---
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
-  name: flyte-devbox-registry-storage
-  namespace: flyte
-spec:
-  accessModes:
-  - ReadWriteOnce
-  capacity:
-    storage: 20Gi
-  hostPath:
-    path: /var/lib/flyte/storage/registry
-  storageClassName: manual
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
-  name: flyte-devbox-registry-storage
-  namespace: flyte
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 20Gi
-  storageClassName: manual
-  volumeName: flyte-devbox-registry-storage
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -8506,7 +8513,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 057bc8cd8f198da64d01b746859585efb371b57b3215ffea2e46a7b83ad7b820
+        checksum/configuration: 53ebdf49e3406c689b89d5bf7c25698f0c4f123ab016f51533e6331fe173a744
         checksum/configuration-secret: e70194084619f4a1d4017093aac6367047167107fd0222513a32a61734629cac
       labels:
         app.kubernetes.io/component: flyte-binary
