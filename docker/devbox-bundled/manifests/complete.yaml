@@ -7774,6 +7774,13 @@ data:
         ephemeralStorage: 0
         gpu: 0
         memory: 0
+    webhook:
+      embeddedSecretManagerConfig:
+        k8sConfig:
+          namespace: 'flyte'
+        type: K8s
+      secretManagerTypes:
+      - Embedded
 kind: ConfigMap
 metadata:
   labels:
@@ -8506,7 +8513,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 057bc8cd8f198da64d01b746859585efb371b57b3215ffea2e46a7b83ad7b820
+        checksum/configuration: 53ebdf49e3406c689b89d5bf7c25698f0c4f123ab016f51533e6331fe173a744
         checksum/configuration-secret: e70194084619f4a1d4017093aac6367047167107fd0222513a32a61734629cac
       labels:
         app.kubernetes.io/component: flyte-binary
