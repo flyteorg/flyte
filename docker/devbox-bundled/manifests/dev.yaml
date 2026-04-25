@@ -8139,8 +8139,49 @@ spec:
       - configMap:
           name: docker-registry-config
         name: docker-registry-config
-      - emptyDir: {}
-        name: data
+      - name: data
+        persistentVolumeClaim:
+          claimName: flyte-devbox-registry-storage
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-devbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-devbox-0.1.0
+  name: flyte-devbox-registry-storage
+  namespace: flyte
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 20Gi
+  hostPath:
+    path: /var/lib/flyte/storage/registry
+  storageClassName: manual
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-devbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-devbox-0.1.0
+  name: flyte-devbox-registry-storage
+  namespace: flyte
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: manual
+  volumeName: flyte-devbox-registry-storage
 ---
 apiVersion: apps/v1
 kind: Deployment

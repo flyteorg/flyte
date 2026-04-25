@@ -5,7 +5,8 @@ docker-registry:
     tag: sandbox
     pullPolicy: Never
   persistence:
-    enabled: false
+    enabled: true
+    existingClaim: flyte-devbox-registry-storage
   secrets:
     haSharedSecret: flytesandboxsecret
   service:
