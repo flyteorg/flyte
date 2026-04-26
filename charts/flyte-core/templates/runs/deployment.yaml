@@ -1,0 +1,88 @@
+{{- if .Values.runs.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "flyte-core.componentFullname" (dict "ctx" $ "component" "runs") }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "flyte-core.componentLabels" (dict "ctx" $ "component" "runs") | nindent 4 }}
+spec:
+  replicas: {{ .Values.runs.replicaCount }}
+  selector:
+    matchLabels: {{- include "flyte-core.selectorLabels" (dict "ctx" $ "component" "runs") | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/runs/configmap.yaml") . | sha256sum }}
+        {{- with .Values.runs.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels: {{- include "flyte-core.selectorLabels" (dict "ctx" $ "component" "runs") | nindent 8 }}
+        {{- with .Values.runs.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "flyte-core.serviceAccountName" . }}
+      {{- with .Values.runs.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.runs.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.runs.affinity }}
+      affinity: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: runs
+          image: "{{ .Values.image.repository }}/runs:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/usr/local/bin/flyte-runs"]
+          args: ["--config", "/etc/flyte/config.d/*.yaml"]
+          ports:
+            - name: http
+              containerPort: {{ .Values.runs.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 30
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            {{- with .Values.runs.extraEnvVars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/flyte/config.d
+            {{- if .Values.database.password }}
+            - name: db-password
+              mountPath: /etc/flyte/db-password
+              readOnly: true
+            {{- end }}
+          {{- with .Values.runs.resources }}
+          resources: {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: config
+          projected:
+            sources:
+              - configMap:
+                  name: {{ include "flyte-core.componentConfigMapName" (dict "ctx" $ "component" "runs") }}
+        {{- if .Values.database.password }}
+        - name: db-password
+          secret:
+            secretName: {{ include "flyte-core.dbSecretName" . }}
+        {{- end }}
+{{- end }}

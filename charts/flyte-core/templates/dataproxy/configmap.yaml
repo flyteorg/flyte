@@ -1,0 +1,30 @@
+{{- if .Values.dataproxy.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flyte-core.componentConfigMapName" (dict "ctx" $ "component" "dataproxy") }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "flyte-core.componentLabels" (dict "ctx" $ "component" "dataproxy") | nindent 4 }}
+data:
+  000-core.yaml: |
+    logger:
+      show-source: true
+      level: {{ .Values.logging.level }}
+  001-storage.yaml: |
+    {{- include "flyte-core.storageConfig" . | nindent 4 }}
+  010-dataproxy.yaml: |
+    dataproxy:
+      {{- with .Values.dataproxy.config }}
+      upload:
+        maxSize: {{ .upload.maxSize | quote }}
+        maxExpiresIn: {{ .upload.maxExpiresIn }}
+        defaultFileNameLength: {{ .upload.defaultFileNameLength }}
+        storagePrefix: {{ .upload.storagePrefix | quote }}
+      download:
+        maxExpiresIn: {{ .download.maxExpiresIn }}
+      {{- end }}
+  {{- with .Values.inlineConfig }}
+  100-inline.yaml: |
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

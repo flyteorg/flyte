@@ -1,0 +1,16 @@
+{{- if .Values.executor.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "flyte-core.webhook.serviceName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "flyte-core.componentLabels" (dict "ctx" $ "component" "executor") | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: webhook
+      port: {{ .Values.webhook.servicePort }}
+      targetPort: webhook
+      protocol: TCP
+  selector: {{- include "flyte-core.selectorLabels" (dict "ctx" $ "component" "executor") | nindent 4 }}
+{{- end }}

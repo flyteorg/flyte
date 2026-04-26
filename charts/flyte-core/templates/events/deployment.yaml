@@ -1,0 +1,78 @@
+{{- if .Values.events.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "flyte-core.componentFullname" (dict "ctx" $ "component" "events") }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "flyte-core.componentLabels" (dict "ctx" $ "component" "events") | nindent 4 }}
+spec:
+  replicas: {{ .Values.events.replicaCount }}
+  selector:
+    matchLabels: {{- include "flyte-core.selectorLabels" (dict "ctx" $ "component" "events") | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/events/configmap.yaml") . | sha256sum }}
+        {{- with .Values.events.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels: {{- include "flyte-core.selectorLabels" (dict "ctx" $ "component" "events") | nindent 8 }}
+        {{- with .Values.events.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "flyte-core.serviceAccountName" . }}
+      {{- with .Values.events.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.events.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.events.affinity }}
+      affinity: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: events
+          image: "{{ .Values.image.repository }}/events:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/usr/local/bin/flyte-events"]
+          args: ["--config", "/etc/flyte/config.d/*.yaml"]
+          ports:
+            - name: http
+              containerPort: {{ .Values.events.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 30
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            {{- with .Values.events.extraEnvVars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/flyte/config.d
+          {{- with .Values.events.resources }}
+          resources: {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: config
+          projected:
+            sources:
+              - configMap:
+                  name: {{ include "flyte-core.componentConfigMapName" (dict "ctx" $ "component" "events") }}
+{{- end }}

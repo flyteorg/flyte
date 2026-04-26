@@ -1,0 +1,21 @@
+{{- if and .Values.rbac.create .Values.serviceAccount.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "flyte-core.fullname" . }}-cluster-role-binding
+  labels: {{- include "flyte-core.labels" . | nindent 4 }}
+    {{- with .Values.rbac.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.rbac.annotations }}
+  annotations: {{- toYaml . | nindent 4 }}
+  {{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "flyte-core.clusterRoleName" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "flyte-core.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}

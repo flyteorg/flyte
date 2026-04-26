@@ -1,0 +1,6 @@
+apiVersion: v2
+name: flyte-core
+description: Helm chart for Flyte core that each component deployed as separate services
+type: application
+version: "0.1.0"
+appVersion: "1.0.0"

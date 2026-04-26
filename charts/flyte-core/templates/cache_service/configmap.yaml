@@ -1,0 +1,26 @@
+{{- if .Values.cacheService.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flyte-core.componentConfigMapName" (dict "ctx" $ "component" "cache-service") }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "flyte-core.componentLabels" (dict "ctx" $ "component" "cache-service") | nindent 4 }}
+data:
+  000-core.yaml: |
+    logger:
+      show-source: true
+      level: {{ .Values.logging.level }}
+  001-storage.yaml: |
+    {{- include "flyte-core.storageConfig" . | nindent 4 }}
+  002-database.yaml: |
+    {{- include "flyte-core.databaseConfig" . | nindent 4 }}
+  010-cache-service.yaml: |
+    cache_service:
+      server:
+        host: "0.0.0.0"
+        port: {{ .Values.cacheService.port }}
+  {{- with .Values.inlineConfig }}
+  100-inline.yaml: |
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

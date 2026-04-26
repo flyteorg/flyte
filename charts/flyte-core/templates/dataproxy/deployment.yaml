@@ -1,0 +1,78 @@
+{{- if .Values.dataproxy.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "flyte-core.componentFullname" (dict "ctx" $ "component" "dataproxy") }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "flyte-core.componentLabels" (dict "ctx" $ "component" "dataproxy") | nindent 4 }}
+spec:
+  replicas: {{ .Values.dataproxy.replicaCount }}
+  selector:
+    matchLabels: {{- include "flyte-core.selectorLabels" (dict "ctx" $ "component" "dataproxy") | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/dataproxy/configmap.yaml") . | sha256sum }}
+        {{- with .Values.dataproxy.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels: {{- include "flyte-core.selectorLabels" (dict "ctx" $ "component" "dataproxy") | nindent 8 }}
+        {{- with .Values.dataproxy.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "flyte-core.serviceAccountName" . }}
+      {{- with .Values.dataproxy.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.dataproxy.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.dataproxy.affinity }}
+      affinity: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: dataproxy
+          image: "{{ .Values.image.repository }}/dataproxy:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/usr/local/bin/flyte-dataproxy"]
+          args: ["--config", "/etc/flyte/config.d/*.yaml"]
+          ports:
+            - name: http
+              containerPort: {{ .Values.dataproxy.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 30
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            {{- with .Values.dataproxy.extraEnvVars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/flyte/config.d
+          {{- with .Values.dataproxy.resources }}
+          resources: {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: config
+          projected:
+            sources:
+              - configMap:
+                  name: {{ include "flyte-core.componentConfigMapName" (dict "ctx" $ "component" "dataproxy") }}
+{{- end }}

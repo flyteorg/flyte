@@ -1,0 +1,86 @@
+{{- if .Values.executor.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "flyte-core.componentFullname" (dict "ctx" $ "component" "executor") }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "flyte-core.componentLabels" (dict "ctx" $ "component" "executor") | nindent 4 }}
+spec:
+  replicas: {{ .Values.executor.replicaCount }}
+  selector:
+    matchLabels: {{- include "flyte-core.selectorLabels" (dict "ctx" $ "component" "executor") | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/executor/configmap.yaml") . | sha256sum }}
+        {{- with .Values.executor.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels: {{- include "flyte-core.selectorLabels" (dict "ctx" $ "component" "executor") | nindent 8 }}
+        {{- with .Values.executor.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "flyte-core.serviceAccountName" . }}
+      {{- with .Values.executor.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.executor.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.executor.affinity }}
+      affinity: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: executor
+          image: "{{ .Values.image.repository }}/executor:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/usr/local/bin/flyte-executor"]
+          args: ["--config", "/etc/flyte/config.d/*.yaml"]
+          ports:
+            - name: health
+              containerPort: {{ .Values.executor.healthProbePort }}
+              protocol: TCP
+            - name: webhook
+              containerPort: 9443
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: health
+            initialDelaySeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: health
+            initialDelaySeconds: 30
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            {{- with .Values.executor.extraEnvVars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/flyte/config.d
+            - name: webhook-certs
+              mountPath: {{ .Values.webhook.certDir }}
+              readOnly: false
+          {{- with .Values.executor.resources }}
+          resources: {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: config
+          projected:
+            sources:
+              - configMap:
+                  name: {{ include "flyte-core.componentConfigMapName" (dict "ctx" $ "component" "executor") }}
+        - name: webhook-certs
+          emptyDir: {}
+{{- end }}

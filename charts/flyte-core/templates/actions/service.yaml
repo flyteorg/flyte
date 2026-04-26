@@ -1,0 +1,16 @@
+{{- if .Values.actions.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "flyte-core.componentFullname" (dict "ctx" $ "component" "actions") }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "flyte-core.componentLabels" (dict "ctx" $ "component" "actions") | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: {{ .Values.actions.port }}
+      targetPort: http
+      protocol: TCP
+  selector: {{- include "flyte-core.selectorLabels" (dict "ctx" $ "component" "actions") | nindent 4 }}
+{{- end }}

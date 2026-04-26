@@ -1,0 +1,24 @@
+{{- if .Values.secretService.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flyte-core.componentConfigMapName" (dict "ctx" $ "component" "secret") }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "flyte-core.componentLabels" (dict "ctx" $ "component" "secret") | nindent 4 }}
+data:
+  000-core.yaml: |
+    logger:
+      show-source: true
+      level: {{ .Values.logging.level }}
+  010-secret.yaml: |
+    secret:
+      server:
+        host: "0.0.0.0"
+        port: {{ .Values.secretService.port }}
+      kubernetes:
+        namespace: {{ .Release.Namespace }}
+  {{- with .Values.inlineConfig }}
+  100-inline.yaml: |
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,27 @@
+{{- if .Values.actions.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flyte-core.componentConfigMapName" (dict "ctx" $ "component" "actions") }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "flyte-core.componentLabels" (dict "ctx" $ "component" "actions") | nindent 4 }}
+data:
+  000-core.yaml: |
+    logger:
+      show-source: true
+      level: {{ .Values.logging.level }}
+  010-actions.yaml: |
+    actions:
+      server:
+        host: "0.0.0.0"
+        port: {{ .Values.actions.port }}
+      kubernetes:
+        namespace: {{ .Release.Namespace }}
+      watchBufferSize: {{ .Values.actions.config.watchBufferSize }}
+      watchWorkers: {{ .Values.actions.config.watchWorkers }}
+      runServiceUrl: "http://{{ include "flyte-core.componentFullname" (dict "ctx" $ "component" "runs") }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.runs.port }}"
+  {{- with .Values.inlineConfig }}
+  100-inline.yaml: |
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

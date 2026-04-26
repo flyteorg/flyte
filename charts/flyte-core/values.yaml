@@ -1,0 +1,187 @@
+# -- Override chart name
+nameOverride: ""
+# -- Override fully qualified chart name
+fullnameOverride: ""
+# -- Common labels applied to all resources
+commonLabels: {}
+# -- Common annotations applied to all resources
+commonAnnotations: {}
+
+# -- Image configuration shared by all components
+image:
+  repository: ghcr.flyte.org/flyteorg/flyte-core
+  tag: nightly
+  pullPolicy: IfNotPresent
+
+# -- Database configuration (used by runs and cache_service)
+database:
+  username: postgres
+  password: ""
+  passwordPath: ""
+  host: postgres
+  port: 5432
+  dbname: flyte
+  options: "sslmode=disable"
+
+# -- Object storage configuration
+storage:
+  metadataContainer: "flyte-data"
+  provider: s3
+  providerConfig:
+    s3:
+      region: "us-east-1"
+      disableSSL: false
+      v2Signing: false
+      endpoint: ""
+      authType: "iam"
+      accessKey: ""
+      secretKey: ""
+    gcs:
+      project: ""
+    azure:
+      account: ""
+      key: ""
+      configDomainSuffix: ""
+      configUploadConcurrency: 4
+
+# -- Logging configuration
+logging:
+  level: 1
+
+# -- Per-component configuration
+# Each component becomes a separate Deployment.
+
+runs:
+  enabled: true
+  port: 8090
+  replicaCount: 1
+  resources: {}
+  podAnnotations: {}
+  podLabels: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnvVars: []
+  config:
+    storagePrefix: "s3://flyte-data"
+    seedProjects:
+      - flytesnacks
+    domains:
+      - id: development
+        name: Development
+      - id: production
+        name: Production
+      - id: staging
+        name: Staging
+
+actions:
+  enabled: true
+  port: 8091
+  replicaCount: 1
+  resources: {}
+  podAnnotations: {}
+  podLabels: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnvVars: []
+  config:
+    watchBufferSize: 100
+    watchWorkers: 10
+
+cacheService:
+  enabled: true
+  port: 8094
+  replicaCount: 1
+  resources: {}
+  podAnnotations: {}
+  podLabels: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnvVars: []
+
+dataproxy:
+  enabled: true
+  port: 8088
+  replicaCount: 1
+  resources: {}
+  podAnnotations: {}
+  podLabels: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnvVars: []
+  config:
+    upload:
+      maxSize: "100Mi"
+      maxExpiresIn: 1h
+      defaultFileNameLength: 20
+      storagePrefix: "uploads"
+    download:
+      maxExpiresIn: 1h
+
+events:
+  enabled: true
+  port: 8092
+  replicaCount: 1
+  resources: {}
+  podAnnotations: {}
+  podLabels: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnvVars: []
+
+executor:
+  enabled: true
+  healthProbePort: 8081
+  replicaCount: 1
+  resources: {}
+  podAnnotations: {}
+  podLabels: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnvVars: []
+  config:
+    leaderElect: false
+    gc:
+      interval: 30m
+      maxTTL: 1h
+
+secretService:
+  enabled: true
+  port: 8093
+  replicaCount: 1
+  resources: {}
+  podAnnotations: {}
+  podLabels: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnvVars: []
+
+# -- Webhook configuration for the executor's mutating admission webhook
+webhook:
+  certDir: /var/run/flyte/certs
+  localCert: true
+  servicePort: 443
+
+# -- RBAC configuration
+rbac:
+  create: true
+  labels: {}
+  annotations: {}
+  extraRules: []
+
+# -- ServiceAccount configuration
+serviceAccount:
+  create: true
+  name: ""
+  labels: {}
+  annotations: {}
+  imagePullSecrets: []
+
+# -- Additional inline configuration merged into all component configs
+inlineConfig: {}

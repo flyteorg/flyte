@@ -1,0 +1,34 @@
+{{- if .Values.runs.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flyte-core.componentConfigMapName" (dict "ctx" $ "component" "runs") }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "flyte-core.componentLabels" (dict "ctx" $ "component" "runs") | nindent 4 }}
+data:
+  000-core.yaml: |
+    logger:
+      show-source: true
+      level: {{ .Values.logging.level }}
+  001-storage.yaml: |
+    {{- include "flyte-core.storageConfig" . | nindent 4 }}
+  002-database.yaml: |
+    {{- include "flyte-core.databaseConfig" . | nindent 4 }}
+  010-runs.yaml: |
+    runs:
+      server:
+        host: "0.0.0.0"
+        port: {{ .Values.runs.port }}
+      storagePrefix: {{ .Values.runs.config.storagePrefix | quote }}
+      actionsServiceUrl: "http://{{ include "flyte-core.componentFullname" (dict "ctx" $ "component" "actions") }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.actions.port }}"
+      {{- with .Values.runs.config.seedProjects }}
+      seedProjects: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.runs.config.domains }}
+      domains: {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- with .Values.inlineConfig }}
+  100-inline.yaml: |
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

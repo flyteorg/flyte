@@ -1,0 +1,37 @@
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "flyte-core.clusterRoleName" . }}
+  labels: {{- include "flyte-core.labels" . | nindent 4 }}
+    {{- with .Values.rbac.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.rbac.annotations }}
+  annotations: {{- toYaml . | nindent 4 }}
+  {{- end }}
+rules:
+  # Executor: manage pods
+  - apiGroups: [""]
+    resources: [pods]
+    verbs: [create, delete, get, list, patch, update, watch]
+  # Executor: create events
+  - apiGroups: [""]
+    resources: [events]
+    verbs: [create, delete, patch, update]
+  # Executor: manage TaskAction CRDs
+  - apiGroups: [flyte.org]
+    resources: [taskactions]
+    verbs: [create, delete, get, list, patch, update, watch]
+  # Executor: manage webhook configurations
+  - apiGroups: [admissionregistration.k8s.io]
+    resources: [mutatingwebhookconfigurations]
+    verbs: [create, get, list, patch, update, watch]
+  # Secret service: manage secrets
+  - apiGroups: [""]
+    resources: [secrets]
+    verbs: [create, get, update]
+  {{- with .Values.rbac.extraRules }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+{{- end }}

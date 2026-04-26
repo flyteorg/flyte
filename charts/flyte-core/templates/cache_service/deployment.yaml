@@ -1,0 +1,88 @@
+{{- if .Values.cacheService.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "flyte-core.componentFullname" (dict "ctx" $ "component" "cache-service") }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "flyte-core.componentLabels" (dict "ctx" $ "component" "cache-service") | nindent 4 }}
+spec:
+  replicas: {{ .Values.cacheService.replicaCount }}
+  selector:
+    matchLabels: {{- include "flyte-core.selectorLabels" (dict "ctx" $ "component" "cache-service") | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/cache_service/configmap.yaml") . | sha256sum }}
+        {{- with .Values.cacheService.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels: {{- include "flyte-core.selectorLabels" (dict "ctx" $ "component" "cache-service") | nindent 8 }}
+        {{- with .Values.cacheService.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "flyte-core.serviceAccountName" . }}
+      {{- with .Values.cacheService.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.cacheService.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.cacheService.affinity }}
+      affinity: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: cache-service
+          image: "{{ .Values.image.repository }}/cache_service:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/usr/local/bin/flyte-cache-service"]
+          args: ["--config", "/etc/flyte/config.d/*.yaml"]
+          ports:
+            - name: http
+              containerPort: {{ .Values.cacheService.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 30
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            {{- with .Values.cacheService.extraEnvVars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/flyte/config.d
+            {{- if .Values.database.password }}
+            - name: db-password
+              mountPath: /etc/flyte/db-password
+              readOnly: true
+            {{- end }}
+          {{- with .Values.cacheService.resources }}
+          resources: {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: config
+          projected:
+            sources:
+              - configMap:
+                  name: {{ include "flyte-core.componentConfigMapName" (dict "ctx" $ "component" "cache-service") }}
+        {{- if .Values.database.password }}
+        - name: db-password
+          secret:
+            secretName: {{ include "flyte-core.dbSecretName" . }}
+        {{- end }}
+{{- end }}
