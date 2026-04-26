@@ -8,10 +8,8 @@ dependencies:
 - name: knative-serving
   repository: https://deeploy-knative-serving-charts.storage.googleapis.com/
   version: 1.18.3
-digest: sha256:6efe6bec03f8b60469f0a4d8c3a985d0c61a9a7ccdbf6a4c6608bd41b17ced8b
-generated: "2026-04-23T12:14:59.242727-07:00"
 - name: rustfs
   repository: https://rustfs.github.io/helm
   version: 0.0.94
-digest: sha256:6d04f6eb6b492af372a3a935f4586a53a261035783be2683338e009be04a12cd
-generated: "2026-04-17T23:08:41.627655-05:00"
+digest: sha256:c689a250047985626abbd72aff025e8d766ba9ef067b4d448c3a555844096bf0
+generated: "2026-04-26T01:24:57.780995-05:00"

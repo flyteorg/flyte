@@ -27,7 +27,6 @@ helmCharts:
 resources:
 - ../namespace.yaml
 - ../embedded-postgres-service.yaml
-<<<<<<< HEAD
 - ../../../../charts/flyte-devbox/charts/knative-serving/crds/serving-crds.yaml
 
 patches:
@@ -85,7 +84,6 @@ patches:
       namespace: knative-serving
     $patch: delete
 
-=======
 patches:
     # Drop the helm test Pod shipped by the rustfs subchart; it is only meant
     # for `helm test` and has no purpose in the plain-manifest deployment flow.
@@ -98,4 +96,3 @@ patches:
     kind: Pod
     metadata:
       name: rustfs-test-connection
->>>>>>> ab2ebce1a (Fix popojk's comment)
