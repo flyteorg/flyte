@@ -70,9 +70,16 @@ func (r *ExecutionRepo) Update(ctx context.Context, execution models.Execution) 
 	timer := r.metrics.UpdateDuration.Start()
 	tx := r.db.WithContext(ctx).Model(&models.Execution{}).Where(getIDFilter(execution.ID)).Updates(execution)
 	timer.Stop()
+
 	if err := tx.Error; err != nil {
 		return r.errorTransformer.ToFlyteAdminError(err)
 	}
+
+	
+	if tx.RowsAffected == 0 {
+		return adminErrors.GetMissingEntityError("execution", nil)
+	}
+
 	return nil
 }
 

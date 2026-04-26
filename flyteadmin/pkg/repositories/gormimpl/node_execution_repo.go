@@ -100,8 +100,13 @@ func (r *NodeExecutionRepo) Update(ctx context.Context, nodeExecution *models.No
 	tx := r.db.WithContext(ctx).Model(&models.NodeExecution{}).Where(getIDFilter(nodeExecution.ID)).Updates(nodeExecution)
 	timer.Stop()
 	if err := tx.Error; err != nil {
-		return r.errorTransformer.ToFlyteAdminError(err)
-	}
+    return r.errorTransformer.ToFlyteAdminError(err)
+}
+
+if tx.RowsAffected == 0 {
+    return adminErrors.GetMissingEntityError("node execution", nil)
+}
+
 	return nil
 }
 
