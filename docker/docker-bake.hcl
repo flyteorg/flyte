@@ -66,7 +66,7 @@ target "runs" {
   tags = ["${IMAGE_REPO_PREFIX}/runs:${IMAGE_SHA_SHORT_TAG}"]
 }
 
-target "" {
+target "secret" {
   inherits   = ["_common"]
   dockerfile = "docker/Dockerfile.secret"
   tags = ["${IMAGE_REPO_PREFIX}/secret:${IMAGE_SHA_SHORT_TAG}"]
