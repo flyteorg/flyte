@@ -269,6 +269,61 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(phTime.After(before)).To(BeTrue(), "PhaseHistory should use controller time, not pod time")
 			Expect(phTime.Before(after)).To(BeTrue(), "PhaseHistory should use controller time, not pod time")
 		})
+
+		It("should persist ErrorState (Code/Kind/Message) on permanent failure", func() {
+			ta := &flyteorgv1.TaskAction{}
+			info := pluginsCore.PhaseInfoFailure("OOMKilled", "Pod OOMKilled", nil)
+			mapPhaseToConditions(ta, info)
+
+			Expect(ta.Status.ErrorState).NotTo(BeNil())
+			Expect(ta.Status.ErrorState.Code).To(Equal("OOMKilled"))
+			Expect(ta.Status.ErrorState.Kind).To(Equal("USER"))
+			Expect(ta.Status.ErrorState.Message).To(Equal("Pod OOMKilled"))
+		})
+
+		It("should persist ErrorState on retryable failure with system kind", func() {
+			ta := &flyteorgv1.TaskAction{}
+			info := pluginsCore.PhaseInfoSystemRetryableFailure("ResourceDeletedExternally", "node lost", nil)
+			mapPhaseToConditions(ta, info)
+
+			Expect(ta.Status.ErrorState).NotTo(BeNil())
+			Expect(ta.Status.ErrorState.Code).To(Equal("ResourceDeletedExternally"))
+			Expect(ta.Status.ErrorState.Kind).To(Equal("SYSTEM"))
+		})
+	})
+
+	Context("errorStateFromExecError", func() {
+		It("returns nil for nil input", func() {
+			Expect(errorStateFromExecError(nil)).To(BeNil())
+		})
+
+		It("preserves Code, Kind=USER, and Message", func() {
+			es := errorStateFromExecError(&core.ExecutionError{
+				Code:    "OOMKilled",
+				Kind:    core.ExecutionError_USER,
+				Message: "container OOMKilled",
+			})
+			Expect(es).NotTo(BeNil())
+			Expect(es.Code).To(Equal("OOMKilled"))
+			Expect(es.Kind).To(Equal("USER"))
+			Expect(es.Message).To(Equal("container OOMKilled"))
+		})
+
+		It("maps ExecutionError_SYSTEM kind to \"SYSTEM\"", func() {
+			es := errorStateFromExecError(&core.ExecutionError{
+				Code: "InternalError",
+				Kind: core.ExecutionError_SYSTEM,
+			})
+			Expect(es.Kind).To(Equal("SYSTEM"))
+		})
+
+		It("leaves Kind empty when ExecutionError kind is UNKNOWN", func() {
+			es := errorStateFromExecError(&core.ExecutionError{
+				Code: "Unknown",
+				Kind: core.ExecutionError_UNKNOWN,
+			})
+			Expect(es.Kind).To(Equal(""))
+		})
 	})
 
 	Context("taskActionStatusChanged", func() {

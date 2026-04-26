@@ -9,7 +9,7 @@ import (
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
-	appconfig "github.com/flyteorg/flyte/v2/app/config"
+	appconfig "github.com/flyteorg/flyte/v2/app/internal/config"
 	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
@@ -22,11 +22,11 @@ import (
 type InternalAppService struct {
 	appconnect.UnimplementedAppServiceHandler
 	k8s appk8s.AppK8sClientInterface
-	cfg *appconfig.AppConfig
+	cfg *appconfig.InternalAppConfig
 }
 
 // NewInternalAppService creates a new InternalAppService.
-func NewInternalAppService(k8s appk8s.AppK8sClientInterface, cfg *appconfig.AppConfig) *InternalAppService {
+func NewInternalAppService(k8s appk8s.AppK8sClientInterface, cfg *appconfig.InternalAppConfig) *InternalAppService {
 	return &InternalAppService{k8s: k8s, cfg: cfg}
 }
 
@@ -61,24 +61,30 @@ func (s *InternalAppService) Create(
 				LastTransitionTime: timestamppb.Now(),
 			},
 		},
-		Ingress: publicIngress(app.GetMetadata().GetId(), s.cfg.BaseDomain),
+		Ingress: publicIngress(app.GetMetadata().GetId(), s.cfg),
 	}
 
 	return connect.NewResponse(&flyteapp.CreateResponse{App: app}), nil
 }
 
-// publicIngress builds the deterministic public URL for an app.
-// Pattern: "https://{name}-{project}-{domain}.{base_domain}"
-// Returns nil if BaseDomain is not configured.
-func publicIngress(id *flyteapp.Identifier, baseDomain string) *flyteapp.Ingress {
-	if baseDomain == "" {
+// publicIngress builds the deterministic public URL for an app using
+// BaseDomain — which must match Knative's domain-template so Kourier
+// serves the URL directly. Returns nil if BaseDomain is unset.
+func publicIngress(id *flyteapp.Identifier, cfg *appconfig.InternalAppConfig) *flyteapp.Ingress {
+	if cfg.BaseDomain == "" {
 		return nil
 	}
-	host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
-		id.GetName(), id.GetProject(), id.GetDomain(), baseDomain))
-	return &flyteapp.Ingress{
-		PublicUrl: "https://" + host,
+	scheme := cfg.Scheme
+	if scheme == "" {
+		scheme = "https"
 	}
+	host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
+		id.GetName(), id.GetProject(), id.GetDomain(), cfg.BaseDomain))
+	url := scheme + "://" + host
+	if cfg.IngressAppsPort != 0 {
+		url += fmt.Sprintf(":%d", cfg.IngressAppsPort)
+	}
+	return &flyteapp.Ingress{PublicUrl: url}
 }
 
 // Get retrieves an app and its live status from the KService CRD.
@@ -92,7 +98,7 @@ func (s *InternalAppService) Get(
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("app_id is required"))
 	}
 
-	status, err := s.k8s.GetStatus(ctx, appID.AppId)
+	app, err := s.k8s.GetApp(ctx, appID.AppId)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
@@ -100,12 +106,7 @@ func (s *InternalAppService) Get(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	return connect.NewResponse(&flyteapp.GetResponse{
-		App: &flyteapp.App{
-			Metadata: &flyteapp.Meta{Id: appID.AppId},
-			Status:   status,
-		},
-	}), nil
+	return connect.NewResponse(&flyteapp.GetResponse{App: app}), nil
 }
 
 // Update modifies an app's spec or desired state.
@@ -137,11 +138,11 @@ func (s *InternalAppService) Update(
 		}
 	}
 
-	status, err := s.k8s.GetStatus(ctx, appID)
+	freshApp, err := s.k8s.GetApp(ctx, appID)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
-	app.Status = status
+	app.Status = freshApp.Status
 
 	return connect.NewResponse(&flyteapp.UpdateResponse{App: app}), nil
 }
@@ -186,7 +187,7 @@ func (s *InternalAppService) List(
 		token = r.GetToken()
 	}
 
-	apps, nextToken, err := s.k8s.List(ctx, project, domain, "", limit, token)
+	apps, nextToken, err := s.k8s.List(ctx, project, domain, limit, token)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -222,11 +223,14 @@ func (s *InternalAppService) Watch(
 	}
 
 	// Send initial snapshot so the client has current state before streaming changes.
-	snapshot, _, err := s.k8s.List(ctx, project, domain, appName, 0, "")
+	snapshot, _, err := s.k8s.List(ctx, project, domain, 0, "")
 	if err != nil {
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	for _, app := range snapshot {
+		if appName != "" && app.GetMetadata().GetId().GetName() != appName {
+			continue
+		}
 		if err := stream.Send(&flyteapp.WatchResponse{
 			Event: &flyteapp.WatchResponse_CreateEvent{
 				CreateEvent: &flyteapp.CreateEvent{App: app},

@@ -15,7 +15,7 @@ var defaultConfig = &Config{
 	},
 	Kubernetes: KubernetesConfig{
 		Namespace:   "flyte",
-		ClusterName: "flyte-demo",
+		ClusterName: "flyte-devbox",
 		QPS:         100,
 		Burst:       200,
 		Timeout:     "30s",

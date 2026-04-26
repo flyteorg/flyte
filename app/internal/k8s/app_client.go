@@ -3,14 +3,18 @@ package k8s
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	"math"
 	"strings"
+	"time"
 
 	"google.golang.org/protobuf/proto"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	k8sresource "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	k8swatch "k8s.io/apimachinery/pkg/watch"
@@ -18,9 +22,11 @@ import (
 	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/flyteorg/flyte/v2/app/config"
+	"github.com/flyteorg/flyte/v2/app/internal/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
+	flytecore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 const (
@@ -31,6 +37,7 @@ const (
 
 	annotationSpecSHA = "flyte.org/spec-sha"
 	annotationAppID   = "flyte.org/app-id"
+	annotationSpec    = "flyte.org/spec"
 
 	maxScaleZero = "0"
 
@@ -48,15 +55,14 @@ type AppK8sClientInterface interface {
 	// is kept so the app can be restarted later.
 	Stop(ctx context.Context, appID *flyteapp.Identifier) error
 
-	// GetStatus reads the KService and maps its conditions to a DeploymentStatus.
+	// GetApp reads the KService and returns the full App including reconstructed Spec and live Status.
 	// Returns a not-found error (checkable with k8serrors.IsNotFound) if the KService does not exist.
-	GetStatus(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.Status, error)
+	GetApp(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.App, error)
 
 	// List returns apps for the given project/domain scope with optional pagination.
-	// If appName is non-empty, only the app with that name is returned.
 	// limit=0 means no limit. token is the K8s continue token from a previous call.
 	// Returns the apps, the continue token for the next page (empty if last page), and any error.
-	List(ctx context.Context, project, domain, appName string, limit uint32, token string) ([]*flyteapp.App, string, error)
+	List(ctx context.Context, project, domain string, limit uint32, token string) ([]*flyteapp.App, string, error)
 
 	// Delete removes the KService CRD entirely. The app must be re-created from scratch.
 	// Use Stop to scale to zero while preserving the KService.
@@ -78,11 +84,11 @@ type AppK8sClientInterface interface {
 type AppK8sClient struct {
 	k8sClient client.WithWatch
 	cache     ctrlcache.Cache
-	cfg       *config.AppConfig
+	cfg       *config.InternalAppConfig
 }
 
 // NewAppK8sClient creates a new AppK8sClient.
-func NewAppK8sClient(k8sClient client.WithWatch, cache ctrlcache.Cache, cfg *config.AppConfig) *AppK8sClient {
+func NewAppK8sClient(k8sClient client.WithWatch, cache ctrlcache.Cache, cfg *config.InternalAppConfig) *AppK8sClient {
 	return &AppK8sClient{
 		k8sClient: k8sClient,
 		cache:     cache,
@@ -102,6 +108,10 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 	name := kserviceName(appID)
 
+	if err := k8s.EnsureNamespaceExists(ctx, c.k8sClient, ns); err != nil {
+		return fmt.Errorf("failed to ensure namespace %s: %w", ns, err)
+	}
+
 	ksvc, err := c.buildKService(app)
 	if err != nil {
 		return fmt.Errorf("failed to build KService for app %s: %w", name, err)
@@ -120,15 +130,27 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 		return fmt.Errorf("failed to get KService %s: %w", name, err)
 	}
 
-	// Skip update if spec has not changed.
 	if existing.Annotations[annotationSpecSHA] == ksvc.Annotations[annotationSpecSHA] {
 		logger.Debugf(ctx, "KService %s/%s spec unchanged, skipping update", ns, name)
 		return nil
 	}
 
 	existing.Spec = ksvc.Spec
-	existing.Labels = ksvc.Labels
-	existing.Annotations = ksvc.Annotations
+	// Merge labels and annotations rather than replacing them wholesale.
+	// Knative sets immutable annotations (e.g. serving.knative.dev/creator)
+	// on creation; overwriting them causes the admission webhook to reject the update.
+	if existing.Labels == nil {
+		existing.Labels = make(map[string]string)
+	}
+	for k, v := range ksvc.Labels {
+		existing.Labels[k] = v
+	}
+	if existing.Annotations == nil {
+		existing.Annotations = make(map[string]string)
+	}
+	for k, v := range ksvc.Annotations {
+		existing.Annotations[k] = v
+	}
 	if err := c.k8sClient.Update(ctx, existing); err != nil {
 		return fmt.Errorf("failed to update KService %s: %w", name, err)
 	}
@@ -172,51 +194,195 @@ func (c *AppK8sClient) Delete(ctx context.Context, appID *flyteapp.Identifier) e
 	return nil
 }
 
+// watchBackoff controls the reconnect timing for Watch. Declared as vars so
+// tests can override them without sleeping.
+var (
+	watchBackoffInitial = 1 * time.Second
+	watchBackoffMax     = 30 * time.Second
+	watchBackoffFactor  = 2.0
+)
+
+// watchState holds mutable reconnect state for a single Watch call.
+// It is goroutine-local — no mutex needed.
+type watchState struct {
+	// lastResourceVersion is the most recent RV seen from any event or Bookmark.
+	// Passed to openWatch on reconnect so K8s resumes from exactly where we left off.
+	lastResourceVersion string
+	backoff             time.Duration
+	consecutiveErrors   int
+}
+
+func (s *watchState) nextBackoff() time.Duration {
+	d := s.backoff
+	if d == 0 {
+		d = watchBackoffInitial
+	}
+	s.backoff = time.Duration(math.Min(float64(d)*watchBackoffFactor, float64(watchBackoffMax)))
+	return d
+}
+
+func (s *watchState) resetBackoff() {
+	s.backoff = watchBackoffInitial
+	s.consecutiveErrors = 0
+}
+
 // Watch returns a channel of WatchResponse events for KServices in the given
 // project/domain scope. If appName is non-empty, only events for that specific
-// app are returned. The channel is closed when ctx is cancelled or the
-// underlying watch terminates.
+// app are returned. The channel is closed only when ctx is cancelled.
+//
+// The goroutine reconnects transparently when the underlying K8s watch closes
+// unexpectedly, tracking resourceVersion to resume without gaps or replays.
 func (c *AppK8sClient) Watch(ctx context.Context, project, domain, appName string) (<-chan *flyteapp.WatchResponse, error) {
 	ns := appNamespace(project, domain)
-
 	labels := map[string]string{labelAppManaged: "true"}
 	if appName != "" {
 		labels[labelAppName] = strings.ToLower(appName)
 	}
 
-	watcher, err := c.k8sClient.Watch(ctx, &servingv1.ServiceList{},
-		client.InNamespace(ns),
-		client.MatchingLabels(labels),
-	)
+	// Open the first watcher eagerly so initial errors (RBAC, missing CRD) are
+	// returned synchronously before spawning the goroutine.
+	watcher, err := c.openWatch(ctx, ns, labels, "")
 	if err != nil {
-		return nil, fmt.Errorf("failed to start KService watch in namespace %s: %w", ns, err)
+		return nil, err
 	}
 
 	ch := make(chan *flyteapp.WatchResponse, 64)
-	go func() {
-		defer close(ch)
-		defer watcher.Stop()
-		for {
+	go c.watchLoop(ctx, ns, labels, watcher, ch)
+	return ch, nil
+}
+
+// openWatch starts a K8s watch from resourceVersion (empty = watch from now).
+// AllowWatchBookmarks is always set so K8s sends Bookmark events on every session,
+// keeping lastResourceVersion current even when no objects change.
+func (c *AppK8sClient) openWatch(ctx context.Context, ns string, labels map[string]string, resourceVersion string) (k8swatch.Interface, error) {
+	rawOpts := &metav1.ListOptions{AllowWatchBookmarks: true}
+	if resourceVersion != "" {
+		rawOpts.ResourceVersion = resourceVersion
+	}
+	opts := []client.ListOption{
+		client.InNamespace(ns),
+		client.MatchingLabels(labels),
+		&client.ListOptions{Raw: rawOpts},
+	}
+	watcher, err := c.k8sClient.Watch(ctx, &servingv1.ServiceList{}, opts...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to start KService watch in namespace %s: %w", ns, err)
+	}
+	return watcher, nil
+}
+
+// watchLoop is the reconnect loop. It drains watcher until it closes, then
+// reopens. Exponential backoff is applied only on K8s Error events; normal
+// watch timeouts (clean channel close) reconnect immediately. Closes ch only
+// when ctx is cancelled.
+func (c *AppK8sClient) watchLoop(
+	ctx context.Context,
+	ns string,
+	labels map[string]string,
+	watcher k8swatch.Interface,
+	ch chan<- *flyteapp.WatchResponse,
+) {
+	defer close(ch)
+	defer watcher.Stop()
+
+	state := &watchState{backoff: watchBackoffInitial}
+
+	for {
+		reconnect, isError := c.drainWatcher(ctx, watcher, ch, state)
+		if !reconnect {
+			return // ctx cancelled
+		}
+
+		watcher.Stop()
+
+		if isError {
+			state.consecutiveErrors++
+			delay := state.nextBackoff()
+			logger.Warnf(ctx, "KService watch in namespace %s closed with error (attempt %d); reconnecting in %v",
+				ns, state.consecutiveErrors, delay)
 			select {
 			case <-ctx.Done():
 				return
-			case event, ok := <-watcher.ResultChan():
-				if !ok {
-					return
+			case <-time.After(delay):
+			}
+		} else {
+			// Normal K8s watch timeout — reconnect immediately, no backoff.
+			state.resetBackoff()
+			logger.Debugf(ctx, "KService watch in namespace %s timed out naturally; reconnecting", ns)
+		}
+
+		newWatcher, err := c.openWatch(ctx, ns, labels, state.lastResourceVersion)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to reopen KService watch in namespace %s: %v", ns, err)
+			// Use an immediately-closed watcher so the loop retries with further backoff.
+			watcher = k8swatch.NewEmptyWatch()
+			continue
+		}
+		watcher = newWatcher
+	}
+}
+
+// drainWatcher processes events from watcher until the channel closes or ctx is done.
+// Returns (reconnect, isError): reconnect=false means ctx was cancelled (stop the loop);
+// isError=true means a K8s Error event triggered the close and backoff should be applied.
+func (c *AppK8sClient) drainWatcher(
+	ctx context.Context,
+	watcher k8swatch.Interface,
+	ch chan<- *flyteapp.WatchResponse,
+	state *watchState,
+) (bool, bool) {
+	for {
+		select {
+		case <-ctx.Done():
+			return false, false
+		case event, ok := <-watcher.ResultChan():
+			if !ok {
+				return true, false // normal K8s watch timeout
+			}
+
+			switch event.Type {
+			case k8swatch.Error:
+				if status, ok := event.Object.(*metav1.Status); ok {
+					logger.Warnf(ctx, "KService watch received error event (code=%d reason=%s): %s; will reconnect",
+						status.Code, status.Reason, status.Message)
+				} else {
+					logger.Warnf(ctx, "KService watch received error event (type %T); will reconnect", event.Object)
 				}
+				return true, true // error — apply backoff on reconnect
+			case k8swatch.Bookmark:
+				// Update RV immediately — there is no delivery to confirm.
+				c.updateResourceVersion(event, state)
+				state.resetBackoff()
+			default:
 				resp := c.kserviceEventToWatchResponse(ctx, event)
 				if resp == nil {
 					continue
 				}
 				select {
 				case ch <- resp:
+					// Advance RV only after confirmed delivery so a failed send
+					// doesn't silently skip the event on the next reconnect.
+					c.updateResourceVersion(event, state)
+					state.resetBackoff()
 				case <-ctx.Done():
-					return
+					return false, false
 				}
 			}
 		}
-	}()
-	return ch, nil
+	}
+}
+
+// updateResourceVersion extracts and stores the latest resourceVersion from a watch event.
+// For Bookmark events it is called immediately; for data events only after successful delivery.
+func (c *AppK8sClient) updateResourceVersion(event k8swatch.Event, state *watchState) {
+	switch event.Type {
+	case k8swatch.Added, k8swatch.Modified, k8swatch.Deleted, k8swatch.Bookmark:
+		if ksvc, ok := event.Object.(*servingv1.Service); ok {
+			if rv := ksvc.GetResourceVersion(); rv != "" {
+				state.lastResourceVersion = rv
+			}
+		}
+	}
 }
 
 // kserviceEventToWatchResponse maps a K8s watch event to a flyteapp.WatchResponse.
@@ -255,8 +421,8 @@ func (c *AppK8sClient) kserviceEventToWatchResponse(ctx context.Context, event k
 	}
 }
 
-// GetStatus reads the KService and maps its conditions to a flyteapp.Status proto.
-func (c *AppK8sClient) GetStatus(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.Status, error) {
+// GetApp reads the KService and returns the full App including reconstructed Spec and live Status.
+func (c *AppK8sClient) GetApp(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.App, error) {
 	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 	name := kserviceName(appID)
 	ksvc := &servingv1.Service{}
@@ -266,20 +432,34 @@ func (c *AppK8sClient) GetStatus(ctx context.Context, appID *flyteapp.Identifier
 		}
 		return nil, fmt.Errorf("failed to get KService %s: %w", name, err)
 	}
-	return c.kserviceToStatus(ctx, ksvc), nil
+	return c.kserviceToApp(ctx, ksvc)
+}
+
+// specFromAnnotation deserializes the Spec stored in the flyte.org/spec annotation.
+// Returns nil if the annotation is absent or malformed.
+func specFromAnnotation(ksvc *servingv1.Service) *flyteapp.Spec {
+	b64, ok := ksvc.Annotations[annotationSpec]
+	if !ok {
+		return nil
+	}
+	b, err := base64.StdEncoding.DecodeString(b64)
+	if err != nil {
+		return nil
+	}
+	spec := &flyteapp.Spec{}
+	if err := proto.Unmarshal(b, spec); err != nil {
+		return nil
+	}
+	return spec
 }
 
 // List returns apps for the given project/domain scope with optional pagination.
-func (c *AppK8sClient) List(ctx context.Context, project, domain, appName string, limit uint32, token string) ([]*flyteapp.App, string, error) {
+func (c *AppK8sClient) List(ctx context.Context, project, domain string, limit uint32, token string) ([]*flyteapp.App, string, error) {
 	ns := appNamespace(project, domain)
 
-	matchLabels := client.MatchingLabels{labelAppManaged: "true"}
-	if appName != "" {
-		matchLabels[labelAppName] = strings.ToLower(appName)
-	}
 	listOpts := []client.ListOption{
 		client.InNamespace(ns),
-		matchLabels,
+		client.MatchingLabels{labelAppManaged: "true"},
 	}
 	if limit > 0 {
 		listOpts = append(listOpts, client.Limit(int64(limit)))
@@ -305,6 +485,25 @@ func (c *AppK8sClient) List(ctx context.Context, project, domain, appName string
 	return apps, list.Continue, nil
 }
 
+// publicIngress returns the deterministic public URL for an app using the same
+// logic as the service layer so GetStatus/List/Watch are consistent with Create.
+func (c *AppK8sClient) publicIngress(id *flyteapp.Identifier) *flyteapp.Ingress {
+	if c.cfg.BaseDomain == "" {
+		return nil
+	}
+	scheme := c.cfg.Scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
+		id.GetName(), id.GetProject(), id.GetDomain(), c.cfg.BaseDomain))
+	url := scheme + "://" + host
+	if c.cfg.IngressAppsPort != 0 {
+		url += fmt.Sprintf(":%d", c.cfg.IngressAppsPort)
+	}
+	return &flyteapp.Ingress{PublicUrl: url}
+}
+
 // --- Helpers ---
 
 // kserviceName returns the KService name for an app. Since each app is deployed
@@ -323,14 +522,19 @@ func kserviceName(id *flyteapp.Identifier) string {
 	return name[:maxKServiceNameLen-9] + "-" + suffix
 }
 
-// specSHA computes a SHA256 digest of the serialized App Spec proto.
-func specSHA(spec *flyteapp.Spec) (string, error) {
+// marshalSpec serializes the App Spec proto and returns the raw bytes.
+func marshalSpec(spec *flyteapp.Spec) ([]byte, error) {
 	b, err := proto.Marshal(spec)
 	if err != nil {
-		return "", fmt.Errorf("failed to marshal spec: %w", err)
+		return nil, fmt.Errorf("failed to marshal spec: %w", err)
 	}
-	sum := sha256.Sum256(b)
-	return hex.EncodeToString(sum[:8]), nil // 8 bytes = 16 hex chars, enough for change detection
+	return b, nil
+}
+
+// specSHA computes a SHA256 digest of the serialized App Spec proto.
+func specSHA(specBytes []byte) string {
+	sum := sha256.Sum256(specBytes)
+	return hex.EncodeToString(sum[:8]) // 8 bytes = 16 hex chars, enough for change detection
 }
 
 // buildKService constructs a Knative Service manifest from an App proto.
@@ -340,14 +544,24 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	name := kserviceName(appID)
 	ns := appNamespace(appID.GetProject(), appID.GetDomain())
 
-	sha, err := specSHA(spec)
+	specBytes, err := marshalSpec(spec)
 	if err != nil {
 		return nil, err
 	}
+	sha := specSHA(specBytes)
 
 	podSpec, err := buildPodSpec(spec)
 	if err != nil {
 		return nil, err
+	}
+	// Inject cluster-level default env vars (e.g. _U_EP_OVERRIDE) before user vars
+	// so they can be overridden by app-specific env vars if needed.
+	if len(c.cfg.DefaultEnvVars) > 0 && len(podSpec.Containers) > 0 {
+		defaults := make([]corev1.EnvVar, 0, len(c.cfg.DefaultEnvVars))
+		for k, v := range c.cfg.DefaultEnvVars {
+			defaults = append(defaults, corev1.EnvVar{Name: k, Value: v})
+		}
+		podSpec.Containers[0].Env = append(defaults, podSpec.Containers[0].Env...)
 	}
 
 	templateAnnotations := buildAutoscalingAnnotations(spec, c.cfg)
@@ -374,6 +588,7 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 			Annotations: map[string]string{
 				annotationSpecSHA: sha,
 				annotationAppID:   fmt.Sprintf("%s/%s/%s", appID.GetProject(), appID.GetDomain(), appID.GetName()),
+				annotationSpec:    base64.StdEncoding.EncodeToString(specBytes),
 			},
 		},
 		Spec: servingv1.ServiceSpec{
@@ -400,9 +615,10 @@ func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 	case *flyteapp.Spec_Container:
 		c := p.Container
 		container := corev1.Container{
-			Name:  "app",
-			Image: c.GetImage(),
-			Args:  c.GetArgs(),
+			Name:    "app",
+			Image:   c.GetImage(),
+			Command: c.GetCommand(),
+			Args:    c.GetArgs(),
 		}
 		for _, e := range c.GetEnv() {
 			container.Env = append(container.Env, corev1.EnvVar{
@@ -410,7 +626,17 @@ func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 				Value: e.GetValue(),
 			})
 		}
-		return corev1.PodSpec{Containers: []corev1.Container{container}}, nil
+		for _, p := range c.GetPorts() {
+			container.Ports = append(container.Ports, corev1.ContainerPort{
+				ContainerPort: int32(p.GetContainerPort()),
+				Name:          p.GetName(),
+			})
+		}
+		container.Resources = buildResourceRequirements(c.GetResources())
+		return corev1.PodSpec{
+			Containers:         []corev1.Container{container},
+			EnableServiceLinks: boolPtr(false),
+		}, nil
 
 	case *flyteapp.Spec_Pod:
 		// K8sPod payloads are not yet supported — the pod spec serialization
@@ -422,8 +648,51 @@ func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 	}
 }
 
+// buildResourceRequirements maps flyteidl2 Resources to corev1.ResourceRequirements.
+func buildResourceRequirements(res *flytecore.Resources) corev1.ResourceRequirements {
+	if res == nil {
+		return corev1.ResourceRequirements{}
+	}
+	reqs := corev1.ResourceRequirements{}
+	if len(res.GetRequests()) > 0 {
+		reqs.Requests = make(corev1.ResourceList)
+		for _, e := range res.GetRequests() {
+			if name, ok := protoResourceName(e.GetName()); ok {
+				reqs.Requests[name] = k8sresource.MustParse(e.GetValue())
+			}
+		}
+	}
+	if len(res.GetLimits()) > 0 {
+		reqs.Limits = make(corev1.ResourceList)
+		for _, e := range res.GetLimits() {
+			if name, ok := protoResourceName(e.GetName()); ok {
+				reqs.Limits[name] = k8sresource.MustParse(e.GetValue())
+			}
+		}
+	}
+	return reqs
+}
+
+// protoResourceName maps a flyteidl2 ResourceName to the equivalent corev1.ResourceName.
+func protoResourceName(name flytecore.Resources_ResourceName) (corev1.ResourceName, bool) {
+	switch name {
+	case flytecore.Resources_CPU:
+		return corev1.ResourceCPU, true
+	case flytecore.Resources_MEMORY:
+		return corev1.ResourceMemory, true
+	case flytecore.Resources_STORAGE:
+		return corev1.ResourceStorage, true
+	case flytecore.Resources_EPHEMERAL_STORAGE:
+		return corev1.ResourceEphemeralStorage, true
+	default:
+		return "", false
+	}
+}
+
+func boolPtr(b bool) *bool { return &b }
+
 // buildAutoscalingAnnotations returns the Knative autoscaling annotations for the revision template.
-func buildAutoscalingAnnotations(spec *flyteapp.Spec, cfg *config.AppConfig) map[string]string {
+func buildAutoscalingAnnotations(spec *flyteapp.Spec, cfg *config.InternalAppConfig) map[string]string {
 	annotations := map[string]string{}
 	autoscaling := spec.GetAutoscaling()
 	if autoscaling == nil {
@@ -498,10 +767,13 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 
 	status := statusWithPhase(phase, message)
 
-	// Populate ingress URL from KService route status.
-	if url := ksvc.Status.URL; url != nil {
-		status.Ingress = &flyteapp.Ingress{
-			PublicUrl: url.String(),
+	// Populate ingress URL from the app annotation so the URL is consistent
+	// with the Create response regardless of Knative route readiness.
+	if appIDStr := ksvc.Annotations[annotationAppID]; appIDStr != "" {
+		parts := strings.SplitN(appIDStr, "/", 3)
+		if len(parts) == 3 {
+			appID := &flyteapp.Identifier{Project: parts[0], Domain: parts[1], Name: parts[2]}
+			status.Ingress = c.publicIngress(appID)
 		}
 	}
 
@@ -516,6 +788,10 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 	}
 	status.K8SMetadata = &flyteapp.K8SMetadata{
 		Namespace: ksvc.Namespace,
+	}
+
+	if !ksvc.CreationTimestamp.IsZero() {
+		status.CreatedAt = timestamppb.New(ksvc.CreationTimestamp.Time)
 	}
 
 	return status
@@ -633,6 +909,7 @@ func (c *AppK8sClient) kserviceToApp(ctx context.Context, ksvc *servingv1.Servic
 		Metadata: &flyteapp.Meta{
 			Id: appID,
 		},
+		Spec:   specFromAnnotation(ksvc),
 		Status: c.kserviceToStatus(ctx, ksvc),
 	}, nil
 }

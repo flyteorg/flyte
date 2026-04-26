@@ -26,6 +26,8 @@ import (
 	"github.com/flyteorg/flyte/v2/dataproxy/logs"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
@@ -42,17 +44,19 @@ type Service struct {
 	taskClient    taskconnect.TaskServiceClient
 	triggerClient triggerconnect.TriggerServiceClient
 	runClient     workflowconnect.RunServiceClient
+	projectClient projectconnect.ProjectServiceClient
 	logStreamer   logs.LogStreamer
 }
 
 // NewService creates a new DataProxyService instance.
-func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient, runClient workflowconnect.RunServiceClient, logStreamer logs.LogStreamer) *Service {
+func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient, runClient workflowconnect.RunServiceClient, projectClient projectconnect.ProjectServiceClient, logStreamer logs.LogStreamer) *Service {
 	return &Service{
 		cfg:           cfg,
 		dataStore:     dataStore,
 		taskClient:    taskClient,
 		triggerClient: triggerClient,
 		runClient:     runClient,
+		projectClient: projectClient,
 		logStreamer:   logStreamer,
 	}
 }
@@ -73,6 +77,9 @@ func (s *Service) CreateUploadLocation(
 	if err := validateUploadRequest(ctx, req.Msg, s.cfg); err != nil {
 		logger.Errorf(ctx, "Request validation failed: %v", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+	if err := s.validateProjectExists(ctx, req.Msg.GetProject()); err != nil {
+		return nil, err
 	}
 
 	// Build the storage path
@@ -121,6 +128,20 @@ func (s *Service) CreateUploadLocation(
 		resp.NativeUrl, resp.ExpiresAt.AsTime().Format(time.RFC3339))
 
 	return connect.NewResponse(resp), nil
+}
+
+// validateProjectExists checks that the given project ID exists by calling the ProjectService.
+func (s *Service) validateProjectExists(ctx context.Context, projectID string) error {
+	if _, err := s.projectClient.GetProject(ctx, connect.NewRequest(&project.GetProjectRequest{
+		Id: projectID,
+	})); err != nil {
+		if connect.CodeOf(err) == connect.CodeNotFound {
+			return connect.NewError(connect.CodeNotFound, fmt.Errorf("project %q not found", projectID))
+		}
+		logger.Errorf(ctx, "Failed to validate project %q: %v", projectID, err)
+		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to validate project: %w", err))
+	}
+	return nil
 }
 
 // checkFileExists validates whether a file upload is safe by checking existing files.
@@ -224,6 +245,10 @@ func (s *Service) UploadInputs(
 		domain = id.ProjectId.GetDomain()
 	default:
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("id is required"))
+	}
+
+	if err := s.validateProjectExists(ctx, project); err != nil {
+		return nil, err
 	}
 
 	// Resolve the task template to get cache_ignore_input_vars.

@@ -22,64 +22,31 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	storageMocks "github.com/flyteorg/flyte/v2/flytestdlib/storage/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
+	actionsconnectmocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
+	projectMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-// mockActionsClient implements actionsconnect.ActionsServiceClient for testing.
-type mockActionsClient struct {
-	mock.Mock
+// newMockProjectClientAlwaysOK returns a mock ProjectServiceClient whose GetProject always succeeds.
+func newMockProjectClientAlwaysOK(t *testing.T) *projectMocks.ProjectServiceClient {
+	pc := projectMocks.NewProjectServiceClient(t)
+	pc.EXPECT().GetProject(mock.Anything, mock.Anything).
+		Return(connect.NewResponse(&project.GetProjectResponse{}), nil).Maybe()
+	return pc
 }
 
-func (m *mockActionsClient) Enqueue(ctx context.Context, req *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error) {
-	args := m.Called(ctx, req)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*connect.Response[actions.EnqueueResponse]), args.Error(1)
-}
-
-func (m *mockActionsClient) GetLatestState(ctx context.Context, req *connect.Request[actions.GetLatestStateRequest]) (*connect.Response[actions.GetLatestStateResponse], error) {
-	args := m.Called(ctx, req)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*connect.Response[actions.GetLatestStateResponse]), args.Error(1)
-}
-
-func (m *mockActionsClient) WatchForUpdates(ctx context.Context, req *connect.Request[actions.WatchForUpdatesRequest]) (*connect.ServerStreamForClient[actions.WatchForUpdatesResponse], error) {
-	args := m.Called(ctx, req)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*connect.ServerStreamForClient[actions.WatchForUpdatesResponse]), args.Error(1)
-}
-
-func (m *mockActionsClient) Update(ctx context.Context, req *connect.Request[actions.UpdateRequest]) (*connect.Response[actions.UpdateResponse], error) {
-	args := m.Called(ctx, req)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*connect.Response[actions.UpdateResponse]), args.Error(1)
-}
-
-func (m *mockActionsClient) Abort(ctx context.Context, req *connect.Request[actions.AbortRequest]) (*connect.Response[actions.AbortResponse], error) {
-	args := m.Called(ctx, req)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*connect.Response[actions.AbortResponse]), args.Error(1)
-}
-
-func newTestService(t *testing.T) (*repoMocks.ActionRepo, *mockActionsClient, *RunService) {
+func newTestService(t *testing.T) (*repoMocks.ActionRepo, *actionsconnectmocks.ActionsServiceClient, *RunService) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
 	repo.On("TaskRepo").Maybe().Return(taskRepo)
@@ -90,7 +57,6 @@ func newTestService(t *testing.T) (*repoMocks.ActionRepo, *mockActionsClient, *R
 		repo.AssertExpectations(t)
 		actionRepo.AssertExpectations(t)
 		taskRepo.AssertExpectations(t)
-		actionsClient.AssertExpectations(t)
 	})
 
 	return actionRepo, actionsClient, svc
@@ -122,7 +88,7 @@ func newRunServiceTestClient(t *testing.T, svc *RunService) workflowconnect.RunS
 func TestGetRunDetails_WithTaskSpec(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
 	repo.On("TaskRepo").Maybe().Return(taskRepo)
@@ -339,7 +305,7 @@ func TestWatchClusterEvents_StreamsNewPersistedClusterEventsWithoutReplay(t *tes
 func TestGetRunDetails_ReturnsRunSpecEnvVars(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
 	repo.On("TaskRepo").Maybe().Return(taskRepo)
@@ -402,7 +368,7 @@ func TestGetRunDetails_ReturnsRunSpecEnvVars(t *testing.T) {
 func TestGetRunDetails_UsesActionCacheStatus(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
 	repo.On("TaskRepo").Maybe().Return(taskRepo)
@@ -459,7 +425,7 @@ func TestGetRunDetails_UsesActionCacheStatus(t *testing.T) {
 func TestGetRunDetails_TaskSpecLookupFails(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
 	repo.On("TaskRepo").Maybe().Return(taskRepo)
@@ -569,7 +535,7 @@ func TestFillDefaultInputsForCreateRun(t *testing.T) {
 func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -580,6 +546,7 @@ func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
 	svc := &RunService{
 		repo:          repo,
 		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -772,9 +739,8 @@ func TestListRuns(t *testing.T) {
 		})
 	}
 	type mockListRes struct {
-		runs  []*models.Run
-		token string
-		err   error
+		runs []*models.Run
+		err  error
 	}
 	testCases := []struct {
 		name    string
@@ -789,22 +755,26 @@ func TestListRuns(t *testing.T) {
 			&workflow.ListRunsResponse{Runs: []*workflow.Run{}, Token: ""},
 		},
 		{
+			// Service fetches Limit+1 rows to detect another page. With 3 rows
+			// returned for a limit of 2, the slice is trimmed to the first 2
+			// runs and the cursor token is the trimmed last row's created_at.
 			"list with limit 2 and token",
-			&common.ListRequest{Limit: 2, Token: "5"},
-			mockListRes{runs: sqlRes[5:7], token: "7", err: nil},
-			&workflow.ListRunsResponse{Runs: runs[5:7], Token: "7"},
+			&common.ListRequest{Limit: 2, Token: sqlRes[5].CreatedAt.UTC().Format(time.RFC3339Nano)},
+			mockListRes{runs: sqlRes[5:8], err: nil},
+			&workflow.ListRunsResponse{Runs: runs[5:7], Token: sqlRes[6].CreatedAt.UTC().Format(time.RFC3339Nano)},
 		},
 		{
+			// Only 2 rows returned for limit 3 means no next page — token empty.
 			"list with limit 3 and token",
-			&common.ListRequest{Limit: 3, Token: "8"},
-			mockListRes{runs: sqlRes[8:10], token: "", err: nil},
+			&common.ListRequest{Limit: 3, Token: sqlRes[8].CreatedAt.UTC().Format(time.RFC3339Nano)},
+			mockListRes{runs: sqlRes[8:10], err: nil},
 			&workflow.ListRunsResponse{Runs: runs[8:10], Token: ""},
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			req := connect.NewRequest(&workflow.ListRunsRequest{Request: tc.req})
-			actionRepo.On("ListRuns", mock.Anything, req.Msg).Return(tc.mockRes.runs, tc.mockRes.token, tc.mockRes.err)
+			actionRepo.On("ListActions", mock.Anything, mock.Anything).Return(tc.mockRes.runs, tc.mockRes.err).Once()
 			got, err := svc.ListRuns(context.Background(), req)
 			assert.NoError(t, err)
 			assert.Equal(t, len(tc.expect.Runs), len(got.Msg.Runs))
@@ -812,6 +782,33 @@ func TestListRuns(t *testing.T) {
 			assert.Equal(t, tc.expect.Token, got.Msg.Token)
 		})
 	}
+}
+
+// TestListAndSendAllActionsUsesAscendingSort guards against regressing the
+// default repo sort order leaking into the WatchActions seed path. Children
+// have a later created_at than their parents; if ListActions returns rows in
+// descending order, the run state manager's insertAction fails because the
+// parent node is not yet in the tree. This test asserts we always pass an
+// ascending created_at sort parameter.
+func TestListAndSendAllActionsUsesAscendingSort(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+
+	runID := &common.RunIdentifier{Project: "p", Domain: "d", Name: "run-1"}
+
+	var captured interfaces.ListResourceInput
+	actionRepo.On("ListActions", mock.Anything, mock.MatchedBy(func(input interfaces.ListResourceInput) bool {
+		captured = input
+		return true
+	})).Return([]*models.Action{}, nil).Once()
+
+	rsm, err := newRunStateManager(nil)
+	require.NoError(t, err)
+
+	err = svc.listAndSendAllActions(context.Background(), runID, rsm, nil)
+	require.NoError(t, err)
+
+	require.Len(t, captured.SortParameters, 1)
+	assert.Equal(t, "created_at ASC", captured.SortParameters[0].GetOrderExpr())
 }
 
 func TestGenerateRunName(t *testing.T) {
@@ -1043,7 +1040,7 @@ func TestInputsProtoCompat(t *testing.T) {
 func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1054,6 +1051,7 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	svc := &RunService{
 		repo:          repo,
 		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1100,7 +1098,7 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1111,6 +1109,7 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	svc := &RunService{
 		repo:          repo,
 		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1157,7 +1156,7 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1168,6 +1167,7 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 	svc := &RunService{
 		repo:          repo,
 		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1206,7 +1206,7 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1217,6 +1217,7 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 	svc := &RunService{
 		repo:          repo,
 		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1274,7 +1275,7 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 
 func TestGetActionData_ReadsOutputFromAttempts(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1420,7 +1421,7 @@ func TestGetActionData_NonSucceededSkipsOutputs(t *testing.T) {
 func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1431,6 +1432,7 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 	svc := &RunService{
 		repo:          repo,
 		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}

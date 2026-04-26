@@ -17,6 +17,7 @@ COPY flyteplugins flyteplugins
 COPY flytestdlib flytestdlib
 COPY gen/go gen/go
 COPY actions actions
+COPY app app
 COPY events events
 COPY runs runs
 COPY cache_service cache_service

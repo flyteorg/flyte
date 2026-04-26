@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	actionsconnectmocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
@@ -33,7 +34,7 @@ var testActionID = &common.ActionIdentifier{
 func newTestServiceWithTaskRepo(t *testing.T) (*repoMocks.ActionRepo, *repoMocks.TaskRepo, *RunService) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
 	repo.On("TaskRepo").Maybe().Return(taskRepo)

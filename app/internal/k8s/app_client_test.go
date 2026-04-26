@@ -4,6 +4,8 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -18,7 +20,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
-	"github.com/flyteorg/flyte/v2/app/config"
+	"github.com/flyteorg/flyte/v2/app/internal/config"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	flytecoreapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -55,7 +57,7 @@ func testClient(t *testing.T, objs ...client.Object) *AppK8sClient {
 		Build()
 	return &AppK8sClient{
 		k8sClient: fc,
-		cfg: &config.AppConfig{
+		cfg: &config.InternalAppConfig{
 			DefaultRequestTimeout: 5 * time.Minute,
 			MaxRequestTimeout:     time.Hour,
 		},
@@ -175,16 +177,16 @@ func TestDelete_NotFound(t *testing.T) {
 	require.NoError(t, c.Delete(context.Background(), id))
 }
 
-func TestGetStatus_NotFound(t *testing.T) {
+func TestGetApp_NotFound(t *testing.T) {
 	c := testClient(t)
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "missing"}
-	status, err := c.GetStatus(context.Background(), id)
+	app, err := c.GetApp(context.Background(), id)
 	require.Error(t, err)
 	assert.True(t, k8serrors.IsNotFound(err))
-	assert.Nil(t, status)
+	assert.Nil(t, app)
 }
 
-func TestGetStatus_Stopped(t *testing.T) {
+func TestGetApp_Stopped(t *testing.T) {
 	c := testClient(t)
 	app := testApp("proj", "dev", "myapp", "nginx:latest")
 	require.NoError(t, c.Deploy(context.Background(), app))
@@ -192,13 +194,13 @@ func TestGetStatus_Stopped(t *testing.T) {
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
 	require.NoError(t, c.Stop(context.Background(), id))
 
-	status, err := c.GetStatus(context.Background(), id)
+	result, err := c.GetApp(context.Background(), id)
 	require.NoError(t, err)
-	require.Len(t, status.Conditions, 1)
-	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_STOPPED, status.Conditions[0].DeploymentStatus)
+	require.Len(t, result.Status.Conditions, 1)
+	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_STOPPED, result.Status.Conditions[0].DeploymentStatus)
 }
 
-func TestGetStatus_CurrentReplicas(t *testing.T) {
+func TestGetApp_CurrentReplicas(t *testing.T) {
 	s := testScheme(t)
 	// Pre-populate a KService with LatestReadyRevisionName already set in status,
 	// and the corresponding Revision with ActualReplicas=4.
@@ -228,13 +230,36 @@ func TestGetStatus_CurrentReplicas(t *testing.T) {
 		Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
-		cfg:       &config.AppConfig{},
+		cfg:       &config.InternalAppConfig{},
 	}
 
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
-	status, err := c.GetStatus(context.Background(), id)
+	result, err := c.GetApp(context.Background(), id)
 	require.NoError(t, err)
-	assert.Equal(t, uint32(4), status.CurrentReplicas)
+	assert.Equal(t, uint32(4), result.Status.CurrentReplicas)
+}
+
+func TestGetApp_SpecRoundTrip(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	app.Spec.Profile = &flyteapp.Profile{
+		Type:             "FastAPI",
+		Name:             "My App",
+		ShortDescription: "A test app",
+	}
+	app.Spec.Autoscaling = &flyteapp.AutoscalingConfig{
+		Replicas: &flyteapp.Replicas{Min: 1, Max: 5},
+	}
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
+	result, err := c.GetApp(context.Background(), id)
+	require.NoError(t, err)
+	require.NotNil(t, result.Spec)
+	assert.Equal(t, "FastAPI", result.Spec.Profile.Type)
+	assert.Equal(t, "My App", result.Spec.Profile.Name)
+	assert.Equal(t, uint32(1), result.Spec.Autoscaling.Replicas.Min)
+	assert.Equal(t, uint32(5), result.Spec.Autoscaling.Replicas.Max)
 }
 
 func TestList(t *testing.T) {
@@ -277,54 +302,17 @@ func TestList(t *testing.T) {
 		Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
-		cfg: &config.AppConfig{
+		cfg: &config.InternalAppConfig{
 			DefaultRequestTimeout: 5 * time.Minute,
 			MaxRequestTimeout:     time.Hour,
 		},
 	}
 
-	apps, nextToken, err := c.List(context.Background(), "proj", "dev", "", 0, "")
+	apps, nextToken, err := c.List(context.Background(), "proj", "dev", 0, "")
 	require.NoError(t, err)
 	assert.Empty(t, nextToken)
 	require.Len(t, apps, 1)
 	assert.Equal(t, "proj", apps[0].Metadata.Id.Project)
-	assert.Equal(t, "app1", apps[0].Metadata.Id.Name)
-}
-
-func TestList_ByAppName(t *testing.T) {
-	s := testScheme(t)
-	ksvc1 := &servingv1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "app1",
-			Namespace: "proj-dev",
-			Labels: map[string]string{
-				labelAppManaged: "true",
-				labelProject:    "proj",
-				labelDomain:     "dev",
-				labelAppName:    "app1",
-			},
-			Annotations: map[string]string{annotationAppID: "proj/dev/app1"},
-		},
-	}
-	ksvc2 := &servingv1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "app2",
-			Namespace: "proj-dev",
-			Labels: map[string]string{
-				labelAppManaged: "true",
-				labelProject:    "proj",
-				labelDomain:     "dev",
-				labelAppName:    "app2",
-			},
-			Annotations: map[string]string{annotationAppID: "proj/dev/app2"},
-		},
-	}
-	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(ksvc1, ksvc2).Build()
-	c := &AppK8sClient{k8sClient: fc, cfg: &config.AppConfig{}}
-
-	apps, _, err := c.List(context.Background(), "proj", "dev", "app1", 0, "")
-	require.NoError(t, err)
-	require.Len(t, apps, 1)
 	assert.Equal(t, "app1", apps[0].Metadata.Id.Name)
 }
 
@@ -348,7 +336,7 @@ func TestGetReplicas(t *testing.T) {
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(pod).Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
-		cfg:       &config.AppConfig{},
+		cfg:       &config.InternalAppConfig{},
 	}
 
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
@@ -370,7 +358,7 @@ func TestDeleteReplica(t *testing.T) {
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(pod).Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
-		cfg:       &config.AppConfig{},
+		cfg:       &config.InternalAppConfig{},
 	}
 
 	replicaID := &flyteapp.ReplicaIdentifier{
@@ -536,4 +524,291 @@ func TestPodDeploymentStatus(t *testing.T) {
 			assert.Equal(t, tt.wantReason, reason)
 		})
 	}
+}
+
+// --- Watch reconnect tests ---
+
+// watchCall is a pre-programmed response for one call to multiWatchClient.Watch.
+type watchCall struct {
+	watcher k8swatch.Interface
+	err     error
+}
+
+// multiWatchClient wraps the fake client but intercepts Watch() calls, returning
+// pre-programmed watchers in sequence. All other methods delegate to the embedded fake.
+type multiWatchClient struct {
+	client.WithWatch
+	mu      sync.Mutex
+	calls   []watchCall
+	callIdx int
+	// capturedRVs records the ResourceVersion passed to each Watch() call (for assertions).
+	capturedRVs []string
+}
+
+func (m *multiWatchClient) Watch(ctx context.Context, list client.ObjectList, opts ...client.ListOption) (k8swatch.Interface, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	// Extract ResourceVersion from Raw options if present.
+	lo := &client.ListOptions{}
+	for _, o := range opts {
+		o.ApplyToList(lo)
+	}
+	rv := ""
+	if lo.Raw != nil {
+		rv = lo.Raw.ResourceVersion
+	}
+	m.capturedRVs = append(m.capturedRVs, rv)
+
+	if m.callIdx >= len(m.calls) {
+		// No more programmed calls — return a watcher that blocks until ctx is cancelled.
+		return k8swatch.NewFakeWithChanSize(0, false), nil
+	}
+	c := m.calls[m.callIdx]
+	m.callIdx++
+	if c.err != nil {
+		return nil, c.err
+	}
+	return c.watcher, nil
+}
+
+// newMultiClient builds an AppK8sClient backed by a multiWatchClient.
+func newMultiClient(t *testing.T, calls []watchCall, objs ...client.Object) (*AppK8sClient, *multiWatchClient) {
+	t.Helper()
+	s := testScheme(t)
+	base := fake.NewClientBuilder().WithScheme(s).WithObjects(objs...).Build()
+	mwc := &multiWatchClient{WithWatch: base, calls: calls}
+	return &AppK8sClient{
+		k8sClient: mwc,
+		cfg:       &config.InternalAppConfig{},
+	}, mwc
+}
+
+// testKsvc builds a minimal KService that kserviceToApp can parse.
+func testKsvc(name, ns, rv string) *servingv1.Service {
+	return &servingv1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            name,
+			Namespace:       ns,
+			ResourceVersion: rv,
+			Annotations:     map[string]string{annotationAppID: "proj/dev/" + name},
+			Labels:          map[string]string{labelAppManaged: "true"},
+		},
+	}
+}
+
+func TestWatch_ReconnectsOnChannelClose(t *testing.T) {
+	watchBackoffInitial = 0
+	t.Cleanup(func() { watchBackoffInitial = 1 * time.Second })
+
+	w1 := k8swatch.NewFake()
+	w2 := k8swatch.NewFake()
+
+	c, _ := newMultiClient(t, []watchCall{{watcher: w1}, {watcher: w2}})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	ch, err := c.Watch(ctx, "proj", "dev", "")
+	require.NoError(t, err)
+
+	// Send one event on w1 then close it (simulates K8s timeout/disconnect).
+	w1.Add(testKsvc("myapp", "proj-dev", "100"))
+	w1.Stop()
+
+	recv1 := <-ch
+	require.NotNil(t, recv1.GetCreateEvent(), "expected CreateEvent from first watcher")
+
+	// After reconnect, send an event on w2.
+	go func() {
+		time.Sleep(10 * time.Millisecond)
+		w2.Add(testKsvc("myapp", "proj-dev", "200"))
+	}()
+
+	recv2 := <-ch
+	require.NotNil(t, recv2.GetCreateEvent(), "expected CreateEvent from second watcher after reconnect")
+}
+
+func TestWatch_ReconnectsOnErrorEvent(t *testing.T) {
+	watchBackoffInitial = 0
+	t.Cleanup(func() { watchBackoffInitial = 1 * time.Second })
+
+	w1 := k8swatch.NewFake()
+	w2 := k8swatch.NewFake()
+
+	c, _ := newMultiClient(t, []watchCall{{watcher: w1}, {watcher: w2}})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	ch, err := c.Watch(ctx, "proj", "dev", "")
+	require.NoError(t, err)
+
+	// Send a K8s Error event — should trigger reconnect.
+	w1.Error(&metav1.Status{Code: 410, Reason: metav1.StatusReasonExpired, Message: "too old resource version"})
+
+	go func() {
+		time.Sleep(10 * time.Millisecond)
+		w2.Add(testKsvc("myapp", "proj-dev", "300"))
+	}()
+
+	resp := <-ch
+	require.NotNil(t, resp.GetCreateEvent(), "expected CreateEvent from second watcher after error-triggered reconnect")
+}
+
+func TestWatch_BookmarkUpdatesResourceVersion(t *testing.T) {
+	watchBackoffInitial = 0
+	t.Cleanup(func() { watchBackoffInitial = 1 * time.Second })
+
+	w1 := k8swatch.NewFake()
+	w2 := k8swatch.NewFake()
+
+	c, mwc := newMultiClient(t, []watchCall{{watcher: w1}, {watcher: w2}})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	ch, err := c.Watch(ctx, "proj", "dev", "")
+	require.NoError(t, err)
+
+	// Send a Bookmark with RV=999 then close w1.
+	w1.Action(k8swatch.Bookmark, &servingv1.Service{
+		ObjectMeta: metav1.ObjectMeta{ResourceVersion: "999"},
+	})
+	w1.Stop()
+
+	// Deliver an event from w2 after reconnect.
+	go func() {
+		time.Sleep(10 * time.Millisecond)
+		w2.Add(testKsvc("myapp", "proj-dev", "1000"))
+	}()
+
+	resp := <-ch
+	require.NotNil(t, resp.GetCreateEvent())
+
+	// The second Watch() call should have been made with ResourceVersion="999".
+	mwc.mu.Lock()
+	rvs := append([]string(nil), mwc.capturedRVs...)
+	mwc.mu.Unlock()
+
+	require.GreaterOrEqual(t, len(rvs), 2, "expected at least 2 Watch calls")
+	assert.Equal(t, "", rvs[0], "first Watch call should have no resourceVersion")
+	assert.Equal(t, "999", rvs[1], "second Watch call should use Bookmark resourceVersion")
+}
+
+func TestWatch_ExponentialBackoff(t *testing.T) {
+	watchBackoffInitial = 10 * time.Millisecond
+	watchBackoffMax = 80 * time.Millisecond
+	watchBackoffFactor = 2.0
+	t.Cleanup(func() {
+		watchBackoffInitial = 1 * time.Second
+		watchBackoffMax = 30 * time.Second
+	})
+
+	// Four watchers that each emit an Error event — only Error events trigger backoff.
+	// NewFakeWithChanSize(1,...) gives a buffer of 1 so pre-sends don't block before
+	// the consumer goroutine starts (NewFake() is unbuffered).
+	calls := make([]watchCall, 4)
+	for i := range calls {
+		w := k8swatch.NewFakeWithChanSize(1, false)
+		calls[i] = watchCall{watcher: w}
+		w.Error(&metav1.Status{Code: 410, Reason: metav1.StatusReasonExpired, Message: "resource version too old"})
+	}
+
+	c, mwc := newMultiClient(t, calls)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	start := time.Now()
+	ch, err := c.Watch(ctx, "proj", "dev", "")
+	require.NoError(t, err)
+
+	// Wait until at least 4 Watch() calls have been made.
+	require.Eventually(t, func() bool {
+		mwc.mu.Lock()
+		defer mwc.mu.Unlock()
+		return len(mwc.capturedRVs) >= 4
+	}, 2*time.Second, 5*time.Millisecond)
+
+	elapsed := time.Since(start)
+	// With 10ms+20ms+40ms backoffs before 4th call, minimum elapsed ≈ 70ms.
+	assert.GreaterOrEqual(t, elapsed, 60*time.Millisecond, "backoff should accumulate across error reconnects")
+
+	cancel()
+	for range ch {
+	}
+}
+
+func TestWatch_CleanCloseNoBackoff(t *testing.T) {
+	watchBackoffInitial = 50 * time.Millisecond
+	watchBackoffMax = 200 * time.Millisecond
+	t.Cleanup(func() {
+		watchBackoffInitial = 1 * time.Second
+		watchBackoffMax = 30 * time.Second
+	})
+
+	// Three watchers that close immediately (clean channel close, no Error event).
+	calls := []watchCall{
+		{watcher: k8swatch.NewFake()},
+		{watcher: k8swatch.NewFake()},
+		{watcher: k8swatch.NewFake()},
+	}
+	for _, wc := range calls {
+		wc.watcher.(*k8swatch.FakeWatcher).Stop()
+	}
+
+	c, mwc := newMultiClient(t, calls)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	start := time.Now()
+	ch, err := c.Watch(ctx, "proj", "dev", "")
+	require.NoError(t, err)
+
+	require.Eventually(t, func() bool {
+		mwc.mu.Lock()
+		defer mwc.mu.Unlock()
+		return len(mwc.capturedRVs) >= 3
+	}, 500*time.Millisecond, 5*time.Millisecond)
+
+	elapsed := time.Since(start)
+	// Clean closes must not apply backoff — all 3 reconnects should be nearly instant.
+	assert.Less(t, elapsed, 30*time.Millisecond, "clean closes should not apply backoff delay")
+
+	cancel()
+	for range ch {
+	}
+}
+
+func TestWatch_ContextCancelStopsLoop(t *testing.T) {
+	watchBackoffInitial = 0
+	t.Cleanup(func() { watchBackoffInitial = 1 * time.Second })
+
+	w1 := k8swatch.NewFake()
+	c, _ := newMultiClient(t, []watchCall{{watcher: w1}})
+
+	ctx, cancel := context.WithCancel(context.Background())
+	ch, err := c.Watch(ctx, "proj", "dev", "")
+	require.NoError(t, err)
+
+	cancel()
+
+	select {
+	case _, ok := <-ch:
+		assert.False(t, ok, "channel should be closed after ctx cancel")
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("channel not closed within 500ms of ctx cancel")
+	}
+}
+
+func TestWatch_InitialWatchErrorReturnsError(t *testing.T) {
+	c, _ := newMultiClient(t, []watchCall{
+		{watcher: nil, err: fmt.Errorf("RBAC denied")},
+	})
+
+	ch, err := c.Watch(context.Background(), "proj", "dev", "")
+	require.Error(t, err)
+	assert.Nil(t, ch)
 }

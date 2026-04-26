@@ -13,6 +13,7 @@ import "flyteidl2/task/common.proto";
 import "flyteidl2/task/run.proto";
 import "flyteidl2/task/task_definition.proto";
 import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 
@@ -71,32 +72,47 @@ message TraceAction {
 // ConditionAction is used to define a condition that can be evaluated at runtime. It can be used to
 // await a signal from an external system and can carry a value.
 message ConditionAction {
-  // Name is the unique identifier for the action. It must be unique within the defined scope below.
+  // Name is the unique identifier for the action.
   string name = 1 [(buf.validate.field).string.min_len = 1];
 
-  oneof scope {
-    option (buf.validate.oneof).required = true;
-    // RunId is the unique identifier for the run this action is associated with.
-    string run_id = 2 [(buf.validate.field).string.min_len = 1];
+  // Fields 2-4 reserved (formerly scope oneof: run_id, action_id, global).
+  reserved 2, 3, 4;
+  reserved "run_id", "action_id", "global";
 
-    // ActionId is the unique identifier for the action this action is associated with.
-    string action_id = 3 [(buf.validate.field).string.min_len = 1];
-
-    // Global indicates the condition is global and can be used across all runs and actions.
-    bool global = 4;
-  }
-
-  // Type is the type of the value the condition is expected. This can be used to properly render
-  // a UI element for the condition or validate when a value is received that it is of the expected
-  // type.
+  // Type is the expected value type for the condition.
   flyteidl2.core.LiteralType type = 6;
 
-  // Prompt is the prompt that will be shown to the user when the condition is awaited.
+  // Prompt shown to the user when the condition is awaited.
   string prompt = 7;
 
-  // Description is a description of the condition. This can be used to provide additional
-  // information to the user about the condition.
+  // Description of the condition.
   string description = 8;
+
+  // How to render the prompt.
+  ConditionPromptType prompt_type = 9;
+
+  // Optional timeout duration. If the condition is not signaled within this
+  // duration after creation, it transitions to TIMED_OUT with a timeout error.
+  // Must be strictly positive when set; zero or negative values are ignored.
+  google.protobuf.Duration timeout = 10;
+
+  // Optional webhook to fire when the condition action is created.
+  ConditionWebhook webhook = 11;
+}
+
+enum ConditionPromptType {
+  CONDITION_PROMPT_TYPE_UNSPECIFIED = 0;
+  CONDITION_PROMPT_TYPE_TEXT = 1;
+  CONDITION_PROMPT_TYPE_MARKDOWN = 2;
+}
+
+message ConditionWebhook {
+  // The HTTP endpoint to POST to when the condition action is created.
+  string url = 1;
+
+  // Optional JSON payload. String values may contain "{callback_uri}"
+  // which the backend replaces with the signal URI for this condition.
+  google.protobuf.Struct payload = 2;
 }
 
 message TaskActionMetadata {
@@ -116,17 +132,8 @@ message TraceActionMetadata {
 
 message ConditionActionMetadata {
   string name = 1;
-  oneof scope {
-    option (buf.validate.oneof).required = true;
-    // RunId is the unique identifier for the run this action is associated with.
-    string run_id = 2 [(buf.validate.field).string.min_len = 1];
-
-    // ActionId is the unique identifier for the action this action is associated with.
-    string action_id = 3 [(buf.validate.field).string.min_len = 1];
-
-    // Global indicates the condition is global and can be used across all runs and actions.
-    bool global = 4;
-  }
+  reserved 2, 3, 4;
+  reserved "run_id", "action_id", "global";
 }
 
 // Static, lightweight metadata about an action.
