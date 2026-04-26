@@ -3,7 +3,7 @@ variable "IMAGE_REPO_PREFIX" {
 }
 
 variable "IMAGE_SHA_SHORT_TAG" {
-  default = "latest"
+  default = "nightly"
 }
 
 variable "GO_VERSION" {
