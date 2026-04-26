@@ -28,7 +28,5 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 FROM gcr.io/distroless/static-debian12
 
 COPY --from=builder /src/actions-service /
-# Copy default config
-COPY --from=builder /src/actions/config.yaml /
 
 ENTRYPOINT ["/actions-service"]

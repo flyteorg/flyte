@@ -25,6 +25,5 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 FROM gcr.io/distroless/static-debian12
 
 COPY --from=builder /src/runs-service /
-COPY --from=builder /src/runs/config.yaml /
 
 ENTRYPOINT ["/runs-service"]
