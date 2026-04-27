@@ -13,23 +13,23 @@ manager:
     namespace: "flyte"
     kubeconfig: "~/.kube/config"
 
-  apps:
-    cacheTtl: 30s
+apps:
+  cacheTtl: 30s
 
-  internalApps:
-    enabled: true
-    baseDomain: "localhost"
-    scheme: "http"
-    ingressAppsPort: 30081
-    defaultRequestTimeout: 300s
-    maxRequestTimeout: 3600s
-    defaultEnvVars:
-      - FLYTE_AWS_ENDPOINT: "http://rustfs.flyte.svc.cluster.local:9000"
-      - FLYTE_AWS_ACCESS_KEY_ID: "rustfs"
-      - FLYTE_AWS_SECRET_ACCESS_KEY: "rustfsstorage"
-      - _U_EP_OVERRIDE: "host.docker.internal:8090"
-      - _U_INSECURE: "true"
-      - _U_USE_ACTIONS: "1"
+internalApps:
+  enabled: true
+  baseDomain: "localhost"
+  scheme: "http"
+  ingressAppsPort: 30081
+  defaultRequestTimeout: 300s
+  maxRequestTimeout: 3600s
+  defaultEnvVars:
+    - FLYTE_AWS_ENDPOINT: "http://rustfs.flyte.svc.cluster.local:9000"
+    - FLYTE_AWS_ACCESS_KEY_ID: "rustfs"
+    - FLYTE_AWS_SECRET_ACCESS_KEY: "rustfsstorage"
+    - _U_EP_OVERRIDE: "host.docker.internal:8090"
+    - _U_INSECURE: "true"
+    - _U_USE_ACTIONS: "1"
 
 
 # Webhook configuration
