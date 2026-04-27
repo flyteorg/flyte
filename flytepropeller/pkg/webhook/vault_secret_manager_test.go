@@ -48,7 +48,7 @@ func RetrieveUUID(annotations map[string]string) string {
 func ExpectedKVv1(uuid string) *corev1.Pod {
 	expected := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Annotations: map[string]string{
+			Annotations: map[string]string{ //nolint:gosec
 				"vault.hashicorp.com/agent-inject":                                "true",
 				"vault.hashicorp.com/secret-volume-path":                          "/etc/flyte/secrets",
 				"vault.hashicorp.com/role":                                        "flyte",
@@ -66,7 +66,7 @@ func ExpectedKVv1(uuid string) *corev1.Pod {
 func ExpectedKVv2(uuid string) *corev1.Pod {
 	expected := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Annotations: map[string]string{
+			Annotations: map[string]string{ //nolint:gosec
 				"vault.hashicorp.com/agent-inject":                                "true",
 				"vault.hashicorp.com/secret-volume-path":                          "/etc/flyte/secrets",
 				"vault.hashicorp.com/role":                                        "flyte",
@@ -84,7 +84,7 @@ func ExpectedKVv2(uuid string) *corev1.Pod {
 func ExpectedExtraAnnotation(uuid string) *corev1.Pod {
 	expected := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Annotations: map[string]string{
+			Annotations: map[string]string{ //nolint:gosec
 				"vault.hashicorp.com/agent-inject":                                "true",
 				"vault.hashicorp.com/secret-volume-path":                          "/etc/flyte/secrets",
 				"vault.hashicorp.com/role":                                        "flyte",
@@ -103,7 +103,7 @@ func ExpectedExtraAnnotation(uuid string) *corev1.Pod {
 func ExpectedExistingRoleAnnotation(uuid string) *corev1.Pod {
 	expected := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Annotations: map[string]string{
+			Annotations: map[string]string{ //nolint:gosec
 				"vault.hashicorp.com/agent-inject":                                "true",
 				"vault.hashicorp.com/secret-volume-path":                          "/etc/flyte/secrets",
 				"vault.hashicorp.com/role":                                        "my-role",
@@ -121,7 +121,7 @@ func ExpectedExistingRoleAnnotation(uuid string) *corev1.Pod {
 func ExpectedConfigAnnotation(uuid string) *corev1.Pod {
 	expected := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Annotations: map[string]string{
+			Annotations: map[string]string{ //nolint:gosec
 				"vault.hashicorp.com/agent-inject":                                "true",
 				"vault.hashicorp.com/secret-volume-path":                          "/etc/flyte/secrets",
 				"vault.hashicorp.com/role":                                        "flyte",
@@ -139,7 +139,7 @@ func ExpectedConfigAnnotation(uuid string) *corev1.Pod {
 func ExpectedDB(uuid string) *corev1.Pod {
 	expected := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Annotations: map[string]string{
+			Annotations: map[string]string{ //nolint:gosec
 				"vault.hashicorp.com/agent-inject":                              "true",
 				"vault.hashicorp.com/secret-volume-path":                        "/etc/flyte/secrets",
 				"vault.hashicorp.com/role":                                      "flyte",

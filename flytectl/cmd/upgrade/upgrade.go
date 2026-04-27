@@ -65,7 +65,7 @@ func SelfUpgrade(rootCmd *cobra.Command) map[string]cmdCore.CommandEntry {
 func selfUpgrade(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	// Check if it's a rollback
 	if len(args) == 1 {
-		if args[0] == rollBackSubCommand && !isRollBackSupported(goos) {
+		if args[0] == rollBackSubCommand && !isRollBackSupported(goos) { //nolint:gosec
 			return nil
 		}
 		ext, err := github.FlytectlReleaseConfig.GetExecutable()

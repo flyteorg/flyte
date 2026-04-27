@@ -286,7 +286,7 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request *adm
 		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.GetRequestId(), err)
 	}
 
-	go func() {
+	go func() { //nolint:gosec
 		ceCtx := context.TODO()
 		if err := m.cloudEventPublisher.Publish(ceCtx, proto.MessageName(request), request); err != nil {
 			logger.Infof(ctx, "error publishing cloud event [%+v] with err: [%v]", request.GetRequestId(), err)

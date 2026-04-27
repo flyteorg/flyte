@@ -7,7 +7,6 @@ import (
 
 	executors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	interfaces "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
-
 	mock "github.com/stretchr/testify/mock"
 )
 

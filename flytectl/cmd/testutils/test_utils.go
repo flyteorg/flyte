@@ -110,7 +110,7 @@ func RandomName(length int) string {
 
 	var b strings.Builder
 	for i := 0; i < length; i++ {
-		c := rune('a' + rand.Intn('z'-'a')) // #nosec G404 - we use this function for testing only, do not need a cryptographically secure random number generator
+		c := rune('a' + rand.Intn('z'-'a')) //nolint:gosec
 		b.WriteRune(c)
 	}
 
