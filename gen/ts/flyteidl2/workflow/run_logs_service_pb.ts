@@ -15,7 +15,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/workflow/run_logs_service.proto.
  */
 export const file_flyteidl2_workflow_run_logs_service: GenFile = /*@__PURE__*/
-  fileDesc("CilmbHl0ZWlkbDIvd29ya2Zsb3cvcnVuX2xvZ3Nfc2VydmljZS5wcm90bxISZmx5dGVpZGwyLndvcmtmbG93ImoKD1RhaWxMb2dzUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAIoUBChBUYWlsTG9nc1Jlc3BvbnNlEjcKBGxvZ3MYASADKAsyKS5mbHl0ZWlkbDIud29ya2Zsb3cuVGFpbExvZ3NSZXNwb25zZS5Mb2dzGjgKBExvZ3MSMAoFbGluZXMYASADKAsyIS5mbHl0ZWlkbDIubG9ncy5kYXRhcGxhbmUuTG9nTGluZTJxCg5SdW5Mb2dzU2VydmljZRJfCghUYWlsTG9ncxIjLmZseXRlaWRsMi53b3JrZmxvdy5UYWlsTG9nc1JlcXVlc3QaJC5mbHl0ZWlkbDIud29ya2Zsb3cuVGFpbExvZ3NSZXNwb25zZSIGiAIBkAIBMAFC0AEKFmNvbS5mbHl0ZWlkbDIud29ya2Zsb3dCE1J1bkxvZ3NTZXJ2aWNlUHJvdG9IAlABWjZnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvd29ya2Zsb3eiAgNGV1iqAhJGbHl0ZWlkbDIuV29ya2Zsb3fKAhJGbHl0ZWlkbDJcV29ya2Zsb3fiAh5GbHl0ZWlkbDJcV29ya2Zsb3dcR1BCTWV0YWRhdGHqAhNGbHl0ZWlkbDI6OldvcmtmbG93YgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_logs_dataplane_payload]);
+  fileDesc("CilmbHl0ZWlkbDIvd29ya2Zsb3cvcnVuX2xvZ3Nfc2VydmljZS5wcm90bxISZmx5dGVpZGwyLndvcmtmbG93IpgBCg9UYWlsTG9nc1JlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESGAoHYXR0ZW1wdBgCIAEoDUIHukgEKgIgABIRCgl0YXNrX3R5cGUYAyABKAkSGQoRdGFza190eXBlX3ZlcnNpb24YBCABKAUihQEKEFRhaWxMb2dzUmVzcG9uc2USNwoEbG9ncxgBIAMoCzIpLmZseXRlaWRsMi53b3JrZmxvdy5UYWlsTG9nc1Jlc3BvbnNlLkxvZ3MaOAoETG9ncxIwCgVsaW5lcxgBIAMoCzIhLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Mb2dMaW5lMnEKDlJ1bkxvZ3NTZXJ2aWNlEl8KCFRhaWxMb2dzEiMuZmx5dGVpZGwyLndvcmtmbG93LlRhaWxMb2dzUmVxdWVzdBokLmZseXRlaWRsMi53b3JrZmxvdy5UYWlsTG9nc1Jlc3BvbnNlIgaIAgGQAgEwAULQAQoWY29tLmZseXRlaWRsMi53b3JrZmxvd0ITUnVuTG9nc1NlcnZpY2VQcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi93b3JrZmxvd6ICA0ZXWKoCEkZseXRlaWRsMi5Xb3JrZmxvd8oCEkZseXRlaWRsMlxXb3JrZmxvd+ICHkZseXRlaWRsMlxXb3JrZmxvd1xHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6V29ya2Zsb3diBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_logs_dataplane_payload]);
 
 /**
  * Request message for tailing logs.
@@ -36,6 +36,22 @@ export type TailLogsRequest = Message<"flyteidl2.workflow.TailLogsRequest"> & {
    * @generated from field: uint32 attempt = 2;
    */
   attempt: number;
+
+  /**
+   * +optional. Connector task type name (e.g. "airflow", "batch_job"). When set, the run service forwards this
+   * hint to the dataplane so log requests for connector tasks can be routed to the connector's GetTaskLogs RPC
+   * instead of pod logs. The UI populates this from the task template it already loaded for the run.
+   *
+   * @generated from field: string task_type = 3;
+   */
+  taskType: string;
+
+  /**
+   * +optional. Connector task type version. Used together with task_type to identify a TaskCategory.
+   *
+   * @generated from field: int32 task_type_version = 4;
+   */
+  taskTypeVersion: number;
 };
 
 /**
