@@ -105,6 +105,54 @@ data:
         {{- end }}
       container: {{ required "Metadata container required" .metadataContainer }}
     {{- end }}
+  {{- if .Values.configuration.auth.enabled }}
+  004-auth.yaml: |
+    auth:
+      appAuth:
+        {{- if .Values.configuration.auth.enableAuthServer }}
+        authServerType: Self
+        {{- else }}
+        authServerType: External
+        {{- end }}
+        {{- with .Values.configuration.auth.externalAuthServer }}
+        externalAuthServer:
+          baseUrl: {{ tpl (default "" .baseUrl) $ | quote }}
+          {{- if .metadataUrl }}
+          metadataUrl: {{ .metadataUrl | quote }}
+          {{- end }}
+          allowedAudience:
+            {{- range .allowedAudience }}
+            - {{ tpl . $ | quote }}
+            {{- end }}
+        {{- end }}
+        {{- with .Values.configuration.auth.flyteClient }}
+        thirdPartyConfig:
+          flyteClient:
+            clientId: {{ .clientId | quote }}
+            redirectUri: {{ .redirectUri | quote }}
+            {{- if .audience }}
+            audience: {{ .audience | quote }}
+            {{- end }}
+            scopes:
+              {{- range .scopes }}
+              - {{ . | quote }}
+              {{- end }}
+        {{- end }}
+      authorizedUris:
+        {{- range .Values.configuration.auth.authorizedUris }}
+        - {{ tpl . $ | quote }}
+        {{- end }}
+      userAuth:
+        openId:
+          baseUrl: {{ .Values.configuration.auth.oidc.baseUrl | quote }}
+          clientId: {{ .Values.configuration.auth.oidc.clientId | quote }}
+          scopes:
+            - openid
+            - profile
+    runs:
+      security:
+        useAuth: true
+  {{- end }}
   {{- if .Values.configuration.inline }}
   100-inline-config.yaml: |
     {{- tpl ( .Values.configuration.inline | toYaml ) . | nindent 4 }}

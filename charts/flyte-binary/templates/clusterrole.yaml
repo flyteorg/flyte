@@ -22,6 +22,15 @@ rules:
   - apiGroups:
     - ""
     resources:
+    - namespaces
+    verbs:
+    - create
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
     - pods
     verbs:
     - create
@@ -33,17 +42,23 @@ rules:
     - watch
   - apiGroups:
     - ""
+    - events.k8s.io
     resources:
     - events
     verbs:
     - create
     - delete
+    - get
+    - list
     - patch
     - update
+    - watch
   - apiGroups:
     - flyte.org
     resources:
     - taskactions
+    - taskactions/status
+    - taskactions/finalizers
     verbs:
     - create
     - delete
@@ -69,8 +84,12 @@ rules:
     - secrets
     verbs:
     - create
+    - delete
     - get
+    - list
+    - patch
     - update
+    - watch
   {{- if .Values.rbac.extraRules }}
   {{- toYaml .Values.rbac.extraRules | nindent 2 }}
   {{- end }}

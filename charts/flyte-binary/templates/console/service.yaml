@@ -1,0 +1,20 @@
+{{- if .Values.console.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "flyte-binary.fullname" . }}-console
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{ include "flyte-binary.labels" . | nindent 4 }}
+  {{- with .Values.console.service.annotations }}
+  annotations:
+    {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.console.service.type | default "ClusterIP" }}
+  ports:
+    - name: http
+      port: {{ .Values.console.service.port | default 80 }}
+      targetPort: http
+      protocol: TCP
+  selector: {{ include "flyte-binary.consoleSelectorLabels" . | nindent 4 }}
+{{- end }}

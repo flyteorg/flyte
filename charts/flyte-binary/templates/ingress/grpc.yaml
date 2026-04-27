@@ -7,20 +7,20 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "flyte-binary.labels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
-    {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
+    {{ tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.ingress.labels }}
-    {{- tpl ( .Values.ingress.labels | toYaml ) . | nindent 4 }}
+    {{ tpl ( .Values.ingress.labels | toYaml ) . | nindent 4 }}
     {{- end }}
   annotations:
     {{- if .Values.commonAnnotations }}
-    {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
+    {{ tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.ingress.commonAnnotations }}
-    {{- tpl ( .Values.ingress.commonAnnotations | toYaml ) . | nindent 4 }}
+    {{ tpl ( .Values.ingress.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.ingress.grpcAnnotations }}
-    {{- tpl ( .Values.ingress.grpcAnnotations | toYaml ) . | nindent 4 }}
+    {{ tpl ( .Values.ingress.grpcAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
 spec:
   {{- if .Values.ingress.grpcIngressClassName }}

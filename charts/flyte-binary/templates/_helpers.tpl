@@ -114,6 +114,35 @@ templates: {{- toYaml .custom | nindent 2 -}}
 {{- end -}}
 
 {{/*
+Selector labels for Console
+*/}}
+{{ define "flyte-binary.consoleSelectorLabels" -}}
+{{ include "flyte-binary.selectorLabels" . }}
+app.kubernetes.io/component: console
+{{- end }}
+
+{{/*
+Get the Secret name for Run service authentication secrets. When a user
+supplies `configuration.auth.runServiceAuthSecretRef`, that existing Secret is
+referenced directly (no template is rendered); otherwise a new Secret named
+`<fullname>-admin-auth` is used.
+*/}}
+{{ define "flyte-binary.configuration.auth.runServiceAuthSecretName" -}}
+{{- if .Values.configuration.auth.runServiceAuthSecretRef -}}
+{{ tpl .Values.configuration.auth.runServiceAuthSecretRef . }}
+{{- else -}}
+{{ printf "%s-admin-auth" (include "flyte-binary.fullname" .) }}
+{{- end -}}
+{{ end -}}
+
+{{/*
+Get the Secret name for Flyte authentication client secrets.
+*/}}
+{{ define "flyte-binary.configuration.auth.clientSecretName" -}}
+{{ printf "%s-client-secrets" (include "flyte-binary.fullname" .) }}
+{{ end -}}
+
+{{/*
 Get the Flyte cluster resource templates ConfigMap name.
 */}}
 {{- define "flyte-binary.clusterResourceTemplates.configMapName" -}}
@@ -131,14 +160,14 @@ Get the Flyte HTTP service name
 Get the Flyte service HTTP port.
 */}}
 {{- define "flyte-binary.service.http.port" -}}
-{{- default 8090 .Values.service.ports.http -}}
+{{- default 8080 .Values.service.ports.http -}}
 {{- end -}}
 
 {{/*
 Get the Flyte gRPC service name
 */}}
 {{- define "flyte-binary.service.grpc.name" -}}
-{{- printf "%s-http" (include "flyte-binary.fullname" .) -}}
+{{- printf "%s-grpc" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
 
 {{/*
@@ -149,7 +178,11 @@ Get the Flyte service gRPC port.
 {{- end -}}
 
 {{/*
-Get the Flyte API paths for ingress.
+Get the Flyte API paths for ingress. Services whose names start with
+"Internal" (e.g. InternalRunService) plus ActionsService are intended for
+intra-cluster traffic from task pods only; they are deliberately NOT exposed
+via the external ALB ingress here. The Go auth middleware allowlists them so
+cluster-internal ClusterIP calls reach them without credentials.
 */}}
 {{- define "flyte-binary.ingress.grpcPaths" -}}
 - /flyteidl2.workflow.RunService
@@ -158,12 +191,20 @@ Get the Flyte API paths for ingress.
 - /flyteidl2.task.TaskService/*
 - /flyteidl2.workflow.TranslatorService
 - /flyteidl2.workflow.TranslatorService/*
-- /flyteidl2.actions.ActionsService
-- /flyteidl2.actions.ActionsService/*
 - /flyteidl2.dataproxy.DataProxyService
 - /flyteidl2.dataproxy.DataProxyService/*
 - /flyteidl2.secret.SecretService
 - /flyteidl2.secret.SecretService/*
+- /flyteidl2.project.ProjectService
+- /flyteidl2.project.ProjectService/*
+- /flyteidl2.app.AppService
+- /flyteidl2.app.AppService/*
+- /flyteidl2.trigger.TriggerService
+- /flyteidl2.trigger.TriggerService/*
+- /flyteidl2.auth.AuthMetadataService
+- /flyteidl2.auth.AuthMetadataService/*
+- /flyteidl2.auth.IdentityService
+- /flyteidl2.auth.IdentityService/*
 {{- end -}}
 
 {{/*
