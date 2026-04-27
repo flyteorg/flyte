@@ -41,5 +41,14 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted AppService at %s", path)
 
+	internalLogsClient := appconnect.NewAppLogsServiceClient(
+		http.DefaultClient,
+		internalAppURL+"/internal",
+	)
+	logsSvc := service.NewAppLogsService(internalLogsClient)
+	logsPath, logsHandler := appconnect.NewAppLogsServiceHandler(logsSvc)
+	sc.Mux.Handle(logsPath, logsHandler)
+	logger.Infof(ctx, "Mounted AppLogsService at %s", logsPath)
+
 	return nil
 }

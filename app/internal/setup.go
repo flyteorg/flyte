@@ -45,5 +45,18 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext, cfg *appconfig.Inter
 	sc.Mux.Handle("/internal"+path, http.StripPrefix("/internal", handler))
 	logger.Infof(ctx, "Mounted InternalAppService at /internal%s", path)
 
+	if sc.K8sConfig != nil {
+		streamer, err := service.NewK8sAppLogStreamer(sc.K8sConfig)
+		if err != nil {
+			return fmt.Errorf("internalapp: failed to create log streamer: %w", err)
+		}
+		logsSvc := service.NewInternalAppLogsService(appK8sClient, streamer)
+		logsPath, logsHandler := appconnect.NewAppLogsServiceHandler(logsSvc)
+		sc.Mux.Handle("/internal"+logsPath, http.StripPrefix("/internal", logsHandler))
+		logger.Infof(ctx, "Mounted InternalAppLogsService at /internal%s", logsPath)
+	} else {
+		logger.Warnf(ctx, "K8sConfig not set, skipping InternalAppLogsService setup")
+	}
+
 	return nil
 }

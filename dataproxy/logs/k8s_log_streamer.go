@@ -1,12 +1,8 @@
 package logs
 
 import (
-	"bufio"
 	"context"
 	"fmt"
-	"io"
-	"strings"
-	"time"
 
 	"connectrpc.com/connect"
 	corev1 "k8s.io/api/core/v1"
@@ -15,17 +11,13 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	"google.golang.org/protobuf/types/known/timestamppb"
-
+	"github.com/flyteorg/flyte/v2/flytestdlib/k8s/podlogs"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/logs/dataplane"
 )
 
-const (
-	logBatchSize        = 100
-	defaultInitialLines = int64(1000)
-)
+const defaultInitialLines = int64(1000)
 
 // K8sLogStreamer streams logs directly from Kubernetes pods.
 type K8sLogStreamer struct {
@@ -93,86 +85,13 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 	}
 	defer logStream.Close()
 
-	reader := bufio.NewReader(logStream)
-
-	lines := make([]*dataplane.LogLine, 0, logBatchSize)
-	var readErr error
-
-	for {
-		line, err := reader.ReadString('\n')
-		if len(line) > 0 {
-			// Trim trailing newline(s) including possible CRLF.
-			line = strings.TrimRight(line, "\r\n")
-			logLine := parseLogLine(line)
-			lines = append(lines, logLine)
-
-			if len(lines) >= logBatchSize {
-				if sendErr := stream.Send(&dataproxy.TailLogsResponse{
-					Logs: []*dataproxy.TailLogsResponse_Logs{
-						{Lines: lines},
-					},
-				}); sendErr != nil {
-					return sendErr
-				}
-				lines = make([]*dataplane.LogLine, 0, logBatchSize)
-			}
-		}
-		if err != nil {
-			if err != io.EOF {
-				readErr = err
-			}
-			break
-		}
-
-		// Flush buffered lines when no more data is immediately available.
-		// Without this, lines sit in the buffer while ReadString blocks
-		// waiting for the next newline (e.g. pod is sleeping).
-		if len(lines) > 0 && reader.Buffered() == 0 {
-			if sendErr := stream.Send(&dataproxy.TailLogsResponse{
-				Logs: []*dataproxy.TailLogsResponse_Logs{
-					{Lines: lines},
-				},
-			}); sendErr != nil {
-				return sendErr
-			}
-			lines = make([]*dataplane.LogLine, 0, logBatchSize)
-		}
+	err = podlogs.Stream(ctx, logStream, podlogs.DefaultBatchSize, func(lines []*dataplane.LogLine) error {
+		return stream.Send(&dataproxy.TailLogsResponse{
+			Logs: []*dataproxy.TailLogsResponse_Logs{{Lines: lines}},
+		})
+	})
+	if err != nil {
+		return connect.NewError(connect.CodeInternal, fmt.Errorf("error reading log stream: %w", err))
 	}
-
-	// Send remaining lines.
-	if len(lines) > 0 {
-		if err := stream.Send(&dataproxy.TailLogsResponse{
-			Logs: []*dataproxy.TailLogsResponse_Logs{
-				{Lines: lines},
-			},
-		}); err != nil {
-			return err
-		}
-	}
-
-	// Return error for non-EOF read failures (unless context was canceled).
-	if readErr != nil && ctx.Err() == nil {
-		return connect.NewError(connect.CodeInternal, fmt.Errorf("error reading log stream: %w", readErr))
-	}
-
 	return nil
-}
-
-// parseLogLine splits a K8s log line into timestamp and message.
-// K8s log lines with timestamps are formatted as: "2006-01-02T15:04:05.999999999Z message"
-func parseLogLine(line string) *dataplane.LogLine {
-	if idx := strings.IndexByte(line, ' '); idx > 0 {
-		if t, err := time.Parse(time.RFC3339Nano, line[:idx]); err == nil {
-			return &dataplane.LogLine{
-				Originator: dataplane.LogLineOriginator_USER,
-				Timestamp:  timestamppb.New(t),
-				Message:    line[idx+1:],
-			}
-		}
-	}
-
-	return &dataplane.LogLine{
-		Originator: dataplane.LogLineOriginator_USER,
-		Message:    line,
-	}
 }
