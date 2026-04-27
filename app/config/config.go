@@ -1,6 +1,10 @@
 package config
 
-import "time"
+import (
+	"time"
+
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+)
 
 // AppConfig holds configuration for the control plane AppService.
 type AppConfig struct {
@@ -13,13 +17,24 @@ type AppConfig struct {
 	CacheTTL time.Duration `json:"cacheTtl" pflag:",TTL for app status cache"`
 }
 
-// DefaultAppConfig returns the default control plane AppConfig.
-func DefaultAppConfig() *AppConfig {
-	return &AppConfig{
-		InternalAppServiceURL: "http://localhost:8091",
-		CacheTTL:              30 * time.Second,
-	}
+
+const appConfigSectionKey = "apps"
+
+var defaultAppConfig = &AppConfig{
+	InternalAppServiceURL: "http://localhost:8091",
+	CacheTTL:              30 * time.Second,
 }
+
+var appConfigSection = config.MustRegisterSection(appConfigSectionKey, defaultAppConfig)
+
+// GetAppConfig returns the current AppConfig.
+func GetAppConfig() *AppConfig {
+	return appConfigSection.GetConfig().(*AppConfig)
+}
+
+const internalAppConfigSectionKey = "internalApps"
+
+//go:generate pflags InternalAppConfig --default-var=defaultInternalAppConfig
 
 // InternalAppConfig holds configuration for the data plane InternalAppService.
 type InternalAppConfig struct {
@@ -49,4 +64,21 @@ type InternalAppConfig struct {
 	// Use this to inject cluster-internal endpoints (e.g. _U_EP_OVERRIDE) that app
 	// processes need to connect back to the Flyte manager.
 	DefaultEnvVars map[string]string `json:"defaultEnvVars" pflag:"-,Default env vars injected into every app pod"`
+
+	// WatchBufferSize is the buffer size for each subscriber's event channel.
+	// A larger value reduces the chance of dropped events under burst load.
+	WatchBufferSize int `json:"watchBufferSize" pflag:",Buffer size for watch subscriber channels"`
+}
+
+var defaultInternalAppConfig = &InternalAppConfig{
+	DefaultRequestTimeout: 300 * time.Second,
+	MaxRequestTimeout:     3600 * time.Second,
+	WatchBufferSize:       100,
+}
+
+var internalAppConfigSection = config.MustRegisterSection(internalAppConfigSectionKey, defaultInternalAppConfig)
+
+// GetInternalAppConfig returns the current InternalAppConfig.
+func GetInternalAppConfig() *InternalAppConfig {
+	return internalAppConfigSection.GetConfig().(*InternalAppConfig)
 }

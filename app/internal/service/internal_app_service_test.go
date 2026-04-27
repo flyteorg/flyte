@@ -64,12 +64,21 @@ func (m *mockAppK8sClient) DeleteReplica(ctx context.Context, replicaID *flyteap
 	return m.Called(ctx, replicaID).Error(0)
 }
 
-func (m *mockAppK8sClient) Watch(ctx context.Context, project, domain, appName string) (<-chan *flyteapp.WatchResponse, error) {
-	args := m.Called(ctx, project, domain, appName)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(<-chan *flyteapp.WatchResponse), args.Error(1)
+func (m *mockAppK8sClient) StartWatching(ctx context.Context) error {
+	return m.Called(ctx).Error(0)
+}
+
+func (m *mockAppK8sClient) StopWatching() {
+	m.Called()
+}
+
+func (m *mockAppK8sClient) Subscribe(appName string) chan *flyteapp.WatchResponse {
+	args := m.Called(appName)
+	return args.Get(0).(chan *flyteapp.WatchResponse)
+}
+
+func (m *mockAppK8sClient) Unsubscribe(appName string, ch chan *flyteapp.WatchResponse) {
+	m.Called(appName, ch)
 }
 
 // --- helpers ---
@@ -322,36 +331,6 @@ func TestList_NoFilter(t *testing.T) {
 
 // --- Watch ---
 
-func TestWatch_InitialSnapshot(t *testing.T) {
-	k8s := &mockAppK8sClient{}
-
-	apps := []*flyteapp.App{testApp()}
-	ch := make(chan *flyteapp.WatchResponse)
-	close(ch)
-
-	k8s.On("List", mock.Anything, "proj", "dev", uint32(0), "").Return(apps, "", nil)
-	k8s.On("Watch", mock.Anything, "proj", "dev", "").Return((<-chan *flyteapp.WatchResponse)(ch), nil)
-
-	client := newTestClient(t, k8s)
-	stream, err := client.Watch(context.Background(), connect.NewRequest(&flyteapp.WatchRequest{
-		Target: &flyteapp.WatchRequest_Project{
-			Project: &common.ProjectIdentifier{Name: "proj", Domain: "dev"},
-		},
-	}))
-	require.NoError(t, err)
-
-	// Expect one CreateEvent from the initial snapshot.
-	require.True(t, stream.Receive())
-	resp := stream.Msg()
-	ce, ok := resp.Event.(*flyteapp.WatchResponse_CreateEvent)
-	require.True(t, ok)
-	assert.Equal(t, "myapp", ce.CreateEvent.App.Metadata.Id.Name)
-
-	// Channel is closed — stream should end.
-	assert.False(t, stream.Receive())
-	k8s.AssertExpectations(t)
-}
-
 func TestWatch_AppIDTarget(t *testing.T) {
 	k8s := &mockAppK8sClient{}
 
@@ -359,7 +338,8 @@ func TestWatch_AppIDTarget(t *testing.T) {
 	close(ch)
 
 	k8s.On("List", mock.Anything, "proj", "dev", uint32(0), "").Return([]*flyteapp.App{}, "", nil)
-	k8s.On("Watch", mock.Anything, "proj", "dev", "myapp").Return((<-chan *flyteapp.WatchResponse)(ch), nil)
+	k8s.On("Subscribe", "myapp").Return(ch)
+	k8s.On("Unsubscribe", "myapp", ch).Return()
 
 	client := newTestClient(t, k8s)
 	stream, err := client.Watch(context.Background(), connect.NewRequest(&flyteapp.WatchRequest{
