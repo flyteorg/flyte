@@ -89,13 +89,6 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := runs.Setup(ctx, sc); err != nil {
 		return err
 	}
-	// InternalAppService must be mounted before AppService so the proxy can reach it.
-	if err := flyteapp.SetupInternal(ctx, sc, &cfg.InternalApps); err != nil {
-		return err
-	}
-	if err := flyteapp.Setup(ctx, sc, &cfg.Apps); err != nil {
-		return err
-	}
 	if err := dataproxy.Setup(ctx, sc); err != nil {
 		return err
 	}
@@ -105,10 +98,19 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := cache_service.Setup(ctx, sc); err != nil {
 		return err
 	}
+	// executor.Setup sets sc.K8sCache (via mgr.GetCache()); services that depend
+	// on the cache (InternalAppService, Actions) must be set up after this.
 	if err := executor.Setup(ctx, sc); err != nil {
 		return err
 	}
 	if err := actions.Setup(ctx, sc); err != nil {
+		return err
+	}
+	// InternalAppService must be mounted before AppService so the proxy can reach it.
+	if err := flyteapp.SetupInternal(ctx, sc); err != nil {
+		return err
+	}
+	if err := flyteapp.Setup(ctx, sc); err != nil {
 		return err
 	}
 	if err := secret.Setup(ctx, sc); err != nil {

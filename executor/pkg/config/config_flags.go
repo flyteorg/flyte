@@ -63,6 +63,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "enableHTTP2"), defaultConfig.EnableHTTP2, "Enable HTTP/2 for metrics and webhook servers")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "EventsServiceURL"), defaultConfig.EventsServiceURL, "URL of the Event Service for action event updates")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cluster"), defaultConfig.Cluster, "Cluster identifier for action events")
+	cmdFlags.Uint32(fmt.Sprintf("%v%v", prefix, "maxSystemFailures"), defaultConfig.MaxSystemFailures, "Max consecutive system-level failures before forcing permanent failure")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "gc.interval"), defaultConfig.GC.Interval.String(), "How often the garbage collector runs. 0 disables GC.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "gc.maxTTL"), defaultConfig.GC.MaxTTL.String(), "Time-to-live for terminal TaskActions before deletion.")
 	return cmdFlags

@@ -8,8 +8,10 @@ import (
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/v2/actions/service/mocks"
+	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -169,4 +171,91 @@ func TestAbort(t *testing.T) {
 
 		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
 	})
+}
+
+func TestErrorStateToExecutionError(t *testing.T) {
+	t.Run("USER kind", func(t *testing.T) {
+		got := errorStateToExecutionError(&executorv1.ErrorState{
+			Code: "OOMKilled", Kind: "USER", Message: "pod oom",
+		})
+		assert.Equal(t, "OOMKilled", got.Code)
+		assert.Equal(t, core.ExecutionError_USER, got.Kind)
+		assert.Equal(t, "pod oom", got.Message)
+	})
+
+	t.Run("SYSTEM kind", func(t *testing.T) {
+		got := errorStateToExecutionError(&executorv1.ErrorState{
+			Code: "NodeLost", Kind: "SYSTEM", Message: "node lost",
+		})
+		assert.Equal(t, core.ExecutionError_SYSTEM, got.Kind)
+	})
+
+	t.Run("unknown kind defaults to UNKNOWN", func(t *testing.T) {
+		got := errorStateToExecutionError(&executorv1.ErrorState{Code: "X", Kind: ""})
+		assert.Equal(t, core.ExecutionError_UNKNOWN, got.Kind)
+	})
+}
+
+func TestTaskActionToUpdate_PopulatesErrorOnFailure(t *testing.T) {
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Project: "flytesnacks", Domain: "development", RunName: "r1", ActionName: "a0",
+			RunOutputBase: "s3://bucket/run",
+		},
+		Status: executorv1.TaskActionStatus{
+			Conditions: []metav1.Condition{
+				{Type: string(executorv1.ConditionTypeFailed), Status: metav1.ConditionTrue},
+			},
+			ErrorState: &executorv1.ErrorState{
+				Code: "OOMKilled", Kind: "USER", Message: "container oom",
+			},
+		},
+	}
+
+	upd := taskActionToUpdate(ta)
+
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_FAILED, upd.Phase)
+	if assert.NotNil(t, upd.Error, "ActionUpdate.Error must be populated for failed actions with ErrorState") {
+		assert.Equal(t, "OOMKilled", upd.Error.Code)
+		assert.Equal(t, core.ExecutionError_USER, upd.Error.Kind)
+		assert.Equal(t, "container oom", upd.Error.Message)
+	}
+}
+
+func TestTaskActionToUpdate_NoErrorWhenNotFailed(t *testing.T) {
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Project: "p", Domain: "d", RunName: "r", ActionName: "a",
+		},
+		Status: executorv1.TaskActionStatus{
+			Conditions: []metav1.Condition{
+				{Type: string(executorv1.ConditionTypeSucceeded), Status: metav1.ConditionTrue},
+			},
+			// ErrorState left from a prior retry should be ignored on success.
+			ErrorState: &executorv1.ErrorState{Code: "OOMKilled", Kind: "USER"},
+		},
+	}
+
+	upd := taskActionToUpdate(ta)
+
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, upd.Phase)
+	assert.Nil(t, upd.Error)
+}
+
+func TestTaskActionToUpdate_FailedWithoutErrorState(t *testing.T) {
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Project: "p", Domain: "d", RunName: "r", ActionName: "a",
+		},
+		Status: executorv1.TaskActionStatus{
+			Conditions: []metav1.Condition{
+				{Type: string(executorv1.ConditionTypeFailed), Status: metav1.ConditionTrue},
+			},
+		},
+	}
+
+	upd := taskActionToUpdate(ta)
+
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_FAILED, upd.Phase)
+	assert.Nil(t, upd.Error, "no ErrorState on CR should leave ActionUpdate.Error nil")
 }

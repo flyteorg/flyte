@@ -1,0 +1,17 @@
+{{- if (index .Values "docker-registry" "enabled") }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "flyte-devbox.persistence.registryVolumeName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "flyte-devbox.labels" . | nindent 4 }}
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  volumeName: {{ include "flyte-devbox.persistence.registryVolumeName" . }}
+{{- end }}

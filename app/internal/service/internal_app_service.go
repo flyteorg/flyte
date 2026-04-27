@@ -98,7 +98,7 @@ func (s *InternalAppService) Get(
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("app_id is required"))
 	}
 
-	status, err := s.k8s.GetStatus(ctx, appID.AppId)
+	app, err := s.k8s.GetApp(ctx, appID.AppId)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
@@ -106,12 +106,7 @@ func (s *InternalAppService) Get(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	return connect.NewResponse(&flyteapp.GetResponse{
-		App: &flyteapp.App{
-			Metadata: &flyteapp.Meta{Id: appID.AppId},
-			Status:   status,
-		},
-	}), nil
+	return connect.NewResponse(&flyteapp.GetResponse{App: app}), nil
 }
 
 // Update modifies an app's spec or desired state.
@@ -143,11 +138,11 @@ func (s *InternalAppService) Update(
 		}
 	}
 
-	status, err := s.k8s.GetStatus(ctx, appID)
+	freshApp, err := s.k8s.GetApp(ctx, appID)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
-	app.Status = status
+	app.Status = freshApp.Status
 
 	return connect.NewResponse(&flyteapp.UpdateResponse{App: app}), nil
 }
@@ -210,22 +205,17 @@ func (s *InternalAppService) Watch(
 	var project, domain, appName string
 
 	switch t := req.Msg.GetTarget().(type) {
-	case *flyteapp.WatchRequest_Project:
-		project = t.Project.GetName()
-		domain = t.Project.GetDomain()
 	case *flyteapp.WatchRequest_AppId:
 		project = t.AppId.GetProject()
 		domain = t.AppId.GetDomain()
 		appName = t.AppId.GetName()
-	case *flyteapp.WatchRequest_Org, *flyteapp.WatchRequest_ClusterId:
-		return connect.NewError(connect.CodeUnimplemented, fmt.Errorf("org and cluster_id watch targets are not supported by the data plane"))
+	case *flyteapp.WatchRequest_Project, *flyteapp.WatchRequest_Org, *flyteapp.WatchRequest_ClusterId:
+		return connect.NewError(connect.CodeUnimplemented, fmt.Errorf("only app_id watch target is supported"))
 	}
 
-	// Start watch before listing so no events are lost between the two calls.
-	ch, err := s.k8s.Watch(ctx, project, domain, appName)
-	if err != nil {
-		return connect.NewError(connect.CodeInternal, err)
-	}
+	// Subscribe before listing so no events are lost between the two calls.
+	ch := s.k8s.Subscribe(appName)
+	defer s.k8s.Unsubscribe(appName, ch)
 
 	// Send initial snapshot so the client has current state before streaming changes.
 	snapshot, _, err := s.k8s.List(ctx, project, domain, 0, "")
