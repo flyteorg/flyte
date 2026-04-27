@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -160,12 +160,14 @@ func persistSecrets(ctx context.Context, _ *pflag.FlagSet) error {
 func buildK8sSecretData(_ context.Context, localPath string) (map[string][]byte, error) {
 	secretsData := make(map[string][]byte, 4)
 
-	err := filepath.Walk(localPath, func(path string, info os.FileInfo, err error) error {
+	fsys := os.DirFS(localPath)
+
+	err := fs.WalkDir(fsys, ".", func(path string, info fs.DirEntry, err error) error {
 		if err != nil || info.IsDir() {
 			return nil
 		}
 
-		data, err := ioutil.ReadFile(path)
+		data, err := fs.ReadFile(fsys, path)
 		if err != nil {
 			return err
 		}

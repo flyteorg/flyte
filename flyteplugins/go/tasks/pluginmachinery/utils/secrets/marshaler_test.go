@@ -34,14 +34,14 @@ func TestMarshalSecretsToMapStrings(t *testing.T) {
 			{
 				Group: ";':/\\",
 			},
-		}}, want: map[string]string{
+		}}, want: map[string]string{ //nolint:gosec
 			"flyte.secrets/s0": "m4zg54lqhiqceozhhixvyxbcbi",
 		}, wantErr: false},
 		{name: "Without group", args: args{secrets: []*core.Secret{
 			{
 				Key: "my_key",
 			},
-		}}, want: map[string]string{
+		}}, want: map[string]string{ //nolint:gosec
 			"flyte.secrets/s0": "nnsxsoraejwxsx2lmv3secq",
 		}, wantErr: false},
 	}

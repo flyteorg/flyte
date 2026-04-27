@@ -88,7 +88,7 @@ func getPluginOverridesFunc(ctx context.Context, args []string, cmdCtx cmdCore.C
 	project = config.GetConfig().Project
 	domain = config.GetConfig().Domain
 	if len(args) == 1 {
-		workflowName = args[0]
+		workflowName = args[0] //nolint:gosec
 	}
 	// Construct a shadow config for PluginOverrides. The shadow config is not using ProjectDomainAttribute/Workflowattribute directly inorder to simplify the inputs.
 	pluginOverrideFileConfig := pluginoverride.FileConfig{Project: project, Domain: domain, Workflow: workflowName}

@@ -5,12 +5,9 @@ package mocks
 import (
 	context "context"
 
-	config "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
-
 	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
+	config "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 	mock "github.com/stretchr/testify/mock"
-
 	v1 "k8s.io/api/core/v1"
 )
 

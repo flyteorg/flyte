@@ -6,7 +6,6 @@ import (
 	context "context"
 
 	cmdcore "github.com/flyteorg/flyte/flytectl/cmd/core"
-
 	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	mock "github.com/stretchr/testify/mock"

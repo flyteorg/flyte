@@ -69,7 +69,7 @@ func getExecutionQueueAttributes(ctx context.Context, args []string, cmdCtx cmdC
 	project = config.GetConfig().Project
 	domain = config.GetConfig().Domain
 	if len(args) == 1 {
-		workflowName = args[0]
+		workflowName = args[0] //nolint:gosec
 	}
 	// Construct a shadow config for ExecutionQueueAttribute. The shadow config is not using ProjectDomainAttribute/Workflowattribute directly inorder to simplify the inputs.
 	executionQueueAttrFileConfig := executionqueueattribute.AttrFileConfig{Project: project, Domain: domain, Workflow: workflowName}

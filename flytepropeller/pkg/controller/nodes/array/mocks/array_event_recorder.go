@@ -5,14 +5,10 @@ package mocks
 import (
 	context "context"
 
-	config "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-
 	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
 	event "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
-
+	config "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	interfaces "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
-
 	mock "github.com/stretchr/testify/mock"
 )
 

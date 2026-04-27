@@ -64,7 +64,7 @@ func authCallbackEndpoint(authCtx interfaces.AuthenticationContext, rw http.Resp
 		return
 	}
 
-	arReq, err := http.NewRequest(http.MethodGet, arURL, nil)
+	arReq, err := http.NewRequest(http.MethodGet, arURL, nil) //nolint:gosec
 	if err != nil {
 		logger.Infof(ctx, "Error occurred in NewAuthorizeRequest: %+v", err)
 		oauth2Provider.WriteAuthorizeError(rw, fosite.NewAuthorizeRequest(), err)

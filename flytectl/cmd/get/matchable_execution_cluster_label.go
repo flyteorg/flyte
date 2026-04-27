@@ -66,7 +66,7 @@ func getExecutionClusterLabel(ctx context.Context, args []string, cmdCtx cmdCore
 	project = config.GetConfig().Project
 	domain = config.GetConfig().Domain
 	if len(args) == 1 {
-		workflowName = args[0]
+		workflowName = args[0] //nolint:gosec
 	}
 	// Construct a shadow config for ExecutionClusterLabel. The shadow config is not using ProjectDomainAttribute/Workflowattribute directly inorder to simplify the inputs.
 	executionClusterLabelFileConfig := executionclusterlabel.FileConfig{Project: project, Domain: domain, Workflow: workflowName}
