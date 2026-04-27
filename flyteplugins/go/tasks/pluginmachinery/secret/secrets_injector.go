@@ -6,7 +6,6 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	k8sRuntime "k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
@@ -42,7 +41,7 @@ func newSecretsInjector(
 	case config.SecretManagerTypeVault:
 		return NewVaultSecretManagerInjector(webhookConfig.VaultSecretManagerConfig), nil
 	case config.SecretManagerTypeEmbedded:
-		kubeConfig, err := rest.InClusterConfig()
+		kubeConfig, err := resolveKubeConfig(ctx)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to get kubernetes config: %v", err)
 			return nil, fmt.Errorf("failed to start secret manager service due to %v", err)

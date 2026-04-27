@@ -186,22 +186,8 @@ func TestBuildTaskActionName(t *testing.T) {
 	})
 }
 
-func TestBuildNamespace(t *testing.T) {
-	t.Run("combines project and domain", func(t *testing.T) {
-		runID := &common.RunIdentifier{
-			Project: "flytesnacks",
-			Domain:  "development",
-		}
-		assert.Equal(t, "flytesnacks-development", buildNamespace(runID))
-	})
-
-	t.Run("different project and domain", func(t *testing.T) {
-		runID := &common.RunIdentifier{
-			Project: "myproject",
-			Domain:  "production",
-		}
-		assert.Equal(t, "myproject-production", buildNamespace(runID))
-	})
+func TestFlyteNamespace(t *testing.T) {
+	assert.Equal(t, "flyte", flyteNamespace)
 }
 
 func TestExtractTaskCacheKey(t *testing.T) {
@@ -717,4 +703,100 @@ func TestWorker_ExitsOnContextCancel(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("worker did not exit after context was cancelled")
 	}
+}
+
+func TestBuildActionUpdate_PropagatesErrorState(t *testing.T) {
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Project: "flytesnacks", Domain: "development", RunName: "r1", ActionName: "child",
+			TaskType: "python",
+		},
+		Status: executorv1.TaskActionStatus{
+			Conditions: []metav1.Condition{
+				{Type: string(executorv1.ConditionTypeFailed), Status: metav1.ConditionTrue},
+			},
+			ErrorState: &executorv1.ErrorState{
+				Code: "OOMKilled", Kind: "USER", Message: "container oom",
+			},
+		},
+	}
+
+	upd := buildActionUpdate(context.Background(), ta, watch.Modified)
+
+	if assert.NotNil(t, upd.ErrorState, "buildActionUpdate must propagate Status.ErrorState onto the channel update") {
+		assert.Equal(t, "OOMKilled", upd.ErrorState.Code)
+		assert.Equal(t, "USER", upd.ErrorState.Kind)
+		assert.Equal(t, "container oom", upd.ErrorState.Message)
+	}
+}
+
+func TestBuildActionUpdate_NilErrorStateWhenAbsent(t *testing.T) {
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Project: "p", Domain: "d", RunName: "r", ActionName: "a", TaskType: "python",
+		},
+	}
+
+	upd := buildActionUpdate(context.Background(), ta, watch.Added)
+
+	assert.Nil(t, upd.ErrorState)
+}
+
+// A delete event (real or DeletedFinalStateUnknown tombstone delivered after
+// informer resync) on a TaskAction that already reached a terminal phase must
+// NOT overwrite the recorded phase with ABORTED.
+func TestBuildActionUpdate_DeleteAfterTerminalPreservesPhase(t *testing.T) {
+	cases := []struct {
+		name      string
+		condition string
+		want      common.ActionPhase
+	}{
+		{"succeeded", string(executorv1.ConditionTypeSucceeded), common.ActionPhase_ACTION_PHASE_SUCCEEDED},
+		{"failed", string(executorv1.ConditionTypeFailed), common.ActionPhase_ACTION_PHASE_FAILED},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			ta := &executorv1.TaskAction{
+				Spec: executorv1.TaskActionSpec{
+					Project: "p", Domain: "d", RunName: "r", ActionName: "a",
+				},
+				Status: executorv1.TaskActionStatus{
+					Conditions: []metav1.Condition{
+						{Type: tc.condition, Status: metav1.ConditionTrue},
+					},
+				},
+			}
+
+			upd := buildActionUpdate(context.Background(), ta, watch.Deleted)
+
+			require.NotNil(t, upd)
+			assert.Equal(t, tc.want, upd.Phase, "delete event must not overwrite a terminal phase with ABORTED")
+			assert.True(t, upd.IsDeleted)
+		})
+	}
+}
+
+// A delete event on a TaskAction that is still running (no terminal condition)
+// should still mark the action as ABORTED.
+func TestBuildActionUpdate_DeleteOnNonTerminalForcesAborted(t *testing.T) {
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Project: "p", Domain: "d", RunName: "r", ActionName: "a",
+		},
+		Status: executorv1.TaskActionStatus{
+			Conditions: []metav1.Condition{
+				{
+					Type:   string(executorv1.ConditionTypeProgressing),
+					Status: metav1.ConditionTrue,
+					Reason: string(executorv1.ConditionReasonExecuting),
+				},
+			},
+		},
+	}
+
+	upd := buildActionUpdate(context.Background(), ta, watch.Deleted)
+
+	require.NotNil(t, upd)
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_ABORTED, upd.Phase)
+	assert.True(t, upd.IsDeleted)
 }

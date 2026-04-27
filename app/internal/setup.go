@@ -29,11 +29,34 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext, cfg *appconfig.Inter
 	}
 
 	appK8sClient := appk8s.NewAppK8sClient(sc.K8sClient, sc.K8sCache, cfg)
+
+	if err := appK8sClient.StartWatching(ctx); err != nil {
+		return fmt.Errorf("internalapp: failed to start KService watcher: %w", err)
+	}
+	sc.AddWorker("app-kservice-watcher", func(ctx context.Context) error {
+		<-ctx.Done()
+		appK8sClient.StopWatching()
+		return nil
+	})
+
 	internalAppSvc := service.NewInternalAppService(appK8sClient, cfg)
 
 	path, handler := appconnect.NewAppServiceHandler(internalAppSvc)
 	sc.Mux.Handle("/internal"+path, http.StripPrefix("/internal", handler))
 	logger.Infof(ctx, "Mounted InternalAppService at /internal%s", path)
+
+	if sc.K8sConfig != nil {
+		streamer, err := service.NewK8sAppLogStreamer(sc.K8sConfig)
+		if err != nil {
+			return fmt.Errorf("internalapp: failed to create log streamer: %w", err)
+		}
+		logsSvc := service.NewInternalAppLogsService(appK8sClient, streamer)
+		logsPath, logsHandler := appconnect.NewAppLogsServiceHandler(logsSvc)
+		sc.Mux.Handle("/internal"+logsPath, http.StripPrefix("/internal", logsHandler))
+		logger.Infof(ctx, "Mounted InternalAppLogsService at /internal%s", logsPath)
+	} else {
+		logger.Warnf(ctx, "K8sConfig not set, skipping InternalAppLogsService setup")
+	}
 
 	return nil
 }
