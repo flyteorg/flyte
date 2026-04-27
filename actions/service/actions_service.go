@@ -13,6 +13,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
 
@@ -137,13 +138,17 @@ func (s *ActionsService) WatchForUpdates(
 				return nil
 			}
 
+			au := &workflow.ActionUpdate{
+				ActionId:  update.ActionID,
+				Phase:     update.Phase,
+				OutputUri: update.OutputUri,
+			}
+			if update.Phase == common.ActionPhase_ACTION_PHASE_FAILED && update.ErrorState != nil {
+				au.Error = errorStateToExecutionError(update.ErrorState)
+			}
 			resp := &actions.WatchForUpdatesResponse{
 				Message: &actions.WatchForUpdatesResponse_ActionUpdate{
-					ActionUpdate: &workflow.ActionUpdate{
-						ActionId:  update.ActionID,
-						Phase:     update.Phase,
-						OutputUri: update.OutputUri,
-					},
+					ActionUpdate: au,
 				},
 			}
 			if err := stream.Send(resp); err != nil {
@@ -195,7 +200,8 @@ func (s *ActionsService) Abort(
 
 // taskActionToUpdate converts a TaskAction CR to a workflow.ActionUpdate.
 func taskActionToUpdate(action *executorv1.TaskAction) *workflow.ActionUpdate {
-	return &workflow.ActionUpdate{
+	phase := getPhaseFromConditions(action)
+	update := &workflow.ActionUpdate{
 		ActionId: &common.ActionIdentifier{
 			Run: &common.RunIdentifier{
 				Project: action.Spec.Project,
@@ -204,8 +210,27 @@ func taskActionToUpdate(action *executorv1.TaskAction) *workflow.ActionUpdate {
 			},
 			Name: action.Spec.ActionName,
 		},
-		Phase:     getPhaseFromConditions(action),
+		Phase:     phase,
 		OutputUri: actionOutputURI(action.Spec.RunOutputBase, action.Spec.ActionName),
+	}
+	if phase == common.ActionPhase_ACTION_PHASE_FAILED && action.Status.ErrorState != nil {
+		update.Error = errorStateToExecutionError(action.Status.ErrorState)
+	}
+	return update
+}
+
+func errorStateToExecutionError(es *executorv1.ErrorState) *core.ExecutionError {
+	kind := core.ExecutionError_UNKNOWN
+	switch es.Kind {
+	case "USER":
+		kind = core.ExecutionError_USER
+	case "SYSTEM":
+		kind = core.ExecutionError_SYSTEM
+	}
+	return &core.ExecutionError{
+		Code:    es.Code,
+		Kind:    kind,
+		Message: es.Message,
 	}
 }
 

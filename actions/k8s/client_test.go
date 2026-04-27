@@ -718,3 +718,40 @@ func TestWorker_ExitsOnContextCancel(t *testing.T) {
 		t.Fatal("worker did not exit after context was cancelled")
 	}
 }
+
+func TestBuildActionUpdate_PropagatesErrorState(t *testing.T) {
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Project: "flytesnacks", Domain: "development", RunName: "r1", ActionName: "child",
+			TaskType: "python",
+		},
+		Status: executorv1.TaskActionStatus{
+			Conditions: []metav1.Condition{
+				{Type: string(executorv1.ConditionTypeFailed), Status: metav1.ConditionTrue},
+			},
+			ErrorState: &executorv1.ErrorState{
+				Code: "OOMKilled", Kind: "USER", Message: "container oom",
+			},
+		},
+	}
+
+	upd := buildActionUpdate(context.Background(), ta, watch.Modified)
+
+	if assert.NotNil(t, upd.ErrorState, "buildActionUpdate must propagate Status.ErrorState onto the channel update") {
+		assert.Equal(t, "OOMKilled", upd.ErrorState.Code)
+		assert.Equal(t, "USER", upd.ErrorState.Kind)
+		assert.Equal(t, "container oom", upd.ErrorState.Message)
+	}
+}
+
+func TestBuildActionUpdate_NilErrorStateWhenAbsent(t *testing.T) {
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Project: "p", Domain: "d", RunName: "r", ActionName: "a", TaskType: "python",
+		},
+	}
+
+	upd := buildActionUpdate(context.Background(), ta, watch.Added)
+
+	assert.Nil(t, upd.ErrorState)
+}

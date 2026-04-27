@@ -89,6 +89,13 @@ Name of PersistentVolume and PersistentVolumeClaim for RustFS
 {{- printf "%s-rustfs-storage" .Release.Name -}}
 {{- end }}
 
+{{/*
+Name of PersistentVolume and PersistentVolumeClaim for Docker Registry
+*/}}
+{{- define "flyte-devbox.persistence.registryVolumeName" -}}
+{{- printf "%s-registry-storage" .Release.Name -}}
+{{- end }}
+
 
 {{/*
 Selector labels for console

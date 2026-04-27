@@ -198,6 +198,25 @@ func (in *TaskActionSpec) SetActionSpec(spec *workflow.ActionSpec) error {
 	return nil
 }
 
+// ErrorState captures the structured error returned by the plugin for a
+// failed/aborted attempt. Persisted on TaskAction status so it can be
+// surfaced as a full core.ExecutionError on the ActionUpdate (and reach
+// the SDK with its Code intact, e.g. "OOMKilled").
+type ErrorState struct {
+	// Code is the plugin-defined error code (e.g. "OOMKilled",
+	// "ContainerCreating", "PrimaryContainerNotFound").
+	// +optional
+	Code string `json:"code,omitempty"`
+
+	// Kind is the error kind: "USER", "SYSTEM", or "" (unspecified).
+	// +optional
+	Kind string `json:"kind,omitempty"`
+
+	// Message is the human-readable error message.
+	// +optional
+	Message string `json:"message,omitempty"`
+}
+
 // PhaseTransition records a phase change with its timestamp.
 type PhaseTransition struct {
 	// Phase is the phase that was entered (e.g. "Queued", "Initializing", "Executing", "Succeeded", "Failed").
@@ -266,6 +285,12 @@ type TaskActionStatus struct {
 	// Queued → Initializing → Executing → Succeeded/Failed, each with a timestamp.
 	// +optional
 	PhaseHistory []PhaseTransition `json:"phaseHistory,omitempty"`
+
+	// ErrorState is the structured error from the last failed/aborted attempt.
+	// Populated when the plugin returns a core.ExecutionError; preserves the
+	// Code field that ActionEvent.ErrorInfo cannot carry.
+	// +optional
+	ErrorState *ErrorState `json:"errorState,omitempty"`
 }
 
 // +kubebuilder:object:root=true

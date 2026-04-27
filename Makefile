@@ -41,9 +41,8 @@ devbox-build: ## Build the flyte devbox image (docker/devbox-bundled)
 
 # Run in dev mode with extra arg FLYTE_DEV=True
 .PHONY: devbox-run
-devbox-run: ## Start the flyte devbox and install Knative with app routing config
+devbox-run: ## Start the flyte devbox (Knative is pre-baked into the image)
 	$(MAKE) -C docker/devbox-bundled start FLYTE_DEV=$(FLYTE_DEV)
-	$(MAKE) -C docker/devbox-bundled setup-knative
 
 .PHONY: devbox-stop
 devbox-stop: ## Stop the flyte devbox

@@ -36,12 +36,12 @@ func (m *mockAppK8sClient) Delete(ctx context.Context, appID *flyteapp.Identifie
 	return m.Called(ctx, appID).Error(0)
 }
 
-func (m *mockAppK8sClient) GetStatus(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.Status, error) {
+func (m *mockAppK8sClient) GetApp(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.App, error) {
 	args := m.Called(ctx, appID)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*flyteapp.Status), args.Error(1)
+	return args.Get(0).(*flyteapp.App), args.Error(1)
 }
 
 func (m *mockAppK8sClient) List(ctx context.Context, project, domain string, limit uint32, token string) ([]*flyteapp.App, string, error) {
@@ -108,10 +108,13 @@ func testApp() *flyteapp.App {
 	}
 }
 
-func testStatus(phase flyteapp.Status_DeploymentStatus) *flyteapp.Status {
-	return &flyteapp.Status{
-		Conditions: []*flyteapp.Condition{
-			{DeploymentStatus: phase},
+func testAppWithStatus(phase flyteapp.Status_DeploymentStatus) *flyteapp.App {
+	return &flyteapp.App{
+		Metadata: &flyteapp.Meta{Id: testAppID()},
+		Status: &flyteapp.Status{
+			Conditions: []*flyteapp.Condition{
+				{DeploymentStatus: phase},
+			},
 		},
 	}
 }
@@ -212,7 +215,7 @@ func TestGet_Success(t *testing.T) {
 	svc := NewInternalAppService(k8s, testCfg())
 
 	appID := testAppID()
-	k8s.On("GetStatus", mock.Anything, appID).Return(testStatus(flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE), nil)
+	k8s.On("GetApp", mock.Anything, appID).Return(testAppWithStatus(flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE), nil)
 
 	resp, err := svc.Get(context.Background(), connect.NewRequest(&flyteapp.GetRequest{
 		Identifier: &flyteapp.GetRequest_AppId{AppId: appID},
@@ -238,7 +241,7 @@ func TestUpdate_Deploy(t *testing.T) {
 
 	app := testApp()
 	k8s.On("Deploy", mock.Anything, app).Return(nil)
-	k8s.On("GetStatus", mock.Anything, app.Metadata.Id).Return(testStatus(flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING), nil)
+	k8s.On("GetApp", mock.Anything, app.Metadata.Id).Return(testAppWithStatus(flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING), nil)
 
 	resp, err := svc.Update(context.Background(), connect.NewRequest(&flyteapp.UpdateRequest{App: app}))
 	require.NoError(t, err)
@@ -253,7 +256,7 @@ func TestUpdate_Stop(t *testing.T) {
 	app := testApp()
 	app.Spec.DesiredState = flyteapp.Spec_DESIRED_STATE_STOPPED
 	k8s.On("Stop", mock.Anything, app.Metadata.Id).Return(nil)
-	k8s.On("GetStatus", mock.Anything, app.Metadata.Id).Return(testStatus(flyteapp.Status_DEPLOYMENT_STATUS_STOPPED), nil)
+	k8s.On("GetApp", mock.Anything, app.Metadata.Id).Return(testAppWithStatus(flyteapp.Status_DEPLOYMENT_STATUS_STOPPED), nil)
 
 	resp, err := svc.Update(context.Background(), connect.NewRequest(&flyteapp.UpdateRequest{App: app}))
 	require.NoError(t, err)
