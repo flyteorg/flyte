@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/utils/strings/slices"
 
@@ -158,6 +160,32 @@ func TestEndToEnd(t *testing.T) {
 		trns, err := plugin.Handle(context.Background(), tCtx)
 		assert.Nil(t, err)
 		assert.Equal(t, trns.Info().Phase(), core.PhaseRetryableFailure)
+	})
+
+	t.Run("run a k8s_pod task with rendered template args", func(t *testing.T) {
+		podSpecStruct, err := utils.MarshalObjToStruct(&v1.PodSpec{
+			Containers: []v1.Container{{
+				Name:  "primary",
+				Image: "test-image",
+				Args:  []string{"pyflyte-execute", "--inputs", "{{.input}}", "--output-prefix", "{{.outputPrefix}}"},
+			}},
+		})
+		assert.NoError(t, err)
+
+		k8sPodTemplate := flyteIdlCore.TaskTemplate{
+			Type:   "k8s_pod_task",
+			Config: map[string]string{"primary_container_name": "primary"},
+			Target: &flyteIdlCore.TaskTemplate_K8SPod{
+				K8SPod: &flyteIdlCore.K8SPod{PodSpec: podSpecStruct},
+			},
+		}
+
+		pluginEntry := pluginmachinery.CreateRemotePlugin(newMockAsyncK8sPodAgentPlugin(t))
+		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("k8s_pod task"))
+		assert.NoError(t, err)
+
+		phase := tests.RunPluginEndToEndTest(t, plugin, &k8sPodTemplate, inputs, nil, nil, iter)
+		assert.Equal(t, true, phase.Phase().IsSuccess())
 	})
 
 	t.Run("failed to read inputs", func(t *testing.T) {
@@ -335,6 +363,57 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 					},
 				},
 				registry: agentRegistry,
+			}, nil
+		},
+	}
+}
+
+// newMockAsyncK8sPodAgentPlugin returns a plugin whose mock CreateTask call asserts that
+// template variables (e.g. {{.input}}, {{.outputPrefix}}) in the K8sPod container args have
+// been rendered into concrete values before the request is sent to the agent.
+func newMockAsyncK8sPodAgentPlugin(t *testing.T) webapi.PluginEntry {
+	asyncClient := new(agentMocks.AsyncAgentServiceClient)
+	registry := Registry{
+		"k8s_pod_task": {defaultTaskTypeVersion: {AgentDeployment: &Deployment{Endpoint: defaultAgentEndpoint}, IsSync: false}},
+	}
+
+	matcher := mock.MatchedBy(func(request *admin.CreateTaskRequest) bool {
+		var rendered v1.PodSpec
+		if err := utils.UnmarshalStructToObj(request.GetTemplate().GetK8SPod().GetPodSpec(), &rendered); err != nil {
+			return false
+		}
+		if len(rendered.Containers) == 0 {
+			return false
+		}
+		for _, arg := range rendered.Containers[0].Args {
+			if strings.Contains(arg, "{{") {
+				return false
+			}
+		}
+		return true
+	})
+	asyncClient.On("CreateTask", mock.Anything, matcher).Return(&admin.CreateTaskResponse{ResourceMeta: []byte{1}}, nil)
+	asyncClient.On("CreateTask", mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		t.Errorf("CreateTask received unrendered K8sPod args: %+v", args.Get(1))
+	}).Return(nil, fmt.Errorf("unrendered args"))
+
+	asyncClient.On("GetTask", mock.Anything, mock.Anything).Return(
+		&admin.GetTaskResponse{Resource: &admin.Resource{Phase: flyteIdlCore.TaskExecution_SUCCEEDED}}, nil)
+	asyncClient.On("DeleteTask", mock.Anything, mock.Anything).Return(&admin.DeleteTaskResponse{}, nil)
+
+	cfg := defaultConfig
+	cfg.DefaultAgent.Endpoint = defaultAgentEndpoint
+	return webapi.PluginEntry{
+		ID:                 "agent-service",
+		SupportedTaskTypes: []core.TaskType{"k8s_pod_task"},
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+			return &Plugin{
+				metricScope: iCtx.MetricsScope(),
+				cfg:         &cfg,
+				cs: &ClientSet{
+					asyncAgentClients: map[string]service.AsyncAgentServiceClient{defaultAgentEndpoint: asyncClient},
+				},
+				registry: registry,
 			}, nil
 		},
 	}
