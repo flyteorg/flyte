@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyte/datacatalog
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/Selvatico/go-mocket v1.0.7

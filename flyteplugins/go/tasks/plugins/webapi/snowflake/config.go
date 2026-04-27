@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	defaultConfig = Config{
+	defaultConfig = Config{ //nolint:gosec
 		WebAPI: webapi.PluginConfig{
 			ResourceQuotas: map[core.ResourceNamespace]int{
 				"default": 1000,

@@ -56,7 +56,7 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 		})
 		assert.NoError(t, err)
 
-		assert.Equal(t, map[string]string{
+		assert.Equal(t, map[string]string{ //nolint:gosec
 			"existingKey":      "existingValue",
 			"flyte.secrets/s0": "m4zg54lqhiqce2lzl4txe22voarau12fpe4caitnpfpwwzlzeifg122vnz1f53tfof1ws3tfnvsw34b1ebcu3vs6kzavecq",
 		}, actual.GetAnnotations())
