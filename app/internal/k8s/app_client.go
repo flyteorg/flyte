@@ -778,7 +778,6 @@ func (c *AppK8sClient) GetReplicas(ctx context.Context, appID *flyteapp.Identifi
 	podList := &corev1.PodList{}
 	if err := c.k8sClient.List(ctx, podList,
 		client.InNamespace(ns),
-		client.MatchingLabels{labelAppName: appID.GetName()},
 		labels,
 	); err != nil {
 		return nil, fmt.Errorf("failed to list pods for app %s/%s/%s: %w",
