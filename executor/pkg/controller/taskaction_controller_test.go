@@ -18,6 +18,7 @@ package controller
 
 import (
 	"context"
+	stderrors "errors"
 	"sync"
 	"time"
 
@@ -39,6 +40,27 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
+
+var errFakeWebhookDenied = stderrors.New(`admission webhook denied: secret "test1" not found`)
+
+// fakePlugin is a minimal Plugin implementation for unit tests.
+type fakePlugin struct {
+	id         string
+	abortCalls int
+}
+
+func (f *fakePlugin) GetID() string                              { return f.id }
+func (f *fakePlugin) GetProperties() pluginsCore.PluginProperties { return pluginsCore.PluginProperties{} }
+func (f *fakePlugin) Handle(_ context.Context, _ pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+	return pluginsCore.UnknownTransition, nil
+}
+func (f *fakePlugin) Abort(_ context.Context, _ pluginsCore.TaskExecutionContext) error {
+	f.abortCalls++
+	return nil
+}
+func (f *fakePlugin) Finalize(_ context.Context, _ pluginsCore.TaskExecutionContext) error {
+	return nil
+}
 
 // fakeEventsClient is a no-op implementation of EventsProxyServiceClient for tests.
 type fakeEventsClient struct{}
@@ -289,6 +311,148 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(ta.Status.ErrorState).NotTo(BeNil())
 			Expect(ta.Status.ErrorState.Code).To(Equal("ResourceDeletedExternally"))
 			Expect(ta.Status.ErrorState.Kind).To(Equal("SYSTEM"))
+		})
+	})
+
+	Context("maxSystemFailures", func() {
+		It("returns the default when MaxSystemFailures is zero", func() {
+			r := &TaskActionReconciler{}
+			Expect(r.maxSystemFailures()).To(Equal(DefaultMaxSystemFailures))
+		})
+
+		It("returns the configured value when set", func() {
+			r := &TaskActionReconciler{MaxSystemFailures: 7}
+			Expect(r.maxSystemFailures()).To(Equal(uint32(7)))
+		})
+	})
+
+	Context("recordSystemError", func() {
+		const handleErrResource = "handle-err-resource"
+		ctx := context.Background()
+		nn := types.NamespacedName{Name: handleErrResource, Namespace: "default"}
+
+		BeforeEach(func() {
+			resource := &flyteorgv1.TaskAction{
+				ObjectMeta: metav1.ObjectMeta{Name: handleErrResource, Namespace: "default"},
+				Spec: flyteorgv1.TaskActionSpec{
+					RunName:       "test-run",
+					Project:       "test-project",
+					Domain:        "test-domain",
+					ActionName:    "test-action",
+					InputURI:      "/tmp/input",
+					RunOutputBase: "/tmp/output",
+					TaskType:      "python-task",
+					TaskTemplate:  buildTaskTemplateBytes("python-task", "python:3.11"),
+				},
+			}
+			Expect(k8sClient.Create(ctx, resource)).To(Succeed())
+		})
+
+		AfterEach(func() {
+			resource := &flyteorgv1.TaskAction{}
+			if err := k8sClient.Get(ctx, nn, resource); err == nil {
+				resource.Finalizers = nil
+				_ = k8sClient.Update(ctx, resource)
+				_ = k8sClient.Delete(ctx, resource)
+			}
+		})
+
+		It("increments SystemFailures and requeues without consuming user retries", func() {
+			r := &TaskActionReconciler{
+				Client:            k8sClient,
+				Scheme:            k8sClient.Scheme(),
+				Recorder:          record.NewFakeRecorder(10),
+				MaxSystemFailures: 3,
+			}
+			ta := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, ta)).To(Succeed())
+			original := ta.DeepCopy()
+			startingAttempts := ta.Status.Attempts
+
+			res, err := r.recordSystemError(ctx, ta, original, "pod", errFakeWebhookDenied)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(res.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
+			Expect(ta.Status.SystemFailures).To(Equal(uint32(1)))
+			Expect(ta.Status.Attempts).To(Equal(startingAttempts), "user retry budget must not be consumed by system errors")
+			Expect(isTerminal(ta)).To(BeFalse())
+
+			persisted := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+			Expect(persisted.Status.SystemFailures).To(Equal(uint32(1)))
+		})
+
+		It("converts to PermanentFailure once the threshold is exceeded", func() {
+			r := &TaskActionReconciler{
+				Client:            k8sClient,
+				Scheme:            k8sClient.Scheme(),
+				Recorder:          record.NewFakeRecorder(10),
+				eventsClient:      &fakeEventsClient{},
+				MaxSystemFailures: 2,
+			}
+			ta := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, ta)).To(Succeed())
+			ta.Status.SystemFailures = 2
+			Expect(k8sClient.Status().Update(ctx, ta)).To(Succeed())
+			Expect(k8sClient.Get(ctx, nn, ta)).To(Succeed())
+			original := ta.DeepCopy()
+
+			res, err := r.recordSystemError(ctx, ta, original, "pod", errFakeWebhookDenied)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(res.RequeueAfter).To(BeZero(), "terminal — should not requeue")
+			Expect(ta.Status.SystemFailures).To(Equal(uint32(3)))
+			Expect(ta.Status.ErrorState).NotTo(BeNil())
+			Expect(ta.Status.ErrorState.Code).To(Equal(MaxSystemFailuresExceededCode))
+			Expect(ta.Status.ErrorState.Kind).To(Equal("SYSTEM"))
+			Expect(ta.Status.ErrorState.Message).To(ContainSubstring("admission webhook"))
+			Expect(isTerminal(ta)).To(BeTrue())
+		})
+	})
+
+	Context("resetPluginResource", func() {
+		It("aborts the plugin and clears persisted plugin state", func() {
+			r := &TaskActionReconciler{}
+			ta := &flyteorgv1.TaskAction{}
+			ta.Status.PluginState = []byte("stale")
+			ta.Status.PluginStateVersion = 1
+
+			fp := &fakePlugin{id: "pod"}
+			r.resetPluginResource(context.Background(), ta, fp, nil)
+
+			Expect(fp.abortCalls).To(Equal(1))
+			Expect(ta.Status.PluginState).To(BeNil())
+			Expect(ta.Status.PluginStateVersion).To(Equal(uint8(0)))
+		})
+	})
+
+	Context("isSystemRetryableFailure", func() {
+		It("is true for PhaseInfoSystemRetryableFailure (PhaseRetryableFailure + kind SYSTEM)", func() {
+			info := pluginsCore.PhaseInfoSystemRetryableFailure("ResourceDeletedExternally", "node lost", nil)
+			Expect(isSystemRetryableFailure(info)).To(BeTrue())
+		})
+
+		It("is false for a user-kind retryable failure", func() {
+			info := pluginsCore.PhaseInfoRetryableFailure("OOMKilled", "container OOMKilled", nil)
+			Expect(isSystemRetryableFailure(info)).To(BeFalse())
+		})
+
+		It("is false for a permanent failure", func() {
+			info := pluginsCore.PhaseInfoFailure("BadInput", "invalid spec", nil)
+			Expect(isSystemRetryableFailure(info)).To(BeFalse())
+		})
+
+		It("is false for a running phase", func() {
+			info := pluginsCore.PhaseInfoRunning(0, nil)
+			Expect(isSystemRetryableFailure(info)).To(BeFalse())
+		})
+	})
+
+	Context("systemErrorFromPhaseInfo", func() {
+		It("formats code and message from the ExecutionError", func() {
+			info := pluginsCore.PhaseInfoSystemRetryableFailure("ResourceDeletedExternally", "node lost", nil)
+			err := systemErrorFromPhaseInfo(info)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("ResourceDeletedExternally"))
+			Expect(err.Error()).To(ContainSubstring("node lost"))
 		})
 	})
 
