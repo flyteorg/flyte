@@ -186,22 +186,8 @@ func TestBuildTaskActionName(t *testing.T) {
 	})
 }
 
-func TestBuildNamespace(t *testing.T) {
-	t.Run("combines project and domain", func(t *testing.T) {
-		runID := &common.RunIdentifier{
-			Project: "flytesnacks",
-			Domain:  "development",
-		}
-		assert.Equal(t, "flytesnacks-development", buildNamespace(runID))
-	})
-
-	t.Run("different project and domain", func(t *testing.T) {
-		runID := &common.RunIdentifier{
-			Project: "myproject",
-			Domain:  "production",
-		}
-		assert.Equal(t, "myproject-production", buildNamespace(runID))
-	})
+func TestFlyteNamespace(t *testing.T) {
+	assert.Equal(t, "flyte", flyteNamespace)
 }
 
 func TestExtractTaskCacheKey(t *testing.T) {
