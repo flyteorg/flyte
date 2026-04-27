@@ -741,3 +741,62 @@ func TestBuildActionUpdate_NilErrorStateWhenAbsent(t *testing.T) {
 
 	assert.Nil(t, upd.ErrorState)
 }
+
+// A delete event (real or DeletedFinalStateUnknown tombstone delivered after
+// informer resync) on a TaskAction that already reached a terminal phase must
+// NOT overwrite the recorded phase with ABORTED.
+func TestBuildActionUpdate_DeleteAfterTerminalPreservesPhase(t *testing.T) {
+	cases := []struct {
+		name      string
+		condition string
+		want      common.ActionPhase
+	}{
+		{"succeeded", string(executorv1.ConditionTypeSucceeded), common.ActionPhase_ACTION_PHASE_SUCCEEDED},
+		{"failed", string(executorv1.ConditionTypeFailed), common.ActionPhase_ACTION_PHASE_FAILED},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			ta := &executorv1.TaskAction{
+				Spec: executorv1.TaskActionSpec{
+					Project: "p", Domain: "d", RunName: "r", ActionName: "a",
+				},
+				Status: executorv1.TaskActionStatus{
+					Conditions: []metav1.Condition{
+						{Type: tc.condition, Status: metav1.ConditionTrue},
+					},
+				},
+			}
+
+			upd := buildActionUpdate(context.Background(), ta, watch.Deleted)
+
+			require.NotNil(t, upd)
+			assert.Equal(t, tc.want, upd.Phase, "delete event must not overwrite a terminal phase with ABORTED")
+			assert.True(t, upd.IsDeleted)
+		})
+	}
+}
+
+// A delete event on a TaskAction that is still running (no terminal condition)
+// should still mark the action as ABORTED.
+func TestBuildActionUpdate_DeleteOnNonTerminalForcesAborted(t *testing.T) {
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Project: "p", Domain: "d", RunName: "r", ActionName: "a",
+		},
+		Status: executorv1.TaskActionStatus{
+			Conditions: []metav1.Condition{
+				{
+					Type:   string(executorv1.ConditionTypeProgressing),
+					Status: metav1.ConditionTrue,
+					Reason: string(executorv1.ConditionReasonExecuting),
+				},
+			},
+		},
+	}
+
+	upd := buildActionUpdate(context.Background(), ta, watch.Deleted)
+
+	require.NotNil(t, upd)
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_ABORTED, upd.Phase)
+	assert.True(t, upd.IsDeleted)
+}
