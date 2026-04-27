@@ -124,20 +124,17 @@ func NewAppK8sClient(k8sClient client.WithWatch, cache ctrlcache.Cache, cfg *con
 	}
 }
 
-// appNamespace is the fixed Kubernetes namespace where all KService objects are deployed.
-const appNamespace = "flyte"
+// AppNamespace is the fixed Kubernetes namespace where all KService objects are deployed.
+const AppNamespace = "flyte"
 
 // defaultOrg is the org returned for apps that have no org persisted on the KService.
 // we always surface a non-empty value for callers (e.g. the UI) that expect one.
 const defaultOrg = "flyte"
 
-// AppNamespace exposes the fixed namespace for callers outside this package.
-const AppNamespace = appNamespace
-
 // Deploy creates or updates the KService for the given app.
 func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 	appID := app.GetMetadata().GetId()
-	ns := appNamespace
+	ns := AppNamespace
 	name := KServiceName(appID)
 
 	if err := k8s.EnsureNamespaceExists(ctx, c.k8sClient, ns); err != nil {
@@ -192,7 +189,7 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 
 // Stop sets max-scale=0 on the KService, scaling it to zero without deleting it.
 func (c *AppK8sClient) Stop(ctx context.Context, appID *flyteapp.Identifier) error {
-	ns := appNamespace
+	ns := AppNamespace
 	name := KServiceName(appID)
 	patch := []byte(`{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/max-scale":"0"}}}}}`)
 	ksvc := &servingv1.Service{}
@@ -211,7 +208,7 @@ func (c *AppK8sClient) Stop(ctx context.Context, appID *flyteapp.Identifier) err
 
 // Delete removes the KService CRD for the given app entirely.
 func (c *AppK8sClient) Delete(ctx context.Context, appID *flyteapp.Identifier) error {
-	ns := appNamespace
+	ns := AppNamespace
 	name := KServiceName(appID)
 	ksvc := &servingv1.Service{}
 	ksvc.Name = name
@@ -381,7 +378,7 @@ func (c *AppK8sClient) StopWatching() {
 
 // GetApp reads the KService and returns the full App including reconstructed Spec and live Status.
 func (c *AppK8sClient) GetApp(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.App, error) {
-	ns := appNamespace
+	ns := AppNamespace
 	name := KServiceName(appID)
 	ksvc := &servingv1.Service{}
 	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: ns}, ksvc); err != nil {
@@ -413,7 +410,7 @@ func specFromAnnotation(ksvc *servingv1.Service) *flyteapp.Spec {
 
 // List returns apps for the given project/domain scope with optional pagination.
 func (c *AppK8sClient) List(ctx context.Context, project, domain string, limit uint32, token string) ([]*flyteapp.App, string, error) {
-	ns := appNamespace
+	ns := AppNamespace
 
 	matchLabels := map[string]string{labelAppManaged: "true"}
 	if project != "" {
@@ -511,7 +508,7 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	appID := app.GetMetadata().GetId()
 	spec := app.GetSpec()
 	name := KServiceName(appID)
-	ns := appNamespace
+	ns := AppNamespace
 
 	specBytes, err := marshalSpec(spec)
 	if err != nil {
@@ -773,7 +770,7 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 // has no ready revision yet (initial rollout), all pods for the service are
 // returned.
 func (c *AppK8sClient) GetReplicas(ctx context.Context, appID *flyteapp.Identifier) ([]*flyteapp.Replica, error) {
-	ns := appNamespace
+	ns := AppNamespace
 	name := KServiceName(appID)
 
 	labels := client.MatchingLabels{labelKnativeService: name}
@@ -805,7 +802,7 @@ func (c *AppK8sClient) GetReplicas(ctx context.Context, appID *flyteapp.Identifi
 
 // DeleteReplica force-deletes a specific pod. Knative will schedule a replacement automatically.
 func (c *AppK8sClient) DeleteReplica(ctx context.Context, replicaID *flyteapp.ReplicaIdentifier) error {
-	ns := appNamespace
+	ns := AppNamespace
 	pod := &corev1.Pod{}
 	pod.Name = replicaID.GetName()
 	pod.Namespace = ns

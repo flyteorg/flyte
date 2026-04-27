@@ -90,7 +90,7 @@ func TestDeploy_Create(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	err = c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: appNamespace}, ksvc)
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc)
 	require.NoError(t, err)
 	assert.Equal(t, "proj", ksvc.Labels[labelProject])
 	assert.Equal(t, "dev", ksvc.Labels[labelDomain])
@@ -110,7 +110,7 @@ func TestDeploy_UpdateOnSpecChange(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: appNamespace}, ksvc))
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
 	assert.Equal(t, "nginx:2.0", ksvc.Spec.Template.Spec.Containers[0].Image)
 }
 
@@ -122,14 +122,14 @@ func TestDeploy_SkipUpdateWhenUnchanged(t *testing.T) {
 	// Get initial resource version.
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: appNamespace}, ksvc))
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
 	initialRV := ksvc.ResourceVersion
 
 	// Deploy same spec — should be a no-op.
 	require.NoError(t, c.Deploy(context.Background(), app))
 
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: appNamespace}, ksvc))
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
 	assert.Equal(t, initialRV, ksvc.ResourceVersion, "resource version should not change on no-op deploy")
 }
 
@@ -143,7 +143,7 @@ func TestStop(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: appNamespace}, ksvc))
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
 	assert.Equal(t, "0", ksvc.Spec.Template.Annotations["autoscaling.knative.dev/max-scale"])
 }
 
@@ -164,7 +164,7 @@ func TestDelete(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	err := c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp", Namespace: appNamespace}, ksvc)
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc)
 	assert.True(t, k8serrors.IsNotFound(err))
 }
 
@@ -203,8 +203,8 @@ func TestGetApp_CurrentReplicas(t *testing.T) {
 	// and the corresponding Revision with ActualReplicas=4.
 	ksvc := &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "myapp",
-			Namespace: appNamespace,
+			Name:      "myapp-proj-dev",
+			Namespace: AppNamespace,
 			Labels: map[string]string{
 				labelAppManaged: "true",
 				labelProject:    "proj",
@@ -218,7 +218,7 @@ func TestGetApp_CurrentReplicas(t *testing.T) {
 	}
 	ksvc.Status.LatestReadyRevisionName = "myapp-00001"
 
-	rev := testRevision("myapp-00001", appNamespace, 4)
+	rev := testRevision("myapp-00001", AppNamespace, 4)
 
 	fc := fake.NewClientBuilder().
 		WithScheme(s).
@@ -265,7 +265,7 @@ func TestList(t *testing.T) {
 	ksvc1 := &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "app1",
-			Namespace: appNamespace,
+			Namespace: AppNamespace,
 			Labels: map[string]string{
 				labelAppManaged: "true",
 				labelProject:    "proj",
@@ -318,9 +318,9 @@ func TestGetReplicas(t *testing.T) {
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "myapp-abc",
-			Namespace: appNamespace,
+			Namespace: AppNamespace,
 			Labels: map[string]string{
-				labelKnativeService: "myapp",
+				labelKnativeService: "myapp-proj-dev",
 			},
 		},
 		Status: corev1.PodStatus{
@@ -347,7 +347,7 @@ func TestGetReplicas(t *testing.T) {
 func TestGetReplicas_FiltersToLatestRevision(t *testing.T) {
 	s := testScheme(t)
 	ksvc := &servingv1.Service{
-		ObjectMeta: metav1.ObjectMeta{Name: "myapp", Namespace: "proj-dev"},
+		ObjectMeta: metav1.ObjectMeta{Name: "myapp-proj-dev", Namespace: AppNamespace},
 		Status: servingv1.ServiceStatus{
 			ConfigurationStatusFields: servingv1.ConfigurationStatusFields{
 				LatestReadyRevisionName: "myapp-00002",
@@ -357,9 +357,9 @@ func TestGetReplicas_FiltersToLatestRevision(t *testing.T) {
 	newPod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "myapp-new",
-			Namespace: "proj-dev",
+			Namespace: AppNamespace,
 			Labels: map[string]string{
-				labelKnativeService:  "myapp",
+				labelKnativeService:  "myapp-proj-dev",
 				labelKnativeRevision: "myapp-00002",
 			},
 		},
@@ -368,9 +368,9 @@ func TestGetReplicas_FiltersToLatestRevision(t *testing.T) {
 	oldPod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "myapp-old",
-			Namespace: "proj-dev",
+			Namespace: AppNamespace,
 			Labels: map[string]string{
-				labelKnativeService:  "myapp",
+				labelKnativeService:  "myapp-proj-dev",
 				labelKnativeRevision: "myapp-00001",
 			},
 		},
@@ -391,7 +391,7 @@ func TestDeleteReplica(t *testing.T) {
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "myapp-abc",
-			Namespace: appNamespace,
+			Namespace: AppNamespace,
 		},
 	}
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(pod).Build()
@@ -407,7 +407,7 @@ func TestDeleteReplica(t *testing.T) {
 	require.NoError(t, c.DeleteReplica(context.Background(), replicaID))
 
 	err := fc.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-abc", Namespace: appNamespace}, &corev1.Pod{})
+		client.ObjectKey{Name: "myapp-abc", Namespace: AppNamespace}, &corev1.Pod{})
 	assert.True(t, k8serrors.IsNotFound(err))
 }
 
@@ -415,7 +415,7 @@ func TestHandleKServiceEvent(t *testing.T) {
 	ksvc := &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "myapp",
-			Namespace: appNamespace,
+			Namespace: AppNamespace,
 			Annotations: map[string]string{
 				annotationAppID: "proj/dev/myapp",
 			},
@@ -570,7 +570,7 @@ func TestSubscribe_ReceivesEvent(t *testing.T) {
 	ch := c.Subscribe("myapp")
 	defer c.Unsubscribe("myapp", ch)
 
-	ksvc := testKsvc("myapp", appNamespace, "100")
+	ksvc := testKsvc("myapp", AppNamespace, "100")
 	c.handleKServiceEvent(context.Background(), ksvc, k8swatch.Added)
 
 	select {
@@ -588,7 +588,7 @@ func TestSubscribe_AppSpecificDoesNotReceiveOtherApps(t *testing.T) {
 	defer c.Unsubscribe("app1", ch)
 
 	// Event for app2 should not be delivered to app1 subscriber.
-	c.handleKServiceEvent(context.Background(), testKsvc("app2", appNamespace, "1"), k8swatch.Added)
+	c.handleKServiceEvent(context.Background(), testKsvc("app2", AppNamespace, "1"), k8swatch.Added)
 
 	select {
 	case <-ch:
@@ -614,7 +614,7 @@ func TestSubscribe_MultipleSubscribers(t *testing.T) {
 	defer c.Unsubscribe("myapp", ch1)
 	defer c.Unsubscribe("myapp", ch2)
 
-	c.handleKServiceEvent(context.Background(), testKsvc("myapp", appNamespace, "1"), k8swatch.Added)
+	c.handleKServiceEvent(context.Background(), testKsvc("myapp", AppNamespace, "1"), k8swatch.Added)
 
 	for _, ch := range []chan *flyteapp.WatchResponse{ch1, ch2} {
 		select {
