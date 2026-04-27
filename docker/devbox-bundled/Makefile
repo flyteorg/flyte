@@ -188,7 +188,7 @@ setup-knative:
 	kubectl patch configmap/config-network -n knative-serving --type merge \
 		--patch '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
 	kubectl patch configmap/config-network -n knative-serving --type merge \
-		--patch '{"data":{"domain-template":"{{.Name}}-{{.Namespace}}.{{.Domain}}"}}'
+		--patch '{"data":{"domain-template":"{{.Name}}.{{.Domain}}"}}'
 	kubectl patch configmap/config-domain -n knative-serving --type merge \
 		--patch '{"data":{"local.flyte.app":null,"localhost":""}}'
 	kubectl patch svc/kourier -n kourier-system --type merge \

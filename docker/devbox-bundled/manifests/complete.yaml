@@ -7969,7 +7969,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  domain-template: '{{.Name}}-{{.Namespace}}.{{.Domain}}'
+  domain-template: '{{.Name}}.{{.Domain}}'
   ingress-class: kourier.ingress.networking.knative.dev
 kind: ConfigMap
 metadata:

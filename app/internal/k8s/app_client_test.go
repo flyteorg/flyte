@@ -458,29 +458,29 @@ func TestHandleKServiceEvent(t *testing.T) {
 	}
 }
 
-func TestKserviceName(t *testing.T) {
+func TestKServiceName(t *testing.T) {
 	tests := []struct {
 		name string
 		want string
 	}{
-		{"myapp", "myapp"},
-		{"MyApp", "myapp"},
-		// v1 and v2 variants stay distinct — no truncation collision.
-		{"my-long-service-name-v1", "my-long-service-name-v1"},
-		{"my-long-service-name-v2", "my-long-service-name-v2"},
-		// Names over 63 chars get a hash suffix instead of blind truncation.
+		{"myapp", "myapp-proj-dev"},
+		{"MyApp", "myapp-proj-dev"},
+		{"my-long-service-name-v1", "my-long-service-name-v1-proj-dev"},
+		{"my-long-service-name-v2", "my-long-service-name-v2-proj-dev"},
+		// Names whose {name}-{project}-{domain} exceeds 63 chars get a hash
+		// suffix instead of blind truncation.
 		{
 			"this-is-a-very-long-app-name-that-exceeds-the-kubernetes-dns-label-limit",
 			func() string {
-				name := "this-is-a-very-long-app-name-that-exceeds-the-kubernetes-dns-label-limit"
-				sum := sha256.Sum256([]byte(name))
-				return name[:54] + "-" + hex.EncodeToString(sum[:4])
+				raw := "this-is-a-very-long-app-name-that-exceeds-the-kubernetes-dns-label-limit-proj-dev"
+				sum := sha256.Sum256([]byte("proj/dev/this-is-a-very-long-app-name-that-exceeds-the-kubernetes-dns-label-limit"))
+				return raw[:54] + "-" + hex.EncodeToString(sum[:4])
 			}(),
 		},
 	}
 	for _, tt := range tests {
 		id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: tt.name}
-		got := kserviceName(id)
+		got := KServiceName(id)
 		assert.Equal(t, tt.want, got)
 		assert.LessOrEqual(t, len(got), maxKServiceNameLen)
 	}

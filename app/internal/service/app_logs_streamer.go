@@ -11,6 +11,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
+	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/k8s/podlogs"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/logs/dataplane"
@@ -41,8 +42,7 @@ func NewK8sAppLogStreamer(k8sConfig *rest.Config) (*K8sAppLogStreamer, error) {
 
 // TailLogs streams log lines for a replica's pod.
 func (s *K8sAppLogStreamer) TailLogs(ctx context.Context, replicaID *flyteapp.ReplicaIdentifier, send func(*flyteapp.LogLines) error) error {
-	appID := replicaID.GetAppId()
-	ns := fmt.Sprintf("%s-%s", appID.GetProject(), appID.GetDomain())
+	ns := appk8s.AppNamespace
 	podName := replicaID.GetName()
 
 	pod, err := s.clientset.CoreV1().Pods(ns).Get(ctx, podName, metav1.GetOptions{})

@@ -28,7 +28,7 @@ patches:
       namespace: knative-serving
     data:
       ingress-class: kourier.ingress.networking.knative.dev
-      domain-template: "{{.Name}}-{{.Namespace}}.{{.Domain}}"
+      domain-template: "{{.Name}}.{{.Domain}}"
 - patch: |-
     apiVersion: v1
     kind: ConfigMap

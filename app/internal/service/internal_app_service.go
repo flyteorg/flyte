@@ -78,8 +78,8 @@ func publicIngress(id *flyteapp.Identifier, cfg *appconfig.InternalAppConfig) *f
 	if scheme == "" {
 		scheme = "https"
 	}
-	host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
-		id.GetName(), id.GetProject(), id.GetDomain(), cfg.BaseDomain))
+	host := strings.ToLower(fmt.Sprintf("%s.%s",
+		appk8s.KServiceName(id), cfg.BaseDomain))
 	url := scheme + "://" + host
 	if cfg.IngressAppsPort != 0 {
 		url += fmt.Sprintf(":%d", cfg.IngressAppsPort)

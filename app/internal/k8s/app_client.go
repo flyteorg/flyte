@@ -48,6 +48,7 @@ const (
 
 	annotationSpecSHA = "flyte.org/spec-sha"
 	annotationAppID   = "flyte.org/app-id"
+	annotationAppOrg  = "flyte.org/app-org"
 	annotationSpec    = "flyte.org/spec"
 
 	maxScaleZero = "0"
@@ -126,11 +127,18 @@ func NewAppK8sClient(k8sClient client.WithWatch, cache ctrlcache.Cache, cfg *con
 // appNamespace is the fixed Kubernetes namespace where all KService objects are deployed.
 const appNamespace = "flyte"
 
+// defaultOrg is the org returned for apps that have no org persisted on the KService.
+// we always surface a non-empty value for callers (e.g. the UI) that expect one.
+const defaultOrg = "flyte"
+
+// AppNamespace exposes the fixed namespace for callers outside this package.
+const AppNamespace = appNamespace
+
 // Deploy creates or updates the KService for the given app.
 func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 	appID := app.GetMetadata().GetId()
 	ns := appNamespace
-	name := kserviceName(appID)
+	name := KServiceName(appID)
 
 	if err := k8s.EnsureNamespaceExists(ctx, c.k8sClient, ns); err != nil {
 		return fmt.Errorf("failed to ensure namespace %s: %w", ns, err)
@@ -185,7 +193,7 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 // Stop sets max-scale=0 on the KService, scaling it to zero without deleting it.
 func (c *AppK8sClient) Stop(ctx context.Context, appID *flyteapp.Identifier) error {
 	ns := appNamespace
-	name := kserviceName(appID)
+	name := KServiceName(appID)
 	patch := []byte(`{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/max-scale":"0"}}}}}`)
 	ksvc := &servingv1.Service{}
 	ksvc.Name = name
@@ -204,7 +212,7 @@ func (c *AppK8sClient) Stop(ctx context.Context, appID *flyteapp.Identifier) err
 // Delete removes the KService CRD for the given app entirely.
 func (c *AppK8sClient) Delete(ctx context.Context, appID *flyteapp.Identifier) error {
 	ns := appNamespace
-	name := kserviceName(appID)
+	name := KServiceName(appID)
 	ksvc := &servingv1.Service{}
 	ksvc.Name = name
 	ksvc.Namespace = ns
@@ -374,7 +382,7 @@ func (c *AppK8sClient) StopWatching() {
 // GetApp reads the KService and returns the full App including reconstructed Spec and live Status.
 func (c *AppK8sClient) GetApp(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.App, error) {
 	ns := appNamespace
-	name := kserviceName(appID)
+	name := KServiceName(appID)
 	ksvc := &servingv1.Service{}
 	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: ns}, ksvc); err != nil {
 		if k8serrors.IsNotFound(err) {
@@ -453,8 +461,8 @@ func (c *AppK8sClient) publicIngress(id *flyteapp.Identifier) *flyteapp.Ingress 
 	if scheme == "" {
 		scheme = "https"
 	}
-	host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
-		id.GetName(), id.GetProject(), id.GetDomain(), c.cfg.BaseDomain))
+	host := strings.ToLower(fmt.Sprintf("%s.%s",
+		KServiceName(id), c.cfg.BaseDomain))
 	url := scheme + "://" + host
 	if c.cfg.IngressAppsPort != 0 {
 		url += fmt.Sprintf(":%d", c.cfg.IngressAppsPort)
@@ -464,16 +472,19 @@ func (c *AppK8sClient) publicIngress(id *flyteapp.Identifier) *flyteapp.Ingress 
 
 // --- Helpers ---
 
-// kserviceName returns the KService name for an app. All apps share the same
-// "flyte" namespace, so the name must be unique across all projects and domains.
-// A deterministic 8-char SHA256 suffix derived from project+domain+name is always
-// appended to guarantee uniqueness. Names are lower-cased and capped at 63 chars
-// (K8s DNS label limit); if the app name exceeds 54 chars the prefix is truncated.
-func kserviceName(id *flyteapp.Identifier) string {
-	name := strings.ToLower(id.GetName())
+// KServiceName returns the KService name for an app. All apps share the
+// "flyte" namespace, so the name must be unique across all (project, domain, name)
+// triples — we encode all three in the name. Lower-cased and capped at 63 chars
+// (K8s DNS label limit); names exceeding the cap fall back to a deterministic
+// 8-char SHA256 suffix to guarantee uniqueness without exceeding the limit.
+func KServiceName(id *flyteapp.Identifier) string {
+	raw := strings.ToLower(fmt.Sprintf("%s-%s-%s", id.GetName(), id.GetProject(), id.GetDomain()))
+	if len(raw) <= maxKServiceNameLen {
+		return raw
+	}
 	sum := sha256.Sum256([]byte(id.GetProject() + "/" + id.GetDomain() + "/" + id.GetName()))
-	suffix := hex.EncodeToString(sum[:4]) // 4 bytes = 8 hex chars
-	prefix := name
+	suffix := hex.EncodeToString(sum[:4])
+	prefix := raw
 	if len(prefix) > maxKServiceNameLen-9 {
 		prefix = prefix[:maxKServiceNameLen-9]
 	}
@@ -499,7 +510,7 @@ func specSHA(specBytes []byte) string {
 func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, error) {
 	appID := app.GetMetadata().GetId()
 	spec := app.GetSpec()
-	name := kserviceName(appID)
+	name := KServiceName(appID)
 	ns := appNamespace
 
 	specBytes, err := marshalSpec(spec)
@@ -546,6 +557,7 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 			Annotations: map[string]string{
 				annotationSpecSHA: sha,
 				annotationAppID:   fmt.Sprintf("%s/%s/%s", appID.GetProject(), appID.GetDomain(), appID.GetName()),
+				annotationAppOrg:  appID.GetOrg(),
 				annotationSpec:    base64.StdEncoding.EncodeToString(specBytes),
 			},
 		},
@@ -762,7 +774,7 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 // returned.
 func (c *AppK8sClient) GetReplicas(ctx context.Context, appID *flyteapp.Identifier) ([]*flyteapp.Replica, error) {
 	ns := appNamespace
-	name := kserviceName(appID)
+	name := KServiceName(appID)
 
 	labels := client.MatchingLabels{labelKnativeService: name}
 	ksvc := &servingv1.Service{}
@@ -873,7 +885,12 @@ func (c *AppK8sClient) kserviceToApp(ctx context.Context, ksvc *servingv1.Servic
 		return nil, fmt.Errorf("KService %s has malformed %s annotation: %q", ksvc.Name, annotationAppID, appIDStr)
 	}
 
+	org := ksvc.Annotations[annotationAppOrg]
+	if org == "" {
+		org = defaultOrg
+	}
 	appID := &flyteapp.Identifier{
+		Org:     org,
 		Project: parts[0],
 		Domain:  parts[1],
 		Name:    parts[2],
