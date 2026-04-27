@@ -328,6 +328,11 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return r.recordSystemError(ctx, taskAction, originalTaskActionInstance, p.GetID(), systemErrorFromPhaseInfo(phaseInfo))
 	}
 
+	// Reset the consecutive system-failure counter on any non-system-error
+	// transition so transient blips earlier in the lifecycle don't accumulate
+	// toward the permanent-failure threshold.
+	taskAction.Status.SystemFailures = 0
+
 	// In-place task restart on USER-kind retryable failure: bump Status.Attempts
 	// and relaunch the pod under the same TaskAction.
 	var restartAttempts uint32
