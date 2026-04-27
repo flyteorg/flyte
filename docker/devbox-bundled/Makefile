@@ -85,16 +85,17 @@ flyte: create_builder
 helm-repos:
 	helm repo add docker-registry https://twuni.github.io/docker-registry.helm
 	helm repo add bitnami https://charts.bitnami.com/bitnami
+	helm repo add knative-serving https://deeploy-knative-serving-charts.storage.googleapis.com/
 	helm repo update
 
 .PHONY: dep_build
 dep_build: helm-repos
-	cd $(SANDBOX_CHART_DIR) && helm dependency build
+	cd $(SANDBOX_CHART_DIR) && helm dependency update
 
 .PHONY: dep_update
 dep_update: SANDBOX_CHART_DIR := ../../charts/flyte-devbox
 dep_update: dep_build
-	cd $(SANDBOX_CHART_DIR)/charts && for f in *.tgz; do tar xzf "$$f"; done
+	cd $(SANDBOX_CHART_DIR)/charts && rm -rf docker-registry flyte-binary knative-serving && for f in *.tgz; do tar xzf "$$f"; done
 
 .PHONY: manifests
 manifests: dep_update
@@ -103,10 +104,14 @@ manifests: dep_update
 		--enable-helm \
 		--load-restrictor=LoadRestrictionsNone \
 		kustomize/complete > manifests/complete.yaml
+	@printf "\n---\n" >> manifests/complete.yaml
+	@cat kustomize/net-kourier.yaml >> manifests/complete.yaml
 	kustomize build \
 		--enable-helm \
 		--load-restrictor=LoadRestrictionsNone \
 		kustomize/dev > manifests/dev.yaml
+	@printf "\n---\n" >> manifests/dev.yaml
+	@cat kustomize/net-kourier.yaml >> manifests/dev.yaml
 
 .PHONY: sync-crds
 sync-crds:

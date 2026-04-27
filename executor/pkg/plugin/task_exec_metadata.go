@@ -12,6 +12,7 @@ import (
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	flytesecret "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
 	pluginsUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -68,7 +69,14 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 	var err error
 	securityContext := extractSecurityContextFromTaskTemplate(ta.Spec.TaskTemplate)
 	secretsMap := make(map[string]string)
-	injectLabels := make(map[string]string)
+	injectLabels := map[string]string{
+		// Flyte OSS v2 has no organization concept, but the secret fetcher
+		// still requires an organization label on the pod. Inject a stable
+		// dummy value so scoped secret lookups succeed.
+		flytesecret.OrganizationLabel: "flyte",
+		flytesecret.ProjectLabel:      ta.Spec.Project,
+		flytesecret.DomainLabel:       ta.Spec.Domain,
+	}
 	if securityContext != nil && len(securityContext.Secrets) > 0 {
 		secretsMap, err = secrets.MarshalSecretsToMapStrings(securityContext.Secrets)
 		if err != nil {

@@ -14,7 +14,6 @@ import (
 	repoimpl "github.com/flyteorg/flyte/v2/app/internal/repository/impl"
 	"github.com/flyteorg/flyte/v2/app/internal/service"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
-	knativeapp "github.com/flyteorg/flyte/v2/flytestdlib/app"
 )
 
 // Setup registers the InternalAppService handler on the SetupContext mux.
@@ -26,7 +25,7 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext, cfg *appconfig.Inter
 		return nil
 	}
 
-	if err := knativeapp.InitAppScheme(); err != nil {
+	if err := stdlibapp.InitAppScheme(); err != nil {
 		return fmt.Errorf("internalapp: failed to register Knative scheme: %w", err)
 	}
 
@@ -37,6 +36,15 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext, cfg *appconfig.Inter
 	appK8sClient := appk8s.NewAppK8sClient(sc.K8sClient, sc.K8sCache, cfg)
 	conditionRepo := repoimpl.NewAppConditionsRepo(sc.DB)
 	internalAppSvc := service.NewInternalAppService(appK8sClient, conditionRepo, cfg)
+
+	if err := appK8sClient.StartWatching(ctx); err != nil {
+		return fmt.Errorf("internalapp: failed to start KService watcher: %w", err)
+	}
+	sc.AddWorker("app-kservice-watcher", func(ctx context.Context) error {
+		<-ctx.Done()
+		appK8sClient.StopWatching()
+		return nil
+	})
 
 	path, handler := appconnect.NewAppServiceHandler(internalAppSvc)
 	sc.Mux.Handle("/internal"+path, http.StripPrefix("/internal", handler))

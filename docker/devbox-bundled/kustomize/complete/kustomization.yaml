@@ -24,7 +24,54 @@ helmCharts:
                 echo waiting for database
                 sleep 0.1
               done
-namespace: flyte
 resources:
 - ../namespace.yaml
 - ../embedded-postgres-service.yaml
+- ../../../../charts/flyte-devbox/charts/knative-serving/crds/serving-crds.yaml
+
+patches:
+- patch: |-
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: config-network
+      namespace: knative-serving
+    data:
+      ingress-class: kourier.ingress.networking.knative.dev
+      domain-template: "{{.Name}}-{{.Namespace}}.{{.Domain}}"
+- patch: |-
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: config-domain
+      namespace: knative-serving
+    data:
+      "localhost": ""
+- patch: |-
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      name: knative-serving-istio
+    $patch: delete
+- patch: |-
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: net-istio-webhook
+      namespace: knative-serving
+    $patch: delete
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: net-istio-webhook
+      namespace: knative-serving
+    $patch: delete
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: net-istio-controller
+      namespace: knative-serving
+    $patch: delete
+

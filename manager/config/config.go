@@ -1,9 +1,6 @@
 package config
 
 import (
-	"time"
-
-	appconfig "github.com/flyteorg/flyte/v2/app/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
 
@@ -21,12 +18,6 @@ type Config struct {
 
 	// Kubernetes configuration
 	Kubernetes KubernetesConfig `json:"kubernetes"`
-
-	// Apps is the control plane AppService configuration.
-	Apps appconfig.AppConfig `json:"apps"`
-
-	// InternalApps is the data plane InternalAppService configuration.
-	InternalApps appconfig.InternalAppConfig `json:"internalApps"`
 }
 
 // ServerConfig holds HTTP server configuration
@@ -63,14 +54,6 @@ var defaultConfig = &Config{
 		QPS:        1000,
 		Burst:      2000,
 		Timeout:    "30s",
-	},
-	Apps: appconfig.AppConfig{
-		CacheTTL: 30 * time.Second,
-	},
-	InternalApps: appconfig.InternalAppConfig{
-		Enabled:               false,
-		DefaultRequestTimeout: 300 * time.Second,
-		MaxRequestTimeout:     3600 * time.Second,
 	},
 }
 
