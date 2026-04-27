@@ -431,7 +431,7 @@ func (c *ActionsClient) setupInformer(ctx context.Context) error {
 				obj = tombstone.Obj
 			}
 			taskAction, ok := obj.(*executorv1.TaskAction)
-			if !ok {
+			if !ok || c.shouldSkipTaskAction(taskAction) {
 				return
 			}
 			c.dispatchEvent(taskAction, watch.Deleted)
@@ -509,7 +509,10 @@ func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, e
 	}
 
 	phase := GetPhaseFromConditions(taskAction)
-	if eventType == watch.Deleted {
+	if eventType == watch.Deleted && !isTerminalPhase(phase) {
+		// Only force ABORTED if the action wasn't already in a terminal phase.
+		// Otherwise a missed-delete tombstone or post-terminal CR cleanup would
+		// overwrite a recorded Succeeded/Failed status with Aborted.
 		phase = common.ActionPhase_ACTION_PHASE_ABORTED
 	}
 
