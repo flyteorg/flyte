@@ -396,9 +396,17 @@ func specFromAnnotation(ksvc *servingv1.Service) *flyteapp.Spec {
 func (c *AppK8sClient) List(ctx context.Context, project, domain string, limit uint32, token string) ([]*flyteapp.App, string, error) {
 	ns := appNamespace
 
+	matchLabels := map[string]string{labelAppManaged: "true"}
+	if project != "" {
+		matchLabels[labelProject] = project
+	}
+	if domain != "" {
+		matchLabels[labelDomain] = domain
+	}
+
 	listOpts := []client.ListOption{
 		client.InNamespace(ns),
-		client.MatchingLabels{labelAppManaged: "true"},
+		client.MatchingLabels(matchLabels),
 	}
 	if limit > 0 {
 		listOpts = append(listOpts, client.Limit(int64(limit)))
@@ -445,20 +453,20 @@ func (c *AppK8sClient) publicIngress(id *flyteapp.Identifier) *flyteapp.Ingress 
 
 // --- Helpers ---
 
-// kserviceName returns the KService name for an app. Since each app is deployed
-// to its own project/domain namespace, the name only needs to be unique within
-// that namespace — the app name alone suffices.
-// Names are lower-cased and capped at 63 chars (K8s DNS label limit). For names
-// that exceed 63 chars, the first 54 chars are kept and an 8-char SHA256 suffix
-// is appended to avoid collisions between names with a long common prefix.
+// kserviceName returns the KService name for an app. All apps share the same
+// "flyte" namespace, so the name must be unique across all projects and domains.
+// A deterministic 8-char SHA256 suffix derived from project+domain+name is always
+// appended to guarantee uniqueness. Names are lower-cased and capped at 63 chars
+// (K8s DNS label limit); if the app name exceeds 54 chars the prefix is truncated.
 func kserviceName(id *flyteapp.Identifier) string {
 	name := strings.ToLower(id.GetName())
-	if len(name) <= maxKServiceNameLen {
-		return name
-	}
-	sum := sha256.Sum256([]byte(name))
+	sum := sha256.Sum256([]byte(id.GetProject() + "/" + id.GetDomain() + "/" + id.GetName()))
 	suffix := hex.EncodeToString(sum[:4]) // 4 bytes = 8 hex chars
-	return name[:maxKServiceNameLen-9] + "-" + suffix
+	prefix := name
+	if len(prefix) > maxKServiceNameLen-9 {
+		prefix = prefix[:maxKServiceNameLen-9]
+	}
+	return prefix + "-" + suffix
 }
 
 // marshalSpec serializes the App Spec proto and returns the raw bytes.
@@ -742,7 +750,11 @@ func (c *AppK8sClient) GetReplicas(ctx context.Context, appID *flyteapp.Identifi
 	podList := &corev1.PodList{}
 	if err := c.k8sClient.List(ctx, podList,
 		client.InNamespace(ns),
-		client.MatchingLabels{labelAppName: appID.GetName()},
+		client.MatchingLabels{
+			labelProject: appID.GetProject(),
+			labelDomain:  appID.GetDomain(),
+			labelAppName: appID.GetName(),
+		},
 	); err != nil {
 		return nil, fmt.Errorf("failed to list pods for app %s/%s/%s: %w",
 			appID.GetProject(), appID.GetDomain(), appID.GetName(), err)
