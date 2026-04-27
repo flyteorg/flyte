@@ -262,6 +262,14 @@ type TaskActionStatus struct {
 	// +optional
 	Attempts uint32 `json:"attempts,omitempty"`
 
+	// SystemFailures counts system-level failures observed during reconciliation —
+	// either Go errors returned from Plugin.Handle (e.g. transient k8s API errors,
+	// admission webhook denials) or plugin transitions reporting a system-retryable
+	// failure (e.g. resource deleted externally). When it exceeds the configured
+	// maximum, the TaskAction is converted to a permanent failure.
+	// +optional
+	SystemFailures uint32 `json:"systemFailures,omitempty"`
+
 	// CacheStatus is the latest observed cache lookup result for this action.
 	// +optional
 	CacheStatus core.CatalogCacheStatus `json:"cacheStatus,omitempty"`
