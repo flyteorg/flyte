@@ -31,6 +31,18 @@ class ClusterPoolIdentifier(_message.Message):
     name: str
     def __init__(self, organization: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
 
+class QueueIdentifier(_message.Message):
+    __slots__ = ["organization", "domain", "project", "name"]
+    ORGANIZATION_FIELD_NUMBER: _ClassVar[int]
+    DOMAIN_FIELD_NUMBER: _ClassVar[int]
+    PROJECT_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    organization: str
+    domain: str
+    project: str
+    name: str
+    def __init__(self, organization: _Optional[str] = ..., domain: _Optional[str] = ..., project: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
+
 class ClusterConfigIdentifier(_message.Message):
     __slots__ = ["organization", "id"]
     ORGANIZATION_FIELD_NUMBER: _ClassVar[int]

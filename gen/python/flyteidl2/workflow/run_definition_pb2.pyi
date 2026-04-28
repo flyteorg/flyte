@@ -66,16 +66,20 @@ class RunDetails(_message.Message):
     def __init__(self, run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., action: _Optional[_Union[ActionDetails, _Mapping]] = ...) -> None: ...
 
 class TaskAction(_message.Message):
-    __slots__ = ["id", "spec", "cache_key", "queue"]
+    __slots__ = ["id", "spec", "cache_key", "queue", "assigned_queue", "assigned_cluster"]
     ID_FIELD_NUMBER: _ClassVar[int]
     SPEC_FIELD_NUMBER: _ClassVar[int]
     CACHE_KEY_FIELD_NUMBER: _ClassVar[int]
     QUEUE_FIELD_NUMBER: _ClassVar[int]
+    ASSIGNED_QUEUE_FIELD_NUMBER: _ClassVar[int]
+    ASSIGNED_CLUSTER_FIELD_NUMBER: _ClassVar[int]
     id: _task_definition_pb2.TaskIdentifier
     spec: _task_definition_pb2.TaskSpec
     cache_key: _wrappers_pb2.StringValue
     queue: str
-    def __init__(self, id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., cache_key: _Optional[_Union[_wrappers_pb2.StringValue, _Mapping]] = ..., queue: _Optional[str] = ...) -> None: ...
+    assigned_queue: _identifier_pb2.QueueIdentifier
+    assigned_cluster: _identifier_pb2.ClusterIdentifier
+    def __init__(self, id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., cache_key: _Optional[_Union[_wrappers_pb2.StringValue, _Mapping]] = ..., queue: _Optional[str] = ..., assigned_queue: _Optional[_Union[_identifier_pb2.QueueIdentifier, _Mapping]] = ..., assigned_cluster: _Optional[_Union[_identifier_pb2.ClusterIdentifier, _Mapping]] = ...) -> None: ...
 
 class TraceAction(_message.Message):
     __slots__ = ["name", "phase", "start_time", "end_time", "outputs", "spec"]

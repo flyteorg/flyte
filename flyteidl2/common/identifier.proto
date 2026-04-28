@@ -22,6 +22,23 @@ message ClusterPoolIdentifier {
   string name = 2;
 }
 
+message QueueIdentifier {
+  option (buf.validate.message).cel = {
+    id: "queue_identifier.domain_project_combination"
+    message: "project requires domain to be specified"
+    expression: "!(this.domain == '' && this.project != '')"
+  };
+
+  string organization = 1 [(buf.validate.field).string.min_len = 1];
+  string domain = 2; // Optional domain scope. Empty means all domains.
+  string project = 3; // Optional project scope. Empty means a domain-specific (if domain is specified) or a global queue.
+  string name = 4 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 63
+    pattern: "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+  }];
+}
+
 message ClusterConfigIdentifier {
   string organization = 1 [(buf.validate.field).string.min_len = 1];
   string id = 2 [(buf.validate.field).string.min_len = 1];

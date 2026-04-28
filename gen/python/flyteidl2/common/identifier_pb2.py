@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!flyteidl2/common/identifier.proto\x12\x10\x66lyteidl2.common\x1a\x1b\x62uf/validate/validate.proto\"~\n\x11ProjectIdentifier\x12+\n\x0corganization\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x0corganization\x12\x1f\n\x06\x64omain\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x06\x64omain\x12\x1b\n\x04name\x18\x03 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x04name\"T\n\x11\x43lusterIdentifier\x12\"\n\x0corganization\x18\x01 \x01(\tR\x0corganization\x12\x1b\n\x04name\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x04name\"O\n\x15\x43lusterPoolIdentifier\x12\"\n\x0corganization\x18\x01 \x01(\tR\x0corganization\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\"_\n\x17\x43lusterConfigIdentifier\x12+\n\x0corganization\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x0corganization\x12\x17\n\x02id\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x02id\"\x88\x01\n\x19\x43lusterNodepoolIdentifier\x12\"\n\x0corganization\x18\x01 \x01(\tR\x0corganization\x12*\n\x0c\x63luster_name\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x0b\x63lusterName\x12\x1b\n\x04name\x18\x03 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x04name\"3\n\x0eUserIdentifier\x12!\n\x07subject\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x07subject\":\n\x15\x41pplicationIdentifier\x12!\n\x07subject\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x07subject\"Q\n\x0eRoleIdentifier\x12\"\n\x0corganization\x18\x01 \x01(\tR\x0corganization\x12\x1b\n\x04name\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x04name\"O\n\rOrgIdentifier\x12>\n\x04name\x18\x01 \x01(\tB*\xbaH\'r%\x10\x01\x18?2\x1f^[a-z0-9]([-a-z0-9]*[a-z0-9])?$R\x04name\"x\n\x18ManagedClusterIdentifier\x12\x1b\n\x04name\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x04name\x12\x39\n\x03org\x18\x03 \x01(\x0b\x32\x1f.flyteidl2.common.OrgIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x03orgJ\x04\x08\x01\x10\x02\"S\n\x10PolicyIdentifier\x12\"\n\x0corganization\x18\x01 \x01(\tR\x0corganization\x12\x1b\n\x04name\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x04name\"\x93\x01\n\rRunIdentifier\x12\x1b\n\x03org\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x03org\x12#\n\x07project\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x07project\x12!\n\x06\x64omain\x18\x03 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x06\x64omain\x12\x1d\n\x04name\x18\x04 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x1eR\x04name\"l\n\x10\x41\x63tionIdentifier\x12\x39\n\x03run\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x03run\x12\x1d\n\x04name\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x1eR\x04name\"\x85\x01\n\x17\x41\x63tionAttemptIdentifier\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12!\n\x07\x61ttempt\x18\x02 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\"\xbb\x01\n\x0bTriggerName\x12\x1b\n\x03org\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x03org\x12#\n\x07project\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x07project\x12!\n\x06\x64omain\x18\x03 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x06\x64omain\x12\x1e\n\x04name\x18\x04 \x01(\tB\n\xbaH\x07r\x05\x10\x01\x18\xff\x01R\x04name\x12\'\n\ttask_name\x18\x05 \x01(\tB\n\xbaH\x07r\x05\x10\x01\x18\xff\x01R\x08taskName\"s\n\x11TriggerIdentifier\x12\x39\n\x04name\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.TriggerNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12#\n\x08revision\x18\x02 \x01(\x04\x42\x07\xbaH\x04\x32\x02 \x00R\x08revisionB\xc0\x01\n\x14\x63om.flyteidl2.commonB\x0fIdentifierProtoH\x02P\x01Z4github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common\xa2\x02\x03\x46\x43X\xaa\x02\x10\x46lyteidl2.Common\xca\x02\x10\x46lyteidl2\\Common\xe2\x02\x1c\x46lyteidl2\\Common\\GPBMetadata\xea\x02\x11\x46lyteidl2::Commonb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!flyteidl2/common/identifier.proto\x12\x10\x66lyteidl2.common\x1a\x1b\x62uf/validate/validate.proto\"~\n\x11ProjectIdentifier\x12+\n\x0corganization\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x0corganization\x12\x1f\n\x06\x64omain\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x06\x64omain\x12\x1b\n\x04name\x18\x03 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x04name\"T\n\x11\x43lusterIdentifier\x12\"\n\x0corganization\x18\x01 \x01(\tR\x0corganization\x12\x1b\n\x04name\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x04name\"O\n\x15\x43lusterPoolIdentifier\x12\"\n\x0corganization\x18\x01 \x01(\tR\x0corganization\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\"\xbc\x02\n\x0fQueueIdentifier\x12+\n\x0corganization\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x0corganization\x12\x16\n\x06\x64omain\x18\x02 \x01(\tR\x06\x64omain\x12\x18\n\x07project\x18\x03 \x01(\tR\x07project\x12>\n\x04name\x18\x04 \x01(\tB*\xbaH\'r%\x10\x01\x18?2\x1f^[a-z0-9]([-a-z0-9]*[a-z0-9])?$R\x04name:\x89\x01\xbaH\x85\x01\x1a\x82\x01\n+queue_identifier.domain_project_combination\x12\'project requires domain to be specified\x1a*!(this.domain == \'\' && this.project != \'\')\"_\n\x17\x43lusterConfigIdentifier\x12+\n\x0corganization\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x0corganization\x12\x17\n\x02id\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x02id\"\x88\x01\n\x19\x43lusterNodepoolIdentifier\x12\"\n\x0corganization\x18\x01 \x01(\tR\x0corganization\x12*\n\x0c\x63luster_name\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x0b\x63lusterName\x12\x1b\n\x04name\x18\x03 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x04name\"3\n\x0eUserIdentifier\x12!\n\x07subject\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x07subject\":\n\x15\x41pplicationIdentifier\x12!\n\x07subject\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x07subject\"Q\n\x0eRoleIdentifier\x12\"\n\x0corganization\x18\x01 \x01(\tR\x0corganization\x12\x1b\n\x04name\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x04name\"O\n\rOrgIdentifier\x12>\n\x04name\x18\x01 \x01(\tB*\xbaH\'r%\x10\x01\x18?2\x1f^[a-z0-9]([-a-z0-9]*[a-z0-9])?$R\x04name\"x\n\x18ManagedClusterIdentifier\x12\x1b\n\x04name\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x04name\x12\x39\n\x03org\x18\x03 \x01(\x0b\x32\x1f.flyteidl2.common.OrgIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x03orgJ\x04\x08\x01\x10\x02\"S\n\x10PolicyIdentifier\x12\"\n\x0corganization\x18\x01 \x01(\tR\x0corganization\x12\x1b\n\x04name\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x04name\"\x93\x01\n\rRunIdentifier\x12\x1b\n\x03org\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x03org\x12#\n\x07project\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x07project\x12!\n\x06\x64omain\x18\x03 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x06\x64omain\x12\x1d\n\x04name\x18\x04 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x1eR\x04name\"l\n\x10\x41\x63tionIdentifier\x12\x39\n\x03run\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x03run\x12\x1d\n\x04name\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x1eR\x04name\"\x85\x01\n\x17\x41\x63tionAttemptIdentifier\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12!\n\x07\x61ttempt\x18\x02 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\"\xbb\x01\n\x0bTriggerName\x12\x1b\n\x03org\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x03org\x12#\n\x07project\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x07project\x12!\n\x06\x64omain\x18\x03 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x06\x64omain\x12\x1e\n\x04name\x18\x04 \x01(\tB\n\xbaH\x07r\x05\x10\x01\x18\xff\x01R\x04name\x12\'\n\ttask_name\x18\x05 \x01(\tB\n\xbaH\x07r\x05\x10\x01\x18\xff\x01R\x08taskName\"s\n\x11TriggerIdentifier\x12\x39\n\x04name\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.TriggerNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12#\n\x08revision\x18\x02 \x01(\x04\x42\x07\xbaH\x04\x32\x02 \x00R\x08revisionB\xc0\x01\n\x14\x63om.flyteidl2.commonB\x0fIdentifierProtoH\x02P\x01Z4github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common\xa2\x02\x03\x46\x43X\xaa\x02\x10\x46lyteidl2.Common\xca\x02\x10\x46lyteidl2\\Common\xe2\x02\x1c\x46lyteidl2\\Common\\GPBMetadata\xea\x02\x11\x46lyteidl2::Commonb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -30,6 +30,12 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _PROJECTIDENTIFIER.fields_by_name['name']._serialized_options = b'\272H\004r\002\020\001'
   _CLUSTERIDENTIFIER.fields_by_name['name']._options = None
   _CLUSTERIDENTIFIER.fields_by_name['name']._serialized_options = b'\272H\004r\002\020\001'
+  _QUEUEIDENTIFIER.fields_by_name['organization']._options = None
+  _QUEUEIDENTIFIER.fields_by_name['organization']._serialized_options = b'\272H\004r\002\020\001'
+  _QUEUEIDENTIFIER.fields_by_name['name']._options = None
+  _QUEUEIDENTIFIER.fields_by_name['name']._serialized_options = b'\272H\'r%\020\001\030?2\037^[a-z0-9]([-a-z0-9]*[a-z0-9])?$'
+  _QUEUEIDENTIFIER._options = None
+  _QUEUEIDENTIFIER._serialized_options = b'\272H\205\001\032\202\001\n+queue_identifier.domain_project_combination\022\'project requires domain to be specified\032*!(this.domain == \'\' && this.project != \'\')'
   _CLUSTERCONFIGIDENTIFIER.fields_by_name['organization']._options = None
   _CLUSTERCONFIGIDENTIFIER.fields_by_name['organization']._serialized_options = b'\272H\004r\002\020\001'
   _CLUSTERCONFIGIDENTIFIER.fields_by_name['id']._options = None
@@ -88,30 +94,32 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_CLUSTERIDENTIFIER']._serialized_end=296
   _globals['_CLUSTERPOOLIDENTIFIER']._serialized_start=298
   _globals['_CLUSTERPOOLIDENTIFIER']._serialized_end=377
-  _globals['_CLUSTERCONFIGIDENTIFIER']._serialized_start=379
-  _globals['_CLUSTERCONFIGIDENTIFIER']._serialized_end=474
-  _globals['_CLUSTERNODEPOOLIDENTIFIER']._serialized_start=477
-  _globals['_CLUSTERNODEPOOLIDENTIFIER']._serialized_end=613
-  _globals['_USERIDENTIFIER']._serialized_start=615
-  _globals['_USERIDENTIFIER']._serialized_end=666
-  _globals['_APPLICATIONIDENTIFIER']._serialized_start=668
-  _globals['_APPLICATIONIDENTIFIER']._serialized_end=726
-  _globals['_ROLEIDENTIFIER']._serialized_start=728
-  _globals['_ROLEIDENTIFIER']._serialized_end=809
-  _globals['_ORGIDENTIFIER']._serialized_start=811
-  _globals['_ORGIDENTIFIER']._serialized_end=890
-  _globals['_MANAGEDCLUSTERIDENTIFIER']._serialized_start=892
-  _globals['_MANAGEDCLUSTERIDENTIFIER']._serialized_end=1012
-  _globals['_POLICYIDENTIFIER']._serialized_start=1014
-  _globals['_POLICYIDENTIFIER']._serialized_end=1097
-  _globals['_RUNIDENTIFIER']._serialized_start=1100
-  _globals['_RUNIDENTIFIER']._serialized_end=1247
-  _globals['_ACTIONIDENTIFIER']._serialized_start=1249
-  _globals['_ACTIONIDENTIFIER']._serialized_end=1357
-  _globals['_ACTIONATTEMPTIDENTIFIER']._serialized_start=1360
-  _globals['_ACTIONATTEMPTIDENTIFIER']._serialized_end=1493
-  _globals['_TRIGGERNAME']._serialized_start=1496
-  _globals['_TRIGGERNAME']._serialized_end=1683
-  _globals['_TRIGGERIDENTIFIER']._serialized_start=1685
-  _globals['_TRIGGERIDENTIFIER']._serialized_end=1800
+  _globals['_QUEUEIDENTIFIER']._serialized_start=380
+  _globals['_QUEUEIDENTIFIER']._serialized_end=696
+  _globals['_CLUSTERCONFIGIDENTIFIER']._serialized_start=698
+  _globals['_CLUSTERCONFIGIDENTIFIER']._serialized_end=793
+  _globals['_CLUSTERNODEPOOLIDENTIFIER']._serialized_start=796
+  _globals['_CLUSTERNODEPOOLIDENTIFIER']._serialized_end=932
+  _globals['_USERIDENTIFIER']._serialized_start=934
+  _globals['_USERIDENTIFIER']._serialized_end=985
+  _globals['_APPLICATIONIDENTIFIER']._serialized_start=987
+  _globals['_APPLICATIONIDENTIFIER']._serialized_end=1045
+  _globals['_ROLEIDENTIFIER']._serialized_start=1047
+  _globals['_ROLEIDENTIFIER']._serialized_end=1128
+  _globals['_ORGIDENTIFIER']._serialized_start=1130
+  _globals['_ORGIDENTIFIER']._serialized_end=1209
+  _globals['_MANAGEDCLUSTERIDENTIFIER']._serialized_start=1211
+  _globals['_MANAGEDCLUSTERIDENTIFIER']._serialized_end=1331
+  _globals['_POLICYIDENTIFIER']._serialized_start=1333
+  _globals['_POLICYIDENTIFIER']._serialized_end=1416
+  _globals['_RUNIDENTIFIER']._serialized_start=1419
+  _globals['_RUNIDENTIFIER']._serialized_end=1566
+  _globals['_ACTIONIDENTIFIER']._serialized_start=1568
+  _globals['_ACTIONIDENTIFIER']._serialized_end=1676
+  _globals['_ACTIONATTEMPTIDENTIFIER']._serialized_start=1679
+  _globals['_ACTIONATTEMPTIDENTIFIER']._serialized_end=1812
+  _globals['_TRIGGERNAME']._serialized_start=1815
+  _globals['_TRIGGERNAME']._serialized_end=2002
+  _globals['_TRIGGERIDENTIFIER']._serialized_start=2004
+  _globals['_TRIGGERIDENTIFIER']._serialized_end=2119
 # @@protoc_insertion_point(module_scope)

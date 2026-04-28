@@ -438,6 +438,64 @@ func (m *TaskAction) validate(all bool) error {
 
 	// no validation rules for Queue
 
+	if all {
+		switch v := interface{}(m.GetAssignedQueue()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskActionValidationError{
+					field:  "AssignedQueue",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskActionValidationError{
+					field:  "AssignedQueue",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAssignedQueue()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskActionValidationError{
+				field:  "AssignedQueue",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetAssignedCluster()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskActionValidationError{
+					field:  "AssignedCluster",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskActionValidationError{
+					field:  "AssignedCluster",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAssignedCluster()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskActionValidationError{
+				field:  "AssignedCluster",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return TaskActionMultiError(errors)
 	}
