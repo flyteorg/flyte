@@ -99,7 +99,7 @@ plugins:
       - _U_USE_ACTIONS: "1"
 
 # Storage Configuration
-# For local development, using RustFS (run: bash start-rustfs.sh)
+# For local development, using RustFS (run: bash ./scripts/start-rustfs.sh)
 # You can also use "mem" type for in-memory storage during testing
 storage:
   type: minio

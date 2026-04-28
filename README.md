@@ -135,7 +135,7 @@ uv pip install flyte[tui]
 
 ## Open Source Backend
 
-The open source backend for Flyte 2 is **coming soon**. This repository will contain the Kubernetes-native backend infrastructure for deploying Flyte 2 as a distributed, multi-node service. See the [Backend README](BACKEND_README.md) for the current state of the backend, protocol buffer definitions, and contribution guide.
+The open source backend for Flyte 2 is **coming soon**. This repository will contain the Kubernetes-native backend infrastructure for deploying Flyte 2 as a distributed, multi-node service. See the [Backend README](docs/BACKEND_README.md) for the current state of the backend, protocol buffer definitions, and contribution guide.
 
 If you need an enterprise-ready, production-grade backend for Flyte 2 today, it is available on [Union.ai](https://www.union.ai/try-flyte-2).
 
@@ -151,7 +151,7 @@ If you need an enterprise-ready, production-grade backend for Flyte 2 today, it 
 
 ## Contributing
 
-We welcome contributions! See the [Backend README](BACKEND_README.md) for backend development, or join us on [slack.flyte.org](https://slack.flyte.org).
+We welcome contributions! See the [Backend README](docs/BACKEND_README.md) for backend development, or join us on [slack.flyte.org](https://slack.flyte.org).
 
 ## License
 

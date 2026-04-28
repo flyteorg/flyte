@@ -33,7 +33,7 @@ logger:
   level: 4  # Info level
   show-source: true
 
-# Storage Configuration (for local dev, using RustFS — run: bash start-rustfs.sh)
+# Storage Configuration (for local dev, using RustFS — run: bash ./scripts/start-rustfs.sh)
 storage:
   type: minio
   container: "flyte-data"
