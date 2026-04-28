@@ -38,6 +38,15 @@ patches:
     data:
       "localhost": ""
 - patch: |-
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: config-deployment
+      namespace: knative-serving
+    data:
+      registries-skipping-tag-resolving: "localhost:30000,kind-registry:5000"
+      allow-http-registry: "true"
+- patch: |-
     apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:

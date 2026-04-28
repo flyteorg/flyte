@@ -7589,7 +7589,9 @@ metadata:
 ---
 apiVersion: v1
 data:
+  allow-http-registry: "true"
   queue-sidecar-image: gcr.io/knative-releases/knative.dev/serving/cmd/queue@sha256:d0be939fdfb469e52e999eb65f39466d18f029984a782affa26322c9fec6db78
+  registries-skipping-tag-resolving: localhost:30000,kind-registry:5000
 kind: ConfigMap
 metadata:
   annotations:
