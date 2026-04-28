@@ -40,7 +40,7 @@ FROM alpine:latest AS buf-downloader
 ARG TARGETARCH
 ARG BUF_VERSION
 RUN apk add --no-cache curl tar
-RUN BUFARCH=$(case ${TARGETARCH} in amd64) echo "x86_64" ;; arm64) echo "aarch64" ;; *) echo "x86_64" ;; esac) && \
+RUN if [ "${TARGETARCH}" = "arm64" ]; then BUFARCH="aarch64"; else BUFARCH="x86_64"; fi && \
     curl -fsSL "https://github.com/bufbuild/buf/releases/download/v${BUF_VERSION}/buf-Linux-${BUFARCH}.tar.gz" | \
     tar -xzC /tmp
 
