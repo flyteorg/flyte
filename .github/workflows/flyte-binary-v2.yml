@@ -13,6 +13,9 @@ on:
       - v2
   workflow_dispatch:
 
+env:
+  DEPOT_PROJECT_ID: ${{ vars.DEPOT_PROJECT_ID }}
+
 jobs:
   test-bootstrap:
     runs-on: ubuntu-latest
@@ -39,11 +42,16 @@ jobs:
     needs: [test-bootstrap]
     permissions:
       contents: read
-      packages: write
-      id-token: write  # required for Depot OIDC auth
+      id-token: write  # required for Depot OIDC auth (GHCR auth uses FLYTE_BOT_PAT)
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Validate Depot project id
+        run: |
+          if [ -z "${DEPOT_PROJECT_ID}" ]; then
+            echo "::error::DEPOT_PROJECT_ID repo variable is not set. Add it under Settings → Secrets and variables → Actions → Variables." >&2
+            exit 1
+          fi
       - name: Setup Golang caches
         uses: actions/cache@v4
         with:
@@ -78,7 +86,7 @@ jobs:
       - name: Export ARM64 Image
         uses: depot/build-push-action@v1
         with:
-          project: ${{ vars.DEPOT_PROJECT_ID }}
+          project: ${{ env.DEPOT_PROJECT_ID }}
           context: .
           platforms: linux/arm64
           tags: flyte-binary-v2:sandbox
@@ -90,7 +98,7 @@ jobs:
       - name: Export AMD64 Image
         uses: depot/build-push-action@v1
         with:
-          project: ${{ vars.DEPOT_PROJECT_ID }}
+          project: ${{ env.DEPOT_PROJECT_ID }}
           context: .
           platforms: linux/amd64
           tags: flyte-binary-v2:sandbox
@@ -115,7 +123,7 @@ jobs:
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: depot/build-push-action@v1
         with:
-          project: ${{ vars.DEPOT_PROJECT_ID }}
+          project: ${{ env.DEPOT_PROJECT_ID }}
           context: .
           # Native multi-arch on Depot — no QEMU. Re-uses the persistent
           # project layer cache from the per-arch builds above.
@@ -132,8 +140,7 @@ jobs:
     needs: [build-and-push-single-binary-image]
     permissions:
       contents: read
-      packages: write
-      id-token: write  # required for Depot OIDC auth
+      id-token: write  # required for Depot OIDC auth (GHCR auth uses FLYTE_BOT_PAT)
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -175,7 +182,7 @@ jobs:
         # resolve a ghcr-hosted FROM.
         uses: depot/build-push-action@v1
         with:
-          project: ${{ vars.DEPOT_PROJECT_ID }}
+          project: ${{ env.DEPOT_PROJECT_ID }}
           context: docker/devbox-bundled
           allow: "security.insecure"
           platforms: linux/arm64,linux/amd64
@@ -189,7 +196,7 @@ jobs:
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: depot/build-push-action@v1
         with:
-          project: ${{ vars.DEPOT_PROJECT_ID }}
+          project: ${{ env.DEPOT_PROJECT_ID }}
           context: docker/devbox-bundled
           allow: "security.insecure"
           platforms: linux/arm64,linux/amd64
@@ -211,7 +218,7 @@ jobs:
       - name: Build and push GPU multi-arch image
         uses: depot/build-push-action@v1
         with:
-          project: ${{ vars.DEPOT_PROJECT_ID }}
+          project: ${{ env.DEPOT_PROJECT_ID }}
           context: docker/devbox-bundled
           file: docker/devbox-bundled/Dockerfile.gpu
           # Point Dockerfile.gpu's `FROM ${BASE_IMAGE}` at the OCI archive

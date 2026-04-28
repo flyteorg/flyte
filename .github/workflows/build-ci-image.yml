@@ -22,6 +22,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}/ci
+  DEPOT_PROJECT_ID: ${{ vars.DEPOT_PROJECT_ID }}
 
 jobs:
   build:
@@ -38,6 +39,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Validate Depot project id
+        run: |
+          if [ -z "${DEPOT_PROJECT_ID}" ]; then
+            echo "::error::DEPOT_PROJECT_ID repo variable is not set. Add it under Settings → Secrets and variables → Actions → Variables." >&2
+            exit 1
+          fi
 
       - name: Set up Depot
         uses: depot/setup-action@v1
@@ -81,9 +89,10 @@ jobs:
           fi
 
       - name: Build and push Docker image
+        id: build
         uses: depot/build-push-action@v1
         with:
-          project: ${{ vars.DEPOT_PROJECT_ID }}
+          project: ${{ env.DEPOT_PROJECT_ID }}
           context: .
           file: ./gen.Dockerfile
           push: true
@@ -95,7 +104,7 @@ jobs:
           # so no cache-from/cache-to plumbing is needed.
 
       - name: Image digest
-        run: echo "Image built with digest ${{ steps.meta.outputs.digest }}"
+        run: echo "Image built with digest ${{ steps.build.outputs.digest }}"
 
       - name: Comment on PR with image tag
         if: github.event_name == 'pull_request'
