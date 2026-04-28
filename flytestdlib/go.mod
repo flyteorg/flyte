@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyte/flytestdlib
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/aws/aws-sdk-go v1.47.11
@@ -18,7 +18,7 @@ require (
 	github.com/golang/protobuf v1.5.4
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/jackc/pgconn v1.14.3
-	github.com/jackc/pgx/v5 v5.9.0
+	github.com/jackc/pgx/v5 v5.9.2
 	github.com/magiconair/properties v1.8.6
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.22.0

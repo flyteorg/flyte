@@ -63,6 +63,8 @@ func GetPhaseInfo(currentCondition kubeflowv1.JobCondition, occurredAt time.Time
 		return pluginsCore.PhaseInfoRetryableFailure(flyteerr.DownstreamSystemError, details, &taskPhaseInfo), nil
 	case kubeflowv1.JobRestarting:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &taskPhaseInfo), nil
+	case kubeflowv1.JobSuspended:
+		return pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "Suspended", &taskPhaseInfo), nil
 	}
 
 	return pluginsCore.PhaseInfoUndefined, nil
@@ -83,6 +85,8 @@ func GetMPIPhaseInfo(currentCondition kubeflowv1.JobCondition, occurredAt time.T
 		return pluginsCore.PhaseInfoRetryableFailure(flyteerr.DownstreamSystemError, details, &taskPhaseInfo), nil
 	case kubeflowv1.JobRestarting:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &taskPhaseInfo), nil
+	case kubeflowv1.JobSuspended:
+		return pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "Suspended", &taskPhaseInfo), nil
 	}
 
 	return pluginsCore.PhaseInfoUndefined, nil

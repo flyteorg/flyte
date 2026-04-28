@@ -330,7 +330,7 @@ func (k KafkaConfig) UpdateSaramaConfig(ctx context.Context, s *sarama.Config) {
 	if k.TLSConfig.Enabled {
 		s.Net.TLS.Enable = true
 		s.Net.TLS.Config = &tls.Config{
-			InsecureSkipVerify: k.TLSConfig.InsecureSkipVerify,
+			InsecureSkipVerify: k.TLSConfig.InsecureSkipVerify, //nolint:gosec
 		}
 		if k.TLSConfig.KeyPath != "" && k.TLSConfig.CertPath != "" {
 			cert, err := tls.LoadX509KeyPair(k.TLSConfig.CertPath, k.TLSConfig.KeyPath)

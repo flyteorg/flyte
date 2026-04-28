@@ -1,18 +1,25 @@
 module github.com/flyteorg/flyte
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/flyteorg/flyte/datacatalog v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flyteadmin v0.0.0-00010101000000-000000000000
+	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000
+	github.com/flyteorg/flyte/flyteplugins v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytepropeller v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/golang/glog v1.2.5
+	github.com/kubeflow/spark-operator v0.0.0-20250325114751-1905be6e1dbd
 	github.com/prometheus/client_golang v1.23.0
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.10
+	github.com/stretchr/testify v1.11.1
 	golang.org/x/sync v0.20.0
+	google.golang.org/protobuf v1.36.11
 	gorm.io/driver/postgres v1.5.3
+	k8s.io/api v0.34.1
+	k8s.io/apimachinery v0.34.1
 	sigs.k8s.io/controller-runtime v0.22.4
 )
 
@@ -82,8 +89,6 @@ require (
 	github.com/evanphx/json-patch/v5 v5.9.11 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
-	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000 // indirect
-	github.com/flyteorg/flyte/flyteplugins v0.0.0-00010101000000-000000000000 // indirect
 	github.com/flyteorg/stow v0.3.12 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
@@ -132,7 +137,7 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgproto3/v2 v2.3.3 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/pgx/v5 v5.9.0 // indirect
+	github.com/jackc/pgx/v5 v5.9.2 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jcmturner/gofork v1.7.6 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
@@ -142,7 +147,6 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
-	github.com/kubeflow/spark-operator v0.0.0-20250325114751-1905be6e1dbd // indirect
 	github.com/kubeflow/training-operator v1.8.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/lestrrat-go/backoff/v2 v2.0.8 // indirect
@@ -199,7 +203,6 @@ require (
 	github.com/spf13/viper v1.21.0 // indirect
 	github.com/spiffe/go-spiffe/v2 v2.6.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
-	github.com/stretchr/testify v1.11.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/tidwall/gjson v1.17.1 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
@@ -244,7 +247,6 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20260401024825-9d38bb4040a9 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260401024825-9d38bb4040a9 // indirect
 	google.golang.org/grpc v1.80.0 // indirect
-	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
@@ -258,9 +260,7 @@ require (
 	gorm.io/driver/sqlite v1.5.4 // indirect
 	gorm.io/gorm v1.25.4 // indirect
 	gorm.io/plugin/opentelemetry v0.1.4 // indirect
-	k8s.io/api v0.34.1 // indirect
 	k8s.io/apiextensions-apiserver v0.34.1 // indirect
-	k8s.io/apimachinery v0.34.1 // indirect
 	k8s.io/client-go v0.34.1 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20250814151709-d7b6acb124c3 // indirect

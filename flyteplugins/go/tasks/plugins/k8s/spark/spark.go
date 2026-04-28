@@ -388,7 +388,7 @@ func (sparkResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx p
 	}, nil
 }
 
-func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, error) {
+func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkApplication, taskTemplate *core.TaskTemplate) (*pluginsCore.TaskInfo, error) {
 
 	sparkConfig := GetSparkConfig()
 	taskLogs := make([]*core.TaskLog, 0, 3)
@@ -406,6 +406,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 				Namespace:       sj.Namespace,
 				LogName:         "(Driver Logs)",
 				TaskExecutionID: taskExecID,
+				TaskTemplate:    taskTemplate,
 			})
 
 			if err != nil {
@@ -523,7 +524,13 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 
 	app := resource.(*sparkOp.SparkApplication)
-	info, err := getEventInfoForSpark(pluginContext, app)
+
+	taskTemplate, err := pluginContext.TaskReader().Read(ctx)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+
+	info, err := getEventInfoForSpark(pluginContext, app, taskTemplate)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}

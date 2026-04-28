@@ -1605,7 +1605,7 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request *adm
 		// Workflow executions are created in state "UNDEFINED". All the time up until a RUNNING event is received is
 		// considered system-induced delay.
 		if executionModel.Mode == int32(admin.ExecutionMetadata_SCHEDULED) {
-			go m.emitScheduledWorkflowMetrics(ctx, executionModel, request.GetEvent().GetOccurredAt())
+			go m.emitScheduledWorkflowMetrics(ctx, executionModel, request.GetEvent().GetOccurredAt()) //nolint:gosec
 		}
 	} else if common.IsExecutionTerminal(request.GetEvent().GetPhase()) {
 		if request.GetEvent().GetPhase() == core.WorkflowExecution_FAILED {
@@ -1620,7 +1620,7 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request *adm
 
 		m.systemMetrics.ActiveExecutions.Dec()
 		m.systemMetrics.ExecutionsTerminated.Inc(contextutils.WithPhase(ctx, request.GetEvent().GetPhase().String()))
-		go m.emitOverallWorkflowExecutionTime(executionModel, request.GetEvent().GetOccurredAt())
+		go m.emitOverallWorkflowExecutionTime(executionModel, request.GetEvent().GetOccurredAt()) //nolint:gosec
 		if request.GetEvent().GetOutputData() != nil {
 			m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(proto.Size(request.GetEvent().GetOutputData())))
 		}
@@ -1640,7 +1640,7 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request *adm
 		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.GetRequestId(), err)
 	}
 
-	go func() {
+	go func() { //nolint:gosec
 		ceCtx := context.TODO()
 		if err := m.cloudEventPublisher.Publish(ceCtx, proto.MessageName(request), request); err != nil {
 			m.systemMetrics.PublishEventError.Inc()

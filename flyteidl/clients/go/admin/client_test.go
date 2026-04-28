@@ -124,7 +124,7 @@ func TestGetAuthenticationDialOptionClientSecret(t *testing.T) {
 		PerRetryTimeout:       config.Duration{Duration: 1 * time.Second},
 	}
 	t.Run("legal", func(t *testing.T) {
-		metadata := &service.OAuth2MetadataResponse{
+		metadata := &service.OAuth2MetadataResponse{ //nolint:gosec
 			TokenEndpoint:   "http://localhost:8089/token",
 			ScopesSupported: []string{"code", "all"},
 		}
@@ -194,7 +194,7 @@ func TestGetAuthenticationDialOptionClientSecret(t *testing.T) {
 		PerRetryTimeout:       config.Duration{Duration: 1 * time.Second},
 	}
 	t.Run("incorrect client secret loc", func(t *testing.T) {
-		metadata := &service.OAuth2MetadataResponse{
+		metadata := &service.OAuth2MetadataResponse{ //nolint:gosec
 			TokenEndpoint:   "http://localhost:8089/token",
 			ScopesSupported: []string{"code", "all"},
 		}
@@ -220,7 +220,7 @@ func TestGetAuthenticationDialOptionPkce(t *testing.T) {
 		AuthType:              AuthTypePkce,
 		PerRetryTimeout:       config.Duration{Duration: 1 * time.Second},
 	}
-	metadata := &service.OAuth2MetadataResponse{
+	metadata := &service.OAuth2MetadataResponse{ //nolint:gosec
 		TokenEndpoint:   "http://localhost:8089/token",
 		ScopesSupported: []string{"code", "all"},
 	}
@@ -264,7 +264,7 @@ func TestGetAuthenticationDialOptionPkce(t *testing.T) {
 func Test_getPkceAuthTokenSource(t *testing.T) {
 	ctx := context.Background()
 	mockAuthClient := new(mocks.AuthMetadataServiceClient)
-	metadata := &service.OAuth2MetadataResponse{
+	metadata := &service.OAuth2MetadataResponse{ //nolint:gosec
 		TokenEndpoint:   "http://localhost:8089/token",
 		ScopesSupported: []string{"code", "all"},
 	}

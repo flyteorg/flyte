@@ -189,6 +189,10 @@ func GetLoginHandler(ctx context.Context, authCtx interfaces.AuthenticationConte
 // the user authentication flow.
 func GetCallbackHandler(ctx context.Context, authCtx interfaces.AuthenticationContext, pluginRegistry *plugins.Registry) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
+		// 1. Limit the request body to 1MB (1 << 20 bytes)
+		// This MUST be done before ParseForm() or FormValue()
+		request.Body = http.MaxBytesReader(writer, request.Body, 1048576)
+
 		logger.Debugf(ctx, "Running callback handler... for RequestURI %v", request.RequestURI)
 		authorizationCode := request.FormValue(AuthorizationResponseCodeType)
 
