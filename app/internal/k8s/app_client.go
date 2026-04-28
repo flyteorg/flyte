@@ -23,6 +23,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/v2/app/internal/config"
+	"github.com/flyteorg/flyte/v2/app/internal/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
@@ -96,9 +97,10 @@ type AppK8sClientInterface interface {
 
 // AppK8sClient implements AppK8sClientInterface using controller-runtime.
 type AppK8sClient struct {
-	k8sClient client.WithWatch
-	cache     ctrlcache.Cache
-	cfg       *config.InternalAppConfig
+	k8sClient     client.WithWatch
+	cache         ctrlcache.Cache
+	cfg           *config.InternalAppConfig
+	conditionRepo interfaces.AppConditionsRepo
 
 	// Watch management
 	mu          sync.RWMutex
@@ -108,12 +110,15 @@ type AppK8sClient struct {
 }
 
 // NewAppK8sClient creates a new AppK8sClient.
-func NewAppK8sClient(k8sClient client.WithWatch, cache ctrlcache.Cache, cfg *config.InternalAppConfig) *AppK8sClient {
+// conditionRepo is used to persist condition history on every KService event;
+// pass nil to disable condition persistence (e.g. in tests that do not need it).
+func NewAppK8sClient(k8sClient client.WithWatch, cache ctrlcache.Cache, cfg *config.InternalAppConfig, conditionRepo interfaces.AppConditionsRepo) *AppK8sClient {
 	return &AppK8sClient{
-		k8sClient:   k8sClient,
-		cache:       cache,
-		cfg:         cfg,
-		subscribers: make(map[string]map[chan *flyteapp.WatchResponse]struct{}),
+		k8sClient:     k8sClient,
+		cache:         cache,
+		cfg:           cfg,
+		conditionRepo: conditionRepo,
+		subscribers:   make(map[string]map[chan *flyteapp.WatchResponse]struct{}),
 	}
 }
 
@@ -277,12 +282,35 @@ func isManagedKService(ksvc *servingv1.Service) bool {
 	return ksvc.Labels[labelAppManaged] == "true"
 }
 
-// handleKServiceEvent converts a KService event into a WatchResponse and
-// notifies all matching subscribers.
+// handleKServiceEvent converts a KService event into a WatchResponse,
+// persists the current deployment status as a condition, and notifies subscribers.
 func (c *AppK8sClient) handleKServiceEvent(ctx context.Context, ksvc *servingv1.Service, eventType k8swatch.EventType) {
 	app, err := c.kserviceToApp(ctx, ksvc)
 	if err != nil {
 		return
+	}
+
+	appID := app.GetMetadata().GetId()
+
+	// Persist the current status as a condition on every K8s state change so that
+	// the full PENDING -> DEPLOYING -> ACTIVE/FAILED transition history is recorded,
+	// regardless of whether any Watch client is connected.
+	// Dedup: read the latest stored condition first; only append if status or message changed.
+	if c.conditionRepo != nil {
+		if eventType == k8swatch.Deleted {
+			// Ensure DB is clean even if a race between Delete() RPC and a late
+			// Modified event caused conditions to be re-written after the RPC cleared them.
+			if err := c.conditionRepo.DeleteConditions(ctx, appID); err != nil {
+				logger.Errorf(ctx, "Failed to delete conditions for app %s on watch deleted event: %v", appID.GetName(), err)
+			}
+		} else if status := app.GetStatus(); status != nil && len(status.GetConditions()) > 0 {
+			cond := status.GetConditions()[0]
+			if c.shouldAppendCondition(ctx, appID, cond) {
+				if err := c.conditionRepo.AppendCondition(ctx, appID, cond, c.cfg.MaxConditions); err != nil {
+					logger.Errorf(ctx, "Failed to persist condition for app %s on watch event: %v", appID.GetName(), err)
+				}
+			}
+		}
 	}
 
 	var resp *flyteapp.WatchResponse
@@ -309,8 +337,29 @@ func (c *AppK8sClient) handleKServiceEvent(ctx context.Context, ksvc *servingv1.
 		return
 	}
 
-	appName := app.GetMetadata().GetId().GetName()
-	c.notifySubscribers(ctx, appName, resp)
+	c.notifySubscribers(ctx, appID.GetName(), resp)
+}
+
+// shouldAppendCondition returns true if cond should be persisted.
+// It skips two classes of noise:
+//  1. PENDING with no message — the transient first Knative event before the
+//     Ready condition is populated; it carries no actionable information.
+//  2. Exact duplicates (same DeploymentStatus + Message as the last stored entry).
+func (c *AppK8sClient) shouldAppendCondition(ctx context.Context, appID *flyteapp.Identifier, cond *flyteapp.Condition) bool {
+	if cond.GetDeploymentStatus() == flyteapp.Status_DEPLOYMENT_STATUS_PENDING && cond.GetMessage() == "" {
+		return false
+	}
+	existing, err := c.conditionRepo.GetConditions(ctx, appID)
+	if err != nil {
+		// On read error, append to avoid missing transitions.
+		logger.Warnf(ctx, "Failed to read conditions for app %s, will append: %v", appID.GetName(), err)
+		return true
+	}
+	if len(existing) == 0 {
+		return true
+	}
+	last := existing[len(existing)-1]
+	return last.GetDeploymentStatus() != cond.GetDeploymentStatus() || last.GetMessage() != cond.GetMessage()
 }
 
 // notifySubscribers sends a WatchResponse to all subscribers for the given app name.
@@ -702,18 +751,28 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 	}
 
 	if phase == flyteapp.Status_DEPLOYMENT_STATUS_UNSPECIFIED {
+		readyCond := ksvc.Status.GetCondition(servingv1.ServiceConditionReady)
 		switch {
 		case ksvc.IsReady():
 			phase = flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE
+			message = "Service is ready"
 		case ksvc.IsFailed():
 			phase = flyteapp.Status_DEPLOYMENT_STATUS_FAILED
-			if c := ksvc.Status.GetCondition(servingv1.ServiceConditionReady); c != nil {
-				message = c.Message
+			if readyCond != nil {
+				message = readyCond.Message
 			}
-		case ksvc.Status.LatestCreatedRevisionName != ksvc.Status.LatestReadyRevisionName:
+		case ksvc.Status.LatestCreatedRevisionName != ksvc.Status.LatestReadyRevisionName &&
+			ksvc.Status.LatestCreatedRevisionName != "":
 			phase = flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING
+			message = fmt.Sprintf("Deploying revision: [%s]", ksvc.Status.LatestCreatedRevisionName)
+			if readyCond != nil && readyCond.Reason != "" {
+				message += fmt.Sprintf("\n%s: %s", readyCond.Reason, readyCond.Message)
+			}
 		default:
 			phase = flyteapp.Status_DEPLOYMENT_STATUS_PENDING
+			if readyCond != nil && readyCond.Reason != "" {
+				message = fmt.Sprintf("%s: %s", readyCond.Reason, readyCond.Message)
+			}
 		}
 	}
 

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -19,6 +20,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/flyteorg/flyte/v2/app/internal/config"
+	"github.com/flyteorg/flyte/v2/app/internal/repository/mocks"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	flytecoreapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -58,7 +60,7 @@ func testClient(t *testing.T, objs ...client.Object) *AppK8sClient {
 		MaxRequestTimeout:     time.Hour,
 		WatchBufferSize:       100,
 	}
-	return NewAppK8sClient(fc, nil, cfg)
+	return NewAppK8sClient(fc, nil, cfg, nil)
 }
 
 // testApp builds a minimal flyteapp.App for use in tests.
@@ -584,6 +586,20 @@ func TestSubscribe_MultipleSubscribers(t *testing.T) {
 	}
 }
 
+// testClientWithRepo builds an AppK8sClient with a real conditionRepo mock.
+func testClientWithRepo(t *testing.T, repo *mocks.AppConditionsRepo, objs ...client.Object) *AppK8sClient {
+	t.Helper()
+	s := testScheme(t)
+	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(objs...).Build()
+	cfg := &config.InternalAppConfig{
+		DefaultRequestTimeout: 5 * time.Minute,
+		MaxRequestTimeout:     time.Hour,
+		WatchBufferSize:       100,
+		MaxConditions:         40,
+	}
+	return NewAppK8sClient(fc, nil, cfg, repo)
+}
+
 // testKsvc builds a minimal KService that kserviceToApp can parse.
 func testKsvc(name, ns, rv string) *servingv1.Service {
 	return &servingv1.Service{
@@ -594,5 +610,110 @@ func testKsvc(name, ns, rv string) *servingv1.Service {
 			Annotations:     map[string]string{annotationAppID: "proj/dev/" + name},
 			Labels:          map[string]string{labelAppManaged: "true"},
 		},
+	}
+}
+
+// --- Condition dedup and message format tests ---
+
+func TestHandleKServiceEvent_DeduplicatesConditions(t *testing.T) {
+	repo := mocks.NewAppConditionsRepo(t)
+	c := testClientWithRepo(t, repo)
+
+	ksvc := testKsvc("myapp", appNamespace, "1")
+	appID := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
+
+	existingCond := &flyteapp.Condition{
+		DeploymentStatus: flyteapp.Status_DEPLOYMENT_STATUS_PENDING,
+		Message:          "",
+	}
+
+	// First call: no existing conditions → should append.
+	repo.On("GetConditions", mock.Anything, appID).Return([]*flyteapp.Condition{}, nil).Once()
+	repo.On("AppendCondition", mock.Anything, appID, mock.Anything, mock.Anything).Return(nil).Once()
+
+	c.handleKServiceEvent(context.Background(), ksvc, k8swatch.Modified)
+
+	// Second call: same status+message already stored → should NOT append.
+	repo.On("GetConditions", mock.Anything, appID).Return([]*flyteapp.Condition{existingCond}, nil).Once()
+
+	c.handleKServiceEvent(context.Background(), ksvc, k8swatch.Modified)
+
+	repo.AssertExpectations(t)
+}
+
+func TestHandleKServiceEvent_AppendsOnStatusChange(t *testing.T) {
+	repo := mocks.NewAppConditionsRepo(t)
+	c := testClientWithRepo(t, repo)
+
+	ksvc := testKsvc("myapp", appNamespace, "1")
+	appID := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
+
+	// Existing condition is DEPLOYING, new event is PENDING → different → should append.
+	existingCond := &flyteapp.Condition{
+		DeploymentStatus: flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING,
+		Message:          "Deploying revision: [myapp-00001]",
+	}
+	repo.On("GetConditions", mock.Anything, appID).Return([]*flyteapp.Condition{existingCond}, nil).Once()
+	repo.On("AppendCondition", mock.Anything, appID, mock.Anything, mock.Anything).Return(nil).Once()
+
+	c.handleKServiceEvent(context.Background(), ksvc, k8swatch.Modified)
+
+	repo.AssertExpectations(t)
+}
+
+func TestKserviceToStatus_Messages(t *testing.T) {
+	tests := []struct {
+		name        string
+		ksvc        func() *servingv1.Service
+		wantPhase   flyteapp.Status_DeploymentStatus
+		wantMessage string
+	}{
+		{
+			name: "active",
+			ksvc: func() *servingv1.Service {
+				ksvc := testKsvc("myapp", appNamespace, "1")
+				ksvc.Status.MarkRouteReady()
+				ksvc.Status.MarkConfigurationReady()
+				return ksvc
+			},
+			wantPhase:   flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE,
+			wantMessage: "Service is ready",
+		},
+		{
+			name: "deploying with knative reason",
+			ksvc: func() *servingv1.Service {
+				ksvc := testKsvc("myapp", appNamespace, "1")
+				ksvc.Status.LatestCreatedRevisionName = "myapp-00002"
+				ksvc.Status.LatestReadyRevisionName = "myapp-00001"
+				ksvc.Status.MarkRouteNotYetReady()
+				return ksvc
+			},
+			wantPhase:   flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING,
+			wantMessage: "Deploying revision: [myapp-00002]",
+		},
+		{
+			name: "stopped",
+			ksvc: func() *servingv1.Service {
+				ksvc := testKsvc("myapp", appNamespace, "1")
+				if ksvc.Spec.Template.Annotations == nil {
+					ksvc.Spec.Template.Annotations = map[string]string{}
+				}
+				ksvc.Spec.Template.Annotations["autoscaling.knative.dev/max-scale"] = "0"
+				return ksvc
+			},
+			wantPhase:   flyteapp.Status_DEPLOYMENT_STATUS_STOPPED,
+			wantMessage: "App scaled to zero",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := testClient(t)
+			status := c.kserviceToStatus(context.Background(), tt.ksvc())
+			require.NotNil(t, status)
+			require.NotEmpty(t, status.Conditions)
+			assert.Equal(t, tt.wantPhase, status.Conditions[0].DeploymentStatus)
+			assert.Equal(t, tt.wantMessage, status.Conditions[0].Message)
+		})
 	}
 }

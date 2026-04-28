@@ -33,9 +33,9 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext, cfg *appconfig.Inter
 		return fmt.Errorf("internalapp: failed to run migrations: %w", err)
 	}
 
-	appK8sClient := appk8s.NewAppK8sClient(sc.K8sClient, sc.K8sCache, cfg)
 	conditionRepo := repoimpl.NewAppConditionsRepo(sc.DB)
-	internalAppSvc := service.NewInternalAppService(appK8sClient, conditionRepo, cfg)
+	appK8sClient := appk8s.NewAppK8sClient(sc.K8sClient, sc.K8sCache, cfg, conditionRepo)
+	internalAppSvc := service.NewInternalAppService(appK8sClient, conditionRepo)
 
 	if err := appK8sClient.StartWatching(ctx); err != nil {
 		return fmt.Errorf("internalapp: failed to start KService watcher: %w", err)

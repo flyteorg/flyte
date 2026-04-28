@@ -5,14 +5,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	appconfig "github.com/flyteorg/flyte/v2/app/internal/config"
 	"github.com/flyteorg/flyte/v2/app/internal/repository/mocks"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
@@ -101,16 +99,6 @@ func newTestRepo(t *testing.T) *mocks.AppConditionsRepo {
 	return repo
 }
 
-func testCfg() *appconfig.InternalAppConfig {
-	return &appconfig.InternalAppConfig{
-		Enabled:               true,
-		BaseDomain:            "example.com",
-		Scheme:                "https",
-		DefaultRequestTimeout: 5 * time.Minute,
-		MaxRequestTimeout:     time.Hour,
-	}
-}
-
 func testAppID() *flyteapp.Identifier {
 	return &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
 }
@@ -138,7 +126,7 @@ func testAppWithStatus(phase flyteapp.Status_DeploymentStatus) *flyteapp.App {
 }
 
 func newTestClient(t *testing.T, k8s *mockAppK8sClient) appconnect.AppServiceClient {
-	svc := NewInternalAppService(k8s, newTestRepo(t), testCfg())
+	svc := NewInternalAppService(k8s, newTestRepo(t))
 	path, handler := appconnect.NewAppServiceHandler(svc)
 	mux := http.NewServeMux()
 	mux.Handle("/internal"+path, http.StripPrefix("/internal", handler))
@@ -151,7 +139,7 @@ func newTestClient(t *testing.T, k8s *mockAppK8sClient) appconnect.AppServiceCli
 
 func TestCreate_Success(t *testing.T) {
 	k8s := &mockAppK8sClient{}
-	svc := NewInternalAppService(k8s, newTestRepo(t), testCfg())
+	svc := NewInternalAppService(k8s, newTestRepo(t))
 
 	app := testApp()
 	ingress := &flyteapp.Ingress{PublicUrl: "https://myapp-3dcbfc92-flyte.example.com"}
@@ -160,13 +148,14 @@ func TestCreate_Success(t *testing.T) {
 
 	resp, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{App: app}))
 	require.NoError(t, err)
-	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_PENDING, resp.Msg.App.Status.Conditions[0].DeploymentStatus)
+	// Conditions are written by handleKServiceEvent, not by Create directly.
+	assert.Empty(t, resp.Msg.App.Status.Conditions)
 	assert.Equal(t, ingress.PublicUrl, resp.Msg.App.Status.Ingress.PublicUrl)
 	k8s.AssertExpectations(t)
 }
 
 func TestCreate_MissingID(t *testing.T) {
-	svc := NewInternalAppService(&mockAppK8sClient{}, newTestRepo(t), testCfg())
+	svc := NewInternalAppService(&mockAppK8sClient{}, newTestRepo(t))
 
 	_, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{
 		App: &flyteapp.App{Spec: testApp().Spec},
@@ -176,7 +165,7 @@ func TestCreate_MissingID(t *testing.T) {
 }
 
 func TestCreate_MissingSpec(t *testing.T) {
-	svc := NewInternalAppService(&mockAppK8sClient{}, newTestRepo(t), testCfg())
+	svc := NewInternalAppService(&mockAppK8sClient{}, newTestRepo(t))
 
 	_, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{
 		App: &flyteapp.App{Metadata: &flyteapp.Meta{Id: testAppID()}},
@@ -186,7 +175,7 @@ func TestCreate_MissingSpec(t *testing.T) {
 }
 
 func TestCreate_MissingPayload(t *testing.T) {
-	svc := NewInternalAppService(&mockAppK8sClient{}, newTestRepo(t), testCfg())
+	svc := NewInternalAppService(&mockAppK8sClient{}, newTestRepo(t))
 
 	_, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{
 		App: &flyteapp.App{
@@ -200,9 +189,7 @@ func TestCreate_MissingPayload(t *testing.T) {
 
 func TestCreate_IngressWithPort(t *testing.T) {
 	k8s := &mockAppK8sClient{}
-	cfg := testCfg()
-	cfg.IngressAppsPort = 30081
-	svc := NewInternalAppService(k8s, newTestRepo(t), cfg)
+	svc := NewInternalAppService(k8s, newTestRepo(t))
 
 	app := testApp()
 	ingress := &flyteapp.Ingress{PublicUrl: "https://myapp-3dcbfc92-flyte.example.com:30081"}
@@ -217,9 +204,7 @@ func TestCreate_IngressWithPort(t *testing.T) {
 
 func TestCreate_NoBaseDomain_NoIngress(t *testing.T) {
 	k8s := &mockAppK8sClient{}
-	cfg := testCfg()
-	cfg.BaseDomain = ""
-	svc := NewInternalAppService(k8s, newTestRepo(t), cfg)
+	svc := NewInternalAppService(k8s, newTestRepo(t))
 
 	app := testApp()
 	k8s.On("Deploy", mock.Anything, app).Return(nil)
@@ -236,7 +221,7 @@ func TestCreate_NoBaseDomain_NoIngress(t *testing.T) {
 func TestGet_Success(t *testing.T) {
 	k8s := &mockAppK8sClient{}
 	repo := mocks.NewAppConditionsRepo(t)
-	svc := NewInternalAppService(k8s, repo, testCfg())
+	svc := NewInternalAppService(k8s, repo)
 
 	appID := testAppID()
 	k8s.On("GetApp", mock.Anything, appID).Return(testAppWithStatus(flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE), nil)
@@ -252,7 +237,7 @@ func TestGet_Success(t *testing.T) {
 }
 
 func TestGet_MissingAppID(t *testing.T) {
-	svc := NewInternalAppService(&mockAppK8sClient{}, newTestRepo(t), testCfg())
+	svc := NewInternalAppService(&mockAppK8sClient{}, newTestRepo(t))
 
 	_, err := svc.Get(context.Background(), connect.NewRequest(&flyteapp.GetRequest{}))
 	require.Error(t, err)
@@ -263,11 +248,14 @@ func TestGet_MissingAppID(t *testing.T) {
 
 func TestUpdate_Deploy(t *testing.T) {
 	k8s := &mockAppK8sClient{}
-	svc := NewInternalAppService(k8s, newTestRepo(t), testCfg())
+	repo := mocks.NewAppConditionsRepo(t)
+	svc := NewInternalAppService(k8s, repo)
 
 	app := testApp()
+	dbConditions := []*flyteapp.Condition{{DeploymentStatus: flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING}}
 	k8s.On("Deploy", mock.Anything, app).Return(nil)
 	k8s.On("GetApp", mock.Anything, app.Metadata.Id).Return(testAppWithStatus(flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING), nil)
+	repo.On("GetConditions", mock.Anything, app.Metadata.Id).Return(dbConditions, nil)
 
 	resp, err := svc.Update(context.Background(), connect.NewRequest(&flyteapp.UpdateRequest{App: app}))
 	require.NoError(t, err)
@@ -277,12 +265,15 @@ func TestUpdate_Deploy(t *testing.T) {
 
 func TestUpdate_Stop(t *testing.T) {
 	k8s := &mockAppK8sClient{}
-	svc := NewInternalAppService(k8s, newTestRepo(t), testCfg())
+	repo := mocks.NewAppConditionsRepo(t)
+	svc := NewInternalAppService(k8s, repo)
 
 	app := testApp()
 	app.Spec.DesiredState = flyteapp.Spec_DESIRED_STATE_STOPPED
+	dbConditions := []*flyteapp.Condition{{DeploymentStatus: flyteapp.Status_DEPLOYMENT_STATUS_STOPPED}}
 	k8s.On("Stop", mock.Anything, app.Metadata.Id).Return(nil)
 	k8s.On("GetApp", mock.Anything, app.Metadata.Id).Return(testAppWithStatus(flyteapp.Status_DEPLOYMENT_STATUS_STOPPED), nil)
+	repo.On("GetConditions", mock.Anything, app.Metadata.Id).Return(dbConditions, nil)
 
 	resp, err := svc.Update(context.Background(), connect.NewRequest(&flyteapp.UpdateRequest{App: app}))
 	require.NoError(t, err)
@@ -291,7 +282,7 @@ func TestUpdate_Stop(t *testing.T) {
 }
 
 func TestUpdate_MissingID(t *testing.T) {
-	svc := NewInternalAppService(&mockAppK8sClient{}, newTestRepo(t), testCfg())
+	svc := NewInternalAppService(&mockAppK8sClient{}, newTestRepo(t))
 
 	_, err := svc.Update(context.Background(), connect.NewRequest(&flyteapp.UpdateRequest{
 		App: &flyteapp.App{},
@@ -304,7 +295,7 @@ func TestUpdate_MissingID(t *testing.T) {
 
 func TestDelete_Success(t *testing.T) {
 	k8s := &mockAppK8sClient{}
-	svc := NewInternalAppService(k8s, newTestRepo(t), testCfg())
+	svc := NewInternalAppService(k8s, newTestRepo(t))
 
 	appID := testAppID()
 	k8s.On("Delete", mock.Anything, appID).Return(nil)
@@ -315,7 +306,7 @@ func TestDelete_Success(t *testing.T) {
 }
 
 func TestDelete_MissingID(t *testing.T) {
-	svc := NewInternalAppService(&mockAppK8sClient{}, newTestRepo(t), testCfg())
+	svc := NewInternalAppService(&mockAppK8sClient{}, newTestRepo(t))
 
 	_, err := svc.Delete(context.Background(), connect.NewRequest(&flyteapp.DeleteRequest{}))
 	require.Error(t, err)
@@ -326,7 +317,7 @@ func TestDelete_MissingID(t *testing.T) {
 
 func TestList_ByProject(t *testing.T) {
 	k8s := &mockAppK8sClient{}
-	svc := NewInternalAppService(k8s, newTestRepo(t), testCfg())
+	svc := NewInternalAppService(k8s, newTestRepo(t))
 
 	apps := []*flyteapp.App{testApp()}
 	k8s.On("List", mock.Anything, "proj", "dev", uint32(10), "tok").Return(apps, "nexttok", nil)
@@ -345,7 +336,7 @@ func TestList_ByProject(t *testing.T) {
 
 func TestList_NoFilter(t *testing.T) {
 	k8s := &mockAppK8sClient{}
-	svc := NewInternalAppService(k8s, newTestRepo(t), testCfg())
+	svc := NewInternalAppService(k8s, newTestRepo(t))
 
 	k8s.On("List", mock.Anything, "", "", uint32(0), "").Return([]*flyteapp.App{}, "", nil)
 

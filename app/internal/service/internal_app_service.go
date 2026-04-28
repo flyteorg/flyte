@@ -5,10 +5,8 @@ import (
 	"fmt"
 
 	"connectrpc.com/connect"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
-	appconfig "github.com/flyteorg/flyte/v2/app/internal/config"
 	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
 	"github.com/flyteorg/flyte/v2/app/internal/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -18,17 +16,17 @@ import (
 
 // InternalAppService is the data plane implementation of the AppService.
 // It has direct K8s access via AppK8sClientInterface.
-// Condition history is persisted in the database via conditionRepo.
+// conditionRepo is used to read condition history; conditions are written by
+// AppK8sClient.handleKServiceEvent on every KService informer event.
 type InternalAppService struct {
 	appconnect.UnimplementedAppServiceHandler
 	k8s           appk8s.AppK8sClientInterface
 	conditionRepo interfaces.AppConditionsRepo
-	cfg           *appconfig.InternalAppConfig
 }
 
 // NewInternalAppService creates a new InternalAppService.
-func NewInternalAppService(k8s appk8s.AppK8sClientInterface, conditionRepo interfaces.AppConditionsRepo, cfg *appconfig.InternalAppConfig) *InternalAppService {
-	return &InternalAppService{k8s: k8s, conditionRepo: conditionRepo, cfg: cfg}
+func NewInternalAppService(k8s appk8s.AppK8sClientInterface, conditionRepo interfaces.AppConditionsRepo) *InternalAppService {
+	return &InternalAppService{k8s: k8s, conditionRepo: conditionRepo}
 }
 
 // Ensure InternalAppService satisfies the generated handler interface.
@@ -55,18 +53,8 @@ func (s *InternalAppService) Create(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	cond := &flyteapp.Condition{
-		DeploymentStatus:   flyteapp.Status_DEPLOYMENT_STATUS_PENDING,
-		LastTransitionTime: timestamppb.Now(),
-		Message:            "App is pending deployment",
-	}
-	if err := s.conditionRepo.AppendCondition(ctx, app.GetMetadata().GetId(), cond, s.cfg.MaxConditions); err != nil {
-		logger.Errorf(ctx, "Failed to persist condition for app %s: %v", app.GetMetadata().GetId().GetName(), err)
-	}
-
 	app.Status = &flyteapp.Status{
-		Conditions: []*flyteapp.Condition{cond},
-		Ingress:    s.k8s.PublicIngress(app.GetMetadata().GetId()),
+		Ingress: s.k8s.PublicIngress(app.GetMetadata().GetId()),
 	}
 
 	return connect.NewResponse(&flyteapp.CreateResponse{App: app}), nil
@@ -83,7 +71,18 @@ func (s *InternalAppService) Get(
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("app_id is required"))
 	}
 
-	app, err := s.k8s.GetApp(ctx, appID.AppId)
+	app, err := s.getWithConditions(ctx, appID.AppId)
+	if err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(&flyteapp.GetResponse{App: app}), nil
+}
+
+// getWithConditions fetches an app from K8s and merges its stored DB condition
+// history into the status. Both Get and Update use this so their responses are consistent.
+func (s *InternalAppService) getWithConditions(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.App, error) {
+	app, err := s.k8s.GetApp(ctx, appID)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
@@ -91,15 +90,14 @@ func (s *InternalAppService) Get(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	conditions, err := s.conditionRepo.GetConditions(ctx, appID.AppId)
+	conditions, err := s.conditionRepo.GetConditions(ctx, appID)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to get conditions for app %s: %v", appID.AppId.GetName(), err)
+		logger.Errorf(ctx, "Failed to get conditions for app %s: %v", appID.GetName(), err)
+	} else {
+		app.Status.Conditions = conditions
 	}
-	app.Status.Conditions = conditions
 
-	return connect.NewResponse(&flyteapp.GetResponse{
-		App: app,
-	}), nil
+	return app, nil
 }
 
 // Update modifies an app's spec or desired state.
@@ -117,17 +115,11 @@ func (s *InternalAppService) Update(
 
 	appID := app.GetMetadata().GetId()
 
-	var cond *flyteapp.Condition
 	switch app.GetSpec().GetDesiredState() {
 	case flyteapp.Spec_DESIRED_STATE_STOPPED:
 		if err := s.k8s.Stop(ctx, appID); err != nil {
 			logger.Errorf(ctx, "Failed to stop app %s: %v", appID.GetName(), err)
 			return nil, connect.NewError(connect.CodeInternal, err)
-		}
-		cond = &flyteapp.Condition{
-			DeploymentStatus:   flyteapp.Status_DEPLOYMENT_STATUS_STOPPED,
-			LastTransitionTime: timestamppb.Now(),
-			Message:            "App scaled to zero",
 		}
 	default:
 		// UNSPECIFIED, STARTED, ACTIVE — deploy/redeploy the spec.
@@ -135,19 +127,13 @@ func (s *InternalAppService) Update(
 			logger.Errorf(ctx, "Failed to update app %s: %v", appID.GetName(), err)
 			return nil, connect.NewError(connect.CodeInternal, err)
 		}
-		cond = &flyteapp.Condition{
-			DeploymentStatus:   flyteapp.Status_DEPLOYMENT_STATUS_PENDING,
-			LastTransitionTime: timestamppb.Now(),
-			Message:            "App is pending deployment",
-		}
-	}
-	if err := s.conditionRepo.AppendCondition(ctx, appID, cond, s.cfg.MaxConditions); err != nil {
-		logger.Errorf(ctx, "Failed to persist condition for app %s: %v", appID.GetName(), err)
 	}
 
-	freshApp, err := s.k8s.GetApp(ctx, appID)
+	// Return K8s live status merged with the full DB condition history,
+	// consistent with Get(). Condition recording is driven by handleKServiceEvent.
+	freshApp, err := s.getWithConditions(ctx, appID)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err
 	}
 	app.Status = freshApp.Status
 
