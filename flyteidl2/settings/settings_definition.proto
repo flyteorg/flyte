@@ -150,8 +150,6 @@ message QuantitySetting {
 // RunSettings controls workflow execution behavior.
 message RunSettings {
   StringSetting default_queue = 1 [(flyteidl2.settings.desc) = "Default queue for task runs"];
-  Int64Setting run_concurrency = 2 [(flyteidl2.settings.desc) = "Maximum number of concurrent runs. 0 means unlimited."];
-  Int64Setting action_concurrency = 3 [(flyteidl2.settings.desc) = "Maximum number of concurrent actions per run. 0 means unlimited."];
 }
 
 // SecuritySettings controls security-related configuration.

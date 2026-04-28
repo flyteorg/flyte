@@ -1081,64 +1081,6 @@ func (m *RunSettings) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetRunConcurrency()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RunSettingsValidationError{
-					field:  "RunConcurrency",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RunSettingsValidationError{
-					field:  "RunConcurrency",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetRunConcurrency()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RunSettingsValidationError{
-				field:  "RunConcurrency",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetActionConcurrency()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RunSettingsValidationError{
-					field:  "ActionConcurrency",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RunSettingsValidationError{
-					field:  "ActionConcurrency",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetActionConcurrency()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RunSettingsValidationError{
-				field:  "ActionConcurrency",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	if len(errors) > 0 {
 		return RunSettingsMultiError(errors)
 	}
