@@ -42,7 +42,7 @@ type InternalAppConfig struct {
 	Enabled bool `json:"enabled" pflag:",Enable app deployment controller"`
 
 	// BaseDomain is the base domain used to generate public URLs for apps.
-	// Apps are exposed at "{name}-{project}-{domain}.{base_domain}".
+	// Apps are exposed at "{name}-{project}-{domain}-{namespace}.{base_domain}".
 	BaseDomain string `json:"baseDomain" pflag:",Base domain for app public URLs"`
 
 	// Scheme is the URL scheme used for public app URLs ("http" or "https").

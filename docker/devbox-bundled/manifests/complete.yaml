@@ -7038,6 +7038,15 @@ spec:
                 description: StateJSON is the JSON serialized NodeStatus that was
                   last sent to the State Service
                 type: string
+              systemFailures:
+                description: |-
+                  SystemFailures counts system-level failures observed during reconciliation —
+                  either Go errors returned from Plugin.Handle (e.g. transient k8s API errors,
+                  admission webhook denials) or plugin transitions reporting a system-retryable
+                  failure (e.g. resource deleted externally). When it exceeds the configured
+                  maximum, the TaskAction is converted to a permanent failure.
+                format: int32
+                type: integer
             type: object
         required:
         - spec
@@ -7748,19 +7757,18 @@ data:
           auth_type: accesskey
       container: flyte-data
   100-inline-config.yaml: |
-    manager:
-      internalApps:
-        baseDomain: localhost
-        defaultEnvVars:
-        - FLYTE_AWS_ENDPOINT: http://rustfs.flyte:9000
-        - FLYTE_AWS_ACCESS_KEY_ID: rustfs
-        - FLYTE_AWS_SECRET_ACCESS_KEY: rustfsstorage
-        - _U_EP_OVERRIDE: flyte-binary-http.flyte:8090
-        - _U_INSECURE: "true"
-        - _U_USE_ACTIONS: "1"
-        enabled: true
-        ingressAppsPort: 30081
-        scheme: http
+    internalApps:
+      baseDomain: localhost
+      defaultEnvVars:
+      - FLYTE_AWS_ENDPOINT: http://rustfs.flyte:9000
+      - FLYTE_AWS_ACCESS_KEY_ID: rustfs
+      - FLYTE_AWS_SECRET_ACCESS_KEY: rustfsstorage
+      - _U_EP_OVERRIDE: flyte-binary-http.flyte:8090
+      - _U_INSECURE: "true"
+      - _U_USE_ACTIONS: "1"
+      enabled: true
+      ingressAppsPort: 30081
+      scheme: http
     plugins:
       k8s:
         default-env-vars:
@@ -7961,7 +7969,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  domain-template: '{{.Name}}-{{.Namespace}}.{{.Domain}}'
+  domain-template: '{{.Name}}.{{.Domain}}'
   ingress-class: kourier.ingress.networking.knative.dev
 kind: ConfigMap
 metadata:
@@ -8532,7 +8540,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 53ebdf49e3406c689b89d5bf7c25698f0c4f123ab016f51533e6331fe173a744
+        checksum/configuration: b8535eb0e5a85227f8d1d1aba0a4339b9050cad039c112d7dda9055b93586bd8
         checksum/configuration-secret: e70194084619f4a1d4017093aac6367047167107fd0222513a32a61734629cac
       labels:
         app.kubernetes.io/component: flyte-binary

@@ -296,6 +296,15 @@ spec:
                 description: StateJSON is the JSON serialized NodeStatus that was
                   last sent to the State Service
                 type: string
+              systemFailures:
+                description: |-
+                  SystemFailures counts system-level failures observed during reconciliation —
+                  either Go errors returned from Plugin.Handle (e.g. transient k8s API errors,
+                  admission webhook denials) or plugin transitions reporting a system-retryable
+                  failure (e.g. resource deleted externally). When it exceeds the configured
+                  maximum, the TaskAction is converted to a permanent failure.
+                format: int32
+                type: integer
             type: object
         required:
         - spec

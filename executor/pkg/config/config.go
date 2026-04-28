@@ -24,6 +24,7 @@ var (
 		EventsServiceURL:       "http://localhost:8090",
 		CacheServiceURL:        "http://localhost:8094",
 		Cluster:                "",
+		MaxSystemFailures:      3,
 		GC: GCConfig{
 			Interval: stdconfig.Duration{Duration: 30 * time.Minute},
 			MaxTTL:   stdconfig.Duration{Duration: 1 * time.Hour},
@@ -77,6 +78,11 @@ type Config struct {
 
 	// Cluster is the cluster identifier attached to action events.
 	Cluster string `json:"cluster" pflag:",Cluster identifier for action events"`
+
+	// MaxSystemFailures bounds consecutive system-level failures (Plugin.Handle Go
+	// errors and plugin-reported system-retryable failures) before a TaskAction is
+	// converted to a permanent failure.
+	MaxSystemFailures uint32 `json:"maxSystemFailures" pflag:",Max consecutive system-level failures before forcing permanent failure"`
 
 	// GC configures the garbage collector for terminal TaskActions.
 	GC GCConfig `json:"gc" pflag:",Garbage collector configuration for terminal TaskActions"`

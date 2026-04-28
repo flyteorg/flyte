@@ -11,9 +11,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
-	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"golang.org/x/sync/errgroup"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -25,6 +23,8 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
@@ -39,10 +39,18 @@ import (
 type RunService struct {
 	repo            interfaces.Repository
 	actionsClient   actionsconnect.ActionsServiceClient
+	dataProxyClient actionDataClient
 	projectClient   projectconnect.ProjectServiceClient
 	storagePrefix   string
 	dataStore       *storage.DataStore
 	abortReconciler *AbortReconciler
+}
+
+type actionDataClient interface {
+	GetActionData(
+		ctx context.Context,
+		req *connect.Request[dataproxy.GetActionDataRequest],
+	) (*connect.Response[dataproxy.GetActionDataResponse], error)
 }
 
 const (
@@ -105,10 +113,19 @@ func (s *RunService) WatchGroups(ctx context.Context, req *connect.Request[workf
 }
 
 // NewRunService creates a new RunService instance
-func NewRunService(repo interfaces.Repository, actionsClient actionsconnect.ActionsServiceClient, projectClient projectconnect.ProjectServiceClient, storagePrefix string, dataStore *storage.DataStore, reconciler *AbortReconciler) *RunService {
+func NewRunService(
+	repo interfaces.Repository,
+	actionsClient actionsconnect.ActionsServiceClient,
+	dataProxyClient dataproxyconnect.DataProxyServiceClient,
+	projectClient projectconnect.ProjectServiceClient,
+	storagePrefix string,
+	dataStore *storage.DataStore,
+	reconciler *AbortReconciler,
+) *RunService {
 	return &RunService{
 		repo:            repo,
 		actionsClient:   actionsClient,
+		dataProxyClient: dataProxyClient,
 		projectClient:   projectClient,
 		storagePrefix:   storagePrefix,
 		dataStore:       dataStore,
@@ -746,7 +763,7 @@ func lastAttemptIsTerminal(attempts []*workflow.ActionAttempt) bool {
 	return IsTerminalPhase(last.GetPhase())
 }
 
-// GetActionData gets input and output data for an action by reading from storage.
+// GetActionData keeps backward compatibility by delegating data reads to DataProxy.
 func (s *RunService) GetActionData(
 	ctx context.Context,
 	req *connect.Request[workflow.GetActionDataRequest],
@@ -758,107 +775,20 @@ func (s *RunService) GetActionData(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	// Get action from DB for storage URIs
-	action, err := s.repo.ActionRepo().GetAction(ctx, req.Msg.ActionId)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to get action: %v", err)
-		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %w", err))
+	if s.dataProxyClient == nil {
+		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("dataproxy client is not configured"))
 	}
 
-	inputURI, _ := extractStorageURIs(action.ActionSpec)
-
-	info := &workflow.RunInfo{}
-	if err := proto.Unmarshal(action.DetailedInfo, info); err != nil {
+	dpResp, err := s.dataProxyClient.GetActionData(ctx, connect.NewRequest(&dataproxy.GetActionDataRequest{
+		ActionId: req.Msg.GetActionId(),
+	}))
+	if err != nil {
 		return nil, err
 	}
 
 	resp := &workflow.GetActionDataResponse{
-		Inputs:  &task.Inputs{},
-		Outputs: &task.Outputs{},
-	}
-
-	// Read inputs from storage
-	group, groupCtx := errgroup.WithContext(ctx)
-	if inputURI != "" {
-		group.Go(func() error {
-			inputRef := storage.DataReference(inputURI)
-			logger.Debugf(groupCtx, "Reading inputs from: %s", inputRef)
-			if err := s.dataStore.ReadProtobuf(groupCtx, inputRef, resp.Inputs); err != nil {
-				if !storage.IsNotFound(err) {
-					logger.Errorf(groupCtx, "Failed to read inputs from %s: %v", inputRef, err)
-					return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read inputs: %w", err))
-				}
-				logger.Debugf(groupCtx, "Inputs not found at %s", inputRef)
-			} else {
-				logger.Debugf(groupCtx, "Read %d input literals and %d action contexts", len(resp.Inputs.Literals), len(resp.Inputs.Context))
-			}
-			return nil
-		})
-	} else {
-		logger.Warnf(ctx, "Action %s has empty InputURI", req.Msg.ActionId.Name)
-	}
-
-	// Read outputs from storage (only present if action succeeded)
-	if action.Phase == int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED) {
-		group.Go(func() error {
-			// There are no attempts for trace actions, so we can skip the attempt validation
-			var attempts []*workflow.ActionAttempt
-			var err error
-			if workflow.ActionType(action.ActionType) == workflow.ActionType_ACTION_TYPE_TRACE {
-				if info.GetOutputsUri() == "" {
-					return nil
-				}
-				logger.Debugf(groupCtx, "Reading outputs from: %s", info.GetOutputsUri())
-
-				outputMap := &core.LiteralMap{}
-				if err := s.dataStore.ReadProtobuf(groupCtx, storage.DataReference(info.GetOutputsUri()), outputMap); err != nil {
-					if !storage.IsNotFound(err) {
-						logger.Errorf(groupCtx, "Failed to read outputs from %s: %v", info.GetOutputsUri(), err)
-						return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read outputs: %w", err))
-					}
-					logger.Debugf(groupCtx, "Outputs not found at %s (action may not have finished)", info.GetOutputsUri())
-				} else {
-					resp.Outputs = literalMapToOutputs(outputMap)
-					logger.Debugf(groupCtx, "Read %d output literals", len(resp.Outputs.Literals))
-				}
-
-				return nil
-			}
-
-			// Default to "task" action types
-			attempts, err = s.getAttempts(groupCtx, req.Msg.GetActionId())
-			if err != nil {
-				return err
-			}
-
-			if len(attempts) == 0 {
-				return app.NewServerError(codes.NotFound, "outputs not available, no attempts for action")
-			}
-
-			outputUri := attempts[len(attempts)-1].GetOutputs().GetOutputUri()
-			if outputUri == "" {
-				return app.NewServerError(codes.NotFound, "outputs not available")
-			}
-
-			logger.Debugf(groupCtx, "Reading outputs from: %s", outputUri)
-			outputMap := &core.LiteralMap{}
-			if err := s.dataStore.ReadProtobuf(groupCtx, storage.DataReference(outputUri), outputMap); err != nil {
-				if !storage.IsNotFound(err) {
-					logger.Errorf(groupCtx, "Failed to read outputs from %s: %v", outputUri, err)
-					return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read outputs: %w", err))
-				}
-				logger.Debugf(groupCtx, "Outputs not found at %s (action may not have finished)", outputUri)
-			} else {
-				resp.Outputs = literalMapToOutputs(outputMap)
-				logger.Debugf(groupCtx, "Read %d output literals", len(resp.Outputs.Literals))
-			}
-
-			return nil
-		})
-	}
-
-	if err := group.Wait(); err != nil {
-		return nil, err
+		Inputs:  dpResp.Msg.GetInputs(),
+		Outputs: dpResp.Msg.GetOutputs(),
 	}
 
 	logger.Infof(ctx, "Retrieved action data for: %s (inputs=%d, outputs=%d)",
