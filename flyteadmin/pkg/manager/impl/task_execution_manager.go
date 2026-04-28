@@ -206,7 +206,7 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.GetRequestId(), err)
 	}
 
-	go func() {
+	go func() { //nolint:gosec
 		ceCtx := context.TODO()
 		if err := m.cloudEventsPublisher.Publish(ceCtx, proto.MessageName(request), request); err != nil {
 			logger.Errorf(ctx, "error publishing cloud event [%+v] with err: [%v]", request.GetRequestId(), err)

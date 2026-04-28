@@ -14,7 +14,7 @@ import (
 //go:generate pflags Config --default-var=DefaultConfig
 
 var (
-	DefaultConfig = &Config{
+	DefaultConfig = &Config{ //nolint:gosec
 		SecretName:        "flyte-pod-webhook",
 		ServiceName:       "flyte-pod-webhook",
 		ServicePort:       443,

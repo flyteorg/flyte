@@ -27,7 +27,7 @@ type TokenCacheKeyringProvider struct {
 }
 
 func (t *TokenCacheKeyringProvider) PurgeIfEquals(existing *oauth2.Token) (bool, error) {
-	if existingBytes, err := json.Marshal(existing); err != nil {
+	if existingBytes, err := json.Marshal(existing); err != nil { //nolint:gosec
 		return false, fmt.Errorf("unable to marshal token to save in cache due to %w", err)
 	} else if tokenJSON, err := keyring.Get(t.ServiceName, t.ServiceUser); err != nil {
 		logger.Warnf(context.Background(), "unable to read token from cache but not failing the purge as the token might not have been saved at all. Error: %v", err)
@@ -88,7 +88,7 @@ func (t *TokenCacheKeyringProvider) SaveToken(token *oauth2.Token) error {
 	}
 
 	var err error
-	if tokenBytes, err = json.Marshal(token); err != nil {
+	if tokenBytes, err = json.Marshal(token); err != nil { //nolint:gosec
 		return fmt.Errorf("unable to marshal token to save in cache due to %w", err)
 	}
 

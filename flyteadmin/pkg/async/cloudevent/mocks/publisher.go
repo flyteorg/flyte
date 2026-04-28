@@ -6,7 +6,6 @@ import (
 	context "context"
 
 	mock "github.com/stretchr/testify/mock"
-
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
 )
 

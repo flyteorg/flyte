@@ -12,7 +12,6 @@ import (
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	jwtgo "github.com/golang-jwt/jwt/v4"
-	"golang.org/x/oauth2"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
@@ -45,14 +44,6 @@ func (r ResourceServer) ValidateAccessToken(ctx context.Context, expectedAudienc
 	}
 
 	return verifyClaims(sets.NewString(append(r.allowedAudience, expectedAudience)...), t.Claims.(jwtgo.MapClaims))
-}
-
-func doRequest(ctx context.Context, req *http.Request) (*http.Response, error) {
-	client := http.DefaultClient
-	if c, ok := ctx.Value(oauth2.HTTPClient).(*http.Client); ok {
-		client = c
-	}
-	return client.Do(req.WithContext(ctx))
 }
 
 func unmarshalResp(r *http.Response, body []byte, v interface{}) error {
