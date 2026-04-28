@@ -42,6 +42,11 @@ class ActionsServiceStub(object):
                 request_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.AbortRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.AbortResponse.FromString,
                 )
+        self.Signal = channel.unary_unary(
+                '/flyteidl2.actions.ActionsService/Signal',
+                request_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.SignalRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.SignalResponse.FromString,
+                )
 
 
 class ActionsServiceServicer(object):
@@ -89,6 +94,18 @@ class ActionsServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def Signal(self, request, context):
+        """Signal resolves a ConditionAction by providing its signal value.
+        On success, transitions the condition to SUCCEEDED with the provided
+        value as its output.
+        Returns FAILED_PRECONDITION if the action is not a condition or is
+        already terminal. Returns NOT_FOUND if the action does not exist.
+        Returns ABORTED if the action has a write in-flight (retry).
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ActionsServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -116,6 +133,11 @@ def add_ActionsServiceServicer_to_server(servicer, server):
                     servicer.Abort,
                     request_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.AbortRequest.FromString,
                     response_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.AbortResponse.SerializeToString,
+            ),
+            'Signal': grpc.unary_unary_rpc_method_handler(
+                    servicer.Signal,
+                    request_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.SignalRequest.FromString,
+                    response_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.SignalResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -212,5 +234,22 @@ class ActionsService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.actions.ActionsService/Abort',
             flyteidl2_dot_actions_dot_actions__service__pb2.AbortRequest.SerializeToString,
             flyteidl2_dot_actions_dot_actions__service__pb2.AbortResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Signal(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.actions.ActionsService/Signal',
+            flyteidl2_dot_actions_dot_actions__service__pb2.SignalRequest.SerializeToString,
+            flyteidl2_dot_actions_dot_actions__service__pb2.SignalResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

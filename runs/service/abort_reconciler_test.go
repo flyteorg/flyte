@@ -12,19 +12,20 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
+	actionsconnectmocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
 // newTestReconciler builds a reconciler wired to mocks with fast timing for tests.
-func newTestReconciler(t *testing.T) (*repoMocks.ActionRepo, *mockActionsClient, *AbortReconciler) {
+func newTestReconciler(t *testing.T) (*repoMocks.ActionRepo, *actionsconnectmocks.ActionsServiceClient, *AbortReconciler) {
 	t.Helper()
 	actionRepo := repoMocks.NewActionRepo(t)
 	repo := repoMocks.NewRepository(t)
 	repo.On("ActionRepo").Return(actionRepo).Maybe()
 
-	actionsClient := &mockActionsClient{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 
 	reconciler := NewAbortReconciler(repo, actionsClient, AbortReconcilerConfig{
 		Workers:      2,
@@ -169,11 +170,11 @@ func TestAbortReconciler_StartupScanPicksUpPending(t *testing.T) {
 	actionRepo, actionsClient, reconciler := newTestReconciler(t)
 
 	action1ID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{Org: "o", Project: "p", Domain: "d", Name: "run1"},
+		Run:  &common.RunIdentifier{Org: "o", Project: "p", Domain: "d", Name: "run1"},
 		Name: "run1",
 	}
 	action2ID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{Org: "o", Project: "p", Domain: "d", Name: "run2"},
+		Run:  &common.RunIdentifier{Org: "o", Project: "p", Domain: "d", Name: "run2"},
 		Name: "run2",
 	}
 

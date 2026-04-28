@@ -1,0 +1,172 @@
+docker-registry:
+  fullnameOverride: docker-registry
+  enabled: true
+  image:
+    tag: sandbox
+    pullPolicy: Never
+  persistence:
+    enabled: true
+    existingClaim: flyte-devbox-registry-storage
+  secrets:
+    haSharedSecret: flytesandboxsecret
+  service:
+    type: NodePort
+    nodePort: 30000
+  # Run as root so the registry can write to the hostPath PV mount, which
+  # is created as root:root 755 by the node and cannot be chowned via fsGroup.
+  securityContext:
+    runAsUser: 0
+  containerSecurityContext:
+    runAsUser: 0
+flyte-binary:
+  fullnameOverride: flyte-binary
+  enabled: true
+  configuration:
+    database:
+      host: 'postgresql'
+      password: postgres
+    storage:
+      metadataContainer: flyte-data
+      userDataContainer: flyte-data
+      provider: s3
+      providerConfig:
+        s3:
+          disableSSL: true
+          v2Signing: true
+          endpoint: http://rustfs.{{ .Release.Namespace }}:9000
+          authType: accesskey
+          accessKey: rustfs
+          secretKey: rustfsstorage
+    logging:
+      level: 5
+    inline:
+      task_resources:
+        defaults:
+          cpu: 500m
+          ephemeralStorage: 0
+          gpu: 0
+          memory: 1Gi
+        limits:
+          cpu: 0
+          ephemeralStorage: 0
+          gpu: 0
+          memory: 0
+      storage:
+        signedURL:
+          stowConfigOverride:
+            endpoint: http://localhost:30002
+      plugins:
+        k8s:
+          default-env-vars:
+            - FLYTE_AWS_ENDPOINT: http://rustfs.{{ .Release.Namespace }}:9000
+            - FLYTE_AWS_ACCESS_KEY_ID: rustfs
+            - FLYTE_AWS_SECRET_ACCESS_KEY: rustfsstorage
+            - _U_EP_OVERRIDE: 'flyte-binary-http.{{ .Release.Namespace }}:8090'
+            - _U_INSECURE: "true"
+            - _U_USE_ACTIONS: "1"
+      runs:
+        database:
+          postgres:
+            host: 'postgresql.{{ .Release.Namespace }}'
+            port: 5432
+            dbName: runs
+            user: postgres
+            password: postgres
+      internalApps:
+        enabled: true
+        baseDomain: "localhost"
+        scheme: "http"
+        ingressAppsPort: 30081
+        defaultEnvVars:
+          - FLYTE_AWS_ENDPOINT: 'http://rustfs.{{ .Release.Namespace }}:9000'
+          - FLYTE_AWS_ACCESS_KEY_ID: rustfs
+          - FLYTE_AWS_SECRET_ACCESS_KEY: rustfsstorage
+          - _U_EP_OVERRIDE: 'flyte-binary-http.{{ .Release.Namespace }}:8090'
+          - _U_INSECURE: "true"
+          - _U_USE_ACTIONS: "1"
+      webhook:
+        secretManagerTypes:
+          - Embedded
+        embeddedSecretManagerConfig:
+          type: K8s
+          k8sConfig:
+            namespace: '{{ .Release.Namespace }}'
+    inlineConfigMap: '{{ include "flyte-devbox.configuration.inlineConfigMap" . }}'
+  clusterResourceTemplates:
+    inlineConfigMap: '{{ include "flyte-devbox.clusterResourceTemplates.inlineConfigMap" . }}'
+  deployment:
+    image:
+      repository: flyte-binary-v2
+      tag: sandbox
+      pullPolicy: Never
+    startupProbe:
+      httpGet:
+        path: /healthz
+        port: http
+      failureThreshold: 30
+      periodSeconds: 1
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: http
+    readinessProbe:
+      httpGet:
+        path: /readyz
+        port: http
+      periodSeconds: 1
+    waitForDB:
+      image:
+        repository: bitnami/postgresql
+        tag: sandbox
+        pullPolicy: Never
+  rbac:
+    # This is strictly NOT RECOMMENDED in production clusters, and is only for use
+    # within local Flyte sandboxes.
+    # When using cluster resource templates to create additional namespaced roles,
+    # Flyte is required to have a superset of those permissions. To simplify
+    # experimenting with new backend plugins that require additional roles be created
+    # with cluster resource templates (e.g. Spark), we add the following:
+    extraRules:
+      - apiGroups:
+        - '*'
+        resources:
+        - '*'
+        verbs:
+        - '*'
+rustfs:
+  enabled: true
+  accessKey: rustfs
+  secretKey: rustfsstorage
+postgresql:
+  fullnameOverride: postgresql
+  enabled: true
+  image:
+    tag: sandbox
+    pullPolicy: Never
+  auth:
+    postgresPassword: postgres
+  shmVolume:
+    enabled: false
+  primary:
+    service:
+      type: NodePort
+      nodePorts:
+        postgresql: 30001
+    persistence:
+      enabled: true
+      existingClaim: '{{ include "flyte-devbox.persistence.dbVolumeName" . }}'
+  volumePermissions:
+    enabled: true
+    image:
+      tag: sandbox
+      pullPolicy: Never
+sandbox:
+  # dev Routes requests to an instance of Flyte running locally on a developer's
+  # development environment. This is only usable if the flyte-binary chart is disabled.
+  dev: false
+  console:
+    enabled: true
+    image:
+      repository: docker.io/unionai-oss/flyteconsole-v2
+      tag: sandbox
+      pullPolicy: Never

@@ -1,0 +1,10 @@
+{{ template "base" . }}
+
+# Override: make the NVIDIA runtime the default. k3s auto-registers a
+# `nvidia` runtime at startup when /usr/bin/nvidia-container-runtime is
+# present. By switching the default, pods requesting `nvidia.com/gpu` get
+# GPU access without needing `runtimeClassName: nvidia` in their spec.
+# nvidia-container-runtime is a passthrough when no GPU is requested, so
+# non-GPU pods are unaffected.
+[plugins.'io.containerd.cri.v1.runtime'.containerd]
+  default_runtime_name = "nvidia"

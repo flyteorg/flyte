@@ -1,0 +1,77 @@
+helmGlobals:
+  chartHome: ../../../../charts
+helmCharts:
+- name: flyte-devbox
+  releaseName: flyte-devbox
+  namespace: flyte
+  valuesInline:
+    # Disabled: PostgreSQL runs as an embedded process on the host via
+    # the fergusstrange/embedded-postgres library instead of a pod.
+    postgresql:
+      enabled: false
+    flyte-binary:
+      deployment:
+        waitForDB:
+          image:
+            repository: rancher/mirrored-library-busybox
+            tag: "1.34.1"
+          command:
+            - sh
+            - -ec
+          args:
+            - |
+              until nc -z postgresql.flyte 5432; do
+                echo waiting for database
+                sleep 0.1
+              done
+resources:
+- ../namespace.yaml
+- ../embedded-postgres-service.yaml
+- ../../../../charts/flyte-devbox/charts/knative-serving/crds/serving-crds.yaml
+
+patches:
+- patch: |-
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: config-network
+      namespace: knative-serving
+    data:
+      ingress-class: kourier.ingress.networking.knative.dev
+      domain-template: "{{.Name}}.{{.Domain}}"
+- patch: |-
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: config-domain
+      namespace: knative-serving
+    data:
+      "localhost": ""
+- patch: |-
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      name: knative-serving-istio
+    $patch: delete
+- patch: |-
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: net-istio-webhook
+      namespace: knative-serving
+    $patch: delete
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: net-istio-webhook
+      namespace: knative-serving
+    $patch: delete
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: net-istio-controller
+      namespace: knative-serving
+    $patch: delete
+

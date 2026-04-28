@@ -12,6 +12,8 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
+	projectMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	mocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -21,11 +23,15 @@ func TestDeployTask(t *testing.T) {
 	ctx := context.Background()
 	mockRepo := mocks.NewRepository(t)
 	mockTaskRepo := mocks.NewTaskRepo(t)
+	mockProjectClient := projectMocks.NewProjectServiceClient(t)
 
 	mockRepo.EXPECT().TaskRepo().Return(mockTaskRepo)
 	mockTaskRepo.EXPECT().CreateTask(ctx, mock.AnythingOfType("*models.Task"), mock.Anything).Return(nil)
+	mockProjectClient.EXPECT().GetProject(ctx, mock.MatchedBy(func(req *connect.Request[project.GetProjectRequest]) bool {
+		return req.Msg.GetId() == "test-project"
+	})).Return(connect.NewResponse(&project.GetProjectResponse{}), nil)
 
-	service := NewTaskService(mockRepo)
+	service := NewTaskService(mockRepo, mockProjectClient)
 
 	req := &task.DeployTaskRequest{
 		TaskId: &task.TaskIdentifier{
@@ -73,7 +79,7 @@ func TestGetTaskDetails(t *testing.T) {
 	mockRepo.EXPECT().TaskRepo().Return(mockTaskRepo)
 	mockTaskRepo.EXPECT().GetTask(ctx, mock.AnythingOfType("models.TaskKey")).Return(taskModel, nil)
 
-	service := NewTaskService(mockRepo)
+	service := NewTaskService(mockRepo, nil)
 
 	req := &task.GetTaskDetailsRequest{
 		TaskId: &task.TaskIdentifier{
@@ -119,7 +125,7 @@ func TestListTasks(t *testing.T) {
 	mockRepo.EXPECT().TaskRepo().Return(mockTaskRepo)
 	mockTaskRepo.EXPECT().ListTasks(ctx, mock.AnythingOfType("interfaces.ListResourceInput")).Return(result, nil)
 
-	service := NewTaskService(mockRepo)
+	service := NewTaskService(mockRepo, nil)
 
 	req := &task.ListTasksRequest{
 		ScopeBy: &task.ListTasksRequest_Org{
@@ -158,7 +164,7 @@ func TestListVersions(t *testing.T) {
 	mockRepo.EXPECT().TaskRepo().Return(mockTaskRepo)
 	mockTaskRepo.EXPECT().ListVersions(ctx, mock.AnythingOfType("interfaces.ListResourceInput")).Return(versions, nil)
 
-	service := NewTaskService(mockRepo)
+	service := NewTaskService(mockRepo, nil)
 
 	req := &task.ListVersionsRequest{
 		TaskName: &task.TaskName{

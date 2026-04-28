@@ -32,14 +32,13 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	actionsClient := actionsk8s.NewActionsClient(
 		sc.K8sClient,
 		sc.K8sCache,
-		sc.Namespace,
 		cfg.WatchBufferSize,
 		cfg.WatchWorkers,
 		runClient,
 		cfg.RecordFilterSize,
 		sc.Scope,
 	)
-	logger.Infof(ctx, "Actions K8s client initialized for namespace: %s", sc.Namespace)
+	logger.Infof(ctx, "Actions K8s client initialized")
 
 	if err := actionsClient.StartWatching(ctx); err != nil {
 		return fmt.Errorf("actions: failed to start TaskAction watcher: %w", err)

@@ -25,6 +25,8 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
+	projectMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	workflowMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect/mocks"
@@ -104,7 +106,12 @@ func TestCreateUploadLocation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStore(t)
-			service := NewService(cfg, mockStore, nil, nil, nil, nil)
+			mockProjectClient := projectMocks.NewProjectServiceClient(t)
+			if !tt.wantErr {
+				mockProjectClient.On("GetProject", mock.Anything, mock.Anything).Return(
+					connect.NewResponse(&project.GetProjectResponse{}), nil)
+			}
+			service := NewService(cfg, mockStore, nil, nil, nil, mockProjectClient, nil)
 
 			req := &connect.Request[dataproxy.CreateUploadLocationRequest]{
 				Msg: tt.req,
@@ -225,7 +232,7 @@ func TestCheckFileExists(t *testing.T) {
 				mockStore = setupMockDataStoreWithExistingFile(t, tt.existingFileMD5)
 			}
 
-			service := NewService(cfg, mockStore, nil, nil, nil, nil)
+			service := NewService(cfg, mockStore, nil, nil, nil, nil, nil)
 			storagePath := storage.DataReference("s3://test-bucket/uploads/test-project/test-domain/test-root/test-file.txt")
 
 			err := service.checkFileExists(ctx, storagePath, tt.req)
@@ -303,7 +310,7 @@ func TestConstructStoragePath(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStore(t)
-			service := NewService(cfg, mockStore, nil, nil, nil, nil)
+			service := NewService(cfg, mockStore, nil, nil, nil, nil, nil)
 
 			path, err := service.constructStoragePath(ctx, tt.req)
 
@@ -460,7 +467,12 @@ func TestUploadInputs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStoreWithWriteProtobuf(t)
-			svc := NewService(cfg, mockStore, nil, nil, nil, nil)
+			mockProjectClient := projectMocks.NewProjectServiceClient(t)
+			if !tt.wantErr {
+				mockProjectClient.On("GetProject", mock.Anything, mock.Anything).Return(
+					connect.NewResponse(&project.GetProjectResponse{}), nil)
+			}
+			svc := NewService(cfg, mockStore, nil, nil, nil, mockProjectClient, nil)
 
 			req := &connect.Request[dataproxy.UploadInputsRequest]{
 				Msg: tt.req,
@@ -624,7 +636,7 @@ func TestGetActionData(t *testing.T) {
 				ComposedProtobufStore: mockComposedStore,
 				ReferenceConstructor:  &simpleRefConstructor{},
 			}
-			svc := NewService(cfg, ds, nil, nil, runClient, nil)
+			svc := NewService(cfg, ds, nil, nil, runClient, nil, nil)
 
 			resp, err := svc.GetActionData(ctx, connect.NewRequest(&dataproxy.GetActionDataRequest{
 				ActionId: actionID,
@@ -719,7 +731,7 @@ func TestTailLogs(t *testing.T) {
 			_ = stream.Send(&dataproxy.TailLogsResponse{})
 		}).Return(nil)
 
-		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, nil, streamer)
 		client := newTailLogsTestClient(t, svc)
 
 		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
@@ -742,7 +754,7 @@ func TestTailLogs(t *testing.T) {
 			nil, connect.NewError(connect.CodeNotFound, assertErr("action missing")))
 
 		streamer := &mockLogStreamer{}
-		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, nil, streamer)
 		client := newTailLogsTestClient(t, svc)
 
 		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
@@ -765,7 +777,7 @@ func TestTailLogs(t *testing.T) {
 			}), nil)
 
 		streamer := &mockLogStreamer{}
-		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, nil, streamer)
 		client := newTailLogsTestClient(t, svc)
 
 		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
@@ -789,7 +801,7 @@ func TestTailLogs(t *testing.T) {
 		streamer.On("TailLogs", mock.Anything, logContext, mock.Anything).Return(
 			connect.NewError(connect.CodeInternal, assertErr("streamer boom")))
 
-		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, nil, streamer)
 		client := newTailLogsTestClient(t, svc)
 
 		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
@@ -813,7 +825,7 @@ func TestTailLogs(t *testing.T) {
 		streamer := &mockLogStreamer{}
 		streamer.On("TailLogs", mock.Anything, logContext, mock.Anything).Return(nil)
 
-		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, streamer)
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, nil, streamer)
 		client := newTailLogsTestClient(t, svc)
 
 		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{

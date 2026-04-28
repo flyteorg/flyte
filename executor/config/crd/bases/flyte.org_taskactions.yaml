@@ -230,6 +230,25 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              errorState:
+                description: |-
+                  ErrorState is the structured error from the last failed/aborted attempt.
+                  Populated when the plugin returns a core.ExecutionError; preserves the
+                  Code field that ActionEvent.ErrorInfo cannot carry.
+                properties:
+                  code:
+                    description: |-
+                      Code is the plugin-defined error code (e.g. "OOMKilled",
+                      "ContainerCreating", "PrimaryContainerNotFound").
+                    type: string
+                  kind:
+                    description: 'Kind is the error kind: "USER", "SYSTEM", or ""
+                      (unspecified).'
+                    type: string
+                  message:
+                    description: Message is the human-readable error message.
+                    type: string
+                type: object
               phaseHistory:
                 description: |-
                   PhaseHistory is an append-only log of phase transitions. Unlike conditions
@@ -277,6 +296,15 @@ spec:
                 description: StateJSON is the JSON serialized NodeStatus that was
                   last sent to the State Service
                 type: string
+              systemFailures:
+                description: |-
+                  SystemFailures counts system-level failures observed during reconciliation —
+                  either Go errors returned from Plugin.Handle (e.g. transient k8s API errors,
+                  admission webhook denials) or plugin transitions reporting a system-retryable
+                  failure (e.g. resource deleted externally). When it exceeds the configured
+                  maximum, the TaskAction is converted to a permanent failure.
+                format: int32
+                type: integer
             type: object
         required:
         - spec

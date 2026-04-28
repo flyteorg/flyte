@@ -1,0 +1,19 @@
+{{- if .Values.rustfs.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: rustfs
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "flyte-devbox.labels" . | nindent 4 }}
+spec:
+  type: NodePort
+  ports:
+  - name: rustfs-api
+    nodePort: 30002
+    port: 9000
+    targetPort: rustfs-api
+  selector:
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}

@@ -1,0 +1,8 @@
+docker.io/bitnami/os-shell:sandbox=bitnamilegacy/os-shell:11-debian-11
+docker.io/library/registry:sandbox=registry:2.8.1
+docker.io/rancher/local-path-provisioner:v0.0.21
+docker.io/rancher/mirrored-coredns-coredns:1.9.1
+docker.io/rancher/mirrored-library-busybox:1.34.1
+docker.io/rancher/mirrored-pause:3.6
+docker.io/rustfs/rustfs:sandbox=rustfs/rustfs:latest
+docker.io/unionai-oss/flyteconsole-v2:sandbox=ghcr.io/unionai-oss/flyteconsole-v2:latest

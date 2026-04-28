@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -20,7 +19,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
@@ -82,58 +80,6 @@ func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*
 	}
 
 	return &run, nil
-}
-
-// ListRuns lists runs with pagination
-func (r *actionRepo) ListRuns(ctx context.Context, req *workflow.ListRunsRequest) ([]*models.Run, string, error) {
-	var queryBuilder strings.Builder
-	var args []interface{}
-	argIdx := 1
-
-	queryBuilder.WriteString("SELECT * FROM actions WHERE parent_action_name IS NULL")
-
-	// Apply scope filters
-	switch scope := req.ScopeBy.(type) {
-	case *workflow.ListRunsRequest_ProjectId:
-		queryBuilder.WriteString(fmt.Sprintf(" AND project = $%d AND domain = $%d", argIdx, argIdx+1))
-		args = append(args, scope.ProjectId.Name, scope.ProjectId.Domain)
-		argIdx += 2
-	}
-
-	// Apply pagination according to token and limit from requests.
-	limit := 50
-	offset := 0
-	if req.Request != nil {
-		if req.Request.Token != "" {
-			parsedOffset, err := strconv.Atoi(req.Request.Token)
-			if err != nil {
-				return nil, "", fmt.Errorf("invalid pagination token: %w", err)
-			}
-			offset = parsedOffset
-		}
-
-		if req.Request.Limit > 0 {
-			limit = int(req.Request.Limit)
-		}
-	}
-
-	queryBuilder.WriteString(fmt.Sprintf(" ORDER BY created_at DESC LIMIT $%d OFFSET $%d", argIdx, argIdx+1))
-	args = append(args, limit+1, offset) // Fetch one extra to determine if there are more
-	argIdx += 2
-
-	var runs []*models.Run
-	if err := sqlx.SelectContext(ctx, r.db, &runs, queryBuilder.String(), args...); err != nil {
-		return nil, "", fmt.Errorf("failed to list runs: %w", err)
-	}
-
-	// Determine next token
-	var nextToken string
-	if len(runs) > limit {
-		runs = runs[:limit]
-		nextToken = fmt.Sprintf("%d", offset+limit)
-	}
-
-	return runs, nextToken, nil
 }
 
 // AbortRun marks only the root action as ABORTED and sets abort_requested_at on it.
@@ -352,45 +298,62 @@ func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdent
 	return &action, nil
 }
 
-// ListActions lists actions for a run
-func (r *actionRepo) ListActions(ctx context.Context, runID *common.RunIdentifier, limit int, token string) ([]*models.Action, string, error) {
-	if limit == 0 {
-		limit = 100
-	}
-
+// ListActions lists actions matching the given input filter, sort, and pagination.
+func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Action, error) {
 	var queryBuilder strings.Builder
 	var args []interface{}
-	argIdx := 1
 
-	queryBuilder.WriteString(fmt.Sprintf("SELECT * FROM actions WHERE project = $%d AND domain = $%d AND run_name = $%d", argIdx, argIdx+1, argIdx+2))
-	args = append(args, runID.Project, runID.Domain, runID.Name)
-	argIdx += 3
+	queryBuilder.WriteString("SELECT * FROM actions")
 
-	// Apply pagination token (encoded as RFC3339Nano created_at cursor)
-	if token != "" {
-		if t, err := time.Parse(time.RFC3339Nano, token); err == nil {
-			queryBuilder.WriteString(fmt.Sprintf(" AND created_at > $%d", argIdx))
+	if input.Filter != nil {
+		expr, err := input.Filter.QueryExpression("")
+		if err != nil {
+			return nil, fmt.Errorf("failed to build filter expression: %w", err)
+		}
+		queryBuilder.WriteString(" WHERE ")
+		queryBuilder.WriteString(expr.Query)
+		args = append(args, expr.Args...)
+	}
+
+	if input.CursorToken != "" {
+		if t, err := time.Parse(time.RFC3339Nano, input.CursorToken); err == nil {
+			// If a filter was already applied above, the WHERE clause is already open
+			// and we extend it with AND. Otherwise we open a new WHERE clause.
+			// Use < because the default sort is DESC (newest first): each page
+			// continues from rows older than the last row of the previous page.
+			if input.Filter != nil {
+				queryBuilder.WriteString(" AND created_at < ?")
+			} else {
+				queryBuilder.WriteString(" WHERE created_at < ?")
+			}
 			args = append(args, t)
-			argIdx++
 		}
 	}
 
-	queryBuilder.WriteString(fmt.Sprintf(" ORDER BY created_at ASC LIMIT $%d", argIdx))
-	args = append(args, limit+1)
+	if len(input.SortParameters) > 0 {
+		queryBuilder.WriteString(" ORDER BY ")
+		for i, sp := range input.SortParameters {
+			if i > 0 {
+				queryBuilder.WriteString(", ")
+			}
+			queryBuilder.WriteString(sp.GetOrderExpr())
+		}
+	} else {
+		// Default sorting non-terminal runs at the top, then by most recent start time.
+		queryBuilder.WriteString(" ORDER BY phase ASC, created_at DESC")
+	}
+
+	queryBuilder.WriteString(" LIMIT ?")
+	args = append(args, input.Limit+1)
+
+	query := sqlx.Rebind(sqlx.DOLLAR, queryBuilder.String())
 
 	var actions []*models.Action
-	if err := sqlx.SelectContext(ctx, r.db, &actions, queryBuilder.String(), args...); err != nil {
-		return nil, "", fmt.Errorf("failed to list actions: %w", err)
+	if err := sqlx.SelectContext(ctx, r.db, &actions, query, args...); err != nil {
+		return nil, fmt.Errorf("failed to list actions: %w", err)
 	}
 
-	// Determine next token
-	var nextToken string
-	if len(actions) > limit {
-		actions = actions[:limit]
-		nextToken = actions[len(actions)-1].CreatedAt.UTC().Format(time.RFC3339Nano)
-	}
-
-	return actions, nextToken, nil
+	return actions, nil
 }
 
 // UpdateActionPhase updates the phase of an action.

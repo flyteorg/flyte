@@ -2706,6 +2706,211 @@ func TestDemystifyPending(t *testing.T) {
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
 		assert.True(t, taskStatus.CleanupOnFailure())
 	})
+
+	// Init container scenarios: a stuck init container must win over the downstream
+	// PodInitializing wait that K8s surfaces on the main container while init is blocked.
+	mainContainerPodInitializing := []v1.ContainerStatus{
+		{
+			Ready: false,
+			State: v1.ContainerState{
+				Waiting: &v1.ContainerStateWaiting{
+					Reason:  "PodInitializing",
+					Message: "waiting for init containers",
+				},
+			},
+		},
+	}
+
+	t.Run("InitContainer_ErrImagePull", func(t *testing.T) {
+		s2 := *s.DeepCopy()
+		s2.InitContainerStatuses = []v1.ContainerStatus{
+			{
+				Ready: false,
+				State: v1.ContainerState{
+					Waiting: &v1.ContainerStateWaiting{
+						Reason:  "ErrImagePull",
+						Message: "cannot pull init image",
+					},
+				},
+			},
+		}
+		s2.ContainerStatuses = mainContainerPodInitializing
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseInitializing, taskStatus.Phase())
+	})
+
+	t.Run("InitContainer_ImagePullBackOffWithinGracePeriod", func(t *testing.T) {
+		s2 := *s.DeepCopy()
+		s2.Conditions[0].LastTransitionTime = metav1.Now()
+		s2.InitContainerStatuses = []v1.ContainerStatus{
+			{
+				Ready: false,
+				State: v1.ContainerState{
+					Waiting: &v1.ContainerStateWaiting{
+						Reason:  "ImagePullBackOff",
+						Message: "Back-off pulling image \"bad-init-image\"",
+					},
+				},
+			},
+		}
+		s2.ContainerStatuses = mainContainerPodInitializing
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseInitializing, taskStatus.Phase())
+	})
+
+	t.Run("InitContainer_ImagePullBackOffOutsideGracePeriod", func(t *testing.T) {
+		s2 := *s.DeepCopy()
+		s2.Conditions[0].LastTransitionTime.Time = metav1.Now().Add(-config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration)
+		s2.InitContainerStatuses = []v1.ContainerStatus{
+			{
+				Ready: false,
+				State: v1.ContainerState{
+					Waiting: &v1.ContainerStateWaiting{
+						Reason:  "ImagePullBackOff",
+						Message: "Back-off pulling image \"bad-init-image\"",
+					},
+				},
+			},
+		}
+		s2.ContainerStatuses = mainContainerPodInitializing
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
+		assert.Contains(t, taskStatus.Err().Code, "ImagePullBackOff")
+		assert.Contains(t, taskStatus.Err().Message, "bad-init-image")
+	})
+
+	t.Run("InitContainer_InvalidImageName", func(t *testing.T) {
+		s2 := *s.DeepCopy()
+		s2.InitContainerStatuses = []v1.ContainerStatus{
+			{
+				Ready: false,
+				State: v1.ContainerState{
+					Waiting: &v1.ContainerStateWaiting{
+						Reason:  "InvalidImageName",
+						Message: "couldn't parse image reference",
+					},
+				},
+			},
+		}
+		s2.ContainerStatuses = mainContainerPodInitializing
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
+	})
+
+	t.Run("InitContainer_CreateContainerConfigErrorOutsideGracePeriod", func(t *testing.T) {
+		s2 := *s.DeepCopy()
+		s2.Conditions[0].LastTransitionTime.Time = metav1.Now().Add(-config.GetK8sPluginConfig().CreateContainerConfigErrorGracePeriod.Duration)
+		s2.InitContainerStatuses = []v1.ContainerStatus{
+			{
+				Ready: false,
+				State: v1.ContainerState{
+					Waiting: &v1.ContainerStateWaiting{
+						Reason:  "CreateContainerConfigError",
+						Message: "secret \"my-secret\" not found",
+					},
+				},
+			},
+		}
+		s2.ContainerStatuses = mainContainerPodInitializing
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
+	})
+
+	t.Run("InitContainer_CreateContainerErrorOutsideGracePeriod", func(t *testing.T) {
+		s2 := *s.DeepCopy()
+		s2.Conditions[0].LastTransitionTime.Time = metav1.Now().Add(-config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration)
+		s2.InitContainerStatuses = []v1.ContainerStatus{
+			{
+				Ready: false,
+				State: v1.ContainerState{
+					Waiting: &v1.ContainerStateWaiting{
+						Reason:  "CreateContainerError",
+						Message: "no command specified",
+					},
+				},
+			},
+		}
+		s2.ContainerStatuses = mainContainerPodInitializing
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
+	})
+
+	t.Run("InitContainer_DefaultUnknownReason", func(t *testing.T) {
+		s2 := *s.DeepCopy()
+		s2.InitContainerStatuses = []v1.ContainerStatus{
+			{
+				Ready: false,
+				State: v1.ContainerState{
+					Waiting: &v1.ContainerStateWaiting{
+						Reason:  "RandomInitError",
+						Message: "something went wrong in init",
+					},
+				},
+			},
+		}
+		s2.ContainerStatuses = mainContainerPodInitializing
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
+	})
+
+	t.Run("InitContainer_SucceededFallsThroughToMainContainer", func(t *testing.T) {
+		// When init containers have completed (State.Waiting == nil) we should fall
+		// through to regular-container inspection and surface the main container's wait.
+		s2 := *s.DeepCopy()
+		s2.InitContainerStatuses = []v1.ContainerStatus{
+			{
+				Ready: true,
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{ExitCode: 0},
+				},
+			},
+		}
+		s2.ContainerStatuses = mainContainerPodInitializing
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseInitializing, taskStatus.Phase())
+	})
+
+	t.Run("InitContainer_FirstSucceededSecondFailingPicksFailing", func(t *testing.T) {
+		// A prior init container succeeded; the next is stuck on ImagePullBackOff past grace.
+		s2 := *s.DeepCopy()
+		s2.Conditions[0].LastTransitionTime.Time = metav1.Now().Add(-config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration)
+		s2.InitContainerStatuses = []v1.ContainerStatus{
+			{
+				Ready: true,
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{ExitCode: 0},
+				},
+			},
+			{
+				Ready: false,
+				State: v1.ContainerState{
+					Waiting: &v1.ContainerStateWaiting{
+						Reason:  "ImagePullBackOff",
+						Message: "Back-off pulling image \"second-init\"",
+					},
+				},
+			},
+		}
+		s2.ContainerStatuses = mainContainerPodInitializing
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
+		assert.Contains(t, taskStatus.Err().Message, "second-init")
+	})
 }
 
 func TestDemystifyPendingTimeout(t *testing.T) {

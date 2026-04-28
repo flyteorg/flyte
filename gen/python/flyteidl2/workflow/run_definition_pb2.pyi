@@ -9,6 +9,7 @@ from flyteidl2.task import common_pb2 as _common_pb2
 from flyteidl2.task import run_pb2 as _run_pb2
 from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
+from google.protobuf import struct_pb2 as _struct_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf import wrappers_pb2 as _wrappers_pb2
 from google.protobuf.internal import containers as _containers
@@ -18,6 +19,12 @@ from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
+
+class ConditionPromptType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    CONDITION_PROMPT_TYPE_UNSPECIFIED: _ClassVar[ConditionPromptType]
+    CONDITION_PROMPT_TYPE_TEXT: _ClassVar[ConditionPromptType]
+    CONDITION_PROMPT_TYPE_MARKDOWN: _ClassVar[ConditionPromptType]
 
 class ActionType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
@@ -32,6 +39,9 @@ class RunSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     RUN_SOURCE_WEB: _ClassVar[RunSource]
     RUN_SOURCE_CLI: _ClassVar[RunSource]
     RUN_SOURCE_SCHEDULE_TRIGGER: _ClassVar[RunSource]
+CONDITION_PROMPT_TYPE_UNSPECIFIED: ConditionPromptType
+CONDITION_PROMPT_TYPE_TEXT: ConditionPromptType
+CONDITION_PROMPT_TYPE_MARKDOWN: ConditionPromptType
 ACTION_TYPE_UNSPECIFIED: ActionType
 ACTION_TYPE_TASK: ActionType
 ACTION_TYPE_TRACE: ActionType
@@ -84,21 +94,30 @@ class TraceAction(_message.Message):
     def __init__(self, name: _Optional[str] = ..., phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.OutputReferences, _Mapping]] = ..., spec: _Optional[_Union[_task_definition_pb2.TraceSpec, _Mapping]] = ...) -> None: ...
 
 class ConditionAction(_message.Message):
-    __slots__ = ["name", "run_id", "action_id", "type", "prompt", "description"]
+    __slots__ = ["name", "type", "prompt", "description", "prompt_type", "timeout", "webhook"]
     NAME_FIELD_NUMBER: _ClassVar[int]
-    RUN_ID_FIELD_NUMBER: _ClassVar[int]
-    ACTION_ID_FIELD_NUMBER: _ClassVar[int]
-    GLOBAL_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     PROMPT_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    PROMPT_TYPE_FIELD_NUMBER: _ClassVar[int]
+    TIMEOUT_FIELD_NUMBER: _ClassVar[int]
+    WEBHOOK_FIELD_NUMBER: _ClassVar[int]
     name: str
-    run_id: str
-    action_id: str
     type: _types_pb2.LiteralType
     prompt: str
     description: str
-    def __init__(self, name: _Optional[str] = ..., run_id: _Optional[str] = ..., action_id: _Optional[str] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., prompt: _Optional[str] = ..., description: _Optional[str] = ..., **kwargs) -> None: ...
+    prompt_type: ConditionPromptType
+    timeout: _duration_pb2.Duration
+    webhook: ConditionWebhook
+    def __init__(self, name: _Optional[str] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., prompt: _Optional[str] = ..., description: _Optional[str] = ..., prompt_type: _Optional[_Union[ConditionPromptType, str]] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., webhook: _Optional[_Union[ConditionWebhook, _Mapping]] = ...) -> None: ...
+
+class ConditionWebhook(_message.Message):
+    __slots__ = ["url", "payload"]
+    URL_FIELD_NUMBER: _ClassVar[int]
+    PAYLOAD_FIELD_NUMBER: _ClassVar[int]
+    url: str
+    payload: _struct_pb2.Struct
+    def __init__(self, url: _Optional[str] = ..., payload: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
 
 class TaskActionMetadata(_message.Message):
     __slots__ = ["id", "task_type", "short_name"]
@@ -117,15 +136,10 @@ class TraceActionMetadata(_message.Message):
     def __init__(self, name: _Optional[str] = ...) -> None: ...
 
 class ConditionActionMetadata(_message.Message):
-    __slots__ = ["name", "run_id", "action_id"]
+    __slots__ = ["name"]
     NAME_FIELD_NUMBER: _ClassVar[int]
-    RUN_ID_FIELD_NUMBER: _ClassVar[int]
-    ACTION_ID_FIELD_NUMBER: _ClassVar[int]
-    GLOBAL_FIELD_NUMBER: _ClassVar[int]
     name: str
-    run_id: str
-    action_id: str
-    def __init__(self, name: _Optional[str] = ..., run_id: _Optional[str] = ..., action_id: _Optional[str] = ..., **kwargs) -> None: ...
+    def __init__(self, name: _Optional[str] = ...) -> None: ...
 
 class ActionMetadata(_message.Message):
     __slots__ = ["parent", "group", "executed_by", "task", "trace", "condition", "action_type", "trigger_id", "environment_name", "funtion_name", "trigger_name", "trigger_type", "source"]

@@ -1,0 +1,55 @@
+{{- if or ( index .Values "flyte-binary" "enabled" ) .Values.sandbox.dev }}
+{{- $backendService := "" }}
+{{- if index .Values "flyte-binary" "enabled" }}
+{{- $backendService = printf "%s-http" ( index .Values "flyte-binary" "fullnameOverride" | default "flyte-binary" ) }}
+{{- else }}
+{{- $backendService = include "flyte-devbox.localHeadlessService" . }}
+{{- end }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "flyte-devbox.fullname" . }}-api
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-devbox.labels" . | nindent 4 }}
+spec:
+  rules:
+    - http:
+        paths:
+          {{- range $path := list "/healthz" "/readyz" }}
+          - path: {{ $path }}
+            pathType: Exact
+            backend:
+              service:
+                name: {{ $backendService }}
+                port:
+                  number: 8090
+          {{- end }}
+          - path: /flyteidl2.
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $backendService }}
+                port:
+                  number: 8090
+{{- end }}
+---
+{{- if .Values.sandbox.console.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: flyte-console
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-devbox.labels" . | nindent 4 }}
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /v2
+            pathType: Prefix
+            backend:
+              service:
+                name: flyte-console
+                port:
+                  number: 80
+{{- end }}
+---
