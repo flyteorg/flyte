@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"connectrpc.com/connect"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -67,30 +66,10 @@ func (s *InternalAppService) Create(
 
 	app.Status = &flyteapp.Status{
 		Conditions: []*flyteapp.Condition{cond},
-		Ingress: publicIngress(app.GetMetadata().GetId(), s.cfg),
+		Ingress:    s.k8s.PublicIngress(app.GetMetadata().GetId()),
 	}
 
 	return connect.NewResponse(&flyteapp.CreateResponse{App: app}), nil
-}
-
-// publicIngress builds the deterministic public URL for an app using
-// BaseDomain — which must match Knative's domain-template so Kourier
-// serves the URL directly. Returns nil if BaseDomain is unset.
-func publicIngress(id *flyteapp.Identifier, cfg *appconfig.InternalAppConfig) *flyteapp.Ingress {
-	if cfg.BaseDomain == "" {
-		return nil
-	}
-	scheme := cfg.Scheme
-	if scheme == "" {
-		scheme = "https"
-	}
-	host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
-		id.GetName(), id.GetProject(), id.GetDomain(), cfg.BaseDomain))
-	url := scheme + "://" + host
-	if cfg.IngressAppsPort != 0 {
-		url += fmt.Sprintf(":%d", cfg.IngressAppsPort)
-	}
-	return &flyteapp.Ingress{PublicUrl: url}
 }
 
 // Get retrieves an app and its live status from the KService CRD.

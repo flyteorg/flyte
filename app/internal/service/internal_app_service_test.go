@@ -82,6 +82,14 @@ func (m *mockAppK8sClient) Unsubscribe(appName string, ch chan *flyteapp.WatchRe
 	m.Called(appName, ch)
 }
 
+func (m *mockAppK8sClient) PublicIngress(id *flyteapp.Identifier) *flyteapp.Ingress {
+	args := m.Called(id)
+	if args.Get(0) == nil {
+		return nil
+	}
+	return args.Get(0).(*flyteapp.Ingress)
+}
+
 // --- helpers ---
 
 // newTestRepo returns a mock AppConditionsRepo that silently accepts any call.
@@ -146,12 +154,14 @@ func TestCreate_Success(t *testing.T) {
 	svc := NewInternalAppService(k8s, newTestRepo(t), testCfg())
 
 	app := testApp()
+	ingress := &flyteapp.Ingress{PublicUrl: "https://myapp-3dcbfc92-flyte.example.com"}
 	k8s.On("Deploy", mock.Anything, app).Return(nil)
+	k8s.On("PublicIngress", app.Metadata.Id).Return(ingress)
 
 	resp, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{App: app}))
 	require.NoError(t, err)
 	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_PENDING, resp.Msg.App.Status.Conditions[0].DeploymentStatus)
-	assert.Equal(t, "https://myapp-proj-dev.example.com", resp.Msg.App.Status.Ingress.PublicUrl)
+	assert.Equal(t, ingress.PublicUrl, resp.Msg.App.Status.Ingress.PublicUrl)
 	k8s.AssertExpectations(t)
 }
 
@@ -195,11 +205,13 @@ func TestCreate_IngressWithPort(t *testing.T) {
 	svc := NewInternalAppService(k8s, newTestRepo(t), cfg)
 
 	app := testApp()
+	ingress := &flyteapp.Ingress{PublicUrl: "https://myapp-3dcbfc92-flyte.example.com:30081"}
 	k8s.On("Deploy", mock.Anything, app).Return(nil)
+	k8s.On("PublicIngress", app.Metadata.Id).Return(ingress)
 
 	resp, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{App: app}))
 	require.NoError(t, err)
-	assert.Equal(t, "https://myapp-proj-dev.example.com:30081", resp.Msg.App.Status.Ingress.PublicUrl)
+	assert.Equal(t, ingress.PublicUrl, resp.Msg.App.Status.Ingress.PublicUrl)
 	k8s.AssertExpectations(t)
 }
 
@@ -211,6 +223,7 @@ func TestCreate_NoBaseDomain_NoIngress(t *testing.T) {
 
 	app := testApp()
 	k8s.On("Deploy", mock.Anything, app).Return(nil)
+	k8s.On("PublicIngress", app.Metadata.Id).Return((*flyteapp.Ingress)(nil))
 
 	resp, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{App: app}))
 	require.NoError(t, err)

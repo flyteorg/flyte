@@ -87,6 +87,11 @@ type AppK8sClientInterface interface {
 
 	// Unsubscribe removes a subscription channel previously returned by Subscribe.
 	Unsubscribe(appName string, ch chan *flyteapp.WatchResponse)
+
+	// PublicIngress returns the deterministic public Ingress URL for the given app,
+	// matching Knative's domain-template so Kourier routes traffic correctly.
+	// Returns nil if BaseDomain is not configured.
+	PublicIngress(id *flyteapp.Identifier) *flyteapp.Ingress
 }
 
 // AppK8sClient implements AppK8sClientInterface using controller-runtime.
@@ -432,9 +437,10 @@ func (c *AppK8sClient) List(ctx context.Context, project, domain string, limit u
 	return apps, list.Continue, nil
 }
 
-// publicIngress returns the deterministic public URL for an app using the same
-// logic as the service layer so GetApp/List/Watch are consistent with Create.
-func (c *AppK8sClient) publicIngress(id *flyteapp.Identifier) *flyteapp.Ingress {
+// PublicIngress returns the deterministic public URL for an app.
+// The host follows Knative's domain-template "{kservice-name}-{namespace}.{domain}"
+// so Kourier routes traffic correctly without extra ingress rules.
+func (c *AppK8sClient) PublicIngress(id *flyteapp.Identifier) *flyteapp.Ingress {
 	if c.cfg.BaseDomain == "" {
 		return nil
 	}
@@ -442,8 +448,7 @@ func (c *AppK8sClient) publicIngress(id *flyteapp.Identifier) *flyteapp.Ingress 
 	if scheme == "" {
 		scheme = "https"
 	}
-	host := strings.ToLower(fmt.Sprintf("%s-%s-%s.%s",
-		id.GetName(), id.GetProject(), id.GetDomain(), c.cfg.BaseDomain))
+	host := fmt.Sprintf("%s-%s.%s", kserviceName(id), appNamespace, c.cfg.BaseDomain)
 	url := scheme + "://" + host
 	if c.cfg.IngressAppsPort != 0 {
 		url += fmt.Sprintf(":%d", c.cfg.IngressAppsPort)
@@ -720,7 +725,7 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 		parts := strings.SplitN(appIDStr, "/", 3)
 		if len(parts) == 3 {
 			appID := &flyteapp.Identifier{Project: parts[0], Domain: parts[1], Name: parts[2]}
-			status.Ingress = c.publicIngress(appID)
+			status.Ingress = c.PublicIngress(appID)
 		}
 	}
 
