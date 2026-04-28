@@ -31,13 +31,20 @@ func NewSortParameter(field string, order interfaces.SortOrder) interfaces.SortP
 	}
 }
 
-// GetSortByFieldsV2 converts proto sort fields to our SortParameter interfaces with validation
+// GetSortByFieldsV2 converts proto sort fields to our SortParameter interfaces with validation.
+// It prefers sort_by_fields; if empty, it falls back to the deprecated sort_by field.
 func GetSortByFieldsV2(request *common.ListRequest, allowedSortColumns sets.Set[string]) ([]interfaces.SortParameter, error) {
-	if request == nil || request.GetSortByFields() == nil {
+	if request == nil {
 		return nil, nil
 	}
 
 	protoSortFields := request.GetSortByFields()
+	if len(protoSortFields) == 0 {
+		// Fall back to deprecated sort_by field.
+		if sortBy := request.GetSortBy(); sortBy != nil && sortBy.Key != "" {
+			protoSortFields = []*common.Sort{sortBy}
+		}
+	}
 	if len(protoSortFields) == 0 {
 		return nil, nil
 	}
