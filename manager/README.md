@@ -45,8 +45,8 @@ All Connect/gRPC services are mounted on a single port. Notable handlers:
 
 ## How It Works
 
-1. **CreateRun** → Runs Service persists run to PostgreSQL and creates the root TaskAction CR in Kubernetes
-2. **Executor** → Watches TaskAction CRs and reconciles them
+1. **CreateRun** → Runs Service persists the run to PostgreSQL and calls `ActionsService.Enqueue(...)` to enqueue the root action
+2. **Actions Service / Executor** → That enqueue flow results in the root TaskAction CR being created in Kubernetes, which the Executor then watches and reconciles
 3. **Executor** → Transitions: Queued → Initializing → Running → Succeeded
 4. **Actions Service** → Watches TaskAction CRs via a shared informer and forwards status updates (phase, output URI, error state) to subscribers; sdk controller consumes these updates through `WatchForUpdates` to drive the run forward
 5. **Runs Service** → Persists state changes to PostgreSQL and notifies its own watchers
