@@ -64,7 +64,7 @@ make devbox-run FLYTE_DEV=true
 make devbox-stop
 ```
 
-`FLYTE_DEV=true` is required when you intend to run the manager locally — it disables the in-cluster manager so your local process can take over. `make devbox-run` writes a kubeconfig pointing at the devbox cluster, so `kubectl` will target it automatically.
+`FLYTE_DEV=true` is required when you intend to run the manager locally — it disables the in-cluster manager so your local process can take over. `make devbox-run` writes a kubeconfig pointing at the devbox cluster in global kubeconfig, so `kubectl` will target it automatically.
 
 ### Build and Run the Manager
 
