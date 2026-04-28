@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
@@ -59,6 +60,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		http.DefaultClient,
 		projectsURL,
 	)
+	dataProxyClient := dataproxyconnect.NewDataProxyServiceClient(http.DefaultClient, projectsURL)
 
 	abortReconciler := service.NewAbortReconciler(repo, actionsClient, service.AbortReconcilerConfig{
 		Workers:      5,
@@ -71,7 +73,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return abortReconciler.Run(ctx)
 	})
 
-	runsSvc := service.NewRunService(repo, actionsClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler)
+	runsSvc := service.NewRunService(repo, actionsClient, dataProxyClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler)
 	taskSvc := service.NewTaskService(repo, projectClient)
 
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc)
