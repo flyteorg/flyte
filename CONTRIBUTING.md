@@ -19,7 +19,7 @@ Before contributing, ensure you have:
 - [Buf CLI](https://buf.build/docs/installation) installed
 - Go 1.24.6 or later
 - Node.js and npm (for TypeScript)
-- Python 3.11+ with `uv` package manager
+- Python 3.10+ with `uv` package manager
 - Rust toolchain (if working with Rust bindings)
 - Git configured with your name and email
 - Docker (for building and running the devbox image)
