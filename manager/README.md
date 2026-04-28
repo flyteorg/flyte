@@ -3,8 +3,8 @@
 The Flyte Manager is a unified binary that runs all Flyte services in a single process:
 
 - **Runs Service** - Manages workflow runs and action state
-- **Executor/Operator** - Enqueues, reconciles, and transitions TaskAction CRs through their lifecycle
-- **Actions Service** - Serves action metadata and lifecycle APIs
+- **Executor/Operator** - Reconciles and transitions TaskAction CRs through their lifecycle
+- **Actions Service** - Serves action metadata and lifecycle APIs, including enqueueing TaskAction CRs
 - **DataProxy Service** - Proxies signed-URL and blob access for task I/O
 - **Events Service** - Ingests and fans out task/run events
 - **Cache Service** - Backs task output caching and lookups
