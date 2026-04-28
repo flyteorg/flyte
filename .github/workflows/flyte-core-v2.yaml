@@ -100,7 +100,8 @@ jobs:
           set: |
             *.platform=${{ matrix.platforms }}
             *.args.tags="ghcr.io/flyteorg/flyte/${{ matrix.target }}:${{ env.SHORT_SHA }}"
-            
+            *.cache-from=type=gha,scope=${{ matrix.target }}-${{ matrix.platforms }}
+            *.cache-to=type=gha,mode=max,scope=${{ matrix.target }}-${{ matrix.platforms }}  
 
       - name: Build and push images
         if: github.event_name == 'push'
@@ -113,4 +114,6 @@ jobs:
           set: |
              *.platform=${{ matrix.platforms }}
              *.args.tags="ghcr.io/flyteorg/flyte/${{ matrix.target }}:${{ env.SHORT_SHA }}"
+             *.cache-from=type=gha,scope=${{ matrix.target }}-${{ matrix.platforms }}
+             *.cache-to=type=gha,mode=max,scope=${{ matrix.target }}-${{ matrix.platforms }}
              
