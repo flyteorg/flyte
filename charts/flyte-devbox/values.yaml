@@ -5,13 +5,19 @@ docker-registry:
     tag: sandbox
     pullPolicy: Never
   persistence:
-    enabled: false
+    enabled: true
+    existingClaim: flyte-devbox-registry-storage
   secrets:
     haSharedSecret: flytesandboxsecret
   service:
     type: NodePort
     nodePort: 30000
-
+  # Run as root so the registry can write to the hostPath PV mount, which
+  # is created as root:root 755 by the node and cannot be chowned via fsGroup.
+  securityContext:
+    runAsUser: 0
+  containerSecurityContext:
+    runAsUser: 0
 flyte-binary:
   fullnameOverride: flyte-binary
   enabled: true
@@ -66,6 +72,25 @@ flyte-binary:
             dbName: runs
             user: postgres
             password: postgres
+      internalApps:
+        enabled: true
+        baseDomain: "localhost"
+        scheme: "http"
+        ingressAppsPort: 30081
+        defaultEnvVars:
+          - FLYTE_AWS_ENDPOINT: 'http://rustfs.{{ .Release.Namespace }}:9000'
+          - FLYTE_AWS_ACCESS_KEY_ID: rustfs
+          - FLYTE_AWS_SECRET_ACCESS_KEY: rustfsstorage
+          - _U_EP_OVERRIDE: 'flyte-binary-http.{{ .Release.Namespace }}:8090'
+          - _U_INSECURE: "true"
+          - _U_USE_ACTIONS: "1"
+      webhook:
+        secretManagerTypes:
+          - Embedded
+        embeddedSecretManagerConfig:
+          type: K8s
+          k8sConfig:
+            namespace: '{{ .Release.Namespace }}'
     inlineConfigMap: '{{ include "flyte-devbox.configuration.inlineConfigMap" . }}'
   clusterResourceTemplates:
     inlineConfigMap: '{{ include "flyte-devbox.clusterResourceTemplates.inlineConfigMap" . }}'
@@ -108,12 +133,10 @@ flyte-binary:
         - '*'
         verbs:
         - '*'
-
 rustfs:
   enabled: true
   accessKey: rustfs
   secretKey: rustfsstorage
-
 postgresql:
   fullnameOverride: postgresql
   enabled: true
@@ -137,7 +160,6 @@ postgresql:
     image:
       tag: sandbox
       pullPolicy: Never
-
 sandbox:
   # dev Routes requests to an instance of Flyte running locally on a developer's
   # development environment. This is only usable if the flyte-binary chart is disabled.

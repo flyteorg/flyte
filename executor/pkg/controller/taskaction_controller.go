@@ -21,10 +21,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"k8s.io/client-go/util/retry"
 	"reflect"
 	"strings"
 	"time"
+
+	"k8s.io/client-go/util/retry"
 
 	"connectrpc.com/connect"
 	corev1 "k8s.io/api/core/v1"
@@ -54,6 +55,14 @@ const (
 	TaskActionDefaultRequeueDuration = 10 * time.Second
 	taskActionFinalizer              = "flyte.org/plugin-finalizer"
 
+	// DefaultMaxSystemFailures bounds consecutive system errors before the
+	// TaskAction is forced to PermanentFailure.
+	DefaultMaxSystemFailures uint32 = 3
+
+	// MaxSystemFailuresExceededCode is the ExecutionError.Code stamped on
+	// TaskActions that hit the system-failure ceiling.
+	MaxSystemFailuresExceededCode = "MaxSystemFailuresExceeded"
+
 	// LabelTerminationStatus marks a TaskAction as terminated for GC discovery.
 	LabelTerminationStatus = "flyte.org/termination-status"
 	// LabelCompletedTime records the UTC time (minute precision) when the TaskAction became terminal.
@@ -76,16 +85,116 @@ const (
 // TaskActionReconciler reconciles a TaskAction object
 type TaskActionReconciler struct {
 	client.Client
-	Scheme          *runtime.Scheme
-	Recorder        record.EventRecorder
-	PluginRegistry  *plugin.Registry
-	DataStore       *storage.DataStore
-	SecretManager   pluginsCore.SecretManager
-	ResourceManager pluginsCore.ResourceManager
-	CatalogClient   catalog.AsyncClient
-	Catalog         catalog.Client
-	eventsClient    workflowconnect.EventsProxyServiceClient
-	cluster         string
+	Scheme            *runtime.Scheme
+	Recorder          record.EventRecorder
+	PluginRegistry    *plugin.Registry
+	DataStore         *storage.DataStore
+	SecretManager     pluginsCore.SecretManager
+	ResourceManager   pluginsCore.ResourceManager
+	CatalogClient     catalog.AsyncClient
+	Catalog           catalog.Client
+	eventsClient      workflowconnect.EventsProxyServiceClient
+	cluster           string
+	MaxSystemFailures uint32
+}
+
+// isSystemRetryableFailure reports whether the plugin transition is a
+// PhaseRetryableFailure with kind=SYSTEM (as produced by PhaseInfoSystemRetryableFailure).
+func isSystemRetryableFailure(phaseInfo pluginsCore.PhaseInfo) bool {
+	if phaseInfo.Phase() != pluginsCore.PhaseRetryableFailure {
+		return false
+	}
+	execErr := phaseInfo.Err()
+	return execErr != nil && execErr.GetKind() == core.ExecutionError_SYSTEM
+}
+
+func systemErrorFromPhaseInfo(phaseInfo pluginsCore.PhaseInfo) error {
+	if execErr := phaseInfo.Err(); execErr != nil {
+		return fmt.Errorf("[%s] %s", execErr.GetCode(), execErr.GetMessage())
+	}
+	return fmt.Errorf("system retryable failure")
+}
+
+func (r *TaskActionReconciler) maxSystemFailures() uint32 {
+	if r.MaxSystemFailures == 0 {
+		return DefaultMaxSystemFailures
+	}
+	return r.MaxSystemFailures
+}
+
+// resetPluginResource aborts any in-flight plugin resource and clears persisted
+// plugin state so the next reconcile starts fresh from PluginPhaseNotStarted.
+func (r *TaskActionReconciler) resetPluginResource(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	p pluginsCore.Plugin,
+	tCtx pluginsCore.TaskExecutionContext,
+) {
+	if abortErr := p.Abort(ctx, tCtx); abortErr != nil {
+		log.FromContext(ctx).Error(abortErr, "failed to abort during system-error reset", "plugin", p.GetID())
+	}
+	taskAction.Status.PluginState = nil
+	taskAction.Status.PluginStateVersion = 0
+}
+
+// recordSystemError increments Status.SystemFailures and either requeues for
+// another attempt or, once the configured threshold is exceeded, converts the
+// TaskAction to a permanent failure. It does not touch the underlying plugin
+// resource — callers that observed a failure phase should invoke
+// resetPluginResource first.
+func (r *TaskActionReconciler) recordSystemError(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	original *flyteorgv1.TaskAction,
+	pluginID string,
+	handleErr error,
+) (ctrl.Result, error) {
+	logger := log.FromContext(ctx)
+	logger.Error(handleErr, "system error from plugin", "plugin", pluginID)
+	if r.Recorder != nil {
+		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedPluginHandle),
+			"Plugin %q system error: %v", pluginID, handleErr)
+	}
+
+	taskAction.Status.SystemFailures++
+	if taskAction.Status.SystemFailures > r.maxSystemFailures() {
+		execErr := &core.ExecutionError{
+			Kind:    core.ExecutionError_SYSTEM,
+			Code:    MaxSystemFailuresExceededCode,
+			Message: fmt.Sprintf("plugin %q failed with system error %d times: %v", pluginID, taskAction.Status.SystemFailures, handleErr),
+		}
+		return r.finalizePermanentFailure(ctx, taskAction, original, execErr)
+	}
+
+	if taskActionStatusChanged(original.Status, taskAction.Status) {
+		if updErr := r.Status().Update(ctx, taskAction); updErr != nil {
+			logger.Error(updErr, "failed to persist SystemFailures counter")
+		}
+	}
+	return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+}
+
+// finalizePermanentFailure converts the TaskAction to a terminal PermanentFailure
+// with the given ExecutionError and stamps GC labels.
+func (r *TaskActionReconciler) finalizePermanentFailure(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	original *flyteorgv1.TaskAction,
+	execErr *core.ExecutionError,
+) (ctrl.Result, error) {
+	phaseInfo := pluginsCore.PhaseInfoFailed(pluginsCore.PhasePermanentFailure, execErr, nil)
+	mapPhaseToConditions(taskAction, phaseInfo)
+	taskAction.Status.PluginPhase = phaseInfo.Phase().String()
+	taskAction.Status.PluginPhaseVersion = phaseInfo.Version()
+	if updErr := r.updateTaskActionStatus(ctx, original, taskAction, phaseInfo); updErr != nil {
+		return ctrl.Result{}, updErr
+	}
+	if isTerminal(taskAction) {
+		if labelErr := r.ensureTerminalLabels(ctx, taskAction); labelErr != nil {
+			return ctrl.Result{}, labelErr
+		}
+	}
+	return ctrl.Result{}, nil
 }
 
 // NewTaskActionReconciler creates a new TaskActionReconciler
@@ -202,10 +311,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	if !cacheShortCircuited {
 		transition, err = p.Handle(ctx, tCtx)
 		if err != nil {
-			logger.Error(err, "plugin Handle failed", "plugin", p.GetID())
-			r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedPluginHandle),
-				"Plugin %q Handle failed: %v", p.GetID(), err)
-			return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+			return r.recordSystemError(ctx, taskAction, originalTaskActionInstance, p.GetID(), err)
 		}
 	}
 
@@ -217,8 +323,18 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	// Map transition phase to TaskAction conditions
 	phaseInfo := transition.Info()
 
-	// In-place task restart: when a recoverable failure occurs, restart the pod within the
-	// same TaskAction rather than relying on the runs service to create a new TaskAction.
+	if !cacheShortCircuited && isSystemRetryableFailure(phaseInfo) {
+		r.resetPluginResource(ctx, taskAction, p, tCtx)
+		return r.recordSystemError(ctx, taskAction, originalTaskActionInstance, p.GetID(), systemErrorFromPhaseInfo(phaseInfo))
+	}
+
+	// Reset the consecutive system-failure counter on any non-system-error
+	// transition so transient blips earlier in the lifecycle don't accumulate
+	// toward the permanent-failure threshold.
+	taskAction.Status.SystemFailures = 0
+
+	// In-place task restart on USER-kind retryable failure: bump Status.Attempts
+	// and relaunch the pod under the same TaskAction.
 	var restartAttempts uint32
 	if !cacheShortCircuited && phaseInfo.Phase() == pluginsCore.PhaseRetryableFailure {
 		currentAttempts := observedAttempts(taskAction)
@@ -548,6 +664,26 @@ func toActionErrorInfo(err *core.ExecutionError) *workflow.ErrorInfo {
 	return out
 }
 
+// errorStateFromExecError converts a plugin core.ExecutionError into the
+// CR-persisted ErrorState.
+func errorStateFromExecError(err *core.ExecutionError) *flyteorgv1.ErrorState {
+	if err == nil {
+		return nil
+	}
+	kind := ""
+	switch err.GetKind() {
+	case core.ExecutionError_USER:
+		kind = "USER"
+	case core.ExecutionError_SYSTEM:
+		kind = "SYSTEM"
+	}
+	return &flyteorgv1.ErrorState{
+		Code:    err.GetCode(),
+		Kind:    kind,
+		Message: err.GetMessage(),
+	}
+}
+
 func toClusterEvents(phaseInfo pluginsCore.PhaseInfo, fallbackTime *timestamppb.Timestamp) []*workflow.ClusterEvent {
 	info := phaseInfo.Info()
 	if phaseInfo.Reason() == "" && (info == nil || len(info.AdditionalReasons) == 0) {
@@ -606,6 +742,7 @@ func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) b
 		oldStatus.PluginPhase != newStatus.PluginPhase ||
 		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion ||
 		oldStatus.Attempts != newStatus.Attempts ||
+		oldStatus.SystemFailures != newStatus.SystemFailures ||
 		oldStatus.CacheStatus != newStatus.CacheStatus {
 		return true
 	}
@@ -658,6 +795,7 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 		msg = info.Reason()
 		if info.Err() != nil {
 			msg = info.Err().GetMessage()
+			ta.Status.ErrorState = errorStateFromExecError(info.Err())
 		}
 		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
 			flyteorgv1.ConditionReasonPermanentFailure, msg)
@@ -669,6 +807,7 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 		msg = info.Reason()
 		if info.Err() != nil {
 			msg = info.Err().GetMessage()
+			ta.Status.ErrorState = errorStateFromExecError(info.Err())
 		}
 		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionTrue,
 			flyteorgv1.ConditionReasonRetryableFailure, msg)

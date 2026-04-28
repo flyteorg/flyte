@@ -1,6 +1,8 @@
 package config
 
-import "github.com/flyteorg/flyte/v2/flytestdlib/config"
+import (
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+)
 
 const configSectionKey = "manager"
 

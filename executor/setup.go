@@ -152,6 +152,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	reconciler.CatalogClient = asyncCatalogClient
 	reconciler.Catalog = cacheClient
 	reconciler.Recorder = mgr.GetEventRecorderFor("taskaction-controller")
+	reconciler.MaxSystemFailures = cfg.MaxSystemFailures
 	if err := reconciler.SetupWithManager(mgr); err != nil {
 		return fmt.Errorf("executor: failed to setup controller: %w", err)
 	}

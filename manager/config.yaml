@@ -13,6 +13,24 @@ manager:
     namespace: "flyte"
     kubeconfig: "~/.kube/config"
 
+apps:
+  cacheTtl: 30s
+
+internalApps:
+  enabled: true
+  baseDomain: "localhost"
+  scheme: "http"
+  ingressAppsPort: 30081
+  defaultRequestTimeout: 300s
+  maxRequestTimeout: 3600s
+  defaultEnvVars:
+    - FLYTE_AWS_ENDPOINT: "http://rustfs.flyte.svc.cluster.local:9000"
+    - FLYTE_AWS_ACCESS_KEY_ID: "rustfs"
+    - FLYTE_AWS_SECRET_ACCESS_KEY: "rustfsstorage"
+    - _U_EP_OVERRIDE: "host.docker.internal:8090"
+    - _U_INSECURE: "true"
+    - _U_USE_ACTIONS: "1"
+
 
 # Webhook configuration
 # localCert: true writes the generated TLS cert to disk so the webhook server can read it.
@@ -21,6 +39,18 @@ webhook:
   certDir: /tmp/flyte/webhook/certs
   serviceName: flyte-devbox-local
   servicePort: 9443
+  # Use the Embedded injector with a K8s backend so the webhook reads the
+  # secret value at admission time from the k8s Secret written by SecretService
+  # (matching EncodeSecretName(org, domain, project, name)) and inlines the
+  # value into the pod spec.
+  secretManagerTypes:
+    - Embedded
+  embeddedSecretManagerConfig:
+    type: K8s
+    k8sConfig:
+      # Must match manager.kubernetes.namespace above — the namespace where
+      # SecretService writes secrets.
+      namespace: flyte
 
 # Executor configuration
 executor:
@@ -64,7 +94,7 @@ plugins:
       - FLYTE_AWS_ENDPOINT: "http://rustfs.flyte.svc.cluster.local:9000"
       - FLYTE_AWS_ACCESS_KEY_ID: "rustfs"
       - FLYTE_AWS_SECRET_ACCESS_KEY: "rustfsstorage"
-      - _U_EP_OVERRIDE: "flyte-devbox-local.flyte.svc.cluster.local:8090"
+      - _U_EP_OVERRIDE: "host.docker.internal:8090"
       - _U_INSECURE: "true"
       - _U_USE_ACTIONS: "1"
 

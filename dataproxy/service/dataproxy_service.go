@@ -19,11 +19,11 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/v2/dataproxy/config"
+	"github.com/flyteorg/flyte/v2/dataproxy/logs"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/dataproxy/logs"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
@@ -470,6 +470,10 @@ func (s *Service) GetActionData(
 	ctx context.Context,
 	req *connect.Request[dataproxy.GetActionDataRequest],
 ) (*connect.Response[dataproxy.GetActionDataResponse], error) {
+	if err := req.Msg.Validate(); err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
 	actionId := req.Msg.GetActionId()
 
 	urisResp, err := s.runClient.GetActionDataURIs(ctx, connect.NewRequest(&workflow.GetActionDataURIsRequest{
@@ -495,11 +499,17 @@ func (s *Service) GetActionData(
 			}
 			logger.Infof(groupCtx, "GetActionData: reading inputs from %s", inputRef)
 			if err := s.dataStore.ReadProtobuf(groupCtx, inputRef, resp.Inputs); err != nil {
-				logger.Errorf(groupCtx, "GetActionData: failed to read inputs from %s: %v", inputRef, err)
-				return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read inputs from %s: %w", inputRef, err))
+				if !storage.IsNotFound(err) {
+					logger.Errorf(groupCtx, "GetActionData: failed to read inputs from %s: %v", inputRef, err)
+					return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read inputs from %s: %w", inputRef, err))
+				}
+			} else {
+				logger.Debugf(groupCtx, "Read %d input literals and %d action contexts", len(resp.Inputs.Literals), len(resp.Inputs.Context))
 			}
 			return nil
 		})
+	} else {
+		logger.Warnf(ctx, "Action %s has empty InputURI", req.Msg.ActionId.Name)
 	}
 
 	if urisResp.Msg.GetOutputsUri() != "" {
@@ -508,11 +518,16 @@ func (s *Service) GetActionData(
 			logger.Infof(groupCtx, "GetActionData: reading outputs from %s", outputRef)
 			var inputsOrOutputs task.Inputs
 			if err := s.dataStore.ReadProtobuf(groupCtx, outputRef, &inputsOrOutputs); err != nil {
-				logger.Errorf(groupCtx, "GetActionData: failed to read outputs from %s: %v", outputRef, err)
-				return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read outputs from %s: %w", outputRef, err))
-			}
-			resp.Outputs = &task.Outputs{
-				Literals: inputsOrOutputs.GetLiterals(),
+				if !storage.IsNotFound(err) {
+					logger.Errorf(groupCtx, "GetActionData: failed to read outputs from %s: %v", outputRef, err)
+					return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read outputs from %s: %w", outputRef, err))
+				}
+				logger.Debugf(groupCtx, "Outputs not found at %s (action may not have finished)", urisResp.Msg.GetOutputsUri())
+			} else {
+				resp.Outputs = &task.Outputs{
+					Literals: inputsOrOutputs.GetLiterals(),
+				}
+				logger.Debugf(groupCtx, "Read %d output literals", len(resp.Outputs.Literals))
 			}
 			return nil
 		})

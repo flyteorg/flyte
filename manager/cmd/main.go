@@ -6,8 +6,10 @@ import (
 	"net/http"
 	"os"
 
+	flyteapp "github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/actions"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
+	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 	"github.com/flyteorg/flyte/v2/cache_service"
 	"github.com/flyteorg/flyte/v2/dataproxy"
 	"github.com/flyteorg/flyte/v2/events"
@@ -50,6 +52,11 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 	sc.DB = db
 
+	// Register Knative types into the shared scheme so the K8s client can manage KServices.
+	if err := servingv1.AddToScheme(executor.Scheme()); err != nil {
+		return fmt.Errorf("failed to register Knative scheme: %w", err)
+	}
+
 	// Initialize Kubernetes client
 	k8sClient, k8sConfig, err := app.InitKubernetesClient(ctx, app.K8sConfig{
 		KubeConfig: cfg.Kubernetes.KubeConfig,
@@ -91,10 +98,19 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := cache_service.Setup(ctx, sc); err != nil {
 		return err
 	}
+	// executor.Setup sets sc.K8sCache (via mgr.GetCache()); services that depend
+	// on the cache (InternalAppService, Actions) must be set up after this.
 	if err := executor.Setup(ctx, sc); err != nil {
 		return err
 	}
 	if err := actions.Setup(ctx, sc); err != nil {
+		return err
+	}
+	// InternalAppService must be mounted before AppService so the proxy can reach it.
+	if err := flyteapp.SetupInternal(ctx, sc); err != nil {
+		return err
+	}
+	if err := flyteapp.Setup(ctx, sc); err != nil {
 		return err
 	}
 	if err := secret.Setup(ctx, sc); err != nil {

@@ -11,6 +11,18 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 )
 
+// NewIsRootActionFilter creates a filter for root actions (runs) only.
+func NewIsRootActionFilter() interfaces.Filter {
+	return &nullFilter{field: "parent_action_name", isNull: true}
+}
+
+// NewRunActionsFilter creates a filter for all actions belonging to a specific run.
+func NewRunActionsFilter(runID *common.RunIdentifier) interfaces.Filter {
+	return NewEqualFilter("project", runID.GetProject()).
+		And(NewEqualFilter("domain", runID.GetDomain())).
+		And(NewEqualFilter("run_name", runID.GetName()))
+}
+
 // basicFilter implements the Filter interface for simple field comparisons
 type basicFilter struct {
 	field      string
@@ -77,6 +89,34 @@ func (f *basicFilter) Or(filter interfaces.Filter) interfaces.Filter {
 		right:    filter,
 		operator: "OR",
 	}
+}
+
+// nullFilter implements the Filter interface for IS NULL / IS NOT NULL checks
+type nullFilter struct {
+	field  string
+	isNull bool
+}
+
+func (f *nullFilter) QueryExpression(table string) (interfaces.QueryExpr, error) {
+	column := f.field
+	if table != "" {
+		column = table + "." + f.field
+	}
+	op := "IS NULL"
+	if !f.isNull {
+		op = "IS NOT NULL"
+	}
+	return interfaces.QueryExpr{
+		Query: fmt.Sprintf("%s %s", column, op),
+	}, nil
+}
+
+func (f *nullFilter) And(filter interfaces.Filter) interfaces.Filter {
+	return &compositeFilter{left: f, right: filter, operator: "AND"}
+}
+
+func (f *nullFilter) Or(filter interfaces.Filter) interfaces.Filter {
+	return &compositeFilter{left: f, right: filter, operator: "OR"}
 }
 
 // compositeFilter implements the Filter interface for AND/OR operations
@@ -150,13 +190,34 @@ func NewProjectIdFilter(projectId *common.ProjectIdentifier) interfaces.Filter {
 	return projectFilter.And(domainFilter)
 }
 
-// NewTaskNameFilter creates a filter for task name (project, domain, name)
+// NewTaskNameFilter creates a filter for task name on the tasks table (project, domain, name).
 func NewTaskNameFilter(taskName *task.TaskName) interfaces.Filter {
-	projectFilter := NewEqualFilter("project", taskName.GetProject())
-	domainFilter := NewEqualFilter("domain", taskName.GetDomain())
-	nameFilter := NewEqualFilter("name", taskName.GetName())
+	return NewEqualFilter("project", taskName.GetProject()).
+		And(NewEqualFilter("domain", taskName.GetDomain())).
+		And(NewEqualFilter("name", taskName.GetName()))
+}
 
-	return projectFilter.And(domainFilter).And(nameFilter)
+// NewRunTaskNameFilter creates a filter matching runs by task name columns on the actions table.
+func NewRunTaskNameFilter(taskName *task.TaskName) interfaces.Filter {
+	return NewEqualFilter("task_project", taskName.GetProject()).
+		And(NewEqualFilter("task_domain", taskName.GetDomain())).
+		And(NewEqualFilter("task_name", taskName.GetName()))
+}
+
+// NewRunTaskIdFilter creates a filter matching runs by full task identifier on the actions table.
+func NewRunTaskIdFilter(taskId *task.TaskIdentifier) interfaces.Filter {
+	return NewEqualFilter("task_project", taskId.GetProject()).
+		And(NewEqualFilter("task_domain", taskId.GetDomain())).
+		And(NewEqualFilter("task_name", taskId.GetName())).
+		And(NewEqualFilter("task_version", taskId.GetVersion()))
+}
+
+// NewTriggerNameFilter creates a filter matching runs by trigger_name on the actions table.
+func NewTriggerNameFilter(triggerName *common.TriggerName) interfaces.Filter {
+	return NewEqualFilter("project", triggerName.GetProject()).
+		And(NewEqualFilter("domain", triggerName.GetDomain())).
+		And(NewEqualFilter("trigger_task_name", triggerName.GetTaskName())).
+		And(NewEqualFilter("trigger_name", triggerName.GetName()))
 }
 
 // NewDeployedByFilter creates a filter for deployed_by = value

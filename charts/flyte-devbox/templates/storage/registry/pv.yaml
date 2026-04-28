@@ -1,0 +1,17 @@
+{{- if (index .Values "docker-registry" "enabled") }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "flyte-devbox.persistence.registryVolumeName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "flyte-devbox.labels" . | nindent 4 }}
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 20Gi
+  hostPath:
+    path: "/var/lib/flyte/storage/registry"
+{{- end }}
