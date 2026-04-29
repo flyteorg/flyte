@@ -133,20 +133,8 @@ flyte-binary:
         - '*'
         verbs:
         - '*'
+# RustFS chart configuration.
 rustfs:
-  enabled: true
-  bucketInit:
-    enabled: true
-    endpoint: http://rustfs-svc.{{ .Release.Namespace }}:9000
-    image:
-      repository: minio/mc
-      tag: latest
-      pullPolicy: IfNotPresent
-  defaultBuckets:
-    - flyte-data
-
-# Upstream RustFS chart configuration.
-rustfsupstream:
   fullnameOverride: rustfs
   mode:
     standalone:

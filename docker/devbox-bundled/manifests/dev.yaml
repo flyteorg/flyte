@@ -7057,6 +7057,19 @@ spec:
       status: {}
 ---
 apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/version: 1.0.0-alpha.94
+    helm.sh/chart: rustfs-0.0.94
+  name: rustfs
+  namespace: flyte
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
@@ -7548,6 +7561,22 @@ metadata:
 ---
 apiVersion: v1
 data:
+  RUSTFS_ADDRESS: :9000
+  RUSTFS_CONSOLE_ADDRESS: :9001
+  RUSTFS_CONSOLE_ENABLE: "true"
+  RUSTFS_OBS_ENVIRONMENT: development
+  RUSTFS_OBS_LOG_DIRECTORY: /logs
+  RUSTFS_OBS_LOGGER_LEVEL: info
+  RUSTFS_REGION: us-east-1
+  RUSTFS_VOLUMES: /data
+kind: ConfigMap
+metadata:
+  labels: {}
+  name: rustfs-config
+  namespace: flyte
+---
+apiVersion: v1
+data:
   max-scale: "1"
 kind: ConfigMap
 metadata:
@@ -7746,13 +7775,8 @@ data:
   RUSTFS_SECRET_KEY: cnVzdGZzc3RvcmFnZQ==
 kind: Secret
 metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
-  name: rustfs
+  labels: {}
+  name: rustfs-secret
   namespace: flyte
 type: Opaque
 ---
@@ -7899,10 +7923,10 @@ metadata:
   labels:
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
-  name: rustfs
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/version: 1.0.0-alpha.94
+    helm.sh/chart: rustfs-0.0.94
+  name: rustfs-svc
   namespace: flyte
 spec:
   ports:
@@ -7917,6 +7941,10 @@ spec:
   selector:
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/name: rustfs
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
   type: NodePort
 ---
 apiVersion: v1
@@ -8087,26 +8115,6 @@ spec:
   storageClassName: manual
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
-  name: flyte-devbox-rustfs-storage
-  namespace: flyte
-spec:
-  accessModes:
-  - ReadWriteOnce
-  capacity:
-    storage: 1Gi
-  hostPath:
-    path: /var/lib/flyte/storage/rustfs
-  storageClassName: manual
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
@@ -8129,22 +8137,34 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
-  name: flyte-devbox-rustfs-storage
+  annotations:
+    helm.sh/resource-policy: keep
+  labels: {}
+  name: rustfs-data
   namespace: flyte
 spec:
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
-  storageClassName: manual
-  volumeName: flyte-devbox-rustfs-storage
+      storage: 256Mi
+  storageClassName: local-path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    helm.sh/resource-policy: keep
+  labels: {}
+  name: rustfs-logs
+  namespace: flyte
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 256Mi
+  storageClassName: local-path
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -8267,9 +8287,9 @@ metadata:
   labels:
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/version: 1.0.0-alpha.94
+    helm.sh/chart: rustfs-0.0.94
   name: rustfs
   namespace: flyte
 spec:
@@ -8289,7 +8309,6 @@ spec:
         app.kubernetes.io/instance: flyte-devbox
         app.kubernetes.io/name: rustfs
     spec:
-      affinity: null
       containers:
       - command:
         - /usr/bin/rustfs
@@ -8309,7 +8328,7 @@ spec:
           periodSeconds: 5
           successThreshold: 1
           timeoutSeconds: 3
-        name: rustfsupstream
+        name: rustfs
         ports:
         - containerPort: 9000
           name: endpoint
@@ -8343,6 +8362,23 @@ spec:
       - command:
         - sh
         - -c
+        - mkdir -p /data/flyte-data
+        image: busybox:stable
+        imagePullPolicy: IfNotPresent
+        name: create-default-buckets
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      - command:
+        - sh
+        - -c
         - |
           mkdir -p /data /mnt/rustfs/logs
           chmod 755 /mnt/rustfs/logs
@@ -8372,50 +8408,6 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: rustfs-data
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    helm.sh/hook: post-install,post-upgrade
-    helm.sh/hook-delete-policy: before-hook-creation,hook-
-    helm.sh/hook-weight: "10"
-  labels:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
-  name: flyte-devbox-rustfs-bucket-init
-  namespace: flyte
-spec:
-  backoffLimit: 6
-  template:
-    spec:
-      containers:
-      - command:
-        - /bin/sh
-        - -ec
-        - |
-          until mc alias set local 'http://rustfs-svc.flyte:9000' 'rustfs' 'rustfsstorage'; do
-            echo "waiting for rustfs endpoint..."
-            sleep 2
-          done
-          mc mb --ignore-existing local/flyte-data
-        image: minio/mc:latest
-        imagePullPolicy: IfNotPresent
-        name: volume-permissions
-        securityContext:
-          runAsUser: 0
-        volumeMounts:
-        - mountPath: /data
-          name: data
-      securityContext:
-        fsGroup: 10001
-      volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: flyte-devbox-rustfs-storage
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -9068,6 +9060,38 @@ spec:
             port:
               number: 8090
         path: /flyteidl2.
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "3600"
+    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "3600"
+    nginx.ingress.kubernetes.io/session-cookie-name: rustfs
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/version: 1.0.0-alpha.94
+    helm.sh/chart: rustfs-0.0.94
+  name: rustfs
+  namespace: flyte
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: example.rustfs.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: rustfs-svc
+            port:
+              name: console
+        path: /
         pathType: Prefix
 ---
 apiVersion: security.istio.io/v1beta1
