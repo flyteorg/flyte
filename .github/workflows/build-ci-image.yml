@@ -25,8 +25,6 @@ env:
 
 jobs:
   build:
-    # when the pull requests are from fork repository, skip the steps for build new ci image
-    if: github.event.pull_request.head.repo.fork != true
     runs-on: ubuntu-latest
     permissions:
       contents: read
