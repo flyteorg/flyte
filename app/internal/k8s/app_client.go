@@ -705,11 +705,15 @@ var knativeCondDefaultMessages = map[knativeapis.ConditionType]string{
 
 // knativeCondToAppCondition maps a single Knative condition to a flyteapp.Condition.
 // For the Ready condition, all statuses (True/False/Unknown) are handled.
-// For sub-conditions (ConfigurationsReady, RoutesReady, etc.), only True is emitted —
-// their failure/unknown state is already reflected on the Ready condition.
-// serviceReady indicates whether the overall KService Ready condition is True,
-// which means all sub-conditions that are True should also be considered ACTIVE.
-func knativeCondToAppCondition(kCond knativeapis.Condition, serviceReady bool) *flyteapp.Condition {
+// For sub-conditions (ConfigurationsReady, RoutesReady, etc.):
+//   - True is always emitted.
+//   - False is emitted only when the service has failed (serviceFailed=true), so that
+//     condition-specific error details (e.g. RevisionFailed) are surfaced.
+//   - Unknown is skipped — the Ready condition already reflects the pending state.
+//
+// serviceReady indicates Ready=True, so True sub-conditions map to ACTIVE instead of DEPLOYING.
+// serviceFailed indicates Ready=False, so False sub-conditions are emitted as FAILED.
+func knativeCondToAppCondition(kCond knativeapis.Condition, serviceReady, serviceFailed bool) *flyteapp.Condition {
 	var phase flyteapp.Status_DeploymentStatus
 
 	if kCond.Type == servingv1.ServiceConditionReady {
@@ -722,14 +726,20 @@ func knativeCondToAppCondition(kCond knativeapis.Condition, serviceReady bool) *
 			phase = flyteapp.Status_DEPLOYMENT_STATUS_PENDING
 		}
 	} else {
-		// Sub-conditions: only emit when True, skip otherwise.
-		if kCond.Status != corev1.ConditionTrue {
+		switch kCond.Status {
+		case corev1.ConditionTrue:
+			if serviceReady {
+				phase = flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE
+			} else {
+				phase = flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING
+			}
+		case corev1.ConditionFalse:
+			if !serviceFailed {
+				return nil
+			}
+			phase = flyteapp.Status_DEPLOYMENT_STATUS_FAILED
+		default: // Unknown: skip, Ready already reflects pending state
 			return nil
-		}
-		if serviceReady {
-			phase = flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE
-		} else {
-			phase = flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING
 		}
 	}
 
@@ -771,9 +781,10 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 
 	readyCond := ksvc.Status.GetCondition(servingv1.ServiceConditionReady)
 	serviceReady := readyCond != nil && readyCond.IsTrue()
+	serviceFailed := readyCond != nil && readyCond.IsFalse()
 	var conditions []*flyteapp.Condition
 	for i := range ksvc.Status.Conditions {
-		if cond := knativeCondToAppCondition(ksvc.Status.Conditions[i], serviceReady); cond != nil {
+		if cond := knativeCondToAppCondition(ksvc.Status.Conditions[i], serviceReady, serviceFailed); cond != nil {
 			conditions = append(conditions, cond)
 		}
 	}
