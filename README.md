@@ -120,7 +120,7 @@ Go to the [Deployment guide](https://docs.flyte.org/en/latest/deployment/deploym
 🧬 **Data lineage**: Track the movement and transformation of data throughout the lifecycle of your data and ML workflows. <br />
 📊 **Map tasks**: Achieve parallel code execution with minimal configuration using [map tasks](https://docs.flyte.org/en/latest/user_guide/advanced_composition/map_tasks.html). <br />
 🌎 **Multi-tenancy**: Multiple users can share the same platform while maintaining their own distinct data and configurations. <br />
-🌟 **Dynamic workflows**: [Build flexible and adaptable workflows](https://docs.flyte.org/en/latest/user_guide/advanced_composition/dynamic_workflows.html) that can change and evolve as needed, making it easier to respond to changing requirements. <br />
+🌟 **Dynamic workflows**: [Build flexible and adaptable workflows](https://www.union.ai/docs/v1/flyte/user-guide/core-concepts/workflows/dynamic-workflows) that can change and evolve as needed, making it easier to respond to changing requirements. <br />
 ⏯️ [Wait](https://docs.flyte.org/en/latest/user_guide/advanced_composition/waiting_for_external_inputs.html) for **external inputs** before proceeding with the execution. <br />
 🌳 **Branching**: [Selectively execute branches](https://docs.flyte.org/en/latest/user_guide/advanced_composition/conditionals.html) of your workflow based on static or dynamic data produced by other tasks or input data. <br />
 📈 **Data visualization**: Visualize data, monitor models and view training history through plots. <br />

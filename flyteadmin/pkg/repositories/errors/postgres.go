@@ -14,8 +14,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/jackc/pgconn"
-	pgxPgconn "github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
@@ -71,8 +70,6 @@ func (p *postgresErrorTransformer) ToFlyteAdminError(err error) flyteAdminErrors
 
 	// Try things both ways, the two pgconns are different types.
 	if pqError, ok := err.(*pgconn.PgError); ok {
-		return p.flyteAdminErrorFromCode(pqError.Code, pqError.Message)
-	} else if pqError, ok := err.(*pgxPgconn.PgError); ok {
 		return p.flyteAdminErrorFromCode(pqError.Code, pqError.Message)
 	}
 
