@@ -201,7 +201,7 @@ jobs:
           platforms: linux/arm64,linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
           build-args: "FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}"
-          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          push: true
       - name: Prepare GPU Image Names
         id: gpu-image-names
         uses: docker/metadata-action@v3
@@ -229,4 +229,4 @@ jobs:
           build-args: |
             FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}
             BASE_IMAGE=base
-          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          push: true
