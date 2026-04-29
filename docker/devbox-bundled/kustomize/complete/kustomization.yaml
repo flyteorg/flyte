@@ -83,10 +83,6 @@ patches:
       name: net-istio-controller
       namespace: knative-serving
     $patch: delete
-
-patches:
-    # Drop the helm test Pod shipped by the rustfs subchart; it is only meant
-    # for `helm test` and has no purpose in the plain-manifest deployment flow.
 - target:
     kind: Pod
     name: rustfs-test-connection
@@ -96,3 +92,30 @@ patches:
     kind: Pod
     metadata:
       name: rustfs-test-connection
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: rustfs
+      namespace: flyte
+    spec:
+      template:
+        spec:
+          initContainers:
+          - name: create-default-buckets
+            image: busybox:stable
+            imagePullPolicy: IfNotPresent
+            command:
+            - sh
+            - -c
+            - mkdir -p /data/flyte-data
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+            volumeMounts:
+            - mountPath: /data
+              name: data
