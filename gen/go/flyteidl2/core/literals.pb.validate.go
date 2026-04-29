@@ -3414,6 +3414,166 @@ var _ interface {
 	ErrorName() string
 } = KeyValuePairValidationError{}
 
+// Validate checks the field values on Backoff with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Backoff) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Backoff with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in BackoffMultiError, or nil if none found.
+func (m *Backoff) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Backoff) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetBase()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BackoffValidationError{
+					field:  "Base",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BackoffValidationError{
+					field:  "Base",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetBase()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BackoffValidationError{
+				field:  "Base",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetCap()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BackoffValidationError{
+					field:  "Cap",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BackoffValidationError{
+					field:  "Cap",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCap()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BackoffValidationError{
+				field:  "Cap",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if m.Factor != nil {
+		// no validation rules for Factor
+	}
+
+	if len(errors) > 0 {
+		return BackoffMultiError(errors)
+	}
+
+	return nil
+}
+
+// BackoffMultiError is an error wrapping multiple validation errors returned
+// by Backoff.ValidateAll() if the designated constraints aren't met.
+type BackoffMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m BackoffMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m BackoffMultiError) AllErrors() []error { return m }
+
+// BackoffValidationError is the validation error returned by Backoff.Validate
+// if the designated constraints aren't met.
+type BackoffValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BackoffValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BackoffValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BackoffValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BackoffValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BackoffValidationError) ErrorName() string { return "BackoffValidationError" }
+
+// Error satisfies the builtin error interface
+func (e BackoffValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBackoff.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BackoffValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BackoffValidationError{}
+
 // Validate checks the field values on RetryStrategy with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -3437,6 +3597,35 @@ func (m *RetryStrategy) validate(all bool) error {
 	var errors []error
 
 	// no validation rules for Retries
+
+	if all {
+		switch v := interface{}(m.GetBackoff()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RetryStrategyValidationError{
+					field:  "Backoff",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RetryStrategyValidationError{
+					field:  "Backoff",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetBackoff()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RetryStrategyValidationError{
+				field:  "Backoff",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return RetryStrategyMultiError(errors)
@@ -3515,3 +3704,161 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RetryStrategyValidationError{}
+
+// Validate checks the field values on TimeoutStrategy with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *TimeoutStrategy) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TimeoutStrategy with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TimeoutStrategyMultiError, or nil if none found.
+func (m *TimeoutStrategy) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TimeoutStrategy) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetQueuedTimeout()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TimeoutStrategyValidationError{
+					field:  "QueuedTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TimeoutStrategyValidationError{
+					field:  "QueuedTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetQueuedTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TimeoutStrategyValidationError{
+				field:  "QueuedTimeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetDeadline()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TimeoutStrategyValidationError{
+					field:  "Deadline",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TimeoutStrategyValidationError{
+					field:  "Deadline",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDeadline()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TimeoutStrategyValidationError{
+				field:  "Deadline",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return TimeoutStrategyMultiError(errors)
+	}
+
+	return nil
+}
+
+// TimeoutStrategyMultiError is an error wrapping multiple validation errors
+// returned by TimeoutStrategy.ValidateAll() if the designated constraints
+// aren't met.
+type TimeoutStrategyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TimeoutStrategyMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TimeoutStrategyMultiError) AllErrors() []error { return m }
+
+// TimeoutStrategyValidationError is the validation error returned by
+// TimeoutStrategy.Validate if the designated constraints aren't met.
+type TimeoutStrategyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TimeoutStrategyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TimeoutStrategyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TimeoutStrategyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TimeoutStrategyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TimeoutStrategyValidationError) ErrorName() string { return "TimeoutStrategyValidationError" }
+
+// Error satisfies the builtin error interface
+func (e TimeoutStrategyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTimeoutStrategy.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TimeoutStrategyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TimeoutStrategyValidationError{}
