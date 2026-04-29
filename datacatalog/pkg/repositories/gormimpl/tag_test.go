@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	mocket "github.com/Selvatico/go-mocket"
-	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"

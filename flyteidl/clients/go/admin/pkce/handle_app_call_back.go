@@ -3,6 +3,7 @@ package pkce
 import (
 	"context"
 	"fmt"
+	"html"
 	"net/http"
 
 	"golang.org/x/oauth2"
@@ -23,9 +24,9 @@ func getAuthServerCallbackHandler(c *oauth.Config, codeVerifier string, tokenCha
 			Error Hint: %s<br>
 			Description: %s<br>
 			<br>`,
-				req.URL.Query().Get("error"),
-				req.URL.Query().Get("error_hint"),
-				req.URL.Query().Get("error_description"),
+				html.EscapeString(req.URL.Query().Get("error")),
+				html.EscapeString(req.URL.Query().Get("error_hint")),
+				html.EscapeString(req.URL.Query().Get("error_description")),
 			)))
 			return
 		}
@@ -44,7 +45,7 @@ func getAuthServerCallbackHandler(c *oauth.Config, codeVerifier string, tokenCha
 		opts = append(opts, oauth2.SetAuthURLParam("code_verifier", codeVerifier))
 
 		ctx := context.WithValue(context.Background(), oauth2.HTTPClient, client)
-		token, err := c.Exchange(ctx, req.URL.Query().Get("code"), opts...)
+		token, err := c.Exchange(ctx, html.EscapeString(req.URL.Query().Get("code")), opts...)
 		if err != nil {
 			errorChannel <- fmt.Errorf("error while exchanging auth code due to %v", err)
 			_, _ = rw.Write([]byte(fmt.Sprintf(`<p>Couldn't get access token due to error: %s</p>`, err.Error())))

@@ -100,7 +100,7 @@ func StartProfilingServer(ctx context.Context, pprofPort int) error {
 		Addr:         fmt.Sprintf(":%d", pprofPort),
 	}
 
-	go func() {
+	go func() { //nolint:gosec
 		<-ctx.Done()
 		if err := srv.Shutdown(context.Background()); err != nil {
 			logger.Errorf(ctx, "Failed to gracefully shutdown profiling server. Error: %v", err)

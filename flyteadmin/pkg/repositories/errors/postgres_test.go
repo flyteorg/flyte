@@ -4,8 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/jackc/pgconn"
-	pgxPgconn "github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/magiconair/properties/assert"
 	"google.golang.org/grpc/codes"
 
@@ -29,7 +28,7 @@ func TestToFlyteAdminError_UniqueConstraintViolation(t *testing.T) {
 	assert.Equal(t, "value with matching already exists (message)",
 		transformedErr.Error())
 
-	err2 := &pgxPgconn.PgError{
+	err2 := &pgconn.PgError{
 		Code:    "23505",
 		Message: "message",
 	}
@@ -50,7 +49,7 @@ func TestToFlyteAdminError_UnrecognizedPostgresError(t *testing.T) {
 	assert.Equal(t, "failed database operation with message",
 		transformedErr.Error())
 
-	err2 := &pgxPgconn.PgError{
+	err2 := &pgconn.PgError{
 		Code:    "foo",
 		Message: "message",
 	}

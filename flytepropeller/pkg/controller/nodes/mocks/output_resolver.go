@@ -7,7 +7,6 @@ import (
 
 	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	executors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
-
 	mock "github.com/stretchr/testify/mock"
 
 	v1alpha1 "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
