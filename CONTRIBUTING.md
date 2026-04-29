@@ -114,7 +114,7 @@ runs:
     postgres:
       host: "localhost"
       port: 30001
-      dbName: "runs"
+      dbname: "runs"
       username: "postgres"
       password: "postgres"
       options: "sslmode=disable"
