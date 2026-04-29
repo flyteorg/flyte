@@ -193,7 +193,6 @@ jobs:
           mkdir -p /tmp/cpu-oci
           tar -xf /tmp/cpu-oci.tar -C /tmp/cpu-oci
       - name: Push CPU multi-arch image
-        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: depot/build-push-action@v1
         with:
           project: ${{ env.DEPOT_PROJECT_ID }}
@@ -202,7 +201,7 @@ jobs:
           platforms: linux/arm64,linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
           build-args: "FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}"
-          push: true
+          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
       - name: Prepare GPU Image Names
         id: gpu-image-names
         uses: docker/metadata-action@v3
