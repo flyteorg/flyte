@@ -716,31 +716,20 @@ var knativeCondDefaultMessages = map[knativeapis.ConditionType]string{
 func knativeCondToAppCondition(kCond knativeapis.Condition, serviceReady, serviceFailed bool) *flyteapp.Condition {
 	var phase flyteapp.Status_DeploymentStatus
 
-	if kCond.Type == servingv1.ServiceConditionReady {
-		switch kCond.Status {
-		case corev1.ConditionTrue:
+	switch kCond.Status {
+	case corev1.ConditionTrue:
+		if serviceReady {
 			phase = flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE
-		case corev1.ConditionFalse:
-			phase = flyteapp.Status_DEPLOYMENT_STATUS_FAILED
-		default: // Unknown
-			phase = flyteapp.Status_DEPLOYMENT_STATUS_PENDING
+		} else {
+			phase = flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING
 		}
-	} else {
-		switch kCond.Status {
-		case corev1.ConditionTrue:
-			if serviceReady {
-				phase = flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE
-			} else {
-				phase = flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING
-			}
-		case corev1.ConditionFalse:
-			if !serviceFailed {
-				return nil
-			}
-			phase = flyteapp.Status_DEPLOYMENT_STATUS_FAILED
-		default: // Unknown: skip, Ready already reflects pending state
+	case corev1.ConditionFalse:
+		if !serviceFailed {
 			return nil
 		}
+		phase = flyteapp.Status_DEPLOYMENT_STATUS_FAILED
+	default: // Unknown
+		phase = flyteapp.Status_DEPLOYMENT_STATUS_PENDING
 	}
 
 	var message string
