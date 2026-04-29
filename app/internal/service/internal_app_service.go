@@ -3,13 +3,10 @@ package service
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"connectrpc.com/connect"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
-	appconfig "github.com/flyteorg/flyte/v2/app/internal/config"
 	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
@@ -17,17 +14,15 @@ import (
 )
 
 // InternalAppService is the data plane implementation of the AppService.
-// It has direct K8s access via AppK8sClientInterface and no database dependency —
-// all app state lives in KService CRDs.
+// It has direct K8s access via AppK8sClientInterface.
 type InternalAppService struct {
 	appconnect.UnimplementedAppServiceHandler
 	k8s appk8s.AppK8sClientInterface
-	cfg *appconfig.InternalAppConfig
 }
 
 // NewInternalAppService creates a new InternalAppService.
-func NewInternalAppService(k8s appk8s.AppK8sClientInterface, cfg *appconfig.InternalAppConfig) *InternalAppService {
-	return &InternalAppService{k8s: k8s, cfg: cfg}
+func NewInternalAppService(k8s appk8s.AppK8sClientInterface) *InternalAppService {
+	return &InternalAppService{k8s: k8s}
 }
 
 // Ensure InternalAppService satisfies the generated handler interface.
@@ -55,36 +50,10 @@ func (s *InternalAppService) Create(
 	}
 
 	app.Status = &flyteapp.Status{
-		Conditions: []*flyteapp.Condition{
-			{
-				DeploymentStatus:   flyteapp.Status_DEPLOYMENT_STATUS_PENDING,
-				LastTransitionTime: timestamppb.Now(),
-			},
-		},
-		Ingress: publicIngress(app.GetMetadata().GetId(), s.cfg),
+		Ingress: s.k8s.PublicIngress(app.GetMetadata().GetId()),
 	}
 
 	return connect.NewResponse(&flyteapp.CreateResponse{App: app}), nil
-}
-
-// publicIngress builds the deterministic public URL for an app using
-// BaseDomain — which must match Knative's domain-template so Kourier
-// serves the URL directly. Returns nil if BaseDomain is unset.
-func publicIngress(id *flyteapp.Identifier, cfg *appconfig.InternalAppConfig) *flyteapp.Ingress {
-	if cfg.BaseDomain == "" {
-		return nil
-	}
-	scheme := cfg.Scheme
-	if scheme == "" {
-		scheme = "https"
-	}
-	host := strings.ToLower(fmt.Sprintf("%s.%s",
-		appk8s.KServiceName(id), cfg.BaseDomain))
-	url := scheme + "://" + host
-	if cfg.IngressAppsPort != 0 {
-		url += fmt.Sprintf(":%d", cfg.IngressAppsPort)
-	}
-	return &flyteapp.Ingress{PublicUrl: url}
 }
 
 // Get retrieves an app and its live status from the KService CRD.
@@ -98,15 +67,24 @@ func (s *InternalAppService) Get(
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("app_id is required"))
 	}
 
-	app, err := s.k8s.GetApp(ctx, appID.AppId)
+	app, err := s.getApp(ctx, appID.AppId)
+	if err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(&flyteapp.GetResponse{App: app}), nil
+}
+
+// getApp fetches an app from K8s with its live status.
+func (s *InternalAppService) getApp(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.App, error) {
+	app, err := s.k8s.GetApp(ctx, appID)
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
-
-	return connect.NewResponse(&flyteapp.GetResponse{App: app}), nil
+	return app, nil
 }
 
 // Update modifies an app's spec or desired state.
@@ -138,9 +116,9 @@ func (s *InternalAppService) Update(
 		}
 	}
 
-	freshApp, err := s.k8s.GetApp(ctx, appID)
+	freshApp, err := s.getApp(ctx, appID)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err
 	}
 	app.Status = freshApp.Status
 
