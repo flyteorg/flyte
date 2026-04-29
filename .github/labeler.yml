@@ -1,0 +1,5 @@
+flyte2:
+  - base-branch: ['^main$']
+
+flyte:
+  - base-branch: ['^master$']
