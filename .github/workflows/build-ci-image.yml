@@ -38,7 +38,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -70,7 +70,7 @@ jobs:
       - name: Set image tag output
         id: set-tag
         run: |
-          if [ "${{ github.event_name }}" == "pull_request_target" ]; then
+          if [ "${{ github.event_name }}" == "pull_request_target" ] || [ "${{ github.event_name }}" == "pull_request" ]; then
             echo "tag=pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
           elif [ "${{ github.ref }}" == "refs/heads/v2" ]; then
             echo "tag=v2" >> $GITHUB_OUTPUT
@@ -106,7 +106,7 @@ jobs:
         run: echo "Image built with digest ${{ steps.meta.outputs.digest }}"
 
       - name: Comment on PR with image tag
-        if: github.event_name == 'pull_request_target'
+        if: github.event_name == 'pull_request_target' || github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
