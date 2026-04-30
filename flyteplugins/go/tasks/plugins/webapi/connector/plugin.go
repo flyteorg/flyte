@@ -87,6 +87,10 @@ type ResourceWrapper struct {
 	CustomInfo     *structpb.Struct
 	ConnectorID    string
 	IsConnectorApp bool
+	// ConnectorEndpoint is the gRPC endpoint of the connector deployment serving this task. It is
+	// recorded on the LogContext emitted by Status() so the dataplane dataproxy can stream logs
+	// from the connector's pods.
+	ConnectorEndpoint string
 }
 
 // IsTerminal is used to avoid making network calls to the connector service if the resource is already in a terminal state.
@@ -244,7 +248,7 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 		return nil, fmt.Errorf("failed to get task from connector with %v", err)
 	}
 
-	return ResourceWrapper{
+	wrapper := ResourceWrapper{
 		Phase:          res.GetResource().GetPhase(),
 		Outputs:        res.GetResource().GetOutputs(),
 		Message:        res.GetResource().GetMessage(),
@@ -252,7 +256,11 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 		CustomInfo:     res.GetResource().GetCustomInfo(),
 		ConnectorID:    connector.ConnectorID,
 		IsConnectorApp: connector.IsConnectorApp,
-	}, nil
+	}
+	if connector.ConnectorDeployment != nil {
+		wrapper.ConnectorEndpoint = connector.ConnectorDeployment.Endpoint
+	}
+	return wrapper, nil
 }
 
 func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error {
@@ -321,15 +329,13 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 	taskInfo := &core.TaskInfo{Logs: logLinks, CustomInfo: resource.CustomInfo}
 
 	// Record the connector endpoint on the LogContext so the dataplane dataproxy can stream logs
-	// straight from the connector via AsyncConnectorService.GetTaskLogs (resource_meta is fetched
-	// separately from PluginStateService at log-stream time).
-	if metadata, ok := taskCtx.ResourceMeta().(ResourceMetaWrapper); ok {
-		if connector, err := p.getFinalConnector(metadata.TaskCategory, p.cfg, metadata.Domain); err == nil && connector != nil && connector.ConnectorDeployment != nil {
-			taskInfo.LogContext = &flyteIdl.LogContext{
-				Connector: &flyteIdl.ConnectorLogContext{
-					Endpoint: connector.ConnectorDeployment.Endpoint,
-				},
-			}
+	// from the connector deployment's pods. The endpoint was resolved at Get() time and stashed
+	// on the ResourceWrapper, so we don't have to re-resolve it here.
+	if resource.ConnectorEndpoint != "" {
+		taskInfo.LogContext = &flyteIdl.LogContext{
+			Connector: &flyteIdl.ConnectorLogContext{
+				Endpoint: resource.ConnectorEndpoint,
+			},
 		}
 	}
 

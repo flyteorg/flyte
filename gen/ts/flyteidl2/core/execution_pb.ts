@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/core/execution.proto.
  */
 export const file_flyteidl2_core_execution: GenFile = /*@__PURE__*/
-  fileDesc("Ch5mbHl0ZWlkbDIvY29yZS9leGVjdXRpb24ucHJvdG8SDmZseXRlaWRsMi5jb3JlIqcBChFXb3JrZmxvd0V4ZWN1dGlvbiKRAQoFUGhhc2USDQoJVU5ERUZJTkVEEAASCgoGUVVFVUVEEAESCwoHUlVOTklORxACEg4KClNVQ0NFRURJTkcQAxINCglTVUNDRUVERUQQBBILCgdGQUlMSU5HEAUSCgoGRkFJTEVEEAYSCwoHQUJPUlRFRBAHEg0KCVRJTUVEX09VVBAIEgwKCEFCT1JUSU5HEAkitgEKDU5vZGVFeGVjdXRpb24ipAEKBVBoYXNlEg0KCVVOREVGSU5FRBAAEgoKBlFVRVVFRBABEgsKB1JVTk5JTkcQAhINCglTVUNDRUVERUQQAxILCgdGQUlMSU5HEAQSCgoGRkFJTEVEEAUSCwoHQUJPUlRFRBAGEgsKB1NLSVBQRUQQBxINCglUSU1FRF9PVVQQCBITCg9EWU5BTUlDX1JVTk5JTkcQCRINCglSRUNPVkVSRUQQCiKsAQoNVGFza0V4ZWN1dGlvbiKaAQoFUGhhc2USDQoJVU5ERUZJTkVEEAASCgoGUVVFVUVEEAESCwoHUlVOTklORxACEg0KCVNVQ0NFRURFRBADEgsKB0FCT1JURUQQBBIKCgZGQUlMRUQQBRIQCgxJTklUSUFMSVpJTkcQBhIZChVXQUlUSU5HX0ZPUl9SRVNPVVJDRVMQBxIUChBSRVRSWUFCTEVfRkFJTEVEEAgi6QEKDkV4ZWN1dGlvbkVycm9yEgwKBGNvZGUYASABKAkSDwoHbWVzc2FnZRgCIAEoCRIRCgllcnJvcl91cmkYAyABKAkSNgoEa2luZBgEIAEoDjIoLmZseXRlaWRsMi5jb3JlLkV4ZWN1dGlvbkVycm9yLkVycm9yS2luZBItCgl0aW1lc3RhbXAYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEg4KBndvcmtlchgGIAEoCSIuCglFcnJvcktpbmQSCwoHVU5LTk9XThAAEggKBFVTRVIQARIKCgZTWVNURU0QAiL4AgoHVGFza0xvZxILCgN1cmkYASABKAkSDAoEbmFtZRgCIAEoCRI9Cg5tZXNzYWdlX2Zvcm1hdBgDIAEoDjIlLmZseXRlaWRsMi5jb3JlLlRhc2tMb2cuTWVzc2FnZUZvcm1hdBImCgN0dGwYBCABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SGAoQU2hvd1doaWxlUGVuZGluZxgFIAEoCBIYChBIaWRlT25jZUZpbmlzaGVkGAYgASgIEjMKCWxpbmtfdHlwZRgHIAEoDjIgLmZseXRlaWRsMi5jb3JlLlRhc2tMb2cuTGlua1R5cGUSDQoFcmVhZHkYCCABKAgSEAoIaWNvbl91cmkYCSABKAkiLwoNTWVzc2FnZUZvcm1hdBILCgdVTktOT1dOEAASBwoDQ1NWEAESCAoESlNPThACIjAKCExpbmtUeXBlEgwKCEVYVEVSTkFMEAASDQoJREFTSEJPQVJEEAESBwoDSURFEAIiUwoKTG9nQ29udGV4dBIrCgRwb2RzGAEgAygLMh0uZmx5dGVpZGwyLmNvcmUuUG9kTG9nQ29udGV4dBIYChBwcmltYXJ5X3BvZF9uYW1lGAIgASgJIsUBCg1Qb2RMb2dDb250ZXh0EhEKCW5hbWVzcGFjZRgBIAEoCRIQCghwb2RfbmFtZRgCIAEoCRI0Cgpjb250YWluZXJzGAMgAygLMiAuZmx5dGVpZGwyLmNvcmUuQ29udGFpbmVyQ29udGV4dBIeChZwcmltYXJ5X2NvbnRhaW5lcl9uYW1lGAQgASgJEjkKD2luaXRfY29udGFpbmVycxgFIAMoCzIgLmZseXRlaWRsMi5jb3JlLkNvbnRhaW5lckNvbnRleHQi8QEKEENvbnRhaW5lckNvbnRleHQSFgoOY29udGFpbmVyX25hbWUYASABKAkSQAoHcHJvY2VzcxgCIAEoCzIvLmZseXRlaWRsMi5jb3JlLkNvbnRhaW5lckNvbnRleHQuUHJvY2Vzc0NvbnRleHQaggEKDlByb2Nlc3NDb250ZXh0EjgKFGNvbnRhaW5lcl9zdGFydF90aW1lGAEgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBI2ChJjb250YWluZXJfZW5kX3RpbWUYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIkoKFFF1YWxpdHlPZlNlcnZpY2VTcGVjEjIKD3F1ZXVlaW5nX2J1ZGdldBgBIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbiLEAQoQUXVhbGl0eU9mU2VydmljZRI1CgR0aWVyGAEgASgOMiUuZmx5dGVpZGwyLmNvcmUuUXVhbGl0eU9mU2VydmljZS5UaWVySAASNAoEc3BlYxgCIAEoCzIkLmZseXRlaWRsMi5jb3JlLlF1YWxpdHlPZlNlcnZpY2VTcGVjSAAiNAoEVGllchINCglVTkRFRklORUQQABIICgRISUdIEAESCgoGTUVESVVNEAISBwoDTE9XEANCDQoLZGVzaWduYXRpb25CswEKEmNvbS5mbHl0ZWlkbDIuY29yZUIORXhlY3V0aW9uUHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvY29yZaICA0ZDWKoCDkZseXRlaWRsMi5Db3JlygIORmx5dGVpZGwyXENvcmXiAhpGbHl0ZWlkbDJcQ29yZVxHUEJNZXRhZGF0YeoCD0ZseXRlaWRsMjo6Q29yZWIGcHJvdG8z", [file_google_protobuf_duration, file_google_protobuf_timestamp]);
+  fileDesc("Ch5mbHl0ZWlkbDIvY29yZS9leGVjdXRpb24ucHJvdG8SDmZseXRlaWRsMi5jb3JlIqcBChFXb3JrZmxvd0V4ZWN1dGlvbiKRAQoFUGhhc2USDQoJVU5ERUZJTkVEEAASCgoGUVVFVUVEEAESCwoHUlVOTklORxACEg4KClNVQ0NFRURJTkcQAxINCglTVUNDRUVERUQQBBILCgdGQUlMSU5HEAUSCgoGRkFJTEVEEAYSCwoHQUJPUlRFRBAHEg0KCVRJTUVEX09VVBAIEgwKCEFCT1JUSU5HEAkitgEKDU5vZGVFeGVjdXRpb24ipAEKBVBoYXNlEg0KCVVOREVGSU5FRBAAEgoKBlFVRVVFRBABEgsKB1JVTk5JTkcQAhINCglTVUNDRUVERUQQAxILCgdGQUlMSU5HEAQSCgoGRkFJTEVEEAUSCwoHQUJPUlRFRBAGEgsKB1NLSVBQRUQQBxINCglUSU1FRF9PVVQQCBITCg9EWU5BTUlDX1JVTk5JTkcQCRINCglSRUNPVkVSRUQQCiKsAQoNVGFza0V4ZWN1dGlvbiKaAQoFUGhhc2USDQoJVU5ERUZJTkVEEAASCgoGUVVFVUVEEAESCwoHUlVOTklORxACEg0KCVNVQ0NFRURFRBADEgsKB0FCT1JURUQQBBIKCgZGQUlMRUQQBRIQCgxJTklUSUFMSVpJTkcQBhIZChVXQUlUSU5HX0ZPUl9SRVNPVVJDRVMQBxIUChBSRVRSWUFCTEVfRkFJTEVEEAgi6QEKDkV4ZWN1dGlvbkVycm9yEgwKBGNvZGUYASABKAkSDwoHbWVzc2FnZRgCIAEoCRIRCgllcnJvcl91cmkYAyABKAkSNgoEa2luZBgEIAEoDjIoLmZseXRlaWRsMi5jb3JlLkV4ZWN1dGlvbkVycm9yLkVycm9yS2luZBItCgl0aW1lc3RhbXAYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEg4KBndvcmtlchgGIAEoCSIuCglFcnJvcktpbmQSCwoHVU5LTk9XThAAEggKBFVTRVIQARIKCgZTWVNURU0QAiL4AgoHVGFza0xvZxILCgN1cmkYASABKAkSDAoEbmFtZRgCIAEoCRI9Cg5tZXNzYWdlX2Zvcm1hdBgDIAEoDjIlLmZseXRlaWRsMi5jb3JlLlRhc2tMb2cuTWVzc2FnZUZvcm1hdBImCgN0dGwYBCABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SGAoQU2hvd1doaWxlUGVuZGluZxgFIAEoCBIYChBIaWRlT25jZUZpbmlzaGVkGAYgASgIEjMKCWxpbmtfdHlwZRgHIAEoDjIgLmZseXRlaWRsMi5jb3JlLlRhc2tMb2cuTGlua1R5cGUSDQoFcmVhZHkYCCABKAgSEAoIaWNvbl91cmkYCSABKAkiLwoNTWVzc2FnZUZvcm1hdBILCgdVTktOT1dOEAASBwoDQ1NWEAESCAoESlNPThACIjAKCExpbmtUeXBlEgwKCEVYVEVSTkFMEAASDQoJREFTSEJPQVJEEAESBwoDSURFEAIiiwEKCkxvZ0NvbnRleHQSKwoEcG9kcxgBIAMoCzIdLmZseXRlaWRsMi5jb3JlLlBvZExvZ0NvbnRleHQSGAoQcHJpbWFyeV9wb2RfbmFtZRgCIAEoCRI2Cgljb25uZWN0b3IYAyABKAsyIy5mbHl0ZWlkbDIuY29yZS5Db25uZWN0b3JMb2dDb250ZXh0IicKE0Nvbm5lY3RvckxvZ0NvbnRleHQSEAoIZW5kcG9pbnQYASABKAkixQEKDVBvZExvZ0NvbnRleHQSEQoJbmFtZXNwYWNlGAEgASgJEhAKCHBvZF9uYW1lGAIgASgJEjQKCmNvbnRhaW5lcnMYAyADKAsyIC5mbHl0ZWlkbDIuY29yZS5Db250YWluZXJDb250ZXh0Eh4KFnByaW1hcnlfY29udGFpbmVyX25hbWUYBCABKAkSOQoPaW5pdF9jb250YWluZXJzGAUgAygLMiAuZmx5dGVpZGwyLmNvcmUuQ29udGFpbmVyQ29udGV4dCLxAQoQQ29udGFpbmVyQ29udGV4dBIWCg5jb250YWluZXJfbmFtZRgBIAEoCRJACgdwcm9jZXNzGAIgASgLMi8uZmx5dGVpZGwyLmNvcmUuQ29udGFpbmVyQ29udGV4dC5Qcm9jZXNzQ29udGV4dBqCAQoOUHJvY2Vzc0NvbnRleHQSOAoUY29udGFpbmVyX3N0YXJ0X3RpbWUYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjYKEmNvbnRhaW5lcl9lbmRfdGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiSgoUUXVhbGl0eU9mU2VydmljZVNwZWMSMgoPcXVldWVpbmdfYnVkZ2V0GAEgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uIsQBChBRdWFsaXR5T2ZTZXJ2aWNlEjUKBHRpZXIYASABKA4yJS5mbHl0ZWlkbDIuY29yZS5RdWFsaXR5T2ZTZXJ2aWNlLlRpZXJIABI0CgRzcGVjGAIgASgLMiQuZmx5dGVpZGwyLmNvcmUuUXVhbGl0eU9mU2VydmljZVNwZWNIACI0CgRUaWVyEg0KCVVOREVGSU5FRBAAEggKBEhJR0gQARIKCgZNRURJVU0QAhIHCgNMT1cQA0INCgtkZXNpZ25hdGlvbkKzAQoSY29tLmZseXRlaWRsMi5jb3JlQg5FeGVjdXRpb25Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9jb3JlogIDRkNYqgIORmx5dGVpZGwyLkNvcmXKAg5GbHl0ZWlkbDJcQ29yZeICGkZseXRlaWRsMlxDb3JlXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpDb3JlYgZwcm90bzM", [file_google_protobuf_duration, file_google_protobuf_timestamp]);
 
 /**
  * Indicates various phases of Workflow Execution
@@ -463,6 +463,15 @@ export type LogContext = Message<"flyteidl2.core.LogContext"> & {
    * @generated from field: string primary_pod_name = 2;
    */
   primaryPodName: string;
+
+  /**
+   * Optional. Set by the connector plugin when an action is served by a connector. The dataplane
+   * dataproxy uses this endpoint to proxy log requests to the connector's GetTaskLogs RPC instead
+   * of streaming pod logs.
+   *
+   * @generated from field: flyteidl2.core.ConnectorLogContext connector = 3;
+   */
+  connector?: ConnectorLogContext;
 };
 
 /**
@@ -471,6 +480,28 @@ export type LogContext = Message<"flyteidl2.core.LogContext"> & {
  */
 export const LogContextSchema: GenMessage<LogContext> = /*@__PURE__*/
   messageDesc(file_flyteidl2_core_execution, 5);
+
+/**
+ * ConnectorLogContext describes how to reach a connector that owns an action's logs.
+ *
+ * @generated from message flyteidl2.core.ConnectorLogContext
+ */
+export type ConnectorLogContext = Message<"flyteidl2.core.ConnectorLogContext"> & {
+  /**
+   * gRPC endpoint of the connector deployment (e.g.
+   * "batch-job-connector.flytesnacks-development.svc.cluster.local:80").
+   *
+   * @generated from field: string endpoint = 1;
+   */
+  endpoint: string;
+};
+
+/**
+ * Describes the message flyteidl2.core.ConnectorLogContext.
+ * Use `create(ConnectorLogContextSchema)` to create a new message.
+ */
+export const ConnectorLogContextSchema: GenMessage<ConnectorLogContext> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_core_execution, 6);
 
 /**
  * Contains metadata required to identify logs produces by a single pod
@@ -509,7 +540,7 @@ export type PodLogContext = Message<"flyteidl2.core.PodLogContext"> & {
  * Use `create(PodLogContextSchema)` to create a new message.
  */
 export const PodLogContextSchema: GenMessage<PodLogContext> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 6);
+  messageDesc(file_flyteidl2_core_execution, 7);
 
 /**
  * Contains metadata required to identify logs produces by a single container
@@ -533,7 +564,7 @@ export type ContainerContext = Message<"flyteidl2.core.ContainerContext"> & {
  * Use `create(ContainerContextSchema)` to create a new message.
  */
 export const ContainerContextSchema: GenMessage<ContainerContext> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 7);
+  messageDesc(file_flyteidl2_core_execution, 8);
 
 /**
  * Contains metadata required to identify logs produces by a single light-weight process that was run inside a container
@@ -557,7 +588,7 @@ export type ContainerContext_ProcessContext = Message<"flyteidl2.core.ContainerC
  * Use `create(ContainerContext_ProcessContextSchema)` to create a new message.
  */
 export const ContainerContext_ProcessContextSchema: GenMessage<ContainerContext_ProcessContext> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 7, 0);
+  messageDesc(file_flyteidl2_core_execution, 8, 0);
 
 /**
  * Represents customized execution run-time attributes.
@@ -578,7 +609,7 @@ export type QualityOfServiceSpec = Message<"flyteidl2.core.QualityOfServiceSpec"
  * Use `create(QualityOfServiceSpecSchema)` to create a new message.
  */
 export const QualityOfServiceSpecSchema: GenMessage<QualityOfServiceSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 8);
+  messageDesc(file_flyteidl2_core_execution, 9);
 
 /**
  * Indicates the priority of an execution.
@@ -609,7 +640,7 @@ export type QualityOfService = Message<"flyteidl2.core.QualityOfService"> & {
  * Use `create(QualityOfServiceSchema)` to create a new message.
  */
 export const QualityOfServiceSchema: GenMessage<QualityOfService> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 9);
+  messageDesc(file_flyteidl2_core_execution, 10);
 
 /**
  * @generated from enum flyteidl2.core.QualityOfService.Tier
@@ -642,5 +673,5 @@ export enum QualityOfService_Tier {
  * Describes the enum flyteidl2.core.QualityOfService.Tier.
  */
 export const QualityOfService_TierSchema: GenEnum<QualityOfService_Tier> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_core_execution, 9, 0);
+  enumDesc(file_flyteidl2_core_execution, 10, 0);
 
