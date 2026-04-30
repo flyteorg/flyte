@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - v2
     paths:
       - 'gen.Dockerfile'
       - '.github/workflows/build-ci-image.yml'
