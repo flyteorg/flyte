@@ -8,7 +8,13 @@ on:
   push:
     branches:
       - main
-  pull_request:
+  # SECURITY: pull_request_target runs in the BASE repo context so repo
+  # variables (vars.*) are available for fork PRs. The tradeoff is that this
+  # job checks out and builds the PR's head ref — i.e. fork-controlled code —
+  # while having access to those vars. We do NOT expose repo secrets here:
+  # PUSH_IMAGES is forced false for fork PRs below, so FLYTE_BOT_PAT login and
+  # any image push only run for branches in the base repo.
+  pull_request_target:
     branches:
       - main
   workflow_dispatch:
@@ -16,14 +22,16 @@ on:
 env:
   DEPOT_PROJECT_ID: ${{ vars.DEPOT_PROJECT_ID }}
   # Push images on push to main, manual dispatch, OR on a PR labeled
-  # `test-push-image` (apply the label to a PR to push test images).
-  PUSH_IMAGES: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'test-push-image')) }}
+  # `test-push-image` from a branch in the base repo (never from forks).
+  PUSH_IMAGES: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.pull_request.labels.*.name, 'test-push-image')) }}
 
 jobs:
   test-bootstrap:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
@@ -49,16 +57,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Debug vars context
-        env:
-          ALL_VARS: ${{ toJSON(vars) }}
-        run: |
-          echo "event_name=${GITHUB_EVENT_NAME}"
-          echo "actor=${GITHUB_ACTOR}"
-          echo "repo=${GITHUB_REPOSITORY}"
-          echo "DEPOT_PROJECT_ID is: '${DEPOT_PROJECT_ID}'"
-          echo "vars JSON:"
-          echo "${ALL_VARS}"
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Validate Depot project id
         run: |
           if [ -z "${DEPOT_PROJECT_ID}" ]; then
@@ -157,6 +157,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/download-artifact@v4
         with:
           name: single-binary-image
