@@ -49,6 +49,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Debug vars context
+        env:
+          ALL_VARS: ${{ toJSON(vars) }}
+        run: |
+          echo "event_name=${GITHUB_EVENT_NAME}"
+          echo "actor=${GITHUB_ACTOR}"
+          echo "repo=${GITHUB_REPOSITORY}"
+          echo "DEPOT_PROJECT_ID is: '${DEPOT_PROJECT_ID}'"
+          echo "vars JSON:"
+          echo "${ALL_VARS}"
       - name: Validate Depot project id
         run: |
           if [ -z "${DEPOT_PROJECT_ID}" ]; then
