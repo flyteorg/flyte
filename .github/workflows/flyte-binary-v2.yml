@@ -266,11 +266,14 @@ jobs:
       - name: Install flyte SDK
         run: pip install "flyte==${{ env.FLYTE_SDK_VERSION }}"
       - name: Configure SDK
+        # Talk directly to flyte-binary (port-forwarded by start-devbox.sh).
+        # The Traefik NodePort 30080 doesn't speak h2c reliably for gRPC, so
+        # SDK calls fall over with cryptic ValueErrors when routed through it.
         run: |
           mkdir -p "$HOME/.flyte"
           cat > "$HOME/.flyte/config.yaml" <<'EOF'
           admin:
-            endpoint: dns:///localhost:30080
+            endpoint: dns:///localhost:8090
             insecure: True
           task:
             domain: development

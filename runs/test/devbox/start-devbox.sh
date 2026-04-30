@@ -93,7 +93,28 @@ until nc -z 127.0.0.1 9000 2>/dev/null; do
   sleep 0.3
 done
 
+# Port-forward directly to the flyte-binary ClusterIP service.
+# The bundled Traefik on NodePort 30080 doesn't reliably do h2c, so the
+# Python SDK's gRPC client (HTTP/2 cleartext) fails through it. Talking
+# directly to svc/flyte-binary:8090 sidesteps the proxy entirely.
+nohup kubectl port-forward -n flyte svc/flyte-binary 8090:8090 \
+  --address 127.0.0.1 \
+  >/tmp/flyte-binary-pf.log 2>&1 &
+disown
+pf_deadline=$(( $(date +%s) + 15 ))
+until nc -z 127.0.0.1 8090 2>/dev/null; do
+  if [ "$(date +%s)" -gt "$pf_deadline" ]; then
+    echo "ERROR: flyte-binary port-forward did not open" >&2
+    cat /tmp/flyte-binary-pf.log >&2 || true
+    exit 1
+  fi
+  sleep 0.3
+done
+
 echo "Devbox ready."
+echo "  flyte-binary (direct): http://localhost:8090"
+echo "  flyte-binary (Traefik): http://localhost:30080"
+echo "  rustfs S3:             http://localhost:30002 (also rustfs.flyte:9000)"
 echo "  Connect API: http://localhost:30080"
 echo "  rustfs S3:   http://localhost:30002"
 echo "  Postgres:    localhost:30001"
