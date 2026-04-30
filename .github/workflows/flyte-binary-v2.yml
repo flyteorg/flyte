@@ -15,6 +15,9 @@ on:
 
 env:
   DEPOT_PROJECT_ID: ${{ vars.DEPOT_PROJECT_ID }}
+  # Push images on push to main, manual dispatch, OR on a PR labeled
+  # `test-push-image` (apply the label to a PR to push test images).
+  PUSH_IMAGES: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'test-push-image')) }}
 
 jobs:
   test-bootstrap:
@@ -113,14 +116,14 @@ jobs:
           name: single-binary-image
           path: docker/devbox-bundled/images/tar
       - name: Login to GitHub Container Registry
-        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+        if: ${{ env.PUSH_IMAGES == 'true' }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
       - name: Build and push Image
-        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+        if: ${{ env.PUSH_IMAGES == 'true' }}
         uses: depot/build-push-action@v1
         with:
           project: ${{ env.DEPOT_PROJECT_ID }}
@@ -133,7 +136,7 @@ jobs:
             FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
-          push: true
+          push: ${{ env.PUSH_IMAGES == 'true' }}
 
   build-and-push-devbox-bundled-image:
     runs-on: ubuntu-latest
@@ -169,7 +172,7 @@ jobs:
             type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' }}
             type=sha,format=long,
       - name: Login to GitHub Container Registry
-        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+        if: ${{ env.PUSH_IMAGES == 'true' }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -192,6 +195,7 @@ jobs:
           save: true
           save-tags: cpu-build-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Push CPU multi-arch image
+        if: ${{ env.PUSH_IMAGES == 'true' }}
         uses: depot/build-push-action@v1
         with:
           project: ${{ env.DEPOT_PROJECT_ID }}
@@ -228,4 +232,4 @@ jobs:
           build-args: |
             FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}
             BASE_IMAGE=registry.depot.dev/${{ env.DEPOT_PROJECT_ID }}:cpu-build-${{ github.run_id }}-${{ github.run_attempt }}
-          push: true
+          push: ${{ env.PUSH_IMAGES == 'true' }}
