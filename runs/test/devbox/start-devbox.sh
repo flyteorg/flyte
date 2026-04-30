@@ -77,6 +77,9 @@ kubectl rollout status deploy/flyte-binary -n flyte --timeout="${remaining}s"
 if ! grep -q '[[:space:]]rustfs\.flyte\b' /etc/hosts; then
   echo "127.0.0.1 rustfs.flyte" | sudo tee -a /etc/hosts >/dev/null
 fi
+if ! command -v socat >/dev/null 2>&1; then
+  sudo apt-get update -qq && sudo apt-get install -y -qq socat
+fi
 nohup socat TCP-LISTEN:9000,reuseaddr,fork TCP:127.0.0.1:30002 \
   >/tmp/rustfs-forward.log 2>&1 &
 disown
