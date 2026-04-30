@@ -24,6 +24,14 @@ message TailLogsRequest {
 
   // The attempt number.
   uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
+
+  // +optional. Connector task type name (e.g. "airflow", "batch_job"). When set, the run service forwards this
+  // hint to the dataplane so log requests for connector tasks can be routed to the connector's GetTaskLogs RPC
+  // instead of pod logs. The UI populates this from the task template it already loaded for the run.
+  string task_type = 3;
+
+  // +optional. Connector task type version. Used together with task_type to identify a TaskCategory.
+  int32 task_type_version = 4;
 }
 
 // Reponse message for tailing logs.

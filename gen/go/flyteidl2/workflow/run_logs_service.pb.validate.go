@@ -88,6 +88,10 @@ func (m *TailLogsRequest) validate(all bool) error {
 
 	// no validation rules for Attempt
 
+	// no validation rules for TaskType
+
+	// no validation rules for TaskTypeVersion
+
 	if len(errors) > 0 {
 		return TailLogsRequestMultiError(errors)
 	}

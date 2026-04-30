@@ -205,6 +205,14 @@ message TailLogsRequest {
 
   // The pod name to tail logs from. If not provided, attempt to find the primary pod, else assume the first pod.
   string pod_name = 3;
+
+  // +optional. Connector task type name (e.g. "airflow", "batch_job"). When set, the dataplane operator
+  // routes the request to the matching connector's GetTaskLogs RPC instead of pod logs. The UI populates
+  // this from the task template it already loaded for the run.
+  string task_type = 4;
+
+  // +optional. Connector task type version. Used together with task_type to identify a TaskCategory.
+  int32 task_type_version = 5;
 }
 
 // Reponse message for tailing logs.
