@@ -536,6 +536,20 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 		podSpec.Containers[0].Env = append(defaults, podSpec.Containers[0].Env...)
 	}
 
+	// Inject INTERNAL_APP_ENDPOINT_PATTERN so app code can construct internal cluster URLs
+	// for other apps by substituting {app_fqdn} with the target app name.
+	// The pattern includes project and domain as a suffix to match the KService name format
+	// {name}-{project}-{domain} used by KServiceName().
+	if len(podSpec.Containers) > 0 {
+		podSpec.Containers[0].Env = append(podSpec.Containers[0].Env, corev1.EnvVar{
+			Name: "INTERNAL_APP_ENDPOINT_PATTERN",
+			Value: fmt.Sprintf("http://{app_fqdn}-%s-%s.%s.svc.cluster.local",
+				strings.ToLower(appID.GetProject()),
+				strings.ToLower(appID.GetDomain()),
+				ns),
+		})
+	}
+
 	templateAnnotations := buildAutoscalingAnnotations(spec, c.cfg)
 
 	timeoutSecs := c.cfg.DefaultRequestTimeout.Seconds()

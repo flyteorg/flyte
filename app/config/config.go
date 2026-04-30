@@ -65,6 +65,11 @@ type InternalAppConfig struct {
 	// processes need to connect back to the Flyte manager.
 	DefaultEnvVars map[string]string `json:"defaultEnvVars" pflag:"-,Default env vars injected into every app pod"`
 
+	// NamespacedNamePrefixTemplate is the template for generating the INTERNAL_APP_ENDPOINT_PATTERN env var.
+	// Supported variables: {{ project }}, {{ domain }}, {{ org }}.
+	// Example: "{{ project }}-{{ domain }}-"
+	NamespacedNamePrefixTemplate string `json:"namespacedNamePrefixTemplate" pflag:",Template for internal app endpoint pattern (e.g., {{ project }}-{{ domain }}-)"`
+
 	// WatchBufferSize is the buffer size for each subscriber's event channel.
 	// A larger value reduces the chance of dropped events under burst load.
 	WatchBufferSize int `json:"watchBufferSize" pflag:",Buffer size for watch subscriber channels"`
