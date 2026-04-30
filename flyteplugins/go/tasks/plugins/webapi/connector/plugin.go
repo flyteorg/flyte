@@ -330,6 +330,9 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 				Endpoint: resource.ConnectorEndpoint,
 			},
 		}
+		logger.Infof(ctx, "Recorded connector endpoint %q on LogContext for connector %q", resource.ConnectorEndpoint, resource.ConnectorID)
+	} else {
+		logger.Debugf(ctx, "Connector endpoint missing on resource for connector %q; LogContext.connector not set", resource.ConnectorID)
 	}
 
 	errorCode := pluginErrors.TaskFailedWithError
