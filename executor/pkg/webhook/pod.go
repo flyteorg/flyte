@@ -77,7 +77,7 @@ func getPodMutatePath() string {
 }
 
 func generateMutatePath(gvk schema.GroupVersionKind) string {
-	return "/mutate-" + strings.Replace(gvk.Group, ".", "-", -1) + "-" +
+	return "/mutate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" +
 		gvk.Version + "-" + strings.ToLower(gvk.Kind)
 }
 
@@ -102,7 +102,7 @@ func (pm PodMutator) CreateMutationWebhookConfiguration(namespace string) (*admi
 		},
 		Webhooks: []admissionregistrationv1.MutatingWebhook{
 			{
-				Name:         webhookName,
+				Name: webhookName,
 				ClientConfig: admissionregistrationv1.WebhookClientConfig{
 					CABundle: caBytes,
 					Service: &admissionregistrationv1.ServiceReference{
