@@ -130,14 +130,16 @@ class GetActionDataResponse(_message.Message):
     def __init__(self, inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.Outputs, _Mapping]] = ...) -> None: ...
 
 class TailLogsRequest(_message.Message):
-    __slots__ = ["action_id", "attempt", "pod_name"]
+    __slots__ = ["action_id", "attempt", "pod_name", "connector_endpoint"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     ATTEMPT_FIELD_NUMBER: _ClassVar[int]
     POD_NAME_FIELD_NUMBER: _ClassVar[int]
+    CONNECTOR_ENDPOINT_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     attempt: int
     pod_name: str
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., pod_name: _Optional[str] = ...) -> None: ...
+    connector_endpoint: str
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., pod_name: _Optional[str] = ..., connector_endpoint: _Optional[str] = ...) -> None: ...
 
 class TailLogsResponse(_message.Message):
     __slots__ = ["logs"]
