@@ -45,7 +45,7 @@ jobs:
     needs: [test-bootstrap]
     permissions:
       contents: read
-      id-token: write  # required for Depot OIDC auth (GHCR auth uses FLYTE_BOT_PAT)
+      id-token: write  # required for Depot OIDC auth (GHCR auth uses FLYTE_BOT_PAT)fffff
     steps:
       - name: Checkout
         uses: actions/checkout@v4
