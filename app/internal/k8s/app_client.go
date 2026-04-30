@@ -704,15 +704,8 @@ var knativeCondDefaultMessages = map[knativeapis.ConditionType]string{
 }
 
 // knativeCondToAppCondition maps a single Knative condition to a flyteapp.Condition.
-// For the Ready condition, all statuses (True/False/Unknown) are handled.
-// For sub-conditions (ConfigurationsReady, RoutesReady, etc.):
-//   - True is always emitted.
-//   - False is emitted only when the service has failed (serviceFailed=true), so that
-//     condition-specific error details (e.g. RevisionFailed) are surfaced.
-//   - Unknown is skipped — the Ready condition already reflects the pending state.
-//
 // serviceReady indicates Ready=True, so True sub-conditions map to ACTIVE instead of DEPLOYING.
-// serviceFailed indicates Ready=False, so False sub-conditions are emitted as FAILED.
+// serviceFailed indicates Ready=False, only in this case False sub-conditions are emitted as FAILED.
 func knativeCondToAppCondition(kCond knativeapis.Condition, serviceReady, serviceFailed bool) *flyteapp.Condition {
 	var phase flyteapp.Status_DeploymentStatus
 
