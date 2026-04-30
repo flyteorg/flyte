@@ -44,10 +44,30 @@ if [ -n "${GITHUB_ENV:-}" ]; then
   echo "KUBECONFIG=$KUBECONFIG" >> "$GITHUB_ENV"
 fi
 
-echo "Waiting for flyte-binary pod to be Ready..."
-kubectl wait --for=condition=Ready pod -n flyte \
-  -l app.kubernetes.io/name=flyte-binary \
-  --timeout="${READY_TIMEOUT}s"
+echo "Waiting for flyte namespace..."
+until kubectl get ns flyte >/dev/null 2>&1; do
+  if [ "$(date +%s)" -gt "$deadline" ]; then
+    echo "ERROR: flyte namespace not created within ${READY_TIMEOUT}s" >&2
+    kubectl get ns >&2 || true
+    exit 1
+  fi
+  sleep 2
+done
+
+echo "Waiting for flyte-binary deployment to exist..."
+until kubectl get deploy -n flyte flyte-binary >/dev/null 2>&1; do
+  if [ "$(date +%s)" -gt "$deadline" ]; then
+    echo "ERROR: flyte-binary deployment not created within ${READY_TIMEOUT}s" >&2
+    kubectl get all -A >&2 || true
+    exit 1
+  fi
+  sleep 2
+done
+
+remaining=$(( deadline - $(date +%s) ))
+[ "$remaining" -lt 30 ] && remaining=30
+echo "Waiting for flyte-binary rollout (timeout ${remaining}s)..."
+kubectl rollout status deploy/flyte-binary -n flyte --timeout="${remaining}s"
 
 echo "Devbox ready."
 echo "  Connect API: http://localhost:30080"
