@@ -97,7 +97,7 @@ done
 # The bundled Traefik on NodePort 30080 doesn't reliably do h2c, so the
 # Python SDK's gRPC client (HTTP/2 cleartext) fails through it. Talking
 # directly to svc/flyte-binary:8090 sidesteps the proxy entirely.
-nohup kubectl port-forward -n flyte svc/flyte-binary 8090:8090 \
+nohup kubectl port-forward -n flyte svc/flyte-binary-http 8090:8090 \
   --address 127.0.0.1 \
   >/tmp/flyte-binary-pf.log 2>&1 &
 disown
