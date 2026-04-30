@@ -271,7 +271,7 @@ jobs:
           cat > "$HOME/.flyte/config.yaml" <<'EOF'
           admin:
             endpoint: dns:///localhost:30080
-            insecure: true
+            insecure: True
           task:
             domain: development
             project: flytesnacks

@@ -69,6 +69,27 @@ remaining=$(( deadline - $(date +%s) ))
 echo "Waiting for flyte-binary rollout (timeout ${remaining}s)..."
 kubectl rollout status deploy/flyte-binary -n flyte --timeout="${remaining}s"
 
+# Bridge rustfs.flyte:9000 -> localhost:30002 (the rustfs NodePort).
+# DataProxy mints signed URLs whose host is the in-cluster storage endpoint
+# (http://rustfs.flyte:9000), which is unreachable from the runner. We add a
+# /etc/hosts entry and a TCP forwarder so the SDK's PUT to the signed URL
+# resolves to the published NodePort and lands on the rustfs pod.
+if ! grep -q '[[:space:]]rustfs\.flyte\b' /etc/hosts; then
+  echo "127.0.0.1 rustfs.flyte" | sudo tee -a /etc/hosts >/dev/null
+fi
+nohup socat TCP-LISTEN:9000,reuseaddr,fork TCP:127.0.0.1:30002 \
+  >/tmp/rustfs-forward.log 2>&1 &
+disown
+forward_deadline=$(( $(date +%s) + 15 ))
+until nc -z 127.0.0.1 9000 2>/dev/null; do
+  if [ "$(date +%s)" -gt "$forward_deadline" ]; then
+    echo "ERROR: rustfs.flyte:9000 forward did not open" >&2
+    cat /tmp/rustfs-forward.log >&2 || true
+    exit 1
+  fi
+  sleep 0.3
+done
+
 echo "Devbox ready."
 echo "  Connect API: http://localhost:30080"
 echo "  rustfs S3:   http://localhost:30002"

@@ -29,8 +29,18 @@ def add_one(x: int) -> int:
 
 
 def main() -> int:
-    flyte.init_from_config()
-    run = flyte.run(add_one, x=41)
+    try:
+        flyte.init_from_config()
+        run = flyte.run(add_one, x=41)
+    except Exception as e:
+        # The SDK wraps storage errors with a generic message; walk the chain
+        # so CI logs show the real cause (network, signing, etc.).
+        cur, depth = e, 0
+        while cur is not None and depth < 10:
+            print(f"  [{depth}] {type(cur).__name__}: {cur}", file=sys.stderr)
+            cur = cur.__cause__ or cur.__context__
+            depth += 1
+        raise
     print(f"run.result={run.result!r}")
     if run.result != 42:
         print(f"FAIL: expected 42, got {run.result!r}", file=sys.stderr)
