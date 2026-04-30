@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4-labs
-FROM --platform=${BUILDPLATFORM} mgoltzsche/podman:minimal AS builder
+FROM --platform=${BUILDPLATFORM} quay.io/skopeo/stable AS builder
 
 ARG TARGETARCH
 ENV TARGETARCH "${TARGETARCH}"
@@ -7,7 +7,7 @@ ENV TARGETARCH "${TARGETARCH}"
 WORKDIR /build
 
 COPY images/manifest.txt images/preload ./
-RUN --security=insecure ./preload manifest.txt
+RUN ./preload manifest.txt
 
 
 FROM --platform=${BUILDPLATFORM} golang:1.24-bullseye AS bootstrap

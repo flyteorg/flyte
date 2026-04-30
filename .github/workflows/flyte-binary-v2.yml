@@ -189,7 +189,6 @@ jobs:
         with:
           project: ${{ env.DEPOT_PROJECT_ID }}
           context: docker/devbox-bundled
-          allow: "security.insecure"
           platforms: linux/arm64,linux/amd64
           build-args: "FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}"
           save: true
@@ -200,7 +199,6 @@ jobs:
         with:
           project: ${{ env.DEPOT_PROJECT_ID }}
           context: docker/devbox-bundled
-          allow: "security.insecure"
           platforms: linux/arm64,linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
           build-args: "FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}"
@@ -226,7 +224,6 @@ jobs:
           # Resolve `FROM ${BASE_IMAGE}` from the CPU build saved to Depot's
           # ephemeral registry above. Auth is implicit because both builds
           # run in the same Depot project.
-          allow: "security.insecure"
           platforms: linux/arm64,linux/amd64
           tags: ${{ steps.gpu-image-names.outputs.tags }}
           build-args: |
