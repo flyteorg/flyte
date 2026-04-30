@@ -68,12 +68,13 @@ type PluginState struct {
 }
 
 type PluginMetrics struct {
-	Scope           promutils.Scope
-	GetCacheMiss    labeled.StopWatch
-	GetCacheHit     labeled.StopWatch
-	GetAPILatency   labeled.StopWatch
-	ResourceDeleted labeled.Counter
-	TaskPodErrors   *prometheus.CounterVec
+	Scope                   promutils.Scope
+	GetCacheMiss            labeled.StopWatch
+	GetCacheHit             labeled.StopWatch
+	GetAPILatency           labeled.StopWatch
+	ResourceDeleted         labeled.Counter
+	TaskPodErrors           *prometheus.CounterVec
+	ClearFinalizersFailures labeled.Counter
 }
 
 func newPluginMetrics(s promutils.Scope) PluginMetrics {
@@ -89,6 +90,7 @@ func newPluginMetrics(s promutils.Scope) PluginMetrics {
 			" called with a deleted resource.", s),
 		TaskPodErrors: s.MustNewCounterVec("task_pod_errors", "Counts how many times task pods failed in given phase with given code",
 			"phase", "error_code"),
+		ClearFinalizersFailures: labeled.NewCounter("clear_finalizers_failures", "Counts how many times clearing finalizers failed.", s),
 	}
 }
 
@@ -480,13 +482,17 @@ func (e PluginManager) Abort(ctx context.Context, tCtx pluginsCore.TaskExecution
 
 // clearFinalizer removes the Flyte finalizer (if it exists) from the k8s resource
 func (e *PluginManager) clearFinalizer(ctx context.Context, o client.Object) error {
+	original := o.DeepCopyObject().(client.Object)
+
 	// Checking for the old finalizer too for backwards compatibility. This should eventually be removed
 	// Go does short-circuiting and we have to make sure both are removed
 	finalizerRemoved := controllerutil.RemoveFinalizer(o, finalizer)
 	oldFinalizerRemoved := controllerutil.RemoveFinalizer(o, oldFinalizer)
 	if finalizerRemoved || oldFinalizerRemoved {
-		err := e.kubeClient.GetClient().Update(ctx, o)
+		// Patch finalizers to reduce conflicts caused by a stale informer cache vs full Update().
+		err := e.kubeClient.GetClient().Patch(ctx, o, client.MergeFrom(original))
 		if err != nil && !isK8sObjectNotExists(err) {
+			e.metrics.ClearFinalizersFailures.Inc(ctx)
 			logger.Warningf(ctx, "Failed to clear finalizer for Resource with name: %v/%v. Error: %v",
 				o.GetNamespace(), o.GetName(), err)
 			return err
