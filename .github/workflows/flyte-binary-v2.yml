@@ -8,12 +8,6 @@ on:
   push:
     branches:
       - main
-  # SECURITY: pull_request_target runs in the BASE repo context so repo
-  # variables (vars.*) are available for fork PRs. The tradeoff is that this
-  # job checks out and builds the PR's head ref — i.e. fork-controlled code —
-  # while having access to those vars. We do NOT expose repo secrets here:
-  # PUSH_IMAGES is forced false for fork PRs below, so FLYTE_BOT_PAT login and
-  # any image push only run for branches in the base repo.
   pull_request_target:
     branches:
       - main

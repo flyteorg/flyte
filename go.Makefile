@@ -20,7 +20,7 @@ COLOR_BLUE    := \033[36m
 
 ##@ General
 
-.PHONY: helppp
+.PHONY: help
 help: ## Display this help message
 	@echo ''
 	@echo '$(COLOR_BOLD)Usage:$(COLOR_RESET)'
