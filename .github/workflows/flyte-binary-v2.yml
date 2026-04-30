@@ -175,11 +175,13 @@ jobs:
           registry: ghcr.io
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
-      - name: Build CPU multi-arch image to OCI archive
-        # Produce an OCI archive locally so the GPU build below can use it as a
-        # named build context. This avoids the PR-gated push chicken-and-egg:
-        # on pull_request events we don't push to ghcr, so the GPU build can't
-        # resolve a ghcr-hosted FROM.
+      - name: Build CPU multi-arch image (save to Depot ephemeral registry)
+        # buildx refuses local OCI export for multi-node multi-arch builds,
+        # and Depot uses native amd64+arm64 nodes — so we save to Depot's
+        # ephemeral registry instead. The saved image is referenceable as
+        # `registry.depot.dev/<project-id>:<save-tag>` from any subsequent
+        # build in the same Depot project, which lets the GPU build resolve
+        # its base on PRs without round-tripping through ghcr.
         uses: depot/build-push-action@v1
         with:
           project: ${{ env.DEPOT_PROJECT_ID }}
@@ -187,11 +189,8 @@ jobs:
           allow: "security.insecure"
           platforms: linux/arm64,linux/amd64
           build-args: "FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}"
-          outputs: type=oci,dest=/tmp/cpu-oci.tar
-      - name: Extract CPU OCI layout for GPU build
-        run: |
-          mkdir -p /tmp/cpu-oci
-          tar -xf /tmp/cpu-oci.tar -C /tmp/cpu-oci
+          save: true
+          save-tags: cpu-build-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Push CPU multi-arch image
         uses: depot/build-push-action@v1
         with:
@@ -220,13 +219,13 @@ jobs:
           project: ${{ env.DEPOT_PROJECT_ID }}
           context: docker/devbox-bundled
           file: docker/devbox-bundled/Dockerfile.gpu
-          # Point Dockerfile.gpu's `FROM ${BASE_IMAGE}` at the OCI archive
-          # produced above — no registry round-trip needed.
-          build-contexts: base=oci-layout:///tmp/cpu-oci
+          # Resolve `FROM ${BASE_IMAGE}` from the CPU build saved to Depot's
+          # ephemeral registry above. Auth is implicit because both builds
+          # run in the same Depot project.
           allow: "security.insecure"
           platforms: linux/arm64,linux/amd64
           tags: ${{ steps.gpu-image-names.outputs.tags }}
           build-args: |
             FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}
-            BASE_IMAGE=base
+            BASE_IMAGE=registry.depot.dev/${{ env.DEPOT_PROJECT_ID }}:cpu-build-${{ github.run_id }}-${{ github.run_attempt }}
           push: true
