@@ -214,13 +214,20 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		return nil, nil, fmt.Errorf("failed to create task from connector with %v", err)
 	}
 
+	resource := ResourceWrapper{
+		ConnectorID:    connector.ConnectorID,
+		IsConnectorApp: connector.IsConnectorApp,
+	}
+	if connector.ConnectorDeployment != nil {
+		resource.ConnectorEndpoint = connector.ConnectorDeployment.Endpoint
+	}
 	return ResourceMetaWrapper{
 		OutputPrefix:          outputPrefix,
 		ConnectorResourceMeta: res.GetResourceMeta(),
 		TaskCategory:          &taskCategory,
 		Connection:            &connection,
 		Domain:                taskTemplate.GetId().GetDomain(),
-	}, nil, nil
+	}, resource, nil
 }
 
 func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
