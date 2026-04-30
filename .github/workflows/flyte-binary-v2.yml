@@ -193,6 +193,14 @@ jobs:
           build-args: "FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}"
           save: true
           save-tags: cpu-build-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Authenticate Docker to Depot Registry
+        # depot/build-push-action forwards the runner's docker auth to the
+        # remote BuildKit, so the GPU build below can resolve its FROM from
+        # registry.depot.dev. Cross-build auth in the Depot registry is NOT
+        # implicit — we need a short-lived pull-token here.
+        run: |
+          depot pull-token --project "${DEPOT_PROJECT_ID}" \
+            | docker login registry.depot.dev -u x-token --password-stdin
       - name: Push CPU multi-arch image
         if: ${{ env.PUSH_IMAGES == 'true' }}
         uses: depot/build-push-action@v1
