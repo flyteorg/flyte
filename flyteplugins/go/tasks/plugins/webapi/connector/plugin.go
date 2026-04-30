@@ -13,9 +13,6 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
-
 	pluginErrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
@@ -23,7 +20,9 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
@@ -80,16 +79,13 @@ type Plugin struct {
 }
 
 type ResourceWrapper struct {
-	Phase          flyteIdl.TaskExecution_Phase
-	Outputs        *task.Outputs
-	Message        string
-	LogLinks       []*flyteIdl.TaskLog
-	CustomInfo     *structpb.Struct
-	ConnectorID    string
-	IsConnectorApp bool
-	// ConnectorEndpoint is the gRPC endpoint of the connector deployment serving this task. It is
-	// recorded on the LogContext emitted by Status() so the dataplane dataproxy can stream logs
-	// from the connector's pods.
+	Phase             flyteIdl.TaskExecution_Phase
+	Outputs           *task.Outputs
+	Message           string
+	LogLinks          []*flyteIdl.TaskLog
+	CustomInfo        *structpb.Struct
+	ConnectorID       string
+	IsConnectorApp    bool
 	ConnectorEndpoint string
 }
 
@@ -214,20 +210,13 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		return nil, nil, fmt.Errorf("failed to create task from connector with %v", err)
 	}
 
-	resource := ResourceWrapper{
-		ConnectorID:    connector.ConnectorID,
-		IsConnectorApp: connector.IsConnectorApp,
-	}
-	if connector.ConnectorDeployment != nil {
-		resource.ConnectorEndpoint = connector.ConnectorDeployment.Endpoint
-	}
 	return ResourceMetaWrapper{
 		OutputPrefix:          outputPrefix,
 		ConnectorResourceMeta: res.GetResourceMeta(),
 		TaskCategory:          &taskCategory,
 		Connection:            &connection,
 		Domain:                taskTemplate.GetId().GetDomain(),
-	}, resource, nil
+	}, nil, nil
 }
 
 func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
@@ -335,9 +324,6 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 
 	taskInfo := &core.TaskInfo{Logs: logLinks, CustomInfo: resource.CustomInfo}
 
-	// Record the connector endpoint on the LogContext so the dataplane dataproxy can stream logs
-	// from the connector deployment's pods. The endpoint was resolved at Get() time and stashed
-	// on the ResourceWrapper, so we don't have to re-resolve it here.
 	if resource.ConnectorEndpoint != "" {
 		taskInfo.LogContext = &flyteIdl.LogContext{
 			Connector: &flyteIdl.ConnectorLogContext{
