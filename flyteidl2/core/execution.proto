@@ -113,6 +113,18 @@ message TaskLog {
 message LogContext {
   repeated PodLogContext pods = 1;
   string primary_pod_name = 2;
+
+  // Optional. Set by the connector plugin when an action is served by a connector. The dataplane
+  // dataproxy uses this endpoint to proxy log requests to the connector's GetTaskLogs RPC instead
+  // of streaming pod logs.
+  ConnectorLogContext connector = 3;
+}
+
+// ConnectorLogContext describes how to reach a connector that owns an action's logs.
+message ConnectorLogContext {
+  // gRPC endpoint of the connector deployment (e.g.
+  // "batch-job-connector.flytesnacks-development.svc.cluster.local:80").
+  string endpoint = 1;
 }
 
 // Contains metadata required to identify logs produces by a single pod

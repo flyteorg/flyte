@@ -319,6 +319,20 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 	}
 
 	taskInfo := &core.TaskInfo{Logs: logLinks, CustomInfo: resource.CustomInfo}
+
+	// Record the connector endpoint on the LogContext so the dataplane dataproxy can stream logs
+	// straight from the connector via AsyncConnectorService.GetTaskLogs (resource_meta is fetched
+	// separately from PluginStateService at log-stream time).
+	if metadata, ok := taskCtx.ResourceMeta().(ResourceMetaWrapper); ok {
+		if connector, err := p.getFinalConnector(metadata.TaskCategory, p.cfg, metadata.Domain); err == nil && connector != nil && connector.ConnectorDeployment != nil {
+			taskInfo.LogContext = &flyteIdl.LogContext{
+				Connector: &flyteIdl.ConnectorLogContext{
+					Endpoint: connector.ConnectorDeployment.Endpoint,
+				},
+			}
+		}
+	}
+
 	errorCode := pluginErrors.TaskFailedWithError
 
 	switch resource.Phase {
