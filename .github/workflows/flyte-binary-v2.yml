@@ -282,6 +282,39 @@ jobs:
           image:
             builder: local
           EOF
+      - name: Probe DataProxy reachability
+        # Diagnostic: hit DataProxy.CreateUploadLocation via plain HTTP/1.1
+        # Connect protocol on both endpoints. This bypasses h2c questions and
+        # tells us (a) whether DataProxy is functional, (b) what host the
+        # signed URL points at, (c) whether the rustfs.flyte:9000 bridge is
+        # actually wired up correctly.
+        run: |
+          set +e
+          set -x
+          payload='{"project":"flytesnacks","domain":"development","org":"localhost","filename":"probe.tar.gz","filename_root":"ci-probe","content_md5":"dGVzdC1jb250ZW50LWhhc2g=","expires_in":"1800s","content_length":1024}'
+          for ep in "http://localhost:8090" "http://localhost:30080"; do
+            echo "::group::CreateUploadLocation @ $ep"
+            curl -sS -i \
+              -H 'Content-Type: application/json' \
+              -X POST "$ep/flyteidl2.dataproxy.DataProxyService/CreateUploadLocation" \
+              --data "$payload"
+            echo
+            echo "::endgroup::"
+          done
+          echo "::group::PUT to signed URL via rustfs.flyte:9000 bridge"
+          signed_url=$(curl -sS \
+            -H 'Content-Type: application/json' \
+            -X POST "http://localhost:8090/flyteidl2.dataproxy.DataProxyService/CreateUploadLocation" \
+            --data "$payload" | python -c 'import sys,json; print(json.load(sys.stdin).get("signedUrl",""))')
+          echo "signed_url=$signed_url"
+          if [ -n "$signed_url" ]; then
+            curl -sS -i -X PUT --data-binary "hello" "$signed_url" || true
+          fi
+          echo "::endgroup::"
+          echo "::group::rustfs.flyte resolution + reachability"
+          getent hosts rustfs.flyte || true
+          curl -sS -i http://rustfs.flyte:9000/ || true
+          echo "::endgroup::"
       - name: Submit task and wait for SUCCEEDED
         run: python runs/test/devbox/hello.py
       - name: Diagnostics on failure
