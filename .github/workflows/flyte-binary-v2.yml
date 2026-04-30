@@ -185,6 +185,12 @@ jobs:
         run: |
           mkdir -p /tmp/cpu-oci
           tar -xf /tmp/cpu-oci.tar -C /tmp/cpu-oci
+      - name: Upload CPU OCI archive for integration test
+        uses: actions/upload-artifact@v4
+        with:
+          name: devbox-cpu-oci
+          path: /tmp/cpu-oci.tar
+          retention-days: 1
       - name: Push CPU multi-arch image
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: docker/build-push-action@v6
@@ -225,3 +231,69 @@ jobs:
           push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
           cache-from: type=gha,scope=demo-gpu
           cache-to: type=gha,mode=max,scope=demo-gpu
+
+  devbox-integration-test:
+    runs-on: ubuntu-latest
+    needs: [build-and-push-devbox-bundled-image]
+    timeout-minutes: 25
+    env:
+      DEVBOX_IMAGE: flyte-devbox:ci
+      FLYTE_WORKER_IMAGE: ghcr.io/flyteorg/flyte:py3.11-v2.0.0b55
+      FLYTE_SDK_VERSION: "2.0.0b55"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: devbox-cpu-oci
+          path: /tmp
+      - name: Load devbox image into Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y skopeo
+          mkdir -p /tmp/cpu-oci
+          tar -xf /tmp/cpu-oci.tar -C /tmp/cpu-oci
+          skopeo copy --override-os linux --override-arch amd64 \
+            oci:/tmp/cpu-oci docker-daemon:${{ env.DEVBOX_IMAGE }}
+          docker images ${{ env.DEVBOX_IMAGE }}
+      - name: Start devbox cluster
+        run: ./runs/test/devbox/start-devbox.sh
+      - name: Pre-pull worker image into k3s containerd
+        # Avoids the in-cluster pull dominating the test budget when the run is submitted.
+        run: docker exec flyte-devbox crictl pull ${{ env.FLYTE_WORKER_IMAGE }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install flyte SDK
+        run: pip install "flyte==${{ env.FLYTE_SDK_VERSION }}"
+      - name: Configure SDK
+        run: |
+          mkdir -p "$HOME/.flyte"
+          cat > "$HOME/.flyte/config.yaml" <<'EOF'
+          admin:
+            endpoint: dns:///localhost:30080
+            insecure: true
+          task:
+            domain: development
+            project: flytesnacks
+            org: localhost
+          image:
+            builder: local
+          EOF
+      - name: Submit task and wait for SUCCEEDED
+        run: python runs/test/devbox/hello.py
+      - name: Diagnostics on failure
+        if: failure()
+        run: |
+          echo "::group::docker logs"
+          docker logs flyte-devbox 2>&1 | tail -200 || true
+          echo "::endgroup::"
+          echo "::group::pods"
+          kubectl get pods -A || true
+          echo "::endgroup::"
+          echo "::group::flyte-binary logs"
+          kubectl logs -n flyte deploy/flyte-binary --tail=500 || true
+          echo "::endgroup::"
+          echo "::group::describe failing pods"
+          kubectl get pods -A --no-headers | awk '$4 != "Running" && $4 != "Completed"' \
+            | while read ns name _; do kubectl describe pod -n "$ns" "$name" || true; done
+          echo "::endgroup::"
