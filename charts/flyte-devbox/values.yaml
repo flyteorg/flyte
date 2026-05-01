@@ -141,6 +141,8 @@ rustfs:
       enabled: true
     distributed:
       enabled: false
+  ingress:
+    enabled: false
   image:
     repository: rustfs/rustfs
     tag: sandbox

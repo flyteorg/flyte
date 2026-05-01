@@ -9064,38 +9064,6 @@ spec:
         path: /flyteidl2.
         pathType: Prefix
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  annotations:
-    nginx.ingress.kubernetes.io/affinity: cookie
-    nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    nginx.ingress.kubernetes.io/session-cookie-expires: "3600"
-    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
-    nginx.ingress.kubernetes.io/session-cookie-max-age: "3600"
-    nginx.ingress.kubernetes.io/session-cookie-name: rustfs
-  labels:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: rustfs
-    app.kubernetes.io/version: 1.0.0-alpha.94
-    helm.sh/chart: rustfs-0.0.94
-  name: rustfs
-  namespace: flyte
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: example.rustfs.com
-    http:
-      paths:
-      - backend:
-          service:
-            name: rustfs-svc
-            port:
-              name: console
-        path: /
-        pathType: Prefix
----
 apiVersion: security.istio.io/v1beta1
 kind: PeerAuthentication
 metadata:
