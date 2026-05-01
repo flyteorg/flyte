@@ -153,6 +153,12 @@ If you need an enterprise-ready, production-grade backend for Flyte 2 today, it 
 
 We welcome contributions! See the [Backend README](docs/BACKEND_README.md) for backend development, or join us on [slack.flyte.org](https://slack.flyte.org).
 
+## Sponsors
+
+CI container image builds for this repository are sponsored by [Depot](https://depot.dev) — fast, native multi-arch Docker builds with persistent layer caching.
+
+[![Built with Depot](https://img.shields.io/badge/Built%20with-Depot-7c3aed?style=for-the-badge&logo=docker&logoColor=white)](https://depot.dev)
+
 ## License
 
 Apache 2.0 — see [LICENSE](LICENSE).

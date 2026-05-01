@@ -19,9 +19,10 @@ Before contributing, ensure you have:
 - [Buf CLI](https://buf.build/docs/installation) installed
 - Go 1.24.6 or later
 - Node.js and npm (for TypeScript)
-- Python 3.9+ with `uv` package manager
+- Python 3.10+ with `uv` package manager
 - Rust toolchain (if working with Rust bindings)
 - Git configured with your name and email
+- Docker (for building and running the devbox image)
 
 ### Setting Up Your Environment
 
@@ -43,6 +44,87 @@ Before contributing, ensure you have:
    make docker-pull   # Pull the docker image for generation
    make gen
    ```
+
+## Running Flyte Locally
+
+The fastest way to run a full Flyte stack on your machine is the bundled **devbox** — a k3d-based Kubernetes cluster with all dependencies (TaskAction CRD, Knative, PostgreSQL, etc.) pre-installed — combined with a locally-running `flyte-manager` binary.
+
+### Start the Flyte Devbox
+
+From the repo root:
+
+```bash
+# Build the devbox image (first time only, or after Dockerfile changes)
+make devbox-build
+
+# Start the devbox cluster in dev mode (required for running the manager locally)
+make devbox-run FLYTE_DEV=true
+
+# Stop the devbox when you're done
+make devbox-stop
+```
+
+`FLYTE_DEV=true` is required when you intend to run the manager locally — it disables the in-cluster manager so your local process can take over. `make devbox-run` writes a kubeconfig pointing at the devbox cluster in global kubeconfig, so `kubectl` will target it automatically.
+
+### Build and Run the Manager
+
+With the devbox running, start the manager locally:
+
+```bash
+# From the repo root
+make -C manager run
+
+# Or from manager/
+make run
+
+# Or build and run the binary directly
+cd manager
+make build
+./bin/flyte-manager --config config.yaml
+```
+
+The manager will:
+1. Connect to PostgreSQL and run database migrations
+2. Start all services in parallel goroutines
+3. Connect to your Kubernetes cluster
+4. Begin reconciling TaskAction CRs
+
+### Configuration
+
+Edit `manager/config.yaml`:
+
+```yaml
+manager:
+  # Single server port hosting all Connect services (Runs, Actions, DataProxy, Events, Cache, Secret, App).
+  server:
+    host: "0.0.0.0"
+    port: 8090
+
+  executor:
+    healthProbePort: 8081
+
+  kubernetes:
+    namespace: "flyte"
+    # Optional: specify custom kubeconfig path
+    # kubeconfig: "/path/to/kubeconfig"
+
+runs:
+  storagePrefix: "s3://flyte-data"
+  database:
+    postgres:
+      host: "localhost"
+      port: 30001
+      dbname: "runs"
+      username: "postgres"
+      password: "postgres"
+      options: "sslmode=disable"
+
+logger:
+  level: 4  # Info level
+  show-source: true
+```
+
+See [`manager/README.md`](manager/README.md) for the full architecture, API endpoints, and troubleshooting tips.
 
 ## Development Workflow
 

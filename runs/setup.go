@@ -88,11 +88,6 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(taskPath, taskHandler)
 	logger.Infof(ctx, "Mounted TaskService at %s", taskPath)
 
-	translatorSvc := service.NewTranslatorService()
-	translatorPath, translatorHandler := workflowconnect.NewTranslatorServiceHandler(translatorSvc)
-	sc.Mux.Handle(translatorPath, translatorHandler)
-	logger.Infof(ctx, "Mounted TranslatorService at %s", translatorPath)
-
 	identitySvc := service.NewIdentityService()
 	identityPath, identityHandler := authconnect.NewIdentityServiceHandler(identitySvc)
 	sc.Mux.Handle(identityPath, identityHandler)

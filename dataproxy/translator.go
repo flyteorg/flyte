@@ -1,30 +1,28 @@
-package service
+package dataproxy
 
 import (
 	"context"
 
 	"connectrpc.com/connect"
 
+	"github.com/flyteorg/flyte/v2/dataproxy/converter"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
-	"github.com/flyteorg/flyte/v2/runs/service/converter"
 )
 
 // TranslatorService implements the TranslatorServiceHandler interface for translating
-// between Flyte literals and JSON representations.
+// between Flyte literals and JSON representations. It is served from the dataproxy
+// binary so that translation requests do not transit the control plane.
 type TranslatorService struct {
 	workflowconnect.UnimplementedTranslatorServiceHandler
 }
 
-// NewTranslatorService creates a new TranslatorService instance.
 func NewTranslatorService() *TranslatorService {
 	return &TranslatorService{}
 }
 
-// Ensure we implement the interface
 var _ workflowconnect.TranslatorServiceHandler = (*TranslatorService)(nil)
 
-// LiteralsToLaunchFormJson converts a list of NamedLiterals to an RSJF-compliant JSON schema.
 func (s *TranslatorService) LiteralsToLaunchFormJson(
 	ctx context.Context,
 	req *connect.Request[workflow.LiteralsToLaunchFormJsonRequest],
@@ -33,11 +31,9 @@ func (s *TranslatorService) LiteralsToLaunchFormJson(
 	if err != nil {
 		return nil, err
 	}
-
 	return connect.NewResponse(&workflow.LiteralsToLaunchFormJsonResponse{Json: schema}), nil
 }
 
-// LaunchFormJsonToLiterals converts an RSJF JSON schema to a list of NamedLiterals.
 func (s *TranslatorService) LaunchFormJsonToLiterals(
 	ctx context.Context,
 	req *connect.Request[workflow.LaunchFormJsonToLiteralsRequest],
@@ -46,13 +42,9 @@ func (s *TranslatorService) LaunchFormJsonToLiterals(
 	if err != nil {
 		return nil, err
 	}
-
-	return connect.NewResponse(&workflow.LaunchFormJsonToLiteralsResponse{
-		Literals: literals,
-	}), nil
+	return connect.NewResponse(&workflow.LaunchFormJsonToLiteralsResponse{Literals: literals}), nil
 }
 
-// TaskSpecToLaunchFormJson converts a TaskSpec to an RSJF-compliant JSON schema.
 func (s *TranslatorService) TaskSpecToLaunchFormJson(
 	ctx context.Context,
 	req *connect.Request[workflow.TaskSpecToLaunchFormJsonRequest],
@@ -61,12 +53,9 @@ func (s *TranslatorService) TaskSpecToLaunchFormJson(
 	if err != nil {
 		return nil, err
 	}
-
 	return connect.NewResponse(&workflow.TaskSpecToLaunchFormJsonResponse{Json: schema}), nil
 }
 
-// JsonValuesToLiterals converts raw JSON values and type definitions (VariableMap)
-// into NamedLiterals.
 func (s *TranslatorService) JsonValuesToLiterals(
 	ctx context.Context,
 	req *connect.Request[workflow.JsonValuesToLiteralsRequest],
@@ -75,8 +64,5 @@ func (s *TranslatorService) JsonValuesToLiterals(
 	if err != nil {
 		return nil, err
 	}
-
-	return connect.NewResponse(&workflow.JsonValuesToLiteralsResponse{
-		Literals: literals,
-	}), nil
+	return connect.NewResponse(&workflow.JsonValuesToLiteralsResponse{Literals: literals}), nil
 }
