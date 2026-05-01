@@ -9,7 +9,6 @@ jobs:
   git-town:
     name: Display the branch stack
     runs-on: ubuntu-latest
-    if: github.event.pull_request.head.repo.full_name == github.repository
 
     permissions:
       contents: read
