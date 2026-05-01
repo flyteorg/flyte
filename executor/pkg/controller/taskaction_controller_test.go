@@ -49,8 +49,10 @@ type fakePlugin struct {
 	abortCalls int
 }
 
-func (f *fakePlugin) GetID() string                              { return f.id }
-func (f *fakePlugin) GetProperties() pluginsCore.PluginProperties { return pluginsCore.PluginProperties{} }
+func (f *fakePlugin) GetID() string { return f.id }
+func (f *fakePlugin) GetProperties() pluginsCore.PluginProperties {
+	return pluginsCore.PluginProperties{}
+}
 func (f *fakePlugin) Handle(_ context.Context, _ pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
 	return pluginsCore.UnknownTransition, nil
 }
@@ -540,8 +542,8 @@ var _ = Describe("TaskAction Controller", func() {
 		BeforeEach(func() {
 			resource := &flyteorgv1.TaskAction{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      abortResourceName,
-					Namespace: "default",
+					Name:       abortResourceName,
+					Namespace:  "default",
 					Finalizers: []string{taskActionFinalizer},
 				},
 				Spec: flyteorgv1.TaskActionSpec{

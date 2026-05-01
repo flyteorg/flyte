@@ -98,7 +98,7 @@ func AddRequiredNodeSelectorRequirements(base *v1.Affinity, new ...v1.NodeSelect
 			nst.MatchExpressions = append(nst.MatchExpressions, new...)
 		}
 	} else {
-		base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{v1.NodeSelectorTerm{MatchExpressions: new}}
+		base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{{MatchExpressions: new}}
 	}
 }
 

@@ -102,7 +102,6 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		var mu sync.Mutex
 		var wg sync.WaitGroup
 		for _, absPath := range absPaths {
-			absPath := absPath
 
 			wg.Add(1)
 			go func() {

@@ -215,11 +215,12 @@ func checkTolerations(t *testing.T, res client.Object, gpuTol v1.Toleration) {
 	// Assert user-specified tolerations don't get overridden
 	assert.Len(t, res.(*v1.Pod).Spec.Tolerations, 2)
 	for _, tol := range res.(*v1.Pod).Spec.Tolerations {
-		if tol.Key == "my toleration key" {
+		switch tol.Key {
+		case "my toleration key":
 			assert.Equal(t, tol.Value, "my toleration value")
-		} else if tol.Key == gpuTol.Key {
+		case gpuTol.Key:
 			assert.Equal(t, tol, gpuTol)
-		} else {
+		default:
 			t.Fatalf("unexpected toleration [%+v]", tol)
 		}
 	}
@@ -614,7 +615,7 @@ func TestBuildSidecarResource_ExtendedResources(t *testing.T) {
 			[]v1.NodeSelectorTerm{
 				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-node-label",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-t4"},
@@ -654,12 +655,12 @@ func TestBuildSidecarResource_ExtendedResources(t *testing.T) {
 			[]v1.NodeSelectorTerm{
 				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-node-label",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-a100"},
 						},
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-partition-size",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"1g.5gb"},
