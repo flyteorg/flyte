@@ -90,30 +90,14 @@ jobs:
       - name: Set short Git SHA as tag
         run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-      - name: Build multi-arch image (PR)
-        if: github.event_name == 'pull_request'
+      - name: Build and push images
         uses: docker/bake-action@v7
         with:
           source: .
           files: docker/docker-bake.hcl
+          push: ${{ github.event_name == 'push' }}
           targets: ${{ matrix.target }}
           set: |
-            *.platform=${{ matrix.platforms }}
             *.args.tags="ghcr.io/flyteorg/flyte/${{ matrix.target }}:${{ env.SHORT_SHA }}"
             *.cache-from=type=gha,scope=${{ matrix.target }}-${{ matrix.platforms }}
-            *.cache-to=type=gha,mode=max,scope=${{ matrix.target }}-${{ matrix.platforms }}  
-
-      - name: Build and push images
-        if: github.event_name == 'push'
-        uses: docker/bake-action@v7
-        with:
-          source: .
-          files: docker/docker-bake.hcl
-          push: true
-          targets: ${{ matrix.target }}
-          set: |
-             *.platform=${{ matrix.platforms }}
-             *.args.tags="ghcr.io/flyteorg/flyte/${{ matrix.target }}:${{ env.SHORT_SHA }}"
-             *.cache-from=type=gha,scope=${{ matrix.target }}-${{ matrix.platforms }}
-             *.cache-to=type=gha,mode=max,scope=${{ matrix.target }}-${{ matrix.platforms }}
-             
+            *.cache-to=type=gha,mode=max,scope=${{ matrix.target }}-${{ matrix.platforms }}
