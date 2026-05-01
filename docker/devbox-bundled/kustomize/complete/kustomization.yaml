@@ -83,4 +83,33 @@ patches:
       name: net-istio-controller
       namespace: knative-serving
     $patch: delete
+- patch: |-
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: config-istio
+      namespace: knative-serving
+    data:
+      local-gateway.knative-serving.knative-local-gateway: kourier-internal.kourier-system.svc.cluster.local
+- patch: |-
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: knative-local-gateway
+      namespace: istio-system
+    $patch: delete
+- patch: |-
+    apiVersion: networking.istio.io/v1beta1
+    kind: Gateway
+    metadata:
+      name: knative-local-gateway
+      namespace: knative-serving
+    $patch: delete
+- patch: |-
+    apiVersion: networking.istio.io/v1beta1
+    kind: Gateway
+    metadata:
+      name: knative-ingress-gateway
+      namespace: knative-serving
+    $patch: delete
 

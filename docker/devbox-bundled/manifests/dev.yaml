@@ -7057,6 +7057,19 @@ spec:
       status: {}
 ---
 apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/version: 1.0.0-alpha.94
+    helm.sh/chart: rustfs-0.0.94
+  name: flyte-devbox-rustfs
+  namespace: flyte
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
@@ -7548,6 +7561,22 @@ metadata:
 ---
 apiVersion: v1
 data:
+  RUSTFS_ADDRESS: :9000
+  RUSTFS_CONSOLE_ADDRESS: :9001
+  RUSTFS_CONSOLE_ENABLE: "true"
+  RUSTFS_OBS_ENVIRONMENT: development
+  RUSTFS_OBS_LOG_DIRECTORY: /logs
+  RUSTFS_OBS_LOGGER_LEVEL: info
+  RUSTFS_REGION: us-east-1
+  RUSTFS_VOLUMES: http://flyte-devbox-rustfs-{0...3}.flyte-devbox-rustfs-headless.flyte.svc.cluster.local:9000/data/rustfs{0...3}
+kind: ConfigMap
+metadata:
+  labels: {}
+  name: flyte-devbox-rustfs-config
+  namespace: flyte
+---
+apiVersion: v1
+data:
   max-scale: "1"
 kind: ConfigMap
 metadata:
@@ -7648,7 +7677,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  local-gateway.knative-serving.knative-local-gateway: knative-local-gateway.istio-system.svc.cluster.local
+  local-gateway.knative-serving.knative-local-gateway: kourier-internal.kourier-system.svc.cluster.local
 kind: ConfigMap
 metadata:
   labels:
@@ -7739,6 +7768,17 @@ metadata:
     heritage: Helm
     release: flyte-devbox
   name: docker-registry-secret
+  namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+data:
+  RUSTFS_ACCESS_KEY: cnVzdGZzYWRtaW4=
+  RUSTFS_SECRET_KEY: cnVzdGZzYWRtaW4=
+kind: Secret
+metadata:
+  labels: {}
+  name: flyte-devbox-rustfs-secret
   namespace: flyte
 type: Opaque
 ---
@@ -7884,6 +7924,53 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/version: 1.0.0-alpha.94
+    helm.sh/chart: rustfs-0.0.94
+  name: flyte-devbox-rustfs-headless
+  namespace: flyte
+spec:
+  clusterIP: None
+  ports:
+  - name: endpoint
+    port: 9000
+  - name: console
+    port: 9001
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/name: rustfs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/version: 1.0.0-alpha.94
+    helm.sh/chart: rustfs-0.0.94
+  name: flyte-devbox-rustfs-svc
+  namespace: flyte
+spec:
+  ports:
+  - name: endpoint
+    port: 9000
+    targetPort: 9000
+  - name: console
+    port: 9001
+    targetPort: 9001
+  selector:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/name: rustfs
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
     app.kubernetes.io/name: embedded-postgresql
   name: postgresql
   namespace: flyte
@@ -7916,29 +8003,6 @@ spec:
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/name: rustfs
   type: NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/component: net-istio
-    app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.18.1
-    experimental.istio.io/disable-gateway-port-translation: "true"
-    networking.knative.dev/ingress-provider: istio
-  name: knative-local-gateway
-  namespace: istio-system
-spec:
-  ports:
-  - name: http2
-    port: 80
-    targetPort: 8081
-  - name: https
-    port: 443
-    targetPort: 8444
-  selector:
-    istio: ingressgateway
-  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -8794,6 +8858,197 @@ spec:
       serviceAccountName: controller
       terminationGracePeriodSeconds: 300
 ---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/version: 1.0.0-alpha.94
+    helm.sh/chart: rustfs-0.0.94
+  name: flyte-devbox-rustfs
+  namespace: flyte
+spec:
+  podManagementPolicy: Parallel
+  replicas: 4
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: flyte-devbox
+      app.kubernetes.io/name: rustfs
+  serviceName: flyte-devbox-rustfs-headless
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: flyte-devbox
+        app.kubernetes.io/name: rustfs
+    spec:
+      affinity:
+        nodeAffinity: {}
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                - rustfs
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - command:
+        - /usr/bin/rustfs
+        envFrom:
+        - configMapRef:
+            name: flyte-devbox-rustfs-config
+        - secretRef:
+            name: flyte-devbox-rustfs-secret
+        image: rustfs/rustfs:1.0.0-alpha.94
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: endpoint
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: rustfs
+        ports:
+        - containerPort: 9000
+          name: endpoint
+        - containerPort: 9001
+          name: console
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health/ready
+            port: endpoint
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+        volumeMounts:
+        - mountPath: /logs
+          name: logs
+          subPath: logs
+        - mountPath: /data/rustfs0
+          name: data-rustfs-0
+        - mountPath: /data/rustfs1
+          name: data-rustfs-1
+        - mountPath: /data/rustfs2
+          name: data-rustfs-2
+        - mountPath: /data/rustfs3
+          name: data-rustfs-3
+      enableServiceLinks: false
+      imagePullSecrets: []
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - |
+          if [ "$REPLICA_COUNT" -eq 4 ]; then
+            for i in $(seq 0 $(($REPLICA_COUNT - 1))); do
+              mkdir -p /data/rustfs$i
+            done;
+          elif [ "$REPLICA_COUNT" -eq 16 ]; then
+            mkdir -p /data
+          fi
+          mkdir -p /mnt/rustfs/logs
+          chmod 755 /mnt/rustfs/logs
+        env:
+        - name: REPLICA_COUNT
+          value: "4"
+        image: busybox:stable
+        imagePullPolicy: IfNotPresent
+        name: init-step
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+        volumeMounts:
+        - mountPath: /data/rustfs0
+          name: data-rustfs-0
+        - mountPath: /data/rustfs1
+          name: data-rustfs-1
+        - mountPath: /data/rustfs2
+          name: data-rustfs-2
+        - mountPath: /data/rustfs3
+          name: data-rustfs-3
+        - mountPath: /mnt/rustfs
+          name: logs
+      securityContext:
+        fsGroup: 10001
+        runAsGroup: 10001
+        runAsUser: 10001
+  volumeClaimTemplates:
+  - metadata:
+      annotations: null
+      labels: {}
+      name: logs
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 256Mi
+      storageClassName: local-path
+  - metadata:
+      annotations: null
+      labels: {}
+      name: data-rustfs-0
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 256Mi
+      storageClassName: local-path
+  - metadata:
+      annotations: null
+      labels: {}
+      name: data-rustfs-1
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 256Mi
+      storageClassName: local-path
+  - metadata:
+      annotations: null
+      labels: {}
+      name: data-rustfs-2
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 256Mi
+      storageClassName: local-path
+  - metadata:
+      annotations: null
+      labels: {}
+      name: data-rustfs-3
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 256Mi
+      storageClassName: local-path
+---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -8898,48 +9153,6 @@ spec:
   - data-plane.knative.dev
   secretName: routing-serving-certs
 ---
-apiVersion: networking.istio.io/v1beta1
-kind: Gateway
-metadata:
-  labels:
-    app.kubernetes.io/component: net-istio
-    app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.18.1
-    networking.knative.dev/ingress-provider: istio
-  name: knative-ingress-gateway
-  namespace: knative-serving
-spec:
-  selector:
-    istio: ingressgateway
-  servers:
-  - hosts:
-    - '*'
-    port:
-      name: http
-      number: 80
-      protocol: HTTP
----
-apiVersion: networking.istio.io/v1beta1
-kind: Gateway
-metadata:
-  labels:
-    app.kubernetes.io/component: net-istio
-    app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.18.1
-    networking.knative.dev/ingress-provider: istio
-  name: knative-local-gateway
-  namespace: knative-serving
-spec:
-  selector:
-    istio: ingressgateway
-  servers:
-  - hosts:
-    - '*'
-    port:
-      name: http
-      number: 8081
-      protocol: HTTP
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -9000,6 +9213,38 @@ spec:
         path: /flyteidl2.
         pathType: Prefix
 ---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "3600"
+    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "3600"
+    nginx.ingress.kubernetes.io/session-cookie-name: rustfs
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/version: 1.0.0-alpha.94
+    helm.sh/chart: rustfs-0.0.94
+  name: flyte-devbox-rustfs
+  namespace: flyte
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: example.rustfs.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: flyte-devbox-rustfs-svc
+            port:
+              name: console
+        path: /
+        pathType: Prefix
+---
 apiVersion: security.istio.io/v1beta1
 kind: PeerAuthentication
 metadata:
@@ -9035,6 +9280,32 @@ spec:
   selector:
     matchLabels:
       app: webhook
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    helm.sh/hook: test
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/version: 1.0.0-alpha.94
+    helm.sh/chart: rustfs-0.0.94
+  name: flyte-devbox-rustfs-test-connection
+  namespace: flyte
+spec:
+  containers:
+  - args:
+    - -O
+    - /dev/null
+    - flyte-devbox-rustfs-svc:9000/health
+    command:
+    - wget
+    image: busybox:stable
+    imagePullPolicy: IfNotPresent
+    name: wget
+  restartPolicy: Never
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
