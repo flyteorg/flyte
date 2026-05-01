@@ -61,7 +61,7 @@ jobs:
         with:
           files: docker/docker-bake.hcl
           target: default
-          fields: platforms
+
   build-and-push:
     needs: prepare
     runs-on: ${{ startsWith(matrix.platforms, 'linux/arm') && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
