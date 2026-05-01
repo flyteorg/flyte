@@ -715,6 +715,7 @@ data:
   resource_manager.yaml: | 
     propeller:
       resourcemanager:
+        redis: null
         type: noop
   storage.yaml: | 
     storage:
@@ -7227,7 +7228,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "a7f80c4bc2e56c53048e7fdda25f8c153b8f22ee6cfbb8bc7fe0d0d6855a0c3"
+        configChecksum: "d32e90ba21c593bb965c40e3ca48de856a3df06dec72a42212308fdcc91883e"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -7305,7 +7306,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.16.6
       annotations:
-        configChecksum: "a7f80c4bc2e56c53048e7fdda25f8c153b8f22ee6cfbb8bc7fe0d0d6855a0c3"
+        configChecksum: "d32e90ba21c593bb965c40e3ca48de856a3df06dec72a42212308fdcc91883e"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:
