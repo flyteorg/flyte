@@ -7,7 +7,11 @@ on:
     paths:
       - 'gen.Dockerfile'
       - '.github/workflows/build-ci-image.yml'
-  pull_request:
+  # SECURITY: pull_request_target runs in the BASE repo context so repo
+  # variables (vars.DEPOT_PROJECT_ID) are available for fork PRs. The
+  # checkout below pins to the PR head SHA so fork-authored Dockerfile
+  # content is what gets built. Image push tag is namespaced to pr-<N>.
+  pull_request_target:
     paths:
       - 'gen.Dockerfile'
       - '.github/workflows/build-ci-image.yml'
@@ -38,6 +42,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
 
       - name: Validate Depot project id
         run: |
@@ -77,7 +84,7 @@ jobs:
       - name: Set image tag output
         id: set-tag
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
+          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
             echo "tag=pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
           elif [ "${{ github.ref }}" == "refs/heads/v2" ]; then
             echo "tag=v2" >> $GITHUB_OUTPUT
@@ -106,7 +113,7 @@ jobs:
         run: echo "Image built with digest ${{ steps.build.outputs.digest }}"
 
       - name: Comment on PR with image tag
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
         uses: actions/github-script@v7
         with:
           script: |
