@@ -122,6 +122,13 @@ build: sync-crds flyte dep_update manifests
 		$(BUILDX_CACHE_FLAGS) \
 		--tag flyte-devbox:latest .
 
+.PHONY: build-rootless
+build-rootless: sync-crds flyte dep_update manifests
+	docker buildx build --builder flyte-devbox --load \
+		$(BUILDX_CACHE_FLAGS) \
+		--file Dockerfile.rootless \
+		--tag flyte-devbox:rootless-latest .
+
 .PHONY: build-gpu
 build-gpu: build
 	docker buildx build --builder flyte-devbox --load \

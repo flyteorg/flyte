@@ -1,0 +1,153 @@
+# syntax=docker/dockerfile:1.4-labs
+#
+# Rootless devbox variant.
+#
+# Differences vs. the rootful Dockerfile:
+#   - Base is debian (not rancher/k3s) so we can install slirp4netns,
+#     newuidmap/newgidmap, fuse-overlayfs and k3s side by side.
+#   - Runs k3s as the unprivileged `flyte` user via `k3s server --rootless`.
+#   - Uses the `native` containerd snapshotter — `/dev/fuse` is not exposed in
+#     locked-down pod runtimes (e.g. Knative on managed k8s), so fuse-overlayfs
+#     would not work. `native` copies image layers; slower, but no FUSE needed.
+#   - Designed to run in a Knative pod with no privileged/SYS_ADMIN/NET_ADMIN
+#     capabilities — only standard Linux caps + unprivileged user namespaces.
+
+FROM --platform=${BUILDPLATFORM} quay.io/skopeo/stable AS builder
+
+ARG TARGETARCH
+ENV TARGETARCH "${TARGETARCH}"
+
+WORKDIR /build
+
+COPY images/manifest.txt images/preload ./
+RUN ./preload manifest.txt
+
+
+FROM --platform=${BUILDPLATFORM} golang:1.24-bullseye AS bootstrap
+
+ARG TARGETARCH
+ENV CGO_ENABLED 0
+ENV GOARCH "${TARGETARCH}"
+ENV GOOS linux
+
+WORKDIR /flyteorg/build
+COPY bootstrap/go.mod bootstrap/go.sum ./
+RUN go mod download
+COPY bootstrap/ ./
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
+    go build -o dist/flyte-devbox-bootstrap cmd/bootstrap/main.go && \
+    go build -o dist/embedded-postgres cmd/embedded-postgres/main.go
+
+
+FROM debian:bookworm-slim AS pg-cache
+
+ARG TARGETARCH
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl unzip xz-utils ca-certificates && rm -rf /var/lib/apt/lists/*
+
+RUN set -ex; \
+    ARCH=$([ "$TARGETARCH" = "arm64" ] && echo "arm64v8" || echo "amd64"); \
+    PG_VERSION="16.9.0"; \
+    CACHE_FILE="embedded-postgres-binaries-linux-${ARCH}-${PG_VERSION}.txz"; \
+    mkdir -p /cache /glibc-libs; \
+    curl -fL "https://repo1.maven.org/maven2/io/zonky/test/postgres/embedded-postgres-binaries-linux-${ARCH}/${PG_VERSION}/embedded-postgres-binaries-linux-${ARCH}-${PG_VERSION}.jar" -o /tmp/pg.jar; \
+    unzip -p /tmp/pg.jar "*.txz" > "/cache/${CACHE_FILE}"; \
+    rm -f /tmp/pg.jar; \
+    mkdir -p /tmp/pg-tmp && tar xJf "/cache/${CACHE_FILE}" -C /tmp/pg-tmp/; \
+    for bin in /tmp/pg-tmp/bin/*; do \
+        ldd "$bin" 2>/dev/null | grep "=>" | awk '{print $3}' | while read lib; do \
+            [ -f "$lib" ] && cp -n "$lib" /glibc-libs/ 2>/dev/null || true; \
+        done; \
+    done; \
+    cp /lib/ld-linux-aarch64.so.1 /glibc-libs/ 2>/dev/null || true; \
+    cp /lib/aarch64-linux-gnu/ld-linux-aarch64.so.1 /glibc-libs/ 2>/dev/null || true; \
+    cp /lib64/ld-linux-x86-64.so.2 /glibc-libs/ 2>/dev/null || true; \
+    cp /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /glibc-libs/ 2>/dev/null || true; \
+    rm -rf /tmp/pg-tmp
+
+
+# ---- Final rootless image ----
+FROM debian:bookworm-slim
+
+ARG TARGETARCH
+ARG K3S_VERSION=v1.34.6+k3s1
+ARG FLYTE_DEVBOX_VERSION
+ENV FLYTE_DEVBOX_VERSION "${FLYTE_DEVBOX_VERSION}"
+
+# Packages needed for rootless k3s:
+#   - slirp4netns: rootless networking
+#   - fuse-overlayfs: not actually used (we use native snapshotter), but kept
+#     installed so users on FUSE-capable runtimes can switch via env var
+#   - uidmap: provides newuidmap/newgidmap for sub-uid mapping
+#   - iptables / nftables: required by kube-proxy and network policy
+#   - kmod, conntrack, ethtool, socat: standard k3s host deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        iptables \
+        nftables \
+        ipset \
+        conntrack \
+        ethtool \
+        socat \
+        kmod \
+        uidmap \
+        slirp4netns \
+        fuse-overlayfs \
+        procps \
+        xz-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install k3s binary
+RUN set -ex; \
+    K3S_ARCH=$([ "$TARGETARCH" = "arm64" ] && echo "-arm64" || echo ""); \
+    curl -fL "https://github.com/k3s-io/k3s/releases/download/${K3S_VERSION}/k3s${K3S_ARCH}" -o /usr/local/bin/k3s; \
+    chmod +x /usr/local/bin/k3s; \
+    ln -sf /usr/local/bin/k3s /usr/local/bin/kubectl; \
+    ln -sf /usr/local/bin/k3s /usr/local/bin/crictl; \
+    ln -sf /usr/local/bin/k3s /usr/local/bin/ctr
+
+# Create the unprivileged flyte user with sub-uid/sub-gid ranges so newuidmap
+# can map a /etc/subuid range into the userns. 100000:65536 gives ~64k uids,
+# enough for any pod. The UID 1000 is conventional for the first non-root user.
+RUN groupadd --gid 1000 flyte && \
+    useradd --uid 1000 --gid 1000 --create-home --shell /bin/bash flyte && \
+    echo "flyte:100000:65536" > /etc/subuid && \
+    echo "flyte:100000:65536" > /etc/subgid
+
+# Install bootstrap, embedded postgres, pre-cached PG binaries and glibc shim.
+COPY --from=bootstrap /flyteorg/build/dist/flyte-devbox-bootstrap /usr/local/bin/
+COPY --from=bootstrap /flyteorg/build/dist/embedded-postgres /usr/local/bin/
+COPY --from=pg-cache /cache/ /var/cache/embedded-postgres/
+COPY --from=pg-cache /glibc-libs/ /usr/lib/pg-glibc/
+
+# Stage k3s air-gapped images and manifests under the flyte user's home so
+# rootless k3s (which uses ~/.rancher/k3s/...) can pick them up.
+COPY --from=builder /build/images/ /home/flyte/.rancher/k3s/agent/images/
+COPY images/tar/${TARGETARCH}/ /home/flyte/.rancher/k3s/agent/images/
+COPY manifests/ /home/flyte/.rancher/k3s/server/manifests-staging/
+COPY bin/ /usr/local/bin/
+
+# postgres user (embedded-postgres library uses uid 999) and dynamic-linker symlinks.
+RUN set -ex; \
+    for f in /usr/lib/pg-glibc/ld-linux-aarch64*; do \
+      [ -f "$f" ] && ln -sf "$f" /lib/$(basename "$f"); \
+    done 2>/dev/null; \
+    for f in /usr/lib/pg-glibc/ld-linux-x86-64*; do \
+      [ -f "$f" ] && mkdir -p /lib64 && ln -sf "$f" /lib64/$(basename "$f"); \
+    done 2>/dev/null; \
+    groupadd --gid 999 postgres && useradd --uid 999 --gid 999 --shell /bin/sh postgres; \
+    chown -R flyte:flyte /home/flyte /var/cache/embedded-postgres
+
+ENV LD_LIBRARY_PATH="/usr/lib/pg-glibc"
+ENV SSL_CERT_DIR=/var/lib/flyte/config/ca-certificates
+ENV HOME=/home/flyte
+ENV XDG_RUNTIME_DIR=/home/flyte/.run
+
+VOLUME /var/lib/flyte/storage
+
+USER flyte
+WORKDIR /home/flyte
+
+ENTRYPOINT [ "/usr/local/bin/k3d-entrypoint-rootless.sh" ]
+CMD [ "server", "--disable=servicelb", "--disable=metrics-server", "--snapshotter=native" ]
