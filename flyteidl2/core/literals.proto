@@ -202,6 +202,12 @@ message KeyValuePair {
 // all are unset, no backoff is applied (retries fire immediately). An unset
 // factor is interpreted as 1.0 (constant delay).
 message Backoff {
+  option (buf.validate.message).cel = {
+    id: "backoff.cap_required_when_factor_gt_1"
+    message: "cap is required when factor > 1 to prevent unbounded retry delay growth"
+    expression: "!has(this.factor) || this.factor <= 1.0 || has(this.cap)"
+  };
+
   // Initial delay before the first retry. Must be >= 0 when set.
   google.protobuf.Duration base = 1 [(buf.validate.field).duration = {
     gte: {seconds: 0}
