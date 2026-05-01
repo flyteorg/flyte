@@ -7,10 +7,6 @@ on:
     paths:
       - 'gen.Dockerfile'
       - '.github/workflows/build-ci-image.yml'
-  # SECURITY: pull_request_target runs in the BASE repo context so repo
-  # variables (vars.DEPOT_PROJECT_ID) are available for fork PRs. The
-  # checkout below pins to the PR head SHA so fork-authored Dockerfile
-  # content is what gets built. Image push tag is namespaced to pr-<N>.
   pull_request_target:
     paths:
       - 'gen.Dockerfile'
