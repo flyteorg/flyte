@@ -19,6 +19,12 @@
 [![SDK Reference](https://img.shields.io/badge/SDK%20Reference-API-brightgreen)](https://www.union.ai/docs/v2/byoc/api-reference/flyte-sdk/)
 [![CLI Reference](https://img.shields.io/badge/CLI%20Reference-API-brightgreen)](https://www.union.ai/docs/v2/byoc/api-reference/flyte-cli/)
 
+Flyte is a Graduated project of the [LF AI & Data Foundation](https://lfaidata.foundation/projects/flyte/).
+
+<a href="https://lfaidata.foundation/projects/flyte/">
+  <img src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/readme/flyte_and_lf.png" alt="Flyte and LF AI & Data Logo" width="250">
+</a>
+
 ## Install
 
 ```bash
@@ -152,6 +158,12 @@ If you need an enterprise-ready, production-grade backend for Flyte 2 today, it 
 ## Contributing
 
 We welcome contributions! See the [Backend README](docs/BACKEND_README.md) for backend development, or join us on [slack.flyte.org](https://slack.flyte.org).
+
+## Sponsors
+
+CI container image builds for this repository are sponsored by [Depot](https://depot.dev) — fast, native multi-arch Docker builds with persistent layer caching.
+
+[![Built with Depot](https://img.shields.io/badge/Built%20with-Depot-7c3aed?style=for-the-badge&logo=docker&logoColor=white)](https://depot.dev)
 
 ## License
 

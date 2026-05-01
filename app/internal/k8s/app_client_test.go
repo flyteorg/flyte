@@ -14,6 +14,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	k8swatch "k8s.io/apimachinery/pkg/watch"
+	duckv1 "knative.dev/pkg/apis/duck/v1"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -636,5 +637,106 @@ func testKsvc(name, ns, rv string) *servingv1.Service {
 			Annotations:     map[string]string{annotationAppID: "proj/dev/" + name},
 			Labels:          map[string]string{labelAppManaged: "true"},
 		},
+	}
+}
+
+// --- Status message format tests ---
+
+func TestKserviceToStatus_Messages(t *testing.T) {
+	tests := []struct {
+		name           string
+		ksvc           func() *servingv1.Service
+		wantConditions []struct {
+			phase   flyteapp.Status_DeploymentStatus
+			message string
+		}
+	}{
+		{
+			name: "active — single Ready=True condition",
+			ksvc: func() *servingv1.Service {
+				ksvc := testKsvc("myapp", AppNamespace, "1")
+				ksvc.Status.Status = duckv1.Status{
+					Conditions: duckv1.Conditions{{
+						Type:   servingv1.ServiceConditionReady,
+						Status: corev1.ConditionTrue,
+					}},
+				}
+				return ksvc
+			},
+			wantConditions: []struct {
+				phase   flyteapp.Status_DeploymentStatus
+				message string
+			}{
+				{flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE, "Service is ready"},
+			},
+		},
+		{
+			name: "active — all three sub-conditions True",
+			ksvc: func() *servingv1.Service {
+				ksvc := testKsvc("myapp", AppNamespace, "1")
+				ksvc.Status.Status = duckv1.Status{
+					Conditions: duckv1.Conditions{
+						{Type: servingv1.ServiceConditionConfigurationsReady, Status: corev1.ConditionTrue},
+						{Type: servingv1.ServiceConditionRoutesReady, Status: corev1.ConditionTrue},
+						{Type: servingv1.ServiceConditionReady, Status: corev1.ConditionTrue},
+					},
+				}
+				return ksvc
+			},
+			wantConditions: []struct {
+				phase   flyteapp.Status_DeploymentStatus
+				message string
+			}{
+				{flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE, "Configuration is ready"},
+				{flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE, "Routes are ready"},
+				{flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE, "Service is ready"},
+			},
+		},
+		{
+			name: "deploying — RoutesReady=Unknown skipped, only Ready=Unknown emitted",
+			ksvc: func() *servingv1.Service {
+				ksvc := testKsvc("myapp", AppNamespace, "1")
+				ksvc.Status.LatestCreatedRevisionName = "myapp-00002"
+				ksvc.Status.LatestReadyRevisionName = "myapp-00001"
+				ksvc.Status.MarkRouteNotYetReady()
+				return ksvc
+			},
+			wantConditions: []struct {
+				phase   flyteapp.Status_DeploymentStatus
+				message string
+			}{
+				{flyteapp.Status_DEPLOYMENT_STATUS_PENDING, "TrafficNotMigrated: Traffic is not yet migrated to the latest revision."},
+			},
+		},
+		{
+			name: "stopped",
+			ksvc: func() *servingv1.Service {
+				ksvc := testKsvc("myapp", AppNamespace, "1")
+				if ksvc.Spec.Template.Annotations == nil {
+					ksvc.Spec.Template.Annotations = map[string]string{}
+				}
+				ksvc.Spec.Template.Annotations["autoscaling.knative.dev/max-scale"] = "0"
+				return ksvc
+			},
+			wantConditions: []struct {
+				phase   flyteapp.Status_DeploymentStatus
+				message string
+			}{
+				{flyteapp.Status_DEPLOYMENT_STATUS_STOPPED, "App scaled to zero"},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := testClient(t)
+			status := c.kserviceToStatus(context.Background(), tt.ksvc())
+			require.NotNil(t, status)
+			require.Len(t, status.Conditions, len(tt.wantConditions))
+			for i, want := range tt.wantConditions {
+				assert.Equal(t, want.phase, status.Conditions[i].DeploymentStatus, "condition[%d] phase", i)
+				assert.Equal(t, want.message, status.Conditions[i].Message, "condition[%d] message", i)
+			}
+		})
 	}
 }

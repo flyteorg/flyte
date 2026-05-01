@@ -48,7 +48,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 workflow_id: 'build-ci-image.yml',
-                event: 'pull_request',
+                event: 'pull_request_target',
                 per_page: 10
               });
 

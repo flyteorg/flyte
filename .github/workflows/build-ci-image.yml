@@ -4,11 +4,10 @@ on:
   push:
     branches:
       - main
-      - v2
     paths:
       - 'gen.Dockerfile'
       - '.github/workflows/build-ci-image.yml'
-  pull_request:
+  pull_request_target:
     paths:
       - 'gen.Dockerfile'
       - '.github/workflows/build-ci-image.yml'
@@ -22,6 +21,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}/ci
+  DEPOT_PROJECT_ID: ${{ vars.DEPOT_PROJECT_ID }}
 
 jobs:
   build:
@@ -30,6 +30,7 @@ jobs:
       contents: read
       packages: write
       pull-requests: write
+      id-token: write  # required for Depot OIDC auth
 
     outputs:
       image-tag: ${{ steps.set-tag.outputs.tag }}
@@ -37,11 +38,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Validate Depot project id
+        run: |
+          if [ -z "${DEPOT_PROJECT_ID}" ]; then
+            echo "::error::DEPOT_PROJECT_ID repo variable is not set. Add it under Settings → Secrets and variables → Actions → Variables." >&2
+            exit 1
+          fi
+
+      - name: Set up Depot
+        uses: depot/setup-action@v1
 
       - name: Log in to GitHub Container Registry
+
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -68,7 +80,7 @@ jobs:
       - name: Set image tag output
         id: set-tag
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
+          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
             echo "tag=pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
           elif [ "${{ github.ref }}" == "refs/heads/v2" ]; then
             echo "tag=v2" >> $GITHUB_OUTPUT
@@ -79,32 +91,25 @@ jobs:
           fi
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v6
+        id: build
+        uses: depot/build-push-action@v1
         with:
+          project: ${{ env.DEPOT_PROJECT_ID }}
           context: .
           file: ./gen.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # Native multi-arch on Depot — no QEMU emulation.
           platforms: linux/amd64,linux/arm64
-          # Multi-layer caching strategy for speed
-          cache-from: |
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.set-tag.outputs.tag }}
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v2
-            type=gha
-          cache-to: |
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
-            type=gha,mode=max
-          # Enable BuildKit features for better caching
-          build-args: |
-            BUILDKIT_INLINE_CACHE=1
+          # Layer cache is automatically persisted by Depot per project,
+          # so no cache-from/cache-to plumbing is needed.
 
       - name: Image digest
-        run: echo "Image built with digest ${{ steps.meta.outputs.digest }}"
+        run: echo "Image built with digest ${{ steps.build.outputs.digest }}"
 
       - name: Comment on PR with image tag
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
         uses: actions/github-script@v7
         with:
           script: |

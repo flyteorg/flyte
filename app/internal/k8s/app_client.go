@@ -18,6 +18,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	k8swatch "k8s.io/apimachinery/pkg/watch"
 	toolscache "k8s.io/client-go/tools/cache"
+	knativeapis "knative.dev/pkg/apis"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -99,6 +100,11 @@ type AppK8sClientInterface interface {
 
 	// Unsubscribe removes a subscription channel previously returned by Subscribe.
 	Unsubscribe(appName string, ch chan *flyteapp.WatchResponse)
+
+	// PublicIngress returns the deterministic public Ingress URL for the given app,
+	// matching Knative's domain-template so Kourier routes traffic correctly.
+	// Returns nil if BaseDomain is not configured.
+	PublicIngress(id *flyteapp.Identifier) *flyteapp.Ingress
 }
 
 // AppK8sClient implements AppK8sClientInterface using controller-runtime.
@@ -288,13 +294,15 @@ func isManagedKService(ksvc *servingv1.Service) bool {
 	return ksvc.Labels[labelAppManaged] == "true"
 }
 
-// handleKServiceEvent converts a KService event into a WatchResponse and
-// notifies all matching subscribers.
+// handleKServiceEvent converts a KService event into a WatchResponse,
+// persists the current deployment status as a condition, and notifies subscribers.
 func (c *AppK8sClient) handleKServiceEvent(ctx context.Context, ksvc *servingv1.Service, eventType k8swatch.EventType) {
 	app, err := c.kserviceToApp(ctx, ksvc)
 	if err != nil {
 		return
 	}
+
+	appID := app.GetMetadata().GetId()
 
 	var resp *flyteapp.WatchResponse
 	switch eventType {
@@ -320,8 +328,7 @@ func (c *AppK8sClient) handleKServiceEvent(ctx context.Context, ksvc *servingv1.
 		return
 	}
 
-	appName := app.GetMetadata().GetId().GetName()
-	c.notifySubscribers(ctx, appName, resp)
+	c.notifySubscribers(ctx, appID.GetName(), resp)
 }
 
 // notifySubscribers sends a WatchResponse to all subscribers for the given app name.
@@ -448,9 +455,8 @@ func (c *AppK8sClient) List(ctx context.Context, project, domain string, limit u
 	return apps, list.Continue, nil
 }
 
-// publicIngress returns the deterministic public URL for an app using the same
-// logic as the service layer so GetApp/List/Watch are consistent with Create.
-func (c *AppK8sClient) publicIngress(id *flyteapp.Identifier) *flyteapp.Ingress {
+// PublicIngress returns the deterministic public URL for an app.
+func (c *AppK8sClient) PublicIngress(id *flyteapp.Identifier) *flyteapp.Ingress {
 	if c.cfg.BaseDomain == "" {
 		return nil
 	}
@@ -689,50 +695,82 @@ func buildAutoscalingAnnotations(spec *flyteapp.Spec, cfg *config.InternalAppCon
 	return annotations
 }
 
-// statusWithPhase builds a flyteapp.Status with a single Condition set to the given phase.
-func statusWithPhase(phase flyteapp.Status_DeploymentStatus, message string) *flyteapp.Status {
-	return &flyteapp.Status{
-		Conditions: []*flyteapp.Condition{
-			{
-				DeploymentStatus:   phase,
-				Message:            message,
-				LastTransitionTime: timestamppb.Now(),
-			},
-		},
+// knativeCondDefaultMessages maps Knative condition types to default display messages
+// used when Knative does not set a message on a True condition.
+var knativeCondDefaultMessages = map[knativeapis.ConditionType]string{
+	servingv1.ServiceConditionConfigurationsReady: "Configuration is ready",
+	servingv1.ServiceConditionRoutesReady:         "Routes are ready",
+	servingv1.ServiceConditionReady:               "Service is ready",
+}
+
+// knativeCondToAppCondition maps a single Knative condition to a flyteapp.Condition.
+// serviceReady indicates Ready=True, so True sub-conditions map to ACTIVE instead of DEPLOYING.
+// serviceFailed indicates Ready=False, only in this case False sub-conditions are emitted as FAILED.
+func knativeCondToAppCondition(kCond knativeapis.Condition, serviceReady, serviceFailed bool) *flyteapp.Condition {
+	var phase flyteapp.Status_DeploymentStatus
+
+	switch kCond.Status {
+	case corev1.ConditionTrue:
+		if serviceReady {
+			phase = flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE
+		} else {
+			phase = flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING
+		}
+	case corev1.ConditionFalse:
+		if !serviceFailed {
+			return nil
+		}
+		phase = flyteapp.Status_DEPLOYMENT_STATUS_FAILED
+	default: // Unknown
+		phase = flyteapp.Status_DEPLOYMENT_STATUS_PENDING
+	}
+
+	var message string
+	if kCond.Reason != "" {
+		message = fmt.Sprintf("%s: %s", kCond.Reason, kCond.Message)
+	} else if kCond.Message != "" {
+		message = kCond.Message
+	} else {
+		message = knativeCondDefaultMessages[kCond.Type]
+	}
+
+	ts := timestamppb.Now()
+	if !kCond.LastTransitionTime.Inner.IsZero() {
+		ts = timestamppb.New(kCond.LastTransitionTime.Inner.Time)
+	}
+	return &flyteapp.Condition{
+		DeploymentStatus:   phase,
+		Message:            message,
+		LastTransitionTime: ts,
 	}
 }
 
 // kserviceToStatus maps a KService's conditions to a flyteapp.Status proto.
 // It fetches the latest ready Revision to read the accurate ActualReplicas count.
 func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Service) *flyteapp.Status {
-	var phase flyteapp.Status_DeploymentStatus
-	var message string
-
 	// Check if max-scale=0 is set — explicitly stopped by the control plane.
 	if ann := ksvc.Spec.Template.Annotations; ann != nil {
 		if ann["autoscaling.knative.dev/max-scale"] == maxScaleZero {
-			phase = flyteapp.Status_DEPLOYMENT_STATUS_STOPPED
-			message = "App scaled to zero"
-		}
-	}
-
-	if phase == flyteapp.Status_DEPLOYMENT_STATUS_UNSPECIFIED {
-		switch {
-		case ksvc.IsReady():
-			phase = flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE
-		case ksvc.IsFailed():
-			phase = flyteapp.Status_DEPLOYMENT_STATUS_FAILED
-			if c := ksvc.Status.GetCondition(servingv1.ServiceConditionReady); c != nil {
-				message = c.Message
+			return &flyteapp.Status{
+				Conditions: []*flyteapp.Condition{{
+					DeploymentStatus:   flyteapp.Status_DEPLOYMENT_STATUS_STOPPED,
+					Message:            "App scaled to zero",
+					LastTransitionTime: timestamppb.Now(),
+				}},
 			}
-		case ksvc.Status.LatestCreatedRevisionName != ksvc.Status.LatestReadyRevisionName:
-			phase = flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING
-		default:
-			phase = flyteapp.Status_DEPLOYMENT_STATUS_PENDING
 		}
 	}
 
-	status := statusWithPhase(phase, message)
+	readyCond := ksvc.Status.GetCondition(servingv1.ServiceConditionReady)
+	serviceReady := readyCond != nil && readyCond.IsTrue()
+	serviceFailed := readyCond != nil && readyCond.IsFalse()
+	var conditions []*flyteapp.Condition
+	for i := range ksvc.Status.Conditions {
+		if cond := knativeCondToAppCondition(ksvc.Status.Conditions[i], serviceReady, serviceFailed); cond != nil {
+			conditions = append(conditions, cond)
+		}
+	}
+	status := &flyteapp.Status{Conditions: conditions}
 
 	// Populate ingress URL from the app annotation so the URL is consistent
 	// with the Create response regardless of Knative route readiness.
@@ -740,7 +778,7 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 		parts := strings.SplitN(appIDStr, "/", 3)
 		if len(parts) == 3 {
 			appID := &flyteapp.Identifier{Project: parts[0], Domain: parts[1], Name: parts[2]}
-			status.Ingress = c.publicIngress(appID)
+			status.Ingress = c.PublicIngress(appID)
 		}
 	}
 

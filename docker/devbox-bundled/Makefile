@@ -73,7 +73,6 @@ create_builder:
 	[ -n "$(shell docker buildx ls | awk '/^flyte-devbox / {print $$1}')" ] || \
 		docker buildx create --name flyte-devbox \
 		--driver docker-container --driver-opt image=moby/buildkit:master \
-		--buildkitd-flags '--allow-insecure-entitlement security.insecure' \
 		--platform linux/arm64,linux/amd64
 
 .PHONY: flyte
@@ -119,13 +118,13 @@ sync-crds:
 
 .PHONY: build
 build: sync-crds flyte dep_update manifests
-	docker buildx build --builder flyte-devbox --allow security.insecure --load \
+	docker buildx build --builder flyte-devbox --load \
 		$(BUILDX_CACHE_FLAGS) \
 		--tag flyte-devbox:latest .
 
 .PHONY: build-gpu
 build-gpu: build
-	docker buildx build --builder flyte-devbox --allow security.insecure --load \
+	docker buildx build --builder flyte-devbox --load \
 		$(BUILDX_CACHE_FLAGS) \
 		--file Dockerfile.gpu \
 		--build-context base=docker-image://flyte-devbox:latest \
