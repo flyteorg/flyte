@@ -85,11 +85,9 @@ data:
       capacity: 1000
       rate: 500
       type: admin
-  catalog.yaml: | 
+  catalog.yaml: |
     catalog-cache:
-      endpoint: datacatalog:89
-      insecure: true
-      type: datacatalog
+      type: noop
   copilot.yaml: | 
     plugins:
       k8s:
@@ -436,7 +434,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "97265f70f47a3e1ac710100719e47cebd553a1185229e18d8ed4bbe76200013"
+        configChecksum: "9a9f82053df3a70b3887205eaabf5bfcee55c8349fbe1b036d69943f0ffef34"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -522,7 +520,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.16.6
       annotations:
-        configChecksum: "97265f70f47a3e1ac710100719e47cebd553a1185229e18d8ed4bbe76200013"
+        configChecksum: "9a9f82053df3a70b3887205eaabf5bfcee55c8349fbe1b036d69943f0ffef34"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:
