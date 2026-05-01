@@ -130,7 +130,10 @@ message TaskMetadata {
   // Runtime information about the task.
   RuntimeMetadata runtime = 2;
 
-  // The overall timeout of a task including user-triggered retries.
+  // Wall-clock bound on a single attempt's ACTION_PHASE_RUNNING phase
+  // (a.k.a. max_runtime). Per attempt — resets on each retry. Enforced by
+  // the lease worker. Unset means unlimited.
+  // For queued_timeout and deadline, see TaskMetadata.timeouts (field 22).
   google.protobuf.Duration timeout = 4;
 
   // Number of retries per task.
@@ -201,6 +204,11 @@ message TaskMetadata {
 
   // Remote URI pointing to the code bundle used to build this task.
   string code_bundle_uri = 21;
+
+  // Additional timeout bounds (queued_timeout, deadline) layered on top of
+  // the per-attempt RUNNING-phase bound expressed by `timeout` (field 4).
+  // Each bound is independently optional; an unspecified bound is unlimited.
+  TimeoutStrategy timeouts = 22;
 }
 
 // A Task structure that uniquely identifies a task in the system
