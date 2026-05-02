@@ -958,12 +958,9 @@ type LogContext struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Pods           []*PodLogContext `protobuf:"bytes,1,rep,name=pods,proto3" json:"pods,omitempty"`
-	PrimaryPodName string           `protobuf:"bytes,2,opt,name=primary_pod_name,json=primaryPodName,proto3" json:"primary_pod_name,omitempty"`
-	// Optional. Set by the connector plugin when an action is served by a connector. The dataplane
-	// dataproxy uses this endpoint to proxy log requests to the connector's GetTaskLogs RPC instead
-	// of streaming pod logs.
-	Connector *ConnectorLogContext `protobuf:"bytes,3,opt,name=connector,proto3" json:"connector,omitempty"`
+	Pods           []*PodLogContext     `protobuf:"bytes,1,rep,name=pods,proto3" json:"pods,omitempty"`
+	PrimaryPodName string               `protobuf:"bytes,2,opt,name=primary_pod_name,json=primaryPodName,proto3" json:"primary_pod_name,omitempty"`
+	Connector      *ConnectorLogContext `protobuf:"bytes,3,opt,name=connector,proto3" json:"connector,omitempty"`
 }
 
 func (x *LogContext) Reset() {

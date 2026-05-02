@@ -566,10 +566,6 @@ export type LogContext = Message<"flyteidl2.core.LogContext"> & {
   primaryPodName: string;
 
   /**
-   * Optional. Set by the connector plugin when an action is served by a connector. The dataplane
-   * dataproxy uses this endpoint to proxy log requests to the connector's GetTaskLogs RPC instead
-   * of streaming pod logs.
-   *
    * @generated from field: flyteidl2.core.ConnectorLogContext connector = 3;
    */
   connector?: ConnectorLogContext;
