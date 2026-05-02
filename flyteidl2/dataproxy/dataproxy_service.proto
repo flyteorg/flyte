@@ -206,8 +206,7 @@ message TailLogsRequest {
   // The pod name to tail logs from. If not provided, attempt to find the primary pod, else assume the first pod.
   string pod_name = 3;
 
-  // +optional. Connector endpoint copied from ActionAttempt.log_context.connector.endpoint when the
-  // action is served by a connector. The dataproxy uses this to stream logs from the connector via
+  // +optional. The dataproxy uses this to stream logs from the connector via
   // AsyncConnectorService.GetTaskLogs instead of pod logs.
   string connector_endpoint = 4;
 }

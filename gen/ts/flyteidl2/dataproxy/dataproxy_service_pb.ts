@@ -439,8 +439,7 @@ export type TailLogsRequest = Message<"flyteidl2.dataproxy.TailLogsRequest"> & {
   podName: string;
 
   /**
-   * +optional. Connector endpoint copied from ActionAttempt.log_context.connector.endpoint when the
-   * action is served by a connector. The dataproxy uses this to stream logs from the connector via
+   * +optional. The dataproxy uses this to stream logs from the connector via
    * AsyncConnectorService.GetTaskLogs instead of pod logs.
    *
    * @generated from field: string connector_endpoint = 4;

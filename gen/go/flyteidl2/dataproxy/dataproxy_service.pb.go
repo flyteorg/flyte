@@ -843,8 +843,7 @@ type TailLogsRequest struct {
 	Attempt uint32 `protobuf:"varint,2,opt,name=attempt,proto3" json:"attempt,omitempty"`
 	// The pod name to tail logs from. If not provided, attempt to find the primary pod, else assume the first pod.
 	PodName string `protobuf:"bytes,3,opt,name=pod_name,json=podName,proto3" json:"pod_name,omitempty"`
-	// +optional. Connector endpoint copied from ActionAttempt.log_context.connector.endpoint when the
-	// action is served by a connector. The dataproxy uses this to stream logs from the connector via
+	// +optional. The dataproxy uses this to stream logs from the connector via
 	// AsyncConnectorService.GetTaskLogs instead of pod logs.
 	ConnectorEndpoint string `protobuf:"bytes,4,opt,name=connector_endpoint,json=connectorEndpoint,proto3" json:"connector_endpoint,omitempty"`
 }
