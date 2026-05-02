@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package flyteidl2.core;
 
+import "buf/validate/validate.proto";
 import "flyteidl2/core/types.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
@@ -196,9 +197,75 @@ message KeyValuePair {
   string value = 2;
 }
 
+// Backoff policy applied between user retries. Computed delay for retry n
+// (0-indexed) is: min(base * factor**n, cap). All fields are optional; if
+// all are unset, no backoff is applied (retries fire immediately). An unset
+// factor is interpreted as 1.0 (constant delay).
+message Backoff {
+  option (buf.validate.message).cel = {
+    id: "backoff.cap_required_when_factor_gt_1"
+    message: "cap is required when factor > 1 to prevent unbounded retry delay growth"
+    expression: "!has(this.factor) || this.factor <= 1.0 || has(this.cap)"
+  };
+
+  // Initial delay before the first retry. Must be >= 0 when set.
+  google.protobuf.Duration base = 1 [(buf.validate.field).duration = {
+    gte: {seconds: 0}
+  }];
+
+  // Multiplier applied per retry. factor=1 yields constant delay; factor=2
+  // doubles each time. When unset, factor is treated as 1.0. Must be >= 1.0
+  // when set.
+  optional double factor = 2 [(buf.validate.field).double.gte = 1.0];
+
+  // Upper bound on the computed delay. Required when factor > 1 to prevent
+  // unbounded growth. Must be >= 0 when set.
+  google.protobuf.Duration cap = 3 [(buf.validate.field).duration = {
+    gte: {seconds: 0}
+  }];
+}
+
 // Retry strategy associated with an executable unit.
 message RetryStrategy {
-  // Number of retries. Retries will be consumed when the job fails with a recoverable error.
-  // The number of retries must be less than or equals to 10.
+  // Number of user retries. Retries are consumed when the job fails with a
+  // recoverable error. Retries are NOT consumed when user code raises
+  // NonRecoverableError (see ContainerError.Kind.NON_RECOVERABLE).
+  // The number of retries must be less than or equal to 10.
   uint32 retries = 5;
+
+  // Optional backoff policy applied between user retries. If unset, retries
+  // fire immediately back-to-back. Backoff applies only to user retries;
+  // system retries are governed by platform recovery policy.
+  Backoff backoff = 6;
+}
+
+// Timeout strategy for an action — additional bounds layered on top of
+// TaskMetadata.timeout (the per-attempt RUNNING-phase bound, a.k.a.
+// max_runtime). Each field below is independently optional. For every
+// duration field in this message, a value of 0 (or an unset field) is
+// interpreted as unlimited (no bound applied). Negative values are
+// rejected.
+//
+// queued_timeout is anchored per attempt (resets on retry). deadline is
+// anchored once at the timestamp the action first entered
+// ACTION_PHASE_QUEUED, recorded by the actions service and reused across
+// all attempts (user or system).
+message TimeoutStrategy {
+  // Wall-clock spent in ACTION_PHASE_QUEUED + ACTION_PHASE_WAITING_FOR_RESOURCES
+  // before the action enters ACTION_PHASE_INITIALIZING. Per attempt — resets
+  // on each retry. Enforced by the leasor (pre-lease) and the lease worker
+  // (post-lease, before user code starts). 0 (or unset) means unlimited.
+  google.protobuf.Duration queued_timeout = 1 [(buf.validate.field).duration = {
+    gte: {seconds: 0}
+  }];
+
+  // Wall-clock from first ACTION_PHASE_QUEUED timestamp to a terminal phase,
+  // across ALL attempts (user and system). One-time, absolute. If deadline
+  // fires while an attempt is mid-flight, the attempt is reaped and the
+  // action terminates as TIMED_OUT regardless of TaskMetadata.timeout or
+  // remaining retry budget. Enforced by the leasor. 0 (or unset) means
+  // unlimited.
+  google.protobuf.Duration deadline = 2 [(buf.validate.field).duration = {
+    gte: {seconds: 0}
+  }];
 }

@@ -2,7 +2,7 @@ name: Go Tests
 
 on:
   push:
-    branches: [v2, main]
+    branches: [main]
   pull_request:
     types: [opened, synchronize, reopened]
 

@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/core/execution.proto.
  */
 export const file_flyteidl2_core_execution: GenFile = /*@__PURE__*/
-  fileDesc("Ch5mbHl0ZWlkbDIvY29yZS9leGVjdXRpb24ucHJvdG8SDmZseXRlaWRsMi5jb3JlIqcBChFXb3JrZmxvd0V4ZWN1dGlvbiKRAQoFUGhhc2USDQoJVU5ERUZJTkVEEAASCgoGUVVFVUVEEAESCwoHUlVOTklORxACEg4KClNVQ0NFRURJTkcQAxINCglTVUNDRUVERUQQBBILCgdGQUlMSU5HEAUSCgoGRkFJTEVEEAYSCwoHQUJPUlRFRBAHEg0KCVRJTUVEX09VVBAIEgwKCEFCT1JUSU5HEAkitgEKDU5vZGVFeGVjdXRpb24ipAEKBVBoYXNlEg0KCVVOREVGSU5FRBAAEgoKBlFVRVVFRBABEgsKB1JVTk5JTkcQAhINCglTVUNDRUVERUQQAxILCgdGQUlMSU5HEAQSCgoGRkFJTEVEEAUSCwoHQUJPUlRFRBAGEgsKB1NLSVBQRUQQBxINCglUSU1FRF9PVVQQCBITCg9EWU5BTUlDX1JVTk5JTkcQCRINCglSRUNPVkVSRUQQCiKsAQoNVGFza0V4ZWN1dGlvbiKaAQoFUGhhc2USDQoJVU5ERUZJTkVEEAASCgoGUVVFVUVEEAESCwoHUlVOTklORxACEg0KCVNVQ0NFRURFRBADEgsKB0FCT1JURUQQBBIKCgZGQUlMRUQQBRIQCgxJTklUSUFMSVpJTkcQBhIZChVXQUlUSU5HX0ZPUl9SRVNPVVJDRVMQBxIUChBSRVRSWUFCTEVfRkFJTEVEEAgi6QEKDkV4ZWN1dGlvbkVycm9yEgwKBGNvZGUYASABKAkSDwoHbWVzc2FnZRgCIAEoCRIRCgllcnJvcl91cmkYAyABKAkSNgoEa2luZBgEIAEoDjIoLmZseXRlaWRsMi5jb3JlLkV4ZWN1dGlvbkVycm9yLkVycm9yS2luZBItCgl0aW1lc3RhbXAYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEg4KBndvcmtlchgGIAEoCSIuCglFcnJvcktpbmQSCwoHVU5LTk9XThAAEggKBFVTRVIQARIKCgZTWVNURU0QAiL4AgoHVGFza0xvZxILCgN1cmkYASABKAkSDAoEbmFtZRgCIAEoCRI9Cg5tZXNzYWdlX2Zvcm1hdBgDIAEoDjIlLmZseXRlaWRsMi5jb3JlLlRhc2tMb2cuTWVzc2FnZUZvcm1hdBImCgN0dGwYBCABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SGAoQU2hvd1doaWxlUGVuZGluZxgFIAEoCBIYChBIaWRlT25jZUZpbmlzaGVkGAYgASgIEjMKCWxpbmtfdHlwZRgHIAEoDjIgLmZseXRlaWRsMi5jb3JlLlRhc2tMb2cuTGlua1R5cGUSDQoFcmVhZHkYCCABKAgSEAoIaWNvbl91cmkYCSABKAkiLwoNTWVzc2FnZUZvcm1hdBILCgdVTktOT1dOEAASBwoDQ1NWEAESCAoESlNPThACIjAKCExpbmtUeXBlEgwKCEVYVEVSTkFMEAASDQoJREFTSEJPQVJEEAESBwoDSURFEAIiiwEKCkxvZ0NvbnRleHQSKwoEcG9kcxgBIAMoCzIdLmZseXRlaWRsMi5jb3JlLlBvZExvZ0NvbnRleHQSGAoQcHJpbWFyeV9wb2RfbmFtZRgCIAEoCRI2Cgljb25uZWN0b3IYAyABKAsyIy5mbHl0ZWlkbDIuY29yZS5Db25uZWN0b3JMb2dDb250ZXh0IicKE0Nvbm5lY3RvckxvZ0NvbnRleHQSEAoIZW5kcG9pbnQYASABKAkixQEKDVBvZExvZ0NvbnRleHQSEQoJbmFtZXNwYWNlGAEgASgJEhAKCHBvZF9uYW1lGAIgASgJEjQKCmNvbnRhaW5lcnMYAyADKAsyIC5mbHl0ZWlkbDIuY29yZS5Db250YWluZXJDb250ZXh0Eh4KFnByaW1hcnlfY29udGFpbmVyX25hbWUYBCABKAkSOQoPaW5pdF9jb250YWluZXJzGAUgAygLMiAuZmx5dGVpZGwyLmNvcmUuQ29udGFpbmVyQ29udGV4dCLxAQoQQ29udGFpbmVyQ29udGV4dBIWCg5jb250YWluZXJfbmFtZRgBIAEoCRJACgdwcm9jZXNzGAIgASgLMi8uZmx5dGVpZGwyLmNvcmUuQ29udGFpbmVyQ29udGV4dC5Qcm9jZXNzQ29udGV4dBqCAQoOUHJvY2Vzc0NvbnRleHQSOAoUY29udGFpbmVyX3N0YXJ0X3RpbWUYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjYKEmNvbnRhaW5lcl9lbmRfdGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiSgoUUXVhbGl0eU9mU2VydmljZVNwZWMSMgoPcXVldWVpbmdfYnVkZ2V0GAEgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uIsQBChBRdWFsaXR5T2ZTZXJ2aWNlEjUKBHRpZXIYASABKA4yJS5mbHl0ZWlkbDIuY29yZS5RdWFsaXR5T2ZTZXJ2aWNlLlRpZXJIABI0CgRzcGVjGAIgASgLMiQuZmx5dGVpZGwyLmNvcmUuUXVhbGl0eU9mU2VydmljZVNwZWNIACI0CgRUaWVyEg0KCVVOREVGSU5FRBAAEggKBEhJR0gQARIKCgZNRURJVU0QAhIHCgNMT1cQA0INCgtkZXNpZ25hdGlvbkKzAQoSY29tLmZseXRlaWRsMi5jb3JlQg5FeGVjdXRpb25Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9jb3JlogIDRkNYqgIORmx5dGVpZGwyLkNvcmXKAg5GbHl0ZWlkbDJcQ29yZeICGkZseXRlaWRsMlxDb3JlXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpDb3JlYgZwcm90bzM", [file_google_protobuf_duration, file_google_protobuf_timestamp]);
+  fileDesc("Ch5mbHl0ZWlkbDIvY29yZS9leGVjdXRpb24ucHJvdG8SDmZseXRlaWRsMi5jb3JlIqcBChFXb3JrZmxvd0V4ZWN1dGlvbiKRAQoFUGhhc2USDQoJVU5ERUZJTkVEEAASCgoGUVVFVUVEEAESCwoHUlVOTklORxACEg4KClNVQ0NFRURJTkcQAxINCglTVUNDRUVERUQQBBILCgdGQUlMSU5HEAUSCgoGRkFJTEVEEAYSCwoHQUJPUlRFRBAHEg0KCVRJTUVEX09VVBAIEgwKCEFCT1JUSU5HEAkitgEKDU5vZGVFeGVjdXRpb24ipAEKBVBoYXNlEg0KCVVOREVGSU5FRBAAEgoKBlFVRVVFRBABEgsKB1JVTk5JTkcQAhINCglTVUNDRUVERUQQAxILCgdGQUlMSU5HEAQSCgoGRkFJTEVEEAUSCwoHQUJPUlRFRBAGEgsKB1NLSVBQRUQQBxINCglUSU1FRF9PVVQQCBITCg9EWU5BTUlDX1JVTk5JTkcQCRINCglSRUNPVkVSRUQQCiKsAQoNVGFza0V4ZWN1dGlvbiKaAQoFUGhhc2USDQoJVU5ERUZJTkVEEAASCgoGUVVFVUVEEAESCwoHUlVOTklORxACEg0KCVNVQ0NFRURFRBADEgsKB0FCT1JURUQQBBIKCgZGQUlMRUQQBRIQCgxJTklUSUFMSVpJTkcQBhIZChVXQUlUSU5HX0ZPUl9SRVNPVVJDRVMQBxIUChBSRVRSWUFCTEVfRkFJTEVEEAgipgIKDkV4ZWN1dGlvbkVycm9yEgwKBGNvZGUYASABKAkSDwoHbWVzc2FnZRgCIAEoCRIRCgllcnJvcl91cmkYAyABKAkSNgoEa2luZBgEIAEoDjIoLmZseXRlaWRsMi5jb3JlLkV4ZWN1dGlvbkVycm9yLkVycm9yS2luZBItCgl0aW1lc3RhbXAYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEg4KBndvcmtlchgGIAEoCRI7Cg5yZWNvdmVyYWJpbGl0eRgHIAEoDjIjLmZseXRlaWRsMi5jb3JlLkNvbnRhaW5lckVycm9yLktpbmQiLgoJRXJyb3JLaW5kEgsKB1VOS05PV04QABIICgRVU0VSEAESCgoGU1lTVEVNEAIiygEKDkNvbnRhaW5lckVycm9yEgwKBGNvZGUYASABKAkSDwoHbWVzc2FnZRgCIAEoCRIxCgRraW5kGAMgASgOMiMuZmx5dGVpZGwyLmNvcmUuQ29udGFpbmVyRXJyb3IuS2luZBI4CgZvcmlnaW4YBCABKA4yKC5mbHl0ZWlkbDIuY29yZS5FeGVjdXRpb25FcnJvci5FcnJvcktpbmQiLAoES2luZBITCg9OT05fUkVDT1ZFUkFCTEUQABIPCgtSRUNPVkVSQUJMRRABIj4KDUVycm9yRG9jdW1lbnQSLQoFZXJyb3IYASABKAsyHi5mbHl0ZWlkbDIuY29yZS5Db250YWluZXJFcnJvciL4AgoHVGFza0xvZxILCgN1cmkYASABKAkSDAoEbmFtZRgCIAEoCRI9Cg5tZXNzYWdlX2Zvcm1hdBgDIAEoDjIlLmZseXRlaWRsMi5jb3JlLlRhc2tMb2cuTWVzc2FnZUZvcm1hdBImCgN0dGwYBCABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SGAoQU2hvd1doaWxlUGVuZGluZxgFIAEoCBIYChBIaWRlT25jZUZpbmlzaGVkGAYgASgIEjMKCWxpbmtfdHlwZRgHIAEoDjIgLmZseXRlaWRsMi5jb3JlLlRhc2tMb2cuTGlua1R5cGUSDQoFcmVhZHkYCCABKAgSEAoIaWNvbl91cmkYCSABKAkiLwoNTWVzc2FnZUZvcm1hdBILCgdVTktOT1dOEAASBwoDQ1NWEAESCAoESlNPThACIjAKCExpbmtUeXBlEgwKCEVYVEVSTkFMEAASDQoJREFTSEJPQVJEEAESBwoDSURFEAIiiwEKCkxvZ0NvbnRleHQSKwoEcG9kcxgBIAMoCzIdLmZseXRlaWRsMi5jb3JlLlBvZExvZ0NvbnRleHQSGAoQcHJpbWFyeV9wb2RfbmFtZRgCIAEoCRI2Cgljb25uZWN0b3IYAyABKAsyIy5mbHl0ZWlkbDIuY29yZS5Db25uZWN0b3JMb2dDb250ZXh0IicKE0Nvbm5lY3RvckxvZ0NvbnRleHQSEAoIZW5kcG9pbnQYASABKAkixQEKDVBvZExvZ0NvbnRleHQSEQoJbmFtZXNwYWNlGAEgASgJEhAKCHBvZF9uYW1lGAIgASgJEjQKCmNvbnRhaW5lcnMYAyADKAsyIC5mbHl0ZWlkbDIuY29yZS5Db250YWluZXJDb250ZXh0Eh4KFnByaW1hcnlfY29udGFpbmVyX25hbWUYBCABKAkSOQoPaW5pdF9jb250YWluZXJzGAUgAygLMiAuZmx5dGVpZGwyLmNvcmUuQ29udGFpbmVyQ29udGV4dCLxAQoQQ29udGFpbmVyQ29udGV4dBIWCg5jb250YWluZXJfbmFtZRgBIAEoCRJACgdwcm9jZXNzGAIgASgLMi8uZmx5dGVpZGwyLmNvcmUuQ29udGFpbmVyQ29udGV4dC5Qcm9jZXNzQ29udGV4dBqCAQoOUHJvY2Vzc0NvbnRleHQSOAoUY29udGFpbmVyX3N0YXJ0X3RpbWUYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjYKEmNvbnRhaW5lcl9lbmRfdGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiSgoUUXVhbGl0eU9mU2VydmljZVNwZWMSMgoPcXVldWVpbmdfYnVkZ2V0GAEgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uIsQBChBRdWFsaXR5T2ZTZXJ2aWNlEjUKBHRpZXIYASABKA4yJS5mbHl0ZWlkbDIuY29yZS5RdWFsaXR5T2ZTZXJ2aWNlLlRpZXJIABI0CgRzcGVjGAIgASgLMiQuZmx5dGVpZGwyLmNvcmUuUXVhbGl0eU9mU2VydmljZVNwZWNIACI0CgRUaWVyEg0KCVVOREVGSU5FRBAAEggKBEhJR0gQARIKCgZNRURJVU0QAhIHCgNMT1cQA0INCgtkZXNpZ25hdGlvbkKzAQoSY29tLmZseXRlaWRsMi5jb3JlQg5FeGVjdXRpb25Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9jb3JlogIDRkNYqgIORmx5dGVpZGwyLkNvcmXKAg5GbHl0ZWlkbDJcQ29yZeICGkZseXRlaWRsMlxDb3JlXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpDb3JlYgZwcm90bzM", [file_google_protobuf_duration, file_google_protobuf_timestamp]);
 
 /**
  * Indicates various phases of Workflow Execution
@@ -293,6 +293,19 @@ export type ExecutionError = Message<"flyteidl2.core.ExecutionError"> & {
    * @generated from field: string worker = 6;
    */
   worker: string;
+
+  /**
+   * Whether this failure consumed a user retry. Mirrors the value the
+   * container reported via ContainerError.kind. Default is NON_RECOVERABLE
+   * (proto3 zero), matching the ContainerError.Kind default — producers
+   * (lease worker, leasor) must always set this explicitly when surfacing
+   * a recoverable failure. The SDK error-marshaling path is the source of
+   * truth: ordinary exceptions -> RECOVERABLE; flyte.errors.NonRecoverableError
+   * -> NON_RECOVERABLE.
+   *
+   * @generated from field: flyteidl2.core.ContainerError.Kind recoverability = 7;
+   */
+  recoverability: ContainerError_Kind;
 };
 
 /**
@@ -329,6 +342,94 @@ export enum ExecutionError_ErrorKind {
  */
 export const ExecutionError_ErrorKindSchema: GenEnum<ExecutionError_ErrorKind> = /*@__PURE__*/
   enumDesc(file_flyteidl2_core_execution, 3, 0);
+
+/**
+ * Error message to propagate detailed errors from container executions to the
+ * execution engine.
+ *
+ * @generated from message flyteidl2.core.ContainerError
+ */
+export type ContainerError = Message<"flyteidl2.core.ContainerError"> & {
+  /**
+   * A simplified code for errors, so that we can provide a glossary of all possible errors.
+   *
+   * @generated from field: string code = 1;
+   */
+  code: string;
+
+  /**
+   * A detailed error message.
+   *
+   * @generated from field: string message = 2;
+   */
+  message: string;
+
+  /**
+   * An abstract error kind for this error. Defaults to Non_Recoverable if not specified.
+   *
+   * @generated from field: flyteidl2.core.ContainerError.Kind kind = 3;
+   */
+  kind: ContainerError_Kind;
+
+  /**
+   * Defines the origin of the error (system, user, unknown).
+   *
+   * @generated from field: flyteidl2.core.ExecutionError.ErrorKind origin = 4;
+   */
+  origin: ExecutionError_ErrorKind;
+};
+
+/**
+ * Describes the message flyteidl2.core.ContainerError.
+ * Use `create(ContainerErrorSchema)` to create a new message.
+ */
+export const ContainerErrorSchema: GenMessage<ContainerError> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_core_execution, 4);
+
+/**
+ * Defines a generic error type that dictates the behavior of the retry strategy.
+ *
+ * @generated from enum flyteidl2.core.ContainerError.Kind
+ */
+export enum ContainerError_Kind {
+  /**
+   * @generated from enum value: NON_RECOVERABLE = 0;
+   */
+  NON_RECOVERABLE = 0,
+
+  /**
+   * @generated from enum value: RECOVERABLE = 1;
+   */
+  RECOVERABLE = 1,
+}
+
+/**
+ * Describes the enum flyteidl2.core.ContainerError.Kind.
+ */
+export const ContainerError_KindSchema: GenEnum<ContainerError_Kind> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_core_execution, 4, 0);
+
+/**
+ * Defines the errors.pb file format the container can produce to communicate
+ * failure reasons to the execution engine.
+ *
+ * @generated from message flyteidl2.core.ErrorDocument
+ */
+export type ErrorDocument = Message<"flyteidl2.core.ErrorDocument"> & {
+  /**
+   * The error raised during execution.
+   *
+   * @generated from field: flyteidl2.core.ContainerError error = 1;
+   */
+  error?: ContainerError;
+};
+
+/**
+ * Describes the message flyteidl2.core.ErrorDocument.
+ * Use `create(ErrorDocumentSchema)` to create a new message.
+ */
+export const ErrorDocumentSchema: GenMessage<ErrorDocument> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_core_execution, 5);
 
 /**
  * Log information for the task that is specific to a log sink
@@ -388,7 +489,7 @@ export type TaskLog = Message<"flyteidl2.core.TaskLog"> & {
  * Use `create(TaskLogSchema)` to create a new message.
  */
 export const TaskLogSchema: GenMessage<TaskLog> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 4);
+  messageDesc(file_flyteidl2_core_execution, 6);
 
 /**
  * @generated from enum flyteidl2.core.TaskLog.MessageFormat
@@ -414,7 +515,7 @@ export enum TaskLog_MessageFormat {
  * Describes the enum flyteidl2.core.TaskLog.MessageFormat.
  */
 export const TaskLog_MessageFormatSchema: GenEnum<TaskLog_MessageFormat> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_core_execution, 4, 0);
+  enumDesc(file_flyteidl2_core_execution, 6, 0);
 
 /**
  * @generated from enum flyteidl2.core.TaskLog.LinkType
@@ -446,7 +547,7 @@ export enum TaskLog_LinkType {
  * Describes the enum flyteidl2.core.TaskLog.LinkType.
  */
 export const TaskLog_LinkTypeSchema: GenEnum<TaskLog_LinkType> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_core_execution, 4, 1);
+  enumDesc(file_flyteidl2_core_execution, 6, 1);
 
 /**
  * Contains metadata required to identify logs produces by a set of pods
@@ -479,7 +580,7 @@ export type LogContext = Message<"flyteidl2.core.LogContext"> & {
  * Use `create(LogContextSchema)` to create a new message.
  */
 export const LogContextSchema: GenMessage<LogContext> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 5);
+  messageDesc(file_flyteidl2_core_execution, 7);
 
 /**
  * ConnectorLogContext describes how to reach a connector that owns an action's logs.
@@ -501,7 +602,7 @@ export type ConnectorLogContext = Message<"flyteidl2.core.ConnectorLogContext"> 
  * Use `create(ConnectorLogContextSchema)` to create a new message.
  */
 export const ConnectorLogContextSchema: GenMessage<ConnectorLogContext> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 6);
+  messageDesc(file_flyteidl2_core_execution, 8);
 
 /**
  * Contains metadata required to identify logs produces by a single pod
@@ -540,7 +641,7 @@ export type PodLogContext = Message<"flyteidl2.core.PodLogContext"> & {
  * Use `create(PodLogContextSchema)` to create a new message.
  */
 export const PodLogContextSchema: GenMessage<PodLogContext> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 7);
+  messageDesc(file_flyteidl2_core_execution, 9);
 
 /**
  * Contains metadata required to identify logs produces by a single container
@@ -564,7 +665,7 @@ export type ContainerContext = Message<"flyteidl2.core.ContainerContext"> & {
  * Use `create(ContainerContextSchema)` to create a new message.
  */
 export const ContainerContextSchema: GenMessage<ContainerContext> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 8);
+  messageDesc(file_flyteidl2_core_execution, 10);
 
 /**
  * Contains metadata required to identify logs produces by a single light-weight process that was run inside a container
@@ -588,7 +689,7 @@ export type ContainerContext_ProcessContext = Message<"flyteidl2.core.ContainerC
  * Use `create(ContainerContext_ProcessContextSchema)` to create a new message.
  */
 export const ContainerContext_ProcessContextSchema: GenMessage<ContainerContext_ProcessContext> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 8, 0);
+  messageDesc(file_flyteidl2_core_execution, 10, 0);
 
 /**
  * Represents customized execution run-time attributes.
@@ -609,7 +710,7 @@ export type QualityOfServiceSpec = Message<"flyteidl2.core.QualityOfServiceSpec"
  * Use `create(QualityOfServiceSpecSchema)` to create a new message.
  */
 export const QualityOfServiceSpecSchema: GenMessage<QualityOfServiceSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 9);
+  messageDesc(file_flyteidl2_core_execution, 11);
 
 /**
  * Indicates the priority of an execution.
@@ -640,7 +741,7 @@ export type QualityOfService = Message<"flyteidl2.core.QualityOfService"> & {
  * Use `create(QualityOfServiceSchema)` to create a new message.
  */
 export const QualityOfServiceSchema: GenMessage<QualityOfService> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 10);
+  messageDesc(file_flyteidl2_core_execution, 12);
 
 /**
  * @generated from enum flyteidl2.core.QualityOfService.Tier
@@ -673,5 +774,5 @@ export enum QualityOfService_Tier {
  * Describes the enum flyteidl2.core.QualityOfService.Tier.
  */
 export const QualityOfService_TierSchema: GenEnum<QualityOfService_Tier> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_core_execution, 10, 0);
+  enumDesc(file_flyteidl2_core_execution, 12, 0);
 
