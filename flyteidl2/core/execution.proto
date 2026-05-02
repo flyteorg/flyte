@@ -150,10 +150,6 @@ message TaskLog {
 message LogContext {
   repeated PodLogContext pods = 1;
   string primary_pod_name = 2;
-
-  // Optional. Set by the connector plugin when an action is served by a connector. The dataplane
-  // dataproxy uses this endpoint to proxy log requests to the connector's GetTaskLogs RPC instead
-  // of streaming pod logs.
   ConnectorLogContext connector = 3;
 }
 

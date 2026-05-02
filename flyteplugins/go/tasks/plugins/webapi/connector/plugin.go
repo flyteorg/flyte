@@ -243,19 +243,16 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 	if err != nil {
 		return nil, fmt.Errorf("failed to get task from connector with %v", err)
 	}
-
-	wrapper := ResourceWrapper{
-		Phase:          res.GetResource().GetPhase(),
-		Outputs:        res.GetResource().GetOutputs(),
-		Message:        res.GetResource().GetMessage(),
-		LogLinks:       res.GetResource().GetLogLinks(),
-		CustomInfo:     res.GetResource().GetCustomInfo(),
-		ConnectorID:    connector.ConnectorID,
-		IsConnectorApp: connector.IsConnectorApp,
-	}
-
-	wrapper.ConnectorEndpoint = connector.ConnectorDeployment.Endpoint
-	return wrapper, nil
+	return ResourceWrapper{
+		Phase:             res.GetResource().GetPhase(),
+		Outputs:           res.GetResource().GetOutputs(),
+		Message:           res.GetResource().GetMessage(),
+		LogLinks:          res.GetResource().GetLogLinks(),
+		CustomInfo:        res.GetResource().GetCustomInfo(),
+		ConnectorID:       connector.ConnectorID,
+		IsConnectorApp:    connector.IsConnectorApp,
+		ConnectorEndpoint: connector.ConnectorDeployment.Endpoint,
+	}, nil
 }
 
 func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error {

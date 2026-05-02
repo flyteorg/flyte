@@ -1432,6 +1432,10 @@ func getLogContextAndClusterForAttempt(ctx context.Context, repo interfaces.Repo
 		return nil, "", connect.NewError(connect.CodeInternal, fmt.Errorf("failed to deserialize event: %w", err))
 	}
 
+	if event.GetLogContext() == nil {
+		return nil, "", connect.NewError(connect.CodeNotFound, fmt.Errorf("no log context found for action %v attempt %d", actionID, attempt))
+	}
+
 	return event.GetLogContext(), event.GetCluster(), nil
 }
 
