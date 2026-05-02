@@ -139,6 +139,8 @@ rustfs:
   mode:
     standalone:
       enabled: true
+      existingClaim:
+        dataClaim: flyte-devbox-rustfs-storage
     distributed:
       enabled: false
   ingress:
