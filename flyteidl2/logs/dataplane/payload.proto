@@ -27,8 +27,8 @@ message LoggingContext {
 
   string cluster_name = 3 [(buf.validate.field).string.min_len = 1];
   string kubernetes_namespace = 4 [(buf.validate.field).string.min_len = 1];
-  string kubernetes_pod_name = 5 [(buf.validate.field).string.min_len = 1];
-  string kubernetes_container_name = 6 [(buf.validate.field).string.min_len = 1];
+  string kubernetes_pod_name = 5;
+  string kubernetes_container_name = 6;
   google.protobuf.Timestamp execution_attempt_start_time = 7;
   google.protobuf.Timestamp execution_attempt_end_time = 8;
   map<string, string> kubernetes_pod_labels = 9;
