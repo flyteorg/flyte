@@ -213,6 +213,8 @@ message TailLogsResponse {
   message Logs {
     // Structured log lines.
     repeated flyteidl2.logs.dataplane.LogLine lines = 1;
+    // Which container these lines are from.
+    flyteidl2.logs.dataplane.ContainerIdentifier container = 2;
   }
 
   // One or more batches of logs.

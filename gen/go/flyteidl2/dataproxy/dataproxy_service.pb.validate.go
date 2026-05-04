@@ -1932,6 +1932,35 @@ func (m *TailLogsResponse_Logs) validate(all bool) error {
 
 	}
 
+	if all {
+		switch v := interface{}(m.GetContainer()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TailLogsResponse_LogsValidationError{
+					field:  "Container",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TailLogsResponse_LogsValidationError{
+					field:  "Container",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetContainer()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TailLogsResponse_LogsValidationError{
+				field:  "Container",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return TailLogsResponse_LogsMultiError(errors)
 	}

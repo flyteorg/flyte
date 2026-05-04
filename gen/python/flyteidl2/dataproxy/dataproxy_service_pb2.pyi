@@ -142,10 +142,12 @@ class TailLogsRequest(_message.Message):
 class TailLogsResponse(_message.Message):
     __slots__ = ["logs"]
     class Logs(_message.Message):
-        __slots__ = ["lines"]
+        __slots__ = ["lines", "container"]
         LINES_FIELD_NUMBER: _ClassVar[int]
+        CONTAINER_FIELD_NUMBER: _ClassVar[int]
         lines: _containers.RepeatedCompositeFieldContainer[_payload_pb2.LogLine]
-        def __init__(self, lines: _Optional[_Iterable[_Union[_payload_pb2.LogLine, _Mapping]]] = ...) -> None: ...
+        container: _payload_pb2.ContainerIdentifier
+        def __init__(self, lines: _Optional[_Iterable[_Union[_payload_pb2.LogLine, _Mapping]]] = ..., container: _Optional[_Union[_payload_pb2.ContainerIdentifier, _Mapping]] = ...) -> None: ...
     LOGS_FIELD_NUMBER: _ClassVar[int]
     logs: _containers.RepeatedCompositeFieldContainer[TailLogsResponse.Logs]
     def __init__(self, logs: _Optional[_Iterable[_Union[TailLogsResponse.Logs, _Mapping]]] = ...) -> None: ...
