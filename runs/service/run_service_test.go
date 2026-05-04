@@ -1407,7 +1407,7 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 	actionRepo.On("CreateAction", mock.Anything, mock.MatchedBy(func(m *models.Run) bool {
 		var info workflow.RunInfo
 		_ = proto.Unmarshal(m.DetailedInfo, &info)
-		return info.InputsUri == offloadedURI
+		return info.InputsUri == offloadedURI+"/inputs.pb"
 	}), mock.Anything).Return(expectedRun, nil).Once()
 	actionsClient.On("Enqueue", mock.MatchedBy(func(_ context.Context) bool { return true }), mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
 		return req.Msg.Action.InputUri == offloadedURI

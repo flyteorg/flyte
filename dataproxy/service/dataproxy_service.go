@@ -492,11 +492,7 @@ func (s *Service) GetActionData(
 
 	if urisResp.Msg.GetInputsUri() != "" {
 		group.Go(func() error {
-			baseRef := storage.DataReference(urisResp.Msg.GetInputsUri())
-			inputRef, err := s.dataStore.ConstructReference(groupCtx, baseRef, "inputs.pb")
-			if err != nil {
-				return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to construct input ref: %w", err))
-			}
+			inputRef := storage.DataReference(urisResp.Msg.GetInputsUri())
 			logger.Infof(groupCtx, "GetActionData: reading inputs from %s", inputRef)
 			if err := s.dataStore.ReadProtobuf(groupCtx, inputRef, resp.Inputs); err != nil {
 				if !storage.IsNotFound(err) {
