@@ -9,17 +9,20 @@ import (
 func TestGetNamespaceName(t *testing.T) {
 	testCases := []struct {
 		template string
+		org      string
 		project  string
 		domain   string
 		want     string
 	}{
-		{"prefix-{{ project }}-{{ domain }}", "flytesnacks", "production", "prefix-flytesnacks-production"},
-		{"{{ domain }}", "flytesnacks", "production", "production"},
-		{"{{ project }}", "flytesnacks", "production", "flytesnacks"},
+		{"prefix-{{ project }}-{{ domain }}", "", "flytesnacks", "production", "prefix-flytesnacks-production"},
+		{"{{ domain }}", "", "flytesnacks", "production", "production"},
+		{"{{ project }}", "", "flytesnacks", "production", "flytesnacks"},
+		{"{{ org }}-{{ project }}-{{ domain }}", "acme", "flytesnacks", "production", "acme-flytesnacks-production"},
+		{"{{ org }}", "acme", "flytesnacks", "production", "acme"},
 	}
 
 	for _, tc := range testCases {
-		got := GetNamespaceName(tc.template, "", tc.project, tc.domain)
+		got := GetNamespaceName(tc.template, tc.org, tc.project, tc.domain)
 		assert.Equal(t, tc.want, got)
 	}
 }
