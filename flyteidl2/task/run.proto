@@ -3,7 +3,6 @@ syntax = "proto3";
 package flyteidl2.task;
 
 import "buf/validate/validate.proto";
-import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/phase.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/security.proto";
@@ -86,7 +85,7 @@ message RunSpec {
   bool overwrite_cache = 5 [deprecated = true];
 
   // the queue name that this run should be executed on.
-  // this value will be used to resolve the full queue id and store it in 'assigned_queue' field.
+  // Queue name is unique within an org so it can be used as an id to reference the queue.
   string queue = 6;
 
   // Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
@@ -104,10 +103,6 @@ message RunSpec {
 
     InlineRuleList notification_rules = 11; // either define an inline one-off rule
   }
-
-  // the actual resolved queue id.
-  // This value will be used as a default queue for all actions in the run unless overridden
-  common.QueueIdentifier assigned_queue = 12;
 }
 
 message InlineRuleList {

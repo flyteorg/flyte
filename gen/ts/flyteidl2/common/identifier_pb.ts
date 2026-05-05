@@ -11,7 +11,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/common/identifier.proto.
  */
 export const file_flyteidl2_common_identifier: GenFile = /*@__PURE__*/
-  fileDesc("CiFmbHl0ZWlkbDIvY29tbW9uL2lkZW50aWZpZXIucHJvdG8SEGZseXRlaWRsMi5jb21tb24iYgoRUHJvamVjdElkZW50aWZpZXISHQoMb3JnYW5pemF0aW9uGAEgASgJQge6SARyAhABEhcKBmRvbWFpbhgCIAEoCUIHukgEcgIQARIVCgRuYW1lGAMgASgJQge6SARyAhABIkAKEUNsdXN0ZXJJZGVudGlmaWVyEhQKDG9yZ2FuaXphdGlvbhgBIAEoCRIVCgRuYW1lGAIgASgJQge6SARyAhABIjsKFUNsdXN0ZXJQb29sSWRlbnRpZmllchIUCgxvcmdhbml6YXRpb24YASABKAkSDAoEbmFtZRgCIAEoCSKXAgoPUXVldWVJZGVudGlmaWVyEh0KDG9yZ2FuaXphdGlvbhgBIAEoCUIHukgEcgIQARIOCgZkb21haW4YAiABKAkSDwoHcHJvamVjdBgDIAEoCRI4CgRuYW1lGAQgASgJQiq6SCdyJRABGD8yH15bYS16MC05XShbLWEtejAtOV0qW2EtejAtOV0pPyQ6iQG6SIUBGoIBCitxdWV1ZV9pZGVudGlmaWVyLmRvbWFpbl9wcm9qZWN0X2NvbWJpbmF0aW9uEidwcm9qZWN0IHJlcXVpcmVzIGRvbWFpbiB0byBiZSBzcGVjaWZpZWQaKiEodGhpcy5kb21haW4gPT0gJycgJiYgdGhpcy5wcm9qZWN0ICE9ICcnKSJNChdDbHVzdGVyQ29uZmlnSWRlbnRpZmllchIdCgxvcmdhbml6YXRpb24YASABKAlCB7pIBHICEAESEwoCaWQYAiABKAlCB7pIBHICEAEiZwoZQ2x1c3Rlck5vZGVwb29sSWRlbnRpZmllchIUCgxvcmdhbml6YXRpb24YASABKAkSHQoMY2x1c3Rlcl9uYW1lGAIgASgJQge6SARyAhABEhUKBG5hbWUYAyABKAlCB7pIBHICEAEiKgoOVXNlcklkZW50aWZpZXISGAoHc3ViamVjdBgBIAEoCUIHukgEcgIQASIxChVBcHBsaWNhdGlvbklkZW50aWZpZXISGAoHc3ViamVjdBgBIAEoCUIHukgEcgIQASI9Cg5Sb2xlSWRlbnRpZmllchIUCgxvcmdhbml6YXRpb24YASABKAkSFQoEbmFtZRgCIAEoCUIHukgEcgIQASJJCg1PcmdJZGVudGlmaWVyEjgKBG5hbWUYASABKAlCKrpIJ3IlEAEYPzIfXlthLXowLTldKFstYS16MC05XSpbYS16MC05XSk/JCJtChhNYW5hZ2VkQ2x1c3RlcklkZW50aWZpZXISFQoEbmFtZRgCIAEoCUIHukgEcgIQARI0CgNvcmcYAyABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLk9yZ0lkZW50aWZpZXJCBrpIA8gBAUoECAEQAiI/ChBQb2xpY3lJZGVudGlmaWVyEhQKDG9yZ2FuaXphdGlvbhgBIAEoCRIVCgRuYW1lGAIgASgJQge6SARyAhABIncKDVJ1bklkZW50aWZpZXISFgoDb3JnGAEgASgJQgm6SAZyBBABGD8SGgoHcHJvamVjdBgCIAEoCUIJukgGcgQQARg/EhkKBmRvbWFpbhgDIAEoCUIJukgGcgQQARg/EhcKBG5hbWUYBCABKAlCCbpIBnIEEAEYHiJhChBBY3Rpb25JZGVudGlmaWVyEjQKA3J1bhgBIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckIGukgDyAEBEhcKBG5hbWUYAiABKAlCCbpIBnIEEAEYHiJyChdBY3Rpb25BdHRlbXB0SWRlbnRpZmllchI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAIpUBCgtUcmlnZ2VyTmFtZRIWCgNvcmcYASABKAlCCbpIBnIEEAEYPxIaCgdwcm9qZWN0GAIgASgJQgm6SAZyBBABGD8SGQoGZG9tYWluGAMgASgJQgm6SAZyBBABGD8SGAoEbmFtZRgEIAEoCUIKukgHcgUQARj/ARIdCgl0YXNrX25hbWUYBSABKAlCCrpIB3IFEAEY/wEiYwoRVHJpZ2dlcklkZW50aWZpZXISMwoEbmFtZRgBIAEoCzIdLmZseXRlaWRsMi5jb21tb24uVHJpZ2dlck5hbWVCBrpIA8gBARIZCghyZXZpc2lvbhgCIAEoBEIHukgEMgIgAELAAQoUY29tLmZseXRlaWRsMi5jb21tb25CD0lkZW50aWZpZXJQcm90b0gCUAFaNGdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9jb21tb26iAgNGQ1iqAhBGbHl0ZWlkbDIuQ29tbW9uygIQRmx5dGVpZGwyXENvbW1vbuICHEZseXRlaWRsMlxDb21tb25cR1BCTWV0YWRhdGHqAhFGbHl0ZWlkbDI6OkNvbW1vbmIGcHJvdG8z", [file_buf_validate_validate]);
+  fileDesc("CiFmbHl0ZWlkbDIvY29tbW9uL2lkZW50aWZpZXIucHJvdG8SEGZseXRlaWRsMi5jb21tb24iYgoRUHJvamVjdElkZW50aWZpZXISHQoMb3JnYW5pemF0aW9uGAEgASgJQge6SARyAhABEhcKBmRvbWFpbhgCIAEoCUIHukgEcgIQARIVCgRuYW1lGAMgASgJQge6SARyAhABIkAKEUNsdXN0ZXJJZGVudGlmaWVyEhQKDG9yZ2FuaXphdGlvbhgBIAEoCRIVCgRuYW1lGAIgASgJQge6SARyAhABIjsKFUNsdXN0ZXJQb29sSWRlbnRpZmllchIUCgxvcmdhbml6YXRpb24YASABKAkSDAoEbmFtZRgCIAEoCSJNChdDbHVzdGVyQ29uZmlnSWRlbnRpZmllchIdCgxvcmdhbml6YXRpb24YASABKAlCB7pIBHICEAESEwoCaWQYAiABKAlCB7pIBHICEAEiZwoZQ2x1c3Rlck5vZGVwb29sSWRlbnRpZmllchIUCgxvcmdhbml6YXRpb24YASABKAkSHQoMY2x1c3Rlcl9uYW1lGAIgASgJQge6SARyAhABEhUKBG5hbWUYAyABKAlCB7pIBHICEAEiKgoOVXNlcklkZW50aWZpZXISGAoHc3ViamVjdBgBIAEoCUIHukgEcgIQASIxChVBcHBsaWNhdGlvbklkZW50aWZpZXISGAoHc3ViamVjdBgBIAEoCUIHukgEcgIQASI9Cg5Sb2xlSWRlbnRpZmllchIUCgxvcmdhbml6YXRpb24YASABKAkSFQoEbmFtZRgCIAEoCUIHukgEcgIQASJJCg1PcmdJZGVudGlmaWVyEjgKBG5hbWUYASABKAlCKrpIJ3IlEAEYPzIfXlthLXowLTldKFstYS16MC05XSpbYS16MC05XSk/JCJtChhNYW5hZ2VkQ2x1c3RlcklkZW50aWZpZXISFQoEbmFtZRgCIAEoCUIHukgEcgIQARI0CgNvcmcYAyABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLk9yZ0lkZW50aWZpZXJCBrpIA8gBAUoECAEQAiI/ChBQb2xpY3lJZGVudGlmaWVyEhQKDG9yZ2FuaXphdGlvbhgBIAEoCRIVCgRuYW1lGAIgASgJQge6SARyAhABIncKDVJ1bklkZW50aWZpZXISFgoDb3JnGAEgASgJQgm6SAZyBBABGD8SGgoHcHJvamVjdBgCIAEoCUIJukgGcgQQARg/EhkKBmRvbWFpbhgDIAEoCUIJukgGcgQQARg/EhcKBG5hbWUYBCABKAlCCbpIBnIEEAEYHiJhChBBY3Rpb25JZGVudGlmaWVyEjQKA3J1bhgBIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckIGukgDyAEBEhcKBG5hbWUYAiABKAlCCbpIBnIEEAEYHiJyChdBY3Rpb25BdHRlbXB0SWRlbnRpZmllchI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAIpUBCgtUcmlnZ2VyTmFtZRIWCgNvcmcYASABKAlCCbpIBnIEEAEYPxIaCgdwcm9qZWN0GAIgASgJQgm6SAZyBBABGD8SGQoGZG9tYWluGAMgASgJQgm6SAZyBBABGD8SGAoEbmFtZRgEIAEoCUIKukgHcgUQARj/ARIdCgl0YXNrX25hbWUYBSABKAlCCrpIB3IFEAEY/wEiYwoRVHJpZ2dlcklkZW50aWZpZXISMwoEbmFtZRgBIAEoCzIdLmZseXRlaWRsMi5jb21tb24uVHJpZ2dlck5hbWVCBrpIA8gBARIZCghyZXZpc2lvbhgCIAEoBEIHukgEMgIgAELAAQoUY29tLmZseXRlaWRsMi5jb21tb25CD0lkZW50aWZpZXJQcm90b0gCUAFaNGdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9jb21tb26iAgNGQ1iqAhBGbHl0ZWlkbDIuQ29tbW9uygIQRmx5dGVpZGwyXENvbW1vbuICHEZseXRlaWRsMlxDb21tb25cR1BCTWV0YWRhdGHqAhFGbHl0ZWlkbDI6OkNvbW1vbmIGcHJvdG8z", [file_buf_validate_validate]);
 
 /**
  * @generated from message flyteidl2.common.ProjectIdentifier
@@ -85,42 +85,6 @@ export const ClusterPoolIdentifierSchema: GenMessage<ClusterPoolIdentifier> = /*
   messageDesc(file_flyteidl2_common_identifier, 2);
 
 /**
- * @generated from message flyteidl2.common.QueueIdentifier
- */
-export type QueueIdentifier = Message<"flyteidl2.common.QueueIdentifier"> & {
-  /**
-   * @generated from field: string organization = 1;
-   */
-  organization: string;
-
-  /**
-   * Optional domain scope. Empty means all domains.
-   *
-   * @generated from field: string domain = 2;
-   */
-  domain: string;
-
-  /**
-   * Optional project scope. Empty means a domain-specific (if domain is specified) or a global queue.
-   *
-   * @generated from field: string project = 3;
-   */
-  project: string;
-
-  /**
-   * @generated from field: string name = 4;
-   */
-  name: string;
-};
-
-/**
- * Describes the message flyteidl2.common.QueueIdentifier.
- * Use `create(QueueIdentifierSchema)` to create a new message.
- */
-export const QueueIdentifierSchema: GenMessage<QueueIdentifier> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_common_identifier, 3);
-
-/**
  * @generated from message flyteidl2.common.ClusterConfigIdentifier
  */
 export type ClusterConfigIdentifier = Message<"flyteidl2.common.ClusterConfigIdentifier"> & {
@@ -140,7 +104,7 @@ export type ClusterConfigIdentifier = Message<"flyteidl2.common.ClusterConfigIde
  * Use `create(ClusterConfigIdentifierSchema)` to create a new message.
  */
 export const ClusterConfigIdentifierSchema: GenMessage<ClusterConfigIdentifier> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_common_identifier, 4);
+  messageDesc(file_flyteidl2_common_identifier, 3);
 
 /**
  * @generated from message flyteidl2.common.ClusterNodepoolIdentifier
@@ -167,7 +131,7 @@ export type ClusterNodepoolIdentifier = Message<"flyteidl2.common.ClusterNodepoo
  * Use `create(ClusterNodepoolIdentifierSchema)` to create a new message.
  */
 export const ClusterNodepoolIdentifierSchema: GenMessage<ClusterNodepoolIdentifier> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_common_identifier, 5);
+  messageDesc(file_flyteidl2_common_identifier, 4);
 
 /**
  * @generated from message flyteidl2.common.UserIdentifier
@@ -184,7 +148,7 @@ export type UserIdentifier = Message<"flyteidl2.common.UserIdentifier"> & {
  * Use `create(UserIdentifierSchema)` to create a new message.
  */
 export const UserIdentifierSchema: GenMessage<UserIdentifier> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_common_identifier, 6);
+  messageDesc(file_flyteidl2_common_identifier, 5);
 
 /**
  * @generated from message flyteidl2.common.ApplicationIdentifier
@@ -201,7 +165,7 @@ export type ApplicationIdentifier = Message<"flyteidl2.common.ApplicationIdentif
  * Use `create(ApplicationIdentifierSchema)` to create a new message.
  */
 export const ApplicationIdentifierSchema: GenMessage<ApplicationIdentifier> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_common_identifier, 7);
+  messageDesc(file_flyteidl2_common_identifier, 6);
 
 /**
  * @generated from message flyteidl2.common.RoleIdentifier
@@ -225,7 +189,7 @@ export type RoleIdentifier = Message<"flyteidl2.common.RoleIdentifier"> & {
  * Use `create(RoleIdentifierSchema)` to create a new message.
  */
 export const RoleIdentifierSchema: GenMessage<RoleIdentifier> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_common_identifier, 8);
+  messageDesc(file_flyteidl2_common_identifier, 7);
 
 /**
  * @generated from message flyteidl2.common.OrgIdentifier
@@ -242,7 +206,7 @@ export type OrgIdentifier = Message<"flyteidl2.common.OrgIdentifier"> & {
  * Use `create(OrgIdentifierSchema)` to create a new message.
  */
 export const OrgIdentifierSchema: GenMessage<OrgIdentifier> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_common_identifier, 9);
+  messageDesc(file_flyteidl2_common_identifier, 8);
 
 /**
  * @generated from message flyteidl2.common.ManagedClusterIdentifier
@@ -264,7 +228,7 @@ export type ManagedClusterIdentifier = Message<"flyteidl2.common.ManagedClusterI
  * Use `create(ManagedClusterIdentifierSchema)` to create a new message.
  */
 export const ManagedClusterIdentifierSchema: GenMessage<ManagedClusterIdentifier> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_common_identifier, 10);
+  messageDesc(file_flyteidl2_common_identifier, 9);
 
 /**
  * @generated from message flyteidl2.common.PolicyIdentifier
@@ -288,7 +252,7 @@ export type PolicyIdentifier = Message<"flyteidl2.common.PolicyIdentifier"> & {
  * Use `create(PolicyIdentifierSchema)` to create a new message.
  */
 export const PolicyIdentifierSchema: GenMessage<PolicyIdentifier> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_common_identifier, 11);
+  messageDesc(file_flyteidl2_common_identifier, 10);
 
 /**
  * Unique identifier of a run.
@@ -330,7 +294,7 @@ export type RunIdentifier = Message<"flyteidl2.common.RunIdentifier"> & {
  * Use `create(RunIdentifierSchema)` to create a new message.
  */
 export const RunIdentifierSchema: GenMessage<RunIdentifier> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_common_identifier, 12);
+  messageDesc(file_flyteidl2_common_identifier, 11);
 
 /**
  * Unique identifier of an action.
@@ -358,7 +322,7 @@ export type ActionIdentifier = Message<"flyteidl2.common.ActionIdentifier"> & {
  * Use `create(ActionIdentifierSchema)` to create a new message.
  */
 export const ActionIdentifierSchema: GenMessage<ActionIdentifier> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_common_identifier, 13);
+  messageDesc(file_flyteidl2_common_identifier, 12);
 
 /**
  * Unique identifier of a single action attempt
@@ -382,7 +346,7 @@ export type ActionAttemptIdentifier = Message<"flyteidl2.common.ActionAttemptIde
  * Use `create(ActionAttemptIdentifierSchema)` to create a new message.
  */
 export const ActionAttemptIdentifierSchema: GenMessage<ActionAttemptIdentifier> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_common_identifier, 14);
+  messageDesc(file_flyteidl2_common_identifier, 13);
 
 /**
  * Identifies trigger within an org, project and domain
@@ -429,7 +393,7 @@ export type TriggerName = Message<"flyteidl2.common.TriggerName"> & {
  * Use `create(TriggerNameSchema)` to create a new message.
  */
 export const TriggerNameSchema: GenMessage<TriggerName> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_common_identifier, 15);
+  messageDesc(file_flyteidl2_common_identifier, 14);
 
 /**
  * Identifies a trigger revision within an org, project and domain
@@ -455,5 +419,5 @@ export type TriggerIdentifier = Message<"flyteidl2.common.TriggerIdentifier"> & 
  * Use `create(TriggerIdentifierSchema)` to create a new message.
  */
 export const TriggerIdentifierSchema: GenMessage<TriggerIdentifier> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_common_identifier, 16);
+  messageDesc(file_flyteidl2_common_identifier, 15);
 
