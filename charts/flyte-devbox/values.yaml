@@ -135,6 +135,7 @@ flyte-binary:
         - '*'
 # RustFS chart configuration.
 rustfs:
+  enabled: true
   fullnameOverride: rustfs
   mode:
     standalone:

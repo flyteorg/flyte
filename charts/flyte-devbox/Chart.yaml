@@ -39,3 +39,4 @@ dependencies:
   - name: rustfs
     version: 0.0.94
     repository: https://rustfs.github.io/helm
+    condition: rustfs.enabled

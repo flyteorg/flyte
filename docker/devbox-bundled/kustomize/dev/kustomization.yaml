@@ -110,12 +110,3 @@ patches:
             volumeMounts:
             - mountPath: /data
               name: data
-- target:
-    kind: Ingress
-    name: rustfs
-  patch: |
-    $patch: delete
-    apiVersion: networking.k8s.io/v1
-    kind: Ingress
-    metadata:
-      name: rustfs
