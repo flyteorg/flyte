@@ -7548,6 +7548,7 @@ metadata:
 ---
 apiVersion: v1
 data:
+  allow-zero-initial-scale: "true"
   max-scale: "1"
 kind: ConfigMap
 metadata:

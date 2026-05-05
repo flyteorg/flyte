@@ -134,6 +134,34 @@ func TestDeploy_SkipUpdateWhenUnchanged(t *testing.T) {
 	assert.Equal(t, initialRV, ksvc.ResourceVersion, "resource version should not change on no-op deploy")
 }
 
+func TestDeploy_AfterStop_ClearsStoppedLabels(t *testing.T) {
+	// Regression: Deploy() was skipping the update when the spec SHA was unchanged,
+	// even if Stop() had marked the KService as stopped. Clicking "Start App" in the UI sends
+	// the same spec, so the SHA matched and the app could never restart.
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
+	require.NoError(t, c.Stop(context.Background(), id))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+	assert.Equal(t, "true", ksvc.Labels[labelAppStopped], "app-stopped label should be set after Stop")
+	assert.Equal(t, visibilityClusterLocal, ksvc.Labels[labelKnativeVisibility], "service should be cluster-local after Stop")
+
+	// Deploy same spec (as "Start App" would) — must not skip due to SHA match.
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+	_, stopped := ksvc.Labels[labelAppStopped]
+	assert.False(t, stopped, "app-stopped label must be cleared after Deploy following a Stop")
+	_, visibility := ksvc.Labels[labelKnativeVisibility]
+	assert.False(t, visibility, "visibility label must be cleared after Deploy following a Stop")
+}
+
 func TestStop(t *testing.T) {
 	c := testClient(t)
 	app := testApp("proj", "dev", "myapp", "nginx:latest")
@@ -145,7 +173,10 @@ func TestStop(t *testing.T) {
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
 		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
-	assert.Equal(t, "0", ksvc.Spec.Template.Annotations["autoscaling.knative.dev/max-scale"])
+	assert.Equal(t, "true", ksvc.Labels[labelAppStopped])
+	assert.Equal(t, visibilityClusterLocal, ksvc.Labels[labelKnativeVisibility])
+	assert.Equal(t, "0", ksvc.Spec.Template.Annotations["autoscaling.knative.dev/min-scale"])
+	assert.Equal(t, "0", ksvc.Spec.Template.Annotations["autoscaling.knative.dev/initial-scale"])
 }
 
 func TestStop_NotFound(t *testing.T) {
@@ -153,6 +184,66 @@ func TestStop_NotFound(t *testing.T) {
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "missing"}
 	// Should succeed silently — already gone.
 	require.NoError(t, c.Stop(context.Background(), id))
+}
+
+func TestStop_DeletesLatestReadyRevision(t *testing.T) {
+	// When a KService has a LatestReadyRevisionName, Stop() must delete that
+	// Revision so its Deployment and pods are immediately terminated.
+	// Updating the KService template alone is not sufficient — it does not immediately terminate existing pods.
+	// for the autoscaler and does not kill running pods; they only scale down after
+	// the stable window (~60s) with no traffic.
+	s := testScheme(t)
+	ksvc := &servingv1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "myapp-proj-dev",
+			Namespace: AppNamespace,
+			Labels: map[string]string{
+				labelAppManaged: "true",
+				labelProject:    "proj",
+				labelDomain:     "dev",
+				labelAppName:    "myapp",
+			},
+			Annotations: map[string]string{
+				annotationAppID: "proj/dev/myapp",
+			},
+		},
+	}
+	ksvc.Status.LatestReadyRevisionName = "myapp-proj-dev-00001"
+
+	rev := &servingv1.Revision{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "myapp-proj-dev-00001",
+			Namespace: AppNamespace,
+		},
+	}
+
+	fc := fake.NewClientBuilder().
+		WithScheme(s).
+		WithObjects(ksvc, rev).
+		WithStatusSubresource(ksvc).
+		Build()
+	c := &AppK8sClient{
+		k8sClient: fc,
+		cfg:       &config.InternalAppConfig{},
+	}
+
+	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
+	require.NoError(t, c.Stop(context.Background(), id))
+
+	// KService must be marked stopped so Deploy can reliably clear the stopped state.
+	gotKsvc := &servingv1.Service{}
+	require.NoError(t, fc.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, gotKsvc))
+	assert.Equal(t, "true", gotKsvc.Labels[labelAppStopped],
+		"KService must carry the app-stopped label after Stop")
+	assert.Equal(t, visibilityClusterLocal, gotKsvc.Labels[labelKnativeVisibility],
+		"KService must be cluster-local after Stop")
+
+	// LatestReadyRevision must be deleted so its pods are terminated immediately.
+	gotRev := &servingv1.Revision{}
+	err := fc.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev-00001", Namespace: AppNamespace}, gotRev)
+	assert.True(t, k8serrors.IsNotFound(err), "LatestReadyRevision must be deleted after Stop")
 }
 
 func TestDelete(t *testing.T) {
@@ -582,7 +673,6 @@ func TestSubscribe_ReceivesEvent(t *testing.T) {
 	}
 }
 
-
 func TestSubscribe_AppSpecificDoesNotReceiveOtherApps(t *testing.T) {
 	c := testClient(t)
 	ch := c.Subscribe("app1")
@@ -712,10 +802,10 @@ func TestKserviceToStatus_Messages(t *testing.T) {
 			name: "stopped",
 			ksvc: func() *servingv1.Service {
 				ksvc := testKsvc("myapp", AppNamespace, "1")
-				if ksvc.Spec.Template.Annotations == nil {
-					ksvc.Spec.Template.Annotations = map[string]string{}
+				if ksvc.Labels == nil {
+					ksvc.Labels = map[string]string{}
 				}
-				ksvc.Spec.Template.Annotations["autoscaling.knative.dev/max-scale"] = "0"
+				ksvc.Labels[labelAppStopped] = "true"
 				return ksvc
 			},
 			wantConditions: []struct {
