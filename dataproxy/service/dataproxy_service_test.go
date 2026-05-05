@@ -544,14 +544,14 @@ func TestGetActionData(t *testing.T) {
 	}{
 		{
 			name:             "success with both inputs and outputs",
-			inputsURI:        "s3://test-bucket/inputs-dir",
+			inputsURI:        "s3://test-bucket/inputs-dir/inputs.pb",
 			outputsURI:       "s3://test-bucket/outputs/outputs.pb",
 			expectInputsLen:  1,
 			expectOutputsLen: 1,
 		},
 		{
 			name:             "success with only inputs",
-			inputsURI:        "s3://test-bucket/inputs-dir",
+			inputsURI:        "s3://test-bucket/inputs-dir/inputs.pb",
 			outputsURI:       "",
 			expectInputsLen:  1,
 			expectOutputsLen: 0,
@@ -577,7 +577,7 @@ func TestGetActionData(t *testing.T) {
 		},
 		{
 			name:          "read inputs error propagates",
-			inputsURI:     "s3://test-bucket/inputs-dir",
+			inputsURI:     "s3://test-bucket/inputs-dir/inputs.pb",
 			readInputsErr: assertErr("read failed"),
 			wantErr:       true,
 		},
@@ -605,7 +605,7 @@ func TestGetActionData(t *testing.T) {
 			mockComposedStore := storageMocks.NewComposedProtobufStore(t)
 
 			if tt.inputsURI != "" {
-				expectedInputRef := storage.DataReference(tt.inputsURI + "/inputs.pb")
+				expectedInputRef := storage.DataReference(tt.inputsURI)
 				call := mockComposedStore.On("ReadProtobuf", mock.Anything, expectedInputRef, mock.Anything)
 				if tt.readInputsErr != nil {
 					call.Return(tt.readInputsErr).Maybe()

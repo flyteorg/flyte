@@ -4,6 +4,7 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
+import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
 import type { BlobType, Error, LiteralType, OutputReference, SchemaType, StructuredDatasetType } from "./types_pb.ts";
 import { file_flyteidl2_core_types } from "./types_pb.ts";
 import type { Duration, Timestamp } from "@bufbuild/protobuf/wkt";
@@ -14,7 +15,7 @@ import type { JsonObject, Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/core/literals.proto.
  */
 export const file_flyteidl2_core_literals: GenFile = /*@__PURE__*/
-  fileDesc("Ch1mbHl0ZWlkbDIvY29yZS9saXRlcmFscy5wcm90bxIOZmx5dGVpZGwyLmNvcmUiyAEKCVByaW1pdGl2ZRIRCgdpbnRlZ2VyGAEgASgDSAASFQoLZmxvYXRfdmFsdWUYAiABKAFIABIWCgxzdHJpbmdfdmFsdWUYAyABKAlIABIRCgdib29sZWFuGAQgASgISAASLgoIZGF0ZXRpbWUYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSAASLQoIZHVyYXRpb24YBiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25IAEIHCgV2YWx1ZSIGCgRWb2lkIkMKBEJsb2ISLgoIbWV0YWRhdGEYASABKAsyHC5mbHl0ZWlkbDIuY29yZS5CbG9iTWV0YWRhdGESCwoDdXJpGAMgASgJIjYKDEJsb2JNZXRhZGF0YRImCgR0eXBlGAEgASgLMhguZmx5dGVpZGwyLmNvcmUuQmxvYlR5cGUiJAoGQmluYXJ5Eg0KBXZhbHVlGAEgASgMEgsKA3RhZxgCIAEoCSI/CgZTY2hlbWESCwoDdXJpGAEgASgJEigKBHR5cGUYAyABKAsyGi5mbHl0ZWlkbDIuY29yZS5TY2hlbWFUeXBlIloKBVVuaW9uEiYKBXZhbHVlGAEgASgLMhcuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbBIpCgR0eXBlGAIgASgLMhsuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbFR5cGUiYwoZU3RydWN0dXJlZERhdGFzZXRNZXRhZGF0YRJGChdzdHJ1Y3R1cmVkX2RhdGFzZXRfdHlwZRgBIAEoCzIlLmZseXRlaWRsMi5jb3JlLlN0cnVjdHVyZWREYXRhc2V0VHlwZSJdChFTdHJ1Y3R1cmVkRGF0YXNldBILCgN1cmkYASABKAkSOwoIbWV0YWRhdGEYAiABKAsyKS5mbHl0ZWlkbDIuY29yZS5TdHJ1Y3R1cmVkRGF0YXNldE1ldGFkYXRhIqMDCgZTY2FsYXISLgoJcHJpbWl0aXZlGAEgASgLMhkuZmx5dGVpZGwyLmNvcmUuUHJpbWl0aXZlSAASJAoEYmxvYhgCIAEoCzIULmZseXRlaWRsMi5jb3JlLkJsb2JIABIoCgZiaW5hcnkYAyABKAsyFi5mbHl0ZWlkbDIuY29yZS5CaW5hcnlIABIoCgZzY2hlbWEYBCABKAsyFi5mbHl0ZWlkbDIuY29yZS5TY2hlbWFIABIpCglub25lX3R5cGUYBSABKAsyFC5mbHl0ZWlkbDIuY29yZS5Wb2lkSAASJgoFZXJyb3IYBiABKAsyFS5mbHl0ZWlkbDIuY29yZS5FcnJvckgAEioKB2dlbmVyaWMYByABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0SAASPwoSc3RydWN0dXJlZF9kYXRhc2V0GAggASgLMiEuZmx5dGVpZGwyLmNvcmUuU3RydWN0dXJlZERhdGFzZXRIABImCgV1bmlvbhgJIAEoCzIVLmZseXRlaWRsMi5jb3JlLlVuaW9uSABCBwoFdmFsdWUi7AIKB0xpdGVyYWwSKAoGc2NhbGFyGAEgASgLMhYuZmx5dGVpZGwyLmNvcmUuU2NhbGFySAASNwoKY29sbGVjdGlvbhgCIAEoCzIhLmZseXRlaWRsMi5jb3JlLkxpdGVyYWxDb2xsZWN0aW9uSAASKQoDbWFwGAMgASgLMhouZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbE1hcEgAEkYKEm9mZmxvYWRlZF9tZXRhZGF0YRgIIAEoCzIoLmZseXRlaWRsMi5jb3JlLkxpdGVyYWxPZmZsb2FkZWRNZXRhZGF0YUgAEgwKBGhhc2gYBCABKAkSNwoIbWV0YWRhdGEYBSADKAsyJS5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsLk1ldGFkYXRhRW50cnkaLwoNTWV0YWRhdGFFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBQgcKBXZhbHVlSgQIBhAHSgQIBxAIIm8KGExpdGVyYWxPZmZsb2FkZWRNZXRhZGF0YRILCgN1cmkYASABKAkSEgoKc2l6ZV9ieXRlcxgCIAEoBBIyCg1pbmZlcnJlZF90eXBlGAMgASgLMhsuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbFR5cGUiPgoRTGl0ZXJhbENvbGxlY3Rpb24SKQoIbGl0ZXJhbHMYASADKAsyFy5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsIpIBCgpMaXRlcmFsTWFwEjoKCGxpdGVyYWxzGAEgAygLMiguZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbE1hcC5MaXRlcmFsc0VudHJ5GkgKDUxpdGVyYWxzRW50cnkSCwoDa2V5GAEgASgJEiYKBXZhbHVlGAIgASgLMhcuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbDoCOAEiRgoVQmluZGluZ0RhdGFDb2xsZWN0aW9uEi0KCGJpbmRpbmdzGAEgAygLMhsuZmx5dGVpZGwyLmNvcmUuQmluZGluZ0RhdGEingEKDkJpbmRpbmdEYXRhTWFwEj4KCGJpbmRpbmdzGAEgAygLMiwuZmx5dGVpZGwyLmNvcmUuQmluZGluZ0RhdGFNYXAuQmluZGluZ3NFbnRyeRpMCg1CaW5kaW5nc0VudHJ5EgsKA2tleRgBIAEoCRIqCgV2YWx1ZRgCIAEoCzIbLmZseXRlaWRsMi5jb3JlLkJpbmRpbmdEYXRhOgI4ASI8CglVbmlvbkluZm8SLwoKdGFyZ2V0VHlwZRgBIAEoCzIbLmZseXRlaWRsMi5jb3JlLkxpdGVyYWxUeXBlItICCgtCaW5kaW5nRGF0YRIoCgZzY2FsYXIYASABKAsyFi5mbHl0ZWlkbDIuY29yZS5TY2FsYXJIABI7Cgpjb2xsZWN0aW9uGAIgASgLMiUuZmx5dGVpZGwyLmNvcmUuQmluZGluZ0RhdGFDb2xsZWN0aW9uSAASMgoHcHJvbWlzZRgDIAEoCzIfLmZseXRlaWRsMi5jb3JlLk91dHB1dFJlZmVyZW5jZUgAEi0KA21hcBgEIAEoCzIeLmZseXRlaWRsMi5jb3JlLkJpbmRpbmdEYXRhTWFwSAASRgoSb2ZmbG9hZGVkX21ldGFkYXRhGAYgASgLMiguZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbE9mZmxvYWRlZE1ldGFkYXRhSAASKAoFdW5pb24YBSABKAsyGS5mbHl0ZWlkbDIuY29yZS5VbmlvbkluZm9CBwoFdmFsdWUiRAoHQmluZGluZxILCgN2YXIYASABKAkSLAoHYmluZGluZxgCIAEoCzIbLmZseXRlaWRsMi5jb3JlLkJpbmRpbmdEYXRhIioKDEtleVZhbHVlUGFpchILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAkiIAoNUmV0cnlTdHJhdGVneRIPCgdyZXRyaWVzGAUgASgNQrIBChJjb20uZmx5dGVpZGwyLmNvcmVCDUxpdGVyYWxzUHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvY29yZaICA0ZDWKoCDkZseXRlaWRsMi5Db3JlygIORmx5dGVpZGwyXENvcmXiAhpGbHl0ZWlkbDJcQ29yZVxHUEJNZXRhZGF0YeoCD0ZseXRlaWRsMjo6Q29yZWIGcHJvdG8z", [file_flyteidl2_core_types, file_google_protobuf_duration, file_google_protobuf_struct, file_google_protobuf_timestamp]);
+  fileDesc("Ch1mbHl0ZWlkbDIvY29yZS9saXRlcmFscy5wcm90bxIOZmx5dGVpZGwyLmNvcmUiyAEKCVByaW1pdGl2ZRIRCgdpbnRlZ2VyGAEgASgDSAASFQoLZmxvYXRfdmFsdWUYAiABKAFIABIWCgxzdHJpbmdfdmFsdWUYAyABKAlIABIRCgdib29sZWFuGAQgASgISAASLgoIZGF0ZXRpbWUYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSAASLQoIZHVyYXRpb24YBiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25IAEIHCgV2YWx1ZSIGCgRWb2lkIkMKBEJsb2ISLgoIbWV0YWRhdGEYASABKAsyHC5mbHl0ZWlkbDIuY29yZS5CbG9iTWV0YWRhdGESCwoDdXJpGAMgASgJIjYKDEJsb2JNZXRhZGF0YRImCgR0eXBlGAEgASgLMhguZmx5dGVpZGwyLmNvcmUuQmxvYlR5cGUiJAoGQmluYXJ5Eg0KBXZhbHVlGAEgASgMEgsKA3RhZxgCIAEoCSI/CgZTY2hlbWESCwoDdXJpGAEgASgJEigKBHR5cGUYAyABKAsyGi5mbHl0ZWlkbDIuY29yZS5TY2hlbWFUeXBlIloKBVVuaW9uEiYKBXZhbHVlGAEgASgLMhcuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbBIpCgR0eXBlGAIgASgLMhsuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbFR5cGUiYwoZU3RydWN0dXJlZERhdGFzZXRNZXRhZGF0YRJGChdzdHJ1Y3R1cmVkX2RhdGFzZXRfdHlwZRgBIAEoCzIlLmZseXRlaWRsMi5jb3JlLlN0cnVjdHVyZWREYXRhc2V0VHlwZSJdChFTdHJ1Y3R1cmVkRGF0YXNldBILCgN1cmkYASABKAkSOwoIbWV0YWRhdGEYAiABKAsyKS5mbHl0ZWlkbDIuY29yZS5TdHJ1Y3R1cmVkRGF0YXNldE1ldGFkYXRhIqMDCgZTY2FsYXISLgoJcHJpbWl0aXZlGAEgASgLMhkuZmx5dGVpZGwyLmNvcmUuUHJpbWl0aXZlSAASJAoEYmxvYhgCIAEoCzIULmZseXRlaWRsMi5jb3JlLkJsb2JIABIoCgZiaW5hcnkYAyABKAsyFi5mbHl0ZWlkbDIuY29yZS5CaW5hcnlIABIoCgZzY2hlbWEYBCABKAsyFi5mbHl0ZWlkbDIuY29yZS5TY2hlbWFIABIpCglub25lX3R5cGUYBSABKAsyFC5mbHl0ZWlkbDIuY29yZS5Wb2lkSAASJgoFZXJyb3IYBiABKAsyFS5mbHl0ZWlkbDIuY29yZS5FcnJvckgAEioKB2dlbmVyaWMYByABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0SAASPwoSc3RydWN0dXJlZF9kYXRhc2V0GAggASgLMiEuZmx5dGVpZGwyLmNvcmUuU3RydWN0dXJlZERhdGFzZXRIABImCgV1bmlvbhgJIAEoCzIVLmZseXRlaWRsMi5jb3JlLlVuaW9uSABCBwoFdmFsdWUi7AIKB0xpdGVyYWwSKAoGc2NhbGFyGAEgASgLMhYuZmx5dGVpZGwyLmNvcmUuU2NhbGFySAASNwoKY29sbGVjdGlvbhgCIAEoCzIhLmZseXRlaWRsMi5jb3JlLkxpdGVyYWxDb2xsZWN0aW9uSAASKQoDbWFwGAMgASgLMhouZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbE1hcEgAEkYKEm9mZmxvYWRlZF9tZXRhZGF0YRgIIAEoCzIoLmZseXRlaWRsMi5jb3JlLkxpdGVyYWxPZmZsb2FkZWRNZXRhZGF0YUgAEgwKBGhhc2gYBCABKAkSNwoIbWV0YWRhdGEYBSADKAsyJS5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsLk1ldGFkYXRhRW50cnkaLwoNTWV0YWRhdGFFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBQgcKBXZhbHVlSgQIBhAHSgQIBxAIIm8KGExpdGVyYWxPZmZsb2FkZWRNZXRhZGF0YRILCgN1cmkYASABKAkSEgoKc2l6ZV9ieXRlcxgCIAEoBBIyCg1pbmZlcnJlZF90eXBlGAMgASgLMhsuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbFR5cGUiPgoRTGl0ZXJhbENvbGxlY3Rpb24SKQoIbGl0ZXJhbHMYASADKAsyFy5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsIpIBCgpMaXRlcmFsTWFwEjoKCGxpdGVyYWxzGAEgAygLMiguZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbE1hcC5MaXRlcmFsc0VudHJ5GkgKDUxpdGVyYWxzRW50cnkSCwoDa2V5GAEgASgJEiYKBXZhbHVlGAIgASgLMhcuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbDoCOAEiRgoVQmluZGluZ0RhdGFDb2xsZWN0aW9uEi0KCGJpbmRpbmdzGAEgAygLMhsuZmx5dGVpZGwyLmNvcmUuQmluZGluZ0RhdGEingEKDkJpbmRpbmdEYXRhTWFwEj4KCGJpbmRpbmdzGAEgAygLMiwuZmx5dGVpZGwyLmNvcmUuQmluZGluZ0RhdGFNYXAuQmluZGluZ3NFbnRyeRpMCg1CaW5kaW5nc0VudHJ5EgsKA2tleRgBIAEoCRIqCgV2YWx1ZRgCIAEoCzIbLmZseXRlaWRsMi5jb3JlLkJpbmRpbmdEYXRhOgI4ASI8CglVbmlvbkluZm8SLwoKdGFyZ2V0VHlwZRgBIAEoCzIbLmZseXRlaWRsMi5jb3JlLkxpdGVyYWxUeXBlItICCgtCaW5kaW5nRGF0YRIoCgZzY2FsYXIYASABKAsyFi5mbHl0ZWlkbDIuY29yZS5TY2FsYXJIABI7Cgpjb2xsZWN0aW9uGAIgASgLMiUuZmx5dGVpZGwyLmNvcmUuQmluZGluZ0RhdGFDb2xsZWN0aW9uSAASMgoHcHJvbWlzZRgDIAEoCzIfLmZseXRlaWRsMi5jb3JlLk91dHB1dFJlZmVyZW5jZUgAEi0KA21hcBgEIAEoCzIeLmZseXRlaWRsMi5jb3JlLkJpbmRpbmdEYXRhTWFwSAASRgoSb2ZmbG9hZGVkX21ldGFkYXRhGAYgASgLMiguZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbE9mZmxvYWRlZE1ldGFkYXRhSAASKAoFdW5pb24YBSABKAsyGS5mbHl0ZWlkbDIuY29yZS5VbmlvbkluZm9CBwoFdmFsdWUiRAoHQmluZGluZxILCgN2YXIYASABKAkSLAoHYmluZGluZxgCIAEoCzIbLmZseXRlaWRsMi5jb3JlLkJpbmRpbmdEYXRhIioKDEtleVZhbHVlUGFpchILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAki0gIKB0JhY2tvZmYSMQoEYmFzZRgBIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIIukgFqgECMgASIwoGZmFjdG9yGAIgASgBQg66SAsSCSkAAAAAAADwP0gAiAEBEjAKA2NhcBgDIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIIukgFqgECMgA6sQG6SK0BGqoBCiViYWNrb2ZmLmNhcF9yZXF1aXJlZF93aGVuX2ZhY3Rvcl9ndF8xEkdjYXAgaXMgcmVxdWlyZWQgd2hlbiBmYWN0b3IgPiAxIHRvIHByZXZlbnQgdW5ib3VuZGVkIHJldHJ5IGRlbGF5IGdyb3d0aBo4IWhhcyh0aGlzLmZhY3RvcikgfHwgdGhpcy5mYWN0b3IgPD0gMS4wIHx8IGhhcyh0aGlzLmNhcClCCQoHX2ZhY3RvciJKCg1SZXRyeVN0cmF0ZWd5Eg8KB3JldHJpZXMYBSABKA0SKAoHYmFja29mZhgGIAEoCzIXLmZseXRlaWRsMi5jb3JlLkJhY2tvZmYihQEKD1RpbWVvdXRTdHJhdGVneRI7Cg5xdWV1ZWRfdGltZW91dBgBIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIIukgFqgECMgASNQoIZGVhZGxpbmUYAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CCLpIBaoBAjIAQrIBChJjb20uZmx5dGVpZGwyLmNvcmVCDUxpdGVyYWxzUHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvY29yZaICA0ZDWKoCDkZseXRlaWRsMi5Db3JlygIORmx5dGVpZGwyXENvcmXiAhpGbHl0ZWlkbDJcQ29yZVxHUEJNZXRhZGF0YeoCD0ZseXRlaWRsMjo6Q29yZWIGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_core_types, file_google_protobuf_duration, file_google_protobuf_struct, file_google_protobuf_timestamp]);
 
 /**
  * Primitive Types
@@ -650,18 +651,70 @@ export const KeyValuePairSchema: GenMessage<KeyValuePair> = /*@__PURE__*/
   messageDesc(file_flyteidl2_core_literals, 19);
 
 /**
+ * Backoff policy applied between user retries. Computed delay for retry n
+ * (0-indexed) is: min(base * factor**n, cap). All fields are optional; if
+ * all are unset, no backoff is applied (retries fire immediately). An unset
+ * factor is interpreted as 1.0 (constant delay).
+ *
+ * @generated from message flyteidl2.core.Backoff
+ */
+export type Backoff = Message<"flyteidl2.core.Backoff"> & {
+  /**
+   * Initial delay before the first retry. Must be >= 0 when set.
+   *
+   * @generated from field: google.protobuf.Duration base = 1;
+   */
+  base?: Duration;
+
+  /**
+   * Multiplier applied per retry. factor=1 yields constant delay; factor=2
+   * doubles each time. When unset, factor is treated as 1.0. Must be >= 1.0
+   * when set.
+   *
+   * @generated from field: optional double factor = 2;
+   */
+  factor?: number;
+
+  /**
+   * Upper bound on the computed delay. Required when factor > 1 to prevent
+   * unbounded growth. Must be >= 0 when set.
+   *
+   * @generated from field: google.protobuf.Duration cap = 3;
+   */
+  cap?: Duration;
+};
+
+/**
+ * Describes the message flyteidl2.core.Backoff.
+ * Use `create(BackoffSchema)` to create a new message.
+ */
+export const BackoffSchema: GenMessage<Backoff> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_core_literals, 20);
+
+/**
  * Retry strategy associated with an executable unit.
  *
  * @generated from message flyteidl2.core.RetryStrategy
  */
 export type RetryStrategy = Message<"flyteidl2.core.RetryStrategy"> & {
   /**
-   * Number of retries. Retries will be consumed when the job fails with a recoverable error.
-   * The number of retries must be less than or equals to 10.
+   * Number of user retries. Retries are consumed when the job fails with a
+   * recoverable error. Retries are NOT consumed when user code raises
+   * NonRecoverableError (see ContainerError.Kind.NON_RECOVERABLE).
+   * The number of retries must be less than or equal to 10.
    *
    * @generated from field: uint32 retries = 5;
    */
   retries: number;
+
+  /**
+   * Optional backoff policy applied between user retries. If unset, retries
+   * fire immediately back-to-back. Backoff applies only to user retries;
+   * system retries are governed by platform recovery policy.
+   *
+   * @generated from field: flyteidl2.core.Backoff backoff = 6;
+   */
+  backoff?: Backoff;
 };
 
 /**
@@ -669,5 +722,51 @@ export type RetryStrategy = Message<"flyteidl2.core.RetryStrategy"> & {
  * Use `create(RetryStrategySchema)` to create a new message.
  */
 export const RetryStrategySchema: GenMessage<RetryStrategy> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_literals, 20);
+  messageDesc(file_flyteidl2_core_literals, 21);
+
+/**
+ * Timeout strategy for an action — additional bounds layered on top of
+ * TaskMetadata.timeout (the per-attempt RUNNING-phase bound, a.k.a.
+ * max_runtime). Each field below is independently optional. For every
+ * duration field in this message, a value of 0 (or an unset field) is
+ * interpreted as unlimited (no bound applied). Negative values are
+ * rejected.
+ *
+ * queued_timeout is anchored per attempt (resets on retry). deadline is
+ * anchored once at the timestamp the action first entered
+ * ACTION_PHASE_QUEUED, recorded by the actions service and reused across
+ * all attempts (user or system).
+ *
+ * @generated from message flyteidl2.core.TimeoutStrategy
+ */
+export type TimeoutStrategy = Message<"flyteidl2.core.TimeoutStrategy"> & {
+  /**
+   * Wall-clock spent in ACTION_PHASE_QUEUED + ACTION_PHASE_WAITING_FOR_RESOURCES
+   * before the action enters ACTION_PHASE_INITIALIZING. Per attempt — resets
+   * on each retry. Enforced by the leasor (pre-lease) and the lease worker
+   * (post-lease, before user code starts). 0 (or unset) means unlimited.
+   *
+   * @generated from field: google.protobuf.Duration queued_timeout = 1;
+   */
+  queuedTimeout?: Duration;
+
+  /**
+   * Wall-clock from first ACTION_PHASE_QUEUED timestamp to a terminal phase,
+   * across ALL attempts (user and system). One-time, absolute. If deadline
+   * fires while an attempt is mid-flight, the attempt is reaped and the
+   * action terminates as TIMED_OUT regardless of TaskMetadata.timeout or
+   * remaining retry budget. Enforced by the leasor. 0 (or unset) means
+   * unlimited.
+   *
+   * @generated from field: google.protobuf.Duration deadline = 2;
+   */
+  deadline?: Duration;
+};
+
+/**
+ * Describes the message flyteidl2.core.TimeoutStrategy.
+ * Use `create(TimeoutStrategySchema)` to create a new message.
+ */
+export const TimeoutStrategySchema: GenMessage<TimeoutStrategy> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_core_literals, 22);
 

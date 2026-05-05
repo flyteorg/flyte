@@ -19,6 +19,12 @@
 [![SDK Reference](https://img.shields.io/badge/SDK%20Reference-API-brightgreen)](https://www.union.ai/docs/v2/byoc/api-reference/flyte-sdk/)
 [![CLI Reference](https://img.shields.io/badge/CLI%20Reference-API-brightgreen)](https://www.union.ai/docs/v2/byoc/api-reference/flyte-cli/)
 
+Flyte is a Graduated project of the [LF AI & Data Foundation](https://lfaidata.foundation/projects/flyte/).
+
+<a href="https://lfaidata.foundation/projects/flyte/">
+  <img src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/readme/flyte_and_lf.png" alt="Flyte and LF AI & Data Logo" width="250">
+</a>
+
 ## Install
 
 ```bash
