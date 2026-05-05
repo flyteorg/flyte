@@ -165,13 +165,13 @@ func (r DataReference) Split() (scheme, container, key string, err error) {
 		return "", "", "", err
 	}
 
-	// Handle storage URLs that use @ to separate container/bucket name from the storage endpoint.
-	// When url.Parse encounters the @ symbol, it treats the part before @ as User and the part after as Host.
-	// Example: Azure ADLS Gen2 uses abfs://container@storageaccount.dfs.core.windows.net/path format.
-	if u.User != nil && u.User.Username() != "" {
+	// Azure ADLS Gen2 encodes the filesystem in the userinfo position:
+	// abfs[s]://container@storageaccount.dfs.core.windows.net/path. url.Parse puts "container" in
+	// u.User and the storage account in u.Host, so pull the container from userinfo for these schemes.
+	// Other schemes keep using u.Host so URLs like s3://accessKey:secret@bucket/key still parse correctly.
+	container = u.Host
+	if (u.Scheme == "abfs" || u.Scheme == "abfss") && u.User != nil && u.User.Username() != "" {
 		container = u.User.Username()
-	} else {
-		container = u.Host
 	}
 
 	return u.Scheme, container, strings.Trim(u.Path, "/"), nil

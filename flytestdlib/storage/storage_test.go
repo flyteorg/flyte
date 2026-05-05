@@ -59,6 +59,26 @@ func TestDataReference_Split(t *testing.T) {
 		assert.Equal(t, "bucket", container)
 		assert.Equal(t, "path/to/object", key)
 	})
+
+	t.Run("Azure ADLS Gen2 URL with abfss scheme", func(t *testing.T) {
+		input := DataReference("abfss://mycontainer@mystorageaccount.dfs.core.windows.net/path/to/file")
+		scheme, container, key, err := input.Split()
+
+		assert.NoError(t, err)
+		assert.Equal(t, "abfss", scheme)
+		assert.Equal(t, "mycontainer", container)
+		assert.Equal(t, "path/to/file", key)
+	})
+
+	t.Run("S3 URL with userinfo keeps host as container", func(t *testing.T) {
+		input := DataReference("s3://accessKey:secret@bucket/path/to/file")
+		scheme, container, key, err := input.Split()
+
+		assert.NoError(t, err)
+		assert.Equal(t, "s3", scheme)
+		assert.Equal(t, "bucket", container)
+		assert.Equal(t, "path/to/file", key)
+	})
 }
 
 func ExampleNewDataStore() {
