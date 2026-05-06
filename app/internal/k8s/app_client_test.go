@@ -732,6 +732,19 @@ func testKsvc(name, ns, rv string) *servingv1.Service {
 
 // --- Status message format tests ---
 
+func TestKserviceToApp_StoppedDesiredState(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+
+	require.NoError(t, c.Deploy(context.Background(), app))
+	require.NoError(t, c.Stop(context.Background(), app.Metadata.Id))
+
+	got, err := c.GetApp(context.Background(), app.Metadata.Id)
+	require.NoError(t, err)
+	assert.Equal(t, flyteapp.Spec_DESIRED_STATE_STOPPED, got.GetSpec().GetDesiredState(),
+		"stopped app should have DesiredState=STOPPED in the returned spec")
+}
+
 func TestKserviceToStatus_Messages(t *testing.T) {
 	tests := []struct {
 		name           string

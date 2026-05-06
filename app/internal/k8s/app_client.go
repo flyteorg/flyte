@@ -973,11 +973,16 @@ func (c *AppK8sClient) kserviceToApp(ctx context.Context, ksvc *servingv1.Servic
 		Name:    parts[2],
 	}
 
+	spec := specFromAnnotation(ksvc)
+	if spec != nil && ksvc.Labels[labelAppStopped] == "true" {
+		spec.DesiredState = flyteapp.Spec_DESIRED_STATE_STOPPED
+	}
+
 	return &flyteapp.App{
 		Metadata: &flyteapp.Meta{
 			Id: appID,
 		},
-		Spec:   specFromAnnotation(ksvc),
+		Spec:   spec,
 		Status: c.kserviceToStatus(ctx, ksvc),
 	}, nil
 }
