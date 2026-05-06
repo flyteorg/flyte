@@ -203,7 +203,7 @@ message TailLogsRequest {
   // The attempt number.
   uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
 
-  // Selects which pod(s) to tail. If unset, defaults to all_pods.
+  // Selects which pod(s) to tail. If unset, defaults to primary_pod.
   oneof pod_selector {
     // Tail logs from the primary pod only.
     bool primary_pod = 3;

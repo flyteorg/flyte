@@ -841,7 +841,7 @@ type TailLogsRequest struct {
 	ActionId *common.ActionIdentifier `protobuf:"bytes,1,opt,name=action_id,json=actionId,proto3" json:"action_id,omitempty"`
 	// The attempt number.
 	Attempt uint32 `protobuf:"varint,2,opt,name=attempt,proto3" json:"attempt,omitempty"`
-	// Selects which pod(s) to tail. If unset, defaults to all_pods.
+	// Selects which pod(s) to tail. If unset, defaults to primary_pod.
 	//
 	// Types that are assignable to PodSelector:
 	//

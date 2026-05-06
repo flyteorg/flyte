@@ -432,7 +432,7 @@ export type TailLogsRequest = Message<"flyteidl2.dataproxy.TailLogsRequest"> & {
   attempt: number;
 
   /**
-   * Selects which pod(s) to tail. If unset, defaults to all_pods.
+   * Selects which pod(s) to tail. If unset, defaults to primary_pod.
    *
    * @generated from oneof flyteidl2.dataproxy.TailLogsRequest.pod_selector
    */
