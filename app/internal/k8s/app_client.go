@@ -494,6 +494,15 @@ func KServiceName(id *flyteapp.Identifier) string {
 	return prefix + "-" + suffix
 }
 
+// renderNamespacedSuffix substitutes {{ project }} and {{ domain }}
+// in a template string to produce the KService name suffix used in INTERNAL_APP_ENDPOINT_PATTERN.
+func renderNamespacedSuffix(tmpl, project, domain string) string {
+	return strings.NewReplacer(
+		"{{ project }}", strings.ToLower(project),
+		"{{ domain }}", strings.ToLower(domain),
+	).Replace(tmpl)
+}
+
 // marshalSpec serializes the App Spec proto and returns the raw bytes.
 func marshalSpec(spec *flyteapp.Spec) ([]byte, error) {
 	b, err := proto.Marshal(spec)
@@ -534,6 +543,18 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 			defaults = append(defaults, corev1.EnvVar{Name: k, Value: v})
 		}
 		podSpec.Containers[0].Env = append(defaults, podSpec.Containers[0].Env...)
+	}
+
+	// Inject INTERNAL_APP_ENDPOINT_PATTERN so app code can construct internal cluster URLs
+	// for other apps by substituting {app_fqdn} with the target app name.
+	// The suffix is rendered from NamespacedNamePrefixTemplate to match the KService name format
+	// {name}-{project}-{domain} used by KServiceName().
+	if len(podSpec.Containers) > 0 {
+		suffix := renderNamespacedSuffix(c.cfg.NamespacedNameSuffixTemplate, appID.GetProject(), appID.GetDomain())
+		podSpec.Containers[0].Env = append(podSpec.Containers[0].Env, corev1.EnvVar{
+			Name:  "INTERNAL_APP_ENDPOINT_PATTERN",
+			Value: fmt.Sprintf("http://{app_fqdn}-%s.%s.svc.cluster.local", suffix, ns),
+		})
 	}
 
 	templateAnnotations := buildAutoscalingAnnotations(spec, c.cfg)
