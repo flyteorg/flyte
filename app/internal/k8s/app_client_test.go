@@ -487,6 +487,25 @@ func TestKServiceName(t *testing.T) {
 	}
 }
 
+func TestRenderNamespacedSuffix(t *testing.T) {
+	tests := []struct {
+		tmpl    string
+		project string
+		domain  string
+		want    string
+	}{
+		{"{{ project }}-{{ domain }}", "myproject", "dev", "myproject-dev"},
+		{"{{ project }}-{{ domain }}", "MyProject", "Dev", "myproject-dev"},
+		{"{{ project }}-{{ domain }}", "proj", "prod", "proj-prod"},
+		{"custom-{{ domain }}", "proj", "dev", "custom-dev"},
+		{"", "proj", "dev", ""},
+	}
+	for _, tt := range tests {
+		got := renderNamespacedSuffix(tt.tmpl, tt.project, tt.domain)
+		assert.Equal(t, tt.want, got)
+	}
+}
+
 func TestPodDeploymentStatus(t *testing.T) {
 	tests := []struct {
 		name       string
