@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyte/v2
 
-go 1.24.6
+go 1.25
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.10-20250912141014-52f32327d4b0.1
@@ -19,7 +19,7 @@ require (
 	github.com/dask/dask-kubernetes/v2023 v2023.0.0-20230626103304-abd02cd17b26
 	github.com/eko/gocache/lib/v4 v4.2.0
 	github.com/eko/gocache/store/freecache/v4 v4.2.0
-	github.com/eko/gocache/store/redis/v4 v4.2.0
+	github.com/eko/gocache/store/redis/v4 v4.2.6
 	github.com/fatih/color v1.13.0
 	github.com/fergusstrange/embedded-postgres v1.34.0
 	github.com/flyteorg/stow v0.3.12
@@ -205,7 +205,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.37.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.7.1 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	go.uber.org/mock v0.4.0 // indirect
+	go.uber.org/mock v0.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
