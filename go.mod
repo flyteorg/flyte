@@ -38,7 +38,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/kubeflow/training-operator v1.9.3
 	github.com/lib/pq v1.10.9
-	github.com/magiconair/properties v1.8.6
+	github.com/magiconair/properties v1.8.10
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/onsi/ginkgo/v2 v2.22.0
 	github.com/onsi/gomega v1.36.1
