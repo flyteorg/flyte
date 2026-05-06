@@ -52,7 +52,11 @@ const (
 	annotationAppOrg  = "flyte.org/app-org"
 	annotationSpec    = "flyte.org/spec"
 
-	maxScaleZero = "0"
+	labelAppStopped        = "flyte.org/app-stopped"
+	labelKnativeVisibility = "networking.knative.dev/visibility"
+	visibilityClusterLocal = "cluster-local"
+
+	scaleZero = "0"
 
 	// maxKServiceNameLen is the Kubernetes DNS label limit.
 	maxKServiceNameLen = 63
@@ -64,8 +68,8 @@ type AppK8sClientInterface interface {
 	// the update if the spec SHA annotation is unchanged.
 	Deploy(ctx context.Context, app *flyteapp.App) error
 
-	// Stop scales the KService to zero by setting max-scale=0. The KService CRD
-	// is kept so the app can be restarted later.
+	// Stop scales the KService to zero and makes it cluster-local (not published to external gateway).
+	// The KService CRD is kept so the app can be restarted later.
 	Stop(ctx context.Context, appID *flyteapp.Identifier) error
 
 	// GetApp reads the KService and returns the full App including reconstructed Spec and live Status.
@@ -165,7 +169,13 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 		return fmt.Errorf("failed to get KService %s: %w", name, err)
 	}
 
-	if existing.Annotations[annotationSpecSHA] == ksvc.Annotations[annotationSpecSHA] {
+	// Always update when the existing KService is in stopped state,
+	// even if the spec SHA is unchanged. Stop() marks the KService with a label
+	// without touching the spec SHA annotation, so an unchanged spec would
+	// otherwise cause Deploy() to skip the update and leave it stopped.
+	existingStopped := existing.Labels != nil && existing.Labels[labelAppStopped] == "true"
+
+	if !existingStopped && existing.Annotations[annotationSpecSHA] == ksvc.Annotations[annotationSpecSHA] {
 		logger.Debugf(ctx, "KService %s/%s spec unchanged, skipping update", ns, name)
 		return nil
 	}
@@ -180,6 +190,9 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 	for k, v := range ksvc.Labels {
 		existing.Labels[k] = v
 	}
+	// Deploy implies "start": clear stop/private labels applied by Stop().
+	delete(existing.Labels, labelAppStopped)
+	delete(existing.Labels, labelKnativeVisibility)
 	if existing.Annotations == nil {
 		existing.Annotations = make(map[string]string)
 	}
@@ -193,22 +206,47 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 	return nil
 }
 
-// Stop sets max-scale=0 on the KService, scaling it to zero without deleting it.
+// Stop makes the app unreachable from the public gateway and scales it to zero without deleting the KService.
 func (c *AppK8sClient) Stop(ctx context.Context, appID *flyteapp.Identifier) error {
 	ns := AppNamespace
 	name := KServiceName(appID)
-	patch := []byte(`{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/max-scale":"0"}}}}}`)
+	// Make the Service cluster-local so it is not published to the external gateway,
+	// and set initial/min scale to zero so it converges to 0 pods.
+	// initial-scale=0 requires allow-zero-initial-scale=true in config-autoscaler.
+	patch := []byte(fmt.Sprintf(
+		`{"metadata":{"labels":{"%s":"true","%s":"%s"}},"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/min-scale":"%s","autoscaling.knative.dev/initial-scale":"%s"}}}}}`,
+		labelAppStopped,
+		labelKnativeVisibility,
+		visibilityClusterLocal,
+		scaleZero,
+		scaleZero,
+	))
 	ksvc := &servingv1.Service{}
 	ksvc.Name = name
 	ksvc.Namespace = ns
 	if err := c.k8sClient.Patch(ctx, ksvc, client.RawPatch(types.MergePatchType, patch)); err != nil {
 		if k8serrors.IsNotFound(err) {
-			// Already stopped/deleted — treat as success.
 			return nil
 		}
 		return fmt.Errorf("failed to patch KService %s to stop: %w", name, err)
 	}
-	logger.Infof(ctx, "Stopped KService %s/%s (max-scale=0)", ns, name)
+
+	// The patch above updates the revision template, which creates a new Revision.
+	// To ensure running pods are terminated immediately (instead of waiting for the
+	// stable window with no traffic), delete the latest ready Revision.
+	current := &servingv1.Service{}
+	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: ns}, current); err == nil {
+		if revName := current.Status.LatestReadyRevisionName; revName != "" {
+			rev := &servingv1.Revision{}
+			rev.Name = revName
+			rev.Namespace = ns
+			if delErr := c.k8sClient.Delete(ctx, rev); delErr != nil && !k8serrors.IsNotFound(delErr) {
+				logger.Warnf(ctx, "Failed to delete Revision %s/%s to stop: %v", ns, revName, delErr)
+			}
+		}
+	}
+
+	logger.Infof(ctx, "Stopped KService %s/%s (cluster-local, scaled to zero)", ns, name)
 	return nil
 }
 
@@ -769,16 +807,14 @@ func knativeCondToAppCondition(kCond knativeapis.Condition, serviceReady, servic
 // kserviceToStatus maps a KService's conditions to a flyteapp.Status proto.
 // It fetches the latest ready Revision to read the accurate ActualReplicas count.
 func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Service) *flyteapp.Status {
-	// Check if max-scale=0 is set — explicitly stopped by the control plane.
-	if ann := ksvc.Spec.Template.Annotations; ann != nil {
-		if ann["autoscaling.knative.dev/max-scale"] == maxScaleZero {
-			return &flyteapp.Status{
-				Conditions: []*flyteapp.Condition{{
-					DeploymentStatus:   flyteapp.Status_DEPLOYMENT_STATUS_STOPPED,
-					Message:            "App scaled to zero",
-					LastTransitionTime: timestamppb.Now(),
-				}},
-			}
+	// Check if the Service is explicitly stopped by the control plane.
+	if ksvc.Labels != nil && ksvc.Labels[labelAppStopped] == "true" {
+		return &flyteapp.Status{
+			Conditions: []*flyteapp.Condition{{
+				DeploymentStatus:   flyteapp.Status_DEPLOYMENT_STATUS_STOPPED,
+				Message:            "App scaled to zero",
+				LastTransitionTime: timestamppb.Now(),
+			}},
 		}
 	}
 
@@ -787,7 +823,13 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 	serviceFailed := readyCond != nil && readyCond.IsFalse()
 	var conditions []*flyteapp.Condition
 	for i := range ksvc.Status.Conditions {
-		if cond := knativeCondToAppCondition(ksvc.Status.Conditions[i], serviceReady, serviceFailed); cond != nil {
+		kCond := ksvc.Status.Conditions[i]
+		// Knative condition sets may surface both RoutesReady=Unknown and Ready=Unknown.
+		// Emit only the overall Ready in this case, since it's what the UI cares about.
+		if kCond.Type == servingv1.ServiceConditionRoutesReady && kCond.Status == corev1.ConditionUnknown {
+			continue
+		}
+		if cond := knativeCondToAppCondition(kCond, serviceReady, serviceFailed); cond != nil {
 			conditions = append(conditions, cond)
 		}
 	}
@@ -952,11 +994,16 @@ func (c *AppK8sClient) kserviceToApp(ctx context.Context, ksvc *servingv1.Servic
 		Name:    parts[2],
 	}
 
+	spec := specFromAnnotation(ksvc)
+	if spec != nil && ksvc.Labels[labelAppStopped] == "true" {
+		spec.DesiredState = flyteapp.Spec_DESIRED_STATE_STOPPED
+	}
+
 	return &flyteapp.App{
 		Metadata: &flyteapp.Meta{
 			Id: appID,
 		},
-		Spec:   specFromAnnotation(ksvc),
+		Spec:   spec,
 		Status: c.kserviceToStatus(ctx, ksvc),
 	}, nil
 }
