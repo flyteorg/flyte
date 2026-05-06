@@ -100,6 +100,27 @@ func TestDeploy_Create(t *testing.T) {
 	assert.Equal(t, "proj/dev/myapp", ksvc.Annotations[annotationAppID])
 }
 
+func TestDeploy_InjectsInternalAppEndpointPattern(t *testing.T) {
+	c := testClient(t)
+	c.cfg.NamespacedNameSuffixTemplate = "{{ project }}-{{ domain }}"
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+	envVars := ksvc.Spec.Template.Spec.Containers[0].Env
+	var pattern string
+	for _, e := range envVars {
+		if e.Name == "INTERNAL_APP_ENDPOINT_PATTERN" {
+			pattern = e.Value
+			break
+		}
+	}
+	assert.Equal(t, "http://{app_fqdn}-proj-dev.flyte.svc.cluster.local", pattern)
+}
+
 func TestDeploy_UpdateOnSpecChange(t *testing.T) {
 	c := testClient(t)
 	app := testApp("proj", "dev", "myapp", "nginx:1.0")
