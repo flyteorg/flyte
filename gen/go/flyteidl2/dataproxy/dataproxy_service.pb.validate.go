@@ -1662,7 +1662,46 @@ func (m *TailLogsRequest) validate(all bool) error {
 
 	// no validation rules for Attempt
 
-	// no validation rules for PodName
+	switch v := m.PodSelector.(type) {
+	case *TailLogsRequest_PrimaryPod:
+		if v == nil {
+			err := TailLogsRequestValidationError{
+				field:  "PodSelector",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for PrimaryPod
+	case *TailLogsRequest_AllPods:
+		if v == nil {
+			err := TailLogsRequestValidationError{
+				field:  "PodSelector",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for AllPods
+	case *TailLogsRequest_PodName:
+		if v == nil {
+			err := TailLogsRequestValidationError{
+				field:  "PodSelector",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for PodName
+	default:
+		_ = v // ensures v is used
+	}
 
 	if len(errors) > 0 {
 		return TailLogsRequestMultiError(errors)

@@ -203,8 +203,15 @@ message TailLogsRequest {
   // The attempt number.
   uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
 
-  // The pod name to tail logs from. If not provided, attempt to find the primary pod, else assume the first pod.
-  string pod_name = 3;
+  // Selects which pod(s) to tail. If unset, defaults to all_pods.
+  oneof pod_selector {
+    // Tail logs from the primary pod only.
+    bool primary_pod = 3;
+    // Tail logs from all pods. This is the default when pod_selector is unset.
+    bool all_pods = 4;
+    // Tail logs from the named pod only.
+    string pod_name = 5;
+  }
 }
 
 // Reponse message for tailing logs.
