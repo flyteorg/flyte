@@ -351,6 +351,21 @@ message SecurityContext {
   // AllowAnonymous indicates if the app should be accessible without authentication. This assumes the app will handle
   // its own authentication or that it's a public app.
   bool allow_anonymous = 5;
+
+  // List of URL path prefixes that are publicly accessible without authentication.
+  // Each prefix must start with "/". Matching is path-segment-aware:
+  //   - "/api"  matches "/api" exact and "/api/..." (NOT "/apifoo")
+  //   - "/api/" matches "/api/..." only (NOT bare "/api")
+  // Query strings and fragments are stripped from the request path before matching.
+  // Independent from allow_anonymous; if allow_anonymous is true, the entire app
+  // is public and these prefixes have no additional effect.
+  // Catastrophic prefix "/" makes the whole app public — equivalent to
+  // allow_anonymous=true. This is intentional.
+  repeated string public_path_prefixes = 6 [
+    (buf.validate.field).repeated.max_items = 50,
+    (buf.validate.field).repeated.items.string.min_len = 1,
+    (buf.validate.field).repeated.items.string.pattern = "^/.*"
+  ];
 }
 
 message ImageSpec {
