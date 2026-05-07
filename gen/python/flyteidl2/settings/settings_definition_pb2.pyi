@@ -118,14 +118,10 @@ class QuantitySetting(_message.Message):
     def __init__(self, state: _Optional[_Union[SettingState, str]] = ..., quantity_value: _Optional[str] = ..., scope_level: _Optional[_Union[ScopeLevel, str]] = ...) -> None: ...
 
 class RunSettings(_message.Message):
-    __slots__ = ["default_queue", "run_concurrency", "action_concurrency"]
+    __slots__ = ["default_queue"]
     DEFAULT_QUEUE_FIELD_NUMBER: _ClassVar[int]
-    RUN_CONCURRENCY_FIELD_NUMBER: _ClassVar[int]
-    ACTION_CONCURRENCY_FIELD_NUMBER: _ClassVar[int]
     default_queue: StringSetting
-    run_concurrency: Int64Setting
-    action_concurrency: Int64Setting
-    def __init__(self, default_queue: _Optional[_Union[StringSetting, _Mapping]] = ..., run_concurrency: _Optional[_Union[Int64Setting, _Mapping]] = ..., action_concurrency: _Optional[_Union[Int64Setting, _Mapping]] = ...) -> None: ...
+    def __init__(self, default_queue: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
 
 class SecuritySettings(_message.Message):
     __slots__ = ["service_account"]
@@ -174,7 +170,7 @@ class Settings(_message.Message):
     security: SecuritySettings
     storage: StorageSettings
     task_resource: TaskResourceSettings
-    labels: StringListSetting
+    labels: StringMapSetting
     annotations: StringMapSetting
     environment_variables: StringMapSetting
-    def __init__(self, run: _Optional[_Union[RunSettings, _Mapping]] = ..., security: _Optional[_Union[SecuritySettings, _Mapping]] = ..., storage: _Optional[_Union[StorageSettings, _Mapping]] = ..., task_resource: _Optional[_Union[TaskResourceSettings, _Mapping]] = ..., labels: _Optional[_Union[StringListSetting, _Mapping]] = ..., annotations: _Optional[_Union[StringMapSetting, _Mapping]] = ..., environment_variables: _Optional[_Union[StringMapSetting, _Mapping]] = ...) -> None: ...
+    def __init__(self, run: _Optional[_Union[RunSettings, _Mapping]] = ..., security: _Optional[_Union[SecuritySettings, _Mapping]] = ..., storage: _Optional[_Union[StorageSettings, _Mapping]] = ..., task_resource: _Optional[_Union[TaskResourceSettings, _Mapping]] = ..., labels: _Optional[_Union[StringMapSetting, _Mapping]] = ..., annotations: _Optional[_Union[StringMapSetting, _Mapping]] = ..., environment_variables: _Optional[_Union[StringMapSetting, _Mapping]] = ...) -> None: ...

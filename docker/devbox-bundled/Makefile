@@ -191,6 +191,8 @@ setup-knative:
 		--patch '{"data":{"domain-template":"{{.Name}}.{{.Domain}}"}}'
 	kubectl patch configmap/config-domain -n knative-serving --type merge \
 		--patch '{"data":{"local.flyte.app":null,"localhost":""}}'
+	kubectl patch configmap/config-autoscaler -n knative-serving --type merge \
+		--patch '{"data":{"allow-zero-initial-scale":"true"}}'
 	kubectl patch svc/kourier -n kourier-system --type merge \
 		--patch '{"spec":{"type":"NodePort","ports":[{"name":"http2","port":80,"targetPort":8080,"nodePort":30081}]}}'
 

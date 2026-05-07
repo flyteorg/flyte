@@ -150,8 +150,6 @@ message QuantitySetting {
 // RunSettings controls workflow execution behavior.
 message RunSettings {
   StringSetting default_queue = 1 [(flyteidl2.settings.desc) = "Default queue for task runs"];
-  Int64Setting run_concurrency = 2 [(flyteidl2.settings.desc) = "Maximum number of concurrent runs. 0 means unlimited."];
-  Int64Setting action_concurrency = 3 [(flyteidl2.settings.desc) = "Maximum number of concurrent actions per run. 0 means unlimited."];
 }
 
 // SecuritySettings controls security-related configuration.
@@ -186,7 +184,7 @@ message Settings {
   SecuritySettings security = 2;
   StorageSettings storage = 3;
   TaskResourceSettings task_resource = 4;
-  StringListSetting labels = 5 [(flyteidl2.settings.desc) = "Kubernetes labels applied to task pods. Additive across scopes."];
+  StringMapSetting labels = 5 [(flyteidl2.settings.desc) = "Kubernetes labels applied to task pods. Child overrides parent on key conflict."];
   StringMapSetting annotations = 6 [(flyteidl2.settings.desc) = "Kubernetes annotations applied to task pods. Child overrides parent on key conflict."];
   StringMapSetting environment_variables = 7 [(flyteidl2.settings.desc) = "Environment variables injected into task pods. Child overrides parent on key conflict."];
 }

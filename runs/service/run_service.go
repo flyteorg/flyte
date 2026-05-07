@@ -316,7 +316,7 @@ func (s *RunService) persistRunModel(
 	triggerType string,
 ) (*models.Run, error) {
 	// Store task spec and compute digest
-	info := &workflow.RunInfo{InputsUri: inputPrefix}
+	info := &workflow.RunInfo{InputsUri: inputPrefix + "/inputs.pb"}
 	taskSpecModel, err := models.NewTaskSpecModel(ctx, taskSpec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create task spec model: %w", err)

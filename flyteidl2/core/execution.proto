@@ -78,6 +78,43 @@ message ExecutionError {
   google.protobuf.Timestamp timestamp = 5;
   // Worker that generated the error
   string worker = 6;
+
+  // Whether this failure consumed a user retry. Mirrors the value the
+  // container reported via ContainerError.kind. Default is NON_RECOVERABLE
+  // (proto3 zero), matching the ContainerError.Kind default — producers
+  // (lease worker, leasor) must always set this explicitly when surfacing
+  // a recoverable failure. The SDK error-marshaling path is the source of
+  // truth: ordinary exceptions -> RECOVERABLE; flyte.errors.NonRecoverableError
+  // -> NON_RECOVERABLE.
+  ContainerError.Kind recoverability = 7;
+}
+
+// Error message to propagate detailed errors from container executions to the
+// execution engine.
+message ContainerError {
+  // A simplified code for errors, so that we can provide a glossary of all possible errors.
+  string code = 1;
+  // A detailed error message.
+  string message = 2;
+
+  // Defines a generic error type that dictates the behavior of the retry strategy.
+  enum Kind {
+    NON_RECOVERABLE = 0;
+    RECOVERABLE = 1;
+  }
+
+  // An abstract error kind for this error. Defaults to Non_Recoverable if not specified.
+  Kind kind = 3;
+
+  // Defines the origin of the error (system, user, unknown).
+  ExecutionError.ErrorKind origin = 4;
+}
+
+// Defines the errors.pb file format the container can produce to communicate
+// failure reasons to the execution engine.
+message ErrorDocument {
+  // The error raised during execution.
+  ContainerError error = 1;
 }
 
 // Log information for the task that is specific to a log sink
