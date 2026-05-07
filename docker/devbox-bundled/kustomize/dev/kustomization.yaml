@@ -81,4 +81,40 @@ patches:
       name: net-istio-controller
       namespace: knative-serving
     $patch: delete
-
+- target:
+    kind: Pod
+    name: rustfs-test-connection
+  patch: |
+    $patch: delete
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: rustfs-test-connection
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: rustfs
+      namespace: flyte
+    spec:
+      template:
+        spec:
+          initContainers:
+          - name: create-default-buckets
+            image: busybox:stable
+            imagePullPolicy: IfNotPresent
+            command:
+            - sh
+            - -c
+            - |
+              chown -R 10001:10001 /data
+              mkdir -p /data/flyte-data
+              chown 10001:10001 /data/flyte-data
+            securityContext:
+              runAsUser: 0
+              runAsNonRoot: false
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+            volumeMounts:
+            - mountPath: /data
+              name: data
