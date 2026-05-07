@@ -206,12 +206,16 @@ message TailLogsRequest {
   // Selects which pod(s) to tail. If unset, defaults to primary_pod.
   oneof pod_selector {
     // Tail logs from the primary pod only.
-    bool primary_pod = 3;
+    bool primary_pod = 6;
     // Tail logs from all pods. This is the default when pod_selector is unset.
-    bool all_pods = 4;
+    bool all_pods = 5;
     // Tail logs from the named pod only.
-    string pod_name = 5;
+    string pod_name = 3;
   }
+
+  // +optional. The dataproxy uses this to stream logs from the connector via
+  // AsyncConnectorService.GetTaskLogs instead of pod logs.
+  optional string connector_endpoint = 4;
 }
 
 // Reponse message for tailing logs.

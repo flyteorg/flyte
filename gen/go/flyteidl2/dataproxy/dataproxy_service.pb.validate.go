@@ -1703,6 +1703,10 @@ func (m *TailLogsRequest) validate(all bool) error {
 		_ = v // ensures v is used
 	}
 
+	if m.ConnectorEndpoint != nil {
+		// no validation rules for ConnectorEndpoint
+	}
+
 	if len(errors) > 0 {
 		return TailLogsRequestMultiError(errors)
 	}

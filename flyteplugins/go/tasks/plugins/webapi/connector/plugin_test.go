@@ -251,6 +251,57 @@ func TestPlugin(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
 	})
+
+	// Verifies that when the connector plugin recorded an endpoint on the
+	// ResourceWrapper, Status surfaces it through TaskInfo.LogContext.Connector
+	// so downstream consumers (action events → dataproxy log streaming) can
+	// reach the connector directly. See PR flyteorg/flyte#7317.
+	t.Run("Status records connector endpoint on LogContext when present", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:             flyteIdlCore.TaskExecution_RUNNING,
+			LogLinks:          []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			ConnectorEndpoint: "batch-job-connector.flytesnacks-development.svc.cluster.local:80",
+		})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+
+		info := phase.Info()
+		assert.NotNil(t, info)
+		assert.NotNil(t, info.LogContext)
+		assert.NotNil(t, info.LogContext.GetConnector())
+		assert.Equal(t,
+			"batch-job-connector.flytesnacks-development.svc.cluster.local:80",
+			info.LogContext.GetConnector().GetEndpoint())
+	})
+
+	// Pod-backed tasks (no connector endpoint) must not get a synthetic
+	// connector LogContext — the executor's pod-event flow owns LogContext for
+	// those.
+	t.Run("Status leaves LogContext unset when no connector endpoint", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_RUNNING,
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			// ConnectorEndpoint intentionally empty.
+		})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		info := phase.Info()
+		assert.NotNil(t, info)
+		assert.Nil(t, info.LogContext)
+	})
 }
 
 func getMockMetadataServiceClient() *connectorMocks.ConnectorMetadataServiceClient {

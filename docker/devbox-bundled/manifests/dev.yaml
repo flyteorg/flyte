@@ -7057,6 +7057,19 @@ spec:
       status: {}
 ---
 apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/version: 1.0.0-alpha.94
+    helm.sh/chart: rustfs-0.0.94
+  name: rustfs
+  namespace: flyte
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
@@ -7548,6 +7561,23 @@ metadata:
 ---
 apiVersion: v1
 data:
+  RUSTFS_ADDRESS: :9000
+  RUSTFS_CONSOLE_ADDRESS: :9001
+  RUSTFS_CONSOLE_ENABLE: "true"
+  RUSTFS_OBS_ENVIRONMENT: development
+  RUSTFS_OBS_LOG_DIRECTORY: /logs
+  RUSTFS_OBS_LOGGER_LEVEL: info
+  RUSTFS_REGION: us-east-1
+  RUSTFS_VOLUMES: /data
+kind: ConfigMap
+metadata:
+  labels: {}
+  name: rustfs-config
+  namespace: flyte
+---
+apiVersion: v1
+data:
+  allow-zero-initial-scale: "true"
   max-scale: "1"
 kind: ConfigMap
 metadata:
@@ -7744,17 +7774,12 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  access-key: cnVzdGZz
-  secret-key: cnVzdGZzc3RvcmFnZQ==
+  RUSTFS_ACCESS_KEY: cnVzdGZz
+  RUSTFS_SECRET_KEY: cnVzdGZzc3RvcmFnZQ==
 kind: Secret
 metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
-  name: rustfs
+  labels: {}
+  name: rustfs-secret
   namespace: flyte
 type: Opaque
 ---
@@ -7901,20 +7926,28 @@ metadata:
   labels:
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
-  name: rustfs
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/version: 1.0.0-alpha.94
+    helm.sh/chart: rustfs-0.0.94
+  name: rustfs-svc
   namespace: flyte
 spec:
   ports:
-  - name: rustfs-api
+  - name: endpoint
     nodePort: 30002
     port: 9000
-    targetPort: rustfs-api
+    targetPort: 9000
+  - name: console
+    nodePort: 32001
+    port: 9001
+    targetPort: 9001
   selector:
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/name: rustfs
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
   type: NodePort
 ---
 apiVersion: v1
@@ -8144,6 +8177,22 @@ spec:
   storageClassName: manual
   volumeName: flyte-devbox-rustfs-storage
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    helm.sh/resource-policy: keep
+  labels: {}
+  name: rustfs-logs
+  namespace: flyte
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 256Mi
+  storageClassName: local-path
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -8265,18 +8314,22 @@ metadata:
   labels:
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/version: 1.0.0-alpha.94
+    helm.sh/chart: rustfs-0.0.94
   name: rustfs
   namespace: flyte
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/instance: flyte-devbox
       app.kubernetes.io/name: rustfs
   strategy:
-    type: Recreate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -8284,65 +8337,102 @@ spec:
         app.kubernetes.io/name: rustfs
     spec:
       containers:
-      - env:
-        - name: RUSTFS_ADDRESS
-          value: 0.0.0.0:9000
-        - name: RUSTFS_VOLUMES
-          value: /data
-        - name: RUSTFS_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              key: access-key
-              name: rustfs
-        - name: RUSTFS_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              key: secret-key
-              name: rustfs
-        image: rustfs/rustfs:sandbox
-        imagePullPolicy: Never
+      - command:
+        - /usr/bin/rustfs
+        envFrom:
+        - configMapRef:
+            name: rustfs-config
+        - secretRef:
+            name: rustfs-secret
+        image: rustfs/rustfs:1.0.0-alpha.94
+        imagePullPolicy: IfNotPresent
         livenessProbe:
-          failureThreshold: 5
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: endpoint
           initialDelaySeconds: 10
-          periodSeconds: 10
-          tcpSocket:
-            port: rustfs-api
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
         name: rustfs
         ports:
         - containerPort: 9000
-          name: rustfs-api
-          protocol: TCP
+          name: endpoint
+        - containerPort: 9001
+          name: console
         readinessProbe:
-          failureThreshold: 5
-          initialDelaySeconds: 5
+          failureThreshold: 3
+          httpGet:
+            path: /health/ready
+            port: endpoint
+          initialDelaySeconds: 30
           periodSeconds: 5
-          tcpSocket:
-            port: rustfs-api
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources: {}
         securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
           runAsNonRoot: true
-          runAsUser: 10001
         volumeMounts:
+        - mountPath: /logs
+          name: logs
+          subPath: logs
         - mountPath: /data
           name: data
+      imagePullSecrets: []
       initContainers:
       - command:
-        - /bin/sh
-        - -ec
+        - sh
+        - -c
         - |
           chown -R 10001:10001 /data
           mkdir -p /data/flyte-data
           chown 10001:10001 /data/flyte-data
-        image: busybox:latest
+        image: busybox:stable
         imagePullPolicy: IfNotPresent
-        name: volume-permissions
+        name: create-default-buckets
         securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: false
           runAsUser: 0
         volumeMounts:
         - mountPath: /data
           name: data
+      - command:
+        - sh
+        - -c
+        - |
+          mkdir -p /data /mnt/rustfs/logs
+          chmod 755 /mnt/rustfs/logs
+        image: busybox:stable
+        imagePullPolicy: IfNotPresent
+        name: init-step
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+        volumeMounts:
+        - mountPath: /data
+          name: data
+        - mountPath: /mnt/rustfs
+          name: logs
       securityContext:
         fsGroup: 10001
+        runAsGroup: 10001
+        runAsUser: 10001
       volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: rustfs-logs
       - name: data
         persistentVolumeClaim:
           claimName: flyte-devbox-rustfs-storage

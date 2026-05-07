@@ -916,6 +916,35 @@ func (m *LogContext) validate(all bool) error {
 
 	// no validation rules for PrimaryPodName
 
+	if all {
+		switch v := interface{}(m.GetConnector()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LogContextValidationError{
+					field:  "Connector",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LogContextValidationError{
+					field:  "Connector",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetConnector()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LogContextValidationError{
+				field:  "Connector",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return LogContextMultiError(errors)
 	}
@@ -992,6 +1021,110 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LogContextValidationError{}
+
+// Validate checks the field values on ConnectorLogContext with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ConnectorLogContext) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ConnectorLogContext with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ConnectorLogContextMultiError, or nil if none found.
+func (m *ConnectorLogContext) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ConnectorLogContext) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Endpoint
+
+	if len(errors) > 0 {
+		return ConnectorLogContextMultiError(errors)
+	}
+
+	return nil
+}
+
+// ConnectorLogContextMultiError is an error wrapping multiple validation
+// errors returned by ConnectorLogContext.ValidateAll() if the designated
+// constraints aren't met.
+type ConnectorLogContextMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ConnectorLogContextMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ConnectorLogContextMultiError) AllErrors() []error { return m }
+
+// ConnectorLogContextValidationError is the validation error returned by
+// ConnectorLogContext.Validate if the designated constraints aren't met.
+type ConnectorLogContextValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ConnectorLogContextValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ConnectorLogContextValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ConnectorLogContextValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ConnectorLogContextValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ConnectorLogContextValidationError) ErrorName() string {
+	return "ConnectorLogContextValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ConnectorLogContextValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sConnectorLogContext.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ConnectorLogContextValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ConnectorLogContextValidationError{}
 
 // Validate checks the field values on PodLogContext with the rules defined in
 // the proto definition for this message. If any rules are violated, the first

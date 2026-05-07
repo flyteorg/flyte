@@ -690,7 +690,15 @@
           "items": {
             "type": "string"
           },
-          "description": "The execution log results."
+          "description": "The execution log results. Deprecated — use `lines` for structured log\nlines that carry timestamps and originator metadata. Retained for\nbackward compatibility with older connectors that emit only strings."
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/dataplaneLogLine"
+          },
+          "description": "Structured log lines (timestamp + message + originator). Preferred over\n`results`. Connectors should populate this field; the operator dataproxy\nfalls back to `results` only when this is empty."
         }
       }
     },
@@ -1911,6 +1919,32 @@
         }
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"
+    },
+    "dataplaneLogLine": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string",
+          "description": "Each line is separated by either CRLF, CR or LF, which are included\nat the ends of the lines. This lets clients know whether log emitter\nwanted to overwrite the previous line (LF) or append a new line (CRLF)."
+        },
+        "originator": {
+          "$ref": "#/definitions/dataplaneLogLineOriginator"
+        }
+      }
+    },
+    "dataplaneLogLineOriginator": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "USER",
+        "SYSTEM"
+      ],
+      "default": "UNKNOWN",
+      "description": " - UNKNOWN: The originator of the log line is unknown.\n - USER: The originator of the log line is the user application.\n - SYSTEM: The originator of the log line is the system."
     },
     "flyteidl2connectorResource": {
       "type": "object",
