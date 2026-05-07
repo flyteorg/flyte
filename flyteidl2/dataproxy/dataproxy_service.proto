@@ -208,7 +208,7 @@ message TailLogsRequest {
 
   // +optional. The dataproxy uses this to stream logs from the connector via
   // AsyncConnectorService.GetTaskLogs instead of pod logs.
-  string connector_endpoint = 4;
+  optional string connector_endpoint = 4;
 }
 
 // Reponse message for tailing logs.
