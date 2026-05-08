@@ -34,6 +34,10 @@ message LoggingContext {
   map<string, string> kubernetes_pod_labels = 9;
   common.Sort.Direction order = 10;
   uint64 number_of_batches = 11;
+  // Attempt number for the execution. Used by log sources to compute pod uniqueIDs
+  // when pod names are hashed (e.g. CloudWatch stream name prefix narrowing).
+  // +optional, defaults to 0
+  uint32 execution_attempt = 12;
 }
 
 // Parameters of environment in which logs were collected. Should contain everything

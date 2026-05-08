@@ -238,6 +238,8 @@ func (m *LoggingContext) validate(all bool) error {
 
 	// no validation rules for NumberOfBatches
 
+	// no validation rules for ExecutionAttempt
+
 	if len(errors) > 0 {
 		return LoggingContextMultiError(errors)
 	}
