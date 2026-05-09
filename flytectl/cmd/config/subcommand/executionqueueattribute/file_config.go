@@ -14,6 +14,8 @@ type AttrFileConfig struct {
 	*admin.ExecutionQueueAttributes
 }
 
+var DefaultAttrFileConfig = &AttrFileConfig{}
+
 // Decorate decorator over ExecutionQueueAttributes.
 func (a AttrFileConfig) Decorate() *admin.MatchingAttributes {
 	return &admin.MatchingAttributes{

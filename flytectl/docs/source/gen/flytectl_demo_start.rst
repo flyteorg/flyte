@@ -18,6 +18,11 @@ Starts the demo cluster without any source code:
 
  flytectl demo start
 
+Starts the demo cluster with different port:
+::
+
+ flytectl demo start --port 6443
+
 Runs a dev cluster, which only has minio and postgres pod.
 ::
 
@@ -100,6 +105,7 @@ Options
       --imagePullOptions.platform string       Forces a specific platform's image to be pulled.'
       --imagePullOptions.registryAuth string   The base64 encoded credentials for the registry.
       --imagePullPolicy ImagePullPolicy        Optional. Defines the image pull behavior [Always/IfNotPresent/Never] (default Always)
+      --port string                            Optional. Specify the port for the Kubernetes in the sandbox. (default "6443")
       --pre                                    Optional. Pre release Version of flyte will be used for sandbox.
       --source string                          deprecated,  path of your source code,  please build images with local daemon
       --version string                         Version of flyte. Only supports flyte releases greater than v0.10.0

@@ -64,13 +64,16 @@ Usage
 
 func updateTaskResourceAttributesFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	updateConfig := taskresourceattribute.DefaultUpdateConfig
-	if len(updateConfig.AttrFile) == 0 {
-		return fmt.Errorf("attrFile is mandatory while calling update for task resource attribute")
-	}
 
 	taskResourceAttrFileConfig := taskresourceattribute.TaskResourceAttrFileConfig{}
-	if err := sconfig.ReadConfigFromFile(&taskResourceAttrFileConfig, updateConfig.AttrFile); err != nil {
-		return err
+	if updateConfig.AttrFile != "" {
+		if err := sconfig.ReadConfigFromFile(&taskResourceAttrFileConfig, updateConfig.AttrFile); err != nil {
+			return err
+		}
+	} else if *taskresourceattribute.DefaultTaskResourceAttrFileConfig == taskResourceAttrFileConfig {
+		return fmt.Errorf("attrFile is mandatory while calling update for task resource attribute")
+	} else {
+		taskResourceAttrFileConfig = *taskresourceattribute.DefaultTaskResourceAttrFileConfig
 	}
 
 	// Get project domain workflow name from the read file.

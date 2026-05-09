@@ -14,6 +14,8 @@ type FileConfig struct {
 	*admin.ExecutionClusterLabel
 }
 
+var DefaultFileConfig = &FileConfig{}
+
 // Decorate decorator over ExecutionClusterLabel.
 func (t FileConfig) Decorate() *admin.MatchingAttributes {
 	return &admin.MatchingAttributes{
