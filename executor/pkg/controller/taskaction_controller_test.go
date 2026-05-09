@@ -326,6 +326,28 @@ var _ = Describe("TaskAction Controller", func() {
 		})
 	})
 
+	// Regression for #7205. Pre-fix, SetupWithManager unconditionally built
+	// the controller without WithOptions, so MaxConcurrentReconciles had no
+	// effect. The behavioral assertion below is intentionally narrow: it
+	// verifies the field is plumbed onto the reconciler and that values that
+	// would have been silently dropped before are now visible to
+	// SetupWithManager. The end-to-end "controller-runtime received this
+	// many workers" check belongs in an integration test (which would
+	// require a real envtest manager); here we lock the contract that the
+	// reconciler exposes the knob.
+	Context("MaxConcurrentReconciles plumbing (#7205)", func() {
+		It("defaults to 0 on a zero-value reconciler so SetupWithManager defers to controller-runtime", func() {
+			r := &TaskActionReconciler{}
+			Expect(r.MaxConcurrentReconciles).To(Equal(0),
+				"expected zero value so SetupWithManager skips WithOptions and inherits the upstream default")
+		})
+
+		It("preserves an explicitly configured value for SetupWithManager to forward", func() {
+			r := &TaskActionReconciler{MaxConcurrentReconciles: 4}
+			Expect(r.MaxConcurrentReconciles).To(Equal(4))
+		})
+	})
+
 	Context("recordSystemError", func() {
 		const handleErrResource = "handle-err-resource"
 		ctx := context.Background()

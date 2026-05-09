@@ -64,6 +64,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "EventsServiceURL"), defaultConfig.EventsServiceURL, "URL of the Event Service for action event updates")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cluster"), defaultConfig.Cluster, "Cluster identifier for action events")
 	cmdFlags.Uint32(fmt.Sprintf("%v%v", prefix, "maxSystemFailures"), defaultConfig.MaxSystemFailures, "Max consecutive system-level failures before forcing permanent failure")
+	cmdFlags.Uint32(fmt.Sprintf("%v%v", prefix, "maxConcurrentReconciles"), defaultConfig.MaxConcurrentReconciles, "Max concurrent reconciles for the TaskAction controller (controller-runtime MaxConcurrentReconciles); 0 means use controller-runtime's default")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "gc.interval"), defaultConfig.GC.Interval.String(), "How often the garbage collector runs. 0 disables GC.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "gc.maxTTL"), defaultConfig.GC.MaxTTL.String(), "Time-to-live for terminal TaskActions before deletion.")
 	return cmdFlags

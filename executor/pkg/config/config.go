@@ -25,6 +25,12 @@ var (
 		CacheServiceURL:        "http://localhost:8094",
 		Cluster:                "",
 		MaxSystemFailures:      3,
+		// Default to 1 reconcile worker. This matches controller-runtime's own
+		// default (see sigs.k8s.io/controller-runtime/pkg/controller.Options) and
+		// preserves the historical single-worker behavior when this knob is
+		// unset; operators tune it upward to spend more CPU on parallel
+		// reconciles when the TaskAction queue grows.
+		MaxConcurrentReconciles: 1,
 		GC: GCConfig{
 			Interval: stdconfig.Duration{Duration: 30 * time.Minute},
 			MaxTTL:   stdconfig.Duration{Duration: 1 * time.Hour},
@@ -83,6 +89,14 @@ type Config struct {
 	// errors and plugin-reported system-retryable failures) before a TaskAction is
 	// converted to a permanent failure.
 	MaxSystemFailures uint32 `json:"maxSystemFailures" pflag:",Max consecutive system-level failures before forcing permanent failure"`
+
+	// MaxConcurrentReconciles is the maximum number of concurrent reconciles
+	// the TaskAction controller may run. Maps directly to
+	// controller.Options.MaxConcurrentReconciles in controller-runtime, so the
+	// upstream documentation applies: each worker pulls one TaskAction at a
+	// time, so this scales the steady-state reconcile parallelism. A value of
+	// 0 means "defer to controller-runtime's own default" (currently 1).
+	MaxConcurrentReconciles uint32 `json:"maxConcurrentReconciles" pflag:",Max concurrent reconciles for the TaskAction controller (controller-runtime MaxConcurrentReconciles); 0 means use controller-runtime's default"`
 
 	// GC configures the garbage collector for terminal TaskActions.
 	GC GCConfig `json:"gc" pflag:",Garbage collector configuration for terminal TaskActions"`
