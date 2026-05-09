@@ -33,23 +33,6 @@ var configSection = config.MustRegisterSection(database, defaultConfig)
 // DbConfig is used to for initiating the database connection with the store that holds registered
 // entities (e.g. workflows, tasks, launch plans...)
 type DbConfig struct {
-	// deprecated: Please use Postgres.Host
-	DeprecatedHost string `json:"host" pflag:"-,deprecated"`
-	// deprecated: Please use Postgres.Port
-	DeprecatedPort int `json:"port" pflag:"-,deprecated"`
-	// deprecated: Please use Postgres.DbName
-	DeprecatedDbName string `json:"dbname" pflag:"-,deprecated"`
-	// deprecated: Please use Postgres.User
-	DeprecatedUser string `json:"username" pflag:"-,deprecated"`
-	// deprecated: Please use Postgres.Password
-	DeprecatedPassword string `json:"password" pflag:"-,deprecated"`
-	// deprecated: Please use Postgres.PasswordPath
-	DeprecatedPasswordPath string `json:"passwordPath" pflag:"-,deprecated"`
-	// deprecated: Please use Postgres.ExtraOptions
-	DeprecatedExtraOptions string `json:"options" pflag:"-,deprecated"`
-	// deprecated: Please use Postgres.Debug
-	DeprecatedDebug bool `json:"debug" pflag:"-,deprecated"`
-
 	EnableForeignKeyConstraintWhenMigrating bool            `json:"enableForeignKeyConstraintWhenMigrating" pflag:",Whether to enable gorm foreign keys when migrating the db"`
 	MaxIdleConnections                      int             `json:"maxIdleConnections" pflag:",maxIdleConnections sets the maximum number of connections in the idle connection pool."`
 	MaxOpenConnections                      int             `json:"maxOpenConnections" pflag:",maxOpenConnections sets the maximum number of open connections to the database."`
@@ -89,30 +72,5 @@ func (s PostgresConfig) IsEmpty() bool {
 }
 
 func GetConfig() *DbConfig {
-	databaseConfig := configSection.GetConfig().(*DbConfig)
-	if len(databaseConfig.DeprecatedHost) > 0 {
-		databaseConfig.Postgres.Host = databaseConfig.DeprecatedHost
-	}
-	if databaseConfig.DeprecatedPort != 0 {
-		databaseConfig.Postgres.Port = databaseConfig.DeprecatedPort
-	}
-	if len(databaseConfig.DeprecatedDbName) > 0 {
-		databaseConfig.Postgres.DbName = databaseConfig.DeprecatedDbName
-	}
-	if len(databaseConfig.DeprecatedUser) > 0 {
-		databaseConfig.Postgres.User = databaseConfig.DeprecatedUser
-	}
-	if len(databaseConfig.DeprecatedPassword) > 0 {
-		databaseConfig.Postgres.Password = databaseConfig.DeprecatedPassword
-	}
-	if len(databaseConfig.DeprecatedPasswordPath) > 0 {
-		databaseConfig.Postgres.PasswordPath = databaseConfig.DeprecatedPasswordPath
-	}
-	if len(databaseConfig.DeprecatedExtraOptions) > 0 {
-		databaseConfig.Postgres.ExtraOptions = databaseConfig.DeprecatedExtraOptions
-	}
-	if databaseConfig.DeprecatedDebug != false {
-		databaseConfig.Postgres.Debug = databaseConfig.DeprecatedDebug
-	}
-	return databaseConfig
+	return configSection.GetConfig().(*DbConfig)
 }
