@@ -5,7 +5,8 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { K8sPod } from "../core/tasks_pb.js";
+import { KeyValuePair } from "../core/literals_pb.js";
+import { K8sPod, Resources } from "../core/tasks_pb.js";
 
 /**
  * RayJobSpec defines the desired state of RayJob
@@ -84,6 +85,105 @@ export class RayJob extends Message<RayJob> {
 }
 
 /**
+ * @generated from message flyteidl.plugins.AutoscalerOptions
+ */
+export class AutoscalerOptions extends Message<AutoscalerOptions> {
+  /**
+   * @generated from field: flyteidl.plugins.AutoscalerOptions.UpscalingMode upscaling_mode = 1;
+   */
+  upscalingMode = AutoscalerOptions_UpscalingMode.UNSPECIFIED;
+
+  /**
+   * @generated from field: int32 idle_timeout_seconds = 2;
+   */
+  idleTimeoutSeconds = 0;
+
+  /**
+   * autoscaler sidecar env vars
+   *
+   * @generated from field: repeated flyteidl.core.KeyValuePair env = 3;
+   */
+  env: KeyValuePair[] = [];
+
+  /**
+   * custom autoscaler image
+   *
+   * @generated from field: string image = 4;
+   */
+  image = "";
+
+  /**
+   * autoscaler container resources
+   *
+   * @generated from field: flyteidl.core.Resources resources = 5;
+   */
+  resources?: Resources;
+
+  constructor(data?: PartialMessage<AutoscalerOptions>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.plugins.AutoscalerOptions";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "upscaling_mode", kind: "enum", T: proto3.getEnumType(AutoscalerOptions_UpscalingMode) },
+    { no: 2, name: "idle_timeout_seconds", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "env", kind: "message", T: KeyValuePair, repeated: true },
+    { no: 4, name: "image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "resources", kind: "message", T: Resources },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AutoscalerOptions {
+    return new AutoscalerOptions().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AutoscalerOptions {
+    return new AutoscalerOptions().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AutoscalerOptions {
+    return new AutoscalerOptions().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AutoscalerOptions | PlainMessage<AutoscalerOptions> | undefined, b: AutoscalerOptions | PlainMessage<AutoscalerOptions> | undefined): boolean {
+    return proto3.util.equals(AutoscalerOptions, a, b);
+  }
+}
+
+/**
+ * @generated from enum flyteidl.plugins.AutoscalerOptions.UpscalingMode
+ */
+export enum AutoscalerOptions_UpscalingMode {
+  /**
+   * @generated from enum value: UPSCALING_MODE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: UPSCALING_MODE_DEFAULT = 1;
+   */
+  DEFAULT = 1,
+
+  /**
+   * @generated from enum value: UPSCALING_MODE_AGGRESSIVE = 2;
+   */
+  AGGRESSIVE = 2,
+
+  /**
+   * @generated from enum value: UPSCALING_MODE_CONSERVATIVE = 3;
+   */
+  CONSERVATIVE = 3,
+}
+// Retrieve enum metadata with: proto3.getEnumType(AutoscalerOptions_UpscalingMode)
+proto3.util.setEnumType(AutoscalerOptions_UpscalingMode, "flyteidl.plugins.AutoscalerOptions.UpscalingMode", [
+  { no: 0, name: "UPSCALING_MODE_UNSPECIFIED" },
+  { no: 1, name: "UPSCALING_MODE_DEFAULT" },
+  { no: 2, name: "UPSCALING_MODE_AGGRESSIVE" },
+  { no: 3, name: "UPSCALING_MODE_CONSERVATIVE" },
+]);
+
+/**
  * Define Ray cluster defines the desired state of RayCluster
  *
  * @generated from message flyteidl.plugins.RayCluster
@@ -110,6 +210,11 @@ export class RayCluster extends Message<RayCluster> {
    */
   enableAutoscaling = false;
 
+  /**
+   * @generated from field: flyteidl.plugins.AutoscalerOptions autoscaler_options = 4;
+   */
+  autoscalerOptions?: AutoscalerOptions;
+
   constructor(data?: PartialMessage<RayCluster>) {
     super();
     proto3.util.initPartial(data, this);
@@ -121,6 +226,7 @@ export class RayCluster extends Message<RayCluster> {
     { no: 1, name: "head_group_spec", kind: "message", T: HeadGroupSpec },
     { no: 2, name: "worker_group_spec", kind: "message", T: WorkerGroupSpec, repeated: true },
     { no: 3, name: "enable_autoscaling", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "autoscaler_options", kind: "message", T: AutoscalerOptions },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RayCluster {

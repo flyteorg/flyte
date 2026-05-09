@@ -129,6 +129,36 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	return rayjob, err
 }
 
+func buildAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.AutoscalerOptions {
+	var autoScalerOptions *rayv1.AutoscalerOptions
+	if options != nil {
+		autoScalerOptions = &rayv1.AutoscalerOptions{}
+		if idleTimeoutTime := options.GetIdleTimeoutSeconds(); idleTimeoutTime > 0 {
+			autoScalerOptions.IdleTimeoutSeconds = &idleTimeoutTime
+		}
+		if upscalingMode := options.GetUpscalingMode(); upscalingMode != plugins.AutoscalerOptions_UPSCALING_MODE_UNSPECIFIED {
+			var mode rayv1.UpscalingMode
+			switch upscalingMode {
+			case plugins.AutoscalerOptions_UPSCALING_MODE_DEFAULT:
+				mode = rayv1.UpscalingMode("Default")
+			case plugins.AutoscalerOptions_UPSCALING_MODE_CONSERVATIVE:
+				mode = rayv1.UpscalingMode("Conservative")
+			case plugins.AutoscalerOptions_UPSCALING_MODE_AGGRESSIVE:
+				mode = rayv1.UpscalingMode("Aggressive")
+			}
+			autoScalerOptions.UpscalingMode = &mode
+		}
+		if image := options.GetImage(); image != "" {
+			autoScalerOptions.Image = &image
+		}
+		if res, err := flytek8s.ToK8sResourceRequirements(options.GetResources()); err == nil {
+			autoScalerOptions.Resources = res
+		}
+		autoScalerOptions.Env = flytek8s.ToK8sEnvVar(options.GetEnv())
+	}
+	return autoScalerOptions
+}
+
 func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.RayJob, objectMeta *metav1.ObjectMeta, taskPodSpec v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
 	cfg := GetConfig()
 
@@ -155,6 +185,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		},
 		WorkerGroupSpecs:        []rayv1.WorkerGroupSpec{},
 		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableAutoscaling,
+		AutoscalerOptions:       buildAutoscalerOptions(rayJob.GetRayCluster().GetAutoscalerOptions()),
 	}
 
 	for _, spec := range rayJob.GetRayCluster().GetWorkerGroupSpec() {
