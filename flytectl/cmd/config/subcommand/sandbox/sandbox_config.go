@@ -42,18 +42,18 @@ type Config struct {
 
 	Force bool `json:"force" pflag:",Optional. Forcefully delete existing sandbox cluster if it exists."`
 
-Port string `json:"port" pflag:",Optional. Specify the port for Kubernetes in the sandbox."`
+	Port string `json:"port" pflag:",Optional. Specify the port for Kubernetes in the sandbox."`
 
-// Allow user to specify the port for the sandbox
-Ports []string `json:"ports" pflag:",Optional. Custom port mappings for sandbox."`
+	// Allow user to specify the port for the sandbox
+	Ports []string `json:"ports" pflag:",Optional. Custom port mappings for sandbox."`
 }
 
 //go:generate pflags Config --default-var DefaultConfig --bind-default-var
 var (
 	DefaultConfig = &Config{
-	Port:  "6443",
-	Ports: []string{}, // Default port mappings
-}
+		Port:  "6443",
+		Ports: []string{}, // Default port mappings
+	}
 )
 
 func (c Config) GetK8sEndpoint() string {

@@ -139,7 +139,6 @@ func GetSandboxPorts(customPorts []string) (map[nat.Port]struct{}, map[nat.Port]
 	})
 }
 
-
 // GetDemoPorts will return demo ports
 func GetDemoPorts(k8sPort string) (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, error) {
 	return nat.ParsePortSpecs([]string{
