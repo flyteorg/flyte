@@ -18,6 +18,8 @@ message SelectClusterRequest {
     flyteidl2.common.ActionIdentifier action_id = 4;
     flyteidl2.common.ActionAttemptIdentifier action_attempt_id = 5;
     flyteidl2.app.Identifier app_id = 6;
+    flyteidl2.common.ClusterPoolIdentifier cluster_pool_id = 7;
+    flyteidl2.common.DomainIdentifier domain_id = 9;
   }
 
   enum Operation {
@@ -29,6 +31,7 @@ message SelectClusterRequest {
     OPERATION_CREATE_DOWNLOAD_LINK = 5;
     OPERATION_TAIL_LOGS = 6;
     OPERATION_GET_ACTION_ATTEMPT_METRICS = 7;
+    OPERATION_USE_SECRETS = 8;
   }
 
   Operation operation = 8 [(buf.validate.field).enum = {
