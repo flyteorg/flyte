@@ -18,6 +18,7 @@ message SelectClusterRequest {
     flyteidl2.common.ActionIdentifier action_id = 4;
     flyteidl2.common.ActionAttemptIdentifier action_attempt_id = 5;
     flyteidl2.app.Identifier app_id = 6;
+    flyteidl2.common.ClusterPoolIdentifier cluster_pool_id = 9;
   }
 
   enum Operation {

@@ -1,4 +1,5 @@
 from buf.validate import validate_pb2 as _validate_pb2
+from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.secret import definition_pb2 as _definition_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
@@ -8,12 +9,14 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class CreateSecretRequest(_message.Message):
-    __slots__ = ["id", "secret_spec"]
+    __slots__ = ["id", "secret_spec", "cluster_pool_id"]
     ID_FIELD_NUMBER: _ClassVar[int]
     SECRET_SPEC_FIELD_NUMBER: _ClassVar[int]
+    CLUSTER_POOL_ID_FIELD_NUMBER: _ClassVar[int]
     id: _definition_pb2.SecretIdentifier
     secret_spec: _definition_pb2.SecretSpec
-    def __init__(self, id: _Optional[_Union[_definition_pb2.SecretIdentifier, _Mapping]] = ..., secret_spec: _Optional[_Union[_definition_pb2.SecretSpec, _Mapping]] = ...) -> None: ...
+    cluster_pool_id: _identifier_pb2.ClusterPoolIdentifier
+    def __init__(self, id: _Optional[_Union[_definition_pb2.SecretIdentifier, _Mapping]] = ..., secret_spec: _Optional[_Union[_definition_pb2.SecretSpec, _Mapping]] = ..., cluster_pool_id: _Optional[_Union[_identifier_pb2.ClusterPoolIdentifier, _Mapping]] = ...) -> None: ...
 
 class CreateSecretResponse(_message.Message):
     __slots__ = []
