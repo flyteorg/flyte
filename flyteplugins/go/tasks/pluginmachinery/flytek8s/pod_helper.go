@@ -1327,6 +1327,15 @@ func classifyWaitingContainer(waiting *v1.ContainerStateWaiting, c v1.PodConditi
 	case "ImagePullBackOff":
 		gracePeriod := config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration
 		if time.Since(t) >= gracePeriod {
+			if isRegistryRateLimited(waiting.Message) {
+				// Registry rate limiting (HTTP 429) is not caused by the user
+				// and is a transient infrastructure problem. Classify as a
+				// system-retryable failure so it does not consume the user's
+				// retry budget.
+				return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
+					OccurredAt: &t,
+				}), t
+			}
 			return pluginsCore.PhaseInfoRetryableFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 				OccurredAt: &t,
 			}), t
@@ -1353,6 +1362,13 @@ func classifyWaitingContainer(waiting *v1.ContainerStateWaiting, c v1.PodConditi
 
 func GetMessageAfterGracePeriod(message string, gracePeriod time.Duration) string {
 	return fmt.Sprintf("Grace period [%s] exceeded|%s", gracePeriod, message)
+}
+
+// isRegistryRateLimited reports whether an ImagePullBackOff message indicates
+// the container runtime hit HTTP 429 Too Many Requests against the image
+// registry — a transient infrastructure failure outside the user's control.
+func isRegistryRateLimited(message string) bool {
+	return strings.Contains(message, "429 Too Many Requests")
 }
 
 func DemystifySuccess(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
