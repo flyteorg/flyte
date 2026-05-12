@@ -406,6 +406,35 @@ func (m *UpdateSecretRequest) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetClusterPoolId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdateSecretRequestValidationError{
+					field:  "ClusterPoolId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdateSecretRequestValidationError{
+					field:  "ClusterPoolId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetClusterPoolId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateSecretRequestValidationError{
+				field:  "ClusterPoolId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return UpdateSecretRequestMultiError(errors)
 	}
@@ -640,6 +669,35 @@ func (m *GetSecretRequest) validate(all bool) error {
 	}
 
 	// no validation rules for IncludeSystemSecrets
+
+	if all {
+		switch v := interface{}(m.GetClusterPoolId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetSecretRequestValidationError{
+					field:  "ClusterPoolId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetSecretRequestValidationError{
+					field:  "ClusterPoolId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetClusterPoolId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetSecretRequestValidationError{
+				field:  "ClusterPoolId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return GetSecretRequestMultiError(errors)
@@ -1149,6 +1207,35 @@ func (m *ListSecretsRequest) validate(all bool) error {
 	// no validation rules for PerClusterTokens
 
 	// no validation rules for IncludeSystemSecrets
+
+	if all {
+		switch v := interface{}(m.GetClusterPoolId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListSecretsRequestValidationError{
+					field:  "ClusterPoolId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListSecretsRequestValidationError{
+					field:  "ClusterPoolId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetClusterPoolId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListSecretsRequestValidationError{
+				field:  "ClusterPoolId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return ListSecretsRequestMultiError(errors)
