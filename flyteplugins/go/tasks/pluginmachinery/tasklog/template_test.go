@@ -32,6 +32,7 @@ func dummyTaskExecID() pluginCore.TaskExecutionID {
 			Org:          "my-task-org",
 		},
 		NodeExecutionId: &core.NodeExecutionIdentifier{
+			NodeId: "my-node-id",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my-execution-name",
 				Project: "my-execution-project",
@@ -150,6 +151,8 @@ func Test_Input_templateVars(t *testing.T) {
 				{defaultRegexes.TaskProject, "my-task-project"},
 				{defaultRegexes.TaskDomain, "my-task-domain"},
 				{defaultRegexes.ExecutionName, "my-execution-name"},
+				{defaultRegexes.RunName, "my-execution-name"},
+				{defaultRegexes.ActionName, "my-node-id"},
 				{defaultRegexes.ExecutionProject, "my-execution-project"},
 				{defaultRegexes.ExecutionDomain, "my-execution-domain"},
 				{defaultRegexes.ExecutionOrg, "my-execution-org"},
@@ -661,6 +664,22 @@ func TestTemplateLogPlugin_GeneratedName(t *testing.T) {
 				PodUnixFinishTime:    12345,
 			},
 			want: "https://example.com/logs/generated-name/view",
+		},
+		{
+			name: "runName and actionName substitute end-to-end",
+			plugin: TemplateLogPlugin{
+				TemplateURIs:  []TemplateURI{"https://example.com/org/{{.executionOrg}}/runs/{{.runName}}-{{.actionName}}/pod/{{.generatedName}}"},
+				MessageFormat: core.TaskLog_JSON,
+			},
+			input: Input{
+				LogName:              "main_logs",
+				TaskExecutionID:      dummyTaskExecID(),
+				PodRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
+				PodRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
+				PodUnixStartTime:     123,
+				PodUnixFinishTime:    12345,
+			},
+			want: "https://example.com/org/my-execution-org/runs/my-execution-name-my-node-id/pod/generated-name",
 		},
 		{
 			name: "generatedName with underscores are sanitized",
