@@ -204,8 +204,8 @@ message TailLogsRequest {
   uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
 
   // Selects which pod(s) to tail. If unset, defaults to primary_pod.
-  oneof pod_filter {
-    // Tail logs from the primary pod only. This is the default when pod_filter is unset.
+  oneof pod_selector {
+    // Tail logs from the primary pod only. This is the default when pod_selector is unset.
     bool primary_pod = 6;
     // Tail logs from all pods.
     bool all_pods = 5;
