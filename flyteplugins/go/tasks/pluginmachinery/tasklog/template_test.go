@@ -32,6 +32,7 @@ func dummyTaskExecID() pluginCore.TaskExecutionID {
 			Org:          "my-task-org",
 		},
 		NodeExecutionId: &core.NodeExecutionIdentifier{
+			NodeId: "my-node-id",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my-execution-name",
 				Project: "my-execution-project",
@@ -150,6 +151,8 @@ func Test_Input_templateVars(t *testing.T) {
 				{defaultRegexes.TaskProject, "my-task-project"},
 				{defaultRegexes.TaskDomain, "my-task-domain"},
 				{defaultRegexes.ExecutionName, "my-execution-name"},
+				{defaultRegexes.RunName, "my-execution-name"},
+				{defaultRegexes.ActionName, "my-node-id"},
 				{defaultRegexes.ExecutionProject, "my-execution-project"},
 				{defaultRegexes.ExecutionDomain, "my-execution-domain"},
 				{defaultRegexes.ExecutionOrg, "my-execution-org"},
