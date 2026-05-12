@@ -212,7 +212,7 @@ type LoggingContext struct {
 	NumberOfBatches           uint64                 `protobuf:"varint,11,opt,name=number_of_batches,json=numberOfBatches,proto3" json:"number_of_batches,omitempty"`
 	// Attempt number for the execution. Used by log sources to compute pod uniqueIDs
 	// when pod names are hashed (e.g. CloudWatch stream name prefix narrowing).
-	// +optional, defaults to 0
+	// +optional, defaults to 1
 	ExecutionAttempt uint32 `protobuf:"varint,12,opt,name=execution_attempt,json=executionAttempt,proto3" json:"execution_attempt,omitempty"`
 }
 

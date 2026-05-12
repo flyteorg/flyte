@@ -106,7 +106,7 @@ export type LoggingContext = Message<"flyteidl2.logs.dataplane.LoggingContext"> 
   /**
    * Attempt number for the execution. Used by log sources to compute pod uniqueIDs
    * when pod names are hashed (e.g. CloudWatch stream name prefix narrowing).
-   * +optional, defaults to 0
+   * +optional, defaults to 1
    *
    * @generated from field: uint32 execution_attempt = 12;
    */
