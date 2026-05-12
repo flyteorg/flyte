@@ -49,12 +49,14 @@ class GetSecretResponse(_message.Message):
     def __init__(self, secret: _Optional[_Union[_definition_pb2.Secret, _Mapping]] = ...) -> None: ...
 
 class DeleteSecretRequest(_message.Message):
-    __slots__ = ["id", "include_system_secrets"]
+    __slots__ = ["id", "include_system_secrets", "cluster_pool_id"]
     ID_FIELD_NUMBER: _ClassVar[int]
     INCLUDE_SYSTEM_SECRETS_FIELD_NUMBER: _ClassVar[int]
+    CLUSTER_POOL_ID_FIELD_NUMBER: _ClassVar[int]
     id: _definition_pb2.SecretIdentifier
     include_system_secrets: bool
-    def __init__(self, id: _Optional[_Union[_definition_pb2.SecretIdentifier, _Mapping]] = ..., include_system_secrets: bool = ...) -> None: ...
+    cluster_pool_id: _identifier_pb2.ClusterPoolIdentifier
+    def __init__(self, id: _Optional[_Union[_definition_pb2.SecretIdentifier, _Mapping]] = ..., include_system_secrets: bool = ..., cluster_pool_id: _Optional[_Union[_identifier_pb2.ClusterPoolIdentifier, _Mapping]] = ...) -> None: ...
 
 class DeleteSecretResponse(_message.Message):
     __slots__ = []

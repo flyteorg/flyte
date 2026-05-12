@@ -903,6 +903,35 @@ func (m *DeleteSecretRequest) validate(all bool) error {
 
 	// no validation rules for IncludeSystemSecrets
 
+	if all {
+		switch v := interface{}(m.GetClusterPoolId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DeleteSecretRequestValidationError{
+					field:  "ClusterPoolId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DeleteSecretRequestValidationError{
+					field:  "ClusterPoolId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetClusterPoolId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DeleteSecretRequestValidationError{
+				field:  "ClusterPoolId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return DeleteSecretRequestMultiError(errors)
 	}
