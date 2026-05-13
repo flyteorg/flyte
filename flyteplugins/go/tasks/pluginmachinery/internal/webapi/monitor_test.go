@@ -14,6 +14,7 @@ import (
 	core2 "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	internalMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/internal/webapi/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/v2/flytestdlib/autorefreshcache"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -57,7 +58,7 @@ func Test_monitor(t *testing.T) {
 	_, err = cacheObj.GetOrCreate("generated_name", CacheItem{Resource: "fake_resource"})
 	assert.NoError(t, err)
 
-	s := &State{}
+	s := &webapi.State{}
 	newState, phaseInfo, err := monitor(ctx, tCtx, client, cacheObj, s)
 	assert.NoError(t, err)
 	assert.NotNil(t, newState)
