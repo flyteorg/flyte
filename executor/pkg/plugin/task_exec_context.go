@@ -146,6 +146,8 @@ func NewTaskExecutionContext(
 	}
 	rawOutputPaths := ioutils.NewRawOutputPaths(ctx, outputPrefix)
 
+	// Attempts is 1-indexed, so the first attempt has nothing to resume from.
+	// Only set a previous checkpoint path from attempt 2 onward.
 	var prevCheckpointPath storage.DataReference
 	if taskAction.Status.Attempts >= 2 {
 		prevOutputPrefix, err := ComputeActionOutputPath(ctx, taskAction.Namespace, taskAction.Name, taskAction.Spec.RunOutputBase, taskAction.Spec.ActionName, attempt-1)
