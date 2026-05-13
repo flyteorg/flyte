@@ -306,6 +306,88 @@ func (m *SelectClusterRequest) validate(all bool) error {
 			}
 		}
 
+	case *SelectClusterRequest_ClusterPoolId:
+		if v == nil {
+			err := SelectClusterRequestValidationError{
+				field:  "Resource",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetClusterPoolId()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, SelectClusterRequestValidationError{
+						field:  "ClusterPoolId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, SelectClusterRequestValidationError{
+						field:  "ClusterPoolId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetClusterPoolId()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SelectClusterRequestValidationError{
+					field:  "ClusterPoolId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *SelectClusterRequest_DomainId:
+		if v == nil {
+			err := SelectClusterRequestValidationError{
+				field:  "Resource",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetDomainId()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, SelectClusterRequestValidationError{
+						field:  "DomainId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, SelectClusterRequestValidationError{
+						field:  "DomainId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetDomainId()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SelectClusterRequestValidationError{
+					field:  "DomainId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}

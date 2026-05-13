@@ -49,7 +49,7 @@ func Test_allocateToken(t *testing.T) {
 	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
 	tCtx.EXPECT().ResourceManager().Return(rm)
 
-	state := &State{}
+	state := &webapi.State{}
 
 	p := newPluginWithProperties(webapi.PluginConfig{
 		ResourceQuotas: map[core.ResourceNamespace]int{
@@ -62,9 +62,9 @@ func Test_allocateToken(t *testing.T) {
 		a := newTokenAllocator(clck)
 		gotNewState, _, err := a.allocateToken(ctx, p, nil, nil, metrics)
 		assert.NoError(t, err)
-		if diff := deep.Equal(gotNewState, &State{
+		if diff := deep.Equal(gotNewState, &webapi.State{
 			AllocationTokenRequestStartTime: tNow,
-			Phase:                           PhaseAllocationTokenAcquired,
+			Phase:                           webapi.PhaseAllocationTokenAcquired,
 		}); len(diff) > 0 {
 			t.Errorf("allocateToken() gotNewState = %v, Diff: %v", gotNewState, diff)
 		}
@@ -75,9 +75,9 @@ func Test_allocateToken(t *testing.T) {
 		a := newTokenAllocator(clck)
 		gotNewState, _, err := a.allocateToken(ctx, p, tCtx, state, metrics)
 		assert.NoError(t, err)
-		if diff := deep.Equal(gotNewState, &State{
+		if diff := deep.Equal(gotNewState, &webapi.State{
 			AllocationTokenRequestStartTime: tNow,
-			Phase:                           PhaseAllocationTokenAcquired,
+			Phase:                           webapi.PhaseAllocationTokenAcquired,
 		}); len(diff) > 0 {
 			t.Errorf("allocateToken() gotNewState = %v, Diff: %v", gotNewState, diff)
 		}
@@ -101,9 +101,9 @@ func Test_allocateToken(t *testing.T) {
 		a := newTokenAllocator(clck)
 		gotNewState, _, err := a.allocateToken(ctx, p, tCtx, state, metrics)
 		assert.NoError(t, err)
-		if diff := deep.Equal(gotNewState, &State{
+		if diff := deep.Equal(gotNewState, &webapi.State{
 			AllocationTokenRequestStartTime: tNow,
-			Phase:                           PhaseNotStarted,
+			Phase:                           webapi.PhaseNotStarted,
 		}); len(diff) > 0 {
 			t.Errorf("allocateToken() gotNewState = %v, Diff: %v", gotNewState, diff)
 		}
