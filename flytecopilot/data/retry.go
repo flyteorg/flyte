@@ -2,8 +2,6 @@ package data
 
 import (
 	"context"
-	stderrors "errors"
-	"strings"
 	"time"
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -12,13 +10,6 @@ import (
 const (
 	uploadFileRetryMaxAttemptIndex = 5
 	uploadFileRetryDelay           = 2 * time.Second
-)
-
-const (
-	errMsgHTTPServerClosedIdleConn = "http: server closed idle connection"
-	errMsgUseOfClosedNetworkConn   = "use of closed network connection"
-	errMsgEOF                      = "EOF"
-	errMsgWriteBrokenPipe          = "write: broken pipe"
 )
 
 // See flyteadmin/pkg/async.RetryOnSpecificErrors
@@ -45,24 +36,6 @@ func retryOnSpecificErrors(ctx context.Context, attempts int, delay time.Duratio
 	return err
 }
 
-func isTransientStorageWriteError(err error) bool {
-	if err == nil {
-		return false
-	}
-	if errorChainContainsSubstring(err, errMsgHTTPServerClosedIdleConn) ||
-		errorChainContainsSubstring(err, errMsgUseOfClosedNetworkConn) ||
-		errorChainContainsSubstring(err, errMsgEOF) ||
-		errorChainContainsSubstring(err, errMsgWriteBrokenPipe) {
-		return true
-	}
-	return false
-}
-
-func errorChainContainsSubstring(err error, needle string) bool {
-	for cur := err; cur != nil; cur = stderrors.Unwrap(cur) {
-		if strings.Contains(cur.Error(), needle) {
-			return true
-		}
-	}
-	return false
+func retryOnAllErrors(err error) bool {
+	return true
 }

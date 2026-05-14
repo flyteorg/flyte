@@ -57,7 +57,7 @@ func UploadFileToStorage(ctx context.Context, filePath string, toPath storage.Da
 			}
 		}()
 		return store.WriteRaw(ctx, toPath, size, storage.Options{}, f)
-	}, isTransientStorageWriteError)
+	}, retryOnAllErrors)
 }
 
 func DownloadFileFromStorage(ctx context.Context, ref storage.DataReference, store *storage.DataStore) (io.ReadCloser, error) {

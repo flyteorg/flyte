@@ -21,7 +21,7 @@ func TestRetryOnSpecificErrors_SucceedsFirstTry(t *testing.T) {
 	err := retryOnSpecificErrors(ctx, 3, time.Millisecond, func() error {
 		calls++
 		return nil
-	}, isTransientStorageWriteError)
+	}, retryOnAllErrors)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, calls)
 }
@@ -35,23 +35,7 @@ func TestRetryOnSpecificErrors_RetriesThenSucceeds(t *testing.T) {
 			return s3LikeError
 		}
 		return nil
-	}, isTransientStorageWriteError)
+	}, retryOnAllErrors)
 	assert.NoError(t, err)
 	assert.Equal(t, 3, calls)
-}
-
-func TestRetryOnSpecificErrors_NonRetryableStops(t *testing.T) {
-	ctx := context.Background()
-	calls := 0
-	want := errors.New("permanent")
-	err := retryOnSpecificErrors(ctx, 5, time.Millisecond, func() error {
-		calls++
-		return want
-	}, isTransientStorageWriteError)
-	assert.ErrorIs(t, err, want)
-	assert.Equal(t, 1, calls)
-}
-
-func TestIsTransientStorageWriteError(t *testing.T) {
-	assert.True(t, isTransientStorageWriteError(s3LikeError))
 }
