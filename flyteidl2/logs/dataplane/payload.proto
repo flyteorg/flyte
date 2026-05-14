@@ -23,7 +23,7 @@ message PodResource {
 // Parameters of environment in which logs were collected. Should contain everything
 // necessary to identify location of task execution logs in cloud providers.
 message LoggingContext {
-  reserved 1, 2, 12;
+  reserved 1, 2;
 
   string cluster_name = 3 [(buf.validate.field).string.min_len = 1];
   string kubernetes_namespace = 4 [(buf.validate.field).string.min_len = 1];
