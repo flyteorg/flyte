@@ -242,14 +242,16 @@ class Profile(_message.Message):
     def __init__(self, type: _Optional[str] = ..., name: _Optional[str] = ..., short_description: _Optional[str] = ..., icon_url: _Optional[str] = ...) -> None: ...
 
 class SecurityContext(_message.Message):
-    __slots__ = ["run_as", "secrets", "allow_anonymous"]
+    __slots__ = ["run_as", "secrets", "allow_anonymous", "anonymous_paths"]
     RUN_AS_FIELD_NUMBER: _ClassVar[int]
     SECRETS_FIELD_NUMBER: _ClassVar[int]
     ALLOW_ANONYMOUS_FIELD_NUMBER: _ClassVar[int]
+    ANONYMOUS_PATHS_FIELD_NUMBER: _ClassVar[int]
     run_as: _security_pb2.Identity
     secrets: _containers.RepeatedCompositeFieldContainer[_security_pb2.Secret]
     allow_anonymous: bool
-    def __init__(self, run_as: _Optional[_Union[_security_pb2.Identity, _Mapping]] = ..., secrets: _Optional[_Iterable[_Union[_security_pb2.Secret, _Mapping]]] = ..., allow_anonymous: bool = ...) -> None: ...
+    anonymous_paths: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, run_as: _Optional[_Union[_security_pb2.Identity, _Mapping]] = ..., secrets: _Optional[_Iterable[_Union[_security_pb2.Secret, _Mapping]]] = ..., allow_anonymous: bool = ..., anonymous_paths: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class ImageSpec(_message.Message):
     __slots__ = ["tag", "build_job_url"]
