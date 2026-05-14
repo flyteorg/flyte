@@ -87,6 +87,9 @@ enum Action {
 
   // View identities, this includes human users and machine apps (client creds)
   ACTION_VIEW_IDENTITIES = 17;
+
+  // Manage cluster queues
+  ACTION_MANAGE_QUEUE = 18;
 }
 
 // Defines a set of allowed actions on a specific authorization resource.
