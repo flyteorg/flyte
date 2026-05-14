@@ -238,8 +238,6 @@ func (m *LoggingContext) validate(all bool) error {
 
 	// no validation rules for NumberOfBatches
 
-	// no validation rules for ExecutionAttempt
-
 	// no validation rules for PodNamePrefix
 
 	if len(errors) > 0 {

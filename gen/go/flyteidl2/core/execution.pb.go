@@ -961,13 +961,7 @@ type LogContext struct {
 	Pods           []*PodLogContext     `protobuf:"bytes,1,rep,name=pods,proto3" json:"pods,omitempty"`
 	PrimaryPodName string               `protobuf:"bytes,2,opt,name=primary_pod_name,json=primaryPodName,proto3" json:"primary_pod_name,omitempty"`
 	Connector      *ConnectorLogContext `protobuf:"bytes,3,opt,name=connector,proto3" json:"connector,omitempty"`
-	// Propeller/leaseworker-generated prefix shared by every pod name created for
-	// this action attempt. Computed from {run, action, attempt} using the active
-	// plugin's GeneratedNameMaxLength (e.g. 47 for Ray, 50 by default). Log sources
-	// use it directly as a stream-name / pod-name prefix, avoiding recomputation
-	// that would drift when a plugin overrides GeneratedNameMaxLength.
-	// +optional
-	PodNamePrefix string `protobuf:"bytes,4,opt,name=pod_name_prefix,json=podNamePrefix,proto3" json:"pod_name_prefix,omitempty"`
+	PodNamePrefix  string               `protobuf:"bytes,4,opt,name=pod_name_prefix,json=podNamePrefix,proto3" json:"pod_name_prefix,omitempty"`
 }
 
 func (x *LogContext) Reset() {

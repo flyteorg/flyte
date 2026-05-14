@@ -23,7 +23,7 @@ message PodResource {
 // Parameters of environment in which logs were collected. Should contain everything
 // necessary to identify location of task execution logs in cloud providers.
 message LoggingContext {
-  reserved 1, 2;
+  reserved 1, 2, 12;
 
   string cluster_name = 3 [(buf.validate.field).string.min_len = 1];
   string kubernetes_namespace = 4 [(buf.validate.field).string.min_len = 1];
@@ -36,18 +36,8 @@ message LoggingContext {
   map<string, string> kubernetes_pod_labels = 9;
   common.Sort.Direction order = 10;
   uint64 number_of_batches = 11;
-  // Attempt number for the execution. Used by log sources to compute pod uniqueIDs
-  // when pod names are hashed (e.g. CloudWatch stream name prefix narrowing).
-  // +optional, defaults to 1
-  uint32 execution_attempt = 12;
-
-  // Pod-name prefix used by log sources to narrow stream/pod searches. When provided
-  // by the caller (typically copied from LogContext.unique_id emitted by the
-  // leaseworker), log sources MUST prefer this over recomputing the uniqueID from
-  // run/action/attempt — avoids drift when the active plugin overrides
-  // GeneratedNameMaxLength (e.g. Ray uses 47, default is 50).
-  // +optional
-  string pod_name_prefix = 13;
+  // +optional, Pod-name prefix used by log sources to narrow stream/pod searches.
+  string pod_name_prefix = 12;
 }
 
 // Parameters of environment in which logs were collected. Should contain everything
