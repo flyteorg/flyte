@@ -3,6 +3,8 @@ name: Check Generated Files
 on:
   pull_request_target:
     types: [opened, synchronize, reopened]
+    branches:
+      - main
 
 jobs:
   setup:

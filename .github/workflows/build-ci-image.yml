@@ -8,6 +8,8 @@ on:
       - 'gen.Dockerfile'
       - '.github/workflows/build-ci-image.yml'
   pull_request_target:
+    branches:
+      - main
     paths:
       - 'gen.Dockerfile'
       - '.github/workflows/build-ci-image.yml'
