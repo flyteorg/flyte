@@ -48,8 +48,8 @@ func TestResourceCache_SyncResource(t *testing.T) {
 			},
 		}
 
-		state := State{
-			Phase: PhaseSucceeded,
+		state := webapi.State{
+			Phase: webapi.PhaseSucceeded,
 		}
 
 		cacheItem := CacheItem{
@@ -79,7 +79,7 @@ func TestResourceCache_SyncResource(t *testing.T) {
 		}
 
 		cacheItem := CacheItem{
-			State: State{
+			State: webapi.State{
 				SyncFailureCount: 5,
 				ErrorMessage:     "some error",
 			},
@@ -92,7 +92,7 @@ func TestResourceCache_SyncResource(t *testing.T) {
 		newCacheItem, err := q.SyncResource(ctx, []autorefreshcache.ItemWrapper{iw})
 		assert.NoError(t, err)
 		assert.Equal(t, autorefreshcache.Update, newCacheItem[0].Action)
-		cacheItem.State.Phase = PhaseSystemFailure
+		cacheItem.State.Phase = webapi.PhaseSystemFailure
 		assert.Equal(t, cacheItem, newCacheItem[0].Item)
 	})
 
@@ -107,9 +107,9 @@ func TestResourceCache_SyncResource(t *testing.T) {
 			},
 		}
 
-		state := State{
+		state := webapi.State{
 			ResourceMeta: "123456",
-			Phase:        PhaseResourcesCreated,
+			Phase:        webapi.PhaseResourcesCreated,
 		}
 
 		cacheItem := CacheItem{
@@ -140,9 +140,9 @@ func TestResourceCache_SyncResource(t *testing.T) {
 			},
 		}
 
-		state := State{
+		state := webapi.State{
 			ResourceMeta: "123456",
-			Phase:        PhaseResourcesCreated,
+			Phase:        webapi.PhaseResourcesCreated,
 		}
 
 		cacheItem := CacheItem{
@@ -159,25 +159,25 @@ func TestResourceCache_SyncResource(t *testing.T) {
 		newExecutionState := newCacheItem[0].Item.(CacheItem)
 		assert.NoError(t, err)
 		assert.Equal(t, autorefreshcache.Update, newCacheItem[0].Action)
-		assert.Equal(t, PhaseResourcesCreated, newExecutionState.Phase)
+		assert.Equal(t, webapi.PhaseResourcesCreated, newExecutionState.Phase)
 	})
 }
 
 func TestToPluginPhase(t *testing.T) {
 	tests := []struct {
 		args    core.Phase
-		want    Phase
+		want    webapi.Phase
 		wantErr bool
 	}{
-		{core.PhaseNotReady, PhaseNotStarted, false},
-		{core.PhaseUndefined, PhaseNotStarted, false},
-		{core.PhaseInitializing, PhaseResourcesCreated, false},
-		{core.PhaseWaitingForResources, PhaseResourcesCreated, false},
-		{core.PhaseQueued, PhaseResourcesCreated, false},
-		{core.PhaseRunning, PhaseResourcesCreated, false},
-		{core.PhaseSuccess, PhaseSucceeded, false},
-		{core.PhasePermanentFailure, PhaseUserFailure, false},
-		{core.PhaseRetryableFailure, PhaseUserFailure, false},
+		{core.PhaseNotReady, webapi.PhaseNotStarted, false},
+		{core.PhaseUndefined, webapi.PhaseNotStarted, false},
+		{core.PhaseInitializing, webapi.PhaseResourcesCreated, false},
+		{core.PhaseWaitingForResources, webapi.PhaseResourcesCreated, false},
+		{core.PhaseQueued, webapi.PhaseResourcesCreated, false},
+		{core.PhaseRunning, webapi.PhaseResourcesCreated, false},
+		{core.PhaseSuccess, webapi.PhaseSucceeded, false},
+		{core.PhasePermanentFailure, webapi.PhaseUserFailure, false},
+		{core.PhaseRetryableFailure, webapi.PhaseUserFailure, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.args.String(), func(t *testing.T) {

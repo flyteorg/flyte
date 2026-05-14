@@ -100,6 +100,7 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 	generatedName := buildGeneratedName(ta)
 	retryAttempt := attemptToRetry(ta.Status.Attempts)
 	maxAttempts := maxAttemptsFromTaskTemplate(ta.Spec.TaskTemplate)
+	taskID := taskIDFromTaskTemplate(ta.Spec.TaskTemplate)
 
 	return &taskExecutionMetadata{
 		ownerID: types.NamespacedName{
@@ -118,6 +119,7 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 					NodeId: ta.Spec.ActionName,
 				},
 				RetryAttempt: retryAttempt,
+				TaskId:       taskID,
 			},
 		},
 		namespace: ta.Namespace,
@@ -167,6 +169,20 @@ func maxAttemptsFromTaskTemplate(data []byte) uint32 {
 	}
 
 	return md.GetRetries().GetRetries() + 1
+}
+
+func taskIDFromTaskTemplate(data []byte) *core.Identifier {
+	if len(data) == 0 {
+		return nil
+	}
+	tmpl := &core.TaskTemplate{}
+	if err := proto.Unmarshal(data, tmpl); err != nil {
+		return nil
+	}
+	if tmpl.GetId() == nil {
+		return nil
+	}
+	return proto.Clone(tmpl.GetId()).(*core.Identifier)
 }
 
 // buildOverridesFromTaskTemplate deserializes the task template and extracts resource requirements.

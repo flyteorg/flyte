@@ -13,9 +13,6 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
-
 	pluginErrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
@@ -23,7 +20,9 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
@@ -80,13 +79,14 @@ type Plugin struct {
 }
 
 type ResourceWrapper struct {
-	Phase          flyteIdl.TaskExecution_Phase
-	Outputs        *task.Outputs
-	Message        string
-	LogLinks       []*flyteIdl.TaskLog
-	CustomInfo     *structpb.Struct
-	ConnectorID    string
-	IsConnectorApp bool
+	Phase             flyteIdl.TaskExecution_Phase
+	Outputs           *task.Outputs
+	Message           string
+	LogLinks          []*flyteIdl.TaskLog
+	CustomInfo        *structpb.Struct
+	ConnectorID       string
+	IsConnectorApp    bool
+	ConnectorEndpoint string
 }
 
 // IsTerminal is used to avoid making network calls to the connector service if the resource is already in a terminal state.
@@ -243,15 +243,15 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 	if err != nil {
 		return nil, fmt.Errorf("failed to get task from connector with %v", err)
 	}
-
 	return ResourceWrapper{
-		Phase:          res.GetResource().GetPhase(),
-		Outputs:        res.GetResource().GetOutputs(),
-		Message:        res.GetResource().GetMessage(),
-		LogLinks:       res.GetResource().GetLogLinks(),
-		CustomInfo:     res.GetResource().GetCustomInfo(),
-		ConnectorID:    connector.ConnectorID,
-		IsConnectorApp: connector.IsConnectorApp,
+		Phase:             res.GetResource().GetPhase(),
+		Outputs:           res.GetResource().GetOutputs(),
+		Message:           res.GetResource().GetMessage(),
+		LogLinks:          res.GetResource().GetLogLinks(),
+		CustomInfo:        res.GetResource().GetCustomInfo(),
+		ConnectorID:       connector.ConnectorID,
+		IsConnectorApp:    connector.IsConnectorApp,
+		ConnectorEndpoint: connector.ConnectorDeployment.Endpoint,
 	}, nil
 }
 
@@ -319,6 +319,15 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 	}
 
 	taskInfo := &core.TaskInfo{Logs: logLinks, CustomInfo: resource.CustomInfo}
+
+	if resource.ConnectorEndpoint != "" {
+		taskInfo.LogContext = &flyteIdl.LogContext{
+			Connector: &flyteIdl.ConnectorLogContext{
+				Endpoint: resource.ConnectorEndpoint,
+			},
+		}
+	}
+
 	errorCode := pluginErrors.TaskFailedWithError
 
 	switch resource.Phase {

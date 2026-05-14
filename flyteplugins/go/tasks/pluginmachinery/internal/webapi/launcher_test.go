@@ -24,9 +24,9 @@ func Test_launch(t *testing.T) {
 		tCtx.EXPECT().TaskExecutionMetadata().Return(meta)
 
 		c := &mocks2.AutoRefresh{}
-		s := State{
+		s := webapi.State{
 			ResourceMeta: "abc",
-			Phase:        PhaseResourcesCreated,
+			Phase:        webapi.PhaseResourcesCreated,
 			PhaseVersion: 2,
 		}
 		c.EXPECT().GetOrCreate("my-id", CacheItem{State: s}).Return(CacheItem{State: s}, nil)
@@ -50,8 +50,8 @@ func Test_launch(t *testing.T) {
 		tCtx.EXPECT().TaskExecutionMetadata().Return(meta)
 
 		c := &mocks2.AutoRefresh{}
-		s := State{
-			Phase:        PhaseResourcesCreated,
+		s := webapi.State{
+			Phase:        webapi.PhaseResourcesCreated,
 			PhaseVersion: 2,
 			ResourceMeta: "abc",
 		}
@@ -76,7 +76,7 @@ func Test_launch(t *testing.T) {
 		tCtx.EXPECT().TaskExecutionMetadata().Return(meta)
 
 		c := &mocks2.AutoRefresh{}
-		s := State{}
+		s := webapi.State{}
 		c.EXPECT().GetOrCreate("my-id", CacheItem{State: s}).Return(CacheItem{State: s}, nil)
 
 		plgn := newPluginWithProperties(webapi.PluginConfig{})
@@ -96,8 +96,8 @@ func Test_launch(t *testing.T) {
 		tCtx.EXPECT().TaskExecutionMetadata().Return(meta)
 
 		c := &mocks2.AutoRefresh{}
-		s := State{
-			Phase:        PhaseResourcesCreated,
+		s := webapi.State{
+			Phase:        webapi.PhaseResourcesCreated,
 			PhaseVersion: 2,
 			ResourceMeta: "my-id",
 		}
