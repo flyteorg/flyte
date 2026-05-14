@@ -240,6 +240,8 @@ func (m *LoggingContext) validate(all bool) error {
 
 	// no validation rules for ExecutionAttempt
 
+	// no validation rules for PodNamePrefix
+
 	if len(errors) > 0 {
 		return LoggingContextMultiError(errors)
 	}
