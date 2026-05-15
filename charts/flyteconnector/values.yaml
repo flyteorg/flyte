@@ -21,9 +21,9 @@ connectorSecret:
 replicaCount: 1
 image:
   # -- Docker image for flyteconnector deployment
-  repository: cr.flyte.org/flyteorg/flyteagent  # FLYTEconnector_IMAGE
+  repository: ghcr.io/flyteorg/flyte-connectors  # FLYTECONNECTOR_IMAGE
   # -- Docker image tag
-  tag: 1.15.3  # FLYTECONNECTOR_TAG
+  tag: latest  # FLYTECONNECTOR_TAG
   # -- Docker image pull policy
   pullPolicy: IfNotPresent
 ports:

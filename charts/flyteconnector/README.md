@@ -19,8 +19,8 @@ A Helm chart for Flyte connector
 | extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
-| image.repository | string | `"cr.flyte.org/flyteorg/flyteagent"` | Docker image for flyteconnector deployment |
-| image.tag | string | `"1.15.3"` | Docker image tag |
+| image.repository | string | `"ghcr.io/flyteorg/flyte-connectors"` | Docker image for flyteconnector deployment |
+| image.tag | string | `"latest"` | Docker image tag |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | nodeSelector for flyteconnector deployment |
 | podAnnotations | object | `{}` | Annotations for flyteconnector pods |
@@ -43,4 +43,3 @@ A Helm chart for Flyte connector
 | serviceAccount.create | bool | `true` | Should a service account be created for flyteconnector |
 | serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
 | tolerations | list | `[]` | tolerations for flyteconnector deployment |
-

@@ -9,3 +9,9 @@ type: application
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
 
 version: v0.2.0  # VERSION
+
+dependencies:
+  - name: flyteconnector
+    version: v0.1.10
+    repository: file://../flyteconnector
+    condition: flyteconnector.enabled
