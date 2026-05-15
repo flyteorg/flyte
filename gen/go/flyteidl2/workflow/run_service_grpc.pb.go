@@ -19,22 +19,23 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	RunService_CreateRun_FullMethodName           = "/flyteidl2.workflow.RunService/CreateRun"
-	RunService_AbortRun_FullMethodName            = "/flyteidl2.workflow.RunService/AbortRun"
-	RunService_GetRunDetails_FullMethodName       = "/flyteidl2.workflow.RunService/GetRunDetails"
-	RunService_WatchRunDetails_FullMethodName     = "/flyteidl2.workflow.RunService/WatchRunDetails"
-	RunService_GetActionDetails_FullMethodName    = "/flyteidl2.workflow.RunService/GetActionDetails"
-	RunService_WatchActionDetails_FullMethodName  = "/flyteidl2.workflow.RunService/WatchActionDetails"
-	RunService_GetActionData_FullMethodName       = "/flyteidl2.workflow.RunService/GetActionData"
-	RunService_ListRuns_FullMethodName            = "/flyteidl2.workflow.RunService/ListRuns"
-	RunService_WatchRuns_FullMethodName           = "/flyteidl2.workflow.RunService/WatchRuns"
-	RunService_ListActions_FullMethodName         = "/flyteidl2.workflow.RunService/ListActions"
-	RunService_WatchActions_FullMethodName        = "/flyteidl2.workflow.RunService/WatchActions"
-	RunService_WatchClusterEvents_FullMethodName  = "/flyteidl2.workflow.RunService/WatchClusterEvents"
-	RunService_AbortAction_FullMethodName         = "/flyteidl2.workflow.RunService/AbortAction"
-	RunService_WatchGroups_FullMethodName         = "/flyteidl2.workflow.RunService/WatchGroups"
-	RunService_GetActionDataURIs_FullMethodName   = "/flyteidl2.workflow.RunService/GetActionDataURIs"
-	RunService_GetActionLogContext_FullMethodName = "/flyteidl2.workflow.RunService/GetActionLogContext"
+	RunService_CreateRun_FullMethodName            = "/flyteidl2.workflow.RunService/CreateRun"
+	RunService_AbortRun_FullMethodName             = "/flyteidl2.workflow.RunService/AbortRun"
+	RunService_GetRunDetails_FullMethodName        = "/flyteidl2.workflow.RunService/GetRunDetails"
+	RunService_WatchRunDetails_FullMethodName      = "/flyteidl2.workflow.RunService/WatchRunDetails"
+	RunService_GetActionDetails_FullMethodName     = "/flyteidl2.workflow.RunService/GetActionDetails"
+	RunService_WatchActionDetails_FullMethodName   = "/flyteidl2.workflow.RunService/WatchActionDetails"
+	RunService_GetActionData_FullMethodName        = "/flyteidl2.workflow.RunService/GetActionData"
+	RunService_ListRuns_FullMethodName             = "/flyteidl2.workflow.RunService/ListRuns"
+	RunService_WatchRuns_FullMethodName            = "/flyteidl2.workflow.RunService/WatchRuns"
+	RunService_ListActions_FullMethodName          = "/flyteidl2.workflow.RunService/ListActions"
+	RunService_WatchActions_FullMethodName         = "/flyteidl2.workflow.RunService/WatchActions"
+	RunService_WatchWindowedActions_FullMethodName = "/flyteidl2.workflow.RunService/WatchWindowedActions"
+	RunService_WatchClusterEvents_FullMethodName   = "/flyteidl2.workflow.RunService/WatchClusterEvents"
+	RunService_AbortAction_FullMethodName          = "/flyteidl2.workflow.RunService/AbortAction"
+	RunService_WatchGroups_FullMethodName          = "/flyteidl2.workflow.RunService/WatchGroups"
+	RunService_GetActionDataURIs_FullMethodName    = "/flyteidl2.workflow.RunService/GetActionDataURIs"
+	RunService_GetActionLogContext_FullMethodName  = "/flyteidl2.workflow.RunService/GetActionLogContext"
 )
 
 // RunServiceClient is the client API for RunService service.
@@ -66,6 +67,11 @@ type RunServiceClient interface {
 	// Stream updates for actions given a run. Responses may include newly discovered nested runs or updates
 	// to  existing ones from the point of invocation.
 	WatchActions(ctx context.Context, in *WatchActionsRequest, opts ...grpc.CallOption) (RunService_WatchActionsClient, error)
+	// Stream a windowed slice of a run's action list. Client sends a Subscribe
+	// message followed by UpdateWindow messages as the user scrolls / expands /
+	// filters; server streams windowed responses containing only the visible
+	// overscan slice, ancestor path, and group aggregates.
+	WatchWindowedActions(ctx context.Context, opts ...grpc.CallOption) (RunService_WatchWindowedActionsClient, error)
 	// Stream of k8s cluster events in human readable form
 	WatchClusterEvents(ctx context.Context, in *WatchClusterEventsRequest, opts ...grpc.CallOption) (RunService_WatchClusterEventsClient, error)
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
@@ -278,8 +284,39 @@ func (x *runServiceWatchActionsClient) Recv() (*WatchActionsResponse, error) {
 	return m, nil
 }
 
+func (c *runServiceClient) WatchWindowedActions(ctx context.Context, opts ...grpc.CallOption) (RunService_WatchWindowedActionsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &RunService_ServiceDesc.Streams[4], RunService_WatchWindowedActions_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &runServiceWatchWindowedActionsClient{stream}
+	return x, nil
+}
+
+type RunService_WatchWindowedActionsClient interface {
+	Send(*WatchWindowedActionsRequest) error
+	Recv() (*WatchWindowedActionsResponse, error)
+	grpc.ClientStream
+}
+
+type runServiceWatchWindowedActionsClient struct {
+	grpc.ClientStream
+}
+
+func (x *runServiceWatchWindowedActionsClient) Send(m *WatchWindowedActionsRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *runServiceWatchWindowedActionsClient) Recv() (*WatchWindowedActionsResponse, error) {
+	m := new(WatchWindowedActionsResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *runServiceClient) WatchClusterEvents(ctx context.Context, in *WatchClusterEventsRequest, opts ...grpc.CallOption) (RunService_WatchClusterEventsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &RunService_ServiceDesc.Streams[4], RunService_WatchClusterEvents_FullMethodName, opts...)
+	stream, err := c.cc.NewStream(ctx, &RunService_ServiceDesc.Streams[5], RunService_WatchClusterEvents_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -320,7 +357,7 @@ func (c *runServiceClient) AbortAction(ctx context.Context, in *AbortActionReque
 }
 
 func (c *runServiceClient) WatchGroups(ctx context.Context, in *WatchGroupsRequest, opts ...grpc.CallOption) (RunService_WatchGroupsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &RunService_ServiceDesc.Streams[5], RunService_WatchGroups_FullMethodName, opts...)
+	stream, err := c.cc.NewStream(ctx, &RunService_ServiceDesc.Streams[6], RunService_WatchGroups_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -398,6 +435,11 @@ type RunServiceServer interface {
 	// Stream updates for actions given a run. Responses may include newly discovered nested runs or updates
 	// to  existing ones from the point of invocation.
 	WatchActions(*WatchActionsRequest, RunService_WatchActionsServer) error
+	// Stream a windowed slice of a run's action list. Client sends a Subscribe
+	// message followed by UpdateWindow messages as the user scrolls / expands /
+	// filters; server streams windowed responses containing only the visible
+	// overscan slice, ancestor path, and group aggregates.
+	WatchWindowedActions(RunService_WatchWindowedActionsServer) error
 	// Stream of k8s cluster events in human readable form
 	WatchClusterEvents(*WatchClusterEventsRequest, RunService_WatchClusterEventsServer) error
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
@@ -446,6 +488,9 @@ func (UnimplementedRunServiceServer) ListActions(context.Context, *ListActionsRe
 }
 func (UnimplementedRunServiceServer) WatchActions(*WatchActionsRequest, RunService_WatchActionsServer) error {
 	return status.Errorf(codes.Unimplemented, "method WatchActions not implemented")
+}
+func (UnimplementedRunServiceServer) WatchWindowedActions(RunService_WatchWindowedActionsServer) error {
+	return status.Errorf(codes.Unimplemented, "method WatchWindowedActions not implemented")
 }
 func (UnimplementedRunServiceServer) WatchClusterEvents(*WatchClusterEventsRequest, RunService_WatchClusterEventsServer) error {
 	return status.Errorf(codes.Unimplemented, "method WatchClusterEvents not implemented")
@@ -684,6 +729,32 @@ func (x *runServiceWatchActionsServer) Send(m *WatchActionsResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _RunService_WatchWindowedActions_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(RunServiceServer).WatchWindowedActions(&runServiceWatchWindowedActionsServer{stream})
+}
+
+type RunService_WatchWindowedActionsServer interface {
+	Send(*WatchWindowedActionsResponse) error
+	Recv() (*WatchWindowedActionsRequest, error)
+	grpc.ServerStream
+}
+
+type runServiceWatchWindowedActionsServer struct {
+	grpc.ServerStream
+}
+
+func (x *runServiceWatchWindowedActionsServer) Send(m *WatchWindowedActionsResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *runServiceWatchWindowedActionsServer) Recv() (*WatchWindowedActionsRequest, error) {
+	m := new(WatchWindowedActionsRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func _RunService_WatchClusterEvents_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(WatchClusterEventsRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -848,6 +919,12 @@ var RunService_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "WatchActions",
 			Handler:       _RunService_WatchActions_Handler,
 			ServerStreams: true,
+		},
+		{
+			StreamName:    "WatchWindowedActions",
+			Handler:       _RunService_WatchWindowedActions_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
 		},
 		{
 			StreamName:    "WatchClusterEvents",

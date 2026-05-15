@@ -2584,6 +2584,40 @@ pub mod run_service_client {
                 );
             self.inner.server_streaming(req, path, codec).await
         }
+        pub async fn watch_windowed_actions(
+            &mut self,
+            request: impl tonic::IntoStreamingRequest<
+                Message = super::WatchWindowedActionsRequest,
+            >,
+        ) -> std::result::Result<
+            tonic::Response<
+                tonic::codec::Streaming<super::WatchWindowedActionsResponse>,
+            >,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.workflow.RunService/WatchWindowedActions",
+            );
+            let mut req = request.into_streaming_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "flyteidl2.workflow.RunService",
+                        "WatchWindowedActions",
+                    ),
+                );
+            self.inner.streaming(req, path, codec).await
+        }
         pub async fn watch_cluster_events(
             &mut self,
             request: impl tonic::IntoRequest<super::WatchClusterEventsRequest>,
@@ -2829,6 +2863,22 @@ pub mod run_service_server {
             request: tonic::Request<super::WatchActionsRequest>,
         ) -> std::result::Result<
             tonic::Response<Self::WatchActionsStream>,
+            tonic::Status,
+        >;
+        /// Server streaming response type for the WatchWindowedActions method.
+        type WatchWindowedActionsStream: tonic::codegen::tokio_stream::Stream<
+                Item = std::result::Result<
+                    super::WatchWindowedActionsResponse,
+                    tonic::Status,
+                >,
+            >
+            + Send
+            + 'static;
+        async fn watch_windowed_actions(
+            &self,
+            request: tonic::Request<tonic::Streaming<super::WatchWindowedActionsRequest>>,
+        ) -> std::result::Result<
+            tonic::Response<Self::WatchWindowedActionsStream>,
             tonic::Status,
         >;
         /// Server streaming response type for the WatchClusterEvents method.
@@ -3456,6 +3506,55 @@ pub mod run_service_server {
                                 max_encoding_message_size,
                             );
                         let res = grpc.server_streaming(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.workflow.RunService/WatchWindowedActions" => {
+                    #[allow(non_camel_case_types)]
+                    struct WatchWindowedActionsSvc<T: RunService>(pub Arc<T>);
+                    impl<
+                        T: RunService,
+                    > tonic::server::StreamingService<super::WatchWindowedActionsRequest>
+                    for WatchWindowedActionsSvc<T> {
+                        type Response = super::WatchWindowedActionsResponse;
+                        type ResponseStream = T::WatchWindowedActionsStream;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::ResponseStream>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                tonic::Streaming<super::WatchWindowedActionsRequest>,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as RunService>::watch_windowed_actions(&inner, request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = WatchWindowedActionsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.streaming(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)

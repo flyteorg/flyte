@@ -60,6 +60,9 @@ const (
 	RunServiceListActionsProcedure = "/flyteidl2.workflow.RunService/ListActions"
 	// RunServiceWatchActionsProcedure is the fully-qualified name of the RunService's WatchActions RPC.
 	RunServiceWatchActionsProcedure = "/flyteidl2.workflow.RunService/WatchActions"
+	// RunServiceWatchWindowedActionsProcedure is the fully-qualified name of the RunService's
+	// WatchWindowedActions RPC.
+	RunServiceWatchWindowedActionsProcedure = "/flyteidl2.workflow.RunService/WatchWindowedActions"
 	// RunServiceWatchClusterEventsProcedure is the fully-qualified name of the RunService's
 	// WatchClusterEvents RPC.
 	RunServiceWatchClusterEventsProcedure = "/flyteidl2.workflow.RunService/WatchClusterEvents"
@@ -77,23 +80,24 @@ const (
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	runServiceServiceDescriptor                   = workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService")
-	runServiceCreateRunMethodDescriptor           = runServiceServiceDescriptor.Methods().ByName("CreateRun")
-	runServiceAbortRunMethodDescriptor            = runServiceServiceDescriptor.Methods().ByName("AbortRun")
-	runServiceGetRunDetailsMethodDescriptor       = runServiceServiceDescriptor.Methods().ByName("GetRunDetails")
-	runServiceWatchRunDetailsMethodDescriptor     = runServiceServiceDescriptor.Methods().ByName("WatchRunDetails")
-	runServiceGetActionDetailsMethodDescriptor    = runServiceServiceDescriptor.Methods().ByName("GetActionDetails")
-	runServiceWatchActionDetailsMethodDescriptor  = runServiceServiceDescriptor.Methods().ByName("WatchActionDetails")
-	runServiceGetActionDataMethodDescriptor       = runServiceServiceDescriptor.Methods().ByName("GetActionData")
-	runServiceListRunsMethodDescriptor            = runServiceServiceDescriptor.Methods().ByName("ListRuns")
-	runServiceWatchRunsMethodDescriptor           = runServiceServiceDescriptor.Methods().ByName("WatchRuns")
-	runServiceListActionsMethodDescriptor         = runServiceServiceDescriptor.Methods().ByName("ListActions")
-	runServiceWatchActionsMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("WatchActions")
-	runServiceWatchClusterEventsMethodDescriptor  = runServiceServiceDescriptor.Methods().ByName("WatchClusterEvents")
-	runServiceAbortActionMethodDescriptor         = runServiceServiceDescriptor.Methods().ByName("AbortAction")
-	runServiceWatchGroupsMethodDescriptor         = runServiceServiceDescriptor.Methods().ByName("WatchGroups")
-	runServiceGetActionDataURIsMethodDescriptor   = runServiceServiceDescriptor.Methods().ByName("GetActionDataURIs")
-	runServiceGetActionLogContextMethodDescriptor = runServiceServiceDescriptor.Methods().ByName("GetActionLogContext")
+	runServiceServiceDescriptor                    = workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService")
+	runServiceCreateRunMethodDescriptor            = runServiceServiceDescriptor.Methods().ByName("CreateRun")
+	runServiceAbortRunMethodDescriptor             = runServiceServiceDescriptor.Methods().ByName("AbortRun")
+	runServiceGetRunDetailsMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("GetRunDetails")
+	runServiceWatchRunDetailsMethodDescriptor      = runServiceServiceDescriptor.Methods().ByName("WatchRunDetails")
+	runServiceGetActionDetailsMethodDescriptor     = runServiceServiceDescriptor.Methods().ByName("GetActionDetails")
+	runServiceWatchActionDetailsMethodDescriptor   = runServiceServiceDescriptor.Methods().ByName("WatchActionDetails")
+	runServiceGetActionDataMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("GetActionData")
+	runServiceListRunsMethodDescriptor             = runServiceServiceDescriptor.Methods().ByName("ListRuns")
+	runServiceWatchRunsMethodDescriptor            = runServiceServiceDescriptor.Methods().ByName("WatchRuns")
+	runServiceListActionsMethodDescriptor          = runServiceServiceDescriptor.Methods().ByName("ListActions")
+	runServiceWatchActionsMethodDescriptor         = runServiceServiceDescriptor.Methods().ByName("WatchActions")
+	runServiceWatchWindowedActionsMethodDescriptor = runServiceServiceDescriptor.Methods().ByName("WatchWindowedActions")
+	runServiceWatchClusterEventsMethodDescriptor   = runServiceServiceDescriptor.Methods().ByName("WatchClusterEvents")
+	runServiceAbortActionMethodDescriptor          = runServiceServiceDescriptor.Methods().ByName("AbortAction")
+	runServiceWatchGroupsMethodDescriptor          = runServiceServiceDescriptor.Methods().ByName("WatchGroups")
+	runServiceGetActionDataURIsMethodDescriptor    = runServiceServiceDescriptor.Methods().ByName("GetActionDataURIs")
+	runServiceGetActionLogContextMethodDescriptor  = runServiceServiceDescriptor.Methods().ByName("GetActionLogContext")
 )
 
 // RunServiceClient is a client for the flyteidl2.workflow.RunService service.
@@ -124,6 +128,11 @@ type RunServiceClient interface {
 	// Stream updates for actions given a run. Responses may include newly discovered nested runs or updates
 	// to  existing ones from the point of invocation.
 	WatchActions(context.Context, *connect.Request[workflow.WatchActionsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionsResponse], error)
+	// Stream a windowed slice of a run's action list. Client sends a Subscribe
+	// message followed by UpdateWindow messages as the user scrolls / expands /
+	// filters; server streams windowed responses containing only the visible
+	// overscan slice, ancestor path, and group aggregates.
+	WatchWindowedActions(context.Context) *connect.BidiStreamForClient[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse]
 	// Stream of k8s cluster events in human readable form
 	WatchClusterEvents(context.Context, *connect.Request[workflow.WatchClusterEventsRequest]) (*connect.ServerStreamForClient[workflow.WatchClusterEventsResponse], error)
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
@@ -217,6 +226,12 @@ func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(runServiceWatchActionsMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		watchWindowedActions: connect.NewClient[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse](
+			httpClient,
+			baseURL+RunServiceWatchWindowedActionsProcedure,
+			connect.WithSchema(runServiceWatchWindowedActionsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		watchClusterEvents: connect.NewClient[workflow.WatchClusterEventsRequest, workflow.WatchClusterEventsResponse](
 			httpClient,
 			baseURL+RunServiceWatchClusterEventsProcedure,
@@ -254,22 +269,23 @@ func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 
 // runServiceClient implements RunServiceClient.
 type runServiceClient struct {
-	createRun           *connect.Client[workflow.CreateRunRequest, workflow.CreateRunResponse]
-	abortRun            *connect.Client[workflow.AbortRunRequest, workflow.AbortRunResponse]
-	getRunDetails       *connect.Client[workflow.GetRunDetailsRequest, workflow.GetRunDetailsResponse]
-	watchRunDetails     *connect.Client[workflow.WatchRunDetailsRequest, workflow.WatchRunDetailsResponse]
-	getActionDetails    *connect.Client[workflow.GetActionDetailsRequest, workflow.GetActionDetailsResponse]
-	watchActionDetails  *connect.Client[workflow.WatchActionDetailsRequest, workflow.WatchActionDetailsResponse]
-	getActionData       *connect.Client[workflow.GetActionDataRequest, workflow.GetActionDataResponse]
-	listRuns            *connect.Client[workflow.ListRunsRequest, workflow.ListRunsResponse]
-	watchRuns           *connect.Client[workflow.WatchRunsRequest, workflow.WatchRunsResponse]
-	listActions         *connect.Client[workflow.ListActionsRequest, workflow.ListActionsResponse]
-	watchActions        *connect.Client[workflow.WatchActionsRequest, workflow.WatchActionsResponse]
-	watchClusterEvents  *connect.Client[workflow.WatchClusterEventsRequest, workflow.WatchClusterEventsResponse]
-	abortAction         *connect.Client[workflow.AbortActionRequest, workflow.AbortActionResponse]
-	watchGroups         *connect.Client[workflow.WatchGroupsRequest, workflow.WatchGroupsResponse]
-	getActionDataURIs   *connect.Client[workflow.GetActionDataURIsRequest, workflow.GetActionDataURIsResponse]
-	getActionLogContext *connect.Client[workflow.GetActionLogContextRequest, workflow.GetActionLogContextResponse]
+	createRun            *connect.Client[workflow.CreateRunRequest, workflow.CreateRunResponse]
+	abortRun             *connect.Client[workflow.AbortRunRequest, workflow.AbortRunResponse]
+	getRunDetails        *connect.Client[workflow.GetRunDetailsRequest, workflow.GetRunDetailsResponse]
+	watchRunDetails      *connect.Client[workflow.WatchRunDetailsRequest, workflow.WatchRunDetailsResponse]
+	getActionDetails     *connect.Client[workflow.GetActionDetailsRequest, workflow.GetActionDetailsResponse]
+	watchActionDetails   *connect.Client[workflow.WatchActionDetailsRequest, workflow.WatchActionDetailsResponse]
+	getActionData        *connect.Client[workflow.GetActionDataRequest, workflow.GetActionDataResponse]
+	listRuns             *connect.Client[workflow.ListRunsRequest, workflow.ListRunsResponse]
+	watchRuns            *connect.Client[workflow.WatchRunsRequest, workflow.WatchRunsResponse]
+	listActions          *connect.Client[workflow.ListActionsRequest, workflow.ListActionsResponse]
+	watchActions         *connect.Client[workflow.WatchActionsRequest, workflow.WatchActionsResponse]
+	watchWindowedActions *connect.Client[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse]
+	watchClusterEvents   *connect.Client[workflow.WatchClusterEventsRequest, workflow.WatchClusterEventsResponse]
+	abortAction          *connect.Client[workflow.AbortActionRequest, workflow.AbortActionResponse]
+	watchGroups          *connect.Client[workflow.WatchGroupsRequest, workflow.WatchGroupsResponse]
+	getActionDataURIs    *connect.Client[workflow.GetActionDataURIsRequest, workflow.GetActionDataURIsResponse]
+	getActionLogContext  *connect.Client[workflow.GetActionLogContextRequest, workflow.GetActionLogContextResponse]
 }
 
 // CreateRun calls flyteidl2.workflow.RunService.CreateRun.
@@ -329,6 +345,11 @@ func (c *runServiceClient) WatchActions(ctx context.Context, req *connect.Reques
 	return c.watchActions.CallServerStream(ctx, req)
 }
 
+// WatchWindowedActions calls flyteidl2.workflow.RunService.WatchWindowedActions.
+func (c *runServiceClient) WatchWindowedActions(ctx context.Context) *connect.BidiStreamForClient[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse] {
+	return c.watchWindowedActions.CallBidiStream(ctx)
+}
+
 // WatchClusterEvents calls flyteidl2.workflow.RunService.WatchClusterEvents.
 func (c *runServiceClient) WatchClusterEvents(ctx context.Context, req *connect.Request[workflow.WatchClusterEventsRequest]) (*connect.ServerStreamForClient[workflow.WatchClusterEventsResponse], error) {
 	return c.watchClusterEvents.CallServerStream(ctx, req)
@@ -382,6 +403,11 @@ type RunServiceHandler interface {
 	// Stream updates for actions given a run. Responses may include newly discovered nested runs or updates
 	// to  existing ones from the point of invocation.
 	WatchActions(context.Context, *connect.Request[workflow.WatchActionsRequest], *connect.ServerStream[workflow.WatchActionsResponse]) error
+	// Stream a windowed slice of a run's action list. Client sends a Subscribe
+	// message followed by UpdateWindow messages as the user scrolls / expands /
+	// filters; server streams windowed responses containing only the visible
+	// overscan slice, ancestor path, and group aggregates.
+	WatchWindowedActions(context.Context, *connect.BidiStream[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse]) error
 	// Stream of k8s cluster events in human readable form
 	WatchClusterEvents(context.Context, *connect.Request[workflow.WatchClusterEventsRequest], *connect.ServerStream[workflow.WatchClusterEventsResponse]) error
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
@@ -471,6 +497,12 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(runServiceWatchActionsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	runServiceWatchWindowedActionsHandler := connect.NewBidiStreamHandler(
+		RunServiceWatchWindowedActionsProcedure,
+		svc.WatchWindowedActions,
+		connect.WithSchema(runServiceWatchWindowedActionsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	runServiceWatchClusterEventsHandler := connect.NewServerStreamHandler(
 		RunServiceWatchClusterEventsProcedure,
 		svc.WatchClusterEvents,
@@ -527,6 +559,8 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 			runServiceListActionsHandler.ServeHTTP(w, r)
 		case RunServiceWatchActionsProcedure:
 			runServiceWatchActionsHandler.ServeHTTP(w, r)
+		case RunServiceWatchWindowedActionsProcedure:
+			runServiceWatchWindowedActionsHandler.ServeHTTP(w, r)
 		case RunServiceWatchClusterEventsProcedure:
 			runServiceWatchClusterEventsHandler.ServeHTTP(w, r)
 		case RunServiceAbortActionProcedure:
@@ -588,6 +622,10 @@ func (UnimplementedRunServiceHandler) ListActions(context.Context, *connect.Requ
 
 func (UnimplementedRunServiceHandler) WatchActions(context.Context, *connect.Request[workflow.WatchActionsRequest], *connect.ServerStream[workflow.WatchActionsResponse]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.WatchActions is not implemented"))
+}
+
+func (UnimplementedRunServiceHandler) WatchWindowedActions(context.Context, *connect.BidiStream[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.WatchWindowedActions is not implemented"))
 }
 
 func (UnimplementedRunServiceHandler) WatchClusterEvents(context.Context, *connect.Request[workflow.WatchClusterEventsRequest], *connect.ServerStream[workflow.WatchClusterEventsResponse]) error {

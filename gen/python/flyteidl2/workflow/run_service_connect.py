@@ -50,6 +50,9 @@ class RunService(Protocol):
     def watch_actions(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest, ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    def watch_windowed_actions(self, request: AsyncIterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsRequest], ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsResponse]:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
     def watch_cluster_events(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchClusterEventsRequest, ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchClusterEventsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
@@ -180,6 +183,16 @@ class RunServiceASGIApplication(ConnectASGIApplication[RunService]):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.watch_actions,
+                ),
+                "/flyteidl2.workflow.RunService/WatchWindowedActions": Endpoint.bidi_stream(
+                    method=MethodInfo(
+                        name="WatchWindowedActions",
+                        service_name="flyteidl2.workflow.RunService",
+                        input=flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsRequest,
+                        output=flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.watch_windowed_actions,
                 ),
                 "/flyteidl2.workflow.RunService/WatchClusterEvents": Endpoint.server_stream(
                     method=MethodInfo(
@@ -474,6 +487,26 @@ class RunServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    def watch_windowed_actions(
+        self,
+        request: AsyncIterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsRequest],
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> AsyncIterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsResponse]:
+        return self.execute_bidi_stream(
+            request=request,
+            method=MethodInfo(
+                name="WatchWindowedActions",
+                service_name="flyteidl2.workflow.RunService",
+                input=flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsRequest,
+                output=flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
     def watch_cluster_events(
         self,
         request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchClusterEventsRequest,
@@ -602,6 +635,8 @@ class RunServiceSync(Protocol):
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def watch_actions(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def watch_windowed_actions(self, request: Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsRequest], ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsResponse]:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def watch_cluster_events(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchClusterEventsRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchClusterEventsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def abort_action(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionResponse:
@@ -727,6 +762,16 @@ class RunServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.watch_actions,
+                ),
+                "/flyteidl2.workflow.RunService/WatchWindowedActions": EndpointSync.bidi_stream(
+                    method=MethodInfo(
+                        name="WatchWindowedActions",
+                        service_name="flyteidl2.workflow.RunService",
+                        input=flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsRequest,
+                        output=flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.watch_windowed_actions,
                 ),
                 "/flyteidl2.workflow.RunService/WatchClusterEvents": EndpointSync.server_stream(
                     method=MethodInfo(
@@ -1015,6 +1060,26 @@ class RunServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.workflow.RunService",
                 input=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest,
                 output=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def watch_windowed_actions(
+        self,
+        request: Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsRequest],
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsResponse]:
+        return self.execute_bidi_stream(
+            request=request,
+            method=MethodInfo(
+                name="WatchWindowedActions",
+                service_name="flyteidl2.workflow.RunService",
+                input=flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsRequest,
+                output=flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
             ),
             headers=headers,

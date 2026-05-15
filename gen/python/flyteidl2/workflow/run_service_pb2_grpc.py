@@ -70,6 +70,11 @@ class RunServiceStub(object):
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse.FromString,
                 )
+        self.WatchWindowedActions = channel.stream_stream(
+                '/flyteidl2.workflow.RunService/WatchWindowedActions',
+                request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsResponse.FromString,
+                )
         self.WatchClusterEvents = channel.unary_stream(
                 '/flyteidl2.workflow.RunService/WatchClusterEvents',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchClusterEventsRequest.SerializeToString,
@@ -180,6 +185,16 @@ class RunServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def WatchWindowedActions(self, request_iterator, context):
+        """Stream a windowed slice of a run's action list. Client sends a Subscribe
+        message followed by UpdateWindow messages as the user scrolls / expands /
+        filters; server streams windowed responses containing only the visible
+        overscan slice, ancestor path, and group aggregates.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def WatchClusterEvents(self, request, context):
         """Stream of k8s cluster events in human readable form
         """
@@ -272,6 +287,11 @@ def add_RunServiceServicer_to_server(servicer, server):
                     servicer.WatchActions,
                     request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse.SerializeToString,
+            ),
+            'WatchWindowedActions': grpc.stream_stream_rpc_method_handler(
+                    servicer.WatchWindowedActions,
+                    request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsResponse.SerializeToString,
             ),
             'WatchClusterEvents': grpc.unary_stream_rpc_method_handler(
                     servicer.WatchClusterEvents,
@@ -493,6 +513,23 @@ class RunService(object):
         return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.RunService/WatchActions',
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def WatchWindowedActions(request_iterator,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.stream_stream(request_iterator, target, '/flyteidl2.workflow.RunService/WatchWindowedActions',
+            flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_run__service__pb2.WatchWindowedActionsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

@@ -2756,6 +2756,59 @@ func (_c *RunServiceClient_WatchRuns_Call) RunAndReturn(run func(context1 contex
 	return _c
 }
 
+// WatchWindowedActions provides a mock function for the type RunServiceClient
+func (_mock *RunServiceClient) WatchWindowedActions(context1 context.Context) *connect.BidiStreamForClient[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse] {
+	ret := _mock.Called(context1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WatchWindowedActions")
+	}
+
+	var r0 *connect.BidiStreamForClient[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse]
+	if returnFunc, ok := ret.Get(0).(func(context.Context) *connect.BidiStreamForClient[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse]); ok {
+		r0 = returnFunc(context1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connect.BidiStreamForClient[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse])
+		}
+	}
+	return r0
+}
+
+// RunServiceClient_WatchWindowedActions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WatchWindowedActions'
+type RunServiceClient_WatchWindowedActions_Call struct {
+	*mock.Call
+}
+
+// WatchWindowedActions is a helper method to define mock.On call
+//   - context1 context.Context
+func (_e *RunServiceClient_Expecter) WatchWindowedActions(context1 interface{}) *RunServiceClient_WatchWindowedActions_Call {
+	return &RunServiceClient_WatchWindowedActions_Call{Call: _e.mock.On("WatchWindowedActions", context1)}
+}
+
+func (_c *RunServiceClient_WatchWindowedActions_Call) Run(run func(context1 context.Context)) *RunServiceClient_WatchWindowedActions_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *RunServiceClient_WatchWindowedActions_Call) Return(bidiStreamForClient *connect.BidiStreamForClient[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse]) *RunServiceClient_WatchWindowedActions_Call {
+	_c.Call.Return(bidiStreamForClient)
+	return _c
+}
+
+func (_c *RunServiceClient_WatchWindowedActions_Call) RunAndReturn(run func(context1 context.Context) *connect.BidiStreamForClient[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse]) *RunServiceClient_WatchWindowedActions_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewRunServiceHandler creates a new instance of RunServiceHandler. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewRunServiceHandler(t interface {
@@ -3837,6 +3890,63 @@ func (_c *RunServiceHandler_WatchRuns_Call) Return(err error) *RunServiceHandler
 }
 
 func (_c *RunServiceHandler_WatchRuns_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[workflow.WatchRunsRequest], serverStream *connect.ServerStream[workflow.WatchRunsResponse]) error) *RunServiceHandler_WatchRuns_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// WatchWindowedActions provides a mock function for the type RunServiceHandler
+func (_mock *RunServiceHandler) WatchWindowedActions(context1 context.Context, bidiStream *connect.BidiStream[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse]) error {
+	ret := _mock.Called(context1, bidiStream)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WatchWindowedActions")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.BidiStream[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse]) error); ok {
+		r0 = returnFunc(context1, bidiStream)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// RunServiceHandler_WatchWindowedActions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WatchWindowedActions'
+type RunServiceHandler_WatchWindowedActions_Call struct {
+	*mock.Call
+}
+
+// WatchWindowedActions is a helper method to define mock.On call
+//   - context1 context.Context
+//   - bidiStream *connect.BidiStream[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse]
+func (_e *RunServiceHandler_Expecter) WatchWindowedActions(context1 interface{}, bidiStream interface{}) *RunServiceHandler_WatchWindowedActions_Call {
+	return &RunServiceHandler_WatchWindowedActions_Call{Call: _e.mock.On("WatchWindowedActions", context1, bidiStream)}
+}
+
+func (_c *RunServiceHandler_WatchWindowedActions_Call) Run(run func(context1 context.Context, bidiStream *connect.BidiStream[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse])) *RunServiceHandler_WatchWindowedActions_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *connect.BidiStream[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse]
+		if args[1] != nil {
+			arg1 = args[1].(*connect.BidiStream[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse])
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *RunServiceHandler_WatchWindowedActions_Call) Return(err error) *RunServiceHandler_WatchWindowedActions_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *RunServiceHandler_WatchWindowedActions_Call) RunAndReturn(run func(context1 context.Context, bidiStream *connect.BidiStream[workflow.WatchWindowedActionsRequest, workflow.WatchWindowedActionsResponse]) error) *RunServiceHandler_WatchWindowedActions_Call {
 	_c.Call.Return(run)
 	return _c
 }
