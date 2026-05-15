@@ -9,7 +9,7 @@ import (
 
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/resolver"
-	v1 "k8s.io/api/core/v1"
+	discoveryv1 "k8s.io/api/discovery/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -133,16 +133,16 @@ func (k *kResolver) Close() {
 	logger.Infof(k.ctx, "k8s resolver: closed")
 }
 
-func (k *kResolver) resolve(e *v1.Endpoints) {
+func (k *kResolver) resolve(e *discoveryv1.EndpointSlice) {
 	var newAddrs []resolver.Address
-	for _, subset := range e.Subsets {
-		port := k.target.port
-
-		for _, address := range subset.Addresses {
+	for _, endpoint := range e.Endpoints {
+		if endpoint.Conditions.Ready != nil && !*endpoint.Conditions.Ready {
+			continue
+		}
+		for _, address := range endpoint.Addresses {
 			newAddrs = append(newAddrs, resolver.Address{
-				Addr:       net.JoinHostPort(address.IP, port),
+				Addr:       net.JoinHostPort(address, k.target.port),
 				ServerName: fmt.Sprintf("%s.%s", k.target.serviceName, k.target.serviceNamespace),
-				Metadata:   nil,
 			})
 		}
 	}
@@ -158,7 +158,7 @@ func (k *kResolver) run() {
 
 	logger.Infof(k.ctx, "Starting k8s resolver for target: [%s], service namespace: [%s], service name: [%s]", k.target, k.target.serviceNamespace, k.target.serviceName)
 
-	watcher, err := k.k8sClient.CoreV1().Endpoints(k.target.serviceNamespace).Watch(k.ctx, metav1.ListOptions{FieldSelector: "metadata.name=" + k.target.serviceName})
+	watcher, err := k.k8sClient.DiscoveryV1().EndpointSlices(k.target.serviceNamespace).Watch(k.ctx, metav1.ListOptions{LabelSelector: "kubernetes.io/service-name=" + k.target.serviceName})
 	if err != nil {
 		logger.Errorf(
 			k.ctx,
@@ -187,7 +187,7 @@ func (k *kResolver) run() {
 			if event.Object == nil {
 				continue
 			}
-			k.resolve(event.Object.(*v1.Endpoints))
+			k.resolve(event.Object.(*discoveryv1.EndpointSlice))
 		}
 	}
 }

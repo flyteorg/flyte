@@ -11,9 +11,10 @@ import (
 	"google.golang.org/grpc/resolver"
 	"google.golang.org/grpc/serviceconfig"
 	"gotest.tools/assert"
-	v1 "k8s.io/api/core/v1"
+	discoveryv1 "k8s.io/api/discovery/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	testclient "k8s.io/client-go/kubernetes/fake"
+	"k8s.io/utils/ptr"
 )
 
 func parseTarget(target string) resolver.Target {
@@ -68,24 +69,23 @@ func TestBuilder(t *testing.T) {
 	// Make sure watcher is started before we create the endpoint
 	time.Sleep(2 * time.Second)
 
-	_, err = k8sClient.CoreV1().Endpoints("flyte").Create(context.Background(), &v1.Endpoints{
+	_, err = k8sClient.DiscoveryV1().EndpointSlices("flyte").Create(context.Background(), &discoveryv1.EndpointSlice{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "flyteagent",
+			Name:      "flyteagent-abc12",
 			Namespace: "flyte",
+			Labels:    map[string]string{"kubernetes.io/service-name": "flyteagent"},
 		},
-		Subsets: []v1.EndpointSubset{
+		AddressType: discoveryv1.AddressTypeIPv4,
+		Endpoints: []discoveryv1.Endpoint{
 			{
-				Addresses: []v1.EndpointAddress{
-					{
-						IP: "10.0.0.1",
-					},
-				},
-				Ports: []v1.EndpointPort{
-					{
-						Name: "grpc",
-						Port: 8000,
-					},
-				},
+				Addresses:  []string{"10.0.0.1"},
+				Conditions: discoveryv1.EndpointConditions{Ready: ptr.To(true)},
+			},
+		},
+		Ports: []discoveryv1.EndpointPort{
+			{
+				Name: ptr.To("grpc"),
+				Port: ptr.To(int32(8000)),
 			},
 		},
 	}, metav1.CreateOptions{})
