@@ -35,7 +35,11 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: "{{ .Values.image.pullPolicy }}"
         name: flyteconnector
-        volumeMounts: {{- include "connectorSecret.volumeMount" . | nindent 8 }}
+        volumeMounts:
+        {{- include "connectorSecret.volumeMount" . | nindent 8 }}
+        {{- with .Values.additionalVolumeMounts -}}
+        {{ tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
         ports:
         - containerPort: {{ .Values.ports.containerPort }}
           name: {{ .Values.ports.name }}
@@ -46,9 +50,6 @@ spec:
         securityContext:
           {{- toYaml .Values.securityContext | nindent 12 }}
         resources: {{- toYaml .Values.resources | nindent 10 }}
-        {{- with .Values.additionalVolumeMounts -}}
-        {{ tpl (toYaml .) $ | nindent 8 }}
-        {{- end }}
       {{- with .Values.additionalContainers -}}
       {{- tpl (toYaml .) $ | nindent 6}}
       {{- end }}
