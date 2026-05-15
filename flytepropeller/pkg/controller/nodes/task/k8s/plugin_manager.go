@@ -262,8 +262,14 @@ func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Tas
 		} else if k8serrors.IsForbidden(err) {
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil)), nil
 		} else if k8serrors.IsBadRequest(err) || k8serrors.IsInvalid(err) {
+			// BadRequest (HTTP 400) and Invalid (HTTP 422) errors are intrinsic
+			// to the request payload and not transient. The most common source
+			// is a validating admission webhook rejecting the pod spec; retrying
+			// with the same input will produce the same rejection. Treat as a
+			// permanent failure so the validation error surfaces to the user
+			// instead of exhausting the workflow's retry budget.
 			logger.Errorf(ctx, "Badly formatted resource for plugin [%s], err %s", e.id, err)
-			// return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("BadTaskFormat", err.Error(), nil)), nil
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("BadTaskFormat", err.Error(), nil)), nil
 		} else if k8serrors.IsRequestEntityTooLargeError(err) {
 			logger.Errorf(ctx, "Badly formatted resource for plugin [%s], err %s", e.id, err)
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("EntityTooLarge", err.Error(), nil)), nil

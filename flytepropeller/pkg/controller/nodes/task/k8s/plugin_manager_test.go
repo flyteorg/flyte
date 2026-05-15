@@ -408,6 +408,75 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		assert.True(t, k8serrors.IsNotFound(err))
 	})
 
+	t.Run("jobBadRequest", func(t *testing.T) {
+		// BadRequest (HTTP 400) errors — typically from a validating admission
+		// webhook — are intrinsic to the request payload and not transient.
+		// Retrying with the same input will produce the same rejection.
+		// They should be treated as a permanent failure (PhasePermanentFailure)
+		// rather than the default retryable system error, so workflows surface
+		// the validation error to the user instead of exhausting their retry
+		// budget. See https://github.com/flyteorg/flyte/issues/6531.
+		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseNotStarted)
+		mockResourceHandler := &pluginsk8sMock.Plugin{}
+		mockResourceHandler.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+		mockResourceHandler.EXPECT().BuildResource(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+		fakeClient := extendedFakeClient{
+			Client:      fake.NewClientBuilder().WithRuntimeObjects().Build(),
+			CreateError: k8serrors.NewBadRequest("admission webhook \"deny.example.com\" denied the request: invalid pod spec"),
+		}
+		mockClientset := k8sfake.NewSimpleClientset()
+
+		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
+			ID:              "x",
+			ResourceToWatch: &v1.Pod{},
+			Plugin:          mockResourceHandler,
+		}, NewResourceMonitorIndex(), mockClientset)
+		assert.NoError(t, err)
+
+		transition, err := pluginManager.Handle(ctx, tctx)
+		assert.NoError(t, err)
+		assert.NotNil(t, transition)
+		transitionInfo := transition.Info()
+		assert.NotNil(t, transitionInfo)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, transitionInfo.Phase())
+		assert.Equal(t, "BadTaskFormat", transitionInfo.Err().GetCode())
+	})
+
+	t.Run("jobInvalid", func(t *testing.T) {
+		// Invalid (HTTP 422) errors indicate the request was well-formed but
+		// the object failed validation (e.g. an invalid field value). Like
+		// BadRequest, this is intrinsic to the payload and not transient, so
+		// it should be a permanent failure.
+		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseNotStarted)
+		mockResourceHandler := &pluginsk8sMock.Plugin{}
+		mockResourceHandler.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+		mockResourceHandler.EXPECT().BuildResource(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+		fakeClient := extendedFakeClient{
+			Client: fake.NewClientBuilder().WithRuntimeObjects().Build(),
+			CreateError: k8serrors.NewInvalid(
+				schema.GroupKind{Group: "", Kind: "Pod"},
+				"test-pod",
+				nil,
+			),
+		}
+		mockClientset := k8sfake.NewSimpleClientset()
+
+		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
+			ID:              "x",
+			ResourceToWatch: &v1.Pod{},
+			Plugin:          mockResourceHandler,
+		}, NewResourceMonitorIndex(), mockClientset)
+		assert.NoError(t, err)
+
+		transition, err := pluginManager.Handle(ctx, tctx)
+		assert.NoError(t, err)
+		assert.NotNil(t, transition)
+		transitionInfo := transition.Info()
+		assert.NotNil(t, transitionInfo)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, transitionInfo.Phase())
+		assert.Equal(t, "BadTaskFormat", transitionInfo.Err().GetCode())
+	})
+
 	t.Run("Insufficient resource blocking pod creation for the first time", func(t *testing.T) {
 		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseNotStarted)
 		var tmpl *core.TaskTemplate
