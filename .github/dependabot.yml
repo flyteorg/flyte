@@ -39,6 +39,7 @@ updates:
       - "gen/**"
     cooldown:
       default-days: 5
+    target-branch: "main"
   - package-ecosystem: "uv"
     directory: "/"
     schedule:
@@ -48,3 +49,4 @@ updates:
       - "gen/**"
     cooldown:
       default-days: 5
+    target-branch: "main"
