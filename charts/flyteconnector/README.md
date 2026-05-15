@@ -15,7 +15,7 @@ A Helm chart for Flyte connector
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
 | configPath | string | `"/etc/flyteconnector/config/*.yaml"` | Default regex string for searching configuration files |
-| connectorSecret.secretData | object | `{"data":{"username":"User"}}` | Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). |
+| connectorSecret.secretData | object | `{}` | Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). |
 | extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |

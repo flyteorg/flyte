@@ -13,9 +13,7 @@ commonAnnotations: {}
 
 connectorSecret:
   # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data).
-  secretData:
-    data:
-      username: User
+  secretData: {}
 
 # -- Replicas count for flyteconnector deployment
 replicaCount: 1

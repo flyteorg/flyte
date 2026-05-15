@@ -23,9 +23,9 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
       - command:
-        - pyflyte
+        - flyte
         - serve
-        - agent
+        - connector
         {{- if .Values.podEnv }}
         env:
         {{- with .Values.podEnv }}
