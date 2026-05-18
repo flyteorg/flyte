@@ -4633,8 +4633,6 @@ func (m *WindowedItem) validate(all bool) error {
 
 	// no validation rules for IsExpanded
 
-	// no validation rules for FlatIndex
-
 	switch v := m.Item.(type) {
 	case *WindowedItem_Action:
 		if v == nil {

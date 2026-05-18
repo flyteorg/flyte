@@ -303,18 +303,16 @@ class WatchWindowedActionsResponse(_message.Message):
     def __init__(self, window_items: _Optional[_Iterable[_Union[WindowedItem, _Mapping]]] = ..., ancestors: _Optional[_Iterable[_Union[WindowedItem, _Mapping]]] = ..., total_flat_count: _Optional[int] = ..., selected_flat_index: _Optional[int] = ..., initial_snapshot_complete: bool = ..., truncations: _Optional[_Iterable[_Union[TruncationNotice, _Mapping]]] = ..., resync_hint: bool = ...) -> None: ...
 
 class WindowedItem(_message.Message):
-    __slots__ = ["action", "group", "depth", "is_expanded", "flat_index"]
+    __slots__ = ["action", "group", "depth", "is_expanded"]
     ACTION_FIELD_NUMBER: _ClassVar[int]
     GROUP_FIELD_NUMBER: _ClassVar[int]
     DEPTH_FIELD_NUMBER: _ClassVar[int]
     IS_EXPANDED_FIELD_NUMBER: _ClassVar[int]
-    FLAT_INDEX_FIELD_NUMBER: _ClassVar[int]
     action: _run_definition_pb2.EnrichedAction
     group: GroupNode
     depth: int
     is_expanded: bool
-    flat_index: int
-    def __init__(self, action: _Optional[_Union[_run_definition_pb2.EnrichedAction, _Mapping]] = ..., group: _Optional[_Union[GroupNode, _Mapping]] = ..., depth: _Optional[int] = ..., is_expanded: bool = ..., flat_index: _Optional[int] = ...) -> None: ...
+    def __init__(self, action: _Optional[_Union[_run_definition_pb2.EnrichedAction, _Mapping]] = ..., group: _Optional[_Union[GroupNode, _Mapping]] = ..., depth: _Optional[int] = ..., is_expanded: bool = ...) -> None: ...
 
 class ActionLeaf(_message.Message):
     __slots__ = ["action_id", "short_name", "duration"]

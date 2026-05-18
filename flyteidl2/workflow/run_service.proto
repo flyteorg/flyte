@@ -432,7 +432,6 @@ message WindowedItem {
   }
   int32 depth = 3;
   bool is_expanded = 4;
-  int64 flat_index = 5;
 }
 
 // ActionLeaf is one entry in a GroupAggregations top-3 list.
