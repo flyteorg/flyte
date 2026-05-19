@@ -3940,6 +3940,8 @@ func (m *WatchActionsRequest) validate(all bool) error {
 
 	}
 
+	// no validation rules for EnableRunStore
+
 	if len(errors) > 0 {
 		return WatchActionsRequestMultiError(errors)
 	}
