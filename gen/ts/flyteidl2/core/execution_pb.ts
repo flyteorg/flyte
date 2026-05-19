@@ -571,6 +571,8 @@ export type LogContext = Message<"flyteidl2.core.LogContext"> & {
   connector?: ConnectorLogContext;
 
   /**
+   * Pod-name prefix used by log sources to narrow stream/pod searches
+   *
    * @generated from field: string pod_name_prefix = 4;
    */
   podNamePrefix: string;

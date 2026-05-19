@@ -961,7 +961,8 @@ type LogContext struct {
 	Pods           []*PodLogContext     `protobuf:"bytes,1,rep,name=pods,proto3" json:"pods,omitempty"`
 	PrimaryPodName string               `protobuf:"bytes,2,opt,name=primary_pod_name,json=primaryPodName,proto3" json:"primary_pod_name,omitempty"`
 	Connector      *ConnectorLogContext `protobuf:"bytes,3,opt,name=connector,proto3" json:"connector,omitempty"`
-	PodNamePrefix  string               `protobuf:"bytes,4,opt,name=pod_name_prefix,json=podNamePrefix,proto3" json:"pod_name_prefix,omitempty"`
+	// Pod-name prefix used by log sources to narrow stream/pod searches
+	PodNamePrefix string `protobuf:"bytes,4,opt,name=pod_name_prefix,json=podNamePrefix,proto3" json:"pod_name_prefix,omitempty"`
 }
 
 func (x *LogContext) Reset() {
