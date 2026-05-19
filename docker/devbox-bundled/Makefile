@@ -85,6 +85,7 @@ helm-repos:
 	helm repo add docker-registry https://twuni.github.io/docker-registry.helm
 	helm repo add bitnami https://charts.bitnami.com/bitnami
 	helm repo add knative-serving https://deeploy-knative-serving-charts.storage.googleapis.com/
+	helm repo add rustfs https://rustfs.github.io/helm
 	helm repo update
 
 .PHONY: dep_build
@@ -190,6 +191,8 @@ setup-knative:
 		--patch '{"data":{"domain-template":"{{.Name}}.{{.Domain}}"}}'
 	kubectl patch configmap/config-domain -n knative-serving --type merge \
 		--patch '{"data":{"local.flyte.app":null,"localhost":""}}'
+	kubectl patch configmap/config-autoscaler -n knative-serving --type merge \
+		--patch '{"data":{"allow-zero-initial-scale":"true"}}'
 	kubectl patch svc/kourier -n kourier-system --type merge \
 		--patch '{"spec":{"type":"NodePort","ports":[{"name":"http2","port":80,"targetPort":8080,"nodePort":30081}]}}'
 

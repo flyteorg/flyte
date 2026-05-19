@@ -69,10 +69,29 @@ func (s *AppService) Get(
 	if err != nil {
 		return nil, err
 	}
-	if ok && appID.AppId != nil && s.cache != nil {
+	if ok && appID.AppId != nil && s.cache != nil && !isTransitionalState(resp.Msg.GetApp()) {
 		s.cache.Add(cacheKey(appID.AppId), resp.Msg.GetApp())
 	}
 	return resp, nil
+}
+
+// isTransitionalState returns true when the app has a non-stopped desired state
+// but is currently reporting a stopped status. This happens in the window between
+// a Start action and K8s actually bringing the pod up; caching in that window
+// would lock the UI into showing "stopped" for the full TTL on every poll cycle.
+func isTransitionalState(app *flyteapp.App) bool {
+	if app == nil {
+		return false
+	}
+	if app.GetSpec().GetDesiredState() == flyteapp.Spec_DESIRED_STATE_STOPPED {
+		return false
+	}
+	for _, cond := range app.GetStatus().GetConditions() {
+		if cond.GetDeploymentStatus() == flyteapp.Status_DEPLOYMENT_STATUS_STOPPED {
+			return true
+		}
+	}
+	return false
 }
 
 // Update forwards to InternalAppService and invalidates the cache entry.

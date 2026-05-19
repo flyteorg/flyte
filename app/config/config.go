@@ -65,15 +65,21 @@ type InternalAppConfig struct {
 	// processes need to connect back to the Flyte manager.
 	DefaultEnvVars map[string]string `json:"defaultEnvVars" pflag:"-,Default env vars injected into every app pod"`
 
+	// NamespacedNameSuffixTemplate is the template for generating the INTERNAL_APP_ENDPOINT_PATTERN env var.
+	// Supported variables: {{ project }}, {{ domain }}.
+	// Example: "{{ project }}-{{ domain }}"
+	NamespacedNameSuffixTemplate string `json:"namespacedNameSuffixTemplate" pflag:",Template for internal app endpoint pattern (e.g., {{ project }}-{{ domain }})"`
+
 	// WatchBufferSize is the buffer size for each subscriber's event channel.
 	// A larger value reduces the chance of dropped events under burst load.
 	WatchBufferSize int `json:"watchBufferSize" pflag:",Buffer size for watch subscriber channels"`
 }
 
 var defaultInternalAppConfig = &InternalAppConfig{
-	DefaultRequestTimeout: 300 * time.Second,
-	MaxRequestTimeout:     3600 * time.Second,
-	WatchBufferSize:       100,
+	DefaultRequestTimeout:        300 * time.Second,
+	MaxRequestTimeout:            3600 * time.Second,
+	WatchBufferSize:              100,
+	NamespacedNameSuffixTemplate: "{{ project }}-{{ domain }}",
 }
 
 var internalAppConfigSection = config.MustRegisterSection(internalAppConfigSectionKey, defaultInternalAppConfig)
