@@ -206,12 +206,14 @@ class ListActionsResponse(_message.Message):
     def __init__(self, actions: _Optional[_Iterable[_Union[_run_definition_pb2.Action, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
 
 class WatchActionsRequest(_message.Message):
-    __slots__ = ["run_id", "filter"]
+    __slots__ = ["run_id", "filter", "enable_run_store"]
     RUN_ID_FIELD_NUMBER: _ClassVar[int]
     FILTER_FIELD_NUMBER: _ClassVar[int]
+    ENABLE_RUN_STORE_FIELD_NUMBER: _ClassVar[int]
     run_id: _identifier_pb2.RunIdentifier
     filter: _containers.RepeatedCompositeFieldContainer[_list_pb2.Filter]
-    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., filter: _Optional[_Iterable[_Union[_list_pb2.Filter, _Mapping]]] = ...) -> None: ...
+    enable_run_store: bool
+    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., filter: _Optional[_Iterable[_Union[_list_pb2.Filter, _Mapping]]] = ..., enable_run_store: bool = ...) -> None: ...
 
 class WatchActionsResponse(_message.Message):
     __slots__ = ["enriched_actions"]
