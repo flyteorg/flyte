@@ -51,9 +51,9 @@ message TaskAction {
   // Enables caching when set and specifies the cache version to use.
   google.protobuf.StringValue cache_key = 3;
 
-  // the specific cluster that this action should be executed on. if not set, the cluster from the
-  // `RunSpec` will be used.
-  string cluster = 4;
+  // the specific queue that this action should be executed on.
+  // this value will be used to resolve the full queue id and store it in 'assigned_queue' field.
+  string queue = 4;
 }
 
 // TraceAction is used to define a trace action that can be used to track the execution of an action that's managed
