@@ -130,11 +130,20 @@ func NewUploadCommand(opts *RootOptions) *cobra.Command {
 		RootOptions: opts,
 	}
 
+	var deprecatedStartTimeout time.Duration
+
 	// deleteCmd represents the delete command
 	uploadCmd := &cobra.Command{
 		Use:   "sidecar <opts>",
 		Short: "uploads flyteData from the localpath to a remote dir.",
 		Long:  `Currently it looks at the outputs.pb and creates one file per variable.`,
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			// --timeout has priority over --start-timeout
+			if cmd.Flags().Changed("start-timeout") && !cmd.Flags().Changed("timeout") {
+				uploadOptions.timeout = deprecatedStartTimeout
+			}
+			return nil
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return uploadOptions.Sidecar(context.Background())
 		},
@@ -148,7 +157,7 @@ func NewUploadCommand(opts *RootOptions) *cobra.Command {
 	uploadCmd.Flags().StringVarP(&uploadOptions.metaOutputName, "meta-output-name", "", "outputs.pb", "The key name under the remoteOutputPrefix that should be return to provide meta information about the outputs on successful execution")
 	uploadCmd.Flags().DurationVarP(&uploadOptions.timeout, "timeout", "t", time.Hour*1, "Max time to allow for uploads to complete, default is 1H")
 	uploadCmd.Flags().BytesBase64VarP(&uploadOptions.typedInterface, "interface", "i", nil, "Typed Interface - core.TypedInterface, base64 encoded string of the serialized protobuf")
-	uploadCmd.Flags().DurationVarP(&uploadOptions.timeout, "start-timeout", "", 0, "Deprecated: Use --timeout instead. Specifies the maximum duration to allow uploads to complete. Retained for backward compatibility.")
+	uploadCmd.Flags().DurationVar(&deprecatedStartTimeout, "start-timeout", 0, "Deprecated: Use --timeout instead. Specifies the maximum duration to allow uploads to complete. Retained for backward compatibility.")
 	uploadCmd.Flags().StringVarP(&uploadOptions.startWatcherType, "start-watcher-type", "", containerwatcher.WatcherTypeSignal, fmt.Sprintf("Sidecar will wait for container before starting upload process. Watcher type makes the type configurable. Available Type %+v", containerwatcher.AllWatcherTypes))
 	uploadCmd.Flags().StringVarP(&uploadOptions.exitWatcherType, "exit-watcher-type", "", containerwatcher.WatcherTypeSignal, fmt.Sprintf("Sidecar will wait for completion of the container before starting upload process. Watcher type makes the type configurable. Available Type %+v", containerwatcher.AllWatcherTypes))
 	return uploadCmd
