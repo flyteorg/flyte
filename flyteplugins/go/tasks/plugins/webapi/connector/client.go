@@ -132,7 +132,7 @@ func updateRegistry(
 					IsConnectorApp:      isConnectorApp,
 				}
 				supportedCategoryName := supportedCategory.GetName()
-				registryKey := RegistryKey{domain: connectorDeployment.Domain, taskTypeName: supportedCategoryName, taskTypeVersion: supportedCategory.GetVersion()}
+				registryKey := RegistryKey{project: connectorDeployment.Project, domain: connectorDeployment.Domain, taskTypeName: supportedCategoryName, taskTypeVersion: supportedCategory.GetVersion()}
 				newConnectorRegistry[registryKey] = connector
 				connectorSupportedTaskCategories[supportedCategoryName] = struct{}{}
 			}
@@ -162,7 +162,7 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 	// If the connector doesn't implement the metadata service, we construct the registry based on the configuration
 	for taskType, connectorDeploymentID := range cfg.ConnectorForTaskTypes {
 		if connectorDeployment, ok := cfg.ConnectorDeployments[connectorDeploymentID]; ok {
-			registryKey := RegistryKey{domain: connectorDeployment.Domain, taskTypeName: taskType, taskTypeVersion: defaultTaskTypeVersion}
+			registryKey := RegistryKey{project: connectorDeployment.Project, domain: connectorDeployment.Domain, taskTypeName: taskType, taskTypeVersion: defaultTaskTypeVersion}
 			connector := &Connector{
 				ConnectorDeployment: connectorDeployment,
 				ConnectorID:         connectorDeploymentID,
@@ -174,7 +174,7 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 
 	// Ensure that the old configuration is backward compatible
 	for _, taskType := range cfg.SupportedTaskTypes {
-		registryKey := RegistryKey{domain: cfg.DefaultConnector.Domain, taskTypeName: taskType, taskTypeVersion: defaultTaskTypeVersion}
+		registryKey := RegistryKey{project: cfg.DefaultConnector.Project, domain: cfg.DefaultConnector.Domain, taskTypeName: taskType, taskTypeVersion: defaultTaskTypeVersion}
 		if _, ok := newConnectorRegistry[registryKey]; !ok {
 			connector := &Connector{
 				ConnectorDeployment: &cfg.DefaultConnector,
