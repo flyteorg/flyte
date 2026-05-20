@@ -53,14 +53,14 @@ func dummyContainerTaskTemplateWithPodSpec(command []string, args []string) *cor
 
 	podSpec := v1.PodSpec{
 		InitContainers: []v1.Container{
-			v1.Container{
+			{
 				Name:    "test-image",
 				Command: command,
 				Args:    args,
 			},
 		},
 		Containers: []v1.Container{
-			v1.Container{
+			{
 				Name:    "test-image",
 				Command: command,
 				Args:    args,
@@ -301,7 +301,7 @@ func TestContainerTaskExecutor_BuildResource_ExtendedResources(t *testing.T) {
 			[]v1.NodeSelectorTerm{
 				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-node-label",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-t4"},
@@ -341,12 +341,12 @@ func TestContainerTaskExecutor_BuildResource_ExtendedResources(t *testing.T) {
 			[]v1.NodeSelectorTerm{
 				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-node-label",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-a100"},
 						},
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-partition-size",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"1g.5gb"},

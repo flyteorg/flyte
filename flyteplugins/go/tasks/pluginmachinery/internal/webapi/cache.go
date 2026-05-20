@@ -51,7 +51,7 @@ func (c CacheItem) IsTerminal() bool {
 			return resource.IsTerminal()
 		}
 	}
-	return c.State.Phase.IsTerminal()
+	return c.Phase.IsTerminal()
 }
 
 // This basically grab an updated status from Client and store it in the cache

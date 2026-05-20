@@ -533,7 +533,7 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	}
 
 	// The retry.RetryOnConflict will refetch the k8s resource to get the latest resource version
-	// This will resovle the conflict error caused by k8s optimistic lock when 2 reconcile loops updating the same CRD
+	// This will resolve the conflict error caused by k8s optimistic lock when 2 reconcile loops updating the same CRD
 	if err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		latest := &flyteorgv1.TaskAction{}
 		if getErr := r.Get(ctx, client.ObjectKeyFromObject(newTaskAction), latest); getErr != nil {

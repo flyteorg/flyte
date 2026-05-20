@@ -33,9 +33,10 @@ jobs:
         with:
           go-version-file: go.mod
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v9
         with:
           working-directory: docker/devbox-bundled/bootstrap
+          version: v2.6.2
       - name: Check formatting
         working-directory: docker/devbox-bundled/bootstrap
         run: |
