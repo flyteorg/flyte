@@ -53,3 +53,23 @@ spec:
                   number: 80
 {{- end }}
 ---
+{{- if .Values.rustfs.enabled}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rustfs-console
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-devbox.labels" . | nindent 4 }}
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rustfs-svc
+                port:
+                  number: 9001
+{{- end }}
+---
