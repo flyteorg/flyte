@@ -15,6 +15,7 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/stow/s3"
 )
 
@@ -78,6 +79,33 @@ func TestDefaultProtobufStore(t *testing.T) {
 
 		assert.EqualError(t, err, "initContainer is required even with `enable-multicontainer`")
 	})
+}
+
+func TestDefaultProtobufStore_EmptyLiteralMap(t *testing.T) {
+	testScope := promutils.NewTestScope()
+	s, err := NewDataStore(&Config{Type: TypeMemory}, testScope)
+	require.NoError(t, err)
+
+	ref := DataReference("empty-literal-map")
+	require.NoError(t, s.WriteProtobuf(context.TODO(), ref, Options{}, &core.LiteralMap{}))
+
+	raw, err := s.ReadRaw(context.TODO(), ref)
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, raw.Close())
+	}()
+
+	rawBytes, err := io.ReadAll(raw)
+	require.NoError(t, err)
+	assert.Empty(t, rawBytes)
+
+	got := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"stale": {},
+		},
+	}
+	require.NoError(t, s.ReadProtobuf(context.TODO(), ref, got))
+	assert.Empty(t, got.GetLiterals())
 }
 
 func TestDefaultProtobufStore_BigDataReadAfterWrite(t *testing.T) {

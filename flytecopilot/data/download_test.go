@@ -265,7 +265,7 @@ func TestRecursiveDownload(t *testing.T) {
 		}
 
 		// Mock reading the offloaded metadata
-		err = s.WriteProtobuf(context.Background(), storage.DataReference("s3://container/offloaded"), storage.Options{}, &core.Literal{
+		err = s.WriteProtobuf(context.Background(), "s3://container/offloaded", storage.Options{}, &core.Literal{
 			Value: &core.Literal_Map{
 				Map: &core.LiteralMap{
 					Literals: map[string]*core.Literal{

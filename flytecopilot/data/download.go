@@ -537,12 +537,13 @@ func (d Downloader) DownloadInputs(ctx context.Context, inputRef storage.DataRef
 		logger.Errorf(ctx, "Failed to download inputs from [%s], err [%s]", inputRef, err)
 		return errors.Wrapf(err, "failed to download input metadata message from remote store")
 	}
+	if len(inputs.GetLiterals()) == 0 {
+		return nil
+	}
+
 	varMap, lMap, err := d.RecursiveDownload(ctx, inputs, outputDir, true)
 	if err != nil {
 		return errors.Wrapf(err, "failed to download input variable from remote store")
-	}
-	if len(lMap.GetLiterals()) == 0 {
-		return nil
 	}
 
 	// We will always write the protobuf
