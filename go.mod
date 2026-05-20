@@ -67,7 +67,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.37.0
 	golang.org/x/exp v0.0.0-20251209150349-8475f28825e9
 	golang.org/x/net v0.54.0
-	golang.org/x/oauth2 v0.32.0
+	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sync v0.20.0
 	golang.org/x/time v0.12.0
 	google.golang.org/api v0.247.0
