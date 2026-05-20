@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "flyteidl2/plugins/clustered.proto",
+    "title": "flytestdlib/utils/prototest/test_type.proto",
     "version": "version not set"
   },
   "consumes": [
