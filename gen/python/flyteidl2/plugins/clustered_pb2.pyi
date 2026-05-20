@@ -43,18 +43,16 @@ class ClusteredTaskSpec(_message.Message):
 class Runtime(_message.Message):
     __slots__ = ["torchrun"]
     TORCHRUN_FIELD_NUMBER: _ClassVar[int]
-    torchrun: TorchRunSpec
-    def __init__(self, torchrun: _Optional[_Union[TorchRunSpec, _Mapping]] = ...) -> None: ...
+    torchrun: TorchRuntime
+    def __init__(self, torchrun: _Optional[_Union[TorchRuntime, _Mapping]] = ...) -> None: ...
 
-class TorchRunSpec(_message.Message):
-    __slots__ = ["rdzv_backend", "max_restarts", "master_port"]
+class TorchRuntime(_message.Message):
+    __slots__ = ["rdzv_backend", "max_restarts"]
     RDZV_BACKEND_FIELD_NUMBER: _ClassVar[int]
     MAX_RESTARTS_FIELD_NUMBER: _ClassVar[int]
-    MASTER_PORT_FIELD_NUMBER: _ClassVar[int]
     rdzv_backend: RdzvBackend
     max_restarts: int
-    master_port: int
-    def __init__(self, rdzv_backend: _Optional[_Union[RdzvBackend, str]] = ..., max_restarts: _Optional[int] = ..., master_port: _Optional[int] = ...) -> None: ...
+    def __init__(self, rdzv_backend: _Optional[_Union[RdzvBackend, str]] = ..., max_restarts: _Optional[int] = ...) -> None: ...
 
 class ClusterFailurePolicy(_message.Message):
     __slots__ = ["max_restarts", "restart_on_host_maintenance"]

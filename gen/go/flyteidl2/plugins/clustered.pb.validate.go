@@ -374,22 +374,22 @@ var _ interface {
 	ErrorName() string
 } = RuntimeValidationError{}
 
-// Validate checks the field values on TorchRunSpec with the rules defined in
+// Validate checks the field values on TorchRuntime with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *TorchRunSpec) Validate() error {
+func (m *TorchRuntime) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on TorchRunSpec with the rules defined
+// ValidateAll checks the field values on TorchRuntime with the rules defined
 // in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in TorchRunSpecMultiError, or
+// result is a list of violation errors wrapped in TorchRuntimeMultiError, or
 // nil if none found.
-func (m *TorchRunSpec) ValidateAll() error {
+func (m *TorchRuntime) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *TorchRunSpec) validate(all bool) error {
+func (m *TorchRuntime) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -400,21 +400,19 @@ func (m *TorchRunSpec) validate(all bool) error {
 
 	// no validation rules for MaxRestarts
 
-	// no validation rules for MasterPort
-
 	if len(errors) > 0 {
-		return TorchRunSpecMultiError(errors)
+		return TorchRuntimeMultiError(errors)
 	}
 
 	return nil
 }
 
-// TorchRunSpecMultiError is an error wrapping multiple validation errors
-// returned by TorchRunSpec.ValidateAll() if the designated constraints aren't met.
-type TorchRunSpecMultiError []error
+// TorchRuntimeMultiError is an error wrapping multiple validation errors
+// returned by TorchRuntime.ValidateAll() if the designated constraints aren't met.
+type TorchRuntimeMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m TorchRunSpecMultiError) Error() string {
+func (m TorchRuntimeMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -423,11 +421,11 @@ func (m TorchRunSpecMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m TorchRunSpecMultiError) AllErrors() []error { return m }
+func (m TorchRuntimeMultiError) AllErrors() []error { return m }
 
-// TorchRunSpecValidationError is the validation error returned by
-// TorchRunSpec.Validate if the designated constraints aren't met.
-type TorchRunSpecValidationError struct {
+// TorchRuntimeValidationError is the validation error returned by
+// TorchRuntime.Validate if the designated constraints aren't met.
+type TorchRuntimeValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -435,22 +433,22 @@ type TorchRunSpecValidationError struct {
 }
 
 // Field function returns field value.
-func (e TorchRunSpecValidationError) Field() string { return e.field }
+func (e TorchRuntimeValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e TorchRunSpecValidationError) Reason() string { return e.reason }
+func (e TorchRuntimeValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e TorchRunSpecValidationError) Cause() error { return e.cause }
+func (e TorchRuntimeValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e TorchRunSpecValidationError) Key() bool { return e.key }
+func (e TorchRuntimeValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e TorchRunSpecValidationError) ErrorName() string { return "TorchRunSpecValidationError" }
+func (e TorchRuntimeValidationError) ErrorName() string { return "TorchRuntimeValidationError" }
 
 // Error satisfies the builtin error interface
-func (e TorchRunSpecValidationError) Error() string {
+func (e TorchRuntimeValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -462,14 +460,14 @@ func (e TorchRunSpecValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sTorchRunSpec.%s: %s%s",
+		"invalid %sTorchRuntime.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = TorchRunSpecValidationError{}
+var _ error = TorchRuntimeValidationError{}
 
 var _ interface {
 	Field() string
@@ -477,7 +475,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = TorchRunSpecValidationError{}
+} = TorchRuntimeValidationError{}
 
 // Validate checks the field values on ClusterFailurePolicy with the rules
 // defined in the proto definition for this message. If any rules are

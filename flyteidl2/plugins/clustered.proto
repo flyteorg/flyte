@@ -32,12 +32,12 @@ message ClusteredTaskSpec {
 // the JobSet shape and Go plugin are unchanged.
 message Runtime {
   oneof kind {
-    TorchRunSpec torchrun = 1;
+    TorchRuntime torchrun = 1;
   }
 }
 
 // Configuration for the torchrun launcher.
-message TorchRunSpec {
+message TorchRuntime {
   // Rendezvous backend. Defaults to STATIC.
   RdzvBackend rdzv_backend = 1;
 
@@ -45,9 +45,6 @@ message TorchRunSpec {
   // Defaults to 0 — whole-cluster restart via JobSet failurePolicy is the
   // recovery mechanism, so in-pod retries are disabled.
   int32 max_restarts = 2;
-
-  // Port used for the torchrun rendezvous endpoint. Defaults to 29500 if unset.
-  int32 master_port = 3;
 }
 
 // Rendezvous backend for torchrun.
