@@ -7,7 +7,7 @@ import (
 
 	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
 	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/proto" //nolint: staticcheck
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )

@@ -10,7 +10,7 @@ import (
 	"reflect"
 
 	"github.com/pkg/errors"
-	"google.golang.org/protobuf/proto" //nolint: staticcheck
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/flyteidl2/clients/go/coreutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/futures"

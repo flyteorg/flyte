@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"strings"
 
-	"google.golang.org/protobuf/proto" //nolint: staticcheck
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"

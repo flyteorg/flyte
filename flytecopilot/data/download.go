@@ -17,7 +17,7 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/proto" //nolint: staticcheck
+	"google.golang.org/protobuf/proto"
 	structpb "google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/futures"

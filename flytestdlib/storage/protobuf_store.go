@@ -8,7 +8,7 @@ import (
 
 	errs "github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
-	"google.golang.org/protobuf/proto" //nolint: staticcheck
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/ioutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
