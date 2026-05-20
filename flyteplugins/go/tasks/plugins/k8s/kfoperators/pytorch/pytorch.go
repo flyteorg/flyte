@@ -66,7 +66,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 	case 0:
 		pytorchTaskExtraArgs := plugins.DistributedPyTorchTrainingTask{}
 
-		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &pytorchTaskExtraArgs)
+		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &pytorchTaskExtraArgs) //nolint: staticcheck
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
@@ -90,7 +90,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 	case 1:
 		kfPytorchTaskExtraArgs := kfplugins.DistributedPyTorchTrainingTask{}
 
-		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfPytorchTaskExtraArgs)
+		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfPytorchTaskExtraArgs) //nolint: staticcheck
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
@@ -209,7 +209,7 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginCo
 	}
 
 	occurredAt := time.Now()
-	statusDetails, _ := utils.MarshalObjToStruct(app.Status)
+	statusDetails, _ := utils.MarshalObjToStruct(app.Status) //nolint: staticcheck
 	podList := &v1.PodList{}
 	err = pluginContext.K8sReader().List(ctx, podList)
 	if err != nil {

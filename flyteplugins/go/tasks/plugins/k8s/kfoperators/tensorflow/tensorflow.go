@@ -57,7 +57,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 	if taskTemplate.TaskTypeVersion == 0 {
 		tensorflowTaskExtraArgs := plugins.DistributedTensorflowTrainingTask{}
 
-		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &tensorflowTaskExtraArgs)
+		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &tensorflowTaskExtraArgs) //nolint: staticcheck
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
@@ -85,7 +85,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 	} else if taskTemplate.TaskTypeVersion == 1 {
 		kfTensorflowTaskExtraArgs := kfplugins.DistributedTensorflowTrainingTask{}
 
-		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfTensorflowTaskExtraArgs)
+		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfTensorflowTaskExtraArgs) //nolint: staticcheck
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
@@ -105,7 +105,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 			if cfg.GetCommon() != nil {
 				replicas = cfg.GetCommon().GetReplicas()
 			} else {
-				replicas = cfg.GetReplicas()
+				replicas = cfg.GetReplicas() //nolint: staticcheck
 			}
 			if replicas <= 0 {
 				continue
@@ -182,7 +182,7 @@ func (tensorflowOperatorResourceHandler) GetTaskPhase(ctx context.Context, plugi
 	}
 
 	occurredAt := time.Now()
-	statusDetails, _ := utils.MarshalObjToStruct(app.Status)
+	statusDetails, _ := utils.MarshalObjToStruct(app.Status) //nolint: staticcheck
 	taskPhaseInfo := pluginsCore.TaskInfo{
 		Logs:       taskLogs,
 		LogContext: nil, // TODO populate log context

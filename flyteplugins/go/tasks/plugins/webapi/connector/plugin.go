@@ -162,7 +162,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	}
 
 	connection := flyteIdl.Connection{}
-	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &connection)
+	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &connection) //nolint: staticcheck
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to unmarshal connection from task template custom: %v", err)
 	}

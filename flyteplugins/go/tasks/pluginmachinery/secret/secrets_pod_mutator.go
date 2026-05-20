@@ -106,7 +106,7 @@ func NewSecretsMutator(ctx context.Context, cfg *config.Config, podNamespace str
 	if len(cfg.SecretManagerTypes) != 0 {
 		enabledSecretManagerTypes = append(enabledSecretManagerTypes, cfg.SecretManagerTypes...)
 	} else {
-		enabledSecretManagerTypes = append(enabledSecretManagerTypes, cfg.SecretManagerType)
+		enabledSecretManagerTypes = append(enabledSecretManagerTypes, cfg.SecretManagerType) //nolint: staticcheck
 	}
 
 	injectors := make(map[config.SecretManagerType]SecretsInjector, len(enabledSecretManagerTypes))

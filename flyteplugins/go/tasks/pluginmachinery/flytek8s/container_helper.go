@@ -132,7 +132,7 @@ func adjustResourceRequirement(resourceName v1.ResourceName, resourceRequirement
 
 // SanitizeGPUResourceRequirements converts generic 'gpu' resource requirements to the desired accelerator resource name.
 func SanitizeGPUResourceRequirements(resources *v1.ResourceRequirements, accelerator *core.GPUAccelerator) {
-	resourceName := config.GetK8sPluginConfig().GpuResourceName
+	resourceName := config.GetK8sPluginConfig().GpuResourceName //nolint: staticcheck
 	if accelerator != nil {
 		resourceName = getAcceleratorResourceName(accelerator)
 	}

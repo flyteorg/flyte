@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -474,7 +473,7 @@ func TestBuildSidecarResource(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	sidecarCustomJSON, err := ioutil.ReadFile(path.Join(dir, "testdata", "sidecar_custom"))
+	sidecarCustomJSON, err := os.ReadFile(path.Join(dir, "testdata", "sidecar_custom"))
 	if err != nil {
 		t.Fatal(sidecarCustomJSON)
 	}

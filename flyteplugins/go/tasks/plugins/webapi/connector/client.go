@@ -55,7 +55,7 @@ func getGrpcConnection(ctx context.Context, connector *Deployment) (*grpc.Client
 	}
 
 	var err error
-	conn, err := grpc.Dial(connector.Endpoint, opts...)
+	conn, err := grpc.Dial(connector.Endpoint, opts...) //nolint: staticcheck
 	if err != nil {
 		return nil, err
 	}

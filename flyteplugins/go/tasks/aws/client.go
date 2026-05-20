@@ -11,9 +11,9 @@ import (
 	"os"
 	"sync"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/aws"             //nolint: staticcheck
+	"github.com/aws/aws-sdk-go/aws/credentials" //nolint: staticcheck
+	"github.com/aws/aws-sdk-go/aws/session"     //nolint: staticcheck
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/errors"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"

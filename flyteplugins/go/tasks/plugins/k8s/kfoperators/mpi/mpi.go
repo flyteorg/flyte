@@ -62,7 +62,7 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 	switch taskTemplate.TaskTypeVersion {
 	case 0:
 		mpiTaskExtraArgs := plugins.DistributedMPITrainingTask{}
-		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &mpiTaskExtraArgs)
+		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &mpiTaskExtraArgs) //nolint: staticcheck
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
@@ -101,7 +101,7 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 	case 1:
 		kfMPITaskExtraArgs := kfplugins.DistributedMPITrainingTask{}
 
-		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfMPITaskExtraArgs)
+		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfMPITaskExtraArgs) //nolint: staticcheck
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
@@ -184,7 +184,7 @@ func (mpiOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginContex
 	}
 
 	occurredAt := time.Now()
-	statusDetails, _ := utils.MarshalObjToStruct(app.Status)
+	statusDetails, _ := utils.MarshalObjToStruct(app.Status) //nolint: staticcheck
 	taskPhaseInfo := pluginsCore.TaskInfo{
 		Logs:       taskLogs,
 		LogContext: nil, // TODO populate log context

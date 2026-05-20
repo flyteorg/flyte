@@ -72,7 +72,7 @@ func (p daskResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	daskJob := plugins.DaskJob{}
-	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &daskJob)
+	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &daskJob) //nolint: staticcheck
 	if err != nil {
 		return nil, errors.Wrapf(errors.BadTaskSpecification, err, "invalid TaskSpecification [%v], failed to unmarshal", taskTemplate.GetCustom())
 	}

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/proto" //nolint: staticcheck
 	"github.com/imdario/mergo"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	v1 "k8s.io/api/core/v1"
@@ -242,7 +242,7 @@ func getAcceleratorConfig(gpuAccelerator *core.GPUAccelerator) config.Accelerato
 
 	// Start with defaults from global GPU config
 	accelConfig := config.AcceleratorDeviceClassConfig{
-		ResourceName:                         cfg.GpuResourceName,
+		ResourceName:                         cfg.GpuResourceName, //nolint: staticcheck
 		DeviceNodeLabel:                      cfg.GpuDeviceNodeLabel,
 		PartitionSizeNodeLabel:               cfg.GpuPartitionSizeNodeLabel,
 		UnpartitionedNodeSelectorRequirement: cfg.GpuUnpartitionedNodeSelectorRequirement,
@@ -456,7 +456,7 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 				"Pod tasks with task type version > 1 should specify their target as a K8sPod with a defined pod spec")
 		}
 
-		err := utils.UnmarshalStructToObj(target.K8SPod.PodSpec, &podSpec)
+		err := utils.UnmarshalStructToObj(target.K8SPod.PodSpec, &podSpec) //nolint: staticcheck
 		if err != nil {
 			return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
 				"Unable to unmarshal task k8s pod [%v], Err: [%v]", target.K8SPod.PodSpec, err.Error())
@@ -674,7 +674,7 @@ func ApplyPodTemplateOverride(objectMeta metav1.ObjectMeta, podTemplate *core.K8
 	}
 
 	var podSpecOverride *v1.PodSpec
-	err := utils.UnmarshalStructToObj(podTemplate.GetPodSpec(), &podSpecOverride)
+	err := utils.UnmarshalStructToObj(podTemplate.GetPodSpec(), &podSpecOverride) //nolint: staticcheck
 	if err != nil {
 		return nil, objectMeta, err
 	}

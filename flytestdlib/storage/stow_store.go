@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	s32 "github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/aws/awserr"     //nolint: staticcheck
+	s32 "github.com/aws/aws-sdk-go/service/s3" //nolint: staticcheck
 	errs "github.com/pkg/errors"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
