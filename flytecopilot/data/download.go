@@ -15,10 +15,10 @@ import (
 	"time"
 
 	"github.com/ghodss/yaml"
-	"github.com/golang/protobuf/jsonpb" //nolint: staticcheck
-	"github.com/golang/protobuf/proto"  //nolint: staticcheck
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto" //nolint: staticcheck
+	structpb "google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/futures"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -289,7 +289,7 @@ func (d Downloader) handleError(_ context.Context, b *core.Error, toFilePath str
 
 func (d Downloader) handleGeneric(ctx context.Context, b *structpb.Struct, toFilePath string, writeToFile bool) (interface{}, error) {
 	if writeToFile && b != nil {
-		m := jsonpb.Marshaler{}
+		m := protojson.MarshalOptions{}
 		writer, err := os.Create(toFilePath)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to open file at path %s", toFilePath)
@@ -300,7 +300,12 @@ func (d Downloader) handleGeneric(ctx context.Context, b *structpb.Struct, toFil
 				logger.Errorf(ctx, "failed to close File write stream. Error: %s", err)
 			}
 		}()
-		return b, m.Marshal(writer, b)
+		raw, err := m.Marshal(b)
+		if err != nil {
+			return nil, err
+		}
+		_, err = writer.Write(raw)
+		return b, err
 	}
 	return b, nil
 }
@@ -310,7 +315,6 @@ func (d Downloader) handlePrimitive(primitive *core.Primitive, toFilePath string
 
 	var toByteArray func() ([]byte, error)
 	var v interface{}
-	var err error
 
 	switch primitive.GetValue().(type) {
 	case *core.Primitive_StringValue:
@@ -334,18 +338,18 @@ func (d Downloader) handlePrimitive(primitive *core.Primitive, toFilePath string
 			return []byte(strconv.FormatFloat(primitive.GetFloatValue(), 'f', -1, 64)), nil
 		}
 	case *core.Primitive_Datetime:
-		v = primitive.GetDatetime().AsTime()
-		if err != nil {
+		if err := primitive.GetDatetime().CheckValid(); err != nil {
 			return nil, err
 		}
+		v = primitive.GetDatetime().AsTime()
 		toByteArray = func() ([]byte, error) {
 			return []byte(primitive.GetDatetime().AsTime().Format(time.RFC3339Nano)), nil
 		}
 	case *core.Primitive_Duration:
-		v = primitive.GetDuration().AsDuration()
-		if err != nil {
+		if err := primitive.GetDuration().CheckValid(); err != nil {
 			return nil, err
 		}
+		v = primitive.GetDuration().AsDuration()
 		toByteArray = func() ([]byte, error) {
 			return []byte(primitive.GetDuration().AsDuration().String()), nil
 		}
@@ -536,6 +540,9 @@ func (d Downloader) DownloadInputs(ctx context.Context, inputRef storage.DataRef
 	varMap, lMap, err := d.RecursiveDownload(ctx, inputs, outputDir, true)
 	if err != nil {
 		return errors.Wrapf(err, "failed to download input variable from remote store")
+	}
+	if len(lMap.GetLiterals()) == 0 {
+		return nil
 	}
 
 	// We will always write the protobuf

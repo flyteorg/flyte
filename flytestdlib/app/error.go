@@ -3,9 +3,10 @@ package app
 import (
 	"fmt"
 
-	"github.com/golang/protobuf/proto" //nolint: staticcheck
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto" //nolint: staticcheck
+	"google.golang.org/protobuf/protoadapt"
 )
 
 type ServerError interface {
@@ -27,7 +28,7 @@ func (e *serverError) Code() codes.Code {
 }
 
 func (e *serverError) WithDetails(details proto.Message) (ServerError, error) {
-	s, err := e.status.WithDetails(details)
+	s, err := e.status.WithDetails(protoadapt.MessageV1Of(details))
 	if err != nil {
 		return nil, err
 	}

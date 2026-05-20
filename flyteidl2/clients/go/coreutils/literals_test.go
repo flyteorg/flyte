@@ -13,11 +13,11 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/go-test/deep"
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
 	"github.com/shamaton/msgpack/v2"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/durationpb"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"

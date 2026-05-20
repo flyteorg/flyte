@@ -11,11 +11,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/jsonpb" //nolint: staticcheck
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
 	"github.com/shamaton/msgpack/v2"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/durationpb"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
@@ -378,8 +378,8 @@ func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error
 	switch t {
 	case core.SimpleType_STRUCT:
 		st := &structpb.Struct{}
-		unmarshaler := jsonpb.Unmarshaler{AllowUnknownFields: true}
-		err := unmarshaler.Unmarshal(strings.NewReader(s), st)
+		unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+		err := unmarshaler.Unmarshal([]byte(s), st)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to load generic type as json.")
 		}

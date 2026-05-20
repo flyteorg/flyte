@@ -3,16 +3,15 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
-	"github.com/golang/protobuf/jsonpb" //nolint: staticcheck
-	"github.com/golang/protobuf/proto"  //nolint: staticcheck
-	structpb "github.com/golang/protobuf/ptypes/struct"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto" //nolint: staticcheck
+	structpb "google.golang.org/protobuf/types/known/structpb"
 )
 
-var jsonPbMarshaler = jsonpb.Marshaler{}
-var jsonPbUnmarshaler = &jsonpb.Unmarshaler{
-	AllowUnknownFields: true,
+var jsonPbMarshaler = protojson.MarshalOptions{}
+var jsonPbUnmarshaler = protojson.UnmarshalOptions{
+	DiscardUnknown: true,
 }
 
 // Deprecated: Use flytestdlib/utils.UnmarshalStructToPb instead.
@@ -21,12 +20,12 @@ func UnmarshalStruct(structObj *structpb.Struct, msg proto.Message) error {
 		return fmt.Errorf("nil Struct Object passed")
 	}
 
-	jsonObj, err := jsonPbMarshaler.MarshalToString(structObj)
+	jsonObj, err := jsonPbMarshaler.Marshal(structObj)
 	if err != nil {
 		return err
 	}
 
-	if err = jsonPbUnmarshaler.Unmarshal(strings.NewReader(jsonObj), msg); err != nil {
+	if err = jsonPbUnmarshaler.Unmarshal(jsonObj, msg); err != nil {
 		return err
 	}
 
@@ -39,12 +38,12 @@ func MarshalStruct(in proto.Message, out *structpb.Struct) error {
 		return fmt.Errorf("nil Struct Object passed")
 	}
 
-	jsonObj, err := jsonPbMarshaler.MarshalToString(in)
+	jsonObj, err := jsonPbMarshaler.Marshal(in)
 	if err != nil {
 		return err
 	}
 
-	if err = jsonpb.UnmarshalString(jsonObj, out); err != nil {
+	if err = jsonPbUnmarshaler.Unmarshal(jsonObj, out); err != nil {
 		return err
 	}
 
@@ -53,7 +52,8 @@ func MarshalStruct(in proto.Message, out *structpb.Struct) error {
 
 // Deprecated: Use flytestdlib/utils.MarshalToString instead.
 func MarshalToString(msg proto.Message) (string, error) {
-	return jsonPbMarshaler.MarshalToString(msg)
+	b, err := jsonPbMarshaler.Marshal(msg)
+	return string(b), err
 }
 
 // Deprecated: Use flytestdlib/utils.MarshalObjToStruct instead.
@@ -66,7 +66,7 @@ func MarshalObjToStruct(input interface{}) (*structpb.Struct, error) {
 
 	// Turn JSON into a protobuf struct
 	structObj := &structpb.Struct{}
-	if err := jsonpb.UnmarshalString(string(b), structObj); err != nil {
+	if err := jsonPbUnmarshaler.Unmarshal(b, structObj); err != nil {
 		return nil, err
 	}
 	return structObj, nil

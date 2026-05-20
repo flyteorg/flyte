@@ -10,7 +10,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"google.golang.org/protobuf/runtime/protoiface"
+	"google.golang.org/protobuf/proto"
 )
 
 type MemoryMetadata struct {
@@ -54,7 +54,7 @@ func TestReadOrigin(t *testing.T) {
 			},
 		}
 		store := &storageMocks.ComposedProtobufStore{}
-		store.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, ref storage.DataReference, msg protoiface.MessageV1) {
+		store.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, ref storage.DataReference, msg proto.Message) {
 			assert.NotNil(t, msg)
 			casted := msg.(*core.ErrorDocument)
 			casted.Error = errorDoc.Error
@@ -89,7 +89,7 @@ func TestReadOrigin(t *testing.T) {
 			},
 		}
 		store := &storageMocks.ComposedProtobufStore{}
-		store.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, ref storage.DataReference, msg protoiface.MessageV1) {
+		store.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, ref storage.DataReference, msg proto.Message) {
 			assert.NotNil(t, msg)
 			casted := msg.(*core.ErrorDocument)
 			casted.Error = errorDoc.Error
