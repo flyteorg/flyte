@@ -12,6 +12,8 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/mocks"
+	secretUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 func TestSecretsWebhook_Mutate(t *testing.T) {
@@ -23,12 +25,16 @@ func TestSecretsWebhook_Mutate(t *testing.T) {
 	})
 
 	namespace := "test-namespace"
+	secretAnnotations, err := secretUtils.MarshalSecretsToMapStrings([]*core.Secret{
+		{
+			Key: "my_key",
+		},
+	})
+	assert.NoError(t, err)
 	podWithAnnotations := &corev1.Pod{
 		ObjectMeta: v1.ObjectMeta{
-			Namespace: namespace,
-			Annotations: map[string]string{
-				"flyte.secrets/s0": "nnsxsorcnv4v623fperca",
-			},
+			Namespace:   namespace,
+			Annotations: secretAnnotations,
 		},
 	}
 
