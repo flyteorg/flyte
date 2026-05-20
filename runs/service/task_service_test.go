@@ -14,8 +14,8 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	projectMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect/mocks"
-	mocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
+	mocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 

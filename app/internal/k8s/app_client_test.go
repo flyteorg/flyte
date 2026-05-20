@@ -581,7 +581,6 @@ func TestSubscribe_ReceivesEvent(t *testing.T) {
 	}
 }
 
-
 func TestSubscribe_AppSpecificDoesNotReceiveOtherApps(t *testing.T) {
 	c := testClient(t)
 	ch := c.Subscribe("app1")

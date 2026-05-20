@@ -17,7 +17,6 @@ type AppConfig struct {
 	CacheTTL time.Duration `json:"cacheTtl" pflag:",TTL for app status cache"`
 }
 
-
 const appConfigSectionKey = "apps"
 
 var defaultAppConfig = &AppConfig{

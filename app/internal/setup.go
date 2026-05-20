@@ -11,7 +11,6 @@ import (
 	appconfig "github.com/flyteorg/flyte/v2/app/internal/config"
 	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
 	"github.com/flyteorg/flyte/v2/app/internal/service"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
 	knativeapp "github.com/flyteorg/flyte/v2/flytestdlib/app"
 )
 

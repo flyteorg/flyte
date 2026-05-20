@@ -19,7 +19,6 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/transformers"
 )
 
-
 type taskService struct {
 	taskconnect.UnimplementedTaskServiceHandler
 	db            interfaces.Repository
@@ -32,7 +31,6 @@ func NewTaskService(repo interfaces.Repository, projectClient projectconnect.Pro
 		projectClient: projectClient,
 	}
 }
-
 
 func (s *taskService) DeployTask(ctx context.Context, c *connect.Request[task.DeployTaskRequest]) (*connect.Response[task.DeployTaskResponse], error) {
 	request := c.Msg

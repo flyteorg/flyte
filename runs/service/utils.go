@@ -11,11 +11,11 @@ import (
 	"connectrpc.com/connect"
 	"github.com/pkg/errors"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
-	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"google.golang.org/protobuf/proto"
 )
 

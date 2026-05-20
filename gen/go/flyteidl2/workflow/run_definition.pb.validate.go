@@ -436,7 +436,7 @@ func (m *TaskAction) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for Cluster
+	// no validation rules for Queue
 
 	if len(errors) > 0 {
 		return TaskActionMultiError(errors)
