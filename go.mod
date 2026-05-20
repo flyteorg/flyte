@@ -9,7 +9,7 @@ require (
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/golang/glog v1.2.5
 	github.com/prometheus/client_golang v1.23.0
-	github.com/spf13/cobra v1.9.1
+	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	golang.org/x/sync v0.20.0
 	gorm.io/driver/postgres v1.5.3
