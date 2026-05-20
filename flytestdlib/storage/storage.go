@@ -14,9 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-
 	"github.com/flyteorg/stow"
+	"github.com/golang/protobuf/proto" //nolint: staticcheck
 )
 
 // DataReference defines a reference to data location.

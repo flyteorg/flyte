@@ -97,7 +97,7 @@ func (q *ResourceCache) SyncResource(ctx context.Context, batch autorefreshcache
 		if cacheItem.SyncFailureCount > q.cfg.MaxSystemFailures {
 			logger.Debugf(ctx, "Sync loop - Item with key [%v] has failed to sync [%v] time(s). More than the allowed [%v] time(s). Marking as failure.",
 				cacheItem.SyncFailureCount, q.cfg.MaxSystemFailures)
-			cacheItem.State.Phase = webapi.PhaseSystemFailure
+			cacheItem.Phase = webapi.PhaseSystemFailure
 			resp = append(resp, autorefreshcache.ItemSyncResponse{
 				ID:     resource.GetID(),
 				Item:   cacheItem,

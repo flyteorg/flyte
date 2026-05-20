@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/proto" //nolint: staticcheck
 	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -88,11 +88,11 @@ func CopilotCommandArgs(storageConfig *storage.Config) []string {
 		return append(commands, fmt.Sprintf("--storage.stow.kind=%s", storageConfig.Stow.Kind))
 	}
 	return append(commands, []string{
-		fmt.Sprintf("--storage.connection.secret-key=%s", storageConfig.Connection.SecretKey),
-		fmt.Sprintf("--storage.connection.access-key=%s", storageConfig.Connection.AccessKey),
-		fmt.Sprintf("--storage.connection.auth-type=%s", storageConfig.Connection.AuthType),
-		fmt.Sprintf("--storage.connection.region=%s", storageConfig.Connection.Region),
-		fmt.Sprintf("--storage.connection.endpoint=%s", storageConfig.Connection.Endpoint.String()),
+		fmt.Sprintf("--storage.connection.secret-key=%s", storageConfig.Connection.SecretKey),       //nolint: staticcheck
+		fmt.Sprintf("--storage.connection.access-key=%s", storageConfig.Connection.AccessKey),       //nolint: staticcheck
+		fmt.Sprintf("--storage.connection.auth-type=%s", storageConfig.Connection.AuthType),         //nolint: staticcheck
+		fmt.Sprintf("--storage.connection.region=%s", storageConfig.Connection.Region),              //nolint: staticcheck
+		fmt.Sprintf("--storage.connection.endpoint=%s", storageConfig.Connection.Endpoint.String()), //nolint: staticcheck
 	}...)
 }
 

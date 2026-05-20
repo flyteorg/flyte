@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/dataproxy"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -3129,7 +3129,7 @@ func TestDemystifyPending_testcases(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			testFile := filepath.Join("testdata", tt.filename)
-			data, err := ioutil.ReadFile(testFile)
+			data, err := os.ReadFile(testFile)
 			assert.NoError(t, err, "failed to read file %s", testFile)
 			pod := &v1.Pod{}
 			if assert.NoError(t, json.Unmarshal(data, pod), "failed to unmarshal json in %s. Expected of type v1.Pod", testFile) {

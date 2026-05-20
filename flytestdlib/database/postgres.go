@@ -81,10 +81,10 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig) (
 
 	if !IsPgErrorWithCode(err, PqInvalidDBCode) {
 		logger.Errorf(ctx, "Unhandled error connecting to postgres, pg [%v]: %v", pgConfig, err)
-		db.Close()
+		db.Close() //nolint:errcheck
 		return nil, err
 	}
-	db.Close()
+	db.Close() //nolint:errcheck
 	logger.Warningf(ctx, "Database [%v] does not exist", pgConfig.DbName)
 
 	// Every postgres installation includes a 'postgres' database by default. We connect to that now in order to
@@ -96,7 +96,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig) (
 	if err != nil {
 		return nil, err
 	}
-	defer defaultDb.Close()
+	defer defaultDb.Close() //nolint: errcheck
 
 	if err = defaultDb.PingContext(ctx); err != nil {
 		return nil, err
@@ -123,7 +123,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig) (
 	}
 
 	if err = db.PingContext(ctx); err != nil {
-		db.Close()
+		db.Close() //nolint:errcheck
 		return nil, err
 	}
 
@@ -139,7 +139,7 @@ func CreatePostgresReadOnlyDbConnection(ctx context.Context, pgConfig PostgresCo
 	}
 
 	if err = db.PingContext(ctx); err != nil {
-		db.Close()
+		db.Close() //nolint: errcheck
 		return nil, err
 	}
 

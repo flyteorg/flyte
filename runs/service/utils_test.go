@@ -230,8 +230,8 @@ func TestGenerateCacheKeyForTask(t *testing.T) {
 			Id:   &core.Identifier{Name: "my-task"},
 			Type: "python",
 			Metadata: &core.TaskMetadata{
-				Discoverable:       true,
-				DiscoveryVersion:   "1.0",
+				Discoverable:         true,
+				DiscoveryVersion:     "1.0",
 				CacheIgnoreInputVars: []string{"y"},
 			},
 		}
