@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package flyteidl2.plugins;
 
-option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins";
-
 import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins";
 
 // Top-level spec for a clustered task execution. Packed into TaskTemplate.custom.
 message ClusteredTaskSpec {
