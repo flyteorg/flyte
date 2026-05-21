@@ -528,6 +528,48 @@ func TestAddCoPilotToPod(t *testing.T) {
 		assertPodHasCoPilot(t, cfg, pilot, iface, &pod)
 	})
 
+	t.Run("nil-task-id", func(t *testing.T) {
+		pod := v1.PodSpec{}
+		iface := &core.TypedInterface{
+			Inputs: &core.VariableMap{
+				Variables: []*core.VariableEntry{
+					{Key: "x", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
+				},
+			},
+			Outputs: &core.VariableMap{
+				Variables: []*core.VariableEntry{
+					{Key: "o", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
+				},
+			},
+		}
+		pilot := &core.DataLoadingConfig{
+			Enabled:    true,
+			InputPath:  "in",
+			OutputPath: "out",
+		}
+		tID := &pluginsCoreMock.TaskExecutionID{}
+		tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{})
+		metadata := &pluginsCoreMock.TaskExecutionMetadata{}
+		metadata.EXPECT().GetTaskExecutionID().Return(tID)
+		overrides := &pluginsCoreMock.TaskOverrides{}
+		overrides.EXPECT().GetResources().Return(resourceRequirements)
+		metadata.EXPECT().GetOverrides().Return(overrides)
+
+		inputPaths := &pluginsIOMock.InputFilePaths{}
+		inputPaths.EXPECT().GetInputPath().Return(storage.DataReference("/base/inputs/inputs.pb"))
+
+		outputPaths := &pluginsIOMock.OutputFilePaths{}
+		outputPaths.EXPECT().GetOutputPrefixPath().Return(storage.DataReference("/output"))
+		outputPaths.EXPECT().GetRawOutputPrefix().Return(storage.DataReference("/raw"))
+
+		var err error
+		assert.NotPanics(t, func() {
+			err = AddCoPilotToPod(ctx, cfg, &pod, iface, metadata, inputPaths, outputPaths, pilot)
+		})
+		assert.NoError(t, err)
+		assertPodHasCoPilot(t, cfg, pilot, iface, &pod)
+	})
+
 	t.Run("happy-nil-iface", func(t *testing.T) {
 		pod := v1.PodSpec{}
 		pilot := &core.DataLoadingConfig{

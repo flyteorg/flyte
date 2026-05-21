@@ -4,13 +4,12 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 	"reflect"
 
-	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/proto" //nolint: staticcheck
 	"github.com/pkg/errors"
 
 	"github.com/flyteorg/flyte/v2/flyteidl2/clients/go/coreutils"
@@ -49,7 +48,7 @@ func (u Uploader) handleSimpleType(_ context.Context, t core.SimpleType, filePat
 	if info.Size() > maxPrimitiveSize {
 		return nil, fmt.Errorf("maximum allowed filesize is [%d], but found [%d]", maxPrimitiveSize, info.Size())
 	}
-	b, err := ioutil.ReadFile(fpath)
+	b, err := os.ReadFile(fpath)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +127,7 @@ func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, f
 	} else if info.IsDir() {
 		return fmt.Errorf("error file is a directory")
 	} else {
-		b, err := ioutil.ReadFile(errFile)
+		b, err := os.ReadFile(errFile)
 		if err != nil {
 			return err
 		}

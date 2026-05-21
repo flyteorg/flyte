@@ -184,7 +184,7 @@ message Settings {
   SecuritySettings security = 2;
   StorageSettings storage = 3;
   TaskResourceSettings task_resource = 4;
-  StringListSetting labels = 5 [(flyteidl2.settings.desc) = "Kubernetes labels applied to task pods. Additive across scopes."];
+  StringMapSetting labels = 5 [(flyteidl2.settings.desc) = "Kubernetes labels applied to task pods. Child overrides parent on key conflict."];
   StringMapSetting annotations = 6 [(flyteidl2.settings.desc) = "Kubernetes annotations applied to task pods. Child overrides parent on key conflict."];
   StringMapSetting environment_variables = 7 [(flyteidl2.settings.desc) = "Environment variables injected into task pods. Child overrides parent on key conflict."];
 }

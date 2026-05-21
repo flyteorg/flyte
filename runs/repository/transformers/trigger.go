@@ -245,4 +245,3 @@ func nullTimeToTimestamppb(t sql.NullTime) *timestamppb.Timestamp {
 	}
 	return nil
 }
-

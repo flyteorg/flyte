@@ -1664,6 +1664,10 @@ func (m *TailLogsRequest) validate(all bool) error {
 
 	// no validation rules for PodName
 
+	if m.ConnectorEndpoint != nil {
+		// no validation rules for ConnectorEndpoint
+	}
+
 	if len(errors) > 0 {
 		return TailLogsRequestMultiError(errors)
 	}

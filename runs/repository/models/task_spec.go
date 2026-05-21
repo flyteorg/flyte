@@ -4,10 +4,9 @@ import (
 	"context"
 	"time"
 
-	"google.golang.org/protobuf/proto"
-
 	"github.com/flyteorg/flyte/v2/flytestdlib/pbhash"
 	flyteWorkflow "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
+	"google.golang.org/protobuf/proto"
 )
 
 var (

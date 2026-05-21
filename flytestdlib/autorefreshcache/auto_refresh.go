@@ -435,6 +435,7 @@ func NewAutoRefreshCache(name string, syncCb SyncFunc, syncRateLimiter workqueue
 	return NewAutoRefreshBatchedCache(name, SingleItemBatches, syncCb, syncRateLimiter, resyncPeriod, parallelizm, size, scope)
 }
 
+// nolint: unused
 func newAutoRefreshCacheWithClock(name string, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter, resyncPeriod time.Duration,
 	parallelizm, size int, scope promutils.Scope, clock clock.WithTicker) (AutoRefresh, error) {
 	return newAutoRefreshBatchedCacheWithClock(name, SingleItemBatches, syncCb, syncRateLimiter, resyncPeriod, parallelizm, size, scope, clock)

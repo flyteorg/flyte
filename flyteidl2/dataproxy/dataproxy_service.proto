@@ -205,6 +205,10 @@ message TailLogsRequest {
 
   // The pod name to tail logs from. If not provided, attempt to find the primary pod, else assume the first pod.
   string pod_name = 3;
+
+  // +optional. The dataproxy uses this to stream logs from the connector via
+  // AsyncConnectorService.GetTaskLogs instead of pod logs.
+  optional string connector_endpoint = 4;
 }
 
 // Reponse message for tailing logs.

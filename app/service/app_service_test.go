@@ -161,6 +161,88 @@ func TestGet_CacheExpired_CallsInternal(t *testing.T) {
 	internal.AssertExpectations(t)
 }
 
+func TestGet_TransitionalState_SkipsCache(t *testing.T) {
+	// Simulate the Start-App bug: after clicking Start, K8s hasn't brought the
+	// pod up yet so InternalAppService still returns STOPPED. The cache must NOT
+	// be populated in this state, otherwise every poll for the full TTL window
+	// returns stale "stopped" and the UI appears stuck.
+	internal := &mockInternalClient{}
+	svc := NewAppService(internal, 30*time.Second)
+
+	appID := testAppID()
+	// App desired=ACTIVE but status=STOPPED (transitional: just started).
+	stoppedApp := &flyteapp.App{
+		Metadata: &flyteapp.Meta{Id: appID},
+		Spec: &flyteapp.Spec{
+			AppPayload: &flyteapp.Spec_Container{
+				Container: &flytecoreapp.Container{Image: "nginx:latest"},
+			},
+			DesiredState: flyteapp.Spec_DESIRED_STATE_ACTIVE,
+		},
+		Status: &flyteapp.Status{
+			Conditions: []*flyteapp.Condition{
+				{DeploymentStatus: flyteapp.Status_DEPLOYMENT_STATUS_STOPPED},
+			},
+		},
+	}
+
+	// Internal is called twice because the response is never cached.
+	internal.On("Get", mock.Anything, mock.Anything).Return(
+		connect.NewResponse(&flyteapp.GetResponse{App: stoppedApp}), nil,
+	).Times(2)
+
+	req := connect.NewRequest(&flyteapp.GetRequest{
+		Identifier: &flyteapp.GetRequest_AppId{AppId: appID},
+	})
+	_, err := svc.Get(context.Background(), req)
+	require.NoError(t, err)
+	_, err = svc.Get(context.Background(), req)
+	require.NoError(t, err)
+
+	_, hit := svc.cache.Get(cacheKey(appID))
+	assert.False(t, hit, "transitional state must not be cached")
+	internal.AssertExpectations(t)
+}
+
+func TestGet_StoppedWithDesiredStopped_Caches(t *testing.T) {
+	// Stable stopped state (user explicitly stopped it) should be cached normally.
+	internal := &mockInternalClient{}
+	svc := NewAppService(internal, 30*time.Second)
+
+	appID := testAppID()
+	stoppedApp := &flyteapp.App{
+		Metadata: &flyteapp.Meta{Id: appID},
+		Spec: &flyteapp.Spec{
+			AppPayload: &flyteapp.Spec_Container{
+				Container: &flytecoreapp.Container{Image: "nginx:latest"},
+			},
+			DesiredState: flyteapp.Spec_DESIRED_STATE_STOPPED,
+		},
+		Status: &flyteapp.Status{
+			Conditions: []*flyteapp.Condition{
+				{DeploymentStatus: flyteapp.Status_DEPLOYMENT_STATUS_STOPPED},
+			},
+		},
+	}
+
+	// Internal called once; second call served from cache.
+	internal.On("Get", mock.Anything, mock.Anything).Return(
+		connect.NewResponse(&flyteapp.GetResponse{App: stoppedApp}), nil,
+	).Once()
+
+	req := connect.NewRequest(&flyteapp.GetRequest{
+		Identifier: &flyteapp.GetRequest_AppId{AppId: appID},
+	})
+	_, err := svc.Get(context.Background(), req)
+	require.NoError(t, err)
+	_, err = svc.Get(context.Background(), req)
+	require.NoError(t, err)
+
+	_, hit := svc.cache.Get(cacheKey(appID))
+	assert.True(t, hit, "stable stopped state should be cached")
+	internal.AssertExpectations(t)
+}
+
 // --- Create / Update / Delete invalidate cache ---
 
 func TestCreate_InvalidatesCache(t *testing.T) {

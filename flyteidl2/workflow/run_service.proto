@@ -335,6 +335,10 @@ message WatchActionsRequest {
   // - NAME (must use function CONTAINS_CASE_INSENSITIVE): the value is whatever string to match to. This will cast all strings to lowercase and match.
   // - PHASE (must use function VALUE_IN): the value is the stringified integer of the enum of the phase and you can pass multiple phases (i.e. ["1", "4"])
   repeated common.Filter filter = 2;
+
+  // Enable the new runStore we implemented for the WatchActions API
+  // TODO(alex): We can remove this once the new runStore is properly tested and stable
+  bool enable_run_store = 3;
 }
 
 // Response message for watching actions, comes with enriched action metadata.

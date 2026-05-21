@@ -12,11 +12,11 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/ghodss/yaml"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
+	"github.com/golang/protobuf/jsonpb" //nolint: staticcheck
+	"github.com/golang/protobuf/proto"  //nolint: staticcheck
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
 
@@ -102,7 +102,6 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		var mu sync.Mutex
 		var wg sync.WaitGroup
 		for _, absPath := range absPaths {
-			absPath := absPath
 
 			wg.Add(1)
 			go func() {
@@ -335,20 +334,20 @@ func (d Downloader) handlePrimitive(primitive *core.Primitive, toFilePath string
 			return []byte(strconv.FormatFloat(primitive.GetFloatValue(), 'f', -1, 64)), nil
 		}
 	case *core.Primitive_Datetime:
-		v, err = ptypes.Timestamp(primitive.GetDatetime())
+		v = primitive.GetDatetime().AsTime()
 		if err != nil {
 			return nil, err
 		}
 		toByteArray = func() ([]byte, error) {
-			return []byte(ptypes.TimestampString(primitive.GetDatetime())), nil
+			return []byte(primitive.GetDatetime().AsTime().Format(time.RFC3339Nano)), nil
 		}
 	case *core.Primitive_Duration:
-		v, err := ptypes.Duration(primitive.GetDuration())
+		v = primitive.GetDuration().AsDuration()
 		if err != nil {
 			return nil, err
 		}
 		toByteArray = func() ([]byte, error) {
-			return []byte(v.String()), nil
+			return []byte(primitive.GetDuration().AsDuration().String()), nil
 		}
 	default:
 		v = nil

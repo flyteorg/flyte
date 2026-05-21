@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jmoiron/sqlx"
 )
 
 // RunTestMain starts an embedded PostgreSQL instance, runs migrate, executes m.Run(),

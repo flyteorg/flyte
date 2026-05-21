@@ -62,7 +62,6 @@ type Config struct {
 
 	// TriggerScheduler configures the cron-based trigger scheduler worker.
 	TriggerScheduler TriggerSchedulerConfig `json:"triggerScheduler"`
-
 }
 
 // ServerConfig holds HTTP server configuration
