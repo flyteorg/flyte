@@ -58,7 +58,7 @@ type ErrorCollection struct {
 func (e ErrorCollection) Error() string {
 	sb := strings.Builder{}
 	for idx, err := range e.Errors {
-		sb.WriteString(fmt.Sprintf("%v: %v\r\n", idx, err))
+		_, _ = fmt.Fprintf(&sb, "%v: %v\r\n", idx, err)
 	}
 
 	return sb.String()
