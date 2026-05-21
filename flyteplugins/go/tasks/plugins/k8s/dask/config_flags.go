@@ -61,5 +61,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.gcp-project"), defaultConfig.Logs.GCPProjectName, "Name of the project in GCP")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.stackdriver-logresourcename"), defaultConfig.Logs.StackdriverLogResourceName, "Name of the logresource in stackdriver")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.stackdriver-template-uri"), defaultConfig.Logs.StackDriverTemplateURI, "Template Uri to use when building stackdriver log links")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "clusterName"), defaultConfig.ClusterName, "K8s cluster identity embedded in the Dask dashboard URL prefix; set to operator's cluster name.")
 	return cmdFlags
 }

@@ -53,6 +53,40 @@ func replacePrimaryContainer(spec *v1.PodSpec, primaryContainerName string, cont
 type daskResourceHandler struct {
 }
 
+// buildDashboardURLPrefix returns the LONG-form union dataproxy path that should
+// be passed to `dask-scheduler --dashboard-prefix` so Bokeh emits tab/WebSocket
+// links that route correctly through the dataproxy. The namespace segment is
+// left as `$(POD_NAMESPACE)` — kubelet expands that at pod start from the
+// downward-API env var the caller is expected to inject.
+//
+// Returns "" when the plugin isn't configured with a cluster name, in which
+// case the scheduler runs with no dashboard prefix (the historical behavior;
+// tabs work only on the legacy CP-routed path that doesn't require Bokeh to
+// know its proxy mount point).
+func buildDashboardURLPrefix(generatedName string, teMetadata pluginsCore.TaskExecutionMetadata) string {
+	cfg := GetConfig()
+	if cfg == nil || cfg.ClusterName == "" {
+		return ""
+	}
+	id := teMetadata.GetTaskExecutionID().GetID()
+	exec := id.GetNodeExecutionId().GetExecutionId()
+	task := id.GetTaskId()
+	return fmt.Sprintf(
+		"/dataplane/dask/v1/generated_name/task/%s/%s/%s/%s/%d/%s/$(POD_NAMESPACE)/%s/%s/%s/%s/%s",
+		exec.GetProject(),
+		exec.GetDomain(),
+		exec.GetName(),
+		id.GetNodeExecutionId().GetNodeId(),
+		id.GetRetryAttempt(),
+		cfg.ClusterName,
+		task.GetProject(),
+		task.GetDomain(),
+		task.GetName(),
+		task.GetVersion(),
+		generatedName,
+	)
+}
+
 func (daskResourceHandler) BuildIdentityResource(_ context.Context, _ pluginsCore.TaskExecutionMetadata) (
 	client.Object, error) {
 	return &daskAPI.DaskJob{
@@ -210,8 +244,23 @@ func createSchedulerSpec(scheduler *plugins.DaskScheduler, clusterName string, p
 	}
 	primaryContainer.Resources = *resources
 
-	// Override args
+	// Override args. When a cluster name is configured, point the scheduler's
+	// Bokeh dashboard at the LONG-form union dataproxy URL prefix so its internal
+	// tab/WebSocket links resolve through the proxy chain. The LONG form works
+	// regardless of whether the cluster is on the legacy CP-routed path or the
+	// zero-trust DP-direct path (the dataproxy on both sides parses it
+	// identically). Without this, Bokeh emits root-relative links like
+	// "/individual-task-stream" that 404 outside the dashboard mount point.
 	primaryContainer.Args = []string{"dask-scheduler"}
+	if prefix := buildDashboardURLPrefix(clusterName, teMetadata); prefix != "" {
+		primaryContainer.Env = append(primaryContainer.Env, v1.EnvVar{
+			Name: "POD_NAMESPACE",
+			ValueFrom: &v1.EnvVarSource{
+				FieldRef: &v1.ObjectFieldSelector{FieldPath: "metadata.namespace"},
+			},
+		})
+		primaryContainer.Args = append(primaryContainer.Args, "--dashboard-prefix", prefix)
+	}
 
 	// Add ports
 	primaryContainer.Ports = []v1.ContainerPort{
