@@ -2576,6 +2576,29 @@ func TestDemystifyPending(t *testing.T) {
 		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 
+	t.Run("ImagePullBackOffOutsideGracePeriod_RegistryRateLimited", func(t *testing.T) {
+		// HTTP 429 from the registry is a transient infrastructure failure,
+		// not a user error — it should surface as a system retryable failure.
+		s2 := *s.DeepCopy()
+		s2.Conditions[0].LastTransitionTime.Time = metav1.Now().Add(-config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration)
+		s2.ContainerStatuses = []v1.ContainerStatus{
+			{
+				Ready: false,
+				State: v1.ContainerState{
+					Waiting: &v1.ContainerStateWaiting{
+						Reason:  "ImagePullBackOff",
+						Message: `Back-off pulling image "registry.example.com/foo:bar": ErrImagePull: failed to pull and unpack image "registry.example.com/foo:bar": failed to copy: httpReadSeeker: failed open: unexpected status code https://registry.example.com/v2/foo/blobs/sha256:abc: 429 Too Many Requests`,
+					},
+				},
+			},
+		}
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+		assert.Equal(t, core.ExecutionError_SYSTEM, taskStatus.Err().Kind)
+		assert.True(t, taskStatus.CleanupOnFailure())
+	})
+
 	t.Run("InvalidImageName", func(t *testing.T) {
 		s.ContainerStatuses = []v1.ContainerStatus{
 			{
