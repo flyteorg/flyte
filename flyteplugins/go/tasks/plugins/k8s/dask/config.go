@@ -19,12 +19,10 @@ var (
 type Config struct {
 	Logs logs.LogConfig `json:"logs,omitempty"`
 
-	// ClusterName is the per-cluster identity ("dogfood-1", "dogfood-gcp-dp", etc.)
-	// that the leaseworker is running in. When set, the dask plugin starts the
+	// When ClusterName is set, the dask plugin starts the
 	// scheduler with `--dashboard-prefix`, baked from this name + the task's
-	// execution identity, so the Bokeh dashboard's internal links resolve through
-	// the union dataproxy reverse-proxy chain. Without it, dashboard tabs render
-	// against the page origin's root path and produce empty bodies.
+	// execution identity, so the Bokeh dashboard's internal links resolve.
+	// Without it, dashboard tabs render against the page origin's root path and produce empty bodies.
 	ClusterName string `json:"clusterName,omitempty" pflag:",K8s cluster identity embedded in the Dask dashboard URL prefix; set to operator's cluster name."`
 }
 
