@@ -118,13 +118,13 @@ func (r *projectRepo) ListProjects(ctx context.Context, input interfaces.ListRes
 	}
 
 	if input.Limit > 0 {
-		queryBuilder.WriteString(fmt.Sprintf(" LIMIT $%d", argIdx))
+		_, _ = fmt.Fprintf(&queryBuilder, " LIMIT $%d", argIdx)
 		args = append(args, input.Limit)
 		argIdx++
 	}
 
 	if input.Offset > 0 {
-		queryBuilder.WriteString(fmt.Sprintf(" OFFSET $%d", argIdx))
+		_, _ = fmt.Fprintf(&queryBuilder, " OFFSET $%d", argIdx)
 		args = append(args, input.Offset)
 		argIdx++ //nolint: ineffassign
 	}
@@ -144,7 +144,7 @@ func rewritePlaceholders(query string, args []interface{}, startIdx int) (string
 	idx := startIdx
 	for _, ch := range query {
 		if ch == '?' {
-			result.WriteString(fmt.Sprintf("$%d", idx))
+			_, _ = fmt.Fprintf(&result, "$%d", idx)
 			idx++
 		} else {
 			result.WriteRune(ch)
