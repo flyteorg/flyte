@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyte/docker/devbox-bundled/bootstrap
 
-go 1.24.0
+go 1.26.3
 
 require (
 	github.com/fergusstrange/embedded-postgres v1.34.0

@@ -41,7 +41,7 @@ func (t *TypedMarshaler[T]) Get(ctx context.Context, key any) (T, error) {
 // It returns a typed marshaler that can be used to marshal and unmarshal values of type T.
 // If T is a pointer type, it will unmarshal into a new instance of T. Otherwise, it will unmarshal into a new instance of *T.
 func NewTypedMarshaler[T any](marshaler *Marshaler) *TypedMarshaler[T] {
-	isPointerType := reflect.TypeOf(new(T)).Elem().Kind() == reflect.Ptr
+	isPointerType := reflect.TypeOf(new(T)).Elem().Kind() == reflect.Pointer
 	var elemType reflect.Type
 	if isPointerType {
 		elemType = reflect.TypeOf(new(T)).Elem().Elem()

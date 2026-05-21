@@ -1,6 +1,6 @@
 # Todo(alex): We should add UI into the image when UI is done
 
-FROM --platform=${BUILDPLATFORM} golang:1.25-bookworm AS flytebuilder
+FROM --platform=${BUILDPLATFORM} golang:1.26.3-bookworm AS flytebuilder
 
 ARG TARGETARCH
 ENV GOARCH="${TARGETARCH}"
