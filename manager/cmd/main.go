@@ -6,14 +6,13 @@ import (
 	"net/http"
 	"os"
 
-	flyteapp "github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/actions"
-	"github.com/flyteorg/flyte/v2/flytestdlib/app"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
+	flyteapp "github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/cache_service"
 	"github.com/flyteorg/flyte/v2/dataproxy"
 	"github.com/flyteorg/flyte/v2/events"
 	"github.com/flyteorg/flyte/v2/executor"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
@@ -23,6 +22,7 @@ import (
 	"github.com/flyteorg/flyte/v2/runs"
 	runsconfig "github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/secret"
+	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
 func main() {

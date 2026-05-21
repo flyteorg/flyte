@@ -1521,18 +1521,6 @@ func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 	return metadata
 }
 
-// extractStorageURIs parses ActionSpec protobuf to extract InputUri and RunOutputBase.
-func extractStorageURIs(specBytes []byte) (inputURI, runOutputBase string) {
-	if len(specBytes) == 0 {
-		return
-	}
-	var spec workflow.ActionSpec
-	if err := proto.Unmarshal(specBytes, &spec); err != nil {
-		return
-	}
-	return spec.GetInputUri(), spec.GetRunOutputBase()
-}
-
 // extractRunSpec parses ActionSpec JSON to extract the RunSpec
 func extractActionSpec(specProto []byte) *workflow.ActionSpec {
 	if len(specProto) == 0 {
@@ -1583,44 +1571,6 @@ func buildInputPrefix(storagePrefix, project, domain, name string) string {
 	return fmt.Sprintf("%s/%s/%s/%s/inputs",
 		strings.TrimRight(storagePrefix, "/"),
 		project, domain, name)
-}
-
-// inputsToLiteralMap converts task.Inputs (ordered NamedLiteral list) to core.LiteralMap (map).
-func inputsToLiteralMap(inputs *task.Inputs) *core.LiteralMap {
-	if inputs == nil || len(inputs.Literals) == 0 {
-		return &core.LiteralMap{Literals: map[string]*core.Literal{}}
-	}
-	m := make(map[string]*core.Literal, len(inputs.Literals))
-	for _, nl := range inputs.Literals {
-		m[nl.Name] = nl.Value
-	}
-	return &core.LiteralMap{Literals: m}
-}
-
-// literalMapToInputs converts a core.LiteralMap to task.Inputs (reverse of inputsToLiteralMap).
-func literalMapToInputs(m *core.LiteralMap) *task.Inputs {
-	if m == nil || len(m.Literals) == 0 {
-		return &task.Inputs{}
-	}
-	literals := make([]*task.NamedLiteral, 0, len(m.Literals))
-	for name, val := range m.Literals {
-		literals = append(literals, &task.NamedLiteral{Name: name, Value: val})
-	}
-	sort.Slice(literals, func(i, j int) bool { return literals[i].Name < literals[j].Name })
-	return &task.Inputs{Literals: literals}
-}
-
-// literalMapToOutputs converts a core.LiteralMap to task.Outputs.
-func literalMapToOutputs(m *core.LiteralMap) *task.Outputs {
-	if m == nil || len(m.Literals) == 0 {
-		return &task.Outputs{}
-	}
-	literals := make([]*task.NamedLiteral, 0, len(m.Literals))
-	for name, val := range m.Literals {
-		literals = append(literals, &task.NamedLiteral{Name: name, Value: val})
-	}
-	sort.Slice(literals, func(i, j int) bool { return literals[i].Name < literals[j].Name })
-	return &task.Outputs{Literals: literals}
 }
 
 // buildRunOutputBase generates the output base path for the run.

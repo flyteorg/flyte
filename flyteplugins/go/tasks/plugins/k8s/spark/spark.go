@@ -67,7 +67,7 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 	}
 
 	sparkJob := plugins.SparkJob{}
-	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &sparkJob)
+	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &sparkJob) //nolint: staticcheck
 	if err != nil {
 		return nil, errors.Wrapf(errors.BadTaskSpecification, err, "invalid TaskSpecification [%v], failed to unmarshal", taskTemplate.GetCustom())
 	}
@@ -186,7 +186,7 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 		if driverPod.GetPodSpec() != nil {
 			var customPodSpec *v1.PodSpec
 
-			err = utils.UnmarshalStructToObj(driverPod.GetPodSpec(), &customPodSpec)
+			err = utils.UnmarshalStructToObj(driverPod.GetPodSpec(), &customPodSpec) //nolint: staticcheck
 			if err != nil {
 				return nil, errors.Errorf(errors.BadTaskSpecification,
 					"Unable to unmarshal driver pod spec [%v], Err: [%v]", driverPod.GetPodSpec(), err.Error())
@@ -239,7 +239,7 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 		if executorPod.GetPodSpec() != nil {
 			var customPodSpec *v1.PodSpec
 
-			err = utils.UnmarshalStructToObj(executorPod.GetPodSpec(), &customPodSpec)
+			err = utils.UnmarshalStructToObj(executorPod.GetPodSpec(), &customPodSpec) //nolint: staticcheck
 			if err != nil {
 				return nil, errors.Errorf(errors.BadTaskSpecification,
 					"Unable to unmarshal executor pod spec [%v], Err: [%v]", executorPod.GetPodSpec(), err.Error())
@@ -521,7 +521,7 @@ func getEventInfoForSpark(ctx context.Context, pluginContext k8s.PluginContext, 
 		})
 	}
 
-	customInfo, err := utils.MarshalObjToStruct(customInfoMap)
+	customInfo, err := utils.MarshalObjToStruct(customInfoMap) //nolint: staticcheck
 	if err != nil {
 		return nil, err
 	}

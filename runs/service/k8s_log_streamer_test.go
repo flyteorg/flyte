@@ -109,8 +109,8 @@ func TestTailLogs_PodNotFound(t *testing.T) {
 
 func TestTailLogs_FollowSetBasedOnPodPhase(t *testing.T) {
 	tests := []struct {
-		name     string
-		phase    corev1.PodPhase
+		name       string
+		phase      corev1.PodPhase
 		wantFollow bool
 	}{
 		{"running pod should follow", corev1.PodRunning, true},

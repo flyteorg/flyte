@@ -67,16 +67,16 @@ func TestPlugin(t *testing.T) {
 		ray := &connectorPb.TaskCategory{Name: "ray", Version: defaultTaskTypeVersion}
 		foo := &connectorPb.TaskCategory{Name: "foo", Version: defaultTaskTypeVersion}
 		bar := &connectorPb.TaskCategory{Name: "bar", Version: defaultTaskTypeVersion}
-		connector, err := plugin.getFinalConnector(spark, &cfg, "")
+		connector, err := plugin.getFinalConnector(spark, &cfg, "", "")
 		assert.NoError(t, err)
 		assert.Equal(t, connector.ConnectorDeployment.Endpoint, "localhost:80")
-		connector, err = plugin.getFinalConnector(foo, &cfg, "")
+		connector, err = plugin.getFinalConnector(foo, &cfg, "", "")
 		assert.NoError(t, err)
 		assert.Equal(t, connector.ConnectorDeployment.Endpoint, cfg.DefaultConnector.Endpoint)
-		connector, err = plugin.getFinalConnector(bar, &cfg, "")
+		connector, err = plugin.getFinalConnector(bar, &cfg, "", "")
 		assert.NoError(t, err)
 		assert.Equal(t, connector.ConnectorDeployment.Endpoint, cfg.DefaultConnector.Endpoint)
-		connector, err = plugin.getFinalConnector(ray, &cfg, "production")
+		connector, err = plugin.getFinalConnector(ray, &cfg, "", "production")
 		assert.NoError(t, err)
 		assert.Equal(t, connector.ConnectorDeployment.Endpoint, rayConnector.ConnectorDeployment.Endpoint)
 	})

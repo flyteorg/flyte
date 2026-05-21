@@ -83,7 +83,7 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 	if err != nil {
 		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to stream pod logs: %w", err))
 	}
-	defer logStream.Close()
+	defer logStream.Close() //nolint:errcheck
 
 	err = podlogs.Stream(ctx, logStream, podlogs.DefaultBatchSize, func(lines []*dataplane.LogLine) error {
 		return stream.Send(&workflow.TailLogsResponse{

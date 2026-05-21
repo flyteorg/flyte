@@ -62,6 +62,11 @@ message PythonWheels {
   // Options for pip packages.
   PipOptions options = 2;
   repeated flyteidl2.core.Secret secret_mounts = 3;
+  // Name of the package to install from the wheel directory. When set, the server
+  // installs with `--find-links <dir> --no-index <package_name>` so pip selects the
+  // wheel matching the target platform. When empty, falls back to legacy `<dir>/*`
+  // glob behavior for backward compatibility with older clients.
+  string package_name = 4;
 }
 
 // UVProject defines a UV project configuration, which includes

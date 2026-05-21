@@ -6,8 +6,8 @@ import (
 	"encoding/base64"
 
 	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/jsonpb" //nolint: staticcheck
+	"github.com/golang/protobuf/proto"  //nolint: staticcheck
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )

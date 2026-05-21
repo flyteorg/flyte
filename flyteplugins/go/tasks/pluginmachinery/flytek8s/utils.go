@@ -123,7 +123,7 @@ func getAllAcceleratorResourceNames() map[v1.ResourceName]struct{} {
 	acceleratorResourceNames := make(map[v1.ResourceName]struct{})
 
 	// Add the legacy GPU resource name for backward compatibility
-	acceleratorResourceNames[cfg.GpuResourceName] = struct{}{}
+	acceleratorResourceNames[cfg.GpuResourceName] = struct{}{} //nolint: staticcheck
 
 	// Add resource names from all configured accelerator device classes
 	for _, deviceClassConfig := range cfg.AcceleratorDeviceClasses {

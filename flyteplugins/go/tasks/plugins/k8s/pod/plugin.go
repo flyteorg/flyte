@@ -66,7 +66,7 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 	if taskTemplate.Type == SidecarTaskType && taskTemplate.TaskTypeVersion == 0 {
 		// handles pod tasks when they are defined as Sidecar tasks and marshal the podspec using k8s proto.
 		sidecarJob := sidecarJob{}
-		err := utils.UnmarshalStructToObj(taskTemplate.GetCustom(), &sidecarJob)
+		err := utils.UnmarshalStructToObj(taskTemplate.GetCustom(), &sidecarJob) //nolint: staticcheck
 		if err != nil {
 			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
@@ -85,7 +85,7 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		objectMeta.Labels = utils.UnionMaps(objectMeta.Labels, sidecarJob.Labels)
 	} else if taskTemplate.Type == SidecarTaskType && taskTemplate.TaskTypeVersion == 1 {
 		// handles pod tasks that marshal the pod spec to the task custom.
-		err := utils.UnmarshalStructToObj(taskTemplate.GetCustom(), &podSpec)
+		err := utils.UnmarshalStructToObj(taskTemplate.GetCustom(), &podSpec) //nolint: staticcheck
 		if err != nil {
 			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
 				"Unable to unmarshal task custom [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
@@ -348,7 +348,7 @@ func DemystifyPodStatus(ctx context.Context, pod *v1.Pod, info pluginsCore.TaskI
 func latestTime(times []metav1.Time) time.Time {
 	var latest time.Time
 	for _, t := range times {
-		if !t.IsZero() && t.Time.After(latest) {
+		if !t.IsZero() && t.After(latest) {
 			latest = t.Time
 		}
 	}

@@ -98,7 +98,7 @@ func replaceAll(template string, vars []TemplateVar) string {
 
 func (input Input) templateVars() []TemplateVar {
 	vars := []TemplateVar{
-		TemplateVar{defaultRegexes.LogName, input.LogName},
+		{defaultRegexes.LogName, input.LogName},
 	}
 
 	gotExtraTemplateVars := input.ExtraTemplateVars != nil
