@@ -92,7 +92,7 @@ type ResourceWrapper struct {
 
 // IsTerminal is used to avoid making network calls to the connector service if the resource is already in a terminal state.
 func (r ResourceWrapper) IsTerminal() bool {
-	return r.Phase == flyteIdl.TaskExecution_SUCCEEDED || r.Phase == flyteIdl.TaskExecution_FAILED || r.Phase == flyteIdl.TaskExecution_ABORTED
+	return r.Phase == flyteIdl.TaskExecution_SUCCEEDED || r.Phase == flyteIdl.TaskExecution_FAILED || r.Phase == flyteIdl.TaskExecution_RETRYABLE_FAILED || r.Phase == flyteIdl.TaskExecution_ABORTED
 }
 
 type ResourceMetaWrapper struct {
@@ -362,6 +362,8 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 		return core.PhaseInfoFailure(errorCode, "failed to run the job with aborted phase.", taskInfo), nil
 	case flyteIdl.TaskExecution_FAILED:
 		return core.PhaseInfoFailure(errorCode, fmt.Sprintf("failed to run the job: %s", resource.Message), taskInfo), nil
+	case flyteIdl.TaskExecution_RETRYABLE_FAILED:
+		return core.PhaseInfoRetryableFailure(errorCode, fmt.Sprintf("failed to run the job: %s", resource.Message), taskInfo), nil
 	}
 	// The default phase is undefined.
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.Phase)
