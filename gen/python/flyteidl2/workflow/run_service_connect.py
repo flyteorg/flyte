@@ -65,6 +65,9 @@ class RunService(Protocol):
     async def get_action_log_context(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    def bidi_stream_test(self, request: AsyncIterator[flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestRequest], ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestResponse]:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
 
 class RunServiceASGIApplication(ConnectASGIApplication[RunService]):
     def __init__(self, service: RunService | AsyncGenerator[RunService], *, interceptors: Iterable[Interceptor]=(), read_max_bytes: int | None = None, compressions: Iterable[Compression] | None = None) -> None:
@@ -230,6 +233,16 @@ class RunServiceASGIApplication(ConnectASGIApplication[RunService]):
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.get_action_log_context,
+                ),
+                "/flyteidl2.workflow.RunService/BidiStreamTest": Endpoint.bidi_stream(
+                    method=MethodInfo(
+                        name="BidiStreamTest",
+                        service_name="flyteidl2.workflow.RunService",
+                        input=flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestRequest,
+                        output=flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.bidi_stream_test,
                 ),
             },
             interceptors=interceptors,
@@ -578,6 +591,26 @@ class RunServiceClient(ConnectClient):
             use_get=use_get,
         )
 
+    def bidi_stream_test(
+        self,
+        request: AsyncIterator[flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestRequest],
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> AsyncIterator[flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestResponse]:
+        return self.execute_bidi_stream(
+            request=request,
+            method=MethodInfo(
+                name="BidiStreamTest",
+                service_name="flyteidl2.workflow.RunService",
+                input=flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestRequest,
+                output=flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
 
 class RunServiceSync(Protocol):
     def create_run(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.CreateRunRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.CreateRunResponse:
@@ -611,6 +644,8 @@ class RunServiceSync(Protocol):
     def get_action_data_u_r_is(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataURIsResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def get_action_log_context(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def bidi_stream_test(self, request: Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestRequest], ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
@@ -777,6 +812,16 @@ class RunServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.get_action_log_context,
+                ),
+                "/flyteidl2.workflow.RunService/BidiStreamTest": EndpointSync.bidi_stream(
+                    method=MethodInfo(
+                        name="BidiStreamTest",
+                        service_name="flyteidl2.workflow.RunService",
+                        input=flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestRequest,
+                        output=flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.bidi_stream_test,
                 ),
             },
             interceptors=interceptors,
@@ -1123,4 +1168,24 @@ class RunServiceClientSync(ConnectClientSync):
             headers=headers,
             timeout_ms=timeout_ms,
             use_get=use_get,
+        )
+
+    def bidi_stream_test(
+        self,
+        request: Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestRequest],
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestResponse]:
+        return self.execute_bidi_stream(
+            request=request,
+            method=MethodInfo(
+                name="BidiStreamTest",
+                service_name="flyteidl2.workflow.RunService",
+                input=flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestRequest,
+                output=flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
         )

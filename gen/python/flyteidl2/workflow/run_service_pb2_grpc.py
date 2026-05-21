@@ -95,6 +95,11 @@ class RunServiceStub(object):
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextResponse.FromString,
                 )
+        self.BidiStreamTest = channel.stream_stream(
+                '/flyteidl2.workflow.RunService/BidiStreamTest',
+                request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestResponse.FromString,
+                )
 
 
 class RunServiceServicer(object):
@@ -215,6 +220,13 @@ class RunServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def BidiStreamTest(self, request_iterator, context):
+        """BidiStreamTest is a no-op echo bidi stream for end-to-end transport testing.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_RunServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -297,6 +309,11 @@ def add_RunServiceServicer_to_server(servicer, server):
                     servicer.GetActionLogContext,
                     request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextResponse.SerializeToString,
+            ),
+            'BidiStreamTest': grpc.stream_stream_rpc_method_handler(
+                    servicer.BidiStreamTest,
+                    request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -578,5 +595,22 @@ class RunService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/GetActionLogContext',
             flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.GetActionLogContextResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def BidiStreamTest(request_iterator,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.stream_stream(request_iterator, target, '/flyteidl2.workflow.RunService/BidiStreamTest',
+            flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_run__service__pb2.BidiStreamTestResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

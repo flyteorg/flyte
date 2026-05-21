@@ -39,6 +39,214 @@ var (
 	_ = common.Sort_Direction(0)
 )
 
+// Validate checks the field values on BidiStreamTestRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *BidiStreamTestRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on BidiStreamTestRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// BidiStreamTestRequestMultiError, or nil if none found.
+func (m *BidiStreamTestRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *BidiStreamTestRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Message
+
+	if len(errors) > 0 {
+		return BidiStreamTestRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// BidiStreamTestRequestMultiError is an error wrapping multiple validation
+// errors returned by BidiStreamTestRequest.ValidateAll() if the designated
+// constraints aren't met.
+type BidiStreamTestRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m BidiStreamTestRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m BidiStreamTestRequestMultiError) AllErrors() []error { return m }
+
+// BidiStreamTestRequestValidationError is the validation error returned by
+// BidiStreamTestRequest.Validate if the designated constraints aren't met.
+type BidiStreamTestRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BidiStreamTestRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BidiStreamTestRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BidiStreamTestRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BidiStreamTestRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BidiStreamTestRequestValidationError) ErrorName() string {
+	return "BidiStreamTestRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BidiStreamTestRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBidiStreamTestRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BidiStreamTestRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BidiStreamTestRequestValidationError{}
+
+// Validate checks the field values on BidiStreamTestResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *BidiStreamTestResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on BidiStreamTestResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// BidiStreamTestResponseMultiError, or nil if none found.
+func (m *BidiStreamTestResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *BidiStreamTestResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Message
+
+	if len(errors) > 0 {
+		return BidiStreamTestResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// BidiStreamTestResponseMultiError is an error wrapping multiple validation
+// errors returned by BidiStreamTestResponse.ValidateAll() if the designated
+// constraints aren't met.
+type BidiStreamTestResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m BidiStreamTestResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m BidiStreamTestResponseMultiError) AllErrors() []error { return m }
+
+// BidiStreamTestResponseValidationError is the validation error returned by
+// BidiStreamTestResponse.Validate if the designated constraints aren't met.
+type BidiStreamTestResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BidiStreamTestResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BidiStreamTestResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BidiStreamTestResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BidiStreamTestResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BidiStreamTestResponseValidationError) ErrorName() string {
+	return "BidiStreamTestResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BidiStreamTestResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBidiStreamTestResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BidiStreamTestResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BidiStreamTestResponseValidationError{}
+
 // Validate checks the field values on CreateRunRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.

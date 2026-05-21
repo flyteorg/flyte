@@ -81,6 +81,17 @@ service RunService {
   rpc GetActionLogContext(GetActionLogContextRequest) returns (GetActionLogContextResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
+  // BidiStreamTest is a no-op echo bidi stream for end-to-end transport testing.
+  rpc BidiStreamTest(stream BidiStreamTestRequest) returns (stream BidiStreamTestResponse) {}
+}
+
+message BidiStreamTestRequest {
+  string message = 1;
+}
+
+message BidiStreamTestResponse {
+  string message = 1;
 }
 
 // Request message for creating a run.

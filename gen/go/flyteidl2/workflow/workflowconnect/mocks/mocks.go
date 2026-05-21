@@ -1804,6 +1804,59 @@ func (_c *RunServiceClient_AbortRun_Call) RunAndReturn(run func(context1 context
 	return _c
 }
 
+// BidiStreamTest provides a mock function for the type RunServiceClient
+func (_mock *RunServiceClient) BidiStreamTest(context1 context.Context) *connect.BidiStreamForClient[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse] {
+	ret := _mock.Called(context1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for BidiStreamTest")
+	}
+
+	var r0 *connect.BidiStreamForClient[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse]
+	if returnFunc, ok := ret.Get(0).(func(context.Context) *connect.BidiStreamForClient[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse]); ok {
+		r0 = returnFunc(context1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connect.BidiStreamForClient[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse])
+		}
+	}
+	return r0
+}
+
+// RunServiceClient_BidiStreamTest_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'BidiStreamTest'
+type RunServiceClient_BidiStreamTest_Call struct {
+	*mock.Call
+}
+
+// BidiStreamTest is a helper method to define mock.On call
+//   - context1 context.Context
+func (_e *RunServiceClient_Expecter) BidiStreamTest(context1 interface{}) *RunServiceClient_BidiStreamTest_Call {
+	return &RunServiceClient_BidiStreamTest_Call{Call: _e.mock.On("BidiStreamTest", context1)}
+}
+
+func (_c *RunServiceClient_BidiStreamTest_Call) Run(run func(context1 context.Context)) *RunServiceClient_BidiStreamTest_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *RunServiceClient_BidiStreamTest_Call) Return(bidiStreamForClient *connect.BidiStreamForClient[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse]) *RunServiceClient_BidiStreamTest_Call {
+	_c.Call.Return(bidiStreamForClient)
+	return _c
+}
+
+func (_c *RunServiceClient_BidiStreamTest_Call) RunAndReturn(run func(context1 context.Context) *connect.BidiStreamForClient[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse]) *RunServiceClient_BidiStreamTest_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateRun provides a mock function for the type RunServiceClient
 func (_mock *RunServiceClient) CreateRun(context1 context.Context, request *connect.Request[workflow.CreateRunRequest]) (*connect.Response[workflow.CreateRunResponse], error) {
 	ret := _mock.Called(context1, request)
@@ -2915,6 +2968,63 @@ func (_c *RunServiceHandler_AbortRun_Call) Return(response *connect.Response[wor
 }
 
 func (_c *RunServiceHandler_AbortRun_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error)) *RunServiceHandler_AbortRun_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// BidiStreamTest provides a mock function for the type RunServiceHandler
+func (_mock *RunServiceHandler) BidiStreamTest(context1 context.Context, bidiStream *connect.BidiStream[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse]) error {
+	ret := _mock.Called(context1, bidiStream)
+
+	if len(ret) == 0 {
+		panic("no return value specified for BidiStreamTest")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.BidiStream[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse]) error); ok {
+		r0 = returnFunc(context1, bidiStream)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// RunServiceHandler_BidiStreamTest_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'BidiStreamTest'
+type RunServiceHandler_BidiStreamTest_Call struct {
+	*mock.Call
+}
+
+// BidiStreamTest is a helper method to define mock.On call
+//   - context1 context.Context
+//   - bidiStream *connect.BidiStream[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse]
+func (_e *RunServiceHandler_Expecter) BidiStreamTest(context1 interface{}, bidiStream interface{}) *RunServiceHandler_BidiStreamTest_Call {
+	return &RunServiceHandler_BidiStreamTest_Call{Call: _e.mock.On("BidiStreamTest", context1, bidiStream)}
+}
+
+func (_c *RunServiceHandler_BidiStreamTest_Call) Run(run func(context1 context.Context, bidiStream *connect.BidiStream[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse])) *RunServiceHandler_BidiStreamTest_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *connect.BidiStream[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse]
+		if args[1] != nil {
+			arg1 = args[1].(*connect.BidiStream[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse])
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *RunServiceHandler_BidiStreamTest_Call) Return(err error) *RunServiceHandler_BidiStreamTest_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *RunServiceHandler_BidiStreamTest_Call) RunAndReturn(run func(context1 context.Context, bidiStream *connect.BidiStream[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse]) error) *RunServiceHandler_BidiStreamTest_Call {
 	_c.Call.Return(run)
 	return _c
 }

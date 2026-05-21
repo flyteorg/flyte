@@ -15,6 +15,18 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class BidiStreamTestRequest(_message.Message):
+    __slots__ = ["message"]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    message: str
+    def __init__(self, message: _Optional[str] = ...) -> None: ...
+
+class BidiStreamTestResponse(_message.Message):
+    __slots__ = ["message"]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    message: str
+    def __init__(self, message: _Optional[str] = ...) -> None: ...
+
 class CreateRunRequest(_message.Message):
     __slots__ = ["run_id", "project_id", "task_id", "task_spec", "trigger_name", "inputs", "offloaded_input_data", "run_spec", "source"]
     RUN_ID_FIELD_NUMBER: _ClassVar[int]

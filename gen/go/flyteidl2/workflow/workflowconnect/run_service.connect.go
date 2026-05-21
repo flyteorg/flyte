@@ -73,6 +73,9 @@ const (
 	// RunServiceGetActionLogContextProcedure is the fully-qualified name of the RunService's
 	// GetActionLogContext RPC.
 	RunServiceGetActionLogContextProcedure = "/flyteidl2.workflow.RunService/GetActionLogContext"
+	// RunServiceBidiStreamTestProcedure is the fully-qualified name of the RunService's BidiStreamTest
+	// RPC.
+	RunServiceBidiStreamTestProcedure = "/flyteidl2.workflow.RunService/BidiStreamTest"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -94,6 +97,7 @@ var (
 	runServiceWatchGroupsMethodDescriptor         = runServiceServiceDescriptor.Methods().ByName("WatchGroups")
 	runServiceGetActionDataURIsMethodDescriptor   = runServiceServiceDescriptor.Methods().ByName("GetActionDataURIs")
 	runServiceGetActionLogContextMethodDescriptor = runServiceServiceDescriptor.Methods().ByName("GetActionLogContext")
+	runServiceBidiStreamTestMethodDescriptor      = runServiceServiceDescriptor.Methods().ByName("BidiStreamTest")
 )
 
 // RunServiceClient is a client for the flyteidl2.workflow.RunService service.
@@ -134,6 +138,8 @@ type RunServiceClient interface {
 	GetActionDataURIs(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error)
 	// Get the logging context (pod name, namespace, cluster) for an action attempt.
 	GetActionLogContext(context.Context, *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error)
+	// BidiStreamTest is a no-op echo bidi stream for end-to-end transport testing.
+	BidiStreamTest(context.Context) *connect.BidiStreamForClient[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse]
 }
 
 // NewRunServiceClient constructs a client for the flyteidl2.workflow.RunService service. By
@@ -249,6 +255,12 @@ func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
+		bidiStreamTest: connect.NewClient[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse](
+			httpClient,
+			baseURL+RunServiceBidiStreamTestProcedure,
+			connect.WithSchema(runServiceBidiStreamTestMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -270,6 +282,7 @@ type runServiceClient struct {
 	watchGroups         *connect.Client[workflow.WatchGroupsRequest, workflow.WatchGroupsResponse]
 	getActionDataURIs   *connect.Client[workflow.GetActionDataURIsRequest, workflow.GetActionDataURIsResponse]
 	getActionLogContext *connect.Client[workflow.GetActionLogContextRequest, workflow.GetActionLogContextResponse]
+	bidiStreamTest      *connect.Client[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse]
 }
 
 // CreateRun calls flyteidl2.workflow.RunService.CreateRun.
@@ -354,6 +367,11 @@ func (c *runServiceClient) GetActionLogContext(ctx context.Context, req *connect
 	return c.getActionLogContext.CallUnary(ctx, req)
 }
 
+// BidiStreamTest calls flyteidl2.workflow.RunService.BidiStreamTest.
+func (c *runServiceClient) BidiStreamTest(ctx context.Context) *connect.BidiStreamForClient[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse] {
+	return c.bidiStreamTest.CallBidiStream(ctx)
+}
+
 // RunServiceHandler is an implementation of the flyteidl2.workflow.RunService service.
 type RunServiceHandler interface {
 	// Create a new run of the given task.
@@ -392,6 +410,8 @@ type RunServiceHandler interface {
 	GetActionDataURIs(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error)
 	// Get the logging context (pod name, namespace, cluster) for an action attempt.
 	GetActionLogContext(context.Context, *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error)
+	// BidiStreamTest is a no-op echo bidi stream for end-to-end transport testing.
+	BidiStreamTest(context.Context, *connect.BidiStream[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse]) error
 }
 
 // NewRunServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -503,6 +523,12 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
+	runServiceBidiStreamTestHandler := connect.NewBidiStreamHandler(
+		RunServiceBidiStreamTestProcedure,
+		svc.BidiStreamTest,
+		connect.WithSchema(runServiceBidiStreamTestMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.workflow.RunService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case RunServiceCreateRunProcedure:
@@ -537,6 +563,8 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 			runServiceGetActionDataURIsHandler.ServeHTTP(w, r)
 		case RunServiceGetActionLogContextProcedure:
 			runServiceGetActionLogContextHandler.ServeHTTP(w, r)
+		case RunServiceBidiStreamTestProcedure:
+			runServiceBidiStreamTestHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -608,4 +636,8 @@ func (UnimplementedRunServiceHandler) GetActionDataURIs(context.Context, *connec
 
 func (UnimplementedRunServiceHandler) GetActionLogContext(context.Context, *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.GetActionLogContext is not implemented"))
+}
+
+func (UnimplementedRunServiceHandler) BidiStreamTest(context.Context, *connect.BidiStream[workflow.BidiStreamTestRequest, workflow.BidiStreamTestResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.BidiStreamTest is not implemented"))
 }

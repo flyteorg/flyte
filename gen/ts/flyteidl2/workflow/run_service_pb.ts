@@ -29,7 +29,41 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/workflow/run_service.proto.
  */
 export const file_flyteidl2_workflow_run_service: GenFile = /*@__PURE__*/
-  fileDesc("CiRmbHl0ZWlkbDIvd29ya2Zsb3cvcnVuX3NlcnZpY2UucHJvdG8SEmZseXRlaWRsMi53b3JrZmxvdyKQBAoQQ3JlYXRlUnVuUmVxdWVzdBIxCgZydW5faWQYASABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJIABI5Cgpwcm9qZWN0X2lkGAYgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckgAEjEKB3Rhc2tfaWQYAiABKAsyHi5mbHl0ZWlkbDIudGFzay5UYXNrSWRlbnRpZmllckgBEi0KCXRhc2tfc3BlYxgDIAEoCzIYLmZseXRlaWRsMi50YXNrLlRhc2tTcGVjSAESNQoMdHJpZ2dlcl9uYW1lGAcgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5UcmlnZ2VyTmFtZUgBEigKBmlucHV0cxgEIAEoCzIWLmZseXRlaWRsMi50YXNrLklucHV0c0gCEkQKFG9mZmxvYWRlZF9pbnB1dF9kYXRhGAkgASgLMiQuZmx5dGVpZGwyLmNvbW1vbi5PZmZsb2FkZWRJbnB1dERhdGFIAhIpCghydW5fc3BlYxgFIAEoCzIXLmZseXRlaWRsMi50YXNrLlJ1blNwZWMSLQoGc291cmNlGAggASgOMh0uZmx5dGVpZGwyLndvcmtmbG93LlJ1blNvdXJjZUILCgJpZBIFukgCCAFCDQoEdGFzaxIFukgCCAFCDwoNaW5wdXRfd3JhcHBlciI5ChFDcmVhdGVSdW5SZXNwb25zZRIkCgNydW4YASABKAsyFy5mbHl0ZWlkbDIud29ya2Zsb3cuUnVuImoKD0Fib3J0UnVuUmVxdWVzdBI3CgZydW5faWQYASABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJCBrpIA8gBARITCgZyZWFzb24YAiABKAlIAIgBAUIJCgdfcmVhc29uIhIKEEFib3J0UnVuUmVzcG9uc2UiTwoUR2V0UnVuRGV0YWlsc1JlcXVlc3QSNwoGcnVuX2lkGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQga6SAPIAQEiSAoVR2V0UnVuRGV0YWlsc1Jlc3BvbnNlEi8KB2RldGFpbHMYASABKAsyHi5mbHl0ZWlkbDIud29ya2Zsb3cuUnVuRGV0YWlscyJRChZXYXRjaFJ1bkRldGFpbHNSZXF1ZXN0EjcKBnJ1bl9pZBgBIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckIGukgDyAEBIkoKF1dhdGNoUnVuRGV0YWlsc1Jlc3BvbnNlEi8KB2RldGFpbHMYASABKAsyHi5mbHl0ZWlkbDIud29ya2Zsb3cuUnVuRGV0YWlscyJYChdHZXRBY3Rpb25EZXRhaWxzUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBASJOChhHZXRBY3Rpb25EZXRhaWxzUmVzcG9uc2USMgoHZGV0YWlscxgBIAEoCzIhLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25EZXRhaWxzIloKGVdhdGNoQWN0aW9uRGV0YWlsc1JlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQEiUAoaV2F0Y2hBY3Rpb25EZXRhaWxzUmVzcG9uc2USMgoHZGV0YWlscxgBIAEoCzIhLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25EZXRhaWxzIlUKFEdldEFjdGlvbkRhdGFSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBImkKFUdldEFjdGlvbkRhdGFSZXNwb25zZRImCgZpbnB1dHMYASABKAsyFi5mbHl0ZWlkbDIudGFzay5JbnB1dHMSKAoHb3V0cHV0cxgCIAEoCzIXLmZseXRlaWRsMi50YXNrLk91dHB1dHMiWQoYR2V0QWN0aW9uRGF0YVVSSXNSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBIkQKGUdldEFjdGlvbkRhdGFVUklzUmVzcG9uc2USEgoKaW5wdXRzX3VyaRgBIAEoCRITCgtvdXRwdXRzX3VyaRgCIAEoCSJ1ChpHZXRBY3Rpb25Mb2dDb250ZXh0UmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAIl8KG0dldEFjdGlvbkxvZ0NvbnRleHRSZXNwb25zZRIvCgtsb2dfY29udGV4dBgBIAEoCzIaLmZseXRlaWRsMi5jb3JlLkxvZ0NvbnRleHQSDwoHY2x1c3RlchgCIAEoCSLMAgoPTGlzdFJ1bnNSZXF1ZXN0Ei4KB3JlcXVlc3QYASABKAsyHS5mbHl0ZWlkbDIuY29tbW9uLkxpc3RSZXF1ZXN0EhYKA29yZxgCIAEoCUIHukgEcgIQAUgAEjkKCnByb2plY3RfaWQYBCABKAsyIy5mbHl0ZWlkbDIuY29tbW9uLlByb2plY3RJZGVudGlmaWVySAASNQoMdHJpZ2dlcl9uYW1lGAYgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5UcmlnZ2VyTmFtZUgAEi0KCXRhc2tfbmFtZRgHIAEoCzIYLmZseXRlaWRsMi50YXNrLlRhc2tOYW1lSAASMQoHdGFza19pZBgIIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVySABCEQoIc2NvcGVfYnkSBbpIAggBSgQIAxAESgQIBRAGIkgKEExpc3RSdW5zUmVzcG9uc2USJQoEcnVucxgBIAMoCzIXLmZseXRlaWRsMi53b3JrZmxvdy5SdW4SDQoFdG9rZW4YAiABKAki5AEKEFdhdGNoUnVuc1JlcXVlc3QSFgoDb3JnGAIgASgJQge6SARyAhABSAASOQoKY2x1c3Rlcl9pZBgDIAEoCzIjLmZseXRlaWRsMi5jb21tb24uQ2x1c3RlcklkZW50aWZpZXJIABI5Cgpwcm9qZWN0X2lkGAQgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckgAEjEKB3Rhc2tfaWQYBSABKAsyHi5mbHl0ZWlkbDIudGFzay5UYXNrSWRlbnRpZmllckgAQg8KBnRhcmdldBIFukgCCAEiOgoRV2F0Y2hSdW5zUmVzcG9uc2USJQoEcnVucxgBIAMoCzIXLmZseXRlaWRsMi53b3JrZmxvdy5SdW4ifQoSTGlzdEFjdGlvbnNSZXF1ZXN0Ei4KB3JlcXVlc3QYASABKAsyHS5mbHl0ZWlkbDIuY29tbW9uLkxpc3RSZXF1ZXN0EjcKBnJ1bl9pZBgCIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckIGukgDyAEBIlEKE0xpc3RBY3Rpb25zUmVzcG9uc2USKwoHYWN0aW9ucxgBIAMoCzIaLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb24SDQoFdG9rZW4YAiABKAkieAoTV2F0Y2hBY3Rpb25zUmVxdWVzdBI3CgZydW5faWQYASABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJCBrpIA8gBARIoCgZmaWx0ZXIYAiADKAsyGC5mbHl0ZWlkbDIuY29tbW9uLkZpbHRlciJUChRXYXRjaEFjdGlvbnNSZXNwb25zZRI8ChBlbnJpY2hlZF9hY3Rpb25zGAEgAygLMiIuZmx5dGVpZGwyLndvcmtmbG93LkVucmljaGVkQWN0aW9uIm0KGVdhdGNoQ2x1c3RlckV2ZW50c1JlcXVlc3QSNgoCaWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAIlYKGldhdGNoQ2x1c3RlckV2ZW50c1Jlc3BvbnNlEjgKDmNsdXN0ZXJfZXZlbnRzGAEgAygLMiAuZmx5dGVpZGwyLndvcmtmbG93LkNsdXN0ZXJFdmVudCJjChJBYm9ydEFjdGlvblJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESDgoGcmVhc29uGAIgASgJIhUKE0Fib3J0QWN0aW9uUmVzcG9uc2UinwMKEldhdGNoR3JvdXBzUmVxdWVzdBI5Cgpwcm9qZWN0X2lkGAEgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckgAEjYKCnN0YXJ0X2RhdGUYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQga6SAPIAQESLAoIZW5kX2RhdGUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KB3JlcXVlc3QYBCABKAsyHS5mbHl0ZWlkbDIuY29tbW9uLkxpc3RSZXF1ZXN0ElAKEWtub3duX3NvcnRfZmllbGRzGAUgAygLMjUuZmx5dGVpZGwyLndvcmtmbG93LldhdGNoR3JvdXBzUmVxdWVzdC5Lbm93blNvcnRGaWVsZBpTCg5Lbm93blNvcnRGaWVsZBI2CgpjcmVhdGVkX2F0GAEgASgOMiAuZmx5dGVpZGwyLmNvbW1vbi5Tb3J0LkRpcmVjdGlvbkgAQgkKB3NvcnRfYnlCEQoIc2NvcGVfYnkSBbpIAggBIlsKE1dhdGNoR3JvdXBzUmVzcG9uc2USMgoLdGFza19ncm91cHMYASADKAsyHS5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza0dyb3VwEhAKCHNlbnRpbmVsGAIgASgIMrANCgpSdW5TZXJ2aWNlEloKCUNyZWF0ZVJ1bhIkLmZseXRlaWRsMi53b3JrZmxvdy5DcmVhdGVSdW5SZXF1ZXN0GiUuZmx5dGVpZGwyLndvcmtmbG93LkNyZWF0ZVJ1blJlc3BvbnNlIgASVwoIQWJvcnRSdW4SIy5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRSdW5SZXF1ZXN0GiQuZmx5dGVpZGwyLndvcmtmbG93LkFib3J0UnVuUmVzcG9uc2UiABJpCg1HZXRSdW5EZXRhaWxzEiguZmx5dGVpZGwyLndvcmtmbG93LkdldFJ1bkRldGFpbHNSZXF1ZXN0GikuZmx5dGVpZGwyLndvcmtmbG93LkdldFJ1bkRldGFpbHNSZXNwb25zZSIDkAIBEm4KD1dhdGNoUnVuRGV0YWlscxIqLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaFJ1bkRldGFpbHNSZXF1ZXN0GisuZmx5dGVpZGwyLndvcmtmbG93LldhdGNoUnVuRGV0YWlsc1Jlc3BvbnNlIgAwARJyChBHZXRBY3Rpb25EZXRhaWxzEisuZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkRldGFpbHNSZXF1ZXN0GiwuZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkRldGFpbHNSZXNwb25zZSIDkAIBEncKEldhdGNoQWN0aW9uRGV0YWlscxItLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaEFjdGlvbkRldGFpbHNSZXF1ZXN0Gi4uZmx5dGVpZGwyLndvcmtmbG93LldhdGNoQWN0aW9uRGV0YWlsc1Jlc3BvbnNlIgAwARJsCg1HZXRBY3Rpb25EYXRhEiguZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkRhdGFSZXF1ZXN0GikuZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkRhdGFSZXNwb25zZSIGiAIBkAIBEloKCExpc3RSdW5zEiMuZmx5dGVpZGwyLndvcmtmbG93Lkxpc3RSdW5zUmVxdWVzdBokLmZseXRlaWRsMi53b3JrZmxvdy5MaXN0UnVuc1Jlc3BvbnNlIgOQAgESXAoJV2F0Y2hSdW5zEiQuZmx5dGVpZGwyLndvcmtmbG93LldhdGNoUnVuc1JlcXVlc3QaJS5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hSdW5zUmVzcG9uc2UiADABEmMKC0xpc3RBY3Rpb25zEiYuZmx5dGVpZGwyLndvcmtmbG93Lkxpc3RBY3Rpb25zUmVxdWVzdBonLmZseXRlaWRsMi53b3JrZmxvdy5MaXN0QWN0aW9uc1Jlc3BvbnNlIgOQAgESZQoMV2F0Y2hBY3Rpb25zEicuZmx5dGVpZGwyLndvcmtmbG93LldhdGNoQWN0aW9uc1JlcXVlc3QaKC5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hBY3Rpb25zUmVzcG9uc2UiADABEncKEldhdGNoQ2x1c3RlckV2ZW50cxItLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaENsdXN0ZXJFdmVudHNSZXF1ZXN0Gi4uZmx5dGVpZGwyLndvcmtmbG93LldhdGNoQ2x1c3RlckV2ZW50c1Jlc3BvbnNlIgAwARJgCgtBYm9ydEFjdGlvbhImLmZseXRlaWRsMi53b3JrZmxvdy5BYm9ydEFjdGlvblJlcXVlc3QaJy5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRBY3Rpb25SZXNwb25zZSIAEmIKC1dhdGNoR3JvdXBzEiYuZmx5dGVpZGwyLndvcmtmbG93LldhdGNoR3JvdXBzUmVxdWVzdBonLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaEdyb3Vwc1Jlc3BvbnNlIgAwARJ1ChFHZXRBY3Rpb25EYXRhVVJJcxIsLmZseXRlaWRsMi53b3JrZmxvdy5HZXRBY3Rpb25EYXRhVVJJc1JlcXVlc3QaLS5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0QWN0aW9uRGF0YVVSSXNSZXNwb25zZSIDkAIBEnsKE0dldEFjdGlvbkxvZ0NvbnRleHQSLi5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0QWN0aW9uTG9nQ29udGV4dFJlcXVlc3QaLy5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0QWN0aW9uTG9nQ29udGV4dFJlc3BvbnNlIgOQAgFCzAEKFmNvbS5mbHl0ZWlkbDIud29ya2Zsb3dCD1J1blNlcnZpY2VQcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi93b3JrZmxvd6ICA0ZXWKoCEkZseXRlaWRsMi5Xb3JrZmxvd8oCEkZseXRlaWRsMlxXb3JrZmxvd+ICHkZseXRlaWRsMlxXb3JrZmxvd1xHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6V29ya2Zsb3diBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_list, file_flyteidl2_common_run, file_flyteidl2_core_execution, file_flyteidl2_task_common, file_flyteidl2_task_run, file_flyteidl2_task_task_definition, file_flyteidl2_workflow_run_definition, file_google_protobuf_timestamp]);
+  fileDesc("CiRmbHl0ZWlkbDIvd29ya2Zsb3cvcnVuX3NlcnZpY2UucHJvdG8SEmZseXRlaWRsMi53b3JrZmxvdyIoChVCaWRpU3RyZWFtVGVzdFJlcXVlc3QSDwoHbWVzc2FnZRgBIAEoCSIpChZCaWRpU3RyZWFtVGVzdFJlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkikAQKEENyZWF0ZVJ1blJlcXVlc3QSMQoGcnVuX2lkGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVySAASOQoKcHJvamVjdF9pZBgGIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJIABIxCgd0YXNrX2lkGAIgASgLMh4uZmx5dGVpZGwyLnRhc2suVGFza0lkZW50aWZpZXJIARItCgl0YXNrX3NwZWMYAyABKAsyGC5mbHl0ZWlkbDIudGFzay5UYXNrU3BlY0gBEjUKDHRyaWdnZXJfbmFtZRgHIAEoCzIdLmZseXRlaWRsMi5jb21tb24uVHJpZ2dlck5hbWVIARIoCgZpbnB1dHMYBCABKAsyFi5mbHl0ZWlkbDIudGFzay5JbnB1dHNIAhJEChRvZmZsb2FkZWRfaW5wdXRfZGF0YRgJIAEoCzIkLmZseXRlaWRsMi5jb21tb24uT2ZmbG9hZGVkSW5wdXREYXRhSAISKQoIcnVuX3NwZWMYBSABKAsyFy5mbHl0ZWlkbDIudGFzay5SdW5TcGVjEi0KBnNvdXJjZRgIIAEoDjIdLmZseXRlaWRsMi53b3JrZmxvdy5SdW5Tb3VyY2VCCwoCaWQSBbpIAggBQg0KBHRhc2sSBbpIAggBQg8KDWlucHV0X3dyYXBwZXIiOQoRQ3JlYXRlUnVuUmVzcG9uc2USJAoDcnVuGAEgASgLMhcuZmx5dGVpZGwyLndvcmtmbG93LlJ1biJqCg9BYm9ydFJ1blJlcXVlc3QSNwoGcnVuX2lkGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQga6SAPIAQESEwoGcmVhc29uGAIgASgJSACIAQFCCQoHX3JlYXNvbiISChBBYm9ydFJ1blJlc3BvbnNlIk8KFEdldFJ1bkRldGFpbHNSZXF1ZXN0EjcKBnJ1bl9pZBgBIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckIGukgDyAEBIkgKFUdldFJ1bkRldGFpbHNSZXNwb25zZRIvCgdkZXRhaWxzGAEgASgLMh4uZmx5dGVpZGwyLndvcmtmbG93LlJ1bkRldGFpbHMiUQoWV2F0Y2hSdW5EZXRhaWxzUmVxdWVzdBI3CgZydW5faWQYASABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJCBrpIA8gBASJKChdXYXRjaFJ1bkRldGFpbHNSZXNwb25zZRIvCgdkZXRhaWxzGAEgASgLMh4uZmx5dGVpZGwyLndvcmtmbG93LlJ1bkRldGFpbHMiWAoXR2V0QWN0aW9uRGV0YWlsc1JlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQEiTgoYR2V0QWN0aW9uRGV0YWlsc1Jlc3BvbnNlEjIKB2RldGFpbHMYASABKAsyIS5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uRGV0YWlscyJaChlXYXRjaEFjdGlvbkRldGFpbHNSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBIlAKGldhdGNoQWN0aW9uRGV0YWlsc1Jlc3BvbnNlEjIKB2RldGFpbHMYASABKAsyIS5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uRGV0YWlscyJVChRHZXRBY3Rpb25EYXRhUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBASJpChVHZXRBY3Rpb25EYXRhUmVzcG9uc2USJgoGaW5wdXRzGAEgASgLMhYuZmx5dGVpZGwyLnRhc2suSW5wdXRzEigKB291dHB1dHMYAiABKAsyFy5mbHl0ZWlkbDIudGFzay5PdXRwdXRzIlkKGEdldEFjdGlvbkRhdGFVUklzUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBASJEChlHZXRBY3Rpb25EYXRhVVJJc1Jlc3BvbnNlEhIKCmlucHV0c191cmkYASABKAkSEwoLb3V0cHV0c191cmkYAiABKAkidQoaR2V0QWN0aW9uTG9nQ29udGV4dFJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESGAoHYXR0ZW1wdBgCIAEoDUIHukgEKgIgACJfChtHZXRBY3Rpb25Mb2dDb250ZXh0UmVzcG9uc2USLwoLbG9nX2NvbnRleHQYASABKAsyGi5mbHl0ZWlkbDIuY29yZS5Mb2dDb250ZXh0Eg8KB2NsdXN0ZXIYAiABKAkizAIKD0xpc3RSdW5zUmVxdWVzdBIuCgdyZXF1ZXN0GAEgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5MaXN0UmVxdWVzdBIWCgNvcmcYAiABKAlCB7pIBHICEAFIABI5Cgpwcm9qZWN0X2lkGAQgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckgAEjUKDHRyaWdnZXJfbmFtZRgGIAEoCzIdLmZseXRlaWRsMi5jb21tb24uVHJpZ2dlck5hbWVIABItCgl0YXNrX25hbWUYByABKAsyGC5mbHl0ZWlkbDIudGFzay5UYXNrTmFtZUgAEjEKB3Rhc2tfaWQYCCABKAsyHi5mbHl0ZWlkbDIudGFzay5UYXNrSWRlbnRpZmllckgAQhEKCHNjb3BlX2J5EgW6SAIIAUoECAMQBEoECAUQBiJIChBMaXN0UnVuc1Jlc3BvbnNlEiUKBHJ1bnMYASADKAsyFy5mbHl0ZWlkbDIud29ya2Zsb3cuUnVuEg0KBXRva2VuGAIgASgJIuQBChBXYXRjaFJ1bnNSZXF1ZXN0EhYKA29yZxgCIAEoCUIHukgEcgIQAUgAEjkKCmNsdXN0ZXJfaWQYAyABKAsyIy5mbHl0ZWlkbDIuY29tbW9uLkNsdXN0ZXJJZGVudGlmaWVySAASOQoKcHJvamVjdF9pZBgEIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJIABIxCgd0YXNrX2lkGAUgASgLMh4uZmx5dGVpZGwyLnRhc2suVGFza0lkZW50aWZpZXJIAEIPCgZ0YXJnZXQSBbpIAggBIjoKEVdhdGNoUnVuc1Jlc3BvbnNlEiUKBHJ1bnMYASADKAsyFy5mbHl0ZWlkbDIud29ya2Zsb3cuUnVuIn0KEkxpc3RBY3Rpb25zUmVxdWVzdBIuCgdyZXF1ZXN0GAEgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5MaXN0UmVxdWVzdBI3CgZydW5faWQYAiABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJCBrpIA8gBASJRChNMaXN0QWN0aW9uc1Jlc3BvbnNlEisKB2FjdGlvbnMYASADKAsyGi5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uEg0KBXRva2VuGAIgASgJIngKE1dhdGNoQWN0aW9uc1JlcXVlc3QSNwoGcnVuX2lkGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQga6SAPIAQESKAoGZmlsdGVyGAIgAygLMhguZmx5dGVpZGwyLmNvbW1vbi5GaWx0ZXIiVAoUV2F0Y2hBY3Rpb25zUmVzcG9uc2USPAoQZW5yaWNoZWRfYWN0aW9ucxgBIAMoCzIiLmZseXRlaWRsMi53b3JrZmxvdy5FbnJpY2hlZEFjdGlvbiJtChlXYXRjaENsdXN0ZXJFdmVudHNSZXF1ZXN0EjYKAmlkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESGAoHYXR0ZW1wdBgCIAEoDUIHukgEKgIgACJWChpXYXRjaENsdXN0ZXJFdmVudHNSZXNwb25zZRI4Cg5jbHVzdGVyX2V2ZW50cxgBIAMoCzIgLmZseXRlaWRsMi53b3JrZmxvdy5DbHVzdGVyRXZlbnQiYwoSQWJvcnRBY3Rpb25SZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBEg4KBnJlYXNvbhgCIAEoCSIVChNBYm9ydEFjdGlvblJlc3BvbnNlIp8DChJXYXRjaEdyb3Vwc1JlcXVlc3QSOQoKcHJvamVjdF9pZBgBIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJIABI2CgpzdGFydF9kYXRlGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEIGukgDyAEBEiwKCGVuZF9kYXRlGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgdyZXF1ZXN0GAQgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5MaXN0UmVxdWVzdBJQChFrbm93bl9zb3J0X2ZpZWxkcxgFIAMoCzI1LmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaEdyb3Vwc1JlcXVlc3QuS25vd25Tb3J0RmllbGQaUwoOS25vd25Tb3J0RmllbGQSNgoKY3JlYXRlZF9hdBgBIAEoDjIgLmZseXRlaWRsMi5jb21tb24uU29ydC5EaXJlY3Rpb25IAEIJCgdzb3J0X2J5QhEKCHNjb3BlX2J5EgW6SAIIASJbChNXYXRjaEdyb3Vwc1Jlc3BvbnNlEjIKC3Rhc2tfZ3JvdXBzGAEgAygLMh0uZmx5dGVpZGwyLndvcmtmbG93LlRhc2tHcm91cBIQCghzZW50aW5lbBgCIAEoCDKfDgoKUnVuU2VydmljZRJaCglDcmVhdGVSdW4SJC5mbHl0ZWlkbDIud29ya2Zsb3cuQ3JlYXRlUnVuUmVxdWVzdBolLmZseXRlaWRsMi53b3JrZmxvdy5DcmVhdGVSdW5SZXNwb25zZSIAElcKCEFib3J0UnVuEiMuZmx5dGVpZGwyLndvcmtmbG93LkFib3J0UnVuUmVxdWVzdBokLmZseXRlaWRsMi53b3JrZmxvdy5BYm9ydFJ1blJlc3BvbnNlIgASaQoNR2V0UnVuRGV0YWlscxIoLmZseXRlaWRsMi53b3JrZmxvdy5HZXRSdW5EZXRhaWxzUmVxdWVzdBopLmZseXRlaWRsMi53b3JrZmxvdy5HZXRSdW5EZXRhaWxzUmVzcG9uc2UiA5ACARJuCg9XYXRjaFJ1bkRldGFpbHMSKi5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hSdW5EZXRhaWxzUmVxdWVzdBorLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaFJ1bkRldGFpbHNSZXNwb25zZSIAMAEScgoQR2V0QWN0aW9uRGV0YWlscxIrLmZseXRlaWRsMi53b3JrZmxvdy5HZXRBY3Rpb25EZXRhaWxzUmVxdWVzdBosLmZseXRlaWRsMi53b3JrZmxvdy5HZXRBY3Rpb25EZXRhaWxzUmVzcG9uc2UiA5ACARJ3ChJXYXRjaEFjdGlvbkRldGFpbHMSLS5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hBY3Rpb25EZXRhaWxzUmVxdWVzdBouLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaEFjdGlvbkRldGFpbHNSZXNwb25zZSIAMAESbAoNR2V0QWN0aW9uRGF0YRIoLmZseXRlaWRsMi53b3JrZmxvdy5HZXRBY3Rpb25EYXRhUmVxdWVzdBopLmZseXRlaWRsMi53b3JrZmxvdy5HZXRBY3Rpb25EYXRhUmVzcG9uc2UiBogCAZACARJaCghMaXN0UnVucxIjLmZseXRlaWRsMi53b3JrZmxvdy5MaXN0UnVuc1JlcXVlc3QaJC5mbHl0ZWlkbDIud29ya2Zsb3cuTGlzdFJ1bnNSZXNwb25zZSIDkAIBElwKCVdhdGNoUnVucxIkLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaFJ1bnNSZXF1ZXN0GiUuZmx5dGVpZGwyLndvcmtmbG93LldhdGNoUnVuc1Jlc3BvbnNlIgAwARJjCgtMaXN0QWN0aW9ucxImLmZseXRlaWRsMi53b3JrZmxvdy5MaXN0QWN0aW9uc1JlcXVlc3QaJy5mbHl0ZWlkbDIud29ya2Zsb3cuTGlzdEFjdGlvbnNSZXNwb25zZSIDkAIBEmUKDFdhdGNoQWN0aW9ucxInLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaEFjdGlvbnNSZXF1ZXN0GiguZmx5dGVpZGwyLndvcmtmbG93LldhdGNoQWN0aW9uc1Jlc3BvbnNlIgAwARJ3ChJXYXRjaENsdXN0ZXJFdmVudHMSLS5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hDbHVzdGVyRXZlbnRzUmVxdWVzdBouLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaENsdXN0ZXJFdmVudHNSZXNwb25zZSIAMAESYAoLQWJvcnRBY3Rpb24SJi5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRBY3Rpb25SZXF1ZXN0GicuZmx5dGVpZGwyLndvcmtmbG93LkFib3J0QWN0aW9uUmVzcG9uc2UiABJiCgtXYXRjaEdyb3VwcxImLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaEdyb3Vwc1JlcXVlc3QaJy5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hHcm91cHNSZXNwb25zZSIAMAESdQoRR2V0QWN0aW9uRGF0YVVSSXMSLC5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0QWN0aW9uRGF0YVVSSXNSZXF1ZXN0Gi0uZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkRhdGFVUklzUmVzcG9uc2UiA5ACARJ7ChNHZXRBY3Rpb25Mb2dDb250ZXh0Ei4uZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkxvZ0NvbnRleHRSZXF1ZXN0Gi8uZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkxvZ0NvbnRleHRSZXNwb25zZSIDkAIBEm0KDkJpZGlTdHJlYW1UZXN0EikuZmx5dGVpZGwyLndvcmtmbG93LkJpZGlTdHJlYW1UZXN0UmVxdWVzdBoqLmZseXRlaWRsMi53b3JrZmxvdy5CaWRpU3RyZWFtVGVzdFJlc3BvbnNlIgAoATABQswBChZjb20uZmx5dGVpZGwyLndvcmtmbG93Qg9SdW5TZXJ2aWNlUHJvdG9IAlABWjZnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvd29ya2Zsb3eiAgNGV1iqAhJGbHl0ZWlkbDIuV29ya2Zsb3fKAhJGbHl0ZWlkbDJcV29ya2Zsb3fiAh5GbHl0ZWlkbDJcV29ya2Zsb3dcR1BCTWV0YWRhdGHqAhNGbHl0ZWlkbDI6OldvcmtmbG93YgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_list, file_flyteidl2_common_run, file_flyteidl2_core_execution, file_flyteidl2_task_common, file_flyteidl2_task_run, file_flyteidl2_task_task_definition, file_flyteidl2_workflow_run_definition, file_google_protobuf_timestamp]);
+
+/**
+ * @generated from message flyteidl2.workflow.BidiStreamTestRequest
+ */
+export type BidiStreamTestRequest = Message<"flyteidl2.workflow.BidiStreamTestRequest"> & {
+  /**
+   * @generated from field: string message = 1;
+   */
+  message: string;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.BidiStreamTestRequest.
+ * Use `create(BidiStreamTestRequestSchema)` to create a new message.
+ */
+export const BidiStreamTestRequestSchema: GenMessage<BidiStreamTestRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_run_service, 0);
+
+/**
+ * @generated from message flyteidl2.workflow.BidiStreamTestResponse
+ */
+export type BidiStreamTestResponse = Message<"flyteidl2.workflow.BidiStreamTestResponse"> & {
+  /**
+   * @generated from field: string message = 1;
+   */
+  message: string;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.BidiStreamTestResponse.
+ * Use `create(BidiStreamTestResponseSchema)` to create a new message.
+ */
+export const BidiStreamTestResponseSchema: GenMessage<BidiStreamTestResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_run_service, 1);
 
 /**
  * Request message for creating a run.
@@ -128,7 +162,7 @@ export type CreateRunRequest = Message<"flyteidl2.workflow.CreateRunRequest"> & 
  * Use `create(CreateRunRequestSchema)` to create a new message.
  */
 export const CreateRunRequestSchema: GenMessage<CreateRunRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 0);
+  messageDesc(file_flyteidl2_workflow_run_service, 2);
 
 /**
  * Response message for creating a run.
@@ -147,7 +181,7 @@ export type CreateRunResponse = Message<"flyteidl2.workflow.CreateRunResponse"> 
  * Use `create(CreateRunResponseSchema)` to create a new message.
  */
 export const CreateRunResponseSchema: GenMessage<CreateRunResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 1);
+  messageDesc(file_flyteidl2_workflow_run_service, 3);
 
 /**
  * Request message for aborting a run.
@@ -175,7 +209,7 @@ export type AbortRunRequest = Message<"flyteidl2.workflow.AbortRunRequest"> & {
  * Use `create(AbortRunRequestSchema)` to create a new message.
  */
 export const AbortRunRequestSchema: GenMessage<AbortRunRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 2);
+  messageDesc(file_flyteidl2_workflow_run_service, 4);
 
 /**
  * Response message for aborting a run.
@@ -190,7 +224,7 @@ export type AbortRunResponse = Message<"flyteidl2.workflow.AbortRunResponse"> & 
  * Use `create(AbortRunResponseSchema)` to create a new message.
  */
 export const AbortRunResponseSchema: GenMessage<AbortRunResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 3);
+  messageDesc(file_flyteidl2_workflow_run_service, 5);
 
 /**
  * Request message for getting detailed information about a run.
@@ -211,7 +245,7 @@ export type GetRunDetailsRequest = Message<"flyteidl2.workflow.GetRunDetailsRequ
  * Use `create(GetRunDetailsRequestSchema)` to create a new message.
  */
 export const GetRunDetailsRequestSchema: GenMessage<GetRunDetailsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 4);
+  messageDesc(file_flyteidl2_workflow_run_service, 6);
 
 /**
  * Response message for getting detailed information about a run.
@@ -232,7 +266,7 @@ export type GetRunDetailsResponse = Message<"flyteidl2.workflow.GetRunDetailsRes
  * Use `create(GetRunDetailsResponseSchema)` to create a new message.
  */
 export const GetRunDetailsResponseSchema: GenMessage<GetRunDetailsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 5);
+  messageDesc(file_flyteidl2_workflow_run_service, 7);
 
 /**
  * Request message for watching detailed information about a run.
@@ -253,7 +287,7 @@ export type WatchRunDetailsRequest = Message<"flyteidl2.workflow.WatchRunDetails
  * Use `create(WatchRunDetailsRequestSchema)` to create a new message.
  */
 export const WatchRunDetailsRequestSchema: GenMessage<WatchRunDetailsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 6);
+  messageDesc(file_flyteidl2_workflow_run_service, 8);
 
 /**
  * Response message for watching detailed information about a run.
@@ -274,7 +308,7 @@ export type WatchRunDetailsResponse = Message<"flyteidl2.workflow.WatchRunDetail
  * Use `create(WatchRunDetailsResponseSchema)` to create a new message.
  */
 export const WatchRunDetailsResponseSchema: GenMessage<WatchRunDetailsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 7);
+  messageDesc(file_flyteidl2_workflow_run_service, 9);
 
 /**
  * Request message for getting detailed information about an action.
@@ -295,7 +329,7 @@ export type GetActionDetailsRequest = Message<"flyteidl2.workflow.GetActionDetai
  * Use `create(GetActionDetailsRequestSchema)` to create a new message.
  */
 export const GetActionDetailsRequestSchema: GenMessage<GetActionDetailsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 8);
+  messageDesc(file_flyteidl2_workflow_run_service, 10);
 
 /**
  * Response message for getting detailed information about an action.
@@ -316,7 +350,7 @@ export type GetActionDetailsResponse = Message<"flyteidl2.workflow.GetActionDeta
  * Use `create(GetActionDetailsResponseSchema)` to create a new message.
  */
 export const GetActionDetailsResponseSchema: GenMessage<GetActionDetailsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 9);
+  messageDesc(file_flyteidl2_workflow_run_service, 11);
 
 /**
  * Request message for watching detailed information about an action.
@@ -337,7 +371,7 @@ export type WatchActionDetailsRequest = Message<"flyteidl2.workflow.WatchActionD
  * Use `create(WatchActionDetailsRequestSchema)` to create a new message.
  */
 export const WatchActionDetailsRequestSchema: GenMessage<WatchActionDetailsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 10);
+  messageDesc(file_flyteidl2_workflow_run_service, 12);
 
 /**
  * Response message for watching detailed information about an action.
@@ -358,7 +392,7 @@ export type WatchActionDetailsResponse = Message<"flyteidl2.workflow.WatchAction
  * Use `create(WatchActionDetailsResponseSchema)` to create a new message.
  */
 export const WatchActionDetailsResponseSchema: GenMessage<WatchActionDetailsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 11);
+  messageDesc(file_flyteidl2_workflow_run_service, 13);
 
 /**
  * Request message for querying action data.
@@ -379,7 +413,7 @@ export type GetActionDataRequest = Message<"flyteidl2.workflow.GetActionDataRequ
  * Use `create(GetActionDataRequestSchema)` to create a new message.
  */
 export const GetActionDataRequestSchema: GenMessage<GetActionDataRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 12);
+  messageDesc(file_flyteidl2_workflow_run_service, 14);
 
 /**
  * Response message for querying action data.
@@ -407,7 +441,7 @@ export type GetActionDataResponse = Message<"flyteidl2.workflow.GetActionDataRes
  * Use `create(GetActionDataResponseSchema)` to create a new message.
  */
 export const GetActionDataResponseSchema: GenMessage<GetActionDataResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 13);
+  messageDesc(file_flyteidl2_workflow_run_service, 15);
 
 /**
  * Request message for getting action data URIs.
@@ -428,7 +462,7 @@ export type GetActionDataURIsRequest = Message<"flyteidl2.workflow.GetActionData
  * Use `create(GetActionDataURIsRequestSchema)` to create a new message.
  */
 export const GetActionDataURIsRequestSchema: GenMessage<GetActionDataURIsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 14);
+  messageDesc(file_flyteidl2_workflow_run_service, 16);
 
 /**
  * Response message for getting action data URIs.
@@ -456,7 +490,7 @@ export type GetActionDataURIsResponse = Message<"flyteidl2.workflow.GetActionDat
  * Use `create(GetActionDataURIsResponseSchema)` to create a new message.
  */
 export const GetActionDataURIsResponseSchema: GenMessage<GetActionDataURIsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 15);
+  messageDesc(file_flyteidl2_workflow_run_service, 17);
 
 /**
  * Request message for getting action log context.
@@ -484,7 +518,7 @@ export type GetActionLogContextRequest = Message<"flyteidl2.workflow.GetActionLo
  * Use `create(GetActionLogContextRequestSchema)` to create a new message.
  */
 export const GetActionLogContextRequestSchema: GenMessage<GetActionLogContextRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 16);
+  messageDesc(file_flyteidl2_workflow_run_service, 18);
 
 /**
  * Response message for getting action log context.
@@ -512,7 +546,7 @@ export type GetActionLogContextResponse = Message<"flyteidl2.workflow.GetActionL
  * Use `create(GetActionLogContextResponseSchema)` to create a new message.
  */
 export const GetActionLogContextResponseSchema: GenMessage<GetActionLogContextResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 17);
+  messageDesc(file_flyteidl2_workflow_run_service, 19);
 
 /**
  * Request message for listing runs.
@@ -578,7 +612,7 @@ export type ListRunsRequest = Message<"flyteidl2.workflow.ListRunsRequest"> & {
  * Use `create(ListRunsRequestSchema)` to create a new message.
  */
 export const ListRunsRequestSchema: GenMessage<ListRunsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 18);
+  messageDesc(file_flyteidl2_workflow_run_service, 20);
 
 /**
  * Response message for listing runs.
@@ -606,7 +640,7 @@ export type ListRunsResponse = Message<"flyteidl2.workflow.ListRunsResponse"> & 
  * Use `create(ListRunsResponseSchema)` to create a new message.
  */
 export const ListRunsResponseSchema: GenMessage<ListRunsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 19);
+  messageDesc(file_flyteidl2_workflow_run_service, 21);
 
 /**
  * Request message for watching runs.
@@ -657,7 +691,7 @@ export type WatchRunsRequest = Message<"flyteidl2.workflow.WatchRunsRequest"> & 
  * Use `create(WatchRunsRequestSchema)` to create a new message.
  */
 export const WatchRunsRequestSchema: GenMessage<WatchRunsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 20);
+  messageDesc(file_flyteidl2_workflow_run_service, 22);
 
 /**
  * Response message for watching runs.
@@ -678,7 +712,7 @@ export type WatchRunsResponse = Message<"flyteidl2.workflow.WatchRunsResponse"> 
  * Use `create(WatchRunsResponseSchema)` to create a new message.
  */
 export const WatchRunsResponseSchema: GenMessage<WatchRunsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 21);
+  messageDesc(file_flyteidl2_workflow_run_service, 23);
 
 /**
  * Request message for listing actions.
@@ -706,7 +740,7 @@ export type ListActionsRequest = Message<"flyteidl2.workflow.ListActionsRequest"
  * Use `create(ListActionsRequestSchema)` to create a new message.
  */
 export const ListActionsRequestSchema: GenMessage<ListActionsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 22);
+  messageDesc(file_flyteidl2_workflow_run_service, 24);
 
 /**
  * Response message for listing actions.
@@ -734,7 +768,7 @@ export type ListActionsResponse = Message<"flyteidl2.workflow.ListActionsRespons
  * Use `create(ListActionsResponseSchema)` to create a new message.
  */
 export const ListActionsResponseSchema: GenMessage<ListActionsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 23);
+  messageDesc(file_flyteidl2_workflow_run_service, 25);
 
 /**
  * Request message for watching actions.
@@ -765,7 +799,7 @@ export type WatchActionsRequest = Message<"flyteidl2.workflow.WatchActionsReques
  * Use `create(WatchActionsRequestSchema)` to create a new message.
  */
 export const WatchActionsRequestSchema: GenMessage<WatchActionsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 24);
+  messageDesc(file_flyteidl2_workflow_run_service, 26);
 
 /**
  * Response message for watching actions, comes with enriched action metadata.
@@ -786,7 +820,7 @@ export type WatchActionsResponse = Message<"flyteidl2.workflow.WatchActionsRespo
  * Use `create(WatchActionsResponseSchema)` to create a new message.
  */
 export const WatchActionsResponseSchema: GenMessage<WatchActionsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 25);
+  messageDesc(file_flyteidl2_workflow_run_service, 27);
 
 /**
  * @generated from message flyteidl2.workflow.WatchClusterEventsRequest
@@ -808,7 +842,7 @@ export type WatchClusterEventsRequest = Message<"flyteidl2.workflow.WatchCluster
  * Use `create(WatchClusterEventsRequestSchema)` to create a new message.
  */
 export const WatchClusterEventsRequestSchema: GenMessage<WatchClusterEventsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 26);
+  messageDesc(file_flyteidl2_workflow_run_service, 28);
 
 /**
  * @generated from message flyteidl2.workflow.WatchClusterEventsResponse
@@ -825,7 +859,7 @@ export type WatchClusterEventsResponse = Message<"flyteidl2.workflow.WatchCluste
  * Use `create(WatchClusterEventsResponseSchema)` to create a new message.
  */
 export const WatchClusterEventsResponseSchema: GenMessage<WatchClusterEventsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 27);
+  messageDesc(file_flyteidl2_workflow_run_service, 29);
 
 /**
  * @generated from message flyteidl2.workflow.AbortActionRequest
@@ -851,7 +885,7 @@ export type AbortActionRequest = Message<"flyteidl2.workflow.AbortActionRequest"
  * Use `create(AbortActionRequestSchema)` to create a new message.
  */
 export const AbortActionRequestSchema: GenMessage<AbortActionRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 28);
+  messageDesc(file_flyteidl2_workflow_run_service, 30);
 
 /**
  * @generated from message flyteidl2.workflow.AbortActionResponse
@@ -864,7 +898,7 @@ export type AbortActionResponse = Message<"flyteidl2.workflow.AbortActionRespons
  * Use `create(AbortActionResponseSchema)` to create a new message.
  */
 export const AbortActionResponseSchema: GenMessage<AbortActionResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 29);
+  messageDesc(file_flyteidl2_workflow_run_service, 31);
 
 /**
  * @generated from message flyteidl2.workflow.WatchGroupsRequest
@@ -919,7 +953,7 @@ export type WatchGroupsRequest = Message<"flyteidl2.workflow.WatchGroupsRequest"
  * Use `create(WatchGroupsRequestSchema)` to create a new message.
  */
 export const WatchGroupsRequestSchema: GenMessage<WatchGroupsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 30);
+  messageDesc(file_flyteidl2_workflow_run_service, 32);
 
 /**
  * @generated from message flyteidl2.workflow.WatchGroupsRequest.KnownSortField
@@ -942,7 +976,7 @@ export type WatchGroupsRequest_KnownSortField = Message<"flyteidl2.workflow.Watc
  * Use `create(WatchGroupsRequest_KnownSortFieldSchema)` to create a new message.
  */
 export const WatchGroupsRequest_KnownSortFieldSchema: GenMessage<WatchGroupsRequest_KnownSortField> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 30, 0);
+  messageDesc(file_flyteidl2_workflow_run_service, 32, 0);
 
 /**
  * Response message for watching task groups.
@@ -972,7 +1006,7 @@ export type WatchGroupsResponse = Message<"flyteidl2.workflow.WatchGroupsRespons
  * Use `create(WatchGroupsResponseSchema)` to create a new message.
  */
 export const WatchGroupsResponseSchema: GenMessage<WatchGroupsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 31);
+  messageDesc(file_flyteidl2_workflow_run_service, 33);
 
 /**
  * RunService provides an interface for managing runs.
@@ -1142,6 +1176,16 @@ export const RunService: GenService<{
     methodKind: "unary";
     input: typeof GetActionLogContextRequestSchema;
     output: typeof GetActionLogContextResponseSchema;
+  },
+  /**
+   * BidiStreamTest is a no-op echo bidi stream for end-to-end transport testing.
+   *
+   * @generated from rpc flyteidl2.workflow.RunService.BidiStreamTest
+   */
+  bidiStreamTest: {
+    methodKind: "bidi_streaming";
+    input: typeof BidiStreamTestRequestSchema;
+    output: typeof BidiStreamTestResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_flyteidl2_workflow_run_service, 0);

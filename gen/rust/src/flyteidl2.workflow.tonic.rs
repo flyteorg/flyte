@@ -2721,6 +2721,35 @@ pub mod run_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        pub async fn bidi_stream_test(
+            &mut self,
+            request: impl tonic::IntoStreamingRequest<
+                Message = super::BidiStreamTestRequest,
+            >,
+        ) -> std::result::Result<
+            tonic::Response<tonic::codec::Streaming<super::BidiStreamTestResponse>>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.workflow.RunService/BidiStreamTest",
+            );
+            let mut req = request.into_streaming_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("flyteidl2.workflow.RunService", "BidiStreamTest"),
+                );
+            self.inner.streaming(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -2879,6 +2908,19 @@ pub mod run_service_server {
             request: tonic::Request<super::GetActionLogContextRequest>,
         ) -> std::result::Result<
             tonic::Response<super::GetActionLogContextResponse>,
+            tonic::Status,
+        >;
+        /// Server streaming response type for the BidiStreamTest method.
+        type BidiStreamTestStream: tonic::codegen::tokio_stream::Stream<
+                Item = std::result::Result<super::BidiStreamTestResponse, tonic::Status>,
+            >
+            + Send
+            + 'static;
+        async fn bidi_stream_test(
+            &self,
+            request: tonic::Request<tonic::Streaming<super::BidiStreamTestRequest>>,
+        ) -> std::result::Result<
+            tonic::Response<Self::BidiStreamTestStream>,
             tonic::Status,
         >;
     }
@@ -3687,6 +3729,54 @@ pub mod run_service_server {
                                 max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.workflow.RunService/BidiStreamTest" => {
+                    #[allow(non_camel_case_types)]
+                    struct BidiStreamTestSvc<T: RunService>(pub Arc<T>);
+                    impl<
+                        T: RunService,
+                    > tonic::server::StreamingService<super::BidiStreamTestRequest>
+                    for BidiStreamTestSvc<T> {
+                        type Response = super::BidiStreamTestResponse;
+                        type ResponseStream = T::BidiStreamTestStream;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::ResponseStream>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                tonic::Streaming<super::BidiStreamTestRequest>,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as RunService>::bidi_stream_test(&inner, request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = BidiStreamTestSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.streaming(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)

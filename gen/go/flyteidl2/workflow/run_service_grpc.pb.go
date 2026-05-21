@@ -35,6 +35,7 @@ const (
 	RunService_WatchGroups_FullMethodName         = "/flyteidl2.workflow.RunService/WatchGroups"
 	RunService_GetActionDataURIs_FullMethodName   = "/flyteidl2.workflow.RunService/GetActionDataURIs"
 	RunService_GetActionLogContext_FullMethodName = "/flyteidl2.workflow.RunService/GetActionLogContext"
+	RunService_BidiStreamTest_FullMethodName      = "/flyteidl2.workflow.RunService/BidiStreamTest"
 )
 
 // RunServiceClient is the client API for RunService service.
@@ -76,6 +77,8 @@ type RunServiceClient interface {
 	GetActionDataURIs(ctx context.Context, in *GetActionDataURIsRequest, opts ...grpc.CallOption) (*GetActionDataURIsResponse, error)
 	// Get the logging context (pod name, namespace, cluster) for an action attempt.
 	GetActionLogContext(ctx context.Context, in *GetActionLogContextRequest, opts ...grpc.CallOption) (*GetActionLogContextResponse, error)
+	// BidiStreamTest is a no-op echo bidi stream for end-to-end transport testing.
+	BidiStreamTest(ctx context.Context, opts ...grpc.CallOption) (RunService_BidiStreamTestClient, error)
 }
 
 type runServiceClient struct {
@@ -369,6 +372,37 @@ func (c *runServiceClient) GetActionLogContext(ctx context.Context, in *GetActio
 	return out, nil
 }
 
+func (c *runServiceClient) BidiStreamTest(ctx context.Context, opts ...grpc.CallOption) (RunService_BidiStreamTestClient, error) {
+	stream, err := c.cc.NewStream(ctx, &RunService_ServiceDesc.Streams[6], RunService_BidiStreamTest_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &runServiceBidiStreamTestClient{stream}
+	return x, nil
+}
+
+type RunService_BidiStreamTestClient interface {
+	Send(*BidiStreamTestRequest) error
+	Recv() (*BidiStreamTestResponse, error)
+	grpc.ClientStream
+}
+
+type runServiceBidiStreamTestClient struct {
+	grpc.ClientStream
+}
+
+func (x *runServiceBidiStreamTestClient) Send(m *BidiStreamTestRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *runServiceBidiStreamTestClient) Recv() (*BidiStreamTestResponse, error) {
+	m := new(BidiStreamTestResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // RunServiceServer is the server API for RunService service.
 // All implementations should embed UnimplementedRunServiceServer
 // for forward compatibility
@@ -408,6 +442,8 @@ type RunServiceServer interface {
 	GetActionDataURIs(context.Context, *GetActionDataURIsRequest) (*GetActionDataURIsResponse, error)
 	// Get the logging context (pod name, namespace, cluster) for an action attempt.
 	GetActionLogContext(context.Context, *GetActionLogContextRequest) (*GetActionLogContextResponse, error)
+	// BidiStreamTest is a no-op echo bidi stream for end-to-end transport testing.
+	BidiStreamTest(RunService_BidiStreamTestServer) error
 }
 
 // UnimplementedRunServiceServer should be embedded to have forward compatible implementations.
@@ -461,6 +497,9 @@ func (UnimplementedRunServiceServer) GetActionDataURIs(context.Context, *GetActi
 }
 func (UnimplementedRunServiceServer) GetActionLogContext(context.Context, *GetActionLogContextRequest) (*GetActionLogContextResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetActionLogContext not implemented")
+}
+func (UnimplementedRunServiceServer) BidiStreamTest(RunService_BidiStreamTestServer) error {
+	return status.Errorf(codes.Unimplemented, "method BidiStreamTest not implemented")
 }
 
 // UnsafeRunServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -780,6 +819,32 @@ func _RunService_GetActionLogContext_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RunService_BidiStreamTest_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(RunServiceServer).BidiStreamTest(&runServiceBidiStreamTestServer{stream})
+}
+
+type RunService_BidiStreamTestServer interface {
+	Send(*BidiStreamTestResponse) error
+	Recv() (*BidiStreamTestRequest, error)
+	grpc.ServerStream
+}
+
+type runServiceBidiStreamTestServer struct {
+	grpc.ServerStream
+}
+
+func (x *runServiceBidiStreamTestServer) Send(m *BidiStreamTestResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *runServiceBidiStreamTestServer) Recv() (*BidiStreamTestRequest, error) {
+	m := new(BidiStreamTestRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // RunService_ServiceDesc is the grpc.ServiceDesc for RunService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -858,6 +923,12 @@ var RunService_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "WatchGroups",
 			Handler:       _RunService_WatchGroups_Handler,
 			ServerStreams: true,
+		},
+		{
+			StreamName:    "BidiStreamTest",
+			Handler:       _RunService_BidiStreamTest_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "flyteidl2/workflow/run_service.proto",
