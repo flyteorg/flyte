@@ -15,8 +15,6 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config/viper"
@@ -118,8 +116,9 @@ func (a *App) serve(ctx context.Context) error {
 
 		addr := fmt.Sprintf("%s:%d", sc.Host, sc.Port)
 		server = &http.Server{
-			Addr:    addr,
-			Handler: h2c.NewHandler(handler, &http2.Server{}),
+			Addr:      addr,
+			Handler:   handler,
+			Protocols: httpProtocols(),
 		}
 
 		wg.Add(1)
@@ -197,17 +196,21 @@ func (a *App) serve(ctx context.Context) error {
 	return shutdownErr
 }
 
+func httpProtocols() *http.Protocols {
+	protocols := &http.Protocols{}
+	protocols.SetHTTP1(true)
+	protocols.SetUnencryptedHTTP2(true)
+	return protocols
+}
+
 // requestGzipDecompressMiddleware pre-decompresses request bodies that carry
 // Content-Encoding: gzip before they reach the connect-rpc handler.
 //
 // Some HTTP clients (e.g. pyqwest used by the Python connectrpc SDK) compress
 // the request body at the application level and set Content-Encoding: gzip,
-// but also use chunked transfer encoding for larger payloads.  Go's h2c
-// framing delivers the body in chunks, so by the time connect-go calls
-// gzip.NewReader on the raw body stream the first bytes it receives may be a
-// chunk-size line rather than the gzip magic bytes, causing "gzip: invalid
-// header".  Pre-reading and fully decompressing the body here, before h2c
-// framing is involved, sidesteps the problem entirely.
+// but also use chunked transfer encoding for larger payloads. Pre-reading and
+// fully decompressing the body here keeps connect-go from seeing chunk framing
+// bytes when it constructs its gzip reader.
 func requestGzipDecompressMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.EqualFold(r.Header.Get("Content-Encoding"), "gzip") {

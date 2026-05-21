@@ -12,15 +12,16 @@ import (
 
 	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 	"github.com/jmoiron/sqlx"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
+	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/migrations"
 	"github.com/flyteorg/flyte/v2/runs/repository"
+	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/service"
 )
 
@@ -103,6 +104,12 @@ func TestMain(m *testing.M) {
 	}
 	log.Println("Database migrations completed")
 
+	if err := ensureTestProject(ctx); err != nil {
+		log.Printf("Failed to seed test project: %v", err)
+		exitCode = 1
+		return
+	}
+
 	// Create repository and services
 	repo, err := repository.NewRepository(testDB, *dbConfig)
 	if err != nil {
@@ -110,15 +117,21 @@ func TestMain(m *testing.M) {
 		exitCode = 1
 		return
 	}
-	taskSvc := service.NewTaskService(repo, nil)
+
+	endpointURL := fmt.Sprintf("http://localhost:%d", testPort)
+	projectClient := projectconnect.NewProjectServiceClient(http.DefaultClient, endpointURL)
+	taskSvc := service.NewTaskService(repo, projectClient)
+	projectSvc := service.NewProjectService(impl.NewProjectRepo(testDB), nil)
 
 	// Create RunService with a no-op actions client (points at test server; not used by watch tests)
-	endpointURL := fmt.Sprintf("http://localhost:%d", testPort)
 	actionsClient := actionsconnect.NewActionsServiceClient(http.DefaultClient, endpointURL)
 	runSvc := service.NewRunService(repo, actionsClient, nil, nil, "", nil, nil)
 
 	// Setup HTTP server
 	mux := http.NewServeMux()
+	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(projectSvc)
+	mux.Handle(projectPath, projectHandler)
+
 	taskPath, taskHandler := taskconnect.NewTaskServiceHandler(taskSvc)
 	mux.Handle(taskPath, taskHandler)
 
@@ -136,8 +149,9 @@ func TestMain(m *testing.M) {
 
 	endpoint = fmt.Sprintf("http://localhost:%d", testPort)
 	testServer = &http.Server{
-		Addr:    fmt.Sprintf(":%d", testPort),
-		Handler: h2c.NewHandler(mux, &http2.Server{}),
+		Addr:      fmt.Sprintf(":%d", testPort),
+		Handler:   mux,
+		Protocols: httpProtocols(),
 	}
 
 	// Start server in background
@@ -171,6 +185,23 @@ func TestMain(m *testing.M) {
 
 	// Run tests
 	exitCode = m.Run()
+}
+
+func httpProtocols() *http.Protocols {
+	protocols := &http.Protocols{}
+	protocols.SetHTTP1(true)
+	protocols.SetUnencryptedHTTP2(true)
+	return protocols
+}
+
+func ensureTestProject(ctx context.Context) error {
+	state := int32(projectpb.ProjectState_PROJECT_STATE_ACTIVE)
+	_, err := testDB.ExecContext(ctx, `
+		INSERT INTO projects (identifier, name, description, labels, state)
+		VALUES ($1, $2, $3, $4, $5)
+		ON CONFLICT (identifier) DO NOTHING
+	`, testProject, "Test Project", "Project used by API integration tests", []byte(nil), &state)
+	return err
 }
 
 // waitForServer waits for the server to be ready
@@ -210,6 +241,9 @@ func cleanupTestDB(t *testing.T) {
 		if _, err := testDB.Exec(fmt.Sprintf("DELETE FROM %s", table)); err != nil {
 			t.Logf("Warning: Failed to cleanup table %s: %v", table, err)
 		}
+	}
+	if err := ensureTestProject(context.Background()); err != nil {
+		t.Fatalf("Failed to seed test project: %v", err)
 	}
 
 	t.Log("Test database cleaned up")
