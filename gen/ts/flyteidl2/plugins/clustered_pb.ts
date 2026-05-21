@@ -4,6 +4,7 @@
 
 import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
+import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
 import { file_google_protobuf_wrappers } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -11,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/plugins/clustered.proto.
  */
 export const file_flyteidl2_plugins_clustered: GenFile = /*@__PURE__*/
-  fileDesc("CiFmbHl0ZWlkbDIvcGx1Z2lucy9jbHVzdGVyZWQucHJvdG8SEWZseXRlaWRsMi5wbHVnaW5zIq0CChFDbHVzdGVyZWRUYXNrU3BlYxIQCghyZXBsaWNhcxgBIAEoBRIgChhhY2NlbGVyYXRvcnNfcGVyX3JlcGxpY2EYAiABKAUSKwoHcnVudGltZRgDIAEoCzIaLmZseXRlaWRsMi5wbHVnaW5zLlJ1bnRpbWUSNQoMaW50ZXJjb25uZWN0GAQgASgOMh8uZmx5dGVpZGwyLnBsdWdpbnMuSW50ZXJjb25uZWN0Ej8KDmZhaWx1cmVfcG9saWN5GAUgASgLMicuZmx5dGVpZGwyLnBsdWdpbnMuQ2x1c3RlckZhaWx1cmVQb2xpY3kSPwoadHRsX3NlY29uZHNfYWZ0ZXJfZmluaXNoZWQYBiABKAsyGy5nb29nbGUucHJvdG9idWYuSW50MzJWYWx1ZSJGCgdSdW50aW1lEjMKCHRvcmNocnVuGAEgASgLMh8uZmx5dGVpZGwyLnBsdWdpbnMuVG9yY2hSdW50aW1lSABCBgoEa2luZCJaCgxUb3JjaFJ1bnRpbWUSNAoMcmR6dl9iYWNrZW5kGAEgASgOMh4uZmx5dGVpZGwyLnBsdWdpbnMuUmR6dkJhY2tlbmQSFAoMbWF4X3Jlc3RhcnRzGAIgASgFIlEKFENsdXN0ZXJGYWlsdXJlUG9saWN5EhQKDG1heF9yZXN0YXJ0cxgBIAEoBRIjChtyZXN0YXJ0X29uX2hvc3RfbWFpbnRlbmFuY2UYAiABKAgqIwoLUmR6dkJhY2tlbmQSCgoGU1RBVElDEAASCAoEQzEwRBABKjoKDEludGVyY29ubmVjdBIHCgNUQ1AQABIHCgNFRkEQARIOCgpJTkZJTklCQU5EEAISCAoEUk9DRRADQsUBChVjb20uZmx5dGVpZGwyLnBsdWdpbnNCDkNsdXN0ZXJlZFByb3RvSAJQAVo1Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3BsdWdpbnOiAgNGUFiqAhFGbHl0ZWlkbDIuUGx1Z2luc8oCEUZseXRlaWRsMlxQbHVnaW5z4gIdRmx5dGVpZGwyXFBsdWdpbnNcR1BCTWV0YWRhdGHqAhJGbHl0ZWlkbDI6OlBsdWdpbnNiBnByb3RvMw", [file_google_protobuf_wrappers]);
+  fileDesc("CiFmbHl0ZWlkbDIvcGx1Z2lucy9jbHVzdGVyZWQucHJvdG8SEWZseXRlaWRsMi5wbHVnaW5zIrYCChFDbHVzdGVyZWRUYXNrU3BlYxIZCghyZXBsaWNhcxgBIAEoBUIHukgEKgIgABIfCg5ucHJvY19wZXJfbm9kZRgCIAEoBUIHukgEKgIgABIrCgdydW50aW1lGAMgASgLMhouZmx5dGVpZGwyLnBsdWdpbnMuUnVudGltZRI1CgxpbnRlcmNvbm5lY3QYBCABKA4yHy5mbHl0ZWlkbDIucGx1Z2lucy5JbnRlcmNvbm5lY3QSPwoOZmFpbHVyZV9wb2xpY3kYBSABKAsyJy5mbHl0ZWlkbDIucGx1Z2lucy5DbHVzdGVyRmFpbHVyZVBvbGljeRJAChp0dGxfc2Vjb25kc19hZnRlcl9maW5pc2hlZBgGIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5VSW50MzJWYWx1ZSJGCgdSdW50aW1lEjMKCHRvcmNocnVuGAEgASgLMh8uZmx5dGVpZGwyLnBsdWdpbnMuVG9yY2hSdW50aW1lSABCBgoEa2luZCJaCgxUb3JjaFJ1bnRpbWUSNAoMcmR6dl9iYWNrZW5kGAEgASgOMh4uZmx5dGVpZGwyLnBsdWdpbnMuUmR6dkJhY2tlbmQSFAoMbWF4X3Jlc3RhcnRzGAIgASgFIlEKFENsdXN0ZXJGYWlsdXJlUG9saWN5EhQKDG1heF9yZXN0YXJ0cxgBIAEoBRIjChtyZXN0YXJ0X29uX2hvc3RfbWFpbnRlbmFuY2UYAiABKAgqIwoLUmR6dkJhY2tlbmQSCgoGU1RBVElDEAASCAoEQzEwRBABKjoKDEludGVyY29ubmVjdBIHCgNUQ1AQABIHCgNFRkEQARIOCgpJTkZJTklCQU5EEAISCAoEUk9DRRADQsUBChVjb20uZmx5dGVpZGwyLnBsdWdpbnNCDkNsdXN0ZXJlZFByb3RvSAJQAVo1Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3BsdWdpbnOiAgNGUFiqAhFGbHl0ZWlkbDIuUGx1Z2luc8oCEUZseXRlaWRsMlxQbHVnaW5z4gIdRmx5dGVpZGwyXFBsdWdpbnNcR1BCTWV0YWRhdGHqAhJGbHl0ZWlkbDI6OlBsdWdpbnNiBnByb3RvMw", [file_buf_validate_validate, file_google_protobuf_wrappers]);
 
 /**
  * Top-level spec for a clustered task execution. Packed into TaskTemplate.custom.
@@ -27,11 +28,11 @@ export type ClusteredTaskSpec = Message<"flyteidl2.plugins.ClusteredTaskSpec"> &
   replicas: number;
 
   /**
-   * Number of accelerators per pod. Passed to torchrun as --nproc-per-node. Required, must be >= 1.
+   * Number of processes per node passed to torchrun as --nproc-per-node (typically one per GPU). Required, must be >= 1.
    *
-   * @generated from field: int32 accelerators_per_replica = 2;
+   * @generated from field: int32 nproc_per_node = 2;
    */
-  acceleratorsPerReplica: number;
+  nprocPerNode: number;
 
   /**
    * Selects the launcher and its per-launcher configuration.
@@ -57,7 +58,7 @@ export type ClusteredTaskSpec = Message<"flyteidl2.plugins.ClusteredTaskSpec"> &
   /**
    * If set, the JobSet is deleted this many seconds after it finishes (success or failure).
    *
-   * @generated from field: google.protobuf.Int32Value ttl_seconds_after_finished = 6;
+   * @generated from field: google.protobuf.UInt32Value ttl_seconds_after_finished = 6;
    */
   ttlSecondsAfterFinished?: number;
 };

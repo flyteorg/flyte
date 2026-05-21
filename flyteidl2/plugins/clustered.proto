@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package flyteidl2.plugins;
 
+import "buf/validate/validate.proto";
 import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins";
@@ -9,10 +10,10 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins";
 // Top-level spec for a clustered task execution. Packed into TaskTemplate.custom.
 message ClusteredTaskSpec {
   // Number of pods (== number of nodes). Required, must be >= 1.
-  int32 replicas = 1;
+  int32 replicas = 1 [(buf.validate.field).uint32.gt = 0];
 
-  // Number of accelerators per pod. Passed to torchrun as --nproc-per-node. Required, must be >= 1.
-  int32 accelerators_per_replica = 2;
+  // Number of processes per node passed to torchrun as --nproc-per-node (typically one per GPU). Required, must be >= 1.
+  int32 nproc_per_node = 2 [(buf.validate.field).uint32.gt = 0];
 
   // Selects the launcher and its per-launcher configuration.
   Runtime runtime = 3;
@@ -24,7 +25,7 @@ message ClusteredTaskSpec {
   ClusterFailurePolicy failure_policy = 5;
 
   // If set, the JobSet is deleted this many seconds after it finishes (success or failure).
-  google.protobuf.Int32Value ttl_seconds_after_finished = 6;
+  google.protobuf.UInt32Value ttl_seconds_after_finished = 6;
 }
 
 // Tagged union of supported launchers. Phase 1: TorchRun only.

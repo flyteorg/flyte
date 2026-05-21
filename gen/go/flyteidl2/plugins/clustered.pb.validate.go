@@ -59,7 +59,7 @@ func (m *ClusteredTaskSpec) validate(all bool) error {
 
 	// no validation rules for Replicas
 
-	// no validation rules for AcceleratorsPerReplica
+	// no validation rules for NprocPerNode
 
 	if all {
 		switch v := interface{}(m.GetRuntime()).(type) {
