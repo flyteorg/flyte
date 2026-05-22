@@ -9515,6 +9515,36 @@ spec:
             name: rustfs-svc
             port:
               number: 9001
+        path: /rustfs/console
+        pathType: Prefix
+      - backend:
+          service:
+            name: rustfs-svc
+            port:
+              number: 9001
+        path: /rustfs/admin
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-devbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-devbox-0.1.0
+  name: rustfs-s3
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: rustfs-svc
+            port:
+              number: 9000
         path: /
         pathType: Prefix
 ---
