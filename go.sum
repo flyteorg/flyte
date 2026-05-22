@@ -139,8 +139,8 @@ github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkp
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
 github.com/eko/gocache/lib/v4 v4.2.3 h1:s78TFqEGAH3SbzP4N40D755JYT/aaGFKEPrsUtC1chU=
 github.com/eko/gocache/lib/v4 v4.2.3/go.mod h1:Zus8mwmaPu1VYOzfomb+Dvx2wV7fT5jDRbHYtQM6MEY=
-github.com/eko/gocache/store/freecache/v4 v4.2.0 h1:MYiUyF5D3JsMfQAyURolH9AMJaBzhX36dEppbgYKbp4=
-github.com/eko/gocache/store/freecache/v4 v4.2.0/go.mod h1:2w6a/5NPHIZIm27AGDKFphRqKygLGqlNt49wd3iXmdE=
+github.com/eko/gocache/store/freecache/v4 v4.2.4 h1:QaRYnoh4eEEL/NYDJl7HqRHhp9rlwR0LSRgek8+PYrY=
+github.com/eko/gocache/store/freecache/v4 v4.2.4/go.mod h1:bSQzTOqmidOM7NARAKU67cRfZyEnME8FHU77ICl9b8E=
 github.com/eko/gocache/store/redis/v4 v4.2.0 h1:YguIDZuMeVFlQFi0DiYQpL7NvHAckinYFjWxvr0qmLw=
 github.com/eko/gocache/store/redis/v4 v4.2.0/go.mod h1:IP4GWCjca/pyruK5GweTZ7zzoFlgQABd3cVMJFEgHfs=
 github.com/emicklei/go-restful/v3 v3.12.2 h1:DhwDP0vY3k8ZzE0RunuJy8GhNpPL6zqLkDf9B/a0/xU=
