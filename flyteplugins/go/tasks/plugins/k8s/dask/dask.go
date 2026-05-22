@@ -3,6 +3,7 @@ package dask
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -53,38 +54,46 @@ func replacePrimaryContainer(spec *v1.PodSpec, primaryContainerName string, cont
 type daskResourceHandler struct {
 }
 
-// buildDashboardURLPrefix returns the LONG-form union dataproxy path that should
-// be passed to `dask-scheduler --dashboard-prefix` so Bokeh emits tab/WebSocket
-// links that route correctly through the dataproxy. The namespace segment is
-// left as `$(POD_NAMESPACE)` — kubelet expands that at pod start from the
-// downward-API env var the caller is expected to inject.
+// dashboardPrefixFromLogConfig returns the path that should be passed to
+// `dask-scheduler --dashboard-prefix` so Bokeh emits tab/WebSocket links that
+// resolve through the reverse-proxy chain. It reuses the existing dashboard
+// log-template (the same `linkType: dashboard` entry under
+// `plugins.dask.logs.templates` that powers the user-facing dashboard link)
+// rather than maintaining a parallel URL structure in Go code: the helm chart
+// is the single source of truth for the URL shape, and the existing tasklog
+// substituter resolves per-task placeholders like `{{.executionProject}}` /
+// `{{.namespace}}` / `{{.generatedName}}` from the task execution identity.
 //
-// Returns "" when the plugin isn't configured with a cluster name, in which
-// case the scheduler runs with no dashboard prefix (the historical behavior;
-// tabs work only on the legacy CP-routed path that doesn't require Bokeh to
-// know its proxy mount point).
-func buildDashboardURLPrefix(generatedName string, teMetadata pluginsCore.TaskExecutionMetadata) string {
-	cfg := GetConfig()
-	if cfg == nil || cfg.ClusterName == "" {
+// Returns "" when no dashboard template is configured, in which case the
+// scheduler runs without `--dashboard-prefix` and Bokeh falls back to emitting
+// root-relative URLs (the historical pre-fix behavior — page loads but tab
+// navigation 404s outside the proxy mount point).
+func dashboardPrefixFromLogConfig(taskTemplate *core.TaskTemplate, teMetadata pluginsCore.TaskExecutionMetadata) string {
+	logPlugin, err := logs.InitializeLogPlugins(&GetConfig().Logs, taskTemplate)
+	if err != nil || logPlugin == nil {
 		return ""
 	}
-	id := teMetadata.GetTaskExecutionID().GetID()
-	exec := id.GetNodeExecutionId().GetExecutionId()
-	task := id.GetTaskId()
-	return fmt.Sprintf(
-		"/dataplane/dask/v1/generated_name/task/%s/%s/%s/%s/%d/%s/$(POD_NAMESPACE)/%s/%s/%s/%s/%s",
-		exec.GetProject(),
-		exec.GetDomain(),
-		exec.GetName(),
-		id.GetNodeExecutionId().GetNodeId(),
-		id.GetRetryAttempt(),
-		cfg.ClusterName,
-		task.GetProject(),
-		task.GetDomain(),
-		task.GetName(),
-		task.GetVersion(),
-		generatedName,
-	)
+	out, err := logPlugin.GetTaskLogs(tasklog.Input{
+		Namespace:       teMetadata.GetNamespace(),
+		TaskExecutionID: teMetadata.GetTaskExecutionID(),
+	})
+	if err != nil {
+		return ""
+	}
+	for _, tl := range out.TaskLogs {
+		if tl == nil || tl.LinkType != core.TaskLog_DASHBOARD {
+			continue
+		}
+		u, err := url.Parse(tl.Uri)
+		if err != nil {
+			continue
+		}
+		// The dashboard templateUri ends at the `/status` tab so users land on
+		// a populated page; Bokeh's prefix is one segment up — the dashboard
+		// root.
+		return strings.TrimSuffix(u.Path, "/status")
+	}
+	return ""
 }
 
 func (daskResourceHandler) BuildIdentityResource(_ context.Context, _ pluginsCore.TaskExecutionMetadata) (
@@ -131,7 +140,8 @@ func (p daskResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	clusterName := taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-	schedulerSpec, err := createSchedulerSpec(daskJob.Scheduler, clusterName, nonInterruptiblePodSpec, primaryContainerName, taskCtx.TaskExecutionMetadata())
+	dashboardPrefix := dashboardPrefixFromLogConfig(taskTemplate, taskCtx.TaskExecutionMetadata())
+	schedulerSpec, err := createSchedulerSpec(daskJob.Scheduler, clusterName, nonInterruptiblePodSpec, primaryContainerName, taskCtx.TaskExecutionMetadata(), dashboardPrefix)
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +228,7 @@ func createWorkerSpec(cluster *plugins.DaskWorkerGroup, podSpec *v1.PodSpec, pri
 }
 
 func createSchedulerSpec(scheduler *plugins.DaskScheduler, clusterName string, podSpec *v1.PodSpec, primaryContainerName string,
-	teMetadata pluginsCore.TaskExecutionMetadata) (*daskAPI.SchedulerSpec, error) {
+	teMetadata pluginsCore.TaskExecutionMetadata, dashboardPrefix string) (*daskAPI.SchedulerSpec, error) {
 	schedulerPodSpec := podSpec.DeepCopy()
 	primaryContainer, err := flytek8s.GetContainer(schedulerPodSpec, primaryContainerName)
 	if err != nil {
@@ -244,22 +254,15 @@ func createSchedulerSpec(scheduler *plugins.DaskScheduler, clusterName string, p
 	}
 	primaryContainer.Resources = *resources
 
-	// Override args. When a cluster name is configured, point the scheduler's
-	// Bokeh dashboard at the LONG-form union dataproxy URL prefix so its internal
-	// tab/WebSocket links resolve through the proxy chain. The LONG form works
-	// regardless of whether the cluster is on the legacy CP-routed path or the
-	// zero-trust DP-direct path (the dataproxy on both sides parses it
-	// identically). Without this, Bokeh emits root-relative links like
-	// "/individual-task-stream" that 404 outside the dashboard mount point.
+	// Override args. When a dashboard prefix is derived from the configured
+	// log templates (see dashboardPrefixFromLogConfig), point the scheduler's
+	// Bokeh dashboard at it so the dashboard's emitted tab/WebSocket URLs
+	// resolve through the reverse-proxy chain. Without this, Bokeh emits
+	// root-relative links like "/individual-task-stream" that 404 outside the
+	// dashboard mount point.
 	primaryContainer.Args = []string{"dask-scheduler"}
-	if prefix := buildDashboardURLPrefix(clusterName, teMetadata); prefix != "" {
-		primaryContainer.Env = append(primaryContainer.Env, v1.EnvVar{
-			Name: "POD_NAMESPACE",
-			ValueFrom: &v1.EnvVarSource{
-				FieldRef: &v1.ObjectFieldSelector{FieldPath: "metadata.namespace"},
-			},
-		})
-		primaryContainer.Args = append(primaryContainer.Args, "--dashboard-prefix", prefix)
+	if dashboardPrefix != "" {
+		primaryContainer.Args = append(primaryContainer.Args, "--dashboard-prefix", dashboardPrefix)
 	}
 
 	// Add ports
