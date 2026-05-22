@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package flyteidl2.plugins;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins";
+
+// Top-level spec for a clustered task execution. Packed into TaskTemplate.custom.
+message ClusteredTaskSpec {
+  // Number of pods (== number of nodes). Required, must be >= 1.
+  int32 replicas = 1 [(buf.validate.field).uint32.gt = 0];
+
+  // Number of processes per node passed to torchrun as --nproc-per-node (typically one per GPU). Required, must be >= 1.
+  int32 nproc_per_node = 2 [(buf.validate.field).uint32.gt = 0];
+
+  // Selects the launcher and its per-launcher configuration.
+  Runtime runtime = 3;
+
+  // Network fabric for collective communications (NCCL all-reduce etc). Defaults to TCP.
+  Interconnect interconnect = 4;
+
+  // Controls restart behaviour on rank failure and host maintenance.
+  ClusterFailurePolicy failure_policy = 5;
+
+  // If set, the JobSet is deleted this many seconds after it finishes (success or failure).
+  google.protobuf.UInt32Value ttl_seconds_after_finished = 6;
+}
+
+// Tagged union of supported launchers. Phase 1: TorchRun only.
+// Future variants (DeepSpeed, Accelerate, JAX) add new oneof fields here;
+// the JobSet shape and Go plugin are unchanged.
+message Runtime {
+  oneof kind {
+    TorchRuntime torchrun = 1;
+  }
+}
+
+// Configuration for the torchrun launcher.
+message TorchRuntime {
+  // Rendezvous backend. Defaults to STATIC.
+  RdzvBackend rdzv_backend = 1;
+
+  // Number of in-pod torchrun restarts before the pod is considered failed.
+  // Defaults to 0 — whole-cluster restart via JobSet failurePolicy is the
+  // recovery mechanism, so in-pod retries are disabled.
+  int32 max_restarts = 2;
+}
+
+// Rendezvous backend for torchrun.
+enum RdzvBackend {
+  // Static rendezvous: full membership declared upfront via --nnodes and
+  // --master-addr. Simple and deterministic. Recovery is whole-job restart
+  // (JobSet failurePolicy), not in-job re-rendezvous.
+  STATIC = 0;
+
+  // TCPStore-based dynamic rendezvous. Enables elastic membership
+  // (--nnodes=MIN:MAX) and in-job re-rendezvous on partial failure.
+  C10D = 1;
+}
+
+// Network fabric for gradient all-reduce and other collective ops.
+// Non-TCP values cause the plugin to inject RDMA device resources,
+// capabilities, and NCCL env vars into the pod spec.
+enum Interconnect {
+  // Plain TCP over the pod CNI network. Works on any cluster. Default.
+  TCP = 0;
+
+  // AWS Elastic Fabric Adapter (EC2 p4d / p5 / trn1). ~100-400 Gbps GPUDirect RDMA.
+  EFA = 1;
+
+  // Mellanox / NVIDIA InfiniBand HCA (CoreWeave, Lambda, on-prem H100 clusters).
+  INFINIBAND = 2;
+
+  // RDMA over Converged Ethernet (Azure ND-series, Oracle Cloud, on-prem Ethernet RDMA).
+  ROCE = 3;
+}
+
+// Controls how the JobSet responds to rank failures and host-maintenance evictions.
+message ClusterFailurePolicy {
+  // Maximum number of whole-cluster restarts before the JobSet is marked failed.
+  // Each restart increments JOBSET_RESTART_ATTEMPT and rotates the torchrun RDZV_ID.
+  int32 max_restarts = 1;
+
+  // If true, pods evicted due to host maintenance (DisruptionTarget condition)
+  // trigger a free restart that does not count against max_restarts.
+  bool restart_on_host_maintenance = 2;
+}

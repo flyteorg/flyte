@@ -252,6 +252,25 @@ func TestPlugin(t *testing.T) {
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
 	})
 
+	t.Run("test TaskExecution_RETRYABLE_FAILED Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_RETRYABLE_FAILED,
+			Outputs:  nil,
+			Message:  "transient",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
+		assert.Equal(t, "failed to run the job: transient", phase.Err().GetMessage())
+	})
+
 	// Verifies that when the connector plugin recorded an endpoint on the
 	// ResourceWrapper, Status surfaces it through TaskInfo.LogContext.Connector
 	// so downstream consumers (action events → dataproxy log streaming) can
@@ -352,5 +371,29 @@ func TestInitializeConnectorRegistry(t *testing.T) {
 
 	for _, key := range expectedKeys {
 		assert.Contains(t, connectorRegistryKeys, key)
+	}
+}
+
+func TestResourceWrapper_IsTerminal(t *testing.T) {
+	cases := []struct {
+		phase    flyteIdlCore.TaskExecution_Phase
+		terminal bool
+	}{
+		{flyteIdlCore.TaskExecution_UNDEFINED, false},
+		{flyteIdlCore.TaskExecution_QUEUED, false},
+		{flyteIdlCore.TaskExecution_RUNNING, false},
+		{flyteIdlCore.TaskExecution_SUCCEEDED, true},
+		{flyteIdlCore.TaskExecution_FAILED, true},
+		{flyteIdlCore.TaskExecution_RETRYABLE_FAILED, true},
+		{flyteIdlCore.TaskExecution_ABORTED, true},
+		{flyteIdlCore.TaskExecution_INITIALIZING, false},
+		{flyteIdlCore.TaskExecution_WAITING_FOR_RESOURCES, false},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.phase.String(), func(t *testing.T) {
+			r := ResourceWrapper{Phase: tc.phase}
+			assert.Equal(t, tc.terminal, r.IsTerminal())
+		})
 	}
 }
