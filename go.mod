@@ -22,7 +22,7 @@ require (
 	github.com/eko/gocache/store/redis/v4 v4.2.0
 	github.com/fatih/color v1.17.0
 	github.com/fergusstrange/embedded-postgres v1.34.0
-	github.com/flyteorg/stow v0.3.12
+	github.com/flyteorg/stow v0.3.13
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-test/deep v1.1.1
