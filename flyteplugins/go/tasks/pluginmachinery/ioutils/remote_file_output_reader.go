@@ -66,6 +66,12 @@ func (r RemoteFileOutputReader) ReadError(ctx context.Context) (io.ExecutionErro
 			Code:    errorDoc.Error.Code,
 			Message: errorDoc.Error.Message,
 			Kind:    errorDoc.Error.Origin,
+			// Propagate the container's recoverability so downstream services
+			// (e.g. a retry decision in the execution engine) can honor
+			// NonRecoverableError without re-reading error.pb. The Go-level
+			// IsRecoverable flag below is set in parallel for in-process
+			// callers; both must agree.
+			Recoverability: errorDoc.Error.Kind,
 		},
 	}
 

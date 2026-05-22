@@ -54,6 +54,7 @@ func (p *ConnectorService) SetSupportedTaskType(taskTypes []string) {
 }
 
 type RegistryKey struct {
+	project         string
 	domain          string
 	taskTypeName    string
 	taskTypeVersion int32
@@ -91,13 +92,14 @@ type ResourceWrapper struct {
 
 // IsTerminal is used to avoid making network calls to the connector service if the resource is already in a terminal state.
 func (r ResourceWrapper) IsTerminal() bool {
-	return r.Phase == flyteIdl.TaskExecution_SUCCEEDED || r.Phase == flyteIdl.TaskExecution_FAILED || r.Phase == flyteIdl.TaskExecution_ABORTED
+	return r.Phase == flyteIdl.TaskExecution_SUCCEEDED || r.Phase == flyteIdl.TaskExecution_FAILED || r.Phase == flyteIdl.TaskExecution_RETRYABLE_FAILED || r.Phase == flyteIdl.TaskExecution_ABORTED
 }
 
 type ResourceMetaWrapper struct {
 	OutputPrefix          string
 	ConnectorResourceMeta []byte
 	TaskCategory          *connectorPb.TaskCategory
+	Project               string
 	Domain                string
 	Connection            *flyteIdl.Connection
 }
@@ -152,13 +154,15 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
 	taskCategory := connectorPb.TaskCategory{Name: taskTemplate.GetType(), Version: taskTemplate.GetTaskTypeVersion()}
-	connector, err := p.getFinalConnector(&taskCategory, p.cfg, taskTemplate.GetId().GetDomain())
+	project := taskTemplate.GetId().GetProject()
+	domain := taskTemplate.GetId().GetDomain()
+	connector, err := p.getFinalConnector(&taskCategory, p.cfg, project, domain)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	connection := flyteIdl.Connection{}
-	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &connection)
+	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &connection) //nolint: staticcheck
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to unmarshal connection from task template custom: %v", err)
 	}
@@ -215,13 +219,14 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		ConnectorResourceMeta: res.GetResourceMeta(),
 		TaskCategory:          &taskCategory,
 		Connection:            &connection,
-		Domain:                taskTemplate.GetId().GetDomain(),
+		Project:               project,
+		Domain:                domain,
 	}, nil, nil
 }
 
 func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	connector, err := p.getFinalConnector(metadata.TaskCategory, p.cfg, metadata.Domain)
+	connector, err := p.getFinalConnector(metadata.TaskCategory, p.cfg, metadata.Project, metadata.Domain)
 	if err != nil {
 		return nil, err
 	}
@@ -260,7 +265,7 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	connector, err := p.getFinalConnector(metadata.TaskCategory, p.cfg, metadata.Domain)
+	connector, err := p.getFinalConnector(metadata.TaskCategory, p.cfg, metadata.Project, metadata.Domain)
 	if err != nil {
 		return err
 	}
@@ -357,6 +362,8 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 		return core.PhaseInfoFailure(errorCode, "failed to run the job with aborted phase.", taskInfo), nil
 	case flyteIdl.TaskExecution_FAILED:
 		return core.PhaseInfoFailure(errorCode, fmt.Sprintf("failed to run the job: %s", resource.Message), taskInfo), nil
+	case flyteIdl.TaskExecution_RETRYABLE_FAILED:
+		return core.PhaseInfoRetryableFailure(errorCode, fmt.Sprintf("failed to run the job: %s", resource.Message), taskInfo), nil
 	}
 	// The default phase is undefined.
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.Phase)
@@ -386,22 +393,32 @@ func (p *Plugin) watchConnectors(ctx context.Context, connectorService *Connecto
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
-func (p *Plugin) getFinalConnector(taskCategory *connectorPb.TaskCategory, cfg *Config, domain string) (*Connector, error) {
+func (p *Plugin) getFinalConnector(taskCategory *connectorPb.TaskCategory, cfg *Config, project, domain string) (*Connector, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
-	registryKey := RegistryKey{domain: domain, taskTypeName: taskCategory.GetName(), taskTypeVersion: taskCategory.GetVersion()}
-	if connector, exists := p.registry[registryKey]; exists {
-		return connector, nil
-	}
-	logger.Debugf(context.Background(), "No connector found for task type [%s] and version [%d] in domain [%s].", taskCategory.GetName(), taskCategory.GetVersion(), domain)
+	taskTypeName := taskCategory.GetName()
+	taskTypeVersion := taskCategory.GetVersion()
 
-	// Use the connector that supports across all domains.
-	registryKey = RegistryKey{domain: "", taskTypeName: taskCategory.GetName(), taskTypeVersion: taskCategory.GetVersion()}
+	registryKey := RegistryKey{project: project, domain: domain, taskTypeName: taskTypeName, taskTypeVersion: taskTypeVersion}
 	if connector, exists := p.registry[registryKey]; exists {
 		return connector, nil
 	}
-	logger.Debugf(context.Background(), "No connector found for task type [%s] and version [%d] in any domain.", taskCategory.GetName(), taskCategory.GetVersion())
+	logger.Debugf(context.Background(), "No connector found for task type [%s] and version [%d] in project [%s] domain [%s].", taskTypeName, taskTypeVersion, project, domain)
+
+	// Fall back to a connector registered for the domain across all projects.
+	registryKey = RegistryKey{project: "", domain: domain, taskTypeName: taskTypeName, taskTypeVersion: taskTypeVersion}
+	if connector, exists := p.registry[registryKey]; exists {
+		return connector, nil
+	}
+	logger.Debugf(context.Background(), "No connector found for task type [%s] and version [%d] in domain [%s].", taskTypeName, taskTypeVersion, domain)
+
+	// Fall back to a connector that supports across all projects and domains.
+	registryKey = RegistryKey{project: "", domain: "", taskTypeName: taskTypeName, taskTypeVersion: taskTypeVersion}
+	if connector, exists := p.registry[registryKey]; exists {
+		return connector, nil
+	}
+	logger.Debugf(context.Background(), "No connector found for task type [%s] and version [%d] in any project or domain.", taskTypeName, taskTypeVersion)
 
 	if len(cfg.DefaultConnector.Endpoint) != 0 {
 		return &Connector{

@@ -8,7 +8,7 @@
 CMD_PATH ?= cmd/main.go
 BIN_DIR ?= bin
 BIN_NAME ?= $(SERVICE_NAME)
-GOLANGCI_LINT_VERSION ?= v2.4.0
+GOLANGCI_LINT_VERSION ?= v2.6.2
 LOCALBIN ?= $(shell pwd)/bin
 
 # ANSI color codes for prettier output

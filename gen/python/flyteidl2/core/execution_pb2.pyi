@@ -175,14 +175,16 @@ class TaskLog(_message.Message):
     def __init__(self, uri: _Optional[str] = ..., name: _Optional[str] = ..., message_format: _Optional[_Union[TaskLog.MessageFormat, str]] = ..., ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., ShowWhilePending: bool = ..., HideOnceFinished: bool = ..., link_type: _Optional[_Union[TaskLog.LinkType, str]] = ..., ready: bool = ..., icon_uri: _Optional[str] = ...) -> None: ...
 
 class LogContext(_message.Message):
-    __slots__ = ["pods", "primary_pod_name", "connector"]
+    __slots__ = ["pods", "primary_pod_name", "connector", "pod_name_prefix"]
     PODS_FIELD_NUMBER: _ClassVar[int]
     PRIMARY_POD_NAME_FIELD_NUMBER: _ClassVar[int]
     CONNECTOR_FIELD_NUMBER: _ClassVar[int]
+    POD_NAME_PREFIX_FIELD_NUMBER: _ClassVar[int]
     pods: _containers.RepeatedCompositeFieldContainer[PodLogContext]
     primary_pod_name: str
     connector: ConnectorLogContext
-    def __init__(self, pods: _Optional[_Iterable[_Union[PodLogContext, _Mapping]]] = ..., primary_pod_name: _Optional[str] = ..., connector: _Optional[_Union[ConnectorLogContext, _Mapping]] = ...) -> None: ...
+    pod_name_prefix: str
+    def __init__(self, pods: _Optional[_Iterable[_Union[PodLogContext, _Mapping]]] = ..., primary_pod_name: _Optional[str] = ..., connector: _Optional[_Union[ConnectorLogContext, _Mapping]] = ..., pod_name_prefix: _Optional[str] = ...) -> None: ...
 
 class ConnectorLogContext(_message.Message):
     __slots__ = ["endpoint"]

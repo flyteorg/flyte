@@ -41,7 +41,7 @@ type viperAccessor struct {
 	rootConfig config.Section
 	// Ensures we initialize the file Watcher once.
 	watcherInitializer *sync.Once
-	existingFlagKeys   sets.String
+	existingFlagKeys   sets.String //nolint: staticcheck
 }
 
 func (viperAccessor) ID() string {
@@ -235,7 +235,7 @@ func stringToByteArray(f, t reflect.Type, data interface{}) (interface{}, error)
 // object. Otherwise, it'll just pass on the original data.
 func jsonUnmarshallerHook(_, to reflect.Type, data interface{}) (interface{}, error) {
 	unmarshalerType := reflect.TypeOf((*json.Unmarshaler)(nil)).Elem()
-	if to.Implements(unmarshalerType) || reflect.PtrTo(to).Implements(unmarshalerType) ||
+	if to.Implements(unmarshalerType) || reflect.PointerTo(to).Implements(unmarshalerType) ||
 		(canGetElement(to.Kind()) && to.Elem().Implements(unmarshalerType)) {
 
 		ctx := context.Background()
