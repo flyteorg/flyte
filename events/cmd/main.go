@@ -4,9 +4,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/events"
 	eventsconfig "github.com/flyteorg/flyte/v2/events/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 )
 
 func main() {

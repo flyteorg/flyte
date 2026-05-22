@@ -126,7 +126,7 @@ func (r *projectRepo) ListProjects(ctx context.Context, input interfaces.ListRes
 	if input.Offset > 0 {
 		queryBuilder.WriteString(fmt.Sprintf(" OFFSET $%d", argIdx))
 		args = append(args, input.Offset)
-		argIdx++
+		argIdx++ //nolint: ineffassign
 	}
 
 	var projects []*models.Project

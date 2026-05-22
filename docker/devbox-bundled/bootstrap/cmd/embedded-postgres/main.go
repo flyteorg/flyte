@@ -108,7 +108,7 @@ func enableRemoteConnections() error {
 	if err != nil {
 		return fmt.Errorf("failed to open pg_hba.conf: %w", err)
 	}
-	defer f.Close()
+	defer f.Close() //nolint: errcheck
 	if _, err := f.WriteString("\n# Allow all hosts (sandbox environment)\nhost all all 0.0.0.0/0 password\nhost all all ::/0 password\n"); err != nil {
 		return fmt.Errorf("failed to write pg_hba.conf: %w", err)
 	}
@@ -122,7 +122,7 @@ func enableRemoteConnections() error {
 	if err != nil {
 		return fmt.Errorf("failed to connect for reload: %w", err)
 	}
-	defer conn.Close()
+	defer conn.Close() //nolint: errcheck
 	if _, err := conn.Exec("SELECT pg_reload_conf()"); err != nil {
 		return fmt.Errorf("failed to reload config: %w", err)
 	}
@@ -139,7 +139,7 @@ func createDatabases() error {
 	if err != nil {
 		return fmt.Errorf("failed to connect to postgres: %w", err)
 	}
-	defer conn.Close()
+	defer conn.Close() //nolint: errcheck
 
 	for _, dbName := range []string{"flyte", "runs"} {
 		var exists bool

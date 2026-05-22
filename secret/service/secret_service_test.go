@@ -123,13 +123,13 @@ func TestSecretService_List_FiltersByScope(t *testing.T) {
 
 	// Write one secret at each scope.
 	secrets := []*secretpb.SecretIdentifier{
-		{Name: "g"},                                           // global
-		{Domain: "d", Name: "dd"},                             // domain
-		{Domain: "d", Project: "p", Name: "pp"},               // project+domain
+		{Name: "g"},                             // global
+		{Domain: "d", Name: "dd"},               // domain
+		{Domain: "d", Project: "p", Name: "pp"}, // project+domain
 	}
 	for _, id := range secrets {
 		_, err := s.CreateSecret(ctx, connect.NewRequest(&secretpb.CreateSecretRequest{
-			Id: id,
+			Id:         id,
 			SecretSpec: &secretpb.SecretSpec{Value: &secretpb.SecretSpec_BinaryValue{BinaryValue: []byte("v")}},
 		}))
 		require.NoError(t, err)

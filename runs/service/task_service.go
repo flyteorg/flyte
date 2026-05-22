@@ -10,7 +10,6 @@ import (
 	commonpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
-	flyteTask "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
@@ -18,7 +17,6 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"github.com/flyteorg/flyte/v2/runs/repository/transformers"
 )
-
 
 type taskService struct {
 	taskconnect.UnimplementedTaskServiceHandler
@@ -32,7 +30,6 @@ func NewTaskService(repo interfaces.Repository, projectClient projectconnect.Pro
 		projectClient: projectClient,
 	}
 }
-
 
 func (s *taskService) DeployTask(ctx context.Context, c *connect.Request[task.DeployTaskRequest]) (*connect.Response[task.DeployTaskResponse], error) {
 	request := c.Msg
@@ -135,7 +132,7 @@ func (s *taskService) GetTaskDetails(ctx context.Context, c *connect.Request[tas
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	return connect.NewResponse(&flyteTask.GetTaskDetailsResponse{
+	return connect.NewResponse(&task.GetTaskDetailsResponse{
 		Details: tasks[0],
 	}), nil
 }

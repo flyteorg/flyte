@@ -85,7 +85,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	rayJob := plugins.RayJob{}
-	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &rayJob)
+	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &rayJob) //nolint: staticcheck
 	if err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 	}
@@ -241,8 +241,8 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 	var runtimeEnvYaml string
 	runtimeEnvYaml = rayJob.RuntimeEnvYaml
 	// If runtime_env exists but runtime_env_yaml does not, convert runtime_env to runtime_env_yaml
-	if rayJob.RuntimeEnv != "" && rayJob.RuntimeEnvYaml == "" {
-		runtimeEnvYaml, err = convertBase64RuntimeEnvToYaml(rayJob.RuntimeEnv)
+	if rayJob.RuntimeEnv != "" && rayJob.RuntimeEnvYaml == "" { //nolint: staticcheck
+		runtimeEnvYaml, err = convertBase64RuntimeEnvToYaml(rayJob.RuntimeEnv) //nolint: staticcheck
 		if err != nil {
 			return nil, err
 		}
@@ -562,7 +562,7 @@ func mergeCustomPodSpec(podSpec *v1.PodSpec, k8sPod *core.K8SPod) (*v1.PodSpec, 
 
 	var customPodSpec *v1.PodSpec
 
-	err := utils.UnmarshalStructToObj(k8sPod.PodSpec, &customPodSpec)
+	err := utils.UnmarshalStructToObj(k8sPod.PodSpec, &customPodSpec) //nolint: staticcheck
 	if err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification,
 			"Unable to unmarshal pod spec [%v], Err: [%v]", k8sPod.PodSpec, err.Error())
