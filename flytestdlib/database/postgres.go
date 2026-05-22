@@ -9,7 +9,6 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
-	oldPgConn "github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
 
@@ -147,20 +146,9 @@ func CreatePostgresReadOnlyDbConnection(ctx context.Context, pgConfig PostgresCo
 }
 
 func IsPgErrorWithCode(err error, code string) bool {
-	// Newer versions of the gorm postgres driver seem to use
-	// "github.com/jackc/pgx/v5/pgconn"
-	// See https://github.com/go-gorm/gorm/issues/4135
-	// Let's just try both of them to make sure.
 	pgErr := &pgconn.PgError{}
 	if errors.As(err, &pgErr) {
-		// err chain does not contain a pgconn.PgError
 		return pgErr.Code == code
-	}
-
-	oldPgErr := &oldPgConn.PgError{}
-	if errors.As(err, &oldPgErr) {
-		// err chain does not contain a pgconn.PgError
-		return oldPgErr.Code == code
 	}
 
 	return false
