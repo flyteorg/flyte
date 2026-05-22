@@ -15,7 +15,7 @@ A Helm chart for Flyte connector
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
 | configPath | string | `"/etc/flyteconnector/config/*.yaml"` | Default regex string for searching configuration files |
-| connectorSecret.secretData | object | `{}` | Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). |
+| connectorSecret.secretData | object | `{}` | Optional Secret manifest fragment to merge into the generated Secret, for example `stringData:` or `data:`. |
 | extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
@@ -29,7 +29,7 @@ A Helm chart for Flyte connector
 | podSecurityContext | object | `{}` |  |
 | ports.containerPort | int | `8000` |  |
 | ports.name | string | `"connector-grpc"` |  |
-| priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
+| priorityClassName | string | `""` | Sets priorityClassName for flyteconnector pod(s). |
 | rbac | object | `{"enabled":false,"rules":[{"apiGroups":[""],"resources":["secrets"],"verbs":["get"]}]}` | RBAC configuration for flyteconnector Enable to allow the connector to read secrets across namespaces (required for per-project Databricks token authentication) |
 | rbac.enabled | bool | `false` | Should RBAC resources (ClusterRole/ClusterRoleBinding) be created for flyteconnector |
 | rbac.rules | list | `[{"apiGroups":[""],"resources":["secrets"],"verbs":["get"]}]` | Rules for the ClusterRole created for flyteconnector |

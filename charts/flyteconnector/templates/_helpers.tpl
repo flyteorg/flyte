@@ -38,16 +38,16 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 # Optional blocks for secret mount
 
 {{- define "connectorSecret.volume" -}}
-- name: {{ include "flyte.name" . }}
+{{- with .Values.connectorSecret.secretData }}
+- name: {{ include "flyte.name" $ }}
   secret:
-    secretName: {{ include "flyte.name" . }}
+    secretName: {{ include "flyte.name" $ }}
+{{- end }}
 {{- end }}
 
 {{- define "connectorSecret.volumeMount" -}}
+{{- with .Values.connectorSecret.secretData }}
 - mountPath: /etc/secrets
-  name: {{ include "flyte.name" . }}
+  name: {{ include "flyte.name" $ }}
 {{- end }}
-
-{{- define "flyteconnector.servicePort" -}}
-{{ include .Values.ports.containerPort}}
 {{- end }}

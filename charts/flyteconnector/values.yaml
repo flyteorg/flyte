@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------
-# FLYTE_CONNCETOR SETTINGS
+# FLYTE_CONNECTOR SETTINGS
 # ---------------------------------------------------------------------
 
 # nameOverride String to override flyteconnector.name template
@@ -12,7 +12,7 @@ commonLabels: {}
 commonAnnotations: {}
 
 connectorSecret:
-  # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data).
+  # -- Optional Secret manifest fragment to merge into the generated Secret, for example `stringData:` or `data:`.
   secretData: {}
 
 # -- Replicas count for flyteconnector deployment
@@ -98,5 +98,5 @@ additionalVolumeMounts: []
 additionalContainers: []
 # -- Appends extra command line arguments to the main command
 extraArgs: {}
-# -- Sets priorityClassName for datacatalog pod(s).
+# -- Sets priorityClassName for flyteconnector pod(s).
 priorityClassName: ""
