@@ -140,12 +140,16 @@ class GetActionLogContextRequest(_message.Message):
     def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ...) -> None: ...
 
 class GetActionLogContextResponse(_message.Message):
-    __slots__ = ["log_context", "cluster"]
+    __slots__ = ["log_context", "cluster", "start_time", "end_time"]
     LOG_CONTEXT_FIELD_NUMBER: _ClassVar[int]
     CLUSTER_FIELD_NUMBER: _ClassVar[int]
+    START_TIME_FIELD_NUMBER: _ClassVar[int]
+    END_TIME_FIELD_NUMBER: _ClassVar[int]
     log_context: _execution_pb2.LogContext
     cluster: str
-    def __init__(self, log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ..., cluster: _Optional[str] = ...) -> None: ...
+    start_time: _timestamp_pb2.Timestamp
+    end_time: _timestamp_pb2.Timestamp
+    def __init__(self, log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ..., cluster: _Optional[str] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class ListRunsRequest(_message.Message):
     __slots__ = ["request", "org", "project_id", "trigger_name", "task_name", "task_id"]
