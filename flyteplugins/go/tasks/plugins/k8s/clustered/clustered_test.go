@@ -403,6 +403,52 @@ func TestGetTaskPhase_Running(t *testing.T) {
 	assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
 }
 
+// --- fast-fail / maintenance tests ---
+
+func TestGetTaskPhase_FastFail_NoJobsFailed(t *testing.T) {
+	// When no jobs have failed in ReplicatedJobsStatus, the fast-fail path is not taken.
+	js := makeJobSet("", "", false)
+	// Explicitly set workers status with Failed=0.
+	js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
+		{Name: "workers", Failed: 0, Active: 2},
+	}
+	// Add an active condition so the switch falls through to running.
+	js.Status.Conditions = []metav1.Condition{
+		{
+			Type:               "SomeActiveCondition",
+			Status:             metav1.ConditionTrue,
+			LastTransitionTime: metav1.NewTime(time.Now()),
+		},
+	}
+
+	spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec))
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	// No pod inspection happens — returns Running.
+	assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+}
+
+func TestGetTaskPhase_MaintenanceRetry_FlagFalse(t *testing.T) {
+	// With RestartOnHostMaintenance=false (default), JobSetFailed always becomes RetryableFailure.
+	js := makeJobSet(jobsetv1alpha2.JobSetFailed, metav1.ConditionTrue, false)
+
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:      2,
+		NprocPerNode:  1,
+		FailurePolicy: &clusteredpb.ClusterFailurePolicy{RestartOnHostMaintenance: false},
+	}
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec))
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	// Flag is false → no pod lookup → normal retryable failure.
+	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
+}
+
 // --- IsTerminal / GetCompletionTime ---
 
 func TestIsTerminal(t *testing.T) {
