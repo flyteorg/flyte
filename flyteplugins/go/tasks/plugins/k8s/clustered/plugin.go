@@ -32,7 +32,8 @@ func (clusteredResourceHandler) IsTerminal(_ context.Context, resource client.Ob
 	}
 	for _, cond := range jobSet.Status.Conditions {
 		t := jobsetv1alpha2.JobSetConditionType(cond.Type)
-		if t == jobsetv1alpha2.JobSetCompleted || t == jobsetv1alpha2.JobSetFailed {
+		if (t == jobsetv1alpha2.JobSetCompleted || t == jobsetv1alpha2.JobSetFailed) &&
+			cond.Status == metav1.ConditionTrue {
 			return true, nil
 		}
 	}
@@ -46,7 +47,8 @@ func (clusteredResourceHandler) GetCompletionTime(resource client.Object) (time.
 	}
 	for _, cond := range jobSet.Status.Conditions {
 		t := jobsetv1alpha2.JobSetConditionType(cond.Type)
-		if t == jobsetv1alpha2.JobSetCompleted || t == jobsetv1alpha2.JobSetFailed {
+		if (t == jobsetv1alpha2.JobSetCompleted || t == jobsetv1alpha2.JobSetFailed) &&
+			cond.Status == metav1.ConditionTrue {
 			if !cond.LastTransitionTime.IsZero() {
 				return cond.LastTransitionTime.Time, nil
 			}

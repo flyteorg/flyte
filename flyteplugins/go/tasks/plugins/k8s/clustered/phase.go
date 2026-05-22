@@ -21,7 +21,7 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("unexpected resource type %T", resource)
 	}
 
-	taskLogs, err := getTaskLogs(pluginContext, jobSet)
+	taskLogs, err := getTaskLogs(ctx, pluginContext, jobSet)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}

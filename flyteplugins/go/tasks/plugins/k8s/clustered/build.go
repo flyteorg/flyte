@@ -2,6 +2,7 @@ package clustered
 
 import (
 	"context"
+	"math"
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -28,6 +29,13 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	var spec clusteredpb.ClusteredTaskSpec
 	if err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &spec); err != nil { //nolint:staticcheck
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid ClusteredTaskSpec: %v", err)
+	}
+
+	if spec.GetReplicas() < 1 {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "replicas must be >= 1, got %d", spec.GetReplicas())
+	}
+	if spec.GetNprocPerNode() < 1 {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nproc_per_node must be >= 1, got %d", spec.GetNprocPerNode())
 	}
 
 	podSpec, objectMeta, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
@@ -119,7 +127,11 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	}
 
 	if ttl := spec.GetTtlSecondsAfterFinished(); ttl != nil {
-		ttlVal := int32(ttl.GetValue())
+		v := ttl.GetValue()
+		if v > math.MaxInt32 {
+			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "ttl_seconds_after_finished %d exceeds maximum allowed value", v)
+		}
+		ttlVal := int32(v)
 		jobSet.Spec.TTLSecondsAfterFinished = &ttlVal
 	}
 

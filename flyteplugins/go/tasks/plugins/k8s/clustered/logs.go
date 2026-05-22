@@ -1,6 +1,7 @@
 package clustered
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -14,8 +15,8 @@ import (
 
 // getTaskLogs synthesizes per-rank log URLs.
 // Pod name pattern: <jobsetName>-workers-0-<podIdx>
-func getTaskLogs(pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet) ([]*core.TaskLog, error) {
-	taskTemplate, err := pluginContext.TaskReader().Read(nil)
+func getTaskLogs(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet) ([]*core.TaskLog, error) {
+	taskTemplate, err := pluginContext.TaskReader().Read(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +58,7 @@ func getTaskLogs(pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet)
 			PodUnixFinishTime:    finishTime,
 			TaskExecutionID:      taskExecID,
 			TaskTemplate:         taskTemplate,
-			ContainerName:        "primary",
+			ContainerName:        pluginContext.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
 		})
 		if err != nil {
 			return nil, err
