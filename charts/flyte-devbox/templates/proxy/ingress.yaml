@@ -64,12 +64,30 @@ spec:
   rules:
     - http:
         paths:
-          - path: /
+          - path: /rustfs/console
             pathType: Prefix
             backend:
               service:
                 name: rustfs-svc
                 port:
                   number: 9001
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rustfs-s3
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-devbox.labels" . | nindent 4 }}
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rustfs-svc
+                port:
+                  number: 9000
 {{- end }}
 ---
