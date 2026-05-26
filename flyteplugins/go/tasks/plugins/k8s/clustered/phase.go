@@ -14,6 +14,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	clusteredpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -28,7 +29,9 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 	// Read spec for failure-policy flags (restart_on_host_maintenance).
 	var spec clusteredpb.ClusteredTaskSpec
 	if taskTemplate, err := pluginContext.TaskReader().Read(ctx); err == nil && taskTemplate != nil {
-		_ = utils.UnmarshalStruct(taskTemplate.GetCustom(), &spec) //nolint:staticcheck
+		if err := utils.UnmarshalStruct(taskTemplate.GetCustom(), &spec); err != nil { //nolint:staticcheck
+			logger.Warningf(ctx, "failed to unmarshal ClusteredTaskSpec: %v", err)
+		}
 	}
 
 	taskLogs, err := getTaskLogs(ctx, pluginContext, jobSet)
