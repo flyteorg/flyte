@@ -5,6 +5,7 @@ linters:
   default: none
   enable:
     - copyloopvar
+    - depguard
     - dupl
     - errcheck
     - ginkgolinter
@@ -22,6 +23,12 @@ linters:
     - unparam
     - unused
   settings:
+    depguard:
+      rules:
+        no-h2c:
+          deny:
+            - pkg: golang.org/x/net/http2/h2c
+              desc: "deprecated: use net/http with http.Protocols.SetUnencryptedHTTP2(true)"
     revive:
       rules:
         - name: comment-spacings
