@@ -14,7 +14,14 @@ import (
 )
 
 // getTaskLogs synthesizes per-rank log URLs.
-// Pod name pattern: <jobsetName>-workers-0-<podIdx>
+//
+// JobSet pod-name pattern: <jobsetName>-<replicatedJob>-<jobIdx>-<podIdx>.
+// We declare a single ReplicatedJob named "workers" with Replicas=1, so jobIdx
+// is always 0; podIdx == JOB_COMPLETION_INDEX == NODE_RANK in [0, totalReplicas).
+//
+// The primary container name is recovered from the annotation written at
+// BuildResource time so we don't depend on TaskExecutionID equaling the
+// container name (which it isn't, in general).
 func getTaskLogs(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet) ([]*core.TaskLog, error) {
 	taskTemplate, err := pluginContext.TaskReader().Read(ctx)
 	if err != nil {
@@ -37,7 +44,7 @@ func getTaskLogs(ctx context.Context, pluginContext k8s.PluginContext, jobSet *j
 
 	var totalReplicas int32
 	for _, rj := range jobSet.Spec.ReplicatedJobs {
-		if rj.Name == "workers" {
+		if rj.Name == workersReplicatedJobName {
 			if rj.Template.Spec.Parallelism != nil {
 				totalReplicas = *rj.Template.Spec.Parallelism
 			}
@@ -45,9 +52,11 @@ func getTaskLogs(ctx context.Context, pluginContext k8s.PluginContext, jobSet *j
 		}
 	}
 
+	primaryContainerName := jobSet.Annotations[primaryContainerAnnotation]
+
 	taskLogs := make([]*core.TaskLog, 0, int(totalReplicas))
 	for podIdx := int32(0); podIdx < totalReplicas; podIdx++ {
-		podName := fmt.Sprintf("%s-workers-0-%d", jobSet.Name, podIdx)
+		podName := fmt.Sprintf("%s-%s-0-%d", jobSet.Name, workersReplicatedJobName, podIdx)
 		output, err := logPlugin.GetTaskLogs(tasklog.Input{
 			PodName:              podName,
 			Namespace:            jobSet.Namespace,
@@ -58,7 +67,7 @@ func getTaskLogs(ctx context.Context, pluginContext k8s.PluginContext, jobSet *j
 			PodUnixFinishTime:    finishTime,
 			TaskExecutionID:      taskExecID,
 			TaskTemplate:         taskTemplate,
-			ContainerName:        pluginContext.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
+			ContainerName:        primaryContainerName,
 		})
 		if err != nil {
 			return nil, err

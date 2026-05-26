@@ -45,7 +45,9 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 
 	podSpec = applyInterconnect(ctx, spec.GetInterconnect(), podSpec)
 
-	// Find the primary container and splice in the entrypoint + runtime env vars.
+	// The SDK is responsible for setting container.Command to the entrypoint module
+	// (python -m flyte.distributed._entrypoint) at serde time. The plugin stays
+	// module-path-agnostic so SDK renames do not require a backend release.
 	primaryIdx := -1
 	for i, c := range podSpec.Containers {
 		if c.Name == primaryContainerName {
@@ -58,11 +60,6 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	}
 
 	container := &podSpec.Containers[primaryIdx]
-
-	// Move original command + args into args-only (passed through to torchrun → a0).
-	originalArgs := append(container.Command, container.Args...)
-	container.Command = []string{"python", "-m", "flyte.distributed._entrypoint"}
-	container.Args = originalArgs
 
 	injectTorchRunEnv(container, &spec)
 
@@ -100,10 +97,11 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 			Name:      jobSetName,
 			Namespace: taskCtx.TaskExecutionMetadata().GetNamespace(),
 			Labels: map[string]string{
-				"flyte.org/execution": taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().GetNodeExecutionId().GetExecutionId().GetName(),
+				"flyte.org/execution": sanitizeLabelValue(taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().GetNodeExecutionId().GetExecutionId().GetName()),
 			},
 			Annotations: map[string]string{
-				"flyte.org/task-type": taskType,
+				"flyte.org/task-type":      taskType,
+				primaryContainerAnnotation: primaryContainerName,
 			},
 		},
 		Spec: jobsetv1alpha2.JobSetSpec{
@@ -116,7 +114,7 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 			FailurePolicy: failurePolicy,
 			ReplicatedJobs: []jobsetv1alpha2.ReplicatedJob{
 				{
-					Name:     "workers",
+					Name:     workersReplicatedJobName,
 					Replicas: replicatedJobReplicas,
 					Template: batchv1.JobTemplateSpec{
 						Spec: jobSpec,

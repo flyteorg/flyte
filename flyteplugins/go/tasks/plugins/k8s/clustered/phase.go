@@ -13,6 +13,7 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
@@ -27,7 +28,10 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 	}
 
 	occurredAt := time.Now()
-	statusDetails, _ := utils.MarshalObjToStruct(jobSet.Status) //nolint:staticcheck
+	statusDetails, err := utils.MarshalObjToStruct(jobSet.Status) //nolint:staticcheck
+	if err != nil {
+		logger.Warnf(ctx, "failed to marshal JobSet status for task info: %v", err)
+	}
 	taskInfo := pluginsCore.TaskInfo{
 		Logs:       taskLogs,
 		OccurredAt: &occurredAt,
