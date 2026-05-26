@@ -154,7 +154,11 @@ func TestBuildResource_HappyPath(t *testing.T) {
 	assert.Equal(t, int32(0), *jobSpec.BackoffLimit)
 }
 
-func TestBuildResource_EntrypointSplice(t *testing.T) {
+func TestBuildResource_PrimaryContainerPreserved(t *testing.T) {
+	// The plugin no longer rewrites container.Command — the SDK does that at
+	// serde time (design §3.2 / §3.8). Here we assert the plugin passes the
+	// TaskTemplate's container through unchanged and stamps the primary
+	// container name onto the JobSet via annotation for status-time recovery.
 	spec := &clusteredpb.ClusteredTaskSpec{
 		Replicas:     2,
 		NprocPerNode: 1,
@@ -175,11 +179,14 @@ func TestBuildResource_EntrypointSplice(t *testing.T) {
 	podSpec := jobSet.Spec.ReplicatedJobs[0].Template.Spec.Template.Spec
 
 	assert.NotEmpty(t, podSpec.Containers)
-	// The first (and only) container is the primary — check it was spliced.
 	primary := &podSpec.Containers[0]
-	assert.Equal(t, []string{"python", "-m", "flyte.distributed._entrypoint"}, primary.Command)
-	// Original command + args should be moved to args.
-	assert.Contains(t, primary.Args, "a0")
+
+	// Command + args from the TaskTemplate must reach the pod untouched.
+	assert.Equal(t, []string{"a0"}, primary.Command)
+	assert.Equal(t, []string{"a0", "--inputs", "s3://bucket/in"}, primary.Args)
+
+	// Primary container name must be retrievable from the JobSet at status time.
+	assert.Equal(t, primary.Name, jobSet.Annotations[primaryContainerAnnotation])
 }
 
 // --- injectTorchRunEnv tests ---
