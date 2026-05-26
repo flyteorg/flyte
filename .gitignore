@@ -40,6 +40,8 @@ docs/_src
 docs/_projects
 docs/tests
 empty-config.yaml
+.kube/
+charts/
 
 **/rust/target
 **/rust/Cargo.lock
@@ -48,3 +50,4 @@ empty-config.yaml
 **/flyteidl2.egg-info
 node_modules
 .claude/
+superpowers/
