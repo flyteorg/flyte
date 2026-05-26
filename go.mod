@@ -83,6 +83,7 @@ require (
 	knative.dev/pkg v0.0.0-20240116073220-b488e7be5902
 	knative.dev/serving v0.40.2
 	sigs.k8s.io/controller-runtime v0.22.4
+	sigs.k8s.io/jobset v0.5.2
 )
 
 require (
