@@ -2,13 +2,12 @@ package secrets
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/golang/protobuf/proto" //nolint: staticcheck
-
-	"strconv"
-	"strings"
+	"google.golang.org/protobuf/encoding/prototext"
 )
 
 const (
@@ -36,7 +35,7 @@ func decodeSecret(encoded string) (string, error) {
 }
 
 func marshalSecret(s *core.Secret) string {
-	return encodeSecret(proto.MarshalTextString(s))
+	return encodeSecret(prototext.MarshalOptions{Multiline: false}.Format(s))
 }
 
 func unmarshalSecret(encoded string) (*core.Secret, error) {
@@ -46,7 +45,7 @@ func unmarshalSecret(encoded string) (*core.Secret, error) {
 	}
 
 	s := &core.Secret{}
-	err = proto.UnmarshalText(decoded, s)
+	err = prototext.Unmarshal([]byte(decoded), s)
 	return s, err
 }
 

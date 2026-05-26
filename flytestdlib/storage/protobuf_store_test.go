@@ -9,42 +9,15 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
 	errs "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/stow/s3"
 )
-
-type mockProtoMessage struct {
-	X int64 `protobuf:"varint,2,opt,name=x,json=x,proto3" json:"x,omitempty"`
-}
-
-type mockBigDataProtoMessage struct {
-	X []byte `protobuf:"bytes,1,opt,name=X,proto3" json:"X,omitempty"`
-}
-
-func (mockProtoMessage) Reset() {
-}
-
-func (m mockProtoMessage) String() string {
-	return proto.CompactTextString(m)
-}
-
-func (mockProtoMessage) ProtoMessage() {
-}
-
-func (mockBigDataProtoMessage) Reset() {
-}
-
-func (m mockBigDataProtoMessage) String() string {
-	return proto.CompactTextString(m)
-}
-
-func (mockBigDataProtoMessage) ProtoMessage() {
-}
 
 func TestDefaultProtobufStore(t *testing.T) {
 	t.Run("Read after Write", func(t *testing.T) {
@@ -52,13 +25,13 @@ func TestDefaultProtobufStore(t *testing.T) {
 		s, err := NewDataStore(&Config{Type: TypeMemory}, testScope)
 		assert.NoError(t, err)
 
-		err = s.WriteProtobuf(context.TODO(), "hello", Options{}, &mockProtoMessage{X: 5})
+		err = s.WriteProtobuf(context.TODO(), "hello", Options{}, wrapperspb.Int64(5))
 		assert.NoError(t, err)
 
-		m := &mockProtoMessage{}
+		m := &wrapperspb.Int64Value{}
 		err = s.ReadProtobuf(context.TODO(), "hello", m)
 		assert.NoError(t, err)
-		assert.Equal(t, int64(5), m.X)
+		assert.Equal(t, int64(5), m.Value)
 	})
 
 	t.Run("RefreshConfig", func(t *testing.T) {
@@ -108,6 +81,33 @@ func TestDefaultProtobufStore(t *testing.T) {
 	})
 }
 
+func TestDefaultProtobufStore_EmptyLiteralMap(t *testing.T) {
+	testScope := promutils.NewTestScope()
+	s, err := NewDataStore(&Config{Type: TypeMemory}, testScope)
+	require.NoError(t, err)
+
+	ref := DataReference("empty-literal-map")
+	require.NoError(t, s.WriteProtobuf(context.TODO(), ref, Options{}, &core.LiteralMap{}))
+
+	raw, err := s.ReadRaw(context.TODO(), ref)
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, raw.Close())
+	}()
+
+	rawBytes, err := io.ReadAll(raw)
+	require.NoError(t, err)
+	assert.Empty(t, rawBytes)
+
+	got := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"stale": {},
+		},
+	}
+	require.NoError(t, s.ReadProtobuf(context.TODO(), ref, got))
+	assert.Empty(t, got.GetLiterals())
+}
+
 func TestDefaultProtobufStore_BigDataReadAfterWrite(t *testing.T) {
 	t.Run("Read after Write with Big Data", func(t *testing.T) {
 		testScope := promutils.NewTestScope()
@@ -127,15 +127,15 @@ func TestDefaultProtobufStore_BigDataReadAfterWrite(t *testing.T) {
 		_, err = rand.Read(bigD)
 		assert.NoError(t, err)
 
-		mockMessage := &mockBigDataProtoMessage{X: bigD}
+		mockMessage := wrapperspb.Bytes(bigD)
 
 		err = s.WriteProtobuf(context.TODO(), DataReference("bigK"), Options{}, mockMessage)
 		assert.NoError(t, err)
 
-		m := &mockBigDataProtoMessage{}
+		m := &wrapperspb.BytesValue{}
 		err = s.ReadProtobuf(context.TODO(), DataReference("bigK"), m)
 		assert.NoError(t, err)
-		assert.Equal(t, bigD, m.X)
+		assert.Equal(t, bigD, m.Value)
 
 	})
 }
@@ -159,13 +159,13 @@ func TestDefaultProtobufStore_HardErrors(t *testing.T) {
 	}
 	pbErroneousStore := NewDefaultProtobufStoreWithMetrics(store, metrics.protoMetrics)
 	t.Run("Test if hard write errors are handled correctly", func(t *testing.T) {
-		err := pbErroneousStore.WriteProtobuf(ctx, k1, Options{}, &mockProtoMessage{X: 5})
+		err := pbErroneousStore.WriteProtobuf(ctx, k1, Options{}, wrapperspb.Int64(5))
 		assert.False(t, IsFailedWriteToCache(err))
 		assert.Equal(t, dummyWriteErrorMsg, errs.Cause(err).Error())
 	})
 
 	t.Run("Test if hard read errors are handled correctly", func(t *testing.T) {
-		m := &mockProtoMessage{}
+		m := &wrapperspb.Int64Value{}
 		err := pbErroneousStore.ReadProtobuf(ctx, k1, m)
 		assert.False(t, IsFailedWriteToCache(err))
 		assert.Equal(t, dummyReadErrorMsg, errs.Cause(err).Error())

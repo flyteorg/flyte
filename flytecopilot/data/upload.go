@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"reflect"
 
-	"github.com/golang/protobuf/proto" //nolint: staticcheck
 	"github.com/pkg/errors"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/flyteidl2/clients/go/coreutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/futures"

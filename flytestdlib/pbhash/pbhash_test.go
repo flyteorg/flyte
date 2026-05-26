@@ -5,74 +5,41 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/duration"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-// Mock a Protobuf generated GO object
-type mockProtoMessage struct {
-	Integer     int64                `protobuf:"varint,1,opt,name=integer,proto3" json:"integer,omitempty"`
-	FloatValue  float64              `protobuf:"fixed64,2,opt,name=float_value,json=floatValue,proto3" json:"float_value,omitempty"`
-	StringValue string               `protobuf:"bytes,3,opt,name=string_value,json=stringValue,proto3" json:"string_value,omitempty"`
-	Boolean     bool                 `protobuf:"varint,4,opt,name=boolean,proto3" json:"boolean,omitempty"`
-	Datetime    *timestamp.Timestamp `protobuf:"bytes,5,opt,name=datetime,proto3" json:"datetime,omitempty"`
-	Duration    *duration.Duration   `protobuf:"bytes,6,opt,name=duration,proto3" json:"duration,omitempty"`
-	MapValue    map[string]string    `protobuf:"bytes,7,rep,name=map_value,json=mapValue,proto3" json:"map_value,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Collections []string             `protobuf:"bytes,8,rep,name=collections,proto3" json:"collections,omitempty"`
-}
+var sampleTime = timestamppb.New(time.Date(2019, 03, 29, 12, 0, 0, 0, time.UTC))
 
-func (mockProtoMessage) Reset() {
-}
+func makeStruct(t *testing.T, fields map[string]interface{}) *structpb.Struct {
+	t.Helper()
 
-func (m mockProtoMessage) String() string {
-	return proto.CompactTextString(m)
+	s, err := structpb.NewStruct(fields)
+	require.NoError(t, err)
+	return s
 }
-
-func (mockProtoMessage) ProtoMessage() {
-}
-
-// Mock an older version of the above pb object that doesn't have some fields
-type mockOlderProto struct {
-	Integer     int64   `protobuf:"varint,1,opt,name=integer,proto3" json:"integer,omitempty"`
-	FloatValue  float64 `protobuf:"fixed64,2,opt,name=float_value,json=floatValue,proto3" json:"float_value,omitempty"`
-	StringValue string  `protobuf:"bytes,3,opt,name=string_value,json=stringValue,proto3" json:"string_value,omitempty"`
-	Boolean     bool    `protobuf:"varint,4,opt,name=boolean,proto3" json:"boolean,omitempty"`
-}
-
-func (mockOlderProto) Reset() {
-}
-
-func (m mockOlderProto) String() string {
-	return proto.CompactTextString(m)
-}
-
-func (mockOlderProto) ProtoMessage() {
-}
-
-var sampleTime, _ = ptypes.TimestampProto(
-	time.Date(2019, 03, 29, 12, 0, 0, 0, time.UTC))
 
 func TestProtoHash(t *testing.T) {
-	mockProto := &mockProtoMessage{
-		Integer:     18,
-		FloatValue:  1.3,
-		StringValue: "lets test this",
-		Boolean:     true,
-		Datetime:    sampleTime,
-		Duration:    ptypes.DurationProto(time.Millisecond),
-		MapValue: map[string]string{
+	mockProto := makeStruct(t, map[string]interface{}{
+		"integer":     18,
+		"floatValue":  1.3,
+		"stringValue": "lets test this",
+		"boolean":     true,
+		"datetime":    sampleTime.AsTime().Format(time.RFC3339Nano),
+		"duration":    durationpb.New(time.Millisecond).AsDuration().String(),
+		"mapValue": map[string]interface{}{
 			"z": "last",
 			"a": "first",
 		},
-		Collections: []string{"1", "2", "3"},
-	}
+		"collections": []interface{}{"1", "2", "3"},
+	})
 
-	expectedHashedMockProto := []byte{0x62, 0x95, 0xb2, 0x2c, 0x23, 0xf5, 0x35, 0x6d, 0x3, 0x56, 0x4d, 0xc7, 0x8f, 0xae,
-		0x2d, 0x2b, 0xbd, 0x7, 0xff, 0xdb, 0x7e, 0xe5, 0xf4, 0x25, 0x8f, 0xbc, 0xb2, 0xc, 0xad, 0xa5, 0x48, 0x44}
-	expectedHashString := "YpWyLCP1NW0DVk3Hj64tK70H/9t+5fQlj7yyDK2lSEQ="
+	expectedHashedMockProto := []byte{0x45, 0xd1, 0xe, 0x9, 0x5e, 0xe3, 0xf7, 0x3e, 0xe9, 0x9, 0xe9, 0xc9, 0x27, 0xd6,
+		0xf5, 0x79, 0x81, 0xf6, 0x52, 0x48, 0x3f, 0x71, 0x8c, 0x2, 0x87, 0x1, 0x98, 0x58, 0x5b, 0x7e, 0xf, 0xda}
+	expectedHashString := "RdEOCV7j9z7pCenJJ9b1eYH2Ukg/cYwChwGYWFt+D9o="
 
 	t.Run("TestFullProtoHash", func(t *testing.T) {
 		hashedBytes, err := ComputeHash(context.Background(), mockProto)
@@ -86,7 +53,10 @@ func TestProtoHash(t *testing.T) {
 	})
 
 	t.Run("TestFullProtoHashReorderKeys", func(t *testing.T) {
-		mockProto.MapValue = map[string]string{"a": "first", "z": "last"}
+		mockProto.Fields["mapValue"] = structpb.NewStructValue(makeStruct(t, map[string]interface{}{
+			"a": "first",
+			"z": "last",
+		}))
 		hashedBytes, err := ComputeHash(context.Background(), mockProto)
 		assert.Nil(t, err)
 		assert.Equal(t, expectedHashedMockProto, hashedBytes)
@@ -100,18 +70,18 @@ func TestProtoHash(t *testing.T) {
 
 func TestPartialFilledProtoHash(t *testing.T) {
 
-	mockProtoOmitEmpty := &mockProtoMessage{
-		Integer:     18,
-		FloatValue:  1.3,
-		StringValue: "lets test this",
-		Boolean:     true,
-	}
+	mockProtoOmitEmpty := makeStruct(t, map[string]interface{}{
+		"integer":     18,
+		"floatValue":  1.3,
+		"stringValue": "lets test this",
+		"boolean":     true,
+	})
 
-	expectedHashedMockProtoOmitEmpty := []byte{0x1a, 0x13, 0xcc, 0x4c, 0xab, 0xc9, 0x7d, 0x43, 0xc7, 0x2b, 0xc5, 0x37,
-		0xbc, 0x49, 0xa8, 0x8b, 0xfc, 0x1d, 0x54, 0x1c, 0x7b, 0x21, 0x04, 0x8f, 0xab, 0x28, 0xc6, 0x5c, 0x06, 0x73,
-		0xaa, 0xe2}
+	expectedHashedMockProtoOmitEmpty := []byte{0x6d, 0xfa, 0xc1, 0xc2, 0xe0, 0xee, 0xad, 0xe2, 0xa5, 0xad, 0x7d, 0x9e,
+		0xad, 0x1c, 0x94, 0x11, 0x6a, 0x21, 0x23, 0xe1, 0xfb, 0xe2, 0x35, 0xd5, 0x37, 0x89, 0xf3, 0xfc, 0xa, 0xfb,
+		0x3d, 0xe9}
 
-	expectedHashStringOmitEmpty := "GhPMTKvJfUPHK8U3vEmoi/wdVBx7IQSPqyjGXAZzquI="
+	expectedHashStringOmitEmpty := "bfrBwuDureKlrX2erRyUEWohI+H74jXVN4nz/Ar7Pek="
 
 	t.Run("TestPartial", func(t *testing.T) {
 		hashedBytes, err := ComputeHash(context.Background(), mockProtoOmitEmpty)
@@ -124,12 +94,12 @@ func TestPartialFilledProtoHash(t *testing.T) {
 		assert.Equal(t, hashedString, expectedHashStringOmitEmpty)
 	})
 
-	mockOldProtoMessage := &mockOlderProto{
-		Integer:     18,
-		FloatValue:  1.3,
-		StringValue: "lets test this",
-		Boolean:     true,
-	}
+	mockOldProtoMessage := makeStruct(t, map[string]interface{}{
+		"integer":     18,
+		"floatValue":  1.3,
+		"stringValue": "lets test this",
+		"boolean":     true,
+	})
 
 	t.Run("TestOlderProto", func(t *testing.T) {
 		hashedBytes, err := ComputeHash(context.Background(), mockOldProtoMessage)
