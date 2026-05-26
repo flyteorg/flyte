@@ -65,12 +65,6 @@ service RunService {
   // to  existing ones from the point of invocation.
   rpc WatchActions(WatchActionsRequest) returns (stream WatchActionsResponse) {}
 
-  // Stream a windowed slice of a run's action list. Client sends a Subscribe
-  // message followed by UpdateWindow messages as the user scrolls / expands /
-  // filters; server streams windowed responses containing only the visible
-  // overscan slice, ancestor path, and group aggregates.
-  rpc WatchWindowedActions(stream WatchWindowedActionsRequest) returns (stream WatchWindowedActionsResponse) {}
-
   // Stream of k8s cluster events in human readable form
   rpc WatchClusterEvents(WatchClusterEventsRequest) returns (stream WatchClusterEventsResponse) {}
 
