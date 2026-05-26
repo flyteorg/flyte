@@ -244,6 +244,12 @@ message GetActionLogContextResponse {
 
   // The cluster where the action attempt is running.
   string cluster = 2;
+
+  // The start time of the action attempt.
+  google.protobuf.Timestamp start_time = 3;
+
+  // The end time of the action attempt. Unset if the attempt is still running.
+  google.protobuf.Timestamp end_time = 4;
 }
 
 // Request message for listing runs.

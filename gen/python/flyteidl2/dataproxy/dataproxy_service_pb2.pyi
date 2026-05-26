@@ -130,24 +130,30 @@ class GetActionDataResponse(_message.Message):
     def __init__(self, inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.Outputs, _Mapping]] = ...) -> None: ...
 
 class TailLogsRequest(_message.Message):
-    __slots__ = ["action_id", "attempt", "pod_name", "connector_endpoint"]
+    __slots__ = ["action_id", "attempt", "primary_pod", "all_pods", "pod_name", "connector_endpoint"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     ATTEMPT_FIELD_NUMBER: _ClassVar[int]
+    PRIMARY_POD_FIELD_NUMBER: _ClassVar[int]
+    ALL_PODS_FIELD_NUMBER: _ClassVar[int]
     POD_NAME_FIELD_NUMBER: _ClassVar[int]
     CONNECTOR_ENDPOINT_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     attempt: int
+    primary_pod: bool
+    all_pods: bool
     pod_name: str
     connector_endpoint: str
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., pod_name: _Optional[str] = ..., connector_endpoint: _Optional[str] = ...) -> None: ...
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., primary_pod: bool = ..., all_pods: bool = ..., pod_name: _Optional[str] = ..., connector_endpoint: _Optional[str] = ...) -> None: ...
 
 class TailLogsResponse(_message.Message):
     __slots__ = ["logs"]
     class Logs(_message.Message):
-        __slots__ = ["lines"]
+        __slots__ = ["lines", "container"]
         LINES_FIELD_NUMBER: _ClassVar[int]
+        CONTAINER_FIELD_NUMBER: _ClassVar[int]
         lines: _containers.RepeatedCompositeFieldContainer[_payload_pb2.LogLine]
-        def __init__(self, lines: _Optional[_Iterable[_Union[_payload_pb2.LogLine, _Mapping]]] = ...) -> None: ...
+        container: _payload_pb2.ContainerIdentifier
+        def __init__(self, lines: _Optional[_Iterable[_Union[_payload_pb2.LogLine, _Mapping]]] = ..., container: _Optional[_Union[_payload_pb2.ContainerIdentifier, _Mapping]] = ...) -> None: ...
     LOGS_FIELD_NUMBER: _ClassVar[int]
     logs: _containers.RepeatedCompositeFieldContainer[TailLogsResponse.Logs]
     def __init__(self, logs: _Optional[_Iterable[_Union[TailLogsResponse.Logs, _Mapping]]] = ...) -> None: ...
