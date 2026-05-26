@@ -1004,6 +1004,18 @@ func (s *RunService) AbortAction(
 	return connect.NewResponse(&workflow.AbortActionResponse{}), nil
 }
 
+// SignalEvent resolves a paused condition action. Condition signalling is not
+// supported by this single-binary backend; downstream backends that route to a
+// dedicated actions service override this RPC.
+func (s *RunService) SignalEvent(
+	ctx context.Context,
+	_ *connect.Request[workflow.SignalEventRequest],
+) (*connect.Response[workflow.SignalEventResponse], error) {
+	logger.Infof(ctx, "Received SignalEvent request")
+	return nil, connect.NewError(connect.CodeUnimplemented,
+		fmt.Errorf("SignalEvent is not supported by this backend"))
+}
+
 // WatchRunDetails streams run details updates from the DB.
 func (s *RunService) WatchRunDetails(
 	ctx context.Context,
