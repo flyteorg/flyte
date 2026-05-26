@@ -18,11 +18,11 @@ require (
 	github.com/coocood/freecache v1.2.4
 	github.com/dask/dask-kubernetes/v2023 v2023.0.0-20230626103304-abd02cd17b26
 	github.com/eko/gocache/lib/v4 v4.2.3
-	github.com/eko/gocache/store/freecache/v4 v4.2.0
+	github.com/eko/gocache/store/freecache/v4 v4.2.4
 	github.com/eko/gocache/store/redis/v4 v4.2.0
 	github.com/fatih/color v1.17.0
 	github.com/fergusstrange/embedded-postgres v1.34.0
-	github.com/flyteorg/stow v0.3.12
+	github.com/flyteorg/stow v0.3.13
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-test/deep v1.1.1
