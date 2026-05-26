@@ -253,7 +253,8 @@ func TestBuildFailurePolicy_MaxRestarts(t *testing.T) {
 	spec := &clusteredpb.ClusteredTaskSpec{
 		FailurePolicy: &clusteredpb.ClusterFailurePolicy{MaxRestarts: 3},
 	}
-	fp := buildFailurePolicy(spec)
+	fp, err := buildFailurePolicy(spec)
+	assert.NoError(t, err)
 	assert.NotNil(t, fp)
 	assert.Equal(t, int32(3), fp.MaxRestarts)
 }
@@ -262,13 +263,24 @@ func TestBuildFailurePolicy_Zero(t *testing.T) {
 	spec := &clusteredpb.ClusteredTaskSpec{
 		FailurePolicy: &clusteredpb.ClusterFailurePolicy{MaxRestarts: 0},
 	}
-	fp := buildFailurePolicy(spec)
+	fp, err := buildFailurePolicy(spec)
+	assert.NoError(t, err)
 	assert.Nil(t, fp)
 }
 
 func TestBuildFailurePolicy_Nil(t *testing.T) {
 	spec := &clusteredpb.ClusteredTaskSpec{}
-	fp := buildFailurePolicy(spec)
+	fp, err := buildFailurePolicy(spec)
+	assert.NoError(t, err)
+	assert.Nil(t, fp)
+}
+
+func TestBuildFailurePolicy_Negative(t *testing.T) {
+	spec := &clusteredpb.ClusteredTaskSpec{
+		FailurePolicy: &clusteredpb.ClusterFailurePolicy{MaxRestarts: -1},
+	}
+	fp, err := buildFailurePolicy(spec)
+	assert.Error(t, err)
 	assert.Nil(t, fp)
 }
 

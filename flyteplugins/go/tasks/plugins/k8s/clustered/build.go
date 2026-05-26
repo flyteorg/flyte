@@ -64,8 +64,12 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	injectTorchRunEnv(container, &spec)
 
 	podSpec.RestartPolicy = corev1.RestartPolicyNever
+	// JobSet name doubles as the headless service / pod subdomain; both must be
+	// RFC 1123 subdomain-compatible. GeneratedName isn't guaranteed to be, so
+	// sanitize once and use the same value for both.
+	jobSetName := utils.ConvertToDNS1123SubdomainCompatibleString(taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
 	if podSpec.Subdomain == "" {
-		podSpec.Subdomain = taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+		podSpec.Subdomain = jobSetName
 	}
 
 	replicas := spec.GetReplicas()
@@ -82,9 +86,11 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 		},
 	}
 
-	failurePolicy := buildFailurePolicy(&spec)
+	failurePolicy, err := buildFailurePolicy(&spec)
+	if err != nil {
+		return nil, err
+	}
 
-	jobSetName := taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 	enableDNSHostnames := true
 	replicatedJobReplicas := int32(1)
 
