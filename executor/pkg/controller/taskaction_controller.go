@@ -35,6 +35,7 @@ import (
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
@@ -96,6 +97,12 @@ type TaskActionReconciler struct {
 	eventsClient      workflowconnect.EventsProxyServiceClient
 	cluster           string
 	MaxSystemFailures uint32
+	// MaxConcurrentReconciles, when > 0, is forwarded to the controller-runtime
+	// builder via WithOptions(controller.Options{MaxConcurrentReconciles: ...})
+	// in SetupWithManager. A zero value defers to controller-runtime's own
+	// default (1) so existing callers that never set this field keep their
+	// pre-#7205 behavior.
+	MaxConcurrentReconciles int
 }
 
 // isSystemRetryableFailure reports whether the plugin transition is a
@@ -880,12 +887,26 @@ func createStateJSON(actionSpec *workflow.ActionSpec, phase string) string {
 }
 
 // SetupWithManager sets up the controller with the Manager.
+//
+// MaxConcurrentReconciles is forwarded to controller-runtime via
+// WithOptions only when set (>0). When unset (zero value), the WithOptions
+// call is skipped and controller-runtime applies its own default of 1, so
+// the historical single-worker behavior is preserved for callers that
+// have not yet wired the new config knob. Non-positive values
+// (including the zero value) intentionally fall through to that default
+// rather than disabling the controller, since 0 workers would silently
+// stop reconciliation altogether.
 func (r *TaskActionReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewControllerManagedBy(mgr).
+	builder := ctrl.NewControllerManagedBy(mgr).
 		For(&flyteorgv1.TaskAction{}).
 		Owns(&corev1.Pod{}).
-		Named("taskaction").
-		Complete(r)
+		Named("taskaction")
+	if r.MaxConcurrentReconciles > 0 {
+		builder = builder.WithOptions(controller.Options{
+			MaxConcurrentReconciles: r.MaxConcurrentReconciles,
+		})
+	}
+	return builder.Complete(r)
 }
 
 // pluginResolver is satisfied by *plugin.Registry and allows mocking in tests.

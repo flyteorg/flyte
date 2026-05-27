@@ -154,6 +154,12 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	reconciler.Catalog = cacheClient
 	reconciler.Recorder = mgr.GetEventRecorderFor("taskaction-controller")
 	reconciler.MaxSystemFailures = cfg.MaxSystemFailures
+	// uint32 -> int conversion is safe in practice: cfg.MaxConcurrentReconciles
+	// is a user-supplied pflag whose operationally meaningful values
+	// (single-digit to a few thousand) fit comfortably in an int on every
+	// supported platform. See SetupWithManager for the "0 means use
+	// controller-runtime's own default" semantics.
+	reconciler.MaxConcurrentReconciles = int(cfg.MaxConcurrentReconciles)
 	if err := reconciler.SetupWithManager(mgr); err != nil {
 		return fmt.Errorf("executor: failed to setup controller: %w", err)
 	}
