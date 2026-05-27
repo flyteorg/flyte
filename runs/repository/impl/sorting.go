@@ -41,7 +41,7 @@ func GetSortByFieldsV2(request *common.ListRequest, allowedSortColumns sets.Set[
 	protoSortFields := request.GetSortByFields()
 	if len(protoSortFields) == 0 {
 		// Fall back to deprecated sort_by field.
-		if sortBy := request.GetSortBy(); sortBy != nil && sortBy.Key != "" {
+		if sortBy := request.GetSortBy(); sortBy != nil && sortBy.Key != "" { //nolint: staticcheck
 			protoSortFields = []*common.Sort{sortBy}
 		}
 	}

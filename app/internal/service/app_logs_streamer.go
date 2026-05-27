@@ -77,7 +77,7 @@ func (s *K8sAppLogStreamer) TailLogs(ctx context.Context, replicaID *flyteapp.Re
 	if err != nil {
 		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to stream pod logs: %w", err))
 	}
-	defer logStream.Close()
+	defer logStream.Close() //nolint:errcheck
 
 	err = podlogs.Stream(ctx, logStream, podlogs.DefaultBatchSize, func(lines []*dataplane.LogLine) error {
 		return send(&flyteapp.LogLines{StructuredLines: lines})

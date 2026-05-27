@@ -12,8 +12,6 @@ import (
 
 	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 	"github.com/jmoiron/sqlx"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
@@ -136,8 +134,9 @@ func TestMain(m *testing.M) {
 
 	endpoint = fmt.Sprintf("http://localhost:%d", testPort)
 	testServer = &http.Server{
-		Addr:    fmt.Sprintf(":%d", testPort),
-		Handler: h2c.NewHandler(mux, &http2.Server{}),
+		Addr:      fmt.Sprintf(":%d", testPort),
+		Handler:   mux,
+		Protocols: httpProtocols(),
 	}
 
 	// Start server in background
@@ -171,6 +170,13 @@ func TestMain(m *testing.M) {
 
 	// Run tests
 	exitCode = m.Run()
+}
+
+func httpProtocols() *http.Protocols {
+	protocols := &http.Protocols{}
+	protocols.SetHTTP1(true)
+	protocols.SetUnencryptedHTTP2(true)
+	return protocols
 }
 
 // waitForServer waits for the server to be ready

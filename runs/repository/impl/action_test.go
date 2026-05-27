@@ -668,7 +668,7 @@ func TestUpdateActionPhase_AbortedDoesNotInsertEvent(t *testing.T) {
 	ctx := context.Background()
 
 	actionID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{Project: "p", Domain: "d", Name: "run-abort"},
+		Run:  &common.RunIdentifier{Project: "p", Domain: "d", Name: "run-abort"},
 		Name: "abort-action",
 	}
 	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)

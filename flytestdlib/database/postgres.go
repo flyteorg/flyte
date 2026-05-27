@@ -9,7 +9,6 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
-	oldPgConn "github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
 
@@ -81,10 +80,10 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig) (
 
 	if !IsPgErrorWithCode(err, PqInvalidDBCode) {
 		logger.Errorf(ctx, "Unhandled error connecting to postgres, pg [%v]: %v", pgConfig, err)
-		db.Close()
+		db.Close() //nolint:errcheck
 		return nil, err
 	}
-	db.Close()
+	db.Close() //nolint:errcheck
 	logger.Warningf(ctx, "Database [%v] does not exist", pgConfig.DbName)
 
 	// Every postgres installation includes a 'postgres' database by default. We connect to that now in order to
@@ -96,7 +95,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig) (
 	if err != nil {
 		return nil, err
 	}
-	defer defaultDb.Close()
+	defer defaultDb.Close() //nolint: errcheck
 
 	if err = defaultDb.PingContext(ctx); err != nil {
 		return nil, err
@@ -123,7 +122,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig) (
 	}
 
 	if err = db.PingContext(ctx); err != nil {
-		db.Close()
+		db.Close() //nolint:errcheck
 		return nil, err
 	}
 
@@ -139,7 +138,7 @@ func CreatePostgresReadOnlyDbConnection(ctx context.Context, pgConfig PostgresCo
 	}
 
 	if err = db.PingContext(ctx); err != nil {
-		db.Close()
+		db.Close() //nolint: errcheck
 		return nil, err
 	}
 
@@ -147,20 +146,9 @@ func CreatePostgresReadOnlyDbConnection(ctx context.Context, pgConfig PostgresCo
 }
 
 func IsPgErrorWithCode(err error, code string) bool {
-	// Newer versions of the gorm postgres driver seem to use
-	// "github.com/jackc/pgx/v5/pgconn"
-	// See https://github.com/go-gorm/gorm/issues/4135
-	// Let's just try both of them to make sure.
 	pgErr := &pgconn.PgError{}
 	if errors.As(err, &pgErr) {
-		// err chain does not contain a pgconn.PgError
 		return pgErr.Code == code
-	}
-
-	oldPgErr := &oldPgConn.PgError{}
-	if errors.As(err, &oldPgErr) {
-		// err chain does not contain a pgconn.PgError
-		return oldPgErr.Code == code
 	}
 
 	return false

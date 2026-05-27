@@ -203,8 +203,15 @@ message TailLogsRequest {
   // The attempt number.
   uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
 
-  // The pod name to tail logs from. If not provided, attempt to find the primary pod, else assume the first pod.
-  string pod_name = 3;
+  // Selects which pod(s) to tail. If unset, defaults to primary_pod.
+  oneof pod_selector {
+    // Tail logs from the primary pod only. This is the default when pod_selector is unset.
+    bool primary_pod = 6;
+    // Tail logs from all pods.
+    bool all_pods = 5;
+    // Tail logs from the named pod only.
+    string pod_name = 3;
+  }
 
   // +optional. The dataproxy uses this to stream logs from the connector via
   // AsyncConnectorService.GetTaskLogs instead of pod logs.
@@ -217,6 +224,8 @@ message TailLogsResponse {
   message Logs {
     // Structured log lines.
     repeated flyteidl2.logs.dataplane.LogLine lines = 1;
+    // Which container these lines are from.
+    flyteidl2.logs.dataplane.ContainerIdentifier container = 2;
   }
 
   // One or more batches of logs.

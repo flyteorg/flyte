@@ -945,6 +945,8 @@ func (m *LogContext) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for PodNamePrefix
+
 	if len(errors) > 0 {
 		return LogContextMultiError(errors)
 	}

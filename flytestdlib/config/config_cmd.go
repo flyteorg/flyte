@@ -173,7 +173,7 @@ func printDocs(title string, isSubsection bool, section Section, visitedSection 
 }
 
 // Print Table of contents
-func printToc(orderedSectionKeys sets.String) {
+func printToc(orderedSectionKeys sets.String) { //nolint: staticcheck
 	for _, sectionKey := range orderedSectionKeys.List() {
 		fmt.Printf("- `%s <#section-%s>`_\n\n", sectionKey, sectionKey)
 	}

@@ -1,31 +1,43 @@
+version: "2"
 run:
-  skip-dirs:
-    - pkg/client
+  allow-parallel-runners: true
 linters:
-  disable-all: true
+  default: none
   enable:
+    - copyloopvar
+    - depguard
+    - dupl
     - errcheck
-    - gosec
-    - gci
+    - ginkgolinter
     - goconst
-    - goimports
-    - gosimple
+    - gocyclo
     - govet
     - ineffassign
+    - lll
     - misspell
     - nakedret
+    - prealloc
+    - revive
     - staticcheck
-    - typecheck
     - unconvert
+    - unparam
     - unused
-    - protogetter
-linters-settings:
-  gci:
-    custom-order: true
-    sections:
-      - standard
-      - default
-      - prefix(github.com/flyteorg)
-    skip-generated: true
-  goconst:
-    ignore-tests: true
+  settings:
+    depguard:
+      rules:
+        no-h2c:
+          deny:
+            - pkg: golang.org/x/net/http2/h2c
+              desc: "deprecated: use net/http with http.Protocols.SetUnencryptedHTTP2(true)"
+    revive:
+      rules:
+        - name: comment-spacings
+        - name: import-shadowing
+  exclusions:
+    generated: lax
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
