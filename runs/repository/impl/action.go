@@ -377,21 +377,21 @@ func (r *actionRepo) UpdateActionPhase(
 	argIdx := 1
 
 	queryBuilder.WriteString("UPDATE actions SET ")
-	_, _ = fmt.Fprintf(&queryBuilder, "phase = $%d, attempts = $%d, cache_status = $%d, updated_at = $%d", argIdx, argIdx+1, argIdx+2, argIdx+3)
+	queryBuilder.WriteString(fmt.Sprintf("phase = $%d, attempts = $%d, cache_status = $%d, updated_at = $%d", argIdx, argIdx+1, argIdx+2, argIdx+3)) //nolint: staticcheck
 	args = append(args, phase, attempts, cacheStatus, now)
 	argIdx += 4
 
 	if endTime != nil {
-		_, _ = fmt.Fprintf(&queryBuilder, ", ended_at = COALESCE(ended_at, GREATEST($%d, created_at))", argIdx)
+		queryBuilder.WriteString(fmt.Sprintf(", ended_at = COALESCE(ended_at, GREATEST($%d, created_at))", argIdx)) //nolint: staticcheck
 		args = append(args, *endTime)
 		argIdx++
-		_, _ = fmt.Fprintf(&queryBuilder, ", duration_ms = EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST($%d, created_at)) - created_at)) * 1000", argIdx)
+		queryBuilder.WriteString(fmt.Sprintf(", duration_ms = EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST($%d, created_at)) - created_at)) * 1000", argIdx)) //nolint: staticcheck
 		args = append(args, *endTime)
 		argIdx++
 	}
 
-	_, _ = fmt.Fprintf(&queryBuilder, " WHERE project = $%d AND domain = $%d AND run_name = $%d AND name = $%d AND (phase <= $%d OR phase = ANY($%d))",
-		argIdx, argIdx+1, argIdx+2, argIdx+3, argIdx+4, argIdx+5)
+	queryBuilder.WriteString(fmt.Sprintf(" WHERE project = $%d AND domain = $%d AND run_name = $%d AND name = $%d AND (phase <= $%d OR phase = ANY($%d))", //nolint: staticcheck
+		argIdx, argIdx+1, argIdx+2, argIdx+3, argIdx+4, argIdx+5))
 	args = append(args, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase, pq.Array(retryablePhases))
 
 	result, err := r.db.ExecContext(ctx, queryBuilder.String(), args...)
@@ -871,22 +871,22 @@ func (r *actionRepo) ListRootActions(ctx context.Context, project, domain string
 	queryBuilder.WriteString("SELECT * FROM actions WHERE parent_action_name IS NULL")
 
 	if project != "" {
-		_, _ = fmt.Fprintf(&queryBuilder, " AND project = $%d", argIdx)
+		queryBuilder.WriteString(fmt.Sprintf(" AND project = $%d", argIdx)) //nolint: staticcheck
 		args = append(args, project)
 		argIdx++
 	}
 	if domain != "" {
-		_, _ = fmt.Fprintf(&queryBuilder, " AND domain = $%d", argIdx)
+		queryBuilder.WriteString(fmt.Sprintf(" AND domain = $%d", argIdx)) //nolint: staticcheck
 		args = append(args, domain)
 		argIdx++
 	}
 	if startDate != nil {
-		_, _ = fmt.Fprintf(&queryBuilder, " AND created_at >= $%d", argIdx)
+		queryBuilder.WriteString(fmt.Sprintf(" AND created_at >= $%d", argIdx)) //nolint: staticcheck
 		args = append(args, *startDate)
 		argIdx++
 	}
 	if endDate != nil {
-		_, _ = fmt.Fprintf(&queryBuilder, " AND created_at <= $%d", argIdx)
+		queryBuilder.WriteString(fmt.Sprintf(" AND created_at <= $%d", argIdx)) //nolint: staticcheck
 		args = append(args, *endDate)
 		argIdx++
 	}
@@ -894,7 +894,7 @@ func (r *actionRepo) ListRootActions(ctx context.Context, project, domain string
 		limit = 1000
 	}
 
-	_, _ = fmt.Fprintf(&queryBuilder, " ORDER BY created_at DESC LIMIT $%d", argIdx)
+	queryBuilder.WriteString(fmt.Sprintf(" ORDER BY created_at DESC LIMIT $%d", argIdx)) //nolint: staticcheck
 	args = append(args, limit)
 
 	var actions []*models.Action

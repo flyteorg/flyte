@@ -306,7 +306,7 @@ func (r *tasksRepo) ListVersions(ctx context.Context, input interfaces.ListResou
 	}
 
 	// Apply pagination
-	_, _ = fmt.Fprintf(&queryBuilder, " LIMIT $%d OFFSET $%d", argIdx, argIdx+1)
+	queryBuilder.WriteString(fmt.Sprintf(" LIMIT $%d OFFSET $%d", argIdx, argIdx+1)) //nolint: staticcheck
 	args = append(args, input.Limit, input.Offset)
 
 	var versions []*models.TaskVersion
