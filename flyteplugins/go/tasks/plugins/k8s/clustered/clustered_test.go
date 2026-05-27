@@ -11,7 +11,9 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8sscheme "k8s.io/client-go/kubernetes/scheme"
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	coreMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
@@ -401,6 +403,128 @@ func TestGetTaskPhase_Running(t *testing.T) {
 	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+}
+
+// --- fast-fail / maintenance tests ---
+
+func TestGetTaskPhase_FastFail_NoJobsFailed(t *testing.T) {
+	// When no jobs have failed in ReplicatedJobsStatus, the fast-fail path is not taken.
+	js := makeJobSet("", "", false)
+	// Explicitly set workers status with Failed=0.
+	js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
+		{Name: "workers", Failed: 0, Active: 2},
+	}
+	// Add an active condition so the switch falls through to running.
+	js.Status.Conditions = []metav1.Condition{
+		{
+			Type:               "SomeActiveCondition",
+			Status:             metav1.ConditionTrue,
+			LastTransitionTime: metav1.NewTime(time.Now()),
+		},
+	}
+
+	spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec))
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	// No pod inspection happens — returns Running.
+	assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+}
+
+func TestGetTaskPhase_MaintenanceRetry_FlagFalse(t *testing.T) {
+	// With RestartOnHostMaintenance=false (default), JobSetFailed always becomes RetryableFailure.
+	js := makeJobSet(jobsetv1alpha2.JobSetFailed, metav1.ConditionTrue, false)
+
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:      2,
+		NprocPerNode:  1,
+		FailurePolicy: &clusteredpb.ClusterFailurePolicy{RestartOnHostMaintenance: false},
+	}
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec))
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	// Flag is false → no pod lookup → normal retryable failure.
+	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
+}
+
+func TestGetTaskPhase_FastFail_Worker0Failed(t *testing.T) {
+	// When Failed>0 for the workers ReplicatedJob, the plugin inspects the rank-0 pod.
+	// A pod with a non-zero exit code should surface PhaseRetryableFailure immediately.
+	js := makeJobSet("", "", false)
+	js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
+		{Name: workersReplicatedJobName, Failed: 1, Active: 1},
+	}
+	// An active unrecognized condition is required for the switch to fall through to the fast-fail path.
+	js.Status.Conditions = []metav1.Condition{
+		{Type: "SomeActiveCondition", Status: metav1.ConditionTrue, LastTransitionTime: metav1.NewTime(time.Now())},
+	}
+
+	pod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      rank0PodName(testJobName),
+			Namespace: testNS,
+		},
+		Status: corev1.PodStatus{
+			Phase:  corev1.PodFailed,
+			Reason: "Error",
+			ContainerStatuses: []corev1.ContainerStatus{
+				{
+					Name: "primary",
+					State: corev1.ContainerState{
+						Terminated: &corev1.ContainerStateTerminated{ExitCode: 1, Reason: "Error"},
+					},
+				},
+			},
+		},
+	}
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pod).Build()
+
+	spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec))
+	pCtx.EXPECT().K8sReader().Return(fakeClient)
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
+	assert.Equal(t, core.ExecutionError_USER, phase.Err().GetKind())
+}
+
+func TestGetTaskPhase_MaintenanceRetry_SystemFailure(t *testing.T) {
+	// When RestartOnHostMaintenance=true and the rank-0 pod failed due to a node shutdown
+	// (system-retryable reason), the plugin returns PhaseRetryableFailure with SYSTEM kind
+	// so Flyte retries without consuming the user's max_restarts budget.
+	js := makeJobSet(jobsetv1alpha2.JobSetFailed, metav1.ConditionTrue, false)
+
+	pod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      rank0PodName(testJobName),
+			Namespace: testNS,
+		},
+		Status: corev1.PodStatus{
+			Phase:  corev1.PodFailed,
+			Reason: "Shutdown",
+		},
+	}
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pod).Build()
+
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:      2,
+		NprocPerNode:  1,
+		FailurePolicy: &clusteredpb.ClusterFailurePolicy{RestartOnHostMaintenance: true},
+	}
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec))
+	pCtx.EXPECT().K8sReader().Return(fakeClient)
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
+	assert.Equal(t, core.ExecutionError_SYSTEM, phase.Err().GetKind())
 }
 
 // --- IsTerminal / GetCompletionTime ---
