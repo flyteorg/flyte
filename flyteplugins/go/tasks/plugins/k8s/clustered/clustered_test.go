@@ -458,6 +458,10 @@ func TestGetTaskPhase_FastFail_Worker0Failed(t *testing.T) {
 	js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
 		{Name: workersReplicatedJobName, Failed: 1, Active: 1},
 	}
+	// An active unrecognized condition is required for the switch to fall through to the fast-fail path.
+	js.Status.Conditions = []metav1.Condition{
+		{Type: "SomeActiveCondition", Status: metav1.ConditionTrue, LastTransitionTime: metav1.NewTime(time.Now())},
+	}
 
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -465,7 +469,8 @@ func TestGetTaskPhase_FastFail_Worker0Failed(t *testing.T) {
 			Namespace: testNS,
 		},
 		Status: corev1.PodStatus{
-			Phase: corev1.PodFailed,
+			Phase:  corev1.PodFailed,
+			Reason: "Error",
 			ContainerStatuses: []corev1.ContainerStatus{
 				{
 					Name: "primary",
