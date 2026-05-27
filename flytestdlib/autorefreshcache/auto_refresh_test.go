@@ -76,7 +76,7 @@ func (p *panickingSyncer) sync(_ context.Context, _ Batch) ([]ItemSyncResponse, 
 
 func TestCacheFour(t *testing.T) {
 	testResyncPeriod := 5 * time.Second
-	rateLimiter := workqueue.DefaultControllerRateLimiter()
+	rateLimiter := workqueue.DefaultTypedControllerRateLimiter[*Batch]()
 	fakeClock := testingclock.NewFakeClock(time.Now())
 
 	t.Run("normal operation", func(t *testing.T) {
@@ -219,7 +219,7 @@ func TestCacheFour(t *testing.T) {
 
 func TestQueueBuildUp(t *testing.T) {
 	testResyncPeriod := time.Hour
-	rateLimiter := workqueue.DefaultControllerRateLimiter()
+	rateLimiter := workqueue.DefaultTypedControllerRateLimiter[*Batch]()
 	fakeClock := testingclock.NewFakeClock(time.Now())
 
 	syncCount := atomic.NewInt32(0)

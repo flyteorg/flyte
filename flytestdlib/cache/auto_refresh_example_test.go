@@ -86,7 +86,7 @@ func ExampleNewAutoRefreshCache() {
 
 	// Since number of items in the cache is dynamic, rate limiter is our knob to control resources we spend on
 	// sync.
-	rateLimiter := workqueue.DefaultControllerRateLimiter()
+	rateLimiter := workqueue.DefaultTypedControllerRateLimiter[*Batch]()
 
 	// since cache refreshes itself asynchronously, it may not notice that an object has been deleted immediately,
 	// so users of the cache should have the delete logic aware of this shortcoming (eg. not-exists may be a valid

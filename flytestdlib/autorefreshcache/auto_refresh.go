@@ -125,7 +125,7 @@ type autoRefresh struct {
 	processing  *sync.Map
 	toDelete    *syncSet
 	syncPeriod  time.Duration
-	workqueue   workqueue.RateLimitingInterface
+	workqueue   workqueue.TypedRateLimitingInterface[*Batch]
 	parallelizm int
 	lock        sync.RWMutex
 	clock       clock.Clock
@@ -333,8 +333,8 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 			w.workqueue.Forget(batch)
 			w.workqueue.Done(batch)
 
-			newBatch := make(Batch, 0, len(*batch.(*Batch)))
-			for _, b := range *batch.(*Batch) {
+			newBatch := make(Batch, 0, len(*batch))
+			for _, b := range *batch {
 				itemID := b.GetID()
 				w.processing.Delete(itemID)
 				item, ok := w.lruMap.Get(itemID)
@@ -394,12 +394,12 @@ func (w *autoRefresh) inProcessing(key interface{}) bool {
 }
 
 // Instantiates a new AutoRefresh Cache that syncs items in batches.
-func NewAutoRefreshBatchedCache(name string, createBatches CreateBatchesFunc, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter,
+func NewAutoRefreshBatchedCache(name string, createBatches CreateBatchesFunc, syncCb SyncFunc, syncRateLimiter workqueue.TypedRateLimiter[*Batch],
 	resyncPeriod time.Duration, parallelizm, size int, scope promutils.Scope) (AutoRefresh, error) {
 	return newAutoRefreshBatchedCacheWithClock(name, createBatches, syncCb, syncRateLimiter, resyncPeriod, parallelizm, size, scope, clock.RealClock{})
 }
 
-func newAutoRefreshBatchedCacheWithClock(name string, createBatches CreateBatchesFunc, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter,
+func newAutoRefreshBatchedCacheWithClock(name string, createBatches CreateBatchesFunc, syncCb SyncFunc, syncRateLimiter workqueue.TypedRateLimiter[*Batch],
 	resyncPeriod time.Duration, parallelizm, size int, scope promutils.Scope, clock clock.WithTicker) (AutoRefresh, error) {
 
 	metrics := newMetrics(scope)
@@ -418,7 +418,7 @@ func newAutoRefreshBatchedCacheWithClock(name string, createBatches CreateBatche
 		processing:      &sync.Map{},
 		toDelete:        newSyncSet(),
 		syncPeriod:      resyncPeriod,
-		workqueue: workqueue.NewRateLimitingQueueWithConfig(syncRateLimiter, workqueue.RateLimitingQueueConfig{
+		workqueue: workqueue.NewTypedRateLimitingQueueWithConfig(syncRateLimiter, workqueue.TypedRateLimitingQueueConfig[*Batch]{
 			Name:  scope.CurrentScope(),
 			Clock: clock,
 		}),
@@ -429,14 +429,14 @@ func newAutoRefreshBatchedCacheWithClock(name string, createBatches CreateBatche
 }
 
 // Instantiates a new AutoRefresh Cache that syncs items periodically.
-func NewAutoRefreshCache(name string, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter, resyncPeriod time.Duration,
+func NewAutoRefreshCache(name string, syncCb SyncFunc, syncRateLimiter workqueue.TypedRateLimiter[*Batch], resyncPeriod time.Duration,
 	parallelizm, size int, scope promutils.Scope) (AutoRefresh, error) {
 
 	return NewAutoRefreshBatchedCache(name, SingleItemBatches, syncCb, syncRateLimiter, resyncPeriod, parallelizm, size, scope)
 }
 
 // nolint: unused
-func newAutoRefreshCacheWithClock(name string, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter, resyncPeriod time.Duration,
+func newAutoRefreshCacheWithClock(name string, syncCb SyncFunc, syncRateLimiter workqueue.TypedRateLimiter[*Batch], resyncPeriod time.Duration,
 	parallelizm, size int, scope promutils.Scope, clock clock.WithTicker) (AutoRefresh, error) {
 	return newAutoRefreshBatchedCacheWithClock(name, SingleItemBatches, syncCb, syncRateLimiter, resyncPeriod, parallelizm, size, scope, clock)
 }
