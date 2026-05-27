@@ -32,6 +32,7 @@ const (
 	RunService_WatchActions_FullMethodName        = "/flyteidl2.workflow.RunService/WatchActions"
 	RunService_WatchClusterEvents_FullMethodName  = "/flyteidl2.workflow.RunService/WatchClusterEvents"
 	RunService_AbortAction_FullMethodName         = "/flyteidl2.workflow.RunService/AbortAction"
+	RunService_SignalEvent_FullMethodName         = "/flyteidl2.workflow.RunService/SignalEvent"
 	RunService_WatchGroups_FullMethodName         = "/flyteidl2.workflow.RunService/WatchGroups"
 	RunService_GetActionDataURIs_FullMethodName   = "/flyteidl2.workflow.RunService/GetActionDataURIs"
 	RunService_GetActionLogContext_FullMethodName = "/flyteidl2.workflow.RunService/GetActionLogContext"
@@ -70,6 +71,11 @@ type RunServiceClient interface {
 	WatchClusterEvents(ctx context.Context, in *WatchClusterEventsRequest, opts ...grpc.CallOption) (RunService_WatchClusterEventsClient, error)
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
 	AbortAction(ctx context.Context, in *AbortActionRequest, opts ...grpc.CallOption) (*AbortActionResponse, error)
+	// SignalEvent resolves a paused condition action by supplying its value.
+	// It converts the user-facing EventPayload to a core.Literal and delegates
+	// to ActionsService.Signal, resolving the condition's parent action for
+	// routing.
+	SignalEvent(ctx context.Context, in *SignalEventRequest, opts ...grpc.CallOption) (*SignalEventResponse, error)
 	// Stream updates for task groups based on the provided filter criteria.
 	WatchGroups(ctx context.Context, in *WatchGroupsRequest, opts ...grpc.CallOption) (RunService_WatchGroupsClient, error)
 	// Get the storage URIs for an action's input and output data.
@@ -319,6 +325,15 @@ func (c *runServiceClient) AbortAction(ctx context.Context, in *AbortActionReque
 	return out, nil
 }
 
+func (c *runServiceClient) SignalEvent(ctx context.Context, in *SignalEventRequest, opts ...grpc.CallOption) (*SignalEventResponse, error) {
+	out := new(SignalEventResponse)
+	err := c.cc.Invoke(ctx, RunService_SignalEvent_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *runServiceClient) WatchGroups(ctx context.Context, in *WatchGroupsRequest, opts ...grpc.CallOption) (RunService_WatchGroupsClient, error) {
 	stream, err := c.cc.NewStream(ctx, &RunService_ServiceDesc.Streams[5], RunService_WatchGroups_FullMethodName, opts...)
 	if err != nil {
@@ -402,6 +417,11 @@ type RunServiceServer interface {
 	WatchClusterEvents(*WatchClusterEventsRequest, RunService_WatchClusterEventsServer) error
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
 	AbortAction(context.Context, *AbortActionRequest) (*AbortActionResponse, error)
+	// SignalEvent resolves a paused condition action by supplying its value.
+	// It converts the user-facing EventPayload to a core.Literal and delegates
+	// to ActionsService.Signal, resolving the condition's parent action for
+	// routing.
+	SignalEvent(context.Context, *SignalEventRequest) (*SignalEventResponse, error)
 	// Stream updates for task groups based on the provided filter criteria.
 	WatchGroups(*WatchGroupsRequest, RunService_WatchGroupsServer) error
 	// Get the storage URIs for an action's input and output data.
@@ -452,6 +472,9 @@ func (UnimplementedRunServiceServer) WatchClusterEvents(*WatchClusterEventsReque
 }
 func (UnimplementedRunServiceServer) AbortAction(context.Context, *AbortActionRequest) (*AbortActionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AbortAction not implemented")
+}
+func (UnimplementedRunServiceServer) SignalEvent(context.Context, *SignalEventRequest) (*SignalEventResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SignalEvent not implemented")
 }
 func (UnimplementedRunServiceServer) WatchGroups(*WatchGroupsRequest, RunService_WatchGroupsServer) error {
 	return status.Errorf(codes.Unimplemented, "method WatchGroups not implemented")
@@ -723,6 +746,24 @@ func _RunService_AbortAction_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RunService_SignalEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SignalEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RunServiceServer).SignalEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RunService_SignalEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RunServiceServer).SignalEvent(ctx, req.(*SignalEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _RunService_WatchGroups_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(WatchGroupsRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -818,6 +859,10 @@ var RunService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AbortAction",
 			Handler:    _RunService_AbortAction_Handler,
+		},
+		{
+			MethodName: "SignalEvent",
+			Handler:    _RunService_SignalEvent_Handler,
 		},
 		{
 			MethodName: "GetActionDataURIs",

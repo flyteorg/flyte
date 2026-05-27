@@ -143,4 +143,3 @@ func GetCatchUpTimes(t *models.Trigger, to time.Time) ([]time.Time, error) {
 	}
 	return times, nil
 }
-

@@ -3,7 +3,6 @@ package secretmanager
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -38,7 +37,7 @@ func (f FileEnvSecretManager) Get(ctx context.Context, key string) (string, erro
 	}
 
 	logger.Debugf(ctx, "reading secrets from filePath [%s]", secretFile)
-	b, err := ioutil.ReadFile(secretFile)
+	b, err := os.ReadFile(secretFile)
 	if err != nil {
 		return "", err
 	}
@@ -71,7 +70,7 @@ func (f FileEnvSecretManager) GetForSecret(ctx context.Context, secret *coreIdl.
 	}
 
 	logger.Debugf(ctx, "reading secrets from filePath [%s]", secretFile)
-	b, err := ioutil.ReadFile(secretFile)
+	b, err := os.ReadFile(secretFile)
 	if err != nil {
 		return "", err
 	}

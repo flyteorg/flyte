@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 	"sync"
@@ -82,7 +81,7 @@ func (s *InMemoryStore) ReadRaw(ctx context.Context, reference DataReference) (i
 	defer s.rwMutex.RUnlock()
 
 	if raw, found := s.cache[reference]; found {
-		return ioutil.NopCloser(bytes.NewReader(raw)), nil
+		return io.NopCloser(bytes.NewReader(raw)), nil
 	}
 
 	return nil, os.ErrNotExist
@@ -107,7 +106,7 @@ func (s *InMemoryStore) WriteRaw(ctx context.Context, reference DataReference, s
 	s.rwMutex.Lock()
 	defer s.rwMutex.Unlock()
 
-	rawBytes, err := ioutil.ReadAll(raw)
+	rawBytes, err := io.ReadAll(raw)
 	if err != nil {
 		return err
 	}

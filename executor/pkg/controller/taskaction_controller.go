@@ -44,8 +44,8 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
-	core "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	task "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -533,7 +533,7 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	}
 
 	// The retry.RetryOnConflict will refetch the k8s resource to get the latest resource version
-	// This will resovle the conflict error caused by k8s optimistic lock when 2 reconcile loops updating the same CRD
+	// This will resolve the conflict error caused by k8s optimistic lock when 2 reconcile loops updating the same CRD
 	if err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		latest := &flyteorgv1.TaskAction{}
 		if getErr := r.Get(ctx, client.ObjectKeyFromObject(newTaskAction), latest); getErr != nil {

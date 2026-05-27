@@ -140,12 +140,16 @@ class GetActionLogContextRequest(_message.Message):
     def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ...) -> None: ...
 
 class GetActionLogContextResponse(_message.Message):
-    __slots__ = ["log_context", "cluster"]
+    __slots__ = ["log_context", "cluster", "start_time", "end_time"]
     LOG_CONTEXT_FIELD_NUMBER: _ClassVar[int]
     CLUSTER_FIELD_NUMBER: _ClassVar[int]
+    START_TIME_FIELD_NUMBER: _ClassVar[int]
+    END_TIME_FIELD_NUMBER: _ClassVar[int]
     log_context: _execution_pb2.LogContext
     cluster: str
-    def __init__(self, log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ..., cluster: _Optional[str] = ...) -> None: ...
+    start_time: _timestamp_pb2.Timestamp
+    end_time: _timestamp_pb2.Timestamp
+    def __init__(self, log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ..., cluster: _Optional[str] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class ListRunsRequest(_message.Message):
     __slots__ = ["request", "org", "project_id", "trigger_name", "task_name", "task_id"]
@@ -244,6 +248,32 @@ class AbortActionRequest(_message.Message):
     def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., reason: _Optional[str] = ...) -> None: ...
 
 class AbortActionResponse(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class EventPayload(_message.Message):
+    __slots__ = ["bool_value", "int_value", "float_value", "string_value"]
+    BOOL_VALUE_FIELD_NUMBER: _ClassVar[int]
+    INT_VALUE_FIELD_NUMBER: _ClassVar[int]
+    FLOAT_VALUE_FIELD_NUMBER: _ClassVar[int]
+    STRING_VALUE_FIELD_NUMBER: _ClassVar[int]
+    bool_value: bool
+    int_value: int
+    float_value: float
+    string_value: str
+    def __init__(self, bool_value: bool = ..., int_value: _Optional[int] = ..., float_value: _Optional[float] = ..., string_value: _Optional[str] = ...) -> None: ...
+
+class SignalEventRequest(_message.Message):
+    __slots__ = ["action_id", "parent_action_name", "payload"]
+    ACTION_ID_FIELD_NUMBER: _ClassVar[int]
+    PARENT_ACTION_NAME_FIELD_NUMBER: _ClassVar[int]
+    PAYLOAD_FIELD_NUMBER: _ClassVar[int]
+    action_id: _identifier_pb2.ActionIdentifier
+    parent_action_name: str
+    payload: EventPayload
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., payload: _Optional[_Union[EventPayload, _Mapping]] = ...) -> None: ...
+
+class SignalEventResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 

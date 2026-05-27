@@ -17,7 +17,7 @@ Thank you for your interest in contributing to Flyte 2! This guide will help you
 
 Before contributing, ensure you have:
 - [Buf CLI](https://buf.build/docs/installation) installed
-- Go 1.24.6 or later
+- Go 1.25.7 or later
 - Node.js and npm (for TypeScript)
 - Python 3.10+ with `uv` package manager
 - Rust toolchain (if working with Rust bindings)

@@ -1345,8 +1345,8 @@ func TestGetActionData_PropagatesDataProxyError(t *testing.T) {
 
 	resp, err := svc.GetActionData(context.Background(), connect.NewRequest(
 		&workflow.GetActionDataRequest{
-		ActionId: actionID,
-	}))
+			ActionId: actionID,
+		}))
 	assert.Nil(t, resp)
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))

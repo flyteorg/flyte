@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/proto" //nolint: staticcheck
 	"github.com/imdario/mergo"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	v1 "k8s.io/api/core/v1"
@@ -98,7 +98,7 @@ func AddRequiredNodeSelectorRequirements(base *v1.Affinity, new ...v1.NodeSelect
 			nst.MatchExpressions = append(nst.MatchExpressions, new...)
 		}
 	} else {
-		base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{v1.NodeSelectorTerm{MatchExpressions: new}}
+		base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{{MatchExpressions: new}}
 	}
 }
 
@@ -242,7 +242,7 @@ func getAcceleratorConfig(gpuAccelerator *core.GPUAccelerator) config.Accelerato
 
 	// Start with defaults from global GPU config
 	accelConfig := config.AcceleratorDeviceClassConfig{
-		ResourceName:                         cfg.GpuResourceName,
+		ResourceName:                         cfg.GpuResourceName, //nolint: staticcheck
 		DeviceNodeLabel:                      cfg.GpuDeviceNodeLabel,
 		PartitionSizeNodeLabel:               cfg.GpuPartitionSizeNodeLabel,
 		UnpartitionedNodeSelectorRequirement: cfg.GpuUnpartitionedNodeSelectorRequirement,
@@ -456,7 +456,7 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 				"Pod tasks with task type version > 1 should specify their target as a K8sPod with a defined pod spec")
 		}
 
-		err := utils.UnmarshalStructToObj(target.K8SPod.PodSpec, &podSpec)
+		err := utils.UnmarshalStructToObj(target.K8SPod.PodSpec, &podSpec) //nolint: staticcheck
 		if err != nil {
 			return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
 				"Unable to unmarshal task k8s pod [%v], Err: [%v]", target.K8SPod.PodSpec, err.Error())
@@ -674,7 +674,7 @@ func ApplyPodTemplateOverride(objectMeta metav1.ObjectMeta, podTemplate *core.K8
 	}
 
 	var podSpecOverride *v1.PodSpec
-	err := utils.UnmarshalStructToObj(podTemplate.GetPodSpec(), &podSpecOverride)
+	err := utils.UnmarshalStructToObj(podTemplate.GetPodSpec(), &podSpecOverride) //nolint: staticcheck
 	if err != nil {
 		return nil, objectMeta, err
 	}
@@ -806,7 +806,7 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	}
 
 	// merge PodTemplate PodSpec with podSpec
-	var mergedObjectMeta *metav1.ObjectMeta = podTemplate.Template.ObjectMeta.DeepCopy()
+	var mergedObjectMeta = podTemplate.Template.ObjectMeta.DeepCopy()
 	if err := mergo.Merge(mergedObjectMeta, objectMeta, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
 		return nil, nil, err
 	}
@@ -827,9 +827,10 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 
 	// extract default container template
 	for i := 0; i < len(templatePodSpec.Containers); i++ {
-		if templatePodSpec.Containers[i].Name == defaultContainerTemplateName {
+		switch templatePodSpec.Containers[i].Name {
+		case defaultContainerTemplateName:
 			defaultContainerTemplate = &templatePodSpec.Containers[i]
-		} else if templatePodSpec.Containers[i].Name == primaryContainerTemplateName {
+		case primaryContainerTemplateName:
 			primaryContainerTemplate = &templatePodSpec.Containers[i]
 		}
 	}
@@ -839,9 +840,10 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 
 	// extract defaultInitContainerTemplate
 	for i := 0; i < len(templatePodSpec.InitContainers); i++ {
-		if templatePodSpec.InitContainers[i].Name == defaultInitContainerTemplateName {
+		switch templatePodSpec.InitContainers[i].Name {
+		case defaultInitContainerTemplateName:
 			defaultInitContainerTemplate = &templatePodSpec.InitContainers[i]
-		} else if templatePodSpec.InitContainers[i].Name == primaryInitContainerTemplateName {
+		case primaryInitContainerTemplateName:
 			primaryInitContainerTemplate = &templatePodSpec.InitContainers[i]
 		}
 	}
@@ -1327,6 +1329,15 @@ func classifyWaitingContainer(waiting *v1.ContainerStateWaiting, c v1.PodConditi
 	case "ImagePullBackOff":
 		gracePeriod := config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration
 		if time.Since(t) >= gracePeriod {
+			if isRegistryRateLimited(waiting.Message) {
+				// Registry rate limiting (HTTP 429) is not caused by the user
+				// and is a transient infrastructure problem. Classify as a
+				// system-retryable failure so it does not consume the user's
+				// retry budget.
+				return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
+					OccurredAt: &t,
+				}), t
+			}
 			return pluginsCore.PhaseInfoRetryableFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 				OccurredAt: &t,
 			}), t
@@ -1353,6 +1364,13 @@ func classifyWaitingContainer(waiting *v1.ContainerStateWaiting, c v1.PodConditi
 
 func GetMessageAfterGracePeriod(message string, gracePeriod time.Duration) string {
 	return fmt.Sprintf("Grace period [%s] exceeded|%s", gracePeriod, message)
+}
+
+// isRegistryRateLimited reports whether an ImagePullBackOff message indicates
+// the container runtime hit HTTP 429 Too Many Requests against the image
+// registry — a transient infrastructure failure outside the user's control.
+func isRegistryRateLimited(message string) bool {
+	return strings.Contains(message, "429 Too Many Requests")
 }
 
 func DemystifySuccess(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {

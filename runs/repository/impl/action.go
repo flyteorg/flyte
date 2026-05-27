@@ -942,13 +942,13 @@ func isConnError(err error) bool {
 func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
 	defer func() {
 		if conn != nil {
-			conn.Close()
+			conn.Close() //nolint:errcheck
 		}
 	}()
 
 	reconnect := func() {
 		if conn != nil {
-			conn.Close()
+			conn.Close() //nolint:errcheck
 			conn = nil
 		}
 		if sqlDB == nil {

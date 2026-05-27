@@ -12,6 +12,9 @@ container: ""
 defaultHttpClient:
   headers: null
   timeout: 0s
+enable-multicontainer: false
 limits:
   maxDownloadMBs: 0
+signedUrl: {}
+stow: {}
 type: s3

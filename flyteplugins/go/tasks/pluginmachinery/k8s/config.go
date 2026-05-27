@@ -2,7 +2,7 @@ package k8s
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/pkg/errors"
 	restclient "k8s.io/client-go/rest"
@@ -21,7 +21,7 @@ type Auth struct {
 }
 
 func (auth Auth) GetCA() ([]byte, error) {
-	cert, err := ioutil.ReadFile(auth.CaCertPath)
+	cert, err := os.ReadFile(auth.CaCertPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read k8s CA cert from configured path")
 	}
@@ -29,7 +29,7 @@ func (auth Auth) GetCA() ([]byte, error) {
 }
 
 func (auth Auth) GetToken() (string, error) {
-	token, err := ioutil.ReadFile(auth.TokenPath)
+	token, err := os.ReadFile(auth.TokenPath)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to read k8s bearer token from configured path")
 	}
