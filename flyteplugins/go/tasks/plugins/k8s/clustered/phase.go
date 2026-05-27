@@ -17,7 +17,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	clusteredpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
-	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
@@ -88,7 +87,7 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 func maybeFastFailWorker0(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet, taskInfo *pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, bool) {
 	for _, s := range jobSet.Status.ReplicatedJobsStatus {
 		if s.Name == "workers" && s.Failed > 0 {
-			podName := fmt.Sprintf("%s-workers-0-0", jobSet.Name)
+			podName := rank0PodName(jobSet.Name)
 			containerName := pluginContext.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 			phase, err := flytek8s.DemystifyFailedOrPendingPod(ctx, pluginContext, *taskInfo, jobSet.Namespace, podName, containerName)
 			if err != nil {

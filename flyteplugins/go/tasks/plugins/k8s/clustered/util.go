@@ -22,6 +22,11 @@ var (
 // sanitizeLabelValue coerces an arbitrary string into a valid Kubernetes label
 // value (≤63 chars, alphanumeric start/end, [a-zA-Z0-9._-] in between).
 // Used for human-supplied identifiers like execution names.
+// rank0PodName returns the pod name for rank 0 (jobIdx=0, podIdx=0) in the workers ReplicatedJob.
+func rank0PodName(jobSetName string) string {
+	return jobSetName + "-" + workersReplicatedJobName + "-0-0"
+}
+
 func sanitizeLabelValue(value string) string {
 	if value == "" {
 		return "none"
