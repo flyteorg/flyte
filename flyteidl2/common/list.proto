@@ -62,13 +62,15 @@ message Filter {
     VALUE_IN = 7;
 
     // NOT_CONTAINS = 8;
-    // VALUE_NOT_IN = 9;
+    VALUE_NOT_IN = 9;
     // STARTS_WITH = 10;
     // NOT_STARTS_WITH = 11;
 
     ENDS_WITH = 12;
     NOT_ENDS_WITH = 13;
     CONTAINS_CASE_INSENSITIVE = 14; // Case insensitive contains function.
+    EXISTS = 15;
+    NOT_EXISTS = 16;
   }
 
   Function function = 1;
@@ -76,6 +78,8 @@ message Filter {
   // e.g. name or version
   string field = 2;
 
-  // Only in the case of a VALUE_IN function, values may contain multiple entries.
+  // Only in the case of a VALUE_IN or VALUE_NOT_IN functions, values may contain multiple entries.
   repeated string values = 3;
+
+  // Next field number: 17
 }
