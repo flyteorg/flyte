@@ -64,21 +64,29 @@ type daskResourceHandler struct {
 // substituter resolves per-task placeholders like `{{.executionProject}}` /
 // `{{.namespace}}` / `{{.generatedName}}` from the task execution identity.
 //
-// Returns "" when no dashboard template is configured, in which case the
+// Returns ("", nil) when no dashboard template is configured, in which case the
 // scheduler runs without `--dashboard-prefix` and Bokeh falls back to emitting
 // root-relative URLs (the historical pre-fix behavior — page loads but tab
-// navigation 404s outside the proxy mount point).
-func dashboardPrefixFromLogConfig(taskTemplate *core.TaskTemplate, teMetadata pluginsCore.TaskExecutionMetadata) string {
+// navigation 404s outside the proxy mount point). Returns a non-nil error when
+// the log plugins fail to initialize, the task-log lookup fails, or the
+// resolved dashboard URI can't be parsed — the caller propagates it so the
+// failure surfaces rather than silently degrading the dashboard links.
+func dashboardPrefixFromLogConfig(ctx context.Context, taskTemplate *core.TaskTemplate, teMetadata pluginsCore.TaskExecutionMetadata) (string, error) {
 	logPlugin, err := logs.InitializeLogPlugins(&GetConfig().Logs, taskTemplate)
-	if err != nil || logPlugin == nil {
-		return ""
+	if err != nil {
+		logger.Errorf(ctx, "Failed to initialize log plugins for dask dashboard prefix for task [%+v]. Error: %v", teMetadata.GetTaskExecutionID(), err)
+		return "", err
+	}
+	if logPlugin == nil {
+		return "", nil
 	}
 	out, err := logPlugin.GetTaskLogs(tasklog.Input{
 		Namespace:       teMetadata.GetNamespace(),
 		TaskExecutionID: teMetadata.GetTaskExecutionID(),
 	})
 	if err != nil {
-		return ""
+		logger.Errorf(ctx, "Failed to get task logs for dask dashboard prefix for ns [%s] and task execution id [%+v]. Error: %v", teMetadata.GetNamespace(), teMetadata.GetTaskExecutionID(), err)
+		return "", err
 	}
 	for _, tl := range out.TaskLogs {
 		if tl == nil || tl.LinkType != core.TaskLog_DASHBOARD {
@@ -86,14 +94,15 @@ func dashboardPrefixFromLogConfig(taskTemplate *core.TaskTemplate, teMetadata pl
 		}
 		u, err := url.Parse(tl.Uri)
 		if err != nil {
-			continue
+			logger.Errorf(ctx, "Failed to parse dask dashboard log URI [%s] for task [%+v]. Error: %v", tl.Uri, teMetadata.GetTaskExecutionID(), err)
+			return "", err
 		}
 		// The dashboard templateUri ends at the `/status` tab so users land on
 		// a populated page; Bokeh's prefix is one segment up — the dashboard
 		// root.
-		return strings.TrimSuffix(u.Path, "/status")
+		return strings.TrimSuffix(u.Path, "/status"), nil
 	}
-	return ""
+	return "", nil
 }
 
 func (daskResourceHandler) BuildIdentityResource(_ context.Context, _ pluginsCore.TaskExecutionMetadata) (
@@ -140,7 +149,10 @@ func (p daskResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	clusterName := taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-	dashboardPrefix := dashboardPrefixFromLogConfig(taskTemplate, taskCtx.TaskExecutionMetadata())
+	dashboardPrefix, err := dashboardPrefixFromLogConfig(ctx, taskTemplate, taskCtx.TaskExecutionMetadata())
+	if err != nil {
+		return nil, err
+	}
 	schedulerSpec, err := createSchedulerSpec(daskJob.Scheduler, clusterName, nonInterruptiblePodSpec, primaryContainerName, taskCtx.TaskExecutionMetadata(), dashboardPrefix)
 	if err != nil {
 		return nil, err
