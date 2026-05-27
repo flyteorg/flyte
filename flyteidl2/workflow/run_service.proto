@@ -367,8 +367,8 @@ message WatchWindowedActionsRequest {
 
     // Extra items to materialize above/below the selected item. Server
     // clamps; 0 means "use server default".
-    int32 overscan_before = 3;
-    int32 overscan_after = 4;
+    int32 overscan_before = 3 [(buf.validate.field).int32.gte = 0];
+    int32 overscan_after = 4 [(buf.validate.field).int32.gte = 0];
 
     // Items the client wants expanded. Key = action name OR group key.
     map<string, NodeExpansionParams> expanded_nodes = 5;
@@ -382,8 +382,8 @@ message WatchWindowedActionsRequest {
   // user scrolls, expands/collapses, or changes filters.
   message UpdateWindow {
     string selected_item_id = 1;
-    int32 overscan_before = 2;
-    int32 overscan_after = 3;
+    int32 overscan_before = 2 [(buf.validate.field).int32.gte = 0];
+    int32 overscan_after = 3 [(buf.validate.field).int32.gte = 0];
     map<string, NodeExpansionParams> expanded_nodes = 4;
     repeated common.ActionPhase phase_filter = 5;
     string name_filter = 6;
@@ -394,8 +394,8 @@ message WatchWindowedActionsRequest {
 // materialize under an expanded node or group. limit <= 0 → server
 // default; server also clamps to a hard cap.
 message NodeExpansionParams {
-  int32 offset = 1;
-  int32 limit = 2;
+  int32 offset = 1 [(buf.validate.field).int32.gte = 0];
+  int32 limit = 2 [(buf.validate.field).int32.gte = 0];
 }
 
 // WatchWindowedActionsResponse is one server → client tick.
