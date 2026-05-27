@@ -86,11 +86,12 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 // This surfaces the failure before the JobSet controller sets JobSetFailed, reducing tail latency.
 func maybeFastFailWorker0(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet, taskInfo *pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, bool) {
 	for _, s := range jobSet.Status.ReplicatedJobsStatus {
-		if s.Name == "workers" && s.Failed > 0 {
+		if s.Name == workersReplicatedJobName && s.Failed > 0 {
 			podName := rank0PodName(jobSet.Name)
-			containerName := pluginContext.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+			containerName := jobSet.Annotations[primaryContainerAnnotation]
 			phase, err := flytek8s.DemystifyFailedOrPendingPod(ctx, pluginContext, *taskInfo, jobSet.Namespace, podName, containerName)
 			if err != nil {
+				logger.Warnf(ctx, "failed to inspect rank-0 pod for fast-fail: %v", err)
 				return pluginsCore.PhaseInfoUndefined, false
 			}
 			if phase.Phase().IsFailure() {
@@ -106,10 +107,11 @@ func maybeFastFailWorker0(ctx context.Context, pluginContext k8s.PluginContext, 
 // PhaseInfoSystemRetryableFailureWithCleanup so Flyte retries without charging user's max_restarts.
 // Best-effort: if the pod is already cleaned up, returns (_, false) and the caller falls through.
 func maybeSystemRetryOnMaintenance(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet, taskInfo *pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, bool) {
-	podName := fmt.Sprintf("%s-workers-0-0", jobSet.Name)
-	containerName := pluginContext.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+	podName := rank0PodName(jobSet.Name)
+	containerName := jobSet.Annotations[primaryContainerAnnotation]
 	phase, err := flytek8s.DemystifyFailedOrPendingPod(ctx, pluginContext, *taskInfo, jobSet.Namespace, podName, containerName)
 	if err != nil {
+		logger.Warnf(ctx, "failed to inspect rank-0 pod for maintenance retry: %v", err)
 		return pluginsCore.PhaseInfoUndefined, false
 	}
 	if phase.Phase() == pluginsCore.PhaseRetryableFailure && phase.Err() != nil && phase.Err().GetKind() == core.ExecutionError_SYSTEM {
