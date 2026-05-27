@@ -48,6 +48,82 @@ func (_m *MockableControllerRuntimeClient) EXPECT() *MockableControllerRuntimeCl
 	return &MockableControllerRuntimeClient_Expecter{mock: &_m.Mock}
 }
 
+// Apply provides a mock function for the type MockableControllerRuntimeClient
+func (_mock *MockableControllerRuntimeClient) Apply(ctx context.Context, obj runtime.ApplyConfiguration, opts ...client.ApplyOption) error {
+	// client.ApplyOption
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, obj)
+	_ca = append(_ca, _va...)
+	ret := _mock.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Apply")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, runtime.ApplyConfiguration, ...client.ApplyOption) error); ok {
+		r0 = returnFunc(ctx, obj, opts...)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockableControllerRuntimeClient_Apply_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Apply'
+type MockableControllerRuntimeClient_Apply_Call struct {
+	*mock.Call
+}
+
+// Apply is a helper method to define mock.On call
+//   - ctx context.Context
+//   - obj runtime.ApplyConfiguration
+//   - opts ...client.ApplyOption
+func (_e *MockableControllerRuntimeClient_Expecter) Apply(ctx interface{}, obj interface{}, opts ...interface{}) *MockableControllerRuntimeClient_Apply_Call {
+	return &MockableControllerRuntimeClient_Apply_Call{Call: _e.mock.On("Apply",
+		append([]interface{}{ctx, obj}, opts...)...)}
+}
+
+func (_c *MockableControllerRuntimeClient_Apply_Call) Run(run func(ctx context.Context, obj runtime.ApplyConfiguration, opts ...client.ApplyOption)) *MockableControllerRuntimeClient_Apply_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 runtime.ApplyConfiguration
+		if args[1] != nil {
+			arg1 = args[1].(runtime.ApplyConfiguration)
+		}
+		var arg2 []client.ApplyOption
+		variadicArgs := make([]client.ApplyOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(client.ApplyOption)
+			}
+		}
+		arg2 = variadicArgs
+		run(
+			arg0,
+			arg1,
+			arg2...,
+		)
+	})
+	return _c
+}
+
+func (_c *MockableControllerRuntimeClient_Apply_Call) Return(err error) *MockableControllerRuntimeClient_Apply_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockableControllerRuntimeClient_Apply_Call) RunAndReturn(run func(ctx context.Context, obj runtime.ApplyConfiguration, opts ...client.ApplyOption) error) *MockableControllerRuntimeClient_Apply_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Create provides a mock function for the type MockableControllerRuntimeClient
 func (_mock *MockableControllerRuntimeClient) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
 	// client.CreateOption

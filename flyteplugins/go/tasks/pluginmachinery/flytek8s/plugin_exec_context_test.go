@@ -16,10 +16,7 @@ import (
 func Test_NodeExecutionK8sReader(t *testing.T) {
 	execID := "abc123"
 	nodeID := "n0"
-	typeMeta := metav1.TypeMeta{
-		Kind:       "Pod",
-		APIVersion: "v1",
-	}
+	typeMeta := metav1.TypeMeta{} // not preserved in fake client
 	pod1 := v1.Pod{
 		TypeMeta: typeMeta,
 		ObjectMeta: metav1.ObjectMeta{
@@ -106,12 +103,10 @@ func Test_NodeExecutionK8sReader(t *testing.T) {
 
 	t.Run("list", func(t *testing.T) {
 		p := &v1.PodList{}
+
 		expected := &v1.PodList{
-			TypeMeta: metav1.TypeMeta{
-				Kind:       "PodList",
-				APIVersion: "v1",
-			},
-			Items: []v1.Pod{pod1, pod2},
+			TypeMeta: metav1.TypeMeta{}, // not preserved in fake client
+			Items:    []v1.Pod{pod1, pod2},
 		}
 
 		err := nodeExecReader.List(ctx, p)
