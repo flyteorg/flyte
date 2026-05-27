@@ -185,7 +185,7 @@ func (r *triggerRepo) ListTriggers(ctx context.Context, input interfaces.ListRes
 		queryBuilder.WriteString(" ORDER BY active DESC, updated_at DESC")
 	}
 
-	_, _ = fmt.Fprintf(&queryBuilder, " LIMIT $%d OFFSET $%d", argIdx, argIdx+1)
+	queryBuilder.WriteString(fmt.Sprintf(" LIMIT $%d OFFSET $%d", argIdx, argIdx+1)) //nolint: staticcheck
 	args = append(args, input.Limit, input.Offset)
 
 	var triggers []*models.Trigger
