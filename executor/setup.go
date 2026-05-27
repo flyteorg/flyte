@@ -169,7 +169,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	)
 	reconciler.CatalogClient = asyncCatalogClient
 	reconciler.Catalog = cacheClient
-	reconciler.Recorder = mgr.GetEventRecorderFor("taskaction-controller")
+	reconciler.Recorder = mgr.GetEventRecorder("taskaction-controller")
 	if cfg.MaxSystemFailures < 0 {
 		return fmt.Errorf("executor: maxSystemFailures must be non-negative, got %d", cfg.MaxSystemFailures)
 	}

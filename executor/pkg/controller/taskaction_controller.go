@@ -25,6 +25,7 @@ import (
 	"strings"
 	"time"
 
+	"k8s.io/client-go/tools/events"
 	"k8s.io/client-go/util/retry"
 
 	"connectrpc.com/connect"
@@ -32,7 +33,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -86,7 +86,7 @@ const (
 type TaskActionReconciler struct {
 	client.Client
 	Scheme            *runtime.Scheme
-	Recorder          record.EventRecorder
+	Recorder          events.EventRecorder
 	PluginRegistry    *plugin.Registry
 	DataStore         *storage.DataStore
 	SecretManager     pluginsCore.SecretManager
@@ -152,7 +152,7 @@ func (r *TaskActionReconciler) recordSystemError(
 	logger := log.FromContext(ctx)
 	logger.Error(handleErr, "system error from plugin", "plugin", pluginID)
 	if r.Recorder != nil {
-		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedPluginHandle),
+		r.Recorder.Eventf(taskAction, nil, corev1.EventTypeWarning, string(FailedPluginHandle), "HandlingPlugin",
 			"Plugin %q system error: %v", pluginID, handleErr)
 	}
 
@@ -258,7 +258,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		if reason == flyteorgv1.ConditionReasonPluginNotFound {
 			eventType = FailedPluginResolve
 		}
-		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(eventType), "%v", err)
+		r.Recorder.Eventf(taskAction, nil, corev1.EventTypeWarning, string(eventType), "ValidatingTaskAction", "%v", err)
 		setCondition(taskAction, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue, reason, err.Error())
 		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse, reason, err.Error())
 		_ = r.Status().Update(ctx, taskAction)
@@ -456,7 +456,7 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 	)
 	if err != nil {
 		logger.Error(err, "failed to build context for abort/finalize")
-		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, "FinalizationSkipped",
+		r.Recorder.Eventf(taskAction, nil, corev1.EventTypeWarning, "FinalizationSkipped", "FinalizingTaskAction",
 			"Could not build task execution context; skipping Abort/Finalize. Underlying resources may need manual cleanup: %v", err)
 		return r.removeFinalizer(ctx, taskAction)
 	}
@@ -522,8 +522,10 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	})); err != nil {
 		r.Recorder.Eventf(
 			newTaskAction,
+			nil,
 			corev1.EventTypeWarning,
 			"ActionEventPublishFailed",
+			"PublishingActionEvent",
 			"Failed to persist action event %q: %v",
 			actionEvent.GetId().GetName(),
 			err,

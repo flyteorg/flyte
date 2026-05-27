@@ -76,7 +76,7 @@ func (p *panickingSyncer) sync(_ context.Context, _ Batch) ([]ItemSyncResponse, 
 
 func TestCacheFour(t *testing.T) {
 	testResyncPeriod := 5 * time.Second
-	rateLimiter := workqueue.DefaultControllerRateLimiter()
+	rateLimiter := workqueue.DefaultTypedControllerRateLimiter[*Batch]()
 	fakeClock := testingclock.NewFakeClock(time.Now())
 
 	t.Run("normal operation", func(t *testing.T) {
@@ -278,7 +278,7 @@ func TestCacheFour(t *testing.T) {
 
 func TestQueueBuildUp(t *testing.T) {
 	testResyncPeriod := time.Hour
-	rateLimiter := workqueue.DefaultControllerRateLimiter()
+	rateLimiter := workqueue.DefaultTypedControllerRateLimiter[*Batch]()
 	fakeClock := testingclock.NewFakeClock(time.Now())
 
 	syncCount := atomic.NewInt32(0)
@@ -323,7 +323,7 @@ func TestQueueBuildUp(t *testing.T) {
 func TestInProcessing(t *testing.T) {
 	syncer := &panickingSyncer{}
 	syncPeriod := time.Millisecond
-	rateLimiter := workqueue.DefaultControllerRateLimiter()
+	rateLimiter := workqueue.DefaultTypedControllerRateLimiter[*Batch]()
 	fakeClock := testingclock.NewFakeClock(time.Now())
 	cache, err := NewInMemoryAutoRefresh("fake3", syncer.sync, rateLimiter, syncPeriod, 10, 2, promutils.NewTestScope(), WithClock(fakeClock))
 	assert.NoError(t, err)
