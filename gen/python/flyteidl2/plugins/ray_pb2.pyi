@@ -31,7 +31,7 @@ class RayCluster(_message.Message):
     def __init__(self, head_group_spec: _Optional[_Union[HeadGroupSpec, _Mapping]] = ..., worker_group_spec: _Optional[_Iterable[_Union[WorkerGroupSpec, _Mapping]]] = ..., enable_autoscaling: bool = ...) -> None: ...
 
 class HeadGroupSpec(_message.Message):
-    __slots__ = ["ray_start_params", "k8s_pod"]
+    __slots__ = ["ray_start_params", "k8s_pod", "extended_resources"]
     class RayStartParamsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -41,12 +41,14 @@ class HeadGroupSpec(_message.Message):
         def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     RAY_START_PARAMS_FIELD_NUMBER: _ClassVar[int]
     K8S_POD_FIELD_NUMBER: _ClassVar[int]
+    EXTENDED_RESOURCES_FIELD_NUMBER: _ClassVar[int]
     ray_start_params: _containers.ScalarMap[str, str]
     k8s_pod: _tasks_pb2.K8sPod
-    def __init__(self, ray_start_params: _Optional[_Mapping[str, str]] = ..., k8s_pod: _Optional[_Union[_tasks_pb2.K8sPod, _Mapping]] = ...) -> None: ...
+    extended_resources: _tasks_pb2.ExtendedResources
+    def __init__(self, ray_start_params: _Optional[_Mapping[str, str]] = ..., k8s_pod: _Optional[_Union[_tasks_pb2.K8sPod, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ...) -> None: ...
 
 class WorkerGroupSpec(_message.Message):
-    __slots__ = ["group_name", "replicas", "min_replicas", "max_replicas", "ray_start_params", "k8s_pod"]
+    __slots__ = ["group_name", "replicas", "min_replicas", "max_replicas", "ray_start_params", "k8s_pod", "extended_resources"]
     class RayStartParamsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -60,10 +62,12 @@ class WorkerGroupSpec(_message.Message):
     MAX_REPLICAS_FIELD_NUMBER: _ClassVar[int]
     RAY_START_PARAMS_FIELD_NUMBER: _ClassVar[int]
     K8S_POD_FIELD_NUMBER: _ClassVar[int]
+    EXTENDED_RESOURCES_FIELD_NUMBER: _ClassVar[int]
     group_name: str
     replicas: int
     min_replicas: int
     max_replicas: int
     ray_start_params: _containers.ScalarMap[str, str]
     k8s_pod: _tasks_pb2.K8sPod
-    def __init__(self, group_name: _Optional[str] = ..., replicas: _Optional[int] = ..., min_replicas: _Optional[int] = ..., max_replicas: _Optional[int] = ..., ray_start_params: _Optional[_Mapping[str, str]] = ..., k8s_pod: _Optional[_Union[_tasks_pb2.K8sPod, _Mapping]] = ...) -> None: ...
+    extended_resources: _tasks_pb2.ExtendedResources
+    def __init__(self, group_name: _Optional[str] = ..., replicas: _Optional[int] = ..., min_replicas: _Optional[int] = ..., max_replicas: _Optional[int] = ..., ray_start_params: _Optional[_Mapping[str, str]] = ..., k8s_pod: _Optional[_Union[_tasks_pb2.K8sPod, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ...) -> None: ...
