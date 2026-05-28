@@ -9,11 +9,14 @@ data:
 {{- with .Values.configmap.admin }}
   admin.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
+{{- if .Values.datacatalog.enabled }}
 {{- with .Values.configmap.catalog }}
   catalog.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
-{{- with .Values.configmap.catalog_cache }}
-  catalog_cache.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- else }}
+  catalog.yaml: |
+    catalog-cache:
+      type: noop
 {{- end }}
 {{- with .Values.configmap.copilot }}
   copilot.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
@@ -32,9 +35,6 @@ data:
 {{- end }}
 {{- with .Values.configmap.otel }}
   otel.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
-{{- end }}
-{{- with .Values.configmap.qubole }}
-  qubole.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.resource_manager }}
   resource_manager.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}

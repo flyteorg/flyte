@@ -822,7 +822,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: b1Zuc0ptZkU5bWUzWFhXTg==
+  haSharedSecret: QktMQjhIUXB5QjQ3alFPQw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1419,7 +1419,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 35ec63b4549ac959b96fd4b326e8a6e2b7fcb578f2a787a7aae67482bec9cf67
+        checksum/secret: f7e28a56b32689b3640bed4be680b751388f43b2bdc62d7e645d9422c549f1aa
       labels:
         app: docker-registry
         release: flyte-sandbox
