@@ -3,7 +3,7 @@ name: Publish Helm Package
 on:
   push:
     tags:
-      - 'v*'
+      - 'v2*'
 
 env:
   DEPOT_PROJECT_ID: ${{ vars.DEPOT_PROJECT_ID }}
