@@ -392,6 +392,15 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 		return v1.PodTemplateSpec{}, err
 	}
 
+	// Apply the head group's extended resources (e.g. GPU accelerator, shared memory)
+	// on top of the task-level extended resources already applied to the base pod spec.
+	// objectMeta is shared across the head and worker groups, so operate on a copy to
+	// avoid leaking group-specific labels (e.g. MIG partition) between groups.
+	objectMeta = objectMeta.DeepCopy()
+	if err = flytek8s.ApplyExtendedResources(basePodSpec, objectMeta, primaryContainer.Name, spec.GetExtendedResources()); err != nil {
+		return v1.PodTemplateSpec{}, err
+	}
+
 	basePodSpec = flytek8s.AddTolerationsForExtendedResources(basePodSpec)
 
 	podTemplateSpec := v1.PodTemplateSpec{
@@ -535,6 +544,15 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 
 	basePodSpec, err := mergeCustomPodSpec(basePodSpec, spec.GetK8SPod())
 	if err != nil {
+		return v1.PodTemplateSpec{}, err
+	}
+
+	// Apply the worker group's extended resources (e.g. GPU accelerator, shared memory)
+	// on top of the task-level extended resources already applied to the base pod spec.
+	// objectMetadata is shared across worker groups, so operate on a copy to avoid
+	// leaking group-specific labels (e.g. MIG partition) between groups.
+	objectMetadata = objectMetadata.DeepCopy()
+	if err = flytek8s.ApplyExtendedResources(basePodSpec, objectMetadata, primaryContainer.Name, spec.GetExtendedResources()); err != nil {
 		return v1.PodTemplateSpec{}, err
 	}
 
