@@ -1,3 +1,4 @@
+# This workflow is triggered manually and only releases the v1 flyteidl package.
 name: Release flyteidl
 
 on:
