@@ -137,20 +137,64 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 
 	podSpec.ServiceAccountName = cfg.ServiceAccount
 
-	rayjob, err := constructRayJob(taskCtx, &rayJob, objectMeta, *podSpec, headNodeRayStartParams, primaryContainerIdx, *primaryContainer)
+	rayjob, err := constructRayJob(ctx, taskCtx, &rayJob, objectMeta, *podSpec, headNodeRayStartParams, primaryContainerIdx, *primaryContainer)
 
 	return rayjob, err
 }
 
-func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.RayJob, objectMeta *metav1.ObjectMeta, taskPodSpec v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
+// buildGroupPodSpec builds the pod spec for a single Ray group (head or worker),
+// applying that group's extended_resources (if any) on top of the task-level and
+// execution-level extended resources. To avoid applying extended resources twice
+// (which can produce conflicting node-affinity requirements or duplicate shared-memory
+// volumes), the group's extended resources are layered into the task overrides and the
+// pod spec is rebuilt once via ToK8sPodSpec, which performs the effective merge. When a
+// group does not set extended_resources, the already-built base pod spec is reused.
+func buildGroupPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, basePodSpec *v1.PodSpec, baseObjectMeta *metav1.ObjectMeta, basePrimaryContainerIdx int, groupExtendedResources *core.ExtendedResources) (*v1.PodSpec, *metav1.ObjectMeta, int, error) {
+	if groupExtendedResources == nil {
+		return basePodSpec.DeepCopy(), baseObjectMeta, basePrimaryContainerIdx, nil
+	}
+
+	// Group-level extended resources override the execution-level overrides, which in
+	// turn override the task-level defaults (handled inside ToK8sPodSpec).
+	effectiveOverrides := flytek8s.ApplyExtendedResourcesOverrides(
+		taskCtx.TaskExecutionMetadata().GetOverrides().GetExtendedResources(),
+		groupExtendedResources,
+	)
+	groupTaskCtx := flytek8s.NewPluginTaskExecutionContext(taskCtx, flytek8s.WithExtendedResources(effectiveOverrides))
+
+	podSpec, objectMeta, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, groupTaskCtx)
+	if err != nil {
+		return nil, nil, 0, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
+	}
+
+	primaryContainerIdx := -1
+	for idx, c := range podSpec.Containers {
+		if c.Name == primaryContainerName {
+			primaryContainerIdx = idx
+			break
+		}
+	}
+	if primaryContainerIdx < 0 {
+		return nil, nil, 0, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to get primary container from the pod")
+	}
+
+	podSpec.ServiceAccountName = GetConfig().ServiceAccount
+	return podSpec, objectMeta, primaryContainerIdx, nil
+}
+
+func constructRayJob(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.RayJob, objectMeta *metav1.ObjectMeta, taskPodSpec v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
 	enableIngress := true
 	cfg := GetConfig()
 
-	headPodSpec := taskPodSpec.DeepCopy()
+	headPodSpec, headObjectMeta, headPrimaryContainerIdx, err := buildGroupPodSpec(
+		ctx, taskCtx, &taskPodSpec, objectMeta, primaryContainerIdx, rayJob.RayCluster.HeadGroupSpec.GetExtendedResources())
+	if err != nil {
+		return nil, err
+	}
 	headPodTemplate, err := buildHeadPodTemplate(
-		&headPodSpec.Containers[primaryContainerIdx],
+		&headPodSpec.Containers[headPrimaryContainerIdx],
 		headPodSpec,
-		objectMeta,
+		headObjectMeta,
 		taskCtx,
 		rayJob.RayCluster.HeadGroupSpec,
 	)
@@ -170,11 +214,15 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 	}
 
 	for _, spec := range rayJob.RayCluster.WorkerGroupSpec {
-		workerPodSpec := taskPodSpec.DeepCopy()
+		workerPodSpec, workerObjectMeta, workerPrimaryContainerIdx, err := buildGroupPodSpec(
+			ctx, taskCtx, &taskPodSpec, objectMeta, primaryContainerIdx, spec.GetExtendedResources())
+		if err != nil {
+			return nil, err
+		}
 		workerPodTemplate, err := buildWorkerPodTemplate(
-			&workerPodSpec.Containers[primaryContainerIdx],
+			&workerPodSpec.Containers[workerPrimaryContainerIdx],
 			workerPodSpec,
-			objectMeta,
+			workerObjectMeta,
 			taskCtx,
 			spec,
 		)
@@ -392,15 +440,6 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 		return v1.PodTemplateSpec{}, err
 	}
 
-	// Apply the head group's extended resources (e.g. GPU accelerator, shared memory)
-	// on top of the task-level extended resources already applied to the base pod spec.
-	// objectMeta is shared across the head and worker groups, so operate on a copy to
-	// avoid leaking group-specific labels (e.g. MIG partition) between groups.
-	objectMeta = objectMeta.DeepCopy()
-	if err = flytek8s.ApplyExtendedResources(basePodSpec, objectMeta, primaryContainer.Name, spec.GetExtendedResources()); err != nil {
-		return v1.PodTemplateSpec{}, err
-	}
-
 	basePodSpec = flytek8s.AddTolerationsForExtendedResources(basePodSpec)
 
 	podTemplateSpec := v1.PodTemplateSpec{
@@ -544,15 +583,6 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 
 	basePodSpec, err := mergeCustomPodSpec(basePodSpec, spec.GetK8SPod())
 	if err != nil {
-		return v1.PodTemplateSpec{}, err
-	}
-
-	// Apply the worker group's extended resources (e.g. GPU accelerator, shared memory)
-	// on top of the task-level extended resources already applied to the base pod spec.
-	// objectMetadata is shared across worker groups, so operate on a copy to avoid
-	// leaking group-specific labels (e.g. MIG partition) between groups.
-	objectMetadata = objectMetadata.DeepCopy()
-	if err = flytek8s.ApplyExtendedResources(basePodSpec, objectMetadata, primaryContainer.Name, spec.GetExtendedResources()); err != nil {
 		return v1.PodTemplateSpec{}, err
 	}
 

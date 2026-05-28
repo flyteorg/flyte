@@ -491,20 +491,19 @@ func TestBuildResourceRayGroupExtendedResources(t *testing.T) {
 			},
 		}
 	}
-	// The base pod (built by ToK8sPodSpec) already carries the nvidia.com/gpu
-	// toleration since its container requests a GPU; the per-group GPU device
-	// toleration is appended afterwards.
+	// Each group's pod is built via ToK8sPodSpec, which applies the GPU device
+	// toleration before the nvidia.com/gpu extended-resource toleration.
 	gpuTolerations := func(device string) []corev1.Toleration {
 		return []corev1.Toleration{
-			{
-				Key:      "nvidia.com/gpu",
-				Operator: corev1.TolerationOpExists,
-				Effect:   corev1.TaintEffectNoSchedule,
-			},
 			{
 				Key:      "gpu-node-label",
 				Value:    device,
 				Operator: corev1.TolerationOpEqual,
+				Effect:   corev1.TaintEffectNoSchedule,
+			},
+			{
+				Key:      "nvidia.com/gpu",
+				Operator: corev1.TolerationOpExists,
 				Effect:   corev1.TaintEffectNoSchedule,
 			},
 		}
@@ -547,6 +546,74 @@ func hasVolume(volumes []corev1.Volume, name string) bool {
 		}
 	}
 	return false
+}
+
+// TestBuildResourceRayGroupExtendedResourcesOverride verifies that when both task-level
+// and group-level extended resources are set, the group-level GPU accelerator overrides
+// the task-level one (rather than producing two conflicting node selector requirements
+// for the same GPU label, which would make the pod unschedulable). Groups that do not
+// set their own extended_resources fall back to the task-level configuration.
+func TestBuildResourceRayGroupExtendedResourcesOverride(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		GpuDeviceNodeLabel:                 "gpu-node-label",
+		GpuResourceName:                    flytek8s.ResourceNvidiaGPU,
+		AddTolerationsForExtendedResources: []string{"nvidia.com/gpu"},
+	}))
+
+	resources := &corev1.ResourceRequirements{
+		Limits: corev1.ResourceList{
+			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+		},
+	}
+
+	// Only the worker group overrides the task-level GPU device; the head group inherits
+	// the task-level device.
+	rayJobObj := dummyRayCustomObj()
+	rayJobObj.RayCluster.WorkerGroupSpec[0].ExtendedResources = &core.ExtendedResources{
+		GpuAccelerator: &core.GPUAccelerator{
+			Device: "nvidia-tesla-a100",
+		},
+	}
+
+	taskTemplate := dummyRayTaskTemplate("ray-id", rayJobObj)
+	// Task-level extended resources request a different (default) GPU device.
+	taskTemplate.ExtendedResources = &core.ExtendedResources{
+		GpuAccelerator: &core.GPUAccelerator{
+			Device: "nvidia-tesla-t4",
+		},
+	}
+	taskContext := dummyRayTaskContext(taskTemplate, resources, nil, "", serviceAccount)
+	rayJobResourceHandler := rayJobResourceHandler{}
+	r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
+	assert.NoError(t, err)
+	assert.NotNil(t, r)
+	rayJob, ok := r.(*rayv1.RayJob)
+	assert.True(t, ok)
+
+	gpuNodeSelectorTerms := func(device string) []corev1.NodeSelectorTerm {
+		return []corev1.NodeSelectorTerm{
+			{
+				MatchExpressions: []corev1.NodeSelectorRequirement{
+					{
+						Key:      "gpu-node-label",
+						Operator: corev1.NodeSelectorOpIn,
+						Values:   []string{device},
+					},
+				},
+			},
+		}
+	}
+
+	// Head node inherits the task-level GPU device (t4) since it sets no extended resources.
+	headNodeSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
+	assert.EqualValues(t, gpuNodeSelectorTerms("nvidia-tesla-t4"),
+		headNodeSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+
+	// Worker node's group-level GPU device (a100) cleanly overrides the task-level device
+	// (t4); there is a single node selector requirement, not two conflicting ones.
+	workerNodeSpec := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec
+	assert.EqualValues(t, gpuNodeSelectorTerms("nvidia-tesla-a100"),
+		workerNodeSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
 }
 
 func TestBuildResourceRayCustomK8SPod(t *testing.T) {

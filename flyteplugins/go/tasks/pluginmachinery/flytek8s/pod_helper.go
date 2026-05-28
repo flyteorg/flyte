@@ -611,9 +611,25 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	//	ApplyAcceleratedInputsSpec(podSpec, primaryContainerName)
 	//}
 
-	// GPU accelerator and shared memory volume
-	if err = ApplyExtendedResources(podSpec, objectMeta, primaryContainerName, extendedResources); err != nil {
-		return nil, nil, err
+	// GPU accelerator
+	if extendedResources.GetGpuAccelerator() != nil {
+		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
+		if ps, ok := extendedResources.GetGpuAccelerator().GetPartitionSizeValue().(*core.GPUAccelerator_PartitionSize); ok {
+			if slices := parseMigSlices(ps.PartitionSize); slices != "" {
+				if objectMeta.Labels == nil {
+					objectMeta.Labels = make(map[string]string)
+				}
+				objectMeta.Labels[GpuPartitionSlicesLabel] = slices
+			}
+		}
+	}
+
+	// Shared memory volume
+	if extendedResources.GetSharedMemory() != nil {
+		err = ApplySharedMemory(podSpec, primaryContainerName, extendedResources.GetSharedMemory())
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 
 	// Override container image if necessary
@@ -712,39 +728,6 @@ func AddTolerationsForExtendedResources(podSpec *v1.PodSpec) *v1.PodSpec {
 	}
 
 	return podSpec
-}
-
-// ApplyExtendedResources applies the GPU accelerator (node selectors, tolerations and
-// MIG partition labels) and shared memory volume described by extendedResources onto
-// the given pod spec and object meta. It is shared by ToK8sPodSpec and plugins (e.g.
-// Ray) that need to apply extended resources to per-replica pod specs. A nil
-// extendedResources is a no-op.
-func ApplyExtendedResources(podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, primaryContainerName string, extendedResources *core.ExtendedResources) error {
-	if extendedResources == nil {
-		return nil
-	}
-
-	// GPU accelerator
-	if extendedResources.GetGpuAccelerator() != nil {
-		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
-		if ps, ok := extendedResources.GetGpuAccelerator().GetPartitionSizeValue().(*core.GPUAccelerator_PartitionSize); ok {
-			if slices := parseMigSlices(ps.PartitionSize); slices != "" {
-				if objectMeta.Labels == nil {
-					objectMeta.Labels = make(map[string]string)
-				}
-				objectMeta.Labels[GpuPartitionSlicesLabel] = slices
-			}
-		}
-	}
-
-	// Shared memory volume
-	if extendedResources.GetSharedMemory() != nil {
-		if err := ApplySharedMemory(podSpec, primaryContainerName, extendedResources.GetSharedMemory()); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 // ToK8sPodSpec builds a PodSpec and ObjectMeta based on the definition passed by the TaskExecutionContext. This
