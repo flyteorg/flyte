@@ -1,3 +1,4 @@
+# This workflow is triggered manually for v1 Flyte releases and generates the Flyte manifest files for GCP, EKS, Sandbox, and TEST environments. It then creates a pull request with the updated manifest files for review and merging.
 name: Generate Flyte manifest
 
 on:
