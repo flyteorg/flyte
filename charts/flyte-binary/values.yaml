@@ -229,7 +229,7 @@ deployment:
   # image Configure image to use for Flyte
   image:
     # repository Flyte image repository
-    repository: cr.flyte.org/flyteorg/flyte-binary  # FLYTE_IMAGE
+    repository: cr.flyte.org/flyteorg/flyte-binary-v2  # FLYTE_IMAGE
     # tag Flyte image tag
     tag: latest  # FLYTE_TAG
     # pullPolicy Flyte image pull policy
