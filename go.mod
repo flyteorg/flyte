@@ -49,7 +49,7 @@ require (
 	github.com/redis/go-redis/extra/redisprometheus/v9 v9.17.2
 	github.com/redis/go-redis/v9 v9.19.0
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/samber/lo v1.39.0
+	github.com/samber/lo v1.53.0
 	github.com/shamaton/msgpack/v2 v2.4.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.10.2
