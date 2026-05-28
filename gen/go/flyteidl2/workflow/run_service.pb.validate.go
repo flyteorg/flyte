@@ -6037,6 +6037,422 @@ var _ interface {
 	ErrorName() string
 } = AbortActionResponseValidationError{}
 
+// Validate checks the field values on EventPayload with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *EventPayload) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on EventPayload with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in EventPayloadMultiError, or
+// nil if none found.
+func (m *EventPayload) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *EventPayload) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	switch v := m.Value.(type) {
+	case *EventPayload_BoolValue:
+		if v == nil {
+			err := EventPayloadValidationError{
+				field:  "Value",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for BoolValue
+	case *EventPayload_IntValue:
+		if v == nil {
+			err := EventPayloadValidationError{
+				field:  "Value",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for IntValue
+	case *EventPayload_FloatValue:
+		if v == nil {
+			err := EventPayloadValidationError{
+				field:  "Value",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for FloatValue
+	case *EventPayload_StringValue:
+		if v == nil {
+			err := EventPayloadValidationError{
+				field:  "Value",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for StringValue
+	default:
+		_ = v // ensures v is used
+	}
+
+	if len(errors) > 0 {
+		return EventPayloadMultiError(errors)
+	}
+
+	return nil
+}
+
+// EventPayloadMultiError is an error wrapping multiple validation errors
+// returned by EventPayload.ValidateAll() if the designated constraints aren't met.
+type EventPayloadMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m EventPayloadMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m EventPayloadMultiError) AllErrors() []error { return m }
+
+// EventPayloadValidationError is the validation error returned by
+// EventPayload.Validate if the designated constraints aren't met.
+type EventPayloadValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EventPayloadValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EventPayloadValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EventPayloadValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EventPayloadValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EventPayloadValidationError) ErrorName() string { return "EventPayloadValidationError" }
+
+// Error satisfies the builtin error interface
+func (e EventPayloadValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEventPayload.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EventPayloadValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EventPayloadValidationError{}
+
+// Validate checks the field values on SignalEventRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SignalEventRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SignalEventRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SignalEventRequestMultiError, or nil if none found.
+func (m *SignalEventRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SignalEventRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetActionId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SignalEventRequestValidationError{
+					field:  "ActionId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SignalEventRequestValidationError{
+					field:  "ActionId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetActionId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SignalEventRequestValidationError{
+				field:  "ActionId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for ParentActionName
+
+	if all {
+		switch v := interface{}(m.GetPayload()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SignalEventRequestValidationError{
+					field:  "Payload",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SignalEventRequestValidationError{
+					field:  "Payload",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPayload()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SignalEventRequestValidationError{
+				field:  "Payload",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SignalEventRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// SignalEventRequestMultiError is an error wrapping multiple validation errors
+// returned by SignalEventRequest.ValidateAll() if the designated constraints
+// aren't met.
+type SignalEventRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SignalEventRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SignalEventRequestMultiError) AllErrors() []error { return m }
+
+// SignalEventRequestValidationError is the validation error returned by
+// SignalEventRequest.Validate if the designated constraints aren't met.
+type SignalEventRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SignalEventRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SignalEventRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SignalEventRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SignalEventRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SignalEventRequestValidationError) ErrorName() string {
+	return "SignalEventRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SignalEventRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSignalEventRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SignalEventRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SignalEventRequestValidationError{}
+
+// Validate checks the field values on SignalEventResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SignalEventResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SignalEventResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SignalEventResponseMultiError, or nil if none found.
+func (m *SignalEventResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SignalEventResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return SignalEventResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// SignalEventResponseMultiError is an error wrapping multiple validation
+// errors returned by SignalEventResponse.ValidateAll() if the designated
+// constraints aren't met.
+type SignalEventResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SignalEventResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SignalEventResponseMultiError) AllErrors() []error { return m }
+
+// SignalEventResponseValidationError is the validation error returned by
+// SignalEventResponse.Validate if the designated constraints aren't met.
+type SignalEventResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SignalEventResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SignalEventResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SignalEventResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SignalEventResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SignalEventResponseValidationError) ErrorName() string {
+	return "SignalEventResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SignalEventResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSignalEventResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SignalEventResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SignalEventResponseValidationError{}
+
 // Validate checks the field values on WatchGroupsRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
