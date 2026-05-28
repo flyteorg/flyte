@@ -90,17 +90,20 @@ func RegisterTracerProviderWithContext(ctx context.Context, serviceName string, 
 		return fmt.Errorf("unknown otel exporter type [%v]", config.ExporterType)
 	}
 
-	telemetryResource, err := resource.Merge(
-		resource.Default(),
-		resource.NewWithAttributes(
-			semconv.SchemaURL,
-			semconv.ServiceNameKey.String(serviceName),
-			semconv.ServiceVersionKey.String(version.Version),
-		),
+	// Carry over the attributes from resource.Default() (telemetry.sdk.*,
+	// OTEL_RESOURCE_ATTRIBUTES / OTEL_SERVICE_NAME env vars, host info) but
+	// stamp them with semconv.SchemaURL instead of calling resource.Merge.
+	// Merge panics when the two sides declare different schema URLs, which
+	// happens whenever the installed otel/sdk's internal semconv version
+	// drifts apart from the semconv version imported above.
+	defaultAttrs := resource.Default().Attributes()
+	attrs := make([]attribute.KeyValue, 0, len(defaultAttrs)+2)
+	attrs = append(attrs, defaultAttrs...)
+	attrs = append(attrs,
+		semconv.ServiceNameKey.String(serviceName),
+		semconv.ServiceVersionKey.String(version.Version),
 	)
-	if err != nil {
-		return err
-	}
+	telemetryResource := resource.NewWithAttributes(semconv.SchemaURL, attrs...)
 
 	var sampler trace.Sampler
 	switch config.SamplerConfig.ParentSampler {
