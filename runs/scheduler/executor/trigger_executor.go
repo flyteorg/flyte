@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"connectrpc.com/otelconnect"
 	"golang.org/x/time/rate"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -35,12 +36,21 @@ type TriggerExecutorConfig struct {
 	QPS float64
 	// Burst is the token-bucket burst size.
 	Burst int
+	// ClientOpts are connect client options for the outbound RunService client.
+	ClientOpts []connect.ClientOption
 }
 
 // NewTriggerExecutor constructs a TriggerExecutor.
 func NewTriggerExecutor(cfg TriggerExecutorConfig) *TriggerExecutor {
+	clientOpts := cfg.ClientOpts
+	if len(clientOpts) == 0 {
+		if otelInterceptor, err := otelconnect.NewInterceptor(); err == nil {
+			clientOpts = []connect.ClientOption{connect.WithInterceptors(otelInterceptor)}
+		}
+	}
+
 	return &TriggerExecutor{
-		runClient: workflowconnect.NewRunServiceClient(http.DefaultClient, cfg.BaseURL),
+		runClient: workflowconnect.NewRunServiceClient(http.DefaultClient, cfg.BaseURL, clientOpts...),
 		limiter:   rate.NewLimiter(rate.Limit(cfg.QPS), cfg.Burst),
 	}
 }

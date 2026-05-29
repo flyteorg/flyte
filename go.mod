@@ -6,6 +6,7 @@ require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20260415201107-50325440f8f2.1
 	cloud.google.com/go/secretmanager v1.16.0
 	connectrpc.com/connect v1.19.1
+	connectrpc.com/otelconnect v0.9.0
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.18.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.10.1
 	github.com/Azure/azure-sdk-for-go/sdk/security/keyvault/azsecrets v1.4.0
@@ -91,8 +92,6 @@ require (
 	sigs.k8s.io/controller-runtime v0.23.3
 	sigs.k8s.io/jobset v0.5.2
 )
-
-require connectrpc.com/otelconnect v0.9.0
 
 require (
 	cel.dev/expr v0.25.1 // indirect

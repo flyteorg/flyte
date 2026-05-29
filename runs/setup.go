@@ -42,6 +42,18 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("runs: failed to run migrations: %w", err)
 	}
 
+	otelCfg := otelutils.GetConfig()
+	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
+		return fmt.Errorf("registering otel providers: %w", err)
+	}
+	otelInterceptor, err := otelconnect.NewInterceptor(
+		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
+		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
+	)
+	if err != nil {
+		return fmt.Errorf("creating otel interceptor: %w", err)
+	}
+
 	repo, err := repository.NewRepository(sc.DB, cfg.Database)
 	if err != nil {
 		return fmt.Errorf("runs: failed to create repository: %w", err)
@@ -55,6 +67,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	actionsClient := actionsconnect.NewActionsServiceClient(
 		http.DefaultClient,
 		actionsURL,
+		connect.WithInterceptors(otelInterceptor),
 	)
 
 	projectsURL := sc.BaseURL
@@ -64,8 +77,9 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	projectClient := projectconnect.NewProjectServiceClient(
 		http.DefaultClient,
 		projectsURL,
+		connect.WithInterceptors(otelInterceptor),
 	)
-	dataProxyClient := dataproxyconnect.NewDataProxyServiceClient(http.DefaultClient, projectsURL)
+	dataProxyClient := dataproxyconnect.NewDataProxyServiceClient(http.DefaultClient, projectsURL, connect.WithInterceptors(otelInterceptor))
 
 	abortReconciler := service.NewAbortReconciler(repo, actionsClient, service.AbortReconcilerConfig{
 		Workers:      5,
@@ -80,18 +94,6 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 	runsSvc := service.NewRunService(repo, actionsClient, dataProxyClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler)
 	taskSvc := service.NewTaskService(repo, projectClient)
-
-	otelCfg := otelutils.GetConfig()
-	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
-		return fmt.Errorf("registering otel providers: %w", err)
-	}
-	otelInterceptor, err := otelconnect.NewInterceptor(
-		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
-		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
-	)
-	if err != nil {
-		return fmt.Errorf("creating otel interceptor: %w", err)
-	}
 
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(runsPath, runsHandler)
@@ -152,7 +154,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		if sc.BaseURL != "" {
 			runsURL = sc.BaseURL
 		}
-		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, runsURL)
+		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, runsURL, connect.WithInterceptors(otelInterceptor))
 		sc.AddWorker("trigger-scheduler", worker)
 		logger.Infof(ctx, "Registered trigger-scheduler worker")
 	}

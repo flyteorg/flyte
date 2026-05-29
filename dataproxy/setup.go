@@ -29,23 +29,6 @@ const otelServiceName = "dataproxy-service"
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
 
-	baseURL := sc.BaseURL
-	taskClient := taskconnect.NewTaskServiceClient(http.DefaultClient, baseURL)
-	triggerClient := triggerconnect.NewTriggerServiceClient(http.DefaultClient, baseURL)
-	runClient := workflowconnect.NewRunServiceClient(http.DefaultClient, baseURL)
-	projectClient := projectconnect.NewProjectServiceClient(http.DefaultClient, baseURL)
-
-	var logStreamer logs.LogStreamer
-	if sc.K8sConfig != nil {
-		var err error
-		logStreamer, err = logs.NewK8sLogStreamer(sc.K8sConfig)
-		if err != nil {
-			return fmt.Errorf("failed to create k8s log streamer: %w", err)
-		}
-	}
-
-	svc := service.NewService(*cfg, sc.DataStore, taskClient, triggerClient, runClient, projectClient, logStreamer)
-
 	otelCfg := otelutils.GetConfig()
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
@@ -57,6 +40,23 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
+
+	baseURL := sc.BaseURL
+	taskClient := taskconnect.NewTaskServiceClient(http.DefaultClient, baseURL, connect.WithInterceptors(otelInterceptor))
+	triggerClient := triggerconnect.NewTriggerServiceClient(http.DefaultClient, baseURL, connect.WithInterceptors(otelInterceptor))
+	runClient := workflowconnect.NewRunServiceClient(http.DefaultClient, baseURL, connect.WithInterceptors(otelInterceptor))
+	projectClient := projectconnect.NewProjectServiceClient(http.DefaultClient, baseURL, connect.WithInterceptors(otelInterceptor))
+
+	var logStreamer logs.LogStreamer
+	if sc.K8sConfig != nil {
+		var err error
+		logStreamer, err = logs.NewK8sLogStreamer(sc.K8sConfig)
+		if err != nil {
+			return fmt.Errorf("failed to create k8s log streamer: %w", err)
+		}
+	}
+
+	svc := service.NewService(*cfg, sc.DataStore, taskClient, triggerClient, runClient, projectClient, logStreamer)
 
 	path, handler := dataproxyconnect.NewDataProxyServiceHandler(svc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(path, handler)

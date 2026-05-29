@@ -32,18 +32,6 @@ func SetupInternal(ctx context.Context, sc *stdlibapp.SetupContext) error {
 func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	cfg := appconfig.GetAppConfig()
 
-	internalAppURL := cfg.InternalAppServiceURL
-	if sc.BaseURL != "" {
-		internalAppURL = sc.BaseURL
-	}
-
-	internalClient := appconnect.NewAppServiceClient(
-		http.DefaultClient,
-		internalAppURL+"/internal",
-	)
-
-	appSvc := service.NewAppService(internalClient, cfg.CacheTTL)
-
 	otelCfg := otelutils.GetConfig()
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
@@ -56,6 +44,19 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
 
+	internalAppURL := cfg.InternalAppServiceURL
+	if sc.BaseURL != "" {
+		internalAppURL = sc.BaseURL
+	}
+
+	internalClient := appconnect.NewAppServiceClient(
+		http.DefaultClient,
+		internalAppURL+"/internal",
+		connect.WithInterceptors(otelInterceptor),
+	)
+
+	appSvc := service.NewAppService(internalClient, cfg.CacheTTL)
+
 	path, handler := appconnect.NewAppServiceHandler(appSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted AppService at %s", path)
@@ -63,6 +64,7 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	internalLogsClient := appconnect.NewAppLogsServiceClient(
 		http.DefaultClient,
 		internalAppURL+"/internal",
+		connect.WithInterceptors(otelInterceptor),
 	)
 	logsSvc := service.NewAppLogsService(internalLogsClient)
 	logsPath, logsHandler := appconnect.NewAppLogsServiceHandler(logsSvc, connect.WithInterceptors(otelInterceptor))

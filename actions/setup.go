@@ -24,6 +24,18 @@ const otelServiceName = "actions-service"
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
 
+	otelCfg := otelutils.GetConfig()
+	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
+		return fmt.Errorf("registering otel providers: %w", err)
+	}
+	otelInterceptor, err := otelconnect.NewInterceptor(
+		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
+		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
+	)
+	if err != nil {
+		return fmt.Errorf("creating otel interceptor: %w", err)
+	}
+
 	if err := actionsk8s.InitScheme(); err != nil {
 		return fmt.Errorf("actions: failed to initialize scheme: %w", err)
 	}
@@ -32,7 +44,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if sc.BaseURL != "" {
 		runServiceURL = sc.BaseURL
 	}
-	runClient := workflowconnect.NewInternalRunServiceClient(http.DefaultClient, runServiceURL)
+	runClient := workflowconnect.NewInternalRunServiceClient(http.DefaultClient, runServiceURL, connect.WithInterceptors(otelInterceptor))
 
 	actionsClient := actionsk8s.NewActionsClient(
 		sc.K8sClient,
@@ -55,18 +67,6 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	})
 
 	actionsSvc := service.NewActionsService(actionsClient)
-
-	otelCfg := otelutils.GetConfig()
-	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
-		return fmt.Errorf("registering otel providers: %w", err)
-	}
-	otelInterceptor, err := otelconnect.NewInterceptor(
-		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
-		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
-	)
-	if err != nil {
-		return fmt.Errorf("creating otel interceptor: %w", err)
-	}
 
 	path, handler := actionsconnect.NewActionsServiceHandler(actionsSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(path, handler)

@@ -21,14 +21,6 @@ const otelServiceName = "events-service"
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
 
-	runServiceURL := cfg.RunServiceURL
-	if sc.BaseURL != "" {
-		runServiceURL = sc.BaseURL
-	}
-	runClient := workflowconnect.NewInternalRunServiceClient(http.DefaultClient, runServiceURL)
-
-	eventsSvc := service.NewEventsProxyService(runClient)
-
 	otelCfg := otelutils.GetConfig()
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
@@ -40,6 +32,14 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
+
+	runServiceURL := cfg.RunServiceURL
+	if sc.BaseURL != "" {
+		runServiceURL = sc.BaseURL
+	}
+	runClient := workflowconnect.NewInternalRunServiceClient(http.DefaultClient, runServiceURL, connect.WithInterceptors(otelInterceptor))
+
+	eventsSvc := service.NewEventsProxyService(runClient)
 
 	path, handler := workflowconnect.NewEventsProxyServiceHandler(eventsSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(path, handler)
