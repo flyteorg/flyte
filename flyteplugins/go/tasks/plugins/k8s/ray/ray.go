@@ -265,6 +265,15 @@ func (h rayJobResourceHandler) BuildJobResource(ctx context.Context, taskCtx plu
 		}
 	}
 
+	// The cluster is shared, so its head/worker pods carry no execution identity (see
+	// stripRunScopedEnvVars). Inject this job's identity into the RayJob runtime_env instead, so Ray
+	// applies it to the driver process (which runs on the shared head node) and each job reports under
+	// its own run rather than the cluster creator's.
+	runtimeEnvYaml, err = injectRunScopedRuntimeEnv(runtimeEnvYaml, collectRunScopedEnvVars(taskCtx))
+	if err != nil {
+		return nil, err
+	}
+
 	jobSpec := rayv1.RayJobSpec{
 		// The cluster is shared and standalone; the job must not own or shut it down.
 		RayClusterSpec:           nil,
@@ -904,4 +913,77 @@ func init() {
 				return k8s.NewDefaultKubeClient(kubeConfig)
 			},
 		})
+}
+
+// collectRunScopedEnvVars returns this task's execution-identity environment variables (the same
+// keys listed in runScopedEnvVars) with their concrete per-run values. These are normally injected
+// onto the task pod by flytek8s.DecorateEnvVars, but for a shared Ray cluster they are stripped from
+// the cluster pods and instead carried by the RayJob runtime_env so the driver gets its own identity.
+func collectRunScopedEnvVars(taskCtx pluginsCore.TaskExecutionContext) map[string]string {
+	out := map[string]string{}
+	meta := taskCtx.TaskExecutionMetadata()
+
+	// Run-scoped vars projected from the TaskAction (RUN_NAME, ACTION_NAME, _U_RUN_BASE, _U_ORG_NAME).
+	for k, v := range meta.GetEnvironmentVariables() {
+		if _, isRunScoped := runScopedEnvVars[k]; isRunScoped {
+			out[k] = v
+		}
+	}
+
+	// Execution/task identity vars injected by flytek8s (FLYTE_INTERNAL_*). Only plain-valued entries
+	// are usable in runtime_env; skip any backed by a downward-API ValueFrom (e.g. _F_PN).
+	for _, e := range flytek8s.GetExecutionEnvVars(meta.GetTaskExecutionID(), meta.GetConsoleURL()) {
+		if e.ValueFrom != nil {
+			continue
+		}
+		if _, isRunScoped := runScopedEnvVars[e.Name]; isRunScoped {
+			out[e.Name] = e.Value
+		}
+	}
+
+	return out
+}
+
+// injectRunScopedRuntimeEnv merges the given env vars into the env_vars section of a Ray
+// runtime_env YAML document, returning the updated YAML. Existing keys in the document take
+// precedence (a user-supplied value is never overwritten). If envVars is empty the input is
+// returned unchanged.
+func injectRunScopedRuntimeEnv(runtimeEnvYaml string, envVars map[string]string) (string, error) {
+	if len(envVars) == 0 {
+		return runtimeEnvYaml, nil
+	}
+
+	doc := map[string]interface{}{}
+	if strings.TrimSpace(runtimeEnvYaml) != "" {
+		if err := yaml.Unmarshal([]byte(runtimeEnvYaml), &doc); err != nil {
+			return "", flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid runtime_env YAML [%v], Err: [%v]", runtimeEnvYaml, err.Error())
+		}
+	}
+
+	// Normalize the existing env_vars section (YAML decodes maps as map[interface{}]interface{}).
+	merged := map[string]interface{}{}
+	if existing, ok := doc["env_vars"]; ok {
+		switch m := existing.(type) {
+		case map[interface{}]interface{}:
+			for k, v := range m {
+				merged[fmt.Sprintf("%v", k)] = v
+			}
+		case map[string]interface{}:
+			for k, v := range m {
+				merged[k] = v
+			}
+		}
+	}
+	for k, v := range envVars {
+		if _, exists := merged[k]; !exists {
+			merged[k] = v
+		}
+	}
+	doc["env_vars"] = merged
+
+	out, err := yaml.Marshal(doc)
+	if err != nil {
+		return "", err
+	}
+	return string(out), nil
 }

@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"gopkg.in/yaml.v2"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -1584,4 +1585,66 @@ func TestIsClusterReady(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.True(t, ready)
+}
+
+func TestInjectRunScopedRuntimeEnv(t *testing.T) {
+	t.Run("adds env_vars to existing runtime_env", func(t *testing.T) {
+		in := "pip:\n- numpy\n"
+		out, err := injectRunScopedRuntimeEnv(in, map[string]string{"RUN_NAME": "r1", "ACTION_NAME": "a0"})
+		require.NoError(t, err)
+
+		var doc map[string]interface{}
+		require.NoError(t, yaml.Unmarshal([]byte(out), &doc))
+		ev, ok := doc["env_vars"].(map[interface{}]interface{})
+		require.True(t, ok, "env_vars present")
+		assert.Equal(t, "r1", ev["RUN_NAME"])
+		assert.Equal(t, "a0", ev["ACTION_NAME"])
+		// Existing keys preserved.
+		assert.Equal(t, []interface{}{"numpy"}, doc["pip"])
+	})
+
+	t.Run("does not overwrite user-supplied env_vars", func(t *testing.T) {
+		in := "env_vars:\n  RUN_NAME: user-set\n"
+		out, err := injectRunScopedRuntimeEnv(in, map[string]string{"RUN_NAME": "r1"})
+		require.NoError(t, err)
+		var doc map[string]interface{}
+		require.NoError(t, yaml.Unmarshal([]byte(out), &doc))
+		ev := doc["env_vars"].(map[interface{}]interface{})
+		assert.Equal(t, "user-set", ev["RUN_NAME"])
+	})
+
+	t.Run("empty envVars returns input unchanged", func(t *testing.T) {
+		in := "pip:\n- numpy\n"
+		out, err := injectRunScopedRuntimeEnv(in, nil)
+		require.NoError(t, err)
+		assert.Equal(t, in, out)
+	})
+
+	t.Run("empty runtime_env produces valid env_vars doc", func(t *testing.T) {
+		out, err := injectRunScopedRuntimeEnv("", map[string]string{"RUN_NAME": "r1"})
+		require.NoError(t, err)
+		var doc map[string]interface{}
+		require.NoError(t, yaml.Unmarshal([]byte(out), &doc))
+		ev := doc["env_vars"].(map[interface{}]interface{})
+		assert.Equal(t, "r1", ev["RUN_NAME"])
+	})
+}
+
+func TestBuildJobResourceInjectsRunScopedRuntimeEnv(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	taskCtx := dummyRayTaskContext(dummyRayTaskTemplate("ray-id", dummyRayCustomObj()), resourceRequirements, nil, "", serviceAccount)
+
+	obj, err := rayJobResourceHandler.BuildJobResource(context.Background(), taskCtx, "ray-test")
+	require.NoError(t, err)
+	rayJob, ok := obj.(*rayv1.RayJob)
+	require.True(t, ok)
+
+	var doc map[string]interface{}
+	require.NoError(t, yaml.Unmarshal([]byte(rayJob.Spec.RuntimeEnvYAML), &doc))
+	ev, ok := doc["env_vars"].(map[interface{}]interface{})
+	require.True(t, ok, "runtime_env should carry env_vars with the job's identity")
+	// The job's execution identity (from flytek8s.GetExecutionEnvVars) must land in runtime_env so the
+	// driver on the shared head pod reports under its own run rather than the cluster creator's.
+	assert.Contains(t, ev, "FLYTE_INTERNAL_EXECUTION_ID")
+	assert.Equal(t, "my_name", ev["FLYTE_INTERNAL_EXECUTION_ID"])
 }
