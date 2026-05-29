@@ -14,7 +14,6 @@ import (
 	"github.com/samber/lo"
 	"gopkg.in/yaml.v2"
 	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -57,19 +56,6 @@ var logTemplateRegexes = struct {
 }{
 	tasklog.MustCreateRegex("rayClusterName"),
 	tasklog.MustCreateRegex("rayJobID"),
-}
-
-// Copy it from KubeRay to avoid adding a new dependency to go.mod.
-// https://github.com/ray-project/kuberay/blob/1ced2b968eabcfee4dcfa61391d307b60e46a2ed/ray-operator/controllers/ray/common/job.go#L122-L145
-var submitterDefaultResourceRequirements = v1.ResourceRequirements{
-	Limits: v1.ResourceList{
-		v1.ResourceCPU:    resource.MustParse("1"),
-		v1.ResourceMemory: resource.MustParse("1Gi"),
-	},
-	Requests: v1.ResourceList{
-		v1.ResourceCPU:    resource.MustParse("500m"),
-		v1.ResourceMemory: resource.MustParse("200Mi"),
-	},
 }
 
 type rayJobResourceHandler struct{}
@@ -493,35 +479,6 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 	podTemplateSpec.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()), spec.GetK8SPod().GetMetadata().GetAnnotations()))
 
 	return podTemplateSpec, nil
-}
-
-func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec) v1.PodTemplateSpec {
-
-	headPodSpec := rayClusterSpec.HeadGroupSpec.Template.Spec
-
-	tolerations := make([]v1.Toleration, 0)
-	if config.GetK8sPluginConfig() != nil && len(config.GetK8sPluginConfig().DefaultTolerations) > 0 {
-		tolerations = append(tolerations, config.GetK8sPluginConfig().DefaultTolerations...)
-	}
-
-	enableServiceLinks := false
-	return v1.PodTemplateSpec{
-		Spec: v1.PodSpec{
-			Containers: []v1.Container{
-				{
-					Name: "ray-job-submitter",
-					// Use the image of the Ray head to be defensive against version mismatch issues
-					Image:     headPodSpec.Containers[0].Image,
-					Resources: submitterDefaultResourceRequirements,
-				},
-			},
-			RestartPolicy:      v1.RestartPolicyNever,
-			EnableServiceLinks: &enableServiceLinks,
-			// Run the RayJob submitter pod with the default affinity/tolerations so it lands on the default node.
-			Tolerations: tolerations,
-			Affinity:    config.GetK8sPluginConfig().DefaultAffinity,
-		},
-	}
 }
 
 func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMetadata *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.WorkerGroupSpec) (v1.PodTemplateSpec, error) {
