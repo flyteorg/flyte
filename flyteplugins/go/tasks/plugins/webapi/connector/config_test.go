@@ -54,7 +54,7 @@ func TestDefaultAgentConfig(t *testing.T) {
 	assert.True(t, cfg.DefaultConnector.Insecure)
 	assert.Equal(t, 10*time.Second, cfg.DefaultConnector.DefaultTimeout.Duration)
 	// DefaultServiceConfig defaults to empty; getGrpcConnection falls back to
-	// defaultGRPCServiceConfig when a deployment does not override it.
+	// DefaultGRPCServiceConfig when a deployment does not override it.
 	assert.Empty(t, cfg.DefaultConnector.DefaultServiceConfig)
 
 	assert.Empty(t, cfg.DefaultConnector.Timeouts)

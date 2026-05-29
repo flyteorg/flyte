@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/x509"
 	"strings"
-	"time"
 
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
@@ -22,18 +21,13 @@ import (
 
 const defaultTaskTypeVersion = 0
 
-// defaultGRPCServiceConfig is the gRPC service config applied to a connector
+// DefaultGRPCServiceConfig is the gRPC service config applied to a connector
 // connection when its Deployment does not set DefaultServiceConfig. It enables
 // round-robin load balancing across connector replicas and retries transient
 // UNAVAILABLE failures so a single dropped connection does not fail the task.
-//
-// Connector traffic frequently flows through an L7 gateway (e.g. the
-// Knative/Kourier Envoy gateway), which reaps idle HTTP/2 connections and sends
-// GOAWAY/drain on routing changes. The cached *grpc.ClientConn then surfaces
-// "error reading server preface: ... use of closed network connection" on the
-// next RPC; retrying UNAVAILABLE absorbs that blip in-band. retryThrottling
-// stops retries from hammering a connector that is genuinely down.
-const defaultGRPCServiceConfig = `{
+// It is exported so callers that register connectors programmatically (e.g. the
+// operator app controller) can set it explicitly.
+const DefaultGRPCServiceConfig = `{
   "loadBalancingConfig": [{"round_robin":{}}],
   "methodConfig": [{
     "name": [{"service": "flyteidl2.connector.AsyncConnectorService"}],
@@ -47,16 +41,6 @@ const defaultGRPCServiceConfig = `{
   }],
   "retryThrottling": {"maxTokens": 10, "tokenRatio": 0.1}
 }`
-
-// gRPC client keepalive parameters. Pinging below the gateway's idle timeout
-// keeps long-lived connector connections from being reaped while idle (the
-// connector metadata poll and task RPCs are bursty), and proactively detects a
-// half-dead connection instead of discovering it on the next RPC.
-var connectorKeepalive = keepalive.ClientParameters{
-	Time:                30 * time.Second,
-	Timeout:             10 * time.Second,
-	PermitWithoutStream: true,
-}
 
 type Connector struct {
 	// ConnectorDeployment is the connector deployment where this connector is running.
@@ -90,11 +74,21 @@ func getGrpcConnection(ctx context.Context, connector *Deployment) (*grpc.Client
 
 	serviceConfig := connector.DefaultServiceConfig
 	if len(serviceConfig) == 0 {
-		serviceConfig = defaultGRPCServiceConfig
+		serviceConfig = DefaultGRPCServiceConfig
 	}
 	opts = append(opts, grpc.WithDefaultServiceConfig(serviceConfig))
 
-	opts = append(opts, grpc.WithKeepaliveParams(connectorKeepalive))
+	// Keepalive is opt-in per deployment. It is only safe for connectors fronted
+	// by an L7 gateway (e.g. Knative/Kourier Envoy) that reaps idle connections;
+	// a directly-reached grpc-go or grpcio (C-core) server rejects frequent idle
+	// pings with GOAWAY "too_many_pings".
+	if connector.Keepalive != nil {
+		opts = append(opts, grpc.WithKeepaliveParams(keepalive.ClientParameters{
+			Time:                connector.Keepalive.Time.Duration,
+			Timeout:             connector.Keepalive.Timeout.Duration,
+			PermitWithoutStream: connector.Keepalive.PermitWithoutStream,
+		}))
+	}
 
 	var err error
 	conn, err := grpc.Dial(connector.Endpoint, opts...) //nolint: staticcheck

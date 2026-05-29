@@ -5,9 +5,12 @@ import (
 	"encoding/json"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
 
 func TestInitializeClients(t *testing.T) {
@@ -33,7 +36,7 @@ func TestInitializeClients(t *testing.T) {
 func TestDefaultGRPCServiceConfig(t *testing.T) {
 	// Must be valid JSON — grpc.WithDefaultServiceConfig silently ignores a
 	// malformed config, so a typo here would disable LB/retry without any error.
-	assert.True(t, json.Valid([]byte(defaultGRPCServiceConfig)), "defaultGRPCServiceConfig must be valid JSON")
+	assert.True(t, json.Valid([]byte(DefaultGRPCServiceConfig)), "DefaultGRPCServiceConfig must be valid JSON")
 
 	var parsed struct {
 		LoadBalancingConfig []map[string]any `json:"loadBalancingConfig"`
@@ -48,7 +51,7 @@ func TestDefaultGRPCServiceConfig(t *testing.T) {
 		} `json:"methodConfig"`
 		RetryThrottling map[string]any `json:"retryThrottling"`
 	}
-	require.NoError(t, json.Unmarshal([]byte(defaultGRPCServiceConfig), &parsed))
+	require.NoError(t, json.Unmarshal([]byte(DefaultGRPCServiceConfig), &parsed))
 
 	require.Len(t, parsed.LoadBalancingConfig, 1)
 	_, hasRoundRobin := parsed.LoadBalancingConfig[0]["round_robin"]
@@ -66,7 +69,7 @@ func TestDefaultGRPCServiceConfig(t *testing.T) {
 func TestGetGrpcConnection(t *testing.T) {
 	ctx := context.Background()
 
-	// Empty DefaultServiceConfig must fall back to defaultGRPCServiceConfig
+	// Empty DefaultServiceConfig must fall back to DefaultGRPCServiceConfig
 	// (round-robin + retry) rather than no service config at all.
 	conn, err := getGrpcConnection(ctx, &Deployment{Endpoint: "x", Insecure: true})
 	require.NoError(t, err)
@@ -79,9 +82,22 @@ func TestGetGrpcConnection(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, conn)
 	assert.NoError(t, conn.Close())
+
+	// Keepalive is opt-in: a deployment may enable it (gateway-fronted connectors).
+	conn, err = getGrpcConnection(ctx, &Deployment{
+		Endpoint: "z", Insecure: true,
+		Keepalive: &KeepaliveConfig{
+			Time:                config.Duration{Duration: 30 * time.Second},
+			Timeout:             config.Duration{Duration: 10 * time.Second},
+			PermitWithoutStream: true,
+		},
+	})
+	require.NoError(t, err)
+	require.NotNil(t, conn)
+	assert.NoError(t, conn.Close())
 }
 
 // ensure the constant referenced from config.go and the LB choice stay in sync
 func TestDefaultGRPCServiceConfigMentionsRoundRobin(t *testing.T) {
-	assert.True(t, strings.Contains(defaultGRPCServiceConfig, "round_robin"))
+	assert.True(t, strings.Contains(DefaultGRPCServiceConfig, "round_robin"))
 }
