@@ -30,6 +30,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/pod"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/pbhash"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
@@ -39,6 +40,9 @@ const (
 	defaultRayStateVolName             = "system-ray-state"
 	rayTaskType                        = "ray"
 	KindRayJob                         = "RayJob"
+	KindRayCluster                     = "RayCluster"
+	rayClusterLabelKey                 = "ray.io/cluster"
+	clusterNameHashLength              = 16
 	IncludeDashboard                   = "include-dashboard"
 	NodeIPAddress                      = "node-ip-address"
 	DashboardHost                      = "dashboard-host"
@@ -75,24 +79,51 @@ func (rayJobResourceHandler) GetProperties() k8s.PluginProperties {
 	return k8s.PluginProperties{GeneratedNameMaxLength: &maxLength}
 }
 
-// BuildResource Creates a new ray job resource
-func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
+// GetClusterName returns a deterministic name for the shared RayCluster derived from the RayJob
+// plugin spec, so that identical specs map to (and share) the same cluster.
+func (rayJobResourceHandler) GetClusterName(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (string, error) {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
-		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "unable to fetch task specification [%v]", err.Error())
+		return "", flyteerr.Errorf(flyteerr.BadTaskSpecification, "unable to fetch task specification [%v]", err.Error())
 	} else if taskTemplate == nil {
-		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nil task specification")
+		return "", flyteerr.Errorf(flyteerr.BadTaskSpecification, "nil task specification")
 	}
 
 	rayJob := plugins.RayJob{}
-	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &rayJob) //nolint: staticcheck
+	if err := utils.UnmarshalStruct(taskTemplate.GetCustom(), &rayJob); err != nil { //nolint: staticcheck
+		return "", flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
+	}
+
+	hash, err := pbhash.ComputeHashString(ctx, &rayJob)
 	if err != nil {
-		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
+		return "", flyteerr.Errorf(flyteerr.BadTaskSpecification, "failed to compute hash for ray job spec [%v]", err.Error())
+	}
+
+	safe := utils.ConvertToDNS1123SubdomainCompatibleString(strings.ToLower(hash))
+	if len(safe) > clusterNameHashLength {
+		safe = safe[:clusterNameHashLength]
+	}
+	return "ray-" + safe, nil
+}
+
+// readRaySpec reads the task template, unmarshals the RayJob plugin spec, converts the task to a
+// k8s pod spec and locates the primary container. It is shared by the cluster- and job-building paths.
+func (rayJobResourceHandler) readRaySpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (*plugins.RayJob, *v1.PodSpec, *metav1.ObjectMeta, int, *v1.Container, error) {
+	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return nil, nil, nil, 0, nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "unable to fetch task specification [%v]", err.Error())
+	} else if taskTemplate == nil {
+		return nil, nil, nil, 0, nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nil task specification")
+	}
+
+	rayJob := plugins.RayJob{}
+	if err := utils.UnmarshalStruct(taskTemplate.GetCustom(), &rayJob); err != nil { //nolint: staticcheck
+		return nil, nil, nil, 0, nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 	}
 
 	podSpec, objectMeta, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
 	if err != nil {
-		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
+		return nil, nil, nil, 0, nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
 	}
 
 	var primaryContainer *v1.Container
@@ -107,9 +138,14 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	if primaryContainer == nil {
-		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to get primary container from the pod: [%v]", err.Error())
+		return nil, nil, nil, 0, nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to get primary container from the pod")
 	}
 
+	return &rayJob, podSpec, objectMeta, primaryContainerIdx, primaryContainer, nil
+}
+
+// buildHeadStartParams computes the head node ray start params, defaulting from config.
+func buildHeadStartParams(rayJob *plugins.RayJob) map[string]string {
 	cfg := GetConfig()
 
 	headNodeRayStartParams := make(map[string]string)
@@ -120,7 +156,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	if _, exist := headNodeRayStartParams[IncludeDashboard]; !exist {
-		headNodeRayStartParams[IncludeDashboard] = strconv.FormatBool(GetConfig().IncludeDashboard)
+		headNodeRayStartParams[IncludeDashboard] = strconv.FormatBool(cfg.IncludeDashboard)
 	}
 
 	if _, exist := headNodeRayStartParams[NodeIPAddress]; !exist {
@@ -135,14 +171,99 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		headNodeRayStartParams[DisableUsageStatsStartParameter] = DisableUsageStatsStartParameterVal
 	}
 
-	podSpec.ServiceAccountName = cfg.ServiceAccount
-
-	rayjob, err := constructRayJob(taskCtx, &rayJob, objectMeta, *podSpec, headNodeRayStartParams, primaryContainerIdx, *primaryContainer)
-
-	return rayjob, err
+	return headNodeRayStartParams
 }
 
-func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.RayJob, objectMeta *metav1.ObjectMeta, taskPodSpec v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
+// BuildClusterResource builds the shared RayCluster object. The framework's ClusterPluginManager
+// assigns the cluster's name/namespace (= sanitized cluster name) and merges labels; we set the
+// ray.io/cluster label here so the RayJob's ClusterSelector matches.
+func (h rayJobResourceHandler) BuildClusterResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
+	rayJob, podSpec, objectMeta, primaryContainerIdx, primaryContainer, err := h.readRaySpec(ctx, taskCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	headNodeRayStartParams := buildHeadStartParams(rayJob)
+	podSpec.ServiceAccountName = GetConfig().ServiceAccount
+
+	clusterSpec, err := buildRayClusterSpec(taskCtx, rayJob, objectMeta, *podSpec, headNodeRayStartParams, primaryContainerIdx, *primaryContainer)
+	if err != nil {
+		return nil, err
+	}
+
+	clusterName, err := h.GetClusterName(ctx, taskCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &rayv1.RayCluster{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       KindRayCluster,
+			APIVersion: rayv1.SchemeGroupVersion.String(),
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{rayClusterLabelKey: clusterName},
+		},
+		Spec: *clusterSpec,
+	}, nil
+}
+
+// BuildJobResource builds the RayJob that binds to the shared RayCluster via ClusterSelector.
+func (h rayJobResourceHandler) BuildJobResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, clusterName string) (client.Object, error) {
+	rayJob, _, objectMeta, _, primaryContainer, err := h.readRaySpec(ctx, taskCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Capture the entrypoint from the fresh primary container before any pod-template building clears Args.
+	entrypoint := strings.Join(primaryContainer.Args, " ")
+
+	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
+	runtimeEnvYaml := rayJob.RuntimeEnvYaml
+	if rayJob.RuntimeEnv != "" && rayJob.RuntimeEnvYaml == "" { //nolint: staticcheck
+		runtimeEnvYaml, err = convertBase64RuntimeEnvToYaml(rayJob.RuntimeEnv) //nolint: staticcheck
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	jobSpec := rayv1.RayJobSpec{
+		// The cluster is shared and standalone; the job must not own or shut it down.
+		RayClusterSpec:           nil,
+		ClusterSelector:          map[string]string{rayClusterLabelKey: clusterName},
+		Entrypoint:               entrypoint,
+		RuntimeEnvYAML:           runtimeEnvYaml,
+		ShutdownAfterJobFinishes: false,
+	}
+
+	return &rayv1.RayJob{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       KindRayJob,
+			APIVersion: rayv1.SchemeGroupVersion.String(),
+		},
+		Spec:       jobSpec,
+		ObjectMeta: *objectMeta,
+	}, nil
+}
+
+func (rayJobResourceHandler) BuildClusterIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (client.Object, error) {
+	return &rayv1.RayCluster{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       KindRayCluster,
+			APIVersion: rayv1.SchemeGroupVersion.String(),
+		},
+	}, nil
+}
+
+func (rayJobResourceHandler) IsClusterReady(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (bool, error) {
+	cluster, ok := resource.(*rayv1.RayCluster)
+	if !ok {
+		return false, fmt.Errorf("unexpected resource type: expected *RayCluster, got %T", resource)
+	}
+	return cluster.Status.State == rayv1.Ready, nil
+}
+
+func buildRayClusterSpec(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.RayJob, objectMeta *metav1.ObjectMeta, taskPodSpec v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayClusterSpec, error) {
 	enableIngress := true
 	cfg := GetConfig()
 
@@ -165,8 +286,9 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 			EnableIngress:  &enableIngress,
 			RayStartParams: headNodeRayStartParams,
 		},
-		WorkerGroupSpecs:        []rayv1.WorkerGroupSpec{},
-		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableAutoscaling,
+		WorkerGroupSpecs: []rayv1.WorkerGroupSpec{},
+		// Shared clusters should autoscale and idle-reap.
+		EnableInTreeAutoscaling: ptrBool(true),
 	}
 
 	for _, spec := range rayJob.RayCluster.WorkerGroupSpec {
@@ -228,43 +350,11 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		rayClusterSpec.WorkerGroupSpecs[index].Template.Spec.ServiceAccountName = serviceAccountName
 	}
 
-	shutdownAfterJobFinishes := cfg.ShutdownAfterJobFinishes
-	ttlSecondsAfterFinished := &cfg.TTLSecondsAfterFinished
-	if rayJob.ShutdownAfterJobFinishes {
-		shutdownAfterJobFinishes = true
-		ttlSecondsAfterFinished = &rayJob.TtlSecondsAfterFinished
-	}
+	return &rayClusterSpec, nil
+}
 
-	submitterPodTemplate := buildSubmitterPodTemplate(&rayClusterSpec)
-
-	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
-	var runtimeEnvYaml string
-	runtimeEnvYaml = rayJob.RuntimeEnvYaml
-	// If runtime_env exists but runtime_env_yaml does not, convert runtime_env to runtime_env_yaml
-	if rayJob.RuntimeEnv != "" && rayJob.RuntimeEnvYaml == "" { //nolint: staticcheck
-		runtimeEnvYaml, err = convertBase64RuntimeEnvToYaml(rayJob.RuntimeEnv) //nolint: staticcheck
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	jobSpec := rayv1.RayJobSpec{
-		RayClusterSpec:           &rayClusterSpec,
-		Entrypoint:               strings.Join(primaryContainer.Args, " "),
-		ShutdownAfterJobFinishes: shutdownAfterJobFinishes,
-		TTLSecondsAfterFinished:  *ttlSecondsAfterFinished,
-		RuntimeEnvYAML:           runtimeEnvYaml,
-		SubmitterPodTemplate:     &submitterPodTemplate,
-	}
-
-	return &rayv1.RayJob{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       KindRayJob,
-			APIVersion: rayv1.SchemeGroupVersion.String(),
-		},
-		Spec:       jobSpec,
-		ObjectMeta: *objectMeta,
-	}, nil
+func ptrBool(b bool) *bool {
+	return &b
 }
 
 func convertBase64RuntimeEnvToYaml(s string) (string, error) {
@@ -576,7 +666,7 @@ func mergeCustomPodSpec(podSpec *v1.PodSpec, k8sPod *core.K8SPod) (*v1.PodSpec, 
 	return podSpec, nil
 }
 
-func (rayJobResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (client.Object, error) {
+func (rayJobResourceHandler) BuildJobIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (client.Object, error) {
 	return &rayv1.RayJob{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       KindRayJob,
@@ -701,7 +791,7 @@ func logContextForPods(rayJobName string, pods []v1.Pod) *core.LogContext {
 	return logCtx
 }
 
-func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
+func (plugin rayJobResourceHandler) GetJobPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 	rayJob := resource.(*rayv1.RayJob)
 	info, err := getEventInfoForRayJob(ctx, GetConfig().Logs, pluginContext, rayJob)
 	if err != nil {
@@ -773,35 +863,6 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	return phaseInfo, err
 }
 
-// IsTerminal returns true if the RayJob is in a terminal state (Complete or Failed)
-func (rayJobResourceHandler) IsTerminal(_ context.Context, resource client.Object) (bool, error) {
-	job, ok := resource.(*rayv1.RayJob)
-	if !ok {
-		return false, fmt.Errorf("unexpected resource type: expected *RayJob, got %T", resource)
-	}
-	status := job.Status.JobDeploymentStatus
-	return status == rayv1.JobDeploymentStatusComplete || status == rayv1.JobDeploymentStatusFailed, nil
-}
-
-// GetCompletionTime returns the end time of the RayJob
-func (rayJobResourceHandler) GetCompletionTime(resource client.Object) (time.Time, error) {
-	job, ok := resource.(*rayv1.RayJob)
-	if !ok {
-		return time.Time{}, fmt.Errorf("unexpected resource type: expected *RayJob, got %T", resource)
-	}
-
-	if job.Status.EndTime != nil && !job.Status.EndTime.IsZero() {
-		return job.Status.EndTime.Time, nil
-	}
-
-	// Fallback to start time or creation time
-	if job.Status.StartTime != nil && !job.Status.StartTime.IsZero() {
-		return job.Status.StartTime.Time, nil
-	}
-
-	return job.CreationTimestamp.Time, nil
-}
-
 func init() {
 	if err := rayv1.AddToScheme(scheme.Scheme); err != nil {
 		panic(err)
@@ -809,11 +870,12 @@ func init() {
 
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{
-			ID:                  rayTaskType,
-			RegisteredTaskTypes: []pluginsCore.TaskType{rayTaskType},
-			ResourceToWatch:     &rayv1.RayJob{},
-			Plugin:              rayJobResourceHandler{},
-			IsDefault:           false,
+			ID:                     rayTaskType,
+			RegisteredTaskTypes:    []pluginsCore.TaskType{rayTaskType},
+			ResourceToWatch:        &rayv1.RayJob{},
+			ClusterResourceToWatch: &rayv1.RayCluster{},
+			ClusterPlugin:          rayJobResourceHandler{},
+			IsDefault:              false,
 			CustomKubeClient: func(ctx context.Context) (pluginsCore.KubeClient, error) {
 				remoteConfig := GetConfig().RemoteClusterConfig
 				if !remoteConfig.Enabled {
