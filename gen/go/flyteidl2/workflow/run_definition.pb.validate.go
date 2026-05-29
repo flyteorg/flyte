@@ -1327,6 +1327,35 @@ func (m *ConditionActionMetadata) validate(all bool) error {
 
 	// no validation rules for Name
 
+	if all {
+		switch v := interface{}(m.GetType()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ConditionActionMetadataValidationError{
+					field:  "Type",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ConditionActionMetadataValidationError{
+					field:  "Type",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetType()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ConditionActionMetadataValidationError{
+				field:  "Type",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return ConditionActionMetadataMultiError(errors)
 	}
@@ -2764,6 +2793,47 @@ func (m *ActionDetails) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ActionDetailsValidationError{
 					field:  "Trace",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ActionDetails_Condition:
+		if v == nil {
+			err := ActionDetailsValidationError{
+				field:  "Spec",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetCondition()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ActionDetailsValidationError{
+						field:  "Condition",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ActionDetailsValidationError{
+						field:  "Condition",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetCondition()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ActionDetailsValidationError{
+					field:  "Condition",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
