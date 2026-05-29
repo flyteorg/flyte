@@ -8,7 +8,7 @@ Chart for basic single Flyte executable deployment
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../flyteconnector | flyteconnector(flyteconnector) | v0.1.10 |
+| file://../flyteconnector | flyteconnector(flyteconnector) | v2.0.0 |
 
 ## Values
 
@@ -172,4 +172,3 @@ Chart for basic single Flyte executable deployment
 | serviceAccount.imagePullSecrets | list | `[]` |  |
 | serviceAccount.labels | object | `{}` |  |
 | serviceAccount.name | string | `""` |  |
-

@@ -12,6 +12,6 @@ version: v0.2.0  # VERSION
 
 dependencies:
   - name: flyteconnector
-    version: v0.1.10
+    version: v2.0.0
     repository: file://../flyteconnector
     condition: flyteconnector.enabled
