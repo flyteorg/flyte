@@ -22,6 +22,14 @@ type PluginEntry struct {
 	ResourceToWatch client.Object
 	// An instance of the plugin
 	Plugin Plugin
+	// ClusterPlugin, when non-nil, indicates this entry is driven by a ClusterPluginManager instead
+	// of a PluginManager. Exactly one of Plugin or ClusterPlugin must be set. When ClusterPlugin is
+	// set, ResourceToWatch must be the job resource type and ClusterResourceToWatch must be the
+	// cluster resource type.
+	ClusterPlugin ClusterPlugin
+	// ClusterResourceToWatch is the cluster CRD type (e.g. &rayv1.RayCluster{}). Required when
+	// ClusterPlugin is set, ignored otherwise.
+	ClusterResourceToWatch client.Object
 	// Boolean that indicates if this plugin can be used as the default for unknown task types. There can only be
 	// one default in the system
 	IsDefault bool
