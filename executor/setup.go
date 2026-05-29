@@ -7,10 +7,12 @@ import (
 	"net/http"
 	"os"
 
+	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -36,6 +38,7 @@ import (
 	// plugins with the global registry.
 	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/clustered"
 	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/pod"
+	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/ray"
 )
 
 var scheme = runtime.NewScheme()
@@ -43,6 +46,9 @@ var scheme = runtime.NewScheme()
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(flyteorgv1.AddToScheme(scheme))
+	// Register CRD types for plugins that use CRDs (must match the plugin imports below).
+	utilruntime.Must(rayv1.AddToScheme(scheme))
+	utilruntime.Must(jobsetv1alpha2.AddToScheme(scheme))
 }
 
 // Scheme returns the runtime.Scheme with executor CRDs registered.
