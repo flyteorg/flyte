@@ -65,6 +65,8 @@ const (
 	RunServiceWatchClusterEventsProcedure = "/flyteidl2.workflow.RunService/WatchClusterEvents"
 	// RunServiceAbortActionProcedure is the fully-qualified name of the RunService's AbortAction RPC.
 	RunServiceAbortActionProcedure = "/flyteidl2.workflow.RunService/AbortAction"
+	// RunServiceSignalEventProcedure is the fully-qualified name of the RunService's SignalEvent RPC.
+	RunServiceSignalEventProcedure = "/flyteidl2.workflow.RunService/SignalEvent"
 	// RunServiceWatchGroupsProcedure is the fully-qualified name of the RunService's WatchGroups RPC.
 	RunServiceWatchGroupsProcedure = "/flyteidl2.workflow.RunService/WatchGroups"
 	// RunServiceGetActionDataURIsProcedure is the fully-qualified name of the RunService's
@@ -91,6 +93,7 @@ var (
 	runServiceWatchActionsMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("WatchActions")
 	runServiceWatchClusterEventsMethodDescriptor  = runServiceServiceDescriptor.Methods().ByName("WatchClusterEvents")
 	runServiceAbortActionMethodDescriptor         = runServiceServiceDescriptor.Methods().ByName("AbortAction")
+	runServiceSignalEventMethodDescriptor         = runServiceServiceDescriptor.Methods().ByName("SignalEvent")
 	runServiceWatchGroupsMethodDescriptor         = runServiceServiceDescriptor.Methods().ByName("WatchGroups")
 	runServiceGetActionDataURIsMethodDescriptor   = runServiceServiceDescriptor.Methods().ByName("GetActionDataURIs")
 	runServiceGetActionLogContextMethodDescriptor = runServiceServiceDescriptor.Methods().ByName("GetActionLogContext")
@@ -128,6 +131,11 @@ type RunServiceClient interface {
 	WatchClusterEvents(context.Context, *connect.Request[workflow.WatchClusterEventsRequest]) (*connect.ServerStreamForClient[workflow.WatchClusterEventsResponse], error)
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
 	AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error)
+	// SignalEvent resolves a paused condition action by supplying its value.
+	// It converts the user-facing EventPayload to a core.Literal and delegates
+	// to ActionsService.Signal, resolving the condition's parent action for
+	// routing.
+	SignalEvent(context.Context, *connect.Request[workflow.SignalEventRequest]) (*connect.Response[workflow.SignalEventResponse], error)
 	// Stream updates for task groups based on the provided filter criteria.
 	WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest]) (*connect.ServerStreamForClient[workflow.WatchGroupsResponse], error)
 	// Get the storage URIs for an action's input and output data.
@@ -229,6 +237,12 @@ func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(runServiceAbortActionMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		signalEvent: connect.NewClient[workflow.SignalEventRequest, workflow.SignalEventResponse](
+			httpClient,
+			baseURL+RunServiceSignalEventProcedure,
+			connect.WithSchema(runServiceSignalEventMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		watchGroups: connect.NewClient[workflow.WatchGroupsRequest, workflow.WatchGroupsResponse](
 			httpClient,
 			baseURL+RunServiceWatchGroupsProcedure,
@@ -267,6 +281,7 @@ type runServiceClient struct {
 	watchActions        *connect.Client[workflow.WatchActionsRequest, workflow.WatchActionsResponse]
 	watchClusterEvents  *connect.Client[workflow.WatchClusterEventsRequest, workflow.WatchClusterEventsResponse]
 	abortAction         *connect.Client[workflow.AbortActionRequest, workflow.AbortActionResponse]
+	signalEvent         *connect.Client[workflow.SignalEventRequest, workflow.SignalEventResponse]
 	watchGroups         *connect.Client[workflow.WatchGroupsRequest, workflow.WatchGroupsResponse]
 	getActionDataURIs   *connect.Client[workflow.GetActionDataURIsRequest, workflow.GetActionDataURIsResponse]
 	getActionLogContext *connect.Client[workflow.GetActionLogContextRequest, workflow.GetActionLogContextResponse]
@@ -339,6 +354,11 @@ func (c *runServiceClient) AbortAction(ctx context.Context, req *connect.Request
 	return c.abortAction.CallUnary(ctx, req)
 }
 
+// SignalEvent calls flyteidl2.workflow.RunService.SignalEvent.
+func (c *runServiceClient) SignalEvent(ctx context.Context, req *connect.Request[workflow.SignalEventRequest]) (*connect.Response[workflow.SignalEventResponse], error) {
+	return c.signalEvent.CallUnary(ctx, req)
+}
+
 // WatchGroups calls flyteidl2.workflow.RunService.WatchGroups.
 func (c *runServiceClient) WatchGroups(ctx context.Context, req *connect.Request[workflow.WatchGroupsRequest]) (*connect.ServerStreamForClient[workflow.WatchGroupsResponse], error) {
 	return c.watchGroups.CallServerStream(ctx, req)
@@ -386,6 +406,11 @@ type RunServiceHandler interface {
 	WatchClusterEvents(context.Context, *connect.Request[workflow.WatchClusterEventsRequest], *connect.ServerStream[workflow.WatchClusterEventsResponse]) error
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
 	AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error)
+	// SignalEvent resolves a paused condition action by supplying its value.
+	// It converts the user-facing EventPayload to a core.Literal and delegates
+	// to ActionsService.Signal, resolving the condition's parent action for
+	// routing.
+	SignalEvent(context.Context, *connect.Request[workflow.SignalEventRequest]) (*connect.Response[workflow.SignalEventResponse], error)
 	// Stream updates for task groups based on the provided filter criteria.
 	WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest], *connect.ServerStream[workflow.WatchGroupsResponse]) error
 	// Get the storage URIs for an action's input and output data.
@@ -483,6 +508,12 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(runServiceAbortActionMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	runServiceSignalEventHandler := connect.NewUnaryHandler(
+		RunServiceSignalEventProcedure,
+		svc.SignalEvent,
+		connect.WithSchema(runServiceSignalEventMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	runServiceWatchGroupsHandler := connect.NewServerStreamHandler(
 		RunServiceWatchGroupsProcedure,
 		svc.WatchGroups,
@@ -531,6 +562,8 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 			runServiceWatchClusterEventsHandler.ServeHTTP(w, r)
 		case RunServiceAbortActionProcedure:
 			runServiceAbortActionHandler.ServeHTTP(w, r)
+		case RunServiceSignalEventProcedure:
+			runServiceSignalEventHandler.ServeHTTP(w, r)
 		case RunServiceWatchGroupsProcedure:
 			runServiceWatchGroupsHandler.ServeHTTP(w, r)
 		case RunServiceGetActionDataURIsProcedure:
@@ -596,6 +629,10 @@ func (UnimplementedRunServiceHandler) WatchClusterEvents(context.Context, *conne
 
 func (UnimplementedRunServiceHandler) AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.AbortAction is not implemented"))
+}
+
+func (UnimplementedRunServiceHandler) SignalEvent(context.Context, *connect.Request[workflow.SignalEventRequest]) (*connect.Response[workflow.SignalEventResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.SignalEvent is not implemented"))
 }
 
 func (UnimplementedRunServiceHandler) WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest], *connect.ServerStream[workflow.WatchGroupsResponse]) error {

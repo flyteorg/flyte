@@ -34,6 +34,7 @@ import (
 
 	// Plugin registrations — blank imports trigger init() which registers
 	// plugins with the global registry.
+	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/clustered"
 	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/pod"
 )
 

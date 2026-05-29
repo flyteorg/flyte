@@ -69,6 +69,12 @@ service RunService {
   // AbortAction aborts a single action that was previously created or is currently being processed by a worker.
   rpc AbortAction(AbortActionRequest) returns (AbortActionResponse) {}
 
+  // SignalEvent resolves a paused condition action by supplying its value.
+  // It converts the user-facing EventPayload to a core.Literal and delegates
+  // to ActionsService.Signal, resolving the condition's parent action for
+  // routing.
+  rpc SignalEvent(SignalEventRequest) returns (SignalEventResponse) {}
+
   // Stream updates for task groups based on the provided filter criteria.
   rpc WatchGroups(WatchGroupsRequest) returns (stream WatchGroupsResponse) {}
 
@@ -364,6 +370,36 @@ message AbortActionRequest {
 }
 
 message AbortActionResponse {}
+
+// EventPayload carries the typed value for a condition signal. This is the
+// user-facing simplified payload surface — the run service converts it to a
+// core.Literal before forwarding to ActionsService.Signal. Exactly one field
+// must be set, matching the condition's declared type.
+message EventPayload {
+  oneof value {
+    option (buf.validate.oneof).required = true;
+    bool bool_value = 1;
+    int64 int_value = 2;
+    double float_value = 3;
+    string string_value = 4;
+  }
+}
+
+// Request message for signalling a condition action within a run.
+message SignalEventRequest {
+  // The condition action to signal.
+  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // The parent action that owns the condition. Used to route the request to
+  // the correct actions-service shard (partitioned by parent action name).
+  string parent_action_name = 2;
+
+  // The value to signal the condition with. Must match the condition's
+  // declared type.
+  EventPayload payload = 3 [(buf.validate.field).required = true];
+}
+
+message SignalEventResponse {}
 
 message WatchGroupsRequest {
   oneof scope_by {

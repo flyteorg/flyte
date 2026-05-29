@@ -146,7 +146,7 @@ func NewPodMutator(ctx context.Context, cfg *webhookConfig.Config, podNamespace 
 	}
 
 	return &PodMutator{
-		decoder:        *admission.NewDecoder(scheme),
+		decoder:        admission.NewDecoder(scheme),
 		cfg:            cfg,
 		secretsMutator: secretsMutator,
 	}, nil

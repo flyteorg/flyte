@@ -131,7 +131,15 @@ message TraceActionMetadata {
 }
 
 message ConditionActionMetadata {
+  // Name of the condition (event) as declared by the SDK.
   string name = 1;
+
+  // Expected payload type for the SDK SignalEvent call. Clients use this
+  // to type-check / format the payload before signaling — for example so
+  // `flyte signal event <run> <action> <value>` can pick the right
+  // primitive variant without the user passing `--type`.
+  core.LiteralType type = 5;
+
   reserved 2, 3, 4;
   reserved "run_id", "action_id", "global";
 }
@@ -279,6 +287,7 @@ message ActionDetails {
   oneof spec {
     task.TaskSpec task = 6;
     task.TraceSpec trace = 8;
+    ConditionAction condition = 9;
   }
 
   // List of action attempts.
