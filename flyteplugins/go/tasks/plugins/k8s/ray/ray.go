@@ -60,6 +60,8 @@ var logTemplateRegexes = struct {
 
 type rayJobResourceHandler struct{}
 
+var _ k8s.ClusterPlugin = rayJobResourceHandler{}
+
 func (rayJobResourceHandler) GetProperties() k8s.PluginProperties {
 	maxLength := 47
 	return k8s.PluginProperties{GeneratedNameMaxLength: &maxLength}
