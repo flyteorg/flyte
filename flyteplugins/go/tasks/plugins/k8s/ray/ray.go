@@ -50,6 +50,56 @@ const (
 	RayHeadContainerName               = "ray-head"
 )
 
+// runScopedEnvVars are the execution-identity environment variables that Flyte injects into a
+// task's pod (via flytek8s.ToK8sPodSpec -> DecorateEnvVars). A shared RayCluster is created once
+// and reused by every task whose spec hashes to the same name, so these vars — which belong to the
+// FIRST task that created the cluster — must NOT be baked onto the long-lived head/worker pods.
+// Otherwise the Ray driver (which runs on the head pod) would read the creating task's identity for
+// every subsequent job. Per-job identity is instead carried by the RayJob (entrypoint args /
+// runtime env). User-supplied env (tokens, PYTHONPATH, etc.) is preserved.
+var runScopedEnvVars = map[string]struct{}{
+	// Projected from the TaskAction by the executor (taskCtx.GetEnvironmentVariables()).
+	"RUN_NAME":    {},
+	"ACTION_NAME": {},
+	"_U_RUN_BASE": {},
+	"_U_ORG_NAME": {},
+	// Injected by flytek8s.GetExecutionEnvVars / GetContextEnvVars.
+	"FLYTE_INTERNAL_EXECUTION_ID":       {},
+	"FLYTE_INTERNAL_EXECUTION_PROJECT":  {},
+	"FLYTE_INTERNAL_EXECUTION_DOMAIN":   {},
+	"FLYTE_INTERNAL_EXECUTION_WORKFLOW": {},
+	"FLYTE_ATTEMPT_NUMBER":              {},
+	"FLYTE_INTERNAL_TASK_PROJECT":       {},
+	"FLYTE_INTERNAL_TASK_DOMAIN":        {},
+	"FLYTE_INTERNAL_TASK_NAME":          {},
+	"FLYTE_INTERNAL_TASK_VERSION":       {},
+	"FLYTE_INTERNAL_PROJECT":            {},
+	"FLYTE_INTERNAL_DOMAIN":             {},
+	"FLYTE_INTERNAL_NAME":               {},
+	"FLYTE_INTERNAL_VERSION":            {},
+}
+
+// stripRunScopedEnvVars removes the run-scoped execution-identity env vars (see runScopedEnvVars)
+// from every container in the pod spec, so the shared cluster's pods stay run-agnostic.
+func stripRunScopedEnvVars(podSpec *v1.PodSpec) {
+	if podSpec == nil {
+		return
+	}
+	strip := func(containers []v1.Container) {
+		for i := range containers {
+			filtered := containers[i].Env[:0]
+			for _, e := range containers[i].Env {
+				if _, isRunScoped := runScopedEnvVars[e.Name]; !isRunScoped {
+					filtered = append(filtered, e)
+				}
+			}
+			containers[i].Env = filtered
+		}
+	}
+	strip(podSpec.InitContainers)
+	strip(podSpec.Containers)
+}
+
 var logTemplateRegexes = struct {
 	RayClusterName *regexp.Regexp
 	RayJobID       *regexp.Regexp
@@ -266,6 +316,9 @@ func buildRayClusterSpec(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugi
 	if err != nil {
 		return nil, err
 	}
+	// The cluster is shared across tasks, so its pods must not carry any single task's execution
+	// identity. Per-job identity travels with the RayJob instead.
+	stripRunScopedEnvVars(&headPodTemplate.Spec)
 
 	rayClusterSpec := rayv1.RayClusterSpec{
 		HeadGroupSpec: rayv1.HeadGroupSpec{
@@ -291,6 +344,7 @@ func buildRayClusterSpec(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugi
 		if err != nil {
 			return nil, err
 		}
+		stripRunScopedEnvVars(&workerPodTemplate.Spec)
 
 		workerNodeRayStartParams := make(map[string]string)
 		if spec.RayStartParams != nil {
