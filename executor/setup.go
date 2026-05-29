@@ -32,8 +32,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 
-	// Plugin registrations — blank imports trigger init() which registers
-	// plugins with the global registry.
+	_ "github.com/flyteorg/flyte/v2/executor/plugins"
 	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/clustered"
 	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/pod"
 )
@@ -57,6 +56,17 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
 
 	cfg := config.GetConfig()
+
+	taskPluginCfg := config.GetTaskPluginConfig()
+	enabledPlugins := make(map[string]bool, len(taskPluginCfg.EnabledPlugins))
+	for _, id := range taskPluginCfg.EnabledPlugins {
+		enabledPlugins[id] = true
+	}
+	for _, reg := range pluginmachinery.PluginRegistry().GetSchemeRegisters() {
+		if len(enabledPlugins) == 0 || enabledPlugins[reg.ID] {
+			utilruntime.Must(reg.AddToScheme(scheme))
+		}
+	}
 
 	var tlsOpts []func(*tls.Config)
 	if !cfg.EnableHTTP2 {
