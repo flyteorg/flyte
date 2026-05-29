@@ -279,6 +279,14 @@ func (m *ClusterPluginManager) checkJobPhase(ctx context.Context, tCtx pluginsCo
 		return pluginsCore.DoTransition(p), nil
 	}
 
+	// If the job is being deleted in the background while still non-terminal, surface it as a
+	// system-retryable failure (mirrors PluginManager.checkResourcePhase). Note: this checks only
+	// the job, never the shared cluster, which is owned by no single task execution.
+	if !p.Phase().IsTerminal() && job.GetDeletionTimestamp() != nil {
+		failureReason := fmt.Sprintf("object [%s] terminated unexpectedly in the background", nsName.String())
+		return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure("UnexpectedObjectDeletion", failureReason, nil)), nil
+	}
+
 	return pluginsCore.DoTransition(p), nil
 }
 
