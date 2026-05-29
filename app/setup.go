@@ -2,16 +2,22 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
+	"connectrpc.com/connect"
+	"connectrpc.com/otelconnect"
 	stdlibapp "github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 
 	appconfig "github.com/flyteorg/flyte/v2/app/config"
 	appinternal "github.com/flyteorg/flyte/v2/app/internal"
 	"github.com/flyteorg/flyte/v2/app/service"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
 )
+
+const otelServiceName = "app-service"
 
 // SetupInternal registers the data plane InternalAppService on the SetupContext mux.
 // It must be called before Setup so the proxy can reach /internal/... on the same mux.
@@ -37,7 +43,20 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	)
 
 	appSvc := service.NewAppService(internalClient, cfg.CacheTTL)
-	path, handler := appconnect.NewAppServiceHandler(appSvc)
+
+	otelCfg := otelutils.GetConfig()
+	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
+		return fmt.Errorf("registering otel providers: %w", err)
+	}
+	otelInterceptor, err := otelconnect.NewInterceptor(
+		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
+		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
+	)
+	if err != nil {
+		return fmt.Errorf("creating otel interceptor: %w", err)
+	}
+
+	path, handler := appconnect.NewAppServiceHandler(appSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted AppService at %s", path)
 
@@ -46,7 +65,7 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 		internalAppURL+"/internal",
 	)
 	logsSvc := service.NewAppLogsService(internalLogsClient)
-	logsPath, logsHandler := appconnect.NewAppLogsServiceHandler(logsSvc)
+	logsPath, logsHandler := appconnect.NewAppLogsServiceHandler(logsSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(logsPath, logsHandler)
 	logger.Infof(ctx, "Mounted AppLogsService at %s", logsPath)
 

@@ -16,9 +16,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice/v2/v2connect"
 )
 
-const (
-	otelServiceName = "cache-service"
-)
+const otelServiceName = "cache-service"
 
 // Setup registers the CacheService handler on the SetupContext mux.
 // Requires sc.DB and sc.DataStore to be set by the standalone binary.
