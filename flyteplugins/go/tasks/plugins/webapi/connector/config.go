@@ -41,10 +41,13 @@ var (
 			},
 		},
 		DefaultConnector: Deployment{
-			Endpoint:             "",
-			Insecure:             true,
-			DefaultTimeout:       config.Duration{Duration: 10 * time.Second},
-			DefaultServiceConfig: `{"loadBalancingConfig": [{"round_robin":{}}]}`,
+			Endpoint:       "",
+			Insecure:       true,
+			DefaultTimeout: config.Duration{Duration: 10 * time.Second},
+			// DefaultServiceConfig is left empty so getGrpcConnection falls back to
+			// defaultGRPCServiceConfig (round-robin LB + UNAVAILABLE retry). Set this
+			// per-deployment only to override that default.
+			DefaultServiceConfig: "",
 		},
 		ConnectorDeployments:  map[string]*Deployment{},
 		ConnectorForTaskTypes: map[string]string{},

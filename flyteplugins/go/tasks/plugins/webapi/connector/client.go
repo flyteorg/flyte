@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/x509"
 	"strings"
+	"time"
 
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
@@ -11,6 +12,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/grpclog"
+	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
@@ -19,6 +21,42 @@ import (
 )
 
 const defaultTaskTypeVersion = 0
+
+// defaultGRPCServiceConfig is the gRPC service config applied to a connector
+// connection when its Deployment does not set DefaultServiceConfig. It enables
+// round-robin load balancing across connector replicas and retries transient
+// UNAVAILABLE failures so a single dropped connection does not fail the task.
+//
+// Connector traffic frequently flows through an L7 gateway (e.g. the
+// Knative/Kourier Envoy gateway), which reaps idle HTTP/2 connections and sends
+// GOAWAY/drain on routing changes. The cached *grpc.ClientConn then surfaces
+// "error reading server preface: ... use of closed network connection" on the
+// next RPC; retrying UNAVAILABLE absorbs that blip in-band. retryThrottling
+// stops retries from hammering a connector that is genuinely down.
+const defaultGRPCServiceConfig = `{
+  "loadBalancingConfig": [{"round_robin":{}}],
+  "methodConfig": [{
+    "name": [{"service": "flyteidl2.connector.AsyncConnectorService"}],
+    "retryPolicy": {
+      "maxAttempts": 4,
+      "initialBackoff": "0.2s",
+      "maxBackoff": "3s",
+      "backoffMultiplier": 2.0,
+      "retryableStatusCodes": ["UNAVAILABLE"]
+    }
+  }],
+  "retryThrottling": {"maxTokens": 10, "tokenRatio": 0.1}
+}`
+
+// gRPC client keepalive parameters. Pinging below the gateway's idle timeout
+// keeps long-lived connector connections from being reaped while idle (the
+// connector metadata poll and task RPCs are bursty), and proactively detects a
+// half-dead connection instead of discovering it on the next RPC.
+var connectorKeepalive = keepalive.ClientParameters{
+	Time:                30 * time.Second,
+	Timeout:             10 * time.Second,
+	PermitWithoutStream: true,
+}
 
 type Connector struct {
 	// ConnectorDeployment is the connector deployment where this connector is running.
@@ -50,9 +88,13 @@ func getGrpcConnection(ctx context.Context, connector *Deployment) (*grpc.Client
 		opts = append(opts, grpc.WithTransportCredentials(creds))
 	}
 
-	if len(connector.DefaultServiceConfig) != 0 {
-		opts = append(opts, grpc.WithDefaultServiceConfig(connector.DefaultServiceConfig))
+	serviceConfig := connector.DefaultServiceConfig
+	if len(serviceConfig) == 0 {
+		serviceConfig = defaultGRPCServiceConfig
 	}
+	opts = append(opts, grpc.WithDefaultServiceConfig(serviceConfig))
+
+	opts = append(opts, grpc.WithKeepaliveParams(connectorKeepalive))
 
 	var err error
 	conn, err := grpc.Dial(connector.Endpoint, opts...) //nolint: staticcheck
