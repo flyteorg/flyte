@@ -116,20 +116,32 @@ func ExampleNewAutoRefreshCache() {
 	// the expected condition (instead of sleeping a fixed duration) keeps this example deterministic
 	// even when the async worker is slow under load.
 	var item Item
+	var lastStatus ExampleItemStatus = ExampleStatusNotStarted
 	deadline := time.Now().Add(10 * time.Second)
 	for {
 		item, err = cache.Get(item1.ID())
-		if err != nil && errors.IsCausedBy(err, ErrNotFound) {
-			fmt.Printf("Item1 is no longer in the cache")
-			break
+		if err != nil {
+			if errors.IsCausedBy(err, ErrNotFound) {
+				fmt.Printf("Item1 is no longer in the cache")
+				break
+			}
+			cancel()
+			panic(fmt.Sprintf("unexpected error fetching item1: %v", err))
 		}
-		if err == nil && item.(*ExampleCacheItem).status == ExampleStatusSucceeded {
-			fmt.Printf("Current status for item1 is %v", item.(*ExampleCacheItem).status)
+
+		exItem, ok := item.(*ExampleCacheItem)
+		if !ok {
+			cancel()
+			panic(fmt.Sprintf("unexpected item type %T for item1", item))
+		}
+		lastStatus = exItem.status
+		if lastStatus == ExampleStatusSucceeded {
+			fmt.Printf("Current status for item1 is %v", lastStatus)
 			break
 		}
 		if time.Now().After(deadline) {
 			cancel()
-			panic(fmt.Sprintf("timed out waiting for item1 to reach %v; last status=%v", ExampleStatusSucceeded, item.(*ExampleCacheItem).status))
+			panic(fmt.Sprintf("timed out waiting for item1 to reach %v; last status=%v", ExampleStatusSucceeded, lastStatus))
 		}
 		time.Sleep(resyncPeriod)
 	}
