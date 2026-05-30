@@ -116,7 +116,7 @@ func ExampleNewAutoRefreshCache() {
 	// the expected condition (instead of sleeping a fixed duration) keeps this example deterministic
 	// even when the async worker is slow under load.
 	var item Item
-	deadline := time.Now().Add(3 * time.Second)
+	deadline := time.Now().Add(10 * time.Second)
 	for {
 		item, err = cache.Get(item1.ID())
 		if err != nil && errors.IsCausedBy(err, ErrNotFound) {
