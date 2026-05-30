@@ -128,8 +128,8 @@ func ExampleNewAutoRefreshCache() {
 			break
 		}
 		if time.Now().After(deadline) {
-			fmt.Printf("Current status for item1 is %v", item.(*ExampleCacheItem).status)
-			break
+			cancel()
+			panic(fmt.Sprintf("timed out waiting for item1 to reach %v; last status=%v", ExampleStatusSucceeded, item.(*ExampleCacheItem).status))
 		}
 		time.Sleep(resyncPeriod)
 	}
