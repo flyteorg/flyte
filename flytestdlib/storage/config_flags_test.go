@@ -309,4 +309,60 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_defaultHttpClient.maxIdleConns", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("defaultHttpClient.maxIdleConns", testValue)
+			if vInt, err := cmdFlags.GetInt("defaultHttpClient.maxIdleConns"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.DefaultHTTPClient.MaxIdleConns)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_defaultHttpClient.maxIdleConnsPerHost", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("defaultHttpClient.maxIdleConnsPerHost", testValue)
+			if vInt, err := cmdFlags.GetInt("defaultHttpClient.maxIdleConnsPerHost"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.DefaultHTTPClient.MaxIdleConnsPerHost)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_defaultHttpClient.maxConnsPerHost", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("defaultHttpClient.maxConnsPerHost", testValue)
+			if vInt, err := cmdFlags.GetInt("defaultHttpClient.maxConnsPerHost"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.DefaultHTTPClient.MaxConnsPerHost)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_defaultHttpClient.idleConnTimeout", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.DefaultHTTPClient.IdleConnTimeout.String()
+
+			cmdFlags.Set("defaultHttpClient.idleConnTimeout", testValue)
+			if vString, err := cmdFlags.GetString("defaultHttpClient.idleConnTimeout"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DefaultHTTPClient.IdleConnTimeout)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

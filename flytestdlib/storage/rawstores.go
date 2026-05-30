@@ -45,14 +45,53 @@ func createHTTPClient(cfg HTTPClientConfig) *http.Client {
 		Timeout: cfg.Timeout.Duration,
 	}
 
+	if cfg.hasTransportConfig() {
+		c.Transport = createHTTPTransport(cfg)
+	}
+
 	if len(cfg.Headers) > 0 {
 		c.Transport = &proxyTransport{
-			RoundTripper:   http.DefaultTransport,
+			RoundTripper:   roundTripperOrDefault(c.Transport),
 			defaultHeaders: cfg.Headers,
 		}
 	}
 
 	return c
+}
+
+func (cfg HTTPClientConfig) hasTransportConfig() bool {
+	return cfg.MaxIdleConns > 0 ||
+		cfg.MaxIdleConnsPerHost > 0 ||
+		cfg.MaxConnsPerHost > 0 ||
+		cfg.IdleConnTimeout.Duration > 0
+}
+
+func createHTTPTransport(cfg HTTPClientConfig) *http.Transport {
+	base, ok := http.DefaultTransport.(*http.Transport)
+	if !ok {
+		base = &http.Transport{}
+	}
+	transport := base.Clone()
+	if cfg.MaxIdleConns > 0 {
+		transport.MaxIdleConns = cfg.MaxIdleConns
+	}
+	if cfg.MaxIdleConnsPerHost > 0 {
+		transport.MaxIdleConnsPerHost = cfg.MaxIdleConnsPerHost
+	}
+	if cfg.MaxConnsPerHost > 0 {
+		transport.MaxConnsPerHost = cfg.MaxConnsPerHost
+	}
+	if cfg.IdleConnTimeout.Duration > 0 {
+		transport.IdleConnTimeout = cfg.IdleConnTimeout.Duration
+	}
+	return transport
+}
+
+func roundTripperOrDefault(rt http.RoundTripper) http.RoundTripper {
+	if rt != nil {
+		return rt
+	}
+	return http.DefaultTransport
 }
 
 type dataStoreMetrics struct {

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"time"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -39,6 +40,12 @@ var (
 			Region:   "us-east-1",
 			AuthType: "iam",
 		},
+		DefaultHTTPClient: HTTPClientConfig{
+			MaxIdleConns:        1024,
+			MaxIdleConnsPerHost: 1024,
+			MaxConnsPerHost:     1024,
+			IdleConnTimeout:     config.Duration{Duration: 90 * time.Second},
+		},
 		MultiContainerEnabled: false,
 	}
 )
@@ -72,8 +79,12 @@ type SignedURLConfig struct {
 
 // HTTPClientConfig encapsulates common settings that can be applied to an HTTP Client.
 type HTTPClientConfig struct {
-	Headers map[string][]string `json:"headers" pflag:"-,Sets http headers to set on the http client."`
-	Timeout config.Duration     `json:"timeout" pflag:",Sets time out on the http client."`
+	Headers             map[string][]string `json:"headers" pflag:"-,Sets http headers to set on the http client."`
+	Timeout             config.Duration     `json:"timeout" pflag:",Sets time out on the http client."`
+	MaxIdleConns        int                 `json:"maxIdleConns" pflag:",Maximum number of idle HTTP connections across all hosts."`
+	MaxIdleConnsPerHost int                 `json:"maxIdleConnsPerHost" pflag:",Maximum number of idle HTTP connections to keep per host."`
+	MaxConnsPerHost     int                 `json:"maxConnsPerHost" pflag:",Maximum number of HTTP connections per host."`
+	IdleConnTimeout     config.Duration     `json:"idleConnTimeout" pflag:",How long idle HTTP connections remain open."`
 }
 
 // ConnectionConfig defines connection configurations.
