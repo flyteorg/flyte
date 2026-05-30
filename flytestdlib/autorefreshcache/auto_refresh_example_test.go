@@ -112,13 +112,26 @@ func ExampleNewAutoRefreshCache() {
 		fmt.Printf("unexpected error in create; err1: %v, err2: %v", err1, err2)
 	}
 
-	// wait for the cache to go through a few refresh cycles and then check status
-	time.Sleep(resyncPeriod * 10)
-	item, err := cache.Get(item1.ID())
-	if err != nil && errors.IsCausedBy(err, ErrNotFound) {
-		fmt.Printf("Item1 is no longer in the cache")
-	} else {
-		fmt.Printf("Current status for item1 is %v", item.(*ExampleCacheItem).status)
+	// Poll until the cache's background worker refreshes item1 to its terminal state. Polling against
+	// the expected condition (instead of sleeping a fixed duration) keeps this example deterministic
+	// even when the async worker is slow under load.
+	var item Item
+	deadline := time.Now().Add(10 * time.Second)
+	for {
+		item, err = cache.Get(item1.ID())
+		if err != nil && errors.IsCausedBy(err, ErrNotFound) {
+			fmt.Printf("Item1 is no longer in the cache")
+			break
+		}
+		if err == nil && item.(*ExampleCacheItem).status == ExampleStatusSucceeded {
+			fmt.Printf("Current status for item1 is %v", item.(*ExampleCacheItem).status)
+			break
+		}
+		if time.Now().After(deadline) {
+			fmt.Printf("Current status for item1 is %v", item.(*ExampleCacheItem).status)
+			break
+		}
+		time.Sleep(resyncPeriod)
 	}
 
 	// stop the cache
