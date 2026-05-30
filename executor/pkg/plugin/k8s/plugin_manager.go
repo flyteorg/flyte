@@ -76,17 +76,26 @@ func (pm *PluginManager) GetProperties() pluginsCore.PluginProperties {
 	}
 }
 
+// addObjectMetadata stamps namespace/labels/annotations, the generated name, and (unless disabled)
+// owner references and finalizers, on an object that IS owned by this task execution.
 func (pm *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) {
+	pm.addObjectMetadataWithName(taskCtx, o, cfg, taskCtx.GetTaskExecutionID().GetGeneratedName(), true)
+}
+
+// addObjectMetadataWithName is the general form. name overrides the object name; when injectOwnership
+// is false, owner references and finalizers are never added (used for shared cluster resources that
+// must outlive a single task execution).
+func (pm *PluginManager) addObjectMetadataWithName(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig, name string, injectOwnership bool) {
 	o.SetNamespace(taskCtx.GetNamespace())
 	o.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.GetAnnotations())))
 	o.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, o.GetLabels(), pluginsUtils.CopyMap(taskCtx.GetLabels())))
-	o.SetName(taskCtx.GetTaskExecutionID().GetGeneratedName())
+	o.SetName(name)
 
-	if !pm.plugin.GetProperties().DisableInjectOwnerReferences && !cfg.DisableInjectOwnerReferences {
+	if injectOwnership && !pm.plugin.GetProperties().DisableInjectOwnerReferences && !cfg.DisableInjectOwnerReferences {
 		o.SetOwnerReferences([]metav1.OwnerReference{taskCtx.GetOwnerReference()})
 	}
 
-	if cfg.InjectFinalizer && !pm.plugin.GetProperties().DisableInjectFinalizer {
+	if injectOwnership && cfg.InjectFinalizer && !pm.plugin.GetProperties().DisableInjectFinalizer {
 		f := append(o.GetFinalizers(), "flyte/flytek8s")
 		o.SetFinalizers(f)
 	}

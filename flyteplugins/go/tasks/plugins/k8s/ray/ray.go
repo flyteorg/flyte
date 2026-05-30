@@ -14,7 +14,6 @@ import (
 	"github.com/samber/lo"
 	"gopkg.in/yaml.v2"
 	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -30,6 +29,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/pod"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/pbhash"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
@@ -39,6 +39,9 @@ const (
 	defaultRayStateVolName             = "system-ray-state"
 	rayTaskType                        = "ray"
 	KindRayJob                         = "RayJob"
+	KindRayCluster                     = "RayCluster"
+	rayClusterLabelKey                 = "ray.io/cluster"
+	clusterNameHashLength              = 16
 	IncludeDashboard                   = "include-dashboard"
 	NodeIPAddress                      = "node-ip-address"
 	DashboardHost                      = "dashboard-host"
@@ -46,6 +49,56 @@ const (
 	DisableUsageStatsStartParameterVal = "true"
 	RayHeadContainerName               = "ray-head"
 )
+
+// runScopedEnvVars are the execution-identity environment variables that Flyte injects into a
+// task's pod (via flytek8s.ToK8sPodSpec -> DecorateEnvVars). A shared RayCluster is created once
+// and reused by every task whose spec hashes to the same name, so these vars — which belong to the
+// FIRST task that created the cluster — must NOT be baked onto the long-lived head/worker pods.
+// Otherwise the Ray driver (which runs on the head pod) would read the creating task's identity for
+// every subsequent job. Per-job identity is instead carried by the RayJob (entrypoint args /
+// runtime env). User-supplied env (tokens, PYTHONPATH, etc.) is preserved.
+var runScopedEnvVars = map[string]struct{}{
+	// Projected from the TaskAction by the executor (taskCtx.GetEnvironmentVariables()).
+	"RUN_NAME":    {},
+	"ACTION_NAME": {},
+	"_U_RUN_BASE": {},
+	"_U_ORG_NAME": {},
+	// Injected by flytek8s.GetExecutionEnvVars / GetContextEnvVars.
+	"FLYTE_INTERNAL_EXECUTION_ID":       {},
+	"FLYTE_INTERNAL_EXECUTION_PROJECT":  {},
+	"FLYTE_INTERNAL_EXECUTION_DOMAIN":   {},
+	"FLYTE_INTERNAL_EXECUTION_WORKFLOW": {},
+	"FLYTE_ATTEMPT_NUMBER":              {},
+	"FLYTE_INTERNAL_TASK_PROJECT":       {},
+	"FLYTE_INTERNAL_TASK_DOMAIN":        {},
+	"FLYTE_INTERNAL_TASK_NAME":          {},
+	"FLYTE_INTERNAL_TASK_VERSION":       {},
+	"FLYTE_INTERNAL_PROJECT":            {},
+	"FLYTE_INTERNAL_DOMAIN":             {},
+	"FLYTE_INTERNAL_NAME":               {},
+	"FLYTE_INTERNAL_VERSION":            {},
+}
+
+// stripRunScopedEnvVars removes the run-scoped execution-identity env vars (see runScopedEnvVars)
+// from every container in the pod spec, so the shared cluster's pods stay run-agnostic.
+func stripRunScopedEnvVars(podSpec *v1.PodSpec) {
+	if podSpec == nil {
+		return
+	}
+	strip := func(containers []v1.Container) {
+		for i := range containers {
+			filtered := containers[i].Env[:0]
+			for _, e := range containers[i].Env {
+				if _, isRunScoped := runScopedEnvVars[e.Name]; !isRunScoped {
+					filtered = append(filtered, e)
+				}
+			}
+			containers[i].Env = filtered
+		}
+	}
+	strip(podSpec.InitContainers)
+	strip(podSpec.Containers)
+}
 
 var logTemplateRegexes = struct {
 	RayClusterName *regexp.Regexp
@@ -55,44 +108,60 @@ var logTemplateRegexes = struct {
 	tasklog.MustCreateRegex("rayJobID"),
 }
 
-// Copy it from KubeRay to avoid adding a new dependency to go.mod.
-// https://github.com/ray-project/kuberay/blob/1ced2b968eabcfee4dcfa61391d307b60e46a2ed/ray-operator/controllers/ray/common/job.go#L122-L145
-var submitterDefaultResourceRequirements = v1.ResourceRequirements{
-	Limits: v1.ResourceList{
-		v1.ResourceCPU:    resource.MustParse("1"),
-		v1.ResourceMemory: resource.MustParse("1Gi"),
-	},
-	Requests: v1.ResourceList{
-		v1.ResourceCPU:    resource.MustParse("500m"),
-		v1.ResourceMemory: resource.MustParse("200Mi"),
-	},
-}
-
 type rayJobResourceHandler struct{}
+
+var _ k8s.ClusterPlugin = rayJobResourceHandler{}
 
 func (rayJobResourceHandler) GetProperties() k8s.PluginProperties {
 	maxLength := 47
 	return k8s.PluginProperties{GeneratedNameMaxLength: &maxLength}
 }
 
-// BuildResource Creates a new ray job resource
-func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
+// GetClusterName returns a deterministic name for the shared RayCluster derived from the RayJob
+// plugin spec, so that identical specs map to (and share) the same cluster.
+func (rayJobResourceHandler) GetClusterName(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (string, error) {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
-		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "unable to fetch task specification [%v]", err.Error())
+		return "", flyteerr.Errorf(flyteerr.BadTaskSpecification, "unable to fetch task specification [%v]", err.Error())
 	} else if taskTemplate == nil {
-		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nil task specification")
+		return "", flyteerr.Errorf(flyteerr.BadTaskSpecification, "nil task specification")
 	}
 
 	rayJob := plugins.RayJob{}
-	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &rayJob) //nolint: staticcheck
+	if err := utils.UnmarshalStruct(taskTemplate.GetCustom(), &rayJob); err != nil { //nolint: staticcheck
+		return "", flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
+	}
+
+	hash, err := pbhash.ComputeHashString(ctx, &rayJob)
 	if err != nil {
-		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
+		return "", flyteerr.Errorf(flyteerr.BadTaskSpecification, "failed to compute hash for ray job spec [%v]", err.Error())
+	}
+
+	safe := utils.ConvertToDNS1123SubdomainCompatibleString(strings.ToLower(hash))
+	if len(safe) > clusterNameHashLength {
+		safe = safe[:clusterNameHashLength]
+	}
+	return "ray-" + safe, nil
+}
+
+// readRaySpec reads the task template, unmarshals the RayJob plugin spec, converts the task to a
+// k8s pod spec and locates the primary container. It is shared by the cluster- and job-building paths.
+func (rayJobResourceHandler) readRaySpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (*plugins.RayJob, *v1.PodSpec, *metav1.ObjectMeta, int, *v1.Container, error) {
+	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return nil, nil, nil, 0, nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "unable to fetch task specification [%v]", err.Error())
+	} else if taskTemplate == nil {
+		return nil, nil, nil, 0, nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nil task specification")
+	}
+
+	rayJob := plugins.RayJob{}
+	if err := utils.UnmarshalStruct(taskTemplate.GetCustom(), &rayJob); err != nil { //nolint: staticcheck
+		return nil, nil, nil, 0, nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 	}
 
 	podSpec, objectMeta, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
 	if err != nil {
-		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
+		return nil, nil, nil, 0, nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
 	}
 
 	var primaryContainer *v1.Container
@@ -107,9 +176,14 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	if primaryContainer == nil {
-		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to get primary container from the pod: [%v]", err.Error())
+		return nil, nil, nil, 0, nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to get primary container from the pod")
 	}
 
+	return &rayJob, podSpec, objectMeta, primaryContainerIdx, primaryContainer, nil
+}
+
+// buildHeadStartParams computes the head node ray start params, defaulting from config.
+func buildHeadStartParams(rayJob *plugins.RayJob) map[string]string {
 	cfg := GetConfig()
 
 	headNodeRayStartParams := make(map[string]string)
@@ -120,7 +194,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	if _, exist := headNodeRayStartParams[IncludeDashboard]; !exist {
-		headNodeRayStartParams[IncludeDashboard] = strconv.FormatBool(GetConfig().IncludeDashboard)
+		headNodeRayStartParams[IncludeDashboard] = strconv.FormatBool(cfg.IncludeDashboard)
 	}
 
 	if _, exist := headNodeRayStartParams[NodeIPAddress]; !exist {
@@ -135,14 +209,108 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		headNodeRayStartParams[DisableUsageStatsStartParameter] = DisableUsageStatsStartParameterVal
 	}
 
-	podSpec.ServiceAccountName = cfg.ServiceAccount
-
-	rayjob, err := constructRayJob(taskCtx, &rayJob, objectMeta, *podSpec, headNodeRayStartParams, primaryContainerIdx, *primaryContainer)
-
-	return rayjob, err
+	return headNodeRayStartParams
 }
 
-func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.RayJob, objectMeta *metav1.ObjectMeta, taskPodSpec v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
+// BuildClusterResource builds the shared RayCluster object. The framework's ClusterPluginManager
+// assigns the cluster's name/namespace (= sanitized cluster name) and merges labels; we set the
+// ray.io/cluster label here so the RayJob's ClusterSelector matches.
+func (h rayJobResourceHandler) BuildClusterResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
+	rayJob, podSpec, objectMeta, primaryContainerIdx, primaryContainer, err := h.readRaySpec(ctx, taskCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	headNodeRayStartParams := buildHeadStartParams(rayJob)
+	podSpec.ServiceAccountName = GetConfig().ServiceAccount
+
+	clusterSpec, err := buildRayClusterSpec(taskCtx, rayJob, objectMeta, *podSpec, headNodeRayStartParams, primaryContainerIdx, *primaryContainer)
+	if err != nil {
+		return nil, err
+	}
+
+	clusterName, err := h.GetClusterName(ctx, taskCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &rayv1.RayCluster{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       KindRayCluster,
+			APIVersion: rayv1.SchemeGroupVersion.String(),
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{rayClusterLabelKey: clusterName},
+		},
+		Spec: *clusterSpec,
+	}, nil
+}
+
+// BuildJobResource builds the RayJob that binds to the shared RayCluster via ClusterSelector.
+func (h rayJobResourceHandler) BuildJobResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, clusterName string) (client.Object, error) {
+	rayJob, _, objectMeta, _, primaryContainer, err := h.readRaySpec(ctx, taskCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Capture the entrypoint from the fresh primary container before any pod-template building clears Args.
+	entrypoint := strings.Join(primaryContainer.Args, " ")
+
+	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
+	runtimeEnvYaml := rayJob.RuntimeEnvYaml
+	if rayJob.RuntimeEnv != "" && rayJob.RuntimeEnvYaml == "" { //nolint: staticcheck
+		runtimeEnvYaml, err = convertBase64RuntimeEnvToYaml(rayJob.RuntimeEnv) //nolint: staticcheck
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// The cluster is shared, so its head/worker pods carry no execution identity (see
+	// stripRunScopedEnvVars). Inject this job's identity into the RayJob runtime_env instead, so Ray
+	// applies it to the driver process (which runs on the shared head node) and each job reports under
+	// its own run rather than the cluster creator's.
+	runtimeEnvYaml, err = injectRunScopedRuntimeEnv(runtimeEnvYaml, collectRunScopedEnvVars(taskCtx))
+	if err != nil {
+		return nil, err
+	}
+
+	jobSpec := rayv1.RayJobSpec{
+		// The cluster is shared and standalone; the job must not own or shut it down.
+		RayClusterSpec:           nil,
+		ClusterSelector:          map[string]string{rayClusterLabelKey: clusterName},
+		Entrypoint:               entrypoint,
+		RuntimeEnvYAML:           runtimeEnvYaml,
+		ShutdownAfterJobFinishes: false,
+	}
+
+	return &rayv1.RayJob{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       KindRayJob,
+			APIVersion: rayv1.SchemeGroupVersion.String(),
+		},
+		Spec:       jobSpec,
+		ObjectMeta: *objectMeta,
+	}, nil
+}
+
+func (rayJobResourceHandler) BuildClusterIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (client.Object, error) {
+	return &rayv1.RayCluster{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       KindRayCluster,
+			APIVersion: rayv1.SchemeGroupVersion.String(),
+		},
+	}, nil
+}
+
+func (rayJobResourceHandler) IsClusterReady(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (bool, error) {
+	cluster, ok := resource.(*rayv1.RayCluster)
+	if !ok {
+		return false, fmt.Errorf("unexpected resource type: expected *RayCluster, got %T", resource)
+	}
+	return cluster.Status.State == rayv1.Ready, nil
+}
+
+func buildRayClusterSpec(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.RayJob, objectMeta *metav1.ObjectMeta, taskPodSpec v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayClusterSpec, error) {
 	enableIngress := true
 	cfg := GetConfig()
 
@@ -157,6 +325,9 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 	if err != nil {
 		return nil, err
 	}
+	// The cluster is shared across tasks, so its pods must not carry any single task's execution
+	// identity. Per-job identity travels with the RayJob instead.
+	stripRunScopedEnvVars(&headPodTemplate.Spec)
 
 	rayClusterSpec := rayv1.RayClusterSpec{
 		HeadGroupSpec: rayv1.HeadGroupSpec{
@@ -165,8 +336,9 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 			EnableIngress:  &enableIngress,
 			RayStartParams: headNodeRayStartParams,
 		},
-		WorkerGroupSpecs:        []rayv1.WorkerGroupSpec{},
-		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableAutoscaling,
+		WorkerGroupSpecs: []rayv1.WorkerGroupSpec{},
+		// Shared clusters should autoscale and idle-reap.
+		EnableInTreeAutoscaling: ptrBool(true),
 	}
 
 	for _, spec := range rayJob.RayCluster.WorkerGroupSpec {
@@ -181,6 +353,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		if err != nil {
 			return nil, err
 		}
+		stripRunScopedEnvVars(&workerPodTemplate.Spec)
 
 		workerNodeRayStartParams := make(map[string]string)
 		if spec.RayStartParams != nil {
@@ -228,43 +401,11 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		rayClusterSpec.WorkerGroupSpecs[index].Template.Spec.ServiceAccountName = serviceAccountName
 	}
 
-	shutdownAfterJobFinishes := cfg.ShutdownAfterJobFinishes
-	ttlSecondsAfterFinished := &cfg.TTLSecondsAfterFinished
-	if rayJob.ShutdownAfterJobFinishes {
-		shutdownAfterJobFinishes = true
-		ttlSecondsAfterFinished = &rayJob.TtlSecondsAfterFinished
-	}
+	return &rayClusterSpec, nil
+}
 
-	submitterPodTemplate := buildSubmitterPodTemplate(&rayClusterSpec)
-
-	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
-	var runtimeEnvYaml string
-	runtimeEnvYaml = rayJob.RuntimeEnvYaml
-	// If runtime_env exists but runtime_env_yaml does not, convert runtime_env to runtime_env_yaml
-	if rayJob.RuntimeEnv != "" && rayJob.RuntimeEnvYaml == "" { //nolint: staticcheck
-		runtimeEnvYaml, err = convertBase64RuntimeEnvToYaml(rayJob.RuntimeEnv) //nolint: staticcheck
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	jobSpec := rayv1.RayJobSpec{
-		RayClusterSpec:           &rayClusterSpec,
-		Entrypoint:               strings.Join(primaryContainer.Args, " "),
-		ShutdownAfterJobFinishes: shutdownAfterJobFinishes,
-		TTLSecondsAfterFinished:  *ttlSecondsAfterFinished,
-		RuntimeEnvYAML:           runtimeEnvYaml,
-		SubmitterPodTemplate:     &submitterPodTemplate,
-	}
-
-	return &rayv1.RayJob{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       KindRayJob,
-			APIVersion: rayv1.SchemeGroupVersion.String(),
-		},
-		Spec:       jobSpec,
-		ObjectMeta: *objectMeta,
-	}, nil
+func ptrBool(b bool) *bool {
+	return &b
 }
 
 func convertBase64RuntimeEnvToYaml(s string) (string, error) {
@@ -403,35 +544,6 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 	podTemplateSpec.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()), spec.GetK8SPod().GetMetadata().GetAnnotations()))
 
 	return podTemplateSpec, nil
-}
-
-func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec) v1.PodTemplateSpec {
-
-	headPodSpec := rayClusterSpec.HeadGroupSpec.Template.Spec
-
-	tolerations := make([]v1.Toleration, 0)
-	if config.GetK8sPluginConfig() != nil && len(config.GetK8sPluginConfig().DefaultTolerations) > 0 {
-		tolerations = append(tolerations, config.GetK8sPluginConfig().DefaultTolerations...)
-	}
-
-	enableServiceLinks := false
-	return v1.PodTemplateSpec{
-		Spec: v1.PodSpec{
-			Containers: []v1.Container{
-				{
-					Name: "ray-job-submitter",
-					// Use the image of the Ray head to be defensive against version mismatch issues
-					Image:     headPodSpec.Containers[0].Image,
-					Resources: submitterDefaultResourceRequirements,
-				},
-			},
-			RestartPolicy:      v1.RestartPolicyNever,
-			EnableServiceLinks: &enableServiceLinks,
-			// Run the RayJob submitter pod with the default affinity/tolerations so it lands on the default node.
-			Tolerations: tolerations,
-			Affinity:    config.GetK8sPluginConfig().DefaultAffinity,
-		},
-	}
 }
 
 func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMetadata *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.WorkerGroupSpec) (v1.PodTemplateSpec, error) {
@@ -576,7 +688,7 @@ func mergeCustomPodSpec(podSpec *v1.PodSpec, k8sPod *core.K8SPod) (*v1.PodSpec, 
 	return podSpec, nil
 }
 
-func (rayJobResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (client.Object, error) {
+func (rayJobResourceHandler) BuildJobIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (client.Object, error) {
 	return &rayv1.RayJob{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       KindRayJob,
@@ -701,7 +813,7 @@ func logContextForPods(rayJobName string, pods []v1.Pod) *core.LogContext {
 	return logCtx
 }
 
-func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
+func (plugin rayJobResourceHandler) GetJobPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 	rayJob := resource.(*rayv1.RayJob)
 	info, err := getEventInfoForRayJob(ctx, GetConfig().Logs, pluginContext, rayJob)
 	if err != nil {
@@ -773,35 +885,6 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	return phaseInfo, err
 }
 
-// IsTerminal returns true if the RayJob is in a terminal state (Complete or Failed)
-func (rayJobResourceHandler) IsTerminal(_ context.Context, resource client.Object) (bool, error) {
-	job, ok := resource.(*rayv1.RayJob)
-	if !ok {
-		return false, fmt.Errorf("unexpected resource type: expected *RayJob, got %T", resource)
-	}
-	status := job.Status.JobDeploymentStatus
-	return status == rayv1.JobDeploymentStatusComplete || status == rayv1.JobDeploymentStatusFailed, nil
-}
-
-// GetCompletionTime returns the end time of the RayJob
-func (rayJobResourceHandler) GetCompletionTime(resource client.Object) (time.Time, error) {
-	job, ok := resource.(*rayv1.RayJob)
-	if !ok {
-		return time.Time{}, fmt.Errorf("unexpected resource type: expected *RayJob, got %T", resource)
-	}
-
-	if job.Status.EndTime != nil && !job.Status.EndTime.IsZero() {
-		return job.Status.EndTime.Time, nil
-	}
-
-	// Fallback to start time or creation time
-	if job.Status.StartTime != nil && !job.Status.StartTime.IsZero() {
-		return job.Status.StartTime.Time, nil
-	}
-
-	return job.CreationTimestamp.Time, nil
-}
-
 func init() {
 	if err := rayv1.AddToScheme(scheme.Scheme); err != nil {
 		panic(err)
@@ -809,11 +892,12 @@ func init() {
 
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{
-			ID:                  rayTaskType,
-			RegisteredTaskTypes: []pluginsCore.TaskType{rayTaskType},
-			ResourceToWatch:     &rayv1.RayJob{},
-			Plugin:              rayJobResourceHandler{},
-			IsDefault:           false,
+			ID:                     rayTaskType,
+			RegisteredTaskTypes:    []pluginsCore.TaskType{rayTaskType},
+			ResourceToWatch:        &rayv1.RayJob{},
+			ClusterResourceToWatch: &rayv1.RayCluster{},
+			ClusterPlugin:          rayJobResourceHandler{},
+			IsDefault:              false,
 			CustomKubeClient: func(ctx context.Context) (pluginsCore.KubeClient, error) {
 				remoteConfig := GetConfig().RemoteClusterConfig
 				if !remoteConfig.Enabled {
@@ -829,4 +913,77 @@ func init() {
 				return k8s.NewDefaultKubeClient(kubeConfig)
 			},
 		})
+}
+
+// collectRunScopedEnvVars returns this task's execution-identity environment variables (the same
+// keys listed in runScopedEnvVars) with their concrete per-run values. These are normally injected
+// onto the task pod by flytek8s.DecorateEnvVars, but for a shared Ray cluster they are stripped from
+// the cluster pods and instead carried by the RayJob runtime_env so the driver gets its own identity.
+func collectRunScopedEnvVars(taskCtx pluginsCore.TaskExecutionContext) map[string]string {
+	out := map[string]string{}
+	meta := taskCtx.TaskExecutionMetadata()
+
+	// Run-scoped vars projected from the TaskAction (RUN_NAME, ACTION_NAME, _U_RUN_BASE, _U_ORG_NAME).
+	for k, v := range meta.GetEnvironmentVariables() {
+		if _, isRunScoped := runScopedEnvVars[k]; isRunScoped {
+			out[k] = v
+		}
+	}
+
+	// Execution/task identity vars injected by flytek8s (FLYTE_INTERNAL_*). Only plain-valued entries
+	// are usable in runtime_env; skip any backed by a downward-API ValueFrom (e.g. _F_PN).
+	for _, e := range flytek8s.GetExecutionEnvVars(meta.GetTaskExecutionID(), meta.GetConsoleURL()) {
+		if e.ValueFrom != nil {
+			continue
+		}
+		if _, isRunScoped := runScopedEnvVars[e.Name]; isRunScoped {
+			out[e.Name] = e.Value
+		}
+	}
+
+	return out
+}
+
+// injectRunScopedRuntimeEnv merges the given env vars into the env_vars section of a Ray
+// runtime_env YAML document, returning the updated YAML. Existing keys in the document take
+// precedence (a user-supplied value is never overwritten). If envVars is empty the input is
+// returned unchanged.
+func injectRunScopedRuntimeEnv(runtimeEnvYaml string, envVars map[string]string) (string, error) {
+	if len(envVars) == 0 {
+		return runtimeEnvYaml, nil
+	}
+
+	doc := map[string]interface{}{}
+	if strings.TrimSpace(runtimeEnvYaml) != "" {
+		if err := yaml.Unmarshal([]byte(runtimeEnvYaml), &doc); err != nil {
+			return "", flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid runtime_env YAML [%v], Err: [%v]", runtimeEnvYaml, err.Error())
+		}
+	}
+
+	// Normalize the existing env_vars section (YAML decodes maps as map[interface{}]interface{}).
+	merged := map[string]interface{}{}
+	if existing, ok := doc["env_vars"]; ok {
+		switch m := existing.(type) {
+		case map[interface{}]interface{}:
+			for k, v := range m {
+				merged[fmt.Sprintf("%v", k)] = v
+			}
+		case map[string]interface{}:
+			for k, v := range m {
+				merged[k] = v
+			}
+		}
+	}
+	for k, v := range envVars {
+		if _, exists := merged[k]; !exists {
+			merged[k] = v
+		}
+	}
+	doc["env_vars"] = merged
+
+	out, err := yaml.Marshal(doc)
+	if err != nil {
+		return "", err
+	}
+	return string(out), nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"gopkg.in/yaml.v2"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -183,46 +185,60 @@ func TestBuildResourceRay(t *testing.T) {
 	assert.Nil(t, err)
 
 	rayCtx := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
-	RayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+	ClusterResource, err := rayJobResourceHandler.BuildClusterResource(context.TODO(), rayCtx)
 	assert.Nil(t, err)
 
-	assert.NotNil(t, RayResource)
-	ray, ok := RayResource.(*rayv1.RayJob)
+	assert.NotNil(t, ClusterResource)
+	ray, ok := ClusterResource.(*rayv1.RayCluster)
 	assert.True(t, ok)
 
-	assert.Equal(t, *ray.Spec.RayClusterSpec.EnableInTreeAutoscaling, true)
-	assert.Equal(t, ray.Spec.ShutdownAfterJobFinishes, true)
-	assert.Equal(t, ray.Spec.TTLSecondsAfterFinished, int32(120))
+	assert.Equal(t, *ray.Spec.EnableInTreeAutoscaling, true)
 
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName, serviceAccount)
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.RayStartParams,
+	assert.Equal(t, ray.Spec.HeadGroupSpec.Template.Spec.ServiceAccountName, serviceAccount)
+	assert.Equal(t, ray.Spec.HeadGroupSpec.RayStartParams,
 		map[string]string{
 			"dashboard-host": "0.0.0.0", "disable-usage-stats": "true", "include-dashboard": "true",
 			"node-ip-address": "$MY_POD_IP", "num-cpus": "1",
 		})
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
+	assert.Equal(t, ray.Spec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
+	assert.Equal(t, ray.Spec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1"})
+	assert.Equal(t, ray.Spec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
 
 	workerReplica := int32(3)
-	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Replicas, workerReplica)
-	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MinReplicas, workerReplica)
-	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MaxReplicas, workerReplica)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].GroupName, workerGroupName)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.ServiceAccountName, serviceAccount)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"disable-usage-stats": "true", "node-ip-address": "$MY_POD_IP"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
+	assert.Equal(t, *ray.Spec.WorkerGroupSpecs[0].Replicas, workerReplica)
+	assert.Equal(t, *ray.Spec.WorkerGroupSpecs[0].MinReplicas, workerReplica)
+	assert.Equal(t, *ray.Spec.WorkerGroupSpecs[0].MaxReplicas, workerReplica)
+	assert.Equal(t, ray.Spec.WorkerGroupSpecs[0].GroupName, workerGroupName)
+	assert.Equal(t, ray.Spec.WorkerGroupSpecs[0].Template.Spec.ServiceAccountName, serviceAccount)
+	assert.Equal(t, ray.Spec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"disable-usage-stats": "true", "node-ip-address": "$MY_POD_IP"})
+	assert.Equal(t, ray.Spec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1"})
+	assert.Equal(t, ray.Spec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1"})
+	assert.Equal(t, ray.Spec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
+
+	// Cluster carries the ray.io/cluster label and a head container named "ray-head".
+	assert.NotEmpty(t, ray.Labels[rayClusterLabelKey])
+	assert.NotEmpty(t, ray.Spec.WorkerGroupSpecs)
+	assert.Equal(t, RayHeadContainerName, ray.Spec.HeadGroupSpec.Template.Spec.Containers[0].Name)
+
+	// The RayJob binds to the cluster via ClusterSelector and has no embedded RayClusterSpec.
+	JobResource, err := rayJobResourceHandler.BuildJobResource(context.TODO(), rayCtx, "ray-test")
+	assert.Nil(t, err)
+	assert.NotNil(t, JobResource)
+	rayJob, ok := JobResource.(*rayv1.RayJob)
+	assert.True(t, ok)
+	assert.Nil(t, rayJob.Spec.RayClusterSpec)
+	assert.Equal(t, "ray-test", rayJob.Spec.ClusterSelector[rayClusterLabelKey])
+	assert.Equal(t, false, rayJob.Spec.ShutdownAfterJobFinishes)
+	assert.Equal(t, strings.Join(testArgs, " "), rayJob.Spec.Entrypoint)
 
 	// Make sure the default service account is being used if SA is not provided in the task context
 	rayCtx = dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", "")
-	RayResource, err = rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+	ClusterResource, err = rayJobResourceHandler.BuildClusterResource(context.TODO(), rayCtx)
 	assert.Nil(t, err)
-	assert.NotNil(t, RayResource)
-	ray, ok = RayResource.(*rayv1.RayJob)
+	assert.NotNil(t, ClusterResource)
+	ray, ok = ClusterResource.(*rayv1.RayCluster)
 	assert.True(t, ok)
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName, GetConfig().ServiceAccount)
+	assert.Equal(t, ray.Spec.HeadGroupSpec.Template.Spec.ServiceAccountName, GetConfig().ServiceAccount)
 }
 
 func TestBuildResourceRayContainerImage(t *testing.T) {
@@ -258,10 +274,10 @@ func TestBuildResourceRayContainerImage(t *testing.T) {
 			taskTemplate := dummyRayTaskTemplate("id", dummyRayCustomObj())
 			taskContext := dummyRayTaskContext(taskTemplate, f.resources, nil, f.containerImageOverride, serviceAccount)
 			rayJobResourceHandler := rayJobResourceHandler{}
-			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
+			r, err := rayJobResourceHandler.BuildClusterResource(context.TODO(), taskContext)
 			assert.Nil(t, err)
 			assert.NotNil(t, r)
-			rayJob, ok := r.(*rayv1.RayJob)
+			rayCluster, ok := r.(*rayv1.RayCluster)
 			assert.True(t, ok)
 
 			var expectedContainerImage string
@@ -272,11 +288,11 @@ func TestBuildResourceRayContainerImage(t *testing.T) {
 			}
 
 			// Head node
-			headNodeSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
+			headNodeSpec := rayCluster.Spec.HeadGroupSpec.Template.Spec
 			assert.Equal(t, expectedContainerImage, headNodeSpec.Containers[0].Image)
 
 			// Worker node
-			workerNodeSpec := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec
+			workerNodeSpec := rayCluster.Spec.WorkerGroupSpecs[0].Template.Spec
 			assert.Equal(t, expectedContainerImage, workerNodeSpec.Containers[0].Image)
 		})
 	}
@@ -400,14 +416,14 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 			taskTemplate.ExtendedResources = p.extendedResourcesBase
 			taskContext := dummyRayTaskContext(taskTemplate, p.resources, p.extendedResourcesOverride, "", serviceAccount)
 			rayJobResourceHandler := rayJobResourceHandler{}
-			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
+			r, err := rayJobResourceHandler.BuildClusterResource(context.TODO(), taskContext)
 			assert.Nil(t, err)
 			assert.NotNil(t, r)
-			rayJob, ok := r.(*rayv1.RayJob)
+			rayCluster, ok := r.(*rayv1.RayCluster)
 			assert.True(t, ok)
 
 			// Head node
-			headNodeSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
+			headNodeSpec := rayCluster.Spec.HeadGroupSpec.Template.Spec
 			assert.EqualValues(
 				t,
 				p.expectedNsr,
@@ -420,7 +436,7 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 			)
 
 			// Worker node
-			workerNodeSpec := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec
+			workerNodeSpec := rayCluster.Spec.WorkerGroupSpecs[0].Template.Spec
 			assert.EqualValues(
 				t,
 				p.expectedNsr,
@@ -491,23 +507,20 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 	}
 
 	params := []struct {
-		name                              string
-		taskResources                     *corev1.ResourceRequirements
-		headK8SPod                        *core.K8SPod
-		workerK8SPod                      *core.K8SPod
-		expectedSubmitterResources        *corev1.ResourceRequirements
-		expectedHeadResources             *corev1.ResourceRequirements
-		expectedWorkerResources           *corev1.ResourceRequirements
-		expectedSubmitterRuntimeClassName *string
-		expectedHeadRuntimeClassName      *string
-		expectedWorkerRuntimeClassName    *string
+		name                           string
+		taskResources                  *corev1.ResourceRequirements
+		headK8SPod                     *core.K8SPod
+		workerK8SPod                   *core.K8SPod
+		expectedHeadResources          *corev1.ResourceRequirements
+		expectedWorkerResources        *corev1.ResourceRequirements
+		expectedHeadRuntimeClassName   *string
+		expectedWorkerRuntimeClassName *string
 	}{
 		{
-			name:                       "task resources",
-			taskResources:              resourceRequirements,
-			expectedSubmitterResources: &submitterDefaultResourceRequirements,
-			expectedHeadResources:      resourceRequirements,
-			expectedWorkerResources:    resourceRequirements,
+			name:                    "task resources",
+			taskResources:           resourceRequirements,
+			expectedHeadResources:   resourceRequirements,
+			expectedWorkerResources: resourceRequirements,
 		},
 		{
 			name:          "custom worker and head resources",
@@ -518,16 +531,14 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 			workerK8SPod: &core.K8SPod{
 				PodSpec: transformStructToStructPB(t, workerPodSpecCustomResources),
 			},
-			expectedSubmitterResources: &submitterDefaultResourceRequirements,
-			expectedHeadResources:      expectedHeadResources,
-			expectedWorkerResources:    expectedWorkerResources,
+			expectedHeadResources:   expectedHeadResources,
+			expectedWorkerResources: expectedWorkerResources,
 		},
 		{
-			name:                       "custom runtime class name",
-			taskResources:              resourceRequirements,
-			expectedSubmitterResources: &submitterDefaultResourceRequirements,
-			expectedHeadResources:      resourceRequirements,
-			expectedWorkerResources:    resourceRequirements,
+			name:                    "custom runtime class name",
+			taskResources:           resourceRequirements,
+			expectedHeadResources:   resourceRequirements,
+			expectedWorkerResources: resourceRequirements,
 			headK8SPod: &core.K8SPod{
 				PodSpec: transformStructToStructPB(t, headPodSpecCustomRuntimeClass),
 			},
@@ -556,19 +567,13 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 			taskTemplate := dummyRayTaskTemplate("ray-id", rayJobInput)
 			taskContext := dummyRayTaskContext(taskTemplate, p.taskResources, nil, "", serviceAccount)
 			rayJobResourceHandler := rayJobResourceHandler{}
-			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
+			r, err := rayJobResourceHandler.BuildClusterResource(context.TODO(), taskContext)
 			assert.Nil(t, err)
 			assert.NotNil(t, r)
-			rayJob, ok := r.(*rayv1.RayJob)
+			rayCluster, ok := r.(*rayv1.RayCluster)
 			assert.True(t, ok)
 
-			submitterPodResources := rayJob.Spec.SubmitterPodTemplate.Spec.Containers[0].Resources
-			assert.EqualValues(t,
-				p.expectedSubmitterResources,
-				&submitterPodResources,
-			)
-
-			headPodSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
+			headPodSpec := rayCluster.Spec.HeadGroupSpec.Template.Spec
 			headPodResources := headPodSpec.Containers[0].Resources
 			assert.EqualValues(t,
 				p.expectedHeadResources,
@@ -577,7 +582,7 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 
 			assert.EqualValues(t, p.expectedHeadRuntimeClassName, headPodSpec.RuntimeClassName)
 
-			for _, workerGroupSpec := range rayJob.Spec.RayClusterSpec.WorkerGroupSpecs {
+			for _, workerGroupSpec := range rayCluster.Spec.WorkerGroupSpecs {
 				workerPodSpec := workerGroupSpec.Template.Spec
 				workerPodResources := workerPodSpec.Containers[0].Resources
 				assert.EqualValues(t,
@@ -612,37 +617,35 @@ func TestDefaultStartParameters(t *testing.T) {
 	err := config.SetK8sPluginConfig(&config.K8sPluginConfig{DefaultTolerations: toleration})
 	assert.Nil(t, err)
 
-	RayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount))
+	ClusterResource, err := rayJobResourceHandler.BuildClusterResource(context.TODO(), dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount))
 	assert.Nil(t, err)
 
-	assert.NotNil(t, RayResource)
-	ray, ok := RayResource.(*rayv1.RayJob)
+	assert.NotNil(t, ClusterResource)
+	ray, ok := ClusterResource.(*rayv1.RayCluster)
 	assert.True(t, ok)
 
-	assert.Equal(t, *ray.Spec.RayClusterSpec.EnableInTreeAutoscaling, true)
-	assert.Equal(t, ray.Spec.ShutdownAfterJobFinishes, true)
-	assert.Equal(t, ray.Spec.TTLSecondsAfterFinished, int32(120))
+	assert.Equal(t, *ray.Spec.EnableInTreeAutoscaling, true)
 
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName, serviceAccount)
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.RayStartParams,
+	assert.Equal(t, ray.Spec.HeadGroupSpec.Template.Spec.ServiceAccountName, serviceAccount)
+	assert.Equal(t, ray.Spec.HeadGroupSpec.RayStartParams,
 		map[string]string{
 			"dashboard-host": "0.0.0.0", "disable-usage-stats": "true", "include-dashboard": "true",
 			"node-ip-address": "$MY_POD_IP",
 		})
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
+	assert.Equal(t, ray.Spec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
+	assert.Equal(t, ray.Spec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1"})
+	assert.Equal(t, ray.Spec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
 
 	workerReplica := int32(3)
-	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Replicas, workerReplica)
-	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MinReplicas, workerReplica)
-	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MaxReplicas, workerReplica)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].GroupName, workerGroupName)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.ServiceAccountName, serviceAccount)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"disable-usage-stats": "true", "node-ip-address": "$MY_POD_IP"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
+	assert.Equal(t, *ray.Spec.WorkerGroupSpecs[0].Replicas, workerReplica)
+	assert.Equal(t, *ray.Spec.WorkerGroupSpecs[0].MinReplicas, workerReplica)
+	assert.Equal(t, *ray.Spec.WorkerGroupSpecs[0].MaxReplicas, workerReplica)
+	assert.Equal(t, ray.Spec.WorkerGroupSpecs[0].GroupName, workerGroupName)
+	assert.Equal(t, ray.Spec.WorkerGroupSpecs[0].Template.Spec.ServiceAccountName, serviceAccount)
+	assert.Equal(t, ray.Spec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"disable-usage-stats": "true", "node-ip-address": "$MY_POD_IP"})
+	assert.Equal(t, ray.Spec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1"})
+	assert.Equal(t, ray.Spec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1"})
+	assert.Equal(t, ray.Spec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
 }
 
 func TestInjectLogsSidecar(t *testing.T) {
@@ -821,13 +824,13 @@ func TestInjectLogsSidecar(t *testing.T) {
 			}))
 			taskContext := dummyRayTaskContext(p.taskTemplate, resourceRequirements, nil, "", serviceAccount)
 			rayJobResourceHandler := rayJobResourceHandler{}
-			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
+			r, err := rayJobResourceHandler.BuildClusterResource(context.TODO(), taskContext)
 			assert.Nil(t, err)
 			assert.NotNil(t, r)
-			rayJob, ok := r.(*rayv1.RayJob)
+			rayCluster, ok := r.(*rayv1.RayCluster)
 			assert.True(t, ok)
 
-			headPodSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
+			headPodSpec := rayCluster.Spec.HeadGroupSpec.Template.Spec
 
 			// Check volumes
 			assert.EqualValues(t, p.expectedVolumes, headPodSpec.Volumes)
@@ -990,7 +993,7 @@ func TestGetTaskPhase(t *testing.T) {
 					StartTime:           &startTime,
 				},
 			}
-			phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
+			phaseInfo, err := rayJobResourceHandler.GetJobPhase(ctx, pluginCtx, rayObject)
 			if tc.expectedError {
 				assert.Error(t, err)
 			} else {
@@ -1016,7 +1019,7 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 
 	rayObject := &rayv1.RayJob{}
 	rayObject.Status.JobDeploymentStatus = rayv1.JobDeploymentStatusInitializing
-	phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
+	phaseInfo, err := rayJobResourceHandler.GetJobPhase(ctx, pluginCtx, rayObject)
 
 	assert.NoError(t, err)
 	assert.Equal(t, phaseInfo.Version(), pluginsCore.DefaultPhaseVersion+1)
@@ -1342,45 +1345,6 @@ func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
 	}
 }
 
-func TestBuildResourceRaySubmitterPodAffinity(t *testing.T) {
-	// Create a default affinity to be set in the K8s plugin config
-	defaultAffinity := &corev1.Affinity{
-		NodeAffinity: &corev1.NodeAffinity{
-			RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
-				NodeSelectorTerms: []corev1.NodeSelectorTerm{
-					{
-						MatchExpressions: []corev1.NodeSelectorRequirement{
-							{
-								Key:      "node-type",
-								Operator: corev1.NodeSelectorOpIn,
-								Values:   []string{"ray-submitter"},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-
-	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
-		DefaultAffinity: defaultAffinity,
-	}))
-
-	taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
-	taskContext := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
-	rayJobResourceHandler := rayJobResourceHandler{}
-	r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
-	assert.Nil(t, err)
-	assert.NotNil(t, r)
-	rayJob, ok := r.(*rayv1.RayJob)
-	assert.True(t, ok)
-
-	// Verify the submitter pod template has the default affinity from K8s plugin config
-	submitterPodAffinity := rayJob.Spec.SubmitterPodTemplate.Spec.Affinity
-	assert.NotNil(t, submitterPodAffinity, "submitter pod should have affinity set")
-	assert.EqualValues(t, defaultAffinity, submitterPodAffinity, "submitter pod affinity should match default affinity from config")
-}
-
 func TestGetPropertiesRay(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
 	maxLength := 47
@@ -1524,7 +1488,7 @@ func TestGetTaskPhaseWithFailedPod(t *testing.T) {
 	}
 
 	// Even though RayJob status is running, should return failure due to pod status
-	phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
+	phaseInfo, err := rayJobResourceHandler.GetJobPhase(ctx, pluginCtx, rayObject)
 	assert.NoError(t, err)
 	assert.True(t, phaseInfo.Phase().IsFailure())
 }
@@ -1560,7 +1524,7 @@ func TestGetTaskPhaseContainerNameConstant(t *testing.T) {
 		},
 	}
 
-	phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
+	phaseInfo, err := rayJobResourceHandler.GetJobPhase(ctx, pluginCtx, rayObject)
 	assert.NoError(t, err)
 	assert.NotNil(t, phaseInfo.Info())
 	assert.NotNil(t, phaseInfo.Info().LogContext)
@@ -1573,111 +1537,114 @@ func TestGetTaskPhaseContainerNameConstant(t *testing.T) {
 	assert.Equal(t, RayHeadContainerName, headPodLogContext.Containers[0].ContainerName)
 }
 
-func TestIsTerminal(t *testing.T) {
+func TestGetClusterNameDeterministic(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+	rayJobResourceHandler := rayJobResourceHandler{}
+	taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+	taskCtx := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+
+	name1, err := rayJobResourceHandler.GetClusterName(context.TODO(), taskCtx)
+	assert.NoError(t, err)
+	name2, err := rayJobResourceHandler.GetClusterName(context.TODO(), taskCtx)
+	assert.NoError(t, err)
+
+	assert.Equal(t, name1, name2)
+	assert.True(t, strings.HasPrefix(name1, "ray-"))
+	assert.LessOrEqual(t, len(name1), 47)
+}
+
+func TestGetClusterNameDiffersForDifferentSpecs(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+	rayJobResourceHandler := rayJobResourceHandler{}
+
+	obj1 := dummyRayCustomObj()
+	obj2 := dummyRayCustomObj()
+	obj2.RuntimeEnvYaml = "pip:\n  - numpy\n"
+
+	taskCtx1 := dummyRayTaskContext(dummyRayTaskTemplate("ray-id", obj1), resourceRequirements, nil, "", serviceAccount)
+	taskCtx2 := dummyRayTaskContext(dummyRayTaskTemplate("ray-id", obj2), resourceRequirements, nil, "", serviceAccount)
+
+	name1, err := rayJobResourceHandler.GetClusterName(context.TODO(), taskCtx1)
+	assert.NoError(t, err)
+	name2, err := rayJobResourceHandler.GetClusterName(context.TODO(), taskCtx2)
+	assert.NoError(t, err)
+
+	assert.NotEqual(t, name1, name2)
+}
+
+func TestIsClusterReady(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
 	ctx := context.Background()
 
-	tests := []struct {
-		name           string
-		status         rayv1.JobDeploymentStatus
-		expectedResult bool
-	}{
-		{"Complete", rayv1.JobDeploymentStatusComplete, true},
-		{"Failed", rayv1.JobDeploymentStatusFailed, true},
-		{"Running", rayv1.JobDeploymentStatusRunning, false},
-		{"Initializing", rayv1.JobDeploymentStatusInitializing, false},
-		{"Suspended", rayv1.JobDeploymentStatusSuspended, false},
-	}
+	notReady, err := rayJobResourceHandler.IsClusterReady(ctx, nil, &rayv1.RayCluster{})
+	assert.NoError(t, err)
+	assert.False(t, notReady)
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			job := &rayv1.RayJob{
-				Status: rayv1.RayJobStatus{
-					JobDeploymentStatus: tt.status,
-				},
-			}
-			result, err := rayJobResourceHandler.IsTerminal(ctx, job)
-			assert.NoError(t, err)
-			assert.Equal(t, tt.expectedResult, result)
-		})
-	}
+	ready, err := rayJobResourceHandler.IsClusterReady(ctx, nil, &rayv1.RayCluster{
+		Status: rayv1.RayClusterStatus{State: rayv1.Ready},
+	})
+	assert.NoError(t, err)
+	assert.True(t, ready)
 }
 
-func TestIsTerminal_WrongResourceType(t *testing.T) {
-	rayJobResourceHandler := rayJobResourceHandler{}
-	ctx := context.Background()
+func TestInjectRunScopedRuntimeEnv(t *testing.T) {
+	t.Run("adds env_vars to existing runtime_env", func(t *testing.T) {
+		in := "pip:\n- numpy\n"
+		out, err := injectRunScopedRuntimeEnv(in, map[string]string{"RUN_NAME": "r1", "ACTION_NAME": "a0"})
+		require.NoError(t, err)
 
-	wrongResource := &corev1.ConfigMap{}
-	result, err := rayJobResourceHandler.IsTerminal(ctx, wrongResource)
-	assert.Error(t, err)
-	assert.False(t, result)
-	assert.Contains(t, err.Error(), "unexpected resource type")
+		var doc map[string]interface{}
+		require.NoError(t, yaml.Unmarshal([]byte(out), &doc))
+		ev, ok := doc["env_vars"].(map[interface{}]interface{})
+		require.True(t, ok, "env_vars present")
+		assert.Equal(t, "r1", ev["RUN_NAME"])
+		assert.Equal(t, "a0", ev["ACTION_NAME"])
+		// Existing keys preserved.
+		assert.Equal(t, []interface{}{"numpy"}, doc["pip"])
+	})
+
+	t.Run("does not overwrite user-supplied env_vars", func(t *testing.T) {
+		in := "env_vars:\n  RUN_NAME: user-set\n"
+		out, err := injectRunScopedRuntimeEnv(in, map[string]string{"RUN_NAME": "r1"})
+		require.NoError(t, err)
+		var doc map[string]interface{}
+		require.NoError(t, yaml.Unmarshal([]byte(out), &doc))
+		ev := doc["env_vars"].(map[interface{}]interface{})
+		assert.Equal(t, "user-set", ev["RUN_NAME"])
+	})
+
+	t.Run("empty envVars returns input unchanged", func(t *testing.T) {
+		in := "pip:\n- numpy\n"
+		out, err := injectRunScopedRuntimeEnv(in, nil)
+		require.NoError(t, err)
+		assert.Equal(t, in, out)
+	})
+
+	t.Run("empty runtime_env produces valid env_vars doc", func(t *testing.T) {
+		out, err := injectRunScopedRuntimeEnv("", map[string]string{"RUN_NAME": "r1"})
+		require.NoError(t, err)
+		var doc map[string]interface{}
+		require.NoError(t, yaml.Unmarshal([]byte(out), &doc))
+		ev := doc["env_vars"].(map[interface{}]interface{})
+		assert.Equal(t, "r1", ev["RUN_NAME"])
+	})
 }
 
-func TestGetCompletionTime(t *testing.T) {
+func TestBuildJobResourceInjectsRunScopedRuntimeEnv(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
+	taskCtx := dummyRayTaskContext(dummyRayTaskTemplate("ray-id", dummyRayCustomObj()), resourceRequirements, nil, "", serviceAccount)
 
-	now := time.Now().Truncate(time.Second)
-	earlier := now.Add(-1 * time.Hour)
-	evenEarlier := now.Add(-2 * time.Hour)
+	obj, err := rayJobResourceHandler.BuildJobResource(context.Background(), taskCtx, "ray-test")
+	require.NoError(t, err)
+	rayJob, ok := obj.(*rayv1.RayJob)
+	require.True(t, ok)
 
-	tests := []struct {
-		name         string
-		job          *rayv1.RayJob
-		expectedTime time.Time
-	}{
-		{
-			name: "uses EndTime",
-			job: &rayv1.RayJob{
-				ObjectMeta: metav1.ObjectMeta{
-					CreationTimestamp: metav1.NewTime(evenEarlier),
-				},
-				Status: rayv1.RayJobStatus{
-					EndTime:   &metav1.Time{Time: now},
-					StartTime: &metav1.Time{Time: earlier},
-				},
-			},
-			expectedTime: now,
-		},
-		{
-			name: "falls back to StartTime",
-			job: &rayv1.RayJob{
-				ObjectMeta: metav1.ObjectMeta{
-					CreationTimestamp: metav1.NewTime(evenEarlier),
-				},
-				Status: rayv1.RayJobStatus{
-					StartTime: &metav1.Time{Time: now},
-				},
-			},
-			expectedTime: now,
-		},
-		{
-			name: "falls back to CreationTimestamp",
-			job: &rayv1.RayJob{
-				ObjectMeta: metav1.ObjectMeta{
-					CreationTimestamp: metav1.NewTime(now),
-				},
-				Status: rayv1.RayJobStatus{},
-			},
-			expectedTime: now,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result, err := rayJobResourceHandler.GetCompletionTime(tt.job)
-			assert.NoError(t, err)
-			assert.Equal(t, tt.expectedTime.Unix(), result.Unix())
-		})
-	}
-}
-
-func TestGetCompletionTime_WrongResourceType(t *testing.T) {
-	rayJobResourceHandler := rayJobResourceHandler{}
-
-	wrongResource := &corev1.ConfigMap{}
-	result, err := rayJobResourceHandler.GetCompletionTime(wrongResource)
-	assert.Error(t, err)
-	assert.True(t, result.IsZero())
-	assert.Contains(t, err.Error(), "unexpected resource type")
+	var doc map[string]interface{}
+	require.NoError(t, yaml.Unmarshal([]byte(rayJob.Spec.RuntimeEnvYAML), &doc))
+	ev, ok := doc["env_vars"].(map[interface{}]interface{})
+	require.True(t, ok, "runtime_env should carry env_vars with the job's identity")
+	// The job's execution identity (from flytek8s.GetExecutionEnvVars) must land in runtime_env so the
+	// driver on the shared head pod reports under its own run rather than the cluster creator's.
+	assert.Contains(t, ev, "FLYTE_INTERNAL_EXECUTION_ID")
+	assert.Equal(t, "my_name", ev["FLYTE_INTERNAL_EXECUTION_ID"])
 }

@@ -53,13 +53,23 @@ func (r *Registry) Initialize(ctx context.Context) error {
 
 	// Load k8s plugins
 	for _, entry := range r.pluginRegistry.GetK8sPlugins() {
-		pm := executorK8s.NewPluginManager(
-			entry.ID,
-			entry.Plugin,
-			r.setupCtx.KubeClient(),
-		)
-		if err := pm.InitializeObjectEventWatcher(ctx); err != nil {
-			return fmt.Errorf("failed to initialize k8s object event watcher for plugin %s: %w", entry.ID, err)
+		var plugin pluginsCore.Plugin
+		if entry.ClusterPlugin != nil {
+			plugin = executorK8s.NewClusterPluginManager(
+				entry.ID,
+				entry.ClusterPlugin,
+				r.setupCtx.KubeClient(),
+			)
+		} else {
+			pm := executorK8s.NewPluginManager(
+				entry.ID,
+				entry.Plugin,
+				r.setupCtx.KubeClient(),
+			)
+			if err := pm.InitializeObjectEventWatcher(ctx); err != nil {
+				return fmt.Errorf("failed to initialize k8s object event watcher for plugin %s: %w", entry.ID, err)
+			}
+			plugin = pm
 		}
 
 		for _, taskType := range entry.RegisteredTaskTypes {
@@ -67,7 +77,7 @@ func (r *Registry) Initialize(ctx context.Context) error {
 				logger.Warnf(ctx, "Task type %q already registered by plugin %q, overwriting with %q",
 					taskType, existing.GetID(), entry.ID)
 			}
-			r.plugins[taskType] = pm
+			r.plugins[taskType] = plugin
 		}
 
 		if entry.IsDefault {
@@ -75,7 +85,7 @@ func (r *Registry) Initialize(ctx context.Context) error {
 				logger.Warnf(ctx, "Multiple default plugins found, overwriting %q with %q",
 					r.defaultPlugin.GetID(), entry.ID)
 			}
-			r.defaultPlugin = pm
+			r.defaultPlugin = plugin
 		}
 
 		logger.Infof(ctx, "Registered k8s plugin [%s] for task types %v", entry.ID, entry.RegisteredTaskTypes)

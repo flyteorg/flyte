@@ -58,12 +58,20 @@ func (p *taskPluginRegistry) RegisterK8sPlugin(info k8s.PluginEntry) {
 		logger.Panicf(context.TODO(), "K8s AsyncPlugin should be registered to handle at least one task type")
 	}
 
-	if info.Plugin == nil {
-		logger.Panicf(context.TODO(), "K8s AsyncPlugin cannot be nil")
+	if info.Plugin == nil && info.ClusterPlugin == nil {
+		logger.Panicf(context.TODO(), "K8s plugin requires either Plugin or ClusterPlugin to be set")
+	}
+
+	if info.Plugin != nil && info.ClusterPlugin != nil {
+		logger.Panicf(context.TODO(), "K8s plugin cannot set both Plugin and ClusterPlugin")
 	}
 
 	if info.ResourceToWatch == nil {
 		logger.Panicf(context.TODO(), "The framework requires a K8s resource to watch, for valid plugin registration")
+	}
+
+	if info.ClusterPlugin != nil && info.ClusterResourceToWatch == nil {
+		logger.Panicf(context.TODO(), "ClusterPlugin requires ClusterResourceToWatch to be set")
 	}
 
 	p.m.Lock()
