@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
-	"connectrpc.com/otelconnect"
 	"golang.org/x/time/rate"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -42,15 +41,8 @@ type TriggerExecutorConfig struct {
 
 // NewTriggerExecutor constructs a TriggerExecutor.
 func NewTriggerExecutor(cfg TriggerExecutorConfig) *TriggerExecutor {
-	clientOpts := cfg.ClientOpts
-	if len(clientOpts) == 0 {
-		if otelInterceptor, err := otelconnect.NewInterceptor(); err == nil {
-			clientOpts = []connect.ClientOption{connect.WithInterceptors(otelInterceptor)}
-		}
-	}
-
 	return &TriggerExecutor{
-		runClient: workflowconnect.NewRunServiceClient(http.DefaultClient, cfg.BaseURL, clientOpts...),
+		runClient: workflowconnect.NewRunServiceClient(http.DefaultClient, cfg.BaseURL, cfg.ClientOpts...),
 		limiter:   rate.NewLimiter(rate.Limit(cfg.QPS), cfg.Burst),
 	}
 }
