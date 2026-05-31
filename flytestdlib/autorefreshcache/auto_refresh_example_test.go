@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/errors"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
@@ -112,43 +113,62 @@ func ExampleNewAutoRefreshCache() {
 		fmt.Printf("unexpected error in create; err1: %v, err2: %v", err1, err2)
 	}
 
-	// Poll until the cache's background worker refreshes item1 to its terminal state. Polling against
-	// the expected condition (instead of sleeping a fixed duration) keeps this example deterministic
-	// even when the async worker is slow under load.
-	var item Item
-	var lastStatus ExampleItemStatus = ExampleStatusNotStarted
-	deadline := time.Now().Add(10 * time.Second)
-	for {
-		item, err = cache.Get(item1.ID())
-		if err != nil {
-			if errors.IsCausedBy(err, ErrNotFound) {
-				fmt.Printf("Item1 is no longer in the cache")
-				break
-			}
-			cancel()
-			panic(fmt.Sprintf("unexpected error fetching item1: %v", err))
-		}
-
-		exItem, ok := item.(*ExampleCacheItem)
-		if !ok {
-			cancel()
-			panic(fmt.Sprintf("unexpected item type %T for item1", item))
-		}
-		lastStatus = exItem.status
-		if lastStatus == ExampleStatusSucceeded {
-			fmt.Printf("Current status for item1 is %v", lastStatus)
-			break
-		}
-		if time.Now().After(deadline) {
-			cancel()
-			panic(fmt.Sprintf("timed out waiting for item1 to reach %v; last status=%v", ExampleStatusSucceeded, lastStatus))
-		}
-		time.Sleep(resyncPeriod)
+	// The cache refreshes asynchronously in the background, so item1 transitions to its terminal
+	// status some time after it is created. Right after GetOrCreate it is already retrievable from
+	// the cache in its initial state. See TestNewAutoRefreshCache for verification that the
+	// background worker eventually advances item1 to its terminal status.
+	item, err := cache.Get(item1.ID())
+	if err != nil {
+		fmt.Printf("unexpected error getting item1: %v", err)
+	} else {
+		fmt.Printf("item1 is in the cache with id %q", item.(*ExampleCacheItem).ID())
 	}
 
 	// stop the cache
 	cancel()
 
 	// Output:
-	// Current status for item1 is Completed
+	// item1 is in the cache with id "item1"
+}
+
+// TestNewAutoRefreshCache verifies that the background worker eventually advances an item to its
+// terminal status. This lives in a test (rather than the example above) so that the wait can use
+// require.Eventually, which needs a *testing.T that example functions do not have.
+func TestNewAutoRefreshCache(t *testing.T) {
+	exampleService := newExampleService()
+
+	syncItemCb := func(ctx context.Context, batch []ItemWrapper) ([]ItemSyncResponse, error) {
+		updatedItems := make([]ItemSyncResponse, 0, len(batch))
+		for _, obj := range batch {
+			oldItem := obj.GetItem().(*ExampleCacheItem)
+			newItem := exampleService.getStatus(oldItem.ID())
+			if newItem.status != oldItem.status {
+				updatedItems = append(updatedItems, ItemSyncResponse{
+					ID:     oldItem.ID(),
+					Item:   newItem,
+					Action: Update,
+				})
+			}
+		}
+		return updatedItems, nil
+	}
+
+	resyncPeriod := time.Millisecond
+	rateLimiter := workqueue.DefaultControllerRateLimiter()
+	cache, err := NewAutoRefreshCache("my-cache", syncItemCb, rateLimiter, resyncPeriod, 10, 100, promutils.NewTestScope())
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	require.NoError(t, cache.Start(ctx))
+
+	item1 := &ExampleCacheItem{status: ExampleStatusNotStarted, id: "item1"}
+	_, err = cache.GetOrCreate(item1.id, item1)
+	require.NoError(t, err)
+
+	// Poll until the background worker refreshes item1 to its terminal state.
+	require.Eventually(t, func() bool {
+		item, err := cache.Get(item1.ID())
+		return err == nil && item.(*ExampleCacheItem).status == ExampleStatusSucceeded
+	}, 3*time.Second, resyncPeriod, "expected item1 to reach terminal status %q", ExampleStatusSucceeded)
 }
