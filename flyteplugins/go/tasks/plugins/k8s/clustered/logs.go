@@ -107,6 +107,10 @@ func getLogContext(ctx context.Context, pluginContext k8s.PluginContext, jobSet 
 	// rank0PodName returns "<jobset>-workers-0-0"; the real pod carries an additional
 	// random suffix, so match on prefix to identify the primary (rank-0) pod.
 	primaryPrefix := rank0PodName(jobSet.Name)
+	// The authoritative primary container name is stored on the JobSet at build time
+	// (see build.go). Child pods don't carry the annotations BuildPodLogContext infers
+	// from, so set it explicitly to avoid resolving to the wrong container (e.g. a sidecar).
+	primaryContainerName := jobSet.Annotations[primaryContainerAnnotation]
 	logCtx := &core.LogContext{Pods: make([]*core.PodLogContext, 0, len(podList.Items))}
 	for i := range podList.Items {
 		pod := &podList.Items[i]
@@ -117,10 +121,19 @@ func getLogContext(ctx context.Context, pluginContext k8s.PluginContext, jobSet 
 		if strings.HasPrefix(pod.Name, primaryPrefix) {
 			logCtx.PrimaryPodName = pod.Name
 		}
-		logCtx.Pods = append(logCtx.Pods, flytek8s.BuildPodLogContext(pod))
+		podLogCtx := flytek8s.BuildPodLogContext(pod)
+		if primaryContainerName != "" {
+			podLogCtx.PrimaryContainerName = primaryContainerName
+		}
+		logCtx.Pods = append(logCtx.Pods, podLogCtx)
 	}
 	if len(logCtx.Pods) == 0 {
 		return nil
+	}
+	// Guarantee PrimaryPodName references a pod in Pods: if rank-0 was pending/absent,
+	// fall back to the first included pod so downstream log streaming can resolve it.
+	if logCtx.PrimaryPodName == "" {
+		logCtx.PrimaryPodName = logCtx.Pods[0].GetPodName()
 	}
 	return logCtx
 }

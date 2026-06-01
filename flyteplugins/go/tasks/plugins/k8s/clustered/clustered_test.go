@@ -535,51 +535,106 @@ func TestGetTaskPhase_MaintenanceRetry_SystemFailure(t *testing.T) {
 }
 
 func TestGetTaskPhase_LogContext(t *testing.T) {
-	// A running JobSet with live worker pods → LogContext is built from the real pods:
-	// the rank-0 pod is marked primary (matched by name prefix despite its random
-	// suffix), and Pending pods are excluded.
-	js := makeJobSet("", "", false)
-	js.Status.Conditions = []metav1.Condition{
-		{Type: "SomeActiveCondition", Status: metav1.ConditionTrue, LastTransitionTime: metav1.NewTime(time.Now())},
-	}
+	const primaryContainer = "primary"
+	const sidecarContainer = "sidecar"
 
+	// mkPod builds a realistic JobSet child pod: a primary container plus a sidecar,
+	// with matching container statuses so BuildPodLogContext produces real container
+	// contexts. Pending pods carry no statuses.
 	mkPod := func(name string, phase corev1.PodPhase) *corev1.Pod {
-		return &corev1.Pod{
+		pod := &corev1.Pod{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      name,
 				Namespace: testNS,
 				Labels:    map[string]string{jobSetNameLabel: testJobName},
 			},
+			Spec: corev1.PodSpec{
+				Containers: []corev1.Container{{Name: primaryContainer}, {Name: sidecarContainer}},
+			},
 			Status: corev1.PodStatus{Phase: phase},
 		}
+		if phase == corev1.PodRunning {
+			running := corev1.ContainerState{Running: &corev1.ContainerStateRunning{StartedAt: metav1.NewTime(time.Now())}}
+			pod.Status.ContainerStatuses = []corev1.ContainerStatus{
+				{Name: primaryContainer, State: running},
+				{Name: sidecarContainer, State: running},
+			}
+		}
+		return pod
 	}
+
+	// jobSet annotates the authoritative primary container name at build time.
+	makeRunningJobSet := func() *jobsetv1alpha2.JobSet {
+		js := makeJobSet("", "", false)
+		js.Annotations = map[string]string{primaryContainerAnnotation: primaryContainer}
+		js.Status.Conditions = []metav1.Condition{
+			{Type: "SomeActiveCondition", Status: metav1.ConditionTrue, LastTransitionTime: metav1.NewTime(time.Now())},
+		}
+		return js
+	}
+
 	// Real JobSet pods carry a random suffix after the "<jobset>-workers-<job>-<idx>" stem.
 	rank0 := rank0PodName(testJobName) + "-x1y2z"
 	rank1 := testJobName + "-workers-0-1-a9b8c"
-	pending := testJobName + "-workers-0-2-pppp"
-	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).
-		WithObjects(
-			mkPod(rank0, corev1.PodRunning),
-			mkPod(rank1, corev1.PodRunning),
-			mkPod(pending, corev1.PodPending),
-		).Build()
+	rank2 := testJobName + "-workers-0-2-pppp"
 
-	spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
-	pCtx := dummyPluginCtx(buildTaskTemplate(spec), fakeClient)
+	t.Run("primary pod and container resolved from live pods", func(t *testing.T) {
+		js := makeRunningJobSet()
+		fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).
+			WithObjects(
+				mkPod(rank0, corev1.PodRunning),
+				mkPod(rank1, corev1.PodRunning),
+				mkPod(rank2, corev1.PodPending),
+			).Build()
 
-	handler := clusteredResourceHandler{}
-	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
-	assert.NoError(t, err)
-	assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+		spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
+		pCtx := dummyPluginCtx(buildTaskTemplate(spec), fakeClient)
 
-	lc := phase.Info().LogContext
-	assert.NotNil(t, lc)
-	assert.Equal(t, rank0, lc.PrimaryPodName)
-	// Pending pod is excluded → only the two running pods remain.
-	assert.Len(t, lc.Pods, 2)
-	names := []string{lc.Pods[0].GetPodName(), lc.Pods[1].GetPodName()}
-	assert.Contains(t, names, rank0)
-	assert.Contains(t, names, rank1)
+		handler := clusteredResourceHandler{}
+		phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+
+		lc := phase.Info().LogContext
+		assert.NotNil(t, lc)
+		assert.Equal(t, rank0, lc.PrimaryPodName)
+		// Pending pod is excluded → only the two running pods remain.
+		assert.Len(t, lc.Pods, 2)
+		names := []string{lc.Pods[0].GetPodName(), lc.Pods[1].GetPodName()}
+		assert.Contains(t, names, rank0)
+		assert.Contains(t, names, rank1)
+
+		// Each pod's primary container comes from the JobSet annotation (not the
+		// sidecar / first container), and container contexts are populated.
+		for _, p := range lc.Pods {
+			assert.Equal(t, primaryContainer, p.GetPrimaryContainerName())
+			assert.GreaterOrEqual(t, len(p.GetContainers()), 1)
+		}
+	})
+
+	t.Run("primary falls back when rank-0 pod is pending", func(t *testing.T) {
+		js := makeRunningJobSet()
+		fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).
+			WithObjects(
+				mkPod(rank0, corev1.PodPending),
+				mkPod(rank1, corev1.PodRunning),
+			).Build()
+
+		spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
+		pCtx := dummyPluginCtx(buildTaskTemplate(spec), fakeClient)
+
+		handler := clusteredResourceHandler{}
+		phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+		assert.NoError(t, err)
+
+		lc := phase.Info().LogContext
+		assert.NotNil(t, lc)
+		// rank-0 is pending and excluded → PrimaryPodName must still reference an
+		// included pod so downstream log streaming can resolve it.
+		assert.Len(t, lc.Pods, 1)
+		assert.Equal(t, rank1, lc.PrimaryPodName)
+		assert.Equal(t, lc.Pods[0].GetPodName(), lc.PrimaryPodName)
+	})
 }
 
 // --- IsTerminal / GetCompletionTime ---
