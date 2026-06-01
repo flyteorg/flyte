@@ -12,8 +12,9 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sscheme "k8s.io/client-go/kubernetes/scheme"
-	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	coreMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
@@ -320,12 +321,20 @@ func makeJobSet(condType jobsetv1alpha2.JobSetConditionType, status metav1.Condi
 	return js
 }
 
-func dummyPluginCtx(taskTemplate *core.TaskTemplate) *k8smocks.PluginContext {
+// emptyK8sReader returns a fake client with no objects, for tests that don't
+// exercise pod inspection (getLogContext just yields an empty pod list -> nil LogContext).
+func emptyK8sReader() client.Reader {
+	return fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).Build()
+}
+
+func dummyPluginCtx(taskTemplate *core.TaskTemplate, k8sReader client.Reader) *k8smocks.PluginContext {
 	pCtx := &k8smocks.PluginContext{}
 
 	taskReader := &coreMocks.TaskReader{}
 	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
 	pCtx.EXPECT().TaskReader().Return(taskReader)
+
+	pCtx.EXPECT().K8sReader().Return(k8sReader)
 
 	tID := &coreMocks.TaskExecutionID{}
 	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
@@ -352,7 +361,7 @@ func TestGetTaskPhase_Initializing(t *testing.T) {
 	js := makeJobSet("", "", suspend)
 
 	spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
-	pCtx := dummyPluginCtx(buildTaskTemplate(spec))
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), emptyK8sReader())
 
 	handler := clusteredResourceHandler{}
 	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
@@ -364,7 +373,7 @@ func TestGetTaskPhase_Success(t *testing.T) {
 	js := makeJobSet(jobsetv1alpha2.JobSetCompleted, metav1.ConditionTrue, false)
 
 	spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
-	pCtx := dummyPluginCtx(buildTaskTemplate(spec))
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), emptyK8sReader())
 
 	handler := clusteredResourceHandler{}
 	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
@@ -376,7 +385,7 @@ func TestGetTaskPhase_Failure(t *testing.T) {
 	js := makeJobSet(jobsetv1alpha2.JobSetFailed, metav1.ConditionTrue, false)
 
 	spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
-	pCtx := dummyPluginCtx(buildTaskTemplate(spec))
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), emptyK8sReader())
 
 	handler := clusteredResourceHandler{}
 	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
@@ -397,7 +406,7 @@ func TestGetTaskPhase_Running(t *testing.T) {
 	}
 
 	spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
-	pCtx := dummyPluginCtx(buildTaskTemplate(spec))
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), emptyK8sReader())
 
 	handler := clusteredResourceHandler{}
 	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
@@ -424,7 +433,7 @@ func TestGetTaskPhase_FastFail_NoJobsFailed(t *testing.T) {
 	}
 
 	spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
-	pCtx := dummyPluginCtx(buildTaskTemplate(spec))
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), emptyK8sReader())
 
 	handler := clusteredResourceHandler{}
 	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
@@ -442,7 +451,7 @@ func TestGetTaskPhase_MaintenanceRetry_FlagFalse(t *testing.T) {
 		NprocPerNode:  1,
 		FailurePolicy: &clusteredpb.ClusterFailurePolicy{RestartOnHostMaintenance: false},
 	}
-	pCtx := dummyPluginCtx(buildTaskTemplate(spec))
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), emptyK8sReader())
 
 	handler := clusteredResourceHandler{}
 	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
@@ -484,8 +493,7 @@ func TestGetTaskPhase_FastFail_Worker0Failed(t *testing.T) {
 	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pod).Build()
 
 	spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
-	pCtx := dummyPluginCtx(buildTaskTemplate(spec))
-	pCtx.EXPECT().K8sReader().Return(fakeClient)
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), fakeClient)
 
 	handler := clusteredResourceHandler{}
 	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
@@ -517,14 +525,61 @@ func TestGetTaskPhase_MaintenanceRetry_SystemFailure(t *testing.T) {
 		NprocPerNode:  1,
 		FailurePolicy: &clusteredpb.ClusterFailurePolicy{RestartOnHostMaintenance: true},
 	}
-	pCtx := dummyPluginCtx(buildTaskTemplate(spec))
-	pCtx.EXPECT().K8sReader().Return(fakeClient)
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), fakeClient)
 
 	handler := clusteredResourceHandler{}
 	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
 	assert.Equal(t, core.ExecutionError_SYSTEM, phase.Err().GetKind())
+}
+
+func TestGetTaskPhase_LogContext(t *testing.T) {
+	// A running JobSet with live worker pods → LogContext is built from the real pods:
+	// the rank-0 pod is marked primary (matched by name prefix despite its random
+	// suffix), and Pending pods are excluded.
+	js := makeJobSet("", "", false)
+	js.Status.Conditions = []metav1.Condition{
+		{Type: "SomeActiveCondition", Status: metav1.ConditionTrue, LastTransitionTime: metav1.NewTime(time.Now())},
+	}
+
+	mkPod := func(name string, phase corev1.PodPhase) *corev1.Pod {
+		return &corev1.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      name,
+				Namespace: testNS,
+				Labels:    map[string]string{jobSetNameLabel: testJobName},
+			},
+			Status: corev1.PodStatus{Phase: phase},
+		}
+	}
+	// Real JobSet pods carry a random suffix after the "<jobset>-workers-<job>-<idx>" stem.
+	rank0 := rank0PodName(testJobName) + "-x1y2z"
+	rank1 := testJobName + "-workers-0-1-a9b8c"
+	pending := testJobName + "-workers-0-2-pppp"
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).
+		WithObjects(
+			mkPod(rank0, corev1.PodRunning),
+			mkPod(rank1, corev1.PodRunning),
+			mkPod(pending, corev1.PodPending),
+		).Build()
+
+	spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), fakeClient)
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+
+	lc := phase.Info().LogContext
+	assert.NotNil(t, lc)
+	assert.Equal(t, rank0, lc.PrimaryPodName)
+	// Pending pod is excluded → only the two running pods remain.
+	assert.Len(t, lc.Pods, 2)
+	names := []string{lc.Pods[0].GetPodName(), lc.Pods[1].GetPodName()}
+	assert.Contains(t, names, rank0)
+	assert.Contains(t, names, rank1)
 }
 
 // --- IsTerminal / GetCompletionTime ---

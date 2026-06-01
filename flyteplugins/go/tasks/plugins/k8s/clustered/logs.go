@@ -3,15 +3,24 @@ package clustered
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
+	v1 "k8s.io/api/core/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
+
+// jobSetNameLabel is stamped by the JobSet controller on every child pod, so we
+// can list a JobSet's pods without depending on predicted pod names.
+const jobSetNameLabel = "jobset.sigs.k8s.io/jobset-name"
 
 // getTaskLogs synthesizes per-rank log URLs.
 //
@@ -75,4 +84,43 @@ func getTaskLogs(ctx context.Context, pluginContext k8s.PluginContext, jobSet *j
 		taskLogs = append(taskLogs, output.TaskLogs...)
 	}
 	return taskLogs, nil
+}
+
+// getLogContext builds the structured LogContext from the JobSet's live child pods.
+//
+// Unlike getTaskLogs (which synthesizes templated URIs from *predicted* pod names and
+// requires a pod-log template to be configured in cluster config), this uses the *real*
+// pods — actual names (including the Job-assigned random suffix), namespace, primary
+// container, and per-container IDs — so the console can fetch logs natively regardless
+// of log-template config. Best-effort: returns nil on list error or when no pods are
+// ready yet, leaving the templated Logs path as the fallback.
+func getLogContext(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet) *core.LogContext {
+	podList := &v1.PodList{}
+	if err := pluginContext.K8sReader().List(ctx, podList,
+		client.InNamespace(jobSet.Namespace),
+		client.MatchingLabels{jobSetNameLabel: jobSet.Name},
+	); err != nil {
+		logger.Warnf(ctx, "failed to list pods for JobSet %s/%s log context: %v", jobSet.Namespace, jobSet.Name, err)
+		return nil
+	}
+
+	// rank0PodName returns "<jobset>-workers-0-0"; the real pod carries an additional
+	// random suffix, so match on prefix to identify the primary (rank-0) pod.
+	primaryPrefix := rank0PodName(jobSet.Name)
+	logCtx := &core.LogContext{Pods: make([]*core.PodLogContext, 0, len(podList.Items))}
+	for i := range podList.Items {
+		pod := &podList.Items[i]
+		// Pending pods have no logs yet and no container IDs to address them by.
+		if pod.Status.Phase == v1.PodPending {
+			continue
+		}
+		if strings.HasPrefix(pod.Name, primaryPrefix) {
+			logCtx.PrimaryPodName = pod.Name
+		}
+		logCtx.Pods = append(logCtx.Pods, flytek8s.BuildPodLogContext(pod))
+	}
+	if len(logCtx.Pods) == 0 {
+		return nil
+	}
+	return logCtx
 }
