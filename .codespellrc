@@ -1,6 +1,33 @@
 [codespell]
+# Skip:
+# - .git, *.pdf, *.svg: VCS metadata and binaries
+# - *.pb: compiled protobuf descriptors
+# - go.sum, go.mod, *.lock, *.lock.yaml, *requirements.txt: dependency lock files
+# - gen: generated code (protobuf bindings etc.)
+# - monodocs-environment.lock.yaml: conda lock file
+# - *.swagger.json: generated swagger specs (escape sequences look like typos)
 skip = .git,*.pb,*.pdf,*.svg,go.sum,go.mod,*requirements.txt,gen,monodocs-environment.lock.yaml,*.lock,*.lock.yaml,*.swagger.json
 check-hidden = true
 # Ignore camelCase and PascalCase identifiers (common in Go code)
 ignore-regex = \b[a-z]+[A-Z]\w*\b|\b[A-Z][a-z]+[A-Z]\w*\b
-ignore-words-list = astroid,bootup,decorder,fo,lightyear,nd,notin,ser,te
+# Per-word rationale below; multi-line list with inline comments
+# (config-file feature, see https://github.com/codespell-project/codespell#using-a-config-file).
+ignore-words-list =
+  # Python static-analysis library name (referenced in conda lockfiles)
+  astroid,
+  # Legitimate word used in scheduler docs and Go code ("during bootup")
+  bootup,
+  # Go linter package: gitlab.com/bosi/decorder
+  decorder,
+  # Short Go variable name for "file output" (flytectl docker test)
+  fo,
+  # Buzz Lightyear used as test-data string in flytectl examples
+  lightyear,
+  # Test-fixture string content in flyteplugins template tests
+  nd,
+  # Kubernetes label-selector operator (e.g. "key notin (a,b)")
+  notin,
+  # Variable name short for "serialized" (Ser field in scheduler snapshot)
+  ser,
+  # Truncated PR title in CHANGELOG ("log te..." for "log template")
+  te
