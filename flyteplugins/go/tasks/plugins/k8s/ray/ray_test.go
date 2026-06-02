@@ -435,6 +435,187 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 	}
 }
 
+func TestBuildResourceRayGroupExtendedResources(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		GpuDeviceNodeLabel:                 "gpu-node-label",
+		GpuPartitionSizeNodeLabel:          "gpu-partition-size",
+		GpuResourceName:                    flytek8s.ResourceNvidiaGPU,
+		AddTolerationsForExtendedResources: []string{"nvidia.com/gpu"},
+	}))
+
+	resources := &corev1.ResourceRequirements{
+		Limits: corev1.ResourceList{
+			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+		},
+	}
+
+	// The head and worker groups request different extended resources via their own
+	// extended_resources fields. No task-level extended resources are set, so each
+	// group's pod spec should reflect only its own configuration.
+	rayJobObj := dummyRayCustomObj()
+	rayJobObj.RayCluster.HeadGroupSpec.ExtendedResources = &core.ExtendedResources{
+		GpuAccelerator: &core.GPUAccelerator{
+			Device: "nvidia-tesla-t4",
+		},
+	}
+	rayJobObj.RayCluster.WorkerGroupSpec[0].ExtendedResources = &core.ExtendedResources{
+		GpuAccelerator: &core.GPUAccelerator{
+			Device: "nvidia-tesla-a100",
+		},
+		SharedMemory: &core.SharedMemory{
+			MountName: "dshm",
+			MountPath: "/dev/shm",
+			SizeLimit: "1Gi",
+		},
+	}
+
+	taskTemplate := dummyRayTaskTemplate("ray-id", rayJobObj)
+	taskContext := dummyRayTaskContext(taskTemplate, resources, nil, "", serviceAccount)
+	rayJobResourceHandler := rayJobResourceHandler{}
+	r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
+	assert.NoError(t, err)
+	assert.NotNil(t, r)
+	rayJob, ok := r.(*rayv1.RayJob)
+	assert.True(t, ok)
+
+	gpuNodeSelectorTerms := func(device string) []corev1.NodeSelectorTerm {
+		return []corev1.NodeSelectorTerm{
+			{
+				MatchExpressions: []corev1.NodeSelectorRequirement{
+					{
+						Key:      "gpu-node-label",
+						Operator: corev1.NodeSelectorOpIn,
+						Values:   []string{device},
+					},
+				},
+			},
+		}
+	}
+	// Each group's pod is built via ToK8sPodSpec, which applies the GPU device
+	// toleration before the nvidia.com/gpu extended-resource toleration.
+	gpuTolerations := func(device string) []corev1.Toleration {
+		return []corev1.Toleration{
+			{
+				Key:      "gpu-node-label",
+				Value:    device,
+				Operator: corev1.TolerationOpEqual,
+				Effect:   corev1.TaintEffectNoSchedule,
+			},
+			{
+				Key:      "nvidia.com/gpu",
+				Operator: corev1.TolerationOpExists,
+				Effect:   corev1.TaintEffectNoSchedule,
+			},
+		}
+	}
+
+	// Head node uses the head group's extended resources (t4, no shared memory).
+	headNodeSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
+	assert.EqualValues(t, gpuNodeSelectorTerms("nvidia-tesla-t4"),
+		headNodeSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+	assert.EqualValues(t, gpuTolerations("nvidia-tesla-t4"), headNodeSpec.Tolerations)
+	assert.False(t, hasVolume(headNodeSpec.Volumes, "dshm"), "head pod should not have the worker's shared memory volume")
+
+	// Worker node uses the worker group's extended resources (a100 + shared memory).
+	workerNodeSpec := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec
+	assert.EqualValues(t, gpuNodeSelectorTerms("nvidia-tesla-a100"),
+		workerNodeSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+	assert.EqualValues(t, gpuTolerations("nvidia-tesla-a100"), workerNodeSpec.Tolerations)
+	assert.True(t, hasVolume(workerNodeSpec.Volumes, "dshm"), "worker pod should have the shared memory volume")
+
+	var workerContainer *corev1.Container
+	for i := range workerNodeSpec.Containers {
+		if workerNodeSpec.Containers[i].Name == "ray-worker" {
+			workerContainer = &workerNodeSpec.Containers[i]
+		}
+	}
+	assert.NotNil(t, workerContainer)
+	hasSharedMemoryMount := false
+	for _, vm := range workerContainer.VolumeMounts {
+		if vm.Name == "dshm" && vm.MountPath == "/dev/shm" {
+			hasSharedMemoryMount = true
+		}
+	}
+	assert.True(t, hasSharedMemoryMount, "worker container should mount the shared memory volume")
+}
+
+func hasVolume(volumes []corev1.Volume, name string) bool {
+	for _, v := range volumes {
+		if v.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
+// TestBuildResourceRayGroupExtendedResourcesOverride verifies that when both task-level
+// and group-level extended resources are set, the group-level GPU accelerator overrides
+// the task-level one (rather than producing two conflicting node selector requirements
+// for the same GPU label, which would make the pod unschedulable). Groups that do not
+// set their own extended_resources fall back to the task-level configuration.
+func TestBuildResourceRayGroupExtendedResourcesOverride(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		GpuDeviceNodeLabel:                 "gpu-node-label",
+		GpuResourceName:                    flytek8s.ResourceNvidiaGPU,
+		AddTolerationsForExtendedResources: []string{"nvidia.com/gpu"},
+	}))
+
+	resources := &corev1.ResourceRequirements{
+		Limits: corev1.ResourceList{
+			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+		},
+	}
+
+	// Only the worker group overrides the task-level GPU device; the head group inherits
+	// the task-level device.
+	rayJobObj := dummyRayCustomObj()
+	rayJobObj.RayCluster.WorkerGroupSpec[0].ExtendedResources = &core.ExtendedResources{
+		GpuAccelerator: &core.GPUAccelerator{
+			Device: "nvidia-tesla-a100",
+		},
+	}
+
+	taskTemplate := dummyRayTaskTemplate("ray-id", rayJobObj)
+	// Task-level extended resources request a different (default) GPU device.
+	taskTemplate.ExtendedResources = &core.ExtendedResources{
+		GpuAccelerator: &core.GPUAccelerator{
+			Device: "nvidia-tesla-t4",
+		},
+	}
+	taskContext := dummyRayTaskContext(taskTemplate, resources, nil, "", serviceAccount)
+	rayJobResourceHandler := rayJobResourceHandler{}
+	r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
+	assert.NoError(t, err)
+	assert.NotNil(t, r)
+	rayJob, ok := r.(*rayv1.RayJob)
+	assert.True(t, ok)
+
+	gpuNodeSelectorTerms := func(device string) []corev1.NodeSelectorTerm {
+		return []corev1.NodeSelectorTerm{
+			{
+				MatchExpressions: []corev1.NodeSelectorRequirement{
+					{
+						Key:      "gpu-node-label",
+						Operator: corev1.NodeSelectorOpIn,
+						Values:   []string{device},
+					},
+				},
+			},
+		}
+	}
+
+	// Head node inherits the task-level GPU device (t4) since it sets no extended resources.
+	headNodeSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
+	assert.EqualValues(t, gpuNodeSelectorTerms("nvidia-tesla-t4"),
+		headNodeSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+
+	// Worker node's group-level GPU device (a100) cleanly overrides the task-level device
+	// (t4); there is a single node selector requirement, not two conflicting ones.
+	workerNodeSpec := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec
+	assert.EqualValues(t, gpuNodeSelectorTerms("nvidia-tesla-a100"),
+		workerNodeSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+}
+
 func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
 
