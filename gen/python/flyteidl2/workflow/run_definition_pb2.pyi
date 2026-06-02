@@ -136,10 +136,12 @@ class TraceActionMetadata(_message.Message):
     def __init__(self, name: _Optional[str] = ...) -> None: ...
 
 class ConditionActionMetadata(_message.Message):
-    __slots__ = ["name"]
+    __slots__ = ["name", "type"]
     NAME_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
     name: str
-    def __init__(self, name: _Optional[str] = ...) -> None: ...
+    type: _types_pb2.LiteralType
+    def __init__(self, name: _Optional[str] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ...) -> None: ...
 
 class ActionMetadata(_message.Message):
     __slots__ = ["parent", "group", "executed_by", "task", "trace", "condition", "action_type", "trigger_id", "environment_name", "funtion_name", "trigger_name", "trigger_type", "source"]
@@ -239,7 +241,7 @@ class AbortInfo(_message.Message):
     def __init__(self, reason: _Optional[str] = ..., aborted_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ...) -> None: ...
 
 class ActionDetails(_message.Message):
-    __slots__ = ["id", "metadata", "status", "error_info", "abort_info", "task", "trace", "attempts"]
+    __slots__ = ["id", "metadata", "status", "error_info", "abort_info", "task", "trace", "condition", "attempts"]
     ID_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
@@ -247,6 +249,7 @@ class ActionDetails(_message.Message):
     ABORT_INFO_FIELD_NUMBER: _ClassVar[int]
     TASK_FIELD_NUMBER: _ClassVar[int]
     TRACE_FIELD_NUMBER: _ClassVar[int]
+    CONDITION_FIELD_NUMBER: _ClassVar[int]
     ATTEMPTS_FIELD_NUMBER: _ClassVar[int]
     id: _identifier_pb2.ActionIdentifier
     metadata: ActionMetadata
@@ -255,8 +258,9 @@ class ActionDetails(_message.Message):
     abort_info: AbortInfo
     task: _task_definition_pb2.TaskSpec
     trace: _task_definition_pb2.TraceSpec
+    condition: ConditionAction
     attempts: _containers.RepeatedCompositeFieldContainer[ActionAttempt]
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., metadata: _Optional[_Union[ActionMetadata, _Mapping]] = ..., status: _Optional[_Union[ActionStatus, _Mapping]] = ..., error_info: _Optional[_Union[ErrorInfo, _Mapping]] = ..., abort_info: _Optional[_Union[AbortInfo, _Mapping]] = ..., task: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., trace: _Optional[_Union[_task_definition_pb2.TraceSpec, _Mapping]] = ..., attempts: _Optional[_Iterable[_Union[ActionAttempt, _Mapping]]] = ...) -> None: ...
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., metadata: _Optional[_Union[ActionMetadata, _Mapping]] = ..., status: _Optional[_Union[ActionStatus, _Mapping]] = ..., error_info: _Optional[_Union[ErrorInfo, _Mapping]] = ..., abort_info: _Optional[_Union[AbortInfo, _Mapping]] = ..., task: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., trace: _Optional[_Union[_task_definition_pb2.TraceSpec, _Mapping]] = ..., condition: _Optional[_Union[ConditionAction, _Mapping]] = ..., attempts: _Optional[_Iterable[_Union[ActionAttempt, _Mapping]]] = ...) -> None: ...
 
 class ActionAttempt(_message.Message):
     __slots__ = ["phase", "start_time", "end_time", "error_info", "attempt", "log_info", "outputs", "logs_available", "cache_status", "cluster_events", "phase_transitions", "cluster", "log_context"]

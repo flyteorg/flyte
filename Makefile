@@ -289,3 +289,11 @@ docker-shell: ## Start an interactive shell in the CI Docker container
 docker-dev: docker-build gen ## Build local image and run generation (fast iteration)
 	@echo '✅  Local Docker image built and generation complete!'
 	@$(MAKE) sep
+
+# =============================================================================
+# Release targets
+# =============================================================================
+
+.PHONY: tag-helm
+tag-helm:
+	./scripts/tag-helm.sh
