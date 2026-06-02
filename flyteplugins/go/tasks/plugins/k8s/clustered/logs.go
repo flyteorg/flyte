@@ -7,7 +7,6 @@ import (
 	"time"
 
 	v1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
@@ -17,10 +16,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
-
-// jobSetNameLabel is stamped by the JobSet controller on every child pod, so we
-// can list a JobSet's pods without depending on predicted pod names.
-const jobSetNameLabel = "jobset.sigs.k8s.io/jobset-name"
 
 // getTaskLogs synthesizes per-rank log URLs.
 //
@@ -95,11 +90,10 @@ func getTaskLogs(ctx context.Context, pluginContext k8s.PluginContext, jobSet *j
 // of log-template config. Best-effort: returns nil on list error or when no pods are
 // ready yet, leaving the templated Logs path as the fallback.
 func getLogContext(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet) *core.LogContext {
+	// The plugin's K8sReader already scopes List calls to this node execution's
+	// namespace and execution-id/node-id labels, so no extra filters are needed.
 	podList := &v1.PodList{}
-	if err := pluginContext.K8sReader().List(ctx, podList,
-		client.InNamespace(jobSet.Namespace),
-		client.MatchingLabels{jobSetNameLabel: jobSet.Name},
-	); err != nil {
+	if err := pluginContext.K8sReader().List(ctx, podList); err != nil {
 		logger.Warnf(ctx, "failed to list pods for JobSet %s/%s log context: %v", jobSet.Namespace, jobSet.Name, err)
 		return nil
 	}
@@ -107,7 +101,7 @@ func getLogContext(ctx context.Context, pluginContext k8s.PluginContext, jobSet 
 	// rank0PodName returns "<jobset>-workers-0-0"; the real pod carries an additional
 	// random suffix, so match on prefix to identify the primary (rank-0) pod.
 	primaryPrefix := rank0PodName(jobSet.Name)
-	// The authoritative primary container name is stored on the JobSet at build time
+	// The authoritative primary container name is stored on the JobSet at build time4
 	// (see build.go). Child pods don't carry the annotations BuildPodLogContext infers
 	// from, so set it explicitly to avoid resolving to the wrong container (e.g. a sidecar).
 	primaryContainerName := jobSet.Annotations[primaryContainerAnnotation]

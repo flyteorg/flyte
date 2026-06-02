@@ -546,7 +546,6 @@ func TestGetTaskPhase_LogContext(t *testing.T) {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      name,
 				Namespace: testNS,
-				Labels:    map[string]string{jobSetNameLabel: testJobName},
 			},
 			Spec: corev1.PodSpec{
 				Containers: []corev1.Container{{Name: primaryContainer}, {Name: sidecarContainer}},
