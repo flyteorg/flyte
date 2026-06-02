@@ -86,7 +86,8 @@ func getTaskLogs(ctx context.Context, pluginContext k8s.PluginContext, jobSet *j
 // Unlike getTaskLogs (which synthesizes templated URIs from *predicted* pod names and
 // requires a pod-log template to be configured in cluster config), this uses the *real*
 // pods — actual names (including the Job-assigned random suffix), namespace, primary
-// container, and per-container IDs — so the console can fetch logs natively regardless
+// container, and per-container names + process timestamps — so the console can fetch
+// logs natively regardless
 // of log-template config. Best-effort: returns nil on list error or when no pods are
 // ready yet, leaving the templated Logs path as the fallback.
 func getLogContext(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet) *core.LogContext {
@@ -101,14 +102,14 @@ func getLogContext(ctx context.Context, pluginContext k8s.PluginContext, jobSet 
 	// rank0PodName returns "<jobset>-workers-0-0"; the real pod carries an additional
 	// random suffix, so match on prefix to identify the primary (rank-0) pod.
 	primaryPrefix := rank0PodName(jobSet.Name)
-	// The authoritative primary container name is stored on the JobSet at build time4
+	// The authoritative primary container name is stored on the JobSet at build time
 	// (see build.go). Child pods don't carry the annotations BuildPodLogContext infers
 	// from, so set it explicitly to avoid resolving to the wrong container (e.g. a sidecar).
 	primaryContainerName := jobSet.Annotations[primaryContainerAnnotation]
 	logCtx := &core.LogContext{Pods: make([]*core.PodLogContext, 0, len(podList.Items))}
 	for i := range podList.Items {
 		pod := &podList.Items[i]
-		// Pending pods have no logs yet and no container IDs to address them by.
+		// Pending pods have no logs yet and no container statuses to build contexts from.
 		if pod.Status.Phase == v1.PodPending {
 			continue
 		}
