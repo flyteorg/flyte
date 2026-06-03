@@ -45,34 +45,18 @@ class EnqueueResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class UpdateRequest(_message.Message):
-    __slots__ = ["action_id", "attempt", "status", "state"]
+    __slots__ = ["action_id", "attempt", "status"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     ATTEMPT_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
-    STATE_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     attempt: int
     status: _run_definition_pb2.ActionStatus
-    state: str
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., status: _Optional[_Union[_run_definition_pb2.ActionStatus, _Mapping]] = ..., state: _Optional[str] = ...) -> None: ...
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., status: _Optional[_Union[_run_definition_pb2.ActionStatus, _Mapping]] = ...) -> None: ...
 
 class UpdateResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
-
-class GetLatestStateRequest(_message.Message):
-    __slots__ = ["action_id", "attempt"]
-    ACTION_ID_FIELD_NUMBER: _ClassVar[int]
-    ATTEMPT_FIELD_NUMBER: _ClassVar[int]
-    action_id: _identifier_pb2.ActionIdentifier
-    attempt: int
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ...) -> None: ...
-
-class GetLatestStateResponse(_message.Message):
-    __slots__ = ["state"]
-    STATE_FIELD_NUMBER: _ClassVar[int]
-    state: str
-    def __init__(self, state: _Optional[str] = ...) -> None: ...
 
 class WatchForUpdatesRequest(_message.Message):
     __slots__ = ["parent_action_id"]

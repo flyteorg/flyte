@@ -20,7 +20,6 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	ActionsService_Enqueue_FullMethodName         = "/flyteidl2.actions.ActionsService/Enqueue"
-	ActionsService_GetLatestState_FullMethodName  = "/flyteidl2.actions.ActionsService/GetLatestState"
 	ActionsService_WatchForUpdates_FullMethodName = "/flyteidl2.actions.ActionsService/WatchForUpdates"
 	ActionsService_Update_FullMethodName          = "/flyteidl2.actions.ActionsService/Update"
 	ActionsService_Abort_FullMethodName           = "/flyteidl2.actions.ActionsService/Abort"
@@ -33,9 +32,6 @@ const (
 type ActionsServiceClient interface {
 	// Enqueue queues a new action for execution.
 	Enqueue(ctx context.Context, in *EnqueueRequest, opts ...grpc.CallOption) (*EnqueueResponse, error)
-	// GetLatestState returns the latest `NodeStatus` of an action.
-	// This deprecates Get in the current StateService.
-	GetLatestState(ctx context.Context, in *GetLatestStateRequest, opts ...grpc.CallOption) (*GetLatestStateResponse, error)
 	// WatchForUpdates watches for updates to the state of actions.
 	// This API guarantees at-least-once delivery semantics.
 	WatchForUpdates(ctx context.Context, in *WatchForUpdatesRequest, opts ...grpc.CallOption) (ActionsService_WatchForUpdatesClient, error)
@@ -65,15 +61,6 @@ func NewActionsServiceClient(cc grpc.ClientConnInterface) ActionsServiceClient {
 func (c *actionsServiceClient) Enqueue(ctx context.Context, in *EnqueueRequest, opts ...grpc.CallOption) (*EnqueueResponse, error) {
 	out := new(EnqueueResponse)
 	err := c.cc.Invoke(ctx, ActionsService_Enqueue_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *actionsServiceClient) GetLatestState(ctx context.Context, in *GetLatestStateRequest, opts ...grpc.CallOption) (*GetLatestStateResponse, error) {
-	out := new(GetLatestStateResponse)
-	err := c.cc.Invoke(ctx, ActionsService_GetLatestState_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -145,9 +132,6 @@ func (c *actionsServiceClient) Signal(ctx context.Context, in *SignalRequest, op
 type ActionsServiceServer interface {
 	// Enqueue queues a new action for execution.
 	Enqueue(context.Context, *EnqueueRequest) (*EnqueueResponse, error)
-	// GetLatestState returns the latest `NodeStatus` of an action.
-	// This deprecates Get in the current StateService.
-	GetLatestState(context.Context, *GetLatestStateRequest) (*GetLatestStateResponse, error)
 	// WatchForUpdates watches for updates to the state of actions.
 	// This API guarantees at-least-once delivery semantics.
 	WatchForUpdates(*WatchForUpdatesRequest, ActionsService_WatchForUpdatesServer) error
@@ -172,9 +156,6 @@ type UnimplementedActionsServiceServer struct {
 
 func (UnimplementedActionsServiceServer) Enqueue(context.Context, *EnqueueRequest) (*EnqueueResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Enqueue not implemented")
-}
-func (UnimplementedActionsServiceServer) GetLatestState(context.Context, *GetLatestStateRequest) (*GetLatestStateResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetLatestState not implemented")
 }
 func (UnimplementedActionsServiceServer) WatchForUpdates(*WatchForUpdatesRequest, ActionsService_WatchForUpdatesServer) error {
 	return status.Errorf(codes.Unimplemented, "method WatchForUpdates not implemented")
@@ -214,24 +195,6 @@ func _ActionsService_Enqueue_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ActionsServiceServer).Enqueue(ctx, req.(*EnqueueRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ActionsService_GetLatestState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetLatestStateRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ActionsServiceServer).GetLatestState(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ActionsService_GetLatestState_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ActionsServiceServer).GetLatestState(ctx, req.(*GetLatestStateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -321,10 +284,6 @@ var ActionsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Enqueue",
 			Handler:    _ActionsService_Enqueue_Handler,
-		},
-		{
-			MethodName: "GetLatestState",
-			Handler:    _ActionsService_GetLatestState_Handler,
 		},
 		{
 			MethodName: "Update",
