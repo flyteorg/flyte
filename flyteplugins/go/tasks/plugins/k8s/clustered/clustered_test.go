@@ -100,8 +100,8 @@ func dummyTaskCtx(taskTemplate *core.TaskTemplate) *coreMocks.TaskExecutionConte
 	meta := &coreMocks.TaskExecutionMetadata{}
 	meta.EXPECT().GetTaskExecutionID().Return(tID)
 	meta.EXPECT().GetNamespace().Return(testNS)
-	meta.EXPECT().GetAnnotations().Return(map[string]string{})
-	meta.EXPECT().GetLabels().Return(map[string]string{})
+	meta.EXPECT().GetAnnotations().Return(map[string]string{"flyte.org/test-annotation": "av"})
+	meta.EXPECT().GetLabels().Return(map[string]string{"execution-id": "my-exec", "node-id": "n1"})
 	meta.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{Kind: "node", Name: "n1"})
 	meta.EXPECT().IsInterruptible().Return(false)
 	meta.EXPECT().GetOverrides().Return(overrides)
@@ -155,6 +155,14 @@ func TestBuildResource_HappyPath(t *testing.T) {
 	assert.Equal(t, int32(4), *jobSpec.Completions)
 	assert.Equal(t, batchv1.IndexedCompletion, *jobSpec.CompletionMode)
 	assert.Equal(t, int32(0), *jobSpec.BackoffLimit)
+
+	// The node-execution labels/annotations must be propagated onto the pod template so
+	// JobSet child pods carry execution-id/node-id; otherwise the node-execution-scoped
+	// K8sReader.List in getLogContext returns nothing and no logs reach the UI.
+	podMeta := jobSpec.Template.ObjectMeta
+	assert.Equal(t, "my-exec", podMeta.Labels["execution-id"])
+	assert.Equal(t, "n1", podMeta.Labels["node-id"])
+	assert.Equal(t, "av", podMeta.Annotations["flyte.org/test-annotation"])
 }
 
 func TestBuildResource_PrimaryContainerPreserved(t *testing.T) {
