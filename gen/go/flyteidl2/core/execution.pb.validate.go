@@ -398,6 +398,8 @@ func (m *ExecutionError) validate(all bool) error {
 
 	// no validation rules for Worker
 
+	// no validation rules for RetryBehavior
+
 	if len(errors) > 0 {
 		return ExecutionErrorMultiError(errors)
 	}

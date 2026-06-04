@@ -87,7 +87,7 @@ class TaskExecution(_message.Message):
     def __init__(self) -> None: ...
 
 class ExecutionError(_message.Message):
-    __slots__ = ["code", "message", "error_uri", "kind", "timestamp", "worker"]
+    __slots__ = ["code", "message", "error_uri", "kind", "timestamp", "worker", "retry_behavior"]
     class ErrorKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         UNKNOWN: _ClassVar[ExecutionError.ErrorKind]
@@ -96,19 +96,27 @@ class ExecutionError(_message.Message):
     UNKNOWN: ExecutionError.ErrorKind
     USER: ExecutionError.ErrorKind
     SYSTEM: ExecutionError.ErrorKind
+    class RetryBehavior(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        NON_RETRYABLE: _ClassVar[ExecutionError.RetryBehavior]
+        RETRYABLE: _ClassVar[ExecutionError.RetryBehavior]
+    NON_RETRYABLE: ExecutionError.RetryBehavior
+    RETRYABLE: ExecutionError.RetryBehavior
     CODE_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
     ERROR_URI_FIELD_NUMBER: _ClassVar[int]
     KIND_FIELD_NUMBER: _ClassVar[int]
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     WORKER_FIELD_NUMBER: _ClassVar[int]
+    RETRY_BEHAVIOR_FIELD_NUMBER: _ClassVar[int]
     code: str
     message: str
     error_uri: str
     kind: ExecutionError.ErrorKind
     timestamp: _timestamp_pb2.Timestamp
     worker: str
-    def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., error_uri: _Optional[str] = ..., kind: _Optional[_Union[ExecutionError.ErrorKind, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., worker: _Optional[str] = ...) -> None: ...
+    retry_behavior: ExecutionError.RetryBehavior
+    def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., error_uri: _Optional[str] = ..., kind: _Optional[_Union[ExecutionError.ErrorKind, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., worker: _Optional[str] = ..., retry_behavior: _Optional[_Union[ExecutionError.RetryBehavior, str]] = ...) -> None: ...
 
 class TaskLog(_message.Message):
     __slots__ = ["uri", "name", "message_format", "ttl", "ShowWhilePending", "HideOnceFinished", "link_type", "ready", "icon_uri"]
