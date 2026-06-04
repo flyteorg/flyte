@@ -21,7 +21,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/actions/actions_service.proto.
  */
 export const file_flyteidl2_actions_actions_service: GenFile = /*@__PURE__*/
-  fileDesc("CidmbHl0ZWlkbDIvYWN0aW9ucy9hY3Rpb25zX3NlcnZpY2UucHJvdG8SEWZseXRlaWRsMi5hY3Rpb25zIogDCgZBY3Rpb24SPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESHwoScGFyZW50X2FjdGlvbl9uYW1lGAIgASgJSAGIAQESGgoJaW5wdXRfdXJpGAMgASgJQge6SARyAhABEiAKD3J1bl9vdXRwdXRfYmFzZRgEIAEoCUIHukgEcgIQARINCgVncm91cBgFIAEoCRIPCgdzdWJqZWN0GAYgASgJEi4KBHRhc2sYByABKAsyHi5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza0FjdGlvbkgAEjAKBXRyYWNlGAggASgLMh8uZmx5dGVpZGwyLndvcmtmbG93LlRyYWNlQWN0aW9uSAASOAoJY29uZGl0aW9uGAkgASgLMiMuZmx5dGVpZGwyLndvcmtmbG93LkNvbmRpdGlvbkFjdGlvbkgAQg0KBHNwZWMSBbpIAggBQhUKE19wYXJlbnRfYWN0aW9uX25hbWUibgoORW5xdWV1ZVJlcXVlc3QSMQoGYWN0aW9uGAEgASgLMhkuZmx5dGVpZGwyLmFjdGlvbnMuQWN0aW9uQga6SAPIAQESKQoIcnVuX3NwZWMYAiABKAsyFy5mbHl0ZWlkbDIudGFzay5SdW5TcGVjIhEKD0VucXVldWVSZXNwb25zZSKxAQoNVXBkYXRlUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAEjgKBnN0YXR1cxgDIAEoCzIgLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25TdGF0dXNCBrpIA8gBARINCgVzdGF0ZRgEIAEoCSIQCg5VcGRhdGVSZXNwb25zZSJwChVHZXRMYXRlc3RTdGF0ZVJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESGAoHYXR0ZW1wdBgCIAEoDUIHukgEKgIgACIwChZHZXRMYXRlc3RTdGF0ZVJlc3BvbnNlEhYKBXN0YXRlGAEgASgJQge6SARyAhABImkKFldhdGNoRm9yVXBkYXRlc1JlcXVlc3QSPgoQcGFyZW50X2FjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckgAQg8KBmZpbHRlchIFukgCCAEingEKF1dhdGNoRm9yVXBkYXRlc1Jlc3BvbnNlEjkKDWFjdGlvbl91cGRhdGUYASABKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uVXBkYXRlSAASPQoPY29udHJvbF9tZXNzYWdlGAIgASgLMiIuZmx5dGVpZGwyLndvcmtmbG93LkNvbnRyb2xNZXNzYWdlSABCCQoHbWVzc2FnZSJtCgxBYm9ydFJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESEwoGcmVhc29uGAIgASgJSACIAQFCCQoHX3JlYXNvbiIPCg1BYm9ydFJlc3BvbnNlIqMBCg1TaWduYWxSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBEiMKEnBhcmVudF9hY3Rpb25fbmFtZRgCIAEoCUIHukgEcgIQARIuCgV2YWx1ZRgDIAEoCzIXLmZseXRlaWRsMi5jb3JlLkxpdGVyYWxCBrpIA8gBASIQCg5TaWduYWxSZXNwb25zZTKrBAoOQWN0aW9uc1NlcnZpY2USUgoHRW5xdWV1ZRIhLmZseXRlaWRsMi5hY3Rpb25zLkVucXVldWVSZXF1ZXN0GiIuZmx5dGVpZGwyLmFjdGlvbnMuRW5xdWV1ZVJlc3BvbnNlIgASZwoOR2V0TGF0ZXN0U3RhdGUSKC5mbHl0ZWlkbDIuYWN0aW9ucy5HZXRMYXRlc3RTdGF0ZVJlcXVlc3QaKS5mbHl0ZWlkbDIuYWN0aW9ucy5HZXRMYXRlc3RTdGF0ZVJlc3BvbnNlIgASbAoPV2F0Y2hGb3JVcGRhdGVzEikuZmx5dGVpZGwyLmFjdGlvbnMuV2F0Y2hGb3JVcGRhdGVzUmVxdWVzdBoqLmZseXRlaWRsMi5hY3Rpb25zLldhdGNoRm9yVXBkYXRlc1Jlc3BvbnNlIgAwARJPCgZVcGRhdGUSIC5mbHl0ZWlkbDIuYWN0aW9ucy5VcGRhdGVSZXF1ZXN0GiEuZmx5dGVpZGwyLmFjdGlvbnMuVXBkYXRlUmVzcG9uc2UiABJMCgVBYm9ydBIfLmZseXRlaWRsMi5hY3Rpb25zLkFib3J0UmVxdWVzdBogLmZseXRlaWRsMi5hY3Rpb25zLkFib3J0UmVzcG9uc2UiABJPCgZTaWduYWwSIC5mbHl0ZWlkbDIuYWN0aW9ucy5TaWduYWxSZXF1ZXN0GiEuZmx5dGVpZGwyLmFjdGlvbnMuU2lnbmFsUmVzcG9uc2UiAELKAQoVY29tLmZseXRlaWRsMi5hY3Rpb25zQhNBY3Rpb25zU2VydmljZVByb3RvSAJQAVo1Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2FjdGlvbnOiAgNGQViqAhFGbHl0ZWlkbDIuQWN0aW9uc8oCEUZseXRlaWRsMlxBY3Rpb25z4gIdRmx5dGVpZGwyXEFjdGlvbnNcR1BCTWV0YWRhdGHqAhJGbHl0ZWlkbDI6OkFjdGlvbnNiBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_core_literals, file_flyteidl2_task_run, file_flyteidl2_workflow_run_definition, file_flyteidl2_workflow_state_service]);
+  fileDesc("CidmbHl0ZWlkbDIvYWN0aW9ucy9hY3Rpb25zX3NlcnZpY2UucHJvdG8SEWZseXRlaWRsMi5hY3Rpb25zIogDCgZBY3Rpb24SPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESHwoScGFyZW50X2FjdGlvbl9uYW1lGAIgASgJSAGIAQESGgoJaW5wdXRfdXJpGAMgASgJQge6SARyAhABEiAKD3J1bl9vdXRwdXRfYmFzZRgEIAEoCUIHukgEcgIQARINCgVncm91cBgFIAEoCRIPCgdzdWJqZWN0GAYgASgJEi4KBHRhc2sYByABKAsyHi5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza0FjdGlvbkgAEjAKBXRyYWNlGAggASgLMh8uZmx5dGVpZGwyLndvcmtmbG93LlRyYWNlQWN0aW9uSAASOAoJY29uZGl0aW9uGAkgASgLMiMuZmx5dGVpZGwyLndvcmtmbG93LkNvbmRpdGlvbkFjdGlvbkgAQg0KBHNwZWMSBbpIAggBQhUKE19wYXJlbnRfYWN0aW9uX25hbWUibgoORW5xdWV1ZVJlcXVlc3QSMQoGYWN0aW9uGAEgASgLMhkuZmx5dGVpZGwyLmFjdGlvbnMuQWN0aW9uQga6SAPIAQESKQoIcnVuX3NwZWMYAiABKAsyFy5mbHl0ZWlkbDIudGFzay5SdW5TcGVjIhEKD0VucXVldWVSZXNwb25zZSKvAQoNVXBkYXRlUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAEjgKBnN0YXR1cxgDIAEoCzIgLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25TdGF0dXNCBrpIA8gBAUoECAQQBVIFc3RhdGUiEAoOVXBkYXRlUmVzcG9uc2UiaQoWV2F0Y2hGb3JVcGRhdGVzUmVxdWVzdBI+ChBwYXJlbnRfYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVySABCDwoGZmlsdGVyEgW6SAIIASKeAQoXV2F0Y2hGb3JVcGRhdGVzUmVzcG9uc2USOQoNYWN0aW9uX3VwZGF0ZRgBIAEoCzIgLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25VcGRhdGVIABI9Cg9jb250cm9sX21lc3NhZ2UYAiABKAsyIi5mbHl0ZWlkbDIud29ya2Zsb3cuQ29udHJvbE1lc3NhZ2VIAEIJCgdtZXNzYWdlIm0KDEFib3J0UmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARITCgZyZWFzb24YAiABKAlIAIgBAUIJCgdfcmVhc29uIg8KDUFib3J0UmVzcG9uc2UiowEKDVNpZ25hbFJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESIwoScGFyZW50X2FjdGlvbl9uYW1lGAIgASgJQge6SARyAhABEi4KBXZhbHVlGAMgASgLMhcuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbEIGukgDyAEBIhAKDlNpZ25hbFJlc3BvbnNlMsIDCg5BY3Rpb25zU2VydmljZRJSCgdFbnF1ZXVlEiEuZmx5dGVpZGwyLmFjdGlvbnMuRW5xdWV1ZVJlcXVlc3QaIi5mbHl0ZWlkbDIuYWN0aW9ucy5FbnF1ZXVlUmVzcG9uc2UiABJsCg9XYXRjaEZvclVwZGF0ZXMSKS5mbHl0ZWlkbDIuYWN0aW9ucy5XYXRjaEZvclVwZGF0ZXNSZXF1ZXN0GiouZmx5dGVpZGwyLmFjdGlvbnMuV2F0Y2hGb3JVcGRhdGVzUmVzcG9uc2UiADABEk8KBlVwZGF0ZRIgLmZseXRlaWRsMi5hY3Rpb25zLlVwZGF0ZVJlcXVlc3QaIS5mbHl0ZWlkbDIuYWN0aW9ucy5VcGRhdGVSZXNwb25zZSIAEkwKBUFib3J0Eh8uZmx5dGVpZGwyLmFjdGlvbnMuQWJvcnRSZXF1ZXN0GiAuZmx5dGVpZGwyLmFjdGlvbnMuQWJvcnRSZXNwb25zZSIAEk8KBlNpZ25hbBIgLmZseXRlaWRsMi5hY3Rpb25zLlNpZ25hbFJlcXVlc3QaIS5mbHl0ZWlkbDIuYWN0aW9ucy5TaWduYWxSZXNwb25zZSIAQsoBChVjb20uZmx5dGVpZGwyLmFjdGlvbnNCE0FjdGlvbnNTZXJ2aWNlUHJvdG9IAlABWjVnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvYWN0aW9uc6ICA0ZBWKoCEUZseXRlaWRsMi5BY3Rpb25zygIRRmx5dGVpZGwyXEFjdGlvbnPiAh1GbHl0ZWlkbDJcQWN0aW9uc1xHUEJNZXRhZGF0YeoCEkZseXRlaWRsMjo6QWN0aW9uc2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_core_literals, file_flyteidl2_task_run, file_flyteidl2_workflow_run_definition, file_flyteidl2_workflow_state_service]);
 
 /**
  * Action represents a unit of work to be executed. Theses can be task executions, traces, or conditions.
@@ -177,13 +177,6 @@ export type UpdateRequest = Message<"flyteidl2.actions.UpdateRequest"> & {
    * @generated from field: flyteidl2.workflow.ActionStatus status = 3;
    */
   status?: ActionStatus;
-
-  /**
-   * The new state in form of a JSON serialized `NodeStatus` object.
-   *
-   * @generated from field: string state = 4;
-   */
-  state: string;
 };
 
 /**
@@ -207,55 +200,6 @@ export type UpdateResponse = Message<"flyteidl2.actions.UpdateResponse"> & {
  */
 export const UpdateResponseSchema: GenMessage<UpdateResponse> = /*@__PURE__*/
   messageDesc(file_flyteidl2_actions_actions_service, 4);
-
-/**
- * GetLatestStateRequest is the request message for getting the state of an action.
- *
- * @generated from message flyteidl2.actions.GetLatestStateRequest
- */
-export type GetLatestStateRequest = Message<"flyteidl2.actions.GetLatestStateRequest"> & {
-  /**
-   * A unique identifier for the action.
-   *
-   * @generated from field: flyteidl2.common.ActionIdentifier action_id = 1;
-   */
-  actionId?: ActionIdentifier;
-
-  /**
-   * The attempt number (starts at 1, incremented on retry).
-   *
-   * @generated from field: uint32 attempt = 2;
-   */
-  attempt: number;
-};
-
-/**
- * Describes the message flyteidl2.actions.GetLatestStateRequest.
- * Use `create(GetLatestStateRequestSchema)` to create a new message.
- */
-export const GetLatestStateRequestSchema: GenMessage<GetLatestStateRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 5);
-
-/**
- * GetLatestStateResponse is the response message for getting the state of an action.
- *
- * @generated from message flyteidl2.actions.GetLatestStateResponse
- */
-export type GetLatestStateResponse = Message<"flyteidl2.actions.GetLatestStateResponse"> & {
-  /**
-   * A JSON serialized `NodeStatus` object.
-   *
-   * @generated from field: string state = 1;
-   */
-  state: string;
-};
-
-/**
- * Describes the message flyteidl2.actions.GetLatestStateResponse.
- * Use `create(GetLatestStateResponseSchema)` to create a new message.
- */
-export const GetLatestStateResponseSchema: GenMessage<GetLatestStateResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 6);
 
 /**
  * WatchForUpdatesRequest is a request message for watching updates to the state of actions.
@@ -284,7 +228,7 @@ export type WatchForUpdatesRequest = Message<"flyteidl2.actions.WatchForUpdatesR
  * Use `create(WatchForUpdatesRequestSchema)` to create a new message.
  */
 export const WatchForUpdatesRequestSchema: GenMessage<WatchForUpdatesRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 7);
+  messageDesc(file_flyteidl2_actions_actions_service, 5);
 
 /**
  * WatchForUpdatesResponse is a response message for watching updates to the state of actions.
@@ -321,7 +265,7 @@ export type WatchForUpdatesResponse = Message<"flyteidl2.actions.WatchForUpdates
  * Use `create(WatchForUpdatesResponseSchema)` to create a new message.
  */
 export const WatchForUpdatesResponseSchema: GenMessage<WatchForUpdatesResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 8);
+  messageDesc(file_flyteidl2_actions_actions_service, 6);
 
 /**
  * AbortRequest is the request message for aborting a queued or running action.
@@ -349,7 +293,7 @@ export type AbortRequest = Message<"flyteidl2.actions.AbortRequest"> & {
  * Use `create(AbortRequestSchema)` to create a new message.
  */
 export const AbortRequestSchema: GenMessage<AbortRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 9);
+  messageDesc(file_flyteidl2_actions_actions_service, 7);
 
 /**
  * AbortResponse is the response message for aborting a queued or running action.
@@ -364,7 +308,7 @@ export type AbortResponse = Message<"flyteidl2.actions.AbortResponse"> & {
  * Use `create(AbortResponseSchema)` to create a new message.
  */
 export const AbortResponseSchema: GenMessage<AbortResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 10);
+  messageDesc(file_flyteidl2_actions_actions_service, 8);
 
 /**
  * SignalRequest is the request message for resolving a condition action.
@@ -401,7 +345,7 @@ export type SignalRequest = Message<"flyteidl2.actions.SignalRequest"> & {
  * Use `create(SignalRequestSchema)` to create a new message.
  */
 export const SignalRequestSchema: GenMessage<SignalRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 11);
+  messageDesc(file_flyteidl2_actions_actions_service, 9);
 
 /**
  * SignalResponse is the response message for resolving a condition action.
@@ -416,7 +360,7 @@ export type SignalResponse = Message<"flyteidl2.actions.SignalResponse"> & {
  * Use `create(SignalResponseSchema)` to create a new message.
  */
 export const SignalResponseSchema: GenMessage<SignalResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_actions_actions_service, 12);
+  messageDesc(file_flyteidl2_actions_actions_service, 10);
 
 /**
  * ActionsService provides an interface for managing the state and execution of actions.
@@ -435,17 +379,6 @@ export const ActionsService: GenService<{
     methodKind: "unary";
     input: typeof EnqueueRequestSchema;
     output: typeof EnqueueResponseSchema;
-  },
-  /**
-   * GetLatestState returns the latest `NodeStatus` of an action.
-   * This deprecates Get in the current StateService.
-   *
-   * @generated from rpc flyteidl2.actions.ActionsService.GetLatestState
-   */
-  getLatestState: {
-    methodKind: "unary";
-    input: typeof GetLatestStateRequestSchema;
-    output: typeof GetLatestStateResponseSchema;
   },
   /**
    * WatchForUpdates watches for updates to the state of actions.

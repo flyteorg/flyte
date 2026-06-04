@@ -18,10 +18,6 @@ service ActionsService {
   // Enqueue queues a new action for execution.
   rpc Enqueue(EnqueueRequest) returns (EnqueueResponse) {}
 
-  // GetLatestState returns the latest `NodeStatus` of an action.
-  // This deprecates Get in the current StateService.
-  rpc GetLatestState(GetLatestStateRequest) returns (GetLatestStateResponse) {}
-
   // WatchForUpdates watches for updates to the state of actions.
   // This API guarantees at-least-once delivery semantics.
   rpc WatchForUpdates(WatchForUpdatesRequest) returns (stream WatchForUpdatesResponse) {}
@@ -109,31 +105,12 @@ message UpdateRequest {
   // The new status of the action.
   flyteidl2.workflow.ActionStatus status = 3 [(buf.validate.field).required = true];
 
-  // The new state in form of a JSON serialized `NodeStatus` object.
-  string state = 4;
+  reserved 4;
+  reserved "state";
 }
 
 // UpdateResponse is the response message for updating the status of an action.
 message UpdateResponse {}
-
-// ============================================================================
-// GetLatestState
-// ============================================================================
-
-// GetLatestStateRequest is the request message for getting the state of an action.
-message GetLatestStateRequest {
-  // A unique identifier for the action.
-  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
-
-  // The attempt number (starts at 1, incremented on retry).
-  uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
-}
-
-// GetLatestStateResponse is the response message for getting the state of an action.
-message GetLatestStateResponse {
-  // A JSON serialized `NodeStatus` object.
-  string state = 1 [(buf.validate.field).string.min_len = 1];
-}
 
 // ============================================================================
 // Watch

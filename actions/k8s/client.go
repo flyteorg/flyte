@@ -227,23 +227,8 @@ func (c *ActionsClient) AbortAction(ctx context.Context, actionID *common.Action
 	return nil
 }
 
-// GetState retrieves the state JSON for a TaskAction
-func (c *ActionsClient) GetState(ctx context.Context, actionID *common.ActionIdentifier) (string, error) {
-	taskActionName := buildTaskActionName(actionID)
-
-	taskAction := &executorv1.TaskAction{}
-	if err := c.k8sClient.Get(ctx, client.ObjectKey{
-		Name:      taskActionName,
-		Namespace: flyteNamespace,
-	}, taskAction); err != nil {
-		return "", fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
-	}
-
-	return taskAction.Status.StateJSON, nil
-}
-
-// PutState updates the state JSON and latest attempt metadata for a TaskAction.
-func (c *ActionsClient) PutState(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus, stateJSON string) error {
+// PutStatus updates the latest attempt metadata for a TaskAction.
+func (c *ActionsClient) PutStatus(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus) error {
 	taskActionName := buildTaskActionName(actionID)
 
 	// Get current TaskAction
@@ -255,24 +240,25 @@ func (c *ActionsClient) PutState(ctx context.Context, actionID *common.ActionIde
 		return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
 
-	// Skip update if the stateJSON does not change
-	if taskAction.Status.StateJSON == stateJSON {
+	if status == nil {
 		return nil
 	}
 
-	// Update state JSON
-	taskAction.Status.StateJSON = stateJSON
-	if status != nil {
-		taskAction.Status.Attempts = status.GetAttempts()
-		taskAction.Status.CacheStatus = status.GetCacheStatus()
+	// Skip update if the attempts and cache status do not change
+	if taskAction.Status.Attempts == status.GetAttempts() &&
+		taskAction.Status.CacheStatus == status.GetCacheStatus() {
+		return nil
 	}
+
+	taskAction.Status.Attempts = status.GetAttempts()
+	taskAction.Status.CacheStatus = status.GetCacheStatus()
 
 	// Update status subresource
 	if err := c.k8sClient.Status().Update(ctx, taskAction); err != nil {
 		return fmt.Errorf("failed to update TaskAction status %s: %w", taskActionName, err)
 	}
 
-	logger.Infof(ctx, "Updated state for TaskAction: %s", taskActionName)
+	logger.Infof(ctx, "Updated status for TaskAction: %s", taskActionName)
 	return nil
 }
 
