@@ -216,12 +216,34 @@ func (s *RunService) CreateRun(
 		if err != nil {
 			return nil, err
 		}
+
+		// If the trigger's inputs were offloaded at registration (SDK >= 2.3.6), launch from the
+		// stored URI rather than merging a kickoff-time input. The scheduled fire time arrives via
+		// CreateRunRequest.run_start_time and surfaces as flyte.ctx().run_start_time instead.
+		triggerDetails, detailsErr := transformers.TriggerModelToTriggerDetails(ctx, triggerModel)
+		if detailsErr != nil {
+			return nil, connect.NewError(connect.CodeInternal, detailsErr)
+		}
+		if offloaded := triggerDetails.GetSpec().GetOffloadedInputData(); offloaded != nil && request.GetInputWrapper() == nil {
+			request.InputWrapper = &workflow.CreateRunRequest_OffloadedInputData{OffloadedInputData: offloaded}
+		}
 	}
 
 	if runSpec == nil {
 		runSpec = &task.RunSpec{}
 	}
 	request.RunSpec = runSpec
+
+	// Stamp the run start time. The scheduler sets CreateRunRequest.run_start_time to a trigger's
+	// scheduled fire time; ad-hoc runs leave it unset and get the current time. This flows to the
+	// executor where it replaces the {{.runStartTime}} container-arg template (SDK >= 2.3.6).
+	if runSpec.GetRunStartTime() == nil {
+		if reqStart := request.GetRunStartTime(); reqStart != nil {
+			runSpec.RunStartTime = reqStart
+		} else {
+			runSpec.RunStartTime = timestamppb.Now()
+		}
+	}
 
 	// Compute storage URIs before DB insert so they're persisted in the ActionSpec
 	inputPrefix := buildInputPrefix(s.storagePrefix, runId.GetProject(), runId.GetDomain(), runId.GetName())

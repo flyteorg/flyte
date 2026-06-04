@@ -7,6 +7,7 @@ import "flyteidl2/common/phase.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/security.proto";
 import "flyteidl2/notification/definition.proto";
+import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
@@ -103,6 +104,13 @@ message RunSpec {
 
     InlineRuleList notification_rules = 11; // either define an inline one-off rule
   }
+
+  // The time at which the run was started. For scheduled-trigger runs this is the trigger's
+  // scheduled fire time; for ad-hoc runs the server defaults it to run-creation time. It is
+  // substituted into the {{.runStartTime}} container-arg template so task code can read it via
+  // flyte.ctx().run_start_time (SDK >= 2.3.6). Older task templates omit the placeholder, so
+  // the substitution is a harmless no-op for them.
+  google.protobuf.Timestamp run_start_time = 12;
 }
 
 message InlineRuleList {

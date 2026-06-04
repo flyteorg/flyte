@@ -128,7 +128,12 @@ message CreateRunRequest {
   // Indicates client that created this run.
   RunSource source = 8;
 
-  // Next field number: 10
+  // Optional explicit run start time. The scheduler sets this to a trigger's scheduled fire time
+  // so it surfaces as flyte.ctx().run_start_time in the task. If unset, the server defaults it to
+  // the current time. Copied onto RunSpec.run_start_time before the action is enqueued.
+  google.protobuf.Timestamp run_start_time = 10;
+
+  // Next field number: 11
 }
 
 // Response message for creating a run.
