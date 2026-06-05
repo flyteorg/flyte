@@ -22,6 +22,7 @@ class LaunchPlanState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
     INACTIVE: _ClassVar[LaunchPlanState]
     ACTIVE: _ClassVar[LaunchPlanState]
+    ARCHIVED: _ClassVar[LaunchPlanState]
 
 class ConcurrencyLimitBehavior(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
@@ -29,6 +30,7 @@ class ConcurrencyLimitBehavior(int, metaclass=_enum_type_wrapper.EnumTypeWrapper
     CONCURRENCY_LIMIT_BEHAVIOR_SKIP: _ClassVar[ConcurrencyLimitBehavior]
 INACTIVE: LaunchPlanState
 ACTIVE: LaunchPlanState
+ARCHIVED: LaunchPlanState
 CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED: ConcurrencyLimitBehavior
 CONCURRENCY_LIMIT_BEHAVIOR_SKIP: ConcurrencyLimitBehavior
 
