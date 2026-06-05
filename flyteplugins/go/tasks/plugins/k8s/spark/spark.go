@@ -234,6 +234,7 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 		},
 	}
 	spec.sparkSpec.ServiceAccount = strPtr(serviceAccountName(nonInterruptibleTaskCtx.TaskExecutionMetadata()))
+	spec.sparkSpec.PriorityClassName = strPtr(podSpec.PriorityClassName)
 
 	if cores, err := strconv.ParseInt(sparkConfig["spark.driver.cores"], 10, 32); err == nil {
 		spec.sparkSpec.Cores = intPtr(int32(cores))
@@ -288,6 +289,7 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 		},
 		serviceAccountName,
 	}
+	spec.sparkSpec.PriorityClassName = strPtr(podSpec.PriorityClassName)
 	if execCores, err := strconv.ParseInt(sparkConfig["spark.executor.cores"], 10, 32); err == nil {
 		spec.sparkSpec.Cores = intPtr(int32(execCores))
 	}
