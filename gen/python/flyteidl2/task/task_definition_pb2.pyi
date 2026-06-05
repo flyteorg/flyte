@@ -2,11 +2,12 @@ from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import identity_pb2 as _identity_pb2
 from flyteidl2.common import phase_pb2 as _phase_pb2
+from flyteidl2.common import run_pb2 as _run_pb2
 from flyteidl2.core import interface_pb2 as _interface_pb2
 from flyteidl2.core import tasks_pb2 as _tasks_pb2
 from flyteidl2.task import common_pb2 as _common_pb2
 from flyteidl2.task import environment_pb2 as _environment_pb2
-from flyteidl2.task import run_pb2 as _run_pb2
+from flyteidl2.task import run_pb2 as _run_pb2_1
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
@@ -166,13 +167,15 @@ class TaskTrigger(_message.Message):
     def __init__(self, name: _Optional[str] = ..., spec: _Optional[_Union[TaskTriggerSpec, _Mapping]] = ..., automation_spec: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ...) -> None: ...
 
 class TaskTriggerSpec(_message.Message):
-    __slots__ = ["active", "inputs", "run_spec", "description"]
+    __slots__ = ["active", "inputs", "offloaded_input_data", "run_spec", "description"]
     ACTIVE_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
+    OFFLOADED_INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     RUN_SPEC_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     active: bool
     inputs: _common_pb2.Inputs
-    run_spec: _run_pb2.RunSpec
+    offloaded_input_data: _run_pb2.OffloadedInputData
+    run_spec: _run_pb2_1.RunSpec
     description: str
-    def __init__(self, active: bool = ..., inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., description: _Optional[str] = ...) -> None: ...
+    def __init__(self, active: bool = ..., inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., offloaded_input_data: _Optional[_Union[_run_pb2.OffloadedInputData, _Mapping]] = ..., run_spec: _Optional[_Union[_run_pb2_1.RunSpec, _Mapping]] = ..., description: _Optional[str] = ...) -> None: ...

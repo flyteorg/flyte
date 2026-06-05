@@ -6,11 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
 
 	"connectrpc.com/connect"
+	semver "github.com/Masterminds/semver/v3"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -62,6 +64,35 @@ const (
 func generateRunName(seed int64) string {
 	rand.Seed(seed)
 	return fmt.Sprintf(runStringFormat, rand.String(runIDLength-1))
+}
+
+// sdkVersionRegex extracts the MAJOR.MINOR.PATCH core from an SDK version string, ignoring any
+// pre-release/dev suffix.
+var sdkVersionRegex = regexp.MustCompile(`v?(\d+\.\d+\.\d+)`)
+
+// minRunStartTimeSDKVersion is the minimum SDK version that understands run_start_time — it emits the
+// {{.runStartTime}} container-arg placeholder and reads --run-start-time (flyte-sdk#1100, v2.3.6).
+var minRunStartTimeSDKVersion = func() *semver.Constraints {
+	c, _ := semver.NewConstraint(">= 2.3.6")
+	return c
+}()
+
+// meetsRunStartTimeSDKVersion returns true if the task's runtime version is >= 2.3.6. Below it,
+// run_start_time is not stamped onto the run, so the executor never substitutes the placeholder.
+func meetsRunStartTimeSDKVersion(taskSpec *task.TaskSpec) bool {
+	version := taskSpec.GetTaskTemplate().GetMetadata().GetRuntime().GetVersion()
+	if version == "" {
+		return false
+	}
+	matches := sdkVersionRegex.FindStringSubmatch(version)
+	if len(matches) < 2 {
+		return false
+	}
+	v, err := semver.NewVersion(matches[1])
+	if err != nil {
+		return false
+	}
+	return minRunStartTimeSDKVersion.Check(v)
 }
 
 // WatchGroups streams task groups (runs grouped by task) from the database.
@@ -234,10 +265,11 @@ func (s *RunService) CreateRun(
 	}
 	request.RunSpec = runSpec
 
-	// Stamp the run start time. The scheduler sets CreateRunRequest.run_start_time to a trigger's
-	// scheduled fire time; ad-hoc runs leave it unset and get the current time. This flows to the
-	// executor where it replaces the {{.runStartTime}} container-arg template (SDK >= 2.3.6).
-	if runSpec.GetRunStartTime() == nil {
+	// Stamp the run start time, but only for SDKs that understand it (>= 2.3.6) — older task
+	// templates have no {{.runStartTime}} placeholder, so leaving it unset keeps the executor from
+	// substituting anything. The scheduler sets CreateRunRequest.run_start_time to a trigger's
+	// scheduled fire time; ad-hoc runs leave it unset and get the current time.
+	if meetsRunStartTimeSDKVersion(taskSpec) && runSpec.GetRunStartTime() == nil {
 		if reqStart := request.GetRunStartTime(); reqStart != nil {
 			runSpec.RunStartTime = reqStart
 		} else {

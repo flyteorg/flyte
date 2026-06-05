@@ -23,9 +23,17 @@ message TriggerMetadata {
 message TriggerSpec {
   reserved 1;
 
-  // Inline inputs for the triggered task. Set by older SDKs that do not offload inputs at
-  // registration. Mutually exclusive with offloaded_input_data.
-  flyteidl2.task.Inputs inputs = 2;
+  // Inputs for the triggered task. Inline literals are set by older SDKs; newer SDKs (>= 2.3.6)
+  // offload the inputs via UploadInputs at registration and set offloaded_input_data instead.
+  oneof input_wrapper {
+    // Inline inputs for the triggered task.
+    flyteidl2.task.Inputs inputs = 2;
+
+    // Offloaded inputs for the triggered task (URI + hash from UploadInputs). When present,
+    // launches pass this directly as the run's OffloadedInputData and rely on run_start_time
+    // rather than merging a kickoff-time input literal.
+    flyteidl2.common.OffloadedInputData offloaded_input_data = 7;
+  }
 
   // The run spec for triggered task.
   flyteidl2.task.RunSpec run_spec = 3;
@@ -41,12 +49,6 @@ message TriggerSpec {
 
   //  Optional description
   string description = 6;
-
-  // Offloaded inputs for the triggered task. Set when the SDK offloads inputs via UploadInputs at
-  // registration time (SDK >= 2.3.6) and passes the resulting URI here instead of inline inputs.
-  // Mutually exclusive with `inputs`. When present, launches pass this directly as the run's
-  // OffloadedInputData and rely on run_start_time rather than merging a kickoff-time input literal.
-  flyteidl2.common.OffloadedInputData offloaded_input_data = 7;
 }
 
 message TriggerStatus {
