@@ -168,10 +168,6 @@ spec:
           lifecycle: {{- tpl ( .Values.deployment.lifecycleHooks | toYaml ) . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            {{- if .Values.configuration.auth.enabled }}
-            - name: auth
-              mountPath: /etc/secrets
-            {{- end }}
             - name: config
               mountPath: /etc/flyte/config.d
             - name: webhook-certs
@@ -187,20 +183,6 @@ spec:
         {{- tpl ( .Values.deployment.sidecars | toYaml ) . | nindent 8 }}
         {{- end }}
       volumes:
-        {{- if .Values.configuration.auth.enabled }}
-        - name: auth
-          projected:
-            sources:
-            - secret:
-                name: {{ include "flyte-binary.configuration.auth.adminAuthSecretName" . }}
-            {{- if .Values.configuration.auth.clientSecretsExternalSecretRef }}
-            - secret:
-                name: {{ tpl .Values.configuration.auth.clientSecretsExternalSecretRef . }}
-            {{- else }}
-            - secret:
-                name: {{ include "flyte-binary.configuration.auth.clientSecretName" . }}
-            {{- end }}
-        {{- end }}
         - name: config
           {{- if (include "flyte-binary.configuration.externalConfiguration" .) }}
           projected:

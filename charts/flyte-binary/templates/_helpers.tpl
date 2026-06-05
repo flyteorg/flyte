@@ -124,19 +124,6 @@ Get the Flyte configuration Secret name.
 {{- printf "%s-config-secret" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
 
-{{/*
-Get the Flyte admin auth Secret name.
-*/}}
-{{- define "flyte-binary.configuration.auth.adminAuthSecretName" -}}
-{{- printf "%s-admin-auth" (include "flyte-binary.fullname" .) -}}
-{{- end -}}
-
-{{/*
-Get the Flyte client secrets Secret name.
-*/}}
-{{- define "flyte-binary.configuration.auth.clientSecretName" -}}
-{{- printf "%s-client-secrets" (include "flyte-binary.fullname" .) -}}
-{{- end -}}
 
 {{/*
 Get the Flyte logging configuration.
