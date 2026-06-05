@@ -109,7 +109,9 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		podNamespace = sc.Namespace
 	}
 
-	if err := webhookPkg.Setup(ctx, kubeClient, wCfg, podNamespace, promutils.NewScope("executor"), mgr); err != nil {
+	executorScope := promutils.NewScope("executor")
+
+	if err := webhookPkg.Setup(ctx, kubeClient, wCfg, podNamespace, executorScope.NewSubScope("webhook"), mgr); err != nil {
 		return fmt.Errorf("executor: webhook setup failed: %w", err)
 	}
 
@@ -121,7 +123,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	setupCtx := plugin.NewSetupContext(
 		mgr, nil, nil, nil, nil,
 		"TaskAction",
-		promutils.NewScope("executor"),
+		executorScope.NewSubScope("plugin"),
 	)
 	registry := plugin.NewRegistry(setupCtx, pluginmachinery.PluginRegistry())
 	if err := registry.Initialize(ctx); err != nil {
