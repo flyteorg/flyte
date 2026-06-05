@@ -189,6 +189,8 @@ Get the Flyte API paths for ingress.
 {{- define "flyte-binary.ingress.grpcPaths" -}}
 - /flyteidl2.workflow.RunService
 - /flyteidl2.workflow.RunService/*
+- /flyteidl2.workflow.RunLogsService
+- /flyteidl2.workflow.RunLogsService/*
 - /flyteidl2.task.TaskService
 - /flyteidl2.task.TaskService/*
 - /flyteidl2.workflow.TranslatorService
