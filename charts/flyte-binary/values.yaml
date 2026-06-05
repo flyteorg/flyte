@@ -357,11 +357,9 @@ service:
 # The console is a static SPA served at `console.basePath` (default /v2). It has
 # no backend configuration of its own and talks to the Flyte API same-origin, so
 # it only works when served behind the same ingress host as the API. Enable the
-# HTTP ingress (`ingress.create: true`) together with `console.enabled` to expose
-# both the console (`/v2`) and the API under one host.
+# HTTP ingress (`ingress.create: true`) to expose both the console (`/v2`) and the
+# API under one host.
 console:
-  # enabled Deploy the Flyte web console
-  enabled: true
   # image Configure image to use for the console
   image:
     # repository Console image repository

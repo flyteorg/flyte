@@ -1,4 +1,3 @@
-{{- if .Values.console.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -22,4 +21,3 @@ spec:
       nodePort: {{ .Values.console.service.nodePort }}
       {{- end }}
   selector: {{- include "flyte-binary.console.selectorLabels" . | nindent 4 }}
-{{- end }}

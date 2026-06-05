@@ -38,7 +38,6 @@ spec:
       {{- if .Values.ingress.httpExtraPaths.prepend }}
       {{- tpl ( .Values.ingress.httpExtraPaths.prepend | toYaml ) . | nindent 6 }}
       {{- end }}
-      {{- if .Values.console.enabled }}
       - backend:
           service:
             name: {{ include "flyte-binary.console.serviceName" . }}
@@ -53,7 +52,6 @@ spec:
               number: {{ .Values.console.service.port }}
         path: {{ .Values.console.basePath }}/*
         pathType: ImplementationSpecific
-      {{- end }}
       {{- if not .Values.ingress.separateGrpcIngress }}
       {{- $paths := (include "flyte-binary.ingress.grpcPaths" .) | fromYamlArray }}
       {{- range $path := $paths }}
