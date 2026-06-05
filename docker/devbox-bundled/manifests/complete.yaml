@@ -7145,6 +7145,15 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - namespaces
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
   - pods
   verbs:
   - create
@@ -7156,17 +7165,23 @@ rules:
   - watch
 - apiGroups:
   - ""
+  - events.k8s.io
   resources:
   - events
   verbs:
   - create
   - delete
+  - get
+  - list
   - patch
   - update
+  - watch
 - apiGroups:
   - flyte.org
   resources:
   - taskactions
+  - taskactions/status
+  - taskactions/finalizers
   verbs:
   - create
   - delete
@@ -7192,8 +7207,12 @@ rules:
   - secrets
   verbs:
   - create
+  - delete
   - get
+  - list
+  - patch
   - update
+  - watch
 - apiGroups:
   - '*'
   resources:
@@ -8068,9 +8087,10 @@ metadata:
   namespace: flyte
 stringData:
   012-database-secrets.yaml: |
-    database:
-      postgres:
-        password: "postgres"
+    runs:
+      database:
+        postgres:
+          password: "postgres"
   013-storage-secrets.yaml: |
     storage:
       stow:
@@ -8151,6 +8171,29 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
+    app.kubernetes.io/component: console
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-binary
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-binary-console
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: console
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/name: flyte-binary
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-binary
@@ -8189,28 +8232,6 @@ spec:
     app.kubernetes.io/component: flyte-binary
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/name: flyte-binary
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
-  name: flyte-console
-  namespace: flyte
-spec:
-  ports:
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: http
-  selector:
-    app.kubernetes.io/component: console
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/name: flyte-devbox
 ---
 apiVersion: v1
 kind: Service
@@ -8592,7 +8613,7 @@ spec:
     metadata:
       annotations:
         checksum/configuration: 06269249f6e0df4e5df3c3f62e2f5bd703a127730dbcd6a68627557d343227af
-        checksum/configuration-secret: e70194084619f4a1d4017093aac6367047167107fd0222513a32a61734629cac
+        checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
       labels:
         app.kubernetes.io/component: flyte-binary
         app.kubernetes.io/instance: flyte-devbox
@@ -8671,12 +8692,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app.kubernetes.io/component: console
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
-  name: flyte-console
+    app.kubernetes.io/name: flyte-binary
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-binary-console
   namespace: flyte
 spec:
   replicas: 1
@@ -8684,13 +8705,13 @@ spec:
     matchLabels:
       app.kubernetes.io/component: console
       app.kubernetes.io/instance: flyte-devbox
-      app.kubernetes.io/name: flyte-devbox
+      app.kubernetes.io/name: flyte-binary
   template:
     metadata:
       labels:
         app.kubernetes.io/component: console
         app.kubernetes.io/instance: flyte-devbox
-        app.kubernetes.io/name: flyte-devbox
+        app.kubernetes.io/name: flyte-binary
     spec:
       containers:
       - image: docker.io/unionai-oss/flyteconsole-v2:sandbox
@@ -9452,7 +9473,7 @@ spec:
       paths:
       - backend:
           service:
-            name: flyte-console
+            name: flyte-binary-console
             port:
               number: 80
         path: /v2
