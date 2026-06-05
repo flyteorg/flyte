@@ -219,6 +219,10 @@ configuration:
   # inlineSecretRef Specify an existing Secret containing additional configuration
   # or overrides for Flyte, to be merged with the base configuration
   inlineSecretRef: ""
+  # extraInlineConfigMapRefs Additional existing ConfigMaps to project into the config volume
+  extraInlineConfigMapRefs: []
+  # extraInlineSecretRefs Additional existing Secrets to project into the config volume
+  extraInlineSecretRefs: []
   # labels Add labels to created ConfigMap
   labels: {}
   # annotations Add annotations to created ConfigMap
@@ -357,7 +361,7 @@ service:
 # both the console (`/v2`) and the API under one host.
 console:
   # enabled Deploy the Flyte web console
-  enabled: false
+  enabled: true
   # image Configure image to use for the console
   image:
     # repository Console image repository

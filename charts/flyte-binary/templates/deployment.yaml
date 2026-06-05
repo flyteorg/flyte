@@ -187,6 +187,20 @@ spec:
         {{- tpl ( .Values.deployment.sidecars | toYaml ) . | nindent 8 }}
         {{- end }}
       volumes:
+        {{- if .Values.configuration.auth.enabled }}
+        - name: auth
+          projected:
+            sources:
+            - secret:
+                name: {{ include "flyte-binary.configuration.auth.adminAuthSecretName" . }}
+            {{- if .Values.configuration.auth.clientSecretsExternalSecretRef }}
+            - secret:
+                name: {{ tpl .Values.configuration.auth.clientSecretsExternalSecretRef . }}
+            {{- else }}
+            - secret:
+                name: {{ include "flyte-binary.configuration.auth.clientSecretName" . }}
+            {{- end }}
+        {{- end }}
         - name: config
           {{- if (include "flyte-binary.configuration.externalConfiguration" .) }}
           projected:
@@ -213,6 +227,14 @@ spec:
             {{- if .Values.configuration.inlineSecretRef }}
             - secret:
                 name: {{ tpl .Values.configuration.inlineSecretRef . }}
+            {{- end }}
+            {{- range .Values.configuration.extraInlineConfigMapRefs }}
+            - configMap:
+                name: {{ tpl . $ }}
+            {{- end }}
+            {{- range .Values.configuration.extraInlineSecretRefs }}
+            - secret:
+                name: {{ tpl . $ }}
             {{- end }}
           {{- end }}
         - name: webhook-certs

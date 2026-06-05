@@ -125,6 +125,20 @@ Get the Flyte configuration Secret name.
 {{- end -}}
 
 {{/*
+Get the Flyte admin auth Secret name.
+*/}}
+{{- define "flyte-binary.configuration.auth.adminAuthSecretName" -}}
+{{- printf "%s-admin-auth" (include "flyte-binary.fullname" .) -}}
+{{- end -}}
+
+{{/*
+Get the Flyte client secrets Secret name.
+*/}}
+{{- define "flyte-binary.configuration.auth.clientSecretName" -}}
+{{- printf "%s-client-secrets" (include "flyte-binary.fullname" .) -}}
+{{- end -}}
+
+{{/*
 Get the Flyte logging configuration.
 */}}
 {{- define "flyte-binary.configuration.logging.plugins" -}}
@@ -192,12 +206,16 @@ Get the Flyte API paths for ingress.
 - /flyteidl2.task.TaskService/*
 - /flyteidl2.workflow.TranslatorService
 - /flyteidl2.workflow.TranslatorService/*
-- /flyteidl2.actions.ActionsService
-- /flyteidl2.actions.ActionsService/*
 - /flyteidl2.dataproxy.DataProxyService
 - /flyteidl2.dataproxy.DataProxyService/*
 - /flyteidl2.secret.SecretService
 - /flyteidl2.secret.SecretService/*
+- /flyteidl2.project.ProjectService
+- /flyteidl2.project.ProjectService/*
+- /flyteidl2.app.AppService
+- /flyteidl2.app.AppService/*
+- /flyteidl2.trigger.TriggerService
+- /flyteidl2.trigger.TriggerService/*
 {{- end -}}
 
 {{/*
