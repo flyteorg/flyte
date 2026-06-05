@@ -349,6 +349,54 @@ service:
   # extraPorts Additional ports to add to Flyte service
   extraPorts: []
 
+# console Configure the Flyte web console (flyteconsole v2)
+# The console is a static SPA served at `console.basePath` (default /v2). It has
+# no backend configuration of its own and talks to the Flyte API same-origin, so
+# it only works when served behind the same ingress host as the API. Enable the
+# HTTP ingress (`ingress.create: true`) together with `console.enabled` to expose
+# both the console (`/v2`) and the API under one host.
+console:
+  # enabled Deploy the Flyte web console
+  enabled: false
+  # image Configure image to use for the console
+  image:
+    # repository Console image repository
+    repository: ghcr.io/unionai-oss/flyteconsole-v2  # FLYTECONSOLE_IMAGE
+    # tag Console image tag
+    tag: latest  # FLYTECONSOLE_TAG
+    # pullPolicy Console image pull policy
+    pullPolicy: IfNotPresent
+  # imagePullSecrets Image pull secrets for the console image (e.g. for a private registry)
+  imagePullSecrets: []
+  # replicaCount Number of console replicas
+  replicaCount: 1
+  # basePath HTTP path the console SPA is served under (must match the ingress route)
+  basePath: /v2
+  # containerPort Port the console container listens on
+  containerPort: 8080
+  # service Configure service for the console
+  service:
+    # type Kubernetes service type
+    type: ClusterIP
+    # port Console service port
+    port: 80
+    # nodePort Node port for the console service if service type is `NodePort` or `LoadBalancer`
+    nodePort: ""
+  # resources Resource limits and requests for the console container
+  resources: {}
+  # podLabels Add labels to console pod
+  podLabels: {}
+  # podAnnotations Add annotations to console pod
+  podAnnotations: {}
+  # nodeSelector Node selector for console pod
+  nodeSelector: {}
+  # tolerations Tolerations for console pod
+  tolerations: []
+  # affinity Affinity for console pod
+  affinity: {}
+  # securityContext Specify security context for the console container
+  securityContext: {}
+
 # ingress Configure ingress for Flyte
 ingress:
   # create Create ingress resources

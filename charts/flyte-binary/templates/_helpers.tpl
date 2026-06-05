@@ -59,6 +59,40 @@ app.kubernetes.io/component: flyte-binary
 {{- end }}
 
 {{/*
+Console fully qualified name
+*/}}
+{{- define "flyte-binary.console.fullname" -}}
+{{- printf "%s-console" (include "flyte-binary.fullname" .) | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Console service name
+*/}}
+{{- define "flyte-binary.console.serviceName" -}}
+{{- include "flyte-binary.console.fullname" . -}}
+{{- end -}}
+
+{{/*
+Console selector labels
+*/}}
+{{- define "flyte-binary.console.selectorLabels" -}}
+{{ include "flyte-binary.baseLabels" . }}
+app.kubernetes.io/component: console
+{{- end -}}
+
+{{/*
+Console common labels
+*/}}
+{{- define "flyte-binary.console.labels" -}}
+helm.sh/chart: {{ include "flyte-binary.chart" . }}
+{{ include "flyte-binary.console.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "flyte-binary.serviceAccountName" -}}
