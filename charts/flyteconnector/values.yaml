@@ -21,7 +21,7 @@ image:
   # -- Docker image for flyteconnector deployment
   repository: ghcr.io/flyteorg/flyte-connectors  # FLYTECONNECTOR_IMAGE
   # -- Docker image tag
-  tag: latest  # FLYTECONNECTOR_TAG
+  tag: py3.12-v2.3.6  # FLYTECONNECTOR_TAG
   # -- Docker image pull policy
   pullPolicy: IfNotPresent
 ports:
