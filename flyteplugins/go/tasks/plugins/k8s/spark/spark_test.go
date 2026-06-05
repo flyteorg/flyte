@@ -1058,6 +1058,49 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, dummySparkConf["spark.executor.memory"], *sparkApp.Spec.Executor.Memory)
 }
 
+func TestBuildResourcePriorityClassName(t *testing.T) {
+	defaultConfig := defaultPluginConfig()
+	assert.NoError(t, config.SetK8sPluginConfig(defaultConfig))
+
+	const priorityClassName = "high-priority"
+	podSpec := dummyPodSpec()
+	podSpec.PriorityClassName = priorityClassName
+	taskTemplate := dummySparkTaskTemplatePod("blah-1", dummySparkConf, podSpec)
+
+	sparkResourceHandler := sparkResourceHandler{}
+	taskCtx := dummySparkTaskContext(taskTemplate, true, k8s.PluginState{})
+	resource, err := sparkResourceHandler.BuildResource(context.TODO(), taskCtx)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, resource)
+	sparkApp, ok := resource.(*sparkOp.SparkApplication)
+	assert.True(t, ok)
+
+	assert.NotNil(t, sparkApp.Spec.Driver.PriorityClassName)
+	assert.Equal(t, priorityClassName, *sparkApp.Spec.Driver.PriorityClassName)
+	assert.NotNil(t, sparkApp.Spec.Executor.PriorityClassName)
+	assert.Equal(t, priorityClassName, *sparkApp.Spec.Executor.PriorityClassName)
+}
+
+func TestBuildResourceNoPriorityClassName(t *testing.T) {
+	defaultConfig := defaultPluginConfig()
+	assert.NoError(t, config.SetK8sPluginConfig(defaultConfig))
+
+	taskTemplate := dummySparkTaskTemplateContainer("blah-1", dummySparkConf)
+	sparkResourceHandler := sparkResourceHandler{}
+	taskCtx := dummySparkTaskContext(taskTemplate, true, k8s.PluginState{})
+	resource, err := sparkResourceHandler.BuildResource(context.TODO(), taskCtx)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, resource)
+	sparkApp, ok := resource.(*sparkOp.SparkApplication)
+	assert.True(t, ok)
+
+	// When no priority class is set, the field should be left unset (nil) rather than an empty string.
+	assert.Nil(t, sparkApp.Spec.Driver.PriorityClassName)
+	assert.Nil(t, sparkApp.Spec.Executor.PriorityClassName)
+}
+
 func TestGetPropertiesSpark(t *testing.T) {
 	sparkResourceHandler := sparkResourceHandler{}
 	expected := k8s.PluginProperties{}
