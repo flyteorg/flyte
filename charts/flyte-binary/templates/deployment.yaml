@@ -168,10 +168,6 @@ spec:
           lifecycle: {{- tpl ( .Values.deployment.lifecycleHooks | toYaml ) . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            {{- if .Values.configuration.auth.enabled }}
-            - name: auth
-              mountPath: /etc/secrets
-            {{- end }}
             - name: config
               mountPath: /etc/flyte/config.d
             - name: webhook-certs
@@ -213,6 +209,14 @@ spec:
             {{- if .Values.configuration.inlineSecretRef }}
             - secret:
                 name: {{ tpl .Values.configuration.inlineSecretRef . }}
+            {{- end }}
+            {{- range .Values.configuration.extraInlineConfigMapRefs }}
+            - configMap:
+                name: {{ tpl . $ }}
+            {{- end }}
+            {{- range .Values.configuration.extraInlineSecretRefs }}
+            - secret:
+                name: {{ tpl . $ }}
             {{- end }}
           {{- end }}
         - name: webhook-certs

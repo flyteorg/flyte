@@ -59,6 +59,40 @@ app.kubernetes.io/component: flyte-binary
 {{- end }}
 
 {{/*
+Console fully qualified name
+*/}}
+{{- define "flyte-binary.console.fullname" -}}
+{{- printf "%s-console" (include "flyte-binary.fullname" .) | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Console service name
+*/}}
+{{- define "flyte-binary.console.serviceName" -}}
+{{- include "flyte-binary.console.fullname" . -}}
+{{- end -}}
+
+{{/*
+Console selector labels
+*/}}
+{{- define "flyte-binary.console.selectorLabels" -}}
+{{ include "flyte-binary.baseLabels" . }}
+app.kubernetes.io/component: console
+{{- end -}}
+
+{{/*
+Console common labels
+*/}}
+{{- define "flyte-binary.console.labels" -}}
+helm.sh/chart: {{ include "flyte-binary.chart" . }}
+{{ include "flyte-binary.console.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "flyte-binary.serviceAccountName" -}}
@@ -89,6 +123,7 @@ Get the Flyte configuration Secret name.
 {{- define "flyte-binary.configuration.configSecretName" -}}
 {{- printf "%s-config-secret" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
+
 
 {{/*
 Get the Flyte logging configuration.
@@ -154,16 +189,22 @@ Get the Flyte API paths for ingress.
 {{- define "flyte-binary.ingress.grpcPaths" -}}
 - /flyteidl2.workflow.RunService
 - /flyteidl2.workflow.RunService/*
+- /flyteidl2.workflow.RunLogsService
+- /flyteidl2.workflow.RunLogsService/*
 - /flyteidl2.task.TaskService
 - /flyteidl2.task.TaskService/*
 - /flyteidl2.workflow.TranslatorService
 - /flyteidl2.workflow.TranslatorService/*
-- /flyteidl2.actions.ActionsService
-- /flyteidl2.actions.ActionsService/*
 - /flyteidl2.dataproxy.DataProxyService
 - /flyteidl2.dataproxy.DataProxyService/*
 - /flyteidl2.secret.SecretService
 - /flyteidl2.secret.SecretService/*
+- /flyteidl2.project.ProjectService
+- /flyteidl2.project.ProjectService/*
+- /flyteidl2.app.AppService
+- /flyteidl2.app.AppService/*
+- /flyteidl2.trigger.TriggerService
+- /flyteidl2.trigger.TriggerService/*
 {{- end -}}
 
 {{/*
