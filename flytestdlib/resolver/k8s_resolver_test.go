@@ -13,7 +13,9 @@ import (
 	"gotest.tools/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8swatch "k8s.io/apimachinery/pkg/watch"
 	testclient "k8s.io/client-go/kubernetes/fake"
+	clientgotesting "k8s.io/client-go/testing"
 )
 
 func parseTarget(target string) resolver.Target {
@@ -96,6 +98,64 @@ func TestBuilder(t *testing.T) {
 	assert.Equal(t, fc.found[0], "10.0.0.1:8000")
 
 	k8sResolver.Close()
+}
+
+func TestBuilderIgnoresStatusEvents(t *testing.T) {
+	k8sClient := testclient.NewClientset()
+	fakeWatcher := k8swatch.NewFakeWithChanSize(2, false)
+	watchStarted := make(chan struct{})
+	k8sClient.PrependWatchReactor("endpoints", func(action clientgotesting.Action) (bool, k8swatch.Interface, error) {
+		close(watchStarted)
+		return true, fakeWatcher, nil
+	})
+
+	builder := NewBuilder(context.Background(), k8sClient, "test")
+	fc := &fakeConn{
+		cmp: make(chan struct{}),
+	}
+	k8sResolver, err := builder.Build(parseTarget("test://flyteagent.flyte.svc.cluster.local:8000"), fc, resolver.BuildOptions{})
+	assert.NilError(t, err)
+	defer k8sResolver.Close()
+
+	select {
+	case <-watchStarted:
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for endpoints watch to start")
+	}
+
+	fakeWatcher.Error(&metav1.Status{
+		Status: metav1.StatusFailure,
+		Reason: metav1.StatusReasonExpired,
+	})
+	fakeWatcher.Add(&v1.Endpoints{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "flyteagent",
+			Namespace: "flyte",
+		},
+		Subsets: []v1.EndpointSubset{
+			{
+				Addresses: []v1.EndpointAddress{
+					{
+						IP: "10.0.0.2",
+					},
+				},
+				Ports: []v1.EndpointPort{
+					{
+						Name: "grpc",
+						Port: 8000,
+					},
+				},
+			},
+		},
+	})
+
+	select {
+	case <-fc.cmp:
+	case <-time.After(time.Second):
+		t.Fatal("timed out waiting for resolver state update")
+	}
+	assert.Equal(t, len(fc.found), 1)
+	assert.Equal(t, fc.found[0], "10.0.0.2:8000")
 }
 
 func TestParseResolverTargets(t *testing.T) {
