@@ -55,7 +55,7 @@ func (*fakeConn) NewServiceConfig(serviceConfig string) {
 }
 
 func TestBuilder(t *testing.T) {
-	k8sClient := testclient.NewSimpleClientset()
+	k8sClient := testclient.NewClientset()
 	builder := NewBuilder(context.Background(), k8sClient, "test")
 	fc := &fakeConn{
 		cmp: make(chan struct{}),
