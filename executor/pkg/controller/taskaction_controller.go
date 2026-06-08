@@ -96,6 +96,7 @@ type TaskActionReconciler struct {
 	eventsClient      workflowconnect.EventsProxyServiceClient
 	cluster           string
 	MaxSystemFailures uint32
+	metrics           *taskActionMetrics
 }
 
 // isSystemRetryableFailure reports whether the plugin transition is a
@@ -206,6 +207,11 @@ func NewTaskActionReconciler(
 	eventsClient workflowconnect.EventsProxyServiceClient,
 	cluster string,
 ) *TaskActionReconciler {
+	metrics, err := registerTaskActionMetrics(c)
+	if err != nil {
+		// Non-fatal: degrade to no custom metrics rather than failing controller setup.
+		log.Log.Error(err, "failed to register TaskAction OTel metrics")
+	}
 	return &TaskActionReconciler{
 		Client:         c,
 		Scheme:         scheme,
@@ -213,6 +219,7 @@ func NewTaskActionReconciler(
 		DataStore:      dataStore,
 		eventsClient:   eventsClient,
 		cluster:        cluster,
+		metrics:        metrics,
 	}
 }
 
@@ -231,6 +238,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	if err := r.Get(ctx, req.NamespacedName, taskAction); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
+	r.metrics.observeCRDSize(ctx, taskAction)
 
 	// Please do NOT modify `originalTaskActionInstance` in the following code. This is for checking
 	// if the TaskAction instance changes
