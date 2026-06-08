@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -36,4 +37,20 @@ func TestObserveCRDSize(t *testing.T) {
 	assert.NotPanics(t, func() {
 		nilMetrics.observeCRDSize(context.Background(), &flyteorgv1.TaskAction{})
 	})
+}
+
+func TestTimeK8sOp(t *testing.T) {
+	m, err := registerTaskActionMetrics(nil)
+	require.NoError(t, err)
+
+	// Propagates the wrapped op's result.
+	sentinel := errors.New("boom")
+	assert.ErrorIs(t, m.timeK8sOp(context.Background(), "get", func() error { return sentinel }), sentinel)
+	assert.NoError(t, m.timeK8sOp(context.Background(), "update", func() error { return nil }))
+
+	// Nil receiver is a transparent pass-through that still runs the op.
+	var nilMetrics *taskActionMetrics
+	ran := false
+	assert.NoError(t, nilMetrics.timeK8sOp(context.Background(), "get", func() error { ran = true; return nil }))
+	assert.True(t, ran)
 }

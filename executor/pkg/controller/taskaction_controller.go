@@ -168,7 +168,7 @@ func (r *TaskActionReconciler) recordSystemError(
 	}
 
 	if taskActionStatusChanged(original.Status, taskAction.Status) {
-		if updErr := r.Status().Update(ctx, taskAction); updErr != nil {
+		if updErr := r.crdStatusUpdate(ctx, taskAction); updErr != nil {
 			logger.Error(updErr, "failed to persist SystemFailures counter")
 		}
 	}
@@ -223,6 +223,22 @@ func NewTaskActionReconciler(
 	}
 }
 
+// crdGet, crdUpdate, and crdStatusUpdate wrap the embedded client's TaskAction CRD
+// operations so their Kubernetes API latency is recorded under taskaction.k8s.duration.
+// They delegate through r.Client (not the promoted r.Get/r.Update/r.Status) so the
+// timing is applied exactly once.
+func (r *TaskActionReconciler) crdGet(ctx context.Context, key client.ObjectKey, obj client.Object) error {
+	return r.metrics.timeK8sOp(ctx, "get", func() error { return r.Client.Get(ctx, key, obj) })
+}
+
+func (r *TaskActionReconciler) crdUpdate(ctx context.Context, obj client.Object) error {
+	return r.metrics.timeK8sOp(ctx, "update", func() error { return r.Client.Update(ctx, obj) })
+}
+
+func (r *TaskActionReconciler) crdStatusUpdate(ctx context.Context, obj client.Object) error {
+	return r.metrics.timeK8sOp(ctx, "status_update", func() error { return r.Client.Status().Update(ctx, obj) })
+}
+
 // +kubebuilder:rbac:groups=flyte.org,resources=taskactions,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=flyte.org,resources=taskactions/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=flyte.org,resources=taskactions/finalizers,verbs=update
@@ -235,7 +251,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	// Fetch the TaskAction instance
 	taskAction := &flyteorgv1.TaskAction{}
-	if err := r.Get(ctx, req.NamespacedName, taskAction); err != nil {
+	if err := r.crdGet(ctx, req.NamespacedName, taskAction); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 	r.metrics.observeCRDSize(ctx, taskAction)
@@ -269,14 +285,14 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(eventType), "%v", err)
 		setCondition(taskAction, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue, reason, err.Error())
 		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse, reason, err.Error())
-		_ = r.Status().Update(ctx, taskAction)
+		_ = r.crdStatusUpdate(ctx, taskAction)
 		return ctrl.Result{}, nil // terminal — do not requeue
 	}
 
 	// Ensure finalizer is present (once validation passes)
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		controllerutil.AddFinalizer(taskAction, taskActionFinalizer)
-		if err := r.Update(ctx, taskAction); err != nil {
+		if err := r.crdUpdate(ctx, taskAction); err != nil {
 			logger.Error(err, "Failed to update TaskAction with finalizer")
 			return ctrl.Result{}, err
 		}
@@ -505,7 +521,7 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 
 func (r *TaskActionReconciler) removeFinalizer(ctx context.Context, taskAction *flyteorgv1.TaskAction) (ctrl.Result, error) {
 	controllerutil.RemoveFinalizer(taskAction, taskActionFinalizer)
-	if err := r.Update(ctx, taskAction); err != nil {
+	if err := r.crdUpdate(ctx, taskAction); err != nil {
 		return ctrl.Result{}, err
 	}
 	return ctrl.Result{}, nil
@@ -544,11 +560,11 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	// This will resolve the conflict error caused by k8s optimistic lock when 2 reconcile loops updating the same CRD
 	if err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		latest := &flyteorgv1.TaskAction{}
-		if getErr := r.Get(ctx, client.ObjectKeyFromObject(newTaskAction), latest); getErr != nil {
+		if getErr := r.crdGet(ctx, client.ObjectKeyFromObject(newTaskAction), latest); getErr != nil {
 			return getErr
 		}
 		latest.Status = newTaskAction.Status
-		return r.Status().Update(ctx, latest)
+		return r.crdStatusUpdate(ctx, latest)
 	}); err != nil {
 		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
 		return err

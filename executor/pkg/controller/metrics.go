@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
@@ -16,13 +17,14 @@ const taskActionMeterName = "taskaction-controller"
 
 // taskActionMetrics holds OTel instruments for the TaskAction controller.
 //
-// Reconcile latency and k8s API read/write latency already come from the
-// controller-runtime metrics server (controller_runtime_reconcile_time_seconds,
-// rest_client_request_duration_seconds), and event-proxy send latency comes from
-// the otelconnect-wrapped events client (rpc_client_duration). This only adds what
-// neither provides: TaskAction CRD count by phase and serialized CRD size.
+// Reconcile throughput, active workers, and workqueue latency already come from
+// the controller-runtime metrics server, and event-proxy send latency comes from
+// the otelconnect-wrapped events client (rpc_client_duration). This adds what
+// none of those provide: TaskAction CRD count by phase, serialized CRD size, and
+// per-operation Kubernetes API read/write latency for the CRD.
 type taskActionMetrics struct {
-	crdSizeBytes metric.Int64Histogram
+	crdSizeBytes  metric.Int64Histogram
+	crdOpDuration metric.Float64Histogram
 }
 
 // registerTaskActionMetrics wires the TaskAction OTel meters onto the "executor"
@@ -35,6 +37,15 @@ func registerTaskActionMetrics(c client.Client) (*taskActionMetrics, error) {
 		"taskaction.crd.size_bytes",
 		metric.WithDescription("Serialized (JSON) size of a TaskAction CRD"),
 		metric.WithUnit("By"),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	crdOp, err := meter.Float64Histogram(
+		"taskaction.k8s.duration",
+		metric.WithDescription("Latency of TaskAction CRD operations against the Kubernetes API, labeled by op (get/update/status_update)"),
+		metric.WithUnit("ms"),
 	)
 	if err != nil {
 		return nil, err
@@ -70,7 +81,7 @@ func registerTaskActionMetrics(c client.Client) (*taskActionMetrics, error) {
 		return nil, err
 	}
 
-	return &taskActionMetrics{crdSizeBytes: crdSize}, nil
+	return &taskActionMetrics{crdSizeBytes: crdSize, crdOpDuration: crdOp}, nil
 }
 
 // observeCRDSize records the serialized size of a TaskAction CRD. No-op if metrics
@@ -82,4 +93,18 @@ func (m *taskActionMetrics) observeCRDSize(ctx context.Context, ta *flyteorgv1.T
 	if b, err := json.Marshal(ta); err == nil {
 		m.crdSizeBytes.Record(ctx, int64(len(b)))
 	}
+}
+
+// timeK8sOp times a Kubernetes API operation against the TaskAction CRD and records
+// its latency under taskaction.k8s.duration{op,error}. It is a transparent pass-through
+// when metrics registration failed (m == nil), so callers can wrap unconditionally.
+func (m *taskActionMetrics) timeK8sOp(ctx context.Context, op string, fn func() error) error {
+	if m == nil || m.crdOpDuration == nil {
+		return fn()
+	}
+	start := time.Now()
+	err := fn()
+	m.crdOpDuration.Record(ctx, float64(time.Since(start).Microseconds())/1000.0,
+		metric.WithAttributes(attribute.String("op", op), attribute.Bool("error", err != nil)))
+	return err
 }
