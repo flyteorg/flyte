@@ -213,7 +213,7 @@ func (s *RunService) CreateRun(
 	// Get the task template and taskID
 	var taskID *task.TaskIdentifier
 	var taskSpec *task.TaskSpec
-	var triggerName, triggerTaskName, triggerType string
+	var triggerName, triggerTaskName, triggerType, triggerKickoffArg string
 	var triggerRevision int64
 	var err error
 	runSpec := request.GetRunSpec()
@@ -258,6 +258,7 @@ func (s *RunService) CreateRun(
 		if offloaded := triggerDetails.GetSpec().GetOffloadedInputData(); offloaded != nil && request.GetInputWrapper() == nil {
 			request.InputWrapper = &workflow.CreateRunRequest_OffloadedInputData{OffloadedInputData: offloaded}
 		}
+		triggerKickoffArg = triggerDetails.GetAutomationSpec().GetSchedule().GetKickoffTimeInputArg()
 	}
 
 	if runSpec == nil {
@@ -291,7 +292,10 @@ func (s *RunService) CreateRun(
 		inputPrefix = iw.OffloadedInputData.GetUri()
 
 		if taskSpec.GetTaskTemplate().GetMetadata().GetDiscoverable() {
-			cacheKey, err = generateCacheKeyForTask(taskSpec.GetTaskTemplate(), iw.OffloadedInputData.GetInputsHash())
+			// Fold run_start_time in when the trigger binds its time to an input — that input isn't in
+			// the offloaded blob, so otherwise every fire would collide on one cache key.
+			inputsHash := foldRunStartTimeIntoHash(iw.OffloadedInputData.GetInputsHash(), triggerKickoffArg, runSpec.GetRunStartTime())
+			cacheKey, err = generateCacheKeyForTask(taskSpec.GetTaskTemplate(), inputsHash)
 			if err != nil {
 				logger.Warnf(ctx, "Failed to generate cache key for root action %v: %v", actionID, err)
 			}
