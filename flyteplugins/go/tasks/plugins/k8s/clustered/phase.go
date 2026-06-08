@@ -45,6 +45,7 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 	}
 	taskInfo := pluginsCore.TaskInfo{
 		Logs:       taskLogs,
+		LogContext: getLogContext(ctx, pluginContext, jobSet),
 		OccurredAt: &occurredAt,
 		CustomInfo: statusDetails,
 	}
