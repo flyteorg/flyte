@@ -294,7 +294,7 @@ func (s *RunService) CreateRun(
 		if taskSpec.GetTaskTemplate().GetMetadata().GetDiscoverable() {
 			// Fold run_start_time in when the trigger binds its time to an input — that input isn't in
 			// the offloaded blob, so otherwise every fire would collide on one cache key.
-			inputsHash := foldRunStartTimeIntoHash(iw.OffloadedInputData.GetInputsHash(), triggerKickoffArg, runSpec.GetRunStartTime())
+			inputsHash := foldRunStartTimeIntoHash(iw.OffloadedInputData.GetInputsHash(), triggerKickoffArg, runSpec.GetRunStartTime(), taskSpec.GetTaskTemplate().GetMetadata().GetCacheIgnoreInputVars())
 			cacheKey, err = generateCacheKeyForTask(taskSpec.GetTaskTemplate(), inputsHash)
 			if err != nil {
 				logger.Warnf(ctx, "Failed to generate cache key for root action %v: %v", actionID, err)
