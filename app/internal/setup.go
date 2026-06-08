@@ -5,14 +5,19 @@ import (
 	"fmt"
 	"net/http"
 
+	"connectrpc.com/connect"
+	"connectrpc.com/otelconnect"
 	stdlibapp "github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 
 	appconfig "github.com/flyteorg/flyte/v2/app/internal/config"
 	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
 	"github.com/flyteorg/flyte/v2/app/internal/service"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
 )
+
+const otelServiceName = "internal-app-service"
 
 // Setup registers the InternalAppService handler on the SetupContext mux.
 // It is mounted at /internal<path> to avoid collision with the control plane
@@ -39,7 +44,19 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext, cfg *appconfig.Inter
 		return nil
 	})
 
-	path, handler := appconnect.NewAppServiceHandler(internalAppSvc)
+	otelCfg := otelutils.GetConfig()
+	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
+		return fmt.Errorf("registering otel providers: %w", err)
+	}
+	otelInterceptor, err := otelconnect.NewInterceptor(
+		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
+		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
+	)
+	if err != nil {
+		return fmt.Errorf("creating otel interceptor: %w", err)
+	}
+
+	path, handler := appconnect.NewAppServiceHandler(internalAppSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle("/internal"+path, http.StripPrefix("/internal", handler))
 	logger.Infof(ctx, "Mounted InternalAppService at /internal%s", path)
 
@@ -49,7 +66,7 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext, cfg *appconfig.Inter
 			return fmt.Errorf("internalapp: failed to create log streamer: %w", err)
 		}
 		logsSvc := service.NewInternalAppLogsService(appK8sClient, streamer)
-		logsPath, logsHandler := appconnect.NewAppLogsServiceHandler(logsSvc)
+		logsPath, logsHandler := appconnect.NewAppLogsServiceHandler(logsSvc, connect.WithInterceptors(otelInterceptor))
 		sc.Mux.Handle("/internal"+logsPath, http.StripPrefix("/internal", logsHandler))
 		logger.Infof(ctx, "Mounted InternalAppLogsService at /internal%s", logsPath)
 	} else {

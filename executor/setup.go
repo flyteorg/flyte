@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 
+	"connectrpc.com/connect"
+	"connectrpc.com/otelconnect"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/kubernetes"
@@ -28,6 +30,7 @@ import (
 	cachecatalog "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog/cache_service"
 	webhookConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
@@ -39,6 +42,8 @@ import (
 )
 
 var scheme = runtime.NewScheme()
+
+const otelServiceName = "executor"
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
@@ -128,17 +133,29 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("executor: failed to initialize plugin registry: %w", err)
 	}
 
+	otelCfg := otelutils.GetConfig()
+	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
+		return fmt.Errorf("registering otel providers: %w", err)
+	}
+	otelInterceptor, err := otelconnect.NewInterceptor(
+		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
+		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
+	)
+	if err != nil {
+		return fmt.Errorf("creating otel interceptor: %w", err)
+	}
+
 	eventsServiceURL := sc.BaseURL
 	if eventsServiceURL == "" {
 		eventsServiceURL = cfg.EventsServiceURL
 	}
-	eventsClient := workflowconnect.NewEventsProxyServiceClient(http.DefaultClient, eventsServiceURL)
+	eventsClient := workflowconnect.NewEventsProxyServiceClient(http.DefaultClient, eventsServiceURL, connect.WithInterceptors(otelInterceptor))
 	catalogCfg := catalog.GetConfig()
 	cacheServiceURL := sc.BaseURL
 	if cacheServiceURL == "" {
 		cacheServiceURL = cfg.CacheServiceURL
 	}
-	cacheClient := cachecatalog.NewHTTPClient(dataStore, cacheServiceURL, catalogCfg.MaxCacheAge.Duration)
+	cacheClient := cachecatalog.NewHTTPClient(dataStore, cacheServiceURL, catalogCfg.MaxCacheAge.Duration, connect.WithInterceptors(otelInterceptor))
 	asyncCatalogClient, err := catalog.NewAsyncClient(cacheClient, *catalogCfg, promutils.NewScope("executor:catalog"))
 	if err != nil {
 		return fmt.Errorf("executor: failed to create catalog cache client: %w", err)
