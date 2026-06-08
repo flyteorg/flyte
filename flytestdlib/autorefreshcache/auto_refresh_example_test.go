@@ -112,13 +112,43 @@ func ExampleNewAutoRefreshCache() {
 		fmt.Printf("unexpected error in create; err1: %v, err2: %v", err1, err2)
 	}
 
-	// wait for the cache to go through a few refresh cycles and then check status
-	time.Sleep(resyncPeriod * 10)
-	item, err := cache.Get(item1.ID())
-	if err != nil && errors.IsCausedBy(err, ErrNotFound) {
-		fmt.Printf("Item1 is no longer in the cache")
-	} else {
-		fmt.Printf("Current status for item1 is %v", item.(*ExampleCacheItem).status)
+	// Poll until the cache's background worker refreshes item1 to its terminal state. Polling against
+	// the expected condition (instead of sleeping a fixed duration) keeps this example deterministic
+	// even when the async worker is slow under load.
+	//
+	// We hand-roll the wait loop instead of using require.Eventually because this is a runnable
+	// Example (verified via the "Output:" comment below), not a Test. Example functions take no
+	// arguments and so have no *testing.T, while require.Eventually requires a require.TestingT to
+	// report failures. The deadline below bounds the wait and panics on timeout to surface a hang.
+	var item Item
+	var lastStatus ExampleItemStatus = ExampleStatusNotStarted
+	deadline := time.Now().Add(10 * time.Second)
+	for {
+		item, err = cache.Get(item1.ID())
+		if err != nil {
+			if errors.IsCausedBy(err, ErrNotFound) {
+				fmt.Printf("Item1 is no longer in the cache")
+				break
+			}
+			cancel()
+			panic(fmt.Sprintf("unexpected error fetching item1: %v", err))
+		}
+
+		exItem, ok := item.(*ExampleCacheItem)
+		if !ok {
+			cancel()
+			panic(fmt.Sprintf("unexpected item type %T for item1", item))
+		}
+		lastStatus = exItem.status
+		if lastStatus == ExampleStatusSucceeded {
+			fmt.Printf("Current status for item1 is %v", lastStatus)
+			break
+		}
+		if time.Now().After(deadline) {
+			cancel()
+			panic(fmt.Sprintf("timed out waiting for item1 to reach %v; last status=%v", ExampleStatusSucceeded, lastStatus))
+		}
+		time.Sleep(resyncPeriod)
 	}
 
 	// stop the cache

@@ -53,26 +53,6 @@ func (s *ActionsService) Enqueue(
 	return connect.NewResponse(&actions.EnqueueResponse{}), nil
 }
 
-// GetLatestState returns the latest state of an action.
-func (s *ActionsService) GetLatestState(
-	ctx context.Context,
-	req *connect.Request[actions.GetLatestStateRequest],
-) (*connect.Response[actions.GetLatestStateResponse], error) {
-	logger.Infof(ctx, "ActionsService.GetLatestState called")
-
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
-	}
-
-	state, err := s.client.GetState(ctx, req.Msg.ActionId)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to get state: %v", err)
-		return nil, connect.NewError(connect.CodeNotFound, err)
-	}
-
-	return connect.NewResponse(&actions.GetLatestStateResponse{State: state}), nil
-}
-
 // WatchForUpdates watches for updates to the state of actions.
 func (s *ActionsService) WatchForUpdates(
 	ctx context.Context,
@@ -160,7 +140,7 @@ func (s *ActionsService) WatchForUpdates(
 	}
 }
 
-// Update updates the status of an action and saves its serialized state.
+// Update updates the status of an action.
 func (s *ActionsService) Update(
 	ctx context.Context,
 	req *connect.Request[actions.UpdateRequest],
@@ -171,7 +151,7 @@ func (s *ActionsService) Update(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	if err := s.client.PutState(ctx, req.Msg.ActionId, req.Msg.Attempt, req.Msg.Status, req.Msg.State); err != nil {
+	if err := s.client.PutStatus(ctx, req.Msg.ActionId, req.Msg.Attempt, req.Msg.Status); err != nil {
 		logger.Errorf(ctx, "Failed to update action: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}

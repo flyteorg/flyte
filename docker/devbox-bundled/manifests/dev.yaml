@@ -7871,28 +7871,6 @@ metadata:
     app.kubernetes.io/name: flyte-devbox
     app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-devbox-0.1.0
-  name: flyte-console
-  namespace: flyte
-spec:
-  ports:
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: http
-  selector:
-    app.kubernetes.io/component: console
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/name: flyte-devbox
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
   name: flyte-devbox-local
   namespace: flyte
 spec:
@@ -8261,52 +8239,6 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: flyte-devbox-registry-storage
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
-  name: flyte-console
-  namespace: flyte
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: console
-      app.kubernetes.io/instance: flyte-devbox
-      app.kubernetes.io/name: flyte-devbox
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/component: console
-        app.kubernetes.io/instance: flyte-devbox
-        app.kubernetes.io/name: flyte-devbox
-    spec:
-      containers:
-      - image: docker.io/unionai-oss/flyteconsole-v2:sandbox
-        imagePullPolicy: Never
-        livenessProbe:
-          httpGet:
-            path: /v2
-            port: http
-          initialDelaySeconds: 5
-          periodSeconds: 30
-        name: console
-        ports:
-        - containerPort: 8080
-          name: http
-          protocol: TCP
-        readinessProbe:
-          httpGet:
-            path: /v2
-            port: http
-          initialDelaySeconds: 5
-          periodSeconds: 10
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -9029,29 +8961,6 @@ spec:
       name: http
       number: 8081
       protocol: HTTP
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
-  name: flyte-console
-  namespace: flyte
-spec:
-  rules:
-  - http:
-      paths:
-      - backend:
-          service:
-            name: flyte-console
-            port:
-              number: 80
-        path: /v2
-        pathType: Prefix
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

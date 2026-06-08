@@ -20,9 +20,6 @@ class ActionsService(Protocol):
     async def enqueue(self, request: flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueRequest, ctx: RequestContext) -> flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
-    async def get_latest_state(self, request: flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateRequest, ctx: RequestContext) -> flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateResponse:
-        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
-
     def watch_for_updates(self, request: flyteidl2_dot_actions_dot_actions__service__pb2.WatchForUpdatesRequest, ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_actions_dot_actions__service__pb2.WatchForUpdatesResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
@@ -50,16 +47,6 @@ class ActionsServiceASGIApplication(ConnectASGIApplication[ActionsService]):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.enqueue,
-                ),
-                "/flyteidl2.actions.ActionsService/GetLatestState": Endpoint.unary(
-                    method=MethodInfo(
-                        name="GetLatestState",
-                        service_name="flyteidl2.actions.ActionsService",
-                        input=flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateRequest,
-                        output=flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
-                    ),
-                    function=svc.get_latest_state,
                 ),
                 "/flyteidl2.actions.ActionsService/WatchForUpdates": Endpoint.server_stream(
                     method=MethodInfo(
@@ -128,26 +115,6 @@ class ActionsServiceClient(ConnectClient):
                 service_name="flyteidl2.actions.ActionsService",
                 input=flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueRequest,
                 output=flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
-            ),
-            headers=headers,
-            timeout_ms=timeout_ms,
-        )
-
-    async def get_latest_state(
-        self,
-        request: flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateRequest,
-        *,
-        headers: Headers | Mapping[str, str] | None = None,
-        timeout_ms: int | None = None,
-    ) -> flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateResponse:
-        return await self.execute_unary(
-            request=request,
-            method=MethodInfo(
-                name="GetLatestState",
-                service_name="flyteidl2.actions.ActionsService",
-                input=flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateRequest,
-                output=flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
             ),
             headers=headers,
@@ -238,8 +205,6 @@ class ActionsServiceClient(ConnectClient):
 class ActionsServiceSync(Protocol):
     def enqueue(self, request: flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueRequest, ctx: RequestContext) -> flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
-    def get_latest_state(self, request: flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateRequest, ctx: RequestContext) -> flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateResponse:
-        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def watch_for_updates(self, request: flyteidl2_dot_actions_dot_actions__service__pb2.WatchForUpdatesRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_actions_dot_actions__service__pb2.WatchForUpdatesResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def update(self, request: flyteidl2_dot_actions_dot_actions__service__pb2.UpdateRequest, ctx: RequestContext) -> flyteidl2_dot_actions_dot_actions__service__pb2.UpdateResponse:
@@ -263,16 +228,6 @@ class ActionsServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.enqueue,
-                ),
-                "/flyteidl2.actions.ActionsService/GetLatestState": EndpointSync.unary(
-                    method=MethodInfo(
-                        name="GetLatestState",
-                        service_name="flyteidl2.actions.ActionsService",
-                        input=flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateRequest,
-                        output=flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
-                    ),
-                    function=service.get_latest_state,
                 ),
                 "/flyteidl2.actions.ActionsService/WatchForUpdates": EndpointSync.server_stream(
                     method=MethodInfo(
@@ -341,26 +296,6 @@ class ActionsServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.actions.ActionsService",
                 input=flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueRequest,
                 output=flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
-            ),
-            headers=headers,
-            timeout_ms=timeout_ms,
-        )
-
-    def get_latest_state(
-        self,
-        request: flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateRequest,
-        *,
-        headers: Headers | Mapping[str, str] | None = None,
-        timeout_ms: int | None = None,
-    ) -> flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateResponse:
-        return self.execute_unary(
-            request=request,
-            method=MethodInfo(
-                name="GetLatestState",
-                service_name="flyteidl2.actions.ActionsService",
-                input=flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateRequest,
-                output=flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
             ),
             headers=headers,

@@ -11,22 +11,22 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/security/keyvault/azsecrets v1.4.0
 	github.com/GoogleCloudPlatform/spark-on-k8s-operator v0.0.0-20200723154620-6f35a1152625
 	github.com/aws/aws-sdk-go v1.55.8
-	github.com/aws/aws-sdk-go-v2 v1.41.7
+	github.com/aws/aws-sdk-go-v2 v1.41.9
 	github.com/aws/aws-sdk-go-v2/config v1.29.6
-	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.41.1
+	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.41.9
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
 	github.com/coocood/freecache v1.2.7
 	github.com/dask/dask-kubernetes/v2023 v2023.0.0-20230626103304-abd02cd17b26
 	github.com/eko/gocache/lib/v4 v4.2.3
 	github.com/eko/gocache/store/freecache/v4 v4.2.4
 	github.com/eko/gocache/store/redis/v4 v4.2.0
-	github.com/fatih/color v1.18.0
+	github.com/fatih/color v1.19.0
 	github.com/fergusstrange/embedded-postgres v1.34.0
 	github.com/flyteorg/stow v0.3.13
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-test/deep v1.1.1
-	github.com/go-viper/mapstructure/v2 v2.4.0
+	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/golang/protobuf v1.5.4
 	github.com/googleapis/gax-go/v2 v2.22.0
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.1.0
@@ -47,7 +47,7 @@ require (
 	github.com/prometheus/common v0.67.5
 	github.com/ray-project/kuberay/ray-operator v1.5.2
 	github.com/redis/go-redis/extra/redisprometheus/v9 v9.17.2
-	github.com/redis/go-redis/v9 v9.19.0
+	github.com/redis/go-redis/v9 v9.20.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/samber/lo v1.53.0
 	github.com/shamaton/msgpack/v2 v2.4.1
@@ -87,6 +87,8 @@ require (
 	sigs.k8s.io/jobset v0.5.2
 )
 
+require github.com/Masterminds/semver/v3 v3.4.0
+
 require (
 	cel.dev/expr v0.25.1 // indirect
 	cloud.google.com/go v0.121.6 // indirect
@@ -103,19 +105,18 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.31.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.53.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.53.0 // indirect
-	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.59 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.28 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.17 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.17 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.25 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.25 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.12.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.12.13 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.24.15 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.28.14 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.14 // indirect
-	github.com/aws/smithy-go v1.25.1 // indirect
+	github.com/aws/smithy-go v1.26.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/blendle/zapdriver v1.3.1 // indirect
@@ -168,7 +169,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
-	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect

@@ -21,6 +21,11 @@ docker-registry:
 flyte-binary:
   fullnameOverride: flyte-binary
   enabled: true
+  console:
+    image:
+      repository: docker.io/unionai-oss/flyteconsole-v2
+      tag: sandbox
+      pullPolicy: Never
   configuration:
     database:
       host: 'postgresql'
@@ -185,9 +190,3 @@ sandbox:
   # dev Routes requests to an instance of Flyte running locally on a developer's
   # development environment. This is only usable if the flyte-binary chart is disabled.
   dev: false
-  console:
-    enabled: true
-    image:
-      repository: docker.io/unionai-oss/flyteconsole-v2
-      tag: sandbox
-      pullPolicy: Never

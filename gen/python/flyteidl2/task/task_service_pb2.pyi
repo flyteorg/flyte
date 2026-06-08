@@ -1,5 +1,6 @@
 from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
+from flyteidl2.common import identity_pb2 as _identity_pb2
 from flyteidl2.common import list_pb2 as _list_pb2
 from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
@@ -83,12 +84,16 @@ class ListVersionsRequest(_message.Message):
 class ListVersionsResponse(_message.Message):
     __slots__ = ["versions", "token"]
     class VersionResponse(_message.Message):
-        __slots__ = ["version", "deployed_at"]
+        __slots__ = ["version", "deployed_at", "deployed_by", "latest_run"]
         VERSION_FIELD_NUMBER: _ClassVar[int]
         DEPLOYED_AT_FIELD_NUMBER: _ClassVar[int]
+        DEPLOYED_BY_FIELD_NUMBER: _ClassVar[int]
+        LATEST_RUN_FIELD_NUMBER: _ClassVar[int]
         version: str
         deployed_at: _timestamp_pb2.Timestamp
-        def __init__(self, version: _Optional[str] = ..., deployed_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+        deployed_by: _identity_pb2.EnrichedIdentity
+        latest_run: _task_definition_pb2.LatestRunSummary
+        def __init__(self, version: _Optional[str] = ..., deployed_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., deployed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., latest_run: _Optional[_Union[_task_definition_pb2.LatestRunSummary, _Mapping]] = ...) -> None: ...
     VERSIONS_FIELD_NUMBER: _ClassVar[int]
     TOKEN_FIELD_NUMBER: _ClassVar[int]
     versions: _containers.RepeatedCompositeFieldContainer[ListVersionsResponse.VersionResponse]

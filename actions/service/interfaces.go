@@ -17,11 +17,8 @@ type ActionsClientInterface interface {
 	// Enqueue creates a TaskAction CR in Kubernetes.
 	Enqueue(ctx context.Context, action *actions.Action, runSpec *task.RunSpec) error
 
-	// GetState retrieves the state JSON for a TaskAction.
-	GetState(ctx context.Context, actionID *common.ActionIdentifier) (string, error)
-
-	// PutState updates the state and status of a TaskAction.
-	PutState(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus, stateJSON string) error
+	// PutStatus updates the status of a TaskAction.
+	PutStatus(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus) error
 
 	// AbortAction aborts a queued or running action, cascading to descendants.
 	AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason *string) error
