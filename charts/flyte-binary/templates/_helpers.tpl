@@ -197,6 +197,8 @@ Get the Flyte API paths for ingress.
 - /flyteidl2.workflow.TranslatorService/*
 - /flyteidl2.dataproxy.DataProxyService
 - /flyteidl2.dataproxy.DataProxyService/*
+- /flyteidl2.cluster.ClusterService
+- /flyteidl2.cluster.ClusterService/*
 - /flyteidl2.secret.SecretService
 - /flyteidl2.secret.SecretService/*
 - /flyteidl2.project.ProjectService

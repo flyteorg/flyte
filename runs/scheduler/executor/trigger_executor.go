@@ -35,12 +35,14 @@ type TriggerExecutorConfig struct {
 	QPS float64
 	// Burst is the token-bucket burst size.
 	Burst int
+	// ClientOpts are connect client options for the outbound RunService client.
+	ClientOpts []connect.ClientOption
 }
 
 // NewTriggerExecutor constructs a TriggerExecutor.
 func NewTriggerExecutor(cfg TriggerExecutorConfig) *TriggerExecutor {
 	return &TriggerExecutor{
-		runClient: workflowconnect.NewRunServiceClient(http.DefaultClient, cfg.BaseURL),
+		runClient: workflowconnect.NewRunServiceClient(http.DefaultClient, cfg.BaseURL, cfg.ClientOpts...),
 		limiter:   rate.NewLimiter(rate.Limit(cfg.QPS), cfg.Burst),
 	}
 }
