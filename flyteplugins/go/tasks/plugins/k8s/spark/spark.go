@@ -234,6 +234,7 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 		},
 	}
 	spec.sparkSpec.ServiceAccount = strPtr(serviceAccountName(nonInterruptibleTaskCtx.TaskExecutionMetadata()))
+	spec.sparkSpec.PriorityClassName = strPtr(podSpec.PriorityClassName)
 
 	if cores, err := strconv.ParseInt(sparkConfig["spark.driver.cores"], 10, 32); err == nil {
 		spec.sparkSpec.Cores = intPtr(int32(cores))
@@ -288,6 +289,7 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 		},
 		serviceAccountName,
 	}
+	spec.sparkSpec.PriorityClassName = strPtr(podSpec.PriorityClassName)
 	if execCores, err := strconv.ParseInt(sparkConfig["spark.executor.cores"], 10, 32); err == nil {
 		spec.sparkSpec.Cores = intPtr(int32(execCores))
 	}
@@ -394,6 +396,14 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 	taskLogs := make([]*core.TaskLog, 0, 3)
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 
+	startTime := sj.CreationTimestamp.Unix()
+	var finishTime int64
+	isTerminal := sj.Status.AppState.State == sparkOp.ApplicationStateCompleted ||
+		sj.Status.AppState.State == sparkOp.ApplicationStateFailed
+	if isTerminal && !sj.Status.TerminationTime.IsZero() {
+		finishTime = sj.Status.TerminationTime.Unix()
+	}
+
 	if sj.Status.DriverInfo.PodName != "" {
 		p, err := logs.InitializeLogPlugins(&sparkConfig.LogConfig.Mixed)
 		if err != nil {
@@ -402,11 +412,15 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 
 		if p != nil {
 			o, err := p.GetTaskLogs(tasklog.Input{
-				PodName:         sj.Status.DriverInfo.PodName,
-				Namespace:       sj.Namespace,
-				LogName:         "(Driver Logs)",
-				TaskExecutionID: taskExecID,
-				TaskTemplate:    taskTemplate,
+				PodName:              sj.Status.DriverInfo.PodName,
+				Namespace:            sj.Namespace,
+				LogName:              "(Driver Logs)",
+				PodRFC3339StartTime:  time.Unix(startTime, 0).Format(time.RFC3339),
+				PodRFC3339FinishTime: time.Unix(finishTime, 0).Format(time.RFC3339),
+				PodUnixStartTime:     startTime,
+				PodUnixFinishTime:    finishTime,
+				TaskExecutionID:      taskExecID,
+				TaskTemplate:         taskTemplate,
 			})
 
 			if err != nil {
@@ -424,10 +438,14 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 
 	if p != nil {
 		o, err := p.GetTaskLogs(tasklog.Input{
-			PodName:         sj.Status.DriverInfo.PodName,
-			Namespace:       sj.Namespace,
-			LogName:         "(User Logs)",
-			TaskExecutionID: taskExecID,
+			PodName:              sj.Status.DriverInfo.PodName,
+			Namespace:            sj.Namespace,
+			LogName:              "(User Logs)",
+			PodRFC3339StartTime:  time.Unix(startTime, 0).Format(time.RFC3339),
+			PodRFC3339FinishTime: time.Unix(finishTime, 0).Format(time.RFC3339),
+			PodUnixStartTime:     startTime,
+			PodUnixFinishTime:    finishTime,
+			TaskExecutionID:      taskExecID,
 		})
 
 		if err != nil {
@@ -444,10 +462,14 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 
 	if p != nil {
 		o, err := p.GetTaskLogs(tasklog.Input{
-			PodName:         sj.Name,
-			Namespace:       sj.Namespace,
-			LogName:         "(System Logs)",
-			TaskExecutionID: taskExecID,
+			PodName:              sj.Name,
+			Namespace:            sj.Namespace,
+			LogName:              "(System Logs)",
+			PodRFC3339StartTime:  time.Unix(startTime, 0).Format(time.RFC3339),
+			PodRFC3339FinishTime: time.Unix(finishTime, 0).Format(time.RFC3339),
+			PodUnixStartTime:     startTime,
+			PodUnixFinishTime:    finishTime,
+			TaskExecutionID:      taskExecID,
 		})
 
 		if err != nil {
@@ -464,10 +486,14 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 
 	if p != nil {
 		o, err := p.GetTaskLogs(tasklog.Input{
-			PodName:         sj.Name,
-			Namespace:       sj.Namespace,
-			LogName:         "(Spark-Submit/All User Logs)",
-			TaskExecutionID: taskExecID,
+			PodName:              sj.Name,
+			Namespace:            sj.Namespace,
+			LogName:              "(Spark-Submit/All User Logs)",
+			PodRFC3339StartTime:  time.Unix(startTime, 0).Format(time.RFC3339),
+			PodRFC3339FinishTime: time.Unix(finishTime, 0).Format(time.RFC3339),
+			PodUnixStartTime:     startTime,
+			PodUnixFinishTime:    finishTime,
+			TaskExecutionID:      taskExecID,
 		})
 
 		if err != nil {
