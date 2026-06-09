@@ -28,6 +28,7 @@ import (
 
 const (
 	BlobstoreClientTracer = "blobstore-client"
+	FlytePropellerTracer  = "flytepropeller"
 	K8sClientTracer       = "k8s-client"
 )
 
