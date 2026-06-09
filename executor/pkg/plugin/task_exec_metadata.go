@@ -10,6 +10,7 @@ import (
 	"k8s.io/utils/ptr"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	executorconfig "github.com/flyteorg/flyte/v2/executor/pkg/config"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	flytesecret "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
@@ -58,6 +59,18 @@ type taskExecutionMetadata struct {
 	envVars         map[string]string
 	interruptible   bool
 	securityContext *core.SecurityContext
+	serviceAccount  string
+}
+
+// resolveServiceAccount returns the Kubernetes service account for the task pod:
+// the one set on the task's security context if present, otherwise the executor's
+// configured default (DefaultK8sServiceAccount). Empty leaves the pod on the
+// namespace `default` ServiceAccount. The proto getters are nil-safe.
+func resolveServiceAccount(securityContext *core.SecurityContext) string {
+	if sa := securityContext.GetRunAs().GetK8SServiceAccount(); sa != "" {
+		return sa
+	}
+	return executorconfig.GetConfig().DefaultK8sServiceAccount
 }
 
 // NewTaskExecutionMetadata creates a TaskExecutionMetadata from a TaskAction.
@@ -137,6 +150,7 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		envVars:         envVars,
 		interruptible:   ta.Spec.Interruptible != nil && *ta.Spec.Interruptible,
 		securityContext: securityContext,
+		serviceAccount:  resolveServiceAccount(securityContext),
 	}, nil
 }
 
@@ -229,7 +243,7 @@ func (m *taskExecutionMetadata) GetOwnerReference() metav1.OwnerReference   { re
 func (m *taskExecutionMetadata) GetLabels() map[string]string               { return m.labels }
 func (m *taskExecutionMetadata) GetAnnotations() map[string]string          { return m.annotations }
 func (m *taskExecutionMetadata) GetMaxAttempts() uint32                     { return m.maxAttempts }
-func (m *taskExecutionMetadata) GetK8sServiceAccount() string               { return "" }
+func (m *taskExecutionMetadata) GetK8sServiceAccount() string               { return m.serviceAccount }
 func (m *taskExecutionMetadata) IsInterruptible() bool                      { return m.interruptible }
 func (m *taskExecutionMetadata) GetInterruptibleFailureThreshold() int32    { return 0 }
 func (m *taskExecutionMetadata) GetEnvironmentVariables() map[string]string { return m.envVars }

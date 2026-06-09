@@ -10,6 +10,17 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
+func TestResolveServiceAccount(t *testing.T) {
+	// A service account set on the task's security context wins.
+	sc := &core.SecurityContext{RunAs: &core.Identity{K8SServiceAccount: "custom-sa"}}
+	require.Equal(t, "custom-sa", resolveServiceAccount(sc))
+
+	// With no run-specified account, it falls back to the executor config default
+	// (empty in tests, i.e. the namespace `default` ServiceAccount). Nil-safe.
+	require.Equal(t, "", resolveServiceAccount(nil))
+	require.Equal(t, "", resolveServiceAccount(&core.SecurityContext{}))
+}
+
 func TestNewTaskExecutionMetadata_UsesProjectedRunContext(t *testing.T) {
 	interruptible := true
 	taskAction := &flyteorgv1.TaskAction{
