@@ -87,7 +87,7 @@ type Config struct {
 	// MaxSystemFailures bounds consecutive system-level failures (Plugin.Handle Go
 	// errors and plugin-reported system-retryable failures) before a TaskAction is
 	// converted to a permanent failure.
-	MaxSystemFailures uint32 `json:"maxSystemFailures" pflag:",Max consecutive system-level failures before forcing permanent failure"`
+	MaxSystemFailures int32 `json:"maxSystemFailures" pflag:",Max consecutive system-level failures before forcing permanent failure"`
 
 	// GC configures the garbage collector for terminal TaskActions.
 	GC GCConfig `json:"gc" pflag:",Garbage collector configuration for terminal TaskActions"`
