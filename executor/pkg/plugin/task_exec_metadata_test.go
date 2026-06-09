@@ -7,32 +7,20 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
-	executorconfig "github.com/flyteorg/flyte/v2/executor/pkg/config"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 func TestResolveServiceAccount(t *testing.T) {
-	// A service account set on the task's security context always wins.
+	// A service account set on the task's security context always wins over the default.
 	sc := &core.SecurityContext{RunAs: &core.Identity{K8SServiceAccount: "custom-sa"}}
-	require.Equal(t, "custom-sa", resolveServiceAccount(sc))
+	require.Equal(t, "custom-sa", resolveServiceAccount(sc, "config-default-sa"))
 
-	// With no executor default and no run account, it resolves to empty (Kubernetes
-	// then uses the pod namespace's `default` ServiceAccount). Getters are nil-safe.
-	cfg := executorconfig.GetConfig()
-	prev := cfg.DefaultK8sServiceAccount
-	defer func() { cfg.DefaultK8sServiceAccount = prev }()
+	// With no run account, it falls back to the provided default. Getters are nil-safe.
+	require.Equal(t, "config-default-sa", resolveServiceAccount(nil, "config-default-sa"))
+	require.Equal(t, "config-default-sa", resolveServiceAccount(&core.SecurityContext{}, "config-default-sa"))
 
-	cfg.DefaultK8sServiceAccount = ""
-	require.Equal(t, "", resolveServiceAccount(nil))
-	require.Equal(t, "", resolveServiceAccount(&core.SecurityContext{}))
-
-	// When an executor default is configured, it is used as the fallback...
-	cfg.DefaultK8sServiceAccount = "config-default-sa"
-	require.Equal(t, "config-default-sa", resolveServiceAccount(nil))
-	require.Equal(t, "config-default-sa", resolveServiceAccount(&core.SecurityContext{}))
-
-	// ...but a run-specified account still takes precedence over it.
-	require.Equal(t, "custom-sa", resolveServiceAccount(sc))
+	// An empty default resolves to empty, so Kubernetes uses the pod namespace's `default`.
+	require.Equal(t, "", resolveServiceAccount(nil, ""))
 }
 
 func TestNewTaskExecutionMetadata_UsesProjectedRunContext(t *testing.T) {

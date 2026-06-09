@@ -62,11 +62,11 @@ type taskExecutionMetadata struct {
 	serviceAccount  string
 }
 
-func resolveServiceAccount(securityContext *core.SecurityContext) string {
+func resolveServiceAccount(securityContext *core.SecurityContext, defaultSA string) string {
 	if sa := securityContext.GetRunAs().GetK8SServiceAccount(); sa != "" {
 		return sa
 	}
-	return executorconfig.GetConfig().DefaultK8sServiceAccount
+	return defaultSA
 }
 
 // NewTaskExecutionMetadata creates a TaskExecutionMetadata from a TaskAction.
@@ -146,7 +146,7 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		envVars:         envVars,
 		interruptible:   ta.Spec.Interruptible != nil && *ta.Spec.Interruptible,
 		securityContext: securityContext,
-		serviceAccount:  resolveServiceAccount(securityContext),
+		serviceAccount:  resolveServiceAccount(securityContext, executorconfig.GetConfig().DefaultK8sServiceAccount),
 	}, nil
 }
 
