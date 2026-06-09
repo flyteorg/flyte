@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/common/list.proto.
  */
 export const file_flyteidl2_common_list: GenFile = /*@__PURE__*/
-  fileDesc("ChtmbHl0ZWlkbDIvY29tbW9uL2xpc3QucHJvdG8SEGZseXRlaWRsMi5jb21tb24idAoEU29ydBILCgNrZXkYASABKAkSMwoJZGlyZWN0aW9uGAIgASgOMiAuZmx5dGVpZGwyLmNvbW1vbi5Tb3J0LkRpcmVjdGlvbiIqCglEaXJlY3Rpb24SDgoKREVTQ0VORElORxAAEg0KCUFTQ0VORElORxABIsgBCgtMaXN0UmVxdWVzdBINCgVsaW1pdBgBIAEoDRINCgV0b2tlbhgCIAEoCRIrCgdzb3J0X2J5GAMgASgLMhYuZmx5dGVpZGwyLmNvbW1vbi5Tb3J0QgIYARIpCgdmaWx0ZXJzGAQgAygLMhguZmx5dGVpZGwyLmNvbW1vbi5GaWx0ZXISEwoLcmF3X2ZpbHRlcnMYBSADKAkSLgoOc29ydF9ieV9maWVsZHMYBiADKAsyFi5mbHl0ZWlkbDIuY29tbW9uLlNvcnQitAIKBkZpbHRlchIzCghmdW5jdGlvbhgBIAEoDjIhLmZseXRlaWRsMi5jb21tb24uRmlsdGVyLkZ1bmN0aW9uEg0KBWZpZWxkGAIgASgJEg4KBnZhbHVlcxgDIAMoCSLVAQoIRnVuY3Rpb24SCQoFRVFVQUwQABINCglOT1RfRVFVQUwQARIQCgxHUkVBVEVSX1RIQU4QAhIZChVHUkVBVEVSX1RIQU5fT1JfRVFVQUwQAxINCglMRVNTX1RIQU4QBBIWChJMRVNTX1RIQU5fT1JfRVFVQUwQBRIMCghDT05UQUlOUxAGEgwKCFZBTFVFX0lOEAcSDQoJRU5EU19XSVRIEAwSEQoNTk9UX0VORFNfV0lUSBANEh0KGUNPTlRBSU5TX0NBU0VfSU5TRU5TSVRJVkUQDkK6AQoUY29tLmZseXRlaWRsMi5jb21tb25CCUxpc3RQcm90b0gCUAFaNGdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9jb21tb26iAgNGQ1iqAhBGbHl0ZWlkbDIuQ29tbW9uygIQRmx5dGVpZGwyXENvbW1vbuICHEZseXRlaWRsMlxDb21tb25cR1BCTWV0YWRhdGHqAhFGbHl0ZWlkbDI6OkNvbW1vbmIGcHJvdG8z");
+  fileDesc("ChtmbHl0ZWlkbDIvY29tbW9uL2xpc3QucHJvdG8SEGZseXRlaWRsMi5jb21tb24idAoEU29ydBILCgNrZXkYASABKAkSMwoJZGlyZWN0aW9uGAIgASgOMiAuZmx5dGVpZGwyLmNvbW1vbi5Tb3J0LkRpcmVjdGlvbiIqCglEaXJlY3Rpb24SDgoKREVTQ0VORElORxAAEg0KCUFTQ0VORElORxABIsgBCgtMaXN0UmVxdWVzdBINCgVsaW1pdBgBIAEoDRINCgV0b2tlbhgCIAEoCRIrCgdzb3J0X2J5GAMgASgLMhYuZmx5dGVpZGwyLmNvbW1vbi5Tb3J0QgIYARIpCgdmaWx0ZXJzGAQgAygLMhguZmx5dGVpZGwyLmNvbW1vbi5GaWx0ZXISEwoLcmF3X2ZpbHRlcnMYBSADKAkSLgoOc29ydF9ieV9maWVsZHMYBiADKAsyFi5mbHl0ZWlkbDIuY29tbW9uLlNvcnQi4gIKBkZpbHRlchIzCghmdW5jdGlvbhgBIAEoDjIhLmZseXRlaWRsMi5jb21tb24uRmlsdGVyLkZ1bmN0aW9uEg0KBWZpZWxkGAIgASgJEg4KBnZhbHVlcxgDIAMoCSKDAgoIRnVuY3Rpb24SCQoFRVFVQUwQABINCglOT1RfRVFVQUwQARIQCgxHUkVBVEVSX1RIQU4QAhIZChVHUkVBVEVSX1RIQU5fT1JfRVFVQUwQAxINCglMRVNTX1RIQU4QBBIWChJMRVNTX1RIQU5fT1JfRVFVQUwQBRIMCghDT05UQUlOUxAGEgwKCFZBTFVFX0lOEAcSEAoMVkFMVUVfTk9UX0lOEAkSDQoJRU5EU19XSVRIEAwSEQoNTk9UX0VORFNfV0lUSBANEh0KGUNPTlRBSU5TX0NBU0VfSU5TRU5TSVRJVkUQDhIKCgZFWElTVFMQDxIOCgpOT1RfRVhJU1RTEBBCugEKFGNvbS5mbHl0ZWlkbDIuY29tbW9uQglMaXN0UHJvdG9IAlABWjRnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvY29tbW9uogIDRkNYqgIQRmx5dGVpZGwyLkNvbW1vbsoCEEZseXRlaWRsMlxDb21tb27iAhxGbHl0ZWlkbDJcQ29tbW9uXEdQQk1ldGFkYXRh6gIRRmx5dGVpZGwyOjpDb21tb25iBnByb3RvMw");
 
 /**
  * Specifies sort ordering in a list request.
@@ -146,7 +146,7 @@ export type Filter = Message<"flyteidl2.common.Filter"> & {
   field: string;
 
   /**
-   * Only in the case of a VALUE_IN function, values may contain multiple entries.
+   * Only in the case of a VALUE_IN or VALUE_NOT_IN functions, values may contain multiple entries.
    *
    * @generated from field: repeated string values = 3;
    */
@@ -207,6 +207,16 @@ export enum Filter_Function {
   VALUE_IN = 7,
 
   /**
+   * NOT_CONTAINS = 8;
+   *
+   * STARTS_WITH = 10;
+   * NOT_STARTS_WITH = 11;
+   *
+   * @generated from enum value: VALUE_NOT_IN = 9;
+   */
+  VALUE_NOT_IN = 9,
+
+  /**
    * @generated from enum value: ENDS_WITH = 12;
    */
   ENDS_WITH = 12,
@@ -222,6 +232,16 @@ export enum Filter_Function {
    * @generated from enum value: CONTAINS_CASE_INSENSITIVE = 14;
    */
   CONTAINS_CASE_INSENSITIVE = 14,
+
+  /**
+   * @generated from enum value: EXISTS = 15;
+   */
+  EXISTS = 15,
+
+  /**
+   * @generated from enum value: NOT_EXISTS = 16;
+   */
+  NOT_EXISTS = 16,
 }
 
 /**

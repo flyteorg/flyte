@@ -48,9 +48,12 @@ class Filter(_message.Message):
         LESS_THAN_OR_EQUAL: _ClassVar[Filter.Function]
         CONTAINS: _ClassVar[Filter.Function]
         VALUE_IN: _ClassVar[Filter.Function]
+        VALUE_NOT_IN: _ClassVar[Filter.Function]
         ENDS_WITH: _ClassVar[Filter.Function]
         NOT_ENDS_WITH: _ClassVar[Filter.Function]
         CONTAINS_CASE_INSENSITIVE: _ClassVar[Filter.Function]
+        EXISTS: _ClassVar[Filter.Function]
+        NOT_EXISTS: _ClassVar[Filter.Function]
     EQUAL: Filter.Function
     NOT_EQUAL: Filter.Function
     GREATER_THAN: Filter.Function
@@ -59,9 +62,12 @@ class Filter(_message.Message):
     LESS_THAN_OR_EQUAL: Filter.Function
     CONTAINS: Filter.Function
     VALUE_IN: Filter.Function
+    VALUE_NOT_IN: Filter.Function
     ENDS_WITH: Filter.Function
     NOT_ENDS_WITH: Filter.Function
     CONTAINS_CASE_INSENSITIVE: Filter.Function
+    EXISTS: Filter.Function
+    NOT_EXISTS: Filter.Function
     FUNCTION_FIELD_NUMBER: _ClassVar[int]
     FIELD_FIELD_NUMBER: _ClassVar[int]
     VALUES_FIELD_NUMBER: _ClassVar[int]
