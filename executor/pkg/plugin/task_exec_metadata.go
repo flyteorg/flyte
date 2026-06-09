@@ -62,11 +62,6 @@ type taskExecutionMetadata struct {
 	serviceAccount  string
 }
 
-// resolveServiceAccount returns the Kubernetes service account for the task pod:
-// the one set on the task's security context if present, otherwise the executor's
-// configured default (DefaultK8sServiceAccount). Empty means no account is set, so
-// Kubernetes assigns the `default` ServiceAccount of the pod's own namespace. The
-// proto getters are nil-safe.
 func resolveServiceAccount(securityContext *core.SecurityContext) string {
 	if sa := securityContext.GetRunAs().GetK8SServiceAccount(); sa != "" {
 		return sa
