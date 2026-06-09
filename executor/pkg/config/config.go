@@ -80,8 +80,8 @@ type Config struct {
 	Cluster string `json:"cluster" pflag:",Cluster identifier for action events"`
 
 	// DefaultK8sServiceAccount is assigned to task pods when the task's security
-	// context does not specify one. Empty leaves the pod on the namespace's
-	// `default` ServiceAccount.
+	// context does not specify one. Empty means no account is set, so Kubernetes
+	// assigns the `default` ServiceAccount of the pod's own namespace.
 	DefaultK8sServiceAccount string `json:"defaultK8sServiceAccount" pflag:",Default Kubernetes service account for task pods when the task does not set one"`
 
 	// MaxSystemFailures bounds consecutive system-level failures (Plugin.Handle Go

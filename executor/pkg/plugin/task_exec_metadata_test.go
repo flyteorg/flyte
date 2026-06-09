@@ -7,18 +7,32 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	executorconfig "github.com/flyteorg/flyte/v2/executor/pkg/config"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 func TestResolveServiceAccount(t *testing.T) {
-	// A service account set on the task's security context wins.
+	// A service account set on the task's security context always wins.
 	sc := &core.SecurityContext{RunAs: &core.Identity{K8SServiceAccount: "custom-sa"}}
 	require.Equal(t, "custom-sa", resolveServiceAccount(sc))
 
-	// With no run-specified account, it falls back to the executor config default
-	// (empty in tests, i.e. the namespace `default` ServiceAccount). Nil-safe.
+	// With no executor default and no run account, it resolves to empty (Kubernetes
+	// then uses the pod namespace's `default` ServiceAccount). Getters are nil-safe.
+	cfg := executorconfig.GetConfig()
+	prev := cfg.DefaultK8sServiceAccount
+	defer func() { cfg.DefaultK8sServiceAccount = prev }()
+
+	cfg.DefaultK8sServiceAccount = ""
 	require.Equal(t, "", resolveServiceAccount(nil))
 	require.Equal(t, "", resolveServiceAccount(&core.SecurityContext{}))
+
+	// When an executor default is configured, it is used as the fallback...
+	cfg.DefaultK8sServiceAccount = "config-default-sa"
+	require.Equal(t, "config-default-sa", resolveServiceAccount(nil))
+	require.Equal(t, "config-default-sa", resolveServiceAccount(&core.SecurityContext{}))
+
+	// ...but a run-specified account still takes precedence over it.
+	require.Equal(t, "custom-sa", resolveServiceAccount(sc))
 }
 
 func TestNewTaskExecutionMetadata_UsesProjectedRunContext(t *testing.T) {

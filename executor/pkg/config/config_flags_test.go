@@ -281,6 +281,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_defaultK8sServiceAccount", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("defaultK8sServiceAccount", testValue)
+			if vString, err := cmdFlags.GetString("defaultK8sServiceAccount"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DefaultK8sServiceAccount)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_gc.interval", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
