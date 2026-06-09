@@ -460,6 +460,23 @@ serviceAccount:
   # imagePullSecrets Secrets to use for fetching images from private registries
   imagePullSecrets: []
 
+# taskServiceAccount Configure the ServiceAccount that task pods run as.
+# The executor launches task pods with an empty service account name, so they
+# use the namespace `default` ServiceAccount. Enable this to manage that
+# ServiceAccount's annotations — e.g. an IRSA `eks.amazonaws.com/role-arn` so
+# task pods get cloud credentials (S3, etc.).
+taskServiceAccount:
+  # create Manage the task ServiceAccount (annotate the default SA)
+  create: false
+  # name Name of the task ServiceAccount (task pods use `default`)
+  name: default
+  # namespace Namespace of the task ServiceAccount (defaults to the release namespace)
+  namespace: ""
+  # labels Add labels to the task ServiceAccount
+  labels: {}
+  # annotations Add annotations to the task ServiceAccount (e.g. IRSA role-arn)
+  annotations: {}
+
 # flyteconnector Configure Flyte Connector objects
 flyteconnector:
   # enable Flag to enable bundled Flyte Connector
