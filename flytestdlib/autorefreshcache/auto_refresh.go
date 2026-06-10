@@ -283,7 +283,7 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 	for _, batch := range batches {
 		b := batch
 		w.workqueue.AddRateLimited(&b)
-		for i := 1; i < len(b); i++ {
+		for i := 0; i < len(b); i++ {
 			w.processing.Store(b[i].GetID(), w.clock.Now())
 		}
 	}

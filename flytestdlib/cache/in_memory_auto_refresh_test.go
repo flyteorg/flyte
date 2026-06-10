@@ -342,3 +342,20 @@ func TestInProcessing(t *testing.T) {
 	_, found := cache.processing.Load("test1")
 	assert.False(t, found)
 }
+
+// Regression: enqueueBatches marked only b[1:] as processing, skipping the batch
+// head b[0]. With the default SingleItemBatches every batch holds one item, so
+// nothing was ever marked and each resync re-enqueued items already in flight.
+func TestEnqueueBatches_MarksSingleItemBatchHead(t *testing.T) {
+	rateLimiter := workqueue.DefaultControllerRateLimiter()
+	fakeClock := testingclock.NewFakeClock(time.Now())
+	cache, err := NewInMemoryAutoRefresh("head", syncFakeItem, rateLimiter, 5*time.Second, 10, 10,
+		promutils.NewTestScope(), WithClock(fakeClock), WithSyncOnCreate(false))
+	assert.NoError(t, err)
+
+	_, err = cache.GetOrCreate("item-1", fakeCacheItem{val: 1})
+	assert.NoError(t, err)
+
+	assert.NoError(t, cache.enqueueBatches(context.Background()))
+	assert.True(t, cache.inProcessing("item-1"), "single-item batch head must be marked processing after enqueue")
+}
