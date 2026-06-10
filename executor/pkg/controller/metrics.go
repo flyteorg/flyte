@@ -37,6 +37,9 @@ type taskActionMetrics struct {
 // provider (the executor's, registered in executor/setup.go). The active-by-phase
 // gauge is observed asynchronously by listing TaskActions from the controller cache.
 func registerTaskActionMetrics(provider metric.MeterProvider, c client.Client) (*taskActionMetrics, error) {
+	if _, ok := provider.(metricnoop.MeterProvider); ok {
+		return nil, nil
+	}
 	meter := provider.Meter(taskActionMeterName)
 
 	crdSize, err := meter.Int64Histogram(
@@ -66,9 +69,13 @@ func registerTaskActionMetrics(provider metric.MeterProvider, c client.Client) (
 	}
 
 	_, err = meter.RegisterCallback(func(ctx context.Context, o metric.Observer) error {
+		if c == nil {
+			return nil
+		}
 		var list flyteorgv1.TaskActionList
 		if err := c.List(ctx, &list); err != nil {
-			return err
+			// Avoid failing the entire metrics collection cycle when the cache/API is temporarily unavailable.
+			return nil
 		}
 		counts := make(map[string]int64, 8)
 		for i := range list.Items {
