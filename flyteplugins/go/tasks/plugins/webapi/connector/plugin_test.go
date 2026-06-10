@@ -397,3 +397,25 @@ func TestResourceWrapper_IsTerminal(t *testing.T) {
 		})
 	}
 }
+
+func TestSetSupportedTaskType(t *testing.T) {
+	ctx := context.TODO()
+	svc := &ConnectorService{}
+
+	svc.SetSupportedTaskType(ctx, []string{"snowflake", "bigquery", "snowflake"})
+	assert.True(t, svc.ContainTaskType("snowflake"))
+	assert.True(t, svc.ContainTaskType("bigquery"))
+	assert.False(t, svc.ContainTaskType("databricks"))
+	assert.Equal(t, []string{"bigquery", "snowflake"}, svc.supportedTaskTypes)
+
+	// same set in a different order with duplicates normalizes to the same value
+	svc.SetSupportedTaskType(ctx, []string{"bigquery", "snowflake", "bigquery"})
+	assert.Equal(t, []string{"bigquery", "snowflake"}, svc.supportedTaskTypes)
+
+	svc.SetSupportedTaskType(ctx, []string{"bigquery"})
+	assert.False(t, svc.ContainTaskType("snowflake"))
+	assert.True(t, svc.ContainTaskType("bigquery"))
+
+	svc.SetSupportedTaskType(ctx, nil)
+	assert.False(t, svc.ContainTaskType("bigquery"))
+}

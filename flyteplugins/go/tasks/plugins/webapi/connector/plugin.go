@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"slices"
+	"strings"
 	"sync"
 	"time"
 
@@ -47,10 +48,16 @@ func (p *ConnectorService) ContainTaskType(taskType string) bool {
 }
 
 // SetSupportedTaskType set supportTaskType in the connector service.
-func (p *ConnectorService) SetSupportedTaskType(taskTypes []string) {
+func (p *ConnectorService) SetSupportedTaskType(ctx context.Context, taskTypes []string) {
+	normalized := slices.Compact(slices.Sorted(slices.Values(taskTypes)))
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	p.supportedTaskTypes = taskTypes
+	// Log the supported task types only when the set changes, to avoid
+	// re-logging the identical registry on every poll interval.
+	if !slices.Equal(normalized, p.supportedTaskTypes) {
+		logger.Infof(ctx, "ConnectorDeployments support the following task types: [%v]", strings.Join(normalized, ", "))
+	}
+	p.supportedTaskTypes = normalized
 }
 
 type RegistryKey struct {
@@ -389,7 +396,7 @@ func (p *Plugin) watchConnectors(ctx context.Context, connectorService *Connecto
 		clientSet := getConnectorClientSets(childCtx)
 		connectorRegistry := getConnectorRegistry(childCtx, clientSet)
 		p.setRegistry(connectorRegistry)
-		connectorService.SetSupportedTaskType(connectorRegistry.getSupportedTaskTypes())
+		connectorService.SetSupportedTaskType(childCtx, connectorRegistry.getSupportedTaskTypes())
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
@@ -479,8 +486,7 @@ func newConnectorPlugin(connectorService *ConnectorService) webapi.PluginEntry {
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			clientSet := getConnectorClientSets(ctx)
 			connectorRegistry := getConnectorRegistry(ctx, clientSet)
-			supportedTaskTypes := connectorRegistry.getSupportedTaskTypes()
-			connectorService.SetSupportedTaskType(supportedTaskTypes)
+			connectorService.SetSupportedTaskType(ctx, connectorRegistry.getSupportedTaskTypes())
 			plugin := &Plugin{
 				metricScope: promutils.NewScope("connector_plugin"),
 				cfg:         cfg,

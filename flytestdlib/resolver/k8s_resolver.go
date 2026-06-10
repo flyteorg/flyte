@@ -131,7 +131,7 @@ func (k *kResolver) ResolveNow(resolver.ResolveNowOptions) {}
 func (k *kResolver) Close() {
 	k.cancel()
 	k.wg.Wait()
-	logger.Infof(k.ctx, "k8s resolver: closed")
+	logger.Debugf(k.ctx, "k8s resolver: closed")
 }
 
 func (k *kResolver) resolve(e *v1.Endpoints) {
@@ -157,7 +157,7 @@ func (k *kResolver) run() {
 	k.wg.Add(1)
 	defer k.wg.Done()
 
-	logger.Infof(k.ctx, "Starting k8s resolver for target: [%s], service namespace: [%s], service name: [%s]", k.target, k.target.serviceNamespace, k.target.serviceName)
+	logger.Debugf(k.ctx, "Starting k8s resolver for target: [%s], service namespace: [%s], service name: [%s]", k.target, k.target.serviceNamespace, k.target.serviceName)
 
 	watcher, err := k.k8sClient.CoreV1().Endpoints(k.target.serviceNamespace).Watch(k.ctx, metav1.ListOptions{FieldSelector: "metadata.name=" + k.target.serviceName})
 	if err != nil {
@@ -181,7 +181,7 @@ func (k *kResolver) run() {
 		case <-k.ctx.Done():
 			return
 		case event, ok := <-watcher.ResultChan():
-			logger.Info(k.ctx, "k8s resolver watcher event response: [%v]", event)
+			logger.Debugf(k.ctx, "k8s resolver watcher event: [%s]", event.Type)
 			if !ok {
 				logger.Debugf(k.ctx, "k8s resolver: watcher closed")
 				return

@@ -334,7 +334,7 @@ func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.
 		SanitizeGPUResourceRequirements(overrideResources, extendedResources.GetGpuAccelerator())
 	}
 
-	logger.Infof(ctx, "ApplyResourceOverrides with Resources [%v], Platform Resources [%v] and Container"+
+	logger.Debugf(ctx, "ApplyResourceOverrides with Resources [%v], Platform Resources [%v] and Container"+
 		" Resources [%v] with mode [%v]", overrideResources, platformResources, container.Resources, mode)
 
 	switch mode {
@@ -353,6 +353,6 @@ func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.
 		container.Resources = ApplyResourceOverrides(container.Resources, *platformResources, !assignIfUnset)
 	}
 
-	logger.Infof(ctx, "Adjusted container resources [%v]", container.Resources)
+	logger.Debugf(ctx, "Adjusted container resources [%v]", container.Resources)
 	return nil
 }
