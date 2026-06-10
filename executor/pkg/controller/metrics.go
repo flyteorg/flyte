@@ -10,10 +10,16 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
-	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 )
 
 const taskActionMeterName = "taskaction-controller"
+
+// Values for the "op" attribute on taskaction.k8s.duration.
+const (
+	opGet          = "get"
+	opUpdate       = "update"
+	opStatusUpdate = "status_update"
+)
 
 // taskActionMetrics holds OTel instruments for the TaskAction controller.
 //
@@ -27,11 +33,11 @@ type taskActionMetrics struct {
 	crdOpDuration metric.Float64Histogram
 }
 
-// registerTaskActionMetrics wires the TaskAction OTel meters onto the "executor"
-// meter provider (registered in executor/setup.go). The active-by-phase gauge is
-// observed asynchronously by listing TaskActions from the controller cache.
-func registerTaskActionMetrics(c client.Client) (*taskActionMetrics, error) {
-	meter := otelutils.GetMeterProvider("executor").Meter(taskActionMeterName)
+// registerTaskActionMetrics wires the TaskAction OTel meters onto the given meter
+// provider (the executor's, registered in executor/setup.go). The active-by-phase
+// gauge is observed asynchronously by listing TaskActions from the controller cache.
+func registerTaskActionMetrics(provider metric.MeterProvider, c client.Client) (*taskActionMetrics, error) {
+	meter := provider.Meter(taskActionMeterName)
 
 	crdSize, err := meter.Int64Histogram(
 		"taskaction.crd.size_bytes",
