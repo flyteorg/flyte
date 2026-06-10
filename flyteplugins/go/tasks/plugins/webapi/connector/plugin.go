@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"slices"
+	"strings"
 	"sync"
 	"time"
 
@@ -383,13 +384,23 @@ func (p *Plugin) getAsyncConnectorClient(ctx context.Context, connector *Deploym
 }
 
 func (p *Plugin) watchConnectors(ctx context.Context, connectorService *ConnectorService) {
+	var lastSupported []string
 	go wait.Until(func() {
 		childCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
 		clientSet := getConnectorClientSets(childCtx)
 		connectorRegistry := getConnectorRegistry(childCtx, clientSet)
 		p.setRegistry(connectorRegistry)
-		connectorService.SetSupportedTaskType(connectorRegistry.getSupportedTaskTypes())
+		supported := connectorRegistry.getSupportedTaskTypes()
+		connectorService.SetSupportedTaskType(supported)
+
+		// Log the supported task types only when the set changes, to avoid
+		// re-logging the identical registry on every poll interval.
+		normalized := slices.Compact(slices.Sorted(slices.Values(supported)))
+		if !slices.Equal(normalized, lastSupported) {
+			logger.Infof(childCtx, "ConnectorDeployments support the following task types: [%v]", strings.Join(normalized, ", "))
+			lastSupported = normalized
+		}
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
