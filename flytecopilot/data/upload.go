@@ -8,6 +8,7 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"strings"
 
 	"github.com/golang/protobuf/proto" //nolint: staticcheck
 	"github.com/pkg/errors"
@@ -68,18 +69,22 @@ func (u Uploader) handleBlobType(ctx context.Context, localPath string, toPath s
 				return err
 			}
 			if info.IsDir() {
-				logger.Warnf(ctx, "Currently nested directories are not supported in multipart blob uploads, for directory @ %s", path)
-			} else {
-				ref, err := u.store.ConstructReference(ctx, toPath, info.Name())
-				if err != nil {
-					return err
-				}
-				files = append(files, dirFile{
-					path: path,
-					info: info,
-					ref:  ref,
-				})
+				return nil
 			}
+			rel, err := filepath.Rel(localPath, path)
+			if err != nil {
+				return err
+			}
+			keys := strings.Split(filepath.ToSlash(rel), "/")
+			ref, err := u.store.ConstructReference(ctx, toPath, keys...)
+			if err != nil {
+				return err
+			}
+			files = append(files, dirFile{
+				path: path,
+				info: info,
+				ref:  ref,
+			})
 			return nil
 		})
 		if err != nil {
