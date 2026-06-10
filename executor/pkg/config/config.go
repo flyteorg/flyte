@@ -79,10 +79,15 @@ type Config struct {
 	// Cluster is the cluster identifier attached to action events.
 	Cluster string `json:"cluster" pflag:",Cluster identifier for action events"`
 
+	// DefaultK8sServiceAccount is assigned to task pods when the task's security
+	// context does not specify one. Empty means no account is set, so Kubernetes
+	// assigns the `default` ServiceAccount of the pod's own namespace.
+	DefaultK8sServiceAccount string `json:"defaultK8sServiceAccount" pflag:",Default Kubernetes service account for task pods when the task does not set one"`
+
 	// MaxSystemFailures bounds consecutive system-level failures (Plugin.Handle Go
 	// errors and plugin-reported system-retryable failures) before a TaskAction is
 	// converted to a permanent failure.
-	MaxSystemFailures uint32 `json:"maxSystemFailures" pflag:",Max consecutive system-level failures before forcing permanent failure"`
+	MaxSystemFailures int32 `json:"maxSystemFailures" pflag:",Max consecutive system-level failures before forcing permanent failure"`
 
 	// GC configures the garbage collector for terminal TaskActions.
 	GC GCConfig `json:"gc" pflag:",Garbage collector configuration for terminal TaskActions"`

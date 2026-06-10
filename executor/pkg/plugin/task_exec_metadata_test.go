@@ -10,6 +10,19 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
+func TestResolveServiceAccount(t *testing.T) {
+	// A service account set on the task's security context always wins over the default.
+	sc := &core.SecurityContext{RunAs: &core.Identity{K8SServiceAccount: "custom-sa"}}
+	require.Equal(t, "custom-sa", resolveServiceAccount(sc, "config-default-sa"))
+
+	// With no run account, it falls back to the provided default. Getters are nil-safe.
+	require.Equal(t, "config-default-sa", resolveServiceAccount(nil, "config-default-sa"))
+	require.Equal(t, "config-default-sa", resolveServiceAccount(&core.SecurityContext{}, "config-default-sa"))
+
+	// An empty default resolves to empty, so Kubernetes uses the pod namespace's `default`.
+	require.Equal(t, "", resolveServiceAccount(nil, ""))
+}
+
 func TestNewTaskExecutionMetadata_UsesProjectedRunContext(t *testing.T) {
 	interruptible := true
 	taskAction := &flyteorgv1.TaskAction{

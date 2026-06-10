@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mitchellh/mapstructure"
+	"github.com/go-viper/mapstructure/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -267,6 +267,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_cacheServiceURL", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("cacheServiceURL", testValue)
+			if vString, err := cmdFlags.GetString("cacheServiceURL"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.CacheServiceURL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_cluster", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -275,6 +289,34 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("cluster", testValue)
 			if vString, err := cmdFlags.GetString("cluster"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Cluster)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_defaultK8sServiceAccount", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("defaultK8sServiceAccount", testValue)
+			if vString, err := cmdFlags.GetString("defaultK8sServiceAccount"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DefaultK8sServiceAccount)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_maxSystemFailures", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("maxSystemFailures", testValue)
+			if vInt32, err := cmdFlags.GetInt32("maxSystemFailures"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt32), &actual.MaxSystemFailures)
 
 			} else {
 				assert.FailNow(t, err.Error())
