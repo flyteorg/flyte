@@ -100,6 +100,7 @@ func registerTaskActionMetrics(provider metric.MeterProvider, c client.Client) (
 
 // observeCRDSize records the serialized size of a TaskAction CRD. No-op when
 // custom metrics are disabled (m == nil).
+func (m *taskActionMetrics) observeCRDSize(ctx context.Context, ta *flyteorgv1.TaskAction) {
 	if m == nil || m.crdSizeBytes == nil {
 		return
 	}
