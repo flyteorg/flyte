@@ -93,9 +93,24 @@ func Render(ctx context.Context, inputTemplate []string, params Parameters) ([]s
 	if params.Inputs == nil || params.OutputPath == nil {
 		return nil, fmt.Errorf("input reader and output path cannot be nil")
 	}
+
+	prevCheckpoint := params.OutputPath.GetPreviousCheckpointsPrefix().String()
+	if prevCheckpoint == "" {
+		prevCheckpoint = "\"\""
+	}
+	values := replacementValues{
+		inputFile:              params.Inputs.GetInputPath().String(),
+		inputPrefix:            params.Inputs.GetInputPrefixPath().String(),
+		outputPrefix:           params.OutputPath.GetOutputPrefixPath().String(),
+		rawOutputDataPrefix:    params.OutputPath.GetRawOutputPrefix().String(),
+		prevCheckpointPrefix:   prevCheckpoint,
+		checkpointOutputPrefix: params.OutputPath.GetCheckpointPrefix().String(),
+		perRetryUniqueKey:      perRetryUniqueKey,
+	}
+
 	res := make([]string, 0, len(inputTemplate))
 	for _, t := range inputTemplate {
-		updated, err := render(ctx, t, params, perRetryUniqueKey)
+		updated, err := render(ctx, t, params, values)
 		if err != nil {
 			return res, err
 		}
@@ -106,19 +121,27 @@ func Render(ctx context.Context, inputTemplate []string, params Parameters) ([]s
 	return res, nil
 }
 
-func render(ctx context.Context, inputTemplate string, params Parameters, perRetryKey string) (string, error) {
+// replacementValues holds the replacement values that are identical for every string of a single
+// Render call, so they are computed once per call rather than once per rendered string.
+type replacementValues struct {
+	inputFile              string
+	inputPrefix            string
+	outputPrefix           string
+	rawOutputDataPrefix    string
+	prevCheckpointPrefix   string
+	checkpointOutputPrefix string
+	perRetryUniqueKey      string
+}
 
-	val := inputFileRegex.ReplaceAllString(inputTemplate, params.Inputs.GetInputPath().String())
-	val = outputRegex.ReplaceAllString(val, params.OutputPath.GetOutputPrefixPath().String())
-	val = inputPrefixRegex.ReplaceAllString(val, params.Inputs.GetInputPrefixPath().String())
-	val = rawOutputDataPrefixRegex.ReplaceAllString(val, params.OutputPath.GetRawOutputPrefix().String())
-	prevCheckpoint := params.OutputPath.GetPreviousCheckpointsPrefix().String()
-	if prevCheckpoint == "" {
-		prevCheckpoint = "\"\""
-	}
-	val = prevCheckpointPrefixRegex.ReplaceAllString(val, prevCheckpoint)
-	val = currCheckpointPrefixRegex.ReplaceAllString(val, params.OutputPath.GetCheckpointPrefix().String())
-	val = perRetryUniqueKey.ReplaceAllString(val, perRetryKey)
+func render(ctx context.Context, inputTemplate string, params Parameters, values replacementValues) (string, error) {
+
+	val := inputFileRegex.ReplaceAllString(inputTemplate, values.inputFile)
+	val = outputRegex.ReplaceAllString(val, values.outputPrefix)
+	val = inputPrefixRegex.ReplaceAllString(val, values.inputPrefix)
+	val = rawOutputDataPrefixRegex.ReplaceAllString(val, values.rawOutputDataPrefix)
+	val = prevCheckpointPrefixRegex.ReplaceAllString(val, values.prevCheckpointPrefix)
+	val = currCheckpointPrefixRegex.ReplaceAllString(val, values.checkpointOutputPrefix)
+	val = perRetryUniqueKey.ReplaceAllString(val, values.perRetryUniqueKey)
 
 	// For Task template, we will replace only if there is a match. This is because, task template replacement
 	// may be expensive, as we may offload
