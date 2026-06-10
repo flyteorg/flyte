@@ -189,8 +189,6 @@ func (r *RedisOptions) GetOptions(ctx context.Context, secretManager SecretManag
 		r.Password = password
 	}
 
-	// Allow config-driven TLS: when UseTLS is set (and no explicit TLSConfig was
-	// provided) negotiate TLS using the system certificate pool.
 	tlsConfig := r.TLSConfig
 	if tlsConfig == nil && r.UseTLS {
 		tlsConfig = &tls.Config{
