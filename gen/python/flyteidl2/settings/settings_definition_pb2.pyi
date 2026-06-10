@@ -118,10 +118,12 @@ class QuantitySetting(_message.Message):
     def __init__(self, state: _Optional[_Union[SettingState, str]] = ..., quantity_value: _Optional[str] = ..., scope_level: _Optional[_Union[ScopeLevel, str]] = ...) -> None: ...
 
 class RunSettings(_message.Message):
-    __slots__ = ["default_queue"]
+    __slots__ = ["default_queue", "max_action_concurrency"]
     DEFAULT_QUEUE_FIELD_NUMBER: _ClassVar[int]
+    MAX_ACTION_CONCURRENCY_FIELD_NUMBER: _ClassVar[int]
     default_queue: StringSetting
-    def __init__(self, default_queue: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
+    max_action_concurrency: Int64Setting
+    def __init__(self, default_queue: _Optional[_Union[StringSetting, _Mapping]] = ..., max_action_concurrency: _Optional[_Union[Int64Setting, _Mapping]] = ...) -> None: ...
 
 class SecuritySettings(_message.Message):
     __slots__ = ["service_account"]
