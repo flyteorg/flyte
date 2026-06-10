@@ -111,6 +111,12 @@ message RunSpec {
   // flyte.ctx().run_start_time (SDK >= 2.3.6). Older task templates omit the placeholder, so
   // the substitution is a harmless no-op for them.
   google.protobuf.Timestamp run_start_time = 12;
+
+  // Maximum number of actions of this run that may execute concurrently.
+  // 0 (unset) means unlimited. Enforced by the scheduler in addition to any
+  // queue-level concurrency limits (min wins): actions beyond the limit stay
+  // queued until a running action of this run completes.
+  uint32 max_action_concurrency = 13;
 }
 
 message InlineRuleList {
