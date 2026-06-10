@@ -7,6 +7,7 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
+	metricnoop "go.opentelemetry.io/otel/metric/noop"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
