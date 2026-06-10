@@ -41,18 +41,32 @@ func applyDefaultHeaders(r *http.Request, headers map[string][]string) {
 }
 
 func createHTTPClient(cfg HTTPClientConfig) *http.Client {
-	c := &http.Client{
-		Timeout: cfg.Timeout.Duration,
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	if cfg.MaxIdleConns > 0 {
+		transport.MaxIdleConns = cfg.MaxIdleConns
+	}
+	if cfg.MaxIdleConnsPerHost > 0 {
+		transport.MaxIdleConnsPerHost = cfg.MaxIdleConnsPerHost
+	}
+	if cfg.MaxConnsPerHost > 0 {
+		transport.MaxConnsPerHost = cfg.MaxConnsPerHost
+	}
+	if cfg.IdleConnTimeout.Duration > 0 {
+		transport.IdleConnTimeout = cfg.IdleConnTimeout.Duration
 	}
 
+	var rt http.RoundTripper = transport
 	if len(cfg.Headers) > 0 {
-		c.Transport = &proxyTransport{
-			RoundTripper:   http.DefaultTransport,
+		rt = &proxyTransport{
+			RoundTripper:   transport,
 			defaultHeaders: cfg.Headers,
 		}
 	}
 
-	return c
+	return &http.Client{
+		Timeout:   cfg.Timeout.Duration,
+		Transport: rt,
+	}
 }
 
 type dataStoreMetrics struct {

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"time"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -39,6 +40,11 @@ var (
 			Region:   "us-east-1",
 			AuthType: "iam",
 		},
+		DefaultHTTPClient: HTTPClientConfig{
+			MaxIdleConns:        1024,
+			MaxIdleConnsPerHost: 1024,
+			IdleConnTimeout:     config.Duration{Duration: 90 * time.Second},
+		},
 		MultiContainerEnabled: false,
 	}
 )
@@ -74,6 +80,11 @@ type SignedURLConfig struct {
 type HTTPClientConfig struct {
 	Headers map[string][]string `json:"headers" pflag:"-,Sets http headers to set on the http client."`
 	Timeout config.Duration     `json:"timeout" pflag:",Sets time out on the http client."`
+	// Zero values for the transport settings below fall back to the http.DefaultTransport values.
+	MaxIdleConns        int             `json:"maxIdleConns" pflag:",Maximum number of idle connections across all hosts. Zero means use the http.DefaultTransport value."`
+	MaxIdleConnsPerHost int             `json:"maxIdleConnsPerHost" pflag:",Maximum number of idle connections per host. Zero means use the http.DefaultTransport value."`
+	MaxConnsPerHost     int             `json:"maxConnsPerHost" pflag:",Maximum number of connections per host; new requests block at the limit. Zero means no limit."`
+	IdleConnTimeout     config.Duration `json:"idleConnTimeout" pflag:",Maximum amount of time an idle connection remains open. Zero means use the http.DefaultTransport value."`
 }
 
 // ConnectionConfig defines connection configurations.
