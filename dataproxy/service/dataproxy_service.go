@@ -483,6 +483,28 @@ func (s *Service) GetActionData(
 		return nil, err
 	}
 
+	// Condition actions carry their inputs/outputs inline (the ConditionAction
+	// spec on RunInfo and the signal Literal on RunInfo.Output) rather than
+	// materialising inputs.pb / outputs.pb to object storage. RunService
+	// signals this by returning both URIs empty; fall back to RunService's
+	// GetActionData, which returns the inline literals directly.
+	if urisResp.Msg.GetInputsUri() == "" && urisResp.Msg.GetOutputsUri() == "" {
+		logger.Debugf(ctx, "GetActionData: both URIs empty for action %s, falling back to RunService.GetActionData for inline literals", actionId.String())
+		//nolint:staticcheck // RunService.GetActionData is deprecated in favour of
+		// DataProxyService.GetActionData (this method) — but calling ourselves would
+		// loop, so we must reach into the run service for the inline literal.
+		dataResp, err := s.runClient.GetActionData(ctx, connect.NewRequest(&workflow.GetActionDataRequest{
+			ActionId: actionId,
+		}))
+		if err != nil {
+			return nil, err
+		}
+		return connect.NewResponse(&dataproxy.GetActionDataResponse{
+			Inputs:  dataResp.Msg.GetInputs(),
+			Outputs: dataResp.Msg.GetOutputs(),
+		}), nil
+	}
+
 	resp := &dataproxy.GetActionDataResponse{
 		Inputs:  &task.Inputs{},
 		Outputs: &task.Outputs{},
