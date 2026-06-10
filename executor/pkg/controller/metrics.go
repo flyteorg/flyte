@@ -98,9 +98,8 @@ func registerTaskActionMetrics(provider metric.MeterProvider, c client.Client) (
 	return &taskActionMetrics{crdSizeBytes: crdSize, crdOpDuration: crdOp}, nil
 }
 
-// observeCRDSize records the serialized size of a TaskAction CRD. No-op if metrics
-// registration failed (m == nil).
-func (m *taskActionMetrics) observeCRDSize(ctx context.Context, ta *flyteorgv1.TaskAction) {
+// observeCRDSize records the serialized size of a TaskAction CRD. No-op when
+// custom metrics are disabled (m == nil).
 	if m == nil || m.crdSizeBytes == nil {
 		return
 	}
@@ -112,7 +111,7 @@ func (m *taskActionMetrics) observeCRDSize(ctx context.Context, ta *flyteorgv1.T
 // recordK8sOp records the latency of a Kubernetes API operation against the
 // TaskAction CRD under taskaction.k8s.duration{op,error}. Call sites time the
 // operation inline (start := time.Now() before the call) and record right after.
-// No-op when metrics registration failed (m == nil), so callers can record
+// No-op when custom metrics are disabled (m == nil), so callers can record
 // unconditionally.
 func (m *taskActionMetrics) recordK8sOp(ctx context.Context, op string, start time.Time, err error) {
 	if m == nil || m.crdOpDuration == nil {
