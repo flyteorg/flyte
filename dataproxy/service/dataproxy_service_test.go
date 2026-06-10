@@ -531,16 +531,28 @@ func TestGetActionData(t *testing.T) {
 		},
 	}
 
+	// Inline literals returned by the RunService.GetActionData fallback path
+	// (used when both URIs are empty — i.e. condition actions).
+	inlineOutputs := &task.Outputs{
+		Literals: []*task.NamedLiteral{
+			{Name: "review", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Boolean{Boolean: true}}}}}}},
+		},
+	}
+
 	tests := []struct {
-		name             string
-		inputsURI        string
-		outputsURI       string
-		runClientErr     error
-		readInputsErr    error
-		readOutputsErr   error
-		wantErr          bool
-		expectInputsLen  int
-		expectOutputsLen int
+		name              string
+		inputsURI         string
+		outputsURI        string
+		runClientErr      error
+		readInputsErr     error
+		readOutputsErr    error
+		// Fallback path (both URIs empty) — what RunService.GetActionData returns.
+		fallbackOutputs   *task.Outputs
+		fallbackClientErr error
+		wantErr           bool
+		expectInputsLen   int
+		expectOutputsLen  int
+		expectOutputName  string
 	}{
 		{
 			name:             "success with both inputs and outputs",
@@ -548,11 +560,13 @@ func TestGetActionData(t *testing.T) {
 			outputsURI:       "s3://test-bucket/outputs/outputs.pb",
 			expectInputsLen:  1,
 			expectOutputsLen: 1,
+			expectOutputName: "o",
 		},
 		{
 			name:             "success with only inputs",
 			inputsURI:        "s3://test-bucket/inputs-dir/inputs.pb",
 			outputsURI:       "",
+			fallbackOutputs:  &task.Outputs{},
 			expectInputsLen:  1,
 			expectOutputsLen: 0,
 		},
@@ -562,13 +576,35 @@ func TestGetActionData(t *testing.T) {
 			outputsURI:       "s3://test-bucket/outputs/outputs.pb",
 			expectInputsLen:  0,
 			expectOutputsLen: 1,
+			expectOutputName: "o",
 		},
 		{
-			name:             "success with neither inputs nor outputs",
+			// Condition action: both URIs empty → fall back to
+			// RunService.GetActionData and surface the inline literal.
+			name:             "both URIs empty falls back to inline literal",
 			inputsURI:        "",
 			outputsURI:       "",
+			fallbackOutputs:  inlineOutputs,
+			expectInputsLen:  0,
+			expectOutputsLen: 1,
+			expectOutputName: "review",
+		},
+		{
+			// Condition action signaled with no payload (or before signal): the
+			// fallback succeeds but returns empty literals.
+			name:             "both URIs empty with empty fallback returns empty",
+			inputsURI:        "",
+			outputsURI:       "",
+			fallbackOutputs:  &task.Outputs{},
 			expectInputsLen:  0,
 			expectOutputsLen: 0,
+		},
+		{
+			name:              "fallback error propagates",
+			inputsURI:         "",
+			outputsURI:        "",
+			fallbackClientErr: connect.NewError(connect.CodeNotFound, assertErr("not found")),
+			wantErr:           true,
 		},
 		{
 			name:         "RunService error propagates",
@@ -600,6 +636,20 @@ func TestGetActionData(t *testing.T) {
 						InputsUri:  tt.inputsURI,
 						OutputsUri: tt.outputsURI,
 					}), nil)
+			}
+
+			// Wire up the inline-literal fallback when both URIs are empty:
+			// the handler calls RunService.GetActionData once to fetch
+			// RunInfo.Output for condition actions (see dataproxy_service.go).
+			if tt.runClientErr == nil && tt.inputsURI == "" && tt.outputsURI == "" {
+				if tt.fallbackClientErr != nil {
+					runClient.EXPECT().GetActionData(mock.Anything, mock.Anything).Return(nil, tt.fallbackClientErr)
+				} else {
+					runClient.EXPECT().GetActionData(mock.Anything, mock.Anything).Return(
+						connect.NewResponse(&workflow.GetActionDataResponse{
+							Outputs: tt.fallbackOutputs,
+						}), nil)
+				}
 			}
 
 			mockComposedStore := storageMocks.NewComposedProtobufStore(t)
@@ -655,7 +705,11 @@ func TestGetActionData(t *testing.T) {
 				assert.Equal(t, "x", resp.Msg.GetInputs().GetLiterals()[0].GetName())
 			}
 			if tt.expectOutputsLen > 0 {
-				assert.Equal(t, "o", resp.Msg.GetOutputs().GetLiterals()[0].GetName())
+				wantName := tt.expectOutputName
+				if wantName == "" {
+					wantName = "o"
+				}
+				assert.Equal(t, wantName, resp.Msg.GetOutputs().GetLiterals()[0].GetName())
 			}
 		})
 	}
