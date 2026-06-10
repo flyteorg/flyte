@@ -73,9 +73,15 @@ func (e *TriggerExecutor) Execute(ctx context.Context, t *models.Trigger, schedu
 			},
 		},
 		Source: workflow.RunSource_RUN_SOURCE_SCHEDULE_TRIGGER,
+		// The scheduled fire time. The run service stamps it onto the run so it surfaces as
+		// flyte.ctx().run_start_time (SDK >= 2.3.6). For older triggers that pin the time to an
+		// input variable, it is additionally injected as the kickoff input arg below.
+		RunStartTime: timestamppb.New(scheduledAt),
 	}
 
 	// Inject the scheduled time as the kickoff input arg if the trigger spec defines one.
+	// Triggers registered by SDKs that offload inputs do not set a kickoff arg and rely on
+	// run_start_time above instead.
 	if argName := kickoffTimeInputArg(t); argName != "" {
 		createReq.InputWrapper = &workflow.CreateRunRequest_Inputs{
 			Inputs: appendKickoffTimeInput(nil, argName, scheduledAt),

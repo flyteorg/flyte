@@ -6,11 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
 
 	"connectrpc.com/connect"
+	semver "github.com/Masterminds/semver/v3"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -62,6 +64,35 @@ const (
 func generateRunName(seed int64) string {
 	rand.Seed(seed)
 	return fmt.Sprintf(runStringFormat, rand.String(runIDLength-1))
+}
+
+// sdkVersionRegex extracts the MAJOR.MINOR.PATCH core from an SDK version string, ignoring any
+// pre-release/dev suffix.
+var sdkVersionRegex = regexp.MustCompile(`v?(\d+\.\d+\.\d+)`)
+
+// minRunStartTimeSDKVersion is the minimum SDK version that understands run_start_time — it emits the
+// {{.runStartTime}} container-arg placeholder and reads --run-start-time (flyte-sdk#1100, v2.3.6).
+var minRunStartTimeSDKVersion = func() *semver.Constraints {
+	c, _ := semver.NewConstraint(">= 2.3.6")
+	return c
+}()
+
+// meetsRunStartTimeSDKVersion returns true if the task's runtime version is >= 2.3.6. Below it,
+// run_start_time is not stamped onto the run, so the executor never substitutes the placeholder.
+func meetsRunStartTimeSDKVersion(taskSpec *task.TaskSpec) bool {
+	version := taskSpec.GetTaskTemplate().GetMetadata().GetRuntime().GetVersion()
+	if version == "" {
+		return false
+	}
+	matches := sdkVersionRegex.FindStringSubmatch(version)
+	if len(matches) < 2 {
+		return false
+	}
+	v, err := semver.NewVersion(matches[1])
+	if err != nil {
+		return false
+	}
+	return minRunStartTimeSDKVersion.Check(v)
 }
 
 // WatchGroups streams task groups (runs grouped by task) from the database.
@@ -182,7 +213,7 @@ func (s *RunService) CreateRun(
 	// Get the task template and taskID
 	var taskID *task.TaskIdentifier
 	var taskSpec *task.TaskSpec
-	var triggerName, triggerTaskName, triggerType string
+	var triggerName, triggerTaskName, triggerType, triggerKickoffArg string
 	var triggerRevision int64
 	var err error
 	runSpec := request.GetRunSpec()
@@ -216,12 +247,36 @@ func (s *RunService) CreateRun(
 		if err != nil {
 			return nil, err
 		}
+
+		// If the trigger's inputs were offloaded at registration (SDK >= 2.3.6), launch from the
+		// stored URI rather than merging a kickoff-time input. The scheduled fire time arrives via
+		// CreateRunRequest.run_start_time and surfaces as flyte.ctx().run_start_time instead.
+		triggerDetails, detailsErr := transformers.TriggerModelToTriggerDetails(ctx, triggerModel)
+		if detailsErr != nil {
+			return nil, connect.NewError(connect.CodeInternal, detailsErr)
+		}
+		if offloaded := triggerDetails.GetSpec().GetOffloadedInputData(); offloaded != nil && request.GetInputWrapper() == nil {
+			request.InputWrapper = &workflow.CreateRunRequest_OffloadedInputData{OffloadedInputData: offloaded}
+		}
+		triggerKickoffArg = triggerDetails.GetAutomationSpec().GetSchedule().GetKickoffTimeInputArg()
 	}
 
 	if runSpec == nil {
 		runSpec = &task.RunSpec{}
 	}
 	request.RunSpec = runSpec
+
+	// Stamp the run start time, but only for SDKs that understand it (>= 2.3.6) — older task
+	// templates have no {{.runStartTime}} placeholder, so leaving it unset keeps the executor from
+	// substituting anything. The scheduler sets CreateRunRequest.run_start_time to a trigger's
+	// scheduled fire time; ad-hoc runs leave it unset and get the current time.
+	if meetsRunStartTimeSDKVersion(taskSpec) && runSpec.GetRunStartTime() == nil {
+		if reqStart := request.GetRunStartTime(); reqStart != nil {
+			runSpec.RunStartTime = reqStart
+		} else {
+			runSpec.RunStartTime = timestamppb.Now()
+		}
+	}
 
 	// Compute storage URIs before DB insert so they're persisted in the ActionSpec
 	inputPrefix := buildInputPrefix(s.storagePrefix, runId.GetProject(), runId.GetDomain(), runId.GetName())
@@ -237,7 +292,10 @@ func (s *RunService) CreateRun(
 		inputPrefix = iw.OffloadedInputData.GetUri()
 
 		if taskSpec.GetTaskTemplate().GetMetadata().GetDiscoverable() {
-			cacheKey, err = generateCacheKeyForTask(taskSpec.GetTaskTemplate(), iw.OffloadedInputData.GetInputsHash())
+			// Fold run_start_time in when the trigger binds its time to an input — that input isn't in
+			// the offloaded blob, so otherwise every fire would collide on one cache key.
+			inputsHash := foldRunStartTimeIntoHash(iw.OffloadedInputData.GetInputsHash(), triggerKickoffArg, runSpec.GetRunStartTime(), taskSpec.GetTaskTemplate().GetMetadata().GetCacheIgnoreInputVars())
+			cacheKey, err = generateCacheKeyForTask(taskSpec.GetTaskTemplate(), inputsHash)
 			if err != nil {
 				logger.Warnf(ctx, "Failed to generate cache key for root action %v: %v", actionID, err)
 			}

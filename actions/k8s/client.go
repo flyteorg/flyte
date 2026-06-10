@@ -6,9 +6,11 @@ import (
 	"hash/fnv"
 	"strings"
 	"sync"
+	"time"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -169,7 +171,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 		taskAction.Spec.CacheKey = extractTaskCacheKey(action)
 
 		// Embed the inline TaskTemplate if present.
-		if err := embedTaskTemplate(action, taskAction); err != nil {
+		if err := embedTaskTemplate(action, taskAction, runSpec); err != nil {
 			return fmt.Errorf("failed to embed task template: %w", err)
 		}
 
@@ -863,8 +865,17 @@ func extractTaskCacheKey(action *actions.Action) string {
 	return taskSpec.Task.CacheKey.Value
 }
 
-// embedTaskTemplate serializes the inline TaskTemplate from the Action into the CR spec.
-func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction) error {
+// runStartTimeTemplateVar is the placeholder the SDK (>= 2.3.6) emits in a task's container args
+// for the run start time. The backend substitutes it at TaskAction creation so the value surfaces
+// as flyte.ctx().run_start_time. See flyteorg/flyte-sdk#1100. Unlike --run-name / --name (which the
+// SDK reads from the RUN_NAME / ACTION_NAME env vars when left unsubstituted), --run-start-time has
+// no env-var fallback, so the value must be baked into the args here.
+const runStartTimeTemplateVar = "{{.runStartTime}}"
+
+// embedTaskTemplate serializes the inline TaskTemplate from the Action into the CR spec,
+// substituting the {{.runStartTime}} container-arg placeholder with runSpec.run_start_time when
+// set. Templates produced by older SDKs omit the placeholder, so the substitution is a no-op.
+func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction, runSpec *task.RunSpec) error {
 	taskSpec, ok := action.Spec.(*actions.Action_Task)
 	if !ok || taskSpec.Task == nil || taskSpec.Task.Spec == nil || taskSpec.Task.Spec.TaskTemplate == nil {
 		// Non-task actions do not carry an inline template.
@@ -875,12 +886,34 @@ func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction
 	taskAction.Spec.TaskType = tmpl.Type
 	taskAction.Spec.ShortName = taskSpec.Task.Spec.ShortName
 
+	tmpl = substituteRunStartTime(tmpl, runSpec.GetRunStartTime())
+
 	data, err := proto.Marshal(tmpl)
 	if err != nil {
 		return fmt.Errorf("failed to marshal task template: %w", err)
 	}
 	taskAction.Spec.TaskTemplate = data
 	return nil
+}
+
+// substituteRunStartTime returns a TaskTemplate whose container args have the {{.runStartTime}}
+// placeholder replaced with ts formatted as RFC3339 UTC. It returns the input unchanged when ts is
+// nil or the template has no container args. The template is cloned before mutation so the caller's
+// proto — which may be persisted separately as the registered task spec — is not affected.
+func substituteRunStartTime(tmpl *core.TaskTemplate, ts *timestamppb.Timestamp) *core.TaskTemplate {
+	if ts == nil {
+		return tmpl
+	}
+	if tmpl.GetContainer() == nil || len(tmpl.GetContainer().GetArgs()) == 0 {
+		return tmpl
+	}
+	value := ts.AsTime().UTC().Format(time.RFC3339)
+	cloned := proto.Clone(tmpl).(*core.TaskTemplate)
+	args := cloned.GetContainer().GetArgs()
+	for i, arg := range args {
+		args[i] = strings.ReplaceAll(arg, runStartTimeTemplateVar, value)
+	}
+	return cloned
 }
 
 // extractShortNameFromTemplate extracts a human-readable function name from a serialized TaskTemplate.
