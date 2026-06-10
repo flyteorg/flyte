@@ -101,16 +101,15 @@ func (m *taskActionMetrics) observeCRDSize(ctx context.Context, ta *flyteorgv1.T
 	}
 }
 
-// timeK8sOp times a Kubernetes API operation against the TaskAction CRD and records
-// its latency under taskaction.k8s.duration{op,error}. It is a transparent pass-through
-// when metrics registration failed (m == nil), so callers can wrap unconditionally.
-func (m *taskActionMetrics) timeK8sOp(ctx context.Context, op string, fn func() error) error {
+// recordK8sOp records the latency of a Kubernetes API operation against the
+// TaskAction CRD under taskaction.k8s.duration{op,error}. Call sites time the
+// operation inline (start := time.Now() before the call) and record right after.
+// No-op when metrics registration failed (m == nil), so callers can record
+// unconditionally.
+func (m *taskActionMetrics) recordK8sOp(ctx context.Context, op string, start time.Time, err error) {
 	if m == nil || m.crdOpDuration == nil {
-		return fn()
+		return
 	}
-	start := time.Now()
-	err := fn()
 	m.crdOpDuration.Record(ctx, float64(time.Since(start).Microseconds())/1000.0,
 		metric.WithAttributes(attribute.String("op", op), attribute.Bool("error", err != nil)))
-	return err
 }

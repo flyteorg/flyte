@@ -169,7 +169,10 @@ func (r *TaskActionReconciler) recordSystemError(
 	}
 
 	if taskActionStatusChanged(original.Status, taskAction.Status) {
-		if updErr := r.Status().Update(ctx, taskAction); updErr != nil {
+		start := time.Now()
+		updErr := r.Status().Update(ctx, taskAction)
+		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
+		if updErr != nil {
 			logger.Error(updErr, "failed to persist SystemFailures counter")
 		}
 	}
@@ -201,8 +204,8 @@ func (r *TaskActionReconciler) finalizePermanentFailure(
 
 // NewTaskActionReconciler creates a new TaskActionReconciler. meterProvider is the
 // executor's OTel meter provider (otelutils.GetMeterProvider(otelServiceName) in
-// executor/setup.go); the embedded client is wrapped so TaskAction CRD operations
-// are timed under taskaction.k8s.duration (see newInstrumentedClient).
+// executor/setup.go). TaskAction CRD operations are timed inline at the call
+// sites via metrics.recordK8sOp.
 func NewTaskActionReconciler(
 	c client.Client,
 	scheme *runtime.Scheme,
@@ -218,7 +221,7 @@ func NewTaskActionReconciler(
 		log.Log.Error(err, "failed to register TaskAction OTel metrics")
 	}
 	return &TaskActionReconciler{
-		Client:         newInstrumentedClient(c, metrics),
+		Client:         c,
 		Scheme:         scheme,
 		PluginRegistry: registry,
 		DataStore:      dataStore,
@@ -240,7 +243,10 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	// Fetch the TaskAction instance
 	taskAction := &flyteorgv1.TaskAction{}
-	if err := r.Get(ctx, req.NamespacedName, taskAction); err != nil {
+	start := time.Now()
+	err := r.Get(ctx, req.NamespacedName, taskAction)
+	r.metrics.recordK8sOp(ctx, opGet, start, err)
+	if err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 	r.metrics.observeCRDSize(ctx, taskAction)
@@ -274,16 +280,21 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(eventType), "%v", err)
 		setCondition(taskAction, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue, reason, err.Error())
 		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse, reason, err.Error())
-		_ = r.Status().Update(ctx, taskAction)
+		start = time.Now()
+		updErr := r.Status().Update(ctx, taskAction) // error intentionally ignored: terminal either way
+		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
 		return ctrl.Result{}, nil // terminal — do not requeue
 	}
 
 	// Ensure finalizer is present (once validation passes)
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		controllerutil.AddFinalizer(taskAction, taskActionFinalizer)
-		if err := r.Update(ctx, taskAction); err != nil {
-			logger.Error(err, "Failed to update TaskAction with finalizer")
-			return ctrl.Result{}, err
+		start = time.Now()
+		updErr := r.Update(ctx, taskAction)
+		r.metrics.recordK8sOp(ctx, opUpdate, start, updErr)
+		if updErr != nil {
+			logger.Error(updErr, "Failed to update TaskAction with finalizer")
+			return ctrl.Result{}, updErr
 		}
 		return ctrl.Result{}, nil
 	}
@@ -510,7 +521,10 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 
 func (r *TaskActionReconciler) removeFinalizer(ctx context.Context, taskAction *flyteorgv1.TaskAction) (ctrl.Result, error) {
 	controllerutil.RemoveFinalizer(taskAction, taskActionFinalizer)
-	if err := r.Update(ctx, taskAction); err != nil {
+	start := time.Now()
+	err := r.Update(ctx, taskAction)
+	r.metrics.recordK8sOp(ctx, opUpdate, start, err)
+	if err != nil {
 		return ctrl.Result{}, err
 	}
 	return ctrl.Result{}, nil
@@ -549,11 +563,17 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	// This will resolve the conflict error caused by k8s optimistic lock when 2 reconcile loops updating the same CRD
 	if err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		latest := &flyteorgv1.TaskAction{}
-		if getErr := r.Get(ctx, client.ObjectKeyFromObject(newTaskAction), latest); getErr != nil {
+		start := time.Now()
+		getErr := r.Get(ctx, client.ObjectKeyFromObject(newTaskAction), latest)
+		r.metrics.recordK8sOp(ctx, opGet, start, getErr)
+		if getErr != nil {
 			return getErr
 		}
 		latest.Status = newTaskAction.Status
-		return r.Status().Update(ctx, latest)
+		start = time.Now()
+		updErr := r.Status().Update(ctx, latest)
+		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
+		return updErr
 	}); err != nil {
 		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
 		return err
