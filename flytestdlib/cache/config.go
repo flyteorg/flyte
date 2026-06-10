@@ -162,8 +162,18 @@ type RedisOptions struct {
 	// Default is to not close idle connections.
 	ConnMaxLifetime config.Duration
 
-	// TLS Config to use. When set, TLS will be negotiated.
+	// TLS Config to use. When set, TLS will be negotiated. Not settable from a
+	// config file; use UseTLS for config-driven TLS.
 	TLSConfig *tls.Config
+
+	// UseTLS negotiates TLS using the system certificate pool. Prefer this over
+	// TLSConfig when configuring from YAML/JSON, where TLSConfig cannot be set.
+	// Ignored when TLSConfig is already provided.
+	UseTLS bool
+
+	// TLSInsecureSkipVerify disables server certificate verification. Only set
+	// this for testing against self-signed certificates.
+	TLSInsecureSkipVerify bool
 
 	// // Disable set-lib on connect. Default is false.
 	DisableIndentity bool
@@ -177,6 +187,16 @@ func (r *RedisOptions) GetOptions(ctx context.Context, secretManager SecretManag
 		}
 
 		r.Password = password
+	}
+
+	// Allow config-driven TLS: when UseTLS is set (and no explicit TLSConfig was
+	// provided) negotiate TLS using the system certificate pool.
+	tlsConfig := r.TLSConfig
+	if tlsConfig == nil && r.UseTLS {
+		tlsConfig = &tls.Config{
+			MinVersion:         tls.VersionTLS12,
+			InsecureSkipVerify: r.TLSInsecureSkipVerify, //nolint:gosec // gated behind explicit UseTLS/TLSInsecureSkipVerify config
+		}
 	}
 
 	return &redis.Options{
@@ -200,7 +220,7 @@ func (r *RedisOptions) GetOptions(ctx context.Context, secretManager SecretManag
 		MaxActiveConns:        r.MaxActiveConns,
 		ConnMaxIdleTime:       r.ConnMaxIdleTime.Duration,
 		ConnMaxLifetime:       r.ConnMaxLifetime.Duration,
-		TLSConfig:             r.TLSConfig,
+		TLSConfig:             tlsConfig,
 		DisableIndentity:      r.DisableIndentity,
 		Username:              r.Username,
 	}, nil
