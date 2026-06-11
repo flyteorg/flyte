@@ -341,6 +341,15 @@ export class BlobType extends Message<BlobType> {
    */
   dimensionality = BlobType_BlobDimensionality.SINGLE;
 
+  /**
+   * Optional file extension (e.g. "csv", "parquet") appended to the blob filename during flytecopilot download.
+   * Unlike "format", this field is not used for type validation in SDK.
+   * It only controls the local filename when materializing to disk.
+   *
+   * @generated from field: string file_extension = 3;
+   */
+  fileExtension = "";
+
   constructor(data?: PartialMessage<BlobType>) {
     super();
     proto3.util.initPartial(data, this);
@@ -351,6 +360,7 @@ export class BlobType extends Message<BlobType> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "format", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "dimensionality", kind: "enum", T: proto3.getEnumType(BlobType_BlobDimensionality) },
+    { no: 3, name: "file_extension", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlobType {

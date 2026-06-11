@@ -105,6 +105,11 @@ pub struct BlobType {
     pub format: ::prost::alloc::string::String,
     #[prost(enumeration="blob_type::BlobDimensionality", tag="2")]
     pub dimensionality: i32,
+    /// Optional file extension (e.g. "csv", "parquet") appended to the blob filename during flytecopilot download.
+    /// Unlike "format", this field is not used for type validation in SDK.
+    /// It only controls the local filename when materializing to disk.
+    #[prost(string, tag="3")]
+    pub file_extension: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `BlobType`.
 pub mod blob_type {

@@ -156,6 +156,10 @@
         },
         "dimensionality": {
           "$ref": "#/definitions/BlobTypeBlobDimensionality"
+        },
+        "file_extension": {
+          "type": "string",
+          "description": "Optional file extension (e.g. \"csv\", \"parquet\") appended to the blob filename during flytecopilot download.\nUnlike \"format\", this field is not used for type validation in SDK.\nIt only controls the local filename when materializing to disk."
         }
       },
       "title": "Defines type behavior for blob objects"

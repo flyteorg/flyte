@@ -2174,6 +2174,9 @@ export namespace flyteidl {
 
             /** BlobType dimensionality */
             dimensionality?: (flyteidl.core.BlobType.BlobDimensionality|null);
+
+            /** BlobType fileExtension */
+            fileExtension?: (string|null);
         }
 
         /** Represents a BlobType. */
@@ -2190,6 +2193,9 @@ export namespace flyteidl {
 
             /** BlobType dimensionality. */
             public dimensionality: flyteidl.core.BlobType.BlobDimensionality;
+
+            /** BlobType fileExtension. */
+            public fileExtension: string;
 
             /**
              * Creates a new BlobType instance using the specified properties.
