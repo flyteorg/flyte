@@ -22,6 +22,7 @@ class SelectClusterRequest(_message.Message):
         OPERATION_TAIL_LOGS: _ClassVar[SelectClusterRequest.Operation]
         OPERATION_GET_ACTION_ATTEMPT_METRICS: _ClassVar[SelectClusterRequest.Operation]
         OPERATION_USE_SECRETS: _ClassVar[SelectClusterRequest.Operation]
+        OPERATION_UPLOAD_TRIGGER: _ClassVar[SelectClusterRequest.Operation]
     OPERATION_UNSPECIFIED: SelectClusterRequest.Operation
     OPERATION_CREATE_UPLOAD_LOCATION: SelectClusterRequest.Operation
     OPERATION_UPLOAD_INPUTS: SelectClusterRequest.Operation
@@ -31,6 +32,7 @@ class SelectClusterRequest(_message.Message):
     OPERATION_TAIL_LOGS: SelectClusterRequest.Operation
     OPERATION_GET_ACTION_ATTEMPT_METRICS: SelectClusterRequest.Operation
     OPERATION_USE_SECRETS: SelectClusterRequest.Operation
+    OPERATION_UPLOAD_TRIGGER: SelectClusterRequest.Operation
     ORG_ID_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
     TASK_ID_FIELD_NUMBER: _ClassVar[int]

@@ -76,7 +76,7 @@ func (p *panickingSyncer) sync(_ context.Context, _ Batch) ([]ItemSyncResponse, 
 
 func TestCacheFour(t *testing.T) {
 	testResyncPeriod := 5 * time.Second
-	rateLimiter := workqueue.DefaultControllerRateLimiter()
+	rateLimiter := workqueue.DefaultTypedControllerRateLimiter[*Batch]()
 	fakeClock := testingclock.NewFakeClock(time.Now())
 
 	t.Run("normal operation", func(t *testing.T) {
@@ -219,7 +219,7 @@ func TestCacheFour(t *testing.T) {
 
 func TestQueueBuildUp(t *testing.T) {
 	testResyncPeriod := time.Hour
-	rateLimiter := workqueue.DefaultControllerRateLimiter()
+	rateLimiter := workqueue.DefaultTypedControllerRateLimiter[*Batch]()
 	fakeClock := testingclock.NewFakeClock(time.Now())
 
 	syncCount := atomic.NewInt32(0)
@@ -286,7 +286,7 @@ func TestInProcessing(t *testing.T) {
 // head b[0]. With the default SingleItemBatches every batch holds one item, so
 // nothing was ever marked and each resync re-enqueued items already in flight.
 func TestEnqueueBatches_MarksSingleItemBatchHead(t *testing.T) {
-	rateLimiter := workqueue.DefaultControllerRateLimiter()
+	rateLimiter := workqueue.DefaultTypedControllerRateLimiter[*Batch]()
 	fakeClock := testingclock.NewFakeClock(time.Now())
 	c, err := newAutoRefreshCacheWithClock("head", syncFakeItem, rateLimiter, 5*time.Second, 10, 10,
 		promutils.NewTestScope(), fakeClock)

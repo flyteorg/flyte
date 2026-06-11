@@ -108,7 +108,7 @@ type queue struct {
 	workers    int
 	maxRetries int
 	started    bool
-	queue      workqueue.Interface
+	queue      workqueue.TypedInterface[*workItemWrapper]
 	index      workItemCache
 	processor  Processor
 }
@@ -204,7 +204,7 @@ func (q *queue) Start(ctx context.Context) error {
 						return
 					}
 
-					wrapperV := item.(*workItemWrapper).Clone()
+					wrapperV := item.Clone()
 					wrapper := &wrapperV
 					ws := wrapper.status
 					var err error
@@ -273,8 +273,10 @@ func NewIndexedWorkQueue(name string, processor Processor, cfg Config, metricsSc
 		rlock:      sync.RWMutex{},
 		workers:    cfg.Workers,
 		maxRetries: cfg.MaxRetries,
-		queue:      workqueue.NewNamed(metricsScope.CurrentScope()),
-		index:      workItemCache{Cache: cache},
-		processor:  processor,
+		queue: workqueue.NewTypedWithConfig[*workItemWrapper](workqueue.TypedQueueConfig[*workItemWrapper]{
+			Name: metricsScope.CurrentScope(),
+		}),
+		index:     workItemCache{Cache: cache},
+		processor: processor,
 	}, nil
 }

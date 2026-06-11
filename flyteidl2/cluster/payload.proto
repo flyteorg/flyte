@@ -32,6 +32,7 @@ message SelectClusterRequest {
     OPERATION_TAIL_LOGS = 6;
     OPERATION_GET_ACTION_ATTEMPT_METRICS = 7;
     OPERATION_USE_SECRETS = 8;
+    OPERATION_UPLOAD_TRIGGER = 9;
   }
 
   Operation operation = 8 [(buf.validate.field).enum = {

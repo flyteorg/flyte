@@ -30,7 +30,7 @@ const (
 
 var (
 	dereferencableKinds = map[reflect.Kind]struct{}{
-		reflect.Array: {}, reflect.Chan: {}, reflect.Map: {}, reflect.Ptr: {}, reflect.Slice: {},
+		reflect.Array: {}, reflect.Chan: {}, reflect.Map: {}, reflect.Pointer: {}, reflect.Slice: {},
 	}
 )
 

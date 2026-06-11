@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyte/v2
 
-go 1.25.7
+go 1.26.3
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20260415201107-50325440f8f2.1
@@ -47,7 +47,7 @@ require (
 	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/common v0.67.5
 	github.com/ray-project/kuberay/ray-operator v1.5.2
-	github.com/redis/go-redis/extra/redisprometheus/v9 v9.17.2
+	github.com/redis/go-redis/extra/redisprometheus/v9 v9.20.0
 	github.com/redis/go-redis/v9 v9.20.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/samber/lo v1.53.0
