@@ -4,6 +4,7 @@ package flyteidl2.actions;
 
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/identity.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/task/run.proto";
 import "flyteidl2/workflow/run_definition.proto";
@@ -150,6 +151,11 @@ message AbortRequest {
 
   // Reason for aborting the action, if applicable.
   optional string reason = 2;
+
+  // Identity of the caller that issued the abort. Populated by Run Service
+  // with a stripped-down EnrichedIdentity (subject only) for storage and
+  // replication; the full identity is re-enriched on read.
+  optional flyteidl2.common.EnrichedIdentity aborted_by = 3;
 }
 
 // AbortResponse is the response message for aborting a queued or running action.
@@ -171,6 +177,11 @@ message SignalRequest {
   // The value literal to signal the condition with. Must match the
   // ConditionAction.type declared at enqueue time.
   flyteidl2.core.Literal value = 3 [(buf.validate.field).required = true];
+
+  // Identity of the caller that issued the signal. Populated by Run Service
+  // with a stripped-down EnrichedIdentity (subject only) for storage and
+  // replication; the full identity is re-enriched on read.
+  optional flyteidl2.common.EnrichedIdentity signalled_by = 4;
 }
 
 // SignalResponse is the response message for resolving a condition action.

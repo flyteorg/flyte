@@ -273,6 +273,12 @@ message AbortInfo {
   common.EnrichedIdentity aborted_by = 2;
 }
 
+// SignalInfo captures details of a condition action resolved via Signal.
+message SignalInfo {
+  // Identity that signalled the condition.
+  common.EnrichedIdentity signalled_by = 1;
+}
+
 // ActionDetails is the full details of an action.
 message ActionDetails {
   // Id for this action.
@@ -289,6 +295,8 @@ message ActionDetails {
     ErrorInfo error_info = 4;
     // Abort info for the action, if aborted.
     AbortInfo abort_info = 5;
+    // Signal info for a condition action resolved via Signal.
+    SignalInfo signal_info = 10;
   }
 
   // Fully resolved spec of the action. Merges user submitted task spec with platform defaults.

@@ -2489,6 +2489,134 @@ var _ interface {
 	ErrorName() string
 } = AbortInfoValidationError{}
 
+// Validate checks the field values on SignalInfo with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *SignalInfo) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SignalInfo with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in SignalInfoMultiError, or
+// nil if none found.
+func (m *SignalInfo) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SignalInfo) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetSignalledBy()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SignalInfoValidationError{
+					field:  "SignalledBy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SignalInfoValidationError{
+					field:  "SignalledBy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSignalledBy()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SignalInfoValidationError{
+				field:  "SignalledBy",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SignalInfoMultiError(errors)
+	}
+
+	return nil
+}
+
+// SignalInfoMultiError is an error wrapping multiple validation errors
+// returned by SignalInfo.ValidateAll() if the designated constraints aren't met.
+type SignalInfoMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SignalInfoMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SignalInfoMultiError) AllErrors() []error { return m }
+
+// SignalInfoValidationError is the validation error returned by
+// SignalInfo.Validate if the designated constraints aren't met.
+type SignalInfoValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SignalInfoValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SignalInfoValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SignalInfoValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SignalInfoValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SignalInfoValidationError) ErrorName() string { return "SignalInfoValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SignalInfoValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSignalInfo.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SignalInfoValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SignalInfoValidationError{}
+
 // Validate checks the field values on ActionDetails with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -2709,6 +2837,47 @@ func (m *ActionDetails) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ActionDetailsValidationError{
 					field:  "AbortInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ActionDetails_SignalInfo:
+		if v == nil {
+			err := ActionDetailsValidationError{
+				field:  "Result",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetSignalInfo()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ActionDetailsValidationError{
+						field:  "SignalInfo",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ActionDetailsValidationError{
+						field:  "SignalInfo",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetSignalInfo()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ActionDetailsValidationError{
+					field:  "SignalInfo",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
