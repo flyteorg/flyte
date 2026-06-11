@@ -117,6 +117,12 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		MetadataURL:   cfg.AuthMetadata.ExternalMetadataURL,
 		RetryAttempts: cfg.AuthMetadata.RetryAttempts,
 		RetryDelay:    cfg.AuthMetadata.RetryDelay,
+	}, service.PublicClientConfig{
+		ClientID:                 cfg.AuthMetadata.FlyteClient.ClientID,
+		RedirectURI:              cfg.AuthMetadata.FlyteClient.RedirectURI,
+		Scopes:                   cfg.AuthMetadata.FlyteClient.Scopes,
+		Audience:                 cfg.AuthMetadata.FlyteClient.Audience,
+		AuthorizationMetadataKey: cfg.AuthMetadata.AuthorizationMetadataKey,
 	})
 	authMetadataPath, authMetadataHandler := authconnect.NewAuthMetadataServiceHandler(authMetadataSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(authMetadataPath, authMetadataHandler)

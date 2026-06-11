@@ -37,30 +37,63 @@ type ExternalAuthServerConfig struct {
 	RetryDelay time.Duration
 }
 
+// PublicClientConfig is the public (CLI/SDK) OAuth2 client configuration
+// advertised via GetPublicClientConfig. Mirrors flyteadmin's
+// appAuth.thirdPartyConfig.flyteClient + grpcAuthorizationHeader.
+type PublicClientConfig struct {
+	// ClientID is the public client id used by CLI/SDK login flows.
+	ClientID string
+	// RedirectURI is the callback the public client listens on during login.
+	RedirectURI string
+	// Scopes are the OAuth2 scopes the public client should request.
+	Scopes []string
+	// Audience is the intended audience for requested tokens.
+	Audience string
+	// AuthorizationMetadataKey is the header/metadata key clients should place
+	// tokens in (default "authorization").
+	AuthorizationMetadataKey string
+}
+
 // AuthMetadataService implements the AuthMetadataServiceHandler interface.
 type AuthMetadataService struct {
 	authconnect.UnimplementedAuthMetadataServiceHandler
 	dataplaneDomain string
 	external        ExternalAuthServerConfig
+	publicClient    PublicClientConfig
 }
 
 // NewAuthMetadataService creates a new AuthMetadataService instance. When
 // external.BaseURL is set, GetOAuth2Metadata proxies that server's metadata.
-func NewAuthMetadataService(dataplaneDomain string, external ExternalAuthServerConfig) *AuthMetadataService {
+// publicClient is advertised to SDKs via GetPublicClientConfig.
+func NewAuthMetadataService(dataplaneDomain string, external ExternalAuthServerConfig, publicClient PublicClientConfig) *AuthMetadataService {
 	return &AuthMetadataService{
 		dataplaneDomain: dataplaneDomain,
 		external:        external,
+		publicClient:    publicClient,
 	}
 }
 
 var _ authconnect.AuthMetadataServiceHandler = (*AuthMetadataService)(nil)
 
+// GetPublicClientConfig returns the public (CLI/SDK) OAuth2 client settings.
+// Mirrors flyteadmin's OAuth2MetadataProvider.GetPublicClientConfig
+// (auth/authzserver/metadata_provider.go), which serves
+// appAuth.thirdPartyConfig.flyteClient + grpcAuthorizationHeader.
 func (s *AuthMetadataService) GetPublicClientConfig(
 	ctx context.Context,
 	req *connect.Request[auth.GetPublicClientConfigRequest],
 ) (*connect.Response[auth.GetPublicClientConfigResponse], error) {
+	authMetadataKey := s.publicClient.AuthorizationMetadataKey
+	if authMetadataKey == "" {
+		authMetadataKey = "authorization"
+	}
 	return connect.NewResponse(&auth.GetPublicClientConfigResponse{
-		DataplaneDomain: s.dataplaneDomain,
+		ClientId:                 s.publicClient.ClientID,
+		RedirectUri:              s.publicClient.RedirectURI,
+		Scopes:                   s.publicClient.Scopes,
+		AuthorizationMetadataKey: authMetadataKey,
+		Audience:                 s.publicClient.Audience,
+		DataplaneDomain:          s.dataplaneDomain,
 	}), nil
 }
 

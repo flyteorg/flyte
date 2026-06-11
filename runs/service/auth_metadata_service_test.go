@@ -16,7 +16,7 @@ import (
 )
 
 func TestGetOAuth2Metadata_NotConfigured(t *testing.T) {
-	svc := NewAuthMetadataService("example.com", ExternalAuthServerConfig{})
+	svc := NewAuthMetadataService("example.com", ExternalAuthServerConfig{}, PublicClientConfig{})
 	_, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeUnimplemented, connect.CodeOf(err))
@@ -42,7 +42,7 @@ func TestGetOAuth2Metadata_External(t *testing.T) {
 
 	svc := NewAuthMetadataService("example.com", ExternalAuthServerConfig{
 		BaseURL: srv.URL + "/oauth2/default",
-	})
+	}, PublicClientConfig{})
 	resp, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
 	require.NoError(t, err)
 	assert.Equal(t, "https://idp.example.com/oauth2/default", resp.Msg.Issuer)
@@ -62,7 +62,7 @@ func TestGetOAuth2Metadata_ExternalCustomMetadataURL(t *testing.T) {
 	svc := NewAuthMetadataService("example.com", ExternalAuthServerConfig{
 		BaseURL:     srv.URL,
 		MetadataURL: "custom/metadata",
-	})
+	}, PublicClientConfig{})
 	resp, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
 	require.NoError(t, err)
 	assert.Equal(t, "https://idp.example.com", resp.Msg.Issuer)
@@ -78,7 +78,7 @@ func TestGetOAuth2Metadata_ExternalUnavailable(t *testing.T) {
 		BaseURL:       srv.URL,
 		RetryAttempts: 1,
 		RetryDelay:    time.Millisecond,
-	})
+	}, PublicClientConfig{})
 	_, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err))
@@ -91,7 +91,7 @@ func TestOAuth2MetadataHTTPHandler(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	svc := NewAuthMetadataService("example.com", ExternalAuthServerConfig{BaseURL: srv.URL + "/oauth2/default"})
+	svc := NewAuthMetadataService("example.com", ExternalAuthServerConfig{BaseURL: srv.URL + "/oauth2/default"}, PublicClientConfig{})
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/.well-known/oauth-authorization-server", nil)
@@ -108,9 +108,37 @@ func TestOAuth2MetadataHTTPHandler(t *testing.T) {
 }
 
 func TestOAuth2MetadataHTTPHandler_NotConfigured(t *testing.T) {
-	svc := NewAuthMetadataService("example.com", ExternalAuthServerConfig{})
+	svc := NewAuthMetadataService("example.com", ExternalAuthServerConfig{}, PublicClientConfig{})
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/.well-known/oauth-authorization-server", nil)
 	OAuth2MetadataHTTPHandler(svc).ServeHTTP(rec, req)
 	assert.Equal(t, http.StatusNotImplemented, rec.Code)
+}
+
+func TestGetPublicClientConfig(t *testing.T) {
+	svc := NewAuthMetadataService("dataplane.example.com", ExternalAuthServerConfig{}, PublicClientConfig{
+		ClientID:                 "flytectl",
+		RedirectURI:              "http://localhost:53593/callback",
+		Scopes:                   []string{"offline_access", "profile"},
+		Audience:                 "https://api.example.com",
+		AuthorizationMetadataKey: "flyte-authorization",
+	})
+	resp, err := svc.GetPublicClientConfig(context.Background(), connect.NewRequest(&auth.GetPublicClientConfigRequest{}))
+	require.NoError(t, err)
+	assert.Equal(t, "flytectl", resp.Msg.ClientId)
+	assert.Equal(t, "http://localhost:53593/callback", resp.Msg.RedirectUri)
+	assert.Equal(t, []string{"offline_access", "profile"}, resp.Msg.Scopes)
+	assert.Equal(t, "https://api.example.com", resp.Msg.Audience)
+	assert.Equal(t, "flyte-authorization", resp.Msg.AuthorizationMetadataKey)
+	assert.Equal(t, "dataplane.example.com", resp.Msg.DataplaneDomain)
+}
+
+func TestGetPublicClientConfig_DefaultAuthMetadataKey(t *testing.T) {
+	// Empty AuthorizationMetadataKey defaults to the standard "authorization"
+	// header (which upstream JWT validators like ALB inspect).
+	svc := NewAuthMetadataService("example.com", ExternalAuthServerConfig{}, PublicClientConfig{})
+	resp, err := svc.GetPublicClientConfig(context.Background(), connect.NewRequest(&auth.GetPublicClientConfigRequest{}))
+	require.NoError(t, err)
+	assert.Equal(t, "authorization", resp.Msg.AuthorizationMetadataKey)
+	assert.Empty(t, resp.Msg.ClientId)
 }

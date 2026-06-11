@@ -90,6 +90,32 @@ type AuthMetadataConfig struct {
 
 	// RetryDelay is the delay between fetch attempts (default 1s).
 	RetryDelay time.Duration `json:"retryDelay" pflag:",Delay between external metadata fetch attempts"`
+
+	// AuthorizationMetadataKey is the header/metadata key clients should place
+	// tokens in, returned by GetPublicClientConfig (default "authorization").
+	AuthorizationMetadataKey string `json:"authorizationMetadataKey" pflag:",Header key clients should use for tokens"`
+
+	// FlyteClient is the public (CLI/SDK) OAuth2 client configuration returned
+	// by GetPublicClientConfig.
+	FlyteClient FlyteClientConfig `json:"flyteClient"`
+}
+
+// FlyteClientConfig mirrors flyteadmin's appAuth.thirdPartyConfig.flyteClient:
+// the public OAuth2 client (flytectl/pyflyte) settings advertised to SDKs via
+// GetPublicClientConfig.
+type FlyteClientConfig struct {
+	// ClientID is the public client id used by CLI/SDK login flows.
+	ClientID string `json:"clientId" pflag:",Public OAuth2 client id advertised to SDKs"`
+
+	// RedirectURI is the callback the public client listens on during login.
+	RedirectURI string `json:"redirectUri" pflag:",Redirect URI for the public client login flow"`
+
+	// Scopes are the OAuth2 scopes the public client should request.
+	Scopes []string `json:"scopes" pflag:",Scopes the public client should request"`
+
+	// Audience is the intended audience for requested tokens (sent when the IdP
+	// requires it, e.g. Auth0/Okta custom authorization servers).
+	Audience string `json:"audience" pflag:",Audience for requested tokens"`
 }
 
 // ServerConfig holds HTTP server configuration
