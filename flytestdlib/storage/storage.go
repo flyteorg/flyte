@@ -1,7 +1,8 @@
 // Package storage defines extensible storage interface.
 // This package registers "storage" config section that maps to Config struct. Use NewDataStore(cfg) to initialize a
 // DataStore with the provided config. The package provides default implementation to access local, S3 (and minio),
-// and In-Memory storage. Use NewCompositeDataStore to swap any portions of the DataStore interface with an external
+// Redis, and In-Memory storage. Use NewCompositeDataStore to swap any portions of the DataStore interface with an
+// external
 // implementation (e.g. a cached protobuf store). The underlying storage is provided by extensible "stow" library. You
 // can use NewStowRawStore(cfg) to create a Raw store based on any other stow-supported configs (e.g. Azure Blob Storage)
 package storage

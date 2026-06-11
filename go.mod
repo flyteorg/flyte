@@ -93,7 +93,10 @@ require (
 	sigs.k8s.io/jobset v0.5.2
 )
 
-require github.com/Masterminds/semver/v3 v3.4.0
+require (
+	github.com/Masterminds/semver/v3 v3.4.0
+	github.com/alicebob/miniredis/v2 v2.38.0
+)
 
 require (
 	cel.dev/expr v0.25.1 // indirect
@@ -199,6 +202,7 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
+	github.com/yuin/gopher-lua v1.1.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.43.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.68.0 // indirect

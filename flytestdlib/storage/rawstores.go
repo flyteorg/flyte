@@ -16,6 +16,7 @@ var stores = map[string]dataStoreCreateFn{
 	TypeMinio:  newStowRawStore,
 	TypeS3:     newStowRawStore,
 	TypeStow:   newStowRawStore,
+	TypeRedis:  NewRedisRawStore,
 }
 
 type proxyTransport struct {
