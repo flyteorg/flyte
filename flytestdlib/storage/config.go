@@ -22,6 +22,7 @@ const (
 	TypeLocal  Type = "local"
 	TypeMinio  Type = "minio"
 	TypeStow   Type = "stow"
+	TypeRedis  Type = "redis"
 )
 
 const (
@@ -51,10 +52,11 @@ var (
 
 // Config is a common storage config.
 type Config struct {
-	Type Type `json:"type" pflag:",Sets the type of storage to configure [s3/minio/local/mem/stow]."`
+	Type Type `json:"type" pflag:",Sets the type of storage [s3/minio/local/mem/stow/redis]."`
 	// Deprecated: Please use StowConfig instead
 	Connection ConnectionConfig `json:"connection"`
 	Stow       StowConfig       `json:"stow,omitempty" pflag:",Storage config for stow backend."`
+	Redis      RedisConfig      `json:"redis,omitempty" pflag:"-,Storage config for the redis backend."`
 
 	// Container here is misleading, it refers to a Bucket (AWS S3) like blobstore entity. In some terms it could be a table
 	InitContainer string `json:"container" pflag:",Initial container (in s3 a bucket) to create -if it doesn't exist-.'"`
@@ -95,6 +97,20 @@ type ConnectionConfig struct {
 	SecretKey  string     `json:"secret-key" pflag:",Secret to use when accesskey is set."`
 	Region     string     `json:"region" pflag:",Region to connect to."`
 	DisableSSL bool       `json:"disable-ssl" pflag:",Disables SSL connection. Should only be used for development."`
+}
+
+// RedisConfig defines the connection for a redis-backed raw store, selected with type: redis.
+// Objects are stored as redis string values keyed by the path portion of the DataReference
+// (redis://<addr>/<key>), which keeps references interoperable with the flyte-sdk redis plugin.
+type RedisConfig struct {
+	// Addr is the host:port of the redis server.
+	Addr string `json:"addr"`
+	// Username for redis ACL authentication (redis 6+), if required.
+	Username string `json:"username"`
+	// Password for redis authentication, if required.
+	Password string `json:"password"`
+	// DB is the logical database to select after connecting.
+	DB int `json:"db"`
 }
 
 // StowConfig defines configs for stow as defined in github.com/flyteorg/stow
