@@ -500,6 +500,7 @@ func (s *Service) GetActionData(
 					return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read inputs from %s: %w", inputRef, err))
 				}
 			} else {
+				resp.InputsUri = urisResp.Msg.GetInputsUri()
 				logger.Debugf(groupCtx, "Read %d input literals and %d action contexts", len(resp.Inputs.Literals), len(resp.Inputs.Context))
 			}
 			return nil
@@ -523,6 +524,7 @@ func (s *Service) GetActionData(
 				resp.Outputs = &task.Outputs{
 					Literals: inputsOrOutputs.GetLiterals(),
 				}
+				resp.OutputsUri = urisResp.Msg.GetOutputsUri()
 				logger.Debugf(groupCtx, "Read %d output literals", len(resp.Outputs.Literals))
 			}
 			return nil

@@ -653,9 +653,15 @@ func TestGetActionData(t *testing.T) {
 			assert.Len(t, resp.Msg.GetOutputs().GetLiterals(), tt.expectOutputsLen)
 			if tt.expectInputsLen > 0 {
 				assert.Equal(t, "x", resp.Msg.GetInputs().GetLiterals()[0].GetName())
+				assert.Equal(t, tt.inputsURI, resp.Msg.GetInputsUri())
+			} else {
+				assert.Empty(t, resp.Msg.GetInputsUri())
 			}
 			if tt.expectOutputsLen > 0 {
 				assert.Equal(t, "o", resp.Msg.GetOutputs().GetLiterals()[0].GetName())
+				assert.Equal(t, tt.outputsURI, resp.Msg.GetOutputsUri())
+			} else {
+				assert.Empty(t, resp.Msg.GetOutputsUri())
 			}
 		})
 	}
