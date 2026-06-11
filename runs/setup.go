@@ -112,10 +112,22 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(identityPath, identityHandler)
 	logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
 
-	authMetadataSvc := service.NewAuthMetadataService(sc.BaseURL)
+	authMetadataSvc := service.NewAuthMetadataService(sc.BaseURL, service.ExternalAuthServerConfig{
+		BaseURL:       cfg.AuthMetadata.ExternalAuthServerBaseURL,
+		MetadataURL:   cfg.AuthMetadata.ExternalMetadataURL,
+		RetryAttempts: cfg.AuthMetadata.RetryAttempts,
+		RetryDelay:    cfg.AuthMetadata.RetryDelay,
+	})
 	authMetadataPath, authMetadataHandler := authconnect.NewAuthMetadataServiceHandler(authMetadataSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(authMetadataPath, authMetadataHandler)
 	logger.Infof(ctx, "Mounted AuthMetadataService at %s", authMetadataPath)
+
+	// Serve OAuth2 authorization-server metadata at the RFC 8414 well-known path
+	// so OAuth2/OIDC discovery clients (flytectl, pyflyte) can find it. When
+	// runs.authMetadata.externalAuthServerBaseUrl is set, this proxies the
+	// external IdP's (e.g. Okta) metadata document.
+	sc.Mux.Handle("/.well-known/oauth-authorization-server", service.OAuth2MetadataHTTPHandler(authMetadataSvc))
+	logger.Infof(ctx, "Mounted OAuth2 metadata at /.well-known/oauth-authorization-server")
 
 	triggerSvc := service.NewTriggerService(repo)
 	triggerPath, triggerHandler := triggerconnect.NewTriggerServiceHandler(triggerSvc, connect.WithInterceptors(otelInterceptor))

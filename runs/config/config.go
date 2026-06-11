@@ -62,6 +62,34 @@ type Config struct {
 
 	// TriggerScheduler configures the cron-based trigger scheduler worker.
 	TriggerScheduler TriggerSchedulerConfig `json:"triggerScheduler"`
+
+	// AuthMetadata configures the OAuth2 authorization-server metadata endpoint
+	// (the GetOAuth2Metadata RPC and /.well-known/oauth-authorization-server).
+	AuthMetadata AuthMetadataConfig `json:"authMetadata"`
+}
+
+// AuthMetadataConfig controls how the runs service serves OAuth2 authorization
+// server metadata. When ExternalAuthServerBaseURL is set, the service proxies
+// the external authorization server's metadata document (e.g. Okta) so that
+// clients discovering auth at this deployment are pointed at the external IdP
+// and obtain externally-issued tokens. When empty, the endpoint is not served.
+type AuthMetadataConfig struct {
+	// ExternalAuthServerBaseURL is the base URL of the external OAuth2
+	// authorization server to proxy metadata from
+	// (e.g. "https://signin.example.com/oauth2/default"). Empty disables the
+	// endpoint (GetOAuth2Metadata returns Unimplemented).
+	ExternalAuthServerBaseURL string `json:"externalAuthServerBaseUrl" pflag:",Base URL of the external OAuth2 authorization server to proxy metadata from"`
+
+	// ExternalMetadataURL optionally overrides the metadata path resolved
+	// against ExternalAuthServerBaseURL. Defaults to
+	// ".well-known/oauth-authorization-server".
+	ExternalMetadataURL string `json:"externalMetadataUrl" pflag:",Override for the external metadata path"`
+
+	// RetryAttempts is how many times to try fetching external metadata (default 5).
+	RetryAttempts int `json:"retryAttempts" pflag:",Attempts to fetch external metadata"`
+
+	// RetryDelay is the delay between fetch attempts (default 1s).
+	RetryDelay time.Duration `json:"retryDelay" pflag:",Delay between external metadata fetch attempts"`
 }
 
 // ServerConfig holds HTTP server configuration
