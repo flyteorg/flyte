@@ -409,6 +409,16 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 				},
 			},
 		},
+		// Disable Ray's terminal-oriented log decorations (ANSI-colored log prefixes and
+		// Ray Data progress bars) so logs collected from non-interactive pods stay readable.
+		{
+			Name:  "RAY_COLOR_PREFIX",
+			Value: "0",
+		},
+		{
+			Name:  "RAY_DATA_DISABLE_PROGRESS_BARS",
+			Value: "1",
+		},
 	}
 
 	// Removed 'a0 ..' / 'pyflyte-execute ..' args from the pod spec.
@@ -493,6 +503,16 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 	envs := []v1.EnvVar{
 		{
 			Name:  "RAY_DISABLE_DOCKER_CPU_WARNING",
+			Value: "1",
+		},
+		// Disable Ray's terminal-oriented log decorations (ANSI-colored log prefixes and
+		// Ray Data progress bars) so logs collected from non-interactive pods stay readable.
+		{
+			Name:  "RAY_COLOR_PREFIX",
+			Value: "0",
+		},
+		{
+			Name:  "RAY_DATA_DISABLE_PROGRESS_BARS",
 			Value: "1",
 		},
 		{
