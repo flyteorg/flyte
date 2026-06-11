@@ -482,6 +482,38 @@ func TestBuildResourceRayDefaultAffinityDilution(t *testing.T) {
 	assertEveryTermHasRequirement(t, workerSpec, defaultAffinityReq)
 }
 
+func TestBuildResourceRay_DisablesLogNoiseEnv(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+	rayCtx := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+
+	RayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+	assert.Nil(t, err)
+	ray, ok := RayResource.(*rayv1.RayJob)
+	assert.True(t, ok)
+
+	hasEnv := func(containers []corev1.Container, name, value string) bool {
+		for _, c := range containers {
+			for _, e := range c.Env {
+				if e.Name == name && e.Value == value {
+					return true
+				}
+			}
+		}
+		return false
+	}
+
+	headContainers := ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Containers
+	workerContainers := ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Containers
+	for _, env := range []struct{ name, value string }{
+		{"RAY_COLOR_PREFIX", "0"},
+		{"RAY_DATA_DISABLE_PROGRESS_BARS", "1"},
+	} {
+		assert.True(t, hasEnv(headContainers, env.name, env.value), "head container must set %s=%s", env.name, env.value)
+		assert.True(t, hasEnv(workerContainers, env.name, env.value), "worker container must set %s=%s", env.name, env.value)
+	}
+}
+
 func TestBuildResourceRayContainerImage(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
 
