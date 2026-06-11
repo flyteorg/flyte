@@ -893,9 +893,6 @@ import (
     "fmt"
     "net/http"
 
-    "golang.org/x/net/http2"
-    "golang.org/x/net/http2/h2c"
-
     "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
     "github.com/flyteorg/flyte/v2/queue/service"
     "github.com/flyteorg/flyte/v2/queue/repository"
@@ -933,9 +930,14 @@ func RunQueue(ctx context.Context) error {
 
     // Setup HTTP/2 support
     addr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
+    protocols := &http.Protocols{}
+    protocols.SetHTTP1(true)
+    protocols.SetUnencryptedHTTP2(true)
+
     server := &http.Server{
-        Addr:    addr,
-        Handler: h2c.NewHandler(mux, &http2.Server{}),
+        Addr:      addr,
+        Handler:   mux,
+        Protocols: protocols,
     }
 
     logger.Infof(ctx, "Starting Queue Service on %s", addr)
