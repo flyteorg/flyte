@@ -7,6 +7,9 @@ import (
 	"io"
 	"os"
 	"testing"
+	"testing/iotest"
+
+	goerrors "errors"
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/stretchr/testify/assert"
@@ -63,13 +66,39 @@ func TestRedisStore_ReadRawLimitExceeded(t *testing.T) {
 	payload := bytes.Repeat([]byte("x"), int(MiB)+1)
 	require.NoError(t, store.WriteRaw(context.TODO(), ref, int64(len(payload)), Options{}, bytes.NewReader(payload)))
 
+	// The limit lives in global config; restore it via t.Cleanup so a failed assertion can't leak
+	// the override into other tests. Tests in this package must not use t.Parallel for this reason.
 	prevLimit := GetConfig().Limits.GetLimitMegabytes
 	GetConfig().Limits.GetLimitMegabytes = 1
-	defer func() { GetConfig().Limits.GetLimitMegabytes = prevLimit }()
+	t.Cleanup(func() { GetConfig().Limits.GetLimitMegabytes = prevLimit })
 
 	_, err := store.ReadRaw(context.TODO(), ref)
 	require.Error(t, err)
 	assert.True(t, IsExceedsLimit(err))
+}
+
+func TestRedisStore_WriteRawStreamExceedsDeclaredSize(t *testing.T) {
+	store, mr := newTestRedisStore(t)
+	ref := redisRef(mr, "mismatched")
+
+	err := store.WriteRaw(context.TODO(), ref, 3, Options{}, bytes.NewReader([]byte("longer-than-declared")))
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "exceeds its bound")
+
+	// The failed write must not leave a (truncated) value behind.
+	md, err := store.Head(context.TODO(), ref)
+	require.NoError(t, err)
+	assert.False(t, md.Exists())
+}
+
+func TestRedisStore_WriteRawDeclaredSizeOverRedisCap(t *testing.T) {
+	store, mr := newTestRedisStore(t)
+
+	// Rejected up front from the declared size alone; the stream is never read.
+	err := store.WriteRaw(context.TODO(), redisRef(mr, "huge"), redisMaxValueBytes+1, Options{},
+		iotest.ErrReader(goerrors.New("stream must not be read")))
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "redis string value cap")
 }
 
 func TestRedisStore_Head(t *testing.T) {
@@ -121,12 +150,16 @@ func TestRedisStore_List(t *testing.T) {
 	otherRef := redisRef(mr, "runs/r2/d.pb")
 	require.NoError(t, store.WriteRaw(context.TODO(), otherRef, 1, Options{}, bytes.NewReader([]byte("x"))))
 
+	var pages [][]DataReference
 	seen := map[DataReference]bool{}
 	cursor := NewCursorAtStart()
 	for {
 		items, nextCursor, err := store.List(context.TODO(), redisRef(mr, "runs/r1"), 2, cursor)
 		require.NoError(t, err)
+		require.LessOrEqual(t, len(items), 2, "List must never return more than maxItems")
+		pages = append(pages, items)
 		for _, item := range items {
+			require.False(t, seen[item], "duplicate item %v across pages", item)
 			seen[item] = true
 		}
 		if IsCursorEnd(nextCursor) {
@@ -135,10 +168,41 @@ func TestRedisStore_List(t *testing.T) {
 		cursor = nextCursor
 	}
 
-	assert.Len(t, seen, len(keys))
+	assert.Equal(t, [][]DataReference{
+		{redisRef(mr, "runs/r1/a.pb"), redisRef(mr, "runs/r1/b.pb")},
+		{redisRef(mr, "runs/r1/sub/c.pb")},
+	}, pages, "pages must be sorted, exactly maxItems-sized, and lossless")
+}
+
+func TestRedisStore_ListContainerRoot(t *testing.T) {
+	store, mr := newTestRedisStore(t)
+	keys := []string{"runs/r1/a.pb", "runs/r2/b.pb", "loose"}
 	for _, k := range keys {
-		assert.True(t, seen[redisRef(mr, k)], "missing %v", k)
+		require.NoError(t, store.WriteRaw(context.TODO(), redisRef(mr, k), 1, Options{}, bytes.NewReader([]byte("x"))))
 	}
+
+	// A reference with no key (the container root) lists everything.
+	items, cursor, err := store.List(context.TODO(), DataReference("redis://"+mr.Addr()), 10, NewCursorAtStart())
+	require.NoError(t, err)
+	assert.True(t, IsCursorEnd(cursor))
+	assert.Equal(t, []DataReference{
+		redisRef(mr, "loose"), redisRef(mr, "runs/r1/a.pb"), redisRef(mr, "runs/r2/b.pb"),
+	}, items)
+}
+
+func TestRedisStore_ReferenceHostIsAdvisory(t *testing.T) {
+	// The same Redis is commonly reachable under different addresses from different vantage points
+	// (in-cluster DNS vs host port mapping), so references whose host differs from the configured
+	// redis.addr still resolve against the configured server.
+	store, mr := newTestRedisStore(t)
+	require.NoError(t, store.WriteRaw(context.TODO(), redisRef(mr, "vantage"), 1, Options{}, bytes.NewReader([]byte("x"))))
+
+	reader, err := store.ReadRaw(context.TODO(), DataReference("redis://elsewhere.example:6379/vantage"))
+	require.NoError(t, err)
+	defer func() { _ = reader.Close() }()
+	data, err := io.ReadAll(reader)
+	require.NoError(t, err)
+	assert.Equal(t, []byte("x"), data)
 }
 
 func TestRedisStore_RejectsNonRedisReference(t *testing.T) {
