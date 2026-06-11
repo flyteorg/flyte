@@ -65,5 +65,9 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "cache.target_gc_percent"), defaultConfig.Cache.TargetGCPercent, "Sets the garbage collection target percentage.")
 	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "limits.maxDownloadMBs"), defaultConfig.Limits.GetLimitMegabytes, "Maximum allowed download size (in MBs) per call.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "defaultHttpClient.timeout"), defaultConfig.DefaultHTTPClient.Timeout.String(), "Sets time out on the http client.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "defaultHttpClient.maxIdleConns"), defaultConfig.DefaultHTTPClient.MaxIdleConns, "Maximum number of idle connections across all hosts. Zero means use the http.DefaultTransport value.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "defaultHttpClient.maxIdleConnsPerHost"), defaultConfig.DefaultHTTPClient.MaxIdleConnsPerHost, "Maximum number of idle connections per host. Zero means use the http.DefaultTransport value.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "defaultHttpClient.maxConnsPerHost"), defaultConfig.DefaultHTTPClient.MaxConnsPerHost, "Maximum number of connections per host; new requests block at the limit. Zero means no limit.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "defaultHttpClient.idleConnTimeout"), defaultConfig.DefaultHTTPClient.IdleConnTimeout.String(), "Maximum amount of time an idle connection remains open. Zero means use the http.DefaultTransport value.")
 	return cmdFlags
 }
