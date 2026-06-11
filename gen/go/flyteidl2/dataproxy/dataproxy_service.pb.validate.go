@@ -1529,6 +1529,10 @@ func (m *GetActionDataResponse) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for InputsUri
+
+	// no validation rules for OutputsUri
+
 	if len(errors) > 0 {
 		return GetActionDataResponseMultiError(errors)
 	}
