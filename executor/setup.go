@@ -167,7 +167,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 	reconciler := controller.NewTaskActionReconciler(
 		mgr.GetClient(), mgr.GetScheme(), registry, dataStore, eventsClient, cfg.Cluster,
-		otelutils.GetMeterProvider(otelServiceName),
+		otelutils.GetMeterProvider(otelServiceName), mgr.GetCache(),
 	)
 	reconciler.CatalogClient = asyncCatalogClient
 	reconciler.Catalog = cacheClient

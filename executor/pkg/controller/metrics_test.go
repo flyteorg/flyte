@@ -12,23 +12,10 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 )
-
-// newTestMetricsScheme builds a scheme with the TaskAction CRD and core types
-// (the latter for asserting non-TaskAction operations pass through untimed).
-func newTestMetricsScheme(t *testing.T) *runtime.Scheme {
-	t.Helper()
-	s := runtime.NewScheme()
-	require.NoError(t, flyteorgv1.AddToScheme(s))
-	require.NoError(t, corev1.AddToScheme(s))
-	return s
-}
 
 // collectMetric drains the manual reader and returns the named metric.
 func collectMetric(t *testing.T, reader *sdkmetric.ManualReader, name string) metricdata.Metrics {
@@ -60,20 +47,17 @@ func findOpDataPoint(t *testing.T, h metricdata.Histogram[float64], op string) m
 func TestRegisterTaskActionMetrics(t *testing.T) {
 	reader := sdkmetric.NewManualReader()
 	provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader))
-	c := fake.NewClientBuilder().WithScheme(newTestMetricsScheme(t)).WithObjects(
-		&flyteorgv1.TaskAction{ObjectMeta: metav1.ObjectMeta{Name: "ta-1", Namespace: "default"},
-			Status: flyteorgv1.TaskActionStatus{PluginPhase: "Executing"}},
-		&flyteorgv1.TaskAction{ObjectMeta: metav1.ObjectMeta{Name: "ta-2", Namespace: "default"},
-			Status: flyteorgv1.TaskActionStatus{PluginPhase: "Executing"}},
-		&flyteorgv1.TaskAction{ObjectMeta: metav1.ObjectMeta{Name: "ta-3", Namespace: "default"}},
-	).Build()
 
-	m, err := registerTaskActionMetrics(provider, c)
+	// The active gauge reports whatever the injected phase counter returns.
+	activeByPhase := func(context.Context) map[string]int64 {
+		return map[string]int64{"Executing": 2, "Unknown": 1}
+	}
+
+	m, err := registerTaskActionMetrics(provider, activeByPhase)
 	require.NoError(t, err)
 	require.NotNil(t, m)
 
-	// Collection triggers the async gauge callback, which lists from the client
-	// and reports active CRD counts by phase ("" maps to Unknown).
+	// Collection triggers the async gauge callback, which observes one data point per phase.
 	gauge, ok := collectMetric(t, reader, "taskaction.active").Data.(metricdata.Gauge[int64])
 	require.True(t, ok)
 	counts := map[string]int64{}
@@ -85,12 +69,24 @@ func TestRegisterTaskActionMetrics(t *testing.T) {
 	assert.Equal(t, map[string]int64{"Executing": 2, "Unknown": 1}, counts)
 }
 
+// TestCountByPhase covers the pure tallying used by cachedPhaseCounter: empty phase
+// maps to "Unknown" and nil entries (which a raw cache listing may contain) are skipped.
+func TestCountByPhase(t *testing.T) {
+	items := []*flyteorgv1.TaskAction{
+		{ObjectMeta: metav1.ObjectMeta{Name: "ta-1"}, Status: flyteorgv1.TaskActionStatus{PluginPhase: "Executing"}},
+		{ObjectMeta: metav1.ObjectMeta{Name: "ta-2"}, Status: flyteorgv1.TaskActionStatus{PluginPhase: "Executing"}},
+		{ObjectMeta: metav1.ObjectMeta{Name: "ta-3"}}, // empty phase -> Unknown
+		nil,
+	}
+	assert.Equal(t, map[string]int64{"Executing": 2, "Unknown": 1}, countByPhase(items))
+	assert.Equal(t, map[string]int64{}, countByPhase(nil))
+}
+
 func TestObserveCRDSize(t *testing.T) {
 	reader := sdkmetric.NewManualReader()
 	provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader))
-	c := fake.NewClientBuilder().WithScheme(newTestMetricsScheme(t)).Build()
 
-	m, err := registerTaskActionMetrics(provider, c)
+	m, err := registerTaskActionMetrics(provider, nil)
 	require.NoError(t, err)
 
 	ta := &flyteorgv1.TaskAction{
@@ -117,9 +113,8 @@ func TestObserveCRDSize(t *testing.T) {
 func TestRecordK8sOp(t *testing.T) {
 	reader := sdkmetric.NewManualReader()
 	provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader))
-	c := fake.NewClientBuilder().WithScheme(newTestMetricsScheme(t)).Build()
 
-	m, err := registerTaskActionMetrics(provider, c)
+	m, err := registerTaskActionMetrics(provider, nil)
 	require.NoError(t, err)
 
 	// Records latency labeled by op/error.

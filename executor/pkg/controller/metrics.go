@@ -8,7 +8,8 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	metricnoop "go.opentelemetry.io/otel/metric/noop"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	toolscache "k8s.io/client-go/tools/cache"
+	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 )
@@ -36,8 +37,10 @@ type taskActionMetrics struct {
 
 // registerTaskActionMetrics wires the TaskAction OTel meters onto the given meter
 // provider (the executor's, registered in executor/setup.go). The active-by-phase
-// gauge is observed asynchronously by listing TaskActions from the controller cache.
-func registerTaskActionMetrics(provider metric.MeterProvider, c client.Client) (*taskActionMetrics, error) {
+// gauge is observed asynchronously via activeByPhase, which returns the current
+// TaskAction count per plugin phase (see cachedPhaseCounter for the cache-backed,
+// no-copy implementation). A nil activeByPhase leaves the gauge unobserved.
+func registerTaskActionMetrics(provider metric.MeterProvider, activeByPhase func(context.Context) map[string]int64) (*taskActionMetrics, error) {
 	if _, ok := provider.(metricnoop.MeterProvider); ok {
 		return nil, nil
 	}
@@ -70,23 +73,10 @@ func registerTaskActionMetrics(provider metric.MeterProvider, c client.Client) (
 	}
 
 	_, err = meter.RegisterCallback(func(ctx context.Context, o metric.Observer) error {
-		if c == nil {
+		if activeByPhase == nil {
 			return nil
 		}
-		var list flyteorgv1.TaskActionList
-		if err := c.List(ctx, &list); err != nil {
-			// Avoid failing the entire metrics collection cycle when the cache/API is temporarily unavailable.
-			return nil
-		}
-		counts := make(map[string]int64, 8)
-		for i := range list.Items {
-			phase := list.Items[i].Status.PluginPhase
-			if phase == "" {
-				phase = "Unknown"
-			}
-			counts[phase]++
-		}
-		for phase, n := range counts {
+		for phase, n := range activeByPhase(ctx) {
 			o.ObserveInt64(active, n, metric.WithAttributes(attribute.String("phase", phase)))
 		}
 		return nil
@@ -96,6 +86,60 @@ func registerTaskActionMetrics(provider metric.MeterProvider, c client.Client) (
 	}
 
 	return &taskActionMetrics{crdSizeBytes: crdSize, crdOpDuration: crdOp}, nil
+}
+
+// countByPhase tallies TaskActions by plugin phase; an empty phase maps to "Unknown".
+// nil entries are skipped so callers can pass a raw cache listing without filtering.
+func countByPhase(items []*flyteorgv1.TaskAction) map[string]int64 {
+	counts := make(map[string]int64, 8)
+	for _, ta := range items {
+		if ta == nil {
+			continue
+		}
+		phase := ta.Status.PluginPhase
+		if phase == "" {
+			phase = "Unknown"
+		}
+		counts[phase]++
+	}
+	return counts
+}
+
+// cachedPhaseCounter returns a function that counts TaskAction CRDs by plugin phase
+// straight from the controller's informer cache indexer. Unlike client.List, the
+// indexer's List returns the cached object pointers without deep-copying every CRD,
+// so a collection cycle costs O(N) pointer reads instead of O(N) full-object copies —
+// this is what keeps the active gauge cheap when many TaskActions exist. The indexer
+// is resolved lazily on first call, because the cache is not yet started when the
+// reconciler is constructed.
+func cachedPhaseCounter(c ctrlcache.Cache) func(context.Context) map[string]int64 {
+	var indexer toolscache.Indexer
+	return func(ctx context.Context) map[string]int64 {
+		if indexer == nil {
+			if c == nil {
+				return nil
+			}
+			// BlockUntilSynced(false): never stall the metric-collection goroutine; a
+			// not-yet-synced cache just yields a partial count the next cycle corrects.
+			informer, err := c.GetInformer(ctx, &flyteorgv1.TaskAction{}, ctrlcache.BlockUntilSynced(false))
+			if err != nil {
+				return nil
+			}
+			sii, ok := informer.(toolscache.SharedIndexInformer)
+			if !ok {
+				return nil
+			}
+			indexer = sii.GetIndexer()
+		}
+		objs := indexer.List()
+		items := make([]*flyteorgv1.TaskAction, 0, len(objs))
+		for _, obj := range objs {
+			if ta, ok := obj.(*flyteorgv1.TaskAction); ok {
+				items = append(items, ta)
+			}
+		}
+		return countByPhase(items)
+	}
 }
 
 // observeCRDSize records the serialized size of a TaskAction CRD. No-op when

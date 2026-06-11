@@ -35,6 +35,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
+	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -204,8 +205,9 @@ func (r *TaskActionReconciler) finalizePermanentFailure(
 
 // NewTaskActionReconciler creates a new TaskActionReconciler. meterProvider is the
 // executor's OTel meter provider (otelutils.GetMeterProvider(otelServiceName) in
-// executor/setup.go). TaskAction CRD operations are timed inline at the call
-// sites via metrics.recordK8sOp.
+// executor/setup.go). cache is the manager's cache (mgr.GetCache()); the active-by-phase
+// gauge counts TaskActions straight from its indexer to avoid deep-copying every CRD.
+// TaskAction CRD operations are timed inline at the call sites via metrics.recordK8sOp.
 func NewTaskActionReconciler(
 	c client.Client,
 	scheme *runtime.Scheme,
@@ -214,8 +216,9 @@ func NewTaskActionReconciler(
 	eventsClient workflowconnect.EventsProxyServiceClient,
 	cluster string,
 	meterProvider metric.MeterProvider,
+	cache ctrlcache.Cache,
 ) *TaskActionReconciler {
-	metrics, err := registerTaskActionMetrics(meterProvider, c)
+	metrics, err := registerTaskActionMetrics(meterProvider, cachedPhaseCounter(cache))
 	if err != nil {
 		// Non-fatal: degrade to no custom metrics rather than failing controller setup.
 		log.Log.Error(err, "failed to register TaskAction OTel metrics")
