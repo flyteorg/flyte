@@ -10,6 +10,12 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/imagebuilder"
 // ImageIdentifier is how to identify an image
 message ImageIdentifier {
   string name = 1 [(buf.validate.field).string.min_len = 1];
+
+  // Optional registry/repository the image lives in, e.g.
+  // "<account>.dkr.ecr.<region>.amazonaws.com/<repo>" for an image built with a custom registry
+  // override (clone(registry=...)). When set, GetImage looks the image up there; when empty, the
+  // cluster's default repository is used.
+  string repository = 2;
 }
 
 // Simple container to surface if image exists

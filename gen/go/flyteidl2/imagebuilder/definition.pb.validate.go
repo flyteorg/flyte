@@ -59,6 +59,8 @@ func (m *ImageIdentifier) validate(all bool) error {
 
 	// no validation rules for Name
 
+	// no validation rules for Repository
+
 	if len(errors) > 0 {
 		return ImageIdentifierMultiError(errors)
 	}
