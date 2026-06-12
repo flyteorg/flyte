@@ -158,8 +158,9 @@ func buildGroupPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCon
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return nil, nil, 0, nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to read task template: [%v]", err.Error())
+	} else if taskTemplate == nil {
+		return nil, nil, 0, nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nil task specification")
 	}
-
 	// Group-level extended resources override the execution-level overrides, which in
 	// turn override the task-level defaults. ToK8sPodSpec performs the same merge
 	// internally; this computes the result so the effective accelerator can be returned.
