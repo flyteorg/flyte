@@ -16,6 +16,7 @@ var stores = map[string]dataStoreCreateFn{
 	TypeMinio:  newStowRawStore,
 	TypeS3:     newStowRawStore,
 	TypeStow:   newStowRawStore,
+	TypeRedis:  NewRedisRawStore,
 }
 
 type proxyTransport struct {
@@ -123,6 +124,19 @@ func (ds *DataStore) RefreshConfig(ctx context.Context, cfg *Config) error {
 	rawStore, err := fn(ctx, cfg, ds.metrics)
 	if err != nil {
 		return err
+	}
+
+	// When redis.addr is configured alongside a non-redis store type, route redis:// references to
+	// a redis store and everything else to the configured store. This keeps metadata in Redis while
+	// raw data and signed URLs continue using the blob store, activated purely by the reference
+	// scheme — no behavior change unless redis:// paths are actually used.
+	if cfg.Type != TypeRedis && len(cfg.Redis.Addr) > 0 {
+		redisStore, err := NewRedisRawStore(ctx, cfg, ds.metrics)
+		if err != nil {
+			return err
+		}
+
+		rawStore = newSchemeRoutingStore(rawStore, redisStore, ds.metrics.copyMetrics)
 	}
 
 	rawStore = newCachedRawStore(cfg, rawStore, ds.metrics.cacheMetrics)

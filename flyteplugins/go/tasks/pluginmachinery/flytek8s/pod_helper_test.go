@@ -124,6 +124,9 @@ func TestAddRequiredNodeSelectorRequirements(t *testing.T) {
 			Operator: v1.NodeSelectorOpIn,
 			Values:   []string{"new"},
 		}
+		// Applying the same requirement twice must not duplicate it (callers like
+		// ApplyGPUNodeSelectors may run more than once on the same pod spec).
+		AddRequiredNodeSelectorRequirements(&affinity, nst)
 		AddRequiredNodeSelectorRequirements(&affinity, nst)
 		assert.EqualValues(
 			t,
@@ -537,6 +540,24 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 			},
 			podSpec.Tolerations,
 		)
+	})
+
+	// The ray plugin re-applies GPU node selectors after merging a group's custom pod
+	// spec, so a second application on the same pod spec must not duplicate the node
+	// selector requirements or tolerations.
+	t.Run("is idempotent", func(t *testing.T) {
+		podSpec := basePodSpec.DeepCopy()
+		accelerator := &core.GPUAccelerator{
+			Device: "nvidia-tesla-a100",
+			PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+				PartitionSize: "1g.5gb",
+			},
+		}
+		ApplyGPUNodeSelectors(podSpec, accelerator)
+		applied := podSpec.DeepCopy()
+		ApplyGPUNodeSelectors(podSpec, accelerator)
+		assert.EqualValues(t, applied.Affinity, podSpec.Affinity)
+		assert.EqualValues(t, applied.Tolerations, podSpec.Tolerations)
 	})
 
 	t.Run("with gpu device and partition size spec", func(t *testing.T) {

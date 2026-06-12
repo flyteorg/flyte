@@ -616,6 +616,127 @@ func TestBuildResourceRayGroupExtendedResourcesOverride(t *testing.T) {
 		workerNodeSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
 }
 
+// TestBuildResourceRayGroupK8SPodGPU is a regression test for the case where the GPU
+// resource is requested only through a group's custom k8s_pod (not the task container).
+// ToK8sPodSpec applies GPU node selectors before the custom pod spec is merged, so the
+// builders must re-apply them post-merge or the device toleration and node affinity are
+// silently dropped (while the generic nvidia.com/gpu toleration, which is computed
+// post-merge, still appears).
+func TestBuildResourceRayGroupK8SPodGPU(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		GpuDeviceNodeLabel:                 "gpu-node-label",
+		GpuResourceName:                    flytek8s.ResourceNvidiaGPU,
+		AddTolerationsForExtendedResources: []string{"nvidia.com/gpu"},
+	}))
+
+	// Task-level resources do not include any GPU.
+	cpuOnlyResources := &corev1.ResourceRequirements{
+		Limits: corev1.ResourceList{
+			corev1.ResourceCPU:    resource.MustParse("1000m"),
+			corev1.ResourceMemory: resource.MustParse("1Gi"),
+		},
+		Requests: corev1.ResourceList{
+			corev1.ResourceCPU:    resource.MustParse("100m"),
+			corev1.ResourceMemory: resource.MustParse("512Mi"),
+		},
+	}
+
+	gpuResources := corev1.ResourceRequirements{
+		Limits: corev1.ResourceList{
+			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+		},
+		Requests: corev1.ResourceList{
+			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+		},
+	}
+	workerGPUPod := &core.K8SPod{
+		PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+			Containers: []corev1.Container{
+				{
+					Name:      "ray-worker",
+					Resources: gpuResources,
+				},
+			},
+		}),
+	}
+
+	expectedNodeSelectorTerms := []corev1.NodeSelectorTerm{
+		{
+			MatchExpressions: []corev1.NodeSelectorRequirement{
+				{
+					Key:      "gpu-node-label",
+					Operator: corev1.NodeSelectorOpIn,
+					Values:   []string{"nvidia-tesla-t4"},
+				},
+			},
+		},
+	}
+	expectedTolerations := []corev1.Toleration{
+		{
+			Key:      "gpu-node-label",
+			Value:    "nvidia-tesla-t4",
+			Operator: corev1.TolerationOpEqual,
+			Effect:   corev1.TaintEffectNoSchedule,
+		},
+		{
+			Key:      "nvidia.com/gpu",
+			Operator: corev1.TolerationOpExists,
+			Effect:   corev1.TaintEffectNoSchedule,
+		},
+	}
+
+	params := []struct {
+		name                   string
+		taskExtendedResources  *core.ExtendedResources
+		groupExtendedResources *core.ExtendedResources
+	}{
+		{
+			name: "accelerator from group extended resources",
+			groupExtendedResources: &core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{Device: "nvidia-tesla-t4"},
+			},
+		},
+		{
+			name: "accelerator from task extended resources",
+			taskExtendedResources: &core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{Device: "nvidia-tesla-t4"},
+			},
+		},
+	}
+
+	for _, p := range params {
+		t.Run(p.name, func(t *testing.T) {
+			rayJobObj := dummyRayCustomObj()
+			rayJobObj.RayCluster.WorkerGroupSpec[0].K8SPod = workerGPUPod
+			rayJobObj.RayCluster.WorkerGroupSpec[0].ExtendedResources = p.groupExtendedResources
+
+			taskTemplate := dummyRayTaskTemplate("ray-id", rayJobObj)
+			taskTemplate.ExtendedResources = p.taskExtendedResources
+			taskContext := dummyRayTaskContext(taskTemplate, cpuOnlyResources, nil, "", serviceAccount)
+			r, err := rayJobResourceHandler{}.BuildResource(context.TODO(), taskContext)
+			assert.NoError(t, err)
+			rayJob, ok := r.(*rayv1.RayJob)
+			assert.True(t, ok)
+
+			// The worker pod's GPU comes only from the group's k8s_pod, so the device
+			// node affinity and toleration must be applied after that merge.
+			workerNodeSpec := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec
+			assert.NotNil(t, workerNodeSpec.Affinity)
+			assert.NotNil(t, workerNodeSpec.Affinity.NodeAffinity)
+			assert.EqualValues(t, expectedNodeSelectorTerms,
+				workerNodeSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+			assert.EqualValues(t, expectedTolerations, workerNodeSpec.Tolerations)
+
+			// The head pod requests no GPU, so it must not pick up GPU scheduling
+			// constraints. (ToK8sPodSpec always initializes an empty Affinity via
+			// ApplyInterruptibleNodeAffinity, so only NodeAffinity is asserted.)
+			headNodeSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
+			assert.Nil(t, headNodeSpec.Affinity.NodeAffinity)
+			assert.Empty(t, headNodeSpec.Tolerations)
+		})
+	}
+}
+
 func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
 

@@ -29,11 +29,13 @@ import (
 	"k8s.io/client-go/util/retry"
 
 	"connectrpc.com/connect"
+	"go.opentelemetry.io/otel/metric"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
+	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -96,6 +98,7 @@ type TaskActionReconciler struct {
 	eventsClient      workflowconnect.EventsProxyServiceClient
 	cluster           string
 	MaxSystemFailures uint32
+	metrics           *taskActionMetrics
 }
 
 // isSystemRetryableFailure reports whether the plugin transition is a
@@ -167,7 +170,10 @@ func (r *TaskActionReconciler) recordSystemError(
 	}
 
 	if taskActionStatusChanged(original.Status, taskAction.Status) {
-		if updErr := r.Status().Update(ctx, taskAction); updErr != nil {
+		start := time.Now()
+		updErr := r.Status().Update(ctx, taskAction)
+		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
+		if updErr != nil {
 			logger.Error(updErr, "failed to persist SystemFailures counter")
 		}
 	}
@@ -197,7 +203,11 @@ func (r *TaskActionReconciler) finalizePermanentFailure(
 	return ctrl.Result{}, nil
 }
 
-// NewTaskActionReconciler creates a new TaskActionReconciler
+// NewTaskActionReconciler creates a new TaskActionReconciler. meterProvider is the
+// executor's OTel meter provider (otelutils.GetMeterProvider(otelServiceName) in
+// executor/setup.go). cache is the manager's cache (mgr.GetCache()); the active-by-phase
+// gauge counts TaskActions straight from its indexer to avoid deep-copying every CRD.
+// TaskAction CRD operations are timed inline at the call sites via metrics.recordK8sOp.
 func NewTaskActionReconciler(
 	c client.Client,
 	scheme *runtime.Scheme,
@@ -205,7 +215,14 @@ func NewTaskActionReconciler(
 	dataStore *storage.DataStore,
 	eventsClient workflowconnect.EventsProxyServiceClient,
 	cluster string,
+	meterProvider metric.MeterProvider,
+	cache ctrlcache.Cache,
 ) *TaskActionReconciler {
+	metrics, err := registerTaskActionMetrics(meterProvider, cachedPhaseCounter(cache))
+	if err != nil {
+		// Non-fatal: degrade to no custom metrics rather than failing controller setup.
+		log.Log.Error(err, "failed to register TaskAction OTel metrics")
+	}
 	return &TaskActionReconciler{
 		Client:         c,
 		Scheme:         scheme,
@@ -213,6 +230,7 @@ func NewTaskActionReconciler(
 		DataStore:      dataStore,
 		eventsClient:   eventsClient,
 		cluster:        cluster,
+		metrics:        metrics,
 	}
 }
 
@@ -228,9 +246,13 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	// Fetch the TaskAction instance
 	taskAction := &flyteorgv1.TaskAction{}
-	if err := r.Get(ctx, req.NamespacedName, taskAction); err != nil {
+	start := time.Now()
+	err := r.Get(ctx, req.NamespacedName, taskAction)
+	r.metrics.recordK8sOp(ctx, opGet, start, err)
+	if err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
+	r.metrics.observeCRDSize(ctx, taskAction)
 
 	// Please do NOT modify `originalTaskActionInstance` in the following code. This is for checking
 	// if the TaskAction instance changes
@@ -261,16 +283,21 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		r.Recorder.Eventf(taskAction, nil, corev1.EventTypeWarning, string(eventType), "ValidatingTaskAction", "%v", err)
 		setCondition(taskAction, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue, reason, err.Error())
 		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse, reason, err.Error())
-		_ = r.Status().Update(ctx, taskAction)
+		start = time.Now()
+		updErr := r.Status().Update(ctx, taskAction) // error intentionally ignored: terminal either way
+		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
 		return ctrl.Result{}, nil // terminal — do not requeue
 	}
 
 	// Ensure finalizer is present (once validation passes)
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		controllerutil.AddFinalizer(taskAction, taskActionFinalizer)
-		if err := r.Update(ctx, taskAction); err != nil {
-			logger.Error(err, "Failed to update TaskAction with finalizer")
-			return ctrl.Result{}, err
+		start = time.Now()
+		updErr := r.Update(ctx, taskAction)
+		r.metrics.recordK8sOp(ctx, opUpdate, start, updErr)
+		if updErr != nil {
+			logger.Error(updErr, "Failed to update TaskAction with finalizer")
+			return ctrl.Result{}, updErr
 		}
 		return ctrl.Result{}, nil
 	}
@@ -497,7 +524,10 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 
 func (r *TaskActionReconciler) removeFinalizer(ctx context.Context, taskAction *flyteorgv1.TaskAction) (ctrl.Result, error) {
 	controllerutil.RemoveFinalizer(taskAction, taskActionFinalizer)
-	if err := r.Update(ctx, taskAction); err != nil {
+	start := time.Now()
+	err := r.Update(ctx, taskAction)
+	r.metrics.recordK8sOp(ctx, opUpdate, start, err)
+	if err != nil {
 		return ctrl.Result{}, err
 	}
 	return ctrl.Result{}, nil
@@ -538,11 +568,17 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	// This will resolve the conflict error caused by k8s optimistic lock when 2 reconcile loops updating the same CRD
 	if err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		latest := &flyteorgv1.TaskAction{}
-		if getErr := r.Get(ctx, client.ObjectKeyFromObject(newTaskAction), latest); getErr != nil {
+		start := time.Now()
+		getErr := r.Get(ctx, client.ObjectKeyFromObject(newTaskAction), latest)
+		r.metrics.recordK8sOp(ctx, opGet, start, getErr)
+		if getErr != nil {
 			return getErr
 		}
 		latest.Status = newTaskAction.Status
-		return r.Status().Update(ctx, latest)
+		start = time.Now()
+		updErr := r.Status().Update(ctx, latest)
+		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
+		return updErr
 	}); err != nil {
 		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
 		return err

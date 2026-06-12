@@ -8,6 +8,7 @@ import "flyteidl2/common/identity.proto";
 import "flyteidl2/common/phase.proto";
 import "flyteidl2/core/catalog.proto";
 import "flyteidl2/core/execution.proto";
+import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/types.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/run.proto";
@@ -273,6 +274,16 @@ message AbortInfo {
   common.EnrichedIdentity aborted_by = 2;
 }
 
+// SignalInfo captures details of a condition action resolved via Signal.
+message SignalInfo {
+  // Identity that signalled the condition.
+  common.EnrichedIdentity signalled_by = 1;
+
+  // The literal value supplied by the signal. Matches the condition's
+  // declared type and is the same payload exposed via GetActionData.
+  flyteidl2.core.Literal output = 2;
+}
+
 // ActionDetails is the full details of an action.
 message ActionDetails {
   // Id for this action.
@@ -289,6 +300,8 @@ message ActionDetails {
     ErrorInfo error_info = 4;
     // Abort info for the action, if aborted.
     AbortInfo abort_info = 5;
+    // Signal info for a condition action resolved via Signal.
+    SignalInfo signal_info = 10;
   }
 
   // Fully resolved spec of the action. Merges user submitted task spec with platform defaults.

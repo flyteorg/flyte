@@ -35,7 +35,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	tracerProvider := otelutils.GetTracerProvider(otelServiceName)
 	meterProvider := otelutils.GetMeterProvider(otelServiceName)
 
-	otelInterceptor, err := otelconnect.NewInterceptor(otelconnect.WithTracerProvider(tracerProvider), otelconnect.WithMeterProvider(meterProvider))
+	otelInterceptor, err := otelconnect.NewInterceptor(otelconnect.WithTracerProvider(tracerProvider), otelconnect.WithMeterProvider(meterProvider), otelconnect.WithoutServerPeerAttributes())
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
