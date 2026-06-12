@@ -18,81 +18,45 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
+	"github.com/flyteorg/flyte/v2/runs/config"
 )
 
 const defaultOAuth2MetadataPath = ".well-known/oauth-authorization-server"
-
-// ExternalAuthServerConfig configures proxying of an external OAuth2
-// authorization server's metadata document (e.g. Okta).
-type ExternalAuthServerConfig struct {
-	// BaseURL is the external authorization server's base URL. When empty,
-	// GetOAuth2Metadata returns Unimplemented (HTTP 501 for the well-known handler).
-	BaseURL string
-	// MetadataURL overrides the metadata path resolved against BaseURL. Defaults
-	// to ".well-known/oauth-authorization-server".
-	MetadataURL string
-	// RetryAttempts is the number of fetch attempts (default 5).
-	RetryAttempts int
-	// RetryDelay is the delay between fetch attempts (default 1s).
-	RetryDelay time.Duration
-}
-
-// PublicClientConfig is the public (CLI/SDK) OAuth2 client configuration
-// advertised via GetPublicClientConfig. Mirrors flyteadmin's
-// appAuth.thirdPartyConfig.flyteClient + grpcAuthorizationHeader.
-type PublicClientConfig struct {
-	// ClientID is the public client id used by CLI/SDK login flows.
-	ClientID string
-	// RedirectURI is the callback the public client listens on during login.
-	RedirectURI string
-	// Scopes are the OAuth2 scopes the public client should request.
-	Scopes []string
-	// Audience is the intended audience for requested tokens.
-	Audience string
-	// AuthorizationMetadataKey is the header/metadata key clients should place
-	// tokens in (default "authorization").
-	AuthorizationMetadataKey string
-}
 
 // AuthMetadataService implements the AuthMetadataServiceHandler interface.
 type AuthMetadataService struct {
 	authconnect.UnimplementedAuthMetadataServiceHandler
 	dataplaneDomain string
-	external        ExternalAuthServerConfig
-	publicClient    PublicClientConfig
+	cfg             config.AuthMetadataConfig
 }
 
 // NewAuthMetadataService creates a new AuthMetadataService instance. When
-// external.BaseURL is set, GetOAuth2Metadata proxies that server's metadata.
-// publicClient is advertised to SDKs via GetPublicClientConfig.
-func NewAuthMetadataService(dataplaneDomain string, external ExternalAuthServerConfig, publicClient PublicClientConfig) *AuthMetadataService {
+// cfg.ExternalAuthServerBaseURL is set, GetOAuth2Metadata proxies that server's
+// metadata. cfg.FlyteClient is advertised to SDKs via GetPublicClientConfig.
+func NewAuthMetadataService(dataplaneDomain string, cfg config.AuthMetadataConfig) *AuthMetadataService {
 	return &AuthMetadataService{
 		dataplaneDomain: dataplaneDomain,
-		external:        external,
-		publicClient:    publicClient,
+		cfg:             cfg,
 	}
 }
 
 var _ authconnect.AuthMetadataServiceHandler = (*AuthMetadataService)(nil)
 
 // GetPublicClientConfig returns the public (CLI/SDK) OAuth2 client settings.
-// Mirrors flyteadmin's OAuth2MetadataProvider.GetPublicClientConfig
-// (auth/authzserver/metadata_provider.go), which serves
-// appAuth.thirdPartyConfig.flyteClient + grpcAuthorizationHeader.
 func (s *AuthMetadataService) GetPublicClientConfig(
 	ctx context.Context,
 	req *connect.Request[auth.GetPublicClientConfigRequest],
 ) (*connect.Response[auth.GetPublicClientConfigResponse], error) {
-	authMetadataKey := s.publicClient.AuthorizationMetadataKey
+	authMetadataKey := s.cfg.AuthorizationMetadataKey
 	if authMetadataKey == "" {
 		authMetadataKey = "authorization"
 	}
 	return connect.NewResponse(&auth.GetPublicClientConfigResponse{
-		ClientId:                 s.publicClient.ClientID,
-		RedirectUri:              s.publicClient.RedirectURI,
-		Scopes:                   s.publicClient.Scopes,
+		ClientId:                 s.cfg.FlyteClient.ClientID,
+		RedirectUri:              s.cfg.FlyteClient.RedirectURI,
+		Scopes:                   s.cfg.FlyteClient.Scopes,
 		AuthorizationMetadataKey: authMetadataKey,
-		Audience:                 s.publicClient.Audience,
+		Audience:                 s.cfg.FlyteClient.Audience,
 		DataplaneDomain:          s.dataplaneDomain,
 	}), nil
 }
@@ -108,26 +72,26 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 	ctx context.Context,
 	_ *connect.Request[auth.GetOAuth2MetadataRequest],
 ) (*connect.Response[auth.GetOAuth2MetadataResponse], error) {
-	if s.external.BaseURL == "" {
+	if s.cfg.ExternalAuthServerBaseURL == "" {
 		return nil, connect.NewError(connect.CodeUnimplemented,
 			errors.New("oauth2 metadata is not configured; set runs.authMetadata.externalAuthServerBaseUrl"))
 	}
 
-	baseURL, err := url.Parse(s.external.BaseURL)
+	baseURL, err := url.Parse(s.cfg.ExternalAuthServerBaseURL)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal,
-			fmt.Errorf("invalid external auth server base URL %q: %w", s.external.BaseURL, err))
+			fmt.Errorf("invalid external auth server base URL %q: %w", s.cfg.ExternalAuthServerBaseURL, err))
 	}
 	if baseURL.Scheme == "" || baseURL.Host == "" {
 		return nil, connect.NewError(connect.CodeInternal,
-			fmt.Errorf("external auth server base URL must be absolute (include scheme and host): %q", s.external.BaseURL))
+			fmt.Errorf("external auth server base URL must be absolute (include scheme and host): %q", s.cfg.ExternalAuthServerBaseURL))
 	}
 
 	// Issuer URLs conventionally do not end with a '/', but metadata URLs are
 	// relative to them. Add a trailing '/' so ResolveReference behaves intuitively.
 	baseURL.Path = strings.TrimSuffix(baseURL.Path, "/") + "/"
 
-	metadataPath := s.external.MetadataURL
+	metadataPath := s.cfg.ExternalMetadataURL
 	if metadataPath == "" {
 		metadataPath = defaultOAuth2MetadataPath
 	}
@@ -144,11 +108,11 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 	}
 	externalMetadataURL := baseURL.ResolveReference(relURL)
 
-	retryAttempts := s.external.RetryAttempts
+	retryAttempts := s.cfg.RetryAttempts
 	if retryAttempts <= 0 {
 		retryAttempts = 5
 	}
-	retryDelay := s.external.RetryDelay
+	retryDelay := s.cfg.RetryDelay
 	if retryDelay <= 0 {
 		retryDelay = time.Second
 	}

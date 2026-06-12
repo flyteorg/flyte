@@ -13,10 +13,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth"
+	"github.com/flyteorg/flyte/v2/runs/config"
 )
 
 func TestGetOAuth2Metadata_NotConfigured(t *testing.T) {
-	svc := NewAuthMetadataService("example.com", ExternalAuthServerConfig{}, PublicClientConfig{})
+	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{})
 	_, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeUnimplemented, connect.CodeOf(err))
@@ -40,9 +41,9 @@ func TestGetOAuth2Metadata_External(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	svc := NewAuthMetadataService("example.com", ExternalAuthServerConfig{
-		BaseURL: srv.URL + "/oauth2/default",
-	}, PublicClientConfig{})
+	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{
+		ExternalAuthServerBaseURL: srv.URL + "/oauth2/default",
+	})
 	resp, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
 	require.NoError(t, err)
 	assert.Equal(t, "https://idp.example.com/oauth2/default", resp.Msg.Issuer)
@@ -59,10 +60,10 @@ func TestGetOAuth2Metadata_ExternalCustomMetadataURL(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	svc := NewAuthMetadataService("example.com", ExternalAuthServerConfig{
-		BaseURL:     srv.URL,
-		MetadataURL: "custom/metadata",
-	}, PublicClientConfig{})
+	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{
+		ExternalAuthServerBaseURL: srv.URL,
+		ExternalMetadataURL:       "custom/metadata",
+	})
 	resp, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
 	require.NoError(t, err)
 	assert.Equal(t, "https://idp.example.com", resp.Msg.Issuer)
@@ -74,11 +75,11 @@ func TestGetOAuth2Metadata_ExternalUnavailable(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	svc := NewAuthMetadataService("example.com", ExternalAuthServerConfig{
-		BaseURL:       srv.URL,
-		RetryAttempts: 1,
-		RetryDelay:    time.Millisecond,
-	}, PublicClientConfig{})
+	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{
+		ExternalAuthServerBaseURL: srv.URL,
+		RetryAttempts:             1,
+		RetryDelay:                time.Millisecond,
+	})
 	_, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err))
@@ -91,7 +92,7 @@ func TestOAuth2MetadataHTTPHandler(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	svc := NewAuthMetadataService("example.com", ExternalAuthServerConfig{BaseURL: srv.URL + "/oauth2/default"}, PublicClientConfig{})
+	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{ExternalAuthServerBaseURL: srv.URL + "/oauth2/default"})
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/.well-known/oauth-authorization-server", nil)
@@ -108,7 +109,7 @@ func TestOAuth2MetadataHTTPHandler(t *testing.T) {
 }
 
 func TestOAuth2MetadataHTTPHandler_NotConfigured(t *testing.T) {
-	svc := NewAuthMetadataService("example.com", ExternalAuthServerConfig{}, PublicClientConfig{})
+	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{})
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/.well-known/oauth-authorization-server", nil)
 	OAuth2MetadataHTTPHandler(svc).ServeHTTP(rec, req)
@@ -116,12 +117,14 @@ func TestOAuth2MetadataHTTPHandler_NotConfigured(t *testing.T) {
 }
 
 func TestGetPublicClientConfig(t *testing.T) {
-	svc := NewAuthMetadataService("dataplane.example.com", ExternalAuthServerConfig{}, PublicClientConfig{
-		ClientID:                 "flytectl",
-		RedirectURI:              "http://localhost:53593/callback",
-		Scopes:                   []string{"offline_access", "profile"},
-		Audience:                 "https://api.example.com",
+	svc := NewAuthMetadataService("dataplane.example.com", config.AuthMetadataConfig{
 		AuthorizationMetadataKey: "flyte-authorization",
+		FlyteClient: config.FlyteClientConfig{
+			ClientID:    "flytectl",
+			RedirectURI: "http://localhost:53593/callback",
+			Scopes:      []string{"offline_access", "profile"},
+			Audience:    "https://api.example.com",
+		},
 	})
 	resp, err := svc.GetPublicClientConfig(context.Background(), connect.NewRequest(&auth.GetPublicClientConfigRequest{}))
 	require.NoError(t, err)
@@ -136,7 +139,7 @@ func TestGetPublicClientConfig(t *testing.T) {
 func TestGetPublicClientConfig_DefaultAuthMetadataKey(t *testing.T) {
 	// Empty AuthorizationMetadataKey defaults to the standard "authorization"
 	// header (which upstream JWT validators like ALB inspect).
-	svc := NewAuthMetadataService("example.com", ExternalAuthServerConfig{}, PublicClientConfig{})
+	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{})
 	resp, err := svc.GetPublicClientConfig(context.Background(), connect.NewRequest(&auth.GetPublicClientConfigRequest{}))
 	require.NoError(t, err)
 	assert.Equal(t, "authorization", resp.Msg.AuthorizationMetadataKey)

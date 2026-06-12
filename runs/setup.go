@@ -112,18 +112,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(identityPath, identityHandler)
 	logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
 
-	authMetadataSvc := service.NewAuthMetadataService(sc.BaseURL, service.ExternalAuthServerConfig{
-		BaseURL:       cfg.AuthMetadata.ExternalAuthServerBaseURL,
-		MetadataURL:   cfg.AuthMetadata.ExternalMetadataURL,
-		RetryAttempts: cfg.AuthMetadata.RetryAttempts,
-		RetryDelay:    cfg.AuthMetadata.RetryDelay,
-	}, service.PublicClientConfig{
-		ClientID:                 cfg.AuthMetadata.FlyteClient.ClientID,
-		RedirectURI:              cfg.AuthMetadata.FlyteClient.RedirectURI,
-		Scopes:                   cfg.AuthMetadata.FlyteClient.Scopes,
-		Audience:                 cfg.AuthMetadata.FlyteClient.Audience,
-		AuthorizationMetadataKey: cfg.AuthMetadata.AuthorizationMetadataKey,
-	})
+	authMetadataSvc := service.NewAuthMetadataService(sc.BaseURL, cfg.AuthMetadata)
 	authMetadataPath, authMetadataHandler := authconnect.NewAuthMetadataServiceHandler(authMetadataSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(authMetadataPath, authMetadataHandler)
 	logger.Infof(ctx, "Mounted AuthMetadataService at %s", authMetadataPath)
