@@ -145,19 +145,19 @@ func serviceAccountName(metadata pluginsCore.TaskExecutionMetadata) string {
 func createSparkPodSpec(
 	taskCtx pluginsCore.TaskExecutionContext,
 	podSpec *v1.PodSpec,
-	objectMeta metav1.ObjectMeta,
+	objectMeta *metav1.ObjectMeta,
 	container *v1.Container,
 	k8sPod *core.K8SPod,
 ) *sparkOp.SparkPodSpec {
 
 	annotations := pluginsUtils.UnionMaps(
 		config.GetK8sPluginConfig().DefaultAnnotations,
-		objectMeta.Annotations,
+		objectMeta.GetAnnotations(),
 		pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()),
 	)
 	labels := pluginsUtils.UnionMaps(
 		config.GetK8sPluginConfig().DefaultLabels,
-		objectMeta.Labels,
+		objectMeta.GetLabels(),
 		pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()),
 	)
 	if k8sPod.GetMetadata().GetAnnotations() != nil {
