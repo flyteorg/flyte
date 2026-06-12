@@ -237,6 +237,12 @@ func sendAndRetryHTTPRequest(ctx context.Context, client *http.Client, targetURL
 			return resp, nil
 		}
 
+		// Don't retry on 4xx: these are usually configuration/request errors.
+		if resp.StatusCode >= http.StatusBadRequest && resp.StatusCode < http.StatusInternalServerError {
+			_ = resp.Body.Close()
+			return nil, fmt.Errorf("non-retryable status code %d from %s", resp.StatusCode, targetURL)
+		}
+
 		_ = resp.Body.Close()
 		lastErr = fmt.Errorf("unexpected status code %d from %s", resp.StatusCode, targetURL)
 		lastResp = resp
