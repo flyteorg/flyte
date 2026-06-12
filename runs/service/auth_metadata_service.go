@@ -87,8 +87,6 @@ func (s *AuthMetadataService) GetPublicClientConfig(
 // flyte clients that discover auth at this deployment obtain tokens from the
 // external IdP (e.g. Okta) directly, so a single token satisfies both this
 // deployment and any upstream (ALB) JWT validation keyed to the same issuer.
-//
-// The external-fetch logic is adapted from flyteorg/flyte#6998.
 func (s *AuthMetadataService) GetOAuth2Metadata(
 	ctx context.Context,
 	_ *connect.Request[auth.GetOAuth2MetadataRequest],
@@ -238,8 +236,6 @@ func connectCodeToHTTPStatus(err error) int {
 // serialization and the snake_case form matching proto field names. This matters
 // because external authorization servers (including flyteadmin) emit camelCase
 // keys while the Go proto struct tags are snake_case.
-//
-// Adapted from flyteorg/flyte#6998.
 func unmarshalResp(r *http.Response, body []byte, v proto.Message) error {
 	// DiscardUnknown: real authorization servers (e.g. Okta) return many metadata
 	// fields beyond those modelled here (introspection_endpoint, claims_supported,
@@ -257,8 +253,6 @@ func unmarshalResp(r *http.Response, body []byte, v proto.Message) error {
 }
 
 // sendAndRetryHTTPRequest fetches the given URL with retry logic.
-//
-// Adapted from flyteorg/flyte#6998.
 func sendAndRetryHTTPRequest(ctx context.Context, client *http.Client, targetURL string, retryAttempts int, retryDelay time.Duration) (*http.Response, error) {
 	var lastErr error
 	var lastResp *http.Response
