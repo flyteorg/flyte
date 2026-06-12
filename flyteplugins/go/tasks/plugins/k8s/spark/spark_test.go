@@ -493,7 +493,7 @@ func dummySparkTaskTemplatePod(id string, sparkConf map[string]string, podSpec *
 		Target: &core.TaskTemplate_K8SPod{
 			K8SPod: &core.K8SPod{
 				Metadata: podMetadata,
-				PodSpec: podSpecPb,
+				PodSpec:  podSpecPb,
 			},
 		},
 		Config: map[string]string{
