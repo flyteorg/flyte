@@ -4,6 +4,7 @@ from flyteidl2.common import identity_pb2 as _identity_pb2
 from flyteidl2.common import phase_pb2 as _phase_pb2
 from flyteidl2.core import catalog_pb2 as _catalog_pb2
 from flyteidl2.core import execution_pb2 as _execution_pb2
+from flyteidl2.core import literals_pb2 as _literals_pb2
 from flyteidl2.core import types_pb2 as _types_pb2
 from flyteidl2.task import common_pb2 as _common_pb2
 from flyteidl2.task import run_pb2 as _run_pb2
@@ -250,10 +251,12 @@ class AbortInfo(_message.Message):
     def __init__(self, reason: _Optional[str] = ..., aborted_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ...) -> None: ...
 
 class SignalInfo(_message.Message):
-    __slots__ = ["signalled_by"]
+    __slots__ = ["signalled_by", "output"]
     SIGNALLED_BY_FIELD_NUMBER: _ClassVar[int]
+    OUTPUT_FIELD_NUMBER: _ClassVar[int]
     signalled_by: _identity_pb2.EnrichedIdentity
-    def __init__(self, signalled_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ...) -> None: ...
+    output: _literals_pb2.Literal
+    def __init__(self, signalled_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., output: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ...) -> None: ...
 
 class ActionDetails(_message.Message):
     __slots__ = ["id", "metadata", "status", "error_info", "abort_info", "signal_info", "task", "trace", "condition", "attempts"]
