@@ -8,6 +8,7 @@ import "flyteidl2/common/identity.proto";
 import "flyteidl2/common/phase.proto";
 import "flyteidl2/core/catalog.proto";
 import "flyteidl2/core/execution.proto";
+import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/types.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/run.proto";
@@ -277,6 +278,10 @@ message AbortInfo {
 message SignalInfo {
   // Identity that signalled the condition.
   common.EnrichedIdentity signalled_by = 1;
+
+  // The literal value supplied by the signal. Matches the condition's
+  // declared type and is the same payload exposed via GetActionData.
+  flyteidl2.core.Literal output = 2;
 }
 
 // ActionDetails is the full details of an action.
