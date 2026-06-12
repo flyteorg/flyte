@@ -177,7 +177,7 @@ func connectCodeToHTTPStatus(err error) int {
 	case connect.CodeInvalidArgument:
 		return http.StatusBadRequest
 	case connect.CodeUnavailable:
-		return http.StatusBadGateway
+		return http.StatusServiceUnavailable
 	default:
 		return http.StatusInternalServerError
 	}
