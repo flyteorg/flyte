@@ -1,4 +1,4 @@
-module github.com/flyteorg/flyte/v2
+﻿module github.com/flyteorg/flyte/v2
 
 go 1.26.3
 
@@ -35,7 +35,7 @@ require (
 	github.com/hashicorp/golang-lru v1.0.2
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/imdario/mergo v0.3.16
-	github.com/jackc/pgx/v5 v5.9.2
+	github.com/jackc/pgx/v5 v5.10.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/kubeflow/training-operator v1.9.3
 	github.com/lib/pq v1.12.3
