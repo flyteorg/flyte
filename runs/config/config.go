@@ -58,7 +58,9 @@ type Config struct {
 	SeedProjects []string `json:"seedProjects" pflag:",Projects to create by default at startup"`
 
 	// Domains are injected into project responses (not stored per project row).
-	Domains []DomainConfig `json:"domains"`
+	// Excluded from pflags (slices of structs are unsupported by the generator);
+	// configure via the config file only.
+	Domains []DomainConfig `json:"domains" pflag:"-"`
 
 	// TriggerScheduler configures the cron-based trigger scheduler worker.
 	TriggerScheduler TriggerSchedulerConfig `json:"triggerScheduler"`
@@ -90,7 +92,7 @@ type AuthMetadataConfig struct {
 	RetryAttempts int `json:"retryAttempts" pflag:",Attempts to fetch external metadata"`
 
 	// RetryDelay is the delay between fetch attempts (default 1s).
-	RetryDelay time.Duration `json:"retryDelay" pflag:",Delay between external metadata fetch attempts"`
+	RetryDelay config.Duration `json:"retryDelay" pflag:",Delay between external metadata fetch attempts"`
 
 	// AuthorizationMetadataKey is the header/metadata key clients should place
 	// tokens in, returned by GetPublicClientConfig (default "authorization").
@@ -137,13 +139,17 @@ type TriggerSchedulerConfig struct {
 	Enabled bool `json:"enabled" pflag:",Enable the trigger scheduler worker"`
 
 	// ResyncInterval is how often the scheduler re-reads active triggers from the DB.
-	ResyncInterval time.Duration `json:"resyncInterval" pflag:",How often to resync active triggers from the database"`
+	// Excluded from pflags (raw time.Duration is unsupported by the generator);
+	// configure via the config file only.
+	ResyncInterval time.Duration `json:"resyncInterval" pflag:"-"`
 
 	// MaxCatchupRunsPerLoop caps how many catchup runs are fired per resync loop.
 	MaxCatchupRunsPerLoop int `json:"maxCatchupRunsPerLoop" pflag:",Maximum catchup runs fired per resync loop"`
 
 	// ExecutionQPS is the token-bucket rate for CreateRun calls (tokens/second).
-	ExecutionQPS float64 `json:"executionQps" pflag:",Rate limit for CreateRun calls (requests per second)"`
+	// Excluded from pflags (float64 is unsupported by the generator); configure
+	// via the config file only.
+	ExecutionQPS float64 `json:"executionQps" pflag:"-"`
 
 	// ExecutionBurst is the token-bucket burst size.
 	ExecutionBurst int `json:"executionBurst" pflag:",Burst size for CreateRun rate limiter"`

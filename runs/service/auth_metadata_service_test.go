@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	stdlibconfig "github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth"
 	"github.com/flyteorg/flyte/v2/runs/config"
 )
@@ -78,7 +79,7 @@ func TestGetOAuth2Metadata_ExternalUnavailable(t *testing.T) {
 	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{
 		ExternalAuthServerBaseURL: srv.URL,
 		RetryAttempts:             1,
-		RetryDelay:                time.Millisecond,
+		RetryDelay:                stdlibconfig.Duration{Duration: time.Millisecond},
 	})
 	_, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
 	require.Error(t, err)
@@ -192,7 +193,7 @@ func TestGetOAuth2Metadata_Upstream4xxIsInternal(t *testing.T) {
 	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{
 		ExternalAuthServerBaseURL: srv.URL,
 		RetryAttempts:             1,
-		RetryDelay:                time.Millisecond,
+		RetryDelay:                stdlibconfig.Duration{Duration: time.Millisecond},
 	})
 	_, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
 	require.Error(t, err)

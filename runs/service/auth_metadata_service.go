@@ -142,7 +142,7 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 	if retryAttempts <= 0 {
 		retryAttempts = 5
 	}
-	retryDelay := s.cfg.RetryDelay
+	retryDelay := s.cfg.RetryDelay.Duration
 	if retryDelay <= 0 {
 		retryDelay = time.Second
 	}
