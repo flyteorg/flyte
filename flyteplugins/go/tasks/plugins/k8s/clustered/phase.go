@@ -60,7 +60,7 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 
 	condition := extractCurrentCondition(jobSet.Status.Conditions)
 	if condition == nil {
-		if hasJobSetStarted(ctx, pluginContext, jobSet, maxRestarts) {
+		if hasJobSetStarted(ctx, pluginContext, jobSet) {
 			if phase, ok := maybeFastFailWorker0(ctx, pluginContext, jobSet, &taskInfo, maxRestarts, true); ok {
 				return phase, nil
 			}
@@ -145,10 +145,6 @@ func isRestartBudgetExhausted(jobSet *jobsetv1alpha2.JobSet, maxRestarts int32) 
 	return jobSet.Status.Restarts >= maxRestarts
 }
 
-func hasRestartBudgetRemaining(jobSet *jobsetv1alpha2.JobSet, maxRestarts int32) bool {
-	return !isRestartBudgetExhausted(jobSet, maxRestarts)
-}
-
 func readPluginState(ctx context.Context, pluginContext k8s.PluginContext) (k8s.PluginState, bool) {
 	pluginState := k8s.PluginState{}
 	if _, err := pluginContext.PluginStateReader().Get(&pluginState); err != nil {
@@ -158,7 +154,7 @@ func readPluginState(ctx context.Context, pluginContext k8s.PluginContext) (k8s.
 	return pluginState, true
 }
 
-func hasJobSetStarted(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet, maxRestarts int32) bool {
+func hasJobSetStarted(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet) bool {
 	if jobSet.Status.Restarts > 0 {
 		return true
 	}
@@ -167,7 +163,10 @@ func hasJobSetStarted(ctx context.Context, pluginContext k8s.PluginContext, jobS
 		if workersStatus.Ready > 0 || workersStatus.Active > 0 || workersStatus.Succeeded > 0 {
 			return true
 		}
-		if workersStatus.Failed > 0 && hasRestartBudgetRemaining(jobSet, maxRestarts) {
+		// A non-zero Failed count means rank-0 pods have run, so the JobSet has started
+		// regardless of remaining restart budget. Budget gating for surfacing the failure
+		// is enforced downstream in maybeFastFailWorker0.
+		if workersStatus.Failed > 0 {
 			return true
 		}
 	}

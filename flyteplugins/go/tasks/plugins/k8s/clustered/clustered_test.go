@@ -711,6 +711,40 @@ func TestGetTaskPhase_FastFail_PendingImagePullRegardlessBudget(t *testing.T) {
 	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
 }
 
+func TestGetTaskPhase_NoCondition_ZeroBudgetFailureFastFails(t *testing.T) {
+	// maxRestarts == 0 and a worker has failed, but the JobSet controller has not yet
+	// written any condition. hasJobSetStarted must still treat this as started so the
+	// failure is surfaced via maybeFastFailWorker0 instead of falling back to Initializing.
+	js := makeJobSet("", "", false)
+	js.Spec.FailurePolicy = &jobsetv1alpha2.FailurePolicy{MaxRestarts: 0}
+	js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
+		{Name: workersReplicatedJobName, Failed: 1},
+	}
+
+	pod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{Name: rank0PodName(testJobName) + "-abc12", Namespace: testNS},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodFailed,
+			ContainerStatuses: []corev1.ContainerStatus{
+				{Name: "primary", State: corev1.ContainerState{Terminated: &corev1.ContainerStateTerminated{ExitCode: 1}}},
+			},
+		},
+	}
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pod).Build()
+
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:      2,
+		NprocPerNode:  1,
+		FailurePolicy: &clusteredpb.ClusterFailurePolicy{MaxRestarts: 0},
+	}
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), fakeClient)
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
+}
+
 func TestGetTaskPhase_RestartingCondition_ReportsRunningWithAttempt(t *testing.T) {
 	js := makeJobSet("", "", false)
 	js.Spec.FailurePolicy = &jobsetv1alpha2.FailurePolicy{MaxRestarts: 1}

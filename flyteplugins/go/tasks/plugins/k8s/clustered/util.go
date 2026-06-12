@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	v1 "k8s.io/api/core/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
@@ -61,7 +62,7 @@ func shouldPreferRank0Pod(candidate, current *v1.Pod) bool {
 // Returns nil when not found or when listing pods fails.
 func findRank0Pod(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet) *v1.Pod {
 	podList := &v1.PodList{}
-	if err := pluginContext.K8sReader().List(ctx, podList); err != nil {
+	if err := pluginContext.K8sReader().List(ctx, podList, client.InNamespace(jobSet.Namespace)); err != nil {
 		logger.Warnf(ctx, "failed to list pods for JobSet %s/%s rank-0 lookup: %v", jobSet.Namespace, jobSet.Name, err)
 		return nil
 	}
