@@ -152,10 +152,16 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 		// Preserve pre-classified codes (e.g. Internal for non-retryable 4xx)
 		// instead of blanket-mapping everything to Unavailable.
 		var connectErr *connect.Error
-		if errors.As(err, &connectErr) {
+		switch {
+		case errors.As(err, &connectErr):
 			return nil, err
+		case errors.Is(err, context.Canceled):
+			return nil, connect.NewError(connect.CodeCanceled, err)
+		case errors.Is(err, context.DeadlineExceeded):
+			return nil, connect.NewError(connect.CodeDeadlineExceeded, err)
+		default:
+			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("failed to fetch OAuth2 metadata: %w", err))
 		}
-		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("failed to fetch OAuth2 metadata: %w", err))
 	}
 	defer func() { _ = response.Body.Close() }()
 
