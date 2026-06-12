@@ -3,13 +3,14 @@ package plugin
 import (
 	"context"
 	"fmt"
+	"slices"
 	"sync"
 
+	executorConfig "github.com/flyteorg/flyte/v2/executor/pkg/config"
+	executorK8s "github.com/flyteorg/flyte/v2/executor/pkg/plugin/k8s"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	k8sPlugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
-
-	executorK8s "github.com/flyteorg/flyte/v2/executor/pkg/plugin/k8s"
 )
 
 // PluginRegistryIface provides access to registered plugin entries.
@@ -42,6 +43,23 @@ func NewRegistry(setupCtx pluginsCore.SetupContext, pluginRegistry PluginRegistr
 	}
 }
 
+type PluginsConfigMeta struct {
+	EnabledPlugins []string
+}
+
+func GetEnabledPlugins() *PluginsConfigMeta {
+	return &PluginsConfigMeta{
+		EnabledPlugins: executorConfig.GetTaskPluginConfig().EnabledPlugins,
+	}
+}
+
+func (pcm *PluginsConfigMeta) isAllowed(id string) bool {
+	if len(pcm.EnabledPlugins) == 0 {
+		return true
+	}
+	return slices.Contains(pcm.EnabledPlugins, id)
+}
+
 // Initialize loads all registered plugins. Must be called once during startup.
 func (r *Registry) Initialize(ctx context.Context) error {
 	r.mu.Lock()
@@ -51,8 +69,14 @@ func (r *Registry) Initialize(ctx context.Context) error {
 		return nil
 	}
 
+	pluginMeta := GetEnabledPlugins()
 	// Load k8s plugins
 	for _, entry := range r.pluginRegistry.GetK8sPlugins() {
+		if !pluginMeta.isAllowed(entry.ID) {
+			logger.Infof(ctx, "Skipping k8s plugin [%s]: not in enabled-plugins allowlist", entry.ID)
+			continue
+		}
+
 		pm := executorK8s.NewPluginManager(
 			entry.ID,
 			entry.Plugin,
@@ -83,6 +107,11 @@ func (r *Registry) Initialize(ctx context.Context) error {
 
 	// Load core plugins
 	for _, entry := range r.pluginRegistry.GetCorePlugins() {
+		if !pluginMeta.isAllowed(entry.ID) {
+			logger.Infof(ctx, "Skipping core plugin [%s]: not in enabled-plugins allowlist", entry.ID)
+			continue
+		}
+
 		plugin, err := pluginsCore.LoadPlugin(ctx, r.setupCtx, entry)
 		if err != nil {
 			return fmt.Errorf("failed to load core plugin %s: %w", entry.ID, err)
@@ -101,6 +130,24 @@ func (r *Registry) Initialize(ctx context.Context) error {
 		}
 
 		logger.Infof(ctx, "Registered core plugin [%s] for task types %v", entry.ID, entry.RegisteredTaskTypes)
+	}
+
+	// Apply defaultForTaskTypes overrides from config. Runs after all plugins are
+	// loaded so any plugin ID (k8s or core) can be referenced.
+	for taskType, pluginID := range executorConfig.GetTaskPluginConfig().DefaultForTaskTypes {
+		var found pluginsCore.Plugin
+		for _, pm := range r.plugins {
+			if pm.GetID() == pluginID {
+				found = pm
+				break
+			}
+		}
+		if found != nil {
+			r.plugins[taskType] = found
+			logger.Infof(ctx, "Overriding task type %q to use plugin %q (from default-for-task-types config)", taskType, pluginID)
+		} else {
+			logger.Warnf(ctx, "default-for-task-types: plugin %q not found for task type %q override", pluginID, taskType)
+		}
 	}
 
 	r.initialized = true
