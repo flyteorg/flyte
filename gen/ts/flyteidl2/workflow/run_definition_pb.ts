@@ -119,7 +119,7 @@ export type TaskAction = Message<"flyteidl2.workflow.TaskAction"> & {
 
   /**
    * the specific queue that this action should be executed on.
-   * this value will be used to resolve the full queue id and store it in 'assigned_queue' field.
+   * if not set, the queue from the `RunSpec` will be used.
    *
    * @generated from field: string queue = 4;
    */
