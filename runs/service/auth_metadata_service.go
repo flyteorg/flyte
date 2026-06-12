@@ -136,6 +136,12 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 		return nil, connect.NewError(connect.CodeInternal,
 			fmt.Errorf("invalid external metadata path %q: %w", metadataPath, err))
 	}
+	// MetadataURL is expected to be a relative path resolved against BaseURL.
+	// Reject absolute or scheme-relative URLs so BaseURL cannot be bypassed.
+	if relURL.IsAbs() || relURL.Host != "" {
+		return nil, connect.NewError(connect.CodeInternal,
+			fmt.Errorf("external metadata path must be relative to externalAuthServerBaseUrl, got %q", metadataPath))
+	}
 	externalMetadataURL := baseURL.ResolveReference(relURL)
 
 	retryAttempts := s.external.RetryAttempts
