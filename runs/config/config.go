@@ -72,8 +72,8 @@ type Config struct {
 // server metadata. When ExternalAuthServerBaseURL is set, the service proxies
 // the external authorization server's metadata document (e.g. Okta) so that
 // clients discovering auth at this deployment are pointed at the external IdP
-// and obtain externally-issued tokens. When empty, the endpoint is not served.
-type AuthMetadataConfig struct {
+// and obtain externally-issued tokens. When empty, GetOAuth2Metadata returns
+// Unimplemented (HTTP 501 for the well-known handler).
 	// ExternalAuthServerBaseURL is the base URL of the external OAuth2
 	// authorization server to proxy metadata from
 	// (e.g. "https://signin.example.com/oauth2/default"). Empty disables the

@@ -25,8 +25,8 @@ const defaultOAuth2MetadataPath = ".well-known/oauth-authorization-server"
 // ExternalAuthServerConfig configures proxying of an external OAuth2
 // authorization server's metadata document (e.g. Okta).
 type ExternalAuthServerConfig struct {
-	// BaseURL is the external authorization server's base URL. When empty, the
-	// OAuth2 metadata endpoint is not served.
+	// BaseURL is the external authorization server's base URL. When empty,
+	// GetOAuth2Metadata returns Unimplemented (HTTP 501 for the well-known handler).
 	BaseURL string
 	// MetadataURL overrides the metadata path resolved against BaseURL. Defaults
 	// to ".well-known/oauth-authorization-server".
@@ -118,6 +118,10 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 		return nil, connect.NewError(connect.CodeInternal,
 			fmt.Errorf("invalid external auth server base URL %q: %w", s.external.BaseURL, err))
 	}
+	if baseURL.Scheme == "" || baseURL.Host == "" {
+		return nil, connect.NewError(connect.CodeInternal,
+			fmt.Errorf("external auth server base URL must be absolute (include scheme and host): %q", s.external.BaseURL))
+	}
 
 	// Issuer URLs conventionally do not end with a '/', but metadata URLs are
 	// relative to them. Add a trailing '/' so ResolveReference behaves intuitively.
@@ -143,7 +147,8 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 		retryDelay = time.Second
 	}
 
-	response, err := sendAndRetryHTTPRequest(ctx, http.DefaultClient, externalMetadataURL.String(), retryAttempts, retryDelay)
+	client := &http.Client{Timeout: 10 * time.Second}
+	response, err := sendAndRetryHTTPRequest(ctx, client, externalMetadataURL.String(), retryAttempts, retryDelay)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("failed to fetch OAuth2 metadata: %w", err))
 	}
@@ -167,6 +172,11 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 // (flytectl, pyflyte) fetch this path directly rather than the Connect RPC.
 func OAuth2MetadataHTTPHandler(svc *AuthMetadataService) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			w.Header().Set("Allow", http.MethodGet)
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
 		resp, err := svc.GetOAuth2Metadata(r.Context(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
 		if err != nil {
 			http.Error(w, err.Error(), connectCodeToHTTPStatus(err))
