@@ -2,6 +2,7 @@ package clustered
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -19,6 +20,7 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	coreMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	pluginIOMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	plugink8s "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	k8smocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -336,6 +338,15 @@ func emptyK8sReader() client.Reader {
 }
 
 func dummyPluginCtx(taskTemplate *core.TaskTemplate, k8sReader client.Reader) *k8smocks.PluginContext {
+	return dummyPluginCtxWithState(taskTemplate, k8sReader, plugink8s.PluginState{}, nil)
+}
+
+func dummyPluginCtxWithState(
+	taskTemplate *core.TaskTemplate,
+	k8sReader client.Reader,
+	pluginState plugink8s.PluginState,
+	pluginStateErr error,
+) *k8smocks.PluginContext {
 	pCtx := &k8smocks.PluginContext{}
 
 	taskReader := &coreMocks.TaskReader{}
@@ -358,7 +369,15 @@ func dummyPluginCtx(taskTemplate *core.TaskTemplate, k8sReader client.Reader) *k
 	pCtx.EXPECT().TaskExecutionMetadata().Return(meta)
 
 	pluginStateReader := &coreMocks.PluginStateReader{}
-	pluginStateReader.EXPECT().Get(mock.Anything).Return(uint8(0), nil)
+	pluginStateReader.EXPECT().Get(mock.Anything).RunAndReturn(func(t interface{}) (uint8, error) {
+		if pluginStateErr != nil {
+			return 0, pluginStateErr
+		}
+		if s, ok := t.(*plugink8s.PluginState); ok {
+			*s = pluginState
+		}
+		return 0, nil
+	})
 	pCtx.EXPECT().PluginStateReader().Return(pluginStateReader)
 
 	return pCtx
@@ -482,7 +501,7 @@ func TestGetTaskPhase_FastFail_Worker0Failed(t *testing.T) {
 
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      rank0PodName(testJobName),
+			Name:      rank0PodName(testJobName) + "-abc12",
 			Namespace: testNS,
 		},
 		Status: corev1.PodStatus{
@@ -518,7 +537,7 @@ func TestGetTaskPhase_MaintenanceRetry_SystemFailure(t *testing.T) {
 
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      rank0PodName(testJobName),
+			Name:      rank0PodName(testJobName) + "-abc12",
 			Namespace: testNS,
 		},
 		Status: corev1.PodStatus{
@@ -540,6 +559,272 @@ func TestGetTaskPhase_MaintenanceRetry_SystemFailure(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
 	assert.Equal(t, core.ExecutionError_SYSTEM, phase.Err().GetKind())
+}
+
+func TestFindRank0Pod_SuffixedAndDeterministic(t *testing.T) {
+	oldFailed := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:              rank0PodName(testJobName) + "-aaaa1",
+			Namespace:         testNS,
+			CreationTimestamp: metav1.NewTime(time.Now().Add(-2 * time.Minute)),
+		},
+		Status: corev1.PodStatus{Phase: corev1.PodFailed},
+	}
+	newRunning := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:              rank0PodName(testJobName) + "-bbbb2",
+			Namespace:         testNS,
+			CreationTimestamp: metav1.NewTime(time.Now()),
+		},
+		Status: corev1.PodStatus{Phase: corev1.PodRunning},
+	}
+	otherPod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      testJobName + "-workers-0-1-ccccc",
+			Namespace: testNS,
+		},
+		Status: corev1.PodStatus{Phase: corev1.PodRunning},
+	}
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(oldFailed, newRunning, otherPod).Build()
+
+	pCtx := &k8smocks.PluginContext{}
+	pCtx.EXPECT().K8sReader().Return(fakeClient)
+
+	js := makeJobSet("", "", false)
+	pod := findRank0Pod(context.Background(), pCtx, js)
+	assert.NotNil(t, pod)
+	assert.Equal(t, newRunning.Name, pod.Name)
+}
+
+func TestGetTaskPhase_FastFail_FailedWithBudgetRemainingReturnsRunning(t *testing.T) {
+	js := makeJobSet("", "", false)
+	js.Spec.FailurePolicy = &jobsetv1alpha2.FailurePolicy{MaxRestarts: 2}
+	js.Status.Restarts = 1
+	js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
+		{Name: workersReplicatedJobName, Failed: 1, Active: 1},
+	}
+	js.Status.Conditions = []metav1.Condition{
+		{Type: "SomeActiveCondition", Status: metav1.ConditionTrue, LastTransitionTime: metav1.NewTime(time.Now())},
+	}
+
+	pod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{Name: rank0PodName(testJobName) + "-abc12", Namespace: testNS},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodFailed,
+			ContainerStatuses: []corev1.ContainerStatus{
+				{Name: "primary", State: corev1.ContainerState{Terminated: &corev1.ContainerStateTerminated{ExitCode: 1}}},
+			},
+		},
+	}
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pod).Build()
+
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:      2,
+		NprocPerNode:  1,
+		FailurePolicy: &clusteredpb.ClusterFailurePolicy{MaxRestarts: 2},
+	}
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), fakeClient)
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+}
+
+func TestGetTaskPhase_FastFail_FailedWithBudgetExhaustedReturnsRetryableFailure(t *testing.T) {
+	js := makeJobSet("", "", false)
+	js.Spec.FailurePolicy = &jobsetv1alpha2.FailurePolicy{MaxRestarts: 1}
+	js.Status.Restarts = 1
+	js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
+		{Name: workersReplicatedJobName, Failed: 1, Active: 1},
+	}
+	js.Status.Conditions = []metav1.Condition{
+		{Type: "SomeActiveCondition", Status: metav1.ConditionTrue, LastTransitionTime: metav1.NewTime(time.Now())},
+	}
+
+	pod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{Name: rank0PodName(testJobName) + "-abc12", Namespace: testNS},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodFailed,
+			ContainerStatuses: []corev1.ContainerStatus{
+				{Name: "primary", State: corev1.ContainerState{Terminated: &corev1.ContainerStateTerminated{ExitCode: 1}}},
+			},
+		},
+	}
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pod).Build()
+
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:      2,
+		NprocPerNode:  1,
+		FailurePolicy: &clusteredpb.ClusterFailurePolicy{MaxRestarts: 1},
+	}
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), fakeClient)
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
+}
+
+func TestGetTaskPhase_FastFail_PendingImagePullRegardlessBudget(t *testing.T) {
+	js := makeJobSet("", "", false)
+	js.Spec.FailurePolicy = &jobsetv1alpha2.FailurePolicy{MaxRestarts: 3}
+	js.Status.Restarts = 1
+	js.Status.Conditions = []metav1.Condition{
+		{Type: "SomeActiveCondition", Status: metav1.ConditionTrue, LastTransitionTime: metav1.NewTime(time.Now())},
+	}
+
+	oldTransition := metav1.NewTime(time.Now().Add(-24 * time.Hour))
+	pod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{Name: rank0PodName(testJobName) + "-abc12", Namespace: testNS},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodPending,
+			Conditions: []corev1.PodCondition{
+				{Type: corev1.PodReady, Status: corev1.ConditionFalse, Reason: "ContainersNotReady", LastTransitionTime: oldTransition},
+			},
+			ContainerStatuses: []corev1.ContainerStatus{
+				{
+					Name:  "primary",
+					Ready: false,
+					State: corev1.ContainerState{
+						Waiting: &corev1.ContainerStateWaiting{
+							Reason:  "ImagePullBackOff",
+							Message: "Back-off pulling image",
+						},
+					},
+				},
+			},
+		},
+	}
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pod).Build()
+
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:      2,
+		NprocPerNode:  1,
+		FailurePolicy: &clusteredpb.ClusterFailurePolicy{MaxRestarts: 3},
+	}
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), fakeClient)
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
+}
+
+func TestGetTaskPhase_NoCondition_ZeroBudgetFailureFastFails(t *testing.T) {
+	// maxRestarts == 0 and a worker has failed, but the JobSet controller has not yet
+	// written any condition. hasJobSetStarted must still treat this as started so the
+	// failure is surfaced via maybeFastFailWorker0 instead of falling back to Initializing.
+	js := makeJobSet("", "", false)
+	js.Spec.FailurePolicy = &jobsetv1alpha2.FailurePolicy{MaxRestarts: 0}
+	js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
+		{Name: workersReplicatedJobName, Failed: 1},
+	}
+
+	pod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{Name: rank0PodName(testJobName) + "-abc12", Namespace: testNS},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodFailed,
+			ContainerStatuses: []corev1.ContainerStatus{
+				{Name: "primary", State: corev1.ContainerState{Terminated: &corev1.ContainerStateTerminated{ExitCode: 1}}},
+			},
+		},
+	}
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pod).Build()
+
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:      2,
+		NprocPerNode:  1,
+		FailurePolicy: &clusteredpb.ClusterFailurePolicy{MaxRestarts: 0},
+	}
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), fakeClient)
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
+}
+
+func TestGetTaskPhase_RestartingCondition_ReportsRunningWithAttempt(t *testing.T) {
+	js := makeJobSet("", "", false)
+	js.Spec.FailurePolicy = &jobsetv1alpha2.FailurePolicy{MaxRestarts: 1}
+	js.Status.Restarts = 1
+	js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
+		{Name: workersReplicatedJobName, Failed: 1},
+	}
+	js.Status.Conditions = []metav1.Condition{
+		{Type: jobSetRestartingConditionType, Status: metav1.ConditionTrue, LastTransitionTime: metav1.NewTime(time.Now())},
+	}
+
+	pod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{Name: rank0PodName(testJobName) + "-abc12", Namespace: testNS},
+		Status: corev1.PodStatus{
+			Phase: corev1.PodFailed,
+			ContainerStatuses: []corev1.ContainerStatus{
+				{Name: "primary", State: corev1.ContainerState{Terminated: &corev1.ContainerStateTerminated{ExitCode: 1}}},
+			},
+		},
+	}
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pod).Build()
+	pCtx := dummyPluginCtx(buildTaskTemplate(&clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}), fakeClient)
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+	assert.Contains(t, phase.Reason(), "restart in progress (attempt 1)")
+}
+
+func TestGetTaskPhase_NoTrueConditionWithRestarts_ReportsRunning(t *testing.T) {
+	js := makeJobSet("", "", false)
+	js.Status.Restarts = 1
+	js.Status.Conditions = []metav1.Condition{
+		{Type: string(jobsetv1alpha2.JobSetSuspended), Status: metav1.ConditionFalse, LastTransitionTime: metav1.NewTime(time.Now())},
+		{Type: string(jobsetv1alpha2.JobSetCompleted), Status: metav1.ConditionFalse, LastTransitionTime: metav1.NewTime(time.Now())},
+	}
+
+	pCtx := dummyPluginCtx(buildTaskTemplate(&clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}), emptyK8sReader())
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+	assert.Contains(t, phase.Reason(), "restart attempt 1")
+}
+
+func TestGetTaskPhase_NoConditionWithPriorRunningState_ReportsRunning(t *testing.T) {
+	js := makeJobSet("", "", false)
+	pCtx := dummyPluginCtxWithState(
+		buildTaskTemplate(&clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}),
+		emptyK8sReader(),
+		plugink8s.PluginState{Phase: pluginsCore.PhaseRunning, PhaseVersion: 1},
+		nil,
+	)
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+}
+
+func TestGetTaskPhase_NoTrueCondition_StateReadErrorFallsBackToStatus(t *testing.T) {
+	js := makeJobSet("", "", false)
+	js.Status.Restarts = 1
+	js.Status.Conditions = []metav1.Condition{
+		{Type: string(jobsetv1alpha2.JobSetCompleted), Status: metav1.ConditionFalse, LastTransitionTime: metav1.NewTime(time.Now())},
+	}
+
+	pCtx := dummyPluginCtxWithState(
+		buildTaskTemplate(&clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}),
+		emptyK8sReader(),
+		plugink8s.PluginState{},
+		errors.New("state read failed"),
+	)
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
 }
 
 func TestGetTaskPhase_LogContext(t *testing.T) {
