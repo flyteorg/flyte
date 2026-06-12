@@ -145,3 +145,56 @@ func TestGetPublicClientConfig_DefaultAuthMetadataKey(t *testing.T) {
 	assert.Equal(t, "authorization", resp.Msg.AuthorizationMetadataKey)
 	assert.Empty(t, resp.Msg.ClientId)
 }
+
+func TestGetOAuth2Metadata_CachesSuccessfulFetch(t *testing.T) {
+	hits := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hits++
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"issuer":"https://idp.example.com"}`))
+	}))
+	defer srv.Close()
+
+	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{ExternalAuthServerBaseURL: srv.URL})
+	for i := 0; i < 3; i++ {
+		resp, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
+		require.NoError(t, err)
+		assert.Equal(t, "https://idp.example.com", resp.Msg.Issuer)
+	}
+	assert.Equal(t, 1, hits, "fresh cache should serve repeat calls without refetching")
+}
+
+func TestGetOAuth2Metadata_BodySizeLimit(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"issuer":"`))
+		big := make([]byte, maxMetadataBodySize+1024)
+		for i := range big {
+			big[i] = 'a'
+		}
+		_, _ = w.Write(big)
+		_, _ = w.Write([]byte(`"}`))
+	}))
+	defer srv.Close()
+
+	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{ExternalAuthServerBaseURL: srv.URL})
+	_, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
+	require.Error(t, err)
+	assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
+}
+
+func TestGetOAuth2Metadata_Upstream4xxIsInternal(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer srv.Close()
+
+	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{
+		ExternalAuthServerBaseURL: srv.URL,
+		RetryAttempts:             1,
+		RetryDelay:                time.Millisecond,
+	})
+	_, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
+	require.Error(t, err)
+	assert.Equal(t, connect.CodeInternal, connect.CodeOf(err), "non-retryable 4xx should be Internal, not Unavailable")
+}

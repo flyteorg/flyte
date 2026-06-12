@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	"connectrpc.com/connect"
@@ -21,13 +22,32 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/config"
 )
 
-const defaultOAuth2MetadataPath = ".well-known/oauth-authorization-server"
+const (
+	defaultOAuth2MetadataPath = ".well-known/oauth-authorization-server"
+
+	// maxMetadataBodySize bounds the upstream metadata document read; RFC 8414
+	// documents are a few KB, so 1 MiB is generous while preventing memory
+	// blowups from a misconfigured upstream.
+	maxMetadataBodySize = 1 << 20
+
+	// metadataCacheTTL is how long a successfully fetched metadata document is
+	// served from memory. The endpoint is public and the document is effectively
+	// static, so this avoids an outbound fetch (with retries) per discovery call.
+	metadataCacheTTL = 5 * time.Minute
+
+	externalFetchTimeout = 10 * time.Second
+)
 
 // AuthMetadataService implements the AuthMetadataServiceHandler interface.
 type AuthMetadataService struct {
 	authconnect.UnimplementedAuthMetadataServiceHandler
 	dataplaneDomain string
 	cfg             config.AuthMetadataConfig
+	httpClient      *http.Client
+
+	mu             sync.Mutex
+	cachedMetadata *auth.GetOAuth2MetadataResponse
+	cacheExpiry    time.Time
 }
 
 // NewAuthMetadataService creates a new AuthMetadataService instance. When
@@ -37,6 +57,7 @@ func NewAuthMetadataService(dataplaneDomain string, cfg config.AuthMetadataConfi
 	return &AuthMetadataService{
 		dataplaneDomain: dataplaneDomain,
 		cfg:             cfg,
+		httpClient:      &http.Client{Timeout: externalFetchTimeout},
 	}
 }
 
@@ -76,6 +97,15 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 		return nil, connect.NewError(connect.CodeUnimplemented,
 			errors.New("oauth2 metadata is not configured; set runs.authMetadata.externalAuthServerBaseUrl"))
 	}
+
+	// Serve from cache while fresh; only successful fetches are cached.
+	s.mu.Lock()
+	if s.cachedMetadata != nil && time.Now().Before(s.cacheExpiry) {
+		cached := proto.Clone(s.cachedMetadata).(*auth.GetOAuth2MetadataResponse)
+		s.mu.Unlock()
+		return connect.NewResponse(cached), nil
+	}
+	s.mu.Unlock()
 
 	baseURL, err := url.Parse(s.cfg.ExternalAuthServerBaseURL)
 	if err != nil {
@@ -117,22 +147,36 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 		retryDelay = time.Second
 	}
 
-	client := &http.Client{Timeout: 10 * time.Second}
-	response, err := sendAndRetryHTTPRequest(ctx, client, externalMetadataURL.String(), retryAttempts, retryDelay)
+	response, err := sendAndRetryHTTPRequest(ctx, s.httpClient, externalMetadataURL.String(), retryAttempts, retryDelay)
 	if err != nil {
+		// Preserve pre-classified codes (e.g. Internal for non-retryable 4xx)
+		// instead of blanket-mapping everything to Unavailable.
+		var connectErr *connect.Error
+		if errors.As(err, &connectErr) {
+			return nil, err
+		}
 		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("failed to fetch OAuth2 metadata: %w", err))
 	}
 	defer func() { _ = response.Body.Close() }()
 
-	raw, err := io.ReadAll(response.Body)
+	raw, err := io.ReadAll(io.LimitReader(response.Body, maxMetadataBodySize+1))
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read OAuth2 metadata response: %w", err))
+	}
+	if len(raw) > maxMetadataBodySize {
+		return nil, connect.NewError(connect.CodeInternal,
+			fmt.Errorf("OAuth2 metadata response exceeds %d bytes", maxMetadataBodySize))
 	}
 
 	resp := &auth.GetOAuth2MetadataResponse{}
 	if err := unmarshalResp(response, raw, resp); err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to unmarshal OAuth2 metadata: %w", err))
 	}
+
+	s.mu.Lock()
+	s.cachedMetadata = proto.Clone(resp).(*auth.GetOAuth2MetadataResponse)
+	s.cacheExpiry = time.Now().Add(metadataCacheTTL)
+	s.mu.Unlock()
 
 	return connect.NewResponse(resp), nil
 }
@@ -238,9 +282,12 @@ func sendAndRetryHTTPRequest(ctx context.Context, client *http.Client, targetURL
 		}
 
 		// Don't retry on 4xx: these are usually configuration/request errors.
+		// Classify as Internal (a misconfiguration of this service), not
+		// Unavailable, so clients see an accurate status.
 		if resp.StatusCode >= http.StatusBadRequest && resp.StatusCode < http.StatusInternalServerError {
 			_ = resp.Body.Close()
-			return nil, fmt.Errorf("non-retryable status code %d from %s", resp.StatusCode, targetURL)
+			return nil, connect.NewError(connect.CodeInternal,
+				fmt.Errorf("non-retryable status code %d from %s", resp.StatusCode, targetURL))
 		}
 
 		_ = resp.Body.Close()
