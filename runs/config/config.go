@@ -74,6 +74,7 @@ type Config struct {
 // clients discovering auth at this deployment are pointed at the external IdP
 // and obtain externally-issued tokens. When empty, GetOAuth2Metadata returns
 // Unimplemented (HTTP 501 for the well-known handler).
+type AuthMetadataConfig struct {
 	// ExternalAuthServerBaseURL is the base URL of the external OAuth2
 	// authorization server to proxy metadata from
 	// (e.g. "https://signin.example.com/oauth2/default"). Empty disables the
