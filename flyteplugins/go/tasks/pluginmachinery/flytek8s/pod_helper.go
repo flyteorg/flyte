@@ -95,11 +95,37 @@ func AddRequiredNodeSelectorRequirements(base *v1.Affinity, new ...v1.NodeSelect
 		nodeSelectorTerms := base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
 		for i := range nodeSelectorTerms {
 			nst := &nodeSelectorTerms[i]
-			nst.MatchExpressions = append(nst.MatchExpressions, new...)
+			for _, req := range new {
+				if !containsNodeSelectorRequirement(nst.MatchExpressions, req) {
+					nst.MatchExpressions = append(nst.MatchExpressions, req)
+				}
+			}
 		}
 	} else {
 		base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{{MatchExpressions: new}}
 	}
+}
+
+// containsNodeSelectorRequirement reports whether reqs already holds an identical
+// requirement, so callers (e.g. ApplyGPUNodeSelectors, which may run more than once
+// on the same pod spec) stay idempotent instead of duplicating match expressions.
+func containsNodeSelectorRequirement(reqs []v1.NodeSelectorRequirement, req v1.NodeSelectorRequirement) bool {
+	for i := range reqs {
+		if reqs[i].Key != req.Key || reqs[i].Operator != req.Operator || len(reqs[i].Values) != len(req.Values) {
+			continue
+		}
+		match := true
+		for j := range req.Values {
+			if reqs[i].Values[j] != req.Values[j] {
+				match = false
+				break
+			}
+		}
+		if match {
+			return true
+		}
+	}
+	return false
 }
 
 // AddPreferredNodeSelectorRequirements appends the provided v1.NodeSelectorRequirement
@@ -319,7 +345,7 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelera
 			Operator: v1.TolerationOpEqual,
 			Effect:   v1.TaintEffectNoSchedule,
 		}
-		podSpec.Tolerations = append(podSpec.Tolerations, deviceTol)
+		addTolerationInPodSpec(podSpec, &deviceTol)
 	}
 
 	// Short circuit if a partition size preference is not specified
@@ -364,7 +390,7 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelera
 		AddRequiredNodeSelectorRequirements(podSpec.Affinity, *partitionSizeNsr)
 	}
 	if partitionSizeTol != nil {
-		podSpec.Tolerations = append(podSpec.Tolerations, *partitionSizeTol)
+		addTolerationInPodSpec(podSpec, partitionSizeTol)
 	}
 }
 
