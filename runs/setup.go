@@ -118,7 +118,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	logger.Infof(ctx, "Mounted AuthMetadataService at %s", authMetadataPath)
 
 	// Serve OAuth2 authorization-server metadata at the RFC 8414 well-known path
-	// so OAuth2/OIDC discovery clients (flytectl, pyflyte) can find it. When
+	// so OAuth2/OIDC discovery clients (flyte-sdk) can find it. When
 	// runs.authMetadata.externalAuthServerBaseUrl is set, this proxies the
 	// external IdP's (e.g. Okta) metadata document.
 	sc.Mux.Handle("/.well-known/oauth-authorization-server", service.OAuth2MetadataHTTPHandler(authMetadataSvc))

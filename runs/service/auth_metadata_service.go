@@ -183,7 +183,7 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 
 // OAuth2MetadataHTTPHandler serves the OAuth2 authorization-server metadata
 // document at the RFC 8414 well-known path. OAuth2/OIDC discovery clients
-// (flytectl, pyflyte) fetch this path directly rather than the Connect RPC.
+// (flyte-sdk) fetch this path directly rather than the Connect RPC.
 func OAuth2MetadataHTTPHandler(svc *AuthMetadataService) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
