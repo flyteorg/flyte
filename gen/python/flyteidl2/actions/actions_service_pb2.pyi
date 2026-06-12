@@ -1,5 +1,6 @@
 from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
+from flyteidl2.common import identity_pb2 as _identity_pb2
 from flyteidl2.core import literals_pb2 as _literals_pb2
 from flyteidl2.task import run_pb2 as _run_pb2
 from flyteidl2.workflow import run_definition_pb2 as _run_definition_pb2
@@ -73,26 +74,30 @@ class WatchForUpdatesResponse(_message.Message):
     def __init__(self, action_update: _Optional[_Union[_state_service_pb2.ActionUpdate, _Mapping]] = ..., control_message: _Optional[_Union[_state_service_pb2.ControlMessage, _Mapping]] = ...) -> None: ...
 
 class AbortRequest(_message.Message):
-    __slots__ = ["action_id", "reason"]
+    __slots__ = ["action_id", "reason", "aborted_by"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     REASON_FIELD_NUMBER: _ClassVar[int]
+    ABORTED_BY_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     reason: str
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., reason: _Optional[str] = ...) -> None: ...
+    aborted_by: _identity_pb2.EnrichedIdentity
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., reason: _Optional[str] = ..., aborted_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ...) -> None: ...
 
 class AbortResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
 class SignalRequest(_message.Message):
-    __slots__ = ["action_id", "parent_action_name", "value"]
+    __slots__ = ["action_id", "parent_action_name", "value", "signalled_by"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     PARENT_ACTION_NAME_FIELD_NUMBER: _ClassVar[int]
     VALUE_FIELD_NUMBER: _ClassVar[int]
+    SIGNALLED_BY_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     parent_action_name: str
     value: _literals_pb2.Literal
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ...) -> None: ...
+    signalled_by: _identity_pb2.EnrichedIdentity
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., signalled_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ...) -> None: ...
 
 class SignalResponse(_message.Message):
     __slots__ = []
