@@ -76,7 +76,7 @@ var (
 		},
 		EmbeddedSecretManagerConfig: EmbeddedSecretManagerConfig{
 			FileMountInitContainer: FileMountInitContainerConfig{
-				Image: "busybox:1.28",
+				Image: "public.ecr.aws/docker/library/busybox:latest",
 				Resources: corev1.ResourceRequirements{
 					Requests: corev1.ResourceList{
 						corev1.ResourceMemory: resource.MustParse("100Mi"),
