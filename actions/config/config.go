@@ -16,6 +16,9 @@ var defaultConfig = &Config{
 	},
 	Kubernetes: app.K8sConfig{
 		Namespace: "flyte",
+		QPS:       1000,
+		Burst:     2000,
+		Timeout:   "30s",
 	},
 	WatchBufferSize: 100,
 	WatchWorkers:    10,
