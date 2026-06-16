@@ -54,6 +54,7 @@ message TaskAction {
   // the specific queue that this action should be executed on.
   // if not set, the queue from the `RunSpec` will be used.
   string queue = 4;
+  reserved "cluster";
 }
 
 // TraceAction is used to define a trace action that can be used to track the execution of an action that's managed
