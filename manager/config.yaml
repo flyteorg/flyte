@@ -1,14 +1,11 @@
 # Unified Flyte Manager Configuration
+#
+# The unified binary has no `manager:` section: it reuses the runs service's
+# `server` block (HTTP listen host/port for all Connect services) and the
+# actions service's `kubernetes` block (the shared k8s client). See below.
 
-manager:
-  # Single server port for all Connect services (Runs, State, Queue, DataProxy)
-  server:
-    host: "0.0.0.0"
-    port: 8090
-
-  executor:
-    healthProbePort: 8081
-
+# Kubernetes config for the shared client used by all services.
+actions:
   kubernetes:
     namespace: "flyte"
     kubeconfig: "~/.kube/config"
@@ -48,7 +45,7 @@ webhook:
   embeddedSecretManagerConfig:
     type: K8s
     k8sConfig:
-      # Must match manager.kubernetes.namespace above — the namespace where
+      # Must match actions.kubernetes.namespace above — the namespace where
       # SecretService writes secrets.
       namespace: flyte
 
@@ -60,6 +57,10 @@ executor:
 
 # Runs service configuration
 runs:
+  # Single server port for all Connect services (Runs, State, Queue, DataProxy)
+  server:
+    host: "0.0.0.0"
+    port: 8090
   storagePrefix: "s3://flyte-data"
   database:
     postgres:
