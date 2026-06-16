@@ -67,23 +67,9 @@ flyte-core-components:
 
 # configuration Specify configuration for Flyte
 configuration:
-  # database Specify configuration for Flyte's database connection
-  database:
-    # username Name for user to connect to database as
-    username: postgres
-    # password Password to connect to database with
-    # If set, a Secret will be created with this value and mounted to Flyte pod
-    password: ""
-    # passwordPath Mountpath of file containing password to be added to Flyte deployment
-    passwordPath: ""
-    # host Hostname of database instance
-    host: 127.0.0.1
-    # port Port to connect to database at
-    port: 5432
-    # dbname Name of database to use
-    dbname: flyte
-    # options Additional client options for connecting to database
-    options: sslmode=disable
+  # database lives under flyte-core-components.runs.database (the unified binary's
+  # single DB config). The waitForDB init container and the optional DB-password
+  # Secret both read it from there, so no configuration.database block is needed.
   # storage Specify configuration for object store
   storage:
     # metadataContainer Bucket to store Flyte metadata

@@ -73,7 +73,7 @@ spec:
             {{- if .Values.deployment.waitForDB.args }}
             {{- tpl ( .Values.deployment.waitForDB.args | toYaml ) . | nindent 12 }}
             {{- else }}
-            {{- with .Values.configuration.database }}
+            {{- with (index .Values "flyte-core-components" "runs" "database" "postgres") }}
             - |
               until pg_isready \
                 -h {{ tpl .host $ }} \
