@@ -283,7 +283,7 @@ func fullyPresentStatus() *secretpb.SecretStatus {
 		ClusterStatus: []*secretpb.ClusterSecretStatus{
 			{
 				Cluster: &commonpb.ClusterIdentifier{
-					Name: cfg.Kubernetes.ClusterName,
+					Name: cfg.ClusterName,
 				},
 				PresenceStatus: secretpb.SecretPresenceStatus_PRESENT,
 			},

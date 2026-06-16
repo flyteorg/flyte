@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
 
@@ -16,8 +17,8 @@ type Config struct {
 	// Executor configuration
 	Executor ExecutorConfig `json:"executor"`
 
-	// Kubernetes configuration
-	Kubernetes KubernetesConfig `json:"kubernetes"`
+	// Kubernetes configuration for the shared client used by all services.
+	Kubernetes app.K8sConfig `json:"kubernetes"`
 }
 
 // ServerConfig holds HTTP server configuration
@@ -31,15 +32,6 @@ type ExecutorConfig struct {
 	HealthProbePort int `json:"healthProbePort" pflag:",Port for executor health probes"`
 }
 
-// KubernetesConfig holds Kubernetes client configuration
-type KubernetesConfig struct {
-	Namespace  string `json:"namespace" pflag:",Kubernetes namespace"`
-	KubeConfig string `json:"kubeconfig" pflag:",Path to kubeconfig file (optional)"`
-	QPS        int    `json:"qps" pflag:",Max sustained queries per second to the API server"`
-	Burst      int    `json:"burst" pflag:",Max burst queries to the API server"`
-	Timeout    string `json:"timeout" pflag:",Default timeout for API server requests (e.g. 30s)"`
-}
-
 var defaultConfig = &Config{
 	Server: ServerConfig{
 		Host: "0.0.0.0",
@@ -48,7 +40,7 @@ var defaultConfig = &Config{
 	Executor: ExecutorConfig{
 		HealthProbePort: 8081,
 	},
-	Kubernetes: KubernetesConfig{
+	Kubernetes: app.K8sConfig{
 		Namespace:  "flyte",
 		KubeConfig: "",
 		QPS:        1000,

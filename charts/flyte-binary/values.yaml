@@ -59,11 +59,11 @@ flyte-core-components:
   secret:
     kubernetes:
       namespace: "flyte"
-      clusterName: "flyte-devbox"
       kubeconfig: ""
       qps: 100
       burst: 200
       timeout: "30s"
+    clusterName: "flyte-devbox"
 
 # configuration Specify configuration for Flyte
 configuration:

@@ -141,20 +141,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_kubernetes.namespace", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("kubernetes.namespace", testValue)
-			if vString, err := cmdFlags.GetString("kubernetes.namespace"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Kubernetes.Namespace)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 	t.Run("Test_kubernetes.kubeconfig", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -163,6 +149,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("kubernetes.kubeconfig", testValue)
 			if vString, err := cmdFlags.GetString("kubernetes.kubeconfig"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Kubernetes.KubeConfig)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_kubernetes.namespace", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("kubernetes.namespace", testValue)
+			if vString, err := cmdFlags.GetString("kubernetes.namespace"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Kubernetes.Namespace)
 
 			} else {
 				assert.FailNow(t, err.Error())

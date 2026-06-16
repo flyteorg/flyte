@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
 
@@ -13,7 +14,7 @@ var defaultConfig = &Config{
 		Port: 8091,
 		Host: "0.0.0.0",
 	},
-	Kubernetes: KubernetesConfig{
+	Kubernetes: app.K8sConfig{
 		Namespace: "flyte",
 	},
 	WatchBufferSize: 100,
@@ -30,8 +31,9 @@ type Config struct {
 	// HTTP server configuration
 	Server ServerConfig `json:"server"`
 
-	// Kubernetes configuration
-	Kubernetes KubernetesConfig `json:"kubernetes"`
+	// Kubernetes configuration (namespace where TaskAction CRs live; the unified
+	// binary shares the manager's client, this is read by the standalone cmd).
+	Kubernetes app.K8sConfig `json:"kubernetes"`
 
 	// WatchBufferSize is the buffer size for each worker's event channel.
 	WatchBufferSize int `json:"watchBufferSize" pflag:",Buffer size for watch channels"`
@@ -51,15 +53,6 @@ type Config struct {
 type ServerConfig struct {
 	Port int    `json:"port" pflag:",Port to bind the HTTP server"`
 	Host string `json:"host" pflag:",Host to bind the HTTP server"`
-}
-
-// KubernetesConfig holds Kubernetes client configuration
-type KubernetesConfig struct {
-	// Namespace where TaskAction CRs are located
-	Namespace string `json:"namespace" pflag:",Kubernetes namespace for TaskAction CRs"`
-
-	// KubeConfig path (optional - if empty, uses in-cluster config)
-	KubeConfig string `json:"kubeconfig" pflag:",Path to kubeconfig file (optional)"`
 }
 
 // GetConfig returns the parsed actions configuration

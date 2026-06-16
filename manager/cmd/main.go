@@ -58,13 +58,7 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	// Initialize Kubernetes client
-	k8sClient, k8sConfig, err := app.InitKubernetesClient(ctx, app.K8sConfig{
-		KubeConfig: cfg.Kubernetes.KubeConfig,
-		Namespace:  cfg.Kubernetes.Namespace,
-		QPS:        cfg.Kubernetes.QPS,
-		Burst:      cfg.Kubernetes.Burst,
-		Timeout:    cfg.Kubernetes.Timeout,
-	}, executor.Scheme())
+	k8sClient, k8sConfig, err := app.InitKubernetesClient(ctx, cfg.Kubernetes, executor.Scheme())
 	if err != nil {
 		return fmt.Errorf("failed to initialize Kubernetes client: %w", err)
 	}

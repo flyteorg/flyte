@@ -16,12 +16,19 @@ import (
 )
 
 // K8sConfig holds Kubernetes connection options used by InitKubernetesClient.
+// It is also the shared `kubernetes` config section for the services (manager,
+// actions, secret), so it carries json/pflag tags.
 type K8sConfig struct {
-	KubeConfig string // path to kubeconfig (empty → in-cluster → default)
-	Namespace  string // namespace to ensure exists
-	QPS        int    // API server QPS limit
-	Burst      int    // API server burst limit
-	Timeout    string // API server request timeout (e.g. "30s")
+	// KubeConfig is the path to a kubeconfig file (empty → in-cluster → default).
+	KubeConfig string `json:"kubeconfig" pflag:",Path to kubeconfig file (optional)"`
+	// Namespace to ensure exists / operate in.
+	Namespace string `json:"namespace" pflag:",Kubernetes namespace"`
+	// QPS is the API server queries-per-second limit (0 → client default).
+	QPS int `json:"qps" pflag:",Maximum queries per second to the Kubernetes API server"`
+	// Burst is the API server burst limit (0 → client default).
+	Burst int `json:"burst" pflag:",Maximum burst above QPS for Kubernetes API server requests"`
+	// Timeout is the API server request timeout, e.g. "30s" (empty → client default).
+	Timeout string `json:"timeout" pflag:",Request timeout for Kubernetes API server calls (e.g. 30s)"`
 }
 
 // InitKubernetesClient creates a controller-runtime WithWatch client.

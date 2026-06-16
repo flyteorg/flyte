@@ -19,13 +19,7 @@ func main() {
 			sc.Host = cfg.Server.Host
 			sc.Port = cfg.Server.Port
 
-			k8sClient, _, err := app.InitKubernetesClient(ctx, app.K8sConfig{
-				KubeConfig: cfg.Kubernetes.KubeConfig,
-				Namespace:  cfg.Kubernetes.Namespace,
-				QPS:        cfg.Kubernetes.QPS,
-				Burst:      cfg.Kubernetes.Burst,
-				Timeout:    cfg.Kubernetes.Timeout,
-			}, nil)
+			k8sClient, _, err := app.InitKubernetesClient(ctx, cfg.Kubernetes, nil)
 			if err != nil {
 				return fmt.Errorf("failed to initialize Kubernetes client: %w", err)
 			}
