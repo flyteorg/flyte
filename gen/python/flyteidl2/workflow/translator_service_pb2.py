@@ -18,7 +18,7 @@ from flyteidl2.task import task_definition_pb2 as flyteidl2_dot_task_dot_task__d
 from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n+flyteidl2/workflow/translator_service.proto\x12\x12\x66lyteidl2.workflow\x1a!flyteidl2/common/identifier.proto\x1a\x1e\x66lyteidl2/core/interface.proto\x1a\x1b\x66lyteidl2/task/common.proto\x1a$flyteidl2/task/task_definition.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xfa\x01\n\x1fLiteralsToLaunchFormJsonRequest\x12\x38\n\x08literals\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.task.NamedLiteralR\x08literals\x12\x39\n\tvariables\x18\x02 \x01(\x0b\x32\x1b.flyteidl2.core.VariableMapR\tvariables\x12!\n\x0cliterals_uri\x18\x03 \x01(\tR\x0bliteralsUri\x12?\n\taction_id\x18\x04 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierR\x08\x61\x63tionId\"O\n LiteralsToLaunchFormJsonResponse\x12+\n\x04json\x18\x01 \x01(\x0b\x32\x17.google.protobuf.StructR\x04json\"N\n\x1fLaunchFormJsonToLiteralsRequest\x12+\n\x04json\x18\x01 \x01(\x0b\x32\x17.google.protobuf.StructR\x04json\"\\\n LaunchFormJsonToLiteralsResponse\x12\x38\n\x08literals\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.task.NamedLiteralR\x08literals\"X\n\x1fTaskSpecToLaunchFormJsonRequest\x12\x35\n\ttask_spec\x18\x01 \x01(\x0b\x32\x18.flyteidl2.task.TaskSpecR\x08taskSpec\"O\n TaskSpecToLaunchFormJsonResponse\x12+\n\x04json\x18\x01 \x01(\x0b\x32\x17.google.protobuf.StructR\x04json\"\x89\x01\n\x1bJsonValuesToLiteralsRequest\x12\x39\n\tvariables\x18\x01 \x01(\x0b\x32\x1b.flyteidl2.core.VariableMapR\tvariables\x12/\n\x06values\x18\x02 \x01(\x0b\x32\x17.google.protobuf.StructR\x06values\"X\n\x1cJsonValuesToLiteralsResponse\x12\x38\n\x08literals\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.task.NamedLiteralR\x08literals2\xba\x04\n\x11TranslatorService\x12\x8a\x01\n\x18LiteralsToLaunchFormJson\x12\x33.flyteidl2.workflow.LiteralsToLaunchFormJsonRequest\x1a\x34.flyteidl2.workflow.LiteralsToLaunchFormJsonResponse\"\x03\x90\x02\x01\x12\x8a\x01\n\x18LaunchFormJsonToLiterals\x12\x33.flyteidl2.workflow.LaunchFormJsonToLiteralsRequest\x1a\x34.flyteidl2.workflow.LaunchFormJsonToLiteralsResponse\"\x03\x90\x02\x01\x12\x8a\x01\n\x18TaskSpecToLaunchFormJson\x12\x33.flyteidl2.workflow.TaskSpecToLaunchFormJsonRequest\x1a\x34.flyteidl2.workflow.TaskSpecToLaunchFormJsonResponse\"\x03\x90\x02\x01\x12~\n\x14JsonValuesToLiterals\x12/.flyteidl2.workflow.JsonValuesToLiteralsRequest\x1a\x30.flyteidl2.workflow.JsonValuesToLiteralsResponse\"\x03\x90\x02\x01\x42\xd3\x01\n\x16\x63om.flyteidl2.workflowB\x16TranslatorServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n+flyteidl2/workflow/translator_service.proto\x12\x12\x66lyteidl2.workflow\x1a!flyteidl2/common/identifier.proto\x1a\x1e\x66lyteidl2/core/interface.proto\x1a\x1b\x66lyteidl2/task/common.proto\x1a$flyteidl2/task/task_definition.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xcb\x02\n\x1fLiteralsToLaunchFormJsonRequest\x12\x38\n\x08literals\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.task.NamedLiteralR\x08literals\x12\x39\n\tvariables\x18\x02 \x01(\x0b\x32\x1b.flyteidl2.core.VariableMapR\tvariables\x12!\n\x0cliterals_uri\x18\x03 \x01(\tR\x0bliteralsUri\x12\x41\n\taction_id\x18\x04 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierH\x00R\x08\x61\x63tionId\x12\x44\n\ntrigger_id\x18\x05 \x01(\x0b\x32#.flyteidl2.common.TriggerIdentifierH\x00R\ttriggerIdB\x07\n\x05owner\"O\n LiteralsToLaunchFormJsonResponse\x12+\n\x04json\x18\x01 \x01(\x0b\x32\x17.google.protobuf.StructR\x04json\"N\n\x1fLaunchFormJsonToLiteralsRequest\x12+\n\x04json\x18\x01 \x01(\x0b\x32\x17.google.protobuf.StructR\x04json\"\\\n LaunchFormJsonToLiteralsResponse\x12\x38\n\x08literals\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.task.NamedLiteralR\x08literals\"X\n\x1fTaskSpecToLaunchFormJsonRequest\x12\x35\n\ttask_spec\x18\x01 \x01(\x0b\x32\x18.flyteidl2.task.TaskSpecR\x08taskSpec\"O\n TaskSpecToLaunchFormJsonResponse\x12+\n\x04json\x18\x01 \x01(\x0b\x32\x17.google.protobuf.StructR\x04json\"\x89\x01\n\x1bJsonValuesToLiteralsRequest\x12\x39\n\tvariables\x18\x01 \x01(\x0b\x32\x1b.flyteidl2.core.VariableMapR\tvariables\x12/\n\x06values\x18\x02 \x01(\x0b\x32\x17.google.protobuf.StructR\x06values\"X\n\x1cJsonValuesToLiteralsResponse\x12\x38\n\x08literals\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.task.NamedLiteralR\x08literals2\xba\x04\n\x11TranslatorService\x12\x8a\x01\n\x18LiteralsToLaunchFormJson\x12\x33.flyteidl2.workflow.LiteralsToLaunchFormJsonRequest\x1a\x34.flyteidl2.workflow.LiteralsToLaunchFormJsonResponse\"\x03\x90\x02\x01\x12\x8a\x01\n\x18LaunchFormJsonToLiterals\x12\x33.flyteidl2.workflow.LaunchFormJsonToLiteralsRequest\x1a\x34.flyteidl2.workflow.LaunchFormJsonToLiteralsResponse\"\x03\x90\x02\x01\x12\x8a\x01\n\x18TaskSpecToLaunchFormJson\x12\x33.flyteidl2.workflow.TaskSpecToLaunchFormJsonRequest\x1a\x34.flyteidl2.workflow.TaskSpecToLaunchFormJsonResponse\"\x03\x90\x02\x01\x12~\n\x14JsonValuesToLiterals\x12/.flyteidl2.workflow.JsonValuesToLiteralsRequest\x1a\x30.flyteidl2.workflow.JsonValuesToLiteralsResponse\"\x03\x90\x02\x01\x42\xd3\x01\n\x16\x63om.flyteidl2.workflowB\x16TranslatorServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -35,21 +35,21 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _TRANSLATORSERVICE.methods_by_name['JsonValuesToLiterals']._options = None
   _TRANSLATORSERVICE.methods_by_name['JsonValuesToLiterals']._serialized_options = b'\220\002\001'
   _globals['_LITERALSTOLAUNCHFORMJSONREQUEST']._serialized_start=232
-  _globals['_LITERALSTOLAUNCHFORMJSONREQUEST']._serialized_end=482
-  _globals['_LITERALSTOLAUNCHFORMJSONRESPONSE']._serialized_start=484
-  _globals['_LITERALSTOLAUNCHFORMJSONRESPONSE']._serialized_end=563
-  _globals['_LAUNCHFORMJSONTOLITERALSREQUEST']._serialized_start=565
-  _globals['_LAUNCHFORMJSONTOLITERALSREQUEST']._serialized_end=643
-  _globals['_LAUNCHFORMJSONTOLITERALSRESPONSE']._serialized_start=645
-  _globals['_LAUNCHFORMJSONTOLITERALSRESPONSE']._serialized_end=737
-  _globals['_TASKSPECTOLAUNCHFORMJSONREQUEST']._serialized_start=739
-  _globals['_TASKSPECTOLAUNCHFORMJSONREQUEST']._serialized_end=827
-  _globals['_TASKSPECTOLAUNCHFORMJSONRESPONSE']._serialized_start=829
-  _globals['_TASKSPECTOLAUNCHFORMJSONRESPONSE']._serialized_end=908
-  _globals['_JSONVALUESTOLITERALSREQUEST']._serialized_start=911
-  _globals['_JSONVALUESTOLITERALSREQUEST']._serialized_end=1048
-  _globals['_JSONVALUESTOLITERALSRESPONSE']._serialized_start=1050
-  _globals['_JSONVALUESTOLITERALSRESPONSE']._serialized_end=1138
-  _globals['_TRANSLATORSERVICE']._serialized_start=1141
-  _globals['_TRANSLATORSERVICE']._serialized_end=1711
+  _globals['_LITERALSTOLAUNCHFORMJSONREQUEST']._serialized_end=563
+  _globals['_LITERALSTOLAUNCHFORMJSONRESPONSE']._serialized_start=565
+  _globals['_LITERALSTOLAUNCHFORMJSONRESPONSE']._serialized_end=644
+  _globals['_LAUNCHFORMJSONTOLITERALSREQUEST']._serialized_start=646
+  _globals['_LAUNCHFORMJSONTOLITERALSREQUEST']._serialized_end=724
+  _globals['_LAUNCHFORMJSONTOLITERALSRESPONSE']._serialized_start=726
+  _globals['_LAUNCHFORMJSONTOLITERALSRESPONSE']._serialized_end=818
+  _globals['_TASKSPECTOLAUNCHFORMJSONREQUEST']._serialized_start=820
+  _globals['_TASKSPECTOLAUNCHFORMJSONREQUEST']._serialized_end=908
+  _globals['_TASKSPECTOLAUNCHFORMJSONRESPONSE']._serialized_start=910
+  _globals['_TASKSPECTOLAUNCHFORMJSONRESPONSE']._serialized_end=989
+  _globals['_JSONVALUESTOLITERALSREQUEST']._serialized_start=992
+  _globals['_JSONVALUESTOLITERALSREQUEST']._serialized_end=1129
+  _globals['_JSONVALUESTOLITERALSRESPONSE']._serialized_start=1131
+  _globals['_JSONVALUESTOLITERALSRESPONSE']._serialized_end=1219
+  _globals['_TRANSLATORSERVICE']._serialized_start=1222
+  _globals['_TRANSLATORSERVICE']._serialized_end=1792
 # @@protoc_insertion_point(module_scope)
