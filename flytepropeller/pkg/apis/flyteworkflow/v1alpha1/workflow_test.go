@@ -5,9 +5,10 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/ghodss/yaml"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 func ReadYamlFileAsJSON(path string) ([]byte, error) {
