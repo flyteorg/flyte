@@ -1,24 +1,13 @@
 # flyte-binary
 
-![Version: v0.2.0](https://img.shields.io/badge/Version-v0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
+![Version: v0.2.0](https://img.shields.io/badge/Version-v0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Chart for basic single Flyte executable deployment
-
-## Requirements
-
-| Repository | Name | Version |
-|------------|------|---------|
-| file://../flyteconnector | flyteconnector(flyteconnector) | v0.1.10 |
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| clusterResourceTemplates.annotations | object | `{}` |  |
-| clusterResourceTemplates.externalConfigMap | string | `""` |  |
-| clusterResourceTemplates.inline | object | `{}` |  |
-| clusterResourceTemplates.inlineConfigMap | string | `""` |  |
-| clusterResourceTemplates.labels | object | `{}` |  |
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
 | configuration.annotations | object | `{}` |  |
@@ -30,7 +19,7 @@ Chart for basic single Flyte executable deployment
 | configuration.auth.flyteClient.clientId | string | `"flytectl"` |  |
 | configuration.auth.flyteClient.redirectUri | string | `"http://localhost:53593/callback"` |  |
 | configuration.auth.flyteClient.scopes[0] | string | `"all"` |  |
-| configuration.auth.internal.clientId | string | `"flytepropeller"` |  |
+| configuration.auth.internal.clientId | string | `"flytemanager"` |  |
 | configuration.auth.internal.clientSecret | string | `""` |  |
 | configuration.auth.internal.clientSecretHash | string | `""` |  |
 | configuration.auth.oidc.baseUrl | string | `""` |  |
@@ -52,6 +41,8 @@ Chart for basic single Flyte executable deployment
 | configuration.database.username | string | `"postgres"` |  |
 | configuration.externalConfigMap | string | `""` |  |
 | configuration.externalSecretRef | string | `""` |  |
+| configuration.extraInlineConfigMapRefs | list | `[]` |  |
+| configuration.extraInlineSecretRefs | list | `[]` |  |
 | configuration.inline | object | `{}` |  |
 | configuration.inlineConfigMap | string | `""` |  |
 | configuration.inlineSecretRef | string | `""` |  |
@@ -64,8 +55,6 @@ Chart for basic single Flyte executable deployment
 | configuration.logging.plugins.kubernetes.templateUri | string | `""` |  |
 | configuration.logging.plugins.stackdriver.enabled | bool | `false` |  |
 | configuration.logging.plugins.stackdriver.templateUri | string | `""` |  |
-| configuration.propeller.createCRDs | bool | `true` |  |
-| configuration.propeller.literalOffloadingConfigEnabled | bool | `false` |  |
 | configuration.storage.metadataContainer | string | `"my-organization-flyte-container"` |  |
 | configuration.storage.provider | string | `"s3"` |  |
 | configuration.storage.providerConfig.azure.account | string | `"storage-account-name"` |  |
@@ -111,7 +100,7 @@ Chart for basic single Flyte executable deployment
 | deployment.genAdminAuthSecret.command | list | `[]` |  |
 | deployment.genAdminAuthSecret.securityContext | object | `{}` |  |
 | deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
-| deployment.image.repository | string | `"cr.flyte.org/flyteorg/flyte-binary"` |  |
+| deployment.image.repository | string | `"cr.flyte.org/flyteorg/flyte-binary-v2"` |  |
 | deployment.image.tag | string | `"latest"` |  |
 | deployment.initContainers | list | `[]` |  |
 | deployment.labels | object | `{}` |  |
@@ -134,18 +123,37 @@ Chart for basic single Flyte executable deployment
 | deployment.waitForDB.image.repository | string | `"postgres"` |  |
 | deployment.waitForDB.image.tag | string | `"15-alpine"` |  |
 | deployment.waitForDB.securityContext | object | `{}` |  |
-| enabled_plugins.tasks | object | `{"task-plugins":{"default-for-task-types":{"container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","connector-service","echo"]}}` | Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig) |
-| enabled_plugins.tasks.task-plugins | object | `{"default-for-task-types":{"container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","connector-service","echo"]}` | Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig) |
-| enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array","connector-service","echo"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
-| flyte-core-components.admin.disableClusterResourceManager | bool | `false` |  |
-| flyte-core-components.admin.disableScheduler | bool | `false` |  |
-| flyte-core-components.admin.disabled | bool | `false` |  |
-| flyte-core-components.admin.seedProjectsWithDetails[0].description | string | `"Default project setup."` |  |
-| flyte-core-components.admin.seedProjectsWithDetails[0].name | string | `"flytesnacks"` |  |
-| flyte-core-components.admin.seedProjects[0] | string | `"flytesnacks"` |  |
-| flyte-core-components.dataCatalog.disabled | bool | `false` |  |
-| flyte-core-components.propeller.disableWebhook | bool | `false` |  |
-| flyte-core-components.propeller.disabled | bool | `false` |  |
+| enabled_plugins.tasks | object | `{"task-plugins":{"default-for-task-types":{"container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","connector-service","echo"]}}` | Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig) |
+| enabled_plugins.tasks.task-plugins | object | `{"default-for-task-types":{"container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","connector-service","echo"]}` | Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig) |
+| enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","connector-service","echo"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
+| flyte-core-components.actions.kubernetes.kubeconfig | string | `""` |  |
+| flyte-core-components.actions.kubernetes.namespace | string | `"flyte"` |  |
+| flyte-core-components.actions.watchBufferSize | int | `100` |  |
+| flyte-core-components.dataproxy.download.maxExpiresIn | string | `"1h"` |  |
+| flyte-core-components.dataproxy.upload.defaultFileNameLength | int | `20` |  |
+| flyte-core-components.dataproxy.upload.maxExpiresIn | string | `"1h"` |  |
+| flyte-core-components.dataproxy.upload.maxSize | string | `"100Mi"` |  |
+| flyte-core-components.dataproxy.upload.storagePrefix | string | `"uploads"` |  |
+| flyte-core-components.runs.database.connMaxLifeTime | string | `"1h"` |  |
+| flyte-core-components.runs.database.maxIdleConnections | int | `10` |  |
+| flyte-core-components.runs.database.maxOpenConnections | int | `100` |  |
+| flyte-core-components.runs.database.postgres.dbname | string | `"flyte"` |  |
+| flyte-core-components.runs.database.postgres.debug | bool | `false` |  |
+| flyte-core-components.runs.database.postgres.host | string | `"127.0.0.1"` |  |
+| flyte-core-components.runs.database.postgres.options | string | `"sslmode=disable"` |  |
+| flyte-core-components.runs.database.postgres.password | string | `""` |  |
+| flyte-core-components.runs.database.postgres.port | int | `5432` |  |
+| flyte-core-components.runs.database.postgres.username | string | `"postgres"` |  |
+| flyte-core-components.runs.server.host | string | `"0.0.0.0"` |  |
+| flyte-core-components.runs.server.port | int | `8090` |  |
+| flyte-core-components.runs.storagePrefix | string | `"s3://flyte-data"` |  |
+| flyte-core-components.runs.watchBufferSize | int | `100` |  |
+| flyte-core-components.secret.kubernetes.burst | int | `200` |  |
+| flyte-core-components.secret.kubernetes.clusterName | string | `"flyte-devbox"` |  |
+| flyte-core-components.secret.kubernetes.kubeconfig | string | `""` |  |
+| flyte-core-components.secret.kubernetes.namespace | string | `"flyte"` |  |
+| flyte-core-components.secret.kubernetes.qps | int | `100` |  |
+| flyte-core-components.secret.kubernetes.timeout | string | `"30s"` |  |
 | flyteconnector.enabled | bool | `false` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.commonAnnotations | object | `{}` |  |
