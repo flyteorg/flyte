@@ -51,7 +51,7 @@ flyte-core-components:
       qps: 100
       burst: 200
       timeout: "30s"
-    clusterName: "flyte-devbox"
+      clusterName: "flyte-devbox"
 
 # configuration Specify configuration for Flyte
 configuration:

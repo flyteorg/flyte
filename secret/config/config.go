@@ -15,12 +15,12 @@ var defaultConfig = &Config{
 		Host: "0.0.0.0",
 	},
 	Kubernetes: app.K8sConfig{
-		Namespace: "flyte",
-		QPS:       100,
-		Burst:     200,
-		Timeout:   "30s",
+		Namespace:   "flyte",
+		QPS:         100,
+		Burst:       200,
+		Timeout:     "30s",
+		ClusterName: "flyte-devbox",
 	},
-	ClusterName: "flyte-devbox",
 }
 
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
@@ -30,13 +30,8 @@ type Config struct {
 	// HTTP server configuration
 	Server ServerConfig `json:"server"`
 
-	// Kubernetes client configuration.
+	// Kubernetes client configuration (also carries ClusterName for status reporting).
 	Kubernetes app.K8sConfig `json:"kubernetes"`
-
-	// ClusterName is the logical name of this cluster, used in secret status
-	// reporting. It is a service identity, not a k8s-client setting, so it lives
-	// at the top level rather than under kubernetes.
-	ClusterName string `json:"clusterName" pflag:",Logical name of the cluster for secret status reporting"`
 }
 
 // ServerConfig holds HTTP server configuration

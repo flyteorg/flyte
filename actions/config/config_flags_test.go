@@ -197,6 +197,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_kubernetes.clusterName", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("kubernetes.clusterName", testValue)
+			if vString, err := cmdFlags.GetString("kubernetes.clusterName"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Kubernetes.ClusterName)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_watchBufferSize", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

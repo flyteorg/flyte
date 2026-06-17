@@ -29,6 +29,9 @@ type K8sConfig struct {
 	Burst int `json:"burst" pflag:",Maximum burst above QPS for Kubernetes API server requests"`
 	// Timeout is the API server request timeout, e.g. "30s" (empty → client default).
 	Timeout string `json:"timeout" pflag:",Request timeout for Kubernetes API server calls (e.g. 30s)"`
+	// ClusterName is the logical name of this cluster, used by the secret service
+	// for secret status reporting.
+	ClusterName string `json:"clusterName" pflag:",Logical name of the cluster for secret status reporting"`
 }
 
 // InitKubernetesClient creates a controller-runtime WithWatch client.
