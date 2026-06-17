@@ -69,5 +69,17 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "actionsServiceUrl"), defaultConfig.ActionsServiceURL, "URL of the actions service")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storagePrefix"), defaultConfig.StoragePrefix, "Base URI prefix for storing run inputs and outputs")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "seedProjects"), defaultConfig.SeedProjects, "Projects to create by default at startup")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "triggerScheduler.enabled"), defaultConfig.TriggerScheduler.Enabled, "Enable the trigger scheduler worker")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "triggerScheduler.maxCatchupRunsPerLoop"), defaultConfig.TriggerScheduler.MaxCatchupRunsPerLoop, "Maximum catchup runs fired per resync loop")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "triggerScheduler.executionBurst"), defaultConfig.TriggerScheduler.ExecutionBurst, "Burst size for CreateRun rate limiter")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "authMetadata.externalAuthServerBaseUrl"), defaultConfig.AuthMetadata.ExternalAuthServerBaseURL, "Base URL of the external OAuth2 authorization server to proxy metadata from")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "authMetadata.externalMetadataUrl"), defaultConfig.AuthMetadata.ExternalMetadataURL, "Override for the external metadata path")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "authMetadata.retryAttempts"), defaultConfig.AuthMetadata.RetryAttempts, "Attempts to fetch external metadata")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "authMetadata.retryDelay"), defaultConfig.AuthMetadata.RetryDelay.String(), "Delay between external metadata fetch attempts")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "authMetadata.authorizationMetadataKey"), defaultConfig.AuthMetadata.AuthorizationMetadataKey, "Header key clients should use for tokens")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "authMetadata.flyteClient.clientId"), defaultConfig.AuthMetadata.FlyteClient.ClientID, "Public OAuth2 client id advertised to SDKs")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "authMetadata.flyteClient.redirectUri"), defaultConfig.AuthMetadata.FlyteClient.RedirectURI, "Redirect URI for the public client login flow")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "authMetadata.flyteClient.scopes"), defaultConfig.AuthMetadata.FlyteClient.Scopes, "Scopes the public client should request")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "authMetadata.flyteClient.audience"), defaultConfig.AuthMetadata.FlyteClient.Audience, "Audience for requested tokens")
 	return cmdFlags
 }
