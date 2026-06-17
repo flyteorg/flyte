@@ -357,8 +357,8 @@ github.com/ray-project/kuberay/ray-operator v1.5.2 h1:EkF6DQjd+ThSd5fx35i56vnqNZ
 github.com/ray-project/kuberay/ray-operator v1.5.2/go.mod h1:itUPJnr3QwoZT70gRgsWFpBolquuZtDRCkdA1lrAb7Y=
 github.com/redis/go-redis/extra/redisprometheus/v9 v9.20.0 h1:lGmUMmqYTo+ly00exQ0qesBrhhO+XB7SdGuomvbU8ng=
 github.com/redis/go-redis/extra/redisprometheus/v9 v9.20.0/go.mod h1:6DxGqf9sNIQvidqVRZbg/OPKYx28HwMEFCF+i3IMWfI=
-github.com/redis/go-redis/v9 v9.20.0 h1:WnQYxLkgO2xiXTCJY0ldIiI8dNqCDlQAG+AtaH7a2a0=
-github.com/redis/go-redis/v9 v9.20.0/go.mod h1:v/M13XI1PVCDcm01VtPFOADfZtHf8YW3baQf57KlIkA=
+github.com/redis/go-redis/v9 v9.20.1 h1:sfCU6A8P3dXbKyWes02uxA2baehGux9dZHfEKtsTB1w=
+github.com/redis/go-redis/v9 v9.20.1/go.mod h1:v/M13XI1PVCDcm01VtPFOADfZtHf8YW3baQf57KlIkA=
 github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0tI/otEQ=
 github.com/rogpeppe/go-internal v1.14.1/go.mod h1:MaRKkUm5W0goXpeCfT7UZI6fk/L7L7so1lCWt35ZSgc=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
