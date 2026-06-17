@@ -45,7 +45,7 @@ type AuthMetadataService struct {
 	cfg             config.AuthMetadataConfig
 	httpClient      *http.Client
 
-	mu             sync.Mutex
+	mu             sync.RWMutex
 	cachedMetadata *auth.GetOAuth2MetadataResponse
 	cacheExpiry    time.Time
 }
@@ -97,13 +97,13 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 	}
 
 	// Serve from cache while fresh; only successful fetches are cached.
-	s.mu.Lock()
+	s.mu.RLock()
 	if s.cachedMetadata != nil && time.Now().Before(s.cacheExpiry) {
 		cached := proto.Clone(s.cachedMetadata).(*auth.GetOAuth2MetadataResponse)
-		s.mu.Unlock()
+		s.mu.RUnlock()
 		return connect.NewResponse(cached), nil
 	}
-	s.mu.Unlock()
+	s.mu.RUnlock()
 
 	baseURL, err := url.Parse(s.cfg.ExternalAuthServerBaseURL)
 	if err != nil {
