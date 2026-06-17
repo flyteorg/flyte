@@ -122,33 +122,91 @@ func (m *LiteralsToLaunchFormJsonRequest) validate(all bool) error {
 
 	// no validation rules for LiteralsUri
 
-	if all {
-		switch v := interface{}(m.GetActionId()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LiteralsToLaunchFormJsonRequestValidationError{
-					field:  "ActionId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
+	switch v := m.Owner.(type) {
+	case *LiteralsToLaunchFormJsonRequest_ActionId:
+		if v == nil {
+			err := LiteralsToLaunchFormJsonRequestValidationError{
+				field:  "Owner",
+				reason: "oneof value cannot be a typed-nil",
 			}
-		case interface{ Validate() error }:
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetActionId()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LiteralsToLaunchFormJsonRequestValidationError{
+						field:  "ActionId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LiteralsToLaunchFormJsonRequestValidationError{
+						field:  "ActionId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetActionId()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				errors = append(errors, LiteralsToLaunchFormJsonRequestValidationError{
+				return LiteralsToLaunchFormJsonRequestValidationError{
 					field:  "ActionId",
 					reason: "embedded message failed validation",
 					cause:  err,
-				})
+				}
 			}
 		}
-	} else if v, ok := interface{}(m.GetActionId()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LiteralsToLaunchFormJsonRequestValidationError{
-				field:  "ActionId",
-				reason: "embedded message failed validation",
-				cause:  err,
+
+	case *LiteralsToLaunchFormJsonRequest_TriggerId:
+		if v == nil {
+			err := LiteralsToLaunchFormJsonRequestValidationError{
+				field:  "Owner",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetTriggerId()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LiteralsToLaunchFormJsonRequestValidationError{
+						field:  "TriggerId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LiteralsToLaunchFormJsonRequestValidationError{
+						field:  "TriggerId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetTriggerId()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LiteralsToLaunchFormJsonRequestValidationError{
+					field:  "TriggerId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
+
+	default:
+		_ = v // ensures v is used
 	}
 
 	if len(errors) > 0 {
