@@ -46,9 +46,6 @@ import (
 
 const (
 	finalizer = "flyte.org/finalizer-k8s"
-	// Old non-domain-qualified finalizer for backwards compatibility
-	// This should eventually be removed
-	oldFinalizer = "flyte/flytek8s"
 )
 
 const pluginStateVersion = 1
@@ -493,8 +490,7 @@ func (e *PluginManager) clearFinalizer(ctx context.Context, o client.Object) err
 	// Checking for the old finalizer too for backwards compatibility. This should eventually be removed
 	// Go does short-circuiting and we have to make sure both are removed
 	finalizerRemoved := controllerutil.RemoveFinalizer(o, finalizer)
-	oldFinalizerRemoved := controllerutil.RemoveFinalizer(o, oldFinalizer)
-	if finalizerRemoved || oldFinalizerRemoved {
+	if finalizerRemoved {
 		// Patch finalizers to reduce conflicts caused by a stale informer cache vs full Update().
 		err := e.kubeClient.GetClient().Patch(ctx, o, client.MergeFrom(original))
 		if err != nil && !isK8sObjectNotExists(err) {
