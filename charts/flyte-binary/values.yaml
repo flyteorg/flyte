@@ -316,11 +316,9 @@ service:
   # If not specified, defaults to corresponding container ports
   ports:
     http: ""
-    grpc: ""
   # nodePorts Node ports for Flyte service if service type is `NodePort` or `LoadBalancer`
   nodePorts:
     http: ""
-    grpc: ""
   # clusterIP Set static IP if service type is `ClusterIP`
   clusterIP: ""
   # labels Add labels to Flyte services
@@ -329,8 +327,6 @@ service:
   commonAnnotations: {}
   # httpAnnotations Add annotations to http service resource
   httpAnnotations: {}
-  # grpcAnnotations Add annotations to grpc service resource
-  grpcAnnotations: {}
   # loadBalancerIP Set static IP if service type is `LoadBalancer`
   loadBalancerIP: ""
   # externalTrafficPolicy Enable client source IP preservation if service type is `NodePort` or `LoadBalancer`
@@ -395,32 +391,20 @@ ingress:
   labels: {}
   # host Hostname to bind to ingress resources
   host: ""
-  # separateGrpcIngress Create a separate ingress resource for GRPC if true. Required for certain ingress controllers like nginx.
-  separateGrpcIngress: true
   # commonAnnotations Add common annotations to all ingress resources
   commonAnnotations: {}
   # httpAnnotations Add annotations to http ingress resource
   httpAnnotations: {}
-  # grpcAnnotations Add annotations to grpc ingress resource
-  grpcAnnotations: {}
   # ingressClassName Ingress class to use with all ingress resources
   ingressClassName: ""
   # httpIngressClassName Ingress class to use with all http ingress resource. Overrides `ingressClassName`
   httpIngressClassName: ""
-  # grpcIngressClassName Ingress class to use with all grpc ingress resource. Overrides `ingressClassName`
-  grpcIngressClassName: ""
   # tls Add TLS configuration to all ingress resources
   tls: []
   # httpTls Add TLS configuration to http ingress resource. Overrides `tls`
   httpTls: []
-  # grpcTls Add TLS configuration to grpc ingress resource. Overrides `tls`
-  grpcTls: []
   # httpExtraPaths Add extra paths to http ingress rule
   httpExtraPaths:
-    prepend: []
-    append: []
-  # grpcExtraPaths Add extra paths to grpc ingress rule
-  grpcExtraPaths:
     prepend: []
     append: []
 
