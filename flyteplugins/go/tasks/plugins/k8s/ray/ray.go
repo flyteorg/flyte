@@ -473,7 +473,7 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 	// merged: a custom k8s_pod may have appended its own node selector terms (OR'd
 	// by Kubernetes), so the (Non)InterruptibleNodeSelectorRequirement must be added
 	// to every term to keep a non-interruptible pod off spot nodes. Idempotent.
-	flytek8s.ApplyInterruptibleScheduling(taskCtx.TaskExecutionMetadata().IsInterruptible(), basePodSpec)
+	flytek8s.ApplyPlatformSchedulingConstraints(taskCtx.TaskExecutionMetadata().IsInterruptible(), basePodSpec)
 
 	podTemplateSpec := v1.PodTemplateSpec{
 		Spec:       *basePodSpec,
@@ -632,7 +632,7 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 	// merged: a custom k8s_pod may have appended its own node selector terms (OR'd
 	// by Kubernetes), so the (Non)InterruptibleNodeSelectorRequirement must be added
 	// to every term to keep a non-interruptible pod off spot nodes. Idempotent.
-	flytek8s.ApplyInterruptibleScheduling(taskCtx.TaskExecutionMetadata().IsInterruptible(), basePodSpec)
+	flytek8s.ApplyPlatformSchedulingConstraints(taskCtx.TaskExecutionMetadata().IsInterruptible(), basePodSpec)
 
 	podTemplateSpec := v1.PodTemplateSpec{
 		Spec:       *basePodSpec,

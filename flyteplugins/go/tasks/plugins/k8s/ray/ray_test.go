@@ -418,6 +418,70 @@ func TestBuildResourceRayInterruptibleCustomAffinity(t *testing.T) {
 	assertEveryTermHasRequirement(t, workerSpec, *nonInterruptibleNSR)
 }
 
+// TestBuildResourceRayDefaultAffinityDilution probes whether a platform-injected
+// DefaultAffinity required node-selector term survives a worker's custom k8s_pod
+// that carries its own affinity term. Same OR-append mechanism as the interruptible
+// bug: if it reproduces, the appended custom term lacks the default-affinity
+// requirement, letting the pod escape the cluster's default node constraint.
+func TestBuildResourceRayDefaultAffinityDilution(t *testing.T) {
+	defaultAffinityReq := corev1.NodeSelectorRequirement{
+		Key:      "node-pool",
+		Operator: corev1.NodeSelectorOpIn,
+		Values:   []string{"flyte-dedicated"},
+	}
+	require.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		DefaultAffinity: &corev1.Affinity{
+			NodeAffinity: &corev1.NodeAffinity{
+				RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+					NodeSelectorTerms: []corev1.NodeSelectorTerm{
+						{MatchExpressions: []corev1.NodeSelectorRequirement{defaultAffinityReq}},
+					},
+				},
+			},
+		},
+	}))
+
+	// CPU-only so GPU handling does not pre-seed Affinity (which would skip
+	// DefaultAffinity application in UpdatePod).
+	cpuOnly := &corev1.ResourceRequirements{
+		Limits:   corev1.ResourceList{corev1.ResourceCPU: resource.MustParse("1000m"), corev1.ResourceMemory: resource.MustParse("1Gi")},
+		Requests: corev1.ResourceList{corev1.ResourceCPU: resource.MustParse("100m"), corev1.ResourceMemory: resource.MustParse("512Mi")},
+	}
+
+	customAffinityPod := &core.K8SPod{
+		PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+			Containers: []corev1.Container{{Name: "ray-worker"}},
+			Affinity: &corev1.Affinity{
+				NodeAffinity: &corev1.NodeAffinity{
+					RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+						NodeSelectorTerms: []corev1.NodeSelectorTerm{
+							{MatchExpressions: []corev1.NodeSelectorRequirement{
+								{Key: "zone", Operator: corev1.NodeSelectorOpIn, Values: []string{"us-east-1a"}},
+							}},
+						},
+					},
+				},
+			},
+		}),
+	}
+
+	rayJobObj := dummyRayCustomObj()
+	rayJobObj.RayCluster.WorkerGroupSpec[0].K8SPod = customAffinityPod
+	taskTemplate := dummyRayTaskTemplate("ray-id", rayJobObj)
+	taskContext := dummyRayTaskContext(taskTemplate, cpuOnly, nil, "", serviceAccount)
+
+	r, err := rayJobResourceHandler{}.BuildResource(context.TODO(), taskContext)
+	require.NoError(t, err)
+	rayJob, ok := r.(*rayv1.RayJob)
+	require.True(t, ok)
+
+	workerSpec := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec
+	terms := workerSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
+	require.GreaterOrEqual(t, len(terms), 2, "expected the custom affinity term to be appended as a separate term")
+	// If this fails, DefaultAffinity is diluted (bug). If it passes, no bug.
+	assertEveryTermHasRequirement(t, workerSpec, defaultAffinityReq)
+}
+
 func TestBuildResourceRayContainerImage(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
 
