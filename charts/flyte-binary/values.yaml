@@ -15,19 +15,6 @@ flyte-core-components:
       port: 8090
     watchBufferSize: 100
     storagePrefix: "s3://flyte-data"
-    # Right now sandbox use SQLite db, we just leave the postgreSQL setting for potential future usage
-    database:
-      maxIdleConnections: 10
-      maxOpenConnections: 100
-      connMaxLifeTime: 1h
-      postgres:
-        host: "127.0.0.1"
-        port: 5432
-        dbname: flyte
-        username: postgres
-        password: ""
-        options: "sslmode=disable"
-        debug: false
 
   actions:
     kubernetes:
@@ -55,23 +42,30 @@ flyte-core-components:
 
 # configuration Specify configuration for Flyte
 configuration:
-  # database Specify configuration for Flyte's database connection
+  # database Specify the database configuration for the unified Flyte binary.
+  # The chart renders this under `runs.database` — the single
+  # DB config the binary reads (runsconfig.GetConfig().Database). The waitForDB
+  # init container and the optional DB-password Secret both derive from here.
   database:
-    # username Name for user to connect to database as
-    username: postgres
-    # password Password to connect to database with
-    # If set, a Secret will be created with this value and mounted to Flyte pod
-    password: ""
-    # passwordPath Mountpath of file containing password to be added to Flyte deployment
-    passwordPath: ""
-    # host Hostname of database instance
-    host: 127.0.0.1
-    # port Port to connect to database at
-    port: 5432
-    # dbname Name of database to use
-    dbname: flyte
-    # options Additional client options for connecting to database
-    options: sslmode=disable
+    maxIdleConnections: 10
+    maxOpenConnections: 100
+    connMaxLifeTime: 1h
+    postgres:
+      host: "127.0.0.1"
+      port: 5432
+      dbname: flyte
+      username: postgres
+      # password Password to connect to the database with.
+      # If set, a Secret is created with this value and mounted to the Flyte pod.
+      # Mutually exclusive with passwordPath — set exactly one of the two.
+      password: ""
+      # passwordPath Path to a file containing the database password, read by the
+      # binary at runtime. Mount the file yourself (e.g. via
+      # deployment.extraVolumes/extraVolumeMounts from an external secret manager);
+      # the chart does not create a Secret for it. Mutually exclusive with password.
+      passwordPath: ""
+      options: "sslmode=disable"
+      debug: false
   # storage Specify configuration for object store
   storage:
     # metadataContainer Bucket to store Flyte metadata
