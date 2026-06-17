@@ -7705,18 +7705,6 @@ data:
         maxSize: 100Mi
         storagePrefix: uploads
     runs:
-      database:
-        connMaxLifeTime: 1h
-        maxIdleConnections: 10
-        maxOpenConnections: 100
-        postgres:
-          dbname: flyte
-          debug: false
-          host: 127.0.0.1
-          options: sslmode=disable
-          password: ""
-          port: 5432
-          username: postgres
       server:
         host: 0.0.0.0
         port: 8090
@@ -7757,13 +7745,18 @@ data:
             cloudwatch-enabled: false
             stackdriver-enabled: false
   002-database.yaml: |
-    database:
-      postgres:
-        username: postgres
-        host: postgresql
-        port: 5432
-        dbname: flyte
-        options: "sslmode=disable"
+    runs:
+      database:
+        connMaxLifeTime: 1h
+        maxIdleConnections: 10
+        maxOpenConnections: 100
+        postgres:
+          dbname: flyte
+          debug: false
+          host: postgresql
+          options: sslmode=disable
+          port: 5432
+          username: postgres
   003-storage.yaml: |
     storage:
       type: stow
@@ -7803,7 +7796,6 @@ data:
         postgres:
           dbName: runs
           host: postgresql.flyte
-          password: postgres
           port: 5432
           user: postgres
     storage:
@@ -8600,7 +8592,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: b3eeb7732d0979610dd7e90fc2681bc752f4c2318ff8df52e3d3651aa49bacd1
+        checksum/configuration: a6c83189407d564600f4ce77d6cedad99dce5b0fa169e07ab6e5ebf6255dff3f
         checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
       labels:
         app.kubernetes.io/component: flyte-binary
