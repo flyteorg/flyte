@@ -128,10 +128,6 @@ func buildFlyteWorkflowSpec(wf *core.CompiledWorkflow, tasks []*core.CompiledTas
 		OutputBindings:  outputBindings,
 		OnFailurePolicy: failurePolicy,
 		Connections:     connections,
-		DeprecatedConnections: v1alpha1.DeprecatedConnections{
-			DownstreamEdges: connections.Downstream,
-			UpstreamEdges:   connections.Upstream,
-		},
 	}, nil
 }
 
