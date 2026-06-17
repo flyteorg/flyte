@@ -68,7 +68,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(clusterPath, clusterHandler)
 	logger.Infof(ctx, "Mounted ClusterService at %s", clusterPath)
 
-	translatorSvc := NewTranslatorService(sc.DataStore, runClient)
+	translatorSvc := NewTranslatorService(sc.DataStore, runClient, triggerClient)
 	translatorPath, translatorHandler := workflowconnect.NewTranslatorServiceHandler(translatorSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(translatorPath, translatorHandler)
 	logger.Infof(ctx, "Mounted TranslatorService at %s", translatorPath)
