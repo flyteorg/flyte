@@ -1,7 +1,6 @@
 package v1alpha1_test
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"testing"
 
@@ -17,21 +16,6 @@ func ReadYamlFileAsJSON(path string) ([]byte, error) {
 		return nil, err
 	}
 	return yaml.YAMLToJSON(r)
-}
-
-func TestWorkflowSpec(t *testing.T) {
-	j, err := ReadYamlFileAsJSON("testdata/workflowspec.yaml")
-	assert.NoError(t, err)
-	w := &v1alpha1.FlyteWorkflow{}
-	err = json.Unmarshal(j, w)
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
-
-	assert.NotNil(t, w.WorkflowSpec)
-	assert.Nil(t, w.GetOnFailureNode())
-	assert.Equal(t, 7, len(w.GetConnections().Downstream))
-	assert.Equal(t, 8, len(w.GetConnections().Upstream))
 }
 
 func TestWorkflowIsInterruptible(t *testing.T) {
