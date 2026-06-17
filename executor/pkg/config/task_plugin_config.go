@@ -19,13 +19,9 @@ var (
 // TasksConfig is the top-level tasks configuration container.
 type TasksConfig struct{}
 
-// TaskPluginConfig holds the task plugin enablement and routing configuration,
+// TaskPluginConfig holds the task plugin routing configuration,
 // read from the tasks.task-plugins config section.
 type TaskPluginConfig struct {
-	// EnabledPlugins is an allowlist of plugin executor IDs to load at startup.
-	// An empty slice loads all compiled-in plugins (default behaviour).
-	EnabledPlugins []string `json:"enabled-plugins"`
-
 	// DefaultForTaskTypes overrides which plugin handles a given task type.
 	// Key: task type string, Value: plugin ID string.
 	DefaultForTaskTypes map[string]string `json:"default-for-task-types"`

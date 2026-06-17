@@ -62,15 +62,8 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 	cfg := config.GetConfig()
 
-	taskPluginCfg := config.GetTaskPluginConfig()
-	enabledPlugins := make(map[string]bool, len(taskPluginCfg.EnabledPlugins))
-	for _, id := range taskPluginCfg.EnabledPlugins {
-		enabledPlugins[id] = true
-	}
 	for _, reg := range pluginmachinery.PluginRegistry().GetSchemeRegisters() {
-		if len(enabledPlugins) == 0 || enabledPlugins[reg.ID] {
-			utilruntime.Must(reg.AddToScheme(scheme))
-		}
+		utilruntime.Must(reg.AddToScheme(scheme))
 	}
 
 	var tlsOpts []func(*tls.Config)
