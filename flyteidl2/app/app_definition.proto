@@ -8,6 +8,7 @@ import "flyteidl2/common/runtime_version.proto";
 import "flyteidl2/core/artifact_id.proto";
 import "flyteidl2/core/security.proto";
 import "flyteidl2/core/tasks.proto";
+import "flyteidl2/task/task_definition.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -42,6 +43,12 @@ message Meta {
 
   // Labels for the app.
   map<string, string> labels = 3;
+
+  // Remote URI pointing to the code bundle used to build this app.
+  string code_bundle_uri = 4;
+
+  // Link to the source code used to define this app.
+  flyteidl2.task.SourceCode source_code = 5;
 }
 
 // For internal usage only. This message is used to wrap the app message with the host.
