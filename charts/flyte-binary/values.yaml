@@ -55,7 +55,7 @@ flyte-core-components:
 # configuration Specify configuration for Flyte
 configuration:
   # database Specify the database configuration for the unified Flyte binary.
-  # The chart renders this under `runs.database` (002-database.yaml) — the single
+  # The chart renders this under `runs.database` — the single
   # DB config the binary reads (runsconfig.GetConfig().Database). The waitForDB
   # init container and the optional DB-password Secret both derive from here.
   database:
