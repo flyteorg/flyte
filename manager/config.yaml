@@ -51,7 +51,7 @@ executor:
 
 # Runs service configuration
 runs:
-  # Single server port for all Connect services (Runs, State, Queue, DataProxy)
+  # Single server port for all Connect services (Runs, Action, DataProxy)
   server:
     host: "0.0.0.0"
     port: 8090
