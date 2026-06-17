@@ -889,6 +889,8 @@ func init() {
 		panic(err)
 	}
 
+	pluginmachinery.PluginRegistry().RegisterScheme(rayTaskType, rayv1.AddToScheme)
+
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{
 			ID:                  rayTaskType,

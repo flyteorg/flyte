@@ -629,6 +629,8 @@ func init() {
 		panic(err)
 	}
 
+	pluginmachinery.PluginRegistry().RegisterScheme(sparkTaskType, sparkOp.AddToScheme)
+
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{
 			ID:                  sparkTaskType,

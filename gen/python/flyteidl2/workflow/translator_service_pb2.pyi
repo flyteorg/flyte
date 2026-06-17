@@ -11,16 +11,18 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class LiteralsToLaunchFormJsonRequest(_message.Message):
-    __slots__ = ["literals", "variables", "literals_uri", "action_id"]
+    __slots__ = ["literals", "variables", "literals_uri", "action_id", "trigger_id"]
     LITERALS_FIELD_NUMBER: _ClassVar[int]
     VARIABLES_FIELD_NUMBER: _ClassVar[int]
     LITERALS_URI_FIELD_NUMBER: _ClassVar[int]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
+    TRIGGER_ID_FIELD_NUMBER: _ClassVar[int]
     literals: _containers.RepeatedCompositeFieldContainer[_common_pb2.NamedLiteral]
     variables: _interface_pb2.VariableMap
     literals_uri: str
     action_id: _identifier_pb2.ActionIdentifier
-    def __init__(self, literals: _Optional[_Iterable[_Union[_common_pb2.NamedLiteral, _Mapping]]] = ..., variables: _Optional[_Union[_interface_pb2.VariableMap, _Mapping]] = ..., literals_uri: _Optional[str] = ..., action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ...) -> None: ...
+    trigger_id: _identifier_pb2.TriggerIdentifier
+    def __init__(self, literals: _Optional[_Iterable[_Union[_common_pb2.NamedLiteral, _Mapping]]] = ..., variables: _Optional[_Union[_interface_pb2.VariableMap, _Mapping]] = ..., literals_uri: _Optional[str] = ..., action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., trigger_id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ...) -> None: ...
 
 class LiteralsToLaunchFormJsonResponse(_message.Message):
     __slots__ = ["json"]
