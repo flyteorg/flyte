@@ -1,0 +1,53 @@
+{{- if and .Values.ingress.create .Values.ingress.wellknownIngress.enabled }}
+{{- $paths := (include "flyte-binary.ingress.wellknownPaths" .) | fromYamlArray }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "flyte-binary.fullname" . }}-wellknown
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-binary.labels" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.ingress.labels }}
+    {{- tpl ( .Values.ingress.labels | toYaml ) . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.ingress.commonAnnotations }}
+    {{- tpl ( .Values.ingress.commonAnnotations | toYaml ) . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.ingress.wellknownIngress.annotations }}
+    {{- tpl ( .Values.ingress.wellknownIngress.annotations | toYaml ) . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.ingress.wellknownIngress.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.wellknownIngress.ingressClassName | quote }}
+  {{- else if .Values.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  {{- end }}
+  rules:
+  - http:
+      paths:
+      {{- range $path := $paths }}
+        - path: {{ $path }}
+          {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
+          pathType: ImplementationSpecific
+          {{- end }}
+          backend:
+            {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+            service:
+              name: {{ include "flyte-binary.service.http.name" $ }}
+              port:
+                number: {{ include "flyte-binary.service.http.port" $ }}
+            {{- else }}
+            serviceName: {{ include "flyte-binary.service.http.name" $ }}
+            servicePort: {{ include "flyte-binary.service.http.port" $ }}
+            {{- end }}
+      {{- end }}
+    {{- if .Values.ingress.host }}
+    host: {{ tpl .Values.ingress.host . | quote }}
+    {{- end }}
+{{- end }}

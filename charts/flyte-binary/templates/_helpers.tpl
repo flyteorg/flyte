@@ -196,6 +196,21 @@ Get the Flyte API paths for ingress.
 {{- end -}}
 
 {{/*
+Get the Flyte auth-discovery paths for ingress. These are unauthenticated:
+clients must reach them before they hold a token (OAuth server metadata, auth
+metadata/identity, and settings).
+*/}}
+{{- define "flyte-binary.ingress.wellknownPaths" -}}
+- /.well-known/oauth-authorization-server
+- /flyteidl2.auth.AuthMetadataService
+- /flyteidl2.auth.AuthMetadataService/*
+- /flyteidl2.auth.IdentityService
+- /flyteidl2.auth.IdentityService/*
+- /flyteidl2.settings.SettingsService
+- /flyteidl2.settings.SettingsService/*
+{{- end -}}
+
+{{/*
 Get the Flyte webhook service name.
 */}}
 {{- define "flyte-binary.webhook.serviceName" -}}

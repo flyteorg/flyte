@@ -150,6 +150,9 @@ Chart for basic single Flyte executable deployment
 | flyte-core-components.secret.kubernetes.timeout | string | `"30s"` |  |
 | flyteconnector.enabled | bool | `false` |  |
 | fullnameOverride | string | `""` |  |
+| ingress.apiJwtIngress.annotations | object | `{}` |  |
+| ingress.apiJwtIngress.enabled | bool | `false` |  |
+| ingress.apiJwtIngress.ingressClassName | string | `""` |  |
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |
 | ingress.host | string | `""` |  |
@@ -161,6 +164,9 @@ Chart for basic single Flyte executable deployment
 | ingress.ingressClassName | string | `""` |  |
 | ingress.labels | object | `{}` |  |
 | ingress.tls | list | `[]` |  |
+| ingress.wellknownIngress.annotations | object | `{}` |  |
+| ingress.wellknownIngress.enabled | bool | `false` |  |
+| ingress.wellknownIngress.ingressClassName | string | `""` |  |
 | nameOverride | string | `""` |  |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
