@@ -1,9 +1,3 @@
-# Unified Flyte Manager Configuration
-#
-# The unified binary has no `manager:` section: it reuses the runs service's
-# `server` block (HTTP listen host/port for all Connect services) and the
-# actions service's `kubernetes` block (the shared k8s client). See below.
-
 # Kubernetes config for the shared client used by all services.
 actions:
   kubernetes:
