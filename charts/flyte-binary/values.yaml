@@ -55,7 +55,15 @@ configuration:
       port: 5432
       dbname: flyte
       username: postgres
+      # password Password to connect to the database with.
+      # If set, a Secret is created with this value and mounted to the Flyte pod.
+      # Mutually exclusive with passwordPath — set exactly one of the two.
       password: ""
+      # passwordPath Path to a file containing the database password, read by the
+      # binary at runtime. Mount the file yourself (e.g. via
+      # deployment.extraVolumes/extraVolumeMounts from an external secret manager);
+      # the chart does not create a Secret for it. Mutually exclusive with password.
+      passwordPath: ""
       options: "sslmode=disable"
       debug: false
   # storage Specify configuration for object store
