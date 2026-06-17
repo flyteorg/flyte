@@ -31,7 +31,7 @@ type K8sConfig struct {
 	Timeout string `json:"timeout" pflag:",Request timeout for Kubernetes API server calls (e.g. 30s)"`
 	// ClusterName is the logical name of this cluster, used by the secret service
 	// for secret status reporting.
-	ClusterName string `json:"clusterName" pflag:",Logical name of the cluster for secret status reporting"`
+	ClusterName string `json:"clusterName" pflag:",Logical name of the Kubernetes cluster"`
 }
 
 // InitKubernetesClient creates a controller-runtime WithWatch client.
