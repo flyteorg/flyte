@@ -27,19 +27,6 @@ flyte-core-components:
       port: 8090
     watchBufferSize: 100
     storagePrefix: "s3://flyte-data"
-    # Right now sandbox use SQLite db, we just leave the postgreSQL setting for potential future usage
-    database:
-      maxIdleConnections: 10
-      maxOpenConnections: 100
-      connMaxLifeTime: 1h
-      postgres:
-        host: "127.0.0.1"
-        port: 5432
-        dbname: flyte
-        username: postgres
-        password: ""
-        options: "sslmode=disable"
-        debug: false
 
   actions:
     kubernetes:
@@ -67,9 +54,22 @@ flyte-core-components:
 
 # configuration Specify configuration for Flyte
 configuration:
-  # database lives under flyte-core-components.runs.database (the unified binary's
-  # single DB config). The waitForDB init container and the optional DB-password
-  # Secret both read it from there, so no configuration.database block is needed.
+  # database Specify the database configuration for the unified Flyte binary.
+  # The chart renders this under `runs.database` (002-database.yaml) — the single
+  # DB config the binary reads (runsconfig.GetConfig().Database). The waitForDB
+  # init container and the optional DB-password Secret both derive from here.
+  database:
+    maxIdleConnections: 10
+    maxOpenConnections: 100
+    connMaxLifeTime: 1h
+    postgres:
+      host: "127.0.0.1"
+      port: 5432
+      dbname: flyte
+      username: postgres
+      password: ""
+      options: "sslmode=disable"
+      debug: false
   # storage Specify configuration for object store
   storage:
     # metadataContainer Bucket to store Flyte metadata

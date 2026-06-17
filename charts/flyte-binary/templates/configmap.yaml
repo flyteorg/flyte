@@ -43,6 +43,17 @@ data:
       k8s-array:
         logs:
           config: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 12 }}
+  002-database.yaml: |
+    {{- with .Values.configuration.database }}
+    {{- /* Render under runs.database — the single DB config the unified binary
+           reads (runsconfig.GetConfig().Database). Strip the password: it is
+           provided via the config Secret (012-database-secrets.yaml) and must
+           not leak into this ConfigMap in plaintext. */}}
+    {{- $database := deepCopy . }}
+    {{- if $database.postgres }}{{- $_ := unset $database.postgres "password" }}{{- end }}
+    runs:
+      database: {{- tpl ( $database | toYaml ) $ | nindent 8 }}
+    {{- end }}
   003-storage.yaml: |
     {{- with .Values.configuration.storage }}
     storage:
