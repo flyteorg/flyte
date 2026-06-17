@@ -77,8 +77,6 @@ flyte-binary:
             port: 5432
             dbName: runs
             user: postgres
-            # password is supplied via the generated config Secret
-            # (012-database-secrets.yaml from configuration.database.postgres.password)
       internalApps:
         enabled: true
         baseDomain: "localhost"
