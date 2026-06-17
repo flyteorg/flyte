@@ -65,8 +65,8 @@ var _ authconnect.AuthMetadataServiceHandler = (*AuthMetadataService)(nil)
 
 // GetPublicClientConfig returns the public (CLI/SDK) OAuth2 client settings.
 func (s *AuthMetadataService) GetPublicClientConfig(
-	ctx context.Context,
-	req *connect.Request[auth.GetPublicClientConfigRequest],
+	_ context.Context,
+	_ *connect.Request[auth.GetPublicClientConfigRequest],
 ) (*connect.Response[auth.GetPublicClientConfigResponse], error) {
 	authMetadataKey := s.cfg.AuthorizationMetadataKey
 	if authMetadataKey == "" {
