@@ -325,8 +325,12 @@ func (s *RunService) CreateRun(
 		}
 	}
 
+	// Capture who created the run from the auth headers the load balancer forwards
+	// (it enforces auth upstream). Empty when there is no authenticated identity.
+	createdBy := subjectFromHeaders(req.Header())
+
 	// Persist task spec and create run model
-	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec, request.GetSource(), triggerName, triggerTaskName, triggerRevision, triggerType)
+	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec, request.GetSource(), triggerName, triggerTaskName, triggerRevision, triggerType, createdBy)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -372,6 +376,7 @@ func (s *RunService) persistRunModel(
 	triggerName, triggerTaskName string,
 	triggerRevision int64,
 	triggerType string,
+	createdBy string,
 ) (*models.Run, error) {
 	// Store task spec and compute digest
 	info := &workflow.RunInfo{InputsUri: inputPrefix + "/inputs.pb"}
@@ -443,6 +448,7 @@ func (s *RunService) persistRunModel(
 		RunSpec:         runSpecBytes,
 		Attempts:        1,
 		RunSource:       source.String(),
+		CreatedBy:       nullStr(createdBy),
 		TriggerTaskName: nullStr(triggerTaskName),
 		TriggerName:     nullStr(triggerName),
 		TriggerRevision: sql.NullInt64{Int64: triggerRevision, Valid: triggerRevision != 0},
@@ -1547,6 +1553,10 @@ func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 		if v, ok := workflow.RunSource_value[action.RunSource]; ok {
 			metadata.Source = workflow.RunSource(v)
 		}
+	}
+
+	if action.CreatedBy.Valid {
+		metadata.ExecutedBy = subjectOnlyIdentity(action.CreatedBy.String)
 	}
 
 	if action.TriggerName.Valid {
