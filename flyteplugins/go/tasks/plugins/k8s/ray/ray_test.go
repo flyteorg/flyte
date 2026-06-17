@@ -111,6 +111,10 @@ func dummyRayTaskTemplate(id string, rayJob *plugins.RayJob) *core.TaskTemplate 
 }
 
 func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage, serviceAccount string) pluginsCore.TaskExecutionContext {
+	return dummyRayTaskContextInterruptible(taskTemplate, resources, extendedResources, containerImage, serviceAccount, true)
+}
+
+func dummyRayTaskContextInterruptible(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage, serviceAccount string, interruptible bool) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
@@ -157,7 +161,7 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 		Kind: "node",
 		Name: "blah",
 	})
-	taskExecutionMetadata.EXPECT().IsInterruptible().Return(true)
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(interruptible)
 	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
 	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return(serviceAccount)
 	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&corev1.ResourceRequirements{})
@@ -223,6 +227,195 @@ func TestBuildResourceRay(t *testing.T) {
 	ray, ok = RayResource.(*rayv1.RayJob)
 	assert.True(t, ok)
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName, GetConfig().ServiceAccount)
+}
+
+var (
+	interruptibleNSR = &corev1.NodeSelectorRequirement{
+		Key:      "interruptible",
+		Operator: corev1.NodeSelectorOpIn,
+		Values:   []string{"true"},
+	}
+	nonInterruptibleNSR = &corev1.NodeSelectorRequirement{
+		Key:      "interruptible",
+		Operator: corev1.NodeSelectorOpIn,
+		Values:   []string{"false"},
+	}
+	interruptibleNodeSelector  = map[string]string{"interruptible-node": "true"}
+	interruptibleTolerationVal = corev1.Toleration{
+		Key:      "interruptible",
+		Value:    "true",
+		Operator: corev1.TolerationOpEqual,
+		Effect:   corev1.TaintEffectNoSchedule,
+	}
+)
+
+func interruptibleK8sPluginConfig() *config.K8sPluginConfig {
+	return &config.K8sPluginConfig{
+		InterruptibleNodeSelectorRequirement:    interruptibleNSR,
+		NonInterruptibleNodeSelectorRequirement: nonInterruptibleNSR,
+		InterruptibleNodeSelector:               interruptibleNodeSelector,
+		InterruptibleTolerations:                []corev1.Toleration{interruptibleTolerationVal},
+	}
+}
+
+// countRequirement returns how many times req appears across all node selector terms.
+func countRequirement(terms []corev1.NodeSelectorTerm, req corev1.NodeSelectorRequirement) int {
+	count := 0
+	for _, term := range terms {
+		for _, e := range term.MatchExpressions {
+			if reflect.DeepEqual(e, req) {
+				count++
+			}
+		}
+	}
+	return count
+}
+
+// assertEveryTermHasRequirement asserts that every node selector term contains req
+// exactly once. This is what guarantees a non-interruptible pod cannot land on a
+// spot node via an OR'd alternative term contributed by a custom k8s_pod overlay.
+func assertEveryTermHasRequirement(t *testing.T, spec corev1.PodSpec, req corev1.NodeSelectorRequirement) {
+	t.Helper()
+	require.NotNil(t, spec.Affinity)
+	require.NotNil(t, spec.Affinity.NodeAffinity)
+	require.NotNil(t, spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution)
+	terms := spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
+	require.NotEmpty(t, terms)
+	for i, term := range terms {
+		assert.Truef(t, containsRequirement(term.MatchExpressions, req),
+			"node selector term %d is missing the expected scheduling requirement %v", i, req)
+	}
+}
+
+func containsRequirement(reqs []corev1.NodeSelectorRequirement, req corev1.NodeSelectorRequirement) bool {
+	for _, r := range reqs {
+		if reflect.DeepEqual(r, req) {
+			return true
+		}
+	}
+	return false
+}
+
+func hasToleration(tolerations []corev1.Toleration, tol corev1.Toleration) bool {
+	for _, t := range tolerations {
+		if reflect.DeepEqual(t, tol) {
+			return true
+		}
+	}
+	return false
+}
+
+// TestBuildResourceRayInterruptible verifies that the task's interruptible flag is
+// reflected on both the head and worker pod templates: interruptible tasks get the
+// interruptible node selector requirement / node selector / tolerations, and
+// non-interruptible tasks get the non-interruptible requirement and none of the
+// interruptible scheduling hints.
+func TestBuildResourceRayInterruptible(t *testing.T) {
+	for _, interruptible := range []bool{true, false} {
+		name := "non-interruptible"
+		if interruptible {
+			name = "interruptible"
+		}
+		t.Run(name, func(t *testing.T) {
+			require.NoError(t, config.SetK8sPluginConfig(interruptibleK8sPluginConfig()))
+
+			taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+			taskContext := dummyRayTaskContextInterruptible(taskTemplate, resourceRequirements, nil, "", serviceAccount, interruptible)
+			r, err := rayJobResourceHandler{}.BuildResource(context.TODO(), taskContext)
+			require.NoError(t, err)
+			rayJob, ok := r.(*rayv1.RayJob)
+			require.True(t, ok)
+
+			expectedReq := *nonInterruptibleNSR
+			if interruptible {
+				expectedReq = *interruptibleNSR
+			}
+
+			specs := map[string]corev1.PodSpec{
+				"head":   rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec,
+				"worker": rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec,
+			}
+			for group, spec := range specs {
+				t.Run(group, func(t *testing.T) {
+					assertEveryTermHasRequirement(t, spec, expectedReq)
+					// Idempotency: the requirement must appear exactly once per pod.
+					assert.Equal(t, 1, countRequirement(
+						spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+						expectedReq), "requirement should be applied exactly once")
+
+					if interruptible {
+						assert.Equal(t, "true", spec.NodeSelector["interruptible-node"])
+						assert.True(t, hasToleration(spec.Tolerations, interruptibleTolerationVal))
+						assert.Equal(t, 1, tolerationCount(spec.Tolerations, interruptibleTolerationVal),
+							"interruptible toleration should be applied exactly once")
+					} else {
+						assert.NotContains(t, spec.NodeSelector, "interruptible-node")
+						assert.False(t, hasToleration(spec.Tolerations, interruptibleTolerationVal))
+					}
+				})
+			}
+		})
+	}
+}
+
+func tolerationCount(tolerations []corev1.Toleration, tol corev1.Toleration) int {
+	count := 0
+	for _, t := range tolerations {
+		if reflect.DeepEqual(t, tol) {
+			count++
+		}
+	}
+	return count
+}
+
+// TestBuildResourceRayInterruptibleCustomAffinity is the regression test for the
+// OR-hole: when a worker's custom k8s_pod carries its own node selector term, the
+// custom-pod merge (mergo WithAppendSlice) appends it as a new OR'd term. Without
+// re-applying interruptible scheduling after the merge, that appended term lacks
+// the non-interruptible requirement, letting the pod schedule on a spot node.
+func TestBuildResourceRayInterruptibleCustomAffinity(t *testing.T) {
+	require.NoError(t, config.SetK8sPluginConfig(interruptibleK8sPluginConfig()))
+
+	customAffinityPod := &core.K8SPod{
+		PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+			Containers: []corev1.Container{{Name: "ray-worker"}},
+			Affinity: &corev1.Affinity{
+				NodeAffinity: &corev1.NodeAffinity{
+					RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+						NodeSelectorTerms: []corev1.NodeSelectorTerm{
+							{
+								MatchExpressions: []corev1.NodeSelectorRequirement{
+									{
+										Key:      "zone",
+										Operator: corev1.NodeSelectorOpIn,
+										Values:   []string{"us-east-1a"},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}),
+	}
+
+	rayJobObj := dummyRayCustomObj()
+	rayJobObj.RayCluster.WorkerGroupSpec[0].K8SPod = customAffinityPod
+	taskTemplate := dummyRayTaskTemplate("ray-id", rayJobObj)
+	// interruptible=false: every resulting node selector term (the base term and the
+	// appended custom term) must carry the non-interruptible requirement.
+	taskContext := dummyRayTaskContextInterruptible(taskTemplate, resourceRequirements, nil, "", serviceAccount, false)
+
+	r, err := rayJobResourceHandler{}.BuildResource(context.TODO(), taskContext)
+	require.NoError(t, err)
+	rayJob, ok := r.(*rayv1.RayJob)
+	require.True(t, ok)
+
+	workerSpec := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec
+	terms := workerSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
+	// Sanity: the custom term was actually appended as a separate OR'd term.
+	require.GreaterOrEqual(t, len(terms), 2, "expected the custom affinity term to be appended as a separate term")
+	assertEveryTermHasRequirement(t, workerSpec, *nonInterruptibleNSR)
 }
 
 func TestBuildResourceRayContainerImage(t *testing.T) {

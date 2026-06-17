@@ -175,6 +175,33 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 	ApplyInterruptibleNodeSelectorRequirement(interruptible, podSpec.Affinity)
 }
 
+// ApplyInterruptibleScheduling re-applies the interruptible scheduling constraints
+// (node-affinity requirement, node selector and tolerations) that correspond to the
+// task's interruptibility onto podSpec. All three operations are idempotent, so it
+// is safe to call after a custom pod-spec merge that may have appended its own node
+// selector terms — those appended terms are OR'd by Kubernetes, so without this the
+// (Non)InterruptibleNodeSelectorRequirement would only sit on the base term and a
+// pod could schedule on a node that satisfies the custom term alone.
+func ApplyInterruptibleScheduling(interruptible bool, podSpec *v1.PodSpec) {
+	// AddRequiredNodeSelectorRequirements adds the requirement to every term,
+	// skipping any term that already carries it, so this stays duplicate-free.
+	ApplyInterruptibleNodeAffinity(interruptible, podSpec)
+
+	if !interruptible {
+		return
+	}
+
+	cfg := config.GetK8sPluginConfig()
+	if len(cfg.InterruptibleNodeSelector) > 0 {
+		podSpec.NodeSelector = utils.UnionMaps(podSpec.NodeSelector, cfg.InterruptibleNodeSelector)
+	}
+	// addTolerationInPodSpec is a no-op when the toleration is already present, so
+	// re-applying does not duplicate tolerations seeded earlier by UpdatePod.
+	for i := range cfg.InterruptibleTolerations {
+		addTolerationInPodSpec(podSpec, &cfg.InterruptibleTolerations[i])
+	}
+}
+
 // Specialized merging of overrides into a base *core.ExtendedResources object. Note
 // that doing a nested merge may not be the intended behavior all the time, so we
 // handle each field separately here.
