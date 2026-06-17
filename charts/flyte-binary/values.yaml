@@ -9,18 +9,6 @@ commonAnnotations: {}
 
 # flyte-core-components: Configuration for the unified Flyte Manager
 flyte-core-components:
-  manager:
-    server:
-      host: "0.0.0.0"
-      port: 8090
-    executor:
-      healthProbePort: 8081
-    kubernetes:
-      namespace: "flyte"
-      kubeconfig: ""
-      qps: 1000
-      burst: 2000
-      timeout: "30s"
   runs:
     server:
       host: "0.0.0.0"
@@ -59,11 +47,11 @@ flyte-core-components:
   secret:
     kubernetes:
       namespace: "flyte"
-      clusterName: "flyte-devbox"
       kubeconfig: ""
       qps: 100
       burst: 200
       timeout: "30s"
+      clusterName: "flyte-devbox"
 
 # configuration Specify configuration for Flyte
 configuration:

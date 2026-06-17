@@ -7704,18 +7704,6 @@ data:
         maxExpiresIn: 1h
         maxSize: 100Mi
         storagePrefix: uploads
-    manager:
-      executor:
-        healthProbePort: 8081
-      kubernetes:
-        burst: 2000
-        kubeconfig: ""
-        namespace: flyte
-        qps: 1000
-        timeout: 30s
-      server:
-        host: 0.0.0.0
-        port: 8090
     runs:
       database:
         connMaxLifeTime: 1h
@@ -8612,7 +8600,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: d2aec94f19fbf15dce1dd1e0530da68a0c2de5043a3a89155daa31eb212fbacb
+        checksum/configuration: b3eeb7732d0979610dd7e90fc2681bc752f4c2318ff8df52e3d3651aa49bacd1
         checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
       labels:
         app.kubernetes.io/component: flyte-binary
