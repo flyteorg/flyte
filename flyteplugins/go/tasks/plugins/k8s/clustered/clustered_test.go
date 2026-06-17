@@ -227,6 +227,8 @@ func TestInjectTorchRunEnv_Static(t *testing.T) {
 	assert.Equal(t, "8", envMap["NPROC_PER_NODE"])
 	assert.Equal(t, "29500", envMap["MASTER_PORT"])
 	assert.Equal(t, "static", envMap["RDZV_BACKEND"])
+	// No failure policy set → budget defaults to 0 (every failure is terminal).
+	assert.Equal(t, "0", envMap["JOBSET_MAX_RESTARTS"])
 
 	// Downward API env vars should be present.
 	names := make(map[string]bool)
@@ -235,7 +237,26 @@ func TestInjectTorchRunEnv_Static(t *testing.T) {
 	}
 	assert.True(t, names["JOBSET_NAME"])
 	assert.True(t, names["JOBSET_RESTART_ATTEMPT"])
+	assert.True(t, names["JOBSET_MAX_RESTARTS"])
 	assert.True(t, names["POD_NAMESPACE"])
+}
+
+func TestInjectTorchRunEnv_MaxRestarts(t *testing.T) {
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:      2,
+		NprocPerNode:  4,
+		FailurePolicy: &clusteredpb.ClusterFailurePolicy{MaxRestarts: 3},
+	}
+	container := &corev1.Container{}
+	injectTorchRunEnv(container, spec)
+
+	for _, e := range container.Env {
+		if e.Name == "JOBSET_MAX_RESTARTS" {
+			assert.Equal(t, "3", e.Value)
+			return
+		}
+	}
+	t.Fatal("JOBSET_MAX_RESTARTS not found")
 }
 
 func TestInjectTorchRunEnv_C10D(t *testing.T) {
