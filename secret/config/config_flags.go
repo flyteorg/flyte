@@ -57,6 +57,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "kubernetes.qps"), defaultConfig.Kubernetes.QPS, "Maximum queries per second to the Kubernetes API server")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "kubernetes.burst"), defaultConfig.Kubernetes.Burst, "Maximum burst above QPS for Kubernetes API server requests")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.timeout"), defaultConfig.Kubernetes.Timeout, "Request timeout for Kubernetes API server calls (e.g. 30s)")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.clusterName"), defaultConfig.Kubernetes.ClusterName, "Logical name of the cluster for secret status reporting")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.clusterName"), defaultConfig.Kubernetes.ClusterName, "Logical name of the Kubernetes cluster")
 	return cmdFlags
 }
