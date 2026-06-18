@@ -407,7 +407,7 @@ ingress:
   # combine cookie-OIDC (browser) and JWT (token) auth. It renders the shared API
   # paths backed by the http service; supply the controller/JWT config (e.g. ALB
   # cert-arn, jwt-validation, the `Authorization: Bearer*` match condition, and a
-  # group.order higher than the http ingress) via `annotations`.
+  # group.order lower than the http ingress (but higher than the wellknown ingress)) via `annotations`.
   apiJwtIngress:
     # enabled Create the JWT (Bearer) API ingress
     enabled: false
