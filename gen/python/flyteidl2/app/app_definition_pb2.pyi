@@ -69,58 +69,20 @@ class App(_message.Message):
     def __init__(self, metadata: _Optional[_Union[Meta, _Mapping]] = ..., spec: _Optional[_Union[Spec, _Mapping]] = ..., status: _Optional[_Union[Status, _Mapping]] = ...) -> None: ...
 
 class Condition(_message.Message):
-    __slots__ = ["last_transition_time", "deployment_status", "message", "revision", "actor", "substate", "failure_info"]
+    __slots__ = ["last_transition_time", "deployment_status", "message", "revision", "actor", "substate"]
     LAST_TRANSITION_TIME_FIELD_NUMBER: _ClassVar[int]
     DEPLOYMENT_STATUS_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
     REVISION_FIELD_NUMBER: _ClassVar[int]
     ACTOR_FIELD_NUMBER: _ClassVar[int]
     SUBSTATE_FIELD_NUMBER: _ClassVar[int]
-    FAILURE_INFO_FIELD_NUMBER: _ClassVar[int]
     last_transition_time: _timestamp_pb2.Timestamp
     deployment_status: Status.DeploymentStatus
     message: str
     revision: int
     actor: _identity_pb2.EnrichedIdentity
     substate: Status.Substate
-    failure_info: FailureInfo
-    def __init__(self, last_transition_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., deployment_status: _Optional[_Union[Status.DeploymentStatus, str]] = ..., message: _Optional[str] = ..., revision: _Optional[int] = ..., actor: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., substate: _Optional[_Union[Status.Substate, str]] = ..., failure_info: _Optional[_Union[FailureInfo, _Mapping]] = ...) -> None: ...
-
-class FailureInfo(_message.Message):
-    __slots__ = ["failure_mode", "summary", "image", "image_pull_error", "secret_name", "mount_path", "exit_code", "restart_count", "container_name", "memory_limit", "recent_log_lines", "action"]
-    class Action(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = []
-        NONE: _ClassVar[FailureInfo.Action]
-        REDEPLOY: _ClassVar[FailureInfo.Action]
-        OPEN_SECRETS: _ClassVar[FailureInfo.Action]
-    NONE: FailureInfo.Action
-    REDEPLOY: FailureInfo.Action
-    OPEN_SECRETS: FailureInfo.Action
-    FAILURE_MODE_FIELD_NUMBER: _ClassVar[int]
-    SUMMARY_FIELD_NUMBER: _ClassVar[int]
-    IMAGE_FIELD_NUMBER: _ClassVar[int]
-    IMAGE_PULL_ERROR_FIELD_NUMBER: _ClassVar[int]
-    SECRET_NAME_FIELD_NUMBER: _ClassVar[int]
-    MOUNT_PATH_FIELD_NUMBER: _ClassVar[int]
-    EXIT_CODE_FIELD_NUMBER: _ClassVar[int]
-    RESTART_COUNT_FIELD_NUMBER: _ClassVar[int]
-    CONTAINER_NAME_FIELD_NUMBER: _ClassVar[int]
-    MEMORY_LIMIT_FIELD_NUMBER: _ClassVar[int]
-    RECENT_LOG_LINES_FIELD_NUMBER: _ClassVar[int]
-    ACTION_FIELD_NUMBER: _ClassVar[int]
-    failure_mode: Status.Substate
-    summary: str
-    image: str
-    image_pull_error: str
-    secret_name: str
-    mount_path: str
-    exit_code: int
-    restart_count: int
-    container_name: str
-    memory_limit: str
-    recent_log_lines: _containers.RepeatedScalarFieldContainer[str]
-    action: FailureInfo.Action
-    def __init__(self, failure_mode: _Optional[_Union[Status.Substate, str]] = ..., summary: _Optional[str] = ..., image: _Optional[str] = ..., image_pull_error: _Optional[str] = ..., secret_name: _Optional[str] = ..., mount_path: _Optional[str] = ..., exit_code: _Optional[int] = ..., restart_count: _Optional[int] = ..., container_name: _Optional[str] = ..., memory_limit: _Optional[str] = ..., recent_log_lines: _Optional[_Iterable[str]] = ..., action: _Optional[_Union[FailureInfo.Action, str]] = ...) -> None: ...
+    def __init__(self, last_transition_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., deployment_status: _Optional[_Union[Status.DeploymentStatus, str]] = ..., message: _Optional[str] = ..., revision: _Optional[int] = ..., actor: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., substate: _Optional[_Union[Status.Substate, str]] = ...) -> None: ...
 
 class Status(_message.Message):
     __slots__ = ["assigned_cluster", "current_replicas", "ingress", "created_at", "last_updated_at", "conditions", "lease_expiration", "k8s_metadata", "materialized_inputs"]

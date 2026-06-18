@@ -120,45 +120,8 @@ message Condition {
   common.EnrichedIdentity actor = 5;
 
   // Finer-grained substate qualifying deployment_status (e.g. FAILED + IMAGE_PULL_ERROR).
+  // Human-readable detail for a failure is carried in the existing `message` field.
   Status.Substate substate = 6;
-
-  // Structured failure detail, set when this condition represents a failure/error.
-  FailureInfo failure_info = 7;
-}
-
-// Structured detail for a failed/erroring Condition. Populated by the operator's failure
-// classifier from pod container statuses or the Knative readiness condition.
-message FailureInfo {
-  // Mirrors the owning Condition.substate so this payload is self-contained for the UI.
-  Status.Substate failure_mode = 1;
-
-  // One-line banner summary.
-  string summary = 2;
-
-  // Image-pull failures.
-  string image = 3;
-  string image_pull_error = 4;
-
-  // Secret-mount failures.
-  string secret_name = 5;
-  string mount_path = 6;
-
-  // Crash / OOM failures.
-  int32 exit_code = 7;
-  int32 restart_count = 8;
-  string container_name = 9;
-  string memory_limit = 10;
-
-  // Last log lines captured at failure time.
-  repeated string recent_log_lines = 11;
-
-  // CTA the UI should render for this failure.
-  enum Action {
-    NONE = 0;
-    REDEPLOY = 1;
-    OPEN_SECRETS = 2;
-  }
-  Action action = 12;
 }
 
 // Represents the status of an app.

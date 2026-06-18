@@ -25,7 +25,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/app/app_definition.proto.
  */
 export const file_flyteidl2_app_app_definition: GenFile = /*@__PURE__*/
-  fileDesc("CiJmbHl0ZWlkbDIvYXBwL2FwcF9kZWZpbml0aW9uLnByb3RvEg1mbHl0ZWlkbDIuYXBwIpYBCgpJZGVudGlmaWVyEgsKA29yZxgBIAEoCRIYCgdwcm9qZWN0GAIgASgJQge6SARyAhABEhcKBmRvbWFpbhgDIAEoCUIHukgEcgIQARJICgRuYW1lGAQgASgJQjq6SDdyNRABGB4yL15bQS1aYS16MC05XSg/OltBLVphLXowLTktXXswLDYxfVtBLVphLXowLTldKT8kIvoBCgRNZXRhEi0KAmlkGAEgASgLMhkuZmx5dGVpZGwyLmFwcC5JZGVudGlmaWVyQga6SAPIAQESGQoIcmV2aXNpb24YAiABKARCB7pIBDICKAASLwoGbGFiZWxzGAMgAygLMh8uZmx5dGVpZGwyLmFwcC5NZXRhLkxhYmVsc0VudHJ5EhcKD2NvZGVfYnVuZGxlX3VyaRgEIAEoCRIvCgtzb3VyY2VfY29kZRgFIAEoCzIaLmZseXRlaWRsMi50YXNrLlNvdXJjZUNvZGUaLQoLTGFiZWxzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJ1CgpBcHBXcmFwcGVyEgwKBGhvc3QYASABKAkSIQoDYXBwGAIgASgLMhIuZmx5dGVpZGwyLmFwcC5BcHBIABIrCgZhcHBfaWQYAyABKAsyGS5mbHl0ZWlkbDIuYXBwLklkZW50aWZpZXJIAEIJCgdwYXlsb2FkIoYBCgNBcHASLQoIbWV0YWRhdGEYASABKAsyEy5mbHl0ZWlkbDIuYXBwLk1ldGFCBrpIA8gBARIpCgRzcGVjGAIgASgLMhMuZmx5dGVpZGwyLmFwcC5TcGVjQga6SAPIAQESJQoGc3RhdHVzGAMgASgLMhUuZmx5dGVpZGwyLmFwcC5TdGF0dXMiywIKCUNvbmRpdGlvbhI4ChRsYXN0X3RyYW5zaXRpb25fdGltZRgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASQQoRZGVwbG95bWVudF9zdGF0dXMYAiABKA4yJi5mbHl0ZWlkbDIuYXBwLlN0YXR1cy5EZXBsb3ltZW50U3RhdHVzEg8KB21lc3NhZ2UYAyABKAkSGQoIcmV2aXNpb24YBCABKARCB7pIBDICKAASMQoFYWN0b3IYBSABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkVucmljaGVkSWRlbnRpdHkSMAoIc3Vic3RhdGUYBiABKA4yHi5mbHl0ZWlkbDIuYXBwLlN0YXR1cy5TdWJzdGF0ZRIwCgxmYWlsdXJlX2luZm8YByABKAsyGi5mbHl0ZWlkbDIuYXBwLkZhaWx1cmVJbmZvIv8CCgtGYWlsdXJlSW5mbxI0CgxmYWlsdXJlX21vZGUYASABKA4yHi5mbHl0ZWlkbDIuYXBwLlN0YXR1cy5TdWJzdGF0ZRIPCgdzdW1tYXJ5GAIgASgJEg0KBWltYWdlGAMgASgJEhgKEGltYWdlX3B1bGxfZXJyb3IYBCABKAkSEwoLc2VjcmV0X25hbWUYBSABKAkSEgoKbW91bnRfcGF0aBgGIAEoCRIRCglleGl0X2NvZGUYByABKAUSFQoNcmVzdGFydF9jb3VudBgIIAEoBRIWCg5jb250YWluZXJfbmFtZRgJIAEoCRIUCgxtZW1vcnlfbGltaXQYCiABKAkSGAoQcmVjZW50X2xvZ19saW5lcxgLIAMoCRIxCgZhY3Rpb24YDCABKA4yIS5mbHl0ZWlkbDIuYXBwLkZhaWx1cmVJbmZvLkFjdGlvbiIyCgZBY3Rpb24SCAoETk9ORRAAEgwKCFJFREVQTE9ZEAESEAoMT1BFTl9TRUNSRVRTEAIi1AcKBlN0YXR1cxIYChBhc3NpZ25lZF9jbHVzdGVyGAEgASgJEiEKEGN1cnJlbnRfcmVwbGljYXMYAiABKA1CB7pIBCoCKAASJwoHaW5ncmVzcxgDIAEoCzIWLmZseXRlaWRsMi5hcHAuSW5ncmVzcxIuCgpjcmVhdGVkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIzCg9sYXN0X3VwZGF0ZWRfYXQYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiwKCmNvbmRpdGlvbnMYBiADKAsyGC5mbHl0ZWlkbDIuYXBwLkNvbmRpdGlvbhI0ChBsZWFzZV9leHBpcmF0aW9uGAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIwCgxrOHNfbWV0YWRhdGEYCCABKAsyGi5mbHl0ZWlkbDIuYXBwLks4c01ldGFkYXRhEj4KE21hdGVyaWFsaXplZF9pbnB1dHMYCSABKAsyIS5mbHl0ZWlkbDIuYXBwLk1hdGVyaWFsaXplZElucHV0cyL7AgoQRGVwbG95bWVudFN0YXR1cxIhCh1ERVBMT1lNRU5UX1NUQVRVU19VTlNQRUNJRklFRBAAEiAKHERFUExPWU1FTlRfU1RBVFVTX1VOQVNTSUdORUQQARIeChpERVBMT1lNRU5UX1NUQVRVU19BU1NJR05FRBACEh0KGURFUExPWU1FTlRfU1RBVFVTX1BFTkRJTkcQAxIdChlERVBMT1lNRU5UX1NUQVRVU19TVE9QUEVEEAQSIQoZREVQTE9ZTUVOVF9TVEFUVVNfU1RBUlRFRBAFGgIIARIcChhERVBMT1lNRU5UX1NUQVRVU19GQUlMRUQQBhIcChhERVBMT1lNRU5UX1NUQVRVU19BQ1RJVkUQBxIgChxERVBMT1lNRU5UX1NUQVRVU19TQ0FMSU5HX1VQEAgSIgoeREVQTE9ZTUVOVF9TVEFUVVNfU0NBTElOR19ET1dOEAkSHwobREVQTE9ZTUVOVF9TVEFUVVNfREVQTE9ZSU5HEAoiqgEKCFN1YnN0YXRlEhgKFFNVQlNUQVRFX1VOU1BFQ0lGSUVEEAASEQoNUFVMTElOR19JTUFHRRABEhAKDElOSVRJQUxJWklORxACEhEKDVdFQkhPT0tfRVJST1IQAxIUChBJTUFHRV9QVUxMX0VSUk9SEAQSFgoSU0VDUkVUX01PVU5UX0VSUk9SEAUSDgoKQ1JBU0hfTE9PUBAGEg4KCk9PTV9LSUxMRUQQByIgCgtLOHNNZXRhZGF0YRIRCgluYW1lc3BhY2UYASABKAkiaAoHSW5ncmVzcxIfCgpwdWJsaWNfdXJsGAEgASgJQgu6SAjYAQFyA4gBARIeCgljbmFtZV91cmwYAiABKAlCC7pICNgBAXIDiAEBEhwKB3ZwY191cmwYAyABKAlCC7pICNgBAXIDiAEBIusGCgRTcGVjEi4KCWNvbnRhaW5lchgBIAEoCzIZLmZseXRlaWRsMi5jb3JlLkNvbnRhaW5lckgAEiUKA3BvZBgCIAEoCzIWLmZseXRlaWRsMi5jb3JlLks4c1BvZEgAEjUKC2F1dG9zY2FsaW5nGAMgASgLMiAuZmx5dGVpZGwyLmFwcC5BdXRvc2NhbGluZ0NvbmZpZxItCgdpbmdyZXNzGAQgASgLMhwuZmx5dGVpZGwyLmFwcC5JbmdyZXNzQ29uZmlnEjcKDWRlc2lyZWRfc3RhdGUYBSABKA4yIC5mbHl0ZWlkbDIuYXBwLlNwZWMuRGVzaXJlZFN0YXRlEhQKDGNsdXN0ZXJfcG9vbBgGIAEoCRIrCgZpbWFnZXMYByABKAsyGy5mbHl0ZWlkbDIuYXBwLkltYWdlU3BlY1NldBI4ChBzZWN1cml0eV9jb250ZXh0GAggASgLMh4uZmx5dGVpZGwyLmFwcC5TZWN1cml0eUNvbnRleHQSPQoSZXh0ZW5kZWRfcmVzb3VyY2VzGAkgASgLMiEuZmx5dGVpZGwyLmNvcmUuRXh0ZW5kZWRSZXNvdXJjZXMSOwoQcnVudGltZV9tZXRhZGF0YRgKIAEoCzIhLmZseXRlaWRsMi5jb21tb24uUnVudGltZU1ldGFkYXRhEicKB3Byb2ZpbGUYCyABKAsyFi5mbHl0ZWlkbDIuYXBwLlByb2ZpbGUSMwoHY3JlYXRvchgMIAEoCzIiLmZseXRlaWRsMi5jb21tb24uRW5yaWNoZWRJZGVudGl0eRIoCgZpbnB1dHMYDSABKAsyGC5mbHl0ZWlkbDIuYXBwLklucHV0TGlzdBIiCgVsaW5rcxgOIAMoCzITLmZseXRlaWRsMi5hcHAuTGluaxIuCgh0aW1lb3V0cxgPIAEoCzIcLmZseXRlaWRsMi5hcHAuVGltZW91dENvbmZpZyKBAQoMRGVzaXJlZFN0YXRlEh0KGURFU0lSRURfU1RBVEVfVU5TUEVDSUZJRUQQABIZChVERVNJUkVEX1NUQVRFX1NUT1BQRUQQARIdChVERVNJUkVEX1NUQVRFX1NUQVJURUQQAhoCCAESGAoUREVTSVJFRF9TVEFURV9BQ1RJVkUQA0IUCgthcHBfcGF5bG9hZBIFukgCCAEiQQoETGluaxIVCgRwYXRoGAEgASgJQge6SARyAhABEg0KBXRpdGxlGAIgASgJEhMKC2lzX3JlbGF0aXZlGAMgASgIIugBCgVJbnB1dBIVCgRuYW1lGAEgASgJQge6SARyAhABEh8KDHN0cmluZ192YWx1ZRgCIAEoCUIHukgEcgIQAUgAEjcKDmFydGlmYWN0X3F1ZXJ5GAMgASgLMh0uZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RRdWVyeUgAEjEKC2FydGlmYWN0X2lkGAQgASgLMhouZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RJREgAEisKBmFwcF9pZBgFIAEoCzIZLmZseXRlaWRsMi5hcHAuSWRlbnRpZmllckgAQg4KBXZhbHVlEgW6SAIIASJgChJNYXRlcmlhbGl6ZWRJbnB1dHMSLwoFaXRlbXMYASADKAsyIC5mbHl0ZWlkbDIuYXBwLk1hdGVyaWFsaXplZElucHV0EhkKCHJldmlzaW9uGAIgASgEQge6SAQyAigAIm0KEU1hdGVyaWFsaXplZElucHV0EhUKBG5hbWUYASABKAlCB7pIBHICEAESMQoLYXJ0aWZhY3RfaWQYAiABKAsyGi5mbHl0ZWlkbDIuY29yZS5BcnRpZmFjdElESABCDgoFdmFsdWUSBbpIAggBIjAKCUlucHV0TGlzdBIjCgVpdGVtcxgBIAMoCzIULmZseXRlaWRsMi5hcHAuSW5wdXQiWwoHUHJvZmlsZRIMCgR0eXBlGAEgASgJEgwKBG5hbWUYAiABKAkSIgoRc2hvcnRfZGVzY3JpcHRpb24YAyABKAlCB7pIBHICGGQSEAoIaWNvbl91cmwYBCABKAkiiQEKD1NlY3VyaXR5Q29udGV4dBIoCgZydW5fYXMYASABKAsyGC5mbHl0ZWlkbDIuY29yZS5JZGVudGl0eRInCgdzZWNyZXRzGAIgAygLMhYuZmx5dGVpZGwyLmNvcmUuU2VjcmV0EhcKD2FsbG93X2Fub255bW91cxgFIAEoCEoECAMQBEoECAQQBSIvCglJbWFnZVNwZWMSCwoDdGFnGAEgASgJEhUKDWJ1aWxkX2pvYl91cmwYAiABKAkiOAoMSW1hZ2VTcGVjU2V0EigKBmltYWdlcxgBIAMoCzIYLmZseXRlaWRsMi5hcHAuSW1hZ2VTcGVjIkIKDUluZ3Jlc3NDb25maWcSDwoHcHJpdmF0ZRgBIAEoCBIRCglzdWJkb21haW4YAiABKAkSDQoFY25hbWUYAyABKAkiqQEKEUF1dG9zY2FsaW5nQ29uZmlnEikKCHJlcGxpY2FzGAEgASgLMhcuZmx5dGVpZGwyLmFwcC5SZXBsaWNhcxIzChBzY2FsZWRvd25fcGVyaW9kGAIgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEjQKDnNjYWxpbmdfbWV0cmljGAMgASgLMhwuZmx5dGVpZGwyLmFwcC5TY2FsaW5nTWV0cmljIocBCg1TY2FsaW5nTWV0cmljEjIKDHJlcXVlc3RfcmF0ZRgBIAEoCzIaLmZseXRlaWRsMi5hcHAuUmVxdWVzdFJhdGVIABIxCgtjb25jdXJyZW5jeRgCIAEoCzIaLmZseXRlaWRsMi5hcHAuQ29uY3VycmVuY3lIAEIPCgZtZXRyaWMSBbpIAggBIiwKC0NvbmN1cnJlbmN5Eh0KDHRhcmdldF92YWx1ZRgBIAEoDUIHukgEKgIgACIsCgtSZXF1ZXN0UmF0ZRIdCgx0YXJnZXRfdmFsdWUYASABKA1CB7pIBCoCKAAiNgoIUmVwbGljYXMSFAoDbWluGAEgASgNQge6SAQqAigAEhQKA21heBgCIAEoDUIHukgEKgIoACJSCg1UaW1lb3V0Q29uZmlnEkEKD3JlcXVlc3RfdGltZW91dBgBIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkINukgKqgEHIgMIkBwyAEKxAQoRY29tLmZseXRlaWRsMi5hcHBCEkFwcERlZmluaXRpb25Qcm90b0gCUAFaMWdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9hcHCiAgNGQViqAg1GbHl0ZWlkbDIuQXBwygINRmx5dGVpZGwyXEFwcOICGUZseXRlaWRsMlxBcHBcR1BCTWV0YWRhdGHqAg5GbHl0ZWlkbDI6OkFwcGIGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identity, file_flyteidl2_common_runtime_version, file_flyteidl2_core_artifact_id, file_flyteidl2_core_security, file_flyteidl2_core_tasks, file_flyteidl2_task_task_definition, file_google_protobuf_duration, file_google_protobuf_timestamp]);
+  fileDesc("CiJmbHl0ZWlkbDIvYXBwL2FwcF9kZWZpbml0aW9uLnByb3RvEg1mbHl0ZWlkbDIuYXBwIpYBCgpJZGVudGlmaWVyEgsKA29yZxgBIAEoCRIYCgdwcm9qZWN0GAIgASgJQge6SARyAhABEhcKBmRvbWFpbhgDIAEoCUIHukgEcgIQARJICgRuYW1lGAQgASgJQjq6SDdyNRABGB4yL15bQS1aYS16MC05XSg/OltBLVphLXowLTktXXswLDYxfVtBLVphLXowLTldKT8kIvoBCgRNZXRhEi0KAmlkGAEgASgLMhkuZmx5dGVpZGwyLmFwcC5JZGVudGlmaWVyQga6SAPIAQESGQoIcmV2aXNpb24YAiABKARCB7pIBDICKAASLwoGbGFiZWxzGAMgAygLMh8uZmx5dGVpZGwyLmFwcC5NZXRhLkxhYmVsc0VudHJ5EhcKD2NvZGVfYnVuZGxlX3VyaRgEIAEoCRIvCgtzb3VyY2VfY29kZRgFIAEoCzIaLmZseXRlaWRsMi50YXNrLlNvdXJjZUNvZGUaLQoLTGFiZWxzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJ1CgpBcHBXcmFwcGVyEgwKBGhvc3QYASABKAkSIQoDYXBwGAIgASgLMhIuZmx5dGVpZGwyLmFwcC5BcHBIABIrCgZhcHBfaWQYAyABKAsyGS5mbHl0ZWlkbDIuYXBwLklkZW50aWZpZXJIAEIJCgdwYXlsb2FkIoYBCgNBcHASLQoIbWV0YWRhdGEYASABKAsyEy5mbHl0ZWlkbDIuYXBwLk1ldGFCBrpIA8gBARIpCgRzcGVjGAIgASgLMhMuZmx5dGVpZGwyLmFwcC5TcGVjQga6SAPIAQESJQoGc3RhdHVzGAMgASgLMhUuZmx5dGVpZGwyLmFwcC5TdGF0dXMimQIKCUNvbmRpdGlvbhI4ChRsYXN0X3RyYW5zaXRpb25fdGltZRgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASQQoRZGVwbG95bWVudF9zdGF0dXMYAiABKA4yJi5mbHl0ZWlkbDIuYXBwLlN0YXR1cy5EZXBsb3ltZW50U3RhdHVzEg8KB21lc3NhZ2UYAyABKAkSGQoIcmV2aXNpb24YBCABKARCB7pIBDICKAASMQoFYWN0b3IYBSABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkVucmljaGVkSWRlbnRpdHkSMAoIc3Vic3RhdGUYBiABKA4yHi5mbHl0ZWlkbDIuYXBwLlN0YXR1cy5TdWJzdGF0ZSLUBwoGU3RhdHVzEhgKEGFzc2lnbmVkX2NsdXN0ZXIYASABKAkSIQoQY3VycmVudF9yZXBsaWNhcxgCIAEoDUIHukgEKgIoABInCgdpbmdyZXNzGAMgASgLMhYuZmx5dGVpZGwyLmFwcC5JbmdyZXNzEi4KCmNyZWF0ZWRfYXQYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjMKD2xhc3RfdXBkYXRlZF9hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLAoKY29uZGl0aW9ucxgGIAMoCzIYLmZseXRlaWRsMi5hcHAuQ29uZGl0aW9uEjQKEGxlYXNlX2V4cGlyYXRpb24YByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjAKDGs4c19tZXRhZGF0YRgIIAEoCzIaLmZseXRlaWRsMi5hcHAuSzhzTWV0YWRhdGESPgoTbWF0ZXJpYWxpemVkX2lucHV0cxgJIAEoCzIhLmZseXRlaWRsMi5hcHAuTWF0ZXJpYWxpemVkSW5wdXRzIvsCChBEZXBsb3ltZW50U3RhdHVzEiEKHURFUExPWU1FTlRfU1RBVFVTX1VOU1BFQ0lGSUVEEAASIAocREVQTE9ZTUVOVF9TVEFUVVNfVU5BU1NJR05FRBABEh4KGkRFUExPWU1FTlRfU1RBVFVTX0FTU0lHTkVEEAISHQoZREVQTE9ZTUVOVF9TVEFUVVNfUEVORElORxADEh0KGURFUExPWU1FTlRfU1RBVFVTX1NUT1BQRUQQBBIhChlERVBMT1lNRU5UX1NUQVRVU19TVEFSVEVEEAUaAggBEhwKGERFUExPWU1FTlRfU1RBVFVTX0ZBSUxFRBAGEhwKGERFUExPWU1FTlRfU1RBVFVTX0FDVElWRRAHEiAKHERFUExPWU1FTlRfU1RBVFVTX1NDQUxJTkdfVVAQCBIiCh5ERVBMT1lNRU5UX1NUQVRVU19TQ0FMSU5HX0RPV04QCRIfChtERVBMT1lNRU5UX1NUQVRVU19ERVBMT1lJTkcQCiKqAQoIU3Vic3RhdGUSGAoUU1VCU1RBVEVfVU5TUEVDSUZJRUQQABIRCg1QVUxMSU5HX0lNQUdFEAESEAoMSU5JVElBTElaSU5HEAISEQoNV0VCSE9PS19FUlJPUhADEhQKEElNQUdFX1BVTExfRVJST1IQBBIWChJTRUNSRVRfTU9VTlRfRVJST1IQBRIOCgpDUkFTSF9MT09QEAYSDgoKT09NX0tJTExFRBAHIiAKC0s4c01ldGFkYXRhEhEKCW5hbWVzcGFjZRgBIAEoCSJoCgdJbmdyZXNzEh8KCnB1YmxpY191cmwYASABKAlCC7pICNgBAXIDiAEBEh4KCWNuYW1lX3VybBgCIAEoCUILukgI2AEBcgOIAQESHAoHdnBjX3VybBgDIAEoCUILukgI2AEBcgOIAQEi6wYKBFNwZWMSLgoJY29udGFpbmVyGAEgASgLMhkuZmx5dGVpZGwyLmNvcmUuQ29udGFpbmVySAASJQoDcG9kGAIgASgLMhYuZmx5dGVpZGwyLmNvcmUuSzhzUG9kSAASNQoLYXV0b3NjYWxpbmcYAyABKAsyIC5mbHl0ZWlkbDIuYXBwLkF1dG9zY2FsaW5nQ29uZmlnEi0KB2luZ3Jlc3MYBCABKAsyHC5mbHl0ZWlkbDIuYXBwLkluZ3Jlc3NDb25maWcSNwoNZGVzaXJlZF9zdGF0ZRgFIAEoDjIgLmZseXRlaWRsMi5hcHAuU3BlYy5EZXNpcmVkU3RhdGUSFAoMY2x1c3Rlcl9wb29sGAYgASgJEisKBmltYWdlcxgHIAEoCzIbLmZseXRlaWRsMi5hcHAuSW1hZ2VTcGVjU2V0EjgKEHNlY3VyaXR5X2NvbnRleHQYCCABKAsyHi5mbHl0ZWlkbDIuYXBwLlNlY3VyaXR5Q29udGV4dBI9ChJleHRlbmRlZF9yZXNvdXJjZXMYCSABKAsyIS5mbHl0ZWlkbDIuY29yZS5FeHRlbmRlZFJlc291cmNlcxI7ChBydW50aW1lX21ldGFkYXRhGAogASgLMiEuZmx5dGVpZGwyLmNvbW1vbi5SdW50aW1lTWV0YWRhdGESJwoHcHJvZmlsZRgLIAEoCzIWLmZseXRlaWRsMi5hcHAuUHJvZmlsZRIzCgdjcmVhdG9yGAwgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5FbnJpY2hlZElkZW50aXR5EigKBmlucHV0cxgNIAEoCzIYLmZseXRlaWRsMi5hcHAuSW5wdXRMaXN0EiIKBWxpbmtzGA4gAygLMhMuZmx5dGVpZGwyLmFwcC5MaW5rEi4KCHRpbWVvdXRzGA8gASgLMhwuZmx5dGVpZGwyLmFwcC5UaW1lb3V0Q29uZmlnIoEBCgxEZXNpcmVkU3RhdGUSHQoZREVTSVJFRF9TVEFURV9VTlNQRUNJRklFRBAAEhkKFURFU0lSRURfU1RBVEVfU1RPUFBFRBABEh0KFURFU0lSRURfU1RBVEVfU1RBUlRFRBACGgIIARIYChRERVNJUkVEX1NUQVRFX0FDVElWRRADQhQKC2FwcF9wYXlsb2FkEgW6SAIIASJBCgRMaW5rEhUKBHBhdGgYASABKAlCB7pIBHICEAESDQoFdGl0bGUYAiABKAkSEwoLaXNfcmVsYXRpdmUYAyABKAgi6AEKBUlucHV0EhUKBG5hbWUYASABKAlCB7pIBHICEAESHwoMc3RyaW5nX3ZhbHVlGAIgASgJQge6SARyAhABSAASNwoOYXJ0aWZhY3RfcXVlcnkYAyABKAsyHS5mbHl0ZWlkbDIuY29yZS5BcnRpZmFjdFF1ZXJ5SAASMQoLYXJ0aWZhY3RfaWQYBCABKAsyGi5mbHl0ZWlkbDIuY29yZS5BcnRpZmFjdElESAASKwoGYXBwX2lkGAUgASgLMhkuZmx5dGVpZGwyLmFwcC5JZGVudGlmaWVySABCDgoFdmFsdWUSBbpIAggBImAKEk1hdGVyaWFsaXplZElucHV0cxIvCgVpdGVtcxgBIAMoCzIgLmZseXRlaWRsMi5hcHAuTWF0ZXJpYWxpemVkSW5wdXQSGQoIcmV2aXNpb24YAiABKARCB7pIBDICKAAibQoRTWF0ZXJpYWxpemVkSW5wdXQSFQoEbmFtZRgBIAEoCUIHukgEcgIQARIxCgthcnRpZmFjdF9pZBgCIAEoCzIaLmZseXRlaWRsMi5jb3JlLkFydGlmYWN0SURIAEIOCgV2YWx1ZRIFukgCCAEiMAoJSW5wdXRMaXN0EiMKBWl0ZW1zGAEgAygLMhQuZmx5dGVpZGwyLmFwcC5JbnB1dCJbCgdQcm9maWxlEgwKBHR5cGUYASABKAkSDAoEbmFtZRgCIAEoCRIiChFzaG9ydF9kZXNjcmlwdGlvbhgDIAEoCUIHukgEcgIYZBIQCghpY29uX3VybBgEIAEoCSKJAQoPU2VjdXJpdHlDb250ZXh0EigKBnJ1bl9hcxgBIAEoCzIYLmZseXRlaWRsMi5jb3JlLklkZW50aXR5EicKB3NlY3JldHMYAiADKAsyFi5mbHl0ZWlkbDIuY29yZS5TZWNyZXQSFwoPYWxsb3dfYW5vbnltb3VzGAUgASgISgQIAxAESgQIBBAFIi8KCUltYWdlU3BlYxILCgN0YWcYASABKAkSFQoNYnVpbGRfam9iX3VybBgCIAEoCSI4CgxJbWFnZVNwZWNTZXQSKAoGaW1hZ2VzGAEgAygLMhguZmx5dGVpZGwyLmFwcC5JbWFnZVNwZWMiQgoNSW5ncmVzc0NvbmZpZxIPCgdwcml2YXRlGAEgASgIEhEKCXN1YmRvbWFpbhgCIAEoCRINCgVjbmFtZRgDIAEoCSKpAQoRQXV0b3NjYWxpbmdDb25maWcSKQoIcmVwbGljYXMYASABKAsyFy5mbHl0ZWlkbDIuYXBwLlJlcGxpY2FzEjMKEHNjYWxlZG93bl9wZXJpb2QYAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SNAoOc2NhbGluZ19tZXRyaWMYAyABKAsyHC5mbHl0ZWlkbDIuYXBwLlNjYWxpbmdNZXRyaWMihwEKDVNjYWxpbmdNZXRyaWMSMgoMcmVxdWVzdF9yYXRlGAEgASgLMhouZmx5dGVpZGwyLmFwcC5SZXF1ZXN0UmF0ZUgAEjEKC2NvbmN1cnJlbmN5GAIgASgLMhouZmx5dGVpZGwyLmFwcC5Db25jdXJyZW5jeUgAQg8KBm1ldHJpYxIFukgCCAEiLAoLQ29uY3VycmVuY3kSHQoMdGFyZ2V0X3ZhbHVlGAEgASgNQge6SAQqAiAAIiwKC1JlcXVlc3RSYXRlEh0KDHRhcmdldF92YWx1ZRgBIAEoDUIHukgEKgIoACI2CghSZXBsaWNhcxIUCgNtaW4YASABKA1CB7pIBCoCKAASFAoDbWF4GAIgASgNQge6SAQqAigAIlIKDVRpbWVvdXRDb25maWcSQQoPcmVxdWVzdF90aW1lb3V0GAEgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uQg26SAqqAQciAwiQHDIAQrEBChFjb20uZmx5dGVpZGwyLmFwcEISQXBwRGVmaW5pdGlvblByb3RvSAJQAVoxZ2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2FwcKICA0ZBWKoCDUZseXRlaWRsMi5BcHDKAg1GbHl0ZWlkbDJcQXBw4gIZRmx5dGVpZGwyXEFwcFxHUEJNZXRhZGF0YeoCDkZseXRlaWRsMjo6QXBwYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identity, file_flyteidl2_common_runtime_version, file_flyteidl2_core_artifact_id, file_flyteidl2_core_security, file_flyteidl2_core_tasks, file_flyteidl2_task_task_definition, file_google_protobuf_duration, file_google_protobuf_timestamp]);
 
 /**
  * @generated from message flyteidl2.app.Identifier
@@ -229,17 +229,11 @@ export type Condition = Message<"flyteidl2.app.Condition"> & {
 
   /**
    * Finer-grained substate qualifying deployment_status (e.g. FAILED + IMAGE_PULL_ERROR).
+   * Human-readable detail for a failure is carried in the existing `message` field.
    *
    * @generated from field: flyteidl2.app.Status.Substate substate = 6;
    */
   substate: Status_Substate;
-
-  /**
-   * Structured failure detail, set when this condition represents a failure/error.
-   *
-   * @generated from field: flyteidl2.app.FailureInfo failure_info = 7;
-   */
-  failureInfo?: FailureInfo;
 };
 
 /**
@@ -248,121 +242,6 @@ export type Condition = Message<"flyteidl2.app.Condition"> & {
  */
 export const ConditionSchema: GenMessage<Condition> = /*@__PURE__*/
   messageDesc(file_flyteidl2_app_app_definition, 4);
-
-/**
- * Structured detail for a failed/erroring Condition. Populated by the operator's failure
- * classifier from pod container statuses or the Knative readiness condition.
- *
- * @generated from message flyteidl2.app.FailureInfo
- */
-export type FailureInfo = Message<"flyteidl2.app.FailureInfo"> & {
-  /**
-   * Mirrors the owning Condition.substate so this payload is self-contained for the UI.
-   *
-   * @generated from field: flyteidl2.app.Status.Substate failure_mode = 1;
-   */
-  failureMode: Status_Substate;
-
-  /**
-   * One-line banner summary.
-   *
-   * @generated from field: string summary = 2;
-   */
-  summary: string;
-
-  /**
-   * Image-pull failures.
-   *
-   * @generated from field: string image = 3;
-   */
-  image: string;
-
-  /**
-   * @generated from field: string image_pull_error = 4;
-   */
-  imagePullError: string;
-
-  /**
-   * Secret-mount failures.
-   *
-   * @generated from field: string secret_name = 5;
-   */
-  secretName: string;
-
-  /**
-   * @generated from field: string mount_path = 6;
-   */
-  mountPath: string;
-
-  /**
-   * Crash / OOM failures.
-   *
-   * @generated from field: int32 exit_code = 7;
-   */
-  exitCode: number;
-
-  /**
-   * @generated from field: int32 restart_count = 8;
-   */
-  restartCount: number;
-
-  /**
-   * @generated from field: string container_name = 9;
-   */
-  containerName: string;
-
-  /**
-   * @generated from field: string memory_limit = 10;
-   */
-  memoryLimit: string;
-
-  /**
-   * Last log lines captured at failure time.
-   *
-   * @generated from field: repeated string recent_log_lines = 11;
-   */
-  recentLogLines: string[];
-
-  /**
-   * @generated from field: flyteidl2.app.FailureInfo.Action action = 12;
-   */
-  action: FailureInfo_Action;
-};
-
-/**
- * Describes the message flyteidl2.app.FailureInfo.
- * Use `create(FailureInfoSchema)` to create a new message.
- */
-export const FailureInfoSchema: GenMessage<FailureInfo> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 5);
-
-/**
- * CTA the UI should render for this failure.
- *
- * @generated from enum flyteidl2.app.FailureInfo.Action
- */
-export enum FailureInfo_Action {
-  /**
-   * @generated from enum value: NONE = 0;
-   */
-  NONE = 0,
-
-  /**
-   * @generated from enum value: REDEPLOY = 1;
-   */
-  REDEPLOY = 1,
-
-  /**
-   * @generated from enum value: OPEN_SECRETS = 2;
-   */
-  OPEN_SECRETS = 2,
-}
-
-/**
- * Describes the enum flyteidl2.app.FailureInfo.Action.
- */
-export const FailureInfo_ActionSchema: GenEnum<FailureInfo_Action> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_app_app_definition, 5, 0);
 
 /**
  * Represents the status of an app.
@@ -436,7 +315,7 @@ export type Status = Message<"flyteidl2.app.Status"> & {
  * Use `create(StatusSchema)` to create a new message.
  */
 export const StatusSchema: GenMessage<Status> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 6);
+  messageDesc(file_flyteidl2_app_app_definition, 5);
 
 /**
  * Enum for deployment status of the app.
@@ -527,7 +406,7 @@ export enum Status_DeploymentStatus {
  * Describes the enum flyteidl2.app.Status.DeploymentStatus.
  */
 export const Status_DeploymentStatusSchema: GenEnum<Status_DeploymentStatus> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_app_app_definition, 6, 0);
+  enumDesc(file_flyteidl2_app_app_definition, 5, 0);
 
 /**
  * Finer-grained substate that qualifies a DeploymentStatus, surfaced on a Condition.
@@ -594,7 +473,7 @@ export enum Status_Substate {
  * Describes the enum flyteidl2.app.Status.Substate.
  */
 export const Status_SubstateSchema: GenEnum<Status_Substate> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_app_app_definition, 6, 1);
+  enumDesc(file_flyteidl2_app_app_definition, 5, 1);
 
 /**
  * @generated from message flyteidl2.app.K8sMetadata
@@ -613,7 +492,7 @@ export type K8sMetadata = Message<"flyteidl2.app.K8sMetadata"> & {
  * Use `create(K8sMetadataSchema)` to create a new message.
  */
 export const K8sMetadataSchema: GenMessage<K8sMetadata> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 7);
+  messageDesc(file_flyteidl2_app_app_definition, 6);
 
 /**
  * @generated from message flyteidl2.app.Ingress
@@ -646,7 +525,7 @@ export type Ingress = Message<"flyteidl2.app.Ingress"> & {
  * Use `create(IngressSchema)` to create a new message.
  */
 export const IngressSchema: GenMessage<Ingress> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 8);
+  messageDesc(file_flyteidl2_app_app_definition, 7);
 
 /**
  * Represents the specification of an app.
@@ -774,7 +653,7 @@ export type Spec = Message<"flyteidl2.app.Spec"> & {
  * Use `create(SpecSchema)` to create a new message.
  */
 export const SpecSchema: GenMessage<Spec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 9);
+  messageDesc(file_flyteidl2_app_app_definition, 8);
 
 /**
  * Enum for deployment status of the app.
@@ -816,7 +695,7 @@ export enum Spec_DesiredState {
  * Describes the enum flyteidl2.app.Spec.DesiredState.
  */
 export const Spec_DesiredStateSchema: GenEnum<Spec_DesiredState> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_app_app_definition, 9, 0);
+  enumDesc(file_flyteidl2_app_app_definition, 8, 0);
 
 /**
  * Represents a link to an external resource (Arize project link, W&B dashboard, etc)
@@ -852,7 +731,7 @@ export type Link = Message<"flyteidl2.app.Link"> & {
  * Use `create(LinkSchema)` to create a new message.
  */
 export const LinkSchema: GenMessage<Link> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 10);
+  messageDesc(file_flyteidl2_app_app_definition, 9);
 
 /**
  * @generated from message flyteidl2.app.Input
@@ -909,7 +788,7 @@ export type Input = Message<"flyteidl2.app.Input"> & {
  * Use `create(InputSchema)` to create a new message.
  */
 export const InputSchema: GenMessage<Input> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 11);
+  messageDesc(file_flyteidl2_app_app_definition, 10);
 
 /**
  * @generated from message flyteidl2.app.MaterializedInputs
@@ -933,7 +812,7 @@ export type MaterializedInputs = Message<"flyteidl2.app.MaterializedInputs"> & {
  * Use `create(MaterializedInputsSchema)` to create a new message.
  */
 export const MaterializedInputsSchema: GenMessage<MaterializedInputs> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 12);
+  messageDesc(file_flyteidl2_app_app_definition, 11);
 
 /**
  * @generated from message flyteidl2.app.MaterializedInput
@@ -965,7 +844,7 @@ export type MaterializedInput = Message<"flyteidl2.app.MaterializedInput"> & {
  * Use `create(MaterializedInputSchema)` to create a new message.
  */
 export const MaterializedInputSchema: GenMessage<MaterializedInput> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 13);
+  messageDesc(file_flyteidl2_app_app_definition, 12);
 
 /**
  * InputList is a list of dependencies for the app.
@@ -986,7 +865,7 @@ export type InputList = Message<"flyteidl2.app.InputList"> & {
  * Use `create(InputListSchema)` to create a new message.
  */
 export const InputListSchema: GenMessage<InputList> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 14);
+  messageDesc(file_flyteidl2_app_app_definition, 13);
 
 /**
  * @generated from message flyteidl2.app.Profile
@@ -1026,7 +905,7 @@ export type Profile = Message<"flyteidl2.app.Profile"> & {
  * Use `create(ProfileSchema)` to create a new message.
  */
 export const ProfileSchema: GenMessage<Profile> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 15);
+  messageDesc(file_flyteidl2_app_app_definition, 14);
 
 /**
  * SecurityContext holds security attributes that apply to tasks.
@@ -1066,7 +945,7 @@ export type SecurityContext = Message<"flyteidl2.app.SecurityContext"> & {
  * Use `create(SecurityContextSchema)` to create a new message.
  */
 export const SecurityContextSchema: GenMessage<SecurityContext> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 16);
+  messageDesc(file_flyteidl2_app_app_definition, 15);
 
 /**
  * @generated from message flyteidl2.app.ImageSpec
@@ -1092,7 +971,7 @@ export type ImageSpec = Message<"flyteidl2.app.ImageSpec"> & {
  * Use `create(ImageSpecSchema)` to create a new message.
  */
 export const ImageSpecSchema: GenMessage<ImageSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 17);
+  messageDesc(file_flyteidl2_app_app_definition, 16);
 
 /**
  * @generated from message flyteidl2.app.ImageSpecSet
@@ -1111,7 +990,7 @@ export type ImageSpecSet = Message<"flyteidl2.app.ImageSpecSet"> & {
  * Use `create(ImageSpecSetSchema)` to create a new message.
  */
 export const ImageSpecSetSchema: GenMessage<ImageSpecSet> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 18);
+  messageDesc(file_flyteidl2_app_app_definition, 17);
 
 /**
  * Represents the ingress configuration of an app.
@@ -1146,7 +1025,7 @@ export type IngressConfig = Message<"flyteidl2.app.IngressConfig"> & {
  * Use `create(IngressConfigSchema)` to create a new message.
  */
 export const IngressConfigSchema: GenMessage<IngressConfig> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 19);
+  messageDesc(file_flyteidl2_app_app_definition, 18);
 
 /**
  * Represents the autoscaling configuration of an app.
@@ -1181,7 +1060,7 @@ export type AutoscalingConfig = Message<"flyteidl2.app.AutoscalingConfig"> & {
  * Use `create(AutoscalingConfigSchema)` to create a new message.
  */
 export const AutoscalingConfigSchema: GenMessage<AutoscalingConfig> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 20);
+  messageDesc(file_flyteidl2_app_app_definition, 19);
 
 /**
  * ScalingMetric allows different scaling strategies for the app.
@@ -1217,7 +1096,7 @@ export type ScalingMetric = Message<"flyteidl2.app.ScalingMetric"> & {
  * Use `create(ScalingMetricSchema)` to create a new message.
  */
 export const ScalingMetricSchema: GenMessage<ScalingMetric> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 21);
+  messageDesc(file_flyteidl2_app_app_definition, 20);
 
 /**
  * This section enables scaling based on the request concurrency. Concurrency calculates how many
@@ -1244,7 +1123,7 @@ export type Concurrency = Message<"flyteidl2.app.Concurrency"> & {
  * Use `create(ConcurrencySchema)` to create a new message.
  */
 export const ConcurrencySchema: GenMessage<Concurrency> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 22);
+  messageDesc(file_flyteidl2_app_app_definition, 21);
 
 /**
  * RequestRate enables scaling based on the request rate. Request rate calculates how many requests
@@ -1270,7 +1149,7 @@ export type RequestRate = Message<"flyteidl2.app.RequestRate"> & {
  * Use `create(RequestRateSchema)` to create a new message.
  */
 export const RequestRateSchema: GenMessage<RequestRate> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 23);
+  messageDesc(file_flyteidl2_app_app_definition, 22);
 
 /**
  * Represents the configuration for the number of replicas.
@@ -1298,7 +1177,7 @@ export type Replicas = Message<"flyteidl2.app.Replicas"> & {
  * Use `create(ReplicasSchema)` to create a new message.
  */
 export const ReplicasSchema: GenMessage<Replicas> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 24);
+  messageDesc(file_flyteidl2_app_app_definition, 23);
 
 /**
  * @generated from message flyteidl2.app.TimeoutConfig
@@ -1320,5 +1199,5 @@ export type TimeoutConfig = Message<"flyteidl2.app.TimeoutConfig"> & {
  * Use `create(TimeoutConfigSchema)` to create a new message.
  */
 export const TimeoutConfigSchema: GenMessage<TimeoutConfig> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_app_app_definition, 25);
+  messageDesc(file_flyteidl2_app_app_definition, 24);
 
