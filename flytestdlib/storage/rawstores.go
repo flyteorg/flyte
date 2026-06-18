@@ -108,36 +108,38 @@ func NewCompositeDataStore(refConstructor ReferenceConstructor, composedProtobuf
 
 // RefreshConfig re-initialises the data store client leaving metrics untouched.
 // This is NOT thread-safe!
+//
+// The DataStore is multi-scheme: the configured Type is built eagerly as the primary backend (it
+// owns the InitContainer and GetBaseContainerFQN), then wrapped in a routing store that lazily
+// instantiates a backend for any other scheme (s3://, gs://, abfs://, redis://, ...) the first time
+// it is referenced and reuses it thereafter. See routingStore for details.
 func (ds *DataStore) RefreshConfig(ctx context.Context, cfg *Config) error {
+	httpClient := createHTTPClient(cfg.DefaultHTTPClient)
+
+	// stow reads http.DefaultClient at dial time. Install the configured client for the eager primary
+	// build; lazy per-scheme dials thread the same client explicitly via the routing store.
 	defaultClient := http.DefaultClient
+	http.DefaultClient = httpClient
 	defer func() {
 		http.DefaultClient = defaultClient
 	}()
-
-	http.DefaultClient = createHTTPClient(cfg.DefaultHTTPClient)
 
 	fn, found := stores[cfg.Type]
 	if !found {
 		return fmt.Errorf("type is of an invalid value [%v]", cfg.Type)
 	}
 
-	rawStore, err := fn(ctx, cfg, ds.metrics)
+	primaryStore, err := fn(ctx, cfg, ds.metrics)
 	if err != nil {
 		return err
 	}
 
-	// When redis.addr is configured alongside a non-redis store type, route redis:// references to
-	// a redis store and everything else to the configured store. This keeps metadata in Redis while
-	// raw data and signed URLs continue using the blob store, activated purely by the reference
-	// scheme — no behavior change unless redis:// paths are actually used.
-	if cfg.Type != TypeRedis && len(cfg.Redis.Addr) > 0 {
-		redisStore, err := NewRedisRawStore(ctx, cfg, ds.metrics)
-		if err != nil {
-			return err
-		}
-
-		rawStore = newSchemeRoutingStore(rawStore, redisStore, ds.metrics.copyMetrics)
+	primaryScheme, err := primarySchemeForConfig(cfg)
+	if err != nil {
+		return err
 	}
+
+	rawStore := newRoutingStore(cfg, httpClient, primaryScheme, primaryStore, ds.metrics)
 
 	rawStore = newCachedRawStore(cfg, rawStore, ds.metrics.cacheMetrics)
 	protoStore := NewDefaultProtobufStoreWithMetrics(rawStore, ds.metrics.protoMetrics)

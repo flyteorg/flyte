@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"slices"
 	"strconv"
@@ -259,23 +260,57 @@ func (s *RedisStore) Delete(ctx context.Context, reference DataReference) error 
 	return nil
 }
 
-// NewRedisRawStore creates a RawStore backed by the Redis server configured in cfg.Redis.
+// NewRedisRawStore creates a RawStore backed by the Redis server configured in cfg.Redis. It is the
+// primary-scheme builder (type: redis) and requires redis.addr to be set.
 func NewRedisRawStore(_ context.Context, cfg *Config, metrics *dataStoreMetrics) (RawStore, error) {
 	if len(cfg.Redis.Addr) == 0 {
 		return nil, fmt.Errorf("storage type [%v] requires redis.addr to be set", TypeRedis)
 	}
 
+	return buildRedisStore(cfg.Redis, metrics), nil
+}
+
+// buildRedisStore constructs a RedisStore from a resolved RedisConfig.
+func buildRedisStore(cfg RedisConfig, metrics *dataStoreMetrics) *RedisStore {
 	self := &RedisStore{
 		client: redis.NewClient(&redis.Options{
-			Addr:     cfg.Redis.Addr,
-			Username: cfg.Redis.Username,
-			Password: cfg.Redis.Password,
-			DB:       cfg.Redis.DB,
+			Addr:     cfg.Addr,
+			Username: cfg.Username,
+			Password: cfg.Password,
+			DB:       cfg.DB,
 		}),
-		baseRef: DataReference(fmt.Sprintf("%s://%s", TypeRedis, cfg.Redis.Addr)),
-		addr:    cfg.Redis.Addr,
+		baseRef: DataReference(fmt.Sprintf("%s://%s", TypeRedis, cfg.Addr)),
+		addr:    cfg.Addr,
 	}
 
 	self.copyImpl = newCopyImpl(self, metrics.copyMetrics)
-	return self, nil
+	return self
+}
+
+// redisFactory lazily builds a redis-backed RawStore for a secondary redis:// scheme. The address is
+// resolved by precedence: an explicit Schemes["redis"].Redis override, then the top-level Redis
+// config, and finally the host portion of the triggering reference. The last step is what lets a
+// bare redis:// reference "just work" — the DataStore instantiates a client pointed at the reference
+// host on demand. It satisfies backendFactory.
+func redisFactory(_ context.Context, _ string, ref DataReference, cfg *Config, _ *http.Client, metrics *dataStoreMetrics) (RawStore, error) {
+	var redisCfg RedisConfig
+	switch {
+	case cfg.Schemes[TypeRedis].Redis != nil:
+		redisCfg = *cfg.Schemes[TypeRedis].Redis
+	case len(cfg.Redis.Addr) > 0:
+		redisCfg = cfg.Redis
+	}
+
+	if redisCfg.Addr == "" {
+		_, host, _, err := ref.Split()
+		if err != nil {
+			return nil, err
+		}
+		if host == "" {
+			return nil, fmt.Errorf("cannot resolve a redis address for reference [%v]: set redis.addr or include a host in the reference", ref)
+		}
+		redisCfg.Addr = host
+	}
+
+	return buildRedisStore(redisCfg, metrics), nil
 }
