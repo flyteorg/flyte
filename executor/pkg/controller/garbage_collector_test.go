@@ -11,6 +11,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 func createTaskAction(ctx context.Context, name string, labels map[string]string) *flyteorgv1.TaskAction {
@@ -62,7 +63,7 @@ var _ = Describe("GarbageCollector", func() {
 			LabelCompletedTime:     expiredTime,
 		})
 
-		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour, promutils.NewTestScope())
 		Expect(gc.collect(ctx)).To(Succeed())
 
 		ta := &flyteorgv1.TaskAction{}
@@ -78,7 +79,7 @@ var _ = Describe("GarbageCollector", func() {
 			LabelCompletedTime:     recentTime,
 		})
 
-		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour, promutils.NewTestScope())
 		Expect(gc.collect(ctx)).To(Succeed())
 
 		ta := &flyteorgv1.TaskAction{}
@@ -89,7 +90,7 @@ var _ = Describe("GarbageCollector", func() {
 	It("should retain non-terminated TaskActions", func() {
 		createTaskAction(ctx, "gc-active", nil)
 
-		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour, promutils.NewTestScope())
 		Expect(gc.collect(ctx)).To(Succeed())
 
 		ta := &flyteorgv1.TaskAction{}
@@ -98,7 +99,7 @@ var _ = Describe("GarbageCollector", func() {
 	})
 
 	It("should handle empty list gracefully", func() {
-		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour, promutils.NewTestScope())
 		Expect(gc.collect(ctx)).To(Succeed())
 	})
 })
