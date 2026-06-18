@@ -441,8 +441,8 @@ func (s *RunService) persistRunModel(
 		return sql.NullString{String: s, Valid: s != ""}
 	}
 
-	// Persist the creator's identity: the bare subject in created_by (for querying)
-	// and the full EnrichedIdentity (subject + name/email) in executed_by.
+	// Persist the creator's identity (subject, plus name/email when captured) as a
+	// serialized EnrichedIdentity in executed_by.
 	var executedByBytes []byte
 	if executedBy != nil {
 		if b, marshalErr := proto.Marshal(executedBy); marshalErr != nil {
@@ -473,7 +473,6 @@ func (s *RunService) persistRunModel(
 		RunSpec:         runSpecBytes,
 		Attempts:        1,
 		RunSource:       source.String(),
-		CreatedBy:       nullStr(identitySubject(executedBy)),
 		ExecutedBy:      executedByBytes,
 		TriggerTaskName: nullStr(triggerTaskName),
 		TriggerName:     nullStr(triggerName),
@@ -1581,16 +1580,13 @@ func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 		}
 	}
 
-	// Prefer the full stored identity (subject + name/email); fall back to a
-	// subject-only identity for rows created before executed_by was captured.
+	// The stored identity (subject, plus name/email when captured). Left nil for
+	// unauthenticated runs or if the stored bytes are unreadable.
 	if len(action.ExecutedBy) > 0 {
 		var id common.EnrichedIdentity
 		if err := proto.Unmarshal(action.ExecutedBy, &id); err == nil {
 			metadata.ExecutedBy = &id
 		}
-	}
-	if metadata.ExecutedBy == nil && action.CreatedBy.Valid {
-		metadata.ExecutedBy = subjectOnlyIdentity(action.CreatedBy.String)
 	}
 
 	if action.TriggerName.Valid {

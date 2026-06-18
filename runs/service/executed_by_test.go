@@ -35,18 +35,16 @@ func TestActionMetadataFromModel_ExecutedBy(t *testing.T) {
 		assert.Equal(t, "kevin@union.ai", eb.GetSpec().GetEmail())
 	})
 
-	t.Run("falls back to subject-only from created_by", func(t *testing.T) {
-		m := &models.Action{}
-		m.CreatedBy.Valid, m.CreatedBy.String = true, "00u2"
+	t.Run("subject-only identity from executed_by", func(t *testing.T) {
+		m := &models.Action{ExecutedBy: mustMarshalIdentity(t, subjectOnlyIdentity("00u2"))}
 		eb := actionMetadataFromModel(m).GetExecutedBy().GetUser()
 		assert.Equal(t, "00u2", eb.GetId().GetSubject())
 		assert.Nil(t, eb.GetSpec())
 	})
 
-	t.Run("corrupt executed_by falls back to created_by", func(t *testing.T) {
+	t.Run("corrupt executed_by yields nil", func(t *testing.T) {
 		m := &models.Action{ExecutedBy: []byte("not a valid proto\xff\xfe")}
-		m.CreatedBy.Valid, m.CreatedBy.String = true, "00u3"
-		assert.Equal(t, "00u3", actionMetadataFromModel(m).GetExecutedBy().GetUser().GetId().GetSubject())
+		assert.Nil(t, actionMetadataFromModel(m).GetExecutedBy())
 	})
 
 	t.Run("no identity yields nil executed_by", func(t *testing.T) {

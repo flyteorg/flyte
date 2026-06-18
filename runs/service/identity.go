@@ -106,8 +106,3 @@ func subjectOnlyIdentity(subject string) *common.EnrichedIdentity {
 		},
 	}
 }
-
-// identitySubject returns the subject of an EnrichedIdentity, or "" if absent.
-func identitySubject(id *common.EnrichedIdentity) string {
-	return id.GetUser().GetId().GetSubject()
-}

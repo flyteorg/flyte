@@ -52,15 +52,10 @@ type Action struct {
 	// Who initiated this run(web, CLI, scheduler, etc.)
 	RunSource string `db:"run_source" json:"run_source,omitempty"`
 
-	// CreatedBy is the OIDC subject of the identity that created this run, captured
-	// from the auth headers the load balancer forwards. NULL for runs created without
-	// an authenticated identity. Not exposed for API-level filtering/sorting — it is
-	// intentionally absent from ActionColumnsSet; add it there only if that's desired.
-	CreatedBy sql.NullString `db:"created_by" json:"created_by,omitempty"`
-
 	// ExecutedBy is the serialized common.EnrichedIdentity of the run's creator
-	// (subject plus name/email when the forwarded OIDC claims include them).
-	// Surfaced directly as ActionMetadata.executed_by. NULL for unauthenticated runs.
+	// (subject, plus name/email when the forwarded OIDC claims include them), captured
+	// from the auth headers the load balancer forwards. Surfaced directly as
+	// ActionMetadata.executed_by. NULL for runs created without an authenticated identity.
 	ExecutedBy []byte `db:"executed_by" json:"executed_by,omitempty"`
 
 	// Trigger fields — only set for runs created via RUN_SOURCE_SCHEDULE_TRIGGER.

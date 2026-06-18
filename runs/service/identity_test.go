@@ -101,6 +101,4 @@ func TestSubjectOnlyIdentity(t *testing.T) {
 	id := subjectOnlyIdentity("user-123")
 	assert.Equal(t, "user-123", id.GetUser().GetId().GetSubject())
 	assert.Nil(t, id.GetUser().GetSpec())
-	assert.Equal(t, "user-123", identitySubject(id))
-	assert.Equal(t, "", identitySubject(nil))
 }
