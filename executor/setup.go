@@ -29,6 +29,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 	cachecatalog "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog/cache_service"
 	webhookConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
+	connectorplugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/webapi/connector"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
@@ -65,6 +66,11 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	for _, reg := range pluginmachinery.PluginRegistry().GetSchemeRegisters() {
 		utilruntime.Must(reg.AddToScheme(scheme))
 	}
+
+	// Register the connector (webapi) backend plugin so task types backed by an external connector
+	// service are routed to it. This must run before plugin.NewRegistry below, which snapshots the
+	// core plugins once.
+	connectorplugin.RegisterConnectorPlugin(&connectorplugin.ConnectorService{})
 
 	var tlsOpts []func(*tls.Config)
 	if !cfg.EnableHTTP2 {
@@ -129,7 +135,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	setupCtx := plugin.NewSetupContext(
-		mgr, nil, nil, nil, nil,
+		mgr, nil, plugin.NewNoopResourceRegistrar(), nil, nil,
 		"TaskAction",
 		executorScope.NewSubScope("plugin"),
 	)
@@ -177,6 +183,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	reconciler.CatalogClient = asyncCatalogClient
 	reconciler.Catalog = cacheClient
 	reconciler.Recorder = mgr.GetEventRecorder("taskaction-controller")
+	// Supply a ResourceManager for the webapi allocation-token path, used by connector-backed task
+	// types that declare ResourceQuotas. It grants every allocation by default, matching
+	// FlytePropeller with no quota backend. Swap in a real one to enforce quotas.
+	reconciler.ResourceManager = plugin.NewNoopResourceManager()
 	if cfg.MaxSystemFailures < 0 {
 		return fmt.Errorf("executor: maxSystemFailures must be non-negative, got %d", cfg.MaxSystemFailures)
 	}
