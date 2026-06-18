@@ -46,6 +46,7 @@ type RunService struct {
 	storagePrefix   string
 	dataStore       *storage.DataStore
 	abortReconciler *AbortReconciler
+	enricher        *identityEnricher
 }
 
 type actionDataClient interface {
@@ -152,6 +153,7 @@ func NewRunService(
 	storagePrefix string,
 	dataStore *storage.DataStore,
 	reconciler *AbortReconciler,
+	authServerBaseURL string,
 ) *RunService {
 	return &RunService{
 		repo:            repo,
@@ -161,6 +163,7 @@ func NewRunService(
 		storagePrefix:   storagePrefix,
 		dataStore:       dataStore,
 		abortReconciler: reconciler,
+		enricher:        newIdentityEnricher(authServerBaseURL),
 	}
 }
 
@@ -326,8 +329,10 @@ func (s *RunService) CreateRun(
 	}
 
 	// Capture who created the run from the auth headers the load balancer forwards
-	// (it enforces auth upstream). nil when there is no authenticated identity.
+	// (it enforces auth upstream). nil when there is no authenticated identity. On the
+	// Bearer path the token carries only the subject, so enrich name/email via userinfo.
 	executedBy := identityFromHeaders(req.Header())
+	executedBy = s.enricher.enrich(ctx, accessTokenFromHeaders(req.Header()), executedBy)
 
 	// Persist task spec and create run model
 	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec, request.GetSource(), triggerName, triggerTaskName, triggerRevision, triggerType, executedBy)
