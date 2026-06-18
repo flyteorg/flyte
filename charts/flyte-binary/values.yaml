@@ -419,8 +419,7 @@ ingress:
     tls: []
   # wellknownIngress Optional separate ingress for the unauthenticated
   # auth-discovery endpoints (`/.well-known/oauth-authorization-server`,
-  # AuthMetadataService, IdentityService, SettingsService) — clients must reach
-  # these before they hold a token. Give it the highest controller precedence
+  # AuthMetadataService) — clients must reach these before they hold a token. Give it the highest controller precedence
   # (e.g. ALB group.order lower than the JWT/http ingresses) so these paths bypass
   # auth. Supply controller config via `annotations`.
   wellknownIngress:
