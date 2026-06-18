@@ -118,6 +118,47 @@ message Condition {
 
   // Actor is the principal that caused the condition.
   common.EnrichedIdentity actor = 5;
+
+  // Finer-grained substate qualifying deployment_status (e.g. FAILED + IMAGE_PULL_ERROR).
+  Status.Substate substate = 6;
+
+  // Structured failure detail, set when this condition represents a failure/error.
+  FailureInfo failure_info = 7;
+}
+
+// Structured detail for a failed/erroring Condition. Populated by the operator's failure
+// classifier from pod container statuses or the Knative readiness condition.
+message FailureInfo {
+  // Mirrors the owning Condition.substate so this payload is self-contained for the UI.
+  Status.Substate failure_mode = 1;
+
+  // One-line banner summary.
+  string summary = 2;
+
+  // Image-pull failures.
+  string image = 3;
+  string image_pull_error = 4;
+
+  // Secret-mount failures.
+  string secret_name = 5;
+  string mount_path = 6;
+
+  // Crash / OOM failures.
+  int32 exit_code = 7;
+  int32 restart_count = 8;
+  string container_name = 9;
+  string memory_limit = 10;
+
+  // Last log lines captured at failure time.
+  repeated string recent_log_lines = 11;
+
+  // CTA the UI should render for this failure.
+  enum Action {
+    NONE = 0;
+    REDEPLOY = 1;
+    OPEN_SECRETS = 2;
+  }
+  Action action = 12;
 }
 
 // Represents the status of an app.
@@ -148,6 +189,25 @@ message Status {
     DEPLOYMENT_STATUS_SCALING_DOWN = 9;
     // Triggered in response to the latest app spec changing
     DEPLOYMENT_STATUS_DEPLOYING = 10;
+  }
+
+  // Finer-grained substate that qualifies a DeploymentStatus, surfaced on a Condition.
+  enum Substate {
+    SUBSTATE_UNSPECIFIED = 0;
+    // The container image is being pulled.
+    PULLING_IMAGE = 1;
+    // The container is starting up.
+    INITIALIZING = 2;
+    // The Knative admission webhook rejected the revision.
+    WEBHOOK_ERROR = 3;
+    // The container image could not be pulled.
+    IMAGE_PULL_ERROR = 4;
+    // A referenced secret could not be mounted.
+    SECRET_MOUNT_ERROR = 5;
+    // The container is repeatedly crashing on startup.
+    CRASH_LOOP = 6;
+    // The container was killed for exceeding its memory limit.
+    OOM_KILLED = 7;
   }
 
   // Current number of replicas.
