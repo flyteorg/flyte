@@ -1147,6 +1147,8 @@ func (m *ListRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for DisableIdentityEnrichment
+
 	switch v := m.FilterBy.(type) {
 	case *ListRequest_Org:
 		if v == nil {
