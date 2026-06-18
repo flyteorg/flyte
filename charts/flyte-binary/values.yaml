@@ -401,6 +401,36 @@ ingress:
   httpExtraPaths:
     prepend: []
     append: []
+  # apiJwtIngress Optional separate ingress that JWT-validates the flyteidl2 API
+  # paths for requests carrying an `Authorization: Bearer` token (SDK/machine
+  # clients). Needed on controllers like AWS ALB where a single ingress cannot
+  # combine cookie-OIDC (browser) and JWT (token) auth. It renders the shared API
+  # paths backed by the http service; supply the controller/JWT config (e.g. ALB
+  # cert-arn, jwt-validation, the `Authorization: Bearer*` match condition, and a
+  # group.order lower than the http ingress (but higher than the wellknown ingress)) via `annotations`.
+  apiJwtIngress:
+    # enabled Create the JWT (Bearer) API ingress
+    enabled: false
+    # annotations Annotations for the JWT API ingress (controller/JWT config)
+    annotations: {}
+    # ingressClassName Ingress class for the JWT API ingress. Overrides `ingressClassName`
+    ingressClassName: ""
+    # tls Add TLS configuration to the JWT API ingress. Overrides `tls`
+    tls: []
+  # wellknownIngress Optional separate ingress for the unauthenticated
+  # auth-discovery endpoints (`/.well-known/oauth-authorization-server`,
+  # AuthMetadataService) — clients must reach these before they hold a token. Give it the highest controller precedence
+  # (e.g. ALB group.order lower than the JWT/http ingresses) so these paths bypass
+  # auth. Supply controller config via `annotations`.
+  wellknownIngress:
+    # enabled Create the unauthenticated auth-discovery ingress
+    enabled: false
+    # annotations Annotations for the auth-discovery ingress (controller config)
+    annotations: {}
+    # ingressClassName Ingress class for the auth-discovery ingress. Overrides `ingressClassName`
+    ingressClassName: ""
+    # tls Add TLS configuration to the auth-discovery ingress. Overrides `tls`
+    tls: []
 
 # rbac Configure Kubernetes RBAC for Flyte
 rbac:

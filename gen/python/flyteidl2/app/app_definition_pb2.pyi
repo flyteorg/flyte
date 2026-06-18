@@ -69,18 +69,20 @@ class App(_message.Message):
     def __init__(self, metadata: _Optional[_Union[Meta, _Mapping]] = ..., spec: _Optional[_Union[Spec, _Mapping]] = ..., status: _Optional[_Union[Status, _Mapping]] = ...) -> None: ...
 
 class Condition(_message.Message):
-    __slots__ = ["last_transition_time", "deployment_status", "message", "revision", "actor"]
+    __slots__ = ["last_transition_time", "deployment_status", "message", "revision", "actor", "substate"]
     LAST_TRANSITION_TIME_FIELD_NUMBER: _ClassVar[int]
     DEPLOYMENT_STATUS_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
     REVISION_FIELD_NUMBER: _ClassVar[int]
     ACTOR_FIELD_NUMBER: _ClassVar[int]
+    SUBSTATE_FIELD_NUMBER: _ClassVar[int]
     last_transition_time: _timestamp_pb2.Timestamp
     deployment_status: Status.DeploymentStatus
     message: str
     revision: int
     actor: _identity_pb2.EnrichedIdentity
-    def __init__(self, last_transition_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., deployment_status: _Optional[_Union[Status.DeploymentStatus, str]] = ..., message: _Optional[str] = ..., revision: _Optional[int] = ..., actor: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ...) -> None: ...
+    substate: Status.Substate
+    def __init__(self, last_transition_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., deployment_status: _Optional[_Union[Status.DeploymentStatus, str]] = ..., message: _Optional[str] = ..., revision: _Optional[int] = ..., actor: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., substate: _Optional[_Union[Status.Substate, str]] = ...) -> None: ...
 
 class Status(_message.Message):
     __slots__ = ["assigned_cluster", "current_replicas", "ingress", "created_at", "last_updated_at", "conditions", "lease_expiration", "k8s_metadata", "materialized_inputs"]
@@ -108,6 +110,24 @@ class Status(_message.Message):
     DEPLOYMENT_STATUS_SCALING_UP: Status.DeploymentStatus
     DEPLOYMENT_STATUS_SCALING_DOWN: Status.DeploymentStatus
     DEPLOYMENT_STATUS_DEPLOYING: Status.DeploymentStatus
+    class Substate(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        SUBSTATE_UNSPECIFIED: _ClassVar[Status.Substate]
+        PULLING_IMAGE: _ClassVar[Status.Substate]
+        INITIALIZING: _ClassVar[Status.Substate]
+        WEBHOOK_ERROR: _ClassVar[Status.Substate]
+        IMAGE_PULL_ERROR: _ClassVar[Status.Substate]
+        SECRET_MOUNT_ERROR: _ClassVar[Status.Substate]
+        CRASH_LOOP: _ClassVar[Status.Substate]
+        OOM_KILLED: _ClassVar[Status.Substate]
+    SUBSTATE_UNSPECIFIED: Status.Substate
+    PULLING_IMAGE: Status.Substate
+    INITIALIZING: Status.Substate
+    WEBHOOK_ERROR: Status.Substate
+    IMAGE_PULL_ERROR: Status.Substate
+    SECRET_MOUNT_ERROR: Status.Substate
+    CRASH_LOOP: Status.Substate
+    OOM_KILLED: Status.Substate
     ASSIGNED_CLUSTER_FIELD_NUMBER: _ClassVar[int]
     CURRENT_REPLICAS_FIELD_NUMBER: _ClassVar[int]
     INGRESS_FIELD_NUMBER: _ClassVar[int]
