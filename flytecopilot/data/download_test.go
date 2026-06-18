@@ -133,6 +133,95 @@ func TestHandleBlobSinglePart(t *testing.T) {
 	}
 }
 
+func writeBlobLit(t *testing.T, s *storage.DataStore, name string) *core.Literal {
+	ref := storage.DataReference("s3://container/" + name)
+	assert.NoError(t, s.WriteRaw(context.Background(), ref, 0, storage.Options{}, bytes.NewReader([]byte("data"))))
+	return &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Blob{Blob: &core.Blob{
+		Uri:      string(ref),
+		Metadata: &core.BlobMetadata{Type: &core.BlobType{Dimensionality: core.BlobType_SINGLE}},
+	}}}}}
+}
+
+func collectionLit(lits ...*core.Literal) *core.Literal {
+	return &core.Literal{Value: &core.Literal_Collection{Collection: &core.LiteralCollection{Literals: lits}}}
+}
+
+func TestNamedDirLayoutPreservesExtensions(t *testing.T) {
+	s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+	d := Downloader{store: s, layout: core.DataLoadingConfig_NAMED_DIR}
+
+	dir := "./nd_input"
+	assert.NoError(t, os.MkdirAll(dir, os.ModePerm))
+	defer func() { _ = os.RemoveAll(dir) }()
+
+	inputs := &core.LiteralMap{Literals: map[string]*core.Literal{
+		// list[File]: each element keeps its ORIGINAL basename in the per-input dir.
+		"reads": collectionLit(writeBlobLit(t, s, "sample_R1.fastq.gz"), writeBlobLit(t, s, "sample_R2.fastq.gz")),
+		// single File: staged inside a per-input dir under its original basename.
+		"fasta": writeBlobLit(t, s, "genome.fasta"),
+	}}
+	_, _, err = d.RecursiveDownload(context.Background(), inputs, dir, true)
+	assert.NoError(t, err)
+
+	// Original names round-trip end-to-end (not 0.gz/1.gz).
+	for _, rel := range []string{"reads/sample_R1.fastq.gz", "reads/sample_R2.fastq.gz", "fasta/genome.fasta"} {
+		_, statErr := os.Stat(filepath.Join(dir, rel))
+		assert.False(t, os.IsNotExist(statErr), "expected staged file %s", rel)
+	}
+}
+
+func TestNamedDirLayoutDedupesCollidingBasenames(t *testing.T) {
+	s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+	d := Downloader{store: s, layout: core.DataLoadingConfig_NAMED_DIR}
+
+	dir := "./nd_collide"
+	assert.NoError(t, os.MkdirAll(dir, os.ModePerm))
+	defer func() { _ = os.RemoveAll(dir) }()
+
+	// Two list elements with identical basenames (distinct random prefixes in
+	// real URIs, same name here) must not clobber each other.
+	inputs := &core.LiteralMap{Literals: map[string]*core.Literal{
+		"reads": collectionLit(writeBlobLit(t, s, "a/reads.fastq.gz"), writeBlobLit(t, s, "b/reads.fastq.gz")),
+	}}
+	_, _, err = d.RecursiveDownload(context.Background(), inputs, dir, true)
+	assert.NoError(t, err)
+
+	// First keeps the name; the collision falls back to an index-prefixed name.
+	for _, rel := range []string{"reads/reads.fastq.gz", "reads/1_reads.fastq.gz"} {
+		_, statErr := os.Stat(filepath.Join(dir, rel))
+		assert.False(t, os.IsNotExist(statErr), "expected staged file %s", rel)
+	}
+}
+
+func TestDirectLayoutIsUnchanged(t *testing.T) {
+	s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+	d := Downloader{store: s} // layout defaults to DIRECT
+
+	dir := "./direct_input"
+	assert.NoError(t, os.MkdirAll(dir, os.ModePerm))
+	defer func() { _ = os.RemoveAll(dir) }()
+
+	inputs := &core.LiteralMap{Literals: map[string]*core.Literal{
+		"reads": collectionLit(writeBlobLit(t, s, "reads_1.fastq.gz"), writeBlobLit(t, s, "reads_2.fastq.gz")),
+		"fasta": writeBlobLit(t, s, "genome.fasta"),
+	}}
+	_, _, err = d.RecursiveDownload(context.Background(), inputs, dir, true)
+	assert.NoError(t, err)
+
+	// list[File] elements stay at <index> (no extension); single File stays
+	// directly at <var> (a file) — backwards-compatible.
+	for _, fn := range []string{"0", "1"} {
+		_, statErr := os.Stat(filepath.Join(dir, "reads", fn))
+		assert.False(t, os.IsNotExist(statErr), "expected staged list element %s", fn)
+	}
+	info, statErr := os.Stat(filepath.Join(dir, "fasta"))
+	assert.NoError(t, statErr)
+	assert.False(t, info.IsDir(), "single File should stage directly as a file under DIRECT")
+}
+
 func TestHandleBlobHTTP(t *testing.T) {
 	s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)

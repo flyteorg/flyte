@@ -119,7 +119,7 @@ func SidecarCommandArgs(fromLocalPath string, outputPrefix, rawOutputPath storag
 	}, nil
 }
 
-func DownloadCommandArgs(fromInputsPath, outputPrefix storage.DataReference, toLocalPath string, format core.DataLoadingConfig_LiteralMapFormat, inputInterface *core.VariableMap) ([]string, error) {
+func DownloadCommandArgs(fromInputsPath, outputPrefix storage.DataReference, toLocalPath string, format core.DataLoadingConfig_LiteralMapFormat, layout core.DataLoadingConfig_FileInputLayout, inputInterface *core.VariableMap) ([]string, error) {
 	if inputInterface == nil {
 		return nil, fmt.Errorf("input Interface is required for CoPilot Downloader")
 	}
@@ -137,6 +137,8 @@ func DownloadCommandArgs(fromInputsPath, outputPrefix storage.DataReference, toL
 		toLocalPath,
 		"--format",
 		format.String(),
+		"--file-input-layout",
+		layout.String(),
 		"--input-interface",
 		base64.StdEncoding.EncodeToString(b),
 	}, nil
@@ -235,7 +237,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			coPilotPod.Volumes = append(coPilotPod.Volumes, DataVolume(cfg.InputVolumeName, size))
 
 			// Lets add the Inputs init container
-			args, err := DownloadCommandArgs(inputPaths.GetInputPath(), outputPaths.GetOutputPrefixPath(), inPath, format, iFace.Inputs)
+			args, err := DownloadCommandArgs(inputPaths.GetInputPath(), outputPaths.GetOutputPrefixPath(), inPath, format, pilot.GetFileInputLayout(), iFace.Inputs)
 			if err != nil {
 				return err
 			}

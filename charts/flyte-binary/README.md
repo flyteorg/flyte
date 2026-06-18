@@ -152,11 +152,6 @@ Chart for basic single Flyte executable deployment
 | fullnameOverride | string | `""` |  |
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |
-| ingress.grpcAnnotations | object | `{}` |  |
-| ingress.grpcExtraPaths.append | list | `[]` |  |
-| ingress.grpcExtraPaths.prepend | list | `[]` |  |
-| ingress.grpcIngressClassName | string | `""` |  |
-| ingress.grpcTls | list | `[]` |  |
 | ingress.host | string | `""` |  |
 | ingress.httpAnnotations | object | `{}` |  |
 | ingress.httpExtraPaths.append | list | `[]` |  |
@@ -165,7 +160,6 @@ Chart for basic single Flyte executable deployment
 | ingress.httpTls | list | `[]` |  |
 | ingress.ingressClassName | string | `""` |  |
 | ingress.labels | object | `{}` |  |
-| ingress.separateGrpcIngress | bool | `true` |  |
 | ingress.tls | list | `[]` |  |
 | nameOverride | string | `""` |  |
 | rbac.annotations | object | `{}` |  |
@@ -176,14 +170,11 @@ Chart for basic single Flyte executable deployment
 | service.commonAnnotations | object | `{}` |  |
 | service.externalTrafficPolicy | string | `"Cluster"` |  |
 | service.extraPorts | list | `[]` |  |
-| service.grpcAnnotations | object | `{}` |  |
 | service.httpAnnotations | object | `{}` |  |
 | service.labels | object | `{}` |  |
 | service.loadBalancerIP | string | `""` |  |
 | service.loadBalancerSourceRanges | list | `[]` |  |
-| service.nodePorts.grpc | string | `""` |  |
 | service.nodePorts.http | string | `""` |  |
-| service.ports.grpc | string | `""` |  |
 | service.ports.http | string | `""` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |

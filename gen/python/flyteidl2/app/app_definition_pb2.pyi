@@ -4,6 +4,7 @@ from flyteidl2.common import runtime_version_pb2 as _runtime_version_pb2
 from flyteidl2.core import artifact_id_pb2 as _artifact_id_pb2
 from flyteidl2.core import security_pb2 as _security_pb2
 from flyteidl2.core import tasks_pb2 as _tasks_pb2
+from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
@@ -27,7 +28,7 @@ class Identifier(_message.Message):
     def __init__(self, org: _Optional[str] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
 
 class Meta(_message.Message):
-    __slots__ = ["id", "revision", "labels"]
+    __slots__ = ["id", "revision", "labels", "code_bundle_uri", "source_code"]
     class LabelsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -38,10 +39,14 @@ class Meta(_message.Message):
     ID_FIELD_NUMBER: _ClassVar[int]
     REVISION_FIELD_NUMBER: _ClassVar[int]
     LABELS_FIELD_NUMBER: _ClassVar[int]
+    CODE_BUNDLE_URI_FIELD_NUMBER: _ClassVar[int]
+    SOURCE_CODE_FIELD_NUMBER: _ClassVar[int]
     id: Identifier
     revision: int
     labels: _containers.ScalarMap[str, str]
-    def __init__(self, id: _Optional[_Union[Identifier, _Mapping]] = ..., revision: _Optional[int] = ..., labels: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    code_bundle_uri: str
+    source_code: _task_definition_pb2.SourceCode
+    def __init__(self, id: _Optional[_Union[Identifier, _Mapping]] = ..., revision: _Optional[int] = ..., labels: _Optional[_Mapping[str, str]] = ..., code_bundle_uri: _Optional[str] = ..., source_code: _Optional[_Union[_task_definition_pb2.SourceCode, _Mapping]] = ...) -> None: ...
 
 class AppWrapper(_message.Message):
     __slots__ = ["host", "app", "app_id"]
