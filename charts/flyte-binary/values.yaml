@@ -124,11 +124,6 @@ configuration:
         enabled: false
         templateUri: ""
       custom: []
-  # NOTE: Flyte authentication is configured under `flyte-core-components.runs.authMetadata`
-  # (external/delegated auth — the binary proxies an external OAuth2 authorization server
-  # and advertises a public client to SDKs). v2 has no self-hosted auth server, so the
-  # old `configuration.auth` block (selfAuthServer/staticClients) has been removed.
-  # Browser SSO and JWT validation are handled at the ingress (see `ingress` annotations).
   # co-pilot Configuration for Flyte CoPilot
   co-pilot:
     # image Configure image to use for CoPilot sidecar
