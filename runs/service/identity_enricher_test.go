@@ -101,9 +101,5 @@ func TestAccessTokenFromHeaders(t *testing.T) {
 	h.Set("Authorization", "Bearer abc")
 	assert.Equal(t, "abc", accessTokenFromHeaders(h))
 
-	h = http.Header{}
-	h.Set(albAccessTokenHdr, "alb-tok")
-	assert.Equal(t, "alb-tok", accessTokenFromHeaders(h))
-
 	assert.Equal(t, "", accessTokenFromHeaders(http.Header{}))
 }

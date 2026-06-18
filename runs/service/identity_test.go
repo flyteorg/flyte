@@ -23,23 +23,6 @@ func TestIdentityFromHeaders(t *testing.T) {
 		wantEmail                    string
 	}{
 		{
-			name:      "flyte-authorization ID token: full claims (SDK path)",
-			headers:   map[string]string{flyteAuthzHeader: "IDToken " + jwt(`{"sub":"00u777","given_name":"Kevin","family_name":"Su","email":"kevin@union.ai"}`)},
-			wantSub:   "00u777",
-			wantFirst: "Kevin",
-			wantLast:  "Su",
-			wantEmail: "kevin@union.ai",
-		},
-		{
-			name: "ID token wins over access token",
-			headers: map[string]string{
-				flyteAuthzHeader:    "IDToken " + jwt(`{"sub":"id-user","given_name":"Named"}`),
-				authorizationHeader: "Bearer " + jwt(`{"sub":"access-user"}`),
-			},
-			wantSub:   "id-user",
-			wantFirst: "Named",
-		},
-		{
 			name:      "amzn oidc data: full claims (cookie path)",
 			headers:   map[string]string{albDataHeader: jwt(`{"sub":"00u123","given_name":"Carina","family_name":"Didilescu","email":"carina@union.ai"}`)},
 			wantSub:   "00u123",

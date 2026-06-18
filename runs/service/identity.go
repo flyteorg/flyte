@@ -20,11 +20,6 @@ const (
 	// (SDK/CLI). The load balancer validates it and forwards it unchanged.
 	authorizationHeader = "Authorization"
 	bearerPrefix        = "Bearer "
-	// flyteAuthzHeader carries the OIDC ID token the Flyte SDK forwards. Unlike the
-	// access token (Authorization), the ID token holds the user's profile claims
-	// (email, given_name, family_name), so no userinfo lookup is needed.
-	flyteAuthzHeader = "Flyte-Authorization"
-	idTokenPrefix    = "IDToken "
 )
 
 // oidcClaims is the subset of OIDC claims we surface as the executing identity.
@@ -40,13 +35,6 @@ type oidcClaims struct {
 // validation), so the claims are trusted and only decoded here — not re-verified.
 // Returns nil when no authenticated identity is present.
 func identityFromHeaders(h http.Header) *common.EnrichedIdentity {
-	// SDK/CLI: the forwarded ID token carries the full profile claims directly.
-	if authz := h.Get(flyteAuthzHeader); len(authz) > len(idTokenPrefix) &&
-		strings.EqualFold(authz[:len(idTokenPrefix)], idTokenPrefix) {
-		if id := identityFromJWT(strings.TrimSpace(authz[len(idTokenPrefix):])); id != nil {
-			return id
-		}
-	}
 	// authenticate-oidc (browser/cookie) path: full claims in the signed data JWT.
 	if id := identityFromJWT(h.Get(albDataHeader)); id != nil {
 		return id

@@ -17,7 +17,6 @@ const (
 	userinfoHTTPTimeout = 3 * time.Second
 	identityCacheTTL    = 10 * time.Minute
 	oidcDiscoveryPath   = "/.well-known/openid-configuration"
-	albAccessTokenHdr   = "X-Amzn-Oidc-Accesstoken"
 )
 
 // identityEnricher fills in a caller's profile (email, first/last name) by calling
@@ -188,12 +187,14 @@ func mergeClaims(base *common.EnrichedIdentity, c *oidcClaims) *common.EnrichedI
 	return base
 }
 
-// accessTokenFromHeaders returns the caller's access token: the forwarded Bearer
-// token (SDK/JWT path) or the ALB-provided access token (cookie path).
+// accessTokenFromHeaders returns the caller's Bearer access token (SDK/JWT path),
+// which the load balancer has validated. The cookie path is not enriched this way:
+// its forwarded access token is short-lived and already expired by request time, so
+// it relies on the claims the proxy injects into x-amzn-oidc-data instead.
 func accessTokenFromHeaders(h http.Header) string {
 	if authz := h.Get(authorizationHeader); len(authz) > len(bearerPrefix) &&
 		strings.EqualFold(authz[:len(bearerPrefix)], bearerPrefix) {
 		return strings.TrimSpace(authz[len(bearerPrefix):])
 	}
-	return strings.TrimSpace(h.Get(albAccessTokenHdr))
+	return ""
 }
