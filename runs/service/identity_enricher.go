@@ -31,11 +31,11 @@ type identityEnricher struct {
 
 	mu          sync.Mutex
 	userinfoURL string // resolved lazily from OIDC discovery, then cached
-	cache       map[string]cachedIdentity
+	cache       map[string]cachedClaims
 }
 
-type cachedIdentity struct {
-	id      *common.EnrichedIdentity
+type cachedClaims struct {
+	claims  *oidcClaims
 	expires time.Time
 }
 
@@ -49,44 +49,52 @@ func newIdentityEnricher(authServerBaseURL string) *identityEnricher {
 	return &identityEnricher{
 		authServerBaseURL: strings.TrimRight(authServerBaseURL, "/"),
 		httpClient:        &http.Client{Timeout: userinfoHTTPTimeout},
-		cache:             map[string]cachedIdentity{},
+		cache:             map[string]cachedClaims{},
 	}
 }
 
-// enrich augments base with profile claims fetched from userinfo when base lacks
-// them and an access token is available. base is returned unchanged on any miss,
-// cache hit without profile, or error — enrichment never blocks or fails run creation.
+// enrich fills any profile fields (email, first/last name) missing from base with
+// userinfo claims fetched using the access token. Fields already present on base
+// (e.g. from x-amzn-oidc-data) are authoritative and kept. userinfo is queried only
+// when the profile is incomplete and not cached. base is returned unchanged on any
+// miss or error — enrichment never blocks or fails run creation.
 func (e *identityEnricher) enrich(ctx context.Context, accessToken string, base *common.EnrichedIdentity) *common.EnrichedIdentity {
-	if e == nil || base.GetUser() == nil || hasProfile(base) || accessToken == "" {
+	if e == nil || base.GetUser() == nil {
 		return base
 	}
 	subject := base.GetUser().GetId().GetSubject()
+	if subject == "" {
+		return base
+	}
+	// Serve a previously fetched set of claims without another userinfo round-trip.
 	if cached := e.cachedFor(subject); cached != nil {
-		return cached
+		return mergeClaims(base, cached)
+	}
+	if isCompleteProfile(base) || accessToken == "" {
+		return base
 	}
 	claims, err := e.fetchUserinfo(ctx, accessToken)
 	if err != nil {
 		logger.Warnf(ctx, "identity enrichment: userinfo fetch failed for subject %q: %v", subject, err)
 		return base
 	}
-	enriched := mergeClaims(base, claims)
-	e.store(subject, enriched)
-	return enriched
+	e.store(subject, claims)
+	return mergeClaims(base, claims)
 }
 
-func (e *identityEnricher) cachedFor(subject string) *common.EnrichedIdentity {
+func (e *identityEnricher) cachedFor(subject string) *oidcClaims {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	if c, ok := e.cache[subject]; ok && time.Now().Before(c.expires) {
-		return c.id
+		return c.claims
 	}
 	return nil
 }
 
-func (e *identityEnricher) store(subject string, id *common.EnrichedIdentity) {
+func (e *identityEnricher) store(subject string, claims *oidcClaims) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	e.cache[subject] = cachedIdentity{id: id, expires: time.Now().Add(identityCacheTTL)}
+	e.cache[subject] = cachedClaims{claims: claims, expires: time.Now().Add(identityCacheTTL)}
 }
 
 func (e *identityEnricher) fetchUserinfo(ctx context.Context, accessToken string) (*oidcClaims, error) {
@@ -150,23 +158,32 @@ func (e *identityEnricher) resolveUserinfoURL(ctx context.Context) (string, erro
 	return doc.UserinfoEndpoint, nil
 }
 
-// hasProfile reports whether the identity already carries any profile field.
-func hasProfile(id *common.EnrichedIdentity) bool {
+// isCompleteProfile reports whether the identity already carries every profile
+// field, in which case no userinfo lookup is needed.
+func isCompleteProfile(id *common.EnrichedIdentity) bool {
 	s := id.GetUser().GetSpec()
-	return s.GetEmail() != "" || s.GetFirstName() != "" || s.GetLastName() != ""
+	return s.GetFirstName() != "" && s.GetLastName() != "" && s.GetEmail() != ""
 }
 
-// mergeClaims sets base's user spec from the fetched claims when any are present.
+// mergeClaims fills only the profile fields missing from base with the fetched
+// claims; fields already set on base are kept (header-provided values win).
 func mergeClaims(base *common.EnrichedIdentity, c *oidcClaims) *common.EnrichedIdentity {
 	if c == nil || base.GetUser() == nil {
 		return base
 	}
-	if c.Email != "" || c.GivenName != "" || c.FamilyName != "" {
-		base.GetUser().Spec = &common.UserSpec{
-			FirstName: c.GivenName,
-			LastName:  c.FamilyName,
-			Email:     c.Email,
-		}
+	s := base.GetUser().GetSpec()
+	first, last, email := s.GetFirstName(), s.GetLastName(), s.GetEmail()
+	if first == "" {
+		first = c.GivenName
+	}
+	if last == "" {
+		last = c.FamilyName
+	}
+	if email == "" {
+		email = c.Email
+	}
+	if first != "" || last != "" || email != "" {
+		base.GetUser().Spec = &common.UserSpec{FirstName: first, LastName: last, Email: email}
 	}
 	return base
 }

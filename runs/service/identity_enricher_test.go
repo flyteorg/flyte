@@ -57,15 +57,30 @@ func TestEnrich_NoOpCases(t *testing.T) {
 	base := subjectOnlyIdentity("s")
 	assert.Equal(t, base, nilE.enrich(context.Background(), "tok", base))
 
-	// no access token: skip enrichment.
+	// no access token: can't fetch, skip enrichment.
 	e.enrich(context.Background(), "", subjectOnlyIdentity("s"))
 
-	// already has a profile: skip enrichment.
-	withProfile := subjectOnlyIdentity("s")
-	withProfile.GetUser().Spec = &common.UserSpec{Email: "e@x.com"}
-	e.enrich(context.Background(), "tok", withProfile)
+	// already a complete profile: nothing missing, skip enrichment.
+	complete := subjectOnlyIdentity("s")
+	complete.GetUser().Spec = &common.UserSpec{FirstName: "A", LastName: "B", Email: "a@b.com"}
+	e.enrich(context.Background(), "tok", complete)
 
 	assert.Equal(t, int32(0), atomic.LoadInt32(userinfoHits))
+}
+
+func TestEnrich_FillsOnlyMissingFields(t *testing.T) {
+	// userinfo returns names (no email); base already has an email from the cookie header.
+	srv, _ := newTestIdP(t, `{"sub":"00u3","given_name":"Kevin","family_name":"Su"}`, http.StatusOK)
+	e := newIdentityEnricher(srv.URL)
+
+	base := subjectOnlyIdentity("00u3")
+	base.GetUser().Spec = &common.UserSpec{Email: "kevin@union.ai"}
+
+	got := e.enrich(context.Background(), "access-tok", base)
+	spec := got.GetUser().GetSpec()
+	assert.Equal(t, "Kevin", spec.GetFirstName())
+	assert.Equal(t, "Su", spec.GetLastName())
+	assert.Equal(t, "kevin@union.ai", spec.GetEmail()) // header email preserved
 }
 
 func TestEnrich_UserinfoErrorFallsBackToBase(t *testing.T) {
