@@ -28,6 +28,11 @@ spec:
   {{- else if .Values.ingress.ingressClassName }}
   ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
   {{- end }}
+  {{- if .Values.ingress.wellknownIngress.tls }}
+  tls: {{- tpl ( .Values.ingress.wellknownIngress.tls | toYaml ) . | nindent 2 }}
+  {{- else if .Values.ingress.tls }}
+  tls: {{- tpl ( .Values.ingress.tls | toYaml ) . | nindent 2 }}
+  {{- end }}
   rules:
   - http:
       paths:

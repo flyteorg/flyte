@@ -415,6 +415,8 @@ ingress:
     annotations: {}
     # ingressClassName Ingress class for the JWT API ingress. Overrides `ingressClassName`
     ingressClassName: ""
+    # tls Add TLS configuration to the JWT API ingress. Overrides `tls`
+    tls: []
   # wellknownIngress Optional separate ingress for the unauthenticated
   # auth-discovery endpoints (`/.well-known/oauth-authorization-server`,
   # AuthMetadataService, IdentityService, SettingsService) — clients must reach
@@ -428,6 +430,8 @@ ingress:
     annotations: {}
     # ingressClassName Ingress class for the auth-discovery ingress. Overrides `ingressClassName`
     ingressClassName: ""
+    # tls Add TLS configuration to the auth-discovery ingress. Overrides `tls`
+    tls: []
 
 # rbac Configure Kubernetes RBAC for Flyte
 rbac:

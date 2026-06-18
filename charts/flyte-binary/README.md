@@ -153,6 +153,7 @@ Chart for basic single Flyte executable deployment
 | ingress.apiJwtIngress.annotations | object | `{}` |  |
 | ingress.apiJwtIngress.enabled | bool | `false` |  |
 | ingress.apiJwtIngress.ingressClassName | string | `""` |  |
+| ingress.apiJwtIngress.tls | list | `[]` |  |
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |
 | ingress.host | string | `""` |  |
@@ -167,6 +168,7 @@ Chart for basic single Flyte executable deployment
 | ingress.wellknownIngress.annotations | object | `{}` |  |
 | ingress.wellknownIngress.enabled | bool | `false` |  |
 | ingress.wellknownIngress.ingressClassName | string | `""` |  |
+| ingress.wellknownIngress.tls | list | `[]` |  |
 | nameOverride | string | `""` |  |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
