@@ -80,6 +80,11 @@ message BlobType {
     // csv, parquet etc
     string format = 1;
     BlobDimensionality dimensionality = 2;
+
+    // Optional file extension (e.g. "csv", "parquet") appended to the blob filename during flytecopilot download.
+    // Unlike "format", this field is not used for type validation in SDK.
+    // It only controls the local filename when materializing to disk.
+    string file_extension = 3;
 }
 
 // Enables declaring enum types, with predefined string values

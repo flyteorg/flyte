@@ -5147,6 +5147,7 @@
                  * @interface IBlobType
                  * @property {string|null} [format] BlobType format
                  * @property {flyteidl.core.BlobType.BlobDimensionality|null} [dimensionality] BlobType dimensionality
+                 * @property {string|null} [fileExtension] BlobType fileExtension
                  */
     
                 /**
@@ -5181,6 +5182,14 @@
                 BlobType.prototype.dimensionality = 0;
     
                 /**
+                 * BlobType fileExtension.
+                 * @member {string} fileExtension
+                 * @memberof flyteidl.core.BlobType
+                 * @instance
+                 */
+                BlobType.prototype.fileExtension = "";
+    
+                /**
                  * Creates a new BlobType instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.BlobType
@@ -5208,6 +5217,8 @@
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.format);
                     if (message.dimensionality != null && message.hasOwnProperty("dimensionality"))
                         writer.uint32(/* id 2, wireType 0 =*/16).int32(message.dimensionality);
+                    if (message.fileExtension != null && message.hasOwnProperty("fileExtension"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.fileExtension);
                     return writer;
                 };
     
@@ -5234,6 +5245,9 @@
                             break;
                         case 2:
                             message.dimensionality = reader.int32();
+                            break;
+                        case 3:
+                            message.fileExtension = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -5265,6 +5279,9 @@
                         case 1:
                             break;
                         }
+                    if (message.fileExtension != null && message.hasOwnProperty("fileExtension"))
+                        if (!$util.isString(message.fileExtension))
+                            return "fileExtension: string expected";
                     return null;
                 };
     

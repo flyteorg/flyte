@@ -8,6 +8,9 @@ vendor
 
 dist
 gen/pb_python/flyteidl.egg-info/
+gen/pb_python/flyteidl/**/__pycache__/
+pip-wheel-metadata/*.dist-info/
+*.egg-info/
 
 .virtualgo
 docs/build/
