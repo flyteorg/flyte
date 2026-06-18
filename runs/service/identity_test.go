@@ -14,6 +14,21 @@ func jwt(payloadJSON string) string {
 	return enc(`{"alg":"RS256"}`) + "." + enc(payloadJSON) + ".sig"
 }
 
+// jwtPadded builds a JWT whose payload uses padded base64url, as AWS ALB's
+// x-amzn-oidc-data does. The decoder must tolerate the padding.
+func jwtPadded(payloadJSON string) string {
+	enc := func(s string) string { return base64.RawURLEncoding.EncodeToString([]byte(s)) }
+	return enc(`{"alg":"ES256"}`) + "." + base64.URLEncoding.EncodeToString([]byte(payloadJSON)) + ".sig"
+}
+
+func TestIdentityFromJWT_ToleratesPadding(t *testing.T) {
+	id := identityFromJWT(jwtPadded(`{"sub":"00u1","given_name":"Kevin","family_name":"Su","email":"kevin@union.ai"}`))
+	assert.Equal(t, "00u1", id.GetUser().GetId().GetSubject())
+	assert.Equal(t, "Kevin", id.GetUser().GetSpec().GetFirstName())
+	assert.Equal(t, "Su", id.GetUser().GetSpec().GetLastName())
+	assert.Equal(t, "kevin@union.ai", id.GetUser().GetSpec().GetEmail())
+}
+
 func TestIdentityFromHeaders(t *testing.T) {
 	tests := []struct {
 		name                         string

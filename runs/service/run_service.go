@@ -334,7 +334,7 @@ func (s *RunService) CreateRun(
 	executedBy := identityFromHeaders(req.Header())
 	executedBy = s.enricher.enrich(ctx, accessTokenFromHeaders(req.Header()), executedBy)
 
-	// Persist task spec and create run model
+	// Persist task spec and create a run model
 	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec, request.GetSource(), triggerName, triggerTaskName, triggerRevision, triggerType, executedBy)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create run: %v", err)

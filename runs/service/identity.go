@@ -59,7 +59,7 @@ func identityFromJWT(token string) *common.EnrichedIdentity {
 	if len(parts) != 3 {
 		return nil
 	}
-	payload, err := base64.RawURLEncoding.DecodeString(parts[1])
+	payload, err := decodeJWTSegment(parts[1])
 	if err != nil {
 		return nil
 	}
@@ -76,6 +76,20 @@ func identityFromJWT(token string) *common.EnrichedIdentity {
 		}
 	}
 	return id
+}
+
+// decodeJWTSegment base64url-decodes a JWT segment, tolerating both the unpadded
+// form (per the JWT spec) and the padded form some issuers — notably AWS ALB's
+// x-amzn-oidc-data — emit. Without this, a payload whose length isn't a multiple of
+// 4 fails strict RawURLEncoding and the claims (email, name) are silently dropped.
+func decodeJWTSegment(seg string) ([]byte, error) {
+	if b, err := base64.RawURLEncoding.DecodeString(seg); err == nil {
+		return b, nil
+	}
+	if pad := len(seg) % 4; pad != 0 {
+		seg += strings.Repeat("=", 4-pad)
+	}
+	return base64.URLEncoding.DecodeString(seg)
 }
 
 // subjectOnlyIdentity builds a minimal EnrichedIdentity carrying just the subject.
