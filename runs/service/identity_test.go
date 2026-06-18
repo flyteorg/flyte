@@ -8,45 +8,58 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// bearerToken builds a syntactically valid (unsigned) JWT carrying the given sub claim.
-func bearerToken(payloadJSON string) string {
+// jwt builds a syntactically valid (unsigned) JWT carrying the given claims payload.
+func jwt(payloadJSON string) string {
 	enc := func(s string) string { return base64.RawURLEncoding.EncodeToString([]byte(s)) }
-	return "Bearer " + enc(`{"alg":"RS256"}`) + "." + enc(payloadJSON) + ".sig"
+	return enc(`{"alg":"RS256"}`) + "." + enc(payloadJSON) + ".sig"
 }
 
-func TestSubjectFromHeaders(t *testing.T) {
+func TestIdentityFromHeaders(t *testing.T) {
 	tests := []struct {
-		name    string
-		headers map[string]string
-		want    string
+		name                         string
+		headers                      map[string]string
+		wantNil                      bool
+		wantSub, wantFirst, wantLast string
+		wantEmail                    string
 	}{
 		{
-			name:    "amzn oidc identity header (cookie path)",
-			headers: map[string]string{albIdentityHeader: "okta|user-123"},
-			want:    "okta|user-123",
+			name:      "amzn oidc data: full claims (cookie path)",
+			headers:   map[string]string{albDataHeader: jwt(`{"sub":"00u123","given_name":"Carina","family_name":"Didilescu","email":"carina@union.ai"}`)},
+			wantSub:   "00u123",
+			wantFirst: "Carina",
+			wantLast:  "Didilescu",
+			wantEmail: "carina@union.ai",
 		},
 		{
-			name:    "amzn oidc identity header is trimmed",
-			headers: map[string]string{albIdentityHeader: "  user-456  "},
-			want:    "user-456",
+			name:      "amzn oidc data: subject + email only (no profile scope)",
+			headers:   map[string]string{albDataHeader: jwt(`{"sub":"00u999","email":"a@b.com"}`)},
+			wantSub:   "00u999",
+			wantEmail: "a@b.com",
 		},
 		{
-			name:    "bearer token sub claim (jwt path)",
-			headers: map[string]string{authorizationHeader: bearerToken(`{"sub":"sdk-user-789","email":"a@b.com"}`)},
-			want:    "sdk-user-789",
+			name:    "amzn oidc identity header fallback (subject only)",
+			headers: map[string]string{albIdentityHeader: "okta|sub-only"},
+			wantSub: "okta|sub-only",
 		},
 		{
-			name: "amzn header takes precedence over bearer",
+			name:      "bearer token claims (SDK path)",
+			headers:   map[string]string{authorizationHeader: "Bearer " + jwt(`{"sub":"sdk-user","given_name":"Dev","email":"dev@union.ai"}`)},
+			wantSub:   "sdk-user",
+			wantFirst: "Dev",
+			wantEmail: "dev@union.ai",
+		},
+		{
+			name: "data header takes precedence over bearer",
 			headers: map[string]string{
-				albIdentityHeader:   "cookie-user",
-				authorizationHeader: bearerToken(`{"sub":"bearer-user"}`),
+				albDataHeader:       jwt(`{"sub":"cookie-user"}`),
+				authorizationHeader: "Bearer " + jwt(`{"sub":"bearer-user"}`),
 			},
-			want: "cookie-user",
+			wantSub: "cookie-user",
 		},
-		{name: "no auth headers", headers: map[string]string{}, want: ""},
-		{name: "non-bearer authorization", headers: map[string]string{authorizationHeader: "Basic abc"}, want: ""},
-		{name: "malformed bearer (two segments)", headers: map[string]string{authorizationHeader: "Bearer a.b"}, want: ""},
-		{name: "bearer without sub", headers: map[string]string{authorizationHeader: bearerToken(`{"email":"a@b.com"}`)}, want: ""},
+		{name: "no auth headers", headers: map[string]string{}, wantNil: true},
+		{name: "non-bearer authorization", headers: map[string]string{authorizationHeader: "Basic abc"}, wantNil: true},
+		{name: "malformed jwt (two segments)", headers: map[string]string{albDataHeader: "a.b"}, wantNil: true},
+		{name: "jwt without sub", headers: map[string]string{albDataHeader: jwt(`{"email":"a@b.com"}`)}, wantNil: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -54,7 +67,15 @@ func TestSubjectFromHeaders(t *testing.T) {
 			for k, v := range tt.headers {
 				h.Set(k, v)
 			}
-			assert.Equal(t, tt.want, subjectFromHeaders(h))
+			id := identityFromHeaders(h)
+			if tt.wantNil {
+				assert.Nil(t, id)
+				return
+			}
+			assert.Equal(t, tt.wantSub, id.GetUser().GetId().GetSubject())
+			assert.Equal(t, tt.wantFirst, id.GetUser().GetSpec().GetFirstName())
+			assert.Equal(t, tt.wantLast, id.GetUser().GetSpec().GetLastName())
+			assert.Equal(t, tt.wantEmail, id.GetUser().GetSpec().GetEmail())
 		})
 	}
 }
@@ -64,4 +85,7 @@ func TestSubjectOnlyIdentity(t *testing.T) {
 
 	id := subjectOnlyIdentity("user-123")
 	assert.Equal(t, "user-123", id.GetUser().GetId().GetSubject())
+	assert.Nil(t, id.GetUser().GetSpec())
+	assert.Equal(t, "user-123", identitySubject(id))
+	assert.Equal(t, "", identitySubject(nil))
 }
