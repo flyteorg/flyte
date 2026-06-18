@@ -836,6 +836,8 @@ func (m *RunSpec) validate(all bool) error {
 
 	// no validation rules for MaxActionConcurrency
 
+	// no validation rules for RunBaseDir
+
 	switch v := m.NotificationSettings.(type) {
 	case *RunSpec_NotificationRuleName:
 		if v == nil {

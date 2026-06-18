@@ -117,6 +117,14 @@ message RunSpec {
   // queue-level concurrency limits (min wins): actions beyond the limit stay
   // queued until a running action of this run completes.
   uint32 max_action_concurrency = 13;
+
+  // Base directory under which the run's metadata (inputs.pb, per-action
+  // outputs.pb, action metadata) is written. When set, it overrides the
+  // org/project/domain settings default and the dataplane cluster default.
+  // Leave empty to fall back to settings, then to the cluster default.
+  // Distinct from raw_data_storage.raw_data_prefix, which controls offloaded
+  // blob (user data) layout.
+  string run_base_dir = 14;
 }
 
 message InlineRuleList {

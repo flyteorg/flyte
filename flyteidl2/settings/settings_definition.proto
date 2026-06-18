@@ -161,6 +161,7 @@ message SecuritySettings {
 // StorageSettings controls data storage configuration.
 message StorageSettings {
   StringSetting raw_data_path = 1 [(flyteidl2.settings.desc) = "Base path for raw data storage (e.g. s3://my-bucket/prefix)"];
+  StringSetting run_base_dir = 2 [(flyteidl2.settings.desc) = "Base directory for run metadata such as inputs/outputs (e.g. s3://my-bucket/prefix)"];
 }
 
 // TaskResourceDefaults holds resource quantity settings for a single bound

@@ -132,10 +132,12 @@ class SecuritySettings(_message.Message):
     def __init__(self, service_account: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
 
 class StorageSettings(_message.Message):
-    __slots__ = ["raw_data_path"]
+    __slots__ = ["raw_data_path", "run_base_dir"]
     RAW_DATA_PATH_FIELD_NUMBER: _ClassVar[int]
+    RUN_BASE_DIR_FIELD_NUMBER: _ClassVar[int]
     raw_data_path: StringSetting
-    def __init__(self, raw_data_path: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
+    run_base_dir: StringSetting
+    def __init__(self, raw_data_path: _Optional[_Union[StringSetting, _Mapping]] = ..., run_base_dir: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
 
 class TaskResourceDefaults(_message.Message):
     __slots__ = ["cpu", "gpu", "memory", "storage"]
