@@ -53,8 +53,9 @@ type Action struct {
 	RunSource string `db:"run_source" json:"run_source,omitempty"`
 
 	// CreatedBy is the OIDC subject of the identity that created this run, captured
-	// from the auth headers the load balancer forwards. Kept for querying/filtering.
-	// NULL for runs created without an authenticated identity.
+	// from the auth headers the load balancer forwards. NULL for runs created without
+	// an authenticated identity. Not exposed for API-level filtering/sorting — it is
+	// intentionally absent from ActionColumnsSet; add it there only if that's desired.
 	CreatedBy sql.NullString `db:"created_by" json:"created_by,omitempty"`
 
 	// ExecutedBy is the serialized common.EnrichedIdentity of the run's creator

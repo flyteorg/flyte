@@ -55,8 +55,10 @@ func newIdentityEnricher(authServerBaseURL string) *identityEnricher {
 // enrich fills any profile fields (email, first/last name) missing from base with
 // userinfo claims fetched using the access token. Fields already present on base
 // (e.g. from x-amzn-oidc-data) are authoritative and kept. userinfo is queried only
-// when the profile is incomplete and not cached. base is returned unchanged on any
-// miss or error — enrichment never blocks or fails run creation.
+// when the profile is incomplete and not cached. On a cache miss it makes a
+// synchronous userinfo call (bounded by userinfoHTTPTimeout), which adds latency to
+// run creation; on any error or timeout it returns base unchanged — enrichment is
+// best-effort and never fails run creation.
 func (e *identityEnricher) enrich(ctx context.Context, accessToken string, base *common.EnrichedIdentity) *common.EnrichedIdentity {
 	if e == nil || base.GetUser() == nil {
 		return base
@@ -77,6 +79,12 @@ func (e *identityEnricher) enrich(ctx context.Context, accessToken string, base 
 		logger.Warnf(ctx, "identity enrichment: userinfo fetch failed for subject %q: %v", subject, err)
 		return base
 	}
+	// Guard against token confusion / IdP misconfiguration: never associate a profile
+	// fetched for a different subject with this run.
+	if claims.Sub != "" && claims.Sub != subject {
+		logger.Warnf(ctx, "identity enrichment: userinfo subject %q does not match caller %q; ignoring", claims.Sub, subject)
+		return base
+	}
 	e.store(subject, claims)
 	return mergeClaims(base, claims)
 }
@@ -84,15 +92,28 @@ func (e *identityEnricher) enrich(ctx context.Context, accessToken string, base 
 func (e *identityEnricher) cachedFor(subject string) *oidcClaims {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	if c, ok := e.cache[subject]; ok && time.Now().Before(c.expires) {
-		return c.claims
+	c, ok := e.cache[subject]
+	if !ok {
+		return nil
 	}
-	return nil
+	if time.Now().After(c.expires) {
+		// Drop the stale entry so the map does not accumulate dead keys.
+		delete(e.cache, subject)
+		return nil
+	}
+	return c.claims
 }
 
 func (e *identityEnricher) store(subject string, claims *oidcClaims) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
+	// Opportunistically evict any other expired entries to bound the map size.
+	now := time.Now()
+	for k, c := range e.cache {
+		if now.After(c.expires) {
+			delete(e.cache, k)
+		}
+	}
 	e.cache[subject] = cachedClaims{claims: claims, expires: time.Now().Add(identityCacheTTL)}
 }
 

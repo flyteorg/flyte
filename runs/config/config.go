@@ -32,6 +32,9 @@ var defaultConfig = &Config{
 		ExecutionQPS:          10.0,
 		ExecutionBurst:        20,
 	},
+	// Defaults on: the runs service is designed to sit behind an auth proxy/LB. Set
+	// false for deployments where that guarantee does not hold.
+	TrustForwardedIdentityHeaders: true,
 }
 
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
@@ -68,6 +71,17 @@ type Config struct {
 	// AuthMetadata configures the OAuth2 authorization-server metadata endpoint
 	// (the GetOAuth2Metadata RPC and /.well-known/oauth-authorization-server).
 	AuthMetadata AuthMetadataConfig `json:"authMetadata"`
+
+	// TrustForwardedIdentityHeaders controls whether run attribution (executed_by)
+	// is derived from the auth headers the proxy forwards (X-Amzn-Oidc-*, Authorization).
+	// Those JWTs are decoded but NOT signature-verified here — that is safe only when
+	// the service sits behind a trusted proxy/LB that validates tokens and strips any
+	// client-supplied copies of these headers. Set to false if the service can be
+	// reached directly or through an untrusted proxy, in which case executed_by is left
+	// unset rather than risk a spoofed identity. (Note: the runs service performs no
+	// authorization itself, so a direct caller can already act unauthenticated — this
+	// flag only governs whether to trust the forwarded identity for attribution.)
+	TrustForwardedIdentityHeaders bool `json:"trustForwardedIdentityHeaders" pflag:",Derive executed_by from proxy-forwarded auth headers (requires a trusted proxy)"`
 }
 
 // AuthMetadataConfig controls how the runs service serves OAuth2 authorization

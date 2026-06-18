@@ -83,6 +83,16 @@ func TestEnrich_FillsOnlyMissingFields(t *testing.T) {
 	assert.Equal(t, "kevin@union.ai", spec.GetEmail()) // header email preserved
 }
 
+func TestEnrich_RejectsSubjectMismatch(t *testing.T) {
+	// userinfo returns a different subject than the caller — must not be trusted.
+	srv, _ := newTestIdP(t, `{"sub":"someone-else","email":"evil@x.com","given_name":"Mallory"}`, http.StatusOK)
+	e := newIdentityEnricher(srv.URL)
+
+	got := e.enrich(context.Background(), "access-tok", subjectOnlyIdentity("00u2"))
+	assert.Nil(t, got.GetUser().GetSpec())
+	assert.Equal(t, "00u2", got.GetUser().GetId().GetSubject())
+}
+
 func TestEnrich_UserinfoErrorFallsBackToBase(t *testing.T) {
 	srv, _ := newTestIdP(t, `nope`, http.StatusUnauthorized)
 	e := newIdentityEnricher(srv.URL)

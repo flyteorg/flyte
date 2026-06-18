@@ -47,6 +47,8 @@ type RunService struct {
 	dataStore       *storage.DataStore
 	abortReconciler *AbortReconciler
 	enricher        *identityEnricher
+	// trustHeaders gates deriving executed_by from proxy-forwarded auth headers.
+	trustHeaders bool
 }
 
 type actionDataClient interface {
@@ -154,6 +156,7 @@ func NewRunService(
 	dataStore *storage.DataStore,
 	reconciler *AbortReconciler,
 	authServerBaseURL string,
+	trustForwardedIdentityHeaders bool,
 ) *RunService {
 	return &RunService{
 		repo:            repo,
@@ -164,6 +167,7 @@ func NewRunService(
 		dataStore:       dataStore,
 		abortReconciler: reconciler,
 		enricher:        newIdentityEnricher(authServerBaseURL),
+		trustHeaders:    trustForwardedIdentityHeaders,
 	}
 }
 
@@ -331,8 +335,13 @@ func (s *RunService) CreateRun(
 	// Capture who created the run from the auth headers the load balancer forwards
 	// (it enforces auth upstream). nil when there is no authenticated identity. On the
 	// Bearer path the token carries only the subject, so enrich name/email via userinfo.
-	executedBy := identityFromHeaders(req.Header())
-	executedBy = s.enricher.enrich(ctx, accessTokenFromHeaders(req.Header()), executedBy)
+	// Only trust the proxy-forwarded identity headers when configured to (the JWTs are
+	// decoded, not signature-verified — see Config.TrustForwardedIdentityHeaders).
+	var executedBy *common.EnrichedIdentity
+	if s.trustHeaders {
+		executedBy = identityFromHeaders(req.Header())
+		executedBy = s.enricher.enrich(ctx, accessTokenFromHeaders(req.Header()), executedBy)
+	}
 
 	// Persist task spec and create a run model
 	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec, request.GetSource(), triggerName, triggerTaskName, triggerRevision, triggerType, executedBy)
