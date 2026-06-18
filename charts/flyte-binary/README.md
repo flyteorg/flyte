@@ -73,7 +73,6 @@ Chart for basic single Flyte executable deployment
 | configuration.storage.providerConfig.s3.region | string | `"us-east-1"` |  |
 | configuration.storage.providerConfig.s3.secretKey | string | `""` |  |
 | configuration.storage.providerConfig.s3.v2Signing | bool | `false` |  |
-| configuration.storage.userDataContainer | string | `"my-organization-flyte-container"` |  |
 | console.affinity | object | `{}` |  |
 | console.basePath | string | `"/v2"` |  |
 | console.containerPort | int | `8080` |  |
@@ -148,7 +147,6 @@ Chart for basic single Flyte executable deployment
 | flyte-core-components.secret.kubernetes.namespace | string | `"flyte"` |  |
 | flyte-core-components.secret.kubernetes.qps | int | `100` |  |
 | flyte-core-components.secret.kubernetes.timeout | string | `"30s"` |  |
-| flyteconnector.enabled | bool | `false` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.apiJwtIngress.annotations | object | `{}` |  |
 | ingress.apiJwtIngress.enabled | bool | `false` |  |
