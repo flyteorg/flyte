@@ -81,5 +81,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "authMetadata.flyteClient.redirectUri"), defaultConfig.AuthMetadata.FlyteClient.RedirectURI, "Redirect URI for the public client login flow")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "authMetadata.flyteClient.scopes"), defaultConfig.AuthMetadata.FlyteClient.Scopes, "Scopes the public client should request")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "authMetadata.flyteClient.audience"), defaultConfig.AuthMetadata.FlyteClient.Audience, "Audience for requested tokens")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "trustForwardedIdentityHeaders"), defaultConfig.TrustForwardedIdentityHeaders, "Derive executed_by from proxy-forwarded auth headers (requires a trusted proxy)")
 	return cmdFlags
 }
