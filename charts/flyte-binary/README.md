@@ -11,20 +11,6 @@ Chart for basic single Flyte executable deployment
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
 | configuration.annotations | object | `{}` |  |
-| configuration.auth.authorizedUris | list | `[]` |  |
-| configuration.auth.clientSecretsExternalSecretRef | string | `""` |  |
-| configuration.auth.enableAuthServer | bool | `true` |  |
-| configuration.auth.enabled | bool | `false` |  |
-| configuration.auth.flyteClient.audience | string | `""` |  |
-| configuration.auth.flyteClient.clientId | string | `"flytectl"` |  |
-| configuration.auth.flyteClient.redirectUri | string | `"http://localhost:53593/callback"` |  |
-| configuration.auth.flyteClient.scopes[0] | string | `"all"` |  |
-| configuration.auth.internal.clientId | string | `"flytemanager"` |  |
-| configuration.auth.internal.clientSecret | string | `""` |  |
-| configuration.auth.internal.clientSecretHash | string | `""` |  |
-| configuration.auth.oidc.baseUrl | string | `""` |  |
-| configuration.auth.oidc.clientId | string | `""` |  |
-| configuration.auth.oidc.clientSecret | string | `""` |  |
 | configuration.co-pilot.image.repository | string | `"cr.flyte.org/flyteorg/flytecopilot"` |  |
 | configuration.co-pilot.image.tag | string | `"v1.16.4"` |  |
 | configuration.connectorService.defaultConnector.defaultTimeout | string | `"10s"` |  |
@@ -73,7 +59,6 @@ Chart for basic single Flyte executable deployment
 | configuration.storage.providerConfig.s3.region | string | `"us-east-1"` |  |
 | configuration.storage.providerConfig.s3.secretKey | string | `""` |  |
 | configuration.storage.providerConfig.s3.v2Signing | bool | `false` |  |
-| configuration.storage.userDataContainer | string | `"my-organization-flyte-container"` |  |
 | console.affinity | object | `{}` |  |
 | console.basePath | string | `"/v2"` |  |
 | console.containerPort | int | `8080` |  |
@@ -148,7 +133,6 @@ Chart for basic single Flyte executable deployment
 | flyte-core-components.secret.kubernetes.namespace | string | `"flyte"` |  |
 | flyte-core-components.secret.kubernetes.qps | int | `100` |  |
 | flyte-core-components.secret.kubernetes.timeout | string | `"30s"` |  |
-| flyteconnector.enabled | bool | `false` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.apiJwtIngress.annotations | object | `{}` |  |
 | ingress.apiJwtIngress.enabled | bool | `false` |  |
