@@ -2281,3 +2281,79 @@ func TestGetCompletionTime_WrongResourceType(t *testing.T) {
 	assert.True(t, result.IsZero())
 	assert.Contains(t, err.Error(), "unexpected resource type")
 }
+
+func TestBuildAutoscalerOptions(t *testing.T) {
+	t.Run("nil input returns nil", func(t *testing.T) {
+		assert.Nil(t, buildAutoscalerOptions(nil))
+	})
+
+	t.Run("idle timeout propagated", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{IdleTimeoutSeconds: 30})
+		require.NotNil(t, result)
+		require.NotNil(t, result.IdleTimeoutSeconds)
+		assert.Equal(t, int32(30), *result.IdleTimeoutSeconds)
+	})
+
+	t.Run("upscaling mode set when non-empty", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{UpscalingMode: plugins.AutoscalerOptions_UPSCALING_MODE_CONSERVATIVE})
+		require.NotNil(t, result)
+		require.NotNil(t, result.UpscalingMode)
+		assert.Equal(t, rayv1.UpscalingMode("Conservative"), *result.UpscalingMode)
+	})
+
+	t.Run("upscaling mode nil when empty", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{UpscalingMode: plugins.AutoscalerOptions_UPSCALING_MODE_UNSPECIFIED})
+		require.NotNil(t, result)
+		assert.Nil(t, result.UpscalingMode)
+	})
+
+	t.Run("image set when non-empty", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{Image: "my-image:latest"})
+		require.NotNil(t, result)
+		require.NotNil(t, result.Image)
+		assert.Equal(t, "my-image:latest", *result.Image)
+	})
+
+	t.Run("idle timeout zero should not be set", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{})
+		require.NotNil(t, result)
+		assert.Nil(t, result.IdleTimeoutSeconds)
+	})
+
+	t.Run("image nil when empty", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{Image: ""})
+		require.NotNil(t, result)
+		assert.Nil(t, result.Image)
+	})
+
+	t.Run("resources requests and limits converted", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{
+			Resources: &core.Resources{
+				Requests: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "250m"},
+					{Name: core.Resources_MEMORY, Value: "512Mi"},
+				},
+				Limits: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "1"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
+				},
+			},
+		})
+		require.NotNil(t, result)
+		require.NotNil(t, result.Resources)
+		assert.Equal(t, resource.MustParse("250m"), result.Resources.Requests[corev1.ResourceCPU])
+		assert.Equal(t, resource.MustParse("512Mi"), result.Resources.Requests[corev1.ResourceMemory])
+		assert.Equal(t, resource.MustParse("1"), result.Resources.Limits[corev1.ResourceCPU])
+		assert.Equal(t, resource.MustParse("1Gi"), result.Resources.Limits[corev1.ResourceMemory])
+	})
+
+	t.Run("env literal value", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{
+			Env: []*core.KeyValuePair{{Key: "FOO", Value: "bar"}},
+		})
+		require.NotNil(t, result)
+		require.Len(t, result.Env, 1)
+		assert.Equal(t, "FOO", result.Env[0].Name)
+		assert.Equal(t, "bar", result.Env[0].Value)
+	})
+}
