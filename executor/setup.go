@@ -135,7 +135,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	setupCtx := plugin.NewSetupContext(
-		mgr, nil, plugin.NewNoopResourceRegistrar(), nil, nil,
+		mgr, plugin.NewNoopSecretManager(), plugin.NewNoopResourceRegistrar(), nil, nil,
 		"TaskAction",
 		executorScope.NewSubScope("plugin"),
 	)
@@ -187,6 +187,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	// types that declare ResourceQuotas. It grants every allocation by default, matching
 	// FlytePropeller with no quota backend. Swap in a real one to enforce quotas.
 	reconciler.ResourceManager = plugin.NewNoopResourceManager()
+	// Supply a SecretManager so connector tasks that reference secrets do not nil-deref at execution
+	// time. It has no backend and fails lookups with a clear error. Swap in a real one to resolve
+	// secrets.
+	reconciler.SecretManager = plugin.NewNoopSecretManager()
 	if cfg.MaxSystemFailures < 0 {
 		return fmt.Errorf("executor: maxSystemFailures must be non-negative, got %d", cfg.MaxSystemFailures)
 	}
