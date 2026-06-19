@@ -573,10 +573,6 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	if err != nil {
 		return nil, err
 	}
-	// Run the app pod under the app's requested service account, falling back to the
-	// configured default. Without this the Knative pod uses the namespace's `default`
-	// SA, which (unlike the flyte SA) has no IRSA role — so the pod gets no cloud
-	// credentials/region and fails to read its code bundle from object storage.
 	if sa := spec.GetSecurityContext().GetRunAs().GetK8SServiceAccount(); sa != "" {
 		podSpec.ServiceAccountName = sa
 	} else if c.cfg.DefaultServiceAccount != "" {
