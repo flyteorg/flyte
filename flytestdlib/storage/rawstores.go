@@ -65,10 +65,10 @@ type dataStoreMetrics struct {
 // newDataStoreMetrics initialises all metrics required for DataStore
 func newDataStoreMetrics(scope promutils.Scope) *dataStoreMetrics {
 	return &dataStoreMetrics{
-		cacheMetrics: newCacheMetrics(scope),
-		protoMetrics: newProtoMetrics(scope),
+		cacheMetrics: newCacheMetrics(scope.NewSubScope("cache")),
+		protoMetrics: newProtoMetrics(scope.NewSubScope("proto")),
 		copyMetrics:  newCopyMetrics(scope.NewSubScope("copy")),
-		stowMetrics:  newStowMetrics(scope),
+		stowMetrics:  newStowMetrics(scope.NewSubScope("stow")),
 	}
 }
 
