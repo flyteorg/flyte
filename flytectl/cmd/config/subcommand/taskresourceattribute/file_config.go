@@ -14,6 +14,8 @@ type TaskResourceAttrFileConfig struct {
 	*admin.TaskResourceAttributes
 }
 
+var DefaultTaskResourceAttrFileConfig = &TaskResourceAttrFileConfig{}
+
 // Decorate decorator over TaskResourceAttributes.
 func (t TaskResourceAttrFileConfig) Decorate() *admin.MatchingAttributes {
 	return &admin.MatchingAttributes{
