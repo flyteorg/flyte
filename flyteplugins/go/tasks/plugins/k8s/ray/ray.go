@@ -25,6 +25,7 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
@@ -830,7 +831,20 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		return pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "cluster is suspended", info), nil
 	case rayv1.JobDeploymentStatusFailed:
 		failInfo := fmt.Sprintf("Failed to run Ray job %s with error: [%s] %s", rayJob.Name, rayJob.Status.Reason, rayJob.Status.Message)
+		// Honor a RECOVERABLE error.pb (written by pyflyte-execute when user code raises
+		// FlyteRecoverableException) so the task's retries fire. A failed RayJob surfaces here as a
+		// terminal phase, so -- unlike the success path -- the k8s plugin manager never reads the
+		// error file on our behalf. Default to a terminal failure if the error file is absent or
+		// unreadable, preserving the previous behavior.
 		phaseInfo, err = pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, failInfo, info), nil
+		if ow := pluginContext.OutputWriter(); ow != nil {
+			reader := ioutils.NewRemoteFileOutputReader(ctx, pluginContext.DataStore(), ow, 0)
+			if hasErr, readerErr := reader.IsError(ctx); readerErr == nil && hasErr {
+				if execErr, readerErr := reader.ReadError(ctx); readerErr == nil && execErr.IsRecoverable {
+					phaseInfo = pluginsCore.PhaseInfoRetryableFailure(flyteerr.TaskFailedWithError, failInfo, info)
+				}
+			}
+		}
 	default:
 		// We already handle all known deployment status, so this should never happen unless a future version of ray
 		// introduced a new job status.
