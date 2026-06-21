@@ -39863,11 +39863,13 @@
              * @enum {string}
              * @property {number} INACTIVE=0 INACTIVE value
              * @property {number} ACTIVE=1 ACTIVE value
+             * @property {number} ARCHIVED=2 ARCHIVED value
              */
             admin.LaunchPlanState = (function() {
                 var valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "INACTIVE"] = 0;
                 values[valuesById[1] = "ACTIVE"] = 1;
+                values[valuesById[2] = "ARCHIVED"] = 2;
                 return values;
             })();
     
@@ -41050,6 +41052,7 @@
                             return "state: enum value expected";
                         case 0:
                         case 1:
+                        case 2:
                             break;
                         }
                     if (message.expectedInputs != null && message.hasOwnProperty("expectedInputs")) {
@@ -41362,6 +41365,7 @@
                             return "state: enum value expected";
                         case 0:
                         case 1:
+                        case 2:
                             break;
                         }
                     return null;

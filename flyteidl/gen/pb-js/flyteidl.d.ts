@@ -16389,7 +16389,8 @@ export namespace flyteidl {
         /** LaunchPlanState enum. */
         enum LaunchPlanState {
             INACTIVE = 0,
-            ACTIVE = 1
+            ACTIVE = 1,
+            ARCHIVED = 2
         }
 
         /** Properties of a LaunchPlan. */
