@@ -133,3 +133,58 @@ func TestRoutingStore_ConcurrentFirstUseDialsOnce(t *testing.T) {
 
 	assert.Equal(t, int32(1), atomic.LoadInt32(counts["bar"]))
 }
+
+// newTestRedisRoutingStore builds a routingStore whose only registered factory is a counting redis
+// factory, with the given cfg. The primary is an unrelated fake store.
+func newTestRedisRoutingStore(t *testing.T, cfg *Config) (*routingStore, *int32) {
+	t.Helper()
+	metrics := newDataStoreMetrics(promutils.NewTestScope())
+	var count int32
+	registry := map[string]backendFactory{
+		TypeRedis: func(_ context.Context, scheme string, _ DataReference, _ *Config, _ *http.Client, m *dataStoreMetrics) (RawStore, error) {
+			atomic.AddInt32(&count, 1)
+			fs := &fakeRawStore{scheme: scheme}
+			fs.copyImpl = newCopyImpl(fs, m.copyMetrics)
+			return fs, nil
+		},
+	}
+	primary := &fakeRawStore{scheme: TypeMemory}
+	primary.copyImpl = newCopyImpl(primary, metrics.copyMetrics)
+	rs := &routingStore{
+		cfg:          cfg,
+		metrics:      metrics,
+		registry:     registry,
+		primary:      TypeMemory,
+		primaryStore: primary,
+	}
+	rs.live.Store(TypeMemory, primary)
+	rs.copyImpl = newCopyImpl(rs, metrics.copyMetrics)
+	return rs, &count
+}
+
+func TestRoutingStore_RedisKeyedByHostWithoutAddr(t *testing.T) {
+	rs, count := newTestRedisRoutingStore(t, &Config{}) // no configured redis address
+
+	// Distinct hosts must dial distinct backends (not silently reuse the first one).
+	for _, ref := range []DataReference{"redis://hostA:6379/k", "redis://hostB:6379/k"} {
+		_, err := rs.Head(context.TODO(), ref)
+		require.NoError(t, err)
+	}
+	assert.Equal(t, int32(2), atomic.LoadInt32(count))
+
+	// The same host is memoized — no additional dial.
+	_, err := rs.Head(context.TODO(), "redis://hostA:6379/other")
+	require.NoError(t, err)
+	assert.Equal(t, int32(2), atomic.LoadInt32(count))
+}
+
+func TestRoutingStore_RedisSharedWhenAddrConfigured(t *testing.T) {
+	rs, count := newTestRedisRoutingStore(t, &Config{Redis: RedisConfig{Addr: "configured:6379"}})
+
+	// With an authoritative configured address, distinct reference hosts share one backend.
+	for _, ref := range []DataReference{"redis://hostA:6379/k", "redis://hostB:6379/k"} {
+		_, err := rs.Head(context.TODO(), ref)
+		require.NoError(t, err)
+	}
+	assert.Equal(t, int32(1), atomic.LoadInt32(count))
+}

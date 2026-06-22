@@ -726,6 +726,31 @@ func TestStowStore_fQNFn(t *testing.T) {
 	assert.Equal(t, DataReference("file://bucket"), fQNFn[local.Kind]("bucket"))
 }
 
+func TestPrimarySchemeForConfig(t *testing.T) {
+	t.Run("built-in stow kind", func(t *testing.T) {
+		scheme, err := primarySchemeForConfig(&Config{Type: TypeStow, Stow: StowConfig{Kind: google.Kind}})
+		assert.NoError(t, err)
+		assert.Equal(t, "gs", scheme)
+	})
+
+	t.Run("custom kind derives scheme from registered fQNFn", func(t *testing.T) {
+		const kind = "test-custom-primary-kind"
+		assert.NoError(t, RegisterStowKind(kind, func(bucket string) DataReference {
+			return DataReference("tcpk://" + bucket)
+		}))
+		// kindToScheme has no entry for this kind, so the scheme must be derived from fQNFn — this is
+		// what lets an out-of-tree RegisterStowKind backend serve as the primary store.
+		scheme, err := primarySchemeForConfig(&Config{Type: TypeStow, Stow: StowConfig{Kind: kind}})
+		assert.NoError(t, err)
+		assert.Equal(t, "tcpk", scheme)
+	})
+
+	t.Run("unknown kind errors", func(t *testing.T) {
+		_, err := primarySchemeForConfig(&Config{Type: TypeStow, Stow: StowConfig{Kind: "no-such-kind"}})
+		assert.Error(t, err)
+	})
+}
+
 func TestStowStore_Delete(t *testing.T) {
 	const container = "container"
 

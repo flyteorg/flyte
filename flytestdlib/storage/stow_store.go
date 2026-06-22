@@ -65,11 +65,18 @@ func primarySchemeForConfig(cfg *Config) (string, error) {
 			// newStowRawStore defaults a missing stow kind to s3 for legacy connection configs.
 			kind = s3.Kind
 		}
-		scheme, ok := kindToScheme[kind]
-		if !ok {
-			return "", fmt.Errorf("no scheme registered for stow kind [%v]", kind)
+		if scheme, ok := kindToScheme[kind]; ok {
+			return scheme, nil
 		}
-		return scheme, nil
+		// kindToScheme only covers built-in kinds. For an out-of-tree kind registered via
+		// RegisterStowKind, derive the scheme from its registered fQNFn (e.g. "myscheme://" -> the
+		// fQNFn yields a "myscheme://..." reference) so it can serve as the primary backend too.
+		if fn, ok := fQNFn[kind]; ok {
+			if scheme, _, _, err := fn("").Split(); err == nil && scheme != "" {
+				return scheme, nil
+			}
+		}
+		return "", fmt.Errorf("no scheme registered for stow kind [%v]", kind)
 	default:
 		return "", fmt.Errorf("type is of an invalid value [%v]", cfg.Type)
 	}
@@ -90,6 +97,10 @@ var kindToScheme = map[string]string{
 // RegisterStowScheme associates a URL scheme with a stow kind so the DataStore can lazily dial it
 // when a reference with that scheme is encountered. Pair it with RegisterStowKind to teach
 // flytestdlib about an out-of-tree stow backend.
+//
+// It mutates a package-level map that is read without locking whenever a DataStore routes or dials a
+// backend, so it MUST be called at init time, before any DataStore is constructed or used. This
+// matches the contract of RegisterStowKind.
 func RegisterStowScheme(scheme, kind string) error {
 	if existing, ok := schemeToStowKind[scheme]; ok && existing != kind {
 		return fmt.Errorf("scheme [%v] already registered to kind [%v]", scheme, existing)
@@ -141,7 +152,9 @@ var fQNFn = map[string]func(string) DataReference{
 	},
 }
 
-// RegisterStowKind registers a new kind of stow store.
+// RegisterStowKind registers a new kind of stow store. It mutates a package-level map read without
+// locking during store construction, so it MUST be called at init time, before any DataStore is
+// constructed or used.
 func RegisterStowKind(kind string, f func(string) DataReference) error {
 	if _, ok := fQNFn[kind]; ok {
 		return fmt.Errorf("kind [%v] already registered", kind)

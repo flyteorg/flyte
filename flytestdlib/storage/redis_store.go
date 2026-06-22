@@ -314,3 +314,15 @@ func redisFactory(_ context.Context, _ string, ref DataReference, cfg *Config, _
 
 	return buildRedisStore(redisCfg, metrics), nil
 }
+
+// redisAddrConfigured reports whether a redis address is configured, meaning redisFactory will NOT
+// fall back to the reference host. It mirrors the address-resolution precedence in redisFactory. The
+// routing store uses this to decide whether redis backends can be memoized per scheme (configured
+// addr: one authoritative server) or must be memoized per host (no addr: each reference host is its
+// own server).
+func redisAddrConfigured(cfg *Config) bool {
+	if rc := cfg.Schemes[TypeRedis].Redis; rc != nil {
+		return rc.Addr != ""
+	}
+	return cfg.Redis.Addr != ""
+}

@@ -55,14 +55,15 @@ func (s *routingStore) storeFor(ctx context.Context, reference DataReference) (R
 }
 
 func (s *routingStore) getOrCreate(ctx context.Context, scheme string, reference DataReference) (RawStore, error) {
-	if v, ok := s.live.Load(scheme); ok {
+	key := s.cacheKey(scheme, reference)
+	if v, ok := s.live.Load(key); ok {
 		return v.(RawStore), nil
 	}
 
-	// Serialize creation so a scheme is dialed at most once even under concurrent first references.
+	// Serialize creation so a backend is dialed at most once even under concurrent first references.
 	s.createMu.Lock()
 	defer s.createMu.Unlock()
-	if v, ok := s.live.Load(scheme); ok {
+	if v, ok := s.live.Load(key); ok {
 		return v.(RawStore), nil
 	}
 
@@ -76,8 +77,24 @@ func (s *routingStore) getOrCreate(ctx context.Context, scheme string, reference
 		return nil, err
 	}
 
-	s.live.Store(scheme, store)
+	s.live.Store(key, store)
 	return store, nil
+}
+
+// cacheKey returns the live-map key for the backend that serves reference under scheme. Backends are
+// normally memoized per scheme. Redis is the exception when no address is configured: redisFactory
+// then dials the host taken from the reference, so distinct hosts must map to distinct backends —
+// keying by scheme alone would make the first host win and silently serve later, different hosts from
+// the wrong server. When a redis address IS configured it is authoritative and the reference host is
+// advisory (see RedisStore), so a single per-scheme backend is correct; this also keeps the eagerly
+// seeded primary (Type: redis always has a configured addr) reachable under its scheme key.
+func (s *routingStore) cacheKey(scheme string, reference DataReference) string {
+	if scheme == TypeRedis && !redisAddrConfigured(s.cfg) {
+		if _, host, _, err := reference.Split(); err == nil && host != "" {
+			return scheme + "://" + host
+		}
+	}
+	return scheme
 }
 
 // GetBaseContainerFQN returns the primary store's base container; other schemes are reachable only
