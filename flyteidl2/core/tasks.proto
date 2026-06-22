@@ -373,6 +373,22 @@ message DataLoadingConfig {
   // This format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding
   LiteralMapFormat format = 4;
   IOStrategy io_strategy = 5;
+
+  // FileInputLayout controls how Blob (File) and collection-of-Blob (list[File])
+  // inputs are laid out under input_path.
+  enum FileInputLayout {
+    // Each File is written directly at input_path/<var>, and each list[File]
+    // element at input_path/<var>/<index>. The original filename (and thus the
+    // extension) is dropped. This is the backwards-compatible default.
+    DIRECT = 0;
+    // Each File is written inside a per-input directory input_path/<var>/ under
+    // a name that preserves its extension (list[File] elements as
+    // input_path/<var>/<index><ext>), so tools that detect a file's format from
+    // its extension work. Consumers reference inputs by globbing the directory.
+    NAMED_DIR = 1;
+  }
+  // How File / list[File] inputs are laid out under input_path.
+  FileInputLayout file_input_layout = 6;
 }
 
 // Defines a pod spec and additional pod metadata that is created when a task is executed.

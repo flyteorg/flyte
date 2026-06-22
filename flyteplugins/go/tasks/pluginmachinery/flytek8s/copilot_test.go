@@ -131,7 +131,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 }
 
 func TestDownloadCommandArgs(t *testing.T) {
-	_, err := DownloadCommandArgs("", "", "", core.DataLoadingConfig_YAML, nil)
+	_, err := DownloadCommandArgs("", "", "", core.DataLoadingConfig_YAML, core.DataLoadingConfig_DIRECT, nil)
 	assert.Error(t, err)
 
 	iFace := &core.VariableMap{
@@ -140,9 +140,9 @@ func TestDownloadCommandArgs(t *testing.T) {
 			{Key: "y", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 		},
 	}
-	d, err := DownloadCommandArgs("s3://from", "s3://output-meta", "/to", core.DataLoadingConfig_JSON, iFace)
+	d, err := DownloadCommandArgs("s3://from", "s3://output-meta", "/to", core.DataLoadingConfig_JSON, core.DataLoadingConfig_NAMED_DIR, iFace)
 	assert.NoError(t, err)
-	expected := []string{"download", "--from-remote", "s3://from", "--to-output-prefix", "s3://output-meta", "--to-local-dir", "/to", "--format", "JSON", "--input-interface", "<interface>"}
+	expected := []string{"download", "--from-remote", "s3://from", "--to-output-prefix", "s3://output-meta", "--to-local-dir", "/to", "--format", "JSON", "--file-input-layout", "NAMED_DIR", "--input-interface", "<interface>"}
 	if assert.Len(t, d, len(expected)) {
 		for i := 0; i < len(expected)-1; i++ {
 			assert.Equal(t, expected[i], d[i])

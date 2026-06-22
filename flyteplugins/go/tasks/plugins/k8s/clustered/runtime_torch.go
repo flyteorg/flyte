@@ -29,6 +29,10 @@ func injectTorchRunEnv(container *corev1.Container, spec *clusteredpb.ClusteredT
 		{Name: "NPROC_PER_NODE", Value: strconv.Itoa(int(spec.GetNprocPerNode()))},
 		{Name: "MASTER_PORT", Value: "29500"},
 		{Name: "RDZV_BACKEND", Value: rdzvBackend},
+		// Restart budget so the SDK runtime can detect the terminal attempt and only write
+		// error.pb once the JobSet has exhausted its restarts. Same source as failure.go's
+		// buildFailurePolicy, so it always matches the JobSet FailurePolicy.MaxRestarts.
+		{Name: "JOBSET_MAX_RESTARTS", Value: strconv.Itoa(int(spec.GetFailurePolicy().GetMaxRestarts()))},
 		{
 			Name: "JOBSET_NAME",
 			ValueFrom: &corev1.EnvVarSource{

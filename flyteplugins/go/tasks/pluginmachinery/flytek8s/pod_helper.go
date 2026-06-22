@@ -175,6 +175,51 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 	ApplyInterruptibleNodeSelectorRequirement(interruptible, podSpec.Affinity)
 }
 
+// ApplyPlatformSchedulingConstraints re-applies the platform-injected scheduling
+// constraints that a custom pod-spec merge can dilute or drop, and MUST be called
+// after MergeOverlayPodSpecOntoBase. mergo appends a custom pod's node selector terms
+// as new OR'd alternatives, so any REQUIRED node-affinity requirement the base carried
+// — the configured DefaultAffinity requirements and the (non)interruptible requirement
+// — ends up only on the base term; a pod could then satisfy an appended custom term
+// alone and escape the constraint. This re-adds those requirements to every term and
+// re-applies the interruptible node selector and tolerations. All operations are
+// idempotent (AddRequiredNodeSelectorRequirements / addTolerationInPodSpec skip
+// entries already present), so re-applying to an unmerged base pod is a no-op.
+//
+// Note: DefaultAffinity requirements are AND'd onto every term, which is the intended
+// semantics for the common single-term DefaultAffinity. A DefaultAffinity expressed as
+// multiple OR'd terms would be tightened to AND across those requirements.
+func ApplyPlatformSchedulingConstraints(interruptible bool, podSpec *v1.PodSpec) {
+	if podSpec.Affinity == nil {
+		podSpec.Affinity = &v1.Affinity{}
+	}
+
+	// Re-add the configured DefaultAffinity required requirements to every term.
+	if da := config.GetK8sPluginConfig().DefaultAffinity; da != nil && da.NodeAffinity != nil &&
+		da.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution != nil {
+		for _, term := range da.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms {
+			AddRequiredNodeSelectorRequirements(podSpec.Affinity, term.MatchExpressions...)
+		}
+	}
+
+	// Re-add the (non)interruptible requirement to every term.
+	ApplyInterruptibleNodeSelectorRequirement(interruptible, podSpec.Affinity)
+
+	if !interruptible {
+		return
+	}
+
+	cfg := config.GetK8sPluginConfig()
+	if len(cfg.InterruptibleNodeSelector) > 0 {
+		podSpec.NodeSelector = utils.UnionMaps(podSpec.NodeSelector, cfg.InterruptibleNodeSelector)
+	}
+	// addTolerationInPodSpec is a no-op when the toleration is already present, so
+	// re-applying does not duplicate tolerations seeded earlier by UpdatePod.
+	for i := range cfg.InterruptibleTolerations {
+		addTolerationInPodSpec(podSpec, &cfg.InterruptibleTolerations[i])
+	}
+}
+
 // Specialized merging of overrides into a base *core.ExtendedResources object. Note
 // that doing a nested merge may not be the intended behavior all the time, so we
 // handle each field separately here.

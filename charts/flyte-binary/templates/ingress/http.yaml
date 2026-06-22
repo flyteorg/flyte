@@ -52,8 +52,7 @@ spec:
               number: {{ .Values.console.service.port }}
         path: {{ .Values.console.basePath }}/*
         pathType: ImplementationSpecific
-      {{- if not .Values.ingress.separateGrpcIngress }}
-      {{- $paths := (include "flyte-binary.ingress.grpcPaths" .) | fromYamlArray }}
+      {{- $paths := (include "flyte-binary.ingress.apiPaths" .) | fromYamlArray }}
       {{- range $path := $paths }}
       - path: {{ $path }}
         {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
@@ -64,12 +63,11 @@ spec:
           service:
             name: {{ include "flyte-binary.service.http.name" $ }}
             port:
-              number: {{ include "flyte-binary.service.grpc.port" $ }}
+              number: {{ include "flyte-binary.service.http.port" $ }}
           {{- else }}
           serviceName: {{ include "flyte-binary.service.http.name" $ }}
-          servicePort: {{ include "flyte-binary.service.grpc.port" $ }}
+          servicePort: {{ include "flyte-binary.service.http.port" $ }}
           {{- end }}
-      {{- end }}
       {{- end }}
       {{- if .Values.ingress.httpExtraPaths.append }}
       {{- tpl ( .Values.ingress.httpExtraPaths.append | toYaml ) . | nindent 6 }}

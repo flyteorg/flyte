@@ -33,7 +33,6 @@ flyte-binary:
         password: postgres
     storage:
       metadataContainer: flyte-data
-      userDataContainer: flyte-data
       provider: s3
       providerConfig:
         s3:
