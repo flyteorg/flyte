@@ -469,6 +469,12 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 
 	basePodSpec = flytek8s.AddTolerationsForExtendedResources(basePodSpec)
 
+	// Re-apply interruptible scheduling now that the group's custom pod spec is
+	// merged: a custom k8s_pod may have appended its own node selector terms (OR'd
+	// by Kubernetes), so the (Non)InterruptibleNodeSelectorRequirement must be added
+	// to every term to keep a non-interruptible pod off spot nodes. Idempotent.
+	flytek8s.ApplyPlatformSchedulingConstraints(taskCtx.TaskExecutionMetadata().IsInterruptible(), basePodSpec)
+
 	podTemplateSpec := v1.PodTemplateSpec{
 		Spec:       *basePodSpec,
 		ObjectMeta: *objectMeta,
@@ -621,6 +627,12 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 	flytek8s.ApplyGPUNodeSelectors(basePodSpec, gpuAccelerator)
 
 	basePodSpec = flytek8s.AddTolerationsForExtendedResources(basePodSpec)
+
+	// Re-apply interruptible scheduling now that the group's custom pod spec is
+	// merged: a custom k8s_pod may have appended its own node selector terms (OR'd
+	// by Kubernetes), so the (Non)InterruptibleNodeSelectorRequirement must be added
+	// to every term to keep a non-interruptible pod off spot nodes. Idempotent.
+	flytek8s.ApplyPlatformSchedulingConstraints(taskCtx.TaskExecutionMetadata().IsInterruptible(), basePodSpec)
 
 	podTemplateSpec := v1.PodTemplateSpec{
 		Spec:       *basePodSpec,
@@ -888,6 +900,8 @@ func init() {
 	if err := rayv1.AddToScheme(scheme.Scheme); err != nil {
 		panic(err)
 	}
+
+	pluginmachinery.PluginRegistry().RegisterScheme(rayTaskType, rayv1.AddToScheme)
 
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{

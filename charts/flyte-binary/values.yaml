@@ -9,37 +9,12 @@ commonAnnotations: {}
 
 # flyte-core-components: Configuration for the unified Flyte Manager
 flyte-core-components:
-  manager:
-    server:
-      host: "0.0.0.0"
-      port: 8090
-    executor:
-      healthProbePort: 8081
-    kubernetes:
-      namespace: "flyte"
-      kubeconfig: ""
-      qps: 1000
-      burst: 2000
-      timeout: "30s"
   runs:
     server:
       host: "0.0.0.0"
       port: 8090
     watchBufferSize: 100
     storagePrefix: "s3://flyte-data"
-    # Right now sandbox use SQLite db, we just leave the postgreSQL setting for potential future usage
-    database:
-      maxIdleConnections: 10
-      maxOpenConnections: 100
-      connMaxLifeTime: 1h
-      postgres:
-        host: "127.0.0.1"
-        port: 5432
-        dbname: flyte
-        username: postgres
-        password: ""
-        options: "sslmode=disable"
-        debug: false
 
   actions:
     kubernetes:
@@ -59,37 +34,42 @@ flyte-core-components:
   secret:
     kubernetes:
       namespace: "flyte"
-      clusterName: "flyte-devbox"
       kubeconfig: ""
       qps: 100
       burst: 200
       timeout: "30s"
+      clusterName: "flyte-devbox"
 
 # configuration Specify configuration for Flyte
 configuration:
-  # database Specify configuration for Flyte's database connection
+  # database Specify the database configuration for the unified Flyte binary.
+  # The chart renders this under `runs.database` — the single
+  # DB config the binary reads (runsconfig.GetConfig().Database). The waitForDB
+  # init container and the optional DB-password Secret both derive from here.
   database:
-    # username Name for user to connect to database as
-    username: postgres
-    # password Password to connect to database with
-    # If set, a Secret will be created with this value and mounted to Flyte pod
-    password: ""
-    # passwordPath Mountpath of file containing password to be added to Flyte deployment
-    passwordPath: ""
-    # host Hostname of database instance
-    host: 127.0.0.1
-    # port Port to connect to database at
-    port: 5432
-    # dbname Name of database to use
-    dbname: flyte
-    # options Additional client options for connecting to database
-    options: sslmode=disable
+    maxIdleConnections: 10
+    maxOpenConnections: 100
+    connMaxLifeTime: 1h
+    postgres:
+      host: "127.0.0.1"
+      port: 5432
+      dbname: flyte
+      username: postgres
+      # password Password to connect to the database with.
+      # If set, a Secret is created with this value and mounted to the Flyte pod.
+      # Mutually exclusive with passwordPath — set exactly one of the two.
+      password: ""
+      # passwordPath Path to a file containing the database password, read by the
+      # binary at runtime. Mount the file yourself (e.g. via
+      # deployment.extraVolumes/extraVolumeMounts from an external secret manager);
+      # the chart does not create a Secret for it. Mutually exclusive with password.
+      passwordPath: ""
+      options: "sslmode=disable"
+      debug: false
   # storage Specify configuration for object store
   storage:
     # metadataContainer Bucket to store Flyte metadata
     metadataContainer: "my-organization-flyte-container"
-    # userDataContainer Bucket to store Flyte user data
-    userDataContainer: "my-organization-flyte-container"
     # provider Object store provider (Supported values: s3, gcs)
     provider: s3
     # providerConfig Additional object store provider-specific configuration
@@ -144,49 +124,6 @@ configuration:
         enabled: false
         templateUri: ""
       custom: []
-  # auth Specify configuration for Flyte authentication
-  # Todo(alex): When we have a auth service, we will come back here to set configuration
-  auth:
-    # enabled Enable Flyte authentication
-    enabled: false
-    # enableAuthServer Enable built-in authentication server
-    enableAuthServer: true
-    # oidc OIDC configuration for Flyte authentication
-    oidc:
-      # baseUrl URL for OIDC provider
-      baseUrl: ""
-      # clientId Flyte application client ID
-      clientId: ""
-      # clientSecret Flyte application client secret
-      clientSecret: ""
-    # internal Configuration for internal authentication
-    # The settings for internal still need to be defined if you wish to use an external auth server
-    # These credentials are used during communication between the FlyteAdmin and Propeller microservices
-    internal:
-      # clientId Client ID for internal authentication - set to external auth server
-      clientId: flytemanager
-      # clientSecret Client secret for internal authentication
-      clientSecret: ""
-      # clientSecretHash Bcrypt hash of clientSecret
-      clientSecretHash: ""
-      # Uncomment next line if needed - set this field if your external Auth server (ex. Auth0) requires an audience parameter
-      # audience: ""
-    # flyteClient Configuration for Flyte client authentication
-    flyteClient:
-      # clientId Client ID for Flyte client authentication
-      clientId: flytectl
-      # redirectUri Redirect URI for Flyte client authentication
-      redirectUri: http://localhost:53593/callback
-      # scopes Scopes for Flyte client authentication
-      scopes:
-        - all
-      # audience Audience for Flyte client authentication
-      audience: ""
-    # authorizedUris Set of URIs that clients are allowed to visit the service on
-    authorizedUris: []
-    # clientSecretExternalSecretRef Specify an existing, external Secret containing values for `client_secret` and `oidc_client_secret`.
-    # If set, a Secret will not be generated by this chart for client secrets.
-    clientSecretsExternalSecretRef: ""
   # co-pilot Configuration for Flyte CoPilot
   co-pilot:
     # image Configure image to use for CoPilot sidecar
@@ -328,11 +265,9 @@ service:
   # If not specified, defaults to corresponding container ports
   ports:
     http: ""
-    grpc: ""
   # nodePorts Node ports for Flyte service if service type is `NodePort` or `LoadBalancer`
   nodePorts:
     http: ""
-    grpc: ""
   # clusterIP Set static IP if service type is `ClusterIP`
   clusterIP: ""
   # labels Add labels to Flyte services
@@ -341,8 +276,6 @@ service:
   commonAnnotations: {}
   # httpAnnotations Add annotations to http service resource
   httpAnnotations: {}
-  # grpcAnnotations Add annotations to grpc service resource
-  grpcAnnotations: {}
   # loadBalancerIP Set static IP if service type is `LoadBalancer`
   loadBalancerIP: ""
   # externalTrafficPolicy Enable client source IP preservation if service type is `NodePort` or `LoadBalancer`
@@ -407,34 +340,52 @@ ingress:
   labels: {}
   # host Hostname to bind to ingress resources
   host: ""
-  # separateGrpcIngress Create a separate ingress resource for GRPC if true. Required for certain ingress controllers like nginx.
-  separateGrpcIngress: true
   # commonAnnotations Add common annotations to all ingress resources
   commonAnnotations: {}
   # httpAnnotations Add annotations to http ingress resource
   httpAnnotations: {}
-  # grpcAnnotations Add annotations to grpc ingress resource
-  grpcAnnotations: {}
   # ingressClassName Ingress class to use with all ingress resources
   ingressClassName: ""
   # httpIngressClassName Ingress class to use with all http ingress resource. Overrides `ingressClassName`
   httpIngressClassName: ""
-  # grpcIngressClassName Ingress class to use with all grpc ingress resource. Overrides `ingressClassName`
-  grpcIngressClassName: ""
   # tls Add TLS configuration to all ingress resources
   tls: []
   # httpTls Add TLS configuration to http ingress resource. Overrides `tls`
   httpTls: []
-  # grpcTls Add TLS configuration to grpc ingress resource. Overrides `tls`
-  grpcTls: []
   # httpExtraPaths Add extra paths to http ingress rule
   httpExtraPaths:
     prepend: []
     append: []
-  # grpcExtraPaths Add extra paths to grpc ingress rule
-  grpcExtraPaths:
-    prepend: []
-    append: []
+  # apiJwtIngress Optional separate ingress that JWT-validates the flyteidl2 API
+  # paths for requests carrying an `Authorization: Bearer` token (SDK/machine
+  # clients). Needed on controllers like AWS ALB where a single ingress cannot
+  # combine cookie-OIDC (browser) and JWT (token) auth. It renders the shared API
+  # paths backed by the http service; supply the controller/JWT config (e.g. ALB
+  # cert-arn, jwt-validation, the `Authorization: Bearer*` match condition, and a
+  # group.order lower than the http ingress (but higher than the wellknown ingress)) via `annotations`.
+  apiJwtIngress:
+    # enabled Create the JWT (Bearer) API ingress
+    enabled: false
+    # annotations Annotations for the JWT API ingress (controller/JWT config)
+    annotations: {}
+    # ingressClassName Ingress class for the JWT API ingress. Overrides `ingressClassName`
+    ingressClassName: ""
+    # tls Add TLS configuration to the JWT API ingress. Overrides `tls`
+    tls: []
+  # wellknownIngress Optional separate ingress for the unauthenticated
+  # auth-discovery endpoints (`/.well-known/oauth-authorization-server`,
+  # AuthMetadataService) — clients must reach these before they hold a token. Give it the highest controller precedence
+  # (e.g. ALB group.order lower than the JWT/http ingresses) so these paths bypass
+  # auth. Supply controller config via `annotations`.
+  wellknownIngress:
+    # enabled Create the unauthenticated auth-discovery ingress
+    enabled: false
+    # annotations Annotations for the auth-discovery ingress (controller config)
+    annotations: {}
+    # ingressClassName Ingress class for the auth-discovery ingress. Overrides `ingressClassName`
+    ingressClassName: ""
+    # tls Add TLS configuration to the auth-discovery ingress. Overrides `tls`
+    tls: []
 
 # rbac Configure Kubernetes RBAC for Flyte
 rbac:
@@ -459,11 +410,6 @@ serviceAccount:
   annotations: {}
   # imagePullSecrets Secrets to use for fetching images from private registries
   imagePullSecrets: []
-
-# flyteconnector Configure Flyte Connector objects
-flyteconnector:
-  # enable Flag to enable bundled Flyte Connector
-  enabled: false
 
 enabled_plugins:
   # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)

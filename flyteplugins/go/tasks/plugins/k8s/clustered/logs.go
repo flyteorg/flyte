@@ -3,7 +3,6 @@ package clustered
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -99,9 +98,6 @@ func getLogContext(ctx context.Context, pluginContext k8s.PluginContext, jobSet 
 		return nil
 	}
 
-	// rank0PodName returns "<jobset>-workers-0-0"; the real pod carries an additional
-	// random suffix, so match on prefix to identify the primary (rank-0) pod.
-	primaryPrefix := rank0PodName(jobSet.Name)
 	// The authoritative primary container name is stored on the JobSet at build time
 	// (see build.go). Child pods don't carry the annotations BuildPodLogContext infers
 	// from, so set it explicitly to avoid resolving to the wrong container (e.g. a sidecar).
@@ -113,7 +109,7 @@ func getLogContext(ctx context.Context, pluginContext k8s.PluginContext, jobSet 
 		if pod.Status.Phase == v1.PodPending {
 			continue
 		}
-		if strings.HasPrefix(pod.Name, primaryPrefix) {
+		if isRank0PodName(jobSet.Name, pod.Name) {
 			logCtx.PrimaryPodName = pod.Name
 		}
 		podLogCtx := flytek8s.BuildPodLogContext(pod)

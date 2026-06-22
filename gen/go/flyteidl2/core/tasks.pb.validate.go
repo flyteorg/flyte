@@ -2015,6 +2015,8 @@ func (m *DataLoadingConfig) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for FileInputLayout
+
 	if len(errors) > 0 {
 		return DataLoadingConfigMultiError(errors)
 	}

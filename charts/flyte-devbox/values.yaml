@@ -28,11 +28,11 @@ flyte-binary:
       pullPolicy: Never
   configuration:
     database:
-      host: 'postgresql'
-      password: postgres
+      postgres:
+        host: 'postgresql'
+        password: postgres
     storage:
       metadataContainer: flyte-data
-      userDataContainer: flyte-data
       provider: s3
       providerConfig:
         s3:
@@ -76,7 +76,6 @@ flyte-binary:
             port: 5432
             dbName: runs
             user: postgres
-            password: postgres
       internalApps:
         enabled: true
         baseDomain: "localhost"

@@ -170,23 +170,9 @@ Get the Flyte service HTTP port.
 {{- end -}}
 
 {{/*
-Get the Flyte gRPC service name
-*/}}
-{{- define "flyte-binary.service.grpc.name" -}}
-{{- printf "%s-http" (include "flyte-binary.fullname" .) -}}
-{{- end -}}
-
-{{/*
-Get the Flyte service gRPC port.
-*/}}
-{{- define "flyte-binary.service.grpc.port" -}}
-{{- default 8090 .Values.service.ports.grpc -}}
-{{- end -}}
-
-{{/*
 Get the Flyte API paths for ingress.
 */}}
-{{- define "flyte-binary.ingress.grpcPaths" -}}
+{{- define "flyte-binary.ingress.apiPaths" -}}
 - /flyteidl2.workflow.RunService
 - /flyteidl2.workflow.RunService/*
 - /flyteidl2.workflow.RunLogsService
@@ -207,6 +193,22 @@ Get the Flyte API paths for ingress.
 - /flyteidl2.app.AppService/*
 - /flyteidl2.trigger.TriggerService
 - /flyteidl2.trigger.TriggerService/*
+- /flyteidl2.auth.IdentityService
+- /flyteidl2.auth.IdentityService/*
+- /flyteidl2.settings.SettingsService
+- /flyteidl2.settings.SettingsService/*
+{{- end -}}
+
+{{/*
+Get the Flyte auth-discovery paths for ingress. These are unauthenticated:
+clients must reach them before they hold a token (OAuth server metadata and the
+auth metadata service). IdentityService and SettingsService require auth and live
+in apiPaths instead.
+*/}}
+{{- define "flyte-binary.ingress.wellknownPaths" -}}
+- /.well-known/oauth-authorization-server
+- /flyteidl2.auth.AuthMetadataService
+- /flyteidl2.auth.AuthMetadataService/*
 {{- end -}}
 
 {{/*

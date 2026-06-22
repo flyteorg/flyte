@@ -57,7 +57,6 @@ A Helm chart for the Flyte local demo cluster
 | flyte-binary.configuration.storage.providerConfig.s3.endpoint | string | `"http://minio.{{ .Release.Namespace }}:9000"` |  |
 | flyte-binary.configuration.storage.providerConfig.s3.secretKey | string | `"miniostorage"` |  |
 | flyte-binary.configuration.storage.providerConfig.s3.v2Signing | bool | `true` |  |
-| flyte-binary.configuration.storage.userDataContainer | string | `"flyte-data"` |  |
 | flyte-binary.deployment.image.pullPolicy | string | `"Never"` |  |
 | flyte-binary.deployment.image.repository | string | `"flyte-binary-v2"` |  |
 | flyte-binary.deployment.image.tag | string | `"sandbox"` |  |

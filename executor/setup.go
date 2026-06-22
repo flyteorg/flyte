@@ -35,8 +35,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 
-	// Plugin registrations — blank imports trigger init() which registers
-	// plugins with the global registry.
+	_ "github.com/flyteorg/flyte/v2/executor/plugins"
 	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/clustered"
 	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/pod"
 )
@@ -62,6 +61,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
 
 	cfg := config.GetConfig()
+
+	for _, reg := range pluginmachinery.PluginRegistry().GetSchemeRegisters() {
+		utilruntime.Must(reg.AddToScheme(scheme))
+	}
 
 	var tlsOpts []func(*tls.Config)
 	if !cfg.EnableHTTP2 {
@@ -114,7 +117,9 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		podNamespace = sc.Namespace
 	}
 
-	if err := webhookPkg.Setup(ctx, kubeClient, wCfg, podNamespace, promutils.NewScope("executor"), mgr); err != nil {
+	executorScope := promutils.NewScope("executor")
+
+	if err := webhookPkg.Setup(ctx, kubeClient, wCfg, podNamespace, executorScope.NewSubScope("webhook"), mgr); err != nil {
 		return fmt.Errorf("executor: webhook setup failed: %w", err)
 	}
 
@@ -126,7 +131,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	setupCtx := plugin.NewSetupContext(
 		mgr, nil, nil, nil, nil,
 		"TaskAction",
-		promutils.NewScope("executor"),
+		executorScope.NewSubScope("plugin"),
 	)
 	registry := plugin.NewRegistry(setupCtx, pluginmachinery.PluginRegistry())
 	if err := registry.Initialize(ctx); err != nil {
