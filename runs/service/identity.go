@@ -101,8 +101,7 @@ func decodeJWTSegment(seg string) ([]byte, error) {
 }
 
 // subjectOnlyIdentity builds a minimal EnrichedIdentity carrying just the subject.
-// Mirrors the cloud transformer fallback; used when only the subject is available.
-// Callers pass a non-empty subject.
+// used when only the subject is available.
 func subjectOnlyIdentity(subject string) *common.EnrichedIdentity {
 	return &common.EnrichedIdentity{
 		Principal: &common.EnrichedIdentity_User{

@@ -15,7 +15,7 @@ import (
 
 const (
 	userinfoHTTPTimeout = 3 * time.Second
-	identityCacheTTL    = 10 * time.Minute
+	identityCacheTTL    = 24 * time.Hour
 	oidcDiscoveryPath   = "/.well-known/openid-configuration"
 )
 
