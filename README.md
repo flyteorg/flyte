@@ -9,6 +9,8 @@
 
 # Flyte 2
 
+[![Listed on TakoAPI](https://img.shields.io/badge/Listed%20on-TakoAPI-7c3aed)](https://takoapi.com/agents/flyteorg-flyte)
+
 **Reliably orchestrate ML pipelines, models, and agents at scale — in pure Python.**
 
 [![Version](https://img.shields.io/pypi/v/flyte?label=version&color=blue)](https://pypi.org/project/flyte/)
