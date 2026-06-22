@@ -97,16 +97,26 @@ dep_update: SANDBOX_CHART_DIR := ../../charts/flyte-devbox
 dep_update: dep_build
 	cd $(SANDBOX_CHART_DIR)/charts && rm -rf docker-registry flyte-binary knative-serving && for f in *.tgz; do tar xzf "$$f"; done
 
+# Use the executor's pinned, Helm-v4-compatible kustomize instead of whatever
+# kustomize the developer happens to have on PATH. Older kustomize probes with
+# `helm version -c --short`, and Helm v4 dropped the `-c` flag, so a bare
+# `kustomize build --enable-helm` fails on machines with Helm v4 installed.
+KUSTOMIZE := ../../executor/bin/kustomize
+
+.PHONY: kustomize
+kustomize:
+	$(MAKE) -C ../../executor kustomize
+
 .PHONY: manifests
-manifests: dep_update
+manifests: dep_update kustomize
 	mkdir -p manifests
-	kustomize build \
+	$(KUSTOMIZE) build \
 		--enable-helm \
 		--load-restrictor=LoadRestrictionsNone \
 		kustomize/complete > manifests/complete.yaml
 	@printf "\n---\n" >> manifests/complete.yaml
 	@cat kustomize/net-kourier.yaml >> manifests/complete.yaml
-	kustomize build \
+	$(KUSTOMIZE) build \
 		--enable-helm \
 		--load-restrictor=LoadRestrictionsNone \
 		kustomize/dev > manifests/dev.yaml
