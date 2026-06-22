@@ -116,20 +116,24 @@ func NewCompositeDataStore(refConstructor ReferenceConstructor, composedProtobuf
 func (ds *DataStore) RefreshConfig(ctx context.Context, cfg *Config) error {
 	httpClient := createHTTPClient(cfg.DefaultHTTPClient)
 
-	// stow reads http.DefaultClient at dial time. Install the configured client for the eager primary
-	// build; lazy per-scheme dials thread the same client explicitly via the routing store.
-	defaultClient := http.DefaultClient
-	http.DefaultClient = httpClient
-	defer func() {
-		http.DefaultClient = defaultClient
-	}()
-
 	fn, found := stores[cfg.Type]
 	if !found {
 		return fmt.Errorf("type is of an invalid value [%v]", cfg.Type)
 	}
 
-	primaryStore, err := fn(ctx, cfg, ds.metrics)
+	// stow reads http.DefaultClient at dial time. Install the configured client for the eager primary
+	// build while holding dialMu — the same lock lazy per-scheme dials take (via dialStow) — so a
+	// concurrent lazy dial or another DataStore being constructed cannot interleave on the global
+	// client and restore the wrong value. Lazy per-scheme dials thread the client explicitly through
+	// the routing store, so the global only needs to be installed for this eager build.
+	primaryStore, err := func() (RawStore, error) {
+		dialMu.Lock()
+		defer dialMu.Unlock()
+		defaultClient := http.DefaultClient
+		http.DefaultClient = httpClient
+		defer func() { http.DefaultClient = defaultClient }()
+		return fn(ctx, cfg, ds.metrics)
+	}()
 	if err != nil {
 		return err
 	}

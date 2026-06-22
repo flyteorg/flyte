@@ -765,6 +765,14 @@ func TestStowFactory_AmbientDialForUnconfiguredScheme(t *testing.T) {
 		_, err := stowFactory(context.TODO(), "not-a-scheme", "not-a-scheme://b/k", &Config{}, nil, metrics)
 		assert.Error(t, err)
 	})
+
+	t.Run("local backend without a path fails fast", func(t *testing.T) {
+		// The local (file://) backend can't be dialed with ambient config; it needs an explicit root
+		// path, so an unconfigured file:// scheme must error deterministically with an actionable message.
+		_, err := stowFactory(context.TODO(), "file", "file://root/key", &Config{}, nil, metrics)
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), local.ConfigKeyPath)
+	})
 }
 
 func TestStowStore_Delete(t *testing.T) {

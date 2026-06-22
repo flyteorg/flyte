@@ -34,7 +34,7 @@ type routingStore struct {
 	registry     map[string]backendFactory
 	primary      string
 	primaryStore RawStore
-	live         sync.Map // scheme -> RawStore
+	live         sync.Map // cacheKey -> RawStore (key is the scheme, or "redis://<host>"; see cacheKey)
 	createMu     sync.Mutex
 }
 

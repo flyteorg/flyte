@@ -708,6 +708,15 @@ func stowFactory(_ context.Context, scheme string, _ DataReference, cfg *Config,
 		}
 	}
 
+	// Unlike cloud backends, the local (file://) backend cannot be dialed with ambient credentials: it
+	// needs an explicit root path. Without one stow would fail deep inside at first use, so fail fast
+	// here with an actionable message instead.
+	if kind == local.Kind {
+		if _, ok := cfgMap[local.ConfigKeyPath]; !ok {
+			return nil, fmt.Errorf("scheme [%v] maps to the local stow backend, which requires an explicit root path; set schemes[%q].config[%q]", scheme, scheme, local.ConfigKeyPath)
+		}
+	}
+
 	loc, err := dialStow(httpClient, kind, cfgMap)
 	if err != nil {
 		return nil, fmt.Errorf("unable to configure storage for scheme [%v] (kind [%v]): %w", scheme, kind, err)
