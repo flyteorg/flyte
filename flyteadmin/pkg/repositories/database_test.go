@@ -78,7 +78,9 @@ func TestSetupDbConnectionPool(t *testing.T) {
 		gormDb, err := gorm.Open(sqlite.Open(filepath.Join(os.TempDir(), "gorm.db")), &gorm.Config{})
 		assert.Nil(t, err)
 		dbConfig := &database.DbConfig{
-			DeprecatedPort:     5432,
+			Postgres: database.PostgresConfig{
+				Port: 5432,
+			},
 			MaxIdleConnections: 10,
 			MaxOpenConnections: 1000,
 			ConnMaxLifeTime:    config.Duration{Duration: time.Hour},
@@ -93,7 +95,9 @@ func TestSetupDbConnectionPool(t *testing.T) {
 		gormDb, err := gorm.Open(sqlite.Open(filepath.Join(os.TempDir(), "gorm.db")), &gorm.Config{})
 		assert.Nil(t, err)
 		dbConfig := &database.DbConfig{
-			DeprecatedPort:     5432,
+			Postgres: database.PostgresConfig{
+				Port: 5432,
+			},
 			MaxIdleConnections: 10,
 			MaxOpenConnections: 1000,
 		}
@@ -110,7 +114,9 @@ func TestSetupDbConnectionPool(t *testing.T) {
 			},
 		}
 		dbConfig := &database.DbConfig{
-			DeprecatedPort:     5432,
+			Postgres: database.PostgresConfig{
+				Port: 5432,
+			},
 			MaxIdleConnections: 10,
 			MaxOpenConnections: 1000,
 			ConnMaxLifeTime:    config.Duration{Duration: time.Hour},

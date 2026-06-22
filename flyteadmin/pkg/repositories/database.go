@@ -80,22 +80,6 @@ func GetDB(ctx context.Context, dbConfig *database.DbConfig, logConfig *logger.C
 		if err != nil {
 			return nil, err
 		}
-
-	case len(dbConfig.DeprecatedHost) > 0 || len(dbConfig.DeprecatedUser) > 0 || len(dbConfig.DeprecatedDbName) > 0:
-		pgConfig := database.PostgresConfig{
-			Host:         dbConfig.DeprecatedHost,
-			Port:         dbConfig.DeprecatedPort,
-			DbName:       dbConfig.DeprecatedDbName,
-			User:         dbConfig.DeprecatedUser,
-			Password:     dbConfig.DeprecatedPassword,
-			PasswordPath: dbConfig.DeprecatedPasswordPath,
-			ExtraOptions: dbConfig.DeprecatedExtraOptions,
-			Debug:        dbConfig.DeprecatedDebug,
-		}
-		gormDb, err = createPostgresDbIfNotExists(ctx, gormConfig, pgConfig)
-		if err != nil {
-			return nil, err
-		}
 	default:
 		return nil, fmt.Errorf("unrecognized database config, %v. Supported only postgres and sqlite", dbConfig)
 	}
