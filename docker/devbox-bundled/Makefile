@@ -98,9 +98,7 @@ dep_update: dep_build
 	cd $(SANDBOX_CHART_DIR)/charts && rm -rf docker-registry flyte-binary knative-serving && for f in *.tgz; do tar xzf "$$f"; done
 
 # Use the executor's pinned, Helm-v4-compatible kustomize instead of whatever
-# kustomize the developer happens to have on PATH. Older kustomize probes with
-# `helm version -c --short`, and Helm v4 dropped the `-c` flag, so a bare
-# `kustomize build --enable-helm` fails on machines with Helm v4 installed.
+# kustomize the developer happens to have on PATH.
 KUSTOMIZE := ../../executor/bin/kustomize
 
 .PHONY: kustomize
