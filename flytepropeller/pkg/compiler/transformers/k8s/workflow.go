@@ -2,17 +2,21 @@
 package k8s
 
 import (
+	"context"
 	"fmt"
 	"hash/fnv"
 	"strings"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const (
@@ -30,6 +34,11 @@ const (
 	ShardKeyLabel = "shard-key"
 	// The fully qualified FlyteWorkflow name
 	WorkflowNameLabel = "workflow-name"
+
+	// Length of hash to use as a suffix on the workflow CR name. Used when config.UseWorkflowCRNameSuffix is true.
+	// The workflow CR name should be at or under 63 characters long, here it is 52 + 1 + 10 = 63
+	workflowCRNameHashLength = 10
+	workflowCRNameSuffixFmt  = "%.52s-%s"
 )
 
 func requiresInputs(w *core.WorkflowTemplate) bool {
@@ -159,6 +168,20 @@ func generateName(wfID *core.Identifier, execID *core.WorkflowExecutionIdentifie
 	}
 }
 
+func hashIdentifier(identifier core.Identifier) uint64 {
+	h := fnv.New64()
+	_, err := h.Write([]byte(fmt.Sprintf("%s:%s:%s",
+		identifier.Project, identifier.Domain, identifier.Name)))
+	if err != nil {
+		// This shouldn't occur.
+		logger.Errorf(context.Background(),
+			"failed to hash execution identifier: %+v with err: %v", identifier, err)
+		return 0
+	}
+	logger.Debugf(context.Background(), "Returning hash for [%+v]: %d", identifier, h.Sum64())
+	return h.Sum64()
+}
+
 // BuildFlyteWorkflow builds v1alpha1.FlyteWorkflow resource. Returned error, if not nil, is of type errors.CompilerErrors.
 func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.LiteralMap,
 	executionID *core.WorkflowExecutionIdentifier, namespace string) (*v1alpha1.FlyteWorkflow, error) {
@@ -231,7 +254,19 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 		errs.Collect(errors.NewWorkflowBuildError(err))
 	}
 
-	obj.ObjectMeta.Name = name
+	if config.GetConfig().UseWorkflowCRNameSuffix {
+		// Seed the randomness before generating the name with random suffix
+		hashedIdentifier := hashIdentifier(core.Identifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		})
+		rand.Seed(int64(hashedIdentifier))
+		obj.ObjectMeta.Name = fmt.Sprintf(workflowCRNameSuffixFmt, name, rand.String(workflowCRNameHashLength))
+	} else {
+		obj.ObjectMeta.Name = name
+	}
+
 	obj.ObjectMeta.GenerateName = generatedName
 	obj.ObjectMeta.Labels[ExecutionIDLabel] = label
 	obj.ObjectMeta.Labels[ProjectLabel] = project
