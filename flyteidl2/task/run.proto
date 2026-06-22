@@ -85,9 +85,10 @@ message RunSpec {
   // Deprecated, please use CacheConfig.OverwriteCache instead
   bool overwrite_cache = 5 [deprecated = true];
 
-  // the specific cluster that this action should be executed on. this value will be used as the
-  // default for all actions in the run unless overridden.
-  string cluster = 6;
+  // the queue name that this run should be executed on.
+  // Queue name is unique within an org so it can be used as an id to reference the queue.
+  string queue = 6;
+  reserved "cluster";
 
   // Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
   RawDataStorage raw_data_storage = 7;
