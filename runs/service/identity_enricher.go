@@ -79,9 +79,9 @@ func (e *identityEnricher) enrich(ctx context.Context, accessToken string, base 
 		logger.Warnf(ctx, "identity enrichment: userinfo fetch failed for subject %q: %v", subject, err)
 		return base
 	}
-	// Guard against token confusion / IdP misconfiguration: never associate a profile
-	// fetched for a different subject with this run.
-	if claims.Sub != "" && claims.Sub != subject {
+	// Guard against token confusion / IdP misconfiguration: OIDC userinfo responses must
+	// include sub, and it must match the caller's subject.
+	if claims.Sub == "" || claims.Sub != subject {
 		logger.Warnf(ctx, "identity enrichment: userinfo subject %q does not match caller %q; ignoring", claims.Sub, subject)
 		return base
 	}
