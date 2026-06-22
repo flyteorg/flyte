@@ -7,17 +7,13 @@ import (
 	"strings"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/runs/config"
 )
 
 const (
-	// albDataHeader is the signed JWT of user claims set by ALB authenticate-oidc
-	// (browser/cookie path). Its payload carries sub, email, given_name, family_name.
-	albDataHeader = "X-Amzn-Oidc-Data"
-	// albIdentityHeader is also set by ALB authenticate-oidc and carries the OIDC
-	// subject (`sub`) directly — used as a fallback when the data header is absent.
-	albIdentityHeader = "X-Amzn-Oidc-Identity"
 	// authorizationHeader carries the Bearer token on the JWT-validation path
-	// (SDK/CLI). The load balancer validates it and forwards it unchanged.
+	// (SDK/CLI). The load balancer validates it and forwards it unchanged. This path
+	// is proxy-agnostic, so its header is fixed rather than configurable.
 	authorizationHeader = "Authorization"
 	bearerPrefix        = "Bearer "
 )
@@ -31,19 +27,31 @@ type oidcClaims struct {
 }
 
 // identityFromHeaders builds the EnrichedIdentity of the caller from the auth headers
-// the load balancer forwards. Auth is enforced upstream (e.g. ALB OIDC / JWT
-// validation), so the claims are trusted and only decoded here — not re-verified.
-// Returns nil when no authenticated identity is present.
-func identityFromHeaders(h http.Header) *common.EnrichedIdentity {
-	// authenticate-oidc (browser/cookie) path: full claims in the signed data JWT.
-	if id := identityFromJWT(h.Get(albDataHeader)); id != nil {
-		return id
+// the proxy forwards, using the configured header names (defaults match AWS ALB; works
+// for oauth2-proxy/Traefik when configured). Auth is enforced upstream, so the claims
+// are trusted and only decoded here — not re-verified. Returns nil when no
+// authenticated identity is present.
+func identityFromHeaders(h http.Header, cfg config.IdentityHeadersConfig) *common.EnrichedIdentity {
+	// Proxy that forwards full claims in a JWT (ALB authenticate-oidc data header).
+	if cfg.ClaimsJWTHeader != "" {
+		if id := identityFromJWT(h.Get(cfg.ClaimsJWTHeader)); id != nil {
+			return id
+		}
 	}
-	// Same path, subject only — when the data header is unavailable.
-	if sub := strings.TrimSpace(h.Get(albIdentityHeader)); sub != "" {
-		return subjectOnlyIdentity(sub)
+	// Proxy that forwards the subject (and optionally email) as plain header values
+	// (ALB identity header; oauth2-proxy X-Auth-Request-User/-Email).
+	if cfg.SubjectHeader != "" {
+		if sub := strings.TrimSpace(h.Get(cfg.SubjectHeader)); sub != "" {
+			id := subjectOnlyIdentity(sub)
+			if cfg.EmailHeader != "" {
+				if email := strings.TrimSpace(h.Get(cfg.EmailHeader)); email != "" {
+					id.GetUser().Spec = &common.UserSpec{Email: email}
+				}
+			}
+			return id
+		}
 	}
-	// JWT (SDK/CLI) path: decode the forwarded Bearer token's claims.
+	// JWT (SDK/CLI) path: decode the forwarded Bearer token's claims. Proxy-agnostic.
 	if token := bearerToken(h); token != "" {
 		return identityFromJWT(token)
 	}

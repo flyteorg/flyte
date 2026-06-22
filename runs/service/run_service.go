@@ -31,6 +31,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -49,6 +50,8 @@ type RunService struct {
 	enricher        *identityEnricher
 	// trustHeaders gates deriving executed_by from proxy-forwarded auth headers.
 	trustHeaders bool
+	// identityHeaders names the proxy-forwarded headers identity is read from.
+	identityHeaders config.IdentityHeadersConfig
 }
 
 type actionDataClient interface {
@@ -157,6 +160,7 @@ func NewRunService(
 	reconciler *AbortReconciler,
 	authServerBaseURL string,
 	trustForwardedIdentityHeaders bool,
+	identityHeaders config.IdentityHeadersConfig,
 ) *RunService {
 	return &RunService{
 		repo:            repo,
@@ -168,6 +172,7 @@ func NewRunService(
 		abortReconciler: reconciler,
 		enricher:        newIdentityEnricher(authServerBaseURL),
 		trustHeaders:    trustForwardedIdentityHeaders,
+		identityHeaders: identityHeaders,
 	}
 }
 
@@ -339,7 +344,7 @@ func (s *RunService) CreateRun(
 	// decoded, not signature-verified — see Config.TrustForwardedIdentityHeaders).
 	var executedBy *common.EnrichedIdentity
 	if s.trustHeaders {
-		executedBy = identityFromHeaders(req.Header())
+		executedBy = identityFromHeaders(req.Header(), s.identityHeaders)
 		// Cookie path isn't enriched here: its forwarded access token is short-lived and
 		// already expired, so it relies on the claims the proxy injects into x-amzn-oidc-data.
 		executedBy = s.enricher.enrich(ctx, bearerToken(req.Header()), executedBy)

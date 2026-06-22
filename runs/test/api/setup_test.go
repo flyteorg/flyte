@@ -17,6 +17,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/migrations"
 	"github.com/flyteorg/flyte/v2/runs/repository"
 	"github.com/flyteorg/flyte/v2/runs/service"
@@ -113,7 +114,7 @@ func TestMain(m *testing.M) {
 	// Create RunService with a no-op actions client (points at test server; not used by watch tests)
 	endpointURL := fmt.Sprintf("http://localhost:%d", testPort)
 	actionsClient := actionsconnect.NewActionsServiceClient(http.DefaultClient, endpointURL)
-	runSvc := service.NewRunService(repo, actionsClient, nil, nil, "", nil, nil, "", true)
+	runSvc := service.NewRunService(repo, actionsClient, nil, nil, "", nil, nil, "", true, config.GetConfig().IdentityHeaders)
 
 	// Setup HTTP server
 	mux := http.NewServeMux()

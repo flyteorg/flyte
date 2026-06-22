@@ -6,7 +6,21 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/v2/runs/config"
 )
+
+// albCfg is the default (AWS ALB) header configuration.
+var albCfg = config.IdentityHeadersConfig{
+	ClaimsJWTHeader: "X-Amzn-Oidc-Data",
+	SubjectHeader:   "X-Amzn-Oidc-Identity",
+}
+
+// proxyCfg is a plain-value proxy (oauth2-proxy / Traefik forward-auth).
+var proxyCfg = config.IdentityHeadersConfig{
+	SubjectHeader: "X-Auth-Request-User",
+	EmailHeader:   "X-Auth-Request-Email",
+}
 
 // jwt builds a syntactically valid (unsigned) JWT carrying the given claims payload.
 func jwt(payloadJSON string) string {
@@ -32,6 +46,7 @@ func TestIdentityFromJWT_ToleratesPadding(t *testing.T) {
 func TestIdentityFromHeaders(t *testing.T) {
 	tests := []struct {
 		name                         string
+		cfg                          config.IdentityHeadersConfig
 		headers                      map[string]string
 		wantNil                      bool
 		wantSub, wantFirst, wantLast string
@@ -39,7 +54,8 @@ func TestIdentityFromHeaders(t *testing.T) {
 	}{
 		{
 			name:      "amzn oidc data: full claims (cookie path)",
-			headers:   map[string]string{albDataHeader: jwt(`{"sub":"00u123","given_name":"Carina","family_name":"Didilescu","email":"carina@union.ai"}`)},
+			cfg:       albCfg,
+			headers:   map[string]string{"X-Amzn-Oidc-Data": jwt(`{"sub":"00u123","given_name":"Carina","family_name":"Didilescu","email":"carina@union.ai"}`)},
 			wantSub:   "00u123",
 			wantFirst: "Carina",
 			wantLast:  "Didilescu",
@@ -47,17 +63,27 @@ func TestIdentityFromHeaders(t *testing.T) {
 		},
 		{
 			name:      "amzn oidc data: subject + email only (no profile scope)",
-			headers:   map[string]string{albDataHeader: jwt(`{"sub":"00u999","email":"a@b.com"}`)},
+			cfg:       albCfg,
+			headers:   map[string]string{"X-Amzn-Oidc-Data": jwt(`{"sub":"00u999","email":"a@b.com"}`)},
 			wantSub:   "00u999",
 			wantEmail: "a@b.com",
 		},
 		{
 			name:    "amzn oidc identity header fallback (subject only)",
-			headers: map[string]string{albIdentityHeader: "okta|sub-only"},
+			cfg:     albCfg,
+			headers: map[string]string{"X-Amzn-Oidc-Identity": "okta|sub-only"},
 			wantSub: "okta|sub-only",
 		},
 		{
+			name:      "oauth2-proxy/traefik plain headers (subject + email)",
+			cfg:       proxyCfg,
+			headers:   map[string]string{"X-Auth-Request-User": "user-42", "X-Auth-Request-Email": "u42@union.ai"},
+			wantSub:   "user-42",
+			wantEmail: "u42@union.ai",
+		},
+		{
 			name:      "bearer token claims (SDK path)",
+			cfg:       albCfg,
 			headers:   map[string]string{authorizationHeader: "Bearer " + jwt(`{"sub":"sdk-user","given_name":"Dev","email":"dev@union.ai"}`)},
 			wantSub:   "sdk-user",
 			wantFirst: "Dev",
@@ -65,16 +91,17 @@ func TestIdentityFromHeaders(t *testing.T) {
 		},
 		{
 			name: "data header takes precedence over bearer",
+			cfg:  albCfg,
 			headers: map[string]string{
-				albDataHeader:       jwt(`{"sub":"cookie-user"}`),
+				"X-Amzn-Oidc-Data":  jwt(`{"sub":"cookie-user"}`),
 				authorizationHeader: "Bearer " + jwt(`{"sub":"bearer-user"}`),
 			},
 			wantSub: "cookie-user",
 		},
-		{name: "no auth headers", headers: map[string]string{}, wantNil: true},
-		{name: "non-bearer authorization", headers: map[string]string{authorizationHeader: "Basic abc"}, wantNil: true},
-		{name: "malformed jwt (two segments)", headers: map[string]string{albDataHeader: "a.b"}, wantNil: true},
-		{name: "jwt without sub", headers: map[string]string{albDataHeader: jwt(`{"email":"a@b.com"}`)}, wantNil: true},
+		{name: "no auth headers", cfg: albCfg, headers: map[string]string{}, wantNil: true},
+		{name: "non-bearer authorization", cfg: albCfg, headers: map[string]string{authorizationHeader: "Basic abc"}, wantNil: true},
+		{name: "malformed jwt (two segments)", cfg: albCfg, headers: map[string]string{"X-Amzn-Oidc-Data": "a.b"}, wantNil: true},
+		{name: "jwt without sub", cfg: albCfg, headers: map[string]string{"X-Amzn-Oidc-Data": jwt(`{"email":"a@b.com"}`)}, wantNil: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -82,7 +109,7 @@ func TestIdentityFromHeaders(t *testing.T) {
 			for k, v := range tt.headers {
 				h.Set(k, v)
 			}
-			id := identityFromHeaders(h)
+			id := identityFromHeaders(h, tt.cfg)
 			if tt.wantNil {
 				assert.Nil(t, id)
 				return
