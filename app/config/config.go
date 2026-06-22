@@ -72,6 +72,12 @@ type InternalAppConfig struct {
 	// WatchBufferSize is the buffer size for each subscriber's event channel.
 	// A larger value reduces the chance of dropped events under burst load.
 	WatchBufferSize int `json:"watchBufferSize" pflag:",Buffer size for watch subscriber channels"`
+
+	// DefaultServiceAccount is assigned to app pods that don't request one via their
+	// security context. Empty means the namespace's `default` ServiceAccount is used.
+	// Set this to the flyte service account (which carries the IRSA role) so app pods
+	// get cloud credentials/region for object storage.
+	DefaultServiceAccount string `json:"defaultServiceAccount" pflag:",Default k8s service account for app pods when the app does not set one"`
 }
 
 var defaultInternalAppConfig = &InternalAppConfig{
