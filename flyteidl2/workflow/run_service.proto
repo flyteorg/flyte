@@ -282,6 +282,10 @@ message ListRunsRequest {
     // Task identifier for filtering runs
     task.TaskIdentifier task_id = 8;
   }
+
+  // When true, only return runs that contain at least one action in the
+  // PAUSED phase (e.g. a human-in-the-loop gate node awaiting input).
+  bool paused_actions_only = 9;
 }
 
 // Response message for listing runs.
