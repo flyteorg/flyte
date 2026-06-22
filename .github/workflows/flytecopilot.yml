@@ -1,24 +1,20 @@
 name: Build & Push Flytecopilot Image
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  # Only cancel superseded runs on PRs; runs on main queue up instead.
-  cancel-in-progress: ${{ github.event_name == 'pull_request_target' }}
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
+# Publish-only: runs from trusted refs (main / manual dispatch) so the build
+# never executes untrusted PR code while Depot OIDC + GHCR creds are in scope
+# (avoids the pull_request_target "pwn-request" class of attack).
 on:
   push:
-    branches:
-      - main
-  pull_request_target:
     branches:
       - main
   workflow_dispatch:
 
 env:
   DEPOT_PROJECT_ID: ${{ vars.DEPOT_PROJECT_ID }}
-  # Push images on push to main, manual dispatch, OR on a PR labeled
-  # `test-push-image` from a branch in the base repo (never from forks).
-  PUSH_IMAGES: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.pull_request.labels.*.name, 'test-push-image')) }}
 
 jobs:
   build-and-push-flytecopilot-image:
@@ -30,7 +26,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.sha }}
           persist-credentials: false
       - name: Validate Depot project id
         run: |
@@ -62,7 +58,6 @@ jobs:
       - name: Set up Depot
         uses: depot/setup-action@v1
       - name: Login to GitHub Container Registry
-        if: ${{ env.PUSH_IMAGES == 'true' }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -79,4 +74,4 @@ jobs:
           build-args: |
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile.flytecopilot
-          push: ${{ env.PUSH_IMAGES == 'true' }}
+          push: true
