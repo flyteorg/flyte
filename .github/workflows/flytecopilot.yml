@@ -73,5 +73,6 @@ jobs:
           tags: ${{ steps.image-names.outputs.tags }}
           build-args: |
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
-          file: Dockerfile.flytecopilot
+          file: Dockerfile
+          target: flytecopilot
           push: true
