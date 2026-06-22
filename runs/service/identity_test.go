@@ -96,8 +96,6 @@ func TestIdentityFromHeaders(t *testing.T) {
 }
 
 func TestSubjectOnlyIdentity(t *testing.T) {
-	assert.Nil(t, subjectOnlyIdentity(""))
-
 	id := subjectOnlyIdentity("user-123")
 	assert.Equal(t, "user-123", id.GetUser().GetId().GetSubject())
 	assert.Nil(t, id.GetUser().GetSpec())

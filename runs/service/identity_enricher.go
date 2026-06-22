@@ -107,13 +107,8 @@ func (e *identityEnricher) cachedFor(subject string) *oidcClaims {
 func (e *identityEnricher) store(subject string, claims *oidcClaims) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	// Opportunistically evict any other expired entries to bound the map size.
-	now := time.Now()
-	for k, c := range e.cache {
-		if now.After(c.expires) {
-			delete(e.cache, k)
-		}
-	}
+	// Map is keyed by distinct user subject, so it's bounded by user count; cachedFor
+	// evicts each stale entry on read. Add size-capped eviction if that ever fails.
 	e.cache[subject] = cachedClaims{claims: claims, expires: time.Now().Add(identityCacheTTL)}
 }
 
@@ -206,16 +201,4 @@ func mergeClaims(base *common.EnrichedIdentity, c *oidcClaims) *common.EnrichedI
 		base.GetUser().Spec = &common.UserSpec{FirstName: first, LastName: last, Email: email}
 	}
 	return base
-}
-
-// accessTokenFromHeaders returns the caller's Bearer access token (SDK/JWT path),
-// which the load balancer has validated. The cookie path is not enriched this way:
-// its forwarded access token is short-lived and already expired by request time, so
-// it relies on the claims the proxy injects into x-amzn-oidc-data instead.
-func accessTokenFromHeaders(h http.Header) string {
-	if authz := h.Get(authorizationHeader); len(authz) > len(bearerPrefix) &&
-		strings.EqualFold(authz[:len(bearerPrefix)], bearerPrefix) {
-		return strings.TrimSpace(authz[len(bearerPrefix):])
-	}
-	return ""
 }

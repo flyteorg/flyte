@@ -44,11 +44,19 @@ func identityFromHeaders(h http.Header) *common.EnrichedIdentity {
 		return subjectOnlyIdentity(sub)
 	}
 	// JWT (SDK/CLI) path: decode the forwarded Bearer token's claims.
-	if authz := h.Get(authorizationHeader); len(authz) > len(bearerPrefix) &&
-		strings.EqualFold(authz[:len(bearerPrefix)], bearerPrefix) {
-		return identityFromJWT(strings.TrimSpace(authz[len(bearerPrefix):]))
+	if token := bearerToken(h); token != "" {
+		return identityFromJWT(token)
 	}
 	return nil
+}
+
+// bearerToken returns the value of an Authorization: Bearer <token> header, or "".
+func bearerToken(h http.Header) string {
+	authz := h.Get(authorizationHeader)
+	if len(authz) > len(bearerPrefix) && strings.EqualFold(authz[:len(bearerPrefix)], bearerPrefix) {
+		return strings.TrimSpace(authz[len(bearerPrefix):])
+	}
+	return ""
 }
 
 // identityFromJWT decodes a JWT's claims payload (without verifying the signature —
@@ -67,15 +75,7 @@ func identityFromJWT(token string) *common.EnrichedIdentity {
 	if err := json.Unmarshal(payload, &c); err != nil || c.Sub == "" {
 		return nil
 	}
-	id := subjectOnlyIdentity(c.Sub)
-	if c.Email != "" || c.GivenName != "" || c.FamilyName != "" {
-		id.GetUser().Spec = &common.UserSpec{
-			FirstName: c.GivenName,
-			LastName:  c.FamilyName,
-			Email:     c.Email,
-		}
-	}
-	return id
+	return mergeClaims(subjectOnlyIdentity(c.Sub), &c)
 }
 
 // decodeJWTSegment base64url-decodes a JWT segment, tolerating both the unpadded
@@ -94,10 +94,8 @@ func decodeJWTSegment(seg string) ([]byte, error) {
 
 // subjectOnlyIdentity builds a minimal EnrichedIdentity carrying just the subject.
 // Mirrors the cloud transformer fallback; used when only the subject is available.
+// Callers pass a non-empty subject.
 func subjectOnlyIdentity(subject string) *common.EnrichedIdentity {
-	if subject == "" {
-		return nil
-	}
 	return &common.EnrichedIdentity{
 		Principal: &common.EnrichedIdentity_User{
 			User: &common.User{

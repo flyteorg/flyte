@@ -340,7 +340,9 @@ func (s *RunService) CreateRun(
 	var executedBy *common.EnrichedIdentity
 	if s.trustHeaders {
 		executedBy = identityFromHeaders(req.Header())
-		executedBy = s.enricher.enrich(ctx, accessTokenFromHeaders(req.Header()), executedBy)
+		// Cookie path isn't enriched here: its forwarded access token is short-lived and
+		// already expired, so it relies on the claims the proxy injects into x-amzn-oidc-data.
+		executedBy = s.enricher.enrich(ctx, bearerToken(req.Header()), executedBy)
 	}
 
 	// Persist task spec and create a run model

@@ -106,10 +106,10 @@ func TestNewIdentityEnricher_EmptyURL(t *testing.T) {
 	assert.Nil(t, newIdentityEnricher(""))
 }
 
-func TestAccessTokenFromHeaders(t *testing.T) {
+func TestBearerToken(t *testing.T) {
 	h := http.Header{}
 	h.Set("Authorization", "Bearer abc")
-	assert.Equal(t, "abc", accessTokenFromHeaders(h))
+	assert.Equal(t, "abc", bearerToken(h))
 
-	assert.Equal(t, "", accessTokenFromHeaders(http.Header{}))
+	assert.Equal(t, "", bearerToken(http.Header{}))
 }
