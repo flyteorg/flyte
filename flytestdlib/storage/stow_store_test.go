@@ -751,6 +751,22 @@ func TestPrimarySchemeForConfig(t *testing.T) {
 	})
 }
 
+func TestStowFactory_AmbientDialForUnconfiguredScheme(t *testing.T) {
+	t.Run("unconfigured scheme dials with ambient credentials", func(t *testing.T) {
+		// No Schemes entry for s3: the factory must derive the stow kind from the scheme and dial with
+		// ambient credentials (empty stow config + the provider's default credential chain) instead of
+		// erroring. The resulting store has no base container and loads containers dynamically.
+		store, err := stowFactory(context.TODO(), "s3", "s3://bucket/key", &Config{}, nil, metrics)
+		assert.NoError(t, err)
+		assert.IsType(t, &StowStore{}, store)
+	})
+
+	t.Run("scheme with no registered stow kind errors", func(t *testing.T) {
+		_, err := stowFactory(context.TODO(), "not-a-scheme", "not-a-scheme://b/k", &Config{}, nil, metrics)
+		assert.Error(t, err)
+	})
+}
+
 func TestStowStore_Delete(t *testing.T) {
 	const container = "container"
 
