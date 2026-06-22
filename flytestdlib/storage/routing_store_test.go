@@ -14,8 +14,9 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
-// newRoutingDataStore builds a DataStore with an in-memory default store plus redis routing,
-// exactly as RefreshConfig wires it when redis.addr is set with a non-redis type.
+// newRoutingDataStore builds a DataStore whose primary backend is the in-memory store and whose
+// secondary redis:// scheme is dialed lazily against a miniredis. cfg.Redis.Addr is set so the
+// redis backend resolves to the test server rather than the reference host.
 func newRoutingDataStore(t *testing.T) (*DataStore, *miniredis.Miniredis) {
 	t.Helper()
 	mr := miniredis.RunT(t)
@@ -27,7 +28,7 @@ func newRoutingDataStore(t *testing.T) (*DataStore, *miniredis.Miniredis) {
 	return ds, mr
 }
 
-func TestSchemeRoutingStore_DispatchByScheme(t *testing.T) {
+func TestRoutingStore_DispatchByScheme(t *testing.T) {
 	ds, mr := newRoutingDataStore(t)
 	redisRef := DataReference(fmt.Sprintf("redis://%s/meta/inputs.pb", mr.Addr()))
 	memRef := DataReference("mem://container/raw/data.bin")
@@ -59,7 +60,7 @@ func TestSchemeRoutingStore_DispatchByScheme(t *testing.T) {
 	assert.Equal(t, int64(4), md.Size())
 }
 
-func TestSchemeRoutingStore_CrossBackendCopy(t *testing.T) {
+func TestRoutingStore_CrossBackendCopy(t *testing.T) {
 	ds, mr := newRoutingDataStore(t)
 	src := DataReference("mem://container/raw/src.bin")
 	dst := DataReference(fmt.Sprintf("redis://%s/meta/dst.bin", mr.Addr()))
@@ -72,22 +73,29 @@ func TestSchemeRoutingStore_CrossBackendCopy(t *testing.T) {
 	assert.Equal(t, "hello", got)
 }
 
-func TestSchemeRoutingStore_BaseContainerIsDefaultStore(t *testing.T) {
+func TestRoutingStore_BaseContainerIsPrimaryStore(t *testing.T) {
 	ds, _ := newRoutingDataStore(t)
-	// The in-memory store's base FQN (empty) — not the redis base.
+	// The base FQN is the primary (in-memory) store's, which is empty — not the redis base.
 	assert.Equal(t, DataReference(""), ds.GetBaseContainerFQN(context.TODO()))
 }
 
-func TestSchemeRoutingStore_NotInstalledWithoutAddr(t *testing.T) {
+// TestRoutingStore_RedisDialsReferenceHostWithoutAddr exercises the lazy-dial fallback: with no
+// redis.addr (and no per-scheme override) configured, a redis:// reference resolves its address
+// from the host portion of the reference itself and "just works".
+func TestRoutingStore_RedisDialsReferenceHostWithoutAddr(t *testing.T) {
+	mr := miniredis.RunT(t)
 	ds, err := NewDataStore(&Config{Type: TypeMemory}, promutils.NewTestScope())
 	require.NoError(t, err)
-	// Without redis.addr, redis:// references fall through to the default store untouched
-	// (the in-memory store treats the reference as an opaque key and misses).
-	_, err = ds.ReadRaw(context.TODO(), DataReference("redis://localhost:6379/x"))
-	assert.Error(t, err)
+
+	ref := DataReference(fmt.Sprintf("redis://%s/meta/inputs.pb", mr.Addr()))
+	require.NoError(t, ds.WriteRaw(context.TODO(), ref, 4, Options{}, bytes.NewReader([]byte("meta"))))
+
+	got, err := mr.Get("meta/inputs.pb")
+	require.NoError(t, err)
+	assert.Equal(t, "meta", got)
 }
 
-func TestSchemeRoutingStore_DeleteRoutes(t *testing.T) {
+func TestRoutingStore_DeleteRoutes(t *testing.T) {
 	ds, mr := newRoutingDataStore(t)
 	ref := DataReference(fmt.Sprintf("redis://%s/meta/doomed.pb", mr.Addr()))
 	require.NoError(t, ds.WriteRaw(context.TODO(), ref, 1, Options{}, bytes.NewReader([]byte("x"))))
