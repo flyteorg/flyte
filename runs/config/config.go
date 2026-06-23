@@ -36,6 +36,9 @@ var defaultConfig = &Config{
 	// false for deployments where that guarantee does not hold.
 	TrustForwardedIdentityHeaders: true,
 	// Defaults match AWS ALB authenticate-oidc. Override for other proxies (see type docs).
+	// EmailHeader is intentionally unset: ALB carries email inside the X-Amzn-Oidc-Data
+	// claims JWT, not a separate header, so there is no ALB header to default it to. It is
+	// only used by plain-value proxies (e.g. oauth2-proxy's X-Auth-Request-Email).
 	IdentityHeaders: IdentityHeadersConfig{
 		ClaimsJWTHeader: "X-Amzn-Oidc-Data",
 		SubjectHeader:   "X-Amzn-Oidc-Identity",
