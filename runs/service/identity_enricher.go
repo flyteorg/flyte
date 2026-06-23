@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -78,46 +80,58 @@ func (e *identityEnricher) enrich(ctx context.Context, accessToken string, base 
 	if isCompleteProfile(base) || accessToken == "" {
 		return base
 	}
-	// Cached by the token subject — the same token always resolves to the same user.
-	claims := e.cachedFor(tokenSubject)
+	// Cache per bearer, keyed by a hash of the access token — NOT by the token's subject,
+	// which may be shared across users (e.g. an OAuth client id) and would serve one user's
+	// profile for another's run. The same token always resolves to the same user.
+	cacheKey := tokenCacheKey(accessToken)
+	claims := e.cachedFor(cacheKey)
 	if claims == nil {
 		fetched, err := e.fetchUserinfo(ctx, accessToken)
 		if err != nil {
-			logger.Warnf(ctx, "identity enrichment: userinfo fetch failed for subject %q: %v", tokenSubject, err)
+			logger.Warnf(ctx, "identity enrichment: userinfo fetch failed for caller %q: %v", tokenSubject, err)
 			return base
 		}
 		if fetched.Sub == "" {
 			logger.Warnf(ctx, "identity enrichment: userinfo returned no subject for caller %q; keeping subject-only", tokenSubject)
 			return base
 		}
-		e.store(tokenSubject, fetched)
+		e.store(cacheKey, fetched)
 		claims = fetched
 	}
 	// Adopt userinfo's subject (authoritative) plus its profile fields.
 	return mergeClaims(subjectOnlyIdentity(claims.Sub), claims)
 }
 
-func (e *identityEnricher) cachedFor(subject string) *oidcClaims {
+// tokenCacheKey derives a stable, non-reversible cache key from the access token, so
+// userinfo results are cached per bearer. The token's own `sub` is unsafe as a key — it
+// can be shared across users (e.g. an OAuth client id), which would let one user's
+// cached profile be served for another user's run.
+func tokenCacheKey(accessToken string) string {
+	sum := sha256.Sum256([]byte(accessToken))
+	return hex.EncodeToString(sum[:])
+}
+
+func (e *identityEnricher) cachedFor(key string) *oidcClaims {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	c, ok := e.cache[subject]
+	c, ok := e.cache[key]
 	if !ok {
 		return nil
 	}
 	if time.Now().After(c.expires) {
 		// Drop the stale entry so the map does not accumulate dead keys.
-		delete(e.cache, subject)
+		delete(e.cache, key)
 		return nil
 	}
 	return c.claims
 }
 
-func (e *identityEnricher) store(subject string, claims *oidcClaims) {
+func (e *identityEnricher) store(key string, claims *oidcClaims) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	// Map is keyed by distinct user subject, so it's bounded by user count; cachedFor
+	// Keyed by access-token hash, so it's bounded by distinct active tokens; cachedFor
 	// evicts each stale entry on read. Add size-capped eviction if that ever fails.
-	e.cache[subject] = cachedClaims{claims: claims, expires: time.Now().Add(identityCacheTTL)}
+	e.cache[key] = cachedClaims{claims: claims, expires: time.Now().Add(identityCacheTTL)}
 }
 
 func (e *identityEnricher) fetchUserinfo(ctx context.Context, accessToken string) (*oidcClaims, error) {

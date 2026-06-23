@@ -84,6 +84,38 @@ func TestEnrich_AdoptsUserinfoIdentity(t *testing.T) {
 	assert.Equal(t, "kevin@union.ai", spec.GetEmail())
 }
 
+func TestEnrich_CachesPerTokenNotPerSubject(t *testing.T) {
+	// Two users authenticate through the same SDK client, so their access tokens carry
+	// the SAME token subject (the client id) but resolve to different users via userinfo.
+	// The cache must key on the token, not the subject, or user B's run gets user A's name.
+	mux := http.NewServeMux()
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
+	mux.HandleFunc("/.well-known/openid-configuration", func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write([]byte(`{"userinfo_endpoint":"` + srv.URL + `/v1/userinfo"}`))
+	})
+	mux.HandleFunc("/v1/userinfo", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Header.Get("Authorization") {
+		case "Bearer tok-a":
+			_, _ = w.Write([]byte(`{"sub":"00uA","given_name":"Alice"}`))
+		case "Bearer tok-b":
+			_, _ = w.Write([]byte(`{"sub":"00uB","given_name":"Bob"}`))
+		default:
+			w.WriteHeader(http.StatusUnauthorized)
+		}
+	})
+	e := newIdentityEnricher(srv.URL)
+
+	// Same token subject "0oaCLIENT" for both, different access tokens.
+	a := e.enrich(context.Background(), "tok-a", subjectOnlyIdentity("0oaCLIENT"))
+	b := e.enrich(context.Background(), "tok-b", subjectOnlyIdentity("0oaCLIENT"))
+
+	assert.Equal(t, "00uA", a.GetUser().GetId().GetSubject())
+	assert.Equal(t, "Alice", a.GetUser().GetSpec().GetFirstName())
+	assert.Equal(t, "00uB", b.GetUser().GetId().GetSubject())
+	assert.Equal(t, "Bob", b.GetUser().GetSpec().GetFirstName())
+}
+
 func TestEnrich_UserinfoWithoutSubjectKeepsBase(t *testing.T) {
 	// userinfo returns no subject — nothing authoritative to adopt, keep subject-only.
 	srv, _ := newTestIdP(t, `{"given_name":"NoSub"}`, http.StatusOK)
