@@ -919,13 +919,12 @@ func createStateJSON(actionSpec *workflow.ActionSpec, phase string) string {
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *TaskActionReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *TaskActionReconciler) SetupWithManager(mgr ctrl.Manager, maxConcurrentReconciles int) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&flyteorgv1.TaskAction{}).
 		Owns(&corev1.Pod{}).
 		Named("taskaction").
-		// NOTE: hardcoded for load testing; promote to executor config if it sticks
-		WithOptions(controller.Options{MaxConcurrentReconciles: 512}).
+		WithOptions(controller.Options{MaxConcurrentReconciles: maxConcurrentReconciles}).
 		Complete(r)
 }
 
