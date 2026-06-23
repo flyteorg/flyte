@@ -15,6 +15,7 @@ on:
       - main
   pull_request:
     paths:
+      - flytecopilot/**
       - Dockerfile
       - .github/workflows/flytecopilot.yml
   workflow_dispatch:
