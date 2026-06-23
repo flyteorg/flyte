@@ -437,46 +437,46 @@ func (s *RunService) persistRunModel(
 	}
 
 	// Persist the creator's identity two ways: the full EnrichedIdentity (subject, plus
-	// name/email when captured) serialized in executed_by for display, and its subject in
-	// created_by as an indexed scalar so runs can be filtered/listed by owner.
-	var executedByBytes []byte
-	var createdBy string
+	// name/email when captured) serialized in created_by for display, and its subject in
+	// created_by_subject as an indexed scalar so runs can be filtered/listed by owner.
+	var createdByBytes []byte
+	var createdBySubject string
 	if executedBy != nil {
-		createdBy = executedBy.GetUser().GetId().GetSubject()
+		createdBySubject = executedBy.GetUser().GetId().GetSubject()
 		if b, marshalErr := proto.Marshal(executedBy); marshalErr != nil {
-			logger.Warnf(ctx, "CreateRun: failed to marshal executed_by identity: %v", marshalErr)
+			logger.Warnf(ctx, "CreateRun: failed to marshal created_by identity: %v", marshalErr)
 		} else {
-			executedByBytes = b
+			createdByBytes = b
 		}
 	}
 
 	runModel := &models.Run{
-		Project:         runId.GetProject(),
-		Domain:          runId.GetDomain(),
-		RunName:         runId.GetName(),
-		Name:            RootActionName,
-		Phase:           int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-		ActionType:      int32(workflow.ActionType_ACTION_TYPE_TASK),
-		TaskProject:     nullStr(taskID.GetProject()),
-		TaskDomain:      nullStr(taskID.GetDomain()),
-		TaskName:        nullStr(taskID.GetName()),
-		TaskVersion:     nullStr(taskID.GetVersion()),
-		TaskType:        taskSpec.GetTaskTemplate().GetType(),
-		TaskShortName:   nullStr(taskSpec.GetShortName()),
-		FunctionName:    taskID.GetName(),
-		EnvironmentName: nullStr(taskSpec.GetEnvironment().GetName()),
-		ActionSpec:      actionSpecBytes,
-		ActionDetails:   []byte("{}"),
-		DetailedInfo:    detailedInfo,
-		RunSpec:         runSpecBytes,
-		Attempts:        1,
-		RunSource:       source.String(),
-		ExecutedBy:      executedByBytes,
-		CreatedBy:       nullStr(createdBy),
-		TriggerTaskName: nullStr(triggerTaskName),
-		TriggerName:     nullStr(triggerName),
-		TriggerRevision: sql.NullInt64{Int64: triggerRevision, Valid: triggerRevision != 0},
-		TriggerType:     nullStr(triggerType),
+		Project:          runId.GetProject(),
+		Domain:           runId.GetDomain(),
+		RunName:          runId.GetName(),
+		Name:             RootActionName,
+		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		ActionType:       int32(workflow.ActionType_ACTION_TYPE_TASK),
+		TaskProject:      nullStr(taskID.GetProject()),
+		TaskDomain:       nullStr(taskID.GetDomain()),
+		TaskName:         nullStr(taskID.GetName()),
+		TaskVersion:      nullStr(taskID.GetVersion()),
+		TaskType:         taskSpec.GetTaskTemplate().GetType(),
+		TaskShortName:    nullStr(taskSpec.GetShortName()),
+		FunctionName:     taskID.GetName(),
+		EnvironmentName:  nullStr(taskSpec.GetEnvironment().GetName()),
+		ActionSpec:       actionSpecBytes,
+		ActionDetails:    []byte("{}"),
+		DetailedInfo:     detailedInfo,
+		RunSpec:          runSpecBytes,
+		Attempts:         1,
+		RunSource:        source.String(),
+		CreatedBy:        createdByBytes,
+		CreatedBySubject: nullStr(createdBySubject),
+		TriggerTaskName:  nullStr(triggerTaskName),
+		TriggerName:      nullStr(triggerName),
+		TriggerRevision:  sql.NullInt64{Int64: triggerRevision, Valid: triggerRevision != 0},
+		TriggerType:      nullStr(triggerType),
 	}
 
 	return s.repo.ActionRepo().CreateAction(ctx, runModel, triggerName != "")
@@ -1559,9 +1559,9 @@ func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 
 	// The stored identity (subject, plus name/email when captured). Left nil for
 	// unauthenticated runs or if the stored bytes are unreadable.
-	if len(action.ExecutedBy) > 0 {
+	if len(action.CreatedBy) > 0 {
 		var id common.EnrichedIdentity
-		if err := proto.Unmarshal(action.ExecutedBy, &id); err == nil {
+		if err := proto.Unmarshal(action.CreatedBy, &id); err == nil {
 			metadata.ExecutedBy = &id
 		}
 	}

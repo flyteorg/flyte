@@ -26,8 +26,8 @@ func fullIdentity(sub, first, last, email string) *common.EnrichedIdentity {
 }
 
 func TestActionMetadataFromModel_ExecutedBy(t *testing.T) {
-	t.Run("full identity from executed_by", func(t *testing.T) {
-		m := &models.Action{ExecutedBy: mustMarshalIdentity(t, fullIdentity("00u1", "Kevin", "Su", "kevin@union.ai"))}
+	t.Run("full identity from created_by", func(t *testing.T) {
+		m := &models.Action{CreatedBy: mustMarshalIdentity(t, fullIdentity("00u1", "Kevin", "Su", "kevin@union.ai"))}
 		eb := actionMetadataFromModel(m).GetExecutedBy().GetUser()
 		assert.Equal(t, "00u1", eb.GetId().GetSubject())
 		assert.Equal(t, "Kevin", eb.GetSpec().GetFirstName())
@@ -35,15 +35,15 @@ func TestActionMetadataFromModel_ExecutedBy(t *testing.T) {
 		assert.Equal(t, "kevin@union.ai", eb.GetSpec().GetEmail())
 	})
 
-	t.Run("subject-only identity from executed_by", func(t *testing.T) {
-		m := &models.Action{ExecutedBy: mustMarshalIdentity(t, subjectOnlyIdentity("00u2"))}
+	t.Run("subject-only identity from created_by", func(t *testing.T) {
+		m := &models.Action{CreatedBy: mustMarshalIdentity(t, subjectOnlyIdentity("00u2"))}
 		eb := actionMetadataFromModel(m).GetExecutedBy().GetUser()
 		assert.Equal(t, "00u2", eb.GetId().GetSubject())
 		assert.Nil(t, eb.GetSpec())
 	})
 
-	t.Run("corrupt executed_by yields nil", func(t *testing.T) {
-		m := &models.Action{ExecutedBy: []byte("not a valid proto\xff\xfe")}
+	t.Run("corrupt created_by yields nil", func(t *testing.T) {
+		m := &models.Action{CreatedBy: []byte("not a valid proto\xff\xfe")}
 		assert.Nil(t, actionMetadataFromModel(m).GetExecutedBy())
 	})
 
