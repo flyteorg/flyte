@@ -66,15 +66,6 @@ jobs:
             echo "::error::DEPOT_PROJECT_ID repo variable is not set. Add it under Settings → Secrets and variables → Actions → Variables." >&2
             exit 1
           fi
-      - name: Setup Golang caches
-        uses: actions/cache@v4
-        with:
-          path: |
-            /root/.cache/go-build
-            /root/go/pkg/mod
-          key: ${{ runner.os }}-golang-${{ hashFiles('go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-golang-
       - name: Set version
         run: |
           echo "FLYTE_VERSION=${{ github.sha }}" >> $GITHUB_ENV
