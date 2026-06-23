@@ -2524,6 +2524,8 @@ func (m *ListRunsRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for PausedActionsOnly
+
 	switch v := m.ScopeBy.(type) {
 	case *ListRunsRequest_Org:
 		if v == nil {

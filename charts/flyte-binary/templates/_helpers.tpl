@@ -191,6 +191,8 @@ Get the Flyte API paths for ingress.
 - /flyteidl2.project.ProjectService/*
 - /flyteidl2.app.AppService
 - /flyteidl2.app.AppService/*
+- /flyteidl2.app.AppLogsService
+- /flyteidl2.app.AppLogsService/*
 - /flyteidl2.trigger.TriggerService
 - /flyteidl2.trigger.TriggerService/*
 - /flyteidl2.auth.IdentityService
