@@ -37,6 +37,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
@@ -923,6 +924,8 @@ func (r *TaskActionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&flyteorgv1.TaskAction{}).
 		Owns(&corev1.Pod{}).
 		Named("taskaction").
+		// NOTE: hardcoded for load testing; promote to executor config if it sticks
+		WithOptions(controller.Options{MaxConcurrentReconciles: 512}).
 		Complete(r)
 }
 
