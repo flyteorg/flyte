@@ -63,7 +63,7 @@ func TestUnsubscribeScopedByRun(t *testing.T) {
 	c.Unsubscribe("runA", "a0", ch)
 
 	// Unsubscribing the only subscriber should drop the key entirely.
-	if _, ok := c.subscribers["runA/a0"]; ok {
+	if _, ok := c.subscribers[subscriberKey("runA", "a0")]; ok {
 		t.Fatal("subscriber key not cleaned up after Unsubscribe")
 	}
 
