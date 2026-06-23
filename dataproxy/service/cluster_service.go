@@ -35,7 +35,8 @@ func (s *ClusterService) SelectCluster(
 	// (e.g. the ALB on the dev cluster → https). When it's absent the request reached us
 	// directly with no proxy (e.g. a local devbox over http), so default to http.
 	var endpoint string
-	if requestHost != "" {
+	host := strings.TrimSpace(requestHost)
+	if host != "" {
 		scheme := "http"
 		if proto := req.Header().Get("X-Forwarded-Proto"); proto != "" {
 			// X-Forwarded-Proto may be a comma-separated list (proxy chain); the first value
@@ -45,7 +46,7 @@ func (s *ClusterService) SelectCluster(
 				scheme = candidate
 			}
 		}
-		endpoint = scheme + "://" + strings.TrimSpace(requestHost)
+		endpoint = scheme + "://" + host
 	}
 
 	return connect.NewResponse(&cluster.SelectClusterResponse{
