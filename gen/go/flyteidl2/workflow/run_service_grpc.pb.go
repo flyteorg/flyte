@@ -25,7 +25,6 @@ const (
 	RunService_WatchRunDetails_FullMethodName     = "/flyteidl2.workflow.RunService/WatchRunDetails"
 	RunService_GetActionDetails_FullMethodName    = "/flyteidl2.workflow.RunService/GetActionDetails"
 	RunService_WatchActionDetails_FullMethodName  = "/flyteidl2.workflow.RunService/WatchActionDetails"
-	RunService_GetActionData_FullMethodName       = "/flyteidl2.workflow.RunService/GetActionData"
 	RunService_ListRuns_FullMethodName            = "/flyteidl2.workflow.RunService/ListRuns"
 	RunService_WatchRuns_FullMethodName           = "/flyteidl2.workflow.RunService/WatchRuns"
 	RunService_ListActions_FullMethodName         = "/flyteidl2.workflow.RunService/ListActions"
@@ -54,9 +53,6 @@ type RunServiceClient interface {
 	GetActionDetails(ctx context.Context, in *GetActionDetailsRequest, opts ...grpc.CallOption) (*GetActionDetailsResponse, error)
 	// Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
 	WatchActionDetails(ctx context.Context, in *WatchActionDetailsRequest, opts ...grpc.CallOption) (RunService_WatchActionDetailsClient, error)
-	// Deprecated: Do not use.
-	// Deprecated: Use DataProxyService.GetActionData instead.
-	GetActionData(ctx context.Context, in *GetActionDataRequest, opts ...grpc.CallOption) (*GetActionDataResponse, error)
 	// List runs based on the provided filter criteria.
 	ListRuns(ctx context.Context, in *ListRunsRequest, opts ...grpc.CallOption) (*ListRunsResponse, error)
 	// Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
@@ -190,16 +186,6 @@ func (x *runServiceWatchActionDetailsClient) Recv() (*WatchActionDetailsResponse
 		return nil, err
 	}
 	return m, nil
-}
-
-// Deprecated: Do not use.
-func (c *runServiceClient) GetActionData(ctx context.Context, in *GetActionDataRequest, opts ...grpc.CallOption) (*GetActionDataResponse, error) {
-	out := new(GetActionDataResponse)
-	err := c.cc.Invoke(ctx, RunService_GetActionData_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *runServiceClient) ListRuns(ctx context.Context, in *ListRunsRequest, opts ...grpc.CallOption) (*ListRunsResponse, error) {
@@ -400,9 +386,6 @@ type RunServiceServer interface {
 	GetActionDetails(context.Context, *GetActionDetailsRequest) (*GetActionDetailsResponse, error)
 	// Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
 	WatchActionDetails(*WatchActionDetailsRequest, RunService_WatchActionDetailsServer) error
-	// Deprecated: Do not use.
-	// Deprecated: Use DataProxyService.GetActionData instead.
-	GetActionData(context.Context, *GetActionDataRequest) (*GetActionDataResponse, error)
 	// List runs based on the provided filter criteria.
 	ListRuns(context.Context, *ListRunsRequest) (*ListRunsResponse, error)
 	// Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
@@ -451,9 +434,6 @@ func (UnimplementedRunServiceServer) GetActionDetails(context.Context, *GetActio
 }
 func (UnimplementedRunServiceServer) WatchActionDetails(*WatchActionDetailsRequest, RunService_WatchActionDetailsServer) error {
 	return status.Errorf(codes.Unimplemented, "method WatchActionDetails not implemented")
-}
-func (UnimplementedRunServiceServer) GetActionData(context.Context, *GetActionDataRequest) (*GetActionDataResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetActionData not implemented")
 }
 func (UnimplementedRunServiceServer) ListRuns(context.Context, *ListRunsRequest) (*ListRunsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListRuns not implemented")
@@ -609,24 +589,6 @@ type runServiceWatchActionDetailsServer struct {
 
 func (x *runServiceWatchActionDetailsServer) Send(m *WatchActionDetailsResponse) error {
 	return x.ServerStream.SendMsg(m)
-}
-
-func _RunService_GetActionData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetActionDataRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RunServiceServer).GetActionData(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: RunService_GetActionData_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RunServiceServer).GetActionData(ctx, req.(*GetActionDataRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _RunService_ListRuns_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -843,10 +805,6 @@ var RunService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetActionDetails",
 			Handler:    _RunService_GetActionDetails_Handler,
-		},
-		{
-			MethodName: "GetActionData",
-			Handler:    _RunService_GetActionData_Handler,
 		},
 		{
 			MethodName: "ListRuns",

@@ -35,9 +35,6 @@ class RunService(Protocol):
     def watch_action_details(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsRequest, ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
-    async def get_action_data(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse:
-        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
-
     async def list_runs(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
@@ -133,16 +130,6 @@ class RunServiceASGIApplication(ConnectASGIApplication[RunService]):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.watch_action_details,
-                ),
-                "/flyteidl2.workflow.RunService/GetActionData": Endpoint.unary(
-                    method=MethodInfo(
-                        name="GetActionData",
-                        service_name="flyteidl2.workflow.RunService",
-                        input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest,
-                        output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse,
-                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
-                    ),
-                    function=svc.get_action_data,
                 ),
                 "/flyteidl2.workflow.RunService/ListRuns": Endpoint.unary(
                     method=MethodInfo(
@@ -381,28 +368,6 @@ class RunServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
-    async def get_action_data(
-        self,
-        request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest,
-        *,
-        headers: Headers | Mapping[str, str] | None = None,
-        timeout_ms: int | None = None,
-        use_get: bool = False,
-    ) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse:
-        return await self.execute_unary(
-            request=request,
-            method=MethodInfo(
-                name="GetActionData",
-                service_name="flyteidl2.workflow.RunService",
-                input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest,
-                output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse,
-                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
-            ),
-            headers=headers,
-            timeout_ms=timeout_ms,
-            use_get=use_get,
-        )
-
     async def list_runs(
         self,
         request: flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsRequest,
@@ -625,8 +590,6 @@ class RunServiceSync(Protocol):
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def watch_action_details(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
-    def get_action_data(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse:
-        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def list_runs(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def watch_runs(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunsRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunsResponse]:
@@ -712,16 +675,6 @@ class RunServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.watch_action_details,
-                ),
-                "/flyteidl2.workflow.RunService/GetActionData": EndpointSync.unary(
-                    method=MethodInfo(
-                        name="GetActionData",
-                        service_name="flyteidl2.workflow.RunService",
-                        input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest,
-                        output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse,
-                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
-                    ),
-                    function=service.get_action_data,
                 ),
                 "/flyteidl2.workflow.RunService/ListRuns": EndpointSync.unary(
                     method=MethodInfo(
@@ -958,28 +911,6 @@ class RunServiceClientSync(ConnectClientSync):
             ),
             headers=headers,
             timeout_ms=timeout_ms,
-        )
-
-    def get_action_data(
-        self,
-        request: flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest,
-        *,
-        headers: Headers | Mapping[str, str] | None = None,
-        timeout_ms: int | None = None,
-        use_get: bool = False,
-    ) -> flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse:
-        return self.execute_unary(
-            request=request,
-            method=MethodInfo(
-                name="GetActionData",
-                service_name="flyteidl2.workflow.RunService",
-                input=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest,
-                output=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse,
-                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
-            ),
-            headers=headers,
-            timeout_ms=timeout_ms,
-            use_get=use_get,
         )
 
     def list_runs(

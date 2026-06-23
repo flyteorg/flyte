@@ -41,12 +41,6 @@ service RunService {
   // Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
   rpc WatchActionDetails(WatchActionDetailsRequest) returns (stream WatchActionDetailsResponse) {}
 
-  // Deprecated: Use DataProxyService.GetActionData instead.
-  rpc GetActionData(GetActionDataRequest) returns (GetActionDataResponse) {
-    option deprecated = true;
-    option idempotency_level = NO_SIDE_EFFECTS;
-  }
-
   // List runs based on the provided filter criteria.
   rpc ListRuns(ListRunsRequest) returns (ListRunsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
@@ -201,21 +195,6 @@ message WatchActionDetailsRequest {
 message WatchActionDetailsResponse {
   // Detailed information about the action.
   ActionDetails details = 1;
-}
-
-// Request message for querying action data.
-message GetActionDataRequest {
-  // Action to query.
-  common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
-}
-
-// Response message for querying action data.
-message GetActionDataResponse {
-  // Inputs for the action.
-  task.Inputs inputs = 1;
-
-  // Outputs for the action.
-  task.Outputs outputs = 2;
 }
 
 // Request message for getting action data URIs.

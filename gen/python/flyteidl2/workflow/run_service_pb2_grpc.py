@@ -45,11 +45,6 @@ class RunServiceStub(object):
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsResponse.FromString,
                 )
-        self.GetActionData = channel.unary_unary(
-                '/flyteidl2.workflow.RunService/GetActionData',
-                request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse.FromString,
-                )
         self.ListRuns = channel.unary_unary(
                 '/flyteidl2.workflow.RunService/ListRuns',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsRequest.SerializeToString,
@@ -143,13 +138,6 @@ class RunServiceServicer(object):
 
     def WatchActionDetails(self, request, context):
         """Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def GetActionData(self, request, context):
-        """Deprecated: Use DataProxyService.GetActionData instead.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -262,11 +250,6 @@ def add_RunServiceServicer_to_server(servicer, server):
                     servicer.WatchActionDetails,
                     request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsResponse.SerializeToString,
-            ),
-            'GetActionData': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetActionData,
-                    request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest.FromString,
-                    response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse.SerializeToString,
             ),
             'ListRuns': grpc.unary_unary_rpc_method_handler(
                     servicer.ListRuns,
@@ -428,23 +411,6 @@ class RunService(object):
         return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.RunService/WatchActionDetails',
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def GetActionData(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/GetActionData',
-            flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataRequest.SerializeToString,
-            flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDataResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
