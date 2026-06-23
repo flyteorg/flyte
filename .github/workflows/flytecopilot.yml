@@ -4,20 +4,51 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
-# Publish-only: runs from trusted refs (main / manual dispatch) so the build
-# never executes untrusted PR code while Depot OIDC + GHCR creds are in scope
-# (avoids the pull_request_target "pwn-request" class of attack).
+# Publishing runs only from trusted refs (push to main / manual dispatch) so
+# the build never executes untrusted PR code while Depot OIDC + GHCR creds are
+# in scope (avoids the pull_request_target "pwn-request" class of attack).
+# PRs that touch the image build get a credential-free, push-free validation
+# build instead (plain pull_request, runs in the PR's own context — no secrets).
 on:
   push:
     branches:
       - main
+  pull_request:
+    paths:
+      - Dockerfile
+      - .github/workflows/flytecopilot.yml
   workflow_dispatch:
 
 env:
   DEPOT_PROJECT_ID: ${{ vars.DEPOT_PROJECT_ID }}
 
 jobs:
+  # PR validation: build the image but never push. No registry/OIDC creds, so
+  # it is safe to run against untrusted fork PR code.
+  build-flytecopilot-image:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          # Single-arch is enough to validate the build on PRs.
+          platforms: linux/amd64
+          file: Dockerfile
+          target: flytecopilot
+          push: false
+
   build-and-push-flytecopilot-image:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: read
