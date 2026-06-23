@@ -68,24 +68,25 @@ func TestEnrich_NoOpCases(t *testing.T) {
 	assert.Equal(t, int32(0), atomic.LoadInt32(userinfoHits))
 }
 
-func TestEnrich_FillsOnlyMissingFields(t *testing.T) {
-	// userinfo returns names (no email); base already has an email from the cookie header.
-	srv, _ := newTestIdP(t, `{"sub":"00u3","given_name":"Kevin","family_name":"Su"}`, http.StatusOK)
+func TestEnrich_AdoptsUserinfoIdentity(t *testing.T) {
+	// Real Bearer case: the access token's sub is a non-user principal (e.g. the SDK
+	// client/app id), while userinfo authoritatively resolves the actual user. enrich
+	// adopts userinfo's subject AND profile, so SDK runs attribute to the same user as
+	// the cookie path rather than to the client id.
+	srv, _ := newTestIdP(t, `{"sub":"00uUSER","given_name":"Kevin","family_name":"Su","email":"kevin@union.ai"}`, http.StatusOK)
 	e := newIdentityEnricher(srv.URL)
 
-	base := subjectOnlyIdentity("00u3")
-	base.GetUser().Spec = &common.UserSpec{Email: "kevin@union.ai"}
-
-	got := e.enrich(context.Background(), "access-tok", base)
+	got := e.enrich(context.Background(), "access-tok", subjectOnlyIdentity("0oaCLIENT"))
+	assert.Equal(t, "00uUSER", got.GetUser().GetId().GetSubject()) // userinfo subject adopted
 	spec := got.GetUser().GetSpec()
 	assert.Equal(t, "Kevin", spec.GetFirstName())
 	assert.Equal(t, "Su", spec.GetLastName())
-	assert.Equal(t, "kevin@union.ai", spec.GetEmail()) // header email preserved
+	assert.Equal(t, "kevin@union.ai", spec.GetEmail())
 }
 
-func TestEnrich_RejectsSubjectMismatch(t *testing.T) {
-	// userinfo returns a different subject than the caller — must not be trusted.
-	srv, _ := newTestIdP(t, `{"sub":"someone-else","email":"evil@x.com","given_name":"Mallory"}`, http.StatusOK)
+func TestEnrich_UserinfoWithoutSubjectKeepsBase(t *testing.T) {
+	// userinfo returns no subject — nothing authoritative to adopt, keep subject-only.
+	srv, _ := newTestIdP(t, `{"given_name":"NoSub"}`, http.StatusOK)
 	e := newIdentityEnricher(srv.URL)
 
 	got := e.enrich(context.Background(), "access-tok", subjectOnlyIdentity("00u2"))

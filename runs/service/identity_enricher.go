@@ -52,41 +52,49 @@ func newIdentityEnricher(authServerBaseURL string) *identityEnricher {
 	}
 }
 
-// enrich fills any profile fields (email, first/last name) missing from base with
-// userinfo claims fetched using the access token. Fields already present on base
-// (e.g. from x-amzn-oidc-data) are authoritative and kept. userinfo is queried only
-// when the profile is incomplete and not cached. On a cache miss it makes a
-// synchronous userinfo call (bounded by userinfoHTTPTimeout), which adds latency to
-// run creation; on any error or timeout it returns base unchanged — enrichment is
+// enrich resolves the caller's full identity (subject, email, first/last name) from the
+// OIDC userinfo endpoint on the Bearer path. base already carries a complete profile on
+// the cookie path (claims are in x-amzn-oidc-data) or has no access token to query with —
+// in those cases it is returned unchanged. Otherwise userinfo is queried (cached by the
+// token's subject; a synchronous call bounded by userinfoHTTPTimeout that adds latency to
+// run creation). On any error or timeout it returns base unchanged — enrichment is
 // best-effort and never fails run creation.
+//
+// userinfo is the authoritative statement of who the access token belongs to, so its
+// subject and profile are adopted wholesale: an OAuth access token's own `sub` is not
+// guaranteed to be the user (e.g. Okta sets it to the client/app id), and trusting it
+// would both lose the profile and attribute the run to a non-user principal — diverging
+// from the cookie path, which records the real user. We therefore replace base's
+// token-derived subject with userinfo's. (There is no token-confusion risk: userinfo is a
+// synchronous call with the caller's own LB-validated access token.)
 func (e *identityEnricher) enrich(ctx context.Context, accessToken string, base *common.EnrichedIdentity) *common.EnrichedIdentity {
 	if e == nil || base.GetUser() == nil {
 		return base
 	}
-	subject := base.GetUser().GetId().GetSubject()
-	if subject == "" {
+	tokenSubject := base.GetUser().GetId().GetSubject()
+	if tokenSubject == "" {
 		return base
-	}
-	// Serve a previously fetched set of claims without another userinfo round-trip.
-	if cached := e.cachedFor(subject); cached != nil {
-		return mergeClaims(base, cached)
 	}
 	if isCompleteProfile(base) || accessToken == "" {
 		return base
 	}
-	claims, err := e.fetchUserinfo(ctx, accessToken)
-	if err != nil {
-		logger.Warnf(ctx, "identity enrichment: userinfo fetch failed for subject %q: %v", subject, err)
-		return base
+	// Cached by the token subject — the same token always resolves to the same user.
+	claims := e.cachedFor(tokenSubject)
+	if claims == nil {
+		fetched, err := e.fetchUserinfo(ctx, accessToken)
+		if err != nil {
+			logger.Warnf(ctx, "identity enrichment: userinfo fetch failed for subject %q: %v", tokenSubject, err)
+			return base
+		}
+		if fetched.Sub == "" {
+			logger.Warnf(ctx, "identity enrichment: userinfo returned no subject for caller %q; keeping subject-only", tokenSubject)
+			return base
+		}
+		e.store(tokenSubject, fetched)
+		claims = fetched
 	}
-	// Guard against token confusion / IdP misconfiguration: OIDC userinfo responses must
-	// include sub, and it must match the caller's subject.
-	if claims.Sub == "" || claims.Sub != subject {
-		logger.Warnf(ctx, "identity enrichment: userinfo subject %q does not match caller %q; ignoring", claims.Sub, subject)
-		return base
-	}
-	e.store(subject, claims)
-	return mergeClaims(base, claims)
+	// Adopt userinfo's subject (authoritative) plus its profile fields.
+	return mergeClaims(subjectOnlyIdentity(claims.Sub), claims)
 }
 
 func (e *identityEnricher) cachedFor(subject string) *oidcClaims {
