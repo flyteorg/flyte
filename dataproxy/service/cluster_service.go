@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"strings"
 
 	"connectrpc.com/connect"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -26,7 +27,25 @@ func (s *ClusterService) SelectCluster(
 ) (*connect.Response[cluster.SelectClusterResponse], error) {
 	requestHost := req.Header().Get("Host")
 	logger.Debugf(ctx, "Request Host: %s", requestHost)
+
+	// Return a scheme-qualified base URL, not a bare host. Clients (the console) use
+	// ClusterEndpoint directly as a Connect transport base URL; a value without a scheme
+	// is treated by the browser as a relative path and resolved against the current page,
+	// producing a 404. Prefer X-Forwarded-Proto, which any TLS-terminating proxy/LB sets
+	// (e.g. the ALB on the dev cluster → https). When it's absent the request reached us
+	// directly with no proxy (e.g. a local devbox over http), so default to http.
+	var endpoint string
+	if requestHost != "" {
+		scheme := "http"
+		if proto := req.Header().Get("X-Forwarded-Proto"); proto != "" {
+			// X-Forwarded-Proto may be a comma-separated list (proxy chain); the first
+			// value is the scheme the client used.
+			scheme = strings.TrimSpace(strings.Split(proto, ",")[0])
+		}
+		endpoint = scheme + "://" + requestHost
+	}
+
 	return connect.NewResponse(&cluster.SelectClusterResponse{
-		ClusterEndpoint: requestHost,
+		ClusterEndpoint: endpoint,
 	}), nil
 }
