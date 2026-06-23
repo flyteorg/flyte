@@ -36,6 +36,9 @@ var defaultConfig = &Config{
 	// false for deployments where that guarantee does not hold.
 	TrustForwardedIdentityHeaders: true,
 	// Defaults match AWS ALB authenticate-oidc. Override for other proxies (see type docs).
+	// EmailHeader is intentionally unset: ALB carries email inside the X-Amzn-Oidc-Data
+	// claims JWT, not a separate header, so there is no ALB header to default it to. It is
+	// only used by plain-value proxies (e.g. oauth2-proxy's X-Auth-Request-Email).
 	IdentityHeaders: IdentityHeadersConfig{
 		ClaimsJWTHeader: "X-Amzn-Oidc-Data",
 		SubjectHeader:   "X-Amzn-Oidc-Identity",
@@ -93,20 +96,23 @@ type Config struct {
 	IdentityHeaders IdentityHeadersConfig `json:"identityHeaders"`
 }
 
-// IdentityHeadersConfig names the proxy-forwarded headers the caller's subject is read
-// from. Defaults match AWS ALB authenticate-oidc. For oauth2-proxy / Traefik
-// forward-auth, clear ClaimsJWTHeader and set SubjectHeader to "X-Auth-Request-User".
-// Only the subject is captured; the display identity (name/email) is resolved from it at
-// read time. The Authorization: Bearer path (SDK/CLI) is always honored regardless of
-// these settings.
+// IdentityHeadersConfig names the proxy-forwarded headers the caller's identity is
+// read from. Defaults match AWS ALB authenticate-oidc. For oauth2-proxy / Traefik
+// forward-auth, clear ClaimsJWTHeader and set SubjectHeader to "X-Auth-Request-User"
+// and EmailHeader to "X-Auth-Request-Email". The Authorization: Bearer path (SDK/CLI)
+// is always honored regardless of these settings.
 type IdentityHeadersConfig struct {
-	// ClaimsJWTHeader carries a JWT whose payload holds the OIDC claims; the `sub` claim
-	// is read from it. ALB: X-Amzn-Oidc-Data. Empty to disable.
+	// ClaimsJWTHeader carries a JWT whose payload holds the OIDC claims
+	// (sub, email, given_name, family_name). ALB: X-Amzn-Oidc-Data. Empty to disable.
 	ClaimsJWTHeader string `json:"claimsJwtHeader" pflag:",Header carrying a claims JWT (ALB: X-Amzn-Oidc-Data)"`
 
 	// SubjectHeader carries the subject directly, used when no claims JWT is present.
 	// ALB: X-Amzn-Oidc-Identity. oauth2-proxy: X-Auth-Request-User. Empty to disable.
 	SubjectHeader string `json:"subjectHeader" pflag:",Header carrying the subject directly (ALB: X-Amzn-Oidc-Identity)"`
+
+	// EmailHeader carries the email directly, for proxies that forward plain values
+	// instead of a JWT. oauth2-proxy: X-Auth-Request-Email. Empty to disable.
+	EmailHeader string `json:"emailHeader" pflag:",Header carrying the email directly (oauth2-proxy: X-Auth-Request-Email)"`
 }
 
 // AuthMetadataConfig controls how the runs service serves OAuth2 authorization

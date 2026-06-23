@@ -18,7 +18,6 @@ var ActionColumnsSet = sets.New(
 	"run_name",
 	"phase",
 	"run_source",
-	"created_by",
 	"trigger_task_name",
 	"trigger_name",
 	"trigger_revision",
@@ -53,12 +52,11 @@ type Action struct {
 	// Who initiated this run(web, CLI, scheduler, etc.)
 	RunSource string `db:"run_source" json:"run_source,omitempty"`
 
-	// CreatedBy is the OIDC subject of the run's creator, captured from the auth headers
-	// the load balancer forwards. Stored as a queryable, indexed column (filter/sort by
-	// owner). The display identity (name/email) is resolved from this subject at read time,
-	// so it never goes stale. Surfaced as ActionMetadata.executed_by. NULL for runs created
-	// without an authenticated identity.
-	CreatedBy sql.NullString `db:"created_by" json:"created_by,omitempty"`
+	// ExecutedBy is the serialized common.EnrichedIdentity of the run's creator
+	// (subject, plus name/email when the forwarded OIDC claims include them), captured
+	// from the auth headers the load balancer forwards. Surfaced directly as
+	// ActionMetadata.executed_by. NULL for runs created without an authenticated identity.
+	ExecutedBy []byte `db:"executed_by" json:"executed_by,omitempty"`
 
 	// Trigger fields — only set for runs created via RUN_SOURCE_SCHEDULE_TRIGGER.
 	TriggerTaskName sql.NullString `db:"trigger_task_name"`

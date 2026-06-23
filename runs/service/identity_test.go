@@ -19,6 +19,7 @@ var albCfg = config.IdentityHeadersConfig{
 // proxyCfg is a plain-value proxy (oauth2-proxy / Traefik forward-auth).
 var proxyCfg = config.IdentityHeadersConfig{
 	SubjectHeader: "X-Auth-Request-User",
+	EmailHeader:   "X-Auth-Request-Email",
 }
 
 // jwt builds a syntactically valid (unsigned) JWT carrying the given claims payload.
@@ -34,40 +35,59 @@ func jwtPadded(payloadJSON string) string {
 	return enc(`{"alg":"ES256"}`) + "." + base64.URLEncoding.EncodeToString([]byte(payloadJSON)) + ".sig"
 }
 
-func TestSubjectFromJWT_ToleratesPadding(t *testing.T) {
-	assert.Equal(t, "00u1", subjectFromJWT(jwtPadded(`{"sub":"00u1","email":"kevin@union.ai"}`)))
+func TestIdentityFromJWT_ToleratesPadding(t *testing.T) {
+	id := identityFromJWT(jwtPadded(`{"sub":"00u1","given_name":"Kevin","family_name":"Su","email":"kevin@union.ai"}`))
+	assert.Equal(t, "00u1", id.GetUser().GetId().GetSubject())
+	assert.Equal(t, "Kevin", id.GetUser().GetSpec().GetFirstName())
+	assert.Equal(t, "Su", id.GetUser().GetSpec().GetLastName())
+	assert.Equal(t, "kevin@union.ai", id.GetUser().GetSpec().GetEmail())
 }
 
-func TestSubjectFromHeaders(t *testing.T) {
+func TestIdentityFromHeaders(t *testing.T) {
 	tests := []struct {
-		name    string
-		cfg     config.IdentityHeadersConfig
-		headers map[string]string
-		want    string
+		name                         string
+		cfg                          config.IdentityHeadersConfig
+		headers                      map[string]string
+		wantNil                      bool
+		wantSub, wantFirst, wantLast string
+		wantEmail                    string
 	}{
 		{
-			name:    "amzn oidc data JWT (cookie path)",
-			cfg:     albCfg,
-			headers: map[string]string{"X-Amzn-Oidc-Data": jwt(`{"sub":"00u123","email":"carina@union.ai"}`)},
-			want:    "00u123",
+			name:      "amzn oidc data: full claims (cookie path)",
+			cfg:       albCfg,
+			headers:   map[string]string{"X-Amzn-Oidc-Data": jwt(`{"sub":"00u123","given_name":"Carina","family_name":"Didilescu","email":"carina@union.ai"}`)},
+			wantSub:   "00u123",
+			wantFirst: "Carina",
+			wantLast:  "Didilescu",
+			wantEmail: "carina@union.ai",
+		},
+		{
+			name:      "amzn oidc data: subject + email only (no profile scope)",
+			cfg:       albCfg,
+			headers:   map[string]string{"X-Amzn-Oidc-Data": jwt(`{"sub":"00u999","email":"a@b.com"}`)},
+			wantSub:   "00u999",
+			wantEmail: "a@b.com",
 		},
 		{
 			name:    "amzn oidc identity header fallback (subject only)",
 			cfg:     albCfg,
 			headers: map[string]string{"X-Amzn-Oidc-Identity": "okta|sub-only"},
-			want:    "okta|sub-only",
+			wantSub: "okta|sub-only",
 		},
 		{
-			name:    "oauth2-proxy/traefik plain subject header",
-			cfg:     proxyCfg,
-			headers: map[string]string{"X-Auth-Request-User": "user-42"},
-			want:    "user-42",
+			name:      "oauth2-proxy/traefik plain headers (subject + email)",
+			cfg:       proxyCfg,
+			headers:   map[string]string{"X-Auth-Request-User": "user-42", "X-Auth-Request-Email": "u42@union.ai"},
+			wantSub:   "user-42",
+			wantEmail: "u42@union.ai",
 		},
 		{
-			name:    "bearer token subject (SDK path)",
-			cfg:     albCfg,
-			headers: map[string]string{authorizationHeader: "Bearer " + jwt(`{"sub":"sdk-user"}`)},
-			want:    "sdk-user",
+			name:      "bearer token claims (SDK path)",
+			cfg:       albCfg,
+			headers:   map[string]string{authorizationHeader: "Bearer " + jwt(`{"sub":"sdk-user","given_name":"Dev","email":"dev@union.ai"}`)},
+			wantSub:   "sdk-user",
+			wantFirst: "Dev",
+			wantEmail: "dev@union.ai",
 		},
 		{
 			name: "data header takes precedence over bearer",
@@ -76,12 +96,12 @@ func TestSubjectFromHeaders(t *testing.T) {
 				"X-Amzn-Oidc-Data":  jwt(`{"sub":"cookie-user"}`),
 				authorizationHeader: "Bearer " + jwt(`{"sub":"bearer-user"}`),
 			},
-			want: "cookie-user",
+			wantSub: "cookie-user",
 		},
-		{name: "no auth headers", cfg: albCfg, headers: map[string]string{}, want: ""},
-		{name: "non-bearer authorization", cfg: albCfg, headers: map[string]string{authorizationHeader: "Basic abc"}, want: ""},
-		{name: "malformed jwt (two segments)", cfg: albCfg, headers: map[string]string{"X-Amzn-Oidc-Data": "a.b"}, want: ""},
-		{name: "jwt without sub", cfg: albCfg, headers: map[string]string{"X-Amzn-Oidc-Data": jwt(`{"email":"a@b.com"}`)}, want: ""},
+		{name: "no auth headers", cfg: albCfg, headers: map[string]string{}, wantNil: true},
+		{name: "non-bearer authorization", cfg: albCfg, headers: map[string]string{authorizationHeader: "Basic abc"}, wantNil: true},
+		{name: "malformed jwt (two segments)", cfg: albCfg, headers: map[string]string{"X-Amzn-Oidc-Data": "a.b"}, wantNil: true},
+		{name: "jwt without sub", cfg: albCfg, headers: map[string]string{"X-Amzn-Oidc-Data": jwt(`{"email":"a@b.com"}`)}, wantNil: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -89,7 +109,15 @@ func TestSubjectFromHeaders(t *testing.T) {
 			for k, v := range tt.headers {
 				h.Set(k, v)
 			}
-			assert.Equal(t, tt.want, subjectFromHeaders(h, tt.cfg))
+			id := identityFromHeaders(h, tt.cfg)
+			if tt.wantNil {
+				assert.Nil(t, id)
+				return
+			}
+			assert.Equal(t, tt.wantSub, id.GetUser().GetId().GetSubject())
+			assert.Equal(t, tt.wantFirst, id.GetUser().GetSpec().GetFirstName())
+			assert.Equal(t, tt.wantLast, id.GetUser().GetSpec().GetLastName())
+			assert.Equal(t, tt.wantEmail, id.GetUser().GetSpec().GetEmail())
 		})
 	}
 }

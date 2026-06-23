@@ -84,5 +84,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "trustForwardedIdentityHeaders"), defaultConfig.TrustForwardedIdentityHeaders, "Derive executed_by from proxy-forwarded auth headers (requires a trusted proxy)")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "identityHeaders.claimsJwtHeader"), defaultConfig.IdentityHeaders.ClaimsJWTHeader, "Header carrying a claims JWT (ALB: X-Amzn-Oidc-Data)")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "identityHeaders.subjectHeader"), defaultConfig.IdentityHeaders.SubjectHeader, "Header carrying the subject directly (ALB: X-Amzn-Oidc-Identity)")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "identityHeaders.emailHeader"), defaultConfig.IdentityHeaders.EmailHeader, "Header carrying the email directly (oauth2-proxy: X-Auth-Request-Email)")
 	return cmdFlags
 }

@@ -15,13 +15,14 @@ flyte-core-components:
       port: 8090
     watchBufferSize: 100
     storagePrefix: "s3://flyte-data"
-    # Run attribution (executed_by) reads the creator's subject from the auth headers the
-    # proxy forwards. Defaults match AWS ALB authenticate-oidc. Behind oauth2-proxy /
-    # Traefik forward-auth instead, uncomment this block to read the plain subject header
+    # Run attribution (executed_by) is read from the auth headers the proxy forwards.
+    # Defaults match AWS ALB authenticate-oidc. Behind oauth2-proxy / Traefik
+    # forward-auth instead, uncomment this block to read the plain-value headers
     # those proxies set (the Authorization: Bearer SDK path always works regardless):
     # identityHeaders:
     #   claimsJwtHeader: ""               # no claims JWT on this path
     #   subjectHeader: X-Auth-Request-User
+    #   emailHeader: X-Auth-Request-Email
 
   actions:
     kubernetes:
