@@ -129,14 +129,16 @@ func TestPutUsesOutputURI(t *testing.T) {
 		},
 	}, store, 0)
 
-	outputPrefix := mem.DataReference("s3://bucket/prefix")
+	// The test DataStore is in-memory (Type: mem), so use mem:// references — its primary scheme —
+	// rather than s3://, which the multi-scheme router would dial as a separate (unconfigured) backend.
+	outputPrefix := mem.DataReference("mem://bucket/prefix")
 	reader := ioutils.NewRemoteFileOutputReader(context.Background(), store, ioutils.NewReadOnlyOutputFilePaths(context.Background(), store, outputPrefix), 0)
-	require.NoError(t, store.WriteProtobuf(context.Background(), mem.DataReference("s3://bucket/prefix/outputs.pb"), mem.Options{}, &corepb.LiteralMap{}))
+	require.NoError(t, store.WriteProtobuf(context.Background(), mem.DataReference("mem://bucket/prefix/outputs.pb"), mem.Options{}, &corepb.LiteralMap{}))
 	status, err := client.Put(context.Background(), newCatalogKey(t), reader, catalog.Metadata{CreatedAt: timestamppb.Now()})
 	require.NoError(t, err)
 	assert.Equal(t, corepb.CatalogCacheStatus_CACHE_POPULATED, status.GetCacheStatus())
 	require.NotNil(t, got)
-	assert.Equal(t, "s3://bucket/prefix/outputs.pb", got.GetBaseRequest().GetOutput().GetOutputUri())
+	assert.Equal(t, "mem://bucket/prefix/outputs.pb", got.GetBaseRequest().GetOutput().GetOutputUri())
 }
 
 func TestGetOrExtendReservationPassesHeartbeat(t *testing.T) {

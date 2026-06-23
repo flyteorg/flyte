@@ -66,7 +66,10 @@ func TestDefaultProtobufStore(t *testing.T) {
 		s, err := NewDataStore(&Config{Type: TypeMemory}, testScope)
 		require.NoError(t, err)
 		require.IsType(t, DefaultProtobufStore{}, s.ComposedProtobufStore)
-		require.IsType(t, &InMemoryStore{}, s.ComposedProtobufStore.(DefaultProtobufStore).RawStore)
+		// The raw store is always the multi-scheme routing store; its primary backend here is the
+		// in-memory store selected by Type: mem.
+		require.IsType(t, &routingStore{}, s.ComposedProtobufStore.(DefaultProtobufStore).RawStore)
+		require.IsType(t, &InMemoryStore{}, s.ComposedProtobufStore.(DefaultProtobufStore).RawStore.(*routingStore).primaryStore)
 
 		oldMetrics := s.metrics
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -87,7 +90,8 @@ func TestDefaultProtobufStore(t *testing.T) {
 
 		assert.NoError(t, err)
 		require.IsType(t, DefaultProtobufStore{}, s.ComposedProtobufStore)
-		assert.IsType(t, &StowStore{}, s.ComposedProtobufStore.(DefaultProtobufStore).RawStore)
+		require.IsType(t, &routingStore{}, s.ComposedProtobufStore.(DefaultProtobufStore).RawStore)
+		assert.IsType(t, &StowStore{}, s.ComposedProtobufStore.(DefaultProtobufStore).RawStore.(*routingStore).primaryStore)
 		assert.Equal(t, oldMetrics, s.metrics)
 	})
 
