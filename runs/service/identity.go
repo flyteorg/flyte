@@ -18,44 +18,31 @@ const (
 	bearerPrefix        = "Bearer "
 )
 
-// oidcClaims is the subset of OIDC claims we surface as the executing identity.
-type oidcClaims struct {
-	Sub        string `json:"sub"`
-	Email      string `json:"email"`
-	GivenName  string `json:"given_name"`
-	FamilyName string `json:"family_name"`
-}
-
-// identityFromHeaders builds the EnrichedIdentity of the caller from the auth headers
-// the proxy forwards, using the configured header names (defaults match AWS ALB; works
-// for oauth2-proxy/Traefik when configured). Auth is enforced upstream, so the claims
-// are trusted and only decoded here — not re-verified. Returns nil when no
-// authenticated identity is present.
-func identityFromHeaders(h http.Header, cfg config.IdentityHeadersConfig) *common.EnrichedIdentity {
-	// Proxy that forwards full claims in a JWT (ALB authenticate-oidc data header).
+// subjectFromHeaders returns the OIDC subject of the caller from the auth headers the
+// proxy forwards, using the configured header names (defaults match AWS ALB; works for
+// oauth2-proxy/Traefik when configured). Auth is enforced upstream, so the forwarded
+// values are trusted and only decoded here — not re-verified. We capture just the
+// subject; the display identity (name/email) is resolved from it at read time. Returns
+// "" when no authenticated identity is present.
+func subjectFromHeaders(h http.Header, cfg config.IdentityHeadersConfig) string {
+	// Proxy that forwards the subject inside a claims JWT (ALB authenticate-oidc data header).
 	if cfg.ClaimsJWTHeader != "" {
-		if id := identityFromJWT(h.Get(cfg.ClaimsJWTHeader)); id != nil {
-			return id
+		if sub := subjectFromJWT(h.Get(cfg.ClaimsJWTHeader)); sub != "" {
+			return sub
 		}
 	}
-	// Proxy that forwards the subject (and optionally email) as plain header values
-	// (ALB identity header; oauth2-proxy X-Auth-Request-User/-Email).
+	// Proxy that forwards the subject as a plain header value
+	// (ALB identity header; oauth2-proxy X-Auth-Request-User).
 	if cfg.SubjectHeader != "" {
 		if sub := strings.TrimSpace(h.Get(cfg.SubjectHeader)); sub != "" {
-			id := subjectOnlyIdentity(sub)
-			if cfg.EmailHeader != "" {
-				if email := strings.TrimSpace(h.Get(cfg.EmailHeader)); email != "" {
-					id.GetUser().Spec = &common.UserSpec{Email: email}
-				}
-			}
-			return id
+			return sub
 		}
 	}
-	// JWT (SDK/CLI) path: decode the forwarded Bearer token's claims. Proxy-agnostic.
+	// JWT (SDK/CLI) path: decode the forwarded Bearer token's subject. Proxy-agnostic.
 	if token := bearerToken(h); token != "" {
-		return identityFromJWT(token)
+		return subjectFromJWT(token)
 	}
-	return nil
+	return ""
 }
 
 // bearerToken returns the value of an Authorization: Bearer <token> header, or "".
@@ -67,29 +54,31 @@ func bearerToken(h http.Header) string {
 	return ""
 }
 
-// identityFromJWT decodes a JWT's claims payload (without verifying the signature —
-// the load balancer already validated it) into an EnrichedIdentity. Returns nil on
-// any malformed input or when no subject claim is present.
-func identityFromJWT(token string) *common.EnrichedIdentity {
+// subjectFromJWT decodes a JWT's claims payload (without verifying the signature — the
+// load balancer already validated it) and returns the `sub` claim. Returns "" on any
+// malformed input or when no subject claim is present.
+func subjectFromJWT(token string) string {
 	parts := strings.Split(token, ".")
 	if len(parts) != 3 {
-		return nil
+		return ""
 	}
 	payload, err := decodeJWTSegment(parts[1])
 	if err != nil {
-		return nil
+		return ""
 	}
-	var c oidcClaims
-	if err := json.Unmarshal(payload, &c); err != nil || c.Sub == "" {
-		return nil
+	var c struct {
+		Sub string `json:"sub"`
 	}
-	return mergeClaims(subjectOnlyIdentity(c.Sub), &c)
+	if err := json.Unmarshal(payload, &c); err != nil {
+		return ""
+	}
+	return c.Sub
 }
 
 // decodeJWTSegment base64url-decodes a JWT segment, tolerating both the unpadded
 // form (per the JWT spec) and the padded form some issuers — notably AWS ALB's
 // x-amzn-oidc-data — emit. Without this, a payload whose length isn't a multiple of
-// 4 fails strict RawURLEncoding and the claims (email, name) are silently dropped.
+// 4 fails strict RawURLEncoding and the subject claim is silently dropped.
 func decodeJWTSegment(seg string) ([]byte, error) {
 	if b, err := base64.RawURLEncoding.DecodeString(seg); err == nil {
 		return b, nil
@@ -100,8 +89,8 @@ func decodeJWTSegment(seg string) ([]byte, error) {
 	return base64.URLEncoding.DecodeString(seg)
 }
 
-// subjectOnlyIdentity builds a minimal EnrichedIdentity carrying just the subject.
-// used when only the subject is available.
+// subjectOnlyIdentity builds a minimal EnrichedIdentity carrying just the subject. Used
+// at read time when no user directory is available to resolve the subject's profile.
 func subjectOnlyIdentity(subject string) *common.EnrichedIdentity {
 	return &common.EnrichedIdentity{
 		Principal: &common.EnrichedIdentity_User{
