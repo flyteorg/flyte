@@ -448,10 +448,13 @@ func (s *RunService) persistRunModel(
 		return sql.NullString{String: s, Valid: s != ""}
 	}
 
-	// Persist the creator's identity (subject, plus name/email when captured) as a
-	// serialized EnrichedIdentity in executed_by.
+	// Persist the creator's identity two ways: the full EnrichedIdentity (subject, plus
+	// name/email when captured) serialized in executed_by for display, and its subject in
+	// created_by as an indexed scalar so runs can be filtered/listed by owner.
 	var executedByBytes []byte
+	var createdBy string
 	if executedBy != nil {
+		createdBy = executedBy.GetUser().GetId().GetSubject()
 		if b, marshalErr := proto.Marshal(executedBy); marshalErr != nil {
 			logger.Warnf(ctx, "CreateRun: failed to marshal executed_by identity: %v", marshalErr)
 		} else {
@@ -481,6 +484,7 @@ func (s *RunService) persistRunModel(
 		Attempts:        1,
 		RunSource:       source.String(),
 		ExecutedBy:      executedByBytes,
+		CreatedBy:       nullStr(createdBy),
 		TriggerTaskName: nullStr(triggerTaskName),
 		TriggerName:     nullStr(triggerName),
 		TriggerRevision: sql.NullInt64{Int64: triggerRevision, Valid: triggerRevision != 0},

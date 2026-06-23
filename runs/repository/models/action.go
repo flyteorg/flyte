@@ -18,6 +18,7 @@ var ActionColumnsSet = sets.New(
 	"run_name",
 	"phase",
 	"run_source",
+	"created_by",
 	"trigger_task_name",
 	"trigger_name",
 	"trigger_revision",
@@ -57,6 +58,11 @@ type Action struct {
 	// from the auth headers the load balancer forwards. Surfaced directly as
 	// ActionMetadata.executed_by. NULL for runs created without an authenticated identity.
 	ExecutedBy []byte `db:"executed_by" json:"executed_by,omitempty"`
+
+	// CreatedBy is the OIDC subject of the run's creator — the same subject embedded in
+	// ExecutedBy, stored as an indexed scalar so runs can be filtered/listed by owner
+	// (a serialized identity blob can't be queried). NULL when ExecutedBy is unset.
+	CreatedBy sql.NullString `db:"created_by" json:"created_by,omitempty"`
 
 	// Trigger fields — only set for runs created via RUN_SOURCE_SCHEDULE_TRIGGER.
 	TriggerTaskName sql.NullString `db:"trigger_task_name"`

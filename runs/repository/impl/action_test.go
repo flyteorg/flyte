@@ -57,11 +57,12 @@ func TestCreateRun(t *testing.T) {
 		Name:    "run1",
 	}
 	runModel := &models.Run{
-		Project: runID.Project,
-		Domain:  runID.Domain,
-		RunName: runID.Name,
-		Name:    rootActionName,
-		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		Project:   runID.Project,
+		Domain:    runID.Domain,
+		RunName:   runID.Name,
+		Name:      rootActionName,
+		Phase:     int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		CreatedBy: sql.NullString{String: "00uABC", Valid: true},
 	}
 
 	run, err := actionRepo.CreateAction(ctx, runModel, false)
@@ -72,6 +73,8 @@ func TestCreateRun(t *testing.T) {
 	assert.Equal(t, runID.Name, run.RunName)
 	assert.Equal(t, "a0", run.Name)
 	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_QUEUED), run.Phase)
+	// created_by (indexed owner subject) round-trips for filtering/listing by owner.
+	assert.Equal(t, "00uABC", run.CreatedBy.String)
 
 	// Attempt duplicate run create with same run name should return existing (idempotent)
 	run2, err := actionRepo.CreateAction(ctx, runModel, false)
