@@ -389,6 +389,71 @@ func TestListRuns(t *testing.T) {
 	}
 }
 
+// TestListActionsOffsetPagination is a regression test for offset-based paging.
+// ListActions only implemented keyset (CursorToken) paging and silently ignored
+// Offset, so an offset-paging caller (WatchActions.listAndSendAllActions) re-read
+// the same first page forever -- capping children_phase_counts at the page size
+// and never terminating its loop for runs with more than one page of actions.
+func TestListActionsOffsetPagination(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	const total = 150
+	for i := 0; i < total; i++ {
+		_, err := actionRepo.CreateAction(ctx, &models.Run{
+			Project: "proj1",
+			Domain:  "domain1",
+			RunName: fmt.Sprintf("r%03d", i),
+			Name:    rootActionName,
+			Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		}, false)
+		require.NoError(t, err)
+	}
+
+	const pageSize = 50
+	sortByName := []interfaces.SortParameter{NewSortParameter("run_name", interfaces.SortOrderAscending)}
+
+	// Offset must shift the window: the page at Offset=50 must start at r050.
+	// Before the fix it started at r000 because Offset was ignored.
+	page2, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter:         NewIsRootActionFilter(),
+		Limit:          pageSize,
+		Offset:         pageSize,
+		SortParameters: sortByName,
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, page2)
+	require.Equal(t, "r050", page2[0].RunName,
+		"Offset must skip the first page; got the first page back (Offset ignored)")
+
+	// Walking all pages by offset must cover every action exactly once and terminate.
+	// The loop bound also guards against the pre-fix infinite re-read of page one.
+	seen := map[string]struct{}{}
+	for offset := 0; offset < total*2; offset += pageSize {
+		batch, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+			Filter:         NewIsRootActionFilter(),
+			Limit:          pageSize,
+			Offset:         offset,
+			SortParameters: sortByName,
+		})
+		require.NoError(t, err)
+		page := batch
+		if len(page) > pageSize { // trim the Limit+1 has-more probe row
+			page = page[:pageSize]
+		}
+		for _, a := range page {
+			seen[a.RunName] = struct{}{}
+		}
+		if len(batch) < pageSize {
+			break
+		}
+	}
+	assert.Len(t, seen, total, "offset paging must cover all actions exactly once")
+}
+
 func setupActionEventDB(t *testing.T) (*sqlx.DB, *actionRepo) {
 	db := setupActionDB(t)
 	r, err := NewActionRepo(db, testDbConfig)
