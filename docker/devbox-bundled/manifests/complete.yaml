@@ -7752,7 +7752,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.16.4"
+          image: "flyte-binary-v2:sandbox"
       k8s-array:
         logs:
           config:
