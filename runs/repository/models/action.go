@@ -57,7 +57,7 @@ type Action struct {
 	// (subject, plus name/email when the forwarded OIDC claims include them), captured
 	// from the auth headers the load balancer forwards. Surfaced directly as
 	// ActionMetadata.executed_by. NULL for runs created without an authenticated identity.
-	ExecutedBy []byte `db:"executed_by" json:"executed_by,omitempty"`
+	ExecutedBy []byte `db:"executed_by"`
 
 	// CreatedBy is the OIDC subject of the run's creator — the same subject embedded in
 	// ExecutedBy, stored as an indexed scalar so runs can be filtered/listed by owner
