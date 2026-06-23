@@ -74,8 +74,8 @@ func (s *ActionsService) WatchForUpdates(
 	}
 
 	// Subscribe before listing to avoid missing events between snapshot and watch.
-	updateCh := s.client.Subscribe(parentActionID.Name)
-	defer s.client.Unsubscribe(parentActionID.Name, updateCh)
+	updateCh := s.client.Subscribe(parentActionID.GetRun().GetName(), parentActionID.Name)
+	defer s.client.Unsubscribe(parentActionID.GetRun().GetName(), parentActionID.Name, updateCh)
 
 	// Send initial state snapshot.
 	childActions, err := s.client.ListChildActions(ctx, parentActionID)
