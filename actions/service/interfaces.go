@@ -26,11 +26,11 @@ type ActionsClientInterface interface {
 	// ListChildActions lists all TaskActions that are children of the given parent action.
 	ListChildActions(ctx context.Context, parentActionID *common.ActionIdentifier) ([]*executorv1.TaskAction, error)
 
-	// Subscribe creates a new subscription channel for action updates for the given parent action name.
-	Subscribe(parentActionName string) chan *k8s.ActionUpdate
+	// Subscribe creates a new subscription channel for action updates scoped to the given (run, parent action).
+	Subscribe(runName, parentActionName string) chan *k8s.ActionUpdate
 
-	// Unsubscribe removes the given channel from the subscription list for the parent action name.
-	Unsubscribe(parentActionName string, ch chan *k8s.ActionUpdate)
+	// Unsubscribe removes the given channel from the subscription list for the (run, parent action).
+	Unsubscribe(runName, parentActionName string, ch chan *k8s.ActionUpdate)
 
 	// StartWatching starts watching TaskAction resources.
 	StartWatching(ctx context.Context) error
