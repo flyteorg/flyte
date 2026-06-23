@@ -11,6 +11,14 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster/clusterconnect"
 )
 
+const (
+	// headerXForwardedProto is the header a TLS-terminating proxy/LB sets to the scheme
+	// the client used.
+	headerXForwardedProto = "X-Forwarded-Proto"
+	schemeHTTP            = "http"
+	schemeHTTPS           = "https"
+)
+
 type ClusterService struct {
 	clusterconnect.UnimplementedClusterServiceHandler
 }
@@ -37,12 +45,12 @@ func (s *ClusterService) SelectCluster(
 	var endpoint string
 	host := strings.TrimSpace(requestHost)
 	if host != "" {
-		scheme := "http"
-		if proto := req.Header().Get("X-Forwarded-Proto"); proto != "" {
+		scheme := schemeHTTP
+		if proto := req.Header().Get(headerXForwardedProto); proto != "" {
 			// X-Forwarded-Proto may be a comma-separated list (proxy chain); the first value
 			// is the scheme the client used.
 			candidate := strings.ToLower(strings.TrimSpace(strings.Split(proto, ",")[0]))
-			if candidate == "http" || candidate == "https" {
+			if candidate == schemeHTTP || candidate == schemeHTTPS {
 				scheme = candidate
 			}
 		}
