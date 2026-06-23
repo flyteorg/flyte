@@ -24,8 +24,8 @@ const (
 // identityEnricher fills in a caller's profile (email, first/last name) by calling
 // the OIDC userinfo endpoint with their access token. It is needed on the Bearer
 // path, where the access token carries only the subject — the profile claims live
-// in userinfo, not the token. Results are cached by subject. Every failure mode is
-// best-effort: the caller's unenriched (subject-only) identity is returned instead.
+// in userinfo, not the token. Results are cached per access token (keyed by a SHA-256 hash).
+// Every failure mode is best-effort: the caller's unenriched (subject-only) identity is returned instead.
 type identityEnricher struct {
 	authServerBaseURL string
 	httpClient        *http.Client
