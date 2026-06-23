@@ -11,8 +11,8 @@ Chart for basic single Flyte executable deployment
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
 | configuration.annotations | object | `{}` |  |
-| configuration.co-pilot.image.repository | string | `"cr.flyte.org/flyteorg/flytecopilot"` |  |
-| configuration.co-pilot.image.tag | string | `"v1.16.4"` |  |
+| configuration.co-pilot.image.repository | string | `"cr.flyte.org/flyteorg/flyte-binary-v2"` |  |
+| configuration.co-pilot.image.tag | string | `"latest"` |  |
 | configuration.connectorService.defaultConnector.defaultTimeout | string | `"10s"` |  |
 | configuration.connectorService.defaultConnector.endpoint | string | `"k8s://flyteconnector.flyte:8000"` |  |
 | configuration.connectorService.defaultConnector.insecure | bool | `true` |  |

@@ -126,12 +126,15 @@ configuration:
       custom: []
   # co-pilot Configuration for Flyte CoPilot
   co-pilot:
-    # image Configure image to use for CoPilot sidecar
+    # image Configure image to use for CoPilot sidecar.
+    # The flyte-copilot binary ships inside the flyte single-binary image
+    # (at /bin/flyte-copilot), so this defaults to the same image as the main
+    # deployment and is bumped in lockstep with it (# FLYTE_TAG).
     image:
       # repository CoPilot sidecar image repository
-      repository: cr.flyte.org/flyteorg/flytecopilot  # FLYTECOPILOT_IMAGE
+      repository: cr.flyte.org/flyteorg/flyte-binary-v2  # FLYTE_IMAGE
       # tag CoPilot sidecar image tag
-      tag: v1.16.4  # FLYTECOPILOT_TAG
+      tag: latest  # FLYTE_TAG
   # connectorService Flyte Connector configuration
   connectorService:
     defaultConnector:
