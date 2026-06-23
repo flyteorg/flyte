@@ -27,6 +27,14 @@ flyte-binary:
       tag: sandbox
       pullPolicy: Never
   configuration:
+    # CoPilot ships inside the locally-built flyte-binary sandbox image
+    # (at /bin/flyte-copilot), so point the sidecar at it instead of pulling
+    # an external image. The image is loaded into k3s, so IfNotPresent resolves
+    # it without a registry pull.
+    co-pilot:
+      image:
+        repository: flyte-binary-v2
+        tag: sandbox
     database:
       postgres:
         host: 'postgresql'
