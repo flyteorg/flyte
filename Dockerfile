@@ -1,6 +1,6 @@
 # Todo(alex): We should add UI into the image when UI is done
 
-FROM --platform=${BUILDPLATFORM} golang:1.26.3-bookworm AS gobase
+FROM --platform=${BUILDPLATFORM} golang:1.26.3-bookworm AS flytebuilder
 
 ARG TARGETARCH
 ENV GOARCH="${TARGETARCH}"
@@ -26,42 +26,13 @@ COPY secret secret
 COPY go.mod go.sum ./
 RUN go mod download
 COPY manager manager
-
-
-# Builds the flyte single binary (the default image).
-FROM gobase AS flytebuilder
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
     go build -v -o dist/flyte ./manager/cmd/
-
-# Builds the flytecopilot data init/sidecar binary.
-FROM gobase AS flytecopilotbuilder
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
     go build -v -o dist/flyte-copilot ./flytecopilot
 
 
-# flytecopilot runtime image. Build with `--target flytecopilot`.
-# flyteplugins invokes copilot as `/bin/flyte-copilot` (flytek8s.CopilotCommandArgs),
-# so the binary must live at that exact path.
-FROM debian:bookworm-slim AS flytecopilot
-
-ARG FLYTE_VERSION
-ENV FLYTE_VERSION="${FLYTE_VERSION}"
-
-ENV DEBCONF_NONINTERACTIVE_SEEN=true
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update && apt-get install --no-install-recommends --yes \
-        ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY --from=flytecopilotbuilder /flyteorg/build/dist/flyte-copilot /bin/flyte-copilot
-
-CMD ["flyte-copilot"]
-
-
-# flyte single binary runtime image. This is the default build target and must
-# remain the last stage so `docker build .` (no --target) keeps building it.
-FROM debian:bookworm-slim AS flyte
+FROM debian:bookworm-slim
 
 ARG FLYTE_VERSION
 ENV FLYTE_VERSION="${FLYTE_VERSION}"
@@ -75,8 +46,11 @@ RUN apt-get update && apt-get install --no-install-recommends --yes \
         tini \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy compiled executable into image
+# Copy compiled executables into image. flyteplugins invokes copilot as
+# `/bin/flyte-copilot` (flytek8s.CopilotCommandArgs), so it must live at that
+# exact path; the copilot init/sidecar container can then reuse this image.
 COPY --from=flytebuilder /flyteorg/build/dist/flyte /usr/local/bin/
+COPY --from=flytebuilder /flyteorg/build/dist/flyte-copilot /bin/flyte-copilot
 
 # Set entrypoint
 ENTRYPOINT [ "/usr/bin/tini", "-g", "--", "/usr/local/bin/flyte" ]
