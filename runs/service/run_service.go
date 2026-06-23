@@ -809,6 +809,16 @@ func lastAttemptIsTerminal(attempts []*workflow.ActionAttempt) bool {
 	return IsTerminalPhase(last.GetPhase())
 }
 
+// GetActionData is deprecated and no longer implemented. Clients should use
+// DataProxyService.GetActionData instead. The RPC is retained in the proto for
+// backwards compatibility but the server returns Unimplemented.
+func (s *RunService) GetActionData(
+	ctx context.Context,
+	req *connect.Request[workflow.GetActionDataRequest],
+) (*connect.Response[workflow.GetActionDataResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("RunService.GetActionData is deprecated; use DataProxyService.GetActionData instead"))
+}
+
 // ListRuns lists runs based on filter criteria
 func (s *RunService) ListRuns(
 	ctx context.Context,

@@ -49,6 +49,9 @@ const (
 	// RunServiceWatchActionDetailsProcedure is the fully-qualified name of the RunService's
 	// WatchActionDetails RPC.
 	RunServiceWatchActionDetailsProcedure = "/flyteidl2.workflow.RunService/WatchActionDetails"
+	// RunServiceGetActionDataProcedure is the fully-qualified name of the RunService's GetActionData
+	// RPC.
+	RunServiceGetActionDataProcedure = "/flyteidl2.workflow.RunService/GetActionData"
 	// RunServiceListRunsProcedure is the fully-qualified name of the RunService's ListRuns RPC.
 	RunServiceListRunsProcedure = "/flyteidl2.workflow.RunService/ListRuns"
 	// RunServiceWatchRunsProcedure is the fully-qualified name of the RunService's WatchRuns RPC.
@@ -83,6 +86,7 @@ var (
 	runServiceWatchRunDetailsMethodDescriptor     = runServiceServiceDescriptor.Methods().ByName("WatchRunDetails")
 	runServiceGetActionDetailsMethodDescriptor    = runServiceServiceDescriptor.Methods().ByName("GetActionDetails")
 	runServiceWatchActionDetailsMethodDescriptor  = runServiceServiceDescriptor.Methods().ByName("WatchActionDetails")
+	runServiceGetActionDataMethodDescriptor       = runServiceServiceDescriptor.Methods().ByName("GetActionData")
 	runServiceListRunsMethodDescriptor            = runServiceServiceDescriptor.Methods().ByName("ListRuns")
 	runServiceWatchRunsMethodDescriptor           = runServiceServiceDescriptor.Methods().ByName("WatchRuns")
 	runServiceListActionsMethodDescriptor         = runServiceServiceDescriptor.Methods().ByName("ListActions")
@@ -109,6 +113,10 @@ type RunServiceClient interface {
 	GetActionDetails(context.Context, *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error)
 	// Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
 	WatchActionDetails(context.Context, *connect.Request[workflow.WatchActionDetailsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionDetailsResponse], error)
+	// Deprecated: Use DataProxyService.GetActionData instead.
+	//
+	// Deprecated: do not use.
+	GetActionData(context.Context, *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error)
 	// List runs based on the provided filter criteria.
 	ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error)
 	// Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
@@ -182,6 +190,13 @@ func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			httpClient,
 			baseURL+RunServiceWatchActionDetailsProcedure,
 			connect.WithSchema(runServiceWatchActionDetailsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		getActionData: connect.NewClient[workflow.GetActionDataRequest, workflow.GetActionDataResponse](
+			httpClient,
+			baseURL+RunServiceGetActionDataProcedure,
+			connect.WithSchema(runServiceGetActionDataMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		listRuns: connect.NewClient[workflow.ListRunsRequest, workflow.ListRunsResponse](
@@ -259,6 +274,7 @@ type runServiceClient struct {
 	watchRunDetails     *connect.Client[workflow.WatchRunDetailsRequest, workflow.WatchRunDetailsResponse]
 	getActionDetails    *connect.Client[workflow.GetActionDetailsRequest, workflow.GetActionDetailsResponse]
 	watchActionDetails  *connect.Client[workflow.WatchActionDetailsRequest, workflow.WatchActionDetailsResponse]
+	getActionData       *connect.Client[workflow.GetActionDataRequest, workflow.GetActionDataResponse]
 	listRuns            *connect.Client[workflow.ListRunsRequest, workflow.ListRunsResponse]
 	watchRuns           *connect.Client[workflow.WatchRunsRequest, workflow.WatchRunsResponse]
 	listActions         *connect.Client[workflow.ListActionsRequest, workflow.ListActionsResponse]
@@ -299,6 +315,13 @@ func (c *runServiceClient) GetActionDetails(ctx context.Context, req *connect.Re
 // WatchActionDetails calls flyteidl2.workflow.RunService.WatchActionDetails.
 func (c *runServiceClient) WatchActionDetails(ctx context.Context, req *connect.Request[workflow.WatchActionDetailsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionDetailsResponse], error) {
 	return c.watchActionDetails.CallServerStream(ctx, req)
+}
+
+// GetActionData calls flyteidl2.workflow.RunService.GetActionData.
+//
+// Deprecated: do not use.
+func (c *runServiceClient) GetActionData(ctx context.Context, req *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error) {
+	return c.getActionData.CallUnary(ctx, req)
 }
 
 // ListRuns calls flyteidl2.workflow.RunService.ListRuns.
@@ -365,6 +388,10 @@ type RunServiceHandler interface {
 	GetActionDetails(context.Context, *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error)
 	// Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
 	WatchActionDetails(context.Context, *connect.Request[workflow.WatchActionDetailsRequest], *connect.ServerStream[workflow.WatchActionDetailsResponse]) error
+	// Deprecated: Use DataProxyService.GetActionData instead.
+	//
+	// Deprecated: do not use.
+	GetActionData(context.Context, *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error)
 	// List runs based on the provided filter criteria.
 	ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error)
 	// Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
@@ -434,6 +461,13 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 		RunServiceWatchActionDetailsProcedure,
 		svc.WatchActionDetails,
 		connect.WithSchema(runServiceWatchActionDetailsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	runServiceGetActionDataHandler := connect.NewUnaryHandler(
+		RunServiceGetActionDataProcedure,
+		svc.GetActionData,
+		connect.WithSchema(runServiceGetActionDataMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	runServiceListRunsHandler := connect.NewUnaryHandler(
@@ -514,6 +548,8 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 			runServiceGetActionDetailsHandler.ServeHTTP(w, r)
 		case RunServiceWatchActionDetailsProcedure:
 			runServiceWatchActionDetailsHandler.ServeHTTP(w, r)
+		case RunServiceGetActionDataProcedure:
+			runServiceGetActionDataHandler.ServeHTTP(w, r)
 		case RunServiceListRunsProcedure:
 			runServiceListRunsHandler.ServeHTTP(w, r)
 		case RunServiceWatchRunsProcedure:
@@ -565,6 +601,10 @@ func (UnimplementedRunServiceHandler) GetActionDetails(context.Context, *connect
 
 func (UnimplementedRunServiceHandler) WatchActionDetails(context.Context, *connect.Request[workflow.WatchActionDetailsRequest], *connect.ServerStream[workflow.WatchActionDetailsResponse]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.WatchActionDetails is not implemented"))
+}
+
+func (UnimplementedRunServiceHandler) GetActionData(context.Context, *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.GetActionData is not implemented"))
 }
 
 func (UnimplementedRunServiceHandler) ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error) {
