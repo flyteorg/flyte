@@ -57,9 +57,9 @@ func newIdentityEnricher(authServerBaseURL string) *identityEnricher {
 // enrich resolves the caller's full identity (subject, email, first/last name) from the
 // OIDC userinfo endpoint on the Bearer path. base already carries a complete profile on
 // the cookie path (claims are in x-amzn-oidc-data) or has no access token to query with —
-// in those cases it is returned unchanged. Otherwise userinfo is queried (cached by the
-// token's subject; a synchronous call bounded by userinfoHTTPTimeout that adds latency to
-// run creation). On any error or timeout it returns base unchanged — enrichment is
+// in those cases it is returned unchanged. Otherwise userinfo is queried (cached per access token;
+// a synchronous call bounded by userinfoHTTPTimeout that adds latency to run creation). On any error
+// or timeout it returns base unchanged — enrichment is best-effort and never fails run creation.
 // best-effort and never fails run creation.
 //
 // userinfo is the authoritative statement of who the access token belongs to, so its
