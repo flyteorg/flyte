@@ -102,6 +102,10 @@ var kindToScheme = map[string]string{
 // backend, so it MUST be called at init time, before any DataStore is constructed or used. This
 // matches the contract of RegisterStowKind.
 func RegisterStowScheme(scheme, kind string) error {
+	// DataReference.Split parses schemes via net/url, which lower-cases them, so normalize the key on
+	// registration — otherwise a scheme registered with any upper-case letters (e.g. "S3") would never
+	// match a reference's parsed scheme and lazy dialing would silently fall back to the primary store.
+	scheme = strings.ToLower(scheme)
 	if existing, ok := schemeToStowKind[scheme]; ok && existing != kind {
 		return fmt.Errorf("scheme [%v] already registered to kind [%v]", scheme, existing)
 	}
@@ -130,6 +134,11 @@ func dialStow(httpClient *http.Client, kind string, cfgMap stow.ConfigMap) (stow
 	defer func() { http.DefaultClient = prev }()
 	return stow.Dial(kind, cfgMap)
 }
+
+// stowDial is the indirection stowFactory uses to dial a backend. It defaults to dialStow and is a
+// package var so tests can stub it, keeping unit tests off the real stow drivers (which would
+// otherwise depend on the ambient cloud credential chain / region resolution).
+var stowDial = dialStow
 
 var fQNFn = map[string]func(string) DataReference{
 	s3.Kind: func(bucket string) DataReference {
@@ -717,7 +726,7 @@ func stowFactory(_ context.Context, scheme string, _ DataReference, cfg *Config,
 		}
 	}
 
-	loc, err := dialStow(httpClient, kind, cfgMap)
+	loc, err := stowDial(httpClient, kind, cfgMap)
 	if err != nil {
 		return nil, fmt.Errorf("unable to configure storage for scheme [%v] (kind [%v]): %w", scheme, kind, err)
 	}

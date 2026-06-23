@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -754,11 +755,24 @@ func TestPrimarySchemeForConfig(t *testing.T) {
 func TestStowFactory_AmbientDialForUnconfiguredScheme(t *testing.T) {
 	t.Run("unconfigured scheme dials with ambient credentials", func(t *testing.T) {
 		// No Schemes entry for s3: the factory must derive the stow kind from the scheme and dial with
-		// ambient credentials (empty stow config + the provider's default credential chain) instead of
-		// erroring. The resulting store has no base container and loads containers dynamically.
+		// ambient credentials (no explicit access key/secret — the provider's default credential chain).
+		// Stub the dial so the test stays hermetic (the real stow S3 driver would depend on the ambient
+		// AWS region/credential chain); assert on the kind and config the factory resolved instead.
+		var gotKind string
+		var gotCfg stow.ConfigMap
+		orig := stowDial
+		stowDial = func(_ *http.Client, kind string, cfgMap stow.ConfigMap) (stow.Location, error) {
+			gotKind, gotCfg = kind, cfgMap
+			return nil, nil // a secondary scheme has an empty base container, so loc is never dereferenced
+		}
+		defer func() { stowDial = orig }()
+
 		store, err := stowFactory(context.TODO(), "s3", "s3://bucket/key", &Config{}, nil, metrics)
 		assert.NoError(t, err)
 		assert.IsType(t, &StowStore{}, store)
+		assert.Equal(t, s3.Kind, gotKind)
+		assert.NotContains(t, gotCfg, s3.ConfigAccessKeyID, "ambient dial must not inject explicit credentials")
+		assert.NotContains(t, gotCfg, s3.ConfigSecretKey, "ambient dial must not inject explicit credentials")
 	})
 
 	t.Run("scheme with no registered stow kind errors", func(t *testing.T) {
