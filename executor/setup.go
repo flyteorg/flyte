@@ -181,7 +181,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("executor: maxSystemFailures must be non-negative, got %d", cfg.MaxSystemFailures)
 	}
 	reconciler.MaxSystemFailures = uint32(cfg.MaxSystemFailures)
-	if err := reconciler.SetupWithManager(mgr); err != nil {
+	if err := reconciler.SetupWithManager(mgr, cfg.MaxConcurrentReconciles); err != nil {
 		return fmt.Errorf("executor: failed to setup controller: %w", err)
 	}
 
