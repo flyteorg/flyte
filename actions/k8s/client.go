@@ -337,7 +337,7 @@ func (c *ActionsClient) GetTaskAction(ctx context.Context, actionID *common.Acti
 	return taskAction, nil
 }
 
-// Subscribe creates a new subscription channel for action updates for specified parent action name
+// Subscribe creates a new subscription channel for action updates scoped to the given (run, parent action).
 // subscriberKey scopes a subscription to a single (run, parent action) pair.
 // The parent action name alone is NOT unique across runs -- every run's root
 // action is named "a0" -- so keying on it alone broadcasts each run's child
