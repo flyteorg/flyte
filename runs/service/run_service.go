@@ -25,8 +25,6 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
@@ -42,7 +40,6 @@ import (
 type RunService struct {
 	repo            interfaces.Repository
 	actionsClient   actionsconnect.ActionsServiceClient
-	dataProxyClient actionDataClient
 	projectClient   projectconnect.ProjectServiceClient
 	storagePrefix   string
 	dataStore       *storage.DataStore
@@ -52,13 +49,6 @@ type RunService struct {
 	trustHeaders bool
 	// identityHeaders names the proxy-forwarded headers identity is read from.
 	identityHeaders config.IdentityHeadersConfig
-}
-
-type actionDataClient interface {
-	GetActionData(
-		ctx context.Context,
-		req *connect.Request[dataproxy.GetActionDataRequest],
-	) (*connect.Response[dataproxy.GetActionDataResponse], error)
 }
 
 const (
@@ -153,7 +143,6 @@ func (s *RunService) WatchGroups(ctx context.Context, req *connect.Request[workf
 func NewRunService(
 	repo interfaces.Repository,
 	actionsClient actionsconnect.ActionsServiceClient,
-	dataProxyClient dataproxyconnect.DataProxyServiceClient,
 	projectClient projectconnect.ProjectServiceClient,
 	storagePrefix string,
 	dataStore *storage.DataStore,
@@ -165,7 +154,6 @@ func NewRunService(
 	return &RunService{
 		repo:            repo,
 		actionsClient:   actionsClient,
-		dataProxyClient: dataProxyClient,
 		projectClient:   projectClient,
 		storagePrefix:   storagePrefix,
 		dataStore:       dataStore,
@@ -863,37 +851,14 @@ func lastAttemptIsTerminal(attempts []*workflow.ActionAttempt) bool {
 	return IsTerminalPhase(last.GetPhase())
 }
 
-// GetActionData keeps backward compatibility by delegating data reads to DataProxy.
+// GetActionData is deprecated and no longer implemented. Clients should use
+// DataProxyService.GetActionData instead. The RPC is retained in the proto for
+// backwards compatibility but the server returns Unimplemented.
 func (s *RunService) GetActionData(
 	ctx context.Context,
 	req *connect.Request[workflow.GetActionDataRequest],
 ) (*connect.Response[workflow.GetActionDataResponse], error) {
-	logger.Infof(ctx, "Received GetActionData request for: %s/%s",
-		req.Msg.ActionId.Run.Name, req.Msg.ActionId.Name)
-
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
-	}
-
-	if s.dataProxyClient == nil {
-		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("dataproxy client is not configured"))
-	}
-
-	dpResp, err := s.dataProxyClient.GetActionData(ctx, connect.NewRequest(&dataproxy.GetActionDataRequest{
-		ActionId: req.Msg.GetActionId(),
-	}))
-	if err != nil {
-		return nil, err
-	}
-
-	resp := &workflow.GetActionDataResponse{
-		Inputs:  dpResp.Msg.GetInputs(),
-		Outputs: dpResp.Msg.GetOutputs(),
-	}
-
-	logger.Infof(ctx, "Retrieved action data for: %s (inputs=%d, outputs=%d)",
-		req.Msg.ActionId.Name, len(resp.Inputs.Literals), len(resp.Outputs.Literals))
-	return connect.NewResponse(resp), nil
+	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("RunService.GetActionData is deprecated; use DataProxyService.GetActionData instead"))
 }
 
 // ListRuns lists runs based on filter criteria
@@ -1529,7 +1494,8 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 	}
 }
 
-// getLogContextAndClusterForAttempt is like getLogContextForAttempt but also returns the cluster name.
+// getLogContextAndClusterForAttempt fetches the latest event for the given attempt and returns
+// its LogContext along with the cluster name.
 func getLogContextAndClusterForAttempt(ctx context.Context, repo interfaces.Repository, actionID *common.ActionIdentifier, attempt uint32) (*core.LogContext, string, error) {
 	m, err := repo.ActionRepo().GetLatestEventByAttempt(ctx, actionID, attempt)
 	if err != nil {

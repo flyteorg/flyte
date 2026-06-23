@@ -25,6 +25,7 @@ var (
 		CacheServiceURL:        "http://localhost:8094",
 		Cluster:                "",
 		MaxSystemFailures:      3,
+		MaxConcurrentReconciles: 512,
 		GC: GCConfig{
 			Interval: stdconfig.Duration{Duration: 30 * time.Minute},
 			MaxTTL:   stdconfig.Duration{Duration: 1 * time.Hour},
@@ -88,6 +89,9 @@ type Config struct {
 	// errors and plugin-reported system-retryable failures) before a TaskAction is
 	// converted to a permanent failure.
 	MaxSystemFailures int32 `json:"maxSystemFailures" pflag:",Max consecutive system-level failures before forcing permanent failure"`
+
+	// MaxConcurrentReconciles is the maximum number of concurrent reconcile loops for TaskActions.
+	MaxConcurrentReconciles int `json:"maxConcurrentReconciles" pflag:",Max concurrent reconcile loops for TaskActions"`
 
 	// GC configures the garbage collector for terminal TaskActions.
 	GC GCConfig `json:"gc" pflag:",Garbage collector configuration for terminal TaskActions"`

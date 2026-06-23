@@ -114,7 +114,7 @@ func TestMain(m *testing.M) {
 	// Create RunService with a no-op actions client (points at test server; not used by watch tests)
 	endpointURL := fmt.Sprintf("http://localhost:%d", testPort)
 	actionsClient := actionsconnect.NewActionsServiceClient(http.DefaultClient, endpointURL)
-	runSvc := service.NewRunService(repo, actionsClient, nil, nil, "", nil, nil, "", true, config.GetConfig().IdentityHeaders)
+	runSvc := service.NewRunService(repo, actionsClient, nil, "", nil, nil, "", true, config.GetConfig().IdentityHeaders)
 
 	// Setup HTTP server
 	mux := http.NewServeMux()

@@ -12,7 +12,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
@@ -34,8 +33,7 @@ import (
 const otelServiceName = "runs-service"
 
 // Setup registers Run and Task service handlers on the SetupContext mux.
-// Requires sc.DB and sc.DataStore to be set. When sc.K8sConfig is provided,
-// RunLogsService is also mounted to enable pod log streaming.
+// Requires sc.DB and sc.DataStore to be set.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
 	if err := migrations.RunMigrations(ctx, sc.DB); err != nil {
@@ -80,8 +78,6 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		projectsURL,
 		connect.WithInterceptors(otelInterceptor),
 	)
-	dataProxyClient := dataproxyconnect.NewDataProxyServiceClient(http.DefaultClient, projectsURL, connect.WithInterceptors(otelInterceptor))
-
 	abortReconciler := service.NewAbortReconciler(repo, actionsClient, service.AbortReconcilerConfig{
 		Workers:      5,
 		MaxAttempts:  10,
@@ -93,7 +89,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return abortReconciler.Run(ctx)
 	})
 
-	runsSvc := service.NewRunService(repo, actionsClient, dataProxyClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
+	runsSvc := service.NewRunService(repo, actionsClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
 	taskSvc := service.NewTaskService(repo, projectClient)
 
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc, connect.WithInterceptors(otelInterceptor))
@@ -141,17 +137,6 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(projectSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(projectPath, projectHandler)
 	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
-
-	if sc.K8sConfig != nil {
-		logStreamer, err := service.NewK8sLogStreamer(sc.K8sConfig)
-		if err != nil {
-			return fmt.Errorf("runs: failed to create k8s log streamer: %w", err)
-		}
-		runLogsSvc := service.NewRunLogsService(repo, logStreamer)
-		runLogsPath, runLogsHandler := workflowconnect.NewRunLogsServiceHandler(runLogsSvc, connect.WithInterceptors(otelInterceptor))
-		sc.Mux.Handle(runLogsPath, runLogsHandler)
-		logger.Infof(ctx, "Mounted RunLogsService at %s", runLogsPath)
-	}
 
 	if err := seedProjects(ctx, impl.NewProjectRepo(sc.DB), cfg.SeedProjects); err != nil {
 		return fmt.Errorf("runs: failed to seed projects: %w", err)
