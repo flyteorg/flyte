@@ -38,11 +38,14 @@ func (s *ClusterService) SelectCluster(
 	if requestHost != "" {
 		scheme := "http"
 		if proto := req.Header().Get("X-Forwarded-Proto"); proto != "" {
-			// X-Forwarded-Proto may be a comma-separated list (proxy chain); the first
-			// value is the scheme the client used.
-			scheme = strings.TrimSpace(strings.Split(proto, ",")[0])
+			// X-Forwarded-Proto may be a comma-separated list (proxy chain); the first value
+			// is the scheme the client used.
+			candidate := strings.ToLower(strings.TrimSpace(strings.Split(proto, ",")[0]))
+			if candidate == "http" || candidate == "https" {
+				scheme = candidate
+			}
 		}
-		endpoint = scheme + "://" + requestHost
+		endpoint = scheme + "://" + strings.TrimSpace(requestHost)
 	}
 
 	return connect.NewResponse(&cluster.SelectClusterResponse{

@@ -24,6 +24,8 @@ func TestSelectCluster_ReturnsSchemeQualifiedEndpoint(t *testing.T) {
 		{name: "devbox direct http (no forwarded proto)", host: "localhost:8090", want: "http://localhost:8090"},
 		{name: "explicit http forwarded proto", host: "localhost:8090", fwdProto: "http", want: "http://localhost:8090"},
 		{name: "takes first of proxy-chain list", host: "development.uniondemo.run", fwdProto: "https, http", want: "https://development.uniondemo.run"},
+		{name: "normalizes uppercase forwarded proto", host: "development.uniondemo.run", fwdProto: "HTTPS", want: "https://development.uniondemo.run"},
+		{name: "blank forwarded proto defaults to http", host: "localhost:8090", fwdProto: "  ", want: "http://localhost:8090"},
 		{name: "empty host yields empty endpoint", host: "", want: ""},
 	}
 	for _, tt := range tests {
