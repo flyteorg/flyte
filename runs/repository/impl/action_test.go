@@ -447,7 +447,7 @@ func TestListActionsOffsetPagination(t *testing.T) {
 		for _, a := range page {
 			seen[a.RunName] = struct{}{}
 		}
-		if len(batch) < pageSize {
+		if len(batch) <= pageSize {
 			break
 		}
 	}
