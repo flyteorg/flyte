@@ -32,6 +32,17 @@ var defaultConfig = &Config{
 		ExecutionQPS:          10.0,
 		ExecutionBurst:        20,
 	},
+	// Defaults on: the runs service is designed to sit behind an auth proxy/LB. Set
+	// false for deployments where that guarantee does not hold.
+	TrustForwardedIdentityHeaders: true,
+	// Defaults match AWS ALB authenticate-oidc. Override for other proxies (see type docs).
+	// EmailHeader is intentionally unset: ALB carries email inside the X-Amzn-Oidc-Data
+	// claims JWT, not a separate header, so there is no ALB header to default it to. It is
+	// only used by plain-value proxies (e.g. oauth2-proxy's X-Auth-Request-Email).
+	IdentityHeaders: IdentityHeadersConfig{
+		ClaimsJWTHeader: "X-Amzn-Oidc-Data",
+		SubjectHeader:   "X-Amzn-Oidc-Identity",
+	},
 }
 
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
@@ -68,6 +79,40 @@ type Config struct {
 	// AuthMetadata configures the OAuth2 authorization-server metadata endpoint
 	// (the GetOAuth2Metadata RPC and /.well-known/oauth-authorization-server).
 	AuthMetadata AuthMetadataConfig `json:"authMetadata"`
+
+	// TrustForwardedIdentityHeaders controls whether run attribution (executed_by)
+	// is derived from the auth headers the proxy forwards (X-Amzn-Oidc-*, Authorization).
+	// Those JWTs are decoded but NOT signature-verified here — that is safe only when
+	// the service sits behind a trusted proxy/LB that validates tokens and strips any
+	// client-supplied copies of these headers. Set to false if the service can be
+	// reached directly or through an untrusted proxy, in which case executed_by is left
+	// unset rather than risk a spoofed identity. (Note: the runs service performs no
+	// authorization itself, so a direct caller can already act unauthenticated — this
+	// flag only governs whether to trust the forwarded identity for attribution.)
+	TrustForwardedIdentityHeaders bool `json:"trustForwardedIdentityHeaders" pflag:",Derive executed_by from proxy-forwarded auth headers (requires a trusted proxy)"`
+
+	// IdentityHeaders names the request headers run attribution (executed_by) is read
+	// from, so the service works behind any auth proxy, not just AWS ALB.
+	IdentityHeaders IdentityHeadersConfig `json:"identityHeaders"`
+}
+
+// IdentityHeadersConfig names the proxy-forwarded headers the caller's identity is
+// read from. Defaults match AWS ALB authenticate-oidc. For oauth2-proxy / Traefik
+// forward-auth, clear ClaimsJWTHeader and set SubjectHeader to "X-Auth-Request-User"
+// and EmailHeader to "X-Auth-Request-Email". The Authorization: Bearer path (SDK/CLI)
+// is always honored regardless of these settings.
+type IdentityHeadersConfig struct {
+	// ClaimsJWTHeader carries a JWT whose payload holds the OIDC claims
+	// (sub, email, given_name, family_name). ALB: X-Amzn-Oidc-Data. Empty to disable.
+	ClaimsJWTHeader string `json:"claimsJwtHeader" pflag:",Header carrying a claims JWT (ALB: X-Amzn-Oidc-Data)"`
+
+	// SubjectHeader carries the subject directly, used when no claims JWT is present.
+	// ALB: X-Amzn-Oidc-Identity. oauth2-proxy: X-Auth-Request-User. Empty to disable.
+	SubjectHeader string `json:"subjectHeader" pflag:",Header carrying the subject directly (ALB: X-Amzn-Oidc-Identity)"`
+
+	// EmailHeader carries the email directly, for proxies that forward plain values
+	// instead of a JWT. oauth2-proxy: X-Auth-Request-Email. Empty to disable.
+	EmailHeader string `json:"emailHeader" pflag:",Header carrying the email directly (oauth2-proxy: X-Auth-Request-Email)"`
 }
 
 // AuthMetadataConfig controls how the runs service serves OAuth2 authorization

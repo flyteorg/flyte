@@ -191,8 +191,26 @@ Get the Flyte API paths for ingress.
 - /flyteidl2.project.ProjectService/*
 - /flyteidl2.app.AppService
 - /flyteidl2.app.AppService/*
+- /flyteidl2.app.AppLogsService
+- /flyteidl2.app.AppLogsService/*
 - /flyteidl2.trigger.TriggerService
 - /flyteidl2.trigger.TriggerService/*
+- /flyteidl2.auth.IdentityService
+- /flyteidl2.auth.IdentityService/*
+- /flyteidl2.settings.SettingsService
+- /flyteidl2.settings.SettingsService/*
+{{- end -}}
+
+{{/*
+Get the Flyte auth-discovery paths for ingress. These are unauthenticated:
+clients must reach them before they hold a token (OAuth server metadata and the
+auth metadata service). IdentityService and SettingsService require auth and live
+in apiPaths instead.
+*/}}
+{{- define "flyte-binary.ingress.wellknownPaths" -}}
+- /.well-known/oauth-authorization-server
+- /flyteidl2.auth.AuthMetadataService
+- /flyteidl2.auth.AuthMetadataService/*
 {{- end -}}
 
 {{/*

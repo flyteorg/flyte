@@ -3,7 +3,7 @@
 CLUSTER_NAME ?= flytev2
 
 # Docker CI image configuration
-DOCKER_CI_IMAGE := ghcr.io/flyteorg/flyte/ci:v2
+DOCKER_CI_IMAGE := ghcr.io/flyteorg/flyte/ci:latest
 
 # Environment variable flags for Docker
 DOCKER_ENV_FLAGS :=

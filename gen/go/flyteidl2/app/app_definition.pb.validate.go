@@ -763,6 +763,8 @@ func (m *Condition) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for Substate
+
 	if len(errors) > 0 {
 		return ConditionMultiError(errors)
 	}

@@ -2,10 +2,12 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -62,7 +64,7 @@ var _ = Describe("GarbageCollector", func() {
 			LabelCompletedTime:     expiredTime,
 		})
 
-		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour)
 		Expect(gc.collect(ctx)).To(Succeed())
 
 		ta := &flyteorgv1.TaskAction{}
@@ -78,7 +80,7 @@ var _ = Describe("GarbageCollector", func() {
 			LabelCompletedTime:     recentTime,
 		})
 
-		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour)
 		Expect(gc.collect(ctx)).To(Succeed())
 
 		ta := &flyteorgv1.TaskAction{}
@@ -89,7 +91,7 @@ var _ = Describe("GarbageCollector", func() {
 	It("should retain non-terminated TaskActions", func() {
 		createTaskAction(ctx, "gc-active", nil)
 
-		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour)
 		Expect(gc.collect(ctx)).To(Succeed())
 
 		ta := &flyteorgv1.TaskAction{}
@@ -98,8 +100,66 @@ var _ = Describe("GarbageCollector", func() {
 	})
 
 	It("should handle empty list gracefully", func() {
-		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour)
 		Expect(gc.collect(ctx)).To(Succeed())
+	})
+
+	It("should paginate across multiple pages of expired TaskActions", func() {
+		// collect() lists with Continue pagination; this exercises that path
+		// (regression: it ran against the cache client, which rejects Continue
+		// with "continue list option is not supported by the cache" once a run
+		// has more than one page of terminal actions). Reader must be uncached.
+		orig := gcPageSize
+		gcPageSize = 2
+		defer func() { gcPageSize = orig }()
+
+		expiredTime := time.Now().UTC().Add(-2 * time.Hour).Format(labelTimeFormat)
+		for i := 0; i < 5; i++ {
+			createTaskAction(ctx, fmt.Sprintf("gc-page-%d", i), map[string]string{
+				LabelTerminationStatus: LabelValueTerminated,
+				LabelCompletedTime:     expiredTime,
+			})
+		}
+
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour)
+		Expect(gc.collect(ctx)).To(Succeed())
+
+		// Assert only the actions this spec created are gone -- checking the whole
+		// namespace is flaky because other specs can leave TaskActions lingering
+		// with a finalizer (DeletionTimestamp set but not yet removed).
+		for i := 0; i < 5; i++ {
+			ta := &flyteorgv1.TaskAction{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Name: fmt.Sprintf("gc-page-%d", i), Namespace: "default"}, ta)
+			Expect(apierrors.IsNotFound(err)).To(BeTrue(), "gc-page-%d should be deleted across pages", i)
+		}
+	})
+
+	It("should sweep immediately on Start without waiting a full interval", func() {
+		expiredTime := time.Now().UTC().Add(-2 * time.Hour).Format(labelTimeFormat)
+		createTaskAction(ctx, "gc-startup", map[string]string{
+			LabelTerminationStatus: LabelValueTerminated,
+			LabelCompletedTime:     expiredTime,
+		})
+
+		// A long interval means the ticker will not fire during the test, so the
+		// expired TaskAction can only be deleted by the immediate startup sweep.
+		// Before the fix, Start waited a full interval before its first collect.
+		gc := NewGarbageCollector(k8sClient, k8sClient, 30*time.Minute, 1*time.Hour)
+		startCtx, cancel := context.WithCancel(ctx)
+		doneCh := make(chan struct{})
+		go func() {
+			defer close(doneCh)
+			_ = gc.Start(startCtx)
+		}()
+		defer func() {
+			cancel()
+			Eventually(doneCh, 2*time.Second, 50*time.Millisecond).Should(BeClosed())
+		}()
+		Eventually(func() bool {
+			ta := &flyteorgv1.TaskAction{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Name: "gc-startup", Namespace: "default"}, ta)
+			return apierrors.IsNotFound(err)
+		}, 10*time.Second, 200*time.Millisecond).Should(BeTrue(), "Start should delete the expired TaskAction via its initial sweep")
 	})
 })
 

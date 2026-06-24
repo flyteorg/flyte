@@ -337,29 +337,40 @@ func (c *ActionsClient) GetTaskAction(ctx context.Context, actionID *common.Acti
 	return taskAction, nil
 }
 
-// Subscribe creates a new subscription channel for action updates for specified parent action name
-func (c *ActionsClient) Subscribe(parentActionName string) chan *ActionUpdate {
+// Subscribe creates a new subscription channel for action updates scoped to the given (run, parent action).
+// subscriberKey scopes a subscription to a single (run, parent action) pair.
+// The parent action name alone is NOT unique across runs -- every run's root
+// action is named "a0" -- so keying on it alone broadcasts each run's child
+// updates to every other run's watch stream. Same-named children then collide
+// in the SDK informer cache and clobber each other's phase, wedging the parent.
+func subscriberKey(runName, parentActionName string) string {
+	return runName + "/" + parentActionName
+}
+
+func (c *ActionsClient) Subscribe(runName, parentActionName string) chan *ActionUpdate {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	key := subscriberKey(runName, parentActionName)
 	ch := make(chan *ActionUpdate, c.bufferSize)
-	if c.subscribers[parentActionName] == nil {
-		c.subscribers[parentActionName] = make(map[chan *ActionUpdate]struct{})
+	if c.subscribers[key] == nil {
+		c.subscribers[key] = make(map[chan *ActionUpdate]struct{})
 	}
-	c.subscribers[parentActionName][ch] = struct{}{}
+	c.subscribers[key][ch] = struct{}{}
 	return ch
 }
 
-// Unsubscribe removes the given channel from the subscription list for the parent action name
-func (c *ActionsClient) Unsubscribe(parentActionName string, ch chan *ActionUpdate) {
+// Unsubscribe removes the given channel from the subscription list for the (run, parent action)
+func (c *ActionsClient) Unsubscribe(runName, parentActionName string, ch chan *ActionUpdate) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if channels, ok := c.subscribers[parentActionName]; ok {
+	key := subscriberKey(runName, parentActionName)
+	if channels, ok := c.subscribers[key]; ok {
 		delete(channels, ch)
 		close(ch)
 		if len(channels) == 0 {
-			delete(c.subscribers, parentActionName)
+			delete(c.subscribers, key)
 		}
 	}
 }
@@ -536,7 +547,8 @@ func (c *ActionsClient) notifySubscribers(ctx context.Context, update *ActionUpd
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	for ch := range c.subscribers[update.ParentActionName] {
+	key := subscriberKey(update.ActionID.GetRun().GetName(), update.ParentActionName)
+	for ch := range c.subscribers[key] {
 		select {
 		case ch <- update:
 		default:

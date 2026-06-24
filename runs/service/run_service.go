@@ -25,12 +25,11 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -41,18 +40,15 @@ import (
 type RunService struct {
 	repo            interfaces.Repository
 	actionsClient   actionsconnect.ActionsServiceClient
-	dataProxyClient actionDataClient
 	projectClient   projectconnect.ProjectServiceClient
 	storagePrefix   string
 	dataStore       *storage.DataStore
 	abortReconciler *AbortReconciler
-}
-
-type actionDataClient interface {
-	GetActionData(
-		ctx context.Context,
-		req *connect.Request[dataproxy.GetActionDataRequest],
-	) (*connect.Response[dataproxy.GetActionDataResponse], error)
+	enricher        *identityEnricher
+	// trustHeaders gates deriving executed_by from proxy-forwarded auth headers.
+	trustHeaders bool
+	// identityHeaders names the proxy-forwarded headers identity is read from.
+	identityHeaders config.IdentityHeadersConfig
 }
 
 const (
@@ -147,20 +143,24 @@ func (s *RunService) WatchGroups(ctx context.Context, req *connect.Request[workf
 func NewRunService(
 	repo interfaces.Repository,
 	actionsClient actionsconnect.ActionsServiceClient,
-	dataProxyClient dataproxyconnect.DataProxyServiceClient,
 	projectClient projectconnect.ProjectServiceClient,
 	storagePrefix string,
 	dataStore *storage.DataStore,
 	reconciler *AbortReconciler,
+	authServerBaseURL string,
+	trustForwardedIdentityHeaders bool,
+	identityHeaders config.IdentityHeadersConfig,
 ) *RunService {
 	return &RunService{
 		repo:            repo,
 		actionsClient:   actionsClient,
-		dataProxyClient: dataProxyClient,
 		projectClient:   projectClient,
 		storagePrefix:   storagePrefix,
 		dataStore:       dataStore,
 		abortReconciler: reconciler,
+		enricher:        newIdentityEnricher(authServerBaseURL),
+		trustHeaders:    trustForwardedIdentityHeaders,
+		identityHeaders: identityHeaders,
 	}
 }
 
@@ -334,8 +334,21 @@ func (s *RunService) CreateRun(
 		}
 	}
 
-	// Persist task spec and create run model
-	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec, request.GetSource(), triggerName, triggerTaskName, triggerRevision, triggerType)
+	// Capture who created the run from the auth headers the load balancer forwards
+	// (it enforces auth upstream). nil when there is no authenticated identity. On the
+	// Bearer path the token carries only the subject, so enrich name/email via userinfo.
+	// Only trust the proxy-forwarded identity headers when configured to (the JWTs are
+	// decoded, not signature-verified — see Config.TrustForwardedIdentityHeaders).
+	var executedBy *common.EnrichedIdentity
+	if s.trustHeaders {
+		executedBy = identityFromHeaders(req.Header(), s.identityHeaders)
+		// Cookie path isn't enriched here: its forwarded access token is short-lived and
+		// already expired, so it relies on the claims the proxy injects into x-amzn-oidc-data.
+		executedBy = s.enricher.enrich(ctx, bearerToken(req.Header()), executedBy)
+	}
+
+	// Persist task spec and create a run model
+	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec, request.GetSource(), triggerName, triggerTaskName, triggerRevision, triggerType, executedBy)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -381,6 +394,7 @@ func (s *RunService) persistRunModel(
 	triggerName, triggerTaskName string,
 	triggerRevision int64,
 	triggerType string,
+	executedBy *common.EnrichedIdentity,
 ) (*models.Run, error) {
 	// Store task spec and compute digest
 	info := &workflow.RunInfo{InputsUri: inputPrefix + "/inputs.pb"}
@@ -431,31 +445,47 @@ func (s *RunService) persistRunModel(
 		return sql.NullString{String: s, Valid: s != ""}
 	}
 
+	// Persist the creator's identity two ways: the full EnrichedIdentity (subject, plus
+	// name/email when captured) serialized in created_by for display, and its subject in
+	// created_by_subject as an indexed scalar so runs can be filtered/listed by owner.
+	var createdByBytes []byte
+	var createdBySubject string
+	if executedBy != nil {
+		createdBySubject = executedBy.GetUser().GetId().GetSubject()
+		if b, marshalErr := proto.Marshal(executedBy); marshalErr != nil {
+			logger.Warnf(ctx, "CreateRun: failed to marshal created_by identity: %v", marshalErr)
+		} else {
+			createdByBytes = b
+		}
+	}
+
 	runModel := &models.Run{
-		Project:         runId.GetProject(),
-		Domain:          runId.GetDomain(),
-		RunName:         runId.GetName(),
-		Name:            RootActionName,
-		Phase:           int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-		ActionType:      int32(workflow.ActionType_ACTION_TYPE_TASK),
-		TaskProject:     nullStr(taskID.GetProject()),
-		TaskDomain:      nullStr(taskID.GetDomain()),
-		TaskName:        nullStr(taskID.GetName()),
-		TaskVersion:     nullStr(taskID.GetVersion()),
-		TaskType:        taskSpec.GetTaskTemplate().GetType(),
-		TaskShortName:   nullStr(taskSpec.GetShortName()),
-		FunctionName:    taskID.GetName(),
-		EnvironmentName: nullStr(taskSpec.GetEnvironment().GetName()),
-		ActionSpec:      actionSpecBytes,
-		ActionDetails:   []byte("{}"),
-		DetailedInfo:    detailedInfo,
-		RunSpec:         runSpecBytes,
-		Attempts:        1,
-		RunSource:       source.String(),
-		TriggerTaskName: nullStr(triggerTaskName),
-		TriggerName:     nullStr(triggerName),
-		TriggerRevision: sql.NullInt64{Int64: triggerRevision, Valid: triggerRevision != 0},
-		TriggerType:     nullStr(triggerType),
+		Project:          runId.GetProject(),
+		Domain:           runId.GetDomain(),
+		RunName:          runId.GetName(),
+		Name:             RootActionName,
+		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		ActionType:       int32(workflow.ActionType_ACTION_TYPE_TASK),
+		TaskProject:      nullStr(taskID.GetProject()),
+		TaskDomain:       nullStr(taskID.GetDomain()),
+		TaskName:         nullStr(taskID.GetName()),
+		TaskVersion:      nullStr(taskID.GetVersion()),
+		TaskType:         taskSpec.GetTaskTemplate().GetType(),
+		TaskShortName:    nullStr(taskSpec.GetShortName()),
+		FunctionName:     taskID.GetName(),
+		EnvironmentName:  nullStr(taskSpec.GetEnvironment().GetName()),
+		ActionSpec:       actionSpecBytes,
+		ActionDetails:    []byte("{}"),
+		DetailedInfo:     detailedInfo,
+		RunSpec:          runSpecBytes,
+		Attempts:         1,
+		RunSource:        source.String(),
+		CreatedBy:        createdByBytes,
+		CreatedBySubject: nullStr(createdBySubject),
+		TriggerTaskName:  nullStr(triggerTaskName),
+		TriggerName:      nullStr(triggerName),
+		TriggerRevision:  sql.NullInt64{Int64: triggerRevision, Valid: triggerRevision != 0},
+		TriggerType:      nullStr(triggerType),
 	}
 
 	return s.repo.ActionRepo().CreateAction(ctx, runModel, triggerName != "")
@@ -830,37 +860,14 @@ func lastAttemptIsTerminal(attempts []*workflow.ActionAttempt) bool {
 	return IsTerminalPhase(last.GetPhase())
 }
 
-// GetActionData keeps backward compatibility by delegating data reads to DataProxy.
+// GetActionData is deprecated and no longer implemented. Clients should use
+// DataProxyService.GetActionData instead. The RPC is retained in the proto for
+// backwards compatibility but the server returns Unimplemented.
 func (s *RunService) GetActionData(
 	ctx context.Context,
 	req *connect.Request[workflow.GetActionDataRequest],
 ) (*connect.Response[workflow.GetActionDataResponse], error) {
-	logger.Infof(ctx, "Received GetActionData request for: %s/%s",
-		req.Msg.ActionId.Run.Name, req.Msg.ActionId.Name)
-
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
-	}
-
-	if s.dataProxyClient == nil {
-		return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("dataproxy client is not configured"))
-	}
-
-	dpResp, err := s.dataProxyClient.GetActionData(ctx, connect.NewRequest(&dataproxy.GetActionDataRequest{
-		ActionId: req.Msg.GetActionId(),
-	}))
-	if err != nil {
-		return nil, err
-	}
-
-	resp := &workflow.GetActionDataResponse{
-		Inputs:  dpResp.Msg.GetInputs(),
-		Outputs: dpResp.Msg.GetOutputs(),
-	}
-
-	logger.Infof(ctx, "Retrieved action data for: %s (inputs=%d, outputs=%d)",
-		req.Msg.ActionId.Name, len(resp.Inputs.Literals), len(resp.Outputs.Literals))
-	return connect.NewResponse(resp), nil
+	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("RunService.GetActionData is deprecated; use DataProxyService.GetActionData instead"))
 }
 
 // ListRuns lists runs based on filter criteria
@@ -1496,7 +1503,8 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 	}
 }
 
-// getLogContextAndClusterForAttempt is like getLogContextForAttempt but also returns the cluster name.
+// getLogContextAndClusterForAttempt fetches the latest event for the given attempt and returns
+// its LogContext along with the cluster name.
 func getLogContextAndClusterForAttempt(ctx context.Context, repo interfaces.Repository, actionID *common.ActionIdentifier, attempt uint32) (*core.LogContext, string, error) {
 	m, err := repo.ActionRepo().GetLatestEventByAttempt(ctx, actionID, attempt)
 	if err != nil {
@@ -1555,6 +1563,15 @@ func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 	if action.RunSource != "" {
 		if v, ok := workflow.RunSource_value[action.RunSource]; ok {
 			metadata.Source = workflow.RunSource(v)
+		}
+	}
+
+	// The stored identity (subject, plus name/email when captured). Left nil for
+	// unauthenticated runs or if the stored bytes are unreadable.
+	if len(action.CreatedBy) > 0 {
+		var id common.EnrichedIdentity
+		if err := proto.Unmarshal(action.CreatedBy, &id); err == nil {
+			metadata.ExecutedBy = &id
 		}
 	}
 

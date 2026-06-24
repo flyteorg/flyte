@@ -28,6 +28,8 @@ RUN go mod download
 COPY manager manager
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
     go build -v -o dist/flyte ./manager/cmd/
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
+    go build -v -o dist/flyte-copilot ./flytecopilot
 
 
 FROM debian:bookworm-slim
@@ -44,8 +46,11 @@ RUN apt-get update && apt-get install --no-install-recommends --yes \
         tini \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy compiled executable into image
+# Copy compiled executables into image. flyteplugins invokes copilot as
+# `/bin/flyte-copilot` (flytek8s.CopilotCommandArgs), so it must live at that
+# exact path; the copilot init/sidecar container can then reuse this image.
 COPY --from=flytebuilder /flyteorg/build/dist/flyte /usr/local/bin/
+COPY --from=flytebuilder /flyteorg/build/dist/flyte-copilot /bin/flyte-copilot
 
 # Set entrypoint
 ENTRYPOINT [ "/usr/bin/tini", "-g", "--", "/usr/local/bin/flyte" ]
