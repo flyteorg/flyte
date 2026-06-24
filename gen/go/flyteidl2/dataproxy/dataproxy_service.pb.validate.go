@@ -372,6 +372,8 @@ func (m *UploadInputsRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for BaseDir
+
 	switch v := m.Id.(type) {
 	case *UploadInputsRequest_RunId:
 		if v == nil {
