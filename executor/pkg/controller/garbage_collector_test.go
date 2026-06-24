@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -63,7 +64,7 @@ var _ = Describe("GarbageCollector", func() {
 			LabelCompletedTime:     expiredTime,
 		})
 
-		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour)
 		Expect(gc.collect(ctx)).To(Succeed())
 
 		ta := &flyteorgv1.TaskAction{}
@@ -79,7 +80,7 @@ var _ = Describe("GarbageCollector", func() {
 			LabelCompletedTime:     recentTime,
 		})
 
-		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour)
 		Expect(gc.collect(ctx)).To(Succeed())
 
 		ta := &flyteorgv1.TaskAction{}
@@ -90,7 +91,7 @@ var _ = Describe("GarbageCollector", func() {
 	It("should retain non-terminated TaskActions", func() {
 		createTaskAction(ctx, "gc-active", nil)
 
-		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour)
 		Expect(gc.collect(ctx)).To(Succeed())
 
 		ta := &flyteorgv1.TaskAction{}
@@ -99,8 +100,33 @@ var _ = Describe("GarbageCollector", func() {
 	})
 
 	It("should handle empty list gracefully", func() {
-		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour)
 		Expect(gc.collect(ctx)).To(Succeed())
+	})
+
+	It("should paginate across multiple pages of expired TaskActions", func() {
+		// collect() lists with Continue pagination; this exercises that path
+		// (regression: it ran against the cache client, which rejects Continue
+		// with "continue list option is not supported by the cache" once a run
+		// has more than one page of terminal actions). Reader must be uncached.
+		orig := gcPageSize
+		gcPageSize = 2
+		defer func() { gcPageSize = orig }()
+
+		expiredTime := time.Now().UTC().Add(-2 * time.Hour).Format(labelTimeFormat)
+		for i := 0; i < 5; i++ {
+			createTaskAction(ctx, fmt.Sprintf("gc-page-%d", i), map[string]string{
+				LabelTerminationStatus: LabelValueTerminated,
+				LabelCompletedTime:     expiredTime,
+			})
+		}
+
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour)
+		Expect(gc.collect(ctx)).To(Succeed())
+
+		var list flyteorgv1.TaskActionList
+		Expect(k8sClient.List(ctx, &list, client.InNamespace("default"))).To(Succeed())
+		Expect(list.Items).To(BeEmpty(), "every expired TaskAction across all pages should be deleted")
 	})
 
 	It("should sweep immediately on Start without waiting a full interval", func() {
@@ -113,7 +139,7 @@ var _ = Describe("GarbageCollector", func() {
 		// A long interval means the ticker will not fire during the test, so the
 		// expired TaskAction can only be deleted by the immediate startup sweep.
 		// Before the fix, Start waited a full interval before its first collect.
-		gc := NewGarbageCollector(k8sClient, 30*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, k8sClient, 30*time.Minute, 1*time.Hour)
 		startCtx, cancel := context.WithCancel(ctx)
 		doneCh := make(chan struct{})
 		go func() {
