@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.task;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/phase.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/security.proto";
@@ -125,6 +126,11 @@ message RunSpec {
   // Distinct from raw_data_storage.raw_data_prefix, which controls offloaded
   // blob (user data) layout.
   string run_base_dir = 14;
+
+  // Optional pointer to the single parent run this run was derived from (re-run, recover,
+  // clone, or explicit SDK/CLI provenance). Set at creation, immutable thereafter, and scoped
+  // to the same org/project/domain as this run.
+  flyteidl2.common.RunIdentifier related_to = 15;
 }
 
 message InlineRuleList {
