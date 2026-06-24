@@ -8,4 +8,4 @@ type: application
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
 
-version: v0.2.0  # VERSION
+version: v0.2.1  # VERSION
