@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
@@ -44,9 +45,7 @@ func (gc *GarbageCollector) Start(ctx context.Context) error {
 
 	// Sweep once immediately on startup. time.Ticker only fires its first tick
 	// after a full interval, so without this a restart defers the first
-	// collection by the whole interval -- and restarts that arrive faster than
-	// the interval keep resetting the ticker before it ever fires, so terminal
-	// TaskActions accumulate without bound.
+	// collection by the whole interval.
 	if err := gc.collect(ctx); err != nil {
 		logger.Error(err, "initial garbage collection cycle failed")
 	}
@@ -104,6 +103,13 @@ func (gc *GarbageCollector) collect(ctx context.Context) error {
 			// The minute-precision format is lexicographically ordered, so string comparison works.
 			if completedTime < cutoff {
 				if err := gc.client.Delete(ctx, ta); err != nil {
+					// Already gone is the desired state: a child TaskAction is
+					// often cascade-deleted (via OwnerReferences) when its parent
+					// is deleted earlier in this same pass, so the explicit delete
+					// races with the cascade and returns NotFound. Not an error.
+					if apierrors.IsNotFound(err) {
+						continue
+					}
 					logger.Error(err, "failed to delete expired TaskAction",
 						"name", ta.Name, "namespace", ta.Namespace, "completedTime", completedTime)
 					continue
