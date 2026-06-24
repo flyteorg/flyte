@@ -40,13 +40,17 @@ data:
           {{- with ( index .Values.configuration "co-pilot" ).image }}
           image: {{ printf "%s:%s" .repository .tag | quote }}
           {{- end }}
-        # Env vars injected into every task pod. Tasks call back to the control
-        # plane (enqueue child actions, watch state) at _U_EP_OVERRIDE; default it
-        # to this release's in-cluster HTTP service so execution works out of the
-        # box. Without it the SDK falls back to host.docker.internal:8090, which
-        # only resolves in the local devbox -> task pods loop and never complete.
-        # The in-cluster service is plain HTTP (TLS terminates at the ingress), so
-        # _U_INSECURE=true; _U_USE_ACTIONS enables the actions/queue path.
+        # Env vars injected into every task pod so it can reach the control plane
+        # to enqueue child actions and watch their state. Without them the SDK
+        # falls back to host.docker.internal:8090 (a devbox-only address that does
+        # not resolve in a real cluster), so task pods loop and never complete.
+        #
+        #   - _U_EP_OVERRIDE: where the task reaches the control plane. Defaults to
+        #     this release's in-cluster HTTP service, <fullname>-http.<namespace>:8090.
+        #   - _U_INSECURE:    talk plain HTTP — the in-cluster service has no TLS
+        #     (TLS terminates at the ingress).
+        #   - _U_USE_ACTIONS: use the actions/queue execution path.
+        #
         # Override or extend via configuration.inline.plugins.k8s.default-env-vars.
         default-env-vars:
           - _U_EP_OVERRIDE: {{ printf "%s.%s:%s" (include "flyte-binary.service.http.name" .) .Release.Namespace (include "flyte-binary.service.http.port" .) | quote }}
