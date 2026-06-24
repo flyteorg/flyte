@@ -203,6 +203,30 @@ func httpProtocols() *http.Protocols {
 	return protocols
 }
 
+// InternalHTTPClient returns an *http.Client tuned for service-to-service
+// connect-rpc calls within the cluster (e.g. executor -> events-proxy ->
+// run-service).
+//
+// http.DefaultClient uses HTTP/1.1 with MaxIdleConnsPerHost=2, so under
+// concurrent load requests serialize on two connections and pay a fresh TCP
+// handshake per call -- which dominates p99 send latency and caps throughput.
+// This client speaks unencrypted HTTP/2 (h2c), so all concurrent RPCs multiplex
+// over a single connection. The internal servers advertise h2c via
+// httpProtocols(); these hops are plaintext http:// so we force cleartext h2
+// with prior knowledge. The generous idle pool only matters on an h1 fallback.
+func InternalHTTPClient() *http.Client {
+	protocols := &http.Protocols{}
+	protocols.SetUnencryptedHTTP2(true)
+	return &http.Client{
+		Transport: &http.Transport{
+			Protocols:           protocols,
+			MaxIdleConns:        256,
+			MaxIdleConnsPerHost: 256,
+			IdleConnTimeout:     90 * time.Second,
+		},
+	}
+}
+
 // requestGzipDecompressMiddleware pre-decompresses request bodies that carry
 // Content-Encoding: gzip before they reach the connect-rpc handler.
 //
