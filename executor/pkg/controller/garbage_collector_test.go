@@ -6,6 +6,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -100,6 +101,28 @@ var _ = Describe("GarbageCollector", func() {
 	It("should handle empty list gracefully", func() {
 		gc := NewGarbageCollector(k8sClient, 1*time.Minute, 1*time.Hour)
 		Expect(gc.collect(ctx)).To(Succeed())
+	})
+
+	It("should sweep immediately on Start without waiting a full interval", func() {
+		expiredTime := time.Now().UTC().Add(-2 * time.Hour).Format(labelTimeFormat)
+		createTaskAction(ctx, "gc-startup", map[string]string{
+			LabelTerminationStatus: LabelValueTerminated,
+			LabelCompletedTime:     expiredTime,
+		})
+
+		// A long interval means the ticker will not fire during the test, so the
+		// expired TaskAction can only be deleted by the immediate startup sweep.
+		// Before the fix, Start waited a full interval before its first collect.
+		gc := NewGarbageCollector(k8sClient, 30*time.Minute, 1*time.Hour)
+		startCtx, cancel := context.WithCancel(ctx)
+		defer cancel()
+		go func() { _ = gc.Start(startCtx) }()
+
+		Eventually(func() bool {
+			ta := &flyteorgv1.TaskAction{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Name: "gc-startup", Namespace: "default"}, ta)
+			return apierrors.IsNotFound(err)
+		}, 10*time.Second, 200*time.Millisecond).Should(BeTrue(), "Start should delete the expired TaskAction via its initial sweep")
 	})
 })
 

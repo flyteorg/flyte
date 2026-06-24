@@ -36,6 +36,15 @@ func (gc *GarbageCollector) Start(ctx context.Context) error {
 	ticker := time.NewTicker(gc.interval)
 	defer ticker.Stop()
 
+	// Sweep once immediately on startup. time.Ticker only fires its first tick
+	// after a full interval, so without this a restart defers the first
+	// collection by the whole interval -- and restarts that arrive faster than
+	// the interval keep resetting the ticker before it ever fires, so terminal
+	// TaskActions accumulate without bound.
+	if err := gc.collect(ctx); err != nil {
+		logger.Error(err, "initial garbage collection cycle failed")
+	}
+
 	for {
 		select {
 		case <-ctx.Done():
