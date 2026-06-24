@@ -115,9 +115,15 @@ var _ = Describe("GarbageCollector", func() {
 		// Before the fix, Start waited a full interval before its first collect.
 		gc := NewGarbageCollector(k8sClient, 30*time.Minute, 1*time.Hour)
 		startCtx, cancel := context.WithCancel(ctx)
-		defer cancel()
-		go func() { _ = gc.Start(startCtx) }()
-
+		doneCh := make(chan struct{})
+		go func() {
+			defer close(doneCh)
+			_ = gc.Start(startCtx)
+		}()
+		defer func() {
+			cancel()
+			Eventually(doneCh, 2*time.Second, 50*time.Millisecond).Should(BeClosed())
+		}()
 		Eventually(func() bool {
 			ta := &flyteorgv1.TaskAction{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Name: "gc-startup", Namespace: "default"}, ta)
