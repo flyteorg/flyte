@@ -7165,6 +7165,12 @@ rules:
   - watch
 - apiGroups:
   - ""
+  resources:
+  - pods/log
+  verbs:
+  - get
+- apiGroups:
+  - ""
   - events.k8s.io
   resources:
   - events
@@ -8608,7 +8614,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: ad6d3ba170962e057fe3375d9f3a28208ae39cce2b2df9f1441d531873f9fa9b
+        checksum/configuration: 9ed3014b64700d5fd7df7d19eb0c2cd88291e3c775e0f34e13e3231d82e49234
         checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
       labels:
         app.kubernetes.io/component: flyte-binary

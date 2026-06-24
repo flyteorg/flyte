@@ -442,7 +442,7 @@ func TestUploadInputs(t *testing.T) {
 			},
 		},
 		{
-			name: "run_base_dir (base_dir) overrides the configured storage prefix",
+			name: "run_base_dir (base_dir) is a full path used verbatim, switching buckets",
 			req: &dataproxy.UploadInputsRequest{
 				Id: &dataproxy.UploadInputsRequest_RunId{
 					RunId: &common.RunIdentifier{
@@ -453,7 +453,7 @@ func TestUploadInputs(t *testing.T) {
 					},
 				},
 				Task:    &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
-				BaseDir: "/custom/base/",
+				BaseDir: "s3://my-own-bucket/team-a/",
 				Inputs: &task.Inputs{
 					Literals: []*task.NamedLiteral{
 						{Name: "x", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 42}}}}}}},
@@ -463,8 +463,11 @@ func TestUploadInputs(t *testing.T) {
 			wantErr: false,
 			validateResult: func(t *testing.T, resp *connect.Response[dataproxy.UploadInputsResponse]) {
 				assert.NotNil(t, resp.Msg.OffloadedInputData)
-				// The override replaces "uploads"; leading/trailing slashes are trimmed.
-				assert.Contains(t, resp.Msg.OffloadedInputData.Uri, "custom/base/test-org/test-project/test-domain/offloaded-inputs/")
+				// base_dir is used verbatim, bucket and all: the inputs land in the
+				// override bucket, not the configured base container (s3://test-bucket)
+				// nor under the "uploads" storage prefix. Trailing slash is trimmed.
+				assert.Contains(t, resp.Msg.OffloadedInputData.Uri, "s3://my-own-bucket/team-a/test-org/test-project/test-domain/offloaded-inputs/")
+				assert.NotContains(t, resp.Msg.OffloadedInputData.Uri, "s3://test-bucket")
 				assert.NotContains(t, resp.Msg.OffloadedInputData.Uri, "uploads/test-org")
 			},
 		},
