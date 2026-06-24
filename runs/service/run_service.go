@@ -1322,12 +1322,17 @@ func (s *RunService) listAndSendAllActions(
 		// Sort ascending by created_at so parent actions are inserted into the
 		// run state manager before their children. insertAction requires the
 		// parent node to already exist in the tree when a child is processed.
+		// "name" is a deterministic tiebreaker: a map task bulk-creates thousands
+		// of children with identical created_at, and OFFSET paging over a
+		// non-unique ORDER BY skips/duplicates rows, so the snapshot loses actions
+		// and ChildPhaseCounts comes up short. name is unique within a run.
 		batch, err := s.repo.ActionRepo().ListActions(ctx, interfaces.ListResourceInput{
 			Filter: impl.NewRunActionsFilter(runID),
 			Limit:  pageSize,
 			Offset: offset,
 			SortParameters: []interfaces.SortParameter{
 				impl.NewSortParameter("created_at", interfaces.SortOrderAscending),
+				impl.NewSortParameter("name", interfaces.SortOrderAscending),
 			},
 		})
 		if err != nil {
