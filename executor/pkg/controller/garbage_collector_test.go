@@ -124,9 +124,14 @@ var _ = Describe("GarbageCollector", func() {
 		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour)
 		Expect(gc.collect(ctx)).To(Succeed())
 
-		var list flyteorgv1.TaskActionList
-		Expect(k8sClient.List(ctx, &list, client.InNamespace("default"))).To(Succeed())
-		Expect(list.Items).To(BeEmpty(), "every expired TaskAction across all pages should be deleted")
+		// Assert only the actions this spec created are gone -- checking the whole
+		// namespace is flaky because other specs can leave TaskActions lingering
+		// with a finalizer (DeletionTimestamp set but not yet removed).
+		for i := 0; i < 5; i++ {
+			ta := &flyteorgv1.TaskAction{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Name: fmt.Sprintf("gc-page-%d", i), Namespace: "default"}, ta)
+			Expect(apierrors.IsNotFound(err)).To(BeTrue(), "gc-page-%d should be deleted across pages", i)
+		}
 	})
 
 	It("should sweep immediately on Start without waiting a full interval", func() {
