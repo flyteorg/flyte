@@ -29,6 +29,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -43,6 +44,11 @@ type RunService struct {
 	storagePrefix   string
 	dataStore       *storage.DataStore
 	abortReconciler *AbortReconciler
+	enricher        *identityEnricher
+	// trustHeaders gates deriving executed_by from proxy-forwarded auth headers.
+	trustHeaders bool
+	// identityHeaders names the proxy-forwarded headers identity is read from.
+	identityHeaders config.IdentityHeadersConfig
 }
 
 const (
@@ -141,6 +147,9 @@ func NewRunService(
 	storagePrefix string,
 	dataStore *storage.DataStore,
 	reconciler *AbortReconciler,
+	authServerBaseURL string,
+	trustForwardedIdentityHeaders bool,
+	identityHeaders config.IdentityHeadersConfig,
 ) *RunService {
 	return &RunService{
 		repo:            repo,
@@ -149,6 +158,9 @@ func NewRunService(
 		storagePrefix:   storagePrefix,
 		dataStore:       dataStore,
 		abortReconciler: reconciler,
+		enricher:        newIdentityEnricher(authServerBaseURL),
+		trustHeaders:    trustForwardedIdentityHeaders,
+		identityHeaders: identityHeaders,
 	}
 }
 
@@ -313,8 +325,21 @@ func (s *RunService) CreateRun(
 		}
 	}
 
-	// Persist task spec and create run model
-	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec, request.GetSource(), triggerName, triggerTaskName, triggerRevision, triggerType)
+	// Capture who created the run from the auth headers the load balancer forwards
+	// (it enforces auth upstream). nil when there is no authenticated identity. On the
+	// Bearer path the token carries only the subject, so enrich name/email via userinfo.
+	// Only trust the proxy-forwarded identity headers when configured to (the JWTs are
+	// decoded, not signature-verified — see Config.TrustForwardedIdentityHeaders).
+	var executedBy *common.EnrichedIdentity
+	if s.trustHeaders {
+		executedBy = identityFromHeaders(req.Header(), s.identityHeaders)
+		// Cookie path isn't enriched here: its forwarded access token is short-lived and
+		// already expired, so it relies on the claims the proxy injects into x-amzn-oidc-data.
+		executedBy = s.enricher.enrich(ctx, bearerToken(req.Header()), executedBy)
+	}
+
+	// Persist task spec and create a run model
+	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec, request.GetSource(), triggerName, triggerTaskName, triggerRevision, triggerType, executedBy)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -360,6 +385,7 @@ func (s *RunService) persistRunModel(
 	triggerName, triggerTaskName string,
 	triggerRevision int64,
 	triggerType string,
+	executedBy *common.EnrichedIdentity,
 ) (*models.Run, error) {
 	// Store task spec and compute digest
 	info := &workflow.RunInfo{InputsUri: inputPrefix + "/inputs.pb"}
@@ -410,31 +436,47 @@ func (s *RunService) persistRunModel(
 		return sql.NullString{String: s, Valid: s != ""}
 	}
 
+	// Persist the creator's identity two ways: the full EnrichedIdentity (subject, plus
+	// name/email when captured) serialized in created_by for display, and its subject in
+	// created_by_subject as an indexed scalar so runs can be filtered/listed by owner.
+	var createdByBytes []byte
+	var createdBySubject string
+	if executedBy != nil {
+		createdBySubject = executedBy.GetUser().GetId().GetSubject()
+		if b, marshalErr := proto.Marshal(executedBy); marshalErr != nil {
+			logger.Warnf(ctx, "CreateRun: failed to marshal created_by identity: %v", marshalErr)
+		} else {
+			createdByBytes = b
+		}
+	}
+
 	runModel := &models.Run{
-		Project:         runId.GetProject(),
-		Domain:          runId.GetDomain(),
-		RunName:         runId.GetName(),
-		Name:            RootActionName,
-		Phase:           int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-		ActionType:      int32(workflow.ActionType_ACTION_TYPE_TASK),
-		TaskProject:     nullStr(taskID.GetProject()),
-		TaskDomain:      nullStr(taskID.GetDomain()),
-		TaskName:        nullStr(taskID.GetName()),
-		TaskVersion:     nullStr(taskID.GetVersion()),
-		TaskType:        taskSpec.GetTaskTemplate().GetType(),
-		TaskShortName:   nullStr(taskSpec.GetShortName()),
-		FunctionName:    taskID.GetName(),
-		EnvironmentName: nullStr(taskSpec.GetEnvironment().GetName()),
-		ActionSpec:      actionSpecBytes,
-		ActionDetails:   []byte("{}"),
-		DetailedInfo:    detailedInfo,
-		RunSpec:         runSpecBytes,
-		Attempts:        1,
-		RunSource:       source.String(),
-		TriggerTaskName: nullStr(triggerTaskName),
-		TriggerName:     nullStr(triggerName),
-		TriggerRevision: sql.NullInt64{Int64: triggerRevision, Valid: triggerRevision != 0},
-		TriggerType:     nullStr(triggerType),
+		Project:          runId.GetProject(),
+		Domain:           runId.GetDomain(),
+		RunName:          runId.GetName(),
+		Name:             RootActionName,
+		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		ActionType:       int32(workflow.ActionType_ACTION_TYPE_TASK),
+		TaskProject:      nullStr(taskID.GetProject()),
+		TaskDomain:       nullStr(taskID.GetDomain()),
+		TaskName:         nullStr(taskID.GetName()),
+		TaskVersion:      nullStr(taskID.GetVersion()),
+		TaskType:         taskSpec.GetTaskTemplate().GetType(),
+		TaskShortName:    nullStr(taskSpec.GetShortName()),
+		FunctionName:     taskID.GetName(),
+		EnvironmentName:  nullStr(taskSpec.GetEnvironment().GetName()),
+		ActionSpec:       actionSpecBytes,
+		ActionDetails:    []byte("{}"),
+		DetailedInfo:     detailedInfo,
+		RunSpec:          runSpecBytes,
+		Attempts:         1,
+		RunSource:        source.String(),
+		CreatedBy:        createdByBytes,
+		CreatedBySubject: nullStr(createdBySubject),
+		TriggerTaskName:  nullStr(triggerTaskName),
+		TriggerName:      nullStr(triggerName),
+		TriggerRevision:  sql.NullInt64{Int64: triggerRevision, Valid: triggerRevision != 0},
+		TriggerType:      nullStr(triggerType),
 	}
 
 	return s.repo.ActionRepo().CreateAction(ctx, runModel, triggerName != "")
@@ -1512,6 +1554,15 @@ func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 	if action.RunSource != "" {
 		if v, ok := workflow.RunSource_value[action.RunSource]; ok {
 			metadata.Source = workflow.RunSource(v)
+		}
+	}
+
+	// The stored identity (subject, plus name/email when captured). Left nil for
+	// unauthenticated runs or if the stored bytes are unreadable.
+	if len(action.CreatedBy) > 0 {
+		var id common.EnrichedIdentity
+		if err := proto.Unmarshal(action.CreatedBy, &id); err == nil {
+			metadata.ExecutedBy = &id
 		}
 	}
 
