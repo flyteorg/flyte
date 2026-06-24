@@ -347,11 +347,7 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 	args = append(args, input.Limit+1)
 
 	// Offset-based pagination. Callers either page by CursorToken (keyset) or by
-	// Offset; the two are mutually exclusive. Without this clause Offset is
-	// silently ignored, so an offset-paging caller re-reads the same first page
-	// forever (e.g. WatchActions.listAndSendAllActions only ever loaded the first
-	// 100 actions, capping children_phase_counts at the page size and never
-	// terminating its loop for runs with more than a page of actions).
+	// Offset; the two are mutually exclusive.
 	if input.CursorToken != "" && input.Offset > 0 {
 		return nil, fmt.Errorf("CursorToken and Offset are mutually exclusive")
 	}
