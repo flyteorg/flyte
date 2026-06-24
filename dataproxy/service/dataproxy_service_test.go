@@ -442,6 +442,33 @@ func TestUploadInputs(t *testing.T) {
 			},
 		},
 		{
+			name: "run_base_dir (base_dir) overrides the configured storage prefix",
+			req: &dataproxy.UploadInputsRequest{
+				Id: &dataproxy.UploadInputsRequest_RunId{
+					RunId: &common.RunIdentifier{
+						Org:     "test-org",
+						Project: "test-project",
+						Domain:  "test-domain",
+						Name:    "test-run",
+					},
+				},
+				Task:    &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: testTaskSpec},
+				BaseDir: "/custom/base/",
+				Inputs: &task.Inputs{
+					Literals: []*task.NamedLiteral{
+						{Name: "x", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 42}}}}}}},
+					},
+				},
+			},
+			wantErr: false,
+			validateResult: func(t *testing.T, resp *connect.Response[dataproxy.UploadInputsResponse]) {
+				assert.NotNil(t, resp.Msg.OffloadedInputData)
+				// The override replaces "uploads"; leading/trailing slashes are trimmed.
+				assert.Contains(t, resp.Msg.OffloadedInputData.Uri, "custom/base/test-org/test-project/test-domain/offloaded-inputs/")
+				assert.NotContains(t, resp.Msg.OffloadedInputData.Uri, "uploads/test-org")
+			},
+		},
+		{
 			name: "cache_ignore_input_vars excludes inputs from hash",
 			req: &dataproxy.UploadInputsRequest{
 				Id: &dataproxy.UploadInputsRequest_RunId{

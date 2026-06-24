@@ -268,7 +268,15 @@ func (s *Service) UploadInputs(
 	}
 
 	// Build the storage path: storagePrefix/org/project/domain/offloaded-inputs/<hash>/inputs.pb
+	// req.base_dir (run_base_dir) overrides the configured storagePrefix when set; it must
+	// match the base CreateRun resolves from RunSpec.run_base_dir so the run reads these
+	// inputs from where they were written.
+	// TODO: consult org/project/domain settings (StorageSettings.run_base_dir) here as the
+	// middle tier once settings lookup lands; it must be applied in CreateRun too.
 	storagePrefix := strings.TrimRight(s.cfg.Upload.StoragePrefix, "/")
+	if base := strings.Trim(req.Msg.GetBaseDir(), "/"); base != "" {
+		storagePrefix = base
+	}
 	pathComponents := []string{storagePrefix, org, project, domain, "offloaded-inputs", inputsHash}
 	pathComponents = lo.Filter(pathComponents, func(key string, _ int) bool {
 		return key != ""
