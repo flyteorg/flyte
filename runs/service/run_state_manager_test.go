@@ -101,6 +101,60 @@ func TestRunStateManagerErrorsWhenParentMissing(t *testing.T) {
 	require.Nil(t, rsm.GetActionTreeNodeByName("child"))
 }
 
+// TestRunStateManagerSeedThenRestreamIsCountNeutral covers the invariant the
+// aggregate-count fix relies on: child phase counts are seeded up front from a
+// lightweight query (so the count is correct from the first streamed page), and
+// then the full snapshot re-streams the same rows. Re-upserting a node with the
+// same phase must be count-neutral, so the seeded total neither doubles nor
+// regresses as the streaming loop replays it.
+func TestRunStateManagerSeedThenRestreamIsCountNeutral(t *testing.T) {
+	rsm, err := newRunStateManager(nil)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	// root -> mapTask -> 150 QUEUED children, mirroring a large map task.
+	const children = 150
+	seed := []*models.Action{
+		testAction("root", nil, common.ActionPhase_ACTION_PHASE_RUNNING, 1),
+		testAction("mapTask", stringPtr("root"), common.ActionPhase_ACTION_PHASE_RUNNING, 2),
+	}
+	for i := 0; i < children; i++ {
+		seed = append(seed, testAction(fmt.Sprintf("c%03d", i), stringPtr("mapTask"),
+			common.ActionPhase_ACTION_PHASE_QUEUED, int64(10+i)))
+	}
+
+	// Seed (listAndSendAllActions discards these updates).
+	_, err = rsm.upsertActions(ctx, seed)
+	require.NoError(t, err)
+
+	queued := common.ActionPhase_ACTION_PHASE_QUEUED
+	require.Equal(t, children, rsm.GetActionTreeNodeByName("mapTask").ChildPhaseCounts[queued])
+	// Transitive: root counts the mapTask node (RUNNING) plus all 150 grandchildren.
+	require.Equal(t, children, rsm.GetActionTreeNodeByName("root").ChildPhaseCounts[queued])
+	require.Equal(t, 1, rsm.GetActionTreeNodeByName("root").ChildPhaseCounts[common.ActionPhase_ACTION_PHASE_RUNNING])
+
+	// Re-stream the same rows in pages (same phases) -> counts must not move.
+	const pageSize = 100
+	for off := 0; off < len(seed); off += pageSize {
+		end := off + pageSize
+		if end > len(seed) {
+			end = len(seed)
+		}
+		_, err = rsm.upsertActions(ctx, seed[off:end])
+		require.NoError(t, err)
+		require.Equal(t, children, rsm.GetActionTreeNodeByName("mapTask").ChildPhaseCounts[queued],
+			"re-streaming with the same phase must be count-neutral")
+	}
+
+	// A genuine live phase change after the snapshot still adjusts the count.
+	_, err = rsm.upsertActions(ctx, []*models.Action{
+		testAction("c000", stringPtr("mapTask"), common.ActionPhase_ACTION_PHASE_SUCCEEDED, 10),
+	})
+	require.NoError(t, err)
+	require.Equal(t, children-1, rsm.GetActionTreeNodeByName("mapTask").ChildPhaseCounts[queued])
+	require.Equal(t, 1, rsm.GetActionTreeNodeByName("mapTask").ChildPhaseCounts[common.ActionPhase_ACTION_PHASE_SUCCEEDED])
+}
+
 func testAction(name string, parent *string, phase common.ActionPhase, createdAtSec int64) *models.Action {
 	return testActionWithTask(name, parent, phase, createdAtSec, "")
 }

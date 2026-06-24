@@ -26,6 +26,10 @@ type ActionRepo interface {
 	GetLatestEventByAttempt(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32) (*models.ActionEvent, error)
 	GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error)
 	ListActions(ctx context.Context, input ListResourceInput) ([]*models.Action, error)
+	// ListActionPhasesForCounts returns lightweight rows (name, parent, phase) for
+	// every action in a run, used to seed child phase counts without streaming all
+	// children. See the impl for details.
+	ListActionPhasesForCounts(ctx context.Context, runID *common.RunIdentifier) ([]*models.Action, error)
 	UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time) error
 	// AbortAction marks only the targeted action as ABORTED and sets abort_requested_at.
 	// K8s cascades CRD deletion to descendants via OwnerReferences.

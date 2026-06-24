@@ -356,6 +356,38 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 	return actions, nil
 }
 
+// ListActionPhasesForCounts returns every action in a run with only the columns
+// needed to seed the run-state tree's child phase counts (name, parent, phase).
+// It deliberately avoids the large bytea columns (action_spec, action_details, ...)
+// so the whole run loads in one fast query. WatchActions otherwise has to stream
+// every child to count them, which the console's stream deadline truncates on big
+// map tasks -- seeding counts up front from this query keeps the aggregate correct
+// from the first streamed page.
+//
+// Ordered created_at ASC so parents are seen before their children (the run-state
+// manager requires the parent node to exist when a child is inserted); name is a
+// deterministic tiebreaker among equal created_at.
+//
+// ponytail: loads all rows for the run into memory. Fine to ~100k actions; beyond
+// that switch to a recursive SQL CTE or paginate.
+func (r *actionRepo) ListActionPhasesForCounts(ctx context.Context, runID *common.RunIdentifier) ([]*models.Action, error) {
+	expr, err := NewRunActionsFilter(runID).QueryExpression("")
+	if err != nil {
+		return nil, fmt.Errorf("failed to build filter expression: %w", err)
+	}
+
+	query := sqlx.Rebind(sqlx.DOLLAR,
+		"SELECT name, parent_action_name, phase, created_at FROM actions WHERE "+
+			expr.Query+" ORDER BY created_at ASC, name ASC")
+
+	var actions []*models.Action
+	if err := sqlx.SelectContext(ctx, r.db, &actions, query, expr.Args...); err != nil {
+		return nil, fmt.Errorf("failed to list action phases: %w", err)
+	}
+
+	return actions, nil
+}
+
 // UpdateActionPhase updates the phase of an action.
 // endTime should be set when the action reaches a terminal phase.
 func (r *actionRepo) UpdateActionPhase(
