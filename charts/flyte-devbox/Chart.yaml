@@ -29,7 +29,7 @@ dependencies:
     repository: https://twuni.github.io/docker-registry.helm
     condition: docker-registry.enabled
   - name: flyte-binary
-    version: v0.2.1
+    version: v0.2.0
     repository: file://../flyte-binary
     condition: flyte-binary.enabled
   - name: knative-serving

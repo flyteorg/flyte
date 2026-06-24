@@ -8,7 +8,7 @@ A Helm chart for the Flyte local demo cluster
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../flyte-binary | flyte-binary | v0.2.1 |
+| file://../flyte-binary | flyte-binary | v0.2.0 |
 | https://charts.bitnami.com/bitnami | minio | 12.6.7 |
 | https://twuni.github.io/docker-registry.helm | docker-registry | 2.2.2 |
 
