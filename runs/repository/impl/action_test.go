@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	sort1 "sort"
 	"testing"
 	"time"
 
@@ -455,6 +456,71 @@ func TestListActionsOffsetPagination(t *testing.T) {
 		}
 	}
 	assert.Len(t, seen, total, "offset paging must cover all actions exactly once")
+}
+
+// TestListActionsOffsetPaginationTiedCreatedAt is a regression test for the
+// children_phase_counts undercount on large map tasks. WatchActions pages the
+// snapshot by Offset sorted by created_at, but a map task bulk-creates thousands
+// of children with identical created_at. OFFSET over a non-unique ORDER BY has
+// undefined order among ties, so pages overlap/skip and the snapshot loses rows
+// (count came up short, e.g. 4.8K instead of 20000). The fix adds a deterministic
+// "name" tiebreaker. Here we force tied created_at and assert offset paging by
+// (created_at, run_name) stays totally ordered and covers every row exactly once.
+func TestListActionsOffsetPaginationTiedCreatedAt(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	const total = 150
+	for i := 0; i < total; i++ {
+		_, err := actionRepo.CreateAction(ctx, &models.Run{
+			Project: "proj1",
+			Domain:  "domain1",
+			RunName: fmt.Sprintf("r%03d", i),
+			Name:    rootActionName,
+			Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		}, false)
+		require.NoError(t, err)
+	}
+
+	// Force every action to share one created_at, reproducing a bulk-created map task.
+	_, err = db.Exec("UPDATE actions SET created_at = '2024-01-01T00:00:00Z'")
+	require.NoError(t, err)
+
+	const pageSize = 50
+	sort := []interfaces.SortParameter{
+		NewSortParameter("created_at", interfaces.SortOrderAscending),
+		NewSortParameter("run_name", interfaces.SortOrderAscending),
+	}
+
+	seen := map[string]struct{}{}
+	var ordered []string
+	for offset := 0; offset < total*2; offset += pageSize {
+		batch, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+			Filter:         NewIsRootActionFilter(),
+			Limit:          pageSize,
+			Offset:         offset,
+			SortParameters: sort,
+		})
+		require.NoError(t, err)
+		page := batch
+		if len(page) > pageSize { // trim the Limit+1 has-more probe row
+			page = page[:pageSize]
+		}
+		for _, a := range page {
+			seen[a.RunName] = struct{}{}
+			ordered = append(ordered, a.RunName)
+		}
+		if len(batch) <= pageSize {
+			break
+		}
+	}
+
+	assert.Len(t, seen, total, "offset paging over tied created_at must cover all actions exactly once")
+	assert.True(t, sort1.IsSorted(sort1.StringSlice(ordered)),
+		"the name tiebreaker must give a total order so pages don't overlap/skip")
 }
 
 func setupActionEventDB(t *testing.T) (*sqlx.DB, *actionRepo) {
