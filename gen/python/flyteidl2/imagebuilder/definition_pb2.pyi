@@ -8,10 +8,12 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class ImageIdentifier(_message.Message):
-    __slots__ = ["name"]
+    __slots__ = ["name", "repository"]
     NAME_FIELD_NUMBER: _ClassVar[int]
+    REPOSITORY_FIELD_NUMBER: _ClassVar[int]
     name: str
-    def __init__(self, name: _Optional[str] = ...) -> None: ...
+    repository: str
+    def __init__(self, name: _Optional[str] = ..., repository: _Optional[str] = ...) -> None: ...
 
 class Image(_message.Message):
     __slots__ = ["id", "fqin"]
