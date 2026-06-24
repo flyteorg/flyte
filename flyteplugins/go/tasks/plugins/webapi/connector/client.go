@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/grpclog"
+	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
@@ -19,6 +20,27 @@ import (
 )
 
 const defaultTaskTypeVersion = 0
+
+// DefaultGRPCServiceConfig is the gRPC service config applied to a connector
+// connection when its Deployment does not set DefaultServiceConfig. It enables
+// round-robin load balancing across connector replicas and retries transient
+// UNAVAILABLE failures so a single dropped connection does not fail the task.
+// It is exported so callers that register connectors programmatically (e.g. the
+// operator app controller) can set it explicitly.
+const DefaultGRPCServiceConfig = `{
+  "loadBalancingConfig": [{"round_robin":{}}],
+  "methodConfig": [{
+    "name": [{"service": "flyteidl2.connector.AsyncConnectorService"}],
+    "retryPolicy": {
+      "maxAttempts": 4,
+      "initialBackoff": "0.2s",
+      "maxBackoff": "3s",
+      "backoffMultiplier": 2.0,
+      "retryableStatusCodes": ["UNAVAILABLE"]
+    }
+  }],
+  "retryThrottling": {"maxTokens": 10, "tokenRatio": 0.1}
+}`
 
 type Connector struct {
 	// ConnectorDeployment is the connector deployment where this connector is running.
@@ -50,8 +72,22 @@ func getGrpcConnection(ctx context.Context, connector *Deployment) (*grpc.Client
 		opts = append(opts, grpc.WithTransportCredentials(creds))
 	}
 
-	if len(connector.DefaultServiceConfig) != 0 {
-		opts = append(opts, grpc.WithDefaultServiceConfig(connector.DefaultServiceConfig))
+	serviceConfig := connector.DefaultServiceConfig
+	if len(serviceConfig) == 0 {
+		serviceConfig = DefaultGRPCServiceConfig
+	}
+	opts = append(opts, grpc.WithDefaultServiceConfig(serviceConfig))
+
+	// Keepalive is opt-in per deployment. It is only safe for connectors fronted
+	// by an L7 gateway (e.g. Knative/Kourier Envoy) that reaps idle connections;
+	// a directly-reached grpc-go or grpcio (C-core) server rejects frequent idle
+	// pings with GOAWAY "too_many_pings".
+	if connector.Keepalive != nil {
+		opts = append(opts, grpc.WithKeepaliveParams(keepalive.ClientParameters{
+			Time:                connector.Keepalive.Time.Duration,
+			Timeout:             connector.Keepalive.Timeout.Duration,
+			PermitWithoutStream: connector.Keepalive.PermitWithoutStream,
+		}))
 	}
 
 	var err error

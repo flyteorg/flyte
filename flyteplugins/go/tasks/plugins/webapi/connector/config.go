@@ -41,10 +41,13 @@ var (
 			},
 		},
 		DefaultConnector: Deployment{
-			Endpoint:             "",
-			Insecure:             true,
-			DefaultTimeout:       config.Duration{Duration: 10 * time.Second},
-			DefaultServiceConfig: `{"loadBalancingConfig": [{"round_robin":{}}]}`,
+			Endpoint:       "",
+			Insecure:       true,
+			DefaultTimeout: config.Duration{Duration: 10 * time.Second},
+			// DefaultServiceConfig is left empty so getGrpcConnection falls back to
+			// DefaultGRPCServiceConfig (round-robin LB + UNAVAILABLE retry). Set this
+			// per-deployment only to override that default.
+			DefaultServiceConfig: "",
 		},
 		ConnectorDeployments:  map[string]*Deployment{},
 		ConnectorForTaskTypes: map[string]string{},
@@ -95,6 +98,14 @@ type Deployment struct {
 	// DefaultServiceConfig sets default gRPC service config; check https://github.com/grpc/grpc/blob/master/doc/service_config.md for more details
 	DefaultServiceConfig string `json:"defaultServiceConfig,omitempty" yaml:"defaultServiceConfig,omitempty"`
 
+	// Keepalive configures gRPC client keepalive pings for this connector. Leave
+	// unset for connectors reached directly: a grpc-go or grpcio (C-core) server
+	// rejects frequent idle pings with GOAWAY "too_many_pings". Set it for
+	// connectors fronted by an L7 gateway (e.g. Knative/Kourier Envoy) that reaps
+	// idle connections, so the connection is kept warm and dead connections are
+	// detected proactively instead of on the next RPC.
+	Keepalive *KeepaliveConfig `json:"keepalive,omitempty" yaml:"keepalive,omitempty"`
+
 	// Timeouts defines various RPC timeout values for different plugin operations: CreateTask, GetTask, DeleteTask; if not configured, defaults to DefaultTimeout
 	Timeouts map[string]config.Duration `json:"timeouts,omitempty" yaml:"timeouts,omitempty"`
 
@@ -106,6 +117,23 @@ type Deployment struct {
 
 	// This connector will handle the tasks in this domain
 	Domain string `json:"domain,omitempty" yaml:"domain,omitempty"`
+}
+
+// KeepaliveConfig configures gRPC client keepalive pings for a connector
+// connection. See https://github.com/grpc/grpc/blob/master/doc/keepalive.md.
+type KeepaliveConfig struct {
+	// Time is the interval between keepalive pings on an otherwise idle
+	// connection. Keep it above the server/gateway enforcement threshold to
+	// avoid GOAWAY "too_many_pings".
+	Time config.Duration `json:"time,omitempty" yaml:"time,omitempty"`
+
+	// Timeout is how long the client waits for a keepalive ping ack before
+	// considering the connection dead and closing it.
+	Timeout config.Duration `json:"timeout,omitempty" yaml:"timeout,omitempty"`
+
+	// PermitWithoutStream sends keepalive pings even when there are no active
+	// RPCs. Required to keep an idle connection warm through a gateway.
+	PermitWithoutStream bool `json:"permitWithoutStream,omitempty" yaml:"permitWithoutStream,omitempty"`
 }
 
 func GetConfig() *Config {

@@ -46,6 +46,31 @@ func (d *Duration) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// MarshalYAML serializes the duration as a string (e.g. "30s") so that
+// gopkg.in/yaml.v2/v3 (which does not honor MarshalJSON) emits a flat value
+// instead of leaking the embedded time.Duration as a nested `duration:` map.
+func (d Duration) MarshalYAML() (interface{}, error) {
+	return d.String(), nil
+}
+
+// UnmarshalYAML parses the string form (e.g. "30s") produced by MarshalYAML.
+func (d *Duration) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var s string
+	if err := unmarshal(&s); err != nil {
+		return err
+	}
+	if len(s) == 0 {
+		d.Duration = time.Duration(0)
+		return nil
+	}
+	parsed, err := time.ParseDuration(s)
+	if err != nil {
+		return err
+	}
+	d.Duration = parsed
+	return nil
+}
+
 // Set implements PFlag's Value interface's set method to set the value of duration from string.
 func (d *Duration) Set(val string) error {
 	var err error
