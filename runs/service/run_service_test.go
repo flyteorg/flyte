@@ -807,8 +807,9 @@ func TestListAndSendAllActionsUsesAscendingSort(t *testing.T) {
 	err = svc.listAndSendAllActions(context.Background(), runID, rsm, nil)
 	require.NoError(t, err)
 
-	require.Len(t, captured.SortParameters, 1)
+	require.Len(t, captured.SortParameters, 2)
 	assert.Equal(t, "created_at ASC", captured.SortParameters[0].GetOrderExpr())
+	assert.Equal(t, "name ASC", captured.SortParameters[1].GetOrderExpr())
 }
 
 func TestGenerateRunName(t *testing.T) {
