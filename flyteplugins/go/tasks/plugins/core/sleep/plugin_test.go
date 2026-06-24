@@ -5,14 +5,15 @@ import (
 	"testing"
 	"time"
 
-	core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	coreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
+
+	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	coreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 )
 
 func TestHandleSucceedsImmediatelyForZeroDuration(t *testing.T) {
