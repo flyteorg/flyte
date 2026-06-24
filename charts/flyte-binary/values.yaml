@@ -206,10 +206,10 @@ deployment:
   # lifecycleHooks Specify hooks to run in Flyte container before or after startup
   lifecycleHooks: {}
   # resources Resource limits and requests for Flyte container
-    # Uncomment and update to specify resources for deployment
-    # resources:
-    #   limits:
-    #     memory: 1Gi
+  # Uncomment and update to specify resources for deployment
+  # resources:
+  #   limits:
+  #     memory: 1Gi
   #   requests:
   #     cpu: 1
   # podSecurityContext Specify security context for Flyte pod
