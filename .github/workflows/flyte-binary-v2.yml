@@ -88,6 +88,7 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/flyte-binary-v2
           tags: |
             type=raw,value=nightly,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+            type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' }}
             type=sha,format=long
       - name: Set up Depot
         uses: depot/setup-action@v1
