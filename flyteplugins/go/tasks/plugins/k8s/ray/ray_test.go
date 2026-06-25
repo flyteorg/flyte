@@ -1619,6 +1619,7 @@ func TestGetTaskPhase_RecoverableErrorFile(t *testing.T) {
 		{"recoverable error.pb maps to retryable failure", newErrorDoc(core.ContainerError_RECOVERABLE), pluginsCore.PhaseRetryableFailure},
 		{"non-recoverable error.pb stays terminal", newErrorDoc(core.ContainerError_NON_RECOVERABLE), pluginsCore.PhasePermanentFailure},
 		{"absent error.pb stays terminal", nil, pluginsCore.PhasePermanentFailure},
+		{"malformed error.pb (nil Error) stays terminal", &core.ErrorDocument{}, pluginsCore.PhasePermanentFailure},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			pluginCtx := rayPluginContextWithErrorDoc(k8s.PluginState{}, tc.errorDoc)
