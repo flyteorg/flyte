@@ -1497,7 +1497,7 @@ func TestGetTaskPhase(t *testing.T) {
 		{rayv1.JobDeploymentStatusSuspending, pluginsCore.PhaseQueued, false},
 	}
 
-	startTime := time.Date(2024, 0, 0, 0, 0, 0, 0, time.UTC)
+	startTime := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 	endTime := startTime.Add(time.Hour)
 	podName, contName, initCont := "ray-clust-ray-head", "ray-head", "init"
 	logCtx := &core.LogContext{
@@ -2017,7 +2017,7 @@ func TestGetPropertiesRay(t *testing.T) {
 
 func rayPluginContextWithErrorDoc(pluginState k8s.PluginState, errorDoc *core.ErrorDocument) *k8smocks.PluginContext {
 	pluginCtx := newPluginContext(pluginState)
-	startTime := time.Date(2024, 0, 0, 0, 0, 0, 0, time.UTC)
+	startTime := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 	endTime := startTime.Add(time.Hour)
 	podName, contName, initCont := "ray-clust-ray-head", "ray-head", "init"
 	podList := []runtime.Object{
@@ -2074,10 +2074,15 @@ func rayPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 // non-nil errorDoc is written to the task's error.pb path so GetTaskPhase can read it back; a nil
 // errorDoc leaves the store empty, modeling a task that produced no error file.
 func wireErrorFile(pluginCtx *k8smocks.PluginContext, errorDoc *core.ErrorDocument) {
-	store, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	store, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	if err != nil {
+		panic(err)
+	}
 	errPath := storage.DataReference("/error.pb")
 	if errorDoc != nil {
-		_ = store.WriteProtobuf(context.Background(), errPath, storage.Options{}, errorDoc)
+		if err := store.WriteProtobuf(context.Background(), errPath, storage.Options{}, errorDoc); err != nil {
+			panic(err)
+		}
 	}
 	ow := &pluginIOMocks.OutputWriter{}
 	ow.EXPECT().GetErrorPath().Return(errPath).Maybe()

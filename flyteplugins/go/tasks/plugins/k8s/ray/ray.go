@@ -831,8 +831,7 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		return pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "cluster is suspended", info), nil
 	case rayv1.JobDeploymentStatusFailed:
 		failInfo := fmt.Sprintf("Failed to run Ray job %s with error: [%s] %s", rayJob.Name, rayJob.Status.Reason, rayJob.Status.Message)
-		// Honor a RECOVERABLE error.pb (written by pyflyte-execute when user code raises
-		// FlyteRecoverableException) so the task's retries fire. A failed RayJob surfaces here as a
+		// Honor a RECOVERABLE error.pb (written by sdk) so the task's retries fire. A failed RayJob surfaces here as a
 		// terminal phase, so -- unlike the success path -- the k8s plugin manager never reads the
 		// error file on our behalf. Default to a terminal failure if the error file is absent or
 		// unreadable, preserving the previous behavior.
