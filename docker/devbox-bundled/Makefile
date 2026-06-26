@@ -129,6 +129,7 @@ sync-crds:
 build: sync-crds flyte dep_update manifests
 	docker buildx build --builder flyte-devbox --load \
 		$(BUILDX_CACHE_FLAGS) \
+		$(if $(CACHEBUST),--build-arg CACHEBUST=$(CACHEBUST)) \
 		--tag flyte-devbox:latest .
 
 .PHONY: build-gpu

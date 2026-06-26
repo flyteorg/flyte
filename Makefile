@@ -36,8 +36,8 @@ build: verify ## Build all Go service binaries
 # =============================================================================
 
 .PHONY: devbox-build
-devbox-build: ## Build the flyte devbox image (docker/devbox-bundled)
-	$(MAKE) -C docker/devbox-bundled build
+devbox-build: ## Build the flyte devbox image (docker/devbox-bundled), always re-pulling the latest UI image
+	$(MAKE) -C docker/devbox-bundled build CACHEBUST=$(shell date +%s)
 
 # Run in dev mode with extra arg FLYTE_DEV=True
 .PHONY: devbox-run
