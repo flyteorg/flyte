@@ -345,7 +345,7 @@ func TestLiteralsToJsonSchema(t *testing.T) {
 		testDurationField := properties["test_duration"].(map[string]any)
 		assert.Equal(t, "string", testDurationField["type"])
 		assert.Equal(t, "duration", testDurationField["format"])
-		assert.Equal(t, duration.String(), testDurationField["default"])
+		assert.Equal(t, "PT1H30M", testDurationField["default"])
 		assert.Equal(t, "A test duration", testDurationField["description"])
 
 		jsonToLiteralsResult, err := LaunchFormJsonToLiterals(context.Background(), literalsToJsonResult)
@@ -594,4 +594,107 @@ func createSimpleDataclassLiteralSingleType() ([]*task.NamedLiteral, *core.Varia
 	})
 
 	return literals, variableMap
+}
+
+func TestFormatISO8601Duration(t *testing.T) {
+	cases := []struct {
+		name     string
+		duration time.Duration
+		expected string
+	}{
+		{"zero", 0, "P0D"},
+		{"seconds", 5 * time.Second, "PT5S"},
+		{"minutes and seconds", 90 * time.Second, "PT1M30S"},
+		{"hours and minutes", time.Hour + 30*time.Minute, "PT1H30M"},
+		{"days", 48 * time.Hour, "P2D"},
+		{"days hours minutes seconds", 49*time.Hour + 4*time.Minute + 5*time.Second, "P2DT1H4M5S"},
+		{"fractional seconds", 1500 * time.Millisecond, "PT1.5S"},
+		{"negative", -(time.Hour + 30*time.Minute), "-PT1H30M"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.expected, formatISO8601Duration(tc.duration))
+		})
+	}
+}
+
+func TestParseISO8601Duration(t *testing.T) {
+	t.Run("valid", func(t *testing.T) {
+		cases := []struct {
+			input    string
+			expected time.Duration
+		}{
+			{"P0D", 0},
+			{"PT5S", 5 * time.Second},
+			{"PT1M30S", 90 * time.Second},
+			{"PT1H30M", time.Hour + 30*time.Minute},
+			{"P2D", 48 * time.Hour},
+			{"P2DT1H4M5S", 49*time.Hour + 4*time.Minute + 5*time.Second},
+			{"P1W", 7 * 24 * time.Hour},
+			{"PT1.5S", 1500 * time.Millisecond},
+			{"-PT1H30M", -(time.Hour + 30*time.Minute)},
+			{"P1M", 30 * 24 * time.Hour},
+			{"P1Y", 365 * 24 * time.Hour},
+		}
+		for _, tc := range cases {
+			t.Run(tc.input, func(t *testing.T) {
+				parsed, err := parseISO8601Duration(tc.input)
+				require.NoError(t, err)
+				assert.Equal(t, tc.expected, parsed.AsDuration())
+			})
+		}
+	})
+
+	t.Run("invalid", func(t *testing.T) {
+		for _, input := range []string{"P", "PT", "", "2h30m", "not-a-duration", "P1H"} {
+			_, err := parseISO8601Duration(input)
+			assert.Error(t, err, "expected error for %q", input)
+		}
+	})
+
+	t.Run("round trips with formatISO8601Duration", func(t *testing.T) {
+		for _, d := range []time.Duration{0, 5 * time.Second, time.Hour + 30*time.Minute, 49*time.Hour + 4*time.Minute + 5*time.Second, 1500 * time.Millisecond} {
+			parsed, err := parseISO8601Duration(formatISO8601Duration(d))
+			require.NoError(t, err)
+			assert.Equal(t, d, parsed.AsDuration())
+		}
+	})
+}
+
+func TestJSONValuesToLiteralsDuration(t *testing.T) {
+	variableMap := makeVariableMap(map[string]*core.Variable{
+		"duration": {
+			Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_DURATION}},
+		},
+	})
+
+	cases := []struct {
+		name     string
+		value    string
+		expected time.Duration
+	}{
+		{"iso-8601", "P2DT3H", 51 * time.Hour},
+		{"iso-8601 minutes", "PT30M", 30 * time.Minute},
+		{"bare seconds (backward compat)", "3600", time.Hour},
+		{"go-style readable (backward compat)", "2h30m", 2*time.Hour + 30*time.Minute},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			values, err := structpb.NewStruct(map[string]any{"duration": tc.value})
+			require.NoError(t, err)
+
+			literals, err := JSONValuesToLiterals(context.Background(), variableMap, values)
+			require.NoError(t, err)
+			require.Len(t, literals, 1)
+			assert.Equal(t, tc.expected, literals[0].GetValue().GetScalar().GetPrimitive().GetDuration().AsDuration())
+		})
+	}
+
+	t.Run("invalid iso-8601 errors", func(t *testing.T) {
+		values, err := structpb.NewStruct(map[string]any{"duration": "P1H"})
+		require.NoError(t, err)
+
+		_, err = JSONValuesToLiterals(context.Background(), variableMap, values)
+		assert.Error(t, err)
+	})
 }

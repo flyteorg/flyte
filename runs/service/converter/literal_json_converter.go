@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"math"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -22,6 +23,154 @@ import (
 )
 
 var digitsOnlyRegex = regexp.MustCompile(`^\d+$`)
+
+// iso8601DurationRegex matches an ISO-8601 duration (e.g. "P2DT3H4M5S", "PT1.5S", "-PT30M").
+// The two "M" components are disambiguated by position: months precede "T", minutes follow it.
+var iso8601DurationRegex = regexp.MustCompile(`^(-)?P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$`)
+
+// Fixed component lengths used to convert ISO-8601 durations to/from seconds. Years and months
+// are inherently ambiguous; these match the launch form frontend (dayjs: 365-day years,
+// 30-day months) so values round-trip between the UI and the backend.
+const (
+	secondsPerMinute = 60
+	secondsPerHour   = 60 * secondsPerMinute
+	secondsPerDay    = 24 * secondsPerHour
+	secondsPerWeek   = 7 * secondsPerDay
+	secondsPerMonth  = 30 * secondsPerDay
+	secondsPerYear   = 365 * secondsPerDay
+)
+
+// isISO8601Duration reports whether s looks like an ISO-8601 duration string.
+func isISO8601Duration(s string) bool {
+	s = strings.TrimSpace(s)
+	return strings.HasPrefix(s, "P") || strings.HasPrefix(s, "-P")
+}
+
+// parseISO8601Duration parses an ISO-8601 duration string (e.g. "P2DT3H4M5S") into a
+// durationpb.Duration. Returns an error if the string is not a valid ISO-8601 duration.
+func parseISO8601Duration(s string) (*durationpb.Duration, error) {
+	matches := iso8601DurationRegex.FindStringSubmatch(strings.TrimSpace(s))
+	if matches == nil {
+		return nil, fmt.Errorf("invalid ISO-8601 duration: %q", s)
+	}
+
+	// Require at least one component so bare "P"/"PT" are rejected.
+	hasComponent := false
+	for _, group := range matches[2:] {
+		if group != "" {
+			hasComponent = true
+			break
+		}
+	}
+	if !hasComponent {
+		return nil, fmt.Errorf("invalid ISO-8601 duration: %q", s)
+	}
+
+	parseInt := func(v string) (int64, error) {
+		if v == "" {
+			return 0, nil
+		}
+		return strconv.ParseInt(v, 10, 64)
+	}
+
+	years, err := parseInt(matches[2])
+	if err != nil {
+		return nil, err
+	}
+	months, err := parseInt(matches[3])
+	if err != nil {
+		return nil, err
+	}
+	weeks, err := parseInt(matches[4])
+	if err != nil {
+		return nil, err
+	}
+	days, err := parseInt(matches[5])
+	if err != nil {
+		return nil, err
+	}
+	hours, err := parseInt(matches[6])
+	if err != nil {
+		return nil, err
+	}
+	minutes, err := parseInt(matches[7])
+	if err != nil {
+		return nil, err
+	}
+
+	totalSeconds := years*secondsPerYear + months*secondsPerMonth + weeks*secondsPerWeek +
+		days*secondsPerDay + hours*secondsPerHour + minutes*secondsPerMinute
+
+	var nanos int32
+	if matches[8] != "" {
+		secondsFloat, err := strconv.ParseFloat(matches[8], 64)
+		if err != nil {
+			return nil, err
+		}
+		wholeSeconds := int64(secondsFloat)
+		totalSeconds += wholeSeconds
+		nanos = int32(math.Round((secondsFloat - float64(wholeSeconds)) * 1e9))
+	}
+
+	duration := &durationpb.Duration{Seconds: totalSeconds, Nanos: nanos}
+	if matches[1] == "-" {
+		duration.Seconds = -duration.Seconds
+		duration.Nanos = -duration.Nanos
+	}
+	return duration, nil
+}
+
+// formatISO8601Duration converts a time.Duration into an ISO-8601 duration string
+// (e.g. "P2DT3H4M5S"). Only days/hours/minutes/seconds are emitted (never years/months) so the
+// representation is unambiguous; the launch form frontend renders it back to a readable string.
+func formatISO8601Duration(d time.Duration) string {
+	if d == 0 {
+		return "P0D"
+	}
+	negative := d < 0
+	if negative {
+		d = -d
+	}
+
+	const nanosPerSecond = int64(1e9)
+	totalNanos := d.Nanoseconds()
+	totalSeconds := totalNanos / nanosPerSecond
+	nanos := totalNanos % nanosPerSecond
+
+	days := totalSeconds / secondsPerDay
+	rem := totalSeconds % secondsPerDay
+	hours := rem / secondsPerHour
+	rem %= secondsPerHour
+	minutes := rem / secondsPerMinute
+	seconds := rem % secondsPerMinute
+
+	var sb strings.Builder
+	if negative {
+		sb.WriteString("-")
+	}
+	sb.WriteString("P")
+	if days > 0 {
+		fmt.Fprintf(&sb, "%dD", days)
+	}
+	if hours > 0 || minutes > 0 || seconds > 0 || nanos > 0 {
+		sb.WriteString("T")
+		if hours > 0 {
+			fmt.Fprintf(&sb, "%dH", hours)
+		}
+		if minutes > 0 {
+			fmt.Fprintf(&sb, "%dM", minutes)
+		}
+		if seconds > 0 || nanos > 0 {
+			if nanos > 0 {
+				frac := strings.TrimRight(fmt.Sprintf("%09d", nanos), "0")
+				fmt.Fprintf(&sb, "%d.%sS", seconds, frac)
+			} else {
+				fmt.Fprintf(&sb, "%dS", seconds)
+			}
+		}
+	}
+	return sb.String()
+}
 
 // This converter translates between JSON represntations and literals/variable maps/task specs. Here is an internal link
 // to documentation surrounding the RSJF spec we are targeting:
@@ -1062,7 +1211,7 @@ func literalToJsonValues(ctx context.Context, literal *core.Literal) (any, error
 				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("datetime cannot be nil"))
 			case *core.Primitive_Duration:
 				if p.Duration != nil {
-					return p.Duration.AsDuration().String(), nil
+					return formatISO8601Duration(p.Duration.AsDuration()), nil
 				}
 				logger.Errorf(ctx, "duration cannot be nil")
 				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("duration cannot be nil"))
@@ -1568,8 +1717,17 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 		case core.SimpleType_DURATION:
 			var dtn *durationpb.Duration
 			if str, ok := value.(string); ok {
-				// Check if the string contains only digits (parse as seconds)
-				if digitsOnlyRegex.MatchString(str) {
+				switch {
+				case isISO8601Duration(str):
+					// Preferred wire format: ISO-8601 (e.g. "P2DT3H", "PT30M").
+					parsed, err := parseISO8601Duration(str)
+					if err != nil {
+						logger.Errorf(ctx, "error parsing ISO-8601 duration when converting json to literal. String: [%s] Err: %v", str, err)
+						return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("error parsing ISO-8601 duration when converting json to literal"))
+					}
+					dtn = parsed
+				case digitsOnlyRegex.MatchString(str):
+					// Backward compatibility: a bare number is treated as seconds.
 					seconds, err := strconv.ParseInt(str, 10, 64)
 					if err != nil {
 						logger.Errorf(ctx, "error parsing duration seconds when converting json to literal. String: [%s] Err: %v", str, err)
@@ -1579,8 +1737,8 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 					dtn = &durationpb.Duration{
 						Seconds: seconds,
 					}
-				} else {
-					// Parse the duration string into a time.Duration
+				default:
+					// Backward compatibility: Go-style duration strings (e.g. "2h30m").
 					duration, err := time.ParseDuration(str)
 					if err != nil {
 						logger.Errorf(ctx, "error parsing duration when converting json to literal. String duration: [%s] Err: %v", str, err)
