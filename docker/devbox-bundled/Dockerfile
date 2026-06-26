@@ -7,6 +7,10 @@ ENV TARGETARCH "${TARGETARCH}"
 WORKDIR /build
 
 COPY images/manifest.txt images/preload ./
+# Several preloaded images use moving tags (e.g. flyteconsole-v2:latest -> :sandbox).
+# Bump CACHEBUST (CI passes the run id) to invalidate this layer and re-pull them;
+# otherwise the cached layer pins yesterday's :latest forever.
+ARG CACHEBUST=0
 RUN ./preload manifest.txt
 
 
