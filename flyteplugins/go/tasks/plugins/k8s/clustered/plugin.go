@@ -57,11 +57,18 @@ func (clusteredResourceHandler) GetCompletionTime(resource client.Object) (time.
 	return jobSet.CreationTimestamp.Time, nil
 }
 
-func (clusteredResourceHandler) BuildIdentityResource(_ context.Context, _ pluginsCore.TaskExecutionMetadata) (client.Object, error) {
+func (clusteredResourceHandler) BuildIdentityResource(_ context.Context, taskExecutionMetadata pluginsCore.TaskExecutionMetadata) (client.Object, error) {
+	// Name must match what BuildResource derives (see build.go) so the lookup/abort
+	// path resolves the same object. buildJobSetName is deterministic from the generated
+	// name alone, so no task template / replica count is needed here. The plugin manager's
+	// addObjectMetadata leaves a non-empty name untouched.
 	return &jobsetv1alpha2.JobSet{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "JobSet",
 			APIVersion: jobsetv1alpha2.SchemeGroupVersion.String(),
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name: buildJobSetName(taskExecutionMetadata.GetTaskExecutionID().GetGeneratedName()),
 		},
 	}, nil
 }
