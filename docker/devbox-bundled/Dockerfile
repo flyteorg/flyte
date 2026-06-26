@@ -8,9 +8,6 @@ WORKDIR /build
 
 COPY images/manifest.txt images/preload ./
 
-# CACHEBUST must be referenced in the RUN: a build arg only busts the cache at
-# its first *usage*, not its definition. echo'ing it forces preload to re-run
-# (re-pulling moving tags like flyteconsole-v2:latest) when the value changes.
 ARG CACHEBUST=0
 RUN echo "cachebust=${CACHEBUST}" && ./preload manifest.txt
 
