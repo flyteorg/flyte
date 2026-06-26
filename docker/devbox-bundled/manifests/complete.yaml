@@ -7759,6 +7759,20 @@ data:
       k8s:
         co-pilot:
           image: "flyte-binary-v2:sandbox"
+        # Env vars injected into every task pod, so it can reach the control plane
+        # to enqueue child actions and watch their state.
+        #
+        #   - _U_EP_OVERRIDE: where the task reaches the control plane. Defaults to
+        #     this release's in-cluster HTTP service, <fullname>-http.<namespace>:8090.
+        #   - _U_INSECURE: talk plain HTTP — the in-cluster service has no TLS
+        #     (TLS terminates at the ingress).
+        #   - _U_USE_ACTIONS: use the actions/queue execution path.
+        #
+        # Override or extend via configuration.inline.plugins.k8s.default-env-vars.
+        default-env-vars:
+          - _U_EP_OVERRIDE: "flyte-binary-http.flyte:8090"
+          - _U_INSECURE: "true"
+          - _U_USE_ACTIONS: "1"
       k8s-array:
         logs:
           config:
@@ -8614,7 +8628,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 9ed3014b64700d5fd7df7d19eb0c2cd88291e3c775e0f34e13e3231d82e49234
+        checksum/configuration: b3c98afcd1c1a1aca5040d049159f6a8683facf7875920987bab9a9df6dc8f97
         checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -9390,6 +9404,10 @@ spec:
     ports:
       web:
         nodePort: 30080
+        # ALB terminates TLS and forwards plaintext to this entrypoint. Trust its
+        # X-Forwarded-Proto: https instead of letting Traefik rewrite it to http.
+        forwardedHeaders:
+          insecure: true
         transport:
           respondingTimeouts:
             readTimeout: 0
