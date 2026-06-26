@@ -204,7 +204,11 @@ jobs:
           project: ${{ env.DEPOT_PROJECT_ID }}
           context: docker/devbox-bundled
           platforms: linux/arm64,linux/amd64
-          build-args: "FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}"
+          # CACHEBUST forces the Dockerfile preload layer to re-pull moving tags
+          # (flyteconsole-v2:latest) instead of reusing a stale cached layer.
+          build-args: |
+            FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}
+            CACHEBUST=${{ github.run_id }}-${{ github.run_attempt }}
           save: true
           save-tags: cpu-build-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Authenticate Docker to Depot Registry
@@ -223,7 +227,9 @@ jobs:
           context: docker/devbox-bundled
           platforms: linux/arm64,linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
-          build-args: "FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}"
+          build-args: |
+            FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}
+            CACHEBUST=${{ github.run_id }}-${{ github.run_attempt }}
           push: true
       - name: Prepare GPU Image Names
         id: gpu-image-names
