@@ -80,7 +80,14 @@ func (pm *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMeta
 	o.SetNamespace(taskCtx.GetNamespace())
 	o.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.GetAnnotations())))
 	o.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, o.GetLabels(), pluginsUtils.CopyMap(taskCtx.GetLabels())))
-	o.SetName(taskCtx.GetTaskExecutionID().GetGeneratedName())
+	// Default the object name to the generated name, but don't clobber a name the plugin
+	// chose itself. The clustered (JobSet) plugin sets its own name bounded to keep derived
+	// child pod names within the 63-char limit; overwriting it here with the (longer)
+	// generated name would make the JobSet webhook reject the pods and the lookup path miss
+	// the created object. Both create and lookup must agree on the plugin-chosen name.
+	if o.GetName() == "" {
+		o.SetName(taskCtx.GetTaskExecutionID().GetGeneratedName())
+	}
 
 	if !pm.plugin.GetProperties().DisableInjectOwnerReferences && !cfg.DisableInjectOwnerReferences {
 		o.SetOwnerReferences([]metav1.OwnerReference{taskCtx.GetOwnerReference()})
@@ -112,6 +119,13 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 		}
 		if k8serrors.IsRequestEntityTooLargeError(err) {
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("EntityTooLarge", err.Error(), nil)), nil
+		}
+		// Admission/validation rejections (e.g. a generated object or derived child name
+		// exceeding k8s length limits) are deterministic: retrying re-submits the identical
+		// object and fails the same way, leaving the execution stuck RUNNING. Fast-fail
+		// instead of looping via UnknownTransition.
+		if k8serrors.IsInvalid(err) {
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("InvalidResource", err.Error(), nil)), nil
 		}
 		reason := k8serrors.ReasonForError(err)
 		logger.Errorf(ctx, "Failed to launch job, system error. err: %v", err)
