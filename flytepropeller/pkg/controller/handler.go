@@ -213,7 +213,7 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 	if w.GetExecutionStatus().IsTerminated() {
 		// Checking for the old finalizer for backwards compatibility
 		// This should be eventually removed
-		if HasCompletedLabel(w) && !controllerutil.ContainsFinalizer(w, Finalizer) && !controllerutil.ContainsFinalizer(w, OldFinalizer) {
+		if HasCompletedLabel(w) && !controllerutil.ContainsFinalizer(w, Finalizer) {
 			logger.Debugf(ctx, "Workflow is terminated.")
 			// This workflow had previously completed, let us ignore it
 			return nil
@@ -329,8 +329,6 @@ func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClo
 			// We add a completed label so that we can avoid polling for this workflow
 			SetCompletedLabel(mutatedWf, time.Now())
 			_ = controllerutil.RemoveFinalizer(mutatedWf, Finalizer)
-			// Backwards compatibility. This should eventually be removed
-			_ = controllerutil.RemoveFinalizer(mutatedWf, OldFinalizer)
 		}
 	}
 
@@ -389,8 +387,6 @@ func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClo
 			// catch potential indefinite update loop
 			if mutatedWf.GetExecutionStatus().IsTerminated() {
 				_ = controllerutil.RemoveFinalizer(mutableW, Finalizer)
-				// Backwards compatibility. This should eventually be removed
-				_ = controllerutil.RemoveFinalizer(mutableW, OldFinalizer)
 				SetDefinitionVersionIfEmpty(mutableW, v1alpha1.LatestWorkflowDefinitionVersion)
 				SetCompletedLabel(mutableW, time.Now())
 				msg := fmt.Sprintf("Workflow size has breached threshold. Finalized with status: %v", mutatedWf.GetExecutionStatus().GetPhase())
