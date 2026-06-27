@@ -78,6 +78,15 @@ who wish to dig deeper into the storage layer.
       🐋 Flyte sandbox ships with a Docker registry. Tag and push custom workflow images to localhost:30000
       📂 The Minio API is hosted on localhost:30002. Use http://localhost:30080/minio/login for Minio console
 
+Stop the Sandbox
+================
+
+To stop the Flyte sandbox, run:
+
+.. prompt:: bash $
+
+    flytectl demo stop
+
 
 Configuration
 ______________
