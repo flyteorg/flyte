@@ -20,57 +20,103 @@ metadata:
     {{- end }}
 rules:
   - apiGroups:
-    - ""
+      - ""
     resources:
-    - pods
+      - namespaces
     verbs:
-    - create
-    - delete
-    - get
-    - list
-    - patch
-    - update
-    - watch
+      - create
+      - get
+      - list
+      - watch
   - apiGroups:
-    - ""
+      - ""
     resources:
-    - events
+      - pods
     verbs:
-    - create
-    - delete
-    - patch
-    - update
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
   - apiGroups:
-    - flyte.org
+      - ""
     resources:
-    - taskactions
+      - pods/log
     verbs:
-    - create
-    - delete
-    - get
-    - list
-    - patch
-    - update
-    - watch
+      - get
   - apiGroups:
-    - admissionregistration.k8s.io
+      - ""
+      - events.k8s.io
     resources:
-    - mutatingwebhookconfigurations
+      - events
     verbs:
-    - create
-    - get
-    - list
-    - patch
-    - update
-    - watch
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
   - apiGroups:
-    - ""
+      - flyte.org
     resources:
-    - secrets
+      - taskactions
+      - taskactions/status
+      - taskactions/finalizers
     verbs:
-    - create
-    - get
-    - update
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - mutatingwebhookconfigurations
+    verbs:
+      - create
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  {{- if dig "inline" "internalApps" "enabled" false (.Values.configuration | default dict) }}
+  # Knative Serving access for the data-plane app controller, added automatically
+  # when apps are enabled (configuration.inline.internalApps.enabled) so operators
+  # don't have to hand-maintain rbac.extraRules. The controller creates and watches
+  # KServices and deletes their Revisions when an app is stopped.
+  - apiGroups:
+      - serving.knative.dev
+    resources:
+      - services
+      - revisions
+      - configurations
+      - routes
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  {{- end }}
   {{- if .Values.rbac.extraRules }}
   {{- toYaml .Values.rbac.extraRules | nindent 2 }}
   {{- end }}

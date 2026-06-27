@@ -115,7 +115,7 @@ func printDocs(title string, isSubsection bool, section Section, visitedSection 
 	for i := 0; i < val.Type().NumField(); i++ {
 		field := val.Type().Field(i)
 		tagType := field.Type
-		if tagType.Kind() == reflect.Ptr {
+		if tagType.Kind() == reflect.Pointer {
 			tagType = field.Type.Elem()
 		}
 
@@ -127,7 +127,7 @@ func printDocs(title string, isSubsection bool, section Section, visitedSection 
 		subVal := val.Field(i)
 		if tagType.Kind() == reflect.Struct {
 			// In order to get value from unexported field in struct
-			if subVal.Kind() == reflect.Ptr {
+			if subVal.Kind() == reflect.Pointer {
 				subVal = reflect.NewAt(subVal.Type(), unsafe.Pointer(subVal.UnsafeAddr())).Elem()
 			} else {
 				subVal = reflect.NewAt(subVal.Type(), unsafe.Pointer(subVal.UnsafeAddr()))
@@ -173,7 +173,7 @@ func printDocs(title string, isSubsection bool, section Section, visitedSection 
 }
 
 // Print Table of contents
-func printToc(orderedSectionKeys sets.String) {
+func printToc(orderedSectionKeys sets.String) { //nolint: staticcheck
 	for _, sectionKey := range orderedSectionKeys.List() {
 		fmt.Printf("- `%s <#section-%s>`_\n\n", sectionKey, sectionKey)
 	}
@@ -240,7 +240,7 @@ func getDefaultValue(val interface{}) string {
 
 func getFieldTypeString(tagType reflect.Type) string {
 	kind := tagType.Kind()
-	if kind == reflect.Ptr {
+	if kind == reflect.Pointer {
 		tagType = tagType.Elem()
 		kind = tagType.Kind()
 	}

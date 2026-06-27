@@ -87,7 +87,7 @@ class TaskExecution(_message.Message):
     def __init__(self) -> None: ...
 
 class ExecutionError(_message.Message):
-    __slots__ = ["code", "message", "error_uri", "kind", "timestamp", "worker"]
+    __slots__ = ["code", "message", "error_uri", "kind", "timestamp", "worker", "recoverability"]
     class ErrorKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         UNKNOWN: _ClassVar[ExecutionError.ErrorKind]
@@ -102,13 +102,39 @@ class ExecutionError(_message.Message):
     KIND_FIELD_NUMBER: _ClassVar[int]
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     WORKER_FIELD_NUMBER: _ClassVar[int]
+    RECOVERABILITY_FIELD_NUMBER: _ClassVar[int]
     code: str
     message: str
     error_uri: str
     kind: ExecutionError.ErrorKind
     timestamp: _timestamp_pb2.Timestamp
     worker: str
-    def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., error_uri: _Optional[str] = ..., kind: _Optional[_Union[ExecutionError.ErrorKind, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., worker: _Optional[str] = ...) -> None: ...
+    recoverability: ContainerError.Kind
+    def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., error_uri: _Optional[str] = ..., kind: _Optional[_Union[ExecutionError.ErrorKind, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., worker: _Optional[str] = ..., recoverability: _Optional[_Union[ContainerError.Kind, str]] = ...) -> None: ...
+
+class ContainerError(_message.Message):
+    __slots__ = ["code", "message", "kind", "origin"]
+    class Kind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        NON_RECOVERABLE: _ClassVar[ContainerError.Kind]
+        RECOVERABLE: _ClassVar[ContainerError.Kind]
+    NON_RECOVERABLE: ContainerError.Kind
+    RECOVERABLE: ContainerError.Kind
+    CODE_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    KIND_FIELD_NUMBER: _ClassVar[int]
+    ORIGIN_FIELD_NUMBER: _ClassVar[int]
+    code: str
+    message: str
+    kind: ContainerError.Kind
+    origin: ExecutionError.ErrorKind
+    def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., kind: _Optional[_Union[ContainerError.Kind, str]] = ..., origin: _Optional[_Union[ExecutionError.ErrorKind, str]] = ...) -> None: ...
+
+class ErrorDocument(_message.Message):
+    __slots__ = ["error"]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    error: ContainerError
+    def __init__(self, error: _Optional[_Union[ContainerError, _Mapping]] = ...) -> None: ...
 
 class TaskLog(_message.Message):
     __slots__ = ["uri", "name", "message_format", "ttl", "ShowWhilePending", "HideOnceFinished", "link_type", "ready", "icon_uri"]
@@ -149,12 +175,22 @@ class TaskLog(_message.Message):
     def __init__(self, uri: _Optional[str] = ..., name: _Optional[str] = ..., message_format: _Optional[_Union[TaskLog.MessageFormat, str]] = ..., ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., ShowWhilePending: bool = ..., HideOnceFinished: bool = ..., link_type: _Optional[_Union[TaskLog.LinkType, str]] = ..., ready: bool = ..., icon_uri: _Optional[str] = ...) -> None: ...
 
 class LogContext(_message.Message):
-    __slots__ = ["pods", "primary_pod_name"]
+    __slots__ = ["pods", "primary_pod_name", "connector", "pod_name_prefix"]
     PODS_FIELD_NUMBER: _ClassVar[int]
     PRIMARY_POD_NAME_FIELD_NUMBER: _ClassVar[int]
+    CONNECTOR_FIELD_NUMBER: _ClassVar[int]
+    POD_NAME_PREFIX_FIELD_NUMBER: _ClassVar[int]
     pods: _containers.RepeatedCompositeFieldContainer[PodLogContext]
     primary_pod_name: str
-    def __init__(self, pods: _Optional[_Iterable[_Union[PodLogContext, _Mapping]]] = ..., primary_pod_name: _Optional[str] = ...) -> None: ...
+    connector: ConnectorLogContext
+    pod_name_prefix: str
+    def __init__(self, pods: _Optional[_Iterable[_Union[PodLogContext, _Mapping]]] = ..., primary_pod_name: _Optional[str] = ..., connector: _Optional[_Union[ConnectorLogContext, _Mapping]] = ..., pod_name_prefix: _Optional[str] = ...) -> None: ...
+
+class ConnectorLogContext(_message.Message):
+    __slots__ = ["endpoint"]
+    ENDPOINT_FIELD_NUMBER: _ClassVar[int]
+    endpoint: str
+    def __init__(self, endpoint: _Optional[str] = ...) -> None: ...
 
 class PodLogContext(_message.Message):
     __slots__ = ["namespace", "pod_name", "containers", "primary_container_name", "init_containers"]

@@ -40,21 +40,33 @@ data:
           {{- with ( index .Values.configuration "co-pilot" ).image }}
           image: {{ printf "%s:%s" .repository .tag | quote }}
           {{- end }}
+        # Env vars injected into every task pod, so it can reach the control plane
+        # to enqueue child actions and watch their state.
+        #
+        #   - _U_EP_OVERRIDE: where the task reaches the control plane. Defaults to
+        #     this release's in-cluster HTTP service, <fullname>-http.<namespace>:8090.
+        #   - _U_INSECURE: talk plain HTTP — the in-cluster service has no TLS
+        #     (TLS terminates at the ingress).
+        #   - _U_USE_ACTIONS: use the actions/queue execution path.
+        #
+        # Override or extend via configuration.inline.plugins.k8s.default-env-vars.
+        default-env-vars:
+          - _U_EP_OVERRIDE: {{ printf "%s.%s:%s" (include "flyte-binary.service.http.name" .) .Release.Namespace (include "flyte-binary.service.http.port" .) | quote }}
+          - _U_INSECURE: "true"
+          - _U_USE_ACTIONS: "1"
       k8s-array:
         logs:
           config: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 12 }}
   002-database.yaml: |
     {{- with .Values.configuration.database }}
-    database:
-      postgres:
-        username: {{ .username }}
-        host: {{ tpl .host $ }}
-        port: {{ .port }}
-        dbname: {{ .dbname }}
-        options: {{ .options | quote }}
-        {{- if .passwordPath }}
-        passwordPath: {{ .passwordPath }}
-        {{- end }}
+    {{- /* Render under runs.database — the single DB config the unified binary
+           reads (runsconfig.GetConfig().Database). Strip the password: it is
+           provided via the config Secret (012-database-secrets.yaml) and must
+           not leak into this ConfigMap in plaintext. */}}
+    {{- $database := deepCopy . }}
+    {{- if $database.postgres }}{{- $_ := unset $database.postgres "password" }}{{- end }}
+    runs:
+      database: {{- tpl ( $database | toYaml ) $ | nindent 8 }}
     {{- end }}
   003-storage.yaml: |
     {{- with .Values.configuration.storage }}

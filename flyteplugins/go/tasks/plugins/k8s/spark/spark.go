@@ -67,7 +67,7 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 	}
 
 	sparkJob := plugins.SparkJob{}
-	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &sparkJob)
+	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &sparkJob) //nolint: staticcheck
 	if err != nil {
 		return nil, errors.Wrapf(errors.BadTaskSpecification, err, "invalid TaskSpecification [%v], failed to unmarshal", taskTemplate.GetCustom())
 	}
@@ -186,7 +186,7 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 		if driverPod.GetPodSpec() != nil {
 			var customPodSpec *v1.PodSpec
 
-			err = utils.UnmarshalStructToObj(driverPod.GetPodSpec(), &customPodSpec)
+			err = utils.UnmarshalStructToObj(driverPod.GetPodSpec(), &customPodSpec) //nolint: staticcheck
 			if err != nil {
 				return nil, errors.Errorf(errors.BadTaskSpecification,
 					"Unable to unmarshal driver pod spec [%v], Err: [%v]", driverPod.GetPodSpec(), err.Error())
@@ -202,6 +202,11 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 			primaryContainerName = driverPod.GetPrimaryContainerName()
 		}
 	}
+
+	// Re-apply platform scheduling after the custom driver pod merge: the merge can
+	// append OR'd node selector terms that would otherwise escape the default-affinity
+	// and (forced) non-interruptible requirements. Idempotent.
+	flytek8s.ApplyPlatformSchedulingConstraints(nonInterruptibleTaskCtx.TaskExecutionMetadata().IsInterruptible(), podSpec)
 
 	primaryContainer, err := flytek8s.GetContainer(podSpec, primaryContainerName)
 	if err != nil {
@@ -239,7 +244,7 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 		if executorPod.GetPodSpec() != nil {
 			var customPodSpec *v1.PodSpec
 
-			err = utils.UnmarshalStructToObj(executorPod.GetPodSpec(), &customPodSpec)
+			err = utils.UnmarshalStructToObj(executorPod.GetPodSpec(), &customPodSpec) //nolint: staticcheck
 			if err != nil {
 				return nil, errors.Errorf(errors.BadTaskSpecification,
 					"Unable to unmarshal executor pod spec [%v], Err: [%v]", executorPod.GetPodSpec(), err.Error())
@@ -254,6 +259,11 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 			primaryContainerName = executorPod.GetPrimaryContainerName()
 		}
 	}
+
+	// Re-apply platform scheduling after the custom executor pod merge: the merge can
+	// append OR'd node selector terms that would otherwise escape the default-affinity
+	// and (non)interruptible requirements. Idempotent.
+	flytek8s.ApplyPlatformSchedulingConstraints(taskCtx.TaskExecutionMetadata().IsInterruptible(), podSpec)
 
 	primaryContainer, err := flytek8s.GetContainer(podSpec, primaryContainerName)
 	if err != nil {
@@ -521,7 +531,7 @@ func getEventInfoForSpark(ctx context.Context, pluginContext k8s.PluginContext, 
 		})
 	}
 
-	customInfo, err := utils.MarshalObjToStruct(customInfoMap)
+	customInfo, err := utils.MarshalObjToStruct(customInfoMap) //nolint: staticcheck
 	if err != nil {
 		return nil, err
 	}
@@ -628,6 +638,8 @@ func init() {
 	if err := sparkOp.AddToScheme(scheme.Scheme); err != nil {
 		panic(err)
 	}
+
+	pluginmachinery.PluginRegistry().RegisterScheme(sparkTaskType, sparkOp.AddToScheme)
 
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{

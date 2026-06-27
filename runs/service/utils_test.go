@@ -3,13 +3,40 @@ package service
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 )
+
+func TestFoldRunStartTimeIntoHash(t *testing.T) {
+	ts := timestamppb.New(time.Date(2026, 6, 3, 12, 0, 0, 0, time.UTC))
+	ts2 := timestamppb.New(time.Date(2026, 6, 3, 13, 0, 0, 0, time.UTC))
+	const h = "abc123"
+
+	// No kickoff arg: the time isn't a declared input, so the hash is unchanged (caches across fires).
+	assert.Equal(t, h, foldRunStartTimeIntoHash(h, "", ts, nil))
+	// No run start time: unchanged.
+	assert.Equal(t, h, foldRunStartTimeIntoHash(h, "start_time", nil, nil))
+	// Kickoff arg + time: folded in (differs from the bare hash).
+	folded := foldRunStartTimeIntoHash(h, "start_time", ts, nil)
+	assert.NotEqual(t, h, folded)
+	// Different fire times produce different hashes -> distinct cache keys per fire.
+	assert.NotEqual(t, folded, foldRunStartTimeIntoHash(h, "start_time", ts2, nil))
+	// Same (hash, arg, time) is stable -> a re-fire of the same scheduled time reuses the cache.
+	assert.Equal(t, folded, foldRunStartTimeIntoHash(h, "start_time", ts, nil))
+	// Kickoff arg in cache_ignore_input_vars: user excluded the trigger time from the cache key, so the
+	// hash is unchanged across fires (cache hits, frozen timestamp) even though the time differs.
+	assert.Equal(t, h, foldRunStartTimeIntoHash(h, "start_time", ts, []string{"start_time"}))
+	assert.Equal(t, foldRunStartTimeIntoHash(h, "start_time", ts, []string{"start_time"}),
+		foldRunStartTimeIntoHash(h, "start_time", ts2, []string{"start_time"}))
+	// Cache-ignore list that doesn't include the kickoff arg: still folds.
+	assert.NotEqual(t, h, foldRunStartTimeIntoHash(h, "start_time", ts, []string{"other"}))
+}
 
 func TestTruncateShortDescription_UnderLimit(t *testing.T) {
 	desc := "Short description"
@@ -230,8 +257,8 @@ func TestGenerateCacheKeyForTask(t *testing.T) {
 			Id:   &core.Identifier{Name: "my-task"},
 			Type: "python",
 			Metadata: &core.TaskMetadata{
-				Discoverable:       true,
-				DiscoveryVersion:   "1.0",
+				Discoverable:         true,
+				DiscoveryVersion:     "1.0",
 				CacheIgnoreInputVars: []string{"y"},
 			},
 		}

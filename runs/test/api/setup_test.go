@@ -12,13 +12,12 @@ import (
 
 	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 	"github.com/jmoiron/sqlx"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/migrations"
 	"github.com/flyteorg/flyte/v2/runs/repository"
 	"github.com/flyteorg/flyte/v2/runs/service"
@@ -115,7 +114,7 @@ func TestMain(m *testing.M) {
 	// Create RunService with a no-op actions client (points at test server; not used by watch tests)
 	endpointURL := fmt.Sprintf("http://localhost:%d", testPort)
 	actionsClient := actionsconnect.NewActionsServiceClient(http.DefaultClient, endpointURL)
-	runSvc := service.NewRunService(repo, actionsClient, nil, nil, "", nil, nil)
+	runSvc := service.NewRunService(repo, actionsClient, nil, "", nil, nil, "", true, config.GetConfig().IdentityHeaders)
 
 	// Setup HTTP server
 	mux := http.NewServeMux()
@@ -136,8 +135,9 @@ func TestMain(m *testing.M) {
 
 	endpoint = fmt.Sprintf("http://localhost:%d", testPort)
 	testServer = &http.Server{
-		Addr:    fmt.Sprintf(":%d", testPort),
-		Handler: h2c.NewHandler(mux, &http2.Server{}),
+		Addr:      fmt.Sprintf(":%d", testPort),
+		Handler:   mux,
+		Protocols: httpProtocols(),
 	}
 
 	// Start server in background
@@ -171,6 +171,13 @@ func TestMain(m *testing.M) {
 
 	// Run tests
 	exitCode = m.Run()
+}
+
+func httpProtocols() *http.Protocols {
+	protocols := &http.Protocols{}
+	protocols.SetHTTP1(true)
+	protocols.SetUnencryptedHTTP2(true)
+	return protocols
 }
 
 // waitForServer waits for the server to be ready

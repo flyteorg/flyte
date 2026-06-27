@@ -3,7 +3,7 @@
 This guide provides steps on how to develop and iterates changes.
 
 ## Prerequisites
-- go version v1.24.0+
+- go version v1.26.3+
 - docker version 17.03+.
 - kubectl version v1.11.3+.
 
@@ -11,14 +11,14 @@ This guide provides steps on how to develop and iterates changes.
 
 We recommend using kind to create a Kubernetes cluster for local development.
 
-### Use go v1.24
+### Use go v1.26
 
-Currently, flyte-v2 use go v1.24 for development.
+Currently, flyte-v2 use go v1.26 for development.
 
 ```sh
-go install golang.org/dl/go1.24.0@latest
-go1.24.0 download
-export GOROOT=$(go1.24.0 env GOROOT)
+go install golang.org/dl/go1.26.3@latest
+go1.26.3 download
+export GOROOT=$(go1.26.3 env GOROOT)
 export PATH="$GOROOT/bin:$PATH"
 ```
 

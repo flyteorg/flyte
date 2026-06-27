@@ -2,13 +2,15 @@
 // @generated from file flyteidl2/workflow/run_service.proto (package flyteidl2.workflow, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
+import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
+import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
 import type { ActionIdentifier, ClusterIdentifier, ProjectIdentifier, RunIdentifier, TriggerName } from "../common/identifier_pb.ts";
 import { file_flyteidl2_common_identifier } from "../common/identifier_pb.ts";
 import type { Filter, ListRequest, Sort_Direction } from "../common/list_pb.ts";
 import { file_flyteidl2_common_list } from "../common/list_pb.ts";
+import type { ActionPhase } from "../common/phase_pb.ts";
+import { file_flyteidl2_common_phase } from "../common/phase_pb.ts";
 import type { OffloadedInputData } from "../common/run_pb.ts";
 import { file_flyteidl2_common_run } from "../common/run_pb.ts";
 import type { LogContext } from "../core/execution_pb.ts";
@@ -21,15 +23,15 @@ import type { TaskIdentifier, TaskName, TaskSpec } from "../task/task_definition
 import { file_flyteidl2_task_task_definition } from "../task/task_definition_pb.ts";
 import type { Action, ActionDetails, ClusterEvent, EnrichedAction, Run, RunDetails, RunSource, TaskGroup } from "./run_definition_pb.ts";
 import { file_flyteidl2_workflow_run_definition } from "./run_definition_pb.ts";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
+import type { Duration, Timestamp } from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_duration, file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file flyteidl2/workflow/run_service.proto.
  */
 export const file_flyteidl2_workflow_run_service: GenFile = /*@__PURE__*/
-  fileDesc("CiRmbHl0ZWlkbDIvd29ya2Zsb3cvcnVuX3NlcnZpY2UucHJvdG8SEmZseXRlaWRsMi53b3JrZmxvdyKQBAoQQ3JlYXRlUnVuUmVxdWVzdBIxCgZydW5faWQYASABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJIABI5Cgpwcm9qZWN0X2lkGAYgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckgAEjEKB3Rhc2tfaWQYAiABKAsyHi5mbHl0ZWlkbDIudGFzay5UYXNrSWRlbnRpZmllckgBEi0KCXRhc2tfc3BlYxgDIAEoCzIYLmZseXRlaWRsMi50YXNrLlRhc2tTcGVjSAESNQoMdHJpZ2dlcl9uYW1lGAcgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5UcmlnZ2VyTmFtZUgBEigKBmlucHV0cxgEIAEoCzIWLmZseXRlaWRsMi50YXNrLklucHV0c0gCEkQKFG9mZmxvYWRlZF9pbnB1dF9kYXRhGAkgASgLMiQuZmx5dGVpZGwyLmNvbW1vbi5PZmZsb2FkZWRJbnB1dERhdGFIAhIpCghydW5fc3BlYxgFIAEoCzIXLmZseXRlaWRsMi50YXNrLlJ1blNwZWMSLQoGc291cmNlGAggASgOMh0uZmx5dGVpZGwyLndvcmtmbG93LlJ1blNvdXJjZUILCgJpZBIFukgCCAFCDQoEdGFzaxIFukgCCAFCDwoNaW5wdXRfd3JhcHBlciI5ChFDcmVhdGVSdW5SZXNwb25zZRIkCgNydW4YASABKAsyFy5mbHl0ZWlkbDIud29ya2Zsb3cuUnVuImoKD0Fib3J0UnVuUmVxdWVzdBI3CgZydW5faWQYASABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJCBrpIA8gBARITCgZyZWFzb24YAiABKAlIAIgBAUIJCgdfcmVhc29uIhIKEEFib3J0UnVuUmVzcG9uc2UiTwoUR2V0UnVuRGV0YWlsc1JlcXVlc3QSNwoGcnVuX2lkGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQga6SAPIAQEiSAoVR2V0UnVuRGV0YWlsc1Jlc3BvbnNlEi8KB2RldGFpbHMYASABKAsyHi5mbHl0ZWlkbDIud29ya2Zsb3cuUnVuRGV0YWlscyJRChZXYXRjaFJ1bkRldGFpbHNSZXF1ZXN0EjcKBnJ1bl9pZBgBIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckIGukgDyAEBIkoKF1dhdGNoUnVuRGV0YWlsc1Jlc3BvbnNlEi8KB2RldGFpbHMYASABKAsyHi5mbHl0ZWlkbDIud29ya2Zsb3cuUnVuRGV0YWlscyJYChdHZXRBY3Rpb25EZXRhaWxzUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBASJOChhHZXRBY3Rpb25EZXRhaWxzUmVzcG9uc2USMgoHZGV0YWlscxgBIAEoCzIhLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25EZXRhaWxzIloKGVdhdGNoQWN0aW9uRGV0YWlsc1JlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQEiUAoaV2F0Y2hBY3Rpb25EZXRhaWxzUmVzcG9uc2USMgoHZGV0YWlscxgBIAEoCzIhLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25EZXRhaWxzIlUKFEdldEFjdGlvbkRhdGFSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBImkKFUdldEFjdGlvbkRhdGFSZXNwb25zZRImCgZpbnB1dHMYASABKAsyFi5mbHl0ZWlkbDIudGFzay5JbnB1dHMSKAoHb3V0cHV0cxgCIAEoCzIXLmZseXRlaWRsMi50YXNrLk91dHB1dHMiWQoYR2V0QWN0aW9uRGF0YVVSSXNSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBIkQKGUdldEFjdGlvbkRhdGFVUklzUmVzcG9uc2USEgoKaW5wdXRzX3VyaRgBIAEoCRITCgtvdXRwdXRzX3VyaRgCIAEoCSJ1ChpHZXRBY3Rpb25Mb2dDb250ZXh0UmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAIl8KG0dldEFjdGlvbkxvZ0NvbnRleHRSZXNwb25zZRIvCgtsb2dfY29udGV4dBgBIAEoCzIaLmZseXRlaWRsMi5jb3JlLkxvZ0NvbnRleHQSDwoHY2x1c3RlchgCIAEoCSLMAgoPTGlzdFJ1bnNSZXF1ZXN0Ei4KB3JlcXVlc3QYASABKAsyHS5mbHl0ZWlkbDIuY29tbW9uLkxpc3RSZXF1ZXN0EhYKA29yZxgCIAEoCUIHukgEcgIQAUgAEjkKCnByb2plY3RfaWQYBCABKAsyIy5mbHl0ZWlkbDIuY29tbW9uLlByb2plY3RJZGVudGlmaWVySAASNQoMdHJpZ2dlcl9uYW1lGAYgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5UcmlnZ2VyTmFtZUgAEi0KCXRhc2tfbmFtZRgHIAEoCzIYLmZseXRlaWRsMi50YXNrLlRhc2tOYW1lSAASMQoHdGFza19pZBgIIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVySABCEQoIc2NvcGVfYnkSBbpIAggBSgQIAxAESgQIBRAGIkgKEExpc3RSdW5zUmVzcG9uc2USJQoEcnVucxgBIAMoCzIXLmZseXRlaWRsMi53b3JrZmxvdy5SdW4SDQoFdG9rZW4YAiABKAki5AEKEFdhdGNoUnVuc1JlcXVlc3QSFgoDb3JnGAIgASgJQge6SARyAhABSAASOQoKY2x1c3Rlcl9pZBgDIAEoCzIjLmZseXRlaWRsMi5jb21tb24uQ2x1c3RlcklkZW50aWZpZXJIABI5Cgpwcm9qZWN0X2lkGAQgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckgAEjEKB3Rhc2tfaWQYBSABKAsyHi5mbHl0ZWlkbDIudGFzay5UYXNrSWRlbnRpZmllckgAQg8KBnRhcmdldBIFukgCCAEiOgoRV2F0Y2hSdW5zUmVzcG9uc2USJQoEcnVucxgBIAMoCzIXLmZseXRlaWRsMi53b3JrZmxvdy5SdW4ifQoSTGlzdEFjdGlvbnNSZXF1ZXN0Ei4KB3JlcXVlc3QYASABKAsyHS5mbHl0ZWlkbDIuY29tbW9uLkxpc3RSZXF1ZXN0EjcKBnJ1bl9pZBgCIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckIGukgDyAEBIlEKE0xpc3RBY3Rpb25zUmVzcG9uc2USKwoHYWN0aW9ucxgBIAMoCzIaLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb24SDQoFdG9rZW4YAiABKAkieAoTV2F0Y2hBY3Rpb25zUmVxdWVzdBI3CgZydW5faWQYASABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJCBrpIA8gBARIoCgZmaWx0ZXIYAiADKAsyGC5mbHl0ZWlkbDIuY29tbW9uLkZpbHRlciJUChRXYXRjaEFjdGlvbnNSZXNwb25zZRI8ChBlbnJpY2hlZF9hY3Rpb25zGAEgAygLMiIuZmx5dGVpZGwyLndvcmtmbG93LkVucmljaGVkQWN0aW9uIm0KGVdhdGNoQ2x1c3RlckV2ZW50c1JlcXVlc3QSNgoCaWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAIlYKGldhdGNoQ2x1c3RlckV2ZW50c1Jlc3BvbnNlEjgKDmNsdXN0ZXJfZXZlbnRzGAEgAygLMiAuZmx5dGVpZGwyLndvcmtmbG93LkNsdXN0ZXJFdmVudCJjChJBYm9ydEFjdGlvblJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESDgoGcmVhc29uGAIgASgJIhUKE0Fib3J0QWN0aW9uUmVzcG9uc2UinwMKEldhdGNoR3JvdXBzUmVxdWVzdBI5Cgpwcm9qZWN0X2lkGAEgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckgAEjYKCnN0YXJ0X2RhdGUYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQga6SAPIAQESLAoIZW5kX2RhdGUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KB3JlcXVlc3QYBCABKAsyHS5mbHl0ZWlkbDIuY29tbW9uLkxpc3RSZXF1ZXN0ElAKEWtub3duX3NvcnRfZmllbGRzGAUgAygLMjUuZmx5dGVpZGwyLndvcmtmbG93LldhdGNoR3JvdXBzUmVxdWVzdC5Lbm93blNvcnRGaWVsZBpTCg5Lbm93blNvcnRGaWVsZBI2CgpjcmVhdGVkX2F0GAEgASgOMiAuZmx5dGVpZGwyLmNvbW1vbi5Tb3J0LkRpcmVjdGlvbkgAQgkKB3NvcnRfYnlCEQoIc2NvcGVfYnkSBbpIAggBIlsKE1dhdGNoR3JvdXBzUmVzcG9uc2USMgoLdGFza19ncm91cHMYASADKAsyHS5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza0dyb3VwEhAKCHNlbnRpbmVsGAIgASgIMrANCgpSdW5TZXJ2aWNlEloKCUNyZWF0ZVJ1bhIkLmZseXRlaWRsMi53b3JrZmxvdy5DcmVhdGVSdW5SZXF1ZXN0GiUuZmx5dGVpZGwyLndvcmtmbG93LkNyZWF0ZVJ1blJlc3BvbnNlIgASVwoIQWJvcnRSdW4SIy5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRSdW5SZXF1ZXN0GiQuZmx5dGVpZGwyLndvcmtmbG93LkFib3J0UnVuUmVzcG9uc2UiABJpCg1HZXRSdW5EZXRhaWxzEiguZmx5dGVpZGwyLndvcmtmbG93LkdldFJ1bkRldGFpbHNSZXF1ZXN0GikuZmx5dGVpZGwyLndvcmtmbG93LkdldFJ1bkRldGFpbHNSZXNwb25zZSIDkAIBEm4KD1dhdGNoUnVuRGV0YWlscxIqLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaFJ1bkRldGFpbHNSZXF1ZXN0GisuZmx5dGVpZGwyLndvcmtmbG93LldhdGNoUnVuRGV0YWlsc1Jlc3BvbnNlIgAwARJyChBHZXRBY3Rpb25EZXRhaWxzEisuZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkRldGFpbHNSZXF1ZXN0GiwuZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkRldGFpbHNSZXNwb25zZSIDkAIBEncKEldhdGNoQWN0aW9uRGV0YWlscxItLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaEFjdGlvbkRldGFpbHNSZXF1ZXN0Gi4uZmx5dGVpZGwyLndvcmtmbG93LldhdGNoQWN0aW9uRGV0YWlsc1Jlc3BvbnNlIgAwARJsCg1HZXRBY3Rpb25EYXRhEiguZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkRhdGFSZXF1ZXN0GikuZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkRhdGFSZXNwb25zZSIGiAIBkAIBEloKCExpc3RSdW5zEiMuZmx5dGVpZGwyLndvcmtmbG93Lkxpc3RSdW5zUmVxdWVzdBokLmZseXRlaWRsMi53b3JrZmxvdy5MaXN0UnVuc1Jlc3BvbnNlIgOQAgESXAoJV2F0Y2hSdW5zEiQuZmx5dGVpZGwyLndvcmtmbG93LldhdGNoUnVuc1JlcXVlc3QaJS5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hSdW5zUmVzcG9uc2UiADABEmMKC0xpc3RBY3Rpb25zEiYuZmx5dGVpZGwyLndvcmtmbG93Lkxpc3RBY3Rpb25zUmVxdWVzdBonLmZseXRlaWRsMi53b3JrZmxvdy5MaXN0QWN0aW9uc1Jlc3BvbnNlIgOQAgESZQoMV2F0Y2hBY3Rpb25zEicuZmx5dGVpZGwyLndvcmtmbG93LldhdGNoQWN0aW9uc1JlcXVlc3QaKC5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hBY3Rpb25zUmVzcG9uc2UiADABEncKEldhdGNoQ2x1c3RlckV2ZW50cxItLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaENsdXN0ZXJFdmVudHNSZXF1ZXN0Gi4uZmx5dGVpZGwyLndvcmtmbG93LldhdGNoQ2x1c3RlckV2ZW50c1Jlc3BvbnNlIgAwARJgCgtBYm9ydEFjdGlvbhImLmZseXRlaWRsMi53b3JrZmxvdy5BYm9ydEFjdGlvblJlcXVlc3QaJy5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRBY3Rpb25SZXNwb25zZSIAEmIKC1dhdGNoR3JvdXBzEiYuZmx5dGVpZGwyLndvcmtmbG93LldhdGNoR3JvdXBzUmVxdWVzdBonLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaEdyb3Vwc1Jlc3BvbnNlIgAwARJ1ChFHZXRBY3Rpb25EYXRhVVJJcxIsLmZseXRlaWRsMi53b3JrZmxvdy5HZXRBY3Rpb25EYXRhVVJJc1JlcXVlc3QaLS5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0QWN0aW9uRGF0YVVSSXNSZXNwb25zZSIDkAIBEnsKE0dldEFjdGlvbkxvZ0NvbnRleHQSLi5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0QWN0aW9uTG9nQ29udGV4dFJlcXVlc3QaLy5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0QWN0aW9uTG9nQ29udGV4dFJlc3BvbnNlIgOQAgFCzAEKFmNvbS5mbHl0ZWlkbDIud29ya2Zsb3dCD1J1blNlcnZpY2VQcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi93b3JrZmxvd6ICA0ZXWKoCEkZseXRlaWRsMi5Xb3JrZmxvd8oCEkZseXRlaWRsMlxXb3JrZmxvd+ICHkZseXRlaWRsMlxXb3JrZmxvd1xHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6V29ya2Zsb3diBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_list, file_flyteidl2_common_run, file_flyteidl2_core_execution, file_flyteidl2_task_common, file_flyteidl2_task_run, file_flyteidl2_task_task_definition, file_flyteidl2_workflow_run_definition, file_google_protobuf_timestamp]);
+  fileDesc("CiRmbHl0ZWlkbDIvd29ya2Zsb3cvcnVuX3NlcnZpY2UucHJvdG8SEmZseXRlaWRsMi53b3JrZmxvdyLEBAoQQ3JlYXRlUnVuUmVxdWVzdBIxCgZydW5faWQYASABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJIABI5Cgpwcm9qZWN0X2lkGAYgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckgAEjEKB3Rhc2tfaWQYAiABKAsyHi5mbHl0ZWlkbDIudGFzay5UYXNrSWRlbnRpZmllckgBEi0KCXRhc2tfc3BlYxgDIAEoCzIYLmZseXRlaWRsMi50YXNrLlRhc2tTcGVjSAESNQoMdHJpZ2dlcl9uYW1lGAcgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5UcmlnZ2VyTmFtZUgBEigKBmlucHV0cxgEIAEoCzIWLmZseXRlaWRsMi50YXNrLklucHV0c0gCEkQKFG9mZmxvYWRlZF9pbnB1dF9kYXRhGAkgASgLMiQuZmx5dGVpZGwyLmNvbW1vbi5PZmZsb2FkZWRJbnB1dERhdGFIAhIpCghydW5fc3BlYxgFIAEoCzIXLmZseXRlaWRsMi50YXNrLlJ1blNwZWMSLQoGc291cmNlGAggASgOMh0uZmx5dGVpZGwyLndvcmtmbG93LlJ1blNvdXJjZRIyCg5ydW5fc3RhcnRfdGltZRgKIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCCwoCaWQSBbpIAggBQg0KBHRhc2sSBbpIAggBQg8KDWlucHV0X3dyYXBwZXIiOQoRQ3JlYXRlUnVuUmVzcG9uc2USJAoDcnVuGAEgASgLMhcuZmx5dGVpZGwyLndvcmtmbG93LlJ1biJqCg9BYm9ydFJ1blJlcXVlc3QSNwoGcnVuX2lkGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQga6SAPIAQESEwoGcmVhc29uGAIgASgJSACIAQFCCQoHX3JlYXNvbiISChBBYm9ydFJ1blJlc3BvbnNlIk8KFEdldFJ1bkRldGFpbHNSZXF1ZXN0EjcKBnJ1bl9pZBgBIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckIGukgDyAEBIkgKFUdldFJ1bkRldGFpbHNSZXNwb25zZRIvCgdkZXRhaWxzGAEgASgLMh4uZmx5dGVpZGwyLndvcmtmbG93LlJ1bkRldGFpbHMiUQoWV2F0Y2hSdW5EZXRhaWxzUmVxdWVzdBI3CgZydW5faWQYASABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJCBrpIA8gBASJKChdXYXRjaFJ1bkRldGFpbHNSZXNwb25zZRIvCgdkZXRhaWxzGAEgASgLMh4uZmx5dGVpZGwyLndvcmtmbG93LlJ1bkRldGFpbHMiWAoXR2V0QWN0aW9uRGV0YWlsc1JlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQEiTgoYR2V0QWN0aW9uRGV0YWlsc1Jlc3BvbnNlEjIKB2RldGFpbHMYASABKAsyIS5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uRGV0YWlscyJaChlXYXRjaEFjdGlvbkRldGFpbHNSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBIlAKGldhdGNoQWN0aW9uRGV0YWlsc1Jlc3BvbnNlEjIKB2RldGFpbHMYASABKAsyIS5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uRGV0YWlscyJVChRHZXRBY3Rpb25EYXRhUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBASJpChVHZXRBY3Rpb25EYXRhUmVzcG9uc2USJgoGaW5wdXRzGAEgASgLMhYuZmx5dGVpZGwyLnRhc2suSW5wdXRzEigKB291dHB1dHMYAiABKAsyFy5mbHl0ZWlkbDIudGFzay5PdXRwdXRzIlkKGEdldEFjdGlvbkRhdGFVUklzUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBASJEChlHZXRBY3Rpb25EYXRhVVJJc1Jlc3BvbnNlEhIKCmlucHV0c191cmkYASABKAkSEwoLb3V0cHV0c191cmkYAiABKAkidQoaR2V0QWN0aW9uTG9nQ29udGV4dFJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESGAoHYXR0ZW1wdBgCIAEoDUIHukgEKgIgACK9AQobR2V0QWN0aW9uTG9nQ29udGV4dFJlc3BvbnNlEi8KC2xvZ19jb250ZXh0GAEgASgLMhouZmx5dGVpZGwyLmNvcmUuTG9nQ29udGV4dBIPCgdjbHVzdGVyGAIgASgJEi4KCnN0YXJ0X3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiwKCGVuZF90aW1lGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCLpAgoPTGlzdFJ1bnNSZXF1ZXN0Ei4KB3JlcXVlc3QYASABKAsyHS5mbHl0ZWlkbDIuY29tbW9uLkxpc3RSZXF1ZXN0EhYKA29yZxgCIAEoCUIHukgEcgIQAUgAEjkKCnByb2plY3RfaWQYBCABKAsyIy5mbHl0ZWlkbDIuY29tbW9uLlByb2plY3RJZGVudGlmaWVySAASNQoMdHJpZ2dlcl9uYW1lGAYgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5UcmlnZ2VyTmFtZUgAEi0KCXRhc2tfbmFtZRgHIAEoCzIYLmZseXRlaWRsMi50YXNrLlRhc2tOYW1lSAASMQoHdGFza19pZBgIIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVySAASGwoTcGF1c2VkX2FjdGlvbnNfb25seRgJIAEoCEIRCghzY29wZV9ieRIFukgCCAFKBAgDEARKBAgFEAYiSAoQTGlzdFJ1bnNSZXNwb25zZRIlCgRydW5zGAEgAygLMhcuZmx5dGVpZGwyLndvcmtmbG93LlJ1bhINCgV0b2tlbhgCIAEoCSLkAQoQV2F0Y2hSdW5zUmVxdWVzdBIWCgNvcmcYAiABKAlCB7pIBHICEAFIABI5CgpjbHVzdGVyX2lkGAMgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5DbHVzdGVySWRlbnRpZmllckgAEjkKCnByb2plY3RfaWQYBCABKAsyIy5mbHl0ZWlkbDIuY29tbW9uLlByb2plY3RJZGVudGlmaWVySAASMQoHdGFza19pZBgFIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVySABCDwoGdGFyZ2V0EgW6SAIIASI6ChFXYXRjaFJ1bnNSZXNwb25zZRIlCgRydW5zGAEgAygLMhcuZmx5dGVpZGwyLndvcmtmbG93LlJ1biJ9ChJMaXN0QWN0aW9uc1JlcXVlc3QSLgoHcmVxdWVzdBgBIAEoCzIdLmZseXRlaWRsMi5jb21tb24uTGlzdFJlcXVlc3QSNwoGcnVuX2lkGAIgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQga6SAPIAQEiUQoTTGlzdEFjdGlvbnNSZXNwb25zZRIrCgdhY3Rpb25zGAEgAygLMhouZmx5dGVpZGwyLndvcmtmbG93LkFjdGlvbhINCgV0b2tlbhgCIAEoCSKSAQoTV2F0Y2hBY3Rpb25zUmVxdWVzdBI3CgZydW5faWQYASABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJCBrpIA8gBARIoCgZmaWx0ZXIYAiADKAsyGC5mbHl0ZWlkbDIuY29tbW9uLkZpbHRlchIYChBlbmFibGVfcnVuX3N0b3JlGAMgASgIIlQKFFdhdGNoQWN0aW9uc1Jlc3BvbnNlEjwKEGVucmljaGVkX2FjdGlvbnMYASADKAsyIi5mbHl0ZWlkbDIud29ya2Zsb3cuRW5yaWNoZWRBY3Rpb24i/gcKG1dhdGNoV2luZG93ZWRBY3Rpb25zUmVxdWVzdBJOCglzdWJzY3JpYmUYASABKAsyOS5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hXaW5kb3dlZEFjdGlvbnNSZXF1ZXN0LlN1YnNjcmliZUgAElUKDXVwZGF0ZV93aW5kb3cYAiABKAsyPC5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hXaW5kb3dlZEFjdGlvbnNSZXF1ZXN0LlVwZGF0ZVdpbmRvd0gAGrADCglTdWJzY3JpYmUSNwoGcnVuX2lkGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQga6SAPIAQESGAoQc2VsZWN0ZWRfaXRlbV9pZBgCIAEoCRIgCg9vdmVyc2Nhbl9iZWZvcmUYAyABKAVCB7pIBBoCKAASHwoOb3ZlcnNjYW5fYWZ0ZXIYBCABKAVCB7pIBBoCKAASZAoOZXhwYW5kZWRfbm9kZXMYBSADKAsyTC5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hXaW5kb3dlZEFjdGlvbnNSZXF1ZXN0LlN1YnNjcmliZS5FeHBhbmRlZE5vZGVzRW50cnkSMwoMcGhhc2VfZmlsdGVyGAYgAygOMh0uZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25QaGFzZRITCgtuYW1lX2ZpbHRlchgHIAEoCRpdChJFeHBhbmRlZE5vZGVzRW50cnkSCwoDa2V5GAEgASgJEjYKBXZhbHVlGAIgASgLMicuZmx5dGVpZGwyLndvcmtmbG93Lk5vZGVFeHBhbnNpb25QYXJhbXM6AjgBGv0CCgxVcGRhdGVXaW5kb3cSGAoQc2VsZWN0ZWRfaXRlbV9pZBgBIAEoCRIgCg9vdmVyc2Nhbl9iZWZvcmUYAiABKAVCB7pIBBoCKAASHwoOb3ZlcnNjYW5fYWZ0ZXIYAyABKAVCB7pIBBoCKAASZwoOZXhwYW5kZWRfbm9kZXMYBCADKAsyTy5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hXaW5kb3dlZEFjdGlvbnNSZXF1ZXN0LlVwZGF0ZVdpbmRvdy5FeHBhbmRlZE5vZGVzRW50cnkSMwoMcGhhc2VfZmlsdGVyGAUgAygOMh0uZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25QaGFzZRITCgtuYW1lX2ZpbHRlchgGIAEoCRpdChJFeHBhbmRlZE5vZGVzRW50cnkSCwoDa2V5GAEgASgJEjYKBXZhbHVlGAIgASgLMicuZmx5dGVpZGwyLndvcmtmbG93Lk5vZGVFeHBhbnNpb25QYXJhbXM6AjgBQgUKA21zZyJGChNOb2RlRXhwYW5zaW9uUGFyYW1zEhcKBm9mZnNldBgBIAEoBUIHukgEGgIoABIWCgVsaW1pdBgCIAEoBUIHukgEGgIoACK1AgocV2F0Y2hXaW5kb3dlZEFjdGlvbnNSZXNwb25zZRI2Cgx3aW5kb3dfaXRlbXMYASADKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuV2luZG93ZWRJdGVtEjMKCWFuY2VzdG9ycxgCIAMoCzIgLmZseXRlaWRsMi53b3JrZmxvdy5XaW5kb3dlZEl0ZW0SGAoQdG90YWxfZmxhdF9jb3VudBgDIAEoAxIbChNzZWxlY3RlZF9mbGF0X2luZGV4GAQgASgDEiEKGWluaXRpYWxfc25hcHNob3RfY29tcGxldGUYBSABKAgSOQoLdHJ1bmNhdGlvbnMYBiADKAsyJC5mbHl0ZWlkbDIud29ya2Zsb3cuVHJ1bmNhdGlvbk5vdGljZRITCgtyZXN5bmNfaGludBgHIAEoCCKgAQoMV2luZG93ZWRJdGVtEjQKBmFjdGlvbhgBIAEoCzIiLmZseXRlaWRsMi53b3JrZmxvdy5FbnJpY2hlZEFjdGlvbkgAEi4KBWdyb3VwGAIgASgLMh0uZmx5dGVpZGwyLndvcmtmbG93Lkdyb3VwTm9kZUgAEg0KBWRlcHRoGAMgASgFEhMKC2lzX2V4cGFuZGVkGAQgASgIQgYKBGl0ZW0iYAoKQWN0aW9uTGVhZhIRCglhY3Rpb25faWQYASABKAkSEgoKc2hvcnRfbmFtZRgCIAEoCRIrCghkdXJhdGlvbhgDIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbiLtAQoRR3JvdXBBZ2dyZWdhdGlvbnMSLgoGZmFpbGVkGAEgAygLMh4uZmx5dGVpZGwyLndvcmtmbG93LkFjdGlvbkxlYWYSOAoQbG9uZ2VzdF9kdXJhdGlvbhgCIAMoCzIeLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25MZWFmEjcKD2xvbmdlc3RfcnVubmluZxgDIAMoCzIeLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25MZWFmEjUKDWxvbmdlc3Rfc2V0dXAYBCADKAsyHi5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uTGVhZiKhAwoJR3JvdXBOb2RlEgoKAmlkGAEgASgJEhIKCmdyb3VwX25hbWUYAiABKAkSEQoJcGFyZW50X2lkGAMgASgJEk8KEmNoaWxkX3BoYXNlX2NvdW50cxgEIAMoCzIzLmZseXRlaWRsMi53b3JrZmxvdy5Hcm91cE5vZGUuQ2hpbGRQaGFzZUNvdW50c0VudHJ5EjcKE2VhcmxpZXN0X3N0YXJ0X3RpbWUYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjMKD2xhdGVzdF9lbmRfdGltZRgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASFgoOdG90YWxfY2hpbGRyZW4YByABKAUSFAoMbWVldHNfZmlsdGVyGAggASgIEjsKDGFnZ3JlZ2F0aW9ucxgJIAEoCzIlLmZseXRlaWRsMi53b3JrZmxvdy5Hcm91cEFnZ3JlZ2F0aW9ucxo3ChVDaGlsZFBoYXNlQ291bnRzRW50cnkSCwoDa2V5GAEgASgFEg0KBXZhbHVlGAIgASgFOgI4ASKSAgoQVHJ1bmNhdGlvbk5vdGljZRI7CgZyZWFzb24YASABKA4yKy5mbHl0ZWlkbDIud29ya2Zsb3cuVHJ1bmNhdGlvbk5vdGljZS5SZWFzb24SHAoUdHJhY2tlZF9hY3Rpb25fY291bnQYAiABKAMSIAoYa25vd25fdG90YWxfYWN0aW9uX2NvdW50GAMgASgDEg8KB21lc3NhZ2UYBCABKAkicAoGUmVhc29uEhYKElJFQVNPTl9VTlNQRUNJRklFRBAAEhkKFVJFQVNPTl9SVU5fTk9ERV9MSU1JVBABEh0KGVJFQVNPTl9QQVJFTlRfQ0hJTERfTElNSVQQAhIUChBSRUFTT05fSFlEUkFUSU5HEAMibQoZV2F0Y2hDbHVzdGVyRXZlbnRzUmVxdWVzdBI2CgJpZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBEhgKB2F0dGVtcHQYAiABKA1CB7pIBCoCIAAiVgoaV2F0Y2hDbHVzdGVyRXZlbnRzUmVzcG9uc2USOAoOY2x1c3Rlcl9ldmVudHMYASADKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuQ2x1c3RlckV2ZW50ImMKEkFib3J0QWN0aW9uUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIOCgZyZWFzb24YAiABKAkiFQoTQWJvcnRBY3Rpb25SZXNwb25zZSJ4CgxFdmVudFBheWxvYWQSFAoKYm9vbF92YWx1ZRgBIAEoCEgAEhMKCWludF92YWx1ZRgCIAEoA0gAEhUKC2Zsb2F0X3ZhbHVlGAMgASgBSAASFgoMc3RyaW5nX3ZhbHVlGAQgASgJSABCDgoFdmFsdWUSBbpIAggBIqoBChJTaWduYWxFdmVudFJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESGgoScGFyZW50X2FjdGlvbl9uYW1lGAIgASgJEjkKB3BheWxvYWQYAyABKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuRXZlbnRQYXlsb2FkQga6SAPIAQEiFQoTU2lnbmFsRXZlbnRSZXNwb25zZSKfAwoSV2F0Y2hHcm91cHNSZXF1ZXN0EjkKCnByb2plY3RfaWQYASABKAsyIy5mbHl0ZWlkbDIuY29tbW9uLlByb2plY3RJZGVudGlmaWVySAASNgoKc3RhcnRfZGF0ZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCBrpIA8gBARIsCghlbmRfZGF0ZRgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoHcmVxdWVzdBgEIAEoCzIdLmZseXRlaWRsMi5jb21tb24uTGlzdFJlcXVlc3QSUAoRa25vd25fc29ydF9maWVsZHMYBSADKAsyNS5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hHcm91cHNSZXF1ZXN0Lktub3duU29ydEZpZWxkGlMKDktub3duU29ydEZpZWxkEjYKCmNyZWF0ZWRfYXQYASABKA4yIC5mbHl0ZWlkbDIuY29tbW9uLlNvcnQuRGlyZWN0aW9uSABCCQoHc29ydF9ieUIRCghzY29wZV9ieRIFukgCCAEiWwoTV2F0Y2hHcm91cHNSZXNwb25zZRIyCgt0YXNrX2dyb3VwcxgBIAMoCzIdLmZseXRlaWRsMi53b3JrZmxvdy5UYXNrR3JvdXASEAoIc2VudGluZWwYAiABKAgykg4KClJ1blNlcnZpY2USWgoJQ3JlYXRlUnVuEiQuZmx5dGVpZGwyLndvcmtmbG93LkNyZWF0ZVJ1blJlcXVlc3QaJS5mbHl0ZWlkbDIud29ya2Zsb3cuQ3JlYXRlUnVuUmVzcG9uc2UiABJXCghBYm9ydFJ1bhIjLmZseXRlaWRsMi53b3JrZmxvdy5BYm9ydFJ1blJlcXVlc3QaJC5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRSdW5SZXNwb25zZSIAEmkKDUdldFJ1bkRldGFpbHMSKC5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0UnVuRGV0YWlsc1JlcXVlc3QaKS5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0UnVuRGV0YWlsc1Jlc3BvbnNlIgOQAgESbgoPV2F0Y2hSdW5EZXRhaWxzEiouZmx5dGVpZGwyLndvcmtmbG93LldhdGNoUnVuRGV0YWlsc1JlcXVlc3QaKy5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hSdW5EZXRhaWxzUmVzcG9uc2UiADABEnIKEEdldEFjdGlvbkRldGFpbHMSKy5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0QWN0aW9uRGV0YWlsc1JlcXVlc3QaLC5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0QWN0aW9uRGV0YWlsc1Jlc3BvbnNlIgOQAgESdwoSV2F0Y2hBY3Rpb25EZXRhaWxzEi0uZmx5dGVpZGwyLndvcmtmbG93LldhdGNoQWN0aW9uRGV0YWlsc1JlcXVlc3QaLi5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hBY3Rpb25EZXRhaWxzUmVzcG9uc2UiADABEmwKDUdldEFjdGlvbkRhdGESKC5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0QWN0aW9uRGF0YVJlcXVlc3QaKS5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0QWN0aW9uRGF0YVJlc3BvbnNlIgaIAgGQAgESWgoITGlzdFJ1bnMSIy5mbHl0ZWlkbDIud29ya2Zsb3cuTGlzdFJ1bnNSZXF1ZXN0GiQuZmx5dGVpZGwyLndvcmtmbG93Lkxpc3RSdW5zUmVzcG9uc2UiA5ACARJcCglXYXRjaFJ1bnMSJC5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hSdW5zUmVxdWVzdBolLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaFJ1bnNSZXNwb25zZSIAMAESYwoLTGlzdEFjdGlvbnMSJi5mbHl0ZWlkbDIud29ya2Zsb3cuTGlzdEFjdGlvbnNSZXF1ZXN0GicuZmx5dGVpZGwyLndvcmtmbG93Lkxpc3RBY3Rpb25zUmVzcG9uc2UiA5ACARJlCgxXYXRjaEFjdGlvbnMSJy5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hBY3Rpb25zUmVxdWVzdBooLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaEFjdGlvbnNSZXNwb25zZSIAMAESdwoSV2F0Y2hDbHVzdGVyRXZlbnRzEi0uZmx5dGVpZGwyLndvcmtmbG93LldhdGNoQ2x1c3RlckV2ZW50c1JlcXVlc3QaLi5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hDbHVzdGVyRXZlbnRzUmVzcG9uc2UiADABEmAKC0Fib3J0QWN0aW9uEiYuZmx5dGVpZGwyLndvcmtmbG93LkFib3J0QWN0aW9uUmVxdWVzdBonLmZseXRlaWRsMi53b3JrZmxvdy5BYm9ydEFjdGlvblJlc3BvbnNlIgASYAoLU2lnbmFsRXZlbnQSJi5mbHl0ZWlkbDIud29ya2Zsb3cuU2lnbmFsRXZlbnRSZXF1ZXN0GicuZmx5dGVpZGwyLndvcmtmbG93LlNpZ25hbEV2ZW50UmVzcG9uc2UiABJiCgtXYXRjaEdyb3VwcxImLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaEdyb3Vwc1JlcXVlc3QaJy5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hHcm91cHNSZXNwb25zZSIAMAESdQoRR2V0QWN0aW9uRGF0YVVSSXMSLC5mbHl0ZWlkbDIud29ya2Zsb3cuR2V0QWN0aW9uRGF0YVVSSXNSZXF1ZXN0Gi0uZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkRhdGFVUklzUmVzcG9uc2UiA5ACARJ7ChNHZXRBY3Rpb25Mb2dDb250ZXh0Ei4uZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkxvZ0NvbnRleHRSZXF1ZXN0Gi8uZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkxvZ0NvbnRleHRSZXNwb25zZSIDkAIBQswBChZjb20uZmx5dGVpZGwyLndvcmtmbG93Qg9SdW5TZXJ2aWNlUHJvdG9IAlABWjZnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvd29ya2Zsb3eiAgNGV1iqAhJGbHl0ZWlkbDIuV29ya2Zsb3fKAhJGbHl0ZWlkbDJcV29ya2Zsb3fiAh5GbHl0ZWlkbDJcV29ya2Zsb3dcR1BCTWV0YWRhdGHqAhNGbHl0ZWlkbDI6OldvcmtmbG93YgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_list, file_flyteidl2_common_phase, file_flyteidl2_common_run, file_flyteidl2_core_execution, file_flyteidl2_task_common, file_flyteidl2_task_run, file_flyteidl2_task_task_definition, file_flyteidl2_workflow_run_definition, file_google_protobuf_duration, file_google_protobuf_timestamp]);
 
 /**
  * Request message for creating a run.
@@ -121,6 +123,15 @@ export type CreateRunRequest = Message<"flyteidl2.workflow.CreateRunRequest"> & 
    * @generated from field: flyteidl2.workflow.RunSource source = 8;
    */
   source: RunSource;
+
+  /**
+   * Optional explicit run start time. The scheduler sets this to a trigger's scheduled fire time
+   * so it surfaces as flyte.ctx().run_start_time in the task. If unset, the server defaults it to
+   * the current time. Copied onto RunSpec.run_start_time before the action is enqueued.
+   *
+   * @generated from field: google.protobuf.Timestamp run_start_time = 10;
+   */
+  runStartTime?: Timestamp;
 };
 
 /**
@@ -505,6 +516,20 @@ export type GetActionLogContextResponse = Message<"flyteidl2.workflow.GetActionL
    * @generated from field: string cluster = 2;
    */
   cluster: string;
+
+  /**
+   * The start time of the action attempt.
+   *
+   * @generated from field: google.protobuf.Timestamp start_time = 3;
+   */
+  startTime?: Timestamp;
+
+  /**
+   * The end time of the action attempt. Unset if the attempt is still running.
+   *
+   * @generated from field: google.protobuf.Timestamp end_time = 4;
+   */
+  endTime?: Timestamp;
 };
 
 /**
@@ -571,6 +596,14 @@ export type ListRunsRequest = Message<"flyteidl2.workflow.ListRunsRequest"> & {
     value: TaskIdentifier;
     case: "taskId";
   } | { case: undefined; value?: undefined };
+
+  /**
+   * When true, only return runs that contain at least one action in the
+   * PAUSED phase (e.g. a human-in-the-loop gate node awaiting input).
+   *
+   * @generated from field: bool paused_actions_only = 9;
+   */
+  pausedActionsOnly: boolean;
 };
 
 /**
@@ -758,6 +791,14 @@ export type WatchActionsRequest = Message<"flyteidl2.workflow.WatchActionsReques
    * @generated from field: repeated flyteidl2.common.Filter filter = 2;
    */
   filter: Filter[];
+
+  /**
+   * Enable the new runStore we implemented for the WatchActions API
+   * TODO(alex): We can remove this once the new runStore is properly tested and stable
+   *
+   * @generated from field: bool enable_run_store = 3;
+   */
+  enableRunStore: boolean;
 };
 
 /**
@@ -789,6 +830,503 @@ export const WatchActionsResponseSchema: GenMessage<WatchActionsResponse> = /*@_
   messageDesc(file_flyteidl2_workflow_run_service, 25);
 
 /**
+ * WatchWindowedActionsRequest is the client → server message on the
+ * bidi stream. The first message must be Subscribe; subsequent
+ * messages must be UpdateWindow.
+ *
+ * @generated from message flyteidl2.workflow.WatchWindowedActionsRequest
+ */
+export type WatchWindowedActionsRequest = Message<"flyteidl2.workflow.WatchWindowedActionsRequest"> & {
+  /**
+   * @generated from oneof flyteidl2.workflow.WatchWindowedActionsRequest.msg
+   */
+  msg: {
+    /**
+     * @generated from field: flyteidl2.workflow.WatchWindowedActionsRequest.Subscribe subscribe = 1;
+     */
+    value: WatchWindowedActionsRequest_Subscribe;
+    case: "subscribe";
+  } | {
+    /**
+     * @generated from field: flyteidl2.workflow.WatchWindowedActionsRequest.UpdateWindow update_window = 2;
+     */
+    value: WatchWindowedActionsRequest_UpdateWindow;
+    case: "updateWindow";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message flyteidl2.workflow.WatchWindowedActionsRequest.
+ * Use `create(WatchWindowedActionsRequestSchema)` to create a new message.
+ */
+export const WatchWindowedActionsRequestSchema: GenMessage<WatchWindowedActionsRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_run_service, 26);
+
+/**
+ * Subscribe opens the subscription. Sent exactly once as the first
+ * message on the stream.
+ *
+ * @generated from message flyteidl2.workflow.WatchWindowedActionsRequest.Subscribe
+ */
+export type WatchWindowedActionsRequest_Subscribe = Message<"flyteidl2.workflow.WatchWindowedActionsRequest.Subscribe"> & {
+  /**
+   * @generated from field: flyteidl2.common.RunIdentifier run_id = 1;
+   */
+  runId?: RunIdentifier;
+
+  /**
+   * Action name or group key currently focused in the UI; the
+   * server centers the window on this item.
+   *
+   * @generated from field: string selected_item_id = 2;
+   */
+  selectedItemId: string;
+
+  /**
+   * Extra items to materialize above/below the selected item. Server
+   * clamps; 0 means "use server default".
+   *
+   * @generated from field: int32 overscan_before = 3;
+   */
+  overscanBefore: number;
+
+  /**
+   * @generated from field: int32 overscan_after = 4;
+   */
+  overscanAfter: number;
+
+  /**
+   * Items the client wants expanded. Key = action name OR group key.
+   *
+   * @generated from field: map<string, flyteidl2.workflow.NodeExpansionParams> expanded_nodes = 5;
+   */
+  expandedNodes: { [key: string]: NodeExpansionParams };
+
+  /**
+   * Optional filters; same semantics as legacy WatchActions filters.
+   *
+   * @generated from field: repeated flyteidl2.common.ActionPhase phase_filter = 6;
+   */
+  phaseFilter: ActionPhase[];
+
+  /**
+   * @generated from field: string name_filter = 7;
+   */
+  nameFilter: string;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.WatchWindowedActionsRequest.Subscribe.
+ * Use `create(WatchWindowedActionsRequest_SubscribeSchema)` to create a new message.
+ */
+export const WatchWindowedActionsRequest_SubscribeSchema: GenMessage<WatchWindowedActionsRequest_Subscribe> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_run_service, 26, 0);
+
+/**
+ * UpdateWindow updates one or more window parameters. Sent as the
+ * user scrolls, expands/collapses, or changes filters.
+ *
+ * @generated from message flyteidl2.workflow.WatchWindowedActionsRequest.UpdateWindow
+ */
+export type WatchWindowedActionsRequest_UpdateWindow = Message<"flyteidl2.workflow.WatchWindowedActionsRequest.UpdateWindow"> & {
+  /**
+   * @generated from field: string selected_item_id = 1;
+   */
+  selectedItemId: string;
+
+  /**
+   * @generated from field: int32 overscan_before = 2;
+   */
+  overscanBefore: number;
+
+  /**
+   * @generated from field: int32 overscan_after = 3;
+   */
+  overscanAfter: number;
+
+  /**
+   * @generated from field: map<string, flyteidl2.workflow.NodeExpansionParams> expanded_nodes = 4;
+   */
+  expandedNodes: { [key: string]: NodeExpansionParams };
+
+  /**
+   * @generated from field: repeated flyteidl2.common.ActionPhase phase_filter = 5;
+   */
+  phaseFilter: ActionPhase[];
+
+  /**
+   * @generated from field: string name_filter = 6;
+   */
+  nameFilter: string;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.WatchWindowedActionsRequest.UpdateWindow.
+ * Use `create(WatchWindowedActionsRequest_UpdateWindowSchema)` to create a new message.
+ */
+export const WatchWindowedActionsRequest_UpdateWindowSchema: GenMessage<WatchWindowedActionsRequest_UpdateWindow> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_run_service, 26, 1);
+
+/**
+ * NodeExpansionParams bounds how many children the server should
+ * materialize under an expanded node or group. limit <= 0 → server
+ * default; server also clamps to a hard cap.
+ *
+ * @generated from message flyteidl2.workflow.NodeExpansionParams
+ */
+export type NodeExpansionParams = Message<"flyteidl2.workflow.NodeExpansionParams"> & {
+  /**
+   * @generated from field: int32 offset = 1;
+   */
+  offset: number;
+
+  /**
+   * @generated from field: int32 limit = 2;
+   */
+  limit: number;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.NodeExpansionParams.
+ * Use `create(NodeExpansionParamsSchema)` to create a new message.
+ */
+export const NodeExpansionParamsSchema: GenMessage<NodeExpansionParams> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_run_service, 27);
+
+/**
+ * WatchWindowedActionsResponse is one server → client tick.
+ *
+ * @generated from message flyteidl2.workflow.WatchWindowedActionsResponse
+ */
+export type WatchWindowedActionsResponse = Message<"flyteidl2.workflow.WatchWindowedActionsResponse"> & {
+  /**
+   * Window slice in flat_index order — only the items the client
+   * can render right now (selected ± overscan).
+   *
+   * @generated from field: repeated flyteidl2.workflow.WindowedItem window_items = 1;
+   */
+  windowItems: WindowedItem[];
+
+  /**
+   * Root → selected_item's parent. Sent on every response for
+   * breadcrumb rendering; bounded by tree depth.
+   *
+   * @generated from field: repeated flyteidl2.workflow.WindowedItem ancestors = 2;
+   */
+  ancestors: WindowedItem[];
+
+  /**
+   * Length of the full expanded flat list (not just the window).
+   *
+   * @generated from field: int64 total_flat_count = 3;
+   */
+  totalFlatCount: bigint;
+
+  /**
+   * Position of selected_item_id within the flat list.
+   *
+   * @generated from field: int64 selected_flat_index = 4;
+   */
+  selectedFlatIndex: bigint;
+
+  /**
+   * True on the response that completes the initial hydration; the
+   * client should treat this as the "first paint done" signal.
+   *
+   * @generated from field: bool initial_snapshot_complete = 5;
+   */
+  initialSnapshotComplete: boolean;
+
+  /**
+   * Sticky truncation notices — present on every response until the
+   * server confirms client receipt.
+   *
+   * @generated from field: repeated flyteidl2.workflow.TruncationNotice truncations = 6;
+   */
+  truncations: TruncationNotice[];
+
+  /**
+   * True when the server had to drop a tick due to backpressure; the
+   * client should re-send its UpdateWindow to force a fresh snapshot.
+   *
+   * @generated from field: bool resync_hint = 7;
+   */
+  resyncHint: boolean;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.WatchWindowedActionsResponse.
+ * Use `create(WatchWindowedActionsResponseSchema)` to create a new message.
+ */
+export const WatchWindowedActionsResponseSchema: GenMessage<WatchWindowedActionsResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_run_service, 28);
+
+/**
+ * WindowedItem is one slot in the windowed flat list — either a
+ * regular action or a synthetic group folder.
+ *
+ * @generated from message flyteidl2.workflow.WindowedItem
+ */
+export type WindowedItem = Message<"flyteidl2.workflow.WindowedItem"> & {
+  /**
+   * @generated from oneof flyteidl2.workflow.WindowedItem.item
+   */
+  item: {
+    /**
+     * @generated from field: flyteidl2.workflow.EnrichedAction action = 1;
+     */
+    value: EnrichedAction;
+    case: "action";
+  } | {
+    /**
+     * @generated from field: flyteidl2.workflow.GroupNode group = 2;
+     */
+    value: GroupNode;
+    case: "group";
+  } | { case: undefined; value?: undefined };
+
+  /**
+   * @generated from field: int32 depth = 3;
+   */
+  depth: number;
+
+  /**
+   * @generated from field: bool is_expanded = 4;
+   */
+  isExpanded: boolean;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.WindowedItem.
+ * Use `create(WindowedItemSchema)` to create a new message.
+ */
+export const WindowedItemSchema: GenMessage<WindowedItem> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_run_service, 29);
+
+/**
+ * ActionLeaf is one entry in a GroupAggregations top-3 list.
+ *
+ * @generated from message flyteidl2.workflow.ActionLeaf
+ */
+export type ActionLeaf = Message<"flyteidl2.workflow.ActionLeaf"> & {
+  /**
+   * Member action name; resolves to a node under the group's parent.
+   *
+   * @generated from field: string action_id = 1;
+   */
+  actionId: string;
+
+  /**
+   * Interned short name from the member's task spec.
+   *
+   * @generated from field: string short_name = 2;
+   */
+  shortName: string;
+
+  /**
+   * Metric for this entry — wall-clock duration, running duration, or
+   * setup time depending on which list the leaf appears in.
+   *
+   * @generated from field: google.protobuf.Duration duration = 3;
+   */
+  duration?: Duration;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.ActionLeaf.
+ * Use `create(ActionLeafSchema)` to create a new message.
+ */
+export const ActionLeafSchema: GenMessage<ActionLeaf> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_run_service, 30);
+
+/**
+ * GroupAggregations carries the four top-3 outlier lists for a group.
+ * Each list holds the three members with the largest metric, sorted
+ * DESC.
+ *
+ * @generated from message flyteidl2.workflow.GroupAggregations
+ */
+export type GroupAggregations = Message<"flyteidl2.workflow.GroupAggregations"> & {
+  /**
+   * Members in terminal FAILED phase, by total duration.
+   *
+   * @generated from field: repeated flyteidl2.workflow.ActionLeaf failed = 1;
+   */
+  failed: ActionLeaf[];
+
+  /**
+   * By total wall-clock duration (created → ended).
+   *
+   * @generated from field: repeated flyteidl2.workflow.ActionLeaf longest_duration = 2;
+   */
+  longestDuration: ActionLeaf[];
+
+  /**
+   * By time spent in RUNNING phase.
+   *
+   * @generated from field: repeated flyteidl2.workflow.ActionLeaf longest_running = 3;
+   */
+  longestRunning: ActionLeaf[];
+
+  /**
+   * By setup time = total duration − running duration.
+   *
+   * @generated from field: repeated flyteidl2.workflow.ActionLeaf longest_setup = 4;
+   */
+  longestSetup: ActionLeaf[];
+};
+
+/**
+ * Describes the message flyteidl2.workflow.GroupAggregations.
+ * Use `create(GroupAggregationsSchema)` to create a new message.
+ */
+export const GroupAggregationsSchema: GenMessage<GroupAggregations> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_run_service, 31);
+
+/**
+ * GroupNode is the synthetic (parent, action_group) folder. The
+ * server emits one of these in place of a contiguous block of
+ * sibling actions sharing an action_group.
+ *
+ * @generated from message flyteidl2.workflow.GroupNode
+ */
+export type GroupNode = Message<"flyteidl2.workflow.GroupNode"> & {
+  /**
+   * Synthetic key — "{parent_action_id}::group::{group_name}".
+   *
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * @generated from field: string group_name = 2;
+   */
+  groupName: string;
+
+  /**
+   * @generated from field: string parent_id = 3;
+   */
+  parentId: string;
+
+  /**
+   * Per-phase member counts (key = ActionPhase enum value).
+   *
+   * @generated from field: map<int32, int32> child_phase_counts = 4;
+   */
+  childPhaseCounts: { [key: number]: number };
+
+  /**
+   * Earliest StartedAt across members; unset until any member starts.
+   *
+   * @generated from field: google.protobuf.Timestamp earliest_start_time = 5;
+   */
+  earliestStartTime?: Timestamp;
+
+  /**
+   * Latest EndedAt across members; unset while any member is still
+   * running.
+   *
+   * @generated from field: google.protobuf.Timestamp latest_end_time = 6;
+   */
+  latestEndTime?: Timestamp;
+
+  /**
+   * @generated from field: int32 total_children = 7;
+   */
+  totalChildren: number;
+
+  /**
+   * @generated from field: bool meets_filter = 8;
+   */
+  meetsFilter: boolean;
+
+  /**
+   * @generated from field: flyteidl2.workflow.GroupAggregations aggregations = 9;
+   */
+  aggregations?: GroupAggregations;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.GroupNode.
+ * Use `create(GroupNodeSchema)` to create a new message.
+ */
+export const GroupNodeSchema: GenMessage<GroupNode> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_run_service, 32);
+
+/**
+ * TruncationNotice tells the client that the response is incomplete
+ * due to a hard cap. Sent sticky — server keeps re-attaching the
+ * notice until receipt is confirmed via a subsequent client message.
+ *
+ * @generated from message flyteidl2.workflow.TruncationNotice
+ */
+export type TruncationNotice = Message<"flyteidl2.workflow.TruncationNotice"> & {
+  /**
+   * @generated from field: flyteidl2.workflow.TruncationNotice.Reason reason = 1;
+   */
+  reason: TruncationNotice_Reason;
+
+  /**
+   * @generated from field: int64 tracked_action_count = 2;
+   */
+  trackedActionCount: bigint;
+
+  /**
+   * @generated from field: int64 known_total_action_count = 3;
+   */
+  knownTotalActionCount: bigint;
+
+  /**
+   * @generated from field: string message = 4;
+   */
+  message: string;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.TruncationNotice.
+ * Use `create(TruncationNoticeSchema)` to create a new message.
+ */
+export const TruncationNoticeSchema: GenMessage<TruncationNotice> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_run_service, 33);
+
+/**
+ * @generated from enum flyteidl2.workflow.TruncationNotice.Reason
+ */
+export enum TruncationNotice_Reason {
+  /**
+   * @generated from enum value: REASON_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * MaxActionsPerRun hit — the run has more actions than the store tracks.
+   *
+   * @generated from enum value: REASON_RUN_NODE_LIMIT = 1;
+   */
+  RUN_NODE_LIMIT = 1,
+
+  /**
+   * MaxChildrenPerParent hit — at least one parent has more children than tracked.
+   *
+   * @generated from enum value: REASON_PARENT_CHILD_LIMIT = 2;
+   */
+  PARENT_CHILD_LIMIT = 2,
+
+  /**
+   * Transient; the store is still hydrating from the DB.
+   *
+   * @generated from enum value: REASON_HYDRATING = 3;
+   */
+  HYDRATING = 3,
+}
+
+/**
+ * Describes the enum flyteidl2.workflow.TruncationNotice.Reason.
+ */
+export const TruncationNotice_ReasonSchema: GenEnum<TruncationNotice_Reason> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_workflow_run_service, 33, 0);
+
+/**
  * @generated from message flyteidl2.workflow.WatchClusterEventsRequest
  */
 export type WatchClusterEventsRequest = Message<"flyteidl2.workflow.WatchClusterEventsRequest"> & {
@@ -808,7 +1346,7 @@ export type WatchClusterEventsRequest = Message<"flyteidl2.workflow.WatchCluster
  * Use `create(WatchClusterEventsRequestSchema)` to create a new message.
  */
 export const WatchClusterEventsRequestSchema: GenMessage<WatchClusterEventsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 26);
+  messageDesc(file_flyteidl2_workflow_run_service, 34);
 
 /**
  * @generated from message flyteidl2.workflow.WatchClusterEventsResponse
@@ -825,7 +1363,7 @@ export type WatchClusterEventsResponse = Message<"flyteidl2.workflow.WatchCluste
  * Use `create(WatchClusterEventsResponseSchema)` to create a new message.
  */
 export const WatchClusterEventsResponseSchema: GenMessage<WatchClusterEventsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 27);
+  messageDesc(file_flyteidl2_workflow_run_service, 35);
 
 /**
  * @generated from message flyteidl2.workflow.AbortActionRequest
@@ -851,7 +1389,7 @@ export type AbortActionRequest = Message<"flyteidl2.workflow.AbortActionRequest"
  * Use `create(AbortActionRequestSchema)` to create a new message.
  */
 export const AbortActionRequestSchema: GenMessage<AbortActionRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 28);
+  messageDesc(file_flyteidl2_workflow_run_service, 36);
 
 /**
  * @generated from message flyteidl2.workflow.AbortActionResponse
@@ -864,7 +1402,103 @@ export type AbortActionResponse = Message<"flyteidl2.workflow.AbortActionRespons
  * Use `create(AbortActionResponseSchema)` to create a new message.
  */
 export const AbortActionResponseSchema: GenMessage<AbortActionResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 29);
+  messageDesc(file_flyteidl2_workflow_run_service, 37);
+
+/**
+ * EventPayload carries the typed value for a condition signal. This is the
+ * user-facing simplified payload surface — the run service converts it to a
+ * core.Literal before forwarding to ActionsService.Signal. Exactly one field
+ * must be set, matching the condition's declared type.
+ *
+ * @generated from message flyteidl2.workflow.EventPayload
+ */
+export type EventPayload = Message<"flyteidl2.workflow.EventPayload"> & {
+  /**
+   * @generated from oneof flyteidl2.workflow.EventPayload.value
+   */
+  value: {
+    /**
+     * @generated from field: bool bool_value = 1;
+     */
+    value: boolean;
+    case: "boolValue";
+  } | {
+    /**
+     * @generated from field: int64 int_value = 2;
+     */
+    value: bigint;
+    case: "intValue";
+  } | {
+    /**
+     * @generated from field: double float_value = 3;
+     */
+    value: number;
+    case: "floatValue";
+  } | {
+    /**
+     * @generated from field: string string_value = 4;
+     */
+    value: string;
+    case: "stringValue";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message flyteidl2.workflow.EventPayload.
+ * Use `create(EventPayloadSchema)` to create a new message.
+ */
+export const EventPayloadSchema: GenMessage<EventPayload> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_run_service, 38);
+
+/**
+ * Request message for signalling a condition action within a run.
+ *
+ * @generated from message flyteidl2.workflow.SignalEventRequest
+ */
+export type SignalEventRequest = Message<"flyteidl2.workflow.SignalEventRequest"> & {
+  /**
+   * The condition action to signal.
+   *
+   * @generated from field: flyteidl2.common.ActionIdentifier action_id = 1;
+   */
+  actionId?: ActionIdentifier;
+
+  /**
+   * The parent action that owns the condition. Used to route the request to
+   * the correct actions-service shard (partitioned by parent action name).
+   *
+   * @generated from field: string parent_action_name = 2;
+   */
+  parentActionName: string;
+
+  /**
+   * The value to signal the condition with. Must match the condition's
+   * declared type.
+   *
+   * @generated from field: flyteidl2.workflow.EventPayload payload = 3;
+   */
+  payload?: EventPayload;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.SignalEventRequest.
+ * Use `create(SignalEventRequestSchema)` to create a new message.
+ */
+export const SignalEventRequestSchema: GenMessage<SignalEventRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_run_service, 39);
+
+/**
+ * @generated from message flyteidl2.workflow.SignalEventResponse
+ */
+export type SignalEventResponse = Message<"flyteidl2.workflow.SignalEventResponse"> & {
+};
+
+/**
+ * Describes the message flyteidl2.workflow.SignalEventResponse.
+ * Use `create(SignalEventResponseSchema)` to create a new message.
+ */
+export const SignalEventResponseSchema: GenMessage<SignalEventResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_run_service, 40);
 
 /**
  * @generated from message flyteidl2.workflow.WatchGroupsRequest
@@ -919,7 +1553,7 @@ export type WatchGroupsRequest = Message<"flyteidl2.workflow.WatchGroupsRequest"
  * Use `create(WatchGroupsRequestSchema)` to create a new message.
  */
 export const WatchGroupsRequestSchema: GenMessage<WatchGroupsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 30);
+  messageDesc(file_flyteidl2_workflow_run_service, 41);
 
 /**
  * @generated from message flyteidl2.workflow.WatchGroupsRequest.KnownSortField
@@ -942,7 +1576,7 @@ export type WatchGroupsRequest_KnownSortField = Message<"flyteidl2.workflow.Watc
  * Use `create(WatchGroupsRequest_KnownSortFieldSchema)` to create a new message.
  */
 export const WatchGroupsRequest_KnownSortFieldSchema: GenMessage<WatchGroupsRequest_KnownSortField> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 30, 0);
+  messageDesc(file_flyteidl2_workflow_run_service, 41, 0);
 
 /**
  * Response message for watching task groups.
@@ -972,7 +1606,7 @@ export type WatchGroupsResponse = Message<"flyteidl2.workflow.WatchGroupsRespons
  * Use `create(WatchGroupsResponseSchema)` to create a new message.
  */
 export const WatchGroupsResponseSchema: GenMessage<WatchGroupsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_run_service, 31);
+  messageDesc(file_flyteidl2_workflow_run_service, 42);
 
 /**
  * RunService provides an interface for managing runs.
@@ -1112,6 +1746,19 @@ export const RunService: GenService<{
     methodKind: "unary";
     input: typeof AbortActionRequestSchema;
     output: typeof AbortActionResponseSchema;
+  },
+  /**
+   * SignalEvent resolves a paused condition action by supplying its value.
+   * It converts the user-facing EventPayload to a core.Literal and delegates
+   * to ActionsService.Signal, resolving the condition's parent action for
+   * routing.
+   *
+   * @generated from rpc flyteidl2.workflow.RunService.SignalEvent
+   */
+  signalEvent: {
+    methodKind: "unary";
+    input: typeof SignalEventRequestSchema;
+    output: typeof SignalEventResponseSchema;
   },
   /**
    * Stream updates for task groups based on the provided filter criteria.

@@ -25,16 +25,19 @@ import (
 	"strings"
 	"time"
 
+	"k8s.io/client-go/tools/events"
 	"k8s.io/client-go/util/retry"
 
 	"connectrpc.com/connect"
+	"go.opentelemetry.io/otel/metric"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
+	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
@@ -44,8 +47,8 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
-	core "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	task "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -86,7 +89,7 @@ const (
 type TaskActionReconciler struct {
 	client.Client
 	Scheme            *runtime.Scheme
-	Recorder          record.EventRecorder
+	Recorder          events.EventRecorder
 	PluginRegistry    *plugin.Registry
 	DataStore         *storage.DataStore
 	SecretManager     pluginsCore.SecretManager
@@ -96,6 +99,7 @@ type TaskActionReconciler struct {
 	eventsClient      workflowconnect.EventsProxyServiceClient
 	cluster           string
 	MaxSystemFailures uint32
+	metrics           *taskActionMetrics
 }
 
 // isSystemRetryableFailure reports whether the plugin transition is a
@@ -152,7 +156,7 @@ func (r *TaskActionReconciler) recordSystemError(
 	logger := log.FromContext(ctx)
 	logger.Error(handleErr, "system error from plugin", "plugin", pluginID)
 	if r.Recorder != nil {
-		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(FailedPluginHandle),
+		r.Recorder.Eventf(taskAction, nil, corev1.EventTypeWarning, string(FailedPluginHandle), "HandlingPlugin",
 			"Plugin %q system error: %v", pluginID, handleErr)
 	}
 
@@ -167,7 +171,10 @@ func (r *TaskActionReconciler) recordSystemError(
 	}
 
 	if taskActionStatusChanged(original.Status, taskAction.Status) {
-		if updErr := r.Status().Update(ctx, taskAction); updErr != nil {
+		start := time.Now()
+		updErr := r.Status().Update(ctx, taskAction)
+		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
+		if updErr != nil {
 			logger.Error(updErr, "failed to persist SystemFailures counter")
 		}
 	}
@@ -197,7 +204,11 @@ func (r *TaskActionReconciler) finalizePermanentFailure(
 	return ctrl.Result{}, nil
 }
 
-// NewTaskActionReconciler creates a new TaskActionReconciler
+// NewTaskActionReconciler creates a new TaskActionReconciler. meterProvider is the
+// executor's OTel meter provider (otelutils.GetMeterProvider(otelServiceName) in
+// executor/setup.go). cache is the manager's cache (mgr.GetCache()); the active-by-phase
+// gauge counts TaskActions straight from its indexer to avoid deep-copying every CRD.
+// TaskAction CRD operations are timed inline at the call sites via metrics.recordK8sOp.
 func NewTaskActionReconciler(
 	c client.Client,
 	scheme *runtime.Scheme,
@@ -205,7 +216,14 @@ func NewTaskActionReconciler(
 	dataStore *storage.DataStore,
 	eventsClient workflowconnect.EventsProxyServiceClient,
 	cluster string,
+	meterProvider metric.MeterProvider,
+	cache ctrlcache.Cache,
 ) *TaskActionReconciler {
+	metrics, err := registerTaskActionMetrics(meterProvider, cachedPhaseCounter(cache))
+	if err != nil {
+		// Non-fatal: degrade to no custom metrics rather than failing controller setup.
+		log.Log.Error(err, "failed to register TaskAction OTel metrics")
+	}
 	return &TaskActionReconciler{
 		Client:         c,
 		Scheme:         scheme,
@@ -213,6 +231,7 @@ func NewTaskActionReconciler(
 		DataStore:      dataStore,
 		eventsClient:   eventsClient,
 		cluster:        cluster,
+		metrics:        metrics,
 	}
 }
 
@@ -228,9 +247,13 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	// Fetch the TaskAction instance
 	taskAction := &flyteorgv1.TaskAction{}
-	if err := r.Get(ctx, req.NamespacedName, taskAction); err != nil {
+	start := time.Now()
+	err := r.Get(ctx, req.NamespacedName, taskAction)
+	r.metrics.recordK8sOp(ctx, opGet, start, err)
+	if err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
+	r.metrics.observeCRDSize(ctx, taskAction)
 
 	// Please do NOT modify `originalTaskActionInstance` in the following code. This is for checking
 	// if the TaskAction instance changes
@@ -258,19 +281,24 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		if reason == flyteorgv1.ConditionReasonPluginNotFound {
 			eventType = FailedPluginResolve
 		}
-		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, string(eventType), "%v", err)
+		r.Recorder.Eventf(taskAction, nil, corev1.EventTypeWarning, string(eventType), "ValidatingTaskAction", "%v", err)
 		setCondition(taskAction, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue, reason, err.Error())
 		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse, reason, err.Error())
-		_ = r.Status().Update(ctx, taskAction)
+		start = time.Now()
+		updErr := r.Status().Update(ctx, taskAction) // error intentionally ignored: terminal either way
+		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
 		return ctrl.Result{}, nil // terminal — do not requeue
 	}
 
 	// Ensure finalizer is present (once validation passes)
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		controllerutil.AddFinalizer(taskAction, taskActionFinalizer)
-		if err := r.Update(ctx, taskAction); err != nil {
-			logger.Error(err, "Failed to update TaskAction with finalizer")
-			return ctrl.Result{}, err
+		start = time.Now()
+		updErr := r.Update(ctx, taskAction)
+		r.metrics.recordK8sOp(ctx, opUpdate, start, updErr)
+		if updErr != nil {
+			logger.Error(updErr, "Failed to update TaskAction with finalizer")
+			return ctrl.Result{}, updErr
 		}
 		return ctrl.Result{}, nil
 	}
@@ -456,7 +484,7 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 	)
 	if err != nil {
 		logger.Error(err, "failed to build context for abort/finalize")
-		r.Recorder.Eventf(taskAction, corev1.EventTypeWarning, "FinalizationSkipped",
+		r.Recorder.Eventf(taskAction, nil, corev1.EventTypeWarning, "FinalizationSkipped", "FinalizingTaskAction",
 			"Could not build task execution context; skipping Abort/Finalize. Underlying resources may need manual cleanup: %v", err)
 		return r.removeFinalizer(ctx, taskAction)
 	}
@@ -497,7 +525,10 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 
 func (r *TaskActionReconciler) removeFinalizer(ctx context.Context, taskAction *flyteorgv1.TaskAction) (ctrl.Result, error) {
 	controllerutil.RemoveFinalizer(taskAction, taskActionFinalizer)
-	if err := r.Update(ctx, taskAction); err != nil {
+	start := time.Now()
+	err := r.Update(ctx, taskAction)
+	r.metrics.recordK8sOp(ctx, opUpdate, start, err)
+	if err != nil {
 		return ctrl.Result{}, err
 	}
 	return ctrl.Result{}, nil
@@ -522,8 +553,10 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	})); err != nil {
 		r.Recorder.Eventf(
 			newTaskAction,
+			nil,
 			corev1.EventTypeWarning,
 			"ActionEventPublishFailed",
+			"PublishingActionEvent",
 			"Failed to persist action event %q: %v",
 			actionEvent.GetId().GetName(),
 			err,
@@ -533,14 +566,20 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	}
 
 	// The retry.RetryOnConflict will refetch the k8s resource to get the latest resource version
-	// This will resovle the conflict error caused by k8s optimistic lock when 2 reconcile loops updating the same CRD
+	// This will resolve the conflict error caused by k8s optimistic lock when 2 reconcile loops updating the same CRD
 	if err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		latest := &flyteorgv1.TaskAction{}
-		if getErr := r.Get(ctx, client.ObjectKeyFromObject(newTaskAction), latest); getErr != nil {
+		start := time.Now()
+		getErr := r.Get(ctx, client.ObjectKeyFromObject(newTaskAction), latest)
+		r.metrics.recordK8sOp(ctx, opGet, start, getErr)
+		if getErr != nil {
 			return getErr
 		}
 		latest.Status = newTaskAction.Status
-		return r.Status().Update(ctx, latest)
+		start = time.Now()
+		updErr := r.Status().Update(ctx, latest)
+		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
+		return updErr
 	}); err != nil {
 		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
 		return err
@@ -880,11 +919,12 @@ func createStateJSON(actionSpec *workflow.ActionSpec, phase string) string {
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *TaskActionReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *TaskActionReconciler) SetupWithManager(mgr ctrl.Manager, maxConcurrentReconciles int) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&flyteorgv1.TaskAction{}).
 		Owns(&corev1.Pod{}).
 		Named("taskaction").
+		WithOptions(controller.Options{MaxConcurrentReconciles: maxConcurrentReconciles}).
 		Complete(r)
 }
 

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "flyte-binary.console.serviceName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-binary.console.labels" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.console.service.type }}
+  ports:
+    - name: http
+      port: {{ .Values.console.service.port }}
+      targetPort: http
+      protocol: TCP
+      {{- if and (or (eq .Values.console.service.type "NodePort") (eq .Values.console.service.type "LoadBalancer")) (not (empty .Values.console.service.nodePort)) }}
+      nodePort: {{ .Values.console.service.nodePort }}
+      {{- end }}
+  selector: {{- include "flyte-binary.console.selectorLabels" . | nindent 4 }}

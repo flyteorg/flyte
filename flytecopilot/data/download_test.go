@@ -20,18 +20,18 @@ func TestHandleBlobMultipart(t *testing.T) {
 		assert.NoError(t, err)
 
 		// Create one file at root level and another in a nested folder
-		ref1 := storage.DataReference("s3://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7c/root_file.txt")
+		ref1 := storage.DataReference("mem://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7c/root_file.txt")
 		err = s.WriteRaw(context.Background(), ref1, 0, storage.Options{}, bytes.NewReader([]byte("root content")))
 		assert.NoError(t, err)
 
-		ref2 := storage.DataReference("s3://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7c/nested/deep_file.txt")
+		ref2 := storage.DataReference("mem://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7c/nested/deep_file.txt")
 		err = s.WriteRaw(context.Background(), ref2, 0, storage.Options{}, bytes.NewReader([]byte("nested content")))
 		assert.NoError(t, err)
 
 		d := Downloader{store: s}
 
 		blob := &core.Blob{
-			Uri: "s3://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7c",
+			Uri: "mem://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7c",
 			Metadata: &core.BlobMetadata{
 				Type: &core.BlobType{
 					Dimensionality: core.BlobType_MULTIPART,
@@ -75,7 +75,7 @@ func TestHandleBlobMultipart(t *testing.T) {
 		d := Downloader{store: s}
 
 		blob := &core.Blob{
-			Uri: "s3://container/folder",
+			Uri: "mem://container/folder",
 			Metadata: &core.BlobMetadata{
 				Type: &core.BlobType{
 					Dimensionality: core.BlobType_MULTIPART,
@@ -100,14 +100,14 @@ func TestHandleBlobMultipart(t *testing.T) {
 func TestHandleBlobSinglePart(t *testing.T) {
 	s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)
-	ref := storage.DataReference("s3://container/file")
+	ref := storage.DataReference("mem://container/file")
 	err = s.WriteRaw(context.Background(), ref, 0, storage.Options{}, bytes.NewReader([]byte{}))
 	assert.NoError(t, err)
 
 	d := Downloader{store: s}
 
 	blob := &core.Blob{
-		Uri: "s3://container/file",
+		Uri: "mem://container/file",
 		Metadata: &core.BlobMetadata{
 			Type: &core.BlobType{
 				Dimensionality: core.BlobType_SINGLE,
@@ -131,6 +131,95 @@ func TestHandleBlobSinglePart(t *testing.T) {
 	if _, err := os.Stat(toPath); os.IsNotExist(err) {
 		t.Errorf("expected file %s to exist", toPath)
 	}
+}
+
+func writeBlobLit(t *testing.T, s *storage.DataStore, name string) *core.Literal {
+	ref := storage.DataReference("mem://container/" + name)
+	assert.NoError(t, s.WriteRaw(context.Background(), ref, 0, storage.Options{}, bytes.NewReader([]byte("data"))))
+	return &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Blob{Blob: &core.Blob{
+		Uri:      string(ref),
+		Metadata: &core.BlobMetadata{Type: &core.BlobType{Dimensionality: core.BlobType_SINGLE}},
+	}}}}}
+}
+
+func collectionLit(lits ...*core.Literal) *core.Literal {
+	return &core.Literal{Value: &core.Literal_Collection{Collection: &core.LiteralCollection{Literals: lits}}}
+}
+
+func TestNamedDirLayoutPreservesExtensions(t *testing.T) {
+	s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+	d := Downloader{store: s, layout: core.DataLoadingConfig_NAMED_DIR}
+
+	dir := "./nd_input"
+	assert.NoError(t, os.MkdirAll(dir, os.ModePerm))
+	defer func() { _ = os.RemoveAll(dir) }()
+
+	inputs := &core.LiteralMap{Literals: map[string]*core.Literal{
+		// list[File]: each element keeps its ORIGINAL basename in the per-input dir.
+		"reads": collectionLit(writeBlobLit(t, s, "sample_R1.fastq.gz"), writeBlobLit(t, s, "sample_R2.fastq.gz")),
+		// single File: staged inside a per-input dir under its original basename.
+		"fasta": writeBlobLit(t, s, "genome.fasta"),
+	}}
+	_, _, err = d.RecursiveDownload(context.Background(), inputs, dir, true)
+	assert.NoError(t, err)
+
+	// Original names round-trip end-to-end (not 0.gz/1.gz).
+	for _, rel := range []string{"reads/sample_R1.fastq.gz", "reads/sample_R2.fastq.gz", "fasta/genome.fasta"} {
+		_, statErr := os.Stat(filepath.Join(dir, rel))
+		assert.False(t, os.IsNotExist(statErr), "expected staged file %s", rel)
+	}
+}
+
+func TestNamedDirLayoutDedupesCollidingBasenames(t *testing.T) {
+	s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+	d := Downloader{store: s, layout: core.DataLoadingConfig_NAMED_DIR}
+
+	dir := "./nd_collide"
+	assert.NoError(t, os.MkdirAll(dir, os.ModePerm))
+	defer func() { _ = os.RemoveAll(dir) }()
+
+	// Two list elements with identical basenames (distinct random prefixes in
+	// real URIs, same name here) must not clobber each other.
+	inputs := &core.LiteralMap{Literals: map[string]*core.Literal{
+		"reads": collectionLit(writeBlobLit(t, s, "a/reads.fastq.gz"), writeBlobLit(t, s, "b/reads.fastq.gz")),
+	}}
+	_, _, err = d.RecursiveDownload(context.Background(), inputs, dir, true)
+	assert.NoError(t, err)
+
+	// First keeps the name; the collision falls back to an index-prefixed name.
+	for _, rel := range []string{"reads/reads.fastq.gz", "reads/1_reads.fastq.gz"} {
+		_, statErr := os.Stat(filepath.Join(dir, rel))
+		assert.False(t, os.IsNotExist(statErr), "expected staged file %s", rel)
+	}
+}
+
+func TestDirectLayoutIsUnchanged(t *testing.T) {
+	s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+	d := Downloader{store: s} // layout defaults to DIRECT
+
+	dir := "./direct_input"
+	assert.NoError(t, os.MkdirAll(dir, os.ModePerm))
+	defer func() { _ = os.RemoveAll(dir) }()
+
+	inputs := &core.LiteralMap{Literals: map[string]*core.Literal{
+		"reads": collectionLit(writeBlobLit(t, s, "reads_1.fastq.gz"), writeBlobLit(t, s, "reads_2.fastq.gz")),
+		"fasta": writeBlobLit(t, s, "genome.fasta"),
+	}}
+	_, _, err = d.RecursiveDownload(context.Background(), inputs, dir, true)
+	assert.NoError(t, err)
+
+	// list[File] elements stay at <index> (no extension); single File stays
+	// directly at <var> (a file) — backwards-compatible.
+	for _, fn := range []string{"0", "1"} {
+		_, statErr := os.Stat(filepath.Join(dir, "reads", fn))
+		assert.False(t, os.IsNotExist(statErr), "expected staged list element %s", fn)
+	}
+	info, statErr := os.Stat(filepath.Join(dir, "fasta"))
+	assert.NoError(t, statErr)
+	assert.False(t, info.IsDir(), "single File should stage directly as a file under DIRECT")
 }
 
 func TestHandleBlobHTTP(t *testing.T) {
@@ -175,7 +264,7 @@ func TestRecursiveDownload(t *testing.T) {
 		offloadedLiteral := &core.Literal{
 			Value: &core.Literal_OffloadedMetadata{
 				OffloadedMetadata: &core.LiteralOffloadedMetadata{
-					Uri: "s3://container/offloaded",
+					Uri: "mem://container/offloaded",
 				},
 			},
 		}
@@ -187,7 +276,7 @@ func TestRecursiveDownload(t *testing.T) {
 		}
 
 		// Mock reading the offloaded metadata
-		err = s.WriteProtobuf(context.Background(), storage.DataReference("s3://container/offloaded"), storage.Options{}, &core.Literal{
+		err = s.WriteProtobuf(context.Background(), storage.DataReference("mem://container/offloaded"), storage.Options{}, &core.Literal{
 			Value: &core.Literal_Collection{
 				Collection: &core.LiteralCollection{
 					Literals: []*core.Literal{
@@ -253,7 +342,7 @@ func TestRecursiveDownload(t *testing.T) {
 		offloadedLiteral := &core.Literal{
 			Value: &core.Literal_OffloadedMetadata{
 				OffloadedMetadata: &core.LiteralOffloadedMetadata{
-					Uri: "s3://container/offloaded",
+					Uri: "mem://container/offloaded",
 				},
 			},
 		}
@@ -265,7 +354,7 @@ func TestRecursiveDownload(t *testing.T) {
 		}
 
 		// Mock reading the offloaded metadata
-		err = s.WriteProtobuf(context.Background(), storage.DataReference("s3://container/offloaded"), storage.Options{}, &core.Literal{
+		err = s.WriteProtobuf(context.Background(), storage.DataReference("mem://container/offloaded"), storage.Options{}, &core.Literal{
 			Value: &core.Literal_Map{
 				Map: &core.LiteralMap{
 					Literals: map[string]*core.Literal{

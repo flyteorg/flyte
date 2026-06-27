@@ -131,7 +131,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 }
 
 func TestDownloadCommandArgs(t *testing.T) {
-	_, err := DownloadCommandArgs("", "", "", core.DataLoadingConfig_YAML, nil)
+	_, err := DownloadCommandArgs("", "", "", core.DataLoadingConfig_YAML, core.DataLoadingConfig_DIRECT, nil)
 	assert.Error(t, err)
 
 	iFace := &core.VariableMap{
@@ -140,9 +140,9 @@ func TestDownloadCommandArgs(t *testing.T) {
 			{Key: "y", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
 		},
 	}
-	d, err := DownloadCommandArgs("s3://from", "s3://output-meta", "/to", core.DataLoadingConfig_JSON, iFace)
+	d, err := DownloadCommandArgs("s3://from", "s3://output-meta", "/to", core.DataLoadingConfig_JSON, core.DataLoadingConfig_NAMED_DIR, iFace)
 	assert.NoError(t, err)
-	expected := []string{"download", "--from-remote", "s3://from", "--to-output-prefix", "s3://output-meta", "--to-local-dir", "/to", "--format", "JSON", "--input-interface", "<interface>"}
+	expected := []string{"download", "--from-remote", "s3://from", "--to-output-prefix", "s3://output-meta", "--to-local-dir", "/to", "--format", "JSON", "--file-input-layout", "NAMED_DIR", "--input-interface", "<interface>"}
 	if assert.Len(t, d, len(expected)) {
 		for i := 0; i < len(expected)-1; i++ {
 			assert.Equal(t, expected[i], d[i])
@@ -525,6 +525,48 @@ func TestAddCoPilotToPod(t *testing.T) {
 		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot))
 		assert.Equal(t, pod.InitContainers[0].Name, cfg.NamePrefix+flyteSidecarContainerName)
 		assert.Equal(t, pod.InitContainers[1].Name, cfg.NamePrefix+flyteDownloaderContainerName)
+		assertPodHasCoPilot(t, cfg, pilot, iface, &pod)
+	})
+
+	t.Run("nil-task-id", func(t *testing.T) {
+		pod := v1.PodSpec{}
+		iface := &core.TypedInterface{
+			Inputs: &core.VariableMap{
+				Variables: []*core.VariableEntry{
+					{Key: "x", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
+				},
+			},
+			Outputs: &core.VariableMap{
+				Variables: []*core.VariableEntry{
+					{Key: "o", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
+				},
+			},
+		}
+		pilot := &core.DataLoadingConfig{
+			Enabled:    true,
+			InputPath:  "in",
+			OutputPath: "out",
+		}
+		tID := &pluginsCoreMock.TaskExecutionID{}
+		tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{})
+		metadata := &pluginsCoreMock.TaskExecutionMetadata{}
+		metadata.EXPECT().GetTaskExecutionID().Return(tID)
+		overrides := &pluginsCoreMock.TaskOverrides{}
+		overrides.EXPECT().GetResources().Return(resourceRequirements)
+		metadata.EXPECT().GetOverrides().Return(overrides)
+
+		inputPaths := &pluginsIOMock.InputFilePaths{}
+		inputPaths.EXPECT().GetInputPath().Return(storage.DataReference("/base/inputs/inputs.pb"))
+
+		outputPaths := &pluginsIOMock.OutputFilePaths{}
+		outputPaths.EXPECT().GetOutputPrefixPath().Return(storage.DataReference("/output"))
+		outputPaths.EXPECT().GetRawOutputPrefix().Return(storage.DataReference("/raw"))
+
+		var err error
+		assert.NotPanics(t, func() {
+			err = AddCoPilotToPod(ctx, cfg, &pod, iface, metadata, inputPaths, outputPaths, pilot)
+		})
+		assert.NoError(t, err)
 		assertPodHasCoPilot(t, cfg, pilot, iface, &pod)
 	})
 

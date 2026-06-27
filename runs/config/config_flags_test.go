@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mitchellh/mapstructure"
+	"github.com/go-viper/mapstructure/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -354,11 +354,235 @@ func TestConfig_SetFlags(t *testing.T) {
 	t.Run("Test_seedProjects", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := []string{"flytesnacks", "demo"}
+			testValue := join_Config(defaultConfig.SeedProjects, ",")
 
-			cmdFlags.Set("seedProjects", join_Config(testValue, ","))
+			cmdFlags.Set("seedProjects", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("seedProjects"); err == nil {
-				testDecodeRaw_Config(t, vStringSlice, &actual.SeedProjects)
+				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.SeedProjects)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_triggerScheduler.enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("triggerScheduler.enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("triggerScheduler.enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.TriggerScheduler.Enabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_triggerScheduler.maxCatchupRunsPerLoop", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("triggerScheduler.maxCatchupRunsPerLoop", testValue)
+			if vInt, err := cmdFlags.GetInt("triggerScheduler.maxCatchupRunsPerLoop"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.TriggerScheduler.MaxCatchupRunsPerLoop)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_triggerScheduler.executionBurst", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("triggerScheduler.executionBurst", testValue)
+			if vInt, err := cmdFlags.GetInt("triggerScheduler.executionBurst"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.TriggerScheduler.ExecutionBurst)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_authMetadata.externalAuthServerBaseUrl", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("authMetadata.externalAuthServerBaseUrl", testValue)
+			if vString, err := cmdFlags.GetString("authMetadata.externalAuthServerBaseUrl"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AuthMetadata.ExternalAuthServerBaseURL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_authMetadata.externalMetadataUrl", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("authMetadata.externalMetadataUrl", testValue)
+			if vString, err := cmdFlags.GetString("authMetadata.externalMetadataUrl"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AuthMetadata.ExternalMetadataURL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_authMetadata.retryAttempts", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("authMetadata.retryAttempts", testValue)
+			if vInt, err := cmdFlags.GetInt("authMetadata.retryAttempts"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.AuthMetadata.RetryAttempts)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_authMetadata.retryDelay", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.AuthMetadata.RetryDelay.String()
+
+			cmdFlags.Set("authMetadata.retryDelay", testValue)
+			if vString, err := cmdFlags.GetString("authMetadata.retryDelay"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AuthMetadata.RetryDelay)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_authMetadata.authorizationMetadataKey", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("authMetadata.authorizationMetadataKey", testValue)
+			if vString, err := cmdFlags.GetString("authMetadata.authorizationMetadataKey"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AuthMetadata.AuthorizationMetadataKey)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_authMetadata.flyteClient.clientId", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("authMetadata.flyteClient.clientId", testValue)
+			if vString, err := cmdFlags.GetString("authMetadata.flyteClient.clientId"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AuthMetadata.FlyteClient.ClientID)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_authMetadata.flyteClient.redirectUri", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("authMetadata.flyteClient.redirectUri", testValue)
+			if vString, err := cmdFlags.GetString("authMetadata.flyteClient.redirectUri"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AuthMetadata.FlyteClient.RedirectURI)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_authMetadata.flyteClient.scopes", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := join_Config(defaultConfig.AuthMetadata.FlyteClient.Scopes, ",")
+
+			cmdFlags.Set("authMetadata.flyteClient.scopes", testValue)
+			if vStringSlice, err := cmdFlags.GetStringSlice("authMetadata.flyteClient.scopes"); err == nil {
+				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.AuthMetadata.FlyteClient.Scopes)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_authMetadata.flyteClient.audience", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("authMetadata.flyteClient.audience", testValue)
+			if vString, err := cmdFlags.GetString("authMetadata.flyteClient.audience"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AuthMetadata.FlyteClient.Audience)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_trustForwardedIdentityHeaders", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("trustForwardedIdentityHeaders", testValue)
+			if vBool, err := cmdFlags.GetBool("trustForwardedIdentityHeaders"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.TrustForwardedIdentityHeaders)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_identityHeaders.claimsJwtHeader", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("identityHeaders.claimsJwtHeader", testValue)
+			if vString, err := cmdFlags.GetString("identityHeaders.claimsJwtHeader"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.IdentityHeaders.ClaimsJWTHeader)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_identityHeaders.subjectHeader", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("identityHeaders.subjectHeader", testValue)
+			if vString, err := cmdFlags.GetString("identityHeaders.subjectHeader"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.IdentityHeaders.SubjectHeader)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_identityHeaders.emailHeader", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("identityHeaders.emailHeader", testValue)
+			if vString, err := cmdFlags.GetString("identityHeaders.emailHeader"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.IdentityHeaders.EmailHeader)
 
 			} else {
 				assert.FailNow(t, err.Error())

@@ -85,7 +85,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	rayJob := plugins.RayJob{}
-	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &rayJob)
+	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &rayJob) //nolint: staticcheck
 	if err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 	}
@@ -137,22 +137,85 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 
 	podSpec.ServiceAccountName = cfg.ServiceAccount
 
-	rayjob, err := constructRayJob(taskCtx, &rayJob, objectMeta, *podSpec, headNodeRayStartParams, primaryContainerIdx, *primaryContainer)
+	rayjob, err := constructRayJob(ctx, taskCtx, &rayJob, objectMeta, *podSpec, headNodeRayStartParams, primaryContainerIdx, *primaryContainer)
 
 	return rayjob, err
 }
 
-func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.RayJob, objectMeta *metav1.ObjectMeta, taskPodSpec v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
+// buildGroupPodSpec builds the pod spec for a single Ray group (head or worker),
+// applying that group's extended_resources (if any) on top of the task-level and
+// execution-level extended resources. To avoid applying extended resources twice
+// (which can produce conflicting node-affinity requirements or duplicate shared-memory
+// volumes), the group's extended resources are layered into the task overrides and the
+// pod spec is rebuilt once via ToK8sPodSpec, which performs the effective merge. When a
+// group does not set extended_resources, the already-built base pod spec is reused.
+//
+// The group's effective GPU accelerator is also returned so the pod template builders
+// can re-apply the accelerator node selectors and tolerations after merging the group's
+// custom k8s_pod: ToK8sPodSpec runs before that merge, and skips them when the GPU
+// resource only arrives with the custom pod spec.
+func buildGroupPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, basePodSpec *v1.PodSpec, baseObjectMeta *metav1.ObjectMeta, basePrimaryContainerIdx int, groupExtendedResources *core.ExtendedResources) (*v1.PodSpec, *metav1.ObjectMeta, int, *core.GPUAccelerator, error) {
+	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return nil, nil, 0, nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to read task template: [%v]", err.Error())
+	} else if taskTemplate == nil {
+		return nil, nil, 0, nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nil task specification")
+	}
+	// Group-level extended resources override the execution-level overrides, which in
+	// turn override the task-level defaults. ToK8sPodSpec performs the same merge
+	// internally; this computes the result so the effective accelerator can be returned.
+	effectiveOverrides := flytek8s.ApplyExtendedResourcesOverrides(
+		taskCtx.TaskExecutionMetadata().GetOverrides().GetExtendedResources(),
+		groupExtendedResources,
+	)
+	effectiveExtendedResources := flytek8s.ApplyExtendedResourcesOverrides(
+		taskTemplate.GetExtendedResources(),
+		effectiveOverrides,
+	)
+	gpuAccelerator := effectiveExtendedResources.GetGpuAccelerator()
+
+	if groupExtendedResources == nil {
+		return basePodSpec.DeepCopy(), baseObjectMeta, basePrimaryContainerIdx, gpuAccelerator, nil
+	}
+
+	groupTaskCtx := flytek8s.NewPluginTaskExecutionContext(taskCtx, flytek8s.WithExtendedResources(effectiveOverrides))
+
+	podSpec, objectMeta, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, groupTaskCtx)
+	if err != nil {
+		return nil, nil, 0, nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
+	}
+
+	primaryContainerIdx := -1
+	for idx, c := range podSpec.Containers {
+		if c.Name == primaryContainerName {
+			primaryContainerIdx = idx
+			break
+		}
+	}
+	if primaryContainerIdx < 0 {
+		return nil, nil, 0, nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to get primary container from the pod")
+	}
+
+	podSpec.ServiceAccountName = GetConfig().ServiceAccount
+	return podSpec, objectMeta, primaryContainerIdx, gpuAccelerator, nil
+}
+
+func constructRayJob(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.RayJob, objectMeta *metav1.ObjectMeta, taskPodSpec v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
 	enableIngress := true
 	cfg := GetConfig()
 
-	headPodSpec := taskPodSpec.DeepCopy()
+	headPodSpec, headObjectMeta, headPrimaryContainerIdx, headGPUAccelerator, err := buildGroupPodSpec(
+		ctx, taskCtx, &taskPodSpec, objectMeta, primaryContainerIdx, rayJob.RayCluster.HeadGroupSpec.GetExtendedResources())
+	if err != nil {
+		return nil, err
+	}
 	headPodTemplate, err := buildHeadPodTemplate(
-		&headPodSpec.Containers[primaryContainerIdx],
+		&headPodSpec.Containers[headPrimaryContainerIdx],
 		headPodSpec,
-		objectMeta,
+		headObjectMeta,
 		taskCtx,
 		rayJob.RayCluster.HeadGroupSpec,
+		headGPUAccelerator,
 	)
 	if err != nil {
 		return nil, err
@@ -170,13 +233,18 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 	}
 
 	for _, spec := range rayJob.RayCluster.WorkerGroupSpec {
-		workerPodSpec := taskPodSpec.DeepCopy()
+		workerPodSpec, workerObjectMeta, workerPrimaryContainerIdx, workerGPUAccelerator, err := buildGroupPodSpec(
+			ctx, taskCtx, &taskPodSpec, objectMeta, primaryContainerIdx, spec.GetExtendedResources())
+		if err != nil {
+			return nil, err
+		}
 		workerPodTemplate, err := buildWorkerPodTemplate(
-			&workerPodSpec.Containers[primaryContainerIdx],
+			&workerPodSpec.Containers[workerPrimaryContainerIdx],
 			workerPodSpec,
-			objectMeta,
+			workerObjectMeta,
 			taskCtx,
 			spec,
+			workerGPUAccelerator,
 		)
 		if err != nil {
 			return nil, err
@@ -241,8 +309,8 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 	var runtimeEnvYaml string
 	runtimeEnvYaml = rayJob.RuntimeEnvYaml
 	// If runtime_env exists but runtime_env_yaml does not, convert runtime_env to runtime_env_yaml
-	if rayJob.RuntimeEnv != "" && rayJob.RuntimeEnvYaml == "" {
-		runtimeEnvYaml, err = convertBase64RuntimeEnvToYaml(rayJob.RuntimeEnv)
+	if rayJob.RuntimeEnv != "" && rayJob.RuntimeEnvYaml == "" { //nolint: staticcheck
+		runtimeEnvYaml, err = convertBase64RuntimeEnvToYaml(rayJob.RuntimeEnv) //nolint: staticcheck
 		if err != nil {
 			return nil, err
 		}
@@ -347,7 +415,7 @@ func injectLogsSidecar(primaryContainer *v1.Container, podSpec *v1.PodSpec) {
 	podSpec.Containers = append(podSpec.Containers, *sidecar)
 }
 
-func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.HeadGroupSpec) (v1.PodTemplateSpec, error) {
+func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.HeadGroupSpec, gpuAccelerator *core.GPUAccelerator) (v1.PodTemplateSpec, error) {
 	// Some configs are copy from  https://github.com/ray-project/kuberay/blob/b72e6bdcd9b8c77a9dc6b5da8560910f3a0c3ffd/apiserver/pkg/util/cluster.go#L97
 	// They should always be the same, so we could hard code here.
 	primaryContainer.Name = RayHeadContainerName
@@ -392,7 +460,20 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 		return v1.PodTemplateSpec{}, err
 	}
 
+	// Re-apply the accelerator node selectors and tolerations now that the group's
+	// custom pod spec is merged: when the GPU resource is requested only via the
+	// group's k8s_pod (not the task container), ToK8sPodSpec ran before the merge
+	// and skipped them. ApplyGPUNodeSelectors is idempotent, so this is a no-op
+	// when they were already applied.
+	flytek8s.ApplyGPUNodeSelectors(basePodSpec, gpuAccelerator)
+
 	basePodSpec = flytek8s.AddTolerationsForExtendedResources(basePodSpec)
+
+	// Re-apply interruptible scheduling now that the group's custom pod spec is
+	// merged: a custom k8s_pod may have appended its own node selector terms (OR'd
+	// by Kubernetes), so the (Non)InterruptibleNodeSelectorRequirement must be added
+	// to every term to keep a non-interruptible pod off spot nodes. Idempotent.
+	flytek8s.ApplyPlatformSchedulingConstraints(taskCtx.TaskExecutionMetadata().IsInterruptible(), basePodSpec)
 
 	podTemplateSpec := v1.PodTemplateSpec{
 		Spec:       *basePodSpec,
@@ -434,7 +515,7 @@ func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec) v1.PodTempl
 	}
 }
 
-func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMetadata *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.WorkerGroupSpec) (v1.PodTemplateSpec, error) {
+func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMetadata *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.WorkerGroupSpec, gpuAccelerator *core.GPUAccelerator) (v1.PodTemplateSpec, error) {
 	// Some configs are copy from  https://github.com/ray-project/kuberay/blob/b72e6bdcd9b8c77a9dc6b5da8560910f3a0c3ffd/apiserver/pkg/util/cluster.go#L185
 	// They should always be the same, so we could hard code here.
 
@@ -538,7 +619,20 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 		return v1.PodTemplateSpec{}, err
 	}
 
+	// Re-apply the accelerator node selectors and tolerations now that the group's
+	// custom pod spec is merged: when the GPU resource is requested only via the
+	// group's k8s_pod (not the task container), ToK8sPodSpec ran before the merge
+	// and skipped them. ApplyGPUNodeSelectors is idempotent, so this is a no-op
+	// when they were already applied.
+	flytek8s.ApplyGPUNodeSelectors(basePodSpec, gpuAccelerator)
+
 	basePodSpec = flytek8s.AddTolerationsForExtendedResources(basePodSpec)
+
+	// Re-apply interruptible scheduling now that the group's custom pod spec is
+	// merged: a custom k8s_pod may have appended its own node selector terms (OR'd
+	// by Kubernetes), so the (Non)InterruptibleNodeSelectorRequirement must be added
+	// to every term to keep a non-interruptible pod off spot nodes. Idempotent.
+	flytek8s.ApplyPlatformSchedulingConstraints(taskCtx.TaskExecutionMetadata().IsInterruptible(), basePodSpec)
 
 	podTemplateSpec := v1.PodTemplateSpec{
 		Spec:       *basePodSpec,
@@ -562,7 +656,7 @@ func mergeCustomPodSpec(podSpec *v1.PodSpec, k8sPod *core.K8SPod) (*v1.PodSpec, 
 
 	var customPodSpec *v1.PodSpec
 
-	err := utils.UnmarshalStructToObj(k8sPod.PodSpec, &customPodSpec)
+	err := utils.UnmarshalStructToObj(k8sPod.PodSpec, &customPodSpec) //nolint: staticcheck
 	if err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification,
 			"Unable to unmarshal pod spec [%v], Err: [%v]", k8sPod.PodSpec, err.Error())
@@ -806,6 +900,8 @@ func init() {
 	if err := rayv1.AddToScheme(scheme.Scheme); err != nil {
 		panic(err)
 	}
+
+	pluginmachinery.PluginRegistry().RegisterScheme(rayTaskType, rayv1.AddToScheme)
 
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{

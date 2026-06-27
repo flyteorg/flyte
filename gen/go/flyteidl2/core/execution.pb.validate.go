@@ -398,6 +398,8 @@ func (m *ExecutionError) validate(all bool) error {
 
 	// no validation rules for Worker
 
+	// no validation rules for Recoverability
+
 	if len(errors) > 0 {
 		return ExecutionErrorMultiError(errors)
 	}
@@ -475,6 +477,243 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ExecutionErrorValidationError{}
+
+// Validate checks the field values on ContainerError with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ContainerError) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ContainerError with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ContainerErrorMultiError,
+// or nil if none found.
+func (m *ContainerError) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ContainerError) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Code
+
+	// no validation rules for Message
+
+	// no validation rules for Kind
+
+	// no validation rules for Origin
+
+	if len(errors) > 0 {
+		return ContainerErrorMultiError(errors)
+	}
+
+	return nil
+}
+
+// ContainerErrorMultiError is an error wrapping multiple validation errors
+// returned by ContainerError.ValidateAll() if the designated constraints
+// aren't met.
+type ContainerErrorMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ContainerErrorMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ContainerErrorMultiError) AllErrors() []error { return m }
+
+// ContainerErrorValidationError is the validation error returned by
+// ContainerError.Validate if the designated constraints aren't met.
+type ContainerErrorValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ContainerErrorValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ContainerErrorValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ContainerErrorValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ContainerErrorValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ContainerErrorValidationError) ErrorName() string { return "ContainerErrorValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ContainerErrorValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sContainerError.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ContainerErrorValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ContainerErrorValidationError{}
+
+// Validate checks the field values on ErrorDocument with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ErrorDocument) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ErrorDocument with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ErrorDocumentMultiError, or
+// nil if none found.
+func (m *ErrorDocument) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ErrorDocument) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetError()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ErrorDocumentValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ErrorDocumentValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ErrorDocumentValidationError{
+				field:  "Error",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ErrorDocumentMultiError(errors)
+	}
+
+	return nil
+}
+
+// ErrorDocumentMultiError is an error wrapping multiple validation errors
+// returned by ErrorDocument.ValidateAll() if the designated constraints
+// aren't met.
+type ErrorDocumentMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ErrorDocumentMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ErrorDocumentMultiError) AllErrors() []error { return m }
+
+// ErrorDocumentValidationError is the validation error returned by
+// ErrorDocument.Validate if the designated constraints aren't met.
+type ErrorDocumentValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ErrorDocumentValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ErrorDocumentValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ErrorDocumentValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ErrorDocumentValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ErrorDocumentValidationError) ErrorName() string { return "ErrorDocumentValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ErrorDocumentValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sErrorDocument.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ErrorDocumentValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ErrorDocumentValidationError{}
 
 // Validate checks the field values on TaskLog with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
@@ -677,6 +916,37 @@ func (m *LogContext) validate(all bool) error {
 
 	// no validation rules for PrimaryPodName
 
+	if all {
+		switch v := interface{}(m.GetConnector()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LogContextValidationError{
+					field:  "Connector",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LogContextValidationError{
+					field:  "Connector",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetConnector()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LogContextValidationError{
+				field:  "Connector",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for PodNamePrefix
+
 	if len(errors) > 0 {
 		return LogContextMultiError(errors)
 	}
@@ -753,6 +1023,110 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LogContextValidationError{}
+
+// Validate checks the field values on ConnectorLogContext with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ConnectorLogContext) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ConnectorLogContext with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ConnectorLogContextMultiError, or nil if none found.
+func (m *ConnectorLogContext) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ConnectorLogContext) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Endpoint
+
+	if len(errors) > 0 {
+		return ConnectorLogContextMultiError(errors)
+	}
+
+	return nil
+}
+
+// ConnectorLogContextMultiError is an error wrapping multiple validation
+// errors returned by ConnectorLogContext.ValidateAll() if the designated
+// constraints aren't met.
+type ConnectorLogContextMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ConnectorLogContextMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ConnectorLogContextMultiError) AllErrors() []error { return m }
+
+// ConnectorLogContextValidationError is the validation error returned by
+// ConnectorLogContext.Validate if the designated constraints aren't met.
+type ConnectorLogContextValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ConnectorLogContextValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ConnectorLogContextValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ConnectorLogContextValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ConnectorLogContextValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ConnectorLogContextValidationError) ErrorName() string {
+	return "ConnectorLogContextValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ConnectorLogContextValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sConnectorLogContext.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ConnectorLogContextValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ConnectorLogContextValidationError{}
 
 // Validate checks the field values on PodLogContext with the rules defined in
 // the proto definition for this message. If any rules are violated, the first

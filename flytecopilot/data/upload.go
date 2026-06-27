@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 	"reflect"
+	"strings"
 
-	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/proto" //nolint: staticcheck
 	"github.com/pkg/errors"
 
 	"github.com/flyteorg/flyte/v2/flyteidl2/clients/go/coreutils"
@@ -49,7 +49,7 @@ func (u Uploader) handleSimpleType(_ context.Context, t core.SimpleType, filePat
 	if info.Size() > maxPrimitiveSize {
 		return nil, fmt.Errorf("maximum allowed filesize is [%d], but found [%d]", maxPrimitiveSize, info.Size())
 	}
-	b, err := ioutil.ReadFile(fpath)
+	b, err := os.ReadFile(fpath)
 	if err != nil {
 		return nil, err
 	}
@@ -69,18 +69,22 @@ func (u Uploader) handleBlobType(ctx context.Context, localPath string, toPath s
 				return err
 			}
 			if info.IsDir() {
-				logger.Warnf(ctx, "Currently nested directories are not supported in multipart blob uploads, for directory @ %s", path)
-			} else {
-				ref, err := u.store.ConstructReference(ctx, toPath, info.Name())
-				if err != nil {
-					return err
-				}
-				files = append(files, dirFile{
-					path: path,
-					info: info,
-					ref:  ref,
-				})
+				return nil
 			}
+			rel, err := filepath.Rel(localPath, path)
+			if err != nil {
+				return err
+			}
+			keys := strings.Split(filepath.ToSlash(rel), "/")
+			ref, err := u.store.ConstructReference(ctx, toPath, keys...)
+			if err != nil {
+				return err
+			}
+			files = append(files, dirFile{
+				path: path,
+				info: info,
+				ref:  ref,
+			})
 			return nil
 		})
 		if err != nil {
@@ -128,7 +132,7 @@ func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, f
 	} else if info.IsDir() {
 		return fmt.Errorf("error file is a directory")
 	} else {
-		b, err := ioutil.ReadFile(errFile)
+		b, err := os.ReadFile(errFile)
 		if err != nil {
 			return err
 		}

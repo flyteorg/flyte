@@ -41,7 +41,7 @@ type ResourceCache struct {
 
 // A wrapper for each item in the cache.
 type CacheItem struct {
-	State
+	webapi.State
 	Resource webapi.Resource
 }
 
@@ -51,7 +51,7 @@ func (c CacheItem) IsTerminal() bool {
 			return resource.IsTerminal()
 		}
 	}
-	return c.State.Phase.IsTerminal()
+	return c.Phase.IsTerminal()
 }
 
 // This basically grab an updated status from Client and store it in the cache
@@ -97,7 +97,7 @@ func (q *ResourceCache) SyncResource(ctx context.Context, batch autorefreshcache
 		if cacheItem.SyncFailureCount > q.cfg.MaxSystemFailures {
 			logger.Debugf(ctx, "Sync loop - Item with key [%v] has failed to sync [%v] time(s). More than the allowed [%v] time(s). Marking as failure.",
 				cacheItem.SyncFailureCount, q.cfg.MaxSystemFailures)
-			cacheItem.State.Phase = PhaseSystemFailure
+			cacheItem.Phase = webapi.PhaseSystemFailure
 			resp = append(resp, autorefreshcache.ItemSyncResponse{
 				ID:     resource.GetID(),
 				Item:   cacheItem,
@@ -138,13 +138,13 @@ func (q *ResourceCache) SyncResource(ctx context.Context, batch autorefreshcache
 }
 
 // ToPluginPhase translates the more granular task phase into the webapi plugin phase.
-func ToPluginPhase(s core.Phase) (Phase, error) {
+func ToPluginPhase(s core.Phase) (webapi.Phase, error) {
 	switch s {
 
 	case core.PhaseUndefined:
 		fallthrough
 	case core.PhaseNotReady:
-		return PhaseNotStarted, nil
+		return webapi.PhaseNotStarted, nil
 	case core.PhaseInitializing:
 		fallthrough
 	case core.PhaseWaitingForResources:
@@ -152,15 +152,15 @@ func ToPluginPhase(s core.Phase) (Phase, error) {
 	case core.PhaseQueued:
 		fallthrough
 	case core.PhaseRunning:
-		return PhaseResourcesCreated, nil
+		return webapi.PhaseResourcesCreated, nil
 	case core.PhaseSuccess:
-		return PhaseSucceeded, nil
+		return webapi.PhaseSucceeded, nil
 	case core.PhasePermanentFailure:
 		fallthrough
 	case core.PhaseRetryableFailure:
-		return PhaseUserFailure, nil
+		return webapi.PhaseUserFailure, nil
 	default:
-		return PhaseSystemFailure, errors.Errorf(BadReturnCodeError, "default fallthrough case")
+		return webapi.PhaseSystemFailure, errors.Errorf(BadReturnCodeError, "default fallthrough case")
 	}
 }
 
@@ -174,9 +174,9 @@ func NewResourceCache(ctx context.Context, name string, client Client, cfg webap
 	}
 
 	autoRefreshCache, err := autorefreshcache.NewAutoRefreshCache(name, q.SyncResource,
-		workqueue.NewMaxOfRateLimiter(
-			workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
-			&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(rateCfg.QPS), rateCfg.Burst)},
+		workqueue.NewTypedMaxOfRateLimiter[*autorefreshcache.Batch](
+			workqueue.NewTypedItemExponentialFailureRateLimiter[*autorefreshcache.Batch](5*time.Millisecond, 1000*time.Second),
+			&workqueue.TypedBucketRateLimiter[*autorefreshcache.Batch]{Limiter: rate.NewLimiter(rate.Limit(rateCfg.QPS), rateCfg.Burst)},
 		), cfg.ResyncInterval.Duration, cfg.Workers, cfg.Size,
 		scope.NewSubScope("cache"))
 

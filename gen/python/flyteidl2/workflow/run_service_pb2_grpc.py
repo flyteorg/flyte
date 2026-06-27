@@ -80,6 +80,11 @@ class RunServiceStub(object):
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionResponse.FromString,
                 )
+        self.SignalEvent = channel.unary_unary(
+                '/flyteidl2.workflow.RunService/SignalEvent',
+                request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventResponse.FromString,
+                )
         self.WatchGroups = channel.unary_stream(
                 '/flyteidl2.workflow.RunService/WatchGroups',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest.SerializeToString,
@@ -194,6 +199,16 @@ class RunServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SignalEvent(self, request, context):
+        """SignalEvent resolves a paused condition action by supplying its value.
+        It converts the user-facing EventPayload to a core.Literal and delegates
+        to ActionsService.Signal, resolving the condition's parent action for
+        routing.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def WatchGroups(self, request, context):
         """Stream updates for task groups based on the provided filter criteria.
         """
@@ -282,6 +297,11 @@ def add_RunServiceServicer_to_server(servicer, server):
                     servicer.AbortAction,
                     request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionResponse.SerializeToString,
+            ),
+            'SignalEvent': grpc.unary_unary_rpc_method_handler(
+                    servicer.SignalEvent,
+                    request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventResponse.SerializeToString,
             ),
             'WatchGroups': grpc.unary_stream_rpc_method_handler(
                     servicer.WatchGroups,
@@ -527,6 +547,23 @@ class RunService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/AbortAction',
             flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SignalEvent(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.RunService/SignalEvent',
+            flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

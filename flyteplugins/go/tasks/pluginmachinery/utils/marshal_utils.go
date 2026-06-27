@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/jsonpb" //nolint: staticcheck
+	"github.com/golang/protobuf/proto"  //nolint: staticcheck
 	structpb "github.com/golang/protobuf/ptypes/struct"
 )
 

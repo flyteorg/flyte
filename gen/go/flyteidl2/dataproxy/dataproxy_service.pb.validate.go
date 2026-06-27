@@ -372,6 +372,8 @@ func (m *UploadInputsRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for BaseDir
+
 	switch v := m.Id.(type) {
 	case *UploadInputsRequest_RunId:
 		if v == nil {
@@ -1529,6 +1531,10 @@ func (m *GetActionDataResponse) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for InputsUri
+
+	// no validation rules for OutputsUri
+
 	if len(errors) > 0 {
 		return GetActionDataResponseMultiError(errors)
 	}
@@ -1662,7 +1668,50 @@ func (m *TailLogsRequest) validate(all bool) error {
 
 	// no validation rules for Attempt
 
-	// no validation rules for PodName
+	switch v := m.PodSelector.(type) {
+	case *TailLogsRequest_PrimaryPod:
+		if v == nil {
+			err := TailLogsRequestValidationError{
+				field:  "PodSelector",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for PrimaryPod
+	case *TailLogsRequest_AllPods:
+		if v == nil {
+			err := TailLogsRequestValidationError{
+				field:  "PodSelector",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for AllPods
+	case *TailLogsRequest_PodName:
+		if v == nil {
+			err := TailLogsRequestValidationError{
+				field:  "PodSelector",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for PodName
+	default:
+		_ = v // ensures v is used
+	}
+
+	if m.ConnectorEndpoint != nil {
+		// no validation rules for ConnectorEndpoint
+	}
 
 	if len(errors) > 0 {
 		return TailLogsRequestMultiError(errors)
@@ -1930,6 +1979,35 @@ func (m *TailLogsResponse_Logs) validate(all bool) error {
 			}
 		}
 
+	}
+
+	if all {
+		switch v := interface{}(m.GetContainer()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TailLogsResponse_LogsValidationError{
+					field:  "Container",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TailLogsResponse_LogsValidationError{
+					field:  "Container",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetContainer()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TailLogsResponse_LogsValidationError{
+				field:  "Container",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	if len(errors) > 0 {

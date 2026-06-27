@@ -1,14 +1,5 @@
-# Unified Flyte Manager Configuration
-
-manager:
-  # Single server port for all Connect services (Runs, State, Queue, DataProxy)
-  server:
-    host: "0.0.0.0"
-    port: 8090
-
-  executor:
-    healthProbePort: 8081
-
+# Kubernetes config for the shared client used by all services.
+actions:
   kubernetes:
     namespace: "flyte"
     kubeconfig: "~/.kube/config"
@@ -24,7 +15,7 @@ internalApps:
   defaultRequestTimeout: 300s
   maxRequestTimeout: 3600s
   defaultEnvVars:
-    - FLYTE_AWS_ENDPOINT: "http://rustfs.flyte.svc.cluster.local:9000"
+    - FLYTE_AWS_ENDPOINT: "http://rustfs-svc.flyte.svc.cluster.local:9000"
     - FLYTE_AWS_ACCESS_KEY_ID: "rustfs"
     - FLYTE_AWS_SECRET_ACCESS_KEY: "rustfsstorage"
     - _U_EP_OVERRIDE: "host.docker.internal:8090"
@@ -48,7 +39,7 @@ webhook:
   embeddedSecretManagerConfig:
     type: K8s
     k8sConfig:
-      # Must match manager.kubernetes.namespace above — the namespace where
+      # Must match actions.kubernetes.namespace above — the namespace where
       # SecretService writes secrets.
       namespace: flyte
 
@@ -60,6 +51,10 @@ executor:
 
 # Runs service configuration
 runs:
+  # Single server port for all Connect services (Runs, Action, DataProxy)
+  server:
+    host: "0.0.0.0"
+    port: 8090
   storagePrefix: "s3://flyte-data"
   database:
     postgres:
@@ -91,7 +86,7 @@ dataproxy:
 plugins:
   k8s:
     default-env-vars:
-      - FLYTE_AWS_ENDPOINT: "http://rustfs.flyte.svc.cluster.local:9000"
+      - FLYTE_AWS_ENDPOINT: "http://rustfs-svc.flyte.svc.cluster.local:9000"
       - FLYTE_AWS_ACCESS_KEY_ID: "rustfs"
       - FLYTE_AWS_SECRET_ACCESS_KEY: "rustfsstorage"
       - _U_EP_OVERRIDE: "host.docker.internal:8090"

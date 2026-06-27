@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"connectrpc.com/connect"
+	"connectrpc.com/otelconnect"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -16,10 +17,16 @@ import (
 )
 
 func main() {
+	otelInterceptor, err := otelconnect.NewInterceptor()
+	if err != nil {
+		log.Fatalf("Failed to create otel interceptor: %v", err)
+	}
+
 	// Create a client
 	client := workflowconnect.NewRunServiceClient(
 		http.DefaultClient,
 		"http://localhost:8090",
+		connect.WithInterceptors(otelInterceptor),
 	)
 
 	ctx := context.Background()

@@ -4,6 +4,8 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
+import type { ActionIdentifier, TriggerIdentifier } from "../common/identifier_pb.ts";
+import { file_flyteidl2_common_identifier } from "../common/identifier_pb.ts";
 import type { VariableMap } from "../core/interface_pb.ts";
 import { file_flyteidl2_core_interface } from "../core/interface_pb.ts";
 import type { NamedLiteral } from "../task/common_pb.ts";
@@ -17,14 +19,14 @@ import type { JsonObject, Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/workflow/translator_service.proto.
  */
 export const file_flyteidl2_workflow_translator_service: GenFile = /*@__PURE__*/
-  fileDesc("CitmbHl0ZWlkbDIvd29ya2Zsb3cvdHJhbnNsYXRvcl9zZXJ2aWNlLnByb3RvEhJmbHl0ZWlkbDIud29ya2Zsb3cigQEKH0xpdGVyYWxzVG9MYXVuY2hGb3JtSnNvblJlcXVlc3QSLgoIbGl0ZXJhbHMYASADKAsyHC5mbHl0ZWlkbDIudGFzay5OYW1lZExpdGVyYWwSLgoJdmFyaWFibGVzGAIgASgLMhsuZmx5dGVpZGwyLmNvcmUuVmFyaWFibGVNYXAiSQogTGl0ZXJhbHNUb0xhdW5jaEZvcm1Kc29uUmVzcG9uc2USJQoEanNvbhgBIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3QiSAofTGF1bmNoRm9ybUpzb25Ub0xpdGVyYWxzUmVxdWVzdBIlCgRqc29uGAEgASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdCJSCiBMYXVuY2hGb3JtSnNvblRvTGl0ZXJhbHNSZXNwb25zZRIuCghsaXRlcmFscxgBIAMoCzIcLmZseXRlaWRsMi50YXNrLk5hbWVkTGl0ZXJhbCJOCh9UYXNrU3BlY1RvTGF1bmNoRm9ybUpzb25SZXF1ZXN0EisKCXRhc2tfc3BlYxgBIAEoCzIYLmZseXRlaWRsMi50YXNrLlRhc2tTcGVjIkkKIFRhc2tTcGVjVG9MYXVuY2hGb3JtSnNvblJlc3BvbnNlEiUKBGpzb24YASABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0InYKG0pzb25WYWx1ZXNUb0xpdGVyYWxzUmVxdWVzdBIuCgl2YXJpYWJsZXMYASABKAsyGy5mbHl0ZWlkbDIuY29yZS5WYXJpYWJsZU1hcBInCgZ2YWx1ZXMYAiABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0Ik4KHEpzb25WYWx1ZXNUb0xpdGVyYWxzUmVzcG9uc2USLgoIbGl0ZXJhbHMYASADKAsyHC5mbHl0ZWlkbDIudGFzay5OYW1lZExpdGVyYWwyugQKEVRyYW5zbGF0b3JTZXJ2aWNlEooBChhMaXRlcmFsc1RvTGF1bmNoRm9ybUpzb24SMy5mbHl0ZWlkbDIud29ya2Zsb3cuTGl0ZXJhbHNUb0xhdW5jaEZvcm1Kc29uUmVxdWVzdBo0LmZseXRlaWRsMi53b3JrZmxvdy5MaXRlcmFsc1RvTGF1bmNoRm9ybUpzb25SZXNwb25zZSIDkAIBEooBChhMYXVuY2hGb3JtSnNvblRvTGl0ZXJhbHMSMy5mbHl0ZWlkbDIud29ya2Zsb3cuTGF1bmNoRm9ybUpzb25Ub0xpdGVyYWxzUmVxdWVzdBo0LmZseXRlaWRsMi53b3JrZmxvdy5MYXVuY2hGb3JtSnNvblRvTGl0ZXJhbHNSZXNwb25zZSIDkAIBEooBChhUYXNrU3BlY1RvTGF1bmNoRm9ybUpzb24SMy5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza1NwZWNUb0xhdW5jaEZvcm1Kc29uUmVxdWVzdBo0LmZseXRlaWRsMi53b3JrZmxvdy5UYXNrU3BlY1RvTGF1bmNoRm9ybUpzb25SZXNwb25zZSIDkAIBEn4KFEpzb25WYWx1ZXNUb0xpdGVyYWxzEi8uZmx5dGVpZGwyLndvcmtmbG93Lkpzb25WYWx1ZXNUb0xpdGVyYWxzUmVxdWVzdBowLmZseXRlaWRsMi53b3JrZmxvdy5Kc29uVmFsdWVzVG9MaXRlcmFsc1Jlc3BvbnNlIgOQAgFC0wEKFmNvbS5mbHl0ZWlkbDIud29ya2Zsb3dCFlRyYW5zbGF0b3JTZXJ2aWNlUHJvdG9IAlABWjZnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvd29ya2Zsb3eiAgNGV1iqAhJGbHl0ZWlkbDIuV29ya2Zsb3fKAhJGbHl0ZWlkbDJcV29ya2Zsb3fiAh5GbHl0ZWlkbDJcV29ya2Zsb3dcR1BCTWV0YWRhdGHqAhNGbHl0ZWlkbDI6OldvcmtmbG93YgZwcm90bzM", [file_flyteidl2_core_interface, file_flyteidl2_task_common, file_flyteidl2_task_task_definition, file_google_protobuf_struct]);
+  fileDesc("CitmbHl0ZWlkbDIvd29ya2Zsb3cvdHJhbnNsYXRvcl9zZXJ2aWNlLnByb3RvEhJmbHl0ZWlkbDIud29ya2Zsb3cilAIKH0xpdGVyYWxzVG9MYXVuY2hGb3JtSnNvblJlcXVlc3QSLgoIbGl0ZXJhbHMYASADKAsyHC5mbHl0ZWlkbDIudGFzay5OYW1lZExpdGVyYWwSLgoJdmFyaWFibGVzGAIgASgLMhsuZmx5dGVpZGwyLmNvcmUuVmFyaWFibGVNYXASFAoMbGl0ZXJhbHNfdXJpGAMgASgJEjcKCWFjdGlvbl9pZBgEIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckgAEjkKCnRyaWdnZXJfaWQYBSABKAsyIy5mbHl0ZWlkbDIuY29tbW9uLlRyaWdnZXJJZGVudGlmaWVySABCBwoFb3duZXIiSQogTGl0ZXJhbHNUb0xhdW5jaEZvcm1Kc29uUmVzcG9uc2USJQoEanNvbhgBIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3QiSAofTGF1bmNoRm9ybUpzb25Ub0xpdGVyYWxzUmVxdWVzdBIlCgRqc29uGAEgASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdCJSCiBMYXVuY2hGb3JtSnNvblRvTGl0ZXJhbHNSZXNwb25zZRIuCghsaXRlcmFscxgBIAMoCzIcLmZseXRlaWRsMi50YXNrLk5hbWVkTGl0ZXJhbCJOCh9UYXNrU3BlY1RvTGF1bmNoRm9ybUpzb25SZXF1ZXN0EisKCXRhc2tfc3BlYxgBIAEoCzIYLmZseXRlaWRsMi50YXNrLlRhc2tTcGVjIkkKIFRhc2tTcGVjVG9MYXVuY2hGb3JtSnNvblJlc3BvbnNlEiUKBGpzb24YASABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0InYKG0pzb25WYWx1ZXNUb0xpdGVyYWxzUmVxdWVzdBIuCgl2YXJpYWJsZXMYASABKAsyGy5mbHl0ZWlkbDIuY29yZS5WYXJpYWJsZU1hcBInCgZ2YWx1ZXMYAiABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0Ik4KHEpzb25WYWx1ZXNUb0xpdGVyYWxzUmVzcG9uc2USLgoIbGl0ZXJhbHMYASADKAsyHC5mbHl0ZWlkbDIudGFzay5OYW1lZExpdGVyYWwyugQKEVRyYW5zbGF0b3JTZXJ2aWNlEooBChhMaXRlcmFsc1RvTGF1bmNoRm9ybUpzb24SMy5mbHl0ZWlkbDIud29ya2Zsb3cuTGl0ZXJhbHNUb0xhdW5jaEZvcm1Kc29uUmVxdWVzdBo0LmZseXRlaWRsMi53b3JrZmxvdy5MaXRlcmFsc1RvTGF1bmNoRm9ybUpzb25SZXNwb25zZSIDkAIBEooBChhMYXVuY2hGb3JtSnNvblRvTGl0ZXJhbHMSMy5mbHl0ZWlkbDIud29ya2Zsb3cuTGF1bmNoRm9ybUpzb25Ub0xpdGVyYWxzUmVxdWVzdBo0LmZseXRlaWRsMi53b3JrZmxvdy5MYXVuY2hGb3JtSnNvblRvTGl0ZXJhbHNSZXNwb25zZSIDkAIBEooBChhUYXNrU3BlY1RvTGF1bmNoRm9ybUpzb24SMy5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza1NwZWNUb0xhdW5jaEZvcm1Kc29uUmVxdWVzdBo0LmZseXRlaWRsMi53b3JrZmxvdy5UYXNrU3BlY1RvTGF1bmNoRm9ybUpzb25SZXNwb25zZSIDkAIBEn4KFEpzb25WYWx1ZXNUb0xpdGVyYWxzEi8uZmx5dGVpZGwyLndvcmtmbG93Lkpzb25WYWx1ZXNUb0xpdGVyYWxzUmVxdWVzdBowLmZseXRlaWRsMi53b3JrZmxvdy5Kc29uVmFsdWVzVG9MaXRlcmFsc1Jlc3BvbnNlIgOQAgFC0wEKFmNvbS5mbHl0ZWlkbDIud29ya2Zsb3dCFlRyYW5zbGF0b3JTZXJ2aWNlUHJvdG9IAlABWjZnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvd29ya2Zsb3eiAgNGV1iqAhJGbHl0ZWlkbDIuV29ya2Zsb3fKAhJGbHl0ZWlkbDJcV29ya2Zsb3fiAh5GbHl0ZWlkbDJcV29ya2Zsb3dcR1BCTWV0YWRhdGHqAhNGbHl0ZWlkbDI6OldvcmtmbG93YgZwcm90bzM", [file_flyteidl2_common_identifier, file_flyteidl2_core_interface, file_flyteidl2_task_common, file_flyteidl2_task_task_definition, file_google_protobuf_struct]);
 
 /**
  * @generated from message flyteidl2.workflow.LiteralsToLaunchFormJsonRequest
  */
 export type LiteralsToLaunchFormJsonRequest = Message<"flyteidl2.workflow.LiteralsToLaunchFormJsonRequest"> & {
   /**
-   * The literals to convert to JSON.
+   * The literals to convert to JSON. Ignored when literals_uri is set.
    *
    * @generated from field: repeated flyteidl2.task.NamedLiteral literals = 1;
    */
@@ -34,6 +36,45 @@ export type LiteralsToLaunchFormJsonRequest = Message<"flyteidl2.workflow.Litera
    * @generated from field: flyteidl2.core.VariableMap variables = 2;
    */
   variables?: VariableMap;
+
+  /**
+   * Raw object store URI for offloaded action literals, as returned by
+   * DataProxyService.GetActionData (inputs_uri / outputs_uri). Only used with
+   * action_id: when set, the service reads the literals from storage instead of
+   * requiring them inline, avoiding a round trip of potentially large payloads
+   * through the client. Ignored when trigger_id is set.
+   *
+   * @generated from field: string literals_uri = 3;
+   */
+  literalsUri: string;
+
+  /**
+   * Identifies the owner of the offloaded literals to convert. Leave unset to
+   * convert the inline `literals` instead.
+   *
+   * @generated from oneof flyteidl2.workflow.LiteralsToLaunchFormJsonRequest.owner
+   */
+  owner: {
+    /**
+     * Identifies the action that owns literals_uri. Required when literals_uri
+     * is set; the URI is validated against the action's data URIs before being
+     * read.
+     *
+     * @generated from field: flyteidl2.common.ActionIdentifier action_id = 4;
+     */
+    value: ActionIdentifier;
+    case: "actionId";
+  } | {
+    /**
+     * Identifies a trigger whose offloaded inputs should be converted. The
+     * service looks up the trigger's offloaded input URI from its spec and
+     * reads it directly, so literals and literals_uri are ignored.
+     *
+     * @generated from field: flyteidl2.common.TriggerIdentifier trigger_id = 5;
+     */
+    value: TriggerIdentifier;
+    case: "triggerId";
+  } | { case: undefined; value?: undefined };
 };
 
 /**

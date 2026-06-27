@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"connectrpc.com/otelconnect"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
@@ -46,8 +47,13 @@ func main() {
 		},
 	}
 
+	otelInterceptor, err := otelconnect.NewInterceptor()
+	if err != nil {
+		log.Fatalf("Failed to create otel interceptor: %v", err)
+	}
+
 	// Create service clients
-	runClient := workflowconnect.NewRunServiceClient(httpClient, runsServiceURL)
+	runClient := workflowconnect.NewRunServiceClient(httpClient, runsServiceURL, connect.WithInterceptors(otelInterceptor))
 
 	log.Println("🚀 Flyte Client Demo")
 	log.Println("===================")
@@ -115,7 +121,7 @@ func watchRuns(ctx context.Context, client workflowconnect.RunServiceClient) {
 		log.Printf("❌ Failed to start WatchRuns: %v", err)
 		return
 	}
-	defer stream.Close()
+	defer stream.Close() //nolint:errcheck
 
 	log.Println("✅ WatchRuns stream connected")
 
@@ -148,7 +154,7 @@ func watchActions(ctx context.Context, client workflowconnect.RunServiceClient, 
 		log.Printf("❌ Failed to start WatchActions: %v", err)
 		return
 	}
-	defer stream.Close()
+	defer stream.Close() //nolint:errcheck
 
 	log.Println("✅ WatchActions stream connected")
 

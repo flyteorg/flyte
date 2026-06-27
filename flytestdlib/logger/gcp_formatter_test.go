@@ -50,7 +50,7 @@ func Test_gcpFormatterFails(t *testing.T) {
 			Message: "some-message",
 			Buffer:  nil,
 			Context: nil,
-		}, "Failed to marshal fields to JSON, json: unsupported type: chan int"},
+		}, "failed to marshal fields to JSON, json: unsupported type: chan int"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

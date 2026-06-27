@@ -10,6 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
@@ -205,6 +207,74 @@ func TestExtractTaskCacheKey(t *testing.T) {
 
 	t.Run("returns empty for non-task action", func(t *testing.T) {
 		assert.Empty(t, extractTaskCacheKey(&actions.Action{}))
+	})
+}
+
+func TestEmbedTaskTemplate_SubstitutesRunStartTime(t *testing.T) {
+	startTime := time.Date(2026, 6, 3, 12, 0, 0, 0, time.UTC)
+
+	newAction := func() *actions.Action {
+		return &actions.Action{
+			Spec: &actions.Action_Task{
+				Task: &workflow.TaskAction{
+					Spec: &task.TaskSpec{
+						TaskTemplate: &core.TaskTemplate{
+							Type: "python",
+							Target: &core.TaskTemplate_Container{
+								Container: &core.Container{
+									Args: []string{"a0", "--run-start-time", runStartTimeTemplateVar, "--name", "{{.actionName}}"},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+	}
+
+	embedded := func(action *actions.Action) *core.TaskTemplate {
+		ta := &executorv1.TaskAction{Spec: executorv1.TaskActionSpec{}}
+		require.NoError(t, embedTaskTemplate(action, ta, &task.RunSpec{RunStartTime: timestamppb.New(startTime)}))
+		out := &core.TaskTemplate{}
+		require.NoError(t, proto.Unmarshal(ta.Spec.TaskTemplate, out))
+		return out
+	}
+
+	t.Run("replaces the placeholder with the RFC3339 run start time", func(t *testing.T) {
+		action := newAction()
+		out := embedded(action)
+		assert.Equal(t,
+			[]string{"a0", "--run-start-time", "2026-06-03T12:00:00Z", "--name", "{{.actionName}}"},
+			out.GetContainer().GetArgs())
+		// The caller's proto must be left untouched (it is persisted separately as the task spec).
+		assert.Equal(t, runStartTimeTemplateVar,
+			action.GetSpec().(*actions.Action_Task).Task.Spec.TaskTemplate.GetContainer().GetArgs()[2])
+	})
+
+	t.Run("no-op when run start time is unset", func(t *testing.T) {
+		ta := &executorv1.TaskAction{Spec: executorv1.TaskActionSpec{}}
+		require.NoError(t, embedTaskTemplate(newAction(), ta, &task.RunSpec{}))
+		out := &core.TaskTemplate{}
+		require.NoError(t, proto.Unmarshal(ta.Spec.TaskTemplate, out))
+		assert.Equal(t, runStartTimeTemplateVar, out.GetContainer().GetArgs()[2])
+	})
+
+	t.Run("no-op when template has no placeholder (older SDK)", func(t *testing.T) {
+		action := &actions.Action{
+			Spec: &actions.Action_Task{
+				Task: &workflow.TaskAction{
+					Spec: &task.TaskSpec{
+						TaskTemplate: &core.TaskTemplate{
+							Target: &core.TaskTemplate_Container{
+								Container: &core.Container{Args: []string{"pyflyte-execute", "--inputs", "{{.input}}"}},
+							},
+						},
+					},
+				},
+			},
+		}
+		out := embedded(action)
+		assert.Equal(t, []string{"pyflyte-execute", "--inputs", "{{.input}}"}, out.GetContainer().GetArgs())
 	})
 }
 

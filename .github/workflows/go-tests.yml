@@ -8,7 +8,8 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  # Only cancel superseded runs on PRs; runs on main queue up instead.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   go-tests:
@@ -40,7 +41,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version: "1.25"
           cache: true
 
       - name: Cache embedded postgres

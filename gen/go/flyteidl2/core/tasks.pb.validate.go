@@ -956,6 +956,35 @@ func (m *TaskMetadata) validate(all bool) error {
 
 	// no validation rules for CodeBundleUri
 
+	if all {
+		switch v := interface{}(m.GetTimeouts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskMetadataValidationError{
+					field:  "Timeouts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskMetadataValidationError{
+					field:  "Timeouts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTimeouts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskMetadataValidationError{
+				field:  "Timeouts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch v := m.InterruptibleValue.(type) {
 	case *TaskMetadata_Interruptible:
 		if v == nil {
@@ -1985,6 +2014,8 @@ func (m *DataLoadingConfig) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for FileInputLayout
 
 	if len(errors) > 0 {
 		return DataLoadingConfigMultiError(errors)

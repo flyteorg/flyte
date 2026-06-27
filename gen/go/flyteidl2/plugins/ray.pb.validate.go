@@ -387,6 +387,35 @@ func (m *HeadGroupSpec) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetExtendedResources()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, HeadGroupSpecValidationError{
+					field:  "ExtendedResources",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, HeadGroupSpecValidationError{
+					field:  "ExtendedResources",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetExtendedResources()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HeadGroupSpecValidationError{
+				field:  "ExtendedResources",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return HeadGroupSpecMultiError(errors)
 	}
@@ -520,6 +549,35 @@ func (m *WorkerGroupSpec) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return WorkerGroupSpecValidationError{
 				field:  "K8SPod",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetExtendedResources()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, WorkerGroupSpecValidationError{
+					field:  "ExtendedResources",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, WorkerGroupSpecValidationError{
+					field:  "ExtendedResources",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetExtendedResources()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WorkerGroupSpecValidationError{
+				field:  "ExtendedResources",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

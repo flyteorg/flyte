@@ -5,6 +5,7 @@ package flyteidl2.trigger;
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/identity.proto";
+import "flyteidl2/common/run.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/run.proto";
 import "google/protobuf/timestamp.proto";
@@ -22,8 +23,17 @@ message TriggerMetadata {
 message TriggerSpec {
   reserved 1;
 
-  // Inputs for triggered task.
-  flyteidl2.task.Inputs inputs = 2;
+  // Inputs for the triggered task. Inline literals are set by older SDKs; newer SDKs (>= 2.3.6)
+  // offload the inputs via UploadInputs at registration and set offloaded_input_data instead.
+  oneof input_wrapper {
+    // Inline inputs for the triggered task.
+    flyteidl2.task.Inputs inputs = 2;
+
+    // Offloaded inputs for the triggered task (URI + hash from UploadInputs). When present,
+    // launches pass this directly as the run's OffloadedInputData and rely on run_start_time
+    // rather than merging a kickoff-time input literal.
+    flyteidl2.common.OffloadedInputData offloaded_input_data = 7;
+  }
 
   // The run spec for triggered task.
   flyteidl2.task.RunSpec run_spec = 3;

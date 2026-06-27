@@ -135,6 +135,13 @@ message UploadInputsRequest {
 
   // The actual inputs.
   task.Inputs inputs = 6;
+
+  // Optional explicit base directory under which to write the offloaded inputs.
+  // Mirrors RunSpec.run_base_dir and must match the value the subsequent
+  // CreateRun resolves, so the run reads inputs from where they were written.
+  // When empty, the server resolves the base from org/project/domain settings,
+  // then the dataplane cluster default.
+  string base_dir = 7;
 }
 
 message UploadInputsResponse {
@@ -193,6 +200,14 @@ message GetActionDataResponse {
 
   // Outputs for the action.
   task.Outputs outputs = 2;
+
+  // Raw object store URI (e.g. s3://bucket/...) for the action's offloaded inputs.
+  // Empty if the inputs are only available inline (e.g. condition actions).
+  string inputs_uri = 3;
+
+  // Raw object store URI for the action's offloaded outputs.
+  // Empty if the action hasn't succeeded, has no outputs, or the outputs are only available inline.
+  string outputs_uri = 4;
 }
 
 // Request message for tailing logs.
@@ -203,8 +218,19 @@ message TailLogsRequest {
   // The attempt number.
   uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
 
-  // The pod name to tail logs from. If not provided, attempt to find the primary pod, else assume the first pod.
-  string pod_name = 3;
+  // Selects which pod(s) to tail. If unset, defaults to primary_pod.
+  oneof pod_selector {
+    // Tail logs from the primary pod only. This is the default when pod_selector is unset.
+    bool primary_pod = 6;
+    // Tail logs from all pods.
+    bool all_pods = 5;
+    // Tail logs from the named pod only.
+    string pod_name = 3;
+  }
+
+  // +optional. The dataproxy uses this to stream logs from the connector via
+  // AsyncConnectorService.GetTaskLogs instead of pod logs.
+  optional string connector_endpoint = 4;
 }
 
 // Reponse message for tailing logs.
@@ -213,6 +239,8 @@ message TailLogsResponse {
   message Logs {
     // Structured log lines.
     repeated flyteidl2.logs.dataplane.LogLine lines = 1;
+    // Which container these lines are from.
+    flyteidl2.logs.dataplane.ContainerIdentifier container = 2;
   }
 
   // One or more batches of logs.

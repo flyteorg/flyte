@@ -1,3 +1,4 @@
+from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.core import types_pb2 as _types_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import struct_pb2 as _struct_pb2
@@ -212,8 +213,28 @@ class KeyValuePair(_message.Message):
     value: str
     def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
 
+class Backoff(_message.Message):
+    __slots__ = ["base", "factor", "cap"]
+    BASE_FIELD_NUMBER: _ClassVar[int]
+    FACTOR_FIELD_NUMBER: _ClassVar[int]
+    CAP_FIELD_NUMBER: _ClassVar[int]
+    base: _duration_pb2.Duration
+    factor: float
+    cap: _duration_pb2.Duration
+    def __init__(self, base: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., factor: _Optional[float] = ..., cap: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+
 class RetryStrategy(_message.Message):
-    __slots__ = ["retries"]
+    __slots__ = ["retries", "backoff"]
     RETRIES_FIELD_NUMBER: _ClassVar[int]
+    BACKOFF_FIELD_NUMBER: _ClassVar[int]
     retries: int
-    def __init__(self, retries: _Optional[int] = ...) -> None: ...
+    backoff: Backoff
+    def __init__(self, retries: _Optional[int] = ..., backoff: _Optional[_Union[Backoff, _Mapping]] = ...) -> None: ...
+
+class TimeoutStrategy(_message.Message):
+    __slots__ = ["queued_timeout", "deadline"]
+    QUEUED_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
+    DEADLINE_FIELD_NUMBER: _ClassVar[int]
+    queued_timeout: _duration_pb2.Duration
+    deadline: _duration_pb2.Duration
+    def __init__(self, queued_timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., deadline: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...

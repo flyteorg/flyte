@@ -145,7 +145,19 @@ func NewTaskExecutionContext(
 		return nil, err
 	}
 	rawOutputPaths := ioutils.NewRawOutputPaths(ctx, outputPrefix)
-	outputFilePaths := ioutils.NewCheckpointRemoteFilePaths(ctx, dataStore, outputPrefix, rawOutputPaths, "")
+
+	// Attempts is 1-indexed, so the first attempt has nothing to resume from.
+	// Only set a previous checkpoint path from attempt 2 onward.
+	var prevCheckpointPath storage.DataReference
+	if taskAction.Status.Attempts >= 2 {
+		prevOutputPrefix, err := ComputeActionOutputPath(ctx, taskAction.Namespace, taskAction.Name, taskAction.Spec.RunOutputBase, taskAction.Spec.ActionName, attempt-1)
+		if err != nil {
+			return nil, fmt.Errorf("failed to compute previous checkpoint path: %w", err)
+		}
+		prevCheckpointPath = ioutils.ConstructCheckpointPath(dataStore, prevOutputPrefix)
+	}
+
+	outputFilePaths := ioutils.NewCheckpointRemoteFilePaths(ctx, dataStore, outputPrefix, rawOutputPaths, prevCheckpointPath)
 	outputWriter := ioutils.NewRemoteFileOutputWriter(ctx, dataStore, outputFilePaths)
 
 	// Task execution metadata

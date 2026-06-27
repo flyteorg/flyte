@@ -33,7 +33,7 @@ spec:
                   number: 8090
 {{- end }}
 ---
-{{- if .Values.sandbox.console.enabled }}
+{{- if index .Values "flyte-binary" "enabled" }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -48,8 +48,46 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: flyte-console
+                name: {{ printf "%s-console" ( index .Values "flyte-binary" "fullnameOverride" | default "flyte-binary" ) }}
                 port:
                   number: 80
+{{- end }}
+---
+{{- if .Values.rustfs.enabled}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rustfs-console
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-devbox.labels" . | nindent 4 }}
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /rustfs/console
+            pathType: Prefix
+            backend:
+              service:
+                name: rustfs-svc
+                port:
+                  number: 9001
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rustfs-s3
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-devbox.labels" . | nindent 4 }}
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rustfs-svc
+                port:
+                  number: 9000
 {{- end }}
 ---

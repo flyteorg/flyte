@@ -17,7 +17,7 @@ Thank you for your interest in contributing to Flyte 2! This guide will help you
 
 Before contributing, ensure you have:
 - [Buf CLI](https://buf.build/docs/installation) installed
-- Go 1.24.6 or later
+- Go 1.26.3 or later
 - Node.js and npm (for TypeScript)
 - Python 3.10+ with `uv` package manager
 - Rust toolchain (if working with Rust bindings)
@@ -339,7 +339,7 @@ Flyte 2 follows [Semantic Versioning 2.0.0](https://semver.org/):
 
 ### Creating a Release (Maintainers Only)
 
-1. **Ensure all changes are merged into `v2` branch**
+1. **Ensure all changes are merged into `main` branch**
 
 2. **Determine the version number** based on changes:
    ```bash
@@ -349,8 +349,8 @@ Flyte 2 follows [Semantic Versioning 2.0.0](https://semver.org/):
 
 3. **Create and push a tag**:
    ```bash
-   git checkout v2
-   git pull upstream v2
+   git checkout main
+   git pull upstream main
    git tag -a v2.X.Y -m "Release v2.X.Y"
    git push upstream v2.X.Y
    ```

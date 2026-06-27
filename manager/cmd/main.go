@@ -6,23 +6,23 @@ import (
 	"net/http"
 	"os"
 
-	flyteapp "github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/actions"
-	"github.com/flyteorg/flyte/v2/flytestdlib/app"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
+	actionsconfig "github.com/flyteorg/flyte/v2/actions/config"
+	flyteapp "github.com/flyteorg/flyte/v2/app"
 	"github.com/flyteorg/flyte/v2/cache_service"
 	"github.com/flyteorg/flyte/v2/dataproxy"
 	"github.com/flyteorg/flyte/v2/events"
 	"github.com/flyteorg/flyte/v2/executor"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
-	managerconfig "github.com/flyteorg/flyte/v2/manager/config"
 	"github.com/flyteorg/flyte/v2/runs"
 	runsconfig "github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/secret"
+	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
 func main() {
@@ -37,12 +37,15 @@ func main() {
 }
 
 func setup(ctx context.Context, sc *app.SetupContext) error {
-	cfg := managerconfig.GetConfig()
-	sc.Host = cfg.Server.Host
-	sc.Port = cfg.Server.Port
-	sc.Namespace = cfg.Kubernetes.Namespace
+	// Reuse the run service's server config and the actions service's Kubernetes
+	// config rather than maintaining a duplicate manager-specific section.
+	serverCfg := runsconfig.GetConfig().Server
+	k8sCfg := actionsconfig.GetConfig().Kubernetes
+	sc.Host = serverCfg.Host
+	sc.Port = serverCfg.Port
+	sc.Namespace = k8sCfg.Namespace
 	sc.Middleware = corsMiddleware
-	sc.BaseURL = fmt.Sprintf("http://localhost:%d", cfg.Server.Port)
+	sc.BaseURL = fmt.Sprintf("http://localhost:%d", serverCfg.Port)
 
 	// Initialize database
 	dbCfg := &runsconfig.GetConfig().Database
@@ -58,13 +61,7 @@ func setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	// Initialize Kubernetes client
-	k8sClient, k8sConfig, err := app.InitKubernetesClient(ctx, app.K8sConfig{
-		KubeConfig: cfg.Kubernetes.KubeConfig,
-		Namespace:  cfg.Kubernetes.Namespace,
-		QPS:        cfg.Kubernetes.QPS,
-		Burst:      cfg.Kubernetes.Burst,
-		Timeout:    cfg.Kubernetes.Timeout,
-	}, executor.Scheme())
+	k8sClient, k8sConfig, err := app.InitKubernetesClient(ctx, k8sCfg, executor.Scheme())
 	if err != nil {
 		return fmt.Errorf("failed to initialize Kubernetes client: %w", err)
 	}

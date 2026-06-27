@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -150,7 +150,6 @@ func TestIsInvalidDBPgError(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 
 		t.Run(tc.Name, func(t *testing.T) {
 			assert.Equal(t, tc.ExpectedResult, IsPgErrorWithCode(tc.Err, PqInvalidDBCode))
@@ -189,7 +188,7 @@ func TestIsPgDbAlreadyExistsError(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
+
 		t.Run(tc.Name, func(t *testing.T) {
 			assert.Equal(t, tc.ExpectedResult, IsPgErrorWithCode(tc.Err, PqDbAlreadyExistsCode))
 		})

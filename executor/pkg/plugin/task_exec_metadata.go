@@ -10,6 +10,7 @@ import (
 	"k8s.io/utils/ptr"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	executorconfig "github.com/flyteorg/flyte/v2/executor/pkg/config"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	flytesecret "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
@@ -58,6 +59,14 @@ type taskExecutionMetadata struct {
 	envVars         map[string]string
 	interruptible   bool
 	securityContext *core.SecurityContext
+	serviceAccount  string
+}
+
+func resolveServiceAccount(securityContext *core.SecurityContext, defaultSA string) string {
+	if sa := securityContext.GetRunAs().GetK8SServiceAccount(); sa != "" {
+		return sa
+	}
+	return defaultSA
 }
 
 // NewTaskExecutionMetadata creates a TaskExecutionMetadata from a TaskAction.
@@ -100,6 +109,7 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 	generatedName := buildGeneratedName(ta)
 	retryAttempt := attemptToRetry(ta.Status.Attempts)
 	maxAttempts := maxAttemptsFromTaskTemplate(ta.Spec.TaskTemplate)
+	taskID := taskIDFromTaskTemplate(ta.Spec.TaskTemplate)
 
 	return &taskExecutionMetadata{
 		ownerID: types.NamespacedName{
@@ -118,6 +128,7 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 					NodeId: ta.Spec.ActionName,
 				},
 				RetryAttempt: retryAttempt,
+				TaskId:       taskID,
 			},
 		},
 		namespace: ta.Namespace,
@@ -135,6 +146,7 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		envVars:         envVars,
 		interruptible:   ta.Spec.Interruptible != nil && *ta.Spec.Interruptible,
 		securityContext: securityContext,
+		serviceAccount:  resolveServiceAccount(securityContext, executorconfig.GetConfig().DefaultK8sServiceAccount),
 	}, nil
 }
 
@@ -167,6 +179,20 @@ func maxAttemptsFromTaskTemplate(data []byte) uint32 {
 	}
 
 	return md.GetRetries().GetRetries() + 1
+}
+
+func taskIDFromTaskTemplate(data []byte) *core.Identifier {
+	if len(data) == 0 {
+		return nil
+	}
+	tmpl := &core.TaskTemplate{}
+	if err := proto.Unmarshal(data, tmpl); err != nil {
+		return nil
+	}
+	if tmpl.GetId() == nil {
+		return nil
+	}
+	return proto.Clone(tmpl.GetId()).(*core.Identifier)
 }
 
 // buildOverridesFromTaskTemplate deserializes the task template and extracts resource requirements.
@@ -213,7 +239,7 @@ func (m *taskExecutionMetadata) GetOwnerReference() metav1.OwnerReference   { re
 func (m *taskExecutionMetadata) GetLabels() map[string]string               { return m.labels }
 func (m *taskExecutionMetadata) GetAnnotations() map[string]string          { return m.annotations }
 func (m *taskExecutionMetadata) GetMaxAttempts() uint32                     { return m.maxAttempts }
-func (m *taskExecutionMetadata) GetK8sServiceAccount() string               { return "" }
+func (m *taskExecutionMetadata) GetK8sServiceAccount() string               { return m.serviceAccount }
 func (m *taskExecutionMetadata) IsInterruptible() bool                      { return m.interruptible }
 func (m *taskExecutionMetadata) GetInterruptibleFailureThreshold() int32    { return 0 }
 func (m *taskExecutionMetadata) GetEnvironmentVariables() map[string]string { return m.envVars }

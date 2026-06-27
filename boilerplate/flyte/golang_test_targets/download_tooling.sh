@@ -17,7 +17,7 @@ set -e
 # In the format of "<cli>:<package>" or ":<package>" if no cli
 tools=(
 	"github.com/vektra/mockery/v3@v3.7.0"
-	"github.com/golangci/golangci-lint/cmd/golangci-lint"
+  "github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2"
 	"github.com/daixiang0/gci"
 	"github.com/alvaroloes/enumer"
 	"github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc"

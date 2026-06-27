@@ -103,7 +103,7 @@ class RuntimeMetadata(_message.Message):
     def __init__(self, type: _Optional[_Union[RuntimeMetadata.RuntimeType, str]] = ..., version: _Optional[str] = ..., flavor: _Optional[str] = ...) -> None: ...
 
 class TaskMetadata(_message.Message):
-    __slots__ = ["discoverable", "runtime", "timeout", "retries", "discovery_version", "deprecated_error_message", "interruptible", "cache_serializable", "tags", "pod_template_name", "cache_ignore_input_vars", "is_eager", "generates_deck", "metadata", "debuggable", "log_links", "image_build_run", "is_entrypoint", "code_bundle_uri"]
+    __slots__ = ["discoverable", "runtime", "timeout", "retries", "discovery_version", "deprecated_error_message", "interruptible", "cache_serializable", "tags", "pod_template_name", "cache_ignore_input_vars", "is_eager", "generates_deck", "metadata", "debuggable", "log_links", "image_build_run", "is_entrypoint", "code_bundle_uri", "timeouts"]
     class TagsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -130,6 +130,7 @@ class TaskMetadata(_message.Message):
     IMAGE_BUILD_RUN_FIELD_NUMBER: _ClassVar[int]
     IS_ENTRYPOINT_FIELD_NUMBER: _ClassVar[int]
     CODE_BUNDLE_URI_FIELD_NUMBER: _ClassVar[int]
+    TIMEOUTS_FIELD_NUMBER: _ClassVar[int]
     discoverable: bool
     runtime: RuntimeMetadata
     timeout: _duration_pb2.Duration
@@ -149,7 +150,8 @@ class TaskMetadata(_message.Message):
     image_build_run: _identifier_pb2.RunIdentifier
     is_entrypoint: bool
     code_bundle_uri: str
-    def __init__(self, discoverable: bool = ..., runtime: _Optional[_Union[RuntimeMetadata, _Mapping]] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., discovery_version: _Optional[str] = ..., deprecated_error_message: _Optional[str] = ..., interruptible: bool = ..., cache_serializable: bool = ..., tags: _Optional[_Mapping[str, str]] = ..., pod_template_name: _Optional[str] = ..., cache_ignore_input_vars: _Optional[_Iterable[str]] = ..., is_eager: bool = ..., generates_deck: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., metadata: _Optional[_Union[K8sObjectMetadata, _Mapping]] = ..., debuggable: bool = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., image_build_run: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., is_entrypoint: bool = ..., code_bundle_uri: _Optional[str] = ...) -> None: ...
+    timeouts: _literals_pb2.TimeoutStrategy
+    def __init__(self, discoverable: bool = ..., runtime: _Optional[_Union[RuntimeMetadata, _Mapping]] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., discovery_version: _Optional[str] = ..., deprecated_error_message: _Optional[str] = ..., interruptible: bool = ..., cache_serializable: bool = ..., tags: _Optional[_Mapping[str, str]] = ..., pod_template_name: _Optional[str] = ..., cache_ignore_input_vars: _Optional[_Iterable[str]] = ..., is_eager: bool = ..., generates_deck: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., metadata: _Optional[_Union[K8sObjectMetadata, _Mapping]] = ..., debuggable: bool = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., image_build_run: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., is_entrypoint: bool = ..., code_bundle_uri: _Optional[str] = ..., timeouts: _Optional[_Union[_literals_pb2.TimeoutStrategy, _Mapping]] = ...) -> None: ...
 
 class TaskTemplate(_message.Message):
     __slots__ = ["id", "type", "metadata", "interface", "custom", "container", "k8s_pod", "sql", "task_type_version", "security_context", "extended_resources", "config"]
@@ -253,7 +255,7 @@ class IOStrategy(_message.Message):
     def __init__(self, download_mode: _Optional[_Union[IOStrategy.DownloadMode, str]] = ..., upload_mode: _Optional[_Union[IOStrategy.UploadMode, str]] = ...) -> None: ...
 
 class DataLoadingConfig(_message.Message):
-    __slots__ = ["enabled", "input_path", "output_path", "format", "io_strategy"]
+    __slots__ = ["enabled", "input_path", "output_path", "format", "io_strategy", "file_input_layout"]
     class LiteralMapFormat(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         JSON: _ClassVar[DataLoadingConfig.LiteralMapFormat]
@@ -262,17 +264,25 @@ class DataLoadingConfig(_message.Message):
     JSON: DataLoadingConfig.LiteralMapFormat
     YAML: DataLoadingConfig.LiteralMapFormat
     PROTO: DataLoadingConfig.LiteralMapFormat
+    class FileInputLayout(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        DIRECT: _ClassVar[DataLoadingConfig.FileInputLayout]
+        NAMED_DIR: _ClassVar[DataLoadingConfig.FileInputLayout]
+    DIRECT: DataLoadingConfig.FileInputLayout
+    NAMED_DIR: DataLoadingConfig.FileInputLayout
     ENABLED_FIELD_NUMBER: _ClassVar[int]
     INPUT_PATH_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_PATH_FIELD_NUMBER: _ClassVar[int]
     FORMAT_FIELD_NUMBER: _ClassVar[int]
     IO_STRATEGY_FIELD_NUMBER: _ClassVar[int]
+    FILE_INPUT_LAYOUT_FIELD_NUMBER: _ClassVar[int]
     enabled: bool
     input_path: str
     output_path: str
     format: DataLoadingConfig.LiteralMapFormat
     io_strategy: IOStrategy
-    def __init__(self, enabled: bool = ..., input_path: _Optional[str] = ..., output_path: _Optional[str] = ..., format: _Optional[_Union[DataLoadingConfig.LiteralMapFormat, str]] = ..., io_strategy: _Optional[_Union[IOStrategy, _Mapping]] = ...) -> None: ...
+    file_input_layout: DataLoadingConfig.FileInputLayout
+    def __init__(self, enabled: bool = ..., input_path: _Optional[str] = ..., output_path: _Optional[str] = ..., format: _Optional[_Union[DataLoadingConfig.LiteralMapFormat, str]] = ..., io_strategy: _Optional[_Union[IOStrategy, _Mapping]] = ..., file_input_layout: _Optional[_Union[DataLoadingConfig.FileInputLayout, str]] = ...) -> None: ...
 
 class K8sPod(_message.Message):
     __slots__ = ["metadata", "pod_spec", "data_config", "primary_container_name"]

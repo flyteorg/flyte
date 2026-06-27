@@ -6,9 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"google.golang.org/protobuf/proto"
 )
 
 var MsgChan chan SandboxMessage

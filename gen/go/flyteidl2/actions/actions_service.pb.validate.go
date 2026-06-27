@@ -642,8 +642,6 @@ func (m *UpdateRequest) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for State
-
 	if len(errors) > 0 {
 		return UpdateRequestMultiError(errors)
 	}
@@ -821,243 +819,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UpdateResponseValidationError{}
-
-// Validate checks the field values on GetLatestStateRequest with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *GetLatestStateRequest) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on GetLatestStateRequest with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// GetLatestStateRequestMultiError, or nil if none found.
-func (m *GetLatestStateRequest) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *GetLatestStateRequest) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetActionId()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GetLatestStateRequestValidationError{
-					field:  "ActionId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, GetLatestStateRequestValidationError{
-					field:  "ActionId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetActionId()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return GetLatestStateRequestValidationError{
-				field:  "ActionId",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for Attempt
-
-	if len(errors) > 0 {
-		return GetLatestStateRequestMultiError(errors)
-	}
-
-	return nil
-}
-
-// GetLatestStateRequestMultiError is an error wrapping multiple validation
-// errors returned by GetLatestStateRequest.ValidateAll() if the designated
-// constraints aren't met.
-type GetLatestStateRequestMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m GetLatestStateRequestMultiError) Error() string {
-	msgs := make([]string, 0, len(m))
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m GetLatestStateRequestMultiError) AllErrors() []error { return m }
-
-// GetLatestStateRequestValidationError is the validation error returned by
-// GetLatestStateRequest.Validate if the designated constraints aren't met.
-type GetLatestStateRequestValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e GetLatestStateRequestValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e GetLatestStateRequestValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e GetLatestStateRequestValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e GetLatestStateRequestValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e GetLatestStateRequestValidationError) ErrorName() string {
-	return "GetLatestStateRequestValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e GetLatestStateRequestValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sGetLatestStateRequest.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = GetLatestStateRequestValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = GetLatestStateRequestValidationError{}
-
-// Validate checks the field values on GetLatestStateResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *GetLatestStateResponse) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on GetLatestStateResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// GetLatestStateResponseMultiError, or nil if none found.
-func (m *GetLatestStateResponse) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *GetLatestStateResponse) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for State
-
-	if len(errors) > 0 {
-		return GetLatestStateResponseMultiError(errors)
-	}
-
-	return nil
-}
-
-// GetLatestStateResponseMultiError is an error wrapping multiple validation
-// errors returned by GetLatestStateResponse.ValidateAll() if the designated
-// constraints aren't met.
-type GetLatestStateResponseMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m GetLatestStateResponseMultiError) Error() string {
-	msgs := make([]string, 0, len(m))
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m GetLatestStateResponseMultiError) AllErrors() []error { return m }
-
-// GetLatestStateResponseValidationError is the validation error returned by
-// GetLatestStateResponse.Validate if the designated constraints aren't met.
-type GetLatestStateResponseValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e GetLatestStateResponseValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e GetLatestStateResponseValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e GetLatestStateResponseValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e GetLatestStateResponseValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e GetLatestStateResponseValidationError) ErrorName() string {
-	return "GetLatestStateResponseValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e GetLatestStateResponseValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sGetLatestStateResponse.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = GetLatestStateResponseValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = GetLatestStateResponseValidationError{}
 
 // Validate checks the field values on WatchForUpdatesRequest with the rules
 // defined in the proto definition for this message. If any rules are
@@ -1451,6 +1212,39 @@ func (m *AbortRequest) validate(all bool) error {
 		// no validation rules for Reason
 	}
 
+	if m.AbortedBy != nil {
+
+		if all {
+			switch v := interface{}(m.GetAbortedBy()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AbortRequestValidationError{
+						field:  "AbortedBy",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AbortRequestValidationError{
+						field:  "AbortedBy",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetAbortedBy()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AbortRequestValidationError{
+					field:  "AbortedBy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return AbortRequestMultiError(errors)
 	}
@@ -1708,6 +1502,39 @@ func (m *SignalRequest) validate(all bool) error {
 				cause:  err,
 			}
 		}
+	}
+
+	if m.SignalledBy != nil {
+
+		if all {
+			switch v := interface{}(m.GetSignalledBy()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, SignalRequestValidationError{
+						field:  "SignalledBy",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, SignalRequestValidationError{
+						field:  "SignalledBy",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetSignalledBy()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SignalRequestValidationError{
+					field:  "SignalledBy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	if len(errors) > 0 {

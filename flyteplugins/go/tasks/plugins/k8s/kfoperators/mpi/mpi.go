@@ -59,9 +59,10 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 
 	var launcherReplicaSpec, workerReplicaSpec *kubeflowv1.ReplicaSpec
 
-	if taskTemplate.TaskTypeVersion == 0 {
+	switch taskTemplate.TaskTypeVersion {
+	case 0:
 		mpiTaskExtraArgs := plugins.DistributedMPITrainingTask{}
-		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &mpiTaskExtraArgs)
+		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &mpiTaskExtraArgs) //nolint: staticcheck
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
@@ -97,10 +98,10 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 			}
 		}
 
-	} else if taskTemplate.TaskTypeVersion == 1 {
+	case 1:
 		kfMPITaskExtraArgs := kfplugins.DistributedMPITrainingTask{}
 
-		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfMPITaskExtraArgs)
+		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfMPITaskExtraArgs) //nolint: staticcheck
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
@@ -119,7 +120,7 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 			runPolicy = common.ParseRunPolicy(kfMPITaskExtraArgs.GetRunPolicy())
 		}
 
-	} else {
+	default:
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification,
 			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.TaskTypeVersion)
 	}
@@ -183,7 +184,7 @@ func (mpiOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginContex
 	}
 
 	occurredAt := time.Now()
-	statusDetails, _ := utils.MarshalObjToStruct(app.Status)
+	statusDetails, _ := utils.MarshalObjToStruct(app.Status) //nolint: staticcheck
 	taskPhaseInfo := pluginsCore.TaskInfo{
 		Logs:       taskLogs,
 		LogContext: nil, // TODO populate log context
@@ -247,6 +248,8 @@ func init() {
 	if err := kubeflowv1.AddToScheme(scheme.Scheme); err != nil {
 		panic(err)
 	}
+
+	pluginmachinery.PluginRegistry().RegisterScheme(common.MPITaskType, kubeflowv1.AddToScheme)
 
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{

@@ -130,7 +130,10 @@ message TaskMetadata {
   // Runtime information about the task.
   RuntimeMetadata runtime = 2;
 
-  // The overall timeout of a task including user-triggered retries.
+  // Wall-clock bound on a single attempt's ACTION_PHASE_RUNNING phase
+  // (a.k.a. max_runtime). Per attempt — resets on each retry. Enforced by
+  // the lease worker. Unset means unlimited.
+  // For queued_timeout and deadline, see TaskMetadata.timeouts (field 22).
   google.protobuf.Duration timeout = 4;
 
   // Number of retries per task.
@@ -201,6 +204,11 @@ message TaskMetadata {
 
   // Remote URI pointing to the code bundle used to build this task.
   string code_bundle_uri = 21;
+
+  // Additional timeout bounds (queued_timeout, deadline) layered on top of
+  // the per-attempt RUNNING-phase bound expressed by `timeout` (field 4).
+  // Each bound is independently optional; an unspecified bound is unlimited.
+  TimeoutStrategy timeouts = 22;
 }
 
 // A Task structure that uniquely identifies a task in the system
@@ -365,6 +373,22 @@ message DataLoadingConfig {
   // This format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding
   LiteralMapFormat format = 4;
   IOStrategy io_strategy = 5;
+
+  // FileInputLayout controls how Blob (File) and collection-of-Blob (list[File])
+  // inputs are laid out under input_path.
+  enum FileInputLayout {
+    // Each File is written directly at input_path/<var>, and each list[File]
+    // element at input_path/<var>/<index>. The original filename (and thus the
+    // extension) is dropped. This is the backwards-compatible default.
+    DIRECT = 0;
+    // Each File is written inside a per-input directory input_path/<var>/ under
+    // a name that preserves its extension (list[File] elements as
+    // input_path/<var>/<index><ext>), so tools that detect a file's format from
+    // its extension work. Consumers reference inputs by globbing the directory.
+    NAMED_DIR = 1;
+  }
+  // How File / list[File] inputs are laid out under input_path.
+  FileInputLayout file_input_layout = 6;
 }
 
 // Defines a pod spec and additional pod metadata that is created when a task is executed.
