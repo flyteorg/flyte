@@ -795,6 +795,9 @@ func TestListAndSendAllActionsUsesAscendingSort(t *testing.T) {
 
 	runID := &common.RunIdentifier{Project: "p", Domain: "d", Name: "run-1"}
 
+	// The seed query runs first; return no rows so the streaming loop below is exercised.
+	actionRepo.On("ListActionPhasesForCounts", mock.Anything, mock.Anything).Return([]*models.Action{}, nil).Once()
+
 	var captured interfaces.ListResourceInput
 	actionRepo.On("ListActions", mock.Anything, mock.MatchedBy(func(input interfaces.ListResourceInput) bool {
 		captured = input

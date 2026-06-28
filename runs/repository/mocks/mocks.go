@@ -644,6 +644,74 @@ func (_c *ActionRepo_InsertEvents_Call) RunAndReturn(run func(ctx context.Contex
 	return _c
 }
 
+// ListActionPhasesForCounts provides a mock function for the type ActionRepo
+func (_mock *ActionRepo) ListActionPhasesForCounts(ctx context.Context, runID *common.RunIdentifier) ([]*models.Action, error) {
+	ret := _mock.Called(ctx, runID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListActionPhasesForCounts")
+	}
+
+	var r0 []*models.Action
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.RunIdentifier) ([]*models.Action, error)); ok {
+		return returnFunc(ctx, runID)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.RunIdentifier) []*models.Action); ok {
+		r0 = returnFunc(ctx, runID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.Action)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *common.RunIdentifier) error); ok {
+		r1 = returnFunc(ctx, runID)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// ActionRepo_ListActionPhasesForCounts_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListActionPhasesForCounts'
+type ActionRepo_ListActionPhasesForCounts_Call struct {
+	*mock.Call
+}
+
+// ListActionPhasesForCounts is a helper method to define mock.On call
+//   - ctx context.Context
+//   - runID *common.RunIdentifier
+func (_e *ActionRepo_Expecter) ListActionPhasesForCounts(ctx interface{}, runID interface{}) *ActionRepo_ListActionPhasesForCounts_Call {
+	return &ActionRepo_ListActionPhasesForCounts_Call{Call: _e.mock.On("ListActionPhasesForCounts", ctx, runID)}
+}
+
+func (_c *ActionRepo_ListActionPhasesForCounts_Call) Run(run func(ctx context.Context, runID *common.RunIdentifier)) *ActionRepo_ListActionPhasesForCounts_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *common.RunIdentifier
+		if args[1] != nil {
+			arg1 = args[1].(*common.RunIdentifier)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *ActionRepo_ListActionPhasesForCounts_Call) Return(actions []*models.Action, err error) *ActionRepo_ListActionPhasesForCounts_Call {
+	_c.Call.Return(actions, err)
+	return _c
+}
+
+func (_c *ActionRepo_ListActionPhasesForCounts_Call) RunAndReturn(run func(ctx context.Context, runID *common.RunIdentifier) ([]*models.Action, error)) *ActionRepo_ListActionPhasesForCounts_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListActions provides a mock function for the type ActionRepo
 func (_mock *ActionRepo) ListActions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Action, error) {
 	ret := _mock.Called(ctx, input)

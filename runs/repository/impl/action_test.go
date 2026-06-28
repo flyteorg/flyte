@@ -695,3 +695,75 @@ func TestUpdateActionPhase_AbortedDoesNotInsertEvent(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 0, count, "UpdateActionPhase(ABORTED) must not insert a synthetic action_events row")
 }
+
+// TestListActionPhasesForCounts verifies the lightweight query used to seed child
+// phase counts returns every action in the run (root + children) with name,
+// parent, and phase populated, ordered so parents precede their children.
+func TestListActionPhasesForCounts(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	runID := &common.RunIdentifier{Project: "proj1", Domain: "domain1", Name: "run1"}
+	base := time.Unix(1700000000, 0)
+
+	// Root action (parent_action_name NULL), created first.
+	_, err = actionRepo.CreateAction(ctx, &models.Action{
+		Project: runID.Project, Domain: runID.Domain, RunName: runID.Name, Name: rootActionName,
+		Phase: int32(common.ActionPhase_ACTION_PHASE_RUNNING), CreatedAt: base,
+	}, false)
+	require.NoError(t, err)
+
+	// Children of the root, half QUEUED half SUCCEEDED.
+	const children = 120
+	wantQueued, wantSucceeded := 0, 0
+	for i := 0; i < children; i++ {
+		phase := common.ActionPhase_ACTION_PHASE_QUEUED
+		if i%2 == 0 {
+			phase = common.ActionPhase_ACTION_PHASE_SUCCEEDED
+			wantSucceeded++
+		} else {
+			wantQueued++
+		}
+		_, err := actionRepo.CreateAction(ctx, &models.Action{
+			Project: runID.Project, Domain: runID.Domain, RunName: runID.Name,
+			Name:             fmt.Sprintf("c%03d", i),
+			ParentActionName: sql.NullString{String: rootActionName, Valid: true},
+			Phase:            int32(phase),
+			CreatedAt:        base.Add(time.Duration(i+1) * time.Second),
+		}, false)
+		require.NoError(t, err)
+	}
+
+	rows, err := actionRepo.ListActionPhasesForCounts(ctx, runID)
+	require.NoError(t, err)
+	require.Len(t, rows, children+1, "must return every action in the run")
+
+	// Root sorts first (earliest created_at); fields needed by the tree are populated.
+	require.Equal(t, rootActionName, rows[0].Name)
+	require.False(t, rows[0].ParentActionName.Valid, "root has no parent")
+
+	gotQueued, gotSucceeded := 0, 0
+	for _, r := range rows {
+		if r.Name == rootActionName {
+			continue
+		}
+		require.True(t, r.ParentActionName.Valid)
+		require.Equal(t, rootActionName, r.ParentActionName.String)
+		switch common.ActionPhase(r.Phase) {
+		case common.ActionPhase_ACTION_PHASE_QUEUED:
+			gotQueued++
+		case common.ActionPhase_ACTION_PHASE_SUCCEEDED:
+			gotSucceeded++
+		}
+	}
+	assert.Equal(t, wantQueued, gotQueued)
+	assert.Equal(t, wantSucceeded, gotSucceeded)
+
+	// Ordering: created_at ascending (parents-before-children invariant).
+	for i := 1; i < len(rows); i++ {
+		require.False(t, rows[i].CreatedAt.Before(rows[i-1].CreatedAt), "rows must be ordered by created_at ASC")
+	}
+}

@@ -1316,6 +1316,23 @@ func (s *RunService) listAndSendAllActions(
 	rsm *runStateManager,
 	stream *connect.ServerStream[workflow.WatchActionsResponse],
 ) error {
+	// Seed child phase counts from a single lightweight query before streaming the
+	// full snapshot. Otherwise ChildPhaseCounts is built up as every child streams
+	// in (~25s for a 20k map task), and the console's stream deadline truncates it
+	// mid-climb -- showing a count far below the real total. Seeding makes the count
+	// correct from the first streamed page; re-streaming the same rows below is
+	// count-neutral (same phase => no-op in modifyPhaseCounters), so nothing
+	// regresses. Mirrors cloud's SQL-aggregated phase counts.
+	seed, err := s.repo.ActionRepo().ListActionPhasesForCounts(ctx, runID)
+	if err != nil {
+		return err
+	}
+	// State only -- the per-node updates are re-sent by the streaming loop below
+	// (with full action data), so we discard them here.
+	if _, err := rsm.upsertActions(ctx, seed); err != nil {
+		return err
+	}
+
 	const pageSize = 100
 	offset := 0
 	for {
