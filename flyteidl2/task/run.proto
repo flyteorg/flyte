@@ -125,6 +125,9 @@ message RunSpec {
   // Distinct from raw_data_storage.raw_data_prefix, which controls offloaded
   // blob (user data) layout.
   string run_base_dir = 14;
+
+  // Pool of the assigned queue for given run.
+  string cluster_pool = 15;
 }
 
 message InlineRuleList {
