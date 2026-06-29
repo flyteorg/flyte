@@ -135,6 +135,13 @@ message UploadInputsRequest {
 
   // The actual inputs.
   task.Inputs inputs = 6;
+
+  // Optional explicit base directory under which to write the offloaded inputs.
+  // Mirrors RunSpec.run_base_dir and must match the value the subsequent
+  // CreateRun resolves, so the run reads inputs from where they were written.
+  // When empty, the server resolves the base from org/project/domain settings,
+  // then the dataplane cluster default.
+  string base_dir = 7;
 }
 
 message UploadInputsResponse {
@@ -193,6 +200,14 @@ message GetActionDataResponse {
 
   // Outputs for the action.
   task.Outputs outputs = 2;
+
+  // Raw object store URI (e.g. s3://bucket/...) for the action's offloaded inputs.
+  // Empty if the inputs are only available inline (e.g. condition actions).
+  string inputs_uri = 3;
+
+  // Raw object store URI for the action's offloaded outputs.
+  // Empty if the action hasn't succeeded, has no outputs, or the outputs are only available inline.
+  string outputs_uri = 4;
 }
 
 // Request message for tailing logs.

@@ -153,7 +153,7 @@ func (r *section) RegisterSectionWithUpdates(key SectionKey, configSection Confi
 		return nil, fmt.Errorf("configSection must be a non-nil pointer. SectionKey: %v", key)
 	}
 
-	if reflect.TypeOf(configSection).Kind() != reflect.Ptr {
+	if reflect.TypeOf(configSection).Kind() != reflect.Pointer {
 		return nil, fmt.Errorf("section must be a Pointer. SectionKey: %v", key)
 	}
 
@@ -199,7 +199,7 @@ func (r *section) SetConfig(c Config) error {
 	r.lockObj.Lock()
 	defer r.lockObj.Unlock()
 
-	if reflect.TypeOf(c).Kind() != reflect.Ptr {
+	if reflect.TypeOf(c).Kind() != reflect.Pointer {
 		return fmt.Errorf("config must be a Pointer")
 	}
 

@@ -2076,35 +2076,6 @@ func (m *TaskTriggerSpec) validate(all bool) error {
 	// no validation rules for Active
 
 	if all {
-		switch v := interface{}(m.GetInputs()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, TaskTriggerSpecValidationError{
-					field:  "Inputs",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, TaskTriggerSpecValidationError{
-					field:  "Inputs",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetInputs()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return TaskTriggerSpecValidationError{
-				field:  "Inputs",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
 		switch v := interface{}(m.GetRunSpec()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
@@ -2134,6 +2105,93 @@ func (m *TaskTriggerSpec) validate(all bool) error {
 	}
 
 	// no validation rules for Description
+
+	switch v := m.InputWrapper.(type) {
+	case *TaskTriggerSpec_Inputs:
+		if v == nil {
+			err := TaskTriggerSpecValidationError{
+				field:  "InputWrapper",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetInputs()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, TaskTriggerSpecValidationError{
+						field:  "Inputs",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, TaskTriggerSpecValidationError{
+						field:  "Inputs",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetInputs()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskTriggerSpecValidationError{
+					field:  "Inputs",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *TaskTriggerSpec_OffloadedInputData:
+		if v == nil {
+			err := TaskTriggerSpecValidationError{
+				field:  "InputWrapper",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetOffloadedInputData()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, TaskTriggerSpecValidationError{
+						field:  "OffloadedInputData",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, TaskTriggerSpecValidationError{
+						field:  "OffloadedInputData",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetOffloadedInputData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskTriggerSpecValidationError{
+					field:  "OffloadedInputData",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
 
 	if len(errors) > 0 {
 		return TaskTriggerSpecMultiError(errors)

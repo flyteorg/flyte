@@ -203,6 +203,11 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 		}
 	}
 
+	// Re-apply platform scheduling after the custom driver pod merge: the merge can
+	// append OR'd node selector terms that would otherwise escape the default-affinity
+	// and (forced) non-interruptible requirements. Idempotent.
+	flytek8s.ApplyPlatformSchedulingConstraints(nonInterruptibleTaskCtx.TaskExecutionMetadata().IsInterruptible(), podSpec)
+
 	primaryContainer, err := flytek8s.GetContainer(podSpec, primaryContainerName)
 	if err != nil {
 		return nil, err
@@ -254,6 +259,11 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 			primaryContainerName = executorPod.GetPrimaryContainerName()
 		}
 	}
+
+	// Re-apply platform scheduling after the custom executor pod merge: the merge can
+	// append OR'd node selector terms that would otherwise escape the default-affinity
+	// and (non)interruptible requirements. Idempotent.
+	flytek8s.ApplyPlatformSchedulingConstraints(taskCtx.TaskExecutionMetadata().IsInterruptible(), podSpec)
 
 	primaryContainer, err := flytek8s.GetContainer(podSpec, primaryContainerName)
 	if err != nil {
@@ -628,6 +638,8 @@ func init() {
 	if err := sparkOp.AddToScheme(scheme.Scheme); err != nil {
 		panic(err)
 	}
+
+	pluginmachinery.PluginRegistry().RegisterScheme(sparkTaskType, sparkOp.AddToScheme)
 
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{

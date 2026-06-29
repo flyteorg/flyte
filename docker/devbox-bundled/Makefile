@@ -97,16 +97,24 @@ dep_update: SANDBOX_CHART_DIR := ../../charts/flyte-devbox
 dep_update: dep_build
 	cd $(SANDBOX_CHART_DIR)/charts && rm -rf docker-registry flyte-binary knative-serving && for f in *.tgz; do tar xzf "$$f"; done
 
+# Use the executor's pinned, Helm-v4-compatible kustomize instead of whatever
+# kustomize the developer happens to have on PATH.
+KUSTOMIZE := ../../executor/bin/kustomize
+
+.PHONY: kustomize
+kustomize:
+	$(MAKE) -C ../../executor kustomize
+
 .PHONY: manifests
-manifests: dep_update
+manifests: dep_update kustomize
 	mkdir -p manifests
-	kustomize build \
+	$(KUSTOMIZE) build \
 		--enable-helm \
 		--load-restrictor=LoadRestrictionsNone \
 		kustomize/complete > manifests/complete.yaml
 	@printf "\n---\n" >> manifests/complete.yaml
 	@cat kustomize/net-kourier.yaml >> manifests/complete.yaml
-	kustomize build \
+	$(KUSTOMIZE) build \
 		--enable-helm \
 		--load-restrictor=LoadRestrictionsNone \
 		kustomize/dev > manifests/dev.yaml
@@ -121,6 +129,7 @@ sync-crds:
 build: sync-crds flyte dep_update manifests
 	docker buildx build --builder flyte-devbox --load \
 		$(BUILDX_CACHE_FLAGS) \
+		$(if $(CACHEBUST),--build-arg CACHEBUST=$(CACHEBUST)) \
 		--tag flyte-devbox:latest .
 
 .PHONY: build-gpu

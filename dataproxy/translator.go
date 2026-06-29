@@ -2,10 +2,16 @@ package dataproxy
 
 import (
 	"context"
+	"fmt"
 
 	"connectrpc.com/connect"
 
 	"github.com/flyteorg/flyte/v2/dataproxy/converter"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
@@ -15,10 +21,18 @@ import (
 // binary so that translation requests do not transit the control plane.
 type TranslatorService struct {
 	workflowconnect.UnimplementedTranslatorServiceHandler
+
+	dataStore     *storage.DataStore
+	runClient     workflowconnect.RunServiceClient
+	triggerClient triggerconnect.TriggerServiceClient
 }
 
-func NewTranslatorService() *TranslatorService {
-	return &TranslatorService{}
+func NewTranslatorService(dataStore *storage.DataStore, runClient workflowconnect.RunServiceClient, triggerClient triggerconnect.TriggerServiceClient) *TranslatorService {
+	return &TranslatorService{
+		dataStore:     dataStore,
+		runClient:     runClient,
+		triggerClient: triggerClient,
+	}
 }
 
 var _ workflowconnect.TranslatorServiceHandler = (*TranslatorService)(nil)
@@ -27,11 +41,87 @@ func (s *TranslatorService) LiteralsToLaunchFormJson(
 	ctx context.Context,
 	req *connect.Request[workflow.LiteralsToLaunchFormJsonRequest],
 ) (*connect.Response[workflow.LiteralsToLaunchFormJsonResponse], error) {
-	schema, err := converter.LiteralsToLaunchFormJson(ctx, req.Msg.GetLiterals(), req.Msg.GetVariables())
+	literals := req.Msg.GetLiterals()
+	switch {
+	case req.Msg.GetTriggerId() != nil:
+		var err error
+		literals, err = s.readTriggerLiterals(ctx, req.Msg.GetTriggerId())
+		if err != nil {
+			return nil, err
+		}
+	case req.Msg.GetLiteralsUri() != "":
+		var err error
+		literals, err = s.readOffloadedLiterals(ctx, req.Msg)
+		if err != nil {
+			return nil, err
+		}
+	}
+	schema, err := converter.LiteralsToLaunchFormJson(ctx, literals, req.Msg.GetVariables())
 	if err != nil {
 		return nil, err
 	}
 	return connect.NewResponse(&workflow.LiteralsToLaunchFormJsonResponse{Json: schema}), nil
+}
+
+// readOffloadedLiterals reads action literals from the object store location named by
+// literals_uri. The URI must match one of the action's data URIs reported by RunService,
+// which both authorizes the read (RunService checks access to the action) and prevents
+// arbitrary storage paths from being supplied.
+func (s *TranslatorService) readOffloadedLiterals(
+	ctx context.Context,
+	req *workflow.LiteralsToLaunchFormJsonRequest,
+) ([]*task.NamedLiteral, error) {
+	actionID := req.GetActionId()
+	if actionID == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("action_id is required when literals_uri is set"))
+	}
+
+	urisResp, err := s.runClient.GetActionDataURIs(ctx, connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		ActionId: actionID,
+	}))
+	if err != nil {
+		return nil, err
+	}
+
+	uri := req.GetLiteralsUri()
+	if uri != urisResp.Msg.GetInputsUri() && uri != urisResp.Msg.GetOutputsUri() {
+		return nil, connect.NewError(connect.CodeInvalidArgument,
+			fmt.Errorf("literals_uri does not match any data URI of action %s", actionID.GetName()))
+	}
+
+	// Both inputs.pb and outputs.pb deserialize as task.Inputs (a NamedLiteral list).
+	var inputsOrOutputs task.Inputs
+	if err := s.dataStore.ReadProtobuf(ctx, storage.DataReference(uri), &inputsOrOutputs); err != nil {
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read literals from %s: %w", uri, err))
+	}
+	return inputsOrOutputs.GetLiterals(), nil
+}
+
+// readTriggerLiterals reads a trigger's offloaded inputs from storage. The offloaded
+// input URI is taken from the trigger's own spec (looked up via TriggerService) rather
+// than supplied by the client, so there is no client-provided URI to validate.
+func (s *TranslatorService) readTriggerLiterals(
+	ctx context.Context,
+	triggerID *common.TriggerIdentifier,
+) ([]*task.NamedLiteral, error) {
+	resp, err := s.triggerClient.GetTriggerRevisionDetails(ctx, connect.NewRequest(&trigger.GetTriggerRevisionDetailsRequest{
+		Id: triggerID,
+	}))
+	if err != nil {
+		return nil, err
+	}
+
+	uri := resp.Msg.GetTrigger().GetSpec().GetOffloadedInputData().GetUri()
+	if uri == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument,
+			fmt.Errorf("trigger %s has no offloaded input data", triggerID.GetName().GetName()))
+	}
+
+	var inputs task.Inputs
+	if err := s.dataStore.ReadProtobuf(ctx, storage.DataReference(uri), &inputs); err != nil {
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read trigger literals from %s: %w", uri, err))
+	}
+	return inputs.GetLiterals(), nil
 }
 
 func (s *TranslatorService) LaunchFormJsonToLiterals(

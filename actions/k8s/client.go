@@ -6,9 +6,11 @@ import (
 	"hash/fnv"
 	"strings"
 	"sync"
+	"time"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -169,7 +171,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 		taskAction.Spec.CacheKey = extractTaskCacheKey(action)
 
 		// Embed the inline TaskTemplate if present.
-		if err := embedTaskTemplate(action, taskAction); err != nil {
+		if err := embedTaskTemplate(action, taskAction, runSpec); err != nil {
 			return fmt.Errorf("failed to embed task template: %w", err)
 		}
 
@@ -227,23 +229,8 @@ func (c *ActionsClient) AbortAction(ctx context.Context, actionID *common.Action
 	return nil
 }
 
-// GetState retrieves the state JSON for a TaskAction
-func (c *ActionsClient) GetState(ctx context.Context, actionID *common.ActionIdentifier) (string, error) {
-	taskActionName := buildTaskActionName(actionID)
-
-	taskAction := &executorv1.TaskAction{}
-	if err := c.k8sClient.Get(ctx, client.ObjectKey{
-		Name:      taskActionName,
-		Namespace: flyteNamespace,
-	}, taskAction); err != nil {
-		return "", fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
-	}
-
-	return taskAction.Status.StateJSON, nil
-}
-
-// PutState updates the state JSON and latest attempt metadata for a TaskAction.
-func (c *ActionsClient) PutState(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus, stateJSON string) error {
+// PutStatus updates the latest attempt metadata for a TaskAction.
+func (c *ActionsClient) PutStatus(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus) error {
 	taskActionName := buildTaskActionName(actionID)
 
 	// Get current TaskAction
@@ -255,24 +242,25 @@ func (c *ActionsClient) PutState(ctx context.Context, actionID *common.ActionIde
 		return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
 
-	// Skip update if the stateJSON does not change
-	if taskAction.Status.StateJSON == stateJSON {
+	if status == nil {
 		return nil
 	}
 
-	// Update state JSON
-	taskAction.Status.StateJSON = stateJSON
-	if status != nil {
-		taskAction.Status.Attempts = status.GetAttempts()
-		taskAction.Status.CacheStatus = status.GetCacheStatus()
+	// Skip update if the attempts and cache status do not change
+	if taskAction.Status.Attempts == status.GetAttempts() &&
+		taskAction.Status.CacheStatus == status.GetCacheStatus() {
+		return nil
 	}
+
+	taskAction.Status.Attempts = status.GetAttempts()
+	taskAction.Status.CacheStatus = status.GetCacheStatus()
 
 	// Update status subresource
 	if err := c.k8sClient.Status().Update(ctx, taskAction); err != nil {
 		return fmt.Errorf("failed to update TaskAction status %s: %w", taskActionName, err)
 	}
 
-	logger.Infof(ctx, "Updated state for TaskAction: %s", taskActionName)
+	logger.Infof(ctx, "Updated status for TaskAction: %s", taskActionName)
 	return nil
 }
 
@@ -349,29 +337,40 @@ func (c *ActionsClient) GetTaskAction(ctx context.Context, actionID *common.Acti
 	return taskAction, nil
 }
 
-// Subscribe creates a new subscription channel for action updates for specified parent action name
-func (c *ActionsClient) Subscribe(parentActionName string) chan *ActionUpdate {
+// Subscribe creates a new subscription channel for action updates scoped to the given (run, parent action).
+// subscriberKey scopes a subscription to a single (run, parent action) pair.
+// The parent action name alone is NOT unique across runs -- every run's root
+// action is named "a0" -- so keying on it alone broadcasts each run's child
+// updates to every other run's watch stream. Same-named children then collide
+// in the SDK informer cache and clobber each other's phase, wedging the parent.
+func subscriberKey(runName, parentActionName string) string {
+	return runName + "/" + parentActionName
+}
+
+func (c *ActionsClient) Subscribe(runName, parentActionName string) chan *ActionUpdate {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	key := subscriberKey(runName, parentActionName)
 	ch := make(chan *ActionUpdate, c.bufferSize)
-	if c.subscribers[parentActionName] == nil {
-		c.subscribers[parentActionName] = make(map[chan *ActionUpdate]struct{})
+	if c.subscribers[key] == nil {
+		c.subscribers[key] = make(map[chan *ActionUpdate]struct{})
 	}
-	c.subscribers[parentActionName][ch] = struct{}{}
+	c.subscribers[key][ch] = struct{}{}
 	return ch
 }
 
-// Unsubscribe removes the given channel from the subscription list for the parent action name
-func (c *ActionsClient) Unsubscribe(parentActionName string, ch chan *ActionUpdate) {
+// Unsubscribe removes the given channel from the subscription list for the (run, parent action)
+func (c *ActionsClient) Unsubscribe(runName, parentActionName string, ch chan *ActionUpdate) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if channels, ok := c.subscribers[parentActionName]; ok {
+	key := subscriberKey(runName, parentActionName)
+	if channels, ok := c.subscribers[key]; ok {
 		delete(channels, ch)
 		close(ch)
 		if len(channels) == 0 {
-			delete(c.subscribers, parentActionName)
+			delete(c.subscribers, key)
 		}
 	}
 }
@@ -548,7 +547,8 @@ func (c *ActionsClient) notifySubscribers(ctx context.Context, update *ActionUpd
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	for ch := range c.subscribers[update.ParentActionName] {
+	key := subscriberKey(update.ActionID.GetRun().GetName(), update.ParentActionName)
+	for ch := range c.subscribers[key] {
 		select {
 		case ch <- update:
 		default:
@@ -877,8 +877,17 @@ func extractTaskCacheKey(action *actions.Action) string {
 	return taskSpec.Task.CacheKey.Value
 }
 
-// embedTaskTemplate serializes the inline TaskTemplate from the Action into the CR spec.
-func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction) error {
+// runStartTimeTemplateVar is the placeholder the SDK (>= 2.3.6) emits in a task's container args
+// for the run start time. The backend substitutes it at TaskAction creation so the value surfaces
+// as flyte.ctx().run_start_time. See flyteorg/flyte-sdk#1100. Unlike --run-name / --name (which the
+// SDK reads from the RUN_NAME / ACTION_NAME env vars when left unsubstituted), --run-start-time has
+// no env-var fallback, so the value must be baked into the args here.
+const runStartTimeTemplateVar = "{{.runStartTime}}"
+
+// embedTaskTemplate serializes the inline TaskTemplate from the Action into the CR spec,
+// substituting the {{.runStartTime}} container-arg placeholder with runSpec.run_start_time when
+// set. Templates produced by older SDKs omit the placeholder, so the substitution is a no-op.
+func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction, runSpec *task.RunSpec) error {
 	taskSpec, ok := action.Spec.(*actions.Action_Task)
 	if !ok || taskSpec.Task == nil || taskSpec.Task.Spec == nil || taskSpec.Task.Spec.TaskTemplate == nil {
 		// Non-task actions do not carry an inline template.
@@ -889,12 +898,34 @@ func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction
 	taskAction.Spec.TaskType = tmpl.Type
 	taskAction.Spec.ShortName = taskSpec.Task.Spec.ShortName
 
+	tmpl = substituteRunStartTime(tmpl, runSpec.GetRunStartTime())
+
 	data, err := proto.Marshal(tmpl)
 	if err != nil {
 		return fmt.Errorf("failed to marshal task template: %w", err)
 	}
 	taskAction.Spec.TaskTemplate = data
 	return nil
+}
+
+// substituteRunStartTime returns a TaskTemplate whose container args have the {{.runStartTime}}
+// placeholder replaced with ts formatted as RFC3339 UTC. It returns the input unchanged when ts is
+// nil or the template has no container args. The template is cloned before mutation so the caller's
+// proto — which may be persisted separately as the registered task spec — is not affected.
+func substituteRunStartTime(tmpl *core.TaskTemplate, ts *timestamppb.Timestamp) *core.TaskTemplate {
+	if ts == nil {
+		return tmpl
+	}
+	if tmpl.GetContainer() == nil || len(tmpl.GetContainer().GetArgs()) == 0 {
+		return tmpl
+	}
+	value := ts.AsTime().UTC().Format(time.RFC3339)
+	cloned := proto.Clone(tmpl).(*core.TaskTemplate)
+	args := cloned.GetContainer().GetArgs()
+	for i, arg := range args {
+		args[i] = strings.ReplaceAll(arg, runStartTimeTemplateVar, value)
+	}
+	return cloned
 }
 
 // extractShortNameFromTemplate extracts a human-readable function name from a serialized TaskTemplate.

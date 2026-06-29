@@ -22,11 +22,6 @@ class ActionsServiceStub(object):
                 request_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueResponse.FromString,
                 )
-        self.GetLatestState = channel.unary_unary(
-                '/flyteidl2.actions.ActionsService/GetLatestState',
-                request_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateResponse.FromString,
-                )
         self.WatchForUpdates = channel.unary_stream(
                 '/flyteidl2.actions.ActionsService/WatchForUpdates',
                 request_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.WatchForUpdatesRequest.SerializeToString,
@@ -57,14 +52,6 @@ class ActionsServiceServicer(object):
 
     def Enqueue(self, request, context):
         """Enqueue queues a new action for execution.
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def GetLatestState(self, request, context):
-        """GetLatestState returns the latest `NodeStatus` of an action.
-        This deprecates Get in the current StateService.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -114,11 +101,6 @@ def add_ActionsServiceServicer_to_server(servicer, server):
                     request_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueRequest.FromString,
                     response_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueResponse.SerializeToString,
             ),
-            'GetLatestState': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetLatestState,
-                    request_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateRequest.FromString,
-                    response_serializer=flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateResponse.SerializeToString,
-            ),
             'WatchForUpdates': grpc.unary_stream_rpc_method_handler(
                     servicer.WatchForUpdates,
                     request_deserializer=flyteidl2_dot_actions_dot_actions__service__pb2.WatchForUpdatesRequest.FromString,
@@ -166,23 +148,6 @@ class ActionsService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.actions.ActionsService/Enqueue',
             flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueRequest.SerializeToString,
             flyteidl2_dot_actions_dot_actions__service__pb2.EnqueueResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def GetLatestState(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.actions.ActionsService/GetLatestState',
-            flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateRequest.SerializeToString,
-            flyteidl2_dot_actions_dot_actions__service__pb2.GetLatestStateResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

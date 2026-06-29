@@ -1,0 +1,103 @@
+name: Publish Helm Package
+
+on:
+  push:
+    tags:
+      - 'v2*'
+
+env:
+  DEPOT_PROJECT_ID: ${{ vars.DEPOT_PROJECT_ID }}
+
+jobs:
+  build-and-push-single-binary-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # required for Depot OIDC auth (GHCR auth uses FLYTE_BOT_PAT)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Validate Depot project id
+        run: |
+          if [ -z "${DEPOT_PROJECT_ID}" ]; then
+            echo "::error::DEPOT_PROJECT_ID repo variable is not set. Add it under Settings → Secrets and variables → Actions → Variables." >&2
+            exit 1
+          fi
+      - name: Setup Golang caches
+        uses: actions/cache@v4
+        with:
+          path: |
+            /root/.cache/go-build
+            /root/go/pkg/mod
+          key: ${{ runner.os }}-golang-${{ hashFiles('go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-golang-
+      - name: Set versions
+        id: set_version
+        run: |
+          # TODO: The console version should be set in config and send into Dockerfile in the future
+          # echo "FLYTECONSOLE_VERSION=latest" >> $GITHUB_ENV
+          echo "FLYTE_VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+      - name: Prepare Image Names
+        id: image-names
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flyte-binary-v2
+          tags: |
+            type=ref,event=tag
+      - name: Set up Depot
+        uses: depot/setup-action@v1
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+      - name: Build and push Image
+        uses: depot/build-push-action@v1
+        with:
+          project: ${{ env.DEPOT_PROJECT_ID }}
+          context: .
+          # Native multi-arch on Depot — no QEMU. Re-uses the persistent
+          # project layer cache from the per-arch builds above.
+          platforms: linux/arm64,linux/amd64
+          tags: ${{ steps.image-names.outputs.tags }}
+          build-args: |
+            FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
+            FLYTE_VERSION=${{ env.FLYTE_VERSION }}
+          file: Dockerfile
+          push: true
+
+  helm-release:
+    name: Flyte helm release
+    runs-on: ubuntu-latest
+    needs:
+      - build-and-push-single-binary-image
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest' # default is latest (stable)
+          token: ${{ secrets.GITHUB_TOKEN }} # only needed if version is 'latest'
+        id: install
+      - name: Configure Git
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
+      - name: Prepare Flyte Helm Release
+        env:
+          VERSION: ${{ github.ref_name }}
+          REPOSITORY: "https://flyteorg.github.io/flyte"
+        run: |
+          make tag-helm
+      - name: Run chart-releaser
+        uses: stefanprodan/helm-gh-pages@v1.4.1
+        with:
+          token: "${{ secrets.FLYTE_BOT_PAT }}"
+          linting: off

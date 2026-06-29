@@ -372,6 +372,8 @@ func (m *UploadInputsRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for BaseDir
+
 	switch v := m.Id.(type) {
 	case *UploadInputsRequest_RunId:
 		if v == nil {
@@ -1528,6 +1530,10 @@ func (m *GetActionDataResponse) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for InputsUri
+
+	// no validation rules for OutputsUri
 
 	if len(errors) > 0 {
 		return GetActionDataResponseMultiError(errors)

@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 
+	"connectrpc.com/connect"
+	"connectrpc.com/otelconnect"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/kubernetes"
@@ -28,17 +30,19 @@ import (
 	cachecatalog "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog/cache_service"
 	webhookConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 
-	// Plugin registrations — blank imports trigger init() which registers
-	// plugins with the global registry.
+	_ "github.com/flyteorg/flyte/v2/executor/plugins"
 	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/clustered"
 	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/pod"
 )
 
 var scheme = runtime.NewScheme()
+
+const otelServiceName = "executor"
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
@@ -57,6 +61,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
 
 	cfg := config.GetConfig()
+
+	for _, reg := range pluginmachinery.PluginRegistry().GetSchemeRegisters() {
+		utilruntime.Must(reg.AddToScheme(scheme))
+	}
 
 	var tlsOpts []func(*tls.Config)
 	if !cfg.EnableHTTP2 {
@@ -109,7 +117,9 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		podNamespace = sc.Namespace
 	}
 
-	if err := webhookPkg.Setup(ctx, kubeClient, wCfg, podNamespace, promutils.NewScope("executor"), mgr); err != nil {
+	executorScope := promutils.NewScope("executor")
+
+	if err := webhookPkg.Setup(ctx, kubeClient, wCfg, podNamespace, executorScope.NewSubScope("webhook"), mgr); err != nil {
 		return fmt.Errorf("executor: webhook setup failed: %w", err)
 	}
 
@@ -121,24 +131,37 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	setupCtx := plugin.NewSetupContext(
 		mgr, nil, nil, nil, nil,
 		"TaskAction",
-		promutils.NewScope("executor"),
+		executorScope.NewSubScope("plugin"),
 	)
 	registry := plugin.NewRegistry(setupCtx, pluginmachinery.PluginRegistry())
 	if err := registry.Initialize(ctx); err != nil {
 		return fmt.Errorf("executor: failed to initialize plugin registry: %w", err)
 	}
 
+	otelCfg := otelutils.GetConfig()
+	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
+		return fmt.Errorf("registering otel providers: %w", err)
+	}
+	otelInterceptor, err := otelconnect.NewInterceptor(
+		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
+		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
+		otelconnect.WithoutServerPeerAttributes(),
+	)
+	if err != nil {
+		return fmt.Errorf("creating otel interceptor: %w", err)
+	}
+
 	eventsServiceURL := sc.BaseURL
 	if eventsServiceURL == "" {
 		eventsServiceURL = cfg.EventsServiceURL
 	}
-	eventsClient := workflowconnect.NewEventsProxyServiceClient(http.DefaultClient, eventsServiceURL)
+	eventsClient := workflowconnect.NewEventsProxyServiceClient(http.DefaultClient, eventsServiceURL, connect.WithInterceptors(otelInterceptor))
 	catalogCfg := catalog.GetConfig()
 	cacheServiceURL := sc.BaseURL
 	if cacheServiceURL == "" {
 		cacheServiceURL = cfg.CacheServiceURL
 	}
-	cacheClient := cachecatalog.NewHTTPClient(dataStore, cacheServiceURL, catalogCfg.MaxCacheAge.Duration)
+	cacheClient := cachecatalog.NewHTTPClient(dataStore, cacheServiceURL, catalogCfg.MaxCacheAge.Duration, connect.WithInterceptors(otelInterceptor))
 	asyncCatalogClient, err := catalog.NewAsyncClient(cacheClient, *catalogCfg, promutils.NewScope("executor:catalog"))
 	if err != nil {
 		return fmt.Errorf("executor: failed to create catalog cache client: %w", err)
@@ -149,12 +172,16 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 	reconciler := controller.NewTaskActionReconciler(
 		mgr.GetClient(), mgr.GetScheme(), registry, dataStore, eventsClient, cfg.Cluster,
+		otelutils.GetMeterProvider(otelServiceName), mgr.GetCache(),
 	)
 	reconciler.CatalogClient = asyncCatalogClient
 	reconciler.Catalog = cacheClient
-	reconciler.Recorder = mgr.GetEventRecorderFor("taskaction-controller")
-	reconciler.MaxSystemFailures = cfg.MaxSystemFailures
-	if err := reconciler.SetupWithManager(mgr); err != nil {
+	reconciler.Recorder = mgr.GetEventRecorder("taskaction-controller")
+	if cfg.MaxSystemFailures < 0 {
+		return fmt.Errorf("executor: maxSystemFailures must be non-negative, got %d", cfg.MaxSystemFailures)
+	}
+	reconciler.MaxSystemFailures = uint32(cfg.MaxSystemFailures)
+	if err := reconciler.SetupWithManager(mgr, cfg.MaxConcurrentReconciles); err != nil {
 		return fmt.Errorf("executor: failed to setup controller: %w", err)
 	}
 
@@ -162,7 +189,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		if cfg.GC.MaxTTL.Duration <= 0 {
 			return fmt.Errorf("executor: gc.maxTTL must be positive when gc is enabled, got %v", cfg.GC.MaxTTL.Duration)
 		}
-		gc := controller.NewGarbageCollector(mgr.GetClient(), cfg.GC.Interval.Duration, cfg.GC.MaxTTL.Duration)
+		gc := controller.NewGarbageCollector(mgr.GetClient(), mgr.GetAPIReader(), cfg.GC.Interval.Duration, cfg.GC.MaxTTL.Duration)
 		if err := mgr.Add(gc); err != nil {
 			return fmt.Errorf("executor: failed to add garbage collector: %w", err)
 		}

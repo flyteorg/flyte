@@ -1,9 +1,9 @@
-{{- if and .Values.ingress.create .Values.ingress.separateGrpcIngress }}
-{{- $paths := (include "flyte-binary.ingress.grpcPaths" .) | fromYamlArray }}
+{{- if and .Values.ingress.create .Values.ingress.apiJwtIngress.enabled }}
+{{- $paths := (include "flyte-binary.ingress.apiPaths" .) | fromYamlArray }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "flyte-binary.fullname" . }}-grpc
+  name: {{ include "flyte-binary.fullname" . }}-api-jwt
   namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "flyte-binary.labels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
@@ -19,26 +19,23 @@ metadata:
     {{- if .Values.ingress.commonAnnotations }}
     {{- tpl ( .Values.ingress.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
-    {{- if .Values.ingress.grpcAnnotations }}
-    {{- tpl ( .Values.ingress.grpcAnnotations | toYaml ) . | nindent 4 }}
+    {{- if .Values.ingress.apiJwtIngress.annotations }}
+    {{- tpl ( .Values.ingress.apiJwtIngress.annotations | toYaml ) . | nindent 4 }}
     {{- end }}
 spec:
-  {{- if .Values.ingress.grpcIngressClassName }}
-  ingressClassName: {{ .Values.ingress.grpcIngressClassName | quote }}
+  {{- if .Values.ingress.apiJwtIngress.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.apiJwtIngress.ingressClassName | quote }}
   {{- else if .Values.ingress.ingressClassName }}
   ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
   {{- end }}
-  {{- if .Values.ingress.grpcTls }}
-  tls: {{- tpl ( .Values.ingress.grpcTls | toYaml ) . | nindent 2 }}
+  {{- if .Values.ingress.apiJwtIngress.tls }}
+  tls: {{- tpl ( .Values.ingress.apiJwtIngress.tls | toYaml ) . | nindent 2 }}
   {{- else if .Values.ingress.tls }}
   tls: {{- tpl ( .Values.ingress.tls | toYaml ) . | nindent 2 }}
   {{- end }}
   rules:
   - http:
       paths:
-      {{- if .Values.ingress.grpcExtraPaths.prepend }}
-      {{- tpl ( .Values.ingress.grpcExtraPaths.prepend | toYaml ) . | nindent 6 }}
-      {{- end }}
       {{- range $path := $paths }}
         - path: {{ $path }}
           {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
@@ -47,16 +44,13 @@ spec:
           backend:
             {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
             service:
-              name: {{ include "flyte-binary.service.grpc.name" $ }}
+              name: {{ include "flyte-binary.service.http.name" $ }}
               port:
-                number: {{ include "flyte-binary.service.grpc.port" $ }}
+                number: {{ include "flyte-binary.service.http.port" $ }}
             {{- else }}
-            serviceName: {{ include "flyte-binary.service.grpc.name" $ }}
-            servicePort: {{ include "flyte-binary.service.grpc.port" $ }}
+            serviceName: {{ include "flyte-binary.service.http.name" $ }}
+            servicePort: {{ include "flyte-binary.service.http.port" $ }}
             {{- end }}
-      {{- end }}
-      {{- if .Values.ingress.grpcExtraPaths.append }}
-      {{- tpl ( .Values.ingress.grpcExtraPaths.append | toYaml ) . | nindent 6 }}
       {{- end }}
     {{- if .Values.ingress.host }}
     host: {{ tpl .Values.ingress.host . | quote }}

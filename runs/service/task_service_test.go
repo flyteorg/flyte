@@ -15,9 +15,41 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	projectMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
+	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
 	mocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
+
+func cronAutomation(kickoffArg string) *task.TriggerAutomationSpec {
+	return &task.TriggerAutomationSpec{
+		Automation: &task.TriggerAutomationSpec_Schedule{
+			Schedule: &task.Schedule{
+				Expression:          &task.Schedule_Cron{Cron: &task.Cron{Expression: "0 0 * * *"}},
+				KickoffTimeInputArg: kickoffArg,
+			},
+		},
+	}
+}
+
+// buildTriggerModels maps an offloaded embedded trigger's inputs into the TriggerSpec input_wrapper.
+func TestBuildTriggerModels_OffloadedInputs(t *testing.T) {
+	taskId := &task.TaskIdentifier{Project: "p", Domain: "d", Name: "t", Version: "v1"}
+	offloaded := &common.OffloadedInputData{Uri: "offloaded-inputs/hash123", InputsHash: "hash123"}
+	tts := []*task.TaskTrigger{{
+		Name:           "trig",
+		Spec:           &task.TaskTriggerSpec{InputWrapper: &task.TaskTriggerSpec_OffloadedInputData{OffloadedInputData: offloaded}},
+		AutomationSpec: cronAutomation(""),
+	}}
+
+	triggerModels, err := buildTriggerModels(context.Background(), taskId, tts)
+	require.NoError(t, err)
+	require.Len(t, triggerModels, 1)
+
+	var spec triggerpb.TriggerSpec
+	require.NoError(t, proto.Unmarshal(triggerModels[0].Spec, &spec))
+	assert.Equal(t, "offloaded-inputs/hash123", spec.GetOffloadedInputData().GetUri())
+	assert.Nil(t, spec.GetInputs())
+}
 
 func TestDeployTask(t *testing.T) {
 	ctx := context.Background()

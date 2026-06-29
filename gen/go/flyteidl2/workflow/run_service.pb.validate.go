@@ -36,7 +36,7 @@ var (
 	_ = anypb.Any{}
 	_ = sort.Sort
 
-	_ = common.Sort_Direction(0)
+	_ = common.ActionPhase(0)
 )
 
 // Validate checks the field values on CreateRunRequest with the rules defined
@@ -91,6 +91,35 @@ func (m *CreateRunRequest) validate(all bool) error {
 	}
 
 	// no validation rules for Source
+
+	if all {
+		switch v := interface{}(m.GetRunStartTime()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CreateRunRequestValidationError{
+					field:  "RunStartTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CreateRunRequestValidationError{
+					field:  "RunStartTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRunStartTime()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CreateRunRequestValidationError{
+				field:  "RunStartTime",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	switch v := m.Id.(type) {
 	case *CreateRunRequest_RunId:
@@ -2786,6 +2815,8 @@ func (m *ListRunsRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for PausedActionsOnly
+
 	switch v := m.ScopeBy.(type) {
 	case *ListRunsRequest_Org:
 		if v == nil {
@@ -4158,6 +4189,1381 @@ var _ interface {
 	ErrorName() string
 } = WatchActionsResponseValidationError{}
 
+// Validate checks the field values on WatchWindowedActionsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *WatchWindowedActionsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WatchWindowedActionsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// WatchWindowedActionsRequestMultiError, or nil if none found.
+func (m *WatchWindowedActionsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WatchWindowedActionsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	switch v := m.Msg.(type) {
+	case *WatchWindowedActionsRequest_Subscribe_:
+		if v == nil {
+			err := WatchWindowedActionsRequestValidationError{
+				field:  "Msg",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetSubscribe()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, WatchWindowedActionsRequestValidationError{
+						field:  "Subscribe",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, WatchWindowedActionsRequestValidationError{
+						field:  "Subscribe",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetSubscribe()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WatchWindowedActionsRequestValidationError{
+					field:  "Subscribe",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *WatchWindowedActionsRequest_UpdateWindow_:
+		if v == nil {
+			err := WatchWindowedActionsRequestValidationError{
+				field:  "Msg",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetUpdateWindow()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, WatchWindowedActionsRequestValidationError{
+						field:  "UpdateWindow",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, WatchWindowedActionsRequestValidationError{
+						field:  "UpdateWindow",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetUpdateWindow()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WatchWindowedActionsRequestValidationError{
+					field:  "UpdateWindow",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
+
+	if len(errors) > 0 {
+		return WatchWindowedActionsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// WatchWindowedActionsRequestMultiError is an error wrapping multiple
+// validation errors returned by WatchWindowedActionsRequest.ValidateAll() if
+// the designated constraints aren't met.
+type WatchWindowedActionsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WatchWindowedActionsRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WatchWindowedActionsRequestMultiError) AllErrors() []error { return m }
+
+// WatchWindowedActionsRequestValidationError is the validation error returned
+// by WatchWindowedActionsRequest.Validate if the designated constraints
+// aren't met.
+type WatchWindowedActionsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WatchWindowedActionsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WatchWindowedActionsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WatchWindowedActionsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WatchWindowedActionsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WatchWindowedActionsRequestValidationError) ErrorName() string {
+	return "WatchWindowedActionsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WatchWindowedActionsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWatchWindowedActionsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WatchWindowedActionsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WatchWindowedActionsRequestValidationError{}
+
+// Validate checks the field values on NodeExpansionParams with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *NodeExpansionParams) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on NodeExpansionParams with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// NodeExpansionParamsMultiError, or nil if none found.
+func (m *NodeExpansionParams) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *NodeExpansionParams) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Offset
+
+	// no validation rules for Limit
+
+	if len(errors) > 0 {
+		return NodeExpansionParamsMultiError(errors)
+	}
+
+	return nil
+}
+
+// NodeExpansionParamsMultiError is an error wrapping multiple validation
+// errors returned by NodeExpansionParams.ValidateAll() if the designated
+// constraints aren't met.
+type NodeExpansionParamsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m NodeExpansionParamsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m NodeExpansionParamsMultiError) AllErrors() []error { return m }
+
+// NodeExpansionParamsValidationError is the validation error returned by
+// NodeExpansionParams.Validate if the designated constraints aren't met.
+type NodeExpansionParamsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e NodeExpansionParamsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e NodeExpansionParamsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e NodeExpansionParamsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e NodeExpansionParamsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e NodeExpansionParamsValidationError) ErrorName() string {
+	return "NodeExpansionParamsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e NodeExpansionParamsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sNodeExpansionParams.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = NodeExpansionParamsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = NodeExpansionParamsValidationError{}
+
+// Validate checks the field values on WatchWindowedActionsResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *WatchWindowedActionsResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WatchWindowedActionsResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// WatchWindowedActionsResponseMultiError, or nil if none found.
+func (m *WatchWindowedActionsResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WatchWindowedActionsResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetWindowItems() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, WatchWindowedActionsResponseValidationError{
+						field:  fmt.Sprintf("WindowItems[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, WatchWindowedActionsResponseValidationError{
+						field:  fmt.Sprintf("WindowItems[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WatchWindowedActionsResponseValidationError{
+					field:  fmt.Sprintf("WindowItems[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetAncestors() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, WatchWindowedActionsResponseValidationError{
+						field:  fmt.Sprintf("Ancestors[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, WatchWindowedActionsResponseValidationError{
+						field:  fmt.Sprintf("Ancestors[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WatchWindowedActionsResponseValidationError{
+					field:  fmt.Sprintf("Ancestors[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for TotalFlatCount
+
+	// no validation rules for SelectedFlatIndex
+
+	// no validation rules for InitialSnapshotComplete
+
+	for idx, item := range m.GetTruncations() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, WatchWindowedActionsResponseValidationError{
+						field:  fmt.Sprintf("Truncations[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, WatchWindowedActionsResponseValidationError{
+						field:  fmt.Sprintf("Truncations[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WatchWindowedActionsResponseValidationError{
+					field:  fmt.Sprintf("Truncations[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for ResyncHint
+
+	if len(errors) > 0 {
+		return WatchWindowedActionsResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// WatchWindowedActionsResponseMultiError is an error wrapping multiple
+// validation errors returned by WatchWindowedActionsResponse.ValidateAll() if
+// the designated constraints aren't met.
+type WatchWindowedActionsResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WatchWindowedActionsResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WatchWindowedActionsResponseMultiError) AllErrors() []error { return m }
+
+// WatchWindowedActionsResponseValidationError is the validation error returned
+// by WatchWindowedActionsResponse.Validate if the designated constraints
+// aren't met.
+type WatchWindowedActionsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WatchWindowedActionsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WatchWindowedActionsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WatchWindowedActionsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WatchWindowedActionsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WatchWindowedActionsResponseValidationError) ErrorName() string {
+	return "WatchWindowedActionsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WatchWindowedActionsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWatchWindowedActionsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WatchWindowedActionsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WatchWindowedActionsResponseValidationError{}
+
+// Validate checks the field values on WindowedItem with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *WindowedItem) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WindowedItem with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in WindowedItemMultiError, or
+// nil if none found.
+func (m *WindowedItem) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WindowedItem) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Depth
+
+	// no validation rules for IsExpanded
+
+	switch v := m.Item.(type) {
+	case *WindowedItem_Action:
+		if v == nil {
+			err := WindowedItemValidationError{
+				field:  "Item",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetAction()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, WindowedItemValidationError{
+						field:  "Action",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, WindowedItemValidationError{
+						field:  "Action",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetAction()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WindowedItemValidationError{
+					field:  "Action",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *WindowedItem_Group:
+		if v == nil {
+			err := WindowedItemValidationError{
+				field:  "Item",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetGroup()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, WindowedItemValidationError{
+						field:  "Group",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, WindowedItemValidationError{
+						field:  "Group",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetGroup()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WindowedItemValidationError{
+					field:  "Group",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
+
+	if len(errors) > 0 {
+		return WindowedItemMultiError(errors)
+	}
+
+	return nil
+}
+
+// WindowedItemMultiError is an error wrapping multiple validation errors
+// returned by WindowedItem.ValidateAll() if the designated constraints aren't met.
+type WindowedItemMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WindowedItemMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WindowedItemMultiError) AllErrors() []error { return m }
+
+// WindowedItemValidationError is the validation error returned by
+// WindowedItem.Validate if the designated constraints aren't met.
+type WindowedItemValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WindowedItemValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WindowedItemValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WindowedItemValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WindowedItemValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WindowedItemValidationError) ErrorName() string { return "WindowedItemValidationError" }
+
+// Error satisfies the builtin error interface
+func (e WindowedItemValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWindowedItem.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WindowedItemValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WindowedItemValidationError{}
+
+// Validate checks the field values on ActionLeaf with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ActionLeaf) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ActionLeaf with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ActionLeafMultiError, or
+// nil if none found.
+func (m *ActionLeaf) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ActionLeaf) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ActionId
+
+	// no validation rules for ShortName
+
+	if all {
+		switch v := interface{}(m.GetDuration()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionLeafValidationError{
+					field:  "Duration",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionLeafValidationError{
+					field:  "Duration",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDuration()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionLeafValidationError{
+				field:  "Duration",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ActionLeafMultiError(errors)
+	}
+
+	return nil
+}
+
+// ActionLeafMultiError is an error wrapping multiple validation errors
+// returned by ActionLeaf.ValidateAll() if the designated constraints aren't met.
+type ActionLeafMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ActionLeafMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ActionLeafMultiError) AllErrors() []error { return m }
+
+// ActionLeafValidationError is the validation error returned by
+// ActionLeaf.Validate if the designated constraints aren't met.
+type ActionLeafValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ActionLeafValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ActionLeafValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ActionLeafValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ActionLeafValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ActionLeafValidationError) ErrorName() string { return "ActionLeafValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ActionLeafValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sActionLeaf.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ActionLeafValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ActionLeafValidationError{}
+
+// Validate checks the field values on GroupAggregations with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *GroupAggregations) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GroupAggregations with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GroupAggregationsMultiError, or nil if none found.
+func (m *GroupAggregations) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GroupAggregations) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetFailed() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GroupAggregationsValidationError{
+						field:  fmt.Sprintf("Failed[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GroupAggregationsValidationError{
+						field:  fmt.Sprintf("Failed[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GroupAggregationsValidationError{
+					field:  fmt.Sprintf("Failed[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetLongestDuration() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GroupAggregationsValidationError{
+						field:  fmt.Sprintf("LongestDuration[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GroupAggregationsValidationError{
+						field:  fmt.Sprintf("LongestDuration[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GroupAggregationsValidationError{
+					field:  fmt.Sprintf("LongestDuration[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetLongestRunning() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GroupAggregationsValidationError{
+						field:  fmt.Sprintf("LongestRunning[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GroupAggregationsValidationError{
+						field:  fmt.Sprintf("LongestRunning[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GroupAggregationsValidationError{
+					field:  fmt.Sprintf("LongestRunning[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetLongestSetup() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GroupAggregationsValidationError{
+						field:  fmt.Sprintf("LongestSetup[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GroupAggregationsValidationError{
+						field:  fmt.Sprintf("LongestSetup[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GroupAggregationsValidationError{
+					field:  fmt.Sprintf("LongestSetup[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GroupAggregationsMultiError(errors)
+	}
+
+	return nil
+}
+
+// GroupAggregationsMultiError is an error wrapping multiple validation errors
+// returned by GroupAggregations.ValidateAll() if the designated constraints
+// aren't met.
+type GroupAggregationsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GroupAggregationsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GroupAggregationsMultiError) AllErrors() []error { return m }
+
+// GroupAggregationsValidationError is the validation error returned by
+// GroupAggregations.Validate if the designated constraints aren't met.
+type GroupAggregationsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GroupAggregationsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GroupAggregationsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GroupAggregationsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GroupAggregationsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GroupAggregationsValidationError) ErrorName() string {
+	return "GroupAggregationsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GroupAggregationsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGroupAggregations.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GroupAggregationsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GroupAggregationsValidationError{}
+
+// Validate checks the field values on GroupNode with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *GroupNode) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GroupNode with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GroupNodeMultiError, or nil
+// if none found.
+func (m *GroupNode) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GroupNode) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for GroupName
+
+	// no validation rules for ParentId
+
+	// no validation rules for ChildPhaseCounts
+
+	if all {
+		switch v := interface{}(m.GetEarliestStartTime()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GroupNodeValidationError{
+					field:  "EarliestStartTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GroupNodeValidationError{
+					field:  "EarliestStartTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetEarliestStartTime()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GroupNodeValidationError{
+				field:  "EarliestStartTime",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetLatestEndTime()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GroupNodeValidationError{
+					field:  "LatestEndTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GroupNodeValidationError{
+					field:  "LatestEndTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLatestEndTime()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GroupNodeValidationError{
+				field:  "LatestEndTime",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for TotalChildren
+
+	// no validation rules for MeetsFilter
+
+	if all {
+		switch v := interface{}(m.GetAggregations()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GroupNodeValidationError{
+					field:  "Aggregations",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GroupNodeValidationError{
+					field:  "Aggregations",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAggregations()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GroupNodeValidationError{
+				field:  "Aggregations",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GroupNodeMultiError(errors)
+	}
+
+	return nil
+}
+
+// GroupNodeMultiError is an error wrapping multiple validation errors returned
+// by GroupNode.ValidateAll() if the designated constraints aren't met.
+type GroupNodeMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GroupNodeMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GroupNodeMultiError) AllErrors() []error { return m }
+
+// GroupNodeValidationError is the validation error returned by
+// GroupNode.Validate if the designated constraints aren't met.
+type GroupNodeValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GroupNodeValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GroupNodeValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GroupNodeValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GroupNodeValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GroupNodeValidationError) ErrorName() string { return "GroupNodeValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GroupNodeValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGroupNode.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GroupNodeValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GroupNodeValidationError{}
+
+// Validate checks the field values on TruncationNotice with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *TruncationNotice) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TruncationNotice with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TruncationNoticeMultiError, or nil if none found.
+func (m *TruncationNotice) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TruncationNotice) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Reason
+
+	// no validation rules for TrackedActionCount
+
+	// no validation rules for KnownTotalActionCount
+
+	// no validation rules for Message
+
+	if len(errors) > 0 {
+		return TruncationNoticeMultiError(errors)
+	}
+
+	return nil
+}
+
+// TruncationNoticeMultiError is an error wrapping multiple validation errors
+// returned by TruncationNotice.ValidateAll() if the designated constraints
+// aren't met.
+type TruncationNoticeMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TruncationNoticeMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TruncationNoticeMultiError) AllErrors() []error { return m }
+
+// TruncationNoticeValidationError is the validation error returned by
+// TruncationNotice.Validate if the designated constraints aren't met.
+type TruncationNoticeValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TruncationNoticeValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TruncationNoticeValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TruncationNoticeValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TruncationNoticeValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TruncationNoticeValidationError) ErrorName() string { return "TruncationNoticeValidationError" }
+
+// Error satisfies the builtin error interface
+func (e TruncationNoticeValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTruncationNotice.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TruncationNoticeValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TruncationNoticeValidationError{}
+
 // Validate checks the field values on WatchClusterEventsRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -5484,6 +6890,354 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = WatchGroupsResponseValidationError{}
+
+// Validate checks the field values on WatchWindowedActionsRequest_Subscribe
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *WatchWindowedActionsRequest_Subscribe) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WatchWindowedActionsRequest_Subscribe
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// WatchWindowedActionsRequest_SubscribeMultiError, or nil if none found.
+func (m *WatchWindowedActionsRequest_Subscribe) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WatchWindowedActionsRequest_Subscribe) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetRunId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, WatchWindowedActionsRequest_SubscribeValidationError{
+					field:  "RunId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, WatchWindowedActionsRequest_SubscribeValidationError{
+					field:  "RunId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRunId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WatchWindowedActionsRequest_SubscribeValidationError{
+				field:  "RunId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for SelectedItemId
+
+	// no validation rules for OverscanBefore
+
+	// no validation rules for OverscanAfter
+
+	{
+		sorted_keys := make([]string, len(m.GetExpandedNodes()))
+		i := 0
+		for key := range m.GetExpandedNodes() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetExpandedNodes()[key]
+			_ = val
+
+			// no validation rules for ExpandedNodes[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, WatchWindowedActionsRequest_SubscribeValidationError{
+							field:  fmt.Sprintf("ExpandedNodes[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, WatchWindowedActionsRequest_SubscribeValidationError{
+							field:  fmt.Sprintf("ExpandedNodes[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return WatchWindowedActionsRequest_SubscribeValidationError{
+						field:  fmt.Sprintf("ExpandedNodes[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
+	// no validation rules for NameFilter
+
+	if len(errors) > 0 {
+		return WatchWindowedActionsRequest_SubscribeMultiError(errors)
+	}
+
+	return nil
+}
+
+// WatchWindowedActionsRequest_SubscribeMultiError is an error wrapping
+// multiple validation errors returned by
+// WatchWindowedActionsRequest_Subscribe.ValidateAll() if the designated
+// constraints aren't met.
+type WatchWindowedActionsRequest_SubscribeMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WatchWindowedActionsRequest_SubscribeMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WatchWindowedActionsRequest_SubscribeMultiError) AllErrors() []error { return m }
+
+// WatchWindowedActionsRequest_SubscribeValidationError is the validation error
+// returned by WatchWindowedActionsRequest_Subscribe.Validate if the
+// designated constraints aren't met.
+type WatchWindowedActionsRequest_SubscribeValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WatchWindowedActionsRequest_SubscribeValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WatchWindowedActionsRequest_SubscribeValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WatchWindowedActionsRequest_SubscribeValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WatchWindowedActionsRequest_SubscribeValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WatchWindowedActionsRequest_SubscribeValidationError) ErrorName() string {
+	return "WatchWindowedActionsRequest_SubscribeValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WatchWindowedActionsRequest_SubscribeValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWatchWindowedActionsRequest_Subscribe.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WatchWindowedActionsRequest_SubscribeValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WatchWindowedActionsRequest_SubscribeValidationError{}
+
+// Validate checks the field values on WatchWindowedActionsRequest_UpdateWindow
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *WatchWindowedActionsRequest_UpdateWindow) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// WatchWindowedActionsRequest_UpdateWindow with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in
+// WatchWindowedActionsRequest_UpdateWindowMultiError, or nil if none found.
+func (m *WatchWindowedActionsRequest_UpdateWindow) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WatchWindowedActionsRequest_UpdateWindow) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for SelectedItemId
+
+	// no validation rules for OverscanBefore
+
+	// no validation rules for OverscanAfter
+
+	{
+		sorted_keys := make([]string, len(m.GetExpandedNodes()))
+		i := 0
+		for key := range m.GetExpandedNodes() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetExpandedNodes()[key]
+			_ = val
+
+			// no validation rules for ExpandedNodes[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, WatchWindowedActionsRequest_UpdateWindowValidationError{
+							field:  fmt.Sprintf("ExpandedNodes[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, WatchWindowedActionsRequest_UpdateWindowValidationError{
+							field:  fmt.Sprintf("ExpandedNodes[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return WatchWindowedActionsRequest_UpdateWindowValidationError{
+						field:  fmt.Sprintf("ExpandedNodes[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
+	// no validation rules for NameFilter
+
+	if len(errors) > 0 {
+		return WatchWindowedActionsRequest_UpdateWindowMultiError(errors)
+	}
+
+	return nil
+}
+
+// WatchWindowedActionsRequest_UpdateWindowMultiError is an error wrapping
+// multiple validation errors returned by
+// WatchWindowedActionsRequest_UpdateWindow.ValidateAll() if the designated
+// constraints aren't met.
+type WatchWindowedActionsRequest_UpdateWindowMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WatchWindowedActionsRequest_UpdateWindowMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WatchWindowedActionsRequest_UpdateWindowMultiError) AllErrors() []error { return m }
+
+// WatchWindowedActionsRequest_UpdateWindowValidationError is the validation
+// error returned by WatchWindowedActionsRequest_UpdateWindow.Validate if the
+// designated constraints aren't met.
+type WatchWindowedActionsRequest_UpdateWindowValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WatchWindowedActionsRequest_UpdateWindowValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WatchWindowedActionsRequest_UpdateWindowValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WatchWindowedActionsRequest_UpdateWindowValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WatchWindowedActionsRequest_UpdateWindowValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WatchWindowedActionsRequest_UpdateWindowValidationError) ErrorName() string {
+	return "WatchWindowedActionsRequest_UpdateWindowValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WatchWindowedActionsRequest_UpdateWindowValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWatchWindowedActionsRequest_UpdateWindow.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WatchWindowedActionsRequest_UpdateWindowValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WatchWindowedActionsRequest_UpdateWindowValidationError{}
 
 // Validate checks the field values on WatchGroupsRequest_KnownSortField with
 // the rules defined in the proto definition for this message. If any rules

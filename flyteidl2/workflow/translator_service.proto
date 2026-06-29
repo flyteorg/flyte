@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package flyteidl2.workflow;
 
+import "flyteidl2/common/identifier.proto";
 import "flyteidl2/core/interface.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/task_definition.proto";
@@ -26,9 +27,30 @@ service TranslatorService {
 }
 
 message LiteralsToLaunchFormJsonRequest {
-  // The literals to convert to JSON.
+  // The literals to convert to JSON. Ignored when literals_uri is set.
   repeated task.NamedLiteral literals = 1;
   flyteidl2.core.VariableMap variables = 2;
+
+  // Raw object store URI for offloaded action literals, as returned by
+  // DataProxyService.GetActionData (inputs_uri / outputs_uri). Only used with
+  // action_id: when set, the service reads the literals from storage instead of
+  // requiring them inline, avoiding a round trip of potentially large payloads
+  // through the client. Ignored when trigger_id is set.
+  string literals_uri = 3;
+
+  // Identifies the owner of the offloaded literals to convert. Leave unset to
+  // convert the inline `literals` instead.
+  oneof owner {
+    // Identifies the action that owns literals_uri. Required when literals_uri
+    // is set; the URI is validated against the action's data URIs before being
+    // read.
+    common.ActionIdentifier action_id = 4;
+
+    // Identifies a trigger whose offloaded inputs should be converted. The
+    // service looks up the trigger's offloaded input URI from its spec and
+    // reads it directly, so literals and literals_uri are ignored.
+    common.TriggerIdentifier trigger_id = 5;
+  }
 }
 
 message LiteralsToLaunchFormJsonResponse {

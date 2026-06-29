@@ -1,8 +1,9 @@
 name: Build & Push Flyte Single Binary Images v2
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  # Only cancel superseded runs on PRs; runs on main queue up instead.
+  cancel-in-progress: ${{ github.event_name == 'pull_request_target' }}
 
 on:
   push:
@@ -36,7 +37,7 @@ jobs:
         uses: golangci/golangci-lint-action@v9
         with:
           working-directory: docker/devbox-bundled/bootstrap
-          version: v2.6.2
+          version: v2.12.2
       - name: Check formatting
         working-directory: docker/devbox-bundled/bootstrap
         run: |
@@ -87,6 +88,7 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/flyte-binary-v2
           tags: |
             type=raw,value=nightly,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+            type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' }}
             type=sha,format=long
       - name: Set up Depot
         uses: depot/setup-action@v1
@@ -202,7 +204,11 @@ jobs:
           project: ${{ env.DEPOT_PROJECT_ID }}
           context: docker/devbox-bundled
           platforms: linux/arm64,linux/amd64
-          build-args: "FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}"
+          # CACHEBUST forces the Dockerfile preload layer to re-pull moving tags
+          # (flyteconsole-v2:latest) instead of reusing a stale cached layer.
+          build-args: |
+            FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}
+            CACHEBUST=${{ github.run_id }}-${{ github.run_attempt }}
           save: true
           save-tags: cpu-build-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Authenticate Docker to Depot Registry
@@ -221,7 +227,9 @@ jobs:
           context: docker/devbox-bundled
           platforms: linux/arm64,linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
-          build-args: "FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}"
+          build-args: |
+            FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}
+            CACHEBUST=${{ github.run_id }}-${{ github.run_attempt }}
           push: true
       - name: Prepare GPU Image Names
         id: gpu-image-names

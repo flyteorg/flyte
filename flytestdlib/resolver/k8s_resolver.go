@@ -2,6 +2,7 @@ package resolver
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -10,7 +11,7 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/resolver"
 	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
@@ -133,7 +134,7 @@ func (k *kResolver) Close() {
 	logger.Infof(k.ctx, "k8s resolver: closed")
 }
 
-func (k *kResolver) resolve(e *v1.Endpoints) {
+func (k *kResolver) resolve(e *v1.Endpoints) { //nolint:staticcheck // EndpointSlice migration needs a resolver behavior change.
 	var newAddrs []resolver.Address
 	for _, subset := range e.Subsets {
 		port := k.target.port
@@ -165,7 +166,8 @@ func (k *kResolver) run() {
 			"k8s resolver: failed to create watcher for target [%s]: service namespace: [%s], service name: [%s], "+"error [%v]",
 			k.target, k.target.serviceNamespace, k.target.serviceName, err,
 		)
-		if statusErr, ok := err.(*errors.StatusError); ok {
+		var statusErr *k8serrors.StatusError
+		if errors.As(err, &statusErr) {
 			logger.Errorf(k.ctx, "k8s resolver: status error details: %v", statusErr.ErrStatus)
 		}
 
@@ -187,7 +189,22 @@ func (k *kResolver) run() {
 			if event.Object == nil {
 				continue
 			}
-			k.resolve(event.Object.(*v1.Endpoints))
+
+			endpoints, isEndpoints := event.Object.(*v1.Endpoints)
+
+			if isEndpoints {
+				k.resolve(endpoints)
+				continue
+			}
+
+			status, isStatus := event.Object.(*metav1.Status)
+			if isStatus {
+				logger.Warnf(k.ctx, "k8s resolver: status error details: %v", status)
+				continue
+			}
+
+			logger.Errorf(k.ctx, "k8s resolver: unknown event type: %T", event.Object)
+
 		}
 	}
 }

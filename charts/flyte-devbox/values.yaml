@@ -21,13 +21,26 @@ docker-registry:
 flyte-binary:
   fullnameOverride: flyte-binary
   enabled: true
+  console:
+    image:
+      repository: docker.io/unionai-oss/flyteconsole-v2
+      tag: sandbox
+      pullPolicy: Never
   configuration:
+    # CoPilot ships inside the locally-built flyte-binary sandbox image
+    # (at /bin/flyte-copilot), so point the sidecar at it instead of pulling
+    # an external image. The image is loaded into k3s, so IfNotPresent resolves
+    # it without a registry pull.
+    co-pilot:
+      image:
+        repository: flyte-binary-v2
+        tag: sandbox
     database:
-      host: 'postgresql'
-      password: postgres
+      postgres:
+        host: 'postgresql'
+        password: postgres
     storage:
       metadataContainer: flyte-data
-      userDataContainer: flyte-data
       provider: s3
       providerConfig:
         s3:
@@ -71,14 +84,13 @@ flyte-binary:
             port: 5432
             dbName: runs
             user: postgres
-            password: postgres
       internalApps:
         enabled: true
         baseDomain: "localhost"
         scheme: "http"
         ingressAppsPort: 30081
         defaultEnvVars:
-          - FLYTE_AWS_ENDPOINT: 'http://rustfs.{{ .Release.Namespace }}:9000'
+          - FLYTE_AWS_ENDPOINT: 'http://rustfs-svc.{{ .Release.Namespace }}:9000'
           - FLYTE_AWS_ACCESS_KEY_ID: rustfs
           - FLYTE_AWS_SECRET_ACCESS_KEY: rustfsstorage
           - _U_EP_OVERRIDE: 'flyte-binary-http.{{ .Release.Namespace }}:8090'
@@ -185,9 +197,3 @@ sandbox:
   # dev Routes requests to an instance of Flyte running locally on a developer's
   # development environment. This is only usable if the flyte-binary chart is disabled.
   dev: false
-  console:
-    enabled: true
-    image:
-      repository: docker.io/unionai-oss/flyteconsole-v2
-      tag: sandbox
-      pullPolicy: Never

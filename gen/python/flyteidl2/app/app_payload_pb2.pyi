@@ -60,16 +60,18 @@ class DeleteResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class ListRequest(_message.Message):
-    __slots__ = ["request", "org", "cluster_id", "project"]
+    __slots__ = ["request", "org", "cluster_id", "project", "disable_identity_enrichment"]
     REQUEST_FIELD_NUMBER: _ClassVar[int]
     ORG_FIELD_NUMBER: _ClassVar[int]
     CLUSTER_ID_FIELD_NUMBER: _ClassVar[int]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
+    DISABLE_IDENTITY_ENRICHMENT_FIELD_NUMBER: _ClassVar[int]
     request: _list_pb2.ListRequest
     org: str
     cluster_id: _identifier_pb2.ClusterIdentifier
     project: _identifier_pb2.ProjectIdentifier
-    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., cluster_id: _Optional[_Union[_identifier_pb2.ClusterIdentifier, _Mapping]] = ..., project: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ...) -> None: ...
+    disable_identity_enrichment: bool
+    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., cluster_id: _Optional[_Union[_identifier_pb2.ClusterIdentifier, _Mapping]] = ..., project: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., disable_identity_enrichment: bool = ...) -> None: ...
 
 class ListResponse(_message.Message):
     __slots__ = ["apps", "token"]

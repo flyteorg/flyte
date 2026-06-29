@@ -3,7 +3,7 @@
 CLUSTER_NAME ?= flytev2
 
 # Docker CI image configuration
-DOCKER_CI_IMAGE := ghcr.io/flyteorg/flyte/ci:v2
+DOCKER_CI_IMAGE := ghcr.io/flyteorg/flyte/ci:latest
 
 # Environment variable flags for Docker
 DOCKER_ENV_FLAGS :=
@@ -36,8 +36,8 @@ build: verify ## Build all Go service binaries
 # =============================================================================
 
 .PHONY: devbox-build
-devbox-build: ## Build the flyte devbox image (docker/devbox-bundled)
-	$(MAKE) -C docker/devbox-bundled build
+devbox-build: ## Build the flyte devbox image (docker/devbox-bundled), always re-pulling the latest UI image
+	$(MAKE) -C docker/devbox-bundled build CACHEBUST=$(shell date +%s)
 
 # Run in dev mode with extra arg FLYTE_DEV=True
 .PHONY: devbox-run
@@ -289,3 +289,11 @@ docker-shell: ## Start an interactive shell in the CI Docker container
 docker-dev: docker-build gen ## Build local image and run generation (fast iteration)
 	@echo '✅  Local Docker image built and generation complete!'
 	@$(MAKE) sep
+
+# =============================================================================
+# Release targets
+# =============================================================================
+
+.PHONY: tag-helm
+tag-helm:
+	./scripts/tag-helm.sh

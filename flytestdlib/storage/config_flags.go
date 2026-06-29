@@ -50,7 +50,7 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "type"), defaultConfig.Type, "Sets the type of storage to configure [s3/minio/local/mem/stow].")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "type"), defaultConfig.Type, "Sets the type of storage [s3/minio/local/mem/stow/redis].")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "connection.endpoint"), defaultConfig.Connection.Endpoint.String(), "URL for storage client to connect to.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "connection.auth-type"), defaultConfig.Connection.AuthType, "Auth Type to use [iam, accesskey].")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "connection.access-key"), defaultConfig.Connection.AccessKey, "Access key to use. Only required when authtype is set to accesskey.")
@@ -65,5 +65,9 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "cache.target_gc_percent"), defaultConfig.Cache.TargetGCPercent, "Sets the garbage collection target percentage.")
 	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "limits.maxDownloadMBs"), defaultConfig.Limits.GetLimitMegabytes, "Maximum allowed download size (in MBs) per call.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "defaultHttpClient.timeout"), defaultConfig.DefaultHTTPClient.Timeout.String(), "Sets time out on the http client.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "defaultHttpClient.maxIdleConns"), defaultConfig.DefaultHTTPClient.MaxIdleConns, "Maximum number of idle connections across all hosts. Zero means use the http.DefaultTransport value.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "defaultHttpClient.maxIdleConnsPerHost"), defaultConfig.DefaultHTTPClient.MaxIdleConnsPerHost, "Maximum number of idle connections per host. Zero means use the http.DefaultTransport value.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "defaultHttpClient.maxConnsPerHost"), defaultConfig.DefaultHTTPClient.MaxConnsPerHost, "Maximum number of connections per host; new requests block at the limit. Zero means no limit.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "defaultHttpClient.idleConnTimeout"), defaultConfig.DefaultHTTPClient.IdleConnTimeout.String(), "Maximum amount of time an idle connection remains open. Zero means use the http.DefaultTransport value.")
 	return cmdFlags
 }

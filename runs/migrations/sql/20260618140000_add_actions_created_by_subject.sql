@@ -1,0 +1,7 @@
+-- Add created_by_subject to actions: the OIDC subject of the run's creator, captured from
+-- the auth headers the load balancer forwards. An indexed, queryable scalar for filtering
+-- and listing runs by owner — complements created_by, which holds the full serialized
+-- EnrichedIdentity (subject plus name/email) for display. NULL for runs created without
+-- an authenticated identity.
+ALTER TABLE actions ADD COLUMN IF NOT EXISTS created_by_subject TEXT;
+CREATE INDEX IF NOT EXISTS idx_actions_created_by_subject ON actions (created_by_subject);

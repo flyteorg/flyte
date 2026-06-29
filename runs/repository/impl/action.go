@@ -224,13 +224,13 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, up
 	}
 
 	result, err := tx.ExecContext(ctx,
-		`INSERT INTO actions (project, domain, run_name, name, parent_action_name, phase, run_source, action_type, action_group, task_project, task_domain, task_name, task_version, task_type, task_short_name, function_name, environment_name, action_spec, action_details, detailed_info, run_spec, attempts, cache_status, trigger_name, trigger_task_name, trigger_revision, created_at, ended_at, duration_ms)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, CASE WHEN $28::timestamptz IS NOT NULL THEN EXTRACT(EPOCH FROM (GREATEST($28::timestamptz, $27) - $27)) * 1000 ELSE NULL END)
+		`INSERT INTO actions (project, domain, run_name, name, parent_action_name, phase, run_source, action_type, action_group, task_project, task_domain, task_name, task_version, task_type, task_short_name, function_name, environment_name, action_spec, action_details, detailed_info, run_spec, attempts, cache_status, trigger_name, trigger_task_name, trigger_revision, created_at, ended_at, created_by, created_by_subject, duration_ms)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, CASE WHEN $28::timestamptz IS NOT NULL THEN EXTRACT(EPOCH FROM (GREATEST($28::timestamptz, $27) - $27)) * 1000 ELSE NULL END)
 		 ON CONFLICT DO NOTHING`,
 		action.Project, action.Domain, action.RunName, action.Name, action.ParentActionName, action.Phase, action.RunSource, action.ActionType, action.ActionGroup,
 		action.TaskProject, action.TaskDomain, action.TaskName, action.TaskVersion, action.TaskType, action.TaskShortName, action.FunctionName, action.EnvironmentName,
 		action.ActionSpec, action.ActionDetails, action.DetailedInfo, action.RunSpec, action.Attempts, action.CacheStatus,
-		action.TriggerName, action.TriggerTaskName, action.TriggerRevision, createdAt, action.EndedAt)
+		action.TriggerName, action.TriggerTaskName, action.TriggerRevision, createdAt, action.EndedAt, action.CreatedBy, action.CreatedBySubject)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create action: %w", err)
 	}
@@ -377,20 +377,20 @@ func (r *actionRepo) UpdateActionPhase(
 	argIdx := 1
 
 	queryBuilder.WriteString("UPDATE actions SET ")
-	queryBuilder.WriteString(fmt.Sprintf("phase = $%d, attempts = $%d, cache_status = $%d, updated_at = $%d", argIdx, argIdx+1, argIdx+2, argIdx+3))
+	queryBuilder.WriteString(fmt.Sprintf("phase = $%d, attempts = $%d, cache_status = $%d, updated_at = $%d", argIdx, argIdx+1, argIdx+2, argIdx+3)) //nolint: staticcheck
 	args = append(args, phase, attempts, cacheStatus, now)
 	argIdx += 4
 
 	if endTime != nil {
-		queryBuilder.WriteString(fmt.Sprintf(", ended_at = COALESCE(ended_at, GREATEST($%d, created_at))", argIdx))
+		queryBuilder.WriteString(fmt.Sprintf(", ended_at = COALESCE(ended_at, GREATEST($%d, created_at))", argIdx)) //nolint: staticcheck
 		args = append(args, *endTime)
 		argIdx++
-		queryBuilder.WriteString(fmt.Sprintf(", duration_ms = EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST($%d, created_at)) - created_at)) * 1000", argIdx))
+		queryBuilder.WriteString(fmt.Sprintf(", duration_ms = EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST($%d, created_at)) - created_at)) * 1000", argIdx)) //nolint: staticcheck
 		args = append(args, *endTime)
 		argIdx++
 	}
 
-	queryBuilder.WriteString(fmt.Sprintf(" WHERE project = $%d AND domain = $%d AND run_name = $%d AND name = $%d AND (phase <= $%d OR phase = ANY($%d))",
+	queryBuilder.WriteString(fmt.Sprintf(" WHERE project = $%d AND domain = $%d AND run_name = $%d AND name = $%d AND (phase <= $%d OR phase = ANY($%d))", //nolint: staticcheck
 		argIdx, argIdx+1, argIdx+2, argIdx+3, argIdx+4, argIdx+5))
 	args = append(args, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase, pq.Array(retryablePhases))
 
@@ -871,22 +871,22 @@ func (r *actionRepo) ListRootActions(ctx context.Context, project, domain string
 	queryBuilder.WriteString("SELECT * FROM actions WHERE parent_action_name IS NULL")
 
 	if project != "" {
-		queryBuilder.WriteString(fmt.Sprintf(" AND project = $%d", argIdx))
+		queryBuilder.WriteString(fmt.Sprintf(" AND project = $%d", argIdx)) //nolint: staticcheck
 		args = append(args, project)
 		argIdx++
 	}
 	if domain != "" {
-		queryBuilder.WriteString(fmt.Sprintf(" AND domain = $%d", argIdx))
+		queryBuilder.WriteString(fmt.Sprintf(" AND domain = $%d", argIdx)) //nolint: staticcheck
 		args = append(args, domain)
 		argIdx++
 	}
 	if startDate != nil {
-		queryBuilder.WriteString(fmt.Sprintf(" AND created_at >= $%d", argIdx))
+		queryBuilder.WriteString(fmt.Sprintf(" AND created_at >= $%d", argIdx)) //nolint: staticcheck
 		args = append(args, *startDate)
 		argIdx++
 	}
 	if endDate != nil {
-		queryBuilder.WriteString(fmt.Sprintf(" AND created_at <= $%d", argIdx))
+		queryBuilder.WriteString(fmt.Sprintf(" AND created_at <= $%d", argIdx)) //nolint: staticcheck
 		args = append(args, *endDate)
 		argIdx++
 	}
@@ -894,7 +894,7 @@ func (r *actionRepo) ListRootActions(ctx context.Context, project, domain string
 		limit = 1000
 	}
 
-	queryBuilder.WriteString(fmt.Sprintf(" ORDER BY created_at DESC LIMIT $%d", argIdx))
+	queryBuilder.WriteString(fmt.Sprintf(" ORDER BY created_at DESC LIMIT $%d", argIdx)) //nolint: staticcheck
 	args = append(args, limit)
 
 	var actions []*models.Action

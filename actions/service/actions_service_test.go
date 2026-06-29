@@ -74,50 +74,18 @@ func TestEnqueue(t *testing.T) {
 	})
 }
 
-func TestGetLatestState(t *testing.T) {
-	t.Run("success", func(t *testing.T) {
-		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsService(m)
-
-		m.EXPECT().GetState(mock.Anything, testActionID).Return(`{"status":"ok"}`, nil)
-
-		resp, err := svc.GetLatestState(context.Background(), connect.NewRequest(&actions.GetLatestStateRequest{
-			ActionId: testActionID,
-			Attempt:  1,
-		}))
-
-		assert.NoError(t, err)
-		assert.Equal(t, `{"status":"ok"}`, resp.Msg.State)
-	})
-
-	t.Run("client error returns not found", func(t *testing.T) {
-		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsService(m)
-
-		m.EXPECT().GetState(mock.Anything, testActionID).Return("", errors.New("not found"))
-
-		_, err := svc.GetLatestState(context.Background(), connect.NewRequest(&actions.GetLatestStateRequest{
-			ActionId: testActionID,
-			Attempt:  1,
-		}))
-
-		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
-	})
-}
-
 func TestUpdate(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		m := mocks.NewActionsClientInterface(t)
 		svc := NewActionsService(m)
 
 		status := &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED}
-		m.EXPECT().PutState(mock.Anything, testActionID, uint32(1), status, `{}`).Return(nil)
+		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status).Return(nil)
 
 		resp, err := svc.Update(context.Background(), connect.NewRequest(&actions.UpdateRequest{
 			ActionId: testActionID,
 			Attempt:  1,
 			Status:   status,
-			State:    `{}`,
 		}))
 
 		assert.NoError(t, err)
@@ -129,13 +97,12 @@ func TestUpdate(t *testing.T) {
 		svc := NewActionsService(m)
 
 		status := &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_RUNNING}
-		m.EXPECT().PutState(mock.Anything, testActionID, uint32(1), status, `{}`).Return(errors.New("write failed"))
+		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status).Return(errors.New("write failed"))
 
 		_, err := svc.Update(context.Background(), connect.NewRequest(&actions.UpdateRequest{
 			ActionId: testActionID,
 			Attempt:  1,
 			Status:   status,
-			State:    `{}`,
 		}))
 
 		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
