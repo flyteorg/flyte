@@ -494,7 +494,10 @@ func (c *workflowExecutor) HandleAbortedWorkflow(ctx context.Context, w *v1alpha
 			return err
 		}
 
-		if w.Status.FailedAttempts > maxRetries {
+		if w.Status.FailedAttempts >= maxRetries {
+			if err != nil {
+				logger.Warningf(ctx, "Discarding cleanup error because system retries are exhausted: %v", err)
+			}
 			err = errors.Errorf(errors.RuntimeExecutionError, w.GetID(), "max number of system retry attempts [%d/%d] exhausted. Last known status message: %v", w.Status.FailedAttempts, maxRetries, w.Status.Message)
 		}
 
