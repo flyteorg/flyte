@@ -131,6 +131,10 @@ message RunSpec {
   // clone, or explicit SDK/CLI provenance). Set at creation, immutable thereafter, and scoped
   // to the same org/project/domain as this run.
   flyteidl2.common.RunIdentifier related_to = 15;
+
+  // Pool of the assigned queue for given run.
+  // Always set by server. Should not be specified by user.
+  string cluster_pool = 16;
 }
 
 message InlineRuleList {
