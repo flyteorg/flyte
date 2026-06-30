@@ -7678,7 +7678,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  local-gateway.knative-serving.knative-local-gateway: knative-local-gateway.istio-system.svc.cluster.local
+  local-gateway.knative-serving.knative-local-gateway: kourier-internal.kourier-system.svc.cluster.local
 kind: ConfigMap
 metadata:
   labels:
@@ -7927,29 +7927,6 @@ spec:
     clientIP:
       timeoutSeconds: 10800
   type: NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/component: net-istio
-    app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.18.1
-    experimental.istio.io/disable-gateway-port-translation: "true"
-    networking.knative.dev/ingress-provider: istio
-  name: knative-local-gateway
-  namespace: istio-system
-spec:
-  ports:
-  - name: http2
-    port: 80
-    targetPort: 8081
-  - name: https
-    port: 443
-    targetPort: 8444
-  selector:
-    istio: ingressgateway
-  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -8924,48 +8901,6 @@ spec:
   - data-plane.knative.dev
   secretName: routing-serving-certs
 ---
-apiVersion: networking.istio.io/v1beta1
-kind: Gateway
-metadata:
-  labels:
-    app.kubernetes.io/component: net-istio
-    app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.18.1
-    networking.knative.dev/ingress-provider: istio
-  name: knative-ingress-gateway
-  namespace: knative-serving
-spec:
-  selector:
-    istio: ingressgateway
-  servers:
-  - hosts:
-    - '*'
-    port:
-      name: http
-      number: 80
-      protocol: HTTP
----
-apiVersion: networking.istio.io/v1beta1
-kind: Gateway
-metadata:
-  labels:
-    app.kubernetes.io/component: net-istio
-    app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.18.1
-    networking.knative.dev/ingress-provider: istio
-  name: knative-local-gateway
-  namespace: knative-serving
-spec:
-  selector:
-    istio: ingressgateway
-  servers:
-  - hosts:
-    - '*'
-    port:
-      name: http
-      number: 8081
-      protocol: HTTP
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -9048,42 +8983,6 @@ spec:
               number: 9000
         path: /
         pathType: Prefix
----
-apiVersion: security.istio.io/v1beta1
-kind: PeerAuthentication
-metadata:
-  labels:
-    app.kubernetes.io/component: net-istio
-    app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.18.1
-    networking.knative.dev/ingress-provider: istio
-  name: net-istio-webhook
-  namespace: knative-serving
-spec:
-  portLevelMtls:
-    "8443":
-      mode: PERMISSIVE
-  selector:
-    matchLabels:
-      app: net-istio-webhook
----
-apiVersion: security.istio.io/v1beta1
-kind: PeerAuthentication
-metadata:
-  labels:
-    app.kubernetes.io/component: net-istio
-    app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.18.1
-    networking.knative.dev/ingress-provider: istio
-  name: webhook
-  namespace: knative-serving
-spec:
-  portLevelMtls:
-    "8443":
-      mode: PERMISSIVE
-  selector:
-    matchLabels:
-      app: webhook
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
