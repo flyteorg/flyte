@@ -397,6 +397,7 @@ type RunSpec struct {
 	// blob (user data) layout.
 	RunBaseDir string `protobuf:"bytes,14,opt,name=run_base_dir,json=runBaseDir,proto3" json:"run_base_dir,omitempty"`
 	// Pool of the assigned queue for given run.
+	// Always set by server. Should not be specified by user.
 	ClusterPool string `protobuf:"bytes,15,opt,name=cluster_pool,json=clusterPool,proto3" json:"cluster_pool,omitempty"`
 }
 

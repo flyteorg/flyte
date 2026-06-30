@@ -269,6 +269,7 @@ export type RunSpec = Message<"flyteidl2.task.RunSpec"> & {
 
   /**
    * Pool of the assigned queue for given run.
+   * Always set by server. Should not be specified by user.
    *
    * @generated from field: string cluster_pool = 15;
    */

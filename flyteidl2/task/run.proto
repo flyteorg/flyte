@@ -127,6 +127,7 @@ message RunSpec {
   string run_base_dir = 14;
 
   // Pool of the assigned queue for given run.
+  // Always set by server. Should not be specified by user.
   string cluster_pool = 15;
 }
 
