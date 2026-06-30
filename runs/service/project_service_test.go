@@ -14,7 +14,7 @@ import (
 
 func setupProjectService(t *testing.T) *ProjectService {
 	t.Cleanup(func() { testDB.Exec("DELETE FROM projects") })
-	return NewProjectService(impl.NewProjectRepo(testDB), []*project.Domain{
+	return NewProjectService(impl.NewProjectRepo(testDB, nil), []*project.Domain{
 		{Id: "development", Name: "Development"},
 		{Id: "production", Name: "Production"},
 	})

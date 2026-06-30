@@ -17,6 +17,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
@@ -30,6 +31,7 @@ type actionRepo struct {
 	db       *sqlx.DB
 	dsn      string // stored for pq.Listener
 	listener *pq.Listener
+	metrics  dbMetrics
 
 	// Subscriber management for LISTEN/NOTIFY
 	runSubscribers    map[chan string]bool
@@ -41,12 +43,15 @@ type actionRepo struct {
 	runNotifyCh    chan string
 }
 
-// NewActionRepo creates a new PostgreSQL repository
-func NewActionRepo(db *sqlx.DB, dbConfig database.DbConfig) (interfaces.ActionRepo, error) {
+// NewActionRepo creates a new PostgreSQL repository. The provided scope is used
+// to register per-operation DB metrics under a "db" sub-scope; pass nil to
+// disable metrics (e.g. in unit tests).
+func NewActionRepo(db *sqlx.DB, dbConfig database.DbConfig, scope promutils.Scope) (interfaces.ActionRepo, error) {
 	dsn := database.GetPostgresDsn(context.Background(), dbConfig.Postgres)
 	repo := &actionRepo{
 		db:                db,
 		dsn:               dsn,
+		metrics:           newDBMetrics(scope),
 		runSubscribers:    make(map[chan string]bool),
 		actionSubscribers: make(map[chan string]bool),
 	}
@@ -66,6 +71,17 @@ func NewActionRepo(db *sqlx.DB, dbConfig database.DbConfig) (interfaces.ActionRe
 
 // GetRun retrieves a run by identifier
 func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*models.Run, error) {
+	var run *models.Run
+	if err := r.metrics.observe(ctx, "get_run", func() (err error) {
+		run, err = r.getRun(ctx, runID)
+		return err
+	}); err != nil {
+		return nil, err
+	}
+	return run, nil
+}
+
+func (r *actionRepo) getRun(ctx context.Context, runID *common.RunIdentifier) (*models.Run, error) {
 	var run models.Run
 	err := sqlx.GetContext(ctx, r.db, &run,
 		"SELECT * FROM actions WHERE project = $1 AND domain = $2 AND run_name = $3 AND parent_action_name IS NULL",
@@ -86,6 +102,12 @@ func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*
 // K8s cascades CRD deletion to child actions via OwnerReferences; the action service
 // informer handles marking them ABORTED in DB when their CRDs are deleted.
 func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
+	return r.metrics.observe(ctx, "abort_run", func() error {
+		return r.abortRun(ctx, runID, reason, abortedBy)
+	})
+}
+
+func (r *actionRepo) abortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
 	now := time.Now()
 
 	var rootName string
@@ -115,6 +137,12 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 
 // InsertEvents inserts a batch of action events, ignoring duplicates (same PK = idempotent).
 func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEvent) error {
+	return r.metrics.observe(ctx, "insert_events", func() error {
+		return r.insertEvents(ctx, events)
+	})
+}
+
+func (r *actionRepo) insertEvents(ctx context.Context, events []*models.ActionEvent) error {
 	if len(events) == 0 {
 		return nil
 	}
@@ -153,6 +181,17 @@ func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEv
 // ListEvents lists action events for a given action identifier.
 func (r *actionRepo) ListEvents(ctx context.Context, actionID *common.ActionIdentifier, limit int) ([]*models.ActionEvent, error) {
 	var events []*models.ActionEvent
+	if err := r.metrics.observe(ctx, "list_events", func() (err error) {
+		events, err = r.listEvents(ctx, actionID, limit)
+		return err
+	}); err != nil {
+		return nil, err
+	}
+	return events, nil
+}
+
+func (r *actionRepo) listEvents(ctx context.Context, actionID *common.ActionIdentifier, limit int) ([]*models.ActionEvent, error) {
+	var events []*models.ActionEvent
 	err := sqlx.SelectContext(ctx, r.db, &events,
 		`SELECT * FROM action_events
 		 WHERE project = $1 AND domain = $2 AND run_name = $3 AND name = $4
@@ -167,6 +206,23 @@ func (r *actionRepo) ListEvents(ctx context.Context, actionID *common.ActionIden
 
 // ListEventsSince lists action events for a given action identifier updated at or after the provided checkpoint.
 func (r *actionRepo) ListEventsSince(
+	ctx context.Context,
+	actionID *common.ActionIdentifier,
+	attempt uint32,
+	since time.Time,
+	offset, limit int,
+) ([]*models.ActionEvent, error) {
+	var events []*models.ActionEvent
+	if err := r.metrics.observe(ctx, "list_events_since", func() (err error) {
+		events, err = r.listEventsSince(ctx, actionID, attempt, since, offset, limit)
+		return err
+	}); err != nil {
+		return nil, err
+	}
+	return events, nil
+}
+
+func (r *actionRepo) listEventsSince(
 	ctx context.Context,
 	actionID *common.ActionIdentifier,
 	attempt uint32,
@@ -190,6 +246,17 @@ func (r *actionRepo) ListEventsSince(
 // GetLatestEventByAttempt returns the most recent event for a given attempt,
 // ordered by version descending, without deserializing all events.
 func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32) (*models.ActionEvent, error) {
+	var event *models.ActionEvent
+	if err := r.metrics.observe(ctx, "get_latest_event_by_attempt", func() (err error) {
+		event, err = r.getLatestEventByAttempt(ctx, actionID, attempt)
+		return err
+	}); err != nil {
+		return nil, err
+	}
+	return event, nil
+}
+
+func (r *actionRepo) getLatestEventByAttempt(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32) (*models.ActionEvent, error) {
 	var event models.ActionEvent
 	err := sqlx.GetContext(ctx, r.db, &event,
 		`SELECT * FROM action_events
@@ -210,6 +277,17 @@ func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *comm
 // When updateTriggeredAt is true and the action has a TriggerName set, triggered_at on the
 // corresponding trigger row is updated to now() in the same transaction.
 func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, updateTriggeredAt bool) (*models.Action, error) {
+	var created *models.Action
+	if err := r.metrics.observe(ctx, "create_action", func() (err error) {
+		created, err = r.createAction(ctx, action, updateTriggeredAt)
+		return err
+	}); err != nil {
+		return nil, err
+	}
+	return created, nil
+}
+
+func (r *actionRepo) createAction(ctx context.Context, action *models.Action, updateTriggeredAt bool) (*models.Action, error) {
 	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to begin tx: %w", err)
@@ -283,6 +361,17 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, up
 
 // GetAction retrieves an action by identifier
 func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error) {
+	var action *models.Action
+	if err := r.metrics.observe(ctx, "get_action", func() (err error) {
+		action, err = r.getAction(ctx, actionID)
+		return err
+	}); err != nil {
+		return nil, err
+	}
+	return action, nil
+}
+
+func (r *actionRepo) getAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error) {
 	var action models.Action
 	err := sqlx.GetContext(ctx, r.db, &action,
 		"SELECT * FROM actions WHERE project = $1 AND domain = $2 AND run_name = $3 AND name = $4",
@@ -300,6 +389,17 @@ func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdent
 
 // ListActions lists actions matching the given input filter, sort, and pagination.
 func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Action, error) {
+	var actions []*models.Action
+	if err := r.metrics.observe(ctx, "list_actions", func() (err error) {
+		actions, err = r.listActions(ctx, input)
+		return err
+	}); err != nil {
+		return nil, err
+	}
+	return actions, nil
+}
+
+func (r *actionRepo) listActions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Action, error) {
 	var queryBuilder strings.Builder
 	var args []interface{}
 
@@ -366,6 +466,19 @@ func (r *actionRepo) UpdateActionPhase(
 	cacheStatus core.CatalogCacheStatus,
 	endTime *time.Time,
 ) error {
+	return r.metrics.observe(ctx, "update_action_phase", func() error {
+		return r.updateActionPhase(ctx, actionID, phase, attempts, cacheStatus, endTime)
+	})
+}
+
+func (r *actionRepo) updateActionPhase(
+	ctx context.Context,
+	actionID *common.ActionIdentifier,
+	phase common.ActionPhase,
+	attempts uint32,
+	cacheStatus core.CatalogCacheStatus,
+	endTime *time.Time,
+) error {
 	now := time.Now()
 	retryablePhases := []int32{
 		int32(common.ActionPhase_ACTION_PHASE_FAILED),
@@ -420,6 +533,12 @@ func (r *actionRepo) UpdateActionPhase(
 // K8s cascades CRD deletion to descendants via OwnerReferences; the action service
 // informer handles marking them ABORTED in DB when their CRDs are deleted.
 func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
+	return r.metrics.observe(ctx, "abort_action", func() error {
+		return r.abortAction(ctx, actionID, reason, abortedBy)
+	})
+}
+
+func (r *actionRepo) abortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
 	now := time.Now()
 
 	result, err := r.db.ExecContext(ctx,
@@ -445,6 +564,17 @@ func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIde
 // ListPendingAborts returns all actions that have abort_requested_at set (i.e. awaiting pod termination).
 func (r *actionRepo) ListPendingAborts(ctx context.Context) ([]*models.Action, error) {
 	var actions []*models.Action
+	if err := r.metrics.observe(ctx, "list_pending_aborts", func() (err error) {
+		actions, err = r.listPendingAborts(ctx)
+		return err
+	}); err != nil {
+		return nil, err
+	}
+	return actions, nil
+}
+
+func (r *actionRepo) listPendingAborts(ctx context.Context) ([]*models.Action, error) {
+	var actions []*models.Action
 	err := sqlx.SelectContext(ctx, r.db, &actions,
 		"SELECT * FROM actions WHERE abort_requested_at IS NOT NULL")
 	if err != nil {
@@ -456,6 +586,15 @@ func (r *actionRepo) ListPendingAborts(ctx context.Context) ([]*models.Action, e
 // MarkAbortAttempt increments abort_attempt_count and returns the new value.
 // Called by the reconciler before each actionsClient.Abort call.
 func (r *actionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.ActionIdentifier) (int, error) {
+	var attemptCount int
+	err := r.metrics.observe(ctx, "mark_abort_attempt", func() (e error) {
+		attemptCount, e = r.markAbortAttempt(ctx, actionID)
+		return e
+	})
+	return attemptCount, err
+}
+
+func (r *actionRepo) markAbortAttempt(ctx context.Context, actionID *common.ActionIdentifier) (int, error) {
 	var abortAttemptCount int
 	err := r.db.QueryRowxContext(ctx,
 		`UPDATE actions SET abort_attempt_count = abort_attempt_count + 1, updated_at = $1
@@ -471,6 +610,12 @@ func (r *actionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.Acti
 
 // ClearAbortRequest clears abort_requested_at (and resets counters) once the pod is confirmed terminated.
 func (r *actionRepo) ClearAbortRequest(ctx context.Context, actionID *common.ActionIdentifier) error {
+	return r.metrics.observe(ctx, "clear_abort_request", func() error {
+		return r.clearAbortRequest(ctx, actionID)
+	})
+}
+
+func (r *actionRepo) clearAbortRequest(ctx context.Context, actionID *common.ActionIdentifier) error {
 	_, err := r.db.ExecContext(ctx,
 		`UPDATE actions SET abort_requested_at = NULL, abort_attempt_count = 0, updated_at = $1
 		 WHERE project = $2 AND domain = $3 AND run_name = $4 AND name = $5`,
@@ -483,6 +628,12 @@ func (r *actionRepo) ClearAbortRequest(ctx context.Context, actionID *common.Act
 
 // UpdateActionState updates the state of an action
 func (r *actionRepo) UpdateActionState(ctx context.Context, actionID *common.ActionIdentifier, state string) error {
+	return r.metrics.observe(ctx, "update_action_state", func() error {
+		return r.updateActionState(ctx, actionID, state)
+	})
+}
+
+func (r *actionRepo) updateActionState(ctx context.Context, actionID *common.ActionIdentifier, state string) error {
 	// Parse the state JSON to extract the phase
 	var stateObj map[string]interface{}
 	if err := json.Unmarshal([]byte(state), &stateObj); err != nil {
@@ -532,6 +683,15 @@ func (r *actionRepo) UpdateActionState(ctx context.Context, actionID *common.Act
 
 // GetActionState retrieves the state of an action
 func (r *actionRepo) GetActionState(ctx context.Context, actionID *common.ActionIdentifier) (string, error) {
+	var state string
+	err := r.metrics.observe(ctx, "get_action_state", func() (e error) {
+		state, e = r.getActionState(ctx, actionID)
+		return e
+	})
+	return state, err
+}
+
+func (r *actionRepo) getActionState(ctx context.Context, actionID *common.ActionIdentifier) (string, error) {
 	var actionDetails []byte
 	err := r.db.QueryRowContext(ctx,
 		"SELECT action_details FROM actions WHERE project = $1 AND domain = $2 AND run_name = $3 AND name = $4",
@@ -546,6 +706,12 @@ func (r *actionRepo) GetActionState(ctx context.Context, actionID *common.Action
 
 // NotifyStateUpdate sends a notification about a state update
 func (r *actionRepo) NotifyStateUpdate(ctx context.Context, actionID *common.ActionIdentifier) error {
+	return r.metrics.observe(ctx, "notify_state_update", func() error {
+		return r.notifyStateUpdate(ctx, actionID)
+	})
+}
+
+func (r *actionRepo) notifyStateUpdate(ctx context.Context, actionID *common.ActionIdentifier) error {
 	// This is already handled by notifyActionUpdate
 	r.notifyActionUpdate(ctx, actionID)
 	return nil
@@ -864,6 +1030,17 @@ func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdent
 
 // ListRootActions lists root actions (runs) matching scope and date filters.
 func (r *actionRepo) ListRootActions(ctx context.Context, project, domain string, startDate, endDate *time.Time, limit int) ([]*models.Action, error) {
+	var actions []*models.Action
+	if err := r.metrics.observe(ctx, "list_root_actions", func() (err error) {
+		actions, err = r.listRootActions(ctx, project, domain, startDate, endDate, limit)
+		return err
+	}); err != nil {
+		return nil, err
+	}
+	return actions, nil
+}
+
+func (r *actionRepo) listRootActions(ctx context.Context, project, domain string, startDate, endDate *time.Time, limit int) ([]*models.Action, error) {
 	var queryBuilder strings.Builder
 	var args []interface{}
 	argIdx := 1
