@@ -7837,7 +7837,7 @@ data:
     storage:
       signedURL:
         stowConfigOverride:
-          endpoint: http://localhost:30002
+          endpoint: http://rustfs.localhost:9000
     task_resources:
       defaults:
         cpu: 500m
@@ -10463,3 +10463,13 @@ spec:
       app: 3scale-kourier-gateway
 
 ---
+# Added for the presigned-URL split-horizon fix (mirrors kustomize/coredns-custom.yaml).
+# Regenerate with `make manifests` to reproduce.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: kube-system
+data:
+  rustfs.override: |
+    rewrite name rustfs.localhost rustfs-svc.flyte.svc.cluster.local

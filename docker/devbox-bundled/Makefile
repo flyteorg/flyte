@@ -166,6 +166,7 @@ start:
 			--publish "30000:30000" \
 			--publish "30001:5432" \
 			--publish "30002:30002" \
+			--publish "9000:30002" \
 			--publish "30080:30080" \
 			--publish "30081:30081" \
 			$(FLYTE_DEVBOX_IMAGE); \

@@ -67,7 +67,12 @@ flyte-binary:
       storage:
         signedURL:
           stowConfigOverride:
-            endpoint: http://localhost:30002
+            # Presigned URLs must be reachable from BOTH the host client and pods. `localhost`
+            # is host-only (inside a pod it's the pod's own localhost -> ConnectError, which
+            # breaks in-pod uploads like flyteplugins-hitl's spec.pb). `rustfs.localhost`
+            # resolves to 127.0.0.1 on the host and, via the coredns-custom rewrite, to the
+            # rustfs ClusterIP in pods. Port 9000 = the rustfs service port.
+            endpoint: http://rustfs.localhost:9000
       plugins:
         k8s:
           default-env-vars:

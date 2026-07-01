@@ -27,6 +27,7 @@ helmCharts:
 resources:
 - ../namespace.yaml
 - ../embedded-postgres-service.yaml
+- ../coredns-custom.yaml
 - ../../../../charts/flyte-devbox/charts/knative-serving/crds/serving-crds.yaml
 
 patches:

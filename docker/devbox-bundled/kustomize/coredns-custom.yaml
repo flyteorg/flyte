@@ -1,0 +1,16 @@
+# Split-horizon resolution for the rustfs presigned-URL host.
+#
+# The control plane mints presigned object-store URLs with host `rustfs.localhost:9000`
+# (see charts/flyte-devbox/values.yaml storage.signedURL.stowConfigOverride.endpoint).
+# On the host, `*.localhost` resolves natively to 127.0.0.1 (-> published rustfs port).
+# Inside pods, k3s CoreDNS imports /etc/coredns/custom/*.override; this rewrite points
+# `rustfs.localhost` at the stable rustfs ClusterIP so in-pod uploads/downloads (e.g.
+# flyteplugins-hitl's spec.pb) reach the object store instead of the pod's own localhost.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: kube-system
+data:
+  rustfs.override: |
+    rewrite name rustfs.localhost rustfs-svc.flyte.svc.cluster.local
