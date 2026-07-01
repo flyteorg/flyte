@@ -11,39 +11,53 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
 type triggerRepo struct {
-	db *sqlx.DB
+	db      *sqlx.DB
+	metrics dbMetrics
 }
 
-func NewTriggerRepo(db *sqlx.DB) interfaces.TriggerRepo {
-	return &triggerRepo{db: db}
+// NewTriggerRepo creates a trigger repository. The provided scope is used to
+// register per-operation DB metrics under a "db" sub-scope; pass nil to disable
+// metrics (e.g. in unit tests).
+func NewTriggerRepo(db *sqlx.DB, scope promutils.Scope) interfaces.TriggerRepo {
+	return &triggerRepo{db: db, metrics: newDBMetrics(scope)}
 }
 
 func (r *triggerRepo) SaveTrigger(ctx context.Context, trigger *models.Trigger, expectedRevision uint64) (*models.Trigger, error) {
+	if err := r.metrics.observe(ctx, "save_trigger", func() error {
+		return r.saveTrigger(ctx, trigger, expectedRevision)
+	}); err != nil {
+		return nil, err
+	}
+	return trigger, nil
+}
+
+func (r *triggerRepo) saveTrigger(ctx context.Context, trigger *models.Trigger, expectedRevision uint64) error {
 	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to begin tx: %w", err)
+		return fmt.Errorf("failed to begin tx: %w", err)
 	}
 	defer func() { _ = tx.Rollback() }()
 
 	if err := upsertTrigger(ctx, tx, trigger, expectedRevision); err != nil {
 		logger.Errorf(ctx, "SaveTrigger failed for %s/%s/%s/%s: %v",
 			trigger.Project, trigger.Domain, trigger.TaskName, trigger.Name, err)
-		return nil, err
+		return err
 	}
 	if err := refreshTaskTriggerMeta(ctx, tx, trigger); err != nil {
-		return nil, err
+		return err
 	}
 
 	if err := tx.Commit(); err != nil {
-		return nil, fmt.Errorf("failed to commit tx: %w", err)
+		return fmt.Errorf("failed to commit tx: %w", err)
 	}
-	return trigger, nil
+	return nil
 }
 
 // upsertTrigger upserts a trigger row and appends an immutable revision snapshot.
@@ -107,38 +121,48 @@ func upsertTrigger(ctx context.Context, tx *sqlx.Tx, trigger *models.Trigger, ex
 
 func (r *triggerRepo) GetTrigger(ctx context.Context, key interfaces.TriggerNameKey) (*models.Trigger, error) {
 	var t models.Trigger
-	var err error
-	if key.TaskName != "" {
-		err = sqlx.GetContext(ctx, r.db, &t,
-			`SELECT * FROM triggers WHERE deleted_at IS NULL
-			   AND project = $1 AND domain = $2 AND task_name = $3 AND name = $4`,
-			key.Project, key.Domain, key.TaskName, key.Name)
-	} else {
-		err = sqlx.GetContext(ctx, r.db, &t,
-			`SELECT * FROM triggers WHERE deleted_at IS NULL
-			   AND project = $1 AND domain = $2 AND name = $3`,
-			key.Project, key.Domain, key.Name)
-	}
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("trigger not found: %s/%s/%s/%s: %w", key.Project, key.Domain, key.TaskName, key.Name, err)
+	if err := r.metrics.observe(ctx, "get_trigger", func() error {
+		var err error
+		if key.TaskName != "" {
+			err = sqlx.GetContext(ctx, r.db, &t,
+				`SELECT * FROM triggers WHERE deleted_at IS NULL
+				   AND project = $1 AND domain = $2 AND task_name = $3 AND name = $4`,
+				key.Project, key.Domain, key.TaskName, key.Name)
+		} else {
+			err = sqlx.GetContext(ctx, r.db, &t,
+				`SELECT * FROM triggers WHERE deleted_at IS NULL
+				   AND project = $1 AND domain = $2 AND name = $3`,
+				key.Project, key.Domain, key.Name)
 		}
-		return nil, fmt.Errorf("failed to get trigger: %w", err)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return fmt.Errorf("trigger not found: %s/%s/%s/%s: %w", key.Project, key.Domain, key.TaskName, key.Name, err)
+			}
+			return fmt.Errorf("failed to get trigger: %w", err)
+		}
+		return nil
+	}); err != nil {
+		return nil, err
 	}
 	return &t, nil
 }
 
 func (r *triggerRepo) GetTriggerRevision(ctx context.Context, project, domain, taskName, name string, revision uint64) (*models.TriggerRevision, error) {
 	var rev models.TriggerRevision
-	err := sqlx.GetContext(ctx, r.db, &rev,
-		`SELECT * FROM trigger_revisions
-		 WHERE project = $1 AND domain = $2 AND task_name = $3 AND name = $4 AND revision = $5`,
-		project, domain, taskName, name, revision)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("trigger revision not found: %s/%s/%s/%s@%d: %w", project, domain, taskName, name, revision, err)
+	if err := r.metrics.observe(ctx, "get_trigger_revision", func() error {
+		err := sqlx.GetContext(ctx, r.db, &rev,
+			`SELECT * FROM trigger_revisions
+			 WHERE project = $1 AND domain = $2 AND task_name = $3 AND name = $4 AND revision = $5`,
+			project, domain, taskName, name, revision)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return fmt.Errorf("trigger revision not found: %s/%s/%s/%s@%d: %w", project, domain, taskName, name, revision, err)
+			}
+			return fmt.Errorf("failed to get trigger revision: %w", err)
 		}
-		return nil, fmt.Errorf("failed to get trigger revision: %w", err)
+		return nil
+	}); err != nil {
+		return nil, err
 	}
 	return &rev, nil
 }
@@ -189,27 +213,43 @@ func (r *triggerRepo) ListTriggers(ctx context.Context, input interfaces.ListRes
 	args = append(args, input.Limit, input.Offset)
 
 	var triggers []*models.Trigger
-	if err := sqlx.SelectContext(ctx, r.db, &triggers, queryBuilder.String(), args...); err != nil {
-		return nil, fmt.Errorf("failed to list triggers: %w", err)
+	if err := r.metrics.observe(ctx, "list_triggers", func() error {
+		if err := sqlx.SelectContext(ctx, r.db, &triggers, queryBuilder.String(), args...); err != nil {
+			return fmt.Errorf("failed to list triggers: %w", err)
+		}
+		return nil
+	}); err != nil {
+		return nil, err
 	}
 	return triggers, nil
 }
 
 func (r *triggerRepo) ListTriggerRevisions(ctx context.Context, project, domain, taskName, name string, input interfaces.ListResourceInput) ([]*models.TriggerRevision, error) {
 	var revisions []*models.TriggerRevision
-	err := sqlx.SelectContext(ctx, r.db, &revisions,
-		`SELECT * FROM trigger_revisions
-		 WHERE project = $1 AND domain = $2 AND task_name = $3 AND name = $4
-		 ORDER BY revision DESC
-		 LIMIT $5 OFFSET $6`,
-		project, domain, taskName, name, input.Limit, input.Offset)
-	if err != nil {
-		return nil, fmt.Errorf("failed to list trigger revisions: %w", err)
+	if err := r.metrics.observe(ctx, "list_trigger_revisions", func() error {
+		err := sqlx.SelectContext(ctx, r.db, &revisions,
+			`SELECT * FROM trigger_revisions
+			 WHERE project = $1 AND domain = $2 AND task_name = $3 AND name = $4
+			 ORDER BY revision DESC
+			 LIMIT $5 OFFSET $6`,
+			project, domain, taskName, name, input.Limit, input.Offset)
+		if err != nil {
+			return fmt.Errorf("failed to list trigger revisions: %w", err)
+		}
+		return nil
+	}); err != nil {
+		return nil, err
 	}
 	return revisions, nil
 }
 
 func (r *triggerRepo) UpdateTriggers(ctx context.Context, keys []interfaces.TriggerNameKey, active bool) error {
+	return r.metrics.observe(ctx, "update_triggers", func() error {
+		return r.updateTriggers(ctx, keys, active)
+	})
+}
+
+func (r *triggerRepo) updateTriggers(ctx context.Context, keys []interfaces.TriggerNameKey, active bool) error {
 	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("failed to begin tx: %w", err)
@@ -256,6 +296,12 @@ func (r *triggerRepo) UpdateTriggers(ctx context.Context, keys []interfaces.Trig
 }
 
 func (r *triggerRepo) DeleteTriggers(ctx context.Context, keys []interfaces.TriggerNameKey) error {
+	return r.metrics.observe(ctx, "delete_triggers", func() error {
+		return r.deleteTriggers(ctx, keys)
+	})
+}
+
+func (r *triggerRepo) deleteTriggers(ctx context.Context, keys []interfaces.TriggerNameKey) error {
 	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("failed to begin tx: %w", err)

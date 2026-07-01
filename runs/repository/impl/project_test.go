@@ -15,7 +15,7 @@ func TestCreateProject_ReturnsAlreadyExists(t *testing.T) {
 	db := setupDB(t)
 	t.Cleanup(func() { db.Exec("DELETE FROM projects") })
 
-	repo := NewProjectRepo(db)
+	repo := NewProjectRepo(db, nil)
 	ctx := context.Background()
 	state := int32(0)
 

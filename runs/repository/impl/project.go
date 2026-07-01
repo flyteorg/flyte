@@ -12,80 +12,96 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
 type projectRepo struct {
-	db *sqlx.DB
+	db      *sqlx.DB
+	metrics dbMetrics
 }
 
-func NewProjectRepo(db *sqlx.DB) interfaces.ProjectRepo {
+// NewProjectRepo creates a project repository. The provided scope is used to
+// register per-operation DB metrics under a "db" sub-scope; pass nil to disable
+// metrics (e.g. in unit tests).
+func NewProjectRepo(db *sqlx.DB, scope promutils.Scope) interfaces.ProjectRepo {
 	return &projectRepo{
-		db: db,
+		db:      db,
+		metrics: newDBMetrics(scope),
 	}
 }
 
 func (r *projectRepo) CreateProject(ctx context.Context, project *models.Project) error {
-	now := time.Now().UTC()
-	project.CreatedAt = now
-	project.UpdatedAt = now
+	return r.metrics.observe(ctx, "create_project", func() error {
+		now := time.Now().UTC()
+		project.CreatedAt = now
+		project.UpdatedAt = now
 
-	result, err := r.db.ExecContext(ctx,
-		`INSERT INTO projects (identifier, name, description, labels, state, created_at, updated_at)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7)
-		 ON CONFLICT (identifier) DO NOTHING`,
-		project.Identifier, project.Name, project.Description, project.Labels, project.State, project.CreatedAt, project.UpdatedAt)
-	if err != nil {
-		if database.IsPgErrorWithCode(err, database.PgDuplicatedKey) {
+		result, err := r.db.ExecContext(ctx,
+			`INSERT INTO projects (identifier, name, description, labels, state, created_at, updated_at)
+			 VALUES ($1, $2, $3, $4, $5, $6, $7)
+			 ON CONFLICT (identifier) DO NOTHING`,
+			project.Identifier, project.Name, project.Description, project.Labels, project.State, project.CreatedAt, project.UpdatedAt)
+		if err != nil {
+			if database.IsPgErrorWithCode(err, database.PgDuplicatedKey) {
+				return fmt.Errorf("%w: %s", interfaces.ErrProjectAlreadyExists, project.Identifier)
+			}
+			return fmt.Errorf("failed to create project %s: %w", project.Identifier, err)
+		}
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			return fmt.Errorf("failed to get rows affected: %w", err)
+		}
+		if rowsAffected == 0 {
 			return fmt.Errorf("%w: %s", interfaces.ErrProjectAlreadyExists, project.Identifier)
 		}
-		return fmt.Errorf("failed to create project %s: %w", project.Identifier, err)
-	}
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to get rows affected: %w", err)
-	}
-	if rowsAffected == 0 {
-		return fmt.Errorf("%w: %s", interfaces.ErrProjectAlreadyExists, project.Identifier)
-	}
-	return nil
+		return nil
+	})
 }
 
 func (r *projectRepo) GetProject(ctx context.Context, identifier string) (*models.Project, error) {
 	var project models.Project
-	err := sqlx.GetContext(ctx, r.db, &project, "SELECT * FROM projects WHERE identifier = $1", identifier)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("%w: %s", interfaces.ErrProjectNotFound, identifier)
+	err := r.metrics.observe(ctx, "get_project", func() error {
+		err := sqlx.GetContext(ctx, r.db, &project, "SELECT * FROM projects WHERE identifier = $1", identifier)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return fmt.Errorf("%w: %s", interfaces.ErrProjectNotFound, identifier)
+			}
+			logger.Errorf(ctx, "failed to get project %s: %v", identifier, err)
+			return fmt.Errorf("failed to get project %s: %w", identifier, err)
 		}
-		logger.Errorf(ctx, "failed to get project %s: %v", identifier, err)
-		return nil, fmt.Errorf("failed to get project %s: %w", identifier, err)
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	return &project, nil
 }
 
 func (r *projectRepo) UpdateProject(ctx context.Context, project *models.Project) error {
-	now := time.Now().UTC()
+	return r.metrics.observe(ctx, "update_project", func() error {
+		now := time.Now().UTC()
 
-	result, err := r.db.ExecContext(ctx,
-		`UPDATE projects SET name = $1, description = $2, labels = $3, state = $4, updated_at = $5
-		 WHERE identifier = $6`,
-		project.Name, project.Description, project.Labels, project.State, now, project.Identifier)
-	if err != nil {
-		logger.Errorf(ctx, "failed to update project %s: %v", project.Identifier, err)
-		return fmt.Errorf("failed to update project %s: %w", project.Identifier, err)
-	}
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to get rows affected: %w", err)
-	}
-	if rowsAffected == 0 {
-		return fmt.Errorf("%w: %s", interfaces.ErrProjectNotFound, project.Identifier)
-	}
+		result, err := r.db.ExecContext(ctx,
+			`UPDATE projects SET name = $1, description = $2, labels = $3, state = $4, updated_at = $5
+			 WHERE identifier = $6`,
+			project.Name, project.Description, project.Labels, project.State, now, project.Identifier)
+		if err != nil {
+			logger.Errorf(ctx, "failed to update project %s: %v", project.Identifier, err)
+			return fmt.Errorf("failed to update project %s: %w", project.Identifier, err)
+		}
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			return fmt.Errorf("failed to get rows affected: %w", err)
+		}
+		if rowsAffected == 0 {
+			return fmt.Errorf("%w: %s", interfaces.ErrProjectNotFound, project.Identifier)
+		}
 
-	return nil
+		return nil
+	})
 }
 
 func (r *projectRepo) ListProjects(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Project, error) {
@@ -130,9 +146,15 @@ func (r *projectRepo) ListProjects(ctx context.Context, input interfaces.ListRes
 	}
 
 	var projects []*models.Project
-	if err := sqlx.SelectContext(ctx, r.db, &projects, queryBuilder.String(), args...); err != nil {
-		logger.Errorf(ctx, "failed to list projects: %v", err)
-		return nil, fmt.Errorf("failed to list projects: %w", err)
+	err := r.metrics.observe(ctx, "list_projects", func() error {
+		if err := sqlx.SelectContext(ctx, r.db, &projects, queryBuilder.String(), args...); err != nil {
+			logger.Errorf(ctx, "failed to list projects: %v", err)
+			return fmt.Errorf("failed to list projects: %w", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	return projects, nil
