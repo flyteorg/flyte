@@ -10423,7 +10423,6 @@ spec:
       app: 3scale-kourier-gateway
 
 ---
----
 # Added for the presigned-URL split-horizon fix (mirrors kustomize/coredns-custom.yaml).
 # Regenerate with `make manifests` to reproduce.
 apiVersion: v1
