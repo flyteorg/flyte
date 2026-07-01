@@ -933,6 +933,14 @@ func (c *nodeExecutor) Abort(ctx context.Context, h interfaces.NodeHandler, nCtx
 		}
 
 		targetEntity := common.GetTargetEntity(ctx, nCtx)
+
+		// This event replaces the running one, so re-attach the deck URI or it is lost.
+		deckFile := ioutils.NewRemoteFileOutputPaths(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetOutputDir(), nil).GetDeckPath()
+		var deckURI string
+		if md, err := nCtx.DataStore().Head(ctx, deckFile); err == nil && md.Exists() {
+			deckURI = deckFile.String()
+		}
+
 		err := nCtx.EventsRecorder().RecordNodeEvent(ctx, &event.NodeExecutionEvent{
 			Id:         nodeExecutionID,
 			Phase:      core.NodeExecution_ABORTED,
@@ -943,6 +951,7 @@ func (c *nodeExecutor) Abort(ctx context.Context, h interfaces.NodeHandler, nCtx
 					Message: reason,
 				},
 			},
+			DeckUri:          deckURI,
 			ProducerId:       c.clusterID,
 			ReportedAt:       ptypes.TimestampNow(),
 			IsInDynamicChain: dynamic,
