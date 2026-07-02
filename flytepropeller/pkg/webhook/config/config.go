@@ -53,6 +53,7 @@ var (
 			Role:      "flyte",
 			KVVersion: KVVersion2,
 		},
+		DisableCreateMutatingWebhookConfig: false,
 	}
 
 	configSection = config.MustRegisterSection("webhook", DefaultConfig)
@@ -103,6 +104,8 @@ type Config struct {
 	AWSSecretManagerConfig   AWSSecretManagerConfig   `json:"awsSecretManager" pflag:",AWS Secret Manager config."`
 	GCPSecretManagerConfig   GCPSecretManagerConfig   `json:"gcpSecretManager" pflag:",GCP Secret Manager config."`
 	VaultSecretManagerConfig VaultSecretManagerConfig `json:"vaultSecretManager" pflag:",Vault Secret Manager config."`
+
+	DisableCreateMutatingWebhookConfig bool `json:"disableCreateMutatingWebhookConfig" pflag:",Disable registration of the MutatingWebhookConfiguration, leaving it to be managed out of band."`
 }
 
 func (c Config) ExpandCertDir() string {
