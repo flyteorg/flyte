@@ -7,7 +7,7 @@ on:
     paths:
       - 'gen.Dockerfile'
       - '.github/workflows/build-ci-image.yml'
-  pull_request_target:
+  pull_request:
     branches:
       - main
     paths:
@@ -24,9 +24,14 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}/ci
   DEPOT_PROJECT_ID: ${{ vars.DEPOT_PROJECT_ID }}
+  PR_NUMBER: ${{ github.event.pull_request.number }}
 
 jobs:
   build:
+    if: >
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -41,7 +46,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
 
       - name: Validate Depot project id
@@ -82,8 +86,8 @@ jobs:
       - name: Set image tag output
         id: set-tag
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
-            echo "tag=pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "tag=pr-$PR_NUMBER" >> $GITHUB_OUTPUT
           elif [ "${{ github.ref }}" == "refs/heads/v2" ]; then
             echo "tag=v2" >> $GITHUB_OUTPUT
           elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
@@ -99,7 +103,7 @@ jobs:
           project: ${{ env.DEPOT_PROJECT_ID }}
           context: .
           file: ./gen.Dockerfile
-          push: true
+          push: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           # Native multi-arch on Depot — no QEMU emulation.
@@ -111,7 +115,7 @@ jobs:
         run: echo "Image built with digest ${{ steps.build.outputs.digest }}"
 
       - name: Comment on PR with image tag
-        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         uses: actions/github-script@v7
         with:
           script: |
