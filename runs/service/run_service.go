@@ -841,7 +841,8 @@ func IsTerminalPhase(phase common.ActionPhase) bool {
 	return phase == common.ActionPhase_ACTION_PHASE_FAILED ||
 		phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED ||
 		phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT ||
-		phase == common.ActionPhase_ACTION_PHASE_ABORTED
+		phase == common.ActionPhase_ACTION_PHASE_ABORTED ||
+		phase == common.ActionPhase_ACTION_PHASE_RECOVERED
 }
 
 // lastAttemptIsTerminal returns true when the highest-numbered attempt has reached a
@@ -1009,7 +1010,8 @@ func (s *RunService) GetActionDataURIs(
 		InputsUri: info.GetInputsUri(),
 	}
 
-	if action.Phase == int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED) {
+	if action.Phase == int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED) ||
+		action.Phase == int32(common.ActionPhase_ACTION_PHASE_RECOVERED) {
 		if workflow.ActionType(action.ActionType) == workflow.ActionType_ACTION_TYPE_TRACE {
 			resp.OutputsUri = info.GetOutputsUri()
 		} else {
