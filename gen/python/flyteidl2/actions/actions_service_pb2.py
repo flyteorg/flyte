@@ -20,7 +20,7 @@ from flyteidl2.workflow import run_definition_pb2 as flyteidl2_dot_workflow_dot_
 from flyteidl2.workflow import state_service_pb2 as flyteidl2_dot_workflow_dot_state__service__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\'flyteidl2/actions/actions_service.proto\x12\x11\x66lyteidl2.actions\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1f\x66lyteidl2/common/identity.proto\x1a\x1d\x66lyteidl2/core/literals.proto\x1a\x18\x66lyteidl2/task/run.proto\x1a\'flyteidl2/workflow/run_definition.proto\x1a&flyteidl2/workflow/state_service.proto\"\xc8\x04\n\x06\x41\x63tion\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x31\n\x12parent_action_name\x18\x02 \x01(\tH\x01R\x10parentActionName\x88\x01\x01\x12$\n\tinput_uri\x18\x03 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x08inputUri\x12/\n\x0frun_output_base\x18\x04 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\rrunOutputBase\x12\x14\n\x05group\x18\x05 \x01(\tR\x05group\x12\x18\n\x07subject\x18\x06 \x01(\tR\x07subject\x12\x34\n\x04task\x18\x07 \x01(\x0b\x32\x1e.flyteidl2.workflow.TaskActionH\x00R\x04task\x12\x37\n\x05trace\x18\x08 \x01(\x0b\x32\x1f.flyteidl2.workflow.TraceActionH\x00R\x05trace\x12\x43\n\tcondition\x18\t \x01(\x0b\x32#.flyteidl2.workflow.ConditionActionH\x00R\tcondition\x12N\n\x0erecovered_from\x18\n \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierH\x02R\rrecoveredFrom\x88\x01\x01\x42\r\n\x04spec\x12\x05\xbaH\x02\x08\x01\x42\x15\n\x13_parent_action_nameB\x11\n\x0f_recovered_from\"\x7f\n\x0e\x45nqueueRequest\x12\x39\n\x06\x61\x63tion\x18\x01 \x01(\x0b\x32\x19.flyteidl2.actions.ActionB\x06\xbaH\x03\xc8\x01\x01R\x06\x61\x63tion\x12\x32\n\x08run_spec\x18\x02 \x01(\x0b\x32\x17.flyteidl2.task.RunSpecR\x07runSpec\"\x11\n\x0f\x45nqueueResponse\"\xca\x01\n\rUpdateRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12!\n\x07\x61ttempt\x18\x02 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\x12@\n\x06status\x18\x03 \x01(\x0b\x32 .flyteidl2.workflow.ActionStatusB\x06\xbaH\x03\xc8\x01\x01R\x06statusJ\x04\x08\x04\x10\x05R\x05state\"\x10\n\x0eUpdateResponse\"y\n\x16WatchForUpdatesRequest\x12N\n\x10parent_action_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierH\x00R\x0eparentActionIdB\x0f\n\x06\x66ilter\x12\x05\xbaH\x02\x08\x01\"\xbc\x01\n\x17WatchForUpdatesResponse\x12G\n\raction_update\x18\x01 \x01(\x0b\x32 .flyteidl2.workflow.ActionUpdateH\x00R\x0c\x61\x63tionUpdate\x12M\n\x0f\x63ontrol_message\x18\x02 \x01(\x0b\x32\".flyteidl2.workflow.ControlMessageH\x00R\x0e\x63ontrolMessageB\t\n\x07message\"\xd6\x01\n\x0c\x41\x62ortRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x1b\n\x06reason\x18\x02 \x01(\tH\x00R\x06reason\x88\x01\x01\x12\x46\n\naborted_by\x18\x03 \x01(\x0b\x32\".flyteidl2.common.EnrichedIdentityH\x01R\tabortedBy\x88\x01\x01\x42\t\n\x07_reasonB\r\n\x0b_aborted_by\"\x0f\n\rAbortResponse\"\xa3\x02\n\rSignalRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x35\n\x12parent_action_name\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x10parentActionName\x12\x35\n\x05value\x18\x03 \x01(\x0b\x32\x17.flyteidl2.core.LiteralB\x06\xbaH\x03\xc8\x01\x01R\x05value\x12J\n\x0csignalled_by\x18\x04 \x01(\x0b\x32\".flyteidl2.common.EnrichedIdentityH\x00R\x0bsignalledBy\x88\x01\x01\x42\x0f\n\r_signalled_by\"\x10\n\x0eSignalResponse2\xc2\x03\n\x0e\x41\x63tionsService\x12R\n\x07\x45nqueue\x12!.flyteidl2.actions.EnqueueRequest\x1a\".flyteidl2.actions.EnqueueResponse\"\x00\x12l\n\x0fWatchForUpdates\x12).flyteidl2.actions.WatchForUpdatesRequest\x1a*.flyteidl2.actions.WatchForUpdatesResponse\"\x00\x30\x01\x12O\n\x06Update\x12 .flyteidl2.actions.UpdateRequest\x1a!.flyteidl2.actions.UpdateResponse\"\x00\x12L\n\x05\x41\x62ort\x12\x1f.flyteidl2.actions.AbortRequest\x1a .flyteidl2.actions.AbortResponse\"\x00\x12O\n\x06Signal\x12 .flyteidl2.actions.SignalRequest\x1a!.flyteidl2.actions.SignalResponse\"\x00\x42\xca\x01\n\x15\x63om.flyteidl2.actionsB\x13\x41\x63tionsServiceProtoH\x02P\x01Z5github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions\xa2\x02\x03\x46\x41X\xaa\x02\x11\x46lyteidl2.Actions\xca\x02\x11\x46lyteidl2\\Actions\xe2\x02\x1d\x46lyteidl2\\Actions\\GPBMetadata\xea\x02\x12\x46lyteidl2::Actionsb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\'flyteidl2/actions/actions_service.proto\x12\x11\x66lyteidl2.actions\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1f\x66lyteidl2/common/identity.proto\x1a\x1d\x66lyteidl2/core/literals.proto\x1a\x18\x66lyteidl2/task/run.proto\x1a\'flyteidl2/workflow/run_definition.proto\x1a&flyteidl2/workflow/state_service.proto\"\xb0\x04\n\x06\x41\x63tion\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x31\n\x12parent_action_name\x18\x02 \x01(\tH\x01R\x10parentActionName\x88\x01\x01\x12$\n\tinput_uri\x18\x03 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x08inputUri\x12/\n\x0frun_output_base\x18\x04 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\rrunOutputBase\x12\x14\n\x05group\x18\x05 \x01(\tR\x05group\x12\x18\n\x07subject\x18\x06 \x01(\tR\x07subject\x12\x34\n\x04task\x18\x07 \x01(\x0b\x32\x1e.flyteidl2.workflow.TaskActionH\x00R\x04task\x12\x37\n\x05trace\x18\x08 \x01(\x0b\x32\x1f.flyteidl2.workflow.TraceActionH\x00R\x05trace\x12\x43\n\tcondition\x18\t \x01(\x0b\x32#.flyteidl2.workflow.ConditionActionH\x00R\tcondition\x12I\n\x0erecovered_from\x18\n \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierR\rrecoveredFromB\r\n\x04spec\x12\x05\xbaH\x02\x08\x01\x42\x15\n\x13_parent_action_name\"\x7f\n\x0e\x45nqueueRequest\x12\x39\n\x06\x61\x63tion\x18\x01 \x01(\x0b\x32\x19.flyteidl2.actions.ActionB\x06\xbaH\x03\xc8\x01\x01R\x06\x61\x63tion\x12\x32\n\x08run_spec\x18\x02 \x01(\x0b\x32\x17.flyteidl2.task.RunSpecR\x07runSpec\"\x11\n\x0f\x45nqueueResponse\"\xca\x01\n\rUpdateRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12!\n\x07\x61ttempt\x18\x02 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x07\x61ttempt\x12@\n\x06status\x18\x03 \x01(\x0b\x32 .flyteidl2.workflow.ActionStatusB\x06\xbaH\x03\xc8\x01\x01R\x06statusJ\x04\x08\x04\x10\x05R\x05state\"\x10\n\x0eUpdateResponse\"y\n\x16WatchForUpdatesRequest\x12N\n\x10parent_action_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierH\x00R\x0eparentActionIdB\x0f\n\x06\x66ilter\x12\x05\xbaH\x02\x08\x01\"\xbc\x01\n\x17WatchForUpdatesResponse\x12G\n\raction_update\x18\x01 \x01(\x0b\x32 .flyteidl2.workflow.ActionUpdateH\x00R\x0c\x61\x63tionUpdate\x12M\n\x0f\x63ontrol_message\x18\x02 \x01(\x0b\x32\".flyteidl2.workflow.ControlMessageH\x00R\x0e\x63ontrolMessageB\t\n\x07message\"\xd6\x01\n\x0c\x41\x62ortRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x1b\n\x06reason\x18\x02 \x01(\tH\x00R\x06reason\x88\x01\x01\x12\x46\n\naborted_by\x18\x03 \x01(\x0b\x32\".flyteidl2.common.EnrichedIdentityH\x01R\tabortedBy\x88\x01\x01\x42\t\n\x07_reasonB\r\n\x0b_aborted_by\"\x0f\n\rAbortResponse\"\xa3\x02\n\rSignalRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x35\n\x12parent_action_name\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x10parentActionName\x12\x35\n\x05value\x18\x03 \x01(\x0b\x32\x17.flyteidl2.core.LiteralB\x06\xbaH\x03\xc8\x01\x01R\x05value\x12J\n\x0csignalled_by\x18\x04 \x01(\x0b\x32\".flyteidl2.common.EnrichedIdentityH\x00R\x0bsignalledBy\x88\x01\x01\x42\x0f\n\r_signalled_by\"\x10\n\x0eSignalResponse2\xc2\x03\n\x0e\x41\x63tionsService\x12R\n\x07\x45nqueue\x12!.flyteidl2.actions.EnqueueRequest\x1a\".flyteidl2.actions.EnqueueResponse\"\x00\x12l\n\x0fWatchForUpdates\x12).flyteidl2.actions.WatchForUpdatesRequest\x1a*.flyteidl2.actions.WatchForUpdatesResponse\"\x00\x30\x01\x12O\n\x06Update\x12 .flyteidl2.actions.UpdateRequest\x1a!.flyteidl2.actions.UpdateResponse\"\x00\x12L\n\x05\x41\x62ort\x12\x1f.flyteidl2.actions.AbortRequest\x1a .flyteidl2.actions.AbortResponse\"\x00\x12O\n\x06Signal\x12 .flyteidl2.actions.SignalRequest\x1a!.flyteidl2.actions.SignalResponse\"\x00\x42\xca\x01\n\x15\x63om.flyteidl2.actionsB\x13\x41\x63tionsServiceProtoH\x02P\x01Z5github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions\xa2\x02\x03\x46\x41X\xaa\x02\x11\x46lyteidl2.Actions\xca\x02\x11\x46lyteidl2\\Actions\xe2\x02\x1d\x46lyteidl2\\Actions\\GPBMetadata\xea\x02\x12\x46lyteidl2::Actionsb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -55,27 +55,27 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _SIGNALREQUEST.fields_by_name['value']._options = None
   _SIGNALREQUEST.fields_by_name['value']._serialized_options = b'\272H\003\310\001\001'
   _globals['_ACTION']._serialized_start=298
-  _globals['_ACTION']._serialized_end=882
-  _globals['_ENQUEUEREQUEST']._serialized_start=884
-  _globals['_ENQUEUEREQUEST']._serialized_end=1011
-  _globals['_ENQUEUERESPONSE']._serialized_start=1013
-  _globals['_ENQUEUERESPONSE']._serialized_end=1030
-  _globals['_UPDATEREQUEST']._serialized_start=1033
-  _globals['_UPDATEREQUEST']._serialized_end=1235
-  _globals['_UPDATERESPONSE']._serialized_start=1237
-  _globals['_UPDATERESPONSE']._serialized_end=1253
-  _globals['_WATCHFORUPDATESREQUEST']._serialized_start=1255
-  _globals['_WATCHFORUPDATESREQUEST']._serialized_end=1376
-  _globals['_WATCHFORUPDATESRESPONSE']._serialized_start=1379
-  _globals['_WATCHFORUPDATESRESPONSE']._serialized_end=1567
-  _globals['_ABORTREQUEST']._serialized_start=1570
-  _globals['_ABORTREQUEST']._serialized_end=1784
-  _globals['_ABORTRESPONSE']._serialized_start=1786
-  _globals['_ABORTRESPONSE']._serialized_end=1801
-  _globals['_SIGNALREQUEST']._serialized_start=1804
-  _globals['_SIGNALREQUEST']._serialized_end=2095
-  _globals['_SIGNALRESPONSE']._serialized_start=2097
-  _globals['_SIGNALRESPONSE']._serialized_end=2113
-  _globals['_ACTIONSSERVICE']._serialized_start=2116
-  _globals['_ACTIONSSERVICE']._serialized_end=2566
+  _globals['_ACTION']._serialized_end=858
+  _globals['_ENQUEUEREQUEST']._serialized_start=860
+  _globals['_ENQUEUEREQUEST']._serialized_end=987
+  _globals['_ENQUEUERESPONSE']._serialized_start=989
+  _globals['_ENQUEUERESPONSE']._serialized_end=1006
+  _globals['_UPDATEREQUEST']._serialized_start=1009
+  _globals['_UPDATEREQUEST']._serialized_end=1211
+  _globals['_UPDATERESPONSE']._serialized_start=1213
+  _globals['_UPDATERESPONSE']._serialized_end=1229
+  _globals['_WATCHFORUPDATESREQUEST']._serialized_start=1231
+  _globals['_WATCHFORUPDATESREQUEST']._serialized_end=1352
+  _globals['_WATCHFORUPDATESRESPONSE']._serialized_start=1355
+  _globals['_WATCHFORUPDATESRESPONSE']._serialized_end=1543
+  _globals['_ABORTREQUEST']._serialized_start=1546
+  _globals['_ABORTREQUEST']._serialized_end=1760
+  _globals['_ABORTRESPONSE']._serialized_start=1762
+  _globals['_ABORTRESPONSE']._serialized_end=1777
+  _globals['_SIGNALREQUEST']._serialized_start=1780
+  _globals['_SIGNALREQUEST']._serialized_end=2071
+  _globals['_SIGNALRESPONSE']._serialized_start=2073
+  _globals['_SIGNALRESPONSE']._serialized_end=2089
+  _globals['_ACTIONSSERVICE']._serialized_start=2092
+  _globals['_ACTIONSSERVICE']._serialized_end=2542
 # @@protoc_insertion_point(module_scope)

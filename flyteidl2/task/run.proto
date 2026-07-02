@@ -88,9 +88,10 @@ enum ConditionRecoveryMode {
 // is the sole carrier of recovery configuration and the extension point for future
 // recovery parameters.
 message Recover {
-  // The prior run whose successful actions should be recovered. Resolved within
-  // the current org/project/domain; cross-project recovery is not supported.
-  flyteidl2.common.RunIdentifier run_id = 1;
+  // The prior run whose successful actions should be recovered. Required — a Recover
+  // message without a run_id is meaningless. Resolved within the current
+  // org/project/domain; cross-project recovery is not supported.
+  flyteidl2.common.RunIdentifier run_id = 1 [(buf.validate.field).required = true];
 
   // How condition actions are treated during recovery. Defaults to RECOVER.
   ConditionRecoveryMode condition_mode = 2;
