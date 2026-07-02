@@ -1466,6 +1466,57 @@ func TestGetActionDataURIs(t *testing.T) {
 		assert.Equal(t, "s3://bucket/outputs/0/outputs.pb", resp.Msg.GetOutputsUri())
 	})
 
+	t.Run("recovered trace action returns outputs uri from RunInfo", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
+			ActionType: int32(workflow.ActionType_ACTION_TYPE_TRACE),
+			DetailedInfo: mustMarshalRunInfo(&workflow.RunInfo{
+				InputsUri:  "s3://bucket/inputs",
+				OutputsUri: "s3://bucket/trace-outputs",
+			}),
+		}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		require.NoError(t, err)
+		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
+		assert.Equal(t, "s3://bucket/trace-outputs", resp.Msg.GetOutputsUri())
+	})
+
+	t.Run("recovered task returns outputs from latest attempt", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
+			ActionType: int32(workflow.ActionType_ACTION_TYPE_TASK),
+			DetailedInfo: mustMarshalRunInfo(&workflow.RunInfo{
+				InputsUri: "s3://bucket/inputs",
+			}),
+		}, nil)
+
+		eventBytes := mustMarshalEvent(&workflow.ActionEvent{
+			Id:      actionID,
+			Attempt: 0,
+			Phase:   common.ActionPhase_ACTION_PHASE_RECOVERED,
+			Outputs: &task.OutputReferences{
+				OutputUri: "s3://bucket/outputs/0/outputs.pb",
+			},
+		})
+		actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{
+			{Attempt: 0, Phase: int32(common.ActionPhase_ACTION_PHASE_RECOVERED), Info: eventBytes},
+		}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		require.NoError(t, err)
+		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
+		assert.Equal(t, "s3://bucket/outputs/0/outputs.pb", resp.Msg.GetOutputsUri())
+	})
+
 	t.Run("succeeded task with no attempts returns NotFound", func(t *testing.T) {
 		actionRepo, _, svc := newTestService(t)
 		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
