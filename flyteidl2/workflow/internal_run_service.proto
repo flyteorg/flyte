@@ -53,6 +53,10 @@ message RecordActionRequest {
     flyteidl2.workflow.TraceAction trace = 11;
     flyteidl2.workflow.ConditionAction condition = 12;
   }
+
+  // Set when the recorded action was recovered from a prior run instead of executed:
+  // the source action (source run id + action name) whose result was reused.
+  flyteidl2.common.ActionIdentifier recovered_from = 13;
 }
 
 // Response message for recording an action.

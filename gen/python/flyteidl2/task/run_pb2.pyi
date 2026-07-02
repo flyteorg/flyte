@@ -19,9 +19,18 @@ class CacheLookupScope(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     CACHE_LOOKUP_SCOPE_UNSPECIFIED: _ClassVar[CacheLookupScope]
     CACHE_LOOKUP_SCOPE_GLOBAL: _ClassVar[CacheLookupScope]
     CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN: _ClassVar[CacheLookupScope]
+
+class ConditionRecoveryMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    CONDITION_RECOVERY_MODE_UNSPECIFIED: _ClassVar[ConditionRecoveryMode]
+    CONDITION_RECOVERY_MODE_RECOVER: _ClassVar[ConditionRecoveryMode]
+    CONDITION_RECOVERY_MODE_RERUN: _ClassVar[ConditionRecoveryMode]
 CACHE_LOOKUP_SCOPE_UNSPECIFIED: CacheLookupScope
 CACHE_LOOKUP_SCOPE_GLOBAL: CacheLookupScope
 CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN: CacheLookupScope
+CONDITION_RECOVERY_MODE_UNSPECIFIED: ConditionRecoveryMode
+CONDITION_RECOVERY_MODE_RECOVER: ConditionRecoveryMode
+CONDITION_RECOVERY_MODE_RERUN: ConditionRecoveryMode
 
 class Labels(_message.Message):
     __slots__ = ["values"]
@@ -69,8 +78,16 @@ class CacheConfig(_message.Message):
     cache_lookup_scope: CacheLookupScope
     def __init__(self, overwrite_cache: bool = ..., cache_lookup_scope: _Optional[_Union[CacheLookupScope, str]] = ...) -> None: ...
 
+class Recover(_message.Message):
+    __slots__ = ["run_id", "condition_mode"]
+    RUN_ID_FIELD_NUMBER: _ClassVar[int]
+    CONDITION_MODE_FIELD_NUMBER: _ClassVar[int]
+    run_id: _identifier_pb2.RunIdentifier
+    condition_mode: ConditionRecoveryMode
+    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., condition_mode: _Optional[_Union[ConditionRecoveryMode, str]] = ...) -> None: ...
+
 class RunSpec(_message.Message):
-    __slots__ = ["labels", "annotations", "envs", "interruptible", "overwrite_cache", "cluster", "raw_data_storage", "security_context", "cache_config", "notification_rule_name", "notification_rules", "run_start_time", "max_action_concurrency", "run_base_dir", "related_to", "cluster_pool"]
+    __slots__ = ["labels", "annotations", "envs", "interruptible", "overwrite_cache", "cluster", "raw_data_storage", "security_context", "cache_config", "notification_rule_name", "notification_rules", "run_start_time", "max_action_concurrency", "run_base_dir", "related_to", "cluster_pool", "recover"]
     LABELS_FIELD_NUMBER: _ClassVar[int]
     ANNOTATIONS_FIELD_NUMBER: _ClassVar[int]
     ENVS_FIELD_NUMBER: _ClassVar[int]
@@ -87,6 +104,7 @@ class RunSpec(_message.Message):
     RUN_BASE_DIR_FIELD_NUMBER: _ClassVar[int]
     RELATED_TO_FIELD_NUMBER: _ClassVar[int]
     CLUSTER_POOL_FIELD_NUMBER: _ClassVar[int]
+    RECOVER_FIELD_NUMBER: _ClassVar[int]
     labels: Labels
     annotations: Annotations
     envs: Envs
@@ -103,7 +121,8 @@ class RunSpec(_message.Message):
     run_base_dir: str
     related_to: _identifier_pb2.RunIdentifier
     cluster_pool: str
-    def __init__(self, labels: _Optional[_Union[Labels, _Mapping]] = ..., annotations: _Optional[_Union[Annotations, _Mapping]] = ..., envs: _Optional[_Union[Envs, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., cluster: _Optional[str] = ..., raw_data_storage: _Optional[_Union[RawDataStorage, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., cache_config: _Optional[_Union[CacheConfig, _Mapping]] = ..., notification_rule_name: _Optional[str] = ..., notification_rules: _Optional[_Union[InlineRuleList, _Mapping]] = ..., run_start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., max_action_concurrency: _Optional[int] = ..., run_base_dir: _Optional[str] = ..., related_to: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., cluster_pool: _Optional[str] = ...) -> None: ...
+    recover: Recover
+    def __init__(self, labels: _Optional[_Union[Labels, _Mapping]] = ..., annotations: _Optional[_Union[Annotations, _Mapping]] = ..., envs: _Optional[_Union[Envs, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., cluster: _Optional[str] = ..., raw_data_storage: _Optional[_Union[RawDataStorage, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., cache_config: _Optional[_Union[CacheConfig, _Mapping]] = ..., notification_rule_name: _Optional[str] = ..., notification_rules: _Optional[_Union[InlineRuleList, _Mapping]] = ..., run_start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., max_action_concurrency: _Optional[int] = ..., run_base_dir: _Optional[str] = ..., related_to: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., cluster_pool: _Optional[str] = ..., recover: _Optional[_Union[Recover, _Mapping]] = ...) -> None: ...
 
 class InlineRuleList(_message.Message):
     __slots__ = ["rules"]

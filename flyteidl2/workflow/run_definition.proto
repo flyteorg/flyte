@@ -195,6 +195,10 @@ message ActionMetadata {
 
   // Who initiated this run
   RunSource source = 16;
+
+  // Set only when this action was recovered from a prior run instead of executed
+  // here: the source action (source run id + action name) whose result was reused.
+  common.ActionIdentifier recovered_from = 17;
 }
 
 enum ActionType {

@@ -69,6 +69,33 @@ message CacheConfig {
   CacheLookupScope cache_lookup_scope = 2;
 }
 
+// ConditionRecoveryMode controls whether a previously-resolved condition action is
+// recovered as-is or re-evaluated (waits for a fresh signal) during a recovery run.
+enum ConditionRecoveryMode {
+  // Treated as RECOVER.
+  CONDITION_RECOVERY_MODE_UNSPECIFIED = 0;
+
+  // Reuse the prior signal/result without re-prompting (default).
+  CONDITION_RECOVERY_MODE_RECOVER = 1;
+
+  // Re-pause the condition and wait for a new signal.
+  CONDITION_RECOVERY_MODE_RERUN = 2;
+}
+
+// Recover instructs the system to build this run as a recovery of a prior run:
+// actions that succeeded in run_id are reused (recorded as RECOVERED without
+// executing); actions that failed, changed, or are missing re-execute. This message
+// is the sole carrier of recovery configuration and the extension point for future
+// recovery parameters.
+message Recover {
+  // The prior run whose successful actions should be recovered. Resolved within
+  // the current org/project/domain; cross-project recovery is not supported.
+  flyteidl2.common.RunIdentifier run_id = 1;
+
+  // How condition actions are treated during recovery. Defaults to RECOVER.
+  ConditionRecoveryMode condition_mode = 2;
+}
+
 message RunSpec {
   // Labels to apply to the run.
   Labels labels = 1;
@@ -135,6 +162,10 @@ message RunSpec {
   // Pool of the assigned queue for given run.
   // Always set by server. Should not be specified by user.
   string cluster_pool = 16;
+
+  // When set, this run is a recovery of the referenced prior run: its successful
+  // actions are reused and only failed/changed ones re-execute. See Recover.
+  Recover recover = 17;
 }
 
 message InlineRuleList {
