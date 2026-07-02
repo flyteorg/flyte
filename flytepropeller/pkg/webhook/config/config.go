@@ -5,6 +5,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
 )
@@ -105,7 +106,8 @@ type Config struct {
 	GCPSecretManagerConfig   GCPSecretManagerConfig   `json:"gcpSecretManager" pflag:",GCP Secret Manager config."`
 	VaultSecretManagerConfig VaultSecretManagerConfig `json:"vaultSecretManager" pflag:",Vault Secret Manager config."`
 
-	DisableCreateMutatingWebhookConfig bool `json:"disableCreateMutatingWebhookConfig" pflag:",Disable registration of the MutatingWebhookConfiguration, leaving it to be managed out of band."`
+	DisableCreateMutatingWebhookConfig bool                  `json:"disableCreateMutatingWebhookConfig" pflag:",Disable registration of the MutatingWebhookConfiguration, leaving it to be managed out of band."`
+	NamespaceSelector                  *metav1.LabelSelector `json:"namespaceSelector" pflag:"-,NamespaceSelector to scope the created MutatingWebhookConfiguration. Nil matches all namespaces."`
 }
 
 func (c Config) ExpandCertDir() string {
