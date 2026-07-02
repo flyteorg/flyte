@@ -185,7 +185,7 @@ message ActionMetadata {
   string environment_name = 12;
 
   // Function name
-  string funtion_name = 13;
+  string function_name = 13;
 
   // Trigger name
   string trigger_name = 14;
