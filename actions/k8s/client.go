@@ -15,6 +15,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/util/retry"
 	toolscache "k8s.io/client-go/tools/cache"
 	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -272,6 +273,84 @@ func (c *ActionsClient) PutStatus(ctx context.Context, actionID *common.ActionId
 
 	logger.Infof(ctx, "Updated status for TaskAction: %s", taskActionName)
 	return nil
+}
+
+// Signal delivers the resolved value to a paused condition action by writing
+// status.signalValue/signalledBy/signalledAt. The reconciler is the single
+// writer of status.conditions[] and flips the CR to Succeeded when it observes
+// the value, so validation here is synchronous but the transition is not.
+func (c *ActionsClient) Signal(ctx context.Context, actionID *common.ActionIdentifier, value *core.Literal, signalledBy string) error {
+	kind, ok := literalPrimitiveKind(value)
+	if !ok {
+		return connect.NewError(connect.CodeInvalidArgument,
+			fmt.Errorf("signal value must be a concrete bool/int/float/str literal"))
+	}
+	valueBytes, err := proto.Marshal(value)
+	if err != nil {
+		return fmt.Errorf("failed to marshal signal value: %w", err)
+	}
+	taskActionName := buildTaskActionName(actionID)
+
+	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		taskAction := &executorv1.TaskAction{}
+		if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: taskActionName, Namespace: flyteNamespace}, taskAction); err != nil {
+			if apierrors.IsNotFound(err) {
+				return connect.NewError(connect.CodeNotFound, fmt.Errorf("condition action %s not found", taskActionName))
+			}
+			return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
+		}
+		if taskAction.Spec.ActionType != executorv1.ActionTypeCondition {
+			return connect.NewError(connect.CodeFailedPrecondition,
+				fmt.Errorf("action %s is not a condition", taskActionName))
+		}
+		if existing := SignalValueFromStatus(ctx, taskAction); existing != nil {
+			if proto.Equal(existing, value) {
+				return nil // idempotent retry of the same signal
+			}
+			return connect.NewError(connect.CodeFailedPrecondition,
+				fmt.Errorf("condition %s already signalled with a different value", taskActionName))
+		}
+		if isTerminalPhase(GetPhaseFromConditions(taskAction)) {
+			return connect.NewError(connect.CodeFailedPrecondition,
+				fmt.Errorf("condition %s already completed", taskActionName))
+		}
+
+		condSpec := &workflow.ConditionAction{}
+		if err := proto.Unmarshal(taskAction.Spec.ConditionSpec, condSpec); err != nil {
+			return fmt.Errorf("failed to unmarshal condition spec for %s: %w", taskActionName, err)
+		}
+		if declared := condSpec.GetType().GetSimple(); declared != kind {
+			return connect.NewError(connect.CodeInvalidArgument,
+				fmt.Errorf("signal value type %s does not match declared condition type %s", kind, declared))
+		}
+
+		now := metav1.Now()
+		taskAction.Status.SignalValue = valueBytes
+		taskAction.Status.SignalledBy = signalledBy
+		taskAction.Status.SignalledAt = &now
+		if err := c.k8sClient.Status().Update(ctx, taskAction); err != nil {
+			return err
+		}
+		logger.Infof(ctx, "Signalled condition TaskAction %s (by %q)", taskActionName, signalledBy)
+		return nil
+	})
+}
+
+// literalPrimitiveKind maps a concrete signal Literal to the SimpleType it
+// would satisfy. ok is false for empty literals and non-primitive values.
+func literalPrimitiveKind(value *core.Literal) (core.SimpleType, bool) {
+	switch value.GetScalar().GetPrimitive().GetValue().(type) {
+	case *core.Primitive_Boolean:
+		return core.SimpleType_BOOLEAN, true
+	case *core.Primitive_Integer:
+		return core.SimpleType_INTEGER, true
+	case *core.Primitive_FloatValue:
+		return core.SimpleType_FLOAT, true
+	case *core.Primitive_StringValue:
+		return core.SimpleType_STRING, true
+	default:
+		return core.SimpleType_NONE, false
+	}
 }
 
 // ListRunActions lists all TaskActions belonging to a run.

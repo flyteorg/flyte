@@ -23,8 +23,38 @@ type ActionsService struct {
 	client ActionsClientInterface
 }
 
-func (s *ActionsService) Signal(ctx context.Context, c *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("endpoint Signal not implemented"))
+// Signal delivers a value to a paused condition action.
+func (s *ActionsService) Signal(ctx context.Context, req *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error) {
+	logger.Infof(ctx, "ActionsService.Signal called")
+
+	if err := req.Msg.Validate(); err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	if err := s.client.Signal(ctx, req.Msg.ActionId, req.Msg.Value, principalSubject(req.Msg.GetSignalledBy())); err != nil {
+		logger.Errorf(ctx, "Failed to signal action: %v", err)
+		return nil, toConnectError(err)
+	}
+
+	return connect.NewResponse(&actions.SignalResponse{}), nil
+}
+
+// principalSubject extracts a storable subject string from the caller identity.
+func principalSubject(id *common.EnrichedIdentity) string {
+	if s := id.GetUser().GetId().GetSubject(); s != "" {
+		return s
+	}
+	return id.GetApplication().GetId().GetSubject()
+}
+
+// toConnectError preserves typed errors from the client (e.g. NotFound,
+// InvalidArgument) and wraps everything else as Internal.
+func toConnectError(err error) error {
+	var connectErr *connect.Error
+	if errors.As(err, &connectErr) {
+		return err
+	}
+	return connect.NewError(connect.CodeInternal, err)
 }
 
 // NewActionsService creates a new ActionsService.
@@ -48,13 +78,7 @@ func (s *ActionsService) Enqueue(
 
 	if err := s.client.Enqueue(ctx, req.Msg.Action, req.Msg.RunSpec); err != nil {
 		logger.Errorf(ctx, "Failed to enqueue action: %v", err)
-		// Preserve typed errors from the client (e.g. InvalidArgument for a
-		// condition with an unsupported declared type).
-		var connectErr *connect.Error
-		if errors.As(err, &connectErr) {
-			return nil, err
-		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, toConnectError(err)
 	}
 
 	return connect.NewResponse(&actions.EnqueueResponse{}), nil

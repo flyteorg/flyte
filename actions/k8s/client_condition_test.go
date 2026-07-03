@@ -33,7 +33,31 @@ func newConditionClient(t *testing.T) *ActionsClient {
 		ObjectMeta: metav1.ObjectMeta{Name: "run1-a0", Namespace: flyteNamespace},
 	}
 	return &ActionsClient{
-		k8sClient: fake.NewClientBuilder().WithScheme(scheme).WithObjects(parent).Build(),
+		k8sClient: fake.NewClientBuilder().
+			WithScheme(scheme).
+			WithObjects(parent).
+			WithStatusSubresource(&executorv1.TaskAction{}).
+			Build(),
+	}
+}
+
+func boolLiteral(v bool) *core.Literal {
+	return &core.Literal{
+		Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{
+				Value: &core.Primitive_Boolean{Boolean: v},
+			}},
+		}},
+	}
+}
+
+func strLiteral(s string) *core.Literal {
+	return &core.Literal{
+		Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{
+				Value: &core.Primitive_StringValue{StringValue: s},
+			}},
+		}},
 	}
 }
 
@@ -94,20 +118,87 @@ func TestBuildActionUpdate_SignalValue(t *testing.T) {
 
 	assert.Nil(t, buildActionUpdate(ctx, ta, watch.Modified).Value)
 
-	lit := &core.Literal{
-		Value: &core.Literal_Scalar{Scalar: &core.Scalar{
-			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{
-				Value: &core.Primitive_Boolean{Boolean: true},
-			}},
-		}},
-	}
-	raw, err := proto.Marshal(lit)
+	raw, err := proto.Marshal(boolLiteral(true))
 	require.NoError(t, err)
 	ta.Status.SignalValue = raw
 
 	value := buildActionUpdate(ctx, ta, watch.Modified).Value
 	require.NotNil(t, value)
 	assert.True(t, value.GetScalar().GetPrimitive().GetBoolean())
+}
+
+func TestSignal(t *testing.T) {
+	ctx := context.Background()
+
+	// newSignalledClient returns a client with the condition "cond1" enqueued.
+	newSignalledClient := func(t *testing.T) *ActionsClient {
+		c := newConditionClient(t)
+		require.NoError(t, c.Enqueue(ctx, newConditionAction(core.SimpleType_BOOLEAN), nil))
+		return c
+	}
+	condID := newConditionAction(core.SimpleType_BOOLEAN).ActionId
+
+	t.Run("happy path persists signal fields", func(t *testing.T) {
+		c := newSignalledClient(t)
+		require.NoError(t, c.Signal(ctx, condID, boolLiteral(true), "user@example.com"))
+
+		ta, err := c.GetTaskAction(ctx, condID)
+		require.NoError(t, err)
+		assert.True(t, proto.Equal(boolLiteral(true), SignalValueFromStatus(ctx, ta)))
+		assert.Equal(t, "user@example.com", ta.Status.SignalledBy)
+		assert.NotNil(t, ta.Status.SignalledAt)
+	})
+
+	t.Run("empty literal is invalid", func(t *testing.T) {
+		err := newSignalledClient(t).Signal(ctx, condID, &core.Literal{}, "u")
+		assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+	})
+
+	t.Run("not found", func(t *testing.T) {
+		missing := &common.ActionIdentifier{Run: condID.Run, Name: "nope"}
+		err := newSignalledClient(t).Signal(ctx, missing, boolLiteral(true), "u")
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	})
+
+	t.Run("not a condition", func(t *testing.T) {
+		parentID := &common.ActionIdentifier{Run: condID.Run, Name: "run1"} // resolves to run1-a0, a task CR
+		err := newSignalledClient(t).Signal(ctx, parentID, boolLiteral(true), "u")
+		assert.Equal(t, connect.CodeFailedPrecondition, connect.CodeOf(err))
+	})
+
+	t.Run("type mismatch", func(t *testing.T) {
+		err := newSignalledClient(t).Signal(ctx, condID, strLiteral("yes"), "u")
+		assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+	})
+
+	t.Run("re-signal with same value is idempotent", func(t *testing.T) {
+		c := newSignalledClient(t)
+		require.NoError(t, c.Signal(ctx, condID, boolLiteral(true), "u"))
+		assert.NoError(t, c.Signal(ctx, condID, boolLiteral(true), "u"))
+	})
+
+	t.Run("re-signal with different value fails", func(t *testing.T) {
+		c := newSignalledClient(t)
+		require.NoError(t, c.Signal(ctx, condID, boolLiteral(true), "u"))
+		err := c.Signal(ctx, condID, boolLiteral(false), "u")
+		assert.Equal(t, connect.CodeFailedPrecondition, connect.CodeOf(err))
+	})
+
+	t.Run("already terminal", func(t *testing.T) {
+		c := newSignalledClient(t)
+		ta, err := c.GetTaskAction(ctx, condID)
+		require.NoError(t, err)
+		ta.Status.Conditions = []metav1.Condition{{
+			Type:               string(executorv1.ConditionTypeFailed),
+			Status:             metav1.ConditionTrue,
+			Reason:             string(executorv1.ConditionReasonTimedOut),
+			LastTransitionTime: metav1.Now(),
+		}}
+		require.NoError(t, c.k8sClient.Status().Update(ctx, ta))
+
+		err = c.Signal(ctx, condID, boolLiteral(true), "u")
+		assert.Equal(t, connect.CodeFailedPrecondition, connect.CodeOf(err))
+	})
 }
 
 func TestGetPhaseFromConditions_ConditionPhases(t *testing.T) {
