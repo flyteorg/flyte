@@ -87,6 +87,8 @@ func (u Uploader) handleBlobType(ctx context.Context, localPath string, toPath s
 			return nil, err
 		}
 
+		logger.Infof(ctx, "Found [%d] files for multipart blob upload from [%s]", len(files), localPath)
+
 		childCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
 		fileUploader := make([]futures.Future, 0, len(files))
@@ -107,7 +109,9 @@ func (u Uploader) handleBlobType(ctx context.Context, localPath string, toPath s
 			}
 		}
 
-		return coreutils.MakeLiteralForBlob(toPath, false, ""), nil
+		logger.Infof(ctx, "Successfully uploaded multipart blob from [%s] to [%s]", localPath, toPath)
+
+		return coreutils.MakeLiteralForBlob(toPath, true, ""), nil
 	}
 	size := info.Size()
 	// Should we make this a go routine as well, so that we can introduce timeouts
