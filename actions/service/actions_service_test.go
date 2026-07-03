@@ -179,7 +179,7 @@ func TestTaskActionToUpdate_PopulatesErrorOnFailure(t *testing.T) {
 		},
 	}
 
-	upd := taskActionToUpdate(ta)
+	upd := taskActionToUpdate(context.Background(), ta)
 
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_FAILED, upd.Phase)
 	if assert.NotNil(t, upd.Error, "ActionUpdate.Error must be populated for failed actions with ErrorState") {
@@ -203,7 +203,7 @@ func TestTaskActionToUpdate_NoErrorWhenNotFailed(t *testing.T) {
 		},
 	}
 
-	upd := taskActionToUpdate(ta)
+	upd := taskActionToUpdate(context.Background(), ta)
 
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, upd.Phase)
 	assert.Nil(t, upd.Error)
@@ -221,7 +221,7 @@ func TestTaskActionToUpdate_FailedWithoutErrorState(t *testing.T) {
 		},
 	}
 
-	upd := taskActionToUpdate(ta)
+	upd := taskActionToUpdate(context.Background(), ta)
 
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_FAILED, upd.Phase)
 	assert.Nil(t, upd.Error, "no ErrorState on CR should leave ActionUpdate.Error nil")

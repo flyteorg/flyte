@@ -8,6 +8,7 @@ import (
 
 	"connectrpc.com/connect"
 
+	"github.com/flyteorg/flyte/v2/actions/k8s"
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
@@ -47,6 +48,12 @@ func (s *ActionsService) Enqueue(
 
 	if err := s.client.Enqueue(ctx, req.Msg.Action, req.Msg.RunSpec); err != nil {
 		logger.Errorf(ctx, "Failed to enqueue action: %v", err)
+		// Preserve typed errors from the client (e.g. InvalidArgument for a
+		// condition with an unsupported declared type).
+		var connectErr *connect.Error
+		if errors.As(err, &connectErr) {
+			return nil, err
+		}
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -86,7 +93,7 @@ func (s *ActionsService) WatchForUpdates(
 	for _, action := range childActions {
 		resp := &actions.WatchForUpdatesResponse{
 			Message: &actions.WatchForUpdatesResponse_ActionUpdate{
-				ActionUpdate: taskActionToUpdate(action),
+				ActionUpdate: taskActionToUpdate(ctx, action),
 			},
 		}
 		if err := stream.Send(resp); err != nil {
@@ -122,6 +129,7 @@ func (s *ActionsService) WatchForUpdates(
 				ActionId:  update.ActionID,
 				Phase:     update.Phase,
 				OutputUri: update.OutputUri,
+				Value:     update.Value,
 			}
 			if update.Phase == common.ActionPhase_ACTION_PHASE_FAILED && update.ErrorState != nil {
 				au.Error = errorStateToExecutionError(update.ErrorState)
@@ -179,8 +187,11 @@ func (s *ActionsService) Abort(
 }
 
 // taskActionToUpdate converts a TaskAction CR to a workflow.ActionUpdate.
-func taskActionToUpdate(action *executorv1.TaskAction) *workflow.ActionUpdate {
-	phase := getPhaseFromConditions(action)
+// The signal value matters here for the recovery case: a parent that
+// reconnects after its condition already resolved gets the value from the
+// snapshot rather than a live event.
+func taskActionToUpdate(ctx context.Context, action *executorv1.TaskAction) *workflow.ActionUpdate {
+	phase := k8s.GetPhaseFromConditions(action)
 	update := &workflow.ActionUpdate{
 		ActionId: &common.ActionIdentifier{
 			Run: &common.RunIdentifier{
@@ -192,6 +203,7 @@ func taskActionToUpdate(action *executorv1.TaskAction) *workflow.ActionUpdate {
 		},
 		Phase:     phase,
 		OutputUri: actionOutputURI(action.Spec.RunOutputBase, action.Spec.ActionName),
+		Value:     k8s.SignalValueFromStatus(ctx, action),
 	}
 	if phase == common.ActionPhase_ACTION_PHASE_FAILED && action.Status.ErrorState != nil {
 		update.Error = errorStateToExecutionError(action.Status.ErrorState)
@@ -219,31 +231,4 @@ func actionOutputURI(runOutputBase, actionName string) string {
 		return ""
 	}
 	return strings.TrimRight(runOutputBase, "/") + "/" + actionName
-}
-
-func getPhaseFromConditions(taskAction *executorv1.TaskAction) common.ActionPhase {
-	for _, cond := range taskAction.Status.Conditions {
-		switch cond.Type {
-		case string(executorv1.ConditionTypeSucceeded):
-			if cond.Status == "True" {
-				return common.ActionPhase_ACTION_PHASE_SUCCEEDED
-			}
-		case string(executorv1.ConditionTypeFailed):
-			if cond.Status == "True" {
-				return common.ActionPhase_ACTION_PHASE_FAILED
-			}
-		case string(executorv1.ConditionTypeProgressing):
-			if cond.Status == "True" {
-				switch cond.Reason {
-				case string(executorv1.ConditionReasonQueued):
-					return common.ActionPhase_ACTION_PHASE_QUEUED
-				case string(executorv1.ConditionReasonInitializing):
-					return common.ActionPhase_ACTION_PHASE_INITIALIZING
-				case string(executorv1.ConditionReasonExecuting):
-					return common.ActionPhase_ACTION_PHASE_RUNNING
-				}
-			}
-		}
-	}
-	return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
 }
