@@ -159,7 +159,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
-      - uses: sovietaced/flytectl-setup-action@caae3482d1d544c72a01b968a71f32256791032b
+      - uses: sovietaced/flytectl-setup-action@b253b7aa4a4700854b49fb5e64199f6983f61daf
       - name: Setup sandbox
         run: |
           mkdir -p ~/.flyte/sandbox
