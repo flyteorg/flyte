@@ -35,7 +35,9 @@ func Setup(ctx context.Context, kubeClient kubernetes.Interface, cfg *webhookCon
 		return fmt.Errorf("webhook: failed to create pod mutator: %w", err)
 	}
 
-	if err := createMutationConfig(ctx, kubeClient, podMutator, defaultNamespace); err != nil {
+	if cfg.DisableCreateMutatingWebhookConfig {
+		logger.Infof(ctx, "Skipping MutatingWebhookConfiguration creation, disabled by config")
+	} else if err := createMutationConfig(ctx, kubeClient, podMutator, defaultNamespace); err != nil {
 		return fmt.Errorf("webhook: failed to create MutatingWebhookConfiguration: %w", err)
 	}
 
