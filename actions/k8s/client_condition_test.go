@@ -7,6 +7,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -21,6 +22,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	runmocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect/mocks"
 )
 
 // newConditionClient returns an ActionsClient backed by a fake k8s client
@@ -198,6 +200,50 @@ func TestSignal(t *testing.T) {
 
 		err = c.Signal(ctx, condID, boolLiteral(true), "u")
 		assert.Equal(t, connect.CodeFailedPrecondition, connect.CodeOf(err))
+	})
+}
+
+func TestNotifyRunService_Condition(t *testing.T) {
+	ctx := context.Background()
+
+	newClientWithRunMock := func(t *testing.T) (*runmocks.InternalRunServiceClient, *ActionsClient) {
+		mockClient := runmocks.NewInternalRunServiceClient(t)
+		return mockClient, &ActionsClient{
+			runClient:   mockClient,
+			subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+		}
+	}
+
+	condSpecBytes, err := proto.Marshal(&workflow.ConditionAction{Name: "approve"})
+	require.NoError(t, err)
+
+	t.Run("added event records condition spec", func(t *testing.T) {
+		mockClient, c := newClientWithRunMock(t)
+		ta, update := newTestActionUpdate("cond1")
+		ta.Spec.ActionType = executorv1.ActionTypeCondition
+		ta.Spec.ConditionSpec = condSpecBytes
+
+		mockClient.EXPECT().RecordAction(mock.Anything, mock.MatchedBy(func(r *connect.Request[workflow.RecordActionRequest]) bool {
+			return r.Msg.GetCondition().GetName() == "approve"
+		})).Return(&connect.Response[workflow.RecordActionResponse]{}, nil)
+
+		c.notifyRunService(ctx, ta, update, watch.Added)
+	})
+
+	t.Run("terminal succeeded carries output and principal", func(t *testing.T) {
+		mockClient, c := newClientWithRunMock(t)
+		ta, update := newTestActionUpdate("cond1")
+		ta.Spec.ActionType = executorv1.ActionTypeCondition
+		ta.Status.SignalledBy = "user@example.com"
+		update.Phase = common.ActionPhase_ACTION_PHASE_SUCCEEDED
+		update.Value = boolLiteral(true)
+
+		mockClient.EXPECT().UpdateActionStatus(mock.Anything, mock.MatchedBy(func(r *connect.Request[workflow.UpdateActionStatusRequest]) bool {
+			return proto.Equal(r.Msg.GetOutput(), boolLiteral(true)) &&
+				r.Msg.GetPrincipal().GetUser().GetId().GetSubject() == "user@example.com"
+		})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil)
+
+		c.notifyRunService(ctx, ta, update, watch.Modified)
 	})
 }
 

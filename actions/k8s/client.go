@@ -682,7 +682,14 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				InputUri: taskAction.Spec.InputURI,
 				Group:    taskAction.Spec.Group,
 			}
-			if taskAction.Spec.TaskType != "" {
+			if taskAction.Spec.ActionType == executorv1.ActionTypeCondition {
+				condSpec := &workflow.ConditionAction{}
+				if err := proto.Unmarshal(taskAction.Spec.ConditionSpec, condSpec); err != nil {
+					logger.Warnf(ctx, "Failed to unmarshal condition spec for %s: %v", update.ActionID.Name, err)
+				} else {
+					recordReq.Spec = &workflow.RecordActionRequest_Condition{Condition: condSpec}
+				}
+			} else if taskAction.Spec.TaskType != "" {
 				ta := &workflow.TaskAction{
 					Id: &task.TaskIdentifier{
 						Project: taskAction.Spec.Project,
@@ -742,6 +749,18 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Attempts:    taskAction.Status.Attempts,
 				CacheStatus: taskAction.Status.CacheStatus,
 			},
+		}
+		// On terminal SUCCEEDED of a signalled condition, ship the resolved
+		// value and actor to the run-service DB.
+		if update.Phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED && update.Value != nil {
+			statusReq.Output = update.Value
+			if taskAction.Status.SignalledBy != "" {
+				statusReq.Principal = &common.EnrichedIdentity{
+					Principal: &common.EnrichedIdentity_User{
+						User: &common.User{Id: &common.UserIdentifier{Subject: taskAction.Status.SignalledBy}},
+					},
+				}
+			}
 		}
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)

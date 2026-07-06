@@ -643,6 +643,17 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 			setActionDetailsSpecFromActionSpec(action, model.ActionSpec)
 		}
 
+		// A signalled condition serves its resolved value inline from RunInfo —
+		// there is no outputs.pb.
+		if action.GetMetadata().GetActionType() == workflow.ActionType_ACTION_TYPE_CONDITION && info.GetOutput() != nil {
+			action.Result = &workflow.ActionDetails_SignalInfo{
+				SignalInfo: &workflow.SignalInfo{
+					SignalledBy: info.GetPrincipal(),
+					Output:      info.GetOutput(),
+				},
+			}
+		}
+
 		return nil
 	})
 
@@ -1078,16 +1089,60 @@ func (s *RunService) AbortAction(
 	return connect.NewResponse(&workflow.AbortActionResponse{}), nil
 }
 
-// SignalEvent resolves a paused condition action. Condition signalling is not
-// supported by this single-binary backend; downstream backends that route to a
-// dedicated actions service override this RPC.
+// SignalEvent resolves a paused condition action by forwarding the payload to
+// the actions service, which validates and writes it onto the condition CR.
 func (s *RunService) SignalEvent(
 	ctx context.Context,
-	_ *connect.Request[workflow.SignalEventRequest],
+	req *connect.Request[workflow.SignalEventRequest],
 ) (*connect.Response[workflow.SignalEventResponse], error) {
 	logger.Infof(ctx, "Received SignalEvent request")
-	return nil, connect.NewError(connect.CodeUnimplemented,
-		fmt.Errorf("SignalEvent is not supported by this backend"))
+
+	if err := req.Msg.Validate(); err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	// Record whoever the auth middleware says is calling; no authz gate (devbox).
+	var signalledBy *common.EnrichedIdentity
+	if s.trustHeaders {
+		signalledBy = identityFromHeaders(req.Header(), s.identityHeaders)
+	}
+
+	if _, err := s.actionsClient.Signal(ctx, connect.NewRequest(&actions.SignalRequest{
+		ActionId:         req.Msg.GetActionId(),
+		ParentActionName: req.Msg.GetParentActionName(),
+		Value:            payloadToLiteral(req.Msg.GetPayload()),
+		SignalledBy:      signalledBy,
+	})); err != nil {
+		logger.Errorf(ctx, "Failed to signal action %s: %v", req.Msg.GetActionId().GetName(), err)
+		// Actions-service errors (NotFound / InvalidArgument / FailedPrecondition)
+		// pass through unchanged.
+		return nil, err
+	}
+
+	return connect.NewResponse(&workflow.SignalEventResponse{}), nil
+}
+
+// payloadToLiteral converts the SignalEvent payload (bool/int/float/string)
+// into the core.Literal the actions service expects.
+func payloadToLiteral(payload *workflow.EventPayload) *core.Literal {
+	primitive := &core.Primitive{}
+	switch v := payload.GetValue().(type) {
+	case *workflow.EventPayload_BoolValue:
+		primitive.Value = &core.Primitive_Boolean{Boolean: v.BoolValue}
+	case *workflow.EventPayload_IntValue:
+		primitive.Value = &core.Primitive_Integer{Integer: v.IntValue}
+	case *workflow.EventPayload_FloatValue:
+		primitive.Value = &core.Primitive_FloatValue{FloatValue: v.FloatValue}
+	case *workflow.EventPayload_StringValue:
+		primitive.Value = &core.Primitive_StringValue{StringValue: v.StringValue}
+	default:
+		return nil
+	}
+	return &core.Literal{
+		Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: primitive},
+		}},
+	}
 }
 
 // WatchRunDetails streams run details updates from the DB.
@@ -1541,6 +1596,8 @@ func setActionDetailsSpecFromActionSpec(details *workflow.ActionDetails, actionS
 		if s.Trace.GetSpec() != nil {
 			details.Spec = &workflow.ActionDetails_Trace{Trace: s.Trace.GetSpec()}
 		}
+	case *workflow.ActionSpec_Condition:
+		details.Spec = &workflow.ActionDetails_Condition{Condition: s.Condition}
 	}
 }
 
@@ -1612,6 +1669,12 @@ func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 			Name: action.FunctionName,
 		}
 		metadata.Spec = &workflow.ActionMetadata_Trace{Trace: traceMeta}
+	case workflow.ActionType_ACTION_TYPE_CONDITION:
+		metadata.Spec = &workflow.ActionMetadata_Condition{
+			Condition: &workflow.ConditionActionMetadata{
+				Name: action.FunctionName,
+			},
+		}
 	}
 
 	return metadata
