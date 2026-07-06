@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"math"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -11,6 +12,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/senseyeio/duration"
 	"github.com/vmihailenco/msgpack/v5"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -22,6 +24,120 @@ import (
 )
 
 var digitsOnlyRegex = regexp.MustCompile(`^\d+$`)
+
+// fractionalSecondRegex matches a fractional seconds component (e.g. "1.5" in "PT1.5S").
+// senseyeio/duration only supports integer seconds; we normalize these before parsing.
+var fractionalSecondRegex = regexp.MustCompile(`(\d+\.\d+)S`)
+
+// Fixed component lengths used to convert ISO-8601 durations to/from seconds. Years and months
+// are inherently ambiguous; these match the launch form frontend (dayjs: 365-day years,
+// 30-day months) so values round-trip between the UI and the backend.
+const (
+	secondsPerMinute = 60
+	secondsPerHour   = 60 * secondsPerMinute
+	secondsPerDay    = 24 * secondsPerHour
+	secondsPerWeek   = 7 * secondsPerDay
+	secondsPerMonth  = 30 * secondsPerDay
+	secondsPerYear   = 365 * secondsPerDay
+)
+
+// isISO8601Duration reports whether s looks like an ISO-8601 duration string.
+func isISO8601Duration(s string) bool {
+	s = strings.TrimSpace(s)
+	return strings.HasPrefix(s, "P") || strings.HasPrefix(s, "-P")
+}
+
+// parseISO8601Duration parses an ISO-8601 duration string (e.g. "P2DT3H4M5S") into a
+// durationpb.Duration using github.com/senseyeio/duration for component parsing.
+func parseISO8601Duration(s string) (*durationpb.Duration, error) {
+	s = strings.TrimSpace(s)
+	negative := false
+	if strings.HasPrefix(s, "-") {
+		negative = true
+		s = s[1:]
+	}
+
+	var subSecondNanos int32
+	if fractionalSecondRegex.MatchString(s) {
+		match := fractionalSecondRegex.FindStringSubmatch(s)
+		secondsFloat, err := strconv.ParseFloat(match[1], 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid ISO-8601 duration: %q", s)
+		}
+		wholeSeconds := int64(secondsFloat)
+		subSecondNanos = int32(math.Round((secondsFloat - float64(wholeSeconds)) * 1e9))
+		s = fractionalSecondRegex.ReplaceAllString(s, fmt.Sprintf("%dS", wholeSeconds))
+	}
+
+	// senseyeio/duration accepts bare "P"/"PT" as zero; reject them to match prior behavior.
+	if s == "P" || s == "PT" {
+		return nil, fmt.Errorf("invalid ISO-8601 duration: %q", s)
+	}
+
+	d, err := duration.ParseISO8601(s)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ISO-8601 duration: %q", s)
+	}
+
+	totalSeconds := int64(d.Y)*secondsPerYear + int64(d.M)*secondsPerMonth + int64(d.W)*secondsPerWeek +
+		int64(d.D)*secondsPerDay + int64(d.TH)*secondsPerHour + int64(d.TM)*secondsPerMinute + int64(d.TS)
+
+	result := &durationpb.Duration{Seconds: totalSeconds, Nanos: subSecondNanos}
+	if negative {
+		result.Seconds = -result.Seconds
+		result.Nanos = -result.Nanos
+	}
+	return result, nil
+}
+
+// formatISO8601Duration converts a time.Duration into an ISO-8601 duration string
+// (e.g. "P2DT3H4M5S") using github.com/senseyeio/duration for stringification.
+// Only days/hours/minutes/seconds are emitted (never years/months) so the representation
+// is unambiguous; the launch form frontend renders it back to a readable string.
+func formatISO8601Duration(d time.Duration) string {
+	if d == 0 {
+		return "P0D"
+	}
+	negative := d < 0
+	if negative {
+		d = -d
+	}
+
+	const nanosPerSecond = int64(1e9)
+	totalNanos := d.Nanoseconds()
+	totalSeconds := totalNanos / nanosPerSecond
+	nanos := totalNanos % nanosPerSecond
+
+	days := int(totalSeconds / secondsPerDay)
+	rem := totalSeconds % secondsPerDay
+	hours := int(rem / secondsPerHour)
+	rem %= secondsPerHour
+	minutes := int(rem / secondsPerMinute)
+	seconds := int(rem % secondsPerMinute)
+
+	sd := duration.Duration{
+		D:  days,
+		TH: hours,
+		TM: minutes,
+		TS: seconds,
+	}
+
+	var result string
+	if sd.IsZero() && nanos > 0 {
+		frac := strings.TrimRight(fmt.Sprintf("%09d", nanos), "0")
+		result = fmt.Sprintf("PT0.%sS", frac)
+	} else {
+		result = sd.String()
+		if nanos > 0 {
+			frac := strings.TrimRight(fmt.Sprintf("%09d", nanos), "0")
+			result = regexp.MustCompile(`(\d+)S$`).ReplaceAllString(result, fmt.Sprintf("%d.%sS", seconds, frac))
+		}
+	}
+	if negative {
+		result = "-" + result
+	}
+	return result
+}
 
 // This converter translates between JSON represntations and literals/variable maps/task specs. Here is an internal link
 // to documentation surrounding the RSJF spec we are targeting:
@@ -1062,7 +1178,7 @@ func literalToJsonValues(ctx context.Context, literal *core.Literal) (any, error
 				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("datetime cannot be nil"))
 			case *core.Primitive_Duration:
 				if p.Duration != nil {
-					return p.Duration.AsDuration().String(), nil
+					return formatISO8601Duration(p.Duration.AsDuration()), nil
 				}
 				logger.Errorf(ctx, "duration cannot be nil")
 				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("duration cannot be nil"))
@@ -1568,8 +1684,17 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 		case core.SimpleType_DURATION:
 			var dtn *durationpb.Duration
 			if str, ok := value.(string); ok {
-				// Check if the string contains only digits (parse as seconds)
-				if digitsOnlyRegex.MatchString(str) {
+				switch {
+				case isISO8601Duration(str):
+					// Preferred wire format: ISO-8601 (e.g. "P2DT3H", "PT30M").
+					parsed, err := parseISO8601Duration(str)
+					if err != nil {
+						logger.Errorf(ctx, "error parsing ISO-8601 duration when converting json to literal. String: [%s] Err: %v", str, err)
+						return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("error parsing ISO-8601 duration when converting json to literal"))
+					}
+					dtn = parsed
+				case digitsOnlyRegex.MatchString(str):
+					// Backward compatibility: a bare number is treated as seconds.
 					seconds, err := strconv.ParseInt(str, 10, 64)
 					if err != nil {
 						logger.Errorf(ctx, "error parsing duration seconds when converting json to literal. String: [%s] Err: %v", str, err)
@@ -1579,8 +1704,8 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 					dtn = &durationpb.Duration{
 						Seconds: seconds,
 					}
-				} else {
-					// Parse the duration string into a time.Duration
+				default:
+					// Backward compatibility: Go-style duration strings (e.g. "2h30m").
 					duration, err := time.ParseDuration(str)
 					if err != nil {
 						logger.Errorf(ctx, "error parsing duration when converting json to literal. String duration: [%s] Err: %v", str, err)
