@@ -91,11 +91,24 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 		return core.UnknownTransition, err
 	}
 
+	// Count a task as running once its resource is created on the remote (connector) service.
+	// Decremented in Finalize. ponytail: process-level gauge; a leaseworker restart resets it to
+	// 0 and it under-counts in-flight tasks until they terminate.
+	if nextState != nil && enteredResourcesCreated(incomingState.Phase, nextState.Phase) {
+		c.metrics.ActiveTasks.Inc()
+	}
+
 	if err := tCtx.PluginStateWriter().Put(pluginStateVersion, nextState); err != nil {
 		return core.UnknownTransition, err
 	}
 
 	return core.DoTransition(phaseInfo), nil
+}
+
+// enteredResourcesCreated reports whether a task just transitioned into PhaseResourcesCreated,
+// i.e. its resource was created on the remote service this round. Used for the active-tasks gauge.
+func enteredResourcesCreated(prev, next webapi.Phase) bool {
+	return prev != webapi.PhaseResourcesCreated && next == webapi.PhaseResourcesCreated
 }
 
 func (c CorePlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) error {
@@ -117,6 +130,11 @@ func (c CorePlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) e
 }
 
 func (c CorePlugin) Finalize(ctx context.Context, tCtx core.TaskExecutionContext) error {
+	// Balance the active-tasks gauge Inc'd in Handle when the resource was created.
+	if st, err := c.unmarshalState(ctx, tCtx.PluginStateReader()); err == nil && st.Phase == webapi.PhaseResourcesCreated {
+		c.metrics.ActiveTasks.Dec()
+	}
+
 	cacheItemID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 	err := c.cache.DeleteDelayed(cacheItemID)
 	if err != nil {

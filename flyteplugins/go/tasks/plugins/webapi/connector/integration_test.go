@@ -88,8 +88,9 @@ func TestEndToEnd(t *testing.T) {
 		connectorPlugin := newMockAsyncConnectorPlugin()
 		connectorPlugin.PluginLoader = func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &Plugin{
-				metricScope: iCtx.MetricsScope(),
-				cfg:         GetConfig(),
+				metricScope:  iCtx.MetricsScope(),
+				getTaskPhase: iCtx.MetricsScope().MustNewCounterVec("connector_get_task_phase", "GetTask responses by phase", "phase"),
+				cfg:          GetConfig(),
 				cs: &ClientSet{
 					asyncConnectorClients:    map[string]connectorPb.AsyncConnectorServiceClient{},
 					connectorMetadataClients: map[string]connectorPb.ConnectorMetadataServiceClient{},
@@ -259,8 +260,9 @@ func newMockAsyncConnectorPlugin() webapi.PluginEntry {
 		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task", "spark"},
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &Plugin{
-				metricScope: iCtx.MetricsScope(),
-				cfg:         &cfg,
+				metricScope:  iCtx.MetricsScope(),
+				getTaskPhase: iCtx.MetricsScope().MustNewCounterVec("connector_get_task_phase", "GetTask responses by phase", "phase"),
+				cfg:          &cfg,
 				cs: &ClientSet{
 					asyncConnectorClients: map[string]connectorPb.AsyncConnectorServiceClient{
 						defaultConnectorEndpoint: asyncConnectorClient,

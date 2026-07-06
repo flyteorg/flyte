@@ -25,6 +25,8 @@ func GrpcClientMetrics(opts ...grpcprometheus.ClientMetricsOption) *grpcpromethe
 	initDefaultGrpcClientMetricsOnce.Do(func() {
 		v2Opts := append([]grpcprometheus.ClientMetricsOption{
 			grpcprometheus.WithClientCounterOptions(grpcprometheus.WithNamespace(namespace)),
+			// Emit v2_grpc_client_handling_seconds so per-RPC latency (e.g. leaseworker -> connector) is chartable.
+			grpcprometheus.WithClientHandlingTimeHistogram(grpcprometheus.WithHistogramNamespace(namespace)),
 		}, opts...)
 		defaultGrpcClientMetrics = grpcprometheus.NewClientMetrics(v2Opts...)
 		prometheus.MustRegister(defaultGrpcClientMetrics)

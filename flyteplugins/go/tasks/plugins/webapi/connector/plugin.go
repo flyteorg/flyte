@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -72,11 +73,12 @@ func (r Registry) getSupportedTaskTypes() []string {
 }
 
 type Plugin struct {
-	metricScope promutils.Scope
-	cfg         *Config
-	cs          *ClientSet
-	registry    Registry
-	mu          sync.RWMutex
+	metricScope  promutils.Scope
+	getTaskPhase *prometheus.CounterVec
+	cfg          *Config
+	cs           *ClientSet
+	registry     Registry
+	mu           sync.RWMutex
 }
 
 type ResourceWrapper struct {
@@ -248,6 +250,8 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 	if err != nil {
 		return nil, fmt.Errorf("failed to get task from connector with %v", err)
 	}
+	// Track the status the connector reports back (RUNNING/SUCCEEDED/FAILED/...) per GetTask.
+	p.getTaskPhase.WithLabelValues(res.GetResource().GetPhase().String()).Inc()
 	return ResourceWrapper{
 		Phase:             res.GetResource().GetPhase(),
 		Outputs:           res.GetResource().GetOutputs(),
@@ -481,11 +485,14 @@ func newConnectorPlugin(connectorService *ConnectorService) webapi.PluginEntry {
 			connectorRegistry := getConnectorRegistry(ctx, clientSet)
 			supportedTaskTypes := connectorRegistry.getSupportedTaskTypes()
 			connectorService.SetSupportedTaskType(supportedTaskTypes)
+			scope := iCtx.MetricsScope()
 			plugin := &Plugin{
-				metricScope: promutils.NewScope("connector_plugin"),
-				cfg:         cfg,
-				cs:          clientSet,
-				registry:    connectorRegistry,
+				metricScope: scope,
+				getTaskPhase: scope.MustNewCounterVec("connector_get_task_phase",
+					"GetTask responses from connectors, by returned task phase", "phase"),
+				cfg:      cfg,
+				cs:       clientSet,
+				registry: connectorRegistry,
 			}
 			plugin.watchConnectors(ctx, connectorService)
 			return plugin, nil
