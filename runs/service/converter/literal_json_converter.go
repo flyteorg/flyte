@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/senseyeio/duration"
 	"github.com/vmihailenco/msgpack/v5"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -24,9 +25,9 @@ import (
 
 var digitsOnlyRegex = regexp.MustCompile(`^\d+$`)
 
-// iso8601DurationRegex matches an ISO-8601 duration (e.g. "P2DT3H4M5S", "PT1.5S", "-PT30M").
-// The two "M" components are disambiguated by position: months precede "T", minutes follow it.
-var iso8601DurationRegex = regexp.MustCompile(`^(-)?P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$`)
+// fractionalSecondRegex matches a fractional seconds component (e.g. "1.5" in "PT1.5S").
+// senseyeio/duration only supports integer seconds; we normalize these before parsing.
+var fractionalSecondRegex = regexp.MustCompile(`(\d+\.\d+)S`)
 
 // Fixed component lengths used to convert ISO-8601 durations to/from seconds. Years and months
 // are inherently ambiguous; these match the launch form frontend (dayjs: 365-day years,
@@ -47,82 +48,52 @@ func isISO8601Duration(s string) bool {
 }
 
 // parseISO8601Duration parses an ISO-8601 duration string (e.g. "P2DT3H4M5S") into a
-// durationpb.Duration. Returns an error if the string is not a valid ISO-8601 duration.
+// durationpb.Duration using github.com/senseyeio/duration for component parsing.
 func parseISO8601Duration(s string) (*durationpb.Duration, error) {
-	matches := iso8601DurationRegex.FindStringSubmatch(strings.TrimSpace(s))
-	if matches == nil {
-		return nil, fmt.Errorf("invalid ISO-8601 duration: %q", s)
+	s = strings.TrimSpace(s)
+	negative := false
+	if strings.HasPrefix(s, "-") {
+		negative = true
+		s = s[1:]
 	}
 
-	// Require at least one component so bare "P"/"PT" are rejected.
-	hasComponent := false
-	for _, group := range matches[2:] {
-		if group != "" {
-			hasComponent = true
-			break
-		}
-	}
-	if !hasComponent {
-		return nil, fmt.Errorf("invalid ISO-8601 duration: %q", s)
-	}
-
-	parseInt := func(v string) (int64, error) {
-		if v == "" {
-			return 0, nil
-		}
-		return strconv.ParseInt(v, 10, 64)
-	}
-
-	years, err := parseInt(matches[2])
-	if err != nil {
-		return nil, err
-	}
-	months, err := parseInt(matches[3])
-	if err != nil {
-		return nil, err
-	}
-	weeks, err := parseInt(matches[4])
-	if err != nil {
-		return nil, err
-	}
-	days, err := parseInt(matches[5])
-	if err != nil {
-		return nil, err
-	}
-	hours, err := parseInt(matches[6])
-	if err != nil {
-		return nil, err
-	}
-	minutes, err := parseInt(matches[7])
-	if err != nil {
-		return nil, err
-	}
-
-	totalSeconds := years*secondsPerYear + months*secondsPerMonth + weeks*secondsPerWeek +
-		days*secondsPerDay + hours*secondsPerHour + minutes*secondsPerMinute
-
-	var nanos int32
-	if matches[8] != "" {
-		secondsFloat, err := strconv.ParseFloat(matches[8], 64)
+	var subSecondNanos int32
+	if fractionalSecondRegex.MatchString(s) {
+		match := fractionalSecondRegex.FindStringSubmatch(s)
+		secondsFloat, err := strconv.ParseFloat(match[1], 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("invalid ISO-8601 duration: %q", s)
 		}
 		wholeSeconds := int64(secondsFloat)
-		totalSeconds += wholeSeconds
-		nanos = int32(math.Round((secondsFloat - float64(wholeSeconds)) * 1e9))
+		subSecondNanos = int32(math.Round((secondsFloat - float64(wholeSeconds)) * 1e9))
+		s = fractionalSecondRegex.ReplaceAllString(s, fmt.Sprintf("%dS", wholeSeconds))
 	}
 
-	duration := &durationpb.Duration{Seconds: totalSeconds, Nanos: nanos}
-	if matches[1] == "-" {
-		duration.Seconds = -duration.Seconds
-		duration.Nanos = -duration.Nanos
+	// senseyeio/duration accepts bare "P"/"PT" as zero; reject them to match prior behavior.
+	if s == "P" || s == "PT" {
+		return nil, fmt.Errorf("invalid ISO-8601 duration: %q", s)
 	}
-	return duration, nil
+
+	d, err := duration.ParseISO8601(s)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ISO-8601 duration: %q", s)
+	}
+
+	totalSeconds := int64(d.Y)*secondsPerYear + int64(d.M)*secondsPerMonth + int64(d.W)*secondsPerWeek +
+		int64(d.D)*secondsPerDay + int64(d.TH)*secondsPerHour + int64(d.TM)*secondsPerMinute + int64(d.TS)
+
+	result := &durationpb.Duration{Seconds: totalSeconds, Nanos: subSecondNanos}
+	if negative {
+		result.Seconds = -result.Seconds
+		result.Nanos = -result.Nanos
+	}
+	return result, nil
 }
 
 // formatISO8601Duration converts a time.Duration into an ISO-8601 duration string
-// (e.g. "P2DT3H4M5S"). Only days/hours/minutes/seconds are emitted (never years/months) so the
-// representation is unambiguous; the launch form frontend renders it back to a readable string.
+// (e.g. "P2DT3H4M5S") using github.com/senseyeio/duration for stringification.
+// Only days/hours/minutes/seconds are emitted (never years/months) so the representation
+// is unambiguous; the launch form frontend renders it back to a readable string.
 func formatISO8601Duration(d time.Duration) string {
 	if d == 0 {
 		return "P0D"
@@ -137,39 +108,35 @@ func formatISO8601Duration(d time.Duration) string {
 	totalSeconds := totalNanos / nanosPerSecond
 	nanos := totalNanos % nanosPerSecond
 
-	days := totalSeconds / secondsPerDay
+	days := int(totalSeconds / secondsPerDay)
 	rem := totalSeconds % secondsPerDay
-	hours := rem / secondsPerHour
+	hours := int(rem / secondsPerHour)
 	rem %= secondsPerHour
-	minutes := rem / secondsPerMinute
-	seconds := rem % secondsPerMinute
+	minutes := int(rem / secondsPerMinute)
+	seconds := int(rem % secondsPerMinute)
 
-	var sb strings.Builder
+	sd := duration.Duration{
+		D:  days,
+		TH: hours,
+		TM: minutes,
+		TS: seconds,
+	}
+
+	var result string
+	if sd.IsZero() && nanos > 0 {
+		frac := strings.TrimRight(fmt.Sprintf("%09d", nanos), "0")
+		result = fmt.Sprintf("PT0.%sS", frac)
+	} else {
+		result = sd.String()
+		if nanos > 0 {
+			frac := strings.TrimRight(fmt.Sprintf("%09d", nanos), "0")
+			result = regexp.MustCompile(`(\d+)S$`).ReplaceAllString(result, fmt.Sprintf("%d.%sS", seconds, frac))
+		}
+	}
 	if negative {
-		sb.WriteString("-")
+		result = "-" + result
 	}
-	sb.WriteString("P")
-	if days > 0 {
-		fmt.Fprintf(&sb, "%dD", days)
-	}
-	if hours > 0 || minutes > 0 || seconds > 0 || nanos > 0 {
-		sb.WriteString("T")
-		if hours > 0 {
-			fmt.Fprintf(&sb, "%dH", hours)
-		}
-		if minutes > 0 {
-			fmt.Fprintf(&sb, "%dM", minutes)
-		}
-		if seconds > 0 || nanos > 0 {
-			if nanos > 0 {
-				frac := strings.TrimRight(fmt.Sprintf("%09d", nanos), "0")
-				fmt.Fprintf(&sb, "%d.%sS", seconds, frac)
-			} else {
-				fmt.Fprintf(&sb, "%dS", seconds)
-			}
-		}
-	}
-	return sb.String()
+	return result
 }
 
 // This converter translates between JSON represntations and literals/variable maps/task specs. Here is an internal link
