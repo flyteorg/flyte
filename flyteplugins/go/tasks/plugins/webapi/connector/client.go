@@ -55,7 +55,6 @@ func getGrpcConnection(ctx context.Context, connector *Deployment) (*grpc.Client
 		opts = append(opts, grpc.WithDefaultServiceConfig(connector.DefaultServiceConfig))
 	}
 
-	// Instrument RPCs to connector pods (v2_grpc_client_* series, grpc_service="flyteidl2.connector.*").
 	clientMetrics := grpcutils.GrpcClientMetrics()
 	opts = append(opts,
 		grpc.WithChainUnaryInterceptor(clientMetrics.UnaryClientInterceptor()),

@@ -91,9 +91,6 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 		return core.UnknownTransition, err
 	}
 
-	// Count a task as running once its resource is created on the remote (connector) service.
-	// Decremented in Finalize. ponytail: process-level gauge; a leaseworker restart resets it to
-	// 0 and it under-counts in-flight tasks until they terminate.
 	if nextState != nil && enteredResourcesCreated(incomingState.Phase, nextState.Phase) {
 		c.metrics.ActiveTasks.Inc()
 	}
@@ -130,7 +127,6 @@ func (c CorePlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) e
 }
 
 func (c CorePlugin) Finalize(ctx context.Context, tCtx core.TaskExecutionContext) error {
-	// Balance the active-tasks gauge Inc'd in Handle when the resource was created.
 	if st, err := c.unmarshalState(ctx, tCtx.PluginStateReader()); err == nil && st.Phase == webapi.PhaseResourcesCreated {
 		c.metrics.ActiveTasks.Dec()
 	}
