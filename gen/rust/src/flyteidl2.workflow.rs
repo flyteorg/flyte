@@ -1624,8 +1624,6 @@ pub mod watch_windowed_actions_request {
     #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct UpdateWindow {
-        #[prost(string, tag="1")]
-        pub selected_item_id: ::prost::alloc::string::String,
         #[prost(int32, tag="2")]
         pub overscan_before: i32,
         #[prost(int32, tag="3")]
@@ -1636,6 +1634,24 @@ pub mod watch_windowed_actions_request {
         pub phase_filter: ::prost::alloc::vec::Vec<i32>,
         #[prost(string, tag="6")]
         pub name_filter: ::prost::alloc::string::String,
+        /// Window anchor: either an item id (semantic selection / deep link) or an
+        /// absolute flat index (scroll-driven viewport). Exactly one must be set.
+        #[prost(oneof="update_window::WindowAnchor", tags="1, 7")]
+        pub window_anchor: ::core::option::Option<update_window::WindowAnchor>,
+    }
+    /// Nested message and enum types in `UpdateWindow`.
+    pub mod update_window {
+        /// Window anchor: either an item id (semantic selection / deep link) or an
+        /// absolute flat index (scroll-driven viewport). Exactly one must be set.
+        #[pyo3::pyclass(dict, get_all, set_all)]
+        #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+        pub enum WindowAnchor {
+            #[prost(string, tag="1")]
+            SelectedItemId(::prost::alloc::string::String),
+            #[prost(uint64, tag="7")]
+            AnchorFlatIndex(u64),
+        }
     }
     #[pyo3::pyclass(dict, get_all, set_all)]
     #[allow(clippy::derive_partial_eq_without_eq)]
