@@ -24,6 +24,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/v2/app/internal/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
+	secretUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
@@ -598,9 +600,33 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 			Name:  "INTERNAL_APP_ENDPOINT_PATTERN",
 			Value: fmt.Sprintf("http://{app_fqdn}-%s.%s.svc.cluster.local", suffix, ns),
 		})
+		// Inject execution context env vars required by flyte.init_in_cluster()
+		podSpec.Containers[0].Env = append(podSpec.Containers[0].Env,
+			corev1.EnvVar{Name: "FLYTE_INTERNAL_EXECUTION_PROJECT", Value: appID.GetProject()},
+			corev1.EnvVar{Name: "FLYTE_INTERNAL_EXECUTION_DOMAIN", Value: appID.GetDomain()},
+		)
 	}
 
 	templateAnnotations := buildAutoscalingAnnotations(spec, c.cfg)
+	// Inject secret labels and annotations into the revision template so the
+	// flyte-binary-webhook mounts the requested secrets and the secret fetcher
+	// can resolve scoped secret lookups (project/domain).
+	var templateLabels map[string]string
+	if securityContext := spec.GetSecurityContext(); securityContext != nil && len(securityContext.GetSecrets()) > 0 {
+		templateLabels = map[string]string{
+			secret.OrganizationLabel: "flyte",
+			secret.ProjectLabel:      appID.GetProject(),
+			secret.DomainLabel:       appID.GetDomain(),
+			secretUtils.PodLabel:     secretUtils.PodLabelValue,
+		}
+		secretsMap, err := secretUtils.MarshalSecretsToMapStrings(securityContext.GetSecrets())
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal secrets: %w", err)
+		}
+		for k, v := range secretsMap {
+			templateAnnotations[k] = v
+		}
+	}
 
 	timeoutSecs := c.cfg.DefaultRequestTimeout.Seconds()
 	if t := spec.GetTimeouts().GetRequestTimeout(); t != nil {
@@ -630,10 +656,11 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 		},
 		Spec: servingv1.ServiceSpec{
 			ConfigurationSpec: servingv1.ConfigurationSpec{
-				Template: servingv1.RevisionTemplateSpec{
-					ObjectMeta: metav1.ObjectMeta{
-						Annotations: templateAnnotations,
-					},
+			Template: servingv1.RevisionTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels:      templateLabels,
+					Annotations: templateAnnotations,
+				},
 					Spec: servingv1.RevisionSpec{
 						PodSpec:        podSpec,
 						TimeoutSeconds: &timeoutSecsInt,
