@@ -616,7 +616,7 @@ func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, e
 		ParentActionName: parentName,
 		StateJSON:        taskAction.Status.StateJSON,
 		Phase:            phase,
-		OutputUri:        buildOutputUri(ctx, taskAction),
+		OutputUri:        BuildOutputUri(ctx, taskAction),
 		IsDeleted:        eventType == watch.Deleted,
 		TaskType:         taskAction.Spec.TaskType,
 		ShortName:        shortName,
@@ -915,10 +915,10 @@ func buildTaskActionName(actionID *common.ActionIdentifier) string {
 	return fmt.Sprintf("%s-%s", actionID.Run.Name, actionID.Name)
 }
 
-// buildOutputUri computes the action-specific output URI from the TaskAction spec.
+// BuildOutputUri computes the action-specific output URI from the TaskAction spec.
 // It uses the same path structure as the executor's ComputeActionOutputPath so that
 // the SDK can find outputs written by the executor.
-func buildOutputUri(ctx context.Context, ta *executorv1.TaskAction) string {
+func BuildOutputUri(ctx context.Context, ta *executorv1.TaskAction) string {
 	if ta.Spec.RunOutputBase == "" {
 		return ""
 	}

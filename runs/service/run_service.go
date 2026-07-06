@@ -1670,11 +1670,19 @@ func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 		}
 		metadata.Spec = &workflow.ActionMetadata_Trace{Trace: traceMeta}
 	case workflow.ActionType_ACTION_TYPE_CONDITION:
-		metadata.Spec = &workflow.ActionMetadata_Condition{
-			Condition: &workflow.ConditionActionMetadata{
-				Name: action.FunctionName,
-			},
+		condMeta := &workflow.ConditionActionMetadata{
+			Name: action.FunctionName,
 		}
+		// Clients type-check the payload against metadata.condition.type before signaling, pull it from the stored spec.
+		if spec := extractActionSpec(action.ActionSpec); spec != nil {
+			if cond := spec.GetCondition(); cond != nil {
+				condMeta.Type = cond.GetType()
+				if condMeta.Name == "" {
+					condMeta.Name = cond.GetName()
+				}
+			}
+		}
+		metadata.Spec = &workflow.ActionMetadata_Condition{Condition: condMeta}
 	}
 
 	return metadata

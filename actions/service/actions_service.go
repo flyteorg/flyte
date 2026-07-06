@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 
 	"connectrpc.com/connect"
 
@@ -226,7 +225,7 @@ func taskActionToUpdate(ctx context.Context, action *executorv1.TaskAction) *wor
 			Name: action.Spec.ActionName,
 		},
 		Phase:     phase,
-		OutputUri: actionOutputURI(action.Spec.RunOutputBase, action.Spec.ActionName),
+		OutputUri: k8s.BuildOutputUri(ctx, action),
 		Value:     k8s.SignalValueFromStatus(ctx, action),
 	}
 	if phase == common.ActionPhase_ACTION_PHASE_FAILED && action.Status.ErrorState != nil {
@@ -248,11 +247,4 @@ func errorStateToExecutionError(es *executorv1.ErrorState) *core.ExecutionError 
 		Kind:    kind,
 		Message: es.Message,
 	}
-}
-
-func actionOutputURI(runOutputBase, actionName string) string {
-	if runOutputBase == "" {
-		return ""
-	}
-	return strings.TrimRight(runOutputBase, "/") + "/" + actionName
 }
