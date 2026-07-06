@@ -121,6 +121,67 @@ func TestDeploy_InjectsInternalAppEndpointPattern(t *testing.T) {
 	assert.Equal(t, "http://{app_fqdn}-proj-dev.flyte.svc.cluster.local", pattern)
 }
 
+func TestDeploy_InjectsExecutionEnvVars(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+	envVars := ksvc.Spec.Template.Spec.Containers[0].Env
+	var gotProject, gotDomain string
+	for _, e := range envVars {
+		if e.Name == "FLYTE_INTERNAL_EXECUTION_PROJECT" {
+			gotProject = e.Value
+		}
+		if e.Name == "FLYTE_INTERNAL_EXECUTION_DOMAIN" {
+			gotDomain = e.Value
+		}
+	}
+	assert.Equal(t, "proj", gotProject)
+	assert.Equal(t, "dev", gotDomain)
+}
+
+func TestDeploy_InjectsSecretLabelsAndAnnotations(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	app.Spec.SecurityContext = &flyteapp.SecurityContext{
+		Secrets: []*flytecoreapp.Secret{
+			{Group: "my_group", Key: "my_key", MountRequirement: flytecoreapp.Secret_ENV_VAR},
+		},
+	}
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+	tpl := ksvc.Spec.Template
+	assert.Equal(t, "flyte", tpl.Labels["organization"])
+	assert.Equal(t, "proj", tpl.Labels["project"])
+	assert.Equal(t, "dev", tpl.Labels["domain"])
+	assert.Equal(t, "true", tpl.Labels["inject-flyte-secrets"])
+	assert.Contains(t, tpl.Annotations, "flyte.secrets/s0")
+}
+
+func TestDeploy_NoSecretLabelsOrAnnotationsWhenNoSecrets(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+	tpl := ksvc.Spec.Template
+	_, hasLabel := tpl.Labels["inject-flyte-secrets"]
+	assert.False(t, hasLabel, "no inject-flyte-secrets label when no secrets configured")
+	_, hasAnnotation := tpl.Annotations["flyte.secrets/s0"]
+	assert.False(t, hasAnnotation, "no secret annotations when no secrets configured")
+}
+
 func TestDeploy_DefaultServiceAccount(t *testing.T) {
 	c := testClient(t)
 	c.cfg.DefaultServiceAccount = "flyte2"
