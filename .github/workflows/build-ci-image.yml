@@ -103,7 +103,7 @@ jobs:
           project: ${{ env.DEPOT_PROJECT_ID }}
           context: .
           file: ./gen.Dockerfile
-          push: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) }}
+          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           # Native multi-arch on Depot — no QEMU emulation.
