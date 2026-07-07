@@ -87,8 +87,8 @@ func TestUploader_RecursiveUpload(t *testing.T) {
 		}
 
 		assert.NoError(t, os.Mkdir(path.Join(tmpDir, "x"), os.ModePerm)) // #nosec G301
-		assert.NoError(t, os.WriteFile(path.Join(tmpDir, "x", "part-1"), []byte("part1"), os.ModePerm))
-		assert.NoError(t, os.WriteFile(path.Join(tmpDir, "x", "part-2"), []byte("part2"), os.ModePerm))
+		assert.NoError(t, os.WriteFile(path.Join(tmpDir, "x", "part-1"), []byte("part1"), 0o600))
+		assert.NoError(t, os.WriteFile(path.Join(tmpDir, "x", "part-2"), []byte("part2"), 0o600))
 
 		store, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 		assert.NoError(t, err)
