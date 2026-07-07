@@ -326,21 +326,29 @@ http_download() {
 http_copy() {
   tmp=$(mktemp)
   http_download "${tmp}" "$1" "$2" || return 1
-  # $tmp is an array of dicts where each dict contains a tag_name.
-  # Assume that we can pull the tag_name out of the json using `jq`.
-  # We want to filter out the elements that do not have a tag_name prefixed
-  # with `flytectl/`.
-  body=$(cat "$tmp" |  jq 'map(select(.tag_name | startswith("flytectl/"))) | .[].tag_name')
+  body=$(cat "$tmp")
   rm -f "${tmp}"
   echo "$body"
+}
+
+github_releases() {
+  owner_repo=$1
+  page=1
+  while :; do
+    giturl="https://api.github.com/repos/${owner_repo}/releases?per_page=100&page=${page}"
+    json=$(http_copy "$giturl" "Accept:application/json") || return 1
+    release_count=$(echo "$json" | jq 'length') || return 1
+    test "$release_count" -eq 0 && break
+    echo "$json" | jq 'map(select((.tag_name // "") | startswith("flytectl/"))) | .[].tag_name'
+    page=$((page + 1))
+  done
 }
 
 github_release() {
   owner_repo=$1
   version=$2
   test -z "$version" && version="latest"
-  giturl="https://api.github.com/repos/${owner_repo}/releases"
-  json=$(http_copy "$giturl" "Accept:application/json")
+  json=$(github_releases "$owner_repo")
   test -z "$json" && return 1
   if [ "$version" = "latest" ]; then
     # Get the first element of the filtered json array
