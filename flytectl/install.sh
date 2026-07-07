@@ -334,14 +334,25 @@ http_copy() {
 github_releases() {
   owner_repo=$1
   page=1
+  tmp=$(mktemp)
   while :; do
     giturl="https://api.github.com/repos/${owner_repo}/releases?per_page=100&page=${page}"
-    json=$(http_copy "$giturl" "Accept:application/json") || return 1
-    release_count=$(echo "$json" | jq 'length') || return 1
+    http_download "${tmp}" "$giturl" "Accept:application/json" || {
+      rm -f "${tmp}"
+      return 1
+    }
+    release_count=$(jq 'length' "${tmp}") || {
+      rm -f "${tmp}"
+      return 1
+    }
     test "$release_count" -eq 0 && break
-    echo "$json" | jq 'map(select((.tag_name // "") | startswith("flytectl/"))) | .[].tag_name'
+    jq 'map(select((.tag_name // "") | startswith("flytectl/"))) | .[].tag_name' "${tmp}" || {
+      rm -f "${tmp}"
+      return 1
+    }
     page=$((page + 1))
   done
+  rm -f "${tmp}"
 }
 
 github_release() {
