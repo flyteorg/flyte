@@ -18,7 +18,6 @@ type Metrics struct {
 	ResourceWaitTime        prometheus.Summary
 	SucceededUnmarshalState labeled.StopWatch
 	FailedUnmarshalState    labeled.Counter
-	ActiveTasks             prometheus.Gauge
 }
 
 var (
@@ -42,7 +41,5 @@ func newMetrics(scope promutils.Scope) Metrics {
 			time.Millisecond, scope),
 		FailedUnmarshalState: labeled.NewCounter("unmarshal_state_failed",
 			"Failed to unmarshal state", scope, labeled.EmitUnlabeledMetric),
-		ActiveTasks: scope.MustNewGauge("active_tasks",
-			"Number of tasks currently running on the remote (connector) service"),
 	}
 }

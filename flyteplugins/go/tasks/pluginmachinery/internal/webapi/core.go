@@ -71,8 +71,6 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 		return core.UnknownTransition, err
 	}
 
-	prevPhase := incomingState.Phase
-
 	var nextState *webapi.State
 	var phaseInfo core.PhaseInfo
 
@@ -93,21 +91,11 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 		return core.UnknownTransition, err
 	}
 
-	if nextState != nil && enteredResourcesCreated(prevPhase, nextState.Phase) {
-		c.metrics.ActiveTasks.Inc()
-	}
-
 	if err := tCtx.PluginStateWriter().Put(pluginStateVersion, nextState); err != nil {
 		return core.UnknownTransition, err
 	}
 
 	return core.DoTransition(phaseInfo), nil
-}
-
-// enteredResourcesCreated reports whether a task just transitioned into PhaseResourcesCreated,
-// i.e. its resource was created on the remote service this round. Used for the active-tasks gauge.
-func enteredResourcesCreated(prev, next webapi.Phase) bool {
-	return prev != webapi.PhaseResourcesCreated && next == webapi.PhaseResourcesCreated
 }
 
 func (c CorePlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) error {
@@ -129,10 +117,6 @@ func (c CorePlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) e
 }
 
 func (c CorePlugin) Finalize(ctx context.Context, tCtx core.TaskExecutionContext) error {
-	if st, err := c.unmarshalState(ctx, tCtx.PluginStateReader()); err == nil && st.Phase == webapi.PhaseResourcesCreated {
-		c.metrics.ActiveTasks.Dec()
-	}
-
 	cacheItemID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 	err := c.cache.DeleteDelayed(cacheItemID)
 	if err != nil {
