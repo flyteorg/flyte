@@ -71,11 +71,6 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 		return core.UnknownTransition, err
 	}
 
-	// Capture the phase before the switch below mutates incomingState. launch() and
-	// allocateToken() receive &incomingState and mutate state.Phase in place, returning
-	// that same pointer as nextState. If we read incomingState.Phase after the switch,
-	// prev and next alias the same (already-mutated) value and the transition check never
-	// fires, leaving the active_tasks gauge stuck at 0.
 	prevPhase := incomingState.Phase
 
 	var nextState *webapi.State
