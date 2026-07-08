@@ -118,13 +118,13 @@ func TestBuildActionUpdate_SignalValue(t *testing.T) {
 	ctx := context.Background()
 	ta, _ := newTestActionUpdate("cond1")
 
-	assert.Nil(t, buildActionUpdate(ctx, ta, watch.Modified).Value)
+	assert.Nil(t, buildActionUpdate(ctx, ta, watch.Modified).SignalValue)
 
 	raw, err := proto.Marshal(boolLiteral(true))
 	require.NoError(t, err)
 	ta.Status.SignalValue = raw
 
-	value := buildActionUpdate(ctx, ta, watch.Modified).Value
+	value := buildActionUpdate(ctx, ta, watch.Modified).SignalValue
 	require.NotNil(t, value)
 	assert.True(t, value.GetScalar().GetPrimitive().GetBoolean())
 }
@@ -236,7 +236,7 @@ func TestNotifyRunService_Condition(t *testing.T) {
 		ta.Spec.ActionType = executorv1.ActionTypeCondition
 		ta.Status.SignalledBy = "user@example.com"
 		update.Phase = common.ActionPhase_ACTION_PHASE_SUCCEEDED
-		update.Value = boolLiteral(true)
+		update.SignalValue = boolLiteral(true)
 
 		mockClient.EXPECT().UpdateActionStatus(mock.Anything, mock.MatchedBy(func(r *connect.Request[workflow.UpdateActionStatusRequest]) bool {
 			return proto.Equal(r.Msg.GetOutput(), boolLiteral(true)) &&

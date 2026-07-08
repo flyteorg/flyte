@@ -45,9 +45,9 @@ type ActionUpdate struct {
 	TaskType         string
 	ShortName        string
 	ErrorState       *executorv1.ErrorState
-	// Value is the resolved signal payload of a condition action, carried
+	// SignalValue is the resolved signal payload of a condition action, carried
 	// inline (never an outputs.pb). Nil for tasks and unsignalled conditions.
-	Value *core.Literal
+	SignalValue *core.Literal
 }
 
 const (
@@ -621,7 +621,7 @@ func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, e
 		TaskType:         taskAction.Spec.TaskType,
 		ShortName:        shortName,
 		ErrorState:       taskAction.Status.ErrorState,
-		Value:            SignalValueFromStatus(ctx, taskAction),
+		SignalValue:      SignalValueFromStatus(ctx, taskAction),
 	}
 }
 
@@ -752,8 +752,8 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		}
 		// On terminal SUCCEEDED of a signalled condition, ship the resolved
 		// value and actor to the run-service DB.
-		if update.Phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED && update.Value != nil {
-			statusReq.Output = update.Value
+		if update.Phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED && update.SignalValue != nil {
+			statusReq.Output = update.SignalValue
 			if taskAction.Status.SignalledBy != "" {
 				statusReq.Principal = &common.EnrichedIdentity{
 					Principal: &common.EnrichedIdentity_User{

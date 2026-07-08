@@ -152,7 +152,7 @@ func (s *ActionsService) WatchForUpdates(
 				ActionId:  update.ActionID,
 				Phase:     update.Phase,
 				OutputUri: update.OutputUri,
-				Value:     update.Value,
+				Value:     update.SignalValue,
 			}
 			if update.Phase == common.ActionPhase_ACTION_PHASE_FAILED && update.ErrorState != nil {
 				au.Error = errorStateToExecutionError(update.ErrorState)
