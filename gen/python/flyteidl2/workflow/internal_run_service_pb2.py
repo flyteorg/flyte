@@ -13,11 +13,13 @@ _sym_db = _symbol_database.Default()
 
 from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
 from flyteidl2.common import identifier_pb2 as flyteidl2_dot_common_dot_identifier__pb2
+from flyteidl2.common import identity_pb2 as flyteidl2_dot_common_dot_identity__pb2
+from flyteidl2.core import literals_pb2 as flyteidl2_dot_core_dot_literals__pb2
 from flyteidl2.workflow import run_definition_pb2 as flyteidl2_dot_workflow_dot_run__definition__pb2
 from google.rpc import status_pb2 as google_dot_rpc_dot_status__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n-flyteidl2/workflow/internal_run_service.proto\x12\x12\x66lyteidl2.workflow\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\'flyteidl2/workflow/run_definition.proto\x1a\x17google/rpc/status.proto\"\xff\x02\n\x13RecordActionRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x16\n\x06parent\x18\x04 \x01(\tR\x06parent\x12\x14\n\x05group\x18\x05 \x01(\tR\x05group\x12\x18\n\x07subject\x18\x06 \x01(\tR\x07subject\x12\x1b\n\tinput_uri\x18\x07 \x01(\tR\x08inputUri\x12\x34\n\x04task\x18\n \x01(\x0b\x32\x1e.flyteidl2.workflow.TaskActionH\x00R\x04task\x12\x37\n\x05trace\x18\x0b \x01(\x0b\x32\x1f.flyteidl2.workflow.TraceActionH\x00R\x05trace\x12\x43\n\tcondition\x18\x0c \x01(\x0b\x32#.flyteidl2.workflow.ConditionActionH\x00R\tconditionB\x06\n\x04spec\"\x93\x01\n\x14RecordActionResponse\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x32\n\x06status\x18\x02 \x01(\x0b\x32\x12.google.rpc.StatusB\x06\xbaH\x03\xc8\x01\x01R\x06status\"^\n\x19RecordActionStreamRequest\x12\x41\n\x07request\x18\x01 \x01(\x0b\x32\'.flyteidl2.workflow.RecordActionRequestR\x07request\"b\n\x1aRecordActionStreamResponse\x12\x44\n\x08response\x18\x01 \x01(\x0b\x32(.flyteidl2.workflow.RecordActionResponseR\x08response\"\xa6\x01\n\x19UpdateActionStatusRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12@\n\x06status\x18\x02 \x01(\x0b\x32 .flyteidl2.workflow.ActionStatusB\x06\xbaH\x03\xc8\x01\x01R\x06status\"\x99\x01\n\x1aUpdateActionStatusResponse\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x32\n\x06status\x18\x02 \x01(\x0b\x32\x12.google.rpc.StatusB\x06\xbaH\x03\xc8\x01\x01R\x06status\"\x80\x01\n\x1fUpdateActionStatusStreamRequest\x12G\n\x07request\x18\x01 \x01(\x0b\x32-.flyteidl2.workflow.UpdateActionStatusRequestR\x07request\x12\x14\n\x05nonce\x18\x02 \x01(\x03R\x05nonce\"\x84\x01\n UpdateActionStatusStreamResponse\x12J\n\x08response\x18\x01 \x01(\x0b\x32..flyteidl2.workflow.UpdateActionStatusResponseR\x08response\x12\x14\n\x05nonce\x18\x02 \x01(\x03R\x05nonce\"Y\n\x18RecordActionEventRequest\x12=\n\x05\x65vent\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.workflow.ActionEventB\x06\xbaH\x03\xc8\x01\x01R\x05\x65vent\"\x98\x01\n\x19RecordActionEventResponse\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x32\n\x06status\x18\x02 \x01(\x0b\x32\x12.google.rpc.StatusB\x06\xbaH\x03\xc8\x01\x01R\x06status\"\\\n\x19RecordActionEventsRequest\x12?\n\x06\x65vents\x18\x01 \x03(\x0b\x32\x1f.flyteidl2.workflow.ActionEventB\x06\xbaH\x03\xc8\x01\x01R\x06\x65vents\"P\n\x1aRecordActionEventsResponse\x12\x32\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.StatusB\x06\xbaH\x03\xc8\x01\x01R\x06status\"\x86\x01\n\x1eRecordActionEventStreamRequest\x12N\n\x07request\x18\x01 \x01(\x0b\x32,.flyteidl2.workflow.RecordActionEventRequestB\x06\xbaH\x03\xc8\x01\x01R\x07request\x12\x14\n\x05nonce\x18\x02 \x01(\x03R\x05nonce\"\x8a\x01\n\x1fRecordActionEventStreamResponse\x12Q\n\x08response\x18\x01 \x01(\x0b\x32-.flyteidl2.workflow.RecordActionEventResponseB\x06\xbaH\x03\xc8\x01\x01R\x08response\x12\x14\n\x05nonce\x18\x02 \x01(\x03R\x05nonce2\xfb\x05\n\x12InternalRunService\x12\x63\n\x0cRecordAction\x12\'.flyteidl2.workflow.RecordActionRequest\x1a(.flyteidl2.workflow.RecordActionResponse\"\x00\x12y\n\x12RecordActionStream\x12-.flyteidl2.workflow.RecordActionStreamRequest\x1a..flyteidl2.workflow.RecordActionStreamResponse\"\x00(\x01\x30\x01\x12u\n\x12UpdateActionStatus\x12-.flyteidl2.workflow.UpdateActionStatusRequest\x1a..flyteidl2.workflow.UpdateActionStatusResponse\"\x00\x12\x8b\x01\n\x18UpdateActionStatusStream\x12\x33.flyteidl2.workflow.UpdateActionStatusStreamRequest\x1a\x34.flyteidl2.workflow.UpdateActionStatusStreamResponse\"\x00(\x01\x30\x01\x12u\n\x12RecordActionEvents\x12-.flyteidl2.workflow.RecordActionEventsRequest\x1a..flyteidl2.workflow.RecordActionEventsResponse\"\x00\x12\x88\x01\n\x17RecordActionEventStream\x12\x32.flyteidl2.workflow.RecordActionEventStreamRequest\x1a\x33.flyteidl2.workflow.RecordActionEventStreamResponse\"\x00(\x01\x30\x01\x42\xd4\x01\n\x16\x63om.flyteidl2.workflowB\x17InternalRunServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n-flyteidl2/workflow/internal_run_service.proto\x12\x12\x66lyteidl2.workflow\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1f\x66lyteidl2/common/identity.proto\x1a\x1d\x66lyteidl2/core/literals.proto\x1a\'flyteidl2/workflow/run_definition.proto\x1a\x17google/rpc/status.proto\"\xff\x02\n\x13RecordActionRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x16\n\x06parent\x18\x04 \x01(\tR\x06parent\x12\x14\n\x05group\x18\x05 \x01(\tR\x05group\x12\x18\n\x07subject\x18\x06 \x01(\tR\x07subject\x12\x1b\n\tinput_uri\x18\x07 \x01(\tR\x08inputUri\x12\x34\n\x04task\x18\n \x01(\x0b\x32\x1e.flyteidl2.workflow.TaskActionH\x00R\x04task\x12\x37\n\x05trace\x18\x0b \x01(\x0b\x32\x1f.flyteidl2.workflow.TraceActionH\x00R\x05trace\x12\x43\n\tcondition\x18\x0c \x01(\x0b\x32#.flyteidl2.workflow.ConditionActionH\x00R\tconditionB\x06\n\x04spec\"\x93\x01\n\x14RecordActionResponse\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x32\n\x06status\x18\x02 \x01(\x0b\x32\x12.google.rpc.StatusB\x06\xbaH\x03\xc8\x01\x01R\x06status\"^\n\x19RecordActionStreamRequest\x12\x41\n\x07request\x18\x01 \x01(\x0b\x32\'.flyteidl2.workflow.RecordActionRequestR\x07request\"b\n\x1aRecordActionStreamResponse\x12\x44\n\x08response\x18\x01 \x01(\x0b\x32(.flyteidl2.workflow.RecordActionResponseR\x08response\"\xf5\x02\n\x19UpdateActionStatusRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12@\n\x06status\x18\x02 \x01(\x0b\x32 .flyteidl2.workflow.ActionStatusB\x06\xbaH\x03\xc8\x01\x01R\x06status\x12\x34\n\x06output\x18\x03 \x01(\x0b\x32\x17.flyteidl2.core.LiteralH\x00R\x06output\x88\x01\x01\x12\x45\n\tprincipal\x18\x04 \x01(\x0b\x32\".flyteidl2.common.EnrichedIdentityH\x01R\tprincipal\x88\x01\x01\x12&\n\x0c\x61\x62ort_reason\x18\x05 \x01(\tH\x02R\x0b\x61\x62ortReason\x88\x01\x01\x42\t\n\x07_outputB\x0c\n\n_principalB\x0f\n\r_abort_reason\"\x99\x01\n\x1aUpdateActionStatusResponse\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x32\n\x06status\x18\x02 \x01(\x0b\x32\x12.google.rpc.StatusB\x06\xbaH\x03\xc8\x01\x01R\x06status\"\x80\x01\n\x1fUpdateActionStatusStreamRequest\x12G\n\x07request\x18\x01 \x01(\x0b\x32-.flyteidl2.workflow.UpdateActionStatusRequestR\x07request\x12\x14\n\x05nonce\x18\x02 \x01(\x03R\x05nonce\"\x84\x01\n UpdateActionStatusStreamResponse\x12J\n\x08response\x18\x01 \x01(\x0b\x32..flyteidl2.workflow.UpdateActionStatusResponseR\x08response\x12\x14\n\x05nonce\x18\x02 \x01(\x03R\x05nonce\"Y\n\x18RecordActionEventRequest\x12=\n\x05\x65vent\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.workflow.ActionEventB\x06\xbaH\x03\xc8\x01\x01R\x05\x65vent\"\x98\x01\n\x19RecordActionEventResponse\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x32\n\x06status\x18\x02 \x01(\x0b\x32\x12.google.rpc.StatusB\x06\xbaH\x03\xc8\x01\x01R\x06status\"\\\n\x19RecordActionEventsRequest\x12?\n\x06\x65vents\x18\x01 \x03(\x0b\x32\x1f.flyteidl2.workflow.ActionEventB\x06\xbaH\x03\xc8\x01\x01R\x06\x65vents\"P\n\x1aRecordActionEventsResponse\x12\x32\n\x06status\x18\x01 \x01(\x0b\x32\x12.google.rpc.StatusB\x06\xbaH\x03\xc8\x01\x01R\x06status\"\x86\x01\n\x1eRecordActionEventStreamRequest\x12N\n\x07request\x18\x01 \x01(\x0b\x32,.flyteidl2.workflow.RecordActionEventRequestB\x06\xbaH\x03\xc8\x01\x01R\x07request\x12\x14\n\x05nonce\x18\x02 \x01(\x03R\x05nonce\"\x8a\x01\n\x1fRecordActionEventStreamResponse\x12Q\n\x08response\x18\x01 \x01(\x0b\x32-.flyteidl2.workflow.RecordActionEventResponseB\x06\xbaH\x03\xc8\x01\x01R\x08response\x12\x14\n\x05nonce\x18\x02 \x01(\x03R\x05nonce2\xfb\x05\n\x12InternalRunService\x12\x63\n\x0cRecordAction\x12\'.flyteidl2.workflow.RecordActionRequest\x1a(.flyteidl2.workflow.RecordActionResponse\"\x00\x12y\n\x12RecordActionStream\x12-.flyteidl2.workflow.RecordActionStreamRequest\x1a..flyteidl2.workflow.RecordActionStreamResponse\"\x00(\x01\x30\x01\x12u\n\x12UpdateActionStatus\x12-.flyteidl2.workflow.UpdateActionStatusRequest\x1a..flyteidl2.workflow.UpdateActionStatusResponse\"\x00\x12\x8b\x01\n\x18UpdateActionStatusStream\x12\x33.flyteidl2.workflow.UpdateActionStatusStreamRequest\x1a\x34.flyteidl2.workflow.UpdateActionStatusStreamResponse\"\x00(\x01\x30\x01\x12u\n\x12RecordActionEvents\x12-.flyteidl2.workflow.RecordActionEventsRequest\x1a..flyteidl2.workflow.RecordActionEventsResponse\"\x00\x12\x88\x01\n\x17RecordActionEventStream\x12\x32.flyteidl2.workflow.RecordActionEventStreamRequest\x1a\x33.flyteidl2.workflow.RecordActionEventStreamResponse\"\x00(\x01\x30\x01\x42\xd4\x01\n\x16\x63om.flyteidl2.workflowB\x17InternalRunServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -53,34 +55,34 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _RECORDACTIONEVENTSTREAMREQUEST.fields_by_name['request']._serialized_options = b'\272H\003\310\001\001'
   _RECORDACTIONEVENTSTREAMRESPONSE.fields_by_name['response']._options = None
   _RECORDACTIONEVENTSTREAMRESPONSE.fields_by_name['response']._serialized_options = b'\272H\003\310\001\001'
-  _globals['_RECORDACTIONREQUEST']._serialized_start=200
-  _globals['_RECORDACTIONREQUEST']._serialized_end=583
-  _globals['_RECORDACTIONRESPONSE']._serialized_start=586
-  _globals['_RECORDACTIONRESPONSE']._serialized_end=733
-  _globals['_RECORDACTIONSTREAMREQUEST']._serialized_start=735
-  _globals['_RECORDACTIONSTREAMREQUEST']._serialized_end=829
-  _globals['_RECORDACTIONSTREAMRESPONSE']._serialized_start=831
-  _globals['_RECORDACTIONSTREAMRESPONSE']._serialized_end=929
-  _globals['_UPDATEACTIONSTATUSREQUEST']._serialized_start=932
-  _globals['_UPDATEACTIONSTATUSREQUEST']._serialized_end=1098
-  _globals['_UPDATEACTIONSTATUSRESPONSE']._serialized_start=1101
-  _globals['_UPDATEACTIONSTATUSRESPONSE']._serialized_end=1254
-  _globals['_UPDATEACTIONSTATUSSTREAMREQUEST']._serialized_start=1257
-  _globals['_UPDATEACTIONSTATUSSTREAMREQUEST']._serialized_end=1385
-  _globals['_UPDATEACTIONSTATUSSTREAMRESPONSE']._serialized_start=1388
-  _globals['_UPDATEACTIONSTATUSSTREAMRESPONSE']._serialized_end=1520
-  _globals['_RECORDACTIONEVENTREQUEST']._serialized_start=1522
-  _globals['_RECORDACTIONEVENTREQUEST']._serialized_end=1611
-  _globals['_RECORDACTIONEVENTRESPONSE']._serialized_start=1614
-  _globals['_RECORDACTIONEVENTRESPONSE']._serialized_end=1766
-  _globals['_RECORDACTIONEVENTSREQUEST']._serialized_start=1768
-  _globals['_RECORDACTIONEVENTSREQUEST']._serialized_end=1860
-  _globals['_RECORDACTIONEVENTSRESPONSE']._serialized_start=1862
-  _globals['_RECORDACTIONEVENTSRESPONSE']._serialized_end=1942
-  _globals['_RECORDACTIONEVENTSTREAMREQUEST']._serialized_start=1945
-  _globals['_RECORDACTIONEVENTSTREAMREQUEST']._serialized_end=2079
-  _globals['_RECORDACTIONEVENTSTREAMRESPONSE']._serialized_start=2082
-  _globals['_RECORDACTIONEVENTSTREAMRESPONSE']._serialized_end=2220
-  _globals['_INTERNALRUNSERVICE']._serialized_start=2223
-  _globals['_INTERNALRUNSERVICE']._serialized_end=2986
+  _globals['_RECORDACTIONREQUEST']._serialized_start=264
+  _globals['_RECORDACTIONREQUEST']._serialized_end=647
+  _globals['_RECORDACTIONRESPONSE']._serialized_start=650
+  _globals['_RECORDACTIONRESPONSE']._serialized_end=797
+  _globals['_RECORDACTIONSTREAMREQUEST']._serialized_start=799
+  _globals['_RECORDACTIONSTREAMREQUEST']._serialized_end=893
+  _globals['_RECORDACTIONSTREAMRESPONSE']._serialized_start=895
+  _globals['_RECORDACTIONSTREAMRESPONSE']._serialized_end=993
+  _globals['_UPDATEACTIONSTATUSREQUEST']._serialized_start=996
+  _globals['_UPDATEACTIONSTATUSREQUEST']._serialized_end=1369
+  _globals['_UPDATEACTIONSTATUSRESPONSE']._serialized_start=1372
+  _globals['_UPDATEACTIONSTATUSRESPONSE']._serialized_end=1525
+  _globals['_UPDATEACTIONSTATUSSTREAMREQUEST']._serialized_start=1528
+  _globals['_UPDATEACTIONSTATUSSTREAMREQUEST']._serialized_end=1656
+  _globals['_UPDATEACTIONSTATUSSTREAMRESPONSE']._serialized_start=1659
+  _globals['_UPDATEACTIONSTATUSSTREAMRESPONSE']._serialized_end=1791
+  _globals['_RECORDACTIONEVENTREQUEST']._serialized_start=1793
+  _globals['_RECORDACTIONEVENTREQUEST']._serialized_end=1882
+  _globals['_RECORDACTIONEVENTRESPONSE']._serialized_start=1885
+  _globals['_RECORDACTIONEVENTRESPONSE']._serialized_end=2037
+  _globals['_RECORDACTIONEVENTSREQUEST']._serialized_start=2039
+  _globals['_RECORDACTIONEVENTSREQUEST']._serialized_end=2131
+  _globals['_RECORDACTIONEVENTSRESPONSE']._serialized_start=2133
+  _globals['_RECORDACTIONEVENTSRESPONSE']._serialized_end=2213
+  _globals['_RECORDACTIONEVENTSTREAMREQUEST']._serialized_start=2216
+  _globals['_RECORDACTIONEVENTSTREAMREQUEST']._serialized_end=2350
+  _globals['_RECORDACTIONEVENTSTREAMRESPONSE']._serialized_start=2353
+  _globals['_RECORDACTIONEVENTSTREAMRESPONSE']._serialized_end=2491
+  _globals['_INTERNALRUNSERVICE']._serialized_start=2494
+  _globals['_INTERNALRUNSERVICE']._serialized_end=3257
 # @@protoc_insertion_point(module_scope)
