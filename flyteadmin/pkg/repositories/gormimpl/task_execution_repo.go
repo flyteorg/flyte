@@ -137,42 +137,6 @@ func (r *TaskExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 	}, nil
 }
 
-func (r *TaskExecutionRepo) Count(ctx context.Context, input interfaces.CountResourceInput) (int64, error) {
-	var err error
-	tx := r.db.WithContext(ctx).Model(&models.TaskExecution{})
-
-	// And add three join conditions
-	// We enable joining on
-	// - task x task exec
-	// - node exec x task exec
-	// - exec x task exec
-	if input.JoinTableEntities[common.Task] {
-		tx = tx.Joins(leftJoinTaskToTaskExec)
-	}
-	if input.JoinTableEntities[common.NodeExecution] {
-		tx = tx.Joins(innerJoinNodeExecToTaskExec)
-	}
-	if input.JoinTableEntities[common.Execution] {
-		tx = tx.Joins(innerJoinExecToTaskExec)
-	}
-
-	// Apply filters
-	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
-	if err != nil {
-		return 0, err
-	}
-
-	// Run the query
-	timer := r.metrics.CountDuration.Start()
-	var count int64
-	tx = tx.Count(&count)
-	timer.Stop()
-	if tx.Error != nil {
-		return 0, r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
-	return count, nil
-}
-
 // Returns an instance of TaskExecutionRepoInterface
 func NewTaskExecutionRepo(
 	db *gorm.DB, errorTransformer flyteAdminDbErrors.ErrorTransformer, scope promutils.Scope) interfaces.TaskExecutionRepoInterface {
