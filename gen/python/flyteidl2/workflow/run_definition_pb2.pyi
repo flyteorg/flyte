@@ -68,12 +68,14 @@ class Run(_message.Message):
     def __init__(self, action: _Optional[_Union[Action, _Mapping]] = ..., labels: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class RunDetails(_message.Message):
-    __slots__ = ["run_spec", "action"]
+    __slots__ = ["run_spec", "action", "task_is_registered"]
     RUN_SPEC_FIELD_NUMBER: _ClassVar[int]
     ACTION_FIELD_NUMBER: _ClassVar[int]
+    TASK_IS_REGISTERED_FIELD_NUMBER: _ClassVar[int]
     run_spec: _run_pb2.RunSpec
     action: ActionDetails
-    def __init__(self, run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., action: _Optional[_Union[ActionDetails, _Mapping]] = ...) -> None: ...
+    task_is_registered: bool
+    def __init__(self, run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., action: _Optional[_Union[ActionDetails, _Mapping]] = ..., task_is_registered: bool = ...) -> None: ...
 
 class TaskAction(_message.Message):
     __slots__ = ["id", "spec", "cache_key", "cluster"]

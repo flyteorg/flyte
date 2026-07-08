@@ -252,6 +252,8 @@ func (m *RunDetails) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for TaskIsRegistered
+
 	if len(errors) > 0 {
 		return RunDetailsMultiError(errors)
 	}
