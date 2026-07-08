@@ -97,9 +97,27 @@ type TaskActionReconciler struct {
 	CatalogClient     catalog.AsyncClient
 	Catalog           catalog.Client
 	eventsClient      workflowconnect.EventsProxyServiceClient
+	eventBatcher      *eventBatcher
 	cluster           string
 	MaxSystemFailures uint32
 	metrics           *taskActionMetrics
+}
+
+// recordEvent persists a single ActionEvent, blocking until it is durably
+// written. It routes through the coalescing eventBatcher when configured (prod)
+// so concurrent reconciles' events collapse into a few multi-row commits;
+// callers still block until their batch commits, so at-least-once semantics are
+// identical to a direct Record (on error the reconcile requeues and re-emits,
+// deduped server-side by ON CONFLICT DO NOTHING). Falls back to a direct Record
+// when no batcher is set (unit tests).
+func (r *TaskActionReconciler) recordEvent(ctx context.Context, event *workflow.ActionEvent) error {
+	if r.eventBatcher != nil {
+		return r.eventBatcher.Record(ctx, event)
+	}
+	_, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
+		Events: []*workflow.ActionEvent{event},
+	}))
+	return err
 }
 
 // isSystemRetryableFailure reports whether the plugin transition is a
@@ -230,6 +248,7 @@ func NewTaskActionReconciler(
 		PluginRegistry: registry,
 		DataStore:      dataStore,
 		eventsClient:   eventsClient,
+		eventBatcher:   newEventBatcher(eventsClient),
 		cluster:        cluster,
 		metrics:        metrics,
 	}
@@ -323,10 +342,19 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
 
+	// The cache-hit lookup (Catalog.Get, a blocking cache-service RPC) only matters before
+	// the task starts executing. Re-issuing it on every reconcile of an already-RUNNING
+	// action is the dominant per-reconcile cost at scale: one RPC per reconcile x tens of
+	// thousands of held actions saturates the cache service, inflating reconcile work
+	// duration to ~800ms and starving newly-created actions of a worker. Skip it once the
+	// action is RUNNING (a cache hit is moot mid-execution); the serializable-reservation
+	// heartbeat is still issued inside evaluateCacheBeforeExecution.
+	alreadyRunning := taskAction.Status.PluginPhase == pluginsCore.PhaseRunning.String()
+
 	// cacheShortCircuited is true when cache handling already decided the outcome,
 	// either via cache hit or waiting on the reservation owner.
 	var cacheShortCircuited bool
-	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
+	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, alreadyRunning)
 	if err != nil {
 		logger.Error(err, "cache pre-execution handling failed")
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
@@ -548,9 +576,7 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	}
 
 	actionEvent := r.buildActionEvent(ctx, newTaskAction, phaseInfo)
-	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
-		Events: []*workflow.ActionEvent{actionEvent},
-	})); err != nil {
+	if err := r.recordEvent(ctx, actionEvent); err != nil {
 		r.Recorder.Eventf(
 			newTaskAction,
 			nil,
@@ -776,8 +802,13 @@ func cacheStatusFromExternalResources(resources []*pluginsCore.ExternalResource)
 // taskActionStatusChanged reports whether any status field has changed between old and new,
 // covering plugin phase, state, state version, observability JSON, conditions, and phase history.
 func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) bool {
-	if oldStatus.StateJSON != newStatus.StateJSON ||
-		oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
+	// NOTE: StateJSON is intentionally NOT compared here. It is a derived, observability-only
+	// field whose createStateJSON() payload includes time.Now(), so it differs on every reconcile.
+	// Gating persistence on it forced a Status().Update (etcd write) + events RPC on every periodic
+	// requeue, even for idle/held actions — the dominant source of etcd write churn at high held
+	// concurrency. StateJSON is derived from the phase/conditions checked below, so excluding it is
+	// safe: any real state change is still detected, and a held action becomes write-silent.
+	if oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
 		oldStatus.PluginPhase != newStatus.PluginPhase ||
 		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion ||
 		oldStatus.Attempts != newStatus.Attempts ||

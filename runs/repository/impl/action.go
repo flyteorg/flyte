@@ -119,15 +119,27 @@ func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEv
 		return nil
 	}
 
-	for _, e := range events {
-		_, err := r.db.ExecContext(ctx,
-			`INSERT INTO action_events (project, domain, run_name, name, attempt, phase, version, info, error_kind, created_at, updated_at)
-			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-			 ON CONFLICT DO NOTHING`,
-			e.Project, e.Domain, e.RunName, e.Name, e.Attempt, e.Phase, e.Version, e.Info, e.ErrorKind)
-		if err != nil {
-			return err
-		}
+	// Single multi-row INSERT so a batch of events costs one transaction/commit
+	// instead of one per event. The executor coalesces concurrent reconciles'
+	// events into batches (see eventBatcher); collapsing them into one statement
+	// here is what turns tens of thousands of one-row commits into a few — the
+	// dominant per-reconcile cost at high held-action counts. Row count is
+	// bounded by the executor batch size, well under Postgres' 65535-parameter
+	// limit at 9 params/row.
+	const colsPerRow = 9
+	valueGroups := make([]string, 0, len(events))
+	args := make([]any, 0, len(events)*colsPerRow)
+	for i, e := range events {
+		b := i * colsPerRow
+		valueGroups = append(valueGroups, fmt.Sprintf(
+			"($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
+			b+1, b+2, b+3, b+4, b+5, b+6, b+7, b+8, b+9))
+		args = append(args, e.Project, e.Domain, e.RunName, e.Name, e.Attempt, e.Phase, e.Version, e.Info, e.ErrorKind)
+	}
+	query := `INSERT INTO action_events (project, domain, run_name, name, attempt, phase, version, info, error_kind, created_at, updated_at) VALUES ` +
+		strings.Join(valueGroups, ", ") + ` ON CONFLICT DO NOTHING`
+	if _, err := r.db.ExecContext(ctx, query, args...); err != nil {
+		return err
 	}
 
 	// Notify subscribers so watchers see new events (e.g. log context becoming available).

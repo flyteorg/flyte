@@ -31,25 +31,33 @@ func (r *TaskActionReconciler) evaluateCacheBeforeExecution(
 	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
 	tCtx pluginsCore.TaskExecutionContext,
+	alreadyRunning bool,
 ) (pluginsCore.Transition, bool, error) {
 	cacheCfg, ok, err := buildTaskCacheConfig(ctx, taskAction, tCtx)
 	if err != nil || !ok || r.Catalog == nil {
 		return pluginsCore.UnknownTransition, false, err
 	}
 
-	entry, err := r.Catalog.Get(ctx, cacheCfg.key)
-	if err == nil {
-		if err := tCtx.OutputWriter().Put(ctx, entry.GetOutputs()); err != nil {
-			return pluginsCore.UnknownTransition, false, fmt.Errorf("persisting cached outputs: %w", err)
+	// The cache-hit lookup only matters before the task starts executing. Once RUNNING, a
+	// hit is moot (we're already running) and issuing this blocking cache-service RPC on
+	// every reconcile of every held action is the dominant per-reconcile cost at scale. Skip
+	// it while RUNNING, but fall through to the serializable-reservation heartbeat below so a
+	// running owner keeps its reservation alive.
+	if !alreadyRunning {
+		entry, err := r.Catalog.Get(ctx, cacheCfg.key)
+		if err == nil {
+			if err := tCtx.OutputWriter().Put(ctx, entry.GetOutputs()); err != nil {
+				return pluginsCore.UnknownTransition, false, fmt.Errorf("persisting cached outputs: %w", err)
+			}
+
+			info := cacheTaskInfo(corepb.CatalogCacheStatus_CACHE_HIT, "cache hit")
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoSuccess(info)), true, nil
 		}
 
-		info := cacheTaskInfo(corepb.CatalogCacheStatus_CACHE_HIT, "cache hit")
-		return pluginsCore.DoTransition(pluginsCore.PhaseInfoSuccess(info)), true, nil
-	}
-
-	if !catalog.IsNotFound(err) {
-		log.FromContext(ctx).Error(err, "cache lookup failed, continuing with task execution")
-		return pluginsCore.UnknownTransition, false, nil
+		if !catalog.IsNotFound(err) {
+			log.FromContext(ctx).Error(err, "cache lookup failed, continuing with task execution")
+			return pluginsCore.UnknownTransition, false, nil
+		}
 	}
 
 	if cacheCfg.serializable {
