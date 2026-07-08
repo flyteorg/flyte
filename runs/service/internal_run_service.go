@@ -289,8 +289,12 @@ func (s *RunService) mergeRunInfoOutput(ctx context.Context, req *workflow.Updat
 			return err
 		}
 	}
-	info.Output = req.GetOutput()
-	info.Principal = req.GetPrincipal()
+	if req.GetOutput() != nil {
+		info.Output = req.GetOutput()
+	}
+	if req.GetPrincipal() != nil {
+		info.Principal = req.GetPrincipal()
+	}
 	detailedInfo, err := proto.Marshal(info)
 	if err != nil {
 		return err
