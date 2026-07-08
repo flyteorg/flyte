@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -64,10 +65,10 @@ type ActionsClient struct {
 	mu sync.RWMutex
 	// Map parent action name to subscriber channels.
 	// Multiple callers may watch the same parent action concurrently.
-	// TODO: add a prometheus counter for dropped updates when metrics are wired up
-	subscribers map[string]map[chan *ActionUpdate]struct{}
-	stopCh      chan struct{}
-	watching    bool
+	droppedUpdates prometheus.Counter
+	subscribers    map[string]map[chan *ActionUpdate]struct{}
+	stopCh         chan struct{}
+	watching       bool
 
 	// Worker pool: numWorkers goroutines each own one channel.
 	// Events are sharded by TaskAction name so per-resource ordering is preserved.
@@ -81,12 +82,13 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, b
 		numWorkers = 1
 	}
 	c := &ActionsClient{
-		k8sClient:   k8sClient,
-		sharedCache: sharedCache,
-		bufferSize:  bufferSize,
-		numWorkers:  numWorkers,
-		runClient:   runClient,
-		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+		k8sClient:      k8sClient,
+		sharedCache:    sharedCache,
+		bufferSize:     bufferSize,
+		numWorkers:     numWorkers,
+		runClient:      runClient,
+		droppedUpdates: scope.MustNewCounter("dropped_updates", "Total number of dropped subscriber updates due to full channel buffer"),
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 
 	if recordFilterSize > 0 {
@@ -552,6 +554,7 @@ func (c *ActionsClient) notifySubscribers(ctx context.Context, update *ActionUpd
 		select {
 		case ch <- update:
 		default:
+			c.droppedUpdates.Inc()
 			logger.Warnf(ctx, "subscriber channel full, dropping update for parent action: %s", update.ParentActionName)
 		}
 	}
