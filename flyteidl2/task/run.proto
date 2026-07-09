@@ -147,11 +147,12 @@ message InlineRule {
     unique: true
     items: {
       enum: {
-        in: [ // terminal phases only
+        in: [ // terminal phases, plus PAUSED (condition awaiting a signal)
           5, // ACTION_PHASE_SUCCEEDED
           6, // ACTION_PHASE_FAILED
           7, // ACTION_PHASE_ABORTED
-          8 // ACTION_PHASE_TIMED_OUT
+          8, // ACTION_PHASE_TIMED_OUT
+          9 // ACTION_PHASE_PAUSED
         ]
       }
     }
