@@ -23,21 +23,12 @@ func main() {
 			cfg := runsconfig.GetConfig()
 			sc.Host = cfg.Server.Host
 			sc.Port = cfg.Server.Port
-			sc.Namespace = "flyte" // TODO: make configurable
 
 			db, err := database.GetDB(ctx, database.GetConfig())
 			if err != nil {
 				return fmt.Errorf("failed to initialize database: %w", err)
 			}
 			sc.DB = db
-
-			k8sClient, _, err := app.InitKubernetesClient(ctx, app.K8sConfig{
-				Namespace: sc.Namespace,
-			}, nil)
-			if err != nil {
-				return fmt.Errorf("failed to initialize Kubernetes client: %w", err)
-			}
-			sc.K8sClient = k8sClient
 
 			labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
 			dataStore, err := storage.NewDataStore(storage.GetConfig(), promutils.NewTestScope())
