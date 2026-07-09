@@ -151,8 +151,14 @@ class TaskResourceSettings(_message.Message):
     mirror_limits_request: BoolSetting
     def __init__(self, min: _Optional[_Union[TaskResourceDefaults, _Mapping]] = ..., max: _Optional[_Union[TaskResourceDefaults, _Mapping]] = ..., mirror_limits_request: _Optional[_Union[BoolSetting, _Mapping]] = ...) -> None: ...
 
+class AppSettings(_message.Message):
+    __slots__ = ["disallow_anonymous"]
+    DISALLOW_ANONYMOUS_FIELD_NUMBER: _ClassVar[int]
+    disallow_anonymous: BoolSetting
+    def __init__(self, disallow_anonymous: _Optional[_Union[BoolSetting, _Mapping]] = ...) -> None: ...
+
 class Settings(_message.Message):
-    __slots__ = ["run", "security", "storage", "task_resource", "labels", "annotations", "environment_variables"]
+    __slots__ = ["run", "security", "storage", "task_resource", "labels", "annotations", "environment_variables", "app"]
     RUN_FIELD_NUMBER: _ClassVar[int]
     SECURITY_FIELD_NUMBER: _ClassVar[int]
     STORAGE_FIELD_NUMBER: _ClassVar[int]
@@ -160,6 +166,7 @@ class Settings(_message.Message):
     LABELS_FIELD_NUMBER: _ClassVar[int]
     ANNOTATIONS_FIELD_NUMBER: _ClassVar[int]
     ENVIRONMENT_VARIABLES_FIELD_NUMBER: _ClassVar[int]
+    APP_FIELD_NUMBER: _ClassVar[int]
     run: RunSettings
     security: SecuritySettings
     storage: StorageSettings
@@ -167,4 +174,5 @@ class Settings(_message.Message):
     labels: StringMapSetting
     annotations: StringMapSetting
     environment_variables: StringMapSetting
-    def __init__(self, run: _Optional[_Union[RunSettings, _Mapping]] = ..., security: _Optional[_Union[SecuritySettings, _Mapping]] = ..., storage: _Optional[_Union[StorageSettings, _Mapping]] = ..., task_resource: _Optional[_Union[TaskResourceSettings, _Mapping]] = ..., labels: _Optional[_Union[StringMapSetting, _Mapping]] = ..., annotations: _Optional[_Union[StringMapSetting, _Mapping]] = ..., environment_variables: _Optional[_Union[StringMapSetting, _Mapping]] = ...) -> None: ...
+    app: AppSettings
+    def __init__(self, run: _Optional[_Union[RunSettings, _Mapping]] = ..., security: _Optional[_Union[SecuritySettings, _Mapping]] = ..., storage: _Optional[_Union[StorageSettings, _Mapping]] = ..., task_resource: _Optional[_Union[TaskResourceSettings, _Mapping]] = ..., labels: _Optional[_Union[StringMapSetting, _Mapping]] = ..., annotations: _Optional[_Union[StringMapSetting, _Mapping]] = ..., environment_variables: _Optional[_Union[StringMapSetting, _Mapping]] = ..., app: _Optional[_Union[AppSettings, _Mapping]] = ...) -> None: ...
