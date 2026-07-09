@@ -39,10 +39,6 @@ message RunDetails {
 
   // Detailed information about the root action.
   ActionDetails action = 2;
-
-  // Computed at read time: whether the run's task version currently exists in the
-  // task store, so the rerun UI can send a TaskId instead of the full inline spec.
-  bool task_is_registered = 3;
 }
 
 message TaskAction {
