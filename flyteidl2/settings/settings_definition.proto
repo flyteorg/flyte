@@ -181,6 +181,15 @@ message TaskResourceSettings {
   BoolSetting mirror_limits_request = 3 [(flyteidl2.settings.desc) = "When true, resource limits mirror requests"];
 }
 
+// AppSettings controls policy for Union Apps.
+message AppSettings {
+  // When VALUE=true, apps may not be deployed with anonymous (unauthenticated)
+  // access: the control plane rejects a deploy that sets allow_anonymous=true,
+  // and the operator forces authentication on at reconcile time. This is the
+  // org-level override of the per-app SecurityContext.allow_anonymous field.
+  BoolSetting disallow_anonymous = 1 [(flyteidl2.settings.desc) = "Disallow anonymous (unauthenticated) access to apps org-wide"];
+}
+
 // Settings holds all configurable settings for a scope.
 message Settings {
   RunSettings run = 1;
@@ -190,4 +199,5 @@ message Settings {
   StringMapSetting labels = 5 [(flyteidl2.settings.desc) = "Kubernetes labels applied to task pods. Child overrides parent on key conflict."];
   StringMapSetting annotations = 6 [(flyteidl2.settings.desc) = "Kubernetes annotations applied to task pods. Child overrides parent on key conflict."];
   StringMapSetting environment_variables = 7 [(flyteidl2.settings.desc) = "Environment variables injected into task pods. Child overrides parent on key conflict."];
+  AppSettings app = 8 [(flyteidl2.settings.desc) = "Union Apps auth policy"];
 }
