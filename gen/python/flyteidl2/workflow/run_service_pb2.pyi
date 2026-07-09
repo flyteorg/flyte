@@ -297,7 +297,7 @@ class NodeExpansionParams(_message.Message):
     def __init__(self, offset: _Optional[int] = ..., limit: _Optional[int] = ...) -> None: ...
 
 class WatchWindowedActionsResponse(_message.Message):
-    __slots__ = ["window_items", "ancestors", "total_flat_count", "selected_flat_index", "initial_snapshot_complete", "truncations", "resync_hint"]
+    __slots__ = ["window_items", "ancestors", "total_flat_count", "selected_flat_index", "initial_snapshot_complete", "truncations", "resync_hint", "hydration_complete"]
     WINDOW_ITEMS_FIELD_NUMBER: _ClassVar[int]
     ANCESTORS_FIELD_NUMBER: _ClassVar[int]
     TOTAL_FLAT_COUNT_FIELD_NUMBER: _ClassVar[int]
@@ -305,6 +305,7 @@ class WatchWindowedActionsResponse(_message.Message):
     INITIAL_SNAPSHOT_COMPLETE_FIELD_NUMBER: _ClassVar[int]
     TRUNCATIONS_FIELD_NUMBER: _ClassVar[int]
     RESYNC_HINT_FIELD_NUMBER: _ClassVar[int]
+    HYDRATION_COMPLETE_FIELD_NUMBER: _ClassVar[int]
     window_items: _containers.RepeatedCompositeFieldContainer[WindowedItem]
     ancestors: _containers.RepeatedCompositeFieldContainer[WindowedItem]
     total_flat_count: int
@@ -312,7 +313,8 @@ class WatchWindowedActionsResponse(_message.Message):
     initial_snapshot_complete: bool
     truncations: _containers.RepeatedCompositeFieldContainer[TruncationNotice]
     resync_hint: bool
-    def __init__(self, window_items: _Optional[_Iterable[_Union[WindowedItem, _Mapping]]] = ..., ancestors: _Optional[_Iterable[_Union[WindowedItem, _Mapping]]] = ..., total_flat_count: _Optional[int] = ..., selected_flat_index: _Optional[int] = ..., initial_snapshot_complete: bool = ..., truncations: _Optional[_Iterable[_Union[TruncationNotice, _Mapping]]] = ..., resync_hint: bool = ...) -> None: ...
+    hydration_complete: bool
+    def __init__(self, window_items: _Optional[_Iterable[_Union[WindowedItem, _Mapping]]] = ..., ancestors: _Optional[_Iterable[_Union[WindowedItem, _Mapping]]] = ..., total_flat_count: _Optional[int] = ..., selected_flat_index: _Optional[int] = ..., initial_snapshot_complete: bool = ..., truncations: _Optional[_Iterable[_Union[TruncationNotice, _Mapping]]] = ..., resync_hint: bool = ..., hydration_complete: bool = ...) -> None: ...
 
 class WindowedItem(_message.Message):
     __slots__ = ["action", "group", "depth", "is_expanded"]

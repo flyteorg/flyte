@@ -4617,6 +4617,8 @@ func (m *WatchWindowedActionsResponse) validate(all bool) error {
 
 	// no validation rules for ResyncHint
 
+	// no validation rules for HydrationComplete
+
 	if len(errors) > 0 {
 		return WatchWindowedActionsResponseMultiError(errors)
 	}
