@@ -151,6 +151,9 @@ func TestNotifyRunService_UpdateActionStatusIncludesAttemptsAndCacheStatus(t *te
 	ta.Status.CacheStatus = core.CatalogCacheStatus_CACHE_HIT
 	update.Phase = common.ActionPhase_ACTION_PHASE_SUCCEEDED
 
+	// First sight of the action (no filter configured) records it before updating status.
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
 	mockClient.On("UpdateActionStatus", mock.Anything, mock.MatchedBy(func(req *connect.Request[workflow.UpdateActionStatusRequest]) bool {
 		status := req.Msg.GetStatus()
 		return status.GetPhase() == common.ActionPhase_ACTION_PHASE_SUCCEEDED &&
@@ -635,6 +638,7 @@ func newWorkerTestClient(numWorkers, bufSize int) *ActionsClient {
 	c := &ActionsClient{
 		numWorkers: numWorkers,
 		workerChs:  make([]chan watch.Event, numWorkers),
+		pending:    make(map[string]struct{}),
 	}
 	for i := range c.workerChs {
 		c.workerChs[i] = make(chan watch.Event, bufSize)
@@ -656,17 +660,96 @@ func newTaskAction(name string) *executorv1.TaskAction {
 
 func TestDispatchEvent_ConsistentSharding(t *testing.T) {
 	c := newWorkerTestClient(4, 10)
-	taskAction := newTaskAction("run1-action1")
 
-	c.dispatchEvent(taskAction, watch.Modified)
-	c.dispatchEvent(taskAction, watch.Modified)
+	// Two DIFFERENT keys that we send once each must land as two items total (one per
+	// key), and each key must always hash to the same single shard.
+	c.dispatchEvent(newTaskAction("run1-action1"), watch.Modified)
+	c.dispatchEvent(newTaskAction("run1-action1"), watch.Modified) // same key -> coalesced away
+	c.dispatchEvent(newTaskAction("run1-action2"), watch.Modified)
 
-	// Both events must land in exactly one shard (the same one each time)
 	var total int
 	for _, ch := range c.workerChs {
 		total += len(ch)
 	}
+	// action1's two dispatches coalesce to one; action2 adds one -> two items total.
 	assert.Equal(t, 2, total)
+}
+
+func TestDispatchEvent_CoalescesUpdatesForSameKey(t *testing.T) {
+	c := newWorkerTestClient(1, 10)
+	ta := newTaskAction("run1-action1")
+
+	// A burst of updates for the same key, before any worker drains the channel.
+	c.dispatchEvent(ta, watch.Modified)
+	c.dispatchEvent(ta, watch.Modified)
+	c.dispatchEvent(ta, watch.Modified)
+
+	// Only ONE item is queued; the rest coalesce (the worker will read latest state).
+	assert.Equal(t, 1, len(c.workerChs[0]), "same-key updates must coalesce to one queued item")
+
+	// After the queued item is drained (pending marker cleared), a new update enqueues again.
+	<-c.workerChs[0]
+	c.pendingMu.Lock()
+	delete(c.pending, ta.Name)
+	c.pendingMu.Unlock()
+	c.dispatchEvent(ta, watch.Modified)
+	assert.Equal(t, 1, len(c.workerChs[0]), "a fresh update after drain must enqueue again")
+}
+
+func succeededTaskAction(name string) *executorv1.TaskAction {
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{Project: "p", Domain: "d", RunName: "run1", ActionName: name},
+	}
+	ta.Name = name
+	ta.Status.Conditions = []metav1.Condition{{Type: string(executorv1.ConditionTypeSucceeded), Status: metav1.ConditionTrue}}
+	return ta
+}
+
+func runningTaskAction(name string) *executorv1.TaskAction {
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{Project: "p", Domain: "d", RunName: "run1", ActionName: name},
+	}
+	ta.Name = name
+	ta.Status.Conditions = []metav1.Condition{{
+		Type: string(executorv1.ConditionTypeProgressing), Status: metav1.ConditionTrue,
+		Reason: string(executorv1.ConditionReasonExecuting),
+	}}
+	return ta
+}
+
+// When queued→running→succeeded pile up while the worker is behind, the coalesced
+// item must be processed at the LATEST state (SUCCEEDED) — a single terminal
+// UpdateActionStatus, never an intermediate RUNNING.
+func TestHandleWatchEvent_CoalescedReadsLatestPhase(t *testing.T) {
+	ctx := context.Background()
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	require.NoError(t, err)
+
+	c := &ActionsClient{
+		runClient:      mockClient,
+		recordedFilter: filter,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+		pending:        map[string]struct{}{"a3": {}}, // the key is queued
+	}
+	// The executor advanced the CRD to SUCCEEDED before the worker ran.
+	c.getLatest = func(_ context.Context, name string) (*executorv1.TaskAction, bool, error) {
+		return succeededTaskAction(name), true, nil
+	}
+
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
+	// Accept exactly one status update, and ONLY if it is SUCCEEDED. A RUNNING update
+	// would be an unexpected call and fail the test.
+	mockClient.On("UpdateActionStatus", mock.Anything, mock.MatchedBy(func(req *connect.Request[workflow.UpdateActionStatusRequest]) bool {
+		return req.Msg.GetStatus().GetPhase() == common.ActionPhase_ACTION_PHASE_SUCCEEDED
+	})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
+
+	// The queued snapshot was RUNNING, but the worker reads the latest (SUCCEEDED).
+	c.handleWatchEvent(ctx, watch.Event{Type: watch.Modified, Object: runningTaskAction("a3")})
+
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
 }
 
 func TestDispatchEvent_DifferentNamesCanLandOnDifferentShards(t *testing.T) {
@@ -699,15 +782,15 @@ func TestDispatchEvent_NilTaskActionIsIgnored(t *testing.T) {
 
 func TestDispatchEvent_FullChannelBlocks(t *testing.T) {
 	c := newWorkerTestClient(1, 1) // single worker, capacity 1
-	taskAction := newTaskAction("run1-action1")
 
-	c.dispatchEvent(taskAction, watch.Modified) // fills the channel
+	c.dispatchEvent(newTaskAction("run1-action1"), watch.Modified) // fills the channel
 
-	// Second dispatch must block because the channel is full.
-	// Run it in a goroutine and verify it unblocks once the channel is drained.
+	// A dispatch for a DIFFERENT key (same shard, since there is one worker) must
+	// block because the channel is full — coalescing only drops same-key duplicates,
+	// not distinct keys. Run it in a goroutine and verify it unblocks once drained.
 	done := make(chan struct{})
 	go func() {
-		c.dispatchEvent(taskAction, watch.Modified)
+		c.dispatchEvent(newTaskAction("run1-action2"), watch.Modified)
 		close(done)
 	}()
 

@@ -11,6 +11,7 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -73,6 +74,18 @@ type ActionsClient struct {
 	// Events are sharded by TaskAction name so per-resource ordering is preserved.
 	numWorkers int
 	workerChs  []chan watch.Event
+
+	// pending coalesces updates by TaskAction name: while a key is queued, further
+	// updates for it are dropped, and the worker reads the LATEST state from the
+	// cache when it runs — so a burst of queued→running→succeeded that piles up
+	// while workers are behind collapses to a single terminal notification. Deletes
+	// bypass this (they carry the tombstone, which has already left the cache).
+	// ponytail: one global lock; shard the map only if pending churn shows up hot.
+	pending   map[string]struct{}
+	pendingMu sync.Mutex
+
+	// getLatest reads the current TaskAction from the shared cache. Overridable in tests.
+	getLatest func(ctx context.Context, name string) (*executorv1.TaskAction, bool, error)
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
@@ -387,6 +400,10 @@ func (c *ActionsClient) StartWatching(ctx context.Context) error {
 	c.stopCh = make(chan struct{})
 	stopCh := c.stopCh // capture before releasing so workers reference the right channel
 	c.workerChs = make([]chan watch.Event, c.numWorkers)
+	c.pending = make(map[string]struct{})
+	if c.getLatest == nil {
+		c.getLatest = c.getLatestFromCache
+	}
 	for i := range c.workerChs {
 		c.workerChs[i] = make(chan watch.Event, c.bufferSize)
 		go c.worker(ctx, c.workerChs[i], stopCh)
@@ -472,6 +489,24 @@ func (c *ActionsClient) dispatchEvent(taskAction *executorv1.TaskAction, eventTy
 	h := fnv.New32a()
 	_, _ = h.Write([]byte(taskAction.Name)) // FNV Write never returns an error
 	shard := h.Sum32() % uint32(c.numWorkers)
+
+	// Deletes carry the tombstone (the object has left the cache) and are terminal,
+	// so they are never coalesced.
+	if eventType == watch.Deleted {
+		c.workerChs[shard] <- watch.Event{Type: eventType, Object: taskAction.DeepCopy()}
+		return
+	}
+
+	// Coalesce updates by key: if one is already queued, drop this — the queued
+	// item's worker will read the latest state from the cache when it runs.
+	c.pendingMu.Lock()
+	if _, already := c.pending[taskAction.Name]; already {
+		c.pendingMu.Unlock()
+		return
+	}
+	c.pending[taskAction.Name] = struct{}{}
+	c.pendingMu.Unlock()
+
 	c.workerChs[shard] <- watch.Event{Type: eventType, Object: taskAction.DeepCopy()}
 }
 
@@ -482,7 +517,44 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 		return
 	}
 
-	c.handleTaskActionEvent(ctx, taskAction, event.Type)
+	// Deletes carry the tombstone (the object is gone from the cache); process it directly.
+	if event.Type == watch.Deleted {
+		c.handleTaskActionEvent(ctx, taskAction, watch.Deleted)
+		return
+	}
+
+	// Coalesced update: clear the pending marker BEFORE reading state so an update
+	// arriving during processing re-enqueues and is not lost. Then read the LATEST
+	// object from the cache — collapsing any intermediate phases that piled up while
+	// the worker was busy into a single up-to-date notification.
+	c.pendingMu.Lock()
+	delete(c.pending, taskAction.Name)
+	c.pendingMu.Unlock()
+
+	latest, found, err := c.getLatest(ctx, taskAction.Name)
+	if err != nil {
+		logger.Warnf(ctx, "coalesced watch: failed to read latest TaskAction %s: %v", taskAction.Name, err)
+		return
+	}
+	if !found {
+		return // object already gone; a delete event (if any) handles the terminal state
+	}
+	if c.shouldSkipTaskAction(latest) {
+		return
+	}
+	c.handleTaskActionEvent(ctx, latest, watch.Modified)
+}
+
+// getLatestFromCache reads the current TaskAction from the shared informer cache.
+func (c *ActionsClient) getLatestFromCache(ctx context.Context, name string) (*executorv1.TaskAction, bool, error) {
+	ta := &executorv1.TaskAction{}
+	if err := c.sharedCache.Get(ctx, client.ObjectKey{Name: name, Namespace: flyteNamespace}, ta); err != nil {
+		if apierrors.IsNotFound(err) {
+			return nil, false, nil
+		}
+		return nil, false, err
+	}
+	return ta, true, nil
 }
 
 func (c *ActionsClient) handleTaskActionEvent(ctx context.Context, taskAction *executorv1.TaskAction, eventType watch.EventType) {
@@ -565,8 +637,10 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		return
 	}
 
-	// On ADDED: create the action record in the DB (deduplicated via bloom filter).
-	if eventType == watch.Added {
+	// On first sight of an action (any non-delete event — a coalesced first event may
+	// arrive as Modified, not Added): create the DB record, deduplicated via the bloom
+	// filter so replays and coalesced updates don't re-record.
+	if eventType != watch.Deleted {
 		actionKey := []byte(buildTaskActionName(update.ActionID))
 		isDuplicate := c.recordedFilter != nil && c.recordedFilter.Contains(ctx, actionKey)
 		if isDuplicate {
@@ -631,13 +705,21 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 	}
 
 	if update.Phase != common.ActionPhase_ACTION_PHASE_UNSPECIFIED {
+		status := &workflow.ActionStatus{
+			Phase:       update.Phase,
+			Attempts:    taskAction.Status.Attempts,
+			CacheStatus: taskAction.Status.CacheStatus,
+		}
+		// Carry the action's true start (its CRD creationTimestamp) so the run service
+		// computes duration from it. Otherwise created_at is stamped whenever this event
+		// is recorded, which — under coalesced/backlogged events — can collapse to the
+		// terminal time and report a near-zero duration for a long-held action.
+		if !taskAction.CreationTimestamp.IsZero() {
+			status.StartTime = timestamppb.New(taskAction.CreationTimestamp.Time)
+		}
 		statusReq := &workflow.UpdateActionStatusRequest{
 			ActionId: update.ActionID,
-			Status: &workflow.ActionStatus{
-				Phase:       update.Phase,
-				Attempts:    taskAction.Status.Attempts,
-				CacheStatus: taskAction.Status.CacheStatus,
-			},
+			Status:   status,
 		}
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)

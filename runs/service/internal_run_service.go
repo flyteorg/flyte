@@ -241,6 +241,15 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 		endTime = &t
 	}
 
+	// The caller may supply the action's true start (its CRD creationTimestamp) so that
+	// duration = ended_at - start is correct even when the status update is recorded
+	// late (coalesced/backlogged events would otherwise collapse created_at toward now).
+	var startTime *time.Time
+	if actionStatus.GetStartTime() != nil {
+		t := actionStatus.GetStartTime().AsTime()
+		startTime = &t
+	}
+
 	if err := s.repo.ActionRepo().UpdateActionPhase(
 		ctx,
 		req.GetActionId(),
@@ -248,6 +257,7 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 		actionStatus.GetAttempts(),
 		actionStatus.GetCacheStatus(),
 		endTime,
+		startTime,
 	); err != nil {
 		logger.Warnf(ctx, "UpdateActionStatus: failed to update action %s: %v", req.GetActionId().GetName(), err)
 		return connect.NewError(connect.CodeInternal, err)
