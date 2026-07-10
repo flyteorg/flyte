@@ -60,12 +60,14 @@ class RunCompletedNotificationTemplateData(_message.Message):
     def __init__(self, run: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., error: _Optional[str] = ...) -> None: ...
 
 class ActionPausedNotificationTemplateData(_message.Message):
-    __slots__ = ["run", "action_name"]
-    RUN_FIELD_NUMBER: _ClassVar[int]
-    ACTION_NAME_FIELD_NUMBER: _ClassVar[int]
-    run: _identifier_pb2.RunIdentifier
-    action_name: str
-    def __init__(self, run: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., action_name: _Optional[str] = ...) -> None: ...
+    __slots__ = ["action", "prompt", "description"]
+    ACTION_FIELD_NUMBER: _ClassVar[int]
+    PROMPT_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    action: _identifier_pb2.ActionIdentifier
+    prompt: str
+    description: str
+    def __init__(self, action: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., prompt: _Optional[str] = ..., description: _Optional[str] = ...) -> None: ...
 
 class WebhookDeliveryTemplate(_message.Message):
     __slots__ = ["url", "method", "headers", "body_template"]

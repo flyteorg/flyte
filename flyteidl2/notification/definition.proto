@@ -37,10 +37,14 @@ message RunCompletedNotificationTemplateData {
 // ActionPausedNotificationTemplateData is the template data available to
 // delivery templates on rules subscribed to ACTION_PHASE_PAUSED.
 message ActionPausedNotificationTemplateData {
-  common.RunIdentifier run = 1 [(buf.validate.field).required = true];
+  // Identifier of the condition action that paused awaiting a signal.
+  common.ActionIdentifier action = 1 [(buf.validate.field).required = true];
 
-  // Name of the action that paused awaiting a signal.
-  string action_name = 2;
+  // Prompt shown to the user when the condition is awaited.
+  string prompt = 2;
+
+  // Description of the condition.
+  string description = 3;
 }
 
 enum HttpMethod {
