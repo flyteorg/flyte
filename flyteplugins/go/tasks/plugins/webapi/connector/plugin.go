@@ -503,7 +503,6 @@ func newConnectorPlugin(connectorService *ConnectorService) webapi.PluginEntry {
 }
 
 func RegisterConnectorPlugin(connectorService *ConnectorService) {
-	fmt.Printf("Registering connector plugin...\n")
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
 	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newConnectorPlugin(connectorService))

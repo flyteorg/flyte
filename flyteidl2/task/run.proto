@@ -69,6 +69,19 @@ message CacheConfig {
   CacheLookupScope cache_lookup_scope = 2;
 }
 
+// TaskSpecSource records how a run's task spec was provided at creation time, so
+// the rerun UI can send a TaskId (deployed) rather than the full inline spec.
+enum TaskSpecSource {
+  TASK_SPEC_SOURCE_UNSPECIFIED = 0;
+
+  // The run referenced a deployed (registered) task by TaskId.
+  TASK_SPEC_SOURCE_DEPLOYED = 1;
+
+  // The run carried an inline task spec (e.g. fast registration) that does not
+  // exist in the task store.
+  TASK_SPEC_SOURCE_EPHEMERAL = 2;
+}
+
 message RunSpec {
   // Labels to apply to the run.
   Labels labels = 1;
@@ -135,6 +148,10 @@ message RunSpec {
   // Pool of the assigned queue for given run.
   // Always set by server. Should not be specified by user.
   string cluster_pool = 16;
+
+  // How the task spec was provided at creation (deployed TaskId vs inline spec).
+  // Set by server; lets the rerun UI choose TaskId over the full inline spec.
+  TaskSpecSource task_spec_source = 17;
 }
 
 message InlineRuleList {

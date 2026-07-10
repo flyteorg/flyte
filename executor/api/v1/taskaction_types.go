@@ -81,6 +81,25 @@ const (
 
 	// ConditionReasonInvalidSpec indicates the TaskAction spec is missing required fields
 	ConditionReasonInvalidSpec TaskActionConditionReason = "InvalidSpec"
+
+	// ConditionReasonPaused indicates a condition action is waiting for a signal (Progressing=True)
+	ConditionReasonPaused TaskActionConditionReason = "Paused"
+
+	// ConditionReasonSignaled indicates a condition action received its signal (Succeeded=True)
+	ConditionReasonSignaled TaskActionConditionReason = "Signaled"
+
+	// ConditionReasonTimedOut indicates a condition action passed its deadline unsignalled (Failed=True)
+	ConditionReasonTimedOut TaskActionConditionReason = "TimedOut"
+)
+
+// ActionType values for TaskActionSpec.ActionType.
+const (
+	// ActionTypeTask is the default action type (plugin-driven task with a pod).
+	ActionTypeTask = "task"
+
+	// ActionTypeCondition is a HITL condition: no plugin, no pod. It reaches
+	// terminal state via Signal (Succeeded) or timeout (Failed).
+	ActionTypeCondition = "condition"
 )
 
 // TaskActionSpec defines the desired state of TaskAction
@@ -115,15 +134,27 @@ type TaskActionSpec struct {
 	// +kubebuilder:validation:MaxLength=30
 	ParentActionName *string `json:"parentActionName,omitempty"`
 
-	// InputURI is the path to the input data for this action
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:MinLength=1
-	InputURI string `json:"inputUri"`
+	// ActionType discriminates what kind of action this CR represents.
+	// Mirrors cloud's explicit ActionType enum. Empty means "task" for
+	// backward compatibility with existing CRs.
+	// +kubebuilder:validation:Enum=task;condition
+	// +optional
+	ActionType string `json:"actionType,omitempty"`
 
-	// RunOutputBase is the base path where this action should write its output
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:MinLength=1
-	RunOutputBase string `json:"runOutputBase"`
+	// ConditionSpec is the proto-serialized workflow.ConditionAction, present iff
+	// actionType == "condition". Carries type/prompt/description/timeout/webhook.
+	// +optional
+	ConditionSpec []byte `json:"conditionSpec,omitempty"`
+
+	// InputURI is the path to the input data for this action.
+	// Empty for conditions; the reconciler validates presence for tasks.
+	// +optional
+	InputURI string `json:"inputUri,omitempty"`
+
+	// RunOutputBase is the base path where this action should write its output.
+	// Empty for conditions; the reconciler validates presence for tasks.
+	// +optional
+	RunOutputBase string `json:"runOutputBase,omitempty"`
 
 	// CacheKey enables cache lookup/writeback for this task action when set.
 	// This is propagated from workflow.TaskAction.cache_key.
@@ -131,20 +162,21 @@ type TaskActionSpec struct {
 	// +kubebuilder:validation:MaxLength=256
 	CacheKey string `json:"cacheKey,omitempty"`
 
-	// TaskType identifies which plugin handles this task (e.g. "container", "spark", "ray")
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:MinLength=1
+	// TaskType identifies which plugin handles this task (e.g. "container", "spark", "ray").
+	// Empty for conditions; the reconciler validates presence for tasks.
+	// +optional
 	// +kubebuilder:validation:MaxLength=63
-	TaskType string `json:"taskType"`
+	TaskType string `json:"taskType,omitempty"`
 
 	// ShortName is the human-readable display name for this task
 	// +optional
 	// +kubebuilder:validation:MaxLength=63
 	ShortName string `json:"shortName,omitempty"`
 
-	// TaskTemplate is the proto-serialized core.TaskTemplate stored inline in etcd
-	// +kubebuilder:validation:Required
-	TaskTemplate []byte `json:"taskTemplate"`
+	// TaskTemplate is the proto-serialized core.TaskTemplate stored inline in etcd.
+	// Empty for conditions; the reconciler validates presence for tasks.
+	// +optional
+	TaskTemplate []byte `json:"taskTemplate,omitempty"`
 
 	// EnvVars are run-scoped environment variables projected from RunSpec for executor runtime use.
 	// +optional
@@ -299,6 +331,20 @@ type TaskActionStatus struct {
 	// Code field that ActionEvent.ErrorInfo cannot carry.
 	// +optional
 	ErrorState *ErrorState `json:"errorState,omitempty"`
+
+	// SignalValue is the proto-serialized core.Literal supplied by Signal.
+	// Set exactly once; the reconciler transitions the CR to Succeeded when present.
+	// Only meaningful for condition actions.
+	// +optional
+	SignalValue []byte `json:"signalValue,omitempty"`
+
+	// SignalledBy identifies the principal that signalled the condition.
+	// +optional
+	SignalledBy string `json:"signalledBy,omitempty"`
+
+	// SignalledAt is when the signal was received.
+	// +optional
+	SignalledAt *metav1.Time `json:"signalledAt,omitempty"`
 }
 
 // +kubebuilder:object:root=true

@@ -869,6 +869,8 @@ func (m *RunSpec) validate(all bool) error {
 
 	// no validation rules for ClusterPool
 
+	// no validation rules for TaskSpecSource
+
 	switch v := m.NotificationSettings.(type) {
 	case *RunSpec_NotificationRuleName:
 		if v == nil {
