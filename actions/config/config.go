@@ -23,7 +23,7 @@ var defaultConfig = &Config{
 	// NOTE: total buffering is WatchWorkers * WatchBufferSize watch.Event entries.
 	// Each entry includes a DeepCopy() of the TaskAction; tune carefully to avoid large memory spikes under backlog.
 	WatchBufferSize: 1000,
-	WatchWorkers:    100
+	WatchWorkers:    100,
 	RunServiceURL:   "http://localhost:8090",
 	// 8M slots × 8 bytes/pointer = 64 MB; can track ~8M unique actions.
 	RecordFilterSize: 1 << 23,
