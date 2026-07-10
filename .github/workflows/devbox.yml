@@ -1,7 +1,5 @@
-# Functional tests against a devbox built from the PR's code, mirroring v1's
-# sandbox-bundled-functional-tests: the backend is the variable under test,
-# the SDK is pinned. Currently a skeleton — it builds and starts the devbox
-# and installs flyte-sdk; SDK example runs will be added on top.
+# Functional tests against a devbox built from the PR's code, the backend is
+# the variable under test and the SDK is pinned.
 name: Devbox
 
 on:
@@ -76,7 +74,26 @@ jobs:
           uv pip install --system "flyte==${FLYTE_SDK_VERSION}"
           python -c "import flyte; print(flyte.__version__)"
 
-      # TODO: register and run a couple of flyte-sdk examples against the
-      # devbox (see v1's single-binary.yml "Register specific tests" step).
-      - name: Run SDK examples (placeholder)
-        run: echo "SDK example runs not wired up yet"
+      # Examples must match the installed SDK version, so check out the same tag.
+      - name: Checkout flyte-sdk examples
+        uses: actions/checkout@v4
+        with:
+          repository: flyteorg/flyte-sdk
+          ref: v${{ env.FLYTE_SDK_VERSION }}
+          path: flyte-sdk
+
+      # The config lives inside the SDK checkout because the example driver
+      # chdirs there (code bundle module names derive from the working directory).
+      - name: Configure SDK for devbox
+        working-directory: flyte-sdk
+        run: |
+          flyte create config \
+            --output .flyte/config.yaml \
+            --endpoint localhost:30080 \
+            --project flytesnacks \
+            --domain development \
+            --builder local \
+            --insecure
+
+      - name: Run SDK examples
+        run: python .github/scripts/devbox_sdk_examples.py flyte-sdk
