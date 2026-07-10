@@ -52,16 +52,16 @@ type ActionUpdate struct {
 
 const (
 	labelTerminalStatusRecorded = "flyte.org/terminal-status-recorded"
-	// flyteNamespace is the single Kubernetes namespace used for all Flyte resources.
-	flyteNamespace = "flyte"
 )
 
 // ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
 type ActionsClient struct {
 	k8sClient   client.WithWatch
 	sharedCache ctrlcache.Cache
-	bufferSize  int
-	runClient   workflowconnect.InternalRunServiceClient
+	// namespace is the single Kubernetes namespace used for all Flyte resources.
+	namespace  string
+	bufferSize int
+	runClient  workflowconnect.InternalRunServiceClient
 	// recordedFilter deduplicates RecordAction calls across watch reconnects.
 	recordedFilter fastcheck.Filter
 
@@ -81,13 +81,14 @@ type ActionsClient struct {
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) *ActionsClient {
+func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) *ActionsClient {
 	if numWorkers <= 0 {
 		numWorkers = 1
 	}
 	c := &ActionsClient{
 		k8sClient:   k8sClient,
 		sharedCache: sharedCache,
+		namespace:   namespace,
 		bufferSize:  bufferSize,
 		numWorkers:  numWorkers,
 		runClient:   runClient,
@@ -117,10 +118,10 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 
 	switch action.GetSpec().(type) {
 	case *actions.Action_Task:
-		if err := k8sutil.EnsureNamespaceExists(ctx, c.k8sClient, flyteNamespace); err != nil {
-			return fmt.Errorf("failed to ensure namespace %s: %w", flyteNamespace, err)
+		if err := k8sutil.EnsureNamespaceExists(ctx, c.k8sClient, c.namespace); err != nil {
+			return fmt.Errorf("failed to ensure namespace %s: %w", c.namespace, err)
 		}
-		taskAction := newTaskActionCR(actionID, executorv1.ActionTypeTask, isRoot)
+		taskAction := c.newTaskActionCR(actionID, executorv1.ActionTypeTask, isRoot)
 		// Set OwnerReference to parent so K8s cascades deletion to children.
 		if !isRoot {
 			parentTaskAction, err := c.setParentOwnership(ctx, taskAction, actionID.Run, *action.ParentActionName)
@@ -158,10 +159,10 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 		if err := validateConditionDeclaredType(cond); err != nil {
 			return connect.NewError(connect.CodeInvalidArgument, err)
 		}
-		if err := k8sutil.EnsureNamespaceExists(ctx, c.k8sClient, flyteNamespace); err != nil {
-			return fmt.Errorf("failed to ensure namespace %s: %w", flyteNamespace, err)
+		if err := k8sutil.EnsureNamespaceExists(ctx, c.k8sClient, c.namespace); err != nil {
+			return fmt.Errorf("failed to ensure namespace %s: %w", c.namespace, err)
 		}
-		taskAction := newTaskActionCR(actionID, executorv1.ActionTypeCondition, isRoot)
+		taskAction := c.newTaskActionCR(actionID, executorv1.ActionTypeCondition, isRoot)
 		if !isRoot {
 			if _, err := c.setParentOwnership(ctx, taskAction, actionID.Run, *action.ParentActionName); err != nil {
 				return err
@@ -228,7 +229,7 @@ func (c *ActionsClient) AbortAction(ctx context.Context, actionID *common.Action
 	logger.Infof(ctx, "Aborting action %s (reason: %v)", taskActionName, reason)
 
 	taskAction := &executorv1.TaskAction{}
-	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: taskActionName, Namespace: flyteNamespace}, taskAction); err != nil {
+	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: taskActionName, Namespace: c.namespace}, taskAction); err != nil {
 		return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
 
@@ -248,7 +249,7 @@ func (c *ActionsClient) PutStatus(ctx context.Context, actionID *common.ActionId
 	taskAction := &executorv1.TaskAction{}
 	if err := c.k8sClient.Get(ctx, client.ObjectKey{
 		Name:      taskActionName,
-		Namespace: flyteNamespace,
+		Namespace: c.namespace,
 	}, taskAction); err != nil {
 		return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
@@ -293,7 +294,7 @@ func (c *ActionsClient) Signal(ctx context.Context, actionID *common.ActionIdent
 
 	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		taskAction := &executorv1.TaskAction{}
-		if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: taskActionName, Namespace: flyteNamespace}, taskAction); err != nil {
+		if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: taskActionName, Namespace: c.namespace}, taskAction); err != nil {
 			if apierrors.IsNotFound(err) {
 				return connect.NewError(connect.CodeNotFound, fmt.Errorf("condition action %s not found", taskActionName))
 			}
@@ -357,7 +358,7 @@ func literalPrimitiveKind(value *core.Literal) (core.SimpleType, bool) {
 func (c *ActionsClient) ListRunActions(ctx context.Context, runID *common.RunIdentifier) ([]*executorv1.TaskAction, error) {
 	taskActionList := &executorv1.TaskActionList{}
 	listOpts := []client.ListOption{
-		client.InNamespace(flyteNamespace),
+		client.InNamespace(c.namespace),
 		client.MatchingLabels{
 			"flyte.org/project": runID.Project,
 			"flyte.org/domain":  runID.Domain,
@@ -381,7 +382,7 @@ func (c *ActionsClient) ListChildActions(ctx context.Context, parentActionID *co
 	// List all TaskActions in the same run
 	taskActionList := &executorv1.TaskActionList{}
 	listOpts := []client.ListOption{
-		client.InNamespace(flyteNamespace),
+		client.InNamespace(c.namespace),
 		client.MatchingLabels{
 			"flyte.org/project": parentActionID.Run.Project,
 			"flyte.org/domain":  parentActionID.Run.Domain,
@@ -418,7 +419,7 @@ func (c *ActionsClient) GetTaskAction(ctx context.Context, actionID *common.Acti
 	taskAction := &executorv1.TaskAction{}
 	if err := c.k8sClient.Get(ctx, client.ObjectKey{
 		Name:      taskActionName,
-		Namespace: flyteNamespace,
+		Namespace: c.namespace,
 	}, taskAction); err != nil {
 		return nil, fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
@@ -482,7 +483,7 @@ func (c *ActionsClient) StartWatching(ctx context.Context) error {
 	}
 	c.mu.Unlock()
 
-	logger.Infof(ctx, "Starting TaskAction watcher for namespace: %s (workers: %d)", flyteNamespace, c.numWorkers)
+	logger.Infof(ctx, "Starting TaskAction watcher for namespace: %s (workers: %d)", c.namespace, c.numWorkers)
 
 	if c.sharedCache == nil {
 		return fmt.Errorf("shared cache is required for TaskAction informer")
@@ -847,11 +848,11 @@ func (c *ActionsClient) markTerminalStatusRecorded(ctx context.Context, taskActi
 
 // newTaskActionCR builds the CR skeleton (name, namespace, labels) shared by
 // all action types.
-func newTaskActionCR(actionID *common.ActionIdentifier, actionType string, isRoot bool) *executorv1.TaskAction {
+func (c *ActionsClient) newTaskActionCR(actionID *common.ActionIdentifier, actionType string, isRoot bool) *executorv1.TaskAction {
 	return &executorv1.TaskAction{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      buildTaskActionName(actionID),
-			Namespace: flyteNamespace,
+			Namespace: c.namespace,
 			Labels: map[string]string{
 				"flyte.org/project":     actionID.Run.Project,
 				"flyte.org/domain":      actionID.Run.Domain,
@@ -875,7 +876,7 @@ func (c *ActionsClient) setParentOwnership(ctx context.Context, child *executorv
 	parentName := buildTaskActionName(parentID)
 
 	parent := &executorv1.TaskAction{}
-	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: parentName, Namespace: flyteNamespace}, parent); err != nil {
+	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: parentName, Namespace: c.namespace}, parent); err != nil {
 		return nil, fmt.Errorf("failed to get parent TaskAction %s: %w", parentName, err)
 	}
 

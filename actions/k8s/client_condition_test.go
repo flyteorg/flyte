@@ -32,9 +32,10 @@ func newConditionClient(t *testing.T) *ActionsClient {
 	require.NoError(t, corev1.AddToScheme(scheme)) // EnsureNamespaceExists needs v1.Namespace
 	require.NoError(t, executorv1.AddToScheme(scheme))
 	parent := &executorv1.TaskAction{
-		ObjectMeta: metav1.ObjectMeta{Name: "run1-a0", Namespace: flyteNamespace},
+		ObjectMeta: metav1.ObjectMeta{Name: "run1-a0", Namespace: "flyte"},
 	}
 	return &ActionsClient{
+		namespace: "flyte",
 		k8sClient: fake.NewClientBuilder().
 			WithScheme(scheme).
 			WithObjects(parent).
