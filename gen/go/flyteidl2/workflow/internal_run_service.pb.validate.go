@@ -804,6 +804,76 @@ func (m *UpdateActionStatusRequest) validate(all bool) error {
 		}
 	}
 
+	if m.Output != nil {
+
+		if all {
+			switch v := interface{}(m.GetOutput()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UpdateActionStatusRequestValidationError{
+						field:  "Output",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UpdateActionStatusRequestValidationError{
+						field:  "Output",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetOutput()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UpdateActionStatusRequestValidationError{
+					field:  "Output",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if m.Principal != nil {
+
+		if all {
+			switch v := interface{}(m.GetPrincipal()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UpdateActionStatusRequestValidationError{
+						field:  "Principal",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UpdateActionStatusRequestValidationError{
+						field:  "Principal",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetPrincipal()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UpdateActionStatusRequestValidationError{
+					field:  "Principal",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if m.AbortReason != nil {
+		// no validation rules for AbortReason
+	}
+
 	if len(errors) > 0 {
 		return UpdateActionStatusRequestMultiError(errors)
 	}
