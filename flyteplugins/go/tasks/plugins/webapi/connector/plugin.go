@@ -251,7 +251,9 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 		return nil, fmt.Errorf("failed to get task from connector with %v", err)
 	}
 	// Track the status the connector reports back (RUNNING/SUCCEEDED/FAILED/...) per GetTask.
-	p.getTaskPhase.WithLabelValues(res.GetResource().GetPhase().String()).Inc()
+	if p.getTaskPhase != nil {
+		p.getTaskPhase.WithLabelValues(res.GetResource().GetPhase().String()).Inc()
+	}
 	return ResourceWrapper{
 		Phase:             res.GetResource().GetPhase(),
 		Outputs:           res.GetResource().GetOutputs(),
