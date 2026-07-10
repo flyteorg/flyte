@@ -88,7 +88,6 @@ func TestEndToEnd(t *testing.T) {
 		connectorPlugin := newMockAsyncConnectorPlugin()
 		connectorPlugin.PluginLoader = func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &Plugin{
-				metricScope:  iCtx.MetricsScope(),
 				getTaskPhase: iCtx.MetricsScope().MustNewCounterVec("connector_get_task_phase", "GetTask responses by phase", "phase"),
 				cfg:          GetConfig(),
 				cs: &ClientSet{
@@ -260,7 +259,6 @@ func newMockAsyncConnectorPlugin() webapi.PluginEntry {
 		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task", "spark"},
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &Plugin{
-				metricScope:  iCtx.MetricsScope(),
 				getTaskPhase: iCtx.MetricsScope().MustNewCounterVec("connector_get_task_phase", "GetTask responses by phase", "phase"),
 				cfg:          &cfg,
 				cs: &ClientSet{

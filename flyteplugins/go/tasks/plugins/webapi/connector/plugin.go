@@ -26,7 +26,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
-	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	connectorPb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/connector"
 	flyteIdl "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
@@ -73,7 +72,6 @@ func (r Registry) getSupportedTaskTypes() []string {
 }
 
 type Plugin struct {
-	metricScope  promutils.Scope
 	getTaskPhase *prometheus.CounterVec
 	cfg          *Config
 	cs           *ClientSet
@@ -489,7 +487,6 @@ func newConnectorPlugin(connectorService *ConnectorService) webapi.PluginEntry {
 			connectorService.SetSupportedTaskType(supportedTaskTypes)
 			scope := iCtx.MetricsScope()
 			plugin := &Plugin{
-				metricScope: scope,
 				getTaskPhase: scope.MustNewCounterVec("connector_get_task_phase",
 					"GetTask responses from connectors, by returned task phase", "phase"),
 				cfg:      cfg,
