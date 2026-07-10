@@ -20,8 +20,8 @@ var defaultConfig = &Config{
 		Burst:     2000,
 		Timeout:   "30s",
 	},
-	WatchBufferSize: 100,
-	WatchWorkers:    10,
+	WatchBufferSize: 1000,
+	WatchWorkers:    100,
 	RunServiceURL:   "http://localhost:8090",
 	// 8M slots × 8 bytes/pointer = 64 MB; can track ~8M unique actions.
 	RecordFilterSize: 1 << 23,
