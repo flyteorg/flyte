@@ -6106,6 +6106,28 @@ Vault Secret Manager config.
   role: flyte
   
 
+disableCreateMutatingWebhookConfig (bool)
+------------------------------------------------------------------------------------------------------------------------
+
+Disable registration of the MutatingWebhookConfiguration, leaving it to be managed out of band.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+namespaceSelector (v1.LabelSelector)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
 config.AWSSecretManagerConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
