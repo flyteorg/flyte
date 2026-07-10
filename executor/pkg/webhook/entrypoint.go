@@ -26,7 +26,7 @@ const (
 func Setup(ctx context.Context, kubeClient kubernetes.Interface, cfg *webhookConfig.Config,
 	defaultNamespace string, scope promutils.Scope, mgr manager.Manager) error {
 
-	if err := InitCerts(ctx, kubeClient, cfg); err != nil {
+	if err := InitCerts(ctx, kubeClient, cfg, defaultNamespace); err != nil {
 		return fmt.Errorf("webhook: failed to initialize certs: %w", err)
 	}
 
