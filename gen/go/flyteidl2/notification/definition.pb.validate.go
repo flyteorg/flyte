@@ -393,6 +393,8 @@ func (m *ActionPausedNotificationTemplateData) validate(all bool) error {
 
 	// no validation rules for Description
 
+	// no validation rules for PromptType
+
 	if len(errors) > 0 {
 		return ActionPausedNotificationTemplateDataMultiError(errors)
 	}

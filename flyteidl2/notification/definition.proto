@@ -45,6 +45,12 @@ message ActionPausedNotificationTemplateData {
 
   // Description of the condition.
   string description = 3;
+
+  // How to render the prompt: "TEXT", "MARKDOWN", or "" when unspecified.
+  // Mirrors flyteidl2.workflow.ConditionPromptType with the enum prefix
+  // trimmed (the workflow package cannot be imported here without an import
+  // cycle through flyteidl2/task/run.proto).
+  string prompt_type = 4;
 }
 
 enum HttpMethod {
