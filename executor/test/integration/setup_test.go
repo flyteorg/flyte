@@ -158,7 +158,7 @@ func TestMain(m *testing.M) {
 
 	// Actions half: the client that Enqueues CRs and watches them back.
 	runClient = &recordingRunClient{}
-	actionsClient = actionsk8s.NewActionsClient(k8sClient, mgr.GetCache(), 32, 1, runClient, 0, promutils.NewScope("integration_actions"))
+	actionsClient = actionsk8s.NewActionsClient(k8sClient, mgr.GetCache(), "flyte", 32, 1, runClient, 0, promutils.NewScope("integration_actions"))
 	if err := actionsClient.StartWatching(ctx); err != nil {
 		log.Printf("Failed to start actions watcher: %v", err)
 		return
