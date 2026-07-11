@@ -191,10 +191,6 @@ func TestBuildTaskActionName(t *testing.T) {
 	})
 }
 
-func TestFlyteNamespace(t *testing.T) {
-	assert.Equal(t, "flyte", flyteNamespace)
-}
-
 func TestExtractTaskCacheKey(t *testing.T) {
 	t.Run("returns cache key for task action", func(t *testing.T) {
 		action := &actions.Action{

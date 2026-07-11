@@ -50,6 +50,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	actionsClient := actionsk8s.NewActionsClient(
 		sc.K8sClient,
 		sc.K8sCache,
+		sc.Namespace,
 		cfg.WatchBufferSize,
 		cfg.WatchWorkers,
 		runClient,

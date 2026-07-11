@@ -432,6 +432,26 @@ func (r *actionRepo) UpdateActionPhase(
 	return nil
 }
 
+// UpdateActionDetailedInfo replaces the serialized RunInfo (detailed_info column).
+func (r *actionRepo) UpdateActionDetailedInfo(ctx context.Context, actionID *common.ActionIdentifier, detailedInfo []byte) error {
+	result, err := r.db.ExecContext(ctx,
+		`UPDATE actions SET detailed_info = $1, updated_at = $2
+		 WHERE project = $3 AND domain = $4 AND run_name = $5 AND name = $6`,
+		detailedInfo, time.Now(),
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+	return nil
+}
+
 // AbortAction marks only the targeted action as ABORTED and sets abort_requested_at.
 // K8s cascades CRD deletion to descendants via OwnerReferences; the action service
 // informer handles marking them ABORTED in DB when their CRDs are deleted.

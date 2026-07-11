@@ -15,6 +15,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/util/retry"
 	toolscache "k8s.io/client-go/tools/cache"
 	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -44,20 +45,23 @@ type ActionUpdate struct {
 	TaskType         string
 	ShortName        string
 	ErrorState       *executorv1.ErrorState
+	// SignalValue is the resolved signal payload of a condition action, carried
+	// inline (never an outputs.pb). Nil for tasks and unsignalled conditions.
+	SignalValue *core.Literal
 }
 
 const (
 	labelTerminalStatusRecorded = "flyte.org/terminal-status-recorded"
-	// flyteNamespace is the single Kubernetes namespace used for all Flyte resources.
-	flyteNamespace = "flyte"
 )
 
 // ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
 type ActionsClient struct {
 	k8sClient   client.WithWatch
 	sharedCache ctrlcache.Cache
-	bufferSize  int
-	runClient   workflowconnect.InternalRunServiceClient
+	// namespace is the single Kubernetes namespace used for all Flyte resources.
+	namespace  string
+	bufferSize int
+	runClient  workflowconnect.InternalRunServiceClient
 	// recordedFilter deduplicates RecordAction calls across watch reconnects.
 	recordedFilter fastcheck.Filter
 
@@ -89,13 +93,14 @@ type ActionsClient struct {
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) *ActionsClient {
+func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) *ActionsClient {
 	if numWorkers <= 0 {
 		numWorkers = 1
 	}
 	c := &ActionsClient{
 		k8sClient:   k8sClient,
 		sharedCache: sharedCache,
+		namespace:   namespace,
 		bufferSize:  bufferSize,
 		numWorkers:  numWorkers,
 		runClient:   runClient,
@@ -125,49 +130,15 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 
 	switch action.GetSpec().(type) {
 	case *actions.Action_Task:
-		taskActionName := buildTaskActionName(actionID)
-		if err := k8sutil.EnsureNamespaceExists(ctx, c.k8sClient, flyteNamespace); err != nil {
-			return fmt.Errorf("failed to ensure namespace %s: %w", flyteNamespace, err)
+		if err := k8sutil.EnsureNamespaceExists(ctx, c.k8sClient, c.namespace); err != nil {
+			return fmt.Errorf("failed to ensure namespace %s: %w", c.namespace, err)
 		}
-		taskAction := &executorv1.TaskAction{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      taskActionName,
-				Namespace: flyteNamespace,
-				Labels: map[string]string{
-					"flyte.org/project":     actionID.Run.Project,
-					"flyte.org/domain":      actionID.Run.Domain,
-					"flyte.org/run":         actionID.Run.Name,
-					"flyte.org/action":      actionID.Name,
-					"flyte.org/action-type": "task", // TODO: derive from action.Spec
-					"flyte.org/is-root":     fmt.Sprintf("%t", isRoot),
-				},
-			},
-			Spec: executorv1.TaskActionSpec{},
-		}
-		var parentTaskAction *executorv1.TaskAction
+		taskAction := c.newTaskActionCR(actionID, executorv1.ActionTypeTask, isRoot)
 		// Set OwnerReference to parent so K8s cascades deletion to children.
 		if !isRoot {
-			parentID := &common.ActionIdentifier{
-				Run:  actionID.Run,
-				Name: *action.ParentActionName,
-			}
-			parentName := buildTaskActionName(parentID)
-
-			parent := &executorv1.TaskAction{}
-			if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: parentName, Namespace: flyteNamespace}, parent); err != nil {
-				return fmt.Errorf("failed to get parent TaskAction %s: %w", parentName, err)
-			}
-			parentTaskAction = parent
-
-			blockOwnerDeletion := true
-			taskAction.OwnerReferences = []metav1.OwnerReference{
-				{
-					APIVersion:         "flyte.org/v1",
-					Kind:               "TaskAction",
-					Name:               parent.Name,
-					UID:                parent.UID,
-					BlockOwnerDeletion: &blockOwnerDeletion,
-				},
+			parentTaskAction, err := c.setParentOwnership(ctx, taskAction, actionID.Run, *action.ParentActionName)
+			if err != nil {
+				return err
 			}
 			// For child actions, inherit parent's run context
 			inheritRunContextFromParentTaskAction(taskAction, parentTaskAction)
@@ -189,10 +160,50 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 		}
 
 		if err := c.k8sClient.Create(ctx, taskAction); err != nil {
-			return fmt.Errorf("failed to create TaskAction CR %s: %w", taskActionName, err)
+			return fmt.Errorf("failed to create TaskAction CR %s: %w", taskAction.Name, err)
 		}
 
-		logger.Infof(ctx, "Created TaskAction CR: %s", taskActionName)
+		logger.Infof(ctx, "Created TaskAction CR: %s", taskAction.Name)
+	case *actions.Action_Condition:
+		cond := action.GetCondition()
+		// Validate the declared type at enqueue time so bad specs fail fast
+		// instead of becoming unsignalable CRs.
+		if err := validateConditionDeclaredType(cond); err != nil {
+			return connect.NewError(connect.CodeInvalidArgument, err)
+		}
+		if err := k8sutil.EnsureNamespaceExists(ctx, c.k8sClient, c.namespace); err != nil {
+			return fmt.Errorf("failed to ensure namespace %s: %w", c.namespace, err)
+		}
+		taskAction := c.newTaskActionCR(actionID, executorv1.ActionTypeCondition, isRoot)
+		if !isRoot {
+			if _, err := c.setParentOwnership(ctx, taskAction, actionID.Run, *action.ParentActionName); err != nil {
+				return err
+			}
+		}
+
+		actionSpec := buildActionSpec(action, runSpec)
+		if err := taskAction.Spec.SetActionSpec(actionSpec); err != nil {
+			return fmt.Errorf("failed to set action spec: %w", err)
+		}
+		taskAction.Spec.ActionType = executorv1.ActionTypeCondition
+		condBytes, err := proto.Marshal(cond)
+		if err != nil {
+			return fmt.Errorf("failed to marshal condition spec: %w", err)
+		}
+		taskAction.Spec.ConditionSpec = condBytes
+		// Unlike task actions, a condition runs no plugin or pod — the CR only
+		// carries the ConditionSpec and stays pending until an external signal
+		// resolves it. So no TaskTemplate or CacheKey is needed here.
+
+		if err := c.k8sClient.Create(ctx, taskAction); err != nil {
+			if apierrors.IsAlreadyExists(err) {
+				logger.Infof(ctx, "TaskAction CR %s already exists, skipping create", taskAction.Name)
+				return nil
+			}
+			return fmt.Errorf("failed to create condition TaskAction CR %s: %w", taskAction.Name, err)
+		}
+
+		logger.Infof(ctx, "Created condition TaskAction CR: %s", taskAction.Name)
 	case *actions.Action_Trace:
 		// For trace action, we only need to record result in RunService as it is already computed in SDK runtime
 		recordReq := &workflow.RecordActionRequest{
@@ -230,7 +241,7 @@ func (c *ActionsClient) AbortAction(ctx context.Context, actionID *common.Action
 	logger.Infof(ctx, "Aborting action %s (reason: %v)", taskActionName, reason)
 
 	taskAction := &executorv1.TaskAction{}
-	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: taskActionName, Namespace: flyteNamespace}, taskAction); err != nil {
+	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: taskActionName, Namespace: c.namespace}, taskAction); err != nil {
 		return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
 
@@ -250,7 +261,7 @@ func (c *ActionsClient) PutStatus(ctx context.Context, actionID *common.ActionId
 	taskAction := &executorv1.TaskAction{}
 	if err := c.k8sClient.Get(ctx, client.ObjectKey{
 		Name:      taskActionName,
-		Namespace: flyteNamespace,
+		Namespace: c.namespace,
 	}, taskAction); err != nil {
 		return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
@@ -277,11 +288,89 @@ func (c *ActionsClient) PutStatus(ctx context.Context, actionID *common.ActionId
 	return nil
 }
 
+// Signal delivers the resolved value to a paused condition action by writing
+// status.signalValue/signalledBy/signalledAt. The reconciler is the single
+// writer of status.conditions[] and flips the CR to Succeeded when it observes
+// the value, so validation here is synchronous but the transition is not.
+func (c *ActionsClient) Signal(ctx context.Context, actionID *common.ActionIdentifier, value *core.Literal, signalledBy string) error {
+	kind, ok := literalPrimitiveKind(value)
+	if !ok {
+		return connect.NewError(connect.CodeInvalidArgument,
+			fmt.Errorf("signal value must be a concrete bool/int/float/str literal"))
+	}
+	valueBytes, err := proto.Marshal(value)
+	if err != nil {
+		return fmt.Errorf("failed to marshal signal value: %w", err)
+	}
+	taskActionName := buildTaskActionName(actionID)
+
+	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		taskAction := &executorv1.TaskAction{}
+		if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: taskActionName, Namespace: c.namespace}, taskAction); err != nil {
+			if apierrors.IsNotFound(err) {
+				return connect.NewError(connect.CodeNotFound, fmt.Errorf("condition action %s not found", taskActionName))
+			}
+			return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
+		}
+		if taskAction.Spec.ActionType != executorv1.ActionTypeCondition {
+			return connect.NewError(connect.CodeFailedPrecondition,
+				fmt.Errorf("action %s is not a condition", taskActionName))
+		}
+		if existing := SignalValueFromStatus(ctx, taskAction); existing != nil {
+			if proto.Equal(existing, value) {
+				return nil // idempotent retry of the same signal
+			}
+			return connect.NewError(connect.CodeFailedPrecondition,
+				fmt.Errorf("condition %s already signalled with a different value", taskActionName))
+		}
+		if isTerminalPhase(GetPhaseFromConditions(taskAction)) {
+			return connect.NewError(connect.CodeFailedPrecondition,
+				fmt.Errorf("condition %s already completed", taskActionName))
+		}
+
+		condSpec := &workflow.ConditionAction{}
+		if err := proto.Unmarshal(taskAction.Spec.ConditionSpec, condSpec); err != nil {
+			return fmt.Errorf("failed to unmarshal condition spec for %s: %w", taskActionName, err)
+		}
+		if declared := condSpec.GetType().GetSimple(); declared != kind {
+			return connect.NewError(connect.CodeInvalidArgument,
+				fmt.Errorf("signal value type %s does not match declared condition type %s", kind, declared))
+		}
+
+		now := metav1.Now()
+		taskAction.Status.SignalValue = valueBytes
+		taskAction.Status.SignalledBy = signalledBy
+		taskAction.Status.SignalledAt = &now
+		if err := c.k8sClient.Status().Update(ctx, taskAction); err != nil {
+			return err
+		}
+		logger.Infof(ctx, "Signalled condition TaskAction %s (by %q)", taskActionName, signalledBy)
+		return nil
+	})
+}
+
+// literalPrimitiveKind maps a concrete signal Literal to the SimpleType it
+// would satisfy. ok is false for empty literals and non-primitive values.
+func literalPrimitiveKind(value *core.Literal) (core.SimpleType, bool) {
+	switch value.GetScalar().GetPrimitive().GetValue().(type) {
+	case *core.Primitive_Boolean:
+		return core.SimpleType_BOOLEAN, true
+	case *core.Primitive_Integer:
+		return core.SimpleType_INTEGER, true
+	case *core.Primitive_FloatValue:
+		return core.SimpleType_FLOAT, true
+	case *core.Primitive_StringValue:
+		return core.SimpleType_STRING, true
+	default:
+		return core.SimpleType_NONE, false
+	}
+}
+
 // ListRunActions lists all TaskActions belonging to a run.
 func (c *ActionsClient) ListRunActions(ctx context.Context, runID *common.RunIdentifier) ([]*executorv1.TaskAction, error) {
 	taskActionList := &executorv1.TaskActionList{}
 	listOpts := []client.ListOption{
-		client.InNamespace(flyteNamespace),
+		client.InNamespace(c.namespace),
 		client.MatchingLabels{
 			"flyte.org/project": runID.Project,
 			"flyte.org/domain":  runID.Domain,
@@ -305,7 +394,7 @@ func (c *ActionsClient) ListChildActions(ctx context.Context, parentActionID *co
 	// List all TaskActions in the same run
 	taskActionList := &executorv1.TaskActionList{}
 	listOpts := []client.ListOption{
-		client.InNamespace(flyteNamespace),
+		client.InNamespace(c.namespace),
 		client.MatchingLabels{
 			"flyte.org/project": parentActionID.Run.Project,
 			"flyte.org/domain":  parentActionID.Run.Domain,
@@ -342,7 +431,7 @@ func (c *ActionsClient) GetTaskAction(ctx context.Context, actionID *common.Acti
 	taskAction := &executorv1.TaskAction{}
 	if err := c.k8sClient.Get(ctx, client.ObjectKey{
 		Name:      taskActionName,
-		Namespace: flyteNamespace,
+		Namespace: c.namespace,
 	}, taskAction); err != nil {
 		return nil, fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
@@ -410,7 +499,7 @@ func (c *ActionsClient) StartWatching(ctx context.Context) error {
 	}
 	c.mu.Unlock()
 
-	logger.Infof(ctx, "Starting TaskAction watcher for namespace: %s (workers: %d)", flyteNamespace, c.numWorkers)
+	logger.Infof(ctx, "Starting TaskAction watcher for namespace: %s (workers: %d)", c.namespace, c.numWorkers)
 
 	if c.sharedCache == nil {
 		return fmt.Errorf("shared cache is required for TaskAction informer")
@@ -548,7 +637,7 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 // getLatestFromCache reads the current TaskAction from the shared informer cache.
 func (c *ActionsClient) getLatestFromCache(ctx context.Context, name string) (*executorv1.TaskAction, bool, error) {
 	ta := &executorv1.TaskAction{}
-	if err := c.sharedCache.Get(ctx, client.ObjectKey{Name: name, Namespace: flyteNamespace}, ta); err != nil {
+	if err := c.sharedCache.Get(ctx, client.ObjectKey{Name: name, Namespace: c.namespace}, ta); err != nil {
 		if apierrors.IsNotFound(err) {
 			return nil, false, nil
 		}
@@ -599,12 +688,27 @@ func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, e
 		ParentActionName: parentName,
 		StateJSON:        taskAction.Status.StateJSON,
 		Phase:            phase,
-		OutputUri:        buildOutputUri(ctx, taskAction),
+		OutputUri:        BuildOutputUri(ctx, taskAction),
 		IsDeleted:        eventType == watch.Deleted,
 		TaskType:         taskAction.Spec.TaskType,
 		ShortName:        shortName,
 		ErrorState:       taskAction.Status.ErrorState,
+		SignalValue:      SignalValueFromStatus(ctx, taskAction),
 	}
+}
+
+// SignalValueFromStatus unmarshals the condition signal value persisted on the
+// CR status. Returns nil when absent (tasks, unsignalled conditions) or invalid.
+func SignalValueFromStatus(ctx context.Context, taskAction *executorv1.TaskAction) *core.Literal {
+	if len(taskAction.Status.SignalValue) == 0 {
+		return nil
+	}
+	value := &core.Literal{}
+	if err := proto.Unmarshal(taskAction.Status.SignalValue, value); err != nil {
+		logger.Warnf(ctx, "failed to unmarshal signal value for %s: %v", taskAction.Name, err)
+		return nil
+	}
+	return value
 }
 
 func (c *ActionsClient) shouldSkipTaskAction(taskAction *executorv1.TaskAction) bool {
@@ -652,7 +756,14 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				InputUri: taskAction.Spec.InputURI,
 				Group:    taskAction.Spec.Group,
 			}
-			if taskAction.Spec.TaskType != "" {
+			if taskAction.Spec.ActionType == executorv1.ActionTypeCondition {
+				condSpec := &workflow.ConditionAction{}
+				if err := proto.Unmarshal(taskAction.Spec.ConditionSpec, condSpec); err != nil {
+					logger.Warnf(ctx, "Failed to unmarshal condition spec for %s: %v", update.ActionID.Name, err)
+				} else {
+					recordReq.Spec = &workflow.RecordActionRequest_Condition{Condition: condSpec}
+				}
+			} else if taskAction.Spec.TaskType != "" {
 				ta := &workflow.TaskAction{
 					Id: &task.TaskIdentifier{
 						Project: taskAction.Spec.Project,
@@ -721,6 +832,18 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 			ActionId: update.ActionID,
 			Status:   status,
 		}
+		// On terminal SUCCEEDED of a signalled condition, ship the resolved
+		// value and actor to the run-service DB.
+		if update.Phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED && update.SignalValue != nil {
+			statusReq.Output = update.SignalValue
+			if taskAction.Status.SignalledBy != "" {
+				statusReq.Principal = &common.EnrichedIdentity{
+					Principal: &common.EnrichedIdentity_User{
+						User: &common.User{Id: &common.UserIdentifier{Subject: taskAction.Status.SignalledBy}},
+					},
+				}
+			}
+		}
 		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
 		} else if isTerminalPhase(update.Phase) && !update.IsDeleted {
@@ -754,6 +877,9 @@ func GetPhaseFromConditions(taskAction *executorv1.TaskAction) common.ActionPhas
 			}
 		case string(executorv1.ConditionTypeFailed):
 			if cond.Status == "True" {
+				if cond.Reason == string(executorv1.ConditionReasonTimedOut) {
+					return common.ActionPhase_ACTION_PHASE_TIMED_OUT
+				}
 				return common.ActionPhase_ACTION_PHASE_FAILED
 			}
 		case string(executorv1.ConditionTypeProgressing):
@@ -765,6 +891,8 @@ func GetPhaseFromConditions(taskAction *executorv1.TaskAction) common.ActionPhas
 					return common.ActionPhase_ACTION_PHASE_INITIALIZING
 				case string(executorv1.ConditionReasonExecuting):
 					return common.ActionPhase_ACTION_PHASE_RUNNING
+				case string(executorv1.ConditionReasonPaused):
+					return common.ActionPhase_ACTION_PHASE_PAUSED
 				}
 			}
 		}
@@ -799,6 +927,65 @@ func (c *ActionsClient) markTerminalStatusRecorded(ctx context.Context, taskActi
 	return nil
 }
 
+// newTaskActionCR builds the CR skeleton (name, namespace, labels) shared by
+// all action types.
+func (c *ActionsClient) newTaskActionCR(actionID *common.ActionIdentifier, actionType string, isRoot bool) *executorv1.TaskAction {
+	return &executorv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      buildTaskActionName(actionID),
+			Namespace: c.namespace,
+			Labels: map[string]string{
+				"flyte.org/project":     actionID.Run.Project,
+				"flyte.org/domain":      actionID.Run.Domain,
+				"flyte.org/run":         actionID.Run.Name,
+				"flyte.org/action":      actionID.Name,
+				"flyte.org/action-type": actionType,
+				"flyte.org/is-root":     fmt.Sprintf("%t", isRoot),
+			},
+		},
+		Spec: executorv1.TaskActionSpec{},
+	}
+}
+
+// setParentOwnership resolves the parent TaskAction and wires an OwnerReference
+// on the child so K8s cascades deletion. Returns the parent CR.
+func (c *ActionsClient) setParentOwnership(ctx context.Context, child *executorv1.TaskAction, runID *common.RunIdentifier, parentActionName string) (*executorv1.TaskAction, error) {
+	parentID := &common.ActionIdentifier{
+		Run:  runID,
+		Name: parentActionName,
+	}
+	parentName := buildTaskActionName(parentID)
+
+	parent := &executorv1.TaskAction{}
+	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: parentName, Namespace: c.namespace}, parent); err != nil {
+		return nil, fmt.Errorf("failed to get parent TaskAction %s: %w", parentName, err)
+	}
+
+	blockOwnerDeletion := true
+	child.OwnerReferences = []metav1.OwnerReference{
+		{
+			APIVersion:         "flyte.org/v1",
+			Kind:               "TaskAction",
+			Name:               parent.Name,
+			UID:                parent.UID,
+			BlockOwnerDeletion: &blockOwnerDeletion,
+		},
+	}
+	return parent, nil
+}
+
+// validateConditionDeclaredType enforces that a condition's declared type is a
+// signalable simple primitive (bool/int/float/string), mirroring cloud's
+// enqueue-time validation.
+func validateConditionDeclaredType(cond *workflow.ConditionAction) error {
+	switch cond.GetType().GetSimple() {
+	case core.SimpleType_BOOLEAN, core.SimpleType_INTEGER, core.SimpleType_FLOAT, core.SimpleType_STRING:
+		return nil
+	default:
+		return fmt.Errorf("condition %q declares unsupported type %s; must be one of bool/int/float/str", cond.GetName(), cond.GetType())
+	}
+}
+
 // buildTaskActionName generates a Kubernetes-compliant name for the TaskAction.
 // For root actions (where action name == run name), the name is <run-id>-a0.
 // For child actions, the name is <run-id>-<action-id>.
@@ -810,10 +997,10 @@ func buildTaskActionName(actionID *common.ActionIdentifier) string {
 	return fmt.Sprintf("%s-%s", actionID.Run.Name, actionID.Name)
 }
 
-// buildOutputUri computes the action-specific output URI from the TaskAction spec.
+// BuildOutputUri computes the action-specific output URI from the TaskAction spec.
 // It uses the same path structure as the executor's ComputeActionOutputPath so that
 // the SDK can find outputs written by the executor.
-func buildOutputUri(ctx context.Context, ta *executorv1.TaskAction) string {
+func BuildOutputUri(ctx context.Context, ta *executorv1.TaskAction) string {
 	if ta.Spec.RunOutputBase == "" {
 		return ""
 	}
