@@ -15,8 +15,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/util/retry"
 	toolscache "k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/util/retry"
 	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -75,18 +75,12 @@ type ActionsClient struct {
 	watching    bool
 
 	// Worker pool: numWorkers goroutines each own one channel.
-	// Events are sharded by TaskAction name so per-resource ordering is preserved.
+	// Events are sharded by the TaskAction name, so per-resource ordering is preserved.
 	numWorkers int
 	workerChs  []chan watch.Event
 
-	// pending coalesces updates by TaskAction name: while a key is queued, further
-	// updates for it are dropped, and the worker reads the LATEST state from the
-	// cache when it runs — so a burst of queued→running→succeeded that piles up
-	// while workers are behind collapses to a single terminal notification. Deletes
-	// bypass this (they carry the tombstone, which has already left the cache).
-	// ponytail: one global lock; shard the map only if pending churn shows up hot.
-	pending   map[string]struct{}
-	pendingMu sync.Mutex
+	actionKeys   map[string]struct{}
+	actionKeysMu sync.Mutex
 
 	// getLatest reads the current TaskAction from the shared cache. Overridable in tests.
 	getLatest func(ctx context.Context, name string) (*executorv1.TaskAction, bool, error)
@@ -489,7 +483,7 @@ func (c *ActionsClient) StartWatching(ctx context.Context) error {
 	c.stopCh = make(chan struct{})
 	stopCh := c.stopCh // capture before releasing so workers reference the right channel
 	c.workerChs = make([]chan watch.Event, c.numWorkers)
-	c.pending = make(map[string]struct{})
+	c.actionKeys = make(map[string]struct{})
 	if c.getLatest == nil {
 		c.getLatest = c.getLatestFromCache
 	}
@@ -588,13 +582,13 @@ func (c *ActionsClient) dispatchEvent(taskAction *executorv1.TaskAction, eventTy
 
 	// Coalesce updates by key: if one is already queued, drop this — the queued
 	// item's worker will read the latest state from the cache when it runs.
-	c.pendingMu.Lock()
-	if _, already := c.pending[taskAction.Name]; already {
-		c.pendingMu.Unlock()
+	c.actionKeysMu.Lock()
+	if _, already := c.actionKeys[taskAction.Name]; already {
+		c.actionKeysMu.Unlock()
 		return
 	}
-	c.pending[taskAction.Name] = struct{}{}
-	c.pendingMu.Unlock()
+	c.actionKeys[taskAction.Name] = struct{}{}
+	c.actionKeysMu.Unlock()
 
 	c.workerChs[shard] <- watch.Event{Type: eventType, Object: taskAction.DeepCopy()}
 }
@@ -612,13 +606,13 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 		return
 	}
 
-	// Coalesced update: clear the pending marker BEFORE reading state so an update
+	// Coalesced update: clear the queued marker BEFORE reading state so an update
 	// arriving during processing re-enqueues and is not lost. Then read the LATEST
 	// object from the cache — collapsing any intermediate phases that piled up while
 	// the worker was busy into a single up-to-date notification.
-	c.pendingMu.Lock()
-	delete(c.pending, taskAction.Name)
-	c.pendingMu.Unlock()
+	c.actionKeysMu.Lock()
+	delete(c.actionKeys, taskAction.Name)
+	c.actionKeysMu.Unlock()
 
 	latest, found, err := c.getLatest(ctx, taskAction.Name)
 	if err != nil {

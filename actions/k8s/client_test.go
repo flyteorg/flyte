@@ -634,7 +634,7 @@ func newWorkerTestClient(numWorkers, bufSize int) *ActionsClient {
 	c := &ActionsClient{
 		numWorkers: numWorkers,
 		workerChs:  make([]chan watch.Event, numWorkers),
-		pending:    make(map[string]struct{}),
+		actionKeys: make(map[string]struct{}),
 	}
 	for i := range c.workerChs {
 		c.workerChs[i] = make(chan watch.Event, bufSize)
@@ -683,11 +683,11 @@ func TestDispatchEvent_CoalescesUpdatesForSameKey(t *testing.T) {
 	// Only ONE item is queued; the rest coalesce (the worker will read latest state).
 	assert.Equal(t, 1, len(c.workerChs[0]), "same-key updates must coalesce to one queued item")
 
-	// After the queued item is drained (pending marker cleared), a new update enqueues again.
+	// After the queued item is drained (queued marker cleared), a new update enqueues again.
 	<-c.workerChs[0]
-	c.pendingMu.Lock()
-	delete(c.pending, ta.Name)
-	c.pendingMu.Unlock()
+	c.actionKeysMu.Lock()
+	delete(c.actionKeys, ta.Name)
+	c.actionKeysMu.Unlock()
 	c.dispatchEvent(ta, watch.Modified)
 	assert.Equal(t, 1, len(c.workerChs[0]), "a fresh update after drain must enqueue again")
 }
@@ -726,7 +726,7 @@ func TestHandleWatchEvent_CoalescedReadsLatestPhase(t *testing.T) {
 		runClient:      mockClient,
 		recordedFilter: filter,
 		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
-		pending:        map[string]struct{}{"a3": {}}, // the key is queued
+		actionKeys:     map[string]struct{}{"a3": {}}, // the key is queued
 	}
 	// The executor advanced the CRD to SUCCEEDED before the worker ran.
 	c.getLatest = func(_ context.Context, name string) (*executorv1.TaskAction, bool, error) {
