@@ -630,7 +630,11 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 	if c.shouldSkipTaskAction(latest) {
 		return
 	}
-	c.handleTaskActionEvent(ctx, latest, watch.Modified)
+	// Forward the ORIGINAL event type: an object's first event is always Added and is
+	// never coalesced away (its marker cannot pre-exist), so Added survives to gate
+	// RecordAction below; dropped events are always behind a queued item whose
+	// latest-read captures their state.
+	c.handleTaskActionEvent(ctx, latest, event.Type)
 }
 
 // getLatestFromCache reads the current TaskAction from the shared informer cache.
@@ -740,10 +744,11 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		return
 	}
 
-	// On first sight of an action (any non-delete event — a coalesced first event may
-	// arrive as Modified, not Added): create the DB record, deduplicated via the bloom filter
-	// filter so replays and coalesced updates don't re-record.
-	if eventType != watch.Deleted {
+	// Create the DB record on first sight. ADDED always records (never coalesced away);
+	// other non-delete events record too when the dedup filter is configured, catching
+	// replays/reconnects without re-recording. With the filter explicitly disabled,
+	// only ADDED records — otherwise every update would trigger a RecordAction RPC.
+	if eventType == watch.Added || (c.recordedFilter != nil && eventType != watch.Deleted) {
 		actionKey := []byte(buildTaskActionName(update.ActionID))
 		isDuplicate := c.recordedFilter != nil && c.recordedFilter.Contains(ctx, actionKey)
 		if isDuplicate {

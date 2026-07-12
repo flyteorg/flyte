@@ -151,9 +151,6 @@ func TestNotifyRunService_UpdateActionStatusIncludesAttemptsAndCacheStatus(t *te
 	ta.Status.CacheStatus = core.CatalogCacheStatus_CACHE_HIT
 	update.Phase = common.ActionPhase_ACTION_PHASE_SUCCEEDED
 
-	// First sight of the action (no filter configured) records it before updating status.
-	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
 	mockClient.On("UpdateActionStatus", mock.Anything, mock.MatchedBy(func(req *connect.Request[workflow.UpdateActionStatusRequest]) bool {
 		status := req.Msg.GetStatus()
 		return status.GetPhase() == common.ActionPhase_ACTION_PHASE_SUCCEEDED &&
