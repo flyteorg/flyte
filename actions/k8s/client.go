@@ -52,7 +52,6 @@ type ActionUpdate struct {
 
 const (
 	labelTerminalStatusRecorded = "flyte.org/terminal-status-recorded"
-	defaultRecordFilterSize     = 1 << 23 // 8M slots x 8 bytes/pointer = 64 MB
 )
 
 // ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
@@ -106,13 +105,15 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, n
 		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 
-	if recordFilterSize <= 0 {
-		recordFilterSize = defaultRecordFilterSize
-	}
-	if filter, err := fastcheck.NewOppoBloomFilter(recordFilterSize, scope.NewSubScope("actions_filter")); err != nil {
-		logger.Warnf(context.Background(), "Failed to create record filter (size=%d): %v; proceeding without dedup", recordFilterSize, err)
-	} else {
-		c.recordedFilter = filter
+	// recordFilterSize defaults to 1<<23 via the config section; an explicit <=0
+	// disables RecordAction dedup (worst case: redundant idempotent RPCs).
+	if recordFilterSize > 0 {
+		filter, err := fastcheck.NewOppoBloomFilter(recordFilterSize, scope.NewSubScope("actions_filter"))
+		if err != nil {
+			logger.Warnf(context.Background(), "Failed to create record filter (size=%d): %v; proceeding without dedup", recordFilterSize, err)
+		} else {
+			c.recordedFilter = filter
+		}
 	}
 
 	return c
