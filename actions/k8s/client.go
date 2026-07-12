@@ -744,10 +744,13 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		return
 	}
 
-	// Create the DB record on first sight. ADDED always records (never coalesced away);
-	// other non-delete events record too when the dedup filter is configured, catching
-	// replays/reconnects without re-recording. With the filter explicitly disabled,
-	// only ADDED records — otherwise every update would trigger a RecordAction RPC.
+	// Create the DB record on first sight. ADDED always records: it is the first event
+	// the informer can deliver for an object (OnAdd fires once, before any update, all
+	// from one delivery goroutine), so its coalescing marker cannot pre-exist and it is
+	// never dropped. Other non-delete events record too when the dedup filter is
+	// configured, catching replays/reconnects without re-recording. With the filter
+	// explicitly disabled, only ADDED records — otherwise every update would trigger a
+	// RecordAction RPC.
 	if eventType == watch.Added || (c.recordedFilter != nil && eventType != watch.Deleted) {
 		actionKey := []byte(buildTaskActionName(update.ActionID))
 		isDuplicate := c.recordedFilter != nil && c.recordedFilter.Contains(ctx, actionKey)
