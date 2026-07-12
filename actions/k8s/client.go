@@ -52,7 +52,7 @@ type ActionUpdate struct {
 
 const (
 	labelTerminalStatusRecorded = "flyte.org/terminal-status-recorded"
-	defaultRecordFilterSize     = 1 << 20 // ~1M live actions, ~100 MiB
+	defaultRecordFilterSize     = 1 << 23 // 8M slots x 8 bytes/pointer = 64 MB
 )
 
 // ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
@@ -109,7 +109,7 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, n
 	if recordFilterSize <= 0 {
 		recordFilterSize = defaultRecordFilterSize
 	}
-	if filter, err := fastcheck.NewLRUCacheFilter(recordFilterSize, scope.NewSubScope("actions_filter")); err != nil {
+	if filter, err := fastcheck.NewOppoBloomFilter(recordFilterSize, scope.NewSubScope("actions_filter")); err != nil {
 		logger.Warnf(context.Background(), "Failed to create record filter (size=%d): %v; proceeding without dedup", recordFilterSize, err)
 	} else {
 		c.recordedFilter = filter
@@ -740,7 +740,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 	}
 
 	// On first sight of an action (any non-delete event — a coalesced first event may
-	// arrive as Modified, not Added): create the DB record, deduplicated via the LRU cache
+	// arrive as Modified, not Added): create the DB record, deduplicated via the bloom filter
 	// filter so replays and coalesced updates don't re-record.
 	if eventType != watch.Deleted {
 		actionKey := []byte(buildTaskActionName(update.ActionID))
