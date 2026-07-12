@@ -382,11 +382,6 @@ func (r *actionRepo) UpdateActionPhase(
 	args = append(args, phase, attempts, cacheStatus, now)
 	argIdx += 4
 
-	// startExpr is the basis for created_at and duration. created_at was stamped when
-	// RecordAction happened to run — which, under event coalescing/backlog, can be long
-	// after the action actually started, collapsing duration toward zero. When the
-	// caller supplies the action's true start (the CRD creationTimestamp), correct
-	// created_at to the earliest known value so duration reflects the real wall-clock.
 	startExpr := "created_at"
 	if startTime != nil {
 		startExpr = fmt.Sprintf("LEAST(created_at, $%d)", argIdx)
@@ -396,8 +391,6 @@ func (r *actionRepo) UpdateActionPhase(
 	}
 
 	if endTime != nil {
-		// Postgres evaluates SET expressions against the OLD row, so both ended_at and
-		// duration reference startExpr (which reads the OLD created_at) consistently.
 		queryBuilder.WriteString(fmt.Sprintf(", ended_at = COALESCE(ended_at, GREATEST($%d, %s))", argIdx, startExpr)) //nolint: staticcheck
 		args = append(args, *endTime)
 		argIdx++

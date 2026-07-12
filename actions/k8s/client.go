@@ -52,6 +52,7 @@ type ActionUpdate struct {
 
 const (
 	labelTerminalStatusRecorded = "flyte.org/terminal-status-recorded"
+	defaultRecordFilterSize     = 1 << 20 // ~1M live actions, ~100 MiB
 )
 
 // ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
@@ -79,8 +80,12 @@ type ActionsClient struct {
 	numWorkers int
 	workerChs  []chan watch.Event
 
-	actionKeys   map[string]struct{}
-	actionKeysMu sync.Mutex
+	// dispatchedActions tracks TaskAction names with an event already dispatched to a
+	// worker channel and not yet processed. Further events for the same action are
+	// dropped (coalesced) — the worker reads the latest state from the cache when it
+	// runs.
+	dispatchedActions   map[string]struct{}
+	dispatchedActionsMu sync.Mutex
 
 	// getLatest reads the current TaskAction from the shared cache. Overridable in tests.
 	getLatest func(ctx context.Context, name string) (*executorv1.TaskAction, bool, error)
@@ -101,13 +106,13 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, n
 		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 
-	if recordFilterSize > 0 {
-		filter, err := fastcheck.NewOppoBloomFilter(recordFilterSize, scope.NewSubScope("actions_filter"))
-		if err != nil {
-			logger.Warnf(context.Background(), "Failed to create record filter (size=%d): %v; proceeding without dedup", recordFilterSize, err)
-		} else {
-			c.recordedFilter = filter
-		}
+	if recordFilterSize <= 0 {
+		recordFilterSize = defaultRecordFilterSize
+	}
+	if filter, err := fastcheck.NewLRUCacheFilter(recordFilterSize, scope.NewSubScope("actions_filter")); err != nil {
+		logger.Warnf(context.Background(), "Failed to create record filter (size=%d): %v; proceeding without dedup", recordFilterSize, err)
+	} else {
+		c.recordedFilter = filter
 	}
 
 	return c
@@ -483,7 +488,7 @@ func (c *ActionsClient) StartWatching(ctx context.Context) error {
 	c.stopCh = make(chan struct{})
 	stopCh := c.stopCh // capture before releasing so workers reference the right channel
 	c.workerChs = make([]chan watch.Event, c.numWorkers)
-	c.actionKeys = make(map[string]struct{})
+	c.dispatchedActions = make(map[string]struct{})
 	if c.getLatest == nil {
 		c.getLatest = c.getLatestFromCache
 	}
@@ -573,22 +578,18 @@ func (c *ActionsClient) dispatchEvent(taskAction *executorv1.TaskAction, eventTy
 	_, _ = h.Write([]byte(taskAction.Name)) // FNV Write never returns an error
 	shard := h.Sum32() % uint32(c.numWorkers)
 
-	// Deletes carry the tombstone (the object has left the cache) and are terminal,
-	// so they are never coalesced.
 	if eventType == watch.Deleted {
 		c.workerChs[shard] <- watch.Event{Type: eventType, Object: taskAction.DeepCopy()}
 		return
 	}
 
-	// Coalesce updates by key: if one is already queued, drop this — the queued
-	// item's worker will read the latest state from the cache when it runs.
-	c.actionKeysMu.Lock()
-	if _, already := c.actionKeys[taskAction.Name]; already {
-		c.actionKeysMu.Unlock()
+	c.dispatchedActionsMu.Lock()
+	if _, already := c.dispatchedActions[taskAction.Name]; already {
+		c.dispatchedActionsMu.Unlock()
 		return
 	}
-	c.actionKeys[taskAction.Name] = struct{}{}
-	c.actionKeysMu.Unlock()
+	c.dispatchedActions[taskAction.Name] = struct{}{}
+	c.dispatchedActionsMu.Unlock()
 
 	c.workerChs[shard] <- watch.Event{Type: eventType, Object: taskAction.DeepCopy()}
 }
@@ -602,17 +603,20 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 
 	// Deletes carry the tombstone (the object is gone from the cache); process it directly.
 	if event.Type == watch.Deleted {
+		// Defensively clear any coalescing marker for the key. Per-key FIFO already
+		// guarantees the marked item was processed (and cleared) before this delete,
+		// so this is a no-op today — it keeps the delete path self-contained if event
+		// routing ever changes.
+		c.dispatchedActionsMu.Lock()
+		delete(c.dispatchedActions, taskAction.Name)
+		c.dispatchedActionsMu.Unlock()
 		c.handleTaskActionEvent(ctx, taskAction, watch.Deleted)
 		return
 	}
 
-	// Coalesced update: clear the queued marker BEFORE reading state so an update
-	// arriving during processing re-enqueues and is not lost. Then read the LATEST
-	// object from the cache — collapsing any intermediate phases that piled up while
-	// the worker was busy into a single up-to-date notification.
-	c.actionKeysMu.Lock()
-	delete(c.actionKeys, taskAction.Name)
-	c.actionKeysMu.Unlock()
+	c.dispatchedActionsMu.Lock()
+	delete(c.dispatchedActions, taskAction.Name)
+	c.dispatchedActionsMu.Unlock()
 
 	latest, found, err := c.getLatest(ctx, taskAction.Name)
 	if err != nil {
@@ -656,7 +660,7 @@ func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, e
 		parentName = *taskAction.Spec.ParentActionName
 	}
 
-	// Determine short name: use spec.ShortName if set, otherwise extract from template ID
+	// Determine a short name: use spec.ShortName if set, otherwise extract from template ID
 	shortName := taskAction.Spec.ShortName
 	if shortName == "" && len(taskAction.Spec.TaskTemplate) > 0 {
 		shortName = extractShortNameFromTemplate(taskAction.Spec.TaskTemplate)
@@ -736,7 +740,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 	}
 
 	// On first sight of an action (any non-delete event — a coalesced first event may
-	// arrive as Modified, not Added): create the DB record, deduplicated via the bloom
+	// arrive as Modified, not Added): create the DB record, deduplicated via the LRU cache
 	// filter so replays and coalesced updates don't re-record.
 	if eventType != watch.Deleted {
 		actionKey := []byte(buildTaskActionName(update.ActionID))

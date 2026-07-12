@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"io"
 	"time"
+
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 
 	"connectrpc.com/connect"
 	grpcstatus "google.golang.org/genproto/googleapis/rpc/status"
@@ -244,21 +245,15 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 	actionStatus := req.GetStatus()
 	var endTime *time.Time
 	if actionStatus.GetEndTime() != nil {
-		t := actionStatus.GetEndTime().AsTime()
-		endTime = &t
+		endTime = new(actionStatus.GetEndTime().AsTime())
 	} else if IsTerminalPhase(actionStatus.GetPhase()) {
 		// If no end time is provided but the phase is terminal, use now.
-		t := time.Now()
-		endTime = &t
+		endTime = new(time.Now())
 	}
 
-	// The caller may supply the action's true start (its CRD creationTimestamp) so that
-	// duration = ended_at - start is correct even when the status update is recorded
-	// late (coalesced/backlogged events would otherwise collapse created_at toward now).
 	var startTime *time.Time
 	if actionStatus.GetStartTime() != nil {
-		t := actionStatus.GetStartTime().AsTime()
-		startTime = &t
+		startTime = new(actionStatus.GetStartTime().AsTime())
 	}
 
 	if err := s.repo.ActionRepo().UpdateActionPhase(

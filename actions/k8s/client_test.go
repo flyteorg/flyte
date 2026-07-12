@@ -632,9 +632,9 @@ func TestNotifyRunService_RootActionAddedDoesNotPromoteParent(t *testing.T) {
 
 func newWorkerTestClient(numWorkers, bufSize int) *ActionsClient {
 	c := &ActionsClient{
-		numWorkers: numWorkers,
-		workerChs:  make([]chan watch.Event, numWorkers),
-		actionKeys: make(map[string]struct{}),
+		numWorkers:        numWorkers,
+		workerChs:         make([]chan watch.Event, numWorkers),
+		dispatchedActions: make(map[string]struct{}),
 	}
 	for i := range c.workerChs {
 		c.workerChs[i] = make(chan watch.Event, bufSize)
@@ -683,11 +683,11 @@ func TestDispatchEvent_CoalescesUpdatesForSameKey(t *testing.T) {
 	// Only ONE item is queued; the rest coalesce (the worker will read latest state).
 	assert.Equal(t, 1, len(c.workerChs[0]), "same-key updates must coalesce to one queued item")
 
-	// After the queued item is drained (queued marker cleared), a new update enqueues again.
+	// After the item is drained (dispatched marker cleared), a new update dispatches again.
 	<-c.workerChs[0]
-	c.actionKeysMu.Lock()
-	delete(c.actionKeys, ta.Name)
-	c.actionKeysMu.Unlock()
+	c.dispatchedActionsMu.Lock()
+	delete(c.dispatchedActions, ta.Name)
+	c.dispatchedActionsMu.Unlock()
 	c.dispatchEvent(ta, watch.Modified)
 	assert.Equal(t, 1, len(c.workerChs[0]), "a fresh update after drain must enqueue again")
 }
@@ -723,10 +723,10 @@ func TestHandleWatchEvent_CoalescedReadsLatestPhase(t *testing.T) {
 	require.NoError(t, err)
 
 	c := &ActionsClient{
-		runClient:      mockClient,
-		recordedFilter: filter,
-		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
-		actionKeys:     map[string]struct{}{"a3": {}}, // the key is queued
+		runClient:         mockClient,
+		recordedFilter:    filter,
+		subscribers:       make(map[string]map[chan *ActionUpdate]struct{}),
+		dispatchedActions: map[string]struct{}{"a3": {}}, // an event for a3 is already dispatched
 	}
 	// The executor advanced the CRD to SUCCEEDED before the worker ran.
 	c.getLatest = func(_ context.Context, name string) (*executorv1.TaskAction, bool, error) {
@@ -741,7 +741,7 @@ func TestHandleWatchEvent_CoalescedReadsLatestPhase(t *testing.T) {
 		return req.Msg.GetStatus().GetPhase() == common.ActionPhase_ACTION_PHASE_SUCCEEDED
 	})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
 
-	// The queued snapshot was RUNNING, but the worker reads the latest (SUCCEEDED).
+	// The dispatched snapshot was RUNNING, but the worker reads the latest (SUCCEEDED).
 	c.handleWatchEvent(ctx, watch.Event{Type: watch.Modified, Object: runningTaskAction("a3")})
 
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)

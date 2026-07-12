@@ -25,8 +25,9 @@ var defaultConfig = &Config{
 	WatchBufferSize: 1000,
 	WatchWorkers:    100,
 	RunServiceURL:   "http://localhost:8090",
-	// 8M slots × 8 bytes/pointer = 64 MB; can track ~8M unique actions.
-	RecordFilterSize: 1 << 23,
+	// LRU of recorded action keys (~1M live actions, ~100 MiB) to dedup RecordAction.
+	// Recency eviction keeps the live working set, so it need not hold all cumulative actions.
+	RecordFilterSize: 1 << 20,
 }
 
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
