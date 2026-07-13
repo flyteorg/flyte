@@ -506,7 +506,7 @@ func TestInsertEvents_ChunksOversizedBatch(t *testing.T) {
 	_, repo := setupActionEventDB(t)
 	ctx := context.Background()
 
-	const n = 8000 // > 7,281, forcing at least two chunks
+	const n = 7300 // > 7,281, forcing at least two chunks
 	events := make([]*models.ActionEvent, 0, n)
 	for i := 0; i < n; i++ {
 		e, err := models.NewActionEventModel(&workflow.ActionEvent{
