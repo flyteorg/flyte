@@ -602,10 +602,6 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 
 	// Deletes carry the tombstone (the object is gone from the cache); process it directly.
 	if event.Type == watch.Deleted {
-		// Defensively clear any coalescing marker for the key. Per-key FIFO already
-		// guarantees the marked item was processed (and cleared) before this delete,
-		// so this is a no-op today — it keeps the delete path self-contained if event
-		// routing ever changes.
 		c.dispatchedActionsMu.Lock()
 		delete(c.dispatchedActions, taskAction.Name)
 		c.dispatchedActionsMu.Unlock()
@@ -628,10 +624,6 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 	if c.shouldSkipTaskAction(latest) {
 		return
 	}
-	// Forward the ORIGINAL event type: an object's first event is always Added and is
-	// never coalesced away (its marker cannot pre-exist), so Added survives to gate
-	// RecordAction below; dropped events are always behind a queued item whose
-	// latest-read captures their state.
 	c.handleTaskActionEvent(ctx, latest, event.Type)
 }
 
