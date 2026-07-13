@@ -2815,6 +2815,8 @@ func (m *ListRunsRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for PausedActionsOnly
+
 	switch v := m.ScopeBy.(type) {
 	case *ListRunsRequest_Org:
 		if v == nil {
@@ -7101,8 +7103,6 @@ func (m *WatchWindowedActionsRequest_UpdateWindow) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for SelectedItemId
-
 	// no validation rules for OverscanBefore
 
 	// no validation rules for OverscanAfter
@@ -7154,6 +7154,35 @@ func (m *WatchWindowedActionsRequest_UpdateWindow) validate(all bool) error {
 	}
 
 	// no validation rules for NameFilter
+
+	switch v := m.WindowAnchor.(type) {
+	case *WatchWindowedActionsRequest_UpdateWindow_SelectedItemId:
+		if v == nil {
+			err := WatchWindowedActionsRequest_UpdateWindowValidationError{
+				field:  "WindowAnchor",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for SelectedItemId
+	case *WatchWindowedActionsRequest_UpdateWindow_AnchorFlatIndex:
+		if v == nil {
+			err := WatchWindowedActionsRequest_UpdateWindowValidationError{
+				field:  "WindowAnchor",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for AnchorFlatIndex
+	default:
+		_ = v // ensures v is used
+	}
 
 	if len(errors) > 0 {
 		return WatchWindowedActionsRequest_UpdateWindowMultiError(errors)

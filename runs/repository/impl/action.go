@@ -224,13 +224,13 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, up
 	}
 
 	result, err := tx.ExecContext(ctx,
-		`INSERT INTO actions (project, domain, run_name, name, parent_action_name, phase, run_source, action_type, action_group, task_project, task_domain, task_name, task_version, task_type, task_short_name, function_name, environment_name, action_spec, action_details, detailed_info, run_spec, attempts, cache_status, trigger_name, trigger_task_name, trigger_revision, created_at, ended_at, duration_ms)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, CASE WHEN $28::timestamptz IS NOT NULL THEN EXTRACT(EPOCH FROM (GREATEST($28::timestamptz, $27) - $27)) * 1000 ELSE NULL END)
+		`INSERT INTO actions (project, domain, run_name, name, parent_action_name, phase, run_source, action_type, action_group, task_project, task_domain, task_name, task_version, task_type, task_short_name, function_name, environment_name, action_spec, action_details, detailed_info, run_spec, attempts, cache_status, trigger_name, trigger_task_name, trigger_revision, created_at, ended_at, created_by, created_by_subject, duration_ms)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, CASE WHEN $28::timestamptz IS NOT NULL THEN EXTRACT(EPOCH FROM (GREATEST($28::timestamptz, $27) - $27)) * 1000 ELSE NULL END)
 		 ON CONFLICT DO NOTHING`,
 		action.Project, action.Domain, action.RunName, action.Name, action.ParentActionName, action.Phase, action.RunSource, action.ActionType, action.ActionGroup,
 		action.TaskProject, action.TaskDomain, action.TaskName, action.TaskVersion, action.TaskType, action.TaskShortName, action.FunctionName, action.EnvironmentName,
 		action.ActionSpec, action.ActionDetails, action.DetailedInfo, action.RunSpec, action.Attempts, action.CacheStatus,
-		action.TriggerName, action.TriggerTaskName, action.TriggerRevision, createdAt, action.EndedAt)
+		action.TriggerName, action.TriggerTaskName, action.TriggerRevision, createdAt, action.EndedAt, action.CreatedBy, action.CreatedBySubject)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create action: %w", err)
 	}
@@ -413,6 +413,26 @@ func (r *actionRepo) UpdateActionPhase(
 		r.notifyRunUpdate(ctx, actionID.Run)
 	}
 
+	return nil
+}
+
+// UpdateActionDetailedInfo replaces the serialized RunInfo (detailed_info column).
+func (r *actionRepo) UpdateActionDetailedInfo(ctx context.Context, actionID *common.ActionIdentifier, detailedInfo []byte) error {
+	result, err := r.db.ExecContext(ctx,
+		`UPDATE actions SET detailed_info = $1, updated_at = $2
+		 WHERE project = $3 AND domain = $4 AND run_name = $5 AND name = $6`,
+		detailedInfo, time.Now(),
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
 	return nil
 }
 

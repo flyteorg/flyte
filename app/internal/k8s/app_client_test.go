@@ -33,6 +33,9 @@ func testScheme(t *testing.T) *runtime.Scheme {
 	return s
 }
 
+// AppNamespace is the namespace all test clients are configured with.
+const AppNamespace = "flyte"
+
 // testRevision builds a Knative Revision object with a given ActualReplicas count.
 func testRevision(name, namespace string, actualReplicas int32) *servingv1.Revision {
 	return &servingv1.Revision{
@@ -59,7 +62,7 @@ func testClient(t *testing.T, objs ...client.Object) *AppK8sClient {
 		MaxRequestTimeout:     time.Hour,
 		WatchBufferSize:       100,
 	}
-	return NewAppK8sClient(fc, nil, cfg)
+	return NewAppK8sClient(fc, nil, AppNamespace, cfg)
 }
 
 // testApp builds a minimal flyteapp.App for use in tests.
@@ -119,6 +122,42 @@ func TestDeploy_InjectsInternalAppEndpointPattern(t *testing.T) {
 		}
 	}
 	assert.Equal(t, "http://{app_fqdn}-proj-dev.flyte.svc.cluster.local", pattern)
+}
+
+func TestDeploy_DefaultServiceAccount(t *testing.T) {
+	c := testClient(t)
+	c.cfg.DefaultServiceAccount = "flyte2"
+	require.NoError(t, c.Deploy(context.Background(), testApp("proj", "dev", "myapp", "nginx:latest")))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+	assert.Equal(t, "flyte2", ksvc.Spec.Template.Spec.ServiceAccountName)
+}
+
+func TestDeploy_AppServiceAccountOverridesDefault(t *testing.T) {
+	c := testClient(t)
+	c.cfg.DefaultServiceAccount = "flyte2"
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	app.Spec.SecurityContext = &flyteapp.SecurityContext{
+		RunAs: &flytecoreapp.Identity{K8SServiceAccount: "app-requested-sa"},
+	}
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+	assert.Equal(t, "app-requested-sa", ksvc.Spec.Template.Spec.ServiceAccountName)
+}
+
+func TestDeploy_NoServiceAccountWhenUnset(t *testing.T) {
+	c := testClient(t) // cfg.DefaultServiceAccount is empty
+	require.NoError(t, c.Deploy(context.Background(), testApp("proj", "dev", "myapp", "nginx:latest")))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+	assert.Empty(t, ksvc.Spec.Template.Spec.ServiceAccountName)
 }
 
 func TestDeploy_UpdateOnSpecChange(t *testing.T) {
@@ -245,6 +284,7 @@ func TestStop_DeletesLatestReadyRevision(t *testing.T) {
 		Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
+		namespace: AppNamespace,
 		cfg:       &config.InternalAppConfig{},
 	}
 
@@ -340,6 +380,7 @@ func TestGetApp_CurrentReplicas(t *testing.T) {
 		Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
+		namespace: AppNamespace,
 		cfg:       &config.InternalAppConfig{},
 	}
 
@@ -412,6 +453,7 @@ func TestList(t *testing.T) {
 		Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
+		namespace: AppNamespace,
 		cfg: &config.InternalAppConfig{
 			DefaultRequestTimeout: 5 * time.Minute,
 			MaxRequestTimeout:     time.Hour,
@@ -446,6 +488,7 @@ func TestGetReplicas(t *testing.T) {
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(pod).Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
+		namespace: AppNamespace,
 		cfg:       &config.InternalAppConfig{},
 	}
 
@@ -490,7 +533,7 @@ func TestGetReplicas_FiltersToLatestRevision(t *testing.T) {
 		Status: corev1.PodStatus{Phase: corev1.PodRunning},
 	}
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(ksvc, newPod, oldPod).Build()
-	c := &AppK8sClient{k8sClient: fc, cfg: &config.InternalAppConfig{}}
+	c := &AppK8sClient{k8sClient: fc, namespace: AppNamespace, cfg: &config.InternalAppConfig{}}
 
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
 	replicas, err := c.GetReplicas(context.Background(), id)
@@ -510,6 +553,7 @@ func TestDeleteReplica(t *testing.T) {
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(pod).Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
+		namespace: AppNamespace,
 		cfg:       &config.InternalAppConfig{},
 	}
 

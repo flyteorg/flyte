@@ -7,7 +7,9 @@ ENV TARGETARCH "${TARGETARCH}"
 WORKDIR /build
 
 COPY images/manifest.txt images/preload ./
-RUN ./preload manifest.txt
+
+ARG CACHEBUST=0
+RUN echo "cachebust=${CACHEBUST}" && ./preload manifest.txt
 
 
 FROM --platform=${BUILDPLATFORM} golang:1.26.3-bookworm AS bootstrap

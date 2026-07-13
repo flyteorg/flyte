@@ -3,13 +3,15 @@ name: Build & Push Flyte Single Binary Images v2
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   # Only cancel superseded runs on PRs; runs on main queue up instead.
-  cancel-in-progress: ${{ github.event_name == 'pull_request_target' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 on:
   push:
     branches:
       - main
-  pull_request_target:
+      - v2
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
     branches:
       - main
   workflow_dispatch:
@@ -18,7 +20,7 @@ env:
   DEPOT_PROJECT_ID: ${{ vars.DEPOT_PROJECT_ID }}
   # Push images on push to main, manual dispatch, OR on a PR labeled
   # `test-push-image` from a branch in the base repo (never from forks).
-  PUSH_IMAGES: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.pull_request.labels.*.name, 'test-push-image')) }}
+  PUSH_IMAGES: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.pull_request.labels.*.name, 'test-push-image')) }}
 
 jobs:
   test-bootstrap:
@@ -28,7 +30,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-go@v5
         with:
@@ -48,6 +49,10 @@ jobs:
           make test
 
   build-and-push-single-binary-image:
+    if: >
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     needs: [test-bootstrap]
     permissions:
@@ -57,7 +62,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - name: Validate Depot project id
         run: |
@@ -88,6 +92,7 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/flyte-binary-v2
           tags: |
             type=raw,value=nightly,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+            type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' }}
             type=sha,format=long
       - name: Set up Depot
         uses: depot/setup-action@v1
@@ -149,6 +154,10 @@ jobs:
           push: ${{ env.PUSH_IMAGES == 'true' }}
 
   build-and-push-devbox-bundled-image:
+    if: >
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     needs: [build-and-push-single-binary-image]
     permissions:
@@ -158,7 +167,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
@@ -183,7 +191,7 @@ jobs:
           tags: |
             type=raw,value=nightly,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/v2' }}
             type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' }}
-            type=sha,format=long,
+            type=sha,format=long
       - name: Login to GitHub Container Registry
         if: ${{ env.PUSH_IMAGES == 'true' }}
         uses: docker/login-action@v3
@@ -203,7 +211,11 @@ jobs:
           project: ${{ env.DEPOT_PROJECT_ID }}
           context: docker/devbox-bundled
           platforms: linux/arm64,linux/amd64
-          build-args: "FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}"
+          # CACHEBUST forces the Dockerfile preload layer to re-pull moving tags
+          # (flyteconsole-v2:latest) instead of reusing a stale cached layer.
+          build-args: |
+            FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}
+            CACHEBUST=${{ github.run_id }}-${{ github.run_attempt }}
           save: true
           save-tags: cpu-build-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Authenticate Docker to Depot Registry
@@ -222,7 +234,9 @@ jobs:
           context: docker/devbox-bundled
           platforms: linux/arm64,linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
-          build-args: "FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}"
+          build-args: |
+            FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}
+            CACHEBUST=${{ github.run_id }}-${{ github.run_attempt }}
           push: true
       - name: Prepare GPU Image Names
         id: gpu-image-names

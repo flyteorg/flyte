@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -724,6 +725,68 @@ func TestStowStore_fQNFn(t *testing.T) {
 	assert.Equal(t, DataReference("sw://bucket"), fQNFn[swift.Kind]("bucket"))
 	assert.Equal(t, DataReference("abfs://bucket"), fQNFn[azure.Kind]("bucket"))
 	assert.Equal(t, DataReference("file://bucket"), fQNFn[local.Kind]("bucket"))
+}
+
+func TestPrimarySchemeForConfig(t *testing.T) {
+	t.Run("built-in stow kind", func(t *testing.T) {
+		scheme, err := primarySchemeForConfig(&Config{Type: TypeStow, Stow: StowConfig{Kind: google.Kind}})
+		assert.NoError(t, err)
+		assert.Equal(t, "gs", scheme)
+	})
+
+	t.Run("custom kind derives scheme from registered fQNFn", func(t *testing.T) {
+		const kind = "test-custom-primary-kind"
+		assert.NoError(t, RegisterStowKind(kind, func(bucket string) DataReference {
+			return DataReference("tcpk://" + bucket)
+		}))
+		// kindToScheme has no entry for this kind, so the scheme must be derived from fQNFn — this is
+		// what lets an out-of-tree RegisterStowKind backend serve as the primary store.
+		scheme, err := primarySchemeForConfig(&Config{Type: TypeStow, Stow: StowConfig{Kind: kind}})
+		assert.NoError(t, err)
+		assert.Equal(t, "tcpk", scheme)
+	})
+
+	t.Run("unknown kind errors", func(t *testing.T) {
+		_, err := primarySchemeForConfig(&Config{Type: TypeStow, Stow: StowConfig{Kind: "no-such-kind"}})
+		assert.Error(t, err)
+	})
+}
+
+func TestStowFactory_AmbientDialForUnconfiguredScheme(t *testing.T) {
+	t.Run("unconfigured scheme dials with ambient credentials", func(t *testing.T) {
+		// No Schemes entry for s3: the factory must derive the stow kind from the scheme and dial with
+		// ambient credentials (no explicit access key/secret — the provider's default credential chain).
+		// Stub the dial so the test stays hermetic (the real stow S3 driver would depend on the ambient
+		// AWS region/credential chain); assert on the kind and config the factory resolved instead.
+		var gotKind string
+		var gotCfg stow.ConfigMap
+		orig := stowDial
+		stowDial = func(_ *http.Client, kind string, cfgMap stow.ConfigMap) (stow.Location, error) {
+			gotKind, gotCfg = kind, cfgMap
+			return nil, nil // a secondary scheme has an empty base container, so loc is never dereferenced
+		}
+		defer func() { stowDial = orig }()
+
+		store, err := stowFactory(context.TODO(), "s3", "s3://bucket/key", &Config{}, nil, metrics)
+		assert.NoError(t, err)
+		assert.IsType(t, &StowStore{}, store)
+		assert.Equal(t, s3.Kind, gotKind)
+		assert.NotContains(t, gotCfg, s3.ConfigAccessKeyID, "ambient dial must not inject explicit credentials")
+		assert.NotContains(t, gotCfg, s3.ConfigSecretKey, "ambient dial must not inject explicit credentials")
+	})
+
+	t.Run("scheme with no registered stow kind errors", func(t *testing.T) {
+		_, err := stowFactory(context.TODO(), "not-a-scheme", "not-a-scheme://b/k", &Config{}, nil, metrics)
+		assert.Error(t, err)
+	})
+
+	t.Run("local backend without a path fails fast", func(t *testing.T) {
+		// The local (file://) backend can't be dialed with ambient config; it needs an explicit root
+		// path, so an unconfigured file:// scheme must error deterministically with an actionable message.
+		_, err := stowFactory(context.TODO(), "file", "file://root/key", &Config{}, nil, metrics)
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), local.ConfigKeyPath)
+	})
 }
 
 func TestStowStore_Delete(t *testing.T) {

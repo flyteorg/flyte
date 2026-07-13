@@ -157,20 +157,22 @@ class GetActionLogContextResponse(_message.Message):
     def __init__(self, log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ..., cluster: _Optional[str] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class ListRunsRequest(_message.Message):
-    __slots__ = ["request", "org", "project_id", "trigger_name", "task_name", "task_id"]
+    __slots__ = ["request", "org", "project_id", "trigger_name", "task_name", "task_id", "paused_actions_only"]
     REQUEST_FIELD_NUMBER: _ClassVar[int]
     ORG_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
     TRIGGER_NAME_FIELD_NUMBER: _ClassVar[int]
     TASK_NAME_FIELD_NUMBER: _ClassVar[int]
     TASK_ID_FIELD_NUMBER: _ClassVar[int]
+    PAUSED_ACTIONS_ONLY_FIELD_NUMBER: _ClassVar[int]
     request: _list_pb2.ListRequest
     org: str
     project_id: _identifier_pb2.ProjectIdentifier
     trigger_name: _identifier_pb2.TriggerName
     task_name: _task_definition_pb2.TaskName
     task_id: _task_definition_pb2.TaskIdentifier
-    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., task_name: _Optional[_Union[_task_definition_pb2.TaskName, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ...) -> None: ...
+    paused_actions_only: bool
+    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., task_name: _Optional[_Union[_task_definition_pb2.TaskName, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., paused_actions_only: bool = ...) -> None: ...
 
 class ListRunsResponse(_message.Message):
     __slots__ = ["runs", "token"]
@@ -257,7 +259,7 @@ class WatchWindowedActionsRequest(_message.Message):
         name_filter: str
         def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., selected_item_id: _Optional[str] = ..., overscan_before: _Optional[int] = ..., overscan_after: _Optional[int] = ..., expanded_nodes: _Optional[_Mapping[str, NodeExpansionParams]] = ..., phase_filter: _Optional[_Iterable[_Union[_phase_pb2.ActionPhase, str]]] = ..., name_filter: _Optional[str] = ...) -> None: ...
     class UpdateWindow(_message.Message):
-        __slots__ = ["selected_item_id", "overscan_before", "overscan_after", "expanded_nodes", "phase_filter", "name_filter"]
+        __slots__ = ["selected_item_id", "anchor_flat_index", "overscan_before", "overscan_after", "expanded_nodes", "phase_filter", "name_filter"]
         class ExpandedNodesEntry(_message.Message):
             __slots__ = ["key", "value"]
             KEY_FIELD_NUMBER: _ClassVar[int]
@@ -266,18 +268,20 @@ class WatchWindowedActionsRequest(_message.Message):
             value: NodeExpansionParams
             def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[NodeExpansionParams, _Mapping]] = ...) -> None: ...
         SELECTED_ITEM_ID_FIELD_NUMBER: _ClassVar[int]
+        ANCHOR_FLAT_INDEX_FIELD_NUMBER: _ClassVar[int]
         OVERSCAN_BEFORE_FIELD_NUMBER: _ClassVar[int]
         OVERSCAN_AFTER_FIELD_NUMBER: _ClassVar[int]
         EXPANDED_NODES_FIELD_NUMBER: _ClassVar[int]
         PHASE_FILTER_FIELD_NUMBER: _ClassVar[int]
         NAME_FILTER_FIELD_NUMBER: _ClassVar[int]
         selected_item_id: str
+        anchor_flat_index: int
         overscan_before: int
         overscan_after: int
         expanded_nodes: _containers.MessageMap[str, NodeExpansionParams]
         phase_filter: _containers.RepeatedScalarFieldContainer[_phase_pb2.ActionPhase]
         name_filter: str
-        def __init__(self, selected_item_id: _Optional[str] = ..., overscan_before: _Optional[int] = ..., overscan_after: _Optional[int] = ..., expanded_nodes: _Optional[_Mapping[str, NodeExpansionParams]] = ..., phase_filter: _Optional[_Iterable[_Union[_phase_pb2.ActionPhase, str]]] = ..., name_filter: _Optional[str] = ...) -> None: ...
+        def __init__(self, selected_item_id: _Optional[str] = ..., anchor_flat_index: _Optional[int] = ..., overscan_before: _Optional[int] = ..., overscan_after: _Optional[int] = ..., expanded_nodes: _Optional[_Mapping[str, NodeExpansionParams]] = ..., phase_filter: _Optional[_Iterable[_Union[_phase_pb2.ActionPhase, str]]] = ..., name_filter: _Optional[str] = ...) -> None: ...
     SUBSCRIBE_FIELD_NUMBER: _ClassVar[int]
     UPDATE_WINDOW_FIELD_NUMBER: _ClassVar[int]
     subscribe: WatchWindowedActionsRequest.Subscribe

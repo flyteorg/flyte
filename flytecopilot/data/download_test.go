@@ -20,18 +20,18 @@ func TestHandleBlobMultipart(t *testing.T) {
 		assert.NoError(t, err)
 
 		// Create one file at root level and another in a nested folder
-		ref1 := storage.DataReference("s3://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7c/root_file.txt")
+		ref1 := storage.DataReference("mem://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7c/root_file.txt")
 		err = s.WriteRaw(context.Background(), ref1, 0, storage.Options{}, bytes.NewReader([]byte("root content")))
 		assert.NoError(t, err)
 
-		ref2 := storage.DataReference("s3://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7c/nested/deep_file.txt")
+		ref2 := storage.DataReference("mem://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7c/nested/deep_file.txt")
 		err = s.WriteRaw(context.Background(), ref2, 0, storage.Options{}, bytes.NewReader([]byte("nested content")))
 		assert.NoError(t, err)
 
 		d := Downloader{store: s}
 
 		blob := &core.Blob{
-			Uri: "s3://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7c",
+			Uri: "mem://container/oz/a9ss8w4mnkk8zttr9p7z-n0-0/0fda6abb7c",
 			Metadata: &core.BlobMetadata{
 				Type: &core.BlobType{
 					Dimensionality: core.BlobType_MULTIPART,
@@ -75,7 +75,7 @@ func TestHandleBlobMultipart(t *testing.T) {
 		d := Downloader{store: s}
 
 		blob := &core.Blob{
-			Uri: "s3://container/folder",
+			Uri: "mem://container/folder",
 			Metadata: &core.BlobMetadata{
 				Type: &core.BlobType{
 					Dimensionality: core.BlobType_MULTIPART,
@@ -100,14 +100,14 @@ func TestHandleBlobMultipart(t *testing.T) {
 func TestHandleBlobSinglePart(t *testing.T) {
 	s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)
-	ref := storage.DataReference("s3://container/file")
+	ref := storage.DataReference("mem://container/file")
 	err = s.WriteRaw(context.Background(), ref, 0, storage.Options{}, bytes.NewReader([]byte{}))
 	assert.NoError(t, err)
 
 	d := Downloader{store: s}
 
 	blob := &core.Blob{
-		Uri: "s3://container/file",
+		Uri: "mem://container/file",
 		Metadata: &core.BlobMetadata{
 			Type: &core.BlobType{
 				Dimensionality: core.BlobType_SINGLE,
@@ -134,7 +134,7 @@ func TestHandleBlobSinglePart(t *testing.T) {
 }
 
 func writeBlobLit(t *testing.T, s *storage.DataStore, name string) *core.Literal {
-	ref := storage.DataReference("s3://container/" + name)
+	ref := storage.DataReference("mem://container/" + name)
 	assert.NoError(t, s.WriteRaw(context.Background(), ref, 0, storage.Options{}, bytes.NewReader([]byte("data"))))
 	return &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Blob{Blob: &core.Blob{
 		Uri:      string(ref),
@@ -264,7 +264,7 @@ func TestRecursiveDownload(t *testing.T) {
 		offloadedLiteral := &core.Literal{
 			Value: &core.Literal_OffloadedMetadata{
 				OffloadedMetadata: &core.LiteralOffloadedMetadata{
-					Uri: "s3://container/offloaded",
+					Uri: "mem://container/offloaded",
 				},
 			},
 		}
@@ -276,7 +276,7 @@ func TestRecursiveDownload(t *testing.T) {
 		}
 
 		// Mock reading the offloaded metadata
-		err = s.WriteProtobuf(context.Background(), storage.DataReference("s3://container/offloaded"), storage.Options{}, &core.Literal{
+		err = s.WriteProtobuf(context.Background(), storage.DataReference("mem://container/offloaded"), storage.Options{}, &core.Literal{
 			Value: &core.Literal_Collection{
 				Collection: &core.LiteralCollection{
 					Literals: []*core.Literal{
@@ -342,7 +342,7 @@ func TestRecursiveDownload(t *testing.T) {
 		offloadedLiteral := &core.Literal{
 			Value: &core.Literal_OffloadedMetadata{
 				OffloadedMetadata: &core.LiteralOffloadedMetadata{
-					Uri: "s3://container/offloaded",
+					Uri: "mem://container/offloaded",
 				},
 			},
 		}
@@ -354,7 +354,7 @@ func TestRecursiveDownload(t *testing.T) {
 		}
 
 		// Mock reading the offloaded metadata
-		err = s.WriteProtobuf(context.Background(), storage.DataReference("s3://container/offloaded"), storage.Options{}, &core.Literal{
+		err = s.WriteProtobuf(context.Background(), storage.DataReference("mem://container/offloaded"), storage.Options{}, &core.Literal{
 			Value: &core.Literal_Map{
 				Map: &core.LiteralMap{
 					Literals: map[string]*core.Literal{

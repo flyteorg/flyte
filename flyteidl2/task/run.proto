@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.task;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/phase.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/security.proto";
@@ -68,6 +69,19 @@ message CacheConfig {
   CacheLookupScope cache_lookup_scope = 2;
 }
 
+// TaskSpecSource records how a run's task spec was provided at creation time, so
+// the rerun UI can send a TaskId (deployed) rather than the full inline spec.
+enum TaskSpecSource {
+  TASK_SPEC_SOURCE_UNSPECIFIED = 0;
+
+  // The run referenced a deployed (registered) task by TaskId.
+  TASK_SPEC_SOURCE_DEPLOYED = 1;
+
+  // The run carried an inline task spec (e.g. fast registration) that does not
+  // exist in the task store.
+  TASK_SPEC_SOURCE_EPHEMERAL = 2;
+}
+
 message RunSpec {
   // Labels to apply to the run.
   Labels labels = 1;
@@ -118,6 +132,27 @@ message RunSpec {
   // queue-level concurrency limits (min wins): actions beyond the limit stay
   // queued until a running action of this run completes.
   uint32 max_action_concurrency = 13;
+
+  // Base directory under which the run's metadata (inputs.pb, per-action
+  // outputs.pb, action metadata) is written. When set, it overrides the
+  // org/project/domain settings default and the dataplane cluster default.
+  // Leave empty to fall back to settings, then to the cluster default.
+  // Distinct from raw_data_storage.raw_data_prefix, which controls offloaded
+  // blob (user data) layout.
+  string run_base_dir = 14;
+
+  // Optional pointer to the single parent run this run was derived from (re-run, recover,
+  // clone, or explicit SDK/CLI provenance). Set at creation, immutable thereafter, and scoped
+  // to the same org/project/domain as this run.
+  flyteidl2.common.RunIdentifier related_to = 15;
+
+  // Pool of the assigned queue for given run.
+  // Always set by server. Should not be specified by user.
+  string cluster_pool = 16;
+
+  // How the task spec was provided at creation (deployed TaskId vs inline spec).
+  // Set by server; lets the rerun UI choose TaskId over the full inline spec.
+  TaskSpecSource task_spec_source = 17;
 }
 
 message InlineRuleList {
