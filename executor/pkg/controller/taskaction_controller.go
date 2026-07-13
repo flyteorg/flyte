@@ -104,7 +104,7 @@ type TaskActionReconciler struct {
 }
 
 // recordEvent persists a single ActionEvent, blocking until it is durably
-// written. It routes through the coalescing eventBatcher when configured (prod)
+// written. It routes through the coalescing eventBatcher when configured
 // so concurrent reconciles' events collapse into a few multi-row commits;
 // callers still block until their batch commits, so at-least-once semantics are
 // identical to a direct Record (on error the reconcile requeues and re-emits,
@@ -341,14 +341,6 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		logger.Error(err, "failed to build task execution context")
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
-
-	// The cache-hit lookup (Catalog.Get, a blocking cache-service RPC) only matters before
-	// the task starts executing. Re-issuing it on every reconcile of an already-RUNNING
-	// action is the dominant per-reconcile cost at scale: one RPC per reconcile x tens of
-	// thousands of held actions saturates the cache service, inflating reconcile work
-	// duration to ~800ms and starving newly-created actions of a worker. Skip it once the
-	// action is RUNNING (a cache hit is moot mid-execution); the serializable-reservation
-	// heartbeat is still issued inside evaluateCacheBeforeExecution.
 	alreadyRunning := taskAction.Status.PluginPhase == pluginsCore.PhaseRunning.String()
 
 	// cacheShortCircuited is true when cache handling already decided the outcome,
@@ -802,12 +794,6 @@ func cacheStatusFromExternalResources(resources []*pluginsCore.ExternalResource)
 // taskActionStatusChanged reports whether any status field has changed between old and new,
 // covering plugin phase, state, state version, observability JSON, conditions, and phase history.
 func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) bool {
-	// NOTE: StateJSON is intentionally NOT compared here. It is a derived, observability-only
-	// field whose createStateJSON() payload includes time.Now(), so it differs on every reconcile.
-	// Gating persistence on it forced a Status().Update (etcd write) + events RPC on every periodic
-	// requeue, even for idle/held actions — the dominant source of etcd write churn at high held
-	// concurrency. StateJSON is derived from the phase/conditions checked below, so excluding it is
-	// safe: any real state change is still detected, and a held action becomes write-silent.
 	if oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
 		oldStatus.PluginPhase != newStatus.PluginPhase ||
 		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion ||

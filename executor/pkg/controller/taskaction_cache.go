@@ -38,11 +38,6 @@ func (r *TaskActionReconciler) evaluateCacheBeforeExecution(
 		return pluginsCore.UnknownTransition, false, err
 	}
 
-	// The cache-hit lookup only matters before the task starts executing. Once RUNNING, a
-	// hit is moot (we're already running) and issuing this blocking cache-service RPC on
-	// every reconcile of every held action is the dominant per-reconcile cost at scale. Skip
-	// it while RUNNING, but fall through to the serializable-reservation heartbeat below so a
-	// running owner keeps its reservation alive.
 	if !alreadyRunning {
 		entry, err := r.Catalog.Get(ctx, cacheCfg.key)
 		if err == nil {
