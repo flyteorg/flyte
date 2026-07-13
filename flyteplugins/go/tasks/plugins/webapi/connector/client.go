@@ -137,7 +137,7 @@ func updateRegistry(
 				connectorSupportedTaskCategories[supportedCategoryName] = struct{}{}
 			}
 		}
-		logger.Infof(ctx, "ConnectorDeployment [%v] supports the following task types: [%v]", connectorDeployment.Endpoint,
+		logger.Debugf(ctx, "ConnectorDeployment [%v] supports the following task types: [%v]", connectorDeployment.Endpoint,
 			strings.Join(maps.Keys(connectorSupportedTaskCategories), ", "))
 	}
 }
@@ -188,7 +188,7 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 	// Update registry with connector apps
 	updateRegistry(ctx, cs, newConnectorRegistry, cfg.ConnectorApps, true)
 
-	logger.Infof(ctx, "ConnectorDeployments support the following task types: [%v]", strings.Join(newConnectorRegistry.getSupportedTaskTypes(), ", "))
+	logger.Debugf(ctx, "ConnectorDeployments support the following task types: [%v]", strings.Join(newConnectorRegistry.getSupportedTaskTypes(), ", "))
 	return newConnectorRegistry
 }
 
