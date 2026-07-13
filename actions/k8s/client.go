@@ -105,8 +105,6 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, n
 		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 
-	// recordFilterSize defaults to 1<<23 via the config section; an explicit <=0
-	// disables RecordAction dedup (worst case: redundant idempotent RPCs).
 	if recordFilterSize > 0 {
 		filter, err := fastcheck.NewOppoBloomFilter(recordFilterSize, scope.NewSubScope("actions_filter"))
 		if err != nil {
@@ -744,13 +742,13 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		return
 	}
 
-	// Create the DB record on first sight. ADDED always records: it is the first event
-	// the informer can deliver for an object (OnAdd fires once, before any update, all
-	// from one delivery goroutine), so its coalescing marker cannot pre-exist and it is
-	// never dropped. Other non-delete events record too when the dedup filter is
-	// configured, catching replays/reconnects without re-recording. With the filter
-	// explicitly disabled, only ADDED records — otherwise every update would trigger a
-	// RecordAction RPC.
+	// Create the DB record once per action:
+	//   ADDED    — always record: nothing precedes an object's ADDED, so it is never
+	//              coalesced away and marks true first sight.
+	//   MODIFIED — record only with the dedup filter on: catches replay/reconnect/
+	//              record-retry first-sights; without the filter it would re-record
+	//              on every update.
+	//   DELETED  — never record: handled as a terminal update below.
 	if eventType == watch.Added || (c.recordedFilter != nil && eventType != watch.Deleted) {
 		actionKey := []byte(buildTaskActionName(update.ActionID))
 		isDuplicate := c.recordedFilter != nil && c.recordedFilter.Contains(ctx, actionKey)
