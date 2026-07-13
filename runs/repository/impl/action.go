@@ -119,20 +119,30 @@ func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEv
 		return nil
 	}
 
+	// Multi-row INSERT so a batch of events costs one commit per chunk instead of one
+	// per event. Chunked because callers are not all bounded: the executor's batcher
+	// flushes <=400 events, but RecordActionEvents accepts arbitrary counts and
+	// Postgres caps a statement at 65,535 bind parameters (9 per row here). Chunks
+	// are inserted independently — same non-transactional semantics as the previous
+	// per-row loop, and ON CONFLICT DO NOTHING keeps retries idempotent.
 	const colsPerRow = 9
-	valueGroups := make([]string, 0, len(events))
-	args := make([]any, 0, len(events)*colsPerRow)
-	for i, e := range events {
-		b := i * colsPerRow
-		valueGroups = append(valueGroups, fmt.Sprintf(
-			"($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
-			b+1, b+2, b+3, b+4, b+5, b+6, b+7, b+8, b+9))
-		args = append(args, e.Project, e.Domain, e.RunName, e.Name, e.Attempt, e.Phase, e.Version, e.Info, e.ErrorKind)
-	}
-	query := `INSERT INTO action_events (project, domain, run_name, name, attempt, phase, version, info, error_kind, created_at, updated_at) VALUES ` +
-		strings.Join(valueGroups, ", ") + ` ON CONFLICT DO NOTHING`
-	if _, err := r.db.ExecContext(ctx, query, args...); err != nil {
-		return err
+	const chunkRows = 5000 // 45,000 params, well under the 65,535 cap
+	for start := 0; start < len(events); start += chunkRows {
+		chunk := events[start:min(start+chunkRows, len(events))]
+		valueGroups := make([]string, 0, len(chunk))
+		args := make([]any, 0, len(chunk)*colsPerRow)
+		for i, e := range chunk {
+			b := i * colsPerRow
+			valueGroups = append(valueGroups, fmt.Sprintf(
+				"($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
+				b+1, b+2, b+3, b+4, b+5, b+6, b+7, b+8, b+9))
+			args = append(args, e.Project, e.Domain, e.RunName, e.Name, e.Attempt, e.Phase, e.Version, e.Info, e.ErrorKind)
+		}
+		query := `INSERT INTO action_events (project, domain, run_name, name, attempt, phase, version, info, error_kind, created_at, updated_at) VALUES ` +
+			strings.Join(valueGroups, ", ") + ` ON CONFLICT DO NOTHING`
+		if _, err := r.db.ExecContext(ctx, query, args...); err != nil {
+			return err
+		}
 	}
 
 	// Notify subscribers so watchers see new events (e.g. log context becoming available).
