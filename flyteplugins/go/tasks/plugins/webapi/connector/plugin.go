@@ -5,7 +5,6 @@ import (
 	"encoding/gob"
 	"fmt"
 	"slices"
-	"strings"
 	"sync"
 	"time"
 
@@ -251,7 +250,7 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 	}
 	// Track the status the connector reports back (RUNNING/SUCCEEDED/FAILED/...) per GetTask.
 	if p.getTaskPhase != nil {
-		p.getTaskPhase.WithLabelValues(strings.TrimPrefix(res.GetResource().GetPhase().String(), "PHASE_")).Inc()
+		p.getTaskPhase.WithLabelValues(res.GetResource().GetPhase().String()).Inc()
 	}
 	return ResourceWrapper{
 		Phase:             res.GetResource().GetPhase(),
