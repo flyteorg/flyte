@@ -34,7 +34,7 @@ func (f *batchTestClient) Record(_ context.Context, req *connect.Request[workflo
 	return connect.NewResponse(&workflow.RecordResponse{}), nil
 }
 
-func ev(name string) *workflow.ActionEvent { return &workflow.ActionEvent{} }
+func ev(name string) *workflow.ActionEvent { _ = name; return &workflow.ActionEvent{} }
 
 // Every enqueued event is delivered to the client exactly once, no batch exceeds
 // the cap, and concurrent callers coalesce into fewer-than-N batches.
