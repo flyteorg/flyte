@@ -416,7 +416,8 @@ type RunSpec struct {
 	//
 	// Deprecated: Marked as deprecated in flyteidl2/task/run.proto.
 	OverwriteCache bool `protobuf:"varint,5,opt,name=overwrite_cache,json=overwriteCache,proto3" json:"overwrite_cache,omitempty"`
-	// the queue name that this run should be executed on.
+	// The queue name that this run should be executed on.
+	// This value will be used as the default for all actions in the run unless overridden in TaskAction.queue.
 	// Queue name is unique within an org so it can be used as an id to reference the queue.
 	Queue string `protobuf:"bytes,6,opt,name=queue,proto3" json:"queue,omitempty"`
 	// Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).

@@ -185,7 +185,8 @@ export type RunSpec = Message<"flyteidl2.task.RunSpec"> & {
   overwriteCache: boolean;
 
   /**
-   * the queue name that this run should be executed on.
+   * The queue name that this run should be executed on.
+   * This value will be used as the default for all actions in the run unless overridden in TaskAction.queue.
    * Queue name is unique within an org so it can be used as an id to reference the queue.
    *
    * @generated from field: string queue = 6;

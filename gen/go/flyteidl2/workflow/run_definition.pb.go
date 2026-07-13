@@ -360,7 +360,7 @@ type TaskAction struct {
 	Spec *task.TaskSpec `protobuf:"bytes,2,opt,name=spec,proto3" json:"spec,omitempty"`
 	// Enables caching when set and specifies the cache version to use.
 	CacheKey *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=cache_key,json=cacheKey,proto3" json:"cache_key,omitempty"`
-	// the specific queue that this action should be executed on.
+	// The specific queue that this action should be executed on.
 	// if not set, the queue from the `RunSpec` will be used.
 	Queue string `protobuf:"bytes,4,opt,name=queue,proto3" json:"queue,omitempty"`
 }

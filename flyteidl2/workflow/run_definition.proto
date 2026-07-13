@@ -51,7 +51,7 @@ message TaskAction {
   // Enables caching when set and specifies the cache version to use.
   google.protobuf.StringValue cache_key = 3;
 
-  // the specific queue that this action should be executed on.
+  // The specific queue that this action should be executed on.
   // if not set, the queue from the `RunSpec` will be used.
   string queue = 4;
   reserved "cluster";

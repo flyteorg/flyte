@@ -118,7 +118,7 @@ export type TaskAction = Message<"flyteidl2.workflow.TaskAction"> & {
   cacheKey?: string;
 
   /**
-   * the specific queue that this action should be executed on.
+   * The specific queue that this action should be executed on.
    * if not set, the queue from the `RunSpec` will be used.
    *
    * @generated from field: string queue = 4;
