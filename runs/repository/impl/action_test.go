@@ -46,7 +46,7 @@ func setupActionDB(t *testing.T) *sqlx.DB {
 func TestCreateRun(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := NewActionRepo(db, testDbConfig, nil)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -85,7 +85,7 @@ func TestCreateRun(t *testing.T) {
 func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := NewActionRepo(db, testDbConfig, nil)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -124,7 +124,7 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	repo, err := NewActionRepo(db, testDbConfig)
+	repo, err := NewActionRepo(db, testDbConfig, nil)
 	require.NoError(t, err)
 	repoImpl := repo.(*actionRepo)
 
@@ -196,7 +196,7 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := NewActionRepo(db, testDbConfig, nil)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -240,7 +240,7 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := NewActionRepo(db, testDbConfig, nil)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -278,7 +278,7 @@ func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := NewActionRepo(db, testDbConfig, nil)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -317,7 +317,7 @@ func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 func TestListRuns(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := NewActionRepo(db, testDbConfig, nil)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -394,7 +394,7 @@ func TestListRuns(t *testing.T) {
 
 func setupActionEventDB(t *testing.T) (*sqlx.DB, *actionRepo) {
 	db := setupActionDB(t)
-	r, err := NewActionRepo(db, testDbConfig)
+	r, err := NewActionRepo(db, testDbConfig, nil)
 	require.NoError(t, err)
 	repo := r.(*actionRepo)
 	return db, repo
@@ -666,7 +666,7 @@ func TestInsertEvents_WithLogContext(t *testing.T) {
 // RecordActionEvents before the TaskAction finalizer is removed.
 func TestUpdateActionPhase_AbortedDoesNotInsertEvent(t *testing.T) {
 	db := setupActionDB(t)
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := NewActionRepo(db, testDbConfig, nil)
 	require.NoError(t, err)
 	ctx := context.Background()
 

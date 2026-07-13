@@ -107,7 +107,7 @@ func TestMain(m *testing.M) {
 	log.Println("Database migrations completed")
 
 	// Create repository and services
-	repo, err := repository.NewRepository(testDB, *dbConfig)
+	repo, err := repository.NewRepository(testDB, *dbConfig, nil)
 	if err != nil {
 		log.Printf("Failed to create repository: %v", err)
 		exitCode = 1

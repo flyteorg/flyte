@@ -11,17 +11,23 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
 type tasksRepo struct {
-	db *sqlx.DB
+	db      *sqlx.DB
+	metrics dbMetrics
 }
 
-func NewTaskRepo(db *sqlx.DB) interfaces.TaskRepo {
+// NewTaskRepo creates a task repository. The provided scope is used to register
+// per-operation DB metrics under a "db" sub-scope; pass nil to disable metrics
+// (e.g. in unit tests).
+func NewTaskRepo(db *sqlx.DB, scope promutils.Scope) interfaces.TaskRepo {
 	return &tasksRepo{
-		db: db,
+		db:      db,
+		metrics: newDBMetrics(scope),
 	}
 }
 
@@ -31,6 +37,12 @@ func NewTaskRepo(db *sqlx.DB) interfaces.TaskRepo {
 // set of triggers via refreshTaskTriggerMeta, so they are intentionally NOT
 // set by the task upsert itself.
 func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task, triggers []*models.Trigger) error {
+	return r.metrics.observe(ctx, "create_task", func() error {
+		return r.createTask(ctx, newTask, triggers)
+	})
+}
+
+func (r *tasksRepo) createTask(ctx context.Context, newTask *models.Task, triggers []*models.Trigger) error {
 	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("failed to begin tx: %w", err)
@@ -116,45 +128,59 @@ func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task, trigge
 
 func (r *tasksRepo) GetTask(ctx context.Context, key models.TaskKey) (*models.Task, error) {
 	var task models.Task
-	err := sqlx.GetContext(ctx, r.db, &task,
-		"SELECT * FROM tasks WHERE project = $1 AND domain = $2 AND name = $3 AND version = $4",
-		key.Project, key.Domain, key.Name, key.Version)
+	err := r.metrics.observe(ctx, "get_task", func() error {
+		err := sqlx.GetContext(ctx, r.db, &task,
+			"SELECT * FROM tasks WHERE project = $1 AND domain = $2 AND name = $3 AND version = $4",
+			key.Project, key.Domain, key.Name, key.Version)
 
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("task not found: %v", key)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return fmt.Errorf("task not found: %v", key)
+			}
+			logger.Errorf(ctx, "failed to get task %v: %v", key, err)
+			return fmt.Errorf("failed to get task %v: %w", key, err)
 		}
-		logger.Errorf(ctx, "failed to get task %v: %v", key, err)
-		return nil, fmt.Errorf("failed to get task %v: %w", key, err)
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	return &task, nil
 }
 
 func (r *tasksRepo) CreateTaskSpec(ctx context.Context, taskSpec *models.TaskSpec) error {
-	_, err := r.db.ExecContext(ctx,
-		`INSERT INTO task_specs (digest, spec) VALUES ($1, $2) ON CONFLICT (digest) DO NOTHING`,
-		taskSpec.Digest, taskSpec.Spec)
+	return r.metrics.observe(ctx, "create_task_spec", func() error {
+		_, err := r.db.ExecContext(ctx,
+			`INSERT INTO task_specs (digest, spec) VALUES ($1, $2) ON CONFLICT (digest) DO NOTHING`,
+			taskSpec.Digest, taskSpec.Spec)
 
-	if err != nil {
-		logger.Errorf(ctx, "failed to create task spec %v: %v", taskSpec.Digest, err)
-		return fmt.Errorf("failed to create task spec %v: %w", taskSpec.Digest, err)
-	}
+		if err != nil {
+			logger.Errorf(ctx, "failed to create task spec %v: %v", taskSpec.Digest, err)
+			return fmt.Errorf("failed to create task spec %v: %w", taskSpec.Digest, err)
+		}
 
-	return nil
+		return nil
+	})
 }
 
 func (r *tasksRepo) GetTaskSpec(ctx context.Context, digest string) (*models.TaskSpec, error) {
 	var taskSpec models.TaskSpec
-	err := sqlx.GetContext(ctx, r.db, &taskSpec,
-		"SELECT * FROM task_specs WHERE digest = $1", digest)
+	err := r.metrics.observe(ctx, "get_task_spec", func() error {
+		err := sqlx.GetContext(ctx, r.db, &taskSpec,
+			"SELECT * FROM task_specs WHERE digest = $1", digest)
 
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("task spec not found: %s", digest)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return fmt.Errorf("task spec not found: %s", digest)
+			}
+			logger.Errorf(ctx, "failed to get task spec %v: %v", digest, err)
+			return fmt.Errorf("failed to get task spec %v: %w", digest, err)
 		}
-		logger.Errorf(ctx, "failed to get task spec %v: %v", digest, err)
-		return nil, fmt.Errorf("failed to get task spec %v: %w", digest, err)
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	return &taskSpec, nil
@@ -249,9 +275,14 @@ LIMIT $%d OFFSET $%d`, filteredWhere, unfilteredWhere, orderBy, argIdx, argIdx+1
 		Total         uint32 `db:"total"`
 	}
 	var rows []taskWithCounts
-	if err := sqlx.SelectContext(ctx, r.db, &rows, cte, allArgs...); err != nil {
-		logger.Errorf(ctx, "failed to list tasks: %v", err)
-		return nil, fmt.Errorf("failed to list tasks: %w", err)
+	if err := r.metrics.observe(ctx, "list_tasks", func() error {
+		if err := sqlx.SelectContext(ctx, r.db, &rows, cte, allArgs...); err != nil {
+			logger.Errorf(ctx, "failed to list tasks: %v", err)
+			return fmt.Errorf("failed to list tasks: %w", err)
+		}
+		return nil
+	}); err != nil {
+		return nil, err
 	}
 
 	tasks := make([]*models.Task, 0, len(rows))
@@ -310,9 +341,14 @@ func (r *tasksRepo) ListVersions(ctx context.Context, input interfaces.ListResou
 	args = append(args, input.Limit, input.Offset)
 
 	var versions []*models.TaskVersion
-	if err := sqlx.SelectContext(ctx, r.db, &versions, queryBuilder.String(), args...); err != nil {
-		logger.Errorf(ctx, "failed to list versions: %v", err)
-		return nil, fmt.Errorf("failed to list versions: %w", err)
+	if err := r.metrics.observe(ctx, "list_versions", func() error {
+		if err := sqlx.SelectContext(ctx, r.db, &versions, queryBuilder.String(), args...); err != nil {
+			logger.Errorf(ctx, "failed to list versions: %v", err)
+			return fmt.Errorf("failed to list versions: %w", err)
+		}
+		return nil
+	}); err != nil {
+		return nil, err
 	}
 
 	return versions, nil

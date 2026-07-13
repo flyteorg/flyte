@@ -28,6 +28,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 )
 
 const otelServiceName = "runs-service"
@@ -53,7 +54,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
 
-	repo, err := repository.NewRepository(sc.DB, cfg.Database)
+	repo, err := repository.NewRepository(sc.DB, cfg.Database, sc.Scope)
 	if err != nil {
 		return fmt.Errorf("runs: failed to create repository: %w", err)
 	}
@@ -133,12 +134,21 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 			Name: d.Name,
 		})
 	}
-	projectSvc := service.NewProjectService(impl.NewProjectRepo(sc.DB), domains)
+	// Construct the project repo once: its DB metrics are registered in the
+	// constructor, so a second NewProjectRepo with the same scope would panic on
+	// duplicate registration. The same instance is shared by the service and the
+	// seed step below.
+	var projectScope promutils.Scope
+	if sc.Scope != nil {
+		projectScope = sc.Scope.NewSubScope("project")
+	}
+	projectRepo := impl.NewProjectRepo(sc.DB, projectScope)
+	projectSvc := service.NewProjectService(projectRepo, domains)
 	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(projectSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(projectPath, projectHandler)
 	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
 
-	if err := seedProjects(ctx, impl.NewProjectRepo(sc.DB), cfg.SeedProjects); err != nil {
+	if err := seedProjects(ctx, projectRepo, cfg.SeedProjects); err != nil {
 		return fmt.Errorf("runs: failed to seed projects: %w", err)
 	}
 

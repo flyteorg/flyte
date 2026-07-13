@@ -29,7 +29,7 @@ func setupTestDB(t *testing.T) *sqlx.DB {
 
 func TestCreateTask(t *testing.T) {
 	db := setupTestDB(t)
-	repo := NewTaskRepo(db)
+	repo := NewTaskRepo(db, nil)
 	ctx := context.Background()
 
 	task := &models.Task{
@@ -59,7 +59,7 @@ func TestCreateTask(t *testing.T) {
 
 func TestGetTask_NotFound(t *testing.T) {
 	db := setupTestDB(t)
-	repo := NewTaskRepo(db)
+	repo := NewTaskRepo(db, nil)
 	ctx := context.Background()
 
 	key := models.TaskKey{
@@ -76,7 +76,7 @@ func TestGetTask_NotFound(t *testing.T) {
 
 func TestListTasks(t *testing.T) {
 	db := setupTestDB(t)
-	repo := NewTaskRepo(db)
+	repo := NewTaskRepo(db, nil)
 	ctx := context.Background()
 
 	task1 := &models.Task{
@@ -116,7 +116,7 @@ func TestListTasks(t *testing.T) {
 
 func TestCreateTaskSpec(t *testing.T) {
 	db := setupTestDB(t)
-	repo := NewTaskRepo(db)
+	repo := NewTaskRepo(db, nil)
 	ctx := context.Background()
 
 	spec := &models.TaskSpec{
@@ -135,7 +135,7 @@ func TestCreateTaskSpec(t *testing.T) {
 
 func TestCreateTask_UpdatePreservesCreatedAt(t *testing.T) {
 	db := setupTestDB(t)
-	repo := NewTaskRepo(db)
+	repo := NewTaskRepo(db, nil)
 	ctx := context.Background()
 
 	task := &models.Task{
