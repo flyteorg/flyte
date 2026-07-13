@@ -104,12 +104,19 @@ func (b *eventBatcher) collect() {
 func (b *eventBatcher) flush(batch []*eventReq) {
 	events := make([]*workflow.ActionEvent, len(batch))
 	links := make([]trace.Link, 0, len(batch))
-	seen := make(map[trace.SpanID]struct{}, len(batch))
+	// Dedupe by (TraceID, SpanID): span IDs are only unique within a trace, and the
+	// point of deduping is "the same span emitted several events in this batch".
+	type linkKey struct {
+		traceID trace.TraceID
+		spanID  trace.SpanID
+	}
+	seen := make(map[linkKey]struct{}, len(batch))
 	for i, r := range batch {
 		events[i] = r.event
 		if r.spanCtx.IsValid() {
-			if _, dup := seen[r.spanCtx.SpanID()]; !dup {
-				seen[r.spanCtx.SpanID()] = struct{}{}
+			k := linkKey{traceID: r.spanCtx.TraceID(), spanID: r.spanCtx.SpanID()}
+			if _, dup := seen[k]; !dup {
+				seen[k] = struct{}{}
 				links = append(links, trace.Link{SpanContext: r.spanCtx})
 			}
 		}
