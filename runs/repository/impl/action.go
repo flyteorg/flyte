@@ -141,7 +141,7 @@ func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEv
 		query := `INSERT INTO action_events (project, domain, run_name, name, attempt, phase, version, info, error_kind, created_at, updated_at) VALUES ` +
 			strings.Join(valueGroups, ", ") + ` ON CONFLICT DO NOTHING`
 		if _, err := r.db.ExecContext(ctx, query, args...); err != nil {
-			return err
+			return fmt.Errorf("insert action_events chunk start=%d size=%d: %w", start, len(chunk), err)
 		}
 	}
 
