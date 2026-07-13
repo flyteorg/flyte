@@ -6815,11 +6815,26 @@ spec:
                 maxLength: 30
                 minLength: 1
                 type: string
+              actionType:
+                description: |-
+                  ActionType discriminates what kind of action this CR represents.
+                  Mirrors cloud's explicit ActionType enum. Empty means "task" for
+                  backward compatibility with existing CRs.
+                enum:
+                - task
+                - condition
+                type: string
               cacheKey:
                 description: |-
                   CacheKey enables cache lookup/writeback for this task action when set.
                   This is propagated from workflow.TaskAction.cache_key.
                 maxLength: 256
+                type: string
+              conditionSpec:
+                description: |-
+                  ConditionSpec is the proto-serialized workflow.ConditionAction, present iff
+                  actionType == "condition". Carries type/prompt/description/timeout/webhook.
+                format: byte
                 type: string
               domain:
                 description: Domain this action belongs to
@@ -6837,8 +6852,9 @@ spec:
                 maxLength: 256
                 type: string
               inputUri:
-                description: InputURI is the path to the input data for this action
-                minLength: 1
+                description: |-
+                  InputURI is the path to the input data for this action.
+                  Empty for conditions; the reconciler validates presence for tasks.
                 type: string
               interruptible:
                 description: Interruptible is the run-scoped interruptibility override
@@ -6860,9 +6876,9 @@ spec:
                 minLength: 1
                 type: string
               runOutputBase:
-                description: RunOutputBase is the base path where this action should
-                  write its output
-                minLength: 1
+                description: |-
+                  RunOutputBase is the base path where this action should write its output.
+                  Empty for conditions; the reconciler validates presence for tasks.
                 type: string
               shortName:
                 description: ShortName is the human-readable display name for this
@@ -6870,25 +6886,22 @@ spec:
                 maxLength: 63
                 type: string
               taskTemplate:
-                description: TaskTemplate is the proto-serialized core.TaskTemplate
-                  stored inline in etcd
+                description: |-
+                  TaskTemplate is the proto-serialized core.TaskTemplate stored inline in etcd.
+                  Empty for conditions; the reconciler validates presence for tasks.
                 format: byte
                 type: string
               taskType:
-                description: TaskType identifies which plugin handles this task (e.g.
-                  "container", "spark", "ray")
+                description: |-
+                  TaskType identifies which plugin handles this task (e.g. "container", "spark", "ray").
+                  Empty for conditions; the reconciler validates presence for tasks.
                 maxLength: 63
-                minLength: 1
                 type: string
             required:
             - actionName
             - domain
-            - inputUri
             - project
             - runName
-            - runOutputBase
-            - taskTemplate
-            - taskType
             type: object
           status:
             description: status defines the observed state of TaskAction
@@ -7034,6 +7047,21 @@ spec:
                 description: PluginStateVersion tracks the version of the plugin state
                   schema for compatibility.
                 type: integer
+              signalValue:
+                description: |-
+                  SignalValue is the proto-serialized core.Literal supplied by Signal.
+                  Set exactly once; the reconciler transitions the CR to Succeeded when present.
+                  Only meaningful for condition actions.
+                format: byte
+                type: string
+              signalledAt:
+                description: SignalledAt is when the signal was received.
+                format: date-time
+                type: string
+              signalledBy:
+                description: SignalledBy identifies the principal that signalled the
+                  condition.
+                type: string
               stateJson:
                 description: StateJSON is the JSON serialized NodeStatus that was
                   last sent to the State Service
