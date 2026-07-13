@@ -34,7 +34,7 @@ func (f *batchTestClient) Record(_ context.Context, req *connect.Request[workflo
 	return connect.NewResponse(&workflow.RecordResponse{}), nil
 }
 
-func ev(name string) *workflow.ActionEvent { _ = name; return &workflow.ActionEvent{} }
+func ev() *workflow.ActionEvent { return &workflow.ActionEvent{} }
 
 // Every enqueued event is delivered to the client exactly once, no batch exceeds
 // the cap, and concurrent callers coalesce into fewer-than-N batches.
@@ -42,13 +42,15 @@ func TestEventBatcher_DeliversAllAndCoalesces(t *testing.T) {
 	fake := &batchTestClient{}
 	b := newEventBatcher(fake)
 
-	const n = 300
+	// n > 2x eventBatchMaxSize so the cap logic must split at least three batches —
+	// otherwise the max-size assertion below never exercises a split.
+	const n = 1000
 	var wg sync.WaitGroup
 	wg.Add(n)
 	for i := 0; i < n; i++ {
 		go func() {
 			defer wg.Done()
-			assert.NoError(t, b.Record(context.Background(), ev("e")))
+			assert.NoError(t, b.Record(context.Background(), ev()))
 		}()
 	}
 	wg.Wait()
@@ -57,6 +59,8 @@ func TestEventBatcher_DeliversAllAndCoalesces(t *testing.T) {
 	defer fake.mu.Unlock()
 	assert.Equal(t, n, fake.total, "every event must reach the client exactly once")
 	assert.Less(t, len(fake.batches), n, "concurrent events should coalesce into fewer batches")
+	assert.GreaterOrEqual(t, len(fake.batches), (n+eventBatchMaxSize-1)/eventBatchMaxSize,
+		"the size cap must force splits once n exceeds eventBatchMaxSize")
 	for _, size := range fake.batches {
 		assert.LessOrEqual(t, size, eventBatchMaxSize, "no batch may exceed the cap")
 	}
@@ -66,7 +70,7 @@ func TestEventBatcher_DeliversAllAndCoalesces(t *testing.T) {
 func TestEventBatcher_PropagatesError(t *testing.T) {
 	fake := &batchTestClient{err: errors.New("boom")}
 	b := newEventBatcher(fake)
-	err := b.Record(context.Background(), ev("e"))
+	err := b.Record(context.Background(), ev())
 	require.Error(t, err)
 }
 
@@ -76,6 +80,6 @@ func TestEventBatcher_RespectsContextCancel(t *testing.T) {
 	b := newEventBatcher(fake)
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	err := b.Record(ctx, ev("e"))
+	err := b.Record(ctx, ev())
 	require.ErrorIs(t, err, context.Canceled)
 }
