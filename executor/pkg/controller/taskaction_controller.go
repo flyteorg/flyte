@@ -820,7 +820,7 @@ func cacheStatusFromExternalResources(resources []*pluginsCore.ExternalResource)
 }
 
 // taskActionStatusChanged reports whether any status field has changed between old and new,
-// covering plugin phase, state, state version, observability JSON, conditions, and phase history.
+// covering plugin phase/state, state version, conditions, and phase history.
 func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) bool {
 	if oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
 		oldStatus.PluginPhase != newStatus.PluginPhase ||
