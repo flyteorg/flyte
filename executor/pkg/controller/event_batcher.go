@@ -5,6 +5,9 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"go.opentelemetry.io/otel/attribute"
+	otelcodes "go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
@@ -31,17 +34,23 @@ const (
 // concurrency is bounded to eventFlushWorkers regardless of reconcile fan-out.
 type eventBatcher struct {
 	client workflowconnect.EventsProxyServiceClient
+	tracer trace.Tracer
 	queue  chan *eventReq
 }
 
 type eventReq struct {
 	event *workflow.ActionEvent
-	done  chan error
+	// spanCtx is the caller's span at enqueue time. A flush fans in events from many
+	// reconciles, so the shared RPC span cannot be parented under any single caller;
+	// each contributor is attached as a span LINK on the flush span instead.
+	spanCtx trace.SpanContext
+	done    chan error
 }
 
-func newEventBatcher(client workflowconnect.EventsProxyServiceClient) *eventBatcher {
+func newEventBatcher(client workflowconnect.EventsProxyServiceClient, tp trace.TracerProvider) *eventBatcher {
 	b := &eventBatcher{
 		client: client,
+		tracer: tp.Tracer("executor/event_batcher"),
 		queue:  make(chan *eventReq, eventQueueDepth),
 	}
 	go b.collect()
@@ -50,7 +59,7 @@ func newEventBatcher(client workflowconnect.EventsProxyServiceClient) *eventBatc
 
 // Record enqueues event and blocks until its batch is flushed or ctx is done.
 func (b *eventBatcher) Record(ctx context.Context, event *workflow.ActionEvent) error {
-	req := &eventReq{event: event, done: make(chan error, 1)}
+	req := &eventReq{event: event, spanCtx: trace.SpanContextFromContext(ctx), done: make(chan error, 1)}
 	select {
 	case b.queue <- req:
 	case <-ctx.Done():
@@ -97,14 +106,33 @@ func (b *eventBatcher) collect() {
 // and unblocks every caller with the shared result.
 func (b *eventBatcher) flush(batch []*eventReq) {
 	events := make([]*workflow.ActionEvent, len(batch))
+	links := make([]trace.Link, 0, len(batch))
+	seen := make(map[trace.SpanID]struct{}, len(batch))
 	for i, r := range batch {
 		events[i] = r.event
+		if r.spanCtx.IsValid() {
+			if _, dup := seen[r.spanCtx.SpanID()]; !dup {
+				seen[r.spanCtx.SpanID()] = struct{}{}
+				links = append(links, trace.Link{SpanContext: r.spanCtx})
+			}
+		}
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), eventFlushTimeout)
 	defer cancel()
+	// Fan-in span: linked to every contributing reconcile span (the SDK may truncate
+	// links at its configured limit, default 128 — events.batch_size records the true
+	// count). The otelconnect client interceptor parents the Record RPC span here.
+	ctx, span := b.tracer.Start(ctx, "eventBatcher.flush",
+		trace.WithLinks(links...),
+		trace.WithAttributes(attribute.Int("events.batch_size", len(batch))))
+	defer span.End()
 	_, err := b.client.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
 		Events: events,
 	}))
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(otelcodes.Error, err.Error())
+	}
 	for _, r := range batch {
 		r.done <- err
 	}

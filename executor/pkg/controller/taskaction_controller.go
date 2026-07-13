@@ -30,6 +30,8 @@ import (
 
 	"connectrpc.com/connect"
 	"go.opentelemetry.io/otel/metric"
+
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -248,7 +250,7 @@ func NewTaskActionReconciler(
 		PluginRegistry: registry,
 		DataStore:      dataStore,
 		eventsClient:   eventsClient,
-		eventBatcher:   newEventBatcher(eventsClient),
+		eventBatcher:   newEventBatcher(eventsClient, otelutils.GetTracerProvider("executor")), // matches otelServiceName in executor/setup.go; noop until registered
 		cluster:        cluster,
 		metrics:        metrics,
 	}
