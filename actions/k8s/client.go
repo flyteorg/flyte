@@ -745,9 +745,9 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 	// Create the DB record once per action:
 	//   ADDED    — always record: nothing precedes an object's ADDED, so it is never
 	//              coalesced away and marks true first sight.
-	//   MODIFIED — record only with the dedup filter on: catches replay/reconnect/
-	//              record-retry first-sights; without the filter it would re-record
-	//              on every update.
+	//   MODIFIED — record only when the dedup filter is on; the filter catches
+	//              replay/reconnect/record-retry first-sights while blocking
+	//              re-records. With the filter off, MODIFIED is skipped entirely.
 	//   DELETED  — never record: handled as a terminal update below.
 	if eventType == watch.Added || (c.recordedFilter != nil && eventType != watch.Deleted) {
 		actionKey := []byte(buildTaskActionName(update.ActionID))
