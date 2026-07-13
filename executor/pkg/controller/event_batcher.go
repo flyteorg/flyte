@@ -39,10 +39,7 @@ type eventBatcher struct {
 }
 
 type eventReq struct {
-	event *workflow.ActionEvent
-	// spanCtx is the caller's span at enqueue time. A flush fans in events from many
-	// reconciles, so the shared RPC span cannot be parented under any single caller;
-	// each contributor is attached as a span LINK on the flush span instead.
+	event   *workflow.ActionEvent
 	spanCtx trace.SpanContext
 	done    chan error
 }
@@ -119,9 +116,6 @@ func (b *eventBatcher) flush(batch []*eventReq) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), eventFlushTimeout)
 	defer cancel()
-	// Fan-in span: linked to every contributing reconcile span (the SDK may truncate
-	// links at its configured limit, default 128 — events.batch_size records the true
-	// count). The otelconnect client interceptor parents the Record RPC span here.
 	ctx, span := b.tracer.Start(ctx, "eventBatcher.flush",
 		trace.WithLinks(links...),
 		trace.WithAttributes(attribute.Int("events.batch_size", len(batch))))
