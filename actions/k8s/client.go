@@ -113,8 +113,7 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, n
 	}
 
 	// The dedup filter is mandatory: notifyRunService records on every event type
-	// (including DELETED, to cover create-then-immediately-delete where the ADDED is
-	// coalesced away), and relies on the filter to keep RecordAction idempotent.
+	// and relies on the filter to keep RecordAction idempotent.
 	filter, err := fastcheck.NewOppoBloomFilter(recordFilterSize, scope.NewSubScope("actions_filter"))
 	if err != nil {
 		return nil, fmt.Errorf("actions: failed to create RecordAction dedup filter (size=%d): %w", recordFilterSize, err)
