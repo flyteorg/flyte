@@ -468,6 +468,12 @@ message ActionLeaf {
   // Metric for this entry — wall-clock duration, running duration, or
   // setup time depending on which list the leaf appears in.
   google.protobuf.Duration duration = 3;
+  // Member's current phase, so collapsed / out-of-window rows can render
+  // status without the full action being hydrated in the window.
+  common.ActionPhase phase = 4;
+  // Member's start time (mirrors ActionStatus.start_time), for the mini
+  // table start-time column on collapsed / out-of-window rows.
+  google.protobuf.Timestamp start_time = 5;
 }
 
 // GroupAggregations carries the four top-3 outlier lists for a group.
