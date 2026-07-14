@@ -110,6 +110,7 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 		3,
 		core.CatalogCacheStatus_CACHE_HIT,
 		&endTime,
+		nil,
 	)
 	require.NoError(t, err)
 
@@ -119,6 +120,66 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 	assert.Equal(t, uint32(3), action.Attempts)
 	assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT, action.CacheStatus)
 	assert.True(t, action.EndedAt.Valid)
+}
+
+// A supplied start time (the action's CRD creationTimestamp) must drive duration, so a
+// long-held action recorded late — e.g. when coalesced/backlogged events collapse
+// created_at toward the terminal time — still reports its real wall-clock duration.
+func TestUpdateActionPhase_StartTimeCorrectsDuration(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	actionID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Org: "org1", Project: "proj1", Domain: "domain1", Name: "run1"},
+		Name: "held-action",
+	}
+	// Row created "late" (created_at defaults to now), as when a coalesced event records
+	// a long-running action only at terminal time.
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	// The action actually started 120s ago (its CRD creationTimestamp) and just ended.
+	endTime := time.Now()
+	startTime := endTime.Add(-120 * time.Second)
+	err = actionRepo.UpdateActionPhase(ctx, actionID, common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime, &startTime)
+	require.NoError(t, err)
+
+	action, err := actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	require.True(t, action.DurationMs.Valid)
+	// Duration ~= ended - start (120s), not ended - created_at (~0).
+	assert.InDelta(t, 120000, action.DurationMs.Int64, 5000,
+		"duration must come from the supplied start time, not the late created_at")
+}
+
+// Without a start time, duration falls back to ended - created_at (unchanged behaviour).
+func TestUpdateActionPhase_NilStartTimeUsesCreatedAt(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	actionID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Org: "org1", Project: "proj1", Domain: "domain1", Name: "run1"},
+		Name: "quick-action",
+	}
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	endTime := time.Now()
+	err = actionRepo.UpdateActionPhase(ctx, actionID, common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil)
+	require.NoError(t, err)
+
+	action, err := actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	require.True(t, action.DurationMs.Valid)
+	assert.Less(t, action.DurationMs.Int64, int64(5000), "without a start time, duration is created_at-based")
 }
 
 func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
@@ -168,7 +229,7 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	}
 
 	// Update "other" — should NOT produce an update for "target".
-	err = repo.UpdateActionPhase(ctx, otherActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil)
+	err = repo.UpdateActionPhase(ctx, otherActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	select {
@@ -180,7 +241,7 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	}
 
 	// Update "target" — should produce an update.
-	err = repo.UpdateActionPhase(ctx, targetActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil)
+	err = repo.UpdateActionPhase(ctx, targetActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	select {
@@ -217,7 +278,7 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 	endTime := time.Now()
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_FAILED, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, &endTime)
+		core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil)
 	require.NoError(t, err)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
@@ -227,7 +288,7 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 	// Retry: transition from FAILED back to QUEUED — should succeed
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_QUEUED, 2,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	action, err = actionRepo.GetAction(ctx, actionID)
@@ -260,13 +321,13 @@ func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 	// Move to RUNNING
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_RUNNING, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	// Try to downgrade from RUNNING to QUEUED — should be a no-op (phase guard)
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_QUEUED, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
@@ -299,13 +360,13 @@ func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 	endTime := time.Now()
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_SUCCEEDED, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, &endTime)
+		core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil)
 	require.NoError(t, err)
 
 	// Try to downgrade from SUCCEEDED to QUEUED — should be a no-op
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_QUEUED, 2,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
@@ -705,7 +766,7 @@ func TestUpdateActionPhase_AbortedDoesNotInsertEvent(t *testing.T) {
 	require.NoError(t, err)
 
 	endTime := time.Now()
-	err = actionRepo.UpdateActionPhase(ctx, actionID, common.ActionPhase_ACTION_PHASE_ABORTED, 1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime)
+	err = actionRepo.UpdateActionPhase(ctx, actionID, common.ActionPhase_ACTION_PHASE_ABORTED, 1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil)
 	require.NoError(t, err)
 
 	// Phase column must be updated.
