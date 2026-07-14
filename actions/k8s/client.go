@@ -100,7 +100,10 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, n
 	if numWorkers <= 0 {
 		numWorkers = 1
 	}
-	if recordFilterSize <= 0 {
+	if recordFilterSize < 0 {
+		return nil, fmt.Errorf("actions: recordFilterSize must be non-negative, got %d", recordFilterSize)
+	}
+	if recordFilterSize == 0 {
 		recordFilterSize = defaultRecordFilterSize
 	}
 	c := &ActionsClient{

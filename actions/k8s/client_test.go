@@ -1011,3 +1011,14 @@ func testFilter() fastcheck.Filter {
 	f, _ := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
 	return f
 }
+
+func TestNewActionsClient_FilterSizeValidation(t *testing.T) {
+	// A negative recordFilterSize is an invalid config and must fail fast.
+	_, err := NewActionsClient(nil, nil, "ns", 10, 1, nil, -1, promutils.NewTestScope())
+	require.Error(t, err)
+
+	// Zero means "unset": fall back to the default and build the mandatory filter.
+	c, err := NewActionsClient(nil, nil, "ns", 10, 1, nil, 0, promutils.NewTestScope())
+	require.NoError(t, err)
+	require.NotNil(t, c.recordedFilter)
+}
