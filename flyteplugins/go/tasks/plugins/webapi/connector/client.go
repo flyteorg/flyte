@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/grpcutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/connector"
 )
@@ -53,6 +54,12 @@ func getGrpcConnection(ctx context.Context, connector *Deployment) (*grpc.Client
 	if len(connector.DefaultServiceConfig) != 0 {
 		opts = append(opts, grpc.WithDefaultServiceConfig(connector.DefaultServiceConfig))
 	}
+
+	clientMetrics := grpcutils.GrpcClientMetrics()
+	opts = append(opts,
+		grpc.WithChainUnaryInterceptor(clientMetrics.UnaryClientInterceptor()),
+		grpc.WithChainStreamInterceptor(clientMetrics.StreamClientInterceptor()),
+	)
 
 	var err error
 	conn, err := grpc.Dial(connector.Endpoint, opts...) //nolint: staticcheck

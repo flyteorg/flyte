@@ -5,6 +5,7 @@ package flyteidl2.task;
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/phase.proto";
+import "flyteidl2/common/run.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/security.proto";
 import "flyteidl2/notification/definition.proto";
@@ -140,10 +141,10 @@ message RunSpec {
   // blob (user data) layout.
   string run_base_dir = 14;
 
-  // Optional pointer to the single parent run this run was derived from (re-run, recover,
-  // clone, or explicit SDK/CLI provenance). Set at creation, immutable thereafter, and scoped
-  // to the same org/project/domain as this run.
-  flyteidl2.common.RunIdentifier related_to = 15;
+  // Deprecated: use relation instead. Optional pointer to the single parent run this run
+  // was derived from. If set and relation is unset, the server normalizes it into relation
+  // with RELATION_TYPE_RERUN.
+  flyteidl2.common.RunIdentifier related_to = 15 [deprecated = true];
 
   // Pool of the assigned queue for given run.
   // Always set by server. Should not be specified by user.
@@ -152,6 +153,11 @@ message RunSpec {
   // How the task spec was provided at creation (deployed TaskId vs inline spec).
   // Set by server; lets the rerun UI choose TaskId over the full inline spec.
   TaskSpecSource task_spec_source = 17;
+
+  // Optional provenance link to the single parent run this run was derived from
+  // (re-run or recover). Set at creation, immutable thereafter, and scoped to the
+  // same org/project/domain as this run. Replaces related_to.
+  flyteidl2.common.Relation relation = 18;
 }
 
 message InlineRuleList {

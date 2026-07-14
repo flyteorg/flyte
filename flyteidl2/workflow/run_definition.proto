@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/identity.proto";
 import "flyteidl2/common/phase.proto";
+import "flyteidl2/common/run.proto";
 import "flyteidl2/core/catalog.proto";
 import "flyteidl2/core/execution.proto";
 import "flyteidl2/core/literals.proto";
@@ -195,6 +196,10 @@ message ActionMetadata {
 
   // Who initiated this run
   RunSource source = 16;
+
+  // Provenance link to the parent run this action was derived from (re-run or
+  // recover), if any. Only set on root actions created with a relation.
+  common.Relation relation = 17;
 }
 
 enum ActionType {

@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.common;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
 
@@ -11,4 +12,32 @@ message OffloadedInputData {
   string uri = 1 [(buf.validate.field).string.min_len = 1];
 
   string inputs_hash = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+// RelationType describes how a run was derived from the parent run it relates to.
+enum RelationType {
+  RELATION_TYPE_UNSPECIFIED = 0;
+
+  // The run is a re-run of the parent run.
+  RELATION_TYPE_RERUN = 1;
+
+  // The run recovers the parent run, resuming from its last known good state.
+  RELATION_TYPE_RECOVER = 2;
+}
+
+// Relation is a provenance link to the single parent run this run was derived from.
+// Set at creation, immutable thereafter.
+message Relation {
+  // The parent run. Scoped to the same org/project/domain as the referencing run.
+  RunIdentifier related_to = 1 [(buf.validate.field).required = true];
+
+  // How this run was derived from the parent.
+  RelationType relation_type = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "relation_type.greater_than_zero"
+      message: "Relation type must be greater than 0 (cannot be UNSPECIFIED)"
+      expression: "int(this) > 0"
+    }
+  ];
 }
