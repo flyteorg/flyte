@@ -347,12 +347,14 @@ func decodeActionCursor(token string) (actionCursor, error) {
 
 // ListActions lists actions matching the given input filter, sort, and pagination.
 func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Action, error) {
-	// ListActions paginates by keyset (KeysetAfter) or cursor (CursorToken); the two
-	// are mutually exclusive. Offset is not supported here (the WatchActions snapshot
-	// uses keyset) — reject it up front so a caller passing Offset fails fast instead of
-	// silently getting the first page again.
-	if input.Offset != 0 {
-		return nil, fmt.Errorf("offset pagination is not supported by ListActions; use keyset or cursor")
+	// ListActions supports three mutually-exclusive pagination modes: keyset
+	// (KeysetAfter, used by the WatchActions snapshot), cursor (CursorToken, the
+	// default-sorted RPC paging), and offset (Offset). At most one may be set.
+	if input.Offset < 0 {
+		return nil, fmt.Errorf("offset must be non-negative")
+	}
+	if input.Offset > 0 && (input.KeysetAfterCreatedAt != nil || input.CursorToken != "") {
+		return nil, fmt.Errorf("offset is mutually exclusive with keysetAfter and cursorToken")
 	}
 	if input.KeysetAfterCreatedAt != nil {
 		if input.CursorToken != "" {
@@ -444,6 +446,11 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 
 	queryBuilder.WriteString(" LIMIT ?")
 	args = append(args, input.Limit+1)
+
+	if input.Offset > 0 {
+		queryBuilder.WriteString(" OFFSET ?")
+		args = append(args, input.Offset)
+	}
 
 	query := sqlx.Rebind(sqlx.DOLLAR, queryBuilder.String())
 

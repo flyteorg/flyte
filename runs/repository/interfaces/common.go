@@ -11,12 +11,13 @@ type ListResourceInput struct {
 	// token is built by EncodeActionCursor over that repo's default sort). The other List
 	// methods on this shared input paginate by Offset and ignore CursorToken. When set,
 	// paging returns rows ordered strictly after the previous page's last row; for
-	// ListActions it is mutually exclusive with KeysetAfter and a custom SortParameters.
+	// ListActions it is mutually exclusive with KeysetAfter, Offset, and a custom
+	// SortParameters.
 	CursorToken string
 
-	// Offset is an integer offset for offset-based pagination (used by other repos'
-	// List methods). actionRepo.ListActions paginates by keyset/cursor, not offset, and
-	// rejects a non-zero Offset rather than silently ignoring it.
+	// Offset is an integer offset for offset-based pagination. actionRepo.ListActions
+	// applies it as SQL OFFSET (mutually exclusive with KeysetAfter and CursorToken) and
+	// rejects a negative value; the other repos' List methods use it too.
 	Offset int
 
 	// KeysetAfterCreatedAt/KeysetAfterName do ascending composite keyset pagination:

@@ -595,11 +595,29 @@ func TestListActions_CursorPaginationTiedCreatedAt(t *testing.T) {
 	})
 	require.Error(t, err)
 
-	// Offset is unsupported and rejected up front rather than silently ignored.
-	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+	// Offset is supported: it applies SQL OFFSET over the default sort. off5 starts 5
+	// rows into off0's ordering.
+	off0, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter: NewRunActionsFilter(runID),
+		Limit:  10,
+	})
+	require.NoError(t, err)
+	require.Greater(t, len(off0), 5)
+	off5, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
 		Filter: NewRunActionsFilter(runID),
 		Limit:  10,
 		Offset: 5,
+	})
+	require.NoError(t, err)
+	assert.Equal(t, off0[5].Name, off5[0].Name, "offset 5 must skip the first 5 rows of the default sort")
+
+	// Negative offset is rejected, and offset is mutually exclusive with cursor.
+	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter: NewRunActionsFilter(runID), Limit: 10, Offset: -1,
+	})
+	require.Error(t, err)
+	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter: NewRunActionsFilter(runID), Limit: 10, Offset: 5, CursorToken: "opaque-cursor",
 	})
 	require.Error(t, err)
 }
