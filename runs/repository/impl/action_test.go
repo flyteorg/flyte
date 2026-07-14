@@ -525,8 +525,10 @@ func TestListActionsOffsetPagination(t *testing.T) {
 // of children with identical created_at. OFFSET over a non-unique ORDER BY has
 // undefined order among ties, so pages overlap/skip and the snapshot loses rows
 // (count came up short, e.g. 4.8K instead of 20000). The fix adds a deterministic
-// "name" tiebreaker. Here we force tied created_at and assert offset paging by
-// (created_at, run_name) stays totally ordered and covers every row exactly once.
+// tiebreaker (the run-scoped unique action "name" in production; here the fixture is
+// root actions across runs, so run_name is the unique column). We force tied
+// created_at and assert offset paging by (created_at, run_name) stays totally ordered
+// and covers every row exactly once.
 func TestListActionsOffsetPaginationTiedCreatedAt(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
@@ -581,7 +583,7 @@ func TestListActionsOffsetPaginationTiedCreatedAt(t *testing.T) {
 
 	assert.Len(t, seen, total, "offset paging over tied created_at must cover all actions exactly once")
 	assert.True(t, sort1.IsSorted(sort1.StringSlice(ordered)),
-		"the name tiebreaker must give a total order so pages don't overlap/skip")
+		"the run_name tiebreaker must give a total order so pages don't overlap/skip")
 }
 
 // TestListActions_KeysetPagination covers the O(n) keyset paging used by the

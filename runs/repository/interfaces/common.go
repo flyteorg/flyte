@@ -7,8 +7,9 @@ type ListResourceInput struct {
 	Limit int
 
 	// CursorToken is a keyset pagination cursor encoded as a RFC3339Nano timestamp.
-	// When set, the query returns rows with created_at strictly greater than the cursor value.
-	// Mutually exclusive with Offset.
+	// It pages the default descending (newest-first) sort, so the query returns rows
+	// with created_at strictly LESS than the cursor value (older than the last row of
+	// the previous page). Mutually exclusive with Offset and KeysetAfter.
 	CursorToken string
 
 	// Offset is an integer offset for offset-based pagination.
