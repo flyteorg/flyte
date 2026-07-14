@@ -91,20 +91,13 @@ type ActionsClient struct {
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
-// defaultRecordFilterSize is the fallback bloom-filter capacity used when the
-// configured size is non-positive. The filter is mandatory (see NewActionsClient),
-// so we always create one rather than running without dedup.
-const defaultRecordFilterSize = 1 << 20
-
 func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) (*ActionsClient, error) {
 	if numWorkers <= 0 {
 		numWorkers = 1
 	}
-	if recordFilterSize < 0 {
-		return nil, fmt.Errorf("actions: recordFilterSize must be non-negative, got %d", recordFilterSize)
-	}
-	if recordFilterSize == 0 {
-		recordFilterSize = defaultRecordFilterSize
+	// The dedup filter is mandatory, so its size must be a positive value.
+	if recordFilterSize <= 0 {
+		return nil, fmt.Errorf("actions: recordFilterSize must be positive, got %d", recordFilterSize)
 	}
 	c := &ActionsClient{
 		k8sClient:   k8sClient,
