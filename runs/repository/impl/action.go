@@ -360,6 +360,9 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 		if input.CursorToken != "" {
 			return nil, fmt.Errorf("keysetAfter is mutually exclusive with cursorToken")
 		}
+		if input.KeysetAfterName == "" {
+			return nil, fmt.Errorf("keysetAfter requires keysetAfterName")
+		}
 		// The keyset WHERE `(created_at, name) > (?, ?)` is only correct when the query
 		// is ordered by exactly (created_at ASC, name ASC); any other sort would skip or
 		// duplicate rows across pages.
