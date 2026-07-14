@@ -399,7 +399,7 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 		if err != nil {
 			return nil, fmt.Errorf("invalid cursor token: %w", err)
 		}
-		if c.Phase == 0 || c.CreatedAt.IsZero() || c.RunName == "" || c.Name == "" {
+		if c.CreatedAt.IsZero() || c.RunName == "" || c.Name == "" {
 			return nil, fmt.Errorf("invalid cursor token: missing required fields")
 		}
 		// Keyset for ORDER BY phase ASC, created_at DESC, run_name DESC, name DESC.
