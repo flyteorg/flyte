@@ -165,16 +165,26 @@ message InlineRuleList {
 }
 
 message InlineRule {
+  // A rule's delivery template compiles against exactly one template data
+  // shape, so PAUSED (ActionPausedNotificationTemplateData) cannot be mixed
+  // with terminal phases (RunCompletedNotificationTemplateData) in one rule.
+  option (buf.validate.message).cel = {
+    id: "paused_rule_exclusive"
+    message: "a rule subscribing to ACTION_PHASE_PAUSED must not subscribe to other phases"
+    expression: "!(flyteidl2.common.ActionPhase.ACTION_PHASE_PAUSED in this.on_phases) || this.on_phases.size() == 1"
+  };
+
   repeated common.ActionPhase on_phases = 1 [(buf.validate.field).repeated = {
     min_items: 1
     unique: true
     items: {
       enum: {
-        in: [ // terminal phases only
+        in: [ // terminal phases, plus PAUSED (condition awaiting a signal)
           5, // ACTION_PHASE_SUCCEEDED
           6, // ACTION_PHASE_FAILED
           7, // ACTION_PHASE_ABORTED
-          8 // ACTION_PHASE_TIMED_OUT
+          8, // ACTION_PHASE_TIMED_OUT
+          9 // ACTION_PHASE_PAUSED
         ]
       }
     }
@@ -187,6 +197,7 @@ message InlineRule {
     string delivery_config_name = 2;
 
     // template can only have fields defined in flyteidl2.notification.RunCompletedNotificationTemplateData
+    // (terminal-phase rules) or flyteidl2.notification.ActionPausedNotificationTemplateData (PAUSED rules)
     flyteidl2.notification.DeliveryConfigTemplate delivery_template = 3;
   }
 }
