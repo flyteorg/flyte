@@ -327,9 +327,12 @@ type actionCursor struct {
 
 // EncodeActionCursor builds the pagination token for the last action of a page. The token
 // is opaque (base64-encoded JSON); callers pass it back as ListResourceInput.CursorToken.
-func EncodeActionCursor(a *models.Action) string {
-	b, _ := json.Marshal(actionCursor{Phase: a.Phase, CreatedAt: a.CreatedAt.UTC(), RunName: a.RunName, Name: a.Name})
-	return base64.RawURLEncoding.EncodeToString(b)
+func EncodeActionCursor(a *models.Action) (string, error) {
+	b, err := json.Marshal(actionCursor{Phase: a.Phase, CreatedAt: a.CreatedAt.UTC(), RunName: a.RunName, Name: a.Name})
+	if err != nil {
+		return "", fmt.Errorf("failed to encode action cursor: %w", err)
+	}
+	return base64.RawURLEncoding.EncodeToString(b), nil
 }
 
 func decodeActionCursor(token string) (actionCursor, error) {
@@ -346,7 +349,11 @@ func decodeActionCursor(token string) (actionCursor, error) {
 func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Action, error) {
 	// ListActions paginates by keyset (KeysetAfter) or cursor (CursorToken); the two
 	// are mutually exclusive. Offset is not supported here (the WatchActions snapshot
-	// uses keyset).
+	// uses keyset) — reject it up front so a caller passing Offset fails fast instead of
+	// silently getting the first page again.
+	if input.Offset != 0 {
+		return nil, fmt.Errorf("offset pagination is not supported by ListActions; use keyset or cursor")
+	}
 	if input.KeysetAfterCreatedAt != nil {
 		if input.CursorToken != "" {
 			return nil, fmt.Errorf("keysetAfter is mutually exclusive with cursorToken")

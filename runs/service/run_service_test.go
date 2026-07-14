@@ -30,6 +30,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -742,6 +743,15 @@ func TestListRuns(t *testing.T) {
 		runs []*models.Run
 		err  error
 	}
+	// The service now returns opaque keyset cursors (impl.EncodeActionCursor over the
+	// last trimmed row), not RFC3339Nano timestamps. Encode the expected/round-tripped
+	// tokens the same way so the assertions match what the handler produces.
+	tok5, err := impl.EncodeActionCursor(sqlRes[5])
+	require.NoError(t, err)
+	tok6, err := impl.EncodeActionCursor(sqlRes[6])
+	require.NoError(t, err)
+	tok8, err := impl.EncodeActionCursor(sqlRes[8])
+	require.NoError(t, err)
 	testCases := []struct {
 		name    string
 		req     *common.ListRequest
@@ -759,14 +769,14 @@ func TestListRuns(t *testing.T) {
 			// returned for a limit of 2, the slice is trimmed to the first 2
 			// runs and the cursor token is the trimmed last row's created_at.
 			"list with limit 2 and token",
-			&common.ListRequest{Limit: 2, Token: sqlRes[5].CreatedAt.UTC().Format(time.RFC3339Nano)},
+			&common.ListRequest{Limit: 2, Token: tok5},
 			mockListRes{runs: sqlRes[5:8], err: nil},
-			&workflow.ListRunsResponse{Runs: runs[5:7], Token: sqlRes[6].CreatedAt.UTC().Format(time.RFC3339Nano)},
+			&workflow.ListRunsResponse{Runs: runs[5:7], Token: tok6},
 		},
 		{
 			// Only 2 rows returned for limit 3 means no next page — token empty.
 			"list with limit 3 and token",
-			&common.ListRequest{Limit: 3, Token: sqlRes[8].CreatedAt.UTC().Format(time.RFC3339Nano)},
+			&common.ListRequest{Limit: 3, Token: tok8},
 			mockListRes{runs: sqlRes[8:10], err: nil},
 			&workflow.ListRunsResponse{Runs: runs[8:10], Token: ""},
 		},

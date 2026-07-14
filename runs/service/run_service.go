@@ -933,7 +933,10 @@ func (s *RunService) ListRuns(
 	var nextToken string
 	if len(actions) > listInput.Limit {
 		actions = actions[:listInput.Limit]
-		nextToken = impl.EncodeActionCursor(actions[len(actions)-1])
+		nextToken, err = impl.EncodeActionCursor(actions[len(actions)-1])
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	protoRuns := make([]*workflow.Run, len(actions))
@@ -984,7 +987,10 @@ func (s *RunService) ListActions(
 	var nextToken string
 	if len(actions) > listInput.Limit {
 		actions = actions[:listInput.Limit]
-		nextToken = impl.EncodeActionCursor(actions[len(actions)-1])
+		nextToken, err = impl.EncodeActionCursor(actions[len(actions)-1])
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	protoActions := make([]*workflow.Action, len(actions))

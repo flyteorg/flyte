@@ -14,7 +14,8 @@ type ListResourceInput struct {
 	CursorToken string
 
 	// Offset is an integer offset for offset-based pagination (used by other repos'
-	// List methods; actionRepo.ListActions paginates by keyset/cursor, not offset).
+	// List methods). actionRepo.ListActions paginates by keyset/cursor, not offset, and
+	// rejects a non-zero Offset rather than silently ignoring it.
 	Offset int
 
 	// KeysetAfterCreatedAt/KeysetAfterName do ascending composite keyset pagination:
