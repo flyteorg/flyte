@@ -1371,7 +1371,12 @@ func (s *RunService) listAndSendAllActions(
 	rsm *runStateManager,
 	stream *connect.ServerStream[workflow.WatchActionsResponse],
 ) error {
-	const pageSize = 100
+	// Larger pages keep the initial snapshot fast: OFFSET paging re-scans ~offset
+	// rows per page, so cost is ~O(n^2/pageSize). At 100 an 8k-action run took ~5s
+	// (and raced the console's stream timeout); 1000 cuts scanned rows and round
+	// trips ~10x, bringing it well under a second. See keyset-cursor follow-up for
+	// the O(n) fix.
+	const pageSize = 1000
 	offset := 0
 	for {
 		// Sort ascending by created_at so parent actions are inserted into the
