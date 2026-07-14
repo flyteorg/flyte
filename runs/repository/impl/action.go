@@ -315,8 +315,18 @@ func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdent
 
 // ListActions lists actions matching the given input filter, sort, and pagination.
 func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Action, error) {
-	if input.KeysetAfterCreatedAt != nil && (input.CursorToken != "" || input.Offset > 0) {
-		return nil, fmt.Errorf("KeysetAfter is mutually exclusive with CursorToken and Offset")
+	if input.KeysetAfterCreatedAt != nil {
+		if input.CursorToken != "" || input.Offset > 0 {
+			return nil, fmt.Errorf("KeysetAfter is mutually exclusive with CursorToken and Offset")
+		}
+		// The keyset WHERE `(created_at, name) > (?, ?)` is only correct when the query
+		// is ordered by exactly (created_at ASC, name ASC); any other sort would skip or
+		// duplicate rows across pages. Enforce that contract rather than trust the caller.
+		if len(input.SortParameters) != 2 ||
+			input.SortParameters[0].GetOrderExpr() != "created_at ASC" ||
+			input.SortParameters[1].GetOrderExpr() != "name ASC" {
+			return nil, fmt.Errorf("KeysetAfter requires SortParameters (created_at ASC, name ASC)")
+		}
 	}
 
 	var queryBuilder strings.Builder

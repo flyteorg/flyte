@@ -654,6 +654,16 @@ func TestListActions_KeysetPagination(t *testing.T) {
 		Offset:               5,
 	})
 	require.Error(t, err)
+
+	// Keyset requires the (created_at ASC, name ASC) sort; any other sort is rejected
+	// because the keyset WHERE would otherwise skip/duplicate rows across pages.
+	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter:               NewRunActionsFilter(runID),
+		Limit:                10,
+		KeysetAfterCreatedAt: &now,
+		SortParameters:       []interfaces.SortParameter{NewSortParameter("name", interfaces.SortOrderAscending)},
+	})
+	require.Error(t, err)
 }
 
 func setupActionEventDB(t *testing.T) (*sqlx.DB, *actionRepo) {
