@@ -346,6 +346,15 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 	queryBuilder.WriteString(" LIMIT ?")
 	args = append(args, input.Limit+1)
 
+	// Offset-based pagination (mutually exclusive with CursorToken, per
+	// ListResourceInput). Without emitting OFFSET, callers that page by Offset
+	// (e.g. WatchActions' initial full listing) silently re-read the first page
+	// on every iteration, capping the result at a single page (~Limit rows).
+	if input.Offset > 0 {
+		queryBuilder.WriteString(" OFFSET ?")
+		args = append(args, input.Offset)
+	}
+
 	query := sqlx.Rebind(sqlx.DOLLAR, queryBuilder.String())
 
 	var actions []*models.Action

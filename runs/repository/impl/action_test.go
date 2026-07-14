@@ -392,6 +392,49 @@ func TestListRuns(t *testing.T) {
 	}
 }
 
+func TestListActions_OffsetPagination(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	// Five root actions in one project.
+	for _, name := range []string{"run-1", "run-2", "run-3", "run-4", "run-5"} {
+		_, err := actionRepo.CreateAction(ctx, &models.Run{
+			Project: "proj1",
+			Domain:  "domain1",
+			RunName: name,
+			Name:    rootActionName,
+			Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		}, false)
+		require.NoError(t, err)
+	}
+
+	filter := NewIsRootActionFilter().And(NewEqualFilter("project", "proj1"))
+	count := func(limit, offset int) int {
+		got, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+			Filter: filter,
+			Limit:  limit,
+			Offset: offset,
+		})
+		require.NoError(t, err)
+		return len(got)
+	}
+
+	require.Equal(t, 5, count(50, 0), "all five root actions")
+
+	// Offset must skip rows: offset N of 5 returns 5-N. Before OFFSET was honored,
+	// the offset was ignored and every one of these returned all 5 rows.
+	assert.Equal(t, 3, count(50, 2), "offset=2 skips the first two")
+	assert.Equal(t, 1, count(50, 4), "offset=4 leaves only the last")
+	assert.Equal(t, 0, count(50, 5), "offset past the end returns nothing")
+
+	// Offset composes with the Limit+1 keyset probe: page size 2 at offset 2 still
+	// returns from the third row onward (up to Limit+1).
+	assert.Equal(t, 3, count(2, 2), "Limit=2 at offset=2 returns rows 3..5 (limit+1 probe)")
+}
+
 func setupActionEventDB(t *testing.T) (*sqlx.DB, *actionRepo) {
 	db := setupActionDB(t)
 	r, err := NewActionRepo(db, testDbConfig)
