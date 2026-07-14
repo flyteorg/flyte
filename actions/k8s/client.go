@@ -741,82 +741,72 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 	if c.runClient == nil {
 		return
 	}
-
-	// Ensure the action's DB row exists before any status update, deduplicated via the
-	// mandatory recordedFilter. We attempt on EVERY event type — including DELETED —
-	// because a create-then-immediately-delete can coalesce the ADDED's processing away
-	// (handleWatchEvent reads the latest from cache, finds it already gone, and bails),
-	// leaving no row for the terminal UpdateActionStatus to match. The DELETE tombstone
-	// still carries Spec, so recording from it creates the row; the filter makes the
-	// normal-lifecycle re-record a no-op.
-	{
-		actionKey := []byte(buildTaskActionName(update.ActionID))
-		isDuplicate := c.recordedFilter.Contains(ctx, actionKey)
-		if isDuplicate {
-			logger.Debugf(ctx, "Skipping duplicate RecordAction for %s", update.ActionID.Name)
-		} else {
-			recordReq := &workflow.RecordActionRequest{
-				ActionId: update.ActionID,
-				Parent:   update.ParentActionName,
-				InputUri: taskAction.Spec.InputURI,
-				Group:    taskAction.Spec.Group,
-			}
-			if taskAction.Spec.ActionType == executorv1.ActionTypeCondition {
-				condSpec := &workflow.ConditionAction{}
-				if err := proto.Unmarshal(taskAction.Spec.ConditionSpec, condSpec); err != nil {
-					logger.Warnf(ctx, "Failed to unmarshal condition spec for %s: %v", update.ActionID.Name, err)
-				} else {
-					recordReq.Spec = &workflow.RecordActionRequest_Condition{Condition: condSpec}
-				}
-			} else if taskAction.Spec.TaskType != "" {
-				ta := &workflow.TaskAction{
-					Id: &task.TaskIdentifier{
-						Project: taskAction.Spec.Project,
-						Domain:  taskAction.Spec.Domain,
-					},
-				}
-				// Deserialize TaskTemplate to build TaskSpec
-				if len(taskAction.Spec.TaskTemplate) > 0 {
-					var tmpl core.TaskTemplate
-					if err := proto.Unmarshal(taskAction.Spec.TaskTemplate, &tmpl); err == nil {
-						if tmplID := tmpl.GetId(); tmplID != nil {
-							ta.Id.Name = tmplID.GetName()
-							ta.Id.Version = tmplID.GetVersion()
-						}
-						ta.Spec = &task.TaskSpec{
-							TaskTemplate: &tmpl,
-							ShortName:    taskAction.Spec.ShortName,
-						}
-					}
-				}
-				recordReq.Spec = &workflow.RecordActionRequest_Task{
-					Task: ta,
-				}
-			}
-			if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {
-				logger.Warnf(ctx, "Failed to record action in run service for %s: %v", update.ActionID.Name, err)
-			} else {
-				c.recordedFilter.Add(ctx, actionKey)
-			}
+	actionKey := []byte(buildTaskActionName(update.ActionID))
+	isDuplicate := c.recordedFilter.Contains(ctx, actionKey)
+	if isDuplicate {
+		logger.Debugf(ctx, "Skipping duplicate RecordAction for %s", update.ActionID.Name)
+	} else {
+		recordReq := &workflow.RecordActionRequest{
+			ActionId: update.ActionID,
+			Parent:   update.ParentActionName,
+			InputUri: taskAction.Spec.InputURI,
+			Group:    taskAction.Spec.Group,
 		}
-
-		// When a child action first appears, the parent must already be running (it
-		// created the child). Promote the parent to RUNNING so the UI doesn't
-		// stay stuck on INITIALIZING while children are executing.
-		if !isDuplicate && eventType != watch.Deleted && update.ParentActionName != "" {
-			parentID := &common.ActionIdentifier{
-				Run:  update.ActionID.Run,
-				Name: update.ParentActionName,
+		if taskAction.Spec.ActionType == executorv1.ActionTypeCondition {
+			condSpec := &workflow.ConditionAction{}
+			if err := proto.Unmarshal(taskAction.Spec.ConditionSpec, condSpec); err != nil {
+				logger.Warnf(ctx, "Failed to unmarshal condition spec for %s: %v", update.ActionID.Name, err)
+			} else {
+				recordReq.Spec = &workflow.RecordActionRequest_Condition{Condition: condSpec}
 			}
-			parentStatusReq := &workflow.UpdateActionStatusRequest{
-				ActionId: parentID,
-				Status: &workflow.ActionStatus{
-					Phase: common.ActionPhase_ACTION_PHASE_RUNNING,
+		} else if taskAction.Spec.TaskType != "" {
+			ta := &workflow.TaskAction{
+				Id: &task.TaskIdentifier{
+					Project: taskAction.Spec.Project,
+					Domain:  taskAction.Spec.Domain,
 				},
 			}
-			if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(parentStatusReq)); err != nil {
-				logger.Warnf(ctx, "Failed to promote parent action %s to RUNNING: %v", update.ParentActionName, err)
+			// Deserialize TaskTemplate to build TaskSpec
+			if len(taskAction.Spec.TaskTemplate) > 0 {
+				var tmpl core.TaskTemplate
+				if err := proto.Unmarshal(taskAction.Spec.TaskTemplate, &tmpl); err == nil {
+					if tmplID := tmpl.GetId(); tmplID != nil {
+						ta.Id.Name = tmplID.GetName()
+						ta.Id.Version = tmplID.GetVersion()
+					}
+					ta.Spec = &task.TaskSpec{
+						TaskTemplate: &tmpl,
+						ShortName:    taskAction.Spec.ShortName,
+					}
+				}
 			}
+			recordReq.Spec = &workflow.RecordActionRequest_Task{
+				Task: ta,
+			}
+		}
+		if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {
+			logger.Warnf(ctx, "Failed to record action in run service for %s: %v", update.ActionID.Name, err)
+		} else {
+			c.recordedFilter.Add(ctx, actionKey)
+		}
+	}
+
+	// When a child action first appears, the parent must already be running (it
+	// created the child). Promote the parent to RUNNING so the UI doesn't
+	// stay stuck on INITIALIZING while children are executing.
+	if !isDuplicate && eventType != watch.Deleted && update.ParentActionName != "" {
+		parentID := &common.ActionIdentifier{
+			Run:  update.ActionID.Run,
+			Name: update.ParentActionName,
+		}
+		parentStatusReq := &workflow.UpdateActionStatusRequest{
+			ActionId: parentID,
+			Status: &workflow.ActionStatus{
+				Phase: common.ActionPhase_ACTION_PHASE_RUNNING,
+			},
+		}
+		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(parentStatusReq)); err != nil {
+			logger.Warnf(ctx, "Failed to promote parent action %s to RUNNING: %v", update.ParentActionName, err)
 		}
 	}
 
