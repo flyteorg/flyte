@@ -169,11 +169,12 @@ type Config struct {
 	AzureSecretManagerConfig    AzureSecretManagerConfig    `json:"azureSecretManager" pflag:",Azure Secret Manager config."`
 
 	// Ignore PFlag for Image Builder
-	ImageBuilderConfig                 ImageBuilderConfig `json:"imageBuilderConfig,omitempty" pflag:"-,"`
-	WebhookTimeout                     int32              `json:"webhookTimeout" pflag:",Timeout for webhook calls in seconds. Defaults to 30 seconds."`
-	DisableCreateMutatingWebhookConfig bool               `json:"disableCreateMutatingWebhookConfig"`
-	KubeClientConfig                   KubeClientConfig   `json:"kubeClientConfig" pflag:",Configuration to control the Kubernetes client used by the webhook"`
-	SecretEnvVarPrefix                 string             `json:"secretEnvVarPrefix" pflag:",The prefix for secret environment variables. Used by K8s, Global, and Embedded secret managers. Defaults to _UNION_"`
+	ImageBuilderConfig                 ImageBuilderConfig    `json:"imageBuilderConfig,omitempty" pflag:"-,"`
+	WebhookTimeout                     int32                 `json:"webhookTimeout" pflag:",Timeout for webhook calls in seconds. Defaults to 30 seconds."`
+	DisableCreateMutatingWebhookConfig bool                  `json:"disableCreateMutatingWebhookConfig"`
+	NamespaceSelector                  *metav1.LabelSelector `json:"namespaceSelector" pflag:"-,NamespaceSelector to scope the created MutatingWebhookConfiguration. Nil matches all namespaces."`
+	KubeClientConfig                   KubeClientConfig      `json:"kubeClientConfig" pflag:",Configuration to control the Kubernetes client used by the webhook"`
+	SecretEnvVarPrefix                 string                `json:"secretEnvVarPrefix" pflag:",The prefix for secret environment variables. Used by K8s, Global, and Embedded secret managers. Defaults to _UNION_"`
 }
 
 //go:generate enumer --type=EmbeddedSecretManagerType -json -yaml -trimprefix=EmbeddedSecretManagerType

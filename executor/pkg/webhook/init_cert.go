@@ -34,18 +34,14 @@ const (
 	CaCertKey            = "ca.crt"
 	ServerCertKey        = "tls.crt"
 	ServerCertPrivateKey = "tls.key"
-	podDefaultNamespace  = "flyte"
 	permission           = 0644
 	folderPerm           = 0755
 )
 
 // InitCerts generates a self-signed TLS certificate for the webhook and stores it in a k8s Secret.
-func InitCerts(ctx context.Context, kubeClient kubernetes.Interface, cfg *webhookConfig.Config) error {
-	podNamespace, found := os.LookupEnv(PodNamespaceEnvVar)
-	if !found {
-		podNamespace = podDefaultNamespace
-	}
-
+// podNamespace must be the namespace the webhook service runs in — the cert's DNS
+// names are derived from it.
+func InitCerts(ctx context.Context, kubeClient kubernetes.Interface, cfg *webhookConfig.Config, podNamespace string) error {
 	logger.Infof(ctx, "Issuing certs")
 	certs, err := createCerts(cfg.ServiceName, podNamespace)
 	if err != nil {
