@@ -76,16 +76,16 @@ class RunDetails(_message.Message):
     def __init__(self, run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., action: _Optional[_Union[ActionDetails, _Mapping]] = ...) -> None: ...
 
 class TaskAction(_message.Message):
-    __slots__ = ["id", "spec", "cache_key", "cluster"]
+    __slots__ = ["id", "spec", "cache_key", "queue"]
     ID_FIELD_NUMBER: _ClassVar[int]
     SPEC_FIELD_NUMBER: _ClassVar[int]
     CACHE_KEY_FIELD_NUMBER: _ClassVar[int]
-    CLUSTER_FIELD_NUMBER: _ClassVar[int]
+    QUEUE_FIELD_NUMBER: _ClassVar[int]
     id: _task_definition_pb2.TaskIdentifier
     spec: _task_definition_pb2.TaskSpec
     cache_key: _wrappers_pb2.StringValue
-    cluster: str
-    def __init__(self, id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., cache_key: _Optional[_Union[_wrappers_pb2.StringValue, _Mapping]] = ..., cluster: _Optional[str] = ...) -> None: ...
+    queue: str
+    def __init__(self, id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., cache_key: _Optional[_Union[_wrappers_pb2.StringValue, _Mapping]] = ..., queue: _Optional[str] = ...) -> None: ...
 
 class TraceAction(_message.Message):
     __slots__ = ["name", "phase", "start_time", "end_time", "outputs", "spec"]

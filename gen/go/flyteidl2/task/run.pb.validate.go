@@ -716,7 +716,7 @@ func (m *RunSpec) validate(all bool) error {
 
 	// no validation rules for OverwriteCache
 
-	// no validation rules for Cluster
+	// no validation rules for Queue
 
 	if all {
 		switch v := interface{}(m.GetRawDataStorage()).(type) {
