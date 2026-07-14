@@ -1172,14 +1172,14 @@ export const ActionLeafSchema: GenMessage<ActionLeaf> = /*@__PURE__*/
 
 /**
  * GroupAggregations carries the four top-3 outlier lists for a group.
- * Each list holds the three members with the largest metric, sorted
- * DESC.
+ * Each list holds the three descendant actions (deep rollup over the
+ * group's whole subtree) with the largest metric, sorted DESC.
  *
  * @generated from message flyteidl2.workflow.GroupAggregations
  */
 export type GroupAggregations = Message<"flyteidl2.workflow.GroupAggregations"> & {
   /**
-   * Members in terminal FAILED phase, by total duration.
+   * Descendants in terminal FAILED phase, by total duration.
    *
    * @generated from field: repeated flyteidl2.workflow.ActionLeaf failed = 1;
    */

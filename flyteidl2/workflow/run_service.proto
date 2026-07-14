@@ -477,10 +477,10 @@ message ActionLeaf {
 }
 
 // GroupAggregations carries the four top-3 outlier lists for a group.
-// Each list holds the three members with the largest metric, sorted
-// DESC.
+// Each list holds the three descendant actions (deep rollup over the
+// group's whole subtree) with the largest metric, sorted DESC.
 message GroupAggregations {
-  // Members in terminal FAILED phase, by total duration.
+  // Descendants in terminal FAILED phase, by total duration.
   repeated ActionLeaf failed = 1;
   // By total wall-clock duration (created → ended).
   repeated ActionLeaf longest_duration = 2;

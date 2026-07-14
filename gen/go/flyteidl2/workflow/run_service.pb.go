@@ -2227,14 +2227,14 @@ func (x *ActionLeaf) GetStartTime() *timestamppb.Timestamp {
 }
 
 // GroupAggregations carries the four top-3 outlier lists for a group.
-// Each list holds the three members with the largest metric, sorted
-// DESC.
+// Each list holds the three descendant actions (deep rollup over the
+// group's whole subtree) with the largest metric, sorted DESC.
 type GroupAggregations struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Members in terminal FAILED phase, by total duration.
+	// Descendants in terminal FAILED phase, by total duration.
 	Failed []*ActionLeaf `protobuf:"bytes,1,rep,name=failed,proto3" json:"failed,omitempty"`
 	// By total wall-clock duration (created → ended).
 	LongestDuration []*ActionLeaf `protobuf:"bytes,2,rep,name=longest_duration,json=longestDuration,proto3" json:"longest_duration,omitempty"`
