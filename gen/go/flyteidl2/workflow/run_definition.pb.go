@@ -889,7 +889,7 @@ type ActionMetadata struct {
 	TriggerType *task.TriggerAutomationSpec `protobuf:"bytes,15,opt,name=trigger_type,json=triggerType,proto3" json:"trigger_type,omitempty"`
 	// Who initiated this run
 	Source RunSource `protobuf:"varint,16,opt,name=source,proto3,enum=flyteidl2.workflow.RunSource" json:"source,omitempty"`
-	// Provenance link to the parent run this run was derived from (re-run or
+	// Provenance link to the parent run this action was derived from (re-run or
 	// recover), if any. Only set on root actions created with a relation.
 	Relation *common.Relation `protobuf:"bytes,17,opt,name=relation,proto3" json:"relation,omitempty"`
 }

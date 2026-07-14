@@ -469,7 +469,7 @@ export type ActionMetadata = Message<"flyteidl2.workflow.ActionMetadata"> & {
   source: RunSource;
 
   /**
-   * Provenance link to the parent run this run was derived from (re-run or
+   * Provenance link to the parent run this action was derived from (re-run or
    * recover), if any. Only set on root actions created with a relation.
    *
    * @generated from field: flyteidl2.common.Relation relation = 17;

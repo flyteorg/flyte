@@ -197,7 +197,7 @@ message ActionMetadata {
   // Who initiated this run
   RunSource source = 16;
 
-  // Provenance link to the parent run this run was derived from (re-run or
+  // Provenance link to the parent run this action was derived from (re-run or
   // recover), if any. Only set on root actions created with a relation.
   common.Relation relation = 17;
 }
