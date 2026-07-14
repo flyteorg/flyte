@@ -410,10 +410,9 @@ func TestListRuns(t *testing.T) {
 	assert.True(t, runNames["run-2"])
 	assert.True(t, runNames["run-3"])
 
-	// ListActions uses a keyset cursor: it returns up to Limit+1 rows so the
-	// caller can detect whether another page exists. Page 1 asks for Limit=2
-	// and gets all 3 rows back (limit+1 probe). The caller trims to Limit and
-	// encodes the last kept row as the opaque CursorToken for page 2.
+	// ListActions offset-paginates: it returns up to Limit+1 rows so the caller can detect
+	// whether another page exists. Page 1 asks for Limit=2 and gets all 3 rows back
+	// (limit+1 probe); page 2 continues at Offset=2 and returns the last row.
 	runsPage1, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
 		Filter: NewIsRootActionFilter(),
 		Limit:  2,
@@ -421,13 +420,10 @@ func TestListRuns(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, runsPage1, 3)
 
-	page1 := runsPage1[:2]
-	cursor, err := EncodeActionCursor(page1[len(page1)-1])
-	require.NoError(t, err)
 	runsPage2, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
-		Filter:      NewIsRootActionFilter(),
-		Limit:       2,
-		CursorToken: cursor,
+		Filter: NewIsRootActionFilter(),
+		Limit:  2,
+		Offset: 2,
 	})
 	require.NoError(t, err)
 	assert.Len(t, runsPage2, 1)
@@ -517,14 +513,13 @@ func TestListActions_KeysetPagination(t *testing.T) {
 	assert.True(t, sort1.IsSorted(sort1.StringSlice(ordered)),
 		"keyset order must be a total order (no skips/overlaps)")
 
-	// Keyset is mutually exclusive with CursorToken (any non-empty cursor triggers it;
-	// the check returns before the token is decoded).
+	// Keyset is mutually exclusive with Offset.
 	now := time.Now()
 	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
 		Filter:               NewRunActionsFilter(runID),
 		Limit:                10,
 		KeysetAfterCreatedAt: &now,
-		CursorToken:          "opaque-cursor",
+		Offset:               5,
 	})
 	require.Error(t, err)
 
@@ -534,12 +529,17 @@ func TestListActions_KeysetPagination(t *testing.T) {
 		Filter:               NewRunActionsFilter(runID),
 		Limit:                10,
 		KeysetAfterCreatedAt: &now,
+		KeysetAfterName:      "n0001",
 		SortParameters:       []interfaces.SortParameter{NewSortParameter("name", interfaces.SortOrderAscending)},
 	})
 	require.Error(t, err)
 }
 
-func TestListActions_CursorPaginationTiedCreatedAt(t *testing.T) {
+// TestListActions_OffsetPagination covers the offset paging used by the ListRuns/ListActions
+// RPC: the page token is the running offset. It forces tied created_at (the bulk-created
+// map-task case) to confirm the default sort's (run_name, name) tiebreaker keeps paging
+// stable — every action is returned exactly once with no skips or repeats.
+func TestListActions_OffsetPagination(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
 	actionRepo, err := NewActionRepo(db, testDbConfig)
@@ -553,19 +553,16 @@ func TestListActions_CursorPaginationTiedCreatedAt(t *testing.T) {
 		_, err := actionRepo.CreateAction(ctx, models.NewActionModel(aid), false)
 		require.NoError(t, err)
 	}
-	// Map-task tie case: every child shares one created_at, so the single-column
-	// `created_at < cursor` cursor would skip the tied rows at each page boundary.
 	_, err = db.Exec("UPDATE actions SET created_at = '2024-01-01T00:00:00Z'")
 	require.NoError(t, err)
 
 	const pageSize = 50
 	seen := map[string]struct{}{}
-	var cursor string
-	for {
+	for offset := 0; ; offset += pageSize {
 		batch, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
-			Filter:      NewRunActionsFilter(runID),
-			Limit:       pageSize,
-			CursorToken: cursor, // empty on the first page
+			Filter: NewRunActionsFilter(runID),
+			Limit:  pageSize,
+			Offset: offset,
 		})
 		require.NoError(t, err)
 		hasMore := len(batch) > pageSize
@@ -580,44 +577,19 @@ func TestListActions_CursorPaginationTiedCreatedAt(t *testing.T) {
 		if !hasMore || len(batch) == 0 {
 			break
 		}
-		cursor, err = EncodeActionCursor(batch[len(batch)-1])
-		require.NoError(t, err)
 	}
+	assert.Len(t, seen, total, "offset paging must cover every action exactly once")
 
-	assert.Len(t, seen, total, "cursor paging over tied created_at must cover every action exactly once")
-
-	// The cursor keyset assumes the default sort; a custom sort is rejected.
-	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
-		Filter:         NewRunActionsFilter(runID),
-		Limit:          10,
-		CursorToken:    "opaque-cursor",
-		SortParameters: []interfaces.SortParameter{NewSortParameter("name", interfaces.SortOrderAscending)},
-	})
-	require.Error(t, err)
-
-	// Offset is supported: it applies SQL OFFSET over the default sort. off5 starts 5
-	// rows into off0's ordering.
-	off0, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
-		Filter: NewRunActionsFilter(runID),
-		Limit:  10,
-	})
-	require.NoError(t, err)
-	require.Greater(t, len(off0), 5)
-	off5, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
-		Filter: NewRunActionsFilter(runID),
-		Limit:  10,
-		Offset: 5,
-	})
-	require.NoError(t, err)
-	assert.Equal(t, off0[5].Name, off5[0].Name, "offset 5 must skip the first 5 rows of the default sort")
-
-	// Negative offset is rejected, and offset is mutually exclusive with cursor.
+	// Negative offset is rejected.
 	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
 		Filter: NewRunActionsFilter(runID), Limit: 10, Offset: -1,
 	})
 	require.Error(t, err)
+
+	// Offset is mutually exclusive with keyset.
+	now := time.Now()
 	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
-		Filter: NewRunActionsFilter(runID), Limit: 10, Offset: 5, CursorToken: "opaque-cursor",
+		Filter: NewRunActionsFilter(runID), Limit: 10, Offset: 5, KeysetAfterCreatedAt: &now,
 	})
 	require.Error(t, err)
 }

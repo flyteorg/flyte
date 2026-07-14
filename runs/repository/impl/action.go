@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"database/sql/driver"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -314,52 +313,18 @@ func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdent
 	return &action, nil
 }
 
-// actionCursor is the keyset cursor for the default action ordering
-// (phase ASC, created_at DESC, run_name DESC, name DESC). It carries the full sort key
-// so a page boundary that falls on rows sharing (phase, created_at) resumes exactly where
-// it left off instead of skipping the tied rows — (run_name, name) is unique per row.
-type actionCursor struct {
-	Phase     int32     `json:"p"`
-	CreatedAt time.Time `json:"c"`
-	RunName   string    `json:"r"`
-	Name      string    `json:"n"`
-}
-
-// EncodeActionCursor builds the pagination token for the last action of a page. The token
-// is opaque (base64-encoded JSON); callers pass it back as ListResourceInput.CursorToken.
-func EncodeActionCursor(a *models.Action) (string, error) {
-	b, err := json.Marshal(actionCursor{Phase: a.Phase, CreatedAt: a.CreatedAt.UTC(), RunName: a.RunName, Name: a.Name})
-	if err != nil {
-		return "", fmt.Errorf("failed to encode action cursor: %w", err)
-	}
-	return base64.RawURLEncoding.EncodeToString(b), nil
-}
-
-func decodeActionCursor(token string) (actionCursor, error) {
-	var c actionCursor
-	b, err := base64.RawURLEncoding.DecodeString(token)
-	if err != nil {
-		return c, err
-	}
-	err = json.Unmarshal(b, &c)
-	return c, err
-}
-
 // ListActions lists actions matching the given input filter, sort, and pagination.
 func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Action, error) {
-	// ListActions supports three mutually-exclusive pagination modes: keyset
-	// (KeysetAfter, used by the WatchActions snapshot), cursor (CursorToken, the
-	// default-sorted RPC paging), and offset (Offset). At most one may be set.
+	// ListActions supports two mutually-exclusive pagination modes: keyset (KeysetAfter,
+	// the ascending (created_at, name) keyset used by the WatchActions snapshot) and offset
+	// (Offset, used by the ListRuns/ListActions RPC — the page token is the running offset).
 	if input.Offset < 0 {
 		return nil, fmt.Errorf("offset must be non-negative")
 	}
-	if input.Offset > 0 && (input.KeysetAfterCreatedAt != nil || input.CursorToken != "") {
-		return nil, fmt.Errorf("offset is mutually exclusive with keysetAfter and cursorToken")
+	if input.Offset > 0 && input.KeysetAfterCreatedAt != nil {
+		return nil, fmt.Errorf("offset is mutually exclusive with keysetAfter")
 	}
 	if input.KeysetAfterCreatedAt != nil {
-		if input.CursorToken != "" {
-			return nil, fmt.Errorf("keysetAfter is mutually exclusive with cursorToken")
-		}
 		if input.KeysetAfterName == "" {
 			return nil, fmt.Errorf("keysetAfter requires keysetAfterName")
 		}
@@ -388,40 +353,6 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 		args = append(args, expr.Args...)
 	}
 
-	if input.CursorToken != "" {
-		// The cursor keyset matches the default ORDER BY exactly
-		// (phase ASC, created_at DESC, run_name DESC, name DESC), so it only works with
-		// the default sort — a custom sort would skip or duplicate rows across pages.
-		if len(input.SortParameters) > 0 {
-			return nil, fmt.Errorf("cursorToken pagination is only supported with the default sort")
-		}
-		c, err := decodeActionCursor(input.CursorToken)
-		if err != nil {
-			return nil, fmt.Errorf("invalid cursor token: %w", err)
-		}
-		if c.CreatedAt.IsZero() || c.RunName == "" || c.Name == "" {
-			return nil, fmt.Errorf("invalid cursor token: missing required fields")
-		}
-		// Keyset for ORDER BY phase ASC, created_at DESC, run_name DESC, name DESC.
-		// Postgres row-value comparison can't mix ASC/DESC, so expand the lexicographic
-		// keyset by hand. (run_name, name) is unique per row (part of the PK), so tied
-		// created_at never skips rows at a page boundary.
-		cond := "(phase > ?" +
-			" OR (phase = ? AND created_at < ?)" +
-			" OR (phase = ? AND created_at = ? AND run_name < ?)" +
-			" OR (phase = ? AND created_at = ? AND run_name = ? AND name < ?))"
-		if input.Filter != nil {
-			queryBuilder.WriteString(" AND " + cond)
-		} else {
-			queryBuilder.WriteString(" WHERE " + cond)
-		}
-		args = append(args,
-			c.Phase,
-			c.Phase, c.CreatedAt,
-			c.Phase, c.CreatedAt, c.RunName,
-			c.Phase, c.CreatedAt, c.RunName, c.Name)
-	}
-
 	if input.KeysetAfterCreatedAt != nil {
 		// Ascending composite keyset: return rows strictly after (created_at, name).
 		// Postgres row-value comparison implements the lexicographic keyset:
@@ -446,7 +377,7 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 	} else {
 		// Default sorting non-terminal runs at the top, then by most recent start time.
 		// (run_name, name) is a deterministic tiebreaker (part of the PK) so the order is
-		// total and cursor pagination never skips rows sharing (phase, created_at).
+		// total and offset pagination is stable (rows don't shuffle between pages).
 		queryBuilder.WriteString(" ORDER BY phase ASC, created_at DESC, run_name DESC, name DESC")
 	}
 

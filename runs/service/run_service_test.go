@@ -30,7 +30,6 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
-	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -743,15 +742,9 @@ func TestListRuns(t *testing.T) {
 		runs []*models.Run
 		err  error
 	}
-	// The service now returns opaque keyset cursors (impl.EncodeActionCursor over the
-	// last trimmed row), not RFC3339Nano timestamps. Encode the expected/round-tripped
-	// tokens the same way so the assertions match what the handler produces.
-	tok5, err := impl.EncodeActionCursor(sqlRes[5])
-	require.NoError(t, err)
-	tok6, err := impl.EncodeActionCursor(sqlRes[6])
-	require.NoError(t, err)
-	tok8, err := impl.EncodeActionCursor(sqlRes[8])
-	require.NoError(t, err)
+	// The page token is the running offset (strconv.Itoa(offset+limit)); the incoming
+	// token is decoded back into listInput.Offset. A request at offset 5 with limit 2 that
+	// still has a next page yields token "7".
 	testCases := []struct {
 		name    string
 		req     *common.ListRequest
@@ -765,19 +758,18 @@ func TestListRuns(t *testing.T) {
 			&workflow.ListRunsResponse{Runs: []*workflow.Run{}, Token: ""},
 		},
 		{
-			// Service fetches Limit+1 rows to detect another page. With 3 rows
-			// returned for a limit of 2, the slice is trimmed to the first 2
-			// runs and the next-page token is the opaque cursor encoded from the
-			// trimmed last row (impl.EncodeActionCursor), i.e. tok6.
+			// Service fetches Limit+1 rows to detect another page. With 3 rows returned
+			// for a limit of 2, the slice is trimmed to the first 2 runs and the next-page
+			// token is the next offset (5 + 2 = 7).
 			"list with limit 2 and token",
-			&common.ListRequest{Limit: 2, Token: tok5},
+			&common.ListRequest{Limit: 2, Token: "5"},
 			mockListRes{runs: sqlRes[5:8], err: nil},
-			&workflow.ListRunsResponse{Runs: runs[5:7], Token: tok6},
+			&workflow.ListRunsResponse{Runs: runs[5:7], Token: "7"},
 		},
 		{
 			// Only 2 rows returned for limit 3 means no next page — token empty.
 			"list with limit 3 and token",
-			&common.ListRequest{Limit: 3, Token: tok8},
+			&common.ListRequest{Limit: 3, Token: "8"},
 			mockListRes{runs: sqlRes[8:10], err: nil},
 			&workflow.ListRunsResponse{Runs: runs[8:10], Token: ""},
 		},

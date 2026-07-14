@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -925,18 +926,13 @@ func (s *RunService) ListRuns(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// We fetch Limit+1 rows to detect whether a next page exists without a
-	// separate COUNT query. If we got more than Limit rows back, there is at
-	// least one more page: trim the slice and encode the last returned row's
-	// full sort key (phase, created_at, run_name, name) as the keyset cursor, so rows
-	// sharing a created_at aren't skipped at the page boundary.
+	// We fetch Limit+1 rows to detect whether a next page exists without a separate COUNT
+	// query. If we got more than Limit rows back, there is at least one more page: trim the
+	// slice and encode the next offset (offset+limit) as the opaque page token.
 	var nextToken string
 	if len(actions) > listInput.Limit {
 		actions = actions[:listInput.Limit]
-		nextToken, err = impl.EncodeActionCursor(actions[len(actions)-1])
-		if err != nil {
-			return nil, connect.NewError(connect.CodeInternal, err)
-		}
+		nextToken = strconv.Itoa(listInput.Offset + listInput.Limit)
 	}
 
 	protoRuns := make([]*workflow.Run, len(actions))
@@ -979,18 +975,13 @@ func (s *RunService) ListActions(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// We fetch Limit+1 rows to detect whether a next page exists without a
-	// separate COUNT query. If we got more than Limit rows back, there is at
-	// least one more page: trim the slice and encode the last returned row's
-	// full sort key (phase, created_at, run_name, name) as the keyset cursor, so rows
-	// sharing a created_at aren't skipped at the page boundary.
+	// We fetch Limit+1 rows to detect whether a next page exists without a separate COUNT
+	// query. If we got more than Limit rows back, there is at least one more page: trim the
+	// slice and encode the next offset (offset+limit) as the opaque page token.
 	var nextToken string
 	if len(actions) > listInput.Limit {
 		actions = actions[:listInput.Limit]
-		nextToken, err = impl.EncodeActionCursor(actions[len(actions)-1])
-		if err != nil {
-			return nil, connect.NewError(connect.CodeInternal, err)
-		}
+		nextToken = strconv.Itoa(listInput.Offset + listInput.Limit)
 	}
 
 	protoActions := make([]*workflow.Action, len(actions))
