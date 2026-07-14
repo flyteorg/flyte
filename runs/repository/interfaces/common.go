@@ -6,6 +6,12 @@ import "time"
 type ListResourceInput struct {
 	Limit int
 
+	// CursorToken is reserved for an opaque keyset-cursor pagination mode. It is currently
+	// unused — the ListRuns/ListActions RPC paginates by Offset (see below) — and no repo
+	// reads it. Kept as a placeholder so a future keyset cursor can be wired in without an
+	// interface change.
+	CursorToken string
+
 	// Offset is an integer offset for offset-based pagination. actionRepo.ListActions
 	// applies it as SQL OFFSET (mutually exclusive with KeysetAfter) and rejects a negative
 	// value; the ListRuns/ListActions RPC encodes the running offset as the page token. The
