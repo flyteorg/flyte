@@ -6,11 +6,12 @@ import "time"
 type ListResourceInput struct {
 	Limit int
 
-	// CursorToken is an opaque keyset pagination cursor (see EncodeActionCursor). It
-	// carries the full default sort key (phase, created_at, run_name, name), so it only
-	// works with the default sort and pages by returning rows ordered strictly after the
-	// last row of the previous page. Mutually exclusive with KeysetAfter and with a
-	// custom SortParameters.
+	// CursorToken is an opaque keyset pagination cursor. Its contents are defined by the
+	// repo that produces and consumes it — today only actionRepo.ListActions uses it (the
+	// token is built by EncodeActionCursor over that repo's default sort). The other List
+	// methods on this shared input paginate by Offset and ignore CursorToken. When set,
+	// paging returns rows ordered strictly after the previous page's last row; for
+	// ListActions it is mutually exclusive with KeysetAfter and a custom SortParameters.
 	CursorToken string
 
 	// Offset is an integer offset for offset-based pagination (used by other repos'
