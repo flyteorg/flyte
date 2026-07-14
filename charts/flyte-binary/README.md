@@ -4,6 +4,12 @@
 
 Chart for basic single Flyte executable deployment
 
+## Requirements
+
+| Repository | Name | Version |
+|------------|------|---------|
+| file://../flyteconnector | flyteconnector | v2.0.0 |
+
 ## Values
 
 | Key | Type | Default | Description |

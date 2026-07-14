@@ -2,7 +2,10 @@ syntax = "proto3";
 
 package flyteidl2.workflow;
 
+import "flyteidl2/common/identity.proto";
+import "flyteidl2/core/literals.proto";
 import "flyteidl2/task/run.proto";
+import "flyteidl2/workflow/run_definition.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 
@@ -20,4 +23,15 @@ message RunInfo {
 
   // Run spec.
   flyteidl2.task.RunSpec run_spec = 4;
+
+  // For ACTION_TYPE_CONDITION actions: the condition spec, so details can be
+  // rendered (prompt/description/type) after the CR is GC'd.
+  flyteidl2.workflow.ConditionAction condition = 5;
+
+  // For ACTION_TYPE_CONDITION actions: the resolved signal value, stored
+  // inline (never an outputs.pb). The long-term record once the CR is GC'd.
+  flyteidl2.core.Literal output = 6;
+
+  // Identity of the actor that signalled (or aborted) the action.
+  flyteidl2.common.EnrichedIdentity principal = 7;
 }

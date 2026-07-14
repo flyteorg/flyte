@@ -11,7 +11,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/k8s/podlogs"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/logs/dataplane"
@@ -26,23 +25,25 @@ const defaultInitialLines = int64(1000)
 // K8sAppLogStreamer streams logs from the pod backing an app replica.
 type K8sAppLogStreamer struct {
 	clientset kubernetes.Interface
+	// namespace is the Kubernetes namespace where app replica pods run.
+	namespace string
 }
 
 // NewK8sAppLogStreamer creates a K8sAppLogStreamer from a Kubernetes REST config.
 // It clears the timeout so that long-lived log streams are not interrupted.
-func NewK8sAppLogStreamer(k8sConfig *rest.Config) (*K8sAppLogStreamer, error) {
+func NewK8sAppLogStreamer(k8sConfig *rest.Config, namespace string) (*K8sAppLogStreamer, error) {
 	cfg := rest.CopyConfig(k8sConfig)
 	cfg.Timeout = 0
 	clientset, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create kubernetes clientset: %w", err)
 	}
-	return &K8sAppLogStreamer{clientset: clientset}, nil
+	return &K8sAppLogStreamer{clientset: clientset, namespace: namespace}, nil
 }
 
 // TailLogs streams log lines for a replica's pod.
 func (s *K8sAppLogStreamer) TailLogs(ctx context.Context, replicaID *flyteapp.ReplicaIdentifier, send func(*flyteapp.LogLines) error) error {
-	ns := appk8s.AppNamespace
+	ns := s.namespace
 	podName := replicaID.GetName()
 
 	pod, err := s.clientset.CoreV1().Pods(ns).Get(ctx, podName, metav1.GetOptions{})

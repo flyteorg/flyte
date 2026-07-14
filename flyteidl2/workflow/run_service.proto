@@ -396,7 +396,13 @@ message WatchWindowedActionsRequest {
   // UpdateWindow updates one or more window parameters. Sent as the
   // user scrolls, expands/collapses, or changes filters.
   message UpdateWindow {
-    string selected_item_id = 1;
+    // Window anchor: either an item id (semantic selection / deep link) or an
+    // absolute flat index (scroll-driven viewport). Exactly one must be set.
+    oneof window_anchor {
+      option (buf.validate.oneof).required = true;
+      string selected_item_id = 1;
+      uint64 anchor_flat_index = 7;
+    }
     int32 overscan_before = 2 [(buf.validate.field).int32.gte = 0];
     int32 overscan_after = 3 [(buf.validate.field).int32.gte = 0];
     map<string, NodeExpansionParams> expanded_nodes = 4;

@@ -6815,11 +6815,26 @@ spec:
                 maxLength: 30
                 minLength: 1
                 type: string
+              actionType:
+                description: |-
+                  ActionType discriminates what kind of action this CR represents.
+                  Mirrors cloud's explicit ActionType enum. Empty means "task" for
+                  backward compatibility with existing CRs.
+                enum:
+                - task
+                - condition
+                type: string
               cacheKey:
                 description: |-
                   CacheKey enables cache lookup/writeback for this task action when set.
                   This is propagated from workflow.TaskAction.cache_key.
                 maxLength: 256
+                type: string
+              conditionSpec:
+                description: |-
+                  ConditionSpec is the proto-serialized workflow.ConditionAction, present iff
+                  actionType == "condition". Carries type/prompt/description/timeout/webhook.
+                format: byte
                 type: string
               domain:
                 description: Domain this action belongs to
@@ -6837,8 +6852,9 @@ spec:
                 maxLength: 256
                 type: string
               inputUri:
-                description: InputURI is the path to the input data for this action
-                minLength: 1
+                description: |-
+                  InputURI is the path to the input data for this action.
+                  Empty for conditions; the reconciler validates presence for tasks.
                 type: string
               interruptible:
                 description: Interruptible is the run-scoped interruptibility override
@@ -6860,9 +6876,9 @@ spec:
                 minLength: 1
                 type: string
               runOutputBase:
-                description: RunOutputBase is the base path where this action should
-                  write its output
-                minLength: 1
+                description: |-
+                  RunOutputBase is the base path where this action should write its output.
+                  Empty for conditions; the reconciler validates presence for tasks.
                 type: string
               shortName:
                 description: ShortName is the human-readable display name for this
@@ -6870,25 +6886,22 @@ spec:
                 maxLength: 63
                 type: string
               taskTemplate:
-                description: TaskTemplate is the proto-serialized core.TaskTemplate
-                  stored inline in etcd
+                description: |-
+                  TaskTemplate is the proto-serialized core.TaskTemplate stored inline in etcd.
+                  Empty for conditions; the reconciler validates presence for tasks.
                 format: byte
                 type: string
               taskType:
-                description: TaskType identifies which plugin handles this task (e.g.
-                  "container", "spark", "ray")
+                description: |-
+                  TaskType identifies which plugin handles this task (e.g. "container", "spark", "ray").
+                  Empty for conditions; the reconciler validates presence for tasks.
                 maxLength: 63
-                minLength: 1
                 type: string
             required:
             - actionName
             - domain
-            - inputUri
             - project
             - runName
-            - runOutputBase
-            - taskTemplate
-            - taskType
             type: object
           status:
             description: status defines the observed state of TaskAction
@@ -7034,6 +7047,21 @@ spec:
                 description: PluginStateVersion tracks the version of the plugin state
                   schema for compatibility.
                 type: integer
+              signalValue:
+                description: |-
+                  SignalValue is the proto-serialized core.Literal supplied by Signal.
+                  Set exactly once; the reconciler transitions the CR to Succeeded when present.
+                  Only meaningful for condition actions.
+                format: byte
+                type: string
+              signalledAt:
+                description: SignalledAt is when the signal was received.
+                format: date-time
+                type: string
+              signalledBy:
+                description: SignalledBy identifies the principal that signalled the
+                  condition.
+                type: string
               stateJson:
                 description: StateJSON is the JSON serialized NodeStatus that was
                   last sent to the State Service
@@ -7163,6 +7191,12 @@ rules:
   - patch
   - update
   - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods/log
+  verbs:
+  - get
 - apiGroups:
   - ""
   - events.k8s.io
@@ -7753,6 +7787,20 @@ data:
       k8s:
         co-pilot:
           image: "flyte-binary-v2:sandbox"
+        # Env vars injected into every task pod, so it can reach the control plane
+        # to enqueue child actions and watch their state.
+        #
+        #   - _U_EP_OVERRIDE: where the task reaches the control plane. Defaults to
+        #     this release's in-cluster HTTP service, <fullname>-http.<namespace>:8090.
+        #   - _U_INSECURE: talk plain HTTP — the in-cluster service has no TLS
+        #     (TLS terminates at the ingress).
+        #   - _U_USE_ACTIONS: use the actions/queue execution path.
+        #
+        # Override or extend via configuration.inline.plugins.k8s.default-env-vars.
+        default-env-vars:
+          - _U_EP_OVERRIDE: "flyte-binary-http.flyte:8090"
+          - _U_INSECURE: "true"
+          - _U_USE_ACTIONS: "1"
       k8s-array:
         logs:
           config:
@@ -8608,7 +8656,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: ad6d3ba170962e057fe3375d9f3a28208ae39cce2b2df9f1441d531873f9fa9b
+        checksum/configuration: b3c98afcd1c1a1aca5040d049159f6a8683facf7875920987bab9a9df6dc8f97
         checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -9384,6 +9432,10 @@ spec:
     ports:
       web:
         nodePort: 30080
+        # ALB terminates TLS and forwards plaintext to this entrypoint. Trust its
+        # X-Forwarded-Proto: https instead of letting Traefik rewrite it to http.
+        forwardedHeaders:
+          insecure: true
         transport:
           respondingTimeouts:
             readTimeout: 0

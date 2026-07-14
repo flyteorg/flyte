@@ -11,6 +11,7 @@ import (
 	"github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	mock "github.com/stretchr/testify/mock"
@@ -302,6 +303,75 @@ func (_c *ActionsClientInterface_PutStatus_Call) Return(err error) *ActionsClien
 }
 
 func (_c *ActionsClientInterface_PutStatus_Call) RunAndReturn(run func(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus) error) *ActionsClientInterface_PutStatus_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Signal provides a mock function for the type ActionsClientInterface
+func (_mock *ActionsClientInterface) Signal(ctx context.Context, actionID *common.ActionIdentifier, value *core.Literal, signalledBy string) error {
+	ret := _mock.Called(ctx, actionID, value, signalledBy)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Signal")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, *core.Literal, string) error); ok {
+		r0 = returnFunc(ctx, actionID, value, signalledBy)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// ActionsClientInterface_Signal_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Signal'
+type ActionsClientInterface_Signal_Call struct {
+	*mock.Call
+}
+
+// Signal is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actionID *common.ActionIdentifier
+//   - value *core.Literal
+//   - signalledBy string
+func (_e *ActionsClientInterface_Expecter) Signal(ctx interface{}, actionID interface{}, value interface{}, signalledBy interface{}) *ActionsClientInterface_Signal_Call {
+	return &ActionsClientInterface_Signal_Call{Call: _e.mock.On("Signal", ctx, actionID, value, signalledBy)}
+}
+
+func (_c *ActionsClientInterface_Signal_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, value *core.Literal, signalledBy string)) *ActionsClientInterface_Signal_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *common.ActionIdentifier
+		if args[1] != nil {
+			arg1 = args[1].(*common.ActionIdentifier)
+		}
+		var arg2 *core.Literal
+		if args[2] != nil {
+			arg2 = args[2].(*core.Literal)
+		}
+		var arg3 string
+		if args[3] != nil {
+			arg3 = args[3].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *ActionsClientInterface_Signal_Call) Return(err error) *ActionsClientInterface_Signal_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *ActionsClientInterface_Signal_Call) RunAndReturn(run func(ctx context.Context, actionID *common.ActionIdentifier, value *core.Literal, signalledBy string) error) *ActionsClientInterface_Signal_Call {
 	_c.Call.Return(run)
 	return _c
 }

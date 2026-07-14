@@ -1,4 +1,5 @@
 from buf.validate import validate_pb2 as _validate_pb2
+from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import phase_pb2 as _phase_pb2
 from flyteidl2.core import literals_pb2 as _literals_pb2
 from flyteidl2.core import security_pb2 as _security_pb2
@@ -18,9 +19,18 @@ class CacheLookupScope(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     CACHE_LOOKUP_SCOPE_UNSPECIFIED: _ClassVar[CacheLookupScope]
     CACHE_LOOKUP_SCOPE_GLOBAL: _ClassVar[CacheLookupScope]
     CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN: _ClassVar[CacheLookupScope]
+
+class TaskSpecSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    TASK_SPEC_SOURCE_UNSPECIFIED: _ClassVar[TaskSpecSource]
+    TASK_SPEC_SOURCE_DEPLOYED: _ClassVar[TaskSpecSource]
+    TASK_SPEC_SOURCE_EPHEMERAL: _ClassVar[TaskSpecSource]
 CACHE_LOOKUP_SCOPE_UNSPECIFIED: CacheLookupScope
 CACHE_LOOKUP_SCOPE_GLOBAL: CacheLookupScope
 CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN: CacheLookupScope
+TASK_SPEC_SOURCE_UNSPECIFIED: TaskSpecSource
+TASK_SPEC_SOURCE_DEPLOYED: TaskSpecSource
+TASK_SPEC_SOURCE_EPHEMERAL: TaskSpecSource
 
 class Labels(_message.Message):
     __slots__ = ["values"]
@@ -69,7 +79,7 @@ class CacheConfig(_message.Message):
     def __init__(self, overwrite_cache: bool = ..., cache_lookup_scope: _Optional[_Union[CacheLookupScope, str]] = ...) -> None: ...
 
 class RunSpec(_message.Message):
-    __slots__ = ["labels", "annotations", "envs", "interruptible", "overwrite_cache", "cluster", "raw_data_storage", "security_context", "cache_config", "notification_rule_name", "notification_rules", "run_start_time", "max_action_concurrency"]
+    __slots__ = ["labels", "annotations", "envs", "interruptible", "overwrite_cache", "cluster", "raw_data_storage", "security_context", "cache_config", "notification_rule_name", "notification_rules", "run_start_time", "max_action_concurrency", "run_base_dir", "related_to", "cluster_pool", "task_spec_source"]
     LABELS_FIELD_NUMBER: _ClassVar[int]
     ANNOTATIONS_FIELD_NUMBER: _ClassVar[int]
     ENVS_FIELD_NUMBER: _ClassVar[int]
@@ -83,6 +93,10 @@ class RunSpec(_message.Message):
     NOTIFICATION_RULES_FIELD_NUMBER: _ClassVar[int]
     RUN_START_TIME_FIELD_NUMBER: _ClassVar[int]
     MAX_ACTION_CONCURRENCY_FIELD_NUMBER: _ClassVar[int]
+    RUN_BASE_DIR_FIELD_NUMBER: _ClassVar[int]
+    RELATED_TO_FIELD_NUMBER: _ClassVar[int]
+    CLUSTER_POOL_FIELD_NUMBER: _ClassVar[int]
+    TASK_SPEC_SOURCE_FIELD_NUMBER: _ClassVar[int]
     labels: Labels
     annotations: Annotations
     envs: Envs
@@ -96,7 +110,11 @@ class RunSpec(_message.Message):
     notification_rules: InlineRuleList
     run_start_time: _timestamp_pb2.Timestamp
     max_action_concurrency: int
-    def __init__(self, labels: _Optional[_Union[Labels, _Mapping]] = ..., annotations: _Optional[_Union[Annotations, _Mapping]] = ..., envs: _Optional[_Union[Envs, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., cluster: _Optional[str] = ..., raw_data_storage: _Optional[_Union[RawDataStorage, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., cache_config: _Optional[_Union[CacheConfig, _Mapping]] = ..., notification_rule_name: _Optional[str] = ..., notification_rules: _Optional[_Union[InlineRuleList, _Mapping]] = ..., run_start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., max_action_concurrency: _Optional[int] = ...) -> None: ...
+    run_base_dir: str
+    related_to: _identifier_pb2.RunIdentifier
+    cluster_pool: str
+    task_spec_source: TaskSpecSource
+    def __init__(self, labels: _Optional[_Union[Labels, _Mapping]] = ..., annotations: _Optional[_Union[Annotations, _Mapping]] = ..., envs: _Optional[_Union[Envs, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., cluster: _Optional[str] = ..., raw_data_storage: _Optional[_Union[RawDataStorage, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., cache_config: _Optional[_Union[CacheConfig, _Mapping]] = ..., notification_rule_name: _Optional[str] = ..., notification_rules: _Optional[_Union[InlineRuleList, _Mapping]] = ..., run_start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., max_action_concurrency: _Optional[int] = ..., run_base_dir: _Optional[str] = ..., related_to: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., cluster_pool: _Optional[str] = ..., task_spec_source: _Optional[_Union[TaskSpecSource, str]] = ...) -> None: ...
 
 class InlineRuleList(_message.Message):
     __slots__ = ["rules"]

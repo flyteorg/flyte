@@ -119,14 +119,29 @@ func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEv
 		return nil
 	}
 
-	for _, e := range events {
-		_, err := r.db.ExecContext(ctx,
-			`INSERT INTO action_events (project, domain, run_name, name, attempt, phase, version, info, error_kind, created_at, updated_at)
-			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-			 ON CONFLICT DO NOTHING`,
-			e.Project, e.Domain, e.RunName, e.Name, e.Attempt, e.Phase, e.Version, e.Info, e.ErrorKind)
-		if err != nil {
-			return err
+	// Multi-row INSERT so a batch of events costs one commit per chunk instead of one
+	// per event. Chunked because callers are not all bounded: the executor's batcher
+	// flushes <=400 events, but RecordActionEvents accepts arbitrary counts and
+	// Postgres caps a statement at 65,535 bind parameters (9 per row here). Chunks
+	// are inserted independently — same non-transactional semantics as the previous
+	// per-row loop, and ON CONFLICT DO NOTHING keeps retries idempotent.
+	const colsPerRow = 9
+	const chunkRows = 5000 // 45,000 params, well under the 65,535 cap
+	for start := 0; start < len(events); start += chunkRows {
+		chunk := events[start:min(start+chunkRows, len(events))]
+		valueGroups := make([]string, 0, len(chunk))
+		args := make([]any, 0, len(chunk)*colsPerRow)
+		for i, e := range chunk {
+			b := i * colsPerRow
+			valueGroups = append(valueGroups, fmt.Sprintf(
+				"($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
+				b+1, b+2, b+3, b+4, b+5, b+6, b+7, b+8, b+9))
+			args = append(args, e.Project, e.Domain, e.RunName, e.Name, e.Attempt, e.Phase, e.Version, e.Info, e.ErrorKind)
+		}
+		query := `INSERT INTO action_events (project, domain, run_name, name, attempt, phase, version, info, error_kind, created_at, updated_at) VALUES ` +
+			strings.Join(valueGroups, ", ") + ` ON CONFLICT DO NOTHING`
+		if _, err := r.db.ExecContext(ctx, query, args...); err != nil {
+			return fmt.Errorf("insert action_events chunk start=%d size=%d: %w", start, len(chunk), err)
 		}
 	}
 
@@ -375,6 +390,7 @@ func (r *actionRepo) UpdateActionPhase(
 	attempts uint32,
 	cacheStatus core.CatalogCacheStatus,
 	endTime *time.Time,
+	startTime *time.Time,
 ) error {
 	now := time.Now()
 	retryablePhases := []int32{
@@ -391,11 +407,19 @@ func (r *actionRepo) UpdateActionPhase(
 	args = append(args, phase, attempts, cacheStatus, now)
 	argIdx += 4
 
+	startExpr := "created_at"
+	if startTime != nil {
+		startExpr = fmt.Sprintf("LEAST(created_at, $%d)", argIdx)
+		queryBuilder.WriteString(fmt.Sprintf(", created_at = %s", startExpr)) //nolint: staticcheck
+		args = append(args, *startTime)
+		argIdx++
+	}
+
 	if endTime != nil {
-		queryBuilder.WriteString(fmt.Sprintf(", ended_at = COALESCE(ended_at, GREATEST($%d, created_at))", argIdx)) //nolint: staticcheck
+		queryBuilder.WriteString(fmt.Sprintf(", ended_at = COALESCE(ended_at, GREATEST($%d, %s))", argIdx, startExpr)) //nolint: staticcheck
 		args = append(args, *endTime)
 		argIdx++
-		queryBuilder.WriteString(fmt.Sprintf(", duration_ms = EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST($%d, created_at)) - created_at)) * 1000", argIdx)) //nolint: staticcheck
+		queryBuilder.WriteString(fmt.Sprintf(", duration_ms = EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST($%d, %s)) - %s)) * 1000", argIdx, startExpr, startExpr)) //nolint: staticcheck
 		args = append(args, *endTime)
 		argIdx++
 	}
@@ -423,6 +447,26 @@ func (r *actionRepo) UpdateActionPhase(
 		r.notifyRunUpdate(ctx, actionID.Run)
 	}
 
+	return nil
+}
+
+// UpdateActionDetailedInfo replaces the serialized RunInfo (detailed_info column).
+func (r *actionRepo) UpdateActionDetailedInfo(ctx context.Context, actionID *common.ActionIdentifier, detailedInfo []byte) error {
+	result, err := r.db.ExecContext(ctx,
+		`UPDATE actions SET detailed_info = $1, updated_at = $2
+		 WHERE project = $3 AND domain = $4 AND run_name = $5 AND name = $6`,
+		detailedInfo, time.Now(),
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
 	return nil
 }
 

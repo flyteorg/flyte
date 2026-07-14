@@ -5,6 +5,8 @@
 import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
+import type { RunIdentifier } from "../common/identifier_pb.ts";
+import { file_flyteidl2_common_identifier } from "../common/identifier_pb.ts";
 import type { ActionPhase } from "../common/phase_pb.ts";
 import { file_flyteidl2_common_phase } from "../common/phase_pb.ts";
 import type { KeyValuePair } from "../core/literals_pb.ts";
@@ -21,7 +23,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/task/run.proto.
  */
 export const file_flyteidl2_task_run: GenFile = /*@__PURE__*/
-  fileDesc("ChhmbHl0ZWlkbDIvdGFzay9ydW4ucHJvdG8SDmZseXRlaWRsMi50YXNrImsKBkxhYmVscxIyCgZ2YWx1ZXMYASADKAsyIi5mbHl0ZWlkbDIudGFzay5MYWJlbHMuVmFsdWVzRW50cnkaLQoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJ1CgtBbm5vdGF0aW9ucxI3CgZ2YWx1ZXMYASADKAsyJy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucy5WYWx1ZXNFbnRyeRotCgtWYWx1ZXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIjQKBEVudnMSLAoGdmFsdWVzGAEgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyIikKDlJhd0RhdGFTdG9yYWdlEhcKD3Jhd19kYXRhX3ByZWZpeBgBIAEoCSJkCgtDYWNoZUNvbmZpZxIXCg9vdmVyd3JpdGVfY2FjaGUYASABKAgSPAoSY2FjaGVfbG9va3VwX3Njb3BlGAIgASgOMiAuZmx5dGVpZGwyLnRhc2suQ2FjaGVMb29rdXBTY29wZSLdBAoHUnVuU3BlYxImCgZsYWJlbHMYASABKAsyFi5mbHl0ZWlkbDIudGFzay5MYWJlbHMSMAoLYW5ub3RhdGlvbnMYAiABKAsyGy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucxIiCgRlbnZzGAMgASgLMhQuZmx5dGVpZGwyLnRhc2suRW52cxIxCg1pbnRlcnJ1cHRpYmxlGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLkJvb2xWYWx1ZRIbCg9vdmVyd3JpdGVfY2FjaGUYBSABKAhCAhgBEg8KB2NsdXN0ZXIYBiABKAkSOAoQcmF3X2RhdGFfc3RvcmFnZRgHIAEoCzIeLmZseXRlaWRsMi50YXNrLlJhd0RhdGFTdG9yYWdlEjkKEHNlY3VyaXR5X2NvbnRleHQYCCABKAsyHy5mbHl0ZWlkbDIuY29yZS5TZWN1cml0eUNvbnRleHQSMQoMY2FjaGVfY29uZmlnGAkgASgLMhsuZmx5dGVpZGwyLnRhc2suQ2FjaGVDb25maWcSIAoWbm90aWZpY2F0aW9uX3J1bGVfbmFtZRgKIAEoCUgAEjwKEm5vdGlmaWNhdGlvbl9ydWxlcxgLIAEoCzIeLmZseXRlaWRsMi50YXNrLklubGluZVJ1bGVMaXN0SAASMgoOcnVuX3N0YXJ0X3RpbWUYDCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEh4KFm1heF9hY3Rpb25fY29uY3VycmVuY3kYDSABKA1CFwoVbm90aWZpY2F0aW9uX3NldHRpbmdzIkUKDklubGluZVJ1bGVMaXN0EjMKBXJ1bGVzGAEgAygLMhouZmx5dGVpZGwyLnRhc2suSW5saW5lUnVsZUIIukgFkgECCAEi1wEKCklubGluZVJ1bGUSSQoJb25fcGhhc2VzGAEgAygOMh0uZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25QaGFzZUIXukgUkgERCAEYASILggEIGAUYBhgHGAgSHgoUZGVsaXZlcnlfY29uZmlnX25hbWUYAiABKAlIABJLChFkZWxpdmVyeV90ZW1wbGF0ZRgDIAEoCzIuLmZseXRlaWRsMi5ub3RpZmljYXRpb24uRGVsaXZlcnlDb25maWdUZW1wbGF0ZUgAQhEKCGRlbGl2ZXJ5EgW6SAIIASp8ChBDYWNoZUxvb2t1cFNjb3BlEiIKHkNBQ0hFX0xPT0tVUF9TQ09QRV9VTlNQRUNJRklFRBAAEh0KGUNBQ0hFX0xPT0tVUF9TQ09QRV9HTE9CQUwQARIlCiFDQUNIRV9MT09LVVBfU0NPUEVfUFJPSkVDVF9ET01BSU4QAkKtAQoSY29tLmZseXRlaWRsMi50YXNrQghSdW5Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi90YXNrogIDRlRYqgIORmx5dGVpZGwyLlRhc2vKAg5GbHl0ZWlkbDJcVGFza+ICGkZseXRlaWRsMlxUYXNrXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpUYXNrYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_phase, file_flyteidl2_core_literals, file_flyteidl2_core_security, file_flyteidl2_notification_definition, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("ChhmbHl0ZWlkbDIvdGFzay9ydW4ucHJvdG8SDmZseXRlaWRsMi50YXNrImsKBkxhYmVscxIyCgZ2YWx1ZXMYASADKAsyIi5mbHl0ZWlkbDIudGFzay5MYWJlbHMuVmFsdWVzRW50cnkaLQoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJ1CgtBbm5vdGF0aW9ucxI3CgZ2YWx1ZXMYASADKAsyJy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucy5WYWx1ZXNFbnRyeRotCgtWYWx1ZXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIjQKBEVudnMSLAoGdmFsdWVzGAEgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyIikKDlJhd0RhdGFTdG9yYWdlEhcKD3Jhd19kYXRhX3ByZWZpeBgBIAEoCSJkCgtDYWNoZUNvbmZpZxIXCg9vdmVyd3JpdGVfY2FjaGUYASABKAgSPAoSY2FjaGVfbG9va3VwX3Njb3BlGAIgASgOMiAuZmx5dGVpZGwyLnRhc2suQ2FjaGVMb29rdXBTY29wZSL4BQoHUnVuU3BlYxImCgZsYWJlbHMYASABKAsyFi5mbHl0ZWlkbDIudGFzay5MYWJlbHMSMAoLYW5ub3RhdGlvbnMYAiABKAsyGy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucxIiCgRlbnZzGAMgASgLMhQuZmx5dGVpZGwyLnRhc2suRW52cxIxCg1pbnRlcnJ1cHRpYmxlGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLkJvb2xWYWx1ZRIbCg9vdmVyd3JpdGVfY2FjaGUYBSABKAhCAhgBEg8KB2NsdXN0ZXIYBiABKAkSOAoQcmF3X2RhdGFfc3RvcmFnZRgHIAEoCzIeLmZseXRlaWRsMi50YXNrLlJhd0RhdGFTdG9yYWdlEjkKEHNlY3VyaXR5X2NvbnRleHQYCCABKAsyHy5mbHl0ZWlkbDIuY29yZS5TZWN1cml0eUNvbnRleHQSMQoMY2FjaGVfY29uZmlnGAkgASgLMhsuZmx5dGVpZGwyLnRhc2suQ2FjaGVDb25maWcSIAoWbm90aWZpY2F0aW9uX3J1bGVfbmFtZRgKIAEoCUgAEjwKEm5vdGlmaWNhdGlvbl9ydWxlcxgLIAEoCzIeLmZseXRlaWRsMi50YXNrLklubGluZVJ1bGVMaXN0SAASMgoOcnVuX3N0YXJ0X3RpbWUYDCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEh4KFm1heF9hY3Rpb25fY29uY3VycmVuY3kYDSABKA0SFAoMcnVuX2Jhc2VfZGlyGA4gASgJEjMKCnJlbGF0ZWRfdG8YDyABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXISFAoMY2x1c3Rlcl9wb29sGBAgASgJEjgKEHRhc2tfc3BlY19zb3VyY2UYESABKA4yHi5mbHl0ZWlkbDIudGFzay5UYXNrU3BlY1NvdXJjZUIXChVub3RpZmljYXRpb25fc2V0dGluZ3MiRQoOSW5saW5lUnVsZUxpc3QSMwoFcnVsZXMYASADKAsyGi5mbHl0ZWlkbDIudGFzay5JbmxpbmVSdWxlQgi6SAWSAQIIASLXAQoKSW5saW5lUnVsZRJJCglvbl9waGFzZXMYASADKA4yHS5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvblBoYXNlQhe6SBSSAREIARgBIguCAQgYBRgGGAcYCBIeChRkZWxpdmVyeV9jb25maWdfbmFtZRgCIAEoCUgAEksKEWRlbGl2ZXJ5X3RlbXBsYXRlGAMgASgLMi4uZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5EZWxpdmVyeUNvbmZpZ1RlbXBsYXRlSABCEQoIZGVsaXZlcnkSBbpIAggBKnwKEENhY2hlTG9va3VwU2NvcGUSIgoeQ0FDSEVfTE9PS1VQX1NDT1BFX1VOU1BFQ0lGSUVEEAASHQoZQ0FDSEVfTE9PS1VQX1NDT1BFX0dMT0JBTBABEiUKIUNBQ0hFX0xPT0tVUF9TQ09QRV9QUk9KRUNUX0RPTUFJThACKnEKDlRhc2tTcGVjU291cmNlEiAKHFRBU0tfU1BFQ19TT1VSQ0VfVU5TUEVDSUZJRUQQABIdChlUQVNLX1NQRUNfU09VUkNFX0RFUExPWUVEEAESHgoaVEFTS19TUEVDX1NPVVJDRV9FUEhFTUVSQUwQAkKtAQoSY29tLmZseXRlaWRsMi50YXNrQghSdW5Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi90YXNrogIDRlRYqgIORmx5dGVpZGwyLlRhc2vKAg5GbHl0ZWlkbDJcVGFza+ICGkZseXRlaWRsMlxUYXNrXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpUYXNrYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_phase, file_flyteidl2_core_literals, file_flyteidl2_core_security, file_flyteidl2_notification_definition, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
 
 /**
  * Label values to be applied to an execution resource.
@@ -254,6 +256,43 @@ export type RunSpec = Message<"flyteidl2.task.RunSpec"> & {
    * @generated from field: uint32 max_action_concurrency = 13;
    */
   maxActionConcurrency: number;
+
+  /**
+   * Base directory under which the run's metadata (inputs.pb, per-action
+   * outputs.pb, action metadata) is written. When set, it overrides the
+   * org/project/domain settings default and the dataplane cluster default.
+   * Leave empty to fall back to settings, then to the cluster default.
+   * Distinct from raw_data_storage.raw_data_prefix, which controls offloaded
+   * blob (user data) layout.
+   *
+   * @generated from field: string run_base_dir = 14;
+   */
+  runBaseDir: string;
+
+  /**
+   * Optional pointer to the single parent run this run was derived from (re-run, recover,
+   * clone, or explicit SDK/CLI provenance). Set at creation, immutable thereafter, and scoped
+   * to the same org/project/domain as this run.
+   *
+   * @generated from field: flyteidl2.common.RunIdentifier related_to = 15;
+   */
+  relatedTo?: RunIdentifier;
+
+  /**
+   * Pool of the assigned queue for given run.
+   * Always set by server. Should not be specified by user.
+   *
+   * @generated from field: string cluster_pool = 16;
+   */
+  clusterPool: string;
+
+  /**
+   * How the task spec was provided at creation (deployed TaskId vs inline spec).
+   * Set by server; lets the rerun UI choose TaskId over the full inline spec.
+   *
+   * @generated from field: flyteidl2.task.TaskSpecSource task_spec_source = 17;
+   */
+  taskSpecSource: TaskSpecSource;
 };
 
 /**
@@ -354,4 +393,38 @@ export enum CacheLookupScope {
  */
 export const CacheLookupScopeSchema: GenEnum<CacheLookupScope> = /*@__PURE__*/
   enumDesc(file_flyteidl2_task_run, 0);
+
+/**
+ * TaskSpecSource records how a run's task spec was provided at creation time, so
+ * the rerun UI can send a TaskId (deployed) rather than the full inline spec.
+ *
+ * @generated from enum flyteidl2.task.TaskSpecSource
+ */
+export enum TaskSpecSource {
+  /**
+   * @generated from enum value: TASK_SPEC_SOURCE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * The run referenced a deployed (registered) task by TaskId.
+   *
+   * @generated from enum value: TASK_SPEC_SOURCE_DEPLOYED = 1;
+   */
+  DEPLOYED = 1,
+
+  /**
+   * The run carried an inline task spec (e.g. fast registration) that does not
+   * exist in the task store.
+   *
+   * @generated from enum value: TASK_SPEC_SOURCE_EPHEMERAL = 2;
+   */
+  EPHEMERAL = 2,
+}
+
+/**
+ * Describes the enum flyteidl2.task.TaskSpecSource.
+ */
+export const TaskSpecSourceSchema: GenEnum<TaskSpecSource> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_task_run, 1);
 

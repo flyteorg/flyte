@@ -75,10 +75,14 @@ create_builder:
 		--driver docker-container --driver-opt image=moby/buildkit:master \
 		--platform linux/arm64,linux/amd64
 
+# Architectures to build the flyte-binary for. CI overrides this to the
+# runner's arch only (e.g. FLYTE_ARCHES=amd64) to skip the cross build.
+FLYTE_ARCHES ?= amd64 arm64
+
 .PHONY: flyte
 flyte: FLYTECONSOLE_VERSION := latest
 flyte: create_builder
-	$(foreach arch,amd64 arm64,$(call FLYTE_BINARY_BUILD,$(arch)))
+	$(foreach arch,$(FLYTE_ARCHES),$(call FLYTE_BINARY_BUILD,$(arch)))
 
 .PHONY: helm-repos
 helm-repos:
@@ -129,6 +133,7 @@ sync-crds:
 build: sync-crds flyte dep_update manifests
 	docker buildx build --builder flyte-devbox --load \
 		$(BUILDX_CACHE_FLAGS) \
+		$(if $(CACHEBUST),--build-arg CACHEBUST=$(CACHEBUST)) \
 		--tag flyte-devbox:latest .
 
 .PHONY: build-gpu

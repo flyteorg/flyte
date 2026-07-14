@@ -482,6 +482,47 @@ func TestBuildResourceRayDefaultAffinityDilution(t *testing.T) {
 	assertEveryTermHasRequirement(t, workerSpec, defaultAffinityReq)
 }
 
+func TestBuildResourceRay_DisablesLogNoiseEnv(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+	rayCtx := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+
+	rayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+	require.NoError(t, err)
+	ray, ok := rayResource.(*rayv1.RayJob)
+	require.True(t, ok)
+
+	// envOf returns the named container's env vars as name->value. The log-noise vars must land
+	// on the Ray container itself, not an injected sidecar, so select by container name rather
+	// than scanning every container in the pod.
+	envOf := func(containers []corev1.Container, containerName string) map[string]string {
+		for _, c := range containers {
+			if c.Name == containerName {
+				env := make(map[string]string, len(c.Env))
+				for _, e := range c.Env {
+					env[e.Name] = e.Value
+				}
+				return env
+			}
+		}
+		return nil
+	}
+
+	require.NotEmpty(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs, "expected at least one worker group")
+	headEnv := envOf(ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Containers, RayHeadContainerName)
+	workerEnv := envOf(ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Containers, "ray-worker")
+	require.NotNil(t, headEnv, "head pod is missing the %s container", RayHeadContainerName)
+	require.NotNil(t, workerEnv, "worker pod is missing the ray-worker container")
+
+	for _, env := range []struct{ name, value string }{
+		{"RAY_COLOR_PREFIX", "0"},
+		{"RAY_DATA_DISABLE_PROGRESS_BARS", "1"},
+	} {
+		assert.Equal(t, env.value, headEnv[env.name], "head container must set %s", env.name)
+		assert.Equal(t, env.value, workerEnv[env.name], "worker container must set %s", env.name)
+	}
+}
+
 func TestBuildResourceRayContainerImage(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
 
