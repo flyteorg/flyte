@@ -99,6 +99,9 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, n
 	if recordFilterSize <= 0 {
 		return nil, fmt.Errorf("actions: recordFilterSize must be positive, got %d", recordFilterSize)
 	}
+	if scope == nil {
+		return nil, fmt.Errorf("actions: metrics scope is required")
+	}
 	c := &ActionsClient{
 		k8sClient:   k8sClient,
 		sharedCache: sharedCache,
