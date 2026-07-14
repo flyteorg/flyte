@@ -165,7 +165,7 @@ message InlineRule {
   option (buf.validate.message).cel = {
     id: "paused_rule_exclusive"
     message: "a rule subscribing to ACTION_PHASE_PAUSED must not subscribe to other phases"
-    expression: "!(9 in this.on_phases) || this.on_phases.size() == 1"
+    expression: "!(flyteidl2.common.ActionPhase.ACTION_PHASE_PAUSED in this.on_phases) || this.on_phases.size() == 1"
   };
 
   repeated common.ActionPhase on_phases = 1 [(buf.validate.field).repeated = {
