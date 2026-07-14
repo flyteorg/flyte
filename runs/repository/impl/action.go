@@ -324,6 +324,12 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 	if input.Offset > 0 && input.KeysetAfterCreatedAt != nil {
 		return nil, fmt.Errorf("offset is mutually exclusive with keysetAfter")
 	}
+	if input.KeysetAfterCreatedAt == nil && input.KeysetAfterName != "" {
+		// The keyset WHERE only runs when KeysetAfterCreatedAt is set; a name on its own
+		// would be silently ignored (paging from the start). Reject it so the mistake is
+		// caught instead of returning wrong pages.
+		return nil, fmt.Errorf("keysetAfterName requires keysetAfterCreatedAt")
+	}
 	if input.KeysetAfterCreatedAt != nil {
 		if input.KeysetAfterName == "" {
 			return nil, fmt.Errorf("keysetAfter requires keysetAfterName")
