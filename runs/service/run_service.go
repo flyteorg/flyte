@@ -935,7 +935,7 @@ func (s *RunService) ListRuns(
 		actions = actions[:listInput.Limit]
 		nextToken, err = impl.EncodeActionCursor(actions[len(actions)-1])
 		if err != nil {
-			return nil, err
+			return nil, connect.NewError(connect.CodeInternal, err)
 		}
 	}
 
@@ -989,7 +989,7 @@ func (s *RunService) ListActions(
 		actions = actions[:listInput.Limit]
 		nextToken, err = impl.EncodeActionCursor(actions[len(actions)-1])
 		if err != nil {
-			return nil, err
+			return nil, connect.NewError(connect.CodeInternal, err)
 		}
 	}
 
