@@ -113,6 +113,9 @@ type TaskActionReconciler struct {
 // deduped server-side by ON CONFLICT DO NOTHING). Falls back to a direct Record
 // when no batcher is set (unit tests).
 func (r *TaskActionReconciler) recordEvent(ctx context.Context, event *workflow.ActionEvent) error {
+	if err := event.Validate(); err != nil {
+		return connect.NewError(connect.CodeInvalidArgument, err)
+	}
 	if r.eventBatcher != nil {
 		return r.eventBatcher.Record(ctx, event)
 	}
@@ -553,9 +556,7 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 	// buildActionEvent derives UpdatedTime from PhaseHistory, which doesn't include the
 	// abort transition. Override it so mergeEvents uses the actual abort time as end_time.
 	actionEvent.UpdatedTime = timestamppb.New(abortTime)
-	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
-		Events: []*workflow.ActionEvent{actionEvent},
-	})); err != nil {
+	if err := r.recordEvent(ctx, actionEvent); err != nil {
 		logger.Error(err, "failed to emit abort event, will retry")
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
