@@ -396,6 +396,9 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 		if err != nil {
 			return nil, fmt.Errorf("invalid cursor token: %w", err)
 		}
+		if c.Phase == 0 || c.CreatedAt.IsZero() || c.RunName == "" || c.Name == "" {
+			return nil, fmt.Errorf("invalid cursor token: missing required fields")
+		}
 		// Keyset for ORDER BY phase ASC, created_at DESC, run_name DESC, name DESC.
 		// Postgres row-value comparison can't mix ASC/DESC, so expand the lexicographic
 		// keyset by hand. (run_name, name) is unique per row (part of the PK), so tied
