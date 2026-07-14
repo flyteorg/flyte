@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"database/sql/driver"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -313,6 +314,34 @@ func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdent
 	return &action, nil
 }
 
+// actionCursor is the keyset cursor for the default action ordering
+// (phase ASC, created_at DESC, run_name DESC, name DESC). It carries the full sort key
+// so a page boundary that falls on rows sharing (phase, created_at) resumes exactly where
+// it left off instead of skipping the tied rows — (run_name, name) is unique per row.
+type actionCursor struct {
+	Phase     int32     `json:"p"`
+	CreatedAt time.Time `json:"c"`
+	RunName   string    `json:"r"`
+	Name      string    `json:"n"`
+}
+
+// EncodeActionCursor builds the pagination token for the last action of a page. The token
+// is opaque (base64-encoded JSON); callers pass it back as ListResourceInput.CursorToken.
+func EncodeActionCursor(a *models.Action) string {
+	b, _ := json.Marshal(actionCursor{Phase: a.Phase, CreatedAt: a.CreatedAt.UTC(), RunName: a.RunName, Name: a.Name})
+	return base64.RawURLEncoding.EncodeToString(b)
+}
+
+func decodeActionCursor(token string) (actionCursor, error) {
+	var c actionCursor
+	b, err := base64.RawURLEncoding.DecodeString(token)
+	if err != nil {
+		return c, err
+	}
+	err = json.Unmarshal(b, &c)
+	return c, err
+}
+
 // ListActions lists actions matching the given input filter, sort, and pagination.
 func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Action, error) {
 	// ListActions paginates by keyset (KeysetAfter) or cursor (CursorToken); the two
@@ -348,18 +377,34 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 	}
 
 	if input.CursorToken != "" {
-		if t, err := time.Parse(time.RFC3339Nano, input.CursorToken); err == nil {
-			// If a filter was already applied above, the WHERE clause is already open
-			// and we extend it with AND. Otherwise we open a new WHERE clause.
-			// Use < because the default sort is DESC (newest first): each page
-			// continues from rows older than the last row of the previous page.
-			if input.Filter != nil {
-				queryBuilder.WriteString(" AND created_at < ?")
-			} else {
-				queryBuilder.WriteString(" WHERE created_at < ?")
-			}
-			args = append(args, t)
+		// The cursor keyset matches the default ORDER BY exactly
+		// (phase ASC, created_at DESC, run_name DESC, name DESC), so it only works with
+		// the default sort — a custom sort would skip or duplicate rows across pages.
+		if len(input.SortParameters) > 0 {
+			return nil, fmt.Errorf("cursorToken pagination is only supported with the default sort")
 		}
+		c, err := decodeActionCursor(input.CursorToken)
+		if err != nil {
+			return nil, fmt.Errorf("invalid cursor token: %w", err)
+		}
+		// Keyset for ORDER BY phase ASC, created_at DESC, run_name DESC, name DESC.
+		// Postgres row-value comparison can't mix ASC/DESC, so expand the lexicographic
+		// keyset by hand. (run_name, name) is unique per row (part of the PK), so tied
+		// created_at never skips rows at a page boundary.
+		cond := "(phase > ?" +
+			" OR (phase = ? AND created_at < ?)" +
+			" OR (phase = ? AND created_at = ? AND run_name < ?)" +
+			" OR (phase = ? AND created_at = ? AND run_name = ? AND name < ?))"
+		if input.Filter != nil {
+			queryBuilder.WriteString(" AND " + cond)
+		} else {
+			queryBuilder.WriteString(" WHERE " + cond)
+		}
+		args = append(args,
+			c.Phase,
+			c.Phase, c.CreatedAt,
+			c.Phase, c.CreatedAt, c.RunName,
+			c.Phase, c.CreatedAt, c.RunName, c.Name)
 	}
 
 	if input.KeysetAfterCreatedAt != nil {
@@ -385,7 +430,9 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 		}
 	} else {
 		// Default sorting non-terminal runs at the top, then by most recent start time.
-		queryBuilder.WriteString(" ORDER BY phase ASC, created_at DESC")
+		// (run_name, name) is a deterministic tiebreaker (part of the PK) so the order is
+		// total and cursor pagination never skips rows sharing (phase, created_at).
+		queryBuilder.WriteString(" ORDER BY phase ASC, created_at DESC, run_name DESC, name DESC")
 	}
 
 	queryBuilder.WriteString(" LIMIT ?")

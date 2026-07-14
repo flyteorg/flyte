@@ -928,11 +928,12 @@ func (s *RunService) ListRuns(
 	// We fetch Limit+1 rows to detect whether a next page exists without a
 	// separate COUNT query. If we got more than Limit rows back, there is at
 	// least one more page: trim the slice and encode the last returned row's
-	// created_at as the keyset cursor for the next request.
+	// full sort key (phase, created_at, run_name, name) as the keyset cursor, so rows
+	// sharing a created_at aren't skipped at the page boundary.
 	var nextToken string
 	if len(actions) > listInput.Limit {
 		actions = actions[:listInput.Limit]
-		nextToken = actions[len(actions)-1].CreatedAt.UTC().Format(time.RFC3339Nano)
+		nextToken = impl.EncodeActionCursor(actions[len(actions)-1])
 	}
 
 	protoRuns := make([]*workflow.Run, len(actions))
@@ -978,11 +979,12 @@ func (s *RunService) ListActions(
 	// We fetch Limit+1 rows to detect whether a next page exists without a
 	// separate COUNT query. If we got more than Limit rows back, there is at
 	// least one more page: trim the slice and encode the last returned row's
-	// created_at as the keyset cursor for the next request.
+	// full sort key (phase, created_at, run_name, name) as the keyset cursor, so rows
+	// sharing a created_at aren't skipped at the page boundary.
 	var nextToken string
 	if len(actions) > listInput.Limit {
 		actions = actions[:listInput.Limit]
-		nextToken = actions[len(actions)-1].CreatedAt.UTC().Format(time.RFC3339Nano)
+		nextToken = impl.EncodeActionCursor(actions[len(actions)-1])
 	}
 
 	protoActions := make([]*workflow.Action, len(actions))
