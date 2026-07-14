@@ -767,7 +767,8 @@ func TestListRuns(t *testing.T) {
 		{
 			// Service fetches Limit+1 rows to detect another page. With 3 rows
 			// returned for a limit of 2, the slice is trimmed to the first 2
-			// runs and the cursor token is the trimmed last row's created_at.
+			// runs and the next-page token is the opaque cursor encoded from the
+			// trimmed last row (impl.EncodeActionCursor), i.e. tok6.
 			"list with limit 2 and token",
 			&common.ListRequest{Limit: 2, Token: tok5},
 			mockListRes{runs: sqlRes[5:8], err: nil},
