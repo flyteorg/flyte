@@ -6,13 +6,9 @@ import "time"
 type ListResourceInput struct {
 	Limit int
 
-	// CursorToken is an opaque keyset pagination cursor. Its contents are defined by the
-	// repo that produces and consumes it — today only actionRepo.ListActions uses it (the
-	// token is built by EncodeActionCursor over that repo's default sort). The other List
-	// methods on this shared input paginate by Offset and ignore CursorToken. When set,
-	// paging returns rows ordered strictly after the previous page's last row; for
-	// ListActions it is mutually exclusive with KeysetAfter, Offset, and a custom
-	// SortParameters.
+	// CursorToken is a keyset pagination cursor encoded as a RFC3339Nano timestamp.
+	// When set, the query returns rows with created_at strictly greater than the cursor value.
+	// Mutually exclusive with Offset.
 	CursorToken string
 
 	// Offset is an integer offset for offset-based pagination. actionRepo.ListActions
