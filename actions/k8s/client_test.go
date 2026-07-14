@@ -1008,7 +1008,10 @@ func TestBuildActionUpdate_DeleteOnNonTerminalForcesAborted(t *testing.T) {
 // real client (constructed via NewActionsClient); struct-literal test clients must
 // set it too, otherwise notifyRunService's RecordAction path nil-derefs.
 func testFilter() fastcheck.Filter {
-	f, _ := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	f, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	if err != nil {
+		panic(err)
+	}
 	return f
 }
 
