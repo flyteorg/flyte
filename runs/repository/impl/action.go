@@ -368,11 +368,30 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 
 	if len(input.SortParameters) > 0 {
 		queryBuilder.WriteString(" ORDER BY ")
+		sortCols := make(map[string]bool, len(input.SortParameters))
 		for i, sp := range input.SortParameters {
 			if i > 0 {
 				queryBuilder.WriteString(", ")
 			}
-			queryBuilder.WriteString(sp.GetOrderExpr())
+			expr := sp.GetOrderExpr()
+			queryBuilder.WriteString(expr)
+			if fields := strings.Fields(expr); len(fields) > 0 {
+				sortCols[fields[0]] = true
+			}
+		}
+		// A client-supplied sort may not be a total order (e.g. created_at DESC with the
+		// tied timestamps of bulk-created map-task children); Postgres then leaves ties in
+		// an arbitrary order, so OFFSET pages can skip/duplicate rows. Append (run_name,
+		// name) — unique per row (part of the PK) — as deterministic tiebreakers so paging
+		// is stable. The keyset snapshot path already orders by exactly (created_at ASC,
+		// name ASC), which is a total order within a run, so leave it untouched.
+		if input.KeysetAfterCreatedAt == nil {
+			if !sortCols["run_name"] {
+				queryBuilder.WriteString(", run_name ASC")
+			}
+			if !sortCols["name"] {
+				queryBuilder.WriteString(", name ASC")
+			}
 		}
 	} else {
 		// Default sorting non-terminal runs at the top, then by most recent start time.

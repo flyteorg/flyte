@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	sort1 "sort"
+	"sort"
 	"testing"
 	"time"
 
@@ -510,7 +510,7 @@ func TestListActions_KeysetPagination(t *testing.T) {
 	}
 
 	assert.Len(t, seen, total, "keyset paging over tied created_at must cover every action exactly once")
-	assert.True(t, sort1.IsSorted(sort1.StringSlice(ordered)),
+	assert.True(t, sort.IsSorted(sort.StringSlice(ordered)),
 		"keyset order must be a total order (no skips/overlaps)")
 
 	// Keyset is mutually exclusive with Offset.
@@ -592,6 +592,54 @@ func TestListActions_OffsetPagination(t *testing.T) {
 		Filter: NewRunActionsFilter(runID), Limit: 10, Offset: 5, KeysetAfterCreatedAt: &now,
 	})
 	require.Error(t, err)
+}
+
+// TestListActions_OffsetPaginationClientSortTiedCreatedAt guards against skipping/duplicating
+// rows when a client-supplied sort is not a total order. `created_at DESC` over bulk-created
+// map-task children (all tied on created_at) leaves ties in an arbitrary order per query, so
+// OFFSET paging would be unstable without the appended (run_name, name) tiebreakers.
+func TestListActions_OffsetPaginationClientSortTiedCreatedAt(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	runID := &common.RunIdentifier{Project: "proj1", Domain: "domain1", Name: "run1"}
+	const total = 250
+	for i := 0; i < total; i++ {
+		aid := &common.ActionIdentifier{Run: runID, Name: fmt.Sprintf("n%04d", i)}
+		_, err := actionRepo.CreateAction(ctx, models.NewActionModel(aid), false)
+		require.NoError(t, err)
+	}
+	_, err = db.Exec("UPDATE actions SET created_at = '2024-01-01T00:00:00Z'")
+	require.NoError(t, err)
+
+	sortDesc := []interfaces.SortParameter{NewSortParameter("created_at", interfaces.SortOrderDescending)}
+	const pageSize = 50
+	seen := map[string]struct{}{}
+	for offset := 0; ; offset += pageSize {
+		batch, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+			Filter:         NewRunActionsFilter(runID),
+			Limit:          pageSize,
+			Offset:         offset,
+			SortParameters: sortDesc,
+		})
+		require.NoError(t, err)
+		hasMore := len(batch) > pageSize
+		if hasMore {
+			batch = batch[:pageSize]
+		}
+		for _, a := range batch {
+			_, dup := seen[a.Name]
+			require.False(t, dup, "action %s returned on more than one page", a.Name)
+			seen[a.Name] = struct{}{}
+		}
+		if !hasMore || len(batch) == 0 {
+			break
+		}
+	}
+	assert.Len(t, seen, total, "client-sorted offset paging over tied created_at must cover every action exactly once")
 }
 
 func setupActionEventDB(t *testing.T) (*sqlx.DB, *actionRepo) {
