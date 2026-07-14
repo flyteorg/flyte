@@ -499,6 +499,33 @@ func TestInsertEvents_MultipleEventsForDifferentActions(t *testing.T) {
 	assert.Equal(t, "action2", got2.Name)
 }
 
+// A batch larger than Postgres' 65,535-bind-parameter budget (9 params/row ->
+// 7,281 rows) must be chunked into multiple INSERTs rather than failing whole.
+// RecordActionEvents accepts arbitrary event counts, so this is a real API path.
+func TestInsertEvents_ChunksOversizedBatch(t *testing.T) {
+	_, repo := setupActionEventDB(t)
+	ctx := context.Background()
+
+	const n = 7300 // > 7,281, forcing at least two chunks
+	events := make([]*models.ActionEvent, 0, n)
+	for i := 0; i < n; i++ {
+		e, err := models.NewActionEventModel(&workflow.ActionEvent{
+			Id:          testActionID,
+			Attempt:     0,
+			Phase:       common.ActionPhase_ACTION_PHASE_RUNNING,
+			Version:     uint32(i), // distinct versions so rows are not deduped
+			UpdatedTime: timestamppb.Now(),
+		})
+		require.NoError(t, err)
+		events = append(events, e)
+	}
+	require.NoError(t, repo.InsertEvents(ctx, events))
+
+	got, err := repo.ListEvents(ctx, testActionID, n+1)
+	require.NoError(t, err)
+	assert.Len(t, got, n, "all chunked rows must be inserted")
+}
+
 func TestInsertEvents_Empty(t *testing.T) {
 	_, repo := setupActionEventDB(t)
 	ctx := context.Background()
