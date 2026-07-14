@@ -1371,25 +1371,26 @@ func (s *RunService) listAndSendAllActions(
 	rsm *runStateManager,
 	stream *connect.ServerStream[workflow.WatchActionsResponse],
 ) error {
-	// Larger pages keep the initial snapshot fast: OFFSET paging re-scans ~offset
-	// rows per page, so cost is ~O(n^2/pageSize). At 100 an 8k-action run took ~5s
-	// (and raced the console's stream timeout); 1000 cuts scanned rows and round
-	// trips ~10x, bringing it well under a second. See keyset-cursor follow-up for
-	// the O(n) fix.
+	// Page the initial snapshot with keyset (cursor) pagination on (created_at, name)
+	// ascending, backed by idx_actions_run_created_name. Each page is an index
+	// range-scan continuing after the previous page's last row, so the full snapshot
+	// is O(n) — OFFSET paging was O(n^2/pageSize) and made large runs (tens of
+	// thousands of actions) race the console's stream timeout, truncating the result.
+	//
+	// created_at is the primary sort so parents are inserted before their children
+	// (insertAction requires the parent node to already exist). name is a unique
+	// per-run tiebreaker giving a total order, so keyset pages never skip/overlap
+	// even when a map task bulk-creates thousands of children with identical
+	// created_at.
 	const pageSize = 1000
-	offset := 0
+	var afterCreatedAt *time.Time
+	var afterName string
 	for {
-		// Sort ascending by created_at so parent actions are inserted into the
-		// run state manager before their children. insertAction requires the
-		// parent node to already exist in the tree when a child is processed.
-		// "name" is a deterministic tiebreaker: a map task bulk-creates thousands
-		// of children with identical created_at, and OFFSET paging over a
-		// non-unique ORDER BY skips/duplicates rows, so the snapshot loses actions
-		// and ChildPhaseCounts comes up short. name is unique within a run.
 		batch, err := s.repo.ActionRepo().ListActions(ctx, interfaces.ListResourceInput{
-			Filter: impl.NewRunActionsFilter(runID),
-			Limit:  pageSize,
-			Offset: offset,
+			Filter:               impl.NewRunActionsFilter(runID),
+			Limit:                pageSize,
+			KeysetAfterCreatedAt: afterCreatedAt,
+			KeysetAfterName:      afterName,
 			SortParameters: []interfaces.SortParameter{
 				impl.NewSortParameter("created_at", interfaces.SortOrderAscending),
 				impl.NewSortParameter("name", interfaces.SortOrderAscending),
@@ -1399,19 +1400,28 @@ func (s *RunService) listAndSendAllActions(
 			return err
 		}
 
+		// ListActions returns up to Limit+1 rows (the extra row is a has-more probe).
+		// Trim it and use it only to decide whether to continue; the trimmed row is
+		// re-read as the first row of the next page via the cursor, so nothing is lost.
+		hasMore := len(batch) > pageSize
+		if hasMore {
+			batch = batch[:pageSize]
+		}
+
 		updates, err := rsm.upsertActions(ctx, batch)
 		if err != nil {
 			return err
 		}
-
 		if err := s.sendChangedActions(runID, updates, stream); err != nil {
 			return err
 		}
 
-		if len(batch) < pageSize {
+		if !hasMore || len(batch) == 0 {
 			return nil
 		}
-		offset += pageSize
+		last := batch[len(batch)-1]
+		afterCreatedAt = &last.CreatedAt
+		afterName = last.Name
 	}
 }
 

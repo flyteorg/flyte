@@ -315,6 +315,10 @@ func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdent
 
 // ListActions lists actions matching the given input filter, sort, and pagination.
 func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Action, error) {
+	if input.KeysetAfterCreatedAt != nil && (input.CursorToken != "" || input.Offset > 0) {
+		return nil, fmt.Errorf("KeysetAfter is mutually exclusive with CursorToken and Offset")
+	}
+
 	var queryBuilder strings.Builder
 	var args []interface{}
 
@@ -343,6 +347,19 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 			}
 			args = append(args, t)
 		}
+	}
+
+	if input.KeysetAfterCreatedAt != nil {
+		// Ascending composite keyset: return rows strictly after (created_at, name).
+		// Postgres row-value comparison implements the lexicographic keyset:
+		// (created_at, name) > (c, n)  <=>  created_at > c OR (created_at = c AND name > n).
+		// Backed by idx_actions_run_created_name so each page is an index range-scan.
+		if input.Filter != nil {
+			queryBuilder.WriteString(" AND (created_at, name) > (?, ?)")
+		} else {
+			queryBuilder.WriteString(" WHERE (created_at, name) > (?, ?)")
+		}
+		args = append(args, *input.KeysetAfterCreatedAt, input.KeysetAfterName)
 	}
 
 	if len(input.SortParameters) > 0 {

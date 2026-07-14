@@ -1,5 +1,7 @@
 package interfaces
 
+import "time"
+
 // ListResourceInput contains parameters for querying collections of resources.
 type ListResourceInput struct {
 	Limit int
@@ -11,6 +13,14 @@ type ListResourceInput struct {
 
 	// Offset is an integer offset for offset-based pagination.
 	Offset int
+
+	// KeysetAfterCreatedAt/KeysetAfterName do ascending composite keyset pagination:
+	// when KeysetAfterCreatedAt is non-nil, the query returns rows ordered strictly
+	// after (created_at, name) = (*KeysetAfterCreatedAt, KeysetAfterName). The caller
+	// must sort by (created_at ASC, name ASC). Mutually exclusive with CursorToken and
+	// Offset. Used by the WatchActions snapshot to page a run's actions in O(n).
+	KeysetAfterCreatedAt *time.Time
+	KeysetAfterName      string
 
 	Filter Filter
 	// The filter set by scopeBy in the query
