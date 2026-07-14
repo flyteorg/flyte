@@ -115,35 +115,14 @@ func TestNotifyRunService_FailedRecordAllowsRetry(t *testing.T) {
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 2)
 }
 
-func TestNotifyRunService_NilFilter(t *testing.T) {
-	ctx := context.Background()
-
-	mockClient := runmocks.NewInternalRunServiceClient(t)
-
-	// No filter — should always call RecordAction
-	c := &ActionsClient{
-		runClient:   mockClient,
-		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
-	}
-
-	ta, update := newTestActionUpdate("action-3")
-
-	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(&connect.Response[workflow.RecordActionResponse]{}, nil)
-
-	c.notifyRunService(ctx, ta, update, watch.Added)
-	c.notifyRunService(ctx, ta, update, watch.Added)
-
-	mockClient.AssertNumberOfCalls(t, "RecordAction", 2)
-}
-
 func TestNotifyRunService_UpdateActionStatusIncludesAttemptsAndCacheStatus(t *testing.T) {
 	ctx := context.Background()
 
 	mockClient := runmocks.NewInternalRunServiceClient(t)
 	c := &ActionsClient{
-		runClient:   mockClient,
-		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+		recordedFilter: testFilter(),
+		runClient:      mockClient,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 
 	ta, update := newTestActionUpdate("action-4")
@@ -157,6 +136,9 @@ func TestNotifyRunService_UpdateActionStatusIncludesAttemptsAndCacheStatus(t *te
 			status.GetAttempts() == 3 &&
 			status.GetCacheStatus() == core.CatalogCacheStatus_CACHE_HIT
 	})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
+	// First-sight MODIFIED now also records (deduped via the mandatory filter).
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Maybe()
 
 	c.notifyRunService(ctx, ta, update, watch.Modified)
 
@@ -399,8 +381,9 @@ func TestNotifyRunService_ChildAddedPromotesParentToRunning(t *testing.T) {
 
 	mockClient := runmocks.NewInternalRunServiceClient(t)
 	c := &ActionsClient{
-		runClient:   mockClient,
-		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+		recordedFilter: testFilter(),
+		runClient:      mockClient,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 
 	runID := &common.RunIdentifier{
@@ -610,8 +593,9 @@ func TestNotifyRunService_RootActionAddedDoesNotPromoteParent(t *testing.T) {
 
 	mockClient := runmocks.NewInternalRunServiceClient(t)
 	c := &ActionsClient{
-		runClient:   mockClient,
-		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+		recordedFilter: testFilter(),
+		runClient:      mockClient,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 
 	// Root action has no parent
@@ -629,6 +613,7 @@ func TestNotifyRunService_RootActionAddedDoesNotPromoteParent(t *testing.T) {
 
 func newWorkerTestClient(numWorkers, bufSize int) *ActionsClient {
 	c := &ActionsClient{
+		recordedFilter:    testFilter(),
 		numWorkers:        numWorkers,
 		workerChs:         make([]chan watch.Event, numWorkers),
 		dispatchedActions: make(map[string]struct{}),
@@ -743,6 +728,78 @@ func TestHandleWatchEvent_CoalescedReadsLatestPhase(t *testing.T) {
 
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
+}
+
+// TestHandleWatchEvent_CreateThenDeleteStillRecords covers the create-then-immediately-delete
+// race: the coalesced ADDED is processed after the object is already gone from the cache
+// (getLatest -> not found -> handleWatchEvent bails without recording), so the DELETE event
+// must record the action before its terminal update. Otherwise UpdateActionStatus would match
+// zero rows and the action would be lost.
+func TestHandleWatchEvent_CreateThenDeleteStillRecords(t *testing.T) {
+	ctx := context.Background()
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	require.NoError(t, err)
+
+	c := &ActionsClient{
+		runClient:         mockClient,
+		recordedFilter:    filter,
+		subscribers:       make(map[string]map[chan *ActionUpdate]struct{}),
+		dispatchedActions: map[string]struct{}{"d1": {}},
+	}
+	// The CR was deleted before the worker reached the coalesced ADDED, so the cache
+	// no longer has it.
+	c.getLatest = func(_ context.Context, _ string) (*executorv1.TaskAction, bool, error) {
+		return nil, false, nil
+	}
+
+	// Step 1: the coalesced ADDED is processed but the object is already gone — nothing
+	// is recorded or updated here (exactly the gap the fix closes).
+	c.handleWatchEvent(ctx, watch.Event{Type: watch.Added, Object: runningTaskAction("d1")})
+	mockClient.AssertNotCalled(t, "RecordAction")
+	mockClient.AssertNotCalled(t, "UpdateActionStatus")
+
+	// Step 2: the DELETE tombstone (still carries Spec) must create the row, then abort it.
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
+	mockClient.On("UpdateActionStatus", mock.Anything, mock.MatchedBy(func(req *connect.Request[workflow.UpdateActionStatusRequest]) bool {
+		return req.Msg.GetStatus().GetPhase() == common.ActionPhase_ACTION_PHASE_ABORTED
+	})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
+
+	c.handleWatchEvent(ctx, watch.Event{Type: watch.Deleted, Object: runningTaskAction("d1")})
+
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+}
+
+// TestHandleWatchEvent_DeleteAfterRecordDoesNotDoubleRecord verifies the mandatory dedup
+// filter keeps the DELETE record path idempotent: an action already recorded on its normal
+// lifecycle is not recorded a second time when its terminal DELETE arrives.
+func TestHandleWatchEvent_DeleteAfterRecordDoesNotDoubleRecord(t *testing.T) {
+	ctx := context.Background()
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	require.NoError(t, err)
+
+	c := &ActionsClient{
+		runClient:      mockClient,
+		recordedFilter: filter,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+	// Pre-mark the action as already recorded (normal ADDED/MODIFIED lifecycle).
+	c.recordedFilter.Add(ctx, []byte(buildTaskActionName(&common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Project: "p", Domain: "d", Name: "run1"},
+		Name: "d2",
+	})))
+
+	// Only the terminal update is expected; no second RecordAction.
+	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
+
+	c.handleTaskActionEvent(ctx, runningTaskAction("d2"), watch.Deleted)
+
+	mockClient.AssertNotCalled(t, "RecordAction")
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
 }
 
 func TestDispatchEvent_DifferentNamesCanLandOnDifferentShards(t *testing.T) {
@@ -945,4 +1002,12 @@ func TestBuildActionUpdate_DeleteOnNonTerminalForcesAborted(t *testing.T) {
 	require.NotNil(t, upd)
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_ABORTED, upd.Phase)
 	assert.True(t, upd.IsDeleted)
+}
+
+// testFilter builds a small dedup filter for tests. The filter is mandatory on a
+// real client (constructed via NewActionsClient); struct-literal test clients must
+// set it too, otherwise notifyRunService's RecordAction path nil-derefs.
+func testFilter() fastcheck.Filter {
+	f, _ := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	return f
 }

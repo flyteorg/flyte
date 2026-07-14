@@ -91,9 +91,17 @@ type ActionsClient struct {
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) *ActionsClient {
+// defaultRecordFilterSize is the fallback bloom-filter capacity used when the
+// configured size is non-positive. The filter is mandatory (see NewActionsClient),
+// so we always create one rather than running without dedup.
+const defaultRecordFilterSize = 1 << 20
+
+func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) (*ActionsClient, error) {
 	if numWorkers <= 0 {
 		numWorkers = 1
+	}
+	if recordFilterSize <= 0 {
+		recordFilterSize = defaultRecordFilterSize
 	}
 	c := &ActionsClient{
 		k8sClient:   k8sClient,
@@ -105,16 +113,16 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, n
 		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 
-	if recordFilterSize > 0 {
-		filter, err := fastcheck.NewOppoBloomFilter(recordFilterSize, scope.NewSubScope("actions_filter"))
-		if err != nil {
-			logger.Warnf(context.Background(), "Failed to create record filter (size=%d): %v; proceeding without dedup", recordFilterSize, err)
-		} else {
-			c.recordedFilter = filter
-		}
+	// The dedup filter is mandatory: notifyRunService records on every event type
+	// (including DELETED, to cover create-then-immediately-delete where the ADDED is
+	// coalesced away), and relies on the filter to keep RecordAction idempotent.
+	filter, err := fastcheck.NewOppoBloomFilter(recordFilterSize, scope.NewSubScope("actions_filter"))
+	if err != nil {
+		return nil, fmt.Errorf("actions: failed to create RecordAction dedup filter (size=%d): %w", recordFilterSize, err)
 	}
+	c.recordedFilter = filter
 
-	return c
+	return c, nil
 }
 
 // Enqueue creates a TaskAction CR in etcd (via the K8s API).
@@ -734,16 +742,16 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		return
 	}
 
-	// Create the DB record once per action:
-	//   ADDED    — always record: nothing precedes an object's ADDED, so it is never
-	//              coalesced away and marks true first sight.
-	//   MODIFIED — record only when the dedup filter is on; the filter catches
-	//              replay/reconnect/record-retry first-sights while blocking
-	//              re-records. With the filter off, MODIFIED is skipped entirely.
-	//   DELETED  — never record: handled as a terminal update below.
-	if eventType == watch.Added || (c.recordedFilter != nil && eventType != watch.Deleted) {
+	// Ensure the action's DB row exists before any status update, deduplicated via the
+	// mandatory recordedFilter. We attempt on EVERY event type — including DELETED —
+	// because a create-then-immediately-delete can coalesce the ADDED's processing away
+	// (handleWatchEvent reads the latest from cache, finds it already gone, and bails),
+	// leaving no row for the terminal UpdateActionStatus to match. The DELETE tombstone
+	// still carries Spec, so recording from it creates the row; the filter makes the
+	// normal-lifecycle re-record a no-op.
+	{
 		actionKey := []byte(buildTaskActionName(update.ActionID))
-		isDuplicate := c.recordedFilter != nil && c.recordedFilter.Contains(ctx, actionKey)
+		isDuplicate := c.recordedFilter.Contains(ctx, actionKey)
 		if isDuplicate {
 			logger.Debugf(ctx, "Skipping duplicate RecordAction for %s", update.ActionID.Name)
 		} else {
@@ -787,15 +795,15 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 			}
 			if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {
 				logger.Warnf(ctx, "Failed to record action in run service for %s: %v", update.ActionID.Name, err)
-			} else if c.recordedFilter != nil {
+			} else {
 				c.recordedFilter.Add(ctx, actionKey)
 			}
 		}
 
-		// When a child action appears, the parent must already be running (it
+		// When a child action first appears, the parent must already be running (it
 		// created the child). Promote the parent to RUNNING so the UI doesn't
 		// stay stuck on INITIALIZING while children are executing.
-		if !isDuplicate && update.ParentActionName != "" {
+		if !isDuplicate && eventType != watch.Deleted && update.ParentActionName != "" {
 			parentID := &common.ActionIdentifier{
 				Run:  update.ActionID.Run,
 				Name: update.ParentActionName,

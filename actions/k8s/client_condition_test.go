@@ -37,7 +37,8 @@ func newConditionClient(t *testing.T) *ActionsClient {
 		ObjectMeta: metav1.ObjectMeta{Name: "run1-a0", Namespace: "flyte"},
 	}
 	return &ActionsClient{
-		namespace: "flyte",
+		recordedFilter: testFilter(),
+		namespace:      "flyte",
 		k8sClient: fake.NewClientBuilder().
 			WithScheme(scheme).
 			WithObjects(parent).
@@ -212,8 +213,9 @@ func TestNotifyRunService_Condition(t *testing.T) {
 	newClientWithRunMock := func(t *testing.T) (*runmocks.InternalRunServiceClient, *ActionsClient) {
 		mockClient := runmocks.NewInternalRunServiceClient(t)
 		return mockClient, &ActionsClient{
-			runClient:   mockClient,
-			subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+			recordedFilter: testFilter(),
+			runClient:      mockClient,
+			subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
 		}
 	}
 
