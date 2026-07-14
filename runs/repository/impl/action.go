@@ -315,17 +315,12 @@ func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdent
 
 // ListActions lists actions matching the given input filter, sort, and pagination.
 func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Action, error) {
-	// Pagination validation. The three modes (keyset / cursor / offset) are mutually
-	// exclusive; a negative offset is a caller error, not "no offset".
-	if input.Offset < 0 {
-		return nil, fmt.Errorf("offset must be non-negative, got %d", input.Offset)
-	}
-	if input.CursorToken != "" && input.Offset != 0 {
-		return nil, fmt.Errorf("cursorToken and offset are mutually exclusive")
-	}
+	// ListActions paginates by keyset (KeysetAfter) or cursor (CursorToken); the two
+	// are mutually exclusive. Offset is not supported here (the WatchActions snapshot
+	// uses keyset).
 	if input.KeysetAfterCreatedAt != nil {
-		if input.CursorToken != "" || input.Offset != 0 {
-			return nil, fmt.Errorf("keysetAfter is mutually exclusive with cursorToken and offset")
+		if input.CursorToken != "" {
+			return nil, fmt.Errorf("keysetAfter is mutually exclusive with cursorToken")
 		}
 		// The keyset WHERE `(created_at, name) > (?, ?)` is only correct when the query
 		// is ordered by exactly (created_at ASC, name ASC); any other sort would skip or
@@ -395,12 +390,6 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 
 	queryBuilder.WriteString(" LIMIT ?")
 	args = append(args, input.Limit+1)
-
-	// Offset-based pagination (validated non-negative and mutually exclusive above).
-	if input.Offset > 0 {
-		queryBuilder.WriteString(" OFFSET ?")
-		args = append(args, input.Offset)
-	}
 
 	query := sqlx.Rebind(sqlx.DOLLAR, queryBuilder.String())
 

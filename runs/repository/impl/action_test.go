@@ -454,138 +454,6 @@ func TestListRuns(t *testing.T) {
 	}
 }
 
-// TestListActionsOffsetPagination is a regression test for offset-based paging.
-// ListActions only implemented keyset (CursorToken) paging and silently ignored
-// Offset, so an offset-paging caller (WatchActions.listAndSendAllActions) re-read
-// the same first page forever -- capping children_phase_counts at the page size
-// and never terminating its loop for runs with more than one page of actions.
-func TestListActionsOffsetPagination(t *testing.T) {
-	db := setupActionDB(t)
-	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
-	require.NoError(t, err)
-	ctx := context.Background()
-
-	const total = 150
-	for i := 0; i < total; i++ {
-		_, err := actionRepo.CreateAction(ctx, &models.Run{
-			Project: "proj1",
-			Domain:  "domain1",
-			RunName: fmt.Sprintf("r%03d", i),
-			Name:    rootActionName,
-			Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-		}, false)
-		require.NoError(t, err)
-	}
-
-	const pageSize = 50
-	sortByName := []interfaces.SortParameter{NewSortParameter("run_name", interfaces.SortOrderAscending)}
-
-	// Offset must shift the window: the page at Offset=50 must start at r050.
-	// Before the fix it started at r000 because Offset was ignored.
-	page2, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
-		Filter:         NewIsRootActionFilter(),
-		Limit:          pageSize,
-		Offset:         pageSize,
-		SortParameters: sortByName,
-	})
-	require.NoError(t, err)
-	require.NotEmpty(t, page2)
-	require.Equal(t, "r050", page2[0].RunName,
-		"Offset must skip the first page; got the first page back (Offset ignored)")
-
-	// Walking all pages by offset must cover every action exactly once and terminate.
-	// The loop bound also guards against the pre-fix infinite re-read of page one.
-	seen := map[string]struct{}{}
-	for offset := 0; offset < total*2; offset += pageSize {
-		batch, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
-			Filter:         NewIsRootActionFilter(),
-			Limit:          pageSize,
-			Offset:         offset,
-			SortParameters: sortByName,
-		})
-		require.NoError(t, err)
-		page := batch
-		if len(page) > pageSize { // trim the Limit+1 has-more probe row
-			page = page[:pageSize]
-		}
-		for _, a := range page {
-			seen[a.RunName] = struct{}{}
-		}
-		if len(batch) <= pageSize {
-			break
-		}
-	}
-	assert.Len(t, seen, total, "offset paging must cover all actions exactly once")
-}
-
-// TestListActionsOffsetPaginationTiedCreatedAt is a regression test for the
-// children_phase_counts undercount on large map tasks. WatchActions pages the
-// snapshot by Offset sorted by created_at, but a map task bulk-creates thousands
-// of children with identical created_at. OFFSET over a non-unique ORDER BY has
-// undefined order among ties, so pages overlap/skip and the snapshot loses rows
-// (count came up short, e.g. 4.8K instead of 20000). The fix adds a deterministic
-// tiebreaker (the run-scoped unique action "name" in production; here the fixture is
-// root actions across runs, so run_name is the unique column). We force tied
-// created_at and assert offset paging by (created_at, run_name) stays totally ordered
-// and covers every row exactly once.
-func TestListActionsOffsetPaginationTiedCreatedAt(t *testing.T) {
-	db := setupActionDB(t)
-	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
-	require.NoError(t, err)
-	ctx := context.Background()
-
-	const total = 150
-	for i := 0; i < total; i++ {
-		_, err := actionRepo.CreateAction(ctx, &models.Run{
-			Project: "proj1",
-			Domain:  "domain1",
-			RunName: fmt.Sprintf("r%03d", i),
-			Name:    rootActionName,
-			Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-		}, false)
-		require.NoError(t, err)
-	}
-
-	// Force every action to share one created_at, reproducing a bulk-created map task.
-	_, err = db.Exec("UPDATE actions SET created_at = '2024-01-01T00:00:00Z'")
-	require.NoError(t, err)
-
-	const pageSize = 50
-	sort := []interfaces.SortParameter{
-		NewSortParameter("created_at", interfaces.SortOrderAscending),
-		NewSortParameter("run_name", interfaces.SortOrderAscending),
-	}
-
-	seen := map[string]struct{}{}
-	var ordered []string
-	for offset := 0; offset < total*2; offset += pageSize {
-		batch, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
-			Filter:         NewIsRootActionFilter(),
-			Limit:          pageSize,
-			Offset:         offset,
-			SortParameters: sort,
-		})
-		require.NoError(t, err)
-		page := batch
-		if len(page) > pageSize { // trim the Limit+1 has-more probe row
-			page = page[:pageSize]
-		}
-		for _, a := range page {
-			seen[a.RunName] = struct{}{}
-			ordered = append(ordered, a.RunName)
-		}
-		if len(batch) <= pageSize {
-			break
-		}
-	}
-
-	assert.Len(t, seen, total, "offset paging over tied created_at must cover all actions exactly once")
-	assert.True(t, sort1.IsSorted(sort1.StringSlice(ordered)),
-		"the run_name tiebreaker must give a total order so pages don't overlap/skip")
-}
-
 // TestListActions_KeysetPagination covers the O(n) keyset paging used by the
 // WatchActions snapshot: pages continue after the previous page's (created_at, name)
 // instead of by OFFSET. It forces tied created_at (the bulk-created map-task case) so
@@ -647,13 +515,13 @@ func TestListActions_KeysetPagination(t *testing.T) {
 	assert.True(t, sort1.IsSorted(sort1.StringSlice(ordered)),
 		"keyset order must be a total order (no skips/overlaps)")
 
-	// Keyset is mutually exclusive with Offset (and CursorToken).
+	// Keyset is mutually exclusive with CursorToken.
 	now := time.Now()
 	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
 		Filter:               NewRunActionsFilter(runID),
 		Limit:                10,
 		KeysetAfterCreatedAt: &now,
-		Offset:               5,
+		CursorToken:          now.Format(time.RFC3339Nano),
 	})
 	require.Error(t, err)
 

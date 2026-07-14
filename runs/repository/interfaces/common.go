@@ -9,17 +9,18 @@ type ListResourceInput struct {
 	// CursorToken is a keyset pagination cursor encoded as a RFC3339Nano timestamp.
 	// It pages the default descending (newest-first) sort, so the query returns rows
 	// with created_at strictly LESS than the cursor value (older than the last row of
-	// the previous page). Mutually exclusive with Offset and KeysetAfter.
+	// the previous page). Mutually exclusive with KeysetAfter.
 	CursorToken string
 
-	// Offset is an integer offset for offset-based pagination.
+	// Offset is an integer offset for offset-based pagination (used by other repos'
+	// List methods; actionRepo.ListActions paginates by keyset/cursor, not offset).
 	Offset int
 
 	// KeysetAfterCreatedAt/KeysetAfterName do ascending composite keyset pagination:
 	// when KeysetAfterCreatedAt is non-nil, the query returns rows ordered strictly
 	// after (created_at, name) = (*KeysetAfterCreatedAt, KeysetAfterName). The caller
-	// must sort by (created_at ASC, name ASC). Mutually exclusive with CursorToken and
-	// Offset. Used by the WatchActions snapshot to page a run's actions in O(n).
+	// must sort by (created_at ASC, name ASC). Mutually exclusive with CursorToken.
+	// Used by the WatchActions snapshot to page a run's actions in O(n).
 	KeysetAfterCreatedAt *time.Time
 	KeysetAfterName      string
 
