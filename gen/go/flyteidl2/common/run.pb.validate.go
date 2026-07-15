@@ -140,3 +140,133 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = OffloadedInputDataValidationError{}
+
+// Validate checks the field values on Relation with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Relation) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Relation with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in RelationMultiError, or nil
+// if none found.
+func (m *Relation) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Relation) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetRelatedTo()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RelationValidationError{
+					field:  "RelatedTo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RelationValidationError{
+					field:  "RelatedTo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRelatedTo()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RelationValidationError{
+				field:  "RelatedTo",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for RelationType
+
+	if len(errors) > 0 {
+		return RelationMultiError(errors)
+	}
+
+	return nil
+}
+
+// RelationMultiError is an error wrapping multiple validation errors returned
+// by Relation.ValidateAll() if the designated constraints aren't met.
+type RelationMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RelationMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RelationMultiError) AllErrors() []error { return m }
+
+// RelationValidationError is the validation error returned by
+// Relation.Validate if the designated constraints aren't met.
+type RelationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RelationValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RelationValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RelationValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RelationValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RelationValidationError) ErrorName() string { return "RelationValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RelationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRelation.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RelationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RelationValidationError{}

@@ -12,9 +12,10 @@ _sym_db = _symbol_database.Default()
 
 
 from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
+from flyteidl2.common import identifier_pb2 as flyteidl2_dot_common_dot_identifier__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1a\x66lyteidl2/common/run.proto\x12\x10\x66lyteidl2.common\x1a\x1b\x62uf/validate/validate.proto\"Y\n\x12OffloadedInputData\x12\x19\n\x03uri\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x03uri\x12(\n\x0binputs_hash\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\ninputsHashB\xb9\x01\n\x14\x63om.flyteidl2.commonB\x08RunProtoH\x02P\x01Z4github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common\xa2\x02\x03\x46\x43X\xaa\x02\x10\x46lyteidl2.Common\xca\x02\x10\x46lyteidl2\\Common\xe2\x02\x1c\x46lyteidl2\\Common\\GPBMetadata\xea\x02\x11\x46lyteidl2::Commonb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1a\x66lyteidl2/common/run.proto\x12\x10\x66lyteidl2.common\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\"Y\n\x12OffloadedInputData\x12\x19\n\x03uri\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x03uri\x12(\n\x0binputs_hash\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\ninputsHash\"\x91\x02\n\x08Relation\x12\x46\n\nrelated_to\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\trelatedTo\x12\xbc\x01\n\rrelation_type\x18\x02 \x01(\x0e\x32\x1e.flyteidl2.common.RelationTypeBw\xbaHt\xba\x01n\n\x1frelation_type.greater_than_zero\x12<Relation type must be greater than 0 (cannot be UNSPECIFIED)\x1a\rint(this) > 0\xc8\x01\x01R\x0crelationType*a\n\x0cRelationType\x12\x1d\n\x19RELATION_TYPE_UNSPECIFIED\x10\x00\x12\x17\n\x13RELATION_TYPE_RERUN\x10\x01\x12\x19\n\x15RELATION_TYPE_RECOVER\x10\x02\x42\xb9\x01\n\x14\x63om.flyteidl2.commonB\x08RunProtoH\x02P\x01Z4github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common\xa2\x02\x03\x46\x43X\xaa\x02\x10\x46lyteidl2.Common\xca\x02\x10\x46lyteidl2\\Common\xe2\x02\x1c\x46lyteidl2\\Common\\GPBMetadata\xea\x02\x11\x46lyteidl2::Commonb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -26,6 +27,14 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _OFFLOADEDINPUTDATA.fields_by_name['uri']._serialized_options = b'\272H\004r\002\020\001'
   _OFFLOADEDINPUTDATA.fields_by_name['inputs_hash']._options = None
   _OFFLOADEDINPUTDATA.fields_by_name['inputs_hash']._serialized_options = b'\272H\004r\002\020\001'
-  _globals['_OFFLOADEDINPUTDATA']._serialized_start=77
-  _globals['_OFFLOADEDINPUTDATA']._serialized_end=166
+  _RELATION.fields_by_name['related_to']._options = None
+  _RELATION.fields_by_name['related_to']._serialized_options = b'\272H\003\310\001\001'
+  _RELATION.fields_by_name['relation_type']._options = None
+  _RELATION.fields_by_name['relation_type']._serialized_options = b'\272Ht\272\001n\n\037relation_type.greater_than_zero\022<Relation type must be greater than 0 (cannot be UNSPECIFIED)\032\rint(this) > 0\310\001\001'
+  _globals['_RELATIONTYPE']._serialized_start=479
+  _globals['_RELATIONTYPE']._serialized_end=576
+  _globals['_OFFLOADEDINPUTDATA']._serialized_start=112
+  _globals['_OFFLOADEDINPUTDATA']._serialized_end=201
+  _globals['_RELATION']._serialized_start=204
+  _globals['_RELATION']._serialized_end=477
 # @@protoc_insertion_point(module_scope)

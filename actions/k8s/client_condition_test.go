@@ -18,6 +18,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -35,7 +37,8 @@ func newConditionClient(t *testing.T) *ActionsClient {
 		ObjectMeta: metav1.ObjectMeta{Name: "run1-a0", Namespace: "flyte"},
 	}
 	return &ActionsClient{
-		namespace: "flyte",
+		recordedFilter: testFilter(),
+		namespace:      "flyte",
 		k8sClient: fake.NewClientBuilder().
 			WithScheme(scheme).
 			WithObjects(parent).
@@ -210,8 +213,9 @@ func TestNotifyRunService_Condition(t *testing.T) {
 	newClientWithRunMock := func(t *testing.T) (*runmocks.InternalRunServiceClient, *ActionsClient) {
 		mockClient := runmocks.NewInternalRunServiceClient(t)
 		return mockClient, &ActionsClient{
-			runClient:   mockClient,
-			subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+			recordedFilter: testFilter(),
+			runClient:      mockClient,
+			subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
 		}
 	}
 
@@ -238,6 +242,15 @@ func TestNotifyRunService_Condition(t *testing.T) {
 		ta.Status.SignalledBy = "user@example.com"
 		update.Phase = common.ActionPhase_ACTION_PHASE_SUCCEEDED
 		update.SignalValue = boolLiteral(true)
+
+		// A terminal action was already recorded on an earlier event; mark it in
+		// the dedup filter so notifyRunService skips RecordAction and only issues
+		// the status update (the coalescing gate records on first sight of any
+		// non-delete event, deduped via this filter).
+		filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+		require.NoError(t, err)
+		c.recordedFilter = filter
+		c.recordedFilter.Add(ctx, []byte(buildTaskActionName(update.ActionID)))
 
 		mockClient.EXPECT().UpdateActionStatus(mock.Anything, mock.MatchedBy(func(r *connect.Request[workflow.UpdateActionStatusRequest]) bool {
 			return proto.Equal(r.Msg.GetOutput(), boolLiteral(true)) &&

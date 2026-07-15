@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -25,7 +26,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
-	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	connectorPb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/connector"
 	flyteIdl "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
@@ -72,11 +72,11 @@ func (r Registry) getSupportedTaskTypes() []string {
 }
 
 type Plugin struct {
-	metricScope promutils.Scope
-	cfg         *Config
-	cs          *ClientSet
-	registry    Registry
-	mu          sync.RWMutex
+	getTaskPhase *prometheus.CounterVec
+	cfg          *Config
+	cs           *ClientSet
+	registry     Registry
+	mu           sync.RWMutex
 }
 
 type ResourceWrapper struct {
@@ -247,6 +247,10 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 	res, err := client.GetTask(finalCtx, request)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get task from connector with %v", err)
+	}
+	// Track the status the connector reports back (RUNNING/SUCCEEDED/FAILED/...) per GetTask.
+	if p.getTaskPhase != nil {
+		p.getTaskPhase.WithLabelValues(res.GetResource().GetPhase().String()).Inc()
 	}
 	return ResourceWrapper{
 		Phase:             res.GetResource().GetPhase(),
@@ -481,11 +485,13 @@ func newConnectorPlugin(connectorService *ConnectorService) webapi.PluginEntry {
 			connectorRegistry := getConnectorRegistry(ctx, clientSet)
 			supportedTaskTypes := connectorRegistry.getSupportedTaskTypes()
 			connectorService.SetSupportedTaskType(supportedTaskTypes)
+			scope := iCtx.MetricsScope()
 			plugin := &Plugin{
-				metricScope: promutils.NewScope("connector_plugin"),
-				cfg:         cfg,
-				cs:          clientSet,
-				registry:    connectorRegistry,
+				getTaskPhase: scope.MustNewCounterVec("connector_get_task_phase",
+					"GetTask responses from connectors, by returned task phase", "phase"),
+				cfg:      cfg,
+				cs:       clientSet,
+				registry: connectorRegistry,
 			}
 			plugin.watchConnectors(ctx, connectorService)
 			return plugin, nil

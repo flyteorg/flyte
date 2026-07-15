@@ -25,6 +25,7 @@ func GrpcClientMetrics(opts ...grpcprometheus.ClientMetricsOption) *grpcpromethe
 	initDefaultGrpcClientMetricsOnce.Do(func() {
 		v2Opts := append([]grpcprometheus.ClientMetricsOption{
 			grpcprometheus.WithClientCounterOptions(grpcprometheus.WithNamespace(namespace)),
+			grpcprometheus.WithClientHandlingTimeHistogram(grpcprometheus.WithHistogramNamespace(namespace)),
 		}, opts...)
 		defaultGrpcClientMetrics = grpcprometheus.NewClientMetrics(v2Opts...)
 		prometheus.MustRegister(defaultGrpcClientMetrics)

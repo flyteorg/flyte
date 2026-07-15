@@ -1219,16 +1219,16 @@ func (_c *ActionRepo_UpdateActionDetailedInfo_Call) RunAndReturn(run func(ctx co
 }
 
 // UpdateActionPhase provides a mock function for the type ActionRepo
-func (_mock *ActionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time) error {
-	ret := _mock.Called(ctx, actionID, phase, attempts, cacheStatus, endTime)
+func (_mock *ActionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time, startTime *time.Time) error {
+	ret := _mock.Called(ctx, actionID, phase, attempts, cacheStatus, endTime, startTime)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateActionPhase")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, common.ActionPhase, uint32, core.CatalogCacheStatus, *time.Time) error); ok {
-		r0 = returnFunc(ctx, actionID, phase, attempts, cacheStatus, endTime)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, common.ActionPhase, uint32, core.CatalogCacheStatus, *time.Time, *time.Time) error); ok {
+		r0 = returnFunc(ctx, actionID, phase, attempts, cacheStatus, endTime, startTime)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -1247,11 +1247,12 @@ type ActionRepo_UpdateActionPhase_Call struct {
 //   - attempts uint32
 //   - cacheStatus core.CatalogCacheStatus
 //   - endTime *time.Time
-func (_e *ActionRepo_Expecter) UpdateActionPhase(ctx interface{}, actionID interface{}, phase interface{}, attempts interface{}, cacheStatus interface{}, endTime interface{}) *ActionRepo_UpdateActionPhase_Call {
-	return &ActionRepo_UpdateActionPhase_Call{Call: _e.mock.On("UpdateActionPhase", ctx, actionID, phase, attempts, cacheStatus, endTime)}
+//   - startTime *time.Time
+func (_e *ActionRepo_Expecter) UpdateActionPhase(ctx interface{}, actionID interface{}, phase interface{}, attempts interface{}, cacheStatus interface{}, endTime interface{}, startTime interface{}) *ActionRepo_UpdateActionPhase_Call {
+	return &ActionRepo_UpdateActionPhase_Call{Call: _e.mock.On("UpdateActionPhase", ctx, actionID, phase, attempts, cacheStatus, endTime, startTime)}
 }
 
-func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time)) *ActionRepo_UpdateActionPhase_Call {
+func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time, startTime *time.Time)) *ActionRepo_UpdateActionPhase_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -1277,6 +1278,10 @@ func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, a
 		if args[5] != nil {
 			arg5 = args[5].(*time.Time)
 		}
+		var arg6 *time.Time
+		if args[6] != nil {
+			arg6 = args[6].(*time.Time)
+		}
 		run(
 			arg0,
 			arg1,
@@ -1284,6 +1289,7 @@ func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, a
 			arg3,
 			arg4,
 			arg5,
+			arg6,
 		)
 	})
 	return _c
@@ -1294,7 +1300,7 @@ func (_c *ActionRepo_UpdateActionPhase_Call) Return(err error) *ActionRepo_Updat
 	return _c
 }
 
-func (_c *ActionRepo_UpdateActionPhase_Call) RunAndReturn(run func(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time) error) *ActionRepo_UpdateActionPhase_Call {
+func (_c *ActionRepo_UpdateActionPhase_Call) RunAndReturn(run func(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time, startTime *time.Time) error) *ActionRepo_UpdateActionPhase_Call {
 	_c.Call.Return(run)
 	return _c
 }
