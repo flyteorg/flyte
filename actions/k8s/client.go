@@ -89,18 +89,12 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, n
 	c := &ActionsClient{
 		k8sClient:      k8sClient,
 		sharedCache:    sharedCache,
+		namespace:      namespace,
 		bufferSize:     bufferSize,
 		numWorkers:     numWorkers,
 		runClient:      runClient,
 		droppedUpdates: scope.MustNewCounter("dropped_updates", "Total number of dropped subscriber updates due to full channel buffer"),
 		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
-		k8sClient:   k8sClient,
-		sharedCache: sharedCache,
-		namespace:   namespace,
-		bufferSize:  bufferSize,
-		numWorkers:  numWorkers,
-		runClient:   runClient,
-		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 
 	if recordFilterSize > 0 {
