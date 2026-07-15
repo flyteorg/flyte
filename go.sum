@@ -353,8 +353,8 @@ github.com/prometheus/common v0.70.0 h1:bcpru3tWPVnxGnETLgOV5jbp/JRXgYEyv65CuBLA
 github.com/prometheus/common v0.70.0/go.mod h1:S/SFasQmgGiYH6C81LKCtYa8QACgthGg5zxL2udV7SY=
 github.com/prometheus/procfs v0.21.0 h1:Qh/e6TlBjZf+XLLqNCqFGmCU6Kj/2Bu7kj3oAc0UnXc=
 github.com/prometheus/procfs v0.21.0/go.mod h1:aB55Cww9pdSJVHk0hUf0inxWyyjPogFIjmHKYgMKmtY=
-github.com/ray-project/kuberay/ray-operator v1.5.2 h1:EkF6DQjd+ThSd5fx35i56vnqNZqnqL/Ak5C5Duo4Ftc=
-github.com/ray-project/kuberay/ray-operator v1.5.2/go.mod h1:itUPJnr3QwoZT70gRgsWFpBolquuZtDRCkdA1lrAb7Y=
+github.com/ray-project/kuberay/ray-operator v1.6.2 h1:XUckRswLMyk71D00L62d2Vanh0fVkNqu56+IF/rr+O0=
+github.com/ray-project/kuberay/ray-operator v1.6.2/go.mod h1:7vBLj6LNKuqbgERKugX3tsYm7uYRFwoE5BpQBUADeK0=
 github.com/redis/go-redis/extra/redisprometheus/v9 v9.21.0 h1:ei2lDcohFUHGG1WVYdad9eKXq0o8nWZQyEWLJxbUBhc=
 github.com/redis/go-redis/extra/redisprometheus/v9 v9.21.0/go.mod h1:QOXM32e4RwxKIkCimb4fXEhsVXn2wqJh61EFIlduWdU=
 github.com/redis/go-redis/v9 v9.21.0 h1:FPBE4hhbAke+TLmcY3WkpbDffJEomdqPn3HYiqAtL9E=
