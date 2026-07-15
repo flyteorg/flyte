@@ -435,8 +435,11 @@ message WatchWindowedActionsResponse {
   // Position of selected_item_id within the flat list.
   int64 selected_flat_index = 4;
 
-  // True on the response that completes the initial hydration; the
-  // client should treat this as the "first paint done" signal.
+  // True on any full-window snapshot the client should replace its
+  // window with — the initial attach snapshot, every mid-hydration
+  // resnapshot, and the final completion snapshot. Distinct from a
+  // delta (which carries only changed items). Use hydration_complete,
+  // not this, to know when the initial load is actually done.
   bool initial_snapshot_complete = 5;
 
   // Sticky truncation notices — present on every response until the
@@ -446,6 +449,12 @@ message WatchWindowedActionsResponse {
   // True when the server had to drop a tick due to backpressure; the
   // client should re-send its UpdateWindow to force a fresh snapshot.
   bool resync_hint = 7;
+
+  // True once the run's initial DB hydration has finished (the store
+  // left the HYDRATING state). Mid-hydration resnapshots carry false;
+  // the completion snapshot and all post-ready responses carry true.
+  // This is the real "first paint / loading done" signal.
+  bool hydration_complete = 8;
 }
 
 // WindowedItem is one slot in the windowed flat list — either a
