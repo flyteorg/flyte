@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"sort"
 	"testing"
 	"time"
 
@@ -110,6 +111,7 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 		3,
 		core.CatalogCacheStatus_CACHE_HIT,
 		&endTime,
+		nil,
 	)
 	require.NoError(t, err)
 
@@ -119,6 +121,66 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 	assert.Equal(t, uint32(3), action.Attempts)
 	assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT, action.CacheStatus)
 	assert.True(t, action.EndedAt.Valid)
+}
+
+// A supplied start time (the action's CRD creationTimestamp) must drive duration, so a
+// long-held action recorded late — e.g. when coalesced/backlogged events collapse
+// created_at toward the terminal time — still reports its real wall-clock duration.
+func TestUpdateActionPhase_StartTimeCorrectsDuration(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	actionID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Org: "org1", Project: "proj1", Domain: "domain1", Name: "run1"},
+		Name: "held-action",
+	}
+	// Row created "late" (created_at defaults to now), as when a coalesced event records
+	// a long-running action only at terminal time.
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	// The action actually started 120s ago (its CRD creationTimestamp) and just ended.
+	endTime := time.Now()
+	startTime := endTime.Add(-120 * time.Second)
+	err = actionRepo.UpdateActionPhase(ctx, actionID, common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime, &startTime)
+	require.NoError(t, err)
+
+	action, err := actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	require.True(t, action.DurationMs.Valid)
+	// Duration ~= ended - start (120s), not ended - created_at (~0).
+	assert.InDelta(t, 120000, action.DurationMs.Int64, 5000,
+		"duration must come from the supplied start time, not the late created_at")
+}
+
+// Without a start time, duration falls back to ended - created_at (unchanged behaviour).
+func TestUpdateActionPhase_NilStartTimeUsesCreatedAt(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	actionID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Org: "org1", Project: "proj1", Domain: "domain1", Name: "run1"},
+		Name: "quick-action",
+	}
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	endTime := time.Now()
+	err = actionRepo.UpdateActionPhase(ctx, actionID, common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil)
+	require.NoError(t, err)
+
+	action, err := actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	require.True(t, action.DurationMs.Valid)
+	assert.Less(t, action.DurationMs.Int64, int64(5000), "without a start time, duration is created_at-based")
 }
 
 func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
@@ -168,7 +230,7 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	}
 
 	// Update "other" — should NOT produce an update for "target".
-	err = repo.UpdateActionPhase(ctx, otherActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil)
+	err = repo.UpdateActionPhase(ctx, otherActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	select {
@@ -180,7 +242,7 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	}
 
 	// Update "target" — should produce an update.
-	err = repo.UpdateActionPhase(ctx, targetActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil)
+	err = repo.UpdateActionPhase(ctx, targetActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	select {
@@ -217,7 +279,7 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 	endTime := time.Now()
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_FAILED, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, &endTime)
+		core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil)
 	require.NoError(t, err)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
@@ -227,7 +289,7 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 	// Retry: transition from FAILED back to QUEUED — should succeed
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_QUEUED, 2,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	action, err = actionRepo.GetAction(ctx, actionID)
@@ -260,13 +322,13 @@ func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 	// Move to RUNNING
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_RUNNING, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	// Try to downgrade from RUNNING to QUEUED — should be a no-op (phase guard)
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_QUEUED, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
@@ -299,13 +361,13 @@ func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 	endTime := time.Now()
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_SUCCEEDED, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, &endTime)
+		core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil)
 	require.NoError(t, err)
 
 	// Try to downgrade from SUCCEEDED to QUEUED — should be a no-op
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_QUEUED, 2,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
@@ -348,10 +410,9 @@ func TestListRuns(t *testing.T) {
 	assert.True(t, runNames["run-2"])
 	assert.True(t, runNames["run-3"])
 
-	// ListActions uses a keyset cursor: it returns up to Limit+1 rows so the
-	// caller can detect whether another page exists. Page 1 asks for Limit=2
-	// and gets all 3 rows back (limit+1 probe). The caller trims to Limit and
-	// uses the last kept row's created_at as the CursorToken for page 2.
+	// ListActions offset-paginates: it returns up to Limit+1 rows so the caller can detect
+	// whether another page exists. Page 1 asks for Limit=2 and gets all 3 rows back
+	// (limit+1 probe); page 2 continues at Offset=2 and returns the last row.
 	runsPage1, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
 		Filter: NewIsRootActionFilter(),
 		Limit:  2,
@@ -359,11 +420,10 @@ func TestListRuns(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, runsPage1, 3)
 
-	page1 := runsPage1[:2]
 	runsPage2, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
-		Filter:      NewIsRootActionFilter(),
-		Limit:       2,
-		CursorToken: page1[len(page1)-1].CreatedAt.UTC().Format(time.RFC3339Nano),
+		Filter: NewIsRootActionFilter(),
+		Limit:  2,
+		Offset: 2,
 	})
 	require.NoError(t, err)
 	assert.Len(t, runsPage2, 1)
@@ -390,6 +450,196 @@ func TestListRuns(t *testing.T) {
 		assert.Equal(t, "proj1", r.Project)
 		assert.Equal(t, "domain1", r.Domain)
 	}
+}
+
+// TestListActions_KeysetPagination covers the O(n) keyset paging used by the
+// WatchActions snapshot: pages continue after the previous page's (created_at, name)
+// instead of by OFFSET. It forces tied created_at (the bulk-created map-task case) so
+// paging must rely on the unique "name" tiebreaker to stay a total order and cover
+// every action exactly once.
+func TestListActions_KeysetPagination(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	runID := &common.RunIdentifier{Project: "proj1", Domain: "domain1", Name: "run1"}
+	const total = 250
+	for i := 0; i < total; i++ {
+		aid := &common.ActionIdentifier{Run: runID, Name: fmt.Sprintf("n%04d", i)}
+		_, err := actionRepo.CreateAction(ctx, models.NewActionModel(aid), false)
+		require.NoError(t, err)
+	}
+	// Force one shared created_at (map-task tie case) so keyset leans on the name tiebreaker.
+	_, err = db.Exec("UPDATE actions SET created_at = '2024-01-01T00:00:00Z'")
+	require.NoError(t, err)
+
+	const pageSize = 50
+	sortAsc := []interfaces.SortParameter{
+		NewSortParameter("created_at", interfaces.SortOrderAscending),
+		NewSortParameter("name", interfaces.SortOrderAscending),
+	}
+	seen := map[string]struct{}{}
+	var ordered []string
+	var afterCreatedAt *time.Time
+	var afterName string
+	for {
+		batch, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+			Filter:               NewRunActionsFilter(runID),
+			Limit:                pageSize,
+			KeysetAfterCreatedAt: afterCreatedAt,
+			KeysetAfterName:      afterName,
+			SortParameters:       sortAsc,
+		})
+		require.NoError(t, err)
+		hasMore := len(batch) > pageSize
+		if hasMore {
+			batch = batch[:pageSize]
+		}
+		for _, a := range batch {
+			seen[a.Name] = struct{}{}
+			ordered = append(ordered, a.Name)
+		}
+		if !hasMore || len(batch) == 0 {
+			break
+		}
+		last := batch[len(batch)-1]
+		afterCreatedAt = &last.CreatedAt
+		afterName = last.Name
+	}
+
+	assert.Len(t, seen, total, "keyset paging over tied created_at must cover every action exactly once")
+	assert.True(t, sort.IsSorted(sort.StringSlice(ordered)),
+		"keyset order must be a total order (no skips/overlaps)")
+
+	// Keyset is mutually exclusive with Offset.
+	now := time.Now()
+	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter:               NewRunActionsFilter(runID),
+		Limit:                10,
+		KeysetAfterCreatedAt: &now,
+		Offset:               5,
+	})
+	require.Error(t, err)
+
+	// Keyset requires the (created_at ASC, name ASC) sort; any other sort is rejected
+	// because the keyset WHERE would otherwise skip/duplicate rows across pages.
+	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter:               NewRunActionsFilter(runID),
+		Limit:                10,
+		KeysetAfterCreatedAt: &now,
+		KeysetAfterName:      "n0001",
+		SortParameters:       []interfaces.SortParameter{NewSortParameter("name", interfaces.SortOrderAscending)},
+	})
+	require.Error(t, err)
+}
+
+// TestListActions_OffsetPagination covers the offset paging used by the ListRuns/ListActions
+// RPC: the page token is the running offset. It forces tied created_at (the bulk-created
+// map-task case) to confirm the default sort's (run_name, name) tiebreaker keeps paging
+// stable — every action is returned exactly once with no skips or repeats.
+func TestListActions_OffsetPagination(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	runID := &common.RunIdentifier{Project: "proj1", Domain: "domain1", Name: "run1"}
+	const total = 250
+	for i := 0; i < total; i++ {
+		aid := &common.ActionIdentifier{Run: runID, Name: fmt.Sprintf("n%04d", i)}
+		_, err := actionRepo.CreateAction(ctx, models.NewActionModel(aid), false)
+		require.NoError(t, err)
+	}
+	_, err = db.Exec("UPDATE actions SET created_at = '2024-01-01T00:00:00Z'")
+	require.NoError(t, err)
+
+	const pageSize = 50
+	seen := map[string]struct{}{}
+	for offset := 0; ; offset += pageSize {
+		batch, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+			Filter: NewRunActionsFilter(runID),
+			Limit:  pageSize,
+			Offset: offset,
+		})
+		require.NoError(t, err)
+		hasMore := len(batch) > pageSize
+		if hasMore {
+			batch = batch[:pageSize]
+		}
+		for _, a := range batch {
+			_, dup := seen[a.Name]
+			require.False(t, dup, "action %s returned on more than one page", a.Name)
+			seen[a.Name] = struct{}{}
+		}
+		if !hasMore || len(batch) == 0 {
+			break
+		}
+	}
+	assert.Len(t, seen, total, "offset paging must cover every action exactly once")
+
+	// Negative offset is rejected.
+	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter: NewRunActionsFilter(runID), Limit: 10, Offset: -1,
+	})
+	require.Error(t, err)
+
+	// Offset is mutually exclusive with keyset.
+	now := time.Now()
+	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter: NewRunActionsFilter(runID), Limit: 10, Offset: 5, KeysetAfterCreatedAt: &now,
+	})
+	require.Error(t, err)
+}
+
+// TestListActions_OffsetPaginationClientSortTiedCreatedAt guards against skipping/duplicating
+// rows when a client-supplied sort is not a total order. `created_at DESC` over bulk-created
+// map-task children (all tied on created_at) leaves ties in an arbitrary order per query, so
+// OFFSET paging would be unstable without the appended (run_name, name) tiebreakers.
+func TestListActions_OffsetPaginationClientSortTiedCreatedAt(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	runID := &common.RunIdentifier{Project: "proj1", Domain: "domain1", Name: "run1"}
+	const total = 250
+	for i := 0; i < total; i++ {
+		aid := &common.ActionIdentifier{Run: runID, Name: fmt.Sprintf("n%04d", i)}
+		_, err := actionRepo.CreateAction(ctx, models.NewActionModel(aid), false)
+		require.NoError(t, err)
+	}
+	_, err = db.Exec("UPDATE actions SET created_at = '2024-01-01T00:00:00Z'")
+	require.NoError(t, err)
+
+	sortDesc := []interfaces.SortParameter{NewSortParameter("created_at", interfaces.SortOrderDescending)}
+	const pageSize = 50
+	seen := map[string]struct{}{}
+	for offset := 0; ; offset += pageSize {
+		batch, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+			Filter:         NewRunActionsFilter(runID),
+			Limit:          pageSize,
+			Offset:         offset,
+			SortParameters: sortDesc,
+		})
+		require.NoError(t, err)
+		hasMore := len(batch) > pageSize
+		if hasMore {
+			batch = batch[:pageSize]
+		}
+		for _, a := range batch {
+			_, dup := seen[a.Name]
+			require.False(t, dup, "action %s returned on more than one page", a.Name)
+			seen[a.Name] = struct{}{}
+		}
+		if !hasMore || len(batch) == 0 {
+			break
+		}
+	}
+	assert.Len(t, seen, total, "client-sorted offset paging over tied created_at must cover every action exactly once")
 }
 
 func setupActionEventDB(t *testing.T) (*sqlx.DB, *actionRepo) {
@@ -497,6 +747,33 @@ func TestInsertEvents_MultipleEventsForDifferentActions(t *testing.T) {
 	got2, err := repo.GetLatestEventByAttempt(ctx, actionID2, 0)
 	require.NoError(t, err)
 	assert.Equal(t, "action2", got2.Name)
+}
+
+// A batch larger than Postgres' 65,535-bind-parameter budget (9 params/row ->
+// 7,281 rows) must be chunked into multiple INSERTs rather than failing whole.
+// RecordActionEvents accepts arbitrary event counts, so this is a real API path.
+func TestInsertEvents_ChunksOversizedBatch(t *testing.T) {
+	_, repo := setupActionEventDB(t)
+	ctx := context.Background()
+
+	const n = 7300 // > 7,281, forcing at least two chunks
+	events := make([]*models.ActionEvent, 0, n)
+	for i := 0; i < n; i++ {
+		e, err := models.NewActionEventModel(&workflow.ActionEvent{
+			Id:          testActionID,
+			Attempt:     0,
+			Phase:       common.ActionPhase_ACTION_PHASE_RUNNING,
+			Version:     uint32(i), // distinct versions so rows are not deduped
+			UpdatedTime: timestamppb.Now(),
+		})
+		require.NoError(t, err)
+		events = append(events, e)
+	}
+	require.NoError(t, repo.InsertEvents(ctx, events))
+
+	got, err := repo.ListEvents(ctx, testActionID, n+1)
+	require.NoError(t, err)
+	assert.Len(t, got, n, "all chunked rows must be inserted")
 }
 
 func TestInsertEvents_Empty(t *testing.T) {
@@ -678,7 +955,7 @@ func TestUpdateActionPhase_AbortedDoesNotInsertEvent(t *testing.T) {
 	require.NoError(t, err)
 
 	endTime := time.Now()
-	err = actionRepo.UpdateActionPhase(ctx, actionID, common.ActionPhase_ACTION_PHASE_ABORTED, 1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime)
+	err = actionRepo.UpdateActionPhase(ctx, actionID, common.ActionPhase_ACTION_PHASE_ABORTED, 1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil)
 	require.NoError(t, err)
 
 	// Phase column must be updated.

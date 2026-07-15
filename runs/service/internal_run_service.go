@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"io"
 	"time"
+
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 
 	"connectrpc.com/connect"
 	grpcstatus "google.golang.org/genproto/googleapis/rpc/status"
@@ -244,12 +245,15 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 	actionStatus := req.GetStatus()
 	var endTime *time.Time
 	if actionStatus.GetEndTime() != nil {
-		t := actionStatus.GetEndTime().AsTime()
-		endTime = &t
+		endTime = new(actionStatus.GetEndTime().AsTime())
 	} else if IsTerminalPhase(actionStatus.GetPhase()) {
 		// If no end time is provided but the phase is terminal, use now.
-		t := time.Now()
-		endTime = &t
+		endTime = new(time.Now())
+	}
+
+	var startTime *time.Time
+	if actionStatus.GetStartTime() != nil {
+		startTime = new(actionStatus.GetStartTime().AsTime())
 	}
 
 	if err := s.repo.ActionRepo().UpdateActionPhase(
@@ -259,6 +263,7 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 		actionStatus.GetAttempts(),
 		actionStatus.GetCacheStatus(),
 		endTime,
+		startTime,
 	); err != nil {
 		logger.Warnf(ctx, "UpdateActionStatus: failed to update action %s: %v", req.GetActionId().GetName(), err)
 		return connect.NewError(connect.CodeInternal, err)

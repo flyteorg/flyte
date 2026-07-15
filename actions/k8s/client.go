@@ -15,8 +15,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/util/retry"
 	toolscache "k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/util/retry"
 	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -75,15 +75,32 @@ type ActionsClient struct {
 	watching    bool
 
 	// Worker pool: numWorkers goroutines each own one channel.
-	// Events are sharded by TaskAction name so per-resource ordering is preserved.
+	// Events are sharded by the TaskAction name, so per-resource ordering is preserved.
 	numWorkers int
 	workerChs  []chan watch.Event
+
+	// dispatchedActions tracks TaskAction names with an event already dispatched to a
+	// worker channel and not yet processed. Further events for the same action are
+	// dropped (coalesced) — the worker reads the latest state from the cache when it
+	// runs.
+	dispatchedActions   map[string]struct{}
+	dispatchedActionsMu sync.Mutex
+
+	// getLatest reads the current TaskAction from the shared cache. Overridable in tests.
+	getLatest func(ctx context.Context, name string) (*executorv1.TaskAction, bool, error)
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) *ActionsClient {
+func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) (*ActionsClient, error) {
 	if numWorkers <= 0 {
 		numWorkers = 1
+	}
+	// The dedup filter is mandatory, so its size must be a positive value.
+	if recordFilterSize <= 0 {
+		return nil, fmt.Errorf("actions: recordFilterSize must be positive, got %d", recordFilterSize)
+	}
+	if scope == nil {
+		return nil, fmt.Errorf("actions: metrics scope is required")
 	}
 	c := &ActionsClient{
 		k8sClient:   k8sClient,
@@ -95,16 +112,15 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, n
 		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 
-	if recordFilterSize > 0 {
-		filter, err := fastcheck.NewOppoBloomFilter(recordFilterSize, scope.NewSubScope("actions_filter"))
-		if err != nil {
-			logger.Warnf(context.Background(), "Failed to create record filter (size=%d): %v; proceeding without dedup", recordFilterSize, err)
-		} else {
-			c.recordedFilter = filter
-		}
+	// The dedup filter is mandatory: notifyRunService records on every event type
+	// and relies on the filter to keep RecordAction idempotent.
+	filter, err := fastcheck.NewOppoBloomFilter(recordFilterSize, scope.NewSubScope("actions_filter"))
+	if err != nil {
+		return nil, fmt.Errorf("actions: failed to create RecordAction dedup filter (size=%d): %w", recordFilterSize, err)
 	}
+	c.recordedFilter = filter
 
-	return c
+	return c, nil
 }
 
 // Enqueue creates a TaskAction CR in etcd (via the K8s API).
@@ -477,6 +493,10 @@ func (c *ActionsClient) StartWatching(ctx context.Context) error {
 	c.stopCh = make(chan struct{})
 	stopCh := c.stopCh // capture before releasing so workers reference the right channel
 	c.workerChs = make([]chan watch.Event, c.numWorkers)
+	c.dispatchedActions = make(map[string]struct{})
+	if c.getLatest == nil {
+		c.getLatest = c.getLatestFromCache
+	}
 	for i := range c.workerChs {
 		c.workerChs[i] = make(chan watch.Event, c.bufferSize)
 		go c.worker(ctx, c.workerChs[i], stopCh)
@@ -562,6 +582,20 @@ func (c *ActionsClient) dispatchEvent(taskAction *executorv1.TaskAction, eventTy
 	h := fnv.New32a()
 	_, _ = h.Write([]byte(taskAction.Name)) // FNV Write never returns an error
 	shard := h.Sum32() % uint32(c.numWorkers)
+
+	if eventType == watch.Deleted {
+		c.workerChs[shard] <- watch.Event{Type: eventType, Object: taskAction.DeepCopy()}
+		return
+	}
+
+	c.dispatchedActionsMu.Lock()
+	if _, already := c.dispatchedActions[taskAction.Name]; already {
+		c.dispatchedActionsMu.Unlock()
+		return
+	}
+	c.dispatchedActions[taskAction.Name] = struct{}{}
+	c.dispatchedActionsMu.Unlock()
+
 	c.workerChs[shard] <- watch.Event{Type: eventType, Object: taskAction.DeepCopy()}
 }
 
@@ -572,7 +606,43 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 		return
 	}
 
-	c.handleTaskActionEvent(ctx, taskAction, event.Type)
+	// Deletes carry the tombstone (the object is gone from the cache); process it directly.
+	if event.Type == watch.Deleted {
+		c.dispatchedActionsMu.Lock()
+		delete(c.dispatchedActions, taskAction.Name)
+		c.dispatchedActionsMu.Unlock()
+		c.handleTaskActionEvent(ctx, taskAction, watch.Deleted)
+		return
+	}
+
+	c.dispatchedActionsMu.Lock()
+	delete(c.dispatchedActions, taskAction.Name)
+	c.dispatchedActionsMu.Unlock()
+
+	latest, found, err := c.getLatest(ctx, taskAction.Name)
+	if err != nil {
+		logger.Warnf(ctx, "coalesced watch: failed to read latest TaskAction %s: %v", taskAction.Name, err)
+		return
+	}
+	if !found {
+		return // object already gone; a delete event (if any) handles the terminal state
+	}
+	if c.shouldSkipTaskAction(latest) {
+		return
+	}
+	c.handleTaskActionEvent(ctx, latest, event.Type)
+}
+
+// getLatestFromCache reads the current TaskAction from the shared informer cache.
+func (c *ActionsClient) getLatestFromCache(ctx context.Context, name string) (*executorv1.TaskAction, bool, error) {
+	ta := &executorv1.TaskAction{}
+	if err := c.sharedCache.Get(ctx, client.ObjectKey{Name: name, Namespace: c.namespace}, ta); err != nil {
+		if apierrors.IsNotFound(err) {
+			return nil, false, nil
+		}
+		return nil, false, err
+	}
+	return ta, true, nil
 }
 
 func (c *ActionsClient) handleTaskActionEvent(ctx context.Context, taskAction *executorv1.TaskAction, eventType watch.EventType) {
@@ -591,7 +661,7 @@ func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, e
 		parentName = *taskAction.Spec.ParentActionName
 	}
 
-	// Determine short name: use spec.ShortName if set, otherwise extract from template ID
+	// Determine a short name: use spec.ShortName if set, otherwise extract from template ID
 	shortName := taskAction.Spec.ShortName
 	if shortName == "" && len(taskAction.Spec.TaskTemplate) > 0 {
 		shortName = extractShortNameFromTemplate(taskAction.Spec.TaskTemplate)
@@ -669,87 +739,91 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 	if c.runClient == nil {
 		return
 	}
-
-	// On ADDED: create the action record in the DB (deduplicated via bloom filter).
-	if eventType == watch.Added {
-		actionKey := []byte(buildTaskActionName(update.ActionID))
-		isDuplicate := c.recordedFilter != nil && c.recordedFilter.Contains(ctx, actionKey)
-		if isDuplicate {
-			logger.Debugf(ctx, "Skipping duplicate RecordAction for %s", update.ActionID.Name)
-		} else {
-			recordReq := &workflow.RecordActionRequest{
-				ActionId: update.ActionID,
-				Parent:   update.ParentActionName,
-				InputUri: taskAction.Spec.InputURI,
-				Group:    taskAction.Spec.Group,
-			}
-			if taskAction.Spec.ActionType == executorv1.ActionTypeCondition {
-				condSpec := &workflow.ConditionAction{}
-				if err := proto.Unmarshal(taskAction.Spec.ConditionSpec, condSpec); err != nil {
-					logger.Warnf(ctx, "Failed to unmarshal condition spec for %s: %v", update.ActionID.Name, err)
-				} else {
-					recordReq.Spec = &workflow.RecordActionRequest_Condition{Condition: condSpec}
-				}
-			} else if taskAction.Spec.TaskType != "" {
-				ta := &workflow.TaskAction{
-					Id: &task.TaskIdentifier{
-						Project: taskAction.Spec.Project,
-						Domain:  taskAction.Spec.Domain,
-					},
-				}
-				// Deserialize TaskTemplate to build TaskSpec
-				if len(taskAction.Spec.TaskTemplate) > 0 {
-					var tmpl core.TaskTemplate
-					if err := proto.Unmarshal(taskAction.Spec.TaskTemplate, &tmpl); err == nil {
-						if tmplID := tmpl.GetId(); tmplID != nil {
-							ta.Id.Name = tmplID.GetName()
-							ta.Id.Version = tmplID.GetVersion()
-						}
-						ta.Spec = &task.TaskSpec{
-							TaskTemplate: &tmpl,
-							ShortName:    taskAction.Spec.ShortName,
-						}
-					}
-				}
-				recordReq.Spec = &workflow.RecordActionRequest_Task{
-					Task: ta,
-				}
-			}
-			if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {
-				logger.Warnf(ctx, "Failed to record action in run service for %s: %v", update.ActionID.Name, err)
-			} else if c.recordedFilter != nil {
-				c.recordedFilter.Add(ctx, actionKey)
-			}
+	actionKey := []byte(buildTaskActionName(update.ActionID))
+	isDuplicate := c.recordedFilter.Contains(ctx, actionKey)
+	if isDuplicate {
+		logger.Debugf(ctx, "Skipping duplicate RecordAction for %s", update.ActionID.Name)
+	} else {
+		recordReq := &workflow.RecordActionRequest{
+			ActionId: update.ActionID,
+			Parent:   update.ParentActionName,
+			InputUri: taskAction.Spec.InputURI,
+			Group:    taskAction.Spec.Group,
 		}
-
-		// When a child action appears, the parent must already be running (it
-		// created the child). Promote the parent to RUNNING so the UI doesn't
-		// stay stuck on INITIALIZING while children are executing.
-		if !isDuplicate && update.ParentActionName != "" {
-			parentID := &common.ActionIdentifier{
-				Run:  update.ActionID.Run,
-				Name: update.ParentActionName,
+		if taskAction.Spec.ActionType == executorv1.ActionTypeCondition {
+			condSpec := &workflow.ConditionAction{}
+			if err := proto.Unmarshal(taskAction.Spec.ConditionSpec, condSpec); err != nil {
+				logger.Warnf(ctx, "Failed to unmarshal condition spec for %s: %v", update.ActionID.Name, err)
+			} else {
+				recordReq.Spec = &workflow.RecordActionRequest_Condition{Condition: condSpec}
 			}
-			parentStatusReq := &workflow.UpdateActionStatusRequest{
-				ActionId: parentID,
-				Status: &workflow.ActionStatus{
-					Phase: common.ActionPhase_ACTION_PHASE_RUNNING,
+		} else if taskAction.Spec.TaskType != "" {
+			ta := &workflow.TaskAction{
+				Id: &task.TaskIdentifier{
+					Project: taskAction.Spec.Project,
+					Domain:  taskAction.Spec.Domain,
 				},
 			}
-			if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(parentStatusReq)); err != nil {
-				logger.Warnf(ctx, "Failed to promote parent action %s to RUNNING: %v", update.ParentActionName, err)
+			// Deserialize TaskTemplate to build TaskSpec
+			if len(taskAction.Spec.TaskTemplate) > 0 {
+				var tmpl core.TaskTemplate
+				if err := proto.Unmarshal(taskAction.Spec.TaskTemplate, &tmpl); err == nil {
+					if tmplID := tmpl.GetId(); tmplID != nil {
+						ta.Id.Name = tmplID.GetName()
+						ta.Id.Version = tmplID.GetVersion()
+					}
+					ta.Spec = &task.TaskSpec{
+						TaskTemplate: &tmpl,
+						ShortName:    taskAction.Spec.ShortName,
+					}
+				}
 			}
+			recordReq.Spec = &workflow.RecordActionRequest_Task{
+				Task: ta,
+			}
+		}
+		if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {
+			logger.Warnf(ctx, "Failed to record action in run service for %s: %v", update.ActionID.Name, err)
+		} else {
+			c.recordedFilter.Add(ctx, actionKey)
+		}
+	}
+
+	// When a child action first appears, the parent must already be running (it
+	// created the child). Promote the parent to RUNNING so the UI doesn't
+	// stay stuck on INITIALIZING while children are executing.
+	if !isDuplicate && eventType != watch.Deleted && update.ParentActionName != "" {
+		parentID := &common.ActionIdentifier{
+			Run:  update.ActionID.Run,
+			Name: update.ParentActionName,
+		}
+		parentStatusReq := &workflow.UpdateActionStatusRequest{
+			ActionId: parentID,
+			Status: &workflow.ActionStatus{
+				Phase: common.ActionPhase_ACTION_PHASE_RUNNING,
+			},
+		}
+		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(parentStatusReq)); err != nil {
+			logger.Warnf(ctx, "Failed to promote parent action %s to RUNNING: %v", update.ParentActionName, err)
 		}
 	}
 
 	if update.Phase != common.ActionPhase_ACTION_PHASE_UNSPECIFIED {
+		status := &workflow.ActionStatus{
+			Phase:       update.Phase,
+			Attempts:    taskAction.Status.Attempts,
+			CacheStatus: taskAction.Status.CacheStatus,
+		}
+		// Carry the action's true start (its CRD creationTimestamp) so the run service
+		// computes duration from it. Otherwise created_at is stamped whenever this event
+		// is recorded, which — under coalesced/backlogged events — can collapse to the
+		// terminal time and report a near-zero duration for a long-held action.
+		if !taskAction.CreationTimestamp.IsZero() {
+			status.StartTime = timestamppb.New(taskAction.CreationTimestamp.Time)
+		}
 		statusReq := &workflow.UpdateActionStatusRequest{
 			ActionId: update.ActionID,
-			Status: &workflow.ActionStatus{
-				Phase:       update.Phase,
-				Attempts:    taskAction.Status.Attempts,
-				CacheStatus: taskAction.Status.CacheStatus,
-			},
+			Status:   status,
 		}
 		// On terminal SUCCEEDED of a signalled condition, ship the resolved
 		// value and actor to the run-service DB.

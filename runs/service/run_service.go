@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -925,14 +926,13 @@ func (s *RunService) ListRuns(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// We fetch Limit+1 rows to detect whether a next page exists without a
-	// separate COUNT query. If we got more than Limit rows back, there is at
-	// least one more page: trim the slice and encode the last returned row's
-	// created_at as the keyset cursor for the next request.
+	// We fetch Limit+1 rows to detect whether a next page exists without a separate COUNT
+	// query. If we got more than Limit rows back, there is at least one more page: trim the
+	// slice and encode the next offset (offset+limit) as the opaque page token.
 	var nextToken string
 	if len(actions) > listInput.Limit {
 		actions = actions[:listInput.Limit]
-		nextToken = actions[len(actions)-1].CreatedAt.UTC().Format(time.RFC3339Nano)
+		nextToken = strconv.Itoa(listInput.Offset + listInput.Limit)
 	}
 
 	protoRuns := make([]*workflow.Run, len(actions))
@@ -975,14 +975,13 @@ func (s *RunService) ListActions(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// We fetch Limit+1 rows to detect whether a next page exists without a
-	// separate COUNT query. If we got more than Limit rows back, there is at
-	// least one more page: trim the slice and encode the last returned row's
-	// created_at as the keyset cursor for the next request.
+	// We fetch Limit+1 rows to detect whether a next page exists without a separate COUNT
+	// query. If we got more than Limit rows back, there is at least one more page: trim the
+	// slice and encode the next offset (offset+limit) as the opaque page token.
 	var nextToken string
 	if len(actions) > listInput.Limit {
 		actions = actions[:listInput.Limit]
-		nextToken = actions[len(actions)-1].CreatedAt.UTC().Format(time.RFC3339Nano)
+		nextToken = strconv.Itoa(listInput.Offset + listInput.Limit)
 	}
 
 	protoActions := make([]*workflow.Action, len(actions))
@@ -1371,37 +1370,57 @@ func (s *RunService) listAndSendAllActions(
 	rsm *runStateManager,
 	stream *connect.ServerStream[workflow.WatchActionsResponse],
 ) error {
-	const pageSize = 100
-	offset := 0
+	// Page the initial snapshot with keyset (cursor) pagination on (created_at, name)
+	// ascending, backed by idx_actions_run_created_name. Each page is an index
+	// range-scan continuing after the previous page's last row, so the full snapshot
+	// is O(n) — OFFSET paging was O(n^2/pageSize) and made large runs (tens of
+	// thousands of actions) race the console's stream timeout, truncating the result.
+	//
+	// created_at is the primary sort so parents are inserted before their children
+	// (insertAction requires the parent node to already exist). name is a unique
+	// per-run tiebreaker giving a total order, so keyset pages never skip/overlap
+	// even when a map task bulk-creates thousands of children with identical
+	// created_at.
+	const pageSize = 1000
+	var afterCreatedAt *time.Time
+	var afterName string
 	for {
-		// Sort ascending by created_at so parent actions are inserted into the
-		// run state manager before their children. insertAction requires the
-		// parent node to already exist in the tree when a child is processed.
 		batch, err := s.repo.ActionRepo().ListActions(ctx, interfaces.ListResourceInput{
-			Filter: impl.NewRunActionsFilter(runID),
-			Limit:  pageSize,
-			Offset: offset,
+			Filter:               impl.NewRunActionsFilter(runID),
+			Limit:                pageSize,
+			KeysetAfterCreatedAt: afterCreatedAt,
+			KeysetAfterName:      afterName,
 			SortParameters: []interfaces.SortParameter{
 				impl.NewSortParameter("created_at", interfaces.SortOrderAscending),
+				impl.NewSortParameter("name", interfaces.SortOrderAscending),
 			},
 		})
 		if err != nil {
 			return err
 		}
 
+		// ListActions returns up to Limit+1 rows (the extra row is a has-more probe).
+		// Trim it and use it only to decide whether to continue; the trimmed row is
+		// re-read as the first row of the next page via the cursor, so nothing is lost.
+		hasMore := len(batch) > pageSize
+		if hasMore {
+			batch = batch[:pageSize]
+		}
+
 		updates, err := rsm.upsertActions(ctx, batch)
 		if err != nil {
 			return err
 		}
-
 		if err := s.sendChangedActions(runID, updates, stream); err != nil {
 			return err
 		}
 
-		if len(batch) < pageSize {
+		if !hasMore || len(batch) == 0 {
 			return nil
 		}
-		offset += pageSize
+		last := batch[len(batch)-1]
+		afterCreatedAt = &last.CreatedAt
+		afterName = last.Name
 	}
 }
 
