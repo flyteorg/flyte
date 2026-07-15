@@ -113,6 +113,12 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 		if k8serrors.IsRequestEntityTooLargeError(err) {
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("EntityTooLarge", err.Error(), nil)), nil
 		}
+		// K8s rejected the resource as invalid (e.g. HTTP 422 for a pod spec with an empty
+		// container image). The same spec will be rejected on every attempt, so retrying as a
+		// system failure only burns retries while the task appears Queued with an error attached.
+		if k8serrors.IsInvalid(err) || k8serrors.IsBadRequest(err) {
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("InvalidResource", err.Error(), nil)), nil
+		}
 		reason := k8serrors.ReasonForError(err)
 		logger.Errorf(ctx, "Failed to launch job, system error. err: %v", err)
 		return pluginsCore.UnknownTransition, errors.Wrapf(stdErrors.ErrorCode(reason), err, "failed to create resource")
