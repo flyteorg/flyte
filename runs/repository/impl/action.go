@@ -315,6 +315,35 @@ func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdent
 
 // ListActions lists actions matching the given input filter, sort, and pagination.
 func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Action, error) {
+	// ListActions supports two mutually-exclusive pagination modes: keyset (KeysetAfter,
+	// the ascending (created_at, name) keyset used by the WatchActions snapshot) and offset
+	// (Offset, used by the ListRuns/ListActions RPC — the page token is the running offset).
+	if input.Offset < 0 {
+		return nil, fmt.Errorf("offset must be non-negative")
+	}
+	if input.Offset > 0 && input.KeysetAfterCreatedAt != nil {
+		return nil, fmt.Errorf("offset is mutually exclusive with keysetAfter")
+	}
+	if input.KeysetAfterCreatedAt == nil && input.KeysetAfterName != "" {
+		// The keyset WHERE only runs when KeysetAfterCreatedAt is set; a name on its own
+		// would be silently ignored (paging from the start). Reject it so the mistake is
+		// caught instead of returning wrong pages.
+		return nil, fmt.Errorf("keysetAfterName requires keysetAfterCreatedAt")
+	}
+	if input.KeysetAfterCreatedAt != nil {
+		if input.KeysetAfterName == "" {
+			return nil, fmt.Errorf("keysetAfter requires keysetAfterName")
+		}
+		// The keyset WHERE `(created_at, name) > (?, ?)` is only correct when the query
+		// is ordered by exactly (created_at ASC, name ASC); any other sort would skip or
+		// duplicate rows across pages.
+		if len(input.SortParameters) != 2 ||
+			input.SortParameters[0].GetOrderExpr() != "created_at ASC" ||
+			input.SortParameters[1].GetOrderExpr() != "name ASC" {
+			return nil, fmt.Errorf("keysetAfter requires sortParameters (created_at ASC, name ASC)")
+		}
+	}
+
 	var queryBuilder strings.Builder
 	var args []interface{}
 
@@ -330,36 +359,60 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 		args = append(args, expr.Args...)
 	}
 
-	if input.CursorToken != "" {
-		if t, err := time.Parse(time.RFC3339Nano, input.CursorToken); err == nil {
-			// If a filter was already applied above, the WHERE clause is already open
-			// and we extend it with AND. Otherwise we open a new WHERE clause.
-			// Use < because the default sort is DESC (newest first): each page
-			// continues from rows older than the last row of the previous page.
-			if input.Filter != nil {
-				queryBuilder.WriteString(" AND created_at < ?")
-			} else {
-				queryBuilder.WriteString(" WHERE created_at < ?")
-			}
-			args = append(args, t)
+	if input.KeysetAfterCreatedAt != nil {
+		// Ascending composite keyset: return rows strictly after (created_at, name).
+		// Postgres row-value comparison implements the lexicographic keyset:
+		// (created_at, name) > (c, n)  <=>  created_at > c OR (created_at = c AND name > n).
+		// Backed by idx_actions_run_created_name so each page is an index range-scan.
+		if input.Filter != nil {
+			queryBuilder.WriteString(" AND (created_at, name) > (?, ?)")
+		} else {
+			queryBuilder.WriteString(" WHERE (created_at, name) > (?, ?)")
 		}
+		args = append(args, *input.KeysetAfterCreatedAt, input.KeysetAfterName)
 	}
 
 	if len(input.SortParameters) > 0 {
 		queryBuilder.WriteString(" ORDER BY ")
+		sortCols := make(map[string]bool, len(input.SortParameters))
 		for i, sp := range input.SortParameters {
 			if i > 0 {
 				queryBuilder.WriteString(", ")
 			}
-			queryBuilder.WriteString(sp.GetOrderExpr())
+			expr := sp.GetOrderExpr()
+			queryBuilder.WriteString(expr)
+			if fields := strings.Fields(expr); len(fields) > 0 {
+				sortCols[fields[0]] = true
+			}
+		}
+		// A client-supplied sort may not be a total order (e.g. created_at DESC with the
+		// tied timestamps of bulk-created map-task children); Postgres then leaves ties in
+		// an arbitrary order, so OFFSET pages can skip/duplicate rows. Append (run_name,
+		// name) — unique per row (part of the PK) — as deterministic tiebreakers so paging
+		// is stable. The keyset snapshot path already orders by exactly (created_at ASC,
+		// name ASC), which is a total order within a run, so leave it untouched.
+		if input.KeysetAfterCreatedAt == nil {
+			if !sortCols["run_name"] {
+				queryBuilder.WriteString(", run_name ASC")
+			}
+			if !sortCols["name"] {
+				queryBuilder.WriteString(", name ASC")
+			}
 		}
 	} else {
 		// Default sorting non-terminal runs at the top, then by most recent start time.
-		queryBuilder.WriteString(" ORDER BY phase ASC, created_at DESC")
+		// (run_name, name) is a deterministic tiebreaker (part of the PK) so the order is
+		// total and offset pagination is stable (rows don't shuffle between pages).
+		queryBuilder.WriteString(" ORDER BY phase ASC, created_at DESC, run_name DESC, name DESC")
 	}
 
 	queryBuilder.WriteString(" LIMIT ?")
 	args = append(args, input.Limit+1)
+
+	if input.Offset > 0 {
+		queryBuilder.WriteString(" OFFSET ?")
+		args = append(args, input.Offset)
+	}
 
 	query := sqlx.Rebind(sqlx.DOLLAR, queryBuilder.String())
 

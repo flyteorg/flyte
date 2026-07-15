@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"sort"
 	"testing"
 	"time"
 
@@ -409,10 +410,9 @@ func TestListRuns(t *testing.T) {
 	assert.True(t, runNames["run-2"])
 	assert.True(t, runNames["run-3"])
 
-	// ListActions uses a keyset cursor: it returns up to Limit+1 rows so the
-	// caller can detect whether another page exists. Page 1 asks for Limit=2
-	// and gets all 3 rows back (limit+1 probe). The caller trims to Limit and
-	// uses the last kept row's created_at as the CursorToken for page 2.
+	// ListActions offset-paginates: it returns up to Limit+1 rows so the caller can detect
+	// whether another page exists. Page 1 asks for Limit=2 and gets all 3 rows back
+	// (limit+1 probe); page 2 continues at Offset=2 and returns the last row.
 	runsPage1, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
 		Filter: NewIsRootActionFilter(),
 		Limit:  2,
@@ -420,11 +420,10 @@ func TestListRuns(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, runsPage1, 3)
 
-	page1 := runsPage1[:2]
 	runsPage2, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
-		Filter:      NewIsRootActionFilter(),
-		Limit:       2,
-		CursorToken: page1[len(page1)-1].CreatedAt.UTC().Format(time.RFC3339Nano),
+		Filter: NewIsRootActionFilter(),
+		Limit:  2,
+		Offset: 2,
 	})
 	require.NoError(t, err)
 	assert.Len(t, runsPage2, 1)
@@ -451,6 +450,196 @@ func TestListRuns(t *testing.T) {
 		assert.Equal(t, "proj1", r.Project)
 		assert.Equal(t, "domain1", r.Domain)
 	}
+}
+
+// TestListActions_KeysetPagination covers the O(n) keyset paging used by the
+// WatchActions snapshot: pages continue after the previous page's (created_at, name)
+// instead of by OFFSET. It forces tied created_at (the bulk-created map-task case) so
+// paging must rely on the unique "name" tiebreaker to stay a total order and cover
+// every action exactly once.
+func TestListActions_KeysetPagination(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	runID := &common.RunIdentifier{Project: "proj1", Domain: "domain1", Name: "run1"}
+	const total = 250
+	for i := 0; i < total; i++ {
+		aid := &common.ActionIdentifier{Run: runID, Name: fmt.Sprintf("n%04d", i)}
+		_, err := actionRepo.CreateAction(ctx, models.NewActionModel(aid), false)
+		require.NoError(t, err)
+	}
+	// Force one shared created_at (map-task tie case) so keyset leans on the name tiebreaker.
+	_, err = db.Exec("UPDATE actions SET created_at = '2024-01-01T00:00:00Z'")
+	require.NoError(t, err)
+
+	const pageSize = 50
+	sortAsc := []interfaces.SortParameter{
+		NewSortParameter("created_at", interfaces.SortOrderAscending),
+		NewSortParameter("name", interfaces.SortOrderAscending),
+	}
+	seen := map[string]struct{}{}
+	var ordered []string
+	var afterCreatedAt *time.Time
+	var afterName string
+	for {
+		batch, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+			Filter:               NewRunActionsFilter(runID),
+			Limit:                pageSize,
+			KeysetAfterCreatedAt: afterCreatedAt,
+			KeysetAfterName:      afterName,
+			SortParameters:       sortAsc,
+		})
+		require.NoError(t, err)
+		hasMore := len(batch) > pageSize
+		if hasMore {
+			batch = batch[:pageSize]
+		}
+		for _, a := range batch {
+			seen[a.Name] = struct{}{}
+			ordered = append(ordered, a.Name)
+		}
+		if !hasMore || len(batch) == 0 {
+			break
+		}
+		last := batch[len(batch)-1]
+		afterCreatedAt = &last.CreatedAt
+		afterName = last.Name
+	}
+
+	assert.Len(t, seen, total, "keyset paging over tied created_at must cover every action exactly once")
+	assert.True(t, sort.IsSorted(sort.StringSlice(ordered)),
+		"keyset order must be a total order (no skips/overlaps)")
+
+	// Keyset is mutually exclusive with Offset.
+	now := time.Now()
+	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter:               NewRunActionsFilter(runID),
+		Limit:                10,
+		KeysetAfterCreatedAt: &now,
+		Offset:               5,
+	})
+	require.Error(t, err)
+
+	// Keyset requires the (created_at ASC, name ASC) sort; any other sort is rejected
+	// because the keyset WHERE would otherwise skip/duplicate rows across pages.
+	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter:               NewRunActionsFilter(runID),
+		Limit:                10,
+		KeysetAfterCreatedAt: &now,
+		KeysetAfterName:      "n0001",
+		SortParameters:       []interfaces.SortParameter{NewSortParameter("name", interfaces.SortOrderAscending)},
+	})
+	require.Error(t, err)
+}
+
+// TestListActions_OffsetPagination covers the offset paging used by the ListRuns/ListActions
+// RPC: the page token is the running offset. It forces tied created_at (the bulk-created
+// map-task case) to confirm the default sort's (run_name, name) tiebreaker keeps paging
+// stable — every action is returned exactly once with no skips or repeats.
+func TestListActions_OffsetPagination(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	runID := &common.RunIdentifier{Project: "proj1", Domain: "domain1", Name: "run1"}
+	const total = 250
+	for i := 0; i < total; i++ {
+		aid := &common.ActionIdentifier{Run: runID, Name: fmt.Sprintf("n%04d", i)}
+		_, err := actionRepo.CreateAction(ctx, models.NewActionModel(aid), false)
+		require.NoError(t, err)
+	}
+	_, err = db.Exec("UPDATE actions SET created_at = '2024-01-01T00:00:00Z'")
+	require.NoError(t, err)
+
+	const pageSize = 50
+	seen := map[string]struct{}{}
+	for offset := 0; ; offset += pageSize {
+		batch, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+			Filter: NewRunActionsFilter(runID),
+			Limit:  pageSize,
+			Offset: offset,
+		})
+		require.NoError(t, err)
+		hasMore := len(batch) > pageSize
+		if hasMore {
+			batch = batch[:pageSize]
+		}
+		for _, a := range batch {
+			_, dup := seen[a.Name]
+			require.False(t, dup, "action %s returned on more than one page", a.Name)
+			seen[a.Name] = struct{}{}
+		}
+		if !hasMore || len(batch) == 0 {
+			break
+		}
+	}
+	assert.Len(t, seen, total, "offset paging must cover every action exactly once")
+
+	// Negative offset is rejected.
+	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter: NewRunActionsFilter(runID), Limit: 10, Offset: -1,
+	})
+	require.Error(t, err)
+
+	// Offset is mutually exclusive with keyset.
+	now := time.Now()
+	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter: NewRunActionsFilter(runID), Limit: 10, Offset: 5, KeysetAfterCreatedAt: &now,
+	})
+	require.Error(t, err)
+}
+
+// TestListActions_OffsetPaginationClientSortTiedCreatedAt guards against skipping/duplicating
+// rows when a client-supplied sort is not a total order. `created_at DESC` over bulk-created
+// map-task children (all tied on created_at) leaves ties in an arbitrary order per query, so
+// OFFSET paging would be unstable without the appended (run_name, name) tiebreakers.
+func TestListActions_OffsetPaginationClientSortTiedCreatedAt(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	runID := &common.RunIdentifier{Project: "proj1", Domain: "domain1", Name: "run1"}
+	const total = 250
+	for i := 0; i < total; i++ {
+		aid := &common.ActionIdentifier{Run: runID, Name: fmt.Sprintf("n%04d", i)}
+		_, err := actionRepo.CreateAction(ctx, models.NewActionModel(aid), false)
+		require.NoError(t, err)
+	}
+	_, err = db.Exec("UPDATE actions SET created_at = '2024-01-01T00:00:00Z'")
+	require.NoError(t, err)
+
+	sortDesc := []interfaces.SortParameter{NewSortParameter("created_at", interfaces.SortOrderDescending)}
+	const pageSize = 50
+	seen := map[string]struct{}{}
+	for offset := 0; ; offset += pageSize {
+		batch, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+			Filter:         NewRunActionsFilter(runID),
+			Limit:          pageSize,
+			Offset:         offset,
+			SortParameters: sortDesc,
+		})
+		require.NoError(t, err)
+		hasMore := len(batch) > pageSize
+		if hasMore {
+			batch = batch[:pageSize]
+		}
+		for _, a := range batch {
+			_, dup := seen[a.Name]
+			require.False(t, dup, "action %s returned on more than one page", a.Name)
+			seen[a.Name] = struct{}{}
+		}
+		if !hasMore || len(batch) == 0 {
+			break
+		}
+	}
+	assert.Len(t, seen, total, "client-sorted offset paging over tied created_at must cover every action exactly once")
 }
 
 func setupActionEventDB(t *testing.T) (*sqlx.DB, *actionRepo) {
