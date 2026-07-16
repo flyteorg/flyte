@@ -91,6 +91,14 @@ enum ConditionRecoveryMode {
 message Recover {
   // How condition actions are treated during recovery. Defaults to RECOVER.
   ConditionRecoveryMode condition_mode = 1;
+
+  // Escape hatch: names of actions that must always re-execute in this recovery
+  // run, even if they succeeded in the run being recovered. A listed parent
+  // action re-executes and therefore re-enqueues its children, each of which goes
+  // through the recovery decision individually (list them too to force the whole
+  // subtree). A listed condition action re-pauses and waits for a new signal,
+  // regardless of condition_mode. Unknown names are ignored.
+  repeated string force_rerun_actions = 2 [(buf.validate.field).repeated.items.string.min_len = 1];
 }
 
 // TaskSpecSource records how a run's task spec was provided at creation time, so

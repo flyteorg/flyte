@@ -89,10 +89,12 @@ class CacheConfig(_message.Message):
     def __init__(self, overwrite_cache: bool = ..., cache_lookup_scope: _Optional[_Union[CacheLookupScope, str]] = ...) -> None: ...
 
 class Recover(_message.Message):
-    __slots__ = ["condition_mode"]
+    __slots__ = ["condition_mode", "force_rerun_actions"]
     CONDITION_MODE_FIELD_NUMBER: _ClassVar[int]
+    FORCE_RERUN_ACTIONS_FIELD_NUMBER: _ClassVar[int]
     condition_mode: ConditionRecoveryMode
-    def __init__(self, condition_mode: _Optional[_Union[ConditionRecoveryMode, str]] = ...) -> None: ...
+    force_rerun_actions: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, condition_mode: _Optional[_Union[ConditionRecoveryMode, str]] = ..., force_rerun_actions: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class RunSpec(_message.Message):
     __slots__ = ["labels", "annotations", "envs", "interruptible", "overwrite_cache", "cluster", "raw_data_storage", "security_context", "cache_config", "notification_rule_name", "notification_rules", "run_start_time", "max_action_concurrency", "run_base_dir", "related_to", "cluster_pool", "task_spec_source", "relation", "recover"]
