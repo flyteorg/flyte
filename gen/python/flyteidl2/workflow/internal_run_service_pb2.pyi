@@ -12,7 +12,7 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class RecordActionRequest(_message.Message):
-    __slots__ = ["action_id", "parent", "group", "subject", "input_uri", "task", "trace", "condition"]
+    __slots__ = ["action_id", "parent", "group", "subject", "input_uri", "task", "trace", "condition", "recovered_from"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     PARENT_FIELD_NUMBER: _ClassVar[int]
     GROUP_FIELD_NUMBER: _ClassVar[int]
@@ -21,6 +21,7 @@ class RecordActionRequest(_message.Message):
     TASK_FIELD_NUMBER: _ClassVar[int]
     TRACE_FIELD_NUMBER: _ClassVar[int]
     CONDITION_FIELD_NUMBER: _ClassVar[int]
+    RECOVERED_FROM_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     parent: str
     group: str
@@ -29,7 +30,8 @@ class RecordActionRequest(_message.Message):
     task: _run_definition_pb2.TaskAction
     trace: _run_definition_pb2.TraceAction
     condition: _run_definition_pb2.ConditionAction
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent: _Optional[str] = ..., group: _Optional[str] = ..., subject: _Optional[str] = ..., input_uri: _Optional[str] = ..., task: _Optional[_Union[_run_definition_pb2.TaskAction, _Mapping]] = ..., trace: _Optional[_Union[_run_definition_pb2.TraceAction, _Mapping]] = ..., condition: _Optional[_Union[_run_definition_pb2.ConditionAction, _Mapping]] = ...) -> None: ...
+    recovered_from: _identifier_pb2.ActionIdentifier
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent: _Optional[str] = ..., group: _Optional[str] = ..., subject: _Optional[str] = ..., input_uri: _Optional[str] = ..., task: _Optional[_Union[_run_definition_pb2.TaskAction, _Mapping]] = ..., trace: _Optional[_Union[_run_definition_pb2.TraceAction, _Mapping]] = ..., condition: _Optional[_Union[_run_definition_pb2.ConditionAction, _Mapping]] = ..., recovered_from: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ...) -> None: ...
 
 class RecordActionResponse(_message.Message):
     __slots__ = ["action_id", "status"]

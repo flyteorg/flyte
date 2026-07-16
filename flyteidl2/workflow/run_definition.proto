@@ -200,6 +200,10 @@ message ActionMetadata {
   // Provenance link to the parent run this action was derived from (re-run or
   // recover), if any. Only set on root actions created with a relation.
   common.Relation relation = 17;
+
+  // Set only when this action was recovered from a prior run instead of executed
+  // here: the source action (source run id + action name) whose result was reused.
+  common.ActionIdentifier recovered_from = 18;
 }
 
 enum ActionType {

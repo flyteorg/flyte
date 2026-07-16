@@ -897,7 +897,8 @@ func isTerminalPhase(phase common.ActionPhase) bool {
 	return phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED ||
 		phase == common.ActionPhase_ACTION_PHASE_FAILED ||
 		phase == common.ActionPhase_ACTION_PHASE_ABORTED ||
-		phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT
+		phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT ||
+		phase == common.ActionPhase_ACTION_PHASE_RECOVERED
 }
 
 func (c *ActionsClient) markTerminalStatusRecorded(ctx context.Context, taskAction *executorv1.TaskAction) error {

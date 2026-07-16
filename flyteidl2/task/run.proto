@@ -70,6 +70,21 @@ message CacheConfig {
   CacheLookupScope cache_lookup_scope = 2;
 }
 
+// Recover carries the optional configuration of a recovery run — a run created
+// with RunSpec.relation.relation_type = RELATION_TYPE_RECOVER. The run being
+// recovered is RunSpec.relation.related_to; this message intentionally carries no
+// run reference of its own. It is the extension point for future recovery
+// parameters.
+message Recover {
+  // Escape hatch: names of actions that must always re-execute in this recovery
+  // run, even if they succeeded in the run being recovered. A listed parent
+  // action re-executes and therefore re-enqueues its children, each of which goes
+  // through the recovery decision individually (list them too to force the whole
+  // subtree). A listed condition action re-pauses and waits for a new signal.
+  // Unknown names are ignored.
+  repeated string force_rerun_actions = 1 [(buf.validate.field).repeated.items.string.min_len = 1];
+}
+
 // TaskSpecSource records how a run's task spec was provided at creation time, so
 // the rerun UI can send a TaskId (deployed) rather than the full inline spec.
 enum TaskSpecSource {
@@ -158,6 +173,11 @@ message RunSpec {
   // (re-run or recover). Set at creation, immutable thereafter, and scoped to the
   // same org/project/domain as this run. Replaces related_to.
   flyteidl2.common.Relation relation = 18;
+
+  // Optional recovery configuration. Only meaningful when relation is set with
+  // RELATION_TYPE_RECOVER: the run recovers relation.related_to — its successful
+  // actions are reused and only failed/changed ones re-execute. See Recover.
+  Recover recover = 19;
 }
 
 message InlineRuleList {
