@@ -775,6 +775,33 @@ func getEventInfoForRayJob(ctx context.Context, logConfig logs.LogConfig, plugin
 	}, nil
 }
 
+// UpdateLinkReadiness flips the readiness of the dashboard/IDE task links in phaseInfo and
+// stamps a matching phase reason. Exported so wrappers that determine head readiness through a
+// different lookup (e.g. jobs submitted to a pre-existing cluster via ClusterSelector) reuse the
+// exact same link handling.
+func UpdateLinkReadiness(phaseInfo *pluginsCore.PhaseInfo, ready bool) {
+	if phaseInfo.Info() == nil {
+		return
+	}
+	for _, tl := range phaseInfo.Info().Logs {
+		if tl != nil && tl.LinkType == core.TaskLog_DASHBOARD {
+			tl.Ready = ready
+			if !ready || phaseInfo.Phase() < pluginsCore.PhaseRunning {
+				phaseInfo.WithReason("Ray dashboard is not ready")
+			} else {
+				phaseInfo.WithReason("Ray dashboard is ready")
+			}
+		} else if tl != nil && tl.LinkType == core.TaskLog_IDE {
+			tl.Ready = ready
+			if !ready || phaseInfo.Phase() != pluginsCore.PhaseRunning {
+				phaseInfo.WithReason("Vscode server is not ready")
+			} else {
+				phaseInfo.WithReason("Vscode server is ready")
+			}
+		}
+	}
+}
+
 func isRayHeadReady(ctx context.Context, rayJobName string, pluginContext k8s.PluginContext) (bool, error) {
 	podList := &v1.PodList{}
 	err := pluginContext.K8sReader().List(ctx, podList)
@@ -860,23 +887,7 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	if ready, err := isRayHeadReady(ctx, rayJob.Name, pluginContext); err != nil {
 		logger.Warnf(ctx, "Failed to determine Ray dashboard readiness. Error: %v", err)
 	} else {
-		for _, tl := range info.Logs {
-			if tl != nil && tl.LinkType == core.TaskLog_DASHBOARD {
-				tl.Ready = ready
-				if !ready || phaseInfo.Phase() < pluginsCore.PhaseRunning {
-					phaseInfo.WithReason("Ray dashboard is not ready")
-				} else {
-					phaseInfo.WithReason("Ray dashboard is ready")
-				}
-			} else if tl != nil && tl.LinkType == core.TaskLog_IDE {
-				tl.Ready = ready
-				if !ready || phaseInfo.Phase() != pluginsCore.PhaseRunning {
-					phaseInfo.WithReason("Vscode server is not ready")
-				} else {
-					phaseInfo.WithReason("Vscode server is ready")
-				}
-			}
-		}
+		UpdateLinkReadiness(&phaseInfo, ready)
 	}
 
 	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
