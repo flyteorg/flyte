@@ -2,16 +2,18 @@
 // @generated from file flyteidl2/common/run.proto (package flyteidl2.common, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
-import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
+import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
+import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
+import type { RunIdentifier } from "./identifier_pb.ts";
+import { file_flyteidl2_common_identifier } from "./identifier_pb.ts";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file flyteidl2/common/run.proto.
  */
 export const file_flyteidl2_common_run: GenFile = /*@__PURE__*/
-  fileDesc("ChpmbHl0ZWlkbDIvY29tbW9uL3J1bi5wcm90bxIQZmx5dGVpZGwyLmNvbW1vbiJIChJPZmZsb2FkZWRJbnB1dERhdGESFAoDdXJpGAEgASgJQge6SARyAhABEhwKC2lucHV0c19oYXNoGAIgASgJQge6SARyAhABQrkBChRjb20uZmx5dGVpZGwyLmNvbW1vbkIIUnVuUHJvdG9IAlABWjRnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvY29tbW9uogIDRkNYqgIQRmx5dGVpZGwyLkNvbW1vbsoCEEZseXRlaWRsMlxDb21tb27iAhxGbHl0ZWlkbDJcQ29tbW9uXEdQQk1ldGFkYXRh6gIRRmx5dGVpZGwyOjpDb21tb25iBnByb3RvMw", [file_buf_validate_validate]);
+  fileDesc("ChpmbHl0ZWlkbDIvY29tbW9uL3J1bi5wcm90bxIQZmx5dGVpZGwyLmNvbW1vbiJIChJPZmZsb2FkZWRJbnB1dERhdGESFAoDdXJpGAEgASgJQge6SARyAhABEhwKC2lucHV0c19oYXNoGAIgASgJQge6SARyAhABIvgBCghSZWxhdGlvbhI7CgpyZWxhdGVkX3RvGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQga6SAPIAQESrgEKDXJlbGF0aW9uX3R5cGUYAiABKA4yHi5mbHl0ZWlkbDIuY29tbW9uLlJlbGF0aW9uVHlwZUJ3ukh0ugFuCh9yZWxhdGlvbl90eXBlLmdyZWF0ZXJfdGhhbl96ZXJvEjxSZWxhdGlvbiB0eXBlIG11c3QgYmUgZ3JlYXRlciB0aGFuIDAgKGNhbm5vdCBiZSBVTlNQRUNJRklFRCkaDWludCh0aGlzKSA+IDDIAQEqYQoMUmVsYXRpb25UeXBlEh0KGVJFTEFUSU9OX1RZUEVfVU5TUEVDSUZJRUQQABIXChNSRUxBVElPTl9UWVBFX1JFUlVOEAESGQoVUkVMQVRJT05fVFlQRV9SRUNPVkVSEAJCuQEKFGNvbS5mbHl0ZWlkbDIuY29tbW9uQghSdW5Qcm90b0gCUAFaNGdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9jb21tb26iAgNGQ1iqAhBGbHl0ZWlkbDIuQ29tbW9uygIQRmx5dGVpZGwyXENvbW1vbuICHEZseXRlaWRsMlxDb21tb25cR1BCTWV0YWRhdGHqAhFGbHl0ZWlkbDI6OkNvbW1vbmIGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier]);
 
 /**
  * Captures required data to reference offloaded inputs.
@@ -36,4 +38,65 @@ export type OffloadedInputData = Message<"flyteidl2.common.OffloadedInputData"> 
  */
 export const OffloadedInputDataSchema: GenMessage<OffloadedInputData> = /*@__PURE__*/
   messageDesc(file_flyteidl2_common_run, 0);
+
+/**
+ * Relation is a provenance link to the single parent run this run was derived from.
+ * Set at creation, immutable thereafter.
+ *
+ * @generated from message flyteidl2.common.Relation
+ */
+export type Relation = Message<"flyteidl2.common.Relation"> & {
+  /**
+   * The parent run. Scoped to the same org/project/domain as the referencing run.
+   *
+   * @generated from field: flyteidl2.common.RunIdentifier related_to = 1;
+   */
+  relatedTo?: RunIdentifier;
+
+  /**
+   * How this run was derived from the parent.
+   *
+   * @generated from field: flyteidl2.common.RelationType relation_type = 2;
+   */
+  relationType: RelationType;
+};
+
+/**
+ * Describes the message flyteidl2.common.Relation.
+ * Use `create(RelationSchema)` to create a new message.
+ */
+export const RelationSchema: GenMessage<Relation> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_common_run, 1);
+
+/**
+ * RelationType describes how a run was derived from the parent run it relates to.
+ *
+ * @generated from enum flyteidl2.common.RelationType
+ */
+export enum RelationType {
+  /**
+   * @generated from enum value: RELATION_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * The run is a re-run of the parent run.
+   *
+   * @generated from enum value: RELATION_TYPE_RERUN = 1;
+   */
+  RERUN = 1,
+
+  /**
+   * The run recovers the parent run, resuming from its last known good state.
+   *
+   * @generated from enum value: RELATION_TYPE_RECOVER = 2;
+   */
+  RECOVER = 2,
+}
+
+/**
+ * Describes the enum flyteidl2.common.RelationType.
+ */
+export const RelationTypeSchema: GenEnum<RelationType> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_common_run, 0);
 

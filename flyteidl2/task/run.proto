@@ -5,6 +5,7 @@ package flyteidl2.task;
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/phase.proto";
+import "flyteidl2/common/run.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/security.proto";
 import "flyteidl2/notification/definition.proto";
@@ -97,6 +98,19 @@ message Recover {
   ConditionRecoveryMode condition_mode = 2;
 }
 
+// TaskSpecSource records how a run's task spec was provided at creation time, so
+// the rerun UI can send a TaskId (deployed) rather than the full inline spec.
+enum TaskSpecSource {
+  TASK_SPEC_SOURCE_UNSPECIFIED = 0;
+
+  // The run referenced a deployed (registered) task by TaskId.
+  TASK_SPEC_SOURCE_DEPLOYED = 1;
+
+  // The run carried an inline task spec (e.g. fast registration) that does not
+  // exist in the task store.
+  TASK_SPEC_SOURCE_EPHEMERAL = 2;
+}
+
 message RunSpec {
   // Labels to apply to the run.
   Labels labels = 1;
@@ -155,18 +169,27 @@ message RunSpec {
   // blob (user data) layout.
   string run_base_dir = 14;
 
-  // Optional pointer to the single parent run this run was derived from (re-run, recover,
-  // clone, or explicit SDK/CLI provenance). Set at creation, immutable thereafter, and scoped
-  // to the same org/project/domain as this run.
-  flyteidl2.common.RunIdentifier related_to = 15;
+  // Deprecated: use relation instead. Optional pointer to the single parent run this run
+  // was derived from. If set and relation is unset, the server normalizes it into relation
+  // with RELATION_TYPE_RERUN.
+  flyteidl2.common.RunIdentifier related_to = 15 [deprecated = true];
 
   // Pool of the assigned queue for given run.
   // Always set by server. Should not be specified by user.
   string cluster_pool = 16;
 
+  // How the task spec was provided at creation (deployed TaskId vs inline spec).
+  // Set by server; lets the rerun UI choose TaskId over the full inline spec.
+  TaskSpecSource task_spec_source = 17;
+
+  // Optional provenance link to the single parent run this run was derived from
+  // (re-run or recover). Set at creation, immutable thereafter, and scoped to the
+  // same org/project/domain as this run. Replaces related_to.
+  flyteidl2.common.Relation relation = 18;
+
   // When set, this run is a recovery of the referenced prior run: its successful
   // actions are reused and only failed/changed ones re-execute. See Recover.
-  Recover recover = 17;
+  Recover recover = 19;
 }
 
 message InlineRuleList {
@@ -174,16 +197,26 @@ message InlineRuleList {
 }
 
 message InlineRule {
+  // A rule's delivery template compiles against exactly one template data
+  // shape, so PAUSED (ActionPausedNotificationTemplateData) cannot be mixed
+  // with terminal phases (RunCompletedNotificationTemplateData) in one rule.
+  option (buf.validate.message).cel = {
+    id: "paused_rule_exclusive"
+    message: "a rule subscribing to ACTION_PHASE_PAUSED must not subscribe to other phases"
+    expression: "!(flyteidl2.common.ActionPhase.ACTION_PHASE_PAUSED in this.on_phases) || this.on_phases.size() == 1"
+  };
+
   repeated common.ActionPhase on_phases = 1 [(buf.validate.field).repeated = {
     min_items: 1
     unique: true
     items: {
       enum: {
-        in: [ // terminal phases only
+        in: [ // terminal phases, plus PAUSED (condition awaiting a signal)
           5, // ACTION_PHASE_SUCCEEDED
           6, // ACTION_PHASE_FAILED
           7, // ACTION_PHASE_ABORTED
-          8 // ACTION_PHASE_TIMED_OUT
+          8, // ACTION_PHASE_TIMED_OUT
+          9 // ACTION_PHASE_PAUSED
         ]
       }
     }
@@ -196,6 +229,7 @@ message InlineRule {
     string delivery_config_name = 2;
 
     // template can only have fields defined in flyteidl2.notification.RunCompletedNotificationTemplateData
+    // (terminal-phase rules) or flyteidl2.notification.ActionPausedNotificationTemplateData (PAUSED rules)
     flyteidl2.notification.DeliveryConfigTemplate delivery_template = 3;
   }
 }

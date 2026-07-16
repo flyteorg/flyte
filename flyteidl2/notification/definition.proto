@@ -23,6 +23,7 @@ message DeliveryConfigTemplate {
 enum EventType {
   EVENT_TYPE_UNSPECIFIED = 0;
   EVENT_TYPE_RUN_COMPLETED = 1;
+  EVENT_TYPE_ACTION_PAUSED = 2;
 }
 
 message RunCompletedNotificationTemplateData {
@@ -31,6 +32,25 @@ message RunCompletedNotificationTemplateData {
   common.ActionPhase phase = 2;
 
   string error = 3;
+}
+
+// ActionPausedNotificationTemplateData is the template data available to
+// delivery templates on rules subscribed to ACTION_PHASE_PAUSED.
+message ActionPausedNotificationTemplateData {
+  // Identifier of the condition action that paused awaiting a signal.
+  common.ActionIdentifier action = 1 [(buf.validate.field).required = true];
+
+  // Prompt shown to the user when the condition is awaited.
+  string prompt = 2;
+
+  // Description of the condition.
+  string description = 3;
+
+  // How to render the prompt: "TEXT", "MARKDOWN", or "" when unspecified.
+  // Mirrors flyteidl2.workflow.ConditionPromptType with the enum prefix
+  // trimmed (the workflow package cannot be imported here without an import
+  // cycle through flyteidl2/task/run.proto).
+  string prompt_type = 4;
 }
 
 enum HttpMethod {
@@ -52,9 +72,7 @@ message WebhookDeliveryTemplate {
     max_len: 2000
   }];
 
-  HttpMethod method = 2 [(buf.validate.field).enum = {
-    not_in: [0]
-  }];
+  HttpMethod method = 2 [(buf.validate.field).enum = {not_in: [0]}];
 
   map<string, string> headers = 3 [(buf.validate.field).map = {
     keys: {
@@ -110,9 +128,7 @@ message ProviderEmailTemplate {
         max_len: 100
       }
     }
-    values: {
-      string: {max_len: 4000}
-    }
+    values: {string: {max_len: 4000}}
     max_pairs: 100
   }];
 }

@@ -161,9 +161,7 @@ message PreSignedURLs {
 message CreateDownloadLinkRequest {
   // ArtifactType is the type of artifact to download.
   // +required
-  ArtifactType artifact_type = 1 [(buf.validate.field).enum = {
-    not_in: [0]
-  }];
+  ArtifactType artifact_type = 1 [(buf.validate.field).enum = {not_in: [0]}];
 
   // ExpiresIn defines the requested expiration duration for the generated URLs. The request will be
   // rejected if this exceeds the platform's configured maximum.

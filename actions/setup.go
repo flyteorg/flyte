@@ -47,15 +47,19 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 	runClient := workflowconnect.NewInternalRunServiceClient(http.DefaultClient, runServiceURL, connect.WithInterceptors(otelInterceptor))
 
-	actionsClient := actionsk8s.NewActionsClient(
+	actionsClient, err := actionsk8s.NewActionsClient(
 		sc.K8sClient,
 		sc.K8sCache,
+		sc.Namespace,
 		cfg.WatchBufferSize,
 		cfg.WatchWorkers,
 		runClient,
 		cfg.RecordFilterSize,
 		sc.Scope,
 	)
+	if err != nil {
+		return fmt.Errorf("actions: failed to create actions client: %w", err)
+	}
 	logger.Infof(ctx, "Actions K8s client initialized")
 
 	if err := actionsClient.StartWatching(ctx); err != nil {

@@ -742,31 +742,38 @@ func TestListRuns(t *testing.T) {
 		runs []*models.Run
 		err  error
 	}
+	// The page token is the running offset (strconv.Itoa(offset+limit)); the incoming
+	// token is decoded back into listInput.Offset. A request at offset 5 with limit 2 that
+	// still has a next page yields token "7".
 	testCases := []struct {
-		name    string
-		req     *common.ListRequest
-		mockRes mockListRes
-		expect  *workflow.ListRunsResponse
+		name         string
+		req          *common.ListRequest
+		expectOffset int
+		mockRes      mockListRes
+		expect       *workflow.ListRunsResponse
 	}{
 		{
 			"Empty Runs",
 			&common.ListRequest{Limit: 2},
+			0,
 			mockListRes{runs: []*models.Run{}, err: nil},
 			&workflow.ListRunsResponse{Runs: []*workflow.Run{}, Token: ""},
 		},
 		{
-			// Service fetches Limit+1 rows to detect another page. With 3 rows
-			// returned for a limit of 2, the slice is trimmed to the first 2
-			// runs and the cursor token is the trimmed last row's created_at.
+			// Service fetches Limit+1 rows to detect another page. With 3 rows returned
+			// for a limit of 2, the slice is trimmed to the first 2 runs and the next-page
+			// token is the next offset (5 + 2 = 7).
 			"list with limit 2 and token",
-			&common.ListRequest{Limit: 2, Token: sqlRes[5].CreatedAt.UTC().Format(time.RFC3339Nano)},
+			&common.ListRequest{Limit: 2, Token: "5"},
+			5,
 			mockListRes{runs: sqlRes[5:8], err: nil},
-			&workflow.ListRunsResponse{Runs: runs[5:7], Token: sqlRes[6].CreatedAt.UTC().Format(time.RFC3339Nano)},
+			&workflow.ListRunsResponse{Runs: runs[5:7], Token: "7"},
 		},
 		{
 			// Only 2 rows returned for limit 3 means no next page — token empty.
 			"list with limit 3 and token",
-			&common.ListRequest{Limit: 3, Token: sqlRes[8].CreatedAt.UTC().Format(time.RFC3339Nano)},
+			&common.ListRequest{Limit: 3, Token: "8"},
+			8,
 			mockListRes{runs: sqlRes[8:10], err: nil},
 			&workflow.ListRunsResponse{Runs: runs[8:10], Token: ""},
 		},
@@ -774,7 +781,10 @@ func TestListRuns(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			req := connect.NewRequest(&workflow.ListRunsRequest{Request: tc.req})
-			actionRepo.On("ListActions", mock.Anything, mock.Anything).Return(tc.mockRes.runs, tc.mockRes.err).Once()
+			// Assert the incoming token was decoded into listInput.Offset.
+			actionRepo.On("ListActions", mock.Anything, mock.MatchedBy(func(input interfaces.ListResourceInput) bool {
+				return input.Offset == tc.expectOffset
+			})).Return(tc.mockRes.runs, tc.mockRes.err).Once()
 			got, err := svc.ListRuns(context.Background(), req)
 			assert.NoError(t, err)
 			assert.Equal(t, len(tc.expect.Runs), len(got.Msg.Runs))
@@ -807,8 +817,9 @@ func TestListAndSendAllActionsUsesAscendingSort(t *testing.T) {
 	err = svc.listAndSendAllActions(context.Background(), runID, rsm, nil)
 	require.NoError(t, err)
 
-	require.Len(t, captured.SortParameters, 1)
+	require.Len(t, captured.SortParameters, 2)
 	assert.Equal(t, "created_at ASC", captured.SortParameters[0].GetOrderExpr())
+	assert.Equal(t, "name ASC", captured.SortParameters[1].GetOrderExpr())
 }
 
 func TestGenerateRunName(t *testing.T) {

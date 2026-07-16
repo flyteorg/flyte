@@ -1947,8 +1947,11 @@ type WatchWindowedActionsResponse struct {
 	TotalFlatCount int64 `protobuf:"varint,3,opt,name=total_flat_count,json=totalFlatCount,proto3" json:"total_flat_count,omitempty"`
 	// Position of selected_item_id within the flat list.
 	SelectedFlatIndex int64 `protobuf:"varint,4,opt,name=selected_flat_index,json=selectedFlatIndex,proto3" json:"selected_flat_index,omitempty"`
-	// True on the response that completes the initial hydration; the
-	// client should treat this as the "first paint done" signal.
+	// True on any full-window snapshot the client should replace its
+	// window with — the initial attach snapshot, every mid-hydration
+	// resnapshot, and the final completion snapshot. Distinct from a
+	// delta (which carries only changed items). Use hydration_complete,
+	// not this, to know when the initial load is actually done.
 	InitialSnapshotComplete bool `protobuf:"varint,5,opt,name=initial_snapshot_complete,json=initialSnapshotComplete,proto3" json:"initial_snapshot_complete,omitempty"`
 	// Sticky truncation notices — present on every response until the
 	// server confirms client receipt.
@@ -1956,6 +1959,11 @@ type WatchWindowedActionsResponse struct {
 	// True when the server had to drop a tick due to backpressure; the
 	// client should re-send its UpdateWindow to force a fresh snapshot.
 	ResyncHint bool `protobuf:"varint,7,opt,name=resync_hint,json=resyncHint,proto3" json:"resync_hint,omitempty"`
+	// True once the run's initial DB hydration has finished (the store
+	// left the HYDRATING state). Mid-hydration resnapshots carry false;
+	// the completion snapshot and all post-ready responses carry true.
+	// This is the real "first paint / loading done" signal.
+	HydrationComplete bool `protobuf:"varint,8,opt,name=hydration_complete,json=hydrationComplete,proto3" json:"hydration_complete,omitempty"`
 }
 
 func (x *WatchWindowedActionsResponse) Reset() {
@@ -2035,6 +2043,13 @@ func (x *WatchWindowedActionsResponse) GetTruncations() []*TruncationNotice {
 func (x *WatchWindowedActionsResponse) GetResyncHint() bool {
 	if x != nil {
 		return x.ResyncHint
+	}
+	return false
+}
+
+func (x *WatchWindowedActionsResponse) GetHydrationComplete() bool {
+	if x != nil {
+		return x.HydrationComplete
 	}
 	return false
 }
@@ -2151,6 +2166,12 @@ type ActionLeaf struct {
 	// Metric for this entry — wall-clock duration, running duration, or
 	// setup time depending on which list the leaf appears in.
 	Duration *durationpb.Duration `protobuf:"bytes,3,opt,name=duration,proto3" json:"duration,omitempty"`
+	// Member's current phase, so collapsed / out-of-window rows can render
+	// status without the full action being hydrated in the window.
+	Phase common.ActionPhase `protobuf:"varint,4,opt,name=phase,proto3,enum=flyteidl2.common.ActionPhase" json:"phase,omitempty"`
+	// Member's start time (mirrors ActionStatus.start_time), for the mini
+	// table start-time column on collapsed / out-of-window rows.
+	StartTime *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 }
 
 func (x *ActionLeaf) Reset() {
@@ -2206,15 +2227,29 @@ func (x *ActionLeaf) GetDuration() *durationpb.Duration {
 	return nil
 }
 
+func (x *ActionLeaf) GetPhase() common.ActionPhase {
+	if x != nil {
+		return x.Phase
+	}
+	return common.ActionPhase(0)
+}
+
+func (x *ActionLeaf) GetStartTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartTime
+	}
+	return nil
+}
+
 // GroupAggregations carries the four top-3 outlier lists for a group.
-// Each list holds the three members with the largest metric, sorted
-// DESC.
+// Each list holds the three descendant actions (deep rollup over the
+// group's whole subtree) with the largest metric, sorted DESC.
 type GroupAggregations struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Members in terminal FAILED phase, by total duration.
+	// Descendants in terminal FAILED phase, by total duration.
 	Failed []*ActionLeaf `protobuf:"bytes,1,rep,name=failed,proto3" json:"failed,omitempty"`
 	// By total wall-clock duration (created → ended).
 	LongestDuration []*ActionLeaf `protobuf:"bytes,2,rep,name=longest_duration,json=longestDuration,proto3" json:"longest_duration,omitempty"`
@@ -3714,7 +3749,7 @@ var file_flyteidl2_workflow_run_service_proto_rawDesc = []byte{
 	0x01, 0x28, 0x05, 0x42, 0x07, 0xba, 0x48, 0x04, 0x1a, 0x02, 0x28, 0x00, 0x52, 0x06, 0x6f, 0x66,
 	0x66, 0x73, 0x65, 0x74, 0x12, 0x1d, 0x0a, 0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x18, 0x02, 0x20,
 	0x01, 0x28, 0x05, 0x42, 0x07, 0xba, 0x48, 0x04, 0x1a, 0x02, 0x28, 0x00, 0x52, 0x05, 0x6c, 0x69,
-	0x6d, 0x69, 0x74, 0x22, 0xa2, 0x03, 0x0a, 0x1c, 0x57, 0x61, 0x74, 0x63, 0x68, 0x57, 0x69, 0x6e,
+	0x6d, 0x69, 0x74, 0x22, 0xd1, 0x03, 0x0a, 0x1c, 0x57, 0x61, 0x74, 0x63, 0x68, 0x57, 0x69, 0x6e,
 	0x64, 0x6f, 0x77, 0x65, 0x64, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x70,
 	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x43, 0x0a, 0x0c, 0x77, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x5f, 0x69,
 	0x74, 0x65, 0x6d, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x66, 0x6c, 0x79,
@@ -3740,19 +3775,22 @@ var file_flyteidl2_workflow_run_service_proto_rawDesc = []byte{
 	0x74, 0x69, 0x6f, 0x6e, 0x4e, 0x6f, 0x74, 0x69, 0x63, 0x65, 0x52, 0x0b, 0x74, 0x72, 0x75, 0x6e,
 	0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x1f, 0x0a, 0x0b, 0x72, 0x65, 0x73, 0x79, 0x6e,
 	0x63, 0x5f, 0x68, 0x69, 0x6e, 0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0a, 0x72, 0x65,
-	0x73, 0x79, 0x6e, 0x63, 0x48, 0x69, 0x6e, 0x74, 0x22, 0xc2, 0x01, 0x0a, 0x0c, 0x57, 0x69, 0x6e,
-	0x64, 0x6f, 0x77, 0x65, 0x64, 0x49, 0x74, 0x65, 0x6d, 0x12, 0x3c, 0x0a, 0x06, 0x61, 0x63, 0x74,
-	0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x22, 0x2e, 0x66, 0x6c, 0x79, 0x74,
-	0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x45,
-	0x6e, 0x72, 0x69, 0x63, 0x68, 0x65, 0x64, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x48, 0x00, 0x52,
-	0x06, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x35, 0x0a, 0x05, 0x67, 0x72, 0x6f, 0x75, 0x70,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64,
-	0x6c, 0x32, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x47, 0x72, 0x6f, 0x75,
-	0x70, 0x4e, 0x6f, 0x64, 0x65, 0x48, 0x00, 0x52, 0x05, 0x67, 0x72, 0x6f, 0x75, 0x70, 0x12, 0x14,
-	0x0a, 0x05, 0x64, 0x65, 0x70, 0x74, 0x68, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x64,
-	0x65, 0x70, 0x74, 0x68, 0x12, 0x1f, 0x0a, 0x0b, 0x69, 0x73, 0x5f, 0x65, 0x78, 0x70, 0x61, 0x6e,
-	0x64, 0x65, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0a, 0x69, 0x73, 0x45, 0x78, 0x70,
-	0x61, 0x6e, 0x64, 0x65, 0x64, 0x42, 0x06, 0x0a, 0x04, 0x69, 0x74, 0x65, 0x6d, 0x22, 0x7f, 0x0a,
+	0x73, 0x79, 0x6e, 0x63, 0x48, 0x69, 0x6e, 0x74, 0x12, 0x2d, 0x0a, 0x12, 0x68, 0x79, 0x64, 0x72,
+	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x63, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x65, 0x18, 0x08,
+	0x20, 0x01, 0x28, 0x08, 0x52, 0x11, 0x68, 0x79, 0x64, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43,
+	0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x65, 0x22, 0xc2, 0x01, 0x0a, 0x0c, 0x57, 0x69, 0x6e, 0x64,
+	0x6f, 0x77, 0x65, 0x64, 0x49, 0x74, 0x65, 0x6d, 0x12, 0x3c, 0x0a, 0x06, 0x61, 0x63, 0x74, 0x69,
+	0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x22, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65,
+	0x69, 0x64, 0x6c, 0x32, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x45, 0x6e,
+	0x72, 0x69, 0x63, 0x68, 0x65, 0x64, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x48, 0x00, 0x52, 0x06,
+	0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x35, 0x0a, 0x05, 0x67, 0x72, 0x6f, 0x75, 0x70, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c,
+	0x32, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x47, 0x72, 0x6f, 0x75, 0x70,
+	0x4e, 0x6f, 0x64, 0x65, 0x48, 0x00, 0x52, 0x05, 0x67, 0x72, 0x6f, 0x75, 0x70, 0x12, 0x14, 0x0a,
+	0x05, 0x64, 0x65, 0x70, 0x74, 0x68, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x64, 0x65,
+	0x70, 0x74, 0x68, 0x12, 0x1f, 0x0a, 0x0b, 0x69, 0x73, 0x5f, 0x65, 0x78, 0x70, 0x61, 0x6e, 0x64,
+	0x65, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0a, 0x69, 0x73, 0x45, 0x78, 0x70, 0x61,
+	0x6e, 0x64, 0x65, 0x64, 0x42, 0x06, 0x0a, 0x04, 0x69, 0x74, 0x65, 0x6d, 0x22, 0xef, 0x01, 0x0a,
 	0x0a, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x4c, 0x65, 0x61, 0x66, 0x12, 0x1b, 0x0a, 0x09, 0x61,
 	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08,
 	0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x1d, 0x0a, 0x0a, 0x73, 0x68, 0x6f, 0x72,
@@ -3760,7 +3798,14 @@ var file_flyteidl2_workflow_run_service_proto_rawDesc = []byte{
 	0x6f, 0x72, 0x74, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x35, 0x0a, 0x08, 0x64, 0x75, 0x72, 0x61, 0x74,
 	0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x67, 0x6f, 0x6f, 0x67,
 	0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x44, 0x75, 0x72, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x52, 0x08, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0xa4,
+	0x74, 0x69, 0x6f, 0x6e, 0x52, 0x08, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x33,
+	0x0a, 0x05, 0x70, 0x68, 0x61, 0x73, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1d, 0x2e,
+	0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e,
+	0x2e, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x68, 0x61, 0x73, 0x65, 0x52, 0x05, 0x70, 0x68,
+	0x61, 0x73, 0x65, 0x12, 0x39, 0x0a, 0x0a, 0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x74, 0x69, 0x6d,
+	0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74,
+	0x61, 0x6d, 0x70, 0x52, 0x09, 0x73, 0x74, 0x61, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x22, 0xa4,
 	0x02, 0x0a, 0x11, 0x47, 0x72, 0x6f, 0x75, 0x70, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74,
 	0x69, 0x6f, 0x6e, 0x73, 0x12, 0x36, 0x0a, 0x06, 0x66, 0x61, 0x69, 0x6c, 0x65, 0x64, 0x18, 0x01,
 	0x20, 0x03, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32,
@@ -4138,9 +4183,9 @@ var file_flyteidl2_workflow_run_service_proto_goTypes = []interface{}{
 	(*common.Filter)(nil),                     // 70: flyteidl2.common.Filter
 	(*EnrichedAction)(nil),                    // 71: flyteidl2.workflow.EnrichedAction
 	(*durationpb.Duration)(nil),               // 72: google.protobuf.Duration
-	(*ClusterEvent)(nil),                      // 73: flyteidl2.workflow.ClusterEvent
-	(*TaskGroup)(nil),                         // 74: flyteidl2.workflow.TaskGroup
-	(common.ActionPhase)(0),                   // 75: flyteidl2.common.ActionPhase
+	(common.ActionPhase)(0),                   // 73: flyteidl2.common.ActionPhase
+	(*ClusterEvent)(nil),                      // 74: flyteidl2.workflow.ClusterEvent
+	(*TaskGroup)(nil),                         // 75: flyteidl2.workflow.TaskGroup
 	(common.Sort_Direction)(0),                // 76: flyteidl2.common.Sort.Direction
 }
 var file_flyteidl2_workflow_run_service_proto_depIdxs = []int32{
@@ -4196,73 +4241,75 @@ var file_flyteidl2_workflow_run_service_proto_depIdxs = []int32{
 	71, // 49: flyteidl2.workflow.WindowedItem.action:type_name -> flyteidl2.workflow.EnrichedAction
 	33, // 50: flyteidl2.workflow.WindowedItem.group:type_name -> flyteidl2.workflow.GroupNode
 	72, // 51: flyteidl2.workflow.ActionLeaf.duration:type_name -> google.protobuf.Duration
-	31, // 52: flyteidl2.workflow.GroupAggregations.failed:type_name -> flyteidl2.workflow.ActionLeaf
-	31, // 53: flyteidl2.workflow.GroupAggregations.longest_duration:type_name -> flyteidl2.workflow.ActionLeaf
-	31, // 54: flyteidl2.workflow.GroupAggregations.longest_running:type_name -> flyteidl2.workflow.ActionLeaf
-	31, // 55: flyteidl2.workflow.GroupAggregations.longest_setup:type_name -> flyteidl2.workflow.ActionLeaf
-	48, // 56: flyteidl2.workflow.GroupNode.child_phase_counts:type_name -> flyteidl2.workflow.GroupNode.ChildPhaseCountsEntry
-	59, // 57: flyteidl2.workflow.GroupNode.earliest_start_time:type_name -> google.protobuf.Timestamp
-	59, // 58: flyteidl2.workflow.GroupNode.latest_end_time:type_name -> google.protobuf.Timestamp
-	32, // 59: flyteidl2.workflow.GroupNode.aggregations:type_name -> flyteidl2.workflow.GroupAggregations
-	0,  // 60: flyteidl2.workflow.TruncationNotice.reason:type_name -> flyteidl2.workflow.TruncationNotice.Reason
-	62, // 61: flyteidl2.workflow.WatchClusterEventsRequest.id:type_name -> flyteidl2.common.ActionIdentifier
-	73, // 62: flyteidl2.workflow.WatchClusterEventsResponse.cluster_events:type_name -> flyteidl2.workflow.ClusterEvent
-	62, // 63: flyteidl2.workflow.AbortActionRequest.action_id:type_name -> flyteidl2.common.ActionIdentifier
-	62, // 64: flyteidl2.workflow.SignalEventRequest.action_id:type_name -> flyteidl2.common.ActionIdentifier
-	39, // 65: flyteidl2.workflow.SignalEventRequest.payload:type_name -> flyteidl2.workflow.EventPayload
-	51, // 66: flyteidl2.workflow.WatchGroupsRequest.project_id:type_name -> flyteidl2.common.ProjectIdentifier
-	59, // 67: flyteidl2.workflow.WatchGroupsRequest.start_date:type_name -> google.protobuf.Timestamp
-	59, // 68: flyteidl2.workflow.WatchGroupsRequest.end_date:type_name -> google.protobuf.Timestamp
-	66, // 69: flyteidl2.workflow.WatchGroupsRequest.request:type_name -> flyteidl2.common.ListRequest
-	49, // 70: flyteidl2.workflow.WatchGroupsRequest.known_sort_fields:type_name -> flyteidl2.workflow.WatchGroupsRequest.KnownSortField
-	74, // 71: flyteidl2.workflow.WatchGroupsResponse.task_groups:type_name -> flyteidl2.workflow.TaskGroup
-	50, // 72: flyteidl2.workflow.WatchWindowedActionsRequest.Subscribe.run_id:type_name -> flyteidl2.common.RunIdentifier
-	46, // 73: flyteidl2.workflow.WatchWindowedActionsRequest.Subscribe.expanded_nodes:type_name -> flyteidl2.workflow.WatchWindowedActionsRequest.Subscribe.ExpandedNodesEntry
-	75, // 74: flyteidl2.workflow.WatchWindowedActionsRequest.Subscribe.phase_filter:type_name -> flyteidl2.common.ActionPhase
-	47, // 75: flyteidl2.workflow.WatchWindowedActionsRequest.UpdateWindow.expanded_nodes:type_name -> flyteidl2.workflow.WatchWindowedActionsRequest.UpdateWindow.ExpandedNodesEntry
-	75, // 76: flyteidl2.workflow.WatchWindowedActionsRequest.UpdateWindow.phase_filter:type_name -> flyteidl2.common.ActionPhase
-	28, // 77: flyteidl2.workflow.WatchWindowedActionsRequest.Subscribe.ExpandedNodesEntry.value:type_name -> flyteidl2.workflow.NodeExpansionParams
-	28, // 78: flyteidl2.workflow.WatchWindowedActionsRequest.UpdateWindow.ExpandedNodesEntry.value:type_name -> flyteidl2.workflow.NodeExpansionParams
-	76, // 79: flyteidl2.workflow.WatchGroupsRequest.KnownSortField.created_at:type_name -> flyteidl2.common.Sort.Direction
-	1,  // 80: flyteidl2.workflow.RunService.CreateRun:input_type -> flyteidl2.workflow.CreateRunRequest
-	3,  // 81: flyteidl2.workflow.RunService.AbortRun:input_type -> flyteidl2.workflow.AbortRunRequest
-	5,  // 82: flyteidl2.workflow.RunService.GetRunDetails:input_type -> flyteidl2.workflow.GetRunDetailsRequest
-	7,  // 83: flyteidl2.workflow.RunService.WatchRunDetails:input_type -> flyteidl2.workflow.WatchRunDetailsRequest
-	9,  // 84: flyteidl2.workflow.RunService.GetActionDetails:input_type -> flyteidl2.workflow.GetActionDetailsRequest
-	11, // 85: flyteidl2.workflow.RunService.WatchActionDetails:input_type -> flyteidl2.workflow.WatchActionDetailsRequest
-	13, // 86: flyteidl2.workflow.RunService.GetActionData:input_type -> flyteidl2.workflow.GetActionDataRequest
-	19, // 87: flyteidl2.workflow.RunService.ListRuns:input_type -> flyteidl2.workflow.ListRunsRequest
-	21, // 88: flyteidl2.workflow.RunService.WatchRuns:input_type -> flyteidl2.workflow.WatchRunsRequest
-	23, // 89: flyteidl2.workflow.RunService.ListActions:input_type -> flyteidl2.workflow.ListActionsRequest
-	25, // 90: flyteidl2.workflow.RunService.WatchActions:input_type -> flyteidl2.workflow.WatchActionsRequest
-	35, // 91: flyteidl2.workflow.RunService.WatchClusterEvents:input_type -> flyteidl2.workflow.WatchClusterEventsRequest
-	37, // 92: flyteidl2.workflow.RunService.AbortAction:input_type -> flyteidl2.workflow.AbortActionRequest
-	40, // 93: flyteidl2.workflow.RunService.SignalEvent:input_type -> flyteidl2.workflow.SignalEventRequest
-	42, // 94: flyteidl2.workflow.RunService.WatchGroups:input_type -> flyteidl2.workflow.WatchGroupsRequest
-	15, // 95: flyteidl2.workflow.RunService.GetActionDataURIs:input_type -> flyteidl2.workflow.GetActionDataURIsRequest
-	17, // 96: flyteidl2.workflow.RunService.GetActionLogContext:input_type -> flyteidl2.workflow.GetActionLogContextRequest
-	2,  // 97: flyteidl2.workflow.RunService.CreateRun:output_type -> flyteidl2.workflow.CreateRunResponse
-	4,  // 98: flyteidl2.workflow.RunService.AbortRun:output_type -> flyteidl2.workflow.AbortRunResponse
-	6,  // 99: flyteidl2.workflow.RunService.GetRunDetails:output_type -> flyteidl2.workflow.GetRunDetailsResponse
-	8,  // 100: flyteidl2.workflow.RunService.WatchRunDetails:output_type -> flyteidl2.workflow.WatchRunDetailsResponse
-	10, // 101: flyteidl2.workflow.RunService.GetActionDetails:output_type -> flyteidl2.workflow.GetActionDetailsResponse
-	12, // 102: flyteidl2.workflow.RunService.WatchActionDetails:output_type -> flyteidl2.workflow.WatchActionDetailsResponse
-	14, // 103: flyteidl2.workflow.RunService.GetActionData:output_type -> flyteidl2.workflow.GetActionDataResponse
-	20, // 104: flyteidl2.workflow.RunService.ListRuns:output_type -> flyteidl2.workflow.ListRunsResponse
-	22, // 105: flyteidl2.workflow.RunService.WatchRuns:output_type -> flyteidl2.workflow.WatchRunsResponse
-	24, // 106: flyteidl2.workflow.RunService.ListActions:output_type -> flyteidl2.workflow.ListActionsResponse
-	26, // 107: flyteidl2.workflow.RunService.WatchActions:output_type -> flyteidl2.workflow.WatchActionsResponse
-	36, // 108: flyteidl2.workflow.RunService.WatchClusterEvents:output_type -> flyteidl2.workflow.WatchClusterEventsResponse
-	38, // 109: flyteidl2.workflow.RunService.AbortAction:output_type -> flyteidl2.workflow.AbortActionResponse
-	41, // 110: flyteidl2.workflow.RunService.SignalEvent:output_type -> flyteidl2.workflow.SignalEventResponse
-	43, // 111: flyteidl2.workflow.RunService.WatchGroups:output_type -> flyteidl2.workflow.WatchGroupsResponse
-	16, // 112: flyteidl2.workflow.RunService.GetActionDataURIs:output_type -> flyteidl2.workflow.GetActionDataURIsResponse
-	18, // 113: flyteidl2.workflow.RunService.GetActionLogContext:output_type -> flyteidl2.workflow.GetActionLogContextResponse
-	97, // [97:114] is the sub-list for method output_type
-	80, // [80:97] is the sub-list for method input_type
-	80, // [80:80] is the sub-list for extension type_name
-	80, // [80:80] is the sub-list for extension extendee
-	0,  // [0:80] is the sub-list for field type_name
+	73, // 52: flyteidl2.workflow.ActionLeaf.phase:type_name -> flyteidl2.common.ActionPhase
+	59, // 53: flyteidl2.workflow.ActionLeaf.start_time:type_name -> google.protobuf.Timestamp
+	31, // 54: flyteidl2.workflow.GroupAggregations.failed:type_name -> flyteidl2.workflow.ActionLeaf
+	31, // 55: flyteidl2.workflow.GroupAggregations.longest_duration:type_name -> flyteidl2.workflow.ActionLeaf
+	31, // 56: flyteidl2.workflow.GroupAggregations.longest_running:type_name -> flyteidl2.workflow.ActionLeaf
+	31, // 57: flyteidl2.workflow.GroupAggregations.longest_setup:type_name -> flyteidl2.workflow.ActionLeaf
+	48, // 58: flyteidl2.workflow.GroupNode.child_phase_counts:type_name -> flyteidl2.workflow.GroupNode.ChildPhaseCountsEntry
+	59, // 59: flyteidl2.workflow.GroupNode.earliest_start_time:type_name -> google.protobuf.Timestamp
+	59, // 60: flyteidl2.workflow.GroupNode.latest_end_time:type_name -> google.protobuf.Timestamp
+	32, // 61: flyteidl2.workflow.GroupNode.aggregations:type_name -> flyteidl2.workflow.GroupAggregations
+	0,  // 62: flyteidl2.workflow.TruncationNotice.reason:type_name -> flyteidl2.workflow.TruncationNotice.Reason
+	62, // 63: flyteidl2.workflow.WatchClusterEventsRequest.id:type_name -> flyteidl2.common.ActionIdentifier
+	74, // 64: flyteidl2.workflow.WatchClusterEventsResponse.cluster_events:type_name -> flyteidl2.workflow.ClusterEvent
+	62, // 65: flyteidl2.workflow.AbortActionRequest.action_id:type_name -> flyteidl2.common.ActionIdentifier
+	62, // 66: flyteidl2.workflow.SignalEventRequest.action_id:type_name -> flyteidl2.common.ActionIdentifier
+	39, // 67: flyteidl2.workflow.SignalEventRequest.payload:type_name -> flyteidl2.workflow.EventPayload
+	51, // 68: flyteidl2.workflow.WatchGroupsRequest.project_id:type_name -> flyteidl2.common.ProjectIdentifier
+	59, // 69: flyteidl2.workflow.WatchGroupsRequest.start_date:type_name -> google.protobuf.Timestamp
+	59, // 70: flyteidl2.workflow.WatchGroupsRequest.end_date:type_name -> google.protobuf.Timestamp
+	66, // 71: flyteidl2.workflow.WatchGroupsRequest.request:type_name -> flyteidl2.common.ListRequest
+	49, // 72: flyteidl2.workflow.WatchGroupsRequest.known_sort_fields:type_name -> flyteidl2.workflow.WatchGroupsRequest.KnownSortField
+	75, // 73: flyteidl2.workflow.WatchGroupsResponse.task_groups:type_name -> flyteidl2.workflow.TaskGroup
+	50, // 74: flyteidl2.workflow.WatchWindowedActionsRequest.Subscribe.run_id:type_name -> flyteidl2.common.RunIdentifier
+	46, // 75: flyteidl2.workflow.WatchWindowedActionsRequest.Subscribe.expanded_nodes:type_name -> flyteidl2.workflow.WatchWindowedActionsRequest.Subscribe.ExpandedNodesEntry
+	73, // 76: flyteidl2.workflow.WatchWindowedActionsRequest.Subscribe.phase_filter:type_name -> flyteidl2.common.ActionPhase
+	47, // 77: flyteidl2.workflow.WatchWindowedActionsRequest.UpdateWindow.expanded_nodes:type_name -> flyteidl2.workflow.WatchWindowedActionsRequest.UpdateWindow.ExpandedNodesEntry
+	73, // 78: flyteidl2.workflow.WatchWindowedActionsRequest.UpdateWindow.phase_filter:type_name -> flyteidl2.common.ActionPhase
+	28, // 79: flyteidl2.workflow.WatchWindowedActionsRequest.Subscribe.ExpandedNodesEntry.value:type_name -> flyteidl2.workflow.NodeExpansionParams
+	28, // 80: flyteidl2.workflow.WatchWindowedActionsRequest.UpdateWindow.ExpandedNodesEntry.value:type_name -> flyteidl2.workflow.NodeExpansionParams
+	76, // 81: flyteidl2.workflow.WatchGroupsRequest.KnownSortField.created_at:type_name -> flyteidl2.common.Sort.Direction
+	1,  // 82: flyteidl2.workflow.RunService.CreateRun:input_type -> flyteidl2.workflow.CreateRunRequest
+	3,  // 83: flyteidl2.workflow.RunService.AbortRun:input_type -> flyteidl2.workflow.AbortRunRequest
+	5,  // 84: flyteidl2.workflow.RunService.GetRunDetails:input_type -> flyteidl2.workflow.GetRunDetailsRequest
+	7,  // 85: flyteidl2.workflow.RunService.WatchRunDetails:input_type -> flyteidl2.workflow.WatchRunDetailsRequest
+	9,  // 86: flyteidl2.workflow.RunService.GetActionDetails:input_type -> flyteidl2.workflow.GetActionDetailsRequest
+	11, // 87: flyteidl2.workflow.RunService.WatchActionDetails:input_type -> flyteidl2.workflow.WatchActionDetailsRequest
+	13, // 88: flyteidl2.workflow.RunService.GetActionData:input_type -> flyteidl2.workflow.GetActionDataRequest
+	19, // 89: flyteidl2.workflow.RunService.ListRuns:input_type -> flyteidl2.workflow.ListRunsRequest
+	21, // 90: flyteidl2.workflow.RunService.WatchRuns:input_type -> flyteidl2.workflow.WatchRunsRequest
+	23, // 91: flyteidl2.workflow.RunService.ListActions:input_type -> flyteidl2.workflow.ListActionsRequest
+	25, // 92: flyteidl2.workflow.RunService.WatchActions:input_type -> flyteidl2.workflow.WatchActionsRequest
+	35, // 93: flyteidl2.workflow.RunService.WatchClusterEvents:input_type -> flyteidl2.workflow.WatchClusterEventsRequest
+	37, // 94: flyteidl2.workflow.RunService.AbortAction:input_type -> flyteidl2.workflow.AbortActionRequest
+	40, // 95: flyteidl2.workflow.RunService.SignalEvent:input_type -> flyteidl2.workflow.SignalEventRequest
+	42, // 96: flyteidl2.workflow.RunService.WatchGroups:input_type -> flyteidl2.workflow.WatchGroupsRequest
+	15, // 97: flyteidl2.workflow.RunService.GetActionDataURIs:input_type -> flyteidl2.workflow.GetActionDataURIsRequest
+	17, // 98: flyteidl2.workflow.RunService.GetActionLogContext:input_type -> flyteidl2.workflow.GetActionLogContextRequest
+	2,  // 99: flyteidl2.workflow.RunService.CreateRun:output_type -> flyteidl2.workflow.CreateRunResponse
+	4,  // 100: flyteidl2.workflow.RunService.AbortRun:output_type -> flyteidl2.workflow.AbortRunResponse
+	6,  // 101: flyteidl2.workflow.RunService.GetRunDetails:output_type -> flyteidl2.workflow.GetRunDetailsResponse
+	8,  // 102: flyteidl2.workflow.RunService.WatchRunDetails:output_type -> flyteidl2.workflow.WatchRunDetailsResponse
+	10, // 103: flyteidl2.workflow.RunService.GetActionDetails:output_type -> flyteidl2.workflow.GetActionDetailsResponse
+	12, // 104: flyteidl2.workflow.RunService.WatchActionDetails:output_type -> flyteidl2.workflow.WatchActionDetailsResponse
+	14, // 105: flyteidl2.workflow.RunService.GetActionData:output_type -> flyteidl2.workflow.GetActionDataResponse
+	20, // 106: flyteidl2.workflow.RunService.ListRuns:output_type -> flyteidl2.workflow.ListRunsResponse
+	22, // 107: flyteidl2.workflow.RunService.WatchRuns:output_type -> flyteidl2.workflow.WatchRunsResponse
+	24, // 108: flyteidl2.workflow.RunService.ListActions:output_type -> flyteidl2.workflow.ListActionsResponse
+	26, // 109: flyteidl2.workflow.RunService.WatchActions:output_type -> flyteidl2.workflow.WatchActionsResponse
+	36, // 110: flyteidl2.workflow.RunService.WatchClusterEvents:output_type -> flyteidl2.workflow.WatchClusterEventsResponse
+	38, // 111: flyteidl2.workflow.RunService.AbortAction:output_type -> flyteidl2.workflow.AbortActionResponse
+	41, // 112: flyteidl2.workflow.RunService.SignalEvent:output_type -> flyteidl2.workflow.SignalEventResponse
+	43, // 113: flyteidl2.workflow.RunService.WatchGroups:output_type -> flyteidl2.workflow.WatchGroupsResponse
+	16, // 114: flyteidl2.workflow.RunService.GetActionDataURIs:output_type -> flyteidl2.workflow.GetActionDataURIsResponse
+	18, // 115: flyteidl2.workflow.RunService.GetActionLogContext:output_type -> flyteidl2.workflow.GetActionLogContextResponse
+	99, // [99:116] is the sub-list for method output_type
+	82, // [82:99] is the sub-list for method input_type
+	82, // [82:82] is the sub-list for extension type_name
+	82, // [82:82] is the sub-list for extension extendee
+	0,  // [0:82] is the sub-list for field type_name
 }
 
 func init() { file_flyteidl2_workflow_run_service_proto_init() }

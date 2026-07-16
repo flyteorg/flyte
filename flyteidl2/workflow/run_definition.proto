@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/identity.proto";
 import "flyteidl2/common/phase.proto";
+import "flyteidl2/common/run.proto";
 import "flyteidl2/core/catalog.proto";
 import "flyteidl2/core/execution.proto";
 import "flyteidl2/core/literals.proto";
@@ -92,10 +93,10 @@ message ConditionAction {
   flyteidl2.core.LiteralType type = 6;
 
   // Prompt shown to the user when the condition is awaited.
-  string prompt = 7;
+  string prompt = 7 [(buf.validate.field).string.max_len = 4096];
 
   // Description of the condition.
-  string description = 8;
+  string description = 8 [(buf.validate.field).string.max_len = 2048];
 
   // How to render the prompt.
   ConditionPromptType prompt_type = 9;
@@ -196,9 +197,13 @@ message ActionMetadata {
   // Who initiated this run
   RunSource source = 16;
 
+  // Provenance link to the parent run this action was derived from (re-run or
+  // recover), if any. Only set on root actions created with a relation.
+  common.Relation relation = 17;
+
   // Set only when this action was recovered from a prior run instead of executed
   // here: the source action (source run id + action name) whose result was reused.
-  common.ActionIdentifier recovered_from = 17;
+  common.ActionIdentifier recovered_from = 18;
 }
 
 enum ActionType {

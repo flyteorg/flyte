@@ -4,6 +4,8 @@ package flyteidl2.workflow;
 
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/identity.proto";
+import "flyteidl2/core/literals.proto";
 import "flyteidl2/workflow/run_definition.proto";
 import "google/rpc/status.proto";
 
@@ -87,6 +89,18 @@ message UpdateActionStatusRequest {
 
   // Updated status of the action.
   flyteidl2.workflow.ActionStatus status = 2 [(buf.validate.field).required = true];
+
+  // For ACTION_TYPE_CONDITION actions, the resolved signal payload. Carried
+  // inline on the terminal Update so GetActionData can return it without an
+  // S3 round trip; tasks and traces leave this unset.
+  optional flyteidl2.core.Literal output = 3;
+
+  // Identity of the actor that issued the Signal or Abort that produced this
+  // terminal phase.
+  optional flyteidl2.common.EnrichedIdentity principal = 4;
+
+  // Reason supplied with the abort, if the terminal phase is ABORTED.
+  optional string abort_reason = 5;
 }
 
 // Response message for updating an action.

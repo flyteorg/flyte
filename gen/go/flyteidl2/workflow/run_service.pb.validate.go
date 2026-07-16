@@ -4617,6 +4617,8 @@ func (m *WatchWindowedActionsResponse) validate(all bool) error {
 
 	// no validation rules for ResyncHint
 
+	// no validation rules for HydrationComplete
+
 	if len(errors) > 0 {
 		return WatchWindowedActionsResponseMultiError(errors)
 	}
@@ -4937,6 +4939,37 @@ func (m *ActionLeaf) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return ActionLeafValidationError{
 				field:  "Duration",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Phase
+
+	if all {
+		switch v := interface{}(m.GetStartTime()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionLeafValidationError{
+					field:  "StartTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionLeafValidationError{
+					field:  "StartTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetStartTime()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionLeafValidationError{
+				field:  "StartTime",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
