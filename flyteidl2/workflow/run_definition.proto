@@ -93,10 +93,10 @@ message ConditionAction {
   flyteidl2.core.LiteralType type = 6;
 
   // Prompt shown to the user when the condition is awaited.
-  string prompt = 7;
+  string prompt = 7 [(buf.validate.field).string.max_len = 4096];
 
   // Description of the condition.
-  string description = 8;
+  string description = 8 [(buf.validate.field).string.max_len = 2048];
 
   // How to render the prompt.
   ConditionPromptType prompt_type = 9;
