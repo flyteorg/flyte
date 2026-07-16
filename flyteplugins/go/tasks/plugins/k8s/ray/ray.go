@@ -303,7 +303,7 @@ func constructRayJob(ctx context.Context, taskCtx pluginsCore.TaskExecutionConte
 		ttlSecondsAfterFinished = &rayJob.TtlSecondsAfterFinished
 	}
 
-	submitterPodTemplate := buildSubmitterPodTemplate(&rayClusterSpec)
+	submitterPodTemplate := buildSubmitterPodTemplate(&rayClusterSpec, objectMeta)
 
 	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
 	var runtimeEnvYaml string
@@ -497,7 +497,7 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 	return podTemplateSpec, nil
 }
 
-func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec) v1.PodTemplateSpec {
+func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec, objectMeta *metav1.ObjectMeta) v1.PodTemplateSpec {
 
 	headPodSpec := rayClusterSpec.HeadGroupSpec.Template.Spec
 
@@ -508,6 +508,14 @@ func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec) v1.PodTempl
 
 	enableServiceLinks := false
 	return v1.PodTemplateSpec{
+		// Carry the task's execution labels/annotations, like the head and worker pod
+		// templates do. KubeRay uses SubmitterPodTemplate verbatim, so without them the
+		// submitter pod is invisible to anything that locates a task's pods by its
+		// execution metadata (e.g. log tailing).
+		ObjectMeta: metav1.ObjectMeta{
+			Labels:      objectMeta.GetLabels(),
+			Annotations: objectMeta.GetAnnotations(),
+		},
 		Spec: v1.PodSpec{
 			Containers: []v1.Container{
 				{
