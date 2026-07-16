@@ -72,7 +72,9 @@ message WebhookDeliveryTemplate {
     max_len: 2000
   }];
 
-  HttpMethod method = 2 [(buf.validate.field).enum = {not_in: [0]}];
+  HttpMethod method = 2 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
 
   map<string, string> headers = 3 [(buf.validate.field).map = {
     keys: {
@@ -128,7 +130,9 @@ message ProviderEmailTemplate {
         max_len: 100
       }
     }
-    values: {string: {max_len: 4000}}
+    values: {
+      string: {max_len: 4000}
+    }
     max_pairs: 100
   }];
 }

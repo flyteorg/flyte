@@ -26,7 +26,9 @@ enum FixedRateUnit {
 // Option for schedules run at a certain frequency e.g. every 2 minutes.
 message FixedRate {
   uint32 value = 1 [(buf.validate.field).uint32.gt = 0];
-  FixedRateUnit unit = 2 [(buf.validate.field).enum = {not_in: [0]}];
+  FixedRateUnit unit = 2 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
 
   // Optional, timestamp after which rate should be calculated. Can be only in future.
   // E.g. We create a rate schedule "every 5 minutes" with start_time="12:00" inactive.
@@ -65,7 +67,9 @@ enum TriggerAutomationSpecType {
 
 message TriggerAutomationSpec {
   // Explicitly defines trigger automation type.
-  TriggerAutomationSpecType type = 1 [(buf.validate.field).enum = {not_in: [0]}];
+  TriggerAutomationSpecType type = 1 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
 
   oneof automation {
     Schedule schedule = 2;

@@ -209,7 +209,9 @@ message Backoff {
   };
 
   // Initial delay before the first retry. Must be >= 0 when set.
-  google.protobuf.Duration base = 1 [(buf.validate.field).duration = {gte: {seconds: 0}}];
+  google.protobuf.Duration base = 1 [(buf.validate.field).duration = {
+    gte: {seconds: 0}
+  }];
 
   // Multiplier applied per retry. factor=1 yields constant delay; factor=2
   // doubles each time. When unset, factor is treated as 1.0. Must be >= 1.0
@@ -218,7 +220,9 @@ message Backoff {
 
   // Upper bound on the computed delay. Required when factor > 1 to prevent
   // unbounded growth. Must be >= 0 when set.
-  google.protobuf.Duration cap = 3 [(buf.validate.field).duration = {gte: {seconds: 0}}];
+  google.protobuf.Duration cap = 3 [(buf.validate.field).duration = {
+    gte: {seconds: 0}
+  }];
 }
 
 // Retry strategy associated with an executable unit.
@@ -251,7 +255,9 @@ message TimeoutStrategy {
   // before the action enters ACTION_PHASE_INITIALIZING. Per attempt — resets
   // on each retry. Enforced by the leasor (pre-lease) and the lease worker
   // (post-lease, before user code starts). 0 (or unset) means unlimited.
-  google.protobuf.Duration queued_timeout = 1 [(buf.validate.field).duration = {gte: {seconds: 0}}];
+  google.protobuf.Duration queued_timeout = 1 [(buf.validate.field).duration = {
+    gte: {seconds: 0}
+  }];
 
   // Wall-clock from first ACTION_PHASE_QUEUED timestamp to a terminal phase,
   // across ALL attempts (user and system). One-time, absolute. If deadline
@@ -259,5 +265,7 @@ message TimeoutStrategy {
   // action terminates as TIMED_OUT regardless of TaskMetadata.timeout or
   // remaining retry budget. Enforced by the leasor. 0 (or unset) means
   // unlimited.
-  google.protobuf.Duration deadline = 2 [(buf.validate.field).duration = {gte: {seconds: 0}}];
+  google.protobuf.Duration deadline = 2 [(buf.validate.field).duration = {
+    gte: {seconds: 0}
+  }];
 }

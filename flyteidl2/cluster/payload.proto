@@ -35,7 +35,9 @@ message SelectClusterRequest {
     OPERATION_UPLOAD_TRIGGER = 9;
   }
 
-  Operation operation = 8 [(buf.validate.field).enum = {not_in: [0]}];
+  Operation operation = 8 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
 }
 
 message SelectClusterResponse {
