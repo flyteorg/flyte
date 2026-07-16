@@ -598,8 +598,6 @@ func (m *Recover) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for ConditionMode
-
 	if len(errors) > 0 {
 		return RecoverMultiError(errors)
 	}

@@ -21,12 +21,6 @@ class CacheLookupScope(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     CACHE_LOOKUP_SCOPE_GLOBAL: _ClassVar[CacheLookupScope]
     CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN: _ClassVar[CacheLookupScope]
 
-class ConditionRecoveryMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
-    CONDITION_RECOVERY_MODE_UNSPECIFIED: _ClassVar[ConditionRecoveryMode]
-    CONDITION_RECOVERY_MODE_RECOVER: _ClassVar[ConditionRecoveryMode]
-    CONDITION_RECOVERY_MODE_RERUN: _ClassVar[ConditionRecoveryMode]
-
 class TaskSpecSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
     TASK_SPEC_SOURCE_UNSPECIFIED: _ClassVar[TaskSpecSource]
@@ -35,9 +29,6 @@ class TaskSpecSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
 CACHE_LOOKUP_SCOPE_UNSPECIFIED: CacheLookupScope
 CACHE_LOOKUP_SCOPE_GLOBAL: CacheLookupScope
 CACHE_LOOKUP_SCOPE_PROJECT_DOMAIN: CacheLookupScope
-CONDITION_RECOVERY_MODE_UNSPECIFIED: ConditionRecoveryMode
-CONDITION_RECOVERY_MODE_RECOVER: ConditionRecoveryMode
-CONDITION_RECOVERY_MODE_RERUN: ConditionRecoveryMode
 TASK_SPEC_SOURCE_UNSPECIFIED: TaskSpecSource
 TASK_SPEC_SOURCE_DEPLOYED: TaskSpecSource
 TASK_SPEC_SOURCE_EPHEMERAL: TaskSpecSource
@@ -89,12 +80,10 @@ class CacheConfig(_message.Message):
     def __init__(self, overwrite_cache: bool = ..., cache_lookup_scope: _Optional[_Union[CacheLookupScope, str]] = ...) -> None: ...
 
 class Recover(_message.Message):
-    __slots__ = ["condition_mode", "force_rerun_actions"]
-    CONDITION_MODE_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["force_rerun_actions"]
     FORCE_RERUN_ACTIONS_FIELD_NUMBER: _ClassVar[int]
-    condition_mode: ConditionRecoveryMode
     force_rerun_actions: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, condition_mode: _Optional[_Union[ConditionRecoveryMode, str]] = ..., force_rerun_actions: _Optional[_Iterable[str]] = ...) -> None: ...
+    def __init__(self, force_rerun_actions: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class RunSpec(_message.Message):
     __slots__ = ["labels", "annotations", "envs", "interruptible", "overwrite_cache", "cluster", "raw_data_storage", "security_context", "cache_config", "notification_rule_name", "notification_rules", "run_start_time", "max_action_concurrency", "run_base_dir", "related_to", "cluster_pool", "task_spec_source", "relation", "recover"]
