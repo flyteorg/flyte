@@ -89,12 +89,10 @@ class CacheConfig(_message.Message):
     def __init__(self, overwrite_cache: bool = ..., cache_lookup_scope: _Optional[_Union[CacheLookupScope, str]] = ...) -> None: ...
 
 class Recover(_message.Message):
-    __slots__ = ["run_id", "condition_mode"]
-    RUN_ID_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["condition_mode"]
     CONDITION_MODE_FIELD_NUMBER: _ClassVar[int]
-    run_id: _identifier_pb2.RunIdentifier
     condition_mode: ConditionRecoveryMode
-    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., condition_mode: _Optional[_Union[ConditionRecoveryMode, str]] = ...) -> None: ...
+    def __init__(self, condition_mode: _Optional[_Union[ConditionRecoveryMode, str]] = ...) -> None: ...
 
 class RunSpec(_message.Message):
     __slots__ = ["labels", "annotations", "envs", "interruptible", "overwrite_cache", "cluster", "raw_data_storage", "security_context", "cache_config", "notification_rule_name", "notification_rules", "run_start_time", "max_action_concurrency", "run_base_dir", "related_to", "cluster_pool", "task_spec_source", "relation", "recover"]

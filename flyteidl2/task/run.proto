@@ -83,19 +83,14 @@ enum ConditionRecoveryMode {
   CONDITION_RECOVERY_MODE_RERUN = 2;
 }
 
-// Recover instructs the system to build this run as a recovery of a prior run:
-// actions that succeeded in run_id are reused (recorded as RECOVERED without
-// executing); actions that failed, changed, or are missing re-execute. This message
-// is the sole carrier of recovery configuration and the extension point for future
-// recovery parameters.
+// Recover carries the optional configuration of a recovery run — a run created
+// with RunSpec.relation.relation_type = RELATION_TYPE_RECOVER. The run being
+// recovered is RunSpec.relation.related_to; this message intentionally carries no
+// run reference of its own. It is the extension point for future recovery
+// parameters.
 message Recover {
-  // The prior run whose successful actions should be recovered. Required — a Recover
-  // message without a run_id is meaningless. Resolved within the current
-  // org/project/domain; cross-project recovery is not supported.
-  flyteidl2.common.RunIdentifier run_id = 1 [(buf.validate.field).required = true];
-
   // How condition actions are treated during recovery. Defaults to RECOVER.
-  ConditionRecoveryMode condition_mode = 2;
+  ConditionRecoveryMode condition_mode = 1;
 }
 
 // TaskSpecSource records how a run's task spec was provided at creation time, so
@@ -187,7 +182,8 @@ message RunSpec {
   // same org/project/domain as this run. Replaces related_to.
   flyteidl2.common.Relation relation = 18;
 
-  // When set, this run is a recovery of the referenced prior run: its successful
+  // Optional recovery configuration. Only meaningful when relation is set with
+  // RELATION_TYPE_RECOVER: the run recovers relation.related_to — its successful
   // actions are reused and only failed/changed ones re-execute. See Recover.
   Recover recover = 19;
 }
