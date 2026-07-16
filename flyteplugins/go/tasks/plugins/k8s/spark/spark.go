@@ -431,6 +431,9 @@ func getEventInfoForSpark(ctx context.Context, pluginContext k8s.PluginContext, 
 	}
 
 	logCtx = &core.LogContext{
+		// Driver/executor pods share the SparkApplication's name as prefix; persisted
+		// multi-pod log queries scope streams by it.
+		PodNamePrefix:  sj.Name,
 		PrimaryPodName: sj.Status.DriverInfo.PodName,
 	}
 	logCtx.Pods = append(logCtx.Pods, &core.PodLogContext{
