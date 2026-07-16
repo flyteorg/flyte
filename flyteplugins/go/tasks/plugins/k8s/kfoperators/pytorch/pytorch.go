@@ -251,10 +251,7 @@ func logContextForPods(pytorchJobName string, pods []v1.Pod) *core.LogContext {
 		return item.Status.Phase != v1.PodPending
 	})
 	logCtx := &core.LogContext{
-		// Master/worker pods share the PyTorchJob's name as prefix; persisted multi-pod
-		// log queries scope streams by it.
-		PodNamePrefix: pytorchJobName,
-		Pods:          make([]*core.PodLogContext, len(pods)),
+		Pods: make([]*core.PodLogContext, len(pods)),
 	}
 	for i, pod := range pods {
 		p := pod

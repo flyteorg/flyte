@@ -413,9 +413,6 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 	}
 	info.Logs = o.TaskLogs
 	info.LogContext = &core.LogContext{
-		// Runner/scheduler/worker pods share the DaskJob's name as prefix; persisted
-		// multi-pod log queries scope streams by it.
-		PodNamePrefix:  job.Name,
 		PrimaryPodName: job.Status.JobRunnerPodName,
 		Pods: []*core.PodLogContext{
 			{

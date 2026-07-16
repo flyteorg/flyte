@@ -102,9 +102,7 @@ func getLogContext(ctx context.Context, pluginContext k8s.PluginContext, jobSet 
 	// (see build.go). Child pods don't carry the annotations BuildPodLogContext infers
 	// from, so set it explicitly to avoid resolving to the wrong container (e.g. a sidecar).
 	primaryContainerName := jobSet.Annotations[primaryContainerAnnotation]
-	// Child pods share the JobSet's name as prefix; persisted multi-pod log queries
-	// scope streams by it.
-	logCtx := &core.LogContext{PodNamePrefix: jobSet.Name, Pods: make([]*core.PodLogContext, 0, len(podList.Items))}
+	logCtx := &core.LogContext{Pods: make([]*core.PodLogContext, 0, len(podList.Items))}
 	for i := range podList.Items {
 		pod := &podList.Items[i]
 		// Pending pods have no logs yet and no container statuses to build contexts from.

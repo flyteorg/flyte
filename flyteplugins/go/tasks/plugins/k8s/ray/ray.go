@@ -828,10 +828,7 @@ func logContextForPods(rayJobName string, pods []v1.Pod) *core.LogContext {
 		return item.Status.Phase != v1.PodPending
 	})
 	logCtx := &core.LogContext{
-		// All of the job's pods (submitter, head, workers) share the RayJob's name as
-		// prefix; persisted multi-pod log queries scope streams by it.
-		PodNamePrefix: rayJobName,
-		Pods:          make([]*core.PodLogContext, len(pods)),
+		Pods: make([]*core.PodLogContext, len(pods)),
 	}
 	for i, pod := range pods {
 		p := pod
