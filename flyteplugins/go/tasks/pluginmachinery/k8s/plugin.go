@@ -116,8 +116,8 @@ type Plugin interface {
 //
 // Unlike Plugin, the cluster resource is intentionally NOT owned by the task execution: it has no
 // owner reference and no finalizer, so completing or aborting one task never deletes a cluster that
-// other tasks may still be using. Cleanup of idle clusters is delegated to the underlying operator
-// (e.g. KubeRay's idle autoscaler). The job resource, by contrast, is owned normally.
+// other tasks may still be using. Cleanup of idle clusters is the plugin's own job via
+// StartCleanup. The job resource, by contrast, is owned normally.
 type ClusterPlugin interface {
 	// GetClusterName returns a deterministic name for the cluster backing this task. Implementations
 	// typically hash the task's plugin-spec proto so that identical specs collapse onto the same
@@ -148,6 +148,13 @@ type ClusterPlugin interface {
 
 	// GetProperties returns properties desired by the plugin (mirrors Plugin.GetProperties).
 	GetProperties() PluginProperties
+
+	// StartCleanup is called once at plugin load time with the kube client the plugin's
+	// resources live on. Cluster resources outlive individual tasks, so the plugin owns their
+	// cleanup: implementations typically start a background loop that deletes clusters (and any
+	// resources retained with them) once they have been idle past their TTL. The loop must exit
+	// when ctx is done; implementations with nothing to clean up may make this a no-op.
+	StartCleanup(ctx context.Context, kubeClient pluginsCore.KubeClient)
 }
 
 // GarbageCollectable is an interface plugins implement to provide an external garbage collector information.

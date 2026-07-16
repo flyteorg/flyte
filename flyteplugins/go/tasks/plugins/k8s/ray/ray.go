@@ -303,7 +303,7 @@ func constructRayJob(ctx context.Context, taskCtx pluginsCore.TaskExecutionConte
 		ttlSecondsAfterFinished = &rayJob.TtlSecondsAfterFinished
 	}
 
-	submitterPodTemplate := buildSubmitterPodTemplate(&rayClusterSpec, objectMeta)
+	submitterPodTemplate := buildSubmitterPodTemplate(&rayClusterSpec, taskCtx)
 
 	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
 	var runtimeEnvYaml string
@@ -497,7 +497,7 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 	return podTemplateSpec, nil
 }
 
-func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec, objectMeta *metav1.ObjectMeta) v1.PodTemplateSpec {
+func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec, taskCtx pluginsCore.TaskExecutionContext) v1.PodTemplateSpec {
 
 	headPodSpec := rayClusterSpec.HeadGroupSpec.Template.Spec
 
@@ -507,15 +507,7 @@ func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec, objectMeta 
 	}
 
 	enableServiceLinks := false
-	return v1.PodTemplateSpec{
-		// Carry the task's execution labels/annotations, like the head and worker pod
-		// templates do. KubeRay uses SubmitterPodTemplate verbatim, so without them the
-		// submitter pod is invisible to anything that locates a task's pods by its
-		// execution metadata (e.g. log tailing).
-		ObjectMeta: metav1.ObjectMeta{
-			Labels:      objectMeta.GetLabels(),
-			Annotations: objectMeta.GetAnnotations(),
-		},
+	podTemplateSpec := v1.PodTemplateSpec{
 		Spec: v1.PodSpec{
 			Containers: []v1.Container{
 				{
@@ -532,6 +524,14 @@ func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec, objectMeta 
 			Affinity:    config.GetK8sPluginConfig().DefaultAffinity,
 		},
 	}
+	// Carry the task's execution labels/annotations, sourced the same way the head and worker
+	// pod templates source theirs (buildHeadPodTemplate/buildWorkerPodTemplate). KubeRay uses
+	// SubmitterPodTemplate verbatim, so without them the submitter pod is invisible to anything
+	// that locates a task's pods by its execution metadata (e.g. log tailing).
+	k8sCfg := config.GetK8sPluginConfig()
+	podTemplateSpec.SetLabels(utils.UnionMaps(k8sCfg.DefaultLabels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels())))
+	podTemplateSpec.SetAnnotations(utils.UnionMaps(k8sCfg.DefaultAnnotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations())))
+	return podTemplateSpec
 }
 
 func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMetadata *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.WorkerGroupSpec, gpuAccelerator *core.GPUAccelerator) (v1.PodTemplateSpec, error) {
