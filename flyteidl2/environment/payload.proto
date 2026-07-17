@@ -1,0 +1,312 @@
+syntax = "proto3";
+
+package flyteidl2.environment;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/list.proto";
+import "flyteidl2/core/literals.proto";
+import "flyteidl2/core/security.proto";
+import "flyteidl2/core/tasks.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/environment";
+
+// EnvironmentClusterState describes whether a cluster materialization can currently serve work.
+enum EnvironmentClusterState {
+  ENVIRONMENT_CLUSTER_STATE_UNSPECIFIED = 0;
+  // The materialization cannot serve work yet and no failure is recorded.
+  ENVIRONMENT_CLUSTER_STATE_NOT_READY = 1;
+  // The materialization can serve work: a worker is ready, or an idle pool
+  // will scale up on demand.
+  ENVIRONMENT_CLUSTER_STATE_READY = 2;
+  // A failure is recorded and the materialization cannot serve work.
+  ENVIRONMENT_CLUSTER_STATE_FAILED = 3;
+}
+
+// EnvironmentState is the top-level state of an environment version across all
+// clusters. Today it is derived from reported cluster statuses; as environments
+// become standalone it becomes the control-plane-owned lifecycle state, and
+// values may grow (clients must tolerate unknown values).
+enum EnvironmentState {
+  ENVIRONMENT_STATE_UNSPECIFIED = 0;
+  // Active on at least one cluster but not yet able to serve work anywhere.
+  ENVIRONMENT_STATE_NOT_READY = 1;
+  // At least one cluster can serve work.
+  ENVIRONMENT_STATE_READY = 2;
+  // Failing on at least one cluster and unable to serve work anywhere.
+  ENVIRONMENT_STATE_FAILED = 3;
+  // Not currently active on any cluster.
+  ENVIRONMENT_STATE_INACTIVE = 4;
+}
+
+// WorkerState describes the state of one environment worker.
+enum WorkerState {
+  WORKER_STATE_UNSPECIFIED = 0;
+  // The worker is starting and cannot run actions yet.
+  WORKER_STATE_INITIALIZING = 1;
+  // The worker can accept and run actions.
+  WORKER_STATE_READY = 2;
+  // The worker is unreachable with no recorded failure; it may recover.
+  WORKER_STATE_DISCONNECTED = 3;
+  // A failure is recorded for the worker.
+  WORKER_STATE_FAILED = 4;
+}
+
+// EnvironmentActionAssignmentState describes whether a worker has been selected for an action.
+enum EnvironmentActionAssignmentState {
+  ENVIRONMENT_ACTION_ASSIGNMENT_STATE_UNSPECIFIED = 0;
+  // Accepted; no worker selected yet.
+  ENVIRONMENT_ACTION_ASSIGNMENT_STATE_PENDING = 1;
+  // A worker is selected.
+  ENVIRONMENT_ACTION_ASSIGNMENT_STATE_ASSIGNED = 2;
+}
+
+// EnvironmentId uniquely identifies an immutable environment version.
+message EnvironmentId {
+  string organization = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+  string project = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+  string domain = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+  string name = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+  // version is an opaque client-assigned identifier (currently an SDK-computed
+  // content hash). Its format is not a contract — do not parse it.
+  string version = 5 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+}
+
+// EnvironmentClusterId identifies one cluster materialization of an environment version.
+message EnvironmentClusterId {
+  EnvironmentId environment = 1 [(buf.validate.field).required = true];
+  string cluster = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+// EnvironmentSpec is the intent-level description of an environment version's
+// worker pods. Every value is baked into the pods — new values mean a new
+// version. Cluster-local platform config and runtime wiring are applied by the
+// data plane at materialization and are not part of the spec.
+message EnvironmentSpec {
+  string image = 1 [(buf.validate.field).string.min_len = 1];
+  flyteidl2.core.Resources resources = 2;
+  flyteidl2.core.ExtendedResources extended_resources = 3;
+  flyteidl2.core.SecurityContext security_context = 4;
+  repeated flyteidl2.core.KeyValuePair env_vars = 5;
+  // Unset means the cluster default interruptible behavior applies.
+  optional bool interruptible = 6;
+  // Name of a base PodTemplate resource applied by the data plane, if any.
+  optional string pod_template_name = 7 [(buf.validate.field).string.min_len = 1];
+  // parallelism is the number of concurrent actions each worker can run.
+  int32 parallelism = 8;
+  // Full authored pod template for environments defined with an inline
+  // PodTemplate; the leaf fields above still describe the primary container.
+  // Carried with primary-container args cleared: args are per-task values,
+  // and clearing them keeps the template identical across every task of one
+  // environment version.
+  flyteidl2.core.K8sPod pod_template = 9;
+}
+
+// EnvironmentScaling holds the pool-management fields — sizing and idle /
+// scale-down timing. Unlike EnvironmentSpec, these values are not baked into
+// worker pods.
+message EnvironmentScaling {
+  // replicas is the most workers the pool scales up to; min_replicas is the
+  // floor it can scale down to. min_replicas unset means the pool stays fixed
+  // at replicas — it does not mean a floor of zero. Both are scoped to a
+  // single cluster materialization.
+  int32 replicas = 1;
+  optional int32 min_replicas = 2;
+  google.protobuf.Duration idle_ttl = 3 [(buf.validate.field).required = true];
+  google.protobuf.Duration scaledown_ttl = 4 [(buf.validate.field).required = true];
+}
+
+// Environment is one immutable environment version: its identity, spec, and scaling.
+message Environment {
+  EnvironmentId id = 1 [(buf.validate.field).required = true];
+  EnvironmentSpec spec = 2 [(buf.validate.field).required = true];
+  EnvironmentScaling scaling = 3 [(buf.validate.field).required = true];
+}
+
+// EnvironmentSummary is the scalar list-row view of an environment version:
+// identity, top-level state, and the display values a list renders. The spec
+// scalars are a server-derived projection of EnvironmentSpec; GetEnvironment
+// returns the full spec.
+message EnvironmentSummary {
+  EnvironmentId id = 1 [(buf.validate.field).required = true];
+  EnvironmentState state = 2 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
+  string image = 3 [(buf.validate.field).string.min_len = 1];
+  // Primary-container quantities as authored: requests, falling back to limits.
+  optional string cpu = 4 [(buf.validate.field).string.min_len = 1];
+  optional string memory = 5 [(buf.validate.field).string.min_len = 1];
+  optional int32 gpu = 6;
+  // Accelerator device as authored (for example A100).
+  optional string gpu_device = 7 [(buf.validate.field).string.min_len = 1];
+  int32 parallelism = 8;
+  EnvironmentScaling scaling = 9 [(buf.validate.field).required = true];
+}
+
+// EnvironmentClusterSummary is the scalar-only view of a cluster's status
+// state, totals, and freshness — no worker/action/error arrays. Use GetEnvironment for those.
+message EnvironmentClusterSummary {
+  string cluster = 1 [(buf.validate.field).string.min_len = 1];
+  EnvironmentClusterState state = 2 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
+  optional string failure_message = 3 [(buf.validate.field).string.max_len = 4096];
+  // Workers currently tracked for the materialization, in any state.
+  int32 worker_count = 4 [(buf.validate.field).int32.gte = 0];
+  // PENDING and ASSIGNED actions currently tracked.
+  int32 action_count = 5 [(buf.validate.field).int32.gte = 0];
+  google.protobuf.Timestamp last_updated_at = 6 [(buf.validate.field).required = true];
+}
+
+// EnvironmentListItem is one environment name and its listed versions: those
+// with at least one cluster status inside the service's freshness window,
+// ordered by most recent activity. Versions are independent pools; any
+// name-level presentation is derived by the caller from the version states.
+message EnvironmentListItem {
+  option (buf.validate.message).cel = {
+    id: "environment_list_item.name_match"
+    message: "every version must belong to the item's environment name"
+    expression: "this.versions.all(v, v.summary.id.name == this.name)"
+  };
+
+  // org/project/domain come from the request scope.
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+  repeated EnvironmentVersionItem versions = 2 [(buf.validate.field).repeated.min_items = 1];
+}
+
+// EnvironmentVersionItem is one environment version's summary and its
+// lightweight cluster summaries.
+message EnvironmentVersionItem {
+  EnvironmentSummary summary = 1 [(buf.validate.field).required = true];
+  repeated EnvironmentClusterSummary cluster_summaries = 2;
+}
+
+message ListEnvironmentsRequest {
+  flyteidl2.common.ProjectIdentifier project_id = 1 [(buf.validate.field).required = true];
+  flyteidl2.common.ListRequest request = 2;
+}
+
+message ListEnvironmentsResponse {
+  repeated EnvironmentListItem environments = 1;
+  string token = 2;
+}
+
+message GetEnvironmentRequest {
+  EnvironmentId id = 1 [(buf.validate.field).required = true];
+}
+
+message GetEnvironmentResponse {
+  Environment environment = 1 [(buf.validate.field).required = true];
+  repeated EnvironmentClusterStatus cluster_statuses = 2;
+  EnvironmentState state = 3 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
+}
+
+// EnvironmentClusterStatus is the most recent snapshot for a cluster materialization.
+message EnvironmentClusterStatus {
+  EnvironmentClusterId id = 1 [(buf.validate.field).required = true];
+  EnvironmentClusterSnapshot snapshot = 2 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp last_updated_at = 3 [(buf.validate.field).required = true];
+}
+
+// EnvironmentClusterSnapshot is the observed state of one materialization.
+// Workers and actions each have a 10,000-entry safety ceiling. Totals describe the
+// complete pre-truncation sets and remain authoritative when an array is truncated.
+message EnvironmentClusterSnapshot {
+  option (buf.validate.message).cel = {
+    id: "environment_cluster_snapshot.worker_count"
+    message: "worker_count and workers_truncated must describe the complete worker set"
+    expression: "this.workers_truncated ? this.worker_count > this.workers.size() : this.worker_count == this.workers.size()"
+  };
+  option (buf.validate.message).cel = {
+    id: "environment_cluster_snapshot.action_count"
+    message: "action_count and actions_truncated must describe the complete action set"
+    expression: "this.actions_truncated ? this.action_count > this.actions.size() : this.action_count == this.actions.size()"
+  };
+
+  EnvironmentClusterState state = 1 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
+  optional string failure_message = 2 [(buf.validate.field).string.max_len = 4096];
+  string kubernetes_namespace = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+  repeated Worker workers = 4 [(buf.validate.field).repeated.max_items = 10000];
+  // Workers currently tracked for the materialization, in any state.
+  int32 worker_count = 5 [(buf.validate.field).int32.gte = 0];
+  bool workers_truncated = 6;
+  repeated EnvironmentAction actions = 7 [(buf.validate.field).repeated.max_items = 10000];
+  // PENDING and ASSIGNED actions currently tracked.
+  int32 action_count = 8 [(buf.validate.field).int32.gte = 0];
+  bool actions_truncated = 9;
+  repeated WorkerError recent_worker_errors = 10 [(buf.validate.field).repeated.max_items = 50];
+}
+
+// Worker is the bounded view of one worker pod.
+message Worker {
+  string id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 253
+  ];
+  WorkerState state = 2 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
+  optional string state_detail = 3 [(buf.validate.field).string.max_len = 1024];
+  optional string error = 4 [(buf.validate.field).string.max_len = 4096];
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp last_heartbeat_at = 6;
+  optional int32 active_tasks = 7;
+  optional int32 task_capacity = 8;
+}
+
+// EnvironmentAction is one pending or assigned action attempt on an environment.
+message EnvironmentAction {
+  option (buf.validate.message).cel = {
+    id: "environment_action.assignment"
+    message: "pending actions must not have worker_id and assigned actions must have worker_id"
+    expression: "(this.assignment_state != 1 || !has(this.worker_id)) && (this.assignment_state != 2 || has(this.worker_id))"
+  };
+
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+  uint32 attempt = 2 [(buf.validate.field).uint32.gt = 0];
+  EnvironmentActionAssignmentState assignment_state = 3 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
+  optional string worker_id = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 253
+  ];
+}
+
+// WorkerError is a recent worker failure, retained after the worker exits.
+message WorkerError {
+  string worker_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 253
+  ];
+  string error = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 4096
+  ];
+  google.protobuf.Timestamp observed_at = 3 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp exited_at = 4;
+}

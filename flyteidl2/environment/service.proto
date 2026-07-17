@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package flyteidl2.environment;
+
+import "flyteidl2/environment/payload.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/environment";
+
+// EnvironmentService exposes environment configuration and per-cluster status.
+service EnvironmentService {
+  // ListEnvironments returns one item per environment name with its versions
+  // and their lightweight cluster summaries. The request's limit and token
+  // page over environment names.
+  rpc ListEnvironments(ListEnvironmentsRequest) returns (ListEnvironmentsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // GetEnvironment returns one environment version and its full per-cluster status snapshots.
+  rpc GetEnvironment(GetEnvironmentRequest) returns (GetEnvironmentResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
