@@ -34,10 +34,12 @@ message LoggingContext {
   map<string, string> kubernetes_pod_labels = 9;
   common.Sort.Direction order = 10;
   uint64 number_of_batches = 11;
-  // +optional, Pod-name prefixes used by log sources to narrow stream/pod searches. The first
-  // element is the task's own pod-name prefix; later elements cover pods living outside it
-  // (e.g. a shared Ray cluster's head/worker pods).
-  repeated string pod_name_prefix = 12;
+  // +optional, Pod-name prefix used by log sources to narrow stream/pod searches.
+  string pod_name_prefix = 12;
+  // +optional, additional pod-name prefixes for pods living outside pod_name_prefix (e.g. a
+  // shared Ray cluster's head/worker pods). Consumers should scope searches to pod_name_prefix
+  // plus these.
+  repeated string pod_name_prefixes = 13;
 }
 
 // Parameters of environment in which logs were collected. Should contain everything
