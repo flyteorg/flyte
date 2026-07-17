@@ -74,6 +74,11 @@ message Action {
     // the spec for a condition action. this will be required if the action is to execute a condition.
     flyteidl2.workflow.ConditionAction condition = 9;
   }
+
+  // set server-side when this action was recovered from a prior run instead of executed:
+  // identifies the source action (source run id + action name) whose result was reused.
+  // never set by clients on enqueue.
+  flyteidl2.common.ActionIdentifier recovered_from = 10;
 }
 
 // ============================================================================

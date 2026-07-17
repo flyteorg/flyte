@@ -16,6 +16,7 @@ class ActionPhase(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     ACTION_PHASE_ABORTED: _ClassVar[ActionPhase]
     ACTION_PHASE_TIMED_OUT: _ClassVar[ActionPhase]
     ACTION_PHASE_PAUSED: _ClassVar[ActionPhase]
+    ACTION_PHASE_RECOVERED: _ClassVar[ActionPhase]
 ACTION_PHASE_UNSPECIFIED: ActionPhase
 ACTION_PHASE_QUEUED: ActionPhase
 ACTION_PHASE_WAITING_FOR_RESOURCES: ActionPhase
@@ -26,3 +27,4 @@ ACTION_PHASE_FAILED: ActionPhase
 ACTION_PHASE_ABORTED: ActionPhase
 ACTION_PHASE_TIMED_OUT: ActionPhase
 ACTION_PHASE_PAUSED: ActionPhase
+ACTION_PHASE_RECOVERED: ActionPhase
