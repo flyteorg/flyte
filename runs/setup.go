@@ -12,6 +12,7 @@ import (
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
 	"github.com/getsentry/sentry-go"
+	"github.com/getsentry/sentry-go/attribute"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
@@ -44,19 +45,31 @@ func sentryDisabled() bool {
 	return disabled
 }
 
-// sentryInterceptor reports server-side CreateRun failures to Sentry. Client-caused
-// errors (invalid argument, not found, ...) are intentionally not reported.
+// sentryInterceptor reports server-side CreateRun failures to Sentry and emits
+// a "flyte.operation" counter per CreateRun call. Client-caused errors
+// (invalid argument, not found, ...) are intentionally not reported as
+// exceptions.
 func sentryInterceptor() connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
 			resp, err := next(ctx, req)
-			if err != nil && req.Spec().Procedure == workflowconnect.RunServiceCreateRunProcedure {
-				switch connect.CodeOf(err) {
-				case connect.CodeInternal, connect.CodeUnknown, connect.CodeDataLoss:
-					hub := sentry.CurrentHub().Clone()
-					hub.Scope().SetTag("procedure", req.Spec().Procedure)
-					hub.CaptureException(err)
+			if req.Spec().Procedure == workflowconnect.RunServiceCreateRunProcedure {
+				attrs := []attribute.Builder{attribute.String("operation", "create_run")}
+				if err != nil {
+					attrs = append(attrs,
+						attribute.String("status", "error"),
+						attribute.String("error_code", connect.CodeOf(err).String()),
+					)
+					switch connect.CodeOf(err) {
+					case connect.CodeInternal, connect.CodeUnknown, connect.CodeDataLoss:
+						hub := sentry.CurrentHub().Clone()
+						hub.Scope().SetTag("procedure", req.Spec().Procedure)
+						hub.CaptureException(err)
+					}
+				} else {
+					attrs = append(attrs, attribute.String("status", "success"))
 				}
+				sentry.NewMeter(ctx).Count("flyte.operation", 1, sentry.WithAttributes(attrs...))
 			}
 			return resp, err
 		}
@@ -94,6 +107,13 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 			return fmt.Errorf("initializing sentry: %w", err)
 		}
 		runsInterceptors = append(runsInterceptors, sentryInterceptor())
+		// Sentry sends async; flush buffered events/metrics on shutdown so they
+		// aren't lost when the pod stops.
+		sc.AddWorker("sentry-flush", func(ctx context.Context) error {
+			<-ctx.Done()
+			sentry.Flush(2 * time.Second)
+			return nil
+		})
 		logger.Infof(ctx, "Sentry error reporting enabled")
 	}
 
