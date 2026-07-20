@@ -35,6 +35,12 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	if spec.GetReplicas() < 1 {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "replicas must be >= 1, got %d", spec.GetReplicas())
 	}
+	// buildJobSetName reserves pod-index digits up to maxReplicasForNaming so the derived
+	// pod names stay within the 63-char limit. Beyond that the reservation is exceeded and
+	// the JobSet webhook would reject the pods, so fail fast with a clear spec error instead.
+	if spec.GetReplicas() > maxReplicasForNaming {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "replicas must be <= %d, got %d", maxReplicasForNaming, spec.GetReplicas())
+	}
 	if spec.GetNprocPerNode() < 1 {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nproc_per_node must be >= 1, got %d", spec.GetNprocPerNode())
 	}

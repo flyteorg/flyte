@@ -45,7 +45,7 @@ const maxReplicasForNaming = 100000
 // so the result is independent of the replica count and matches on both the create
 // and lookup paths.
 func buildJobSetName(generatedName string) string {
-	name := utils.ConvertToDNS1123SubdomainCompatibleString(generatedName)
+	name := toDNS1035Label(generatedName)
 
 	maxPodIdx := strconv.Itoa(maxReplicasForNaming - 1)
 	// placement.GenPodName("", ...) yields exactly the "-<replicatedJob>-<jobIdx>-<podIdx>"
@@ -61,10 +61,27 @@ func buildJobSetName(generatedName string) string {
 	}
 
 	if fixedLengthID, err := encoding.FixedLengthUniqueID(name, stdlibutils.MaxUniqueIDLength); err == nil && maxLen > len(fixedLengthID)+1 {
-		prefix := strings.TrimRight(name[:maxLen-len(fixedLengthID)-1], ".-")
+		prefix := strings.TrimRight(name[:maxLen-len(fixedLengthID)-1], "-")
 		return prefix + "-" + fixedLengthID
 	}
-	return strings.TrimRight(name[:maxLen], ".-")
+	return strings.TrimRight(name[:maxLen], "-")
+}
+
+// toDNS1035Label coerces an arbitrary string into a valid RFC 1035 DNS label:
+// starts with a letter, ends with an alphanumeric, and contains only [-a-z0-9]
+// (no dots). The JobSet name becomes a component of the child Job/Pod names, which
+// JobSet's admission webhook validates as DNS-1035 labels. ConvertToDNS1123Subdomain-
+// CompatibleString only targets the looser subdomain rules and can legally retain a
+// '.' or a leading digit, either of which would make the derived label invalid and be
+// rejected by the webhook — so we tighten it here.
+func toDNS1035Label(name string) string {
+	name = utils.ConvertToDNS1123SubdomainCompatibleString(name)
+	name = strings.ReplaceAll(name, ".", "-")
+	name = strings.Trim(name, "-")
+	if name == "" || name[0] < 'a' || name[0] > 'z' {
+		name = "x" + name
+	}
+	return name
 }
 
 // Name of the sole ReplicatedJob in the JobSet. Pod names follow the pattern
