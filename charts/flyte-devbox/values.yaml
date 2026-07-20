@@ -77,6 +77,11 @@ flyte-binary:
             - _U_EP_OVERRIDE: 'flyte-binary-http.{{ .Release.Namespace }}:8090'
             - _U_INSECURE: "true"
             - _U_USE_ACTIONS: "1"
+            # Disable OpenSSL's ARM capability detection. Docker Desktop's
+            # Apple-Silicon VM advertises SVE/SVE2 via HWCAP but cannot execute
+            # those instructions, so cryptography/OpenSSL SIGILLs (exit 132) on
+            # import. Forcing generic code paths avoids the illegal instruction.
+            - OPENSSL_armcap: "0"
       runs:
         database:
           postgres:
@@ -96,6 +101,9 @@ flyte-binary:
           - _U_EP_OVERRIDE: 'flyte-binary-http.{{ .Release.Namespace }}:8090'
           - _U_INSECURE: "true"
           - _U_USE_ACTIONS: "1"
+          # See note above: avoid SVE-related SIGILL from OpenSSL on the
+          # Apple-Silicon Docker Desktop VM.
+          - OPENSSL_armcap: "0"
       webhook:
         secretManagerTypes:
           - Embedded

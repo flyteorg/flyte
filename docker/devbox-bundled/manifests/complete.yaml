@@ -7843,6 +7843,7 @@ data:
       - _U_EP_OVERRIDE: flyte-binary-http.flyte:8090
       - _U_INSECURE: "true"
       - _U_USE_ACTIONS: "1"
+      - OPENSSL_armcap: "0"
       enabled: true
       ingressAppsPort: 30081
       scheme: http
@@ -7855,6 +7856,7 @@ data:
         - _U_EP_OVERRIDE: flyte-binary-http.flyte:8090
         - _U_INSECURE: "true"
         - _U_USE_ACTIONS: "1"
+        - OPENSSL_armcap: "0"
     runs:
       database:
         postgres:
@@ -8656,7 +8658,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: b3c98afcd1c1a1aca5040d049159f6a8683facf7875920987bab9a9df6dc8f97
+        checksum/configuration: a68b7731c32351a5f09fcc989168c7da52ea644afbfcb7cee0fb989598128223
         checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
       labels:
         app.kubernetes.io/component: flyte-binary
