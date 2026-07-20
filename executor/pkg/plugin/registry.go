@@ -53,11 +53,12 @@ func (r *Registry) Initialize(ctx context.Context) error {
 
 	// Load k8s plugins
 	for _, entry := range r.pluginRegistry.GetK8sPlugins() {
-		// ClusterPlugin entries have no plain Plugin and are driven by an external
-		// ClusterPluginManager, not the executor.
-		if entry.Plugin == nil {
+		if entry.Plugin != nil {
 			logger.Infof(ctx, "Skipping k8s plugin %q: cluster plugin entries are not supported by the executor", entry.ID)
 			continue
+		}
+		if entry.Plugin == nil {
+			return fmt.Errorf("invalid k8s plugin entry %q: Plugin is nil", entry.ID)
 		}
 		pm := executorK8s.NewPluginManager(
 			entry.ID,

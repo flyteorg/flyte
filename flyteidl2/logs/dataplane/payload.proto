@@ -37,9 +37,7 @@ message LoggingContext {
   // +optional. Deprecated: use pod_name_prefixes. Still populated with the task's own pod-name
   // prefix for readers that predate pod_name_prefixes.
   string pod_name_prefix = 12 [deprecated = true];
-  // +optional, pod-name prefixes used by log sources to narrow stream/pod searches. The first
-  // element is the task's own pod-name prefix; later elements cover pods living outside it
-  // (e.g. a shared Ray cluster's head/worker pods).
+  // +optional, pod-name prefixes used by log sources to narrow stream/pod searches.
   repeated string pod_name_prefixes = 13;
 }
 
