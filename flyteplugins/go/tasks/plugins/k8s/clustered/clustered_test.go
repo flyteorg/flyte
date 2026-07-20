@@ -1002,9 +1002,22 @@ func TestBuildJobSetName_ShortNameUnchanged(t *testing.T) {
 func TestBuildJobSetName_SanitizesInvalidChars(t *testing.T) {
 	// Uppercase/underscore aren't DNS-1123 subdomain compatible; they must be normalized.
 	name := buildJobSetName("My_Run")
-	assert.Empty(t, validation.IsDNS1123Subdomain(name))
+	assert.Empty(t, validation.IsDNS1035Label(name))
 	assert.NotContains(t, name, "_")
 	assert.Equal(t, strings.ToLower(name), name)
+}
+
+func TestBuildJobSetName_CoercesToDNS1035Label(t *testing.T) {
+	// The JobSet name becomes a component of the child pod names, which the webhook
+	// validates as DNS-1035 labels: no dots, must start with a letter. A generated
+	// name with a dot or a leading digit must not leak into the derived names.
+	for _, generated := range []string{"my.run-a0-0", "9run-a0-0", "0.1.2", "svc.default.a0"} {
+		name := buildJobSetName(generated)
+		assert.Empty(t, validation.IsDNS1035Label(name), "jobset name %q (from %q) is not a valid DNS-1035 label", name, generated)
+		assert.NotContains(t, name, ".", "jobset name %q retained a dot", name)
+		podName := longestPodName(name, maxReplicasForNaming)
+		assert.Empty(t, validation.IsDNS1035Label(podName), "derived pod name %q invalid (from %q)", podName, generated)
+	}
 }
 
 func TestBuildJobSetName_LongNameFitsPodLimit(t *testing.T) {
@@ -1014,8 +1027,9 @@ func TestBuildJobSetName_LongNameFitsPodLimit(t *testing.T) {
 
 	// The name is derived from the generated name alone (no replica count), so a single
 	// bounded name must keep the longest pod name valid across every supported replica
-	// count, including the worst case the truncation reserves for.
-	assert.Empty(t, validation.IsDNS1123Subdomain(name), "jobset name not a valid subdomain")
+	// count, including the worst case the truncation reserves for. The name itself must
+	// be a valid DNS-1035 label, since it's embedded in the derived Job/Pod names.
+	assert.Empty(t, validation.IsDNS1035Label(name), "jobset name not a valid DNS-1035 label")
 	for _, replicas := range []int32{1, 4, 16, 128, 1024, 10000, maxReplicasForNaming} {
 		podName := longestPodName(name, replicas)
 		assert.LessOrEqual(t, len(podName), dns1035LabelMaxLength, "pod name %q (%d chars) exceeds limit for replicas=%d", podName, len(podName), replicas)
@@ -1035,7 +1049,7 @@ func TestBuildJobSetName_NoTrailingSeparator(t *testing.T) {
 	name := buildJobSetName(strings.Repeat("x", 50) + "." + strings.Repeat("y", 50))
 	assert.NotEqual(t, "-", name[len(name)-1:])
 	assert.NotEqual(t, ".", name[len(name)-1:])
-	assert.Empty(t, validation.IsDNS1123Subdomain(name))
+	assert.Empty(t, validation.IsDNS1035Label(name))
 }
 
 // TestBuildResourceAndIdentityNameMatch guards the create/lookup invariant: BuildResource
@@ -1064,7 +1078,26 @@ func TestBuildResourceAndIdentityNameMatch(t *testing.T) {
 
 	assert.Equal(t, created.GetName(), identity.GetName(), "create and lookup names diverge")
 	assert.NotEqual(t, longGeneratedName, created.GetName(), "long name should have been truncated")
-	assert.Empty(t, validation.IsDNS1123Subdomain(created.GetName()))
+	assert.Empty(t, validation.IsDNS1035Label(created.GetName()))
 	podName := longestPodName(created.GetName(), maxReplicasForNaming)
 	assert.LessOrEqual(t, len(podName), dns1035LabelMaxLength)
+}
+
+// TestBuildResource_ReplicasExceedNamingBudget verifies BuildResource fails fast with a
+// spec error when replicas exceeds the pod-index budget buildJobSetName reserves for; past
+// that bound the derived pod names could exceed 63 chars and be rejected by the webhook.
+func TestBuildResource_ReplicasExceedNamingBudget(t *testing.T) {
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:     maxReplicasForNaming + 1,
+		NprocPerNode: 1,
+		Runtime: &clusteredpb.Runtime{
+			Kind: &clusteredpb.Runtime_Torchrun{Torchrun: &clusteredpb.TorchRuntime{}},
+		},
+	}
+	taskCtx := dummyTaskCtx(buildTaskTemplate(spec))
+	handler := clusteredResourceHandler{}
+
+	_, err := handler.BuildResource(context.Background(), taskCtx)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "replicas must be <=")
 }
