@@ -798,8 +798,8 @@ func (_m *ClusterPlugin) EXPECT() *ClusterPlugin_Expecter {
 }
 
 // BuildClusterIdentityResource provides a mock function for the type ClusterPlugin
-func (_mock *ClusterPlugin) BuildClusterIdentityResource(ctx context.Context, taskCtx core.TaskExecutionMetadata) (client.Object, error) {
-	ret := _mock.Called(ctx, taskCtx)
+func (_mock *ClusterPlugin) BuildClusterIdentityResource(ctx context.Context, taskMeta core.TaskExecutionMetadata) (client.Object, error) {
+	ret := _mock.Called(ctx, taskMeta)
 
 	if len(ret) == 0 {
 		panic("no return value specified for BuildClusterIdentityResource")
@@ -808,17 +808,17 @@ func (_mock *ClusterPlugin) BuildClusterIdentityResource(ctx context.Context, ta
 	var r0 client.Object
 	var r1 error
 	if returnFunc, ok := ret.Get(0).(func(context.Context, core.TaskExecutionMetadata) (client.Object, error)); ok {
-		return returnFunc(ctx, taskCtx)
+		return returnFunc(ctx, taskMeta)
 	}
 	if returnFunc, ok := ret.Get(0).(func(context.Context, core.TaskExecutionMetadata) client.Object); ok {
-		r0 = returnFunc(ctx, taskCtx)
+		r0 = returnFunc(ctx, taskMeta)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(client.Object)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, core.TaskExecutionMetadata) error); ok {
-		r1 = returnFunc(ctx, taskCtx)
+		r1 = returnFunc(ctx, taskMeta)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -832,12 +832,12 @@ type ClusterPlugin_BuildClusterIdentityResource_Call struct {
 
 // BuildClusterIdentityResource is a helper method to define mock.On call
 //   - ctx context.Context
-//   - taskCtx core.TaskExecutionMetadata
-func (_e *ClusterPlugin_Expecter) BuildClusterIdentityResource(ctx interface{}, taskCtx interface{}) *ClusterPlugin_BuildClusterIdentityResource_Call {
-	return &ClusterPlugin_BuildClusterIdentityResource_Call{Call: _e.mock.On("BuildClusterIdentityResource", ctx, taskCtx)}
+//   - taskMeta core.TaskExecutionMetadata
+func (_e *ClusterPlugin_Expecter) BuildClusterIdentityResource(ctx interface{}, taskMeta interface{}) *ClusterPlugin_BuildClusterIdentityResource_Call {
+	return &ClusterPlugin_BuildClusterIdentityResource_Call{Call: _e.mock.On("BuildClusterIdentityResource", ctx, taskMeta)}
 }
 
-func (_c *ClusterPlugin_BuildClusterIdentityResource_Call) Run(run func(ctx context.Context, taskCtx core.TaskExecutionMetadata)) *ClusterPlugin_BuildClusterIdentityResource_Call {
+func (_c *ClusterPlugin_BuildClusterIdentityResource_Call) Run(run func(ctx context.Context, taskMeta core.TaskExecutionMetadata)) *ClusterPlugin_BuildClusterIdentityResource_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -860,7 +860,7 @@ func (_c *ClusterPlugin_BuildClusterIdentityResource_Call) Return(object client.
 	return _c
 }
 
-func (_c *ClusterPlugin_BuildClusterIdentityResource_Call) RunAndReturn(run func(ctx context.Context, taskCtx core.TaskExecutionMetadata) (client.Object, error)) *ClusterPlugin_BuildClusterIdentityResource_Call {
+func (_c *ClusterPlugin_BuildClusterIdentityResource_Call) RunAndReturn(run func(ctx context.Context, taskMeta core.TaskExecutionMetadata) (client.Object, error)) *ClusterPlugin_BuildClusterIdentityResource_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -934,8 +934,8 @@ func (_c *ClusterPlugin_BuildClusterResource_Call) RunAndReturn(run func(ctx con
 }
 
 // BuildJobIdentityResource provides a mock function for the type ClusterPlugin
-func (_mock *ClusterPlugin) BuildJobIdentityResource(ctx context.Context, taskCtx core.TaskExecutionMetadata) (client.Object, error) {
-	ret := _mock.Called(ctx, taskCtx)
+func (_mock *ClusterPlugin) BuildJobIdentityResource(ctx context.Context, taskMeta core.TaskExecutionMetadata) (client.Object, error) {
+	ret := _mock.Called(ctx, taskMeta)
 
 	if len(ret) == 0 {
 		panic("no return value specified for BuildJobIdentityResource")
@@ -944,17 +944,17 @@ func (_mock *ClusterPlugin) BuildJobIdentityResource(ctx context.Context, taskCt
 	var r0 client.Object
 	var r1 error
 	if returnFunc, ok := ret.Get(0).(func(context.Context, core.TaskExecutionMetadata) (client.Object, error)); ok {
-		return returnFunc(ctx, taskCtx)
+		return returnFunc(ctx, taskMeta)
 	}
 	if returnFunc, ok := ret.Get(0).(func(context.Context, core.TaskExecutionMetadata) client.Object); ok {
-		r0 = returnFunc(ctx, taskCtx)
+		r0 = returnFunc(ctx, taskMeta)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(client.Object)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, core.TaskExecutionMetadata) error); ok {
-		r1 = returnFunc(ctx, taskCtx)
+		r1 = returnFunc(ctx, taskMeta)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -968,12 +968,12 @@ type ClusterPlugin_BuildJobIdentityResource_Call struct {
 
 // BuildJobIdentityResource is a helper method to define mock.On call
 //   - ctx context.Context
-//   - taskCtx core.TaskExecutionMetadata
-func (_e *ClusterPlugin_Expecter) BuildJobIdentityResource(ctx interface{}, taskCtx interface{}) *ClusterPlugin_BuildJobIdentityResource_Call {
-	return &ClusterPlugin_BuildJobIdentityResource_Call{Call: _e.mock.On("BuildJobIdentityResource", ctx, taskCtx)}
+//   - taskMeta core.TaskExecutionMetadata
+func (_e *ClusterPlugin_Expecter) BuildJobIdentityResource(ctx interface{}, taskMeta interface{}) *ClusterPlugin_BuildJobIdentityResource_Call {
+	return &ClusterPlugin_BuildJobIdentityResource_Call{Call: _e.mock.On("BuildJobIdentityResource", ctx, taskMeta)}
 }
 
-func (_c *ClusterPlugin_BuildJobIdentityResource_Call) Run(run func(ctx context.Context, taskCtx core.TaskExecutionMetadata)) *ClusterPlugin_BuildJobIdentityResource_Call {
+func (_c *ClusterPlugin_BuildJobIdentityResource_Call) Run(run func(ctx context.Context, taskMeta core.TaskExecutionMetadata)) *ClusterPlugin_BuildJobIdentityResource_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -996,7 +996,7 @@ func (_c *ClusterPlugin_BuildJobIdentityResource_Call) Return(object client.Obje
 	return _c
 }
 
-func (_c *ClusterPlugin_BuildJobIdentityResource_Call) RunAndReturn(run func(ctx context.Context, taskCtx core.TaskExecutionMetadata) (client.Object, error)) *ClusterPlugin_BuildJobIdentityResource_Call {
+func (_c *ClusterPlugin_BuildJobIdentityResource_Call) RunAndReturn(run func(ctx context.Context, taskMeta core.TaskExecutionMetadata) (client.Object, error)) *ClusterPlugin_BuildJobIdentityResource_Call {
 	_c.Call.Return(run)
 	return _c
 }
