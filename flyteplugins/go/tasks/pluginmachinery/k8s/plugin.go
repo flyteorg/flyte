@@ -121,7 +121,7 @@ type Plugin interface {
 type ClusterPlugin interface {
 	// GetClusterName returns a deterministic name for the cluster backing this task. Implementations
 	// typically hash the task's plugin-spec proto so that identical specs collapse onto the same
-	// cluster. The framework sanitizes the result into a DNS1123 subdomain before use.
+	// cluster. Callers should sanitize the result into a DNS1123 subdomain before use.
 	GetClusterName(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (string, error)
 
 	// BuildClusterResource builds the full cluster object (e.g. a RayCluster) that will be posted to
@@ -130,7 +130,7 @@ type ClusterPlugin interface {
 
 	// BuildClusterIdentityResource builds a query object (type/object meta only) used to GET the
 	// cluster for readiness checks.
-	BuildClusterIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (client.Object, error)
+	BuildClusterIdentityResource(ctx context.Context, taskMeta pluginsCore.TaskExecutionMetadata) (client.Object, error)
 
 	// IsClusterReady reports whether the cluster can accept jobs.
 	IsClusterReady(ctx context.Context, pluginContext PluginContext, cluster client.Object) (bool, error)
@@ -140,7 +140,7 @@ type ClusterPlugin interface {
 	BuildJobResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, clusterName string) (client.Object, error)
 
 	// BuildJobIdentityResource builds a query object (type/object meta only) used to GET the job.
-	BuildJobIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (client.Object, error)
+	BuildJobIdentityResource(ctx context.Context, taskMeta pluginsCore.TaskExecutionMetadata) (client.Object, error)
 
 	// GetJobPhase analyses the job resource and reports the status as a TaskPhase. This is analogous
 	// to Plugin.GetTaskPhase and is expected to be relatively fast.
@@ -149,11 +149,11 @@ type ClusterPlugin interface {
 	// GetProperties returns properties desired by the plugin (mirrors Plugin.GetProperties).
 	GetProperties() PluginProperties
 
-	// StartCleanup is called once at plugin load time with the kube client the plugin's
-	// resources live on. Cluster resources outlive individual tasks, so the plugin owns their
-	// cleanup: implementations typically start a background loop that deletes clusters (and any
-	// resources retained with them) once they have been idle past their TTL. The loop must exit
-	// when ctx is done; implementations with nothing to clean up may make this a no-op.
+	// StartCleanup is intended to be called once by the component driving ClusterPlugins, with the
+	// kube client the plugin's resources live on. Cluster resources outlive individual tasks, so the
+	// plugin owns their cleanup: implementations typically start a background loop that deletes idle
+	// clusters (and any resources retained with them) once they have been idle past their TTL. The
+	// loop must exit when ctx is done; implementations with nothing to clean up may make this a no-op.
 	StartCleanup(ctx context.Context, kubeClient pluginsCore.KubeClient)
 }
 

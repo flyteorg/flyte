@@ -780,7 +780,7 @@ func getEventInfoForRayJob(ctx context.Context, logConfig logs.LogConfig, plugin
 // different lookup (e.g. jobs submitted to a pre-existing cluster via ClusterSelector) reuse the
 // exact same link handling.
 func UpdateLinkReadiness(phaseInfo *pluginsCore.PhaseInfo, ready bool) {
-	if phaseInfo.Info() == nil {
+	if phaseInfo == nil || phaseInfo.Info() == nil {
 		return
 	}
 	for _, tl := range phaseInfo.Info().Logs {
