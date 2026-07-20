@@ -215,9 +215,7 @@ type LoggingContext struct {
 	//
 	// Deprecated: Marked as deprecated in flyteidl2/logs/dataplane/payload.proto.
 	PodNamePrefix string `protobuf:"bytes,12,opt,name=pod_name_prefix,json=podNamePrefix,proto3" json:"pod_name_prefix,omitempty"`
-	// +optional, pod-name prefixes used by log sources to narrow stream/pod searches. The first
-	// element is the task's own pod-name prefix; later elements cover pods living outside it
-	// (e.g. a shared Ray cluster's head/worker pods).
+	// +optional, pod-name prefixes used by log sources to narrow stream/pod searches.
 	PodNamePrefixes []string `protobuf:"bytes,13,rep,name=pod_name_prefixes,json=podNamePrefixes,proto3" json:"pod_name_prefixes,omitempty"`
 }
 
