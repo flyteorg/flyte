@@ -524,10 +524,6 @@ func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec, taskCtx plu
 			Affinity:    config.GetK8sPluginConfig().DefaultAffinity,
 		},
 	}
-	// Carry the task's execution labels/annotations, sourced the same way the head and worker
-	// pod templates source theirs (buildHeadPodTemplate/buildWorkerPodTemplate). KubeRay uses
-	// SubmitterPodTemplate verbatim, so without them the submitter pod is invisible to anything
-	// that locates a task's pods by its execution metadata (e.g. log tailing).
 	k8sCfg := config.GetK8sPluginConfig()
 	podTemplateSpec.SetLabels(utils.UnionMaps(k8sCfg.DefaultLabels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels())))
 	podTemplateSpec.SetAnnotations(utils.UnionMaps(k8sCfg.DefaultAnnotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations())))
