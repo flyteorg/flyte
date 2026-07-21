@@ -23,12 +23,6 @@ data:
     logger:
       show-source: true
       level: {{ default 1 .Values.configuration.logging.level }}
-    # Flyte-native secrets (flyte create secret): the secret service writes Kubernetes
-    # Secrets into this namespace, and the pod webhook's embedded secret manager reads
-    # them back from the same namespace. Keep the two in sync.
-    secret:
-      kubernetes:
-        namespace: {{ .Release.Namespace }}
     webhook:
       certDir: /var/run/flyte/certs
       localCert: true

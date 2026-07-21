@@ -39,9 +39,14 @@ flyte-core-components:
     download:
       maxExpiresIn: 1h
 
+  # Flyte-native secrets (flyte create secret): the secret service writes Kubernetes
+  # Secrets into this namespace, and the pod webhook's embedded secret manager reads
+  # them back from the same namespace (webhook.embeddedSecretManagerConfig.k8sConfig
+  # in the ConfigMap template). Keep the two in sync. Rendered through tpl, so it
+  # defaults to the release namespace.
   secret:
     kubernetes:
-      namespace: "flyte"
+      namespace: '{{ .Release.Namespace }}'
       kubeconfig: ""
       qps: 100
       burst: 200
