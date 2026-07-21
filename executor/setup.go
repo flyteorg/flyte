@@ -140,10 +140,6 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		podNamespace = sc.Namespace
 	}
 
-	// Populate the flytek8s.DefaultPodTemplateStore read during pod construction, so both the
-	// global plugins.k8s default-pod-template-name and per-task pod_template_name resolve.
-	// Failing to sync (e.g. a missing `podtemplates` RBAC grant) fails startup: silently
-	// running with an empty store is exactly the bug this wiring fixes.
 	informerFactory := informers.NewSharedInformerFactory(kubeClient, 0)
 	if err := watchPodTemplates(informerFactory, podNamespace); err != nil {
 		return fmt.Errorf("executor: failed to register PodTemplate event handler: %w", err)
