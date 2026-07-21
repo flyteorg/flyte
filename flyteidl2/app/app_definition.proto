@@ -112,8 +112,7 @@ message Condition {
   // Message for the condition.
   string message = 3;
 
-  // Revision the Condition applies to. This can be used by consumers
-  // to introspect and visualize which revisions are up.
+  // Optimistic-concurrency counter bumped on every status write. This is NOT a
   uint64 revision = 4 [(buf.validate.field).uint64.gte = 0];
 
   // Actor is the principal that caused the condition.
@@ -122,6 +121,9 @@ message Condition {
   // Finer-grained substate qualifying deployment_status (e.g. FAILED + IMAGE_PULL_ERROR).
   // Human-readable detail for a failure is carried in the existing `message` field.
   Status.Substate substate = 6;
+
+  // Identity of the deployment this Condition applies to (the functional spec hash).
+  string deployment_id = 7;
 }
 
 // Represents the status of an app.
