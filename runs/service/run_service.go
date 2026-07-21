@@ -259,6 +259,12 @@ func (s *RunService) CreateRun(
 		if offloaded := triggerDetails.GetSpec().GetOffloadedInputData(); offloaded != nil && request.GetInputWrapper() == nil {
 			request.InputWrapper = &workflow.CreateRunRequest_OffloadedInputData{OffloadedInputData: offloaded}
 		}
+		// Restore the run spec captured at registration (env vars, labels, annotations,
+		// interruptible, etc.) so trigger-fired runs carry them. The scheduler fires with only
+		// a TriggerName and no run spec, so without this those overrides are silently dropped.
+		if runSpec == nil {
+			runSpec = triggerDetails.GetSpec().GetRunSpec()
+		}
 		triggerKickoffArg = triggerDetails.GetAutomationSpec().GetSchedule().GetKickoffTimeInputArg()
 	}
 

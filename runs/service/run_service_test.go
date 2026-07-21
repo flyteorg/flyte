@@ -28,6 +28,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	projectMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
+	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
@@ -1162,6 +1163,109 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	assert.Equal(t, "rtest99999", run.Action.Id.Run.Name)
 	assert.Equal(t, "a0", run.Action.Id.Name)
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_QUEUED, run.Action.Status.Phase)
+}
+
+// TestCreateRun_TriggerFire_CarriesRunSpecEnvVars locks in that a run fired from a trigger
+// carries the run-level env vars captured in the trigger's stored run spec. The scheduler fires
+// with only a TriggerName (no run spec), so CreateRun must restore the run spec from the trigger
+// — otherwise Trigger(env_vars=...) is silently dropped before the pod is built.
+func TestCreateRun_TriggerFire_CarriesRunSpecEnvVars(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	triggerRepo := &repoMocks.TriggerRepo{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(taskRepo)
+	repo.On("TriggerRepo").Return(triggerRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	// Trigger stored at registration with a run-level env var.
+	triggerSpecBytes, err := proto.Marshal(&triggerpb.TriggerSpec{
+		TaskVersion: "v1",
+		RunSpec: &task.RunSpec{
+			Envs: &task.Envs{
+				Values: []*core.KeyValuePair{
+					{Key: "TRIGGER_ENV", Value: "from-trigger"},
+				},
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	triggerRepo.On("GetTrigger", mock.Anything, mock.Anything).Return(&models.Trigger{
+		Project:        "myproj",
+		Domain:         "production",
+		TaskName:       "mytask",
+		Name:           "mytrigger",
+		TaskVersion:    "v1",
+		LatestRevision: 1,
+		Spec:           triggerSpecBytes,
+	}, nil).Once()
+
+	// Task referenced by the trigger.
+	taskRepo.On("GetTask", mock.Anything, mock.Anything).Return(&models.Task{}, nil).Once()
+	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Maybe()
+
+	// Capture the persisted action so we can inspect the run spec it carries.
+	var persisted *models.Action
+	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).
+		Run(func(args mock.Arguments) {
+			persisted = args.Get(1).(*models.Action)
+		}).
+		Return(&models.Run{
+			Project: "myproj",
+			Domain:  "production",
+			RunName: "rtrig1",
+			Name:    "a0",
+			Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		}, nil).Once()
+
+	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+	actionsClient.On("Enqueue", mock.Anything, mock.Anything).
+		Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{
+				Project: "myproj",
+				Domain:  "production",
+				Name:    "rtrig1",
+			},
+		},
+		Task: &workflow.CreateRunRequest_TriggerName{
+			TriggerName: &common.TriggerName{
+				Project:  "myproj",
+				Domain:   "production",
+				TaskName: "mytask",
+				Name:     "mytrigger",
+			},
+		},
+		Source: workflow.RunSource_RUN_SOURCE_SCHEDULE_TRIGGER,
+	}
+
+	_, err = svc.CreateRun(context.Background(), connect.NewRequest(req))
+	require.NoError(t, err)
+
+	require.NotNil(t, persisted, "CreateAction should have been called")
+	var gotRunSpec task.RunSpec
+	require.NoError(t, proto.Unmarshal(persisted.RunSpec, &gotRunSpec))
+	gotEnv := map[string]string{}
+	for _, kv := range gotRunSpec.GetEnvs().GetValues() {
+		gotEnv[kv.GetKey()] = kv.GetValue()
+	}
+	assert.Equal(t, "from-trigger", gotEnv["TRIGGER_ENV"],
+		"trigger-fired run must carry the trigger's run-level env vars")
 }
 
 func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
