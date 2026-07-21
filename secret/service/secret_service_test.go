@@ -170,15 +170,15 @@ func TestSecretService_List_RejectsProjectWithoutDomain(t *testing.T) {
 	require.Error(t, err)
 }
 
-func TestServiceCreatedSecretIsReadableByWebhookFetcher(t *testing.T) {
+func TestK8sSecretWrittenByServiceIsReadableByWebhookFetcher(t *testing.T) {
 	// End-to-end naming compatibility: a Secret written by CreateSecret must be
 	// found by the K8sSecretFetcher the pod webhook's embedded secret manager
 	// uses, via the scope-fallback lookup IDs derived from task pod labels.
 	// This is the invariant that, when broken, silently delivers no secrets.
 	podLabels := map[string]string{
-		"organization": defaultOrganization,
-		"domain":       "development",
-		"project":      "flytesnacks",
+		flytesecret.OrganizationLabel: defaultOrganization,
+		flytesecret.DomainLabel:       "development",
+		flytesecret.ProjectLabel:      "flytesnacks",
 	}
 
 	for _, tc := range []struct {
@@ -192,15 +192,16 @@ func TestServiceCreatedSecretIsReadableByWebhookFetcher(t *testing.T) {
 		t.Run(tc.scope, func(t *testing.T) {
 			encoded, k8sName, err := getK8sSecretName(context.Background(), tc.id)
 			require.NoError(t, err)
-			k8sSecret, err := buildK8sSecret(encoded, k8sName, "flyte", tc.id,
+			ns := secretNamespace()
+			k8sSecret, err := buildK8sSecret(encoded, k8sName, ns, tc.id,
 				&secretpb.SecretSpec{Value: &secretpb.SecretSpec_StringValue{StringValue: "v"}})
 			require.NoError(t, err)
-			// fake typed clientset stores StringData as-is only via Data; mimic API server behavior
+			// Fake typed clientset does not merge StringData into Data; mimic apiserver behavior.
 			k8sSecret.Data = map[string][]byte{encoded: []byte("v")}
+			k8sSecret.StringData = nil
 
 			fetcher := flytesecret.NewK8sSecretFetcher(
-				k8sFake.NewSimpleClientset(k8sSecret).CoreV1().Secrets("flyte"))
-
+				k8sFake.NewSimpleClientset(k8sSecret).CoreV1().Secrets(ns))
 			// Walk scopes exactly like EmbeddedSecretManagerInjector.lookUpSecret.
 			ids := []string{
 				flytesecret.EncodeSecretName(podLabels["organization"], podLabels["domain"], podLabels["project"], "sec"),
