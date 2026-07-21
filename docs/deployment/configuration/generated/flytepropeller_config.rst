@@ -433,7 +433,7 @@ Path (string)
   ""
   
 
-RawPath (string)
+Fragment (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -441,26 +441,6 @@ RawPath (string)
 .. code-block:: yaml
 
   ""
-  
-
-OmitHost (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "false"
-  
-
-ForceQuery (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "false"
   
 
 RawQuery (string)
@@ -473,7 +453,7 @@ RawQuery (string)
   ""
   
 
-Fragment (string)
+RawPath (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -491,6 +471,26 @@ RawFragment (string)
 .. code-block:: yaml
 
   ""
+  
+
+ForceQuery (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+OmitHost (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 deviceflow.Config
@@ -6104,6 +6104,28 @@ Vault Secret Manager config.
   annotations: null
   kvVersion: "2"
   role: flyte
+  
+
+disableCreateMutatingWebhookConfig (bool)
+------------------------------------------------------------------------------------------------------------------------
+
+Disable registration of the MutatingWebhookConfiguration, leaving it to be managed out of band.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+namespaceSelector (v1.LabelSelector)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
   
 
 config.AWSSecretManagerConfig

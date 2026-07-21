@@ -39,14 +39,13 @@ If you need clarification after reading this document, we encourage you to join 
 
 ### Code Contributors
 
-We’re excited that you’re interested in contributing code to Flyte! Before you start, please take a look at our [Quickstart](https://www.union.ai/docs/v2/flyte/user-guide/quickstart/) docs, it includes setup instructions, build steps, and details on running your first workflow locally.
+We’re excited that you’re interested in contributing code to Flyte! Before you start, please take a look at our [Getting started](https://www.union.ai/docs/v1/flyte/user-guide/getting-started/) docs, it includes setup instructions, build steps, and details on running your first workflow locally.
 
 #### Recommendation Order (For Beginners)
 
-- Finish reading [Core Concepts](https://www.union.ai/docs/v2/flyte/user-guide/core-concepts/)
-- Finish reading [Connecting a Cluster](https://www.union.ai/docs/v2/flyte/user-guide/connecting-to-a-cluster/)
-- Finish reading [Projects and Domain](https://www.union.ai/docs/v2/flyte/user-guide/projects-and-domains/) 
-- Finish reading [From Flyte 1 to Flyte 2](https://www.union.ai/docs/v2/flyte/user-guide/flyte-2/) 
+- Finish reading [Core Concepts](https://www.union.ai/docs/v1/flyte/user-guide/core-concepts/)
+- Finish reading [Connecting a Cluster](https://www.union.ai/docs/v1/flyte/user-guide/getting-started/local-setup/)
+- Finish reading [Projects and Domains](https://www.union.ai/docs/v1/flyte/user-guide/development-cycle/projects-and-domains/)
 
 ### Reporting Bugs
 
@@ -62,7 +61,7 @@ Unsure if your contribution is “small”, “large” or whether it fits into 
 
 ### Improving The Documentation
 
-If you notice outdated information or areas that could be clarified, kindly start a discussion in the [contribute](https://flyte-org.slack.com/archives/C04NJPLRWUX) channel on slack. For more information, please checkout [Contributing to documentation](https://www.union.ai/docs/v2/flyte/community/#contributing-to-documentation).
+If you notice outdated information or areas that could be clarified, kindly start a discussion in the [contribute](https://flyte-org.slack.com/archives/C04NJPLRWUX) channel on slack. For more information, please checkout [Contributing to documentation](https://www.union.ai/docs/v1/flyte/community/#contributing-to-documentation).
 
 ### Improving The Design
 

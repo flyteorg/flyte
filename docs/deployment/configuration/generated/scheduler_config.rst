@@ -469,7 +469,7 @@ Path (string)
   ""
   
 
-RawPath (string)
+Fragment (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -477,26 +477,6 @@ RawPath (string)
 .. code-block:: yaml
 
   ""
-  
-
-OmitHost (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "false"
-  
-
-ForceQuery (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "false"
   
 
 RawQuery (string)
@@ -509,7 +489,7 @@ RawQuery (string)
   ""
   
 
-Fragment (string)
+RawPath (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -527,6 +507,26 @@ RawFragment (string)
 .. code-block:: yaml
 
   ""
+  
+
+ForceQuery (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+OmitHost (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 deviceflow.Config
@@ -2837,16 +2837,6 @@ template (string)
 .. code-block:: yaml
 
   '{{ project }}-{{ domain }}'
-  
-
-templateData (map[string]interfaces.DataSource)
-------------------------------------------------------------------------------------------------------------------------
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  null
   
 
 Section: notifications
@@ -7092,7 +7082,6 @@ security (`config.ServerSecurityOptions`_)
   - flyte-authorization
   allowedOrigins:
   - '*'
-  auditAccess: false
   insecureCookieHeader: false
   secure: false
   ssl:
@@ -7115,22 +7104,6 @@ grpc (`config.GrpcConfig`_)
   serverReflection: true
   
 
-thirdPartyConfig (`config.ThirdPartyConfigOptions`_)
-------------------------------------------------------------------------------------------------------------------------
-
-Deprecated please use auth.appAuth.thirdPartyConfig instead.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  flyteClient:
-    audience: ""
-    clientId: ""
-    redirectUri: ""
-    scopes: []
-  
-
 dataProxy (`config.DataProxyConfig`_)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -7145,7 +7118,6 @@ Defines data proxy configuration.
   upload:
     defaultFileNameLength: 20
     maxExpiresIn: 1h0m0s
-    maxSize: 6Mi
     storagePrefix: ""
   
 
@@ -7201,7 +7173,6 @@ Defines data proxy upload configuration.
 
   defaultFileNameLength: 20
   maxExpiresIn: 1h0m0s
-  maxSize: 6Mi
   storagePrefix: ""
   
 
@@ -7234,18 +7205,6 @@ Maximum allowed expiration duration.
 
 config.DataProxyUploadConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-maxSize (`resource.Quantity`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Maximum allowed upload size.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  6Mi
-  
 
 maxExpiresIn (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -7420,16 +7379,6 @@ useAuth (bool)
   
 
 insecureCookieHeader (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "false"
-  
-
-auditAccess (bool)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 

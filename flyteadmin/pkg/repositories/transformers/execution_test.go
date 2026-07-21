@@ -113,6 +113,8 @@ func TestCreateExecutionModel(t *testing.T) {
 		expectedSpecBytes, _ := proto.Marshal(expectedSpec)
 		assert.Equal(t, expectedSpecBytes, execution.Spec)
 		assert.Equal(t, execution.User, principal)
+		assert.Nil(t, execution.ErrorKind)
+		assert.Nil(t, execution.ErrorCode)
 
 		expectedCreatedAt, _ := ptypes.TimestampProto(createdAt)
 		expectedClosure, _ := proto.Marshal(&admin.ExecutionClosure{
@@ -172,6 +174,10 @@ func TestCreateExecutionModel(t *testing.T) {
 		expectedSpecBytes, _ := proto.Marshal(expectedSpec)
 		assert.Equal(t, expectedSpecBytes, execution.Spec)
 		assert.Equal(t, execution.User, principal)
+		assert.NotNil(t, execution.ErrorKind)
+		assert.Equal(t, core.ExecutionError_SYSTEM.String(), *execution.ErrorKind)
+		assert.NotNil(t, execution.ErrorCode)
+		assert.Equal(t, "Unknown", *execution.ErrorCode)
 
 		expectedCreatedAt, _ := ptypes.TimestampProto(createdAt)
 		expectedClosure, _ := proto.Marshal(&admin.ExecutionClosure{
@@ -238,6 +244,10 @@ func TestCreateExecutionModel(t *testing.T) {
 		expectedSpecBytes, _ := proto.Marshal(expectedSpec)
 		assert.Equal(t, expectedSpecBytes, execution.Spec)
 		assert.Equal(t, execution.User, principal)
+		assert.NotNil(t, execution.ErrorKind)
+		assert.Equal(t, core.ExecutionError_USER.String(), *execution.ErrorKind)
+		assert.NotNil(t, execution.ErrorCode)
+		assert.Equal(t, codes.InvalidArgument.String(), *execution.ErrorCode)
 
 		expectedCreatedAt, _ := ptypes.TimestampProto(createdAt)
 		expectedClosure, _ := proto.Marshal(&admin.ExecutionClosure{
@@ -304,6 +314,10 @@ func TestCreateExecutionModel(t *testing.T) {
 		expectedSpecBytes, _ := proto.Marshal(expectedSpec)
 		assert.Equal(t, expectedSpecBytes, execution.Spec)
 		assert.Equal(t, execution.User, principal)
+		assert.NotNil(t, execution.ErrorKind)
+		assert.Equal(t, core.ExecutionError_SYSTEM.String(), *execution.ErrorKind)
+		assert.NotNil(t, execution.ErrorCode)
+		assert.Equal(t, codes.Internal.String(), *execution.ErrorCode)
 
 		expectedCreatedAt, _ := ptypes.TimestampProto(createdAt)
 		expectedClosure, _ := proto.Marshal(&admin.ExecutionClosure{

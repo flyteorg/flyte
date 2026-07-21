@@ -1254,6 +1254,30 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 	assert.Equal(t, phaseInfo.Version(), pluginsCore.DefaultPhaseVersion+1)
 }
 
+// A new RayJob (empty JobDeploymentStatus) must still go through
+// MaybeUpdatePhaseVersionFromPluginContext so that updates (e.g. log links) are
+// reflected via a phase version bump rather than being dropped by an early exit.
+func TestGetTaskPhaseNewJobIncreasePhaseVersion(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+
+	ctx := context.TODO()
+
+	pluginState := k8s.PluginState{
+		Phase:        pluginsCore.PhaseQueued,
+		PhaseVersion: pluginsCore.DefaultPhaseVersion,
+		Reason:       "task submitted to K8s",
+	}
+	pluginCtx := newPluginContext(pluginState)
+
+	rayObject := &rayv1.RayJob{}
+	rayObject.Status.JobDeploymentStatus = rayv1.JobDeploymentStatusNew
+	phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
+
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseQueued.String(), phaseInfo.Phase().String())
+	assert.Equal(t, pluginsCore.DefaultPhaseVersion+1, phaseInfo.Version())
+}
+
 func TestGetEventInfo_LogTemplates(t *testing.T) {
 	pluginCtx := newPluginContext(k8s.PluginState{})
 	testCases := []struct {

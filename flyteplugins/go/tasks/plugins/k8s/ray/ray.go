@@ -671,14 +671,12 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
-	if len(rayJob.Status.JobDeploymentStatus) == 0 {
-		return pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "Scheduling", info), nil
-	}
-
 	var phaseInfo pluginsCore.PhaseInfo
 
 	// KubeRay creates a Ray cluster first, and then submits a Ray job to the cluster
 	switch rayJob.Status.JobDeploymentStatus {
+	case rayv1.JobDeploymentStatusNew:
+		phaseInfo, err = pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "Scheduling", info), nil
 	case rayv1.JobDeploymentStatusInitializing:
 		phaseInfo, err = pluginsCore.PhaseInfoInitializing(pluginsCore.DefaultPhaseVersion, "cluster is creating", info), nil
 	case rayv1.JobDeploymentStatusRunning:

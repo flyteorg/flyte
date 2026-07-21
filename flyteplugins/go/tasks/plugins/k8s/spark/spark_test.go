@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+	"time"
 
 	sparkOp "github.com/kubeflow/spark-operator/api/v1beta2"
 	"github.com/stretchr/testify/assert"
@@ -171,6 +172,88 @@ func TestGetEventInfo(t *testing.T) {
 	}
 
 	assert.Equal(t, expectedLinks, generatedLinks)
+}
+
+func TestGetEventInfoTimestamps(t *testing.T) {
+	assert.NoError(t, setSparkConfig(&Config{
+		LogConfig: LogConfig{
+			Mixed: logs.LogConfig{
+				IsCloudwatchEnabled:   true,
+				CloudwatchTemplateURI: "https://logs.example.com/{{ .podName }}?start={{ .podUnixStartTime }}&end={{ .podUnixFinishTime }}&rfc3339start={{ .podRFC3339StartTime }}",
+			},
+		},
+	}))
+
+	creationTime := v1.NewTime(v1.Now().Add(-10 * time.Minute))
+	terminationTime := v1.NewTime(v1.Now().Add(-1 * time.Minute))
+
+	t.Run("running app has start time but no finish time", func(t *testing.T) {
+		app := &sparkOp.SparkApplication{
+			ObjectMeta: v1.ObjectMeta{
+				Name:              "spark-app-name",
+				Namespace:         "spark-namespace",
+				CreationTimestamp: creationTime,
+			},
+			Status: sparkOp.SparkApplicationStatus{
+				SparkApplicationID: "app-id",
+				AppState: sparkOp.ApplicationState{
+					State: sparkOp.ApplicationStateRunning,
+				},
+				DriverInfo: sparkOp.DriverInfo{
+					PodName:             "spark-pod",
+					WebUIIngressAddress: sparkUIAddress,
+				},
+				ExecutionAttempts: 1,
+			},
+		}
+
+		taskTemplate := dummySparkTaskTemplateContainer("blah-1", dummySparkConf)
+		taskCtx := dummySparkTaskContext(taskTemplate, false, k8s.PluginState{})
+		info, err := getEventInfoForSpark(taskCtx, app, taskTemplate)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, info.Logs)
+
+		driverLogURI := info.Logs[0].GetUri()
+		expectedStart := strconv.FormatInt(creationTime.Unix(), 10)
+		assert.Contains(t, driverLogURI, "start="+expectedStart)
+		assert.NotContains(t, driverLogURI, "start=0")
+		assert.Contains(t, driverLogURI, "end=0")
+	})
+
+	t.Run("completed app has start and finish time from TerminationTime", func(t *testing.T) {
+		app := &sparkOp.SparkApplication{
+			ObjectMeta: v1.ObjectMeta{
+				Name:              "spark-app-name",
+				Namespace:         "spark-namespace",
+				CreationTimestamp: creationTime,
+			},
+			Status: sparkOp.SparkApplicationStatus{
+				SparkApplicationID: "app-id",
+				AppState: sparkOp.ApplicationState{
+					State: sparkOp.ApplicationStateCompleted,
+				},
+				TerminationTime: terminationTime,
+				DriverInfo: sparkOp.DriverInfo{
+					PodName:             "spark-pod",
+					WebUIIngressAddress: sparkUIAddress,
+				},
+				ExecutionAttempts: 1,
+			},
+		}
+
+		taskTemplate := dummySparkTaskTemplateContainer("blah-1", dummySparkConf)
+		taskCtx := dummySparkTaskContext(taskTemplate, false, k8s.PluginState{})
+		info, err := getEventInfoForSpark(taskCtx, app, taskTemplate)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, info.Logs)
+
+		driverLogURI := info.Logs[0].GetUri()
+		expectedStart := strconv.FormatInt(creationTime.Unix(), 10)
+		expectedFinish := strconv.FormatInt(terminationTime.Unix(), 10)
+		assert.Contains(t, driverLogURI, "start="+expectedStart)
+		assert.Contains(t, driverLogURI, "end="+expectedFinish)
+		assert.NotContains(t, driverLogURI, "end=0")
+	})
 }
 
 func TestGetTaskPhase(t *testing.T) {
@@ -384,7 +467,7 @@ func dummySparkTaskTemplateDriverExecutor(id string, sparkConf map[string]string
 	}
 }
 
-func dummySparkTaskTemplatePod(id string, sparkConf map[string]string, podSpec *corev1.PodSpec) *core.TaskTemplate {
+func dummySparkTaskTemplatePod(id string, sparkConf map[string]string, podSpec *corev1.PodSpec, podMetadata *core.K8SObjectMetadata) *core.TaskTemplate {
 	// add driver/executor pod below
 	sparkJob := dummySparkCustomObj(sparkConf)
 	sparkJobJSON, err := utils.MarshalToString(sparkJob)
@@ -409,7 +492,8 @@ func dummySparkTaskTemplatePod(id string, sparkConf map[string]string, podSpec *
 		Type: "k8s_pod",
 		Target: &core.TaskTemplate_K8SPod{
 			K8SPod: &core.K8SPod{
-				PodSpec: podSpecPb,
+				Metadata: podMetadata,
+				PodSpec:  podSpecPb,
 			},
 		},
 		Config: map[string]string{
@@ -866,8 +950,12 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	podSpec := dummyPodSpec()
 	podSpec.Tolerations = append(podSpec.Tolerations, extraToleration)
 	podSpec.NodeSelector = map[string]string{"x/custom": "foo"}
-	taskTemplate := dummySparkTaskTemplatePod("blah-1", dummySparkConf, podSpec)
-	taskTemplate.GetK8SPod()
+	podMetadata := &core.K8SObjectMetadata{
+		Annotations: map[string]string{"annotation-2": "val2"},
+		Labels:      map[string]string{"label-2": "val2"},
+	}
+
+	taskTemplate := dummySparkTaskTemplatePod("blah-1", dummySparkConf, podSpec, podMetadata)
 	sparkResourceHandler := sparkResourceHandler{}
 
 	taskCtx := dummySparkTaskContext(taskTemplate, true, k8s.PluginState{})
@@ -897,8 +985,8 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, sparkApplicationFile, *sparkApp.Spec.MainApplicationFile)
 
 	// Driver
-	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultAnnotations, map[string]string{"annotation-1": "val1"}), sparkApp.Spec.Driver.Annotations)
-	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultLabels, map[string]string{"label-1": "val1"}), sparkApp.Spec.Driver.Labels)
+	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultAnnotations, map[string]string{"annotation-1": "val1", "annotation-2": "val2"}), sparkApp.Spec.Driver.Annotations)
+	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultLabels, map[string]string{"label-1": "val1", "label-2": "val2"}), sparkApp.Spec.Driver.Labels)
 	assert.Equal(t, len(findEnvVarByName(sparkApp.Spec.Driver.Env, "FLYTE_MAX_ATTEMPTS").Value), 1)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Driver.Env, "foo").Value)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Driver.Env, "fooEnv").Value)
@@ -935,8 +1023,8 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, dummySparkConf["spark.driver.memory"], *sparkApp.Spec.Driver.Memory)
 
 	// Executor
-	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultAnnotations, map[string]string{"annotation-1": "val1"}), sparkApp.Spec.Executor.Annotations)
-	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultLabels, map[string]string{"label-1": "val1"}), sparkApp.Spec.Executor.Labels)
+	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultAnnotations, map[string]string{"annotation-1": "val1", "annotation-2": "val2"}), sparkApp.Spec.Executor.Annotations)
+	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultLabels, map[string]string{"label-1": "val1", "label-2": "val2"}), sparkApp.Spec.Executor.Labels)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Executor.Env, "foo").Value)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Executor.Env, "fooEnv").Value)
 	assert.Equal(t, findEnvVarByName(dummyEnvVarsWithSecretRef, "SECRET"), findEnvVarByName(sparkApp.Spec.Executor.Env, "SECRET"))
@@ -973,6 +1061,49 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, intPtr(int32(instances)), sparkApp.Spec.Executor.Instances)
 	assert.Equal(t, intPtr(int32(cores)), sparkApp.Spec.Executor.Cores)
 	assert.Equal(t, dummySparkConf["spark.executor.memory"], *sparkApp.Spec.Executor.Memory)
+}
+
+func TestBuildResourcePriorityClassName(t *testing.T) {
+	defaultConfig := defaultPluginConfig()
+	assert.NoError(t, config.SetK8sPluginConfig(defaultConfig))
+
+	const priorityClassName = "high-priority"
+	podSpec := dummyPodSpec()
+	podSpec.PriorityClassName = priorityClassName
+	taskTemplate := dummySparkTaskTemplatePod("blah-1", dummySparkConf, podSpec, nil)
+
+	sparkResourceHandler := sparkResourceHandler{}
+	taskCtx := dummySparkTaskContext(taskTemplate, true, k8s.PluginState{})
+	resource, err := sparkResourceHandler.BuildResource(context.TODO(), taskCtx)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, resource)
+	sparkApp, ok := resource.(*sparkOp.SparkApplication)
+	assert.True(t, ok)
+
+	assert.NotNil(t, sparkApp.Spec.Driver.PriorityClassName)
+	assert.Equal(t, priorityClassName, *sparkApp.Spec.Driver.PriorityClassName)
+	assert.NotNil(t, sparkApp.Spec.Executor.PriorityClassName)
+	assert.Equal(t, priorityClassName, *sparkApp.Spec.Executor.PriorityClassName)
+}
+
+func TestBuildResourceNoPriorityClassName(t *testing.T) {
+	defaultConfig := defaultPluginConfig()
+	assert.NoError(t, config.SetK8sPluginConfig(defaultConfig))
+
+	taskTemplate := dummySparkTaskTemplateContainer("blah-1", dummySparkConf)
+	sparkResourceHandler := sparkResourceHandler{}
+	taskCtx := dummySparkTaskContext(taskTemplate, true, k8s.PluginState{})
+	resource, err := sparkResourceHandler.BuildResource(context.TODO(), taskCtx)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, resource)
+	sparkApp, ok := resource.(*sparkOp.SparkApplication)
+	assert.True(t, ok)
+
+	// When no priority class is set, the field should be left unset (nil) rather than an empty string.
+	assert.Nil(t, sparkApp.Spec.Driver.PriorityClassName)
+	assert.Nil(t, sparkApp.Spec.Executor.PriorityClassName)
 }
 
 func TestGetPropertiesSpark(t *testing.T) {
