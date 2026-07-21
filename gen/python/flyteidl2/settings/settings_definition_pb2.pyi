@@ -87,16 +87,6 @@ class BoolSetting(_message.Message):
     scope_level: ScopeLevel
     def __init__(self, state: _Optional[_Union[SettingState, str]] = ..., bool_value: bool = ..., scope_level: _Optional[_Union[ScopeLevel, str]] = ...) -> None: ...
 
-class StringListSetting(_message.Message):
-    __slots__ = ["state", "list_value", "scope_level"]
-    STATE_FIELD_NUMBER: _ClassVar[int]
-    LIST_VALUE_FIELD_NUMBER: _ClassVar[int]
-    SCOPE_LEVEL_FIELD_NUMBER: _ClassVar[int]
-    state: SettingState
-    list_value: StringValues
-    scope_level: ScopeLevel
-    def __init__(self, state: _Optional[_Union[SettingState, str]] = ..., list_value: _Optional[_Union[StringValues, _Mapping]] = ..., scope_level: _Optional[_Union[ScopeLevel, str]] = ...) -> None: ...
-
 class StringMapSetting(_message.Message):
     __slots__ = ["state", "map_value", "scope_level"]
     STATE_FIELD_NUMBER: _ClassVar[int]
@@ -134,12 +124,10 @@ class SecuritySettings(_message.Message):
     def __init__(self, service_account: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
 
 class StorageSettings(_message.Message):
-    __slots__ = ["raw_data_path", "run_base_dir"]
+    __slots__ = ["raw_data_path"]
     RAW_DATA_PATH_FIELD_NUMBER: _ClassVar[int]
-    RUN_BASE_DIR_FIELD_NUMBER: _ClassVar[int]
     raw_data_path: StringSetting
-    run_base_dir: StringSetting
-    def __init__(self, raw_data_path: _Optional[_Union[StringSetting, _Mapping]] = ..., run_base_dir: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
+    def __init__(self, raw_data_path: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
 
 class TaskResourceDefaults(_message.Message):
     __slots__ = ["cpu", "gpu", "memory", "storage"]

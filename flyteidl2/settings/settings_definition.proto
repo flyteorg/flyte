@@ -113,16 +113,6 @@ message BoolSetting {
   ScopeLevel scope_level = 3;
 }
 
-// A setting that holds a list of strings.
-// Merge behavior: additive (parent-first concatenation). UNSET clears
-// accumulated values from parent scopes.
-message StringListSetting {
-  SettingState state = 1;
-  // Meaningful only when state = VALUE.
-  StringValues list_value = 2;
-  ScopeLevel scope_level = 3;
-}
-
 // A setting that holds a string-to-string map.
 // Merge behavior: child entries override parent on key conflict. UNSET clears
 // accumulated entries from parent scopes.
@@ -151,7 +141,7 @@ message QuantitySetting {
 message RunSettings {
   StringSetting default_queue = 1 [(flyteidl2.settings.desc) = "Default queue for task runs"];
   Int64Setting max_action_concurrency = 2 [(flyteidl2.settings.desc) = "Maximum number of actions of a run that may execute concurrently. 0 or unset means unlimited."];
-  StringSetting run_base_dir = 3 [(flyteidl2.settings.desc) = "the default source directory that Flyte uses as the base for code bundling and import resolution"];
+  StringSetting run_base_dir = 3 [(flyteidl2.settings.desc) = "Base directory for run metadata such as inputs/outputs (e.g. s3://my-bucket/prefix)"];
 }
 
 // SecuritySettings controls security-related configuration.
@@ -162,7 +152,9 @@ message SecuritySettings {
 // StorageSettings controls data storage configuration.
 message StorageSettings {
   StringSetting raw_data_path = 1 [(flyteidl2.settings.desc) = "Base path for raw data storage (e.g. s3://my-bucket/prefix)"];
-  StringSetting run_base_dir = 2 [(flyteidl2.settings.desc) = "Base directory for run metadata such as inputs/outputs (e.g. s3://my-bucket/prefix)"];
+  // run_base_dir moved to RunSettings; nothing read it here.
+  reserved 2;
+  reserved "run_base_dir";
 }
 
 // TaskResourceDefaults holds resource quantity settings for a single bound
