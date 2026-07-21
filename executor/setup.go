@@ -11,6 +11,7 @@ import (
 	"connectrpc.com/otelconnect"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -27,6 +28,7 @@ import (
 	webhookPkg "github.com/flyteorg/flyte/v2/executor/pkg/webhook"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	cachecatalog "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog/cache_service"
 	webhookConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	connectorplugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/webapi/connector"
@@ -54,6 +56,15 @@ func init() {
 // Useful for callers that need to pass the scheme to InitKubernetesClient.
 func Scheme() *runtime.Scheme {
 	return scheme
+}
+
+// watchPodTemplates wires a PodTemplate informer into the flytek8s.DefaultPodTemplateStore,
+// with defaultNamespace as the fallback namespace for template lookups.
+func watchPodTemplates(informerFactory informers.SharedInformerFactory, defaultNamespace string) error {
+	flytek8s.DefaultPodTemplateStore.SetDefaultNamespace(defaultNamespace)
+	_, err := informerFactory.Core().V1().PodTemplates().Informer().AddEventHandler(
+		flytek8s.GetPodTemplateUpdatesHandler(&flytek8s.DefaultPodTemplateStore))
+	return err
 }
 
 // Setup registers the executor as a background worker on the SetupContext.
@@ -122,6 +133,20 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if podNamespace == "" {
 		podNamespace = sc.Namespace
 	}
+
+	// Populate the flytek8s.DefaultPodTemplateStore read during pod construction, so both the
+	// global plugins.k8s default-pod-template-name and per-task pod_template_name resolve.
+	// Uses a standalone informer rather than the manager cache so a missing `podtemplates`
+	// RBAC grant degrades to watch-error logs instead of failing manager cache sync.
+	informerFactory := informers.NewSharedInformerFactory(kubeClient, 0)
+	if err := watchPodTemplates(informerFactory, podNamespace); err != nil {
+		return fmt.Errorf("executor: failed to register PodTemplate event handler: %w", err)
+	}
+	sc.AddWorker("podtemplate-informer", func(ctx context.Context) error {
+		informerFactory.Start(ctx.Done())
+		<-ctx.Done()
+		return nil
+	})
 
 	executorScope := promutils.NewScope("executor")
 
