@@ -208,15 +208,17 @@ func TestK8sSecretWrittenByServiceIsReadableByWebhookFetcher(t *testing.T) {
 				flytesecret.EncodeSecretName(podLabels["organization"], podLabels["domain"], "", "sec"),
 				flytesecret.EncodeSecretName(podLabels["organization"], "", "", "sec"),
 			}
-			var found bool
+			expectedID := flytesecret.EncodeSecretName(defaultOrganization, tc.id.GetDomain(), tc.id.GetProject(), tc.id.GetName())
+			var foundID string
 			for _, id := range ids {
-				if v, err := fetcher.GetSecretValue(context.Background(), id); err == nil {
+				v, err := fetcher.GetSecretValue(context.Background(), id)
+				if err == nil {
 					assert.Equal(t, "v", string(v.BinaryValue))
-					found = true
+					foundID = id
 					break
 				}
 			}
-			assert.True(t, found, "secret created at %s scope not found via any lookup scope", tc.scope)
+			assert.Equal(t, expectedID, foundID, "secret created at %s scope was not found at the expected lookup scope", tc.scope)
 		})
 	}
 }
