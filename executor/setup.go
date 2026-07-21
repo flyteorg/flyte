@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
@@ -14,6 +15,7 @@ import (
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	k8scache "k8s.io/client-go/tools/cache"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -28,8 +30,8 @@ import (
 	webhookPkg "github.com/flyteorg/flyte/v2/executor/pkg/webhook"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	cachecatalog "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog/cache_service"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	webhookConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	connectorplugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/webapi/connector"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
@@ -46,6 +48,10 @@ import (
 var scheme = runtime.NewScheme()
 
 const otelServiceName = "executor"
+
+// podTemplateSyncTimeout bounds the initial PodTemplate informer sync; matches
+// controller-runtime's default cache sync timeout.
+const podTemplateSyncTimeout = 2 * time.Minute
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
@@ -136,14 +142,20 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 	// Populate the flytek8s.DefaultPodTemplateStore read during pod construction, so both the
 	// global plugins.k8s default-pod-template-name and per-task pod_template_name resolve.
-	// Uses a standalone informer rather than the manager cache so a missing `podtemplates`
-	// RBAC grant degrades to watch-error logs instead of failing manager cache sync.
+	// Failing to sync (e.g. a missing `podtemplates` RBAC grant) fails startup: silently
+	// running with an empty store is exactly the bug this wiring fixes.
 	informerFactory := informers.NewSharedInformerFactory(kubeClient, 0)
 	if err := watchPodTemplates(informerFactory, podNamespace); err != nil {
 		return fmt.Errorf("executor: failed to register PodTemplate event handler: %w", err)
 	}
 	sc.AddWorker("podtemplate-informer", func(ctx context.Context) error {
 		informerFactory.Start(ctx.Done())
+		syncCtx, cancel := context.WithTimeout(ctx, podTemplateSyncTimeout)
+		defer cancel()
+		if !k8scache.WaitForCacheSync(syncCtx.Done(), informerFactory.Core().V1().PodTemplates().Informer().HasSynced) {
+			return fmt.Errorf("executor: PodTemplate informer failed to sync within %v; "+
+				"verify the service account can get/list/watch core/v1 podtemplates", podTemplateSyncTimeout)
+		}
 		<-ctx.Done()
 		return nil
 	})
