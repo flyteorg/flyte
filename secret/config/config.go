@@ -1,6 +1,7 @@
 package config
 
 import (
+	webhookconfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
@@ -15,7 +16,9 @@ var defaultConfig = &Config{
 		Host: "0.0.0.0",
 	},
 	Kubernetes: app.K8sConfig{
-		Namespace:   "flyte",
+		// Same constant the pod webhook's embedded K8s secret fetcher defaults to —
+		// the webhook reads back the Secrets this service writes.
+		Namespace:   webhookconfig.DefaultSecretsNamespace,
 		QPS:         100,
 		Burst:       200,
 		Timeout:     "30s",

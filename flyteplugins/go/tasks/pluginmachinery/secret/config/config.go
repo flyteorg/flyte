@@ -19,6 +19,11 @@ import (
 const (
 	EmbeddedSecretsFileMountInitContainerName = "init-embedded-secret"
 	DefaultSecretEnvVarPrefix                 = "_UNION_"
+
+	// DefaultSecretsNamespace is the namespace flyte-native secrets are stored in by
+	// default. The secret service writes Kubernetes Secrets here, and the webhook's
+	// embedded K8s secret fetcher reads them back — both defaults must stay in sync.
+	DefaultSecretsNamespace = "flyte"
 )
 
 var (
@@ -77,8 +82,7 @@ var (
 		EmbeddedSecretManagerConfig: EmbeddedSecretManagerConfig{
 			Type: EmbeddedSecretManagerTypeK8s,
 			K8sConfig: K8sConfig{
-				// Must match the secret service's kubernetes.namespace (same default).
-				Namespace: "flyte",
+				Namespace: DefaultSecretsNamespace,
 			},
 			FileMountInitContainer: FileMountInitContainerConfig{
 				Image: "public.ecr.aws/docker/library/busybox:latest",
