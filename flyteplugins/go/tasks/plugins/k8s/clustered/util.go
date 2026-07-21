@@ -30,6 +30,26 @@ const dns1035LabelMaxLength = 63
 // 99999 nodes is far beyond any real distributed-training job.
 const maxReplicasForNaming = 100000
 
+// jobSetNameSuffixLen is the number of characters JobSet appends to the JobSet name
+// when deriving its longest child pod name. placement.GenPodName("", ...) yields
+// exactly the "-<replicatedJob>-<jobIdx>-<podIdx>" portion JobSet appends to the
+// JobSet name; "-abcde" mirrors the 5-char random suffix the Job controller adds.
+// This matches what the JobSet webhook validates against.
+func jobSetNameSuffixLen() int {
+	maxPodIdx := strconv.Itoa(maxReplicasForNaming - 1)
+	return len(placement.GenPodName("", workersReplicatedJobName, "0", maxPodIdx)) + len("-abcde")
+}
+
+// generatedNameMaxLength bounds the task's generated name itself, via the plugin's
+// PluginProperties. Plugin managers may stamp GetGeneratedName() directly onto the
+// object they create — overwriting the name BuildResource chose — so truncating
+// inside buildJobSetName alone is not enough: the bound has to hold at the source.
+// Exposing it as GeneratedNameMaxLength makes every execution context that honors
+// the property produce a generated name whose derived child pod names fit the
+// 63-char limit, and buildJobSetName then passes it through unchanged so the
+// create, lookup, and any manager-stamped paths all agree on the same name.
+var generatedNameMaxLength = dns1035LabelMaxLength - jobSetNameSuffixLen()
+
 // buildJobSetName derives the JobSet name from the task's generated name while
 // guaranteeing that the longest child pod name JobSet generates stays within the
 // 63-character DNS-1035 label limit.
@@ -39,20 +59,16 @@ const maxReplicasForNaming = 100000
 // rejects the entire JobSet if it would exceed 63 characters. Composed/nested
 // tasks produce long generated names, so without truncating here the webhook
 // rejects the pods, the plugin retries forever, and the execution is stuck in
-// RUNNING. We truncate to leave room for the suffix JobSet appends and add a hash
-// so distinct executions don't collide. jobIdx is always 0 (single ReplicatedJob
-// with Replicas=1); podIdx is reserved for the worst case (see maxReplicasForNaming)
-// so the result is independent of the replica count and matches on both the create
-// and lookup paths.
+// RUNNING. Generated names are normally already bounded at the source (see
+// generatedNameMaxLength), making this a defense-in-depth no-op; it still truncates
+// with a hash for contexts that don't honor GeneratedNameMaxLength. jobIdx is
+// always 0 (single ReplicatedJob with Replicas=1); podIdx is reserved for the worst
+// case (see maxReplicasForNaming) so the result is independent of the replica count
+// and matches on both the create and lookup paths.
 func buildJobSetName(generatedName string) string {
 	name := toDNS1035Label(generatedName)
 
-	maxPodIdx := strconv.Itoa(maxReplicasForNaming - 1)
-	// placement.GenPodName("", ...) yields exactly the "-<replicatedJob>-<jobIdx>-<podIdx>"
-	// portion JobSet appends to the JobSet name; "-abcde" mirrors the 5-char random suffix
-	// the Job controller adds. This matches what the JobSet webhook validates against.
-	suffixLen := len(placement.GenPodName("", workersReplicatedJobName, "0", maxPodIdx)) + len("-abcde")
-	maxLen := dns1035LabelMaxLength - suffixLen
+	maxLen := dns1035LabelMaxLength - jobSetNameSuffixLen()
 	if maxLen < 1 {
 		maxLen = 1
 	}
