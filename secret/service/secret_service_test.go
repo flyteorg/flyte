@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	k8sRuntime "k8s.io/apimachinery/pkg/runtime"
+	k8sFake "k8s.io/client-go/kubernetes/fake"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
@@ -167,4 +168,54 @@ func TestSecretService_List_RejectsProjectWithoutDomain(t *testing.T) {
 	s := NewSecretService(k)
 	_, err := s.ListSecrets(context.Background(), connect.NewRequest(&secretpb.ListSecretsRequest{Project: "flytesnacks"}))
 	require.Error(t, err)
+}
+
+func TestServiceCreatedSecretIsReadableByWebhookFetcher(t *testing.T) {
+	// End-to-end naming compatibility: a Secret written by CreateSecret must be
+	// found by the K8sSecretFetcher the pod webhook's embedded secret manager
+	// uses, via the scope-fallback lookup IDs derived from task pod labels.
+	// This is the invariant that, when broken, silently delivers no secrets.
+	podLabels := map[string]string{
+		"organization": defaultOrganization,
+		"domain":       "development",
+		"project":      "flytesnacks",
+	}
+
+	for _, tc := range []struct {
+		scope string
+		id    *secretpb.SecretIdentifier
+	}{
+		{"project", &secretpb.SecretIdentifier{Domain: "development", Project: "flytesnacks", Name: "sec"}},
+		{"domain", &secretpb.SecretIdentifier{Domain: "development", Name: "sec"}},
+		{"org", &secretpb.SecretIdentifier{Name: "sec"}},
+	} {
+		t.Run(tc.scope, func(t *testing.T) {
+			encoded, k8sName, err := getK8sSecretName(context.Background(), tc.id)
+			require.NoError(t, err)
+			k8sSecret, err := buildK8sSecret(encoded, k8sName, "flyte", tc.id,
+				&secretpb.SecretSpec{Value: &secretpb.SecretSpec_StringValue{StringValue: "v"}})
+			require.NoError(t, err)
+			// fake typed clientset stores StringData as-is only via Data; mimic API server behavior
+			k8sSecret.Data = map[string][]byte{encoded: []byte("v")}
+
+			fetcher := flytesecret.NewK8sSecretFetcher(
+				k8sFake.NewSimpleClientset(k8sSecret).CoreV1().Secrets("flyte"))
+
+			// Walk scopes exactly like EmbeddedSecretManagerInjector.lookUpSecret.
+			ids := []string{
+				flytesecret.EncodeSecretName(podLabels["organization"], podLabels["domain"], podLabels["project"], "sec"),
+				flytesecret.EncodeSecretName(podLabels["organization"], podLabels["domain"], "", "sec"),
+				flytesecret.EncodeSecretName(podLabels["organization"], "", "", "sec"),
+			}
+			var found bool
+			for _, id := range ids {
+				if v, err := fetcher.GetSecretValue(context.Background(), id); err == nil {
+					assert.Equal(t, "v", string(v.BinaryValue))
+					found = true
+					break
+				}
+			}
+			assert.True(t, found, "secret created at %s scope not found via any lookup scope", tc.scope)
+		})
+	}
 }

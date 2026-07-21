@@ -29,8 +29,13 @@ var (
 		MetricsPrefix:     "flyte:",
 		CertDir:           "/etc/webhook/certs",
 		LocalCert:         false,
-		ListenPort:        9443,
-		SecretManagerType: SecretManagerTypeK8s,
+		ListenPort: 9443,
+		// Embedded + K8s fetcher matches the naming scheme the v2 secret service uses when
+		// `flyte create secret` writes Kubernetes Secrets (md5 of the org/domain/project/name
+		// encoded ID, value stored under the encoded ID key), including scope fallback
+		// (project+domain -> domain -> org). The plain K8s injector references secrets by
+		// md5(key)/key, which the secret service never creates.
+		SecretManagerType: SecretManagerTypeEmbedded,
 		AWSSecretManagerConfig: AWSSecretManagerConfig{
 			SidecarImage: "docker.io/amazon/aws-secrets-manager-secret-sidecar:v0.1.4",
 			Resources: corev1.ResourceRequirements{
@@ -75,6 +80,11 @@ var (
 			KVVersion: KVVersion2,
 		},
 		EmbeddedSecretManagerConfig: EmbeddedSecretManagerConfig{
+			Type: EmbeddedSecretManagerTypeK8s,
+			K8sConfig: K8sConfig{
+				// Must match the secret service's kubernetes.namespace (same default).
+				Namespace: "flyte",
+			},
 			FileMountInitContainer: FileMountInitContainerConfig{
 				Image: "public.ecr.aws/docker/library/busybox:latest",
 				Resources: corev1.ResourceRequirements{
