@@ -14,6 +14,8 @@ type AttrFileConfig struct {
 	*admin.ClusterResourceAttributes
 }
 
+var DefaultAttrFileConfig = &AttrFileConfig{}
+
 // Decorate decorator over ClusterResourceAttributes.
 func (c AttrFileConfig) Decorate() *admin.MatchingAttributes {
 	return &admin.MatchingAttributes{
