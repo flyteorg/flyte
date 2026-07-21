@@ -22,7 +22,11 @@ type clusteredResourceHandler struct{}
 var _ k8s.Plugin = clusteredResourceHandler{}
 
 func (clusteredResourceHandler) GetProperties() k8s.PluginProperties {
-	return k8s.PluginProperties{}
+	// Bound the generated name at the source so any consumer that stamps
+	// GetGeneratedName() onto the JobSet — including plugin managers that overwrite
+	// the object name after BuildResource — yields child pod names within the
+	// 63-char limit. See generatedNameMaxLength in util.go.
+	return k8s.PluginProperties{GeneratedNameMaxLength: &generatedNameMaxLength}
 }
 
 func (clusteredResourceHandler) IsTerminal(_ context.Context, resource client.Object) (bool, error) {

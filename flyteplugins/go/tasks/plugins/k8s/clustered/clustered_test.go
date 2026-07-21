@@ -1044,6 +1044,27 @@ func TestBuildJobSetName_LongNamesAreDistinct(t *testing.T) {
 	assert.NotEqual(t, a, b)
 }
 
+// TestGeneratedNameMaxLength_BoundsSourceName guards the source-of-truth bound: plugin
+// managers may stamp GetGeneratedName() directly onto the JobSet, overwriting the name
+// BuildResource chose, so the plugin advertises GeneratedNameMaxLength and every name
+// within that bound must (a) keep the worst-case derived pod name within the 63-char
+// limit and (b) pass through buildJobSetName unchanged, so a manager-stamped name and
+// the plugin-built name are identical.
+func TestGeneratedNameMaxLength_BoundsSourceName(t *testing.T) {
+	props := clusteredResourceHandler{}.GetProperties()
+	if assert.NotNil(t, props.GeneratedNameMaxLength) {
+		assert.Equal(t, generatedNameMaxLength, *props.GeneratedNameMaxLength)
+	}
+
+	// A generated name at exactly the advertised bound must survive untouched and
+	// still fit the pod-name budget at the worst-case replica count.
+	atBound := "g" + strings.Repeat("a", generatedNameMaxLength-1)
+	assert.Equal(t, atBound, buildJobSetName(atBound))
+	podName := longestPodName(atBound, maxReplicasForNaming)
+	assert.LessOrEqual(t, len(podName), dns1035LabelMaxLength, "pod name %q (%d chars) exceeds limit", podName, len(podName))
+	assert.Empty(t, validation.IsDNS1035Label(podName), "pod name %q invalid", podName)
+}
+
 func TestBuildJobSetName_NoTrailingSeparator(t *testing.T) {
 	// Truncation must not leave a trailing '-' or '.', which would be invalid.
 	name := buildJobSetName(strings.Repeat("x", 50) + "." + strings.Repeat("y", 50))
