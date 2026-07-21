@@ -39,10 +39,6 @@ func Test_cacheFlyteWorkflow(t *testing.T) {
 					Downstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{},
 					Upstream:   map[v1alpha1.NodeID][]v1alpha1.NodeID{},
 				},
-				DeprecatedConnections: v1alpha1.DeprecatedConnections{
-					DownstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{},
-					UpstreamEdges:   map[v1alpha1.NodeID][]v1alpha1.NodeID{},
-				},
 			},
 		}
 
@@ -63,10 +59,6 @@ func Test_cacheFlyteWorkflow(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "abc",
-				DeprecatedConnections: v1alpha1.DeprecatedConnections{
-					DownstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{},
-					UpstreamEdges:   map[v1alpha1.NodeID][]v1alpha1.NodeID{},
-				},
 			},
 			ExecutionConfig: v1alpha1.ExecutionConfig{
 				TaskResources: v1alpha1.TaskResources{

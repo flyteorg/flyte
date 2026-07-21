@@ -14,33 +14,61 @@ inputs:
         primitive:
           datetime: 2018-08-08T22:16:36.860016587Z
 spec:
-  connections:
-    add-one-and-print-0:
-      - sum-non-none-0
-    add-one-and-print-1:
-      - add-one-and-print-2
-      - add-one-and-print-2
-      - sum-and-print-0
-      - sum-and-print-0
-    add-one-and-print-2:
-      - sum-and-print-0
-      - sum-and-print-0
-    add-one-and-print-3:
-      - sum-non-none-0
-      - sum-non-none-0
-    start-node:
-      - print-every-time-0
-      - add-one-and-print-0
-      - add-one-and-print-3
-    sum-and-print-0:
-      - print-every-time-0
-      - print-every-time-0
-      - print-every-time-0
-      - print-every-time-0
-    sum-non-none-0:
-      - add-one-and-print-1
-      - add-one-and-print-1
-      - sum-and-print-0
+  edges:
+    downstream:
+      add-one-and-print-0:
+        - sum-non-none-0
+      add-one-and-print-1:
+        - add-one-and-print-2
+        - add-one-and-print-2
+        - sum-and-print-0
+        - sum-and-print-0
+      add-one-and-print-2:
+        - sum-and-print-0
+        - sum-and-print-0
+      add-one-and-print-3:
+        - sum-non-none-0
+        - sum-non-none-0
+      start-node:
+        - print-every-time-0
+        - add-one-and-print-0
+        - add-one-and-print-3
+      sum-and-print-0:
+        - print-every-time-0
+        - print-every-time-0
+        - print-every-time-0
+        - print-every-time-0
+      sum-non-none-0:
+        - add-one-and-print-1
+        - add-one-and-print-1
+        - sum-and-print-0
+    upstream:
+      add-one-and-print-0:
+        - start-node
+      add-one-and-print-1:
+        - sum-non-none-0
+        - sum-non-none-0
+      add-one-and-print-2:
+        - add-one-and-print-1
+        - add-one-and-print-1
+      add-one-and-print-3:
+        - start-node
+      print-every-time-0:
+        - start-node
+        - sum-and-print-0
+        - sum-and-print-0
+        - sum-and-print-0
+        - sum-and-print-0
+      sum-and-print-0:
+        - add-one-and-print-1
+        - add-one-and-print-1
+        - add-one-and-print-2
+        - add-one-and-print-2
+        - sum-non-none-0
+      sum-non-none-0:
+        - add-one-and-print-0
+        - add-one-and-print-3
+        - add-one-and-print-3
   id: dummy-workflow-1-0
   nodes:
     add-one-and-print-0:
@@ -425,4 +453,3 @@ tasks:
         version: 1.19.0b10
       timeout: 0s
     type: "7"
-
