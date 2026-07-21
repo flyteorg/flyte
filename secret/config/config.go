@@ -16,8 +16,6 @@ var defaultConfig = &Config{
 		Host: "0.0.0.0",
 	},
 	Kubernetes: app.K8sConfig{
-		// Same constant the pod webhook's embedded K8s secret fetcher defaults to —
-		// the webhook reads back the Secrets this service writes.
 		Namespace:   webhookconfig.DefaultSecretsNamespace,
 		QPS:         100,
 		Burst:       200,
