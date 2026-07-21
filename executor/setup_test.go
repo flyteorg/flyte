@@ -17,6 +17,7 @@ import (
 )
 
 func TestWatchPodTemplatesPopulatesDefaultStore(t *testing.T) {
+	flytek8s.DefaultPodTemplateStore = flytek8s.NewPodTemplateStore()
 	podTemplate := &v1.PodTemplate{
 		ObjectMeta: metav1.ObjectMeta{Name: "flyte-template", Namespace: "flyte"},
 		Template: v1.PodTemplateSpec{
@@ -31,7 +32,7 @@ func TestWatchPodTemplatesPopulatesDefaultStore(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	informerFactory.Start(ctx.Done())
-	cache.WaitForCacheSync(ctx.Done(), informerFactory.Core().V1().PodTemplates().Informer().HasSynced)
+	require.True(t, cache.WaitForCacheSync(ctx.Done(), informerFactory.Core().V1().PodTemplates().Informer().HasSynced), "podtemplate informer cache never synced")
 
 	// direct hit in the pod's namespace
 	assert.NotNil(t, flytek8s.DefaultPodTemplateStore.LoadOrDefault("flyte", "flyte-template"))
