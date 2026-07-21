@@ -136,7 +136,7 @@ Chart for basic single Flyte executable deployment
 | flyte-core-components.secret.kubernetes.burst | int | `200` |  |
 | flyte-core-components.secret.kubernetes.clusterName | string | `"flyte-devbox"` |  |
 | flyte-core-components.secret.kubernetes.kubeconfig | string | `""` |  |
-| flyte-core-components.secret.kubernetes.namespace | string | `"flyte"` |  |
+| flyte-core-components.secret.kubernetes.namespace | string | `"{{ .Release.Namespace }}"` |  |
 | flyte-core-components.secret.kubernetes.qps | int | `100` |  |
 | flyte-core-components.secret.kubernetes.timeout | string | `"30s"` |  |
 | fullnameOverride | string | `""` |  |
