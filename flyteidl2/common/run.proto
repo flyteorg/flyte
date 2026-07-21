@@ -23,6 +23,9 @@ enum RelationType {
 
   // The run recovers the parent run, resuming from its last known good state.
   RELATION_TYPE_RECOVER = 2;
+
+  // The run was spawned as a child of the parent run (a nested or sub-run).
+  RELATION_TYPE_SPAWN = 3;
 }
 
 // Relation is a provenance link to the single parent run this run was derived from.
