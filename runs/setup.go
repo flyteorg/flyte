@@ -5,10 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
+	"github.com/getsentry/sentry-go"
+	"github.com/getsentry/sentry-go/attribute"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
@@ -32,6 +36,46 @@ import (
 
 const otelServiceName = "runs-service"
 
+// sentryDSN is hardcoded and is not user configuration
+const sentryDSN = "https://d0e3f0a470b8e1333411eff583cf4004@o4507249423810560.ingest.us.sentry.io/4511135180128256"
+
+// sentryDisabled honors FLYTE_DISABLE_SENTRY, unset or unparsable means enabled.
+func sentryDisabled() bool {
+	disabled, _ := strconv.ParseBool(os.Getenv("FLYTE_DISABLE_SENTRY"))
+	return disabled
+}
+
+// sentryInterceptor reports server-side CreateRun failures to Sentry and emits
+// a "flyte.operation" counter per CreateRun call. Client-caused errors
+// (invalid argument, not found, ...) are intentionally not reported as
+// exceptions.
+func sentryInterceptor() connect.UnaryInterceptorFunc {
+	return func(next connect.UnaryFunc) connect.UnaryFunc {
+		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
+			resp, err := next(ctx, req)
+			if req.Spec().Procedure == workflowconnect.RunServiceCreateRunProcedure {
+				attrs := []attribute.Builder{attribute.String("operation", "create_run")}
+				if err != nil {
+					attrs = append(attrs,
+						attribute.String("status", "error"),
+						attribute.String("error_code", connect.CodeOf(err).String()),
+					)
+					switch connect.CodeOf(err) {
+					case connect.CodeInternal, connect.CodeUnknown, connect.CodeDataLoss:
+						hub := sentry.CurrentHub().Clone()
+						hub.Scope().SetTag("procedure", req.Spec().Procedure)
+						hub.CaptureException(err)
+					}
+				} else {
+					attrs = append(attrs, attribute.String("status", "success"))
+				}
+				sentry.NewMeter(ctx).Count("flyte.operation", 1, sentry.WithAttributes(attrs...))
+			}
+			return resp, err
+		}
+	}
+}
+
 // Setup registers Run and Task service handlers on the SetupContext mux.
 // Requires sc.DB and sc.DataStore to be set.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
@@ -51,6 +95,27 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	)
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
+	}
+
+	// Sentry is on by default with the hardcoded DSN; FLYTE_DISABLE_SENTRY=true opts out.
+	runsInterceptors := []connect.Interceptor{otelInterceptor}
+	if !sentryDisabled() {
+		if err := sentry.Init(sentry.ClientOptions{
+			Dsn:         sentryDSN,
+			Environment: otelServiceName,
+		}); err != nil {
+			logger.Errorf(ctx, "failed to initialize sentry, continuing without it: %v", err)
+		} else {
+			runsInterceptors = append(runsInterceptors, sentryInterceptor())
+			// Sentry sends async; flush buffered events/metrics on shutdown so they
+			// aren't lost when the pod stops.
+			sc.AddWorker("sentry-flush", func(ctx context.Context) error {
+				<-ctx.Done()
+				sentry.Flush(2 * time.Second)
+				return nil
+			})
+			logger.Infof(ctx, "Sentry error reporting enabled")
+		}
 	}
 
 	repo, err := repository.NewRepository(sc.DB, cfg.Database)
@@ -92,7 +157,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	runsSvc := service.NewRunService(repo, actionsClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
 	taskSvc := service.NewTaskService(repo, projectClient)
 
-	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc, connect.WithInterceptors(otelInterceptor))
+	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc, connect.WithInterceptors(runsInterceptors...))
 	sc.Mux.Handle(runsPath, runsHandler)
 	logger.Infof(ctx, "Mounted RunService at %s", runsPath)
 
