@@ -655,8 +655,8 @@ func newStowRawStore(_ context.Context, cfg *Config, metrics *dataStoreMetrics) 
 	kind := cfg.Stow.Kind
 
 	if kind == s3.Kind {
-		secretKeyVal, _ := cfgMap[s3.ConfigSecretKey]
-		secretKeyPath, _ := cfgMap[ConfigSecretKeyPath]
+		secretKeyVal := cfgMap[s3.ConfigSecretKey]
+		secretKeyPath := cfgMap[ConfigSecretKeyPath]
 
 		secretKey, err := resolveSecretKey(secretKeyVal, secretKeyPath)
 		if err != nil {
@@ -720,8 +720,8 @@ func stowFactory(_ context.Context, scheme string, _ DataReference, cfg *Config,
 			cfgMap[s3.ConfigAuthType] = "iam"
 		}
 
-		secretKeyVal, _ := cfgMap[s3.ConfigSecretKey]
-		secretKeyPath, _ := cfgMap[ConfigSecretKeyPath]
+		secretKeyVal := cfgMap[s3.ConfigSecretKey]
+		secretKeyPath := cfgMap[ConfigSecretKeyPath]
 
 		secretKey, err := resolveSecretKey(secretKeyVal, secretKeyPath)
 		if err != nil {

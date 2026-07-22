@@ -6,7 +6,6 @@ import (
 	errors2 "errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -162,7 +161,7 @@ func (m mockStowItem) Size() (int64, error) {
 }
 
 func (mockStowItem) Open() (io.ReadCloser, error) {
-	return ioutil.NopCloser(bytes.NewReader([]byte{})), nil
+	return io.NopCloser(bytes.NewReader([]byte{})), nil
 }
 
 func (mockStowItem) ETag() (string, error) {
@@ -281,7 +280,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 		dataReference := writeTestFile(ctx, t, s, "s3://container/path")
 		raw, err := s.ReadRaw(ctx, dataReference)
 		assert.NoError(t, err)
-		rawBytes, err := ioutil.ReadAll(raw)
+		rawBytes, err := io.ReadAll(raw)
 		assert.NoError(t, err)
 		assert.Equal(t, 0, len(rawBytes))
 		assert.Equal(t, DataReference("s3://container"), s.GetBaseContainerFQN(context.TODO()))
@@ -362,7 +361,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 		dataReference := writeTestFile(ctx, t, s, "s3://bad-container/path")
 		raw, err := s.ReadRaw(context.TODO(), dataReference)
 		assert.NoError(t, err)
-		rawBytes, err := ioutil.ReadAll(raw)
+		rawBytes, err := io.ReadAll(raw)
 		assert.NoError(t, err)
 		assert.Equal(t, 0, len(rawBytes))
 		assert.Equal(t, DataReference("s3://container"), s.GetBaseContainerFQN(context.TODO()))
@@ -485,7 +484,7 @@ func TestNewLocalStore(t *testing.T) {
 	})
 
 	t.Run("Initialize container", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir("", "stdlib_local")
+		tmpDir, err := os.MkdirTemp("", "stdlib_local")
 		assert.NoError(t, err)
 
 		stats, err := os.Stat(tmpDir)
@@ -513,7 +512,7 @@ func TestNewLocalStore(t *testing.T) {
 	})
 
 	t.Run("missing init container", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir("", "stdlib_local")
+		tmpDir, err := os.MkdirTemp("", "stdlib_local")
 		assert.NoError(t, err)
 
 		stats, err := os.Stat(tmpDir)
@@ -534,7 +533,7 @@ func TestNewLocalStore(t *testing.T) {
 	})
 
 	t.Run("multi-container enabled", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir("", "stdlib_local")
+		tmpDir, err := os.MkdirTemp("", "stdlib_local")
 		assert.NoError(t, err)
 
 		stats, err := os.Stat(tmpDir)

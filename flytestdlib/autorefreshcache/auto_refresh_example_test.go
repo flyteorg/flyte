@@ -121,7 +121,7 @@ func ExampleNewAutoRefreshCache() {
 	// arguments and so have no *testing.T, while require.Eventually requires a require.TestingT to
 	// report failures. The deadline below bounds the wait and panics on timeout to surface a hang.
 	var item Item
-	var lastStatus ExampleItemStatus = ExampleStatusNotStarted
+	var lastStatus = ExampleStatusNotStarted
 	deadline := time.Now().Add(10 * time.Second)
 	for {
 		item, err = cache.Get(item1.ID())
