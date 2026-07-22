@@ -151,6 +151,34 @@ git fetch upstream
 git rebase upstream/v2
 ```
 
+### CI Checks on Pull Requests from Forks
+
+For security reasons, pull requests opened from a **forked repository do not run the
+full CI suite** that runs on branches in `flyteorg/flyte`. Fork PRs execute in an
+isolated context without access to repository secrets, so any job that builds or pushes
+an image — or comments on the PR — is skipped rather than run.
+
+Checks that behave differently on fork PRs:
+
+- **CI image build & push** (`build-ci-image.yml`): skipped entirely — no image is built
+  or pushed, and no build-status comment is posted to the PR.
+- **Generated-code check** (`check-generate.yml`): runs against the fallback base image
+  instead of a PR-specific image, so it does **not** validate generated code against the
+  changes in the PR.
+- **Single-binary & devbox images** (`flyte-binary-v2.yml`): both build-and-push jobs are
+  skipped.
+
+**For contributors:** this is expected — you don't need to do anything, and a skipped
+image job is not a failure. Run `make gen` and the checks under
+[Testing and Verification](#testing-and-verification) locally to catch issues before
+requesting review.
+
+**For maintainers:** treat a skipped or green image/generate check on a fork PR as
+*"not run,"* not *"passed."* Before merging, validate the change under full CI by either
+checking out the contributor's branch locally and running the affected checks (e.g.
+`make gen` and confirming there is no diff), or pushing the branch to `flyteorg/flyte`
+(with the contributor's permission) to trigger the complete pipeline.
+
 ## Making Changes
 
 ### 1. Modifying Protocol Buffers
