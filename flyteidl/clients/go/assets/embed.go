@@ -7,6 +7,6 @@ import (
 
 // AdminSwaggerFile is the admin.swagger.json file embedded into the binary.
 //
-//go:generate cp ../../../gen/pb-go/gateway/flyteidl/service/admin.swagger.json admin.swagger.json
+//go:generate sh -c "cmp -s ../../../gen/pb-go/gateway/flyteidl/service/admin.swagger.json admin.swagger.json || cp ../../../gen/pb-go/gateway/flyteidl/service/admin.swagger.json admin.swagger.json"
 //go:embed admin.swagger.json
 var AdminSwaggerFile []byte
