@@ -32,6 +32,7 @@ import (
 
 const FailureTypeLabel contextutils.Key = "failure_type"
 const FlyteContentMD5 = "flyteContentMD5"
+const ConfigSecretKeyPath = "secret_key_path"
 
 // schemeToStowKind maps a URL scheme to the stow kind that serves it. It is the inverse of the
 // scheme prefixes produced by fQNFn and lets the multi-scheme DataStore lazily dial a stow backend
@@ -650,12 +651,21 @@ func newStowRawStore(_ context.Context, cfg *Config, metrics *dataStoreMetrics) 
 		return nil, fmt.Errorf("initContainer is required even with `enable-multicontainer`")
 	}
 
-	var cfgMap stow.ConfigMap
-	var kind string
+	var cfgMap stow.ConfigMap = cfg.Stow.Config
+	kind := cfg.Stow.Kind
 
-	if len(cfg.Stow.Kind) > 0 && len(cfg.Stow.Config) > 0 {
-		kind = cfg.Stow.Kind
-		cfgMap = cfg.Stow.Config
+	if kind == s3.Kind {
+		secretKeyVal, _ := cfgMap[s3.ConfigSecretKey]
+		secretKeyPath, _ := cfgMap[ConfigSecretKeyPath]
+
+		secretKey, err := resolveSecretKey(secretKeyVal, secretKeyPath)
+		if err != nil {
+			return nil, fmt.Errorf("resolving S3 secret key: %w", err)
+		}
+
+		if len(secretKey) > 0 {
+			cfgMap[s3.ConfigSecretKey] = secretKey
+		}
 	}
 
 	fn, ok := fQNFn[kind]
@@ -713,6 +723,17 @@ func stowFactory(_ context.Context, scheme string, _ DataReference, cfg *Config,
 			cfgMap[s3.ConfigAuthType] = "iam"
 		}
 
+		secretKeyVal, _ := cfgMap[s3.ConfigSecretKey]
+		secretKeyPath, _ := cfgMap[ConfigSecretKeyPath]
+
+		secretKey, err := resolveSecretKey(secretKeyVal, secretKeyPath)
+		if err != nil {
+			return nil, fmt.Errorf("resolving S3 secret key: %w", err)
+		}
+
+		if len(secretKey) > 0 {
+			cfgMap[s3.ConfigSecretKey] = secretKey
+		}
 	}
 
 	// Unlike cloud backends, the local (file://) backend cannot be dialed with ambient credentials: it

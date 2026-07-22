@@ -20,6 +20,7 @@ import (
 	s32 "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
@@ -563,6 +564,11 @@ func TestNewLocalStore(t *testing.T) {
 }
 
 func Test_newStowRawStore(t *testing.T) {
+	secretKey := "password"
+	path := filepath.Join(t.TempDir(), "secret-key-path")
+	err := os.WriteFile(path, []byte(secretKey), 0o600)
+	assert.NoError(t, err)
+
 	type args struct {
 		cfg *Config
 	}
@@ -592,15 +598,39 @@ func Test_newStowRawStore(t *testing.T) {
 				},
 			},
 		}}, true},
+		{"secretKeyPath", args{&Config{
+			Type:          TypeS3,
+			InitContainer: "flyte",
+			Stow: StowConfig{
+				Kind: TypeS3,
+				Config: map[string]string{
+					s3.ConfigAccessKeyID: "my-access-key-id",
+					ConfigSecretKeyPath:  path,
+				},
+			},
+		}}, false},
+		{"secretKeyPath not found", args{&Config{
+			Type:          TypeS3,
+			InitContainer: "flyte",
+			Stow: StowConfig{
+				Kind: TypeS3,
+				Config: map[string]string{
+					s3.ConfigAccessKeyID: "my-access-key-id",
+					ConfigSecretKeyPath:  filepath.Join(t.TempDir(), "wrong"),
+				},
+			},
+		}}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := newStowRawStore(context.TODO(), tt.args.cfg, metrics)
 			if tt.wantErr {
-				assert.Error(t, err, "newStowRawStore() error = %v, wantErr %v", err, tt.wantErr)
+				require.Error(t, err, "newStowRawStore() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			assert.NotNil(t, got, "Expected rawstore, found nil!")
+
+			require.NoError(t, err, "newStowRawStore() error = %v, wantErr %v", err, tt.wantErr)
+			require.NotNil(t, got, "Expected rawstore, found nil!")
 		})
 	}
 }
