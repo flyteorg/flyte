@@ -211,16 +211,72 @@ func (c *recursiveNodeExecutor) RecursiveNodeHandler(ctx context.Context, execCo
 			return interfaces.NodeStatusRunning, nil
 		}
 
-		if IsMaxParallelismAchieved(ctx, currentNode, nodePhase, execContext) {
-			parentNodeEndTime, err := GetParentNodeMaxEndTime(ctx, dag, nl, currentNode)
-			if err != nil {
-				logger.Warnf(ctx, "Failed to record parallelism wait latency for node. Error: %s", err.Error())
-			} else {
-				if !parentNodeEndTime.IsZero() {
-					c.metrics.ParallelismWaitLatency.Observe(ctx, parentNodeEndTime.Time, time.Now())
-				}
+		// There is a subtle corner case in setting the dirty flag for subworkflows.
+		// The dirty flag is expected to be set within UpdateNodeStatus()->SetWorkflowNodePhase()->SetDirty()
+		// However, the phase is updated only when there is a change:
+		// 	if np != s.GetPhase() || p.GetReason() != s.GetMessage() {
+		// 		s.UpdatePhase(np, ToK8sTime(p.GetOccurredAt()), p.GetReason(), enableCRDebugMetadata, p.GetErr())
+		// 	}
+		// This results in subworkflow nodes not getting evaluated as the phase is not updated.
+		// Also note that the handling for the subworkflow node SetPhase explicitly sets the dirty flag only in
+		// case of a phase change as well.
+		// func (in *WorkflowNodeStatus) SetWorkflowNodePhase(phase WorkflowNodePhase) {
+		// 	if in.Phase != phase {
+		// 		in.SetDirty()
+		// 		in.Phase = phase
+		// 	}
+		// }
+
+		// Generate unique node ID to track visits across nested subworkflows.
+		// This is used to track conclusively whether a node has been visited within this evaluation cycle.
+		uniqueNodeID, uniqueIDErr := common.GenerateUniqueID(execContext.GetParentInfo(), currentNode.GetID())
+		if uniqueIDErr != nil {
+			logger.Warnf(currentNodeCtx, "NodeVisit: Error generating unique node ID for [%v]: %v", currentNode.GetID(), uniqueIDErr)
+			// Fallback to using the current node ID if unique ID generation fails
+			// Note that the uniquIDErr will still be non-nil and used as indicator that the Unique ID is not available.
+			uniqueNodeID = currentNode.GetID()
+		} else {
+			logger.Debugf(currentNodeCtx, "NodeVisit: Unique node ID generated for [%v]: %v", currentNode.GetID(), uniqueNodeID)
+		}
+
+		// Check for visited nodes for workflow nodes (subworkflows/launchplans) based on the unique node ID
+		if uniqueIDErr == nil && currentNode.GetKind() == v1alpha1.NodeKindWorkflow {
+			if execContext.VisitedNodes().Contains(uniqueNodeID) {
+				logger.Debugf(currentNodeCtx, "NodeVisit: Node already visited, will be skipped: [%v]", uniqueNodeID)
+				return interfaces.NodeStatusRunning, nil
 			}
-			return interfaces.NodeStatusRunning, nil
+			logger.Debugf(currentNodeCtx, "NodeVisit: Node not visited, will be processed: [%v]", uniqueNodeID)
+		} else {
+			logger.Debugf(currentNodeCtx, "NodeVisit: NonWorkflow node, will not be checked for visited nodes: [%v]", uniqueNodeID)
+		}
+
+		if IsMaxParallelismAchieved(ctx, currentNode, nodePhase, execContext) {
+			// Check if we can bypass parallelism limit for already-running workflow nodes
+			// Note that while this currently applies to workflow nodes, it could be extended to other node types which
+			// are potentially hitting the same parallelism limit behavior.
+			canBypassParallelism := config.GetConfig().NodeConfig.BypassParallelismCheckForWorkflowNodes &&
+				currentNode.GetKind() == v1alpha1.NodeKindWorkflow &&
+				nodePhase != v1alpha1.NodePhaseNotYetStarted
+
+			if !canBypassParallelism {
+				// Record parallelism wait latency metrics
+				parentNodeEndTime, err := GetParentNodeMaxEndTime(ctx, dag, nl, currentNode)
+				if err != nil {
+					logger.Warnf(ctx, "Failed to record parallelism wait latency for node. Error: %s", err.Error())
+				} else {
+					if !parentNodeEndTime.IsZero() {
+						c.metrics.ParallelismWaitLatency.Observe(ctx, parentNodeEndTime.Time, time.Now())
+					}
+				}
+				logger.Debugf(currentNodeCtx, "NodeVisit: max-parallelism reached for node [%v], current parallelism [%d]", uniqueNodeID, execContext.CurrentParallelism())
+				return interfaces.NodeStatusRunning, nil
+			}
+
+			logger.Infof(currentNodeCtx,
+				"NodeVisit: Bypassing max-parallelism limit for Workflow node [%v], node phase [%v], current parallelism [%d]",
+				uniqueNodeID,
+				nodePhase.String(),
+				execContext.CurrentParallelism())
 		}
 
 		nCtx, err := c.nCtxBuilder.BuildNodeExecutionContext(ctx, execContext, nl, currentNode.GetID())
@@ -240,7 +296,21 @@ func (c *recursiveNodeExecutor) RecursiveNodeHandler(ctx context.Context, execCo
 			return interfaces.NodeStatusUndefined, err
 		}
 
-		return c.nodeExecutor.HandleNode(currentNodeCtx, dag, nCtx, h)
+		status, err := c.nodeExecutor.HandleNode(currentNodeCtx, dag, nCtx, h)
+		if err != nil {
+			logger.Errorf(currentNodeCtx, "NodeVisit:Error handling node %v, will not be added to visited set: [%v]", currentNode.GetID(), err)
+			return status, err
+		}
+
+		// Add to visited set after successful node handling
+		if uniqueIDErr == nil && currentNode.GetKind() == v1alpha1.NodeKindWorkflow {
+			execContext.VisitedNodes().Add(uniqueNodeID)
+			logger.Debugf(currentNodeCtx, "NodeVisit: Added node to visited set: [%v]", uniqueNodeID)
+		} else {
+			logger.Debugf(currentNodeCtx, "NodeVisit: Not a Workflow node, will not be added to visited set: [%v]", uniqueNodeID)
+		}
+
+		return status, nil
 
 		// TODO we can optimize skip state handling by iterating down the graph and marking all as skipped
 		// Currently we treat either Skip or Success the same way. In this approach only one node will be skipped
@@ -1453,6 +1523,9 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, defaultRawOutputPrefix storage.DataReference, kubeClient executors.Client,
 	catalogClient catalog.Client, recoveryClient recovery.Client, literalOffloadingConfig config.LiteralOffloadingConfig, eventConfig *config.EventConfig, clusterID string, signalClient service.SignalServiceClient,
 	nodeHandlerFactory interfaces.HandlerFactory, scope promutils.Scope) (interfaces.Node, error) {
+
+	// Log any important config values
+	logger.Infof(ctx, "Node Executor Config: bypass-parallelism-check-for-workflow-nodes=%v", nodeConfig.BypassParallelismCheckForWorkflowNodes)
 
 	// TODO we may want to make this configurable.
 	shardSelector, err := ioutils.NewBase36PrefixShardSelector(ctx)
