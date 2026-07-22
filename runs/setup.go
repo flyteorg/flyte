@@ -104,17 +104,18 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 			Dsn:         sentryDSN,
 			Environment: otelServiceName,
 		}); err != nil {
-			return fmt.Errorf("initializing sentry: %w", err)
+			logger.Errorf(ctx, "failed to initialize sentry, continuing without it: %v", err)
+		} else {
+			runsInterceptors = append(runsInterceptors, sentryInterceptor())
+			// Sentry sends async; flush buffered events/metrics on shutdown so they
+			// aren't lost when the pod stops.
+			sc.AddWorker("sentry-flush", func(ctx context.Context) error {
+				<-ctx.Done()
+				sentry.Flush(2 * time.Second)
+				return nil
+			})
+			logger.Infof(ctx, "Sentry error reporting enabled")
 		}
-		runsInterceptors = append(runsInterceptors, sentryInterceptor())
-		// Sentry sends async; flush buffered events/metrics on shutdown so they
-		// aren't lost when the pod stops.
-		sc.AddWorker("sentry-flush", func(ctx context.Context) error {
-			<-ctx.Done()
-			sentry.Flush(2 * time.Second)
-			return nil
-		})
-		logger.Infof(ctx, "Sentry error reporting enabled")
 	}
 
 	repo, err := repository.NewRepository(sc.DB, cfg.Database)
