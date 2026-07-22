@@ -29,6 +29,12 @@ data:
       secretName: {{ include "flyte-binary.webhook.secretName" . }}
       serviceName: {{ include "flyte-binary.webhook.serviceName" . }}
       servicePort: 443
+      secretManagerTypes:
+        - Embedded
+      embeddedSecretManagerConfig:
+        type: K8s
+        k8sConfig:
+          namespace: {{ .Release.Namespace }}
 {{ tpl ( index .Values "flyte-core-components" | toYaml ) . | nindent 4 }}
   001-plugins.yaml: |
     tasks:

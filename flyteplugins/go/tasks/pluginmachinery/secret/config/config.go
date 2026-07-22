@@ -19,6 +19,11 @@ import (
 const (
 	EmbeddedSecretsFileMountInitContainerName = "init-embedded-secret"
 	DefaultSecretEnvVarPrefix                 = "_UNION_"
+
+	// DefaultSecretsNamespace is the namespace flyte-native secrets are stored in by
+	// default. The secret service writes Kubernetes Secrets here, and the webhook's
+	// embedded K8s secret fetcher reads them back — both defaults must stay in sync.
+	DefaultSecretsNamespace = "flyte"
 )
 
 var (
@@ -30,7 +35,7 @@ var (
 		CertDir:           "/etc/webhook/certs",
 		LocalCert:         false,
 		ListenPort:        9443,
-		SecretManagerType: SecretManagerTypeK8s,
+		SecretManagerType: SecretManagerTypeEmbedded,
 		AWSSecretManagerConfig: AWSSecretManagerConfig{
 			SidecarImage: "docker.io/amazon/aws-secrets-manager-secret-sidecar:v0.1.4",
 			Resources: corev1.ResourceRequirements{
@@ -75,6 +80,10 @@ var (
 			KVVersion: KVVersion2,
 		},
 		EmbeddedSecretManagerConfig: EmbeddedSecretManagerConfig{
+			Type: EmbeddedSecretManagerTypeK8s,
+			K8sConfig: K8sConfig{
+				Namespace: DefaultSecretsNamespace,
+			},
 			FileMountInitContainer: FileMountInitContainerConfig{
 				Image: "public.ecr.aws/docker/library/busybox:latest",
 				Resources: corev1.ResourceRequirements{
