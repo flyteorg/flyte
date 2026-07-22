@@ -589,7 +589,7 @@ func Test_newStowRawStore(t *testing.T) {
 			},
 		}}, true},
 		{"minio", args{&Config{
-			Type:          TypeMinio,
+			Type:          TypeStow,
 			InitContainer: "some-container",
 			Stow: StowConfig{
 				Kind: local.Kind,
@@ -599,10 +599,10 @@ func Test_newStowRawStore(t *testing.T) {
 			},
 		}}, true},
 		{"secretKeyPath", args{&Config{
-			Type:          TypeS3,
+			Type:          TypeStow,
 			InitContainer: "flyte",
 			Stow: StowConfig{
-				Kind: TypeS3,
+				Kind: s3.Kind,
 				Config: map[string]string{
 					s3.ConfigAccessKeyID: "my-access-key-id",
 					ConfigSecretKeyPath:  path,
@@ -610,10 +610,10 @@ func Test_newStowRawStore(t *testing.T) {
 			},
 		}}, false},
 		{"secretKeyPath not found", args{&Config{
-			Type:          TypeS3,
+			Type:          TypeStow,
 			InitContainer: "flyte",
 			Stow: StowConfig{
-				Kind: TypeS3,
+				Kind: s3.Kind,
 				Config: map[string]string{
 					s3.ConfigAccessKeyID: "my-access-key-id",
 					ConfigSecretKeyPath:  filepath.Join(t.TempDir(), "wrong"),

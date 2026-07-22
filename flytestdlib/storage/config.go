@@ -6,6 +6,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/stow/s3"
 )
 
 //go:generate pflags Config --default-var=defaultConfig
@@ -33,10 +34,12 @@ const (
 var (
 	ConfigSection = config.MustRegisterSection(configSectionKey, defaultConfig)
 	defaultConfig = &Config{
-		Type: TypeS3,
+		Type: TypeStow,
 		Stow: StowConfig{
-			Kind:   "s3",
-			Config: map[string]string{},
+			Kind: s3.Kind,
+			Config: map[string]string{
+				s3.ConfigRegion: "us-east-1",
+			},
 		},
 		Limits: LimitsConfig{
 			GetLimitMegabytes: 2,

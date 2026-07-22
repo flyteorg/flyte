@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/flyteorg/stow/s3"
 	"github.com/ghodss/yaml"
 	"github.com/stretchr/testify/assert"
 
@@ -28,9 +29,9 @@ func TestStorageAndLoggerConfig(t *testing.T) {
 
 	expected := CompositeConfig{
 		Storage: storage.Config{
-			Type: "s3",
+			Type: storage.TypeStow,
 			Stow: storage.StowConfig{
-				Kind: "s3",
+				Kind: s3.Kind,
 				Config: map[string]string{
 					"endpoint":  "http://minio:9000",
 					"authType":  "accesskey",

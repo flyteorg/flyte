@@ -33,4 +33,4 @@ storage:
       region: us-east-1
       secretKey: miniostorage
     kind: s3
-  type: s3
+  type: stow

@@ -716,9 +716,6 @@ func stowFactory(_ context.Context, scheme string, _ DataReference, cfg *Config,
 	// Seed an S3 region from the legacy connection config when no explicit one was given, so ambient
 	// S3 dials inherit the deployment's default region instead of failing region resolution.
 	if kind == s3.Kind {
-		if _, ok := cfgMap[s3.ConfigRegion]; !ok {
-			cfgMap[s3.ConfigRegion] = "us-east-1"
-		}
 		if _, ok := cfgMap[s3.ConfigAuthType]; !ok {
 			cfgMap[s3.ConfigAuthType] = "iam"
 		}

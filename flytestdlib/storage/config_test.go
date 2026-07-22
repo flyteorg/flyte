@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/flyteorg/stow/s3"
 	"github.com/ghodss/yaml"
 	"github.com/stretchr/testify/assert"
 )
@@ -16,9 +17,9 @@ var update = flag.Bool("update", false, "Updates testdata")
 
 func TestMarshal(t *testing.T) {
 	expected := Config{
-		Type: "s3",
+		Type: TypeStow,
 		Stow: StowConfig{
-			Kind: "s3",
+			Kind: s3.Kind,
 			Config: map[string]string{
 				"Endpoint":   "http://minio:9000",
 				"AuthType":   "accesskey",

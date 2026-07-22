@@ -27,4 +27,4 @@ stow:
     Region: us-east-1
     SecretKey: miniostorage
   kind: s3
-type: s3
+type: stow
