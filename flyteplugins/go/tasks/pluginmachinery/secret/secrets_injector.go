@@ -63,28 +63,38 @@ func newSecretsInjector(
 			return nil, fmt.Errorf("failed to add core v1 to scheme: %w", err)
 		}
 
-		secretInformerCache, err := ctrlcache.New(kubeConfig, ctrlcache.Options{
-			Scheme: ctrlRuntimeScheme,
-		})
-		if err != nil {
-			return nil, fmt.Errorf("failed to create informer cache: %w", err)
-		}
-
-		go func() {
-			if err := secretInformerCache.Start(ctx); err != nil {
-				logger.Errorf(ctx, "secret informer cache stopped: %v", err)
+		// The k8s client is only used by embedded_secret_manager's image-pull-secret
+		// path. When that feature is disabled we use a direct client and skip the
+		// informer entirely; otherwise we back the client with a Secret informer.
+		clientOpts := client.Options{Scheme: ctrlRuntimeScheme}
+		if webhookConfig.EmbeddedSecretManagerConfig.ImagePullSecrets.Enabled {
+			secretInformerCache, err := ctrlcache.New(kubeConfig, ctrlcache.Options{
+				Scheme: ctrlRuntimeScheme,
+			})
+			if err != nil {
+				return nil, fmt.Errorf("failed to create informer cache: %w", err)
 			}
-		}()
-		if !secretInformerCache.WaitForCacheSync(ctx) {
-			return nil, fmt.Errorf("secret informer cache failed to sync")
+
+			// Explicitly register the Secret informer so the cache only watches
+			// Secrets (not every kind in corev1) and so WaitForCacheSync below
+			// actually blocks on the initial Secret list.
+			if _, err := secretInformerCache.GetInformer(ctx, &corev1.Secret{}); err != nil {
+				return nil, fmt.Errorf("failed to register Secret informer: %w", err)
+			}
+
+			go func() {
+				if err := secretInformerCache.Start(ctx); err != nil {
+					logger.Errorf(ctx, "secret informer cache stopped: %v", err)
+				}
+			}()
+			if !secretInformerCache.WaitForCacheSync(ctx) {
+				return nil, fmt.Errorf("secret informer cache failed to sync")
+			}
+
+			clientOpts.Cache = &client.CacheOptions{Reader: secretInformerCache}
 		}
 
-		ctrlRuntimeClient, err := client.New(kubeConfig, client.Options{
-			Scheme: ctrlRuntimeScheme,
-			Cache: &client.CacheOptions{
-				Reader: secretInformerCache,
-			},
-		})
+		ctrlRuntimeClient, err := client.New(kubeConfig, clientOpts)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create controller-runtime client: %w", err)
 		}
