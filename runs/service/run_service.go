@@ -1160,17 +1160,13 @@ func (s *RunService) WatchRunDetails(
 ) error {
 	logger.Infof(ctx, "Received WatchRunDetails request")
 
-	// For now, just send initial state and close
-	// TODO: Implement actual streaming with polling or database triggers
 	run, err := s.repo.ActionRepo().GetRun(ctx, req.Msg.RunId)
 	if err != nil {
 		return connect.NewError(connect.CodeNotFound, err)
 	}
 
 	resp := &workflow.WatchRunDetailsResponse{
-		Details: &workflow.RunDetails{
-			// Would populate from run model
-		},
+		Details: s.runModelToDetails(run, req.Msg.RunId),
 	}
 
 	if err := stream.Send(resp); err != nil {
@@ -1179,7 +1175,6 @@ func (s *RunService) WatchRunDetails(
 
 	logger.Infof(ctx, "Sent initial run details for: %s", run.Name)
 
-	// Keep connection open and send updates (simplified)
 	updates := make(chan *models.Run, 50)
 	errs := make(chan error, 1)
 
@@ -1193,9 +1188,7 @@ func (s *RunService) WatchRunDetails(
 			return connect.NewError(connect.CodeInternal, err)
 		case run := <-updates:
 			resp := &workflow.WatchRunDetailsResponse{
-				Details: &workflow.RunDetails{
-					// Would populate from run
-				},
+				Details: s.runModelToDetails(run, req.Msg.RunId),
 			}
 			if err := stream.Send(resp); err != nil {
 				return err
@@ -1560,8 +1553,36 @@ func (s *RunService) getClusterEventsInfo(
 	return info, nil
 }
 
+// runModelToDetails converts a DB Run model to a RunDetails proto.
+func (s *RunService) runModelToDetails(run *models.Run, runID *common.RunIdentifier) *workflow.RunDetails {
+	if run == nil && runID == nil {
+		return nil
+	}
+	var runSpec *task.RunSpec
+	if run != nil && len(run.ActionSpec) > 0 {
+		var actionSpec workflow.ActionSpec
+		if err := json.Unmarshal(run.ActionSpec, &actionSpec); err == nil {
+			runSpec = actionSpec.RunSpec
+		}
+	}
+
+	id := &common.ActionIdentifier{
+		Run: runID,
+	}
+	if run != nil {
+		id.Name = run.Name
+	}
+	return &workflow.RunDetails{
+		RunSpec: runSpec,
+		Action:  s.actionModelToDetails(run, id),
+	}
+}
+
 // actionModelToDetails converts a DB Action model to an ActionDetails proto.
 func (s *RunService) actionModelToDetails(action *models.Action, actionID *common.ActionIdentifier) *workflow.ActionDetails {
+	if action == nil && actionID == nil {
+		return nil
+	}
 	status := &workflow.ActionStatus{
 		Phase:       common.ActionPhase(action.Phase),
 		StartTime:   timestamppb.New(action.CreatedAt),
@@ -1570,6 +1591,8 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 	}
 	if action.EndedAt.Valid {
 		status.EndTime = timestamppb.New(action.EndedAt.Time)
+		durationMs := uint64(status.EndTime.AsTime().Sub(status.StartTime.AsTime()).Milliseconds())
+		status.DurationMs = &durationMs
 	}
 	if action.DurationMs.Valid {
 		durationMs := uint64(action.DurationMs.Int64)
