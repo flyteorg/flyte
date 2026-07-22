@@ -214,6 +214,7 @@ export type Condition = Message<"flyteidl2.app.Condition"> & {
 
   /**
    * Optimistic-concurrency counter bumped on every status write. This is NOT a
+   * deployment identity — use `deployment_id` to anchor per-deployment state.
    *
    * @generated from field: uint64 revision = 4;
    */

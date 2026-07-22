@@ -113,6 +113,7 @@ message Condition {
   string message = 3;
 
   // Optimistic-concurrency counter bumped on every status write. This is NOT a
+  // deployment identity — use `deployment_id` to anchor per-deployment state.
   uint64 revision = 4 [(buf.validate.field).uint64.gte = 0];
 
   // Actor is the principal that caused the condition.

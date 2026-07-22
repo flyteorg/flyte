@@ -573,6 +573,7 @@ type Condition struct {
 	// Message for the condition.
 	Message string `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
 	// Optimistic-concurrency counter bumped on every status write. This is NOT a
+	// deployment identity — use `deployment_id` to anchor per-deployment state.
 	Revision uint64 `protobuf:"varint,4,opt,name=revision,proto3" json:"revision,omitempty"`
 	// Actor is the principal that caused the condition.
 	Actor *common.EnrichedIdentity `protobuf:"bytes,5,opt,name=actor,proto3" json:"actor,omitempty"`
