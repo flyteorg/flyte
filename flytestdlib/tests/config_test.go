@@ -13,7 +13,6 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config/viper"
-	"github.com/flyteorg/flyte/v2/flytestdlib/internal/utils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 )
@@ -30,13 +29,15 @@ func TestStorageAndLoggerConfig(t *testing.T) {
 	expected := CompositeConfig{
 		Storage: storage.Config{
 			Type: "s3",
-			Connection: storage.ConnectionConfig{
-				Endpoint:   config.URL{URL: utils.MustParseURL("http://minio:9000")},
-				AuthType:   "accesskey",
-				AccessKey:  "minio",
-				SecretKey:  "miniostorage",
-				Region:     "us-east-1",
-				DisableSSL: true,
+			Stow: storage.StowConfig{
+				Kind: "s3",
+				Config: map[string]string{
+					"endpoint":  "http://minio:9000",
+					"authType":  "accesskey",
+					"accessKey": "minio",
+					"secretKey": "miniostorage",
+					"region":    "us-east-1",
+				},
 			},
 		},
 		Logger: logger.Config{

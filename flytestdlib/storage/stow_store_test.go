@@ -21,9 +21,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/v2/flytestdlib/internal/utils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/stow"
 	"github.com/flyteorg/stow/azure"
@@ -587,8 +585,11 @@ func Test_newStowRawStore(t *testing.T) {
 		{"minio", args{&Config{
 			Type:          TypeMinio,
 			InitContainer: "some-container",
-			Connection: ConnectionConfig{
-				Endpoint: config.URL{URL: utils.MustParseURL("http://minio:9000")},
+			Stow: StowConfig{
+				Kind: local.Kind,
+				Config: map[string]string{
+					"endpoint": "http://minio:9000",
+				},
 			},
 		}}, true},
 	}

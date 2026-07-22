@@ -34,12 +34,12 @@ var (
 	ConfigSection = config.MustRegisterSection(configSectionKey, defaultConfig)
 	defaultConfig = &Config{
 		Type: TypeS3,
+		Stow: StowConfig{
+			Kind:   "s3",
+			Config: map[string]string{},
+		},
 		Limits: LimitsConfig{
 			GetLimitMegabytes: 2,
-		},
-		Connection: ConnectionConfig{
-			Region:   "us-east-1",
-			AuthType: "iam",
 		},
 		DefaultHTTPClient: HTTPClientConfig{
 			MaxIdleConns:        1024,
@@ -52,11 +52,9 @@ var (
 
 // Config is a common storage config.
 type Config struct {
-	Type Type `json:"type" pflag:",Sets the type of storage [s3/minio/local/mem/stow/redis]."`
-	// Deprecated: Please use StowConfig instead
-	Connection ConnectionConfig `json:"connection"`
-	Stow       StowConfig       `json:"stow,omitempty" pflag:",Storage config for stow backend."`
-	Redis      RedisConfig      `json:"redis,omitempty" pflag:"-,Storage config for the redis backend."`
+	Type  Type        `json:"type" pflag:",Sets the type of storage [s3/minio/local/mem/stow/redis]."`
+	Stow  StowConfig  `json:"stow,omitempty" pflag:",Storage config for stow backend."`
+	Redis RedisConfig `json:"redis,omitempty" pflag:"-,Storage config for the redis backend."`
 
 	// Container here is misleading, it refers to a Bucket (AWS S3) like blobstore entity. In some terms it could be a table
 	InitContainer string `json:"container" pflag:",Initial container (in s3 a bucket) to create -if it doesn't exist-.'"`
@@ -95,16 +93,6 @@ type HTTPClientConfig struct {
 	MaxIdleConnsPerHost int             `json:"maxIdleConnsPerHost" pflag:",Maximum number of idle connections per host. Zero means use the http.DefaultTransport value."`
 	MaxConnsPerHost     int             `json:"maxConnsPerHost" pflag:",Maximum number of connections per host; new requests block at the limit. Zero means no limit."`
 	IdleConnTimeout     config.Duration `json:"idleConnTimeout" pflag:",Maximum amount of time an idle connection remains open. Zero means use the http.DefaultTransport value."`
-}
-
-// ConnectionConfig defines connection configurations.
-type ConnectionConfig struct {
-	Endpoint   config.URL `json:"endpoint" pflag:",URL for storage client to connect to."`
-	AuthType   string     `json:"auth-type" pflag:",Auth Type to use [iam,accesskey]."`
-	AccessKey  string     `json:"access-key" pflag:",Access key to use. Only required when authtype is set to accesskey."`
-	SecretKey  string     `json:"secret-key" pflag:",Secret to use when accesskey is set."`
-	Region     string     `json:"region" pflag:",Region to connect to."`
-	DisableSSL bool       `json:"disable-ssl" pflag:",Disables SSL connection. Should only be used for development."`
 }
 
 // RedisConfig defines the connection for a redis-backed raw store, selected with type: redis.

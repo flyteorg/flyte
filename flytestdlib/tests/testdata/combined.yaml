@@ -8,20 +8,29 @@ storage:
   cache:
     max_size_mbs: 0
     target_gc_percent: 0
-  connection:
-    access-key: minio
-    auth-type: accesskey
-    disable-ssl: true
-    endpoint: http://minio:9000
-    region: us-east-1
-    secret-key: miniostorage
   container: ""
   defaultHttpClient:
     headers: null
+    idleConnTimeout: 0s
+    maxConnsPerHost: 0
+    maxIdleConns: 0
+    maxIdleConnsPerHost: 0
     timeout: 0s
   enable-multicontainer: false
   limits:
     maxDownloadMBs: 0
+  redis:
+    addr: ""
+    db: 0
+    password: ""
+    username: ""
   signedUrl: {}
-  stow: {}
+  stow:
+    config:
+      accessKey: minio
+      authType: accesskey
+      endpoint: http://minio:9000
+      region: us-east-1
+      secretKey: miniostorage
+    kind: s3
   type: s3
