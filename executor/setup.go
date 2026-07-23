@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"net/http"
 	"os"
 	"time"
 
@@ -194,7 +193,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if eventsServiceURL == "" {
 		eventsServiceURL = cfg.EventsServiceURL
 	}
-	eventsClient := workflowconnect.NewEventsProxyServiceClient(http.DefaultClient, eventsServiceURL, connect.WithInterceptors(otelInterceptor))
+	eventsClient := workflowconnect.NewEventsProxyServiceClient(app.InternalHTTPClient(), eventsServiceURL, connect.WithInterceptors(otelInterceptor))
 	catalogCfg := catalog.GetConfig()
 	cacheServiceURL := sc.BaseURL
 	if cacheServiceURL == "" {
