@@ -81,6 +81,52 @@ patches:
       name: net-istio-controller
       namespace: knative-serving
     $patch: delete
+- patch: |-
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: config-istio
+      namespace: knative-serving
+    data:
+      local-gateway.knative-serving.knative-local-gateway: kourier-internal.kourier-system.svc.cluster.local
+- patch: |-
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: knative-local-gateway
+      namespace: istio-system
+    $patch: delete
+- patch: |-
+    apiVersion: networking.istio.io/v1beta1
+    kind: Gateway
+    metadata:
+      name: knative-local-gateway
+      namespace: knative-serving
+    $patch: delete
+- patch: |-
+    apiVersion: networking.istio.io/v1beta1
+    kind: Gateway
+    metadata:
+      name: knative-ingress-gateway
+      namespace: knative-serving
+    $patch: delete
+# net-istio also renders two PeerAuthentication CRs (security.istio.io); the
+# istio CRDs aren't installed in this kourier devbox, so without these deletes
+# k3s fails the whole flyte.yaml addon and the cluster never goes ready.
+- patch: |-
+    apiVersion: security.istio.io/v1beta1
+    kind: PeerAuthentication
+    metadata:
+      name: net-istio-webhook
+      namespace: knative-serving
+    $patch: delete
+- patch: |-
+    apiVersion: security.istio.io/v1beta1
+    kind: PeerAuthentication
+    metadata:
+      name: webhook
+      namespace: knative-serving
+    $patch: delete
 - target:
     kind: Pod
     name: rustfs-test-connection
