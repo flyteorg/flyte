@@ -35,6 +35,12 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	if spec.GetReplicas() < 1 {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "replicas must be >= 1, got %d", spec.GetReplicas())
 	}
+	// buildJobSetName reserves pod-index digits up to maxReplicasForNaming so the derived
+	// pod names stay within the 63-char limit. Beyond that the reservation is exceeded and
+	// the JobSet webhook would reject the pods, so fail fast with a clear spec error instead.
+	if spec.GetReplicas() > maxReplicasForNaming {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "replicas must be <= %d, got %d", maxReplicasForNaming, spec.GetReplicas())
+	}
 	if spec.GetNprocPerNode() < 1 {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nproc_per_node must be >= 1, got %d", spec.GetNprocPerNode())
 	}
@@ -77,15 +83,19 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	injectTorchRunEnv(container, &spec)
 
 	podSpec.RestartPolicy = corev1.RestartPolicyNever
+	replicas := spec.GetReplicas()
 	// JobSet name doubles as the headless service / pod subdomain; both must be
-	// RFC 1123 subdomain-compatible. GeneratedName isn't guaranteed to be, so
-	// sanitize once and use the same value for both.
-	jobSetName := utils.ConvertToDNS1123SubdomainCompatibleString(taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
+	// RFC 1123 subdomain-compatible. GeneratedName isn't guaranteed to be, and for
+	// composed/nested tasks it can be long enough that JobSet's derived pod names
+	// exceed the 63-char limit and the webhook rejects them. buildJobSetName both
+	// sanitizes and bounds the name so the longest generated pod name stays valid.
+	// BuildIdentityResource must derive the same name (see plugin.go) so the lookup
+	// and abort paths resolve the object this create path produces.
+	jobSetName := buildJobSetName(taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
 	if podSpec.Subdomain == "" {
 		podSpec.Subdomain = jobSetName
 	}
 
-	replicas := spec.GetReplicas()
 	completionMode := batchv1.IndexedCompletion
 	backoffLimit := int32(0)
 	jobSpec := batchv1.JobSpec{

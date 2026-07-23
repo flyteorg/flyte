@@ -3,6 +3,8 @@ package clustered
 import (
 	"context"
 	"errors"
+	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -12,10 +14,12 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/validation"
 	k8sscheme "k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
+	"sigs.k8s.io/jobset/pkg/util/placement"
 
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	coreMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
@@ -55,6 +59,12 @@ func buildTaskTemplate(spec *clusteredpb.ClusteredTaskSpec) *core.TaskTemplate {
 
 // dummyTaskCtx builds a minimal task execution context suitable for BuildResource tests.
 func dummyTaskCtx(taskTemplate *core.TaskTemplate) *coreMocks.TaskExecutionContext {
+	return dummyTaskCtxWithGeneratedName(taskTemplate, testJobName)
+}
+
+// dummyTaskCtxWithGeneratedName is dummyTaskCtx with a caller-supplied generated name, used to
+// exercise the long composed/nested-name truncation path.
+func dummyTaskCtxWithGeneratedName(taskTemplate *core.TaskTemplate, generatedName string) *coreMocks.TaskExecutionContext {
 	taskCtx := &coreMocks.TaskExecutionContext{}
 
 	inputReader := &pluginIOMocks.InputReader{}
@@ -85,7 +95,7 @@ func dummyTaskCtx(taskTemplate *core.TaskTemplate) *coreMocks.TaskExecutionConte
 			},
 		},
 	})
-	tID.EXPECT().GetGeneratedName().Return(testJobName)
+	tID.EXPECT().GetGeneratedName().Return(generatedName)
 	tID.EXPECT().GetUniqueNodeID().Return("node-id")
 
 	overrides := &coreMocks.TaskOverrides{}
@@ -972,4 +982,143 @@ func TestGetCompletionTime(t *testing.T) {
 	ts, err := handler.GetCompletionTime(js)
 	assert.NoError(t, err)
 	assert.False(t, ts.IsZero())
+}
+
+// --- buildJobSetName tests ---
+
+// longestPodName reproduces the worst-case pod name JobSet's admission webhook validates:
+// "<jobSetName>-<replicatedJob>-<jobIdx>-<podIdx>-<5-char random suffix>" (jobIdx is always
+// 0 here since the single ReplicatedJob has Replicas=1; podIdx maxes at replicas-1).
+func longestPodName(jobSetName string, replicas int32) string {
+	maxPodIdx := strconv.Itoa(int(replicas - 1))
+	return placement.GenPodName(jobSetName, workersReplicatedJobName, "0", maxPodIdx) + "-abcde"
+}
+
+func TestBuildJobSetName_ShortNameUnchanged(t *testing.T) {
+	name := buildJobSetName("f-abc123")
+	assert.Equal(t, "f-abc123", name)
+}
+
+func TestBuildJobSetName_SanitizesInvalidChars(t *testing.T) {
+	// Uppercase/underscore aren't DNS-1123 subdomain compatible; they must be normalized.
+	name := buildJobSetName("My_Run")
+	assert.Empty(t, validation.IsDNS1035Label(name))
+	assert.NotContains(t, name, "_")
+	assert.Equal(t, strings.ToLower(name), name)
+}
+
+func TestBuildJobSetName_CoercesToDNS1035Label(t *testing.T) {
+	// The JobSet name becomes a component of the child pod names, which the webhook
+	// validates as DNS-1035 labels: no dots, must start with a letter. A generated
+	// name with a dot or a leading digit must not leak into the derived names.
+	for _, generated := range []string{"my.run-a0-0", "9run-a0-0", "0.1.2", "svc.default.a0"} {
+		name := buildJobSetName(generated)
+		assert.Empty(t, validation.IsDNS1035Label(name), "jobset name %q (from %q) is not a valid DNS-1035 label", name, generated)
+		assert.NotContains(t, name, ".", "jobset name %q retained a dot", name)
+		podName := longestPodName(name, maxReplicasForNaming)
+		assert.Empty(t, validation.IsDNS1035Label(podName), "derived pod name %q invalid (from %q)", podName, generated)
+	}
+}
+
+func TestBuildJobSetName_LongNameFitsPodLimit(t *testing.T) {
+	// A composed/nested task can produce a generated name well beyond the budget.
+	long := strings.Repeat("composed-subtask-", 8) + "tail" // ~140 chars
+	name := buildJobSetName(long)
+
+	// The name is derived from the generated name alone (no replica count), so a single
+	// bounded name must keep the longest pod name valid across every supported replica
+	// count, including the worst case the truncation reserves for. The name itself must
+	// be a valid DNS-1035 label, since it's embedded in the derived Job/Pod names.
+	assert.Empty(t, validation.IsDNS1035Label(name), "jobset name not a valid DNS-1035 label")
+	for _, replicas := range []int32{1, 4, 16, 128, 1024, 10000, maxReplicasForNaming} {
+		podName := longestPodName(name, replicas)
+		assert.LessOrEqual(t, len(podName), dns1035LabelMaxLength, "pod name %q (%d chars) exceeds limit for replicas=%d", podName, len(podName), replicas)
+		assert.Empty(t, validation.IsDNS1035Label(podName), "pod name %q invalid for replicas=%d", podName, replicas)
+	}
+}
+
+func TestBuildJobSetName_LongNamesAreDistinct(t *testing.T) {
+	// Two different long names that share a prefix must not collide after truncation.
+	a := buildJobSetName(strings.Repeat("a", 60) + "-one")
+	b := buildJobSetName(strings.Repeat("a", 60) + "-two")
+	assert.NotEqual(t, a, b)
+}
+
+// TestGeneratedNameMaxLength_BoundsSourceName guards the source-of-truth bound: plugin
+// managers may stamp GetGeneratedName() directly onto the JobSet, overwriting the name
+// BuildResource chose, so the plugin advertises GeneratedNameMaxLength and every name
+// within that bound must (a) keep the worst-case derived pod name within the 63-char
+// limit and (b) pass through buildJobSetName unchanged, so a manager-stamped name and
+// the plugin-built name are identical.
+func TestGeneratedNameMaxLength_BoundsSourceName(t *testing.T) {
+	props := clusteredResourceHandler{}.GetProperties()
+	if assert.NotNil(t, props.GeneratedNameMaxLength) {
+		assert.Equal(t, generatedNameMaxLength, *props.GeneratedNameMaxLength)
+	}
+
+	// A generated name at exactly the advertised bound must survive untouched and
+	// still fit the pod-name budget at the worst-case replica count.
+	atBound := "g" + strings.Repeat("a", generatedNameMaxLength-1)
+	assert.Equal(t, atBound, buildJobSetName(atBound))
+	podName := longestPodName(atBound, maxReplicasForNaming)
+	assert.LessOrEqual(t, len(podName), dns1035LabelMaxLength, "pod name %q (%d chars) exceeds limit", podName, len(podName))
+	assert.Empty(t, validation.IsDNS1035Label(podName), "pod name %q invalid", podName)
+}
+
+func TestBuildJobSetName_NoTrailingSeparator(t *testing.T) {
+	// Truncation must not leave a trailing '-' or '.', which would be invalid.
+	name := buildJobSetName(strings.Repeat("x", 50) + "." + strings.Repeat("y", 50))
+	assert.NotEqual(t, "-", name[len(name)-1:])
+	assert.NotEqual(t, ".", name[len(name)-1:])
+	assert.Empty(t, validation.IsDNS1035Label(name))
+}
+
+// TestBuildResourceAndIdentityNameMatch guards the create/lookup invariant: BuildResource
+// (create) and BuildIdentityResource (lookup/abort) must name the JobSet identically, even
+// for a long composed/nested generated name, or the plugin manager can't find the object it
+// created. The shared name must also keep the longest derived pod name within 63 chars.
+func TestBuildResourceAndIdentityNameMatch(t *testing.T) {
+	longGeneratedName := strings.Repeat("composed-subtask-", 8) + "tail-0" // ~140 chars
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:     4,
+		NprocPerNode: 8,
+		Runtime: &clusteredpb.Runtime{
+			Kind: &clusteredpb.Runtime_Torchrun{
+				Torchrun: &clusteredpb.TorchRuntime{RdzvBackend: clusteredpb.RdzvBackend_STATIC},
+			},
+		},
+	}
+	taskCtx := dummyTaskCtxWithGeneratedName(buildTaskTemplate(spec), longGeneratedName)
+	handler := clusteredResourceHandler{}
+
+	created, err := handler.BuildResource(context.Background(), taskCtx)
+	assert.NoError(t, err)
+
+	identity, err := handler.BuildIdentityResource(context.Background(), taskCtx.TaskExecutionMetadata())
+	assert.NoError(t, err)
+
+	assert.Equal(t, created.GetName(), identity.GetName(), "create and lookup names diverge")
+	assert.NotEqual(t, longGeneratedName, created.GetName(), "long name should have been truncated")
+	assert.Empty(t, validation.IsDNS1035Label(created.GetName()))
+	podName := longestPodName(created.GetName(), maxReplicasForNaming)
+	assert.LessOrEqual(t, len(podName), dns1035LabelMaxLength)
+}
+
+// TestBuildResource_ReplicasExceedNamingBudget verifies BuildResource fails fast with a
+// spec error when replicas exceeds the pod-index budget buildJobSetName reserves for; past
+// that bound the derived pod names could exceed 63 chars and be rejected by the webhook.
+func TestBuildResource_ReplicasExceedNamingBudget(t *testing.T) {
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:     maxReplicasForNaming + 1,
+		NprocPerNode: 1,
+		Runtime: &clusteredpb.Runtime{
+			Kind: &clusteredpb.Runtime_Torchrun{Torchrun: &clusteredpb.TorchRuntime{}},
+		},
+	}
+	taskCtx := dummyTaskCtx(buildTaskTemplate(spec))
+	handler := clusteredResourceHandler{}
+
+	_, err := handler.BuildResource(context.Background(), taskCtx)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "replicas must be <=")
 }
