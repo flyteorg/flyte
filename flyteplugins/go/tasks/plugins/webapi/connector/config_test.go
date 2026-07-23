@@ -53,7 +53,9 @@ func TestDefaultAgentConfig(t *testing.T) {
 	assert.Equal(t, "", cfg.DefaultConnector.Endpoint)
 	assert.True(t, cfg.DefaultConnector.Insecure)
 	assert.Equal(t, 10*time.Second, cfg.DefaultConnector.DefaultTimeout.Duration)
-	assert.Equal(t, `{"loadBalancingConfig": [{"round_robin":{}}]}`, cfg.DefaultConnector.DefaultServiceConfig)
+	// DefaultServiceConfig defaults to empty; getGrpcConnection falls back to
+	// DefaultGRPCServiceConfig when a deployment does not override it.
+	assert.Empty(t, cfg.DefaultConnector.DefaultServiceConfig)
 
 	assert.Empty(t, cfg.DefaultConnector.Timeouts)
 
