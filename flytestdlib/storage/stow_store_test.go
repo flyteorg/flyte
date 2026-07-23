@@ -19,10 +19,9 @@ import (
 	s32 "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/v2/flytestdlib/internal/utils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/stow"
 	"github.com/flyteorg/stow/azure"
@@ -564,6 +563,11 @@ func TestNewLocalStore(t *testing.T) {
 }
 
 func Test_newStowRawStore(t *testing.T) {
+	secretKey := "password"
+	path := filepath.Join(t.TempDir(), "secret-key-path")
+	err := os.WriteFile(path, []byte(secretKey), 0o600)
+	assert.NoError(t, err)
+
 	type args struct {
 		cfg *Config
 	}
@@ -584,10 +588,35 @@ func Test_newStowRawStore(t *testing.T) {
 			},
 		}}, true},
 		{"minio", args{&Config{
-			Type:          TypeMinio,
+			Type:          TypeStow,
 			InitContainer: "some-container",
-			Connection: ConnectionConfig{
-				Endpoint: config.URL{URL: utils.MustParseURL("http://minio:9000")},
+			Stow: StowConfig{
+				Kind: local.Kind,
+				Config: map[string]string{
+					"endpoint": "http://minio:9000",
+				},
+			},
+		}}, true},
+		{"secretKeyPath", args{&Config{
+			Type:          TypeStow,
+			InitContainer: "flyte",
+			Stow: StowConfig{
+				Kind: s3.Kind,
+				Config: map[string]string{
+					s3.ConfigAccessKeyID: "my-access-key-id",
+					ConfigSecretKeyPath:  path,
+				},
+			},
+		}}, false},
+		{"secretKeyPath not found", args{&Config{
+			Type:          TypeStow,
+			InitContainer: "flyte",
+			Stow: StowConfig{
+				Kind: s3.Kind,
+				Config: map[string]string{
+					s3.ConfigAccessKeyID: "my-access-key-id",
+					ConfigSecretKeyPath:  filepath.Join(t.TempDir(), "wrong"),
+				},
 			},
 		}}, true},
 	}
@@ -595,10 +624,12 @@ func Test_newStowRawStore(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := newStowRawStore(context.TODO(), tt.args.cfg, metrics)
 			if tt.wantErr {
-				assert.Error(t, err, "newStowRawStore() error = %v, wantErr %v", err, tt.wantErr)
+				require.Error(t, err, "newStowRawStore() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			assert.NotNil(t, got, "Expected rawstore, found nil!")
+
+			require.NoError(t, err, "newStowRawStore() error = %v, wantErr %v", err, tt.wantErr)
+			require.NotNil(t, got, "Expected rawstore, found nil!")
 		})
 	}
 }
