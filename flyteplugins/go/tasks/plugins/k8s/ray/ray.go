@@ -303,7 +303,7 @@ func constructRayJob(ctx context.Context, taskCtx pluginsCore.TaskExecutionConte
 		ttlSecondsAfterFinished = &rayJob.TtlSecondsAfterFinished
 	}
 
-	submitterPodTemplate := buildSubmitterPodTemplate(&rayClusterSpec)
+	submitterPodTemplate := buildSubmitterPodTemplate(&rayClusterSpec, taskCtx)
 
 	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
 	var runtimeEnvYaml string
@@ -497,7 +497,7 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 	return podTemplateSpec, nil
 }
 
-func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec) v1.PodTemplateSpec {
+func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec, taskCtx pluginsCore.TaskExecutionContext) v1.PodTemplateSpec {
 
 	headPodSpec := rayClusterSpec.HeadGroupSpec.Template.Spec
 
@@ -507,7 +507,7 @@ func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec) v1.PodTempl
 	}
 
 	enableServiceLinks := false
-	return v1.PodTemplateSpec{
+	podTemplateSpec := v1.PodTemplateSpec{
 		Spec: v1.PodSpec{
 			Containers: []v1.Container{
 				{
@@ -524,6 +524,10 @@ func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec) v1.PodTempl
 			Affinity:    config.GetK8sPluginConfig().DefaultAffinity,
 		},
 	}
+	k8sCfg := config.GetK8sPluginConfig()
+	podTemplateSpec.SetLabels(utils.UnionMaps(k8sCfg.DefaultLabels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels())))
+	podTemplateSpec.SetAnnotations(utils.UnionMaps(k8sCfg.DefaultAnnotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations())))
+	return podTemplateSpec
 }
 
 func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMetadata *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.WorkerGroupSpec, gpuAccelerator *core.GPUAccelerator) (v1.PodTemplateSpec, error) {
@@ -767,6 +771,33 @@ func getEventInfoForRayJob(ctx context.Context, logConfig logs.LogConfig, plugin
 	}, nil
 }
 
+// UpdateLinkReadiness flips the readiness of the dashboard/IDE task links in phaseInfo and
+// stamps a matching phase reason. Exported so wrappers that determine head readiness through a
+// different lookup (e.g. jobs submitted to a pre-existing cluster via ClusterSelector) reuse the
+// exact same link handling.
+func UpdateLinkReadiness(phaseInfo *pluginsCore.PhaseInfo, ready bool) {
+	if phaseInfo == nil || phaseInfo.Info() == nil {
+		return
+	}
+	for _, tl := range phaseInfo.Info().Logs {
+		if tl != nil && tl.LinkType == core.TaskLog_DASHBOARD {
+			tl.Ready = ready
+			if !ready || phaseInfo.Phase() < pluginsCore.PhaseRunning {
+				phaseInfo.WithReason("Ray dashboard is not ready")
+			} else {
+				phaseInfo.WithReason("Ray dashboard is ready")
+			}
+		} else if tl != nil && tl.LinkType == core.TaskLog_IDE {
+			tl.Ready = ready
+			if !ready || phaseInfo.Phase() != pluginsCore.PhaseRunning {
+				phaseInfo.WithReason("Vscode server is not ready")
+			} else {
+				phaseInfo.WithReason("Vscode server is ready")
+			}
+		}
+	}
+}
+
 func isRayHeadReady(ctx context.Context, rayJobName string, pluginContext k8s.PluginContext) (bool, error) {
 	podList := &v1.PodList{}
 	err := pluginContext.K8sReader().List(ctx, podList)
@@ -852,23 +883,7 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	if ready, err := isRayHeadReady(ctx, rayJob.Name, pluginContext); err != nil {
 		logger.Warnf(ctx, "Failed to determine Ray dashboard readiness. Error: %v", err)
 	} else {
-		for _, tl := range info.Logs {
-			if tl != nil && tl.LinkType == core.TaskLog_DASHBOARD {
-				tl.Ready = ready
-				if !ready || phaseInfo.Phase() < pluginsCore.PhaseRunning {
-					phaseInfo.WithReason("Ray dashboard is not ready")
-				} else {
-					phaseInfo.WithReason("Ray dashboard is ready")
-				}
-			} else if tl != nil && tl.LinkType == core.TaskLog_IDE {
-				tl.Ready = ready
-				if !ready || phaseInfo.Phase() != pluginsCore.PhaseRunning {
-					phaseInfo.WithReason("Vscode server is not ready")
-				} else {
-					phaseInfo.WithReason("Vscode server is ready")
-				}
-			}
-		}
+		UpdateLinkReadiness(&phaseInfo, ready)
 	}
 
 	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)

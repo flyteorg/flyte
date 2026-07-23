@@ -151,8 +151,11 @@ message LogContext {
   repeated PodLogContext pods = 1;
   string primary_pod_name = 2;
   ConnectorLogContext connector = 3;
-  // Pod-name prefix used by log sources to narrow stream/pod searches
-  string pod_name_prefix = 4;
+  // Deprecated: use pod_name_prefixes. Still populated with the task's own pod-name prefix for
+  // readers that predate pod_name_prefixes.
+  string pod_name_prefix = 4 [deprecated = true];
+  // Pod-name prefixes used by log sources to narrow stream/pod searches.
+  repeated string pod_name_prefixes = 5;
 }
 
 // ConnectorLogContext describes how to reach a connector that owns an action's logs.
