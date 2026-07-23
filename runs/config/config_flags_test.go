@@ -127,20 +127,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_database.enableForeignKeyConstraintWhenMigrating", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("database.enableForeignKeyConstraintWhenMigrating", testValue)
-			if vBool, err := cmdFlags.GetBool("database.enableForeignKeyConstraintWhenMigrating"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.Database.EnableForeignKeyConstraintWhenMigrating)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 	t.Run("Test_database.maxIdleConnections", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

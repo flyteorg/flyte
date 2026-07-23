@@ -5,7 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/binary"
 	"fmt"
-	"io/ioutil"
+
 	"os"
 	"os/exec"
 	"path"
@@ -564,7 +564,7 @@ func newSymlinkedConfigFile(t *testing.T) (watchDir, configFile string, cleanup 
 	//    |_ data (symlink for data1)
 	//    |_ config.yaml (symlink for data/config.yaml -recursively a symlink of data1/config.yaml)
 
-	watchDir, err := ioutil.TempDir("", "config-test-")
+	watchDir, err := os.MkdirTemp("", "config-test-")
 	assert.NoError(t, err)
 
 	dataDir1 := path.Join(watchDir, "data1")

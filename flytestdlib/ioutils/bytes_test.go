@@ -1,7 +1,8 @@
 package ioutils
 
 import (
-	"io/ioutil"
+	"io"
+
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,7 +11,7 @@ import (
 func TestNewBytesReadCloser(t *testing.T) {
 	i := []byte("abc")
 	r := NewBytesReadCloser(i)
-	o, e := ioutil.ReadAll(r)
+	o, e := io.ReadAll(r)
 	assert.NoError(t, e)
 	assert.Equal(t, o, i)
 	assert.NoError(t, r.Close())
