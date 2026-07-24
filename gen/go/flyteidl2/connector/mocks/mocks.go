@@ -103,11 +103,11 @@ func (_m *AsyncConnectorServiceClient) EXPECT() *AsyncConnectorServiceClient_Exp
 // CreateTask provides a mock function for the type AsyncConnectorServiceClient
 func (_mock *AsyncConnectorServiceClient) CreateTask(ctx context.Context, in *connector.CreateTaskRequest, opts ...grpc.CallOption) (*connector.CreateTaskResponse, error) {
 	// grpc.CallOption
-	_va := make([]interface{}, len(opts))
+	_va := make([]any, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, in)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -145,9 +145,9 @@ type AsyncConnectorServiceClient_CreateTask_Call struct {
 //   - ctx context.Context
 //   - in *connector.CreateTaskRequest
 //   - opts ...grpc.CallOption
-func (_e *AsyncConnectorServiceClient_Expecter) CreateTask(ctx interface{}, in interface{}, opts ...interface{}) *AsyncConnectorServiceClient_CreateTask_Call {
+func (_e *AsyncConnectorServiceClient_Expecter) CreateTask(ctx any, in any, opts ...any) *AsyncConnectorServiceClient_CreateTask_Call {
 	return &AsyncConnectorServiceClient_CreateTask_Call{Call: _e.mock.On("CreateTask",
-		append([]interface{}{ctx, in}, opts...)...)}
+		append([]any{ctx, in}, opts...)...)}
 }
 
 func (_c *AsyncConnectorServiceClient_CreateTask_Call) Run(run func(ctx context.Context, in *connector.CreateTaskRequest, opts ...grpc.CallOption)) *AsyncConnectorServiceClient_CreateTask_Call {
@@ -190,11 +190,11 @@ func (_c *AsyncConnectorServiceClient_CreateTask_Call) RunAndReturn(run func(ctx
 // DeleteTask provides a mock function for the type AsyncConnectorServiceClient
 func (_mock *AsyncConnectorServiceClient) DeleteTask(ctx context.Context, in *connector.DeleteTaskRequest, opts ...grpc.CallOption) (*connector.DeleteTaskResponse, error) {
 	// grpc.CallOption
-	_va := make([]interface{}, len(opts))
+	_va := make([]any, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, in)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -232,9 +232,9 @@ type AsyncConnectorServiceClient_DeleteTask_Call struct {
 //   - ctx context.Context
 //   - in *connector.DeleteTaskRequest
 //   - opts ...grpc.CallOption
-func (_e *AsyncConnectorServiceClient_Expecter) DeleteTask(ctx interface{}, in interface{}, opts ...interface{}) *AsyncConnectorServiceClient_DeleteTask_Call {
+func (_e *AsyncConnectorServiceClient_Expecter) DeleteTask(ctx any, in any, opts ...any) *AsyncConnectorServiceClient_DeleteTask_Call {
 	return &AsyncConnectorServiceClient_DeleteTask_Call{Call: _e.mock.On("DeleteTask",
-		append([]interface{}{ctx, in}, opts...)...)}
+		append([]any{ctx, in}, opts...)...)}
 }
 
 func (_c *AsyncConnectorServiceClient_DeleteTask_Call) Run(run func(ctx context.Context, in *connector.DeleteTaskRequest, opts ...grpc.CallOption)) *AsyncConnectorServiceClient_DeleteTask_Call {
@@ -277,11 +277,11 @@ func (_c *AsyncConnectorServiceClient_DeleteTask_Call) RunAndReturn(run func(ctx
 // GetTask provides a mock function for the type AsyncConnectorServiceClient
 func (_mock *AsyncConnectorServiceClient) GetTask(ctx context.Context, in *connector.GetTaskRequest, opts ...grpc.CallOption) (*connector.GetTaskResponse, error) {
 	// grpc.CallOption
-	_va := make([]interface{}, len(opts))
+	_va := make([]any, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, in)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -319,9 +319,9 @@ type AsyncConnectorServiceClient_GetTask_Call struct {
 //   - ctx context.Context
 //   - in *connector.GetTaskRequest
 //   - opts ...grpc.CallOption
-func (_e *AsyncConnectorServiceClient_Expecter) GetTask(ctx interface{}, in interface{}, opts ...interface{}) *AsyncConnectorServiceClient_GetTask_Call {
+func (_e *AsyncConnectorServiceClient_Expecter) GetTask(ctx any, in any, opts ...any) *AsyncConnectorServiceClient_GetTask_Call {
 	return &AsyncConnectorServiceClient_GetTask_Call{Call: _e.mock.On("GetTask",
-		append([]interface{}{ctx, in}, opts...)...)}
+		append([]any{ctx, in}, opts...)...)}
 }
 
 func (_c *AsyncConnectorServiceClient_GetTask_Call) Run(run func(ctx context.Context, in *connector.GetTaskRequest, opts ...grpc.CallOption)) *AsyncConnectorServiceClient_GetTask_Call {
@@ -364,11 +364,11 @@ func (_c *AsyncConnectorServiceClient_GetTask_Call) RunAndReturn(run func(ctx co
 // GetTaskLogs provides a mock function for the type AsyncConnectorServiceClient
 func (_mock *AsyncConnectorServiceClient) GetTaskLogs(ctx context.Context, in *connector.GetTaskLogsRequest, opts ...grpc.CallOption) (connector.AsyncConnectorService_GetTaskLogsClient, error) {
 	// grpc.CallOption
-	_va := make([]interface{}, len(opts))
+	_va := make([]any, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, in)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -406,9 +406,9 @@ type AsyncConnectorServiceClient_GetTaskLogs_Call struct {
 //   - ctx context.Context
 //   - in *connector.GetTaskLogsRequest
 //   - opts ...grpc.CallOption
-func (_e *AsyncConnectorServiceClient_Expecter) GetTaskLogs(ctx interface{}, in interface{}, opts ...interface{}) *AsyncConnectorServiceClient_GetTaskLogs_Call {
+func (_e *AsyncConnectorServiceClient_Expecter) GetTaskLogs(ctx any, in any, opts ...any) *AsyncConnectorServiceClient_GetTaskLogs_Call {
 	return &AsyncConnectorServiceClient_GetTaskLogs_Call{Call: _e.mock.On("GetTaskLogs",
-		append([]interface{}{ctx, in}, opts...)...)}
+		append([]any{ctx, in}, opts...)...)}
 }
 
 func (_c *AsyncConnectorServiceClient_GetTaskLogs_Call) Run(run func(ctx context.Context, in *connector.GetTaskLogsRequest, opts ...grpc.CallOption)) *AsyncConnectorServiceClient_GetTaskLogs_Call {
@@ -451,11 +451,11 @@ func (_c *AsyncConnectorServiceClient_GetTaskLogs_Call) RunAndReturn(run func(ct
 // GetTaskMetrics provides a mock function for the type AsyncConnectorServiceClient
 func (_mock *AsyncConnectorServiceClient) GetTaskMetrics(ctx context.Context, in *connector.GetTaskMetricsRequest, opts ...grpc.CallOption) (*connector.GetTaskMetricsResponse, error) {
 	// grpc.CallOption
-	_va := make([]interface{}, len(opts))
+	_va := make([]any, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, in)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -493,9 +493,9 @@ type AsyncConnectorServiceClient_GetTaskMetrics_Call struct {
 //   - ctx context.Context
 //   - in *connector.GetTaskMetricsRequest
 //   - opts ...grpc.CallOption
-func (_e *AsyncConnectorServiceClient_Expecter) GetTaskMetrics(ctx interface{}, in interface{}, opts ...interface{}) *AsyncConnectorServiceClient_GetTaskMetrics_Call {
+func (_e *AsyncConnectorServiceClient_Expecter) GetTaskMetrics(ctx any, in any, opts ...any) *AsyncConnectorServiceClient_GetTaskMetrics_Call {
 	return &AsyncConnectorServiceClient_GetTaskMetrics_Call{Call: _e.mock.On("GetTaskMetrics",
-		append([]interface{}{ctx, in}, opts...)...)}
+		append([]any{ctx, in}, opts...)...)}
 }
 
 func (_c *AsyncConnectorServiceClient_GetTaskMetrics_Call) Run(run func(ctx context.Context, in *connector.GetTaskMetricsRequest, opts ...grpc.CallOption)) *AsyncConnectorServiceClient_GetTaskMetrics_Call {
@@ -786,7 +786,7 @@ type AsyncConnectorService_GetTaskLogsClient_RecvMsg_Call struct {
 
 // RecvMsg is a helper method to define mock.On call
 //   - m any
-func (_e *AsyncConnectorService_GetTaskLogsClient_Expecter) RecvMsg(m interface{}) *AsyncConnectorService_GetTaskLogsClient_RecvMsg_Call {
+func (_e *AsyncConnectorService_GetTaskLogsClient_Expecter) RecvMsg(m any) *AsyncConnectorService_GetTaskLogsClient_RecvMsg_Call {
 	return &AsyncConnectorService_GetTaskLogsClient_RecvMsg_Call{Call: _e.mock.On("RecvMsg", m)}
 }
 
@@ -837,7 +837,7 @@ type AsyncConnectorService_GetTaskLogsClient_SendMsg_Call struct {
 
 // SendMsg is a helper method to define mock.On call
 //   - m any
-func (_e *AsyncConnectorService_GetTaskLogsClient_Expecter) SendMsg(m interface{}) *AsyncConnectorService_GetTaskLogsClient_SendMsg_Call {
+func (_e *AsyncConnectorService_GetTaskLogsClient_Expecter) SendMsg(m any) *AsyncConnectorService_GetTaskLogsClient_SendMsg_Call {
 	return &AsyncConnectorService_GetTaskLogsClient_SendMsg_Call{Call: _e.mock.On("SendMsg", m)}
 }
 
@@ -973,7 +973,7 @@ type AsyncConnectorServiceServer_CreateTask_Call struct {
 // CreateTask is a helper method to define mock.On call
 //   - context1 context.Context
 //   - createTaskRequest *connector.CreateTaskRequest
-func (_e *AsyncConnectorServiceServer_Expecter) CreateTask(context1 interface{}, createTaskRequest interface{}) *AsyncConnectorServiceServer_CreateTask_Call {
+func (_e *AsyncConnectorServiceServer_Expecter) CreateTask(context1 any, createTaskRequest any) *AsyncConnectorServiceServer_CreateTask_Call {
 	return &AsyncConnectorServiceServer_CreateTask_Call{Call: _e.mock.On("CreateTask", context1, createTaskRequest)}
 }
 
@@ -1041,7 +1041,7 @@ type AsyncConnectorServiceServer_DeleteTask_Call struct {
 // DeleteTask is a helper method to define mock.On call
 //   - context1 context.Context
 //   - deleteTaskRequest *connector.DeleteTaskRequest
-func (_e *AsyncConnectorServiceServer_Expecter) DeleteTask(context1 interface{}, deleteTaskRequest interface{}) *AsyncConnectorServiceServer_DeleteTask_Call {
+func (_e *AsyncConnectorServiceServer_Expecter) DeleteTask(context1 any, deleteTaskRequest any) *AsyncConnectorServiceServer_DeleteTask_Call {
 	return &AsyncConnectorServiceServer_DeleteTask_Call{Call: _e.mock.On("DeleteTask", context1, deleteTaskRequest)}
 }
 
@@ -1109,7 +1109,7 @@ type AsyncConnectorServiceServer_GetTask_Call struct {
 // GetTask is a helper method to define mock.On call
 //   - context1 context.Context
 //   - getTaskRequest *connector.GetTaskRequest
-func (_e *AsyncConnectorServiceServer_Expecter) GetTask(context1 interface{}, getTaskRequest interface{}) *AsyncConnectorServiceServer_GetTask_Call {
+func (_e *AsyncConnectorServiceServer_Expecter) GetTask(context1 any, getTaskRequest any) *AsyncConnectorServiceServer_GetTask_Call {
 	return &AsyncConnectorServiceServer_GetTask_Call{Call: _e.mock.On("GetTask", context1, getTaskRequest)}
 }
 
@@ -1166,7 +1166,7 @@ type AsyncConnectorServiceServer_GetTaskLogs_Call struct {
 // GetTaskLogs is a helper method to define mock.On call
 //   - getTaskLogsRequest *connector.GetTaskLogsRequest
 //   - asyncConnectorService_GetTaskLogsServer connector.AsyncConnectorService_GetTaskLogsServer
-func (_e *AsyncConnectorServiceServer_Expecter) GetTaskLogs(getTaskLogsRequest interface{}, asyncConnectorService_GetTaskLogsServer interface{}) *AsyncConnectorServiceServer_GetTaskLogs_Call {
+func (_e *AsyncConnectorServiceServer_Expecter) GetTaskLogs(getTaskLogsRequest any, asyncConnectorService_GetTaskLogsServer any) *AsyncConnectorServiceServer_GetTaskLogs_Call {
 	return &AsyncConnectorServiceServer_GetTaskLogs_Call{Call: _e.mock.On("GetTaskLogs", getTaskLogsRequest, asyncConnectorService_GetTaskLogsServer)}
 }
 
@@ -1234,7 +1234,7 @@ type AsyncConnectorServiceServer_GetTaskMetrics_Call struct {
 // GetTaskMetrics is a helper method to define mock.On call
 //   - context1 context.Context
 //   - getTaskMetricsRequest *connector.GetTaskMetricsRequest
-func (_e *AsyncConnectorServiceServer_Expecter) GetTaskMetrics(context1 interface{}, getTaskMetricsRequest interface{}) *AsyncConnectorServiceServer_GetTaskMetrics_Call {
+func (_e *AsyncConnectorServiceServer_Expecter) GetTaskMetrics(context1 any, getTaskMetricsRequest any) *AsyncConnectorServiceServer_GetTaskMetrics_Call {
 	return &AsyncConnectorServiceServer_GetTaskMetrics_Call{Call: _e.mock.On("GetTaskMetrics", context1, getTaskMetricsRequest)}
 }
 
@@ -1423,7 +1423,7 @@ type AsyncConnectorService_GetTaskLogsServer_RecvMsg_Call struct {
 
 // RecvMsg is a helper method to define mock.On call
 //   - m any
-func (_e *AsyncConnectorService_GetTaskLogsServer_Expecter) RecvMsg(m interface{}) *AsyncConnectorService_GetTaskLogsServer_RecvMsg_Call {
+func (_e *AsyncConnectorService_GetTaskLogsServer_Expecter) RecvMsg(m any) *AsyncConnectorService_GetTaskLogsServer_RecvMsg_Call {
 	return &AsyncConnectorService_GetTaskLogsServer_RecvMsg_Call{Call: _e.mock.On("RecvMsg", m)}
 }
 
@@ -1474,7 +1474,7 @@ type AsyncConnectorService_GetTaskLogsServer_Send_Call struct {
 
 // Send is a helper method to define mock.On call
 //   - getTaskLogsResponse *connector.GetTaskLogsResponse
-func (_e *AsyncConnectorService_GetTaskLogsServer_Expecter) Send(getTaskLogsResponse interface{}) *AsyncConnectorService_GetTaskLogsServer_Send_Call {
+func (_e *AsyncConnectorService_GetTaskLogsServer_Expecter) Send(getTaskLogsResponse any) *AsyncConnectorService_GetTaskLogsServer_Send_Call {
 	return &AsyncConnectorService_GetTaskLogsServer_Send_Call{Call: _e.mock.On("Send", getTaskLogsResponse)}
 }
 
@@ -1525,7 +1525,7 @@ type AsyncConnectorService_GetTaskLogsServer_SendHeader_Call struct {
 
 // SendHeader is a helper method to define mock.On call
 //   - mD metadata.MD
-func (_e *AsyncConnectorService_GetTaskLogsServer_Expecter) SendHeader(mD interface{}) *AsyncConnectorService_GetTaskLogsServer_SendHeader_Call {
+func (_e *AsyncConnectorService_GetTaskLogsServer_Expecter) SendHeader(mD any) *AsyncConnectorService_GetTaskLogsServer_SendHeader_Call {
 	return &AsyncConnectorService_GetTaskLogsServer_SendHeader_Call{Call: _e.mock.On("SendHeader", mD)}
 }
 
@@ -1576,7 +1576,7 @@ type AsyncConnectorService_GetTaskLogsServer_SendMsg_Call struct {
 
 // SendMsg is a helper method to define mock.On call
 //   - m any
-func (_e *AsyncConnectorService_GetTaskLogsServer_Expecter) SendMsg(m interface{}) *AsyncConnectorService_GetTaskLogsServer_SendMsg_Call {
+func (_e *AsyncConnectorService_GetTaskLogsServer_Expecter) SendMsg(m any) *AsyncConnectorService_GetTaskLogsServer_SendMsg_Call {
 	return &AsyncConnectorService_GetTaskLogsServer_SendMsg_Call{Call: _e.mock.On("SendMsg", m)}
 }
 
@@ -1627,7 +1627,7 @@ type AsyncConnectorService_GetTaskLogsServer_SetHeader_Call struct {
 
 // SetHeader is a helper method to define mock.On call
 //   - mD metadata.MD
-func (_e *AsyncConnectorService_GetTaskLogsServer_Expecter) SetHeader(mD interface{}) *AsyncConnectorService_GetTaskLogsServer_SetHeader_Call {
+func (_e *AsyncConnectorService_GetTaskLogsServer_Expecter) SetHeader(mD any) *AsyncConnectorService_GetTaskLogsServer_SetHeader_Call {
 	return &AsyncConnectorService_GetTaskLogsServer_SetHeader_Call{Call: _e.mock.On("SetHeader", mD)}
 }
 
@@ -1667,7 +1667,7 @@ type AsyncConnectorService_GetTaskLogsServer_SetTrailer_Call struct {
 
 // SetTrailer is a helper method to define mock.On call
 //   - mD metadata.MD
-func (_e *AsyncConnectorService_GetTaskLogsServer_Expecter) SetTrailer(mD interface{}) *AsyncConnectorService_GetTaskLogsServer_SetTrailer_Call {
+func (_e *AsyncConnectorService_GetTaskLogsServer_Expecter) SetTrailer(mD any) *AsyncConnectorService_GetTaskLogsServer_SetTrailer_Call {
 	return &AsyncConnectorService_GetTaskLogsServer_SetTrailer_Call{Call: _e.mock.On("SetTrailer", mD)}
 }
 
@@ -1724,11 +1724,11 @@ func (_m *ConnectorMetadataServiceClient) EXPECT() *ConnectorMetadataServiceClie
 // GetConnector provides a mock function for the type ConnectorMetadataServiceClient
 func (_mock *ConnectorMetadataServiceClient) GetConnector(ctx context.Context, in *connector.GetConnectorRequest, opts ...grpc.CallOption) (*connector.GetConnectorResponse, error) {
 	// grpc.CallOption
-	_va := make([]interface{}, len(opts))
+	_va := make([]any, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, in)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -1766,9 +1766,9 @@ type ConnectorMetadataServiceClient_GetConnector_Call struct {
 //   - ctx context.Context
 //   - in *connector.GetConnectorRequest
 //   - opts ...grpc.CallOption
-func (_e *ConnectorMetadataServiceClient_Expecter) GetConnector(ctx interface{}, in interface{}, opts ...interface{}) *ConnectorMetadataServiceClient_GetConnector_Call {
+func (_e *ConnectorMetadataServiceClient_Expecter) GetConnector(ctx any, in any, opts ...any) *ConnectorMetadataServiceClient_GetConnector_Call {
 	return &ConnectorMetadataServiceClient_GetConnector_Call{Call: _e.mock.On("GetConnector",
-		append([]interface{}{ctx, in}, opts...)...)}
+		append([]any{ctx, in}, opts...)...)}
 }
 
 func (_c *ConnectorMetadataServiceClient_GetConnector_Call) Run(run func(ctx context.Context, in *connector.GetConnectorRequest, opts ...grpc.CallOption)) *ConnectorMetadataServiceClient_GetConnector_Call {
@@ -1811,11 +1811,11 @@ func (_c *ConnectorMetadataServiceClient_GetConnector_Call) RunAndReturn(run fun
 // ListConnectors provides a mock function for the type ConnectorMetadataServiceClient
 func (_mock *ConnectorMetadataServiceClient) ListConnectors(ctx context.Context, in *connector.ListConnectorsRequest, opts ...grpc.CallOption) (*connector.ListConnectorsResponse, error) {
 	// grpc.CallOption
-	_va := make([]interface{}, len(opts))
+	_va := make([]any, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, in)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -1853,9 +1853,9 @@ type ConnectorMetadataServiceClient_ListConnectors_Call struct {
 //   - ctx context.Context
 //   - in *connector.ListConnectorsRequest
 //   - opts ...grpc.CallOption
-func (_e *ConnectorMetadataServiceClient_Expecter) ListConnectors(ctx interface{}, in interface{}, opts ...interface{}) *ConnectorMetadataServiceClient_ListConnectors_Call {
+func (_e *ConnectorMetadataServiceClient_Expecter) ListConnectors(ctx any, in any, opts ...any) *ConnectorMetadataServiceClient_ListConnectors_Call {
 	return &ConnectorMetadataServiceClient_ListConnectors_Call{Call: _e.mock.On("ListConnectors",
-		append([]interface{}{ctx, in}, opts...)...)}
+		append([]any{ctx, in}, opts...)...)}
 }
 
 func (_c *ConnectorMetadataServiceClient_ListConnectors_Call) Run(run func(ctx context.Context, in *connector.ListConnectorsRequest, opts ...grpc.CallOption)) *ConnectorMetadataServiceClient_ListConnectors_Call {
@@ -1958,7 +1958,7 @@ type ConnectorMetadataServiceServer_GetConnector_Call struct {
 // GetConnector is a helper method to define mock.On call
 //   - context1 context.Context
 //   - getConnectorRequest *connector.GetConnectorRequest
-func (_e *ConnectorMetadataServiceServer_Expecter) GetConnector(context1 interface{}, getConnectorRequest interface{}) *ConnectorMetadataServiceServer_GetConnector_Call {
+func (_e *ConnectorMetadataServiceServer_Expecter) GetConnector(context1 any, getConnectorRequest any) *ConnectorMetadataServiceServer_GetConnector_Call {
 	return &ConnectorMetadataServiceServer_GetConnector_Call{Call: _e.mock.On("GetConnector", context1, getConnectorRequest)}
 }
 
@@ -2026,7 +2026,7 @@ type ConnectorMetadataServiceServer_ListConnectors_Call struct {
 // ListConnectors is a helper method to define mock.On call
 //   - context1 context.Context
 //   - listConnectorsRequest *connector.ListConnectorsRequest
-func (_e *ConnectorMetadataServiceServer_Expecter) ListConnectors(context1 interface{}, listConnectorsRequest interface{}) *ConnectorMetadataServiceServer_ListConnectors_Call {
+func (_e *ConnectorMetadataServiceServer_Expecter) ListConnectors(context1 any, listConnectorsRequest any) *ConnectorMetadataServiceServer_ListConnectors_Call {
 	return &ConnectorMetadataServiceServer_ListConnectors_Call{Call: _e.mock.On("ListConnectors", context1, listConnectorsRequest)}
 }
 

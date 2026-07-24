@@ -69,7 +69,7 @@ type ActionRepo_AbortAction_Call struct {
 //   - actionID *common.ActionIdentifier
 //   - reason string
 //   - abortedBy *common.EnrichedIdentity
-func (_e *ActionRepo_Expecter) AbortAction(ctx interface{}, actionID interface{}, reason interface{}, abortedBy interface{}) *ActionRepo_AbortAction_Call {
+func (_e *ActionRepo_Expecter) AbortAction(ctx any, actionID any, reason any, abortedBy any) *ActionRepo_AbortAction_Call {
 	return &ActionRepo_AbortAction_Call{Call: _e.mock.On("AbortAction", ctx, actionID, reason, abortedBy)}
 }
 
@@ -138,7 +138,7 @@ type ActionRepo_AbortRun_Call struct {
 //   - runID *common.RunIdentifier
 //   - reason string
 //   - abortedBy *common.EnrichedIdentity
-func (_e *ActionRepo_Expecter) AbortRun(ctx interface{}, runID interface{}, reason interface{}, abortedBy interface{}) *ActionRepo_AbortRun_Call {
+func (_e *ActionRepo_Expecter) AbortRun(ctx any, runID any, reason any, abortedBy any) *ActionRepo_AbortRun_Call {
 	return &ActionRepo_AbortRun_Call{Call: _e.mock.On("AbortRun", ctx, runID, reason, abortedBy)}
 }
 
@@ -205,7 +205,7 @@ type ActionRepo_ClearAbortRequest_Call struct {
 // ClearAbortRequest is a helper method to define mock.On call
 //   - ctx context.Context
 //   - actionID *common.ActionIdentifier
-func (_e *ActionRepo_Expecter) ClearAbortRequest(ctx interface{}, actionID interface{}) *ActionRepo_ClearAbortRequest_Call {
+func (_e *ActionRepo_Expecter) ClearAbortRequest(ctx any, actionID any) *ActionRepo_ClearAbortRequest_Call {
 	return &ActionRepo_ClearAbortRequest_Call{Call: _e.mock.On("ClearAbortRequest", ctx, actionID)}
 }
 
@@ -274,7 +274,7 @@ type ActionRepo_CreateAction_Call struct {
 //   - ctx context.Context
 //   - action *models.Action
 //   - updateTriggeredAt bool
-func (_e *ActionRepo_Expecter) CreateAction(ctx interface{}, action interface{}, updateTriggeredAt interface{}) *ActionRepo_CreateAction_Call {
+func (_e *ActionRepo_Expecter) CreateAction(ctx any, action any, updateTriggeredAt any) *ActionRepo_CreateAction_Call {
 	return &ActionRepo_CreateAction_Call{Call: _e.mock.On("CreateAction", ctx, action, updateTriggeredAt)}
 }
 
@@ -347,7 +347,7 @@ type ActionRepo_GetAction_Call struct {
 // GetAction is a helper method to define mock.On call
 //   - ctx context.Context
 //   - actionID *common.ActionIdentifier
-func (_e *ActionRepo_Expecter) GetAction(ctx interface{}, actionID interface{}) *ActionRepo_GetAction_Call {
+func (_e *ActionRepo_Expecter) GetAction(ctx any, actionID any) *ActionRepo_GetAction_Call {
 	return &ActionRepo_GetAction_Call{Call: _e.mock.On("GetAction", ctx, actionID)}
 }
 
@@ -413,7 +413,7 @@ type ActionRepo_GetActionState_Call struct {
 // GetActionState is a helper method to define mock.On call
 //   - ctx context.Context
 //   - actionID *common.ActionIdentifier
-func (_e *ActionRepo_Expecter) GetActionState(ctx interface{}, actionID interface{}) *ActionRepo_GetActionState_Call {
+func (_e *ActionRepo_Expecter) GetActionState(ctx any, actionID any) *ActionRepo_GetActionState_Call {
 	return &ActionRepo_GetActionState_Call{Call: _e.mock.On("GetActionState", ctx, actionID)}
 }
 
@@ -482,7 +482,7 @@ type ActionRepo_GetLatestEventByAttempt_Call struct {
 //   - ctx context.Context
 //   - actionID *common.ActionIdentifier
 //   - attempt uint32
-func (_e *ActionRepo_Expecter) GetLatestEventByAttempt(ctx interface{}, actionID interface{}, attempt interface{}) *ActionRepo_GetLatestEventByAttempt_Call {
+func (_e *ActionRepo_Expecter) GetLatestEventByAttempt(ctx any, actionID any, attempt any) *ActionRepo_GetLatestEventByAttempt_Call {
 	return &ActionRepo_GetLatestEventByAttempt_Call{Call: _e.mock.On("GetLatestEventByAttempt", ctx, actionID, attempt)}
 }
 
@@ -555,7 +555,7 @@ type ActionRepo_GetRun_Call struct {
 // GetRun is a helper method to define mock.On call
 //   - ctx context.Context
 //   - runID *common.RunIdentifier
-func (_e *ActionRepo_Expecter) GetRun(ctx interface{}, runID interface{}) *ActionRepo_GetRun_Call {
+func (_e *ActionRepo_Expecter) GetRun(ctx any, runID any) *ActionRepo_GetRun_Call {
 	return &ActionRepo_GetRun_Call{Call: _e.mock.On("GetRun", ctx, runID)}
 }
 
@@ -612,7 +612,7 @@ type ActionRepo_InsertEvents_Call struct {
 // InsertEvents is a helper method to define mock.On call
 //   - ctx context.Context
 //   - events []*models.ActionEvent
-func (_e *ActionRepo_Expecter) InsertEvents(ctx interface{}, events interface{}) *ActionRepo_InsertEvents_Call {
+func (_e *ActionRepo_Expecter) InsertEvents(ctx any, events any) *ActionRepo_InsertEvents_Call {
 	return &ActionRepo_InsertEvents_Call{Call: _e.mock.On("InsertEvents", ctx, events)}
 }
 
@@ -680,7 +680,7 @@ type ActionRepo_ListActions_Call struct {
 // ListActions is a helper method to define mock.On call
 //   - ctx context.Context
 //   - input interfaces.ListResourceInput
-func (_e *ActionRepo_Expecter) ListActions(ctx interface{}, input interface{}) *ActionRepo_ListActions_Call {
+func (_e *ActionRepo_Expecter) ListActions(ctx any, input any) *ActionRepo_ListActions_Call {
 	return &ActionRepo_ListActions_Call{Call: _e.mock.On("ListActions", ctx, input)}
 }
 
@@ -749,7 +749,7 @@ type ActionRepo_ListEvents_Call struct {
 //   - ctx context.Context
 //   - actionID *common.ActionIdentifier
 //   - limit int
-func (_e *ActionRepo_Expecter) ListEvents(ctx interface{}, actionID interface{}, limit interface{}) *ActionRepo_ListEvents_Call {
+func (_e *ActionRepo_Expecter) ListEvents(ctx any, actionID any, limit any) *ActionRepo_ListEvents_Call {
 	return &ActionRepo_ListEvents_Call{Call: _e.mock.On("ListEvents", ctx, actionID, limit)}
 }
 
@@ -826,7 +826,7 @@ type ActionRepo_ListEventsSince_Call struct {
 //   - since time.Time
 //   - offset int
 //   - limit int
-func (_e *ActionRepo_Expecter) ListEventsSince(ctx interface{}, actionID interface{}, attempt interface{}, since interface{}, offset interface{}, limit interface{}) *ActionRepo_ListEventsSince_Call {
+func (_e *ActionRepo_Expecter) ListEventsSince(ctx any, actionID any, attempt any, since any, offset any, limit any) *ActionRepo_ListEventsSince_Call {
 	return &ActionRepo_ListEventsSince_Call{Call: _e.mock.On("ListEventsSince", ctx, actionID, attempt, since, offset, limit)}
 }
 
@@ -913,7 +913,7 @@ type ActionRepo_ListPendingAborts_Call struct {
 
 // ListPendingAborts is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *ActionRepo_Expecter) ListPendingAborts(ctx interface{}) *ActionRepo_ListPendingAborts_Call {
+func (_e *ActionRepo_Expecter) ListPendingAborts(ctx any) *ActionRepo_ListPendingAborts_Call {
 	return &ActionRepo_ListPendingAborts_Call{Call: _e.mock.On("ListPendingAborts", ctx)}
 }
 
@@ -980,7 +980,7 @@ type ActionRepo_ListRootActions_Call struct {
 //   - startDate *time.Time
 //   - endDate *time.Time
 //   - limit int
-func (_e *ActionRepo_Expecter) ListRootActions(ctx interface{}, project interface{}, domain interface{}, startDate interface{}, endDate interface{}, limit interface{}) *ActionRepo_ListRootActions_Call {
+func (_e *ActionRepo_Expecter) ListRootActions(ctx any, project any, domain any, startDate any, endDate any, limit any) *ActionRepo_ListRootActions_Call {
 	return &ActionRepo_ListRootActions_Call{Call: _e.mock.On("ListRootActions", ctx, project, domain, startDate, endDate, limit)}
 }
 
@@ -1066,7 +1066,7 @@ type ActionRepo_MarkAbortAttempt_Call struct {
 // MarkAbortAttempt is a helper method to define mock.On call
 //   - ctx context.Context
 //   - actionID *common.ActionIdentifier
-func (_e *ActionRepo_Expecter) MarkAbortAttempt(ctx interface{}, actionID interface{}) *ActionRepo_MarkAbortAttempt_Call {
+func (_e *ActionRepo_Expecter) MarkAbortAttempt(ctx any, actionID any) *ActionRepo_MarkAbortAttempt_Call {
 	return &ActionRepo_MarkAbortAttempt_Call{Call: _e.mock.On("MarkAbortAttempt", ctx, actionID)}
 }
 
@@ -1123,7 +1123,7 @@ type ActionRepo_NotifyStateUpdate_Call struct {
 // NotifyStateUpdate is a helper method to define mock.On call
 //   - ctx context.Context
 //   - actionID *common.ActionIdentifier
-func (_e *ActionRepo_Expecter) NotifyStateUpdate(ctx interface{}, actionID interface{}) *ActionRepo_NotifyStateUpdate_Call {
+func (_e *ActionRepo_Expecter) NotifyStateUpdate(ctx any, actionID any) *ActionRepo_NotifyStateUpdate_Call {
 	return &ActionRepo_NotifyStateUpdate_Call{Call: _e.mock.On("NotifyStateUpdate", ctx, actionID)}
 }
 
@@ -1181,7 +1181,7 @@ type ActionRepo_UpdateActionDetailedInfo_Call struct {
 //   - ctx context.Context
 //   - actionID *common.ActionIdentifier
 //   - detailedInfo []byte
-func (_e *ActionRepo_Expecter) UpdateActionDetailedInfo(ctx interface{}, actionID interface{}, detailedInfo interface{}) *ActionRepo_UpdateActionDetailedInfo_Call {
+func (_e *ActionRepo_Expecter) UpdateActionDetailedInfo(ctx any, actionID any, detailedInfo any) *ActionRepo_UpdateActionDetailedInfo_Call {
 	return &ActionRepo_UpdateActionDetailedInfo_Call{Call: _e.mock.On("UpdateActionDetailedInfo", ctx, actionID, detailedInfo)}
 }
 
@@ -1248,7 +1248,7 @@ type ActionRepo_UpdateActionPhase_Call struct {
 //   - cacheStatus core.CatalogCacheStatus
 //   - endTime *time.Time
 //   - startTime *time.Time
-func (_e *ActionRepo_Expecter) UpdateActionPhase(ctx interface{}, actionID interface{}, phase interface{}, attempts interface{}, cacheStatus interface{}, endTime interface{}, startTime interface{}) *ActionRepo_UpdateActionPhase_Call {
+func (_e *ActionRepo_Expecter) UpdateActionPhase(ctx any, actionID any, phase any, attempts any, cacheStatus any, endTime any, startTime any) *ActionRepo_UpdateActionPhase_Call {
 	return &ActionRepo_UpdateActionPhase_Call{Call: _e.mock.On("UpdateActionPhase", ctx, actionID, phase, attempts, cacheStatus, endTime, startTime)}
 }
 
@@ -1331,7 +1331,7 @@ type ActionRepo_UpdateActionState_Call struct {
 //   - ctx context.Context
 //   - actionID *common.ActionIdentifier
 //   - state string
-func (_e *ActionRepo_Expecter) UpdateActionState(ctx interface{}, actionID interface{}, state interface{}) *ActionRepo_UpdateActionState_Call {
+func (_e *ActionRepo_Expecter) UpdateActionState(ctx any, actionID any, state any) *ActionRepo_UpdateActionState_Call {
 	return &ActionRepo_UpdateActionState_Call{Call: _e.mock.On("UpdateActionState", ctx, actionID, state)}
 }
 
@@ -1384,7 +1384,7 @@ type ActionRepo_WatchActionUpdates_Call struct {
 //   - actionID *common.ActionIdentifier
 //   - updates chan<- *models.Action
 //   - errs chan<- error
-func (_e *ActionRepo_Expecter) WatchActionUpdates(ctx interface{}, actionID interface{}, updates interface{}, errs interface{}) *ActionRepo_WatchActionUpdates_Call {
+func (_e *ActionRepo_Expecter) WatchActionUpdates(ctx any, actionID any, updates any, errs any) *ActionRepo_WatchActionUpdates_Call {
 	return &ActionRepo_WatchActionUpdates_Call{Call: _e.mock.On("WatchActionUpdates", ctx, actionID, updates, errs)}
 }
 
@@ -1442,7 +1442,7 @@ type ActionRepo_WatchAllActionUpdates_Call struct {
 //   - runID *common.RunIdentifier
 //   - updates chan<- *models.Action
 //   - errs chan<- error
-func (_e *ActionRepo_Expecter) WatchAllActionUpdates(ctx interface{}, runID interface{}, updates interface{}, errs interface{}) *ActionRepo_WatchAllActionUpdates_Call {
+func (_e *ActionRepo_Expecter) WatchAllActionUpdates(ctx any, runID any, updates any, errs any) *ActionRepo_WatchAllActionUpdates_Call {
 	return &ActionRepo_WatchAllActionUpdates_Call{Call: _e.mock.On("WatchAllActionUpdates", ctx, runID, updates, errs)}
 }
 
@@ -1499,7 +1499,7 @@ type ActionRepo_WatchAllRunUpdates_Call struct {
 //   - ctx context.Context
 //   - updates chan<- *models.Run
 //   - errs chan<- error
-func (_e *ActionRepo_Expecter) WatchAllRunUpdates(ctx interface{}, updates interface{}, errs interface{}) *ActionRepo_WatchAllRunUpdates_Call {
+func (_e *ActionRepo_Expecter) WatchAllRunUpdates(ctx any, updates any, errs any) *ActionRepo_WatchAllRunUpdates_Call {
 	return &ActionRepo_WatchAllRunUpdates_Call{Call: _e.mock.On("WatchAllRunUpdates", ctx, updates, errs)}
 }
 
@@ -1552,7 +1552,7 @@ type ActionRepo_WatchRunUpdates_Call struct {
 //   - runID *common.RunIdentifier
 //   - updates chan<- *models.Run
 //   - errs chan<- error
-func (_e *ActionRepo_Expecter) WatchRunUpdates(ctx interface{}, runID interface{}, updates interface{}, errs interface{}) *ActionRepo_WatchRunUpdates_Call {
+func (_e *ActionRepo_Expecter) WatchRunUpdates(ctx any, runID any, updates any, errs any) *ActionRepo_WatchRunUpdates_Call {
 	return &ActionRepo_WatchRunUpdates_Call{Call: _e.mock.On("WatchRunUpdates", ctx, runID, updates, errs)}
 }
 
@@ -1609,7 +1609,7 @@ type ActionRepo_WatchStateUpdates_Call struct {
 //   - ctx context.Context
 //   - updates chan<- *common.ActionIdentifier
 //   - errs chan<- error
-func (_e *ActionRepo_Expecter) WatchStateUpdates(ctx interface{}, updates interface{}, errs interface{}) *ActionRepo_WatchStateUpdates_Call {
+func (_e *ActionRepo_Expecter) WatchStateUpdates(ctx any, updates any, errs any) *ActionRepo_WatchStateUpdates_Call {
 	return &ActionRepo_WatchStateUpdates_Call{Call: _e.mock.On("WatchStateUpdates", ctx, updates, errs)}
 }
 
@@ -1699,7 +1699,7 @@ type Filter_And_Call struct {
 
 // And is a helper method to define mock.On call
 //   - filter interfaces.Filter
-func (_e *Filter_Expecter) And(filter interface{}) *Filter_And_Call {
+func (_e *Filter_Expecter) And(filter any) *Filter_And_Call {
 	return &Filter_And_Call{Call: _e.mock.On("And", filter)}
 }
 
@@ -1752,7 +1752,7 @@ type Filter_Or_Call struct {
 
 // Or is a helper method to define mock.On call
 //   - filter interfaces.Filter
-func (_e *Filter_Expecter) Or(filter interface{}) *Filter_Or_Call {
+func (_e *Filter_Expecter) Or(filter any) *Filter_Or_Call {
 	return &Filter_Or_Call{Call: _e.mock.On("Or", filter)}
 }
 
@@ -1812,7 +1812,7 @@ type Filter_QueryExpression_Call struct {
 
 // QueryExpression is a helper method to define mock.On call
 //   - table string
-func (_e *Filter_Expecter) QueryExpression(table interface{}) *Filter_QueryExpression_Call {
+func (_e *Filter_Expecter) QueryExpression(table any) *Filter_QueryExpression_Call {
 	return &Filter_QueryExpression_Call{Call: _e.mock.On("QueryExpression", table)}
 }
 
@@ -1891,7 +1891,7 @@ type ProjectRepo_CreateProject_Call struct {
 // CreateProject is a helper method to define mock.On call
 //   - ctx context.Context
 //   - project *models.Project
-func (_e *ProjectRepo_Expecter) CreateProject(ctx interface{}, project interface{}) *ProjectRepo_CreateProject_Call {
+func (_e *ProjectRepo_Expecter) CreateProject(ctx any, project any) *ProjectRepo_CreateProject_Call {
 	return &ProjectRepo_CreateProject_Call{Call: _e.mock.On("CreateProject", ctx, project)}
 }
 
@@ -1959,7 +1959,7 @@ type ProjectRepo_GetProject_Call struct {
 // GetProject is a helper method to define mock.On call
 //   - ctx context.Context
 //   - identifier string
-func (_e *ProjectRepo_Expecter) GetProject(ctx interface{}, identifier interface{}) *ProjectRepo_GetProject_Call {
+func (_e *ProjectRepo_Expecter) GetProject(ctx any, identifier any) *ProjectRepo_GetProject_Call {
 	return &ProjectRepo_GetProject_Call{Call: _e.mock.On("GetProject", ctx, identifier)}
 }
 
@@ -2027,7 +2027,7 @@ type ProjectRepo_ListProjects_Call struct {
 // ListProjects is a helper method to define mock.On call
 //   - ctx context.Context
 //   - input interfaces.ListResourceInput
-func (_e *ProjectRepo_Expecter) ListProjects(ctx interface{}, input interface{}) *ProjectRepo_ListProjects_Call {
+func (_e *ProjectRepo_Expecter) ListProjects(ctx any, input any) *ProjectRepo_ListProjects_Call {
 	return &ProjectRepo_ListProjects_Call{Call: _e.mock.On("ListProjects", ctx, input)}
 }
 
@@ -2084,7 +2084,7 @@ type ProjectRepo_UpdateProject_Call struct {
 // UpdateProject is a helper method to define mock.On call
 //   - ctx context.Context
 //   - project *models.Project
-func (_e *ProjectRepo_Expecter) UpdateProject(ctx interface{}, project interface{}) *ProjectRepo_UpdateProject_Call {
+func (_e *ProjectRepo_Expecter) UpdateProject(ctx any, project any) *ProjectRepo_UpdateProject_Call {
 	return &ProjectRepo_UpdateProject_Call{Call: _e.mock.On("UpdateProject", ctx, project)}
 }
 
@@ -2405,7 +2405,7 @@ type TaskRepo_CreateTask_Call struct {
 //   - ctx context.Context
 //   - task *models.Task
 //   - triggers []*models.Trigger
-func (_e *TaskRepo_Expecter) CreateTask(ctx interface{}, task interface{}, triggers interface{}) *TaskRepo_CreateTask_Call {
+func (_e *TaskRepo_Expecter) CreateTask(ctx any, task any, triggers any) *TaskRepo_CreateTask_Call {
 	return &TaskRepo_CreateTask_Call{Call: _e.mock.On("CreateTask", ctx, task, triggers)}
 }
 
@@ -2467,7 +2467,7 @@ type TaskRepo_CreateTaskSpec_Call struct {
 // CreateTaskSpec is a helper method to define mock.On call
 //   - ctx context.Context
 //   - taskSpec *models.TaskSpec
-func (_e *TaskRepo_Expecter) CreateTaskSpec(ctx interface{}, taskSpec interface{}) *TaskRepo_CreateTaskSpec_Call {
+func (_e *TaskRepo_Expecter) CreateTaskSpec(ctx any, taskSpec any) *TaskRepo_CreateTaskSpec_Call {
 	return &TaskRepo_CreateTaskSpec_Call{Call: _e.mock.On("CreateTaskSpec", ctx, taskSpec)}
 }
 
@@ -2535,7 +2535,7 @@ type TaskRepo_GetTask_Call struct {
 // GetTask is a helper method to define mock.On call
 //   - ctx context.Context
 //   - key models.TaskKey
-func (_e *TaskRepo_Expecter) GetTask(ctx interface{}, key interface{}) *TaskRepo_GetTask_Call {
+func (_e *TaskRepo_Expecter) GetTask(ctx any, key any) *TaskRepo_GetTask_Call {
 	return &TaskRepo_GetTask_Call{Call: _e.mock.On("GetTask", ctx, key)}
 }
 
@@ -2603,7 +2603,7 @@ type TaskRepo_GetTaskSpec_Call struct {
 // GetTaskSpec is a helper method to define mock.On call
 //   - ctx context.Context
 //   - digest string
-func (_e *TaskRepo_Expecter) GetTaskSpec(ctx interface{}, digest interface{}) *TaskRepo_GetTaskSpec_Call {
+func (_e *TaskRepo_Expecter) GetTaskSpec(ctx any, digest any) *TaskRepo_GetTaskSpec_Call {
 	return &TaskRepo_GetTaskSpec_Call{Call: _e.mock.On("GetTaskSpec", ctx, digest)}
 }
 
@@ -2671,7 +2671,7 @@ type TaskRepo_ListTasks_Call struct {
 // ListTasks is a helper method to define mock.On call
 //   - ctx context.Context
 //   - input interfaces.ListResourceInput
-func (_e *TaskRepo_Expecter) ListTasks(ctx interface{}, input interface{}) *TaskRepo_ListTasks_Call {
+func (_e *TaskRepo_Expecter) ListTasks(ctx any, input any) *TaskRepo_ListTasks_Call {
 	return &TaskRepo_ListTasks_Call{Call: _e.mock.On("ListTasks", ctx, input)}
 }
 
@@ -2739,7 +2739,7 @@ type TaskRepo_ListVersions_Call struct {
 // ListVersions is a helper method to define mock.On call
 //   - ctx context.Context
 //   - input interfaces.ListResourceInput
-func (_e *TaskRepo_Expecter) ListVersions(ctx interface{}, input interface{}) *TaskRepo_ListVersions_Call {
+func (_e *TaskRepo_Expecter) ListVersions(ctx any, input any) *TaskRepo_ListVersions_Call {
 	return &TaskRepo_ListVersions_Call{Call: _e.mock.On("ListVersions", ctx, input)}
 }
 
@@ -2823,7 +2823,7 @@ type TriggerRepo_DeleteTriggers_Call struct {
 // DeleteTriggers is a helper method to define mock.On call
 //   - ctx context.Context
 //   - keys []interfaces.TriggerNameKey
-func (_e *TriggerRepo_Expecter) DeleteTriggers(ctx interface{}, keys interface{}) *TriggerRepo_DeleteTriggers_Call {
+func (_e *TriggerRepo_Expecter) DeleteTriggers(ctx any, keys any) *TriggerRepo_DeleteTriggers_Call {
 	return &TriggerRepo_DeleteTriggers_Call{Call: _e.mock.On("DeleteTriggers", ctx, keys)}
 }
 
@@ -2891,7 +2891,7 @@ type TriggerRepo_GetTrigger_Call struct {
 // GetTrigger is a helper method to define mock.On call
 //   - ctx context.Context
 //   - key interfaces.TriggerNameKey
-func (_e *TriggerRepo_Expecter) GetTrigger(ctx interface{}, key interface{}) *TriggerRepo_GetTrigger_Call {
+func (_e *TriggerRepo_Expecter) GetTrigger(ctx any, key any) *TriggerRepo_GetTrigger_Call {
 	return &TriggerRepo_GetTrigger_Call{Call: _e.mock.On("GetTrigger", ctx, key)}
 }
 
@@ -2963,7 +2963,7 @@ type TriggerRepo_GetTriggerRevision_Call struct {
 //   - taskName string
 //   - name string
 //   - revision uint64
-func (_e *TriggerRepo_Expecter) GetTriggerRevision(ctx interface{}, project interface{}, domain interface{}, taskName interface{}, name interface{}, revision interface{}) *TriggerRepo_GetTriggerRevision_Call {
+func (_e *TriggerRepo_Expecter) GetTriggerRevision(ctx any, project any, domain any, taskName any, name any, revision any) *TriggerRepo_GetTriggerRevision_Call {
 	return &TriggerRepo_GetTriggerRevision_Call{Call: _e.mock.On("GetTriggerRevision", ctx, project, domain, taskName, name, revision)}
 }
 
@@ -3055,7 +3055,7 @@ type TriggerRepo_ListTriggerRevisions_Call struct {
 //   - taskName string
 //   - name string
 //   - input interfaces.ListResourceInput
-func (_e *TriggerRepo_Expecter) ListTriggerRevisions(ctx interface{}, project interface{}, domain interface{}, taskName interface{}, name interface{}, input interface{}) *TriggerRepo_ListTriggerRevisions_Call {
+func (_e *TriggerRepo_Expecter) ListTriggerRevisions(ctx any, project any, domain any, taskName any, name any, input any) *TriggerRepo_ListTriggerRevisions_Call {
 	return &TriggerRepo_ListTriggerRevisions_Call{Call: _e.mock.On("ListTriggerRevisions", ctx, project, domain, taskName, name, input)}
 }
 
@@ -3143,7 +3143,7 @@ type TriggerRepo_ListTriggers_Call struct {
 // ListTriggers is a helper method to define mock.On call
 //   - ctx context.Context
 //   - input interfaces.ListResourceInput
-func (_e *TriggerRepo_Expecter) ListTriggers(ctx interface{}, input interface{}) *TriggerRepo_ListTriggers_Call {
+func (_e *TriggerRepo_Expecter) ListTriggers(ctx any, input any) *TriggerRepo_ListTriggers_Call {
 	return &TriggerRepo_ListTriggers_Call{Call: _e.mock.On("ListTriggers", ctx, input)}
 }
 
@@ -3212,7 +3212,7 @@ type TriggerRepo_SaveTrigger_Call struct {
 //   - ctx context.Context
 //   - trigger *models.Trigger
 //   - expectedRevision uint64
-func (_e *TriggerRepo_Expecter) SaveTrigger(ctx interface{}, trigger interface{}, expectedRevision interface{}) *TriggerRepo_SaveTrigger_Call {
+func (_e *TriggerRepo_Expecter) SaveTrigger(ctx any, trigger any, expectedRevision any) *TriggerRepo_SaveTrigger_Call {
 	return &TriggerRepo_SaveTrigger_Call{Call: _e.mock.On("SaveTrigger", ctx, trigger, expectedRevision)}
 }
 
@@ -3275,7 +3275,7 @@ type TriggerRepo_UpdateTriggers_Call struct {
 //   - ctx context.Context
 //   - keys []interfaces.TriggerNameKey
 //   - active bool
-func (_e *TriggerRepo_Expecter) UpdateTriggers(ctx interface{}, keys interface{}, active interface{}) *TriggerRepo_UpdateTriggers_Call {
+func (_e *TriggerRepo_Expecter) UpdateTriggers(ctx any, keys any, active any) *TriggerRepo_UpdateTriggers_Call {
 	return &TriggerRepo_UpdateTriggers_Call{Call: _e.mock.On("UpdateTriggers", ctx, keys, active)}
 }
 

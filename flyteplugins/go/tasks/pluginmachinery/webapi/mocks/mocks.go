@@ -1304,7 +1304,7 @@ type AsyncPlugin_Create_Call struct {
 // Create is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx webapi.TaskExecutionContextReader
-func (_e *AsyncPlugin_Expecter) Create(ctx interface{}, tCtx interface{}) *AsyncPlugin_Create_Call {
+func (_e *AsyncPlugin_Expecter) Create(ctx any, tCtx any) *AsyncPlugin_Create_Call {
 	return &AsyncPlugin_Create_Call{Call: _e.mock.On("Create", ctx, tCtx)}
 }
 
@@ -1361,7 +1361,7 @@ type AsyncPlugin_Delete_Call struct {
 // Delete is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx webapi.DeleteContext
-func (_e *AsyncPlugin_Expecter) Delete(ctx interface{}, tCtx interface{}) *AsyncPlugin_Delete_Call {
+func (_e *AsyncPlugin_Expecter) Delete(ctx any, tCtx any) *AsyncPlugin_Delete_Call {
 	return &AsyncPlugin_Delete_Call{Call: _e.mock.On("Delete", ctx, tCtx)}
 }
 
@@ -1429,7 +1429,7 @@ type AsyncPlugin_Get_Call struct {
 // Get is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx webapi.GetContext
-func (_e *AsyncPlugin_Expecter) Get(ctx interface{}, tCtx interface{}) *AsyncPlugin_Get_Call {
+func (_e *AsyncPlugin_Expecter) Get(ctx any, tCtx any) *AsyncPlugin_Get_Call {
 	return &AsyncPlugin_Get_Call{Call: _e.mock.On("Get", ctx, tCtx)}
 }
 
@@ -1545,7 +1545,7 @@ type AsyncPlugin_ResourceRequirements_Call struct {
 // ResourceRequirements is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx webapi.TaskExecutionContextReader
-func (_e *AsyncPlugin_Expecter) ResourceRequirements(ctx interface{}, tCtx interface{}) *AsyncPlugin_ResourceRequirements_Call {
+func (_e *AsyncPlugin_Expecter) ResourceRequirements(ctx any, tCtx any) *AsyncPlugin_ResourceRequirements_Call {
 	return &AsyncPlugin_ResourceRequirements_Call{Call: _e.mock.On("ResourceRequirements", ctx, tCtx)}
 }
 
@@ -1611,7 +1611,7 @@ type AsyncPlugin_Status_Call struct {
 // Status is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx webapi.StatusContext
-func (_e *AsyncPlugin_Expecter) Status(ctx interface{}, tCtx interface{}) *AsyncPlugin_Status_Call {
+func (_e *AsyncPlugin_Expecter) Status(ctx any, tCtx any) *AsyncPlugin_Status_Call {
 	return &AsyncPlugin_Status_Call{Call: _e.mock.On("Status", ctx, tCtx)}
 }
 
@@ -1704,7 +1704,7 @@ type SyncPlugin_Do_Call struct {
 // Do is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx webapi.TaskExecutionContext
-func (_e *SyncPlugin_Expecter) Do(ctx interface{}, tCtx interface{}) *SyncPlugin_Do_Call {
+func (_e *SyncPlugin_Expecter) Do(ctx any, tCtx any) *SyncPlugin_Do_Call {
 	return &SyncPlugin_Do_Call{Call: _e.mock.On("Do", ctx, tCtx)}
 }
 

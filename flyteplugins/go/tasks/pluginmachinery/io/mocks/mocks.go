@@ -190,7 +190,7 @@ type InputReader_Get_Call struct {
 
 // Get is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *InputReader_Expecter) Get(ctx interface{}) *InputReader_Get_Call {
+func (_e *InputReader_Expecter) Get(ctx any) *InputReader_Get_Call {
 	return &InputReader_Get_Call{Call: _e.mock.On("Get", ctx)}
 }
 
@@ -365,7 +365,7 @@ type OutputReader_DeckExists_Call struct {
 
 // DeckExists is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *OutputReader_Expecter) DeckExists(ctx interface{}) *OutputReader_DeckExists_Call {
+func (_e *OutputReader_Expecter) DeckExists(ctx any) *OutputReader_DeckExists_Call {
 	return &OutputReader_DeckExists_Call{Call: _e.mock.On("DeckExists", ctx)}
 }
 
@@ -425,7 +425,7 @@ type OutputReader_Exists_Call struct {
 
 // Exists is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *OutputReader_Expecter) Exists(ctx interface{}) *OutputReader_Exists_Call {
+func (_e *OutputReader_Expecter) Exists(ctx any) *OutputReader_Exists_Call {
 	return &OutputReader_Exists_Call{Call: _e.mock.On("Exists", ctx)}
 }
 
@@ -485,7 +485,7 @@ type OutputReader_IsError_Call struct {
 
 // IsError is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *OutputReader_Expecter) IsError(ctx interface{}) *OutputReader_IsError_Call {
+func (_e *OutputReader_Expecter) IsError(ctx any) *OutputReader_IsError_Call {
 	return &OutputReader_IsError_Call{Call: _e.mock.On("IsError", ctx)}
 }
 
@@ -536,7 +536,7 @@ type OutputReader_IsFile_Call struct {
 
 // IsFile is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *OutputReader_Expecter) IsFile(ctx interface{}) *OutputReader_IsFile_Call {
+func (_e *OutputReader_Expecter) IsFile(ctx any) *OutputReader_IsFile_Call {
 	return &OutputReader_IsFile_Call{Call: _e.mock.On("IsFile", ctx)}
 }
 
@@ -606,7 +606,7 @@ type OutputReader_Read_Call struct {
 
 // Read is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *OutputReader_Expecter) Read(ctx interface{}) *OutputReader_Read_Call {
+func (_e *OutputReader_Expecter) Read(ctx any) *OutputReader_Read_Call {
 	return &OutputReader_Read_Call{Call: _e.mock.On("Read", ctx)}
 }
 
@@ -666,7 +666,7 @@ type OutputReader_ReadError_Call struct {
 
 // ReadError is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *OutputReader_Expecter) ReadError(ctx interface{}) *OutputReader_ReadError_Call {
+func (_e *OutputReader_Expecter) ReadError(ctx any) *OutputReader_ReadError_Call {
 	return &OutputReader_ReadError_Call{Call: _e.mock.On("ReadError", ctx)}
 }
 
@@ -1574,7 +1574,7 @@ type OutputWriter_Put_Call struct {
 // Put is a helper method to define mock.On call
 //   - ctx context.Context
 //   - reader io.OutputReader
-func (_e *OutputWriter_Expecter) Put(ctx interface{}, reader interface{}) *OutputWriter_Put_Call {
+func (_e *OutputWriter_Expecter) Put(ctx any, reader any) *OutputWriter_Put_Call {
 	return &OutputWriter_Put_Call{Call: _e.mock.On("Put", ctx, reader)}
 }
 

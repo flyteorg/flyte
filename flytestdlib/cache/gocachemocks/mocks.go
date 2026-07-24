@@ -62,7 +62,7 @@ type CacheInterface_Clear_Call[T any] struct {
 
 // Clear is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *CacheInterface_Expecter[T]) Clear(ctx interface{}) *CacheInterface_Clear_Call[T] {
+func (_e *CacheInterface_Expecter[T]) Clear(ctx any) *CacheInterface_Clear_Call[T] {
 	return &CacheInterface_Clear_Call[T]{Call: _e.mock.On("Clear", ctx)}
 }
 
@@ -114,7 +114,7 @@ type CacheInterface_Delete_Call[T any] struct {
 // Delete is a helper method to define mock.On call
 //   - ctx context.Context
 //   - key any
-func (_e *CacheInterface_Expecter[T]) Delete(ctx interface{}, key interface{}) *CacheInterface_Delete_Call[T] {
+func (_e *CacheInterface_Expecter[T]) Delete(ctx any, key any) *CacheInterface_Delete_Call[T] {
 	return &CacheInterface_Delete_Call[T]{Call: _e.mock.On("Delete", ctx, key)}
 }
 
@@ -182,7 +182,7 @@ type CacheInterface_Get_Call[T any] struct {
 // Get is a helper method to define mock.On call
 //   - ctx context.Context
 //   - key any
-func (_e *CacheInterface_Expecter[T]) Get(ctx interface{}, key interface{}) *CacheInterface_Get_Call[T] {
+func (_e *CacheInterface_Expecter[T]) Get(ctx any, key any) *CacheInterface_Get_Call[T] {
 	return &CacheInterface_Get_Call[T]{Call: _e.mock.On("Get", ctx, key)}
 }
 
@@ -261,11 +261,11 @@ func (_c *CacheInterface_GetType_Call[T]) RunAndReturn(run func() string) *Cache
 // Invalidate provides a mock function for the type CacheInterface
 func (_mock *CacheInterface[T]) Invalidate(ctx context.Context, options ...store.InvalidateOption) error {
 	// store.InvalidateOption
-	_va := make([]interface{}, len(options))
+	_va := make([]any, len(options))
 	for _i := range options {
 		_va[_i] = options[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -291,9 +291,9 @@ type CacheInterface_Invalidate_Call[T any] struct {
 // Invalidate is a helper method to define mock.On call
 //   - ctx context.Context
 //   - options ...store.InvalidateOption
-func (_e *CacheInterface_Expecter[T]) Invalidate(ctx interface{}, options ...interface{}) *CacheInterface_Invalidate_Call[T] {
+func (_e *CacheInterface_Expecter[T]) Invalidate(ctx any, options ...any) *CacheInterface_Invalidate_Call[T] {
 	return &CacheInterface_Invalidate_Call[T]{Call: _e.mock.On("Invalidate",
-		append([]interface{}{ctx}, options...)...)}
+		append([]any{ctx}, options...)...)}
 }
 
 func (_c *CacheInterface_Invalidate_Call[T]) Run(run func(ctx context.Context, options ...store.InvalidateOption)) *CacheInterface_Invalidate_Call[T] {
@@ -331,11 +331,11 @@ func (_c *CacheInterface_Invalidate_Call[T]) RunAndReturn(run func(ctx context.C
 // Set provides a mock function for the type CacheInterface
 func (_mock *CacheInterface[T]) Set(ctx context.Context, key any, object T, options ...store.Option) error {
 	// store.Option
-	_va := make([]interface{}, len(options))
+	_va := make([]any, len(options))
 	for _i := range options {
 		_va[_i] = options[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, key, object)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -363,9 +363,9 @@ type CacheInterface_Set_Call[T any] struct {
 //   - key any
 //   - object T
 //   - options ...store.Option
-func (_e *CacheInterface_Expecter[T]) Set(ctx interface{}, key interface{}, object interface{}, options ...interface{}) *CacheInterface_Set_Call[T] {
+func (_e *CacheInterface_Expecter[T]) Set(ctx any, key any, object any, options ...any) *CacheInterface_Set_Call[T] {
 	return &CacheInterface_Set_Call[T]{Call: _e.mock.On("Set",
-		append([]interface{}{ctx, key, object}, options...)...)}
+		append([]any{ctx, key, object}, options...)...)}
 }
 
 func (_c *CacheInterface_Set_Call[T]) Run(run func(ctx context.Context, key any, object T, options ...store.Option)) *CacheInterface_Set_Call[T] {

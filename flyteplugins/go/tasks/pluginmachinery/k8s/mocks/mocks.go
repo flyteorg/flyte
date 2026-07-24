@@ -428,7 +428,7 @@ type Plugin_BuildIdentityResource_Call struct {
 // BuildIdentityResource is a helper method to define mock.On call
 //   - ctx context.Context
 //   - taskCtx core.TaskExecutionMetadata
-func (_e *Plugin_Expecter) BuildIdentityResource(ctx interface{}, taskCtx interface{}) *Plugin_BuildIdentityResource_Call {
+func (_e *Plugin_Expecter) BuildIdentityResource(ctx any, taskCtx any) *Plugin_BuildIdentityResource_Call {
 	return &Plugin_BuildIdentityResource_Call{Call: _e.mock.On("BuildIdentityResource", ctx, taskCtx)}
 }
 
@@ -496,7 +496,7 @@ type Plugin_BuildResource_Call struct {
 // BuildResource is a helper method to define mock.On call
 //   - ctx context.Context
 //   - taskCtx core.TaskExecutionContext
-func (_e *Plugin_Expecter) BuildResource(ctx interface{}, taskCtx interface{}) *Plugin_BuildResource_Call {
+func (_e *Plugin_Expecter) BuildResource(ctx any, taskCtx any) *Plugin_BuildResource_Call {
 	return &Plugin_BuildResource_Call{Call: _e.mock.On("BuildResource", ctx, taskCtx)}
 }
 
@@ -561,7 +561,7 @@ type Plugin_GetCompletionTime_Call struct {
 
 // GetCompletionTime is a helper method to define mock.On call
 //   - resource client.Object
-func (_e *Plugin_Expecter) GetCompletionTime(resource interface{}) *Plugin_GetCompletionTime_Call {
+func (_e *Plugin_Expecter) GetCompletionTime(resource any) *Plugin_GetCompletionTime_Call {
 	return &Plugin_GetCompletionTime_Call{Call: _e.mock.On("GetCompletionTime", resource)}
 }
 
@@ -667,7 +667,7 @@ type Plugin_GetTaskPhase_Call struct {
 //   - ctx context.Context
 //   - pluginContext k8s.PluginContext
 //   - resource client.Object
-func (_e *Plugin_Expecter) GetTaskPhase(ctx interface{}, pluginContext interface{}, resource interface{}) *Plugin_GetTaskPhase_Call {
+func (_e *Plugin_Expecter) GetTaskPhase(ctx any, pluginContext any, resource any) *Plugin_GetTaskPhase_Call {
 	return &Plugin_GetTaskPhase_Call{Call: _e.mock.On("GetTaskPhase", ctx, pluginContext, resource)}
 }
 
@@ -738,7 +738,7 @@ type Plugin_IsTerminal_Call struct {
 // IsTerminal is a helper method to define mock.On call
 //   - ctx context.Context
 //   - resource client.Object
-func (_e *Plugin_Expecter) IsTerminal(ctx interface{}, resource interface{}) *Plugin_IsTerminal_Call {
+func (_e *Plugin_Expecter) IsTerminal(ctx any, resource any) *Plugin_IsTerminal_Call {
 	return &Plugin_IsTerminal_Call{Call: _e.mock.On("IsTerminal", ctx, resource)}
 }
 
@@ -830,7 +830,7 @@ type GarbageCollectable_GetCompletionTime_Call struct {
 
 // GetCompletionTime is a helper method to define mock.On call
 //   - resource client.Object
-func (_e *GarbageCollectable_Expecter) GetCompletionTime(resource interface{}) *GarbageCollectable_GetCompletionTime_Call {
+func (_e *GarbageCollectable_Expecter) GetCompletionTime(resource any) *GarbageCollectable_GetCompletionTime_Call {
 	return &GarbageCollectable_GetCompletionTime_Call{Call: _e.mock.On("GetCompletionTime", resource)}
 }
 
@@ -891,7 +891,7 @@ type GarbageCollectable_IsTerminal_Call struct {
 // IsTerminal is a helper method to define mock.On call
 //   - ctx context.Context
 //   - resource client.Object
-func (_e *GarbageCollectable_Expecter) IsTerminal(ctx interface{}, resource interface{}) *GarbageCollectable_IsTerminal_Call {
+func (_e *GarbageCollectable_Expecter) IsTerminal(ctx any, resource any) *GarbageCollectable_IsTerminal_Call {
 	return &GarbageCollectable_IsTerminal_Call{Call: _e.mock.On("IsTerminal", ctx, resource)}
 }
 
@@ -985,7 +985,7 @@ type PluginAbortOverride_OnAbort_Call struct {
 //   - ctx context.Context
 //   - tCtx core.TaskExecutionContext
 //   - resource client.Object
-func (_e *PluginAbortOverride_Expecter) OnAbort(ctx interface{}, tCtx interface{}, resource interface{}) *PluginAbortOverride_OnAbort_Call {
+func (_e *PluginAbortOverride_Expecter) OnAbort(ctx any, tCtx any, resource any) *PluginAbortOverride_OnAbort_Call {
 	return &PluginAbortOverride_OnAbort_Call{Call: _e.mock.On("OnAbort", ctx, tCtx, resource)}
 }
 

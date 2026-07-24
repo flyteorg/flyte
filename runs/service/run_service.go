@@ -1637,8 +1637,8 @@ func setActionDetailsSpecFromActionSpec(details *workflow.ActionDetails, actionS
 // actionMetadataFromModel builds an ActionMetadata proto from DB model columns.
 func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 	metadata := &workflow.ActionMetadata{
-		ActionType:  workflow.ActionType(action.ActionType),
-		FuntionName: action.FunctionName,
+		ActionType:   workflow.ActionType(action.ActionType),
+		FunctionName: action.FunctionName,
 	}
 	if action.ParentActionName.Valid {
 		metadata.Parent = action.ParentActionName.String
@@ -1959,7 +1959,7 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 		// No-op, this should never happen.
 	}
 
-	metadata.FuntionName = action.FunctionName
+	metadata.FunctionName = action.FunctionName
 	metadata.Source = workflow.RunSource(workflow.RunSource_value[action.RunSource])
 
 	if action.TriggerName.Valid {
