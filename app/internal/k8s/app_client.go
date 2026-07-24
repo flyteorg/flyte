@@ -26,6 +26,7 @@ import (
 	"github.com/flyteorg/flyte/v2/app/internal/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	flytecore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -646,7 +647,7 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 }
 
 // buildPodSpec constructs a corev1.PodSpec from an App Spec.
-// Supports Container payload only for now; K8sPod support can be added in a follow-up.
+// Supports Container and K8sPod payloads.
 func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 	switch p := spec.GetAppPayload().(type) {
 	case *flyteapp.Spec_Container:
@@ -676,9 +677,18 @@ func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 		}, nil
 
 	case *flyteapp.Spec_Pod:
-		// K8sPod payloads are not yet supported — the pod spec serialization
-		// from flyteplugins is needed for a complete implementation.
-		return corev1.PodSpec{}, fmt.Errorf("K8sPod app payload is not yet supported")
+		pod := p.Pod
+		if pod == nil || pod.GetPodSpec() == nil {
+			return corev1.PodSpec{}, fmt.Errorf("K8sPod app payload has no pod spec")
+		}
+		var podSpec corev1.PodSpec
+		if err := utils.UnmarshalStructToObj(pod.GetPodSpec(), &podSpec); err != nil {
+			return corev1.PodSpec{}, fmt.Errorf("failed to unmarshal K8sPod spec: %w", err)
+		}
+		if podSpec.EnableServiceLinks == nil {
+			podSpec.EnableServiceLinks = boolPtr(false)
+		}
+		return podSpec, nil
 
 	default:
 		return corev1.PodSpec{}, fmt.Errorf("app spec has no payload (container or pod required)")
