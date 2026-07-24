@@ -374,24 +374,17 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 }
 
 func (p *Plugin) getAsyncConnectorClient(ctx context.Context, connector *Deployment) (connectorPb.AsyncConnectorServiceClient, error) {
-	client, ok := p.cs.asyncConnectorClients[connector.Endpoint]
-	if !ok {
-		conn, err := getGrpcConnection(ctx, connector)
-		if err != nil {
-			return nil, err
-		}
-		client = connectorPb.NewAsyncConnectorServiceClient(conn)
-		p.cs.asyncConnectorClients[connector.Endpoint] = client
-	}
-	return client, nil
+	return p.cs.getOrDialAsyncClient(ctx, connector)
 }
 
 func (p *Plugin) watchConnectors(ctx context.Context, connectorService *ConnectorService) {
 	go wait.Until(func() {
-		childCtx, cancel := context.WithCancel(ctx)
-		defer cancel()
-		clientSet := getConnectorClientSets(childCtx)
-		connectorRegistry := getConnectorRegistry(childCtx, clientSet)
+		for _, deployment := range allConnectorDeployments(GetConfig()) {
+			if _, err := p.cs.getOrDialMetadataClient(ctx, deployment); err != nil {
+				logger.Errorf(ctx, "failed to connect to connector [%v]: %v", deployment.Endpoint, err)
+			}
+		}
+		connectorRegistry := getConnectorRegistry(ctx, p.cs)
 		p.setRegistry(connectorRegistry)
 		connectorService.SetSupportedTaskType(connectorRegistry.getSupportedTaskTypes())
 	}, p.cfg.PollInterval.Duration, ctx.Done())
