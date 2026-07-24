@@ -104,6 +104,8 @@ configuration:
         accessKey: ""
         # secretKey Secret key for authenticating with S3-compatible service
         secretKey: ""
+        # secretKeyPath Path to a file containing the secret key for authenticating with S3-compatible service
+        secretKeyPath: ""
       # gcs Provider configuration for GCS object store
       gcs:
         # project Google Cloud project in which bucket resides

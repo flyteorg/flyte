@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"errors"
-	"io/ioutil"
 	"net"
 	"os"
 	"testing"
@@ -52,7 +51,7 @@ func TestGetPostgresDsn(t *testing.T) {
 	})
 	t.Run("with password path", func(t *testing.T) {
 		password := "123abc"
-		tmpFile, err := ioutil.TempFile("", "prefix")
+		tmpFile, err := os.CreateTemp("", "prefix")
 		if err != nil {
 			t.Errorf("Couldn't open temp file: %v", err)
 		}
@@ -93,7 +92,7 @@ func TestGetPostgresReadDsn(t *testing.T) {
 	})
 	t.Run("with password path", func(t *testing.T) {
 		password := "1234abc"
-		tmpFile, err := ioutil.TempFile("", "prefix")
+		tmpFile, err := os.CreateTemp("", "prefix")
 		if err != nil {
 			t.Errorf("Couldn't open temp file: %v", err)
 		}

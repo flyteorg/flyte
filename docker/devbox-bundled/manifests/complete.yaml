@@ -7199,6 +7199,14 @@ rules:
   - get
 - apiGroups:
   - ""
+  resources:
+  - podtemplates
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
   - events.k8s.io
   resources:
   - events
@@ -7739,6 +7747,12 @@ data:
       secretName: flyte-binary-webhook-secret
       serviceName: flyte-binary-webhook
       servicePort: 443
+      secretManagerTypes:
+        - Embedded
+      embeddedSecretManagerConfig:
+        type: K8s
+        k8sConfig:
+          namespace: flyte
 
     actions:
       kubernetes:
@@ -7764,7 +7778,7 @@ data:
         burst: 200
         clusterName: flyte-devbox
         kubeconfig: ""
-        namespace: flyte
+        namespace: 'flyte'
         qps: 100
         timeout: 30s
   001-plugins.yaml: |
@@ -8656,7 +8670,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: b3c98afcd1c1a1aca5040d049159f6a8683facf7875920987bab9a9df6dc8f97
+        checksum/configuration: 806913c16fd28512aaf60eccab4c1f3bf9aa6689da8474f4458a833c8dad3b94
         checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
       labels:
         app.kubernetes.io/component: flyte-binary

@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -31,6 +32,7 @@ import (
 
 const FailureTypeLabel contextutils.Key = "failure_type"
 const FlyteContentMD5 = "flyteContentMD5"
+const ConfigSecretKeyPath = "secret_key_path"
 
 // schemeToStowKind maps a URL scheme to the stow kind that serves it. It is the inverse of the
 // scheme prefixes produced by fQNFn and lets the multi-scheme DataStore lazily dial a stow backend
@@ -649,16 +651,21 @@ func newStowRawStore(_ context.Context, cfg *Config, metrics *dataStoreMetrics) 
 		return nil, fmt.Errorf("initContainer is required even with `enable-multicontainer`")
 	}
 
-	var cfgMap stow.ConfigMap
-	var kind string
-	if len(cfg.Stow.Kind) > 0 && len(cfg.Stow.Config) > 0 {
-		kind = cfg.Stow.Kind
-		cfgMap = cfg.Stow.Config
-	} else {
-		logger.Warnf(context.TODO(), "stow configuration section missing, defaulting to legacy s3/minio connection config")
-		// This is for supporting legacy configurations which configure S3 via connection config
-		kind = s3.Kind
-		cfgMap = legacyS3ConfigMap(cfg.Connection)
+	var cfgMap stow.ConfigMap = cfg.Stow.Config
+	kind := cfg.Stow.Kind
+
+	if kind == s3.Kind {
+		secretKeyVal := cfgMap[s3.ConfigSecretKey]
+		secretKeyPath := cfgMap[ConfigSecretKeyPath]
+
+		secretKey, err := resolveSecretKey(secretKeyVal, secretKeyPath)
+		if err != nil {
+			return nil, fmt.Errorf("resolving S3 secret key: %w", err)
+		}
+
+		if len(secretKey) > 0 {
+			cfgMap[s3.ConfigSecretKey] = secretKey
+		}
 	}
 
 	fn, ok := fQNFn[kind]
@@ -709,11 +716,20 @@ func stowFactory(_ context.Context, scheme string, _ DataReference, cfg *Config,
 	// Seed an S3 region from the legacy connection config when no explicit one was given, so ambient
 	// S3 dials inherit the deployment's default region instead of failing region resolution.
 	if kind == s3.Kind {
-		if _, ok := cfgMap[s3.ConfigRegion]; !ok && cfg.Connection.Region != "" {
-			cfgMap[s3.ConfigRegion] = cfg.Connection.Region
-		}
 		if _, ok := cfgMap[s3.ConfigAuthType]; !ok {
 			cfgMap[s3.ConfigAuthType] = "iam"
+		}
+
+		secretKeyVal := cfgMap[s3.ConfigSecretKey]
+		secretKeyPath := cfgMap[ConfigSecretKeyPath]
+
+		secretKey, err := resolveSecretKey(secretKeyVal, secretKeyPath)
+		if err != nil {
+			return nil, fmt.Errorf("resolving S3 secret key: %w", err)
+		}
+
+		if len(secretKey) > 0 {
+			cfgMap[s3.ConfigSecretKey] = secretKey
 		}
 	}
 
@@ -736,29 +752,24 @@ func stowFactory(_ context.Context, scheme string, _ DataReference, cfg *Config,
 	return NewStowRawStore(DataReference(scheme+"://"), loc, nil, true, metrics)
 }
 
-func legacyS3ConfigMap(cfg ConnectionConfig) stow.ConfigMap {
-	// Non-nullable fields
-	stowConfig := stow.ConfigMap{
-		s3.ConfigAuthType: cfg.AuthType,
-		s3.ConfigRegion:   cfg.Region,
-	}
+func resolveSecretKey(secretKeyVal, secretKeyPath string) (string, error) {
+	secretKey := secretKeyVal
+	if len(secretKeyPath) > 0 {
+		_, err := os.Stat(secretKeyPath)
 
-	// Fields that differ between minio and real S3
-	if endpoint := cfg.Endpoint.String(); endpoint != "" {
-		stowConfig[s3.ConfigEndpoint] = endpoint
-	}
+		if err != nil {
+			if os.IsNotExist(err) {
+				return "", fmt.Errorf("secret key path does not exist")
+			}
 
-	if accessKey := cfg.AccessKey; accessKey != "" {
-		stowConfig[s3.ConfigAccessKeyID] = accessKey
-	}
+			return "", fmt.Errorf("getting secret key path file info: %w", err)
+		}
 
-	if secretKey := cfg.SecretKey; secretKey != "" {
-		stowConfig[s3.ConfigSecretKey] = secretKey
+		secretKeyFileVal, err := os.ReadFile(secretKeyPath)
+		if err != nil {
+			return "", fmt.Errorf("reading secret key file: %w", err)
+		}
+		secretKey = strings.TrimSpace(string(secretKeyFileVal))
 	}
-
-	if disableSsl := cfg.DisableSSL; disableSsl {
-		stowConfig[s3.ConfigDisableSSL] = "True"
-	}
-
-	return stowConfig
+	return secretKey, nil
 }

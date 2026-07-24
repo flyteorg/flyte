@@ -52,7 +52,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "server.port"), defaultConfig.Server.Port, "Port to bind the HTTP server")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "server.host"), defaultConfig.Server.Host, "Host to bind the HTTP server")
-	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "database.enableForeignKeyConstraintWhenMigrating"), defaultConfig.Database.EnableForeignKeyConstraintWhenMigrating, "Whether to enable gorm foreign keys when migrating the db")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "database.maxIdleConnections"), defaultConfig.Database.MaxIdleConnections, "maxIdleConnections sets the maximum number of connections in the idle connection pool.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "database.maxOpenConnections"), defaultConfig.Database.MaxOpenConnections, "maxOpenConnections sets the maximum number of open connections to the database.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "database.connMaxLifeTime"), defaultConfig.Database.ConnMaxLifeTime.String(), "sets the maximum amount of time a connection may be reused")

@@ -7,11 +7,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/flyteorg/stow/s3"
 	"github.com/ghodss/yaml"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/flyteorg/flyte/v2/flytestdlib/config"
-	"github.com/flyteorg/flyte/v2/flytestdlib/internal/utils"
 )
 
 // Make sure existing config file(s) parse correctly before overriding them with this flag!
@@ -19,14 +17,17 @@ var update = flag.Bool("update", false, "Updates testdata")
 
 func TestMarshal(t *testing.T) {
 	expected := Config{
-		Type: "s3",
-		Connection: ConnectionConfig{
-			Endpoint:   config.URL{URL: utils.MustParseURL("http://minio:9000")},
-			AuthType:   "accesskey",
-			AccessKey:  "minio",
-			SecretKey:  "miniostorage",
-			Region:     "us-east-1",
-			DisableSSL: true,
+		Type: TypeStow,
+		Stow: StowConfig{
+			Kind: s3.Kind,
+			Config: map[string]string{
+				"Endpoint":   "http://minio:9000",
+				"AuthType":   "accesskey",
+				"AccessKey":  "minio",
+				"SecretKey":  "miniostorage",
+				"Region":     "us-east-1",
+				"DisableSSL": "true",
+			},
 		},
 	}
 

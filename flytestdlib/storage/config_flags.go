@@ -51,12 +51,6 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "type"), defaultConfig.Type, "Sets the type of storage [s3/minio/local/mem/stow/redis].")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "connection.endpoint"), defaultConfig.Connection.Endpoint.String(), "URL for storage client to connect to.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "connection.auth-type"), defaultConfig.Connection.AuthType, "Auth Type to use [iam, accesskey].")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "connection.access-key"), defaultConfig.Connection.AccessKey, "Access key to use. Only required when authtype is set to accesskey.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "connection.secret-key"), defaultConfig.Connection.SecretKey, "Secret to use when accesskey is set.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "connection.region"), defaultConfig.Connection.Region, "Region to connect to.")
-	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "connection.disable-ssl"), defaultConfig.Connection.DisableSSL, "Disables SSL connection. Should only be used for development.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "stow.kind"), defaultConfig.Stow.Kind, "Kind of Stow backend to use. Refer to github/flyteorg/stow")
 	cmdFlags.StringToString(fmt.Sprintf("%v%v", prefix, "stow.config"), defaultConfig.Stow.Config, "Configuration for stow backend. Refer to github/flyteorg/stow")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "container"), defaultConfig.InitContainer, "Initial container (in s3 a bucket) to create -if it doesn't exist-.'")

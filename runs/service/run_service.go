@@ -914,6 +914,12 @@ func (s *RunService) ListRuns(
 		scopeFilter = scopeFilter.And(impl.NewRunTaskIdFilter(scope.TaskId))
 	}
 
+	// Restrict to runs that contain at least one PAUSED action (e.g. a
+	// human-in-the-loop gate node awaiting input) when requested.
+	if req.Msg.PausedActionsOnly {
+		scopeFilter = scopeFilter.And(impl.NewHasPausedActionFilter())
+	}
+
 	// Parse pagination, sort, and user-supplied filters from the common ListRequest.
 	listInput, err := impl.NewListResourceInputFromProto(req.Msg.Request, models.ActionColumnsSet)
 	if err != nil {
