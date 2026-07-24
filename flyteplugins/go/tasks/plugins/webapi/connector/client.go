@@ -45,16 +45,29 @@ type ClientSet struct {
 func (cs *ClientSet) getOrDialAsyncClient(ctx context.Context, deployment *Deployment) (connector.AsyncConnectorServiceClient, error) {
 	cs.mu.Lock()
 	defer cs.mu.Unlock()
+
+	if cs.asyncConnectorClients == nil {
+		cs.asyncConnectorClients = make(map[string]connector.AsyncConnectorServiceClient)
+	}
+	if cs.connectorMetadataClients == nil {
+		cs.connectorMetadataClients = make(map[string]connector.ConnectorMetadataServiceClient)
+	}
+
 	if client, ok := cs.asyncConnectorClients[deployment.Endpoint]; ok {
 		return client, nil
 	}
+
 	conn, err := getGrpcConnection(ctx, deployment)
 	if err != nil {
 		return nil, err
 	}
-	client := connector.NewAsyncConnectorServiceClient(conn)
-	cs.asyncConnectorClients[deployment.Endpoint] = client
-	return client, nil
+
+	asyncClient := connector.NewAsyncConnectorServiceClient(conn)
+	cs.asyncConnectorClients[deployment.Endpoint] = asyncClient
+	if _, ok := cs.connectorMetadataClients[deployment.Endpoint]; !ok {
+		cs.connectorMetadataClients[deployment.Endpoint] = connector.NewConnectorMetadataServiceClient(conn)
+	}
+	return asyncClient, nil
 }
 
 // getOrDialMetadataClient returns the cached ConnectorMetadataService client for
