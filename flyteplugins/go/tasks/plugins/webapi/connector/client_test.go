@@ -45,11 +45,13 @@ func TestAllConnectorDeployments(t *testing.T) {
 }
 
 func TestGetConnectorMetadataClientReusesConnection(t *testing.T) {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	// A pre-existing cached client for endpoint "ep".
 	conn, err := grpc.NewClient("passthrough:///ep", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	assert.NoError(t, err)
+	t.Cleanup(func() { _ = conn.Close() })
 	existing := connectorpb.NewConnectorMetadataServiceClient(conn)
 
 	p := &Plugin{cs: &ClientSet{
@@ -62,7 +64,7 @@ func TestGetConnectorMetadataClientReusesConnection(t *testing.T) {
 	assert.True(t, existing == p.cs.connectorMetadataClients["ep"], "cached connection should be reused, not re-dialed")
 
 	// New endpoint -> dialed and cached.
-	assert.NoError(t, p.getConnectorMetadataClient(ctx, &Deployment{Endpoint: "new", Insecure: true}))
-	_, ok := p.cs.connectorMetadataClients["new"]
+	assert.NoError(t, p.getConnectorMetadataClient(ctx, &Deployment{Endpoint: "passthrough:///new", Insecure: true}))
+	_, ok := p.cs.connectorMetadataClients["passthrough:///new"]
 	assert.True(t, ok, "new endpoint should be dialed and cached")
 }
