@@ -390,6 +390,8 @@ func (p *Plugin) getAsyncConnectorClient(ctx context.Context, connector *Deploym
 // the endpoint, dialing a persistent connection (bound to the plugin's context)
 // on first use.
 func (p *Plugin) getConnectorMetadataClient(ctx context.Context, deployment *Deployment) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
 	if _, ok := p.cs.connectorMetadataClients[deployment.Endpoint]; ok {
 		return nil
 	}
@@ -403,11 +405,6 @@ func (p *Plugin) getConnectorMetadataClient(ctx context.Context, deployment *Dep
 
 func (p *Plugin) watchConnectors(ctx context.Context, connectorService *ConnectorService) {
 	go wait.Until(func() {
-		// Reuse the persistent, keepalive'd connections held on p.cs; only dial
-		// connector endpoints we haven't connected to yet (e.g. newly-added
-		// deployments). Previously this re-dialed a throwaway connection every
-		// poll, so each ListConnectors paid a fresh TCP+HTTP/2 handshake through
-		// the ingress path.
 		for _, deployment := range allConnectorDeployments(GetConfig()) {
 			if err := p.getConnectorMetadataClient(ctx, deployment); err != nil {
 				logger.Errorf(ctx, "failed to connect to connector [%v]: %v", deployment.Endpoint, err)
