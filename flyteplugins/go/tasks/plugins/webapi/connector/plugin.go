@@ -388,8 +388,7 @@ func (p *Plugin) getAsyncConnectorClient(ctx context.Context, connector *Deploym
 
 // getConnectorMetadataClient returns a cached ConnectorMetadataService client for
 // the endpoint, dialing a persistent connection (bound to the plugin's context)
-// on first use. Connections are reused across polls instead of being re-dialed
-// every PollInterval, so ListConnectors runs over a warm, keepalive'd channel.
+// on first use.
 func (p *Plugin) getConnectorMetadataClient(ctx context.Context, deployment *Deployment) error {
 	if _, ok := p.cs.connectorMetadataClients[deployment.Endpoint]; ok {
 		return nil

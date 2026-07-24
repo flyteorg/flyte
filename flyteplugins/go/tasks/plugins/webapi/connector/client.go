@@ -63,8 +63,7 @@ func getGrpcConnection(ctx context.Context, connector *Deployment) (*grpc.Client
 		grpc.WithChainStreamInterceptor(clientMetrics.StreamClientInterceptor()),
 		// Keepalive lets gRPC notice a dead/half-open transport within seconds
 		// (via HTTP/2 PINGs during active RPCs) instead of relying on the OS TCP
-		// timeout. Conservative values so we don't trip a server's ping-rate
-		// enforcement; PermitWithoutStream is intentionally left false.
+		// timeout.
 		grpc.WithKeepaliveParams(keepalive.ClientParameters{
 			Time:    30 * time.Second,
 			Timeout: 10 * time.Second,
