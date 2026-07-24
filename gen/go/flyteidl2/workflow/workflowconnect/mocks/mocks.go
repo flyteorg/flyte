@@ -75,7 +75,7 @@ type EventsProxyServiceClient_Record_Call struct {
 // Record is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.RecordRequest]
-func (_e *EventsProxyServiceClient_Expecter) Record(context1 interface{}, request interface{}) *EventsProxyServiceClient_Record_Call {
+func (_e *EventsProxyServiceClient_Expecter) Record(context1 any, request any) *EventsProxyServiceClient_Record_Call {
 	return &EventsProxyServiceClient_Record_Call{Call: _e.mock.On("Record", context1, request)}
 }
 
@@ -170,7 +170,7 @@ type EventsProxyServiceHandler_Record_Call struct {
 // Record is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.RecordRequest]
-func (_e *EventsProxyServiceHandler_Expecter) Record(context1 interface{}, request interface{}) *EventsProxyServiceHandler_Record_Call {
+func (_e *EventsProxyServiceHandler_Expecter) Record(context1 any, request any) *EventsProxyServiceHandler_Record_Call {
 	return &EventsProxyServiceHandler_Record_Call{Call: _e.mock.On("Record", context1, request)}
 }
 
@@ -265,7 +265,7 @@ type InternalRunServiceClient_RecordAction_Call struct {
 // RecordAction is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.RecordActionRequest]
-func (_e *InternalRunServiceClient_Expecter) RecordAction(context1 interface{}, request interface{}) *InternalRunServiceClient_RecordAction_Call {
+func (_e *InternalRunServiceClient_Expecter) RecordAction(context1 any, request any) *InternalRunServiceClient_RecordAction_Call {
 	return &InternalRunServiceClient_RecordAction_Call{Call: _e.mock.On("RecordAction", context1, request)}
 }
 
@@ -323,7 +323,7 @@ type InternalRunServiceClient_RecordActionEventStream_Call struct {
 
 // RecordActionEventStream is a helper method to define mock.On call
 //   - context1 context.Context
-func (_e *InternalRunServiceClient_Expecter) RecordActionEventStream(context1 interface{}) *InternalRunServiceClient_RecordActionEventStream_Call {
+func (_e *InternalRunServiceClient_Expecter) RecordActionEventStream(context1 any) *InternalRunServiceClient_RecordActionEventStream_Call {
 	return &InternalRunServiceClient_RecordActionEventStream_Call{Call: _e.mock.On("RecordActionEventStream", context1)}
 }
 
@@ -386,7 +386,7 @@ type InternalRunServiceClient_RecordActionEvents_Call struct {
 // RecordActionEvents is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.RecordActionEventsRequest]
-func (_e *InternalRunServiceClient_Expecter) RecordActionEvents(context1 interface{}, request interface{}) *InternalRunServiceClient_RecordActionEvents_Call {
+func (_e *InternalRunServiceClient_Expecter) RecordActionEvents(context1 any, request any) *InternalRunServiceClient_RecordActionEvents_Call {
 	return &InternalRunServiceClient_RecordActionEvents_Call{Call: _e.mock.On("RecordActionEvents", context1, request)}
 }
 
@@ -444,7 +444,7 @@ type InternalRunServiceClient_RecordActionStream_Call struct {
 
 // RecordActionStream is a helper method to define mock.On call
 //   - context1 context.Context
-func (_e *InternalRunServiceClient_Expecter) RecordActionStream(context1 interface{}) *InternalRunServiceClient_RecordActionStream_Call {
+func (_e *InternalRunServiceClient_Expecter) RecordActionStream(context1 any) *InternalRunServiceClient_RecordActionStream_Call {
 	return &InternalRunServiceClient_RecordActionStream_Call{Call: _e.mock.On("RecordActionStream", context1)}
 }
 
@@ -507,7 +507,7 @@ type InternalRunServiceClient_UpdateActionStatus_Call struct {
 // UpdateActionStatus is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.UpdateActionStatusRequest]
-func (_e *InternalRunServiceClient_Expecter) UpdateActionStatus(context1 interface{}, request interface{}) *InternalRunServiceClient_UpdateActionStatus_Call {
+func (_e *InternalRunServiceClient_Expecter) UpdateActionStatus(context1 any, request any) *InternalRunServiceClient_UpdateActionStatus_Call {
 	return &InternalRunServiceClient_UpdateActionStatus_Call{Call: _e.mock.On("UpdateActionStatus", context1, request)}
 }
 
@@ -565,7 +565,7 @@ type InternalRunServiceClient_UpdateActionStatusStream_Call struct {
 
 // UpdateActionStatusStream is a helper method to define mock.On call
 //   - context1 context.Context
-func (_e *InternalRunServiceClient_Expecter) UpdateActionStatusStream(context1 interface{}) *InternalRunServiceClient_UpdateActionStatusStream_Call {
+func (_e *InternalRunServiceClient_Expecter) UpdateActionStatusStream(context1 any) *InternalRunServiceClient_UpdateActionStatusStream_Call {
 	return &InternalRunServiceClient_UpdateActionStatusStream_Call{Call: _e.mock.On("UpdateActionStatusStream", context1)}
 }
 
@@ -655,7 +655,7 @@ type InternalRunServiceHandler_RecordAction_Call struct {
 // RecordAction is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.RecordActionRequest]
-func (_e *InternalRunServiceHandler_Expecter) RecordAction(context1 interface{}, request interface{}) *InternalRunServiceHandler_RecordAction_Call {
+func (_e *InternalRunServiceHandler_Expecter) RecordAction(context1 any, request any) *InternalRunServiceHandler_RecordAction_Call {
 	return &InternalRunServiceHandler_RecordAction_Call{Call: _e.mock.On("RecordAction", context1, request)}
 }
 
@@ -712,7 +712,7 @@ type InternalRunServiceHandler_RecordActionEventStream_Call struct {
 // RecordActionEventStream is a helper method to define mock.On call
 //   - context1 context.Context
 //   - bidiStream *connect.BidiStream[workflow.RecordActionEventStreamRequest, workflow.RecordActionEventStreamResponse]
-func (_e *InternalRunServiceHandler_Expecter) RecordActionEventStream(context1 interface{}, bidiStream interface{}) *InternalRunServiceHandler_RecordActionEventStream_Call {
+func (_e *InternalRunServiceHandler_Expecter) RecordActionEventStream(context1 any, bidiStream any) *InternalRunServiceHandler_RecordActionEventStream_Call {
 	return &InternalRunServiceHandler_RecordActionEventStream_Call{Call: _e.mock.On("RecordActionEventStream", context1, bidiStream)}
 }
 
@@ -780,7 +780,7 @@ type InternalRunServiceHandler_RecordActionEvents_Call struct {
 // RecordActionEvents is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.RecordActionEventsRequest]
-func (_e *InternalRunServiceHandler_Expecter) RecordActionEvents(context1 interface{}, request interface{}) *InternalRunServiceHandler_RecordActionEvents_Call {
+func (_e *InternalRunServiceHandler_Expecter) RecordActionEvents(context1 any, request any) *InternalRunServiceHandler_RecordActionEvents_Call {
 	return &InternalRunServiceHandler_RecordActionEvents_Call{Call: _e.mock.On("RecordActionEvents", context1, request)}
 }
 
@@ -837,7 +837,7 @@ type InternalRunServiceHandler_RecordActionStream_Call struct {
 // RecordActionStream is a helper method to define mock.On call
 //   - context1 context.Context
 //   - bidiStream *connect.BidiStream[workflow.RecordActionStreamRequest, workflow.RecordActionStreamResponse]
-func (_e *InternalRunServiceHandler_Expecter) RecordActionStream(context1 interface{}, bidiStream interface{}) *InternalRunServiceHandler_RecordActionStream_Call {
+func (_e *InternalRunServiceHandler_Expecter) RecordActionStream(context1 any, bidiStream any) *InternalRunServiceHandler_RecordActionStream_Call {
 	return &InternalRunServiceHandler_RecordActionStream_Call{Call: _e.mock.On("RecordActionStream", context1, bidiStream)}
 }
 
@@ -905,7 +905,7 @@ type InternalRunServiceHandler_UpdateActionStatus_Call struct {
 // UpdateActionStatus is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.UpdateActionStatusRequest]
-func (_e *InternalRunServiceHandler_Expecter) UpdateActionStatus(context1 interface{}, request interface{}) *InternalRunServiceHandler_UpdateActionStatus_Call {
+func (_e *InternalRunServiceHandler_Expecter) UpdateActionStatus(context1 any, request any) *InternalRunServiceHandler_UpdateActionStatus_Call {
 	return &InternalRunServiceHandler_UpdateActionStatus_Call{Call: _e.mock.On("UpdateActionStatus", context1, request)}
 }
 
@@ -962,7 +962,7 @@ type InternalRunServiceHandler_UpdateActionStatusStream_Call struct {
 // UpdateActionStatusStream is a helper method to define mock.On call
 //   - context1 context.Context
 //   - bidiStream *connect.BidiStream[workflow.UpdateActionStatusStreamRequest, workflow.UpdateActionStatusStreamResponse]
-func (_e *InternalRunServiceHandler_Expecter) UpdateActionStatusStream(context1 interface{}, bidiStream interface{}) *InternalRunServiceHandler_UpdateActionStatusStream_Call {
+func (_e *InternalRunServiceHandler_Expecter) UpdateActionStatusStream(context1 any, bidiStream any) *InternalRunServiceHandler_UpdateActionStatusStream_Call {
 	return &InternalRunServiceHandler_UpdateActionStatusStream_Call{Call: _e.mock.On("UpdateActionStatusStream", context1, bidiStream)}
 }
 
@@ -1057,7 +1057,7 @@ type QueueServiceClient_AbortQueuedAction_Call struct {
 // AbortQueuedAction is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.AbortQueuedActionRequest]
-func (_e *QueueServiceClient_Expecter) AbortQueuedAction(context1 interface{}, request interface{}) *QueueServiceClient_AbortQueuedAction_Call {
+func (_e *QueueServiceClient_Expecter) AbortQueuedAction(context1 any, request any) *QueueServiceClient_AbortQueuedAction_Call {
 	return &QueueServiceClient_AbortQueuedAction_Call{Call: _e.mock.On("AbortQueuedAction", context1, request)}
 }
 
@@ -1125,7 +1125,7 @@ type QueueServiceClient_AbortQueuedRun_Call struct {
 // AbortQueuedRun is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.AbortQueuedRunRequest]
-func (_e *QueueServiceClient_Expecter) AbortQueuedRun(context1 interface{}, request interface{}) *QueueServiceClient_AbortQueuedRun_Call {
+func (_e *QueueServiceClient_Expecter) AbortQueuedRun(context1 any, request any) *QueueServiceClient_AbortQueuedRun_Call {
 	return &QueueServiceClient_AbortQueuedRun_Call{Call: _e.mock.On("AbortQueuedRun", context1, request)}
 }
 
@@ -1193,7 +1193,7 @@ type QueueServiceClient_EnqueueAction_Call struct {
 // EnqueueAction is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.EnqueueActionRequest]
-func (_e *QueueServiceClient_Expecter) EnqueueAction(context1 interface{}, request interface{}) *QueueServiceClient_EnqueueAction_Call {
+func (_e *QueueServiceClient_Expecter) EnqueueAction(context1 any, request any) *QueueServiceClient_EnqueueAction_Call {
 	return &QueueServiceClient_EnqueueAction_Call{Call: _e.mock.On("EnqueueAction", context1, request)}
 }
 
@@ -1288,7 +1288,7 @@ type QueueServiceHandler_AbortQueuedAction_Call struct {
 // AbortQueuedAction is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.AbortQueuedActionRequest]
-func (_e *QueueServiceHandler_Expecter) AbortQueuedAction(context1 interface{}, request interface{}) *QueueServiceHandler_AbortQueuedAction_Call {
+func (_e *QueueServiceHandler_Expecter) AbortQueuedAction(context1 any, request any) *QueueServiceHandler_AbortQueuedAction_Call {
 	return &QueueServiceHandler_AbortQueuedAction_Call{Call: _e.mock.On("AbortQueuedAction", context1, request)}
 }
 
@@ -1356,7 +1356,7 @@ type QueueServiceHandler_AbortQueuedRun_Call struct {
 // AbortQueuedRun is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.AbortQueuedRunRequest]
-func (_e *QueueServiceHandler_Expecter) AbortQueuedRun(context1 interface{}, request interface{}) *QueueServiceHandler_AbortQueuedRun_Call {
+func (_e *QueueServiceHandler_Expecter) AbortQueuedRun(context1 any, request any) *QueueServiceHandler_AbortQueuedRun_Call {
 	return &QueueServiceHandler_AbortQueuedRun_Call{Call: _e.mock.On("AbortQueuedRun", context1, request)}
 }
 
@@ -1424,7 +1424,7 @@ type QueueServiceHandler_EnqueueAction_Call struct {
 // EnqueueAction is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.EnqueueActionRequest]
-func (_e *QueueServiceHandler_Expecter) EnqueueAction(context1 interface{}, request interface{}) *QueueServiceHandler_EnqueueAction_Call {
+func (_e *QueueServiceHandler_Expecter) EnqueueAction(context1 any, request any) *QueueServiceHandler_EnqueueAction_Call {
 	return &QueueServiceHandler_EnqueueAction_Call{Call: _e.mock.On("EnqueueAction", context1, request)}
 }
 
@@ -1519,7 +1519,7 @@ type RunLogsServiceClient_TailLogs_Call struct {
 // TailLogs is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.TailLogsRequest]
-func (_e *RunLogsServiceClient_Expecter) TailLogs(context1 interface{}, request interface{}) *RunLogsServiceClient_TailLogs_Call {
+func (_e *RunLogsServiceClient_Expecter) TailLogs(context1 any, request any) *RunLogsServiceClient_TailLogs_Call {
 	return &RunLogsServiceClient_TailLogs_Call{Call: _e.mock.On("TailLogs", context1, request)}
 }
 
@@ -1604,7 +1604,7 @@ type RunLogsServiceHandler_TailLogs_Call struct {
 //   - context1 context.Context
 //   - request *connect.Request[workflow.TailLogsRequest]
 //   - serverStream *connect.ServerStream[workflow.TailLogsResponse]
-func (_e *RunLogsServiceHandler_Expecter) TailLogs(context1 interface{}, request interface{}, serverStream interface{}) *RunLogsServiceHandler_TailLogs_Call {
+func (_e *RunLogsServiceHandler_Expecter) TailLogs(context1 any, request any, serverStream any) *RunLogsServiceHandler_TailLogs_Call {
 	return &RunLogsServiceHandler_TailLogs_Call{Call: _e.mock.On("TailLogs", context1, request, serverStream)}
 }
 
@@ -1704,7 +1704,7 @@ type RunServiceClient_AbortAction_Call struct {
 // AbortAction is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.AbortActionRequest]
-func (_e *RunServiceClient_Expecter) AbortAction(context1 interface{}, request interface{}) *RunServiceClient_AbortAction_Call {
+func (_e *RunServiceClient_Expecter) AbortAction(context1 any, request any) *RunServiceClient_AbortAction_Call {
 	return &RunServiceClient_AbortAction_Call{Call: _e.mock.On("AbortAction", context1, request)}
 }
 
@@ -1772,7 +1772,7 @@ type RunServiceClient_AbortRun_Call struct {
 // AbortRun is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.AbortRunRequest]
-func (_e *RunServiceClient_Expecter) AbortRun(context1 interface{}, request interface{}) *RunServiceClient_AbortRun_Call {
+func (_e *RunServiceClient_Expecter) AbortRun(context1 any, request any) *RunServiceClient_AbortRun_Call {
 	return &RunServiceClient_AbortRun_Call{Call: _e.mock.On("AbortRun", context1, request)}
 }
 
@@ -1840,7 +1840,7 @@ type RunServiceClient_CreateRun_Call struct {
 // CreateRun is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.CreateRunRequest]
-func (_e *RunServiceClient_Expecter) CreateRun(context1 interface{}, request interface{}) *RunServiceClient_CreateRun_Call {
+func (_e *RunServiceClient_Expecter) CreateRun(context1 any, request any) *RunServiceClient_CreateRun_Call {
 	return &RunServiceClient_CreateRun_Call{Call: _e.mock.On("CreateRun", context1, request)}
 }
 
@@ -1908,7 +1908,7 @@ type RunServiceClient_GetActionData_Call struct {
 // GetActionData is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.GetActionDataRequest]
-func (_e *RunServiceClient_Expecter) GetActionData(context1 interface{}, request interface{}) *RunServiceClient_GetActionData_Call {
+func (_e *RunServiceClient_Expecter) GetActionData(context1 any, request any) *RunServiceClient_GetActionData_Call {
 	return &RunServiceClient_GetActionData_Call{Call: _e.mock.On("GetActionData", context1, request)}
 }
 
@@ -1976,7 +1976,7 @@ type RunServiceClient_GetActionDataURIs_Call struct {
 // GetActionDataURIs is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.GetActionDataURIsRequest]
-func (_e *RunServiceClient_Expecter) GetActionDataURIs(context1 interface{}, request interface{}) *RunServiceClient_GetActionDataURIs_Call {
+func (_e *RunServiceClient_Expecter) GetActionDataURIs(context1 any, request any) *RunServiceClient_GetActionDataURIs_Call {
 	return &RunServiceClient_GetActionDataURIs_Call{Call: _e.mock.On("GetActionDataURIs", context1, request)}
 }
 
@@ -2044,7 +2044,7 @@ type RunServiceClient_GetActionDetails_Call struct {
 // GetActionDetails is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.GetActionDetailsRequest]
-func (_e *RunServiceClient_Expecter) GetActionDetails(context1 interface{}, request interface{}) *RunServiceClient_GetActionDetails_Call {
+func (_e *RunServiceClient_Expecter) GetActionDetails(context1 any, request any) *RunServiceClient_GetActionDetails_Call {
 	return &RunServiceClient_GetActionDetails_Call{Call: _e.mock.On("GetActionDetails", context1, request)}
 }
 
@@ -2112,7 +2112,7 @@ type RunServiceClient_GetActionLogContext_Call struct {
 // GetActionLogContext is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.GetActionLogContextRequest]
-func (_e *RunServiceClient_Expecter) GetActionLogContext(context1 interface{}, request interface{}) *RunServiceClient_GetActionLogContext_Call {
+func (_e *RunServiceClient_Expecter) GetActionLogContext(context1 any, request any) *RunServiceClient_GetActionLogContext_Call {
 	return &RunServiceClient_GetActionLogContext_Call{Call: _e.mock.On("GetActionLogContext", context1, request)}
 }
 
@@ -2180,7 +2180,7 @@ type RunServiceClient_GetRunDetails_Call struct {
 // GetRunDetails is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.GetRunDetailsRequest]
-func (_e *RunServiceClient_Expecter) GetRunDetails(context1 interface{}, request interface{}) *RunServiceClient_GetRunDetails_Call {
+func (_e *RunServiceClient_Expecter) GetRunDetails(context1 any, request any) *RunServiceClient_GetRunDetails_Call {
 	return &RunServiceClient_GetRunDetails_Call{Call: _e.mock.On("GetRunDetails", context1, request)}
 }
 
@@ -2248,7 +2248,7 @@ type RunServiceClient_ListActions_Call struct {
 // ListActions is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.ListActionsRequest]
-func (_e *RunServiceClient_Expecter) ListActions(context1 interface{}, request interface{}) *RunServiceClient_ListActions_Call {
+func (_e *RunServiceClient_Expecter) ListActions(context1 any, request any) *RunServiceClient_ListActions_Call {
 	return &RunServiceClient_ListActions_Call{Call: _e.mock.On("ListActions", context1, request)}
 }
 
@@ -2316,7 +2316,7 @@ type RunServiceClient_ListRuns_Call struct {
 // ListRuns is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.ListRunsRequest]
-func (_e *RunServiceClient_Expecter) ListRuns(context1 interface{}, request interface{}) *RunServiceClient_ListRuns_Call {
+func (_e *RunServiceClient_Expecter) ListRuns(context1 any, request any) *RunServiceClient_ListRuns_Call {
 	return &RunServiceClient_ListRuns_Call{Call: _e.mock.On("ListRuns", context1, request)}
 }
 
@@ -2384,7 +2384,7 @@ type RunServiceClient_SignalEvent_Call struct {
 // SignalEvent is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.SignalEventRequest]
-func (_e *RunServiceClient_Expecter) SignalEvent(context1 interface{}, request interface{}) *RunServiceClient_SignalEvent_Call {
+func (_e *RunServiceClient_Expecter) SignalEvent(context1 any, request any) *RunServiceClient_SignalEvent_Call {
 	return &RunServiceClient_SignalEvent_Call{Call: _e.mock.On("SignalEvent", context1, request)}
 }
 
@@ -2452,7 +2452,7 @@ type RunServiceClient_WatchActionDetails_Call struct {
 // WatchActionDetails is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.WatchActionDetailsRequest]
-func (_e *RunServiceClient_Expecter) WatchActionDetails(context1 interface{}, request interface{}) *RunServiceClient_WatchActionDetails_Call {
+func (_e *RunServiceClient_Expecter) WatchActionDetails(context1 any, request any) *RunServiceClient_WatchActionDetails_Call {
 	return &RunServiceClient_WatchActionDetails_Call{Call: _e.mock.On("WatchActionDetails", context1, request)}
 }
 
@@ -2520,7 +2520,7 @@ type RunServiceClient_WatchActions_Call struct {
 // WatchActions is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.WatchActionsRequest]
-func (_e *RunServiceClient_Expecter) WatchActions(context1 interface{}, request interface{}) *RunServiceClient_WatchActions_Call {
+func (_e *RunServiceClient_Expecter) WatchActions(context1 any, request any) *RunServiceClient_WatchActions_Call {
 	return &RunServiceClient_WatchActions_Call{Call: _e.mock.On("WatchActions", context1, request)}
 }
 
@@ -2588,7 +2588,7 @@ type RunServiceClient_WatchClusterEvents_Call struct {
 // WatchClusterEvents is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.WatchClusterEventsRequest]
-func (_e *RunServiceClient_Expecter) WatchClusterEvents(context1 interface{}, request interface{}) *RunServiceClient_WatchClusterEvents_Call {
+func (_e *RunServiceClient_Expecter) WatchClusterEvents(context1 any, request any) *RunServiceClient_WatchClusterEvents_Call {
 	return &RunServiceClient_WatchClusterEvents_Call{Call: _e.mock.On("WatchClusterEvents", context1, request)}
 }
 
@@ -2656,7 +2656,7 @@ type RunServiceClient_WatchGroups_Call struct {
 // WatchGroups is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.WatchGroupsRequest]
-func (_e *RunServiceClient_Expecter) WatchGroups(context1 interface{}, request interface{}) *RunServiceClient_WatchGroups_Call {
+func (_e *RunServiceClient_Expecter) WatchGroups(context1 any, request any) *RunServiceClient_WatchGroups_Call {
 	return &RunServiceClient_WatchGroups_Call{Call: _e.mock.On("WatchGroups", context1, request)}
 }
 
@@ -2724,7 +2724,7 @@ type RunServiceClient_WatchRunDetails_Call struct {
 // WatchRunDetails is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.WatchRunDetailsRequest]
-func (_e *RunServiceClient_Expecter) WatchRunDetails(context1 interface{}, request interface{}) *RunServiceClient_WatchRunDetails_Call {
+func (_e *RunServiceClient_Expecter) WatchRunDetails(context1 any, request any) *RunServiceClient_WatchRunDetails_Call {
 	return &RunServiceClient_WatchRunDetails_Call{Call: _e.mock.On("WatchRunDetails", context1, request)}
 }
 
@@ -2792,7 +2792,7 @@ type RunServiceClient_WatchRuns_Call struct {
 // WatchRuns is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.WatchRunsRequest]
-func (_e *RunServiceClient_Expecter) WatchRuns(context1 interface{}, request interface{}) *RunServiceClient_WatchRuns_Call {
+func (_e *RunServiceClient_Expecter) WatchRuns(context1 any, request any) *RunServiceClient_WatchRuns_Call {
 	return &RunServiceClient_WatchRuns_Call{Call: _e.mock.On("WatchRuns", context1, request)}
 }
 
@@ -2887,7 +2887,7 @@ type RunServiceHandler_AbortAction_Call struct {
 // AbortAction is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.AbortActionRequest]
-func (_e *RunServiceHandler_Expecter) AbortAction(context1 interface{}, request interface{}) *RunServiceHandler_AbortAction_Call {
+func (_e *RunServiceHandler_Expecter) AbortAction(context1 any, request any) *RunServiceHandler_AbortAction_Call {
 	return &RunServiceHandler_AbortAction_Call{Call: _e.mock.On("AbortAction", context1, request)}
 }
 
@@ -2955,7 +2955,7 @@ type RunServiceHandler_AbortRun_Call struct {
 // AbortRun is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.AbortRunRequest]
-func (_e *RunServiceHandler_Expecter) AbortRun(context1 interface{}, request interface{}) *RunServiceHandler_AbortRun_Call {
+func (_e *RunServiceHandler_Expecter) AbortRun(context1 any, request any) *RunServiceHandler_AbortRun_Call {
 	return &RunServiceHandler_AbortRun_Call{Call: _e.mock.On("AbortRun", context1, request)}
 }
 
@@ -3023,7 +3023,7 @@ type RunServiceHandler_CreateRun_Call struct {
 // CreateRun is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.CreateRunRequest]
-func (_e *RunServiceHandler_Expecter) CreateRun(context1 interface{}, request interface{}) *RunServiceHandler_CreateRun_Call {
+func (_e *RunServiceHandler_Expecter) CreateRun(context1 any, request any) *RunServiceHandler_CreateRun_Call {
 	return &RunServiceHandler_CreateRun_Call{Call: _e.mock.On("CreateRun", context1, request)}
 }
 
@@ -3091,7 +3091,7 @@ type RunServiceHandler_GetActionData_Call struct {
 // GetActionData is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.GetActionDataRequest]
-func (_e *RunServiceHandler_Expecter) GetActionData(context1 interface{}, request interface{}) *RunServiceHandler_GetActionData_Call {
+func (_e *RunServiceHandler_Expecter) GetActionData(context1 any, request any) *RunServiceHandler_GetActionData_Call {
 	return &RunServiceHandler_GetActionData_Call{Call: _e.mock.On("GetActionData", context1, request)}
 }
 
@@ -3159,7 +3159,7 @@ type RunServiceHandler_GetActionDataURIs_Call struct {
 // GetActionDataURIs is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.GetActionDataURIsRequest]
-func (_e *RunServiceHandler_Expecter) GetActionDataURIs(context1 interface{}, request interface{}) *RunServiceHandler_GetActionDataURIs_Call {
+func (_e *RunServiceHandler_Expecter) GetActionDataURIs(context1 any, request any) *RunServiceHandler_GetActionDataURIs_Call {
 	return &RunServiceHandler_GetActionDataURIs_Call{Call: _e.mock.On("GetActionDataURIs", context1, request)}
 }
 
@@ -3227,7 +3227,7 @@ type RunServiceHandler_GetActionDetails_Call struct {
 // GetActionDetails is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.GetActionDetailsRequest]
-func (_e *RunServiceHandler_Expecter) GetActionDetails(context1 interface{}, request interface{}) *RunServiceHandler_GetActionDetails_Call {
+func (_e *RunServiceHandler_Expecter) GetActionDetails(context1 any, request any) *RunServiceHandler_GetActionDetails_Call {
 	return &RunServiceHandler_GetActionDetails_Call{Call: _e.mock.On("GetActionDetails", context1, request)}
 }
 
@@ -3295,7 +3295,7 @@ type RunServiceHandler_GetActionLogContext_Call struct {
 // GetActionLogContext is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.GetActionLogContextRequest]
-func (_e *RunServiceHandler_Expecter) GetActionLogContext(context1 interface{}, request interface{}) *RunServiceHandler_GetActionLogContext_Call {
+func (_e *RunServiceHandler_Expecter) GetActionLogContext(context1 any, request any) *RunServiceHandler_GetActionLogContext_Call {
 	return &RunServiceHandler_GetActionLogContext_Call{Call: _e.mock.On("GetActionLogContext", context1, request)}
 }
 
@@ -3363,7 +3363,7 @@ type RunServiceHandler_GetRunDetails_Call struct {
 // GetRunDetails is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.GetRunDetailsRequest]
-func (_e *RunServiceHandler_Expecter) GetRunDetails(context1 interface{}, request interface{}) *RunServiceHandler_GetRunDetails_Call {
+func (_e *RunServiceHandler_Expecter) GetRunDetails(context1 any, request any) *RunServiceHandler_GetRunDetails_Call {
 	return &RunServiceHandler_GetRunDetails_Call{Call: _e.mock.On("GetRunDetails", context1, request)}
 }
 
@@ -3431,7 +3431,7 @@ type RunServiceHandler_ListActions_Call struct {
 // ListActions is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.ListActionsRequest]
-func (_e *RunServiceHandler_Expecter) ListActions(context1 interface{}, request interface{}) *RunServiceHandler_ListActions_Call {
+func (_e *RunServiceHandler_Expecter) ListActions(context1 any, request any) *RunServiceHandler_ListActions_Call {
 	return &RunServiceHandler_ListActions_Call{Call: _e.mock.On("ListActions", context1, request)}
 }
 
@@ -3499,7 +3499,7 @@ type RunServiceHandler_ListRuns_Call struct {
 // ListRuns is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.ListRunsRequest]
-func (_e *RunServiceHandler_Expecter) ListRuns(context1 interface{}, request interface{}) *RunServiceHandler_ListRuns_Call {
+func (_e *RunServiceHandler_Expecter) ListRuns(context1 any, request any) *RunServiceHandler_ListRuns_Call {
 	return &RunServiceHandler_ListRuns_Call{Call: _e.mock.On("ListRuns", context1, request)}
 }
 
@@ -3567,7 +3567,7 @@ type RunServiceHandler_SignalEvent_Call struct {
 // SignalEvent is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.SignalEventRequest]
-func (_e *RunServiceHandler_Expecter) SignalEvent(context1 interface{}, request interface{}) *RunServiceHandler_SignalEvent_Call {
+func (_e *RunServiceHandler_Expecter) SignalEvent(context1 any, request any) *RunServiceHandler_SignalEvent_Call {
 	return &RunServiceHandler_SignalEvent_Call{Call: _e.mock.On("SignalEvent", context1, request)}
 }
 
@@ -3625,7 +3625,7 @@ type RunServiceHandler_WatchActionDetails_Call struct {
 //   - context1 context.Context
 //   - request *connect.Request[workflow.WatchActionDetailsRequest]
 //   - serverStream *connect.ServerStream[workflow.WatchActionDetailsResponse]
-func (_e *RunServiceHandler_Expecter) WatchActionDetails(context1 interface{}, request interface{}, serverStream interface{}) *RunServiceHandler_WatchActionDetails_Call {
+func (_e *RunServiceHandler_Expecter) WatchActionDetails(context1 any, request any, serverStream any) *RunServiceHandler_WatchActionDetails_Call {
 	return &RunServiceHandler_WatchActionDetails_Call{Call: _e.mock.On("WatchActionDetails", context1, request, serverStream)}
 }
 
@@ -3688,7 +3688,7 @@ type RunServiceHandler_WatchActions_Call struct {
 //   - context1 context.Context
 //   - request *connect.Request[workflow.WatchActionsRequest]
 //   - serverStream *connect.ServerStream[workflow.WatchActionsResponse]
-func (_e *RunServiceHandler_Expecter) WatchActions(context1 interface{}, request interface{}, serverStream interface{}) *RunServiceHandler_WatchActions_Call {
+func (_e *RunServiceHandler_Expecter) WatchActions(context1 any, request any, serverStream any) *RunServiceHandler_WatchActions_Call {
 	return &RunServiceHandler_WatchActions_Call{Call: _e.mock.On("WatchActions", context1, request, serverStream)}
 }
 
@@ -3751,7 +3751,7 @@ type RunServiceHandler_WatchClusterEvents_Call struct {
 //   - context1 context.Context
 //   - request *connect.Request[workflow.WatchClusterEventsRequest]
 //   - serverStream *connect.ServerStream[workflow.WatchClusterEventsResponse]
-func (_e *RunServiceHandler_Expecter) WatchClusterEvents(context1 interface{}, request interface{}, serverStream interface{}) *RunServiceHandler_WatchClusterEvents_Call {
+func (_e *RunServiceHandler_Expecter) WatchClusterEvents(context1 any, request any, serverStream any) *RunServiceHandler_WatchClusterEvents_Call {
 	return &RunServiceHandler_WatchClusterEvents_Call{Call: _e.mock.On("WatchClusterEvents", context1, request, serverStream)}
 }
 
@@ -3814,7 +3814,7 @@ type RunServiceHandler_WatchGroups_Call struct {
 //   - context1 context.Context
 //   - request *connect.Request[workflow.WatchGroupsRequest]
 //   - serverStream *connect.ServerStream[workflow.WatchGroupsResponse]
-func (_e *RunServiceHandler_Expecter) WatchGroups(context1 interface{}, request interface{}, serverStream interface{}) *RunServiceHandler_WatchGroups_Call {
+func (_e *RunServiceHandler_Expecter) WatchGroups(context1 any, request any, serverStream any) *RunServiceHandler_WatchGroups_Call {
 	return &RunServiceHandler_WatchGroups_Call{Call: _e.mock.On("WatchGroups", context1, request, serverStream)}
 }
 
@@ -3877,7 +3877,7 @@ type RunServiceHandler_WatchRunDetails_Call struct {
 //   - context1 context.Context
 //   - request *connect.Request[workflow.WatchRunDetailsRequest]
 //   - serverStream *connect.ServerStream[workflow.WatchRunDetailsResponse]
-func (_e *RunServiceHandler_Expecter) WatchRunDetails(context1 interface{}, request interface{}, serverStream interface{}) *RunServiceHandler_WatchRunDetails_Call {
+func (_e *RunServiceHandler_Expecter) WatchRunDetails(context1 any, request any, serverStream any) *RunServiceHandler_WatchRunDetails_Call {
 	return &RunServiceHandler_WatchRunDetails_Call{Call: _e.mock.On("WatchRunDetails", context1, request, serverStream)}
 }
 
@@ -3940,7 +3940,7 @@ type RunServiceHandler_WatchRuns_Call struct {
 //   - context1 context.Context
 //   - request *connect.Request[workflow.WatchRunsRequest]
 //   - serverStream *connect.ServerStream[workflow.WatchRunsResponse]
-func (_e *RunServiceHandler_Expecter) WatchRuns(context1 interface{}, request interface{}, serverStream interface{}) *RunServiceHandler_WatchRuns_Call {
+func (_e *RunServiceHandler_Expecter) WatchRuns(context1 any, request any, serverStream any) *RunServiceHandler_WatchRuns_Call {
 	return &RunServiceHandler_WatchRuns_Call{Call: _e.mock.On("WatchRuns", context1, request, serverStream)}
 }
 
@@ -4040,7 +4040,7 @@ type StateServiceClient_Get_Call struct {
 // Get is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.GetRequest]
-func (_e *StateServiceClient_Expecter) Get(context1 interface{}, request interface{}) *StateServiceClient_Get_Call {
+func (_e *StateServiceClient_Expecter) Get(context1 any, request any) *StateServiceClient_Get_Call {
 	return &StateServiceClient_Get_Call{Call: _e.mock.On("Get", context1, request)}
 }
 
@@ -4108,7 +4108,7 @@ type StateServiceClient_Put_Call struct {
 // Put is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.PutRequest]
-func (_e *StateServiceClient_Expecter) Put(context1 interface{}, request interface{}) *StateServiceClient_Put_Call {
+func (_e *StateServiceClient_Expecter) Put(context1 any, request any) *StateServiceClient_Put_Call {
 	return &StateServiceClient_Put_Call{Call: _e.mock.On("Put", context1, request)}
 }
 
@@ -4176,7 +4176,7 @@ type StateServiceClient_Watch_Call struct {
 // Watch is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.WatchRequest]
-func (_e *StateServiceClient_Expecter) Watch(context1 interface{}, request interface{}) *StateServiceClient_Watch_Call {
+func (_e *StateServiceClient_Expecter) Watch(context1 any, request any) *StateServiceClient_Watch_Call {
 	return &StateServiceClient_Watch_Call{Call: _e.mock.On("Watch", context1, request)}
 }
 
@@ -4271,7 +4271,7 @@ type StateServiceHandler_Get_Call struct {
 // Get is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.GetRequest]
-func (_e *StateServiceHandler_Expecter) Get(context1 interface{}, request interface{}) *StateServiceHandler_Get_Call {
+func (_e *StateServiceHandler_Expecter) Get(context1 any, request any) *StateServiceHandler_Get_Call {
 	return &StateServiceHandler_Get_Call{Call: _e.mock.On("Get", context1, request)}
 }
 
@@ -4339,7 +4339,7 @@ type StateServiceHandler_Put_Call struct {
 // Put is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.PutRequest]
-func (_e *StateServiceHandler_Expecter) Put(context1 interface{}, request interface{}) *StateServiceHandler_Put_Call {
+func (_e *StateServiceHandler_Expecter) Put(context1 any, request any) *StateServiceHandler_Put_Call {
 	return &StateServiceHandler_Put_Call{Call: _e.mock.On("Put", context1, request)}
 }
 
@@ -4397,7 +4397,7 @@ type StateServiceHandler_Watch_Call struct {
 //   - context1 context.Context
 //   - request *connect.Request[workflow.WatchRequest]
 //   - serverStream *connect.ServerStream[workflow.WatchResponse]
-func (_e *StateServiceHandler_Expecter) Watch(context1 interface{}, request interface{}, serverStream interface{}) *StateServiceHandler_Watch_Call {
+func (_e *StateServiceHandler_Expecter) Watch(context1 any, request any, serverStream any) *StateServiceHandler_Watch_Call {
 	return &StateServiceHandler_Watch_Call{Call: _e.mock.On("Watch", context1, request, serverStream)}
 }
 
@@ -4497,7 +4497,7 @@ type TranslatorServiceClient_JsonValuesToLiterals_Call struct {
 // JsonValuesToLiterals is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.JsonValuesToLiteralsRequest]
-func (_e *TranslatorServiceClient_Expecter) JsonValuesToLiterals(context1 interface{}, request interface{}) *TranslatorServiceClient_JsonValuesToLiterals_Call {
+func (_e *TranslatorServiceClient_Expecter) JsonValuesToLiterals(context1 any, request any) *TranslatorServiceClient_JsonValuesToLiterals_Call {
 	return &TranslatorServiceClient_JsonValuesToLiterals_Call{Call: _e.mock.On("JsonValuesToLiterals", context1, request)}
 }
 
@@ -4565,7 +4565,7 @@ type TranslatorServiceClient_LaunchFormJsonToLiterals_Call struct {
 // LaunchFormJsonToLiterals is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.LaunchFormJsonToLiteralsRequest]
-func (_e *TranslatorServiceClient_Expecter) LaunchFormJsonToLiterals(context1 interface{}, request interface{}) *TranslatorServiceClient_LaunchFormJsonToLiterals_Call {
+func (_e *TranslatorServiceClient_Expecter) LaunchFormJsonToLiterals(context1 any, request any) *TranslatorServiceClient_LaunchFormJsonToLiterals_Call {
 	return &TranslatorServiceClient_LaunchFormJsonToLiterals_Call{Call: _e.mock.On("LaunchFormJsonToLiterals", context1, request)}
 }
 
@@ -4633,7 +4633,7 @@ type TranslatorServiceClient_LiteralsToLaunchFormJson_Call struct {
 // LiteralsToLaunchFormJson is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.LiteralsToLaunchFormJsonRequest]
-func (_e *TranslatorServiceClient_Expecter) LiteralsToLaunchFormJson(context1 interface{}, request interface{}) *TranslatorServiceClient_LiteralsToLaunchFormJson_Call {
+func (_e *TranslatorServiceClient_Expecter) LiteralsToLaunchFormJson(context1 any, request any) *TranslatorServiceClient_LiteralsToLaunchFormJson_Call {
 	return &TranslatorServiceClient_LiteralsToLaunchFormJson_Call{Call: _e.mock.On("LiteralsToLaunchFormJson", context1, request)}
 }
 
@@ -4701,7 +4701,7 @@ type TranslatorServiceClient_TaskSpecToLaunchFormJson_Call struct {
 // TaskSpecToLaunchFormJson is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.TaskSpecToLaunchFormJsonRequest]
-func (_e *TranslatorServiceClient_Expecter) TaskSpecToLaunchFormJson(context1 interface{}, request interface{}) *TranslatorServiceClient_TaskSpecToLaunchFormJson_Call {
+func (_e *TranslatorServiceClient_Expecter) TaskSpecToLaunchFormJson(context1 any, request any) *TranslatorServiceClient_TaskSpecToLaunchFormJson_Call {
 	return &TranslatorServiceClient_TaskSpecToLaunchFormJson_Call{Call: _e.mock.On("TaskSpecToLaunchFormJson", context1, request)}
 }
 
@@ -4796,7 +4796,7 @@ type TranslatorServiceHandler_JsonValuesToLiterals_Call struct {
 // JsonValuesToLiterals is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.JsonValuesToLiteralsRequest]
-func (_e *TranslatorServiceHandler_Expecter) JsonValuesToLiterals(context1 interface{}, request interface{}) *TranslatorServiceHandler_JsonValuesToLiterals_Call {
+func (_e *TranslatorServiceHandler_Expecter) JsonValuesToLiterals(context1 any, request any) *TranslatorServiceHandler_JsonValuesToLiterals_Call {
 	return &TranslatorServiceHandler_JsonValuesToLiterals_Call{Call: _e.mock.On("JsonValuesToLiterals", context1, request)}
 }
 
@@ -4864,7 +4864,7 @@ type TranslatorServiceHandler_LaunchFormJsonToLiterals_Call struct {
 // LaunchFormJsonToLiterals is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.LaunchFormJsonToLiteralsRequest]
-func (_e *TranslatorServiceHandler_Expecter) LaunchFormJsonToLiterals(context1 interface{}, request interface{}) *TranslatorServiceHandler_LaunchFormJsonToLiterals_Call {
+func (_e *TranslatorServiceHandler_Expecter) LaunchFormJsonToLiterals(context1 any, request any) *TranslatorServiceHandler_LaunchFormJsonToLiterals_Call {
 	return &TranslatorServiceHandler_LaunchFormJsonToLiterals_Call{Call: _e.mock.On("LaunchFormJsonToLiterals", context1, request)}
 }
 
@@ -4932,7 +4932,7 @@ type TranslatorServiceHandler_LiteralsToLaunchFormJson_Call struct {
 // LiteralsToLaunchFormJson is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.LiteralsToLaunchFormJsonRequest]
-func (_e *TranslatorServiceHandler_Expecter) LiteralsToLaunchFormJson(context1 interface{}, request interface{}) *TranslatorServiceHandler_LiteralsToLaunchFormJson_Call {
+func (_e *TranslatorServiceHandler_Expecter) LiteralsToLaunchFormJson(context1 any, request any) *TranslatorServiceHandler_LiteralsToLaunchFormJson_Call {
 	return &TranslatorServiceHandler_LiteralsToLaunchFormJson_Call{Call: _e.mock.On("LiteralsToLaunchFormJson", context1, request)}
 }
 
@@ -5000,7 +5000,7 @@ type TranslatorServiceHandler_TaskSpecToLaunchFormJson_Call struct {
 // TaskSpecToLaunchFormJson is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[workflow.TaskSpecToLaunchFormJsonRequest]
-func (_e *TranslatorServiceHandler_Expecter) TaskSpecToLaunchFormJson(context1 interface{}, request interface{}) *TranslatorServiceHandler_TaskSpecToLaunchFormJson_Call {
+func (_e *TranslatorServiceHandler_Expecter) TaskSpecToLaunchFormJson(context1 any, request any) *TranslatorServiceHandler_TaskSpecToLaunchFormJson_Call {
 	return &TranslatorServiceHandler_TaskSpecToLaunchFormJson_Call{Call: _e.mock.On("TaskSpecToLaunchFormJson", context1, request)}
 }
 

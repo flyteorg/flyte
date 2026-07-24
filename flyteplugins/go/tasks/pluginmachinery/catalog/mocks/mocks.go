@@ -143,7 +143,7 @@ type Future_OnReady_Call struct {
 
 // OnReady is a helper method to define mock.On call
 //   - handler catalog.ReadyHandler
-func (_e *Future_Expecter) OnReady(handler interface{}) *Future_OnReady_Call {
+func (_e *Future_Expecter) OnReady(handler any) *Future_OnReady_Call {
 	return &Future_OnReady_Call{Call: _e.mock.On("OnReady", handler)}
 }
 
@@ -298,7 +298,7 @@ type UploadFuture_OnReady_Call struct {
 
 // OnReady is a helper method to define mock.On call
 //   - handler catalog.ReadyHandler
-func (_e *UploadFuture_Expecter) OnReady(handler interface{}) *UploadFuture_OnReady_Call {
+func (_e *UploadFuture_Expecter) OnReady(handler any) *UploadFuture_OnReady_Call {
 	return &UploadFuture_OnReady_Call{Call: _e.mock.On("OnReady", handler)}
 }
 
@@ -508,7 +508,7 @@ type DownloadFuture_OnReady_Call struct {
 
 // OnReady is a helper method to define mock.On call
 //   - handler catalog.ReadyHandler
-func (_e *DownloadFuture_Expecter) OnReady(handler interface{}) *DownloadFuture_OnReady_Call {
+func (_e *DownloadFuture_Expecter) OnReady(handler any) *DownloadFuture_OnReady_Call {
 	return &DownloadFuture_OnReady_Call{Call: _e.mock.On("OnReady", handler)}
 }
 
@@ -726,11 +726,11 @@ func (_m *AsyncClient) EXPECT() *AsyncClient_Expecter {
 // Download provides a mock function for the type AsyncClient
 func (_mock *AsyncClient) Download(ctx context.Context, requests ...catalog.DownloadRequest) (catalog.DownloadFuture, error) {
 	// catalog.DownloadRequest
-	_va := make([]interface{}, len(requests))
+	_va := make([]any, len(requests))
 	for _i := range requests {
 		_va[_i] = requests[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -767,9 +767,9 @@ type AsyncClient_Download_Call struct {
 // Download is a helper method to define mock.On call
 //   - ctx context.Context
 //   - requests ...catalog.DownloadRequest
-func (_e *AsyncClient_Expecter) Download(ctx interface{}, requests ...interface{}) *AsyncClient_Download_Call {
+func (_e *AsyncClient_Expecter) Download(ctx any, requests ...any) *AsyncClient_Download_Call {
 	return &AsyncClient_Download_Call{Call: _e.mock.On("Download",
-		append([]interface{}{ctx}, requests...)...)}
+		append([]any{ctx}, requests...)...)}
 }
 
 func (_c *AsyncClient_Download_Call) Run(run func(ctx context.Context, requests ...catalog.DownloadRequest)) *AsyncClient_Download_Call {
@@ -807,11 +807,11 @@ func (_c *AsyncClient_Download_Call) RunAndReturn(run func(ctx context.Context, 
 // Upload provides a mock function for the type AsyncClient
 func (_mock *AsyncClient) Upload(ctx context.Context, requests ...catalog.UploadRequest) (catalog.UploadFuture, error) {
 	// catalog.UploadRequest
-	_va := make([]interface{}, len(requests))
+	_va := make([]any, len(requests))
 	for _i := range requests {
 		_va[_i] = requests[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -848,9 +848,9 @@ type AsyncClient_Upload_Call struct {
 // Upload is a helper method to define mock.On call
 //   - ctx context.Context
 //   - requests ...catalog.UploadRequest
-func (_e *AsyncClient_Expecter) Upload(ctx interface{}, requests ...interface{}) *AsyncClient_Upload_Call {
+func (_e *AsyncClient_Expecter) Upload(ctx any, requests ...any) *AsyncClient_Upload_Call {
 	return &AsyncClient_Upload_Call{Call: _e.mock.On("Upload",
-		append([]interface{}{ctx}, requests...)...)}
+		append([]any{ctx}, requests...)...)}
 }
 
 func (_c *AsyncClient_Upload_Call) Run(run func(ctx context.Context, requests ...catalog.UploadRequest)) *AsyncClient_Upload_Call {
@@ -946,7 +946,7 @@ type Client_Get_Call struct {
 // Get is a helper method to define mock.On call
 //   - ctx context.Context
 //   - key catalog.Key
-func (_e *Client_Expecter) Get(ctx interface{}, key interface{}) *Client_Get_Call {
+func (_e *Client_Expecter) Get(ctx any, key any) *Client_Get_Call {
 	return &Client_Get_Call{Call: _e.mock.On("Get", ctx, key)}
 }
 
@@ -1016,7 +1016,7 @@ type Client_GetOrExtendReservation_Call struct {
 //   - key catalog.Key
 //   - ownerID string
 //   - heartbeatInterval time.Duration
-func (_e *Client_Expecter) GetOrExtendReservation(ctx interface{}, key interface{}, ownerID interface{}, heartbeatInterval interface{}) *Client_GetOrExtendReservation_Call {
+func (_e *Client_Expecter) GetOrExtendReservation(ctx any, key any, ownerID any, heartbeatInterval any) *Client_GetOrExtendReservation_Call {
 	return &Client_GetOrExtendReservation_Call{Call: _e.mock.On("GetOrExtendReservation", ctx, key, ownerID, heartbeatInterval)}
 }
 
@@ -1082,7 +1082,7 @@ type Client_GetReservationCache_Call struct {
 
 // GetReservationCache is a helper method to define mock.On call
 //   - ownerID string
-func (_e *Client_Expecter) GetReservationCache(ownerID interface{}) *Client_GetReservationCache_Call {
+func (_e *Client_Expecter) GetReservationCache(ownerID any) *Client_GetReservationCache_Call {
 	return &Client_GetReservationCache_Call{Call: _e.mock.On("GetReservationCache", ownerID)}
 }
 
@@ -1145,7 +1145,7 @@ type Client_Put_Call struct {
 //   - key catalog.Key
 //   - reader io.OutputReader
 //   - metadata catalog.Metadata
-func (_e *Client_Expecter) Put(ctx interface{}, key interface{}, reader interface{}, metadata interface{}) *Client_Put_Call {
+func (_e *Client_Expecter) Put(ctx any, key any, reader any, metadata any) *Client_Put_Call {
 	return &Client_Put_Call{Call: _e.mock.On("Put", ctx, key, reader, metadata)}
 }
 
@@ -1213,7 +1213,7 @@ type Client_ReleaseReservation_Call struct {
 //   - ctx context.Context
 //   - key catalog.Key
 //   - ownerID string
-func (_e *Client_Expecter) ReleaseReservation(ctx interface{}, key interface{}, ownerID interface{}) *Client_ReleaseReservation_Call {
+func (_e *Client_Expecter) ReleaseReservation(ctx any, key any, ownerID any) *Client_ReleaseReservation_Call {
 	return &Client_ReleaseReservation_Call{Call: _e.mock.On("ReleaseReservation", ctx, key, ownerID)}
 }
 
@@ -1286,7 +1286,7 @@ type Client_Update_Call struct {
 //   - key catalog.Key
 //   - reader io.OutputReader
 //   - metadata catalog.Metadata
-func (_e *Client_Expecter) Update(ctx interface{}, key interface{}, reader interface{}, metadata interface{}) *Client_Update_Call {
+func (_e *Client_Expecter) Update(ctx any, key any, reader any, metadata any) *Client_Update_Call {
 	return &Client_Update_Call{Call: _e.mock.On("Update", ctx, key, reader, metadata)}
 }
 
@@ -1342,7 +1342,7 @@ type Client_UpdateReservationCache_Call struct {
 // UpdateReservationCache is a helper method to define mock.On call
 //   - ownerID string
 //   - entry catalog.ReservationCache
-func (_e *Client_Expecter) UpdateReservationCache(ownerID interface{}, entry interface{}) *Client_UpdateReservationCache_Call {
+func (_e *Client_Expecter) UpdateReservationCache(ownerID any, entry any) *Client_UpdateReservationCache_Call {
 	return &Client_UpdateReservationCache_Call{Call: _e.mock.On("UpdateReservationCache", ownerID, entry)}
 }
 

@@ -75,7 +75,7 @@ type ActionsServiceClient_Abort_Call struct {
 // Abort is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[actions.AbortRequest]
-func (_e *ActionsServiceClient_Expecter) Abort(context1 interface{}, request interface{}) *ActionsServiceClient_Abort_Call {
+func (_e *ActionsServiceClient_Expecter) Abort(context1 any, request any) *ActionsServiceClient_Abort_Call {
 	return &ActionsServiceClient_Abort_Call{Call: _e.mock.On("Abort", context1, request)}
 }
 
@@ -143,7 +143,7 @@ type ActionsServiceClient_Enqueue_Call struct {
 // Enqueue is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[actions.EnqueueRequest]
-func (_e *ActionsServiceClient_Expecter) Enqueue(context1 interface{}, request interface{}) *ActionsServiceClient_Enqueue_Call {
+func (_e *ActionsServiceClient_Expecter) Enqueue(context1 any, request any) *ActionsServiceClient_Enqueue_Call {
 	return &ActionsServiceClient_Enqueue_Call{Call: _e.mock.On("Enqueue", context1, request)}
 }
 
@@ -211,7 +211,7 @@ type ActionsServiceClient_Signal_Call struct {
 // Signal is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[actions.SignalRequest]
-func (_e *ActionsServiceClient_Expecter) Signal(context1 interface{}, request interface{}) *ActionsServiceClient_Signal_Call {
+func (_e *ActionsServiceClient_Expecter) Signal(context1 any, request any) *ActionsServiceClient_Signal_Call {
 	return &ActionsServiceClient_Signal_Call{Call: _e.mock.On("Signal", context1, request)}
 }
 
@@ -279,7 +279,7 @@ type ActionsServiceClient_Update_Call struct {
 // Update is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[actions.UpdateRequest]
-func (_e *ActionsServiceClient_Expecter) Update(context1 interface{}, request interface{}) *ActionsServiceClient_Update_Call {
+func (_e *ActionsServiceClient_Expecter) Update(context1 any, request any) *ActionsServiceClient_Update_Call {
 	return &ActionsServiceClient_Update_Call{Call: _e.mock.On("Update", context1, request)}
 }
 
@@ -347,7 +347,7 @@ type ActionsServiceClient_WatchForUpdates_Call struct {
 // WatchForUpdates is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[actions.WatchForUpdatesRequest]
-func (_e *ActionsServiceClient_Expecter) WatchForUpdates(context1 interface{}, request interface{}) *ActionsServiceClient_WatchForUpdates_Call {
+func (_e *ActionsServiceClient_Expecter) WatchForUpdates(context1 any, request any) *ActionsServiceClient_WatchForUpdates_Call {
 	return &ActionsServiceClient_WatchForUpdates_Call{Call: _e.mock.On("WatchForUpdates", context1, request)}
 }
 
@@ -442,7 +442,7 @@ type ActionsServiceHandler_Abort_Call struct {
 // Abort is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[actions.AbortRequest]
-func (_e *ActionsServiceHandler_Expecter) Abort(context1 interface{}, request interface{}) *ActionsServiceHandler_Abort_Call {
+func (_e *ActionsServiceHandler_Expecter) Abort(context1 any, request any) *ActionsServiceHandler_Abort_Call {
 	return &ActionsServiceHandler_Abort_Call{Call: _e.mock.On("Abort", context1, request)}
 }
 
@@ -510,7 +510,7 @@ type ActionsServiceHandler_Enqueue_Call struct {
 // Enqueue is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[actions.EnqueueRequest]
-func (_e *ActionsServiceHandler_Expecter) Enqueue(context1 interface{}, request interface{}) *ActionsServiceHandler_Enqueue_Call {
+func (_e *ActionsServiceHandler_Expecter) Enqueue(context1 any, request any) *ActionsServiceHandler_Enqueue_Call {
 	return &ActionsServiceHandler_Enqueue_Call{Call: _e.mock.On("Enqueue", context1, request)}
 }
 
@@ -578,7 +578,7 @@ type ActionsServiceHandler_Signal_Call struct {
 // Signal is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[actions.SignalRequest]
-func (_e *ActionsServiceHandler_Expecter) Signal(context1 interface{}, request interface{}) *ActionsServiceHandler_Signal_Call {
+func (_e *ActionsServiceHandler_Expecter) Signal(context1 any, request any) *ActionsServiceHandler_Signal_Call {
 	return &ActionsServiceHandler_Signal_Call{Call: _e.mock.On("Signal", context1, request)}
 }
 
@@ -646,7 +646,7 @@ type ActionsServiceHandler_Update_Call struct {
 // Update is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[actions.UpdateRequest]
-func (_e *ActionsServiceHandler_Expecter) Update(context1 interface{}, request interface{}) *ActionsServiceHandler_Update_Call {
+func (_e *ActionsServiceHandler_Expecter) Update(context1 any, request any) *ActionsServiceHandler_Update_Call {
 	return &ActionsServiceHandler_Update_Call{Call: _e.mock.On("Update", context1, request)}
 }
 
@@ -704,7 +704,7 @@ type ActionsServiceHandler_WatchForUpdates_Call struct {
 //   - context1 context.Context
 //   - request *connect.Request[actions.WatchForUpdatesRequest]
 //   - serverStream *connect.ServerStream[actions.WatchForUpdatesResponse]
-func (_e *ActionsServiceHandler_Expecter) WatchForUpdates(context1 interface{}, request interface{}, serverStream interface{}) *ActionsServiceHandler_WatchForUpdates_Call {
+func (_e *ActionsServiceHandler_Expecter) WatchForUpdates(context1 any, request any, serverStream any) *ActionsServiceHandler_WatchForUpdates_Call {
 	return &ActionsServiceHandler_WatchForUpdates_Call{Call: _e.mock.On("WatchForUpdates", context1, request, serverStream)}
 }
 

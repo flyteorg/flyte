@@ -75,7 +75,7 @@ type Client_Get_Call struct {
 // Get is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx webapi.GetContext
-func (_e *Client_Expecter) Get(ctx interface{}, tCtx interface{}) *Client_Get_Call {
+func (_e *Client_Expecter) Get(ctx any, tCtx any) *Client_Get_Call {
 	return &Client_Get_Call{Call: _e.mock.On("Get", ctx, tCtx)}
 }
 
@@ -141,7 +141,7 @@ type Client_Status_Call struct {
 // Status is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx webapi.StatusContext
-func (_e *Client_Expecter) Status(ctx interface{}, tCtx interface{}) *Client_Status_Call {
+func (_e *Client_Expecter) Status(ctx any, tCtx any) *Client_Status_Call {
 	return &Client_Status_Call{Call: _e.mock.On("Status", ctx, tCtx)}
 }
 

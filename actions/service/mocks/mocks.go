@@ -70,7 +70,7 @@ type ActionsClientInterface_AbortAction_Call struct {
 //   - ctx context.Context
 //   - actionID *common.ActionIdentifier
 //   - reason *string
-func (_e *ActionsClientInterface_Expecter) AbortAction(ctx interface{}, actionID interface{}, reason interface{}) *ActionsClientInterface_AbortAction_Call {
+func (_e *ActionsClientInterface_Expecter) AbortAction(ctx any, actionID any, reason any) *ActionsClientInterface_AbortAction_Call {
 	return &ActionsClientInterface_AbortAction_Call{Call: _e.mock.On("AbortAction", ctx, actionID, reason)}
 }
 
@@ -133,7 +133,7 @@ type ActionsClientInterface_Enqueue_Call struct {
 //   - ctx context.Context
 //   - action *actions.Action
 //   - runSpec *task.RunSpec
-func (_e *ActionsClientInterface_Expecter) Enqueue(ctx interface{}, action interface{}, runSpec interface{}) *ActionsClientInterface_Enqueue_Call {
+func (_e *ActionsClientInterface_Expecter) Enqueue(ctx any, action any, runSpec any) *ActionsClientInterface_Enqueue_Call {
 	return &ActionsClientInterface_Enqueue_Call{Call: _e.mock.On("Enqueue", ctx, action, runSpec)}
 }
 
@@ -206,7 +206,7 @@ type ActionsClientInterface_ListChildActions_Call struct {
 // ListChildActions is a helper method to define mock.On call
 //   - ctx context.Context
 //   - parentActionID *common.ActionIdentifier
-func (_e *ActionsClientInterface_Expecter) ListChildActions(ctx interface{}, parentActionID interface{}) *ActionsClientInterface_ListChildActions_Call {
+func (_e *ActionsClientInterface_Expecter) ListChildActions(ctx any, parentActionID any) *ActionsClientInterface_ListChildActions_Call {
 	return &ActionsClientInterface_ListChildActions_Call{Call: _e.mock.On("ListChildActions", ctx, parentActionID)}
 }
 
@@ -265,7 +265,7 @@ type ActionsClientInterface_PutStatus_Call struct {
 //   - actionID *common.ActionIdentifier
 //   - attempt uint32
 //   - status *workflow.ActionStatus
-func (_e *ActionsClientInterface_Expecter) PutStatus(ctx interface{}, actionID interface{}, attempt interface{}, status interface{}) *ActionsClientInterface_PutStatus_Call {
+func (_e *ActionsClientInterface_Expecter) PutStatus(ctx any, actionID any, attempt any, status any) *ActionsClientInterface_PutStatus_Call {
 	return &ActionsClientInterface_PutStatus_Call{Call: _e.mock.On("PutStatus", ctx, actionID, attempt, status)}
 }
 
@@ -334,7 +334,7 @@ type ActionsClientInterface_Signal_Call struct {
 //   - actionID *common.ActionIdentifier
 //   - value *core.Literal
 //   - signalledBy string
-func (_e *ActionsClientInterface_Expecter) Signal(ctx interface{}, actionID interface{}, value interface{}, signalledBy interface{}) *ActionsClientInterface_Signal_Call {
+func (_e *ActionsClientInterface_Expecter) Signal(ctx any, actionID any, value any, signalledBy any) *ActionsClientInterface_Signal_Call {
 	return &ActionsClientInterface_Signal_Call{Call: _e.mock.On("Signal", ctx, actionID, value, signalledBy)}
 }
 
@@ -400,7 +400,7 @@ type ActionsClientInterface_StartWatching_Call struct {
 
 // StartWatching is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *ActionsClientInterface_Expecter) StartWatching(ctx interface{}) *ActionsClientInterface_StartWatching_Call {
+func (_e *ActionsClientInterface_Expecter) StartWatching(ctx any) *ActionsClientInterface_StartWatching_Call {
 	return &ActionsClientInterface_StartWatching_Call{Call: _e.mock.On("StartWatching", ctx)}
 }
 
@@ -487,7 +487,7 @@ type ActionsClientInterface_Subscribe_Call struct {
 // Subscribe is a helper method to define mock.On call
 //   - runName string
 //   - parentActionName string
-func (_e *ActionsClientInterface_Expecter) Subscribe(runName interface{}, parentActionName interface{}) *ActionsClientInterface_Subscribe_Call {
+func (_e *ActionsClientInterface_Expecter) Subscribe(runName any, parentActionName any) *ActionsClientInterface_Subscribe_Call {
 	return &ActionsClientInterface_Subscribe_Call{Call: _e.mock.On("Subscribe", runName, parentActionName)}
 }
 
@@ -534,7 +534,7 @@ type ActionsClientInterface_Unsubscribe_Call struct {
 //   - runName string
 //   - parentActionName string
 //   - ch chan *k8s.ActionUpdate
-func (_e *ActionsClientInterface_Expecter) Unsubscribe(runName interface{}, parentActionName interface{}, ch interface{}) *ActionsClientInterface_Unsubscribe_Call {
+func (_e *ActionsClientInterface_Expecter) Unsubscribe(runName any, parentActionName any, ch any) *ActionsClientInterface_Unsubscribe_Call {
 	return &ActionsClientInterface_Unsubscribe_Call{Call: _e.mock.On("Unsubscribe", runName, parentActionName, ch)}
 }
 

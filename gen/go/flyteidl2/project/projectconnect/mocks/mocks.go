@@ -75,7 +75,7 @@ type ProjectServiceClient_CreateProject_Call struct {
 // CreateProject is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[project.CreateProjectRequest]
-func (_e *ProjectServiceClient_Expecter) CreateProject(context1 interface{}, request interface{}) *ProjectServiceClient_CreateProject_Call {
+func (_e *ProjectServiceClient_Expecter) CreateProject(context1 any, request any) *ProjectServiceClient_CreateProject_Call {
 	return &ProjectServiceClient_CreateProject_Call{Call: _e.mock.On("CreateProject", context1, request)}
 }
 
@@ -143,7 +143,7 @@ type ProjectServiceClient_GetProject_Call struct {
 // GetProject is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[project.GetProjectRequest]
-func (_e *ProjectServiceClient_Expecter) GetProject(context1 interface{}, request interface{}) *ProjectServiceClient_GetProject_Call {
+func (_e *ProjectServiceClient_Expecter) GetProject(context1 any, request any) *ProjectServiceClient_GetProject_Call {
 	return &ProjectServiceClient_GetProject_Call{Call: _e.mock.On("GetProject", context1, request)}
 }
 
@@ -211,7 +211,7 @@ type ProjectServiceClient_ListProjects_Call struct {
 // ListProjects is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[project.ListProjectsRequest]
-func (_e *ProjectServiceClient_Expecter) ListProjects(context1 interface{}, request interface{}) *ProjectServiceClient_ListProjects_Call {
+func (_e *ProjectServiceClient_Expecter) ListProjects(context1 any, request any) *ProjectServiceClient_ListProjects_Call {
 	return &ProjectServiceClient_ListProjects_Call{Call: _e.mock.On("ListProjects", context1, request)}
 }
 
@@ -279,7 +279,7 @@ type ProjectServiceClient_UpdateProject_Call struct {
 // UpdateProject is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[project.UpdateProjectRequest]
-func (_e *ProjectServiceClient_Expecter) UpdateProject(context1 interface{}, request interface{}) *ProjectServiceClient_UpdateProject_Call {
+func (_e *ProjectServiceClient_Expecter) UpdateProject(context1 any, request any) *ProjectServiceClient_UpdateProject_Call {
 	return &ProjectServiceClient_UpdateProject_Call{Call: _e.mock.On("UpdateProject", context1, request)}
 }
 
@@ -374,7 +374,7 @@ type ProjectServiceHandler_CreateProject_Call struct {
 // CreateProject is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[project.CreateProjectRequest]
-func (_e *ProjectServiceHandler_Expecter) CreateProject(context1 interface{}, request interface{}) *ProjectServiceHandler_CreateProject_Call {
+func (_e *ProjectServiceHandler_Expecter) CreateProject(context1 any, request any) *ProjectServiceHandler_CreateProject_Call {
 	return &ProjectServiceHandler_CreateProject_Call{Call: _e.mock.On("CreateProject", context1, request)}
 }
 
@@ -442,7 +442,7 @@ type ProjectServiceHandler_GetProject_Call struct {
 // GetProject is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[project.GetProjectRequest]
-func (_e *ProjectServiceHandler_Expecter) GetProject(context1 interface{}, request interface{}) *ProjectServiceHandler_GetProject_Call {
+func (_e *ProjectServiceHandler_Expecter) GetProject(context1 any, request any) *ProjectServiceHandler_GetProject_Call {
 	return &ProjectServiceHandler_GetProject_Call{Call: _e.mock.On("GetProject", context1, request)}
 }
 
@@ -510,7 +510,7 @@ type ProjectServiceHandler_ListProjects_Call struct {
 // ListProjects is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[project.ListProjectsRequest]
-func (_e *ProjectServiceHandler_Expecter) ListProjects(context1 interface{}, request interface{}) *ProjectServiceHandler_ListProjects_Call {
+func (_e *ProjectServiceHandler_Expecter) ListProjects(context1 any, request any) *ProjectServiceHandler_ListProjects_Call {
 	return &ProjectServiceHandler_ListProjects_Call{Call: _e.mock.On("ListProjects", context1, request)}
 }
 
@@ -578,7 +578,7 @@ type ProjectServiceHandler_UpdateProject_Call struct {
 // UpdateProject is a helper method to define mock.On call
 //   - context1 context.Context
 //   - request *connect.Request[project.UpdateProjectRequest]
-func (_e *ProjectServiceHandler_Expecter) UpdateProject(context1 interface{}, request interface{}) *ProjectServiceHandler_UpdateProject_Call {
+func (_e *ProjectServiceHandler_Expecter) UpdateProject(context1 any, request any) *ProjectServiceHandler_UpdateProject_Call {
 	return &ProjectServiceHandler_UpdateProject_Call{Call: _e.mock.On("UpdateProject", context1, request)}
 }
 
