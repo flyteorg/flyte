@@ -34,8 +34,6 @@ type Connector struct {
 }
 
 // ClientSet contains the clients exposed to communicate with various connector services.
-// Its maps are read/written from multiple goroutines (the connector poll loop and
-// concurrent task handlers), so all access must go through the mutex-guarded helpers.
 type ClientSet struct {
 	mu                       sync.RWMutex
 	asyncConnectorClients    map[string]connector.AsyncConnectorServiceClient    // map[endpoint] => AsyncConnectorServiceClient

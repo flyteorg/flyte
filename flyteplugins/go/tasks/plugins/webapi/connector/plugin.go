@@ -379,11 +379,6 @@ func (p *Plugin) getAsyncConnectorClient(ctx context.Context, connector *Deploym
 
 func (p *Plugin) watchConnectors(ctx context.Context, connectorService *ConnectorService) {
 	go wait.Until(func() {
-		// Reuse the persistent, keepalive'd connections held on p.cs; only dial
-		// connector endpoints we haven't connected to yet (e.g. newly-added
-		// deployments). Previously this re-dialed a throwaway connection every
-		// poll, so each ListConnectors paid a fresh TCP+HTTP/2 handshake through
-		// the ingress path.
 		for _, deployment := range allConnectorDeployments(GetConfig()) {
 			if _, err := p.cs.getOrDialMetadataClient(ctx, deployment); err != nil {
 				logger.Errorf(ctx, "failed to connect to connector [%v]: %v", deployment.Endpoint, err)
