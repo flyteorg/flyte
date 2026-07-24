@@ -53,6 +53,7 @@ func TestGetOrDialMetadataClientReusesConnection(t *testing.T) {
 	// A pre-existing cached client for endpoint "ep".
 	conn, err := grpc.NewClient("passthrough:///ep", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	assert.NoError(t, err)
+	t.Cleanup(func() { _ = conn.Close() })
 	existing := connectorpb.NewConnectorMetadataServiceClient(conn)
 
 	cs := &ClientSet{
