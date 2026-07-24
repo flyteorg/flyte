@@ -386,12 +386,35 @@ func (p *Plugin) getAsyncConnectorClient(ctx context.Context, connector *Deploym
 	return client, nil
 }
 
+// getConnectorMetadataClient returns a cached ConnectorMetadataService client for
+// the endpoint, dialing a persistent connection (bound to the plugin's context)
+// on first use. Connections are reused across polls instead of being re-dialed
+// every PollInterval, so ListConnectors runs over a warm, keepalive'd channel.
+func (p *Plugin) getConnectorMetadataClient(ctx context.Context, deployment *Deployment) error {
+	if _, ok := p.cs.connectorMetadataClients[deployment.Endpoint]; ok {
+		return nil
+	}
+	conn, err := getGrpcConnection(ctx, deployment)
+	if err != nil {
+		return err
+	}
+	p.cs.connectorMetadataClients[deployment.Endpoint] = connectorPb.NewConnectorMetadataServiceClient(conn)
+	return nil
+}
+
 func (p *Plugin) watchConnectors(ctx context.Context, connectorService *ConnectorService) {
 	go wait.Until(func() {
-		childCtx, cancel := context.WithCancel(ctx)
-		defer cancel()
-		clientSet := getConnectorClientSets(childCtx)
-		connectorRegistry := getConnectorRegistry(childCtx, clientSet)
+		// Reuse the persistent, keepalive'd connections held on p.cs; only dial
+		// connector endpoints we haven't connected to yet (e.g. newly-added
+		// deployments). Previously this re-dialed a throwaway connection every
+		// poll, so each ListConnectors paid a fresh TCP+HTTP/2 handshake through
+		// the ingress path.
+		for _, deployment := range allConnectorDeployments(GetConfig()) {
+			if err := p.getConnectorMetadataClient(ctx, deployment); err != nil {
+				logger.Errorf(ctx, "failed to connect to connector [%v]: %v", deployment.Endpoint, err)
+			}
+		}
+		connectorRegistry := getConnectorRegistry(ctx, p.cs)
 		p.setRegistry(connectorRegistry)
 		connectorService.SetSupportedTaskType(connectorRegistry.getSupportedTaskTypes())
 	}, p.cfg.PollInterval.Duration, ctx.Done())

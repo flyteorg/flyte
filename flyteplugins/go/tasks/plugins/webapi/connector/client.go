@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/x509"
 	"strings"
+	"time"
 
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
@@ -11,6 +12,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/grpclog"
+	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
@@ -59,6 +61,14 @@ func getGrpcConnection(ctx context.Context, connector *Deployment) (*grpc.Client
 	opts = append(opts,
 		grpc.WithChainUnaryInterceptor(clientMetrics.UnaryClientInterceptor()),
 		grpc.WithChainStreamInterceptor(clientMetrics.StreamClientInterceptor()),
+		// Keepalive lets gRPC notice a dead/half-open transport within seconds
+		// (via HTTP/2 PINGs during active RPCs) instead of relying on the OS TCP
+		// timeout. Conservative values so we don't trip a server's ping-rate
+		// enforcement; PermitWithoutStream is intentionally left false.
+		grpc.WithKeepaliveParams(keepalive.ClientParameters{
+			Time:    30 * time.Second,
+			Timeout: 10 * time.Second,
+		}),
 	)
 
 	var err error
@@ -199,28 +209,29 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 	return newConnectorRegistry
 }
 
+// allConnectorDeployments returns every configured connector endpoint: the
+// default connector, explicit deployments, and connector apps.
+func allConnectorDeployments(cfg *Config) []*Deployment {
+	var connectorDeployments []*Deployment
+	if len(cfg.DefaultConnector.Endpoint) != 0 {
+		connectorDeployments = append(connectorDeployments, &cfg.DefaultConnector)
+	}
+	for _, deployment := range cfg.ConnectorDeployments {
+		connectorDeployments = append(connectorDeployments, deployment)
+	}
+	for _, deployment := range cfg.ConnectorApps {
+		connectorDeployments = append(connectorDeployments, deployment)
+	}
+	return connectorDeployments
+}
+
 func getConnectorClientSets(ctx context.Context) *ClientSet {
 	clientSet := &ClientSet{
 		asyncConnectorClients:    make(map[string]connector.AsyncConnectorServiceClient),
 		connectorMetadataClients: make(map[string]connector.ConnectorMetadataServiceClient),
 	}
 
-	var connectorDeployments []*Deployment
-	cfg := GetConfig()
-
-	if len(cfg.DefaultConnector.Endpoint) != 0 {
-		connectorDeployments = append(connectorDeployments, &cfg.DefaultConnector)
-	}
-
-	for _, deployment := range cfg.ConnectorDeployments {
-		connectorDeployments = append(connectorDeployments, deployment)
-	}
-
-	for _, deployment := range cfg.ConnectorApps {
-		connectorDeployments = append(connectorDeployments, deployment)
-	}
-
-	for _, connectorDeployment := range connectorDeployments {
+	for _, connectorDeployment := range allConnectorDeployments(GetConfig()) {
 		if _, ok := clientSet.connectorMetadataClients[connectorDeployment.Endpoint]; ok {
 			logger.Infof(ctx, "Connector client already initialized for [%v]", connectorDeployment.Endpoint)
 			continue
