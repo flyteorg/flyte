@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/x509"
 	"strings"
+	"sync"
 	"time"
 
 	"golang.org/x/exp/maps"
@@ -33,9 +34,54 @@ type Connector struct {
 }
 
 // ClientSet contains the clients exposed to communicate with various connector services.
+// Its maps are read/written from multiple goroutines (the connector poll loop and
+// concurrent task handlers), so all access must go through the mutex-guarded helpers.
 type ClientSet struct {
+	mu                       sync.RWMutex
 	asyncConnectorClients    map[string]connector.AsyncConnectorServiceClient    // map[endpoint] => AsyncConnectorServiceClient
 	connectorMetadataClients map[string]connector.ConnectorMetadataServiceClient // map[endpoint] => ConnectorMetadataServiceClient
+}
+
+// getOrDialAsyncClient returns the cached AsyncConnectorService client for the
+// endpoint, dialing (and caching) a persistent connection on first use.
+func (cs *ClientSet) getOrDialAsyncClient(ctx context.Context, deployment *Deployment) (connector.AsyncConnectorServiceClient, error) {
+	cs.mu.Lock()
+	defer cs.mu.Unlock()
+	if client, ok := cs.asyncConnectorClients[deployment.Endpoint]; ok {
+		return client, nil
+	}
+	conn, err := getGrpcConnection(ctx, deployment)
+	if err != nil {
+		return nil, err
+	}
+	client := connector.NewAsyncConnectorServiceClient(conn)
+	cs.asyncConnectorClients[deployment.Endpoint] = client
+	return client, nil
+}
+
+// getOrDialMetadataClient returns the cached ConnectorMetadataService client for
+// the endpoint, dialing (and caching) a persistent connection on first use.
+func (cs *ClientSet) getOrDialMetadataClient(ctx context.Context, deployment *Deployment) (connector.ConnectorMetadataServiceClient, error) {
+	cs.mu.Lock()
+	defer cs.mu.Unlock()
+	if client, ok := cs.connectorMetadataClients[deployment.Endpoint]; ok {
+		return client, nil
+	}
+	conn, err := getGrpcConnection(ctx, deployment)
+	if err != nil {
+		return nil, err
+	}
+	client := connector.NewConnectorMetadataServiceClient(conn)
+	cs.connectorMetadataClients[deployment.Endpoint] = client
+	return client, nil
+}
+
+// metadataClient returns the cached ConnectorMetadataService client for the endpoint.
+func (cs *ClientSet) metadataClient(endpoint string) (connector.ConnectorMetadataServiceClient, bool) {
+	cs.mu.RLock()
+	defer cs.mu.RUnlock()
+	client, ok := cs.connectorMetadataClients[endpoint]
+	return client, ok
 }
 
 func getGrpcConnection(ctx context.Context, connector *Deployment) (*grpc.ClientConn, error) {
@@ -111,7 +157,7 @@ func updateRegistry(
 	isConnectorApp bool,
 ) {
 	for connectorID, connectorDeployment := range connectorDeployments {
-		client, ok := cs.connectorMetadataClients[connectorDeployment.Endpoint]
+		client, ok := cs.metadataClient(connectorDeployment.Endpoint)
 		if !ok {
 			logger.Warningf(ctx, "Connector client not found in the clientSet for the endpoint: %v", connectorDeployment.Endpoint)
 			continue
