@@ -7679,6 +7679,7 @@ apiVersion: v1
 data:
   kubernetes.podspec-affinity: enabled
   kubernetes.podspec-nodeselector: enabled
+  kubernetes.podspec-persistent-volume-claim: enabled
   kubernetes.podspec-tolerations: enabled
 kind: ConfigMap
 metadata:
