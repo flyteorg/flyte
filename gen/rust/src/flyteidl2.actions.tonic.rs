@@ -109,33 +109,6 @@ pub mod actions_service_client {
                 .insert(GrpcMethod::new("flyteidl2.actions.ActionsService", "Enqueue"));
             self.inner.unary(req, path, codec).await
         }
-        pub async fn get_latest_state(
-            &mut self,
-            request: impl tonic::IntoRequest<super::GetLatestStateRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetLatestStateResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.actions.ActionsService/GetLatestState",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("flyteidl2.actions.ActionsService", "GetLatestState"),
-                );
-            self.inner.unary(req, path, codec).await
-        }
         pub async fn watch_for_updates(
             &mut self,
             request: impl tonic::IntoRequest<super::WatchForUpdatesRequest>,
@@ -245,13 +218,6 @@ pub mod actions_service_server {
             &self,
             request: tonic::Request<super::EnqueueRequest>,
         ) -> std::result::Result<tonic::Response<super::EnqueueResponse>, tonic::Status>;
-        async fn get_latest_state(
-            &self,
-            request: tonic::Request<super::GetLatestStateRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GetLatestStateResponse>,
-            tonic::Status,
-        >;
         /// Server streaming response type for the WatchForUpdates method.
         type WatchForUpdatesStream: tonic::codegen::tokio_stream::Stream<
                 Item = std::result::Result<super::WatchForUpdatesResponse, tonic::Status>,
@@ -384,52 +350,6 @@ pub mod actions_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let method = EnqueueSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/flyteidl2.actions.ActionsService/GetLatestState" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetLatestStateSvc<T: ActionsService>(pub Arc<T>);
-                    impl<
-                        T: ActionsService,
-                    > tonic::server::UnaryService<super::GetLatestStateRequest>
-                    for GetLatestStateSvc<T> {
-                        type Response = super::GetLatestStateResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetLatestStateRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                <T as ActionsService>::get_latest_state(&inner, request)
-                                    .await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let method = GetLatestStateSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

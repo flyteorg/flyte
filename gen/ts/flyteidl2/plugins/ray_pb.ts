@@ -4,7 +4,7 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
-import type { K8sPod } from "../core/tasks_pb.ts";
+import type { ExtendedResources, K8sPod } from "../core/tasks_pb.ts";
 import { file_flyteidl2_core_tasks } from "../core/tasks_pb.ts";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/plugins/ray.proto.
  */
 export const file_flyteidl2_plugins_ray: GenFile = /*@__PURE__*/
-  fileDesc("ChtmbHl0ZWlkbDIvcGx1Z2lucy9yYXkucHJvdG8SEWZseXRlaWRsMi5wbHVnaW5zIrgBCgZSYXlKb2ISMgoLcmF5X2NsdXN0ZXIYASABKAsyHS5mbHl0ZWlkbDIucGx1Z2lucy5SYXlDbHVzdGVyEhcKC3J1bnRpbWVfZW52GAIgASgJQgIYARIjChtzaHV0ZG93bl9hZnRlcl9qb2JfZmluaXNoZXMYAyABKAgSIgoadHRsX3NlY29uZHNfYWZ0ZXJfZmluaXNoZWQYBCABKAUSGAoQcnVudGltZV9lbnZfeWFtbBgFIAEoCSKiAQoKUmF5Q2x1c3RlchI5Cg9oZWFkX2dyb3VwX3NwZWMYASABKAsyIC5mbHl0ZWlkbDIucGx1Z2lucy5IZWFkR3JvdXBTcGVjEj0KEXdvcmtlcl9ncm91cF9zcGVjGAIgAygLMiIuZmx5dGVpZGwyLnBsdWdpbnMuV29ya2VyR3JvdXBTcGVjEhoKEmVuYWJsZV9hdXRvc2NhbGluZxgDIAEoCCK/AQoNSGVhZEdyb3VwU3BlYxJOChByYXlfc3RhcnRfcGFyYW1zGAEgAygLMjQuZmx5dGVpZGwyLnBsdWdpbnMuSGVhZEdyb3VwU3BlYy5SYXlTdGFydFBhcmFtc0VudHJ5EicKB2s4c19wb2QYAiABKAsyFi5mbHl0ZWlkbDIuY29yZS5LOHNQb2QaNQoTUmF5U3RhcnRQYXJhbXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIpUCCg9Xb3JrZXJHcm91cFNwZWMSEgoKZ3JvdXBfbmFtZRgBIAEoCRIQCghyZXBsaWNhcxgCIAEoBRIUCgxtaW5fcmVwbGljYXMYAyABKAUSFAoMbWF4X3JlcGxpY2FzGAQgASgFElAKEHJheV9zdGFydF9wYXJhbXMYBSADKAsyNi5mbHl0ZWlkbDIucGx1Z2lucy5Xb3JrZXJHcm91cFNwZWMuUmF5U3RhcnRQYXJhbXNFbnRyeRInCgdrOHNfcG9kGAYgASgLMhYuZmx5dGVpZGwyLmNvcmUuSzhzUG9kGjUKE1JheVN0YXJ0UGFyYW1zRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4AUK/AQoVY29tLmZseXRlaWRsMi5wbHVnaW5zQghSYXlQcm90b0gCUAFaNWdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9wbHVnaW5zogIDRlBYqgIRRmx5dGVpZGwyLlBsdWdpbnPKAhFGbHl0ZWlkbDJcUGx1Z2luc+ICHUZseXRlaWRsMlxQbHVnaW5zXEdQQk1ldGFkYXRh6gISRmx5dGVpZGwyOjpQbHVnaW5zYgZwcm90bzM", [file_flyteidl2_core_tasks]);
+  fileDesc("ChtmbHl0ZWlkbDIvcGx1Z2lucy9yYXkucHJvdG8SEWZseXRlaWRsMi5wbHVnaW5zIrgBCgZSYXlKb2ISMgoLcmF5X2NsdXN0ZXIYASABKAsyHS5mbHl0ZWlkbDIucGx1Z2lucy5SYXlDbHVzdGVyEhcKC3J1bnRpbWVfZW52GAIgASgJQgIYARIjChtzaHV0ZG93bl9hZnRlcl9qb2JfZmluaXNoZXMYAyABKAgSIgoadHRsX3NlY29uZHNfYWZ0ZXJfZmluaXNoZWQYBCABKAUSGAoQcnVudGltZV9lbnZfeWFtbBgFIAEoCSKiAQoKUmF5Q2x1c3RlchI5Cg9oZWFkX2dyb3VwX3NwZWMYASABKAsyIC5mbHl0ZWlkbDIucGx1Z2lucy5IZWFkR3JvdXBTcGVjEj0KEXdvcmtlcl9ncm91cF9zcGVjGAIgAygLMiIuZmx5dGVpZGwyLnBsdWdpbnMuV29ya2VyR3JvdXBTcGVjEhoKEmVuYWJsZV9hdXRvc2NhbGluZxgDIAEoCCL+AQoNSGVhZEdyb3VwU3BlYxJOChByYXlfc3RhcnRfcGFyYW1zGAEgAygLMjQuZmx5dGVpZGwyLnBsdWdpbnMuSGVhZEdyb3VwU3BlYy5SYXlTdGFydFBhcmFtc0VudHJ5EicKB2s4c19wb2QYAiABKAsyFi5mbHl0ZWlkbDIuY29yZS5LOHNQb2QSPQoSZXh0ZW5kZWRfcmVzb3VyY2VzGAMgASgLMiEuZmx5dGVpZGwyLmNvcmUuRXh0ZW5kZWRSZXNvdXJjZXMaNQoTUmF5U3RhcnRQYXJhbXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBItQCCg9Xb3JrZXJHcm91cFNwZWMSEgoKZ3JvdXBfbmFtZRgBIAEoCRIQCghyZXBsaWNhcxgCIAEoBRIUCgxtaW5fcmVwbGljYXMYAyABKAUSFAoMbWF4X3JlcGxpY2FzGAQgASgFElAKEHJheV9zdGFydF9wYXJhbXMYBSADKAsyNi5mbHl0ZWlkbDIucGx1Z2lucy5Xb3JrZXJHcm91cFNwZWMuUmF5U3RhcnRQYXJhbXNFbnRyeRInCgdrOHNfcG9kGAYgASgLMhYuZmx5dGVpZGwyLmNvcmUuSzhzUG9kEj0KEmV4dGVuZGVkX3Jlc291cmNlcxgHIAEoCzIhLmZseXRlaWRsMi5jb3JlLkV4dGVuZGVkUmVzb3VyY2VzGjUKE1JheVN0YXJ0UGFyYW1zRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4AUK/AQoVY29tLmZseXRlaWRsMi5wbHVnaW5zQghSYXlQcm90b0gCUAFaNWdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9wbHVnaW5zogIDRlBYqgIRRmx5dGVpZGwyLlBsdWdpbnPKAhFGbHl0ZWlkbDJcUGx1Z2luc+ICHUZseXRlaWRsMlxQbHVnaW5zXEdQQk1ldGFkYXRh6gISRmx5dGVpZGwyOjpQbHVnaW5zYgZwcm90bzM", [file_flyteidl2_core_tasks]);
 
 /**
  * RayJobSpec defines the desired state of RayJob
@@ -121,6 +121,14 @@ export type HeadGroupSpec = Message<"flyteidl2.plugins.HeadGroupSpec"> & {
    * @generated from field: flyteidl2.core.K8sPod k8s_pod = 2;
    */
   k8sPod?: K8sPod;
+
+  /**
+   * Encapsulates all non-standard resources, not captured by
+   * v1.ResourceRequirements, to allocate to a task.
+   *
+   * @generated from field: flyteidl2.core.ExtendedResources extended_resources = 3;
+   */
+  extendedResources?: ExtendedResources;
 };
 
 /**
@@ -178,6 +186,14 @@ export type WorkerGroupSpec = Message<"flyteidl2.plugins.WorkerGroupSpec"> & {
    * @generated from field: flyteidl2.core.K8sPod k8s_pod = 6;
    */
   k8sPod?: K8sPod;
+
+  /**
+   * Encapsulates all non-standard resources, not captured by
+   * v1.ResourceRequirements, to allocate to a task.
+   *
+   * @generated from field: flyteidl2.core.ExtendedResources extended_resources = 7;
+   */
+  extendedResources?: ExtendedResources;
 };
 
 /**

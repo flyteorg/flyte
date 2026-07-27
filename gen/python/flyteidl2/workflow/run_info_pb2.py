@@ -11,10 +11,13 @@ from google.protobuf.internal import builder as _builder
 _sym_db = _symbol_database.Default()
 
 
+from flyteidl2.common import identity_pb2 as flyteidl2_dot_common_dot_identity__pb2
+from flyteidl2.core import literals_pb2 as flyteidl2_dot_core_dot_literals__pb2
 from flyteidl2.task import run_pb2 as flyteidl2_dot_task_dot_run__pb2
+from flyteidl2.workflow import run_definition_pb2 as flyteidl2_dot_workflow_dot_run__definition__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!flyteidl2/workflow/run_info.proto\x12\x12\x66lyteidl2.workflow\x1a\x18\x66lyteidl2/task/run.proto\"\xa7\x01\n\x07RunInfo\x12(\n\x10task_spec_digest\x18\x01 \x01(\tR\x0etaskSpecDigest\x12\x1d\n\ninputs_uri\x18\x02 \x01(\tR\tinputsUri\x12\x1f\n\x0boutputs_uri\x18\x03 \x01(\tR\noutputsUri\x12\x32\n\x08run_spec\x18\x04 \x01(\x0b\x32\x17.flyteidl2.task.RunSpecR\x07runSpecB\xc9\x01\n\x16\x63om.flyteidl2.workflowB\x0cRunInfoProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!flyteidl2/workflow/run_info.proto\x12\x12\x66lyteidl2.workflow\x1a\x1f\x66lyteidl2/common/identity.proto\x1a\x1d\x66lyteidl2/core/literals.proto\x1a\x18\x66lyteidl2/task/run.proto\x1a\'flyteidl2/workflow/run_definition.proto\"\xdd\x02\n\x07RunInfo\x12(\n\x10task_spec_digest\x18\x01 \x01(\tR\x0etaskSpecDigest\x12\x1d\n\ninputs_uri\x18\x02 \x01(\tR\tinputsUri\x12\x1f\n\x0boutputs_uri\x18\x03 \x01(\tR\noutputsUri\x12\x32\n\x08run_spec\x18\x04 \x01(\x0b\x32\x17.flyteidl2.task.RunSpecR\x07runSpec\x12\x41\n\tcondition\x18\x05 \x01(\x0b\x32#.flyteidl2.workflow.ConditionActionR\tcondition\x12/\n\x06output\x18\x06 \x01(\x0b\x32\x17.flyteidl2.core.LiteralR\x06output\x12@\n\tprincipal\x18\x07 \x01(\x0b\x32\".flyteidl2.common.EnrichedIdentityR\tprincipalB\xc9\x01\n\x16\x63om.flyteidl2.workflowB\x0cRunInfoProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -22,6 +25,6 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'flyteidl2.workflow.run_info
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\026com.flyteidl2.workflowB\014RunInfoProtoH\002P\001Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\242\002\003FWX\252\002\022Flyteidl2.Workflow\312\002\022Flyteidl2\\Workflow\342\002\036Flyteidl2\\Workflow\\GPBMetadata\352\002\023Flyteidl2::Workflow'
-  _globals['_RUNINFO']._serialized_start=84
-  _globals['_RUNINFO']._serialized_end=251
+  _globals['_RUNINFO']._serialized_start=189
+  _globals['_RUNINFO']._serialized_end=538
 # @@protoc_insertion_point(module_scope)

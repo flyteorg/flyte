@@ -79,6 +79,9 @@ message ListRequest {
     // Project identifier for filtering apps.
     common.ProjectIdentifier project = 4;
   }
+
+  // Disable caller identity enrichment in the response.
+  bool disable_identity_enrichment = 5;
 }
 
 // Response message for listing apps.

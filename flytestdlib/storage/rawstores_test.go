@@ -13,7 +13,31 @@ import (
 func Test_createHTTPClient(t *testing.T) {
 	t.Run("empty", func(t *testing.T) {
 		client := createHTTPClient(HTTPClientConfig{})
-		assert.Nil(t, client.Transport)
+
+		transport, casted := client.Transport.(*http.Transport)
+		assert.True(t, casted)
+		defaultTransport := http.DefaultTransport.(*http.Transport)
+		assert.NotSame(t, defaultTransport, transport)
+		assert.Equal(t, defaultTransport.MaxIdleConns, transport.MaxIdleConns)
+		assert.Equal(t, defaultTransport.MaxIdleConnsPerHost, transport.MaxIdleConnsPerHost)
+		assert.Equal(t, defaultTransport.MaxConnsPerHost, transport.MaxConnsPerHost)
+		assert.Equal(t, defaultTransport.IdleConnTimeout, transport.IdleConnTimeout)
+	})
+
+	t.Run("Transport settings", func(t *testing.T) {
+		client := createHTTPClient(HTTPClientConfig{
+			MaxIdleConns:        512,
+			MaxIdleConnsPerHost: 256,
+			MaxConnsPerHost:     128,
+			IdleConnTimeout:     config.Duration{Duration: 30 * time.Second},
+		})
+
+		transport, casted := client.Transport.(*http.Transport)
+		assert.True(t, casted)
+		assert.Equal(t, 512, transport.MaxIdleConns)
+		assert.Equal(t, 256, transport.MaxIdleConnsPerHost)
+		assert.Equal(t, 128, transport.MaxConnsPerHost)
+		assert.Equal(t, 30*time.Second, transport.IdleConnTimeout)
 	})
 
 	t.Run("Some headers", func(t *testing.T) {
@@ -22,13 +46,17 @@ func Test_createHTTPClient(t *testing.T) {
 		}
 
 		client := createHTTPClient(HTTPClientConfig{
-			Headers: m,
+			Headers:             m,
+			MaxIdleConnsPerHost: 256,
 		})
 
 		assert.NotNil(t, client.Transport)
 		proxyTransport, casted := client.Transport.(*proxyTransport)
 		assert.True(t, casted)
 		assert.Equal(t, m, proxyTransport.defaultHeaders)
+		transport, casted := proxyTransport.RoundTripper.(*http.Transport)
+		assert.True(t, casted)
+		assert.Equal(t, 256, transport.MaxIdleConnsPerHost)
 	})
 
 	t.Run("Set empty timeout", func(t *testing.T) {

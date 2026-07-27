@@ -31,7 +31,6 @@ type TriggerRepo interface {
 
 	// DeleteTriggers soft-deletes the given triggers and appends revision rows.
 	DeleteTriggers(ctx context.Context, keys []TriggerNameKey) error
-
 }
 
 // TriggerNameKey is a lightweight identity tuple used for batch operations.

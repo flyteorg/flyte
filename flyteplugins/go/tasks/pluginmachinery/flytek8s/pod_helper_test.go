@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -124,13 +124,16 @@ func TestAddRequiredNodeSelectorRequirements(t *testing.T) {
 			Operator: v1.NodeSelectorOpIn,
 			Values:   []string{"new"},
 		}
+		// Applying the same requirement twice must not duplicate it (callers like
+		// ApplyGPUNodeSelectors may run more than once on the same pod spec).
+		AddRequiredNodeSelectorRequirements(&affinity, nst)
 		AddRequiredNodeSelectorRequirements(&affinity, nst)
 		assert.EqualValues(
 			t,
 			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
+				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "new",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"new"},
@@ -147,9 +150,9 @@ func TestAddRequiredNodeSelectorRequirements(t *testing.T) {
 			NodeAffinity: &v1.NodeAffinity{
 				RequiredDuringSchedulingIgnoredDuringExecution: &v1.NodeSelector{
 					NodeSelectorTerms: []v1.NodeSelectorTerm{
-						v1.NodeSelectorTerm{
+						{
 							MatchExpressions: []v1.NodeSelectorRequirement{
-								v1.NodeSelectorRequirement{
+								{
 									Key:      "required",
 									Operator: v1.NodeSelectorOpIn,
 									Values:   []string{"required"},
@@ -159,11 +162,11 @@ func TestAddRequiredNodeSelectorRequirements(t *testing.T) {
 					},
 				},
 				PreferredDuringSchedulingIgnoredDuringExecution: []v1.PreferredSchedulingTerm{
-					v1.PreferredSchedulingTerm{
+					{
 						Weight: 1,
 						Preference: v1.NodeSelectorTerm{
 							MatchExpressions: []v1.NodeSelectorRequirement{
-								v1.NodeSelectorRequirement{
+								{
 									Key:      "preferred",
 									Operator: v1.NodeSelectorOpIn,
 									Values:   []string{"preferred"},
@@ -183,14 +186,14 @@ func TestAddRequiredNodeSelectorRequirements(t *testing.T) {
 		assert.EqualValues(
 			t,
 			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
+				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "required",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"required"},
 						},
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "new",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"new"},
@@ -203,11 +206,11 @@ func TestAddRequiredNodeSelectorRequirements(t *testing.T) {
 		assert.EqualValues(
 			t,
 			[]v1.PreferredSchedulingTerm{
-				v1.PreferredSchedulingTerm{
+				{
 					Weight: 1,
 					Preference: v1.NodeSelectorTerm{
 						MatchExpressions: []v1.NodeSelectorRequirement{
-							v1.NodeSelectorRequirement{
+							{
 								Key:      "preferred",
 								Operator: v1.NodeSelectorOpIn,
 								Values:   []string{"preferred"},
@@ -233,11 +236,11 @@ func TestAddPreferredNodeSelectorRequirements(t *testing.T) {
 		assert.EqualValues(
 			t,
 			[]v1.PreferredSchedulingTerm{
-				v1.PreferredSchedulingTerm{
+				{
 					Weight: 10,
 					Preference: v1.NodeSelectorTerm{
 						MatchExpressions: []v1.NodeSelectorRequirement{
-							v1.NodeSelectorRequirement{
+							{
 								Key:      "new",
 								Operator: v1.NodeSelectorOpIn,
 								Values:   []string{"new"},
@@ -255,9 +258,9 @@ func TestAddPreferredNodeSelectorRequirements(t *testing.T) {
 			NodeAffinity: &v1.NodeAffinity{
 				RequiredDuringSchedulingIgnoredDuringExecution: &v1.NodeSelector{
 					NodeSelectorTerms: []v1.NodeSelectorTerm{
-						v1.NodeSelectorTerm{
+						{
 							MatchExpressions: []v1.NodeSelectorRequirement{
-								v1.NodeSelectorRequirement{
+								{
 									Key:      "required",
 									Operator: v1.NodeSelectorOpIn,
 									Values:   []string{"required"},
@@ -267,11 +270,11 @@ func TestAddPreferredNodeSelectorRequirements(t *testing.T) {
 					},
 				},
 				PreferredDuringSchedulingIgnoredDuringExecution: []v1.PreferredSchedulingTerm{
-					v1.PreferredSchedulingTerm{
+					{
 						Weight: 1,
 						Preference: v1.NodeSelectorTerm{
 							MatchExpressions: []v1.NodeSelectorRequirement{
-								v1.NodeSelectorRequirement{
+								{
 									Key:      "preferred",
 									Operator: v1.NodeSelectorOpIn,
 									Values:   []string{"preferred"},
@@ -291,9 +294,9 @@ func TestAddPreferredNodeSelectorRequirements(t *testing.T) {
 		assert.EqualValues(
 			t,
 			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
+				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "required",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"required"},
@@ -306,11 +309,11 @@ func TestAddPreferredNodeSelectorRequirements(t *testing.T) {
 		assert.EqualValues(
 			t,
 			[]v1.PreferredSchedulingTerm{
-				v1.PreferredSchedulingTerm{
+				{
 					Weight: 1,
 					Preference: v1.NodeSelectorTerm{
 						MatchExpressions: []v1.NodeSelectorRequirement{
-							v1.NodeSelectorRequirement{
+							{
 								Key:      "preferred",
 								Operator: v1.NodeSelectorOpIn,
 								Values:   []string{"preferred"},
@@ -318,11 +321,11 @@ func TestAddPreferredNodeSelectorRequirements(t *testing.T) {
 						},
 					},
 				},
-				v1.PreferredSchedulingTerm{
+				{
 					Weight: 10,
 					Preference: v1.NodeSelectorTerm{
 						MatchExpressions: []v1.NodeSelectorRequirement{
-							v1.NodeSelectorRequirement{
+							{
 								Key:      "new",
 								Operator: v1.NodeSelectorOpIn,
 								Values:   []string{"new"},
@@ -343,9 +346,9 @@ func TestApplyInterruptibleNodeAffinity(t *testing.T) {
 		assert.EqualValues(
 			t,
 			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
+				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "x/interruptible",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"true"},
@@ -363,9 +366,9 @@ func TestApplyInterruptibleNodeAffinity(t *testing.T) {
 		assert.EqualValues(
 			t,
 			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
+				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "x/interruptible",
 							Operator: v1.NodeSelectorOpDoesNotExist,
 						},
@@ -382,9 +385,9 @@ func TestApplyInterruptibleNodeAffinity(t *testing.T) {
 				NodeAffinity: &v1.NodeAffinity{
 					RequiredDuringSchedulingIgnoredDuringExecution: &v1.NodeSelector{
 						NodeSelectorTerms: []v1.NodeSelectorTerm{
-							v1.NodeSelectorTerm{
+							{
 								MatchExpressions: []v1.NodeSelectorRequirement{
-									v1.NodeSelectorRequirement{
+									{
 										Key:      "node selector requirement",
 										Operator: v1.NodeSelectorOpIn,
 										Values:   []string{"exists"},
@@ -400,14 +403,14 @@ func TestApplyInterruptibleNodeAffinity(t *testing.T) {
 		assert.EqualValues(
 			t,
 			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
+				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "node selector requirement",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"exists"},
 						},
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "x/interruptible",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"true"},
@@ -513,9 +516,9 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 		assert.EqualValues(
 			t,
 			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
+				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-device",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-a100"},
@@ -539,6 +542,24 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 		)
 	})
 
+	// The ray plugin re-applies GPU node selectors after merging a group's custom pod
+	// spec, so a second application on the same pod spec must not duplicate the node
+	// selector requirements or tolerations.
+	t.Run("is idempotent", func(t *testing.T) {
+		podSpec := basePodSpec.DeepCopy()
+		accelerator := &core.GPUAccelerator{
+			Device: "nvidia-tesla-a100",
+			PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+				PartitionSize: "1g.5gb",
+			},
+		}
+		ApplyGPUNodeSelectors(podSpec, accelerator)
+		applied := podSpec.DeepCopy()
+		ApplyGPUNodeSelectors(podSpec, accelerator)
+		assert.EqualValues(t, applied.Affinity, podSpec.Affinity)
+		assert.EqualValues(t, applied.Tolerations, podSpec.Tolerations)
+	})
+
 	t.Run("with gpu device and partition size spec", func(t *testing.T) {
 		podSpec := basePodSpec.DeepCopy()
 		ApplyGPUNodeSelectors(
@@ -553,14 +574,14 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 		assert.EqualValues(
 			t,
 			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
+				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-device",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-a100"},
 						},
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-partition-size",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"1g.5gb"},
@@ -604,14 +625,14 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 		assert.EqualValues(
 			t,
 			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
+				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-device",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-a100"},
 						},
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-partition-size",
 							Operator: v1.NodeSelectorOpDoesNotExist,
 						},
@@ -667,9 +688,9 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 		assert.EqualValues(
 			t,
 			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
+				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-device",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-a100"},
@@ -714,9 +735,9 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 		assert.EqualValues(
 			t,
 			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
+				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-device",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-h100"}, // Normalized name
@@ -758,9 +779,9 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 		assert.EqualValues(
 			t,
 			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
+				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-device",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-h100"}, // Still normalized correctly
@@ -803,9 +824,9 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 		assert.EqualValues(
 			t,
 			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
+				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "tpu-device",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"tpu-v5-lite-podslice"}, // Normalized TPU name
@@ -833,9 +854,9 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 		assert.EqualValues(
 			t,
 			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
+				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-device",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"custom-gpu-device"}, // Used as-is since not in mapping
@@ -1674,13 +1695,14 @@ func updatePod(t *testing.T) {
 	UpdatePod(taskExecutionMetadata, []v1.ResourceRequirements{}, &pod.Spec)
 	assert.Equal(t, v1.RestartPolicyNever, pod.Spec.RestartPolicy)
 	for _, tol := range pod.Spec.Tolerations {
-		if tol.Key == "x/flyte" {
+		switch tol.Key {
+		case "x/flyte":
 			assert.Equal(t, tol.Value, "interruptible")
 			assert.Equal(t, tol.Operator, v1.TolerationOperator("Equal"))
 			assert.Equal(t, tol.Effect, v1.TaintEffect("NoSchedule"))
-		} else if tol.Key == "my toleration key" {
+		case "my toleration key":
 			assert.Equal(t, tol.Value, "my toleration value")
-		} else {
+		default:
 			t.Fatalf("unexpected toleration [%+v]", tol)
 		}
 	}
@@ -1694,9 +1716,9 @@ func updatePod(t *testing.T) {
 	assert.EqualValues(
 		t,
 		[]v1.NodeSelectorTerm{
-			v1.NodeSelectorTerm{
+			{
 				MatchExpressions: []v1.NodeSelectorRequirement{
-					v1.NodeSelectorRequirement{
+					{
 						Key:      "x/interruptible",
 						Operator: v1.NodeSelectorOpIn,
 						Values:   []string{"true"},
@@ -1715,9 +1737,9 @@ func TestUpdatePodWithDefaultAffinityAndInterruptibleNodeSelectorRequirement(t *
 			NodeAffinity: &v1.NodeAffinity{
 				RequiredDuringSchedulingIgnoredDuringExecution: &v1.NodeSelector{
 					NodeSelectorTerms: []v1.NodeSelectorTerm{
-						v1.NodeSelectorTerm{
+						{
 							MatchExpressions: []v1.NodeSelectorRequirement{
-								v1.NodeSelectorRequirement{
+								{
 									Key:      "default node affinity",
 									Operator: v1.NodeSelectorOpIn,
 									Values:   []string{"exists"},
@@ -1740,14 +1762,14 @@ func TestUpdatePodWithDefaultAffinityAndInterruptibleNodeSelectorRequirement(t *
 		assert.EqualValues(
 			t,
 			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
+				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "default node affinity",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"exists"},
 						},
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "x/interruptible",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"true"},
@@ -1785,9 +1807,9 @@ func toK8sPodInterruptible(t *testing.T) {
 	assert.EqualValues(
 		t,
 		[]v1.NodeSelectorTerm{
-			v1.NodeSelectorTerm{
+			{
 				MatchExpressions: []v1.NodeSelectorRequirement{
-					v1.NodeSelectorRequirement{
+					{
 						Key:      "x/interruptible",
 						Operator: v1.NodeSelectorOpIn,
 						Values:   []string{"true"},
@@ -2121,7 +2143,7 @@ func TestToK8sPodExtendedResources(t *testing.T) {
 			[]v1.NodeSelectorTerm{
 				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-node-label",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-t4"},
@@ -2161,12 +2183,12 @@ func TestToK8sPodExtendedResources(t *testing.T) {
 			[]v1.NodeSelectorTerm{
 				{
 					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-node-label",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-a100"},
 						},
-						v1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-partition-size",
 							Operator: v1.NodeSelectorOpIn,
 							Values:   []string{"1g.5gb"},
@@ -2572,6 +2594,29 @@ func TestDemystifyPending(t *testing.T) {
 		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
+	})
+
+	t.Run("ImagePullBackOffOutsideGracePeriod_RegistryRateLimited", func(t *testing.T) {
+		// HTTP 429 from the registry is a transient infrastructure failure,
+		// not a user error — it should surface as a system retryable failure.
+		s2 := *s.DeepCopy()
+		s2.Conditions[0].LastTransitionTime.Time = metav1.Now().Add(-config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration)
+		s2.ContainerStatuses = []v1.ContainerStatus{
+			{
+				Ready: false,
+				State: v1.ContainerState{
+					Waiting: &v1.ContainerStateWaiting{
+						Reason:  "ImagePullBackOff",
+						Message: `Back-off pulling image "registry.example.com/foo:bar": ErrImagePull: failed to pull and unpack image "registry.example.com/foo:bar": failed to copy: httpReadSeeker: failed open: unexpected status code https://registry.example.com/v2/foo/blobs/sha256:abc: 429 Too Many Requests`,
+					},
+				},
+			},
+		}
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+		assert.Equal(t, core.ExecutionError_SYSTEM, taskStatus.Err().Kind)
 		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 
@@ -3128,7 +3173,7 @@ func TestDemystifyPending_testcases(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			testFile := filepath.Join("testdata", tt.filename)
-			data, err := ioutil.ReadFile(testFile)
+			data, err := os.ReadFile(testFile)
 			assert.NoError(t, err, "failed to read file %s", testFile)
 			pod := &v1.Pod{}
 			if assert.NoError(t, json.Unmarshal(data, pod), "failed to unmarshal json in %s. Expected of type v1.Pod", testFile) {
@@ -3419,10 +3464,10 @@ func TestGetPodTemplate(t *testing.T) {
 func TestMergeWithBasePodTemplate(t *testing.T) {
 	podSpec := v1.PodSpec{
 		Containers: []v1.Container{
-			v1.Container{
+			{
 				Name: "foo",
 			},
-			v1.Container{
+			{
 				Name: "bar",
 			},
 		},
@@ -4142,7 +4187,7 @@ func TestAddTolerationsForExtendedResources(t *testing.T) {
 
 	podSpec := &v1.PodSpec{
 		Containers: []v1.Container{
-			v1.Container{
+			{
 				Resources: v1.ResourceRequirements{
 					Requests: v1.ResourceList{
 						gpuResourceName:           resource.MustParse("1"),
@@ -4173,7 +4218,7 @@ func TestAddTolerationsForExtendedResources(t *testing.T) {
 
 	podSpec = &v1.PodSpec{
 		InitContainers: []v1.Container{
-			v1.Container{
+			{
 				Resources: v1.ResourceRequirements{
 					Requests: v1.ResourceList{
 						gpuResourceName:           resource.MustParse("1"),
@@ -4203,7 +4248,7 @@ func TestAddTolerationsForExtendedResources(t *testing.T) {
 
 	podSpec = &v1.PodSpec{
 		Containers: []v1.Container{
-			v1.Container{
+			{
 				Resources: v1.ResourceRequirements{
 					Requests: v1.ResourceList{
 						gpuResourceName:           resource.MustParse("1"),

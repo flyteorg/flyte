@@ -2,7 +2,6 @@ package ioutils
 
 import (
 	"io"
-	"io/ioutil"
 )
 
 // Defines a common interface for timers.
@@ -13,5 +12,5 @@ type Timer interface {
 
 func ReadAll(r io.Reader, t Timer) ([]byte, error) {
 	defer t.Stop()
-	return ioutil.ReadAll(r)
+	return io.ReadAll(r)
 }

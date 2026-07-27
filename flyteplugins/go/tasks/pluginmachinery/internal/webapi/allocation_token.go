@@ -21,13 +21,13 @@ func newTokenAllocator(c clock.Clock) tokenAllocator {
 	}
 }
 
-func (a tokenAllocator) allocateToken(ctx context.Context, p webapi.AsyncPlugin, tCtx core.TaskExecutionContext, state *State, metrics Metrics) (
-	newState *State, phaseInfo core.PhaseInfo, err error) {
+func (a tokenAllocator) allocateToken(ctx context.Context, p webapi.AsyncPlugin, tCtx core.TaskExecutionContext, state *webapi.State, metrics Metrics) (
+	newState *webapi.State, phaseInfo core.PhaseInfo, err error) {
 	if len(p.GetConfig().ResourceQuotas) == 0 {
 		// No quota, return success
-		return &State{
+		return &webapi.State{
 			AllocationTokenRequestStartTime: a.clock.Now(),
-			Phase:                           PhaseAllocationTokenAcquired,
+			Phase:                           webapi.PhaseAllocationTokenAcquired,
 		}, core.PhaseInfoQueued(a.clock.Now(), 0, "No allocation token required"), nil
 	}
 
@@ -48,9 +48,9 @@ func (a tokenAllocator) allocateToken(ctx context.Context, p webapi.AsyncPlugin,
 	case core.AllocationStatusGranted:
 		metrics.AllocationGranted.Inc(ctx)
 		metrics.ResourceWaitTime.Observe(float64(a.clock.Since(state.AllocationTokenRequestStartTime).Milliseconds()))
-		return &State{
+		return &webapi.State{
 			AllocationTokenRequestStartTime: a.clock.Now(),
-			Phase:                           PhaseAllocationTokenAcquired,
+			Phase:                           webapi.PhaseAllocationTokenAcquired,
 		}, core.PhaseInfoQueued(a.clock.Now(), 0, "Allocation token required"), nil
 	case core.AllocationStatusNamespaceQuotaExceeded:
 	case core.AllocationStatusExhausted:
@@ -61,9 +61,9 @@ func (a tokenAllocator) allocateToken(ctx context.Context, p webapi.AsyncPlugin,
 			startTime = a.clock.Now()
 		}
 
-		return &State{
+		return &webapi.State{
 				AllocationTokenRequestStartTime: startTime,
-				Phase:                           PhaseNotStarted,
+				Phase:                           webapi.PhaseNotStarted,
 			}, core.PhaseInfoWaitingForResourcesInfo(
 				a.clock.Now(), 0, "Quota for task has exceeded. Waiting for the resource.", nil), nil
 	}

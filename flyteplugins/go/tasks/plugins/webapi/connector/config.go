@@ -101,7 +101,10 @@ type Deployment struct {
 	// DefaultTimeout gives the default RPC timeout if a more specific one is not defined in Timeouts; if neither DefaultTimeout nor Timeouts is defined for an operation, RPC timeout will not be enforced
 	DefaultTimeout config.Duration `json:"defaultTimeout,omitempty" yaml:"defaultTimeout,omitempty"`
 
-	// The tasks in this domain will be handled by this agent
+	// This connector will handle the tasks in this project
+	Project string `json:"project,omitempty" yaml:"project,omitempty"`
+
+	// This connector will handle the tasks in this domain
 	Domain string `json:"domain,omitempty" yaml:"domain,omitempty"`
 }
 

@@ -546,7 +546,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 			"Flyteinteractive enabled but no task template",
 			&LogConfig{
 				DynamicLogLinks: map[string]tasklog.TemplateLogPlugin{
-					"vscode": tasklog.TemplateLogPlugin{
+					"vscode": {
 						DisplayName: "vscode link",
 						TemplateURIs: []tasklog.TemplateURI{
 							"https://flyteinteractive.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
@@ -561,7 +561,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 			"Flyteinteractive enabled but config not found in task template",
 			&LogConfig{
 				DynamicLogLinks: map[string]tasklog.TemplateLogPlugin{
-					"vscode": tasklog.TemplateLogPlugin{
+					"vscode": {
 						DisplayName: "vscode link",
 						TemplateURIs: []tasklog.TemplateURI{
 							"https://flyteinteractive.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
@@ -587,7 +587,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 			"Flyteinteractive - multiple dynamic options",
 			&LogConfig{
 				DynamicLogLinks: map[string]tasklog.TemplateLogPlugin{
-					"vscode": tasklog.TemplateLogPlugin{
+					"vscode": {
 						DisplayName: "vscode link",
 						TemplateURIs: []tasklog.TemplateURI{
 							"https://abc.com:{{ .taskConfig.port }}/{{ .taskConfig.route }}",
@@ -617,7 +617,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 			"Flyteinteractive - multiple uses of the template (invalid use of ports in a URI)",
 			&LogConfig{
 				DynamicLogLinks: map[string]tasklog.TemplateLogPlugin{
-					"vscode": tasklog.TemplateLogPlugin{
+					"vscode": {
 						DisplayName: "vscode link",
 						TemplateURIs: []tasklog.TemplateURI{
 							"https://abc.com:{{ .taskConfig.port }}:{{ .taskConfig.port}}",
@@ -668,7 +668,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 				IsKubernetesEnabled:   true,
 				KubernetesTemplateURI: "https://k8s.com/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
 				DynamicLogLinks: map[string]tasklog.TemplateLogPlugin{
-					"vscode": tasklog.TemplateLogPlugin{
+					"vscode": {
 						DisplayName: "vscode link",
 						TemplateURIs: []tasklog.TemplateURI{
 							"https://flyteinteractive.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",

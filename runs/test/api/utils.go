@@ -6,11 +6,11 @@ import (
 	"time"
 )
 
-func uniqueString() string {
+func uniqueString() string { //nolint: unused
 	return fmt.Sprintf("%d", time.Now().UnixNano())
 }
 
-func newClient() *http.Client {
+func newClient() *http.Client { //nolint: unused
 	return &http.Client{
 		Timeout: 30 * time.Second,
 	}

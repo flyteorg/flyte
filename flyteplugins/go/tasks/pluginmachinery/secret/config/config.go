@@ -19,6 +19,11 @@ import (
 const (
 	EmbeddedSecretsFileMountInitContainerName = "init-embedded-secret"
 	DefaultSecretEnvVarPrefix                 = "_UNION_"
+
+	// DefaultSecretsNamespace is the namespace flyte-native secrets are stored in by
+	// default. The secret service writes Kubernetes Secrets here, and the webhook's
+	// embedded K8s secret fetcher reads them back — both defaults must stay in sync.
+	DefaultSecretsNamespace = "flyte"
 )
 
 var (
@@ -30,7 +35,7 @@ var (
 		CertDir:           "/etc/webhook/certs",
 		LocalCert:         false,
 		ListenPort:        9443,
-		SecretManagerType: SecretManagerTypeK8s,
+		SecretManagerType: SecretManagerTypeEmbedded,
 		AWSSecretManagerConfig: AWSSecretManagerConfig{
 			SidecarImage: "docker.io/amazon/aws-secrets-manager-secret-sidecar:v0.1.4",
 			Resources: corev1.ResourceRequirements{
@@ -75,8 +80,12 @@ var (
 			KVVersion: KVVersion2,
 		},
 		EmbeddedSecretManagerConfig: EmbeddedSecretManagerConfig{
+			Type: EmbeddedSecretManagerTypeK8s,
+			K8sConfig: K8sConfig{
+				Namespace: DefaultSecretsNamespace,
+			},
 			FileMountInitContainer: FileMountInitContainerConfig{
-				Image: "busybox:1.28",
+				Image: "public.ecr.aws/docker/library/busybox:latest",
 				Resources: corev1.ResourceRequirements{
 					Requests: corev1.ResourceList{
 						corev1.ResourceMemory: resource.MustParse("100Mi"),
@@ -169,11 +178,12 @@ type Config struct {
 	AzureSecretManagerConfig    AzureSecretManagerConfig    `json:"azureSecretManager" pflag:",Azure Secret Manager config."`
 
 	// Ignore PFlag for Image Builder
-	ImageBuilderConfig                 ImageBuilderConfig `json:"imageBuilderConfig,omitempty" pflag:"-,"`
-	WebhookTimeout                     int32              `json:"webhookTimeout" pflag:",Timeout for webhook calls in seconds. Defaults to 30 seconds."`
-	DisableCreateMutatingWebhookConfig bool               `json:"disableCreateMutatingWebhookConfig"`
-	KubeClientConfig                   KubeClientConfig   `json:"kubeClientConfig" pflag:",Configuration to control the Kubernetes client used by the webhook"`
-	SecretEnvVarPrefix                 string             `json:"secretEnvVarPrefix" pflag:",The prefix for secret environment variables. Used by K8s, Global, and Embedded secret managers. Defaults to _UNION_"`
+	ImageBuilderConfig                 ImageBuilderConfig    `json:"imageBuilderConfig,omitempty" pflag:"-,"`
+	WebhookTimeout                     int32                 `json:"webhookTimeout" pflag:",Timeout for webhook calls in seconds. Defaults to 30 seconds."`
+	DisableCreateMutatingWebhookConfig bool                  `json:"disableCreateMutatingWebhookConfig"`
+	NamespaceSelector                  *metav1.LabelSelector `json:"namespaceSelector" pflag:"-,NamespaceSelector to scope the created MutatingWebhookConfiguration. Nil matches all namespaces."`
+	KubeClientConfig                   KubeClientConfig      `json:"kubeClientConfig" pflag:",Configuration to control the Kubernetes client used by the webhook"`
+	SecretEnvVarPrefix                 string                `json:"secretEnvVarPrefix" pflag:",The prefix for secret environment variables. Used by K8s, Global, and Embedded secret managers. Defaults to _UNION_"`
 }
 
 //go:generate enumer --type=EmbeddedSecretManagerType -json -yaml -trimprefix=EmbeddedSecretManagerType

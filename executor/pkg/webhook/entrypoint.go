@@ -26,7 +26,7 @@ const (
 func Setup(ctx context.Context, kubeClient kubernetes.Interface, cfg *webhookConfig.Config,
 	defaultNamespace string, scope promutils.Scope, mgr manager.Manager) error {
 
-	if err := InitCerts(ctx, kubeClient, cfg); err != nil {
+	if err := InitCerts(ctx, kubeClient, cfg, defaultNamespace); err != nil {
 		return fmt.Errorf("webhook: failed to initialize certs: %w", err)
 	}
 
@@ -35,7 +35,9 @@ func Setup(ctx context.Context, kubeClient kubernetes.Interface, cfg *webhookCon
 		return fmt.Errorf("webhook: failed to create pod mutator: %w", err)
 	}
 
-	if err := createMutationConfig(ctx, kubeClient, podMutator, defaultNamespace); err != nil {
+	if cfg.DisableCreateMutatingWebhookConfig {
+		logger.Infof(ctx, "Skipping MutatingWebhookConfiguration creation, disabled by config")
+	} else if err := createMutationConfig(ctx, kubeClient, podMutator, defaultNamespace); err != nil {
 		return fmt.Errorf("webhook: failed to create MutatingWebhookConfiguration: %w", err)
 	}
 

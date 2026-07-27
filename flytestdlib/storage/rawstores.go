@@ -16,6 +16,7 @@ var stores = map[string]dataStoreCreateFn{
 	TypeMinio:  newStowRawStore,
 	TypeS3:     newStowRawStore,
 	TypeStow:   newStowRawStore,
+	TypeRedis:  NewRedisRawStore,
 }
 
 type proxyTransport struct {
@@ -41,18 +42,32 @@ func applyDefaultHeaders(r *http.Request, headers map[string][]string) {
 }
 
 func createHTTPClient(cfg HTTPClientConfig) *http.Client {
-	c := &http.Client{
-		Timeout: cfg.Timeout.Duration,
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	if cfg.MaxIdleConns > 0 {
+		transport.MaxIdleConns = cfg.MaxIdleConns
+	}
+	if cfg.MaxIdleConnsPerHost > 0 {
+		transport.MaxIdleConnsPerHost = cfg.MaxIdleConnsPerHost
+	}
+	if cfg.MaxConnsPerHost > 0 {
+		transport.MaxConnsPerHost = cfg.MaxConnsPerHost
+	}
+	if cfg.IdleConnTimeout.Duration > 0 {
+		transport.IdleConnTimeout = cfg.IdleConnTimeout.Duration
 	}
 
+	var rt http.RoundTripper = transport
 	if len(cfg.Headers) > 0 {
-		c.Transport = &proxyTransport{
-			RoundTripper:   http.DefaultTransport,
+		rt = &proxyTransport{
+			RoundTripper:   transport,
 			defaultHeaders: cfg.Headers,
 		}
 	}
 
-	return c
+	return &http.Client{
+		Timeout:   cfg.Timeout.Duration,
+		Transport: rt,
+	}
 }
 
 type dataStoreMetrics struct {
@@ -93,23 +108,42 @@ func NewCompositeDataStore(refConstructor ReferenceConstructor, composedProtobuf
 
 // RefreshConfig re-initialises the data store client leaving metrics untouched.
 // This is NOT thread-safe!
+//
+// The DataStore is multi-scheme: the configured Type is built eagerly as the primary backend (it
+// owns the InitContainer and GetBaseContainerFQN), then wrapped in a routing store that lazily
+// instantiates a backend for any other scheme (s3://, gs://, abfs://, redis://, ...) the first time
+// it is referenced and reuses it thereafter. See routingStore for details.
 func (ds *DataStore) RefreshConfig(ctx context.Context, cfg *Config) error {
-	defaultClient := http.DefaultClient
-	defer func() {
-		http.DefaultClient = defaultClient
-	}()
-
-	http.DefaultClient = createHTTPClient(cfg.DefaultHTTPClient)
+	httpClient := createHTTPClient(cfg.DefaultHTTPClient)
 
 	fn, found := stores[cfg.Type]
 	if !found {
 		return fmt.Errorf("type is of an invalid value [%v]", cfg.Type)
 	}
 
-	rawStore, err := fn(ctx, cfg, ds.metrics)
+	// stow reads http.DefaultClient at dial time. Install the configured client for the eager primary
+	// build while holding dialMu — the same lock lazy per-scheme dials take (via dialStow) — so a
+	// concurrent lazy dial or another DataStore being constructed cannot interleave on the global
+	// client and restore the wrong value. Lazy per-scheme dials thread the client explicitly through
+	// the routing store, so the global only needs to be installed for this eager build.
+	primaryStore, err := func() (RawStore, error) {
+		dialMu.Lock()
+		defer dialMu.Unlock()
+		defaultClient := http.DefaultClient
+		http.DefaultClient = httpClient
+		defer func() { http.DefaultClient = defaultClient }()
+		return fn(ctx, cfg, ds.metrics)
+	}()
 	if err != nil {
 		return err
 	}
+
+	primaryScheme, err := primarySchemeForConfig(cfg)
+	if err != nil {
+		return err
+	}
+
+	rawStore := newRoutingStore(cfg, httpClient, primaryScheme, primaryStore, ds.metrics)
 
 	rawStore = newCachedRawStore(cfg, rawStore, ds.metrics.cacheMetrics)
 	protoStore := NewDefaultProtobufStoreWithMetrics(rawStore, ds.metrics.protoMetrics)

@@ -6815,11 +6815,26 @@ spec:
                 maxLength: 30
                 minLength: 1
                 type: string
+              actionType:
+                description: |-
+                  ActionType discriminates what kind of action this CR represents.
+                  Mirrors cloud's explicit ActionType enum. Empty means "task" for
+                  backward compatibility with existing CRs.
+                enum:
+                - task
+                - condition
+                type: string
               cacheKey:
                 description: |-
                   CacheKey enables cache lookup/writeback for this task action when set.
                   This is propagated from workflow.TaskAction.cache_key.
                 maxLength: 256
+                type: string
+              conditionSpec:
+                description: |-
+                  ConditionSpec is the proto-serialized workflow.ConditionAction, present iff
+                  actionType == "condition". Carries type/prompt/description/timeout/webhook.
+                format: byte
                 type: string
               domain:
                 description: Domain this action belongs to
@@ -6837,8 +6852,9 @@ spec:
                 maxLength: 256
                 type: string
               inputUri:
-                description: InputURI is the path to the input data for this action
-                minLength: 1
+                description: |-
+                  InputURI is the path to the input data for this action.
+                  Empty for conditions; the reconciler validates presence for tasks.
                 type: string
               interruptible:
                 description: Interruptible is the run-scoped interruptibility override
@@ -6860,9 +6876,9 @@ spec:
                 minLength: 1
                 type: string
               runOutputBase:
-                description: RunOutputBase is the base path where this action should
-                  write its output
-                minLength: 1
+                description: |-
+                  RunOutputBase is the base path where this action should write its output.
+                  Empty for conditions; the reconciler validates presence for tasks.
                 type: string
               shortName:
                 description: ShortName is the human-readable display name for this
@@ -6870,25 +6886,22 @@ spec:
                 maxLength: 63
                 type: string
               taskTemplate:
-                description: TaskTemplate is the proto-serialized core.TaskTemplate
-                  stored inline in etcd
+                description: |-
+                  TaskTemplate is the proto-serialized core.TaskTemplate stored inline in etcd.
+                  Empty for conditions; the reconciler validates presence for tasks.
                 format: byte
                 type: string
               taskType:
-                description: TaskType identifies which plugin handles this task (e.g.
-                  "container", "spark", "ray")
+                description: |-
+                  TaskType identifies which plugin handles this task (e.g. "container", "spark", "ray").
+                  Empty for conditions; the reconciler validates presence for tasks.
                 maxLength: 63
-                minLength: 1
                 type: string
             required:
             - actionName
             - domain
-            - inputUri
             - project
             - runName
-            - runOutputBase
-            - taskTemplate
-            - taskType
             type: object
           status:
             description: status defines the observed state of TaskAction
@@ -7034,6 +7047,21 @@ spec:
                 description: PluginStateVersion tracks the version of the plugin state
                   schema for compatibility.
                 type: integer
+              signalValue:
+                description: |-
+                  SignalValue is the proto-serialized core.Literal supplied by Signal.
+                  Set exactly once; the reconciler transitions the CR to Succeeded when present.
+                  Only meaningful for condition actions.
+                format: byte
+                type: string
+              signalledAt:
+                description: SignalledAt is when the signal was received.
+                format: date-time
+                type: string
+              signalledBy:
+                description: SignalledBy identifies the principal that signalled the
+                  condition.
+                type: string
               stateJson:
                 description: StateJSON is the JSON serialized NodeStatus that was
                   last sent to the State Service
@@ -7068,6 +7096,7 @@ metadata:
   namespace: flyte
 ---
 apiVersion: v1
+<<<<<<< HEAD
 automountServiceAccountToken: true
 kind: ServiceAccount
 metadata:
@@ -7081,6 +7110,22 @@ metadata:
   namespace: flyte
 ---
 apiVersion: v1
+||||||| 4b2c90388
+=======
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/version: 1.0.0-alpha.94
+    helm.sh/chart: rustfs-0.0.94
+  name: rustfs
+  namespace: flyte
+---
+apiVersion: v1
+>>>>>>> 3785a9fa13ab8f43787eec57511706e7aad43c2e
 kind: ServiceAccount
 metadata:
   labels:
@@ -7145,6 +7190,15 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - namespaces
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
   - pods
   verbs:
   - create
@@ -7157,16 +7211,36 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - pods/log
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - podtemplates
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  - events.k8s.io
+  resources:
   - events
   verbs:
   - create
   - delete
+  - get
+  - list
   - patch
   - update
+  - watch
 - apiGroups:
   - flyte.org
   resources:
   - taskactions
+  - taskactions/status
+  - taskactions/finalizers
   verbs:
   - create
   - delete
@@ -7192,8 +7266,27 @@ rules:
   - secrets
   verbs:
   - create
+  - delete
   - get
+  - list
+  - patch
   - update
+  - watch
+- apiGroups:
+  - serving.knative.dev
+  resources:
+  - services
+  - revisions
+  - configurations
+  - routes
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
 - apiGroups:
   - '*'
   resources:
@@ -7671,6 +7764,12 @@ data:
       secretName: flyte-binary-webhook-secret
       serviceName: flyte-binary-webhook
       servicePort: 443
+      secretManagerTypes:
+        - Embedded
+      embeddedSecretManagerConfig:
+        type: K8s
+        k8sConfig:
+          namespace: flyte
 
     actions:
       kubernetes:
@@ -7685,31 +7784,7 @@ data:
         maxExpiresIn: 1h
         maxSize: 100Mi
         storagePrefix: uploads
-    manager:
-      executor:
-        healthProbePort: 8081
-      kubernetes:
-        burst: 2000
-        kubeconfig: ""
-        namespace: flyte
-        qps: 1000
-        timeout: 30s
-      server:
-        host: 0.0.0.0
-        port: 8090
     runs:
-      database:
-        connMaxLifeTime: 1h
-        maxIdleConnections: 10
-        maxOpenConnections: 100
-        postgres:
-          dbname: flyte
-          debug: false
-          host: 127.0.0.1
-          options: sslmode=disable
-          password: ""
-          port: 5432
-          username: postgres
       server:
         host: 0.0.0.0
         port: 8090
@@ -7720,7 +7795,7 @@ data:
         burst: 200
         clusterName: flyte-devbox
         kubeconfig: ""
-        namespace: flyte
+        namespace: 'flyte'
         qps: 100
         timeout: 30s
   001-plugins.yaml: |
@@ -7742,7 +7817,21 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.16.4"
+          image: "flyte-binary-v2:sandbox"
+        # Env vars injected into every task pod, so it can reach the control plane
+        # to enqueue child actions and watch their state.
+        #
+        #   - _U_EP_OVERRIDE: where the task reaches the control plane. Defaults to
+        #     this release's in-cluster HTTP service, <fullname>-http.<namespace>:8090.
+        #   - _U_INSECURE: talk plain HTTP — the in-cluster service has no TLS
+        #     (TLS terminates at the ingress).
+        #   - _U_USE_ACTIONS: use the actions/queue execution path.
+        #
+        # Override or extend via configuration.inline.plugins.k8s.default-env-vars.
+        default-env-vars:
+          - _U_EP_OVERRIDE: "flyte-binary-http.flyte:8090"
+          - _U_INSECURE: "true"
+          - _U_USE_ACTIONS: "1"
       k8s-array:
         logs:
           config:
@@ -7750,13 +7839,19 @@ data:
             cloudwatch-enabled: false
             stackdriver-enabled: false
   002-database.yaml: |
-    database:
-      postgres:
-        username: postgres
-        host: postgresql
-        port: 5432
-        dbname: flyte
-        options: "sslmode=disable"
+    runs:
+      database:
+        connMaxLifeTime: 1h
+        maxIdleConnections: 10
+        maxOpenConnections: 100
+        postgres:
+          dbname: flyte
+          debug: false
+          host: postgresql
+          options: sslmode=disable
+          passwordPath: ""
+          port: 5432
+          username: postgres
   003-storage.yaml: |
     storage:
       type: stow
@@ -7766,14 +7861,14 @@ data:
           region: us-east-1
           disable_ssl: true
           v2_signing: true
-          endpoint: http://rustfs.flyte:9000
+          endpoint: http://rustfs-svc.flyte:9000
           auth_type: accesskey
       container: flyte-data
   100-inline-config.yaml: |
     internalApps:
       baseDomain: localhost
       defaultEnvVars:
-      - FLYTE_AWS_ENDPOINT: http://rustfs.flyte:9000
+      - FLYTE_AWS_ENDPOINT: http://rustfs-svc.flyte:9000
       - FLYTE_AWS_ACCESS_KEY_ID: rustfs
       - FLYTE_AWS_SECRET_ACCESS_KEY: rustfsstorage
       - _U_EP_OVERRIDE: flyte-binary-http.flyte:8090
@@ -7785,7 +7880,7 @@ data:
     plugins:
       k8s:
         default-env-vars:
-        - FLYTE_AWS_ENDPOINT: http://rustfs.flyte:9000
+        - FLYTE_AWS_ENDPOINT: http://rustfs-svc.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: rustfs
         - FLYTE_AWS_SECRET_ACCESS_KEY: rustfsstorage
         - _U_EP_OVERRIDE: flyte-binary-http.flyte:8090
@@ -7796,7 +7891,6 @@ data:
         postgres:
           dbName: runs
           host: postgresql.flyte
-          password: postgres
           port: 5432
           user: postgres
     storage:
@@ -7845,6 +7939,7 @@ metadata:
 ---
 apiVersion: v1
 data:
+<<<<<<< HEAD
   RUSTFS_ADDRESS: :9000
   RUSTFS_CONSOLE_ADDRESS: :9001
   RUSTFS_CONSOLE_ENABLE: "true"
@@ -7861,6 +7956,26 @@ metadata:
 ---
 apiVersion: v1
 data:
+||||||| 4b2c90388
+=======
+  RUSTFS_ADDRESS: :9000
+  RUSTFS_CONSOLE_ADDRESS: :9001
+  RUSTFS_CONSOLE_ENABLE: "true"
+  RUSTFS_OBS_ENVIRONMENT: development
+  RUSTFS_OBS_LOG_DIRECTORY: /logs
+  RUSTFS_OBS_LOGGER_LEVEL: info
+  RUSTFS_REGION: us-east-1
+  RUSTFS_VOLUMES: /data
+kind: ConfigMap
+metadata:
+  labels: {}
+  name: rustfs-config
+  namespace: flyte
+---
+apiVersion: v1
+data:
+  allow-zero-initial-scale: "true"
+>>>>>>> 3785a9fa13ab8f43787eec57511706e7aad43c2e
   max-scale: "1"
 kind: ConfigMap
 metadata:
@@ -8068,9 +8183,10 @@ metadata:
   namespace: flyte
 stringData:
   012-database-secrets.yaml: |
-    database:
-      postgres:
-        password: "postgres"
+    runs:
+      database:
+        postgres:
+          password: "postgres"
   013-storage-secrets.yaml: |
     storage:
       stow:
@@ -8081,6 +8197,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
+<<<<<<< HEAD
   RUSTFS_ACCESS_KEY: cnVzdGZzYWRtaW4=
   RUSTFS_SECRET_KEY: cnVzdGZzYWRtaW4=
 kind: Secret
@@ -8094,15 +8211,17 @@ apiVersion: v1
 data:
   access-key: cnVzdGZz
   secret-key: cnVzdGZzc3RvcmFnZQ==
+||||||| 4b2c90388
+  access-key: cnVzdGZz
+  secret-key: cnVzdGZzc3RvcmFnZQ==
+=======
+  RUSTFS_ACCESS_KEY: cnVzdGZz
+  RUSTFS_SECRET_KEY: cnVzdGZzc3RvcmFnZQ==
+>>>>>>> 3785a9fa13ab8f43787eec57511706e7aad43c2e
 kind: Secret
 metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
-  name: rustfs
+  labels: {}
+  name: rustfs-secret
   namespace: flyte
 type: Opaque
 ---
@@ -8167,6 +8286,29 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
+    app.kubernetes.io/component: console
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-binary
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-binary-console
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: console
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/name: flyte-binary
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-binary
@@ -8210,6 +8352,7 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
+<<<<<<< HEAD
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-devbox
@@ -8279,6 +8422,31 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
+||||||| 4b2c90388
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-devbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-devbox-0.1.0
+  name: flyte-console
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: console
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/name: flyte-devbox
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+=======
+>>>>>>> 3785a9fa13ab8f43787eec57511706e7aad43c2e
     app.kubernetes.io/name: embedded-postgresql
   name: postgresql
   namespace: flyte
@@ -8296,20 +8464,28 @@ metadata:
   labels:
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
-  name: rustfs
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/version: 1.0.0-alpha.94
+    helm.sh/chart: rustfs-0.0.94
+  name: rustfs-svc
   namespace: flyte
 spec:
   ports:
-  - name: rustfs-api
+  - name: endpoint
     nodePort: 30002
     port: 9000
-    targetPort: rustfs-api
+    targetPort: 9000
+  - name: console
+    nodePort: 32001
+    port: 9001
+    targetPort: 9001
   selector:
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/name: rustfs
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
   type: NodePort
 ---
 apiVersion: v1
@@ -8539,6 +8715,22 @@ spec:
   storageClassName: manual
   volumeName: flyte-devbox-rustfs-storage
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    helm.sh/resource-policy: keep
+  labels: {}
+  name: rustfs-logs
+  namespace: flyte
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 256Mi
+  storageClassName: local-path
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -8630,8 +8822,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: b8535eb0e5a85227f8d1d1aba0a4339b9050cad039c112d7dda9055b93586bd8
-        checksum/configuration-secret: e70194084619f4a1d4017093aac6367047167107fd0222513a32a61734629cac
+        checksum/configuration: 806913c16fd28512aaf60eccab4c1f3bf9aa6689da8474f4458a833c8dad3b94
+        checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
       labels:
         app.kubernetes.io/component: flyte-binary
         app.kubernetes.io/instance: flyte-devbox
@@ -8710,12 +8902,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app.kubernetes.io/component: console
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
-  name: flyte-console
+    app.kubernetes.io/name: flyte-binary
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-binary-console
   namespace: flyte
 spec:
   replicas: 1
@@ -8723,13 +8915,13 @@ spec:
     matchLabels:
       app.kubernetes.io/component: console
       app.kubernetes.io/instance: flyte-devbox
-      app.kubernetes.io/name: flyte-devbox
+      app.kubernetes.io/name: flyte-binary
   template:
     metadata:
       labels:
         app.kubernetes.io/component: console
         app.kubernetes.io/instance: flyte-devbox
-        app.kubernetes.io/name: flyte-devbox
+        app.kubernetes.io/name: flyte-binary
     spec:
       containers:
       - image: docker.io/unionai-oss/flyteconsole-v2:sandbox
@@ -8758,18 +8950,22 @@ metadata:
   labels:
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-devbox
-    app.kubernetes.io/version: 1.16.1
-    helm.sh/chart: flyte-devbox-0.1.0
+    app.kubernetes.io/name: rustfs
+    app.kubernetes.io/version: 1.0.0-alpha.94
+    helm.sh/chart: rustfs-0.0.94
   name: rustfs
   namespace: flyte
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/instance: flyte-devbox
       app.kubernetes.io/name: rustfs
   strategy:
-    type: Recreate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -8777,65 +8973,102 @@ spec:
         app.kubernetes.io/name: rustfs
     spec:
       containers:
-      - env:
-        - name: RUSTFS_ADDRESS
-          value: 0.0.0.0:9000
-        - name: RUSTFS_VOLUMES
-          value: /data
-        - name: RUSTFS_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              key: access-key
-              name: rustfs
-        - name: RUSTFS_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              key: secret-key
-              name: rustfs
-        image: rustfs/rustfs:sandbox
-        imagePullPolicy: Never
+      - command:
+        - /usr/bin/rustfs
+        envFrom:
+        - configMapRef:
+            name: rustfs-config
+        - secretRef:
+            name: rustfs-secret
+        image: rustfs/rustfs:1.0.0-alpha.94
+        imagePullPolicy: IfNotPresent
         livenessProbe:
-          failureThreshold: 5
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: endpoint
           initialDelaySeconds: 10
-          periodSeconds: 10
-          tcpSocket:
-            port: rustfs-api
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
         name: rustfs
         ports:
         - containerPort: 9000
-          name: rustfs-api
-          protocol: TCP
+          name: endpoint
+        - containerPort: 9001
+          name: console
         readinessProbe:
-          failureThreshold: 5
-          initialDelaySeconds: 5
+          failureThreshold: 3
+          httpGet:
+            path: /health/ready
+            port: endpoint
+          initialDelaySeconds: 30
           periodSeconds: 5
-          tcpSocket:
-            port: rustfs-api
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources: {}
         securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
           runAsNonRoot: true
-          runAsUser: 10001
         volumeMounts:
+        - mountPath: /logs
+          name: logs
+          subPath: logs
         - mountPath: /data
           name: data
+      imagePullSecrets: []
       initContainers:
       - command:
-        - /bin/sh
-        - -ec
+        - sh
+        - -c
         - |
           chown -R 10001:10001 /data
           mkdir -p /data/flyte-data
           chown 10001:10001 /data/flyte-data
-        image: busybox:latest
+        image: busybox:stable
         imagePullPolicy: IfNotPresent
-        name: volume-permissions
+        name: create-default-buckets
         securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: false
           runAsUser: 0
         volumeMounts:
         - mountPath: /data
           name: data
+      - command:
+        - sh
+        - -c
+        - |
+          mkdir -p /data /mnt/rustfs/logs
+          chmod 755 /mnt/rustfs/logs
+        image: busybox:stable
+        imagePullPolicy: IfNotPresent
+        name: init-step
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+        volumeMounts:
+        - mountPath: /data
+          name: data
+        - mountPath: /mnt/rustfs
+          name: logs
       securityContext:
         fsGroup: 10001
+        runAsGroup: 10001
+        runAsUser: 10001
       volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: rustfs-logs
       - name: data
         persistentVolumeClaim:
           claimName: flyte-devbox-rustfs-storage
@@ -9556,6 +9789,10 @@ spec:
     ports:
       web:
         nodePort: 30080
+        # ALB terminates TLS and forwards plaintext to this entrypoint. Trust its
+        # X-Forwarded-Proto: https instead of letting Traefik rewrite it to http.
+        forwardedHeaders:
+          insecure: true
         transport:
           respondingTimeouts:
             readTimeout: 0
@@ -9641,7 +9878,7 @@ spec:
       paths:
       - backend:
           service:
-            name: flyte-console
+            name: flyte-binary-console
             port:
               number: 80
         path: /v2
@@ -9684,6 +9921,7 @@ spec:
         path: /flyteidl2.
         pathType: Prefix
 ---
+<<<<<<< HEAD
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -9716,6 +9954,55 @@ spec:
         path: /
         pathType: Prefix
 ---
+||||||| 4b2c90388
+=======
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-devbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-devbox-0.1.0
+  name: rustfs-console
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: rustfs-svc
+            port:
+              number: 9001
+        path: /rustfs/console
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-devbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-devbox-0.1.0
+  name: rustfs-s3
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: rustfs-svc
+            port:
+              number: 9000
+        path: /
+        pathType: Prefix
+---
+>>>>>>> 3785a9fa13ab8f43787eec57511706e7aad43c2e
 apiVersion: security.istio.io/v1beta1
 kind: PeerAuthentication
 metadata:

@@ -13,6 +13,7 @@ import (
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -734,14 +735,14 @@ func TestBuildResourceContainer(t *testing.T) {
 	assert.Equal(t, sj.PythonApplicationType, sparkApp.Spec.Type)
 	assert.Equal(t, testArgs, sparkApp.Spec.Arguments)
 	assert.Equal(t, testImage, *sparkApp.Spec.Image)
-	assert.NotNil(t, sparkApp.Spec.Driver.SparkPodSpec.SecurityContenxt)
-	assert.Equal(t, *sparkApp.Spec.Driver.SparkPodSpec.SecurityContenxt.RunAsUser, *defaultConfig.DefaultPodSecurityContext.RunAsUser)
+	assert.NotNil(t, sparkApp.Spec.Driver.SecurityContenxt)
+	assert.Equal(t, *sparkApp.Spec.Driver.SecurityContenxt.RunAsUser, *defaultConfig.DefaultPodSecurityContext.RunAsUser)
 	assert.NotNil(t, sparkApp.Spec.Driver.DNSConfig)
 	assert.Equal(t, []string{"8.8.8.8", "8.8.4.4"}, sparkApp.Spec.Driver.DNSConfig.Nameservers)
 	assert.ElementsMatch(t, defaultConfig.DefaultPodDNSConfig.Options, sparkApp.Spec.Driver.DNSConfig.Options)
 	assert.Equal(t, []string{"ns1.svc.cluster-domain.example", "my.dns.search.suffix"}, sparkApp.Spec.Driver.DNSConfig.Searches)
-	assert.NotNil(t, sparkApp.Spec.Executor.SparkPodSpec.SecurityContenxt)
-	assert.Equal(t, *sparkApp.Spec.Executor.SparkPodSpec.SecurityContenxt.RunAsUser, *defaultConfig.DefaultPodSecurityContext.RunAsUser)
+	assert.NotNil(t, sparkApp.Spec.Executor.SecurityContenxt)
+	assert.Equal(t, *sparkApp.Spec.Executor.SecurityContenxt.RunAsUser, *defaultConfig.DefaultPodSecurityContext.RunAsUser)
 	assert.NotNil(t, sparkApp.Spec.Executor.DNSConfig)
 	assert.NotNil(t, sparkApp.Spec.Executor.DNSConfig)
 	assert.ElementsMatch(t, defaultConfig.DefaultPodDNSConfig.Options, sparkApp.Spec.Executor.DNSConfig.Options)
@@ -1283,4 +1284,66 @@ func TestGetCompletionTime_WrongResourceType(t *testing.T) {
 	assert.Error(t, err)
 	assert.True(t, result.IsZero())
 	assert.Contains(t, err.Error(), "unexpected resource type")
+}
+
+// TestBuildResourceSparkExecutorAffinityDilution probes whether the non-interruptible
+// node-selector requirement (interruptible=false) survives on a Spark executor whose
+// custom executorPod carries its own node-affinity term. Spark merges the executor
+// overlay (spark.go createExecutorSpec) but re-applies no scheduling afterwards, so
+// this is the Spark analogue of the Ray OR-append dilution. If it fails, the appended
+// custom term lacks the non-interruptible requirement (bug); if it passes, no bug.
+func TestBuildResourceSparkExecutorAffinityDilution(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+	defaultConfig := defaultPluginConfig()
+	require.NoError(t, config.SetK8sPluginConfig(defaultConfig))
+
+	executorPodSpec := &corev1.PodSpec{
+		Affinity: &corev1.Affinity{
+			NodeAffinity: &corev1.NodeAffinity{
+				RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+					NodeSelectorTerms: []corev1.NodeSelectorTerm{
+						{MatchExpressions: []corev1.NodeSelectorRequirement{
+							{Key: "zone", Operator: corev1.NodeSelectorOpIn, Values: []string{"us-east-1a"}},
+						}},
+					},
+				},
+			},
+		},
+	}
+	podSpecPb, err := utils.MarshalObjToStruct(executorPodSpec)
+	require.NoError(t, err)
+
+	sparkJob := dummySparkCustomObj(dummySparkConf)
+	sparkJob.ExecutorPod = &core.K8SPod{PodSpec: podSpecPb}
+
+	sparkJobJSON, err := utils.MarshalToString(sparkJob)
+	require.NoError(t, err)
+	structObj := structpb.Struct{}
+	require.NoError(t, stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj))
+	taskTemplate := &core.TaskTemplate{
+		Id:     &core.Identifier{Name: "spark-exec-affinity"},
+		Type:   "container",
+		Target: &core.TaskTemplate_Container{Container: &core.Container{Image: testImage, Args: testArgs, Env: dummyEnvVars}},
+		Custom: &structObj,
+	}
+
+	resource, err := sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
+	require.NoError(t, err)
+	sparkApp, ok := resource.(*sj.SparkApplication)
+	require.True(t, ok)
+
+	require.NotNil(t, sparkApp.Spec.Executor.Affinity)
+	require.NotNil(t, sparkApp.Spec.Executor.Affinity.NodeAffinity)
+	terms := sparkApp.Spec.Executor.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
+	require.GreaterOrEqual(t, len(terms), 2, "expected the custom executor affinity term to be appended as a separate term")
+	for i, term := range terms {
+		found := false
+		for _, e := range term.MatchExpressions {
+			if reflect.DeepEqual(e, *defaultConfig.NonInterruptibleNodeSelectorRequirement) {
+				found = true
+				break
+			}
+		}
+		assert.Truef(t, found, "executor node selector term %d is missing the non-interruptible requirement", i)
+	}
 }

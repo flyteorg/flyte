@@ -1574,6 +1574,68 @@ func (m *ListVersionsResponse_VersionResponse) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetDeployedBy()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListVersionsResponse_VersionResponseValidationError{
+					field:  "DeployedBy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListVersionsResponse_VersionResponseValidationError{
+					field:  "DeployedBy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDeployedBy()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListVersionsResponse_VersionResponseValidationError{
+				field:  "DeployedBy",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if m.LatestRun != nil {
+
+		if all {
+			switch v := interface{}(m.GetLatestRun()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListVersionsResponse_VersionResponseValidationError{
+						field:  "LatestRun",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListVersionsResponse_VersionResponseValidationError{
+						field:  "LatestRun",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetLatestRun()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListVersionsResponse_VersionResponseValidationError{
+					field:  "LatestRun",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return ListVersionsResponse_VersionResponseMultiError(errors)
 	}

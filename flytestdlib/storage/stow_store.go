@@ -4,14 +4,16 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	s32 "github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/aws/awserr"     //nolint: staticcheck
+	s32 "github.com/aws/aws-sdk-go/service/s3" //nolint: staticcheck
 	errs "github.com/pkg/errors"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
@@ -30,6 +32,115 @@ import (
 
 const FailureTypeLabel contextutils.Key = "failure_type"
 const FlyteContentMD5 = "flyteContentMD5"
+const ConfigSecretKeyPath = "secret_key_path"
+
+// schemeToStowKind maps a URL scheme to the stow kind that serves it. It is the inverse of the
+// scheme prefixes produced by fQNFn and lets the multi-scheme DataStore lazily dial a stow backend
+// from the scheme of a DataReference. Register additional schemes with RegisterStowScheme.
+var schemeToStowKind = map[string]string{
+	"s3":    s3.Kind,
+	"gs":    google.Kind,
+	"abfs":  azure.Kind,
+	"abfss": azure.Kind,
+	"os":    oracle.Kind,
+	"sw":    swift.Kind,
+	"file":  local.Kind,
+}
+
+// primarySchemeForConfig returns the URL scheme under which the eagerly-built primary store is
+// registered in the routing store. It is derived from Config.Type (and, for the generic "stow" type,
+// from the configured stow kind) so that references using the primary scheme resolve to the primary
+// store rather than lazily dialing a second backend.
+func primarySchemeForConfig(cfg *Config) (string, error) {
+	switch cfg.Type {
+	case TypeMemory:
+		return TypeMemory, nil
+	case TypeRedis:
+		return TypeRedis, nil
+	case TypeLocal:
+		return "file", nil
+	case TypeS3, TypeMinio:
+		return "s3", nil
+	case TypeStow:
+		kind := cfg.Stow.Kind
+		if kind == "" {
+			// newStowRawStore defaults a missing stow kind to s3 for legacy connection configs.
+			kind = s3.Kind
+		}
+		if scheme, ok := kindToScheme[kind]; ok {
+			return scheme, nil
+		}
+		// kindToScheme only covers built-in kinds. For an out-of-tree kind registered via
+		// RegisterStowKind, derive the scheme from its registered fQNFn (e.g. "myscheme://" -> the
+		// fQNFn yields a "myscheme://..." reference) so it can serve as the primary backend too.
+		if fn, ok := fQNFn[kind]; ok {
+			if scheme, _, _, err := fn("").Split(); err == nil && scheme != "" {
+				return scheme, nil
+			}
+		}
+		return "", fmt.Errorf("no scheme registered for stow kind [%v]", kind)
+	default:
+		return "", fmt.Errorf("type is of an invalid value [%v]", cfg.Type)
+	}
+}
+
+// kindToScheme maps a stow kind to its canonical URL scheme. It determines the primary scheme of a
+// stow-backed DataStore (the scheme under which the eagerly-built primary store is registered), and
+// is the deterministic inverse of schemeToStowKind (azure resolves to "abfs", not "abfss").
+var kindToScheme = map[string]string{
+	s3.Kind:     "s3",
+	google.Kind: "gs",
+	azure.Kind:  "abfs",
+	oracle.Kind: "os",
+	swift.Kind:  "sw",
+	local.Kind:  "file",
+}
+
+// RegisterStowScheme associates a URL scheme with a stow kind so the DataStore can lazily dial it
+// when a reference with that scheme is encountered. Pair it with RegisterStowKind to teach
+// flytestdlib about an out-of-tree stow backend.
+//
+// It mutates a package-level map that is read without locking whenever a DataStore routes or dials a
+// backend, so it MUST be called at init time, before any DataStore is constructed or used. This
+// matches the contract of RegisterStowKind.
+func RegisterStowScheme(scheme, kind string) error {
+	// DataReference.Split parses schemes via net/url, which lower-cases them, so normalize the key on
+	// registration — otherwise a scheme registered with any upper-case letters (e.g. "S3") would never
+	// match a reference's parsed scheme and lazy dialing would silently fall back to the primary store.
+	scheme = strings.ToLower(scheme)
+	if existing, ok := schemeToStowKind[scheme]; ok && existing != kind {
+		return fmt.Errorf("scheme [%v] already registered to kind [%v]", scheme, existing)
+	}
+
+	schemeToStowKind[scheme] = kind
+	return nil
+}
+
+// dialMu serializes stow.Dial calls that temporarily install a custom http.DefaultClient. stow reads
+// http.DefaultClient at dial time, so we swap it in for the duration of the dial and restore it
+// after. Dials happen at most once per scheme, so the lock is uncontended in practice.
+var dialMu sync.Mutex
+
+// dialStow dials a stow Location with the provided http client installed as http.DefaultClient. A nil
+// client leaves the global untouched. This is the lazy-dial counterpart to the global swap that
+// RefreshConfig performs around the eager primary-store construction.
+func dialStow(httpClient *http.Client, kind string, cfgMap stow.ConfigMap) (stow.Location, error) {
+	if httpClient == nil {
+		return stow.Dial(kind, cfgMap)
+	}
+
+	dialMu.Lock()
+	defer dialMu.Unlock()
+	prev := http.DefaultClient
+	http.DefaultClient = httpClient
+	defer func() { http.DefaultClient = prev }()
+	return stow.Dial(kind, cfgMap)
+}
+
+// stowDial is the indirection stowFactory uses to dial a backend. It defaults to dialStow and is a
+// package var so tests can stub it, keeping unit tests off the real stow drivers (which would
+// otherwise depend on the ambient cloud credential chain / region resolution).
+var stowDial = dialStow
 
 var fQNFn = map[string]func(string) DataReference{
 	s3.Kind: func(bucket string) DataReference {
@@ -52,7 +163,9 @@ var fQNFn = map[string]func(string) DataReference{
 	},
 }
 
-// RegisterStowKind registers a new kind of stow store.
+// RegisterStowKind registers a new kind of stow store. It mutates a package-level map read without
+// locking during store construction, so it MUST be called at init time, before any DataStore is
+// constructed or used.
 func RegisterStowKind(kind string, f func(string) DataReference) error {
 	if _, ok := fQNFn[kind]; ok {
 		return fmt.Errorf("kind [%v] already registered", kind)
@@ -488,6 +601,14 @@ func NewStowRawStore(baseContainerFQN DataReference, loc, signedURLLoc stow.Loca
 	if err != nil {
 		return nil, err
 	}
+
+	// A secondary (non-primary) scheme has no configured InitContainer, so there is no base container
+	// to eagerly create. Such stores must load every container dynamically; the caller is expected to
+	// pass enableDynamicContainerLoading=true alongside an empty container.
+	if c == "" {
+		return self, nil
+	}
+
 	container, err := self.LoadContainer(context.TODO(), c, true)
 	if err != nil {
 		return nil, err
@@ -530,16 +651,21 @@ func newStowRawStore(_ context.Context, cfg *Config, metrics *dataStoreMetrics) 
 		return nil, fmt.Errorf("initContainer is required even with `enable-multicontainer`")
 	}
 
-	var cfgMap stow.ConfigMap
-	var kind string
-	if len(cfg.Stow.Kind) > 0 && len(cfg.Stow.Config) > 0 {
-		kind = cfg.Stow.Kind
-		cfgMap = cfg.Stow.Config
-	} else {
-		logger.Warnf(context.TODO(), "stow configuration section missing, defaulting to legacy s3/minio connection config")
-		// This is for supporting legacy configurations which configure S3 via connection config
-		kind = s3.Kind
-		cfgMap = legacyS3ConfigMap(cfg.Connection)
+	var cfgMap stow.ConfigMap = cfg.Stow.Config
+	kind := cfg.Stow.Kind
+
+	if kind == s3.Kind {
+		secretKeyVal := cfgMap[s3.ConfigSecretKey]
+		secretKeyPath := cfgMap[ConfigSecretKeyPath]
+
+		secretKey, err := resolveSecretKey(secretKeyVal, secretKeyPath)
+		if err != nil {
+			return nil, fmt.Errorf("resolving S3 secret key: %w", err)
+		}
+
+		if len(secretKey) > 0 {
+			cfgMap[s3.ConfigSecretKey] = secretKey
+		}
 	}
 
 	fn, ok := fQNFn[kind]
@@ -565,29 +691,85 @@ func newStowRawStore(_ context.Context, cfg *Config, metrics *dataStoreMetrics) 
 	return NewStowRawStore(fn(cfg.InitContainer), loc, signedURLLoc, cfg.MultiContainerEnabled, metrics)
 }
 
-func legacyS3ConfigMap(cfg ConnectionConfig) stow.ConfigMap {
-	// Non-nullable fields
-	stowConfig := stow.ConfigMap{
-		s3.ConfigAuthType: cfg.AuthType,
-		s3.ConfigRegion:   cfg.Region,
+// stowFactory lazily builds a stow-backed RawStore for a secondary scheme (any scheme that is not
+// the DataStore's primary scheme). The stow kind and config are resolved from cfg.Schemes[scheme]
+// when present, otherwise the kind is derived from the scheme and the backend is dialed with ambient
+// credentials. The resulting store has no base container and always loads containers dynamically, so
+// a single DataStore can address any container under the scheme. It satisfies backendFactory.
+func stowFactory(_ context.Context, scheme string, _ DataReference, cfg *Config, httpClient *http.Client, metrics *dataStoreMetrics) (RawStore, error) {
+	override := cfg.Schemes[scheme]
+
+	kind := override.Kind
+	if kind == "" {
+		k, ok := schemeToStowKind[scheme]
+		if !ok {
+			return nil, fmt.Errorf("no stow kind registered for scheme [%v]; register one with RegisterStowScheme", scheme)
+		}
+		kind = k
 	}
 
-	// Fields that differ between minio and real S3
-	if endpoint := cfg.Endpoint.String(); endpoint != "" {
-		stowConfig[s3.ConfigEndpoint] = endpoint
+	cfgMap := stow.ConfigMap{}
+	for k, v := range override.Config {
+		cfgMap[k] = v
 	}
 
-	if accessKey := cfg.AccessKey; accessKey != "" {
-		stowConfig[s3.ConfigAccessKeyID] = accessKey
+	// Seed an S3 region from the legacy connection config when no explicit one was given, so ambient
+	// S3 dials inherit the deployment's default region instead of failing region resolution.
+	if kind == s3.Kind {
+		if _, ok := cfgMap[s3.ConfigAuthType]; !ok {
+			cfgMap[s3.ConfigAuthType] = "iam"
+		}
+
+		secretKeyVal := cfgMap[s3.ConfigSecretKey]
+		secretKeyPath := cfgMap[ConfigSecretKeyPath]
+
+		secretKey, err := resolveSecretKey(secretKeyVal, secretKeyPath)
+		if err != nil {
+			return nil, fmt.Errorf("resolving S3 secret key: %w", err)
+		}
+
+		if len(secretKey) > 0 {
+			cfgMap[s3.ConfigSecretKey] = secretKey
+		}
 	}
 
-	if secretKey := cfg.SecretKey; secretKey != "" {
-		stowConfig[s3.ConfigSecretKey] = secretKey
+	// Unlike cloud backends, the local (file://) backend cannot be dialed with ambient credentials: it
+	// needs an explicit root path. Without one stow would fail deep inside at first use, so fail fast
+	// here with an actionable message instead.
+	if kind == local.Kind {
+		if _, ok := cfgMap[local.ConfigKeyPath]; !ok {
+			return nil, fmt.Errorf("scheme [%v] maps to the local stow backend, which requires an explicit root path; set schemes[%q].config[%q]", scheme, scheme, local.ConfigKeyPath)
+		}
 	}
 
-	if disableSsl := cfg.DisableSSL; disableSsl {
-		stowConfig[s3.ConfigDisableSSL] = "True"
+	loc, err := stowDial(httpClient, kind, cfgMap)
+	if err != nil {
+		return nil, fmt.Errorf("unable to configure storage for scheme [%v] (kind [%v]): %w", scheme, kind, err)
 	}
 
-	return stowConfig
+	// An empty container in the FQN tells NewStowRawStore there is no base container to create;
+	// dynamic loading is forced on so every container under this scheme resolves lazily.
+	return NewStowRawStore(DataReference(scheme+"://"), loc, nil, true, metrics)
+}
+
+func resolveSecretKey(secretKeyVal, secretKeyPath string) (string, error) {
+	secretKey := secretKeyVal
+	if len(secretKeyPath) > 0 {
+		_, err := os.Stat(secretKeyPath)
+
+		if err != nil {
+			if os.IsNotExist(err) {
+				return "", fmt.Errorf("secret key path does not exist")
+			}
+
+			return "", fmt.Errorf("getting secret key path file info: %w", err)
+		}
+
+		secretKeyFileVal, err := os.ReadFile(secretKeyPath)
+		if err != nil {
+			return "", fmt.Errorf("reading secret key file: %w", err)
+		}
+		secretKey = strings.TrimSpace(string(secretKeyFileVal))
+	}
+	return secretKey, nil
 }

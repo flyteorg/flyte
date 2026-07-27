@@ -76,7 +76,7 @@ func (p *panickingSyncer) sync(_ context.Context, _ Batch) ([]ItemSyncResponse, 
 
 func TestCacheFour(t *testing.T) {
 	testResyncPeriod := 5 * time.Second
-	rateLimiter := workqueue.DefaultControllerRateLimiter()
+	rateLimiter := workqueue.DefaultTypedControllerRateLimiter[*Batch]()
 	fakeClock := testingclock.NewFakeClock(time.Now())
 
 	t.Run("normal operation", func(t *testing.T) {
@@ -278,7 +278,7 @@ func TestCacheFour(t *testing.T) {
 
 func TestQueueBuildUp(t *testing.T) {
 	testResyncPeriod := time.Hour
-	rateLimiter := workqueue.DefaultControllerRateLimiter()
+	rateLimiter := workqueue.DefaultTypedControllerRateLimiter[*Batch]()
 	fakeClock := testingclock.NewFakeClock(time.Now())
 
 	syncCount := atomic.NewInt32(0)
@@ -323,7 +323,7 @@ func TestQueueBuildUp(t *testing.T) {
 func TestInProcessing(t *testing.T) {
 	syncer := &panickingSyncer{}
 	syncPeriod := time.Millisecond
-	rateLimiter := workqueue.DefaultControllerRateLimiter()
+	rateLimiter := workqueue.DefaultTypedControllerRateLimiter[*Batch]()
 	fakeClock := testingclock.NewFakeClock(time.Now())
 	cache, err := NewInMemoryAutoRefresh("fake3", syncer.sync, rateLimiter, syncPeriod, 10, 2, promutils.NewTestScope(), WithClock(fakeClock))
 	assert.NoError(t, err)
@@ -341,4 +341,21 @@ func TestInProcessing(t *testing.T) {
 	assert.False(t, cache.inProcessing("test1"))
 	_, found := cache.processing.Load("test1")
 	assert.False(t, found)
+}
+
+// Regression: enqueueBatches marked only b[1:] as processing, skipping the batch
+// head b[0]. With the default SingleItemBatches every batch holds one item, so
+// nothing was ever marked and each resync re-enqueued items already in flight.
+func TestEnqueueBatches_MarksSingleItemBatchHead(t *testing.T) {
+	rateLimiter := workqueue.DefaultTypedControllerRateLimiter[*Batch]()
+	fakeClock := testingclock.NewFakeClock(time.Now())
+	cache, err := NewInMemoryAutoRefresh("head", syncFakeItem, rateLimiter, 5*time.Second, 10, 10,
+		promutils.NewTestScope(), WithClock(fakeClock), WithSyncOnCreate(false))
+	assert.NoError(t, err)
+
+	_, err = cache.GetOrCreate("item-1", fakeCacheItem{val: 1})
+	assert.NoError(t, err)
+
+	assert.NoError(t, cache.enqueueBatches(context.Background()))
+	assert.True(t, cache.inProcessing("item-1"), "single-item batch head must be marked processing after enqueue")
 }

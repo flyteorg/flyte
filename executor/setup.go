@@ -6,11 +6,16 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
+	"connectrpc.com/connect"
+	"connectrpc.com/otelconnect"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	k8scache "k8s.io/client-go/tools/cache"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -18,7 +23,6 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/executor/pkg/config"
 	"github.com/flyteorg/flyte/v2/executor/pkg/controller"
@@ -27,17 +31,27 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 	cachecatalog "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog/cache_service"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	webhookConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
+	connectorplugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/webapi/connector"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 
-	// Plugin registrations — blank imports trigger init() which registers
-	// plugins with the global registry.
+	_ "github.com/flyteorg/flyte/v2/executor/plugins"
+	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/clustered"
 	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/pod"
 )
 
 var scheme = runtime.NewScheme()
+
+const otelServiceName = "executor"
+
+// podTemplateSyncTimeout bounds the initial PodTemplate informer sync; matches
+// controller-runtime's default cache sync timeout.
+const podTemplateSyncTimeout = 2 * time.Minute
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
@@ -50,12 +64,30 @@ func Scheme() *runtime.Scheme {
 	return scheme
 }
 
+// watchPodTemplates wires a PodTemplate informer into the flytek8s.DefaultPodTemplateStore,
+// with defaultNamespace as the fallback namespace for template lookups.
+func watchPodTemplates(informerFactory informers.SharedInformerFactory, defaultNamespace string) error {
+	flytek8s.DefaultPodTemplateStore.SetDefaultNamespace(defaultNamespace)
+	_, err := informerFactory.Core().V1().PodTemplates().Informer().AddEventHandler(
+		flytek8s.GetPodTemplateUpdatesHandler(&flytek8s.DefaultPodTemplateStore))
+	return err
+}
+
 // Setup registers the executor as a background worker on the SetupContext.
 // Requires sc.K8sConfig and sc.DataStore to be set.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
 
 	cfg := config.GetConfig()
+
+	for _, reg := range pluginmachinery.PluginRegistry().GetSchemeRegisters() {
+		utilruntime.Must(reg.AddToScheme(scheme))
+	}
+
+	// Register the connector (webapi) backend plugin so task types backed by an external connector
+	// service are routed to it. This must run before plugin.NewRegistry below, which snapshots the
+	// core plugins once.
+	connectorplugin.RegisterConnectorPlugin(&connectorplugin.ConnectorService{})
 
 	var tlsOpts []func(*tls.Config)
 	if !cfg.EnableHTTP2 {
@@ -108,7 +140,25 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		podNamespace = sc.Namespace
 	}
 
-	if err := webhookPkg.Setup(ctx, kubeClient, wCfg, podNamespace, promutils.NewScope("executor"), mgr); err != nil {
+	informerFactory := informers.NewSharedInformerFactory(kubeClient, 0)
+	if err := watchPodTemplates(informerFactory, podNamespace); err != nil {
+		return fmt.Errorf("executor: failed to register PodTemplate event handler: %w", err)
+	}
+	sc.AddWorker("podtemplate-informer", func(ctx context.Context) error {
+		informerFactory.Start(ctx.Done())
+		syncCtx, cancel := context.WithTimeout(ctx, podTemplateSyncTimeout)
+		defer cancel()
+		if !k8scache.WaitForCacheSync(syncCtx.Done(), informerFactory.Core().V1().PodTemplates().Informer().HasSynced) {
+			return fmt.Errorf("executor: PodTemplate informer failed to sync within %v; "+
+				"verify the service account can get/list/watch core/v1 podtemplates", podTemplateSyncTimeout)
+		}
+		<-ctx.Done()
+		return nil
+	})
+
+	executorScope := promutils.NewScope("executor")
+
+	if err := webhookPkg.Setup(ctx, kubeClient, wCfg, podNamespace, executorScope.NewSubScope("webhook"), mgr); err != nil {
 		return fmt.Errorf("executor: webhook setup failed: %w", err)
 	}
 
@@ -118,26 +168,39 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	setupCtx := plugin.NewSetupContext(
-		mgr, nil, nil, nil, nil,
+		mgr, plugin.NewNoopSecretManager(), plugin.NewNoopResourceRegistrar(), nil, nil,
 		"TaskAction",
-		promutils.NewScope("executor"),
+		executorScope.NewSubScope("plugin"),
 	)
 	registry := plugin.NewRegistry(setupCtx, pluginmachinery.PluginRegistry())
 	if err := registry.Initialize(ctx); err != nil {
 		return fmt.Errorf("executor: failed to initialize plugin registry: %w", err)
 	}
 
+	otelCfg := otelutils.GetConfig()
+	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
+		return fmt.Errorf("registering otel providers: %w", err)
+	}
+	otelInterceptor, err := otelconnect.NewInterceptor(
+		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
+		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
+		otelconnect.WithoutServerPeerAttributes(),
+	)
+	if err != nil {
+		return fmt.Errorf("creating otel interceptor: %w", err)
+	}
+
 	eventsServiceURL := sc.BaseURL
 	if eventsServiceURL == "" {
 		eventsServiceURL = cfg.EventsServiceURL
 	}
-	eventsClient := workflowconnect.NewEventsProxyServiceClient(http.DefaultClient, eventsServiceURL)
+	eventsClient := workflowconnect.NewEventsProxyServiceClient(http.DefaultClient, eventsServiceURL, connect.WithInterceptors(otelInterceptor))
 	catalogCfg := catalog.GetConfig()
 	cacheServiceURL := sc.BaseURL
 	if cacheServiceURL == "" {
 		cacheServiceURL = cfg.CacheServiceURL
 	}
-	cacheClient := cachecatalog.NewHTTPClient(dataStore, cacheServiceURL, catalogCfg.MaxCacheAge.Duration)
+	cacheClient := cachecatalog.NewHTTPClient(dataStore, cacheServiceURL, catalogCfg.MaxCacheAge.Duration, connect.WithInterceptors(otelInterceptor))
 	asyncCatalogClient, err := catalog.NewAsyncClient(cacheClient, *catalogCfg, promutils.NewScope("executor:catalog"))
 	if err != nil {
 		return fmt.Errorf("executor: failed to create catalog cache client: %w", err)
@@ -148,12 +211,24 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 	reconciler := controller.NewTaskActionReconciler(
 		mgr.GetClient(), mgr.GetScheme(), registry, dataStore, eventsClient, cfg.Cluster,
+		otelutils.GetMeterProvider(otelServiceName), mgr.GetCache(),
 	)
 	reconciler.CatalogClient = asyncCatalogClient
 	reconciler.Catalog = cacheClient
-	reconciler.Recorder = mgr.GetEventRecorderFor("taskaction-controller")
-	reconciler.MaxSystemFailures = cfg.MaxSystemFailures
-	if err := reconciler.SetupWithManager(mgr); err != nil {
+	reconciler.Recorder = mgr.GetEventRecorder("taskaction-controller")
+	// Supply a ResourceManager for the webapi allocation-token path, used by connector-backed task
+	// types that declare ResourceQuotas. It grants every allocation by default, matching
+	// FlytePropeller with no quota backend. Swap in a real one to enforce quotas.
+	reconciler.ResourceManager = plugin.NewNoopResourceManager()
+	// Supply a SecretManager so connector tasks that reference secrets do not nil-deref at execution
+	// time. It has no backend and fails lookups with a clear error. Swap in a real one to resolve
+	// secrets.
+	reconciler.SecretManager = plugin.NewNoopSecretManager()
+	if cfg.MaxSystemFailures < 0 {
+		return fmt.Errorf("executor: maxSystemFailures must be non-negative, got %d", cfg.MaxSystemFailures)
+	}
+	reconciler.MaxSystemFailures = uint32(cfg.MaxSystemFailures)
+	if err := reconciler.SetupWithManager(mgr, cfg.MaxConcurrentReconciles); err != nil {
 		return fmt.Errorf("executor: failed to setup controller: %w", err)
 	}
 
@@ -161,7 +236,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		if cfg.GC.MaxTTL.Duration <= 0 {
 			return fmt.Errorf("executor: gc.maxTTL must be positive when gc is enabled, got %v", cfg.GC.MaxTTL.Duration)
 		}
-		gc := controller.NewGarbageCollector(mgr.GetClient(), cfg.GC.Interval.Duration, cfg.GC.MaxTTL.Duration)
+		gc := controller.NewGarbageCollector(mgr.GetClient(), mgr.GetAPIReader(), cfg.GC.Interval.Duration, cfg.GC.MaxTTL.Duration)
 		if err := mgr.Add(gc); err != nil {
 			return fmt.Errorf("executor: failed to add garbage collector: %w", err)
 		}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"connectrpc.com/connect"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
@@ -19,11 +20,13 @@ func Start(
 	triggerRepo interfaces.TriggerRepo,
 	cfg config.TriggerSchedulerConfig,
 	baseURL string,
+	clientOpts ...connect.ClientOption,
 ) func(ctx context.Context) error {
 	exec := executor.NewTriggerExecutor(executor.TriggerExecutorConfig{
-		BaseURL: baseURL,
-		QPS:     cfg.ExecutionQPS,
-		Burst:   cfg.ExecutionBurst,
+		BaseURL:    baseURL,
+		QPS:        cfg.ExecutionQPS,
+		Burst:      cfg.ExecutionBurst,
+		ClientOpts: clientOpts,
 	})
 
 	sched := core.NewGoCronScheduler(exec)

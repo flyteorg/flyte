@@ -917,6 +917,8 @@ func (m *PythonWheels) validate(all bool) error {
 
 	}
 
+	// no validation rules for PackageName
+
 	if len(errors) > 0 {
 		return PythonWheelsMultiError(errors)
 	}

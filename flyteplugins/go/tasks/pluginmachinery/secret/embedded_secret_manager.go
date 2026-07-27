@@ -222,7 +222,7 @@ func (i *EmbeddedSecretManagerInjector) addImagePullSecretToPod(
 		}
 
 		pod.Spec.ImagePullSecrets = append(pod.Spec.ImagePullSecrets, imagePullSecretRef)
-		slices2.SortStableFunc(pod.Spec.ImagePullSecrets, func(e corev1.LocalObjectReference, e2 corev1.LocalObjectReference) int {
+		slices2.SortStableFunc(pod.Spec.ImagePullSecrets, func(e corev1.LocalObjectReference, e2 corev1.LocalObjectReference) int { //nolint: govet
 			return strings.Compare(e.Name, e2.Name)
 		})
 

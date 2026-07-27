@@ -35,9 +35,6 @@ const (
 const (
 	// ActionsServiceEnqueueProcedure is the fully-qualified name of the ActionsService's Enqueue RPC.
 	ActionsServiceEnqueueProcedure = "/flyteidl2.actions.ActionsService/Enqueue"
-	// ActionsServiceGetLatestStateProcedure is the fully-qualified name of the ActionsService's
-	// GetLatestState RPC.
-	ActionsServiceGetLatestStateProcedure = "/flyteidl2.actions.ActionsService/GetLatestState"
 	// ActionsServiceWatchForUpdatesProcedure is the fully-qualified name of the ActionsService's
 	// WatchForUpdates RPC.
 	ActionsServiceWatchForUpdatesProcedure = "/flyteidl2.actions.ActionsService/WatchForUpdates"
@@ -53,7 +50,6 @@ const (
 var (
 	actionsServiceServiceDescriptor               = actions.File_flyteidl2_actions_actions_service_proto.Services().ByName("ActionsService")
 	actionsServiceEnqueueMethodDescriptor         = actionsServiceServiceDescriptor.Methods().ByName("Enqueue")
-	actionsServiceGetLatestStateMethodDescriptor  = actionsServiceServiceDescriptor.Methods().ByName("GetLatestState")
 	actionsServiceWatchForUpdatesMethodDescriptor = actionsServiceServiceDescriptor.Methods().ByName("WatchForUpdates")
 	actionsServiceUpdateMethodDescriptor          = actionsServiceServiceDescriptor.Methods().ByName("Update")
 	actionsServiceAbortMethodDescriptor           = actionsServiceServiceDescriptor.Methods().ByName("Abort")
@@ -64,9 +60,6 @@ var (
 type ActionsServiceClient interface {
 	// Enqueue queues a new action for execution.
 	Enqueue(context.Context, *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error)
-	// GetLatestState returns the latest `NodeStatus` of an action.
-	// This deprecates Get in the current StateService.
-	GetLatestState(context.Context, *connect.Request[actions.GetLatestStateRequest]) (*connect.Response[actions.GetLatestStateResponse], error)
 	// WatchForUpdates watches for updates to the state of actions.
 	// This API guarantees at-least-once delivery semantics.
 	WatchForUpdates(context.Context, *connect.Request[actions.WatchForUpdatesRequest]) (*connect.ServerStreamForClient[actions.WatchForUpdatesResponse], error)
@@ -101,12 +94,6 @@ func NewActionsServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithSchema(actionsServiceEnqueueMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		getLatestState: connect.NewClient[actions.GetLatestStateRequest, actions.GetLatestStateResponse](
-			httpClient,
-			baseURL+ActionsServiceGetLatestStateProcedure,
-			connect.WithSchema(actionsServiceGetLatestStateMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
 		watchForUpdates: connect.NewClient[actions.WatchForUpdatesRequest, actions.WatchForUpdatesResponse](
 			httpClient,
 			baseURL+ActionsServiceWatchForUpdatesProcedure,
@@ -137,7 +124,6 @@ func NewActionsServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 // actionsServiceClient implements ActionsServiceClient.
 type actionsServiceClient struct {
 	enqueue         *connect.Client[actions.EnqueueRequest, actions.EnqueueResponse]
-	getLatestState  *connect.Client[actions.GetLatestStateRequest, actions.GetLatestStateResponse]
 	watchForUpdates *connect.Client[actions.WatchForUpdatesRequest, actions.WatchForUpdatesResponse]
 	update          *connect.Client[actions.UpdateRequest, actions.UpdateResponse]
 	abort           *connect.Client[actions.AbortRequest, actions.AbortResponse]
@@ -147,11 +133,6 @@ type actionsServiceClient struct {
 // Enqueue calls flyteidl2.actions.ActionsService.Enqueue.
 func (c *actionsServiceClient) Enqueue(ctx context.Context, req *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error) {
 	return c.enqueue.CallUnary(ctx, req)
-}
-
-// GetLatestState calls flyteidl2.actions.ActionsService.GetLatestState.
-func (c *actionsServiceClient) GetLatestState(ctx context.Context, req *connect.Request[actions.GetLatestStateRequest]) (*connect.Response[actions.GetLatestStateResponse], error) {
-	return c.getLatestState.CallUnary(ctx, req)
 }
 
 // WatchForUpdates calls flyteidl2.actions.ActionsService.WatchForUpdates.
@@ -178,9 +159,6 @@ func (c *actionsServiceClient) Signal(ctx context.Context, req *connect.Request[
 type ActionsServiceHandler interface {
 	// Enqueue queues a new action for execution.
 	Enqueue(context.Context, *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error)
-	// GetLatestState returns the latest `NodeStatus` of an action.
-	// This deprecates Get in the current StateService.
-	GetLatestState(context.Context, *connect.Request[actions.GetLatestStateRequest]) (*connect.Response[actions.GetLatestStateResponse], error)
 	// WatchForUpdates watches for updates to the state of actions.
 	// This API guarantees at-least-once delivery semantics.
 	WatchForUpdates(context.Context, *connect.Request[actions.WatchForUpdatesRequest], *connect.ServerStream[actions.WatchForUpdatesResponse]) error
@@ -211,12 +189,6 @@ func NewActionsServiceHandler(svc ActionsServiceHandler, opts ...connect.Handler
 		connect.WithSchema(actionsServiceEnqueueMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	actionsServiceGetLatestStateHandler := connect.NewUnaryHandler(
-		ActionsServiceGetLatestStateProcedure,
-		svc.GetLatestState,
-		connect.WithSchema(actionsServiceGetLatestStateMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
 	actionsServiceWatchForUpdatesHandler := connect.NewServerStreamHandler(
 		ActionsServiceWatchForUpdatesProcedure,
 		svc.WatchForUpdates,
@@ -245,8 +217,6 @@ func NewActionsServiceHandler(svc ActionsServiceHandler, opts ...connect.Handler
 		switch r.URL.Path {
 		case ActionsServiceEnqueueProcedure:
 			actionsServiceEnqueueHandler.ServeHTTP(w, r)
-		case ActionsServiceGetLatestStateProcedure:
-			actionsServiceGetLatestStateHandler.ServeHTTP(w, r)
 		case ActionsServiceWatchForUpdatesProcedure:
 			actionsServiceWatchForUpdatesHandler.ServeHTTP(w, r)
 		case ActionsServiceUpdateProcedure:
@@ -266,10 +236,6 @@ type UnimplementedActionsServiceHandler struct{}
 
 func (UnimplementedActionsServiceHandler) Enqueue(context.Context, *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.actions.ActionsService.Enqueue is not implemented"))
-}
-
-func (UnimplementedActionsServiceHandler) GetLatestState(context.Context, *connect.Request[actions.GetLatestStateRequest]) (*connect.Response[actions.GetLatestStateResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.actions.ActionsService.GetLatestState is not implemented"))
 }
 
 func (UnimplementedActionsServiceHandler) WatchForUpdates(context.Context, *connect.Request[actions.WatchForUpdatesRequest], *connect.ServerStream[actions.WatchForUpdatesResponse]) error {

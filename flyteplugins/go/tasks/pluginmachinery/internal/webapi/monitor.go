@@ -6,12 +6,13 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/v2/flytestdlib/autorefreshcache"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
-func monitor(ctx context.Context, tCtx core.TaskExecutionContext, p Client, cache autorefreshcache.AutoRefresh, state *State) (
-	newState *State, phaseInfo core.PhaseInfo, err error) {
+func monitor(ctx context.Context, tCtx core.TaskExecutionContext, p Client, cache autorefreshcache.AutoRefresh, state *webapi.State) (
+	newState *webapi.State, phaseInfo core.PhaseInfo, err error) {
 	newCacheItem := CacheItem{
 		State: *state,
 	}

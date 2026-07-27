@@ -12,6 +12,11 @@ message ProjectIdentifier {
   string name = 3 [(buf.validate.field).string.min_len = 1];
 }
 
+message DomainIdentifier {
+  string organization = 1 [(buf.validate.field).string.min_len = 1];
+  string name = 2 [(buf.validate.field).string.min_len = 1];
+}
+
 message ClusterIdentifier {
   string organization = 1;
   string name = 2 [(buf.validate.field).string.min_len = 1];

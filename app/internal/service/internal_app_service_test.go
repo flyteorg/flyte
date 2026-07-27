@@ -13,8 +13,8 @@ import (
 
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
-	flytecoreapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	flytecoreapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 // mockAppK8sClient is a testify mock for AppK8sClientInterface.

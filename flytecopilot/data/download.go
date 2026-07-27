@@ -12,11 +12,11 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/ghodss/yaml"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
+	"github.com/golang/protobuf/jsonpb" //nolint: staticcheck
+	"github.com/golang/protobuf/proto"  //nolint: staticcheck
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
 
@@ -31,6 +31,8 @@ type Downloader struct {
 	store  *storage.DataStore
 	// TODO support download mode
 	mode core.IOStrategy_DownloadMode
+	// layout controls how Blob/list[Blob] inputs are laid out on disk.
+	layout core.DataLoadingConfig_FileInputLayout
 }
 
 // TODO add timeout and rate limit
@@ -102,7 +104,6 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		var mu sync.Mutex
 		var wg sync.WaitGroup
 		for _, absPath := range absPaths {
-			absPath := absPath
 
 			wg.Add(1)
 			go func() {
@@ -335,20 +336,20 @@ func (d Downloader) handlePrimitive(primitive *core.Primitive, toFilePath string
 			return []byte(strconv.FormatFloat(primitive.GetFloatValue(), 'f', -1, 64)), nil
 		}
 	case *core.Primitive_Datetime:
-		v, err = ptypes.Timestamp(primitive.GetDatetime())
+		v = primitive.GetDatetime().AsTime()
 		if err != nil {
 			return nil, err
 		}
 		toByteArray = func() ([]byte, error) {
-			return []byte(ptypes.TimestampString(primitive.GetDatetime())), nil
+			return []byte(primitive.GetDatetime().AsTime().Format(time.RFC3339Nano)), nil
 		}
 	case *core.Primitive_Duration:
-		v, err := ptypes.Duration(primitive.GetDuration())
+		v = primitive.GetDuration().AsDuration()
 		if err != nil {
 			return nil, err
 		}
 		toByteArray = func() ([]byte, error) {
-			return []byte(v.String()), nil
+			return []byte(primitive.GetDuration().AsDuration().String()), nil
 		}
 	default:
 		v = nil
@@ -445,6 +446,16 @@ func (d Downloader) handleLiteral(ctx context.Context, lit *core.Literal, filePa
 	}
 }
 
+// singleBlob returns the Blob of a single-dimensional Blob literal, or nil if
+// the literal is not a single Blob.
+func singleBlob(lit *core.Literal) *core.Blob {
+	b := lit.GetScalar().GetBlob()
+	if b == nil || b.GetMetadata().GetType().GetDimensionality() != core.BlobType_SINGLE {
+		return nil
+	}
+	return b
+}
+
 // Collection should be stored as a top level list file and may have accompanying files?
 func (d Downloader) handleCollection(ctx context.Context, c *core.LiteralCollection, dir string, writePrimitiveToFile bool) ([]interface{}, *core.LiteralCollection, error) {
 	if c == nil || len(c.GetLiterals()) == 0 {
@@ -452,8 +463,25 @@ func (d Downloader) handleCollection(ctx context.Context, c *core.LiteralCollect
 	}
 	var collection []interface{}
 	litCollection := &core.LiteralCollection{}
+	// Under NAMED_DIR, list[File] elements keep their ORIGINAL basename (the blob
+	// URI basename, which the SDK preserves on upload) so names round-trip
+	// end-to-end (e.g. sample0.fastq.gz, not 0.gz). seen tracks basenames so a
+	// collision (two inputs sharing a name) falls back to an index-prefixed name
+	// rather than clobbering. DIRECT keeps the bare index, unchanged.
+	seen := make(map[string]bool)
 	for i, lit := range c.GetLiterals() {
-		filePath := path.Join(dir, strconv.Itoa(i))
+		name := strconv.Itoa(i)
+		if d.layout == core.DataLoadingConfig_NAMED_DIR {
+			if b := singleBlob(lit); b != nil {
+				base := path.Base(b.GetUri())
+				if base == "" || base == "." || base == "/" || seen[base] {
+					base = strconv.Itoa(i) + "_" + base
+				}
+				seen[base] = true
+				name = base
+			}
+		}
+		filePath := path.Join(dir, name)
 		v, lit, err := d.handleLiteral(ctx, lit, filePath, writePrimitiveToFile)
 		if err != nil {
 			return nil, nil, err
@@ -490,7 +518,19 @@ func (d Downloader) RecursiveDownload(ctx context.Context, inputs *core.LiteralM
 		varPath := path.Join(dir, variable)
 		lit := literal
 		f[variable] = futures.NewAsyncFuture(childCtx, func(ctx2 context.Context) (interface{}, error) {
-			v, lit, err := d.handleLiteral(ctx2, lit, varPath, writePrimitiveToFile)
+			fp := varPath
+			// Under NAMED_DIR, a single File is placed inside a per-input
+			// directory under its original basename (preserving the extension),
+			// mirroring list[File] so a glob over <var>/ finds it.
+			if d.layout == core.DataLoadingConfig_NAMED_DIR {
+				if b := singleBlob(lit); b != nil {
+					if err := os.MkdirAll(varPath, os.ModePerm); err != nil {
+						return nil, errors.Wrapf(err, "failed to create input dir [%s]", varPath)
+					}
+					fp = path.Join(varPath, path.Base(b.GetUri()))
+				}
+			}
+			v, lit, err := d.handleLiteral(ctx2, lit, fp, writePrimitiveToFile)
 			if err != nil {
 				return nil, err
 			}
@@ -566,10 +606,11 @@ func (d Downloader) DownloadInputs(ctx context.Context, inputRef storage.DataRef
 	return nil
 }
 
-func NewDownloader(_ context.Context, store *storage.DataStore, format core.DataLoadingConfig_LiteralMapFormat, mode core.IOStrategy_DownloadMode) Downloader {
+func NewDownloader(_ context.Context, store *storage.DataStore, format core.DataLoadingConfig_LiteralMapFormat, mode core.IOStrategy_DownloadMode, layout core.DataLoadingConfig_FileInputLayout) Downloader {
 	return Downloader{
 		format: format,
 		store:  store,
 		mode:   mode,
+		layout: layout,
 	}
 }

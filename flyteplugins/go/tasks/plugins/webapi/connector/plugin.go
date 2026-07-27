@@ -8,13 +8,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
 	"k8s.io/apimachinery/pkg/util/wait"
-
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 
 	pluginErrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
@@ -23,10 +21,11 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
-	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	connectorPb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/connector"
 	flyteIdl "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
@@ -55,6 +54,7 @@ func (p *ConnectorService) SetSupportedTaskType(taskTypes []string) {
 }
 
 type RegistryKey struct {
+	project         string
 	domain          string
 	taskTypeName    string
 	taskTypeVersion int32
@@ -72,32 +72,34 @@ func (r Registry) getSupportedTaskTypes() []string {
 }
 
 type Plugin struct {
-	metricScope promutils.Scope
-	cfg         *Config
-	cs          *ClientSet
-	registry    Registry
-	mu          sync.RWMutex
+	getTaskPhase *prometheus.CounterVec
+	cfg          *Config
+	cs           *ClientSet
+	registry     Registry
+	mu           sync.RWMutex
 }
 
 type ResourceWrapper struct {
-	Phase          flyteIdl.TaskExecution_Phase
-	Outputs        *task.Outputs
-	Message        string
-	LogLinks       []*flyteIdl.TaskLog
-	CustomInfo     *structpb.Struct
-	ConnectorID    string
-	IsConnectorApp bool
+	Phase             flyteIdl.TaskExecution_Phase
+	Outputs           *task.Outputs
+	Message           string
+	LogLinks          []*flyteIdl.TaskLog
+	CustomInfo        *structpb.Struct
+	ConnectorID       string
+	IsConnectorApp    bool
+	ConnectorEndpoint string
 }
 
 // IsTerminal is used to avoid making network calls to the connector service if the resource is already in a terminal state.
 func (r ResourceWrapper) IsTerminal() bool {
-	return r.Phase == flyteIdl.TaskExecution_SUCCEEDED || r.Phase == flyteIdl.TaskExecution_FAILED || r.Phase == flyteIdl.TaskExecution_ABORTED
+	return r.Phase == flyteIdl.TaskExecution_SUCCEEDED || r.Phase == flyteIdl.TaskExecution_FAILED || r.Phase == flyteIdl.TaskExecution_RETRYABLE_FAILED || r.Phase == flyteIdl.TaskExecution_ABORTED
 }
 
 type ResourceMetaWrapper struct {
 	OutputPrefix          string
 	ConnectorResourceMeta []byte
 	TaskCategory          *connectorPb.TaskCategory
+	Project               string
 	Domain                string
 	Connection            *flyteIdl.Connection
 }
@@ -152,13 +154,15 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
 	taskCategory := connectorPb.TaskCategory{Name: taskTemplate.GetType(), Version: taskTemplate.GetTaskTypeVersion()}
-	connector, err := p.getFinalConnector(&taskCategory, p.cfg, taskTemplate.GetId().GetDomain())
+	project := taskTemplate.GetId().GetProject()
+	domain := taskTemplate.GetId().GetDomain()
+	connector, err := p.getFinalConnector(&taskCategory, p.cfg, project, domain)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	connection := flyteIdl.Connection{}
-	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &connection)
+	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &connection) //nolint: staticcheck
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to unmarshal connection from task template custom: %v", err)
 	}
@@ -215,13 +219,14 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		ConnectorResourceMeta: res.GetResourceMeta(),
 		TaskCategory:          &taskCategory,
 		Connection:            &connection,
-		Domain:                taskTemplate.GetId().GetDomain(),
+		Project:               project,
+		Domain:                domain,
 	}, nil, nil
 }
 
 func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	connector, err := p.getFinalConnector(metadata.TaskCategory, p.cfg, metadata.Domain)
+	connector, err := p.getFinalConnector(metadata.TaskCategory, p.cfg, metadata.Project, metadata.Domain)
 	if err != nil {
 		return nil, err
 	}
@@ -243,15 +248,19 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 	if err != nil {
 		return nil, fmt.Errorf("failed to get task from connector with %v", err)
 	}
-
+	// Track the status the connector reports back (RUNNING/SUCCEEDED/FAILED/...) per GetTask.
+	if p.getTaskPhase != nil {
+		p.getTaskPhase.WithLabelValues(res.GetResource().GetPhase().String()).Inc()
+	}
 	return ResourceWrapper{
-		Phase:          res.GetResource().GetPhase(),
-		Outputs:        res.GetResource().GetOutputs(),
-		Message:        res.GetResource().GetMessage(),
-		LogLinks:       res.GetResource().GetLogLinks(),
-		CustomInfo:     res.GetResource().GetCustomInfo(),
-		ConnectorID:    connector.ConnectorID,
-		IsConnectorApp: connector.IsConnectorApp,
+		Phase:             res.GetResource().GetPhase(),
+		Outputs:           res.GetResource().GetOutputs(),
+		Message:           res.GetResource().GetMessage(),
+		LogLinks:          res.GetResource().GetLogLinks(),
+		CustomInfo:        res.GetResource().GetCustomInfo(),
+		ConnectorID:       connector.ConnectorID,
+		IsConnectorApp:    connector.IsConnectorApp,
+		ConnectorEndpoint: connector.ConnectorDeployment.Endpoint,
 	}, nil
 }
 
@@ -260,7 +269,7 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	connector, err := p.getFinalConnector(metadata.TaskCategory, p.cfg, metadata.Domain)
+	connector, err := p.getFinalConnector(metadata.TaskCategory, p.cfg, metadata.Project, metadata.Domain)
 	if err != nil {
 		return err
 	}
@@ -319,6 +328,15 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 	}
 
 	taskInfo := &core.TaskInfo{Logs: logLinks, CustomInfo: resource.CustomInfo}
+
+	if resource.ConnectorEndpoint != "" {
+		taskInfo.LogContext = &flyteIdl.LogContext{
+			Connector: &flyteIdl.ConnectorLogContext{
+				Endpoint: resource.ConnectorEndpoint,
+			},
+		}
+	}
+
 	errorCode := pluginErrors.TaskFailedWithError
 
 	switch resource.Phase {
@@ -348,51 +366,56 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 		return core.PhaseInfoFailure(errorCode, "failed to run the job with aborted phase.", taskInfo), nil
 	case flyteIdl.TaskExecution_FAILED:
 		return core.PhaseInfoFailure(errorCode, fmt.Sprintf("failed to run the job: %s", resource.Message), taskInfo), nil
+	case flyteIdl.TaskExecution_RETRYABLE_FAILED:
+		return core.PhaseInfoRetryableFailure(errorCode, fmt.Sprintf("failed to run the job: %s", resource.Message), taskInfo), nil
 	}
 	// The default phase is undefined.
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.Phase)
 }
 
 func (p *Plugin) getAsyncConnectorClient(ctx context.Context, connector *Deployment) (connectorPb.AsyncConnectorServiceClient, error) {
-	client, ok := p.cs.asyncConnectorClients[connector.Endpoint]
-	if !ok {
-		conn, err := getGrpcConnection(ctx, connector)
-		if err != nil {
-			return nil, err
-		}
-		client = connectorPb.NewAsyncConnectorServiceClient(conn)
-		p.cs.asyncConnectorClients[connector.Endpoint] = client
-	}
-	return client, nil
+	return p.cs.getOrDialAsyncClient(ctx, connector)
 }
 
 func (p *Plugin) watchConnectors(ctx context.Context, connectorService *ConnectorService) {
 	go wait.Until(func() {
-		childCtx, cancel := context.WithCancel(ctx)
-		defer cancel()
-		clientSet := getConnectorClientSets(childCtx)
-		connectorRegistry := getConnectorRegistry(childCtx, clientSet)
+		for _, deployment := range allConnectorDeployments(GetConfig()) {
+			if _, err := p.cs.getOrDialMetadataClient(ctx, deployment); err != nil {
+				logger.Errorf(ctx, "failed to connect to connector [%v]: %v", deployment.Endpoint, err)
+			}
+		}
+		connectorRegistry := getConnectorRegistry(ctx, p.cs)
 		p.setRegistry(connectorRegistry)
 		connectorService.SetSupportedTaskType(connectorRegistry.getSupportedTaskTypes())
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
-func (p *Plugin) getFinalConnector(taskCategory *connectorPb.TaskCategory, cfg *Config, domain string) (*Connector, error) {
+func (p *Plugin) getFinalConnector(taskCategory *connectorPb.TaskCategory, cfg *Config, project, domain string) (*Connector, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
-	registryKey := RegistryKey{domain: domain, taskTypeName: taskCategory.GetName(), taskTypeVersion: taskCategory.GetVersion()}
-	if connector, exists := p.registry[registryKey]; exists {
-		return connector, nil
-	}
-	logger.Debugf(context.Background(), "No connector found for task type [%s] and version [%d] in domain [%s].", taskCategory.GetName(), taskCategory.GetVersion(), domain)
+	taskTypeName := taskCategory.GetName()
+	taskTypeVersion := taskCategory.GetVersion()
 
-	// Use the connector that supports across all domains.
-	registryKey = RegistryKey{domain: "", taskTypeName: taskCategory.GetName(), taskTypeVersion: taskCategory.GetVersion()}
+	registryKey := RegistryKey{project: project, domain: domain, taskTypeName: taskTypeName, taskTypeVersion: taskTypeVersion}
 	if connector, exists := p.registry[registryKey]; exists {
 		return connector, nil
 	}
-	logger.Debugf(context.Background(), "No connector found for task type [%s] and version [%d] in any domain.", taskCategory.GetName(), taskCategory.GetVersion())
+	logger.Debugf(context.Background(), "No connector found for task type [%s] and version [%d] in project [%s] domain [%s].", taskTypeName, taskTypeVersion, project, domain)
+
+	// Fall back to a connector registered for the domain across all projects.
+	registryKey = RegistryKey{project: "", domain: domain, taskTypeName: taskTypeName, taskTypeVersion: taskTypeVersion}
+	if connector, exists := p.registry[registryKey]; exists {
+		return connector, nil
+	}
+	logger.Debugf(context.Background(), "No connector found for task type [%s] and version [%d] in domain [%s].", taskTypeName, taskTypeVersion, domain)
+
+	// Fall back to a connector that supports across all projects and domains.
+	registryKey = RegistryKey{project: "", domain: "", taskTypeName: taskTypeName, taskTypeVersion: taskTypeVersion}
+	if connector, exists := p.registry[registryKey]; exists {
+		return connector, nil
+	}
+	logger.Debugf(context.Background(), "No connector found for task type [%s] and version [%d] in any project or domain.", taskTypeName, taskTypeVersion)
 
 	if len(cfg.DefaultConnector.Endpoint) != 0 {
 		return &Connector{
@@ -455,11 +478,13 @@ func newConnectorPlugin(connectorService *ConnectorService) webapi.PluginEntry {
 			connectorRegistry := getConnectorRegistry(ctx, clientSet)
 			supportedTaskTypes := connectorRegistry.getSupportedTaskTypes()
 			connectorService.SetSupportedTaskType(supportedTaskTypes)
+			scope := iCtx.MetricsScope()
 			plugin := &Plugin{
-				metricScope: promutils.NewScope("connector_plugin"),
-				cfg:         cfg,
-				cs:          clientSet,
-				registry:    connectorRegistry,
+				getTaskPhase: scope.MustNewCounterVec("connector_get_task_phase",
+					"GetTask responses from connectors, by returned task phase", "phase"),
+				cfg:      cfg,
+				cs:       clientSet,
+				registry: connectorRegistry,
 			}
 			plugin.watchConnectors(ctx, connectorService)
 			return plugin, nil
@@ -468,7 +493,6 @@ func newConnectorPlugin(connectorService *ConnectorService) webapi.PluginEntry {
 }
 
 func RegisterConnectorPlugin(connectorService *ConnectorService) {
-	fmt.Printf("Registering connector plugin...\n")
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
 	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newConnectorPlugin(connectorService))

@@ -66,20 +66,22 @@ class CreateUploadLocationResponse(_message.Message):
     def __init__(self, signed_url: _Optional[str] = ..., native_url: _Optional[str] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., headers: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class UploadInputsRequest(_message.Message):
-    __slots__ = ["run_id", "project_id", "task_id", "task_spec", "trigger_name", "inputs"]
+    __slots__ = ["run_id", "project_id", "task_id", "task_spec", "trigger_name", "inputs", "base_dir"]
     RUN_ID_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
     TASK_ID_FIELD_NUMBER: _ClassVar[int]
     TASK_SPEC_FIELD_NUMBER: _ClassVar[int]
     TRIGGER_NAME_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
+    BASE_DIR_FIELD_NUMBER: _ClassVar[int]
     run_id: _identifier_pb2.RunIdentifier
     project_id: _identifier_pb2.ProjectIdentifier
     task_id: _task_definition_pb2.TaskIdentifier
     task_spec: _task_definition_pb2.TaskSpec
     trigger_name: _identifier_pb2.TriggerName
     inputs: _common_pb2.Inputs
-    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., task_spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ...) -> None: ...
+    base_dir: str
+    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., task_spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., base_dir: _Optional[str] = ...) -> None: ...
 
 class UploadInputsResponse(_message.Message):
     __slots__ = ["offloaded_input_data"]
@@ -122,30 +124,42 @@ class GetActionDataRequest(_message.Message):
     def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ...) -> None: ...
 
 class GetActionDataResponse(_message.Message):
-    __slots__ = ["inputs", "outputs"]
+    __slots__ = ["inputs", "outputs", "inputs_uri", "outputs_uri"]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    INPUTS_URI_FIELD_NUMBER: _ClassVar[int]
+    OUTPUTS_URI_FIELD_NUMBER: _ClassVar[int]
     inputs: _common_pb2.Inputs
     outputs: _common_pb2.Outputs
-    def __init__(self, inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.Outputs, _Mapping]] = ...) -> None: ...
+    inputs_uri: str
+    outputs_uri: str
+    def __init__(self, inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.Outputs, _Mapping]] = ..., inputs_uri: _Optional[str] = ..., outputs_uri: _Optional[str] = ...) -> None: ...
 
 class TailLogsRequest(_message.Message):
-    __slots__ = ["action_id", "attempt", "pod_name"]
+    __slots__ = ["action_id", "attempt", "primary_pod", "all_pods", "pod_name", "connector_endpoint"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     ATTEMPT_FIELD_NUMBER: _ClassVar[int]
+    PRIMARY_POD_FIELD_NUMBER: _ClassVar[int]
+    ALL_PODS_FIELD_NUMBER: _ClassVar[int]
     POD_NAME_FIELD_NUMBER: _ClassVar[int]
+    CONNECTOR_ENDPOINT_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     attempt: int
+    primary_pod: bool
+    all_pods: bool
     pod_name: str
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., pod_name: _Optional[str] = ...) -> None: ...
+    connector_endpoint: str
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., primary_pod: bool = ..., all_pods: bool = ..., pod_name: _Optional[str] = ..., connector_endpoint: _Optional[str] = ...) -> None: ...
 
 class TailLogsResponse(_message.Message):
     __slots__ = ["logs"]
     class Logs(_message.Message):
-        __slots__ = ["lines"]
+        __slots__ = ["lines", "container"]
         LINES_FIELD_NUMBER: _ClassVar[int]
+        CONTAINER_FIELD_NUMBER: _ClassVar[int]
         lines: _containers.RepeatedCompositeFieldContainer[_payload_pb2.LogLine]
-        def __init__(self, lines: _Optional[_Iterable[_Union[_payload_pb2.LogLine, _Mapping]]] = ...) -> None: ...
+        container: _payload_pb2.ContainerIdentifier
+        def __init__(self, lines: _Optional[_Iterable[_Union[_payload_pb2.LogLine, _Mapping]]] = ..., container: _Optional[_Union[_payload_pb2.ContainerIdentifier, _Mapping]] = ...) -> None: ...
     LOGS_FIELD_NUMBER: _ClassVar[int]
     logs: _containers.RepeatedCompositeFieldContainer[TailLogsResponse.Logs]
     def __init__(self, logs: _Optional[_Iterable[_Union[TailLogsResponse.Logs, _Mapping]]] = ...) -> None: ...

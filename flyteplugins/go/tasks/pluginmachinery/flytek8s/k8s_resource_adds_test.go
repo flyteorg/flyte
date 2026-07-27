@@ -6,7 +6,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	v12 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -64,7 +63,7 @@ func TestGetExecutionEnvVars(t *testing.T) {
 		envVars := GetExecutionEnvVars(mock, tt.consoleURL)
 		assert.Len(t, envVars, tt.expectedEnvVars)
 		if tt.expectedEnvVar != nil {
-			assert.True(t, proto.Equal(&envVars[5], tt.expectedEnvVar))
+			assert.Equal(t, tt.expectedEnvVar, &envVars[5])
 		}
 	}
 }

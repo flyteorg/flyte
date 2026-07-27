@@ -15,6 +15,14 @@ class ProjectIdentifier(_message.Message):
     name: str
     def __init__(self, organization: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
 
+class DomainIdentifier(_message.Message):
+    __slots__ = ["organization", "name"]
+    ORGANIZATION_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    organization: str
+    name: str
+    def __init__(self, organization: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
+
 class ClusterIdentifier(_message.Message):
     __slots__ = ["organization", "name"]
     ORGANIZATION_FIELD_NUMBER: _ClassVar[int]

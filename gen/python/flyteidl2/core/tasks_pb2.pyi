@@ -255,7 +255,7 @@ class IOStrategy(_message.Message):
     def __init__(self, download_mode: _Optional[_Union[IOStrategy.DownloadMode, str]] = ..., upload_mode: _Optional[_Union[IOStrategy.UploadMode, str]] = ...) -> None: ...
 
 class DataLoadingConfig(_message.Message):
-    __slots__ = ["enabled", "input_path", "output_path", "format", "io_strategy"]
+    __slots__ = ["enabled", "input_path", "output_path", "format", "io_strategy", "file_input_layout"]
     class LiteralMapFormat(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         JSON: _ClassVar[DataLoadingConfig.LiteralMapFormat]
@@ -264,17 +264,25 @@ class DataLoadingConfig(_message.Message):
     JSON: DataLoadingConfig.LiteralMapFormat
     YAML: DataLoadingConfig.LiteralMapFormat
     PROTO: DataLoadingConfig.LiteralMapFormat
+    class FileInputLayout(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        DIRECT: _ClassVar[DataLoadingConfig.FileInputLayout]
+        NAMED_DIR: _ClassVar[DataLoadingConfig.FileInputLayout]
+    DIRECT: DataLoadingConfig.FileInputLayout
+    NAMED_DIR: DataLoadingConfig.FileInputLayout
     ENABLED_FIELD_NUMBER: _ClassVar[int]
     INPUT_PATH_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_PATH_FIELD_NUMBER: _ClassVar[int]
     FORMAT_FIELD_NUMBER: _ClassVar[int]
     IO_STRATEGY_FIELD_NUMBER: _ClassVar[int]
+    FILE_INPUT_LAYOUT_FIELD_NUMBER: _ClassVar[int]
     enabled: bool
     input_path: str
     output_path: str
     format: DataLoadingConfig.LiteralMapFormat
     io_strategy: IOStrategy
-    def __init__(self, enabled: bool = ..., input_path: _Optional[str] = ..., output_path: _Optional[str] = ..., format: _Optional[_Union[DataLoadingConfig.LiteralMapFormat, str]] = ..., io_strategy: _Optional[_Union[IOStrategy, _Mapping]] = ...) -> None: ...
+    file_input_layout: DataLoadingConfig.FileInputLayout
+    def __init__(self, enabled: bool = ..., input_path: _Optional[str] = ..., output_path: _Optional[str] = ..., format: _Optional[_Union[DataLoadingConfig.LiteralMapFormat, str]] = ..., io_strategy: _Optional[_Union[IOStrategy, _Mapping]] = ..., file_input_layout: _Optional[_Union[DataLoadingConfig.FileInputLayout, str]] = ...) -> None: ...
 
 class K8sPod(_message.Message):
     __slots__ = ["metadata", "pod_spec", "data_config", "primary_container_name"]

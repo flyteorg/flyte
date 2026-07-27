@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/proto" //nolint: staticcheck
 	"github.com/imdario/mergo"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	v1 "k8s.io/api/core/v1"
@@ -95,11 +95,37 @@ func AddRequiredNodeSelectorRequirements(base *v1.Affinity, new ...v1.NodeSelect
 		nodeSelectorTerms := base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
 		for i := range nodeSelectorTerms {
 			nst := &nodeSelectorTerms[i]
-			nst.MatchExpressions = append(nst.MatchExpressions, new...)
+			for _, req := range new {
+				if !containsNodeSelectorRequirement(nst.MatchExpressions, req) {
+					nst.MatchExpressions = append(nst.MatchExpressions, req)
+				}
+			}
 		}
 	} else {
-		base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{v1.NodeSelectorTerm{MatchExpressions: new}}
+		base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{{MatchExpressions: new}}
 	}
+}
+
+// containsNodeSelectorRequirement reports whether reqs already holds an identical
+// requirement, so callers (e.g. ApplyGPUNodeSelectors, which may run more than once
+// on the same pod spec) stay idempotent instead of duplicating match expressions.
+func containsNodeSelectorRequirement(reqs []v1.NodeSelectorRequirement, req v1.NodeSelectorRequirement) bool {
+	for i := range reqs {
+		if reqs[i].Key != req.Key || reqs[i].Operator != req.Operator || len(reqs[i].Values) != len(req.Values) {
+			continue
+		}
+		match := true
+		for j := range req.Values {
+			if reqs[i].Values[j] != req.Values[j] {
+				match = false
+				break
+			}
+		}
+		if match {
+			return true
+		}
+	}
+	return false
 }
 
 // AddPreferredNodeSelectorRequirements appends the provided v1.NodeSelectorRequirement
@@ -147,6 +173,51 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 	}
 
 	ApplyInterruptibleNodeSelectorRequirement(interruptible, podSpec.Affinity)
+}
+
+// ApplyPlatformSchedulingConstraints re-applies the platform-injected scheduling
+// constraints that a custom pod-spec merge can dilute or drop, and MUST be called
+// after MergeOverlayPodSpecOntoBase. mergo appends a custom pod's node selector terms
+// as new OR'd alternatives, so any REQUIRED node-affinity requirement the base carried
+// — the configured DefaultAffinity requirements and the (non)interruptible requirement
+// — ends up only on the base term; a pod could then satisfy an appended custom term
+// alone and escape the constraint. This re-adds those requirements to every term and
+// re-applies the interruptible node selector and tolerations. All operations are
+// idempotent (AddRequiredNodeSelectorRequirements / addTolerationInPodSpec skip
+// entries already present), so re-applying to an unmerged base pod is a no-op.
+//
+// Note: DefaultAffinity requirements are AND'd onto every term, which is the intended
+// semantics for the common single-term DefaultAffinity. A DefaultAffinity expressed as
+// multiple OR'd terms would be tightened to AND across those requirements.
+func ApplyPlatformSchedulingConstraints(interruptible bool, podSpec *v1.PodSpec) {
+	if podSpec.Affinity == nil {
+		podSpec.Affinity = &v1.Affinity{}
+	}
+
+	// Re-add the configured DefaultAffinity required requirements to every term.
+	if da := config.GetK8sPluginConfig().DefaultAffinity; da != nil && da.NodeAffinity != nil &&
+		da.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution != nil {
+		for _, term := range da.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms {
+			AddRequiredNodeSelectorRequirements(podSpec.Affinity, term.MatchExpressions...)
+		}
+	}
+
+	// Re-add the (non)interruptible requirement to every term.
+	ApplyInterruptibleNodeSelectorRequirement(interruptible, podSpec.Affinity)
+
+	if !interruptible {
+		return
+	}
+
+	cfg := config.GetK8sPluginConfig()
+	if len(cfg.InterruptibleNodeSelector) > 0 {
+		podSpec.NodeSelector = utils.UnionMaps(podSpec.NodeSelector, cfg.InterruptibleNodeSelector)
+	}
+	// addTolerationInPodSpec is a no-op when the toleration is already present, so
+	// re-applying does not duplicate tolerations seeded earlier by UpdatePod.
+	for i := range cfg.InterruptibleTolerations {
+		addTolerationInPodSpec(podSpec, &cfg.InterruptibleTolerations[i])
+	}
 }
 
 // Specialized merging of overrides into a base *core.ExtendedResources object. Note
@@ -242,7 +313,7 @@ func getAcceleratorConfig(gpuAccelerator *core.GPUAccelerator) config.Accelerato
 
 	// Start with defaults from global GPU config
 	accelConfig := config.AcceleratorDeviceClassConfig{
-		ResourceName:                         cfg.GpuResourceName,
+		ResourceName:                         cfg.GpuResourceName, //nolint: staticcheck
 		DeviceNodeLabel:                      cfg.GpuDeviceNodeLabel,
 		PartitionSizeNodeLabel:               cfg.GpuPartitionSizeNodeLabel,
 		UnpartitionedNodeSelectorRequirement: cfg.GpuUnpartitionedNodeSelectorRequirement,
@@ -319,7 +390,7 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelera
 			Operator: v1.TolerationOpEqual,
 			Effect:   v1.TaintEffectNoSchedule,
 		}
-		podSpec.Tolerations = append(podSpec.Tolerations, deviceTol)
+		addTolerationInPodSpec(podSpec, &deviceTol)
 	}
 
 	// Short circuit if a partition size preference is not specified
@@ -364,7 +435,7 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelera
 		AddRequiredNodeSelectorRequirements(podSpec.Affinity, *partitionSizeNsr)
 	}
 	if partitionSizeTol != nil {
-		podSpec.Tolerations = append(podSpec.Tolerations, *partitionSizeTol)
+		addTolerationInPodSpec(podSpec, partitionSizeTol)
 	}
 }
 
@@ -456,7 +527,7 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 				"Pod tasks with task type version > 1 should specify their target as a K8sPod with a defined pod spec")
 		}
 
-		err := utils.UnmarshalStructToObj(target.K8SPod.PodSpec, &podSpec)
+		err := utils.UnmarshalStructToObj(target.K8SPod.PodSpec, &podSpec) //nolint: staticcheck
 		if err != nil {
 			return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
 				"Unable to unmarshal task k8s pod [%v], Err: [%v]", target.K8SPod.PodSpec, err.Error())
@@ -674,7 +745,7 @@ func ApplyPodTemplateOverride(objectMeta metav1.ObjectMeta, podTemplate *core.K8
 	}
 
 	var podSpecOverride *v1.PodSpec
-	err := utils.UnmarshalStructToObj(podTemplate.GetPodSpec(), &podSpecOverride)
+	err := utils.UnmarshalStructToObj(podTemplate.GetPodSpec(), &podSpecOverride) //nolint: staticcheck
 	if err != nil {
 		return nil, objectMeta, err
 	}
@@ -806,7 +877,7 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	}
 
 	// merge PodTemplate PodSpec with podSpec
-	var mergedObjectMeta *metav1.ObjectMeta = podTemplate.Template.ObjectMeta.DeepCopy()
+	var mergedObjectMeta = podTemplate.Template.ObjectMeta.DeepCopy()
 	if err := mergo.Merge(mergedObjectMeta, objectMeta, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
 		return nil, nil, err
 	}
@@ -827,9 +898,10 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 
 	// extract default container template
 	for i := 0; i < len(templatePodSpec.Containers); i++ {
-		if templatePodSpec.Containers[i].Name == defaultContainerTemplateName {
+		switch templatePodSpec.Containers[i].Name {
+		case defaultContainerTemplateName:
 			defaultContainerTemplate = &templatePodSpec.Containers[i]
-		} else if templatePodSpec.Containers[i].Name == primaryContainerTemplateName {
+		case primaryContainerTemplateName:
 			primaryContainerTemplate = &templatePodSpec.Containers[i]
 		}
 	}
@@ -839,9 +911,10 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 
 	// extract defaultInitContainerTemplate
 	for i := 0; i < len(templatePodSpec.InitContainers); i++ {
-		if templatePodSpec.InitContainers[i].Name == defaultInitContainerTemplateName {
+		switch templatePodSpec.InitContainers[i].Name {
+		case defaultInitContainerTemplateName:
 			defaultInitContainerTemplate = &templatePodSpec.InitContainers[i]
-		} else if templatePodSpec.InitContainers[i].Name == primaryInitContainerTemplateName {
+		case primaryInitContainerTemplateName:
 			primaryInitContainerTemplate = &templatePodSpec.InitContainers[i]
 		}
 	}
@@ -1327,6 +1400,15 @@ func classifyWaitingContainer(waiting *v1.ContainerStateWaiting, c v1.PodConditi
 	case "ImagePullBackOff":
 		gracePeriod := config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration
 		if time.Since(t) >= gracePeriod {
+			if isRegistryRateLimited(waiting.Message) {
+				// Registry rate limiting (HTTP 429) is not caused by the user
+				// and is a transient infrastructure problem. Classify as a
+				// system-retryable failure so it does not consume the user's
+				// retry budget.
+				return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
+					OccurredAt: &t,
+				}), t
+			}
 			return pluginsCore.PhaseInfoRetryableFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 				OccurredAt: &t,
 			}), t
@@ -1353,6 +1435,13 @@ func classifyWaitingContainer(waiting *v1.ContainerStateWaiting, c v1.PodConditi
 
 func GetMessageAfterGracePeriod(message string, gracePeriod time.Duration) string {
 	return fmt.Sprintf("Grace period [%s] exceeded|%s", gracePeriod, message)
+}
+
+// isRegistryRateLimited reports whether an ImagePullBackOff message indicates
+// the container runtime hit HTTP 429 Too Many Requests against the image
+// registry — a transient infrastructure failure outside the user's control.
+func isRegistryRateLimited(message string) bool {
+	return strings.Contains(message, "429 Too Many Requests")
 }
 
 func DemystifySuccess(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {

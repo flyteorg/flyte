@@ -7,6 +7,7 @@ import "flyteidl2/core/identifier.proto";
 import "flyteidl2/core/metrics.proto";
 import "flyteidl2/core/security.proto";
 import "flyteidl2/core/tasks.proto";
+import "flyteidl2/logs/dataplane/payload.proto";
 import "flyteidl2/task/common.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
@@ -208,8 +209,15 @@ message GetTaskLogsResponseHeader {
 }
 
 message GetTaskLogsResponseBody {
-  // The execution log results.
-  repeated string results = 1;
+  // The execution log results. Deprecated — use `lines` for structured log
+  // lines that carry timestamps and originator metadata. Retained for
+  // backward compatibility with older connectors that emit only strings.
+  repeated string results = 1 [deprecated = true];
+
+  // Structured log lines (timestamp + message + originator). Preferred over
+  // `results`. Connectors should populate this field; the operator dataproxy
+  // falls back to `results` only when this is empty.
+  repeated flyteidl2.logs.dataplane.LogLine lines = 2;
 }
 
 // A response containing the logs for a task execution.

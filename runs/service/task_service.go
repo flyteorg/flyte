@@ -10,7 +10,6 @@ import (
 	commonpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
-	flyteTask "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
@@ -18,7 +17,6 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"github.com/flyteorg/flyte/v2/runs/repository/transformers"
 )
-
 
 type taskService struct {
 	taskconnect.UnimplementedTaskServiceHandler
@@ -32,7 +30,6 @@ func NewTaskService(repo interfaces.Repository, projectClient projectconnect.Pro
 		projectClient: projectClient,
 	}
 }
-
 
 func (s *taskService) DeployTask(ctx context.Context, c *connect.Request[task.DeployTaskRequest]) (*connect.Response[task.DeployTaskResponse], error) {
 	request := c.Msg
@@ -99,8 +96,13 @@ func buildTriggerModels(
 			Active:      tt.GetSpec().GetActive(),
 			TaskVersion: taskId.GetVersion(),
 			Description: truncateShortDescription(tt.GetSpec().GetDescription()),
-			Inputs:      tt.GetSpec().GetInputs(),
 			RunSpec:     tt.GetSpec().GetRunSpec(),
+		}
+		// Carry over whichever input form the request used — inline literals or an offloaded URI.
+		if offloaded := tt.GetSpec().GetOffloadedInputData(); offloaded != nil {
+			spec.InputWrapper = &triggerpb.TriggerSpec_OffloadedInputData{OffloadedInputData: offloaded}
+		} else if inputs := tt.GetSpec().GetInputs(); inputs != nil {
+			spec.InputWrapper = &triggerpb.TriggerSpec_Inputs{Inputs: inputs}
 		}
 		id := &commonpb.TriggerIdentifier{
 			Name: &commonpb.TriggerName{
@@ -135,7 +137,7 @@ func (s *taskService) GetTaskDetails(ctx context.Context, c *connect.Request[tas
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	return connect.NewResponse(&flyteTask.GetTaskDetailsResponse{
+	return connect.NewResponse(&task.GetTaskDetailsResponse{
 		Details: tasks[0],
 	}), nil
 }

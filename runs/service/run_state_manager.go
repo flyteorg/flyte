@@ -310,7 +310,7 @@ func (rsm *runStateManager) GetActionTreeNodeByName(name string) *node {
 }
 
 func getParentActionName(actionNode *node) string {
-	if actionNode == nil || actionNode.Action == nil || actionNode.Action.ParentActionName.Valid == false {
+	if actionNode == nil || actionNode.Action == nil || !actionNode.Action.ParentActionName.Valid {
 		return ""
 	}
 	return actionNode.Action.ParentActionName.String

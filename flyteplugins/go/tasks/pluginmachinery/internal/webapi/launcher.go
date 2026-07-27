@@ -12,7 +12,7 @@ import (
 )
 
 func launch(ctx context.Context, p webapi.AsyncPlugin, tCtx core.TaskExecutionContext, cache autorefreshcache.AutoRefresh,
-	state *State) (newState *State, phaseInfo core.PhaseInfo, err error) {
+	state *webapi.State) (newState *webapi.State, phaseInfo core.PhaseInfo, err error) {
 	rMeta, r, err := p.Create(ctx, tCtx)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create resourceeeeee. Error: %v", err)
@@ -37,7 +37,7 @@ func launch(ctx context.Context, p webapi.AsyncPlugin, tCtx core.TaskExecutionCo
 
 	// Store the created resource name, and update our state.
 	state.ResourceMeta = rMeta
-	state.Phase = PhaseResourcesCreated
+	state.Phase = webapi.PhaseResourcesCreated
 	state.PhaseVersion = 2
 
 	cacheItem := CacheItem{

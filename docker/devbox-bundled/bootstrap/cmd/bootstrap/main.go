@@ -37,7 +37,7 @@ func getNodeIP() (string, error) {
 		// Fallback: scan interfaces for a non-loopback address
 		return getFirstNonLoopbackIP()
 	}
-	defer conn.Close()
+	defer conn.Close() //nolint:errcheck
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
 	return localAddr.IP.String(), nil
 }

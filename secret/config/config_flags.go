@@ -52,11 +52,11 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "server.port"), defaultConfig.Server.Port, "Port to bind the HTTP server")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "server.host"), defaultConfig.Server.Host, "Host to bind the HTTP server")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.namespace"), defaultConfig.Kubernetes.Namespace, "Kubernetes namespace for secret operations")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.clusterName"), defaultConfig.Kubernetes.ClusterName, "Logical name of the cluster for secret status reporting")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.kubeconfig"), defaultConfig.Kubernetes.KubeConfig, "Path to kubeconfig file (optional)")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.namespace"), defaultConfig.Kubernetes.Namespace, "Kubernetes namespace")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "kubernetes.qps"), defaultConfig.Kubernetes.QPS, "Maximum queries per second to the Kubernetes API server")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "kubernetes.burst"), defaultConfig.Kubernetes.Burst, "Maximum burst above QPS for Kubernetes API server requests")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.timeout"), defaultConfig.Kubernetes.Timeout, "Request timeout for Kubernetes API server calls")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.timeout"), defaultConfig.Kubernetes.Timeout, "Request timeout for Kubernetes API server calls (e.g. 30s)")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.clusterName"), defaultConfig.Kubernetes.ClusterName, "Logical name of the Kubernetes cluster")
 	return cmdFlags
 }

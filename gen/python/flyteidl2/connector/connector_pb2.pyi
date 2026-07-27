@@ -3,6 +3,7 @@ from flyteidl2.core import identifier_pb2 as _identifier_pb2
 from flyteidl2.core import metrics_pb2 as _metrics_pb2
 from flyteidl2.core import security_pb2 as _security_pb2
 from flyteidl2.core import tasks_pb2 as _tasks_pb2
+from flyteidl2.logs.dataplane import payload_pb2 as _payload_pb2
 from flyteidl2.task import common_pb2 as _common_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import struct_pb2 as _struct_pb2
@@ -218,10 +219,12 @@ class GetTaskLogsResponseHeader(_message.Message):
     def __init__(self, token: _Optional[str] = ...) -> None: ...
 
 class GetTaskLogsResponseBody(_message.Message):
-    __slots__ = ["results"]
+    __slots__ = ["results", "lines"]
     RESULTS_FIELD_NUMBER: _ClassVar[int]
+    LINES_FIELD_NUMBER: _ClassVar[int]
     results: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, results: _Optional[_Iterable[str]] = ...) -> None: ...
+    lines: _containers.RepeatedCompositeFieldContainer[_payload_pb2.LogLine]
+    def __init__(self, results: _Optional[_Iterable[str]] = ..., lines: _Optional[_Iterable[_Union[_payload_pb2.LogLine, _Mapping]]] = ...) -> None: ...
 
 class GetTaskLogsResponse(_message.Message):
     __slots__ = ["header", "body"]

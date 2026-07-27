@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mitchellh/mapstructure"
+	"github.com/go-viper/mapstructure/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -177,6 +177,34 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("writer.maxItems", testValue)
 			if vInt, err := cmdFlags.GetInt("writer.maxItems"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.WriterWorkqueueConfig.IndexCacheMaxItems)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_cacheKey.enforceExecutionProjectDomain", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("cacheKey.enforceExecutionProjectDomain", testValue)
+			if vBool, err := cmdFlags.GetBool("cacheKey.enforceExecutionProjectDomain"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.CacheKey.EnforceExecutionProjectDomain)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_maxCacheAge", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.MaxCacheAge.String()
+
+			cmdFlags.Set("maxCacheAge", testValue)
+			if vString, err := cmdFlags.GetString("maxCacheAge"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.MaxCacheAge)
 
 			} else {
 				assert.FailNow(t, err.Error())

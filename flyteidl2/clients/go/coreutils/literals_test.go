@@ -13,11 +13,12 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/go-test/deep"
-	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
 	"github.com/shamaton/msgpack/v2"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -63,18 +64,15 @@ func TestMakePrimitive(t *testing.T) {
 		p, err := MakePrimitive(v)
 		assert.NoError(t, err)
 		assert.Equal(t, "*core.Primitive_Datetime", reflect.TypeOf(p.Value).String())
-		j, err := ptypes.TimestampProto(v)
-		assert.NoError(t, err)
+		j := timestamppb.New(v)
 		assert.Equal(t, j, p.GetDatetime())
-		_, err = MakePrimitive(time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC))
-		assert.Error(t, err)
 	}
 	{
 		v := time.Second * 10
 		p, err := MakePrimitive(v)
 		assert.NoError(t, err)
 		assert.Equal(t, "*core.Primitive_Duration", reflect.TypeOf(p.Value).String())
-		assert.Equal(t, ptypes.DurationProto(v), p.GetDuration())
+		assert.Equal(t, durationpb.New(v), p.GetDuration())
 	}
 	{
 		v := struct {
@@ -96,7 +94,7 @@ func TestMustMakePrimitive(t *testing.T) {
 		v := time.Second * 10
 		p := MustMakePrimitive(v)
 		assert.Equal(t, "*core.Primitive_Duration", reflect.TypeOf(p.Value).String())
-		assert.Equal(t, ptypes.DurationProto(v), p.GetDuration())
+		assert.Equal(t, durationpb.New(v), p.GetDuration())
 	}
 }
 

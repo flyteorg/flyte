@@ -2,11 +2,13 @@ from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import identity_pb2 as _identity_pb2
 from flyteidl2.common import phase_pb2 as _phase_pb2
+from flyteidl2.common import run_pb2 as _run_pb2
 from flyteidl2.core import catalog_pb2 as _catalog_pb2
 from flyteidl2.core import execution_pb2 as _execution_pb2
+from flyteidl2.core import literals_pb2 as _literals_pb2
 from flyteidl2.core import types_pb2 as _types_pb2
 from flyteidl2.task import common_pb2 as _common_pb2
-from flyteidl2.task import run_pb2 as _run_pb2
+from flyteidl2.task import run_pb2 as _run_pb2_1
 from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import struct_pb2 as _struct_pb2
@@ -52,18 +54,27 @@ RUN_SOURCE_CLI: RunSource
 RUN_SOURCE_SCHEDULE_TRIGGER: RunSource
 
 class Run(_message.Message):
-    __slots__ = ["action"]
+    __slots__ = ["action", "labels"]
+    class LabelsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     ACTION_FIELD_NUMBER: _ClassVar[int]
+    LABELS_FIELD_NUMBER: _ClassVar[int]
     action: Action
-    def __init__(self, action: _Optional[_Union[Action, _Mapping]] = ...) -> None: ...
+    labels: _containers.ScalarMap[str, str]
+    def __init__(self, action: _Optional[_Union[Action, _Mapping]] = ..., labels: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class RunDetails(_message.Message):
     __slots__ = ["run_spec", "action"]
     RUN_SPEC_FIELD_NUMBER: _ClassVar[int]
     ACTION_FIELD_NUMBER: _ClassVar[int]
-    run_spec: _run_pb2.RunSpec
+    run_spec: _run_pb2_1.RunSpec
     action: ActionDetails
-    def __init__(self, run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., action: _Optional[_Union[ActionDetails, _Mapping]] = ...) -> None: ...
+    def __init__(self, run_spec: _Optional[_Union[_run_pb2_1.RunSpec, _Mapping]] = ..., action: _Optional[_Union[ActionDetails, _Mapping]] = ...) -> None: ...
 
 class TaskAction(_message.Message):
     __slots__ = ["id", "spec", "cache_key", "cluster"]
@@ -136,13 +147,15 @@ class TraceActionMetadata(_message.Message):
     def __init__(self, name: _Optional[str] = ...) -> None: ...
 
 class ConditionActionMetadata(_message.Message):
-    __slots__ = ["name"]
+    __slots__ = ["name", "type"]
     NAME_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
     name: str
-    def __init__(self, name: _Optional[str] = ...) -> None: ...
+    type: _types_pb2.LiteralType
+    def __init__(self, name: _Optional[str] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ...) -> None: ...
 
 class ActionMetadata(_message.Message):
-    __slots__ = ["parent", "group", "executed_by", "task", "trace", "condition", "action_type", "trigger_id", "environment_name", "funtion_name", "trigger_name", "trigger_type", "source"]
+    __slots__ = ["parent", "group", "executed_by", "task", "trace", "condition", "action_type", "trigger_id", "environment_name", "funtion_name", "trigger_name", "trigger_type", "source", "relation", "recovered_from"]
     PARENT_FIELD_NUMBER: _ClassVar[int]
     GROUP_FIELD_NUMBER: _ClassVar[int]
     EXECUTED_BY_FIELD_NUMBER: _ClassVar[int]
@@ -156,6 +169,8 @@ class ActionMetadata(_message.Message):
     TRIGGER_NAME_FIELD_NUMBER: _ClassVar[int]
     TRIGGER_TYPE_FIELD_NUMBER: _ClassVar[int]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
+    RELATION_FIELD_NUMBER: _ClassVar[int]
+    RECOVERED_FROM_FIELD_NUMBER: _ClassVar[int]
     parent: str
     group: str
     executed_by: _identity_pb2.EnrichedIdentity
@@ -169,7 +184,9 @@ class ActionMetadata(_message.Message):
     trigger_name: str
     trigger_type: _common_pb2.TriggerAutomationSpec
     source: RunSource
-    def __init__(self, parent: _Optional[str] = ..., group: _Optional[str] = ..., executed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., task: _Optional[_Union[TaskActionMetadata, _Mapping]] = ..., trace: _Optional[_Union[TraceActionMetadata, _Mapping]] = ..., condition: _Optional[_Union[ConditionActionMetadata, _Mapping]] = ..., action_type: _Optional[_Union[ActionType, str]] = ..., trigger_id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ..., environment_name: _Optional[str] = ..., funtion_name: _Optional[str] = ..., trigger_name: _Optional[str] = ..., trigger_type: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ..., source: _Optional[_Union[RunSource, str]] = ...) -> None: ...
+    relation: _run_pb2.Relation
+    recovered_from: _identifier_pb2.ActionIdentifier
+    def __init__(self, parent: _Optional[str] = ..., group: _Optional[str] = ..., executed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., task: _Optional[_Union[TaskActionMetadata, _Mapping]] = ..., trace: _Optional[_Union[TraceActionMetadata, _Mapping]] = ..., condition: _Optional[_Union[ConditionActionMetadata, _Mapping]] = ..., action_type: _Optional[_Union[ActionType, str]] = ..., trigger_id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ..., environment_name: _Optional[str] = ..., funtion_name: _Optional[str] = ..., trigger_name: _Optional[str] = ..., trigger_type: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ..., source: _Optional[_Union[RunSource, str]] = ..., relation: _Optional[_Union[_run_pb2.Relation, _Mapping]] = ..., recovered_from: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ...) -> None: ...
 
 class ActionStatus(_message.Message):
     __slots__ = ["phase", "start_time", "end_time", "attempts", "cache_status", "duration_ms"]
@@ -238,25 +255,37 @@ class AbortInfo(_message.Message):
     aborted_by: _identity_pb2.EnrichedIdentity
     def __init__(self, reason: _Optional[str] = ..., aborted_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ...) -> None: ...
 
+class SignalInfo(_message.Message):
+    __slots__ = ["signalled_by", "output"]
+    SIGNALLED_BY_FIELD_NUMBER: _ClassVar[int]
+    OUTPUT_FIELD_NUMBER: _ClassVar[int]
+    signalled_by: _identity_pb2.EnrichedIdentity
+    output: _literals_pb2.Literal
+    def __init__(self, signalled_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., output: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ...) -> None: ...
+
 class ActionDetails(_message.Message):
-    __slots__ = ["id", "metadata", "status", "error_info", "abort_info", "task", "trace", "attempts"]
+    __slots__ = ["id", "metadata", "status", "error_info", "abort_info", "signal_info", "task", "trace", "condition", "attempts"]
     ID_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
     ERROR_INFO_FIELD_NUMBER: _ClassVar[int]
     ABORT_INFO_FIELD_NUMBER: _ClassVar[int]
+    SIGNAL_INFO_FIELD_NUMBER: _ClassVar[int]
     TASK_FIELD_NUMBER: _ClassVar[int]
     TRACE_FIELD_NUMBER: _ClassVar[int]
+    CONDITION_FIELD_NUMBER: _ClassVar[int]
     ATTEMPTS_FIELD_NUMBER: _ClassVar[int]
     id: _identifier_pb2.ActionIdentifier
     metadata: ActionMetadata
     status: ActionStatus
     error_info: ErrorInfo
     abort_info: AbortInfo
+    signal_info: SignalInfo
     task: _task_definition_pb2.TaskSpec
     trace: _task_definition_pb2.TraceSpec
+    condition: ConditionAction
     attempts: _containers.RepeatedCompositeFieldContainer[ActionAttempt]
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., metadata: _Optional[_Union[ActionMetadata, _Mapping]] = ..., status: _Optional[_Union[ActionStatus, _Mapping]] = ..., error_info: _Optional[_Union[ErrorInfo, _Mapping]] = ..., abort_info: _Optional[_Union[AbortInfo, _Mapping]] = ..., task: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., trace: _Optional[_Union[_task_definition_pb2.TraceSpec, _Mapping]] = ..., attempts: _Optional[_Iterable[_Union[ActionAttempt, _Mapping]]] = ...) -> None: ...
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., metadata: _Optional[_Union[ActionMetadata, _Mapping]] = ..., status: _Optional[_Union[ActionStatus, _Mapping]] = ..., error_info: _Optional[_Union[ErrorInfo, _Mapping]] = ..., abort_info: _Optional[_Union[AbortInfo, _Mapping]] = ..., signal_info: _Optional[_Union[SignalInfo, _Mapping]] = ..., task: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., trace: _Optional[_Union[_task_definition_pb2.TraceSpec, _Mapping]] = ..., condition: _Optional[_Union[ConditionAction, _Mapping]] = ..., attempts: _Optional[_Iterable[_Union[ActionAttempt, _Mapping]]] = ...) -> None: ...
 
 class ActionAttempt(_message.Message):
     __slots__ = ["phase", "start_time", "end_time", "error_info", "attempt", "log_info", "outputs", "logs_available", "cache_status", "cluster_events", "phase_transitions", "cluster", "log_context"]
@@ -353,14 +382,14 @@ class ActionSpec(_message.Message):
     GROUP_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     parent_action_name: str
-    run_spec: _run_pb2.RunSpec
+    run_spec: _run_pb2_1.RunSpec
     input_uri: str
     run_output_base: str
     task: TaskAction
     condition: ConditionAction
     trace: TraceAction
     group: str
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., run_spec: _Optional[_Union[_run_pb2.RunSpec, _Mapping]] = ..., input_uri: _Optional[str] = ..., run_output_base: _Optional[str] = ..., task: _Optional[_Union[TaskAction, _Mapping]] = ..., condition: _Optional[_Union[ConditionAction, _Mapping]] = ..., trace: _Optional[_Union[TraceAction, _Mapping]] = ..., group: _Optional[str] = ...) -> None: ...
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., run_spec: _Optional[_Union[_run_pb2_1.RunSpec, _Mapping]] = ..., input_uri: _Optional[str] = ..., run_output_base: _Optional[str] = ..., task: _Optional[_Union[TaskAction, _Mapping]] = ..., condition: _Optional[_Union[ConditionAction, _Mapping]] = ..., trace: _Optional[_Union[TraceAction, _Mapping]] = ..., group: _Optional[str] = ...) -> None: ...
 
 class TaskGroup(_message.Message):
     __slots__ = ["task_name", "environment_name", "total_runs", "latest_run_time", "recent_statuses", "average_failure_rate", "average_duration", "latest_finished_time", "created_by", "should_delete", "short_name", "error_counts", "phase_counts", "average_time_to_running"]

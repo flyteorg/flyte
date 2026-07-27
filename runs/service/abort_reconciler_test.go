@@ -170,11 +170,11 @@ func TestAbortReconciler_StartupScanPicksUpPending(t *testing.T) {
 	actionRepo, actionsClient, reconciler := newTestReconciler(t)
 
 	action1ID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{Org: "o", Project: "p", Domain: "d", Name: "run1"},
+		Run:  &common.RunIdentifier{Org: "o", Project: "p", Domain: "d", Name: "run1"},
 		Name: "run1",
 	}
 	action2ID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{Org: "o", Project: "p", Domain: "d", Name: "run2"},
+		Run:  &common.RunIdentifier{Org: "o", Project: "p", Domain: "d", Name: "run2"},
 		Name: "run2",
 	}
 

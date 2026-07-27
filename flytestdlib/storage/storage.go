@@ -1,9 +1,10 @@
 // Package storage defines extensible storage interface.
 // This package registers "storage" config section that maps to Config struct. Use NewDataStore(cfg) to initialize a
-// DataStore with the provided config. The package provides default implementation to access local, S3 (and minio),
-// and In-Memory storage. Use NewCompositeDataStore to swap any portions of the DataStore interface with an external
-// implementation (e.g. a cached protobuf store). The underlying storage is provided by extensible "stow" library. You
-// can use NewStowRawStore(cfg) to create a Raw store based on any other stow-supported configs (e.g. Azure Blob Storage)
+// DataStore with the provided config. The package provides default implementations to access local, S3 (and minio),
+// In-Memory, and Redis storage. Use NewCompositeDataStore to swap any portion of the DataStore interface with an
+// external implementation (e.g. a cached protobuf store). Blob-store access is provided by the extensible "stow"
+// library; use NewStowRawStore(cfg) to create a Raw store based on any other stow-supported config (e.g. Azure Blob
+// Storage).
 package storage
 
 import (
@@ -14,9 +15,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-
 	"github.com/flyteorg/stow"
+	"github.com/golang/protobuf/proto" //nolint: staticcheck
 )
 
 // DataReference defines a reference to data location.
@@ -165,7 +165,16 @@ func (r DataReference) Split() (scheme, container, key string, err error) {
 		return "", "", "", err
 	}
 
-	return u.Scheme, u.Host, strings.Trim(u.Path, "/"), nil
+	// Azure ADLS Gen2 encodes the filesystem in the userinfo position:
+	// abfs[s]://container@storageaccount.dfs.core.windows.net/path. url.Parse puts "container" in
+	// u.User and the storage account in u.Host, so pull the container from userinfo for these schemes.
+	// Other schemes keep using u.Host so URLs like s3://accessKey:secret@bucket/key still parse correctly.
+	container = u.Host
+	if (u.Scheme == "abfs" || u.Scheme == "abfss") && u.User != nil && u.User.Username() != "" {
+		container = u.User.Username()
+	}
+
+	return u.Scheme, container, strings.Trim(u.Path, "/"), nil
 }
 
 func (r DataReference) String() string {

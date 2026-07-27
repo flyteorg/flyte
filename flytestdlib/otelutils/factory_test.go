@@ -12,11 +12,12 @@ func TestRegisterTracerProviderWithContext(t *testing.T) {
 	serviceName := "foo"
 
 	// register tracer provider with no exporters
-	err := RegisterTracerProviderWithContext(ctx, serviceName, defaultConfig)
+	err := RegisterProvidersWithContext(ctx, serviceName, defaultConfig)
 	assert.Nil(t, err)
 
 	// validate no tracerProviders are registered
 	assert.Len(t, tracerProviders, 0)
+	assert.Len(t, meterProviders, 0)
 
 	// register tracer provider with all exporters
 	fullConfig := Config{
@@ -29,11 +30,12 @@ func TestRegisterTracerProviderWithContext(t *testing.T) {
 			ParentSampler: AlwaysSample,
 		},
 	}
-	err = RegisterTracerProviderWithContext(ctx, serviceName, &fullConfig)
+	err = RegisterProvidersWithContext(ctx, serviceName, &fullConfig)
 	assert.Nil(t, err)
 
 	// validate tracerProvider is registered
 	assert.Len(t, tracerProviders, 1)
+	assert.Len(t, meterProviders, 1)
 }
 
 func TestNewSpan(t *testing.T) {

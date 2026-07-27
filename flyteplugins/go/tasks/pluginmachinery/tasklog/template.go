@@ -49,6 +49,8 @@ type templateRegexes struct {
 	GeneratedName        *regexp.Regexp
 	AgentID              *regexp.Regexp
 	ConnectorID          *regexp.Regexp
+	RunName              *regexp.Regexp
+	ActionName           *regexp.Regexp
 }
 
 func initDefaultRegexes() templateRegexes {
@@ -78,6 +80,8 @@ func initDefaultRegexes() templateRegexes {
 		MustCreateRegex("generatedName"),
 		MustCreateRegex("agentID"),
 		MustCreateRegex("connectorID"),
+		MustCreateRegex("runName"),
+		MustCreateRegex("actionName"),
 	}
 }
 
@@ -94,7 +98,7 @@ func replaceAll(template string, vars []TemplateVar) string {
 
 func (input Input) templateVars() []TemplateVar {
 	vars := []TemplateVar{
-		TemplateVar{defaultRegexes.LogName, input.LogName},
+		{defaultRegexes.LogName, input.LogName},
 	}
 
 	gotExtraTemplateVars := input.ExtraTemplateVars != nil
@@ -174,6 +178,14 @@ func (input Input) templateVars() []TemplateVar {
 				TemplateVar{
 					defaultRegexes.ExecutionName,
 					taskExecutionIdentifier.NodeExecutionId.ExecutionId.Name,
+				},
+				TemplateVar{
+					defaultRegexes.RunName,
+					taskExecutionIdentifier.NodeExecutionId.ExecutionId.Name,
+				},
+				TemplateVar{
+					defaultRegexes.ActionName,
+					taskExecutionIdentifier.NodeExecutionId.NodeId,
 				},
 				TemplateVar{
 					defaultRegexes.ExecutionProject,

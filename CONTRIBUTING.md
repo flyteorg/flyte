@@ -17,7 +17,7 @@ Thank you for your interest in contributing to Flyte 2! This guide will help you
 
 Before contributing, ensure you have:
 - [Buf CLI](https://buf.build/docs/installation) installed
-- Go 1.24.6 or later
+- Go 1.26.3 or later
 - Node.js and npm (for TypeScript)
 - Python 3.10+ with `uv` package manager
 - Rust toolchain (if working with Rust bindings)
@@ -150,6 +150,34 @@ Regularly sync with upstream:
 git fetch upstream
 git rebase upstream/v2
 ```
+
+### CI Checks on Pull Requests from Forks
+
+For security reasons, pull requests opened from a **forked repository do not run the
+full CI suite** that runs on branches in `flyteorg/flyte`. Fork PRs execute in an
+isolated context without access to repository secrets, so any job that builds or pushes
+an image — or comments on the PR — is skipped rather than run.
+
+Checks that behave differently on fork PRs:
+
+- **CI image build & push** (`build-ci-image.yml`): skipped entirely — no image is built
+  or pushed, and no build-status comment is posted to the PR.
+- **Generated-code check** (`check-generate.yml`): runs against the fallback base image
+  instead of a PR-specific image, so it does **not** validate generated code against the
+  changes in the PR.
+- **Single-binary & devbox images** (`flyte-binary-v2.yml`): both build-and-push jobs are
+  skipped.
+
+**For contributors:** this is expected — you don't need to do anything, and a skipped
+image job is not a failure. Run `make gen` and the checks under
+[Testing and Verification](#testing-and-verification) locally to catch issues before
+requesting review.
+
+**For maintainers:** treat a skipped or green image/generate check on a fork PR as
+*"not run,"* not *"passed."* Before merging, validate the change under full CI by either
+checking out the contributor's branch locally and running the affected checks (e.g.
+`make gen` and confirming there is no diff), or pushing the branch to `flyteorg/flyte`
+(with the contributor's permission) to trigger the complete pipeline.
 
 ## Making Changes
 
@@ -339,7 +367,7 @@ Flyte 2 follows [Semantic Versioning 2.0.0](https://semver.org/):
 
 ### Creating a Release (Maintainers Only)
 
-1. **Ensure all changes are merged into `v2` branch**
+1. **Ensure all changes are merged into `main` branch**
 
 2. **Determine the version number** based on changes:
    ```bash
@@ -349,8 +377,8 @@ Flyte 2 follows [Semantic Versioning 2.0.0](https://semver.org/):
 
 3. **Create and push a tag**:
    ```bash
-   git checkout v2
-   git pull upstream v2
+   git checkout main
+   git pull upstream main
    git tag -a v2.X.Y -m "Release v2.X.Y"
    git push upstream v2.X.Y
    ```

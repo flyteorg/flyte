@@ -2,13 +2,13 @@ package secrets
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
-
-	"github.com/golang/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/golang/protobuf/proto" //nolint: staticcheck
+
+	"strconv"
+	"strings"
 )
 
 const (

@@ -1155,17 +1155,80 @@ func (_c *ActionRepo_NotifyStateUpdate_Call) RunAndReturn(run func(ctx context.C
 	return _c
 }
 
+// UpdateActionDetailedInfo provides a mock function for the type ActionRepo
+func (_mock *ActionRepo) UpdateActionDetailedInfo(ctx context.Context, actionID *common.ActionIdentifier, detailedInfo []byte) error {
+	ret := _mock.Called(ctx, actionID, detailedInfo)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateActionDetailedInfo")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, []byte) error); ok {
+		r0 = returnFunc(ctx, actionID, detailedInfo)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// ActionRepo_UpdateActionDetailedInfo_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateActionDetailedInfo'
+type ActionRepo_UpdateActionDetailedInfo_Call struct {
+	*mock.Call
+}
+
+// UpdateActionDetailedInfo is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actionID *common.ActionIdentifier
+//   - detailedInfo []byte
+func (_e *ActionRepo_Expecter) UpdateActionDetailedInfo(ctx interface{}, actionID interface{}, detailedInfo interface{}) *ActionRepo_UpdateActionDetailedInfo_Call {
+	return &ActionRepo_UpdateActionDetailedInfo_Call{Call: _e.mock.On("UpdateActionDetailedInfo", ctx, actionID, detailedInfo)}
+}
+
+func (_c *ActionRepo_UpdateActionDetailedInfo_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, detailedInfo []byte)) *ActionRepo_UpdateActionDetailedInfo_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *common.ActionIdentifier
+		if args[1] != nil {
+			arg1 = args[1].(*common.ActionIdentifier)
+		}
+		var arg2 []byte
+		if args[2] != nil {
+			arg2 = args[2].([]byte)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *ActionRepo_UpdateActionDetailedInfo_Call) Return(err error) *ActionRepo_UpdateActionDetailedInfo_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *ActionRepo_UpdateActionDetailedInfo_Call) RunAndReturn(run func(ctx context.Context, actionID *common.ActionIdentifier, detailedInfo []byte) error) *ActionRepo_UpdateActionDetailedInfo_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateActionPhase provides a mock function for the type ActionRepo
-func (_mock *ActionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time) error {
-	ret := _mock.Called(ctx, actionID, phase, attempts, cacheStatus, endTime)
+func (_mock *ActionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time, startTime *time.Time) error {
+	ret := _mock.Called(ctx, actionID, phase, attempts, cacheStatus, endTime, startTime)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateActionPhase")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, common.ActionPhase, uint32, core.CatalogCacheStatus, *time.Time) error); ok {
-		r0 = returnFunc(ctx, actionID, phase, attempts, cacheStatus, endTime)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, common.ActionPhase, uint32, core.CatalogCacheStatus, *time.Time, *time.Time) error); ok {
+		r0 = returnFunc(ctx, actionID, phase, attempts, cacheStatus, endTime, startTime)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -1184,11 +1247,12 @@ type ActionRepo_UpdateActionPhase_Call struct {
 //   - attempts uint32
 //   - cacheStatus core.CatalogCacheStatus
 //   - endTime *time.Time
-func (_e *ActionRepo_Expecter) UpdateActionPhase(ctx interface{}, actionID interface{}, phase interface{}, attempts interface{}, cacheStatus interface{}, endTime interface{}) *ActionRepo_UpdateActionPhase_Call {
-	return &ActionRepo_UpdateActionPhase_Call{Call: _e.mock.On("UpdateActionPhase", ctx, actionID, phase, attempts, cacheStatus, endTime)}
+//   - startTime *time.Time
+func (_e *ActionRepo_Expecter) UpdateActionPhase(ctx interface{}, actionID interface{}, phase interface{}, attempts interface{}, cacheStatus interface{}, endTime interface{}, startTime interface{}) *ActionRepo_UpdateActionPhase_Call {
+	return &ActionRepo_UpdateActionPhase_Call{Call: _e.mock.On("UpdateActionPhase", ctx, actionID, phase, attempts, cacheStatus, endTime, startTime)}
 }
 
-func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time)) *ActionRepo_UpdateActionPhase_Call {
+func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time, startTime *time.Time)) *ActionRepo_UpdateActionPhase_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -1214,6 +1278,10 @@ func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, a
 		if args[5] != nil {
 			arg5 = args[5].(*time.Time)
 		}
+		var arg6 *time.Time
+		if args[6] != nil {
+			arg6 = args[6].(*time.Time)
+		}
 		run(
 			arg0,
 			arg1,
@@ -1221,6 +1289,7 @@ func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, a
 			arg3,
 			arg4,
 			arg5,
+			arg6,
 		)
 	})
 	return _c
@@ -1231,7 +1300,7 @@ func (_c *ActionRepo_UpdateActionPhase_Call) Return(err error) *ActionRepo_Updat
 	return _c
 }
 
-func (_c *ActionRepo_UpdateActionPhase_Call) RunAndReturn(run func(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time) error) *ActionRepo_UpdateActionPhase_Call {
+func (_c *ActionRepo_UpdateActionPhase_Call) RunAndReturn(run func(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time, startTime *time.Time) error) *ActionRepo_UpdateActionPhase_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -56,6 +56,9 @@ class RunService(Protocol):
     async def abort_action(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def signal_event(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
     def watch_groups(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest, ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
@@ -200,6 +203,16 @@ class RunServiceASGIApplication(ConnectASGIApplication[RunService]):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.abort_action,
+                ),
+                "/flyteidl2.workflow.RunService/SignalEvent": Endpoint.unary(
+                    method=MethodInfo(
+                        name="SignalEvent",
+                        service_name="flyteidl2.workflow.RunService",
+                        input=flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventRequest,
+                        output=flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.signal_event,
                 ),
                 "/flyteidl2.workflow.RunService/WatchGroups": Endpoint.server_stream(
                     method=MethodInfo(
@@ -514,6 +527,26 @@ class RunServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    async def signal_event(
+        self,
+        request: flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="SignalEvent",
+                service_name="flyteidl2.workflow.RunService",
+                input=flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventRequest,
+                output=flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
     def watch_groups(
         self,
         request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest,
@@ -605,6 +638,8 @@ class RunServiceSync(Protocol):
     def watch_cluster_events(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchClusterEventsRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchClusterEventsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def abort_action(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def signal_event(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def watch_groups(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchGroupsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
@@ -747,6 +782,16 @@ class RunServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.abort_action,
+                ),
+                "/flyteidl2.workflow.RunService/SignalEvent": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="SignalEvent",
+                        service_name="flyteidl2.workflow.RunService",
+                        input=flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventRequest,
+                        output=flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.signal_event,
                 ),
                 "/flyteidl2.workflow.RunService/WatchGroups": EndpointSync.server_stream(
                     method=MethodInfo(
@@ -1055,6 +1100,26 @@ class RunServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.workflow.RunService",
                 input=flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionRequest,
                 output=flyteidl2_dot_workflow_dot_run__service__pb2.AbortActionResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def signal_event(
+        self,
+        request: flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="SignalEvent",
+                service_name="flyteidl2.workflow.RunService",
+                input=flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventRequest,
+                output=flyteidl2_dot_workflow_dot_run__service__pb2.SignalEventResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
             ),
             headers=headers,

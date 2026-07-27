@@ -10,7 +10,7 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class SelectClusterRequest(_message.Message):
-    __slots__ = ["org_id", "project_id", "task_id", "action_id", "action_attempt_id", "app_id", "operation"]
+    __slots__ = ["org_id", "project_id", "task_id", "action_id", "action_attempt_id", "app_id", "cluster_pool_id", "domain_id", "operation"]
     class Operation(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         OPERATION_UNSPECIFIED: _ClassVar[SelectClusterRequest.Operation]
@@ -21,6 +21,8 @@ class SelectClusterRequest(_message.Message):
         OPERATION_CREATE_DOWNLOAD_LINK: _ClassVar[SelectClusterRequest.Operation]
         OPERATION_TAIL_LOGS: _ClassVar[SelectClusterRequest.Operation]
         OPERATION_GET_ACTION_ATTEMPT_METRICS: _ClassVar[SelectClusterRequest.Operation]
+        OPERATION_USE_SECRETS: _ClassVar[SelectClusterRequest.Operation]
+        OPERATION_UPLOAD_TRIGGER: _ClassVar[SelectClusterRequest.Operation]
     OPERATION_UNSPECIFIED: SelectClusterRequest.Operation
     OPERATION_CREATE_UPLOAD_LOCATION: SelectClusterRequest.Operation
     OPERATION_UPLOAD_INPUTS: SelectClusterRequest.Operation
@@ -29,12 +31,16 @@ class SelectClusterRequest(_message.Message):
     OPERATION_CREATE_DOWNLOAD_LINK: SelectClusterRequest.Operation
     OPERATION_TAIL_LOGS: SelectClusterRequest.Operation
     OPERATION_GET_ACTION_ATTEMPT_METRICS: SelectClusterRequest.Operation
+    OPERATION_USE_SECRETS: SelectClusterRequest.Operation
+    OPERATION_UPLOAD_TRIGGER: SelectClusterRequest.Operation
     ORG_ID_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
     TASK_ID_FIELD_NUMBER: _ClassVar[int]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     ACTION_ATTEMPT_ID_FIELD_NUMBER: _ClassVar[int]
     APP_ID_FIELD_NUMBER: _ClassVar[int]
+    CLUSTER_POOL_ID_FIELD_NUMBER: _ClassVar[int]
+    DOMAIN_ID_FIELD_NUMBER: _ClassVar[int]
     OPERATION_FIELD_NUMBER: _ClassVar[int]
     org_id: _identifier_pb2.OrgIdentifier
     project_id: _identifier_pb2.ProjectIdentifier
@@ -42,8 +48,10 @@ class SelectClusterRequest(_message.Message):
     action_id: _identifier_pb2.ActionIdentifier
     action_attempt_id: _identifier_pb2.ActionAttemptIdentifier
     app_id: _app_definition_pb2.Identifier
+    cluster_pool_id: _identifier_pb2.ClusterPoolIdentifier
+    domain_id: _identifier_pb2.DomainIdentifier
     operation: SelectClusterRequest.Operation
-    def __init__(self, org_id: _Optional[_Union[_identifier_pb2.OrgIdentifier, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., action_attempt_id: _Optional[_Union[_identifier_pb2.ActionAttemptIdentifier, _Mapping]] = ..., app_id: _Optional[_Union[_app_definition_pb2.Identifier, _Mapping]] = ..., operation: _Optional[_Union[SelectClusterRequest.Operation, str]] = ...) -> None: ...
+    def __init__(self, org_id: _Optional[_Union[_identifier_pb2.OrgIdentifier, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., action_attempt_id: _Optional[_Union[_identifier_pb2.ActionAttemptIdentifier, _Mapping]] = ..., app_id: _Optional[_Union[_app_definition_pb2.Identifier, _Mapping]] = ..., cluster_pool_id: _Optional[_Union[_identifier_pb2.ClusterPoolIdentifier, _Mapping]] = ..., domain_id: _Optional[_Union[_identifier_pb2.DomainIdentifier, _Mapping]] = ..., operation: _Optional[_Union[SelectClusterRequest.Operation, str]] = ...) -> None: ...
 
 class SelectClusterResponse(_message.Message):
     __slots__ = ["cluster_endpoint"]

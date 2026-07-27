@@ -62,14 +62,16 @@ class Requirements(_message.Message):
     def __init__(self, file: _Optional[str] = ..., options: _Optional[_Union[PipOptions, _Mapping]] = ..., secret_mounts: _Optional[_Iterable[_Union[_security_pb2.Secret, _Mapping]]] = ...) -> None: ...
 
 class PythonWheels(_message.Message):
-    __slots__ = ["dir", "options", "secret_mounts"]
+    __slots__ = ["dir", "options", "secret_mounts", "package_name"]
     DIR_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
     SECRET_MOUNTS_FIELD_NUMBER: _ClassVar[int]
+    PACKAGE_NAME_FIELD_NUMBER: _ClassVar[int]
     dir: str
     options: PipOptions
     secret_mounts: _containers.RepeatedCompositeFieldContainer[_security_pb2.Secret]
-    def __init__(self, dir: _Optional[str] = ..., options: _Optional[_Union[PipOptions, _Mapping]] = ..., secret_mounts: _Optional[_Iterable[_Union[_security_pb2.Secret, _Mapping]]] = ...) -> None: ...
+    package_name: str
+    def __init__(self, dir: _Optional[str] = ..., options: _Optional[_Union[PipOptions, _Mapping]] = ..., secret_mounts: _Optional[_Iterable[_Union[_security_pb2.Secret, _Mapping]]] = ..., package_name: _Optional[str] = ...) -> None: ...
 
 class UVProject(_message.Message):
     __slots__ = ["pyproject", "uvlock", "options", "secret_mounts", "source_dir"]

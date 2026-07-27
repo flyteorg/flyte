@@ -39,6 +39,9 @@ message HeadGroupSpec {
   map<string, string> ray_start_params = 1;
   // Pod Spec for the ray head pod
   core.K8sPod k8s_pod = 2;
+  // Encapsulates all non-standard resources, not captured by
+  // v1.ResourceRequirements, to allocate to a task.
+  flyteidl2.core.ExtendedResources extended_resources = 3;
 }
 
 // WorkerGroupSpec are the specs for the worker pods
@@ -56,4 +59,7 @@ message WorkerGroupSpec {
   map<string, string> ray_start_params = 5;
   // Pod Spec for ray worker pods
   core.K8sPod k8s_pod = 6;
+  // Encapsulates all non-standard resources, not captured by
+  // v1.ResourceRequirements, to allocate to a task.
+  flyteidl2.core.ExtendedResources extended_resources = 7;
 }

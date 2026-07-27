@@ -74,6 +74,10 @@ func TestReadOrigin(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, core.ExecutionError_USER, ee.Kind)
 		assert.False(t, ee.IsRecoverable)
+		// Proto-level Recoverability mirrors the container's kind so the bit
+		// travels on the wire to downstream services. Without this, all errors
+		// surface as the proto3 zero (NON_RECOVERABLE) regardless of intent.
+		assert.Equal(t, core.ContainerError_NON_RECOVERABLE, ee.GetRecoverability())
 		exists, err := r.DeckExists(ctx)
 		assert.NoError(t, err)
 		assert.True(t, exists)
@@ -105,5 +109,6 @@ func TestReadOrigin(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, core.ExecutionError_SYSTEM, ee.Kind)
 		assert.True(t, ee.IsRecoverable)
+		assert.Equal(t, core.ContainerError_RECOVERABLE, ee.GetRecoverability())
 	})
 }

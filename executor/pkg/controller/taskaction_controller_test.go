@@ -30,7 +30,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
@@ -49,8 +49,10 @@ type fakePlugin struct {
 	abortCalls int
 }
 
-func (f *fakePlugin) GetID() string                              { return f.id }
-func (f *fakePlugin) GetProperties() pluginsCore.PluginProperties { return pluginsCore.PluginProperties{} }
+func (f *fakePlugin) GetID() string { return f.id }
+func (f *fakePlugin) GetProperties() pluginsCore.PluginProperties {
+	return pluginsCore.PluginProperties{}
+}
 func (f *fakePlugin) Handle(_ context.Context, _ pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
 	return pluginsCore.UnknownTransition, nil
 }
@@ -172,7 +174,7 @@ var _ = Describe("TaskAction Controller", func() {
 			controllerReconciler := &TaskActionReconciler{
 				Client:         k8sClient,
 				Scheme:         k8sClient.Scheme(),
-				Recorder:       record.NewFakeRecorder(10),
+				Recorder:       events.NewFakeRecorder(10),
 				PluginRegistry: pluginRegistry,
 				DataStore:      dataStore,
 				eventsClient:   &fakeEventsClient{},
@@ -361,7 +363,7 @@ var _ = Describe("TaskAction Controller", func() {
 			r := &TaskActionReconciler{
 				Client:            k8sClient,
 				Scheme:            k8sClient.Scheme(),
-				Recorder:          record.NewFakeRecorder(10),
+				Recorder:          events.NewFakeRecorder(10),
 				MaxSystemFailures: 3,
 			}
 			ta := &flyteorgv1.TaskAction{}
@@ -385,7 +387,7 @@ var _ = Describe("TaskAction Controller", func() {
 			r := &TaskActionReconciler{
 				Client:            k8sClient,
 				Scheme:            k8sClient.Scheme(),
-				Recorder:          record.NewFakeRecorder(10),
+				Recorder:          events.NewFakeRecorder(10),
 				eventsClient:      &fakeEventsClient{},
 				MaxSystemFailures: 2,
 			}
@@ -540,8 +542,8 @@ var _ = Describe("TaskAction Controller", func() {
 		BeforeEach(func() {
 			resource := &flyteorgv1.TaskAction{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      abortResourceName,
-					Namespace: "default",
+					Name:       abortResourceName,
+					Namespace:  "default",
 					Finalizers: []string{taskActionFinalizer},
 				},
 				Spec: flyteorgv1.TaskActionSpec{
@@ -573,7 +575,7 @@ var _ = Describe("TaskAction Controller", func() {
 			reconciler := &TaskActionReconciler{
 				Client:         k8sClient,
 				Scheme:         k8sClient.Scheme(),
-				Recorder:       record.NewFakeRecorder(10),
+				Recorder:       events.NewFakeRecorder(10),
 				PluginRegistry: pluginRegistry,
 				DataStore:      dataStore,
 				eventsClient:   recorder,

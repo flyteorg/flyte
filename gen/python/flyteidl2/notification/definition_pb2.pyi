@@ -13,6 +13,7 @@ class EventType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
     EVENT_TYPE_UNSPECIFIED: _ClassVar[EventType]
     EVENT_TYPE_RUN_COMPLETED: _ClassVar[EventType]
+    EVENT_TYPE_ACTION_PAUSED: _ClassVar[EventType]
 
 class HttpMethod(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
@@ -28,6 +29,7 @@ class HttpMethod(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     HTTP_METHOD_PATCH: _ClassVar[HttpMethod]
 EVENT_TYPE_UNSPECIFIED: EventType
 EVENT_TYPE_RUN_COMPLETED: EventType
+EVENT_TYPE_ACTION_PAUSED: EventType
 HTTP_METHOD_UNSPECIFIED: HttpMethod
 HTTP_METHOD_GET: HttpMethod
 HTTP_METHOD_HEAD: HttpMethod
@@ -56,6 +58,18 @@ class RunCompletedNotificationTemplateData(_message.Message):
     phase: _phase_pb2.ActionPhase
     error: str
     def __init__(self, run: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., error: _Optional[str] = ...) -> None: ...
+
+class ActionPausedNotificationTemplateData(_message.Message):
+    __slots__ = ["action", "prompt", "description", "prompt_type"]
+    ACTION_FIELD_NUMBER: _ClassVar[int]
+    PROMPT_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    PROMPT_TYPE_FIELD_NUMBER: _ClassVar[int]
+    action: _identifier_pb2.ActionIdentifier
+    prompt: str
+    description: str
+    prompt_type: str
+    def __init__(self, action: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., prompt: _Optional[str] = ..., description: _Optional[str] = ..., prompt_type: _Optional[str] = ...) -> None: ...
 
 class WebhookDeliveryTemplate(_message.Message):
     __slots__ = ["url", "method", "headers", "body_template"]

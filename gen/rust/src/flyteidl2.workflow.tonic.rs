@@ -2639,6 +2639,31 @@ pub mod run_service_client {
                 .insert(GrpcMethod::new("flyteidl2.workflow.RunService", "AbortAction"));
             self.inner.unary(req, path, codec).await
         }
+        pub async fn signal_event(
+            &mut self,
+            request: impl tonic::IntoRequest<super::SignalEventRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::SignalEventResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.workflow.RunService/SignalEvent",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("flyteidl2.workflow.RunService", "SignalEvent"));
+            self.inner.unary(req, path, codec).await
+        }
         pub async fn watch_groups(
             &mut self,
             request: impl tonic::IntoRequest<super::WatchGroupsRequest>,
@@ -2852,6 +2877,13 @@ pub mod run_service_server {
             request: tonic::Request<super::AbortActionRequest>,
         ) -> std::result::Result<
             tonic::Response<super::AbortActionResponse>,
+            tonic::Status,
+        >;
+        async fn signal_event(
+            &self,
+            request: tonic::Request<super::SignalEventRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::SignalEventResponse>,
             tonic::Status,
         >;
         /// Server streaming response type for the WatchGroups method.
@@ -3538,6 +3570,51 @@ pub mod run_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let method = AbortActionSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.workflow.RunService/SignalEvent" => {
+                    #[allow(non_camel_case_types)]
+                    struct SignalEventSvc<T: RunService>(pub Arc<T>);
+                    impl<
+                        T: RunService,
+                    > tonic::server::UnaryService<super::SignalEventRequest>
+                    for SignalEventSvc<T> {
+                        type Response = super::SignalEventResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::SignalEventRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as RunService>::signal_event(&inner, request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = SignalEventSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

@@ -34,7 +34,7 @@ func (r *lazyUploadingTaskReader) Path(ctx context.Context) (storage.DataReferen
 	// We are using atomic because it is ok to re-upload in some cases. We know that most of the plugins are
 	// executed in a single go-routine, so chances of a race condition are minimal.
 	if !r.uploaded.Load() {
-		t, err := r.SimpleTaskReader.Read(ctx)
+		t, err := r.Read(ctx)
 		if err != nil {
 			return "", err
 		}

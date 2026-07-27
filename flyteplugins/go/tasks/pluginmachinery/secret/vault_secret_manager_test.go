@@ -306,7 +306,7 @@ func TestVaultSecretManagerInjector_Inject(t *testing.T) {
 				return
 			}
 
-			uuid := RetrieveUUID(got.ObjectMeta.Annotations)
+			uuid := RetrieveUUID(got.Annotations)
 			expected := tt.want(uuid)
 			if diff := deep.Equal(got, expected); diff != nil {
 				t.Errorf("Inject() Diff = %v\r\n got = %v\r\n want = %v", diff, got, expected)

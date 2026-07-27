@@ -7,6 +7,9 @@ updates:
     # Skip the folder where your generated/dist code lives
     exclude-paths:
       - "gen/**"
+    cooldown:
+      default-days: 5
+    target-branch: "main"
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
@@ -14,6 +17,19 @@ updates:
     # Skip the folder where your generated/dist code lives
     exclude-paths:
       - "gen/**"
+    cooldown:
+      default-days: 5
+    target-branch: "main"
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    # Skip the folder where your generated/dist code lives
+    exclude-paths:
+      - "gen/**"
+    cooldown:
+      default-days: 5
+    target-branch: "master"
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
@@ -21,6 +37,9 @@ updates:
     # Skip the folder where your generated/dist code lives
     exclude-paths:
       - "gen/**"
+    cooldown:
+      default-days: 5
+    target-branch: "main"
   - package-ecosystem: "uv"
     directory: "/"
     schedule:
@@ -28,3 +47,6 @@ updates:
     # Skip the folder where your generated/dist code lives
     exclude-paths:
       - "gen/**"
+    cooldown:
+      default-days: 5
+    target-branch: "main"

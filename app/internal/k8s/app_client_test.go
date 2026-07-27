@@ -36,6 +36,9 @@ func testScheme(t *testing.T) *runtime.Scheme {
 	return s
 }
 
+// AppNamespace is the namespace all test clients are configured with.
+const AppNamespace = "flyte"
+
 // testRevision builds a Knative Revision object with a given ActualReplicas count.
 func testRevision(name, namespace string, actualReplicas int32) *servingv1.Revision {
 	return &servingv1.Revision{
@@ -62,7 +65,7 @@ func testClient(t *testing.T, objs ...client.Object) *AppK8sClient {
 		MaxRequestTimeout:     time.Hour,
 		WatchBufferSize:       100,
 	}
-	return NewAppK8sClient(fc, nil, cfg)
+	return NewAppK8sClient(fc, nil, AppNamespace, cfg)
 }
 
 // testApp builds a minimal flyteapp.App for use in tests.
@@ -103,6 +106,124 @@ func TestDeploy_Create(t *testing.T) {
 	assert.Equal(t, "proj/dev/myapp", ksvc.Annotations[annotationAppID])
 }
 
+func TestDeploy_InjectsInternalAppEndpointPattern(t *testing.T) {
+	c := testClient(t)
+	c.cfg.NamespacedNameSuffixTemplate = "{{ project }}-{{ domain }}"
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+	envVars := ksvc.Spec.Template.Spec.Containers[0].Env
+	var pattern string
+	for _, e := range envVars {
+		if e.Name == "INTERNAL_APP_ENDPOINT_PATTERN" {
+			pattern = e.Value
+			break
+		}
+	}
+	assert.Equal(t, "http://{app_fqdn}-proj-dev.flyte.svc.cluster.local", pattern)
+}
+
+func TestDeploy_InjectsExecutionEnvVars(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+	envVars := ksvc.Spec.Template.Spec.Containers[0].Env
+	var gotProject, gotDomain string
+	for _, e := range envVars {
+		if e.Name == "FLYTE_INTERNAL_EXECUTION_PROJECT" {
+			gotProject = e.Value
+		}
+		if e.Name == "FLYTE_INTERNAL_EXECUTION_DOMAIN" {
+			gotDomain = e.Value
+		}
+	}
+	assert.Equal(t, "proj", gotProject)
+	assert.Equal(t, "dev", gotDomain)
+}
+
+func TestDeploy_InjectsSecretLabelsAndAnnotations(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	app.Spec.SecurityContext = &flyteapp.SecurityContext{
+		Secrets: []*flytecoreapp.Secret{
+			{Group: "my_group", Key: "my_key", MountRequirement: flytecoreapp.Secret_ENV_VAR},
+		},
+	}
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+	tpl := ksvc.Spec.Template
+	assert.Equal(t, "flyte", tpl.Labels["organization"])
+	assert.Equal(t, "proj", tpl.Labels["project"])
+	assert.Equal(t, "dev", tpl.Labels["domain"])
+	assert.Equal(t, "true", tpl.Labels["inject-flyte-secrets"])
+	assert.Contains(t, tpl.Annotations, "flyte.secrets/s0")
+}
+
+func TestDeploy_NoSecretLabelsOrAnnotationsWhenNoSecrets(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+	tpl := ksvc.Spec.Template
+	_, hasLabel := tpl.Labels["inject-flyte-secrets"]
+	assert.False(t, hasLabel, "no inject-flyte-secrets label when no secrets configured")
+	_, hasAnnotation := tpl.Annotations["flyte.secrets/s0"]
+	assert.False(t, hasAnnotation, "no secret annotations when no secrets configured")
+}
+
+func TestDeploy_DefaultServiceAccount(t *testing.T) {
+	c := testClient(t)
+	c.cfg.DefaultServiceAccount = "flyte2"
+	require.NoError(t, c.Deploy(context.Background(), testApp("proj", "dev", "myapp", "nginx:latest")))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+	assert.Equal(t, "flyte2", ksvc.Spec.Template.Spec.ServiceAccountName)
+}
+
+func TestDeploy_AppServiceAccountOverridesDefault(t *testing.T) {
+	c := testClient(t)
+	c.cfg.DefaultServiceAccount = "flyte2"
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	app.Spec.SecurityContext = &flyteapp.SecurityContext{
+		RunAs: &flytecoreapp.Identity{K8SServiceAccount: "app-requested-sa"},
+	}
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+	assert.Equal(t, "app-requested-sa", ksvc.Spec.Template.Spec.ServiceAccountName)
+}
+
+func TestDeploy_NoServiceAccountWhenUnset(t *testing.T) {
+	c := testClient(t) // cfg.DefaultServiceAccount is empty
+	require.NoError(t, c.Deploy(context.Background(), testApp("proj", "dev", "myapp", "nginx:latest")))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+	assert.Empty(t, ksvc.Spec.Template.Spec.ServiceAccountName)
+}
+
 func TestDeploy_UpdateOnSpecChange(t *testing.T) {
 	c := testClient(t)
 	app := testApp("proj", "dev", "myapp", "nginx:1.0")
@@ -137,6 +258,34 @@ func TestDeploy_SkipUpdateWhenUnchanged(t *testing.T) {
 	assert.Equal(t, initialRV, ksvc.ResourceVersion, "resource version should not change on no-op deploy")
 }
 
+func TestDeploy_AfterStop_ClearsStoppedLabels(t *testing.T) {
+	// Regression: Deploy() was skipping the update when the spec SHA was unchanged,
+	// even if Stop() had marked the KService as stopped. Clicking "Start App" in the UI sends
+	// the same spec, so the SHA matched and the app could never restart.
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
+	require.NoError(t, c.Stop(context.Background(), id))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+	assert.Equal(t, "true", ksvc.Labels[labelAppStopped], "app-stopped label should be set after Stop")
+	assert.Equal(t, visibilityClusterLocal, ksvc.Labels[labelKnativeVisibility], "service should be cluster-local after Stop")
+
+	// Deploy same spec (as "Start App" would) — must not skip due to SHA match.
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+	_, stopped := ksvc.Labels[labelAppStopped]
+	assert.False(t, stopped, "app-stopped label must be cleared after Deploy following a Stop")
+	_, visibility := ksvc.Labels[labelKnativeVisibility]
+	assert.False(t, visibility, "visibility label must be cleared after Deploy following a Stop")
+}
+
 func TestStop(t *testing.T) {
 	c := testClient(t)
 	app := testApp("proj", "dev", "myapp", "nginx:latest")
@@ -148,7 +297,10 @@ func TestStop(t *testing.T) {
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
 		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
-	assert.Equal(t, "0", ksvc.Spec.Template.Annotations["autoscaling.knative.dev/max-scale"])
+	assert.Equal(t, "true", ksvc.Labels[labelAppStopped])
+	assert.Equal(t, visibilityClusterLocal, ksvc.Labels[labelKnativeVisibility])
+	assert.Equal(t, "0", ksvc.Spec.Template.Annotations["autoscaling.knative.dev/min-scale"])
+	assert.Equal(t, "0", ksvc.Spec.Template.Annotations["autoscaling.knative.dev/initial-scale"])
 }
 
 func TestStop_NotFound(t *testing.T) {
@@ -156,6 +308,67 @@ func TestStop_NotFound(t *testing.T) {
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "missing"}
 	// Should succeed silently — already gone.
 	require.NoError(t, c.Stop(context.Background(), id))
+}
+
+func TestStop_DeletesLatestReadyRevision(t *testing.T) {
+	// When a KService has a LatestReadyRevisionName, Stop() must delete that
+	// Revision so its Deployment and pods are immediately terminated.
+	// Updating the KService template alone is not sufficient — it does not immediately terminate existing pods.
+	// for the autoscaler and does not kill running pods; they only scale down after
+	// the stable window (~60s) with no traffic.
+	s := testScheme(t)
+	ksvc := &servingv1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "myapp-proj-dev",
+			Namespace: AppNamespace,
+			Labels: map[string]string{
+				labelAppManaged: "true",
+				labelProject:    "proj",
+				labelDomain:     "dev",
+				labelAppName:    "myapp",
+			},
+			Annotations: map[string]string{
+				annotationAppID: "proj/dev/myapp",
+			},
+		},
+	}
+	ksvc.Status.LatestReadyRevisionName = "myapp-proj-dev-00001"
+
+	rev := &servingv1.Revision{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "myapp-proj-dev-00001",
+			Namespace: AppNamespace,
+		},
+	}
+
+	fc := fake.NewClientBuilder().
+		WithScheme(s).
+		WithObjects(ksvc, rev).
+		WithStatusSubresource(ksvc).
+		Build()
+	c := &AppK8sClient{
+		k8sClient: fc,
+		namespace: AppNamespace,
+		cfg:       &config.InternalAppConfig{},
+	}
+
+	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
+	require.NoError(t, c.Stop(context.Background(), id))
+
+	// KService must be marked stopped so Deploy can reliably clear the stopped state.
+	gotKsvc := &servingv1.Service{}
+	require.NoError(t, fc.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, gotKsvc))
+	assert.Equal(t, "true", gotKsvc.Labels[labelAppStopped],
+		"KService must carry the app-stopped label after Stop")
+	assert.Equal(t, visibilityClusterLocal, gotKsvc.Labels[labelKnativeVisibility],
+		"KService must be cluster-local after Stop")
+
+	// LatestReadyRevision must be deleted so its pods are terminated immediately.
+	gotRev := &servingv1.Revision{}
+	err := fc.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev-00001", Namespace: AppNamespace}, gotRev)
+	assert.True(t, k8serrors.IsNotFound(err), "LatestReadyRevision must be deleted after Stop")
 }
 
 func TestDelete(t *testing.T) {
@@ -231,6 +444,7 @@ func TestGetApp_CurrentReplicas(t *testing.T) {
 		Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
+		namespace: AppNamespace,
 		cfg:       &config.InternalAppConfig{},
 	}
 
@@ -303,6 +517,7 @@ func TestList(t *testing.T) {
 		Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
+		namespace: AppNamespace,
 		cfg: &config.InternalAppConfig{
 			DefaultRequestTimeout: 5 * time.Minute,
 			MaxRequestTimeout:     time.Hour,
@@ -337,6 +552,7 @@ func TestGetReplicas(t *testing.T) {
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(pod).Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
+		namespace: AppNamespace,
 		cfg:       &config.InternalAppConfig{},
 	}
 
@@ -381,7 +597,7 @@ func TestGetReplicas_FiltersToLatestRevision(t *testing.T) {
 		Status: corev1.PodStatus{Phase: corev1.PodRunning},
 	}
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(ksvc, newPod, oldPod).Build()
-	c := &AppK8sClient{k8sClient: fc, cfg: &config.InternalAppConfig{}}
+	c := &AppK8sClient{k8sClient: fc, namespace: AppNamespace, cfg: &config.InternalAppConfig{}}
 
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
 	replicas, err := c.GetReplicas(context.Background(), id)
@@ -401,6 +617,7 @@ func TestDeleteReplica(t *testing.T) {
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(pod).Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
+		namespace: AppNamespace,
 		cfg:       &config.InternalAppConfig{},
 	}
 
@@ -487,6 +704,25 @@ func TestKServiceName(t *testing.T) {
 		got := KServiceName(id)
 		assert.Equal(t, tt.want, got)
 		assert.LessOrEqual(t, len(got), maxKServiceNameLen)
+	}
+}
+
+func TestRenderNamespacedSuffix(t *testing.T) {
+	tests := []struct {
+		tmpl    string
+		project string
+		domain  string
+		want    string
+	}{
+		{"{{ project }}-{{ domain }}", "myproject", "dev", "myproject-dev"},
+		{"{{ project }}-{{ domain }}", "MyProject", "Dev", "myproject-dev"},
+		{"{{ project }}-{{ domain }}", "proj", "prod", "proj-prod"},
+		{"custom-{{ domain }}", "proj", "dev", "custom-dev"},
+		{"", "proj", "dev", ""},
+	}
+	for _, tt := range tests {
+		got := renderNamespacedSuffix(tt.tmpl, tt.project, tt.domain)
+		assert.Equal(t, tt.want, got)
 	}
 }
 
@@ -585,7 +821,6 @@ func TestSubscribe_ReceivesEvent(t *testing.T) {
 	}
 }
 
-
 func TestSubscribe_AppSpecificDoesNotReceiveOtherApps(t *testing.T) {
 	c := testClient(t)
 	ch := c.Subscribe("app1")
@@ -644,6 +879,19 @@ func testKsvc(name, ns, rv string) *servingv1.Service {
 }
 
 // --- Status message format tests ---
+
+func TestKserviceToApp_StoppedDesiredState(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+
+	require.NoError(t, c.Deploy(context.Background(), app))
+	require.NoError(t, c.Stop(context.Background(), app.Metadata.Id))
+
+	got, err := c.GetApp(context.Background(), app.Metadata.Id)
+	require.NoError(t, err)
+	assert.Equal(t, flyteapp.Spec_DESIRED_STATE_STOPPED, got.GetSpec().GetDesiredState(),
+		"stopped app should have DesiredState=STOPPED in the returned spec")
+}
 
 func TestKserviceToStatus_Messages(t *testing.T) {
 	tests := []struct {
@@ -715,10 +963,10 @@ func TestKserviceToStatus_Messages(t *testing.T) {
 			name: "stopped",
 			ksvc: func() *servingv1.Service {
 				ksvc := testKsvc("myapp", AppNamespace, "1")
-				if ksvc.Spec.Template.Annotations == nil {
-					ksvc.Spec.Template.Annotations = map[string]string{}
+				if ksvc.Labels == nil {
+					ksvc.Labels = map[string]string{}
 				}
-				ksvc.Spec.Template.Annotations["autoscaling.knative.dev/max-scale"] = "0"
+				ksvc.Labels[labelAppStopped] = "true"
 				return ksvc
 			},
 			wantConditions: []struct {

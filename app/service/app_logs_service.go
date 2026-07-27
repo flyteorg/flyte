@@ -33,7 +33,7 @@ func (s *AppLogsService) TailLogs(
 	if err != nil {
 		return connect.NewError(connect.CodeInternal, err)
 	}
-	defer clientStream.Close()
+	defer clientStream.Close() //nolint:errcheck
 	for clientStream.Receive() {
 		if err := stream.Send(clientStream.Msg()); err != nil {
 			return err

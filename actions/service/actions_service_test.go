@@ -74,50 +74,18 @@ func TestEnqueue(t *testing.T) {
 	})
 }
 
-func TestGetLatestState(t *testing.T) {
-	t.Run("success", func(t *testing.T) {
-		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsService(m)
-
-		m.EXPECT().GetState(mock.Anything, testActionID).Return(`{"status":"ok"}`, nil)
-
-		resp, err := svc.GetLatestState(context.Background(), connect.NewRequest(&actions.GetLatestStateRequest{
-			ActionId: testActionID,
-			Attempt:  1,
-		}))
-
-		assert.NoError(t, err)
-		assert.Equal(t, `{"status":"ok"}`, resp.Msg.State)
-	})
-
-	t.Run("client error returns not found", func(t *testing.T) {
-		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsService(m)
-
-		m.EXPECT().GetState(mock.Anything, testActionID).Return("", errors.New("not found"))
-
-		_, err := svc.GetLatestState(context.Background(), connect.NewRequest(&actions.GetLatestStateRequest{
-			ActionId: testActionID,
-			Attempt:  1,
-		}))
-
-		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
-	})
-}
-
 func TestUpdate(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		m := mocks.NewActionsClientInterface(t)
 		svc := NewActionsService(m)
 
 		status := &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED}
-		m.EXPECT().PutState(mock.Anything, testActionID, uint32(1), status, `{}`).Return(nil)
+		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status).Return(nil)
 
 		resp, err := svc.Update(context.Background(), connect.NewRequest(&actions.UpdateRequest{
 			ActionId: testActionID,
 			Attempt:  1,
 			Status:   status,
-			State:    `{}`,
 		}))
 
 		assert.NoError(t, err)
@@ -129,13 +97,12 @@ func TestUpdate(t *testing.T) {
 		svc := NewActionsService(m)
 
 		status := &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_RUNNING}
-		m.EXPECT().PutState(mock.Anything, testActionID, uint32(1), status, `{}`).Return(errors.New("write failed"))
+		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status).Return(errors.New("write failed"))
 
 		_, err := svc.Update(context.Background(), connect.NewRequest(&actions.UpdateRequest{
 			ActionId: testActionID,
 			Attempt:  1,
 			Status:   status,
-			State:    `{}`,
 		}))
 
 		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
@@ -167,6 +134,66 @@ func TestAbort(t *testing.T) {
 
 		_, err := svc.Abort(context.Background(), connect.NewRequest(&actions.AbortRequest{
 			ActionId: testActionID,
+		}))
+
+		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
+	})
+}
+
+func TestSignal(t *testing.T) {
+	value := &core.Literal{
+		Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{
+				Value: &core.Primitive_Boolean{Boolean: true},
+			}},
+		}},
+	}
+	signalledBy := &common.EnrichedIdentity{
+		Principal: &common.EnrichedIdentity_User{
+			User: &common.User{Id: &common.UserIdentifier{Subject: "user@example.com"}},
+		},
+	}
+
+	t.Run("success extracts caller subject", func(t *testing.T) {
+		m := mocks.NewActionsClientInterface(t)
+		svc := NewActionsService(m)
+
+		m.EXPECT().Signal(mock.Anything, testActionID, value, "user@example.com").Return(nil)
+
+		resp, err := svc.Signal(context.Background(), connect.NewRequest(&actions.SignalRequest{
+			ActionId:    testActionID,
+			Value:       value,
+			SignalledBy: signalledBy,
+		}))
+
+		assert.NoError(t, err)
+		assert.NotNil(t, resp)
+	})
+
+	t.Run("typed client error passes through", func(t *testing.T) {
+		m := mocks.NewActionsClientInterface(t)
+		svc := NewActionsService(m)
+
+		m.EXPECT().Signal(mock.Anything, testActionID, value, "").
+			Return(connect.NewError(connect.CodeNotFound, errors.New("not found")))
+
+		_, err := svc.Signal(context.Background(), connect.NewRequest(&actions.SignalRequest{
+			ActionId: testActionID,
+			Value:    value,
+		}))
+
+		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	})
+
+	t.Run("untyped client error becomes internal", func(t *testing.T) {
+		m := mocks.NewActionsClientInterface(t)
+		svc := NewActionsService(m)
+
+		m.EXPECT().Signal(mock.Anything, testActionID, value, "").Return(errors.New("k8s down"))
+
+		_, err := svc.Signal(context.Background(), connect.NewRequest(&actions.SignalRequest{
+			ActionId: testActionID,
+			Value:    value,
 		}))
 
 		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
@@ -212,7 +239,7 @@ func TestTaskActionToUpdate_PopulatesErrorOnFailure(t *testing.T) {
 		},
 	}
 
-	upd := taskActionToUpdate(ta)
+	upd := taskActionToUpdate(context.Background(), ta)
 
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_FAILED, upd.Phase)
 	if assert.NotNil(t, upd.Error, "ActionUpdate.Error must be populated for failed actions with ErrorState") {
@@ -236,7 +263,7 @@ func TestTaskActionToUpdate_NoErrorWhenNotFailed(t *testing.T) {
 		},
 	}
 
-	upd := taskActionToUpdate(ta)
+	upd := taskActionToUpdate(context.Background(), ta)
 
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, upd.Phase)
 	assert.Nil(t, upd.Error)
@@ -254,7 +281,7 @@ func TestTaskActionToUpdate_FailedWithoutErrorState(t *testing.T) {
 		},
 	}
 
-	upd := taskActionToUpdate(ta)
+	upd := taskActionToUpdate(context.Background(), ta)
 
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_FAILED, upd.Phase)
 	assert.Nil(t, upd.Error, "no ErrorState on CR should leave ActionUpdate.Error nil")

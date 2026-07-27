@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/proto" //nolint: staticcheck
 	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -43,10 +43,15 @@ func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []st
 		storageCfg = storage.GetConfig()
 	}
 
+	command, err := CopilotCommandArgs(storageCfg)
+	if err != nil {
+		return v1.Container{}, err
+	}
+
 	return v1.Container{
 		Name:       cfg.NamePrefix + name,
 		Image:      cfg.Image,
-		Command:    CopilotCommandArgs(storageCfg),
+		Command:    command,
 		Args:       args,
 		WorkingDir: "/",
 		Resources: v1.ResourceRequirements{
@@ -65,7 +70,7 @@ func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []st
 	}, nil
 }
 
-func CopilotCommandArgs(storageConfig *storage.Config) []string {
+func CopilotCommandArgs(storageConfig *storage.Config) ([]string, error) {
 	var commands = []string{
 		"/bin/flyte-copilot",
 		"--storage.limits.maxDownloadMBs=0",
@@ -85,15 +90,10 @@ func CopilotCommandArgs(storageConfig *storage.Config) []string {
 			commands = append(commands, "--storage.stow.config")
 			commands = append(commands, fmt.Sprintf("%s=%s", key, val))
 		}
-		return append(commands, fmt.Sprintf("--storage.stow.kind=%s", storageConfig.Stow.Kind))
+		return append(commands, fmt.Sprintf("--storage.stow.kind=%s", storageConfig.Stow.Kind)), nil
 	}
-	return append(commands, []string{
-		fmt.Sprintf("--storage.connection.secret-key=%s", storageConfig.Connection.SecretKey),
-		fmt.Sprintf("--storage.connection.access-key=%s", storageConfig.Connection.AccessKey),
-		fmt.Sprintf("--storage.connection.auth-type=%s", storageConfig.Connection.AuthType),
-		fmt.Sprintf("--storage.connection.region=%s", storageConfig.Connection.Region),
-		fmt.Sprintf("--storage.connection.endpoint=%s", storageConfig.Connection.Endpoint.String()),
-	}...)
+
+	return commands, fmt.Errorf("no stow.config or stow.kind specified")
 }
 
 func SidecarCommandArgs(fromLocalPath string, outputPrefix, rawOutputPath storage.DataReference, uploadTimeout time.Duration, iface *core.TypedInterface) ([]string, error) {
@@ -119,7 +119,7 @@ func SidecarCommandArgs(fromLocalPath string, outputPrefix, rawOutputPath storag
 	}, nil
 }
 
-func DownloadCommandArgs(fromInputsPath, outputPrefix storage.DataReference, toLocalPath string, format core.DataLoadingConfig_LiteralMapFormat, inputInterface *core.VariableMap) ([]string, error) {
+func DownloadCommandArgs(fromInputsPath, outputPrefix storage.DataReference, toLocalPath string, format core.DataLoadingConfig_LiteralMapFormat, layout core.DataLoadingConfig_FileInputLayout, inputInterface *core.VariableMap) ([]string, error) {
 	if inputInterface == nil {
 		return nil, fmt.Errorf("input Interface is required for CoPilot Downloader")
 	}
@@ -137,6 +137,8 @@ func DownloadCommandArgs(fromInputsPath, outputPrefix storage.DataReference, toL
 		toLocalPath,
 		"--format",
 		format.String(),
+		"--file-input-layout",
+		layout.String(),
 		"--input-interface",
 		base64.StdEncoding.EncodeToString(b),
 	}, nil
@@ -213,8 +215,8 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 		return nil
 	}
 
-	//nolint:protogetter
-	logger.Infof(ctx, "CoPilot Enabled for task [%s]", taskExecMetadata.GetTaskExecutionID().GetID().TaskId.GetName())
+	taskName := taskExecMetadata.GetTaskExecutionID().GetID().GetTaskId().GetName()
+	logger.Infof(ctx, "CoPilot Enabled for task [%s]", taskName)
 	if iFace != nil {
 		if iFace.Inputs != nil && len(iFace.Inputs.Variables) > 0 {
 			inPath := cfg.DefaultInputDataPath
@@ -224,7 +226,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 
 			// TODO we should calculate input volume size based on the size of the inputs which is known ahead of time. We should store that as part of the metadata
 			size := CalculateStorageSize(taskExecMetadata.GetOverrides().GetResources())
-			logger.Infof(ctx, "Adding Input path [%s] of Size [%d] for Task [%s]", inPath, size, taskExecMetadata.GetTaskExecutionID().GetID().TaskId.Name)
+			logger.Infof(ctx, "Adding Input path [%s] of Size [%v] for Task [%s]", inPath, size, taskName)
 			inputsVolumeMount := v1.VolumeMount{
 				Name:      cfg.InputVolumeName,
 				MountPath: inPath,
@@ -235,7 +237,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			coPilotPod.Volumes = append(coPilotPod.Volumes, DataVolume(cfg.InputVolumeName, size))
 
 			// Lets add the Inputs init container
-			args, err := DownloadCommandArgs(inputPaths.GetInputPath(), outputPaths.GetOutputPrefixPath(), inPath, format, iFace.Inputs)
+			args, err := DownloadCommandArgs(inputPaths.GetInputPath(), outputPaths.GetOutputPrefixPath(), inPath, format, pilot.GetFileInputLayout(), iFace.Inputs)
 			if err != nil {
 				return err
 			}
@@ -253,7 +255,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			}
 
 			size := CalculateStorageSize(taskExecMetadata.GetOverrides().GetResources())
-			logger.Infof(ctx, "Adding Output path [%s] of size [%d] for Task [%s]", size, outPath, taskExecMetadata.GetTaskExecutionID().GetID().TaskId.Name)
+			logger.Infof(ctx, "Adding Output path [%s] of size [%v] for Task [%s]", outPath, size, taskName)
 
 			outputsVolumeMount := v1.VolumeMount{
 				Name:      cfg.OutputVolumeName,
@@ -278,7 +280,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			// Let the sidecar container start before the downloader; it will ensure the signal watcher is started before the main container finishes.
 			coPilotPod.InitContainers = append([]v1.Container{sidecar}, coPilotPod.InitContainers...)
 
-			timeoutSeconds := int64(cfg.Timeout.Duration.Seconds())
+			timeoutSeconds := int64(cfg.Timeout.Seconds())
 			coPilotPod.TerminationGracePeriodSeconds = &timeoutSeconds
 		}
 	}

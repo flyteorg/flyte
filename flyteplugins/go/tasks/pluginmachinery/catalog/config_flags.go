@@ -56,5 +56,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "writer.workers"), defaultConfig.WriterWorkqueueConfig.Workers, "Number of concurrent workers to start processing the queue.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "writer.maxRetries"), defaultConfig.WriterWorkqueueConfig.MaxRetries, "Maximum number of retries per item.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "writer.maxItems"), defaultConfig.WriterWorkqueueConfig.IndexCacheMaxItems, "Maximum number of entries to keep in the index.")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "cacheKey.enforceExecutionProjectDomain"), defaultConfig.CacheKey.EnforceExecutionProjectDomain, " Use execution project domain when computing the cache key. This means that even if you reference tasks/launchplans from a different project,  cache keys will be computed based on the execution project domain instead.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "maxCacheAge"), defaultConfig.MaxCacheAge.String(), "Cache entries past this age will incur cache miss. 0 means cache never expires.")
 	return cmdFlags
 }

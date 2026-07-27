@@ -4,6 +4,7 @@ package flyteidl2.task;
 
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/identity.proto";
 import "flyteidl2/common/list.proto";
 import "flyteidl2/task/task_definition.proto";
 import "google/protobuf/timestamp.proto";
@@ -120,6 +121,12 @@ message ListVersionsResponse {
 
     // The time the task version was deployed
     google.protobuf.Timestamp deployed_at = 2 [(buf.validate.field).required = true];
+
+    // Identity that deployed this version
+    common.EnrichedIdentity deployed_by = 3 [(buf.validate.field).required = true];
+
+    // Summary of the latest run for this version, if any
+    optional LatestRunSummary latest_run = 4;
   }
 
   // Version with deployed_at

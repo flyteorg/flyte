@@ -46,6 +46,6 @@ func GetSparkConfig() *Config {
 }
 
 // This method should be used for unit testing only
-func setSparkConfig(cfg *Config) error {
+func setSparkConfig(cfg *Config) error { //nolint: unused
 	return sparkConfigSection.SetConfig(cfg)
 }

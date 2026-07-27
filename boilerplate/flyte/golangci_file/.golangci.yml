@@ -3,38 +3,39 @@
 # 
 # TO OPT OUT OF UPDATES, SEE https://github.com/flyteorg/boilerplate/blob/master/Readme.rst
 
+version: "2"
 run:
-  skip-dirs:
-    - pkg/client
-
+  allow-parallel-runners: true
 linters:
-  disable-all: true
+  default: none
   enable:
-    - deadcode
+    - copyloopvar
+    - dupl
     - errcheck
-    - gas
-    - gci
+    - ginkgolinter
     - goconst
-    - goimports
-    - golint
-    - gosimple
+    - gocyclo
     - govet
     - ineffassign
+    - lll
     - misspell
     - nakedret
+    - prealloc
+    - revive
     - staticcheck
-    - structcheck
-    - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
-
-linters-settings:
-  gci:
-    custom-order: true
-    sections:
-      - standard
-      - default
-      - prefix(github.com/flyteorg)
-    skip-generated: true
+  settings:
+    revive:
+      rules:
+        - name: comment-spacings
+        - name: import-shadowing
+  exclusions:
+    generated: lax
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax

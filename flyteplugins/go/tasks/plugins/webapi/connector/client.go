@@ -4,6 +4,8 @@ import (
 	"context"
 	"crypto/x509"
 	"strings"
+	"sync"
+	"time"
 
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
@@ -11,9 +13,11 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/grpclog"
+	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/grpcutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/connector"
 )
@@ -31,8 +35,64 @@ type Connector struct {
 
 // ClientSet contains the clients exposed to communicate with various connector services.
 type ClientSet struct {
+	mu                       sync.RWMutex
 	asyncConnectorClients    map[string]connector.AsyncConnectorServiceClient    // map[endpoint] => AsyncConnectorServiceClient
 	connectorMetadataClients map[string]connector.ConnectorMetadataServiceClient // map[endpoint] => ConnectorMetadataServiceClient
+}
+
+// getOrDialAsyncClient returns the cached AsyncConnectorService client for the
+// endpoint, dialing (and caching) a persistent connection on first use.
+func (cs *ClientSet) getOrDialAsyncClient(ctx context.Context, deployment *Deployment) (connector.AsyncConnectorServiceClient, error) {
+	cs.mu.Lock()
+	defer cs.mu.Unlock()
+
+	if cs.asyncConnectorClients == nil {
+		cs.asyncConnectorClients = make(map[string]connector.AsyncConnectorServiceClient)
+	}
+	if cs.connectorMetadataClients == nil {
+		cs.connectorMetadataClients = make(map[string]connector.ConnectorMetadataServiceClient)
+	}
+
+	if client, ok := cs.asyncConnectorClients[deployment.Endpoint]; ok {
+		return client, nil
+	}
+
+	conn, err := getGrpcConnection(ctx, deployment)
+	if err != nil {
+		return nil, err
+	}
+
+	asyncClient := connector.NewAsyncConnectorServiceClient(conn)
+	cs.asyncConnectorClients[deployment.Endpoint] = asyncClient
+	if _, ok := cs.connectorMetadataClients[deployment.Endpoint]; !ok {
+		cs.connectorMetadataClients[deployment.Endpoint] = connector.NewConnectorMetadataServiceClient(conn)
+	}
+	return asyncClient, nil
+}
+
+// getOrDialMetadataClient returns the cached ConnectorMetadataService client for
+// the endpoint, dialing (and caching) a persistent connection on first use.
+func (cs *ClientSet) getOrDialMetadataClient(ctx context.Context, deployment *Deployment) (connector.ConnectorMetadataServiceClient, error) {
+	cs.mu.Lock()
+	defer cs.mu.Unlock()
+	if client, ok := cs.connectorMetadataClients[deployment.Endpoint]; ok {
+		return client, nil
+	}
+	conn, err := getGrpcConnection(ctx, deployment)
+	if err != nil {
+		return nil, err
+	}
+	client := connector.NewConnectorMetadataServiceClient(conn)
+	cs.connectorMetadataClients[deployment.Endpoint] = client
+	return client, nil
+}
+
+// metadataClient returns the cached ConnectorMetadataService client for the endpoint.
+func (cs *ClientSet) metadataClient(endpoint string) (connector.ConnectorMetadataServiceClient, bool) {
+	cs.mu.RLock()
+	defer cs.mu.RUnlock()
+	client, ok := cs.connectorMetadataClients[endpoint]
+	return client, ok
 }
 
 func getGrpcConnection(ctx context.Context, connector *Deployment) (*grpc.ClientConn, error) {
@@ -54,8 +114,21 @@ func getGrpcConnection(ctx context.Context, connector *Deployment) (*grpc.Client
 		opts = append(opts, grpc.WithDefaultServiceConfig(connector.DefaultServiceConfig))
 	}
 
+	clientMetrics := grpcutils.GrpcClientMetrics()
+	opts = append(opts,
+		grpc.WithChainUnaryInterceptor(clientMetrics.UnaryClientInterceptor()),
+		grpc.WithChainStreamInterceptor(clientMetrics.StreamClientInterceptor()),
+		// Keepalive lets gRPC notice a dead/half-open transport within seconds
+		// (via HTTP/2 PINGs during active RPCs) instead of relying on the OS TCP
+		// timeout.
+		grpc.WithKeepaliveParams(keepalive.ClientParameters{
+			Time:    30 * time.Second,
+			Timeout: 10 * time.Second,
+		}),
+	)
+
 	var err error
-	conn, err := grpc.Dial(connector.Endpoint, opts...)
+	conn, err := grpc.Dial(connector.Endpoint, opts...) //nolint: staticcheck
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +168,7 @@ func updateRegistry(
 	isConnectorApp bool,
 ) {
 	for connectorID, connectorDeployment := range connectorDeployments {
-		client, ok := cs.connectorMetadataClients[connectorDeployment.Endpoint]
+		client, ok := cs.metadataClient(connectorDeployment.Endpoint)
 		if !ok {
 			logger.Warningf(ctx, "Connector client not found in the clientSet for the endpoint: %v", connectorDeployment.Endpoint)
 			continue
@@ -132,7 +205,7 @@ func updateRegistry(
 					IsConnectorApp:      isConnectorApp,
 				}
 				supportedCategoryName := supportedCategory.GetName()
-				registryKey := RegistryKey{domain: connectorDeployment.Domain, taskTypeName: supportedCategoryName, taskTypeVersion: supportedCategory.GetVersion()}
+				registryKey := RegistryKey{project: connectorDeployment.Project, domain: connectorDeployment.Domain, taskTypeName: supportedCategoryName, taskTypeVersion: supportedCategory.GetVersion()}
 				newConnectorRegistry[registryKey] = connector
 				connectorSupportedTaskCategories[supportedCategoryName] = struct{}{}
 			}
@@ -162,7 +235,7 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 	// If the connector doesn't implement the metadata service, we construct the registry based on the configuration
 	for taskType, connectorDeploymentID := range cfg.ConnectorForTaskTypes {
 		if connectorDeployment, ok := cfg.ConnectorDeployments[connectorDeploymentID]; ok {
-			registryKey := RegistryKey{domain: connectorDeployment.Domain, taskTypeName: taskType, taskTypeVersion: defaultTaskTypeVersion}
+			registryKey := RegistryKey{project: connectorDeployment.Project, domain: connectorDeployment.Domain, taskTypeName: taskType, taskTypeVersion: defaultTaskTypeVersion}
 			connector := &Connector{
 				ConnectorDeployment: connectorDeployment,
 				ConnectorID:         connectorDeploymentID,
@@ -174,7 +247,7 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 
 	// Ensure that the old configuration is backward compatible
 	for _, taskType := range cfg.SupportedTaskTypes {
-		registryKey := RegistryKey{domain: cfg.DefaultConnector.Domain, taskTypeName: taskType, taskTypeVersion: defaultTaskTypeVersion}
+		registryKey := RegistryKey{project: cfg.DefaultConnector.Project, domain: cfg.DefaultConnector.Domain, taskTypeName: taskType, taskTypeVersion: defaultTaskTypeVersion}
 		if _, ok := newConnectorRegistry[registryKey]; !ok {
 			connector := &Connector{
 				ConnectorDeployment: &cfg.DefaultConnector,
@@ -192,28 +265,29 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 	return newConnectorRegistry
 }
 
+// allConnectorDeployments returns every configured connector endpoint: the
+// default connector, explicit deployments, and connector apps.
+func allConnectorDeployments(cfg *Config) []*Deployment {
+	var connectorDeployments []*Deployment
+	if len(cfg.DefaultConnector.Endpoint) != 0 {
+		connectorDeployments = append(connectorDeployments, &cfg.DefaultConnector)
+	}
+	for _, deployment := range cfg.ConnectorDeployments {
+		connectorDeployments = append(connectorDeployments, deployment)
+	}
+	for _, deployment := range cfg.ConnectorApps {
+		connectorDeployments = append(connectorDeployments, deployment)
+	}
+	return connectorDeployments
+}
+
 func getConnectorClientSets(ctx context.Context) *ClientSet {
 	clientSet := &ClientSet{
 		asyncConnectorClients:    make(map[string]connector.AsyncConnectorServiceClient),
 		connectorMetadataClients: make(map[string]connector.ConnectorMetadataServiceClient),
 	}
 
-	var connectorDeployments []*Deployment
-	cfg := GetConfig()
-
-	if len(cfg.DefaultConnector.Endpoint) != 0 {
-		connectorDeployments = append(connectorDeployments, &cfg.DefaultConnector)
-	}
-
-	for _, deployment := range cfg.ConnectorDeployments {
-		connectorDeployments = append(connectorDeployments, deployment)
-	}
-
-	for _, deployment := range cfg.ConnectorApps {
-		connectorDeployments = append(connectorDeployments, deployment)
-	}
-
-	for _, connectorDeployment := range connectorDeployments {
+	for _, connectorDeployment := range allConnectorDeployments(GetConfig()) {
 		if _, ok := clientSet.connectorMetadataClients[connectorDeployment.Endpoint]; ok {
 			logger.Infof(ctx, "Connector client already initialized for [%v]", connectorDeployment.Endpoint)
 			continue

@@ -38,9 +38,9 @@ type CorePlugin struct {
 	metrics        Metrics
 }
 
-func (c CorePlugin) unmarshalState(ctx context.Context, stateReader core.PluginStateReader) (State, error) {
+func (c CorePlugin) unmarshalState(ctx context.Context, stateReader core.PluginStateReader) (webapi.State, error) {
 	t := c.metrics.SucceededUnmarshalState.Start(ctx)
-	existingState := State{}
+	existingState := webapi.State{}
 
 	// We assume here that the first time this function is called, the custom state we get back is whatever we passed in,
 	// namely the zero-value of our struct.
@@ -49,7 +49,7 @@ func (c CorePlugin) unmarshalState(ctx context.Context, stateReader core.PluginS
 		logger.Errorf(ctx, "AsyncPlugin [%v] failed to unmarshal custom state. Error: %v",
 			c.GetID(), err)
 
-		return State{}, errors.Wrapf(errors.CorruptedPluginState, err,
+		return webapi.State{}, errors.Wrapf(errors.CorruptedPluginState, err,
 			"Failed to unmarshal custom state in Handle")
 	}
 
@@ -71,19 +71,19 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 		return core.UnknownTransition, err
 	}
 
-	var nextState *State
+	var nextState *webapi.State
 	var phaseInfo core.PhaseInfo
 
 	switch incomingState.Phase {
-	case PhaseNotStarted:
+	case webapi.PhaseNotStarted:
 		if len(c.p.GetConfig().ResourceQuotas) > 0 {
 			nextState, phaseInfo, err = c.tokenAllocator.allocateToken(ctx, c.p, tCtx, &incomingState, c.metrics)
 		} else {
 			nextState, phaseInfo, err = launch(ctx, c.p, tCtx, c.cache, &incomingState)
 		}
-	case PhaseAllocationTokenAcquired:
+	case webapi.PhaseAllocationTokenAcquired:
 		nextState, phaseInfo, err = launch(ctx, c.p, tCtx, c.cache, &incomingState)
-	case PhaseResourcesCreated:
+	case webapi.PhaseResourcesCreated:
 		nextState, phaseInfo, err = monitor(ctx, tCtx, c.p, c.cache, &incomingState)
 	}
 

@@ -6,6 +6,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	k8sRuntime "k8s.io/apimachinery/pkg/runtime"
+	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
@@ -62,8 +63,27 @@ func newSecretsInjector(
 			return nil, fmt.Errorf("failed to add core v1 to scheme: %w", err)
 		}
 
+		secretInformerCache, err := ctrlcache.New(kubeConfig, ctrlcache.Options{
+			Scheme: ctrlRuntimeScheme,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to create informer cache: %w", err)
+		}
+
+		go func() {
+			if err := secretInformerCache.Start(ctx); err != nil {
+				logger.Errorf(ctx, "secret informer cache stopped: %v", err)
+			}
+		}()
+		if !secretInformerCache.WaitForCacheSync(ctx) {
+			return nil, fmt.Errorf("secret informer cache failed to sync")
+		}
+
 		ctrlRuntimeClient, err := client.New(kubeConfig, client.Options{
 			Scheme: ctrlRuntimeScheme,
+			Cache: &client.CacheOptions{
+				Reader: secretInformerCache,
+			},
 		})
 		if err != nil {
 			return nil, fmt.Errorf("failed to create controller-runtime client: %w", err)

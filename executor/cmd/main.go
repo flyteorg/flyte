@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/executor"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 

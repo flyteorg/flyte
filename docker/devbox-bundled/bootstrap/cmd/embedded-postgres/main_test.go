@@ -53,7 +53,7 @@ func TestPgHbaConfAppend(t *testing.T) {
 	assert.NoError(t, err)
 	_, err = f.WriteString("\n# Allow all hosts (sandbox environment)\nhost all all 0.0.0.0/0 password\nhost all all ::/0 password\n")
 	assert.NoError(t, err)
-	f.Close()
+	f.Close() //nolint: errcheck
 
 	content, err := os.ReadFile(hbaPath)
 	assert.NoError(t, err)

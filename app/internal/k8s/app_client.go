@@ -10,7 +10,7 @@ import (
 	"sync"
 
 	"google.golang.org/protobuf/proto"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	k8sresource "k8s.io/apimachinery/pkg/api/resource"
@@ -24,6 +24,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/v2/app/internal/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
+	secretUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
@@ -53,7 +55,11 @@ const (
 	annotationAppOrg  = "flyte.org/app-org"
 	annotationSpec    = "flyte.org/spec"
 
-	maxScaleZero = "0"
+	labelAppStopped        = "flyte.org/app-stopped"
+	labelKnativeVisibility = "networking.knative.dev/visibility"
+	visibilityClusterLocal = "cluster-local"
+
+	scaleZero = "0"
 
 	// maxKServiceNameLen is the Kubernetes DNS label limit.
 	maxKServiceNameLen = 63
@@ -65,8 +71,8 @@ type AppK8sClientInterface interface {
 	// the update if the spec SHA annotation is unchanged.
 	Deploy(ctx context.Context, app *flyteapp.App) error
 
-	// Stop scales the KService to zero by setting max-scale=0. The KService CRD
-	// is kept so the app can be restarted later.
+	// Stop scales the KService to zero and makes it cluster-local (not published to external gateway).
+	// The KService CRD is kept so the app can be restarted later.
 	Stop(ctx context.Context, appID *flyteapp.Identifier) error
 
 	// GetApp reads the KService and returns the full App including reconstructed Spec and live Status.
@@ -113,6 +119,8 @@ type AppK8sClient struct {
 	k8sClient client.WithWatch
 	cache     ctrlcache.Cache
 	cfg       *config.InternalAppConfig
+	// Kubernetes namespace where all KService objects are deployed.
+	namespace string
 
 	// Watch management
 	mu          sync.RWMutex
@@ -122,17 +130,15 @@ type AppK8sClient struct {
 }
 
 // NewAppK8sClient creates a new AppK8sClient.
-func NewAppK8sClient(k8sClient client.WithWatch, cache ctrlcache.Cache, cfg *config.InternalAppConfig) *AppK8sClient {
+func NewAppK8sClient(k8sClient client.WithWatch, cache ctrlcache.Cache, namespace string, cfg *config.InternalAppConfig) *AppK8sClient {
 	return &AppK8sClient{
 		k8sClient:   k8sClient,
 		cache:       cache,
 		cfg:         cfg,
+		namespace:   namespace,
 		subscribers: make(map[string]map[chan *flyteapp.WatchResponse]struct{}),
 	}
 }
-
-// AppNamespace is the fixed Kubernetes namespace where all KService objects are deployed.
-const AppNamespace = "flyte"
 
 // defaultOrg is the org returned for apps that have no org persisted on the KService.
 // we always surface a non-empty value for callers (e.g. the UI) that expect one.
@@ -141,7 +147,7 @@ const defaultOrg = "flyte"
 // Deploy creates or updates the KService for the given app.
 func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 	appID := app.GetMetadata().GetId()
-	ns := AppNamespace
+	ns := c.namespace
 	name := KServiceName(appID)
 
 	if err := k8s.EnsureNamespaceExists(ctx, c.k8sClient, ns); err != nil {
@@ -166,7 +172,13 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 		return fmt.Errorf("failed to get KService %s: %w", name, err)
 	}
 
-	if existing.Annotations[annotationSpecSHA] == ksvc.Annotations[annotationSpecSHA] {
+	// Always update when the existing KService is in stopped state,
+	// even if the spec SHA is unchanged. Stop() marks the KService with a label
+	// without touching the spec SHA annotation, so an unchanged spec would
+	// otherwise cause Deploy() to skip the update and leave it stopped.
+	existingStopped := existing.Labels != nil && existing.Labels[labelAppStopped] == "true"
+
+	if !existingStopped && existing.Annotations[annotationSpecSHA] == ksvc.Annotations[annotationSpecSHA] {
 		logger.Debugf(ctx, "KService %s/%s spec unchanged, skipping update", ns, name)
 		return nil
 	}
@@ -181,6 +193,9 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 	for k, v := range ksvc.Labels {
 		existing.Labels[k] = v
 	}
+	// Deploy implies "start": clear stop/private labels applied by Stop().
+	delete(existing.Labels, labelAppStopped)
+	delete(existing.Labels, labelKnativeVisibility)
 	if existing.Annotations == nil {
 		existing.Annotations = make(map[string]string)
 	}
@@ -194,28 +209,53 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 	return nil
 }
 
-// Stop sets max-scale=0 on the KService, scaling it to zero without deleting it.
+// Stop makes the app unreachable from the public gateway and scales it to zero without deleting the KService.
 func (c *AppK8sClient) Stop(ctx context.Context, appID *flyteapp.Identifier) error {
-	ns := AppNamespace
+	ns := c.namespace
 	name := KServiceName(appID)
-	patch := []byte(`{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/max-scale":"0"}}}}}`)
+	// Make the Service cluster-local so it is not published to the external gateway,
+	// and set initial/min scale to zero so it converges to 0 pods.
+	// initial-scale=0 requires allow-zero-initial-scale=true in config-autoscaler.
+	patch := []byte(fmt.Sprintf(
+		`{"metadata":{"labels":{"%s":"true","%s":"%s"}},"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/min-scale":"%s","autoscaling.knative.dev/initial-scale":"%s"}}}}}`,
+		labelAppStopped,
+		labelKnativeVisibility,
+		visibilityClusterLocal,
+		scaleZero,
+		scaleZero,
+	))
 	ksvc := &servingv1.Service{}
 	ksvc.Name = name
 	ksvc.Namespace = ns
 	if err := c.k8sClient.Patch(ctx, ksvc, client.RawPatch(types.MergePatchType, patch)); err != nil {
 		if k8serrors.IsNotFound(err) {
-			// Already stopped/deleted — treat as success.
 			return nil
 		}
 		return fmt.Errorf("failed to patch KService %s to stop: %w", name, err)
 	}
-	logger.Infof(ctx, "Stopped KService %s/%s (max-scale=0)", ns, name)
+
+	// The patch above updates the revision template, which creates a new Revision.
+	// To ensure running pods are terminated immediately (instead of waiting for the
+	// stable window with no traffic), delete the latest ready Revision.
+	current := &servingv1.Service{}
+	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: ns}, current); err == nil {
+		if revName := current.Status.LatestReadyRevisionName; revName != "" {
+			rev := &servingv1.Revision{}
+			rev.Name = revName
+			rev.Namespace = ns
+			if delErr := c.k8sClient.Delete(ctx, rev); delErr != nil && !k8serrors.IsNotFound(delErr) {
+				logger.Warnf(ctx, "Failed to delete Revision %s/%s to stop: %v", ns, revName, delErr)
+			}
+		}
+	}
+
+	logger.Infof(ctx, "Stopped KService %s/%s (cluster-local, scaled to zero)", ns, name)
 	return nil
 }
 
 // Delete removes the KService CRD for the given app entirely.
 func (c *AppK8sClient) Delete(ctx context.Context, appID *flyteapp.Identifier) error {
-	ns := AppNamespace
+	ns := c.namespace
 	name := KServiceName(appID)
 	ksvc := &servingv1.Service{}
 	ksvc.Name = name
@@ -386,7 +426,7 @@ func (c *AppK8sClient) StopWatching() {
 
 // GetApp reads the KService and returns the full App including reconstructed Spec and live Status.
 func (c *AppK8sClient) GetApp(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.App, error) {
-	ns := AppNamespace
+	ns := c.namespace
 	name := KServiceName(appID)
 	ksvc := &servingv1.Service{}
 	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: ns}, ksvc); err != nil {
@@ -418,7 +458,7 @@ func specFromAnnotation(ksvc *servingv1.Service) *flyteapp.Spec {
 
 // List returns apps for the given project/domain scope with optional pagination.
 func (c *AppK8sClient) List(ctx context.Context, project, domain string, limit uint32, token string) ([]*flyteapp.App, string, error) {
-	ns := AppNamespace
+	ns := c.namespace
 
 	matchLabels := map[string]string{labelAppManaged: "true"}
 	if project != "" {
@@ -495,6 +535,15 @@ func KServiceName(id *flyteapp.Identifier) string {
 	return prefix + "-" + suffix
 }
 
+// renderNamespacedSuffix substitutes {{ project }} and {{ domain }}
+// in a template string to produce the KService name suffix used in INTERNAL_APP_ENDPOINT_PATTERN.
+func renderNamespacedSuffix(tmpl, project, domain string) string {
+	return strings.NewReplacer(
+		"{{ project }}", strings.ToLower(project),
+		"{{ domain }}", strings.ToLower(domain),
+	).Replace(tmpl)
+}
+
 // marshalSpec serializes the App Spec proto and returns the raw bytes.
 func marshalSpec(spec *flyteapp.Spec) ([]byte, error) {
 	b, err := proto.Marshal(spec)
@@ -515,7 +564,7 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	appID := app.GetMetadata().GetId()
 	spec := app.GetSpec()
 	name := KServiceName(appID)
-	ns := AppNamespace
+	ns := c.namespace
 
 	specBytes, err := marshalSpec(spec)
 	if err != nil {
@@ -527,6 +576,11 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	if err != nil {
 		return nil, err
 	}
+	if sa := spec.GetSecurityContext().GetRunAs().GetK8SServiceAccount(); sa != "" {
+		podSpec.ServiceAccountName = sa
+	} else if c.cfg.DefaultServiceAccount != "" {
+		podSpec.ServiceAccountName = c.cfg.DefaultServiceAccount
+	}
 	// Inject cluster-level default env vars (e.g. _U_EP_OVERRIDE) before user vars
 	// so they can be overridden by app-specific env vars if needed.
 	if len(c.cfg.DefaultEnvVars) > 0 && len(podSpec.Containers) > 0 {
@@ -537,7 +591,43 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 		podSpec.Containers[0].Env = append(defaults, podSpec.Containers[0].Env...)
 	}
 
+	// Inject INTERNAL_APP_ENDPOINT_PATTERN so app code can construct internal cluster URLs
+	// for other apps by substituting {app_fqdn} with the target app name.
+	// The suffix is rendered from NamespacedNamePrefixTemplate to match the KService name format
+	// {name}-{project}-{domain} used by KServiceName().
+	if len(podSpec.Containers) > 0 {
+		suffix := renderNamespacedSuffix(c.cfg.NamespacedNameSuffixTemplate, appID.GetProject(), appID.GetDomain())
+		podSpec.Containers[0].Env = append(podSpec.Containers[0].Env, corev1.EnvVar{
+			Name:  "INTERNAL_APP_ENDPOINT_PATTERN",
+			Value: fmt.Sprintf("http://{app_fqdn}-%s.%s.svc.cluster.local", suffix, ns),
+		})
+		// Inject execution context env vars required by flyte.init_in_cluster()
+		podSpec.Containers[0].Env = append(podSpec.Containers[0].Env,
+			corev1.EnvVar{Name: "FLYTE_INTERNAL_EXECUTION_PROJECT", Value: appID.GetProject()},
+			corev1.EnvVar{Name: "FLYTE_INTERNAL_EXECUTION_DOMAIN", Value: appID.GetDomain()},
+		)
+	}
+
 	templateAnnotations := buildAutoscalingAnnotations(spec, c.cfg)
+	// Inject secret labels and annotations into the revision template so the
+	// flyte-binary-webhook mounts the requested secrets and the secret fetcher
+	// can resolve scoped secret lookups (project/domain).
+	var templateLabels map[string]string
+	if securityContext := spec.GetSecurityContext(); securityContext != nil && len(securityContext.GetSecrets()) > 0 {
+		templateLabels = map[string]string{
+			secret.OrganizationLabel: "flyte",
+			secret.ProjectLabel:      appID.GetProject(),
+			secret.DomainLabel:       appID.GetDomain(),
+			secretUtils.PodLabel:     secretUtils.PodLabelValue,
+		}
+		secretsMap, err := secretUtils.MarshalSecretsToMapStrings(securityContext.GetSecrets())
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal secrets: %w", err)
+		}
+		for k, v := range secretsMap {
+			templateAnnotations[k] = v
+		}
+	}
 
 	timeoutSecs := c.cfg.DefaultRequestTimeout.Seconds()
 	if t := spec.GetTimeouts().GetRequestTimeout(); t != nil {
@@ -567,10 +657,11 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 		},
 		Spec: servingv1.ServiceSpec{
 			ConfigurationSpec: servingv1.ConfigurationSpec{
-				Template: servingv1.RevisionTemplateSpec{
-					ObjectMeta: metav1.ObjectMeta{
-						Annotations: templateAnnotations,
-					},
+			Template: servingv1.RevisionTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels:      templateLabels,
+					Annotations: templateAnnotations,
+				},
 					Spec: servingv1.RevisionSpec{
 						PodSpec:        podSpec,
 						TimeoutSeconds: &timeoutSecsInt,
@@ -758,16 +849,14 @@ func knativeCondToAppCondition(kCond knativeapis.Condition, serviceReady, servic
 // kserviceToStatus maps a KService's conditions to a flyteapp.Status proto.
 // It fetches the latest ready Revision to read the accurate ActualReplicas count.
 func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Service) *flyteapp.Status {
-	// Check if max-scale=0 is set — explicitly stopped by the control plane.
-	if ann := ksvc.Spec.Template.Annotations; ann != nil {
-		if ann["autoscaling.knative.dev/max-scale"] == maxScaleZero {
-			return &flyteapp.Status{
-				Conditions: []*flyteapp.Condition{{
-					DeploymentStatus:   flyteapp.Status_DEPLOYMENT_STATUS_STOPPED,
-					Message:            "App scaled to zero",
-					LastTransitionTime: timestamppb.Now(),
-				}},
-			}
+	// Check if the Service is explicitly stopped by the control plane.
+	if ksvc.Labels != nil && ksvc.Labels[labelAppStopped] == "true" {
+		return &flyteapp.Status{
+			Conditions: []*flyteapp.Condition{{
+				DeploymentStatus:   flyteapp.Status_DEPLOYMENT_STATUS_STOPPED,
+				Message:            "App scaled to zero",
+				LastTransitionTime: timestamppb.Now(),
+			}},
 		}
 	}
 
@@ -776,7 +865,13 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 	serviceFailed := readyCond != nil && readyCond.IsFalse()
 	var conditions []*flyteapp.Condition
 	for i := range ksvc.Status.Conditions {
-		if cond := knativeCondToAppCondition(ksvc.Status.Conditions[i], serviceReady, serviceFailed); cond != nil {
+		kCond := ksvc.Status.Conditions[i]
+		// Knative condition sets may surface both RoutesReady=Unknown and Ready=Unknown.
+		// Emit only the overall Ready in this case, since it's what the UI cares about.
+		if kCond.Type == servingv1.ServiceConditionRoutesReady && kCond.Status == corev1.ConditionUnknown {
+			continue
+		}
+		if cond := knativeCondToAppCondition(kCond, serviceReady, serviceFailed); cond != nil {
 			conditions = append(conditions, cond)
 		}
 	}
@@ -818,7 +913,7 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 // has no ready revision yet (initial rollout), all pods for the service are
 // returned.
 func (c *AppK8sClient) GetReplicas(ctx context.Context, appID *flyteapp.Identifier) ([]*flyteapp.Replica, error) {
-	ns := AppNamespace
+	ns := c.namespace
 	name := KServiceName(appID)
 
 	labels := client.MatchingLabels{labelKnativeService: name}
@@ -850,7 +945,7 @@ func (c *AppK8sClient) GetReplicas(ctx context.Context, appID *flyteapp.Identifi
 
 // DeleteReplica force-deletes a specific pod. Knative will schedule a replacement automatically.
 func (c *AppK8sClient) DeleteReplica(ctx context.Context, replicaID *flyteapp.ReplicaIdentifier) error {
-	ns := AppNamespace
+	ns := c.namespace
 	pod := &corev1.Pod{}
 	pod.Name = replicaID.GetName()
 	pod.Namespace = ns
@@ -941,11 +1036,16 @@ func (c *AppK8sClient) kserviceToApp(ctx context.Context, ksvc *servingv1.Servic
 		Name:    parts[2],
 	}
 
+	spec := specFromAnnotation(ksvc)
+	if spec != nil && ksvc.Labels[labelAppStopped] == "true" {
+		spec.DesiredState = flyteapp.Spec_DESIRED_STATE_STOPPED
+	}
+
 	return &flyteapp.App{
 		Metadata: &flyteapp.Meta{
 			Id: appID,
 		},
-		Spec:   specFromAnnotation(ksvc),
+		Spec:   spec,
 		Status: c.kserviceToStatus(ctx, ksvc),
 	}, nil
 }
