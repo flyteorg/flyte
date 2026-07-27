@@ -57,6 +57,17 @@ patches:
       registries-skipping-tag-resolving: "localhost:30000,kind-registry:5000"
       allow-http-registry: "true"
 - patch: |-
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: config-features
+      namespace: knative-serving
+    data:
+      # Allow apps (KServices) to mount pre-existing PVCs, e.g. warm model
+      # weights for serving. Off by default in Knative; required for the
+      # K8sPod app payload's persistentVolumeClaim volumes to pass validation.
+      kubernetes.podspec-persistent-volume-claim: "enabled"
+- patch: |-
     apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
