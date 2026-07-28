@@ -539,5 +539,5 @@ message TaskGroup {
 // Metadata associated with a cache operation.
 message CacheMetadata {
   // The action attempt that produced the cached outputs.
-  common.ActionAttemptIdentifier source_action_attempt = 1 [(buf.validate.field).required = true];
+  common.ActionAttemptIdentifier source_action_attempt = 1;
 }
