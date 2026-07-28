@@ -69,10 +69,6 @@ metadata:
   labels: {{- include "flyte-devbox.labels" . | nindent 4 }}
 spec:
   redirectRegex:
-    # Send the bare host to the console. Without this, http://localhost:30080/
-    # falls through to the rustfs S3 catch-all below and answers with an S3 XML
-    # error, which reads as "the devbox is broken" to anyone who opens the root
-    # URL to check whether it came up.
     regex: "^(https?://[^/]+)/?$"
     replacement: "${1}{{ $consoleBasePath }}"
     # Temporary, so browsers don't cache the hop if the console ever moves.
