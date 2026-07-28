@@ -387,8 +387,15 @@ func LiteralsToLaunchFormJson(ctx context.Context, literals []*task.NamedLiteral
 	for _, literal := range literals {
 		variable, ok := varMap[literal.GetName()]
 		if !ok {
-			logger.Errorf(ctx, "variable not found in variable map for literal: %s", literal.GetName())
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("variable not found in variable map for literal: %s", literal.GetName()))
+			// The literal has no corresponding variable in the target interface.
+			// This happens legitimately when re-converting a run's inputs against a
+			// different task version (e.g. the launch-form version selector switching
+			// versions): inputs the new task def dropped have nowhere to map. Skip
+			// them (with a warning) instead of failing the whole conversion, so the
+			// inputs the two versions *share* are still preserved. Mirrors the
+			// unmapped-field handling in JSONValuesToLiterals.
+			logger.Warnf(ctx, "skipping literal %q with no corresponding variable in the target interface (ignoring)", literal.GetName())
+			continue
 		}
 		fieldName := literal.GetName()
 
