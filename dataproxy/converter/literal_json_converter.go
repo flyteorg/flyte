@@ -167,7 +167,7 @@ func JSONValuesToLiterals(ctx context.Context, variableMap *core.VariableMap, va
 		// are allowed and will be ignored (with a warning). This is intentional to avoid
 		// hard failures when translating literals for a task version that has a different
 		// template than the original task these inputs were derived from.
-		logger.Warnf(ctx, "found unmapped fields in JSON payload that do not correspond to any variable (ignoring): %v", unmappedFields)
+		logger.Debugf(ctx, "found unmapped fields in JSON payload that do not correspond to any variable (ignoring): %v", unmappedFields)
 	}
 
 	return literals, nil
@@ -394,7 +394,7 @@ func LiteralsToLaunchFormJson(ctx context.Context, literals []*task.NamedLiteral
 			// them (with a warning) instead of failing the whole conversion, so the
 			// inputs the two versions *share* are still preserved. Mirrors the
 			// unmapped-field handling in JSONValuesToLiterals.
-			logger.Warnf(ctx, "skipping literal %q with no corresponding variable in the target interface (ignoring)", literal.GetName())
+			logger.Debugf(ctx, "skipping literal %q with no corresponding variable in the target interface (ignoring)", literal.GetName())
 			continue
 		}
 		fieldName := literal.GetName()
