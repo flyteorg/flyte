@@ -560,13 +560,21 @@ func TestJSONValuesToLiterals(t *testing.T) {
 		assert.Contains(t, err.Error(), "missing value for variable")
 	})
 
-	t.Run("nil variableMap", func(t *testing.T) {
+	t.Run("nil variableMap is treated as empty (no inputs)", func(t *testing.T) {
+		// A task with no declared inputs has a nil variableMap; this should
+		// yield no literals rather than erroring.
+		empty, err := structpb.NewStruct(map[string]any{})
+		require.NoError(t, err)
+		literals, err := JSONValuesToLiterals(context.Background(), nil, empty)
+		require.NoError(t, err)
+		assert.Empty(t, literals)
+
+		// Any provided values have no matching variable, so they're ignored.
 		values, err := structpb.NewStruct(map[string]any{"foo": "bar"})
 		require.NoError(t, err)
-
-		_, err = JSONValuesToLiterals(context.Background(), nil, values)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "variableMap cannot be nil")
+		literals, err = JSONValuesToLiterals(context.Background(), nil, values)
+		require.NoError(t, err)
+		assert.Empty(t, literals)
 	})
 
 	t.Run("nil values", func(t *testing.T) {
