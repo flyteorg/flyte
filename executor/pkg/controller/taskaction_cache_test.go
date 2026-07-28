@@ -101,7 +101,7 @@ func TestHandleCacheBeforeExecutionHit(t *testing.T) {
 		},
 	}
 
-	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
+	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, false)
 	require.NoError(t, err)
 	require.True(t, handled)
 	assert.Equal(t, pluginsCore.PhaseSuccess, transition.Info().Phase())
@@ -132,7 +132,7 @@ func TestHandleCacheBeforeExecutionWaitingForReservation(t *testing.T) {
 		},
 	}
 
-	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
+	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, false)
 	require.NoError(t, err)
 	require.True(t, handled)
 	assert.Equal(t, pluginsCore.PhaseWaitingForCache, transition.Info().Phase())
@@ -158,9 +158,32 @@ func TestHandleCacheBeforeExecutionMissWithoutSerializableSkipsReservation(t *te
 		},
 	}
 
-	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
+	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, false)
 	require.NoError(t, err)
 	require.False(t, handled)
+	assert.Equal(t, pluginsCore.UnknownTransition, transition)
+}
+
+func TestHandleCacheBeforeExecutionRunningSkipsGet(t *testing.T) {
+	ensureTestMetricKeys()
+	ctx := context.Background()
+	// non-serializable cacheable action already RUNNING: the cache-hit lookup must be skipped.
+	taskAction, dataStore := newCacheableTaskAction(t, true, false)
+	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
+
+	r := &TaskActionReconciler{
+		DataStore: dataStore,
+		Catalog: &stubCatalogClient{
+			getFunc: func(context.Context, catalog.Key) (catalog.Entry, error) {
+				t.Fatal("Catalog.Get must not be called for an already-running action")
+				return catalog.Entry{}, nil
+			},
+		},
+	}
+
+	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, true)
+	require.NoError(t, err)
+	require.False(t, handled) // falls through to plugin.Handle
 	assert.Equal(t, pluginsCore.UnknownTransition, transition)
 }
 

@@ -53,7 +53,7 @@ func newTestRoutingStore(t *testing.T, schemes ...string) (*routingStore, map[st
 	counts := map[string]*int32{}
 	registry := map[string]backendFactory{}
 	for _, sc := range schemes {
-		sc := sc
+
 		var n int32
 		counts[sc] = &n
 		registry[sc] = func(_ context.Context, scheme string, _ DataReference, _ *Config, _ *http.Client, m *dataStoreMetrics) (RawStore, error) {

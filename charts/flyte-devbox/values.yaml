@@ -197,3 +197,16 @@ sandbox:
   # dev Routes requests to an instance of Flyte running locally on a developer's
   # development environment. This is only usable if the flyte-binary chart is disabled.
   dev: false
+  # console runs an in-cluster Flyte console even in dev mode (when the flyte-binary
+  # chart is disabled and the manager runs on the host), so http://localhost:30080/v2
+  # keeps working. The image is preloaded into the devbox, hence pullPolicy: Never.
+  console:
+    enabled: true
+    image:
+      repository: docker.io/unionai-oss/flyteconsole-v2
+      tag: sandbox
+      pullPolicy: Never
+    containerPort: 8080
+    basePath: /v2
+    service:
+      port: 80

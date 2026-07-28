@@ -6,7 +6,6 @@ import (
 	errors2 "errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -20,10 +19,9 @@ import (
 	s32 "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/v2/flytestdlib/internal/utils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/stow"
 	"github.com/flyteorg/stow/azure"
@@ -163,7 +161,7 @@ func (m mockStowItem) Size() (int64, error) {
 }
 
 func (mockStowItem) Open() (io.ReadCloser, error) {
-	return ioutil.NopCloser(bytes.NewReader([]byte{})), nil
+	return io.NopCloser(bytes.NewReader([]byte{})), nil
 }
 
 func (mockStowItem) ETag() (string, error) {
@@ -282,7 +280,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 		dataReference := writeTestFile(ctx, t, s, "s3://container/path")
 		raw, err := s.ReadRaw(ctx, dataReference)
 		assert.NoError(t, err)
-		rawBytes, err := ioutil.ReadAll(raw)
+		rawBytes, err := io.ReadAll(raw)
 		assert.NoError(t, err)
 		assert.Equal(t, 0, len(rawBytes))
 		assert.Equal(t, DataReference("s3://container"), s.GetBaseContainerFQN(context.TODO()))
@@ -363,7 +361,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 		dataReference := writeTestFile(ctx, t, s, "s3://bad-container/path")
 		raw, err := s.ReadRaw(context.TODO(), dataReference)
 		assert.NoError(t, err)
-		rawBytes, err := ioutil.ReadAll(raw)
+		rawBytes, err := io.ReadAll(raw)
 		assert.NoError(t, err)
 		assert.Equal(t, 0, len(rawBytes))
 		assert.Equal(t, DataReference("s3://container"), s.GetBaseContainerFQN(context.TODO()))
@@ -486,7 +484,7 @@ func TestNewLocalStore(t *testing.T) {
 	})
 
 	t.Run("Initialize container", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir("", "stdlib_local")
+		tmpDir, err := os.MkdirTemp("", "stdlib_local")
 		assert.NoError(t, err)
 
 		stats, err := os.Stat(tmpDir)
@@ -514,7 +512,7 @@ func TestNewLocalStore(t *testing.T) {
 	})
 
 	t.Run("missing init container", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir("", "stdlib_local")
+		tmpDir, err := os.MkdirTemp("", "stdlib_local")
 		assert.NoError(t, err)
 
 		stats, err := os.Stat(tmpDir)
@@ -535,7 +533,7 @@ func TestNewLocalStore(t *testing.T) {
 	})
 
 	t.Run("multi-container enabled", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir("", "stdlib_local")
+		tmpDir, err := os.MkdirTemp("", "stdlib_local")
 		assert.NoError(t, err)
 
 		stats, err := os.Stat(tmpDir)
@@ -565,6 +563,11 @@ func TestNewLocalStore(t *testing.T) {
 }
 
 func Test_newStowRawStore(t *testing.T) {
+	secretKey := "password"
+	path := filepath.Join(t.TempDir(), "secret-key-path")
+	err := os.WriteFile(path, []byte(secretKey), 0o600)
+	assert.NoError(t, err)
+
 	type args struct {
 		cfg *Config
 	}
@@ -585,10 +588,35 @@ func Test_newStowRawStore(t *testing.T) {
 			},
 		}}, true},
 		{"minio", args{&Config{
-			Type:          TypeMinio,
+			Type:          TypeStow,
 			InitContainer: "some-container",
-			Connection: ConnectionConfig{
-				Endpoint: config.URL{URL: utils.MustParseURL("http://minio:9000")},
+			Stow: StowConfig{
+				Kind: local.Kind,
+				Config: map[string]string{
+					"endpoint": "http://minio:9000",
+				},
+			},
+		}}, true},
+		{"secretKeyPath", args{&Config{
+			Type:          TypeStow,
+			InitContainer: "flyte",
+			Stow: StowConfig{
+				Kind: s3.Kind,
+				Config: map[string]string{
+					s3.ConfigAccessKeyID: "my-access-key-id",
+					ConfigSecretKeyPath:  path,
+				},
+			},
+		}}, false},
+		{"secretKeyPath not found", args{&Config{
+			Type:          TypeStow,
+			InitContainer: "flyte",
+			Stow: StowConfig{
+				Kind: s3.Kind,
+				Config: map[string]string{
+					s3.ConfigAccessKeyID: "my-access-key-id",
+					ConfigSecretKeyPath:  filepath.Join(t.TempDir(), "wrong"),
+				},
 			},
 		}}, true},
 	}
@@ -596,10 +624,12 @@ func Test_newStowRawStore(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := newStowRawStore(context.TODO(), tt.args.cfg, metrics)
 			if tt.wantErr {
-				assert.Error(t, err, "newStowRawStore() error = %v, wantErr %v", err, tt.wantErr)
+				require.Error(t, err, "newStowRawStore() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			assert.NotNil(t, got, "Expected rawstore, found nil!")
+
+			require.NoError(t, err, "newStowRawStore() error = %v, wantErr %v", err, tt.wantErr)
+			require.NotNil(t, got, "Expected rawstore, found nil!")
 		})
 	}
 }

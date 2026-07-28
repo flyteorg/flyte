@@ -656,141 +656,6 @@ var _ interface {
 	ErrorName() string
 } = BoolSettingValidationError{}
 
-// Validate checks the field values on StringListSetting with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *StringListSetting) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on StringListSetting with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// StringListSettingMultiError, or nil if none found.
-func (m *StringListSetting) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *StringListSetting) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for State
-
-	if all {
-		switch v := interface{}(m.GetListValue()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, StringListSettingValidationError{
-					field:  "ListValue",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, StringListSettingValidationError{
-					field:  "ListValue",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetListValue()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return StringListSettingValidationError{
-				field:  "ListValue",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for ScopeLevel
-
-	if len(errors) > 0 {
-		return StringListSettingMultiError(errors)
-	}
-
-	return nil
-}
-
-// StringListSettingMultiError is an error wrapping multiple validation errors
-// returned by StringListSetting.ValidateAll() if the designated constraints
-// aren't met.
-type StringListSettingMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m StringListSettingMultiError) Error() string {
-	msgs := make([]string, 0, len(m))
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m StringListSettingMultiError) AllErrors() []error { return m }
-
-// StringListSettingValidationError is the validation error returned by
-// StringListSetting.Validate if the designated constraints aren't met.
-type StringListSettingValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e StringListSettingValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e StringListSettingValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e StringListSettingValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e StringListSettingValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e StringListSettingValidationError) ErrorName() string {
-	return "StringListSettingValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e StringListSettingValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sStringListSetting.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = StringListSettingValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = StringListSettingValidationError{}
-
 // Validate checks the field values on StringMapSetting with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
@@ -1396,35 +1261,6 @@ func (m *StorageSettings) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetRunBaseDir()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, StorageSettingsValidationError{
-					field:  "RunBaseDir",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, StorageSettingsValidationError{
-					field:  "RunBaseDir",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetRunBaseDir()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return StorageSettingsValidationError{
-				field:  "RunBaseDir",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	if len(errors) > 0 {
 		return StorageSettingsMultiError(errors)
 	}
@@ -1910,6 +1746,134 @@ var _ interface {
 	ErrorName() string
 } = TaskResourceSettingsValidationError{}
 
+// Validate checks the field values on AppSettings with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AppSettings) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AppSettings with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AppSettingsMultiError, or
+// nil if none found.
+func (m *AppSettings) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AppSettings) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetDisallowAnonymous()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AppSettingsValidationError{
+					field:  "DisallowAnonymous",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AppSettingsValidationError{
+					field:  "DisallowAnonymous",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDisallowAnonymous()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AppSettingsValidationError{
+				field:  "DisallowAnonymous",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AppSettingsMultiError(errors)
+	}
+
+	return nil
+}
+
+// AppSettingsMultiError is an error wrapping multiple validation errors
+// returned by AppSettings.ValidateAll() if the designated constraints aren't met.
+type AppSettingsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AppSettingsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AppSettingsMultiError) AllErrors() []error { return m }
+
+// AppSettingsValidationError is the validation error returned by
+// AppSettings.Validate if the designated constraints aren't met.
+type AppSettingsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AppSettingsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AppSettingsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AppSettingsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AppSettingsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AppSettingsValidationError) ErrorName() string { return "AppSettingsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AppSettingsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAppSettings.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AppSettingsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AppSettingsValidationError{}
+
 // Validate checks the field values on Settings with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -2129,6 +2093,35 @@ func (m *Settings) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return SettingsValidationError{
 				field:  "EnvironmentVariables",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetApp()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SettingsValidationError{
+					field:  "App",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SettingsValidationError{
+					field:  "App",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetApp()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SettingsValidationError{
+				field:  "App",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

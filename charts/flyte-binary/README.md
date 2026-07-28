@@ -64,6 +64,7 @@ Chart for basic single Flyte executable deployment
 | configuration.storage.providerConfig.s3.endpoint | string | `""` |  |
 | configuration.storage.providerConfig.s3.region | string | `"us-east-1"` |  |
 | configuration.storage.providerConfig.s3.secretKey | string | `""` |  |
+| configuration.storage.providerConfig.s3.secretKeyPath | string | `""` |  |
 | configuration.storage.providerConfig.s3.v2Signing | bool | `false` |  |
 | console.affinity | object | `{}` |  |
 | console.basePath | string | `"/v2"` |  |
@@ -136,7 +137,7 @@ Chart for basic single Flyte executable deployment
 | flyte-core-components.secret.kubernetes.burst | int | `200` |  |
 | flyte-core-components.secret.kubernetes.clusterName | string | `"flyte-devbox"` |  |
 | flyte-core-components.secret.kubernetes.kubeconfig | string | `""` |  |
-| flyte-core-components.secret.kubernetes.namespace | string | `"flyte"` |  |
+| flyte-core-components.secret.kubernetes.namespace | string | `"{{ .Release.Namespace }}"` |  |
 | flyte-core-components.secret.kubernetes.qps | int | `100` |  |
 | flyte-core-components.secret.kubernetes.timeout | string | `"30s"` |  |
 | fullnameOverride | string | `""` |  |

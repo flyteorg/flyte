@@ -765,6 +765,8 @@ func (m *Condition) validate(all bool) error {
 
 	// no validation rules for Substate
 
+	// no validation rules for DeploymentId
+
 	if len(errors) > 0 {
 		return ConditionMultiError(errors)
 	}

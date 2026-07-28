@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -25,7 +26,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
-	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	connectorPb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/connector"
 	flyteIdl "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
@@ -72,11 +72,11 @@ func (r Registry) getSupportedTaskTypes() []string {
 }
 
 type Plugin struct {
-	metricScope promutils.Scope
-	cfg         *Config
-	cs          *ClientSet
-	registry    Registry
-	mu          sync.RWMutex
+	getTaskPhase *prometheus.CounterVec
+	cfg          *Config
+	cs           *ClientSet
+	registry     Registry
+	mu           sync.RWMutex
 }
 
 type ResourceWrapper struct {
@@ -248,6 +248,10 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 	if err != nil {
 		return nil, fmt.Errorf("failed to get task from connector with %v", err)
 	}
+	// Track the status the connector reports back (RUNNING/SUCCEEDED/FAILED/...) per GetTask.
+	if p.getTaskPhase != nil {
+		p.getTaskPhase.WithLabelValues(res.GetResource().GetPhase().String()).Inc()
+	}
 	return ResourceWrapper{
 		Phase:             res.GetResource().GetPhase(),
 		Outputs:           res.GetResource().GetOutputs(),
@@ -370,24 +374,17 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 }
 
 func (p *Plugin) getAsyncConnectorClient(ctx context.Context, connector *Deployment) (connectorPb.AsyncConnectorServiceClient, error) {
-	client, ok := p.cs.asyncConnectorClients[connector.Endpoint]
-	if !ok {
-		conn, err := getGrpcConnection(ctx, connector)
-		if err != nil {
-			return nil, err
-		}
-		client = connectorPb.NewAsyncConnectorServiceClient(conn)
-		p.cs.asyncConnectorClients[connector.Endpoint] = client
-	}
-	return client, nil
+	return p.cs.getOrDialAsyncClient(ctx, connector)
 }
 
 func (p *Plugin) watchConnectors(ctx context.Context, connectorService *ConnectorService) {
 	go wait.Until(func() {
-		childCtx, cancel := context.WithCancel(ctx)
-		defer cancel()
-		clientSet := getConnectorClientSets(childCtx)
-		connectorRegistry := getConnectorRegistry(childCtx, clientSet)
+		for _, deployment := range allConnectorDeployments(GetConfig()) {
+			if _, err := p.cs.getOrDialMetadataClient(ctx, deployment); err != nil {
+				logger.Errorf(ctx, "failed to connect to connector [%v]: %v", deployment.Endpoint, err)
+			}
+		}
+		connectorRegistry := getConnectorRegistry(ctx, p.cs)
 		p.setRegistry(connectorRegistry)
 		connectorService.SetSupportedTaskType(connectorRegistry.getSupportedTaskTypes())
 	}, p.cfg.PollInterval.Duration, ctx.Done())
@@ -481,11 +478,13 @@ func newConnectorPlugin(connectorService *ConnectorService) webapi.PluginEntry {
 			connectorRegistry := getConnectorRegistry(ctx, clientSet)
 			supportedTaskTypes := connectorRegistry.getSupportedTaskTypes()
 			connectorService.SetSupportedTaskType(supportedTaskTypes)
+			scope := iCtx.MetricsScope()
 			plugin := &Plugin{
-				metricScope: promutils.NewScope("connector_plugin"),
-				cfg:         cfg,
-				cs:          clientSet,
-				registry:    connectorRegistry,
+				getTaskPhase: scope.MustNewCounterVec("connector_get_task_phase",
+					"GetTask responses from connectors, by returned task phase", "phase"),
+				cfg:      cfg,
+				cs:       clientSet,
+				registry: connectorRegistry,
 			}
 			plugin.watchConnectors(ctx, connectorService)
 			return plugin, nil

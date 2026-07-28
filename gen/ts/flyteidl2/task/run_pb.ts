@@ -9,6 +9,8 @@ import type { RunIdentifier } from "../common/identifier_pb.ts";
 import { file_flyteidl2_common_identifier } from "../common/identifier_pb.ts";
 import type { ActionPhase } from "../common/phase_pb.ts";
 import { file_flyteidl2_common_phase } from "../common/phase_pb.ts";
+import type { Relation } from "../common/run_pb.ts";
+import { file_flyteidl2_common_run } from "../common/run_pb.ts";
 import type { KeyValuePair } from "../core/literals_pb.ts";
 import { file_flyteidl2_core_literals } from "../core/literals_pb.ts";
 import type { SecurityContext } from "../core/security_pb.ts";
@@ -23,7 +25,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/task/run.proto.
  */
 export const file_flyteidl2_task_run: GenFile = /*@__PURE__*/
-  fileDesc("ChhmbHl0ZWlkbDIvdGFzay9ydW4ucHJvdG8SDmZseXRlaWRsMi50YXNrImsKBkxhYmVscxIyCgZ2YWx1ZXMYASADKAsyIi5mbHl0ZWlkbDIudGFzay5MYWJlbHMuVmFsdWVzRW50cnkaLQoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJ1CgtBbm5vdGF0aW9ucxI3CgZ2YWx1ZXMYASADKAsyJy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucy5WYWx1ZXNFbnRyeRotCgtWYWx1ZXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIjQKBEVudnMSLAoGdmFsdWVzGAEgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyIikKDlJhd0RhdGFTdG9yYWdlEhcKD3Jhd19kYXRhX3ByZWZpeBgBIAEoCSJkCgtDYWNoZUNvbmZpZxIXCg9vdmVyd3JpdGVfY2FjaGUYASABKAgSPAoSY2FjaGVfbG9va3VwX3Njb3BlGAIgASgOMiAuZmx5dGVpZGwyLnRhc2suQ2FjaGVMb29rdXBTY29wZSL/BQoHUnVuU3BlYxImCgZsYWJlbHMYASABKAsyFi5mbHl0ZWlkbDIudGFzay5MYWJlbHMSMAoLYW5ub3RhdGlvbnMYAiABKAsyGy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucxIiCgRlbnZzGAMgASgLMhQuZmx5dGVpZGwyLnRhc2suRW52cxIxCg1pbnRlcnJ1cHRpYmxlGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLkJvb2xWYWx1ZRIbCg9vdmVyd3JpdGVfY2FjaGUYBSABKAhCAhgBEg0KBXF1ZXVlGAYgASgJEjgKEHJhd19kYXRhX3N0b3JhZ2UYByABKAsyHi5mbHl0ZWlkbDIudGFzay5SYXdEYXRhU3RvcmFnZRI5ChBzZWN1cml0eV9jb250ZXh0GAggASgLMh8uZmx5dGVpZGwyLmNvcmUuU2VjdXJpdHlDb250ZXh0EjEKDGNhY2hlX2NvbmZpZxgJIAEoCzIbLmZseXRlaWRsMi50YXNrLkNhY2hlQ29uZmlnEiAKFm5vdGlmaWNhdGlvbl9ydWxlX25hbWUYCiABKAlIABI8ChJub3RpZmljYXRpb25fcnVsZXMYCyABKAsyHi5mbHl0ZWlkbDIudGFzay5JbmxpbmVSdWxlTGlzdEgAEjIKDnJ1bl9zdGFydF90aW1lGAwgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIeChZtYXhfYWN0aW9uX2NvbmN1cnJlbmN5GA0gASgNEhQKDHJ1bl9iYXNlX2RpchgOIAEoCRIzCgpyZWxhdGVkX3RvGA8gASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyEhQKDGNsdXN0ZXJfcG9vbBgQIAEoCRI4ChB0YXNrX3NwZWNfc291cmNlGBEgASgOMh4uZmx5dGVpZGwyLnRhc2suVGFza1NwZWNTb3VyY2VCFwoVbm90aWZpY2F0aW9uX3NldHRpbmdzUgdjbHVzdGVyIkUKDklubGluZVJ1bGVMaXN0EjMKBXJ1bGVzGAEgAygLMhouZmx5dGVpZGwyLnRhc2suSW5saW5lUnVsZUIIukgFkgECCAEi1wEKCklubGluZVJ1bGUSSQoJb25fcGhhc2VzGAEgAygOMh0uZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25QaGFzZUIXukgUkgERCAEYASILggEIGAUYBhgHGAgSHgoUZGVsaXZlcnlfY29uZmlnX25hbWUYAiABKAlIABJLChFkZWxpdmVyeV90ZW1wbGF0ZRgDIAEoCzIuLmZseXRlaWRsMi5ub3RpZmljYXRpb24uRGVsaXZlcnlDb25maWdUZW1wbGF0ZUgAQhEKCGRlbGl2ZXJ5EgW6SAIIASp8ChBDYWNoZUxvb2t1cFNjb3BlEiIKHkNBQ0hFX0xPT0tVUF9TQ09QRV9VTlNQRUNJRklFRBAAEh0KGUNBQ0hFX0xPT0tVUF9TQ09QRV9HTE9CQUwQARIlCiFDQUNIRV9MT09LVVBfU0NPUEVfUFJPSkVDVF9ET01BSU4QAipxCg5UYXNrU3BlY1NvdXJjZRIgChxUQVNLX1NQRUNfU09VUkNFX1VOU1BFQ0lGSUVEEAASHQoZVEFTS19TUEVDX1NPVVJDRV9ERVBMT1lFRBABEh4KGlRBU0tfU1BFQ19TT1VSQ0VfRVBIRU1FUkFMEAJCrQEKEmNvbS5mbHl0ZWlkbDIudGFza0IIUnVuUHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvdGFza6ICA0ZUWKoCDkZseXRlaWRsMi5UYXNrygIORmx5dGVpZGwyXFRhc2viAhpGbHl0ZWlkbDJcVGFza1xHUEJNZXRhZGF0YeoCD0ZseXRlaWRsMjo6VGFza2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_phase, file_flyteidl2_core_literals, file_flyteidl2_core_security, file_flyteidl2_notification_definition, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("ChhmbHl0ZWlkbDIvdGFzay9ydW4ucHJvdG8SDmZseXRlaWRsMi50YXNrImsKBkxhYmVscxIyCgZ2YWx1ZXMYASADKAsyIi5mbHl0ZWlkbDIudGFzay5MYWJlbHMuVmFsdWVzRW50cnkaLQoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJ1CgtBbm5vdGF0aW9ucxI3CgZ2YWx1ZXMYASADKAsyJy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucy5WYWx1ZXNFbnRyeRotCgtWYWx1ZXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIjQKBEVudnMSLAoGdmFsdWVzGAEgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyIikKDlJhd0RhdGFTdG9yYWdlEhcKD3Jhd19kYXRhX3ByZWZpeBgBIAEoCSJkCgtDYWNoZUNvbmZpZxIXCg9vdmVyd3JpdGVfY2FjaGUYASABKAgSPAoSY2FjaGVfbG9va3VwX3Njb3BlGAIgASgOMiAuZmx5dGVpZGwyLnRhc2suQ2FjaGVMb29rdXBTY29wZSI0CgdSZWNvdmVyEikKE2ZvcmNlX3JlcnVuX2FjdGlvbnMYASADKAlCDLpICZIBBiIEcgIQASLbBgoHUnVuU3BlYxImCgZsYWJlbHMYASABKAsyFi5mbHl0ZWlkbDIudGFzay5MYWJlbHMSMAoLYW5ub3RhdGlvbnMYAiABKAsyGy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucxIiCgRlbnZzGAMgASgLMhQuZmx5dGVpZGwyLnRhc2suRW52cxIxCg1pbnRlcnJ1cHRpYmxlGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLkJvb2xWYWx1ZRIbCg9vdmVyd3JpdGVfY2FjaGUYBSABKAhCAhgBEg0KBXF1ZXVlGAYgASgJEjgKEHJhd19kYXRhX3N0b3JhZ2UYByABKAsyHi5mbHl0ZWlkbDIudGFzay5SYXdEYXRhU3RvcmFnZRI5ChBzZWN1cml0eV9jb250ZXh0GAggASgLMh8uZmx5dGVpZGwyLmNvcmUuU2VjdXJpdHlDb250ZXh0EjEKDGNhY2hlX2NvbmZpZxgJIAEoCzIbLmZseXRlaWRsMi50YXNrLkNhY2hlQ29uZmlnEiAKFm5vdGlmaWNhdGlvbl9ydWxlX25hbWUYCiABKAlIABI8ChJub3RpZmljYXRpb25fcnVsZXMYCyABKAsyHi5mbHl0ZWlkbDIudGFzay5JbmxpbmVSdWxlTGlzdEgAEjIKDnJ1bl9zdGFydF90aW1lGAwgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIeChZtYXhfYWN0aW9uX2NvbmN1cnJlbmN5GA0gASgNEhQKDHJ1bl9iYXNlX2RpchgOIAEoCRI3CgpyZWxhdGVkX3RvGA8gASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQgIYARIUCgxjbHVzdGVyX3Bvb2wYECABKAkSOAoQdGFza19zcGVjX3NvdXJjZRgRIAEoDjIeLmZseXRlaWRsMi50YXNrLlRhc2tTcGVjU291cmNlEiwKCHJlbGF0aW9uGBIgASgLMhouZmx5dGVpZGwyLmNvbW1vbi5SZWxhdGlvbhIoCgdyZWNvdmVyGBMgASgLMhcuZmx5dGVpZGwyLnRhc2suUmVjb3ZlckIXChVub3RpZmljYXRpb25fc2V0dGluZ3NSB2NsdXN0ZXIiRQoOSW5saW5lUnVsZUxpc3QSMwoFcnVsZXMYASADKAsyGi5mbHl0ZWlkbDIudGFzay5JbmxpbmVSdWxlQgi6SAWSAQIIASKtAwoKSW5saW5lUnVsZRJLCglvbl9waGFzZXMYASADKA4yHS5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvblBoYXNlQhm6SBaSARMIARgBIg2CAQoYBRgGGAcYCBgJEh4KFGRlbGl2ZXJ5X2NvbmZpZ19uYW1lGAIgASgJSAASSwoRZGVsaXZlcnlfdGVtcGxhdGUYAyABKAsyLi5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLkRlbGl2ZXJ5Q29uZmlnVGVtcGxhdGVIADrRAbpIzQEaygEKFXBhdXNlZF9ydWxlX2V4Y2x1c2l2ZRJMYSBydWxlIHN1YnNjcmliaW5nIHRvIEFDVElPTl9QSEFTRV9QQVVTRUQgbXVzdCBub3Qgc3Vic2NyaWJlIHRvIG90aGVyIHBoYXNlcxpjIShmbHl0ZWlkbDIuY29tbW9uLkFjdGlvblBoYXNlLkFDVElPTl9QSEFTRV9QQVVTRUQgaW4gdGhpcy5vbl9waGFzZXMpIHx8IHRoaXMub25fcGhhc2VzLnNpemUoKSA9PSAxQhEKCGRlbGl2ZXJ5EgW6SAIIASp8ChBDYWNoZUxvb2t1cFNjb3BlEiIKHkNBQ0hFX0xPT0tVUF9TQ09QRV9VTlNQRUNJRklFRBAAEh0KGUNBQ0hFX0xPT0tVUF9TQ09QRV9HTE9CQUwQARIlCiFDQUNIRV9MT09LVVBfU0NPUEVfUFJPSkVDVF9ET01BSU4QAipxCg5UYXNrU3BlY1NvdXJjZRIgChxUQVNLX1NQRUNfU09VUkNFX1VOU1BFQ0lGSUVEEAASHQoZVEFTS19TUEVDX1NPVVJDRV9ERVBMT1lFRBABEh4KGlRBU0tfU1BFQ19TT1VSQ0VfRVBIRU1FUkFMEAJCrQEKEmNvbS5mbHl0ZWlkbDIudGFza0IIUnVuUHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvdGFza6ICA0ZUWKoCDkZseXRlaWRsMi5UYXNrygIORmx5dGVpZGwyXFRhc2viAhpGbHl0ZWlkbDJcVGFza1xHUEJNZXRhZGF0YeoCD0ZseXRlaWRsMjo6VGFza2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_phase, file_flyteidl2_common_run, file_flyteidl2_core_literals, file_flyteidl2_core_security, file_flyteidl2_notification_definition, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
 
 /**
  * Label values to be applied to an execution resource.
@@ -142,6 +144,36 @@ export type CacheConfig = Message<"flyteidl2.task.CacheConfig"> & {
  */
 export const CacheConfigSchema: GenMessage<CacheConfig> = /*@__PURE__*/
   messageDesc(file_flyteidl2_task_run, 4);
+
+/**
+ * Recover carries the optional configuration of a recovery run — a run created
+ * with RunSpec.relation.relation_type = RELATION_TYPE_RECOVER. The run being
+ * recovered is RunSpec.relation.related_to; this message intentionally carries no
+ * run reference of its own. It is the extension point for future recovery
+ * parameters.
+ *
+ * @generated from message flyteidl2.task.Recover
+ */
+export type Recover = Message<"flyteidl2.task.Recover"> & {
+  /**
+   * Escape hatch: names of actions that must always re-execute in this recovery
+   * run, even if they succeeded in the run being recovered. A listed parent
+   * action re-executes and therefore re-enqueues its children, each of which goes
+   * through the recovery decision individually (list them too to force the whole
+   * subtree). A listed condition action re-pauses and waits for a new signal.
+   * Unknown names are ignored.
+   *
+   * @generated from field: repeated string force_rerun_actions = 1;
+   */
+  forceRerunActions: string[];
+};
+
+/**
+ * Describes the message flyteidl2.task.Recover.
+ * Use `create(RecoverSchema)` to create a new message.
+ */
+export const RecoverSchema: GenMessage<Recover> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_run, 5);
 
 /**
  * @generated from message flyteidl2.task.RunSpec
@@ -271,11 +303,12 @@ export type RunSpec = Message<"flyteidl2.task.RunSpec"> & {
   runBaseDir: string;
 
   /**
-   * Optional pointer to the single parent run this run was derived from (re-run, recover,
-   * clone, or explicit SDK/CLI provenance). Set at creation, immutable thereafter, and scoped
-   * to the same org/project/domain as this run.
+   * Deprecated: use relation instead. Optional pointer to the single parent run this run
+   * was derived from. If set and relation is unset, the server normalizes it into relation
+   * with RELATION_TYPE_RERUN.
    *
-   * @generated from field: flyteidl2.common.RunIdentifier related_to = 15;
+   * @generated from field: flyteidl2.common.RunIdentifier related_to = 15 [deprecated = true];
+   * @deprecated
    */
   relatedTo?: RunIdentifier;
 
@@ -294,6 +327,24 @@ export type RunSpec = Message<"flyteidl2.task.RunSpec"> & {
    * @generated from field: flyteidl2.task.TaskSpecSource task_spec_source = 17;
    */
   taskSpecSource: TaskSpecSource;
+
+  /**
+   * Optional provenance link to the single parent run this run was derived from
+   * (re-run or recover). Set at creation, immutable thereafter, and scoped to the
+   * same org/project/domain as this run. Replaces related_to.
+   *
+   * @generated from field: flyteidl2.common.Relation relation = 18;
+   */
+  relation?: Relation;
+
+  /**
+   * Optional recovery configuration. Only meaningful when relation is set with
+   * RELATION_TYPE_RECOVER: the run recovers relation.related_to — its successful
+   * actions are reused and only failed/changed ones re-execute. See Recover.
+   *
+   * @generated from field: flyteidl2.task.Recover recover = 19;
+   */
+  recover?: Recover;
 };
 
 /**
@@ -301,7 +352,7 @@ export type RunSpec = Message<"flyteidl2.task.RunSpec"> & {
  * Use `create(RunSpecSchema)` to create a new message.
  */
 export const RunSpecSchema: GenMessage<RunSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_run, 5);
+  messageDesc(file_flyteidl2_task_run, 6);
 
 /**
  * @generated from message flyteidl2.task.InlineRuleList
@@ -318,7 +369,7 @@ export type InlineRuleList = Message<"flyteidl2.task.InlineRuleList"> & {
  * Use `create(InlineRuleListSchema)` to create a new message.
  */
 export const InlineRuleListSchema: GenMessage<InlineRuleList> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_run, 6);
+  messageDesc(file_flyteidl2_task_run, 7);
 
 /**
  * @generated from message flyteidl2.task.InlineRule
@@ -343,6 +394,7 @@ export type InlineRule = Message<"flyteidl2.task.InlineRule"> & {
   } | {
     /**
      * template can only have fields defined in flyteidl2.notification.RunCompletedNotificationTemplateData
+     * (terminal-phase rules) or flyteidl2.notification.ActionPausedNotificationTemplateData (PAUSED rules)
      *
      * @generated from field: flyteidl2.notification.DeliveryConfigTemplate delivery_template = 3;
      */
@@ -356,7 +408,7 @@ export type InlineRule = Message<"flyteidl2.task.InlineRule"> & {
  * Use `create(InlineRuleSchema)` to create a new message.
  */
 export const InlineRuleSchema: GenMessage<InlineRule> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_run, 7);
+  messageDesc(file_flyteidl2_task_run, 8);
 
 /**
  * @generated from enum flyteidl2.task.CacheLookupScope

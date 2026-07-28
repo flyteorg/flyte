@@ -87,6 +87,20 @@ func (s *GoCronScheduler) UpdateSchedules(ctx context.Context, triggers []*model
 			logger.Errorf(ctx, "scheduler: failed to compute start time for %s: %v", key, err)
 			continue
 		}
+		// StartTime returns the scheduling baseline (deploy/last-exec time), which is
+		// typically in the past. ScheduleTimedJob uses it verbatim as the job's first
+		// fire time, and the cron loop fires any entry whose next time is <= now
+		// immediately — so without advancing it, registering a job makes the trigger
+		// fire once right after deploy. Advance along the schedule to the first tick
+		// strictly after now; missed runs in (lastExec, now] are handled by CatchupAll.
+		now := time.Now().UTC()
+		for !startTime.After(now) {
+			next := sched.Next(startTime)
+			if next.IsZero() || !next.After(startTime) {
+				break // defensive: schedule no longer yields future times
+			}
+			startTime = next
+		}
 		job := NewGoCronJob(ctx, t, s.executor)
 		job.entryID = s.cron.ScheduleTimedJob(sched, job, startTime)
 		s.jobs[key] = job

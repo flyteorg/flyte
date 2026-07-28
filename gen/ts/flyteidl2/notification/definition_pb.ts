@@ -5,7 +5,7 @@
 import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
-import type { RunIdentifier } from "../common/identifier_pb.ts";
+import type { ActionIdentifier, RunIdentifier } from "../common/identifier_pb.ts";
 import { file_flyteidl2_common_identifier } from "../common/identifier_pb.ts";
 import type { ActionPhase } from "../common/phase_pb.ts";
 import { file_flyteidl2_common_phase } from "../common/phase_pb.ts";
@@ -15,7 +15,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/notification/definition.proto.
  */
 export const file_flyteidl2_notification_definition: GenFile = /*@__PURE__*/
-  fileDesc("CidmbHl0ZWlkbDIvbm90aWZpY2F0aW9uL2RlZmluaXRpb24ucHJvdG8SFmZseXRlaWRsMi5ub3RpZmljYXRpb24ijgIKFkRlbGl2ZXJ5Q29uZmlnVGVtcGxhdGUSQAoHd2ViaG9vaxgBIAEoCzIvLmZseXRlaWRsMi5ub3RpZmljYXRpb24uV2ViaG9va0RlbGl2ZXJ5VGVtcGxhdGUSPAoFZW1haWwYAiABKAsyLS5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLkVtYWlsRGVsaXZlcnlUZW1wbGF0ZTp0ukhxGm8KFWF0X2xlYXN0X29uZV9yZXF1aXJlZBIwYXQgbGVhc3Qgb25lIG9mIHRoZSBkZWxpdmVyeSBvcHRpb25zIG11c3QgYmUgc2V0GiRoYXModGhpcy53ZWJob29rKSB8fCBoYXModGhpcy5lbWFpbCkimQEKJFJ1bkNvbXBsZXRlZE5vdGlmaWNhdGlvblRlbXBsYXRlRGF0YRI0CgNydW4YASABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJCBrpIA8gBARIsCgVwaGFzZRgCIAEoDjIdLmZseXRlaWRsMi5jb21tb24uQWN0aW9uUGhhc2USDQoFZXJyb3IYAyABKAkioAIKF1dlYmhvb2tEZWxpdmVyeVRlbXBsYXRlEhcKA3VybBgBIAEoCUIKukgHcgUQARjQDxI8CgZtZXRob2QYAiABKA4yIi5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLkh0dHBNZXRob2RCCLpIBYIBAiAAEmcKB2hlYWRlcnMYAyADKAsyPC5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLldlYmhvb2tEZWxpdmVyeVRlbXBsYXRlLkhlYWRlcnNFbnRyeUIYukgVmgESEBQiBnIEEAEYFCoGcgQQARgyEhUKDWJvZHlfdGVtcGxhdGUYBCABKAkaLgoMSGVhZGVyc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiLwoORW1haWxSZWNpcGllbnQSDAoEbmFtZRgBIAEoCRIPCgdhZGRyZXNzGAIgASgJImYKE0lubGluZUVtYWlsVGVtcGxhdGUSGAoHc3ViamVjdBgBIAEoCUIHukgEcgIQARIeCg1odG1sX3RlbXBsYXRlGAIgASgJQge6SARyAhABEhUKDXRleHRfdGVtcGxhdGUYAyABKAki3gEKFVByb3ZpZGVyRW1haWxUZW1wbGF0ZRIfCgt0ZW1wbGF0ZV9pZBgBIAEoCUIKukgHcgUQARjIARJvCg10ZW1wbGF0ZV9kYXRhGAIgAygLMj8uZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5Qcm92aWRlckVtYWlsVGVtcGxhdGUuVGVtcGxhdGVEYXRhRW50cnlCF7pIFJoBERBkIgZyBBABGGQqBXIDGKAfGjMKEVRlbXBsYXRlRGF0YUVudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEi2wIKFUVtYWlsRGVsaXZlcnlUZW1wbGF0ZRI8CgJ0bxgBIAMoCzImLmZseXRlaWRsMi5ub3RpZmljYXRpb24uRW1haWxSZWNpcGllbnRCCLpIBZIBAggBEjIKAmNjGAIgAygLMiYuZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5FbWFpbFJlY2lwaWVudBIzCgNiY2MYAyADKAsyJi5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLkVtYWlsUmVjaXBpZW50Ej0KBmlubGluZRgEIAEoCzIrLmZseXRlaWRsMi5ub3RpZmljYXRpb24uSW5saW5lRW1haWxUZW1wbGF0ZUgAEkoKEXByb3ZpZGVyX3RlbXBsYXRlGAUgASgLMi0uZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5Qcm92aWRlckVtYWlsVGVtcGxhdGVIAEIQCgdjb250ZW50EgW6SAIIASpFCglFdmVudFR5cGUSGgoWRVZFTlRfVFlQRV9VTlNQRUNJRklFRBAAEhwKGEVWRU5UX1RZUEVfUlVOX0NPTVBMRVRFRBABKvcBCgpIdHRwTWV0aG9kEhsKF0hUVFBfTUVUSE9EX1VOU1BFQ0lGSUVEEAASEwoPSFRUUF9NRVRIT0RfR0VUEAESFAoQSFRUUF9NRVRIT0RfSEVBRBACEhQKEEhUVFBfTUVUSE9EX1BPU1QQAxITCg9IVFRQX01FVEhPRF9QVVQQBBIWChJIVFRQX01FVEhPRF9ERUxFVEUQBRIXChNIVFRQX01FVEhPRF9DT05ORUNUEAYSFwoTSFRUUF9NRVRIT0RfT1BUSU9OUxAHEhUKEUhUVFBfTUVUSE9EX1RSQUNFEAgSFQoRSFRUUF9NRVRIT0RfUEFUQ0gQCULkAQoaY29tLmZseXRlaWRsMi5ub3RpZmljYXRpb25CD0RlZmluaXRpb25Qcm90b0gCUAFaOmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9ub3RpZmljYXRpb26iAgNGTliqAhZGbHl0ZWlkbDIuTm90aWZpY2F0aW9uygIWRmx5dGVpZGwyXE5vdGlmaWNhdGlvbuICIkZseXRlaWRsMlxOb3RpZmljYXRpb25cR1BCTWV0YWRhdGHqAhdGbHl0ZWlkbDI6Ok5vdGlmaWNhdGlvbmIGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_phase]);
+  fileDesc("CidmbHl0ZWlkbDIvbm90aWZpY2F0aW9uL2RlZmluaXRpb24ucHJvdG8SFmZseXRlaWRsMi5ub3RpZmljYXRpb24ijgIKFkRlbGl2ZXJ5Q29uZmlnVGVtcGxhdGUSQAoHd2ViaG9vaxgBIAEoCzIvLmZseXRlaWRsMi5ub3RpZmljYXRpb24uV2ViaG9va0RlbGl2ZXJ5VGVtcGxhdGUSPAoFZW1haWwYAiABKAsyLS5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLkVtYWlsRGVsaXZlcnlUZW1wbGF0ZTp0ukhxGm8KFWF0X2xlYXN0X29uZV9yZXF1aXJlZBIwYXQgbGVhc3Qgb25lIG9mIHRoZSBkZWxpdmVyeSBvcHRpb25zIG11c3QgYmUgc2V0GiRoYXModGhpcy53ZWJob29rKSB8fCBoYXModGhpcy5lbWFpbCkimQEKJFJ1bkNvbXBsZXRlZE5vdGlmaWNhdGlvblRlbXBsYXRlRGF0YRI0CgNydW4YASABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJCBrpIA8gBARIsCgVwaGFzZRgCIAEoDjIdLmZseXRlaWRsMi5jb21tb24uQWN0aW9uUGhhc2USDQoFZXJyb3IYAyABKAkinAEKJEFjdGlvblBhdXNlZE5vdGlmaWNhdGlvblRlbXBsYXRlRGF0YRI6CgZhY3Rpb24YASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIOCgZwcm9tcHQYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkSEwoLcHJvbXB0X3R5cGUYBCABKAkioAIKF1dlYmhvb2tEZWxpdmVyeVRlbXBsYXRlEhcKA3VybBgBIAEoCUIKukgHcgUQARjQDxI8CgZtZXRob2QYAiABKA4yIi5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLkh0dHBNZXRob2RCCLpIBYIBAiAAEmcKB2hlYWRlcnMYAyADKAsyPC5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLldlYmhvb2tEZWxpdmVyeVRlbXBsYXRlLkhlYWRlcnNFbnRyeUIYukgVmgESEBQiBnIEEAEYFCoGcgQQARgyEhUKDWJvZHlfdGVtcGxhdGUYBCABKAkaLgoMSGVhZGVyc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiLwoORW1haWxSZWNpcGllbnQSDAoEbmFtZRgBIAEoCRIPCgdhZGRyZXNzGAIgASgJImYKE0lubGluZUVtYWlsVGVtcGxhdGUSGAoHc3ViamVjdBgBIAEoCUIHukgEcgIQARIeCg1odG1sX3RlbXBsYXRlGAIgASgJQge6SARyAhABEhUKDXRleHRfdGVtcGxhdGUYAyABKAki3gEKFVByb3ZpZGVyRW1haWxUZW1wbGF0ZRIfCgt0ZW1wbGF0ZV9pZBgBIAEoCUIKukgHcgUQARjIARJvCg10ZW1wbGF0ZV9kYXRhGAIgAygLMj8uZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5Qcm92aWRlckVtYWlsVGVtcGxhdGUuVGVtcGxhdGVEYXRhRW50cnlCF7pIFJoBERBkIgZyBBABGGQqBXIDGKAfGjMKEVRlbXBsYXRlRGF0YUVudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEi2wIKFUVtYWlsRGVsaXZlcnlUZW1wbGF0ZRI8CgJ0bxgBIAMoCzImLmZseXRlaWRsMi5ub3RpZmljYXRpb24uRW1haWxSZWNpcGllbnRCCLpIBZIBAggBEjIKAmNjGAIgAygLMiYuZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5FbWFpbFJlY2lwaWVudBIzCgNiY2MYAyADKAsyJi5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLkVtYWlsUmVjaXBpZW50Ej0KBmlubGluZRgEIAEoCzIrLmZseXRlaWRsMi5ub3RpZmljYXRpb24uSW5saW5lRW1haWxUZW1wbGF0ZUgAEkoKEXByb3ZpZGVyX3RlbXBsYXRlGAUgASgLMi0uZmx5dGVpZGwyLm5vdGlmaWNhdGlvbi5Qcm92aWRlckVtYWlsVGVtcGxhdGVIAEIQCgdjb250ZW50EgW6SAIIASpjCglFdmVudFR5cGUSGgoWRVZFTlRfVFlQRV9VTlNQRUNJRklFRBAAEhwKGEVWRU5UX1RZUEVfUlVOX0NPTVBMRVRFRBABEhwKGEVWRU5UX1RZUEVfQUNUSU9OX1BBVVNFRBACKvcBCgpIdHRwTWV0aG9kEhsKF0hUVFBfTUVUSE9EX1VOU1BFQ0lGSUVEEAASEwoPSFRUUF9NRVRIT0RfR0VUEAESFAoQSFRUUF9NRVRIT0RfSEVBRBACEhQKEEhUVFBfTUVUSE9EX1BPU1QQAxITCg9IVFRQX01FVEhPRF9QVVQQBBIWChJIVFRQX01FVEhPRF9ERUxFVEUQBRIXChNIVFRQX01FVEhPRF9DT05ORUNUEAYSFwoTSFRUUF9NRVRIT0RfT1BUSU9OUxAHEhUKEUhUVFBfTUVUSE9EX1RSQUNFEAgSFQoRSFRUUF9NRVRIT0RfUEFUQ0gQCULkAQoaY29tLmZseXRlaWRsMi5ub3RpZmljYXRpb25CD0RlZmluaXRpb25Qcm90b0gCUAFaOmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9ub3RpZmljYXRpb26iAgNGTliqAhZGbHl0ZWlkbDIuTm90aWZpY2F0aW9uygIWRmx5dGVpZGwyXE5vdGlmaWNhdGlvbuICIkZseXRlaWRsMlxOb3RpZmljYXRpb25cR1BCTWV0YWRhdGHqAhdGbHl0ZWlkbDI6Ok5vdGlmaWNhdGlvbmIGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_phase]);
 
 /**
  * @generated from message flyteidl2.notification.DeliveryConfigTemplate
@@ -67,6 +67,52 @@ export const RunCompletedNotificationTemplateDataSchema: GenMessage<RunCompleted
   messageDesc(file_flyteidl2_notification_definition, 1);
 
 /**
+ * ActionPausedNotificationTemplateData is the template data available to
+ * delivery templates on rules subscribed to ACTION_PHASE_PAUSED.
+ *
+ * @generated from message flyteidl2.notification.ActionPausedNotificationTemplateData
+ */
+export type ActionPausedNotificationTemplateData = Message<"flyteidl2.notification.ActionPausedNotificationTemplateData"> & {
+  /**
+   * Identifier of the condition action that paused awaiting a signal.
+   *
+   * @generated from field: flyteidl2.common.ActionIdentifier action = 1;
+   */
+  action?: ActionIdentifier;
+
+  /**
+   * Prompt shown to the user when the condition is awaited.
+   *
+   * @generated from field: string prompt = 2;
+   */
+  prompt: string;
+
+  /**
+   * Description of the condition.
+   *
+   * @generated from field: string description = 3;
+   */
+  description: string;
+
+  /**
+   * How to render the prompt: "TEXT", "MARKDOWN", or "" when unspecified.
+   * Mirrors flyteidl2.workflow.ConditionPromptType with the enum prefix
+   * trimmed (the workflow package cannot be imported here without an import
+   * cycle through flyteidl2/task/run.proto).
+   *
+   * @generated from field: string prompt_type = 4;
+   */
+  promptType: string;
+};
+
+/**
+ * Describes the message flyteidl2.notification.ActionPausedNotificationTemplateData.
+ * Use `create(ActionPausedNotificationTemplateDataSchema)` to create a new message.
+ */
+export const ActionPausedNotificationTemplateDataSchema: GenMessage<ActionPausedNotificationTemplateData> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_notification_definition, 2);
+
+/**
  * @generated from message flyteidl2.notification.WebhookDeliveryTemplate
  */
 export type WebhookDeliveryTemplate = Message<"flyteidl2.notification.WebhookDeliveryTemplate"> & {
@@ -98,7 +144,7 @@ export type WebhookDeliveryTemplate = Message<"flyteidl2.notification.WebhookDel
  * Use `create(WebhookDeliveryTemplateSchema)` to create a new message.
  */
 export const WebhookDeliveryTemplateSchema: GenMessage<WebhookDeliveryTemplate> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_notification_definition, 2);
+  messageDesc(file_flyteidl2_notification_definition, 3);
 
 /**
  * @generated from message flyteidl2.notification.EmailRecipient
@@ -120,7 +166,7 @@ export type EmailRecipient = Message<"flyteidl2.notification.EmailRecipient"> & 
  * Use `create(EmailRecipientSchema)` to create a new message.
  */
 export const EmailRecipientSchema: GenMessage<EmailRecipient> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_notification_definition, 3);
+  messageDesc(file_flyteidl2_notification_definition, 4);
 
 /**
  * InlineEmailTemplate contains subject and body content rendered by the
@@ -156,7 +202,7 @@ export type InlineEmailTemplate = Message<"flyteidl2.notification.InlineEmailTem
  * Use `create(InlineEmailTemplateSchema)` to create a new message.
  */
 export const InlineEmailTemplateSchema: GenMessage<InlineEmailTemplate> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_notification_definition, 4);
+  messageDesc(file_flyteidl2_notification_definition, 5);
 
 /**
  * ProviderEmailTemplate references an externally managed email template owned
@@ -187,7 +233,7 @@ export type ProviderEmailTemplate = Message<"flyteidl2.notification.ProviderEmai
  * Use `create(ProviderEmailTemplateSchema)` to create a new message.
  */
 export const ProviderEmailTemplateSchema: GenMessage<ProviderEmailTemplate> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_notification_definition, 5);
+  messageDesc(file_flyteidl2_notification_definition, 6);
 
 /**
  * @generated from message flyteidl2.notification.EmailDeliveryTemplate
@@ -233,7 +279,7 @@ export type EmailDeliveryTemplate = Message<"flyteidl2.notification.EmailDeliver
  * Use `create(EmailDeliveryTemplateSchema)` to create a new message.
  */
 export const EmailDeliveryTemplateSchema: GenMessage<EmailDeliveryTemplate> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_notification_definition, 6);
+  messageDesc(file_flyteidl2_notification_definition, 7);
 
 /**
  * @generated from enum flyteidl2.notification.EventType
@@ -248,6 +294,11 @@ export enum EventType {
    * @generated from enum value: EVENT_TYPE_RUN_COMPLETED = 1;
    */
   RUN_COMPLETED = 1,
+
+  /**
+   * @generated from enum value: EVENT_TYPE_ACTION_PAUSED = 2;
+   */
+  ACTION_PAUSED = 2,
 }
 
 /**

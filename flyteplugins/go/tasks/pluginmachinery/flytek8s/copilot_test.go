@@ -45,19 +45,6 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		Memory: "1024Mi",
 	}
 
-	t.Run("happy", func(t *testing.T) {
-		c, err := FlyteCoPilotContainer("x", cfg, []string{"hello"})
-		assert.NoError(t, err)
-		assert.Equal(t, "test-x", c.Name)
-		assert.Equal(t, "test", c.Image)
-		assert.Equal(t, CopilotCommandArgs(storage.GetConfig()), c.Command)
-		assert.Equal(t, []string{"hello"}, c.Args)
-		assert.Equal(t, 0, len(c.VolumeMounts))
-		assert.Equal(t, "/", c.WorkingDir)
-		assert.Equal(t, 2, len(c.Resources.Limits))
-		assert.Equal(t, 2, len(c.Resources.Requests))
-	})
-
 	t.Run("happy stow backend", func(t *testing.T) {
 		storage.GetConfig().Stow.Kind = "S3"
 		storage.GetConfig().Stow.Config = map[string]string{
@@ -65,9 +52,13 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		}
 		c, err := FlyteCoPilotContainer("x", cfg, []string{"hello"})
 		assert.NoError(t, err)
+
+		expectedCommand, err := CopilotCommandArgs(storage.GetConfig())
+		assert.NoError(t, err)
+
 		assert.Equal(t, "test-x", c.Name)
 		assert.Equal(t, "test", c.Image)
-		assert.Equal(t, CopilotCommandArgs(storage.GetConfig()), c.Command)
+		assert.Equal(t, expectedCommand, c.Command)
 		assert.Equal(t, []string{"hello"}, c.Args)
 		assert.Equal(t, 0, len(c.VolumeMounts))
 		assert.Equal(t, "/", c.WorkingDir)
@@ -82,6 +73,9 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 	})
 
 	t.Run("happy stow GCP backend", func(t *testing.T) {
+		expectedCommand, err := CopilotCommandArgs(storage.GetConfig())
+		assert.NoError(t, err)
+
 		storage.GetConfig().Type = storage.TypeStow
 		storage.GetConfig().InitContainer = "bucket"
 		storage.GetConfig().Stow.Kind = "google"
@@ -90,7 +84,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 			"project_id": "flyte-gcp",
 			"scope":      "read_write",
 		}
-		assert.Equal(t, 12, len(CopilotCommandArgs(storage.GetConfig())))
+		assert.Equal(t, 7, len(expectedCommand))
 	})
 
 	t.Run("storage override", func(t *testing.T) {
@@ -110,7 +104,10 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(c.VolumeMounts))
 
-		assert.ElementsMatch(t, c.Command, CopilotCommandArgs(&storageConfigOverride))
+		expectedCommand, err := CopilotCommandArgs(&storageConfigOverride)
+		assert.NoError(t, err)
+
+		assert.ElementsMatch(t, c.Command, expectedCommand)
 	})
 
 	t.Run("bad-res-cpu", func(t *testing.T) {

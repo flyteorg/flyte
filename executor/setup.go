@@ -6,13 +6,16 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	k8scache "k8s.io/client-go/tools/cache"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -28,6 +31,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 	cachecatalog "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog/cache_service"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	webhookConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	connectorplugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/webapi/connector"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
@@ -45,6 +49,10 @@ var scheme = runtime.NewScheme()
 
 const otelServiceName = "executor"
 
+// podTemplateSyncTimeout bounds the initial PodTemplate informer sync; matches
+// controller-runtime's default cache sync timeout.
+const podTemplateSyncTimeout = 2 * time.Minute
+
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(flyteorgv1.AddToScheme(scheme))
@@ -54,6 +62,15 @@ func init() {
 // Useful for callers that need to pass the scheme to InitKubernetesClient.
 func Scheme() *runtime.Scheme {
 	return scheme
+}
+
+// watchPodTemplates wires a PodTemplate informer into the flytek8s.DefaultPodTemplateStore,
+// with defaultNamespace as the fallback namespace for template lookups.
+func watchPodTemplates(informerFactory informers.SharedInformerFactory, defaultNamespace string) error {
+	flytek8s.DefaultPodTemplateStore.SetDefaultNamespace(defaultNamespace)
+	_, err := informerFactory.Core().V1().PodTemplates().Informer().AddEventHandler(
+		flytek8s.GetPodTemplateUpdatesHandler(&flytek8s.DefaultPodTemplateStore))
+	return err
 }
 
 // Setup registers the executor as a background worker on the SetupContext.
@@ -122,6 +139,22 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if podNamespace == "" {
 		podNamespace = sc.Namespace
 	}
+
+	informerFactory := informers.NewSharedInformerFactory(kubeClient, 0)
+	if err := watchPodTemplates(informerFactory, podNamespace); err != nil {
+		return fmt.Errorf("executor: failed to register PodTemplate event handler: %w", err)
+	}
+	sc.AddWorker("podtemplate-informer", func(ctx context.Context) error {
+		informerFactory.Start(ctx.Done())
+		syncCtx, cancel := context.WithTimeout(ctx, podTemplateSyncTimeout)
+		defer cancel()
+		if !k8scache.WaitForCacheSync(syncCtx.Done(), informerFactory.Core().V1().PodTemplates().Informer().HasSynced) {
+			return fmt.Errorf("executor: PodTemplate informer failed to sync within %v; "+
+				"verify the service account can get/list/watch core/v1 podtemplates", podTemplateSyncTimeout)
+		}
+		<-ctx.Done()
+		return nil
+	})
 
 	executorScope := promutils.NewScope("executor")
 

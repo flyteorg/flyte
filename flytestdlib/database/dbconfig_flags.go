@@ -50,7 +50,6 @@ func (DbConfig) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg DbConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("DbConfig", pflag.ExitOnError)
-	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "enableForeignKeyConstraintWhenMigrating"), defaultConfig.EnableForeignKeyConstraintWhenMigrating, "Whether to enable gorm foreign keys when migrating the db")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "maxIdleConnections"), defaultConfig.MaxIdleConnections, "maxIdleConnections sets the maximum number of connections in the idle connection pool.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "maxOpenConnections"), defaultConfig.MaxOpenConnections, "maxOpenConnections sets the maximum number of open connections to the database.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "connMaxLifeTime"), defaultConfig.ConnMaxLifeTime.String(), "sets the maximum amount of time a connection may be reused")

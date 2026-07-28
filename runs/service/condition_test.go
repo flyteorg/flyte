@@ -78,7 +78,7 @@ func TestUpdateActionStatus_PersistsOutput(t *testing.T) {
 	}
 
 	actionRepo.On("UpdateActionPhase", mock.Anything, testActionID,
-		common.ActionPhase_ACTION_PHASE_SUCCEEDED, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		common.ActionPhase_ACTION_PHASE_SUCCEEDED, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	actionRepo.On("GetAction", mock.Anything, testActionID).
 		Return(&models.Action{DetailedInfo: existingInfo}, nil)
 
@@ -109,7 +109,7 @@ func TestUpdateActionStatus_NoOutputSkipsRunInfoWrite(t *testing.T) {
 	actionRepo, _, svc := newTestServiceWithTaskRepo(t)
 
 	actionRepo.On("UpdateActionPhase", mock.Anything, testActionID,
-		common.ActionPhase_ACTION_PHASE_RUNNING, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		common.ActionPhase_ACTION_PHASE_RUNNING, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	// No GetAction/UpdateActionDetailedInfo expectations: AssertExpectations
 	// fails if the RunInfo write path runs.
 

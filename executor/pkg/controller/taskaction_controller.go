@@ -30,6 +30,8 @@ import (
 
 	"connectrpc.com/connect"
 	"go.opentelemetry.io/otel/metric"
+
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -97,9 +99,30 @@ type TaskActionReconciler struct {
 	CatalogClient     catalog.AsyncClient
 	Catalog           catalog.Client
 	eventsClient      workflowconnect.EventsProxyServiceClient
+	eventBatcher      *eventBatcher
 	cluster           string
 	MaxSystemFailures uint32
 	metrics           *taskActionMetrics
+}
+
+// recordEvent persists a single ActionEvent, blocking until it is durably
+// written. It routes through the coalescing eventBatcher when configured
+// so concurrent reconciles' events collapse into a few multi-row commits;
+// callers still block until their batch commits, so at-least-once semantics are
+// identical to a direct Record (on error the reconcile requeues and re-emits,
+// deduped server-side by ON CONFLICT DO NOTHING). Falls back to a direct Record
+// when no batcher is set (unit tests).
+func (r *TaskActionReconciler) recordEvent(ctx context.Context, event *workflow.ActionEvent) error {
+	if err := event.Validate(); err != nil {
+		return connect.NewError(connect.CodeInvalidArgument, err)
+	}
+	if r.eventBatcher != nil {
+		return r.eventBatcher.Record(ctx, event)
+	}
+	_, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
+		Events: []*workflow.ActionEvent{event},
+	}))
+	return err
 }
 
 // isSystemRetryableFailure reports whether the plugin transition is a
@@ -230,6 +253,7 @@ func NewTaskActionReconciler(
 		PluginRegistry: registry,
 		DataStore:      dataStore,
 		eventsClient:   eventsClient,
+		eventBatcher:   newEventBatcher(eventsClient, otelutils.GetTracerProvider("executor")), // matches otelServiceName in executor/setup.go; noop until registered
 		cluster:        cluster,
 		metrics:        metrics,
 	}
@@ -340,11 +364,12 @@ func (r *TaskActionReconciler) reconcileTask(
 		logger.Error(err, "failed to build task execution context")
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
+	alreadyRunning := taskAction.Status.PluginPhase == pluginsCore.PhaseRunning.String()
 
 	// cacheShortCircuited is true when cache handling already decided the outcome,
 	// either via cache hit or waiting on the reservation owner.
 	var cacheShortCircuited bool
-	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
+	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, alreadyRunning)
 	if err != nil {
 		logger.Error(err, "cache pre-execution handling failed")
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
@@ -531,9 +556,7 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 	// buildActionEvent derives UpdatedTime from PhaseHistory, which doesn't include the
 	// abort transition. Override it so mergeEvents uses the actual abort time as end_time.
 	actionEvent.UpdatedTime = timestamppb.New(abortTime)
-	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
-		Events: []*workflow.ActionEvent{actionEvent},
-	})); err != nil {
+	if err := r.recordEvent(ctx, actionEvent); err != nil {
 		logger.Error(err, "failed to emit abort event, will retry")
 		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
 	}
@@ -566,9 +589,7 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	}
 
 	actionEvent := r.buildActionEvent(ctx, newTaskAction, phaseInfo)
-	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
-		Events: []*workflow.ActionEvent{actionEvent},
-	})); err != nil {
+	if err := r.recordEvent(ctx, actionEvent); err != nil {
 		r.Recorder.Eventf(
 			newTaskAction,
 			nil,
@@ -802,10 +823,9 @@ func cacheStatusFromExternalResources(resources []*pluginsCore.ExternalResource)
 }
 
 // taskActionStatusChanged reports whether any status field has changed between old and new,
-// covering plugin phase, state, state version, observability JSON, conditions, and phase history.
+// covering plugin phase/state, state version, conditions, and phase history.
 func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) bool {
-	if oldStatus.StateJSON != newStatus.StateJSON ||
-		oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
+	if oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
 		oldStatus.PluginPhase != newStatus.PluginPhase ||
 		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion ||
 		oldStatus.Attempts != newStatus.Attempts ||
