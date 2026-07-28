@@ -7199,6 +7199,14 @@ rules:
   - get
 - apiGroups:
   - ""
+  resources:
+  - podtemplates
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
   - events.k8s.io
   resources:
   - events
@@ -7739,6 +7747,12 @@ data:
       secretName: flyte-binary-webhook-secret
       serviceName: flyte-binary-webhook
       servicePort: 443
+      secretManagerTypes:
+        - Embedded
+      embeddedSecretManagerConfig:
+        type: K8s
+        k8sConfig:
+          namespace: flyte
 
     actions:
       kubernetes:
@@ -7764,7 +7778,7 @@ data:
         burst: 200
         clusterName: flyte-devbox
         kubeconfig: ""
-        namespace: flyte
+        namespace: 'flyte'
         qps: 100
         timeout: 30s
   001-plugins.yaml: |
@@ -8656,7 +8670,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: b3c98afcd1c1a1aca5040d049159f6a8683facf7875920987bab9a9df6dc8f97
+        checksum/configuration: 806913c16fd28512aaf60eccab4c1f3bf9aa6689da8474f4458a833c8dad3b94
         checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -9530,6 +9544,32 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: flyte-flyte-devbox-root-to-console@kubernetescrd
+    traefik.ingress.kubernetes.io/router.priority: "1000"
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-devbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-devbox-0.1.0
+  name: flyte-console-root-redirect
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-binary-console
+            port:
+              number: 80
+        path: /
+        pathType: Exact
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
   labels:
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/managed-by: Helm
@@ -9645,6 +9685,23 @@ spec:
   selector:
     matchLabels:
       app: webhook
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-devbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-devbox-0.1.0
+  name: flyte-devbox-root-to-console
+  namespace: flyte
+spec:
+  redirectRegex:
+    permanent: false
+    regex: ^(https?://[^/]+)/?$
+    replacement: ${1}/v2
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration

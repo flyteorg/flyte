@@ -9084,6 +9084,32 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: flyte-flyte-devbox-root-to-console@kubernetescrd
+    traefik.ingress.kubernetes.io/router.priority: "1000"
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-devbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-devbox-0.1.0
+  name: flyte-console-root-redirect
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-devbox-console
+            port:
+              number: 80
+        path: /
+        pathType: Exact
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
   labels:
     app.kubernetes.io/instance: flyte-devbox
     app.kubernetes.io/managed-by: Helm
@@ -9199,6 +9225,23 @@ spec:
   selector:
     matchLabels:
       app: webhook
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-devbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-devbox-0.1.0
+  name: flyte-devbox-root-to-console
+  namespace: flyte
+spec:
+  redirectRegex:
+    permanent: false
+    regex: ^(https?://[^/]+)/?$
+    replacement: ${1}/v2
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
