@@ -61,6 +61,9 @@ func (s *IdentityService) UserInfo(
 	}
 
 	id := identityFromHeaders(req.Header(), s.identityHeaders)
+	if id == nil {
+		return nil, connect.NewError(connect.CodeUnauthenticated, errNoIdentity)
+	}
 	// On the Bearer path the token holds only a subject; userinfo supplies name/email.
 	id = s.enricher.enrich(ctx, bearerToken(req.Header()), id)
 
