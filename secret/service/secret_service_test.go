@@ -285,3 +285,27 @@ func TestSecretService_InvalidationFailureDoesNotFailWrite(t *testing.T) {
 		})
 	}
 }
+
+// A delete whose Secret is already gone (deleted out-of-band) still has to invalidate: the
+// webhook may be serving the old value from cache, so skipping it would keep a secret the user
+// believes is deleted injected into pods until the TTL expires.
+func TestSecretService_DeleteInvalidatesEvenWhenNotFound(t *testing.T) {
+	var got []webhook.InvalidateRequest
+	srv := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+		var req webhook.InvalidateRequest
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&req))
+		got = append(got, req)
+	}))
+	defer srv.Close()
+
+	s := NewSecretService(newTestClient(t), srv.URL)
+	_, err := s.DeleteSecret(context.Background(), connect.NewRequest(&secretpb.DeleteSecretRequest{
+		Id: &secretpb.SecretIdentifier{Domain: "development", Name: "never-created"},
+	}))
+
+	require.Error(t, err, "deleting a missing secret should still report NotFound")
+	assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	assert.Equal(t, []webhook.InvalidateRequest{
+		{Org: defaultOrganization, Domain: "development", Name: "never-created"},
+	}, got)
+}

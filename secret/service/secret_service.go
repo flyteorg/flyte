@@ -267,6 +267,12 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 		},
 	}
 
+	// Invalidate on every exit path, not just the happy one. If the Secret is already gone
+	// (deleted out-of-band) this returns NotFound, but the webhook may still be serving the
+	// old value from cache — leaving a secret the user believes is deleted injected into pods
+	// for up to the cache TTL. Deferred so the NotFound and error paths are covered too.
+	defer s.invalidateCache(ctx, req.Msg.GetId())
+
 	if err := s.k8sClient.Delete(ctx, k8sSecret); err != nil {
 		if k8sErrors.IsNotFound(err) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", req.Msg.GetId().GetName()))
@@ -276,7 +282,6 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 	}
 
 	logger.Debugf(ctx, "deleted k8s secret %v", k8sSecretName)
-	s.invalidateCache(ctx, req.Msg.GetId())
 
 	return connect.NewResponse(&secretpb.DeleteSecretResponse{}), nil
 }
