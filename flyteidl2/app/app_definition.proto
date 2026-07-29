@@ -199,6 +199,10 @@ message Status {
   K8sMetadata k8s_metadata = 8;
 
   MaterializedInputs materialized_inputs = 9;
+
+  // LastStartedAt is the time the app most recently started (first start or restart).
+  // Unset for apps that never started, and for those last started before this field existed.
+  google.protobuf.Timestamp last_started_at = 10;
 }
 
 message K8sMetadata {
