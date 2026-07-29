@@ -59,6 +59,12 @@ func (pm PodMutator) Handle(ctx context.Context, request admission.Request) admi
 	return admission.Allowed("No changes")
 }
 
+// InvalidateCache implements app.SecretCacheInvalidator, letting the secret service drop
+// cached secret values as soon as they are written.
+func (pm PodMutator) InvalidateCache(ctx context.Context, org, domain, project, secretName string) {
+	pm.secretsMutator.InvalidateCache(ctx, org, domain, project, secretName)
+}
+
 func (pm PodMutator) Register(ctx context.Context, mgr manager.Manager) error {
 	wh := &admission.Webhook{Handler: pm}
 	mutatePath := getPodMutatePath()

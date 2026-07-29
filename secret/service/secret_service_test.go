@@ -83,7 +83,7 @@ func TestGetK8sSecretName_ScopeHashesDiffer(t *testing.T) {
 
 func TestSecretService_CreateThenGet(t *testing.T) {
 	k := newTestClient(t)
-	s := NewSecretService(k)
+	s := NewSecretService(k, nil)
 	ctx := context.Background()
 	id := &secretpb.SecretIdentifier{
 		Project: "flytesnacks",
@@ -106,7 +106,7 @@ func TestSecretService_CreateThenGet(t *testing.T) {
 
 func TestSecretService_GetNotFound_UsesOriginalName(t *testing.T) {
 	k := newTestClient(t)
-	s := NewSecretService(k)
+	s := NewSecretService(k, nil)
 	ctx := context.Background()
 	_, err := s.GetSecret(ctx, connect.NewRequest(&secretpb.GetSecretRequest{
 		Id: &secretpb.SecretIdentifier{Name: "my-secret1"},
@@ -119,7 +119,7 @@ func TestSecretService_GetNotFound_UsesOriginalName(t *testing.T) {
 
 func TestSecretService_List_FiltersByScope(t *testing.T) {
 	k := newTestClient(t)
-	s := NewSecretService(k)
+	s := NewSecretService(k, nil)
 	ctx := context.Background()
 
 	// Write one secret at each scope.
@@ -165,7 +165,7 @@ func namesOf(secrets []*secretpb.Secret) []string {
 
 func TestSecretService_List_RejectsProjectWithoutDomain(t *testing.T) {
 	k := newTestClient(t)
-	s := NewSecretService(k)
+	s := NewSecretService(k, nil)
 	_, err := s.ListSecrets(context.Background(), connect.NewRequest(&secretpb.ListSecretsRequest{Project: "flytesnacks"}))
 	require.Error(t, err)
 }
@@ -221,4 +221,44 @@ func TestK8sSecretWrittenByServiceIsReadableByWebhookFetcher(t *testing.T) {
 			assert.Equal(t, expectedID, foundID, "secret created at %s scope was not found at the expected lookup scope", tc.scope)
 		})
 	}
+}
+
+type recordingInvalidator struct {
+	calls [][4]string
+}
+
+func (r *recordingInvalidator) InvalidateCache(_ context.Context, org, domain, project, name string) {
+	r.calls = append(r.calls, [4]string{org, domain, project, name})
+}
+
+// Every write path must invalidate the webhook's secret cache, otherwise a task admitted after
+// the write keeps getting the old value until the cache TTL expires. Create counts as a write:
+// a newly created narrow-scope secret can be shadowed by an already-cached broader-scope one.
+func TestSecretService_WritesInvalidateCache(t *testing.T) {
+	ctx := context.Background()
+	id := &secretpb.SecretIdentifier{Project: "flytesnacks", Domain: "development", Name: "my-secret"}
+	spec := &secretpb.SecretSpec{Value: &secretpb.SecretSpec_BinaryValue{BinaryValue: []byte("v")}}
+	want := [4]string{defaultOrganization, "development", "flytesnacks", "my-secret"}
+
+	inv := &recordingInvalidator{}
+	s := NewSecretService(newTestClient(t), inv)
+
+	_, err := s.CreateSecret(ctx, connect.NewRequest(&secretpb.CreateSecretRequest{Id: id, SecretSpec: spec}))
+	require.NoError(t, err)
+	_, err = s.UpdateSecret(ctx, connect.NewRequest(&secretpb.UpdateSecretRequest{Id: id, SecretSpec: spec}))
+	require.NoError(t, err)
+	_, err = s.DeleteSecret(ctx, connect.NewRequest(&secretpb.DeleteSecretRequest{Id: id}))
+	require.NoError(t, err)
+
+	assert.Equal(t, [][4]string{want, want, want}, inv.calls)
+}
+
+// The standalone secret-service binary has no in-process webhook; writes must still succeed.
+func TestSecretService_NilInvalidatorIsNoop(t *testing.T) {
+	s := NewSecretService(newTestClient(t), nil)
+	_, err := s.CreateSecret(context.Background(), connect.NewRequest(&secretpb.CreateSecretRequest{
+		Id:         &secretpb.SecretIdentifier{Domain: "development", Name: "s"},
+		SecretSpec: &secretpb.SecretSpec{Value: &secretpb.SecretSpec_BinaryValue{BinaryValue: []byte("v")}},
+	}))
+	require.NoError(t, err)
 }

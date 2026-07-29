@@ -158,9 +158,13 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 	executorScope := promutils.NewScope("executor")
 
-	if err := webhookPkg.Setup(ctx, kubeClient, wCfg, podNamespace, executorScope.NewSubScope("webhook"), mgr); err != nil {
+	podMutator, err := webhookPkg.Setup(ctx, kubeClient, wCfg, podNamespace, executorScope.NewSubScope("webhook"), mgr)
+	if err != nil {
 		return fmt.Errorf("executor: webhook setup failed: %w", err)
 	}
+	// Let services set up later in this process (the secret service) invalidate the webhook's
+	// secret cache on write.
+	sc.SecretCacheInvalidator = podMutator
 
 	dataStore, err := storage.NewDataStore(storage.GetConfig(), promutils.NewScope("executor:storage"))
 	if err != nil {

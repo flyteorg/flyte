@@ -12,6 +12,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	flytesecret "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
+	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	commonpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	secretpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/secret"
@@ -37,11 +38,25 @@ var _ secretconnect.SecretServiceHandler = (*SecretService)(nil)
 // SecretService implements the SecretService gRPC API.
 type SecretService struct {
 	k8sClient client.Client
+
+	// cacheInvalidator drops the pod webhook's cached copy of a secret after a write so tasks
+	// pick up the new value immediately. Nil when the webhook isn't running in this process.
+	cacheInvalidator app.SecretCacheInvalidator
 }
 
 // NewSecretService creates a new SecretService.
-func NewSecretService(k8sClient client.Client) *SecretService {
-	return &SecretService{k8sClient: k8sClient}
+func NewSecretService(k8sClient client.Client, cacheInvalidator app.SecretCacheInvalidator) *SecretService {
+	return &SecretService{k8sClient: k8sClient, cacheInvalidator: cacheInvalidator}
+}
+
+// invalidateCache drops any cached value for id. Called after every write (create, update,
+// delete): a create can shadow a broader-scoped secret that is already cached, so it needs
+// invalidation just as much as an update does.
+func (s *SecretService) invalidateCache(ctx context.Context, id *secretpb.SecretIdentifier) {
+	if s.cacheInvalidator == nil {
+		return
+	}
+	s.cacheInvalidator.InvalidateCache(ctx, defaultOrganization, id.GetDomain(), id.GetProject(), id.GetName())
 }
 
 // validateScope enforces the valid scope combinations supported by the secret
@@ -97,6 +112,8 @@ func (s *SecretService) CreateSecret(ctx context.Context, req *connect.Request[s
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
+	s.invalidateCache(ctx, req.Msg.GetId())
+
 	return connect.NewResponse(&secretpb.CreateSecretResponse{}), nil
 }
 
@@ -141,6 +158,8 @@ func (s *SecretService) UpdateSecret(ctx context.Context, req *connect.Request[s
 		logger.Errorf(ctx, "failed to update secret %v: %v", encodedName, err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+
+	s.invalidateCache(ctx, req.Msg.GetId())
 
 	return connect.NewResponse(&secretpb.UpdateSecretResponse{}), nil
 }
@@ -207,6 +226,8 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 	}
 
 	logger.Debugf(ctx, "deleted k8s secret %v", k8sSecretName)
+	s.invalidateCache(ctx, req.Msg.GetId())
+
 	return connect.NewResponse(&secretpb.DeleteSecretResponse{}), nil
 }
 

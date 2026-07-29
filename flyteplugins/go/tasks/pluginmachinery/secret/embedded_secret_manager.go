@@ -77,6 +77,24 @@ func (i *EmbeddedSecretManagerInjector) Type() config.SecretManagerType {
 	return config.SecretManagerTypeEmbedded
 }
 
+// InvalidateCache drops the cached value(s) for a secret so the next pod admission re-reads it
+// from the fetchers. lookUpSecret caches under whichever cascade scope the fetcher resolved the
+// secret at (project+domain, domain, or org), and the caller has no way to know which one that
+// was, so all three keys are cleared.
+func (i *EmbeddedSecretManagerInjector) InvalidateCache(ctx context.Context, org, domain, project, secretName string) {
+	for _, cacheKey := range []string{
+		EncodeSecretName(org, domain, project, secretName),
+		EncodeSecretName(org, domain, EmptySecretScope, secretName),
+		EncodeSecretName(org, EmptySecretScope, EmptySecretScope, secretName),
+	} {
+		if err := i.secretCache.Delete(ctx, cacheKey); err != nil {
+			logger.Debugf(ctx, "Failed to delete cache entry [%s]: %v", cacheKey, err)
+		}
+	}
+
+	logger.Infof(ctx, "Invalidated cache entries for secret [%s/%s/%s/%s]", org, domain, project, secretName)
+}
+
 func GetSecretID(secretKey string, labels map[string]string) (string, error) {
 	return EncodeSecretName(labels[OrganizationLabel], labels[DomainLabel], labels[ProjectLabel], secretKey), nil
 }

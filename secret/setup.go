@@ -18,7 +18,7 @@ const otelServiceName = "secret-service"
 // Setup registers the SecretService handler on the SetupContext mux.
 // Requires sc.K8sClient and sc.Namespace to be set.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
-	svc := service.NewSecretService(sc.K8sClient)
+	svc := service.NewSecretService(sc.K8sClient, sc.SecretCacheInvalidator)
 
 	otelCfg := otelutils.GetConfig()
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
