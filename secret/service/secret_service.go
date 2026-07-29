@@ -64,13 +64,16 @@ func NewSecretService(k8sClient client.Client, cacheInvalidationURL string) *Sec
 	}
 }
 
-// invalidateCache asks the pod webhook to drop any cached value for id. Called after every write
-// (create, update, delete): a create can shadow a broader-scoped secret that is already cached,
-// so it needs invalidation just as much as an update does.
+// invalidateWebhookSecretCache asks the pod webhook to drop any cached value for id. Named for
+// the cache it clears (the webhook's), not to be confused with the webhook-side
+// SecretsPodMutator.InvalidateCache this reaches over HTTP.
+//
+// Called after every write (create, update, delete): a create can shadow a broader-scoped secret
+// that is already cached, so it needs invalidation just as much as an update does.
 //
 // Best-effort. The secret is already durably written at this point, so a failure here must not
 // fail the RPC — it only means the old value lingers until the webhook's cache TTL expires.
-func (s *SecretService) invalidateCache(ctx context.Context, id *secretpb.SecretIdentifier) {
+func (s *SecretService) invalidateWebhookSecretCache(ctx context.Context, id *secretpb.SecretIdentifier) {
 	if s.cacheInvalidationURL == "" {
 		return
 	}
@@ -162,7 +165,7 @@ func (s *SecretService) CreateSecret(ctx context.Context, req *connect.Request[s
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	s.invalidateCache(ctx, req.Msg.GetId())
+	s.invalidateWebhookSecretCache(ctx, req.Msg.GetId())
 
 	return connect.NewResponse(&secretpb.CreateSecretResponse{}), nil
 }
@@ -209,7 +212,7 @@ func (s *SecretService) UpdateSecret(ctx context.Context, req *connect.Request[s
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	s.invalidateCache(ctx, req.Msg.GetId())
+	s.invalidateWebhookSecretCache(ctx, req.Msg.GetId())
 
 	return connect.NewResponse(&secretpb.UpdateSecretResponse{}), nil
 }
@@ -271,7 +274,7 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 	// (deleted out-of-band) this returns NotFound, but the webhook may still be serving the
 	// old value from cache — leaving a secret the user believes is deleted injected into pods
 	// for up to the cache TTL. Deferred so the NotFound and error paths are covered too.
-	defer s.invalidateCache(ctx, req.Msg.GetId())
+	defer s.invalidateWebhookSecretCache(ctx, req.Msg.GetId())
 
 	if err := s.k8sClient.Delete(ctx, k8sSecret); err != nil {
 		if k8sErrors.IsNotFound(err) {
