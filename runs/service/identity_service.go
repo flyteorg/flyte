@@ -13,7 +13,6 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/config"
 )
 
-// errNoIdentity is returned when a request carries no resolvable caller identity (missing or untrusted).
 var errNoIdentity = errors.New("no authenticated identity on request (missing or untrusted identity headers)")
 
 // IdentityService implements the IdentityServiceHandler interface.
@@ -48,8 +47,7 @@ func NewIdentityService(
 var _ authconnect.IdentityServiceHandler = (*IdentityService)(nil)
 
 // UserInfo returns information about the currently logged in user, resolved from the
-// auth headers the proxy forwards — the same path run attribution uses, so whoami and
-// a run's executed_by can never disagree.
+// auth headers the proxy forwards — the same path run attribution uses.
 //
 // Returns Unauthenticated when the request carries no identity, or when forwarded
 // headers aren't trusted (in which case the caller cannot be established at all), so
