@@ -20,11 +20,6 @@ import (
 type SecretsInjector interface {
 	Type() config.SecretManagerType
 	Inject(ctx context.Context, secrets *core.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error)
-
-	// InvalidateCache drops any cached value for the named secret so the next Inject re-reads
-	// it. Injectors that read through to their backend on every Inject implement this as a
-	// no-op. It is on the interface rather than an optional one so that adding a caching
-	// injector without wiring up invalidation is a compile error, not a stale-secret bug.
 	InvalidateCache(ctx context.Context, org, domain, project, secretName string)
 }
 
