@@ -52,9 +52,10 @@ message TaskAction {
   // Enables caching when set and specifies the cache version to use.
   google.protobuf.StringValue cache_key = 3;
 
-  // the specific cluster that this action should be executed on. if not set, the cluster from the
-  // `RunSpec` will be used.
-  string cluster = 4;
+  // The specific queue that this action should be executed on.
+  // If not set, the queue from the `RunSpec` will be used.
+  string queue = 4;
+  reserved "cluster";
 }
 
 // TraceAction is used to define a trace action that can be used to track the execution of an action that's managed
@@ -365,6 +366,9 @@ message ActionAttempt {
 
   // Contains corresponding k8s pods and containers information for this action attempt.
   flyteidl2.core.LogContext log_context = 13;
+
+  // Cache metadata for this attempt, set only for cache hits.
+  CacheMetadata cache_metadata = 14;
 }
 
 message ClusterEvent {
@@ -434,6 +438,9 @@ message ActionEvent {
 
   // Timestamp when the event was observed and reported by the executor
   google.protobuf.Timestamp reported_time = 15;
+
+  // Cache metadata for this event, set only for cache hits.
+  CacheMetadata cache_metadata = 16;
 }
 
 message ActionSpec {
@@ -528,4 +535,10 @@ message TaskGroup {
 
   // Average time from run creation to entering RUNNING phase.
   google.protobuf.Duration average_time_to_running = 14;
+}
+
+// Metadata associated with a cache operation.
+message CacheMetadata {
+  // The action attempt that produced the cached outputs.
+  common.ActionAttemptIdentifier source_action_attempt = 1;
 }

@@ -34,10 +34,13 @@ spec:
 {{- end }}
 ---
 {{- $consoleService := "" }}
+{{- $consoleBasePath := "" }}
 {{- if index .Values "flyte-binary" "enabled" }}
 {{- $consoleService = printf "%s-console" ( index .Values "flyte-binary" "fullnameOverride" | default "flyte-binary" ) }}
+{{- $consoleBasePath = dig "console" "basePath" "/v2" ( index .Values "flyte-binary" ) }}
 {{- else if and .Values.sandbox.dev .Values.sandbox.console.enabled }}
 {{- $consoleService = printf "%s-console" ( include "flyte-devbox.fullname" . ) }}
+{{- $consoleBasePath = .Values.sandbox.console.basePath | default "/v2" }}
 {{- end }}
 {{- if $consoleService }}
 apiVersion: networking.k8s.io/v1
@@ -50,9 +53,48 @@ spec:
   rules:
     - http:
         paths:
-          - path: /v2
+          - path: {{ $consoleBasePath }}
             pathType: Prefix
             backend:
+              service:
+                name: {{ $consoleService }}
+                port:
+                  number: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ include "flyte-devbox.fullname" . }}-root-to-console
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-devbox.labels" . | nindent 4 }}
+spec:
+  redirectRegex:
+    regex: "^(https?://[^/]+)/?$"
+    replacement: "${1}{{ $consoleBasePath }}"
+    # Temporary, so browsers don't cache the hop if the console ever moves.
+    permanent: false
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: flyte-console-root-redirect
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-devbox.labels" . | nindent 4 }}
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: {{ printf "%s-%s-root-to-console@kubernetescrd" .Release.Namespace ( include "flyte-devbox.fullname" . ) | quote }}
+    # Traefik derives router priority from rule length, so this route's
+    # Path(`/`) would lose to the rustfs PathPrefix(`/`) below. Pin it higher.
+    traefik.ingress.kubernetes.io/router.priority: "1000"
+spec:
+  rules:
+    - http:
+        paths:
+          # Exact, so only the bare root redirects
+          - path: /
+            pathType: Exact
+            backend:
+              # Never actually reached: the middleware redirects first. Traefik
+              # still requires a resolvable backend on the route.
               service:
                 name: {{ $consoleService }}
                 port:
