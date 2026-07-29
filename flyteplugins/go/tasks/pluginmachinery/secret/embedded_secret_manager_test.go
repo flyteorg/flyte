@@ -11,7 +11,6 @@ import (
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	k8sError "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -827,9 +826,6 @@ func TestEmbeddedSecretManagerInjector_InvalidateCache_ClearsAllCascadeScopes(t 
 		&config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix},
 	)
 
-	invalidator, ok := injector.(cacheInvalidator)
-	require.True(t, ok, "embedded injector must implement cacheInvalidator")
-
-	invalidator.InvalidateCache(ctx, org, domain, project, name)
+	injector.InvalidateCache(ctx, org, domain, project, name)
 	assert.ElementsMatch(t, wantKeys, deleted)
 }
