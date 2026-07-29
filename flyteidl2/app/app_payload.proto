@@ -82,6 +82,11 @@ message ListRequest {
 
   // Disable caller identity enrichment in the response.
   bool disable_identity_enrichment = 5;
+
+  // Include the total number of apps matching the request's filters in the response.
+  // This performs an additional count query, so it should typically only be set on
+  // the first page of a paginated listing.
+  bool include_total_count = 6;
 }
 
 // Response message for listing apps.
@@ -90,6 +95,9 @@ message ListResponse {
   repeated App apps = 1;
   // Token for fetching the next page of results, if any.
   string token = 2;
+  // Total number of apps matching the request's filters, ignoring pagination.
+  // Only populated when include_total_count is set on the request.
+  int64 total_count = 3;
 }
 
 // Request message for watching app events.
