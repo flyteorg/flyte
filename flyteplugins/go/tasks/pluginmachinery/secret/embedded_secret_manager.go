@@ -42,6 +42,13 @@ const (
 	OrganizationLabel = "organization"
 	EmptySecretScope  = ""
 
+	// DefaultOrganization is the placeholder org for Flyte OSS v2, which has no organization
+	// concept, but whose secret fetcher still requires one. Everything that stamps the
+	// OrganizationLabel on a pod, encodes a secret name, or invalidates a cached secret must
+	// use this same value: the org is part of the cache key, so a mismatch between any two of
+	// them silently resolves to a different secret or clears a key nobody reads.
+	DefaultOrganization = "flyte"
+
 	// All of the namespace, group and key cannot contain '/' so it is safe to use '/' as a delimiter.
 	NamespaceGroupKeyDelimiter = "/"
 	rawK8sSecretsStorageFormat = valueFormatter + NamespaceGroupKeyDelimiter + valueFormatter + NamespaceGroupKeyDelimiter + valueFormatter

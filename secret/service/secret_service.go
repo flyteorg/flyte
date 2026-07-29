@@ -38,7 +38,7 @@ const (
 	// defaultOrganization is a placeholder org used in the encoded secret ID
 	// because Flyte OSS v2 has no organization concept. It must match the
 	// organization label stamped on task pods by the executor.
-	defaultOrganization = "flyte"
+	defaultOrganization = flytesecret.DefaultOrganization
 )
 
 // Ensure SecretService implements SecretServiceHandler at compile time.
