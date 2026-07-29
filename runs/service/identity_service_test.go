@@ -31,8 +31,6 @@ func TestIdentityService_UserInfo(t *testing.T) {
 		headers map[string]string
 
 		wantCode connect.Code // non-zero means an error is expected
-		wantSub  string
-		wantName string
 		want     *auth.UserInfoResponse
 	}{
 		{

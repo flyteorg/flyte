@@ -13,8 +13,8 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/config"
 )
 
-// errNoIdentity is returned when a request carries no resolvable caller identity.
-var errNoIdentity = errors.New("no authenticated identity on request")
+// errNoIdentity is returned when a request carries no resolvable caller identity (missing or untrusted).
+var errNoIdentity = errors.New("no authenticated identity on request (missing or untrusted identity headers)")
 
 // IdentityService implements the IdentityServiceHandler interface.
 type IdentityService struct {
