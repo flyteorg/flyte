@@ -657,11 +657,11 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 		},
 		Spec: servingv1.ServiceSpec{
 			ConfigurationSpec: servingv1.ConfigurationSpec{
-			Template: servingv1.RevisionTemplateSpec{
-				ObjectMeta: metav1.ObjectMeta{
-					Labels:      templateLabels,
-					Annotations: templateAnnotations,
-				},
+				Template: servingv1.RevisionTemplateSpec{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels:      templateLabels,
+						Annotations: templateAnnotations,
+					},
 					Spec: servingv1.RevisionSpec{
 						PodSpec:        podSpec,
 						TimeoutSeconds: &timeoutSecsInt,

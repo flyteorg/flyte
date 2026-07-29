@@ -992,7 +992,6 @@ func TestKserviceToStatus_Messages(t *testing.T) {
 	}
 }
 
-
 // transformStructToStructPB converts an arbitrary Go object into a *structpb.Struct
 // by round-tripping through JSON. It fails the test on any marshaling error.
 func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
