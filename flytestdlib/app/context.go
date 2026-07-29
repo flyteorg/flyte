@@ -25,14 +25,6 @@ type namedWorker struct {
 	fn   WorkerFunc
 }
 
-// SecretCacheInvalidator drops any cached copy of a secret value. It is implemented by the
-// executor's pod webhook (which caches resolved secrets across pod admissions) and consumed by
-// the secret service so that writing a secret takes effect immediately instead of after the
-// cache TTL. Only valid when both run in the same process, i.e. the unified `flyte` binary.
-type SecretCacheInvalidator interface {
-	InvalidateCache(ctx context.Context, org, domain, project, secretName string)
-}
-
 // SetupContext carries shared resources to service Setup functions.
 // New fields can be added here without changing any Setup() signature.
 type SetupContext struct {
@@ -54,10 +46,6 @@ type SetupContext struct {
 
 	// K8sCache is an optional shared controller-runtime cache.
 	K8sCache cache.Cache
-
-	// SecretCacheInvalidator is set by the executor when its pod webhook runs in this process
-	// (nil otherwise, e.g. in the standalone secret-service binary).
-	SecretCacheInvalidator SecretCacheInvalidator
 
 	// DataStore is the object storage client (may be nil).
 	DataStore *storage.DataStore

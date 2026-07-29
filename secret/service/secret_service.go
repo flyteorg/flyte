@@ -1,8 +1,13 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"net/http"
+	"strings"
+	"time"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -11,8 +16,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/v2/executor/pkg/webhook"
 	flytesecret "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
-	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	commonpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	secretpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/secret"
@@ -25,6 +30,10 @@ const (
 	managedSecretLabelValue = "true"
 	projectLabelKey         = "app.flyte.org/project"
 	domainLabelKey          = "app.flyte.org/domain"
+
+	// cacheInvalidationTimeout bounds the best-effort call to the webhook's invalidation
+	// endpoint so a wedged webhook can't stall secret writes.
+	cacheInvalidationTimeout = 5 * time.Second
 
 	// defaultOrganization is a placeholder org used in the encoded secret ID
 	// because Flyte OSS v2 has no organization concept. It must match the
@@ -39,24 +48,65 @@ var _ secretconnect.SecretServiceHandler = (*SecretService)(nil)
 type SecretService struct {
 	k8sClient client.Client
 
-	// cacheInvalidator drops the pod webhook's cached copy of a secret after a write so tasks
-	// pick up the new value immediately. Nil when the webhook isn't running in this process.
-	cacheInvalidator app.SecretCacheInvalidator
+	// cacheInvalidationURL is the base URL of the pod webhook's cache invalidation server.
+	// Empty disables invalidation, in which case writes take effect after the webhook's TTL.
+	cacheInvalidationURL string
+	httpClient           *http.Client
 }
 
-// NewSecretService creates a new SecretService.
-func NewSecretService(k8sClient client.Client, cacheInvalidator app.SecretCacheInvalidator) *SecretService {
-	return &SecretService{k8sClient: k8sClient, cacheInvalidator: cacheInvalidator}
+// NewSecretService creates a new SecretService. cacheInvalidationURL is the base URL of the pod
+// webhook's cache invalidation server; pass "" to disable cache invalidation.
+func NewSecretService(k8sClient client.Client, cacheInvalidationURL string) *SecretService {
+	return &SecretService{
+		k8sClient:            k8sClient,
+		cacheInvalidationURL: cacheInvalidationURL,
+		httpClient:           &http.Client{Timeout: cacheInvalidationTimeout},
+	}
 }
 
-// invalidateCache drops any cached value for id. Called after every write (create, update,
-// delete): a create can shadow a broader-scoped secret that is already cached, so it needs
-// invalidation just as much as an update does.
+// invalidateCache asks the pod webhook to drop any cached value for id. Called after every write
+// (create, update, delete): a create can shadow a broader-scoped secret that is already cached,
+// so it needs invalidation just as much as an update does.
+//
+// Best-effort. The secret is already durably written at this point, so a failure here must not
+// fail the RPC — it only means the old value lingers until the webhook's cache TTL expires.
 func (s *SecretService) invalidateCache(ctx context.Context, id *secretpb.SecretIdentifier) {
-	if s.cacheInvalidator == nil {
+	if s.cacheInvalidationURL == "" {
 		return
 	}
-	s.cacheInvalidator.InvalidateCache(ctx, defaultOrganization, id.GetDomain(), id.GetProject(), id.GetName())
+
+	body, err := json.Marshal(webhook.InvalidateRequest{
+		Org:     defaultOrganization,
+		Domain:  id.GetDomain(),
+		Project: id.GetProject(),
+		Name:    id.GetName(),
+	})
+	if err != nil {
+		logger.Warnf(ctx, "failed to encode cache invalidation request for %v: %v", id.GetName(), err)
+		return
+	}
+
+	url := strings.TrimSuffix(s.cacheInvalidationURL, "/") + webhook.InvalidateSecretPath
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
+	if err != nil {
+		logger.Warnf(ctx, "failed to build cache invalidation request for %v: %v", id.GetName(), err)
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := s.httpClient.Do(req)
+	if err != nil {
+		logger.Warnf(ctx, "failed to invalidate secret cache for %v: %v; the old value may be served until the webhook cache TTL expires", id.GetName(), err)
+		return
+	}
+	defer resp.Body.Close() // nolint: errcheck
+
+	if resp.StatusCode != http.StatusOK {
+		logger.Warnf(ctx, "secret cache invalidation for %v returned %s; the old value may be served until the webhook cache TTL expires", id.GetName(), resp.Status)
+		return
+	}
+
+	logger.Debugf(ctx, "invalidated webhook secret cache for %v", id.GetName())
 }
 
 // validateScope enforces the valid scope combinations supported by the secret

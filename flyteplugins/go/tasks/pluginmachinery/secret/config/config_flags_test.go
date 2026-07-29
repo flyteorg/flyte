@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-viper/mapstructure/v2"
+	"github.com/mitchellh/mapstructure"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -149,6 +149,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("listenPort", testValue)
 			if vInt, err := cmdFlags.GetInt("listenPort"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.ListenPort)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_cacheInvalidationPort", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("cacheInvalidationPort", testValue)
+			if vInt, err := cmdFlags.GetInt("cacheInvalidationPort"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.CacheInvalidationPort)
 
 			} else {
 				assert.FailNow(t, err.Error())

@@ -140,6 +140,9 @@ spec:
               containerPort: 8090
             - name: webhook
               containerPort: 9443
+            - name: cache-internal
+              containerPort: 9444
+              protocol: TCP
           {{- if .Values.deployment.startupProbe }}
           startupProbe: {{- tpl ( .Values.deployment.startupProbe | toYaml ) . | nindent 12 }}
           {{- end }}

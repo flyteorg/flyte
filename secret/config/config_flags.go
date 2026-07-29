@@ -52,6 +52,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "server.port"), defaultConfig.Server.Port, "Port to bind the HTTP server")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "server.host"), defaultConfig.Server.Host, "Host to bind the HTTP server")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cacheInvalidationURL"), defaultConfig.CacheInvalidationURL, "Base URL of the pod webhook's secret cache invalidation server")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.kubeconfig"), defaultConfig.Kubernetes.KubeConfig, "Path to kubeconfig file (optional)")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.namespace"), defaultConfig.Kubernetes.Namespace, "Kubernetes namespace")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "kubernetes.qps"), defaultConfig.Kubernetes.QPS, "Maximum queries per second to the Kubernetes API server")
