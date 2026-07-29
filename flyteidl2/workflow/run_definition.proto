@@ -53,7 +53,7 @@ message TaskAction {
   google.protobuf.StringValue cache_key = 3;
 
   // The specific queue that this action should be executed on.
-  // if not set, the queue from the `RunSpec` will be used.
+  // If not set, the queue from the `RunSpec` will be used.
   string queue = 4;
   reserved "cluster";
 }
