@@ -114,10 +114,7 @@ func (s *SecretService) invalidateWebhookSecretCache(ctx context.Context, id *se
 
 // invalidationTargets resolves the configured host to one URL per webhook pod.
 //
-// Resolution rather than a single request is what makes this correct against a headless Service:
-// its DNS returns an A record per pod, and every replica caches independently, so a request to
-// the name alone would reach one arbitrary pod and leave the others stale. A ClusterIP Service or
-// a bare host resolves to exactly one address, so the same code path handles both.
+// Resolution rather than a single request is what makes this correct against a headless Service.
 func (s *SecretService) invalidationTargets(ctx context.Context) ([]string, error) {
 	base, err := url.Parse(strings.TrimSuffix(s.webhookURL, "/"))
 	if err != nil {
