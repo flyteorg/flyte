@@ -397,3 +397,33 @@ func TestSecretService_InvalidationTargets(t *testing.T) {
 		assert.Error(t, err)
 	})
 }
+
+// A client that hangs up after the write is persisted must not leave the webhook serving the old
+// value: by then the secret is already durably changed, and the cancelled request context would
+// otherwise propagate into DNS resolution and the POST, failing invalidation for up to the cache
+// TTL. Fails without context.WithoutCancel in invalidateWebhookSecretCache.
+func TestSecretService_InvalidatesWithAlreadyCancelledContext(t *testing.T) {
+	got := make(chan webhook.InvalidateRequest, 1)
+	srv := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+		var req webhook.InvalidateRequest
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&req))
+		got <- req
+	}))
+	defer srv.Close()
+
+	// Cancelled before the call, standing in for a caller that hung up once the write landed.
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	NewSecretService(newTestClient(t), srv.URL).invalidateWebhookSecretCache(ctx,
+		&secretpb.SecretIdentifier{Domain: "development", Project: "flytesnacks", Name: "hungup"})
+
+	select {
+	case req := <-got:
+		assert.Equal(t, webhook.InvalidateRequest{
+			Org: defaultOrganization, Domain: "development", Project: "flytesnacks", Name: "hungup",
+		}, req)
+	default:
+		t.Fatal("invalidation was not sent: a cancelled caller context suppressed it")
+	}
+}
