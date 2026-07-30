@@ -11,8 +11,3 @@ spec:
       port: 443
       targetPort: 9443
       protocol: TCP
-    # Plain HTTP, unauthenticated: cluster-internal only, never routed through an ingress.
-    - name: cache-internal
-      port: 9444
-      targetPort: 9444
-      protocol: TCP
