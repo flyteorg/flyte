@@ -41,6 +41,13 @@ const (
 	// the webhook's cacheInvalidationPort.
 	defaultCacheInvalidationPort = "9444"
 
+	// schemeSeparator and defaultWebhookScheme fill in a scheme when webhookURL omits one.
+	// url.Parse reads "host:9444" as scheme "host" with an empty Host, so a scheme-less value
+	// would otherwise be rejected. Plain HTTP because the invalidation endpoint is
+	// cluster-internal and unauthenticated by design.
+	schemeSeparator      = "://"
+	defaultWebhookScheme = "http" + schemeSeparator
+
 	staleWarning = "the old value may be served until the webhook cache TTL expires"
 
 	// defaultOrganization is a placeholder org used in the encoded secret ID
@@ -120,8 +127,8 @@ func (s *SecretService) invalidateWebhookSecretCache(ctx context.Context, id *se
 // Resolution rather than a single request is what makes this correct against a headless Service.
 func (s *SecretService) invalidationTargets(ctx context.Context) ([]string, error) {
 	raw := strings.TrimSuffix(s.webhookURL, "/")
-	if !strings.Contains(raw, "://") {
-		raw = "http://" + raw
+	if !strings.Contains(raw, schemeSeparator) {
+		raw = defaultWebhookScheme + raw
 	}
 
 	base, err := url.Parse(raw)
