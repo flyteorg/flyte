@@ -211,6 +211,30 @@ message TaskMetadata {
   TimeoutStrategy timeouts = 22;
 }
 
+// ReusePolicy configures reuse of a task's execution environment across invocations, so
+// environment creation cost is paid once and amortized: a warm container pool for reusable
+// container/actor tasks, or a shared, long-lived cluster for cluster-backed plugins (e.g. Ray).
+// Total concurrent capacity is max_replicas * concurrency.
+message ReusePolicy {
+  // Minimum number of replicas to keep warm (a fixed-size pool uses min == max).
+  int32 min_replicas = 1;
+
+  // Maximum number of replicas; the upper bound for demand-based auto-scaling.
+  int32 max_replicas = 2;
+
+  // Maximum number of concurrent tasks a single replica may handle. Values > 1 are only
+  // meaningful for async tasks.
+  int32 concurrency = 3;
+
+  // How long the whole reusable environment may sit idle (no running tasks) before it is torn
+  // down entirely.
+  google.protobuf.Duration idle_ttl = 4;
+
+  // Minimum delay before an individual idle replica is scaled down during auto-scaling
+  // (distinct from idle_ttl, which governs the whole environment).
+  google.protobuf.Duration scaledown_ttl = 5;
+}
+
 // A Task structure that uniquely identifies a task in the system
 // Tasks are registered as a first step in the system.
 message TaskTemplate {
@@ -255,6 +279,10 @@ message TaskTemplate {
   // to use as required.
   // reserve the field numbers 1 through 15 for very frequently occurring message elements
   map<string, string> config = 16;
+
+  // Environment-reuse policy for this task, if any. A structured alternative to encoding the
+  // policy inside `custom`: reusable/cluster-backed plugins read it directly from here.
+  ReusePolicy reuse_policy = 19;
 }
 
 // ----------------- First class Plugins
