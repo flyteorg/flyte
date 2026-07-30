@@ -5,7 +5,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -34,6 +36,12 @@ const (
 	// cacheInvalidationTimeout bounds the best-effort call to the webhook's invalidation
 	// endpoint so a wedged webhook can't stall secret writes.
 	cacheInvalidationTimeout = 5 * time.Second
+
+	// defaultCacheInvalidationPort is used when cacheInvalidationURL names no port. Must match
+	// the webhook's cacheInvalidationPort.
+	defaultCacheInvalidationPort = "9444"
+
+	staleWarning = "the old value may be served until the webhook cache TTL expires"
 
 	// defaultOrganization is a placeholder org used in the encoded secret ID
 	// because Flyte OSS v2 has no organization concept. It must match the
@@ -89,36 +97,86 @@ func (s *SecretService) invalidateWebhookSecretCache(ctx context.Context, id *se
 		return
 	}
 
-	// Single target: flyte-binary runs one replica, so the configured URL reaches the only
-	// webhook there is.
-	//
-	// TODO: once the webhook runs with multiple replicas, point cacheInvalidationURL at the
-	// headless Service (<release>-flyte-binary-webhook-headless:9444) and fan out with
-	// net.DefaultResolver.LookupHost, POSTing every pod IP — what cloud's operator-proxy does.
-	// Repointing the URL at the headless name WITHOUT that change is worse than leaving it:
-	// Go's client picks a single A record, so one arbitrary replica gets invalidated and the
-	// rest keep serving stale secrets.
-	url := strings.TrimSuffix(s.cacheInvalidationURL, "/") + webhook.InvalidateSecretPath
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
+	targets, err := s.invalidationTargets(ctx)
 	if err != nil {
-		logger.Warnf(ctx, "failed to build cache invalidation request for %v: %v", id.GetName(), err)
+		logger.Warnf(ctx, "failed to resolve webhook cache invalidation targets for %v: %v; %s", id.GetName(), err, staleWarning)
 		return
+	}
+
+	failed := 0
+	for _, target := range targets {
+		if err := s.postInvalidation(ctx, target, body); err != nil {
+			failed++
+			logger.Warnf(ctx, "failed to invalidate secret cache for %v on %s: %v", id.GetName(), target, err)
+		}
+	}
+
+	if failed > 0 {
+		logger.Warnf(ctx, "secret cache invalidation for %v failed on %d/%d webhook pod(s); %s", id.GetName(), failed, len(targets), staleWarning)
+		return
+	}
+
+	logger.Debugf(ctx, "invalidated webhook secret cache for %v across %d pod(s)", id.GetName(), len(targets))
+}
+
+// invalidationTargets resolves the configured host to one URL per webhook pod.
+//
+// Resolution rather than a single request is what makes this correct against a headless Service:
+// its DNS returns an A record per pod, and every replica caches independently, so a request to
+// the name alone would reach one arbitrary pod and leave the others stale. A ClusterIP Service or
+// a bare host resolves to exactly one address, so the same code path handles both.
+func (s *SecretService) invalidationTargets(ctx context.Context) ([]string, error) {
+	base, err := url.Parse(strings.TrimSuffix(s.cacheInvalidationURL, "/"))
+	if err != nil {
+		return nil, fmt.Errorf("parsing %q: %w", s.cacheInvalidationURL, err)
+	}
+
+	host := base.Hostname()
+	if host == "" {
+		return nil, fmt.Errorf("no host in %q", s.cacheInvalidationURL)
+	}
+	port := base.Port()
+	if port == "" {
+		port = defaultCacheInvalidationPort
+	}
+
+	// LookupHost passes IP literals straight through, so an explicitly configured address works.
+	ips, err := net.DefaultResolver.LookupHost(ctx, host)
+	if err != nil {
+		return nil, fmt.Errorf("resolving %q: %w", host, err)
+	}
+	if len(ips) == 0 {
+		return nil, fmt.Errorf("no webhook pods resolved for %q", host)
+	}
+
+	targets := make([]string, 0, len(ips))
+	for _, ip := range ips {
+		targets = append(targets, (&url.URL{
+			Scheme: base.Scheme,
+			Host:   net.JoinHostPort(ip, port),
+			Path:   webhook.InvalidateSecretPath,
+		}).String())
+	}
+	return targets, nil
+}
+
+func (s *SecretService) postInvalidation(ctx context.Context, target string, body []byte) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, target, bytes.NewReader(body))
+	if err != nil {
+		return fmt.Errorf("building request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := s.httpClient.Do(req)
 	if err != nil {
-		logger.Warnf(ctx, "failed to invalidate secret cache for %v: %v; the old value may be served until the webhook cache TTL expires", id.GetName(), err)
-		return
+		return err
 	}
 	defer resp.Body.Close() // nolint: errcheck
 
 	if resp.StatusCode != http.StatusOK {
-		logger.Warnf(ctx, "secret cache invalidation for %v returned %s; the old value may be served until the webhook cache TTL expires", id.GetName(), resp.Status)
-		return
+		return fmt.Errorf("returned %s", resp.Status)
 	}
-
-	logger.Debugf(ctx, "invalidated webhook secret cache for %v", id.GetName())
+	return nil
 }
 
 // validateScope enforces the valid scope combinations supported by the secret
