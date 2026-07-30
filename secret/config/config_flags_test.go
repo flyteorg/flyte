@@ -127,14 +127,14 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_cacheInvalidationURL", func(t *testing.T) {
+	t.Run("Test_webhookURL", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("cacheInvalidationURL", testValue)
-			if vString, err := cmdFlags.GetString("cacheInvalidationURL"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.CacheInvalidationURL)
+			cmdFlags.Set("webhookURL", testValue)
+			if vString, err := cmdFlags.GetString("webhookURL"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.WebhookURL)
 
 			} else {
 				assert.FailNow(t, err.Error())

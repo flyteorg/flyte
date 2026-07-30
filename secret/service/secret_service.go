@@ -37,7 +37,7 @@ const (
 	// endpoint so a wedged webhook can't stall secret writes.
 	cacheInvalidationTimeout = 5 * time.Second
 
-	// defaultCacheInvalidationPort is used when cacheInvalidationURL names no port. Must match
+	// defaultCacheInvalidationPort is used when webhookURL names no port. Must match
 	// the webhook's cacheInvalidationPort.
 	defaultCacheInvalidationPort = "9444"
 
@@ -56,25 +56,26 @@ var _ secretconnect.SecretServiceHandler = (*SecretService)(nil)
 type SecretService struct {
 	k8sClient client.Client
 
-	// cacheInvalidationURL is the base URL of the pod webhook's cache invalidation server.
-	// Empty disables invalidation, in which case writes take effect after the webhook's TTL.
-	cacheInvalidationURL string
-	httpClient           *http.Client
+	// webhookURL is the base URL of the pod webhook's cache invalidation server — its 9444
+	// port, not the 9443 admission port. Empty disables invalidation, in which case writes
+	// take effect after the webhook's TTL.
+	webhookURL string
+	httpClient *http.Client
 }
 
-// NewSecretService creates a new SecretService. cacheInvalidationURL is the base URL of the pod
+// NewSecretService creates a new SecretService. webhookURL is the base URL of the pod
 // webhook's cache invalidation server; pass "" to disable cache invalidation.
-func NewSecretService(k8sClient client.Client, cacheInvalidationURL string) *SecretService {
+func NewSecretService(k8sClient client.Client, webhookURL string) *SecretService {
 	return &SecretService{
-		k8sClient:            k8sClient,
-		cacheInvalidationURL: cacheInvalidationURL,
-		httpClient:           &http.Client{Timeout: cacheInvalidationTimeout},
+		k8sClient:  k8sClient,
+		webhookURL: webhookURL,
+		httpClient: &http.Client{Timeout: cacheInvalidationTimeout},
 	}
 }
 
 // invalidateWebhookSecretCache asks the pod webhook to drop any cached value for id.
 func (s *SecretService) invalidateWebhookSecretCache(ctx context.Context, id *secretpb.SecretIdentifier) {
-	if s.cacheInvalidationURL == "" {
+	if s.webhookURL == "" {
 		return
 	}
 
@@ -118,14 +119,14 @@ func (s *SecretService) invalidateWebhookSecretCache(ctx context.Context, id *se
 // the name alone would reach one arbitrary pod and leave the others stale. A ClusterIP Service or
 // a bare host resolves to exactly one address, so the same code path handles both.
 func (s *SecretService) invalidationTargets(ctx context.Context) ([]string, error) {
-	base, err := url.Parse(strings.TrimSuffix(s.cacheInvalidationURL, "/"))
+	base, err := url.Parse(strings.TrimSuffix(s.webhookURL, "/"))
 	if err != nil {
-		return nil, fmt.Errorf("parsing %q: %w", s.cacheInvalidationURL, err)
+		return nil, fmt.Errorf("parsing %q: %w", s.webhookURL, err)
 	}
 
 	host := base.Hostname()
 	if host == "" {
-		return nil, fmt.Errorf("no host in %q", s.cacheInvalidationURL)
+		return nil, fmt.Errorf("no host in %q", s.webhookURL)
 	}
 	port := base.Port()
 	if port == "" {

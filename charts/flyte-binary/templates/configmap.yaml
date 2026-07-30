@@ -35,10 +35,6 @@ data:
         type: K8s
         k8sConfig:
           namespace: {{ .Release.Namespace }}
-    secret:
-      # Headless Service, so the secret service resolves it to every webhook pod and invalidates
-      # all of their caches. A ClusterIP Service would reach exactly one replica.
-      cacheInvalidationURL: http://{{ include "flyte-binary.webhook.headlessServiceName" . }}.{{ .Release.Namespace }}.svc:9444
 {{ tpl ( index .Values "flyte-core-components" | toYaml ) . | nindent 4 }}
   001-plugins.yaml: |
     tasks:
