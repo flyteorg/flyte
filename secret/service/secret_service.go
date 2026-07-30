@@ -79,11 +79,6 @@ func (s *SecretService) invalidateWebhookSecretCache(ctx context.Context, id *se
 		return
 	}
 
-	// Detach from the caller's cancellation. By the time this runs the secret is already
-	// persisted, so a client that hung up mid-request must not leave the webhook serving the
-	// old value until TTL — which is what happens if the cancelled context propagates into DNS
-	// resolution and the POSTs. WithoutCancel keeps the values (logging, tracing) and drops only
-	// the cancellation, so we re-impose our own deadline to stay bounded.
 	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), cacheInvalidationTimeout)
 	defer cancel()
 
@@ -230,8 +225,7 @@ func (s *SecretService) CreateSecret(ctx context.Context, req *connect.Request[s
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// Deferred so it survives any early return added between here and the response.
-	defer s.invalidateWebhookSecretCache(ctx, req.Msg.GetId())
+	s.invalidateWebhookSecretCache(ctx, req.Msg.GetId())
 
 	return connect.NewResponse(&secretpb.CreateSecretResponse{}), nil
 }
@@ -278,8 +272,7 @@ func (s *SecretService) UpdateSecret(ctx context.Context, req *connect.Request[s
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// Deferred so it survives any early return added between here and the response.
-	defer s.invalidateWebhookSecretCache(ctx, req.Msg.GetId())
+	s.invalidateWebhookSecretCache(ctx, req.Msg.GetId())
 
 	return connect.NewResponse(&secretpb.UpdateSecretResponse{}), nil
 }
