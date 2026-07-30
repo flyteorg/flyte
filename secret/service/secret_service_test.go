@@ -384,6 +384,11 @@ func TestSecretService_InvalidationTargets(t *testing.T) {
 		"default port":   {"http://127.0.0.1", []string{"http://127.0.0.1:9444/invalidate-secret"}},
 		"trailing slash": {"http://127.0.0.1:9999/", []string{"http://127.0.0.1:9999/invalidate-secret"}},
 		"ipv6 literal":   {"http://[::1]:9999", []string{"http://[::1]:9999/invalidate-secret"}},
+
+		// Scheme-less forms: url.Parse reads "127.0.0.1:9999" as scheme "127.0.0.1" with an
+		// empty Host, so these would be rejected and invalidation would degrade to TTL.
+		"no scheme, with port": {"127.0.0.1:9999", []string{"http://127.0.0.1:9999/invalidate-secret"}},
+		"no scheme, no port":   {"127.0.0.1", []string{"http://127.0.0.1:9444/invalidate-secret"}},
 	} {
 		t.Run(name, func(t *testing.T) {
 			got, err := NewSecretService(nil, tc.url).invalidationTargets(context.Background())
@@ -393,7 +398,7 @@ func TestSecretService_InvalidationTargets(t *testing.T) {
 	}
 
 	t.Run("rejects a url with no host", func(t *testing.T) {
-		_, err := NewSecretService(nil, "not-a-url").invalidationTargets(context.Background())
+		_, err := NewSecretService(nil, "http://").invalidationTargets(context.Background())
 		assert.Error(t, err)
 	})
 }
