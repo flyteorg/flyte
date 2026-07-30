@@ -72,15 +72,7 @@ func NewSecretService(k8sClient client.Client, cacheInvalidationURL string) *Sec
 	}
 }
 
-// invalidateWebhookSecretCache asks the pod webhook to drop any cached value for id. Named for
-// the cache it clears (the webhook's), not to be confused with the webhook-side
-// SecretsPodMutator.InvalidateCache this reaches over HTTP.
-//
-// Called after every write (create, update, delete): a create can shadow a broader-scoped secret
-// that is already cached, so it needs invalidation just as much as an update does.
-//
-// Best-effort. The secret is already durably written at this point, so a failure here must not
-// fail the RPC — it only means the old value lingers until the webhook's cache TTL expires.
+// invalidateWebhookSecretCache asks the pod webhook to drop any cached value for id.
 func (s *SecretService) invalidateWebhookSecretCache(ctx context.Context, id *secretpb.SecretIdentifier) {
 	if s.cacheInvalidationURL == "" {
 		return
