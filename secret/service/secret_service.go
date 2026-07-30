@@ -42,9 +42,6 @@ const (
 	defaultCacheInvalidationPort = "9444"
 
 	// schemeSeparator and defaultWebhookScheme fill in a scheme when webhookURL omits one.
-	// url.Parse reads "host:9444" as scheme "host" with an empty Host, so a scheme-less value
-	// would otherwise be rejected. Plain HTTP because the invalidation endpoint is
-	// cluster-internal and unauthenticated by design.
 	schemeSeparator      = "://"
 	defaultWebhookScheme = "http" + schemeSeparator
 
