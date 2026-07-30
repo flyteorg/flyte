@@ -120,9 +120,6 @@ func (s *SecretService) invalidateWebhookSecretCache(ctx context.Context, id *se
 // Resolution rather than a single request is what makes this correct against a headless Service.
 func (s *SecretService) invalidationTargets(ctx context.Context) ([]string, error) {
 	raw := strings.TrimSuffix(s.webhookURL, "/")
-	// Tolerate a scheme-less value like "webhook-headless.flyte.svc:9444". url.Parse reads that
-	// as scheme "webhook-headless.flyte.svc" with opaque "9444" and an empty Host, so without
-	// this the config would be rejected and invalidation would quietly degrade to TTL.
 	if !strings.Contains(raw, "://") {
 		raw = "http://" + raw
 	}
