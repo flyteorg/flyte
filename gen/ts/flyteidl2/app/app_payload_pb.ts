@@ -253,8 +253,11 @@ export type ListRequest = Message<"flyteidl2.app.ListRequest"> & {
 
   /**
    * Include the total number of apps matching the request's filters in the response.
-   * This performs an additional count query, so it should typically only be set on
-   * the first page of a paginated listing.
+   * May be set on any request, including any page of a paginated listing. The count
+   * reflects state at the time the request is served and may change between pages, so
+   * a client that needs an up-to-date total can request it again on a later page.
+   * This performs an additional count query, so leave it unset when the total is not
+   * needed.
    *
    * @generated from field: bool include_total_count = 6;
    */

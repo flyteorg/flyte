@@ -466,8 +466,11 @@ type ListRequest struct {
 	// Disable caller identity enrichment in the response.
 	DisableIdentityEnrichment bool `protobuf:"varint,5,opt,name=disable_identity_enrichment,json=disableIdentityEnrichment,proto3" json:"disable_identity_enrichment,omitempty"`
 	// Include the total number of apps matching the request's filters in the response.
-	// This performs an additional count query, so it should typically only be set on
-	// the first page of a paginated listing.
+	// May be set on any request, including any page of a paginated listing. The count
+	// reflects state at the time the request is served and may change between pages, so
+	// a client that needs an up-to-date total can request it again on a later page.
+	// This performs an additional count query, so leave it unset when the total is not
+	// needed.
 	IncludeTotalCount bool `protobuf:"varint,6,opt,name=include_total_count,json=includeTotalCount,proto3" json:"include_total_count,omitempty"`
 }
 
