@@ -45,7 +45,7 @@ require (
 	github.com/onsi/gomega v1.42.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.23.2
-	github.com/prometheus/common v0.70.0
+	github.com/prometheus/common v0.70.1
 	github.com/ray-project/kuberay/ray-operator v1.6.2
 	github.com/redis/go-redis/extra/redisprometheus/v9 v9.21.0
 	github.com/redis/go-redis/v9 v9.21.0
