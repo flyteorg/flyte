@@ -89,6 +89,15 @@ func (s *SecretService) invalidateWebhookSecretCache(ctx context.Context, id *se
 		return
 	}
 
+	// Single target: flyte-binary runs one replica, so the configured URL reaches the only
+	// webhook there is.
+	//
+	// TODO: once the webhook runs with multiple replicas, point cacheInvalidationURL at the
+	// headless Service (<release>-flyte-binary-webhook-headless:9444) and fan out with
+	// net.DefaultResolver.LookupHost, POSTing every pod IP — what cloud's operator-proxy does.
+	// Repointing the URL at the headless name WITHOUT that change is worse than leaving it:
+	// Go's client picks a single A record, so one arbitrary replica gets invalidated and the
+	// rest keep serving stale secrets.
 	url := strings.TrimSuffix(s.cacheInvalidationURL, "/") + webhook.InvalidateSecretPath
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
 	if err != nil {
@@ -270,7 +279,7 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 		},
 	}
 
-	// Invalidate on every exit path, not just the happy one. If the Secret is already gone
+	// If the Secret is already gone
 	// (deleted out-of-band) this returns NotFound, but the webhook may still be serving the
 	// old value from cache — leaving a secret the user believes is deleted injected into pods
 	// for up to the cache TTL. Deferred so the NotFound and error paths are covered too.
