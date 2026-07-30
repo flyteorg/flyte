@@ -60,20 +60,9 @@ func (s *IdentityService) UserInfo(
 		return nil, connect.NewError(connect.CodeUnauthenticated, errNoIdentity)
 	}
 
-	h := req.Header()
-	id := identityFromHeaders(h, s.identityHeaders)
+	id := resolveIdentity(ctx, req.Header(), s.identityHeaders, s.enricher)
 	if id == nil {
 		return nil, connect.NewError(connect.CodeUnauthenticated, errNoIdentity)
-	}
-
-	// Only enrich when the bearer token was the actual identity source.
-	if token := bearerToken(h); token != "" {
-		claimsHdr := s.identityHeaders.ClaimsJWTHeader
-		subjHdr := s.identityHeaders.SubjectHeader
-		if (claimsHdr == "" || identityFromJWT(h.Get(claimsHdr)) == nil) && (subjHdr == "" || strings.TrimSpace(h.Get(subjHdr)) == "") {
-			// On the Bearer path the token holds only a subject; userinfo supplies name/email.
-			id = s.enricher.enrich(ctx, token, id)
-		}
 	}
 
 	user := id.GetUser()
