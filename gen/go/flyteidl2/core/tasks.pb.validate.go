@@ -985,6 +985,8 @@ func (m *TaskMetadata) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for ProducesArtifacts
+
 	switch v := m.InterruptibleValue.(type) {
 	case *TaskMetadata_Interruptible:
 		if v == nil {
