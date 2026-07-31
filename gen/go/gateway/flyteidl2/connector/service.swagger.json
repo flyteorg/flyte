@@ -1508,7 +1508,7 @@
         "concurrency": {
           "type": "integer",
           "format": "int32",
-          "description": "Maximum number of concurrent tasks a single replica may handle. Values \u003e 1 are only\nmeaningful for async tasks. 0 means unset (treated as 1)."
+          "description": "Maximum number of concurrent tasks a single replica may handle. Values \u003e 1 are only\nmeaningful for async tasks."
         },
         "idle_ttl": {
           "type": "string",
@@ -1523,7 +1523,7 @@
           "description": "How widely the reusable environment may be shared. Defaults to GLOBAL (reuse across all runs)."
         }
       },
-      "description": "ReusePolicy configures reuse of a task's execution environment across invocations, so\nenvironment creation cost is paid once and amortized: a warm container pool for reusable\ncontainer/actor tasks, or a shared, long-lived cluster for cluster-backed plugins (e.g. Ray).\nTotal concurrent capacity is max_replicas * concurrency."
+      "description": "ReusePolicy configures reuse of a task's execution environment across invocations, so\nenvironment creation cost is paid once and amortized: a warm container pool for reusable\ncontainer tasks or a shared long-lived cluster for cluster-backed plugins (e.g. Ray).\nTotal concurrent capacity is max_replicas * concurrency."
     },
     "coreRuntimeBinding": {
       "type": "object"
@@ -1800,7 +1800,7 @@
         },
         "reuse_policy": {
           "$ref": "#/definitions/coreReusePolicy",
-          "description": "Environment-reuse policy for this task, if any. A structured alternative to encoding the\npolicy inside `custom`: reusable/cluster-backed plugins read it directly from here."
+          "description": "Reuse policy for the task's execution environment (a warm container pool, or a shared,\nlong-lived cluster for cluster-backed plugins like Ray). When unset, no reuse is configured."
         }
       },
       "description": "A Task structure that uniquely identifies a task in the system\nTasks are registered as a first step in the system."
