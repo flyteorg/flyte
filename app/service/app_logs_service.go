@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"connectrpc.com/connect"
 
@@ -31,7 +32,7 @@ func (s *AppLogsService) TailLogs(
 ) error {
 	clientStream, err := s.internalClient.TailLogs(ctx, req)
 	if err != nil {
-		return connect.NewError(connect.CodeInternal, err)
+		return fmt.Errorf("tail logs failed: %w", err)
 	}
 	defer clientStream.Close() //nolint:errcheck
 	for clientStream.Receive() {

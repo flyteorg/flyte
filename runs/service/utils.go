@@ -14,7 +14,6 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
@@ -133,8 +132,7 @@ func validateProjectExists(ctx context.Context, projectClient projectconnect.Pro
 		if connect.CodeOf(err) == connect.CodeNotFound {
 			return connect.NewError(connect.CodeNotFound, fmt.Errorf("project %q not found", projectID))
 		}
-		logger.Errorf(ctx, "Failed to validate project %q: %v", projectID, err)
-		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to validate project: %w", err))
+		return fmt.Errorf("failed to validate project: %w", err)
 	}
 	return nil
 }

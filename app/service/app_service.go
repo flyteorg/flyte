@@ -140,7 +140,7 @@ func (s *AppService) Watch(
 ) error {
 	clientStream, err := s.internalClient.Watch(ctx, req)
 	if err != nil {
-		return connect.NewError(connect.CodeInternal, err)
+		return fmt.Errorf("watching projects: %w", err)
 	}
 	defer clientStream.Close() //nolint:errcheck
 	for clientStream.Receive() {

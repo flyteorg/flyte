@@ -98,7 +98,7 @@ func (s *RunService) WatchGroups(ctx context.Context, req *connect.Request[workf
 
 	groups, err := s.buildTaskGroups(ctx, req.Msg)
 	if err != nil {
-		return connect.NewError(connect.CodeInternal, err)
+		return fmt.Errorf("building task groups: %v", err)
 	}
 
 	// Send initial response with sentinel
@@ -177,7 +177,6 @@ func (s *RunService) CreateRun(
 	request := req.Msg
 	// Validate request
 	if err := request.Validate(); err != nil {
-		logger.Errorf(ctx, "Invalid CreateRun request: %v", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
@@ -254,7 +253,7 @@ func (s *RunService) CreateRun(
 		// CreateRunRequest.run_start_time and surfaces as flyte.ctx().run_start_time instead.
 		triggerDetails, detailsErr := transformers.TriggerModelToTriggerDetails(ctx, triggerModel)
 		if detailsErr != nil {
-			return nil, connect.NewError(connect.CodeInternal, detailsErr)
+			return nil, fmt.Errorf("trigger details: %w", detailsErr)
 		}
 		if offloaded := triggerDetails.GetSpec().GetOffloadedInputData(); offloaded != nil && request.GetInputWrapper() == nil {
 			request.InputWrapper = &workflow.CreateRunRequest_OffloadedInputData{OffloadedInputData: offloaded}
@@ -323,8 +322,7 @@ func (s *RunService) CreateRun(
 		// Persist the full Inputs proto so context survives CreateRun -> storage -> runtime.
 		inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
 		if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, inputs); err != nil {
-			logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
-			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
+			return nil, fmt.Errorf("failed to write inputs: %w", err)
 		}
 		logger.Infof(ctx, "Wrote inputs to %s", inputRef)
 
@@ -356,8 +354,7 @@ func (s *RunService) CreateRun(
 	// Persist task spec and create a run model
 	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec, request.GetSource(), triggerName, triggerTaskName, triggerRevision, triggerType, executedBy)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to create run: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("persisting run model: %w", err)
 	}
 
 	_, err = s.actionsClient.Enqueue(ctx, connect.NewRequest(&actions.EnqueueRequest{
@@ -522,8 +519,7 @@ func (s *RunService) AbortRun(
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("run not found: %s/%s/%s", req.Msg.RunId.Project, req.Msg.RunId.Domain, req.Msg.RunId.Name))
 		}
-		logger.Errorf(ctx, "Failed to abort run: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("aborting run: %w", err)
 	}
 
 	if s.abortReconciler != nil {
@@ -546,7 +542,6 @@ func (s *RunService) GetRunDetails(
 
 	run, err := s.repo.ActionRepo().GetRun(ctx, req.Msg.RunId)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to get run: %v", err)
 		return nil, connect.NewError(connect.CodeNotFound, err)
 	}
 
@@ -557,7 +552,6 @@ func (s *RunService) GetRunDetails(
 
 	actionDetails, err := s.buildActionDetails(ctx, run, rootActionID)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to build run action details: %v", err)
 		return nil, err
 	}
 
@@ -614,9 +608,6 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 		if info.GetTaskSpecDigest() != "" {
 			specModel, err := s.repo.TaskRepo().GetTaskSpec(ctx, info.GetTaskSpecDigest())
 			if err != nil {
-				if ctx.Err() == nil {
-					logger.Errorf(ctx, "failed to get task spec for action %v: %v", actionId, err)
-				}
 				return err
 			}
 
@@ -627,20 +618,17 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 			case workflow.ActionType_ACTION_TYPE_TASK:
 				spec, err := transformers.ToTaskSpec(specModel)
 				if err != nil {
-					logger.Errorf(ctx, "failed to convert task spec model for action %v: %v", actionId, err)
 					return err
 				}
 				action.Spec = &workflow.ActionDetails_Task{Task: spec}
 			case workflow.ActionType_ACTION_TYPE_TRACE:
 				spec, err := transformers.ToTraceSpec(specModel)
 				if err != nil {
-					logger.Errorf(ctx, "failed to convert trace spec model for action %v: %v", actionId, err)
 					return err
 				}
 				action.Spec = &workflow.ActionDetails_Trace{Trace: spec}
 			default:
-				return connect.NewError(connect.CodeInternal,
-					fmt.Errorf("unknown action type %v for action %v", action.GetMetadata().GetActionType(), actionId))
+				return fmt.Errorf("unknown action type %v for action %v", action.GetMetadata().GetActionType(), actionId)
 			}
 		}
 
@@ -678,9 +666,6 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 	})
 
 	if err := eg.Wait(); err != nil {
-		if ctx.Err() == nil {
-			logger.Errorf(ctx, "failed to get action details for action %v: %v", actionId, err)
-		}
 		return nil, err
 	}
 
@@ -934,8 +919,7 @@ func (s *RunService) ListRuns(
 
 	actions, err := s.repo.ActionRepo().ListActions(ctx, listInput)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to list runs: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("listing actions: %w", err)
 	}
 
 	// We fetch Limit+1 rows to detect whether a next page exists without a separate COUNT
@@ -983,8 +967,7 @@ func (s *RunService) ListActions(
 
 	actions, err := s.repo.ActionRepo().ListActions(ctx, listInput)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to list actions: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("listing actions: %w", err)
 	}
 
 	// We fetch Limit+1 rows to detect whether a next page exists without a separate COUNT
@@ -1090,8 +1073,7 @@ func (s *RunService) AbortAction(
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %s", req.Msg.ActionId.Name))
 		}
-		logger.Errorf(ctx, "Failed to abort action: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("aborting action %s: %w", req.Msg.ActionId.Name, err)
 	}
 
 	if s.abortReconciler != nil {
@@ -1125,7 +1107,6 @@ func (s *RunService) SignalEvent(
 		Value:            payloadToLiteral(req.Msg.GetPayload()),
 		SignalledBy:      signalledBy,
 	})); err != nil {
-		logger.Errorf(ctx, "Failed to signal action %s: %v", req.Msg.GetActionId().GetName(), err)
 		// Actions-service errors (NotFound / InvalidArgument / FailedPrecondition)
 		// pass through unchanged.
 		return nil, err
@@ -1195,7 +1176,7 @@ func (s *RunService) WatchRunDetails(
 		case <-ctx.Done():
 			return nil
 		case err := <-errs:
-			return connect.NewError(connect.CodeInternal, err)
+			return fmt.Errorf("watching run updates: %w", err)
 		case run := <-updates:
 			resp := &workflow.WatchRunDetailsResponse{
 				Details: &workflow.RunDetails{
@@ -1247,7 +1228,7 @@ func (s *RunService) WatchActionDetails(
 		case <-ctx.Done():
 			return nil
 		case err := <-errs:
-			return connect.NewError(connect.CodeInternal, err)
+			return fmt.Errorf("watching action updates: %w", err)
 		case updated, ok := <-updates:
 			if !ok {
 				return nil
@@ -1258,8 +1239,7 @@ func (s *RunService) WatchActionDetails(
 				if ctx.Err() != nil {
 					return nil
 				}
-				logger.Errorf(ctx, "failed to get action details for action %s: %v", actionID.Name, err)
-				return connect.NewError(connect.CodeInternal, err)
+				return fmt.Errorf("building action details: %w", err)
 			}
 			if err := stream.Send(&workflow.WatchActionDetailsResponse{
 				Details: details,
@@ -1313,7 +1293,6 @@ func (s *RunService) WatchRuns(
 		case <-ctx.Done():
 			return nil
 		case err := <-errsCh:
-			logger.Errorf(ctx, "Error watching runs: %v", err)
 			return err
 		case run := <-updatesCh:
 			// Filter the run based on the watch request criteria
@@ -1352,7 +1331,6 @@ func (s *RunService) WatchActions(
 	}
 
 	if err := s.listAndSendAllActions(ctx, runID, rsm, stream); err != nil {
-		logger.Errorf(ctx, "Failed to list actions: %v", err)
 		return err
 	}
 
@@ -1492,7 +1470,7 @@ func (s *RunService) WatchClusterEvents(
 		for {
 			info, err := s.getClusterEventsInfo(ctx, actionID, attempt, lastUpdatedAt, offset, maxEvents)
 			if err != nil {
-				return connect.NewError(connect.CodeInternal, err)
+				return fmt.Errorf("get cluster events info: %w", err)
 			}
 			isTerminal = isTerminal || info.isTerminal
 
@@ -1519,7 +1497,7 @@ func (s *RunService) WatchClusterEvents(
 		case <-ctx.Done():
 			return nil
 		case err := <-errsCh:
-			return connect.NewError(connect.CodeInternal, err)
+			return fmt.Errorf("watch cluster events: %w", err)
 		case updated, ok := <-updatesCh:
 			if !ok {
 				return nil
@@ -1598,12 +1576,12 @@ func getLogContextAndClusterForAttempt(ctx context.Context, repo interfaces.Repo
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, "", connect.NewError(connect.CodeNotFound, fmt.Errorf("no event found for action %v attempt %d", actionID, attempt))
 		}
-		return nil, "", connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get event for action %v attempt %d: %w", actionID, attempt, err))
+		return nil, "", fmt.Errorf("failed to get event for action %v attempt %d: %w", actionID, attempt, err)
 	}
 
 	event, err := m.ToActionEvent()
 	if err != nil {
-		return nil, "", connect.NewError(connect.CodeInternal, fmt.Errorf("failed to deserialize event: %w", err))
+		return nil, "", fmt.Errorf("failed to deserialize event: %w", err)
 	}
 
 	if event.GetLogContext() == nil {

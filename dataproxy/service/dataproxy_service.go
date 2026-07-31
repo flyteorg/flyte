@@ -71,12 +71,10 @@ func (s *Service) CreateUploadLocation(
 
 	// Validation on request
 	if err := req.Msg.Validate(); err != nil {
-		logger.Errorf(ctx, "Invalid CreateUploadLocation request: %v", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid CreateUploadLocationRequest: %v", err))
 	}
 	if err := validateUploadRequest(ctx, req.Msg, s.cfg); err != nil {
-		logger.Errorf(ctx, "Request validation failed: %v", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid CreateUploadLocationRequest: %v", err))
 	}
 	if err := s.validateProjectExists(ctx, req.Msg.GetProject()); err != nil {
 		return nil, err
@@ -85,8 +83,7 @@ func (s *Service) CreateUploadLocation(
 	// Build the storage path
 	storagePath, err := s.constructStoragePath(ctx, req.Msg)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to construct storage path: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to construct storage path: %w", err))
+		return nil, fmt.Errorf("failed to construct storage path: %w", err)
 	}
 
 	// Check if file already exists and validate for safe upload
@@ -111,8 +108,7 @@ func (s *Service) CreateUploadLocation(
 	// Generate signed URL
 	signedResp, err := s.dataStore.CreateSignedURL(ctx, storagePath, props)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to create signed URL: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to create signed URL: %w", err))
+		return nil, fmt.Errorf("failed to create signed URL: %w", err)
 	}
 
 	// Build response
@@ -138,8 +134,7 @@ func (s *Service) validateProjectExists(ctx context.Context, projectID string) e
 		if connect.CodeOf(err) == connect.CodeNotFound {
 			return connect.NewError(connect.CodeNotFound, fmt.Errorf("project %q not found", projectID))
 		}
-		logger.Errorf(ctx, "Failed to validate project %q: %v", projectID, err)
-		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to validate project: %w", err))
+		return fmt.Errorf("failed to validate project: %w", err)
 	}
 	return nil
 }
@@ -160,8 +155,7 @@ func (s *Service) checkFileExists(ctx context.Context, storagePath storage.DataR
 
 	metadata, err := s.dataStore.Head(ctx, storagePath)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to check if file exists at location [%s]: %v", storagePath.String(), err)
-		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to check if file exists at location [%s]: %w", storagePath.String(), err))
+		return fmt.Errorf("failed to check if file exists at location [%s]: %w", storagePath.String(), err)
 	}
 
 	if !metadata.Exists() {
@@ -181,7 +175,6 @@ func (s *Service) checkFileExists(ctx context.Context, storagePath storage.DataR
 	base64Digest := base64.StdEncoding.EncodeToString(req.GetContentMd5())
 	if base64Digest != metadata.ContentMD5() {
 		// Hash mismatch, reject to prevent overwriting different content
-		logger.Errorf(ctx, "File exists at [%v] with different content hash", storagePath)
 		return connect.NewError(connect.CodeAlreadyExists,
 			fmt.Errorf("file already exists at [%v] with different content (hash mismatch)", storagePath))
 	}
@@ -228,7 +221,6 @@ func (s *Service) UploadInputs(
 	logger.Infof(ctx, "UploadInputs request received")
 
 	if err := req.Msg.Validate(); err != nil {
-		logger.Errorf(ctx, "Invalid UploadInputs request: %v", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
@@ -263,8 +255,7 @@ func (s *Service) UploadInputs(
 	// Deterministically hash the filtered inputs for cache key computation.
 	inputsHash, err := hashInputsProto(filteredInputs)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to hash inputs: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to hash inputs: %w", err))
+		return nil, fmt.Errorf("failed to hash inputs: %w", err)
 	}
 
 	// Build the storage path: <base>/org/project/domain/offloaded-inputs/<hash>/inputs.pb
@@ -292,20 +283,17 @@ func (s *Service) UploadInputs(
 
 	dirRef, err := s.dataStore.ConstructReference(ctx, baseRef, pathComponents...)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to construct storage path: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to construct storage path: %w", err))
+		return nil, fmt.Errorf("failed to construct storage path: %w", err)
 	}
 
 	inputRef, err := s.dataStore.ConstructReference(ctx, dirRef, "inputs.pb")
 	if err != nil {
-		logger.Errorf(ctx, "Failed to construct input ref: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to construct input ref: %w", err))
+		return nil, fmt.Errorf("failed to construct input ref: %w", err)
 	}
 
 	// Store all inputs (unfiltered) — the hash is over the filtered set for caching.
 	if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, req.Msg.GetInputs()); err != nil {
-		logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
+		return nil, fmt.Errorf("failed to write inputs: %w", err)
 	}
 
 	logger.Infof(ctx, "Successfully uploaded inputs to %s (hash=%s)", inputRef, inputsHash)
@@ -326,7 +314,6 @@ func (s *Service) CreateDownloadLink(
 	logger.Infof(ctx, "CreateDownloadLink request received")
 
 	if err := req.Msg.Validate(); err != nil {
-		logger.Errorf(ctx, "Invalid CreateDownloadLink request: %v", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
@@ -349,9 +336,7 @@ func (s *Service) CreateDownloadLink(
 	ref := storage.DataReference(nativeURL)
 	meta, err := s.dataStore.Head(ctx, ref)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to head artifact at [%s]: %v", nativeURL, err)
-		return nil, connect.NewError(connect.CodeInternal,
-			fmt.Errorf("failed to check artifact existence: %w", err))
+		return nil, fmt.Errorf("failed to check artifact existence: %w", err)
 	}
 	if !meta.Exists() {
 		return nil, connect.NewError(connect.CodeNotFound,
@@ -363,9 +348,7 @@ func (s *Service) CreateDownloadLink(
 		ExpiresIn: expiresIn,
 	})
 	if err != nil {
-		logger.Errorf(ctx, "Failed to create signed URL for [%s]: %v", nativeURL, err)
-		return nil, connect.NewError(connect.CodeInternal,
-			fmt.Errorf("failed to create signed URL: %w", err))
+		return nil, fmt.Errorf("failed to create signed URL: %w", err)
 	}
 
 	expiresAt := timestamppb.New(time.Now().Add(expiresIn))
@@ -390,7 +373,6 @@ func (s *Service) resolveArtifactURL(ctx context.Context, req *dataproxy.CreateD
 		ActionId: attemptID.GetActionId(),
 	}))
 	if err != nil {
-		logger.Errorf(ctx, "Failed to get action details for %v: %v", attemptID.GetActionId(), err)
 		return "", connect.NewError(connect.CodeNotFound,
 			fmt.Errorf("failed to get action details: %w", err))
 	}
@@ -432,7 +414,6 @@ func (s *Service) resolveTaskTemplate(ctx context.Context, req *dataproxy.Upload
 			TaskId: t.TaskId,
 		}))
 		if err != nil {
-			logger.Errorf(ctx, "Failed to get task details for %v: %v", t.TaskId, err)
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("failed to get task: %w", err))
 		}
 		return resp.Msg.GetDetails().GetSpec().GetTaskTemplate(), nil
@@ -441,7 +422,6 @@ func (s *Service) resolveTaskTemplate(ctx context.Context, req *dataproxy.Upload
 			Name: t.TriggerName,
 		}))
 		if err != nil {
-			logger.Errorf(ctx, "Failed to get trigger details for %v: %v", t.TriggerName, err)
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("failed to get trigger: %w", err))
 		}
 		triggerDetails := triggerResp.Msg.GetTrigger()
@@ -456,7 +436,6 @@ func (s *Service) resolveTaskTemplate(ctx context.Context, req *dataproxy.Upload
 			TaskId: taskID,
 		}))
 		if err != nil {
-			logger.Errorf(ctx, "Failed to get task details for trigger %v: %v", t.TriggerName, err)
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("failed to get task for trigger: %w", err))
 		}
 		return taskResp.Msg.GetDetails().GetSpec().GetTaskTemplate(), nil
@@ -511,8 +490,7 @@ func (s *Service) GetActionData(
 			logger.Infof(groupCtx, "GetActionData: reading inputs from %s", inputRef)
 			if err := s.dataStore.ReadProtobuf(groupCtx, inputRef, resp.Inputs); err != nil {
 				if !storage.IsNotFound(err) {
-					logger.Errorf(groupCtx, "GetActionData: failed to read inputs from %s: %v", inputRef, err)
-					return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read inputs from %s: %w", inputRef, err))
+					return fmt.Errorf("failed to read inputs from %s: %w", inputRef, err)
 				}
 			} else {
 				resp.InputsUri = urisResp.Msg.GetInputsUri()
@@ -531,8 +509,7 @@ func (s *Service) GetActionData(
 			var inputsOrOutputs task.Inputs
 			if err := s.dataStore.ReadProtobuf(groupCtx, outputRef, &inputsOrOutputs); err != nil {
 				if !storage.IsNotFound(err) {
-					logger.Errorf(groupCtx, "GetActionData: failed to read outputs from %s: %v", outputRef, err)
-					return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read outputs from %s: %w", outputRef, err))
+					return fmt.Errorf("failed to read outputs from %s: %w", outputRef, err)
 				}
 				logger.Debugf(groupCtx, "Outputs not found at %s (action may not have finished)", urisResp.Msg.GetOutputsUri())
 			} else {

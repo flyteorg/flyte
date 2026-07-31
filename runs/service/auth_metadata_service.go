@@ -107,12 +107,10 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 
 	baseURL, err := url.Parse(s.cfg.ExternalAuthServerBaseURL)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal,
-			fmt.Errorf("invalid external auth server base URL %q: %w", s.cfg.ExternalAuthServerBaseURL, err))
+		return nil, fmt.Errorf("invalid external auth server base URL %q: %w", s.cfg.ExternalAuthServerBaseURL, err)
 	}
 	if baseURL.Scheme == "" || baseURL.Host == "" {
-		return nil, connect.NewError(connect.CodeInternal,
-			fmt.Errorf("external auth server base URL must be absolute (include scheme and host): %q", s.cfg.ExternalAuthServerBaseURL))
+		return nil, fmt.Errorf("external auth server base URL must be absolute (include scheme and host): %q", s.cfg.ExternalAuthServerBaseURL)
 	}
 
 	// Issuer URLs conventionally do not end with a '/', but metadata URLs are
@@ -125,14 +123,12 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 	}
 	relURL, err := url.Parse(metadataPath)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal,
-			fmt.Errorf("invalid external metadata path %q: %w", metadataPath, err))
+		return nil, fmt.Errorf("invalid external metadata path %q: %w", metadataPath, err)
 	}
 	// MetadataURL is expected to be a relative path resolved against BaseURL.
 	// Reject absolute, scheme-relative, or root-relative paths so BaseURL cannot be bypassed.
 	if relURL.IsAbs() || relURL.Host != "" || strings.HasPrefix(relURL.Path, "/") {
-		return nil, connect.NewError(connect.CodeInternal,
-			fmt.Errorf("external metadata path must be relative to externalAuthServerBaseUrl (no leading '/'), got %q", metadataPath))
+		return nil, fmt.Errorf("external metadata path must be relative to externalAuthServerBaseUrl (no leading '/'), got %q", metadataPath)
 	}
 	externalMetadataURL := baseURL.ResolveReference(relURL)
 
@@ -165,16 +161,16 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 
 	raw, err := io.ReadAll(io.LimitReader(response.Body, maxMetadataBodySize+1))
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read OAuth2 metadata response: %w", err))
+		return nil, fmt.Errorf("failed to read OAuth2 metadata response: %w", err)
 	}
 	if len(raw) > maxMetadataBodySize {
-		return nil, connect.NewError(connect.CodeInternal,
-			fmt.Errorf("OAuth2 metadata response exceeds %d bytes", maxMetadataBodySize))
+		return nil,
+			fmt.Errorf("OAuth2 metadata response exceeds %d bytes", maxMetadataBodySize)
 	}
 
 	resp := &auth.GetOAuth2MetadataResponse{}
 	if err := unmarshalResp(response, raw, resp); err != nil {
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to unmarshal OAuth2 metadata: %w", err))
+		return nil, fmt.Errorf("failed to unmarshal OAuth2 metadata: %w", err)
 	}
 
 	s.mu.Lock()
@@ -286,8 +282,8 @@ func sendAndRetryHTTPRequest(ctx context.Context, client *http.Client, targetURL
 		// Unavailable, so clients see an accurate status.
 		if resp.StatusCode >= http.StatusBadRequest && resp.StatusCode < http.StatusInternalServerError {
 			_ = resp.Body.Close()
-			return nil, connect.NewError(connect.CodeInternal,
-				fmt.Errorf("non-retryable status code %d from %s", resp.StatusCode, targetURL))
+			return nil,
+				fmt.Errorf("non-retryable status code %d from %s", resp.StatusCode, targetURL)
 		}
 
 		_ = resp.Body.Close()

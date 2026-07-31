@@ -122,7 +122,7 @@ func (s *InternalAppLogsService) resolveReplicas(ctx context.Context, req *flyte
 		}
 		replicas, err := s.k8s.GetReplicas(ctx, t.AppId)
 		if err != nil {
-			return nil, connect.NewError(connect.CodeInternal, err)
+			return nil, fmt.Errorf("failed to fetch replicas: %w", err)
 		}
 		ids := make([]*flyteapp.ReplicaIdentifier, 0, len(replicas))
 		for _, r := range replicas {

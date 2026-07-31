@@ -6,7 +6,6 @@ import (
 
 	"connectrpc.com/connect"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	commonpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
@@ -35,7 +34,6 @@ func (s *taskService) DeployTask(ctx context.Context, c *connect.Request[task.De
 	request := c.Msg
 
 	if err := request.Validate(); err != nil {
-		logger.Errorf(ctx, "Invalid DeployTask request: %v", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
@@ -65,13 +63,13 @@ func (s *taskService) DeployTask(ctx context.Context, c *connect.Request[task.De
 
 	taskModel, err := transformers.NewTaskModel(ctx, taskId, taskSpec)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to create task model: %w", err)
 	}
 	taskModel.TotalTriggers = uint32(len(request.GetTriggers()))
 
 	// Single transaction: upsert task + insert trigger revisions + refresh task meta.
 	if err := s.db.TaskRepo().CreateTask(ctx, taskModel, triggerModels); err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to create task model: %w", err)
 	}
 
 	return connect.NewResponse(&task.DeployTaskResponse{}), nil
@@ -116,7 +114,6 @@ func buildTriggerModels(
 		}
 		m, err := transformers.NewTriggerModel(ctx, id, spec, tt.GetAutomationSpec())
 		if err != nil {
-			logger.Errorf(ctx, "failed to build trigger model for %q: %v", tt.GetName(), err)
 			return nil, fmt.Errorf("failed to build trigger model for %q: %w", tt.GetName(), err)
 		}
 		triggerModels = append(triggerModels, m)
@@ -134,7 +131,7 @@ func (s *taskService) GetTaskDetails(ctx context.Context, c *connect.Request[tas
 	// TODO(nary): Add identity enrichment after adding auth
 	tasks, err := transformers.TaskModelsToTaskDetailsWithoutIdentity(ctx, []*models.Task{model})
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to convert task model to task details: %w", err)
 	}
 
 	return connect.NewResponse(&task.GetTaskDetailsResponse{
@@ -182,7 +179,7 @@ func (s *taskService) ListTasks(ctx context.Context, c *connect.Request[task.Lis
 
 	taskResWithCounts, err := s.db.TaskRepo().ListTasks(ctx, listInput)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to list tasks: %w", err)
 	}
 
 	// TODO(nary): Extract task names and get latest runs after adding ActionRepo.GetLatestRunByTasks
@@ -193,7 +190,7 @@ func (s *taskService) ListTasks(ctx context.Context, c *connect.Request[task.Lis
 	tasks, taskMetadata, err := transformers.TaskListResultToTasksAndMetadata(
 		ctx, taskResWithCounts, latestRuns, nil, false, false)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to list tasks: %w", err)
 	}
 
 	var token string
@@ -224,7 +221,7 @@ func (s *taskService) ListVersions(ctx context.Context, c *connect.Request[task.
 
 	versionModels, err := s.db.TaskRepo().ListVersions(ctx, listInput)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to list versions: %w", err)
 	}
 
 	versions := transformers.VersionModelsToVersionResponses(versionModels)

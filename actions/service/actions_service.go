@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"connectrpc.com/connect"
@@ -31,8 +30,7 @@ func (s *ActionsService) Signal(ctx context.Context, req *connect.Request[action
 	}
 
 	if err := s.client.Signal(ctx, req.Msg.ActionId, req.Msg.Value, principalSubject(req.Msg.GetSignalledBy())); err != nil {
-		logger.Errorf(ctx, "Failed to signal action: %v", err)
-		return nil, toConnectError(err)
+		return nil, fmt.Errorf("failed to signal action: %w", err)
 	}
 
 	return connect.NewResponse(&actions.SignalResponse{}), nil
@@ -44,16 +42,6 @@ func principalSubject(id *common.EnrichedIdentity) string {
 		return s
 	}
 	return id.GetApplication().GetId().GetSubject()
-}
-
-// toConnectError preserves typed errors from the client (e.g. NotFound,
-// InvalidArgument) and wraps everything else as Internal.
-func toConnectError(err error) error {
-	var connectErr *connect.Error
-	if errors.As(err, &connectErr) {
-		return err
-	}
-	return connect.NewError(connect.CodeInternal, err)
 }
 
 // NewActionsService creates a new ActionsService.
@@ -76,8 +64,7 @@ func (s *ActionsService) Enqueue(
 	}
 
 	if err := s.client.Enqueue(ctx, req.Msg.Action, req.Msg.RunSpec); err != nil {
-		logger.Errorf(ctx, "Failed to enqueue action: %v", err)
-		return nil, toConnectError(err)
+		return nil, fmt.Errorf("failed to enqueue action: %w", err)
 	}
 
 	return connect.NewResponse(&actions.EnqueueResponse{}), nil
@@ -110,7 +97,7 @@ func (s *ActionsService) WatchForUpdates(
 	// Send initial state snapshot.
 	childActions, err := s.client.ListChildActions(ctx, parentActionID)
 	if err != nil {
-		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to list child actions: %w", err))
+		return fmt.Errorf("failed to list child actions: %w", err)
 	}
 
 	for _, action := range childActions {
@@ -183,8 +170,7 @@ func (s *ActionsService) Update(
 	}
 
 	if err := s.client.PutStatus(ctx, req.Msg.ActionId, req.Msg.Attempt, req.Msg.Status); err != nil {
-		logger.Errorf(ctx, "Failed to update action: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to update action: %w", err)
 	}
 
 	return connect.NewResponse(&actions.UpdateResponse{}), nil
@@ -202,8 +188,7 @@ func (s *ActionsService) Abort(
 	}
 
 	if err := s.client.AbortAction(ctx, req.Msg.ActionId, req.Msg.Reason); err != nil {
-		logger.Errorf(ctx, "Failed to abort action: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to abort action: %w", err)
 	}
 
 	return connect.NewResponse(&actions.AbortResponse{}), nil

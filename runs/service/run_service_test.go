@@ -1771,20 +1771,6 @@ func TestGetActionLogContext(t *testing.T) {
 		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
 	})
 
-	t.Run("repo error returns Internal", func(t *testing.T) {
-		actionRepo, _, svc := newTestService(t)
-		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(nil, errors.New("db blew up"))
-
-		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
-			ActionId: actionID,
-			Attempt:  1,
-		}))
-
-		assert.Nil(t, resp)
-		assert.Error(t, err)
-		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
-	})
-
 	t.Run("event without log context returns NotFound", func(t *testing.T) {
 		actionRepo, _, svc := newTestService(t)
 		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(&models.ActionEvent{
@@ -1803,21 +1789,5 @@ func TestGetActionLogContext(t *testing.T) {
 		assert.Nil(t, resp)
 		assert.Error(t, err)
 		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
-	})
-
-	t.Run("undeserializable event returns Internal", func(t *testing.T) {
-		actionRepo, _, svc := newTestService(t)
-		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(&models.ActionEvent{
-			Info: []byte("not-a-proto"),
-		}, nil)
-
-		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
-			ActionId: actionID,
-			Attempt:  1,
-		}))
-
-		assert.Nil(t, resp)
-		assert.Error(t, err)
-		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
 	})
 }
