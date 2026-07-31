@@ -209,6 +209,10 @@ message TaskMetadata {
   // the per-attempt RUNNING-phase bound expressed by `timeout` (field 4).
   // Each bound is independently optional; an unspecified bound is unlimited.
   TimeoutStrategy timeouts = 22;
+
+  // If true, the backend extracts artifact metadata stamped on this task's
+  // output literals and records them as generated artifacts on the action.
+  bool produces_artifacts = 23;
 }
 
 // A Task structure that uniquely identifies a task in the system

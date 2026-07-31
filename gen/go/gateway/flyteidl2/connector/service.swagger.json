@@ -2278,6 +2278,10 @@
         "timeouts": {
           "$ref": "#/definitions/coreTimeoutStrategy",
           "description": "Additional timeout bounds (queued_timeout, deadline) layered on top of\nthe per-attempt RUNNING-phase bound expressed by `timeout` (field 4).\nEach bound is independently optional; an unspecified bound is unlimited."
+        },
+        "produces_artifacts": {
+          "type": "boolean",
+          "description": "If true, the backend extracts artifact metadata stamped on this task's\noutput literals and records them as generated artifacts on the action."
         }
       },
       "title": "Task Metadata"
