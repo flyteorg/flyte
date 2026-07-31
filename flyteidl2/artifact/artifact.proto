@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package flyteidl2.artifact;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/core/literals.proto";
+import "flyteidl2/core/types.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/artifact";
+
+// Identifies an artifact name within an org, project and domain.
+message ArtifactName {
+  // Org this artifact belongs to. Stamped by the server from the caller's
+  // identity; clients may leave this empty.
+  string org = 1 [(buf.validate.field).string.max_len = 63];
+
+  // Project this artifact belongs to.
+  string project = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+
+  // Domain this artifact belongs to.
+  string domain = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+
+  // Unique name of the artifact within org/project/domain.
+  string name = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+}
+
+// Fully qualified identifier of a single artifact version.
+message ArtifactIdentifier {
+  ArtifactName name = 1 [(buf.validate.field).required = true];
+
+  // Version of the artifact.
+  string version = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+}
+
+// Reference to a previously uploaded card (model/data card) describing the
+// artifact.
+message Card {
+  // URI of the uploaded card content.
+  string uri = 1 [(buf.validate.field).string.max_len = 1024];
+
+  // Format of the card, e.g. html, md, json, yaml, csv, tsv, png, jpg, jpeg.
+  string format = 2 [(buf.validate.field).string.max_len = 16];
+
+  // Type of the card, e.g. model, data, generic.
+  string type = 3 [(buf.validate.field).string.max_len = 16];
+}
+
+// User-provided specification of an artifact.
+message ArtifactSpec {
+  // The typed value of the artifact. Offloaded data (files, directories,
+  // dataframes) must already reside in blob storage; the literal references
+  // it by uri.
+  core.Literal value = 1 [(buf.validate.field).required = true];
+
+  // The Flyte type of the value.
+  core.LiteralType type = 2 [(buf.validate.field).required = true];
+
+  // Optional human readable description.
+  string description = 3 [(buf.validate.field).string.max_len = 255];
+
+  // Free-form, user-supplied key/value metadata.
+  map<string, string> user_metadata = 4;
+
+  // Optional card describing this artifact.
+  Card card = 5;
+}
+
+// A fully materialized artifact as stored by the service.
+message Artifact {
+  ArtifactIdentifier artifact_id = 1;
+
+  ArtifactSpec spec = 2;
+
+  // Time at which the artifact was created.
+  google.protobuf.Timestamp created_at = 3;
+
+  // Identity that created the artifact.
+  string created_by = 4;
+}
