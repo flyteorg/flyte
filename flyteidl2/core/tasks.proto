@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package flyteidl2.core;
 
+import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/core/execution.proto";
 import "flyteidl2/core/identifier.proto";
@@ -216,6 +217,12 @@ message TaskMetadata {
 // container/actor tasks, or a shared, long-lived cluster for cluster-backed plugins (e.g. Ray).
 // Total concurrent capacity is max_replicas * concurrency.
 message ReusePolicy {
+  option (buf.validate.message).cel = {
+    id: "reuse_policy.replicas"
+    message: "max_replicas must be >= min_replicas"
+    expression: "this.max_replicas >= this.min_replicas"
+  };
+
   // Scope bounds how widely a reusable environment may be shared.
   enum Scope {
     // Reuse one environment across all runs (the default). Cheapest: creation cost is paid once
@@ -229,14 +236,14 @@ message ReusePolicy {
   }
 
   // Minimum number of replicas to keep warm (a fixed-size pool uses min == max).
-  int32 min_replicas = 1;
+  int32 min_replicas = 1 [(buf.validate.field).int32.gte = 0];
 
   // Maximum number of replicas; the upper bound for demand-based auto-scaling.
-  int32 max_replicas = 2;
+  int32 max_replicas = 2 [(buf.validate.field).int32.gte = 1];
 
   // Maximum number of concurrent tasks a single replica may handle. Values > 1 are only
   // meaningful for async tasks.
-  int32 concurrency = 3;
+  int32 concurrency = 3 [(buf.validate.field).int32.gte = 1];
 
   // How long the whole reusable environment may sit idle (no running tasks) before it is torn
   // down entirely.
@@ -247,7 +254,7 @@ message ReusePolicy {
   google.protobuf.Duration scaledown_ttl = 5;
 
   // How widely the reusable environment may be shared. Defaults to GLOBAL (reuse across all runs).
-  Scope scope = 6;
+  Scope scope = 6 [(buf.validate.field).enum.defined_only = true];
 }
 
 // A Task structure that uniquely identifies a task in the system

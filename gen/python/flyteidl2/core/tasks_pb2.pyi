@@ -1,3 +1,4 @@
+from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.core import execution_pb2 as _execution_pb2
 from flyteidl2.core import identifier_pb2 as _identifier_pb2_1
