@@ -40,6 +40,21 @@ class DataProxyServiceStub(object):
                 request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse.FromString,
                 )
+        self.UploadMetadata = channel.unary_unary(
+                '/flyteidl2.dataproxy.DataProxyService/UploadMetadata',
+                request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadMetadataRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse.FromString,
+                )
+        self.GetLocalActionData = channel.unary_unary(
+                '/flyteidl2.dataproxy.DataProxyService/GetLocalActionData',
+                request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse.FromString,
+                )
+        self.CreateLocalDownloadLink = channel.unary_unary(
+                '/flyteidl2.dataproxy.DataProxyService/CreateLocalDownloadLink',
+                request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateLocalDownloadLinkRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse.FromString,
+                )
 
 
 class DataProxyServiceServicer(object):
@@ -80,6 +95,32 @@ class DataProxyServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def UploadMetadata(self, request, context):
+        """UploadMetadata generates a signed URL for uploading a local run's metadata artifact
+        (inputs.pb / outputs.pb / report.html) directly to the control plane's storage backend.
+        Local runs only; never routes to a dataplane.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetLocalActionData(self, request, context):
+        """Get input and output data for an action of a local run, served directly from the control
+        plane's storage backend. Local runs only; never routes to a dataplane.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CreateLocalDownloadLink(self, request, context):
+        """CreateLocalDownloadLink generates signed URL(s) for downloading an artifact of a local run
+        action attempt directly from the control plane's storage backend. Local runs only; never
+        routes to a dataplane.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_DataProxyServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -107,6 +148,21 @@ def add_DataProxyServiceServicer_to_server(servicer, server):
                     servicer.TailLogs,
                     request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest.FromString,
                     response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse.SerializeToString,
+            ),
+            'UploadMetadata': grpc.unary_unary_rpc_method_handler(
+                    servicer.UploadMetadata,
+                    request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadMetadataRequest.FromString,
+                    response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse.SerializeToString,
+            ),
+            'GetLocalActionData': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetLocalActionData,
+                    request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest.FromString,
+                    response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse.SerializeToString,
+            ),
+            'CreateLocalDownloadLink': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateLocalDownloadLink,
+                    request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateLocalDownloadLinkRequest.FromString,
+                    response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -201,5 +257,56 @@ class DataProxyService(object):
         return grpc.experimental.unary_stream(request, target, '/flyteidl2.dataproxy.DataProxyService/TailLogs',
             flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest.SerializeToString,
             flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def UploadMetadata(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.dataproxy.DataProxyService/UploadMetadata',
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadMetadataRequest.SerializeToString,
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetLocalActionData(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.dataproxy.DataProxyService/GetLocalActionData',
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest.SerializeToString,
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def CreateLocalDownloadLink(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.dataproxy.DataProxyService/CreateLocalDownloadLink',
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateLocalDownloadLinkRequest.SerializeToString,
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

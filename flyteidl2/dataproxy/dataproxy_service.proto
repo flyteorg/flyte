@@ -21,6 +21,10 @@ enum ArtifactType {
   ARTIFACT_TYPE_REPORT = 1;
   // ARTIFACT_TYPE_CODE_BUNDLE refers to the code bundle (tarball) generated for an action.
   ARTIFACT_TYPE_CODE_BUNDLE = 2;
+  // ARTIFACT_TYPE_INPUTS refers to an action's serialized inputs (inputs.pb).
+  ARTIFACT_TYPE_INPUTS = 3;
+  // ARTIFACT_TYPE_OUTPUTS refers to an action's serialized outputs (outputs.pb).
+  ARTIFACT_TYPE_OUTPUTS = 4;
 }
 
 // DataProxyService provides an interface for managing data uploads and downloads.
@@ -40,6 +44,22 @@ service DataProxyService {
 
   // Stream logs for an action attempt.
   rpc TailLogs(TailLogsRequest) returns (stream TailLogsResponse) {}
+
+  // UploadMetadata generates a signed URL for uploading a local run's metadata artifact
+  // (inputs.pb / outputs.pb / report.html) directly to the control plane's storage backend.
+  // Local runs only; never routes to a dataplane.
+  rpc UploadMetadata(UploadMetadataRequest) returns (CreateUploadLocationResponse) {}
+
+  // Get input and output data for an action of a local run, served directly from the control
+  // plane's storage backend. Local runs only; never routes to a dataplane.
+  rpc GetLocalActionData(GetActionDataRequest) returns (GetActionDataResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // CreateLocalDownloadLink generates signed URL(s) for downloading an artifact of a local run
+  // action attempt directly from the control plane's storage backend. Local runs only; never
+  // routes to a dataplane.
+  rpc CreateLocalDownloadLink(CreateLocalDownloadLinkRequest) returns (CreateDownloadLinkResponse) {}
 }
 
 // CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.
@@ -231,6 +251,67 @@ message TailLogsRequest {
   // +optional. The dataproxy uses this to stream logs from the connector via
   // AsyncConnectorService.GetTaskLogs instead of pod logs.
   optional string connector_endpoint = 4;
+}
+
+// UploadMetadataRequest specifies the request for the UploadMetadata API. The data proxy service
+// derives the storage path from the authenticated org and the target action, following the local
+// run metadata layout: <prefix>/<org>/<project>/<domain>/<run>/<action>/inputs.pb for inputs and
+// <prefix>/<org>/<project>/<domain>/<run>/<action>/<attempt>/{outputs.pb,report.html} otherwise.
+message UploadMetadataRequest {
+  // ArtifactType is the type of artifact to upload. INPUTS targets an action; OUTPUTS and REPORT
+  // target an action attempt.
+  ArtifactType artifact_type = 1 [(buf.validate.field).enum = {
+    in: [
+      1,
+      3,
+      4
+    ]
+  }];
+
+  // Target identifies the action (INPUTS) or action attempt (OUTPUTS / REPORT) the artifact
+  // belongs to.
+  oneof target {
+    option (buf.validate.oneof).required = true;
+
+    common.ActionIdentifier action_id = 2;
+
+    common.ActionAttemptIdentifier action_attempt_id = 3;
+  }
+
+  // ContentMD5 restricts the upload location to the specific MD5 provided.
+  // +required
+  bytes content_md5 = 4 [(buf.validate.field).bytes.len = 16];
+
+  // ContentLength specifies the size of the content to be uploaded in bytes. Validated against
+  // the platform's maximum upload size.
+  // +optional
+  int64 content_length = 5;
+
+  // ExpiresIn defines the requested expiration duration for the generated URL. The request will
+  // be rejected if this exceeds the platform's configured maximum.
+  // +optional. The default value comes from the global config.
+  google.protobuf.Duration expires_in = 6;
+
+  // If true, the data proxy will add content_md5 to the Signed URL requirements, forcing clients
+  // to send this checksum with the object. Required for data integrity on backends like GCP.
+  bool add_content_md5_metadata = 7;
+}
+
+// CreateLocalDownloadLinkRequest specifies the request for the CreateLocalDownloadLink API.
+message CreateLocalDownloadLinkRequest {
+  // ArtifactType is the type of artifact to download.
+  // +required
+  ArtifactType artifact_type = 1 [(buf.validate.field).enum = {
+    not_in: [0]
+  }];
+
+  // ActionAttemptId identifies the local run action attempt whose artifact is to be downloaded.
+  common.ActionAttemptIdentifier action_attempt_id = 2 [(buf.validate.field).required = true];
+
+  // ExpiresIn defines the requested expiration duration for the generated URLs. The request will
+  // be rejected if this exceeds the platform's configured maximum.
+  // +optional. The default value comes from the global config.
+  google.protobuf.Duration expires_in = 3;
 }
 
 // Reponse message for tailing logs.

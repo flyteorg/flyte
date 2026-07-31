@@ -32,6 +32,15 @@ class DataProxyService(Protocol):
     def tail_logs(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest, ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def upload_metadata(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadMetadataRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def get_local_action_data(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def create_local_download_link(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateLocalDownloadLinkRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
 
 class DataProxyServiceASGIApplication(ConnectASGIApplication[DataProxyService]):
     def __init__(self, service: DataProxyService | AsyncGenerator[DataProxyService], *, interceptors: Iterable[Interceptor]=(), read_max_bytes: int | None = None, compressions: Iterable[Compression] | None = None) -> None:
@@ -87,6 +96,36 @@ class DataProxyServiceASGIApplication(ConnectASGIApplication[DataProxyService]):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.tail_logs,
+                ),
+                "/flyteidl2.dataproxy.DataProxyService/UploadMetadata": Endpoint.unary(
+                    method=MethodInfo(
+                        name="UploadMetadata",
+                        service_name="flyteidl2.dataproxy.DataProxyService",
+                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadMetadataRequest,
+                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.upload_metadata,
+                ),
+                "/flyteidl2.dataproxy.DataProxyService/GetLocalActionData": Endpoint.unary(
+                    method=MethodInfo(
+                        name="GetLocalActionData",
+                        service_name="flyteidl2.dataproxy.DataProxyService",
+                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
+                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.get_local_action_data,
+                ),
+                "/flyteidl2.dataproxy.DataProxyService/CreateLocalDownloadLink": Endpoint.unary(
+                    method=MethodInfo(
+                        name="CreateLocalDownloadLink",
+                        service_name="flyteidl2.dataproxy.DataProxyService",
+                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateLocalDownloadLinkRequest,
+                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.create_local_download_link,
                 ),
             },
             interceptors=interceptors,
@@ -203,6 +242,68 @@ class DataProxyServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    async def upload_metadata(
+        self,
+        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadMetadataRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="UploadMetadata",
+                service_name="flyteidl2.dataproxy.DataProxyService",
+                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadMetadataRequest,
+                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def get_local_action_data(
+        self,
+        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetLocalActionData",
+                service_name="flyteidl2.dataproxy.DataProxyService",
+                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
+                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    async def create_local_download_link(
+        self,
+        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateLocalDownloadLinkRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="CreateLocalDownloadLink",
+                service_name="flyteidl2.dataproxy.DataProxyService",
+                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateLocalDownloadLinkRequest,
+                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
 
 class DataProxyServiceSync(Protocol):
     def create_upload_location(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse:
@@ -214,6 +315,12 @@ class DataProxyServiceSync(Protocol):
     def get_action_data(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def tail_logs(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse]:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def upload_metadata(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadMetadataRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def get_local_action_data(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def create_local_download_link(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateLocalDownloadLinkRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
@@ -270,6 +377,36 @@ class DataProxyServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.tail_logs,
+                ),
+                "/flyteidl2.dataproxy.DataProxyService/UploadMetadata": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="UploadMetadata",
+                        service_name="flyteidl2.dataproxy.DataProxyService",
+                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadMetadataRequest,
+                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.upload_metadata,
+                ),
+                "/flyteidl2.dataproxy.DataProxyService/GetLocalActionData": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="GetLocalActionData",
+                        service_name="flyteidl2.dataproxy.DataProxyService",
+                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
+                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.get_local_action_data,
+                ),
+                "/flyteidl2.dataproxy.DataProxyService/CreateLocalDownloadLink": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="CreateLocalDownloadLink",
+                        service_name="flyteidl2.dataproxy.DataProxyService",
+                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateLocalDownloadLinkRequest,
+                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.create_local_download_link,
                 ),
             },
             interceptors=interceptors,
@@ -380,6 +517,68 @@ class DataProxyServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.dataproxy.DataProxyService",
                 input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest,
                 output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def upload_metadata(
+        self,
+        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadMetadataRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="UploadMetadata",
+                service_name="flyteidl2.dataproxy.DataProxyService",
+                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.UploadMetadataRequest,
+                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def get_local_action_data(
+        self,
+        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetLocalActionData",
+                service_name="flyteidl2.dataproxy.DataProxyService",
+                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest,
+                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def create_local_download_link(
+        self,
+        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateLocalDownloadLinkRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="CreateLocalDownloadLink",
+                service_name="flyteidl2.dataproxy.DataProxyService",
+                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateLocalDownloadLinkRequest,
+                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
             ),
             headers=headers,

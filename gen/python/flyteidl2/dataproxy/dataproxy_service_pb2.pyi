@@ -20,9 +20,13 @@ class ArtifactType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     ARTIFACT_TYPE_UNSPECIFIED: _ClassVar[ArtifactType]
     ARTIFACT_TYPE_REPORT: _ClassVar[ArtifactType]
     ARTIFACT_TYPE_CODE_BUNDLE: _ClassVar[ArtifactType]
+    ARTIFACT_TYPE_INPUTS: _ClassVar[ArtifactType]
+    ARTIFACT_TYPE_OUTPUTS: _ClassVar[ArtifactType]
 ARTIFACT_TYPE_UNSPECIFIED: ArtifactType
 ARTIFACT_TYPE_REPORT: ArtifactType
 ARTIFACT_TYPE_CODE_BUNDLE: ArtifactType
+ARTIFACT_TYPE_INPUTS: ArtifactType
+ARTIFACT_TYPE_OUTPUTS: ArtifactType
 
 class CreateUploadLocationRequest(_message.Message):
     __slots__ = ["project", "domain", "filename", "expires_in", "content_md5", "filename_root", "add_content_md5_metadata", "org", "content_length"]
@@ -150,6 +154,34 @@ class TailLogsRequest(_message.Message):
     pod_name: str
     connector_endpoint: str
     def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., primary_pod: bool = ..., all_pods: bool = ..., pod_name: _Optional[str] = ..., connector_endpoint: _Optional[str] = ...) -> None: ...
+
+class UploadMetadataRequest(_message.Message):
+    __slots__ = ["artifact_type", "action_id", "action_attempt_id", "content_md5", "content_length", "expires_in", "add_content_md5_metadata"]
+    ARTIFACT_TYPE_FIELD_NUMBER: _ClassVar[int]
+    ACTION_ID_FIELD_NUMBER: _ClassVar[int]
+    ACTION_ATTEMPT_ID_FIELD_NUMBER: _ClassVar[int]
+    CONTENT_MD5_FIELD_NUMBER: _ClassVar[int]
+    CONTENT_LENGTH_FIELD_NUMBER: _ClassVar[int]
+    EXPIRES_IN_FIELD_NUMBER: _ClassVar[int]
+    ADD_CONTENT_MD5_METADATA_FIELD_NUMBER: _ClassVar[int]
+    artifact_type: ArtifactType
+    action_id: _identifier_pb2.ActionIdentifier
+    action_attempt_id: _identifier_pb2.ActionAttemptIdentifier
+    content_md5: bytes
+    content_length: int
+    expires_in: _duration_pb2.Duration
+    add_content_md5_metadata: bool
+    def __init__(self, artifact_type: _Optional[_Union[ArtifactType, str]] = ..., action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., action_attempt_id: _Optional[_Union[_identifier_pb2.ActionAttemptIdentifier, _Mapping]] = ..., content_md5: _Optional[bytes] = ..., content_length: _Optional[int] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., add_content_md5_metadata: bool = ...) -> None: ...
+
+class CreateLocalDownloadLinkRequest(_message.Message):
+    __slots__ = ["artifact_type", "action_attempt_id", "expires_in"]
+    ARTIFACT_TYPE_FIELD_NUMBER: _ClassVar[int]
+    ACTION_ATTEMPT_ID_FIELD_NUMBER: _ClassVar[int]
+    EXPIRES_IN_FIELD_NUMBER: _ClassVar[int]
+    artifact_type: ArtifactType
+    action_attempt_id: _identifier_pb2.ActionAttemptIdentifier
+    expires_in: _duration_pb2.Duration
+    def __init__(self, artifact_type: _Optional[_Union[ArtifactType, str]] = ..., action_attempt_id: _Optional[_Union[_identifier_pb2.ActionAttemptIdentifier, _Mapping]] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
 
 class TailLogsResponse(_message.Message):
     __slots__ = ["logs"]
