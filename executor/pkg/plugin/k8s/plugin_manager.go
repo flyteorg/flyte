@@ -80,7 +80,13 @@ func (pm *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMeta
 	o.SetNamespace(taskCtx.GetNamespace())
 	o.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.GetAnnotations())))
 	o.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, o.GetLabels(), pluginsUtils.CopyMap(taskCtx.GetLabels())))
-	o.SetName(taskCtx.GetTaskExecutionID().GetGeneratedName())
+	name := taskCtx.GetTaskExecutionID().GetGeneratedName()
+	if pm.plugin.GetProperties().GeneratedNameMaxLength != nil {
+		if truncatedName, err := taskCtx.GetTaskExecutionID().GetGeneratedNameWith(0, *pm.plugin.GetProperties().GeneratedNameMaxLength); err == nil {
+			name = truncatedName
+		}
+	}
+	o.SetName(name)
 
 	if !pm.plugin.GetProperties().DisableInjectOwnerReferences && !cfg.DisableInjectOwnerReferences {
 		o.SetOwnerReferences([]metav1.OwnerReference{taskCtx.GetOwnerReference()})

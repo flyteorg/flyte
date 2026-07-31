@@ -5,11 +5,14 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 const _SecretManagerTypeName = "GlobalK8sAWSGCPVaultEmbeddedAzure"
 
 var _SecretManagerTypeIndex = [...]uint8{0, 6, 9, 12, 15, 20, 28, 33}
+
+const _SecretManagerTypeLowerName = "globalk8sawsgcpvaultembeddedazure"
 
 func (i SecretManagerType) String() string {
 	if i < 0 || i >= SecretManagerType(len(_SecretManagerTypeIndex)-1) {
@@ -18,16 +21,46 @@ func (i SecretManagerType) String() string {
 	return _SecretManagerTypeName[_SecretManagerTypeIndex[i]:_SecretManagerTypeIndex[i+1]]
 }
 
-var _SecretManagerTypeValues = []SecretManagerType{0, 1, 2, 3, 4, 5, 6}
+// An "invalid array index" compiler error signifies that the constant values have changed.
+// Re-run the stringer command to generate them again.
+func _SecretManagerTypeNoOp() {
+	var x [1]struct{}
+	_ = x[SecretManagerTypeGlobal-(0)]
+	_ = x[SecretManagerTypeK8s-(1)]
+	_ = x[SecretManagerTypeAWS-(2)]
+	_ = x[SecretManagerTypeGCP-(3)]
+	_ = x[SecretManagerTypeVault-(4)]
+	_ = x[SecretManagerTypeEmbedded-(5)]
+	_ = x[SecretManagerTypeAzure-(6)]
+}
+
+var _SecretManagerTypeValues = []SecretManagerType{SecretManagerTypeGlobal, SecretManagerTypeK8s, SecretManagerTypeAWS, SecretManagerTypeGCP, SecretManagerTypeVault, SecretManagerTypeEmbedded, SecretManagerTypeAzure}
 
 var _SecretManagerTypeNameToValueMap = map[string]SecretManagerType{
-	_SecretManagerTypeName[0:6]:   0,
-	_SecretManagerTypeName[6:9]:   1,
-	_SecretManagerTypeName[9:12]:  2,
-	_SecretManagerTypeName[12:15]: 3,
-	_SecretManagerTypeName[15:20]: 4,
-	_SecretManagerTypeName[20:28]: 5,
-	_SecretManagerTypeName[28:33]: 6,
+	_SecretManagerTypeName[0:6]:        SecretManagerTypeGlobal,
+	_SecretManagerTypeLowerName[0:6]:   SecretManagerTypeGlobal,
+	_SecretManagerTypeName[6:9]:        SecretManagerTypeK8s,
+	_SecretManagerTypeLowerName[6:9]:   SecretManagerTypeK8s,
+	_SecretManagerTypeName[9:12]:       SecretManagerTypeAWS,
+	_SecretManagerTypeLowerName[9:12]:  SecretManagerTypeAWS,
+	_SecretManagerTypeName[12:15]:      SecretManagerTypeGCP,
+	_SecretManagerTypeLowerName[12:15]: SecretManagerTypeGCP,
+	_SecretManagerTypeName[15:20]:      SecretManagerTypeVault,
+	_SecretManagerTypeLowerName[15:20]: SecretManagerTypeVault,
+	_SecretManagerTypeName[20:28]:      SecretManagerTypeEmbedded,
+	_SecretManagerTypeLowerName[20:28]: SecretManagerTypeEmbedded,
+	_SecretManagerTypeName[28:33]:      SecretManagerTypeAzure,
+	_SecretManagerTypeLowerName[28:33]: SecretManagerTypeAzure,
+}
+
+var _SecretManagerTypeNames = []string{
+	_SecretManagerTypeName[0:6],
+	_SecretManagerTypeName[6:9],
+	_SecretManagerTypeName[9:12],
+	_SecretManagerTypeName[12:15],
+	_SecretManagerTypeName[15:20],
+	_SecretManagerTypeName[20:28],
+	_SecretManagerTypeName[28:33],
 }
 
 // SecretManagerTypeString retrieves an enum value from the enum constants string name.
@@ -36,12 +69,23 @@ func SecretManagerTypeString(s string) (SecretManagerType, error) {
 	if val, ok := _SecretManagerTypeNameToValueMap[s]; ok {
 		return val, nil
 	}
+
+	if val, ok := _SecretManagerTypeNameToValueMap[strings.ToLower(s)]; ok {
+		return val, nil
+	}
 	return 0, fmt.Errorf("%s does not belong to SecretManagerType values", s)
 }
 
 // SecretManagerTypeValues returns all values of the enum
 func SecretManagerTypeValues() []SecretManagerType {
 	return _SecretManagerTypeValues
+}
+
+// SecretManagerTypeStrings returns a slice of all String values of the enum
+func SecretManagerTypeStrings() []string {
+	strs := make([]string, len(_SecretManagerTypeNames))
+	copy(strs, _SecretManagerTypeNames)
+	return strs
 }
 
 // IsASecretManagerType returns "true" if the value is listed in the enum definition. "false" otherwise

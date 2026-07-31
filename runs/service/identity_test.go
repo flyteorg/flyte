@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/base64"
 	"net/http"
 	"testing"
@@ -126,4 +127,39 @@ func TestSubjectOnlyIdentity(t *testing.T) {
 	id := subjectOnlyIdentity("user-123")
 	assert.Equal(t, "user-123", id.GetUser().GetId().GetSubject())
 	assert.Nil(t, id.GetUser().GetSpec())
+}
+
+func TestResolveIdentity(t *testing.T) {
+	// A Bearer token whose claims carry only a subject — enrichment must fill the rest.
+	bearer := jwt(`{"sub":"00uBEARER"}`)
+
+	// The bearer-path-enriches case is covered end-to-end by
+	// TestIdentityService_UserInfo_EnrichesBearerViaUserinfo.
+
+	t.Run("proxy claims identity with bearer present is not enriched", func(t *testing.T) {
+		srv, hits := newTestIdP(t, `{"sub":"00uOTHER","email":"other@union.ai"}`, http.StatusOK)
+		h := http.Header{}
+		// Claims header supplies the identity (incomplete profile: no name)…
+		h.Set("X-Amzn-Oidc-Data", jwt(`{"sub":"00uPROXY","email":"proxy@union.ai"}`))
+		// …but a Bearer token is also present. userinfo must NOT be consulted, or its
+		// subject would override the proxy-verified one.
+		h.Set(authorizationHeader, bearerPrefix+bearer)
+		id := resolveIdentity(context.Background(), h, albCfg, newIdentityEnricher(srv.URL))
+		assert.Equal(t, "00uPROXY", id.GetUser().GetId().GetSubject())
+		assert.Equal(t, int32(0), *hits)
+	})
+
+	t.Run("subject header identity with bearer present is not enriched", func(t *testing.T) {
+		srv, hits := newTestIdP(t, `{"sub":"00uOTHER"}`, http.StatusOK)
+		h := http.Header{}
+		h.Set("X-Amzn-Oidc-Identity", "00uPROXY")
+		h.Set(authorizationHeader, bearerPrefix+bearer)
+		id := resolveIdentity(context.Background(), h, albCfg, newIdentityEnricher(srv.URL))
+		assert.Equal(t, "00uPROXY", id.GetUser().GetId().GetSubject())
+		assert.Equal(t, int32(0), *hits)
+	})
+
+	t.Run("no identity returns nil", func(t *testing.T) {
+		assert.Nil(t, resolveIdentity(context.Background(), http.Header{}, albCfg, nil))
+	})
 }
