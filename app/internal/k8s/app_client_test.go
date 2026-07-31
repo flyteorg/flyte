@@ -2,9 +2,8 @@ package k8s
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
+	"regexp"
 	"testing"
 	"time"
 
@@ -88,6 +87,12 @@ func testApp(project, domain, name, image string) *flyteapp.App {
 	}
 }
 
+// testKSvcName returns the KService name an app is created under. Tests derive it
+// rather than hardcoding it so the fixtures follow the naming scheme.
+func testKSvcName(project, domain, name string) string {
+	return KServiceName(&flyteapp.Identifier{Project: project, Domain: domain, Name: name})
+}
+
 func TestDeploy_Create(t *testing.T) {
 	c := testClient(t)
 	app := testApp("proj", "dev", "myapp", "nginx:latest")
@@ -97,7 +102,7 @@ func TestDeploy_Create(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	err = c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc)
+		client.ObjectKey{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace}, ksvc)
 	require.NoError(t, err)
 	assert.Equal(t, "proj", ksvc.Labels[labelProject])
 	assert.Equal(t, "dev", ksvc.Labels[labelDomain])
@@ -114,7 +119,7 @@ func TestDeploy_InjectsInternalAppEndpointPattern(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+		client.ObjectKey{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace}, ksvc))
 
 	envVars := ksvc.Spec.Template.Spec.Containers[0].Env
 	var pattern string
@@ -134,7 +139,7 @@ func TestDeploy_InjectsExecutionEnvVars(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+		client.ObjectKey{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace}, ksvc))
 
 	envVars := ksvc.Spec.Template.Spec.Containers[0].Env
 	var gotProject, gotDomain string
@@ -162,7 +167,7 @@ func TestDeploy_InjectsSecretLabelsAndAnnotations(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+		client.ObjectKey{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace}, ksvc))
 
 	tpl := ksvc.Spec.Template
 	assert.Equal(t, "flyte", tpl.Labels["organization"])
@@ -179,7 +184,7 @@ func TestDeploy_NoSecretLabelsOrAnnotationsWhenNoSecrets(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+		client.ObjectKey{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace}, ksvc))
 
 	tpl := ksvc.Spec.Template
 	_, hasLabel := tpl.Labels["inject-flyte-secrets"]
@@ -195,7 +200,7 @@ func TestDeploy_DefaultServiceAccount(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+		client.ObjectKey{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace}, ksvc))
 	assert.Equal(t, "flyte2", ksvc.Spec.Template.Spec.ServiceAccountName)
 }
 
@@ -210,7 +215,7 @@ func TestDeploy_AppServiceAccountOverridesDefault(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+		client.ObjectKey{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace}, ksvc))
 	assert.Equal(t, "app-requested-sa", ksvc.Spec.Template.Spec.ServiceAccountName)
 }
 
@@ -220,7 +225,7 @@ func TestDeploy_NoServiceAccountWhenUnset(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+		client.ObjectKey{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace}, ksvc))
 	assert.Empty(t, ksvc.Spec.Template.Spec.ServiceAccountName)
 }
 
@@ -235,7 +240,7 @@ func TestDeploy_UpdateOnSpecChange(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+		client.ObjectKey{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace}, ksvc))
 	assert.Equal(t, "nginx:2.0", ksvc.Spec.Template.Spec.Containers[0].Image)
 }
 
@@ -247,14 +252,14 @@ func TestDeploy_SkipUpdateWhenUnchanged(t *testing.T) {
 	// Get initial resource version.
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+		client.ObjectKey{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace}, ksvc))
 	initialRV := ksvc.ResourceVersion
 
 	// Deploy same spec — should be a no-op.
 	require.NoError(t, c.Deploy(context.Background(), app))
 
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+		client.ObjectKey{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace}, ksvc))
 	assert.Equal(t, initialRV, ksvc.ResourceVersion, "resource version should not change on no-op deploy")
 }
 
@@ -271,7 +276,7 @@ func TestDeploy_AfterStop_ClearsStoppedLabels(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+		client.ObjectKey{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace}, ksvc))
 	assert.Equal(t, "true", ksvc.Labels[labelAppStopped], "app-stopped label should be set after Stop")
 	assert.Equal(t, visibilityClusterLocal, ksvc.Labels[labelKnativeVisibility], "service should be cluster-local after Stop")
 
@@ -279,7 +284,7 @@ func TestDeploy_AfterStop_ClearsStoppedLabels(t *testing.T) {
 	require.NoError(t, c.Deploy(context.Background(), app))
 
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+		client.ObjectKey{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace}, ksvc))
 	_, stopped := ksvc.Labels[labelAppStopped]
 	assert.False(t, stopped, "app-stopped label must be cleared after Deploy following a Stop")
 	_, visibility := ksvc.Labels[labelKnativeVisibility]
@@ -296,7 +301,7 @@ func TestStop(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	require.NoError(t, c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+		client.ObjectKey{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace}, ksvc))
 	assert.Equal(t, "true", ksvc.Labels[labelAppStopped])
 	assert.Equal(t, visibilityClusterLocal, ksvc.Labels[labelKnativeVisibility])
 	assert.Equal(t, "0", ksvc.Spec.Template.Annotations["autoscaling.knative.dev/min-scale"])
@@ -319,7 +324,7 @@ func TestStop_DeletesLatestReadyRevision(t *testing.T) {
 	s := testScheme(t)
 	ksvc := &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "myapp-proj-dev",
+			Name:      testKSvcName("proj", "dev", "myapp"),
 			Namespace: AppNamespace,
 			Labels: map[string]string{
 				labelAppManaged: "true",
@@ -358,7 +363,7 @@ func TestStop_DeletesLatestReadyRevision(t *testing.T) {
 	// KService must be marked stopped so Deploy can reliably clear the stopped state.
 	gotKsvc := &servingv1.Service{}
 	require.NoError(t, fc.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, gotKsvc))
+		client.ObjectKey{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace}, gotKsvc))
 	assert.Equal(t, "true", gotKsvc.Labels[labelAppStopped],
 		"KService must carry the app-stopped label after Stop")
 	assert.Equal(t, visibilityClusterLocal, gotKsvc.Labels[labelKnativeVisibility],
@@ -381,7 +386,7 @@ func TestDelete(t *testing.T) {
 
 	ksvc := &servingv1.Service{}
 	err := c.k8sClient.Get(context.Background(),
-		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc)
+		client.ObjectKey{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace}, ksvc)
 	assert.True(t, k8serrors.IsNotFound(err))
 }
 
@@ -420,7 +425,7 @@ func TestGetApp_CurrentReplicas(t *testing.T) {
 	// and the corresponding Revision with ActualReplicas=4.
 	ksvc := &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "myapp-proj-dev",
+			Name:      testKSvcName("proj", "dev", "myapp"),
 			Namespace: AppNamespace,
 			Labels: map[string]string{
 				labelAppManaged: "true",
@@ -539,7 +544,7 @@ func TestGetReplicas(t *testing.T) {
 			Name:      "myapp-abc",
 			Namespace: AppNamespace,
 			Labels: map[string]string{
-				labelKnativeService: "myapp-proj-dev",
+				labelKnativeService: testKSvcName("proj", "dev", "myapp"),
 			},
 		},
 		Status: corev1.PodStatus{
@@ -567,7 +572,7 @@ func TestGetReplicas(t *testing.T) {
 func TestGetReplicas_FiltersToLatestRevision(t *testing.T) {
 	s := testScheme(t)
 	ksvc := &servingv1.Service{
-		ObjectMeta: metav1.ObjectMeta{Name: "myapp-proj-dev", Namespace: AppNamespace},
+		ObjectMeta: metav1.ObjectMeta{Name: testKSvcName("proj", "dev", "myapp"), Namespace: AppNamespace},
 		Status: servingv1.ServiceStatus{
 			ConfigurationStatusFields: servingv1.ConfigurationStatusFields{
 				LatestReadyRevisionName: "myapp-00002",
@@ -579,7 +584,7 @@ func TestGetReplicas_FiltersToLatestRevision(t *testing.T) {
 			Name:      "myapp-new",
 			Namespace: AppNamespace,
 			Labels: map[string]string{
-				labelKnativeService:  "myapp-proj-dev",
+				labelKnativeService:  testKSvcName("proj", "dev", "myapp"),
 				labelKnativeRevision: "myapp-00002",
 			},
 		},
@@ -590,7 +595,7 @@ func TestGetReplicas_FiltersToLatestRevision(t *testing.T) {
 			Name:      "myapp-old",
 			Namespace: AppNamespace,
 			Labels: map[string]string{
-				labelKnativeService:  "myapp-proj-dev",
+				labelKnativeService:  testKSvcName("proj", "dev", "myapp"),
 				labelKnativeRevision: "myapp-00001",
 			},
 		},
@@ -640,7 +645,12 @@ func TestHandleKServiceEvent(t *testing.T) {
 			Annotations: map[string]string{
 				annotationAppID: "proj/dev/myapp",
 			},
-			Labels: map[string]string{labelAppManaged: "true"},
+			Labels: map[string]string{
+				labelAppManaged: "true",
+				labelProject:    "proj",
+				labelDomain:     "dev",
+				labelAppName:    "myapp",
+			},
 		},
 	}
 
@@ -681,30 +691,212 @@ func TestHandleKServiceEvent(t *testing.T) {
 
 func TestKServiceName(t *testing.T) {
 	tests := []struct {
-		name string
+		desc string
+		id   *flyteapp.Identifier
 		want string
 	}{
-		{"myapp", "myapp-proj-dev"},
-		{"MyApp", "myapp-proj-dev"},
-		{"my-long-service-name-v1", "my-long-service-name-v1-proj-dev"},
-		{"my-long-service-name-v2", "my-long-service-name-v2-proj-dev"},
-		// Names whose {name}-{project}-{domain} exceeds 63 chars get a hash
-		// suffix instead of blind truncation.
 		{
-			"this-is-a-very-long-app-name-that-exceeds-the-kubernetes-dns-label-limit",
-			func() string {
-				raw := "this-is-a-very-long-app-name-that-exceeds-the-kubernetes-dns-label-limit-proj-dev"
-				sum := sha256.Sum256([]byte("proj/dev/this-is-a-very-long-app-name-that-exceeds-the-kubernetes-dns-label-limit"))
-				return raw[:54] + "-" + hex.EncodeToString(sum[:4])
-			}(),
+			desc: "standard identifier",
+			id:   &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"},
+			want: "k-myapp-nyzyrk24yeye56darerfyox46y",
+		},
+		{
+			// Case is part of the identity — nothing else in Flyte folds it — so this
+			// must not collide with the lowercase identifier above. Only the readable
+			// prefix is lowercased, because a DNS label has to be.
+			desc: "case-variant identity hashes distinctly",
+			id:   &flyteapp.Identifier{Project: "PROJ", Domain: "Dev", Name: "MyApp"},
+			want: "k-myapp-eaq2xqk7hypngwmksa3d7vfyk4",
+		},
+		{
+			desc: "app names differing only by suffix stay distinct",
+			id:   &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "my-long-service-name-v1"},
+			want: "k-my-long-service-name-v1-lx7ylbnzddt2iphutzu2zfo62a",
+		},
+		{
+			desc: "long app name is truncated to fit the DNS label limit",
+			id: &flyteapp.Identifier{
+				Project: "proj",
+				Domain:  "dev",
+				Name:    "this-is-a-very-long-app-name-that-exceeds-the-kubernetes-dns-label-limit",
+			},
+			want: "k-this-is-a-very-long-app-name-that-6z6rtjpjidce5tijzvreclx75e",
 		},
 	}
 	for _, tt := range tests {
-		id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: tt.name}
-		got := KServiceName(id)
-		assert.Equal(t, tt.want, got)
-		assert.LessOrEqual(t, len(got), maxKServiceNameLen)
+		t.Run(tt.desc, func(t *testing.T) {
+			got := KServiceName(tt.id)
+			assert.Equal(t, tt.want, got)
+			assert.LessOrEqual(t, len(got), maxKServiceNameLen)
+			// Must be a valid DNS-1035 label — leading letter, lowercase
+			// alphanumerics and hyphens, trailing alphanumeric — and end in the
+			// digest, with the readable prefix optional.
+			assert.Regexp(t, `^k-([a-z0-9]([-a-z0-9]*[a-z0-9])?-)?[a-z2-7]{26}$`, got)
+		})
 	}
+}
+
+// TestKServiceName_DistinguishesAmbiguousIdentities is the regression test for
+// issue #7622. The previous derivation joined the fields with "-", so these two
+// identities both flattened to "svc-team-prod-x" and the second app to deploy
+// would overwrite the first app's spec.
+func TestKServiceName_DistinguishesAmbiguousIdentities(t *testing.T) {
+	first := &flyteapp.Identifier{Name: "svc", Project: "team", Domain: "prod-x"}
+	second := &flyteapp.Identifier{Name: "svc", Project: "team-prod", Domain: "x"}
+
+	assert.NotEqual(t, KServiceName(first), KServiceName(second))
+}
+
+// TestKServiceName_TrimsHyphensAroundAppName covers app names that the proto
+// pattern forbids but nothing currently enforces. The readable segment is tidied so
+// the name never contains "--", and the result stays a valid DNS-1035 label.
+func TestKServiceName_TrimsHyphensAroundAppName(t *testing.T) {
+	// The label rule Knative applies: leading letter, lowercase alphanumerics and
+	// hyphens, trailing alphanumeric.
+	dns1035 := regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`)
+
+	names := []string{"myapp", "-foo", "foo-", "-foo-", "---", "-", "",
+		// 35+ characters, so the truncation path runs before the trim.
+		"-----------------------------------x",
+		"this-is-a-very-long-app-name-that-exceeds-the-kubernetes-dns-label-limit"}
+
+	seen := make(map[string]string, len(names))
+	for _, name := range names {
+		got := KServiceName(&flyteapp.Identifier{Project: "proj", Domain: "dev", Name: name})
+
+		assert.Regexp(t, dns1035, got, "name %q produced an invalid DNS-1035 label", name)
+		assert.NotContains(t, got, "--", "name %q produced a doubled hyphen", name)
+		assert.LessOrEqual(t, len(got), maxKServiceNameLen)
+		// Trimming must not merge distinct identities — the digest keeps them apart.
+		if prev, dup := seen[got]; dup {
+			t.Errorf("names %q and %q collided on %s", prev, name, got)
+		}
+		seen[got] = name
+	}
+}
+
+func TestKServiceName_OrgIsPartOfIdentity(t *testing.T) {
+	base := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
+	otherOrg := &flyteapp.Identifier{Org: "acme", Project: "proj", Domain: "dev", Name: "myapp"}
+
+	assert.NotEqual(t, KServiceName(base), KServiceName(otherOrg),
+		"apps in different orgs must not share a KService")
+
+	// An unset org and an explicit default org are the same app: Get returns the
+	// default, so a client round-tripping an app must not land on a second KService.
+	defaultedOrg := &flyteapp.Identifier{Org: defaultOrg, Project: "proj", Domain: "dev", Name: "myapp"}
+	assert.Equal(t, KServiceName(base), KServiceName(defaultedOrg))
+}
+
+func TestIdentifierFromKService(t *testing.T) {
+	ksvc := func(labels, annotations map[string]string) *servingv1.Service {
+		return &servingv1.Service{ObjectMeta: metav1.ObjectMeta{
+			Name: "k-myapp-abc", Labels: labels, Annotations: annotations,
+		}}
+	}
+
+	tests := []struct {
+		desc        string
+		labels      map[string]string
+		annotations map[string]string
+		want        *flyteapp.Identifier
+		wantErrOn   string
+	}{
+		{
+			desc:   "unset org reads back as the default org",
+			labels: map[string]string{labelProject: "proj", labelDomain: "dev", labelAppName: "myapp"},
+			want:   &flyteapp.Identifier{Org: defaultOrg, Project: "proj", Domain: "dev", Name: "myapp"},
+		},
+		{
+			desc:        "org annotation is honored",
+			labels:      map[string]string{labelProject: "proj", labelDomain: "dev", labelAppName: "myapp"},
+			annotations: map[string]string{annotationAppOrg: "acme"},
+			want:        &flyteapp.Identifier{Org: "acme", Project: "proj", Domain: "dev", Name: "myapp"},
+		},
+		{
+			// Labels store the identity verbatim, and case is part of it, so an app
+			// round-trips as exactly the identity it was deployed under.
+			desc:   "case is preserved",
+			labels: map[string]string{labelProject: "Proj", labelDomain: "Dev", labelAppName: "MyApp"},
+			want:   &flyteapp.Identifier{Org: defaultOrg, Project: "Proj", Domain: "Dev", Name: "MyApp"},
+		},
+		{
+			// Nothing validates app names today, so a blank one deploys and has to
+			// read back. Present-but-empty is not the same as absent.
+			desc:   "empty label value is a valid identity",
+			labels: map[string]string{labelProject: "proj", labelDomain: "dev", labelAppName: ""},
+			want:   &flyteapp.Identifier{Org: defaultOrg, Project: "proj", Domain: "dev", Name: ""},
+		},
+		{
+			desc:      "missing project label is not an identity",
+			labels:    map[string]string{labelDomain: "dev", labelAppName: "myapp"},
+			wantErrOn: labelProject,
+		},
+		{
+			desc:      "missing domain label is not an identity",
+			labels:    map[string]string{labelProject: "proj", labelAppName: "myapp"},
+			wantErrOn: labelDomain,
+		},
+		{
+			desc:      "missing app-name label is not an identity",
+			labels:    map[string]string{labelProject: "proj", labelDomain: "dev"},
+			wantErrOn: labelAppName,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			got, err := identifierFromKService(ksvc(tt.labels, tt.annotations))
+			if tt.wantErrOn != "" {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tt.wantErrOn)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want.GetOrg(), got.GetOrg())
+			assert.Equal(t, tt.want.GetProject(), got.GetProject())
+			assert.Equal(t, tt.want.GetDomain(), got.GetDomain())
+			assert.Equal(t, tt.want.GetName(), got.GetName())
+		})
+	}
+}
+
+// The reported URL and the KService's own name must derive from the same identity.
+// Any path that rebuilds the identity without the org computes a host for a
+// different app, and the link resolves to nothing.
+func TestGetApp_IngressUsesAppOrg(t *testing.T) {
+	c := testClient(t)
+	c.cfg.BaseDomain = "example.com"
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	app.Metadata.Id.Org = "acme"
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	got, err := c.GetApp(context.Background(), app.GetMetadata().GetId())
+	require.NoError(t, err)
+
+	assert.Equal(t, "https://"+KServiceName(app.GetMetadata().GetId())+".example.com",
+		got.GetStatus().GetIngress().GetPublicUrl(),
+		"the reported URL must address the KService the app actually lives in")
+}
+
+// TestKServiceToApp_RoundTripsIdentity pins the full loop: the identity written by
+// Deploy is the identity Get reads back, org included.
+func TestKServiceToApp_RoundTripsIdentity(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	app.Metadata.Id.Org = "acme"
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	got, err := c.GetApp(context.Background(), app.GetMetadata().GetId())
+	require.NoError(t, err)
+
+	gotID := got.GetMetadata().GetId()
+	assert.Equal(t, "acme", gotID.GetOrg())
+	assert.Equal(t, "proj", gotID.GetProject())
+	assert.Equal(t, "dev", gotID.GetDomain())
+	assert.Equal(t, "myapp", gotID.GetName())
+	assert.Equal(t, KServiceName(app.GetMetadata().GetId()), KServiceName(gotID),
+		"the round-tripped identity must resolve to the same KService")
 }
 
 func TestRenderNamespacedSuffix(t *testing.T) {
@@ -873,14 +1065,19 @@ func testKsvc(name, ns, rv string) *servingv1.Service {
 			Namespace:       ns,
 			ResourceVersion: rv,
 			Annotations:     map[string]string{annotationAppID: "proj/dev/" + name},
-			Labels:          map[string]string{labelAppManaged: "true"},
+			Labels: map[string]string{
+				labelAppManaged: "true",
+				labelProject:    "proj",
+				labelDomain:     "dev",
+				labelAppName:    name,
+			},
 		},
 	}
 }
 
 // --- Status message format tests ---
 
-func TestKserviceToApp_StoppedDesiredState(t *testing.T) {
+func TestKServiceToApp_StoppedDesiredState(t *testing.T) {
 	c := testClient(t)
 	app := testApp("proj", "dev", "myapp", "nginx:latest")
 
@@ -893,7 +1090,7 @@ func TestKserviceToApp_StoppedDesiredState(t *testing.T) {
 		"stopped app should have DesiredState=STOPPED in the returned spec")
 }
 
-func TestKserviceToStatus_Messages(t *testing.T) {
+func TestKServiceToStatus_Messages(t *testing.T) {
 	tests := []struct {
 		name           string
 		ksvc           func() *servingv1.Service
@@ -981,7 +1178,8 @@ func TestKserviceToStatus_Messages(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := testClient(t)
-			status := c.kserviceToStatus(context.Background(), tt.ksvc())
+			status := c.kServiceToStatus(context.Background(), tt.ksvc(),
+				&flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"})
 			require.NotNil(t, status)
 			require.Len(t, status.Conditions, len(tt.wantConditions))
 			for i, want := range tt.wantConditions {
