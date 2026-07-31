@@ -511,6 +511,15 @@
       "default": "UNKNOWN",
       "description": "Known resource names.\n\n - EPHEMERAL_STORAGE: For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs."
     },
+    "ReusePolicyScope": {
+      "type": "string",
+      "enum": [
+        "GLOBAL",
+        "RUN"
+      ],
+      "default": "GLOBAL",
+      "description": "Scope bounds how widely a reusable environment may be shared.\n\n - GLOBAL: Reuse one environment across all runs (the default). Cheapest: creation cost is paid once\nand amortized across every invocation everywhere.\n - RUN: Restrict reuse to a single run: each run gets its own environment, torn down with the run."
+    },
     "SchemaColumnSchemaColumnType": {
       "type": "string",
       "enum": [
@@ -1508,6 +1517,10 @@
         "scaledown_ttl": {
           "type": "string",
           "description": "Minimum delay before an individual idle replica is scaled down during auto-scaling\n(distinct from idle_ttl, which governs the whole environment)."
+        },
+        "scope": {
+          "$ref": "#/definitions/ReusePolicyScope",
+          "description": "How widely the reusable environment may be shared. Defaults to GLOBAL (reuse across all runs)."
         }
       },
       "description": "ReusePolicy configures reuse of a task's execution environment across invocations, so\nenvironment creation cost is paid once and amortized: a warm container pool for reusable\ncontainer/actor tasks, or a shared, long-lived cluster for cluster-backed plugins (e.g. Ray).\nTotal concurrent capacity is max_replicas * concurrency."
