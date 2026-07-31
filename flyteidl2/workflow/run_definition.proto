@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.workflow;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/common/cache.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/identity.proto";
 import "flyteidl2/common/phase.proto";
@@ -368,7 +369,7 @@ message ActionAttempt {
   flyteidl2.core.LogContext log_context = 13;
 
   // Cache metadata for this attempt, set only for cache hits.
-  CacheMetadata cache_metadata = 14;
+  common.CacheMetadata cache_metadata = 14;
 }
 
 message ClusterEvent {
@@ -440,7 +441,7 @@ message ActionEvent {
   google.protobuf.Timestamp reported_time = 15;
 
   // Cache metadata for this event, set only for cache hits.
-  CacheMetadata cache_metadata = 16;
+  common.CacheMetadata cache_metadata = 16;
 }
 
 message ActionSpec {
@@ -535,10 +536,4 @@ message TaskGroup {
 
   // Average time from run creation to entering RUNNING phase.
   google.protobuf.Duration average_time_to_running = 14;
-}
-
-// Metadata associated with a cache operation.
-message CacheMetadata {
-  // The action attempt that produced the cached outputs.
-  common.ActionAttemptIdentifier source_action_attempt = 1;
 }
