@@ -9,8 +9,8 @@ import (
 	"io"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
-	mock "github.com/stretchr/testify/mock"
 	"github.com/golang/protobuf/proto" //nolint: staticcheck
+	mock "github.com/stretchr/testify/mock"
 )
 
 // NewMetadata creates a new instance of Metadata. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

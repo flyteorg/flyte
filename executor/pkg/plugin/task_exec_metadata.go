@@ -12,6 +12,7 @@ import (
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	executorconfig "github.com/flyteorg/flyte/v2/executor/pkg/config"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	flytesecret "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
 	pluginsUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
@@ -32,11 +33,7 @@ func (t *taskExecutionID) GetGeneratedName() string {
 }
 
 func (t *taskExecutionID) GetGeneratedNameWith(minLength, maxLength int) (string, error) {
-	name := t.generatedName
-	if len(name) > maxLength {
-		name = name[:maxLength]
-	}
-	return name, nil
+	return encoding.FixedLengthUniqueID(t.generatedName, maxLength)
 }
 
 func (t *taskExecutionID) GetID() *core.TaskExecutionIdentifier {
