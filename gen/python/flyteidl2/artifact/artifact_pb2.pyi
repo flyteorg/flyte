@@ -1,4 +1,5 @@
 from buf.validate import validate_pb2 as _validate_pb2
+from flyteidl2.common import identity_pb2 as _identity_pb2
 from flyteidl2.core import literals_pb2 as _literals_pb2
 from flyteidl2.core import types_pb2 as _types_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
@@ -69,5 +70,5 @@ class Artifact(_message.Message):
     artifact_id: ArtifactIdentifier
     spec: ArtifactSpec
     created_at: _timestamp_pb2.Timestamp
-    created_by: str
-    def __init__(self, artifact_id: _Optional[_Union[ArtifactIdentifier, _Mapping]] = ..., spec: _Optional[_Union[ArtifactSpec, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., created_by: _Optional[str] = ...) -> None: ...
+    created_by: _identity_pb2.EnrichedIdentity
+    def __init__(self, artifact_id: _Optional[_Union[ArtifactIdentifier, _Mapping]] = ..., spec: _Optional[_Union[ArtifactSpec, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., created_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ...) -> None: ...

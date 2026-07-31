@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.artifact;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/common/identity.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/types.proto";
 import "google/protobuf/timestamp.proto";
@@ -87,6 +88,8 @@ message Artifact {
   // Time at which the artifact was created.
   google.protobuf.Timestamp created_at = 3;
 
-  // Identity that created the artifact.
-  string created_by = 4;
+  // Identity that created the artifact. Persisted subject-stripped; services
+  // re-enrich via the identity cache when serving (same convention as
+  // workflow.ActionMetadata.executed_by).
+  common.EnrichedIdentity created_by = 4;
 }
