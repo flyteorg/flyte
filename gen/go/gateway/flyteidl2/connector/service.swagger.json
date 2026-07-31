@@ -1508,7 +1508,7 @@
         "concurrency": {
           "type": "integer",
           "format": "int32",
-          "description": "Maximum number of concurrent tasks a single replica may handle. Values \u003e 1 are only\nmeaningful for async tasks."
+          "description": "Maximum number of concurrent tasks a single replica may handle. Values \u003e 1 are only\nmeaningful for async tasks. 0 means unset (treated as 1)."
         },
         "idle_ttl": {
           "type": "string",
