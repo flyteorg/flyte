@@ -3,7 +3,9 @@ package k8s
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/base32"
 	"encoding/base64"
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"strings"
@@ -51,9 +53,14 @@ const (
 	labelKnativeRevision = "serving.knative.dev/revision"
 
 	annotationSpecSHA = "flyte.org/spec-sha"
-	annotationAppID   = "flyte.org/app-id"
-	annotationAppOrg  = "flyte.org/app-org"
-	annotationSpec    = "flyte.org/spec"
+
+	// annotationAppID holds "{project}/{domain}/{name}" for human inspection with
+	// kubectl. It is decorative: the join is ambiguous when a field contains "/",
+	// so identity is read from the labels below — see identifierFromKService.
+	annotationAppID = "flyte.org/app-id"
+
+	annotationAppOrg = "flyte.org/app-org"
+	annotationSpec   = "flyte.org/spec"
 
 	labelAppStopped        = "flyte.org/app-stopped"
 	labelKnativeVisibility = "networking.knative.dev/visibility"
@@ -64,6 +71,11 @@ const (
 	// maxKServiceNameLen is the Kubernetes DNS label limit.
 	maxKServiceNameLen = 63
 )
+
+// kServiceNameEncoding encodes the identity digest using only characters valid in
+// a DNS label: lowercase letters and digits, no padding.
+var kServiceNameEncoding = base32.NewEncoding("abcdefghijklmnopqrstuvwxyz234567").
+	WithPadding(base32.NoPadding)
 
 // AppK8sClientInterface defines the KService lifecycle operations for the App service.
 type AppK8sClientInterface interface {
@@ -338,8 +350,9 @@ func isManagedKService(ksvc *servingv1.Service) bool {
 // handleKServiceEvent converts a KService event into a WatchResponse,
 // persists the current deployment status as a condition, and notifies subscribers.
 func (c *AppK8sClient) handleKServiceEvent(ctx context.Context, ksvc *servingv1.Service, eventType k8swatch.EventType) {
-	app, err := c.kserviceToApp(ctx, ksvc)
+	app, err := c.kServiceToApp(ctx, ksvc)
 	if err != nil {
+		logger.Warnf(ctx, "Skipping KService %s event: failed to convert to app: %v", ksvc.Name, err)
 		return
 	}
 
@@ -435,7 +448,7 @@ func (c *AppK8sClient) GetApp(ctx context.Context, appID *flyteapp.Identifier) (
 		}
 		return nil, fmt.Errorf("failed to get KService %s: %w", name, err)
 	}
-	return c.kserviceToApp(ctx, ksvc)
+	return c.kServiceToApp(ctx, ksvc)
 }
 
 // specFromAnnotation deserializes the Spec stored in the flyte.org/spec annotation.
@@ -486,7 +499,7 @@ func (c *AppK8sClient) List(ctx context.Context, project, domain string, limit u
 
 	apps := make([]*flyteapp.App, 0, len(list.Items))
 	for i := range list.Items {
-		a, err := c.kserviceToApp(ctx, &list.Items[i])
+		a, err := c.kServiceToApp(ctx, &list.Items[i])
 		if err != nil {
 			logger.Warnf(ctx, "Skipping KService %s: failed to convert to app: %v", list.Items[i].Name, err)
 			continue
@@ -516,23 +529,89 @@ func (c *AppK8sClient) PublicIngress(id *flyteapp.Identifier) *flyteapp.Ingress 
 
 // --- Helpers ---
 
-// KServiceName returns the KService name for an app. All apps share the
-// "flyte" namespace, so the name must be unique across all (project, domain, name)
-// triples — we encode all three in the name. Lower-cased and capped at 63 chars
-// (K8s DNS label limit); names exceeding the cap fall back to a deterministic
-// 8-char SHA256 suffix to guarantee uniqueness without exceeding the limit.
+// KServiceName returns the KService name for an app, in the form
+// k-<lowercase-app-name>-<26-character-lowercase-base32-hash>.
+//
+// The hash covers the app's full identity — org, project, domain and name — with
+// each field length-prefixed, so the encoding stays unambiguous whatever the
+// fields contain. The app name is included for readability only. The "k-" prefix
+// versions the format and makes the name start with a letter, as Knative requires
+// (DNS-1035).
+//
+// The identity is hashed exactly as given. Project, domain and name are
+// case-sensitive everywhere else in Flyte — nothing lowercases them, and the proto
+// constrains only their length — so folding case here would map two distinct apps
+// onto one KService. Only the readable prefix is lowercased, because a DNS label
+// must be.
+//
+// Every value here is part of the on-disk name format: changing any of them
+// renames every existing app's KService, so they are fixed rather than tunable.
 func KServiceName(id *flyteapp.Identifier) string {
-	raw := strings.ToLower(fmt.Sprintf("%s-%s-%s", id.GetName(), id.GetProject(), id.GetDomain()))
-	if len(raw) <= maxKServiceNameLen {
-		return raw
+	// 16 bytes = 128 bits of digest, which Base32-encodes to 26 characters.
+	const hashBytes = 16
+
+	// Use default org if org is empty
+	org := id.GetOrg()
+	if org == "" {
+		org = defaultOrg
 	}
-	sum := sha256.Sum256([]byte(id.GetProject() + "/" + id.GetDomain() + "/" + id.GetName()))
-	suffix := hex.EncodeToString(sum[:4])
-	prefix := raw
-	if len(prefix) > maxKServiceNameLen-9 {
-		prefix = prefix[:maxKServiceNameLen-9]
+
+	canonical := make([]byte, 0, len(org)+len(id.GetProject())+len(id.GetDomain())+len(id.GetName())+16)
+	for _, field := range []string{org, id.GetProject(), id.GetDomain(), id.GetName()} {
+		canonical = binary.BigEndian.AppendUint32(canonical, uint32(len(field)))
+		canonical = append(canonical, field...)
 	}
-	return prefix + "-" + suffix
+
+	sum := sha256.Sum256(canonical)
+	suffix := kServiceNameEncoding.EncodeToString(sum[:hashBytes])
+
+	// Reserve room for "k-" and the "-" before the suffix. Hyphens are then trimmed
+	// from both ends so neither a truncation mid-word nor an app name that already
+	// starts or ends with one yields "--". A name that is nothing but hyphens trims
+	// away entirely, leaving just the prefix and digest.
+	appName := strings.ToLower(id.GetName())
+	maxAppNameLen := maxKServiceNameLen - len("k-") - len(suffix) - 1
+	if len(appName) > maxAppNameLen {
+		appName = appName[:maxAppNameLen]
+	}
+	appName = strings.Trim(appName, "-")
+	if appName == "" {
+		return "k-" + suffix
+	}
+	return "k-" + appName + "-" + suffix
+}
+
+// identifierFromKService reconstructs the app identity from the KService's labels
+// and org annotation. Every field has its own key, so nothing has to be parsed and
+// no value can be mistaken for a delimiter — unlike the flyte.org/app-id annotation,
+// which stores the same identity as a "/"-joined string and is decorative only.
+func identifierFromKService(ksvc *servingv1.Service) (*flyteapp.Identifier, error) {
+	project, ok := ksvc.Labels[labelProject]
+	if !ok {
+		return nil, fmt.Errorf("KService %s missing %s label", ksvc.Name, labelProject)
+	}
+	domain, ok := ksvc.Labels[labelDomain]
+	if !ok {
+		return nil, fmt.Errorf("KService %s missing %s label", ksvc.Name, labelDomain)
+	}
+	name, ok := ksvc.Labels[labelAppName]
+	if !ok {
+		return nil, fmt.Errorf("KService %s missing %s label", ksvc.Name, labelAppName)
+	}
+
+	// Match KServiceName: an unset org is the default org, so an app created without
+	// one reads back as the same identity it was deployed under.
+	org := ksvc.Annotations[annotationAppOrg]
+	if org == "" {
+		org = defaultOrg
+	}
+
+	return &flyteapp.Identifier{
+		Org:     org,
+		Project: project,
+		Domain:  domain,
+		Name:    name,
+	}, nil
 }
 
 // renderNamespacedSuffix substitutes {{ project }} and {{ domain }}
@@ -566,6 +645,15 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	name := KServiceName(appID)
 	ns := c.namespace
 
+	// Use default org if org is empty
+	org := appID.GetOrg()
+	if org == "" {
+		org = defaultOrg
+	}
+	project := appID.GetProject()
+	domain := appID.GetDomain()
+	appName := appID.GetName()
+
 	specBytes, err := marshalSpec(spec)
 	if err != nil {
 		return nil, err
@@ -593,18 +681,22 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 
 	// Inject INTERNAL_APP_ENDPOINT_PATTERN so app code can construct internal cluster URLs
 	// for other apps by substituting {app_fqdn} with the target app name.
-	// The suffix is rendered from NamespacedNamePrefixTemplate to match the KService name format
-	// {name}-{project}-{domain} used by KServiceName().
+	//
+	// TODO: this no longer resolves. The pattern reproduces the KService name format
+	// {name}-{project}-{domain}, which apps could rebuild by string substitution.
+	// KServiceName includes a digest of the full identity, which app code cannot
+	// compute, so every URL built from this pattern points at nothing.
+	//
 	if len(podSpec.Containers) > 0 {
-		suffix := renderNamespacedSuffix(c.cfg.NamespacedNameSuffixTemplate, appID.GetProject(), appID.GetDomain())
+		suffix := renderNamespacedSuffix(c.cfg.NamespacedNameSuffixTemplate, project, domain)
 		podSpec.Containers[0].Env = append(podSpec.Containers[0].Env, corev1.EnvVar{
 			Name:  "INTERNAL_APP_ENDPOINT_PATTERN",
 			Value: fmt.Sprintf("http://{app_fqdn}-%s.%s.svc.cluster.local", suffix, ns),
 		})
 		// Inject execution context env vars required by flyte.init_in_cluster()
 		podSpec.Containers[0].Env = append(podSpec.Containers[0].Env,
-			corev1.EnvVar{Name: "FLYTE_INTERNAL_EXECUTION_PROJECT", Value: appID.GetProject()},
-			corev1.EnvVar{Name: "FLYTE_INTERNAL_EXECUTION_DOMAIN", Value: appID.GetDomain()},
+			corev1.EnvVar{Name: "FLYTE_INTERNAL_EXECUTION_PROJECT", Value: project},
+			corev1.EnvVar{Name: "FLYTE_INTERNAL_EXECUTION_DOMAIN", Value: domain},
 		)
 	}
 
@@ -615,9 +707,12 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	var templateLabels map[string]string
 	if securityContext := spec.GetSecurityContext(); securityContext != nil && len(securityContext.GetSecrets()) > 0 {
 		templateLabels = map[string]string{
-			secret.OrganizationLabel: "flyte",
-			secret.ProjectLabel:      appID.GetProject(),
-			secret.DomainLabel:       appID.GetDomain(),
+			// Always defaultOrg, never the app's org: the secret writer encodes every
+			// secret ID with it (secret/service/secret_service.go), so a pod labelled
+			// with anything else looks up a name that was never written.
+			secret.OrganizationLabel: defaultOrg,
+			secret.ProjectLabel:      project,
+			secret.DomainLabel:       domain,
 			secretUtils.PodLabel:     secretUtils.PodLabelValue,
 		}
 		secretsMap, err := secretUtils.MarshalSecretsToMapStrings(securityContext.GetSecrets())
@@ -644,14 +739,14 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 			Namespace: ns,
 			Labels: map[string]string{
 				labelAppManaged: "true",
-				labelProject:    appID.GetProject(),
-				labelDomain:     appID.GetDomain(),
-				labelAppName:    appID.GetName(),
+				labelProject:    project,
+				labelDomain:     domain,
+				labelAppName:    appName,
 			},
 			Annotations: map[string]string{
 				annotationSpecSHA: sha,
-				annotationAppID:   fmt.Sprintf("%s/%s/%s", appID.GetProject(), appID.GetDomain(), appID.GetName()),
-				annotationAppOrg:  appID.GetOrg(),
+				annotationAppID:   fmt.Sprintf("%s/%s/%s", project, domain, appName),
+				annotationAppOrg:  org,
 				annotationSpec:    base64.StdEncoding.EncodeToString(specBytes),
 			},
 		},
@@ -846,9 +941,12 @@ func knativeCondToAppCondition(kCond knativeapis.Condition, serviceReady, servic
 	}
 }
 
-// kserviceToStatus maps a KService's conditions to a flyteapp.Status proto.
+// kServiceToStatus maps a KService's conditions to a flyteapp.Status proto.
 // It fetches the latest ready Revision to read the accurate ActualReplicas count.
-func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Service) *flyteapp.Status {
+//
+// appID is passed in rather than re-derived from the object, so the KService's name
+// and the URL reported for it are computed from one identity.
+func (c *AppK8sClient) kServiceToStatus(ctx context.Context, ksvc *servingv1.Service, appID *flyteapp.Identifier) *flyteapp.Status {
 	// Check if the Service is explicitly stopped by the control plane.
 	if ksvc.Labels != nil && ksvc.Labels[labelAppStopped] == "true" {
 		return &flyteapp.Status{
@@ -877,15 +975,9 @@ func (c *AppK8sClient) kserviceToStatus(ctx context.Context, ksvc *servingv1.Ser
 	}
 	status := &flyteapp.Status{Conditions: conditions}
 
-	// Populate ingress URL from the app annotation so the URL is consistent
-	// with the Create response regardless of Knative route readiness.
-	if appIDStr := ksvc.Annotations[annotationAppID]; appIDStr != "" {
-		parts := strings.SplitN(appIDStr, "/", 3)
-		if len(parts) == 3 {
-			appID := &flyteapp.Identifier{Project: parts[0], Domain: parts[1], Name: parts[2]}
-			status.Ingress = c.PublicIngress(appID)
-		}
-	}
+	// Derive the ingress URL from the identity rather than the live Knative route,
+	// so it is consistent with the Create response regardless of route readiness.
+	status.Ingress = c.PublicIngress(appID)
 
 	// Populate current replica count from the latest ready Revision.
 	if revName := ksvc.Status.LatestReadyRevisionName; revName != "" {
@@ -1011,29 +1103,12 @@ func podDeploymentStatus(pod *corev1.Pod) (string, string) {
 	}
 }
 
-// kserviceToApp reconstructs a flyteapp.App from a KService by reading the
-// app identifier from annotations and the live status from KService conditions.
-func (c *AppK8sClient) kserviceToApp(ctx context.Context, ksvc *servingv1.Service) (*flyteapp.App, error) {
-	appIDStr, ok := ksvc.Annotations[annotationAppID]
-	if !ok {
-		return nil, fmt.Errorf("KService %s missing %s annotation", ksvc.Name, annotationAppID)
-	}
-
-	// annotation format: "{project}/{domain}/{name}"
-	parts := strings.SplitN(appIDStr, "/", 3)
-	if len(parts) != 3 {
-		return nil, fmt.Errorf("KService %s has malformed %s annotation: %q", ksvc.Name, annotationAppID, appIDStr)
-	}
-
-	org := ksvc.Annotations[annotationAppOrg]
-	if org == "" {
-		org = defaultOrg
-	}
-	appID := &flyteapp.Identifier{
-		Org:     org,
-		Project: parts[0],
-		Domain:  parts[1],
-		Name:    parts[2],
+// kServiceToApp reconstructs a flyteapp.App from a KService by reading the
+// app identifier from its labels and the live status from KService conditions.
+func (c *AppK8sClient) kServiceToApp(ctx context.Context, ksvc *servingv1.Service) (*flyteapp.App, error) {
+	appID, err := identifierFromKService(ksvc)
+	if err != nil {
+		return nil, err
 	}
 
 	spec := specFromAnnotation(ksvc)
@@ -1046,6 +1121,6 @@ func (c *AppK8sClient) kserviceToApp(ctx context.Context, ksvc *servingv1.Servic
 			Id: appID,
 		},
 		Spec:   spec,
-		Status: c.kserviceToStatus(ctx, ksvc),
+		Status: c.kServiceToStatus(ctx, ksvc, appID),
 	}, nil
 }
