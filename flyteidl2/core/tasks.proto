@@ -214,7 +214,7 @@ message TaskMetadata {
 
 // ReusePolicy configures reuse of a task's execution environment across invocations, so
 // environment creation cost is paid once and amortized: a warm container pool for reusable
-// container/actor tasks, or a shared, long-lived cluster for cluster-backed plugins (e.g. Ray).
+// container tasks or a shared long-lived cluster for cluster-backed plugins (e.g. Ray).
 // Total concurrent capacity is max_replicas * concurrency.
 message ReusePolicy {
   option (buf.validate.message).cel = {
@@ -306,7 +306,7 @@ message TaskTemplate {
   // reserve the field numbers 1 through 15 for very frequently occurring message elements
   map<string, string> config = 16;
 
-  // Reuse policy for the task's execution environment (a warm container/actor pool, or a shared,
+  // Reuse policy for the task's execution environment (a warm container pool, or a shared,
   // long-lived cluster for cluster-backed plugins like Ray). When unset, no reuse is configured.
   ReusePolicy reuse_policy = 19;
 }
