@@ -122,6 +122,11 @@ class Status(_message.Message):
         SECRET_MOUNT_ERROR: _ClassVar[Status.Substate]
         CRASH_LOOP: _ClassVar[Status.Substate]
         OOM_KILLED: _ClassVar[Status.Substate]
+        RUNNING: _ClassVar[Status.Substate]
+        SCALED_TO_ZERO: _ClassVar[Status.Substate]
+        SCALING_FROM_ZERO: _ClassVar[Status.Substate]
+        SCALING_UP: _ClassVar[Status.Substate]
+        SCALING_DOWN: _ClassVar[Status.Substate]
     SUBSTATE_UNSPECIFIED: Status.Substate
     PULLING_IMAGE: Status.Substate
     INITIALIZING: Status.Substate
@@ -130,6 +135,11 @@ class Status(_message.Message):
     SECRET_MOUNT_ERROR: Status.Substate
     CRASH_LOOP: Status.Substate
     OOM_KILLED: Status.Substate
+    RUNNING: Status.Substate
+    SCALED_TO_ZERO: Status.Substate
+    SCALING_FROM_ZERO: Status.Substate
+    SCALING_UP: Status.Substate
+    SCALING_DOWN: Status.Substate
     ASSIGNED_CLUSTER_FIELD_NUMBER: _ClassVar[int]
     CURRENT_REPLICAS_FIELD_NUMBER: _ClassVar[int]
     INGRESS_FIELD_NUMBER: _ClassVar[int]

@@ -149,16 +149,21 @@ message Status {
     DEPLOYMENT_STATUS_FAILED = 6;
     // Deployment is completed.
     DEPLOYMENT_STATUS_ACTIVE = 7;
-    // Triggered in response to desired app replicas > actual app replicas
-    DEPLOYMENT_STATUS_SCALING_UP = 8;
-    // Triggered in response to desired app replicas < actual app replicas
-    DEPLOYMENT_STATUS_SCALING_DOWN = 9;
+    // Triggered in response to desired app replicas > actual app replicas.
+    // Please use DEPLOYMENT_STATUS_ACTIVE with Substate.SCALING_UP instead.
+    DEPLOYMENT_STATUS_SCALING_UP = 8 [deprecated = true];
+    // Triggered in response to desired app replicas < actual app replicas.
+    // Please use DEPLOYMENT_STATUS_ACTIVE with Substate.SCALING_DOWN instead.
+    DEPLOYMENT_STATUS_SCALING_DOWN = 9 [deprecated = true];
     // Triggered in response to the latest app spec changing
     DEPLOYMENT_STATUS_DEPLOYING = 10;
   }
 
   // Finer-grained substate that qualifies a DeploymentStatus, surfaced on a Condition.
   enum Substate {
+    // No specific substate. On a DEPLOYMENT_STATUS_FAILED condition this is a
+    // legitimate terminal state meaning "failed for an unclassified reason";
+    // consumers must not assume every FAILED condition carries a specific substate.
     SUBSTATE_UNSPECIFIED = 0;
     // The container image is being pulled.
     PULLING_IMAGE = 1;
@@ -174,6 +179,20 @@ message Status {
     CRASH_LOOP = 6;
     // The container was killed for exceeding its memory limit.
     OOM_KILLED = 7;
+    // The app is serving normally. Qualifies DEPLOYMENT_STATUS_ACTIVE.
+    RUNNING = 8;
+    // The app has zero replicas and is idle; it will scale up on the first request.
+    // Qualifies DEPLOYMENT_STATUS_ACTIVE.
+    SCALED_TO_ZERO = 9;
+    // The app is cold-starting from zero replicas after receiving a request.
+    // Qualifies DEPLOYMENT_STATUS_ACTIVE.
+    SCALING_FROM_ZERO = 10;
+    // Desired replicas exceed actual replicas. Qualifies DEPLOYMENT_STATUS_ACTIVE.
+    // Replaces the deprecated top-level DEPLOYMENT_STATUS_SCALING_UP.
+    SCALING_UP = 11;
+    // Actual replicas exceed desired replicas. Qualifies DEPLOYMENT_STATUS_ACTIVE.
+    // Replaces the deprecated top-level DEPLOYMENT_STATUS_SCALING_DOWN.
+    SCALING_DOWN = 12;
   }
 
   // Current number of replicas.
