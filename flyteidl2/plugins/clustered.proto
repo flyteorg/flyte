@@ -10,10 +10,10 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins";
 // Top-level spec for a clustered task execution. Packed into TaskTemplate.custom.
 message ClusteredTaskSpec {
   // Number of pods (== number of nodes). Required, must be >= 1.
-  int32 replicas = 1 [(buf.validate.field).int32.gt = 0];
+  int32 replicas = 1 [(buf.validate.field).uint32.gt = 0];
 
   // Number of processes per node passed to torchrun as --nproc-per-node (typically one per GPU). Required, must be >= 1.
-  int32 nproc_per_node = 2 [(buf.validate.field).int32.gt = 0];
+  int32 nproc_per_node = 2 [(buf.validate.field).uint32.gt = 0];
 
   // Selects the launcher and its per-launcher configuration.
   Runtime runtime = 3;
