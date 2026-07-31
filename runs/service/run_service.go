@@ -598,7 +598,7 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 		if len(model.DetailedInfo) > 0 {
 			info = &workflow.RunInfo{}
 			if err := proto.Unmarshal(model.DetailedInfo, info); err != nil {
-				return err
+				return fmt.Errorf("unmarshalling run detailed info: %w", err)
 			}
 		}
 
@@ -608,7 +608,7 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 		if info.GetTaskSpecDigest() != "" {
 			specModel, err := s.repo.TaskRepo().GetTaskSpec(ctx, info.GetTaskSpecDigest())
 			if err != nil {
-				return err
+				return fmt.Errorf("getting task spec for action %v: %w", actionId, err)
 			}
 
 			// Fill in the action spec based on the action type
@@ -618,13 +618,13 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 			case workflow.ActionType_ACTION_TYPE_TASK:
 				spec, err := transformers.ToTaskSpec(specModel)
 				if err != nil {
-					return err
+					return fmt.Errorf("failed to convert task spec model for action: %v: %w", actionId, err)
 				}
 				action.Spec = &workflow.ActionDetails_Task{Task: spec}
 			case workflow.ActionType_ACTION_TYPE_TRACE:
 				spec, err := transformers.ToTraceSpec(specModel)
 				if err != nil {
-					return err
+					return fmt.Errorf("failed to convert trace spec model for action: %v: %w", actionId, err)
 				}
 				action.Spec = &workflow.ActionDetails_Trace{Trace: spec}
 			default:
@@ -666,6 +666,9 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 	})
 
 	if err := eg.Wait(); err != nil {
+		if ctx.Err() == nil {
+			logger.Warnf(ctx, "failed to get action details for action %v: %v", actionId, err)
+		}
 		return nil, err
 	}
 
@@ -705,8 +708,7 @@ func (s *RunService) getAttempts(ctx context.Context, actionId *common.ActionIde
 	for _, m := range eventModels {
 		event, err := m.ToActionEvent()
 		if err != nil {
-			logger.Warnf(ctx, "failed to convert action event model for action %v: %v", actionId, err)
-			return nil, err
+			return nil, fmt.Errorf("failed to convert action event model for action %v: %w", actionId, err)
 		}
 		events = append(events, event)
 	}
@@ -1109,7 +1111,7 @@ func (s *RunService) SignalEvent(
 	})); err != nil {
 		// Actions-service errors (NotFound / InvalidArgument / FailedPrecondition)
 		// pass through unchanged.
-		return nil, err
+		return nil, fmt.Errorf("failed to signal action %s: %w", req.Msg.ActionId.Name, err)
 	}
 
 	return connect.NewResponse(&workflow.SignalEventResponse{}), nil
@@ -1284,7 +1286,7 @@ func (s *RunService) WatchRuns(
 		if err := stream.Send(&workflow.WatchRunsResponse{
 			Runs: protoRuns,
 		}); err != nil {
-			return err
+			return fmt.Errorf("sending runs: %w", err)
 		}
 	}
 
@@ -1293,7 +1295,7 @@ func (s *RunService) WatchRuns(
 		case <-ctx.Done():
 			return nil
 		case err := <-errsCh:
-			return err
+			return fmt.Errorf("watching runs: %w", err)
 		case run := <-updatesCh:
 			// Filter the run based on the watch request criteria
 			if !s.runMatchesFilter(run, req.Msg) {
@@ -1305,7 +1307,7 @@ func (s *RunService) WatchRuns(
 			if err := stream.Send(&workflow.WatchRunsResponse{
 				Runs: []*workflow.Run{protoRun},
 			}); err != nil {
-				return err
+				return fmt.Errorf("sending response: %w", err)
 			}
 		}
 	}
@@ -1327,11 +1329,11 @@ func (s *RunService) WatchActions(
 
 	rsm, err := newRunStateManager(req.Msg.GetFilter())
 	if err != nil {
-		return err
+		return fmt.Errorf("creating run state manager: %w", err)
 	}
 
 	if err := s.listAndSendAllActions(ctx, runID, rsm, stream); err != nil {
-		return err
+		return fmt.Errorf("listing and sending all actions: %w", err)
 	}
 
 	for {
@@ -1339,17 +1341,17 @@ func (s *RunService) WatchActions(
 		case <-ctx.Done():
 			return nil
 		case err := <-errsCh:
-			return err
+			return fmt.Errorf("watching actions: %w", err)
 		case updated, ok := <-updatesCh:
 			if !ok {
 				return nil
 			}
 			updates, err := rsm.upsertActions(ctx, []*models.Action{updated})
 			if err != nil {
-				return err
+				return fmt.Errorf("updating actions: %w", err)
 			}
 			if err := s.sendChangedActions(runID, updates, stream); err != nil {
-				return err
+				return fmt.Errorf("sending changed actions: %w", err)
 			}
 		}
 	}
@@ -1387,7 +1389,7 @@ func (s *RunService) listAndSendAllActions(
 			},
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("listing actions: %w", err)
 		}
 
 		// ListActions returns up to Limit+1 rows (the extra row is a has-more probe).
@@ -1400,10 +1402,10 @@ func (s *RunService) listAndSendAllActions(
 
 		updates, err := rsm.upsertActions(ctx, batch)
 		if err != nil {
-			return err
+			return fmt.Errorf("updating actions: %w", err)
 		}
 		if err := s.sendChangedActions(runID, updates, stream); err != nil {
-			return err
+			return fmt.Errorf("sending changed actions: %w", err)
 		}
 
 		if !hasMore || len(batch) == 0 {
@@ -1476,7 +1478,7 @@ func (s *RunService) WatchClusterEvents(
 
 			if len(info.events) > 0 {
 				if err := stream.Send(&workflow.WatchClusterEventsResponse{ClusterEvents: info.events}); err != nil {
-					return err
+					return fmt.Errorf("sending cluster events response: %w", err)
 				}
 			}
 
