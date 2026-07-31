@@ -79,7 +79,7 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		// Flyte OSS v2 has no organization concept, but the secret fetcher
 		// still requires an organization label on the pod. Inject a stable
 		// dummy value so scoped secret lookups succeed.
-		flytesecret.OrganizationLabel: "flyte",
+		flytesecret.OrganizationLabel: flytesecret.DefaultOrganization,
 		flytesecret.ProjectLabel:      ta.Spec.Project,
 		flytesecret.DomainLabel:       ta.Spec.Domain,
 	}

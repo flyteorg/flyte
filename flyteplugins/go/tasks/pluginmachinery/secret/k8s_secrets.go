@@ -121,3 +121,6 @@ func NewK8sSecretsInjector(cfg *config.Config) K8sSecretInjector {
 		cfg: cfg,
 	}
 }
+
+// InvalidateCache is a no-op: this injector resolves secrets on every Inject and caches nothing.
+func (i K8sSecretInjector) InvalidateCache(_ context.Context, _, _, _, _ string) {}

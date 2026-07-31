@@ -142,7 +142,7 @@ func NewAppK8sClient(k8sClient client.WithWatch, cache ctrlcache.Cache, namespac
 
 // defaultOrg is the org returned for apps that have no org persisted on the KService.
 // we always surface a non-empty value for callers (e.g. the UI) that expect one.
-const defaultOrg = "flyte"
+const defaultOrg = secret.DefaultOrganization
 
 // Deploy creates or updates the KService for the given app.
 func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
@@ -615,7 +615,7 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	var templateLabels map[string]string
 	if securityContext := spec.GetSecurityContext(); securityContext != nil && len(securityContext.GetSecrets()) > 0 {
 		templateLabels = map[string]string{
-			secret.OrganizationLabel: "flyte",
+			secret.OrganizationLabel: secret.DefaultOrganization,
 			secret.ProjectLabel:      appID.GetProject(),
 			secret.DomainLabel:       appID.GetDomain(),
 			secretUtils.PodLabel:     secretUtils.PodLabelValue,

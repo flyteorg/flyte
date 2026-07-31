@@ -799,3 +799,33 @@ func (f secretFetcherMock) GetSecretValue(ctx context.Context, secretID string) 
 
 	return &v, nil
 }
+
+// A secret cached at a broader scope than the one being invalidated must still be dropped:
+// lookUpSecret caches under whichever scope the fetcher resolved at, so invalidating only the
+// (org, domain, project) key would leave a shadowing org- or domain-scoped entry behind and the
+// cascade would keep serving the stale value until TTL eviction.
+func TestEmbeddedSecretManagerInjector_InvalidateCache_ClearsAllCascadeScopes(t *testing.T) {
+	ctx := context.Background()
+
+	org, domain, project, name := "o-apple", "d-cherry", "p-banana", "secret1"
+	wantKeys := []string{
+		EncodeSecretName(org, domain, project, name),
+		EncodeSecretName(org, domain, EmptySecretScope, name),
+		EncodeSecretName(org, EmptySecretScope, EmptySecretScope, name),
+	}
+
+	var deleted []string
+	secretCache := cacheMocks.NewCacheInterface[SecretValue](t)
+	secretCache.EXPECT().Delete(mock.Anything, mock.Anything).
+		Run(func(_ context.Context, key any) { deleted = append(deleted, key.(string)) }).
+		Return(nil).Times(len(wantKeys))
+
+	injector := NewEmbeddedSecretManagerInjector(
+		config.EmbeddedSecretManagerConfig{}, nil,
+		&mocks.MockableControllerRuntimeClient{}, testReferenceNamespace, secretCache,
+		&config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix},
+	)
+
+	injector.InvalidateCache(ctx, org, domain, project, name)
+	assert.ElementsMatch(t, wantKeys, deleted)
+}

@@ -5,11 +5,14 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 const _KVVersionName = "12"
 
 var _KVVersionIndex = [...]uint8{0, 1, 2}
+
+const _KVVersionLowerName = "12"
 
 func (i KVVersion) String() string {
 	if i < 0 || i >= KVVersion(len(_KVVersionIndex)-1) {
@@ -18,11 +21,26 @@ func (i KVVersion) String() string {
 	return _KVVersionName[_KVVersionIndex[i]:_KVVersionIndex[i+1]]
 }
 
-var _KVVersionValues = []KVVersion{0, 1}
+// An "invalid array index" compiler error signifies that the constant values have changed.
+// Re-run the stringer command to generate them again.
+func _KVVersionNoOp() {
+	var x [1]struct{}
+	_ = x[KVVersion1-(0)]
+	_ = x[KVVersion2-(1)]
+}
+
+var _KVVersionValues = []KVVersion{KVVersion1, KVVersion2}
 
 var _KVVersionNameToValueMap = map[string]KVVersion{
-	_KVVersionName[0:1]: 0,
-	_KVVersionName[1:2]: 1,
+	_KVVersionName[0:1]:      KVVersion1,
+	_KVVersionLowerName[0:1]: KVVersion1,
+	_KVVersionName[1:2]:      KVVersion2,
+	_KVVersionLowerName[1:2]: KVVersion2,
+}
+
+var _KVVersionNames = []string{
+	_KVVersionName[0:1],
+	_KVVersionName[1:2],
 }
 
 // KVVersionString retrieves an enum value from the enum constants string name.
@@ -31,12 +49,23 @@ func KVVersionString(s string) (KVVersion, error) {
 	if val, ok := _KVVersionNameToValueMap[s]; ok {
 		return val, nil
 	}
+
+	if val, ok := _KVVersionNameToValueMap[strings.ToLower(s)]; ok {
+		return val, nil
+	}
 	return 0, fmt.Errorf("%s does not belong to KVVersion values", s)
 }
 
 // KVVersionValues returns all values of the enum
 func KVVersionValues() []KVVersion {
 	return _KVVersionValues
+}
+
+// KVVersionStrings returns a slice of all String values of the enum
+func KVVersionStrings() []string {
+	strs := make([]string, len(_KVVersionNames))
+	copy(strs, _KVVersionNames)
+	return strs
 }
 
 // IsAKVVersion returns "true" if the value is listed in the enum definition. "false" otherwise
