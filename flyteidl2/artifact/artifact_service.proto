@@ -24,6 +24,13 @@ service ArtifactService {
   rpc ListArtifacts(ListArtifactsRequest) returns (ListArtifactsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
+  // List distinct artifact names within a project, one entry per name carrying
+  // the latest version's full record and the total version count. Ordered by
+  // the latest version's creation time, newest first.
+  rpc ListArtifactNames(ListArtifactNamesRequest) returns (ListArtifactNamesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 // request message for creating an artifact.
@@ -74,6 +81,34 @@ message ListArtifactsRequest {
 // response message for listing artifacts.
 message ListArtifactsResponse {
   repeated Artifact artifacts = 1;
+
+  // Pagination token for the next page; empty when exhausted.
+  string token = 2;
+}
+
+// request message for listing distinct artifact names.
+message ListArtifactNamesRequest {
+  // Common list request parameters (limit, token, filters).
+  // Supported filters: field "name" with CONTAINS.
+  common.ListRequest request = 1;
+
+  // Project scope for the listing. organization is stamped by the server.
+  common.ProjectIdentifier project_id = 2 [(buf.validate.field).required = true];
+}
+
+// One distinct artifact name: the latest version's full record plus the
+// total number of versions published under the name.
+message ArtifactGroup {
+  // The most recently created version of the artifact.
+  Artifact latest = 1;
+
+  // Total number of versions published under this name.
+  uint64 versions = 2;
+}
+
+// response message for listing distinct artifact names.
+message ListArtifactNamesResponse {
+  repeated ArtifactGroup groups = 1;
 
   // Pagination token for the next page; empty when exhausted.
   string token = 2;
