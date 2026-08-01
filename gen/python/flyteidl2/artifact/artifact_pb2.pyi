@@ -1,4 +1,5 @@
 from buf.validate import validate_pb2 as _validate_pb2
+from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import identity_pb2 as _identity_pb2
 from flyteidl2.core import literals_pb2 as _literals_pb2
 from flyteidl2.core import types_pb2 as _types_pb2
@@ -40,8 +41,18 @@ class Card(_message.Message):
     type: str
     def __init__(self, uri: _Optional[str] = ..., format: _Optional[str] = ..., type: _Optional[str] = ...) -> None: ...
 
+class ArtifactSource(_message.Message):
+    __slots__ = ["task_action", "external_ref", "attempt"]
+    TASK_ACTION_FIELD_NUMBER: _ClassVar[int]
+    EXTERNAL_REF_FIELD_NUMBER: _ClassVar[int]
+    ATTEMPT_FIELD_NUMBER: _ClassVar[int]
+    task_action: _identifier_pb2.ActionIdentifier
+    external_ref: str
+    attempt: int
+    def __init__(self, task_action: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., external_ref: _Optional[str] = ..., attempt: _Optional[int] = ...) -> None: ...
+
 class ArtifactSpec(_message.Message):
-    __slots__ = ["value", "type", "description", "user_metadata", "card"]
+    __slots__ = ["value", "type", "description", "user_metadata", "card", "source"]
     class UserMetadataEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -54,12 +65,14 @@ class ArtifactSpec(_message.Message):
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     USER_METADATA_FIELD_NUMBER: _ClassVar[int]
     CARD_FIELD_NUMBER: _ClassVar[int]
+    SOURCE_FIELD_NUMBER: _ClassVar[int]
     value: _literals_pb2.Literal
     type: _types_pb2.LiteralType
     description: str
     user_metadata: _containers.ScalarMap[str, str]
     card: Card
-    def __init__(self, value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., description: _Optional[str] = ..., user_metadata: _Optional[_Mapping[str, str]] = ..., card: _Optional[_Union[Card, _Mapping]] = ...) -> None: ...
+    source: ArtifactSource
+    def __init__(self, value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., description: _Optional[str] = ..., user_metadata: _Optional[_Mapping[str, str]] = ..., card: _Optional[_Union[Card, _Mapping]] = ..., source: _Optional[_Union[ArtifactSource, _Mapping]] = ...) -> None: ...
 
 class Artifact(_message.Message):
     __slots__ = ["artifact_id", "spec", "created_at", "created_by"]
