@@ -41,15 +41,21 @@ class Card(_message.Message):
     type: str
     def __init__(self, uri: _Optional[str] = ..., format: _Optional[str] = ..., type: _Optional[str] = ...) -> None: ...
 
+class TaskActionSource(_message.Message):
+    __slots__ = ["action", "attempt"]
+    ACTION_FIELD_NUMBER: _ClassVar[int]
+    ATTEMPT_FIELD_NUMBER: _ClassVar[int]
+    action: _identifier_pb2.ActionIdentifier
+    attempt: int
+    def __init__(self, action: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ...) -> None: ...
+
 class ArtifactSource(_message.Message):
-    __slots__ = ["task_action", "external_ref", "attempt"]
+    __slots__ = ["task_action", "external_ref"]
     TASK_ACTION_FIELD_NUMBER: _ClassVar[int]
     EXTERNAL_REF_FIELD_NUMBER: _ClassVar[int]
-    ATTEMPT_FIELD_NUMBER: _ClassVar[int]
-    task_action: _identifier_pb2.ActionIdentifier
+    task_action: TaskActionSource
     external_ref: str
-    attempt: int
-    def __init__(self, task_action: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., external_ref: _Optional[str] = ..., attempt: _Optional[int] = ...) -> None: ...
+    def __init__(self, task_action: _Optional[_Union[TaskActionSource, _Mapping]] = ..., external_ref: _Optional[str] = ...) -> None: ...
 
 class ArtifactSpec(_message.Message):
     __slots__ = ["value", "type", "description", "user_metadata", "card", "source"]

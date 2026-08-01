@@ -60,6 +60,16 @@ message Card {
   string type = 3 [(buf.validate.field).string.max_len = 16];
 }
 
+// The task action attempt that produced an artifact. A dedicated message
+// (rather than common.ActionAttemptIdentifier) because producing attempts are
+// 0-based while that identifier validates attempt > 0.
+message TaskActionSource {
+  common.ActionIdentifier action = 1 [(buf.validate.field).required = true];
+
+  // Attempt of the producing action; retries are distinct provenance.
+  uint32 attempt = 2;
+}
+
 // Provenance of an artifact: what produced it. An unset oneof means the
 // artifact was created manually (e.g. published from a laptop) with no
 // specific origin.
@@ -68,16 +78,12 @@ message ArtifactSource {
     // The task action that produced this artifact, for artifacts published
     // from inside a running task or extracted by the backend from task
     // outputs.
-    common.ActionIdentifier task_action = 1;
+    TaskActionSource task_action = 1;
 
     // Opaque reference into an external system (a URI, model id, dataset id,
     // ticket, ...) for artifacts imported from outside Flyte.
     string external_ref = 2 [(buf.validate.field).string.max_len = 1024];
   }
-
-  // Attempt of the producing action. Only meaningful with task_action;
-  // retries are distinct provenance.
-  uint32 attempt = 3;
 }
 
 // User-provided specification of an artifact.

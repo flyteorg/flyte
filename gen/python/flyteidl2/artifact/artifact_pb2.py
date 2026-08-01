@@ -19,7 +19,7 @@ from flyteidl2.core import types_pb2 as flyteidl2_dot_core_dot_types__pb2
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!flyteidl2/artifact/artifact.proto\x12\x12\x66lyteidl2.artifact\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1f\x66lyteidl2/common/identity.proto\x1a\x1d\x66lyteidl2/core/literals.proto\x1a\x1a\x66lyteidl2/core/types.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x91\x01\n\x0c\x41rtifactName\x12\x19\n\x03org\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x18?R\x03org\x12#\n\x07project\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18@R\x07project\x12!\n\x06\x64omain\x18\x03 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18@R\x06\x64omain\x12\x1e\n\x04name\x18\x04 \x01(\tB\n\xbaH\x07r\x05\x10\x01\x18\xff\x01R\x04name\"x\n\x12\x41rtifactIdentifier\x12<\n\x04name\x18\x01 \x01(\x0b\x32 .flyteidl2.artifact.ArtifactNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12$\n\x07version\x18\x02 \x01(\tB\n\xbaH\x07r\x05\x10\x01\x18\xff\x01R\x07version\"`\n\x04\x43\x61rd\x12\x1a\n\x03uri\x18\x01 \x01(\tB\x08\xbaH\x05r\x03\x18\x80\x08R\x03uri\x12\x1f\n\x06\x66ormat\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x18\x10R\x06\x66ormat\x12\x1b\n\x04type\x18\x03 \x01(\tB\x07\xbaH\x04r\x02\x18\x10R\x04type\"\xaa\x01\n\x0e\x41rtifactSource\x12\x45\n\x0btask_action\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierH\x00R\ntaskAction\x12-\n\x0c\x65xternal_ref\x18\x02 \x01(\tB\x08\xbaH\x05r\x03\x18\x80\x08H\x00R\x0b\x65xternalRef\x12\x18\n\x07\x61ttempt\x18\x03 \x01(\rR\x07\x61ttemptB\x08\n\x06source\"\xae\x03\n\x0c\x41rtifactSpec\x12\x35\n\x05value\x18\x01 \x01(\x0b\x32\x17.flyteidl2.core.LiteralB\x06\xbaH\x03\xc8\x01\x01R\x05value\x12\x37\n\x04type\x18\x02 \x01(\x0b\x32\x1b.flyteidl2.core.LiteralTypeB\x06\xbaH\x03\xc8\x01\x01R\x04type\x12*\n\x0b\x64\x65scription\x18\x03 \x01(\tB\x08\xbaH\x05r\x03\x18\xff\x01R\x0b\x64\x65scription\x12W\n\ruser_metadata\x18\x04 \x03(\x0b\x32\x32.flyteidl2.artifact.ArtifactSpec.UserMetadataEntryR\x0cuserMetadata\x12,\n\x04\x63\x61rd\x18\x05 \x01(\x0b\x32\x18.flyteidl2.artifact.CardR\x04\x63\x61rd\x12:\n\x06source\x18\x06 \x01(\x0b\x32\".flyteidl2.artifact.ArtifactSourceR\x06source\x1a?\n\x11UserMetadataEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\x87\x02\n\x08\x41rtifact\x12G\n\x0b\x61rtifact_id\x18\x01 \x01(\x0b\x32&.flyteidl2.artifact.ArtifactIdentifierR\nartifactId\x12\x34\n\x04spec\x18\x02 \x01(\x0b\x32 .flyteidl2.artifact.ArtifactSpecR\x04spec\x12\x39\n\ncreated_at\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x41\n\ncreated_by\x18\x04 \x01(\x0b\x32\".flyteidl2.common.EnrichedIdentityR\tcreatedByB\xca\x01\n\x16\x63om.flyteidl2.artifactB\rArtifactProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/artifact\xa2\x02\x03\x46\x41X\xaa\x02\x12\x46lyteidl2.Artifact\xca\x02\x12\x46lyteidl2\\Artifact\xe2\x02\x1e\x46lyteidl2\\Artifact\\GPBMetadata\xea\x02\x13\x46lyteidl2::Artifactb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!flyteidl2/artifact/artifact.proto\x12\x12\x66lyteidl2.artifact\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1f\x66lyteidl2/common/identity.proto\x1a\x1d\x66lyteidl2/core/literals.proto\x1a\x1a\x66lyteidl2/core/types.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x91\x01\n\x0c\x41rtifactName\x12\x19\n\x03org\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x18?R\x03org\x12#\n\x07project\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18@R\x07project\x12!\n\x06\x64omain\x18\x03 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18@R\x06\x64omain\x12\x1e\n\x04name\x18\x04 \x01(\tB\n\xbaH\x07r\x05\x10\x01\x18\xff\x01R\x04name\"x\n\x12\x41rtifactIdentifier\x12<\n\x04name\x18\x01 \x01(\x0b\x32 .flyteidl2.artifact.ArtifactNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12$\n\x07version\x18\x02 \x01(\tB\n\xbaH\x07r\x05\x10\x01\x18\xff\x01R\x07version\"`\n\x04\x43\x61rd\x12\x1a\n\x03uri\x18\x01 \x01(\tB\x08\xbaH\x05r\x03\x18\x80\x08R\x03uri\x12\x1f\n\x06\x66ormat\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x18\x10R\x06\x66ormat\x12\x1b\n\x04type\x18\x03 \x01(\tB\x07\xbaH\x04r\x02\x18\x10R\x04type\"p\n\x10TaskActionSource\x12\x42\n\x06\x61\x63tion\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x06\x61\x63tion\x12\x18\n\x07\x61ttempt\x18\x02 \x01(\rR\x07\x61ttempt\"\x92\x01\n\x0e\x41rtifactSource\x12G\n\x0btask_action\x18\x01 \x01(\x0b\x32$.flyteidl2.artifact.TaskActionSourceH\x00R\ntaskAction\x12-\n\x0c\x65xternal_ref\x18\x02 \x01(\tB\x08\xbaH\x05r\x03\x18\x80\x08H\x00R\x0b\x65xternalRefB\x08\n\x06source\"\xae\x03\n\x0c\x41rtifactSpec\x12\x35\n\x05value\x18\x01 \x01(\x0b\x32\x17.flyteidl2.core.LiteralB\x06\xbaH\x03\xc8\x01\x01R\x05value\x12\x37\n\x04type\x18\x02 \x01(\x0b\x32\x1b.flyteidl2.core.LiteralTypeB\x06\xbaH\x03\xc8\x01\x01R\x04type\x12*\n\x0b\x64\x65scription\x18\x03 \x01(\tB\x08\xbaH\x05r\x03\x18\xff\x01R\x0b\x64\x65scription\x12W\n\ruser_metadata\x18\x04 \x03(\x0b\x32\x32.flyteidl2.artifact.ArtifactSpec.UserMetadataEntryR\x0cuserMetadata\x12,\n\x04\x63\x61rd\x18\x05 \x01(\x0b\x32\x18.flyteidl2.artifact.CardR\x04\x63\x61rd\x12:\n\x06source\x18\x06 \x01(\x0b\x32\".flyteidl2.artifact.ArtifactSourceR\x06source\x1a?\n\x11UserMetadataEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\x87\x02\n\x08\x41rtifact\x12G\n\x0b\x61rtifact_id\x18\x01 \x01(\x0b\x32&.flyteidl2.artifact.ArtifactIdentifierR\nartifactId\x12\x34\n\x04spec\x18\x02 \x01(\x0b\x32 .flyteidl2.artifact.ArtifactSpecR\x04spec\x12\x39\n\ncreated_at\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x41\n\ncreated_by\x18\x04 \x01(\x0b\x32\".flyteidl2.common.EnrichedIdentityR\tcreatedByB\xca\x01\n\x16\x63om.flyteidl2.artifactB\rArtifactProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/artifact\xa2\x02\x03\x46\x41X\xaa\x02\x12\x46lyteidl2.Artifact\xca\x02\x12\x46lyteidl2\\Artifact\xe2\x02\x1e\x46lyteidl2\\Artifact\\GPBMetadata\xea\x02\x13\x46lyteidl2::Artifactb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -45,6 +45,8 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _CARD.fields_by_name['format']._serialized_options = b'\272H\004r\002\030\020'
   _CARD.fields_by_name['type']._options = None
   _CARD.fields_by_name['type']._serialized_options = b'\272H\004r\002\030\020'
+  _TASKACTIONSOURCE.fields_by_name['action']._options = None
+  _TASKACTIONSOURCE.fields_by_name['action']._serialized_options = b'\272H\003\310\001\001'
   _ARTIFACTSOURCE.fields_by_name['external_ref']._options = None
   _ARTIFACTSOURCE.fields_by_name['external_ref']._serialized_options = b'\272H\005r\003\030\200\010'
   _ARTIFACTSPEC_USERMETADATAENTRY._options = None
@@ -61,12 +63,14 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_ARTIFACTIDENTIFIER']._serialized_end=514
   _globals['_CARD']._serialized_start=516
   _globals['_CARD']._serialized_end=612
-  _globals['_ARTIFACTSOURCE']._serialized_start=615
-  _globals['_ARTIFACTSOURCE']._serialized_end=785
-  _globals['_ARTIFACTSPEC']._serialized_start=788
-  _globals['_ARTIFACTSPEC']._serialized_end=1218
-  _globals['_ARTIFACTSPEC_USERMETADATAENTRY']._serialized_start=1155
-  _globals['_ARTIFACTSPEC_USERMETADATAENTRY']._serialized_end=1218
-  _globals['_ARTIFACT']._serialized_start=1221
-  _globals['_ARTIFACT']._serialized_end=1484
+  _globals['_TASKACTIONSOURCE']._serialized_start=614
+  _globals['_TASKACTIONSOURCE']._serialized_end=726
+  _globals['_ARTIFACTSOURCE']._serialized_start=729
+  _globals['_ARTIFACTSOURCE']._serialized_end=875
+  _globals['_ARTIFACTSPEC']._serialized_start=878
+  _globals['_ARTIFACTSPEC']._serialized_end=1308
+  _globals['_ARTIFACTSPEC_USERMETADATAENTRY']._serialized_start=1245
+  _globals['_ARTIFACTSPEC_USERMETADATAENTRY']._serialized_end=1308
+  _globals['_ARTIFACT']._serialized_start=1311
+  _globals['_ARTIFACT']._serialized_end=1574
 # @@protoc_insertion_point(module_scope)
