@@ -42,14 +42,18 @@ const (
 	// ArtifactServiceListArtifactsProcedure is the fully-qualified name of the ArtifactService's
 	// ListArtifacts RPC.
 	ArtifactServiceListArtifactsProcedure = "/flyteidl2.artifact.ArtifactService/ListArtifacts"
+	// ArtifactServiceListArtifactNamesProcedure is the fully-qualified name of the ArtifactService's
+	// ListArtifactNames RPC.
+	ArtifactServiceListArtifactNamesProcedure = "/flyteidl2.artifact.ArtifactService/ListArtifactNames"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	artifactServiceServiceDescriptor              = artifact.File_flyteidl2_artifact_artifact_service_proto.Services().ByName("ArtifactService")
-	artifactServiceCreateArtifactMethodDescriptor = artifactServiceServiceDescriptor.Methods().ByName("CreateArtifact")
-	artifactServiceGetArtifactMethodDescriptor    = artifactServiceServiceDescriptor.Methods().ByName("GetArtifact")
-	artifactServiceListArtifactsMethodDescriptor  = artifactServiceServiceDescriptor.Methods().ByName("ListArtifacts")
+	artifactServiceServiceDescriptor                 = artifact.File_flyteidl2_artifact_artifact_service_proto.Services().ByName("ArtifactService")
+	artifactServiceCreateArtifactMethodDescriptor    = artifactServiceServiceDescriptor.Methods().ByName("CreateArtifact")
+	artifactServiceGetArtifactMethodDescriptor       = artifactServiceServiceDescriptor.Methods().ByName("GetArtifact")
+	artifactServiceListArtifactsMethodDescriptor     = artifactServiceServiceDescriptor.Methods().ByName("ListArtifacts")
+	artifactServiceListArtifactNamesMethodDescriptor = artifactServiceServiceDescriptor.Methods().ByName("ListArtifactNames")
 )
 
 // ArtifactServiceClient is a client for the flyteidl2.artifact.ArtifactService service.
@@ -60,6 +64,10 @@ type ArtifactServiceClient interface {
 	GetArtifact(context.Context, *connect.Request[artifact.GetArtifactRequest]) (*connect.Response[artifact.GetArtifactResponse], error)
 	// List artifacts within a project, optionally filtered by name.
 	ListArtifacts(context.Context, *connect.Request[artifact.ListArtifactsRequest]) (*connect.Response[artifact.ListArtifactsResponse], error)
+	// List distinct artifact names within a project, one entry per name carrying
+	// the latest version's full record and the total version count. Ordered by
+	// the latest version's creation time, newest first.
+	ListArtifactNames(context.Context, *connect.Request[artifact.ListArtifactNamesRequest]) (*connect.Response[artifact.ListArtifactNamesResponse], error)
 }
 
 // NewArtifactServiceClient constructs a client for the flyteidl2.artifact.ArtifactService service.
@@ -92,14 +100,22 @@ func NewArtifactServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
+		listArtifactNames: connect.NewClient[artifact.ListArtifactNamesRequest, artifact.ListArtifactNamesResponse](
+			httpClient,
+			baseURL+ArtifactServiceListArtifactNamesProcedure,
+			connect.WithSchema(artifactServiceListArtifactNamesMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // artifactServiceClient implements ArtifactServiceClient.
 type artifactServiceClient struct {
-	createArtifact *connect.Client[artifact.CreateArtifactRequest, artifact.CreateArtifactResponse]
-	getArtifact    *connect.Client[artifact.GetArtifactRequest, artifact.GetArtifactResponse]
-	listArtifacts  *connect.Client[artifact.ListArtifactsRequest, artifact.ListArtifactsResponse]
+	createArtifact    *connect.Client[artifact.CreateArtifactRequest, artifact.CreateArtifactResponse]
+	getArtifact       *connect.Client[artifact.GetArtifactRequest, artifact.GetArtifactResponse]
+	listArtifacts     *connect.Client[artifact.ListArtifactsRequest, artifact.ListArtifactsResponse]
+	listArtifactNames *connect.Client[artifact.ListArtifactNamesRequest, artifact.ListArtifactNamesResponse]
 }
 
 // CreateArtifact calls flyteidl2.artifact.ArtifactService.CreateArtifact.
@@ -117,6 +133,11 @@ func (c *artifactServiceClient) ListArtifacts(ctx context.Context, req *connect.
 	return c.listArtifacts.CallUnary(ctx, req)
 }
 
+// ListArtifactNames calls flyteidl2.artifact.ArtifactService.ListArtifactNames.
+func (c *artifactServiceClient) ListArtifactNames(ctx context.Context, req *connect.Request[artifact.ListArtifactNamesRequest]) (*connect.Response[artifact.ListArtifactNamesResponse], error) {
+	return c.listArtifactNames.CallUnary(ctx, req)
+}
+
 // ArtifactServiceHandler is an implementation of the flyteidl2.artifact.ArtifactService service.
 type ArtifactServiceHandler interface {
 	// Create a new artifact version.
@@ -125,6 +146,10 @@ type ArtifactServiceHandler interface {
 	GetArtifact(context.Context, *connect.Request[artifact.GetArtifactRequest]) (*connect.Response[artifact.GetArtifactResponse], error)
 	// List artifacts within a project, optionally filtered by name.
 	ListArtifacts(context.Context, *connect.Request[artifact.ListArtifactsRequest]) (*connect.Response[artifact.ListArtifactsResponse], error)
+	// List distinct artifact names within a project, one entry per name carrying
+	// the latest version's full record and the total version count. Ordered by
+	// the latest version's creation time, newest first.
+	ListArtifactNames(context.Context, *connect.Request[artifact.ListArtifactNamesRequest]) (*connect.Response[artifact.ListArtifactNamesResponse], error)
 }
 
 // NewArtifactServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -153,6 +178,13 @@ func NewArtifactServiceHandler(svc ArtifactServiceHandler, opts ...connect.Handl
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
+	artifactServiceListArtifactNamesHandler := connect.NewUnaryHandler(
+		ArtifactServiceListArtifactNamesProcedure,
+		svc.ListArtifactNames,
+		connect.WithSchema(artifactServiceListArtifactNamesMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.artifact.ArtifactService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ArtifactServiceCreateArtifactProcedure:
@@ -161,6 +193,8 @@ func NewArtifactServiceHandler(svc ArtifactServiceHandler, opts ...connect.Handl
 			artifactServiceGetArtifactHandler.ServeHTTP(w, r)
 		case ArtifactServiceListArtifactsProcedure:
 			artifactServiceListArtifactsHandler.ServeHTTP(w, r)
+		case ArtifactServiceListArtifactNamesProcedure:
+			artifactServiceListArtifactNamesHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -180,4 +214,8 @@ func (UnimplementedArtifactServiceHandler) GetArtifact(context.Context, *connect
 
 func (UnimplementedArtifactServiceHandler) ListArtifacts(context.Context, *connect.Request[artifact.ListArtifactsRequest]) (*connect.Response[artifact.ListArtifactsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.artifact.ArtifactService.ListArtifacts is not implemented"))
+}
+
+func (UnimplementedArtifactServiceHandler) ListArtifactNames(context.Context, *connect.Request[artifact.ListArtifactNamesRequest]) (*connect.Response[artifact.ListArtifactNamesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.artifact.ArtifactService.ListArtifactNames is not implemented"))
 }

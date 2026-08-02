@@ -31,6 +31,11 @@ class ArtifactServiceStub(object):
                 request_serializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactsResponse.FromString,
                 )
+        self.ListArtifactNames = channel.unary_unary(
+                '/flyteidl2.artifact.ArtifactService/ListArtifactNames',
+                request_serializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactNamesRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactNamesResponse.FromString,
+                )
 
 
 class ArtifactServiceServicer(object):
@@ -59,6 +64,15 @@ class ArtifactServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ListArtifactNames(self, request, context):
+        """List distinct artifact names within a project, one entry per name carrying
+        the latest version's full record and the total version count. Ordered by
+        the latest version's creation time, newest first.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ArtifactServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -76,6 +90,11 @@ def add_ArtifactServiceServicer_to_server(servicer, server):
                     servicer.ListArtifacts,
                     request_deserializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactsRequest.FromString,
                     response_serializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactsResponse.SerializeToString,
+            ),
+            'ListArtifactNames': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListArtifactNames,
+                    request_deserializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactNamesRequest.FromString,
+                    response_serializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactNamesResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -137,5 +156,22 @@ class ArtifactService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.artifact.ArtifactService/ListArtifacts',
             flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactsRequest.SerializeToString,
             flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ListArtifactNames(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.artifact.ArtifactService/ListArtifactNames',
+            flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactNamesRequest.SerializeToString,
+            flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactNamesResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

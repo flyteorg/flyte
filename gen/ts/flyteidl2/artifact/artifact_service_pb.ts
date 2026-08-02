@@ -17,7 +17,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/artifact/artifact_service.proto.
  */
 export const file_flyteidl2_artifact_artifact_service: GenFile = /*@__PURE__*/
-  fileDesc("CilmbHl0ZWlkbDIvYXJ0aWZhY3QvYXJ0aWZhY3Rfc2VydmljZS5wcm90bxISZmx5dGVpZGwyLmFydGlmYWN0IpQBChVDcmVhdGVBcnRpZmFjdFJlcXVlc3QSQwoLYXJ0aWZhY3RfaWQYASABKAsyJi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RJZGVudGlmaWVyQga6SAPIAQESNgoEc3BlYxgCIAEoCzIgLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdFNwZWNCBrpIA8gBASJIChZDcmVhdGVBcnRpZmFjdFJlc3BvbnNlEi4KCGFydGlmYWN0GAEgASgLMhwuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0IngKEkdldEFydGlmYWN0UmVxdWVzdBI2CgRuYW1lGAEgASgLMiAuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0TmFtZUIGukgDyAEBEh4KB3ZlcnNpb24YAiABKAlCCLpIBXIDGP8BSACIAQFCCgoIX3ZlcnNpb24iRQoTR2V0QXJ0aWZhY3RSZXNwb25zZRIuCghhcnRpZmFjdBgBIAEoCzIcLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdCKtAQoUTGlzdEFydGlmYWN0c1JlcXVlc3QSLgoHcmVxdWVzdBgBIAEoCzIdLmZseXRlaWRsMi5jb21tb24uTGlzdFJlcXVlc3QSPwoKcHJvamVjdF9pZBgCIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJCBrpIA8gBARIbCgRuYW1lGAMgASgJQgi6SAVyAxj/AUgAiAEBQgcKBV9uYW1lIlcKFUxpc3RBcnRpZmFjdHNSZXNwb25zZRIvCglhcnRpZmFjdHMYASADKAsyHC5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3QSDQoFdG9rZW4YAiABKAkyzAIKD0FydGlmYWN0U2VydmljZRJpCg5DcmVhdGVBcnRpZmFjdBIpLmZseXRlaWRsMi5hcnRpZmFjdC5DcmVhdGVBcnRpZmFjdFJlcXVlc3QaKi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQ3JlYXRlQXJ0aWZhY3RSZXNwb25zZSIAEmMKC0dldEFydGlmYWN0EiYuZmx5dGVpZGwyLmFydGlmYWN0LkdldEFydGlmYWN0UmVxdWVzdBonLmZseXRlaWRsMi5hcnRpZmFjdC5HZXRBcnRpZmFjdFJlc3BvbnNlIgOQAgESaQoNTGlzdEFydGlmYWN0cxIoLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RzUmVxdWVzdBopLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RzUmVzcG9uc2UiA5ACAULRAQoWY29tLmZseXRlaWRsMi5hcnRpZmFjdEIUQXJ0aWZhY3RTZXJ2aWNlUHJvdG9IAlABWjZnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvYXJ0aWZhY3SiAgNGQViqAhJGbHl0ZWlkbDIuQXJ0aWZhY3TKAhJGbHl0ZWlkbDJcQXJ0aWZhY3TiAh5GbHl0ZWlkbDJcQXJ0aWZhY3RcR1BCTWV0YWRhdGHqAhNGbHl0ZWlkbDI6OkFydGlmYWN0YgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_artifact_artifact, file_flyteidl2_common_identifier, file_flyteidl2_common_list]);
+  fileDesc("CilmbHl0ZWlkbDIvYXJ0aWZhY3QvYXJ0aWZhY3Rfc2VydmljZS5wcm90bxISZmx5dGVpZGwyLmFydGlmYWN0IpQBChVDcmVhdGVBcnRpZmFjdFJlcXVlc3QSQwoLYXJ0aWZhY3RfaWQYASABKAsyJi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RJZGVudGlmaWVyQga6SAPIAQESNgoEc3BlYxgCIAEoCzIgLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdFNwZWNCBrpIA8gBASJIChZDcmVhdGVBcnRpZmFjdFJlc3BvbnNlEi4KCGFydGlmYWN0GAEgASgLMhwuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0IngKEkdldEFydGlmYWN0UmVxdWVzdBI2CgRuYW1lGAEgASgLMiAuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0TmFtZUIGukgDyAEBEh4KB3ZlcnNpb24YAiABKAlCCLpIBXIDGP8BSACIAQFCCgoIX3ZlcnNpb24iRQoTR2V0QXJ0aWZhY3RSZXNwb25zZRIuCghhcnRpZmFjdBgBIAEoCzIcLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdCKtAQoUTGlzdEFydGlmYWN0c1JlcXVlc3QSLgoHcmVxdWVzdBgBIAEoCzIdLmZseXRlaWRsMi5jb21tb24uTGlzdFJlcXVlc3QSPwoKcHJvamVjdF9pZBgCIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJCBrpIA8gBARIbCgRuYW1lGAMgASgJQgi6SAVyAxj/AUgAiAEBQgcKBV9uYW1lIlcKFUxpc3RBcnRpZmFjdHNSZXNwb25zZRIvCglhcnRpZmFjdHMYASADKAsyHC5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3QSDQoFdG9rZW4YAiABKAkiiwEKGExpc3RBcnRpZmFjdE5hbWVzUmVxdWVzdBIuCgdyZXF1ZXN0GAEgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5MaXN0UmVxdWVzdBI/Cgpwcm9qZWN0X2lkGAIgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckIGukgDyAEBIk8KDUFydGlmYWN0R3JvdXASLAoGbGF0ZXN0GAEgASgLMhwuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0EhAKCHZlcnNpb25zGAIgASgEIl0KGUxpc3RBcnRpZmFjdE5hbWVzUmVzcG9uc2USMQoGZ3JvdXBzGAEgAygLMiEuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0R3JvdXASDQoFdG9rZW4YAiABKAkywwMKD0FydGlmYWN0U2VydmljZRJpCg5DcmVhdGVBcnRpZmFjdBIpLmZseXRlaWRsMi5hcnRpZmFjdC5DcmVhdGVBcnRpZmFjdFJlcXVlc3QaKi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQ3JlYXRlQXJ0aWZhY3RSZXNwb25zZSIAEmMKC0dldEFydGlmYWN0EiYuZmx5dGVpZGwyLmFydGlmYWN0LkdldEFydGlmYWN0UmVxdWVzdBonLmZseXRlaWRsMi5hcnRpZmFjdC5HZXRBcnRpZmFjdFJlc3BvbnNlIgOQAgESaQoNTGlzdEFydGlmYWN0cxIoLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RzUmVxdWVzdBopLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RzUmVzcG9uc2UiA5ACARJ1ChFMaXN0QXJ0aWZhY3ROYW1lcxIsLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3ROYW1lc1JlcXVlc3QaLS5mbHl0ZWlkbDIuYXJ0aWZhY3QuTGlzdEFydGlmYWN0TmFtZXNSZXNwb25zZSIDkAIBQtEBChZjb20uZmx5dGVpZGwyLmFydGlmYWN0QhRBcnRpZmFjdFNlcnZpY2VQcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9hcnRpZmFjdKICA0ZBWKoCEkZseXRlaWRsMi5BcnRpZmFjdMoCEkZseXRlaWRsMlxBcnRpZmFjdOICHkZseXRlaWRsMlxBcnRpZmFjdFxHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6QXJ0aWZhY3RiBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_artifact_artifact, file_flyteidl2_common_identifier, file_flyteidl2_common_list]);
 
 /**
  * request message for creating an artifact.
@@ -181,6 +181,90 @@ export const ListArtifactsResponseSchema: GenMessage<ListArtifactsResponse> = /*
   messageDesc(file_flyteidl2_artifact_artifact_service, 5);
 
 /**
+ * request message for listing distinct artifact names.
+ *
+ * @generated from message flyteidl2.artifact.ListArtifactNamesRequest
+ */
+export type ListArtifactNamesRequest = Message<"flyteidl2.artifact.ListArtifactNamesRequest"> & {
+  /**
+   * Common list request parameters (limit, token, filters).
+   * Supported filters: field "name" with CONTAINS.
+   *
+   * @generated from field: flyteidl2.common.ListRequest request = 1;
+   */
+  request?: ListRequest;
+
+  /**
+   * Project scope for the listing. organization is stamped by the server.
+   *
+   * @generated from field: flyteidl2.common.ProjectIdentifier project_id = 2;
+   */
+  projectId?: ProjectIdentifier;
+};
+
+/**
+ * Describes the message flyteidl2.artifact.ListArtifactNamesRequest.
+ * Use `create(ListArtifactNamesRequestSchema)` to create a new message.
+ */
+export const ListArtifactNamesRequestSchema: GenMessage<ListArtifactNamesRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact_service, 6);
+
+/**
+ * One distinct artifact name: the latest version's full record plus the
+ * total number of versions published under the name.
+ *
+ * @generated from message flyteidl2.artifact.ArtifactGroup
+ */
+export type ArtifactGroup = Message<"flyteidl2.artifact.ArtifactGroup"> & {
+  /**
+   * The most recently created version of the artifact.
+   *
+   * @generated from field: flyteidl2.artifact.Artifact latest = 1;
+   */
+  latest?: Artifact;
+
+  /**
+   * Total number of versions published under this name.
+   *
+   * @generated from field: uint64 versions = 2;
+   */
+  versions: bigint;
+};
+
+/**
+ * Describes the message flyteidl2.artifact.ArtifactGroup.
+ * Use `create(ArtifactGroupSchema)` to create a new message.
+ */
+export const ArtifactGroupSchema: GenMessage<ArtifactGroup> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact_service, 7);
+
+/**
+ * response message for listing distinct artifact names.
+ *
+ * @generated from message flyteidl2.artifact.ListArtifactNamesResponse
+ */
+export type ListArtifactNamesResponse = Message<"flyteidl2.artifact.ListArtifactNamesResponse"> & {
+  /**
+   * @generated from field: repeated flyteidl2.artifact.ArtifactGroup groups = 1;
+   */
+  groups: ArtifactGroup[];
+
+  /**
+   * Pagination token for the next page; empty when exhausted.
+   *
+   * @generated from field: string token = 2;
+   */
+  token: string;
+};
+
+/**
+ * Describes the message flyteidl2.artifact.ListArtifactNamesResponse.
+ * Use `create(ListArtifactNamesResponseSchema)` to create a new message.
+ */
+export const ListArtifactNamesResponseSchema: GenMessage<ListArtifactNamesResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact_service, 8);
+
+/**
  * ArtifactService provides a minimal interface for publishing and retrieving
  * typed artifacts.
  *
@@ -216,6 +300,18 @@ export const ArtifactService: GenService<{
     methodKind: "unary";
     input: typeof ListArtifactsRequestSchema;
     output: typeof ListArtifactsResponseSchema;
+  },
+  /**
+   * List distinct artifact names within a project, one entry per name carrying
+   * the latest version's full record and the total version count. Ordered by
+   * the latest version's creation time, newest first.
+   *
+   * @generated from rpc flyteidl2.artifact.ArtifactService.ListArtifactNames
+   */
+  listArtifactNames: {
+    methodKind: "unary";
+    input: typeof ListArtifactNamesRequestSchema;
+    output: typeof ListArtifactNamesResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_flyteidl2_artifact_artifact_service, 0);

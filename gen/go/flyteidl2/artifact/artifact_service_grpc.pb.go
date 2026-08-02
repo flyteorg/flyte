@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ArtifactService_CreateArtifact_FullMethodName = "/flyteidl2.artifact.ArtifactService/CreateArtifact"
-	ArtifactService_GetArtifact_FullMethodName    = "/flyteidl2.artifact.ArtifactService/GetArtifact"
-	ArtifactService_ListArtifacts_FullMethodName  = "/flyteidl2.artifact.ArtifactService/ListArtifacts"
+	ArtifactService_CreateArtifact_FullMethodName    = "/flyteidl2.artifact.ArtifactService/CreateArtifact"
+	ArtifactService_GetArtifact_FullMethodName       = "/flyteidl2.artifact.ArtifactService/GetArtifact"
+	ArtifactService_ListArtifacts_FullMethodName     = "/flyteidl2.artifact.ArtifactService/ListArtifacts"
+	ArtifactService_ListArtifactNames_FullMethodName = "/flyteidl2.artifact.ArtifactService/ListArtifactNames"
 )
 
 // ArtifactServiceClient is the client API for ArtifactService service.
@@ -34,6 +35,10 @@ type ArtifactServiceClient interface {
 	GetArtifact(ctx context.Context, in *GetArtifactRequest, opts ...grpc.CallOption) (*GetArtifactResponse, error)
 	// List artifacts within a project, optionally filtered by name.
 	ListArtifacts(ctx context.Context, in *ListArtifactsRequest, opts ...grpc.CallOption) (*ListArtifactsResponse, error)
+	// List distinct artifact names within a project, one entry per name carrying
+	// the latest version's full record and the total version count. Ordered by
+	// the latest version's creation time, newest first.
+	ListArtifactNames(ctx context.Context, in *ListArtifactNamesRequest, opts ...grpc.CallOption) (*ListArtifactNamesResponse, error)
 }
 
 type artifactServiceClient struct {
@@ -71,6 +76,15 @@ func (c *artifactServiceClient) ListArtifacts(ctx context.Context, in *ListArtif
 	return out, nil
 }
 
+func (c *artifactServiceClient) ListArtifactNames(ctx context.Context, in *ListArtifactNamesRequest, opts ...grpc.CallOption) (*ListArtifactNamesResponse, error) {
+	out := new(ListArtifactNamesResponse)
+	err := c.cc.Invoke(ctx, ArtifactService_ListArtifactNames_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArtifactServiceServer is the server API for ArtifactService service.
 // All implementations should embed UnimplementedArtifactServiceServer
 // for forward compatibility
@@ -81,6 +95,10 @@ type ArtifactServiceServer interface {
 	GetArtifact(context.Context, *GetArtifactRequest) (*GetArtifactResponse, error)
 	// List artifacts within a project, optionally filtered by name.
 	ListArtifacts(context.Context, *ListArtifactsRequest) (*ListArtifactsResponse, error)
+	// List distinct artifact names within a project, one entry per name carrying
+	// the latest version's full record and the total version count. Ordered by
+	// the latest version's creation time, newest first.
+	ListArtifactNames(context.Context, *ListArtifactNamesRequest) (*ListArtifactNamesResponse, error)
 }
 
 // UnimplementedArtifactServiceServer should be embedded to have forward compatible implementations.
@@ -95,6 +113,9 @@ func (UnimplementedArtifactServiceServer) GetArtifact(context.Context, *GetArtif
 }
 func (UnimplementedArtifactServiceServer) ListArtifacts(context.Context, *ListArtifactsRequest) (*ListArtifactsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListArtifacts not implemented")
+}
+func (UnimplementedArtifactServiceServer) ListArtifactNames(context.Context, *ListArtifactNamesRequest) (*ListArtifactNamesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListArtifactNames not implemented")
 }
 
 // UnsafeArtifactServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -162,6 +183,24 @@ func _ArtifactService_ListArtifacts_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArtifactService_ListArtifactNames_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListArtifactNamesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArtifactServiceServer).ListArtifactNames(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArtifactService_ListArtifactNames_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArtifactServiceServer).ListArtifactNames(ctx, req.(*ListArtifactNamesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArtifactService_ServiceDesc is the grpc.ServiceDesc for ArtifactService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -180,6 +219,10 @@ var ArtifactService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListArtifacts",
 			Handler:    _ArtifactService_ListArtifacts_Handler,
+		},
+		{
+			MethodName: "ListArtifactNames",
+			Handler:    _ArtifactService_ListArtifactNames_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

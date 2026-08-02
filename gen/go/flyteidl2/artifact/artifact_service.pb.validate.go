@@ -893,3 +893,432 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListArtifactsResponseValidationError{}
+
+// Validate checks the field values on ListArtifactNamesRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListArtifactNamesRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListArtifactNamesRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListArtifactNamesRequestMultiError, or nil if none found.
+func (m *ListArtifactNamesRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListArtifactNamesRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetRequest()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListArtifactNamesRequestValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListArtifactNamesRequestValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRequest()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListArtifactNamesRequestValidationError{
+				field:  "Request",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetProjectId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListArtifactNamesRequestValidationError{
+					field:  "ProjectId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListArtifactNamesRequestValidationError{
+					field:  "ProjectId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetProjectId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListArtifactNamesRequestValidationError{
+				field:  "ProjectId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ListArtifactNamesRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListArtifactNamesRequestMultiError is an error wrapping multiple validation
+// errors returned by ListArtifactNamesRequest.ValidateAll() if the designated
+// constraints aren't met.
+type ListArtifactNamesRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListArtifactNamesRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListArtifactNamesRequestMultiError) AllErrors() []error { return m }
+
+// ListArtifactNamesRequestValidationError is the validation error returned by
+// ListArtifactNamesRequest.Validate if the designated constraints aren't met.
+type ListArtifactNamesRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListArtifactNamesRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListArtifactNamesRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListArtifactNamesRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListArtifactNamesRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListArtifactNamesRequestValidationError) ErrorName() string {
+	return "ListArtifactNamesRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListArtifactNamesRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListArtifactNamesRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListArtifactNamesRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListArtifactNamesRequestValidationError{}
+
+// Validate checks the field values on ArtifactGroup with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ArtifactGroup) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ArtifactGroup with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ArtifactGroupMultiError, or
+// nil if none found.
+func (m *ArtifactGroup) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ArtifactGroup) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetLatest()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ArtifactGroupValidationError{
+					field:  "Latest",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ArtifactGroupValidationError{
+					field:  "Latest",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLatest()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ArtifactGroupValidationError{
+				field:  "Latest",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Versions
+
+	if len(errors) > 0 {
+		return ArtifactGroupMultiError(errors)
+	}
+
+	return nil
+}
+
+// ArtifactGroupMultiError is an error wrapping multiple validation errors
+// returned by ArtifactGroup.ValidateAll() if the designated constraints
+// aren't met.
+type ArtifactGroupMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ArtifactGroupMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ArtifactGroupMultiError) AllErrors() []error { return m }
+
+// ArtifactGroupValidationError is the validation error returned by
+// ArtifactGroup.Validate if the designated constraints aren't met.
+type ArtifactGroupValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ArtifactGroupValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ArtifactGroupValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ArtifactGroupValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ArtifactGroupValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ArtifactGroupValidationError) ErrorName() string { return "ArtifactGroupValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ArtifactGroupValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sArtifactGroup.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ArtifactGroupValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ArtifactGroupValidationError{}
+
+// Validate checks the field values on ListArtifactNamesResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListArtifactNamesResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListArtifactNamesResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListArtifactNamesResponseMultiError, or nil if none found.
+func (m *ListArtifactNamesResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListArtifactNamesResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetGroups() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListArtifactNamesResponseValidationError{
+						field:  fmt.Sprintf("Groups[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListArtifactNamesResponseValidationError{
+						field:  fmt.Sprintf("Groups[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListArtifactNamesResponseValidationError{
+					field:  fmt.Sprintf("Groups[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for Token
+
+	if len(errors) > 0 {
+		return ListArtifactNamesResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListArtifactNamesResponseMultiError is an error wrapping multiple validation
+// errors returned by ListArtifactNamesResponse.ValidateAll() if the
+// designated constraints aren't met.
+type ListArtifactNamesResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListArtifactNamesResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListArtifactNamesResponseMultiError) AllErrors() []error { return m }
+
+// ListArtifactNamesResponseValidationError is the validation error returned by
+// ListArtifactNamesResponse.Validate if the designated constraints aren't met.
+type ListArtifactNamesResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListArtifactNamesResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListArtifactNamesResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListArtifactNamesResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListArtifactNamesResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListArtifactNamesResponseValidationError) ErrorName() string {
+	return "ListArtifactNamesResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListArtifactNamesResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListArtifactNamesResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListArtifactNamesResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListArtifactNamesResponseValidationError{}
