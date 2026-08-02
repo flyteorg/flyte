@@ -17,6 +17,8 @@ import type { Inputs, Outputs } from "../task/common_pb.ts";
 import { file_flyteidl2_task_common } from "../task/common_pb.ts";
 import type { TaskIdentifier, TaskSpec } from "../task/task_definition_pb.ts";
 import { file_flyteidl2_task_task_definition } from "../task/task_definition_pb.ts";
+import type { RunSource } from "../workflow/run_definition_pb.ts";
+import { file_flyteidl2_workflow_run_definition } from "../workflow/run_definition_pb.ts";
 import type { Duration, Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_duration, file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
@@ -25,7 +27,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/dataproxy/dataproxy_service.proto.
  */
 export const file_flyteidl2_dataproxy_dataproxy_service: GenFile = /*@__PURE__*/
-  fileDesc("CitmbHl0ZWlkbDIvZGF0YXByb3h5L2RhdGFwcm94eV9zZXJ2aWNlLnByb3RvEhNmbHl0ZWlkbDIuZGF0YXByb3h5Io0CChtDcmVhdGVVcGxvYWRMb2NhdGlvblJlcXVlc3QSGAoHcHJvamVjdBgBIAEoCUIHukgEcgIQARIXCgZkb21haW4YAiABKAlCB7pIBHICEAESEAoIZmlsZW5hbWUYAyABKAkSLQoKZXhwaXJlc19pbhgEIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIcCgtjb250ZW50X21kNRgFIAEoDEIHukgEegJoEBIVCg1maWxlbmFtZV9yb290GAYgASgJEiAKGGFkZF9jb250ZW50X21kNV9tZXRhZGF0YRgHIAEoCBILCgNvcmcYCCABKAkSFgoOY29udGVudF9sZW5ndGgYCSABKAMi9wEKHENyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2USEgoKc2lnbmVkX3VybBgBIAEoCRISCgpuYXRpdmVfdXJsGAIgASgJEi4KCmV4cGlyZXNfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEk8KB2hlYWRlcnMYBCADKAsyPi5mbHl0ZWlkbDIuZGF0YXByb3h5LkNyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2UuSGVhZGVyc0VudHJ5Gi4KDEhlYWRlcnNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIvICChNVcGxvYWRJbnB1dHNSZXF1ZXN0EjEKBnJ1bl9pZBgBIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckgAEjkKCnByb2plY3RfaWQYAiABKAsyIy5mbHl0ZWlkbDIuY29tbW9uLlByb2plY3RJZGVudGlmaWVySAASMQoHdGFza19pZBgDIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVySAESLQoJdGFza19zcGVjGAQgASgLMhguZmx5dGVpZGwyLnRhc2suVGFza1NwZWNIARI1Cgx0cmlnZ2VyX25hbWUYBSABKAsyHS5mbHl0ZWlkbDIuY29tbW9uLlRyaWdnZXJOYW1lSAESJgoGaW5wdXRzGAYgASgLMhYuZmx5dGVpZGwyLnRhc2suSW5wdXRzEhAKCGJhc2VfZGlyGAcgASgJQgsKAmlkEgW6SAIIAUINCgR0YXNrEgW6SAIIASJaChRVcGxvYWRJbnB1dHNSZXNwb25zZRJCChRvZmZsb2FkZWRfaW5wdXRfZGF0YRgBIAEoCzIkLmZseXRlaWRsMi5jb21tb24uT2ZmbG9hZGVkSW5wdXREYXRhIlMKDVByZVNpZ25lZFVSTHMSEgoKc2lnbmVkX3VybBgBIAMoCRIuCgpleHBpcmVzX2F0GAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCLHAgoZQ3JlYXRlRG93bmxvYWRMaW5rUmVxdWVzdBJCCg1hcnRpZmFjdF90eXBlGAEgASgOMiEuZmx5dGVpZGwyLmRhdGFwcm94eS5BcnRpZmFjdFR5cGVCCLpIBYIBAiAAEi0KCmV4cGlyZXNfaW4YAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SRgoRYWN0aW9uX2F0dGVtcHRfaWQYAyABKAsyKS5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbkF0dGVtcHRJZGVudGlmaWVySAASKwoGYXBwX2lkGAQgASgLMhkuZmx5dGVpZGwyLmFwcC5JZGVudGlmaWVySAASMQoHdGFza19pZBgFIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVySABCDwoGc291cmNlEgW6SAIIASJZChpDcmVhdGVEb3dubG9hZExpbmtSZXNwb25zZRI7Cg9wcmVfc2lnbmVkX3VybHMYASABKAsyIi5mbHl0ZWlkbDIuZGF0YXByb3h5LlByZVNpZ25lZFVSTHMiVQoUR2V0QWN0aW9uRGF0YVJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQEikgEKFUdldEFjdGlvbkRhdGFSZXNwb25zZRImCgZpbnB1dHMYASABKAsyFi5mbHl0ZWlkbDIudGFzay5JbnB1dHMSKAoHb3V0cHV0cxgCIAEoCzIXLmZseXRlaWRsMi50YXNrLk91dHB1dHMSEgoKaW5wdXRzX3VyaRgDIAEoCRITCgtvdXRwdXRzX3VyaRgEIAEoCSLxAQoPVGFpbExvZ3NSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBEhgKB2F0dGVtcHQYAiABKA1CB7pIBCoCIAASFQoLcHJpbWFyeV9wb2QYBiABKAhIABISCghhbGxfcG9kcxgFIAEoCEgAEhIKCHBvZF9uYW1lGAMgASgJSAASHwoSY29ubmVjdG9yX2VuZHBvaW50GAQgASgJSAGIAQFCDgoMcG9kX3NlbGVjdG9yQhUKE19jb25uZWN0b3JfZW5kcG9pbnQi+AIKFVVwbG9hZE1ldGFkYXRhUmVxdWVzdBJGCg1hcnRpZmFjdF90eXBlGAEgASgOMiEuZmx5dGVpZGwyLmRhdGFwcm94eS5BcnRpZmFjdFR5cGVCDLpICYIBBhgBGAMYBBI3CglhY3Rpb25faWQYAiABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJIABJGChFhY3Rpb25fYXR0ZW1wdF9pZBgDIAEoCzIpLmZseXRlaWRsMi5jb21tb24uQWN0aW9uQXR0ZW1wdElkZW50aWZpZXJIABIcCgtjb250ZW50X21kNRgEIAEoDEIHukgEegJoEBIWCg5jb250ZW50X2xlbmd0aBgFIAEoAxItCgpleHBpcmVzX2luGAYgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEiAKGGFkZF9jb250ZW50X21kNV9tZXRhZGF0YRgHIAEoCEIPCgZ0YXJnZXQSBbpIAggBIuEBCh5DcmVhdGVMb2NhbERvd25sb2FkTGlua1JlcXVlc3QSQgoNYXJ0aWZhY3RfdHlwZRgBIAEoDjIhLmZseXRlaWRsMi5kYXRhcHJveHkuQXJ0aWZhY3RUeXBlQgi6SAWCAQIgABJMChFhY3Rpb25fYXR0ZW1wdF9pZBgCIAEoCzIpLmZseXRlaWRsMi5jb21tb24uQWN0aW9uQXR0ZW1wdElkZW50aWZpZXJCBrpIA8gBARItCgpleHBpcmVzX2luGAMgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uIsgBChBUYWlsTG9nc1Jlc3BvbnNlEjgKBGxvZ3MYASADKAsyKi5mbHl0ZWlkbDIuZGF0YXByb3h5LlRhaWxMb2dzUmVzcG9uc2UuTG9ncxp6CgRMb2dzEjAKBWxpbmVzGAEgAygLMiEuZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lLkxvZ0xpbmUSQAoJY29udGFpbmVyGAIgASgLMi0uZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lLkNvbnRhaW5lcklkZW50aWZpZXIqmwEKDEFydGlmYWN0VHlwZRIdChlBUlRJRkFDVF9UWVBFX1VOU1BFQ0lGSUVEEAASGAoUQVJUSUZBQ1RfVFlQRV9SRVBPUlQQARIdChlBUlRJRkFDVF9UWVBFX0NPREVfQlVORExFEAISGAoUQVJUSUZBQ1RfVFlQRV9JTlBVVFMQAxIZChVBUlRJRkFDVF9UWVBFX09VVFBVVFMQBDKkBwoQRGF0YVByb3h5U2VydmljZRJ9ChRDcmVhdGVVcGxvYWRMb2NhdGlvbhIwLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlVXBsb2FkTG9jYXRpb25SZXF1ZXN0GjEuZmx5dGVpZGwyLmRhdGFwcm94eS5DcmVhdGVVcGxvYWRMb2NhdGlvblJlc3BvbnNlIgASZQoMVXBsb2FkSW5wdXRzEiguZmx5dGVpZGwyLmRhdGFwcm94eS5VcGxvYWRJbnB1dHNSZXF1ZXN0GikuZmx5dGVpZGwyLmRhdGFwcm94eS5VcGxvYWRJbnB1dHNSZXNwb25zZSIAEncKEkNyZWF0ZURvd25sb2FkTGluaxIuLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlRG93bmxvYWRMaW5rUmVxdWVzdBovLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlRG93bmxvYWRMaW5rUmVzcG9uc2UiABJrCg1HZXRBY3Rpb25EYXRhEikuZmx5dGVpZGwyLmRhdGFwcm94eS5HZXRBY3Rpb25EYXRhUmVxdWVzdBoqLmZseXRlaWRsMi5kYXRhcHJveHkuR2V0QWN0aW9uRGF0YVJlc3BvbnNlIgOQAgESWwoIVGFpbExvZ3MSJC5mbHl0ZWlkbDIuZGF0YXByb3h5LlRhaWxMb2dzUmVxdWVzdBolLmZseXRlaWRsMi5kYXRhcHJveHkuVGFpbExvZ3NSZXNwb25zZSIAMAEScQoOVXBsb2FkTWV0YWRhdGESKi5mbHl0ZWlkbDIuZGF0YXByb3h5LlVwbG9hZE1ldGFkYXRhUmVxdWVzdBoxLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlVXBsb2FkTG9jYXRpb25SZXNwb25zZSIAEnAKEkdldExvY2FsQWN0aW9uRGF0YRIpLmZseXRlaWRsMi5kYXRhcHJveHkuR2V0QWN0aW9uRGF0YVJlcXVlc3QaKi5mbHl0ZWlkbDIuZGF0YXByb3h5LkdldEFjdGlvbkRhdGFSZXNwb25zZSIDkAIBEoEBChdDcmVhdGVMb2NhbERvd25sb2FkTGluaxIzLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlTG9jYWxEb3dubG9hZExpbmtSZXF1ZXN0Gi8uZmx5dGVpZGwyLmRhdGFwcm94eS5DcmVhdGVEb3dubG9hZExpbmtSZXNwb25zZSIAQtgBChdjb20uZmx5dGVpZGwyLmRhdGFwcm94eUIVRGF0YXByb3h5U2VydmljZVByb3RvSAJQAVo3Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2RhdGFwcm94eaICA0ZEWKoCE0ZseXRlaWRsMi5EYXRhcHJveHnKAhNGbHl0ZWlkbDJcRGF0YXByb3h54gIfRmx5dGVpZGwyXERhdGFwcm94eVxHUEJNZXRhZGF0YeoCFEZseXRlaWRsMjo6RGF0YXByb3h5YgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_app_app_definition, file_flyteidl2_common_identifier, file_flyteidl2_common_run, file_flyteidl2_logs_dataplane_payload, file_flyteidl2_task_common, file_flyteidl2_task_task_definition, file_google_protobuf_duration, file_google_protobuf_timestamp]);
+  fileDesc("CitmbHl0ZWlkbDIvZGF0YXByb3h5L2RhdGFwcm94eV9zZXJ2aWNlLnByb3RvEhNmbHl0ZWlkbDIuZGF0YXByb3h5Io0CChtDcmVhdGVVcGxvYWRMb2NhdGlvblJlcXVlc3QSGAoHcHJvamVjdBgBIAEoCUIHukgEcgIQARIXCgZkb21haW4YAiABKAlCB7pIBHICEAESEAoIZmlsZW5hbWUYAyABKAkSLQoKZXhwaXJlc19pbhgEIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIcCgtjb250ZW50X21kNRgFIAEoDEIHukgEegJoEBIVCg1maWxlbmFtZV9yb290GAYgASgJEiAKGGFkZF9jb250ZW50X21kNV9tZXRhZGF0YRgHIAEoCBILCgNvcmcYCCABKAkSFgoOY29udGVudF9sZW5ndGgYCSABKAMi9wEKHENyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2USEgoKc2lnbmVkX3VybBgBIAEoCRISCgpuYXRpdmVfdXJsGAIgASgJEi4KCmV4cGlyZXNfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEk8KB2hlYWRlcnMYBCADKAsyPi5mbHl0ZWlkbDIuZGF0YXByb3h5LkNyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2UuSGVhZGVyc0VudHJ5Gi4KDEhlYWRlcnNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIvICChNVcGxvYWRJbnB1dHNSZXF1ZXN0EjEKBnJ1bl9pZBgBIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckgAEjkKCnByb2plY3RfaWQYAiABKAsyIy5mbHl0ZWlkbDIuY29tbW9uLlByb2plY3RJZGVudGlmaWVySAASMQoHdGFza19pZBgDIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVySAESLQoJdGFza19zcGVjGAQgASgLMhguZmx5dGVpZGwyLnRhc2suVGFza1NwZWNIARI1Cgx0cmlnZ2VyX25hbWUYBSABKAsyHS5mbHl0ZWlkbDIuY29tbW9uLlRyaWdnZXJOYW1lSAESJgoGaW5wdXRzGAYgASgLMhYuZmx5dGVpZGwyLnRhc2suSW5wdXRzEhAKCGJhc2VfZGlyGAcgASgJQgsKAmlkEgW6SAIIAUINCgR0YXNrEgW6SAIIASJaChRVcGxvYWRJbnB1dHNSZXNwb25zZRJCChRvZmZsb2FkZWRfaW5wdXRfZGF0YRgBIAEoCzIkLmZseXRlaWRsMi5jb21tb24uT2ZmbG9hZGVkSW5wdXREYXRhIlMKDVByZVNpZ25lZFVSTHMSEgoKc2lnbmVkX3VybBgBIAMoCRIuCgpleHBpcmVzX2F0GAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCLHAgoZQ3JlYXRlRG93bmxvYWRMaW5rUmVxdWVzdBJCCg1hcnRpZmFjdF90eXBlGAEgASgOMiEuZmx5dGVpZGwyLmRhdGFwcm94eS5BcnRpZmFjdFR5cGVCCLpIBYIBAiAAEi0KCmV4cGlyZXNfaW4YAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SRgoRYWN0aW9uX2F0dGVtcHRfaWQYAyABKAsyKS5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbkF0dGVtcHRJZGVudGlmaWVySAASKwoGYXBwX2lkGAQgASgLMhkuZmx5dGVpZGwyLmFwcC5JZGVudGlmaWVySAASMQoHdGFza19pZBgFIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVySABCDwoGc291cmNlEgW6SAIIASJZChpDcmVhdGVEb3dubG9hZExpbmtSZXNwb25zZRI7Cg9wcmVfc2lnbmVkX3VybHMYASABKAsyIi5mbHl0ZWlkbDIuZGF0YXByb3h5LlByZVNpZ25lZFVSTHMiiAEKFEdldEFjdGlvbkRhdGFSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBEjEKCnJ1bl9zb3VyY2UYAiABKA4yHS5mbHl0ZWlkbDIud29ya2Zsb3cuUnVuU291cmNlIpIBChVHZXRBY3Rpb25EYXRhUmVzcG9uc2USJgoGaW5wdXRzGAEgASgLMhYuZmx5dGVpZGwyLnRhc2suSW5wdXRzEigKB291dHB1dHMYAiABKAsyFy5mbHl0ZWlkbDIudGFzay5PdXRwdXRzEhIKCmlucHV0c191cmkYAyABKAkSEwoLb3V0cHV0c191cmkYBCABKAki8QEKD1RhaWxMb2dzUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAEhUKC3ByaW1hcnlfcG9kGAYgASgISAASEgoIYWxsX3BvZHMYBSABKAhIABISCghwb2RfbmFtZRgDIAEoCUgAEh8KEmNvbm5lY3Rvcl9lbmRwb2ludBgEIAEoCUgBiAEBQg4KDHBvZF9zZWxlY3RvckIVChNfY29ubmVjdG9yX2VuZHBvaW50IsgBChBUYWlsTG9nc1Jlc3BvbnNlEjgKBGxvZ3MYASADKAsyKi5mbHl0ZWlkbDIuZGF0YXByb3h5LlRhaWxMb2dzUmVzcG9uc2UuTG9ncxp6CgRMb2dzEjAKBWxpbmVzGAEgAygLMiEuZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lLkxvZ0xpbmUSQAoJY29udGFpbmVyGAIgASgLMi0uZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lLkNvbnRhaW5lcklkZW50aWZpZXIqZgoMQXJ0aWZhY3RUeXBlEh0KGUFSVElGQUNUX1RZUEVfVU5TUEVDSUZJRUQQABIYChRBUlRJRkFDVF9UWVBFX1JFUE9SVBABEh0KGUFSVElGQUNUX1RZUEVfQ09ERV9CVU5ETEUQAjK7BAoQRGF0YVByb3h5U2VydmljZRJ9ChRDcmVhdGVVcGxvYWRMb2NhdGlvbhIwLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlVXBsb2FkTG9jYXRpb25SZXF1ZXN0GjEuZmx5dGVpZGwyLmRhdGFwcm94eS5DcmVhdGVVcGxvYWRMb2NhdGlvblJlc3BvbnNlIgASZQoMVXBsb2FkSW5wdXRzEiguZmx5dGVpZGwyLmRhdGFwcm94eS5VcGxvYWRJbnB1dHNSZXF1ZXN0GikuZmx5dGVpZGwyLmRhdGFwcm94eS5VcGxvYWRJbnB1dHNSZXNwb25zZSIAEncKEkNyZWF0ZURvd25sb2FkTGluaxIuLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlRG93bmxvYWRMaW5rUmVxdWVzdBovLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlRG93bmxvYWRMaW5rUmVzcG9uc2UiABJrCg1HZXRBY3Rpb25EYXRhEikuZmx5dGVpZGwyLmRhdGFwcm94eS5HZXRBY3Rpb25EYXRhUmVxdWVzdBoqLmZseXRlaWRsMi5kYXRhcHJveHkuR2V0QWN0aW9uRGF0YVJlc3BvbnNlIgOQAgESWwoIVGFpbExvZ3MSJC5mbHl0ZWlkbDIuZGF0YXByb3h5LlRhaWxMb2dzUmVxdWVzdBolLmZseXRlaWRsMi5kYXRhcHJveHkuVGFpbExvZ3NSZXNwb25zZSIAMAFC2AEKF2NvbS5mbHl0ZWlkbDIuZGF0YXByb3h5QhVEYXRhcHJveHlTZXJ2aWNlUHJvdG9IAlABWjdnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvZGF0YXByb3h5ogIDRkRYqgITRmx5dGVpZGwyLkRhdGFwcm94ecoCE0ZseXRlaWRsMlxEYXRhcHJveHniAh9GbHl0ZWlkbDJcRGF0YXByb3h5XEdQQk1ldGFkYXRh6gIURmx5dGVpZGwyOjpEYXRhcHJveHliBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_app_app_definition, file_flyteidl2_common_identifier, file_flyteidl2_common_run, file_flyteidl2_logs_dataplane_payload, file_flyteidl2_task_common, file_flyteidl2_task_task_definition, file_flyteidl2_workflow_run_definition, file_google_protobuf_duration, file_google_protobuf_timestamp]);
 
 /**
  * CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.
@@ -385,6 +387,17 @@ export type GetActionDataRequest = Message<"flyteidl2.dataproxy.GetActionDataReq
    * @generated from field: flyteidl2.common.ActionIdentifier action_id = 1;
    */
   actionId?: ActionIdentifier;
+
+  /**
+   * Source of the run the action belongs to. Run names are not unique across platform and
+   * local runs, so the server uses this to resolve the action against the matching service
+   * (RUN_SOURCE_LOCAL resolves via LocalRunService; anything else keeps the platform
+   * behavior).
+   * +optional
+   *
+   * @generated from field: flyteidl2.workflow.RunSource run_source = 2;
+   */
+  runSource: RunSource;
 };
 
 /**
@@ -506,123 +519,6 @@ export const TailLogsRequestSchema: GenMessage<TailLogsRequest> = /*@__PURE__*/
   messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 9);
 
 /**
- * UploadMetadataRequest specifies the request for the UploadMetadata API. The data proxy service
- * derives the storage path from the authenticated org and the target action, following the local
- * run metadata layout: <prefix>/<org>/<project>/<domain>/<run>/<action>/inputs.pb for inputs and
- * <prefix>/<org>/<project>/<domain>/<run>/<action>/<attempt>/{outputs.pb,report.html} otherwise.
- *
- * @generated from message flyteidl2.dataproxy.UploadMetadataRequest
- */
-export type UploadMetadataRequest = Message<"flyteidl2.dataproxy.UploadMetadataRequest"> & {
-  /**
-   * ArtifactType is the type of artifact to upload. INPUTS targets an action; OUTPUTS and REPORT
-   * target an action attempt.
-   *
-   * @generated from field: flyteidl2.dataproxy.ArtifactType artifact_type = 1;
-   */
-  artifactType: ArtifactType;
-
-  /**
-   * Target identifies the action (INPUTS) or action attempt (OUTPUTS / REPORT) the artifact
-   * belongs to.
-   *
-   * @generated from oneof flyteidl2.dataproxy.UploadMetadataRequest.target
-   */
-  target: {
-    /**
-     * @generated from field: flyteidl2.common.ActionIdentifier action_id = 2;
-     */
-    value: ActionIdentifier;
-    case: "actionId";
-  } | {
-    /**
-     * @generated from field: flyteidl2.common.ActionAttemptIdentifier action_attempt_id = 3;
-     */
-    value: ActionAttemptIdentifier;
-    case: "actionAttemptId";
-  } | { case: undefined; value?: undefined };
-
-  /**
-   * ContentMD5 restricts the upload location to the specific MD5 provided.
-   * +required
-   *
-   * @generated from field: bytes content_md5 = 4;
-   */
-  contentMd5: Uint8Array;
-
-  /**
-   * ContentLength specifies the size of the content to be uploaded in bytes. Validated against
-   * the platform's maximum upload size.
-   * +optional
-   *
-   * @generated from field: int64 content_length = 5;
-   */
-  contentLength: bigint;
-
-  /**
-   * ExpiresIn defines the requested expiration duration for the generated URL. The request will
-   * be rejected if this exceeds the platform's configured maximum.
-   * +optional. The default value comes from the global config.
-   *
-   * @generated from field: google.protobuf.Duration expires_in = 6;
-   */
-  expiresIn?: Duration;
-
-  /**
-   * If true, the data proxy will add content_md5 to the Signed URL requirements, forcing clients
-   * to send this checksum with the object. Required for data integrity on backends like GCP.
-   *
-   * @generated from field: bool add_content_md5_metadata = 7;
-   */
-  addContentMd5Metadata: boolean;
-};
-
-/**
- * Describes the message flyteidl2.dataproxy.UploadMetadataRequest.
- * Use `create(UploadMetadataRequestSchema)` to create a new message.
- */
-export const UploadMetadataRequestSchema: GenMessage<UploadMetadataRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 10);
-
-/**
- * CreateLocalDownloadLinkRequest specifies the request for the CreateLocalDownloadLink API.
- *
- * @generated from message flyteidl2.dataproxy.CreateLocalDownloadLinkRequest
- */
-export type CreateLocalDownloadLinkRequest = Message<"flyteidl2.dataproxy.CreateLocalDownloadLinkRequest"> & {
-  /**
-   * ArtifactType is the type of artifact to download.
-   * +required
-   *
-   * @generated from field: flyteidl2.dataproxy.ArtifactType artifact_type = 1;
-   */
-  artifactType: ArtifactType;
-
-  /**
-   * ActionAttemptId identifies the local run action attempt whose artifact is to be downloaded.
-   *
-   * @generated from field: flyteidl2.common.ActionAttemptIdentifier action_attempt_id = 2;
-   */
-  actionAttemptId?: ActionAttemptIdentifier;
-
-  /**
-   * ExpiresIn defines the requested expiration duration for the generated URLs. The request will
-   * be rejected if this exceeds the platform's configured maximum.
-   * +optional. The default value comes from the global config.
-   *
-   * @generated from field: google.protobuf.Duration expires_in = 3;
-   */
-  expiresIn?: Duration;
-};
-
-/**
- * Describes the message flyteidl2.dataproxy.CreateLocalDownloadLinkRequest.
- * Use `create(CreateLocalDownloadLinkRequestSchema)` to create a new message.
- */
-export const CreateLocalDownloadLinkRequestSchema: GenMessage<CreateLocalDownloadLinkRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 11);
-
-/**
  * Reponse message for tailing logs.
  *
  * @generated from message flyteidl2.dataproxy.TailLogsResponse
@@ -641,7 +537,7 @@ export type TailLogsResponse = Message<"flyteidl2.dataproxy.TailLogsResponse"> &
  * Use `create(TailLogsResponseSchema)` to create a new message.
  */
 export const TailLogsResponseSchema: GenMessage<TailLogsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 12);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 10);
 
 /**
  * A batch of logs.
@@ -669,7 +565,7 @@ export type TailLogsResponse_Logs = Message<"flyteidl2.dataproxy.TailLogsRespons
  * Use `create(TailLogsResponse_LogsSchema)` to create a new message.
  */
 export const TailLogsResponse_LogsSchema: GenMessage<TailLogsResponse_Logs> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 12, 0);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 10, 0);
 
 /**
  * ArtifactType defines the type of artifact to be downloaded.
@@ -695,20 +591,6 @@ export enum ArtifactType {
    * @generated from enum value: ARTIFACT_TYPE_CODE_BUNDLE = 2;
    */
   CODE_BUNDLE = 2,
-
-  /**
-   * ARTIFACT_TYPE_INPUTS refers to an action's serialized inputs (inputs.pb).
-   *
-   * @generated from enum value: ARTIFACT_TYPE_INPUTS = 3;
-   */
-  INPUTS = 3,
-
-  /**
-   * ARTIFACT_TYPE_OUTPUTS refers to an action's serialized outputs (outputs.pb).
-   *
-   * @generated from enum value: ARTIFACT_TYPE_OUTPUTS = 4;
-   */
-  OUTPUTS = 4,
 }
 
 /**
@@ -770,41 +652,6 @@ export const DataProxyService: GenService<{
     methodKind: "server_streaming";
     input: typeof TailLogsRequestSchema;
     output: typeof TailLogsResponseSchema;
-  },
-  /**
-   * UploadMetadata generates a signed URL for uploading a local run's metadata artifact
-   * (inputs.pb / outputs.pb / report.html) directly to the control plane's storage backend.
-   * Local runs only; never routes to a dataplane.
-   *
-   * @generated from rpc flyteidl2.dataproxy.DataProxyService.UploadMetadata
-   */
-  uploadMetadata: {
-    methodKind: "unary";
-    input: typeof UploadMetadataRequestSchema;
-    output: typeof CreateUploadLocationResponseSchema;
-  },
-  /**
-   * Get input and output data for an action of a local run, served directly from the control
-   * plane's storage backend. Local runs only; never routes to a dataplane.
-   *
-   * @generated from rpc flyteidl2.dataproxy.DataProxyService.GetLocalActionData
-   */
-  getLocalActionData: {
-    methodKind: "unary";
-    input: typeof GetActionDataRequestSchema;
-    output: typeof GetActionDataResponseSchema;
-  },
-  /**
-   * CreateLocalDownloadLink generates signed URL(s) for downloading an artifact of a local run
-   * action attempt directly from the control plane's storage backend. Local runs only; never
-   * routes to a dataplane.
-   *
-   * @generated from rpc flyteidl2.dataproxy.DataProxyService.CreateLocalDownloadLink
-   */
-  createLocalDownloadLink: {
-    methodKind: "unary";
-    input: typeof CreateLocalDownloadLinkRequestSchema;
-    output: typeof CreateDownloadLinkResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_flyteidl2_dataproxy_dataproxy_service, 0);
