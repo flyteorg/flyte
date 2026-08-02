@@ -63,6 +63,9 @@ const (
 	// LocalRunServiceWatchActionsProcedure is the fully-qualified name of the LocalRunService's
 	// WatchActions RPC.
 	LocalRunServiceWatchActionsProcedure = "/flyteidl2.workflow.LocalRunService/WatchActions"
+	// LocalRunServiceAbortRunProcedure is the fully-qualified name of the LocalRunService's AbortRun
+	// RPC.
+	LocalRunServiceAbortRunProcedure = "/flyteidl2.workflow.LocalRunService/AbortRun"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -78,6 +81,7 @@ var (
 	localRunServiceWatchRunsMethodDescriptor          = localRunServiceServiceDescriptor.Methods().ByName("WatchRuns")
 	localRunServiceListActionsMethodDescriptor        = localRunServiceServiceDescriptor.Methods().ByName("ListActions")
 	localRunServiceWatchActionsMethodDescriptor       = localRunServiceServiceDescriptor.Methods().ByName("WatchActions")
+	localRunServiceAbortRunMethodDescriptor           = localRunServiceServiceDescriptor.Methods().ByName("AbortRun")
 )
 
 // LocalRunServiceClient is a client for the flyteidl2.workflow.LocalRunService service.
@@ -107,6 +111,10 @@ type LocalRunServiceClient interface {
 	ListActions(context.Context, *connect.Request[workflow.ListActionsRequest]) (*connect.Response[workflow.ListActionsResponse], error)
 	// Stream updates for actions of a given local run.
 	WatchActions(context.Context, *connect.Request[workflow.WatchActionsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionsResponse], error)
+	// Abort a local run: mark the run and all of its non-terminal actions ABORTED on the server.
+	// The platform cannot stop the local orchestrator; subsequent reports against aborted actions
+	// are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
+	AbortRun(context.Context, *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error)
 }
 
 // NewLocalRunServiceClient constructs a client for the flyteidl2.workflow.LocalRunService service.
@@ -183,6 +191,12 @@ func NewLocalRunServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithSchema(localRunServiceWatchActionsMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		abortRun: connect.NewClient[workflow.AbortRunRequest, workflow.AbortRunResponse](
+			httpClient,
+			baseURL+LocalRunServiceAbortRunProcedure,
+			connect.WithSchema(localRunServiceAbortRunMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -198,6 +212,7 @@ type localRunServiceClient struct {
 	watchRuns          *connect.Client[workflow.WatchRunsRequest, workflow.WatchRunsResponse]
 	listActions        *connect.Client[workflow.ListActionsRequest, workflow.ListActionsResponse]
 	watchActions       *connect.Client[workflow.WatchActionsRequest, workflow.WatchActionsResponse]
+	abortRun           *connect.Client[workflow.AbortRunRequest, workflow.AbortRunResponse]
 }
 
 // CreateRun calls flyteidl2.workflow.LocalRunService.CreateRun.
@@ -250,6 +265,11 @@ func (c *localRunServiceClient) WatchActions(ctx context.Context, req *connect.R
 	return c.watchActions.CallServerStream(ctx, req)
 }
 
+// AbortRun calls flyteidl2.workflow.LocalRunService.AbortRun.
+func (c *localRunServiceClient) AbortRun(ctx context.Context, req *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error) {
+	return c.abortRun.CallUnary(ctx, req)
+}
+
 // LocalRunServiceHandler is an implementation of the flyteidl2.workflow.LocalRunService service.
 type LocalRunServiceHandler interface {
 	// Register a new local run. The server creates the root action ("a0") in the reported state and
@@ -277,6 +297,10 @@ type LocalRunServiceHandler interface {
 	ListActions(context.Context, *connect.Request[workflow.ListActionsRequest]) (*connect.Response[workflow.ListActionsResponse], error)
 	// Stream updates for actions of a given local run.
 	WatchActions(context.Context, *connect.Request[workflow.WatchActionsRequest], *connect.ServerStream[workflow.WatchActionsResponse]) error
+	// Abort a local run: mark the run and all of its non-terminal actions ABORTED on the server.
+	// The platform cannot stop the local orchestrator; subsequent reports against aborted actions
+	// are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
+	AbortRun(context.Context, *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error)
 }
 
 // NewLocalRunServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -349,6 +373,12 @@ func NewLocalRunServiceHandler(svc LocalRunServiceHandler, opts ...connect.Handl
 		connect.WithSchema(localRunServiceWatchActionsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	localRunServiceAbortRunHandler := connect.NewUnaryHandler(
+		LocalRunServiceAbortRunProcedure,
+		svc.AbortRun,
+		connect.WithSchema(localRunServiceAbortRunMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.workflow.LocalRunService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case LocalRunServiceCreateRunProcedure:
@@ -371,6 +401,8 @@ func NewLocalRunServiceHandler(svc LocalRunServiceHandler, opts ...connect.Handl
 			localRunServiceListActionsHandler.ServeHTTP(w, r)
 		case LocalRunServiceWatchActionsProcedure:
 			localRunServiceWatchActionsHandler.ServeHTTP(w, r)
+		case LocalRunServiceAbortRunProcedure:
+			localRunServiceAbortRunHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -418,4 +450,8 @@ func (UnimplementedLocalRunServiceHandler) ListActions(context.Context, *connect
 
 func (UnimplementedLocalRunServiceHandler) WatchActions(context.Context, *connect.Request[workflow.WatchActionsRequest], *connect.ServerStream[workflow.WatchActionsResponse]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.LocalRunService.WatchActions is not implemented"))
+}
+
+func (UnimplementedLocalRunServiceHandler) AbortRun(context.Context, *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.LocalRunService.AbortRun is not implemented"))
 }

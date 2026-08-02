@@ -64,6 +64,11 @@ service LocalRunService {
 
   // Stream updates for actions of a given local run.
   rpc WatchActions(WatchActionsRequest) returns (stream WatchActionsResponse) {}
+
+  // Abort a local run: mark the run and all of its non-terminal actions ABORTED on the server.
+  // The platform cannot stop the local orchestrator; subsequent reports against aborted actions
+  // are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
+  rpc AbortRun(AbortRunRequest) returns (AbortRunResponse) {}
 }
 
 // Request message for creating a local run.

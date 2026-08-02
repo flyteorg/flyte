@@ -48,6 +48,9 @@ class LocalRunService(Protocol):
     def watch_actions(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest, ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def abort_run(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
 
 class LocalRunServiceASGIApplication(ConnectASGIApplication[LocalRunService]):
     def __init__(self, service: LocalRunService | AsyncGenerator[LocalRunService], *, interceptors: Iterable[Interceptor]=(), read_max_bytes: int | None = None, compressions: Iterable[Compression] | None = None) -> None:
@@ -153,6 +156,16 @@ class LocalRunServiceASGIApplication(ConnectASGIApplication[LocalRunService]):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.watch_actions,
+                ),
+                "/flyteidl2.workflow.LocalRunService/AbortRun": Endpoint.unary(
+                    method=MethodInfo(
+                        name="AbortRun",
+                        service_name="flyteidl2.workflow.LocalRunService",
+                        input=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest,
+                        output=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.abort_run,
                 ),
             },
             interceptors=interceptors,
@@ -375,6 +388,26 @@ class LocalRunServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    async def abort_run(
+        self,
+        request: flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="AbortRun",
+                service_name="flyteidl2.workflow.LocalRunService",
+                input=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest,
+                output=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
 
 class LocalRunServiceSync(Protocol):
     def create_run(self, request: flyteidl2_dot_workflow_dot_local__run__service__pb2.CreateLocalRunRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.CreateRunResponse:
@@ -396,6 +429,8 @@ class LocalRunServiceSync(Protocol):
     def list_actions(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.ListActionsRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.ListActionsResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def watch_actions(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse]:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def abort_run(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
@@ -502,6 +537,16 @@ class LocalRunServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.watch_actions,
+                ),
+                "/flyteidl2.workflow.LocalRunService/AbortRun": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="AbortRun",
+                        service_name="flyteidl2.workflow.LocalRunService",
+                        input=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest,
+                        output=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.abort_run,
                 ),
             },
             interceptors=interceptors,
@@ -718,6 +763,26 @@ class LocalRunServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.workflow.LocalRunService",
                 input=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest,
                 output=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def abort_run(
+        self,
+        request: flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="AbortRun",
+                service_name="flyteidl2.workflow.LocalRunService",
+                input=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest,
+                output=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
             ),
             headers=headers,

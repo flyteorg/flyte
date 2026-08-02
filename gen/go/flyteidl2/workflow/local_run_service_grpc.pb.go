@@ -29,6 +29,7 @@ const (
 	LocalRunService_WatchRuns_FullMethodName          = "/flyteidl2.workflow.LocalRunService/WatchRuns"
 	LocalRunService_ListActions_FullMethodName        = "/flyteidl2.workflow.LocalRunService/ListActions"
 	LocalRunService_WatchActions_FullMethodName       = "/flyteidl2.workflow.LocalRunService/WatchActions"
+	LocalRunService_AbortRun_FullMethodName           = "/flyteidl2.workflow.LocalRunService/AbortRun"
 )
 
 // LocalRunServiceClient is the client API for LocalRunService service.
@@ -60,6 +61,10 @@ type LocalRunServiceClient interface {
 	ListActions(ctx context.Context, in *ListActionsRequest, opts ...grpc.CallOption) (*ListActionsResponse, error)
 	// Stream updates for actions of a given local run.
 	WatchActions(ctx context.Context, in *WatchActionsRequest, opts ...grpc.CallOption) (LocalRunService_WatchActionsClient, error)
+	// Abort a local run: mark the run and all of its non-terminal actions ABORTED on the server.
+	// The platform cannot stop the local orchestrator; subsequent reports against aborted actions
+	// are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
+	AbortRun(ctx context.Context, in *AbortRunRequest, opts ...grpc.CallOption) (*AbortRunResponse, error)
 }
 
 type localRunServiceClient struct {
@@ -252,6 +257,15 @@ func (x *localRunServiceWatchActionsClient) Recv() (*WatchActionsResponse, error
 	return m, nil
 }
 
+func (c *localRunServiceClient) AbortRun(ctx context.Context, in *AbortRunRequest, opts ...grpc.CallOption) (*AbortRunResponse, error) {
+	out := new(AbortRunResponse)
+	err := c.cc.Invoke(ctx, LocalRunService_AbortRun_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LocalRunServiceServer is the server API for LocalRunService service.
 // All implementations should embed UnimplementedLocalRunServiceServer
 // for forward compatibility
@@ -281,6 +295,10 @@ type LocalRunServiceServer interface {
 	ListActions(context.Context, *ListActionsRequest) (*ListActionsResponse, error)
 	// Stream updates for actions of a given local run.
 	WatchActions(*WatchActionsRequest, LocalRunService_WatchActionsServer) error
+	// Abort a local run: mark the run and all of its non-terminal actions ABORTED on the server.
+	// The platform cannot stop the local orchestrator; subsequent reports against aborted actions
+	// are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
+	AbortRun(context.Context, *AbortRunRequest) (*AbortRunResponse, error)
 }
 
 // UnimplementedLocalRunServiceServer should be embedded to have forward compatible implementations.
@@ -316,6 +334,9 @@ func (UnimplementedLocalRunServiceServer) ListActions(context.Context, *ListActi
 }
 func (UnimplementedLocalRunServiceServer) WatchActions(*WatchActionsRequest, LocalRunService_WatchActionsServer) error {
 	return status.Errorf(codes.Unimplemented, "method WatchActions not implemented")
+}
+func (UnimplementedLocalRunServiceServer) AbortRun(context.Context, *AbortRunRequest) (*AbortRunResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AbortRun not implemented")
 }
 
 // UnsafeLocalRunServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -521,6 +542,24 @@ func (x *localRunServiceWatchActionsServer) Send(m *WatchActionsResponse) error 
 	return x.ServerStream.SendMsg(m)
 }
 
+func _LocalRunService_AbortRun_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AbortRunRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LocalRunServiceServer).AbortRun(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LocalRunService_AbortRun_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LocalRunServiceServer).AbortRun(ctx, req.(*AbortRunRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // LocalRunService_ServiceDesc is the grpc.ServiceDesc for LocalRunService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -551,6 +590,10 @@ var LocalRunService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListActions",
 			Handler:    _LocalRunService_ListActions_Handler,
+		},
+		{
+			MethodName: "AbortRun",
+			Handler:    _LocalRunService_AbortRun_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

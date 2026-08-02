@@ -1021,6 +1021,74 @@ func (_m *LocalRunServiceClient) EXPECT() *LocalRunServiceClient_Expecter {
 	return &LocalRunServiceClient_Expecter{mock: &_m.Mock}
 }
 
+// AbortRun provides a mock function for the type LocalRunServiceClient
+func (_mock *LocalRunServiceClient) AbortRun(context1 context.Context, request *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error) {
+	ret := _mock.Called(context1, request)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AbortRun")
+	}
+
+	var r0 *connect.Response[workflow.AbortRunResponse]
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error)); ok {
+		return returnFunc(context1, request)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.AbortRunRequest]) *connect.Response[workflow.AbortRunResponse]); ok {
+		r0 = returnFunc(context1, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connect.Response[workflow.AbortRunResponse])
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[workflow.AbortRunRequest]) error); ok {
+		r1 = returnFunc(context1, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// LocalRunServiceClient_AbortRun_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AbortRun'
+type LocalRunServiceClient_AbortRun_Call struct {
+	*mock.Call
+}
+
+// AbortRun is a helper method to define mock.On call
+//   - context1 context.Context
+//   - request *connect.Request[workflow.AbortRunRequest]
+func (_e *LocalRunServiceClient_Expecter) AbortRun(context1 interface{}, request interface{}) *LocalRunServiceClient_AbortRun_Call {
+	return &LocalRunServiceClient_AbortRun_Call{Call: _e.mock.On("AbortRun", context1, request)}
+}
+
+func (_c *LocalRunServiceClient_AbortRun_Call) Run(run func(context1 context.Context, request *connect.Request[workflow.AbortRunRequest])) *LocalRunServiceClient_AbortRun_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *connect.Request[workflow.AbortRunRequest]
+		if args[1] != nil {
+			arg1 = args[1].(*connect.Request[workflow.AbortRunRequest])
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *LocalRunServiceClient_AbortRun_Call) Return(response *connect.Response[workflow.AbortRunResponse], err error) *LocalRunServiceClient_AbortRun_Call {
+	_c.Call.Return(response, err)
+	return _c
+}
+
+func (_c *LocalRunServiceClient_AbortRun_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error)) *LocalRunServiceClient_AbortRun_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateRun provides a mock function for the type LocalRunServiceClient
 func (_mock *LocalRunServiceClient) CreateRun(context1 context.Context, request *connect.Request[workflow.CreateLocalRunRequest]) (*connect.Response[workflow.CreateRunResponse], error) {
 	ret := _mock.Called(context1, request)
@@ -1726,6 +1794,74 @@ type LocalRunServiceHandler_Expecter struct {
 
 func (_m *LocalRunServiceHandler) EXPECT() *LocalRunServiceHandler_Expecter {
 	return &LocalRunServiceHandler_Expecter{mock: &_m.Mock}
+}
+
+// AbortRun provides a mock function for the type LocalRunServiceHandler
+func (_mock *LocalRunServiceHandler) AbortRun(context1 context.Context, request *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error) {
+	ret := _mock.Called(context1, request)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AbortRun")
+	}
+
+	var r0 *connect.Response[workflow.AbortRunResponse]
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error)); ok {
+		return returnFunc(context1, request)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.AbortRunRequest]) *connect.Response[workflow.AbortRunResponse]); ok {
+		r0 = returnFunc(context1, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connect.Response[workflow.AbortRunResponse])
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[workflow.AbortRunRequest]) error); ok {
+		r1 = returnFunc(context1, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// LocalRunServiceHandler_AbortRun_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AbortRun'
+type LocalRunServiceHandler_AbortRun_Call struct {
+	*mock.Call
+}
+
+// AbortRun is a helper method to define mock.On call
+//   - context1 context.Context
+//   - request *connect.Request[workflow.AbortRunRequest]
+func (_e *LocalRunServiceHandler_Expecter) AbortRun(context1 interface{}, request interface{}) *LocalRunServiceHandler_AbortRun_Call {
+	return &LocalRunServiceHandler_AbortRun_Call{Call: _e.mock.On("AbortRun", context1, request)}
+}
+
+func (_c *LocalRunServiceHandler_AbortRun_Call) Run(run func(context1 context.Context, request *connect.Request[workflow.AbortRunRequest])) *LocalRunServiceHandler_AbortRun_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *connect.Request[workflow.AbortRunRequest]
+		if args[1] != nil {
+			arg1 = args[1].(*connect.Request[workflow.AbortRunRequest])
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *LocalRunServiceHandler_AbortRun_Call) Return(response *connect.Response[workflow.AbortRunResponse], err error) *LocalRunServiceHandler_AbortRun_Call {
+	_c.Call.Return(response, err)
+	return _c
+}
+
+func (_c *LocalRunServiceHandler_AbortRun_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error)) *LocalRunServiceHandler_AbortRun_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // CreateRun provides a mock function for the type LocalRunServiceHandler

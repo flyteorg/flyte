@@ -71,6 +71,11 @@ class LocalRunServiceStub(object):
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse.FromString,
                 )
+        self.AbortRun = channel.unary_unary(
+                '/flyteidl2.workflow.LocalRunService/AbortRun',
+                request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse.FromString,
+                )
 
 
 class LocalRunServiceServicer(object):
@@ -157,6 +162,15 @@ class LocalRunServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def AbortRun(self, request, context):
+        """Abort a local run: mark the run and all of its non-terminal actions ABORTED on the server.
+        The platform cannot stop the local orchestrator; subsequent reports against aborted actions
+        are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_LocalRunServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -209,6 +223,11 @@ def add_LocalRunServiceServicer_to_server(servicer, server):
                     servicer.WatchActions,
                     request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse.SerializeToString,
+            ),
+            'AbortRun': grpc.unary_unary_rpc_method_handler(
+                    servicer.AbortRun,
+                    request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -393,5 +412,22 @@ class LocalRunService(object):
         return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.LocalRunService/WatchActions',
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def AbortRun(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.LocalRunService/AbortRun',
+            flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
