@@ -438,7 +438,7 @@ func (m *TaskAction) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for Cluster
+	// no validation rules for Queue
 
 	if len(errors) > 0 {
 		return TaskActionMultiError(errors)
@@ -3401,6 +3401,35 @@ func (m *ActionAttempt) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetCacheMetadata()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionAttemptValidationError{
+					field:  "CacheMetadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionAttemptValidationError{
+					field:  "CacheMetadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCacheMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionAttemptValidationError{
+				field:  "CacheMetadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if m.EndTime != nil {
 
 		if all {
@@ -4107,6 +4136,35 @@ func (m *ActionEvent) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return ActionEventValidationError{
 				field:  "ReportedTime",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetCacheMetadata()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionEventValidationError{
+					field:  "CacheMetadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionEventValidationError{
+					field:  "CacheMetadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCacheMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionEventValidationError{
+				field:  "CacheMetadata",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

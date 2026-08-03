@@ -23,6 +23,8 @@ class SelectClusterRequest(_message.Message):
         OPERATION_GET_ACTION_ATTEMPT_METRICS: _ClassVar[SelectClusterRequest.Operation]
         OPERATION_USE_SECRETS: _ClassVar[SelectClusterRequest.Operation]
         OPERATION_UPLOAD_TRIGGER: _ClassVar[SelectClusterRequest.Operation]
+        OPERATION_GET_IMAGE: _ClassVar[SelectClusterRequest.Operation]
+        OPERATION_LOCAL_RUN_DATA: _ClassVar[SelectClusterRequest.Operation]
     OPERATION_UNSPECIFIED: SelectClusterRequest.Operation
     OPERATION_CREATE_UPLOAD_LOCATION: SelectClusterRequest.Operation
     OPERATION_UPLOAD_INPUTS: SelectClusterRequest.Operation
@@ -33,6 +35,8 @@ class SelectClusterRequest(_message.Message):
     OPERATION_GET_ACTION_ATTEMPT_METRICS: SelectClusterRequest.Operation
     OPERATION_USE_SECRETS: SelectClusterRequest.Operation
     OPERATION_UPLOAD_TRIGGER: SelectClusterRequest.Operation
+    OPERATION_GET_IMAGE: SelectClusterRequest.Operation
+    OPERATION_LOCAL_RUN_DATA: SelectClusterRequest.Operation
     ORG_ID_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
     TASK_ID_FIELD_NUMBER: _ClassVar[int]
@@ -54,7 +58,9 @@ class SelectClusterRequest(_message.Message):
     def __init__(self, org_id: _Optional[_Union[_identifier_pb2.OrgIdentifier, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., action_attempt_id: _Optional[_Union[_identifier_pb2.ActionAttemptIdentifier, _Mapping]] = ..., app_id: _Optional[_Union[_app_definition_pb2.Identifier, _Mapping]] = ..., cluster_pool_id: _Optional[_Union[_identifier_pb2.ClusterPoolIdentifier, _Mapping]] = ..., domain_id: _Optional[_Union[_identifier_pb2.DomainIdentifier, _Mapping]] = ..., operation: _Optional[_Union[SelectClusterRequest.Operation, str]] = ...) -> None: ...
 
 class SelectClusterResponse(_message.Message):
-    __slots__ = ["cluster_endpoint"]
+    __slots__ = ["cluster_endpoint", "cluster"]
     CLUSTER_ENDPOINT_FIELD_NUMBER: _ClassVar[int]
+    CLUSTER_FIELD_NUMBER: _ClassVar[int]
     cluster_endpoint: str
-    def __init__(self, cluster_endpoint: _Optional[str] = ...) -> None: ...
+    cluster: str
+    def __init__(self, cluster_endpoint: _Optional[str] = ..., cluster: _Optional[str] = ...) -> None: ...

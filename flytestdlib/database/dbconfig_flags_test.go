@@ -99,20 +99,6 @@ func TestDbConfig_SetFlags(t *testing.T) {
 	cmdFlags := actual.GetPFlagSet("")
 	assert.True(t, cmdFlags.HasFlags())
 
-	t.Run("Test_enableForeignKeyConstraintWhenMigrating", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("enableForeignKeyConstraintWhenMigrating", testValue)
-			if vBool, err := cmdFlags.GetBool("enableForeignKeyConstraintWhenMigrating"); err == nil {
-				testDecodeJson_DbConfig(t, fmt.Sprintf("%v", vBool), &actual.EnableForeignKeyConstraintWhenMigrating)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 	t.Run("Test_maxIdleConnections", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

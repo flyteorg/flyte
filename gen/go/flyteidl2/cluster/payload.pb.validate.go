@@ -496,6 +496,8 @@ func (m *SelectClusterResponse) validate(all bool) error {
 
 	// no validation rules for ClusterEndpoint
 
+	// no validation rules for Cluster
+
 	if len(errors) > 0 {
 		return SelectClusterResponseMultiError(errors)
 	}

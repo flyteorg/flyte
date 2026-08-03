@@ -43,10 +43,15 @@ func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []st
 		storageCfg = storage.GetConfig()
 	}
 
+	command, err := CopilotCommandArgs(storageCfg)
+	if err != nil {
+		return v1.Container{}, err
+	}
+
 	return v1.Container{
 		Name:       cfg.NamePrefix + name,
 		Image:      cfg.Image,
-		Command:    CopilotCommandArgs(storageCfg),
+		Command:    command,
 		Args:       args,
 		WorkingDir: "/",
 		Resources: v1.ResourceRequirements{
@@ -65,7 +70,7 @@ func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []st
 	}, nil
 }
 
-func CopilotCommandArgs(storageConfig *storage.Config) []string {
+func CopilotCommandArgs(storageConfig *storage.Config) ([]string, error) {
 	var commands = []string{
 		"/bin/flyte-copilot",
 		"--storage.limits.maxDownloadMBs=0",
@@ -85,15 +90,10 @@ func CopilotCommandArgs(storageConfig *storage.Config) []string {
 			commands = append(commands, "--storage.stow.config")
 			commands = append(commands, fmt.Sprintf("%s=%s", key, val))
 		}
-		return append(commands, fmt.Sprintf("--storage.stow.kind=%s", storageConfig.Stow.Kind))
+		return append(commands, fmt.Sprintf("--storage.stow.kind=%s", storageConfig.Stow.Kind)), nil
 	}
-	return append(commands, []string{
-		fmt.Sprintf("--storage.connection.secret-key=%s", storageConfig.Connection.SecretKey),       //nolint: staticcheck
-		fmt.Sprintf("--storage.connection.access-key=%s", storageConfig.Connection.AccessKey),       //nolint: staticcheck
-		fmt.Sprintf("--storage.connection.auth-type=%s", storageConfig.Connection.AuthType),         //nolint: staticcheck
-		fmt.Sprintf("--storage.connection.region=%s", storageConfig.Connection.Region),              //nolint: staticcheck
-		fmt.Sprintf("--storage.connection.endpoint=%s", storageConfig.Connection.Endpoint.String()), //nolint: staticcheck
-	}...)
+
+	return commands, fmt.Errorf("no stow.config or stow.kind specified")
 }
 
 func SidecarCommandArgs(fromLocalPath string, outputPrefix, rawOutputPath storage.DataReference, uploadTimeout time.Duration, iface *core.TypedInterface) ([]string, error) {

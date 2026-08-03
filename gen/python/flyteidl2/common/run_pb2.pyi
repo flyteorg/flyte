@@ -12,9 +12,11 @@ class RelationType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     RELATION_TYPE_UNSPECIFIED: _ClassVar[RelationType]
     RELATION_TYPE_RERUN: _ClassVar[RelationType]
     RELATION_TYPE_RECOVER: _ClassVar[RelationType]
+    RELATION_TYPE_SPAWN: _ClassVar[RelationType]
 RELATION_TYPE_UNSPECIFIED: RelationType
 RELATION_TYPE_RERUN: RelationType
 RELATION_TYPE_RECOVER: RelationType
+RELATION_TYPE_SPAWN: RelationType
 
 class OffloadedInputData(_message.Message):
     __slots__ = ["uri", "inputs_hash"]

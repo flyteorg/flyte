@@ -89,3 +89,6 @@ func NewVaultSecretManagerInjector(cfg config.VaultSecretManagerConfig) VaultSec
 		cfg: cfg,
 	}
 }
+
+// InvalidateCache is a no-op: this injector resolves secrets on every Inject and caches nothing.
+func (i VaultSecretManagerInjector) InvalidateCache(_ context.Context, _, _, _, _ string) {}

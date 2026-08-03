@@ -259,6 +259,12 @@ func (s *RunService) CreateRun(
 		if offloaded := triggerDetails.GetSpec().GetOffloadedInputData(); offloaded != nil && request.GetInputWrapper() == nil {
 			request.InputWrapper = &workflow.CreateRunRequest_OffloadedInputData{OffloadedInputData: offloaded}
 		}
+		// Restore the run spec captured at registration (env vars, labels, annotations,
+		// interruptible, etc.) so trigger-fired runs carry them. The scheduler fires with only
+		// a TriggerName and no run spec, so without this those overrides are silently dropped.
+		if runSpec == nil {
+			runSpec = triggerDetails.GetSpec().GetRunSpec()
+		}
 		triggerKickoffArg = triggerDetails.GetAutomationSpec().GetSchedule().GetKickoffTimeInputArg()
 	}
 
@@ -342,10 +348,9 @@ func (s *RunService) CreateRun(
 	// decoded, not signature-verified — see Config.TrustForwardedIdentityHeaders).
 	var executedBy *common.EnrichedIdentity
 	if s.trustHeaders {
-		executedBy = identityFromHeaders(req.Header(), s.identityHeaders)
-		// Cookie path isn't enriched here: its forwarded access token is short-lived and
-		// already expired, so it relies on the claims the proxy injects into x-amzn-oidc-data.
-		executedBy = s.enricher.enrich(ctx, bearerToken(req.Header()), executedBy)
+		// resolveIdentity enriches only on the Bearer path; the cookie path relies on
+		// the claims the proxy injects (its forwarded access token is already expired).
+		executedBy = resolveIdentity(ctx, req.Header(), s.identityHeaders, s.enricher)
 	}
 
 	// Persist task spec and create a run model
@@ -906,6 +911,12 @@ func (s *RunService) ListRuns(
 		scopeFilter = scopeFilter.And(impl.NewRunTaskNameFilter(scope.TaskName))
 	case *workflow.ListRunsRequest_TaskId:
 		scopeFilter = scopeFilter.And(impl.NewRunTaskIdFilter(scope.TaskId))
+	}
+
+	// Restrict to runs that contain at least one PAUSED action (e.g. a
+	// human-in-the-loop gate node awaiting input) when requested.
+	if req.Msg.PausedActionsOnly {
+		scopeFilter = scopeFilter.And(impl.NewHasPausedActionFilter())
 	}
 
 	// Parse pagination, sort, and user-supplied filters from the common ListRequest.

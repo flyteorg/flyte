@@ -511,6 +511,15 @@
       "default": "UNKNOWN",
       "description": "Known resource names.\n\n - EPHEMERAL_STORAGE: For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs."
     },
+    "ReusePolicyScope": {
+      "type": "string",
+      "enum": [
+        "GLOBAL",
+        "RUN"
+      ],
+      "default": "GLOBAL",
+      "description": "Scope bounds how widely a reusable environment may be shared.\n\n - GLOBAL: Reuse one environment across all runs (the default). Cheapest: creation cost is paid once\nand amortized across every invocation everywhere.\n - RUN: Restrict reuse to a single run: each run gets its own environment, torn down with the run."
+    },
     "SchemaColumnSchemaColumnType": {
       "type": "string",
       "enum": [
@@ -1483,6 +1492,39 @@
       },
       "description": "Retry strategy associated with an executable unit."
     },
+    "coreReusePolicy": {
+      "type": "object",
+      "properties": {
+        "min_replicas": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Minimum number of replicas to keep warm (a fixed-size pool uses min == max)."
+        },
+        "max_replicas": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Maximum number of replicas; the upper bound for demand-based auto-scaling."
+        },
+        "concurrency": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Maximum number of concurrent tasks a single replica may handle. Values \u003e 1 are only\nmeaningful for async tasks."
+        },
+        "idle_ttl": {
+          "type": "string",
+          "description": "How long the whole reusable environment may sit idle (no running tasks) before it is torn\ndown entirely."
+        },
+        "scaledown_ttl": {
+          "type": "string",
+          "description": "Minimum delay before an individual idle replica is scaled down during auto-scaling\n(distinct from idle_ttl, which governs the whole environment)."
+        },
+        "scope": {
+          "$ref": "#/definitions/ReusePolicyScope",
+          "description": "How widely the reusable environment may be shared. Defaults to GLOBAL (reuse across all runs)."
+        }
+      },
+      "description": "ReusePolicy configures reuse of a task's execution environment across invocations, so\nenvironment creation cost is paid once and amortized: a warm container pool for reusable\ncontainer tasks or a shared long-lived cluster for cluster-backed plugins (e.g. Ray).\nTotal concurrent capacity is max_replicas * concurrency."
+    },
     "coreRuntimeBinding": {
       "type": "object"
     },
@@ -1755,6 +1797,10 @@
             "type": "string"
           },
           "title": "Metadata about the custom defined for this task. This is extensible to allow various plugins in the system\nto use as required.\nreserve the field numbers 1 through 15 for very frequently occurring message elements"
+        },
+        "reuse_policy": {
+          "$ref": "#/definitions/coreReusePolicy",
+          "description": "Reuse policy for the task's execution environment (a warm container pool, or a shared,\nlong-lived cluster for cluster-backed plugins like Ray). When unset, no reuse is configured."
         }
       },
       "description": "A Task structure that uniquely identifies a task in the system\nTasks are registered as a first step in the system."
@@ -2278,6 +2324,10 @@
         "timeouts": {
           "$ref": "#/definitions/coreTimeoutStrategy",
           "description": "Additional timeout bounds (queued_timeout, deadline) layered on top of\nthe per-attempt RUNNING-phase bound expressed by `timeout` (field 4).\nEach bound is independently optional; an unspecified bound is unlimited."
+        },
+        "produces_artifacts": {
+          "type": "boolean",
+          "description": "If true, the backend extracts artifact metadata stamped on this task's\noutput literals and records them as generated artifacts on the action."
         }
       },
       "title": "Task Metadata"

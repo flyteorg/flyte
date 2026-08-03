@@ -39,9 +39,20 @@ flyte-core-components:
     download:
       maxExpiresIn: 1h
 
+  # Flyte-native secrets (flyte create secret): the secret service writes Kubernetes
+  # Secrets into this namespace, and the pod webhook's embedded secret manager reads
+  # them back from the same namespace (webhook.embeddedSecretManagerConfig.k8sConfig
+  # in the ConfigMap template). Keep the two in sync. Rendered through tpl, so it
+  # defaults to the release namespace.
   secret:
+    # webhookURL Where the secret service posts to drop the pod webhook's cached secret values
+    # after a write, so the next admitted pod sees the new value instead of waiting out the
+    # cache TTL. This is the webhook's cache invalidation port (9444), not admission (9443).
+    # The headless Service resolves to every webhook pod, so all replicas are invalidated; a
+    # ClusterIP Service would reach exactly one. Set to "" to disable invalidation.
+    webhookURL: 'http://{{ include "flyte-binary.webhook.headlessServiceName" . }}.{{ .Release.Namespace }}.svc:9444'
     kubernetes:
-      namespace: "flyte"
+      namespace: '{{ .Release.Namespace }}'
       kubeconfig: ""
       qps: 100
       burst: 200
@@ -99,6 +110,8 @@ configuration:
         accessKey: ""
         # secretKey Secret key for authenticating with S3-compatible service
         secretKey: ""
+        # secretKeyPath Path to a file containing the secret key for authenticating with S3-compatible service
+        secretKeyPath: ""
       # gcs Provider configuration for GCS object store
       gcs:
         # project Google Cloud project in which bucket resides
