@@ -104,7 +104,7 @@ class RuntimeMetadata(_message.Message):
     def __init__(self, type: _Optional[_Union[RuntimeMetadata.RuntimeType, str]] = ..., version: _Optional[str] = ..., flavor: _Optional[str] = ...) -> None: ...
 
 class TaskMetadata(_message.Message):
-    __slots__ = ["discoverable", "runtime", "timeout", "retries", "discovery_version", "deprecated_error_message", "interruptible", "cache_serializable", "tags", "pod_template_name", "cache_ignore_input_vars", "is_eager", "generates_deck", "metadata", "debuggable", "log_links", "image_build_run", "is_entrypoint", "code_bundle_uri", "timeouts"]
+    __slots__ = ["discoverable", "runtime", "timeout", "retries", "discovery_version", "deprecated_error_message", "interruptible", "cache_serializable", "tags", "pod_template_name", "cache_ignore_input_vars", "is_eager", "generates_deck", "metadata", "debuggable", "log_links", "image_build_run", "is_entrypoint", "code_bundle_uri", "timeouts", "produces_artifacts"]
     class TagsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -132,6 +132,7 @@ class TaskMetadata(_message.Message):
     IS_ENTRYPOINT_FIELD_NUMBER: _ClassVar[int]
     CODE_BUNDLE_URI_FIELD_NUMBER: _ClassVar[int]
     TIMEOUTS_FIELD_NUMBER: _ClassVar[int]
+    PRODUCES_ARTIFACTS_FIELD_NUMBER: _ClassVar[int]
     discoverable: bool
     runtime: RuntimeMetadata
     timeout: _duration_pb2.Duration
@@ -152,7 +153,30 @@ class TaskMetadata(_message.Message):
     is_entrypoint: bool
     code_bundle_uri: str
     timeouts: _literals_pb2.TimeoutStrategy
-    def __init__(self, discoverable: bool = ..., runtime: _Optional[_Union[RuntimeMetadata, _Mapping]] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., discovery_version: _Optional[str] = ..., deprecated_error_message: _Optional[str] = ..., interruptible: bool = ..., cache_serializable: bool = ..., tags: _Optional[_Mapping[str, str]] = ..., pod_template_name: _Optional[str] = ..., cache_ignore_input_vars: _Optional[_Iterable[str]] = ..., is_eager: bool = ..., generates_deck: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., metadata: _Optional[_Union[K8sObjectMetadata, _Mapping]] = ..., debuggable: bool = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., image_build_run: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., is_entrypoint: bool = ..., code_bundle_uri: _Optional[str] = ..., timeouts: _Optional[_Union[_literals_pb2.TimeoutStrategy, _Mapping]] = ...) -> None: ...
+    produces_artifacts: bool
+    def __init__(self, discoverable: bool = ..., runtime: _Optional[_Union[RuntimeMetadata, _Mapping]] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., discovery_version: _Optional[str] = ..., deprecated_error_message: _Optional[str] = ..., interruptible: bool = ..., cache_serializable: bool = ..., tags: _Optional[_Mapping[str, str]] = ..., pod_template_name: _Optional[str] = ..., cache_ignore_input_vars: _Optional[_Iterable[str]] = ..., is_eager: bool = ..., generates_deck: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., metadata: _Optional[_Union[K8sObjectMetadata, _Mapping]] = ..., debuggable: bool = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., image_build_run: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., is_entrypoint: bool = ..., code_bundle_uri: _Optional[str] = ..., timeouts: _Optional[_Union[_literals_pb2.TimeoutStrategy, _Mapping]] = ..., produces_artifacts: bool = ...) -> None: ...
+
+class ReusePolicy(_message.Message):
+    __slots__ = ["min_replicas", "max_replicas", "concurrency", "idle_ttl", "scaledown_ttl", "scope"]
+    class Scope(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        GLOBAL: _ClassVar[ReusePolicy.Scope]
+        RUN: _ClassVar[ReusePolicy.Scope]
+    GLOBAL: ReusePolicy.Scope
+    RUN: ReusePolicy.Scope
+    MIN_REPLICAS_FIELD_NUMBER: _ClassVar[int]
+    MAX_REPLICAS_FIELD_NUMBER: _ClassVar[int]
+    CONCURRENCY_FIELD_NUMBER: _ClassVar[int]
+    IDLE_TTL_FIELD_NUMBER: _ClassVar[int]
+    SCALEDOWN_TTL_FIELD_NUMBER: _ClassVar[int]
+    SCOPE_FIELD_NUMBER: _ClassVar[int]
+    min_replicas: int
+    max_replicas: int
+    concurrency: int
+    idle_ttl: _duration_pb2.Duration
+    scaledown_ttl: _duration_pb2.Duration
+    scope: ReusePolicy.Scope
+    def __init__(self, min_replicas: _Optional[int] = ..., max_replicas: _Optional[int] = ..., concurrency: _Optional[int] = ..., idle_ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., scaledown_ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., scope: _Optional[_Union[ReusePolicy.Scope, str]] = ...) -> None: ...
 
 class TaskTemplate(_message.Message):
     __slots__ = ["id", "type", "metadata", "interface", "custom", "container", "k8s_pod", "sql", "task_type_version", "security_context", "extended_resources", "config", "reuse_policy"]
@@ -188,6 +212,7 @@ class TaskTemplate(_message.Message):
     security_context: _security_pb2.SecurityContext
     extended_resources: ExtendedResources
     config: _containers.ScalarMap[str, str]
+<<<<<<< HEAD
     reuse_policy: ReusePolicy
     def __init__(self, id: _Optional[_Union[_identifier_pb2_1.Identifier, _Mapping]] = ..., type: _Optional[str] = ..., metadata: _Optional[_Union[TaskMetadata, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., custom: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., container: _Optional[_Union[Container, _Mapping]] = ..., k8s_pod: _Optional[_Union[K8sPod, _Mapping]] = ..., sql: _Optional[_Union[Sql, _Mapping]] = ..., task_type_version: _Optional[int] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., extended_resources: _Optional[_Union[ExtendedResources, _Mapping]] = ..., config: _Optional[_Mapping[str, str]] = ..., reuse_policy: _Optional[_Union[ReusePolicy, _Mapping]] = ...) -> None: ...
 
@@ -212,6 +237,12 @@ class ReusePolicy(_message.Message):
     scaledown_ttl: _duration_pb2.Duration
     scope: ReusePolicy.Scope
     def __init__(self, min_replicas: _Optional[int] = ..., max_replicas: _Optional[int] = ..., concurrency: _Optional[int] = ..., idle_ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., scaledown_ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., scope: _Optional[_Union[ReusePolicy.Scope, str]] = ...) -> None: ...
+||||||| b4f85a12b
+    def __init__(self, id: _Optional[_Union[_identifier_pb2_1.Identifier, _Mapping]] = ..., type: _Optional[str] = ..., metadata: _Optional[_Union[TaskMetadata, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., custom: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., container: _Optional[_Union[Container, _Mapping]] = ..., k8s_pod: _Optional[_Union[K8sPod, _Mapping]] = ..., sql: _Optional[_Union[Sql, _Mapping]] = ..., task_type_version: _Optional[int] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., extended_resources: _Optional[_Union[ExtendedResources, _Mapping]] = ..., config: _Optional[_Mapping[str, str]] = ...) -> None: ...
+=======
+    reuse_policy: ReusePolicy
+    def __init__(self, id: _Optional[_Union[_identifier_pb2_1.Identifier, _Mapping]] = ..., type: _Optional[str] = ..., metadata: _Optional[_Union[TaskMetadata, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., custom: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., container: _Optional[_Union[Container, _Mapping]] = ..., k8s_pod: _Optional[_Union[K8sPod, _Mapping]] = ..., sql: _Optional[_Union[Sql, _Mapping]] = ..., task_type_version: _Optional[int] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., extended_resources: _Optional[_Union[ExtendedResources, _Mapping]] = ..., config: _Optional[_Mapping[str, str]] = ..., reuse_policy: _Optional[_Union[ReusePolicy, _Mapping]] = ...) -> None: ...
+>>>>>>> 1d16a678185afcac4007879e9ad78b8db41accc1
 
 class ContainerPort(_message.Message):
     __slots__ = ["container_port", "name"]

@@ -1,0 +1,24 @@
+{{/*
+Headless Service for secret cache invalidation. Resolves to every webhook pod IP rather than a
+single virtual IP, so a caller can fan invalidation out to all replicas — a ClusterIP Service
+would load-balance to exactly one, leaving the rest serving stale secrets until their TTL.
+
+Separate from the main webhook Service on purpose: that one is what the
+MutatingWebhookConfiguration points the API server at for admission, and it needs to stay
+ClusterIP. Do not merge the two.
+*/}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "flyte-binary.webhook.headlessServiceName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-binary.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  selector: {{- include "flyte-binary.selectorLabels" . | nindent 4 }}
+  ports:
+    # Plain HTTP, unauthenticated: cluster-internal only, never routed through an ingress.
+    - name: cache-internal
+      port: 9444
+      targetPort: 9444
+      protocol: TCP

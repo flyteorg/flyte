@@ -4,8 +4,11 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"testing"
 	"time"
+
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -122,6 +125,67 @@ func TestDeploy_InjectsInternalAppEndpointPattern(t *testing.T) {
 		}
 	}
 	assert.Equal(t, "http://{app_fqdn}-proj-dev.flyte.svc.cluster.local", pattern)
+}
+
+func TestDeploy_InjectsExecutionEnvVars(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+	envVars := ksvc.Spec.Template.Spec.Containers[0].Env
+	var gotProject, gotDomain string
+	for _, e := range envVars {
+		if e.Name == "FLYTE_INTERNAL_EXECUTION_PROJECT" {
+			gotProject = e.Value
+		}
+		if e.Name == "FLYTE_INTERNAL_EXECUTION_DOMAIN" {
+			gotDomain = e.Value
+		}
+	}
+	assert.Equal(t, "proj", gotProject)
+	assert.Equal(t, "dev", gotDomain)
+}
+
+func TestDeploy_InjectsSecretLabelsAndAnnotations(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	app.Spec.SecurityContext = &flyteapp.SecurityContext{
+		Secrets: []*flytecoreapp.Secret{
+			{Group: "my_group", Key: "my_key", MountRequirement: flytecoreapp.Secret_ENV_VAR},
+		},
+	}
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+	tpl := ksvc.Spec.Template
+	assert.Equal(t, "flyte", tpl.Labels["organization"])
+	assert.Equal(t, "proj", tpl.Labels["project"])
+	assert.Equal(t, "dev", tpl.Labels["domain"])
+	assert.Equal(t, "true", tpl.Labels["inject-flyte-secrets"])
+	assert.Contains(t, tpl.Annotations, "flyte.secrets/s0")
+}
+
+func TestDeploy_NoSecretLabelsOrAnnotationsWhenNoSecrets(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+	tpl := ksvc.Spec.Template
+	_, hasLabel := tpl.Labels["inject-flyte-secrets"]
+	assert.False(t, hasLabel, "no inject-flyte-secrets label when no secrets configured")
+	_, hasAnnotation := tpl.Annotations["flyte.secrets/s0"]
+	assert.False(t, hasAnnotation, "no secret annotations when no secrets configured")
 }
 
 func TestDeploy_DefaultServiceAccount(t *testing.T) {
@@ -926,4 +990,139 @@ func TestKserviceToStatus_Messages(t *testing.T) {
 			}
 		})
 	}
+}
+
+// transformStructToStructPB converts an arbitrary Go object into a *structpb.Struct
+// by round-tripping through JSON. It fails the test on any marshaling error.
+func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
+	t.Helper()
+	data, err := json.Marshal(obj)
+	require.NoError(t, err)
+	m := make(map[string]interface{})
+	err = json.Unmarshal(data, &m)
+	require.NoError(t, err)
+	s, err := structpb.NewStruct(m)
+	require.NoError(t, err)
+	return s
+}
+
+func TestBuildPodSpec_Container(t *testing.T) {
+	spec := &flyteapp.Spec{
+		AppPayload: &flyteapp.Spec_Container{
+			Container: &flytecoreapp.Container{
+				Image:   "nginx:latest",
+				Command: []string{"nginx"},
+				Args:    []string{"-g", "daemon off;"},
+				Env: []*flytecoreapp.KeyValuePair{
+					{Key: "FOO", Value: "bar"},
+				},
+				Ports: []*flytecoreapp.ContainerPort{
+					{ContainerPort: 8080, Name: "http"},
+				},
+				Resources: &flytecoreapp.Resources{
+					Requests: []*flytecoreapp.Resources_ResourceEntry{
+						{Name: flytecoreapp.Resources_CPU, Value: "100m"},
+						{Name: flytecoreapp.Resources_MEMORY, Value: "128Mi"},
+					},
+				},
+			},
+		},
+	}
+
+	podSpec, err := buildPodSpec(spec)
+	require.NoError(t, err)
+	require.Len(t, podSpec.Containers, 1)
+	assert.Equal(t, "app", podSpec.Containers[0].Name)
+	assert.Equal(t, "nginx:latest", podSpec.Containers[0].Image)
+	assert.Equal(t, []string{"nginx"}, podSpec.Containers[0].Command)
+	assert.Equal(t, []string{"-g", "daemon off;"}, podSpec.Containers[0].Args)
+	assert.Equal(t, []corev1.EnvVar{{Name: "FOO", Value: "bar"}}, podSpec.Containers[0].Env)
+	assert.Equal(t, []corev1.ContainerPort{{ContainerPort: 8080, Name: "http"}}, podSpec.Containers[0].Ports)
+	assert.Equal(t, "100m", podSpec.Containers[0].Resources.Requests.Cpu().String())
+	assert.Equal(t, "128Mi", podSpec.Containers[0].Resources.Requests.Memory().String())
+	assert.NotNil(t, podSpec.EnableServiceLinks)
+	assert.False(t, *podSpec.EnableServiceLinks)
+}
+
+func TestBuildPodSpec_Pod(t *testing.T) {
+	podSpecMap := map[string]interface{}{
+		"containers": []map[string]interface{}{
+			{
+				"name":  "app",
+				"image": "my-image:v1",
+				"ports": []map[string]interface{}{
+					{"containerPort": float64(80), "name": "http"},
+				},
+				"resources": map[string]interface{}{
+					"requests": map[string]interface{}{
+						"cpu":    "250m",
+						"memory": "256Mi",
+					},
+				},
+			},
+		},
+		"restartPolicy": "Always",
+	}
+
+	spec := &flyteapp.Spec{
+		AppPayload: &flyteapp.Spec_Pod{
+			Pod: &flytecoreapp.K8SPod{
+				PodSpec: transformStructToStructPB(t, podSpecMap),
+			},
+		},
+	}
+
+	podSpec, err := buildPodSpec(spec)
+	require.NoError(t, err)
+	require.Len(t, podSpec.Containers, 1)
+	assert.Equal(t, "app", podSpec.Containers[0].Name)
+	assert.Equal(t, "my-image:v1", podSpec.Containers[0].Image)
+	assert.Len(t, podSpec.Containers[0].Ports, 1)
+	assert.Equal(t, int32(80), podSpec.Containers[0].Ports[0].ContainerPort)
+	assert.Equal(t, "250m", podSpec.Containers[0].Resources.Requests.Cpu().String())
+	assert.Equal(t, "256Mi", podSpec.Containers[0].Resources.Requests.Memory().String())
+	assert.Equal(t, corev1.RestartPolicyAlways, podSpec.RestartPolicy)
+	assert.NotNil(t, podSpec.EnableServiceLinks)
+	assert.False(t, *podSpec.EnableServiceLinks)
+}
+
+func TestBuildPodSpec_Pod_NilPodSpec(t *testing.T) {
+	spec := &flyteapp.Spec{
+		AppPayload: &flyteapp.Spec_Pod{
+			Pod: &flytecoreapp.K8SPod{},
+		},
+	}
+
+	_, err := buildPodSpec(spec)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "has no pod spec")
+}
+
+func TestBuildPodSpec_Pod_InvalidJSON(t *testing.T) {
+	// Create a Struct that cannot be unmarshaled into corev1.PodSpec.
+	// "containers" must be an array, not a string.
+	s := &structpb.Struct{
+		Fields: map[string]*structpb.Value{
+			"containers": {Kind: &structpb.Value_StringValue{StringValue: "not-an-array"}},
+		},
+	}
+
+	spec := &flyteapp.Spec{
+		AppPayload: &flyteapp.Spec_Pod{
+			Pod: &flytecoreapp.K8SPod{
+				PodSpec: s,
+			},
+		},
+	}
+
+	_, err := buildPodSpec(spec)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to unmarshal K8sPod spec")
+}
+
+func TestBuildPodSpec_NoPayload(t *testing.T) {
+	spec := &flyteapp.Spec{}
+	_, err := buildPodSpec(spec)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "app spec has no payload")
 }

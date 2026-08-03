@@ -24,8 +24,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/v2/app/internal/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
+	secretUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	flytecore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -139,7 +142,7 @@ func NewAppK8sClient(k8sClient client.WithWatch, cache ctrlcache.Cache, namespac
 
 // defaultOrg is the org returned for apps that have no org persisted on the KService.
 // we always surface a non-empty value for callers (e.g. the UI) that expect one.
-const defaultOrg = "flyte"
+const defaultOrg = secret.DefaultOrganization
 
 // Deploy creates or updates the KService for the given app.
 func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
@@ -598,9 +601,33 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 			Name:  "INTERNAL_APP_ENDPOINT_PATTERN",
 			Value: fmt.Sprintf("http://{app_fqdn}-%s.%s.svc.cluster.local", suffix, ns),
 		})
+		// Inject execution context env vars required by flyte.init_in_cluster()
+		podSpec.Containers[0].Env = append(podSpec.Containers[0].Env,
+			corev1.EnvVar{Name: "FLYTE_INTERNAL_EXECUTION_PROJECT", Value: appID.GetProject()},
+			corev1.EnvVar{Name: "FLYTE_INTERNAL_EXECUTION_DOMAIN", Value: appID.GetDomain()},
+		)
 	}
 
 	templateAnnotations := buildAutoscalingAnnotations(spec, c.cfg)
+	// Inject secret labels and annotations into the revision template so the
+	// flyte-binary-webhook mounts the requested secrets and the secret fetcher
+	// can resolve scoped secret lookups (project/domain).
+	var templateLabels map[string]string
+	if securityContext := spec.GetSecurityContext(); securityContext != nil && len(securityContext.GetSecrets()) > 0 {
+		templateLabels = map[string]string{
+			secret.OrganizationLabel: secret.DefaultOrganization,
+			secret.ProjectLabel:      appID.GetProject(),
+			secret.DomainLabel:       appID.GetDomain(),
+			secretUtils.PodLabel:     secretUtils.PodLabelValue,
+		}
+		secretsMap, err := secretUtils.MarshalSecretsToMapStrings(securityContext.GetSecrets())
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal secrets: %w", err)
+		}
+		for k, v := range secretsMap {
+			templateAnnotations[k] = v
+		}
+	}
 
 	timeoutSecs := c.cfg.DefaultRequestTimeout.Seconds()
 	if t := spec.GetTimeouts().GetRequestTimeout(); t != nil {
@@ -632,6 +659,7 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 			ConfigurationSpec: servingv1.ConfigurationSpec{
 				Template: servingv1.RevisionTemplateSpec{
 					ObjectMeta: metav1.ObjectMeta{
+						Labels:      templateLabels,
 						Annotations: templateAnnotations,
 					},
 					Spec: servingv1.RevisionSpec{
@@ -646,7 +674,7 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 }
 
 // buildPodSpec constructs a corev1.PodSpec from an App Spec.
-// Supports Container payload only for now; K8sPod support can be added in a follow-up.
+// Supports Container and K8sPod payloads.
 func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 	switch p := spec.GetAppPayload().(type) {
 	case *flyteapp.Spec_Container:
@@ -676,9 +704,18 @@ func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 		}, nil
 
 	case *flyteapp.Spec_Pod:
-		// K8sPod payloads are not yet supported — the pod spec serialization
-		// from flyteplugins is needed for a complete implementation.
-		return corev1.PodSpec{}, fmt.Errorf("K8sPod app payload is not yet supported")
+		pod := p.Pod
+		if pod == nil || pod.GetPodSpec() == nil {
+			return corev1.PodSpec{}, fmt.Errorf("K8sPod app payload has no pod spec")
+		}
+		var podSpec corev1.PodSpec
+		if err := utils.UnmarshalStructToObj(pod.GetPodSpec(), &podSpec); err != nil {
+			return corev1.PodSpec{}, fmt.Errorf("failed to unmarshal K8sPod spec: %w", err)
+		}
+		if podSpec.EnableServiceLinks == nil {
+			podSpec.EnableServiceLinks = boolPtr(false)
+		}
+		return podSpec, nil
 
 	default:
 		return corev1.PodSpec{}, fmt.Errorf("app spec has no payload (container or pod required)")

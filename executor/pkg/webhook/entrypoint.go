@@ -23,30 +23,31 @@ const (
 
 // Setup initializes the webhook: generates certs, registers MutatingWebhookConfiguration, and registers the HTTP handler.
 // It is called before mgr.Start() so that the webhook server is ready to receive requests.
+// The returned PodMutator owns the secret cache and can be used to invalidate it.
 func Setup(ctx context.Context, kubeClient kubernetes.Interface, cfg *webhookConfig.Config,
-	defaultNamespace string, scope promutils.Scope, mgr manager.Manager) error {
+	defaultNamespace string, scope promutils.Scope, mgr manager.Manager) (*PodMutator, error) {
 
 	if err := InitCerts(ctx, kubeClient, cfg, defaultNamespace); err != nil {
-		return fmt.Errorf("webhook: failed to initialize certs: %w", err)
+		return nil, fmt.Errorf("webhook: failed to initialize certs: %w", err)
 	}
 
 	podMutator, err := NewPodMutator(ctx, cfg, defaultNamespace, mgr.GetScheme(), scope)
 	if err != nil {
-		return fmt.Errorf("webhook: failed to create pod mutator: %w", err)
+		return nil, fmt.Errorf("webhook: failed to create pod mutator: %w", err)
 	}
 
 	if cfg.DisableCreateMutatingWebhookConfig {
 		logger.Infof(ctx, "Skipping MutatingWebhookConfiguration creation, disabled by config")
 	} else if err := createMutationConfig(ctx, kubeClient, podMutator, defaultNamespace); err != nil {
-		return fmt.Errorf("webhook: failed to create MutatingWebhookConfiguration: %w", err)
+		return nil, fmt.Errorf("webhook: failed to create MutatingWebhookConfiguration: %w", err)
 	}
 
 	if err := podMutator.Register(ctx, mgr); err != nil {
-		return fmt.Errorf("webhook: failed to register handler: %w", err)
+		return nil, fmt.Errorf("webhook: failed to register handler: %w", err)
 	}
 
 	logger.Infof(ctx, "Webhook setup complete")
-	return nil
+	return podMutator, nil
 }
 
 func createMutationConfig(ctx context.Context, kubeClient kubernetes.Interface, webhookObj *PodMutator, defaultNamespace string) error {

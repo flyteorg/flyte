@@ -48,6 +48,14 @@ rules:
       - get
   - apiGroups:
       - ""
+    resources:
+      - podtemplates
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
       - events.k8s.io
     resources:
       - events

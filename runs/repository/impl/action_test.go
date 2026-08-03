@@ -452,6 +452,41 @@ func TestListRuns(t *testing.T) {
 	}
 }
 
+func TestListRuns_HasPausedActionFilter(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	// run-paused: RUNNING root with a PAUSED child (HITL gate awaiting input).
+	// run-plain: RUNNING root whose child is also RUNNING.
+	for _, a := range []*models.Action{
+		{Project: "proj1", Domain: "domain1", RunName: "run-paused", Name: rootActionName,
+			Phase: int32(common.ActionPhase_ACTION_PHASE_RUNNING)},
+		{Project: "proj1", Domain: "domain1", RunName: "run-paused", Name: "gate-node",
+			ParentActionName: sql.NullString{String: rootActionName, Valid: true},
+			Phase:            int32(common.ActionPhase_ACTION_PHASE_PAUSED)},
+		{Project: "proj1", Domain: "domain1", RunName: "run-plain", Name: rootActionName,
+			Phase: int32(common.ActionPhase_ACTION_PHASE_RUNNING)},
+		{Project: "proj1", Domain: "domain1", RunName: "run-plain", Name: "worker-node",
+			ParentActionName: sql.NullString{String: rootActionName, Valid: true},
+			Phase:            int32(common.ActionPhase_ACTION_PHASE_RUNNING)},
+	} {
+		_, err := actionRepo.CreateAction(ctx, a, false)
+		require.NoError(t, err)
+	}
+
+	runs, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter: NewIsRootActionFilter().And(NewHasPausedActionFilter()),
+		Limit:  50,
+	})
+	require.NoError(t, err)
+	require.Len(t, runs, 1)
+	assert.Equal(t, "run-paused", runs[0].RunName)
+	assert.False(t, runs[0].ParentActionName.Valid, "only the root action should be returned")
+}
+
 // TestListActions_KeysetPagination covers the O(n) keyset paging used by the
 // WatchActions snapshot: pages continue after the previous page's (created_at, name)
 // instead of by OFFSET. It forces tied created_at (the bulk-created map-task case) so

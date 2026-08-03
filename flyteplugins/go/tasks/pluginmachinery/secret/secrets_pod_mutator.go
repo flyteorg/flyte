@@ -67,6 +67,14 @@ func (s *SecretsPodMutator) Mutate(ctx context.Context, pod *corev1.Pod) (newP *
 	return pod, len(secrets) > 0, nil
 }
 
+// InvalidateCache asks every enabled injector to drop its copy of the named secret, so a
+// subsequent pod admission picks up the new value instead of waiting out the cache TTL.
+func (s *SecretsPodMutator) InvalidateCache(ctx context.Context, org, domain, project, secretName string) {
+	for _, secretManagerType := range s.enabledSecretManagerTypes {
+		s.injectors[secretManagerType].InvalidateCache(ctx, org, domain, project, secretName)
+	}
+}
+
 func (s *SecretsPodMutator) LabelSelector() *metav1.LabelSelector {
 	return &metav1.LabelSelector{
 		MatchLabels: map[string]string{

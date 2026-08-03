@@ -16,6 +16,19 @@ func NewIsRootActionFilter() interfaces.Filter {
 	return &nullFilter{field: "parent_action_name", isNull: true}
 }
 
+// NewHasPausedActionFilter matches root actions whose run contains at least one
+// action in the PAUSED phase (e.g. a human-in-the-loop gate node awaiting input).
+func NewHasPausedActionFilter() interfaces.Filter {
+	return NewRawFilter(
+		`EXISTS (SELECT 1 FROM actions a2 `+
+			`WHERE a2.project = actions.project `+
+			`AND a2.domain = actions.domain `+
+			`AND a2.run_name = actions.run_name `+
+			`AND a2.phase = ?)`,
+		int32(common.ActionPhase_ACTION_PHASE_PAUSED),
+	)
+}
+
 // NewRunActionsFilter creates a filter for all actions belonging to a specific run.
 func NewRunActionsFilter(runID *common.RunIdentifier) interfaces.Filter {
 	return NewEqualFilter("project", runID.GetProject()).
@@ -116,6 +129,31 @@ func (f *nullFilter) And(filter interfaces.Filter) interfaces.Filter {
 }
 
 func (f *nullFilter) Or(filter interfaces.Filter) interfaces.Filter {
+	return &compositeFilter{left: f, right: filter, operator: "OR"}
+}
+
+// rawFilter implements the Filter interface for hand-written SQL predicates that
+// the field/expression filters cannot express (e.g. correlated EXISTS subqueries).
+// The query must qualify its own columns; the table argument is ignored.
+type rawFilter struct {
+	query string
+	args  []interface{}
+}
+
+// NewRawFilter creates a filter from a raw SQL predicate and its bind arguments.
+func NewRawFilter(query string, args ...interface{}) interfaces.Filter {
+	return &rawFilter{query: query, args: args}
+}
+
+func (f *rawFilter) QueryExpression(table string) (interfaces.QueryExpr, error) {
+	return interfaces.QueryExpr{Query: f.query, Args: f.args}, nil
+}
+
+func (f *rawFilter) And(filter interfaces.Filter) interfaces.Filter {
+	return &compositeFilter{left: f, right: filter, operator: "AND"}
+}
+
+func (f *rawFilter) Or(filter interfaces.Filter) interfaces.Filter {
 	return &compositeFilter{left: f, right: filter, operator: "OR"}
 }
 
