@@ -43,7 +43,9 @@ type CreateLocalRunRequest struct {
 	//	*CreateLocalRunRequest_TaskId
 	//	*CreateLocalRunRequest_TaskSpec
 	Task isCreateLocalRunRequest_Task `protobuf_oneof:"task"`
-	// Reference to the run's inputs, previously uploaded via DataProxyService.UploadMetadata.
+	// Reference to the run's inputs, previously uploaded via
+	// DataProxyService.CreateUploadLocation (routed with
+	// SelectClusterRequest.OPERATION_LOCAL_RUN_DATA).
 	OffloadedInputData *common.OffloadedInputData `protobuf:"bytes,5,opt,name=offloaded_input_data,json=offloadedInputData,proto3,oneof" json:"offloaded_input_data,omitempty"`
 	// The run spec to use. Only client-relevant fields are honored; dataplane scheduling fields
 	// (queue, cluster) are ignored for local runs.

@@ -81,7 +81,9 @@ export type CreateLocalRunRequest = Message<"flyteidl2.workflow.CreateLocalRunRe
   } | { case: undefined; value?: undefined };
 
   /**
-   * Reference to the run's inputs, previously uploaded via DataProxyService.UploadMetadata.
+   * Reference to the run's inputs, previously uploaded via
+   * DataProxyService.CreateUploadLocation (routed with
+   * SelectClusterRequest.OPERATION_LOCAL_RUN_DATA).
    *
    * @generated from field: optional flyteidl2.common.OffloadedInputData offloaded_input_data = 5;
    */

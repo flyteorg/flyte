@@ -94,7 +94,9 @@ message CreateLocalRunRequest {
     task.TaskSpec task_spec = 4;
   }
 
-  // Reference to the run's inputs, previously uploaded via DataProxyService.UploadMetadata.
+  // Reference to the run's inputs, previously uploaded via
+  // DataProxyService.CreateUploadLocation (routed with
+  // SelectClusterRequest.OPERATION_LOCAL_RUN_DATA).
   optional common.OffloadedInputData offloaded_input_data = 5;
 
   // The run spec to use. Only client-relevant fields are honored; dataplane scheduling fields
