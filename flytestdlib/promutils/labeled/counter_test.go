@@ -59,6 +59,21 @@ func TestLabeledCounter(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
+	t.Run("LeadingDigit", func(t *testing.T) {
+		scope := promutils.NewScope("testscope_counter")
+		c := NewCounter("2xx", "some desc", scope)
+		assert.NotNil(t, c)
+
+		c.Inc(context.TODO())
+		expected := `
+			# HELP testscope_counter:_2xx some desc
+			# TYPE testscope_counter:_2xx counter
+			testscope_counter:_2xx{domain="",project="",task="",wf=""} 1
+		`
+		err := testutil.CollectAndCompare(c.CounterVec, strings.NewReader(expected))
+		assert.NoError(t, err)
+	})
+
 	t.Run("Unlabeled", func(t *testing.T) {
 		scope := promutils.NewScope("testscope_counter")
 		c := NewCounter("c2", "some desc", scope, EmitUnlabeledMetric)

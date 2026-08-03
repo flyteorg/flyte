@@ -49,7 +49,7 @@ func (f *fakeRawStore) Delete(context.Context, DataReference) error { return nil
 // of any network/credential dependency.
 func newTestRoutingStore(t *testing.T, schemes ...string) (*routingStore, map[string]*int32) {
 	t.Helper()
-	metrics := newDataStoreMetrics(promutils.NewTestScope())
+	metrics := newDataStoreMetrics(promutils.NewTestScope(), false)
 	counts := map[string]*int32{}
 	registry := map[string]backendFactory{}
 	for _, sc := range schemes {
@@ -138,7 +138,7 @@ func TestRoutingStore_ConcurrentFirstUseDialsOnce(t *testing.T) {
 // factory, with the given cfg. The primary is an unrelated fake store.
 func newTestRedisRoutingStore(t *testing.T, cfg *Config) (*routingStore, *int32) {
 	t.Helper()
-	metrics := newDataStoreMetrics(promutils.NewTestScope())
+	metrics := newDataStoreMetrics(promutils.NewTestScope(), false)
 	var count int32
 	registry := map[string]backendFactory{
 		TypeRedis: func(_ context.Context, scheme string, _ DataReference, _ *Config, _ *http.Client, m *dataStoreMetrics) (RawStore, error) {

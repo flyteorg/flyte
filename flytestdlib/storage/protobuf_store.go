@@ -24,6 +24,8 @@ type protoMetrics struct {
 	UnmarshalFailure             prometheus.Counter
 	WriteFailureUnrelatedToCache prometheus.Counter
 	ReadFailureUnrelatedToCache  prometheus.Counter
+	WrittenBytes                 prometheus.Counter
+	ReadBytes                    prometheus.Counter
 }
 
 // Implements ProtobufStore to marshal and unmarshal protobufs to/from a RawStore
@@ -54,6 +56,7 @@ func (s DefaultProtobufStore) ReadProtobuf(ctx context.Context, reference DataRe
 	if err != nil {
 		return errs.Wrap(err, fmt.Sprintf("readAll: %v", reference))
 	}
+	s.metrics.ReadBytes.Add(float64(len(docContents)))
 
 	t := s.metrics.UnmarshalTime.Start()
 	err = proto.Unmarshal(docContents, msg)
@@ -84,23 +87,36 @@ func (s DefaultProtobufStore) WriteProtobuf(ctx context.Context, reference DataR
 		s.metrics.WriteFailureUnrelatedToCache.Inc()
 		return err
 	}
+	s.metrics.WrittenBytes.Add(float64(len(raw)))
 	return nil
 }
 
-func newProtoMetrics(scope promutils.Scope) *protoMetrics {
+func newProtoMetrics(existingScope, canonicalScope promutils.Scope) *protoMetrics {
 	return &protoMetrics{
-		FetchLatency:                 scope.MustNewStopWatch("proto_fetch", "Time to read data before unmarshalling", time.Millisecond),
-		MarshalTime:                  scope.MustNewStopWatch("marshal", "Time incurred in marshalling data before writing", time.Millisecond),
-		UnmarshalTime:                scope.MustNewStopWatch("unmarshal", "Time incurred in unmarshalling received data", time.Millisecond),
-		MarshalFailure:               scope.MustNewCounter("marshal_failure", "Failures when marshalling"),
-		UnmarshalFailure:             scope.MustNewCounter("unmarshal_failure", "Failures when unmarshalling"),
-		WriteFailureUnrelatedToCache: scope.MustNewCounter("write_failure_unrelated_to_cache", "Raw store write failures that are not caused by ErrFailedToWriteCache"),
-		ReadFailureUnrelatedToCache:  scope.MustNewCounter("read_failure_unrelated_to_cache", "Raw store read failures that are not caused by ErrFailedToWriteCache"),
+		FetchLatency: existingScope.MustNewStopWatch(
+			"proto_fetch", "Time to read data before unmarshalling", time.Millisecond,
+		),
+		MarshalTime: existingScope.MustNewStopWatch(
+			"marshal", "Time incurred in marshalling data before writing", time.Millisecond,
+		),
+		UnmarshalTime: existingScope.MustNewStopWatch(
+			"unmarshal", "Time incurred in unmarshalling received data", time.Millisecond,
+		),
+		MarshalFailure:   existingScope.MustNewCounter("marshal_failure", "Failures when marshalling"),
+		UnmarshalFailure: existingScope.MustNewCounter("unmarshal_failure", "Failures when unmarshalling"),
+		WriteFailureUnrelatedToCache: existingScope.MustNewCounter(
+			"write_failure_unrelated_to_cache", "Raw store write failures that are not caused by ErrFailedToWriteCache",
+		),
+		ReadFailureUnrelatedToCache: existingScope.MustNewCounter(
+			"read_failure_unrelated_to_cache", "Raw store read failures that are not caused by ErrFailedToWriteCache",
+		),
+		WrittenBytes: canonicalScope.MustNewCounter("written_bytes_total", "Bytes written after marshalling"),
+		ReadBytes:    canonicalScope.MustNewCounter("read_bytes_total", "Bytes read before unmarshalling"),
 	}
 }
 
 func NewDefaultProtobufStore(store RawStore, scope promutils.Scope) DefaultProtobufStore {
-	return NewDefaultProtobufStoreWithMetrics(store, newProtoMetrics(scope))
+	return NewDefaultProtobufStoreWithMetrics(store, newProtoMetrics(scope, scope))
 }
 
 func NewDefaultProtobufStoreWithMetrics(store RawStore, metrics *protoMetrics) DefaultProtobufStore {

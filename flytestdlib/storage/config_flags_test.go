@@ -141,6 +141,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_enableLegacyMetrics", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("enableLegacyMetrics", testValue)
+			if vBool, err := cmdFlags.GetBool("enableLegacyMetrics"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.EnableLegacyMetrics)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_container", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

@@ -42,14 +42,37 @@ func TestNewScope(t *testing.T) {
 	})
 	s := NewScope("test")
 	assert.Equal(t, "test:", s.CurrentScope())
+	assert.Equal(t, "_2scope:", NewScope("2scope").CurrentScope())
 	assert.Equal(t, "test:hello:", s.NewSubScope("hello").CurrentScope())
 	assert.Panics(t, func() {
 		s.NewSubScope("")
 	})
 	assert.Equal(t, "test:timer_x", s.NewScopedMetricName("timer_x"))
+	assert.Equal(t, "test:_2xx", s.NewScopedMetricName("2xx"))
 	assert.Equal(t, "test:hello:timer:", s.NewSubScope("hello").NewSubScope("timer").CurrentScope())
 	assert.Equal(t, "test:hello:timer:", s.NewSubScope("hello").NewSubScope("timer:").CurrentScope())
 	assert.Equal(t, "test:k8s_array:test_1:", s.NewSubScope("k8s-array").NewSubScope("test-1:").CurrentScope())
+}
+
+func TestSanitizeMetricName(t *testing.T) {
+	testCases := []struct {
+		name     string
+		expected string
+	}{
+		{name: "metric", expected: "metric"},
+		{name: "test-1", expected: "test_1"},
+		{name: "2xx", expected: "_2xx"},
+		{name: ".2xx", expected: "_2xx"},
+		{name: "_2xx", expected: "_2xx"},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			actual := SanitizeMetricName(testCase.name)
+			assert.Equal(t, testCase.expected, actual)
+			assert.Equal(t, actual, SanitizeMetricName(actual))
+		})
+	}
 }
 
 func TestMetricsScope(t *testing.T) {

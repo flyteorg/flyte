@@ -9,6 +9,7 @@ import (
 	"runtime/debug"
 	"testing"
 
+	"github.com/prometheus/client_golang/prometheus/testutil"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/ioutils"
@@ -166,12 +167,15 @@ func TestCachedRawStore(t *testing.T) {
 	})
 
 	t.Run("ReadCachePopulate", func(t *testing.T) {
+		readBytes := testutil.ToFloat64(metrics.cacheMetrics.CacheReadBytes)
+		writeBytes := testutil.ToFloat64(metrics.cacheMetrics.CacheWriteBytes)
 		o, err := cStore.ReadRaw(ctx, k1)
 		assert.NoError(t, err)
 		b, err := io.ReadAll(o)
 		assert.NoError(t, err)
 		assert.Equal(t, d1, b)
 		assert.True(t, readCalled)
+		assert.Equal(t, writeBytes+float64(len(d1)), testutil.ToFloat64(metrics.cacheMetrics.CacheWriteBytes))
 		readCalled = false
 		o, err = cStore.ReadRaw(ctx, k1)
 		assert.NoError(t, err)
@@ -179,6 +183,7 @@ func TestCachedRawStore(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, d1, b)
 		assert.False(t, readCalled)
+		assert.Equal(t, readBytes+float64(len(d1)), testutil.ToFloat64(metrics.cacheMetrics.CacheReadBytes))
 	})
 
 	t.Run("ReadFail", func(t *testing.T) {
@@ -189,9 +194,12 @@ func TestCachedRawStore(t *testing.T) {
 	})
 
 	t.Run("WriteAndRead", func(t *testing.T) {
+		readBytes := testutil.ToFloat64(metrics.cacheMetrics.CacheReadBytes)
+		writeBytes := testutil.ToFloat64(metrics.cacheMetrics.CacheWriteBytes)
 		readCalled = false
 		assert.NoError(t, cStore.WriteRaw(ctx, k2, int64(len(d2)), Options{}, bytes.NewReader(d2)))
 		assert.True(t, writeCalled)
+		assert.Equal(t, writeBytes+float64(len(d2)), testutil.ToFloat64(metrics.cacheMetrics.CacheWriteBytes))
 
 		o, err := cStore.ReadRaw(ctx, k2)
 		assert.NoError(t, err)
@@ -199,14 +207,18 @@ func TestCachedRawStore(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, d2, b)
 		assert.False(t, readCalled)
+		assert.Equal(t, readBytes+float64(len(d2)), testutil.ToFloat64(metrics.cacheMetrics.CacheReadBytes))
 	})
 
 	t.Run("WriteAndReadBigData", func(t *testing.T) {
+		writeBytes := testutil.ToFloat64(metrics.cacheMetrics.CacheWriteBytes)
+		writeErrors := testutil.ToFloat64(metrics.cacheMetrics.CacheWriteError)
 		writeCalled = false
 		readCalled = false
 		err := cStore.WriteRaw(ctx, bigK, int64(len(bigD)), Options{}, bytes.NewReader(bigD))
 		assert.True(t, writeCalled)
 		assert.True(t, IsFailedWriteToCache(err))
+		assert.Equal(t, writeBytes, testutil.ToFloat64(metrics.cacheMetrics.CacheWriteBytes))
 
 		o, err := cStore.ReadRaw(ctx, bigK)
 		assert.True(t, IsFailedWriteToCache(err))
@@ -214,6 +226,8 @@ func TestCachedRawStore(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, bigD, b)
 		assert.True(t, readCalled)
+		assert.Equal(t, writeBytes, testutil.ToFloat64(metrics.cacheMetrics.CacheWriteBytes))
+		assert.Equal(t, writeErrors+2, testutil.ToFloat64(metrics.cacheMetrics.CacheWriteError))
 	})
 
 	t.Run("DeleteExists", func(t *testing.T) {

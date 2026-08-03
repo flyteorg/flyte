@@ -5,6 +5,8 @@ import (
 	"context"
 	"io"
 	"runtime/debug"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/coocood/freecache"
@@ -19,12 +21,41 @@ import (
 
 const neverExpire = 0
 
-// TODO Freecache has bunch of metrics it calculates. Lets write a prom collector to publish these metrics
+type freecacheCollector struct {
+	cache          atomic.Pointer[freecache.Cache]
+	registerOnce   sync.Once
+	entryCount     *prometheus.Desc
+	evacuateCount  *prometheus.Desc
+	overwriteCount *prometheus.Desc
+	expiredCount   *prometheus.Desc
+}
+
+func (c *freecacheCollector) Describe(ch chan<- *prometheus.Desc) {
+	ch <- c.entryCount
+	ch <- c.evacuateCount
+	ch <- c.overwriteCount
+	ch <- c.expiredCount
+}
+
+func (c *freecacheCollector) Collect(ch chan<- prometheus.Metric) {
+	cache := c.cache.Load()
+	if cache == nil {
+		return
+	}
+	ch <- prometheus.MustNewConstMetric(c.entryCount, prometheus.GaugeValue, float64(cache.EntryCount()))
+	ch <- prometheus.MustNewConstMetric(c.evacuateCount, prometheus.CounterValue, float64(cache.EvacuateCount()))
+	ch <- prometheus.MustNewConstMetric(c.overwriteCount, prometheus.CounterValue, float64(cache.OverwriteCount()))
+	ch <- prometheus.MustNewConstMetric(c.expiredCount, prometheus.CounterValue, float64(cache.ExpiredCount()))
+}
+
 type cacheMetrics struct {
 	CacheHit        prometheus.Counter
 	CacheMiss       prometheus.Counter
 	CacheWriteError prometheus.Counter
 	FetchLatency    promutils.StopWatch
+	CacheReadBytes  prometheus.Counter
+	CacheWriteBytes prometheus.Counter
+	collector       *freecacheCollector
 }
 
 type cachedRawStore struct {
@@ -59,6 +90,7 @@ func (s *cachedRawStore) ReadRaw(ctx context.Context, reference DataReference) (
 	if oRaw, err := s.cache.Get(key); err == nil {
 		// Found, Cache hit
 		s.metrics.CacheHit.Inc()
+		s.metrics.CacheReadBytes.Add(float64(len(oRaw)))
 		return ioutils.NewBytesReadCloser(oRaw), nil
 	}
 	s.metrics.CacheMiss.Inc()
@@ -81,8 +113,11 @@ func (s *cachedRawStore) ReadRaw(ctx context.Context, reference DataReference) (
 
 	err = s.cache.Set(key, b, 0)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to Cache the metadata")
+		s.metrics.CacheWriteError.Inc()
 		err = errors.Wrapf(ErrFailedToWriteCache, err, "Failed to Cache the metadata")
+		logger.Warn(ctx, err.Error())
+	} else {
+		s.metrics.CacheWriteBytes.Add(float64(len(b)))
 	}
 
 	return ioutils.NewBytesReadCloser(b), err
@@ -104,6 +139,9 @@ func (s *cachedRawStore) WriteRaw(ctx context.Context, reference DataReference, 
 	if err != nil {
 		s.metrics.CacheWriteError.Inc()
 		err = errors.Wrapf(ErrFailedToWriteCache, err, "Failed to Cache the metadata")
+		logger.Warn(ctx, err.Error())
+	} else {
+		s.metrics.CacheWriteBytes.Add(float64(buf.Len()))
 	}
 
 	return err
@@ -121,12 +159,36 @@ func (s *cachedRawStore) Delete(ctx context.Context, reference DataReference) er
 	return s.RawStore.Delete(ctx, reference)
 }
 
-func newCacheMetrics(scope promutils.Scope) *cacheMetrics {
+func newCacheMetrics(existingScope, canonicalScope promutils.Scope) *cacheMetrics {
 	return &cacheMetrics{
-		FetchLatency:    scope.MustNewStopWatch("remote_fetch", "Total Time to read from remote metastore", time.Millisecond),
-		CacheHit:        scope.MustNewCounter("cache_hit", "Number of times metadata was found in cache"),
-		CacheMiss:       scope.MustNewCounter("cache_miss", "Number of times metadata was not found in cache and remote fetch was required"),
-		CacheWriteError: scope.MustNewCounter("cache_write_err", "Failed to write to cache"),
+		FetchLatency: existingScope.MustNewStopWatch(
+			"remote_fetch", "Total Time to read from remote metastore", time.Millisecond,
+		),
+		CacheHit: existingScope.MustNewCounter("cache_hit", "Number of times metadata was found in cache"),
+		CacheMiss: existingScope.MustNewCounter(
+			"cache_miss", "Number of times metadata was not found in cache and remote fetch was required",
+		),
+		CacheWriteError: existingScope.MustNewCounter("cache_write_err", "Failed to write to cache"),
+		CacheReadBytes:  canonicalScope.MustNewCounter("read_bytes_total", "Bytes read from in-memory cache"),
+		CacheWriteBytes: canonicalScope.MustNewCounter("write_bytes_total", "Bytes written to in-memory cache"),
+		collector: &freecacheCollector{
+			entryCount: prometheus.NewDesc(
+				canonicalScope.NewScopedMetricName("entry_count"),
+				"Current number of entries in the in-memory cache", nil, nil,
+			),
+			evacuateCount: prometheus.NewDesc(
+				canonicalScope.NewScopedMetricName("evacuate_count_total"),
+				"Number of entries evicted from the in-memory cache due to memory pressure", nil, nil,
+			),
+			overwriteCount: prometheus.NewDesc(
+				canonicalScope.NewScopedMetricName("overwrite_count_total"),
+				"Number of times an entry was overwritten in the in-memory cache", nil, nil,
+			),
+			expiredCount: prometheus.NewDesc(
+				canonicalScope.NewScopedMetricName("expired_count_total"),
+				"Number of entries expired from the in-memory cache", nil, nil,
+			),
+		},
 	}
 }
 
@@ -136,11 +198,17 @@ func newCachedRawStore(cfg *Config, store RawStore, metrics *cacheMetrics) RawSt
 		if cfg.Cache.TargetGCPercent > 0 {
 			debug.SetGCPercent(cfg.Cache.TargetGCPercent)
 		}
+		fc := freecache.NewCache(cfg.Cache.MaxSizeMegabytes * 1024 * 1024)
+		metrics.collector.cache.Store(fc)
+		metrics.collector.registerOnce.Do(func() {
+			prometheus.MustRegister(metrics.collector)
+		})
 		return &cachedRawStore{
 			RawStore: store,
-			cache:    freecache.NewCache(cfg.Cache.MaxSizeMegabytes * 1024 * 1024),
+			cache:    fc,
 			metrics:  metrics,
 		}
 	}
+	metrics.collector.cache.Store(nil)
 	return store
 }
