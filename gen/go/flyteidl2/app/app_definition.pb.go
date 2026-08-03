@@ -127,11 +127,13 @@ const (
 	// legitimate terminal state meaning "failed for an unclassified reason";
 	// consumers must not assume every FAILED condition carries a specific substate.
 	Status_SUBSTATE_UNSPECIFIED Status_Substate = 0
-	// The container image is being pulled.
+	// The container image is being pulled. Qualifies DEPLOYMENT_STATUS_DEPLOYING.
 	Status_PULLING_IMAGE Status_Substate = 1
-	// The container is starting up.
+	// The container is starting up. Qualifies DEPLOYMENT_STATUS_DEPLOYING.
 	Status_INITIALIZING Status_Substate = 2
-	// The Knative admission webhook rejected the revision.
+	// The Knative admission webhook rejected the revision. Qualifies
+	// DEPLOYMENT_STATUS_DEPLOYING while the rejection may still resolve
+	// (admission is retried), and DEPLOYMENT_STATUS_FAILED once terminal.
 	Status_WEBHOOK_ERROR Status_Substate = 3
 	// The container image could not be pulled.
 	Status_IMAGE_PULL_ERROR Status_Substate = 4
@@ -142,12 +144,16 @@ const (
 	// The container was killed for exceeding its memory limit.
 	Status_OOM_KILLED Status_Substate = 7
 	// The app is serving normally. Qualifies DEPLOYMENT_STATUS_ACTIVE.
+	// An ACTIVE+RUNNING condition newer than a FAILED condition for the same
+	// deployment means the failure resolved in place (the service became Ready
+	// without a redeploy); a bare ACTIVE with SUBSTATE_UNSPECIFIED carries no
+	// such recovery meaning.
 	Status_RUNNING Status_Substate = 8
 	// The app has zero replicas and is idle; it will scale up on the first request.
 	// Qualifies DEPLOYMENT_STATUS_ACTIVE.
 	Status_SCALED_TO_ZERO Status_Substate = 9
-	// The app is cold-starting from zero replicas after receiving a request.
-	// Qualifies DEPLOYMENT_STATUS_ACTIVE.
+	// The app is cold-starting from zero replicas, typically after receiving
+	// a request. Qualifies DEPLOYMENT_STATUS_ACTIVE.
 	Status_SCALING_FROM_ZERO Status_Substate = 10
 	// Desired replicas exceed actual replicas. Qualifies DEPLOYMENT_STATUS_ACTIVE.
 	// Replaces the deprecated top-level DEPLOYMENT_STATUS_SCALING_UP.

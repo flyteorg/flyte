@@ -443,21 +443,23 @@ export enum Status_Substate {
   SUBSTATE_UNSPECIFIED = 0,
 
   /**
-   * The container image is being pulled.
+   * The container image is being pulled. Qualifies DEPLOYMENT_STATUS_DEPLOYING.
    *
    * @generated from enum value: PULLING_IMAGE = 1;
    */
   PULLING_IMAGE = 1,
 
   /**
-   * The container is starting up.
+   * The container is starting up. Qualifies DEPLOYMENT_STATUS_DEPLOYING.
    *
    * @generated from enum value: INITIALIZING = 2;
    */
   INITIALIZING = 2,
 
   /**
-   * The Knative admission webhook rejected the revision.
+   * The Knative admission webhook rejected the revision. Qualifies
+   * DEPLOYMENT_STATUS_DEPLOYING while the rejection may still resolve
+   * (admission is retried), and DEPLOYMENT_STATUS_FAILED once terminal.
    *
    * @generated from enum value: WEBHOOK_ERROR = 3;
    */
@@ -493,6 +495,10 @@ export enum Status_Substate {
 
   /**
    * The app is serving normally. Qualifies DEPLOYMENT_STATUS_ACTIVE.
+   * An ACTIVE+RUNNING condition newer than a FAILED condition for the same
+   * deployment means the failure resolved in place (the service became Ready
+   * without a redeploy); a bare ACTIVE with SUBSTATE_UNSPECIFIED carries no
+   * such recovery meaning.
    *
    * @generated from enum value: RUNNING = 8;
    */
@@ -507,8 +513,8 @@ export enum Status_Substate {
   SCALED_TO_ZERO = 9,
 
   /**
-   * The app is cold-starting from zero replicas after receiving a request.
-   * Qualifies DEPLOYMENT_STATUS_ACTIVE.
+   * The app is cold-starting from zero replicas, typically after receiving
+   * a request. Qualifies DEPLOYMENT_STATUS_ACTIVE.
    *
    * @generated from enum value: SCALING_FROM_ZERO = 10;
    */

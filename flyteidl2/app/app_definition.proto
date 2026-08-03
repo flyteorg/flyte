@@ -165,11 +165,13 @@ message Status {
     // legitimate terminal state meaning "failed for an unclassified reason";
     // consumers must not assume every FAILED condition carries a specific substate.
     SUBSTATE_UNSPECIFIED = 0;
-    // The container image is being pulled.
+    // The container image is being pulled. Qualifies DEPLOYMENT_STATUS_DEPLOYING.
     PULLING_IMAGE = 1;
-    // The container is starting up.
+    // The container is starting up. Qualifies DEPLOYMENT_STATUS_DEPLOYING.
     INITIALIZING = 2;
-    // The Knative admission webhook rejected the revision.
+    // The Knative admission webhook rejected the revision. Qualifies
+    // DEPLOYMENT_STATUS_DEPLOYING while the rejection may still resolve
+    // (admission is retried), and DEPLOYMENT_STATUS_FAILED once terminal.
     WEBHOOK_ERROR = 3;
     // The container image could not be pulled.
     IMAGE_PULL_ERROR = 4;
@@ -180,12 +182,16 @@ message Status {
     // The container was killed for exceeding its memory limit.
     OOM_KILLED = 7;
     // The app is serving normally. Qualifies DEPLOYMENT_STATUS_ACTIVE.
+    // An ACTIVE+RUNNING condition newer than a FAILED condition for the same
+    // deployment means the failure resolved in place (the service became Ready
+    // without a redeploy); a bare ACTIVE with SUBSTATE_UNSPECIFIED carries no
+    // such recovery meaning.
     RUNNING = 8;
     // The app has zero replicas and is idle; it will scale up on the first request.
     // Qualifies DEPLOYMENT_STATUS_ACTIVE.
     SCALED_TO_ZERO = 9;
-    // The app is cold-starting from zero replicas after receiving a request.
-    // Qualifies DEPLOYMENT_STATUS_ACTIVE.
+    // The app is cold-starting from zero replicas, typically after receiving
+    // a request. Qualifies DEPLOYMENT_STATUS_ACTIVE.
     SCALING_FROM_ZERO = 10;
     // Desired replicas exceed actual replicas. Qualifies DEPLOYMENT_STATUS_ACTIVE.
     // Replaces the deprecated top-level DEPLOYMENT_STATUS_SCALING_UP.
