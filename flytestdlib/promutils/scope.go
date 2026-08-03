@@ -518,7 +518,7 @@ func (m metricsScope) NewScopedMetricName(name string) string {
 		panic("metric name cannot be an empty string")
 	}
 
-	return SanitizeMetricName(m.scope + name)
+	return m.scope + SanitizeMetricName(name)
 }
 
 func (m metricsScope) NewSubScope(subscopeName string) Scope {
@@ -552,13 +552,20 @@ func NewScope(name string) Scope {
 	}
 }
 
-// SanitizeMetricName ensures the generates metric name is compatible with the underlying prometheus library.
+// SanitizeMetricName returns a Prometheus-compatible metric name. If the first retained character is a digit,
+// the name is prefixed with an underscore.
 func SanitizeMetricName(name string) string {
 	out := strings.Builder{}
-	for i, b := range name {
-		if (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || b == '_' || b == ':' || (b >= '0' && b <= '9' && i > 0) {
+	for _, b := range name {
+		switch {
+		case (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || b == '_' || b == ':':
 			out.WriteRune(b)
-		} else if b == '-' {
+		case b >= '0' && b <= '9':
+			if out.Len() == 0 {
+				out.WriteRune('_')
+			}
+			out.WriteRune(b)
+		case b == '-':
 			out.WriteRune('_')
 		}
 	}

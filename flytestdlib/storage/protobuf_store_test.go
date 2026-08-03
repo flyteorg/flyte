@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -11,9 +12,11 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	errs "github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/ioutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/stow/s3"
 )
@@ -110,6 +113,36 @@ func TestDefaultProtobufStore(t *testing.T) {
 
 		assert.EqualError(t, err, "initContainer is required even with `enable-multicontainer`")
 	})
+}
+
+func TestDefaultProtobufStoreByteMetrics(t *testing.T) {
+	message := &mockProtoMessage{X: 5}
+	raw, err := proto.Marshal(message)
+	require.NoError(t, err)
+
+	store := &dummyStore{
+		WriteRawCb: func(_ context.Context, _ DataReference, size int64, _ Options, reader io.Reader) error {
+			actual, err := io.ReadAll(reader)
+			require.NoError(t, err)
+			require.Equal(t, int64(len(raw)), size)
+			require.True(t, bytes.Equal(raw, actual))
+			return nil
+		},
+		ReadRawCb: func(_ context.Context, _ DataReference) (io.ReadCloser, error) {
+			return ioutils.NewBytesReadCloser(raw), nil
+		},
+	}
+	scope := promutils.NewTestScope()
+	protoMetrics := newProtoMetrics(scope, scope)
+	protobufStore := NewDefaultProtobufStoreWithMetrics(store, protoMetrics)
+
+	require.NoError(t, protobufStore.WriteProtobuf(context.Background(), "key", Options{}, message))
+	require.Equal(t, float64(len(raw)), testutil.ToFloat64(protoMetrics.WrittenBytes))
+
+	readMessage := &mockProtoMessage{}
+	require.NoError(t, protobufStore.ReadProtobuf(context.Background(), "key", readMessage))
+	require.Equal(t, float64(len(raw)), testutil.ToFloat64(protoMetrics.ReadBytes))
+	require.Equal(t, message.X, readMessage.X)
 }
 
 func TestDefaultProtobufStore_BigDataReadAfterWrite(t *testing.T) {

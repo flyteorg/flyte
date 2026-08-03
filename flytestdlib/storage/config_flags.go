@@ -53,6 +53,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "type"), defaultConfig.Type, "Sets the type of storage [s3/minio/local/mem/stow/redis].")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "stow.kind"), defaultConfig.Stow.Kind, "Kind of Stow backend to use. Refer to github/flyteorg/stow")
 	cmdFlags.StringToString(fmt.Sprintf("%v%v", prefix, "stow.config"), defaultConfig.Stow.Config, "Configuration for stow backend. Refer to github/flyteorg/stow")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "enableLegacyMetrics"), defaultConfig.EnableLegacyMetrics, "Publish legacy unscoped storage metric aliases. Requires a service restart when changed.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "container"), defaultConfig.InitContainer, "Initial container (in s3 a bucket) to create -if it doesn't exist-.'")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "enable-multicontainer"), defaultConfig.MultiContainerEnabled, "If this is true,  then the container argument is overlooked and redundant. This config will automatically open new connections to new containers/buckets as they are encountered")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "cache.max_size_mbs"), defaultConfig.Cache.MaxSizeMegabytes, "Maximum size of the cache where the Blob store data is cached in-memory. If not specified or set to 0,  cache is not used")

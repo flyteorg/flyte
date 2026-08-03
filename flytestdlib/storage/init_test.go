@@ -11,5 +11,5 @@ var metrics *dataStoreMetrics
 func init() {
 	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
 	scope := promutils.NewTestScope()
-	metrics = newDataStoreMetrics(scope)
+	metrics = newDataStoreMetrics(scope, false)
 }

@@ -77,13 +77,25 @@ type dataStoreMetrics struct {
 	stowMetrics  *stowMetrics
 }
 
-// newDataStoreMetrics initialises all metrics required for DataStore
-func newDataStoreMetrics(scope promutils.Scope) *dataStoreMetrics {
+// newDataStoreMetrics initialises all metrics required for DataStore.
+func newDataStoreMetrics(scope promutils.Scope, enableLegacyMetrics bool) *dataStoreMetrics {
+	cacheScope := scope.NewSubScope("cache")
+	protoScope := scope.NewSubScope("proto")
+	stowScope := scope.NewSubScope("stow")
+	cacheExistingScope := cacheScope
+	protoExistingScope := protoScope
+	stowExistingScope := stowScope
+	if enableLegacyMetrics {
+		cacheExistingScope = promutils.NewMirroredScope(cacheScope, scope)
+		protoExistingScope = promutils.NewMirroredScope(protoScope, scope)
+		stowExistingScope = promutils.NewMirroredScope(stowScope, scope)
+	}
+
 	return &dataStoreMetrics{
-		cacheMetrics: newCacheMetrics(scope),
-		protoMetrics: newProtoMetrics(scope),
+		cacheMetrics: newCacheMetrics(cacheExistingScope, cacheScope),
+		protoMetrics: newProtoMetrics(protoExistingScope, protoScope),
 		copyMetrics:  newCopyMetrics(scope.NewSubScope("copy")),
-		stowMetrics:  newStowMetrics(scope),
+		stowMetrics:  newStowMetrics(stowExistingScope),
 	}
 }
 
@@ -94,7 +106,7 @@ func NewDataStore(cfg *Config, scope promutils.Scope) (s *DataStore, err error) 
 
 // NewDataStoreWithContext creates a new Data Store with the supplied config and context.
 func NewDataStoreWithContext(ctx context.Context, cfg *Config, scope promutils.Scope) (s *DataStore, err error) {
-	ds := &DataStore{metrics: newDataStoreMetrics(scope)}
+	ds := &DataStore{metrics: newDataStoreMetrics(scope, cfg.EnableLegacyMetrics)}
 	return ds, ds.RefreshConfig(ctx, cfg)
 }
 

@@ -58,6 +58,9 @@ type Config struct {
 	Type  Type        `json:"type" pflag:",Sets the type of storage [s3/minio/local/mem/stow/redis]."`
 	Stow  StowConfig  `json:"stow,omitempty" pflag:",Storage config for stow backend."`
 	Redis RedisConfig `json:"redis,omitempty" pflag:"-,Storage config for the redis backend."`
+	// EnableLegacyMetrics publishes aliases for storage metrics that predate the cache, proto, and stow subscopes.
+	// Changing this value requires recreating the DataStore.
+	EnableLegacyMetrics bool `json:"enableLegacyMetrics" pflag:",Publish legacy unscoped storage metric aliases. Requires a service restart when changed."` //nolint:lll
 
 	// Container here is misleading, it refers to a Bucket (AWS S3) like blobstore entity. In some terms it could be a table
 	InitContainer string `json:"container" pflag:",Initial container (in s3 a bucket) to create -if it doesn't exist-.'"`
