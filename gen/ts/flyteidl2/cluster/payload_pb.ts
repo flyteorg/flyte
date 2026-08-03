@@ -80,9 +80,8 @@ export type SelectClusterRequest = Message<"flyteidl2.cluster.SelectClusterReque
     case: "domainId";
   } | {
     /**
-     * Names one specific cluster. Used by operations that are inherently
-     * cluster-scoped, where any other cluster in the pool would serve the
-     * wrong data.
+     * Names the cluster directly. this is for callers that already know
+     * the cluster and have nothing else to resolve from.
      *
      * @generated from field: flyteidl2.common.ClusterIdentifier cluster_id = 10;
      */

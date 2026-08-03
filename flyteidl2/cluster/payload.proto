@@ -20,9 +20,8 @@ message SelectClusterRequest {
     flyteidl2.app.Identifier app_id = 6;
     flyteidl2.common.ClusterPoolIdentifier cluster_pool_id = 7;
     flyteidl2.common.DomainIdentifier domain_id = 9;
-    // Names one specific cluster. Used by operations that are inherently
-    // cluster-scoped, where any other cluster in the pool would serve the
-    // wrong data.
+    // Names the cluster directly. this is for callers that already know
+    // the cluster and have nothing else to resolve from.
     flyteidl2.common.ClusterIdentifier cluster_id = 10;
   }
 

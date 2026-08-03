@@ -269,9 +269,8 @@ type SelectClusterRequest_DomainId struct {
 }
 
 type SelectClusterRequest_ClusterId struct {
-	// Names one specific cluster. Used by operations that are inherently
-	// cluster-scoped, where any other cluster in the pool would serve the
-	// wrong data.
+	// Names the cluster directly. this is for callers that already know
+	// the cluster and have nothing else to resolve from.
 	ClusterId *common.ClusterIdentifier `protobuf:"bytes,10,opt,name=cluster_id,json=clusterId,proto3,oneof"`
 }
 
