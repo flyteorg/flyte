@@ -42,6 +42,7 @@ class RunSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     RUN_SOURCE_WEB: _ClassVar[RunSource]
     RUN_SOURCE_CLI: _ClassVar[RunSource]
     RUN_SOURCE_SCHEDULE_TRIGGER: _ClassVar[RunSource]
+    RUN_SOURCE_ARTIFACT_TRIGGER: _ClassVar[RunSource]
 CONDITION_PROMPT_TYPE_UNSPECIFIED: ConditionPromptType
 CONDITION_PROMPT_TYPE_TEXT: ConditionPromptType
 CONDITION_PROMPT_TYPE_MARKDOWN: ConditionPromptType
@@ -53,6 +54,7 @@ RUN_SOURCE_UNSPECIFIED: RunSource
 RUN_SOURCE_WEB: RunSource
 RUN_SOURCE_CLI: RunSource
 RUN_SOURCE_SCHEDULE_TRIGGER: RunSource
+RUN_SOURCE_ARTIFACT_TRIGGER: RunSource
 
 class Run(_message.Message):
     __slots__ = ["action", "labels"]

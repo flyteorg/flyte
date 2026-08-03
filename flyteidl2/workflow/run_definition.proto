@@ -477,6 +477,7 @@ enum RunSource {
   RUN_SOURCE_WEB = 1;
   RUN_SOURCE_CLI = 2;
   RUN_SOURCE_SCHEDULE_TRIGGER = 3;
+  RUN_SOURCE_ARTIFACT_TRIGGER = 4;
 }
 
 // TaskGroup represents a group of runs for a specific task.

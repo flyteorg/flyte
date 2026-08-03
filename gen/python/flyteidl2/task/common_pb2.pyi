@@ -22,6 +22,7 @@ class TriggerAutomationSpecType(int, metaclass=_enum_type_wrapper.EnumTypeWrappe
     TYPE_UNSPECIFIED: _ClassVar[TriggerAutomationSpecType]
     TYPE_NONE: _ClassVar[TriggerAutomationSpecType]
     TYPE_SCHEDULE: _ClassVar[TriggerAutomationSpecType]
+    TYPE_ARTIFACT: _ClassVar[TriggerAutomationSpecType]
 FIXED_RATE_UNIT_UNSPECIFIED: FixedRateUnit
 FIXED_RATE_UNIT_MINUTE: FixedRateUnit
 FIXED_RATE_UNIT_HOUR: FixedRateUnit
@@ -29,6 +30,7 @@ FIXED_RATE_UNIT_DAY: FixedRateUnit
 TYPE_UNSPECIFIED: TriggerAutomationSpecType
 TYPE_NONE: TriggerAutomationSpecType
 TYPE_SCHEDULE: TriggerAutomationSpecType
+TYPE_ARTIFACT: TriggerAutomationSpecType
 
 class NamedParameter(_message.Message):
     __slots__ = ["name", "parameter"]
@@ -68,13 +70,25 @@ class Schedule(_message.Message):
     kickoff_time_input_arg: str
     def __init__(self, rate: _Optional[_Union[FixedRate, _Mapping]] = ..., cron_expression: _Optional[str] = ..., cron: _Optional[_Union[Cron, _Mapping]] = ..., kickoff_time_input_arg: _Optional[str] = ...) -> None: ...
 
+class ArtifactTrigger(_message.Message):
+    __slots__ = ["artifact_name", "version", "input_arg"]
+    ARTIFACT_NAME_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    INPUT_ARG_FIELD_NUMBER: _ClassVar[int]
+    artifact_name: str
+    version: str
+    input_arg: str
+    def __init__(self, artifact_name: _Optional[str] = ..., version: _Optional[str] = ..., input_arg: _Optional[str] = ...) -> None: ...
+
 class TriggerAutomationSpec(_message.Message):
-    __slots__ = ["type", "schedule"]
+    __slots__ = ["type", "schedule", "artifact"]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     SCHEDULE_FIELD_NUMBER: _ClassVar[int]
+    ARTIFACT_FIELD_NUMBER: _ClassVar[int]
     type: TriggerAutomationSpecType
     schedule: Schedule
-    def __init__(self, type: _Optional[_Union[TriggerAutomationSpecType, str]] = ..., schedule: _Optional[_Union[Schedule, _Mapping]] = ...) -> None: ...
+    artifact: ArtifactTrigger
+    def __init__(self, type: _Optional[_Union[TriggerAutomationSpecType, str]] = ..., schedule: _Optional[_Union[Schedule, _Mapping]] = ..., artifact: _Optional[_Union[ArtifactTrigger, _Mapping]] = ...) -> None: ...
 
 class NamedLiteral(_message.Message):
     __slots__ = ["name", "value"]

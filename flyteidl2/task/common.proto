@@ -63,6 +63,21 @@ enum TriggerAutomationSpecType {
   TYPE_UNSPECIFIED = 0;
   TYPE_NONE = 1;
   TYPE_SCHEDULE = 2;
+  TYPE_ARTIFACT = 3;
+}
+
+// Fires a run when a new version of the named artifact is created.
+message ArtifactTrigger {
+  // Name of the artifact to watch, scoped to the trigger's org/project/domain.
+  string artifact_name = 1 [(buf.validate.field).string.min_len = 1];
+
+  // Optional: fire only when exactly this version is created. Empty means any new version.
+  string version = 2;
+
+  // Name of the task input variable that the triggering artifact's value will be supplied to
+  // when the run is kicked off. Mirrors Schedule.kickoff_time_input_arg. Optional; empty means
+  // the artifact is not bound to any input.
+  string input_arg = 3;
 }
 
 message TriggerAutomationSpec {
@@ -74,7 +89,9 @@ message TriggerAutomationSpec {
   oneof automation {
     Schedule schedule = 2;
 
-    // In future will be extended with other automation types: webhook, artifacts, etc.
+    ArtifactTrigger artifact = 3;
+
+    // In future will be extended with other automation types: webhook, etc.
   }
 }
 

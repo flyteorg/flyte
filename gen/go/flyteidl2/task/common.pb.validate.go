@@ -600,6 +600,112 @@ var _ interface {
 	ErrorName() string
 } = ScheduleValidationError{}
 
+// Validate checks the field values on ArtifactTrigger with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ArtifactTrigger) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ArtifactTrigger with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ArtifactTriggerMultiError, or nil if none found.
+func (m *ArtifactTrigger) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ArtifactTrigger) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ArtifactName
+
+	// no validation rules for Version
+
+	// no validation rules for InputArg
+
+	if len(errors) > 0 {
+		return ArtifactTriggerMultiError(errors)
+	}
+
+	return nil
+}
+
+// ArtifactTriggerMultiError is an error wrapping multiple validation errors
+// returned by ArtifactTrigger.ValidateAll() if the designated constraints
+// aren't met.
+type ArtifactTriggerMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ArtifactTriggerMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ArtifactTriggerMultiError) AllErrors() []error { return m }
+
+// ArtifactTriggerValidationError is the validation error returned by
+// ArtifactTrigger.Validate if the designated constraints aren't met.
+type ArtifactTriggerValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ArtifactTriggerValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ArtifactTriggerValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ArtifactTriggerValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ArtifactTriggerValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ArtifactTriggerValidationError) ErrorName() string { return "ArtifactTriggerValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ArtifactTriggerValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sArtifactTrigger.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ArtifactTriggerValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ArtifactTriggerValidationError{}
+
 // Validate checks the field values on TriggerAutomationSpec with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -660,6 +766,47 @@ func (m *TriggerAutomationSpec) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return TriggerAutomationSpecValidationError{
 					field:  "Schedule",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *TriggerAutomationSpec_Artifact:
+		if v == nil {
+			err := TriggerAutomationSpecValidationError{
+				field:  "Automation",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetArtifact()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, TriggerAutomationSpecValidationError{
+						field:  "Artifact",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, TriggerAutomationSpecValidationError{
+						field:  "Artifact",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetArtifact()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TriggerAutomationSpecValidationError{
+					field:  "Artifact",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
