@@ -89,6 +89,16 @@ type ComplexType struct {
 
 type ComplexTypeArray []ComplexType
 
+type Plugin struct {
+	Name        string            `json:"name"`
+	Annotations map[string]string `json:"annotations"`
+}
+
+type DottedKeysConfig struct {
+	Annotations map[string]string `json:"annotations"`
+	Plugins     []Plugin          `json:"plugins"`
+}
+
 type ConfigWithLists struct {
 	ListOfStuff []ComplexType `json:"list"`
 	StringValue string        `json:"string-val"`
@@ -402,6 +412,27 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 				assert.Equal(t, "abc2", r.ItemsMap["itemB"]["itemBa"].ID)
 				assert.Equal(t, "xyz1", r.ItemsMap["itemA"]["itemAb"].ID)
 				assert.Equal(t, "xyz2", r.ItemsMap["itemB"]["itemBb"].ID)
+			})
+
+			t.Run("DottedKeysEndToEnd", func(t *testing.T) {
+				root := config.NewRootSection()
+				_, err := root.RegisterSection("dotted-keys", &DottedKeysConfig{})
+				assert.NoError(t, err)
+
+				v := provider(config.Options{
+					SearchPaths: []string{filepath.Join("testdata", "dotted_keys_config.yaml")},
+					RootSection: root,
+				})
+
+				assert.NoError(t, v.UpdateConfig(context.TODO()))
+				r := root.GetSection("dotted-keys").GetConfig().(*DottedKeysConfig)
+
+				assert.Equal(t, "false", r.Annotations["cluster-autoscaler.kubernetes.io/safe-to-evict"])
+				assert.Equal(t, "true", r.Annotations["sidecar.istio.io/inject"])
+
+				assert.Len(t, r.Plugins, 1)
+				assert.Equal(t, "KeepMyCase", r.Plugins[0].Name)
+				assert.Equal(t, "/etc/plugin", r.Plugins[0].Annotations["config.path"])
 			})
 		})
 
