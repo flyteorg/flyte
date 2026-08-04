@@ -98,6 +98,18 @@ enum LogLineOriginator {
   SYSTEM = 2;
 }
 
+// Which of the two backends a batch of lines was read from. Distinct from LogsSource, which
+// selects what a request asks for; this reports what a response actually carries.
+enum LogLineSource {
+  LOG_LINE_SOURCE_UNSPECIFIED = 0;
+
+  // Read from the Kubernetes API for a pod that is currently running.
+  LOG_LINE_SOURCE_LIVE = 1;
+
+  // Read from the persisted log backend.
+  LOG_LINE_SOURCE_PERSISTED = 2;
+}
+
 message LogLine {
   google.protobuf.Timestamp timestamp = 1;
 
@@ -126,6 +138,9 @@ message LogLines {
   // at the ends of the lines. This lets clients know whether log emitter
   // wanted to overwrite the previous line (LF) or append a new line (CRLF).
   repeated LogLine structured_lines = 4;
+
+  // Which backend these lines were read from. Every line in a batch has the same source.
+  LogLineSource source = 5;
 }
 
 message LogContainersList {

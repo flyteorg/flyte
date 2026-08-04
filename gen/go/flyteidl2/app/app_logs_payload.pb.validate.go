@@ -17,6 +17,8 @@ import (
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/types/known/anypb"
+
+	dataplane "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/logs/dataplane"
 )
 
 // ensure the imports are used
@@ -33,6 +35,8 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = dataplane.LogsSource(0)
 )
 
 // Validate checks the field values on TailLogsRequest with the rules defined
@@ -56,6 +60,8 @@ func (m *TailLogsRequest) validate(all bool) error {
 	}
 
 	var errors []error
+
+	// no validation rules for Source
 
 	switch v := m.Target.(type) {
 	case *TailLogsRequest_AppId:
@@ -442,6 +448,8 @@ func (m *LogLines) validate(all bool) error {
 		}
 
 	}
+
+	// no validation rules for Source
 
 	if len(errors) > 0 {
 		return LogLinesMultiError(errors)

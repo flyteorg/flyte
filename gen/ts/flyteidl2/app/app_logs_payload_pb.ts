@@ -9,7 +9,7 @@ import type { Identifier } from "./app_definition_pb.ts";
 import { file_flyteidl2_app_app_definition } from "./app_definition_pb.ts";
 import type { ReplicaIdentifier } from "./replica_definition_pb.ts";
 import { file_flyteidl2_app_replica_definition } from "./replica_definition_pb.ts";
-import type { LogLine, LogLines as LogLines$1 } from "../logs/dataplane/payload_pb.ts";
+import type { LogLine, LogLines as LogLines$1, LogLineSource, LogsSource } from "../logs/dataplane/payload_pb.ts";
 import { file_flyteidl2_logs_dataplane_payload } from "../logs/dataplane/payload_pb.ts";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -17,7 +17,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/app/app_logs_payload.proto.
  */
 export const file_flyteidl2_app_app_logs_payload: GenFile = /*@__PURE__*/
-  fileDesc("CiRmbHl0ZWlkbDIvYXBwL2FwcF9sb2dzX3BheWxvYWQucHJvdG8SDWZseXRlaWRsMi5hcHAihwEKD1RhaWxMb2dzUmVxdWVzdBIrCgZhcHBfaWQYASABKAsyGS5mbHl0ZWlkbDIuYXBwLklkZW50aWZpZXJIABI2CgpyZXBsaWNhX2lkGAIgASgLMiAuZmx5dGVpZGwyLmFwcC5SZXBsaWNhSWRlbnRpZmllckgAQg8KBnRhcmdldBIFukgCCAEiSwoVUmVwbGljYUlkZW50aWZpZXJMaXN0EjIKCHJlcGxpY2FzGAEgAygLMiAuZmx5dGVpZGwyLmFwcC5SZXBsaWNhSWRlbnRpZmllciKYAQoITG9nTGluZXMSEQoFbGluZXMYASADKAlCAhgBEjwKCnJlcGxpY2FfaWQYAiABKAsyIC5mbHl0ZWlkbDIuYXBwLlJlcGxpY2FJZGVudGlmaWVyQga6SAPIAQESOwoQc3RydWN0dXJlZF9saW5lcxgDIAMoCzIhLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Mb2dMaW5lIjYKDUxvZ0xpbmVzQmF0Y2gSJQoEbG9ncxgBIAMoCzIXLmZseXRlaWRsMi5hcHAuTG9nTGluZXMiyQEKEFRhaWxMb2dzUmVzcG9uc2USOAoIcmVwbGljYXMYASABKAsyJC5mbHl0ZWlkbDIuYXBwLlJlcGxpY2FJZGVudGlmaWVyTGlzdEgAEjsKCWxvZ19saW5lcxgCIAEoCzIiLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Mb2dMaW5lc0ICGAFIABIvCgdiYXRjaGVzGAMgASgLMhwuZmx5dGVpZGwyLmFwcC5Mb2dMaW5lc0JhdGNoSABCDQoEcmVzcBIFukgCCAFCsgEKEWNvbS5mbHl0ZWlkbDIuYXBwQhNBcHBMb2dzUGF5bG9hZFByb3RvSAJQAVoxZ2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2FwcKICA0ZBWKoCDUZseXRlaWRsMi5BcHDKAg1GbHl0ZWlkbDJcQXBw4gIZRmx5dGVpZGwyXEFwcFxHUEJNZXRhZGF0YeoCDkZseXRlaWRsMjo6QXBwYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_app_app_definition, file_flyteidl2_app_replica_definition, file_flyteidl2_logs_dataplane_payload]);
+  fileDesc("CiRmbHl0ZWlkbDIvYXBwL2FwcF9sb2dzX3BheWxvYWQucHJvdG8SDWZseXRlaWRsMi5hcHAivQEKD1RhaWxMb2dzUmVxdWVzdBIrCgZhcHBfaWQYASABKAsyGS5mbHl0ZWlkbDIuYXBwLklkZW50aWZpZXJIABI2CgpyZXBsaWNhX2lkGAIgASgLMiAuZmx5dGVpZGwyLmFwcC5SZXBsaWNhSWRlbnRpZmllckgAEjQKBnNvdXJjZRgDIAEoDjIkLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Mb2dzU291cmNlQg8KBnRhcmdldBIFukgCCAEiSwoVUmVwbGljYUlkZW50aWZpZXJMaXN0EjIKCHJlcGxpY2FzGAEgAygLMiAuZmx5dGVpZGwyLmFwcC5SZXBsaWNhSWRlbnRpZmllciLRAQoITG9nTGluZXMSEQoFbGluZXMYASADKAlCAhgBEjwKCnJlcGxpY2FfaWQYAiABKAsyIC5mbHl0ZWlkbDIuYXBwLlJlcGxpY2FJZGVudGlmaWVyQga6SAPIAQESOwoQc3RydWN0dXJlZF9saW5lcxgDIAMoCzIhLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Mb2dMaW5lEjcKBnNvdXJjZRgEIAEoDjInLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Mb2dMaW5lU291cmNlIjYKDUxvZ0xpbmVzQmF0Y2gSJQoEbG9ncxgBIAMoCzIXLmZseXRlaWRsMi5hcHAuTG9nTGluZXMiyQEKEFRhaWxMb2dzUmVzcG9uc2USOAoIcmVwbGljYXMYASABKAsyJC5mbHl0ZWlkbDIuYXBwLlJlcGxpY2FJZGVudGlmaWVyTGlzdEgAEjsKCWxvZ19saW5lcxgCIAEoCzIiLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Mb2dMaW5lc0ICGAFIABIvCgdiYXRjaGVzGAMgASgLMhwuZmx5dGVpZGwyLmFwcC5Mb2dMaW5lc0JhdGNoSABCDQoEcmVzcBIFukgCCAFCsgEKEWNvbS5mbHl0ZWlkbDIuYXBwQhNBcHBMb2dzUGF5bG9hZFByb3RvSAJQAVoxZ2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2FwcKICA0ZBWKoCDUZseXRlaWRsMi5BcHDKAg1GbHl0ZWlkbDJcQXBw4gIZRmx5dGVpZGwyXEFwcFxHUEJNZXRhZGF0YeoCDkZseXRlaWRsMjo6QXBwYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_app_app_definition, file_flyteidl2_app_replica_definition, file_flyteidl2_logs_dataplane_payload]);
 
 /**
  * @generated from message flyteidl2.app.TailLogsRequest
@@ -43,6 +43,15 @@ export type TailLogsRequest = Message<"flyteidl2.app.TailLogsRequest"> & {
     value: ReplicaIdentifier;
     case: "replicaId";
   } | { case: undefined; value?: undefined };
+
+  /**
+   * Which backends to stream from. Defaults to LIVE_OR_PERSISTED. Use LIVE_ONLY to get the live
+   * tail without paying for a persisted-history scan, and re-request with LIVE_OR_PERSISTED when
+   * the history is actually wanted.
+   *
+   * @generated from field: flyteidl2.logs.dataplane.LogsSource source = 3;
+   */
+  source: LogsSource;
 };
 
 /**
@@ -88,6 +97,13 @@ export type LogLines = Message<"flyteidl2.app.LogLines"> & {
    * @generated from field: repeated flyteidl2.logs.dataplane.LogLine structured_lines = 3;
    */
   structuredLines: LogLine[];
+
+  /**
+   * Which backend these lines were read from. Every line in a batch has the same source.
+   *
+   * @generated from field: flyteidl2.logs.dataplane.LogLineSource source = 4;
+   */
+  source: LogLineSource;
 };
 
 /**
