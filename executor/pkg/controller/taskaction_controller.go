@@ -103,7 +103,7 @@ type TaskActionReconciler struct {
 	cluster           string
 	MaxSystemFailures uint32
 	// RequeueDuration overrides how long to wait before reconciling a running
-	// TaskAction again. Zero means TaskActionDefaultRequeueDuration.
+	// TaskAction again. Any non-positive value means TaskActionDefaultRequeueDuration.
 	RequeueDuration time.Duration
 	metrics         *taskActionMetrics
 }
@@ -153,8 +153,9 @@ func (r *TaskActionReconciler) maxSystemFailures() uint32 {
 }
 
 // requeueDuration is how long to wait before reconciling a running TaskAction
-// again. It also bounds the cache reservation heartbeat, so a serializable
-// reservation is held at least until the next reconcile.
+// again. Any non-positive value falls back to TaskActionDefaultRequeueDuration.
+// It is also the cache reservation heartbeat requested from cache_service; see
+// cacheReservationHeartbeat for what that does and does not guarantee.
 func (r *TaskActionReconciler) requeueDuration() time.Duration {
 	if r.RequeueDuration <= 0 {
 		return TaskActionDefaultRequeueDuration
