@@ -51,6 +51,12 @@ class TracedRunService(Protocol):
     async def abort_run(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    def stream_logs(self, request: AsyncIterator[flyteidl2_dot_workflow_dot_traced__run__service__pb2.StreamLogsRequest], ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_workflow_dot_traced__run__service__pb2.StreamLogsResponse]:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    def tail_logs(self, request: flyteidl2_dot_workflow_dot_traced__run__service__pb2.TailTracedLogsRequest, ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_workflow_dot_traced__run__service__pb2.TailTracedLogsResponse]:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
 
 class TracedRunServiceASGIApplication(ConnectASGIApplication[TracedRunService]):
     def __init__(self, service: TracedRunService | AsyncGenerator[TracedRunService], *, interceptors: Iterable[Interceptor]=(), read_max_bytes: int | None = None, compressions: Iterable[Compression] | None = None) -> None:
@@ -166,6 +172,26 @@ class TracedRunServiceASGIApplication(ConnectASGIApplication[TracedRunService]):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.abort_run,
+                ),
+                "/flyteidl2.workflow.TracedRunService/StreamLogs": Endpoint.bidi_stream(
+                    method=MethodInfo(
+                        name="StreamLogs",
+                        service_name="flyteidl2.workflow.TracedRunService",
+                        input=flyteidl2_dot_workflow_dot_traced__run__service__pb2.StreamLogsRequest,
+                        output=flyteidl2_dot_workflow_dot_traced__run__service__pb2.StreamLogsResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.stream_logs,
+                ),
+                "/flyteidl2.workflow.TracedRunService/TailLogs": Endpoint.server_stream(
+                    method=MethodInfo(
+                        name="TailLogs",
+                        service_name="flyteidl2.workflow.TracedRunService",
+                        input=flyteidl2_dot_workflow_dot_traced__run__service__pb2.TailTracedLogsRequest,
+                        output=flyteidl2_dot_workflow_dot_traced__run__service__pb2.TailTracedLogsResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.tail_logs,
                 ),
             },
             interceptors=interceptors,
@@ -408,6 +434,46 @@ class TracedRunServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    def stream_logs(
+        self,
+        request: AsyncIterator[flyteidl2_dot_workflow_dot_traced__run__service__pb2.StreamLogsRequest],
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> AsyncIterator[flyteidl2_dot_workflow_dot_traced__run__service__pb2.StreamLogsResponse]:
+        return self.execute_bidi_stream(
+            request=request,
+            method=MethodInfo(
+                name="StreamLogs",
+                service_name="flyteidl2.workflow.TracedRunService",
+                input=flyteidl2_dot_workflow_dot_traced__run__service__pb2.StreamLogsRequest,
+                output=flyteidl2_dot_workflow_dot_traced__run__service__pb2.StreamLogsResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def tail_logs(
+        self,
+        request: flyteidl2_dot_workflow_dot_traced__run__service__pb2.TailTracedLogsRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> AsyncIterator[flyteidl2_dot_workflow_dot_traced__run__service__pb2.TailTracedLogsResponse]:
+        return self.execute_server_stream(
+            request=request,
+            method=MethodInfo(
+                name="TailLogs",
+                service_name="flyteidl2.workflow.TracedRunService",
+                input=flyteidl2_dot_workflow_dot_traced__run__service__pb2.TailTracedLogsRequest,
+                output=flyteidl2_dot_workflow_dot_traced__run__service__pb2.TailTracedLogsResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
 
 class TracedRunServiceSync(Protocol):
     def create_run(self, request: flyteidl2_dot_workflow_dot_traced__run__service__pb2.CreateTracedRunRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.CreateRunResponse:
@@ -431,6 +497,10 @@ class TracedRunServiceSync(Protocol):
     def watch_actions(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def abort_run(self, request: flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def stream_logs(self, request: Iterator[flyteidl2_dot_workflow_dot_traced__run__service__pb2.StreamLogsRequest], ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_traced__run__service__pb2.StreamLogsResponse]:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def tail_logs(self, request: flyteidl2_dot_workflow_dot_traced__run__service__pb2.TailTracedLogsRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_traced__run__service__pb2.TailTracedLogsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
@@ -547,6 +617,26 @@ class TracedRunServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.abort_run,
+                ),
+                "/flyteidl2.workflow.TracedRunService/StreamLogs": EndpointSync.bidi_stream(
+                    method=MethodInfo(
+                        name="StreamLogs",
+                        service_name="flyteidl2.workflow.TracedRunService",
+                        input=flyteidl2_dot_workflow_dot_traced__run__service__pb2.StreamLogsRequest,
+                        output=flyteidl2_dot_workflow_dot_traced__run__service__pb2.StreamLogsResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.stream_logs,
+                ),
+                "/flyteidl2.workflow.TracedRunService/TailLogs": EndpointSync.server_stream(
+                    method=MethodInfo(
+                        name="TailLogs",
+                        service_name="flyteidl2.workflow.TracedRunService",
+                        input=flyteidl2_dot_workflow_dot_traced__run__service__pb2.TailTracedLogsRequest,
+                        output=flyteidl2_dot_workflow_dot_traced__run__service__pb2.TailTracedLogsResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.tail_logs,
                 ),
             },
             interceptors=interceptors,
@@ -784,6 +874,46 @@ class TracedRunServiceClientSync(ConnectClientSync):
                 input=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest,
                 output=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def stream_logs(
+        self,
+        request: Iterator[flyteidl2_dot_workflow_dot_traced__run__service__pb2.StreamLogsRequest],
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> Iterator[flyteidl2_dot_workflow_dot_traced__run__service__pb2.StreamLogsResponse]:
+        return self.execute_bidi_stream(
+            request=request,
+            method=MethodInfo(
+                name="StreamLogs",
+                service_name="flyteidl2.workflow.TracedRunService",
+                input=flyteidl2_dot_workflow_dot_traced__run__service__pb2.StreamLogsRequest,
+                output=flyteidl2_dot_workflow_dot_traced__run__service__pb2.StreamLogsResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def tail_logs(
+        self,
+        request: flyteidl2_dot_workflow_dot_traced__run__service__pb2.TailTracedLogsRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> Iterator[flyteidl2_dot_workflow_dot_traced__run__service__pb2.TailTracedLogsResponse]:
+        return self.execute_server_stream(
+            request=request,
+            method=MethodInfo(
+                name="TailLogs",
+                service_name="flyteidl2.workflow.TracedRunService",
+                input=flyteidl2_dot_workflow_dot_traced__run__service__pb2.TailTracedLogsRequest,
+                output=flyteidl2_dot_workflow_dot_traced__run__service__pb2.TailTracedLogsResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,

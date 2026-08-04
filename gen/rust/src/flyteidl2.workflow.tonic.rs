@@ -4202,6 +4202,60 @@ pub mod traced_run_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        pub async fn stream_logs(
+            &mut self,
+            request: impl tonic::IntoStreamingRequest<Message = super::StreamLogsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<tonic::codec::Streaming<super::StreamLogsResponse>>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.workflow.TracedRunService/StreamLogs",
+            );
+            let mut req = request.into_streaming_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("flyteidl2.workflow.TracedRunService", "StreamLogs"),
+                );
+            self.inner.streaming(req, path, codec).await
+        }
+        pub async fn tail_logs(
+            &mut self,
+            request: impl tonic::IntoRequest<super::TailTracedLogsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<tonic::codec::Streaming<super::TailTracedLogsResponse>>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.workflow.TracedRunService/TailLogs",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("flyteidl2.workflow.TracedRunService", "TailLogs"),
+                );
+            self.inner.server_streaming(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -4312,6 +4366,26 @@ pub mod traced_run_service_server {
             tonic::Response<super::AbortRunResponse>,
             tonic::Status,
         >;
+        /// Server streaming response type for the StreamLogs method.
+        type StreamLogsStream: tonic::codegen::tokio_stream::Stream<
+                Item = std::result::Result<super::StreamLogsResponse, tonic::Status>,
+            >
+            + Send
+            + 'static;
+        async fn stream_logs(
+            &self,
+            request: tonic::Request<tonic::Streaming<super::StreamLogsRequest>>,
+        ) -> std::result::Result<tonic::Response<Self::StreamLogsStream>, tonic::Status>;
+        /// Server streaming response type for the TailLogs method.
+        type TailLogsStream: tonic::codegen::tokio_stream::Stream<
+                Item = std::result::Result<super::TailTracedLogsResponse, tonic::Status>,
+            >
+            + Send
+            + 'static;
+        async fn tail_logs(
+            &self,
+            request: tonic::Request<super::TailTracedLogsRequest>,
+        ) -> std::result::Result<tonic::Response<Self::TailLogsStream>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct TracedRunServiceServer<T: TracedRunService> {
@@ -4895,6 +4969,100 @@ pub mod traced_run_service_server {
                                 max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.workflow.TracedRunService/StreamLogs" => {
+                    #[allow(non_camel_case_types)]
+                    struct StreamLogsSvc<T: TracedRunService>(pub Arc<T>);
+                    impl<
+                        T: TracedRunService,
+                    > tonic::server::StreamingService<super::StreamLogsRequest>
+                    for StreamLogsSvc<T> {
+                        type Response = super::StreamLogsResponse;
+                        type ResponseStream = T::StreamLogsStream;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::ResponseStream>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                tonic::Streaming<super::StreamLogsRequest>,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as TracedRunService>::stream_logs(&inner, request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = StreamLogsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.streaming(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.workflow.TracedRunService/TailLogs" => {
+                    #[allow(non_camel_case_types)]
+                    struct TailLogsSvc<T: TracedRunService>(pub Arc<T>);
+                    impl<
+                        T: TracedRunService,
+                    > tonic::server::ServerStreamingService<super::TailTracedLogsRequest>
+                    for TailLogsSvc<T> {
+                        type Response = super::TailTracedLogsResponse;
+                        type ResponseStream = T::TailLogsStream;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::ResponseStream>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::TailTracedLogsRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as TracedRunService>::tail_logs(&inner, request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = TailLogsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.server_streaming(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)
