@@ -282,25 +282,7 @@ only end-to-end verification once the server lands.
 | 4.1 | Verify the existing flyte-sdk settings commands end-to-end against the new server; fix any gaps found |
 | 4.2 | User-facing docs: concepts page for scopes, inheritance, `UNSET` semantics |
 
-## 6 Drawbacks
-
-- One more table and service to operate — mitigated by living inside the
-  existing `runs` deployable, no new binary.
-- A second source of truth next to static config until Phase 3 defines
-  precedence clearly (settings override static defaults; explicit user specs
-  override both).
-
-## 7 Unresolved questions
-
-- Should resolved settings be cached server-side, or is one indexed
-  `key = ANY(...)` query per run creation cheap enough? (Proposal: ship
-  without a cache, measure.)
-- Authorization: the current server performs no authz; settings writes should
-  be gated once an authz story exists. Out of scope here.
-- Future scopes (e.g. user-level) — the key encoding is versioned (`v1:`) to
-  leave room.
-
-## 8 Conclusion
+## 6 Conclusion
 
 The API is designed, reviewed, merged, and code-generated in four languages;
 the storage and service patterns it needs already exist in the repo. What
