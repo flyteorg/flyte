@@ -481,6 +481,8 @@ enum RunSource {
   // The run is orchestrated outside the platform (e.g. on a user's machine) and its state is
   // reported via LocalRunService.
   RUN_SOURCE_LOCAL = 4;
+
+  RUN_SOURCE_ARTIFACT_TRIGGER = 5;
 }
 
 // TaskGroup represents a group of runs for a specific task.

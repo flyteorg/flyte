@@ -142,6 +142,376 @@ var _ interface {
 	ErrorName() string
 } = ArtifactKeyValidationError{}
 
+// Validate checks the field values on ArtifactVersionId with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ArtifactVersionId) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ArtifactVersionId with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ArtifactVersionIdMultiError, or nil if none found.
+func (m *ArtifactVersionId) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ArtifactVersionId) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetKey()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ArtifactVersionIdValidationError{
+					field:  "Key",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ArtifactVersionIdValidationError{
+					field:  "Key",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetKey()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ArtifactVersionIdValidationError{
+				field:  "Key",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Version
+
+	if len(errors) > 0 {
+		return ArtifactVersionIdMultiError(errors)
+	}
+
+	return nil
+}
+
+// ArtifactVersionIdMultiError is an error wrapping multiple validation errors
+// returned by ArtifactVersionId.ValidateAll() if the designated constraints
+// aren't met.
+type ArtifactVersionIdMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ArtifactVersionIdMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ArtifactVersionIdMultiError) AllErrors() []error { return m }
+
+// ArtifactVersionIdValidationError is the validation error returned by
+// ArtifactVersionId.Validate if the designated constraints aren't met.
+type ArtifactVersionIdValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ArtifactVersionIdValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ArtifactVersionIdValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ArtifactVersionIdValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ArtifactVersionIdValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ArtifactVersionIdValidationError) ErrorName() string {
+	return "ArtifactVersionIdValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ArtifactVersionIdValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sArtifactVersionId.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ArtifactVersionIdValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ArtifactVersionIdValidationError{}
+
+// Validate checks the field values on ArtifactCard with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ArtifactCard) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ArtifactCard with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ArtifactCardMultiError, or
+// nil if none found.
+func (m *ArtifactCard) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ArtifactCard) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Uri
+
+	// no validation rules for Format
+
+	// no validation rules for Type
+
+	if len(errors) > 0 {
+		return ArtifactCardMultiError(errors)
+	}
+
+	return nil
+}
+
+// ArtifactCardMultiError is an error wrapping multiple validation errors
+// returned by ArtifactCard.ValidateAll() if the designated constraints aren't met.
+type ArtifactCardMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ArtifactCardMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ArtifactCardMultiError) AllErrors() []error { return m }
+
+// ArtifactCardValidationError is the validation error returned by
+// ArtifactCard.Validate if the designated constraints aren't met.
+type ArtifactCardValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ArtifactCardValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ArtifactCardValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ArtifactCardValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ArtifactCardValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ArtifactCardValidationError) ErrorName() string { return "ArtifactCardValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ArtifactCardValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sArtifactCard.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ArtifactCardValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ArtifactCardValidationError{}
+
+// Validate checks the field values on ArtifactInfo with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ArtifactInfo) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ArtifactInfo with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ArtifactInfoMultiError, or
+// nil if none found.
+func (m *ArtifactInfo) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ArtifactInfo) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Description
+
+	// no validation rules for UserMetadata
+
+	if all {
+		switch v := interface{}(m.GetCard()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ArtifactInfoValidationError{
+					field:  "Card",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ArtifactInfoValidationError{
+					field:  "Card",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCard()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ArtifactInfoValidationError{
+				field:  "Card",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ArtifactInfoMultiError(errors)
+	}
+
+	return nil
+}
+
+// ArtifactInfoMultiError is an error wrapping multiple validation errors
+// returned by ArtifactInfo.ValidateAll() if the designated constraints aren't met.
+type ArtifactInfoMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ArtifactInfoMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ArtifactInfoMultiError) AllErrors() []error { return m }
+
+// ArtifactInfoValidationError is the validation error returned by
+// ArtifactInfo.Validate if the designated constraints aren't met.
+type ArtifactInfoValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ArtifactInfoValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ArtifactInfoValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ArtifactInfoValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ArtifactInfoValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ArtifactInfoValidationError) ErrorName() string { return "ArtifactInfoValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ArtifactInfoValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sArtifactInfo.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ArtifactInfoValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ArtifactInfoValidationError{}
+
 // Validate checks the field values on ArtifactBindingData with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
