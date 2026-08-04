@@ -86,33 +86,33 @@ var (
 
 // TracedRunServiceClient is a client for the flyteidl2.workflow.TracedRunService service.
 type TracedRunServiceClient interface {
-	// Register a new local run. The server creates the root action ("a0") in the reported state and
+	// Register a new traced run. The server creates the root action ("a0") in the reported state and
 	// returns the resolved run. If a run name is not provided, the server generates one.
 	CreateRun(context.Context, *connect.Request[workflow.CreateTracedRunRequest]) (*connect.Response[workflow.CreateRunResponse], error)
-	// Report state for one or more actions of a local run. Creates actions on first report and
+	// Report state for one or more actions of a traced run. Creates actions on first report and
 	// updates them on subsequent reports. Reports are idempotent: an event with an
 	// (attempt, version, phase) tuple that was already recorded is acknowledged as success.
 	ReportActions(context.Context, *connect.Request[workflow.ReportTracedActionsRequest]) (*connect.Response[workflow.ReportTracedActionsResponse], error)
-	// Get detailed information about a local run.
+	// Get detailed information about a traced run.
 	GetRunDetails(context.Context, *connect.Request[workflow.GetRunDetailsRequest]) (*connect.Response[workflow.GetRunDetailsResponse], error)
-	// Stream detailed information updates about a local run. The call will terminate when the run
+	// Stream detailed information updates about a traced run. The call will terminate when the run
 	// reaches a terminal phase.
 	WatchRunDetails(context.Context, *connect.Request[workflow.WatchRunDetailsRequest]) (*connect.ServerStreamForClient[workflow.WatchRunDetailsResponse], error)
-	// Get detailed information about an action of a local run.
+	// Get detailed information about an action of a traced run.
 	GetActionDetails(context.Context, *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error)
-	// Stream detailed information updates about an action of a local run. The call will terminate
+	// Stream detailed information updates about an action of a traced run. The call will terminate
 	// when the action reaches a terminal phase.
 	WatchActionDetails(context.Context, *connect.Request[workflow.WatchActionDetailsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionDetailsResponse], error)
-	// List local runs based on the provided filter criteria.
+	// List traced runs based on the provided filter criteria.
 	ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error)
-	// Stream updates for local runs based on the provided filter criteria.
+	// Stream updates for traced runs based on the provided filter criteria.
 	WatchRuns(context.Context, *connect.Request[workflow.WatchRunsRequest]) (*connect.ServerStreamForClient[workflow.WatchRunsResponse], error)
-	// List all actions for a given local run.
+	// List all actions for a given traced run.
 	ListActions(context.Context, *connect.Request[workflow.ListActionsRequest]) (*connect.Response[workflow.ListActionsResponse], error)
-	// Stream updates for actions of a given local run.
+	// Stream updates for actions of a given traced run.
 	WatchActions(context.Context, *connect.Request[workflow.WatchActionsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionsResponse], error)
-	// Abort a local run: mark the run and all of its non-terminal actions ABORTED on the server.
-	// The platform cannot stop the local orchestrator; subsequent reports against aborted actions
+	// Abort a traced run: mark the run and all of its non-terminal actions ABORTED on the server.
+	// The platform cannot stop the client that owns the run; subsequent reports against aborted actions
 	// are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
 	AbortRun(context.Context, *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error)
 }
@@ -272,33 +272,33 @@ func (c *tracedRunServiceClient) AbortRun(ctx context.Context, req *connect.Requ
 
 // TracedRunServiceHandler is an implementation of the flyteidl2.workflow.TracedRunService service.
 type TracedRunServiceHandler interface {
-	// Register a new local run. The server creates the root action ("a0") in the reported state and
+	// Register a new traced run. The server creates the root action ("a0") in the reported state and
 	// returns the resolved run. If a run name is not provided, the server generates one.
 	CreateRun(context.Context, *connect.Request[workflow.CreateTracedRunRequest]) (*connect.Response[workflow.CreateRunResponse], error)
-	// Report state for one or more actions of a local run. Creates actions on first report and
+	// Report state for one or more actions of a traced run. Creates actions on first report and
 	// updates them on subsequent reports. Reports are idempotent: an event with an
 	// (attempt, version, phase) tuple that was already recorded is acknowledged as success.
 	ReportActions(context.Context, *connect.Request[workflow.ReportTracedActionsRequest]) (*connect.Response[workflow.ReportTracedActionsResponse], error)
-	// Get detailed information about a local run.
+	// Get detailed information about a traced run.
 	GetRunDetails(context.Context, *connect.Request[workflow.GetRunDetailsRequest]) (*connect.Response[workflow.GetRunDetailsResponse], error)
-	// Stream detailed information updates about a local run. The call will terminate when the run
+	// Stream detailed information updates about a traced run. The call will terminate when the run
 	// reaches a terminal phase.
 	WatchRunDetails(context.Context, *connect.Request[workflow.WatchRunDetailsRequest], *connect.ServerStream[workflow.WatchRunDetailsResponse]) error
-	// Get detailed information about an action of a local run.
+	// Get detailed information about an action of a traced run.
 	GetActionDetails(context.Context, *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error)
-	// Stream detailed information updates about an action of a local run. The call will terminate
+	// Stream detailed information updates about an action of a traced run. The call will terminate
 	// when the action reaches a terminal phase.
 	WatchActionDetails(context.Context, *connect.Request[workflow.WatchActionDetailsRequest], *connect.ServerStream[workflow.WatchActionDetailsResponse]) error
-	// List local runs based on the provided filter criteria.
+	// List traced runs based on the provided filter criteria.
 	ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error)
-	// Stream updates for local runs based on the provided filter criteria.
+	// Stream updates for traced runs based on the provided filter criteria.
 	WatchRuns(context.Context, *connect.Request[workflow.WatchRunsRequest], *connect.ServerStream[workflow.WatchRunsResponse]) error
-	// List all actions for a given local run.
+	// List all actions for a given traced run.
 	ListActions(context.Context, *connect.Request[workflow.ListActionsRequest]) (*connect.Response[workflow.ListActionsResponse], error)
-	// Stream updates for actions of a given local run.
+	// Stream updates for actions of a given traced run.
 	WatchActions(context.Context, *connect.Request[workflow.WatchActionsRequest], *connect.ServerStream[workflow.WatchActionsResponse]) error
-	// Abort a local run: mark the run and all of its non-terminal actions ABORTED on the server.
-	// The platform cannot stop the local orchestrator; subsequent reports against aborted actions
+	// Abort a traced run: mark the run and all of its non-terminal actions ABORTED on the server.
+	// The platform cannot stop the client that owns the run; subsequent reports against aborted actions
 	// are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
 	AbortRun(context.Context, *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error)
 }

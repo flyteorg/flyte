@@ -25,7 +25,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Request message for creating a local run.
+// Request message for creating a traced run.
 type CreateTracedRunRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -46,11 +46,11 @@ type CreateTracedRunRequest struct {
 	// Reference to the run's inputs, previously uploaded via DataProxyService.UploadMetadata.
 	OffloadedInputData *common.OffloadedInputData `protobuf:"bytes,5,opt,name=offloaded_input_data,json=offloadedInputData,proto3,oneof" json:"offloaded_input_data,omitempty"`
 	// The run spec to use. Only client-relevant fields are honored; dataplane scheduling fields
-	// (queue, cluster) are ignored for local runs.
+	// (queue, cluster) are ignored for traced runs.
 	RunSpec *task.RunSpec `protobuf:"bytes,6,opt,name=run_spec,json=runSpec,proto3" json:"run_spec,omitempty"`
 	// User-defined labels attached to this run at creation time.
 	Labels map[string]string `protobuf:"bytes,7,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	// Time the local run actually started. If unset, the server defaults it to the current time.
+	// Time the traced run actually started. If unset, the server defaults it to the current time.
 	RunStartTime *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=run_start_time,json=runStartTime,proto3" json:"run_start_time,omitempty"`
 }
 
@@ -192,7 +192,7 @@ func (*CreateTracedRunRequest_TaskId) isCreateTracedRunRequest_Task() {}
 
 func (*CreateTracedRunRequest_TaskSpec) isCreateTracedRunRequest_Task() {}
 
-// A single action state report within a local run.
+// A single action state report within a traced run.
 type TracedActionUpdate struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -315,7 +315,7 @@ func (*TracedActionUpdate_Task) isTracedActionUpdate_Spec() {}
 
 func (*TracedActionUpdate_Trace) isTracedActionUpdate_Spec() {}
 
-// Request message for reporting local action state.
+// Request message for reporting traced action state.
 type ReportTracedActionsRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -373,7 +373,7 @@ func (x *ReportTracedActionsRequest) GetUpdates() []*TracedActionUpdate {
 	return nil
 }
 
-// Response message for reporting local action state.
+// Response message for reporting traced action state.
 type ReportTracedActionsResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

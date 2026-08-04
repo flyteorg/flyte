@@ -24,58 +24,58 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 // client-supplied state can never be mistaken for execution state the platform owns.
 //
 // The read/watch surface deliberately mirrors RunService (same request/response messages) so that
-// clients and UIs built against RunService work against local runs with only a service swap.
+// clients and UIs built against RunService work against traced runs with only a service swap.
 service TracedRunService {
-  // Register a new local run. The server creates the root action ("a0") in the reported state and
+  // Register a new traced run. The server creates the root action ("a0") in the reported state and
   // returns the resolved run. If a run name is not provided, the server generates one.
   rpc CreateRun(CreateTracedRunRequest) returns (CreateRunResponse) {}
 
-  // Report state for one or more actions of a local run. Creates actions on first report and
+  // Report state for one or more actions of a traced run. Creates actions on first report and
   // updates them on subsequent reports. Reports are idempotent: an event with an
   // (attempt, version, phase) tuple that was already recorded is acknowledged as success.
   rpc ReportActions(ReportTracedActionsRequest) returns (ReportTracedActionsResponse) {}
 
-  // Get detailed information about a local run.
+  // Get detailed information about a traced run.
   rpc GetRunDetails(GetRunDetailsRequest) returns (GetRunDetailsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
-  // Stream detailed information updates about a local run. The call will terminate when the run
+  // Stream detailed information updates about a traced run. The call will terminate when the run
   // reaches a terminal phase.
   rpc WatchRunDetails(WatchRunDetailsRequest) returns (stream WatchRunDetailsResponse) {}
 
-  // Get detailed information about an action of a local run.
+  // Get detailed information about an action of a traced run.
   rpc GetActionDetails(GetActionDetailsRequest) returns (GetActionDetailsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
-  // Stream detailed information updates about an action of a local run. The call will terminate
+  // Stream detailed information updates about an action of a traced run. The call will terminate
   // when the action reaches a terminal phase.
   rpc WatchActionDetails(WatchActionDetailsRequest) returns (stream WatchActionDetailsResponse) {}
 
-  // List local runs based on the provided filter criteria.
+  // List traced runs based on the provided filter criteria.
   rpc ListRuns(ListRunsRequest) returns (ListRunsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
-  // Stream updates for local runs based on the provided filter criteria.
+  // Stream updates for traced runs based on the provided filter criteria.
   rpc WatchRuns(WatchRunsRequest) returns (stream WatchRunsResponse) {}
 
-  // List all actions for a given local run.
+  // List all actions for a given traced run.
   rpc ListActions(ListActionsRequest) returns (ListActionsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
-  // Stream updates for actions of a given local run.
+  // Stream updates for actions of a given traced run.
   rpc WatchActions(WatchActionsRequest) returns (stream WatchActionsResponse) {}
 
-  // Abort a local run: mark the run and all of its non-terminal actions ABORTED on the server.
-  // The platform cannot stop the local orchestrator; subsequent reports against aborted actions
+  // Abort a traced run: mark the run and all of its non-terminal actions ABORTED on the server.
+  // The platform cannot stop the client that owns the run; subsequent reports against aborted actions
   // are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
   rpc AbortRun(AbortRunRequest) returns (AbortRunResponse) {}
 }
 
-// Request message for creating a local run.
+// Request message for creating a traced run.
 message CreateTracedRunRequest {
   oneof id {
     option (buf.validate.oneof).required = true;
@@ -102,17 +102,17 @@ message CreateTracedRunRequest {
   optional common.OffloadedInputData offloaded_input_data = 5;
 
   // The run spec to use. Only client-relevant fields are honored; dataplane scheduling fields
-  // (queue, cluster) are ignored for local runs.
+  // (queue, cluster) are ignored for traced runs.
   task.RunSpec run_spec = 6;
 
   // User-defined labels attached to this run at creation time.
   map<string, string> labels = 7;
 
-  // Time the local run actually started. If unset, the server defaults it to the current time.
+  // Time the traced run actually started. If unset, the server defaults it to the current time.
   google.protobuf.Timestamp run_start_time = 8;
 }
 
-// A single action state report within a local run.
+// A single action state report within a traced run.
 message TracedActionUpdate {
   // The event describing this state transition. Carries the action id, attempt (starting at 1),
   // phase, monotonically increasing version, timestamps, error info and output references
@@ -136,7 +136,7 @@ message TracedActionUpdate {
   ActionStatus status = 6;
 }
 
-// Request message for reporting local action state.
+// Request message for reporting traced action state.
 message ReportTracedActionsRequest {
   // The run these action reports belong to. Every update's action id must reference this run.
   common.RunIdentifier run_id = 1 [(buf.validate.field).required = true];
@@ -145,7 +145,7 @@ message ReportTracedActionsRequest {
   repeated TracedActionUpdate updates = 2 [(buf.validate.field).repeated.min_items = 1];
 }
 
-// Response message for reporting local action state.
+// Response message for reporting traced action state.
 message ReportTracedActionsResponse {
   // Per-update results, parallel to the request's updates. Duplicate (already recorded) events
   // are reported as success.
