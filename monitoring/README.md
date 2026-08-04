@@ -1,7 +1,6 @@
 # Monitoring assets
 
-Grafana dashboards for Flyte v2, kept here rather than under any one deployment
-because the same JSON works anywhere flyte2 is running — devbox, AWS, GCP.
+Grafana dashboards for Flyte v2.
 
 ```
 dashboards/flyte-execution.json   RPC latency, throughput and error rates per service
