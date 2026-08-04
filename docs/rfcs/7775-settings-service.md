@@ -149,6 +149,14 @@ service SettingsService {
 populated: `{org}` = org-level, `{org, domain}` = domain-level,
 `{org, domain, project}` = project-level.
 
+**Org handling in OSS.** OSS deployments have no organization concept, so an
+empty `org` is normalized server-side to the existing placeholder
+`DefaultOrganization = "flyte"`
+(`flyteplugins/go/tasks/pluginmachinery/secret/embedded_secret_manager.go`) —
+the same convention the secret and app services already use. Org-level
+settings therefore act as **instance-wide defaults**; clients never need to
+send an org.
+
 ### Storage
 
 One Postgres row **per scope level**, following the existing sqlx +
@@ -195,7 +203,8 @@ migrations, `SetupContext`, and the embedded-Postgres test harness.
 
 Validation is hand-written in the service (the generated `Validate()` from
 protoc-gen-validate does not enforce the `buf.validate` annotations used in
-the settings protos): key shape (org required; project requires domain),
+the settings protos): key shape (empty org defaults to `"flyte"`; project
+requires domain),
 quantities parse via `resource.ParseQuantity`, and
 `max_action_concurrency` ∈ {0} ∪ [2, MaxUint32] (a cap of 1 would deadlock
 any run with more than one action).
@@ -211,7 +220,7 @@ the same phase.
 | # | Task | Pattern to copy | Deliverable |
 |---|---|---|---|
 | 1.1 | **[independent]** Migration: `settings` table | `runs/migrations/sql/*.sql` | one SQL file |
-| 1.2 | **[independent]** Model + key encoder (`"v1:{org}:{domain}:{project}"`) | `runs/repository/models/project.go` | `models/settings.go` + unit test |
+| 1.2 | **[independent]** Model + key encoder (`"v1:{org}:{domain}:{project}"`, empty org normalized to `"flyte"`) | `runs/repository/models/project.go` | `models/settings.go` + unit test |
 | 1.3 | Repo interface (`Create/Get/GetByKeys/Update`) + sentinel errors (`ErrSettingsNotFound`, `ErrSettingsVersionConflict`) | `runs/repository/interfaces/project.go` | `interfaces/settings.go` (mockery picks it up automatically) |
 | 1.4 | sqlx implementation incl. optimistic-locking `Update` | `runs/repository/impl/project.go`, locking: `impl/trigger.go` | `impl/settings.go` + embedded-Postgres tests |
 
