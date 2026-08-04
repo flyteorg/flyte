@@ -64,7 +64,7 @@ the most specific level wins for scalars and maps merge additively
 or `UNSET` (explicitly blank, blocks inheritance).
 
 A full worked walkthrough of every RPC with exact request/response payloads
-already lives in [`flyteidl2/settings/settings_customer_flow.md`](../flyteidl2/settings/settings_customer_flow.md).
+already lives in [`flyteidl2/settings/settings_customer_flow.md`](../../flyteidl2/settings/settings_customer_flow.md).
 Some motivating scenarios:
 
 ### Example 1 — environment defaults per domain
