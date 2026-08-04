@@ -176,7 +176,7 @@ export type SelectClusterResponse = Message<"flyteidl2.cluster.SelectClusterResp
   /**
    * Name of the cluster the endpoint belongs to. Empty when the request was routed to the
    * control plane's own endpoint. Clients that persist where an artifact was written (e.g.
-   * local-run reporters stamping the attempt's cluster) use this to make reads routable later.
+   * traced-run reporters stamping the attempt's cluster) use this to make reads routable later.
    *
    * @generated from field: string cluster = 2;
    */

@@ -36,33 +36,33 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TracedRunServiceClient interface {
-	// Register a new local run. The server creates the root action ("a0") in the reported state and
+	// Register a new traced run. The server creates the root action ("a0") in the reported state and
 	// returns the resolved run. If a run name is not provided, the server generates one.
 	CreateRun(ctx context.Context, in *CreateTracedRunRequest, opts ...grpc.CallOption) (*CreateRunResponse, error)
-	// Report state for one or more actions of a local run. Creates actions on first report and
+	// Report state for one or more actions of a traced run. Creates actions on first report and
 	// updates them on subsequent reports. Reports are idempotent: an event with an
 	// (attempt, version, phase) tuple that was already recorded is acknowledged as success.
 	ReportActions(ctx context.Context, in *ReportTracedActionsRequest, opts ...grpc.CallOption) (*ReportTracedActionsResponse, error)
-	// Get detailed information about a local run.
+	// Get detailed information about a traced run.
 	GetRunDetails(ctx context.Context, in *GetRunDetailsRequest, opts ...grpc.CallOption) (*GetRunDetailsResponse, error)
-	// Stream detailed information updates about a local run. The call will terminate when the run
+	// Stream detailed information updates about a traced run. The call will terminate when the run
 	// reaches a terminal phase.
 	WatchRunDetails(ctx context.Context, in *WatchRunDetailsRequest, opts ...grpc.CallOption) (TracedRunService_WatchRunDetailsClient, error)
-	// Get detailed information about an action of a local run.
+	// Get detailed information about an action of a traced run.
 	GetActionDetails(ctx context.Context, in *GetActionDetailsRequest, opts ...grpc.CallOption) (*GetActionDetailsResponse, error)
-	// Stream detailed information updates about an action of a local run. The call will terminate
+	// Stream detailed information updates about an action of a traced run. The call will terminate
 	// when the action reaches a terminal phase.
 	WatchActionDetails(ctx context.Context, in *WatchActionDetailsRequest, opts ...grpc.CallOption) (TracedRunService_WatchActionDetailsClient, error)
-	// List local runs based on the provided filter criteria.
+	// List traced runs based on the provided filter criteria.
 	ListRuns(ctx context.Context, in *ListRunsRequest, opts ...grpc.CallOption) (*ListRunsResponse, error)
-	// Stream updates for local runs based on the provided filter criteria.
+	// Stream updates for traced runs based on the provided filter criteria.
 	WatchRuns(ctx context.Context, in *WatchRunsRequest, opts ...grpc.CallOption) (TracedRunService_WatchRunsClient, error)
-	// List all actions for a given local run.
+	// List all actions for a given traced run.
 	ListActions(ctx context.Context, in *ListActionsRequest, opts ...grpc.CallOption) (*ListActionsResponse, error)
-	// Stream updates for actions of a given local run.
+	// Stream updates for actions of a given traced run.
 	WatchActions(ctx context.Context, in *WatchActionsRequest, opts ...grpc.CallOption) (TracedRunService_WatchActionsClient, error)
-	// Abort a local run: mark the run and all of its non-terminal actions ABORTED on the server.
-	// The platform cannot stop the local orchestrator; subsequent reports against aborted actions
+	// Abort a traced run: mark the run and all of its non-terminal actions ABORTED on the server.
+	// The platform cannot stop the client that owns the run; subsequent reports against aborted actions
 	// are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
 	AbortRun(ctx context.Context, in *AbortRunRequest, opts ...grpc.CallOption) (*AbortRunResponse, error)
 }
@@ -270,33 +270,33 @@ func (c *tracedRunServiceClient) AbortRun(ctx context.Context, in *AbortRunReque
 // All implementations should embed UnimplementedTracedRunServiceServer
 // for forward compatibility
 type TracedRunServiceServer interface {
-	// Register a new local run. The server creates the root action ("a0") in the reported state and
+	// Register a new traced run. The server creates the root action ("a0") in the reported state and
 	// returns the resolved run. If a run name is not provided, the server generates one.
 	CreateRun(context.Context, *CreateTracedRunRequest) (*CreateRunResponse, error)
-	// Report state for one or more actions of a local run. Creates actions on first report and
+	// Report state for one or more actions of a traced run. Creates actions on first report and
 	// updates them on subsequent reports. Reports are idempotent: an event with an
 	// (attempt, version, phase) tuple that was already recorded is acknowledged as success.
 	ReportActions(context.Context, *ReportTracedActionsRequest) (*ReportTracedActionsResponse, error)
-	// Get detailed information about a local run.
+	// Get detailed information about a traced run.
 	GetRunDetails(context.Context, *GetRunDetailsRequest) (*GetRunDetailsResponse, error)
-	// Stream detailed information updates about a local run. The call will terminate when the run
+	// Stream detailed information updates about a traced run. The call will terminate when the run
 	// reaches a terminal phase.
 	WatchRunDetails(*WatchRunDetailsRequest, TracedRunService_WatchRunDetailsServer) error
-	// Get detailed information about an action of a local run.
+	// Get detailed information about an action of a traced run.
 	GetActionDetails(context.Context, *GetActionDetailsRequest) (*GetActionDetailsResponse, error)
-	// Stream detailed information updates about an action of a local run. The call will terminate
+	// Stream detailed information updates about an action of a traced run. The call will terminate
 	// when the action reaches a terminal phase.
 	WatchActionDetails(*WatchActionDetailsRequest, TracedRunService_WatchActionDetailsServer) error
-	// List local runs based on the provided filter criteria.
+	// List traced runs based on the provided filter criteria.
 	ListRuns(context.Context, *ListRunsRequest) (*ListRunsResponse, error)
-	// Stream updates for local runs based on the provided filter criteria.
+	// Stream updates for traced runs based on the provided filter criteria.
 	WatchRuns(*WatchRunsRequest, TracedRunService_WatchRunsServer) error
-	// List all actions for a given local run.
+	// List all actions for a given traced run.
 	ListActions(context.Context, *ListActionsRequest) (*ListActionsResponse, error)
-	// Stream updates for actions of a given local run.
+	// Stream updates for actions of a given traced run.
 	WatchActions(*WatchActionsRequest, TracedRunService_WatchActionsServer) error
-	// Abort a local run: mark the run and all of its non-terminal actions ABORTED on the server.
-	// The platform cannot stop the local orchestrator; subsequent reports against aborted actions
+	// Abort a traced run: mark the run and all of its non-terminal actions ABORTED on the server.
+	// The platform cannot stop the client that owns the run; subsequent reports against aborted actions
 	// are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
 	AbortRun(context.Context, *AbortRunRequest) (*AbortRunResponse, error)
 }

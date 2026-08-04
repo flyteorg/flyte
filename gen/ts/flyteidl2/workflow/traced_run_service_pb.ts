@@ -31,7 +31,7 @@ export const file_flyteidl2_workflow_traced_run_service: GenFile = /*@__PURE__*/
   fileDesc("CitmbHl0ZWlkbDIvd29ya2Zsb3cvdHJhY2VkX3J1bl9zZXJ2aWNlLnByb3RvEhJmbHl0ZWlkbDIud29ya2Zsb3civAQKFkNyZWF0ZVRyYWNlZFJ1blJlcXVlc3QSMQoGcnVuX2lkGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVySAASOQoKcHJvamVjdF9pZBgCIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJIABIxCgd0YXNrX2lkGAMgASgLMh4uZmx5dGVpZGwyLnRhc2suVGFza0lkZW50aWZpZXJIARItCgl0YXNrX3NwZWMYBCABKAsyGC5mbHl0ZWlkbDIudGFzay5UYXNrU3BlY0gBEkcKFG9mZmxvYWRlZF9pbnB1dF9kYXRhGAUgASgLMiQuZmx5dGVpZGwyLmNvbW1vbi5PZmZsb2FkZWRJbnB1dERhdGFIAogBARIpCghydW5fc3BlYxgGIAEoCzIXLmZseXRlaWRsMi50YXNrLlJ1blNwZWMSRgoGbGFiZWxzGAcgAygLMjYuZmx5dGVpZGwyLndvcmtmbG93LkNyZWF0ZVRyYWNlZFJ1blJlcXVlc3QuTGFiZWxzRW50cnkSMgoOcnVuX3N0YXJ0X3RpbWUYCCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wGi0KC0xhYmVsc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAFCCwoCaWQSBbpIAggBQg0KBHRhc2sSBbpIAggBQhcKFV9vZmZsb2FkZWRfaW5wdXRfZGF0YSKMAgoSVHJhY2VkQWN0aW9uVXBkYXRlEjYKBWV2ZW50GAEgASgLMh8uZmx5dGVpZGwyLndvcmtmbG93LkFjdGlvbkV2ZW50Qga6SAPIAQESEwoLcGFyZW50X25hbWUYAiABKAkSDQoFZ3JvdXAYAyABKAkSLgoEdGFzaxgEIAEoCzIeLmZseXRlaWRsMi53b3JrZmxvdy5UYXNrQWN0aW9uSAASMAoFdHJhY2UYBSABKAsyHy5mbHl0ZWlkbDIud29ya2Zsb3cuVHJhY2VBY3Rpb25IABIwCgZzdGF0dXMYBiABKAsyIC5mbHl0ZWlkbDIud29ya2Zsb3cuQWN0aW9uU3RhdHVzQgYKBHNwZWMimAEKGlJlcG9ydFRyYWNlZEFjdGlvbnNSZXF1ZXN0EjcKBnJ1bl9pZBgBIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckIGukgDyAEBEkEKB3VwZGF0ZXMYAiADKAsyJi5mbHl0ZWlkbDIud29ya2Zsb3cuVHJhY2VkQWN0aW9uVXBkYXRlQgi6SAWSAQIIASJDChtSZXBvcnRUcmFjZWRBY3Rpb25zUmVzcG9uc2USJAoIc3RhdHVzZXMYASADKAsyEi5nb29nbGUucnBjLlN0YXR1czKPCQoQVHJhY2VkUnVuU2VydmljZRJgCglDcmVhdGVSdW4SKi5mbHl0ZWlkbDIud29ya2Zsb3cuQ3JlYXRlVHJhY2VkUnVuUmVxdWVzdBolLmZseXRlaWRsMi53b3JrZmxvdy5DcmVhdGVSdW5SZXNwb25zZSIAEnIKDVJlcG9ydEFjdGlvbnMSLi5mbHl0ZWlkbDIud29ya2Zsb3cuUmVwb3J0VHJhY2VkQWN0aW9uc1JlcXVlc3QaLy5mbHl0ZWlkbDIud29ya2Zsb3cuUmVwb3J0VHJhY2VkQWN0aW9uc1Jlc3BvbnNlIgASaQoNR2V0UnVuRGV0YWlscxIoLmZseXRlaWRsMi53b3JrZmxvdy5HZXRSdW5EZXRhaWxzUmVxdWVzdBopLmZseXRlaWRsMi53b3JrZmxvdy5HZXRSdW5EZXRhaWxzUmVzcG9uc2UiA5ACARJuCg9XYXRjaFJ1bkRldGFpbHMSKi5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hSdW5EZXRhaWxzUmVxdWVzdBorLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaFJ1bkRldGFpbHNSZXNwb25zZSIAMAEScgoQR2V0QWN0aW9uRGV0YWlscxIrLmZseXRlaWRsMi53b3JrZmxvdy5HZXRBY3Rpb25EZXRhaWxzUmVxdWVzdBosLmZseXRlaWRsMi53b3JrZmxvdy5HZXRBY3Rpb25EZXRhaWxzUmVzcG9uc2UiA5ACARJ3ChJXYXRjaEFjdGlvbkRldGFpbHMSLS5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hBY3Rpb25EZXRhaWxzUmVxdWVzdBouLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaEFjdGlvbkRldGFpbHNSZXNwb25zZSIAMAESWgoITGlzdFJ1bnMSIy5mbHl0ZWlkbDIud29ya2Zsb3cuTGlzdFJ1bnNSZXF1ZXN0GiQuZmx5dGVpZGwyLndvcmtmbG93Lkxpc3RSdW5zUmVzcG9uc2UiA5ACARJcCglXYXRjaFJ1bnMSJC5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hSdW5zUmVxdWVzdBolLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaFJ1bnNSZXNwb25zZSIAMAESYwoLTGlzdEFjdGlvbnMSJi5mbHl0ZWlkbDIud29ya2Zsb3cuTGlzdEFjdGlvbnNSZXF1ZXN0GicuZmx5dGVpZGwyLndvcmtmbG93Lkxpc3RBY3Rpb25zUmVzcG9uc2UiA5ACARJlCgxXYXRjaEFjdGlvbnMSJy5mbHl0ZWlkbDIud29ya2Zsb3cuV2F0Y2hBY3Rpb25zUmVxdWVzdBooLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaEFjdGlvbnNSZXNwb25zZSIAMAESVwoIQWJvcnRSdW4SIy5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRSdW5SZXF1ZXN0GiQuZmx5dGVpZGwyLndvcmtmbG93LkFib3J0UnVuUmVzcG9uc2UiAELSAQoWY29tLmZseXRlaWRsMi53b3JrZmxvd0IVVHJhY2VkUnVuU2VydmljZVByb3RvSAJQAVo2Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3dvcmtmbG93ogIDRldYqgISRmx5dGVpZGwyLldvcmtmbG93ygISRmx5dGVpZGwyXFdvcmtmbG934gIeRmx5dGVpZGwyXFdvcmtmbG93XEdQQk1ldGFkYXRh6gITRmx5dGVpZGwyOjpXb3JrZmxvd2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_run, file_flyteidl2_task_common, file_flyteidl2_task_run, file_flyteidl2_task_task_definition, file_flyteidl2_workflow_run_definition, file_flyteidl2_workflow_run_service, file_google_protobuf_timestamp, file_google_rpc_status]);
 
 /**
- * Request message for creating a local run.
+ * Request message for creating a traced run.
  *
  * @generated from message flyteidl2.workflow.CreateTracedRunRequest
  */
@@ -89,7 +89,7 @@ export type CreateTracedRunRequest = Message<"flyteidl2.workflow.CreateTracedRun
 
   /**
    * The run spec to use. Only client-relevant fields are honored; dataplane scheduling fields
-   * (queue, cluster) are ignored for local runs.
+   * (queue, cluster) are ignored for traced runs.
    *
    * @generated from field: flyteidl2.task.RunSpec run_spec = 6;
    */
@@ -103,7 +103,7 @@ export type CreateTracedRunRequest = Message<"flyteidl2.workflow.CreateTracedRun
   labels: { [key: string]: string };
 
   /**
-   * Time the local run actually started. If unset, the server defaults it to the current time.
+   * Time the traced run actually started. If unset, the server defaults it to the current time.
    *
    * @generated from field: google.protobuf.Timestamp run_start_time = 8;
    */
@@ -118,7 +118,7 @@ export const CreateTracedRunRequestSchema: GenMessage<CreateTracedRunRequest> = 
   messageDesc(file_flyteidl2_workflow_traced_run_service, 0);
 
 /**
- * A single action state report within a local run.
+ * A single action state report within a traced run.
  *
  * @generated from message flyteidl2.workflow.TracedActionUpdate
  */
@@ -182,7 +182,7 @@ export const TracedActionUpdateSchema: GenMessage<TracedActionUpdate> = /*@__PUR
   messageDesc(file_flyteidl2_workflow_traced_run_service, 1);
 
 /**
- * Request message for reporting local action state.
+ * Request message for reporting traced action state.
  *
  * @generated from message flyteidl2.workflow.ReportTracedActionsRequest
  */
@@ -210,7 +210,7 @@ export const ReportTracedActionsRequestSchema: GenMessage<ReportTracedActionsReq
   messageDesc(file_flyteidl2_workflow_traced_run_service, 2);
 
 /**
- * Response message for reporting local action state.
+ * Response message for reporting traced action state.
  *
  * @generated from message flyteidl2.workflow.ReportTracedActionsResponse
  */
@@ -241,13 +241,13 @@ export const ReportTracedActionsResponseSchema: GenMessage<ReportTracedActionsRe
  * client-supplied state can never be mistaken for execution state the platform owns.
  *
  * The read/watch surface deliberately mirrors RunService (same request/response messages) so that
- * clients and UIs built against RunService work against local runs with only a service swap.
+ * clients and UIs built against RunService work against traced runs with only a service swap.
  *
  * @generated from service flyteidl2.workflow.TracedRunService
  */
 export const TracedRunService: GenService<{
   /**
-   * Register a new local run. The server creates the root action ("a0") in the reported state and
+   * Register a new traced run. The server creates the root action ("a0") in the reported state and
    * returns the resolved run. If a run name is not provided, the server generates one.
    *
    * @generated from rpc flyteidl2.workflow.TracedRunService.CreateRun
@@ -258,7 +258,7 @@ export const TracedRunService: GenService<{
     output: typeof CreateRunResponseSchema;
   },
   /**
-   * Report state for one or more actions of a local run. Creates actions on first report and
+   * Report state for one or more actions of a traced run. Creates actions on first report and
    * updates them on subsequent reports. Reports are idempotent: an event with an
    * (attempt, version, phase) tuple that was already recorded is acknowledged as success.
    *
@@ -270,7 +270,7 @@ export const TracedRunService: GenService<{
     output: typeof ReportTracedActionsResponseSchema;
   },
   /**
-   * Get detailed information about a local run.
+   * Get detailed information about a traced run.
    *
    * @generated from rpc flyteidl2.workflow.TracedRunService.GetRunDetails
    */
@@ -280,7 +280,7 @@ export const TracedRunService: GenService<{
     output: typeof GetRunDetailsResponseSchema;
   },
   /**
-   * Stream detailed information updates about a local run. The call will terminate when the run
+   * Stream detailed information updates about a traced run. The call will terminate when the run
    * reaches a terminal phase.
    *
    * @generated from rpc flyteidl2.workflow.TracedRunService.WatchRunDetails
@@ -291,7 +291,7 @@ export const TracedRunService: GenService<{
     output: typeof WatchRunDetailsResponseSchema;
   },
   /**
-   * Get detailed information about an action of a local run.
+   * Get detailed information about an action of a traced run.
    *
    * @generated from rpc flyteidl2.workflow.TracedRunService.GetActionDetails
    */
@@ -301,7 +301,7 @@ export const TracedRunService: GenService<{
     output: typeof GetActionDetailsResponseSchema;
   },
   /**
-   * Stream detailed information updates about an action of a local run. The call will terminate
+   * Stream detailed information updates about an action of a traced run. The call will terminate
    * when the action reaches a terminal phase.
    *
    * @generated from rpc flyteidl2.workflow.TracedRunService.WatchActionDetails
@@ -312,7 +312,7 @@ export const TracedRunService: GenService<{
     output: typeof WatchActionDetailsResponseSchema;
   },
   /**
-   * List local runs based on the provided filter criteria.
+   * List traced runs based on the provided filter criteria.
    *
    * @generated from rpc flyteidl2.workflow.TracedRunService.ListRuns
    */
@@ -322,7 +322,7 @@ export const TracedRunService: GenService<{
     output: typeof ListRunsResponseSchema;
   },
   /**
-   * Stream updates for local runs based on the provided filter criteria.
+   * Stream updates for traced runs based on the provided filter criteria.
    *
    * @generated from rpc flyteidl2.workflow.TracedRunService.WatchRuns
    */
@@ -332,7 +332,7 @@ export const TracedRunService: GenService<{
     output: typeof WatchRunsResponseSchema;
   },
   /**
-   * List all actions for a given local run.
+   * List all actions for a given traced run.
    *
    * @generated from rpc flyteidl2.workflow.TracedRunService.ListActions
    */
@@ -342,7 +342,7 @@ export const TracedRunService: GenService<{
     output: typeof ListActionsResponseSchema;
   },
   /**
-   * Stream updates for actions of a given local run.
+   * Stream updates for actions of a given traced run.
    *
    * @generated from rpc flyteidl2.workflow.TracedRunService.WatchActions
    */
@@ -352,8 +352,8 @@ export const TracedRunService: GenService<{
     output: typeof WatchActionsResponseSchema;
   },
   /**
-   * Abort a local run: mark the run and all of its non-terminal actions ABORTED on the server.
-   * The platform cannot stop the local orchestrator; subsequent reports against aborted actions
+   * Abort a traced run: mark the run and all of its non-terminal actions ABORTED on the server.
+   * The platform cannot stop the client that owns the run; subsequent reports against aborted actions
    * are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
    *
    * @generated from rpc flyteidl2.workflow.TracedRunService.AbortRun

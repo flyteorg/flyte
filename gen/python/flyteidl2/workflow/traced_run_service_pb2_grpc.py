@@ -16,7 +16,7 @@ class TracedRunServiceStub(object):
     client-supplied state can never be mistaken for execution state the platform owns.
 
     The read/watch surface deliberately mirrors RunService (same request/response messages) so that
-    clients and UIs built against RunService work against local runs with only a service swap.
+    clients and UIs built against RunService work against traced runs with only a service swap.
     """
 
     def __init__(self, channel):
@@ -92,11 +92,11 @@ class TracedRunServiceServicer(object):
     client-supplied state can never be mistaken for execution state the platform owns.
 
     The read/watch surface deliberately mirrors RunService (same request/response messages) so that
-    clients and UIs built against RunService work against local runs with only a service swap.
+    clients and UIs built against RunService work against traced runs with only a service swap.
     """
 
     def CreateRun(self, request, context):
-        """Register a new local run. The server creates the root action ("a0") in the reported state and
+        """Register a new traced run. The server creates the root action ("a0") in the reported state and
         returns the resolved run. If a run name is not provided, the server generates one.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -104,7 +104,7 @@ class TracedRunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def ReportActions(self, request, context):
-        """Report state for one or more actions of a local run. Creates actions on first report and
+        """Report state for one or more actions of a traced run. Creates actions on first report and
         updates them on subsequent reports. Reports are idempotent: an event with an
         (attempt, version, phase) tuple that was already recorded is acknowledged as success.
         """
@@ -113,14 +113,14 @@ class TracedRunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def GetRunDetails(self, request, context):
-        """Get detailed information about a local run.
+        """Get detailed information about a traced run.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def WatchRunDetails(self, request, context):
-        """Stream detailed information updates about a local run. The call will terminate when the run
+        """Stream detailed information updates about a traced run. The call will terminate when the run
         reaches a terminal phase.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -128,14 +128,14 @@ class TracedRunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def GetActionDetails(self, request, context):
-        """Get detailed information about an action of a local run.
+        """Get detailed information about an action of a traced run.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def WatchActionDetails(self, request, context):
-        """Stream detailed information updates about an action of a local run. The call will terminate
+        """Stream detailed information updates about an action of a traced run. The call will terminate
         when the action reaches a terminal phase.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -143,36 +143,36 @@ class TracedRunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def ListRuns(self, request, context):
-        """List local runs based on the provided filter criteria.
+        """List traced runs based on the provided filter criteria.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def WatchRuns(self, request, context):
-        """Stream updates for local runs based on the provided filter criteria.
+        """Stream updates for traced runs based on the provided filter criteria.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def ListActions(self, request, context):
-        """List all actions for a given local run.
+        """List all actions for a given traced run.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def WatchActions(self, request, context):
-        """Stream updates for actions of a given local run.
+        """Stream updates for actions of a given traced run.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def AbortRun(self, request, context):
-        """Abort a local run: mark the run and all of its non-terminal actions ABORTED on the server.
-        The platform cannot stop the local orchestrator; subsequent reports against aborted actions
+        """Abort a traced run: mark the run and all of its non-terminal actions ABORTED on the server.
+        The platform cannot stop the client that owns the run; subsequent reports against aborted actions
         are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -254,7 +254,7 @@ class TracedRunService(object):
     client-supplied state can never be mistaken for execution state the platform owns.
 
     The read/watch surface deliberately mirrors RunService (same request/response messages) so that
-    clients and UIs built against RunService work against local runs with only a service swap.
+    clients and UIs built against RunService work against traced runs with only a service swap.
     """
 
     @staticmethod
