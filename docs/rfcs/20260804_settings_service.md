@@ -272,14 +272,15 @@ config. This phase wires resolution into the run-creation path:
 | 3.4 | **[independent]** Storage settings | `storage.raw_data_path`, `run.run_base_dir` |
 | 3.5 | Precedence rule + docs: explicit user-provided spec values always win over settings-derived defaults | all of the above |
 
-### Phase 4 — surfaces (all independent, all parallelizable)
+### Phase 4 — verification & docs (all independent)
+
+The SDK already supports editing settings, so no new client work is needed —
+only end-to-end verification once the server lands.
 
 | # | Task |
 |---|---|
-| 4.1 | CLI: `get settings` / `update settings` (clients already generated) |
-| 4.2 | UI: settings page using `GetSettingsForEdit` (per-level editing with version-based conflict detection; the `desc` proto field option carries per-field help text readable via reflection) |
-| 4.3 | User-facing docs: concepts page for scopes, inheritance, `UNSET` semantics |
-| 4.4 | `flytekit` helpers, if any ergonomics gaps surface |
+| 4.1 | Verify the existing flyte-sdk settings commands end-to-end against the new server; fix any gaps found |
+| 4.2 | User-facing docs: concepts page for scopes, inheritance, `UNSET` semantics |
 
 ## 6 Drawbacks
 
@@ -289,16 +290,7 @@ config. This phase wires resolution into the run-creation path:
   precedence clearly (settings override static defaults; explicit user specs
   override both).
 
-## 7 Alternatives
-
-- **Port Flyte 1 matchable attributes.** Rejected during the IDL design
-  (#7127): free-form structure, no inheritance states, confusing CRUD.
-- **Static config only.** Cannot express per-project/domain values without
-  redeploys; no guardrails.
-- **Per-workflow config in user code.** Exactly the repetition and lack of
-  central enforcement this proposal removes.
-
-## 8 Unresolved questions
+## 7 Unresolved questions
 
 - Should resolved settings be cached server-side, or is one indexed
   `key = ANY(...)` query per run creation cheap enough? (Proposal: ship
@@ -308,7 +300,7 @@ config. This phase wires resolution into the run-creation path:
 - Future scopes (e.g. user-level) — the key encoding is versioned (`v1:`) to
   leave room.
 
-## 9 Conclusion
+## 8 Conclusion
 
 The API is designed, reviewed, merged, and code-generated in four languages;
 the storage and service patterns it needs already exist in the repo. What
