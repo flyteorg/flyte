@@ -222,6 +222,12 @@ monitoring:
 	@[ -n "$$(docker ps --filter name=^$(DEVBOX_NAME)$$ --format '{{.Names}}')" ] || \
 		{ echo "$(DEVBOX_NAME) is not running — run 'make devbox-run' first"; exit 1; }
 	kubectl --context $(DEVBOX_CONTEXT) apply -f monitoring/monitoring.yaml
+	@# The dashboards live as real .json files rather than embedded in the
+	@# manifest, so they diff as JSON. Any file dropped in monitoring/dashboards/
+	@# is picked up by Grafana's file provisioner.
+	kubectl --context $(DEVBOX_CONTEXT) -n monitoring create configmap grafana-dashboards \
+		--from-file=monitoring/dashboards/ --dry-run=client -o yaml | \
+		kubectl --context $(DEVBOX_CONTEXT) apply -f -
 	@# Point flyte at the collector so the dashboard has something to chart.
 	kubectl --context $(DEVBOX_CONTEXT) -n flyte patch cm flyte-binary-config --type merge --patch '{"data":{"200-otel.yaml":"otel:\n  type: otlpgrpc\n  otlpgrpc:\n    endpoint: http://otel-collector.monitoring.svc.cluster.local:4317\n  sampler: { parentSampler: traceid, traceIdRatio: 0.01 }\n"}}'
 	kubectl --context $(DEVBOX_CONTEXT) -n flyte rollout restart deploy flyte-binary
@@ -242,6 +248,7 @@ monitoring:
 monitoring-clean:
 	-kubectl --context $(DEVBOX_CONTEXT) -n flyte patch cm flyte-binary-config --type json --patch '[{"op":"remove","path":"/data/200-otel.yaml"}]'
 	-kubectl --context $(DEVBOX_CONTEXT) -n flyte rollout restart deploy flyte-binary
+	-kubectl --context $(DEVBOX_CONTEXT) -n monitoring delete configmap grafana-dashboards
 	-kubectl --context $(DEVBOX_CONTEXT) delete -f monitoring/monitoring.yaml
 
 .PHONY: stop
