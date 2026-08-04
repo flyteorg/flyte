@@ -24,7 +24,7 @@ data:
       # reads zero everywhere.
       metricstransform:
         transforms:
-          - include: ^rpc\\..*
+          - include: ^rpc\..*
             match_type: regexp
             action: update
             operations:

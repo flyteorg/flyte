@@ -145,9 +145,9 @@ build-gpu: build
 		--build-arg BASE_IMAGE=base \
 		--tag flyte-devbox:gpu-latest .
 
-GRAFANA_NODE_PORT ?= 30300
-DEVBOX_NAME ?= flyte-devbox
-DEVBOX_CONTEXT ?= flyte-devbox
+override GRAFANA_NODE_PORT := 30300
+override DEVBOX_NAME := flyte-devbox
+override DEVBOX_CONTEXT := flyte-devbox
 
 # Port map
 # 6443 - k8s API server
