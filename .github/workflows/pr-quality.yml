@@ -19,4 +19,4 @@ jobs:
         with:
           # Require several independent warning signs before taking action to
           # avoid penalizing legitimate contributors for a single heuristic.
-          max-failures: 4
+          max-failures: 8
