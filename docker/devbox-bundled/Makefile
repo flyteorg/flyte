@@ -236,7 +236,7 @@ monitoring:
 	kubectl --context $(DEVBOX_CONTEXT) -n flyte rollout status deploy/flyte-binary --timeout=300s
 	@echo
 	@if docker port $(DEVBOX_NAME) | grep -q "^30300/tcp"; then \
-		echo "Grafana:  http://localhost:30300/d/oss/flyte-v2   (anonymous admin)"; \
+		echo "Grafana:  http://localhost:30300/d/oss/flyte-execution   (anonymous admin)"; \
 	else \
 		echo "NOTE: this devbox predates the Grafana port being published, so"; \
 		echo "      http://localhost:30300 is not reachable yet. Recreate it:"; \

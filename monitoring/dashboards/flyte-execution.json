@@ -1,6 +1,6 @@
 {
   "uid": "oss",
-  "title": "Flyte v2",
+  "title": "Flyte Execution",
   "tags": [
     "flyte",
     "otel",
