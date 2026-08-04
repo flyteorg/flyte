@@ -19,9 +19,6 @@ domain, and project scope**, with well-defined inheritance and override
 semantics, instead of baking them into static server config or repeating them
 in every task decorator.
 
-The work is deliberately sliced into small, independent tasks across four
-phases so that many contributors can pick up pieces in parallel.
-
 ## 2 Motivation — why do we need it?
 
 Today, every knob that shapes *how* a task runs comes from exactly two places:
