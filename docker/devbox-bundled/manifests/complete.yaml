@@ -8299,10 +8299,6 @@ spec:
     port: 443
     protocol: TCP
     targetPort: 9443
-  - name: cache-internal
-    port: 9444
-    protocol: TCP
-    targetPort: 9444
   selector:
     app.kubernetes.io/component: flyte-binary
     app.kubernetes.io/instance: flyte-devbox

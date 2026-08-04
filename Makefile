@@ -48,6 +48,16 @@ devbox-run: ## Start the flyte devbox (Knative is pre-baked into the image)
 devbox-stop: ## Stop the flyte devbox
 	$(MAKE) -C docker/devbox-bundled stop
 
+# Opt-in rather than bundled: the Grafana stack adds ~1.4GB unpacked to the
+# devbox image, so it is pulled on demand into a running devbox instead.
+.PHONY: devbox-monitoring
+devbox-monitoring: ## Add the Grafana/Prometheus/OTel stack to a running devbox (http://localhost:30300)
+	$(MAKE) -C docker/devbox-bundled monitoring
+
+.PHONY: devbox-monitoring-stop
+devbox-monitoring-stop: ## Remove the Grafana stack from the devbox
+	$(MAKE) -C docker/devbox-bundled monitoring-clean
+
 .PHONY: help
 help: ## Show this help message
 	@echo '🆘  Showing help message'
