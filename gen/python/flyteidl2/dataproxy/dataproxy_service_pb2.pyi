@@ -5,6 +5,7 @@ from flyteidl2.common import run_pb2 as _run_pb2
 from flyteidl2.logs.dataplane import payload_pb2 as _payload_pb2
 from flyteidl2.task import common_pb2 as _common_pb2
 from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
+from flyteidl2.workflow import run_definition_pb2 as _run_definition_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
@@ -118,10 +119,12 @@ class CreateDownloadLinkResponse(_message.Message):
     def __init__(self, pre_signed_urls: _Optional[_Union[PreSignedURLs, _Mapping]] = ...) -> None: ...
 
 class GetActionDataRequest(_message.Message):
-    __slots__ = ["action_id"]
+    __slots__ = ["action_id", "run_source"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
+    RUN_SOURCE_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ...) -> None: ...
+    run_source: _run_definition_pb2.RunSource
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., run_source: _Optional[_Union[_run_definition_pb2.RunSource, str]] = ...) -> None: ...
 
 class GetActionDataResponse(_message.Message):
     __slots__ = ["inputs", "outputs", "inputs_uri", "outputs_uri"]
