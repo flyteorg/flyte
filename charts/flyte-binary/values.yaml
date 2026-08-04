@@ -333,6 +333,10 @@ console:
   basePath: /v2
   # containerPort Port the console container listens on
   containerPort: 8080
+  # env Environment variables for the console container. Set `OIDC_LOGOUT_URL` to your
+  # identity provider's logout endpoint so Sign out ends the IdP session, not just the
+  # proxy session cookie (e.g. `https://<okta-org>/login/signout`).
+  env: []
   # service Configure service for the console
   service:
     # type Kubernetes service type
