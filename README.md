@@ -1,7 +1,7 @@
 > [!IMPORTANT]
 > ## Flyte 2 is now generally available!
 >
-> Check out the deployment guide [here](https://www.union.ai/docs/v2/flyte/oss-deployment/) to get started.
+> Read more in the announcement [here](https://www.union.ai/blog-post/flyte-2-is-generally-available-the-durable-open-source-ai-runtime).
 >
 > Want to try Flyte 2 locally? Run the [Devbox](https://www.union.ai/docs/v2/flyte/user-guide/get-started/run-modes/running-devbox/).
 >
