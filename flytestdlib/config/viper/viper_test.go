@@ -169,6 +169,55 @@ func Test_restoreDottedMapKeys(t *testing.T) {
 			},
 		}, viper)
 	})
+
+	t.Run("removes flat lowercased duplicate", func(t *testing.T) {
+		// Viper lowercased the dotted key without splitting it: no skeleton
+		// to prune, but the lowercase flat variant must not survive as a
+		// duplicate next to the restored original.
+		viper := map[string]interface{}{
+			"annotations": map[string]interface{}{
+				"key.with.dots": "v1",
+			},
+		}
+		raw := map[string]interface{}{
+			"annotations": map[string]interface{}{
+				"Key.With.Dots": "v1",
+			},
+		}
+
+		restoreDottedMapKeys(viper, raw)
+
+		assert.Equal(t, map[string]interface{}{
+			"annotations": map[string]interface{}{
+				"Key.With.Dots": "v1",
+			},
+		}, viper)
+	})
+
+	t.Run("keeps genuinely lowercase sibling key", func(t *testing.T) {
+		// Both spellings exist in the raw YAML as distinct keys; restoring
+		// one must not delete the other regardless of iteration order.
+		viper := map[string]interface{}{
+			"annotations": map[string]interface{}{
+				"key.with.dots": "v2",
+			},
+		}
+		raw := map[string]interface{}{
+			"annotations": map[string]interface{}{
+				"Key.With.Dots": "v1",
+				"key.with.dots": "v2",
+			},
+		}
+
+		restoreDottedMapKeys(viper, raw)
+
+		assert.Equal(t, map[string]interface{}{
+			"annotations": map[string]interface{}{
+				"Key.With.Dots": "v1",
+				"key.with.dots": "v2",
+			},
+		}, viper)
+	})
 }
 
 func Test_pruneSplitPath(t *testing.T) {

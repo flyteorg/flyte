@@ -339,7 +339,15 @@ func restoreDottedMapKeys(viperData, rawData map[string]interface{}) {
 			// Drop the nested skeleton viper built from this dotted key, then
 			// reinsert the raw value under the original key. Lowercase the
 			// path because viper lowercases all keys.
-			pruneSplitPath(viperData, strings.Split(strings.ToLower(rawKey), keyDelim))
+			lowerKey := strings.ToLower(rawKey)
+			pruneSplitPath(viperData, strings.Split(lowerKey, keyDelim))
+			// Viper sometimes lowercases a dotted key without splitting it,
+			// leaving a flat lowercased duplicate that pruneSplitPath (which
+			// only removes split skeletons) does not touch. Drop it unless the
+			// lowercased spelling is itself a genuine key in the raw YAML.
+			if _, isRealKey := rawData[lowerKey]; lowerKey != rawKey && !isRealKey {
+				delete(viperData, lowerKey)
+			}
 			viperData[rawKey] = rawVal
 			continue
 		}
