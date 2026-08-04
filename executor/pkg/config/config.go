@@ -96,10 +96,15 @@ type Config struct {
 
 	// RequeueDuration is how long the controller waits before reconciling a running
 	// TaskAction again. Lowering it makes task actions more responsive at the cost of
-	// more reconciles and more load on the plugin backends. It also sets the cache
-	// reservation heartbeat interval, so a reservation stays held until the next
-	// reconcile.
-	RequeueDuration stdconfig.Duration `json:"requeueDuration" pflag:",How long to wait before reconciling a running TaskAction again"`
+	// more reconciles and more load on the plugin backends. 0 or unset means the
+	// built-in default of 10s.
+	//
+	// It is also the cache reservation heartbeat requested from cache_service. That
+	// service clamps the request to its own maxReservationHeartbeat, so raising this
+	// past cache_service's maxReservationHeartbeat times heartbeatGracePeriodMultiplier
+	// (10s times 3 by default) without raising that setting too can let a serializable
+	// cache reservation expire before the next reconcile.
+	RequeueDuration stdconfig.Duration `json:"requeueDuration" pflag:",How long to wait before reconciling a running TaskAction again. 0 means the default of 10s"`
 
 	// GC configures the garbage collector for terminal TaskActions.
 	GC GCConfig `json:"gc" pflag:",Garbage collector configuration for terminal TaskActions"`
