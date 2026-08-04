@@ -69,28 +69,6 @@ unquoted `1` is a YAML integer:
 error: json: cannot unmarshal number into Go struct field ObjectMeta.metadata.labels of type string
 ```
 
-## Why a ConfigMap and not just a UI import
-
-A UI import writes the dashboard into Grafana's own database (`grafana.db`, under
-`/var/lib/grafana`). If that path is not persisted, the dashboard disappears the
-next time the pod restarts — an upgrade, an eviction, a node moving. A
-provisioned ConfigMap is re-read at every start, so it always comes back.
-
-That is not a hypothetical: kube-prometheus-stack ships `persistence.enabled:
-false`, so Grafana's storage is an `emptyDir` by default. Restarting Grafana with
-both kinds present leaves the provisioned dashboard serving and the imported one
-returning 404.
-
-Check which case you are in:
-
-```bash
-kubectl -n <ns> get deploy <grafana-deploy> \
-  -o jsonpath='{.spec.template.spec.volumes[?(@.name=="storage")]}'
-# {"emptyDir":{},...}          -> UI imports vanish on restart; use the ConfigMap
-# {"persistentVolumeClaim":..} -> UI imports survive; the ConfigMap is then just
-#                                 a way to keep the dashboard versioned in git
-```
-
 ## Editing
 
 Edit in Grafana, then export via **Share → Export → Save to file** and replace
