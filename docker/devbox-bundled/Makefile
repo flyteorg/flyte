@@ -145,7 +145,6 @@ build-gpu: build
 		--build-arg BASE_IMAGE=base \
 		--tag flyte-devbox:gpu-latest .
 
-override GRAFANA_NODE_PORT := 30300
 override DEVBOX_NAME := flyte-devbox
 override DEVBOX_CONTEXT := flyte-devbox
 
@@ -177,17 +176,10 @@ start:
 			--publish "30002:30002" \
 			--publish "30080:30080" \
 			--publish "30081:30081" \
-			--publish "$(GRAFANA_NODE_PORT):$(GRAFANA_NODE_PORT)" \
+			--publish "30300:30300" \
 			$(FLYTE_DEVBOX_IMAGE); \
 	fi
 	@echo "Waiting for kubeconfig..."
-	@# Read the kubeconfig out of the container instead of trusting the bind
-	@# mount. A devbox that is already running may have been started with a
-	@# different host dir at /.kube (or by other tooling), in which case a stale
-	@# $(PWD)/.kube/kubeconfig sails past this wait and the next step fails with
-	@# "cannot access '/.kube/kubeconfig'". Reading from the container also
-	@# lands the file owned by the invoking user, so no chown is needed (the
-	@# bind-mounted copy is root-owned on WSL).
 	@mkdir -p $(PWD)/.kube
 	@until docker exec flyte-devbox test -s /etc/rancher/k3s/k3s.yaml >/dev/null 2>&1; do sleep 1; done
 	@docker exec flyte-devbox cat /etc/rancher/k3s/k3s.yaml > $(PWD)/.kube/kubeconfig
