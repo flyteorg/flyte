@@ -234,11 +234,11 @@ monitoring:
 	kubectl --context $(DEVBOX_CONTEXT) -n monitoring rollout status deploy/grafana --timeout=300s
 	kubectl --context $(DEVBOX_CONTEXT) -n flyte rollout status deploy/flyte-binary --timeout=300s
 	@echo
-	@if docker port $(DEVBOX_NAME) | grep -q "^$(GRAFANA_NODE_PORT)/tcp"; then \
-		echo "Grafana:  http://localhost:$(GRAFANA_NODE_PORT)/d/oss/flyte-v2   (anonymous admin)"; \
+	@if docker port $(DEVBOX_NAME) | grep -q "^30300/tcp"; then \
+		echo "Grafana:  http://localhost:30300/d/oss/flyte-v2   (anonymous admin)"; \
 	else \
 		echo "NOTE: this devbox predates the Grafana port being published, so"; \
-		echo "      http://localhost:$(GRAFANA_NODE_PORT) is not reachable yet. Recreate it:"; \
+		echo "      http://localhost:30300 is not reachable yet. Recreate it:"; \
 		echo "        make devbox-stop && make devbox-run"; \
 	fi
 	@echo "Metrics appear ~60s after the first RPC traffic."
