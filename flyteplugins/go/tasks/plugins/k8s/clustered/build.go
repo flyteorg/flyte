@@ -35,9 +35,9 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	if spec.GetReplicas() < 1 {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "replicas must be >= 1, got %d", spec.GetReplicas())
 	}
-	// buildJobSetName reserves pod-index digits up to maxReplicasForNaming so the derived
-	// pod names stay within the 63-char limit. Beyond that the reservation is exceeded and
-	// the JobSet webhook would reject the pods, so fail fast with a clear spec error instead.
+	// generatedNameMaxLength reserves pod-index digits up to maxReplicasForNaming so the
+	// derived pod names stay within the 63-char limit. Beyond that the reservation is exceeded
+	// and the JobSet webhook would reject the pods, so fail fast with a clear spec error instead.
 	if spec.GetReplicas() > maxReplicasForNaming {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "replicas must be <= %d, got %d", maxReplicasForNaming, spec.GetReplicas())
 	}
@@ -84,14 +84,15 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 
 	podSpec.RestartPolicy = corev1.RestartPolicyNever
 	replicas := spec.GetReplicas()
-	// JobSet name doubles as the headless service / pod subdomain; both must be
-	// RFC 1123 subdomain-compatible. GeneratedName isn't guaranteed to be, and for
-	// composed/nested tasks it can be long enough that JobSet's derived pod names
-	// exceed the 63-char limit and the webhook rejects them. buildJobSetName both
-	// sanitizes and bounds the name so the longest generated pod name stays valid.
-	// BuildIdentityResource must derive the same name (see plugin.go) so the lookup
-	// and abort paths resolve the object this create path produces.
-	jobSetName := buildJobSetName(taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
+	// The plugin manager stamps the object name via GetGeneratedNameWith(0,
+	// GeneratedNameMaxLength) — sanitized to a DNS-1035 label and bounded so JobSet's
+	// derived child pod names stay within the 63-char limit (see generatedNameMaxLength
+	// in util.go). Derive the same name here for the headless service / pod subdomain,
+	// which must equal the JobSet name for pod DNS to resolve.
+	jobSetName, err := taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedNameWith(0, generatedNameMaxLength)
+	if err != nil {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "failed to derive JobSet name: %v", err)
+	}
 	if podSpec.Subdomain == "" {
 		podSpec.Subdomain = jobSetName
 	}

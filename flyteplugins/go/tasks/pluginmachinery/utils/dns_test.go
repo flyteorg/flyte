@@ -79,6 +79,61 @@ func TestConvertToDNS1123CompatibleString(t *testing.T) {
 	}
 }
 
+func TestConvertToDNS1035LabelCompatibleString(t *testing.T) {
+	tests := []struct {
+		name string
+		arg  string
+		want string
+	}{
+		{
+			name: "already compatible",
+			arg:  "f-abc123",
+			want: "f-abc123",
+		},
+		{
+			name: "dots become hyphens",
+			arg:  "my.run-a0-0",
+			want: "my-run-a0-0",
+		},
+		{
+			name: "leading digit gets letter prefix",
+			arg:  "9run-a0-0",
+			want: "x9run-a0-0",
+		},
+		{
+			name: "dots and digits only",
+			arg:  "0.1.2",
+			want: "x0-1-2",
+		},
+		{
+			name: "subdomain-style name",
+			arg:  "svc.default.a0",
+			want: "svc-default-a0",
+		},
+		{
+			name: "uppercase and underscore normalized",
+			arg:  "My_Run",
+			want: "myrun",
+		},
+		{
+			name: "empty input",
+			arg:  "",
+			want: "x",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := ConvertToDNS1035LabelCompatibleString(tt.arg)
+			if errs := validation.IsDNS1035Label(got); len(errs) > 0 {
+				t.Errorf("ConvertToDNS1035LabelCompatibleString() = %v, which is not a valid DNS-1035 label: %v", got, errs)
+			}
+			if got != tt.want {
+				t.Errorf("ConvertToDNS1035LabelCompatibleString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestConvertCamelCaseToKebabCase(t *testing.T) {
 	type args struct {
 		name string

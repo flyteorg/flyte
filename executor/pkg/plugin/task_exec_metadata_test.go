@@ -136,5 +136,26 @@ func TestTaskExecutionID_GetGeneratedNameWith(t *testing.T) {
 		_, err := execID.GetGeneratedNameWith(0, 2)
 		require.Error(t, err)
 	})
+
+	// Names within the max length must still come out DNS-1035 compatible: consumers
+	// (ray, clustered/JobSet) derive Service and child pod names from them, and dots or
+	// leading digits would be rejected by admission webhooks.
+	t.Run("sanitizes dots to DNS-1035 label", func(t *testing.T) {
+		execID := &taskExecutionID{
+			generatedName: "my.run-a0-0",
+		}
+		name, err := execID.GetGeneratedNameWith(0, 50)
+		require.NoError(t, err)
+		require.Equal(t, "my-run-a0-0", name)
+	})
+
+	t.Run("sanitizes leading digit to DNS-1035 label", func(t *testing.T) {
+		execID := &taskExecutionID{
+			generatedName: "9run-a0-0",
+		}
+		name, err := execID.GetGeneratedNameWith(0, 50)
+		require.NoError(t, err)
+		require.Equal(t, "x9run-a0-0", name)
+	})
 }
 
