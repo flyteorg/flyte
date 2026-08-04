@@ -5,6 +5,7 @@ package flyteidl2.artifact;
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/identity.proto";
+import "flyteidl2/core/artifact_id.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/types.proto";
 import "google/protobuf/timestamp.proto";
@@ -47,19 +48,6 @@ message ArtifactIdentifier {
   ];
 }
 
-// Reference to a previously uploaded card (model/data card) describing the
-// artifact.
-message Card {
-  // URI of the uploaded card content.
-  string uri = 1 [(buf.validate.field).string.max_len = 1024];
-
-  // Format of the card, e.g. html, md, json, yaml, csv, tsv, png, jpg, jpeg.
-  string format = 2 [(buf.validate.field).string.max_len = 16];
-
-  // Type of the card, e.g. model, data, generic.
-  string type = 3 [(buf.validate.field).string.max_len = 16];
-}
-
 // The task action attempt that produced an artifact. A dedicated message
 // (rather than common.ActionAttemptIdentifier) because producing attempts are
 // 0-based while that identifier validates attempt > 0.
@@ -96,14 +84,10 @@ message ArtifactSpec {
   // The Flyte type of the value.
   core.LiteralType type = 2 [(buf.validate.field).required = true];
 
-  // Optional human readable description.
-  string description = 3 [(buf.validate.field).string.max_len = 255];
-
-  // Free-form, user-supplied key/value metadata.
-  map<string, string> user_metadata = 4;
-
-  // Optional card describing this artifact.
-  Card card = 5;
+  // Descriptive payload (description, user metadata, card). Shared with the
+  // production declaration (task.ProducedArtifact.info), so task-produced
+  // artifacts carry it verbatim.
+  core.ArtifactInfo info = 3;
 
   // Optional provenance: what produced this artifact. Clients (including the
   // SDK, which stamps this automatically when publishing from inside a
