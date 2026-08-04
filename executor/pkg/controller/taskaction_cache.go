@@ -19,7 +19,13 @@ import (
 	corepb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
-const cacheReservationHeartbeatInterval = TaskActionDefaultRequeueDuration
+// cacheReservationHeartbeat is the reservation lease handed to the catalog. It
+// tracks the requeue duration so the reservation outlives the gap until the next
+// reconcile; a shorter lease would let another owner take the reservation while
+// this TaskAction is still waiting to be reconciled.
+func (r *TaskActionReconciler) cacheReservationHeartbeat() time.Duration {
+	return r.requeueDuration()
+}
 
 type taskCacheConfig struct {
 	key          catalog.Key
@@ -56,7 +62,7 @@ func (r *TaskActionReconciler) evaluateCacheBeforeExecution(
 	}
 
 	if cacheCfg.serializable {
-		reservation, err := r.Catalog.GetOrExtendReservation(ctx, cacheCfg.key, cacheCfg.ownerID, cacheReservationHeartbeatInterval)
+		reservation, err := r.Catalog.GetOrExtendReservation(ctx, cacheCfg.key, cacheCfg.ownerID, r.cacheReservationHeartbeat())
 		if err != nil {
 			return pluginsCore.UnknownTransition, false, fmt.Errorf("acquiring cache reservation: %w", err)
 		}

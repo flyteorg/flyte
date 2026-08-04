@@ -102,7 +102,10 @@ type TaskActionReconciler struct {
 	eventBatcher      *eventBatcher
 	cluster           string
 	MaxSystemFailures uint32
-	metrics           *taskActionMetrics
+	// RequeueDuration overrides how long to wait before reconciling a running
+	// TaskAction again. Zero means TaskActionDefaultRequeueDuration.
+	RequeueDuration time.Duration
+	metrics         *taskActionMetrics
 }
 
 // recordEvent persists a single ActionEvent, blocking until it is durably
@@ -147,6 +150,16 @@ func (r *TaskActionReconciler) maxSystemFailures() uint32 {
 		return DefaultMaxSystemFailures
 	}
 	return r.MaxSystemFailures
+}
+
+// requeueDuration is how long to wait before reconciling a running TaskAction
+// again. It also bounds the cache reservation heartbeat, so a serializable
+// reservation is held at least until the next reconcile.
+func (r *TaskActionReconciler) requeueDuration() time.Duration {
+	if r.RequeueDuration <= 0 {
+		return TaskActionDefaultRequeueDuration
+	}
+	return r.RequeueDuration
 }
 
 // resetPluginResource aborts any in-flight plugin resource and clears persisted
@@ -201,7 +214,7 @@ func (r *TaskActionReconciler) recordSystemError(
 			logger.Error(updErr, "failed to persist SystemFailures counter")
 		}
 	}
-	return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 }
 
 // finalizePermanentFailure converts the TaskAction to a terminal PermanentFailure
@@ -362,7 +375,7 @@ func (r *TaskActionReconciler) reconcileTask(
 	)
 	if err != nil {
 		logger.Error(err, "failed to build task execution context")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 	}
 	alreadyRunning := taskAction.Status.PluginPhase == pluginsCore.PhaseRunning.String()
 
@@ -372,7 +385,7 @@ func (r *TaskActionReconciler) reconcileTask(
 	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, alreadyRunning)
 	if err != nil {
 		logger.Error(err, "cache pre-execution handling failed")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 	}
 	// Even when cache handling short-circuits execution, we still continue through the
 	// shared reconcile tail below so the derived transition updates conditions, status,
@@ -388,7 +401,7 @@ func (r *TaskActionReconciler) reconcileTask(
 
 	if transition, err = r.finalizeCacheAfterExecution(ctx, taskAction, tCtx, transition, cacheShortCircuited); err != nil {
 		logger.Error(err, "cache post-execution handling failed")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 	}
 
 	// Map transition phase to TaskAction conditions
@@ -475,7 +488,7 @@ func (r *TaskActionReconciler) reconcileTask(
 		}
 	}
 
-	return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 }
 
 // ensureTerminalLabels adds GC-related labels to a terminal TaskAction if not already present.
@@ -534,12 +547,12 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 
 	if err := p.Abort(ctx, tCtx); err != nil {
 		logger.Error(err, "plugin Abort failed, will retry")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 	}
 
 	if err := p.Finalize(ctx, tCtx); err != nil {
 		logger.Error(err, "plugin Finalize failed, will retry")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 	}
 
 	if cacheCfg, ok, err := buildTaskCacheConfig(ctx, taskAction, tCtx); err != nil {
@@ -558,7 +571,7 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 	actionEvent.UpdatedTime = timestamppb.New(abortTime)
 	if err := r.recordEvent(ctx, actionEvent); err != nil {
 		logger.Error(err, "failed to emit abort event, will retry")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 	}
 
 	return r.removeFinalizer(ctx, taskAction)

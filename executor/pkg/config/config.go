@@ -26,6 +26,7 @@ var (
 		Cluster:                 "",
 		MaxSystemFailures:       3,
 		MaxConcurrentReconciles: 512,
+		RequeueDuration:         stdconfig.Duration{Duration: 10 * time.Second},
 		GC: GCConfig{
 			Interval: stdconfig.Duration{Duration: 30 * time.Minute},
 			MaxTTL:   stdconfig.Duration{Duration: 1 * time.Hour},
@@ -92,6 +93,13 @@ type Config struct {
 
 	// MaxConcurrentReconciles is the maximum number of concurrent reconcile loops for TaskActions.
 	MaxConcurrentReconciles int `json:"maxConcurrentReconciles" pflag:",Max concurrent reconcile loops for TaskActions"`
+
+	// RequeueDuration is how long the controller waits before reconciling a running
+	// TaskAction again. Lowering it makes task actions more responsive at the cost of
+	// more reconciles and more load on the plugin backends. It also sets the cache
+	// reservation heartbeat interval, so a reservation stays held until the next
+	// reconcile.
+	RequeueDuration stdconfig.Duration `json:"requeueDuration" pflag:",How long to wait before reconciling a running TaskAction again"`
 
 	// GC configures the garbage collector for terminal TaskActions.
 	GC GCConfig `json:"gc" pflag:",Garbage collector configuration for terminal TaskActions"`

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-viper/mapstructure/v2"
+	"github.com/mitchellh/mapstructure"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -317,6 +317,34 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("maxSystemFailures", testValue)
 			if vInt32, err := cmdFlags.GetInt32("maxSystemFailures"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt32), &actual.MaxSystemFailures)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_maxConcurrentReconciles", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("maxConcurrentReconciles", testValue)
+			if vInt, err := cmdFlags.GetInt("maxConcurrentReconciles"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.MaxConcurrentReconciles)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_requeueDuration", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.RequeueDuration.String()
+
+			cmdFlags.Set("requeueDuration", testValue)
+			if vString, err := cmdFlags.GetString("requeueDuration"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.RequeueDuration)
 
 			} else {
 				assert.FailNow(t, err.Error())
