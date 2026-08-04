@@ -12,12 +12,14 @@ _sym_db = _symbol_database.Default()
 
 
 from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
+from flyteidl2.core import artifact_id_pb2 as flyteidl2_dot_core_dot_artifact__id__pb2
 from flyteidl2.core import interface_pb2 as flyteidl2_dot_core_dot_interface__pb2
 from flyteidl2.core import literals_pb2 as flyteidl2_dot_core_dot_literals__pb2
+from flyteidl2.core import types_pb2 as flyteidl2_dot_core_dot_types__pb2
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1b\x66lyteidl2/task/common.proto\x12\x0e\x66lyteidl2.task\x1a\x1b\x62uf/validate/validate.proto\x1a\x1e\x66lyteidl2/core/interface.proto\x1a\x1d\x66lyteidl2/core/literals.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"]\n\x0eNamedParameter\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x37\n\tparameter\x18\x02 \x01(\x0b\x32\x19.flyteidl2.core.ParameterR\tparameter\"\xa2\x01\n\tFixedRate\x12\x1d\n\x05value\x18\x01 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x05value\x12;\n\x04unit\x18\x02 \x01(\x0e\x32\x1d.flyteidl2.task.FixedRateUnitB\x08\xbaH\x05\x82\x01\x02 \x00R\x04unit\x12\x39\n\nstart_time\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tstartTime\"K\n\x04\x43ron\x12\'\n\nexpression\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\nexpression\x12\x1a\n\x08timezone\x18\x02 \x01(\tR\x08timezone\"\xe0\x01\n\x08Schedule\x12/\n\x04rate\x18\x01 \x01(\x0b\x32\x19.flyteidl2.task.FixedRateH\x00R\x04rate\x12-\n\x0f\x63ron_expression\x18\x02 \x01(\tB\x02\x18\x01H\x00R\x0e\x63ronExpression\x12*\n\x04\x63ron\x18\x04 \x01(\x0b\x32\x14.flyteidl2.task.CronH\x00R\x04\x63ron\x12\x33\n\x16kickoff_time_input_arg\x18\x03 \x01(\tR\x13kickoffTimeInputArgB\x13\n\nexpression\x12\x05\xbaH\x02\x08\x01\"v\n\x0f\x41rtifactTrigger\x12,\n\rartifact_name\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x0c\x61rtifactName\x12\x18\n\x07version\x18\x02 \x01(\tR\x07version\x12\x1b\n\tinput_arg\x18\x03 \x01(\tR\x08inputArg\"\xe5\x01\n\x15TriggerAutomationSpec\x12G\n\x04type\x18\x01 \x01(\x0e\x32).flyteidl2.task.TriggerAutomationSpecTypeB\x08\xbaH\x05\x82\x01\x02 \x00R\x04type\x12\x36\n\x08schedule\x18\x02 \x01(\x0b\x32\x18.flyteidl2.task.ScheduleH\x00R\x08schedule\x12=\n\x08\x61rtifact\x18\x03 \x01(\x0b\x32\x1f.flyteidl2.task.ArtifactTriggerH\x00R\x08\x61rtifactB\x0c\n\nautomation\"Q\n\x0cNamedLiteral\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12-\n\x05value\x18\x02 \x01(\x0b\x32\x17.flyteidl2.core.LiteralR\x05value\"P\n\x10OutputReferences\x12\x1d\n\noutput_uri\x18\x01 \x01(\tR\toutputUri\x12\x1d\n\nreport_uri\x18\x02 \x01(\tR\treportUri\"z\n\x06Inputs\x12\x38\n\x08literals\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.task.NamedLiteralR\x08literals\x12\x36\n\x07\x63ontext\x18\x02 \x03(\x0b\x32\x1c.flyteidl2.core.KeyValuePairR\x07\x63ontext\"C\n\x07Outputs\x12\x38\n\x08literals\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.task.NamedLiteralR\x08literals*\x7f\n\rFixedRateUnit\x12\x1f\n\x1b\x46IXED_RATE_UNIT_UNSPECIFIED\x10\x00\x12\x1a\n\x16\x46IXED_RATE_UNIT_MINUTE\x10\x01\x12\x18\n\x14\x46IXED_RATE_UNIT_HOUR\x10\x02\x12\x17\n\x13\x46IXED_RATE_UNIT_DAY\x10\x03*f\n\x19TriggerAutomationSpecType\x12\x14\n\x10TYPE_UNSPECIFIED\x10\x00\x12\r\n\tTYPE_NONE\x10\x01\x12\x11\n\rTYPE_SCHEDULE\x10\x02\x12\x11\n\rTYPE_ARTIFACT\x10\x03\x42\xb0\x01\n\x12\x63om.flyteidl2.taskB\x0b\x43ommonProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task\xa2\x02\x03\x46TX\xaa\x02\x0e\x46lyteidl2.Task\xca\x02\x0e\x46lyteidl2\\Task\xe2\x02\x1a\x46lyteidl2\\Task\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Taskb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1b\x66lyteidl2/task/common.proto\x12\x0e\x66lyteidl2.task\x1a\x1b\x62uf/validate/validate.proto\x1a flyteidl2/core/artifact_id.proto\x1a\x1e\x66lyteidl2/core/interface.proto\x1a\x1d\x66lyteidl2/core/literals.proto\x1a\x1a\x66lyteidl2/core/types.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"]\n\x0eNamedParameter\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x37\n\tparameter\x18\x02 \x01(\x0b\x32\x19.flyteidl2.core.ParameterR\tparameter\"\xa2\x01\n\tFixedRate\x12\x1d\n\x05value\x18\x01 \x01(\rB\x07\xbaH\x04*\x02 \x00R\x05value\x12;\n\x04unit\x18\x02 \x01(\x0e\x32\x1d.flyteidl2.task.FixedRateUnitB\x08\xbaH\x05\x82\x01\x02 \x00R\x04unit\x12\x39\n\nstart_time\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tstartTime\"K\n\x04\x43ron\x12\'\n\nexpression\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\nexpression\x12\x1a\n\x08timezone\x18\x02 \x01(\tR\x08timezone\"\xe0\x01\n\x08Schedule\x12/\n\x04rate\x18\x01 \x01(\x0b\x32\x19.flyteidl2.task.FixedRateH\x00R\x04rate\x12-\n\x0f\x63ron_expression\x18\x02 \x01(\tB\x02\x18\x01H\x00R\x0e\x63ronExpression\x12*\n\x04\x63ron\x18\x04 \x01(\x0b\x32\x14.flyteidl2.task.CronH\x00R\x04\x63ron\x12\x33\n\x16kickoff_time_input_arg\x18\x03 \x01(\tR\x13kickoffTimeInputArgB\x13\n\nexpression\x12\x05\xbaH\x02\x08\x01\"v\n\x0f\x41rtifactTrigger\x12,\n\rartifact_name\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x0c\x61rtifactName\x12\x18\n\x07version\x18\x02 \x01(\tR\x07version\x12\x1b\n\tinput_arg\x18\x03 \x01(\tR\x08inputArg\"\xe5\x01\n\x15TriggerAutomationSpec\x12G\n\x04type\x18\x01 \x01(\x0e\x32).flyteidl2.task.TriggerAutomationSpecTypeB\x08\xbaH\x05\x82\x01\x02 \x00R\x04type\x12\x36\n\x08schedule\x18\x02 \x01(\x0b\x32\x18.flyteidl2.task.ScheduleH\x00R\x08schedule\x12=\n\x08\x61rtifact\x18\x03 \x01(\x0b\x32\x1f.flyteidl2.task.ArtifactTriggerH\x00R\x08\x61rtifactB\x0c\n\nautomation\"Q\n\x0cNamedLiteral\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12-\n\x05value\x18\x02 \x01(\x0b\x32\x17.flyteidl2.core.LiteralR\x05value\"P\n\x10OutputReferences\x12\x1d\n\noutput_uri\x18\x01 \x01(\tR\toutputUri\x12\x1d\n\nreport_uri\x18\x02 \x01(\tR\treportUri\"z\n\x06Inputs\x12\x38\n\x08literals\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.task.NamedLiteralR\x08literals\x12\x36\n\x07\x63ontext\x18\x02 \x03(\x0b\x32\x1c.flyteidl2.core.KeyValuePairR\x07\x63ontext\"\xcd\x01\n\x10ProducedArtifact\x12\x1f\n\x06output\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x06output\x12\x1b\n\x04name\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x04name\x12\x18\n\x07version\x18\x03 \x01(\tR\x07version\x12\x30\n\x04info\x18\x04 \x01(\x0b\x32\x1c.flyteidl2.core.ArtifactInfoR\x04info\x12/\n\x04type\x18\x05 \x01(\x0b\x32\x1b.flyteidl2.core.LiteralTypeR\x04type\"\x94\x01\n\x07Outputs\x12\x38\n\x08literals\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.task.NamedLiteralR\x08literals\x12O\n\x12produced_artifacts\x18\x03 \x03(\x0b\x32 .flyteidl2.task.ProducedArtifactR\x11producedArtifacts*\x7f\n\rFixedRateUnit\x12\x1f\n\x1b\x46IXED_RATE_UNIT_UNSPECIFIED\x10\x00\x12\x1a\n\x16\x46IXED_RATE_UNIT_MINUTE\x10\x01\x12\x18\n\x14\x46IXED_RATE_UNIT_HOUR\x10\x02\x12\x17\n\x13\x46IXED_RATE_UNIT_DAY\x10\x03*f\n\x19TriggerAutomationSpecType\x12\x14\n\x10TYPE_UNSPECIFIED\x10\x00\x12\r\n\tTYPE_NONE\x10\x01\x12\x11\n\rTYPE_SCHEDULE\x10\x02\x12\x11\n\rTYPE_ARTIFACT\x10\x03\x42\xb0\x01\n\x12\x63om.flyteidl2.taskB\x0b\x43ommonProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task\xa2\x02\x03\x46TX\xaa\x02\x0e\x46lyteidl2.Task\xca\x02\x0e\x46lyteidl2\\Task\xe2\x02\x1a\x46lyteidl2\\Task\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Taskb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -39,28 +41,34 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _ARTIFACTTRIGGER.fields_by_name['artifact_name']._serialized_options = b'\272H\004r\002\020\001'
   _TRIGGERAUTOMATIONSPEC.fields_by_name['type']._options = None
   _TRIGGERAUTOMATIONSPEC.fields_by_name['type']._serialized_options = b'\272H\005\202\001\002 \000'
-  _globals['_FIXEDRATEUNIT']._serialized_start=1446
-  _globals['_FIXEDRATEUNIT']._serialized_end=1573
-  _globals['_TRIGGERAUTOMATIONSPECTYPE']._serialized_start=1575
-  _globals['_TRIGGERAUTOMATIONSPECTYPE']._serialized_end=1677
-  _globals['_NAMEDPARAMETER']._serialized_start=172
-  _globals['_NAMEDPARAMETER']._serialized_end=265
-  _globals['_FIXEDRATE']._serialized_start=268
-  _globals['_FIXEDRATE']._serialized_end=430
-  _globals['_CRON']._serialized_start=432
-  _globals['_CRON']._serialized_end=507
-  _globals['_SCHEDULE']._serialized_start=510
-  _globals['_SCHEDULE']._serialized_end=734
-  _globals['_ARTIFACTTRIGGER']._serialized_start=736
-  _globals['_ARTIFACTTRIGGER']._serialized_end=854
-  _globals['_TRIGGERAUTOMATIONSPEC']._serialized_start=857
-  _globals['_TRIGGERAUTOMATIONSPEC']._serialized_end=1086
-  _globals['_NAMEDLITERAL']._serialized_start=1088
-  _globals['_NAMEDLITERAL']._serialized_end=1169
-  _globals['_OUTPUTREFERENCES']._serialized_start=1171
-  _globals['_OUTPUTREFERENCES']._serialized_end=1251
-  _globals['_INPUTS']._serialized_start=1253
-  _globals['_INPUTS']._serialized_end=1375
-  _globals['_OUTPUTS']._serialized_start=1377
-  _globals['_OUTPUTS']._serialized_end=1444
+  _PRODUCEDARTIFACT.fields_by_name['output']._options = None
+  _PRODUCEDARTIFACT.fields_by_name['output']._serialized_options = b'\272H\004r\002\020\001'
+  _PRODUCEDARTIFACT.fields_by_name['name']._options = None
+  _PRODUCEDARTIFACT.fields_by_name['name']._serialized_options = b'\272H\004r\002\020\001'
+  _globals['_FIXEDRATEUNIT']._serialized_start=1798
+  _globals['_FIXEDRATEUNIT']._serialized_end=1925
+  _globals['_TRIGGERAUTOMATIONSPECTYPE']._serialized_start=1927
+  _globals['_TRIGGERAUTOMATIONSPECTYPE']._serialized_end=2029
+  _globals['_NAMEDPARAMETER']._serialized_start=234
+  _globals['_NAMEDPARAMETER']._serialized_end=327
+  _globals['_FIXEDRATE']._serialized_start=330
+  _globals['_FIXEDRATE']._serialized_end=492
+  _globals['_CRON']._serialized_start=494
+  _globals['_CRON']._serialized_end=569
+  _globals['_SCHEDULE']._serialized_start=572
+  _globals['_SCHEDULE']._serialized_end=796
+  _globals['_ARTIFACTTRIGGER']._serialized_start=798
+  _globals['_ARTIFACTTRIGGER']._serialized_end=916
+  _globals['_TRIGGERAUTOMATIONSPEC']._serialized_start=919
+  _globals['_TRIGGERAUTOMATIONSPEC']._serialized_end=1148
+  _globals['_NAMEDLITERAL']._serialized_start=1150
+  _globals['_NAMEDLITERAL']._serialized_end=1231
+  _globals['_OUTPUTREFERENCES']._serialized_start=1233
+  _globals['_OUTPUTREFERENCES']._serialized_end=1313
+  _globals['_INPUTS']._serialized_start=1315
+  _globals['_INPUTS']._serialized_end=1437
+  _globals['_PRODUCEDARTIFACT']._serialized_start=1440
+  _globals['_PRODUCEDARTIFACT']._serialized_end=1645
+  _globals['_OUTPUTS']._serialized_start=1648
+  _globals['_OUTPUTS']._serialized_end=1796
 # @@protoc_insertion_point(module_scope)

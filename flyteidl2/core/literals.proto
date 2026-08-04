@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.core;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/core/artifact_id.proto";
 import "flyteidl2/core/types.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
@@ -116,6 +117,13 @@ message Literal {
 
   // Additional metadata for literals.
   map<string, string> metadata = 5;
+
+  // Identity of the artifact this value is / came from. Set once at artifact
+  // registration (and by clients when binding a fetched artifact as an input);
+  // it travels with the value through every copy. Participates in cache-key
+  // hashing by design: two versions of an artifact are distinct inputs even
+  // when their bytes coincide.
+  ArtifactVersionId artifact_id = 9;
 }
 
 // A message that contains the metadata of the offloaded data.

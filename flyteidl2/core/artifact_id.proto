@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package flyteidl2.core;
 
+import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core";
@@ -12,6 +13,42 @@ message ArtifactKey {
   string domain = 2;
   string name = 3;
   string org = 4;
+}
+
+// Identity of one artifact version. Unlike the legacy ArtifactID below, this
+// carries no partition machinery — it is the minimal identity stamped onto
+// values (core.Literal.artifact_id) and referenced by v2 artifact APIs.
+message ArtifactVersionId {
+  ArtifactKey key = 1;
+  string version = 2;
+}
+
+// Reference to a previously uploaded card (model/data card) describing an
+// artifact.
+message ArtifactCard {
+  // URI of the uploaded card content.
+  string uri = 1 [(buf.validate.field).string.max_len = 1024];
+
+  // Format of the card, e.g. html, md, json, yaml, csv, tsv, png, jpg, jpeg.
+  string format = 2 [(buf.validate.field).string.max_len = 16];
+
+  // Type of the card, e.g. model, data, generic.
+  string type = 3 [(buf.validate.field).string.max_len = 16];
+}
+
+// Descriptive payload of an artifact — shared by the production declaration
+// (task.ProducedArtifact) and the stored spec (artifact.ArtifactSpec).
+// Deliberately excludes identity (name/version): identity lives in
+// ArtifactIdentifier / the declaration, so it can never drift against this.
+message ArtifactInfo {
+  // Optional human readable description.
+  string description = 1 [(buf.validate.field).string.max_len = 255];
+
+  // Free-form, user-supplied key/value metadata.
+  map<string, string> user_metadata = 2;
+
+  // Optional card describing this artifact.
+  ArtifactCard card = 3;
 }
 
 // Only valid for triggers

@@ -3,8 +3,10 @@ syntax = "proto3";
 package flyteidl2.task;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/core/artifact_id.proto";
 import "flyteidl2/core/interface.proto";
 import "flyteidl2/core/literals.proto";
+import "flyteidl2/core/types.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
@@ -127,8 +129,36 @@ message Inputs {
   repeated flyteidl2.core.KeyValuePair context = 2;
 }
 
+// Declares that a named output of the producing action is a new artifact
+// version. The output's literal (in Outputs.literals) is the artifact's value;
+// org/project/domain come from the producing action's scope at registration.
+message ProducedArtifact {
+  // Name of the NamedLiteral in Outputs.literals this declaration refers to.
+  string output = 1 [(buf.validate.field).string.min_len = 1];
+
+  // Artifact name to register under.
+  string name = 2 [(buf.validate.field).string.min_len = 1];
+
+  // Optional explicit version. Empty means the backend derives one
+  // (<run>-<action>-<attempt>).
+  string version = 3;
+
+  // Descriptive payload, copied verbatim into ArtifactSpec.info.
+  flyteidl2.core.ArtifactInfo info = 4;
+
+  // The declared Flyte type of the output, copied into ArtifactSpec.type.
+  // The producing SDK is authoritative for this.
+  flyteidl2.core.LiteralType type = 5;
+}
+
 // Output payload for an action.
 message Outputs {
   // Ordered outputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move.
   repeated NamedLiteral literals = 1;
+
+  // Artifact registration declarations for outputs wrapped as artifacts by the
+  // producing task. Field 3 (not 2) on purpose: outputs.pb blobs are sometimes
+  // cross-decoded as task.Inputs, where field 2 is `context`; field 3 is unused
+  // there, so this never aliases.
+  repeated ProducedArtifact produced_artifacts = 3;
 }
