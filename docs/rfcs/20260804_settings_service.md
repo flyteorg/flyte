@@ -14,8 +14,8 @@ yet**.
 
 This RFC proposes implementing the `SettingsService` so platform operators can
 set runtime defaults (default queue, task resource bounds, environment
-variables, labels/annotations, service account, storage paths) at **org,
-domain, and project scope**, with well-defined inheritance and override
+variables, labels/annotations, service account, storage paths) at
+**instance, domain, and project scope**, with well-defined inheritance and override
 semantics, instead of baking them into static server config or repeating them
 in every task decorator.
 
@@ -54,7 +54,7 @@ merged after design review. Implementing the service is the missing step.
 
 ## 3 When do we need it? — concrete examples
 
-Settings are resolved along the scope chain **org → domain → project**, where
+Settings are resolved along the scope chain **instance → domain → project**, where
 the most specific level wins for scalars and maps merge additively
 (child overrides parent on key conflict). Every leaf carries a
 `SettingState`: `INHERIT` (defer to parent, the default), `VALUE` (set here),
@@ -70,7 +70,7 @@ An admin wants sane logging everywhere, verbose logging in development:
 
 | Scope | `environment_variables` |
 |---|---|
-| org | `{LOG_LEVEL: info}` |
+| instance | `{LOG_LEVEL: info}` |
 | domain `development` | `{LOG_LEVEL: debug}` |
 | project `recsys` (in `development`) | `{TEAM: ml}` |
 
@@ -81,7 +81,7 @@ came from, so a UI can show "inherited from domain".
 
 ### Example 2 — resource guardrails
 
-Platform team enforces ceilings once, at the org level:
+Platform team enforces ceilings once, instance-wide:
 
 ```
 task_resource.max.cpu    = "16"
@@ -98,7 +98,7 @@ that didn't ask for one.
 
 ```
 run.default_queue = "gpu-pool"        (set on domain `production`)
-run.max_action_concurrency = 64      (set on org)
+run.max_action_concurrency = 64      (set instance-wide)
 ```
 
 Any run created in `production` without an explicit queue lands on
@@ -107,7 +107,7 @@ more specific scope overrides it.
 
 ### Example 4 — explicitly blanking an inherited value
 
-The org sets `security.service_account = "default-runner"`. One untrusted
+The instance-wide default is `security.service_account = "default-runner"`. One untrusted
 project must *not* inherit it. Setting the project-level value to state
 `UNSET` blocks inheritance without providing a replacement — a tri-state
 (`INHERIT`/`UNSET`/`VALUE`) that plain key-value systems cannot express.
@@ -138,7 +138,7 @@ per-task (`pod_template_name` in `TaskMetadata`) and cluster-wide
 (`default-pod-template-name` plugin config) selection work.
 
 A `pod_template_name` setting restores the per-scope capability with no new
-machinery: an admin sets it at org, domain, or project scope; at run creation
+machinery: an admin sets it at instance, domain, or project scope; at run creation
 the resolved name is stamped onto tasks that don't specify their own; the
 existing `PodTemplateStore` lookup does the rest. This covers everything the
 typed settings don't (tolerations, node selectors, sidecars, init
@@ -165,16 +165,15 @@ service SettingsService {
 ```
 
 `SettingsKey{org, domain, project}` determines scope by which fields are
-populated: `{org}` = org-level, `{org, domain}` = domain-level,
-`{org, domain, project}` = project-level.
+populated: `{}` = instance level, `{domain}` = domain level,
+`{domain, project}` = project level.
 
-**Org handling in OSS.** OSS deployments have no organization concept, so an
-empty `org` is normalized server-side to the existing placeholder
+**The `org` field.** OSS deployments have no organization concept; clients
+leave `org` empty and the server normalizes it to the existing placeholder
 `DefaultOrganization = "flyte"`
 (`flyteplugins/go/tasks/pluginmachinery/secret/embedded_secret_manager.go`) —
-the same convention the secret and app services already use. Org-level
-settings therefore act as **instance-wide defaults**; clients never need to
-send an org.
+the same convention the secret and app services already use. Instance-level
+settings are stored under that placeholder key.
 
 ### Storage
 
@@ -206,7 +205,7 @@ CREATE TABLE IF NOT EXISTS settings (
 Pure functions, independently testable without a database:
 
 - **Scalars** (`StringSetting`, `Int64Setting`, `BoolSetting`,
-  `QuantitySetting`): iterate org → domain → project; the last level whose
+  `QuantitySetting`): iterate instance → domain → project; the last level whose
   state is not `INHERIT` wins; annotate the winner with its `scope_level`.
 - **String maps**: merge additively parent-first, child overriding on key
   conflict; a level with state `UNSET` clears everything accumulated so far.
