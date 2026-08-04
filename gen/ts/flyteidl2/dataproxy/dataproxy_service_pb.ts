@@ -390,8 +390,8 @@ export type GetActionDataRequest = Message<"flyteidl2.dataproxy.GetActionDataReq
 
   /**
    * Source of the run the action belongs to. Run names are not unique across platform and
-   * local runs, so the server uses this to resolve the action against the matching service
-   * (RUN_SOURCE_LOCAL resolves via LocalRunService; anything else keeps the platform
+   * traced runs, so the server uses this to resolve the action against the matching service
+   * (RUN_SOURCE_TRACED resolves via TracedRunService; anything else keeps the platform
    * behavior).
    * +optional
    *

@@ -478,9 +478,9 @@ enum RunSource {
   RUN_SOURCE_CLI = 2;
   RUN_SOURCE_SCHEDULE_TRIGGER = 3;
 
-  // The run is orchestrated outside the platform (e.g. on a user's machine) and its state is
-  // reported via LocalRunService.
-  RUN_SOURCE_LOCAL = 4;
+  // The run is orchestrated outside the platform — on a user's machine, in CI, inside an agent
+  // framework — and its action tree is reported via TracedRunService.
+  RUN_SOURCE_TRACED = 4;
 
   RUN_SOURCE_ARTIFACT_TRIGGER = 5;
 }

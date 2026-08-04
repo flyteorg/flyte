@@ -747,8 +747,8 @@ type GetActionDataRequest struct {
 	// Action to query.
 	ActionId *common.ActionIdentifier `protobuf:"bytes,1,opt,name=action_id,json=actionId,proto3" json:"action_id,omitempty"`
 	// Source of the run the action belongs to. Run names are not unique across platform and
-	// local runs, so the server uses this to resolve the action against the matching service
-	// (RUN_SOURCE_LOCAL resolves via LocalRunService; anything else keeps the platform
+	// traced runs, so the server uses this to resolve the action against the matching service
+	// (RUN_SOURCE_TRACED resolves via TracedRunService; anything else keeps the platform
 	// behavior).
 	// +optional
 	RunSource workflow.RunSource `protobuf:"varint,2,opt,name=run_source,json=runSource,proto3,enum=flyteidl2.workflow.RunSource" json:"run_source,omitempty"`

@@ -1476,6 +1476,740 @@ pub mod internal_run_service_server {
     }
 }
 /// Generated client implementations.
+pub mod queue_service_client {
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    use tonic::codegen::*;
+    use tonic::codegen::http::Uri;
+    #[derive(Debug, Clone)]
+    pub struct QueueServiceClient<T> {
+        inner: tonic::client::Grpc<T>,
+    }
+    impl QueueServiceClient<tonic::transport::Channel> {
+        /// Attempt to create a new client by connecting to a given endpoint.
+        pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
+        where
+            D: TryInto<tonic::transport::Endpoint>,
+            D::Error: Into<StdError>,
+        {
+            let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
+            Ok(Self::new(conn))
+        }
+    }
+    impl<T> QueueServiceClient<T>
+    where
+        T: tonic::client::GrpcService<tonic::body::BoxBody>,
+        T::Error: Into<StdError>,
+        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
+        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+    {
+        pub fn new(inner: T) -> Self {
+            let inner = tonic::client::Grpc::new(inner);
+            Self { inner }
+        }
+        pub fn with_origin(inner: T, origin: Uri) -> Self {
+            let inner = tonic::client::Grpc::with_origin(inner, origin);
+            Self { inner }
+        }
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> QueueServiceClient<InterceptedService<T, F>>
+        where
+            F: tonic::service::Interceptor,
+            T::ResponseBody: Default,
+            T: tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+                Response = http::Response<
+                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
+                >,
+            >,
+            <T as tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+            >>::Error: Into<StdError> + Send + Sync,
+        {
+            QueueServiceClient::new(InterceptedService::new(inner, interceptor))
+        }
+        /// Compress requests with the given encoding.
+        ///
+        /// This requires the server to support it otherwise it might respond with an
+        /// error.
+        #[must_use]
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.send_compressed(encoding);
+            self
+        }
+        /// Enable decompressing responses.
+        #[must_use]
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.accept_compressed(encoding);
+            self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_decoding_message_size(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_encoding_message_size(limit);
+            self
+        }
+        pub async fn enqueue_action(
+            &mut self,
+            request: impl tonic::IntoRequest<super::EnqueueActionRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::EnqueueActionResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.workflow.QueueService/EnqueueAction",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("flyteidl2.workflow.QueueService", "EnqueueAction"),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn abort_queued_run(
+            &mut self,
+            request: impl tonic::IntoRequest<super::AbortQueuedRunRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::AbortQueuedRunResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.workflow.QueueService/AbortQueuedRun",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("flyteidl2.workflow.QueueService", "AbortQueuedRun"),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn abort_queued_action(
+            &mut self,
+            request: impl tonic::IntoRequest<super::AbortQueuedActionRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::AbortQueuedActionResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.workflow.QueueService/AbortQueuedAction",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "flyteidl2.workflow.QueueService",
+                        "AbortQueuedAction",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+    }
+}
+/// Generated server implementations.
+pub mod queue_service_server {
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    use tonic::codegen::*;
+    /// Generated trait containing gRPC methods that should be implemented for use with QueueServiceServer.
+    #[async_trait]
+    pub trait QueueService: Send + Sync + 'static {
+        async fn enqueue_action(
+            &self,
+            request: tonic::Request<super::EnqueueActionRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::EnqueueActionResponse>,
+            tonic::Status,
+        >;
+        async fn abort_queued_run(
+            &self,
+            request: tonic::Request<super::AbortQueuedRunRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::AbortQueuedRunResponse>,
+            tonic::Status,
+        >;
+        async fn abort_queued_action(
+            &self,
+            request: tonic::Request<super::AbortQueuedActionRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::AbortQueuedActionResponse>,
+            tonic::Status,
+        >;
+    }
+    #[derive(Debug)]
+    pub struct QueueServiceServer<T: QueueService> {
+        inner: Arc<T>,
+        accept_compression_encodings: EnabledCompressionEncodings,
+        send_compression_encodings: EnabledCompressionEncodings,
+        max_decoding_message_size: Option<usize>,
+        max_encoding_message_size: Option<usize>,
+    }
+    impl<T: QueueService> QueueServiceServer<T> {
+        pub fn new(inner: T) -> Self {
+            Self::from_arc(Arc::new(inner))
+        }
+        pub fn from_arc(inner: Arc<T>) -> Self {
+            Self {
+                inner,
+                accept_compression_encodings: Default::default(),
+                send_compression_encodings: Default::default(),
+                max_decoding_message_size: None,
+                max_encoding_message_size: None,
+            }
+        }
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> InterceptedService<Self, F>
+        where
+            F: tonic::service::Interceptor,
+        {
+            InterceptedService::new(Self::new(inner), interceptor)
+        }
+        /// Enable decompressing requests with the given encoding.
+        #[must_use]
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.accept_compression_encodings.enable(encoding);
+            self
+        }
+        /// Compress responses with the given encoding, if the client supports it.
+        #[must_use]
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.send_compression_encodings.enable(encoding);
+            self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.max_decoding_message_size = Some(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.max_encoding_message_size = Some(limit);
+            self
+        }
+    }
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for QueueServiceServer<T>
+    where
+        T: QueueService,
+        B: Body + Send + 'static,
+        B::Error: Into<StdError> + Send + 'static,
+    {
+        type Response = http::Response<tonic::body::BoxBody>;
+        type Error = std::convert::Infallible;
+        type Future = BoxFuture<Self::Response, Self::Error>;
+        fn poll_ready(
+            &mut self,
+            _cx: &mut Context<'_>,
+        ) -> Poll<std::result::Result<(), Self::Error>> {
+            Poll::Ready(Ok(()))
+        }
+        fn call(&mut self, req: http::Request<B>) -> Self::Future {
+            match req.uri().path() {
+                "/flyteidl2.workflow.QueueService/EnqueueAction" => {
+                    #[allow(non_camel_case_types)]
+                    struct EnqueueActionSvc<T: QueueService>(pub Arc<T>);
+                    impl<
+                        T: QueueService,
+                    > tonic::server::UnaryService<super::EnqueueActionRequest>
+                    for EnqueueActionSvc<T> {
+                        type Response = super::EnqueueActionResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::EnqueueActionRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as QueueService>::enqueue_action(&inner, request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = EnqueueActionSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.workflow.QueueService/AbortQueuedRun" => {
+                    #[allow(non_camel_case_types)]
+                    struct AbortQueuedRunSvc<T: QueueService>(pub Arc<T>);
+                    impl<
+                        T: QueueService,
+                    > tonic::server::UnaryService<super::AbortQueuedRunRequest>
+                    for AbortQueuedRunSvc<T> {
+                        type Response = super::AbortQueuedRunResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::AbortQueuedRunRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as QueueService>::abort_queued_run(&inner, request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = AbortQueuedRunSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.workflow.QueueService/AbortQueuedAction" => {
+                    #[allow(non_camel_case_types)]
+                    struct AbortQueuedActionSvc<T: QueueService>(pub Arc<T>);
+                    impl<
+                        T: QueueService,
+                    > tonic::server::UnaryService<super::AbortQueuedActionRequest>
+                    for AbortQueuedActionSvc<T> {
+                        type Response = super::AbortQueuedActionResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::AbortQueuedActionRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as QueueService>::abort_queued_action(&inner, request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = AbortQueuedActionSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                _ => {
+                    Box::pin(async move {
+                        Ok(
+                            http::Response::builder()
+                                .status(200)
+                                .header("grpc-status", tonic::Code::Unimplemented as i32)
+                                .header(
+                                    http::header::CONTENT_TYPE,
+                                    tonic::metadata::GRPC_CONTENT_TYPE,
+                                )
+                                .body(empty_body())
+                                .unwrap(),
+                        )
+                    })
+                }
+            }
+        }
+    }
+    impl<T: QueueService> Clone for QueueServiceServer<T> {
+        fn clone(&self) -> Self {
+            let inner = self.inner.clone();
+            Self {
+                inner,
+                accept_compression_encodings: self.accept_compression_encodings,
+                send_compression_encodings: self.send_compression_encodings,
+                max_decoding_message_size: self.max_decoding_message_size,
+                max_encoding_message_size: self.max_encoding_message_size,
+            }
+        }
+    }
+    impl<T: QueueService> tonic::server::NamedService for QueueServiceServer<T> {
+        const NAME: &'static str = "flyteidl2.workflow.QueueService";
+    }
+}
+/// Generated client implementations.
+pub mod run_logs_service_client {
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    use tonic::codegen::*;
+    use tonic::codegen::http::Uri;
+    #[derive(Debug, Clone)]
+    pub struct RunLogsServiceClient<T> {
+        inner: tonic::client::Grpc<T>,
+    }
+    impl RunLogsServiceClient<tonic::transport::Channel> {
+        /// Attempt to create a new client by connecting to a given endpoint.
+        pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
+        where
+            D: TryInto<tonic::transport::Endpoint>,
+            D::Error: Into<StdError>,
+        {
+            let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
+            Ok(Self::new(conn))
+        }
+    }
+    impl<T> RunLogsServiceClient<T>
+    where
+        T: tonic::client::GrpcService<tonic::body::BoxBody>,
+        T::Error: Into<StdError>,
+        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
+        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+    {
+        pub fn new(inner: T) -> Self {
+            let inner = tonic::client::Grpc::new(inner);
+            Self { inner }
+        }
+        pub fn with_origin(inner: T, origin: Uri) -> Self {
+            let inner = tonic::client::Grpc::with_origin(inner, origin);
+            Self { inner }
+        }
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> RunLogsServiceClient<InterceptedService<T, F>>
+        where
+            F: tonic::service::Interceptor,
+            T::ResponseBody: Default,
+            T: tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+                Response = http::Response<
+                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
+                >,
+            >,
+            <T as tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+            >>::Error: Into<StdError> + Send + Sync,
+        {
+            RunLogsServiceClient::new(InterceptedService::new(inner, interceptor))
+        }
+        /// Compress requests with the given encoding.
+        ///
+        /// This requires the server to support it otherwise it might respond with an
+        /// error.
+        #[must_use]
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.send_compressed(encoding);
+            self
+        }
+        /// Enable decompressing responses.
+        #[must_use]
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.accept_compressed(encoding);
+            self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_decoding_message_size(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_encoding_message_size(limit);
+            self
+        }
+        pub async fn tail_logs(
+            &mut self,
+            request: impl tonic::IntoRequest<super::TailLogsRequest>,
+        ) -> std::result::Result<
+            tonic::Response<tonic::codec::Streaming<super::TailLogsResponse>>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.workflow.RunLogsService/TailLogs",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("flyteidl2.workflow.RunLogsService", "TailLogs"),
+                );
+            self.inner.server_streaming(req, path, codec).await
+        }
+    }
+}
+/// Generated server implementations.
+pub mod run_logs_service_server {
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    use tonic::codegen::*;
+    /// Generated trait containing gRPC methods that should be implemented for use with RunLogsServiceServer.
+    #[async_trait]
+    pub trait RunLogsService: Send + Sync + 'static {
+        /// Server streaming response type for the TailLogs method.
+        type TailLogsStream: tonic::codegen::tokio_stream::Stream<
+                Item = std::result::Result<super::TailLogsResponse, tonic::Status>,
+            >
+            + Send
+            + 'static;
+        async fn tail_logs(
+            &self,
+            request: tonic::Request<super::TailLogsRequest>,
+        ) -> std::result::Result<tonic::Response<Self::TailLogsStream>, tonic::Status>;
+    }
+    #[derive(Debug)]
+    pub struct RunLogsServiceServer<T: RunLogsService> {
+        inner: Arc<T>,
+        accept_compression_encodings: EnabledCompressionEncodings,
+        send_compression_encodings: EnabledCompressionEncodings,
+        max_decoding_message_size: Option<usize>,
+        max_encoding_message_size: Option<usize>,
+    }
+    impl<T: RunLogsService> RunLogsServiceServer<T> {
+        pub fn new(inner: T) -> Self {
+            Self::from_arc(Arc::new(inner))
+        }
+        pub fn from_arc(inner: Arc<T>) -> Self {
+            Self {
+                inner,
+                accept_compression_encodings: Default::default(),
+                send_compression_encodings: Default::default(),
+                max_decoding_message_size: None,
+                max_encoding_message_size: None,
+            }
+        }
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> InterceptedService<Self, F>
+        where
+            F: tonic::service::Interceptor,
+        {
+            InterceptedService::new(Self::new(inner), interceptor)
+        }
+        /// Enable decompressing requests with the given encoding.
+        #[must_use]
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.accept_compression_encodings.enable(encoding);
+            self
+        }
+        /// Compress responses with the given encoding, if the client supports it.
+        #[must_use]
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.send_compression_encodings.enable(encoding);
+            self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.max_decoding_message_size = Some(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.max_encoding_message_size = Some(limit);
+            self
+        }
+    }
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for RunLogsServiceServer<T>
+    where
+        T: RunLogsService,
+        B: Body + Send + 'static,
+        B::Error: Into<StdError> + Send + 'static,
+    {
+        type Response = http::Response<tonic::body::BoxBody>;
+        type Error = std::convert::Infallible;
+        type Future = BoxFuture<Self::Response, Self::Error>;
+        fn poll_ready(
+            &mut self,
+            _cx: &mut Context<'_>,
+        ) -> Poll<std::result::Result<(), Self::Error>> {
+            Poll::Ready(Ok(()))
+        }
+        fn call(&mut self, req: http::Request<B>) -> Self::Future {
+            match req.uri().path() {
+                "/flyteidl2.workflow.RunLogsService/TailLogs" => {
+                    #[allow(non_camel_case_types)]
+                    struct TailLogsSvc<T: RunLogsService>(pub Arc<T>);
+                    impl<
+                        T: RunLogsService,
+                    > tonic::server::ServerStreamingService<super::TailLogsRequest>
+                    for TailLogsSvc<T> {
+                        type Response = super::TailLogsResponse;
+                        type ResponseStream = T::TailLogsStream;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::ResponseStream>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::TailLogsRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as RunLogsService>::tail_logs(&inner, request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = TailLogsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.server_streaming(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                _ => {
+                    Box::pin(async move {
+                        Ok(
+                            http::Response::builder()
+                                .status(200)
+                                .header("grpc-status", tonic::Code::Unimplemented as i32)
+                                .header(
+                                    http::header::CONTENT_TYPE,
+                                    tonic::metadata::GRPC_CONTENT_TYPE,
+                                )
+                                .body(empty_body())
+                                .unwrap(),
+                        )
+                    })
+                }
+            }
+        }
+    }
+    impl<T: RunLogsService> Clone for RunLogsServiceServer<T> {
+        fn clone(&self) -> Self {
+            let inner = self.inner.clone();
+            Self {
+                inner,
+                accept_compression_encodings: self.accept_compression_encodings,
+                send_compression_encodings: self.send_compression_encodings,
+                max_decoding_message_size: self.max_decoding_message_size,
+                max_encoding_message_size: self.max_encoding_message_size,
+            }
+        }
+    }
+    impl<T: RunLogsService> tonic::server::NamedService for RunLogsServiceServer<T> {
+        const NAME: &'static str = "flyteidl2.workflow.RunLogsService";
+    }
+}
+/// Generated client implementations.
 pub mod run_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
@@ -3069,15 +3803,15 @@ pub mod run_service_server {
     }
 }
 /// Generated client implementations.
-pub mod local_run_service_client {
+pub mod traced_run_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
-    pub struct LocalRunServiceClient<T> {
+    pub struct TracedRunServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl LocalRunServiceClient<tonic::transport::Channel> {
+    impl TracedRunServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -3088,7 +3822,7 @@ pub mod local_run_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> LocalRunServiceClient<T>
+    impl<T> TracedRunServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -3106,7 +3840,7 @@ pub mod local_run_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> LocalRunServiceClient<InterceptedService<T, F>>
+        ) -> TracedRunServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
@@ -3120,7 +3854,7 @@ pub mod local_run_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            LocalRunServiceClient::new(InterceptedService::new(inner, interceptor))
+            TracedRunServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with the given encoding.
         ///
@@ -3155,7 +3889,7 @@ pub mod local_run_service_client {
         }
         pub async fn create_run(
             &mut self,
-            request: impl tonic::IntoRequest<super::CreateLocalRunRequest>,
+            request: impl tonic::IntoRequest<super::CreateTracedRunRequest>,
         ) -> std::result::Result<
             tonic::Response<super::CreateRunResponse>,
             tonic::Status,
@@ -3171,20 +3905,20 @@ pub mod local_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.LocalRunService/CreateRun",
+                "/flyteidl2.workflow.TracedRunService/CreateRun",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("flyteidl2.workflow.LocalRunService", "CreateRun"),
+                    GrpcMethod::new("flyteidl2.workflow.TracedRunService", "CreateRun"),
                 );
             self.inner.unary(req, path, codec).await
         }
         pub async fn report_actions(
             &mut self,
-            request: impl tonic::IntoRequest<super::ReportLocalActionsRequest>,
+            request: impl tonic::IntoRequest<super::ReportTracedActionsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::ReportLocalActionsResponse>,
+            tonic::Response<super::ReportTracedActionsResponse>,
             tonic::Status,
         > {
             self.inner
@@ -3198,13 +3932,13 @@ pub mod local_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.LocalRunService/ReportActions",
+                "/flyteidl2.workflow.TracedRunService/ReportActions",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.workflow.LocalRunService",
+                        "flyteidl2.workflow.TracedRunService",
                         "ReportActions",
                     ),
                 );
@@ -3228,13 +3962,13 @@ pub mod local_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.LocalRunService/GetRunDetails",
+                "/flyteidl2.workflow.TracedRunService/GetRunDetails",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.workflow.LocalRunService",
+                        "flyteidl2.workflow.TracedRunService",
                         "GetRunDetails",
                     ),
                 );
@@ -3258,13 +3992,13 @@ pub mod local_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.LocalRunService/WatchRunDetails",
+                "/flyteidl2.workflow.TracedRunService/WatchRunDetails",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.workflow.LocalRunService",
+                        "flyteidl2.workflow.TracedRunService",
                         "WatchRunDetails",
                     ),
                 );
@@ -3288,13 +4022,13 @@ pub mod local_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.LocalRunService/GetActionDetails",
+                "/flyteidl2.workflow.TracedRunService/GetActionDetails",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.workflow.LocalRunService",
+                        "flyteidl2.workflow.TracedRunService",
                         "GetActionDetails",
                     ),
                 );
@@ -3318,13 +4052,13 @@ pub mod local_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.LocalRunService/WatchActionDetails",
+                "/flyteidl2.workflow.TracedRunService/WatchActionDetails",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.workflow.LocalRunService",
+                        "flyteidl2.workflow.TracedRunService",
                         "WatchActionDetails",
                     ),
                 );
@@ -3348,12 +4082,12 @@ pub mod local_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.LocalRunService/ListRuns",
+                "/flyteidl2.workflow.TracedRunService/ListRuns",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("flyteidl2.workflow.LocalRunService", "ListRuns"),
+                    GrpcMethod::new("flyteidl2.workflow.TracedRunService", "ListRuns"),
                 );
             self.inner.unary(req, path, codec).await
         }
@@ -3375,12 +4109,12 @@ pub mod local_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.LocalRunService/WatchRuns",
+                "/flyteidl2.workflow.TracedRunService/WatchRuns",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("flyteidl2.workflow.LocalRunService", "WatchRuns"),
+                    GrpcMethod::new("flyteidl2.workflow.TracedRunService", "WatchRuns"),
                 );
             self.inner.server_streaming(req, path, codec).await
         }
@@ -3402,12 +4136,12 @@ pub mod local_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.LocalRunService/ListActions",
+                "/flyteidl2.workflow.TracedRunService/ListActions",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("flyteidl2.workflow.LocalRunService", "ListActions"),
+                    GrpcMethod::new("flyteidl2.workflow.TracedRunService", "ListActions"),
                 );
             self.inner.unary(req, path, codec).await
         }
@@ -3429,12 +4163,15 @@ pub mod local_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.LocalRunService/WatchActions",
+                "/flyteidl2.workflow.TracedRunService/WatchActions",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("flyteidl2.workflow.LocalRunService", "WatchActions"),
+                    GrpcMethod::new(
+                        "flyteidl2.workflow.TracedRunService",
+                        "WatchActions",
+                    ),
                 );
             self.inner.server_streaming(req, path, codec).await
         }
@@ -3456,36 +4193,36 @@ pub mod local_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.LocalRunService/AbortRun",
+                "/flyteidl2.workflow.TracedRunService/AbortRun",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("flyteidl2.workflow.LocalRunService", "AbortRun"),
+                    GrpcMethod::new("flyteidl2.workflow.TracedRunService", "AbortRun"),
                 );
             self.inner.unary(req, path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod local_run_service_server {
+pub mod traced_run_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with LocalRunServiceServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with TracedRunServiceServer.
     #[async_trait]
-    pub trait LocalRunService: Send + Sync + 'static {
+    pub trait TracedRunService: Send + Sync + 'static {
         async fn create_run(
             &self,
-            request: tonic::Request<super::CreateLocalRunRequest>,
+            request: tonic::Request<super::CreateTracedRunRequest>,
         ) -> std::result::Result<
             tonic::Response<super::CreateRunResponse>,
             tonic::Status,
         >;
         async fn report_actions(
             &self,
-            request: tonic::Request<super::ReportLocalActionsRequest>,
+            request: tonic::Request<super::ReportTracedActionsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::ReportLocalActionsResponse>,
+            tonic::Response<super::ReportTracedActionsResponse>,
             tonic::Status,
         >;
         async fn get_run_details(
@@ -3577,14 +4314,14 @@ pub mod local_run_service_server {
         >;
     }
     #[derive(Debug)]
-    pub struct LocalRunServiceServer<T: LocalRunService> {
+    pub struct TracedRunServiceServer<T: TracedRunService> {
         inner: Arc<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
         max_decoding_message_size: Option<usize>,
         max_encoding_message_size: Option<usize>,
     }
-    impl<T: LocalRunService> LocalRunServiceServer<T> {
+    impl<T: TracedRunService> TracedRunServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -3635,9 +4372,9 @@ pub mod local_run_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for LocalRunServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for TracedRunServiceServer<T>
     where
-        T: LocalRunService,
+        T: TracedRunService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -3652,12 +4389,12 @@ pub mod local_run_service_server {
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             match req.uri().path() {
-                "/flyteidl2.workflow.LocalRunService/CreateRun" => {
+                "/flyteidl2.workflow.TracedRunService/CreateRun" => {
                     #[allow(non_camel_case_types)]
-                    struct CreateRunSvc<T: LocalRunService>(pub Arc<T>);
+                    struct CreateRunSvc<T: TracedRunService>(pub Arc<T>);
                     impl<
-                        T: LocalRunService,
-                    > tonic::server::UnaryService<super::CreateLocalRunRequest>
+                        T: TracedRunService,
+                    > tonic::server::UnaryService<super::CreateTracedRunRequest>
                     for CreateRunSvc<T> {
                         type Response = super::CreateRunResponse;
                         type Future = BoxFuture<
@@ -3666,11 +4403,11 @@ pub mod local_run_service_server {
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::CreateLocalRunRequest>,
+                            request: tonic::Request<super::CreateTracedRunRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as LocalRunService>::create_run(&inner, request).await
+                                <T as TracedRunService>::create_run(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -3697,25 +4434,25 @@ pub mod local_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.LocalRunService/ReportActions" => {
+                "/flyteidl2.workflow.TracedRunService/ReportActions" => {
                     #[allow(non_camel_case_types)]
-                    struct ReportActionsSvc<T: LocalRunService>(pub Arc<T>);
+                    struct ReportActionsSvc<T: TracedRunService>(pub Arc<T>);
                     impl<
-                        T: LocalRunService,
-                    > tonic::server::UnaryService<super::ReportLocalActionsRequest>
+                        T: TracedRunService,
+                    > tonic::server::UnaryService<super::ReportTracedActionsRequest>
                     for ReportActionsSvc<T> {
-                        type Response = super::ReportLocalActionsResponse;
+                        type Response = super::ReportTracedActionsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::ReportLocalActionsRequest>,
+                            request: tonic::Request<super::ReportTracedActionsRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as LocalRunService>::report_actions(&inner, request)
+                                <T as TracedRunService>::report_actions(&inner, request)
                                     .await
                             };
                             Box::pin(fut)
@@ -3743,11 +4480,11 @@ pub mod local_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.LocalRunService/GetRunDetails" => {
+                "/flyteidl2.workflow.TracedRunService/GetRunDetails" => {
                     #[allow(non_camel_case_types)]
-                    struct GetRunDetailsSvc<T: LocalRunService>(pub Arc<T>);
+                    struct GetRunDetailsSvc<T: TracedRunService>(pub Arc<T>);
                     impl<
-                        T: LocalRunService,
+                        T: TracedRunService,
                     > tonic::server::UnaryService<super::GetRunDetailsRequest>
                     for GetRunDetailsSvc<T> {
                         type Response = super::GetRunDetailsResponse;
@@ -3761,7 +4498,7 @@ pub mod local_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as LocalRunService>::get_run_details(&inner, request)
+                                <T as TracedRunService>::get_run_details(&inner, request)
                                     .await
                             };
                             Box::pin(fut)
@@ -3789,11 +4526,11 @@ pub mod local_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.LocalRunService/WatchRunDetails" => {
+                "/flyteidl2.workflow.TracedRunService/WatchRunDetails" => {
                     #[allow(non_camel_case_types)]
-                    struct WatchRunDetailsSvc<T: LocalRunService>(pub Arc<T>);
+                    struct WatchRunDetailsSvc<T: TracedRunService>(pub Arc<T>);
                     impl<
-                        T: LocalRunService,
+                        T: TracedRunService,
                     > tonic::server::ServerStreamingService<
                         super::WatchRunDetailsRequest,
                     > for WatchRunDetailsSvc<T> {
@@ -3809,7 +4546,7 @@ pub mod local_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as LocalRunService>::watch_run_details(&inner, request)
+                                <T as TracedRunService>::watch_run_details(&inner, request)
                                     .await
                             };
                             Box::pin(fut)
@@ -3837,11 +4574,11 @@ pub mod local_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.LocalRunService/GetActionDetails" => {
+                "/flyteidl2.workflow.TracedRunService/GetActionDetails" => {
                     #[allow(non_camel_case_types)]
-                    struct GetActionDetailsSvc<T: LocalRunService>(pub Arc<T>);
+                    struct GetActionDetailsSvc<T: TracedRunService>(pub Arc<T>);
                     impl<
-                        T: LocalRunService,
+                        T: TracedRunService,
                     > tonic::server::UnaryService<super::GetActionDetailsRequest>
                     for GetActionDetailsSvc<T> {
                         type Response = super::GetActionDetailsResponse;
@@ -3855,7 +4592,7 @@ pub mod local_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as LocalRunService>::get_action_details(&inner, request)
+                                <T as TracedRunService>::get_action_details(&inner, request)
                                     .await
                             };
                             Box::pin(fut)
@@ -3883,11 +4620,11 @@ pub mod local_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.LocalRunService/WatchActionDetails" => {
+                "/flyteidl2.workflow.TracedRunService/WatchActionDetails" => {
                     #[allow(non_camel_case_types)]
-                    struct WatchActionDetailsSvc<T: LocalRunService>(pub Arc<T>);
+                    struct WatchActionDetailsSvc<T: TracedRunService>(pub Arc<T>);
                     impl<
-                        T: LocalRunService,
+                        T: TracedRunService,
                     > tonic::server::ServerStreamingService<
                         super::WatchActionDetailsRequest,
                     > for WatchActionDetailsSvc<T> {
@@ -3903,7 +4640,7 @@ pub mod local_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as LocalRunService>::watch_action_details(
+                                <T as TracedRunService>::watch_action_details(
                                         &inner,
                                         request,
                                     )
@@ -3934,11 +4671,11 @@ pub mod local_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.LocalRunService/ListRuns" => {
+                "/flyteidl2.workflow.TracedRunService/ListRuns" => {
                     #[allow(non_camel_case_types)]
-                    struct ListRunsSvc<T: LocalRunService>(pub Arc<T>);
+                    struct ListRunsSvc<T: TracedRunService>(pub Arc<T>);
                     impl<
-                        T: LocalRunService,
+                        T: TracedRunService,
                     > tonic::server::UnaryService<super::ListRunsRequest>
                     for ListRunsSvc<T> {
                         type Response = super::ListRunsResponse;
@@ -3952,7 +4689,7 @@ pub mod local_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as LocalRunService>::list_runs(&inner, request).await
+                                <T as TracedRunService>::list_runs(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -3979,11 +4716,11 @@ pub mod local_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.LocalRunService/WatchRuns" => {
+                "/flyteidl2.workflow.TracedRunService/WatchRuns" => {
                     #[allow(non_camel_case_types)]
-                    struct WatchRunsSvc<T: LocalRunService>(pub Arc<T>);
+                    struct WatchRunsSvc<T: TracedRunService>(pub Arc<T>);
                     impl<
-                        T: LocalRunService,
+                        T: TracedRunService,
                     > tonic::server::ServerStreamingService<super::WatchRunsRequest>
                     for WatchRunsSvc<T> {
                         type Response = super::WatchRunsResponse;
@@ -3998,7 +4735,7 @@ pub mod local_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as LocalRunService>::watch_runs(&inner, request).await
+                                <T as TracedRunService>::watch_runs(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -4025,11 +4762,11 @@ pub mod local_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.LocalRunService/ListActions" => {
+                "/flyteidl2.workflow.TracedRunService/ListActions" => {
                     #[allow(non_camel_case_types)]
-                    struct ListActionsSvc<T: LocalRunService>(pub Arc<T>);
+                    struct ListActionsSvc<T: TracedRunService>(pub Arc<T>);
                     impl<
-                        T: LocalRunService,
+                        T: TracedRunService,
                     > tonic::server::UnaryService<super::ListActionsRequest>
                     for ListActionsSvc<T> {
                         type Response = super::ListActionsResponse;
@@ -4043,7 +4780,7 @@ pub mod local_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as LocalRunService>::list_actions(&inner, request).await
+                                <T as TracedRunService>::list_actions(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -4070,11 +4807,11 @@ pub mod local_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.LocalRunService/WatchActions" => {
+                "/flyteidl2.workflow.TracedRunService/WatchActions" => {
                     #[allow(non_camel_case_types)]
-                    struct WatchActionsSvc<T: LocalRunService>(pub Arc<T>);
+                    struct WatchActionsSvc<T: TracedRunService>(pub Arc<T>);
                     impl<
-                        T: LocalRunService,
+                        T: TracedRunService,
                     > tonic::server::ServerStreamingService<super::WatchActionsRequest>
                     for WatchActionsSvc<T> {
                         type Response = super::WatchActionsResponse;
@@ -4089,7 +4826,8 @@ pub mod local_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as LocalRunService>::watch_actions(&inner, request).await
+                                <T as TracedRunService>::watch_actions(&inner, request)
+                                    .await
                             };
                             Box::pin(fut)
                         }
@@ -4116,11 +4854,11 @@ pub mod local_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.LocalRunService/AbortRun" => {
+                "/flyteidl2.workflow.TracedRunService/AbortRun" => {
                     #[allow(non_camel_case_types)]
-                    struct AbortRunSvc<T: LocalRunService>(pub Arc<T>);
+                    struct AbortRunSvc<T: TracedRunService>(pub Arc<T>);
                     impl<
-                        T: LocalRunService,
+                        T: TracedRunService,
                     > tonic::server::UnaryService<super::AbortRunRequest>
                     for AbortRunSvc<T> {
                         type Response = super::AbortRunResponse;
@@ -4134,7 +4872,7 @@ pub mod local_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as LocalRunService>::abort_run(&inner, request).await
+                                <T as TracedRunService>::abort_run(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -4179,7 +4917,7 @@ pub mod local_run_service_server {
             }
         }
     }
-    impl<T: LocalRunService> Clone for LocalRunServiceServer<T> {
+    impl<T: TracedRunService> Clone for TracedRunServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -4191,742 +4929,8 @@ pub mod local_run_service_server {
             }
         }
     }
-    impl<T: LocalRunService> tonic::server::NamedService for LocalRunServiceServer<T> {
-        const NAME: &'static str = "flyteidl2.workflow.LocalRunService";
-    }
-}
-/// Generated client implementations.
-pub mod queue_service_client {
-    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
-    use tonic::codegen::*;
-    use tonic::codegen::http::Uri;
-    #[derive(Debug, Clone)]
-    pub struct QueueServiceClient<T> {
-        inner: tonic::client::Grpc<T>,
-    }
-    impl QueueServiceClient<tonic::transport::Channel> {
-        /// Attempt to create a new client by connecting to a given endpoint.
-        pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
-        where
-            D: TryInto<tonic::transport::Endpoint>,
-            D::Error: Into<StdError>,
-        {
-            let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
-            Ok(Self::new(conn))
-        }
-    }
-    impl<T> QueueServiceClient<T>
-    where
-        T: tonic::client::GrpcService<tonic::body::BoxBody>,
-        T::Error: Into<StdError>,
-        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
-        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
-    {
-        pub fn new(inner: T) -> Self {
-            let inner = tonic::client::Grpc::new(inner);
-            Self { inner }
-        }
-        pub fn with_origin(inner: T, origin: Uri) -> Self {
-            let inner = tonic::client::Grpc::with_origin(inner, origin);
-            Self { inner }
-        }
-        pub fn with_interceptor<F>(
-            inner: T,
-            interceptor: F,
-        ) -> QueueServiceClient<InterceptedService<T, F>>
-        where
-            F: tonic::service::Interceptor,
-            T::ResponseBody: Default,
-            T: tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
-                Response = http::Response<
-                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
-                >,
-            >,
-            <T as tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
-            >>::Error: Into<StdError> + Send + Sync,
-        {
-            QueueServiceClient::new(InterceptedService::new(inner, interceptor))
-        }
-        /// Compress requests with the given encoding.
-        ///
-        /// This requires the server to support it otherwise it might respond with an
-        /// error.
-        #[must_use]
-        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
-            self.inner = self.inner.send_compressed(encoding);
-            self
-        }
-        /// Enable decompressing responses.
-        #[must_use]
-        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
-            self.inner = self.inner.accept_compressed(encoding);
-            self
-        }
-        /// Limits the maximum size of a decoded message.
-        ///
-        /// Default: `4MB`
-        #[must_use]
-        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
-            self.inner = self.inner.max_decoding_message_size(limit);
-            self
-        }
-        /// Limits the maximum size of an encoded message.
-        ///
-        /// Default: `usize::MAX`
-        #[must_use]
-        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
-            self.inner = self.inner.max_encoding_message_size(limit);
-            self
-        }
-        pub async fn enqueue_action(
-            &mut self,
-            request: impl tonic::IntoRequest<super::EnqueueActionRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::EnqueueActionResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.QueueService/EnqueueAction",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("flyteidl2.workflow.QueueService", "EnqueueAction"),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn abort_queued_run(
-            &mut self,
-            request: impl tonic::IntoRequest<super::AbortQueuedRunRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::AbortQueuedRunResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.QueueService/AbortQueuedRun",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("flyteidl2.workflow.QueueService", "AbortQueuedRun"),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-        pub async fn abort_queued_action(
-            &mut self,
-            request: impl tonic::IntoRequest<super::AbortQueuedActionRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::AbortQueuedActionResponse>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.QueueService/AbortQueuedAction",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new(
-                        "flyteidl2.workflow.QueueService",
-                        "AbortQueuedAction",
-                    ),
-                );
-            self.inner.unary(req, path, codec).await
-        }
-    }
-}
-/// Generated server implementations.
-pub mod queue_service_server {
-    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
-    use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with QueueServiceServer.
-    #[async_trait]
-    pub trait QueueService: Send + Sync + 'static {
-        async fn enqueue_action(
-            &self,
-            request: tonic::Request<super::EnqueueActionRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::EnqueueActionResponse>,
-            tonic::Status,
-        >;
-        async fn abort_queued_run(
-            &self,
-            request: tonic::Request<super::AbortQueuedRunRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::AbortQueuedRunResponse>,
-            tonic::Status,
-        >;
-        async fn abort_queued_action(
-            &self,
-            request: tonic::Request<super::AbortQueuedActionRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::AbortQueuedActionResponse>,
-            tonic::Status,
-        >;
-    }
-    #[derive(Debug)]
-    pub struct QueueServiceServer<T: QueueService> {
-        inner: Arc<T>,
-        accept_compression_encodings: EnabledCompressionEncodings,
-        send_compression_encodings: EnabledCompressionEncodings,
-        max_decoding_message_size: Option<usize>,
-        max_encoding_message_size: Option<usize>,
-    }
-    impl<T: QueueService> QueueServiceServer<T> {
-        pub fn new(inner: T) -> Self {
-            Self::from_arc(Arc::new(inner))
-        }
-        pub fn from_arc(inner: Arc<T>) -> Self {
-            Self {
-                inner,
-                accept_compression_encodings: Default::default(),
-                send_compression_encodings: Default::default(),
-                max_decoding_message_size: None,
-                max_encoding_message_size: None,
-            }
-        }
-        pub fn with_interceptor<F>(
-            inner: T,
-            interceptor: F,
-        ) -> InterceptedService<Self, F>
-        where
-            F: tonic::service::Interceptor,
-        {
-            InterceptedService::new(Self::new(inner), interceptor)
-        }
-        /// Enable decompressing requests with the given encoding.
-        #[must_use]
-        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
-            self.accept_compression_encodings.enable(encoding);
-            self
-        }
-        /// Compress responses with the given encoding, if the client supports it.
-        #[must_use]
-        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
-            self.send_compression_encodings.enable(encoding);
-            self
-        }
-        /// Limits the maximum size of a decoded message.
-        ///
-        /// Default: `4MB`
-        #[must_use]
-        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
-            self.max_decoding_message_size = Some(limit);
-            self
-        }
-        /// Limits the maximum size of an encoded message.
-        ///
-        /// Default: `usize::MAX`
-        #[must_use]
-        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
-            self.max_encoding_message_size = Some(limit);
-            self
-        }
-    }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for QueueServiceServer<T>
-    where
-        T: QueueService,
-        B: Body + Send + 'static,
-        B::Error: Into<StdError> + Send + 'static,
-    {
-        type Response = http::Response<tonic::body::BoxBody>;
-        type Error = std::convert::Infallible;
-        type Future = BoxFuture<Self::Response, Self::Error>;
-        fn poll_ready(
-            &mut self,
-            _cx: &mut Context<'_>,
-        ) -> Poll<std::result::Result<(), Self::Error>> {
-            Poll::Ready(Ok(()))
-        }
-        fn call(&mut self, req: http::Request<B>) -> Self::Future {
-            match req.uri().path() {
-                "/flyteidl2.workflow.QueueService/EnqueueAction" => {
-                    #[allow(non_camel_case_types)]
-                    struct EnqueueActionSvc<T: QueueService>(pub Arc<T>);
-                    impl<
-                        T: QueueService,
-                    > tonic::server::UnaryService<super::EnqueueActionRequest>
-                    for EnqueueActionSvc<T> {
-                        type Response = super::EnqueueActionResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::EnqueueActionRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                <T as QueueService>::enqueue_action(&inner, request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let method = EnqueueActionSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/flyteidl2.workflow.QueueService/AbortQueuedRun" => {
-                    #[allow(non_camel_case_types)]
-                    struct AbortQueuedRunSvc<T: QueueService>(pub Arc<T>);
-                    impl<
-                        T: QueueService,
-                    > tonic::server::UnaryService<super::AbortQueuedRunRequest>
-                    for AbortQueuedRunSvc<T> {
-                        type Response = super::AbortQueuedRunResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::AbortQueuedRunRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                <T as QueueService>::abort_queued_run(&inner, request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let method = AbortQueuedRunSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/flyteidl2.workflow.QueueService/AbortQueuedAction" => {
-                    #[allow(non_camel_case_types)]
-                    struct AbortQueuedActionSvc<T: QueueService>(pub Arc<T>);
-                    impl<
-                        T: QueueService,
-                    > tonic::server::UnaryService<super::AbortQueuedActionRequest>
-                    for AbortQueuedActionSvc<T> {
-                        type Response = super::AbortQueuedActionResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::AbortQueuedActionRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                <T as QueueService>::abort_queued_action(&inner, request)
-                                    .await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let method = AbortQueuedActionSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                _ => {
-                    Box::pin(async move {
-                        Ok(
-                            http::Response::builder()
-                                .status(200)
-                                .header("grpc-status", tonic::Code::Unimplemented as i32)
-                                .header(
-                                    http::header::CONTENT_TYPE,
-                                    tonic::metadata::GRPC_CONTENT_TYPE,
-                                )
-                                .body(empty_body())
-                                .unwrap(),
-                        )
-                    })
-                }
-            }
-        }
-    }
-    impl<T: QueueService> Clone for QueueServiceServer<T> {
-        fn clone(&self) -> Self {
-            let inner = self.inner.clone();
-            Self {
-                inner,
-                accept_compression_encodings: self.accept_compression_encodings,
-                send_compression_encodings: self.send_compression_encodings,
-                max_decoding_message_size: self.max_decoding_message_size,
-                max_encoding_message_size: self.max_encoding_message_size,
-            }
-        }
-    }
-    impl<T: QueueService> tonic::server::NamedService for QueueServiceServer<T> {
-        const NAME: &'static str = "flyteidl2.workflow.QueueService";
-    }
-}
-/// Generated client implementations.
-pub mod run_logs_service_client {
-    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
-    use tonic::codegen::*;
-    use tonic::codegen::http::Uri;
-    #[derive(Debug, Clone)]
-    pub struct RunLogsServiceClient<T> {
-        inner: tonic::client::Grpc<T>,
-    }
-    impl RunLogsServiceClient<tonic::transport::Channel> {
-        /// Attempt to create a new client by connecting to a given endpoint.
-        pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
-        where
-            D: TryInto<tonic::transport::Endpoint>,
-            D::Error: Into<StdError>,
-        {
-            let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
-            Ok(Self::new(conn))
-        }
-    }
-    impl<T> RunLogsServiceClient<T>
-    where
-        T: tonic::client::GrpcService<tonic::body::BoxBody>,
-        T::Error: Into<StdError>,
-        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
-        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
-    {
-        pub fn new(inner: T) -> Self {
-            let inner = tonic::client::Grpc::new(inner);
-            Self { inner }
-        }
-        pub fn with_origin(inner: T, origin: Uri) -> Self {
-            let inner = tonic::client::Grpc::with_origin(inner, origin);
-            Self { inner }
-        }
-        pub fn with_interceptor<F>(
-            inner: T,
-            interceptor: F,
-        ) -> RunLogsServiceClient<InterceptedService<T, F>>
-        where
-            F: tonic::service::Interceptor,
-            T::ResponseBody: Default,
-            T: tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
-                Response = http::Response<
-                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
-                >,
-            >,
-            <T as tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
-            >>::Error: Into<StdError> + Send + Sync,
-        {
-            RunLogsServiceClient::new(InterceptedService::new(inner, interceptor))
-        }
-        /// Compress requests with the given encoding.
-        ///
-        /// This requires the server to support it otherwise it might respond with an
-        /// error.
-        #[must_use]
-        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
-            self.inner = self.inner.send_compressed(encoding);
-            self
-        }
-        /// Enable decompressing responses.
-        #[must_use]
-        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
-            self.inner = self.inner.accept_compressed(encoding);
-            self
-        }
-        /// Limits the maximum size of a decoded message.
-        ///
-        /// Default: `4MB`
-        #[must_use]
-        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
-            self.inner = self.inner.max_decoding_message_size(limit);
-            self
-        }
-        /// Limits the maximum size of an encoded message.
-        ///
-        /// Default: `usize::MAX`
-        #[must_use]
-        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
-            self.inner = self.inner.max_encoding_message_size(limit);
-            self
-        }
-        pub async fn tail_logs(
-            &mut self,
-            request: impl tonic::IntoRequest<super::TailLogsRequest>,
-        ) -> std::result::Result<
-            tonic::Response<tonic::codec::Streaming<super::TailLogsResponse>>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.RunLogsService/TailLogs",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(
-                    GrpcMethod::new("flyteidl2.workflow.RunLogsService", "TailLogs"),
-                );
-            self.inner.server_streaming(req, path, codec).await
-        }
-    }
-}
-/// Generated server implementations.
-pub mod run_logs_service_server {
-    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
-    use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with RunLogsServiceServer.
-    #[async_trait]
-    pub trait RunLogsService: Send + Sync + 'static {
-        /// Server streaming response type for the TailLogs method.
-        type TailLogsStream: tonic::codegen::tokio_stream::Stream<
-                Item = std::result::Result<super::TailLogsResponse, tonic::Status>,
-            >
-            + Send
-            + 'static;
-        async fn tail_logs(
-            &self,
-            request: tonic::Request<super::TailLogsRequest>,
-        ) -> std::result::Result<tonic::Response<Self::TailLogsStream>, tonic::Status>;
-    }
-    #[derive(Debug)]
-    pub struct RunLogsServiceServer<T: RunLogsService> {
-        inner: Arc<T>,
-        accept_compression_encodings: EnabledCompressionEncodings,
-        send_compression_encodings: EnabledCompressionEncodings,
-        max_decoding_message_size: Option<usize>,
-        max_encoding_message_size: Option<usize>,
-    }
-    impl<T: RunLogsService> RunLogsServiceServer<T> {
-        pub fn new(inner: T) -> Self {
-            Self::from_arc(Arc::new(inner))
-        }
-        pub fn from_arc(inner: Arc<T>) -> Self {
-            Self {
-                inner,
-                accept_compression_encodings: Default::default(),
-                send_compression_encodings: Default::default(),
-                max_decoding_message_size: None,
-                max_encoding_message_size: None,
-            }
-        }
-        pub fn with_interceptor<F>(
-            inner: T,
-            interceptor: F,
-        ) -> InterceptedService<Self, F>
-        where
-            F: tonic::service::Interceptor,
-        {
-            InterceptedService::new(Self::new(inner), interceptor)
-        }
-        /// Enable decompressing requests with the given encoding.
-        #[must_use]
-        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
-            self.accept_compression_encodings.enable(encoding);
-            self
-        }
-        /// Compress responses with the given encoding, if the client supports it.
-        #[must_use]
-        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
-            self.send_compression_encodings.enable(encoding);
-            self
-        }
-        /// Limits the maximum size of a decoded message.
-        ///
-        /// Default: `4MB`
-        #[must_use]
-        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
-            self.max_decoding_message_size = Some(limit);
-            self
-        }
-        /// Limits the maximum size of an encoded message.
-        ///
-        /// Default: `usize::MAX`
-        #[must_use]
-        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
-            self.max_encoding_message_size = Some(limit);
-            self
-        }
-    }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for RunLogsServiceServer<T>
-    where
-        T: RunLogsService,
-        B: Body + Send + 'static,
-        B::Error: Into<StdError> + Send + 'static,
-    {
-        type Response = http::Response<tonic::body::BoxBody>;
-        type Error = std::convert::Infallible;
-        type Future = BoxFuture<Self::Response, Self::Error>;
-        fn poll_ready(
-            &mut self,
-            _cx: &mut Context<'_>,
-        ) -> Poll<std::result::Result<(), Self::Error>> {
-            Poll::Ready(Ok(()))
-        }
-        fn call(&mut self, req: http::Request<B>) -> Self::Future {
-            match req.uri().path() {
-                "/flyteidl2.workflow.RunLogsService/TailLogs" => {
-                    #[allow(non_camel_case_types)]
-                    struct TailLogsSvc<T: RunLogsService>(pub Arc<T>);
-                    impl<
-                        T: RunLogsService,
-                    > tonic::server::ServerStreamingService<super::TailLogsRequest>
-                    for TailLogsSvc<T> {
-                        type Response = super::TailLogsResponse;
-                        type ResponseStream = T::TailLogsStream;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::ResponseStream>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::TailLogsRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                <T as RunLogsService>::tail_logs(&inner, request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let method = TailLogsSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.server_streaming(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                _ => {
-                    Box::pin(async move {
-                        Ok(
-                            http::Response::builder()
-                                .status(200)
-                                .header("grpc-status", tonic::Code::Unimplemented as i32)
-                                .header(
-                                    http::header::CONTENT_TYPE,
-                                    tonic::metadata::GRPC_CONTENT_TYPE,
-                                )
-                                .body(empty_body())
-                                .unwrap(),
-                        )
-                    })
-                }
-            }
-        }
-    }
-    impl<T: RunLogsService> Clone for RunLogsServiceServer<T> {
-        fn clone(&self) -> Self {
-            let inner = self.inner.clone();
-            Self {
-                inner,
-                accept_compression_encodings: self.accept_compression_encodings,
-                send_compression_encodings: self.send_compression_encodings,
-                max_decoding_message_size: self.max_decoding_message_size,
-                max_encoding_message_size: self.max_encoding_message_size,
-            }
-        }
-    }
-    impl<T: RunLogsService> tonic::server::NamedService for RunLogsServiceServer<T> {
-        const NAME: &'static str = "flyteidl2.workflow.RunLogsService";
+    impl<T: TracedRunService> tonic::server::NamedService for TracedRunServiceServer<T> {
+        const NAME: &'static str = "flyteidl2.workflow.TracedRunService";
     }
 }
 /// Generated client implementations.

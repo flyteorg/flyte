@@ -15,21 +15,25 @@ import "google/rpc/status.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 
-// LocalRunService manages runs that are orchestrated OUTSIDE the platform — typically on a user's
-// machine — where the client executes actions itself and only reports their state here. Local runs
-// are tracked separately from platform-orchestrated runs and never involve a dataplane.
+// TracedRunService records runs that are orchestrated OUTSIDE the platform: the client executes
+// the work itself — on a laptop, in CI, inside an agent framework — and reports the resulting
+// action tree here. The platform never schedules these runs and no dataplane is involved; it
+// stores what it is told and streams it back.
+//
+// Traced runs are tracked separately from platform-orchestrated runs so that reported,
+// client-supplied state can never be mistaken for execution state the platform owns.
 //
 // The read/watch surface deliberately mirrors RunService (same request/response messages) so that
 // clients and UIs built against RunService work against local runs with only a service swap.
-service LocalRunService {
+service TracedRunService {
   // Register a new local run. The server creates the root action ("a0") in the reported state and
   // returns the resolved run. If a run name is not provided, the server generates one.
-  rpc CreateRun(CreateLocalRunRequest) returns (CreateRunResponse) {}
+  rpc CreateRun(CreateTracedRunRequest) returns (CreateRunResponse) {}
 
   // Report state for one or more actions of a local run. Creates actions on first report and
   // updates them on subsequent reports. Reports are idempotent: an event with an
   // (attempt, version, phase) tuple that was already recorded is acknowledged as success.
-  rpc ReportActions(ReportLocalActionsRequest) returns (ReportLocalActionsResponse) {}
+  rpc ReportActions(ReportTracedActionsRequest) returns (ReportTracedActionsResponse) {}
 
   // Get detailed information about a local run.
   rpc GetRunDetails(GetRunDetailsRequest) returns (GetRunDetailsResponse) {
@@ -72,7 +76,7 @@ service LocalRunService {
 }
 
 // Request message for creating a local run.
-message CreateLocalRunRequest {
+message CreateTracedRunRequest {
   oneof id {
     option (buf.validate.oneof).required = true;
 
@@ -109,7 +113,7 @@ message CreateLocalRunRequest {
 }
 
 // A single action state report within a local run.
-message LocalActionUpdate {
+message TracedActionUpdate {
   // The event describing this state transition. Carries the action id, attempt (starting at 1),
   // phase, monotonically increasing version, timestamps, error info and output references
   // (output_uri / report_uri under the control plane's storage).
@@ -133,16 +137,16 @@ message LocalActionUpdate {
 }
 
 // Request message for reporting local action state.
-message ReportLocalActionsRequest {
+message ReportTracedActionsRequest {
   // The run these action reports belong to. Every update's action id must reference this run.
   common.RunIdentifier run_id = 1 [(buf.validate.field).required = true];
 
   // The action state reports.
-  repeated LocalActionUpdate updates = 2 [(buf.validate.field).repeated.min_items = 1];
+  repeated TracedActionUpdate updates = 2 [(buf.validate.field).repeated.min_items = 1];
 }
 
 // Response message for reporting local action state.
-message ReportLocalActionsResponse {
+message ReportTracedActionsResponse {
   // Per-update results, parallel to the request's updates. Duplicate (already recorded) events
   // are reported as success.
   repeated google.rpc.Status statuses = 1;
