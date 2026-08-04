@@ -1,6 +1,8 @@
 from buf.validate import validate_pb2 as _validate_pb2
+from flyteidl2.core import artifact_id_pb2 as _artifact_id_pb2
 from flyteidl2.core import interface_pb2 as _interface_pb2
 from flyteidl2.core import literals_pb2 as _literals_pb2
+from flyteidl2.core import types_pb2 as _types_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
@@ -114,8 +116,24 @@ class Inputs(_message.Message):
     context: _containers.RepeatedCompositeFieldContainer[_literals_pb2.KeyValuePair]
     def __init__(self, literals: _Optional[_Iterable[_Union[NamedLiteral, _Mapping]]] = ..., context: _Optional[_Iterable[_Union[_literals_pb2.KeyValuePair, _Mapping]]] = ...) -> None: ...
 
+class ProducedArtifact(_message.Message):
+    __slots__ = ["output", "name", "version", "info", "type"]
+    OUTPUT_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    INFO_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
+    output: str
+    name: str
+    version: str
+    info: _artifact_id_pb2.ArtifactInfo
+    type: _types_pb2.LiteralType
+    def __init__(self, output: _Optional[str] = ..., name: _Optional[str] = ..., version: _Optional[str] = ..., info: _Optional[_Union[_artifact_id_pb2.ArtifactInfo, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ...) -> None: ...
+
 class Outputs(_message.Message):
-    __slots__ = ["literals"]
+    __slots__ = ["literals", "produced_artifacts"]
     LITERALS_FIELD_NUMBER: _ClassVar[int]
+    PRODUCED_ARTIFACTS_FIELD_NUMBER: _ClassVar[int]
     literals: _containers.RepeatedCompositeFieldContainer[NamedLiteral]
-    def __init__(self, literals: _Optional[_Iterable[_Union[NamedLiteral, _Mapping]]] = ...) -> None: ...
+    produced_artifacts: _containers.RepeatedCompositeFieldContainer[ProducedArtifact]
+    def __init__(self, literals: _Optional[_Iterable[_Union[NamedLiteral, _Mapping]]] = ..., produced_artifacts: _Optional[_Iterable[_Union[ProducedArtifact, _Mapping]]] = ...) -> None: ...

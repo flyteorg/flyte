@@ -1,3 +1,4 @@
+from buf.validate import validate_pb2 as _validate_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
@@ -38,6 +39,41 @@ class ArtifactKey(_message.Message):
     name: str
     org: str
     def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
+
+class ArtifactVersionId(_message.Message):
+    __slots__ = ["key", "version"]
+    KEY_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    key: ArtifactKey
+    version: str
+    def __init__(self, key: _Optional[_Union[ArtifactKey, _Mapping]] = ..., version: _Optional[str] = ...) -> None: ...
+
+class ArtifactCard(_message.Message):
+    __slots__ = ["uri", "format", "type"]
+    URI_FIELD_NUMBER: _ClassVar[int]
+    FORMAT_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
+    uri: str
+    format: str
+    type: str
+    def __init__(self, uri: _Optional[str] = ..., format: _Optional[str] = ..., type: _Optional[str] = ...) -> None: ...
+
+class ArtifactInfo(_message.Message):
+    __slots__ = ["description", "user_metadata", "card"]
+    class UserMetadataEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    USER_METADATA_FIELD_NUMBER: _ClassVar[int]
+    CARD_FIELD_NUMBER: _ClassVar[int]
+    description: str
+    user_metadata: _containers.ScalarMap[str, str]
+    card: ArtifactCard
+    def __init__(self, description: _Optional[str] = ..., user_metadata: _Optional[_Mapping[str, str]] = ..., card: _Optional[_Union[ArtifactCard, _Mapping]] = ...) -> None: ...
 
 class ArtifactBindingData(_message.Message):
     __slots__ = ["partition_key", "bind_to_time_partition", "time_transform"]
