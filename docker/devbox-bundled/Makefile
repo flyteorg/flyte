@@ -222,10 +222,7 @@ monitoring:
 	@[ -n "$$(docker ps --filter name=^$(DEVBOX_NAME)$$ --format '{{.Names}}')" ] || \
 		{ echo "$(DEVBOX_NAME) is not running — run 'make devbox-run' first"; exit 1; }
 	kubectl --context $(DEVBOX_CONTEXT) apply -f monitoring/monitoring.yaml
-	@# Dashboards come from the repo-level monitoring/dashboards/, since they are
-	@# not devbox-specific — the same JSON is used for AWS/GCP deployments (see
-	@# monitoring/README.md). Grafana's file provisioner picks up whatever lands
-	@# in the mounted directory.
+	@# Dashboards come from the repo-level monitoring/dashboards/.
 	kubectl --context $(DEVBOX_CONTEXT) -n monitoring create configmap grafana-dashboards \
 		--from-file=../../monitoring/dashboards/ --dry-run=client -o yaml | \
 		kubectl --context $(DEVBOX_CONTEXT) apply -f -
