@@ -14,10 +14,10 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings";
 // Go:
 //   import (
 //     "google.golang.org/protobuf/proto"
-//     org "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/org"
+//     settings "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 //   )
-//   field := (&org.RunSettings{}).ProtoReflect().Descriptor().Fields().ByName("default_queue")
-//   desc := proto.GetExtension(field.Options(), org.E_Desc).(string)
+//   field := (&settings.RunSettings{}).ProtoReflect().Descriptor().Fields().ByName("default_queue")
+//   desc := proto.GetExtension(field.Options(), settings.E_Desc).(string)
 //
 // TypeScript (protobuf-es):
 //   import { RunSettings } from "./settings_definition_pb";
@@ -26,12 +26,21 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings";
 //   const description = getExtension(field.proto.options, desc);
 //
 // Python:
-//   from flyteidl2.org import settings_definition_pb2
+//   from flyteidl2.settings import settings_definition_pb2
 //   field = settings_definition_pb2.RunSettings.DESCRIPTOR.fields_by_name["default_queue"]
 //   description = field.GetOptions().Extensions[settings_definition_pb2.desc]
 
+// Extension numbers below come from the protobuf global extension registry,
+// which reserves 1364-1373 for Flyte. See
+// https://github.com/protocolbuffers/protobuf/blob/main/docs/options.md
+//
+// Do not use numbers from the 50000-99999 range here. That range is only safe
+// for schemas that never share a descriptor pool with third-party protos, and
+// flyteidl2 is published to buf.build, PyPI and npm. desc previously sat at
+// 50000 and collided with another published extension at the same tag, which
+// fails registration at import time for anyone importing both.
 extend google.protobuf.FieldOptions {
-  string desc = 50000;
+  string desc = 1364;
 }
 
 // SettingState controls how a setting at a given scope behaves.
