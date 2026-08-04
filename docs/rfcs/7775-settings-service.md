@@ -129,12 +129,34 @@ project must *not* inherit it. Setting the project-level value to state
 | `task_resource.mirror_limits_request` | bool | Copy requests into missing limits |
 | `labels`, `annotations` | string map | Applied to task pods, additive across scopes |
 | `environment_variables` | string map | Injected into task pods, additive across scopes |
+| `pod_template_name` | string | *(proposed addition, see below)* Name of a `PodTemplate` resource used as the base for task pods |
+
+### Example 5 — per-project/domain pod templates
+
+Flyte 1 supported per-project-domain `PodTemplate`s implicitly: task pods ran
+in per-project-domain namespaces, and the namespace-aware `PodTemplateStore`
+picked up a `PodTemplate` resource created in each namespace. Flyte 2 runs all
+task pods in a **single namespace**, so that dimension collapses — today only
+per-task (`pod_template_name` in `TaskMetadata`) and cluster-wide
+(`default-pod-template-name` plugin config) selection work.
+
+A `pod_template_name` setting restores the per-scope capability with no new
+machinery: an admin sets it at org, domain, or project scope; at run creation
+the resolved name is stamped onto tasks that don't specify their own; the
+existing `PodTemplateStore` lookup does the rest. This covers everything the
+typed settings don't (tolerations, node selectors, sidecars, init
+containers, …) by referencing the full Kubernetes API instead of duplicating
+it in the settings schema.
 
 ## 4 Proposed Implementation
 
-### API (done — no proto changes required)
+### API (one proto field to add, everything else is done)
 
-Four RPCs, already defined and code-generated:
+The only schema change this RFC proposes is a top-level
+`StringSetting pod_template_name` field on `Settings` (alongside the other
+pod-level settings: `labels`, `annotations`, `environment_variables`) plus
+`make buf` regeneration. Everything else is already defined and
+code-generated. Four RPCs:
 
 ```protobuf
 service SettingsService {
@@ -223,6 +245,7 @@ the same phase.
 | 1.2 | **[independent]** Model + key encoder (`"v1:{org}:{domain}:{project}"`, empty org normalized to `"flyte"`) | `runs/repository/models/project.go` | `models/settings.go` + unit test |
 | 1.3 | Repo interface (`Create/Get/GetByKeys/Update`) + sentinel errors (`ErrSettingsNotFound`, `ErrSettingsVersionConflict`) | `runs/repository/interfaces/project.go` | `interfaces/settings.go` (mockery picks it up automatically) |
 | 1.4 | sqlx implementation incl. optimistic-locking `Update` | `runs/repository/impl/project.go`, locking: `impl/trigger.go` | `impl/settings.go` + embedded-Postgres tests |
+| 1.5 | **[independent]** Proto: add `pod_template_name` `StringSetting` to `Settings` + regen (`make buf`) | existing fields in `settings_definition.proto` | one proto field + generated code |
 
 ### Phase 2 — resolution engine + service (the core)
 
@@ -248,6 +271,7 @@ config. This phase wires resolution into the run-creation path:
 |---|---|---|
 | 3.1 | Settings applier scaffold: resolve once per run creation, apply to run/task specs | `run.default_queue`, `run.max_action_concurrency` |
 | 3.2 | **[independent]** Pod-level settings | `environment_variables`, `labels`, `annotations`, `security.service_account` |
+| 3.2b | **[independent]** Pod template selection: stamp resolved name onto tasks without an explicit `pod_template_name`; `PodTemplateStore` handles the rest | `pod_template_name` |
 | 3.3 | **[independent]** Task resource bounds | `task_resource.min/max`, `mirror_limits_request` |
 | 3.4 | **[independent]** Storage settings | `storage.raw_data_path`, `run.run_base_dir` |
 | 3.5 | Precedence rule + docs: explicit user-provided spec values always win over settings-derived defaults | all of the above |
