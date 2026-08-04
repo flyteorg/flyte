@@ -69,6 +69,7 @@ Chart for basic single Flyte executable deployment
 | console.affinity | object | `{}` |  |
 | console.basePath | string | `"/v2"` |  |
 | console.containerPort | int | `8080` |  |
+| console.env | list | `[]` |  |
 | console.image.pullPolicy | string | `"IfNotPresent"` |  |
 | console.image.repository | string | `"ghcr.io/unionai-oss/flyteconsole-v2"` |  |
 | console.image.tag | string | `"latest"` |  |
