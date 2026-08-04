@@ -30,6 +30,8 @@ const (
 	TrackedRunService_ListActions_FullMethodName        = "/flyteidl2.workflow.TrackedRunService/ListActions"
 	TrackedRunService_WatchActions_FullMethodName       = "/flyteidl2.workflow.TrackedRunService/WatchActions"
 	TrackedRunService_AbortRun_FullMethodName           = "/flyteidl2.workflow.TrackedRunService/AbortRun"
+	TrackedRunService_StreamLogs_FullMethodName         = "/flyteidl2.workflow.TrackedRunService/StreamLogs"
+	TrackedRunService_TailLogs_FullMethodName           = "/flyteidl2.workflow.TrackedRunService/TailLogs"
 )
 
 // TrackedRunServiceClient is the client API for TrackedRunService service.
@@ -65,6 +67,31 @@ type TrackedRunServiceClient interface {
 	// The platform cannot stop the client that owns the run; subsequent reports against aborted actions
 	// are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
 	AbortRun(ctx context.Context, in *AbortRunRequest, opts ...grpc.CallOption) (*AbortRunResponse, error)
+	// Offer to serve logs for a tracked run. The platform has no access to the machine the run
+	// executes on, so logs can only come from the client itself, while it is still running.
+	//
+	// The client holds this bidirectional stream open for as long as it is willing to serve logs
+	// and the server drives it: rather than the client pushing everything it produces, the server
+	// asks for specific logs on demand — when somebody opens the run in the console. Nothing is
+	// stored server-side; batches are relayed to whoever is watching and then dropped. For logs
+	// that outlive the client, see TrackedActionUpdate.log_tail.
+	//
+	// The client speaks first with Register, naming the run it can serve. Thereafter the server
+	// sends ServeLogs and CancelLogs, and the client answers with LogBatch or LogError messages
+	// carrying the matching request_id. Requests may overlap; request_id is what pairs them up.
+	//
+	// SECURITY: this is the one place where the server names a resource for the client to read,
+	// which inverts the usual trust direction. A client MUST check that every requested
+	// action_attempt_id belongs to the run it registered, and refuse anything else. Without that
+	// check a hostile or impersonated server could use the stream to read logs the user never
+	// asked it to open.
+	StreamLogs(ctx context.Context, opts ...grpc.CallOption) (TrackedRunService_StreamLogsClient, error)
+	// Tail logs for one attempt of a tracked action. Served live from the run's StreamLogs
+	// connection when one is registered, and otherwise from the capped tail the client persisted
+	// with the attempt's terminal report. Returns FAILED_PRECONDITION when the run has neither —
+	// a run whose client exited without persisting a tail has no logs to give, and the caller
+	// should be told that rather than shown an empty stream.
+	TailLogs(ctx context.Context, in *TailTrackedLogsRequest, opts ...grpc.CallOption) (TrackedRunService_TailLogsClient, error)
 }
 
 type trackedRunServiceClient struct {
@@ -266,6 +293,69 @@ func (c *trackedRunServiceClient) AbortRun(ctx context.Context, in *AbortRunRequ
 	return out, nil
 }
 
+func (c *trackedRunServiceClient) StreamLogs(ctx context.Context, opts ...grpc.CallOption) (TrackedRunService_StreamLogsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &TrackedRunService_ServiceDesc.Streams[4], TrackedRunService_StreamLogs_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &trackedRunServiceStreamLogsClient{stream}
+	return x, nil
+}
+
+type TrackedRunService_StreamLogsClient interface {
+	Send(*StreamLogsRequest) error
+	Recv() (*StreamLogsResponse, error)
+	grpc.ClientStream
+}
+
+type trackedRunServiceStreamLogsClient struct {
+	grpc.ClientStream
+}
+
+func (x *trackedRunServiceStreamLogsClient) Send(m *StreamLogsRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *trackedRunServiceStreamLogsClient) Recv() (*StreamLogsResponse, error) {
+	m := new(StreamLogsResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *trackedRunServiceClient) TailLogs(ctx context.Context, in *TailTrackedLogsRequest, opts ...grpc.CallOption) (TrackedRunService_TailLogsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &TrackedRunService_ServiceDesc.Streams[5], TrackedRunService_TailLogs_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &trackedRunServiceTailLogsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type TrackedRunService_TailLogsClient interface {
+	Recv() (*TailTrackedLogsResponse, error)
+	grpc.ClientStream
+}
+
+type trackedRunServiceTailLogsClient struct {
+	grpc.ClientStream
+}
+
+func (x *trackedRunServiceTailLogsClient) Recv() (*TailTrackedLogsResponse, error) {
+	m := new(TailTrackedLogsResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // TrackedRunServiceServer is the server API for TrackedRunService service.
 // All implementations should embed UnimplementedTrackedRunServiceServer
 // for forward compatibility
@@ -299,6 +389,31 @@ type TrackedRunServiceServer interface {
 	// The platform cannot stop the client that owns the run; subsequent reports against aborted actions
 	// are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
 	AbortRun(context.Context, *AbortRunRequest) (*AbortRunResponse, error)
+	// Offer to serve logs for a tracked run. The platform has no access to the machine the run
+	// executes on, so logs can only come from the client itself, while it is still running.
+	//
+	// The client holds this bidirectional stream open for as long as it is willing to serve logs
+	// and the server drives it: rather than the client pushing everything it produces, the server
+	// asks for specific logs on demand — when somebody opens the run in the console. Nothing is
+	// stored server-side; batches are relayed to whoever is watching and then dropped. For logs
+	// that outlive the client, see TrackedActionUpdate.log_tail.
+	//
+	// The client speaks first with Register, naming the run it can serve. Thereafter the server
+	// sends ServeLogs and CancelLogs, and the client answers with LogBatch or LogError messages
+	// carrying the matching request_id. Requests may overlap; request_id is what pairs them up.
+	//
+	// SECURITY: this is the one place where the server names a resource for the client to read,
+	// which inverts the usual trust direction. A client MUST check that every requested
+	// action_attempt_id belongs to the run it registered, and refuse anything else. Without that
+	// check a hostile or impersonated server could use the stream to read logs the user never
+	// asked it to open.
+	StreamLogs(TrackedRunService_StreamLogsServer) error
+	// Tail logs for one attempt of a tracked action. Served live from the run's StreamLogs
+	// connection when one is registered, and otherwise from the capped tail the client persisted
+	// with the attempt's terminal report. Returns FAILED_PRECONDITION when the run has neither —
+	// a run whose client exited without persisting a tail has no logs to give, and the caller
+	// should be told that rather than shown an empty stream.
+	TailLogs(*TailTrackedLogsRequest, TrackedRunService_TailLogsServer) error
 }
 
 // UnimplementedTrackedRunServiceServer should be embedded to have forward compatible implementations.
@@ -337,6 +452,12 @@ func (UnimplementedTrackedRunServiceServer) WatchActions(*WatchActionsRequest, T
 }
 func (UnimplementedTrackedRunServiceServer) AbortRun(context.Context, *AbortRunRequest) (*AbortRunResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AbortRun not implemented")
+}
+func (UnimplementedTrackedRunServiceServer) StreamLogs(TrackedRunService_StreamLogsServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamLogs not implemented")
+}
+func (UnimplementedTrackedRunServiceServer) TailLogs(*TailTrackedLogsRequest, TrackedRunService_TailLogsServer) error {
+	return status.Errorf(codes.Unimplemented, "method TailLogs not implemented")
 }
 
 // UnsafeTrackedRunServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -560,6 +681,53 @@ func _TrackedRunService_AbortRun_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TrackedRunService_StreamLogs_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(TrackedRunServiceServer).StreamLogs(&trackedRunServiceStreamLogsServer{stream})
+}
+
+type TrackedRunService_StreamLogsServer interface {
+	Send(*StreamLogsResponse) error
+	Recv() (*StreamLogsRequest, error)
+	grpc.ServerStream
+}
+
+type trackedRunServiceStreamLogsServer struct {
+	grpc.ServerStream
+}
+
+func (x *trackedRunServiceStreamLogsServer) Send(m *StreamLogsResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *trackedRunServiceStreamLogsServer) Recv() (*StreamLogsRequest, error) {
+	m := new(StreamLogsRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func _TrackedRunService_TailLogs_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(TailTrackedLogsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(TrackedRunServiceServer).TailLogs(m, &trackedRunServiceTailLogsServer{stream})
+}
+
+type TrackedRunService_TailLogsServer interface {
+	Send(*TailTrackedLogsResponse) error
+	grpc.ServerStream
+}
+
+type trackedRunServiceTailLogsServer struct {
+	grpc.ServerStream
+}
+
+func (x *trackedRunServiceTailLogsServer) Send(m *TailTrackedLogsResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // TrackedRunService_ServiceDesc is the grpc.ServiceDesc for TrackedRunService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -615,6 +783,17 @@ var TrackedRunService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "WatchActions",
 			Handler:       _TrackedRunService_WatchActions_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "StreamLogs",
+			Handler:       _TrackedRunService_StreamLogs_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "TailLogs",
+			Handler:       _TrackedRunService_TailLogs_Handler,
 			ServerStreams: true,
 		},
 	},

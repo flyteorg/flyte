@@ -66,6 +66,12 @@ const (
 	// TrackedRunServiceAbortRunProcedure is the fully-qualified name of the TrackedRunService's
 	// AbortRun RPC.
 	TrackedRunServiceAbortRunProcedure = "/flyteidl2.workflow.TrackedRunService/AbortRun"
+	// TrackedRunServiceStreamLogsProcedure is the fully-qualified name of the TrackedRunService's
+	// StreamLogs RPC.
+	TrackedRunServiceStreamLogsProcedure = "/flyteidl2.workflow.TrackedRunService/StreamLogs"
+	// TrackedRunServiceTailLogsProcedure is the fully-qualified name of the TrackedRunService's
+	// TailLogs RPC.
+	TrackedRunServiceTailLogsProcedure = "/flyteidl2.workflow.TrackedRunService/TailLogs"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -82,6 +88,8 @@ var (
 	trackedRunServiceListActionsMethodDescriptor        = trackedRunServiceServiceDescriptor.Methods().ByName("ListActions")
 	trackedRunServiceWatchActionsMethodDescriptor       = trackedRunServiceServiceDescriptor.Methods().ByName("WatchActions")
 	trackedRunServiceAbortRunMethodDescriptor           = trackedRunServiceServiceDescriptor.Methods().ByName("AbortRun")
+	trackedRunServiceStreamLogsMethodDescriptor         = trackedRunServiceServiceDescriptor.Methods().ByName("StreamLogs")
+	trackedRunServiceTailLogsMethodDescriptor           = trackedRunServiceServiceDescriptor.Methods().ByName("TailLogs")
 )
 
 // TrackedRunServiceClient is a client for the flyteidl2.workflow.TrackedRunService service.
@@ -115,6 +123,31 @@ type TrackedRunServiceClient interface {
 	// The platform cannot stop the client that owns the run; subsequent reports against aborted actions
 	// are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
 	AbortRun(context.Context, *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error)
+	// Offer to serve logs for a tracked run. The platform has no access to the machine the run
+	// executes on, so logs can only come from the client itself, while it is still running.
+	//
+	// The client holds this bidirectional stream open for as long as it is willing to serve logs
+	// and the server drives it: rather than the client pushing everything it produces, the server
+	// asks for specific logs on demand — when somebody opens the run in the console. Nothing is
+	// stored server-side; batches are relayed to whoever is watching and then dropped. For logs
+	// that outlive the client, see TrackedActionUpdate.log_tail.
+	//
+	// The client speaks first with Register, naming the run it can serve. Thereafter the server
+	// sends ServeLogs and CancelLogs, and the client answers with LogBatch or LogError messages
+	// carrying the matching request_id. Requests may overlap; request_id is what pairs them up.
+	//
+	// SECURITY: this is the one place where the server names a resource for the client to read,
+	// which inverts the usual trust direction. A client MUST check that every requested
+	// action_attempt_id belongs to the run it registered, and refuse anything else. Without that
+	// check a hostile or impersonated server could use the stream to read logs the user never
+	// asked it to open.
+	StreamLogs(context.Context) *connect.BidiStreamForClient[workflow.StreamLogsRequest, workflow.StreamLogsResponse]
+	// Tail logs for one attempt of a tracked action. Served live from the run's StreamLogs
+	// connection when one is registered, and otherwise from the capped tail the client persisted
+	// with the attempt's terminal report. Returns FAILED_PRECONDITION when the run has neither —
+	// a run whose client exited without persisting a tail has no logs to give, and the caller
+	// should be told that rather than shown an empty stream.
+	TailLogs(context.Context, *connect.Request[workflow.TailTrackedLogsRequest]) (*connect.ServerStreamForClient[workflow.TailTrackedLogsResponse], error)
 }
 
 // NewTrackedRunServiceClient constructs a client for the flyteidl2.workflow.TrackedRunService
@@ -197,6 +230,19 @@ func NewTrackedRunServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithSchema(trackedRunServiceAbortRunMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		streamLogs: connect.NewClient[workflow.StreamLogsRequest, workflow.StreamLogsResponse](
+			httpClient,
+			baseURL+TrackedRunServiceStreamLogsProcedure,
+			connect.WithSchema(trackedRunServiceStreamLogsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		tailLogs: connect.NewClient[workflow.TailTrackedLogsRequest, workflow.TailTrackedLogsResponse](
+			httpClient,
+			baseURL+TrackedRunServiceTailLogsProcedure,
+			connect.WithSchema(trackedRunServiceTailLogsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -213,6 +259,8 @@ type trackedRunServiceClient struct {
 	listActions        *connect.Client[workflow.ListActionsRequest, workflow.ListActionsResponse]
 	watchActions       *connect.Client[workflow.WatchActionsRequest, workflow.WatchActionsResponse]
 	abortRun           *connect.Client[workflow.AbortRunRequest, workflow.AbortRunResponse]
+	streamLogs         *connect.Client[workflow.StreamLogsRequest, workflow.StreamLogsResponse]
+	tailLogs           *connect.Client[workflow.TailTrackedLogsRequest, workflow.TailTrackedLogsResponse]
 }
 
 // CreateRun calls flyteidl2.workflow.TrackedRunService.CreateRun.
@@ -270,6 +318,16 @@ func (c *trackedRunServiceClient) AbortRun(ctx context.Context, req *connect.Req
 	return c.abortRun.CallUnary(ctx, req)
 }
 
+// StreamLogs calls flyteidl2.workflow.TrackedRunService.StreamLogs.
+func (c *trackedRunServiceClient) StreamLogs(ctx context.Context) *connect.BidiStreamForClient[workflow.StreamLogsRequest, workflow.StreamLogsResponse] {
+	return c.streamLogs.CallBidiStream(ctx)
+}
+
+// TailLogs calls flyteidl2.workflow.TrackedRunService.TailLogs.
+func (c *trackedRunServiceClient) TailLogs(ctx context.Context, req *connect.Request[workflow.TailTrackedLogsRequest]) (*connect.ServerStreamForClient[workflow.TailTrackedLogsResponse], error) {
+	return c.tailLogs.CallServerStream(ctx, req)
+}
+
 // TrackedRunServiceHandler is an implementation of the flyteidl2.workflow.TrackedRunService
 // service.
 type TrackedRunServiceHandler interface {
@@ -302,6 +360,31 @@ type TrackedRunServiceHandler interface {
 	// The platform cannot stop the client that owns the run; subsequent reports against aborted actions
 	// are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
 	AbortRun(context.Context, *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error)
+	// Offer to serve logs for a tracked run. The platform has no access to the machine the run
+	// executes on, so logs can only come from the client itself, while it is still running.
+	//
+	// The client holds this bidirectional stream open for as long as it is willing to serve logs
+	// and the server drives it: rather than the client pushing everything it produces, the server
+	// asks for specific logs on demand — when somebody opens the run in the console. Nothing is
+	// stored server-side; batches are relayed to whoever is watching and then dropped. For logs
+	// that outlive the client, see TrackedActionUpdate.log_tail.
+	//
+	// The client speaks first with Register, naming the run it can serve. Thereafter the server
+	// sends ServeLogs and CancelLogs, and the client answers with LogBatch or LogError messages
+	// carrying the matching request_id. Requests may overlap; request_id is what pairs them up.
+	//
+	// SECURITY: this is the one place where the server names a resource for the client to read,
+	// which inverts the usual trust direction. A client MUST check that every requested
+	// action_attempt_id belongs to the run it registered, and refuse anything else. Without that
+	// check a hostile or impersonated server could use the stream to read logs the user never
+	// asked it to open.
+	StreamLogs(context.Context, *connect.BidiStream[workflow.StreamLogsRequest, workflow.StreamLogsResponse]) error
+	// Tail logs for one attempt of a tracked action. Served live from the run's StreamLogs
+	// connection when one is registered, and otherwise from the capped tail the client persisted
+	// with the attempt's terminal report. Returns FAILED_PRECONDITION when the run has neither —
+	// a run whose client exited without persisting a tail has no logs to give, and the caller
+	// should be told that rather than shown an empty stream.
+	TailLogs(context.Context, *connect.Request[workflow.TailTrackedLogsRequest], *connect.ServerStream[workflow.TailTrackedLogsResponse]) error
 }
 
 // NewTrackedRunServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -380,6 +463,19 @@ func NewTrackedRunServiceHandler(svc TrackedRunServiceHandler, opts ...connect.H
 		connect.WithSchema(trackedRunServiceAbortRunMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	trackedRunServiceStreamLogsHandler := connect.NewBidiStreamHandler(
+		TrackedRunServiceStreamLogsProcedure,
+		svc.StreamLogs,
+		connect.WithSchema(trackedRunServiceStreamLogsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	trackedRunServiceTailLogsHandler := connect.NewServerStreamHandler(
+		TrackedRunServiceTailLogsProcedure,
+		svc.TailLogs,
+		connect.WithSchema(trackedRunServiceTailLogsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.workflow.TrackedRunService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case TrackedRunServiceCreateRunProcedure:
@@ -404,6 +500,10 @@ func NewTrackedRunServiceHandler(svc TrackedRunServiceHandler, opts ...connect.H
 			trackedRunServiceWatchActionsHandler.ServeHTTP(w, r)
 		case TrackedRunServiceAbortRunProcedure:
 			trackedRunServiceAbortRunHandler.ServeHTTP(w, r)
+		case TrackedRunServiceStreamLogsProcedure:
+			trackedRunServiceStreamLogsHandler.ServeHTTP(w, r)
+		case TrackedRunServiceTailLogsProcedure:
+			trackedRunServiceTailLogsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -455,4 +555,12 @@ func (UnimplementedTrackedRunServiceHandler) WatchActions(context.Context, *conn
 
 func (UnimplementedTrackedRunServiceHandler) AbortRun(context.Context, *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TrackedRunService.AbortRun is not implemented"))
+}
+
+func (UnimplementedTrackedRunServiceHandler) StreamLogs(context.Context, *connect.BidiStream[workflow.StreamLogsRequest, workflow.StreamLogsResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TrackedRunService.StreamLogs is not implemented"))
+}
+
+func (UnimplementedTrackedRunServiceHandler) TailLogs(context.Context, *connect.Request[workflow.TailTrackedLogsRequest], *connect.ServerStream[workflow.TailTrackedLogsResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TrackedRunService.TailLogs is not implemented"))
 }

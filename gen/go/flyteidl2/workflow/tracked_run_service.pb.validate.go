@@ -487,6 +487,35 @@ func (m *TrackedActionUpdate) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetLogTail()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TrackedActionUpdateValidationError{
+					field:  "LogTail",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TrackedActionUpdateValidationError{
+					field:  "LogTail",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLogTail()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TrackedActionUpdateValidationError{
+				field:  "LogTail",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch v := m.Spec.(type) {
 	case *TrackedActionUpdate_Task:
 		if v == nil {
@@ -653,6 +682,873 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TrackedActionUpdateValidationError{}
+
+// Validate checks the field values on LogTail with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *LogTail) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LogTail with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in LogTailMultiError, or nil if none found.
+func (m *LogTail) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LogTail) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetLines() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LogTailValidationError{
+						field:  fmt.Sprintf("Lines[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LogTailValidationError{
+						field:  fmt.Sprintf("Lines[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LogTailValidationError{
+					field:  fmt.Sprintf("Lines[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for Truncated
+
+	if len(errors) > 0 {
+		return LogTailMultiError(errors)
+	}
+
+	return nil
+}
+
+// LogTailMultiError is an error wrapping multiple validation errors returned
+// by LogTail.ValidateAll() if the designated constraints aren't met.
+type LogTailMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LogTailMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LogTailMultiError) AllErrors() []error { return m }
+
+// LogTailValidationError is the validation error returned by LogTail.Validate
+// if the designated constraints aren't met.
+type LogTailValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LogTailValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LogTailValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LogTailValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LogTailValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LogTailValidationError) ErrorName() string { return "LogTailValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LogTailValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLogTail.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LogTailValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LogTailValidationError{}
+
+// Validate checks the field values on StreamLogsRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *StreamLogsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on StreamLogsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// StreamLogsRequestMultiError, or nil if none found.
+func (m *StreamLogsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StreamLogsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	switch v := m.Message.(type) {
+	case *StreamLogsRequest_Register_:
+		if v == nil {
+			err := StreamLogsRequestValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetRegister()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, StreamLogsRequestValidationError{
+						field:  "Register",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, StreamLogsRequestValidationError{
+						field:  "Register",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRegister()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return StreamLogsRequestValidationError{
+					field:  "Register",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *StreamLogsRequest_Batch:
+		if v == nil {
+			err := StreamLogsRequestValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetBatch()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, StreamLogsRequestValidationError{
+						field:  "Batch",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, StreamLogsRequestValidationError{
+						field:  "Batch",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetBatch()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return StreamLogsRequestValidationError{
+					field:  "Batch",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *StreamLogsRequest_Error:
+		if v == nil {
+			err := StreamLogsRequestValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetError()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, StreamLogsRequestValidationError{
+						field:  "Error",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, StreamLogsRequestValidationError{
+						field:  "Error",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return StreamLogsRequestValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
+
+	if len(errors) > 0 {
+		return StreamLogsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// StreamLogsRequestMultiError is an error wrapping multiple validation errors
+// returned by StreamLogsRequest.ValidateAll() if the designated constraints
+// aren't met.
+type StreamLogsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StreamLogsRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StreamLogsRequestMultiError) AllErrors() []error { return m }
+
+// StreamLogsRequestValidationError is the validation error returned by
+// StreamLogsRequest.Validate if the designated constraints aren't met.
+type StreamLogsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StreamLogsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StreamLogsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StreamLogsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StreamLogsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StreamLogsRequestValidationError) ErrorName() string {
+	return "StreamLogsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e StreamLogsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStreamLogsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StreamLogsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StreamLogsRequestValidationError{}
+
+// Validate checks the field values on StreamLogsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *StreamLogsResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on StreamLogsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// StreamLogsResponseMultiError, or nil if none found.
+func (m *StreamLogsResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StreamLogsResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	switch v := m.Message.(type) {
+	case *StreamLogsResponse_Registered_:
+		if v == nil {
+			err := StreamLogsResponseValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetRegistered()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, StreamLogsResponseValidationError{
+						field:  "Registered",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, StreamLogsResponseValidationError{
+						field:  "Registered",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRegistered()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return StreamLogsResponseValidationError{
+					field:  "Registered",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *StreamLogsResponse_Serve:
+		if v == nil {
+			err := StreamLogsResponseValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetServe()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, StreamLogsResponseValidationError{
+						field:  "Serve",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, StreamLogsResponseValidationError{
+						field:  "Serve",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetServe()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return StreamLogsResponseValidationError{
+					field:  "Serve",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *StreamLogsResponse_Cancel:
+		if v == nil {
+			err := StreamLogsResponseValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetCancel()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, StreamLogsResponseValidationError{
+						field:  "Cancel",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, StreamLogsResponseValidationError{
+						field:  "Cancel",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetCancel()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return StreamLogsResponseValidationError{
+					field:  "Cancel",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
+
+	if len(errors) > 0 {
+		return StreamLogsResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// StreamLogsResponseMultiError is an error wrapping multiple validation errors
+// returned by StreamLogsResponse.ValidateAll() if the designated constraints
+// aren't met.
+type StreamLogsResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StreamLogsResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StreamLogsResponseMultiError) AllErrors() []error { return m }
+
+// StreamLogsResponseValidationError is the validation error returned by
+// StreamLogsResponse.Validate if the designated constraints aren't met.
+type StreamLogsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StreamLogsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StreamLogsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StreamLogsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StreamLogsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StreamLogsResponseValidationError) ErrorName() string {
+	return "StreamLogsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e StreamLogsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStreamLogsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StreamLogsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StreamLogsResponseValidationError{}
+
+// Validate checks the field values on TailTrackedLogsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *TailTrackedLogsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TailTrackedLogsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TailTrackedLogsRequestMultiError, or nil if none found.
+func (m *TailTrackedLogsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TailTrackedLogsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetActionAttemptId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TailTrackedLogsRequestValidationError{
+					field:  "ActionAttemptId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TailTrackedLogsRequestValidationError{
+					field:  "ActionAttemptId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetActionAttemptId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TailTrackedLogsRequestValidationError{
+				field:  "ActionAttemptId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Follow
+
+	if len(errors) > 0 {
+		return TailTrackedLogsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// TailTrackedLogsRequestMultiError is an error wrapping multiple validation
+// errors returned by TailTrackedLogsRequest.ValidateAll() if the designated
+// constraints aren't met.
+type TailTrackedLogsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TailTrackedLogsRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TailTrackedLogsRequestMultiError) AllErrors() []error { return m }
+
+// TailTrackedLogsRequestValidationError is the validation error returned by
+// TailTrackedLogsRequest.Validate if the designated constraints aren't met.
+type TailTrackedLogsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TailTrackedLogsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TailTrackedLogsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TailTrackedLogsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TailTrackedLogsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TailTrackedLogsRequestValidationError) ErrorName() string {
+	return "TailTrackedLogsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TailTrackedLogsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTailTrackedLogsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TailTrackedLogsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TailTrackedLogsRequestValidationError{}
+
+// Validate checks the field values on TailTrackedLogsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *TailTrackedLogsResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TailTrackedLogsResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TailTrackedLogsResponseMultiError, or nil if none found.
+func (m *TailTrackedLogsResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TailTrackedLogsResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetLines() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, TailTrackedLogsResponseValidationError{
+						field:  fmt.Sprintf("Lines[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, TailTrackedLogsResponseValidationError{
+						field:  fmt.Sprintf("Lines[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TailTrackedLogsResponseValidationError{
+					field:  fmt.Sprintf("Lines[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for Source
+
+	// no validation rules for Truncated
+
+	if len(errors) > 0 {
+		return TailTrackedLogsResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// TailTrackedLogsResponseMultiError is an error wrapping multiple validation
+// errors returned by TailTrackedLogsResponse.ValidateAll() if the designated
+// constraints aren't met.
+type TailTrackedLogsResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TailTrackedLogsResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TailTrackedLogsResponseMultiError) AllErrors() []error { return m }
+
+// TailTrackedLogsResponseValidationError is the validation error returned by
+// TailTrackedLogsResponse.Validate if the designated constraints aren't met.
+type TailTrackedLogsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TailTrackedLogsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TailTrackedLogsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TailTrackedLogsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TailTrackedLogsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TailTrackedLogsResponseValidationError) ErrorName() string {
+	return "TailTrackedLogsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TailTrackedLogsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTailTrackedLogsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TailTrackedLogsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TailTrackedLogsResponseValidationError{}
 
 // Validate checks the field values on ReportTrackedActionsRequest with the
 // rules defined in the proto definition for this message. If any rules are
@@ -956,3 +1852,780 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ReportTrackedActionsResponseValidationError{}
+
+// Validate checks the field values on StreamLogsRequest_Register with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *StreamLogsRequest_Register) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on StreamLogsRequest_Register with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// StreamLogsRequest_RegisterMultiError, or nil if none found.
+func (m *StreamLogsRequest_Register) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StreamLogsRequest_Register) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetRunId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, StreamLogsRequest_RegisterValidationError{
+					field:  "RunId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, StreamLogsRequest_RegisterValidationError{
+					field:  "RunId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRunId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return StreamLogsRequest_RegisterValidationError{
+				field:  "RunId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return StreamLogsRequest_RegisterMultiError(errors)
+	}
+
+	return nil
+}
+
+// StreamLogsRequest_RegisterMultiError is an error wrapping multiple
+// validation errors returned by StreamLogsRequest_Register.ValidateAll() if
+// the designated constraints aren't met.
+type StreamLogsRequest_RegisterMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StreamLogsRequest_RegisterMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StreamLogsRequest_RegisterMultiError) AllErrors() []error { return m }
+
+// StreamLogsRequest_RegisterValidationError is the validation error returned
+// by StreamLogsRequest_Register.Validate if the designated constraints aren't met.
+type StreamLogsRequest_RegisterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StreamLogsRequest_RegisterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StreamLogsRequest_RegisterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StreamLogsRequest_RegisterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StreamLogsRequest_RegisterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StreamLogsRequest_RegisterValidationError) ErrorName() string {
+	return "StreamLogsRequest_RegisterValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e StreamLogsRequest_RegisterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStreamLogsRequest_Register.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StreamLogsRequest_RegisterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StreamLogsRequest_RegisterValidationError{}
+
+// Validate checks the field values on StreamLogsRequest_LogBatch with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *StreamLogsRequest_LogBatch) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on StreamLogsRequest_LogBatch with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// StreamLogsRequest_LogBatchMultiError, or nil if none found.
+func (m *StreamLogsRequest_LogBatch) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StreamLogsRequest_LogBatch) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for RequestId
+
+	for idx, item := range m.GetLines() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, StreamLogsRequest_LogBatchValidationError{
+						field:  fmt.Sprintf("Lines[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, StreamLogsRequest_LogBatchValidationError{
+						field:  fmt.Sprintf("Lines[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return StreamLogsRequest_LogBatchValidationError{
+					field:  fmt.Sprintf("Lines[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for Eof
+
+	if len(errors) > 0 {
+		return StreamLogsRequest_LogBatchMultiError(errors)
+	}
+
+	return nil
+}
+
+// StreamLogsRequest_LogBatchMultiError is an error wrapping multiple
+// validation errors returned by StreamLogsRequest_LogBatch.ValidateAll() if
+// the designated constraints aren't met.
+type StreamLogsRequest_LogBatchMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StreamLogsRequest_LogBatchMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StreamLogsRequest_LogBatchMultiError) AllErrors() []error { return m }
+
+// StreamLogsRequest_LogBatchValidationError is the validation error returned
+// by StreamLogsRequest_LogBatch.Validate if the designated constraints aren't met.
+type StreamLogsRequest_LogBatchValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StreamLogsRequest_LogBatchValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StreamLogsRequest_LogBatchValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StreamLogsRequest_LogBatchValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StreamLogsRequest_LogBatchValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StreamLogsRequest_LogBatchValidationError) ErrorName() string {
+	return "StreamLogsRequest_LogBatchValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e StreamLogsRequest_LogBatchValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStreamLogsRequest_LogBatch.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StreamLogsRequest_LogBatchValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StreamLogsRequest_LogBatchValidationError{}
+
+// Validate checks the field values on StreamLogsRequest_LogError with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *StreamLogsRequest_LogError) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on StreamLogsRequest_LogError with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// StreamLogsRequest_LogErrorMultiError, or nil if none found.
+func (m *StreamLogsRequest_LogError) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StreamLogsRequest_LogError) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for RequestId
+
+	if all {
+		switch v := interface{}(m.GetError()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, StreamLogsRequest_LogErrorValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, StreamLogsRequest_LogErrorValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return StreamLogsRequest_LogErrorValidationError{
+				field:  "Error",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return StreamLogsRequest_LogErrorMultiError(errors)
+	}
+
+	return nil
+}
+
+// StreamLogsRequest_LogErrorMultiError is an error wrapping multiple
+// validation errors returned by StreamLogsRequest_LogError.ValidateAll() if
+// the designated constraints aren't met.
+type StreamLogsRequest_LogErrorMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StreamLogsRequest_LogErrorMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StreamLogsRequest_LogErrorMultiError) AllErrors() []error { return m }
+
+// StreamLogsRequest_LogErrorValidationError is the validation error returned
+// by StreamLogsRequest_LogError.Validate if the designated constraints aren't met.
+type StreamLogsRequest_LogErrorValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StreamLogsRequest_LogErrorValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StreamLogsRequest_LogErrorValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StreamLogsRequest_LogErrorValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StreamLogsRequest_LogErrorValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StreamLogsRequest_LogErrorValidationError) ErrorName() string {
+	return "StreamLogsRequest_LogErrorValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e StreamLogsRequest_LogErrorValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStreamLogsRequest_LogError.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StreamLogsRequest_LogErrorValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StreamLogsRequest_LogErrorValidationError{}
+
+// Validate checks the field values on StreamLogsResponse_Registered with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *StreamLogsResponse_Registered) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on StreamLogsResponse_Registered with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// StreamLogsResponse_RegisteredMultiError, or nil if none found.
+func (m *StreamLogsResponse_Registered) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StreamLogsResponse_Registered) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return StreamLogsResponse_RegisteredMultiError(errors)
+	}
+
+	return nil
+}
+
+// StreamLogsResponse_RegisteredMultiError is an error wrapping multiple
+// validation errors returned by StreamLogsResponse_Registered.ValidateAll()
+// if the designated constraints aren't met.
+type StreamLogsResponse_RegisteredMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StreamLogsResponse_RegisteredMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StreamLogsResponse_RegisteredMultiError) AllErrors() []error { return m }
+
+// StreamLogsResponse_RegisteredValidationError is the validation error
+// returned by StreamLogsResponse_Registered.Validate if the designated
+// constraints aren't met.
+type StreamLogsResponse_RegisteredValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StreamLogsResponse_RegisteredValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StreamLogsResponse_RegisteredValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StreamLogsResponse_RegisteredValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StreamLogsResponse_RegisteredValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StreamLogsResponse_RegisteredValidationError) ErrorName() string {
+	return "StreamLogsResponse_RegisteredValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e StreamLogsResponse_RegisteredValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStreamLogsResponse_Registered.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StreamLogsResponse_RegisteredValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StreamLogsResponse_RegisteredValidationError{}
+
+// Validate checks the field values on StreamLogsResponse_ServeLogs with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *StreamLogsResponse_ServeLogs) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on StreamLogsResponse_ServeLogs with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// StreamLogsResponse_ServeLogsMultiError, or nil if none found.
+func (m *StreamLogsResponse_ServeLogs) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StreamLogsResponse_ServeLogs) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for RequestId
+
+	if all {
+		switch v := interface{}(m.GetActionAttemptId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, StreamLogsResponse_ServeLogsValidationError{
+					field:  "ActionAttemptId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, StreamLogsResponse_ServeLogsValidationError{
+					field:  "ActionAttemptId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetActionAttemptId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return StreamLogsResponse_ServeLogsValidationError{
+				field:  "ActionAttemptId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetFromTimestamp()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, StreamLogsResponse_ServeLogsValidationError{
+					field:  "FromTimestamp",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, StreamLogsResponse_ServeLogsValidationError{
+					field:  "FromTimestamp",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetFromTimestamp()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return StreamLogsResponse_ServeLogsValidationError{
+				field:  "FromTimestamp",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Follow
+
+	if len(errors) > 0 {
+		return StreamLogsResponse_ServeLogsMultiError(errors)
+	}
+
+	return nil
+}
+
+// StreamLogsResponse_ServeLogsMultiError is an error wrapping multiple
+// validation errors returned by StreamLogsResponse_ServeLogs.ValidateAll() if
+// the designated constraints aren't met.
+type StreamLogsResponse_ServeLogsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StreamLogsResponse_ServeLogsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StreamLogsResponse_ServeLogsMultiError) AllErrors() []error { return m }
+
+// StreamLogsResponse_ServeLogsValidationError is the validation error returned
+// by StreamLogsResponse_ServeLogs.Validate if the designated constraints
+// aren't met.
+type StreamLogsResponse_ServeLogsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StreamLogsResponse_ServeLogsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StreamLogsResponse_ServeLogsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StreamLogsResponse_ServeLogsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StreamLogsResponse_ServeLogsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StreamLogsResponse_ServeLogsValidationError) ErrorName() string {
+	return "StreamLogsResponse_ServeLogsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e StreamLogsResponse_ServeLogsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStreamLogsResponse_ServeLogs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StreamLogsResponse_ServeLogsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StreamLogsResponse_ServeLogsValidationError{}
+
+// Validate checks the field values on StreamLogsResponse_CancelLogs with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *StreamLogsResponse_CancelLogs) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on StreamLogsResponse_CancelLogs with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// StreamLogsResponse_CancelLogsMultiError, or nil if none found.
+func (m *StreamLogsResponse_CancelLogs) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StreamLogsResponse_CancelLogs) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for RequestId
+
+	if len(errors) > 0 {
+		return StreamLogsResponse_CancelLogsMultiError(errors)
+	}
+
+	return nil
+}
+
+// StreamLogsResponse_CancelLogsMultiError is an error wrapping multiple
+// validation errors returned by StreamLogsResponse_CancelLogs.ValidateAll()
+// if the designated constraints aren't met.
+type StreamLogsResponse_CancelLogsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StreamLogsResponse_CancelLogsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StreamLogsResponse_CancelLogsMultiError) AllErrors() []error { return m }
+
+// StreamLogsResponse_CancelLogsValidationError is the validation error
+// returned by StreamLogsResponse_CancelLogs.Validate if the designated
+// constraints aren't met.
+type StreamLogsResponse_CancelLogsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StreamLogsResponse_CancelLogsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StreamLogsResponse_CancelLogsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StreamLogsResponse_CancelLogsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StreamLogsResponse_CancelLogsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StreamLogsResponse_CancelLogsValidationError) ErrorName() string {
+	return "StreamLogsResponse_CancelLogsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e StreamLogsResponse_CancelLogsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStreamLogsResponse_CancelLogs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StreamLogsResponse_CancelLogsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StreamLogsResponse_CancelLogsValidationError{}

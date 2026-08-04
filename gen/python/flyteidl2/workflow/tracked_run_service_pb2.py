@@ -14,6 +14,7 @@ _sym_db = _symbol_database.Default()
 from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
 from flyteidl2.common import identifier_pb2 as flyteidl2_dot_common_dot_identifier__pb2
 from flyteidl2.common import run_pb2 as flyteidl2_dot_common_dot_run__pb2
+from flyteidl2.logs.dataplane import payload_pb2 as flyteidl2_dot_logs_dot_dataplane_dot_payload__pb2
 from flyteidl2.task import common_pb2 as flyteidl2_dot_task_dot_common__pb2
 from flyteidl2.task import run_pb2 as flyteidl2_dot_task_dot_run__pb2
 from flyteidl2.task import task_definition_pb2 as flyteidl2_dot_task_dot_task__definition__pb2
@@ -23,7 +24,7 @@ from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__
 from google.rpc import status_pb2 as google_dot_rpc_dot_status__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n,flyteidl2/workflow/tracked_run_service.proto\x12\x12\x66lyteidl2.workflow\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1a\x66lyteidl2/common/run.proto\x1a\x1b\x66lyteidl2/task/common.proto\x1a\x18\x66lyteidl2/task/run.proto\x1a$flyteidl2/task/task_definition.proto\x1a\'flyteidl2/workflow/run_definition.proto\x1a$flyteidl2/workflow/run_service.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\"\xa1\x05\n\x17\x43reateTrackedRunRequest\x12\x38\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierH\x00R\x05runId\x12\x44\n\nproject_id\x18\x02 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\tprojectId\x12\x39\n\x07task_id\x18\x03 \x01(\x0b\x32\x1e.flyteidl2.task.TaskIdentifierH\x01R\x06taskId\x12\x37\n\ttask_spec\x18\x04 \x01(\x0b\x32\x18.flyteidl2.task.TaskSpecH\x01R\x08taskSpec\x12[\n\x14offloaded_input_data\x18\x05 \x01(\x0b\x32$.flyteidl2.common.OffloadedInputDataH\x02R\x12offloadedInputData\x88\x01\x01\x12\x32\n\x08run_spec\x18\x06 \x01(\x0b\x32\x17.flyteidl2.task.RunSpecR\x07runSpec\x12O\n\x06labels\x18\x07 \x03(\x0b\x32\x37.flyteidl2.workflow.CreateTrackedRunRequest.LabelsEntryR\x06labels\x12@\n\x0erun_start_time\x18\x08 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x0crunStartTime\x1a\x39\n\x0bLabelsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x42\x0b\n\x02id\x12\x05\xbaH\x02\x08\x01\x42\r\n\x04task\x12\x05\xbaH\x02\x08\x01\x42\x17\n\x15_offloaded_input_data\"\xbc\x02\n\x13TrackedActionUpdate\x12=\n\x05\x65vent\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.workflow.ActionEventB\x06\xbaH\x03\xc8\x01\x01R\x05\x65vent\x12\x1f\n\x0bparent_name\x18\x02 \x01(\tR\nparentName\x12\x14\n\x05group\x18\x03 \x01(\tR\x05group\x12\x34\n\x04task\x18\x04 \x01(\x0b\x32\x1e.flyteidl2.workflow.TaskActionH\x00R\x04task\x12\x37\n\x05trace\x18\x05 \x01(\x0b\x32\x1f.flyteidl2.workflow.TraceActionH\x00R\x05trace\x12\x38\n\x06status\x18\x06 \x01(\x0b\x32 .flyteidl2.workflow.ActionStatusR\x06statusB\x06\n\x04spec\"\xaa\x01\n\x1bReportTrackedActionsRequest\x12>\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05runId\x12K\n\x07updates\x18\x02 \x03(\x0b\x32\'.flyteidl2.workflow.TrackedActionUpdateB\x08\xbaH\x05\x92\x01\x02\x08\x01R\x07updates\"N\n\x1cReportTrackedActionsResponse\x12.\n\x08statuses\x18\x01 \x03(\x0b\x32\x12.google.rpc.StatusR\x08statuses2\x93\t\n\x11TrackedRunService\x12\x61\n\tCreateRun\x12+.flyteidl2.workflow.CreateTrackedRunRequest\x1a%.flyteidl2.workflow.CreateRunResponse\"\x00\x12t\n\rReportActions\x12/.flyteidl2.workflow.ReportTrackedActionsRequest\x1a\x30.flyteidl2.workflow.ReportTrackedActionsResponse\"\x00\x12i\n\rGetRunDetails\x12(.flyteidl2.workflow.GetRunDetailsRequest\x1a).flyteidl2.workflow.GetRunDetailsResponse\"\x03\x90\x02\x01\x12n\n\x0fWatchRunDetails\x12*.flyteidl2.workflow.WatchRunDetailsRequest\x1a+.flyteidl2.workflow.WatchRunDetailsResponse\"\x00\x30\x01\x12r\n\x10GetActionDetails\x12+.flyteidl2.workflow.GetActionDetailsRequest\x1a,.flyteidl2.workflow.GetActionDetailsResponse\"\x03\x90\x02\x01\x12w\n\x12WatchActionDetails\x12-.flyteidl2.workflow.WatchActionDetailsRequest\x1a..flyteidl2.workflow.WatchActionDetailsResponse\"\x00\x30\x01\x12Z\n\x08ListRuns\x12#.flyteidl2.workflow.ListRunsRequest\x1a$.flyteidl2.workflow.ListRunsResponse\"\x03\x90\x02\x01\x12\\\n\tWatchRuns\x12$.flyteidl2.workflow.WatchRunsRequest\x1a%.flyteidl2.workflow.WatchRunsResponse\"\x00\x30\x01\x12\x63\n\x0bListActions\x12&.flyteidl2.workflow.ListActionsRequest\x1a\'.flyteidl2.workflow.ListActionsResponse\"\x03\x90\x02\x01\x12\x65\n\x0cWatchActions\x12\'.flyteidl2.workflow.WatchActionsRequest\x1a(.flyteidl2.workflow.WatchActionsResponse\"\x00\x30\x01\x12W\n\x08\x41\x62ortRun\x12#.flyteidl2.workflow.AbortRunRequest\x1a$.flyteidl2.workflow.AbortRunResponse\"\x00\x42\xd3\x01\n\x16\x63om.flyteidl2.workflowB\x16TrackedRunServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n,flyteidl2/workflow/tracked_run_service.proto\x12\x12\x66lyteidl2.workflow\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1a\x66lyteidl2/common/run.proto\x1a&flyteidl2/logs/dataplane/payload.proto\x1a\x1b\x66lyteidl2/task/common.proto\x1a\x18\x66lyteidl2/task/run.proto\x1a$flyteidl2/task/task_definition.proto\x1a\'flyteidl2/workflow/run_definition.proto\x1a$flyteidl2/workflow/run_service.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17google/rpc/status.proto\"\xa1\x05\n\x17\x43reateTrackedRunRequest\x12\x38\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierH\x00R\x05runId\x12\x44\n\nproject_id\x18\x02 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\tprojectId\x12\x39\n\x07task_id\x18\x03 \x01(\x0b\x32\x1e.flyteidl2.task.TaskIdentifierH\x01R\x06taskId\x12\x37\n\ttask_spec\x18\x04 \x01(\x0b\x32\x18.flyteidl2.task.TaskSpecH\x01R\x08taskSpec\x12[\n\x14offloaded_input_data\x18\x05 \x01(\x0b\x32$.flyteidl2.common.OffloadedInputDataH\x02R\x12offloadedInputData\x88\x01\x01\x12\x32\n\x08run_spec\x18\x06 \x01(\x0b\x32\x17.flyteidl2.task.RunSpecR\x07runSpec\x12O\n\x06labels\x18\x07 \x03(\x0b\x32\x37.flyteidl2.workflow.CreateTrackedRunRequest.LabelsEntryR\x06labels\x12@\n\x0erun_start_time\x18\x08 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x0crunStartTime\x1a\x39\n\x0bLabelsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x42\x0b\n\x02id\x12\x05\xbaH\x02\x08\x01\x42\r\n\x04task\x12\x05\xbaH\x02\x08\x01\x42\x17\n\x15_offloaded_input_data\"\xf4\x02\n\x13TrackedActionUpdate\x12=\n\x05\x65vent\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.workflow.ActionEventB\x06\xbaH\x03\xc8\x01\x01R\x05\x65vent\x12\x1f\n\x0bparent_name\x18\x02 \x01(\tR\nparentName\x12\x14\n\x05group\x18\x03 \x01(\tR\x05group\x12\x34\n\x04task\x18\x04 \x01(\x0b\x32\x1e.flyteidl2.workflow.TaskActionH\x00R\x04task\x12\x37\n\x05trace\x18\x05 \x01(\x0b\x32\x1f.flyteidl2.workflow.TraceActionH\x00R\x05trace\x12\x38\n\x06status\x18\x06 \x01(\x0b\x32 .flyteidl2.workflow.ActionStatusR\x06status\x12\x36\n\x08log_tail\x18\x07 \x01(\x0b\x32\x1b.flyteidl2.workflow.LogTailR\x07logTailB\x06\n\x04spec\"`\n\x07LogTail\x12\x37\n\x05lines\x18\x01 \x03(\x0b\x32!.flyteidl2.logs.dataplane.LogLineR\x05lines\x12\x1c\n\ttruncated\x18\x02 \x01(\x08R\ttruncated\"\xb4\x04\n\x11StreamLogsRequest\x12L\n\x08register\x18\x01 \x01(\x0b\x32..flyteidl2.workflow.StreamLogsRequest.RegisterH\x00R\x08register\x12\x46\n\x05\x62\x61tch\x18\x02 \x01(\x0b\x32..flyteidl2.workflow.StreamLogsRequest.LogBatchH\x00R\x05\x62\x61tch\x12\x46\n\x05\x65rror\x18\x03 \x01(\x0b\x32..flyteidl2.workflow.StreamLogsRequest.LogErrorH\x00R\x05\x65rror\x1aJ\n\x08Register\x12>\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05runId\x1a}\n\x08LogBatch\x12&\n\nrequest_id\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\trequestId\x12\x37\n\x05lines\x18\x02 \x03(\x0b\x32!.flyteidl2.logs.dataplane.LogLineR\x05lines\x12\x10\n\x03\x65of\x18\x03 \x01(\x08R\x03\x65of\x1a\x64\n\x08LogError\x12&\n\nrequest_id\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\trequestId\x12\x30\n\x05\x65rror\x18\x02 \x01(\x0b\x32\x12.google.rpc.StatusB\x06\xbaH\x03\xc8\x01\x01R\x05\x65rrorB\x10\n\x07message\x12\x05\xbaH\x02\x08\x01\"\xc6\x04\n\x12StreamLogsResponse\x12S\n\nregistered\x18\x01 \x01(\x0b\x32\x31.flyteidl2.workflow.StreamLogsResponse.RegisteredH\x00R\nregistered\x12H\n\x05serve\x18\x02 \x01(\x0b\x32\x30.flyteidl2.workflow.StreamLogsResponse.ServeLogsH\x00R\x05serve\x12K\n\x06\x63\x61ncel\x18\x03 \x01(\x0b\x32\x31.flyteidl2.workflow.StreamLogsResponse.CancelLogsH\x00R\x06\x63\x61ncel\x1a\x0c\n\nRegistered\x1a\xed\x01\n\tServeLogs\x12&\n\nrequest_id\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\trequestId\x12]\n\x11\x61\x63tion_attempt_id\x18\x02 \x01(\x0b\x32).flyteidl2.common.ActionAttemptIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x0f\x61\x63tionAttemptId\x12\x41\n\x0e\x66rom_timestamp\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\rfromTimestamp\x12\x16\n\x06\x66ollow\x18\x04 \x01(\x08R\x06\x66ollow\x1a\x34\n\nCancelLogs\x12&\n\nrequest_id\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\trequestIdB\x10\n\x07message\x12\x05\xbaH\x02\x08\x01\"\x8f\x01\n\x16TailTrackedLogsRequest\x12]\n\x11\x61\x63tion_attempt_id\x18\x01 \x01(\x0b\x32).flyteidl2.common.ActionAttemptIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x0f\x61\x63tionAttemptId\x12\x16\n\x06\x66ollow\x18\x02 \x01(\x08R\x06\x66ollow\"\x85\x02\n\x17TailTrackedLogsResponse\x12\x37\n\x05lines\x18\x01 \x03(\x0b\x32!.flyteidl2.logs.dataplane.LogLineR\x05lines\x12J\n\x06source\x18\x02 \x01(\x0e\x32\x32.flyteidl2.workflow.TailTrackedLogsResponse.SourceR\x06source\x12\x1c\n\ttruncated\x18\x03 \x01(\x08R\ttruncated\"G\n\x06Source\x12\x16\n\x12SOURCE_UNSPECIFIED\x10\x00\x12\x0f\n\x0bSOURCE_LIVE\x10\x01\x12\x14\n\x10SOURCE_PERSISTED\x10\x02\"\xaa\x01\n\x1bReportTrackedActionsRequest\x12>\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05runId\x12K\n\x07updates\x18\x02 \x03(\x0b\x32\'.flyteidl2.workflow.TrackedActionUpdateB\x08\xbaH\x05\x92\x01\x02\x08\x01R\x07updates\"N\n\x1cReportTrackedActionsResponse\x12.\n\x08statuses\x18\x01 \x03(\x0b\x32\x12.google.rpc.StatusR\x08statuses2\xe2\n\n\x11TrackedRunService\x12\x61\n\tCreateRun\x12+.flyteidl2.workflow.CreateTrackedRunRequest\x1a%.flyteidl2.workflow.CreateRunResponse\"\x00\x12t\n\rReportActions\x12/.flyteidl2.workflow.ReportTrackedActionsRequest\x1a\x30.flyteidl2.workflow.ReportTrackedActionsResponse\"\x00\x12i\n\rGetRunDetails\x12(.flyteidl2.workflow.GetRunDetailsRequest\x1a).flyteidl2.workflow.GetRunDetailsResponse\"\x03\x90\x02\x01\x12n\n\x0fWatchRunDetails\x12*.flyteidl2.workflow.WatchRunDetailsRequest\x1a+.flyteidl2.workflow.WatchRunDetailsResponse\"\x00\x30\x01\x12r\n\x10GetActionDetails\x12+.flyteidl2.workflow.GetActionDetailsRequest\x1a,.flyteidl2.workflow.GetActionDetailsResponse\"\x03\x90\x02\x01\x12w\n\x12WatchActionDetails\x12-.flyteidl2.workflow.WatchActionDetailsRequest\x1a..flyteidl2.workflow.WatchActionDetailsResponse\"\x00\x30\x01\x12Z\n\x08ListRuns\x12#.flyteidl2.workflow.ListRunsRequest\x1a$.flyteidl2.workflow.ListRunsResponse\"\x03\x90\x02\x01\x12\\\n\tWatchRuns\x12$.flyteidl2.workflow.WatchRunsRequest\x1a%.flyteidl2.workflow.WatchRunsResponse\"\x00\x30\x01\x12\x63\n\x0bListActions\x12&.flyteidl2.workflow.ListActionsRequest\x1a\'.flyteidl2.workflow.ListActionsResponse\"\x03\x90\x02\x01\x12\x65\n\x0cWatchActions\x12\'.flyteidl2.workflow.WatchActionsRequest\x1a(.flyteidl2.workflow.WatchActionsResponse\"\x00\x30\x01\x12W\n\x08\x41\x62ortRun\x12#.flyteidl2.workflow.AbortRunRequest\x1a$.flyteidl2.workflow.AbortRunResponse\"\x00\x12\x61\n\nStreamLogs\x12%.flyteidl2.workflow.StreamLogsRequest\x1a&.flyteidl2.workflow.StreamLogsResponse\"\x00(\x01\x30\x01\x12j\n\x08TailLogs\x12*.flyteidl2.workflow.TailTrackedLogsRequest\x1a+.flyteidl2.workflow.TailTrackedLogsResponse\"\x03\x90\x02\x01\x30\x01\x42\xd3\x01\n\x16\x63om.flyteidl2.workflowB\x16TrackedRunServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -39,6 +40,26 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _CREATETRACKEDRUNREQUEST.oneofs_by_name['task']._serialized_options = b'\272H\002\010\001'
   _TRACKEDACTIONUPDATE.fields_by_name['event']._options = None
   _TRACKEDACTIONUPDATE.fields_by_name['event']._serialized_options = b'\272H\003\310\001\001'
+  _STREAMLOGSREQUEST_REGISTER.fields_by_name['run_id']._options = None
+  _STREAMLOGSREQUEST_REGISTER.fields_by_name['run_id']._serialized_options = b'\272H\003\310\001\001'
+  _STREAMLOGSREQUEST_LOGBATCH.fields_by_name['request_id']._options = None
+  _STREAMLOGSREQUEST_LOGBATCH.fields_by_name['request_id']._serialized_options = b'\272H\004r\002\020\001'
+  _STREAMLOGSREQUEST_LOGERROR.fields_by_name['request_id']._options = None
+  _STREAMLOGSREQUEST_LOGERROR.fields_by_name['request_id']._serialized_options = b'\272H\004r\002\020\001'
+  _STREAMLOGSREQUEST_LOGERROR.fields_by_name['error']._options = None
+  _STREAMLOGSREQUEST_LOGERROR.fields_by_name['error']._serialized_options = b'\272H\003\310\001\001'
+  _STREAMLOGSREQUEST.oneofs_by_name['message']._options = None
+  _STREAMLOGSREQUEST.oneofs_by_name['message']._serialized_options = b'\272H\002\010\001'
+  _STREAMLOGSRESPONSE_SERVELOGS.fields_by_name['request_id']._options = None
+  _STREAMLOGSRESPONSE_SERVELOGS.fields_by_name['request_id']._serialized_options = b'\272H\004r\002\020\001'
+  _STREAMLOGSRESPONSE_SERVELOGS.fields_by_name['action_attempt_id']._options = None
+  _STREAMLOGSRESPONSE_SERVELOGS.fields_by_name['action_attempt_id']._serialized_options = b'\272H\003\310\001\001'
+  _STREAMLOGSRESPONSE_CANCELLOGS.fields_by_name['request_id']._options = None
+  _STREAMLOGSRESPONSE_CANCELLOGS.fields_by_name['request_id']._serialized_options = b'\272H\004r\002\020\001'
+  _STREAMLOGSRESPONSE.oneofs_by_name['message']._options = None
+  _STREAMLOGSRESPONSE.oneofs_by_name['message']._serialized_options = b'\272H\002\010\001'
+  _TAILTRACKEDLOGSREQUEST.fields_by_name['action_attempt_id']._options = None
+  _TAILTRACKEDLOGSREQUEST.fields_by_name['action_attempt_id']._serialized_options = b'\272H\003\310\001\001'
   _REPORTTRACKEDACTIONSREQUEST.fields_by_name['run_id']._options = None
   _REPORTTRACKEDACTIONSREQUEST.fields_by_name['run_id']._serialized_options = b'\272H\003\310\001\001'
   _REPORTTRACKEDACTIONSREQUEST.fields_by_name['updates']._options = None
@@ -51,16 +72,42 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _TRACKEDRUNSERVICE.methods_by_name['ListRuns']._serialized_options = b'\220\002\001'
   _TRACKEDRUNSERVICE.methods_by_name['ListActions']._options = None
   _TRACKEDRUNSERVICE.methods_by_name['ListActions']._serialized_options = b'\220\002\001'
-  _globals['_CREATETRACKEDRUNREQUEST']._serialized_start=391
-  _globals['_CREATETRACKEDRUNREQUEST']._serialized_end=1064
-  _globals['_CREATETRACKEDRUNREQUEST_LABELSENTRY']._serialized_start=954
-  _globals['_CREATETRACKEDRUNREQUEST_LABELSENTRY']._serialized_end=1011
-  _globals['_TRACKEDACTIONUPDATE']._serialized_start=1067
-  _globals['_TRACKEDACTIONUPDATE']._serialized_end=1383
-  _globals['_REPORTTRACKEDACTIONSREQUEST']._serialized_start=1386
-  _globals['_REPORTTRACKEDACTIONSREQUEST']._serialized_end=1556
-  _globals['_REPORTTRACKEDACTIONSRESPONSE']._serialized_start=1558
-  _globals['_REPORTTRACKEDACTIONSRESPONSE']._serialized_end=1636
-  _globals['_TRACKEDRUNSERVICE']._serialized_start=1639
-  _globals['_TRACKEDRUNSERVICE']._serialized_end=2810
+  _TRACKEDRUNSERVICE.methods_by_name['TailLogs']._options = None
+  _TRACKEDRUNSERVICE.methods_by_name['TailLogs']._serialized_options = b'\220\002\001'
+  _globals['_CREATETRACKEDRUNREQUEST']._serialized_start=431
+  _globals['_CREATETRACKEDRUNREQUEST']._serialized_end=1104
+  _globals['_CREATETRACKEDRUNREQUEST_LABELSENTRY']._serialized_start=994
+  _globals['_CREATETRACKEDRUNREQUEST_LABELSENTRY']._serialized_end=1051
+  _globals['_TRACKEDACTIONUPDATE']._serialized_start=1107
+  _globals['_TRACKEDACTIONUPDATE']._serialized_end=1479
+  _globals['_LOGTAIL']._serialized_start=1481
+  _globals['_LOGTAIL']._serialized_end=1577
+  _globals['_STREAMLOGSREQUEST']._serialized_start=1580
+  _globals['_STREAMLOGSREQUEST']._serialized_end=2144
+  _globals['_STREAMLOGSREQUEST_REGISTER']._serialized_start=1823
+  _globals['_STREAMLOGSREQUEST_REGISTER']._serialized_end=1897
+  _globals['_STREAMLOGSREQUEST_LOGBATCH']._serialized_start=1899
+  _globals['_STREAMLOGSREQUEST_LOGBATCH']._serialized_end=2024
+  _globals['_STREAMLOGSREQUEST_LOGERROR']._serialized_start=2026
+  _globals['_STREAMLOGSREQUEST_LOGERROR']._serialized_end=2126
+  _globals['_STREAMLOGSRESPONSE']._serialized_start=2147
+  _globals['_STREAMLOGSRESPONSE']._serialized_end=2729
+  _globals['_STREAMLOGSRESPONSE_REGISTERED']._serialized_start=2405
+  _globals['_STREAMLOGSRESPONSE_REGISTERED']._serialized_end=2417
+  _globals['_STREAMLOGSRESPONSE_SERVELOGS']._serialized_start=2420
+  _globals['_STREAMLOGSRESPONSE_SERVELOGS']._serialized_end=2657
+  _globals['_STREAMLOGSRESPONSE_CANCELLOGS']._serialized_start=2659
+  _globals['_STREAMLOGSRESPONSE_CANCELLOGS']._serialized_end=2711
+  _globals['_TAILTRACKEDLOGSREQUEST']._serialized_start=2732
+  _globals['_TAILTRACKEDLOGSREQUEST']._serialized_end=2875
+  _globals['_TAILTRACKEDLOGSRESPONSE']._serialized_start=2878
+  _globals['_TAILTRACKEDLOGSRESPONSE']._serialized_end=3139
+  _globals['_TAILTRACKEDLOGSRESPONSE_SOURCE']._serialized_start=3068
+  _globals['_TAILTRACKEDLOGSRESPONSE_SOURCE']._serialized_end=3139
+  _globals['_REPORTTRACKEDACTIONSREQUEST']._serialized_start=3142
+  _globals['_REPORTTRACKEDACTIONSREQUEST']._serialized_end=3312
+  _globals['_REPORTTRACKEDACTIONSRESPONSE']._serialized_start=3314
+  _globals['_REPORTTRACKEDACTIONSRESPONSE']._serialized_end=3392
+  _globals['_TRACKEDRUNSERVICE']._serialized_start=3395
+  _globals['_TRACKEDRUNSERVICE']._serialized_end=4773
 # @@protoc_insertion_point(module_scope)

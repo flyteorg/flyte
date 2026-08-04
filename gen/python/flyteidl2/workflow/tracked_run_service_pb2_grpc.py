@@ -80,6 +80,16 @@ class TrackedRunServiceStub(object):
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse.FromString,
                 )
+        self.StreamLogs = channel.stream_stream(
+                '/flyteidl2.workflow.TrackedRunService/StreamLogs',
+                request_serializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.StreamLogsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.StreamLogsResponse.FromString,
+                )
+        self.TailLogs = channel.unary_stream(
+                '/flyteidl2.workflow.TrackedRunService/TailLogs',
+                request_serializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.TailTrackedLogsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.TailTrackedLogsResponse.FromString,
+                )
 
 
 class TrackedRunServiceServicer(object):
@@ -179,6 +189,41 @@ class TrackedRunServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def StreamLogs(self, request_iterator, context):
+        """Offer to serve logs for a tracked run. The platform has no access to the machine the run
+        executes on, so logs can only come from the client itself, while it is still running.
+
+        The client holds this bidirectional stream open for as long as it is willing to serve logs
+        and the server drives it: rather than the client pushing everything it produces, the server
+        asks for specific logs on demand — when somebody opens the run in the console. Nothing is
+        stored server-side; batches are relayed to whoever is watching and then dropped. For logs
+        that outlive the client, see TrackedActionUpdate.log_tail.
+
+        The client speaks first with Register, naming the run it can serve. Thereafter the server
+        sends ServeLogs and CancelLogs, and the client answers with LogBatch or LogError messages
+        carrying the matching request_id. Requests may overlap; request_id is what pairs them up.
+
+        SECURITY: this is the one place where the server names a resource for the client to read,
+        which inverts the usual trust direction. A client MUST check that every requested
+        action_attempt_id belongs to the run it registered, and refuse anything else. Without that
+        check a hostile or impersonated server could use the stream to read logs the user never
+        asked it to open.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def TailLogs(self, request, context):
+        """Tail logs for one attempt of a tracked action. Served live from the run's StreamLogs
+        connection when one is registered, and otherwise from the capped tail the client persisted
+        with the attempt's terminal report. Returns FAILED_PRECONDITION when the run has neither —
+        a run whose client exited without persisting a tail has no logs to give, and the caller
+        should be told that rather than shown an empty stream.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_TrackedRunServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -236,6 +281,16 @@ def add_TrackedRunServiceServicer_to_server(servicer, server):
                     servicer.AbortRun,
                     request_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse.SerializeToString,
+            ),
+            'StreamLogs': grpc.stream_stream_rpc_method_handler(
+                    servicer.StreamLogs,
+                    request_deserializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.StreamLogsRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.StreamLogsResponse.SerializeToString,
+            ),
+            'TailLogs': grpc.unary_stream_rpc_method_handler(
+                    servicer.TailLogs,
+                    request_deserializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.TailTrackedLogsRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.TailTrackedLogsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -441,5 +496,39 @@ class TrackedRunService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TrackedRunService/AbortRun',
             flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def StreamLogs(request_iterator,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.stream_stream(request_iterator, target, '/flyteidl2.workflow.TrackedRunService/StreamLogs',
+            flyteidl2_dot_workflow_dot_tracked__run__service__pb2.StreamLogsRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_tracked__run__service__pb2.StreamLogsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def TailLogs(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.TrackedRunService/TailLogs',
+            flyteidl2_dot_workflow_dot_tracked__run__service__pb2.TailTrackedLogsRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_tracked__run__service__pb2.TailTrackedLogsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

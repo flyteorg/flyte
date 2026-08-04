@@ -2,13 +2,15 @@
 // @generated from file flyteidl2/workflow/tracked_run_service.proto (package flyteidl2.workflow, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
+import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
+import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
-import type { ProjectIdentifier, RunIdentifier } from "../common/identifier_pb.ts";
+import type { ActionAttemptIdentifier, ProjectIdentifier, RunIdentifier } from "../common/identifier_pb.ts";
 import { file_flyteidl2_common_identifier } from "../common/identifier_pb.ts";
 import type { OffloadedInputData } from "../common/run_pb.ts";
 import { file_flyteidl2_common_run } from "../common/run_pb.ts";
+import type { LogLine } from "../logs/dataplane/payload_pb.ts";
+import { file_flyteidl2_logs_dataplane_payload } from "../logs/dataplane/payload_pb.ts";
 import { file_flyteidl2_task_common } from "../task/common_pb.ts";
 import type { RunSpec } from "../task/run_pb.ts";
 import { file_flyteidl2_task_run } from "../task/run_pb.ts";
@@ -28,7 +30,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/workflow/tracked_run_service.proto.
  */
 export const file_flyteidl2_workflow_tracked_run_service: GenFile = /*@__PURE__*/
-  fileDesc("CixmbHl0ZWlkbDIvd29ya2Zsb3cvdHJhY2tlZF9ydW5fc2VydmljZS5wcm90bxISZmx5dGVpZGwyLndvcmtmbG93Ir4EChdDcmVhdGVUcmFja2VkUnVuUmVxdWVzdBIxCgZydW5faWQYASABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJIABI5Cgpwcm9qZWN0X2lkGAIgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckgAEjEKB3Rhc2tfaWQYAyABKAsyHi5mbHl0ZWlkbDIudGFzay5UYXNrSWRlbnRpZmllckgBEi0KCXRhc2tfc3BlYxgEIAEoCzIYLmZseXRlaWRsMi50YXNrLlRhc2tTcGVjSAESRwoUb2ZmbG9hZGVkX2lucHV0X2RhdGEYBSABKAsyJC5mbHl0ZWlkbDIuY29tbW9uLk9mZmxvYWRlZElucHV0RGF0YUgCiAEBEikKCHJ1bl9zcGVjGAYgASgLMhcuZmx5dGVpZGwyLnRhc2suUnVuU3BlYxJHCgZsYWJlbHMYByADKAsyNy5mbHl0ZWlkbDIud29ya2Zsb3cuQ3JlYXRlVHJhY2tlZFJ1blJlcXVlc3QuTGFiZWxzRW50cnkSMgoOcnVuX3N0YXJ0X3RpbWUYCCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wGi0KC0xhYmVsc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAFCCwoCaWQSBbpIAggBQg0KBHRhc2sSBbpIAggBQhcKFV9vZmZsb2FkZWRfaW5wdXRfZGF0YSKNAgoTVHJhY2tlZEFjdGlvblVwZGF0ZRI2CgVldmVudBgBIAEoCzIfLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25FdmVudEIGukgDyAEBEhMKC3BhcmVudF9uYW1lGAIgASgJEg0KBWdyb3VwGAMgASgJEi4KBHRhc2sYBCABKAsyHi5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza0FjdGlvbkgAEjAKBXRyYWNlGAUgASgLMh8uZmx5dGVpZGwyLndvcmtmbG93LlRyYWNlQWN0aW9uSAASMAoGc3RhdHVzGAYgASgLMiAuZmx5dGVpZGwyLndvcmtmbG93LkFjdGlvblN0YXR1c0IGCgRzcGVjIpoBChtSZXBvcnRUcmFja2VkQWN0aW9uc1JlcXVlc3QSNwoGcnVuX2lkGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQga6SAPIAQESQgoHdXBkYXRlcxgCIAMoCzInLmZseXRlaWRsMi53b3JrZmxvdy5UcmFja2VkQWN0aW9uVXBkYXRlQgi6SAWSAQIIASJEChxSZXBvcnRUcmFja2VkQWN0aW9uc1Jlc3BvbnNlEiQKCHN0YXR1c2VzGAEgAygLMhIuZ29vZ2xlLnJwYy5TdGF0dXMykwkKEVRyYWNrZWRSdW5TZXJ2aWNlEmEKCUNyZWF0ZVJ1bhIrLmZseXRlaWRsMi53b3JrZmxvdy5DcmVhdGVUcmFja2VkUnVuUmVxdWVzdBolLmZseXRlaWRsMi53b3JrZmxvdy5DcmVhdGVSdW5SZXNwb25zZSIAEnQKDVJlcG9ydEFjdGlvbnMSLy5mbHl0ZWlkbDIud29ya2Zsb3cuUmVwb3J0VHJhY2tlZEFjdGlvbnNSZXF1ZXN0GjAuZmx5dGVpZGwyLndvcmtmbG93LlJlcG9ydFRyYWNrZWRBY3Rpb25zUmVzcG9uc2UiABJpCg1HZXRSdW5EZXRhaWxzEiguZmx5dGVpZGwyLndvcmtmbG93LkdldFJ1bkRldGFpbHNSZXF1ZXN0GikuZmx5dGVpZGwyLndvcmtmbG93LkdldFJ1bkRldGFpbHNSZXNwb25zZSIDkAIBEm4KD1dhdGNoUnVuRGV0YWlscxIqLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaFJ1bkRldGFpbHNSZXF1ZXN0GisuZmx5dGVpZGwyLndvcmtmbG93LldhdGNoUnVuRGV0YWlsc1Jlc3BvbnNlIgAwARJyChBHZXRBY3Rpb25EZXRhaWxzEisuZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkRldGFpbHNSZXF1ZXN0GiwuZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkRldGFpbHNSZXNwb25zZSIDkAIBEncKEldhdGNoQWN0aW9uRGV0YWlscxItLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaEFjdGlvbkRldGFpbHNSZXF1ZXN0Gi4uZmx5dGVpZGwyLndvcmtmbG93LldhdGNoQWN0aW9uRGV0YWlsc1Jlc3BvbnNlIgAwARJaCghMaXN0UnVucxIjLmZseXRlaWRsMi53b3JrZmxvdy5MaXN0UnVuc1JlcXVlc3QaJC5mbHl0ZWlkbDIud29ya2Zsb3cuTGlzdFJ1bnNSZXNwb25zZSIDkAIBElwKCVdhdGNoUnVucxIkLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaFJ1bnNSZXF1ZXN0GiUuZmx5dGVpZGwyLndvcmtmbG93LldhdGNoUnVuc1Jlc3BvbnNlIgAwARJjCgtMaXN0QWN0aW9ucxImLmZseXRlaWRsMi53b3JrZmxvdy5MaXN0QWN0aW9uc1JlcXVlc3QaJy5mbHl0ZWlkbDIud29ya2Zsb3cuTGlzdEFjdGlvbnNSZXNwb25zZSIDkAIBEmUKDFdhdGNoQWN0aW9ucxInLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaEFjdGlvbnNSZXF1ZXN0GiguZmx5dGVpZGwyLndvcmtmbG93LldhdGNoQWN0aW9uc1Jlc3BvbnNlIgAwARJXCghBYm9ydFJ1bhIjLmZseXRlaWRsMi53b3JrZmxvdy5BYm9ydFJ1blJlcXVlc3QaJC5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRSdW5SZXNwb25zZSIAQtMBChZjb20uZmx5dGVpZGwyLndvcmtmbG93QhZUcmFja2VkUnVuU2VydmljZVByb3RvSAJQAVo2Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3dvcmtmbG93ogIDRldYqgISRmx5dGVpZGwyLldvcmtmbG93ygISRmx5dGVpZGwyXFdvcmtmbG934gIeRmx5dGVpZGwyXFdvcmtmbG93XEdQQk1ldGFkYXRh6gITRmx5dGVpZGwyOjpXb3JrZmxvd2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_run, file_flyteidl2_task_common, file_flyteidl2_task_run, file_flyteidl2_task_task_definition, file_flyteidl2_workflow_run_definition, file_flyteidl2_workflow_run_service, file_google_protobuf_timestamp, file_google_rpc_status]);
+  fileDesc("CixmbHl0ZWlkbDIvd29ya2Zsb3cvdHJhY2tlZF9ydW5fc2VydmljZS5wcm90bxISZmx5dGVpZGwyLndvcmtmbG93Ir4EChdDcmVhdGVUcmFja2VkUnVuUmVxdWVzdBIxCgZydW5faWQYASABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJIABI5Cgpwcm9qZWN0X2lkGAIgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckgAEjEKB3Rhc2tfaWQYAyABKAsyHi5mbHl0ZWlkbDIudGFzay5UYXNrSWRlbnRpZmllckgBEi0KCXRhc2tfc3BlYxgEIAEoCzIYLmZseXRlaWRsMi50YXNrLlRhc2tTcGVjSAESRwoUb2ZmbG9hZGVkX2lucHV0X2RhdGEYBSABKAsyJC5mbHl0ZWlkbDIuY29tbW9uLk9mZmxvYWRlZElucHV0RGF0YUgCiAEBEikKCHJ1bl9zcGVjGAYgASgLMhcuZmx5dGVpZGwyLnRhc2suUnVuU3BlYxJHCgZsYWJlbHMYByADKAsyNy5mbHl0ZWlkbDIud29ya2Zsb3cuQ3JlYXRlVHJhY2tlZFJ1blJlcXVlc3QuTGFiZWxzRW50cnkSMgoOcnVuX3N0YXJ0X3RpbWUYCCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wGi0KC0xhYmVsc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAFCCwoCaWQSBbpIAggBQg0KBHRhc2sSBbpIAggBQhcKFV9vZmZsb2FkZWRfaW5wdXRfZGF0YSK8AgoTVHJhY2tlZEFjdGlvblVwZGF0ZRI2CgVldmVudBgBIAEoCzIfLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25FdmVudEIGukgDyAEBEhMKC3BhcmVudF9uYW1lGAIgASgJEg0KBWdyb3VwGAMgASgJEi4KBHRhc2sYBCABKAsyHi5mbHl0ZWlkbDIud29ya2Zsb3cuVGFza0FjdGlvbkgAEjAKBXRyYWNlGAUgASgLMh8uZmx5dGVpZGwyLndvcmtmbG93LlRyYWNlQWN0aW9uSAASMAoGc3RhdHVzGAYgASgLMiAuZmx5dGVpZGwyLndvcmtmbG93LkFjdGlvblN0YXR1cxItCghsb2dfdGFpbBgHIAEoCzIbLmZseXRlaWRsMi53b3JrZmxvdy5Mb2dUYWlsQgYKBHNwZWMiTgoHTG9nVGFpbBIwCgVsaW5lcxgBIAMoCzIhLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Mb2dMaW5lEhEKCXRydW5jYXRlZBgCIAEoCCLsAwoRU3RyZWFtTG9nc1JlcXVlc3QSQgoIcmVnaXN0ZXIYASABKAsyLi5mbHl0ZWlkbDIud29ya2Zsb3cuU3RyZWFtTG9nc1JlcXVlc3QuUmVnaXN0ZXJIABI/CgViYXRjaBgCIAEoCzIuLmZseXRlaWRsMi53b3JrZmxvdy5TdHJlYW1Mb2dzUmVxdWVzdC5Mb2dCYXRjaEgAEj8KBWVycm9yGAMgASgLMi4uZmx5dGVpZGwyLndvcmtmbG93LlN0cmVhbUxvZ3NSZXF1ZXN0LkxvZ0Vycm9ySAAaQwoIUmVnaXN0ZXISNwoGcnVuX2lkGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQga6SAPIAQEaZgoITG9nQmF0Y2gSGwoKcmVxdWVzdF9pZBgBIAEoCUIHukgEcgIQARIwCgVsaW5lcxgCIAMoCzIhLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Mb2dMaW5lEgsKA2VvZhgDIAEoCBpSCghMb2dFcnJvchIbCgpyZXF1ZXN0X2lkGAEgASgJQge6SARyAhABEikKBWVycm9yGAIgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXNCBrpIA8gBAUIQCgdtZXNzYWdlEgW6SAIIASLtAwoSU3RyZWFtTG9nc1Jlc3BvbnNlEkcKCnJlZ2lzdGVyZWQYASABKAsyMS5mbHl0ZWlkbDIud29ya2Zsb3cuU3RyZWFtTG9nc1Jlc3BvbnNlLlJlZ2lzdGVyZWRIABJBCgVzZXJ2ZRgCIAEoCzIwLmZseXRlaWRsMi53b3JrZmxvdy5TdHJlYW1Mb2dzUmVzcG9uc2UuU2VydmVMb2dzSAASQwoGY2FuY2VsGAMgASgLMjEuZmx5dGVpZGwyLndvcmtmbG93LlN0cmVhbUxvZ3NSZXNwb25zZS5DYW5jZWxMb2dzSAAaDAoKUmVnaXN0ZXJlZBq6AQoJU2VydmVMb2dzEhsKCnJlcXVlc3RfaWQYASABKAlCB7pIBHICEAESTAoRYWN0aW9uX2F0dGVtcHRfaWQYAiABKAsyKS5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbkF0dGVtcHRJZGVudGlmaWVyQga6SAPIAQESMgoOZnJvbV90aW1lc3RhbXAYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEg4KBmZvbGxvdxgEIAEoCBopCgpDYW5jZWxMb2dzEhsKCnJlcXVlc3RfaWQYASABKAlCB7pIBHICEAFCEAoHbWVzc2FnZRIFukgCCAEidgoWVGFpbFRyYWNrZWRMb2dzUmVxdWVzdBJMChFhY3Rpb25fYXR0ZW1wdF9pZBgBIAEoCzIpLmZseXRlaWRsMi5jb21tb24uQWN0aW9uQXR0ZW1wdElkZW50aWZpZXJCBrpIA8gBARIOCgZmb2xsb3cYAiABKAgi6wEKF1RhaWxUcmFja2VkTG9nc1Jlc3BvbnNlEjAKBWxpbmVzGAEgAygLMiEuZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lLkxvZ0xpbmUSQgoGc291cmNlGAIgASgOMjIuZmx5dGVpZGwyLndvcmtmbG93LlRhaWxUcmFja2VkTG9nc1Jlc3BvbnNlLlNvdXJjZRIRCgl0cnVuY2F0ZWQYAyABKAgiRwoGU291cmNlEhYKElNPVVJDRV9VTlNQRUNJRklFRBAAEg8KC1NPVVJDRV9MSVZFEAESFAoQU09VUkNFX1BFUlNJU1RFRBACIpoBChtSZXBvcnRUcmFja2VkQWN0aW9uc1JlcXVlc3QSNwoGcnVuX2lkGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQga6SAPIAQESQgoHdXBkYXRlcxgCIAMoCzInLmZseXRlaWRsMi53b3JrZmxvdy5UcmFja2VkQWN0aW9uVXBkYXRlQgi6SAWSAQIIASJEChxSZXBvcnRUcmFja2VkQWN0aW9uc1Jlc3BvbnNlEiQKCHN0YXR1c2VzGAEgAygLMhIuZ29vZ2xlLnJwYy5TdGF0dXMy4goKEVRyYWNrZWRSdW5TZXJ2aWNlEmEKCUNyZWF0ZVJ1bhIrLmZseXRlaWRsMi53b3JrZmxvdy5DcmVhdGVUcmFja2VkUnVuUmVxdWVzdBolLmZseXRlaWRsMi53b3JrZmxvdy5DcmVhdGVSdW5SZXNwb25zZSIAEnQKDVJlcG9ydEFjdGlvbnMSLy5mbHl0ZWlkbDIud29ya2Zsb3cuUmVwb3J0VHJhY2tlZEFjdGlvbnNSZXF1ZXN0GjAuZmx5dGVpZGwyLndvcmtmbG93LlJlcG9ydFRyYWNrZWRBY3Rpb25zUmVzcG9uc2UiABJpCg1HZXRSdW5EZXRhaWxzEiguZmx5dGVpZGwyLndvcmtmbG93LkdldFJ1bkRldGFpbHNSZXF1ZXN0GikuZmx5dGVpZGwyLndvcmtmbG93LkdldFJ1bkRldGFpbHNSZXNwb25zZSIDkAIBEm4KD1dhdGNoUnVuRGV0YWlscxIqLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaFJ1bkRldGFpbHNSZXF1ZXN0GisuZmx5dGVpZGwyLndvcmtmbG93LldhdGNoUnVuRGV0YWlsc1Jlc3BvbnNlIgAwARJyChBHZXRBY3Rpb25EZXRhaWxzEisuZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkRldGFpbHNSZXF1ZXN0GiwuZmx5dGVpZGwyLndvcmtmbG93LkdldEFjdGlvbkRldGFpbHNSZXNwb25zZSIDkAIBEncKEldhdGNoQWN0aW9uRGV0YWlscxItLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaEFjdGlvbkRldGFpbHNSZXF1ZXN0Gi4uZmx5dGVpZGwyLndvcmtmbG93LldhdGNoQWN0aW9uRGV0YWlsc1Jlc3BvbnNlIgAwARJaCghMaXN0UnVucxIjLmZseXRlaWRsMi53b3JrZmxvdy5MaXN0UnVuc1JlcXVlc3QaJC5mbHl0ZWlkbDIud29ya2Zsb3cuTGlzdFJ1bnNSZXNwb25zZSIDkAIBElwKCVdhdGNoUnVucxIkLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaFJ1bnNSZXF1ZXN0GiUuZmx5dGVpZGwyLndvcmtmbG93LldhdGNoUnVuc1Jlc3BvbnNlIgAwARJjCgtMaXN0QWN0aW9ucxImLmZseXRlaWRsMi53b3JrZmxvdy5MaXN0QWN0aW9uc1JlcXVlc3QaJy5mbHl0ZWlkbDIud29ya2Zsb3cuTGlzdEFjdGlvbnNSZXNwb25zZSIDkAIBEmUKDFdhdGNoQWN0aW9ucxInLmZseXRlaWRsMi53b3JrZmxvdy5XYXRjaEFjdGlvbnNSZXF1ZXN0GiguZmx5dGVpZGwyLndvcmtmbG93LldhdGNoQWN0aW9uc1Jlc3BvbnNlIgAwARJXCghBYm9ydFJ1bhIjLmZseXRlaWRsMi53b3JrZmxvdy5BYm9ydFJ1blJlcXVlc3QaJC5mbHl0ZWlkbDIud29ya2Zsb3cuQWJvcnRSdW5SZXNwb25zZSIAEmEKClN0cmVhbUxvZ3MSJS5mbHl0ZWlkbDIud29ya2Zsb3cuU3RyZWFtTG9nc1JlcXVlc3QaJi5mbHl0ZWlkbDIud29ya2Zsb3cuU3RyZWFtTG9nc1Jlc3BvbnNlIgAoATABEmoKCFRhaWxMb2dzEiouZmx5dGVpZGwyLndvcmtmbG93LlRhaWxUcmFja2VkTG9nc1JlcXVlc3QaKy5mbHl0ZWlkbDIud29ya2Zsb3cuVGFpbFRyYWNrZWRMb2dzUmVzcG9uc2UiA5ACATABQtMBChZjb20uZmx5dGVpZGwyLndvcmtmbG93QhZUcmFja2VkUnVuU2VydmljZVByb3RvSAJQAVo2Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3dvcmtmbG93ogIDRldYqgISRmx5dGVpZGwyLldvcmtmbG93ygISRmx5dGVpZGwyXFdvcmtmbG934gIeRmx5dGVpZGwyXFdvcmtmbG93XEdQQk1ldGFkYXRh6gITRmx5dGVpZGwyOjpXb3JrZmxvd2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_run, file_flyteidl2_logs_dataplane_payload, file_flyteidl2_task_common, file_flyteidl2_task_run, file_flyteidl2_task_task_definition, file_flyteidl2_workflow_run_definition, file_flyteidl2_workflow_run_service, file_google_protobuf_timestamp, file_google_rpc_status]);
 
 /**
  * Request message for creating a tracked run.
@@ -172,6 +174,15 @@ export type TrackedActionUpdate = Message<"flyteidl2.workflow.TrackedActionUpdat
    * @generated from field: flyteidl2.workflow.ActionStatus status = 6;
    */
   status?: ActionStatus;
+
+  /**
+   * Tail of this attempt's log output, so that logs survive the client exiting. Only honored on
+   * a terminal event; ignored otherwise. The server caps how much it will store and rejects
+   * reports that exceed the cap, so clients should keep only the most recent lines.
+   *
+   * @generated from field: flyteidl2.workflow.LogTail log_tail = 7;
+   */
+  logTail?: LogTail;
 };
 
 /**
@@ -180,6 +191,374 @@ export type TrackedActionUpdate = Message<"flyteidl2.workflow.TrackedActionUpdat
  */
 export const TrackedActionUpdateSchema: GenMessage<TrackedActionUpdate> = /*@__PURE__*/
   messageDesc(file_flyteidl2_workflow_tracked_run_service, 1);
+
+/**
+ * A bounded window of an action attempt's log output, retained after the run's client is gone.
+ *
+ * @generated from message flyteidl2.workflow.LogTail
+ */
+export type LogTail = Message<"flyteidl2.workflow.LogTail"> & {
+  /**
+   * Log lines, oldest first.
+   *
+   * @generated from field: repeated flyteidl2.logs.dataplane.LogLine lines = 1;
+   */
+  lines: LogLine[];
+
+  /**
+   * True when earlier lines were dropped to fit the cap, so readers can say so rather than
+   * presenting a partial log as if it were the whole thing.
+   *
+   * @generated from field: bool truncated = 2;
+   */
+  truncated: boolean;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.LogTail.
+ * Use `create(LogTailSchema)` to create a new message.
+ */
+export const LogTailSchema: GenMessage<LogTail> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_tracked_run_service, 2);
+
+/**
+ * Client -> server message on the StreamLogs stream.
+ *
+ * @generated from message flyteidl2.workflow.StreamLogsRequest
+ */
+export type StreamLogsRequest = Message<"flyteidl2.workflow.StreamLogsRequest"> & {
+  /**
+   * @generated from oneof flyteidl2.workflow.StreamLogsRequest.message
+   */
+  message: {
+    /**
+     * @generated from field: flyteidl2.workflow.StreamLogsRequest.Register register = 1;
+     */
+    value: StreamLogsRequest_Register;
+    case: "register";
+  } | {
+    /**
+     * @generated from field: flyteidl2.workflow.StreamLogsRequest.LogBatch batch = 2;
+     */
+    value: StreamLogsRequest_LogBatch;
+    case: "batch";
+  } | {
+    /**
+     * @generated from field: flyteidl2.workflow.StreamLogsRequest.LogError error = 3;
+     */
+    value: StreamLogsRequest_LogError;
+    case: "error";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message flyteidl2.workflow.StreamLogsRequest.
+ * Use `create(StreamLogsRequestSchema)` to create a new message.
+ */
+export const StreamLogsRequestSchema: GenMessage<StreamLogsRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_tracked_run_service, 3);
+
+/**
+ * Registers this connection as the log source for a run. Must be the first message on the
+ * stream, and may be sent only once. The caller must be authorized for the run.
+ *
+ * At most one connection serves a run at a time: registering again replaces the previous
+ * connection, which the server then closes. This is deliberate — a re-run or a reconnect
+ * after a network drop should take over rather than be refused.
+ *
+ * @generated from message flyteidl2.workflow.StreamLogsRequest.Register
+ */
+export type StreamLogsRequest_Register = Message<"flyteidl2.workflow.StreamLogsRequest.Register"> & {
+  /**
+   * The tracked run whose logs this client can serve.
+   *
+   * @generated from field: flyteidl2.common.RunIdentifier run_id = 1;
+   */
+  runId?: RunIdentifier;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.StreamLogsRequest.Register.
+ * Use `create(StreamLogsRequest_RegisterSchema)` to create a new message.
+ */
+export const StreamLogsRequest_RegisterSchema: GenMessage<StreamLogsRequest_Register> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_tracked_run_service, 3, 0);
+
+/**
+ * Log lines answering a ServeLogs request. A request may be answered by many batches.
+ *
+ * @generated from message flyteidl2.workflow.StreamLogsRequest.LogBatch
+ */
+export type StreamLogsRequest_LogBatch = Message<"flyteidl2.workflow.StreamLogsRequest.LogBatch"> & {
+  /**
+   * The request_id from the ServeLogs this answers. Batches for an unknown or already
+   * cancelled request_id are ignored.
+   *
+   * @generated from field: string request_id = 1;
+   */
+  requestId: string;
+
+  /**
+   * Log lines, oldest first.
+   *
+   * @generated from field: repeated flyteidl2.logs.dataplane.LogLine lines = 2;
+   */
+  lines: LogLine[];
+
+  /**
+   * Set on the final batch for this request_id: nothing further will be sent for it. For a
+   * follow request this means the attempt ended; otherwise it means the backlog is exhausted.
+   *
+   * @generated from field: bool eof = 3;
+   */
+  eof: boolean;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.StreamLogsRequest.LogBatch.
+ * Use `create(StreamLogsRequest_LogBatchSchema)` to create a new message.
+ */
+export const StreamLogsRequest_LogBatchSchema: GenMessage<StreamLogsRequest_LogBatch> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_tracked_run_service, 3, 1);
+
+/**
+ * The client cannot answer a request — the attempt is unknown to it, its log buffer has been
+ * discarded, or the request failed the ownership check. The server fails the corresponding
+ * watchers; the stream itself stays up and other requests are unaffected.
+ *
+ * @generated from message flyteidl2.workflow.StreamLogsRequest.LogError
+ */
+export type StreamLogsRequest_LogError = Message<"flyteidl2.workflow.StreamLogsRequest.LogError"> & {
+  /**
+   * @generated from field: string request_id = 1;
+   */
+  requestId: string;
+
+  /**
+   * @generated from field: google.rpc.Status error = 2;
+   */
+  error?: Status;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.StreamLogsRequest.LogError.
+ * Use `create(StreamLogsRequest_LogErrorSchema)` to create a new message.
+ */
+export const StreamLogsRequest_LogErrorSchema: GenMessage<StreamLogsRequest_LogError> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_tracked_run_service, 3, 2);
+
+/**
+ * Server -> client message on the StreamLogs stream.
+ *
+ * @generated from message flyteidl2.workflow.StreamLogsResponse
+ */
+export type StreamLogsResponse = Message<"flyteidl2.workflow.StreamLogsResponse"> & {
+  /**
+   * @generated from oneof flyteidl2.workflow.StreamLogsResponse.message
+   */
+  message: {
+    /**
+     * @generated from field: flyteidl2.workflow.StreamLogsResponse.Registered registered = 1;
+     */
+    value: StreamLogsResponse_Registered;
+    case: "registered";
+  } | {
+    /**
+     * @generated from field: flyteidl2.workflow.StreamLogsResponse.ServeLogs serve = 2;
+     */
+    value: StreamLogsResponse_ServeLogs;
+    case: "serve";
+  } | {
+    /**
+     * @generated from field: flyteidl2.workflow.StreamLogsResponse.CancelLogs cancel = 3;
+     */
+    value: StreamLogsResponse_CancelLogs;
+    case: "cancel";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message flyteidl2.workflow.StreamLogsResponse.
+ * Use `create(StreamLogsResponseSchema)` to create a new message.
+ */
+export const StreamLogsResponseSchema: GenMessage<StreamLogsResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_tracked_run_service, 4);
+
+/**
+ * Acknowledges Register. Sent once, before any ServeLogs. A client that never sees this
+ * should not assume its logs are reachable.
+ *
+ * @generated from message flyteidl2.workflow.StreamLogsResponse.Registered
+ */
+export type StreamLogsResponse_Registered = Message<"flyteidl2.workflow.StreamLogsResponse.Registered"> & {
+};
+
+/**
+ * Describes the message flyteidl2.workflow.StreamLogsResponse.Registered.
+ * Use `create(StreamLogsResponse_RegisteredSchema)` to create a new message.
+ */
+export const StreamLogsResponse_RegisteredSchema: GenMessage<StreamLogsResponse_Registered> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_tracked_run_service, 4, 0);
+
+/**
+ * Asks the client to send logs for one action attempt.
+ *
+ * @generated from message flyteidl2.workflow.StreamLogsResponse.ServeLogs
+ */
+export type StreamLogsResponse_ServeLogs = Message<"flyteidl2.workflow.StreamLogsResponse.ServeLogs"> & {
+  /**
+   * Correlates the client's LogBatch and LogError messages with this request. Unique within
+   * the stream.
+   *
+   * @generated from field: string request_id = 1;
+   */
+  requestId: string;
+
+  /**
+   * The attempt to read. MUST belong to the registered run; see the SECURITY note on
+   * StreamLogs — verifying this is the client's responsibility, not the server's promise.
+   *
+   * @generated from field: flyteidl2.common.ActionAttemptIdentifier action_attempt_id = 2;
+   */
+  actionAttemptId?: ActionAttemptIdentifier;
+
+  /**
+   * Send only lines at or after this time. Unset means everything the client still holds.
+   *
+   * @generated from field: google.protobuf.Timestamp from_timestamp = 3;
+   */
+  fromTimestamp?: Timestamp;
+
+  /**
+   * When true, keep sending lines as they are produced, until the attempt ends or the server
+   * cancels. When false, send what is buffered and close the request with eof.
+   *
+   * @generated from field: bool follow = 4;
+   */
+  follow: boolean;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.StreamLogsResponse.ServeLogs.
+ * Use `create(StreamLogsResponse_ServeLogsSchema)` to create a new message.
+ */
+export const StreamLogsResponse_ServeLogsSchema: GenMessage<StreamLogsResponse_ServeLogs> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_tracked_run_service, 4, 1);
+
+/**
+ * Withdraws an earlier ServeLogs because the last watcher went away. The client stops sending
+ * batches for this request_id. Cancelling an unknown request_id is not an error.
+ *
+ * @generated from message flyteidl2.workflow.StreamLogsResponse.CancelLogs
+ */
+export type StreamLogsResponse_CancelLogs = Message<"flyteidl2.workflow.StreamLogsResponse.CancelLogs"> & {
+  /**
+   * @generated from field: string request_id = 1;
+   */
+  requestId: string;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.StreamLogsResponse.CancelLogs.
+ * Use `create(StreamLogsResponse_CancelLogsSchema)` to create a new message.
+ */
+export const StreamLogsResponse_CancelLogsSchema: GenMessage<StreamLogsResponse_CancelLogs> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_tracked_run_service, 4, 2);
+
+/**
+ * Request message for tailing a tracked action attempt's logs.
+ *
+ * @generated from message flyteidl2.workflow.TailTrackedLogsRequest
+ */
+export type TailTrackedLogsRequest = Message<"flyteidl2.workflow.TailTrackedLogsRequest"> & {
+  /**
+   * The action attempt to tail.
+   *
+   * @generated from field: flyteidl2.common.ActionAttemptIdentifier action_attempt_id = 1;
+   */
+  actionAttemptId?: ActionAttemptIdentifier;
+
+  /**
+   * Keep the stream open and forward lines as they are produced. Only meaningful while the
+   * run's client is connected; a persisted tail is always sent in full and then completed.
+   *
+   * @generated from field: bool follow = 2;
+   */
+  follow: boolean;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.TailTrackedLogsRequest.
+ * Use `create(TailTrackedLogsRequestSchema)` to create a new message.
+ */
+export const TailTrackedLogsRequestSchema: GenMessage<TailTrackedLogsRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_tracked_run_service, 5);
+
+/**
+ * Response message for tailing a tracked action attempt's logs.
+ *
+ * @generated from message flyteidl2.workflow.TailTrackedLogsResponse
+ */
+export type TailTrackedLogsResponse = Message<"flyteidl2.workflow.TailTrackedLogsResponse"> & {
+  /**
+   * Log lines, oldest first.
+   *
+   * @generated from field: repeated flyteidl2.logs.dataplane.LogLine lines = 1;
+   */
+  lines: LogLine[];
+
+  /**
+   * @generated from field: flyteidl2.workflow.TailTrackedLogsResponse.Source source = 2;
+   */
+  source: TailTrackedLogsResponse_Source;
+
+  /**
+   * True when earlier lines are missing from what is being sent.
+   *
+   * @generated from field: bool truncated = 3;
+   */
+  truncated: boolean;
+};
+
+/**
+ * Describes the message flyteidl2.workflow.TailTrackedLogsResponse.
+ * Use `create(TailTrackedLogsResponseSchema)` to create a new message.
+ */
+export const TailTrackedLogsResponseSchema: GenMessage<TailTrackedLogsResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_workflow_tracked_run_service, 6);
+
+/**
+ * Where the lines came from. Readers should surface this: a persisted tail is a bounded
+ * window, not the whole log, and it never grows.
+ *
+ * @generated from enum flyteidl2.workflow.TailTrackedLogsResponse.Source
+ */
+export enum TailTrackedLogsResponse_Source {
+  /**
+   * @generated from enum value: SOURCE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * Relayed from the run's client over its StreamLogs connection.
+   *
+   * @generated from enum value: SOURCE_LIVE = 1;
+   */
+  LIVE = 1,
+
+  /**
+   * Read back from the tail persisted with the attempt's terminal report.
+   *
+   * @generated from enum value: SOURCE_PERSISTED = 2;
+   */
+  PERSISTED = 2,
+}
+
+/**
+ * Describes the enum flyteidl2.workflow.TailTrackedLogsResponse.Source.
+ */
+export const TailTrackedLogsResponse_SourceSchema: GenEnum<TailTrackedLogsResponse_Source> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_workflow_tracked_run_service, 6, 0);
 
 /**
  * Request message for reporting tracked action state.
@@ -207,7 +586,7 @@ export type ReportTrackedActionsRequest = Message<"flyteidl2.workflow.ReportTrac
  * Use `create(ReportTrackedActionsRequestSchema)` to create a new message.
  */
 export const ReportTrackedActionsRequestSchema: GenMessage<ReportTrackedActionsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_tracked_run_service, 2);
+  messageDesc(file_flyteidl2_workflow_tracked_run_service, 7);
 
 /**
  * Response message for reporting tracked action state.
@@ -229,7 +608,7 @@ export type ReportTrackedActionsResponse = Message<"flyteidl2.workflow.ReportTra
  * Use `create(ReportTrackedActionsResponseSchema)` to create a new message.
  */
 export const ReportTrackedActionsResponseSchema: GenMessage<ReportTrackedActionsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_workflow_tracked_run_service, 3);
+  messageDesc(file_flyteidl2_workflow_tracked_run_service, 8);
 
 /**
  * TrackedRunService records runs that are orchestrated OUTSIDE the platform: the client executes
@@ -362,6 +741,47 @@ export const TrackedRunService: GenService<{
     methodKind: "unary";
     input: typeof AbortRunRequestSchema;
     output: typeof AbortRunResponseSchema;
+  },
+  /**
+   * Offer to serve logs for a tracked run. The platform has no access to the machine the run
+   * executes on, so logs can only come from the client itself, while it is still running.
+   *
+   * The client holds this bidirectional stream open for as long as it is willing to serve logs
+   * and the server drives it: rather than the client pushing everything it produces, the server
+   * asks for specific logs on demand — when somebody opens the run in the console. Nothing is
+   * stored server-side; batches are relayed to whoever is watching and then dropped. For logs
+   * that outlive the client, see TrackedActionUpdate.log_tail.
+   *
+   * The client speaks first with Register, naming the run it can serve. Thereafter the server
+   * sends ServeLogs and CancelLogs, and the client answers with LogBatch or LogError messages
+   * carrying the matching request_id. Requests may overlap; request_id is what pairs them up.
+   *
+   * SECURITY: this is the one place where the server names a resource for the client to read,
+   * which inverts the usual trust direction. A client MUST check that every requested
+   * action_attempt_id belongs to the run it registered, and refuse anything else. Without that
+   * check a hostile or impersonated server could use the stream to read logs the user never
+   * asked it to open.
+   *
+   * @generated from rpc flyteidl2.workflow.TrackedRunService.StreamLogs
+   */
+  streamLogs: {
+    methodKind: "bidi_streaming";
+    input: typeof StreamLogsRequestSchema;
+    output: typeof StreamLogsResponseSchema;
+  },
+  /**
+   * Tail logs for one attempt of a tracked action. Served live from the run's StreamLogs
+   * connection when one is registered, and otherwise from the capped tail the client persisted
+   * with the attempt's terminal report. Returns FAILED_PRECONDITION when the run has neither —
+   * a run whose client exited without persisting a tail has no logs to give, and the caller
+   * should be told that rather than shown an empty stream.
+   *
+   * @generated from rpc flyteidl2.workflow.TrackedRunService.TailLogs
+   */
+  tailLogs: {
+    methodKind: "server_streaming";
+    input: typeof TailTrackedLogsRequestSchema;
+    output: typeof TailTrackedLogsResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_flyteidl2_workflow_tracked_run_service, 0);
