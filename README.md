@@ -1,7 +1,9 @@
 > [!IMPORTANT]
-> ## Flyte 2 Devbox is now available!
+> ## Flyte 2 is now generally available!
 >
-> Check out the guide [here](https://www.union.ai/docs/v2/flyte/user-guide/run-modes/running-devbox/) to get started.
+> Check out the deployment guide [here](https://www.union.ai/docs/v2/flyte/oss-deployment/) to get started.
+>
+> Want to try Flyte 2 locally? Run the [Devbox](https://www.union.ai/docs/v2/flyte/user-guide/get-started/run-modes/running-devbox/)
 >
 > Looking for Flyte 1? Go to the [master](https://github.com/flyteorg/flyte/tree/master) branch, where Flyte 1 is now maintained.
 
