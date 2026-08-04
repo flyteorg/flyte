@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"net/http"
@@ -56,6 +57,30 @@ func identityFromHeaders(h http.Header, cfg config.IdentityHeadersConfig) *commo
 		return identityFromJWT(token)
 	}
 	return nil
+}
+
+// resolveIdentity returns the caller's identity from the forwarded auth headers,
+// enriched via the OIDC userinfo endpoint only when the Bearer token itself was the
+// identity source. When a proxy header (claims JWT or subject) established the
+// identity, enrichment is skipped: the forwarded access token may be expired or
+// belong to a different principal, and userinfo's subject would override the
+// proxy-verified one. Returns nil when no authenticated identity is present.
+func resolveIdentity(ctx context.Context, h http.Header, cfg config.IdentityHeadersConfig, enricher *identityEnricher) *common.EnrichedIdentity {
+	id := identityFromHeaders(h, cfg)
+	if id == nil {
+		return nil
+	}
+	token := bearerToken(h)
+	if token == "" {
+		return id
+	}
+	if cfg.ClaimsJWTHeader != "" && identityFromJWT(h.Get(cfg.ClaimsJWTHeader)) != nil {
+		return id
+	}
+	if cfg.SubjectHeader != "" && strings.TrimSpace(h.Get(cfg.SubjectHeader)) != "" {
+		return id
+	}
+	return enricher.enrich(ctx, token, id)
 }
 
 // bearerToken returns the value of an Authorization: Bearer <token> header, or "".

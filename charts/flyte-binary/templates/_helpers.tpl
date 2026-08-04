@@ -220,6 +220,10 @@ Get the Flyte webhook service name.
 {{- printf "%s-webhook" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
 
+{{- define "flyte-binary.webhook.headlessServiceName" -}}
+{{- printf "%s-webhook-headless" (include "flyte-binary.fullname" .) -}}
+{{- end -}}
+
 {{/*
 Get the Flyte webhook secret name.
 */}}

@@ -7792,6 +7792,7 @@ data:
         namespace: 'flyte'
         qps: 100
         timeout: 30s
+      webhookURL: http://flyte-binary-webhook-headless.flyte.svc:9444
   001-plugins.yaml: |
     tasks:
       task-plugins:
@@ -8306,6 +8307,28 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-binary
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-binary-webhook-headless
+  namespace: flyte
+spec:
+  clusterIP: None
+  ports:
+  - name: cache-internal
+    port: 9444
+    protocol: TCP
+    targetPort: 9444
+  selector:
+    app.kubernetes.io/component: flyte-binary
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/name: flyte-binary
+---
+apiVersion: v1
+kind: Service
+metadata:
   annotations:
     projectcontour.io/upstream-protocol.h2c: grpc
   labels:
@@ -8706,7 +8729,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 806913c16fd28512aaf60eccab4c1f3bf9aa6689da8474f4458a833c8dad3b94
+        checksum/configuration: 49e259b5181cecd91e406f5453b471831e41529923b6c290ae9a3c38ac124337
         checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -8738,6 +8761,9 @@ spec:
           name: http
         - containerPort: 9443
           name: webhook
+        - containerPort: 9444
+          name: cache-internal
+          protocol: TCP
         readinessProbe:
           httpGet:
             path: /readyz

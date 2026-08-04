@@ -69,6 +69,7 @@ Chart for basic single Flyte executable deployment
 | console.affinity | object | `{}` |  |
 | console.basePath | string | `"/v2"` |  |
 | console.containerPort | int | `8080` |  |
+| console.env | list | `[]` |  |
 | console.image.pullPolicy | string | `"IfNotPresent"` |  |
 | console.image.repository | string | `"ghcr.io/unionai-oss/flyteconsole-v2"` |  |
 | console.image.tag | string | `"latest"` |  |
@@ -140,6 +141,7 @@ Chart for basic single Flyte executable deployment
 | flyte-core-components.secret.kubernetes.namespace | string | `"{{ .Release.Namespace }}"` |  |
 | flyte-core-components.secret.kubernetes.qps | int | `100` |  |
 | flyte-core-components.secret.kubernetes.timeout | string | `"30s"` |  |
+| flyte-core-components.secret.webhookURL | string | `"http://{{ include \"flyte-binary.webhook.headlessServiceName\" . }}.{{ .Release.Namespace }}.svc:9444"` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.apiJwtIngress.annotations | object | `{}` |  |
 | ingress.apiJwtIngress.enabled | bool | `false` |  |

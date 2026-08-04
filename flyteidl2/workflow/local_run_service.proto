@@ -1,0 +1,149 @@
+syntax = "proto3";
+
+package flyteidl2.workflow;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/run.proto";
+import "flyteidl2/task/common.proto";
+import "flyteidl2/task/run.proto";
+import "flyteidl2/task/task_definition.proto";
+import "flyteidl2/workflow/run_definition.proto";
+import "flyteidl2/workflow/run_service.proto";
+import "google/protobuf/timestamp.proto";
+import "google/rpc/status.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
+
+// LocalRunService manages runs that are orchestrated OUTSIDE the platform — typically on a user's
+// machine — where the client executes actions itself and only reports their state here. Local runs
+// are tracked separately from platform-orchestrated runs and never involve a dataplane.
+//
+// The read/watch surface deliberately mirrors RunService (same request/response messages) so that
+// clients and UIs built against RunService work against local runs with only a service swap.
+service LocalRunService {
+  // Register a new local run. The server creates the root action ("a0") in the reported state and
+  // returns the resolved run. If a run name is not provided, the server generates one.
+  rpc CreateRun(CreateLocalRunRequest) returns (CreateRunResponse) {}
+
+  // Report state for one or more actions of a local run. Creates actions on first report and
+  // updates them on subsequent reports. Reports are idempotent: an event with an
+  // (attempt, version, phase) tuple that was already recorded is acknowledged as success.
+  rpc ReportActions(ReportLocalActionsRequest) returns (ReportLocalActionsResponse) {}
+
+  // Get detailed information about a local run.
+  rpc GetRunDetails(GetRunDetailsRequest) returns (GetRunDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Stream detailed information updates about a local run. The call will terminate when the run
+  // reaches a terminal phase.
+  rpc WatchRunDetails(WatchRunDetailsRequest) returns (stream WatchRunDetailsResponse) {}
+
+  // Get detailed information about an action of a local run.
+  rpc GetActionDetails(GetActionDetailsRequest) returns (GetActionDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Stream detailed information updates about an action of a local run. The call will terminate
+  // when the action reaches a terminal phase.
+  rpc WatchActionDetails(WatchActionDetailsRequest) returns (stream WatchActionDetailsResponse) {}
+
+  // List local runs based on the provided filter criteria.
+  rpc ListRuns(ListRunsRequest) returns (ListRunsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Stream updates for local runs based on the provided filter criteria.
+  rpc WatchRuns(WatchRunsRequest) returns (stream WatchRunsResponse) {}
+
+  // List all actions for a given local run.
+  rpc ListActions(ListActionsRequest) returns (ListActionsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Stream updates for actions of a given local run.
+  rpc WatchActions(WatchActionsRequest) returns (stream WatchActionsResponse) {}
+
+  // Abort a local run: mark the run and all of its non-terminal actions ABORTED on the server.
+  // The platform cannot stop the local orchestrator; subsequent reports against aborted actions
+  // are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
+  rpc AbortRun(AbortRunRequest) returns (AbortRunResponse) {}
+}
+
+// Request message for creating a local run.
+message CreateLocalRunRequest {
+  oneof id {
+    option (buf.validate.oneof).required = true;
+
+    // The user provided run id.
+    common.RunIdentifier run_id = 1;
+
+    // The project id for this run. Run name will be generated.
+    common.ProjectIdentifier project_id = 2;
+  }
+
+  // The task this run executes.
+  oneof task {
+    option (buf.validate.oneof).required = true;
+
+    // The task id to use.
+    task.TaskIdentifier task_id = 3;
+
+    // The task spec to use.
+    task.TaskSpec task_spec = 4;
+  }
+
+  // Reference to the run's inputs, previously uploaded via DataProxyService.UploadMetadata.
+  optional common.OffloadedInputData offloaded_input_data = 5;
+
+  // The run spec to use. Only client-relevant fields are honored; dataplane scheduling fields
+  // (queue, cluster) are ignored for local runs.
+  task.RunSpec run_spec = 6;
+
+  // User-defined labels attached to this run at creation time.
+  map<string, string> labels = 7;
+
+  // Time the local run actually started. If unset, the server defaults it to the current time.
+  google.protobuf.Timestamp run_start_time = 8;
+}
+
+// A single action state report within a local run.
+message LocalActionUpdate {
+  // The event describing this state transition. Carries the action id, attempt (starting at 1),
+  // phase, monotonically increasing version, timestamps, error info and output references
+  // (output_uri / report_uri under the control plane's storage).
+  ActionEvent event = 1 [(buf.validate.field).required = true];
+
+  // Name of the parent action if this is a nested action. Empty for the root action. Only
+  // honored on the first report of an action.
+  string parent_name = 2;
+
+  // Group this action belongs to, if applicable. Only honored on the first report of an action.
+  string group = 3;
+
+  // The action's spec. Should be provided on the first report of an action; ignored afterwards.
+  oneof spec {
+    TaskAction task = 4;
+    TraceAction trace = 5;
+  }
+
+  // Rolled-up status of the action (attempts count, start/end time).
+  ActionStatus status = 6;
+}
+
+// Request message for reporting local action state.
+message ReportLocalActionsRequest {
+  // The run these action reports belong to. Every update's action id must reference this run.
+  common.RunIdentifier run_id = 1 [(buf.validate.field).required = true];
+
+  // The action state reports.
+  repeated LocalActionUpdate updates = 2 [(buf.validate.field).repeated.min_items = 1];
+}
+
+// Response message for reporting local action state.
+message ReportLocalActionsResponse {
+  // Per-update results, parallel to the request's updates. Duplicate (already recorded) events
+  // are reported as success.
+  repeated google.rpc.Status statuses = 1;
+}

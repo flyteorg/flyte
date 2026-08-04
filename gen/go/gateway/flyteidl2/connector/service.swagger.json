@@ -511,6 +511,15 @@
       "default": "UNKNOWN",
       "description": "Known resource names.\n\n - EPHEMERAL_STORAGE: For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs."
     },
+    "ReusePolicyScope": {
+      "type": "string",
+      "enum": [
+        "GLOBAL",
+        "RUN"
+      ],
+      "default": "GLOBAL",
+      "description": "Scope bounds how widely a reusable environment may be shared.\n\n - GLOBAL: Reuse one environment across all runs (the default). Cheapest: creation cost is paid once\nand amortized across every invocation everywhere.\n - RUN: Restrict reuse to a single run: each run gets its own environment, torn down with the run."
+    },
     "SchemaColumnSchemaColumnType": {
       "type": "string",
       "enum": [
@@ -786,6 +795,24 @@
       },
       "title": "Only valid for triggers"
     },
+    "coreArtifactCard": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "URI of the uploaded card content."
+        },
+        "format": {
+          "type": "string",
+          "description": "Format of the card, e.g. html, md, json, yaml, csv, tsv, png, jpg, jpeg."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of the card, e.g. model, data, generic."
+        }
+      },
+      "description": "Reference to a previously uploaded card (model/data card) describing an\nartifact."
+    },
     "coreArtifactID": {
       "type": "object",
       "properties": {
@@ -804,6 +831,27 @@
           "description": "There is no such thing as an empty time partition - if it's not set, then there is no time partition."
         }
       }
+    },
+    "coreArtifactInfo": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Optional human readable description."
+        },
+        "user_metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Free-form, user-supplied key/value metadata."
+        },
+        "card": {
+          "$ref": "#/definitions/coreArtifactCard",
+          "description": "Optional card describing this artifact."
+        }
+      },
+      "description": "Descriptive payload of an artifact — shared by the production declaration\n(task.ProducedArtifact) and the stored spec (artifact.ArtifactSpec).\nDeliberately excludes identity (name/version): identity lives in\nArtifactIdentifier / the declaration, so it can never drift against this."
     },
     "coreArtifactKey": {
       "type": "object",
@@ -833,6 +881,18 @@
           "$ref": "#/definitions/coreLabelValue"
         }
       }
+    },
+    "coreArtifactVersionId": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/coreArtifactKey"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "description": "Identity of one artifact version. Unlike the legacy ArtifactID below, this\ncarries no partition machinery — it is the minimal identity stamped onto\nvalues (core.Literal.artifact_id) and referenced by v2 artifact APIs."
     },
     "coreBackoff": {
       "type": "object",
@@ -1230,6 +1290,10 @@
             "type": "string"
           },
           "description": "Additional metadata for literals."
+        },
+        "artifact_id": {
+          "$ref": "#/definitions/coreArtifactVersionId",
+          "description": "Identity of the artifact this value is / came from. Set once at artifact\nregistration (and by clients when binding a fetched artifact as an input);\nit travels with the value through every copy. Participates in cache-key\nhashing by design: two versions of an artifact are distinct inputs even\nwhen their bytes coincide."
         }
       },
       "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."
@@ -1482,6 +1546,39 @@
         }
       },
       "description": "Retry strategy associated with an executable unit."
+    },
+    "coreReusePolicy": {
+      "type": "object",
+      "properties": {
+        "min_replicas": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Minimum number of replicas to keep warm (a fixed-size pool uses min == max)."
+        },
+        "max_replicas": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Maximum number of replicas; the upper bound for demand-based auto-scaling."
+        },
+        "concurrency": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Maximum number of concurrent tasks a single replica may handle. Values \u003e 1 are only\nmeaningful for async tasks."
+        },
+        "idle_ttl": {
+          "type": "string",
+          "description": "How long the whole reusable environment may sit idle (no running tasks) before it is torn\ndown entirely."
+        },
+        "scaledown_ttl": {
+          "type": "string",
+          "description": "Minimum delay before an individual idle replica is scaled down during auto-scaling\n(distinct from idle_ttl, which governs the whole environment)."
+        },
+        "scope": {
+          "$ref": "#/definitions/ReusePolicyScope",
+          "description": "How widely the reusable environment may be shared. Defaults to GLOBAL (reuse across all runs)."
+        }
+      },
+      "description": "ReusePolicy configures reuse of a task's execution environment across invocations, so\nenvironment creation cost is paid once and amortized: a warm container pool for reusable\ncontainer tasks or a shared long-lived cluster for cluster-backed plugins (e.g. Ray).\nTotal concurrent capacity is max_replicas * concurrency."
     },
     "coreRuntimeBinding": {
       "type": "object"
@@ -1755,6 +1852,10 @@
             "type": "string"
           },
           "title": "Metadata about the custom defined for this task. This is extensible to allow various plugins in the system\nto use as required.\nreserve the field numbers 1 through 15 for very frequently occurring message elements"
+        },
+        "reuse_policy": {
+          "$ref": "#/definitions/coreReusePolicy",
+          "description": "Reuse policy for the task's execution environment (a warm container pool, or a shared,\nlong-lived cluster for cluster-backed plugins like Ray). When unset, no reuse is configured."
         }
       },
       "description": "A Task structure that uniquely identifies a task in the system\nTasks are registered as a first step in the system."
@@ -2278,6 +2379,10 @@
         "timeouts": {
           "$ref": "#/definitions/coreTimeoutStrategy",
           "description": "Additional timeout bounds (queued_timeout, deadline) layered on top of\nthe per-attempt RUNNING-phase bound expressed by `timeout` (field 4).\nEach bound is independently optional; an unspecified bound is unlimited."
+        },
+        "produces_artifacts": {
+          "type": "boolean",
+          "description": "If true, the backend extracts artifact metadata stamped on this task's\noutput literals and records them as generated artifacts on the action."
         }
       },
       "title": "Task Metadata"
@@ -2370,9 +2475,43 @@
             "$ref": "#/definitions/taskNamedLiteral"
           },
           "description": "Ordered outputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move."
+        },
+        "produced_artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/taskProducedArtifact"
+          },
+          "description": "Artifact registration declarations for outputs wrapped as artifacts by the\nproducing task. Field 3 (not 2) on purpose: outputs.pb blobs are sometimes\ncross-decoded as task.Inputs, where field 2 is `context`; field 3 is unused\nthere, so this never aliases."
         }
       },
       "description": "Output payload for an action."
+    },
+    "taskProducedArtifact": {
+      "type": "object",
+      "properties": {
+        "output": {
+          "type": "string",
+          "description": "Name of the NamedLiteral in Outputs.literals this declaration refers to."
+        },
+        "name": {
+          "type": "string",
+          "description": "Artifact name to register under."
+        },
+        "version": {
+          "type": "string",
+          "description": "Optional explicit version. Empty means the backend derives one\n(\u003crun\u003e-\u003caction\u003e-\u003cattempt\u003e)."
+        },
+        "info": {
+          "$ref": "#/definitions/coreArtifactInfo",
+          "description": "Descriptive payload, copied verbatim into ArtifactSpec.info."
+        },
+        "type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "The declared Flyte type of the output, copied into ArtifactSpec.type.\nThe producing SDK is authoritative for this."
+        }
+      },
+      "description": "Declares that a named output of the producing action is a new artifact\nversion. The output's literal (in Outputs.literals) is the artifact's value;\norg/project/domain come from the producing action's scope at registration."
     }
   }
 }

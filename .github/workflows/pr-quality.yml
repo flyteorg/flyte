@@ -1,0 +1,22 @@
+name: PR Quality
+
+on:
+  pull_request_target:
+    types: [opened, reopened]
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: write
+
+jobs:
+  anti-slop:
+    name: Screen low-quality pull requests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check pull request quality
+        uses: peakoss/anti-slop@v0.3.0
+        with:
+          # Require several independent warning signs before taking action to
+          # avoid penalizing legitimate contributors for a single heuristic.
+          max-failures: 8

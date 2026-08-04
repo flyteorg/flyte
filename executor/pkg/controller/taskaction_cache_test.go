@@ -125,7 +125,9 @@ func TestHandleCacheBeforeExecutionWaitingForReservation(t *testing.T) {
 				return catalog.Entry{}, grpcstatus.Error(codes.NotFound, "miss")
 			},
 			getOrExtendReservationFunc: func(_ context.Context, _ catalog.Key, ownerID string, heartbeat time.Duration) (*cacheservice.Reservation, error) {
-				assert.Equal(t, cacheReservationHeartbeatInterval, heartbeat)
+				// This reconciler leaves RequeueDuration unset, so the heartbeat
+				// falls back to the default requeue duration.
+				assert.Equal(t, TaskActionDefaultRequeueDuration, heartbeat)
 				assert.Equal(t, "default/cacheable-action", ownerID)
 				return &cacheservice.Reservation{OwnerId: "default/other-action"}, nil
 			},
@@ -137,6 +139,58 @@ func TestHandleCacheBeforeExecutionWaitingForReservation(t *testing.T) {
 	require.True(t, handled)
 	assert.Equal(t, pluginsCore.PhaseWaitingForCache, transition.Info().Phase())
 	assert.Equal(t, corepb.CatalogCacheStatus_CACHE_MISS, transition.Info().Info().ExternalResources[0].CacheStatus)
+}
+
+// The reservation lease has to track the requeue duration. If it did not, an
+// operator who raised the requeue duration would have reservations expire before
+// the next reconcile and another owner could take them.
+func TestHandleCacheBeforeExecutionReservationHeartbeatTracksRequeueDuration(t *testing.T) {
+	ensureTestMetricKeys()
+	ctx := context.Background()
+	taskAction, dataStore := newCacheableTaskAction(t, true, true)
+	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
+
+	const configuredRequeue = 45 * time.Second
+	var gotHeartbeat time.Duration
+
+	r := &TaskActionReconciler{
+		DataStore:       dataStore,
+		RequeueDuration: configuredRequeue,
+		Catalog: &stubCatalogClient{
+			getFunc: func(context.Context, catalog.Key) (catalog.Entry, error) {
+				return catalog.Entry{}, grpcstatus.Error(codes.NotFound, "miss")
+			},
+			getOrExtendReservationFunc: func(_ context.Context, _ catalog.Key, _ string, heartbeat time.Duration) (*cacheservice.Reservation, error) {
+				gotHeartbeat = heartbeat
+				return &cacheservice.Reservation{OwnerId: "default/other-action"}, nil
+			},
+		},
+	}
+
+	_, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, false)
+	require.NoError(t, err)
+	require.True(t, handled)
+	assert.Equal(t, configuredRequeue, gotHeartbeat)
+}
+
+func TestRequeueDurationFallsBackToDefault(t *testing.T) {
+	tests := []struct {
+		name string
+		set  time.Duration
+		want time.Duration
+	}{
+		{name: "unset", set: 0, want: TaskActionDefaultRequeueDuration},
+		{name: "negative", set: -1 * time.Second, want: TaskActionDefaultRequeueDuration},
+		{name: "configured", set: 45 * time.Second, want: 45 * time.Second},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &TaskActionReconciler{RequeueDuration: tt.set}
+			assert.Equal(t, tt.want, r.requeueDuration())
+			assert.Equal(t, tt.want, r.cacheReservationHeartbeat())
+		})
+	}
 }
 
 func TestHandleCacheBeforeExecutionMissWithoutSerializableSkipsReservation(t *testing.T) {

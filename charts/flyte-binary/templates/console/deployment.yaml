@@ -44,6 +44,9 @@ spec:
             - name: http
               containerPort: {{ .Values.console.containerPort }}
               protocol: TCP
+          {{- with .Values.console.env }}
+          env: {{- toYaml . | nindent 12 }}
+          {{- end }}
           livenessProbe:
             httpGet:
               path: {{ .Values.console.basePath }}
