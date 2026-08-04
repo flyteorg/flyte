@@ -44,6 +44,31 @@ kubectl create configmap flyte-v2-dashboard \
 **Any other Grafana** — import `dashboards/flyte-v2.json` through the UI
 (Dashboards → New → Import), or mount it via file provisioning.
 
+### About that `grafana_dashboard: "1"` label
+
+The sidecar decides what to pick up from two env vars, both set by the chart:
+
+```bash
+kubectl -n <ns> get deploy <grafana-deploy> -o json | \
+  jq -r '.spec.template.spec.containers[] | select(.name|test("sc-dashboard"))
+         | .env[] | select(.name|test("^LABEL")) | "\(.name)=\(.value)"'
+# LABEL=grafana_dashboard
+# LABEL_VALUE=1
+```
+
+`LABEL` is the key it watches. `LABEL_VALUE` is the value it requires — when the
+chart sets it (kube-prometheus-stack does, to `1`), a ConfigMap labelled
+`grafana_dashboard: "true"` is ignored. When it is empty, any value matches. So
+`"1"` is not decoration; check the two vars rather than copying a value that
+worked somewhere else.
+
+The quotes are load-bearing too — Kubernetes label values are strings, and
+unquoted `1` is a YAML integer:
+
+```
+error: json: cannot unmarshal number into Go struct field ObjectMeta.metadata.labels of type string
+```
+
 ## Why a ConfigMap and not just a UI import
 
 A UI import writes the dashboard into Grafana's own database (`grafana.db`, under
