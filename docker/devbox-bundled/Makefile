@@ -180,23 +180,15 @@ start:
 			$(FLYTE_DEVBOX_IMAGE); \
 	fi
 	@echo "Waiting for kubeconfig..."
-	@# Read the kubeconfig out of the container rather than the bind mount: a
-	@# devbox that is already running may have been started with a different host
-	@# dir at /.kube, and a stale file there would satisfy the wait and then fail.
-	@# Stage it under $(HOME)/.kube — docker creates the bind-mount source dir as
-	@# root, so writing into it from the host fails for a non-root user (CI).
-	@until docker exec flyte-devbox test -s /etc/rancher/k3s/k3s.yaml >/dev/null 2>&1; do sleep 1; done
+	@until [ -s $(PWD)/.kube/kubeconfig ]; do sleep 1; done
+	@# On WSL, the bind-mounted kubeconfig may be root-owned, which makes the host-side cp fail with permission denied.
+	@docker exec flyte-devbox chown $(shell id -u):$(shell id -g) /.kube/kubeconfig
 	@mkdir -p $(HOME)/.kube
-	@docker exec flyte-devbox cat /etc/rancher/k3s/k3s.yaml > $(HOME)/.kube/flyte-devbox.kubeconfig
-	@# Keep the bind-mounted copy readable so `make kubeconfig` still works; it is
-	@# root-owned and mode 0600 when k3s writes it. Absent if this devbox mounts a
-	@# different dir, hence the tolerated failure.
-	@docker exec flyte-devbox chown $(shell id -u):$(shell id -g) /.kube/kubeconfig 2>/dev/null || true
 	@if [ -f $(HOME)/.kube/config ]; then \
-		KUBECONFIG=$(HOME)/.kube/flyte-devbox.kubeconfig:$(HOME)/.kube/config kubectl config view --flatten > $(HOME)/.kube/config.merged && \
-		mv $(HOME)/.kube/config.merged $(HOME)/.kube/config; \
+		KUBECONFIG=$(PWD)/.kube/kubeconfig:$(HOME)/.kube/config kubectl config view --flatten > /tmp/kubeconfig-merged && \
+		mv /tmp/kubeconfig-merged $(HOME)/.kube/config; \
 	else \
-		cp $(HOME)/.kube/flyte-devbox.kubeconfig $(HOME)/.kube/config; \
+		cp $(PWD)/.kube/kubeconfig $(HOME)/.kube/config; \
 	fi
 	@kubectl config use-context flyte-devbox >/dev/null 2>&1 || true
 	@echo "Kubeconfig merged into ~/.kube/config"
