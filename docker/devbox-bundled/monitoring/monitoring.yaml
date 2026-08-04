@@ -1576,9 +1576,15 @@ spec:
         - name: grafana
           image: docker.io/grafana/grafana:11.5.1
           env:
+            # Anonymous access so the dashboard opens without a login, but as a
+            # Viewer: k3s publishes NodePorts on 0.0.0.0, so this is reachable
+            # from the LAN, and a Grafana Admin can add datasources — which makes
+            # the pod issue arbitrary requests to whatever it can reach. Viewing
+            # is all this stack is for. Basic auth stays enabled so an admin
+            # login is still available (admin/admin on first start) if you want
+            # to edit panels.
             - { name: GF_AUTH_ANONYMOUS_ENABLED, value: "true" }
-            - { name: GF_AUTH_ANONYMOUS_ORG_ROLE, value: "Admin" }
-            - { name: GF_AUTH_BASIC_ENABLED, value: "false" }
+            - { name: GF_AUTH_ANONYMOUS_ORG_ROLE, value: "Viewer" }
           ports: [{ containerPort: 3000 }]
           volumeMounts:
             - { name: provisioning-ds, mountPath: /etc/grafana/provisioning/datasources }
