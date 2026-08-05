@@ -700,6 +700,8 @@ func (m *LogLine) validate(all bool) error {
 
 	// no validation rules for Originator
 
+	// no validation rules for ShortPodName
+
 	if len(errors) > 0 {
 		return LogLineMultiError(errors)
 	}

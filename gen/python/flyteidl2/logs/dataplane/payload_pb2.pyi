@@ -114,14 +114,16 @@ class LiveLogsOptions(_message.Message):
     def __init__(self, log_pod_status: bool = ..., log_timestamps: bool = ...) -> None: ...
 
 class LogLine(_message.Message):
-    __slots__ = ["timestamp", "message", "originator"]
+    __slots__ = ["timestamp", "message", "originator", "short_pod_name"]
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
     ORIGINATOR_FIELD_NUMBER: _ClassVar[int]
+    SHORT_POD_NAME_FIELD_NUMBER: _ClassVar[int]
     timestamp: _timestamp_pb2.Timestamp
     message: str
     originator: LogLineOriginator
-    def __init__(self, timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., message: _Optional[str] = ..., originator: _Optional[_Union[LogLineOriginator, str]] = ...) -> None: ...
+    short_pod_name: str
+    def __init__(self, timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., message: _Optional[str] = ..., originator: _Optional[_Union[LogLineOriginator, str]] = ..., short_pod_name: _Optional[str] = ...) -> None: ...
 
 class LogLines(_message.Message):
     __slots__ = ["lines", "container_index", "container", "structured_lines", "source"]
