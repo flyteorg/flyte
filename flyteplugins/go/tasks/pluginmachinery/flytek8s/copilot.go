@@ -23,7 +23,6 @@ import (
 const (
 	flyteSidecarContainerName    = "uploader"
 	flyteDownloaderContainerName = "downloader"
-	copilotConfigVolumeName      = "flyte-copilot-config"
 )
 
 func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []string, volumeMounts ...v1.VolumeMount) (v1.Container, error) {
@@ -44,7 +43,7 @@ func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []st
 		storageCfg = storage.GetConfig()
 	}
 
-	command, err := CopilotCommandArgs(storageCfg, cfg.StorageConfig.ConfigGlob())
+	command, err := CopilotCommandArgs(storageCfg)
 	if err != nil {
 		return v1.Container{}, err
 	}
@@ -71,23 +70,7 @@ func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []st
 	}, nil
 }
 
-// CopilotCommandArgs builds the co-pilot entrypoint. The stow configuration — kind,
-// endpoint, and credentials alike — is deliberately NOT passed here; co-pilot reads it
-// from the files AddCoPilotToPod mounts. Rendering it into the command would publish the
-// storage credentials in every task's pod spec, where any principal that can read pods
-// could recover them without access to the Secret holding them.
-//
-// The whole stow config must travel together via those files. Splitting it — non-sensitive
-// keys as flags, credentials in the file — does not work: `storage.stow.config` binds to
-// a pflag StringToString, and once that flag is set viper resolves the key entirely from
-// it rather than merging into the file's map, silently dropping the credentials.
-func CopilotCommandArgs(storageConfig *storage.Config, storageConfigGlob string) ([]string, error) {
-	if storageConfigGlob == "" {
-		return nil, fmt.Errorf("co-pilot storage-config is not configured: set mount-path and at least " +
-			"one of config-map-name/secret-name so the storage config reaches co-pilot as mounted files " +
-			"instead of on the command line")
-	}
-
+func CopilotCommandArgs(storageConfig *storage.Config) ([]string, error) {
 	var commands = []string{
 		"/bin/flyte-copilot",
 		"--storage.limits.maxDownloadMBs=0",
@@ -102,7 +85,15 @@ func CopilotCommandArgs(storageConfig *storage.Config, storageConfigGlob string)
 	}
 	commands = append(commands, fmt.Sprintf("--storage.type=%s", storageConfig.Type))
 
-	return append(commands, "--config", storageConfigGlob), nil
+	if len(storageConfig.Stow.Config) > 0 && len(storageConfig.Stow.Kind) > 0 {
+		for key, val := range storageConfig.Stow.Config {
+			commands = append(commands, "--storage.stow.config")
+			commands = append(commands, fmt.Sprintf("%s=%s", key, val))
+		}
+		return append(commands, fmt.Sprintf("--storage.stow.kind=%s", storageConfig.Stow.Kind)), nil
+	}
+
+	return commands, fmt.Errorf("no stow.config or stow.kind specified")
 }
 
 func SidecarCommandArgs(fromLocalPath string, outputPrefix, rawOutputPath storage.DataReference, uploadTimeout time.Duration, iface *core.TypedInterface) ([]string, error) {
@@ -151,72 +142,6 @@ func DownloadCommandArgs(fromInputsPath, outputPrefix storage.DataReference, toL
 		"--input-interface",
 		base64.StdEncoding.EncodeToString(b),
 	}, nil
-}
-
-// keyToPaths projects each key under its own name, so the mounted filenames match the
-// keys the deployment already uses and their numeric prefixes keep ordering the merge.
-func keyToPaths(keys []string) []v1.KeyToPath {
-	if len(keys) == 0 {
-		return nil
-	}
-	items := make([]v1.KeyToPath, 0, len(keys))
-	for _, k := range keys {
-		items = append(items, v1.KeyToPath{Key: k, Path: k})
-	}
-	return items
-}
-
-// storageConfigVolume projects co-pilot's storage configuration into a read-only volume.
-// Both sources are combined here rather than merged into one object, preserving the
-// deployment's split of non-sensitive settings (ConfigMap) from credentials (Secret).
-//
-// Only the configured keys are projected. Both objects carry unrelated entries — plugin
-// config, database credentials — which must neither reach the co-pilot containers nor be
-// parsed by co-pilot's strict-mode config loader, which rejects sections it does not
-// recognise. A source with no name is omitted entirely: a deployment using instance
-// credentials (S3 authType=iam) renders no credential file, and naming a key that is
-// never written would fail the mount.
-func storageConfigVolume(cfg config.StorageConfigSources) v1.Volume {
-	// Read-only for the owner: co-pilot only reads this, and the containers run as
-	// whatever user the image declares.
-	mode := int32(0400)
-	sources := make([]v1.VolumeProjection, 0, 2)
-	if cfg.ConfigMapName != "" {
-		sources = append(sources, v1.VolumeProjection{
-			ConfigMap: &v1.ConfigMapProjection{
-				LocalObjectReference: v1.LocalObjectReference{Name: cfg.ConfigMapName},
-				Items:                keyToPaths(cfg.ConfigMapKeys),
-			},
-		})
-	}
-	if cfg.SecretName != "" {
-		sources = append(sources, v1.VolumeProjection{
-			Secret: &v1.SecretProjection{
-				LocalObjectReference: v1.LocalObjectReference{Name: cfg.SecretName},
-				Items:                keyToPaths(cfg.SecretKeys),
-			},
-		})
-	}
-	return v1.Volume{
-		Name: copilotConfigVolumeName,
-		VolumeSource: v1.VolumeSource{
-			Projected: &v1.ProjectedVolumeSource{
-				Sources:     sources,
-				DefaultMode: &mode,
-			},
-		},
-	}
-}
-
-// storageConfigMount is the mount matching storageConfigVolume. It is attached to the
-// co-pilot containers only — never to the primary container, which runs user code and
-// must not be able to read the storage credentials.
-func storageConfigMount(cfg config.StorageConfigSources) v1.VolumeMount {
-	return v1.VolumeMount{
-		Name:      copilotConfigVolumeName,
-		MountPath: cfg.MountPath,
-		ReadOnly:  true,
-	}
 }
 
 func DataVolume(name string, size *resource.Quantity) v1.Volume {
@@ -292,19 +217,8 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 
 	taskName := taskExecMetadata.GetTaskExecutionID().GetID().GetTaskId().GetName()
 	logger.Infof(ctx, "CoPilot Enabled for task [%s]", taskName)
-
-	cfgMount := storageConfigMount(cfg.StorageConfig)
-
 	if iFace != nil {
-		needsDownloader := iFace.Inputs != nil && len(iFace.Inputs.Variables) > 0
-		needsUploader := iFace.Outputs != nil && len(iFace.Outputs.Variables) > 0
-
-		// We only mount the volume when either downloader or uploader is required
-		if needsDownloader || needsUploader {
-			coPilotPod.Volumes = append(coPilotPod.Volumes, storageConfigVolume(cfg.StorageConfig))
-		}
-
-		if needsDownloader {
+		if iFace.Inputs != nil && len(iFace.Inputs.Variables) > 0 {
 			inPath := cfg.DefaultInputDataPath
 			if pilot.GetInputPath() != "" {
 				inPath = pilot.GetInputPath()
@@ -327,14 +241,14 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			if err != nil {
 				return err
 			}
-			downloader, err := FlyteCoPilotContainer(flyteDownloaderContainerName, cfg, args, inputsVolumeMount, cfgMount)
+			downloader, err := FlyteCoPilotContainer(flyteDownloaderContainerName, cfg, args, inputsVolumeMount)
 			if err != nil {
 				return err
 			}
 			coPilotPod.InitContainers = append(coPilotPod.InitContainers, downloader)
 		}
 
-		if needsUploader {
+		if iFace.Outputs != nil && len(iFace.Outputs.Variables) > 0 {
 			outPath := cfg.DefaultOutputPath
 			if pilot.GetOutputPath() != "" {
 				outPath = pilot.GetOutputPath()
@@ -356,7 +270,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			if err != nil {
 				return err
 			}
-			sidecar, err := FlyteCoPilotContainer(flyteSidecarContainerName, cfg, args, outputsVolumeMount, cfgMount)
+			sidecar, err := FlyteCoPilotContainer(flyteSidecarContainerName, cfg, args, outputsVolumeMount)
 			// Make it into sidecar container
 			restartPolicy := v1.ContainerRestartPolicyAlways
 			sidecar.RestartPolicy = &restartPolicy
