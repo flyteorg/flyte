@@ -36,10 +36,36 @@ type actionRepo struct {
 	actionSubscribers map[chan string]bool
 	mu                sync.RWMutex
 
-	// Dedicated channels for async NOTIFY to avoid pool contention
-	actionNotifyCh chan string
-	runNotifyCh    chan string
+	// Pending NOTIFY payloads, drained by a dedicated pump so that write RPCs
+	// never wait on a notification. A payload is an identity rather than a
+	// state and every listener re-reads from the database when it wakes, so
+	// repeated updates for the same key collapse into a single delivery. That
+	// makes a set the right structure: it bounds memory by the number of
+	// distinct pending actions instead of by update volume, and it lets a
+	// failed pg_notify be retried by merging the keys back in.
+	// The value is the number of times this payload has failed for a reason
+	// that was not the connection's fault, which bounds how long a payload
+	// Postgres will never accept can hold up everything else.
+	notifyMu       sync.Mutex
+	pendingActions map[string]int
+	pendingRuns    map[string]int
+	// pendingCh carries a single "something is pending" nudge. The sets above
+	// are the queue; this channel only wakes the pump.
+	pendingCh chan struct{}
 }
+
+const (
+	// Backoff bounds for retrying a pg_notify that failed, so a broken
+	// connection cannot turn the pump into a hot loop.
+	notifyRetryMinBackoff = 50 * time.Millisecond
+	notifyRetryMaxBackoff = 5 * time.Second
+	// notifyRetryLimit bounds retries of a payload that keeps failing while
+	// the connection is healthy, which means the payload itself is the
+	// problem. pg_notify rejects payloads of 8000 bytes or more permanently,
+	// for example. Retrying such a payload forever would hold every other
+	// watcher's wakeup behind it, which is worse than losing one hint.
+	notifyRetryLimit = 10
+)
 
 // NewActionRepo creates a new PostgreSQL repository
 func NewActionRepo(db *sqlx.DB, dbConfig database.DbConfig) (interfaces.ActionRepo, error) {
@@ -51,8 +77,9 @@ func NewActionRepo(db *sqlx.DB, dbConfig database.DbConfig) (interfaces.ActionRe
 		actionSubscribers: make(map[chan string]bool),
 	}
 
-	repo.actionNotifyCh = make(chan string, 256)
-	repo.runNotifyCh = make(chan string, 256)
+	repo.pendingActions = make(map[string]int)
+	repo.pendingRuns = make(map[string]int)
+	repo.pendingCh = make(chan struct{}, 1)
 
 	if err := repo.startPostgresListener(); err != nil {
 		return nil, fmt.Errorf("failed to start postgres listener: %w", err)
@@ -947,16 +974,84 @@ func (r *actionRepo) processNotifications() {
 	}
 }
 
-// notifyRunUpdate sends a notification about a run update via the
-// dedicated notify channel, avoiding connection pool contention.
-func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdentifier) {
+// notifyRunUpdate queues a notification about a run update for the dedicated
+// notify pump, avoiding connection pool contention.
+//
+// ctx is deliberately not consulted: the row is already committed by the time
+// this runs, and dropping the wakeup because the caller's request was
+// cancelled would leave other watchers looking at a stale phase.
+func (r *actionRepo) notifyRunUpdate(_ context.Context, runID *common.RunIdentifier) {
 	payload := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
 
-	select {
-	case r.runNotifyCh <- payload:
-	case <-ctx.Done():
-		logger.Warnf(ctx, "Run NOTIFY send cancelled for %s: %v", payload, ctx.Err())
+	r.notifyMu.Lock()
+	markPending(r.pendingRuns, payload)
+	r.notifyMu.Unlock()
+
+	r.signalPending()
+}
+
+// markPending queues payload, keeping any attempt count it has already
+// accumulated. Resetting the count here would let a payload that can never be
+// delivered stay pending forever, since a busy action keeps re-queuing it.
+func markPending(pending map[string]int, payload string) {
+	if _, queued := pending[payload]; !queued {
+		pending[payload] = 0
 	}
+}
+
+// signalPending nudges the notify pump without ever blocking. A nudge that is
+// already buffered needs no second one: the pump re-reads the whole pending
+// set once it wakes, so one outstanding signal covers any number of keys.
+func (r *actionRepo) signalPending() {
+	select {
+	case r.pendingCh <- struct{}{}:
+	default:
+	}
+}
+
+// takePendingNotifications swaps the pending sets out for empty ones and
+// returns what was queued.
+func (r *actionRepo) takePendingNotifications() (actions, runs map[string]int) {
+	r.notifyMu.Lock()
+	defer r.notifyMu.Unlock()
+
+	actions, runs = r.pendingActions, r.pendingRuns
+	r.pendingActions = make(map[string]int)
+	r.pendingRuns = make(map[string]int)
+	return actions, runs
+}
+
+// requeuePendingNotifications merges undelivered payloads back so the pump can
+// retry them. Re-adding a key is idempotent, so a retry cannot duplicate work,
+// and updates that arrived meanwhile merge into the same entry.
+func (r *actionRepo) requeuePendingNotifications(actions, runs map[string]int) {
+	if len(actions) == 0 && len(runs) == 0 {
+		return
+	}
+
+	r.notifyMu.Lock()
+	r.pendingActions = mergePending(r.pendingActions, actions)
+	r.pendingRuns = mergePending(r.pendingRuns, runs)
+	r.notifyMu.Unlock()
+
+	r.signalPending()
+}
+
+// mergePending folds src into dst and returns the map to keep. It copies the
+// smaller side so that requeuing a large failed batch into a nearly empty
+// pending set holds the lock for the size of the smaller map, not the batch.
+// Where both sides hold a payload the higher attempt count wins, so a new
+// update arriving for a failing action cannot refill its retry budget.
+func mergePending(dst, src map[string]int) map[string]int {
+	if len(src) > len(dst) {
+		dst, src = src, dst
+	}
+	for payload, attempts := range src {
+		if existing, queued := dst[payload]; !queued || attempts > existing {
+			dst[payload] = attempts
+		}
+	}
+	return dst
 }
 
 // ListRootActions lists root actions (runs) matching scope and date filters.
@@ -1012,7 +1107,7 @@ func (r *actionRepo) startNotifyLoop() error {
 		return fmt.Errorf("acquire dedicated NOTIFY connection: %w", err)
 	}
 
-	go r.runNotifyLoop(sqlDB, conn)
+	go r.runNotifyLoop(context.Background(), sqlDB, conn)
 	return nil
 }
 
@@ -1033,10 +1128,13 @@ func isConnError(err error) bool {
 	return false
 }
 
-// runNotifyLoop processes notify channels using the given connection.
-// On connection errors it attempts to reconnect; if reconnection fails
-// the error is logged and the notification is skipped.
-func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
+// runNotifyLoop drains the pending notification sets using the given
+// connection. On connection errors it attempts to reconnect; payloads it could
+// not deliver stay pending and are retried with backoff, so a transient
+// database problem costs a delay rather than a lost wakeup.
+//
+// It returns when ctx is done.
+func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql.Conn) {
 	defer func() {
 		if conn != nil {
 			conn.Close() //nolint:errcheck
@@ -1052,69 +1150,126 @@ func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
 			return
 		}
 		var err error
-		conn, err = sqlDB.Conn(context.Background())
+		conn, err = sqlDB.Conn(ctx)
 		if err != nil {
-			logger.Errorf(context.Background(), "Failed to re-acquire NOTIFY connection: %v", err)
+			logger.Errorf(ctx, "Failed to re-acquire NOTIFY connection: %v", err)
 			conn = nil
 		}
 	}
 
-	execNotify := func(channel, payload string) {
+	// execNotify reports whether the payload was delivered. A false result
+	// keeps the payload pending for the next attempt.
+	execNotify := func(channel, payload string) bool {
 		if conn == nil {
 			reconnect()
 		}
 		if conn == nil {
-			logger.Errorf(context.Background(), "No NOTIFY connection available, dropping %s notification", channel)
-			return
+			logger.Errorf(ctx, "No NOTIFY connection available, keeping %s notification pending", channel)
+			return false
 		}
-		if _, err := conn.ExecContext(context.Background(), "SELECT pg_notify($1, $2)", channel, payload); err != nil {
-			logger.Errorf(context.Background(), "Failed to NOTIFY %s: %v", channel, err)
+		if _, err := conn.ExecContext(ctx, "SELECT pg_notify($1, $2)", channel, payload); err != nil {
+			logger.Errorf(ctx, "Failed to NOTIFY %s: %v", channel, err)
 			if isConnError(err) {
 				reconnect()
 			}
+			return false
 		}
+		return true
 	}
 
-	drainAndExec := func(channel, firstPayload string, ch <-chan string) {
-		execNotify(channel, firstPayload)
-		for {
-			select {
-			case payload, ok := <-ch:
-				if !ok {
-					return
-				}
-				execNotify(channel, payload)
-			default:
-				return
+	// emit delivers every payload in the set. It returns the payloads worth
+	// another attempt, with their attempt counts advanced, and how many were
+	// delivered. A payload only spends its retry budget when the connection
+	// was healthy and it failed anyway, because that means the payload itself
+	// is what Postgres rejected.
+	emit := func(channel string, payloads map[string]int) (retry map[string]int, delivered int) {
+		keep := func(payload string, attempts int) {
+			if retry == nil {
+				retry = make(map[string]int, len(payloads))
 			}
+			retry[payload] = attempts
 		}
+
+		connectionLost := false
+		for payload, attempts := range payloads {
+			// Once the connection is gone, trying the rest would just make
+			// every remaining payload attempt its own reconnect. Keep them
+			// and let the backoff below handle recovery.
+			if connectionLost {
+				keep(payload, attempts)
+				continue
+			}
+			if execNotify(channel, payload) {
+				delivered++
+				continue
+			}
+			if conn == nil {
+				connectionLost = true
+				keep(payload, attempts)
+				continue
+			}
+
+			attempts++
+			if attempts >= notifyRetryLimit {
+				logger.Errorf(ctx, "Dropping %s notification after %d failed attempts: %s",
+					channel, attempts, payload)
+				continue
+			}
+			keep(payload, attempts)
+		}
+		return retry, delivered
 	}
 
+	backoff := notifyRetryMinBackoff
 	for {
 		select {
-		case payload, ok := <-r.actionNotifyCh:
-			if !ok {
-				return
-			}
-			drainAndExec("action_updates", payload, r.actionNotifyCh)
-		case payload, ok := <-r.runNotifyCh:
-			if !ok {
-				return
-			}
-			drainAndExec("run_updates", payload, r.runNotifyCh)
+		case <-ctx.Done():
+			return
+		case <-r.pendingCh:
+		}
+
+		actions, runs := r.takePendingNotifications()
+		retryActions, deliveredActions := emit("action_updates", actions)
+		retryRuns, deliveredRuns := emit("run_updates", runs)
+
+		if len(retryActions) == 0 && len(retryRuns) == 0 {
+			backoff = notifyRetryMinBackoff
+			continue
+		}
+
+		r.requeuePendingNotifications(retryActions, retryRuns)
+
+		// Delivering anything at all means the pump is healthy and something
+		// payload-specific failed, so do not slow every other watcher down.
+		if deliveredActions+deliveredRuns > 0 {
+			backoff = notifyRetryMinBackoff
+		}
+
+		// Wait before the retry so a broken connection cannot spin the pump.
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(backoff):
+		}
+		backoff *= 2
+		if backoff > notifyRetryMaxBackoff {
+			backoff = notifyRetryMaxBackoff
 		}
 	}
 }
 
-// notifyActionUpdate sends a notification about an action update via the
-// dedicated notify channel, avoiding connection pool contention.
-func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.ActionIdentifier) {
+// notifyActionUpdate queues a notification about an action update for the
+// dedicated notify pump, avoiding connection pool contention.
+//
+// This is called from inside write RPCs, right after the row is committed, so
+// it must never block. ctx is deliberately not consulted; see notifyRunUpdate.
+func (r *actionRepo) notifyActionUpdate(_ context.Context, actionID *common.ActionIdentifier) {
 	payload := fmt.Sprintf("%s/%s/%s/%s",
 		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 
-	select {
-	case r.actionNotifyCh <- payload:
-	case <-ctx.Done():
-		logger.Errorf(ctx, "Action NOTIFY send cancelled for %s: %v", payload, ctx.Err())
-	}
+	r.notifyMu.Lock()
+	markPending(r.pendingActions, payload)
+	r.notifyMu.Unlock()
+
+	r.signalPending()
 }
