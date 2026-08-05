@@ -149,12 +149,10 @@ If you need an enterprise-ready, production-grade backend for Flyte 2 today, it 
 
 ## Learn More
 
-- **[Live Demo](https://flyte2intro.apps.demo.hosted.unionai.cloud/)** — Try Flyte 2 in your browser
-- **[Documentation](https://www.union.ai/docs/v2/flyte/user-guide/running-locally/)** — Get started running locally
+- **[Try DevBox](https://www.union.ai/docs/v2/flyte/user-guide/get-started/run-modes/running-devbox/)** - Get started
 - **[SDK Reference](https://www.union.ai/docs/v2/byoc/api-reference/flyte-sdk/)** — API reference docs
 - **[CLI Reference](https://www.union.ai/docs/v2/byoc/api-reference/flyte-cli/)** — CLI docs
 - **[flyte-sdk](https://github.com/flyteorg/flyte-sdk)** — The Flyte 2 Python SDK repository
-- **[Join the Flyte 2 Production Preview](https://www.union.ai/try-flyte-2)** — Get early access
 - **[Slack](https://slack.flyte.org/)** | **[GitHub Discussions](https://github.com/flyteorg/flyte/discussions)** | **[Issues](https://github.com/flyteorg/flyte/issues)**
 
 ## Contributing
