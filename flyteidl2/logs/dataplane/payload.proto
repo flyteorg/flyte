@@ -98,8 +98,7 @@ enum LogLineOriginator {
   SYSTEM = 2;
 }
 
-// Which of the two backends a batch of lines was read from. Distinct from LogsSource, which
-// selects what a request asks for; this reports what a response actually carries.
+// By default we use live log, and it will fall back to persisted if live logs not available
 enum LogLineSource {
   LOG_LINE_SOURCE_UNSPECIFIED = 0;
 
@@ -119,6 +118,11 @@ message LogLine {
   string message = 2;
 
   LogLineOriginator originator = 3;
+
+  // Last few characters of the pod name this line came from. Enough to tell replicas apart
+  // per line without repeating the full generated name. Empty when the source cannot
+  // attribute the line to a pod.
+  string short_pod_name = 4;
 }
 
 message LogLines {

@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package flyteidl2.artifact;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/artifact/artifact.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/list.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/artifact";
+
+// ArtifactService provides a minimal interface for publishing and retrieving
+// typed artifacts.
+service ArtifactService {
+  // Create a new artifact version.
+  rpc CreateArtifact(CreateArtifactRequest) returns (CreateArtifactResponse) {}
+
+  // Get a single artifact by name and version.
+  rpc GetArtifact(GetArtifactRequest) returns (GetArtifactResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // List artifacts within a project, optionally filtered by name.
+  rpc ListArtifacts(ListArtifactsRequest) returns (ListArtifactsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // List distinct artifact names within a project, one entry per name carrying
+  // the latest version's full record and the total version count. Ordered by
+  // the latest version's creation time, newest first.
+  rpc ListArtifactNames(ListArtifactNamesRequest) returns (ListArtifactNamesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+// request message for creating an artifact.
+message CreateArtifactRequest {
+  // Fully qualified id (name + version) for the new artifact version.
+  ArtifactIdentifier artifact_id = 1 [(buf.validate.field).required = true];
+
+  // Specification of the artifact.
+  ArtifactSpec spec = 2 [(buf.validate.field).required = true];
+}
+
+// response message for creating an artifact.
+message CreateArtifactResponse {
+  // The artifact as persisted.
+  Artifact artifact = 1;
+}
+
+// request message for getting an artifact.
+message GetArtifactRequest {
+  // Name of the artifact.
+  ArtifactName name = 1 [(buf.validate.field).required = true];
+
+  // Version to fetch. When unset or set to "latest", the most recently
+  // created version is returned.
+  optional string version = 2 [(buf.validate.field).string.max_len = 255];
+}
+
+// response message for getting an artifact.
+message GetArtifactResponse {
+  Artifact artifact = 1;
+}
+
+// request message for listing artifacts.
+message ListArtifactsRequest {
+  // Common list request parameters (limit, token, filters).
+  // Supported filters: field "name" with CONTAINS,
+  // field "created_at" with GREATER_THAN (RFC3339 timestamp value).
+  common.ListRequest request = 1;
+
+  // Project scope for the listing. organization is stamped by the server.
+  common.ProjectIdentifier project_id = 2 [(buf.validate.field).required = true];
+
+  // Optional exact name; when set, lists all versions of that artifact,
+  // newest first.
+  optional string name = 3 [(buf.validate.field).string.max_len = 255];
+}
+
+// response message for listing artifacts.
+message ListArtifactsResponse {
+  repeated Artifact artifacts = 1;
+
+  // Pagination token for the next page; empty when exhausted.
+  string token = 2;
+}
+
+// request message for listing distinct artifact names.
+message ListArtifactNamesRequest {
+  // Common list request parameters (limit, token, filters).
+  // Supported filters: field "name" with CONTAINS.
+  common.ListRequest request = 1;
+
+  // Project scope for the listing. organization is stamped by the server.
+  common.ProjectIdentifier project_id = 2 [(buf.validate.field).required = true];
+}
+
+// One distinct artifact name: the latest version's full record plus the
+// total number of versions published under the name.
+message ArtifactGroup {
+  // The most recently created version of the artifact.
+  Artifact latest = 1;
+
+  // Total number of versions published under this name.
+  uint64 versions = 2;
+}
+
+// response message for listing distinct artifact names.
+message ListArtifactNamesResponse {
+  repeated ArtifactGroup groups = 1;
+
+  // Pagination token for the next page; empty when exhausted.
+  string token = 2;
+}

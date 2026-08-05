@@ -795,6 +795,24 @@
       },
       "title": "Only valid for triggers"
     },
+    "coreArtifactCard": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "URI of the uploaded card content."
+        },
+        "format": {
+          "type": "string",
+          "description": "Format of the card, e.g. html, md, json, yaml, csv, tsv, png, jpg, jpeg."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of the card, e.g. model, data, generic."
+        }
+      },
+      "description": "Reference to a previously uploaded card (model/data card) describing an\nartifact."
+    },
     "coreArtifactID": {
       "type": "object",
       "properties": {
@@ -813,6 +831,27 @@
           "description": "There is no such thing as an empty time partition - if it's not set, then there is no time partition."
         }
       }
+    },
+    "coreArtifactInfo": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Optional human readable description."
+        },
+        "user_metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Free-form, user-supplied key/value metadata."
+        },
+        "card": {
+          "$ref": "#/definitions/coreArtifactCard",
+          "description": "Optional card describing this artifact."
+        }
+      },
+      "description": "Descriptive payload of an artifact — shared by the production declaration\n(task.ProducedArtifact) and the stored spec (artifact.ArtifactSpec).\nDeliberately excludes identity (name/version): identity lives in\nArtifactIdentifier / the declaration, so it can never drift against this."
     },
     "coreArtifactKey": {
       "type": "object",
@@ -842,6 +881,18 @@
           "$ref": "#/definitions/coreLabelValue"
         }
       }
+    },
+    "coreArtifactVersionId": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/coreArtifactKey"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "description": "Identity of one artifact version. Unlike the legacy ArtifactID below, this\ncarries no partition machinery — it is the minimal identity stamped onto\nvalues (core.Literal.artifact_id) and referenced by v2 artifact APIs."
     },
     "coreBackoff": {
       "type": "object",
@@ -1239,6 +1290,10 @@
             "type": "string"
           },
           "description": "Additional metadata for literals."
+        },
+        "artifact_id": {
+          "$ref": "#/definitions/coreArtifactVersionId",
+          "description": "Identity of the artifact this value is / came from. Set once at artifact\nregistration (and by clients when binding a fetched artifact as an input);\nit travels with the value through every copy. Participates in cache-key\nhashing by design: two versions of an artifact are distinct inputs even\nwhen their bytes coincide."
         }
       },
       "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."
@@ -2324,6 +2379,10 @@
         "timeouts": {
           "$ref": "#/definitions/coreTimeoutStrategy",
           "description": "Additional timeout bounds (queued_timeout, deadline) layered on top of\nthe per-attempt RUNNING-phase bound expressed by `timeout` (field 4).\nEach bound is independently optional; an unspecified bound is unlimited."
+        },
+        "produces_artifacts": {
+          "type": "boolean",
+          "description": "If true, the backend extracts artifact metadata stamped on this task's\noutput literals and records them as generated artifacts on the action."
         }
       },
       "title": "Task Metadata"
@@ -2416,9 +2475,43 @@
             "$ref": "#/definitions/taskNamedLiteral"
           },
           "description": "Ordered outputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move."
+        },
+        "produced_artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/taskProducedArtifact"
+          },
+          "description": "Artifact registration declarations for outputs wrapped as artifacts by the\nproducing task. Field 3 (not 2) on purpose: outputs.pb blobs are sometimes\ncross-decoded as task.Inputs, where field 2 is `context`; field 3 is unused\nthere, so this never aliases."
         }
       },
       "description": "Output payload for an action."
+    },
+    "taskProducedArtifact": {
+      "type": "object",
+      "properties": {
+        "output": {
+          "type": "string",
+          "description": "Name of the NamedLiteral in Outputs.literals this declaration refers to."
+        },
+        "name": {
+          "type": "string",
+          "description": "Artifact name to register under."
+        },
+        "version": {
+          "type": "string",
+          "description": "Optional explicit version. Empty means the backend derives one\n(\u003crun\u003e-\u003caction\u003e-\u003cattempt\u003e)."
+        },
+        "info": {
+          "$ref": "#/definitions/coreArtifactInfo",
+          "description": "Descriptive payload, copied verbatim into ArtifactSpec.info."
+        },
+        "type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "The declared Flyte type of the output, copied into ArtifactSpec.type.\nThe producing SDK is authoritative for this."
+        }
+      },
+      "description": "Declares that a named output of the producing action is a new artifact\nversion. The output's literal (in Outputs.literals) is the artifact's value;\norg/project/domain come from the producing action's scope at registration."
     }
   }
 }
