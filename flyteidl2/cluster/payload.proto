@@ -34,10 +34,10 @@ message SelectClusterRequest {
     OPERATION_USE_SECRETS = 8;
     OPERATION_UPLOAD_TRIGGER = 9;
     OPERATION_GET_IMAGE = 10;
-    // Data operations (uploads/reads/download links) for traced runs. Routes to a dataplane
+    // Data operations (uploads/reads/download links) for tracked runs. Routes to a dataplane
     // only when the org's clusters are all directly reachable (zero trust); otherwise the
     // server answers with its own endpoint and serves these from control-plane storage.
-    OPERATION_TRACED_RUN_DATA = 11;
+    OPERATION_TRACKED_RUN_DATA = 11;
   }
 
   Operation operation = 8 [(buf.validate.field).enum = {
@@ -50,6 +50,6 @@ message SelectClusterResponse {
 
   // Name of the cluster the endpoint belongs to. Empty when the request was routed to the
   // control plane's own endpoint. Clients that persist where an artifact was written (e.g.
-  // traced-run reporters stamping the attempt's cluster) use this to make reads routable later.
+  // tracked-run reporters stamping the attempt's cluster) use this to make reads routable later.
   string cluster = 2;
 }

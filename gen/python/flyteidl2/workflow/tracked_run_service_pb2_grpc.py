@@ -3,20 +3,20 @@
 import grpc
 
 from flyteidl2.workflow import run_service_pb2 as flyteidl2_dot_workflow_dot_run__service__pb2
-from flyteidl2.workflow import traced_run_service_pb2 as flyteidl2_dot_workflow_dot_traced__run__service__pb2
+from flyteidl2.workflow import tracked_run_service_pb2 as flyteidl2_dot_workflow_dot_tracked__run__service__pb2
 
 
-class TracedRunServiceStub(object):
-    """TracedRunService records runs that are orchestrated OUTSIDE the platform: the client executes
+class TrackedRunServiceStub(object):
+    """TrackedRunService records runs that are orchestrated OUTSIDE the platform: the client executes
     the work itself — on a laptop, in CI, inside an agent framework — and reports the resulting
     action tree here. The platform never schedules these runs and no dataplane is involved; it
     stores what it is told and streams it back.
 
-    Traced runs are tracked separately from platform-orchestrated runs so that reported,
+    Tracked runs are tracked separately from platform-orchestrated runs so that reported,
     client-supplied state can never be mistaken for execution state the platform owns.
 
     The read/watch surface deliberately mirrors RunService (same request/response messages) so that
-    clients and UIs built against RunService work against traced runs with only a service swap.
+    clients and UIs built against RunService work against tracked runs with only a service swap.
     """
 
     def __init__(self, channel):
@@ -26,77 +26,77 @@ class TracedRunServiceStub(object):
             channel: A grpc.Channel.
         """
         self.CreateRun = channel.unary_unary(
-                '/flyteidl2.workflow.TracedRunService/CreateRun',
-                request_serializer=flyteidl2_dot_workflow_dot_traced__run__service__pb2.CreateTracedRunRequest.SerializeToString,
+                '/flyteidl2.workflow.TrackedRunService/CreateRun',
+                request_serializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.CreateTrackedRunRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.CreateRunResponse.FromString,
                 )
         self.ReportActions = channel.unary_unary(
-                '/flyteidl2.workflow.TracedRunService/ReportActions',
-                request_serializer=flyteidl2_dot_workflow_dot_traced__run__service__pb2.ReportTracedActionsRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_workflow_dot_traced__run__service__pb2.ReportTracedActionsResponse.FromString,
+                '/flyteidl2.workflow.TrackedRunService/ReportActions',
+                request_serializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.ReportTrackedActionsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.ReportTrackedActionsResponse.FromString,
                 )
         self.GetRunDetails = channel.unary_unary(
-                '/flyteidl2.workflow.TracedRunService/GetRunDetails',
+                '/flyteidl2.workflow.TrackedRunService/GetRunDetails',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetRunDetailsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetRunDetailsResponse.FromString,
                 )
         self.WatchRunDetails = channel.unary_stream(
-                '/flyteidl2.workflow.TracedRunService/WatchRunDetails',
+                '/flyteidl2.workflow.TrackedRunService/WatchRunDetails',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunDetailsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunDetailsResponse.FromString,
                 )
         self.GetActionDetails = channel.unary_unary(
-                '/flyteidl2.workflow.TracedRunService/GetActionDetails',
+                '/flyteidl2.workflow.TrackedRunService/GetActionDetails',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDetailsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDetailsResponse.FromString,
                 )
         self.WatchActionDetails = channel.unary_stream(
-                '/flyteidl2.workflow.TracedRunService/WatchActionDetails',
+                '/flyteidl2.workflow.TrackedRunService/WatchActionDetails',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsResponse.FromString,
                 )
         self.ListRuns = channel.unary_unary(
-                '/flyteidl2.workflow.TracedRunService/ListRuns',
+                '/flyteidl2.workflow.TrackedRunService/ListRuns',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsResponse.FromString,
                 )
         self.WatchRuns = channel.unary_stream(
-                '/flyteidl2.workflow.TracedRunService/WatchRuns',
+                '/flyteidl2.workflow.TrackedRunService/WatchRuns',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunsResponse.FromString,
                 )
         self.ListActions = channel.unary_unary(
-                '/flyteidl2.workflow.TracedRunService/ListActions',
+                '/flyteidl2.workflow.TrackedRunService/ListActions',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.ListActionsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.ListActionsResponse.FromString,
                 )
         self.WatchActions = channel.unary_stream(
-                '/flyteidl2.workflow.TracedRunService/WatchActions',
+                '/flyteidl2.workflow.TrackedRunService/WatchActions',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse.FromString,
                 )
         self.AbortRun = channel.unary_unary(
-                '/flyteidl2.workflow.TracedRunService/AbortRun',
+                '/flyteidl2.workflow.TrackedRunService/AbortRun',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse.FromString,
                 )
 
 
-class TracedRunServiceServicer(object):
-    """TracedRunService records runs that are orchestrated OUTSIDE the platform: the client executes
+class TrackedRunServiceServicer(object):
+    """TrackedRunService records runs that are orchestrated OUTSIDE the platform: the client executes
     the work itself — on a laptop, in CI, inside an agent framework — and reports the resulting
     action tree here. The platform never schedules these runs and no dataplane is involved; it
     stores what it is told and streams it back.
 
-    Traced runs are tracked separately from platform-orchestrated runs so that reported,
+    Tracked runs are tracked separately from platform-orchestrated runs so that reported,
     client-supplied state can never be mistaken for execution state the platform owns.
 
     The read/watch surface deliberately mirrors RunService (same request/response messages) so that
-    clients and UIs built against RunService work against traced runs with only a service swap.
+    clients and UIs built against RunService work against tracked runs with only a service swap.
     """
 
     def CreateRun(self, request, context):
-        """Register a new traced run. The server creates the root action ("a0") in the reported state and
+        """Register a new tracked run. The server creates the root action ("a0") in the reported state and
         returns the resolved run. If a run name is not provided, the server generates one.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -104,7 +104,7 @@ class TracedRunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def ReportActions(self, request, context):
-        """Report state for one or more actions of a traced run. Creates actions on first report and
+        """Report state for one or more actions of a tracked run. Creates actions on first report and
         updates them on subsequent reports. Reports are idempotent: an event with an
         (attempt, version, phase) tuple that was already recorded is acknowledged as success.
         """
@@ -113,14 +113,14 @@ class TracedRunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def GetRunDetails(self, request, context):
-        """Get detailed information about a traced run.
+        """Get detailed information about a tracked run.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def WatchRunDetails(self, request, context):
-        """Stream detailed information updates about a traced run. The call will terminate when the run
+        """Stream detailed information updates about a tracked run. The call will terminate when the run
         reaches a terminal phase.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -128,14 +128,14 @@ class TracedRunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def GetActionDetails(self, request, context):
-        """Get detailed information about an action of a traced run.
+        """Get detailed information about an action of a tracked run.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def WatchActionDetails(self, request, context):
-        """Stream detailed information updates about an action of a traced run. The call will terminate
+        """Stream detailed information updates about an action of a tracked run. The call will terminate
         when the action reaches a terminal phase.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -143,35 +143,35 @@ class TracedRunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def ListRuns(self, request, context):
-        """List traced runs based on the provided filter criteria.
+        """List tracked runs based on the provided filter criteria.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def WatchRuns(self, request, context):
-        """Stream updates for traced runs based on the provided filter criteria.
+        """Stream updates for tracked runs based on the provided filter criteria.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def ListActions(self, request, context):
-        """List all actions for a given traced run.
+        """List all actions for a given tracked run.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def WatchActions(self, request, context):
-        """Stream updates for actions of a given traced run.
+        """Stream updates for actions of a given tracked run.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def AbortRun(self, request, context):
-        """Abort a traced run: mark the run and all of its non-terminal actions ABORTED on the server.
+        """Abort a tracked run: mark the run and all of its non-terminal actions ABORTED on the server.
         The platform cannot stop the client that owns the run; subsequent reports against aborted actions
         are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
         """
@@ -180,17 +180,17 @@ class TracedRunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_TracedRunServiceServicer_to_server(servicer, server):
+def add_TrackedRunServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'CreateRun': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateRun,
-                    request_deserializer=flyteidl2_dot_workflow_dot_traced__run__service__pb2.CreateTracedRunRequest.FromString,
+                    request_deserializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.CreateTrackedRunRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.CreateRunResponse.SerializeToString,
             ),
             'ReportActions': grpc.unary_unary_rpc_method_handler(
                     servicer.ReportActions,
-                    request_deserializer=flyteidl2_dot_workflow_dot_traced__run__service__pb2.ReportTracedActionsRequest.FromString,
-                    response_serializer=flyteidl2_dot_workflow_dot_traced__run__service__pb2.ReportTracedActionsResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.ReportTrackedActionsRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.ReportTrackedActionsResponse.SerializeToString,
             ),
             'GetRunDetails': grpc.unary_unary_rpc_method_handler(
                     servicer.GetRunDetails,
@@ -239,22 +239,22 @@ def add_TracedRunServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl2.workflow.TracedRunService', rpc_method_handlers)
+            'flyteidl2.workflow.TrackedRunService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class TracedRunService(object):
-    """TracedRunService records runs that are orchestrated OUTSIDE the platform: the client executes
+class TrackedRunService(object):
+    """TrackedRunService records runs that are orchestrated OUTSIDE the platform: the client executes
     the work itself — on a laptop, in CI, inside an agent framework — and reports the resulting
     action tree here. The platform never schedules these runs and no dataplane is involved; it
     stores what it is told and streams it back.
 
-    Traced runs are tracked separately from platform-orchestrated runs so that reported,
+    Tracked runs are tracked separately from platform-orchestrated runs so that reported,
     client-supplied state can never be mistaken for execution state the platform owns.
 
     The read/watch surface deliberately mirrors RunService (same request/response messages) so that
-    clients and UIs built against RunService work against traced runs with only a service swap.
+    clients and UIs built against RunService work against tracked runs with only a service swap.
     """
 
     @staticmethod
@@ -268,8 +268,8 @@ class TracedRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TracedRunService/CreateRun',
-            flyteidl2_dot_workflow_dot_traced__run__service__pb2.CreateTracedRunRequest.SerializeToString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TrackedRunService/CreateRun',
+            flyteidl2_dot_workflow_dot_tracked__run__service__pb2.CreateTrackedRunRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.CreateRunResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
@@ -285,9 +285,9 @@ class TracedRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TracedRunService/ReportActions',
-            flyteidl2_dot_workflow_dot_traced__run__service__pb2.ReportTracedActionsRequest.SerializeToString,
-            flyteidl2_dot_workflow_dot_traced__run__service__pb2.ReportTracedActionsResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TrackedRunService/ReportActions',
+            flyteidl2_dot_workflow_dot_tracked__run__service__pb2.ReportTrackedActionsRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_tracked__run__service__pb2.ReportTrackedActionsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -302,7 +302,7 @@ class TracedRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TracedRunService/GetRunDetails',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TrackedRunService/GetRunDetails',
             flyteidl2_dot_workflow_dot_run__service__pb2.GetRunDetailsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.GetRunDetailsResponse.FromString,
             options, channel_credentials,
@@ -319,7 +319,7 @@ class TracedRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.TracedRunService/WatchRunDetails',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.TrackedRunService/WatchRunDetails',
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunDetailsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunDetailsResponse.FromString,
             options, channel_credentials,
@@ -336,7 +336,7 @@ class TracedRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TracedRunService/GetActionDetails',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TrackedRunService/GetActionDetails',
             flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDetailsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDetailsResponse.FromString,
             options, channel_credentials,
@@ -353,7 +353,7 @@ class TracedRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.TracedRunService/WatchActionDetails',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.TrackedRunService/WatchActionDetails',
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsResponse.FromString,
             options, channel_credentials,
@@ -370,7 +370,7 @@ class TracedRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TracedRunService/ListRuns',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TrackedRunService/ListRuns',
             flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsResponse.FromString,
             options, channel_credentials,
@@ -387,7 +387,7 @@ class TracedRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.TracedRunService/WatchRuns',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.TrackedRunService/WatchRuns',
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunsResponse.FromString,
             options, channel_credentials,
@@ -404,7 +404,7 @@ class TracedRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TracedRunService/ListActions',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TrackedRunService/ListActions',
             flyteidl2_dot_workflow_dot_run__service__pb2.ListActionsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.ListActionsResponse.FromString,
             options, channel_credentials,
@@ -421,7 +421,7 @@ class TracedRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.TracedRunService/WatchActions',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.TrackedRunService/WatchActions',
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse.FromString,
             options, channel_credentials,
@@ -438,7 +438,7 @@ class TracedRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TracedRunService/AbortRun',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TrackedRunService/AbortRun',
             flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse.FromString,
             options, channel_credentials,

@@ -3803,15 +3803,15 @@ pub mod run_service_server {
     }
 }
 /// Generated client implementations.
-pub mod traced_run_service_client {
+pub mod tracked_run_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
-    pub struct TracedRunServiceClient<T> {
+    pub struct TrackedRunServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl TracedRunServiceClient<tonic::transport::Channel> {
+    impl TrackedRunServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -3822,7 +3822,7 @@ pub mod traced_run_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> TracedRunServiceClient<T>
+    impl<T> TrackedRunServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -3840,7 +3840,7 @@ pub mod traced_run_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> TracedRunServiceClient<InterceptedService<T, F>>
+        ) -> TrackedRunServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
@@ -3854,7 +3854,7 @@ pub mod traced_run_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            TracedRunServiceClient::new(InterceptedService::new(inner, interceptor))
+            TrackedRunServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with the given encoding.
         ///
@@ -3889,7 +3889,7 @@ pub mod traced_run_service_client {
         }
         pub async fn create_run(
             &mut self,
-            request: impl tonic::IntoRequest<super::CreateTracedRunRequest>,
+            request: impl tonic::IntoRequest<super::CreateTrackedRunRequest>,
         ) -> std::result::Result<
             tonic::Response<super::CreateRunResponse>,
             tonic::Status,
@@ -3905,20 +3905,20 @@ pub mod traced_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.TracedRunService/CreateRun",
+                "/flyteidl2.workflow.TrackedRunService/CreateRun",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("flyteidl2.workflow.TracedRunService", "CreateRun"),
+                    GrpcMethod::new("flyteidl2.workflow.TrackedRunService", "CreateRun"),
                 );
             self.inner.unary(req, path, codec).await
         }
         pub async fn report_actions(
             &mut self,
-            request: impl tonic::IntoRequest<super::ReportTracedActionsRequest>,
+            request: impl tonic::IntoRequest<super::ReportTrackedActionsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::ReportTracedActionsResponse>,
+            tonic::Response<super::ReportTrackedActionsResponse>,
             tonic::Status,
         > {
             self.inner
@@ -3932,13 +3932,13 @@ pub mod traced_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.TracedRunService/ReportActions",
+                "/flyteidl2.workflow.TrackedRunService/ReportActions",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.workflow.TracedRunService",
+                        "flyteidl2.workflow.TrackedRunService",
                         "ReportActions",
                     ),
                 );
@@ -3962,13 +3962,13 @@ pub mod traced_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.TracedRunService/GetRunDetails",
+                "/flyteidl2.workflow.TrackedRunService/GetRunDetails",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.workflow.TracedRunService",
+                        "flyteidl2.workflow.TrackedRunService",
                         "GetRunDetails",
                     ),
                 );
@@ -3992,13 +3992,13 @@ pub mod traced_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.TracedRunService/WatchRunDetails",
+                "/flyteidl2.workflow.TrackedRunService/WatchRunDetails",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.workflow.TracedRunService",
+                        "flyteidl2.workflow.TrackedRunService",
                         "WatchRunDetails",
                     ),
                 );
@@ -4022,13 +4022,13 @@ pub mod traced_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.TracedRunService/GetActionDetails",
+                "/flyteidl2.workflow.TrackedRunService/GetActionDetails",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.workflow.TracedRunService",
+                        "flyteidl2.workflow.TrackedRunService",
                         "GetActionDetails",
                     ),
                 );
@@ -4052,13 +4052,13 @@ pub mod traced_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.TracedRunService/WatchActionDetails",
+                "/flyteidl2.workflow.TrackedRunService/WatchActionDetails",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.workflow.TracedRunService",
+                        "flyteidl2.workflow.TrackedRunService",
                         "WatchActionDetails",
                     ),
                 );
@@ -4082,12 +4082,12 @@ pub mod traced_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.TracedRunService/ListRuns",
+                "/flyteidl2.workflow.TrackedRunService/ListRuns",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("flyteidl2.workflow.TracedRunService", "ListRuns"),
+                    GrpcMethod::new("flyteidl2.workflow.TrackedRunService", "ListRuns"),
                 );
             self.inner.unary(req, path, codec).await
         }
@@ -4109,12 +4109,12 @@ pub mod traced_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.TracedRunService/WatchRuns",
+                "/flyteidl2.workflow.TrackedRunService/WatchRuns",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("flyteidl2.workflow.TracedRunService", "WatchRuns"),
+                    GrpcMethod::new("flyteidl2.workflow.TrackedRunService", "WatchRuns"),
                 );
             self.inner.server_streaming(req, path, codec).await
         }
@@ -4136,12 +4136,15 @@ pub mod traced_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.TracedRunService/ListActions",
+                "/flyteidl2.workflow.TrackedRunService/ListActions",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("flyteidl2.workflow.TracedRunService", "ListActions"),
+                    GrpcMethod::new(
+                        "flyteidl2.workflow.TrackedRunService",
+                        "ListActions",
+                    ),
                 );
             self.inner.unary(req, path, codec).await
         }
@@ -4163,13 +4166,13 @@ pub mod traced_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.TracedRunService/WatchActions",
+                "/flyteidl2.workflow.TrackedRunService/WatchActions",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
-                        "flyteidl2.workflow.TracedRunService",
+                        "flyteidl2.workflow.TrackedRunService",
                         "WatchActions",
                     ),
                 );
@@ -4193,36 +4196,36 @@ pub mod traced_run_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl2.workflow.TracedRunService/AbortRun",
+                "/flyteidl2.workflow.TrackedRunService/AbortRun",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("flyteidl2.workflow.TracedRunService", "AbortRun"),
+                    GrpcMethod::new("flyteidl2.workflow.TrackedRunService", "AbortRun"),
                 );
             self.inner.unary(req, path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod traced_run_service_server {
+pub mod tracked_run_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with TracedRunServiceServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with TrackedRunServiceServer.
     #[async_trait]
-    pub trait TracedRunService: Send + Sync + 'static {
+    pub trait TrackedRunService: Send + Sync + 'static {
         async fn create_run(
             &self,
-            request: tonic::Request<super::CreateTracedRunRequest>,
+            request: tonic::Request<super::CreateTrackedRunRequest>,
         ) -> std::result::Result<
             tonic::Response<super::CreateRunResponse>,
             tonic::Status,
         >;
         async fn report_actions(
             &self,
-            request: tonic::Request<super::ReportTracedActionsRequest>,
+            request: tonic::Request<super::ReportTrackedActionsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::ReportTracedActionsResponse>,
+            tonic::Response<super::ReportTrackedActionsResponse>,
             tonic::Status,
         >;
         async fn get_run_details(
@@ -4314,14 +4317,14 @@ pub mod traced_run_service_server {
         >;
     }
     #[derive(Debug)]
-    pub struct TracedRunServiceServer<T: TracedRunService> {
+    pub struct TrackedRunServiceServer<T: TrackedRunService> {
         inner: Arc<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
         max_decoding_message_size: Option<usize>,
         max_encoding_message_size: Option<usize>,
     }
-    impl<T: TracedRunService> TracedRunServiceServer<T> {
+    impl<T: TrackedRunService> TrackedRunServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -4372,9 +4375,9 @@ pub mod traced_run_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for TracedRunServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for TrackedRunServiceServer<T>
     where
-        T: TracedRunService,
+        T: TrackedRunService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -4389,12 +4392,12 @@ pub mod traced_run_service_server {
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             match req.uri().path() {
-                "/flyteidl2.workflow.TracedRunService/CreateRun" => {
+                "/flyteidl2.workflow.TrackedRunService/CreateRun" => {
                     #[allow(non_camel_case_types)]
-                    struct CreateRunSvc<T: TracedRunService>(pub Arc<T>);
+                    struct CreateRunSvc<T: TrackedRunService>(pub Arc<T>);
                     impl<
-                        T: TracedRunService,
-                    > tonic::server::UnaryService<super::CreateTracedRunRequest>
+                        T: TrackedRunService,
+                    > tonic::server::UnaryService<super::CreateTrackedRunRequest>
                     for CreateRunSvc<T> {
                         type Response = super::CreateRunResponse;
                         type Future = BoxFuture<
@@ -4403,11 +4406,11 @@ pub mod traced_run_service_server {
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::CreateTracedRunRequest>,
+                            request: tonic::Request<super::CreateTrackedRunRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as TracedRunService>::create_run(&inner, request).await
+                                <T as TrackedRunService>::create_run(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -4434,25 +4437,25 @@ pub mod traced_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.TracedRunService/ReportActions" => {
+                "/flyteidl2.workflow.TrackedRunService/ReportActions" => {
                     #[allow(non_camel_case_types)]
-                    struct ReportActionsSvc<T: TracedRunService>(pub Arc<T>);
+                    struct ReportActionsSvc<T: TrackedRunService>(pub Arc<T>);
                     impl<
-                        T: TracedRunService,
-                    > tonic::server::UnaryService<super::ReportTracedActionsRequest>
+                        T: TrackedRunService,
+                    > tonic::server::UnaryService<super::ReportTrackedActionsRequest>
                     for ReportActionsSvc<T> {
-                        type Response = super::ReportTracedActionsResponse;
+                        type Response = super::ReportTrackedActionsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::ReportTracedActionsRequest>,
+                            request: tonic::Request<super::ReportTrackedActionsRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as TracedRunService>::report_actions(&inner, request)
+                                <T as TrackedRunService>::report_actions(&inner, request)
                                     .await
                             };
                             Box::pin(fut)
@@ -4480,11 +4483,11 @@ pub mod traced_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.TracedRunService/GetRunDetails" => {
+                "/flyteidl2.workflow.TrackedRunService/GetRunDetails" => {
                     #[allow(non_camel_case_types)]
-                    struct GetRunDetailsSvc<T: TracedRunService>(pub Arc<T>);
+                    struct GetRunDetailsSvc<T: TrackedRunService>(pub Arc<T>);
                     impl<
-                        T: TracedRunService,
+                        T: TrackedRunService,
                     > tonic::server::UnaryService<super::GetRunDetailsRequest>
                     for GetRunDetailsSvc<T> {
                         type Response = super::GetRunDetailsResponse;
@@ -4498,7 +4501,7 @@ pub mod traced_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as TracedRunService>::get_run_details(&inner, request)
+                                <T as TrackedRunService>::get_run_details(&inner, request)
                                     .await
                             };
                             Box::pin(fut)
@@ -4526,11 +4529,11 @@ pub mod traced_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.TracedRunService/WatchRunDetails" => {
+                "/flyteidl2.workflow.TrackedRunService/WatchRunDetails" => {
                     #[allow(non_camel_case_types)]
-                    struct WatchRunDetailsSvc<T: TracedRunService>(pub Arc<T>);
+                    struct WatchRunDetailsSvc<T: TrackedRunService>(pub Arc<T>);
                     impl<
-                        T: TracedRunService,
+                        T: TrackedRunService,
                     > tonic::server::ServerStreamingService<
                         super::WatchRunDetailsRequest,
                     > for WatchRunDetailsSvc<T> {
@@ -4546,7 +4549,7 @@ pub mod traced_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as TracedRunService>::watch_run_details(&inner, request)
+                                <T as TrackedRunService>::watch_run_details(&inner, request)
                                     .await
                             };
                             Box::pin(fut)
@@ -4574,11 +4577,11 @@ pub mod traced_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.TracedRunService/GetActionDetails" => {
+                "/flyteidl2.workflow.TrackedRunService/GetActionDetails" => {
                     #[allow(non_camel_case_types)]
-                    struct GetActionDetailsSvc<T: TracedRunService>(pub Arc<T>);
+                    struct GetActionDetailsSvc<T: TrackedRunService>(pub Arc<T>);
                     impl<
-                        T: TracedRunService,
+                        T: TrackedRunService,
                     > tonic::server::UnaryService<super::GetActionDetailsRequest>
                     for GetActionDetailsSvc<T> {
                         type Response = super::GetActionDetailsResponse;
@@ -4592,7 +4595,10 @@ pub mod traced_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as TracedRunService>::get_action_details(&inner, request)
+                                <T as TrackedRunService>::get_action_details(
+                                        &inner,
+                                        request,
+                                    )
                                     .await
                             };
                             Box::pin(fut)
@@ -4620,11 +4626,11 @@ pub mod traced_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.TracedRunService/WatchActionDetails" => {
+                "/flyteidl2.workflow.TrackedRunService/WatchActionDetails" => {
                     #[allow(non_camel_case_types)]
-                    struct WatchActionDetailsSvc<T: TracedRunService>(pub Arc<T>);
+                    struct WatchActionDetailsSvc<T: TrackedRunService>(pub Arc<T>);
                     impl<
-                        T: TracedRunService,
+                        T: TrackedRunService,
                     > tonic::server::ServerStreamingService<
                         super::WatchActionDetailsRequest,
                     > for WatchActionDetailsSvc<T> {
@@ -4640,7 +4646,7 @@ pub mod traced_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as TracedRunService>::watch_action_details(
+                                <T as TrackedRunService>::watch_action_details(
                                         &inner,
                                         request,
                                     )
@@ -4671,11 +4677,11 @@ pub mod traced_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.TracedRunService/ListRuns" => {
+                "/flyteidl2.workflow.TrackedRunService/ListRuns" => {
                     #[allow(non_camel_case_types)]
-                    struct ListRunsSvc<T: TracedRunService>(pub Arc<T>);
+                    struct ListRunsSvc<T: TrackedRunService>(pub Arc<T>);
                     impl<
-                        T: TracedRunService,
+                        T: TrackedRunService,
                     > tonic::server::UnaryService<super::ListRunsRequest>
                     for ListRunsSvc<T> {
                         type Response = super::ListRunsResponse;
@@ -4689,7 +4695,7 @@ pub mod traced_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as TracedRunService>::list_runs(&inner, request).await
+                                <T as TrackedRunService>::list_runs(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -4716,11 +4722,11 @@ pub mod traced_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.TracedRunService/WatchRuns" => {
+                "/flyteidl2.workflow.TrackedRunService/WatchRuns" => {
                     #[allow(non_camel_case_types)]
-                    struct WatchRunsSvc<T: TracedRunService>(pub Arc<T>);
+                    struct WatchRunsSvc<T: TrackedRunService>(pub Arc<T>);
                     impl<
-                        T: TracedRunService,
+                        T: TrackedRunService,
                     > tonic::server::ServerStreamingService<super::WatchRunsRequest>
                     for WatchRunsSvc<T> {
                         type Response = super::WatchRunsResponse;
@@ -4735,7 +4741,7 @@ pub mod traced_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as TracedRunService>::watch_runs(&inner, request).await
+                                <T as TrackedRunService>::watch_runs(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -4762,11 +4768,11 @@ pub mod traced_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.TracedRunService/ListActions" => {
+                "/flyteidl2.workflow.TrackedRunService/ListActions" => {
                     #[allow(non_camel_case_types)]
-                    struct ListActionsSvc<T: TracedRunService>(pub Arc<T>);
+                    struct ListActionsSvc<T: TrackedRunService>(pub Arc<T>);
                     impl<
-                        T: TracedRunService,
+                        T: TrackedRunService,
                     > tonic::server::UnaryService<super::ListActionsRequest>
                     for ListActionsSvc<T> {
                         type Response = super::ListActionsResponse;
@@ -4780,7 +4786,8 @@ pub mod traced_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as TracedRunService>::list_actions(&inner, request).await
+                                <T as TrackedRunService>::list_actions(&inner, request)
+                                    .await
                             };
                             Box::pin(fut)
                         }
@@ -4807,11 +4814,11 @@ pub mod traced_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.TracedRunService/WatchActions" => {
+                "/flyteidl2.workflow.TrackedRunService/WatchActions" => {
                     #[allow(non_camel_case_types)]
-                    struct WatchActionsSvc<T: TracedRunService>(pub Arc<T>);
+                    struct WatchActionsSvc<T: TrackedRunService>(pub Arc<T>);
                     impl<
-                        T: TracedRunService,
+                        T: TrackedRunService,
                     > tonic::server::ServerStreamingService<super::WatchActionsRequest>
                     for WatchActionsSvc<T> {
                         type Response = super::WatchActionsResponse;
@@ -4826,7 +4833,7 @@ pub mod traced_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as TracedRunService>::watch_actions(&inner, request)
+                                <T as TrackedRunService>::watch_actions(&inner, request)
                                     .await
                             };
                             Box::pin(fut)
@@ -4854,11 +4861,11 @@ pub mod traced_run_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl2.workflow.TracedRunService/AbortRun" => {
+                "/flyteidl2.workflow.TrackedRunService/AbortRun" => {
                     #[allow(non_camel_case_types)]
-                    struct AbortRunSvc<T: TracedRunService>(pub Arc<T>);
+                    struct AbortRunSvc<T: TrackedRunService>(pub Arc<T>);
                     impl<
-                        T: TracedRunService,
+                        T: TrackedRunService,
                     > tonic::server::UnaryService<super::AbortRunRequest>
                     for AbortRunSvc<T> {
                         type Response = super::AbortRunResponse;
@@ -4872,7 +4879,7 @@ pub mod traced_run_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as TracedRunService>::abort_run(&inner, request).await
+                                <T as TrackedRunService>::abort_run(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -4917,7 +4924,7 @@ pub mod traced_run_service_server {
             }
         }
     }
-    impl<T: TracedRunService> Clone for TracedRunServiceServer<T> {
+    impl<T: TrackedRunService> Clone for TrackedRunServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -4929,8 +4936,9 @@ pub mod traced_run_service_server {
             }
         }
     }
-    impl<T: TracedRunService> tonic::server::NamedService for TracedRunServiceServer<T> {
-        const NAME: &'static str = "flyteidl2.workflow.TracedRunService";
+    impl<T: TrackedRunService> tonic::server::NamedService
+    for TrackedRunServiceServer<T> {
+        const NAME: &'static str = "flyteidl2.workflow.TrackedRunService";
     }
 }
 /// Generated client implementations.
