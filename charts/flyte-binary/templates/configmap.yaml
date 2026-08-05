@@ -46,26 +46,6 @@ data:
           {{- with ( index .Values.configuration "co-pilot" ).image }}
           image: {{ printf "%s:%s" .repository .tag | quote }}
           {{- end }}
-          # Co-pilot reads the storage configuration from these objects, projected into
-          # its containers as files. Passing it on the command line instead would put the
-          # storage credentials into every task's pod spec, readable by anyone who can
-          # read pods. Only the storage keys are projected: co-pilot parses its config in
-          # strict mode and would fail on the other entries these objects carry.
-          storage-config:
-            mount-path: /etc/flyte/copilot
-            config-map-name: {{ include "flyte-binary.configuration.configMapName" . }}
-            config-map-keys:
-              - 003-storage.yaml
-            {{- if and (eq "s3" .Values.configuration.storage.provider) (eq "accesskey" .Values.configuration.storage.providerConfig.s3.authType) }}
-            {{- /*
-              Only named when the deployment actually renders credentials. With
-              authType=iam there is no 013-storage-secrets.yaml, and projecting a key that
-              was never written fails the mount for every task pod.
-            */}}
-            secret-name: {{ include "flyte-binary.configuration.configSecretName" . }}
-            secret-keys:
-              - 013-storage-secrets.yaml
-            {{- end }}
         # Env vars injected into every task pod, so it can reach the control plane
         # to enqueue child actions and watch their state.
         #
