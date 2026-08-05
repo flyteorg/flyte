@@ -1,8 +1,0 @@
-dotted-keys:
-  annotations:
-    cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
-    sidecar.istio.io/inject: "true"
-  plugins:
-    - name: KeepMyCase
-      annotations:
-        config.path: /etc/plugin
