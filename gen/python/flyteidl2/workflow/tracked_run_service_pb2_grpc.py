@@ -2,17 +2,21 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from flyteidl2.workflow import local_run_service_pb2 as flyteidl2_dot_workflow_dot_local__run__service__pb2
 from flyteidl2.workflow import run_service_pb2 as flyteidl2_dot_workflow_dot_run__service__pb2
+from flyteidl2.workflow import tracked_run_service_pb2 as flyteidl2_dot_workflow_dot_tracked__run__service__pb2
 
 
-class LocalRunServiceStub(object):
-    """LocalRunService manages runs that are orchestrated OUTSIDE the platform — typically on a user's
-    machine — where the client executes actions itself and only reports their state here. Local runs
-    are tracked separately from platform-orchestrated runs and never involve a dataplane.
+class TrackedRunServiceStub(object):
+    """TrackedRunService records runs that are orchestrated OUTSIDE the platform: the client executes
+    the work itself — on a laptop, in CI, inside an agent framework — and reports the resulting
+    action tree here. The platform never schedules these runs and no dataplane is involved; it
+    stores what it is told and streams it back.
+
+    Tracked runs are tracked separately from platform-orchestrated runs so that reported,
+    client-supplied state can never be mistaken for execution state the platform owns.
 
     The read/watch surface deliberately mirrors RunService (same request/response messages) so that
-    clients and UIs built against RunService work against local runs with only a service swap.
+    clients and UIs built against RunService work against tracked runs with only a service swap.
     """
 
     def __init__(self, channel):
@@ -22,73 +26,77 @@ class LocalRunServiceStub(object):
             channel: A grpc.Channel.
         """
         self.CreateRun = channel.unary_unary(
-                '/flyteidl2.workflow.LocalRunService/CreateRun',
-                request_serializer=flyteidl2_dot_workflow_dot_local__run__service__pb2.CreateLocalRunRequest.SerializeToString,
+                '/flyteidl2.workflow.TrackedRunService/CreateRun',
+                request_serializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.CreateTrackedRunRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.CreateRunResponse.FromString,
                 )
         self.ReportActions = channel.unary_unary(
-                '/flyteidl2.workflow.LocalRunService/ReportActions',
-                request_serializer=flyteidl2_dot_workflow_dot_local__run__service__pb2.ReportLocalActionsRequest.SerializeToString,
-                response_deserializer=flyteidl2_dot_workflow_dot_local__run__service__pb2.ReportLocalActionsResponse.FromString,
+                '/flyteidl2.workflow.TrackedRunService/ReportActions',
+                request_serializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.ReportTrackedActionsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.ReportTrackedActionsResponse.FromString,
                 )
         self.GetRunDetails = channel.unary_unary(
-                '/flyteidl2.workflow.LocalRunService/GetRunDetails',
+                '/flyteidl2.workflow.TrackedRunService/GetRunDetails',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetRunDetailsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetRunDetailsResponse.FromString,
                 )
         self.WatchRunDetails = channel.unary_stream(
-                '/flyteidl2.workflow.LocalRunService/WatchRunDetails',
+                '/flyteidl2.workflow.TrackedRunService/WatchRunDetails',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunDetailsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunDetailsResponse.FromString,
                 )
         self.GetActionDetails = channel.unary_unary(
-                '/flyteidl2.workflow.LocalRunService/GetActionDetails',
+                '/flyteidl2.workflow.TrackedRunService/GetActionDetails',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDetailsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDetailsResponse.FromString,
                 )
         self.WatchActionDetails = channel.unary_stream(
-                '/flyteidl2.workflow.LocalRunService/WatchActionDetails',
+                '/flyteidl2.workflow.TrackedRunService/WatchActionDetails',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsResponse.FromString,
                 )
         self.ListRuns = channel.unary_unary(
-                '/flyteidl2.workflow.LocalRunService/ListRuns',
+                '/flyteidl2.workflow.TrackedRunService/ListRuns',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsResponse.FromString,
                 )
         self.WatchRuns = channel.unary_stream(
-                '/flyteidl2.workflow.LocalRunService/WatchRuns',
+                '/flyteidl2.workflow.TrackedRunService/WatchRuns',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunsResponse.FromString,
                 )
         self.ListActions = channel.unary_unary(
-                '/flyteidl2.workflow.LocalRunService/ListActions',
+                '/flyteidl2.workflow.TrackedRunService/ListActions',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.ListActionsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.ListActionsResponse.FromString,
                 )
         self.WatchActions = channel.unary_stream(
-                '/flyteidl2.workflow.LocalRunService/WatchActions',
+                '/flyteidl2.workflow.TrackedRunService/WatchActions',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse.FromString,
                 )
         self.AbortRun = channel.unary_unary(
-                '/flyteidl2.workflow.LocalRunService/AbortRun',
+                '/flyteidl2.workflow.TrackedRunService/AbortRun',
                 request_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse.FromString,
                 )
 
 
-class LocalRunServiceServicer(object):
-    """LocalRunService manages runs that are orchestrated OUTSIDE the platform — typically on a user's
-    machine — where the client executes actions itself and only reports their state here. Local runs
-    are tracked separately from platform-orchestrated runs and never involve a dataplane.
+class TrackedRunServiceServicer(object):
+    """TrackedRunService records runs that are orchestrated OUTSIDE the platform: the client executes
+    the work itself — on a laptop, in CI, inside an agent framework — and reports the resulting
+    action tree here. The platform never schedules these runs and no dataplane is involved; it
+    stores what it is told and streams it back.
+
+    Tracked runs are tracked separately from platform-orchestrated runs so that reported,
+    client-supplied state can never be mistaken for execution state the platform owns.
 
     The read/watch surface deliberately mirrors RunService (same request/response messages) so that
-    clients and UIs built against RunService work against local runs with only a service swap.
+    clients and UIs built against RunService work against tracked runs with only a service swap.
     """
 
     def CreateRun(self, request, context):
-        """Register a new local run. The server creates the root action ("a0") in the reported state and
+        """Register a new tracked run. The server creates the root action ("a0") in the reported state and
         returns the resolved run. If a run name is not provided, the server generates one.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -96,7 +104,7 @@ class LocalRunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def ReportActions(self, request, context):
-        """Report state for one or more actions of a local run. Creates actions on first report and
+        """Report state for one or more actions of a tracked run. Creates actions on first report and
         updates them on subsequent reports. Reports are idempotent: an event with an
         (attempt, version, phase) tuple that was already recorded is acknowledged as success.
         """
@@ -105,14 +113,14 @@ class LocalRunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def GetRunDetails(self, request, context):
-        """Get detailed information about a local run.
+        """Get detailed information about a tracked run.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def WatchRunDetails(self, request, context):
-        """Stream detailed information updates about a local run. The call will terminate when the run
+        """Stream detailed information updates about a tracked run. The call will terminate when the run
         reaches a terminal phase.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -120,14 +128,14 @@ class LocalRunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def GetActionDetails(self, request, context):
-        """Get detailed information about an action of a local run.
+        """Get detailed information about an action of a tracked run.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def WatchActionDetails(self, request, context):
-        """Stream detailed information updates about an action of a local run. The call will terminate
+        """Stream detailed information updates about an action of a tracked run. The call will terminate
         when the action reaches a terminal phase.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -135,36 +143,36 @@ class LocalRunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def ListRuns(self, request, context):
-        """List local runs based on the provided filter criteria.
+        """List tracked runs based on the provided filter criteria.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def WatchRuns(self, request, context):
-        """Stream updates for local runs based on the provided filter criteria.
+        """Stream updates for tracked runs based on the provided filter criteria.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def ListActions(self, request, context):
-        """List all actions for a given local run.
+        """List all actions for a given tracked run.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def WatchActions(self, request, context):
-        """Stream updates for actions of a given local run.
+        """Stream updates for actions of a given tracked run.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def AbortRun(self, request, context):
-        """Abort a local run: mark the run and all of its non-terminal actions ABORTED on the server.
-        The platform cannot stop the local orchestrator; subsequent reports against aborted actions
+        """Abort a tracked run: mark the run and all of its non-terminal actions ABORTED on the server.
+        The platform cannot stop the client that owns the run; subsequent reports against aborted actions
         are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -172,17 +180,17 @@ class LocalRunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_LocalRunServiceServicer_to_server(servicer, server):
+def add_TrackedRunServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'CreateRun': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateRun,
-                    request_deserializer=flyteidl2_dot_workflow_dot_local__run__service__pb2.CreateLocalRunRequest.FromString,
+                    request_deserializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.CreateTrackedRunRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_run__service__pb2.CreateRunResponse.SerializeToString,
             ),
             'ReportActions': grpc.unary_unary_rpc_method_handler(
                     servicer.ReportActions,
-                    request_deserializer=flyteidl2_dot_workflow_dot_local__run__service__pb2.ReportLocalActionsRequest.FromString,
-                    response_serializer=flyteidl2_dot_workflow_dot_local__run__service__pb2.ReportLocalActionsResponse.SerializeToString,
+                    request_deserializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.ReportTrackedActionsRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_tracked__run__service__pb2.ReportTrackedActionsResponse.SerializeToString,
             ),
             'GetRunDetails': grpc.unary_unary_rpc_method_handler(
                     servicer.GetRunDetails,
@@ -231,18 +239,22 @@ def add_LocalRunServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl2.workflow.LocalRunService', rpc_method_handlers)
+            'flyteidl2.workflow.TrackedRunService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class LocalRunService(object):
-    """LocalRunService manages runs that are orchestrated OUTSIDE the platform — typically on a user's
-    machine — where the client executes actions itself and only reports their state here. Local runs
-    are tracked separately from platform-orchestrated runs and never involve a dataplane.
+class TrackedRunService(object):
+    """TrackedRunService records runs that are orchestrated OUTSIDE the platform: the client executes
+    the work itself — on a laptop, in CI, inside an agent framework — and reports the resulting
+    action tree here. The platform never schedules these runs and no dataplane is involved; it
+    stores what it is told and streams it back.
+
+    Tracked runs are tracked separately from platform-orchestrated runs so that reported,
+    client-supplied state can never be mistaken for execution state the platform owns.
 
     The read/watch surface deliberately mirrors RunService (same request/response messages) so that
-    clients and UIs built against RunService work against local runs with only a service swap.
+    clients and UIs built against RunService work against tracked runs with only a service swap.
     """
 
     @staticmethod
@@ -256,8 +268,8 @@ class LocalRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.LocalRunService/CreateRun',
-            flyteidl2_dot_workflow_dot_local__run__service__pb2.CreateLocalRunRequest.SerializeToString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TrackedRunService/CreateRun',
+            flyteidl2_dot_workflow_dot_tracked__run__service__pb2.CreateTrackedRunRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.CreateRunResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
@@ -273,9 +285,9 @@ class LocalRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.LocalRunService/ReportActions',
-            flyteidl2_dot_workflow_dot_local__run__service__pb2.ReportLocalActionsRequest.SerializeToString,
-            flyteidl2_dot_workflow_dot_local__run__service__pb2.ReportLocalActionsResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TrackedRunService/ReportActions',
+            flyteidl2_dot_workflow_dot_tracked__run__service__pb2.ReportTrackedActionsRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_tracked__run__service__pb2.ReportTrackedActionsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -290,7 +302,7 @@ class LocalRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.LocalRunService/GetRunDetails',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TrackedRunService/GetRunDetails',
             flyteidl2_dot_workflow_dot_run__service__pb2.GetRunDetailsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.GetRunDetailsResponse.FromString,
             options, channel_credentials,
@@ -307,7 +319,7 @@ class LocalRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.LocalRunService/WatchRunDetails',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.TrackedRunService/WatchRunDetails',
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunDetailsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunDetailsResponse.FromString,
             options, channel_credentials,
@@ -324,7 +336,7 @@ class LocalRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.LocalRunService/GetActionDetails',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TrackedRunService/GetActionDetails',
             flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDetailsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.GetActionDetailsResponse.FromString,
             options, channel_credentials,
@@ -341,7 +353,7 @@ class LocalRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.LocalRunService/WatchActionDetails',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.TrackedRunService/WatchActionDetails',
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionDetailsResponse.FromString,
             options, channel_credentials,
@@ -358,7 +370,7 @@ class LocalRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.LocalRunService/ListRuns',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TrackedRunService/ListRuns',
             flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.ListRunsResponse.FromString,
             options, channel_credentials,
@@ -375,7 +387,7 @@ class LocalRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.LocalRunService/WatchRuns',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.TrackedRunService/WatchRuns',
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchRunsResponse.FromString,
             options, channel_credentials,
@@ -392,7 +404,7 @@ class LocalRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.LocalRunService/ListActions',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TrackedRunService/ListActions',
             flyteidl2_dot_workflow_dot_run__service__pb2.ListActionsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.ListActionsResponse.FromString,
             options, channel_credentials,
@@ -409,7 +421,7 @@ class LocalRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.LocalRunService/WatchActions',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl2.workflow.TrackedRunService/WatchActions',
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.WatchActionsResponse.FromString,
             options, channel_credentials,
@@ -426,7 +438,7 @@ class LocalRunService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.LocalRunService/AbortRun',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.TrackedRunService/AbortRun',
             flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_run__service__pb2.AbortRunResponse.FromString,
             options, channel_credentials,
