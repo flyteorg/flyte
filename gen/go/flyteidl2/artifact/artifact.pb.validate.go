@@ -275,110 +275,6 @@ var _ interface {
 	ErrorName() string
 } = ArtifactIdentifierValidationError{}
 
-// Validate checks the field values on Card with the rules defined in the proto
-// definition for this message. If any rules are violated, the first error
-// encountered is returned, or nil if there are no violations.
-func (m *Card) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on Card with the rules defined in the
-// proto definition for this message. If any rules are violated, the result is
-// a list of violation errors wrapped in CardMultiError, or nil if none found.
-func (m *Card) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *Card) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Uri
-
-	// no validation rules for Format
-
-	// no validation rules for Type
-
-	if len(errors) > 0 {
-		return CardMultiError(errors)
-	}
-
-	return nil
-}
-
-// CardMultiError is an error wrapping multiple validation errors returned by
-// Card.ValidateAll() if the designated constraints aren't met.
-type CardMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m CardMultiError) Error() string {
-	msgs := make([]string, 0, len(m))
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m CardMultiError) AllErrors() []error { return m }
-
-// CardValidationError is the validation error returned by Card.Validate if the
-// designated constraints aren't met.
-type CardValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e CardValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e CardValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e CardValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e CardValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e CardValidationError) ErrorName() string { return "CardValidationError" }
-
-// Error satisfies the builtin error interface
-func (e CardValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sCard.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = CardValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = CardValidationError{}
-
 // Validate checks the field values on TaskActionSource with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
@@ -748,16 +644,12 @@ func (m *ArtifactSpec) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for Description
-
-	// no validation rules for UserMetadata
-
 	if all {
-		switch v := interface{}(m.GetCard()).(type) {
+		switch v := interface{}(m.GetInfo()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, ArtifactSpecValidationError{
-					field:  "Card",
+					field:  "Info",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -765,16 +657,16 @@ func (m *ArtifactSpec) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, ArtifactSpecValidationError{
-					field:  "Card",
+					field:  "Info",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetCard()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetInfo()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ArtifactSpecValidationError{
-				field:  "Card",
+				field:  "Info",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

@@ -4,6 +4,7 @@
 
 import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
+import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
@@ -12,7 +13,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/core/artifact_id.proto.
  */
 export const file_flyteidl2_core_artifact_id: GenFile = /*@__PURE__*/
-  fileDesc("CiBmbHl0ZWlkbDIvY29yZS9hcnRpZmFjdF9pZC5wcm90bxIOZmx5dGVpZGwyLmNvcmUiSQoLQXJ0aWZhY3RLZXkSDwoHcHJvamVjdBgBIAEoCRIOCgZkb21haW4YAiABKAkSDAoEbmFtZRgDIAEoCRILCgNvcmcYBCABKAkinwEKE0FydGlmYWN0QmluZGluZ0RhdGESFwoNcGFydGl0aW9uX2tleRgFIAEoCUgAEiAKFmJpbmRfdG9fdGltZV9wYXJ0aXRpb24YBiABKAhIABI1Cg50aW1lX3RyYW5zZm9ybRgHIAEoCzIdLmZseXRlaWRsMi5jb3JlLlRpbWVUcmFuc2Zvcm1CEAoOcGFydGl0aW9uX2RhdGFKBAgBEAUiSAoNVGltZVRyYW5zZm9ybRIRCgl0cmFuc2Zvcm0YASABKAkSJAoCb3AYAiABKA4yGC5mbHl0ZWlkbDIuY29yZS5PcGVyYXRvciIfChBJbnB1dEJpbmRpbmdEYXRhEgsKA3ZhchgBIAEoCSIQCg5SdW50aW1lQmluZGluZyKXAgoKTGFiZWxWYWx1ZRIWCgxzdGF0aWNfdmFsdWUYASABKAlIABIwCgp0aW1lX3ZhbHVlGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAEkAKEXRyaWdnZXJlZF9iaW5kaW5nGAMgASgLMiMuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RCaW5kaW5nRGF0YUgAEjkKDWlucHV0X2JpbmRpbmcYBCABKAsyIC5mbHl0ZWlkbDIuY29yZS5JbnB1dEJpbmRpbmdEYXRhSAASOQoPcnVudGltZV9iaW5kaW5nGAUgASgLMh4uZmx5dGVpZGwyLmNvcmUuUnVudGltZUJpbmRpbmdIAEIHCgV2YWx1ZSKMAQoKUGFydGl0aW9ucxI0CgV2YWx1ZRgBIAMoCzIlLmZseXRlaWRsMi5jb3JlLlBhcnRpdGlvbnMuVmFsdWVFbnRyeRpICgpWYWx1ZUVudHJ5EgsKA2tleRgBIAEoCRIpCgV2YWx1ZRgCIAEoCzIaLmZseXRlaWRsMi5jb3JlLkxhYmVsVmFsdWU6AjgBImwKDVRpbWVQYXJ0aXRpb24SKQoFdmFsdWUYASABKAsyGi5mbHl0ZWlkbDIuY29yZS5MYWJlbFZhbHVlEjAKC2dyYW51bGFyaXR5GAIgASgOMhsuZmx5dGVpZGwyLmNvcmUuR3JhbnVsYXJpdHkitwEKCkFydGlmYWN0SUQSMQoMYXJ0aWZhY3Rfa2V5GAEgASgLMhsuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RLZXkSDwoHdmVyc2lvbhgCIAEoCRIuCgpwYXJ0aXRpb25zGAMgASgLMhouZmx5dGVpZGwyLmNvcmUuUGFydGl0aW9ucxI1Cg50aW1lX3BhcnRpdGlvbhgEIAEoCzIdLmZseXRlaWRsMi5jb3JlLlRpbWVQYXJ0aXRpb24iawoLQXJ0aWZhY3RUYWcSMQoMYXJ0aWZhY3Rfa2V5GAEgASgLMhsuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RLZXkSKQoFdmFsdWUYAiABKAsyGi5mbHl0ZWlkbDIuY29yZS5MYWJlbFZhbHVlIswBCg1BcnRpZmFjdFF1ZXJ5EjEKC2FydGlmYWN0X2lkGAEgASgLMhouZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RJREgAEjMKDGFydGlmYWN0X3RhZxgCIAEoCzIbLmZseXRlaWRsMi5jb3JlLkFydGlmYWN0VGFnSAASDQoDdXJpGAMgASgJSAASNgoHYmluZGluZxgEIAEoCzIjLmZseXRlaWRsMi5jb3JlLkFydGlmYWN0QmluZGluZ0RhdGFIAEIMCgppZGVudGlmaWVyKkIKC0dyYW51bGFyaXR5EgkKBVVOU0VUEAASCgoGTUlOVVRFEAESCAoESE9VUhACEgcKA0RBWRADEgkKBU1PTlRIEAQqHwoIT3BlcmF0b3ISCQoFTUlOVVMQABIICgRQTFVTEAFCtAEKEmNvbS5mbHl0ZWlkbDIuY29yZUIPQXJ0aWZhY3RJZFByb3RvSAJQAVoyZ2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2NvcmWiAgNGQ1iqAg5GbHl0ZWlkbDIuQ29yZcoCDkZseXRlaWRsMlxDb3Jl4gIaRmx5dGVpZGwyXENvcmVcR1BCTWV0YWRhdGHqAg9GbHl0ZWlkbDI6OkNvcmViBnByb3RvMw", [file_google_protobuf_timestamp]);
+  fileDesc("CiBmbHl0ZWlkbDIvY29yZS9hcnRpZmFjdF9pZC5wcm90bxIOZmx5dGVpZGwyLmNvcmUiSQoLQXJ0aWZhY3RLZXkSDwoHcHJvamVjdBgBIAEoCRIOCgZkb21haW4YAiABKAkSDAoEbmFtZRgDIAEoCRILCgNvcmcYBCABKAkiTgoRQXJ0aWZhY3RWZXJzaW9uSWQSKAoDa2V5GAEgASgLMhsuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RLZXkSDwoHdmVyc2lvbhgCIAEoCSJVCgxBcnRpZmFjdENhcmQSFQoDdXJpGAEgASgJQgi6SAVyAxiACBIXCgZmb3JtYXQYAiABKAlCB7pIBHICGBASFQoEdHlwZRgDIAEoCUIHukgEcgIYECLVAQoMQXJ0aWZhY3RJbmZvEh0KC2Rlc2NyaXB0aW9uGAEgASgJQgi6SAVyAxj/ARJFCg11c2VyX21ldGFkYXRhGAIgAygLMi4uZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RJbmZvLlVzZXJNZXRhZGF0YUVudHJ5EioKBGNhcmQYAyABKAsyHC5mbHl0ZWlkbDIuY29yZS5BcnRpZmFjdENhcmQaMwoRVXNlck1ldGFkYXRhRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASKfAQoTQXJ0aWZhY3RCaW5kaW5nRGF0YRIXCg1wYXJ0aXRpb25fa2V5GAUgASgJSAASIAoWYmluZF90b190aW1lX3BhcnRpdGlvbhgGIAEoCEgAEjUKDnRpbWVfdHJhbnNmb3JtGAcgASgLMh0uZmx5dGVpZGwyLmNvcmUuVGltZVRyYW5zZm9ybUIQCg5wYXJ0aXRpb25fZGF0YUoECAEQBSJICg1UaW1lVHJhbnNmb3JtEhEKCXRyYW5zZm9ybRgBIAEoCRIkCgJvcBgCIAEoDjIYLmZseXRlaWRsMi5jb3JlLk9wZXJhdG9yIh8KEElucHV0QmluZGluZ0RhdGESCwoDdmFyGAEgASgJIhAKDlJ1bnRpbWVCaW5kaW5nIpcCCgpMYWJlbFZhbHVlEhYKDHN0YXRpY192YWx1ZRgBIAEoCUgAEjAKCnRpbWVfdmFsdWUYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSAASQAoRdHJpZ2dlcmVkX2JpbmRpbmcYAyABKAsyIy5mbHl0ZWlkbDIuY29yZS5BcnRpZmFjdEJpbmRpbmdEYXRhSAASOQoNaW5wdXRfYmluZGluZxgEIAEoCzIgLmZseXRlaWRsMi5jb3JlLklucHV0QmluZGluZ0RhdGFIABI5Cg9ydW50aW1lX2JpbmRpbmcYBSABKAsyHi5mbHl0ZWlkbDIuY29yZS5SdW50aW1lQmluZGluZ0gAQgcKBXZhbHVlIowBCgpQYXJ0aXRpb25zEjQKBXZhbHVlGAEgAygLMiUuZmx5dGVpZGwyLmNvcmUuUGFydGl0aW9ucy5WYWx1ZUVudHJ5GkgKClZhbHVlRW50cnkSCwoDa2V5GAEgASgJEikKBXZhbHVlGAIgASgLMhouZmx5dGVpZGwyLmNvcmUuTGFiZWxWYWx1ZToCOAEibAoNVGltZVBhcnRpdGlvbhIpCgV2YWx1ZRgBIAEoCzIaLmZseXRlaWRsMi5jb3JlLkxhYmVsVmFsdWUSMAoLZ3JhbnVsYXJpdHkYAiABKA4yGy5mbHl0ZWlkbDIuY29yZS5HcmFudWxhcml0eSK3AQoKQXJ0aWZhY3RJRBIxCgxhcnRpZmFjdF9rZXkYASABKAsyGy5mbHl0ZWlkbDIuY29yZS5BcnRpZmFjdEtleRIPCgd2ZXJzaW9uGAIgASgJEi4KCnBhcnRpdGlvbnMYAyABKAsyGi5mbHl0ZWlkbDIuY29yZS5QYXJ0aXRpb25zEjUKDnRpbWVfcGFydGl0aW9uGAQgASgLMh0uZmx5dGVpZGwyLmNvcmUuVGltZVBhcnRpdGlvbiJrCgtBcnRpZmFjdFRhZxIxCgxhcnRpZmFjdF9rZXkYASABKAsyGy5mbHl0ZWlkbDIuY29yZS5BcnRpZmFjdEtleRIpCgV2YWx1ZRgCIAEoCzIaLmZseXRlaWRsMi5jb3JlLkxhYmVsVmFsdWUizAEKDUFydGlmYWN0UXVlcnkSMQoLYXJ0aWZhY3RfaWQYASABKAsyGi5mbHl0ZWlkbDIuY29yZS5BcnRpZmFjdElESAASMwoMYXJ0aWZhY3RfdGFnGAIgASgLMhsuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RUYWdIABINCgN1cmkYAyABKAlIABI2CgdiaW5kaW5nGAQgASgLMiMuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RCaW5kaW5nRGF0YUgAQgwKCmlkZW50aWZpZXIqQgoLR3JhbnVsYXJpdHkSCQoFVU5TRVQQABIKCgZNSU5VVEUQARIICgRIT1VSEAISBwoDREFZEAMSCQoFTU9OVEgQBCofCghPcGVyYXRvchIJCgVNSU5VUxAAEggKBFBMVVMQAUK0AQoSY29tLmZseXRlaWRsMi5jb3JlQg9BcnRpZmFjdElkUHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvY29yZaICA0ZDWKoCDkZseXRlaWRsMi5Db3JlygIORmx5dGVpZGwyXENvcmXiAhpGbHl0ZWlkbDJcQ29yZVxHUEJNZXRhZGF0YeoCD0ZseXRlaWRsMjo6Q29yZWIGcHJvdG8z", [file_buf_validate_validate, file_google_protobuf_timestamp]);
 
 /**
  * @generated from message flyteidl2.core.ArtifactKey
@@ -47,6 +48,106 @@ export type ArtifactKey = Message<"flyteidl2.core.ArtifactKey"> & {
  */
 export const ArtifactKeySchema: GenMessage<ArtifactKey> = /*@__PURE__*/
   messageDesc(file_flyteidl2_core_artifact_id, 0);
+
+/**
+ * Identity of one artifact version. Unlike the legacy ArtifactID below, this
+ * carries no partition machinery — it is the minimal identity stamped onto
+ * values (core.Literal.artifact_id) and referenced by v2 artifact APIs.
+ *
+ * @generated from message flyteidl2.core.ArtifactVersionId
+ */
+export type ArtifactVersionId = Message<"flyteidl2.core.ArtifactVersionId"> & {
+  /**
+   * @generated from field: flyteidl2.core.ArtifactKey key = 1;
+   */
+  key?: ArtifactKey;
+
+  /**
+   * @generated from field: string version = 2;
+   */
+  version: string;
+};
+
+/**
+ * Describes the message flyteidl2.core.ArtifactVersionId.
+ * Use `create(ArtifactVersionIdSchema)` to create a new message.
+ */
+export const ArtifactVersionIdSchema: GenMessage<ArtifactVersionId> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_core_artifact_id, 1);
+
+/**
+ * Reference to a previously uploaded card (model/data card) describing an
+ * artifact.
+ *
+ * @generated from message flyteidl2.core.ArtifactCard
+ */
+export type ArtifactCard = Message<"flyteidl2.core.ArtifactCard"> & {
+  /**
+   * URI of the uploaded card content.
+   *
+   * @generated from field: string uri = 1;
+   */
+  uri: string;
+
+  /**
+   * Format of the card, e.g. html, md, json, yaml, csv, tsv, png, jpg, jpeg.
+   *
+   * @generated from field: string format = 2;
+   */
+  format: string;
+
+  /**
+   * Type of the card, e.g. model, data, generic.
+   *
+   * @generated from field: string type = 3;
+   */
+  type: string;
+};
+
+/**
+ * Describes the message flyteidl2.core.ArtifactCard.
+ * Use `create(ArtifactCardSchema)` to create a new message.
+ */
+export const ArtifactCardSchema: GenMessage<ArtifactCard> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_core_artifact_id, 2);
+
+/**
+ * Descriptive payload of an artifact — shared by the production declaration
+ * (task.ProducedArtifact) and the stored spec (artifact.ArtifactSpec).
+ * Deliberately excludes identity (name/version): identity lives in
+ * ArtifactIdentifier / the declaration, so it can never drift against this.
+ *
+ * @generated from message flyteidl2.core.ArtifactInfo
+ */
+export type ArtifactInfo = Message<"flyteidl2.core.ArtifactInfo"> & {
+  /**
+   * Optional human readable description.
+   *
+   * @generated from field: string description = 1;
+   */
+  description: string;
+
+  /**
+   * Free-form, user-supplied key/value metadata.
+   *
+   * @generated from field: map<string, string> user_metadata = 2;
+   */
+  userMetadata: { [key: string]: string };
+
+  /**
+   * Optional card describing this artifact.
+   *
+   * @generated from field: flyteidl2.core.ArtifactCard card = 3;
+   */
+  card?: ArtifactCard;
+};
+
+/**
+ * Describes the message flyteidl2.core.ArtifactInfo.
+ * Use `create(ArtifactInfoSchema)` to create a new message.
+ */
+export const ArtifactInfoSchema: GenMessage<ArtifactInfo> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_core_artifact_id, 3);
 
 /**
  * Only valid for triggers
@@ -86,7 +187,7 @@ export type ArtifactBindingData = Message<"flyteidl2.core.ArtifactBindingData"> 
  * Use `create(ArtifactBindingDataSchema)` to create a new message.
  */
 export const ArtifactBindingDataSchema: GenMessage<ArtifactBindingData> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_artifact_id, 1);
+  messageDesc(file_flyteidl2_core_artifact_id, 4);
 
 /**
  * @generated from message flyteidl2.core.TimeTransform
@@ -108,7 +209,7 @@ export type TimeTransform = Message<"flyteidl2.core.TimeTransform"> & {
  * Use `create(TimeTransformSchema)` to create a new message.
  */
 export const TimeTransformSchema: GenMessage<TimeTransform> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_artifact_id, 2);
+  messageDesc(file_flyteidl2_core_artifact_id, 5);
 
 /**
  * @generated from message flyteidl2.core.InputBindingData
@@ -125,7 +226,7 @@ export type InputBindingData = Message<"flyteidl2.core.InputBindingData"> & {
  * Use `create(InputBindingDataSchema)` to create a new message.
  */
 export const InputBindingDataSchema: GenMessage<InputBindingData> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_artifact_id, 3);
+  messageDesc(file_flyteidl2_core_artifact_id, 6);
 
 /**
  * @generated from message flyteidl2.core.RuntimeBinding
@@ -138,7 +239,7 @@ export type RuntimeBinding = Message<"flyteidl2.core.RuntimeBinding"> & {
  * Use `create(RuntimeBindingSchema)` to create a new message.
  */
 export const RuntimeBindingSchema: GenMessage<RuntimeBinding> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_artifact_id, 4);
+  messageDesc(file_flyteidl2_core_artifact_id, 7);
 
 /**
  * @generated from message flyteidl2.core.LabelValue
@@ -189,7 +290,7 @@ export type LabelValue = Message<"flyteidl2.core.LabelValue"> & {
  * Use `create(LabelValueSchema)` to create a new message.
  */
 export const LabelValueSchema: GenMessage<LabelValue> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_artifact_id, 5);
+  messageDesc(file_flyteidl2_core_artifact_id, 8);
 
 /**
  * @generated from message flyteidl2.core.Partitions
@@ -206,7 +307,7 @@ export type Partitions = Message<"flyteidl2.core.Partitions"> & {
  * Use `create(PartitionsSchema)` to create a new message.
  */
 export const PartitionsSchema: GenMessage<Partitions> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_artifact_id, 6);
+  messageDesc(file_flyteidl2_core_artifact_id, 9);
 
 /**
  * @generated from message flyteidl2.core.TimePartition
@@ -228,7 +329,7 @@ export type TimePartition = Message<"flyteidl2.core.TimePartition"> & {
  * Use `create(TimePartitionSchema)` to create a new message.
  */
 export const TimePartitionSchema: GenMessage<TimePartition> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_artifact_id, 7);
+  messageDesc(file_flyteidl2_core_artifact_id, 10);
 
 /**
  * @generated from message flyteidl2.core.ArtifactID
@@ -265,7 +366,7 @@ export type ArtifactID = Message<"flyteidl2.core.ArtifactID"> & {
  * Use `create(ArtifactIDSchema)` to create a new message.
  */
 export const ArtifactIDSchema: GenMessage<ArtifactID> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_artifact_id, 8);
+  messageDesc(file_flyteidl2_core_artifact_id, 11);
 
 /**
  * @generated from message flyteidl2.core.ArtifactTag
@@ -287,7 +388,7 @@ export type ArtifactTag = Message<"flyteidl2.core.ArtifactTag"> & {
  * Use `create(ArtifactTagSchema)` to create a new message.
  */
 export const ArtifactTagSchema: GenMessage<ArtifactTag> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_artifact_id, 9);
+  messageDesc(file_flyteidl2_core_artifact_id, 12);
 
 /**
  * Uniqueness constraints for Artifacts
@@ -337,7 +438,7 @@ export type ArtifactQuery = Message<"flyteidl2.core.ArtifactQuery"> & {
  * Use `create(ArtifactQuerySchema)` to create a new message.
  */
 export const ArtifactQuerySchema: GenMessage<ArtifactQuery> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_artifact_id, 10);
+  messageDesc(file_flyteidl2_core_artifact_id, 13);
 
 /**
  * @generated from enum flyteidl2.core.Granularity

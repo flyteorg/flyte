@@ -103,6 +103,8 @@ configuration:
         # Useful for s3-compatible blob stores (e.g. minio)
         v2Signing: false
         # endpoint URL of S3-compatible service
+        # Leave empty for Amazon S3; for other s3-compatible blob stores (e.g. Backblaze B2,
+        # Cloudflare R2, MinIO) set the provider URL, for example https://s3.example-region.example.com
         endpoint: ""
         # authType Type of authentication to use for connecting to S3-compatible service (Supported values: iam, accesskey)
         authType: "iam"
@@ -333,6 +335,16 @@ console:
   basePath: /v2
   # containerPort Port the console container listens on
   containerPort: 8080
+  # env Environment variables for the console container.
+  # `OIDC_LOGOUT_URL` — your identity provider's logout endpoint, so Sign out ends the
+  # IdP session and not just the proxy's (e.g. `https://<okta-org>/login/signout`).
+  # `LOGOUT_CLEAR_COOKIES` — comma-separated session cookies Sign out expires. Defaults
+  # to AWS ALB's `AWSELBAuthSessionCookie-0..3` (its documented maximum: 4K per shard,
+  # 16K total); override if the listener rule sets a custom `SessionCookieName`.
+  # Proxies with their own sign-out endpoint
+  # (oauth2-proxy, GCP IAP, Cloudflare Access) clear their cookie themselves: point
+  # `OIDC_LOGOUT_URL` at that endpoint and set this to `""`.
+  env: []
   # service Configure service for the console
   service:
     # type Kubernetes service type

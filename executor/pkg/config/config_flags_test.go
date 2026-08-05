@@ -323,6 +323,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_requeueDuration", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.RequeueDuration.String()
+
+			cmdFlags.Set("requeueDuration", testValue)
+			if vString, err := cmdFlags.GetString("requeueDuration"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.RequeueDuration)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_gc.interval", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
