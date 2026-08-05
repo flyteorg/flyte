@@ -14,6 +14,8 @@ type FileConfig struct {
 	*admin.PluginOverrides
 }
 
+var DefaultFileConfig = &FileConfig{}
+
 // Decorate decorator over PluginOverrides.
 func (t FileConfig) Decorate() *admin.MatchingAttributes {
 	return &admin.MatchingAttributes{
