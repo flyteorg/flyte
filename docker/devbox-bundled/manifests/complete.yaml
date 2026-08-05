@@ -7813,6 +7813,19 @@ data:
       k8s:
         co-pilot:
           image: "flyte-binary-v2:sandbox"
+          # Co-pilot reads the storage configuration from these objects, projected into
+          # its containers as files. Passing it on the command line instead would put the
+          # storage credentials into every task's pod spec, readable by anyone who can
+          # read pods. Only the storage keys are projected: co-pilot parses its config in
+          # strict mode and would fail on the other entries these objects carry.
+          storage-config:
+            mount-path: /etc/flyte/copilot
+            config-map-name: flyte-binary-config
+            config-map-keys:
+              - 003-storage.yaml
+            secret-name: flyte-binary-config-secret
+            secret-keys:
+              - 013-storage-secrets.yaml
         # Env vars injected into every task pod, so it can reach the control plane
         # to enqueue child actions and watch their state.
         #
@@ -8299,10 +8312,6 @@ spec:
     port: 443
     protocol: TCP
     targetPort: 9443
-  - name: cache-internal
-    port: 9444
-    protocol: TCP
-    targetPort: 9444
   selector:
     app.kubernetes.io/component: flyte-binary
     app.kubernetes.io/instance: flyte-devbox
@@ -8733,7 +8742,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 49e259b5181cecd91e406f5453b471831e41529923b6c290ae9a3c38ac124337
+        checksum/configuration: 7c2f3008aba066bea2a253c53bf851d22afbc4f50088ffef38461f984a47110f
         checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
       labels:
         app.kubernetes.io/component: flyte-binary
