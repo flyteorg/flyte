@@ -7,7 +7,6 @@ import (
 	"fmt"
 
 	"connectrpc.com/connect"
-	"github.com/robfig/cron/v3"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	commonpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -18,6 +17,7 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"github.com/flyteorg/flyte/v2/runs/repository/transformers"
+	schedulercore "github.com/flyteorg/flyte/v2/runs/scheduler/core"
 )
 
 type triggerService struct {
@@ -205,15 +205,7 @@ func (s *triggerService) DeleteTriggers(
 
 // validateCronExpression validates the cron expression in a TriggerAutomationSpec, if present.
 func validateCronExpression(triggerName string, spec *taskpb.TriggerAutomationSpec) error {
-	cronSchedule := spec.GetSchedule().GetCron()
-	if cronSchedule == nil {
-		return nil
-	}
-	expr := cronSchedule.GetExpression()
-	if tz := cronSchedule.GetTimezone(); tz != "" {
-		expr = fmt.Sprintf("CRON_TZ=%s %s", tz, expr)
-	}
-	if _, err := cron.ParseStandard(expr); err != nil {
+	if _, err := schedulercore.ParseCronSchedule(spec.GetSchedule()); err != nil {
 		return connect.NewError(connect.CodeInvalidArgument,
 			fmt.Errorf("trigger %q has invalid cron expression: %w", triggerName, err))
 	}

@@ -30,21 +30,8 @@ func ParseSchedule(t *models.Trigger) (cron.Schedule, error) {
 		return nil, nil
 	}
 
-	// Prefer the structured Cron object; fall back to legacy CronExpression string.
-	if c := sched.GetCron(); c != nil && c.GetExpression() != "" {
-		expr := c.GetExpression()
-		parsed, err := cron.ParseStandard(expr)
-		if err != nil {
-			return nil, fmt.Errorf("invalid cron expression %q: %w", expr, err)
-		}
-		return parsed, nil
-	}
-	if expr := sched.GetCronExpression(); expr != "" { //nolint:staticcheck // legacy field
-		parsed, err := cron.ParseStandard(expr)
-		if err != nil {
-			return nil, fmt.Errorf("invalid cron expression %q: %w", expr, err)
-		}
-		return parsed, nil
+	if parsed, err := ParseCronSchedule(sched); err != nil || parsed != nil {
+		return parsed, err
 	}
 
 	// Fixed-rate schedule.
@@ -57,6 +44,30 @@ func ParseSchedule(t *models.Trigger) (cron.Schedule, error) {
 	}
 
 	return nil, nil
+}
+
+// ParseCronSchedule parses either form of cron schedule, including its timezone.
+func ParseCronSchedule(sched *task.Schedule) (cron.Schedule, error) {
+	if sched == nil {
+		return nil, nil
+	}
+
+	expr := sched.GetCronExpression() //nolint:staticcheck // legacy field
+	if c := sched.GetCron(); c != nil {
+		expr = c.GetExpression()
+		if tz := c.GetTimezone(); tz != "" {
+			expr = fmt.Sprintf("CRON_TZ=%s %s", tz, expr)
+		}
+	}
+	if expr == "" {
+		return nil, nil
+	}
+
+	parsed, err := cron.ParseStandard(expr)
+	if err != nil {
+		return nil, fmt.Errorf("invalid cron expression %q: %w", expr, err)
+	}
+	return parsed, nil
 }
 
 // fixedRateDuration converts a FixedRate proto to a time.Duration.

@@ -36,13 +36,13 @@ func (r *recordingExecutor) count() int {
 // newCronTrigger builds a schedule trigger whose scheduling baseline (UpdatedAt)
 // is `baseline`. A baseline in the past is exactly the deploy-time situation that
 // used to make the job fire immediately on registration.
-func newCronTrigger(t *testing.T, name, expr string, baseline time.Time) *models.Trigger {
+func newCronTrigger(t *testing.T, name, expr, timezone string, baseline time.Time) *models.Trigger {
 	t.Helper()
 	spec := &task.TriggerAutomationSpec{
 		Type: task.TriggerAutomationSpecType_TYPE_SCHEDULE,
 		Automation: &task.TriggerAutomationSpec_Schedule{
 			Schedule: &task.Schedule{
-				Expression: &task.Schedule_Cron{Cron: &task.Cron{Expression: expr}},
+				Expression: &task.Schedule_Cron{Cron: &task.Cron{Expression: expr, Timezone: timezone}},
 			},
 		},
 	}
@@ -60,6 +60,59 @@ func newCronTrigger(t *testing.T, name, expr string, baseline time.Time) *models
 	}
 }
 
+func TestCronScheduleTimezone(t *testing.T) {
+	tests := []struct {
+		name     string
+		timezone string
+		baseline time.Time
+		want     []time.Time
+	}{
+		{
+			name:     "UTC",
+			timezone: "UTC",
+			baseline: time.Date(2026, 7, 1, 8, 59, 0, 0, time.UTC),
+			want: []time.Time{
+				time.Date(2026, 7, 1, 9, 0, 0, 0, time.UTC),
+				time.Date(2026, 7, 2, 9, 0, 0, 0, time.UTC),
+			},
+		},
+		{
+			name:     "non-UTC",
+			timezone: "America/Los_Angeles",
+			baseline: time.Date(2026, 7, 1, 15, 59, 0, 0, time.UTC),
+			want: []time.Time{
+				time.Date(2026, 7, 1, 16, 0, 0, 0, time.UTC),
+				time.Date(2026, 7, 2, 16, 0, 0, 0, time.UTC),
+			},
+		},
+		{
+			name:     "DST boundary",
+			timezone: "America/Los_Angeles",
+			baseline: time.Date(2026, 3, 7, 16, 59, 0, 0, time.UTC),
+			want: []time.Time{
+				time.Date(2026, 3, 7, 17, 0, 0, 0, time.UTC),
+				time.Date(2026, 3, 8, 16, 0, 0, 0, time.UTC),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			trig := newCronTrigger(t, tt.name, "0 9 * * *", tt.timezone, tt.baseline)
+			schedule, err := ParseSchedule(trig)
+			require.NoError(t, err)
+			assert.Equal(t, tt.want[0], schedule.Next(tt.baseline).UTC())
+
+			catchUp, err := GetCatchUpTimes(trig, tt.want[1].Add(time.Minute))
+			require.NoError(t, err)
+			require.Len(t, catchUp, len(tt.want))
+			for i := range catchUp {
+				assert.Equal(t, tt.want[i], catchUp[i].UTC())
+			}
+		})
+	}
+}
+
 // TestUpdateSchedules_NoImmediateFireForPastBaseline locks in that registering a
 // trigger does not schedule its first fire in the past. StartTime returns the
 // deploy/last-exec baseline (in the past); the cron loop fires any entry whose
@@ -70,7 +123,7 @@ func TestUpdateSchedules_NoImmediateFireForPastBaseline(t *testing.T) {
 	s := NewGoCronScheduler(exec)
 
 	// Hourly cron, baseline 10 minutes in the past.
-	trig := newCronTrigger(t, "k1", "0 * * * *", time.Now().Add(-10*time.Minute))
+	trig := newCronTrigger(t, "k1", "0 * * * *", "", time.Now().Add(-10*time.Minute))
 	s.UpdateSchedules(context.Background(), []*models.Trigger{trig})
 
 	require.Len(t, s.jobs, 1)
@@ -94,7 +147,7 @@ func TestUpdateSchedules_RunningSchedulerDoesNotFireImmediately(t *testing.T) {
 	s.Start()
 	defer s.Stop()
 
-	trig := newCronTrigger(t, "k1", "0 * * * *", time.Now().Add(-10*time.Minute))
+	trig := newCronTrigger(t, "k1", "0 * * * *", "", time.Now().Add(-10*time.Minute))
 	s.UpdateSchedules(context.Background(), []*models.Trigger{trig})
 
 	// Give the run loop time to process the newly added entry. With the past
