@@ -145,6 +145,7 @@ Chart for basic single Flyte executable deployment
 | fullnameOverride | string | `""` |  |
 | ingress.apiJwtIngress.annotations | object | `{}` |  |
 | ingress.apiJwtIngress.enabled | bool | `false` |  |
+| ingress.apiJwtIngress.host | string | `""` |  |
 | ingress.apiJwtIngress.ingressClassName | string | `""` |  |
 | ingress.apiJwtIngress.tls | list | `[]` |  |
 | ingress.commonAnnotations | object | `{}` |  |
@@ -160,6 +161,7 @@ Chart for basic single Flyte executable deployment
 | ingress.tls | list | `[]` |  |
 | ingress.wellknownIngress.annotations | object | `{}` |  |
 | ingress.wellknownIngress.enabled | bool | `false` |  |
+| ingress.wellknownIngress.host | string | `""` |  |
 | ingress.wellknownIngress.ingressClassName | string | `""` |  |
 | ingress.wellknownIngress.tls | list | `[]` |  |
 | nameOverride | string | `""` |  |
@@ -183,4 +185,3 @@ Chart for basic single Flyte executable deployment
 | serviceAccount.imagePullSecrets | list | `[]` |  |
 | serviceAccount.labels | object | `{}` |  |
 | serviceAccount.name | string | `""` |  |
-

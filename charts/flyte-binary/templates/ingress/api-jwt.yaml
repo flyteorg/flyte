@@ -52,7 +52,9 @@ spec:
             servicePort: {{ include "flyte-binary.service.http.port" $ }}
             {{- end }}
       {{- end }}
-    {{- if .Values.ingress.host }}
+    {{- if .Values.ingress.apiJwtIngress.host }}
+    host: {{ tpl .Values.ingress.apiJwtIngress.host . | quote }}
+    {{- else if .Values.ingress.host }}
     host: {{ tpl .Values.ingress.host . | quote }}
     {{- end }}
 {{- end }}
