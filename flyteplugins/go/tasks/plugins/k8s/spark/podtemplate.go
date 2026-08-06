@@ -3,7 +3,6 @@ package spark
 import (
 	"context"
 	"sync"
-	"time"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
@@ -50,7 +49,7 @@ func detectPodTemplateSupport(ctx context.Context) bool {
 		return false
 	}
 
-	getCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	getCtx, cancel := context.WithTimeout(ctx, GetSparkConfig().PodTemplateDetectionTimeout.Duration)
 	defer cancel()
 	crd, err := clientset.ApiextensionsV1().CustomResourceDefinitions().Get(getCtx, sparkApplicationCRDName, metav1.GetOptions{})
 	if err != nil {
