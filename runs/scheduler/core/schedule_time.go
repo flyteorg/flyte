@@ -9,6 +9,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
+	"github.com/flyteorg/flyte/v2/runs/schedule"
 )
 
 // ParseSchedule returns a cron.Schedule for the trigger's automation spec.
@@ -30,7 +31,7 @@ func ParseSchedule(t *models.Trigger) (cron.Schedule, error) {
 		return nil, nil
 	}
 
-	if parsed, err := ParseCronSchedule(sched); err != nil || parsed != nil {
+	if parsed, err := schedule.ParseCron(sched); err != nil || parsed != nil {
 		return parsed, err
 	}
 
@@ -44,30 +45,6 @@ func ParseSchedule(t *models.Trigger) (cron.Schedule, error) {
 	}
 
 	return nil, nil
-}
-
-// ParseCronSchedule parses either form of cron schedule, including its timezone.
-func ParseCronSchedule(sched *task.Schedule) (cron.Schedule, error) {
-	if sched == nil {
-		return nil, nil
-	}
-
-	expr := sched.GetCronExpression() //nolint:staticcheck // legacy field
-	if c := sched.GetCron(); c != nil {
-		expr = c.GetExpression()
-		if tz := c.GetTimezone(); tz != "" {
-			expr = fmt.Sprintf("CRON_TZ=%s %s", tz, expr)
-		}
-	}
-	if expr == "" {
-		return nil, nil
-	}
-
-	parsed, err := cron.ParseStandard(expr)
-	if err != nil {
-		return nil, fmt.Errorf("invalid cron expression %q: %w", expr, err)
-	}
-	return parsed, nil
 }
 
 // fixedRateDuration converts a FixedRate proto to a time.Duration.
