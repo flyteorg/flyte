@@ -71,5 +71,9 @@ func (cfg K8sPluginConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "update-backoff-retries"), defaultK8sConfig.UpdateBackoffRetries, "Number of retries for exponential backoff when updating a resource.")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "add-tolerations-for-extended-resources"), defaultK8sConfig.AddTolerationsForExtendedResources, "Name of the extended resources for which tolerations should be added.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "disable-inject-owner-references"), defaultK8sConfig.DisableInjectOwnerReferences, "Override to not set owner references on k8s resources. This is useful for V2 node execution")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "accelerated-inputs.enabled"), defaultK8sConfig.AcceleratedInputs.Enabled, "Enabled accelerated inputs feature which overwrites remote artifacts path to local disk paths")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "accelerated-inputs.remote-path-prefix"), defaultK8sConfig.AcceleratedInputs.RemotePathPrefix, "Remote path prefix that should be replaced with local path prefix")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "accelerated-inputs.local-path-prefix"), defaultK8sConfig.AcceleratedInputs.LocalPathPrefix, "Path to locally mounted directory k8s pod")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "accelerated-inputs.volume-path"), defaultK8sConfig.AcceleratedInputs.VolumePath, "Path to locally mounted directory on k8s host node")
 	return cmdFlags
 }
