@@ -6,3 +6,6 @@ dotted-keys:
     - name: KeepMyCase
       annotations:
         config.path: /etc/plugin
+  env-vars:
+    - MY_ENV_VAR: somevalue
+    - FLYTE_AWS_ENDPOINT: http://localhost:30084

@@ -95,8 +95,9 @@ type Plugin struct {
 }
 
 type DottedKeysConfig struct {
-	Annotations map[string]string `json:"annotations"`
-	Plugins     []Plugin          `json:"plugins"`
+	Annotations map[string]string   `json:"annotations"`
+	Plugins     []Plugin            `json:"plugins"`
+	EnvVars     []map[string]string `json:"env-vars"`
 }
 
 type ConfigWithLists struct {
@@ -433,6 +434,14 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 				assert.Len(t, r.Plugins, 1)
 				assert.Equal(t, "KeepMyCase", r.Plugins[0].Name)
 				assert.Equal(t, "/etc/plugin", r.Plugins[0].Annotations["config.path"])
+
+				// The default-env-vars shape: a list of single-pair maps whose keys are env var
+				// names. The keys must come back with case and underscores intact — lowercasing
+				// MY_ENV_VAR would silently export the wrong variable into task pods.
+				assert.Equal(t, []map[string]string{
+					{"MY_ENV_VAR": "somevalue"},
+					{"FLYTE_AWS_ENDPOINT": "http://localhost:30084"},
+				}, r.EnvVars)
 			})
 		})
 
