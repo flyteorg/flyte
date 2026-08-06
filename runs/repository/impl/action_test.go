@@ -299,6 +299,39 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 	assert.Equal(t, uint32(2), action.Attempts)
 }
 
+func TestUpdateActionPhase_AllowsPausedTerminalTransitions(t *testing.T) {
+	db := setupActionDB(t)
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	for _, phase := range []common.ActionPhase{
+		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		common.ActionPhase_ACTION_PHASE_TIMED_OUT,
+		common.ActionPhase_ACTION_PHASE_ABORTED,
+	} {
+		t.Run(phase.String(), func(t *testing.T) {
+			actionID := &common.ActionIdentifier{
+				Run:  &common.RunIdentifier{Project: "proj1", Domain: "domain1", Name: "run1"},
+				Name: phase.String(),
+			}
+			_, err := actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
+			require.NoError(t, err)
+			require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
+				common.ActionPhase_ACTION_PHASE_PAUSED, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
+
+			endTime := time.Now()
+			require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
+				phase, 1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil))
+
+			action, err := actionRepo.GetAction(ctx, actionID)
+			require.NoError(t, err)
+			assert.Equal(t, int32(phase), action.Phase)
+			assert.True(t, action.EndedAt.Valid)
+		})
+	}
+}
+
 func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
@@ -325,11 +358,11 @@ func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
-	// Try to downgrade from RUNNING to QUEUED — should be a no-op (phase guard)
+	// Try to downgrade from RUNNING to QUEUED — should be rejected by the phase guard.
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_QUEUED, 1,
 		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
-	require.NoError(t, err)
+	require.ErrorIs(t, err, sql.ErrNoRows)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
 	require.NoError(t, err)
@@ -364,11 +397,11 @@ func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 		core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil)
 	require.NoError(t, err)
 
-	// Try to downgrade from SUCCEEDED to QUEUED — should be a no-op
+	// Try to downgrade from SUCCEEDED to QUEUED — should be rejected.
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_QUEUED, 2,
 		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
-	require.NoError(t, err)
+	require.ErrorIs(t, err, sql.ErrNoRows)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
 	require.NoError(t, err)
