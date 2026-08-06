@@ -143,6 +143,11 @@ var (
 		UpdateBaseBackoffDuration:          10,
 		UpdateBackoffRetries:               5,
 		AddTolerationsForExtendedResources: []string{},
+		AcceleratedInputs: AcceleratedInputs{
+			Enabled:         false,
+			LocalPathPrefix: "/union-persistent-data",
+			VolumePath:      "/mnt/k8s-disks/0/union-persistent-data",
+		},
 	}
 
 	// K8sPluginConfigSection provides a singular top level config section for all plugins.
@@ -304,6 +309,16 @@ type K8sPluginConfig struct {
 
 	// DisableInjectOwnerReferences is a boolean flag that indicates if owner references should be injected into the k8s resources.
 	DisableInjectOwnerReferences bool `json:"disable-inject-owner-references" pflag:",Override to not set owner references on k8s resources. This is useful for V2 node execution"`
+
+	// AcceleratedInputs configures mounting the node-local accelerated datasets volume into task pods.
+	AcceleratedInputs AcceleratedInputs `json:"accelerated-inputs" pflag:",Accelerated inputs config"`
+}
+
+type AcceleratedInputs struct {
+	Enabled          bool   `json:"enabled" pflag:",Enabled accelerated inputs feature which overwrites remote artifacts path to local disk paths"`
+	RemotePathPrefix string `json:"remote-path-prefix" pflag:",Remote path prefix that should be replaced with local path prefix"`
+	LocalPathPrefix  string `json:"local-path-prefix" pflag:",Path to locally mounted directory k8s pod"`
+	VolumePath       string `json:"volume-path" pflag:",Path to locally mounted directory on k8s host node"`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers
