@@ -38,6 +38,12 @@ type ControlFlow interface {
 	IncrementNodeExecutionCount() uint32
 	CurrentTaskExecutionCount() uint32
 	IncrementTaskExecutionCount() uint32
+	VisitedNodes() VisitedNodes
+}
+
+type VisitedNodes interface {
+	Add(nodeID v1alpha1.NodeID)
+	Contains(nodeID v1alpha1.NodeID) bool
 }
 
 type ExecutionContext interface {
@@ -78,12 +84,31 @@ func (p *parentExecutionInfo) CurrentAttempt() uint32 {
 	return p.currentAttempts
 }
 
+type visitNodes struct {
+	visitedNodes map[v1alpha1.NodeID]bool
+}
+
+func (v *visitNodes) Add(nodeID v1alpha1.NodeID) {
+	v.visitedNodes[nodeID] = true
+}
+
+func (v *visitNodes) Contains(nodeID v1alpha1.NodeID) bool {
+	return v.visitedNodes[nodeID]
+}
+
+func NewVisitedNodes() VisitedNodes {
+	return &visitNodes{
+		visitedNodes: make(map[v1alpha1.NodeID]bool),
+	}
+}
+
 type controlFlow struct {
 	// We could use atomic.Uint32, but this is not required for current Propeller. As every round is run in a single
 	// thread and using atomic will introduce memory barriers
 	parallelism        uint32
 	nodeExecutionCount uint32
 	taskExecutionCount uint32
+	visitedNodes       VisitedNodes
 }
 
 func (c *controlFlow) CurrentParallelism() uint32 {
@@ -111,6 +136,10 @@ func (c *controlFlow) CurrentTaskExecutionCount() uint32 {
 func (c *controlFlow) IncrementTaskExecutionCount() uint32 {
 	c.taskExecutionCount++
 	return c.taskExecutionCount
+}
+
+func (c *controlFlow) VisitedNodes() VisitedNodes {
+	return c.visitedNodes
 }
 
 func NewExecutionContextWithTasksGetter(prevExecContext ExecutionContext, taskGetter TaskDetailsGetter) ExecutionContext {
@@ -148,5 +177,6 @@ func InitializeControlFlow() ControlFlow {
 		parallelism:        0,
 		nodeExecutionCount: 0,
 		taskExecutionCount: 0,
+		visitedNodes:       NewVisitedNodes(),
 	}
 }

@@ -1,0 +1,16 @@
+# Flyte SDK for authoring and running workflows
+flytekit>=1.10.0
+
+# Required for CronSchedule and other scheduling features
+croniter>=1.3.0
+
+# Additional dependencies for development and testing
+flytekitplugins-pod>=1.10.0
+
+# Optional: for better CLI experience
+flytectl-python>=0.1.0
+
+# Development tools (optional)
+pytest>=7.0.0
+black>=23.0.0
+isort>=5.12.0
