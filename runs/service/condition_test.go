@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"testing"
 
@@ -17,6 +16,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
@@ -126,7 +126,7 @@ func TestUpdateActionStatus_RejectedConditionTransitionDoesNotPersistOutput(t *t
 
 	actionRepo.On("UpdateActionPhase", mock.Anything, testActionID,
 		common.ActionPhase_ACTION_PHASE_SUCCEEDED, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-		Return(sql.ErrNoRows)
+		Return(interfaces.ErrPhaseTransitionRejected)
 
 	resp, err := svc.UpdateActionStatus(context.Background(), connect.NewRequest(&workflow.UpdateActionStatusRequest{
 		ActionId: testActionID,
@@ -134,7 +134,7 @@ func TestUpdateActionStatus_RejectedConditionTransitionDoesNotPersistOutput(t *t
 		Output:   testBoolLiteral(true),
 	}))
 	require.NoError(t, err)
-	assert.EqualValues(t, connect.CodeInternal, resp.Msg.GetStatus().GetCode())
+	assert.EqualValues(t, 0, resp.Msg.GetStatus().GetCode())
 }
 
 func TestSignalEvent(t *testing.T) {

@@ -363,7 +363,7 @@ func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_QUEUED, 1,
 		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
-	require.ErrorIs(t, err, sql.ErrNoRows)
+	require.ErrorIs(t, err, interfaces.ErrPhaseTransitionRejected)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
 	require.NoError(t, err)
@@ -398,11 +398,16 @@ func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 		core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil)
 	require.NoError(t, err)
 
-	// Try to downgrade from SUCCEEDED to QUEUED — should be rejected.
-	err = actionRepo.UpdateActionPhase(ctx, actionID,
-		common.ActionPhase_ACTION_PHASE_QUEUED, 2,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
-	require.ErrorIs(t, err, sql.ErrNoRows)
+	for _, phase := range []common.ActionPhase{
+		common.ActionPhase_ACTION_PHASE_QUEUED,
+		common.ActionPhase_ACTION_PHASE_FAILED,
+		common.ActionPhase_ACTION_PHASE_TIMED_OUT,
+	} {
+		// Delayed updates must not overwrite a completed action.
+		err = actionRepo.UpdateActionPhase(ctx, actionID, phase, 2,
+			core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
+		require.ErrorIs(t, err, interfaces.ErrPhaseTransitionRejected)
+	}
 
 	action, err := actionRepo.GetAction(ctx, actionID)
 	require.NoError(t, err)
