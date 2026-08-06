@@ -304,7 +304,19 @@ func constructRayJob(ctx context.Context, taskCtx pluginsCore.TaskExecutionConte
 		ttlSecondsAfterFinished = &rayJob.TtlSecondsAfterFinished
 	}
 
-	submitterPodTemplate := buildSubmitterPodTemplate(&rayClusterSpec, taskCtx)
+	submissionMode := rayv1.K8sJobMode
+	switch rayJob.SubmissionMode {
+	case plugins.SubmissionMode_SUBMISSION_MODE_HTTP:
+		submissionMode = rayv1.HTTPMode
+	}
+
+	// A submitter pod only exists in K8sJobMode; in HTTPMode the KubeRay operator
+	// submits the job directly to the head node, so no template is needed.
+	var submitterPodTemplate *v1.PodTemplateSpec
+	if submissionMode == rayv1.K8sJobMode {
+		template := buildSubmitterPodTemplate(&rayClusterSpec, taskCtx)
+		submitterPodTemplate = &template
+	}
 
 	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
 	var runtimeEnvYaml string
@@ -323,7 +335,8 @@ func constructRayJob(ctx context.Context, taskCtx pluginsCore.TaskExecutionConte
 		ShutdownAfterJobFinishes: shutdownAfterJobFinishes,
 		TTLSecondsAfterFinished:  *ttlSecondsAfterFinished,
 		RuntimeEnvYAML:           runtimeEnvYaml,
-		SubmitterPodTemplate:     &submitterPodTemplate,
+		SubmitterPodTemplate:     submitterPodTemplate,
+		SubmissionMode:           submissionMode,
 	}
 
 	return &rayv1.RayJob{

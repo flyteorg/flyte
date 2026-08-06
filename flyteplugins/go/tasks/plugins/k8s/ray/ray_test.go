@@ -233,6 +233,34 @@ func TestBuildResourceRay(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName, GetConfig().ServiceAccount)
 }
 
+func TestBuildResourceRaySubmissionMode(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+
+	taskTemplate := dummyRayTaskTemplate("ray-submission-default", dummyRayCustomObj())
+	rayCtx := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+
+	rayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+	assert.Nil(t, err)
+
+	ray, ok := rayResource.(*rayv1.RayJob)
+	assert.True(t, ok)
+	assert.Equal(t, rayv1.K8sJobMode, ray.Spec.SubmissionMode)
+	assert.NotNil(t, ray.Spec.SubmitterPodTemplate)
+
+	rayJobObj := dummyRayCustomObj()
+	rayJobObj.SubmissionMode = plugins.SubmissionMode_SUBMISSION_MODE_HTTP
+	taskTemplate = dummyRayTaskTemplate("ray-submission-http", rayJobObj)
+	rayCtx = dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+
+	rayResource, err = rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+	assert.Nil(t, err)
+
+	ray, ok = rayResource.(*rayv1.RayJob)
+	assert.True(t, ok)
+	assert.Equal(t, rayv1.HTTPMode, ray.Spec.SubmissionMode)
+	assert.Nil(t, ray.Spec.SubmitterPodTemplate)
+}
+
 var (
 	interruptibleNSR = &corev1.NodeSelectorRequirement{
 		Key:      "interruptible",

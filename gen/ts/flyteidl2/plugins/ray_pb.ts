@@ -2,8 +2,8 @@
 // @generated from file flyteidl2/plugins/ray.proto (package flyteidl2.plugins, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
-import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
+import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
+import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import type { ExtendedResources, K8sPod } from "../core/tasks_pb.ts";
 import { file_flyteidl2_core_tasks } from "../core/tasks_pb.ts";
 import type { Message } from "@bufbuild/protobuf";
@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/plugins/ray.proto.
  */
 export const file_flyteidl2_plugins_ray: GenFile = /*@__PURE__*/
-  fileDesc("ChtmbHl0ZWlkbDIvcGx1Z2lucy9yYXkucHJvdG8SEWZseXRlaWRsMi5wbHVnaW5zIrgBCgZSYXlKb2ISMgoLcmF5X2NsdXN0ZXIYASABKAsyHS5mbHl0ZWlkbDIucGx1Z2lucy5SYXlDbHVzdGVyEhcKC3J1bnRpbWVfZW52GAIgASgJQgIYARIjChtzaHV0ZG93bl9hZnRlcl9qb2JfZmluaXNoZXMYAyABKAgSIgoadHRsX3NlY29uZHNfYWZ0ZXJfZmluaXNoZWQYBCABKAUSGAoQcnVudGltZV9lbnZfeWFtbBgFIAEoCSKiAQoKUmF5Q2x1c3RlchI5Cg9oZWFkX2dyb3VwX3NwZWMYASABKAsyIC5mbHl0ZWlkbDIucGx1Z2lucy5IZWFkR3JvdXBTcGVjEj0KEXdvcmtlcl9ncm91cF9zcGVjGAIgAygLMiIuZmx5dGVpZGwyLnBsdWdpbnMuV29ya2VyR3JvdXBTcGVjEhoKEmVuYWJsZV9hdXRvc2NhbGluZxgDIAEoCCL+AQoNSGVhZEdyb3VwU3BlYxJOChByYXlfc3RhcnRfcGFyYW1zGAEgAygLMjQuZmx5dGVpZGwyLnBsdWdpbnMuSGVhZEdyb3VwU3BlYy5SYXlTdGFydFBhcmFtc0VudHJ5EicKB2s4c19wb2QYAiABKAsyFi5mbHl0ZWlkbDIuY29yZS5LOHNQb2QSPQoSZXh0ZW5kZWRfcmVzb3VyY2VzGAMgASgLMiEuZmx5dGVpZGwyLmNvcmUuRXh0ZW5kZWRSZXNvdXJjZXMaNQoTUmF5U3RhcnRQYXJhbXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBItQCCg9Xb3JrZXJHcm91cFNwZWMSEgoKZ3JvdXBfbmFtZRgBIAEoCRIQCghyZXBsaWNhcxgCIAEoBRIUCgxtaW5fcmVwbGljYXMYAyABKAUSFAoMbWF4X3JlcGxpY2FzGAQgASgFElAKEHJheV9zdGFydF9wYXJhbXMYBSADKAsyNi5mbHl0ZWlkbDIucGx1Z2lucy5Xb3JrZXJHcm91cFNwZWMuUmF5U3RhcnRQYXJhbXNFbnRyeRInCgdrOHNfcG9kGAYgASgLMhYuZmx5dGVpZGwyLmNvcmUuSzhzUG9kEj0KEmV4dGVuZGVkX3Jlc291cmNlcxgHIAEoCzIhLmZseXRlaWRsMi5jb3JlLkV4dGVuZGVkUmVzb3VyY2VzGjUKE1JheVN0YXJ0UGFyYW1zRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4AUK/AQoVY29tLmZseXRlaWRsMi5wbHVnaW5zQghSYXlQcm90b0gCUAFaNWdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9wbHVnaW5zogIDRlBYqgIRRmx5dGVpZGwyLlBsdWdpbnPKAhFGbHl0ZWlkbDJcUGx1Z2luc+ICHUZseXRlaWRsMlxQbHVnaW5zXEdQQk1ldGFkYXRh6gISRmx5dGVpZGwyOjpQbHVnaW5zYgZwcm90bzM", [file_flyteidl2_core_tasks]);
+  fileDesc("ChtmbHl0ZWlkbDIvcGx1Z2lucy9yYXkucHJvdG8SEWZseXRlaWRsMi5wbHVnaW5zIvQBCgZSYXlKb2ISMgoLcmF5X2NsdXN0ZXIYASABKAsyHS5mbHl0ZWlkbDIucGx1Z2lucy5SYXlDbHVzdGVyEhcKC3J1bnRpbWVfZW52GAIgASgJQgIYARIjChtzaHV0ZG93bl9hZnRlcl9qb2JfZmluaXNoZXMYAyABKAgSIgoadHRsX3NlY29uZHNfYWZ0ZXJfZmluaXNoZWQYBCABKAUSGAoQcnVudGltZV9lbnZfeWFtbBgFIAEoCRI6Cg9zdWJtaXNzaW9uX21vZGUYBiABKA4yIS5mbHl0ZWlkbDIucGx1Z2lucy5TdWJtaXNzaW9uTW9kZSKiAQoKUmF5Q2x1c3RlchI5Cg9oZWFkX2dyb3VwX3NwZWMYASABKAsyIC5mbHl0ZWlkbDIucGx1Z2lucy5IZWFkR3JvdXBTcGVjEj0KEXdvcmtlcl9ncm91cF9zcGVjGAIgAygLMiIuZmx5dGVpZGwyLnBsdWdpbnMuV29ya2VyR3JvdXBTcGVjEhoKEmVuYWJsZV9hdXRvc2NhbGluZxgDIAEoCCL+AQoNSGVhZEdyb3VwU3BlYxJOChByYXlfc3RhcnRfcGFyYW1zGAEgAygLMjQuZmx5dGVpZGwyLnBsdWdpbnMuSGVhZEdyb3VwU3BlYy5SYXlTdGFydFBhcmFtc0VudHJ5EicKB2s4c19wb2QYAiABKAsyFi5mbHl0ZWlkbDIuY29yZS5LOHNQb2QSPQoSZXh0ZW5kZWRfcmVzb3VyY2VzGAMgASgLMiEuZmx5dGVpZGwyLmNvcmUuRXh0ZW5kZWRSZXNvdXJjZXMaNQoTUmF5U3RhcnRQYXJhbXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBItQCCg9Xb3JrZXJHcm91cFNwZWMSEgoKZ3JvdXBfbmFtZRgBIAEoCRIQCghyZXBsaWNhcxgCIAEoBRIUCgxtaW5fcmVwbGljYXMYAyABKAUSFAoMbWF4X3JlcGxpY2FzGAQgASgFElAKEHJheV9zdGFydF9wYXJhbXMYBSADKAsyNi5mbHl0ZWlkbDIucGx1Z2lucy5Xb3JrZXJHcm91cFNwZWMuUmF5U3RhcnRQYXJhbXNFbnRyeRInCgdrOHNfcG9kGAYgASgLMhYuZmx5dGVpZGwyLmNvcmUuSzhzUG9kEj0KEmV4dGVuZGVkX3Jlc291cmNlcxgHIAEoCzIhLmZseXRlaWRsMi5jb3JlLkV4dGVuZGVkUmVzb3VyY2VzGjUKE1JheVN0YXJ0UGFyYW1zRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASpHCg5TdWJtaXNzaW9uTW9kZRIbChdTVUJNSVNTSU9OX01PREVfSzhTX0pPQhAAEhgKFFNVQk1JU1NJT05fTU9ERV9IVFRQEAFCvwEKFWNvbS5mbHl0ZWlkbDIucGx1Z2luc0IIUmF5UHJvdG9IAlABWjVnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvcGx1Z2luc6ICA0ZQWKoCEUZseXRlaWRsMi5QbHVnaW5zygIRRmx5dGVpZGwyXFBsdWdpbnPiAh1GbHl0ZWlkbDJcUGx1Z2luc1xHUEJNZXRhZGF0YeoCEkZseXRlaWRsMjo6UGx1Z2luc2IGcHJvdG8z", [file_flyteidl2_core_tasks]);
 
 /**
  * RayJobSpec defines the desired state of RayJob
@@ -57,6 +57,14 @@ export type RayJob = Message<"flyteidl2.plugins.RayJob"> & {
    * @generated from field: string runtime_env_yaml = 5;
    */
   runtimeEnvYaml: string;
+
+  /**
+   * submission_mode specifies how the Ray job is submitted to the RayCluster.
+   * If not set, defaults to SUBMISSION_MODE_K8S_JOB.
+   *
+   * @generated from field: flyteidl2.plugins.SubmissionMode submission_mode = 6;
+   */
+  submissionMode: SubmissionMode;
 };
 
 /**
@@ -202,4 +210,34 @@ export type WorkerGroupSpec = Message<"flyteidl2.plugins.WorkerGroupSpec"> & {
  */
 export const WorkerGroupSpecSchema: GenMessage<WorkerGroupSpec> = /*@__PURE__*/
   messageDesc(file_flyteidl2_plugins_ray, 3);
+
+/**
+ * SubmissionMode specifies how the KubeRay operator submits the Ray job to the RayCluster.
+ *
+ * @generated from enum flyteidl2.plugins.SubmissionMode
+ */
+export enum SubmissionMode {
+  /**
+   * The KubeRay operator creates a submitter Kubernetes Job that runs `ray job submit`
+   * against the RayCluster. This is the default and preserves existing behavior.
+   *
+   * @generated from enum value: SUBMISSION_MODE_K8S_JOB = 0;
+   */
+  K8S_JOB = 0,
+
+  /**
+   * The KubeRay operator submits the Ray job by sending an HTTP request directly to
+   * the RayCluster head node. No submitter pod is created, which avoids job failures
+   * caused by eviction of the submitter pod.
+   *
+   * @generated from enum value: SUBMISSION_MODE_HTTP = 1;
+   */
+  HTTP = 1,
+}
+
+/**
+ * Describes the enum flyteidl2.plugins.SubmissionMode.
+ */
+export const SubmissionModeSchema: GenEnum<SubmissionMode> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_plugins_ray, 0);
 
