@@ -124,6 +124,15 @@ Get the Flyte configuration Secret name.
 {{- printf "%s-config-secret" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
 
+{{/*
+Get the Secret name holding co-pilot's storage credentials. Separate from the
+configuration Secret because envFrom injects each key under its own name, and the
+configuration Secret's keys are config filenames rather than environment variable names.
+*/}}
+{{- define "flyte-binary.configuration.copilotStorageSecretName" -}}
+{{- printf "%s-copilot-storage-creds" (include "flyte-binary.fullname" .) -}}
+{{- end -}}
+
 
 {{/*
 Get the Flyte logging configuration.

@@ -7813,19 +7813,16 @@ data:
       k8s:
         co-pilot:
           image: "flyte-binary-v2:sandbox"
-          # Co-pilot reads the storage configuration from these objects, projected into
-          # its containers as files. Passing it on the command line instead would put the
-          # storage credentials into every task's pod spec, readable by anyone who can
-          # read pods. Only the storage keys are projected: co-pilot parses its config in
-          # strict mode and would fail on the other entries these objects carry.
-          storage-config:
-            mount-path: /etc/flyte/copilot
-            config-map-name: flyte-binary-config
-            config-map-keys:
-              - 003-storage.yaml
-            secret-name: flyte-binary-config-secret
-            secret-keys:
-              - 013-storage-secrets.yaml
+          # Co-pilot receives the S3 credentials as environment variables from this Secret
+          # rather than on its command line, where they would land in every task's pod spec
+          # and be readable by anyone who can read pods.
+          #
+          # Only named when such a Secret exists. With authType=iam there is nothing to
+          # inject; with secretKeyPath the secret lives in a file this chart cannot read, so
+          # unless copilotCredentialsSecretRef names one, co-pilot keeps receiving the
+          # credentials on its command line as it did before.
+          storage-credentials:
+            secret-name: flyte-binary-copilot-storage-creds
         # Env vars injected into every task pod, so it can reach the control plane
         # to enqueue child actions and watch their state.
         #
@@ -8181,6 +8178,21 @@ stringData:
         config:
           access_key_id: "rustfs"
           secret_key: "rustfsstorage"
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-binary
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-binary-copilot-storage-creds
+  namespace: flyte
+stringData:
+  AWS_ACCESS_KEY_ID: rustfs
+  AWS_SECRET_ACCESS_KEY: rustfsstorage
 type: Opaque
 ---
 apiVersion: v1
@@ -8742,7 +8754,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 7c2f3008aba066bea2a253c53bf851d22afbc4f50088ffef38461f984a47110f
+        checksum/configuration: 16d27493882213e6e4705177ba0c0ca97e267ab1ba0d5d19e5099405c1e77738
         checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
       labels:
         app.kubernetes.io/component: flyte-binary

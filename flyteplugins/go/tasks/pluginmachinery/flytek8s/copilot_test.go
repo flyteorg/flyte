@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -44,12 +45,8 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		},
 		CPU:    "1024m",
 		Memory: "1024Mi",
-		StorageConfig: config.StorageConfigSources{
-			ConfigMapName: "flyte-config",
-			ConfigMapKeys: []string{"003-storage.yaml"},
-			SecretName:    "flyte-config-secret",
-			SecretKeys:    []string{"013-storage-secrets.yaml"},
-			MountPath:     "/etc/flyte/copilot",
+		StorageCredentials: config.StorageCredentialsConfig{
+			SecretName: "flyte-copilot-storage-creds",
 		},
 	}
 
@@ -58,10 +55,10 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		storage.GetConfig().Stow.Config = map[string]string{
 			"path": "config.yaml",
 		}
-		c, err := FlyteCoPilotContainer("x", cfg, []string{"hello"})
+		c, err := FlyteCoPilotContainer(context.TODO(), "x", cfg, []string{"hello"})
 		assert.NoError(t, err)
 
-		expectedCommand, err := CopilotCommandArgs(storage.GetConfig(), cfg.StorageConfig.ConfigGlob())
+		expectedCommand, err := CopilotCommandArgs(context.TODO(), storage.GetConfig(), cfg.StorageCredentials)
 		assert.NoError(t, err)
 
 		assert.Equal(t, "test-x", c.Name)
@@ -75,47 +72,99 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 	})
 
 	t.Run("happy-vols", func(t *testing.T) {
-		c, err := FlyteCoPilotContainer("x", cfg, []string{"hello"}, v1.VolumeMount{Name: "X", MountPath: "/"})
+		c, err := FlyteCoPilotContainer(context.TODO(), "x", cfg, []string{"hello"}, v1.VolumeMount{Name: "X", MountPath: "/"})
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(c.VolumeMounts))
 	})
 
-	t.Run("happy stow GCP backend", func(t *testing.T) {
+	t.Run("s3 credentials are withheld and auth_type forced to iam", func(t *testing.T) {
+		storage.GetConfig().Type = storage.TypeStow
+		storage.GetConfig().InitContainer = "bucket"
+		storage.GetConfig().Stow.Kind = "s3"
+		storage.GetConfig().Stow.Config = map[string]string{
+			"access_key_id":   "AKIAEXAMPLE12345",
+			"secret_key":      "s3-secret-value",
+			"secret_key_path": "/etc/flyte/storage/secret_key",
+			"auth_type":       "accesskey",
+			"region":          "us-east-1",
+			"endpoint":        "http://minio:9000",
+		}
+
+		command, err := CopilotCommandArgs(context.TODO(), storage.GetConfig(), cfg.StorageCredentials)
+		assert.NoError(t, err)
+
+		joined := strings.Join(command, " ")
+		assert.NotContains(t, joined, "AKIAEXAMPLE12345")
+		assert.NotContains(t, joined, "s3-secret-value")
+		// The path is withheld too: it names a file in the deployment's container, which
+		// does not exist in a task pod, and newStowRawStore stats it regardless of auth_type.
+		assert.NotContains(t, joined, "/etc/flyte/storage/secret_key")
+
+		// iam is what makes stow consult the environment; under accesskey it builds a
+		// static provider from the (now absent) config keys and its makefn rejects them.
+		assert.Contains(t, joined, "auth_type=iam")
+		assert.NotContains(t, joined, "auth_type=accesskey")
+
+		// Non-credential settings still travel on the command line.
+		assert.Contains(t, joined, "region=us-east-1")
+		assert.Contains(t, joined, "endpoint=http://minio:9000")
+	})
+
+	t.Run("s3 without a credentials secret falls back to the old rendering", func(t *testing.T) {
+		// Backwards compatibility: a deployment that has not adopted the new setting keeps
+		// working, still exposed, rather than failing to launch every ContainerTask.
+		storage.GetConfig().Type = storage.TypeStow
+		storage.GetConfig().InitContainer = "bucket"
+		storage.GetConfig().Stow.Kind = "s3"
+		storage.GetConfig().Stow.Config = map[string]string{
+			"access_key_id":   "AKIAFALLBACK",
+			"secret_key":      "fallback-secret",
+			"secret_key_path": "/etc/flyte/storage/secret_key",
+			"auth_type":       "accesskey",
+			"region":          "us-east-1",
+		}
+
+		command, err := CopilotCommandArgs(context.TODO(), storage.GetConfig(), config.StorageCredentialsConfig{})
+		assert.NoError(t, err)
+
+		joined := strings.Join(command, " ")
+		assert.Contains(t, joined, "access_key_id=AKIAFALLBACK")
+		assert.Contains(t, joined, "secret_key=fallback-secret")
+		// The deployment's own auth_type is left alone; iam only applies when the
+		// credentials actually travel out-of-band.
+		assert.Contains(t, joined, "auth_type=accesskey")
+		assert.NotContains(t, joined, "auth_type=iam")
+		// secret_key_path is dropped even here: it names a file that does not exist in a
+		// task pod, and forwarding it stops co-pilot from starting at all.
+		assert.NotContains(t, joined, "secret_key_path")
+
+		bare := cfg
+		bare.StorageCredentials = config.StorageCredentialsConfig{}
+		c, err := FlyteCoPilotContainer(context.TODO(), "x", bare, []string{"hello"})
+		assert.NoError(t, err)
+		assert.Empty(t, c.EnvFrom, "nothing to inject when no Secret is configured")
+	})
+
+	t.Run("non-s3 backends are rendered unchanged", func(t *testing.T) {
+		// Documented limitation of the env-var approach: Azure and Swift read their key
+		// straight from the stow config map with no ambient-credential path, so filtering
+		// it would break them rather than secure them. Their credentials still reach the
+		// pod spec — tracked separately from the S3 fix.
 		storage.GetConfig().Type = storage.TypeStow
 		storage.GetConfig().InitContainer = "bucket"
 		storage.GetConfig().Stow.Kind = "google"
 		storage.GetConfig().Stow.Config = map[string]string{
 			"json":       "service-account-key",
 			"project_id": "flyte-gcp",
-			"scope":      "read_write",
 		}
 
-		command, err := CopilotCommandArgs(storage.GetConfig(), cfg.StorageConfig.ConfigGlob())
-		assert.NoError(t, err)
+		command, err := CopilotCommandArgs(context.TODO(), storage.GetConfig(), config.StorageCredentialsConfig{})
+		assert.NoError(t, err, "a missing credentials secret must not block non-s3 backends")
 
-		// Every backend keeps its credentials off the command line, not just S3: the
-		// stow config is never rendered here, so a backend whose secret lives under a
-		// different key (GCP's service-account JSON) is covered without enumerating it.
-		assert.NotContains(t, command, "--storage.stow.config")
-		for _, val := range storage.GetConfig().Stow.Config {
-			for _, arg := range command {
-				assert.NotContains(t, arg, val)
-			}
-		}
-		assert.Contains(t, command, "--config")
-		assert.Contains(t, command, "/etc/flyte/copilot/*.yaml")
-	})
-
-	t.Run("unconfigured storage config secret is rejected", func(t *testing.T) {
-		// Failing loudly is deliberate: falling back to the old flag-rendered config
-		// would put the storage credentials back into every task's pod spec.
-		_, err := CopilotCommandArgs(storage.GetConfig(), "")
-		assert.Error(t, err)
-
-		bare := cfg
-		bare.StorageConfig = config.StorageConfigSources{}
-		_, err = FlyteCoPilotContainer("x", bare, []string{"hello"})
-		assert.Error(t, err)
+		joined := strings.Join(command, " ")
+		assert.Contains(t, joined, "project_id=flyte-gcp")
+		assert.Contains(t, joined, "--storage.stow.kind=google")
+		assert.NotContains(t, joined, "auth_type=iam", "auth_type is an s3 concept")
 	})
 
 	t.Run("storage override", func(t *testing.T) {
@@ -131,11 +180,11 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		}
 		cfg.StorageConfigOverride = &storageConfigOverride
 
-		c, err := FlyteCoPilotContainer("x", cfg, []string{"hello"}, v1.VolumeMount{Name: "X", MountPath: "/"})
+		c, err := FlyteCoPilotContainer(context.TODO(), "x", cfg, []string{"hello"}, v1.VolumeMount{Name: "X", MountPath: "/"})
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(c.VolumeMounts))
 
-		expectedCommand, err := CopilotCommandArgs(&storageConfigOverride, cfg.StorageConfig.ConfigGlob())
+		expectedCommand, err := CopilotCommandArgs(context.TODO(), &storageConfigOverride, cfg.StorageCredentials)
 		assert.NoError(t, err)
 
 		assert.ElementsMatch(t, c.Command, expectedCommand)
@@ -144,7 +193,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 	t.Run("bad-res-cpu", func(t *testing.T) {
 		old := cfg.CPU
 		cfg.CPU = "x"
-		_, err := FlyteCoPilotContainer("x", cfg, []string{"hello"}, v1.VolumeMount{Name: "X", MountPath: "/"})
+		_, err := FlyteCoPilotContainer(context.TODO(), "x", cfg, []string{"hello"}, v1.VolumeMount{Name: "X", MountPath: "/"})
 		assert.Error(t, err)
 		cfg.CPU = old
 	})
@@ -152,7 +201,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 	t.Run("bad-res-mem", func(t *testing.T) {
 		old := cfg.Memory
 		cfg.Memory = "x"
-		_, err := FlyteCoPilotContainer("x", cfg, []string{"hello"}, v1.VolumeMount{Name: "X", MountPath: "/"})
+		_, err := FlyteCoPilotContainer(context.TODO(), "x", cfg, []string{"hello"}, v1.VolumeMount{Name: "X", MountPath: "/"})
 		assert.Error(t, err)
 		cfg.Memory = old
 	})
@@ -285,21 +334,14 @@ func TestAddCoPilotToPod_StorageCredentialsNeverInPodSpec(t *testing.T) {
 		OutputVolumeName:     "out",
 		CPU:                  "1024m",
 		Memory:               "1024Mi",
-		StorageConfig: config.StorageConfigSources{
-			ConfigMapName: "flyte-config",
-			ConfigMapKeys: []string{"003-storage.yaml"},
-			SecretName:    "flyte-config-secret",
-			SecretKeys:    []string{"013-storage-secrets.yaml"},
-			MountPath:     "/etc/flyte/copilot",
+		StorageCredentials: config.StorageCredentialsConfig{
+			SecretName: "flyte-copilot-storage-creds",
 		},
 	}
 
 	secrets := map[string]string{
 		"access_key_id": "AKIAEXAMPLE12345",
 		"secret_key":    "s3-secret-value",
-		"key":           "azure-account-key",
-		"json":          "gcp-service-account-json",
-		"password":      "oracle-password",
 	}
 	original := storage.GetConfig().Stow.Config
 	defer func() { storage.GetConfig().Stow.Config = original }()
@@ -342,44 +384,24 @@ func TestAddCoPilotToPod_StorageCredentialsNeverInPodSpec(t *testing.T) {
 			"stow config value for %q leaked into the pod spec", name)
 	}
 
-	// The credentials are absent because co-pilot reads them from a mounted Secret, and
-	// that mount must reach the co-pilot containers only.
-	// Exactly one. This task has both inputs and outputs, so both co-pilot containers are
-	// added and each needs the config; adding the volume per container instead of per pod
-	// would be a duplicate volume name and the API server would reject the whole pod.
-	var volume *v1.Volume
-	volumeCount := 0
-	for i := range pod.Volumes {
-		if pod.Volumes[i].Name == copilotConfigVolumeName {
-			volume = &pod.Volumes[i]
-			volumeCount++
-		}
-	}
-	assert.Equal(t, 1, volumeCount, "storage config volume must be added exactly once")
-	if assert.NotNil(t, volume, "storage config volume missing") {
-		if assert.NotNil(t, volume.Projected, "both config sources must be projected together") {
-			assert.Len(t, volume.Projected.Sources, 2)
-			cm := volume.Projected.Sources[0].ConfigMap
-			sec := volume.Projected.Sources[1].Secret
-			assert.Equal(t, cfg.StorageConfig.ConfigMapName, cm.Name)
-			assert.Equal(t, cfg.StorageConfig.SecretName, sec.Name)
-			// Only the listed keys: both objects also hold entries co-pilot must not see
-			// (plugin config, database credentials) and cannot parse under strict mode.
-			assert.Len(t, cm.Items, len(cfg.StorageConfig.ConfigMapKeys))
-			assert.Len(t, sec.Items, len(cfg.StorageConfig.SecretKeys))
-		}
-	}
+	// The credentials are absent from the spec because co-pilot receives them as
+	// environment variables, and that injection must reach the co-pilot containers only.
 	for _, c := range pod.InitContainers {
-		mounts := make([]string, 0, len(c.VolumeMounts))
-		for _, m := range c.VolumeMounts {
-			mounts = append(mounts, m.Name)
+		secretRefs := make([]string, 0, len(c.EnvFrom))
+		for _, e := range c.EnvFrom {
+			if e.SecretRef != nil {
+				secretRefs = append(secretRefs, e.SecretRef.Name)
+			}
 		}
-		assert.Contains(t, mounts, copilotConfigVolumeName, "co-pilot container %q cannot read its config", c.Name)
+		assert.Contains(t, secretRefs, cfg.StorageCredentials.SecretName,
+			"co-pilot container %q has no credentials", c.Name)
 	}
 	for _, c := range pod.Containers {
-		for _, m := range c.VolumeMounts {
-			assert.NotEqual(t, copilotConfigVolumeName, m.Name,
-				"primary container %q must not be able to read the storage credentials", c.Name)
+		for _, e := range c.EnvFrom {
+			if e.SecretRef != nil {
+				assert.NotEqual(t, cfg.StorageCredentials.SecretName, e.SecretRef.Name,
+					"primary container %q must not receive the storage credentials", c.Name)
+			}
 		}
 	}
 }
@@ -599,12 +621,8 @@ func TestAddCoPilotToPod(t *testing.T) {
 		},
 		CPU:    "1024m",
 		Memory: "1024Mi",
-		StorageConfig: config.StorageConfigSources{
-			ConfigMapName: "flyte-config",
-			ConfigMapKeys: []string{"003-storage.yaml"},
-			SecretName:    "flyte-config-secret",
-			SecretKeys:    []string{"013-storage-secrets.yaml"},
-			MountPath:     "/etc/flyte/copilot",
+		StorageCredentials: config.StorageCredentialsConfig{
+			SecretName: "flyte-copilot-storage-creds",
 		},
 	}
 
@@ -766,24 +784,6 @@ func TestAddCoPilotToPod(t *testing.T) {
 		}
 		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot))
 		assertPodHasCoPilot(t, cfg, pilot, iface, &pod)
-	})
-
-	t.Run("empty-iface-adds-no-config-volume", func(t *testing.T) {
-		// A non-nil interface with neither inputs nor outputs adds no co-pilot container,
-		// so it must add no storage config volume either — otherwise the pod would depend
-		// on a Secret that nothing mounts, and would fail to start if it were absent.
-		pod := v1.PodSpec{}
-		iface := &core.TypedInterface{}
-		pilot := &core.DataLoadingConfig{
-			Enabled:    true,
-			InputPath:  "in",
-			OutputPath: "out",
-		}
-		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot))
-		assert.Empty(t, pod.InitContainers)
-		for _, v := range pod.Volumes {
-			assert.NotEqual(t, copilotConfigVolumeName, v.Name)
-		}
 	})
 
 	t.Run("disabled", func(t *testing.T) {

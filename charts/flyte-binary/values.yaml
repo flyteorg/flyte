@@ -89,6 +89,12 @@ configuration:
   storage:
     # metadataContainer Bucket to store Flyte metadata
     metadataContainer: "my-organization-flyte-container"
+    # copilotCredentialsSecretRef Name of an existing Secret holding
+    # AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY, injected into the co-pilot containers so the
+    # credentials stay out of task pod specs. Leave empty to have the chart render one from
+    # providerConfig.s3.accessKey/secretKey. Required when using s3.secretKeyPath, since a
+    # file path in this deployment's container cannot be read from a task pod.
+    copilotCredentialsSecretRef: ""
     # provider Object store provider (Supported values: s3, gcs)
     provider: s3
     # providerConfig Additional object store provider-specific configuration
