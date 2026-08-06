@@ -25,6 +25,20 @@ import (
 
 const rootActionName = "a0"
 
+var allowedActionPhaseSources = map[common.ActionPhase][]common.ActionPhase{
+	common.ActionPhase_ACTION_PHASE_UNSPECIFIED:           {common.ActionPhase_ACTION_PHASE_UNSPECIFIED},
+	common.ActionPhase_ACTION_PHASE_QUEUED:                {common.ActionPhase_ACTION_PHASE_UNSPECIFIED, common.ActionPhase_ACTION_PHASE_QUEUED, common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_TIMED_OUT},
+	common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES: {common.ActionPhase_ACTION_PHASE_UNSPECIFIED, common.ActionPhase_ACTION_PHASE_QUEUED, common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_TIMED_OUT},
+	common.ActionPhase_ACTION_PHASE_INITIALIZING:          {common.ActionPhase_ACTION_PHASE_UNSPECIFIED, common.ActionPhase_ACTION_PHASE_QUEUED, common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, common.ActionPhase_ACTION_PHASE_INITIALIZING, common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_TIMED_OUT},
+	common.ActionPhase_ACTION_PHASE_RUNNING:               {common.ActionPhase_ACTION_PHASE_UNSPECIFIED, common.ActionPhase_ACTION_PHASE_QUEUED, common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, common.ActionPhase_ACTION_PHASE_INITIALIZING, common.ActionPhase_ACTION_PHASE_RUNNING, common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_TIMED_OUT},
+	common.ActionPhase_ACTION_PHASE_SUCCEEDED:             {common.ActionPhase_ACTION_PHASE_UNSPECIFIED, common.ActionPhase_ACTION_PHASE_QUEUED, common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, common.ActionPhase_ACTION_PHASE_INITIALIZING, common.ActionPhase_ACTION_PHASE_RUNNING, common.ActionPhase_ACTION_PHASE_SUCCEEDED, common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_TIMED_OUT, common.ActionPhase_ACTION_PHASE_PAUSED},
+	common.ActionPhase_ACTION_PHASE_FAILED:                {common.ActionPhase_ACTION_PHASE_UNSPECIFIED, common.ActionPhase_ACTION_PHASE_QUEUED, common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, common.ActionPhase_ACTION_PHASE_INITIALIZING, common.ActionPhase_ACTION_PHASE_RUNNING, common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_TIMED_OUT},
+	common.ActionPhase_ACTION_PHASE_ABORTED:               {common.ActionPhase_ACTION_PHASE_UNSPECIFIED, common.ActionPhase_ACTION_PHASE_QUEUED, common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, common.ActionPhase_ACTION_PHASE_INITIALIZING, common.ActionPhase_ACTION_PHASE_RUNNING, common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_ABORTED, common.ActionPhase_ACTION_PHASE_TIMED_OUT, common.ActionPhase_ACTION_PHASE_PAUSED},
+	common.ActionPhase_ACTION_PHASE_TIMED_OUT:             {common.ActionPhase_ACTION_PHASE_UNSPECIFIED, common.ActionPhase_ACTION_PHASE_QUEUED, common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, common.ActionPhase_ACTION_PHASE_INITIALIZING, common.ActionPhase_ACTION_PHASE_RUNNING, common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_TIMED_OUT, common.ActionPhase_ACTION_PHASE_PAUSED},
+	common.ActionPhase_ACTION_PHASE_PAUSED:                {common.ActionPhase_ACTION_PHASE_UNSPECIFIED, common.ActionPhase_ACTION_PHASE_QUEUED, common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, common.ActionPhase_ACTION_PHASE_INITIALIZING, common.ActionPhase_ACTION_PHASE_RUNNING, common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_TIMED_OUT, common.ActionPhase_ACTION_PHASE_PAUSED},
+	common.ActionPhase_ACTION_PHASE_RECOVERED:             {common.ActionPhase_ACTION_PHASE_UNSPECIFIED, common.ActionPhase_ACTION_PHASE_QUEUED, common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, common.ActionPhase_ACTION_PHASE_INITIALIZING, common.ActionPhase_ACTION_PHASE_RUNNING, common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_TIMED_OUT, common.ActionPhase_ACTION_PHASE_RECOVERED},
+}
+
 // actionRepo implements actionRepo interface using PostgreSQL
 type actionRepo struct {
 	db       *sqlx.DB
@@ -436,16 +450,10 @@ func (r *actionRepo) UpdateActionPhase(
 	startTime *time.Time,
 ) error {
 	now := time.Now()
-	retryablePhases := []int32{
-		int32(common.ActionPhase_ACTION_PHASE_FAILED),
-		int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
-	}
-	terminalPhases := []int32{
-		int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
-		int32(common.ActionPhase_ACTION_PHASE_FAILED),
-		int32(common.ActionPhase_ACTION_PHASE_ABORTED),
-		int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
-		int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
+	allowedSources := allowedActionPhaseSources[phase]
+	allowedSourceValues := make([]int32, len(allowedSources))
+	for i, source := range allowedSources {
+		allowedSourceValues[i] = int32(source)
 	}
 
 	var queryBuilder strings.Builder
@@ -474,10 +482,9 @@ func (r *actionRepo) UpdateActionPhase(
 		argIdx++
 	}
 
-	queryBuilder.WriteString(fmt.Sprintf(" WHERE project = $%d AND domain = $%d AND run_name = $%d AND name = $%d AND (phase <= $%d OR phase = ANY($%d) OR (phase = $%d AND $%d = ANY($%d)))", //nolint: staticcheck
-		argIdx, argIdx+1, argIdx+2, argIdx+3, argIdx+4, argIdx+5, argIdx+6, argIdx+4, argIdx+7))
-	args = append(args, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase,
-		pq.Array(retryablePhases), int32(common.ActionPhase_ACTION_PHASE_PAUSED), pq.Array(terminalPhases))
+	queryBuilder.WriteString(fmt.Sprintf(" WHERE project = $%d AND domain = $%d AND run_name = $%d AND name = $%d AND phase = ANY($%d)", //nolint: staticcheck
+		argIdx, argIdx+1, argIdx+2, argIdx+3, argIdx+4))
+	args = append(args, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, pq.Array(allowedSourceValues))
 
 	result, err := r.db.ExecContext(ctx, queryBuilder.String(), args...)
 	if err != nil {
@@ -487,6 +494,9 @@ func (r *actionRepo) UpdateActionPhase(
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return err
+	}
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
 	}
 	if rowsAffected > 0 {
 		r.notifyActionUpdate(ctx, actionID)
