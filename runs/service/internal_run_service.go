@@ -17,6 +17,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
@@ -265,6 +266,9 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 		endTime,
 		startTime,
 	); err != nil {
+		if errors.Is(err, interfaces.ErrPhaseTransitionRejected) {
+			return nil
+		}
 		logger.Warnf(ctx, "UpdateActionStatus: failed to update action %s: %v", req.GetActionId().GetName(), err)
 		return connect.NewError(connect.CodeInternal, err)
 	}

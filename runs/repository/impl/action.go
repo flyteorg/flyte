@@ -36,7 +36,7 @@ var allowedActionPhaseSources = map[common.ActionPhase][]common.ActionPhase{
 	common.ActionPhase_ACTION_PHASE_ABORTED:               {common.ActionPhase_ACTION_PHASE_UNSPECIFIED, common.ActionPhase_ACTION_PHASE_QUEUED, common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, common.ActionPhase_ACTION_PHASE_INITIALIZING, common.ActionPhase_ACTION_PHASE_RUNNING, common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_ABORTED, common.ActionPhase_ACTION_PHASE_TIMED_OUT, common.ActionPhase_ACTION_PHASE_PAUSED},
 	common.ActionPhase_ACTION_PHASE_TIMED_OUT:             {common.ActionPhase_ACTION_PHASE_UNSPECIFIED, common.ActionPhase_ACTION_PHASE_QUEUED, common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, common.ActionPhase_ACTION_PHASE_INITIALIZING, common.ActionPhase_ACTION_PHASE_RUNNING, common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_TIMED_OUT, common.ActionPhase_ACTION_PHASE_PAUSED},
 	common.ActionPhase_ACTION_PHASE_PAUSED:                {common.ActionPhase_ACTION_PHASE_UNSPECIFIED, common.ActionPhase_ACTION_PHASE_QUEUED, common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, common.ActionPhase_ACTION_PHASE_INITIALIZING, common.ActionPhase_ACTION_PHASE_RUNNING, common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_TIMED_OUT, common.ActionPhase_ACTION_PHASE_PAUSED},
-	common.ActionPhase_ACTION_PHASE_RECOVERED:             {common.ActionPhase_ACTION_PHASE_UNSPECIFIED, common.ActionPhase_ACTION_PHASE_QUEUED, common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, common.ActionPhase_ACTION_PHASE_INITIALIZING, common.ActionPhase_ACTION_PHASE_RUNNING, common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_TIMED_OUT, common.ActionPhase_ACTION_PHASE_RECOVERED},
+	common.ActionPhase_ACTION_PHASE_RECOVERED:             {common.ActionPhase_ACTION_PHASE_UNSPECIFIED, common.ActionPhase_ACTION_PHASE_QUEUED, common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, common.ActionPhase_ACTION_PHASE_INITIALIZING, common.ActionPhase_ACTION_PHASE_RUNNING, common.ActionPhase_ACTION_PHASE_RECOVERED},
 }
 
 // actionRepo implements actionRepo interface using PostgreSQL
@@ -496,11 +496,18 @@ func (r *actionRepo) UpdateActionPhase(
 		return err
 	}
 	if rowsAffected == 0 {
+		var exists bool
+		if err := r.db.GetContext(ctx, &exists,
+			"SELECT EXISTS (SELECT 1 FROM actions WHERE project = $1 AND domain = $2 AND run_name = $3 AND name = $4)",
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name); err != nil {
+			return err
+		}
+		if exists {
+			return interfaces.ErrPhaseTransitionRejected
+		}
 		return sql.ErrNoRows
 	}
-	if rowsAffected > 0 {
-		r.notifyActionUpdate(ctx, actionID)
-	}
+	r.notifyActionUpdate(ctx, actionID)
 
 	// If this is the root action (the run itself), also notify run subscribers
 	// so that WatchRuns streams reflect phase transitions (e.g. RUNNING → SUCCEEDED).
