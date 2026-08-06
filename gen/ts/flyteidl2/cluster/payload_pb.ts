@@ -7,7 +7,7 @@ import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
 import type { Identifier } from "../app/app_definition_pb.ts";
 import { file_flyteidl2_app_app_definition } from "../app/app_definition_pb.ts";
-import type { ActionAttemptIdentifier, ActionIdentifier, ClusterPoolIdentifier, DomainIdentifier, OrgIdentifier, ProjectIdentifier } from "../common/identifier_pb.ts";
+import type { ActionAttemptIdentifier, ActionIdentifier, ClusterIdentifier, ClusterPoolIdentifier, DomainIdentifier, OrgIdentifier, ProjectIdentifier } from "../common/identifier_pb.ts";
 import { file_flyteidl2_common_identifier } from "../common/identifier_pb.ts";
 import type { TaskIdentifier } from "../task/task_definition_pb.ts";
 import { file_flyteidl2_task_task_definition } from "../task/task_definition_pb.ts";
@@ -17,7 +17,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/cluster/payload.proto.
  */
 export const file_flyteidl2_cluster_payload: GenFile = /*@__PURE__*/
-  fileDesc("Ch9mbHl0ZWlkbDIvY2x1c3Rlci9wYXlsb2FkLnByb3RvEhFmbHl0ZWlkbDIuY2x1c3RlciLKBwoUU2VsZWN0Q2x1c3RlclJlcXVlc3QSMQoGb3JnX2lkGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5PcmdJZGVudGlmaWVySAASOQoKcHJvamVjdF9pZBgCIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJIABIxCgd0YXNrX2lkGAMgASgLMh4uZmx5dGVpZGwyLnRhc2suVGFza0lkZW50aWZpZXJIABI3CglhY3Rpb25faWQYBCABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJIABJGChFhY3Rpb25fYXR0ZW1wdF9pZBgFIAEoCzIpLmZseXRlaWRsMi5jb21tb24uQWN0aW9uQXR0ZW1wdElkZW50aWZpZXJIABIrCgZhcHBfaWQYBiABKAsyGS5mbHl0ZWlkbDIuYXBwLklkZW50aWZpZXJIABJCCg9jbHVzdGVyX3Bvb2xfaWQYByABKAsyJy5mbHl0ZWlkbDIuY29tbW9uLkNsdXN0ZXJQb29sSWRlbnRpZmllckgAEjcKCWRvbWFpbl9pZBgJIAEoCzIiLmZseXRlaWRsMi5jb21tb24uRG9tYWluSWRlbnRpZmllckgAEk4KCW9wZXJhdGlvbhgIIAEoDjIxLmZseXRlaWRsMi5jbHVzdGVyLlNlbGVjdENsdXN0ZXJSZXF1ZXN0Lk9wZXJhdGlvbkIIukgFggECIAAiggMKCU9wZXJhdGlvbhIZChVPUEVSQVRJT05fVU5TUEVDSUZJRUQQABIkCiBPUEVSQVRJT05fQ1JFQVRFX1VQTE9BRF9MT0NBVElPThABEhsKF09QRVJBVElPTl9VUExPQURfSU5QVVRTEAISHQoZT1BFUkFUSU9OX0dFVF9BQ1RJT05fREFUQRADEiEKHU9QRVJBVElPTl9RVUVSWV9SQU5HRV9NRVRSSUNTEAQSIgoeT1BFUkFUSU9OX0NSRUFURV9ET1dOTE9BRF9MSU5LEAUSFwoTT1BFUkFUSU9OX1RBSUxfTE9HUxAGEigKJE9QRVJBVElPTl9HRVRfQUNUSU9OX0FUVEVNUFRfTUVUUklDUxAHEhkKFU9QRVJBVElPTl9VU0VfU0VDUkVUUxAIEhwKGE9QRVJBVElPTl9VUExPQURfVFJJR0dFUhAJEhcKE09QRVJBVElPTl9HRVRfSU1BR0UQChIcChhPUEVSQVRJT05fTE9DQUxfUlVOX0RBVEEQC0IRCghyZXNvdXJjZRIFukgCCAEiQgoVU2VsZWN0Q2x1c3RlclJlc3BvbnNlEhgKEGNsdXN0ZXJfZW5kcG9pbnQYASABKAkSDwoHY2x1c3RlchgCIAEoCULDAQoVY29tLmZseXRlaWRsMi5jbHVzdGVyQgxQYXlsb2FkUHJvdG9IAlABWjVnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvY2x1c3RlcqICA0ZDWKoCEUZseXRlaWRsMi5DbHVzdGVyygIRRmx5dGVpZGwyXENsdXN0ZXLiAh1GbHl0ZWlkbDJcQ2x1c3RlclxHUEJNZXRhZGF0YeoCEkZseXRlaWRsMjo6Q2x1c3RlcmIGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_app_app_definition, file_flyteidl2_common_identifier, file_flyteidl2_task_task_definition]);
+  fileDesc("Ch9mbHl0ZWlkbDIvY2x1c3Rlci9wYXlsb2FkLnByb3RvEhFmbHl0ZWlkbDIuY2x1c3RlciKHCAoUU2VsZWN0Q2x1c3RlclJlcXVlc3QSMQoGb3JnX2lkGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5PcmdJZGVudGlmaWVySAASOQoKcHJvamVjdF9pZBgCIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJIABIxCgd0YXNrX2lkGAMgASgLMh4uZmx5dGVpZGwyLnRhc2suVGFza0lkZW50aWZpZXJIABI3CglhY3Rpb25faWQYBCABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJIABJGChFhY3Rpb25fYXR0ZW1wdF9pZBgFIAEoCzIpLmZseXRlaWRsMi5jb21tb24uQWN0aW9uQXR0ZW1wdElkZW50aWZpZXJIABIrCgZhcHBfaWQYBiABKAsyGS5mbHl0ZWlkbDIuYXBwLklkZW50aWZpZXJIABJCCg9jbHVzdGVyX3Bvb2xfaWQYByABKAsyJy5mbHl0ZWlkbDIuY29tbW9uLkNsdXN0ZXJQb29sSWRlbnRpZmllckgAEjcKCWRvbWFpbl9pZBgJIAEoCzIiLmZseXRlaWRsMi5jb21tb24uRG9tYWluSWRlbnRpZmllckgAEjkKCmNsdXN0ZXJfaWQYCiABKAsyIy5mbHl0ZWlkbDIuY29tbW9uLkNsdXN0ZXJJZGVudGlmaWVySAASTgoJb3BlcmF0aW9uGAggASgOMjEuZmx5dGVpZGwyLmNsdXN0ZXIuU2VsZWN0Q2x1c3RlclJlcXVlc3QuT3BlcmF0aW9uQgi6SAWCAQIgACKEAwoJT3BlcmF0aW9uEhkKFU9QRVJBVElPTl9VTlNQRUNJRklFRBAAEiQKIE9QRVJBVElPTl9DUkVBVEVfVVBMT0FEX0xPQ0FUSU9OEAESGwoXT1BFUkFUSU9OX1VQTE9BRF9JTlBVVFMQAhIdChlPUEVSQVRJT05fR0VUX0FDVElPTl9EQVRBEAMSIQodT1BFUkFUSU9OX1FVRVJZX1JBTkdFX01FVFJJQ1MQBBIiCh5PUEVSQVRJT05fQ1JFQVRFX0RPV05MT0FEX0xJTksQBRIXChNPUEVSQVRJT05fVEFJTF9MT0dTEAYSKAokT1BFUkFUSU9OX0dFVF9BQ1RJT05fQVRURU1QVF9NRVRSSUNTEAcSGQoVT1BFUkFUSU9OX1VTRV9TRUNSRVRTEAgSHAoYT1BFUkFUSU9OX1VQTE9BRF9UUklHR0VSEAkSFwoTT1BFUkFUSU9OX0dFVF9JTUFHRRAKEh4KGk9QRVJBVElPTl9UUkFDS0VEX1JVTl9EQVRBEAtCEQoIcmVzb3VyY2USBbpIAggBIkIKFVNlbGVjdENsdXN0ZXJSZXNwb25zZRIYChBjbHVzdGVyX2VuZHBvaW50GAEgASgJEg8KB2NsdXN0ZXIYAiABKAlCwwEKFWNvbS5mbHl0ZWlkbDIuY2x1c3RlckIMUGF5bG9hZFByb3RvSAJQAVo1Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2NsdXN0ZXKiAgNGQ1iqAhFGbHl0ZWlkbDIuQ2x1c3RlcsoCEUZseXRlaWRsMlxDbHVzdGVy4gIdRmx5dGVpZGwyXENsdXN0ZXJcR1BCTWV0YWRhdGHqAhJGbHl0ZWlkbDI6OkNsdXN0ZXJiBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_app_app_definition, file_flyteidl2_common_identifier, file_flyteidl2_task_task_definition]);
 
 /**
  * @generated from message flyteidl2.cluster.SelectClusterRequest
@@ -74,6 +74,15 @@ export type SelectClusterRequest = Message<"flyteidl2.cluster.SelectClusterReque
      */
     value: DomainIdentifier;
     case: "domainId";
+  } | {
+    /**
+     * Names the cluster directly. this is for callers that already know
+     * the cluster and have nothing else to resolve from.
+     *
+     * @generated from field: flyteidl2.common.ClusterIdentifier cluster_id = 10;
+     */
+    value: ClusterIdentifier;
+    case: "clusterId";
   } | { case: undefined; value?: undefined };
 
   /**
@@ -149,13 +158,13 @@ export enum SelectClusterRequest_Operation {
   GET_IMAGE = 10,
 
   /**
-   * Data operations (uploads/reads/download links) for locally-orchestrated runs. Routes to a
-   * dataplane only when the org's clusters are all directly reachable (zero trust); otherwise
-   * the server answers with its own endpoint and serves these from control-plane storage.
+   * Data operations (uploads/reads/download links) for tracked runs. Routes to a dataplane
+   * only when the org's clusters are all directly reachable (zero trust); otherwise the
+   * server answers with its own endpoint and serves these from control-plane storage.
    *
-   * @generated from enum value: OPERATION_LOCAL_RUN_DATA = 11;
+   * @generated from enum value: OPERATION_TRACKED_RUN_DATA = 11;
    */
-  LOCAL_RUN_DATA = 11,
+  TRACKED_RUN_DATA = 11,
 }
 
 /**
@@ -176,7 +185,7 @@ export type SelectClusterResponse = Message<"flyteidl2.cluster.SelectClusterResp
   /**
    * Name of the cluster the endpoint belongs to. Empty when the request was routed to the
    * control plane's own endpoint. Clients that persist where an artifact was written (e.g.
-   * local-run reporters stamping the attempt's cluster) use this to make reads routable later.
+   * tracked-run reporters stamping the attempt's cluster) use this to make reads routable later.
    *
    * @generated from field: string cluster = 2;
    */
