@@ -151,6 +151,36 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.Empty(t, c.VolumeMounts, "nothing to mount when no source is configured")
 	})
 
+	t.Run("a ConfigMap without a Secret still mounts, for backends that need no credentials", func(t *testing.T) {
+		// S3 authType=iam and gcs/azure keep everything in 003-storage.yaml, so the
+		// ConfigMap alone is a complete configuration. Deployments whose credentials the
+		// chart cannot reach (s3 secretKeyPath) must not land here: co-pilot would read the
+		// mounted files, find no credentials, and have nothing on its command line either.
+		// The chart gates that on copilotStorageComplete; this asserts the shape it emits.
+		storage.GetConfig().Type = storage.TypeStow
+		storage.GetConfig().InitContainer = "bucket"
+		storage.GetConfig().Stow.Kind = "s3"
+		storage.GetConfig().Stow.Config = map[string]string{
+			"auth_type": "iam",
+			"region":    "us-east-1",
+		}
+
+		sources := config.StorageConfigSources{
+			ConfigMapName: "flyte-config",
+			ConfigMapKeys: []string{"003-storage.yaml"},
+			MountPath:     "/etc/flyte/copilot",
+		}
+		assert.True(t, sources.Configured())
+
+		command, err := CopilotCommandArgs(context.TODO(), storage.GetConfig(), sources, false)
+		assert.NoError(t, err)
+		assert.Contains(t, strings.Join(command, " "), "--config /etc/flyte/copilot/*.yaml")
+
+		vol := storageConfigVolume(sources)
+		assert.Len(t, vol.Projected.Sources, 1, "an unnamed Secret must not be projected")
+		assert.NotNil(t, vol.Projected.Sources[0].ConfigMap)
+	})
+
 	t.Run("non-s3 backends are mounted the same way", func(t *testing.T) {
 		storage.GetConfig().Type = storage.TypeStow
 		storage.GetConfig().InitContainer = "bucket"

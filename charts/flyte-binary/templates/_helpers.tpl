@@ -139,6 +139,34 @@ starting; such deployments supply their own Secret via storage.copilotStorageSec
 {{- end -}}
 
 {{/*
+Whether the projected files would give co-pilot a *complete* storage configuration. Co-pilot
+takes the stow config all-or-nothing — once it reads the mounted files, nothing is passed on
+its command line — so an incomplete mount leaves it with no credentials at all rather than
+falling back. Configuring it is therefore gated on this.
+
+Complete when: the operator named the sources themselves; or the backend keeps everything in
+003-storage.yaml (gcs, azure); or S3 needs no credentials (authType=iam, resolved ambiently);
+or S3's credentials are in 013-storage-secrets.yaml.
+
+Incomplete for S3 with secretKeyPath and no copilotStorageSecretRef: 003-storage.yaml carries
+no credentials and the secret lives in a file only this deployment's container has. Those
+deployments keep receiving the stow config on the co-pilot command line, as before.
+*/}}
+{{- define "flyte-binary.configuration.copilotStorageComplete" -}}
+{{- with .Values.configuration.storage -}}
+{{- if or .copilotStorageConfigMapRef .copilotStorageSecretRef -}}
+true
+{{- else if ne "s3" .provider -}}
+true
+{{- else if ne "accesskey" .providerConfig.s3.authType -}}
+true
+{{- else if .providerConfig.s3.secretKey -}}
+true
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Get the Flyte logging configuration.
 */}}
 {{- define "flyte-binary.configuration.logging.plugins" -}}

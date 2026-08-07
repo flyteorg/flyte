@@ -51,6 +51,8 @@ Chart for basic single Flyte executable deployment
 | configuration.logging.plugins.kubernetes.templateUri | string | `""` |  |
 | configuration.logging.plugins.stackdriver.enabled | bool | `false` |  |
 | configuration.logging.plugins.stackdriver.templateUri | string | `""` |  |
+| configuration.storage.copilotStorageConfigMapRef | string | `""` |  |
+| configuration.storage.copilotStorageSecretRef | string | `""` |  |
 | configuration.storage.metadataContainer | string | `"my-organization-flyte-container"` |  |
 | configuration.storage.provider | string | `"s3"` |  |
 | configuration.storage.providerConfig.azure.account | string | `"storage-account-name"` |  |

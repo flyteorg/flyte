@@ -46,25 +46,28 @@ data:
           {{- with ( index .Values.configuration "co-pilot" ).image }}
           image: {{ printf "%s:%s" .repository .tag | quote }}
           {{- end }}
-          # Co-pilot reads its storage configuration from these two objects, projected into
-          # its containers as files, rather than receiving it on its command line — where the
+          {{- if include "flyte-binary.configuration.copilotStorageComplete" . }}
+          # Co-pilot reads its storage configuration from these objects, projected into its
+          # containers as files, rather than receiving it on its command line — where the
           # credentials would land in every task's pod spec and be readable by anyone who can
           # read pods. Only the named keys are projected: co-pilot parses its config in strict
           # mode and rejects the sections it does not recognise.
           #
-          # Any source left empty is simply not projected. With none of them set co-pilot
-          # falls back to receiving the stow config on its command line, as it did before.
+          # Emitted only when those files would be a complete configuration; see
+          # copilotStorageComplete. Otherwise co-pilot falls back to receiving the stow config
+          # on its command line, as it did before.
           storage-config:
             mount-path: /etc/flyte/copilot
             config-map-name: {{ .Values.configuration.storage.copilotStorageConfigMapRef | default (include "flyte-binary.configuration.configMapName" .) | quote }}
             config-map-keys:
               - 003-storage.yaml
             {{- $secretRef := .Values.configuration.storage.copilotStorageSecretRef | default (ternary (include "flyte-binary.configuration.configSecretName" .) "" (not (empty (include "flyte-binary.configuration.copilotStorageSecretRendered" .)))) }}
-            secret-name: {{ $secretRef | quote }}
             {{- if $secretRef }}
+            secret-name: {{ $secretRef | quote }}
             secret-keys:
               - 013-storage-secrets.yaml
             {{- end }}
+          {{- end }}
         # Env vars injected into every task pod, so it can reach the control plane
         # to enqueue child actions and watch their state.
         #
