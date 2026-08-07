@@ -402,6 +402,8 @@ ingress:
   apiJwtIngress:
     # enabled Create the JWT (Bearer) API ingress
     enabled: false
+    # host Hostname for the JWT API ingress. Overrides `ingress.host`
+    host: ""
     # annotations Annotations for the JWT API ingress (controller/JWT config)
     annotations: {}
     # ingressClassName Ingress class for the JWT API ingress. Overrides `ingressClassName`
@@ -416,6 +418,8 @@ ingress:
   wellknownIngress:
     # enabled Create the unauthenticated auth-discovery ingress
     enabled: false
+    # host Hostname for the auth-discovery ingress. Overrides `ingress.host`
+    host: ""
     # annotations Annotations for the auth-discovery ingress (controller config)
     annotations: {}
     # ingressClassName Ingress class for the auth-discovery ingress. Overrides `ingressClassName`
