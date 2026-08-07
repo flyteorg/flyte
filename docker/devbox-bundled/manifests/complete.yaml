@@ -7813,6 +7813,23 @@ data:
       k8s:
         co-pilot:
           image: "flyte-binary-v2:sandbox"
+          # Co-pilot reads its storage configuration from these objects, projected into its
+          # containers as files, rather than receiving it on its command line — where the
+          # credentials would land in every task's pod spec and be readable by anyone who can
+          # read pods. Only the named keys are projected: co-pilot parses its config in strict
+          # mode and rejects the sections it does not recognise.
+          #
+          # Emitted only when those files would be a complete configuration; see
+          # copilotStorageComplete. Otherwise co-pilot falls back to receiving the stow config
+          # on its command line, as it did before.
+          storage-config:
+            mount-path: /etc/flyte/copilot
+            config-map-name: "flyte-binary-config"
+            config-map-keys:
+              - 003-storage.yaml
+            secret-name: "flyte-binary-config-secret"
+            secret-keys:
+              - 013-storage-secrets.yaml
         # Env vars injected into every task pod, so it can reach the control plane
         # to enqueue child actions and watch their state.
         #
@@ -8706,7 +8723,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 49e259b5181cecd91e406f5453b471831e41529923b6c290ae9a3c38ac124337
+        checksum/configuration: 77f8e3078e6a5c08729a61314634482cefa301c393665ed403c8aae0c18dfe95
         checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
       labels:
         app.kubernetes.io/component: flyte-binary

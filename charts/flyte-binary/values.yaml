@@ -89,6 +89,18 @@ configuration:
   storage:
     # metadataContainer Bucket to store Flyte metadata
     metadataContainer: "my-organization-flyte-container"
+    # copilotStorageConfigMapRef Name of an existing ConfigMap holding a 003-storage.yaml key,
+    # projected into the co-pilot containers. Leave empty to use this release's own
+    # configuration ConfigMap. Set it when configuration.externalConfigMap is in use, since
+    # the chart cannot know that ConfigMap's key names.
+    copilotStorageConfigMapRef: ""
+    # copilotStorageSecretRef Name of an existing Secret holding a 013-storage-secrets.yaml
+    # key, projected into the co-pilot containers so the storage credentials stay out of task
+    # pod specs. Leave empty to use this release's own configuration Secret when it carries
+    # that key. Set it when using configuration.externalSecretRef, or s3.secretKeyPath — the
+    # latter names a file that exists only in this deployment's container, so co-pilot cannot
+    # read it from a task pod and needs a Secret carrying the key itself.
+    copilotStorageSecretRef: ""
     # provider Object store provider (Supported values: s3, gcs)
     provider: s3
     # providerConfig Additional object store provider-specific configuration

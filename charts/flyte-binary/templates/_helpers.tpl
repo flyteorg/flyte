@@ -124,6 +124,47 @@ Get the Flyte configuration Secret name.
 {{- printf "%s-config-secret" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
 
+{{/*
+Whether the configuration Secret carries a storage credentials file (013-storage-secrets.yaml)
+for co-pilot to mount. Must stay in lockstep with the conditions guarding that key in
+config-secret.yaml: naming a key that is never written leaves every task pod stuck in
+ContainerCreating. secretKeyPath is excluded deliberately — it names a file that exists only
+in this deployment's own container, so mounting it into a task pod would stop co-pilot from
+starting; such deployments supply their own Secret via storage.copilotStorageSecretRef.
+*/}}
+{{- define "flyte-binary.configuration.copilotStorageSecretRendered" -}}
+{{- if and (eq "s3" .Values.configuration.storage.provider) (eq "accesskey" .Values.configuration.storage.providerConfig.s3.authType) -}}
+{{- .Values.configuration.storage.providerConfig.s3.secretKey -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Whether the projected files would give co-pilot a *complete* storage configuration. Co-pilot
+takes the stow config all-or-nothing — once it reads the mounted files, nothing is passed on
+its command line — so an incomplete mount leaves it with no credentials at all rather than
+falling back. Configuring it is therefore gated on this.
+
+Complete when: the operator named the sources themselves; or the backend keeps everything in
+003-storage.yaml (gcs, azure); or S3 needs no credentials (authType=iam, resolved ambiently);
+or S3's credentials are in 013-storage-secrets.yaml.
+
+Incomplete for S3 with secretKeyPath and no copilotStorageSecretRef: 003-storage.yaml carries
+no credentials and the secret lives in a file only this deployment's container has. Those
+deployments keep receiving the stow config on the co-pilot command line, as before.
+*/}}
+{{- define "flyte-binary.configuration.copilotStorageComplete" -}}
+{{- with .Values.configuration.storage -}}
+{{- if or .copilotStorageConfigMapRef .copilotStorageSecretRef -}}
+true
+{{- else if ne "s3" .provider -}}
+true
+{{- else if ne "accesskey" .providerConfig.s3.authType -}}
+true
+{{- else if .providerConfig.s3.secretKey -}}
+true
+{{- end -}}
+{{- end -}}
+{{- end -}}
 
 {{/*
 Get the Flyte logging configuration.

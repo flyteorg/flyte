@@ -49,6 +49,15 @@ var (
 			Timeout: config2.Duration{
 				Duration: time.Hour * 1,
 			},
+			// The object names are intentionally unset: they are deployment-specific.
+			// Leaving them empty falls back to rendering the stow config on the co-pilot
+			// command line, which is how deployments that predate this setting keep
+			// working — at the cost of the exposure CopilotCommandArgs warns about.
+			StorageConfig: StorageConfigSources{
+				ConfigMapKeys: []string{"003-storage.yaml"},
+				SecretKeys:    []string{"013-storage-secrets.yaml"},
+				MountPath:     "/etc/flyte/copilot",
+			},
 		},
 		DefaultCPURequest:    defaultCPURequest,
 		DefaultMemoryRequest: defaultMemoryRequest,
@@ -327,10 +336,50 @@ type FlyteCoPilotConfig struct {
 	// Timeout for upload
 	Timeout config2.Duration `json:"timeout" pflag:"-,Max time to allow for uploads to complete."`
 	// Resources for CoPilot Containers
-	CPU                   string          `json:"cpu" pflag:",Used to set cpu for co-pilot containers"`
-	Memory                string          `json:"memory" pflag:",Used to set memory for co-pilot containers"`
-	Storage               string          `json:"storage" pflag:",Default storage limit for individual inputs / outputs"`
+	CPU     string `json:"cpu" pflag:",Used to set cpu for co-pilot containers"`
+	Memory  string `json:"memory" pflag:",Used to set memory for co-pilot containers"`
+	Storage string `json:"storage" pflag:",Default storage limit for individual inputs / outputs"`
+	// StorageConfigOverride replaces the deployment's storage config for co-pilot only.
+	// Setting it puts the stow config back on the co-pilot command line even when
+	// StorageConfig names mounted sources — see CopilotCommandArgs.
 	StorageConfigOverride *storage.Config `json:"storage-config-override" pflag:"-,Override for the storage config to use for co-pilot"`
+	// Sources of the storage configuration co-pilot reads at startup.
+	StorageConfig StorageConfigSources `json:"storage-config" pflag:"-,Sources of the storage config mounted into co-pilot containers"`
+}
+
+// StorageConfigSources names the ConfigMap and Secret holding co-pilot's storage
+// configuration. Both are projected into MountPath and co-pilot is pointed at them with
+// --config, so the storage credentials never appear in the pod spec: recovering them
+// requires access to the Secret rather than merely to pods.
+//
+// Two sources rather than one because the deployment already splits the configuration —
+// non-sensitive settings in a ConfigMap, credentials in a Secret — and a projected volume
+// can combine them, so that split is preserved instead of forcing everything into the
+// Secret. flytestdlib globs the mount directory and merges one viper per file, so the two
+// halves resolve to a single storage config.
+type StorageConfigSources struct {
+	// ConfigMapName holds the non-sensitive storage settings (endpoint, region, bucket).
+	ConfigMapName string `json:"config-map-name" pflag:",ConfigMap holding co-pilot's non-sensitive storage config"`
+	// ConfigMapKeys within ConfigMapName to project. Only these are mounted: the same
+	// ConfigMap carries unrelated entries, which must stay out of the co-pilot containers
+	// and out of co-pilot's strict-mode config parsing, which rejects sections it does
+	// not recognise.
+	ConfigMapKeys []string `json:"config-map-keys" pflag:"-,Keys within the ConfigMap to project"`
+	// SecretName holds the storage credentials. Empty for deployments that have none to
+	// mount — instance credentials (S3 authType=iam), or a secret kept in a file this
+	// chart cannot read.
+	SecretName string `json:"secret-name" pflag:",Secret holding co-pilot's storage credentials"`
+	// SecretKeys within SecretName to project. Same reasoning as ConfigMapKeys.
+	SecretKeys []string `json:"secret-keys" pflag:"-,Keys within the Secret to project"`
+	// MountPath is where both sources are projected. Co-pilot is pointed at
+	// MountPath/*.yaml, which flytestdlib globs and merges.
+	MountPath string `json:"mount-path" pflag:",Path the storage config sources are projected into"`
+}
+
+// Configured reports whether at least one source is named. With none, there is nothing to
+// mount and co-pilot falls back to receiving the stow config on its command line.
+func (s StorageConfigSources) Configured() bool {
+	return s.MountPath != "" && (s.ConfigMapName != "" || s.SecretName != "")
 }
 
 type AcceleratorDeviceClassConfig struct {
