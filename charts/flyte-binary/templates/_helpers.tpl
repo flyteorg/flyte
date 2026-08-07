@@ -125,14 +125,18 @@ Get the Flyte configuration Secret name.
 {{- end -}}
 
 {{/*
-Get the Secret name holding co-pilot's storage credentials. Separate from the
-configuration Secret because envFrom injects each key under its own name, and the
-configuration Secret's keys are config filenames rather than environment variable names.
+Whether the configuration Secret carries a storage credentials file (013-storage-secrets.yaml)
+for co-pilot to mount. Must stay in lockstep with the conditions guarding that key in
+config-secret.yaml: naming a key that is never written leaves every task pod stuck in
+ContainerCreating. secretKeyPath is excluded deliberately — it names a file that exists only
+in this deployment's own container, so mounting it into a task pod would stop co-pilot from
+starting; such deployments supply their own Secret via storage.copilotStorageSecretRef.
 */}}
-{{- define "flyte-binary.configuration.copilotStorageSecretName" -}}
-{{- printf "%s-copilot-storage-creds" (include "flyte-binary.fullname" .) -}}
+{{- define "flyte-binary.configuration.copilotStorageSecretRendered" -}}
+{{- if and (eq "s3" .Values.configuration.storage.provider) (eq "accesskey" .Values.configuration.storage.providerConfig.s3.authType) -}}
+{{- .Values.configuration.storage.providerConfig.s3.secretKey -}}
 {{- end -}}
-
+{{- end -}}
 
 {{/*
 Get the Flyte logging configuration.

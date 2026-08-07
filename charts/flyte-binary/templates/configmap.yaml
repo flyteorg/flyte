@@ -46,20 +46,25 @@ data:
           {{- with ( index .Values.configuration "co-pilot" ).image }}
           image: {{ printf "%s:%s" .repository .tag | quote }}
           {{- end }}
-          {{- if and (eq "s3" .Values.configuration.storage.provider) (eq "accesskey" .Values.configuration.storage.providerConfig.s3.authType) }}
-          {{- if or .Values.configuration.storage.copilotCredentialsSecretRef .Values.configuration.storage.providerConfig.s3.secretKey }}
-          # Co-pilot receives the S3 credentials as environment variables from this Secret
-          # rather than on its command line, where they would land in every task's pod spec
-          # and be readable by anyone who can read pods.
+          # Co-pilot reads its storage configuration from these two objects, projected into
+          # its containers as files, rather than receiving it on its command line — where the
+          # credentials would land in every task's pod spec and be readable by anyone who can
+          # read pods. Only the named keys are projected: co-pilot parses its config in strict
+          # mode and rejects the sections it does not recognise.
           #
-          # Only named when such a Secret exists. With authType=iam there is nothing to
-          # inject; with secretKeyPath the secret lives in a file this chart cannot read, so
-          # unless copilotCredentialsSecretRef names one, co-pilot keeps receiving the
-          # credentials on its command line as it did before.
-          storage-credentials:
-            secret-name: {{ .Values.configuration.storage.copilotCredentialsSecretRef | default (include "flyte-binary.configuration.copilotStorageSecretName" .) }}
-          {{- end }}
-          {{- end }}
+          # Any source left empty is simply not projected. With none of them set co-pilot
+          # falls back to receiving the stow config on its command line, as it did before.
+          storage-config:
+            mount-path: /etc/flyte/copilot
+            config-map-name: {{ .Values.configuration.storage.copilotStorageConfigMapRef | default (include "flyte-binary.configuration.configMapName" .) | quote }}
+            config-map-keys:
+              - 003-storage.yaml
+            {{- $secretRef := .Values.configuration.storage.copilotStorageSecretRef | default (ternary (include "flyte-binary.configuration.configSecretName" .) "" (not (empty (include "flyte-binary.configuration.copilotStorageSecretRendered" .)))) }}
+            secret-name: {{ $secretRef | quote }}
+            {{- if $secretRef }}
+            secret-keys:
+              - 013-storage-secrets.yaml
+            {{- end }}
         # Env vars injected into every task pod, so it can reach the control plane
         # to enqueue child actions and watch their state.
         #
