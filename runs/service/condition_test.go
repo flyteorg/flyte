@@ -16,6 +16,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
@@ -118,6 +119,22 @@ func TestUpdateActionStatus_NoOutputSkipsRunInfoWrite(t *testing.T) {
 		Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_RUNNING},
 	}))
 	require.NoError(t, err)
+}
+
+func TestUpdateActionStatus_RejectedConditionTransitionDoesNotPersistOutput(t *testing.T) {
+	actionRepo, _, svc := newTestServiceWithTaskRepo(t)
+
+	actionRepo.On("UpdateActionPhase", mock.Anything, testActionID,
+		common.ActionPhase_ACTION_PHASE_SUCCEEDED, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(interfaces.ErrPhaseTransitionRejected)
+
+	resp, err := svc.UpdateActionStatus(context.Background(), connect.NewRequest(&workflow.UpdateActionStatusRequest{
+		ActionId: testActionID,
+		Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED},
+		Output:   testBoolLiteral(true),
+	}))
+	require.NoError(t, err)
+	assert.EqualValues(t, 0, resp.Msg.GetStatus().GetCode())
 }
 
 func TestSignalEvent(t *testing.T) {
