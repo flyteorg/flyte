@@ -33,13 +33,7 @@ func (t *taskExecutionID) GetGeneratedName() string {
 }
 
 func (t *taskExecutionID) GetGeneratedNameWith(minLength, maxLength int) (string, error) {
-	// Plugins that set GeneratedNameMaxLength (ray, clustered) do so because k8s derives
-	// Services and child pod names from the object name, which must be DNS-1035 labels
-	// (leading letter, no dots). FixedLengthUniqueID passes names that already fit through
-	// verbatim — without sanitizing first, a generated name with a dot or leading digit
-	// would produce derived names the admission webhooks reject. Sanitize before hashing
-	// so create and lookup paths always derive the identical name.
-	return encoding.FixedLengthUniqueID(pluginsUtils.ConvertToDNS1035LabelCompatibleString(t.generatedName), maxLength)
+	return encoding.FixedLengthUniqueID(t.generatedName, maxLength)
 }
 
 func (t *taskExecutionID) GetID() *core.TaskExecutionIdentifier {

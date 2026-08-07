@@ -97,9 +97,9 @@ func dummyTaskCtxWithGeneratedName(taskTemplate *core.TaskTemplate, generatedNam
 		},
 	})
 	tID.EXPECT().GetGeneratedName().Return(generatedName)
-	// Mirrors the executor's implementation: DNS-1035 sanitize, then bound with a hash.
+	// Mirrors the executor's implementation: bound with a hash when over maxLength.
 	tID.EXPECT().GetGeneratedNameWith(mock.Anything, mock.Anything).RunAndReturn(func(minLength, maxLength int) (string, error) {
-		return encoding.FixedLengthUniqueID(utils.ConvertToDNS1035LabelCompatibleString(generatedName), maxLength)
+		return encoding.FixedLengthUniqueID(generatedName, maxLength)
 	}).Maybe()
 	tID.EXPECT().GetUniqueNodeID().Return("node-id")
 
@@ -1001,9 +1001,9 @@ func longestPodName(jobSetName string, replicas int32) string {
 
 // managerStampedName mirrors the name the plugin manager stamps on both the create and
 // lookup paths: GetGeneratedNameWith(0, GeneratedNameMaxLength) as implemented by the
-// executor (DNS-1035 sanitize, then bound with a hash).
+// executor (bound with a hash when over the max length).
 func managerStampedName(t *testing.T, generatedName string) string {
-	name, err := encoding.FixedLengthUniqueID(utils.ConvertToDNS1035LabelCompatibleString(generatedName), generatedNameMaxLength)
+	name, err := encoding.FixedLengthUniqueID(generatedName, generatedNameMaxLength)
 	assert.NoError(t, err)
 	return name
 }
@@ -1019,10 +1019,10 @@ func TestGeneratedNameMaxLength_BoundsPodNames(t *testing.T) {
 		assert.Equal(t, generatedNameMaxLength, *props.GeneratedNameMaxLength)
 	}
 
+	// Run names are validated as DNS-1035 labels at creation, so generated names are
+	// always label-compatible; only their length varies.
 	for _, generated := range []string{
-		"f-abc123",    // short, already compatible
-		"my.run-a0-0", // dot: legal in the TaskAction CR name, not in derived labels
-		"9run-a0-0",   // leading digit
+		"f-abc123", // short
 		"g" + strings.Repeat("a", generatedNameMaxLength-1), // exactly at the bound
 		strings.Repeat("composed-subtask-", 8) + "tail-0",   // long composed/nested name
 	} {

@@ -33,22 +33,6 @@ func ConvertToDNS1123SubdomainCompatibleString(name string) string {
 	return name
 }
 
-// ConvertToDNS1035LabelCompatibleString coerces an arbitrary string into a valid RFC 1035 DNS
-// label: starts with a letter, ends with an alphanumeric, and contains only [-a-z0-9] (no dots).
-// Service names — and names k8s controllers derive them from, like JobSet child pod prefixes —
-// must be DNS-1035 labels. ConvertToDNS1123SubdomainCompatibleString only targets the looser
-// subdomain rules and can legally retain a '.' or a leading digit, either of which would make
-// the derived label invalid — so we tighten it here.
-func ConvertToDNS1035LabelCompatibleString(name string) string {
-	name = ConvertToDNS1123SubdomainCompatibleString(name)
-	name = strings.ReplaceAll(name, ".", "-")
-	name = strings.Trim(name, "-")
-	if name == "" || name[0] < 'a' || name[0] > 'z' {
-		name = "x" + name
-	}
-	return name
-}
-
 // ConvertCamelCaseToKebabCase rewrites a string written in camel case (e.g. PenPineappleApplePen) in kebab case (pen-pineapple-apple-pen)
 func ConvertCamelCaseToKebabCase(name string) string {
 	return strings.ToLower(camelCaseRegex.ReplaceAllString(name, "${1}-${2}"))
