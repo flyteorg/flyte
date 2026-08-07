@@ -251,11 +251,15 @@ message ReusePolicy {
 
   // How long the whole reusable environment may sit idle (no running tasks) before it is torn
   // down entirely.
-  google.protobuf.Duration idle_ttl = 4 [(buf.validate.field).duration = {gte: {seconds: 0}}];
+  google.protobuf.Duration idle_ttl = 4 [(buf.validate.field).duration = {
+    gte: {seconds: 0}
+  }];
 
   // Minimum delay before an individual idle replica is scaled down during auto-scaling
   // (distinct from idle_ttl, which governs the whole environment).
-  google.protobuf.Duration scaledown_ttl = 5 [(buf.validate.field).duration = {gte: {seconds: 0}}];
+  google.protobuf.Duration scaledown_ttl = 5 [(buf.validate.field).duration = {
+    gte: {seconds: 0}
+  }];
 
   // How widely the reusable environment may be shared. Defaults to GLOBAL (reuse across all runs).
   Scope scope = 6 [(buf.validate.field).enum.defined_only = true];
