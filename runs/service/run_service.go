@@ -189,6 +189,9 @@ func (s *RunService) CreateRun(
 	switch id := request.Id.(type) {
 	case *workflow.CreateRunRequest_RunId:
 		runId = request.GetRunId()
+		if err := validateRunName(runId.GetName()); err != nil {
+			return nil, err
+		}
 	case *workflow.CreateRunRequest_ProjectId:
 		runId = &common.RunIdentifier{
 			Project: id.ProjectId.Name,
