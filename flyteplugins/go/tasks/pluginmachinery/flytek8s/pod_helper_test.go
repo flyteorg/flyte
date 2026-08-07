@@ -2033,30 +2033,71 @@ func TestToK8sPod(t *testing.T) {
 		}
 	})
 
-	// TODO @pvditt
-	//t.Run("AcceleratedInputsEnabled", func(t *testing.T) {
-	//	cfg := propellerCfg.GetConfig()
-	//	cfg.AcceleratedInputs.Enabled = true
-	//	cfg.AcceleratedInputs.VolumePath = "/test/path"
-	//	cfg.AcceleratedInputs.LocalPathPrefix = "/test/local"
-	//	defer func() { cfg.AcceleratedInputs.Enabled = false }()
-	//	x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
-	//
-	//	p, _, _, err := ToK8sPodSpec(ctx, x)
-	//
-	//	assert.NoError(t, err)
-	//	if assert.Len(t, p.Volumes, 1) {
-	//		vol := p.Volumes[0]
-	//		assert.Equal(t, "union-persistent-data-volume", vol.Name)
-	//		assert.Equal(t, cfg.AcceleratedInputs.VolumePath, vol.HostPath.Path)
-	//	}
-	//	if assert.Len(t, p.Containers, 1) && assert.Len(t, p.Containers[0].VolumeMounts, 1) {
-	//		mount := p.Containers[0].VolumeMounts[0]
-	//		assert.Equal(t, "union-persistent-data-volume", mount.Name)
-	//		assert.Equal(t, cfg.AcceleratedInputs.LocalPathPrefix, mount.MountPath)
-	//		assert.True(t, mount.ReadOnly)
-	//	}
-	//})
+	t.Run("AcceleratedInputsEnabled", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratedInputs: config.AcceleratedInputs{
+				Enabled:         true,
+				VolumePath:      "/test/path",
+				LocalPathPrefix: "/test/local",
+			},
+		}))
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
+
+		p, _, _, err := ToK8sPodSpec(ctx, x)
+
+		assert.NoError(t, err)
+		if assert.Len(t, p.Volumes, 1) {
+			vol := p.Volumes[0]
+			assert.Equal(t, "union-persistent-data-volume", vol.Name)
+			assert.Equal(t, "/test/path", vol.HostPath.Path)
+		}
+		if assert.Len(t, p.Containers, 1) && assert.Len(t, p.Containers[0].VolumeMounts, 1) {
+			mount := p.Containers[0].VolumeMounts[0]
+			assert.Equal(t, "union-persistent-data-volume", mount.Name)
+			assert.Equal(t, "/test/local", mount.MountPath)
+			assert.True(t, mount.ReadOnly)
+		}
+	})
+}
+
+func TestApplyAcceleratedInputsSpec(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		AcceleratedInputs: config.AcceleratedInputs{
+			Enabled:         true,
+			VolumePath:      "/test/path",
+			LocalPathPrefix: "/test/local",
+		},
+	}))
+
+	t.Run("existing volume without primary mount", func(t *testing.T) {
+		spec := &v1.PodSpec{
+			Containers: []v1.Container{{Name: "primary"}, {Name: "sidecar"}},
+			Volumes:    []v1.Volume{{Name: "union-persistent-data-volume"}},
+		}
+
+		ApplyAcceleratedInputsSpec(spec, "primary")
+
+		assert.Len(t, spec.Volumes, 1)
+		if assert.Len(t, spec.Containers[0].VolumeMounts, 1) {
+			mount := spec.Containers[0].VolumeMounts[0]
+			assert.Equal(t, "union-persistent-data-volume", mount.Name)
+			assert.Equal(t, "/test/local", mount.MountPath)
+			assert.True(t, mount.ReadOnly)
+		}
+		assert.Empty(t, spec.Containers[1].VolumeMounts)
+	})
+
+	t.Run("repeated application", func(t *testing.T) {
+		spec := &v1.PodSpec{
+			Containers: []v1.Container{{Name: "primary"}},
+		}
+
+		ApplyAcceleratedInputsSpec(spec, "primary")
+		ApplyAcceleratedInputsSpec(spec, "primary")
+
+		assert.Len(t, spec.Volumes, 1)
+		assert.Len(t, spec.Containers[0].VolumeMounts, 1)
+	})
 }
 
 func TestToK8sPodContainerImage(t *testing.T) {
