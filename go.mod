@@ -43,7 +43,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.32.0
 	github.com/onsi/gomega v1.42.1
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.23.2
+	github.com/prometheus/client_golang v1.24.1
 	github.com/prometheus/common v0.70.1
 	github.com/ray-project/kuberay/ray-operator v1.6.2
 	github.com/redis/go-redis/extra/redisprometheus/v9 v9.21.0
@@ -189,7 +189,7 @@ require (
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/procfs v0.21.0 // indirect
+	github.com/prometheus/procfs v0.21.1 // indirect
 	github.com/sagikazarmark/locafero v0.11.0 // indirect
 	github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8 // indirect
 	github.com/spf13/afero v1.15.0 // indirect
