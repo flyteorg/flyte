@@ -3,6 +3,8 @@ package clustered
 import (
 	"context"
 	"errors"
+	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -12,13 +14,16 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/validation"
 	k8sscheme "k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
+	"sigs.k8s.io/jobset/pkg/util/placement"
 
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	coreMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
 	pluginIOMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	plugink8s "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	k8smocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
@@ -55,6 +60,12 @@ func buildTaskTemplate(spec *clusteredpb.ClusteredTaskSpec) *core.TaskTemplate {
 
 // dummyTaskCtx builds a minimal task execution context suitable for BuildResource tests.
 func dummyTaskCtx(taskTemplate *core.TaskTemplate) *coreMocks.TaskExecutionContext {
+	return dummyTaskCtxWithGeneratedName(taskTemplate, testJobName)
+}
+
+// dummyTaskCtxWithGeneratedName is dummyTaskCtx with a caller-supplied generated name, used to
+// exercise the long composed/nested-name truncation path.
+func dummyTaskCtxWithGeneratedName(taskTemplate *core.TaskTemplate, generatedName string) *coreMocks.TaskExecutionContext {
 	taskCtx := &coreMocks.TaskExecutionContext{}
 
 	inputReader := &pluginIOMocks.InputReader{}
@@ -85,7 +96,11 @@ func dummyTaskCtx(taskTemplate *core.TaskTemplate) *coreMocks.TaskExecutionConte
 			},
 		},
 	})
-	tID.EXPECT().GetGeneratedName().Return(testJobName)
+	tID.EXPECT().GetGeneratedName().Return(generatedName)
+	// Mirrors the executor's implementation: bound with a hash when over maxLength.
+	tID.EXPECT().GetGeneratedNameWith(mock.Anything, mock.Anything).RunAndReturn(func(minLength, maxLength int) (string, error) {
+		return encoding.FixedLengthUniqueID(generatedName, maxLength)
+	}).Maybe()
 	tID.EXPECT().GetUniqueNodeID().Return("node-id")
 
 	overrides := &coreMocks.TaskOverrides{}
@@ -972,4 +987,107 @@ func TestGetCompletionTime(t *testing.T) {
 	ts, err := handler.GetCompletionTime(js)
 	assert.NoError(t, err)
 	assert.False(t, ts.IsZero())
+}
+
+// --- naming tests ---
+
+// longestPodName reproduces the worst-case pod name JobSet's admission webhook validates:
+// "<jobSetName>-<replicatedJob>-<jobIdx>-<podIdx>-<5-char random suffix>" (jobIdx is always
+// 0 here since the single ReplicatedJob has Replicas=1; podIdx maxes at replicas-1).
+func longestPodName(jobSetName string, replicas int32) string {
+	maxPodIdx := strconv.Itoa(int(replicas - 1))
+	return placement.GenPodName(jobSetName, workersReplicatedJobName, "0", maxPodIdx) + "-abcde"
+}
+
+// managerStampedName mirrors the name the plugin manager stamps on both the create and
+// lookup paths: GetGeneratedNameWith(0, GeneratedNameMaxLength) as implemented by the
+// executor (bound with a hash when over the max length).
+func managerStampedName(t *testing.T, generatedName string) string {
+	name, err := encoding.FixedLengthUniqueID(generatedName, generatedNameMaxLength)
+	assert.NoError(t, err)
+	return name
+}
+
+// TestGeneratedNameMaxLength_BoundsPodNames guards the advertised bound: every
+// manager-stamped name within GeneratedNameMaxLength must keep the worst-case derived
+// pod name a valid DNS-1035 label within the 63-char limit, across every supported
+// replica count (the bound is independent of the replica count so create and lookup
+// agree without a task template).
+func TestGeneratedNameMaxLength_BoundsPodNames(t *testing.T) {
+	props := clusteredResourceHandler{}.GetProperties()
+	if assert.NotNil(t, props.GeneratedNameMaxLength) {
+		assert.Equal(t, generatedNameMaxLength, *props.GeneratedNameMaxLength)
+	}
+
+	// Run names are validated as DNS-1035 labels at creation, so generated names are
+	// always label-compatible; only their length varies.
+	for _, generated := range []string{
+		"f-abc123", // short
+		"g" + strings.Repeat("a", generatedNameMaxLength-1), // exactly at the bound
+		strings.Repeat("composed-subtask-", 8) + "tail-0",   // long composed/nested name
+	} {
+		name := managerStampedName(t, generated)
+		assert.LessOrEqual(t, len(name), generatedNameMaxLength)
+		assert.Empty(t, validation.IsDNS1035Label(name), "stamped name %q (from %q) is not a valid DNS-1035 label", name, generated)
+		for _, replicas := range []int32{1, 128, 10000, maxReplicasForNaming} {
+			podName := longestPodName(name, replicas)
+			assert.LessOrEqual(t, len(podName), dns1035LabelMaxLength, "pod name %q (%d chars) exceeds limit for replicas=%d", podName, len(podName), replicas)
+			assert.Empty(t, validation.IsDNS1035Label(podName), "pod name %q invalid for replicas=%d", podName, replicas)
+		}
+	}
+}
+
+// TestBuildResource_NameMatchesManagerStamp guards the create/lookup invariant under the
+// GeneratedNameMaxLength mechanism: the manager stamps the same name on the built object
+// and the identity object, and BuildResource must derive that identical name for the pod
+// subdomain (the headless service and JobSet name must match for pod DNS to resolve).
+// BuildIdentityResource leaves the name empty — the manager owns naming.
+func TestBuildResource_NameMatchesManagerStamp(t *testing.T) {
+	longGeneratedName := strings.Repeat("composed-subtask-", 8) + "tail-0" // ~140 chars
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:     4,
+		NprocPerNode: 8,
+		Runtime: &clusteredpb.Runtime{
+			Kind: &clusteredpb.Runtime_Torchrun{
+				Torchrun: &clusteredpb.TorchRuntime{RdzvBackend: clusteredpb.RdzvBackend_STATIC},
+			},
+		},
+	}
+	taskCtx := dummyTaskCtxWithGeneratedName(buildTaskTemplate(spec), longGeneratedName)
+	handler := clusteredResourceHandler{}
+
+	created, err := handler.BuildResource(context.Background(), taskCtx)
+	assert.NoError(t, err)
+
+	expected := managerStampedName(t, longGeneratedName)
+	assert.NotEqual(t, longGeneratedName, expected, "long name should have been truncated")
+
+	jobSet, ok := created.(*jobsetv1alpha2.JobSet)
+	assert.True(t, ok, "expected *JobSet")
+	assert.Equal(t, expected, jobSet.Name)
+	assert.Equal(t, expected, jobSet.Spec.ReplicatedJobs[0].Template.Spec.Template.Spec.Subdomain)
+
+	identity, err := handler.BuildIdentityResource(context.Background(), taskCtx.TaskExecutionMetadata())
+	assert.NoError(t, err)
+	assert.Empty(t, identity.GetName(), "identity name is stamped by the plugin manager, not the plugin")
+}
+
+// TestBuildResource_ReplicasExceedNamingBudget verifies BuildResource fails fast with a
+// spec error when replicas exceeds the pod-index budget generatedNameMaxLength reserves
+// for; past that bound the derived pod names could exceed 63 chars and be rejected by the
+// webhook.
+func TestBuildResource_ReplicasExceedNamingBudget(t *testing.T) {
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:     maxReplicasForNaming + 1,
+		NprocPerNode: 1,
+		Runtime: &clusteredpb.Runtime{
+			Kind: &clusteredpb.Runtime_Torchrun{Torchrun: &clusteredpb.TorchRuntime{}},
+		},
+	}
+	taskCtx := dummyTaskCtx(buildTaskTemplate(spec))
+	handler := clusteredResourceHandler{}
+
+	_, err := handler.BuildResource(context.Background(), taskCtx)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "replicas must be <=")
 }
