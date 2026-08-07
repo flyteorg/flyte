@@ -9,6 +9,7 @@ import "flyteidl2/common/run.proto";
 import "flyteidl2/logs/dataplane/payload.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/task_definition.proto";
+import "flyteidl2/workflow/run_definition.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -191,6 +192,13 @@ message CreateDownloadLinkResponse {
 message GetActionDataRequest {
   // Action to query.
   common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // Source of the run the action belongs to. Run names are not unique across platform and
+  // tracked runs, so the server uses this to resolve the action against the matching service
+  // (RUN_SOURCE_TRACKED resolves via TrackedRunService; anything else keeps the platform
+  // behavior).
+  // +optional
+  workflow.RunSource run_source = 2;
 }
 
 // Response message for querying action data.

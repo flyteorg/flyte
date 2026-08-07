@@ -4,6 +4,12 @@
 
 Chart for basic single Flyte executable deployment
 
+## Requirements
+
+| Repository | Name | Version |
+|------------|------|---------|
+| file://../flyteconnector | flyteconnector | v2.0.0 |
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -58,10 +64,12 @@ Chart for basic single Flyte executable deployment
 | configuration.storage.providerConfig.s3.endpoint | string | `""` |  |
 | configuration.storage.providerConfig.s3.region | string | `"us-east-1"` |  |
 | configuration.storage.providerConfig.s3.secretKey | string | `""` |  |
+| configuration.storage.providerConfig.s3.secretKeyPath | string | `""` |  |
 | configuration.storage.providerConfig.s3.v2Signing | bool | `false` |  |
 | console.affinity | object | `{}` |  |
 | console.basePath | string | `"/v2"` |  |
 | console.containerPort | int | `8080` |  |
+| console.env | list | `[]` |  |
 | console.image.pullPolicy | string | `"IfNotPresent"` |  |
 | console.image.repository | string | `"ghcr.io/unionai-oss/flyteconsole-v2"` |  |
 | console.image.tag | string | `"latest"` |  |
@@ -130,12 +138,14 @@ Chart for basic single Flyte executable deployment
 | flyte-core-components.secret.kubernetes.burst | int | `200` |  |
 | flyte-core-components.secret.kubernetes.clusterName | string | `"flyte-devbox"` |  |
 | flyte-core-components.secret.kubernetes.kubeconfig | string | `""` |  |
-| flyte-core-components.secret.kubernetes.namespace | string | `"flyte"` |  |
+| flyte-core-components.secret.kubernetes.namespace | string | `"{{ .Release.Namespace }}"` |  |
 | flyte-core-components.secret.kubernetes.qps | int | `100` |  |
 | flyte-core-components.secret.kubernetes.timeout | string | `"30s"` |  |
+| flyte-core-components.secret.webhookURL | string | `"http://{{ include \"flyte-binary.webhook.headlessServiceName\" . }}.{{ .Release.Namespace }}.svc:9444"` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.apiJwtIngress.annotations | object | `{}` |  |
 | ingress.apiJwtIngress.enabled | bool | `false` |  |
+| ingress.apiJwtIngress.host | string | `""` |  |
 | ingress.apiJwtIngress.ingressClassName | string | `""` |  |
 | ingress.apiJwtIngress.tls | list | `[]` |  |
 | ingress.commonAnnotations | object | `{}` |  |
@@ -151,6 +161,7 @@ Chart for basic single Flyte executable deployment
 | ingress.tls | list | `[]` |  |
 | ingress.wellknownIngress.annotations | object | `{}` |  |
 | ingress.wellknownIngress.enabled | bool | `false` |  |
+| ingress.wellknownIngress.host | string | `""` |  |
 | ingress.wellknownIngress.ingressClassName | string | `""` |  |
 | ingress.wellknownIngress.tls | list | `[]` |  |
 | nameOverride | string | `""` |  |

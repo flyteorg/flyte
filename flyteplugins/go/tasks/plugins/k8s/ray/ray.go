@@ -25,6 +25,7 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
@@ -303,7 +304,7 @@ func constructRayJob(ctx context.Context, taskCtx pluginsCore.TaskExecutionConte
 		ttlSecondsAfterFinished = &rayJob.TtlSecondsAfterFinished
 	}
 
-	submitterPodTemplate := buildSubmitterPodTemplate(&rayClusterSpec)
+	submitterPodTemplate := buildSubmitterPodTemplate(&rayClusterSpec, taskCtx)
 
 	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
 	var runtimeEnvYaml string
@@ -415,6 +416,16 @@ func injectLogsSidecar(primaryContainer *v1.Container, podSpec *v1.PodSpec) {
 	podSpec.Containers = append(podSpec.Containers, *sidecar)
 }
 
+// logNoiseDisablingEnvVars disables Ray's terminal-oriented log decorations (ANSI-colored log
+// prefixes and Ray Data progress bars) so logs collected from non-interactive head and worker
+// pods stay readable. Shared by the head and worker builders to keep the two in sync.
+func logNoiseDisablingEnvVars() []v1.EnvVar {
+	return []v1.EnvVar{
+		{Name: "RAY_COLOR_PREFIX", Value: "0"},
+		{Name: "RAY_DATA_DISABLE_PROGRESS_BARS", Value: "1"},
+	}
+}
+
 func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.HeadGroupSpec, gpuAccelerator *core.GPUAccelerator) (v1.PodTemplateSpec, error) {
 	// Some configs are copy from  https://github.com/ray-project/kuberay/blob/b72e6bdcd9b8c77a9dc6b5da8560910f3a0c3ffd/apiserver/pkg/util/cluster.go#L97
 	// They should always be the same, so we could hard code here.
@@ -430,6 +441,7 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 			},
 		},
 	}
+	envs = append(envs, logNoiseDisablingEnvVars()...)
 
 	// Removed 'a0 ..' / 'pyflyte-execute ..' args from the pod spec.
 	primaryContainer.Args = []string{}
@@ -486,7 +498,7 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 	return podTemplateSpec, nil
 }
 
-func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec) v1.PodTemplateSpec {
+func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec, taskCtx pluginsCore.TaskExecutionContext) v1.PodTemplateSpec {
 
 	headPodSpec := rayClusterSpec.HeadGroupSpec.Template.Spec
 
@@ -496,7 +508,7 @@ func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec) v1.PodTempl
 	}
 
 	enableServiceLinks := false
-	return v1.PodTemplateSpec{
+	podTemplateSpec := v1.PodTemplateSpec{
 		Spec: v1.PodSpec{
 			Containers: []v1.Container{
 				{
@@ -513,6 +525,10 @@ func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec) v1.PodTempl
 			Affinity:    config.GetK8sPluginConfig().DefaultAffinity,
 		},
 	}
+	k8sCfg := config.GetK8sPluginConfig()
+	podTemplateSpec.SetLabels(utils.UnionMaps(k8sCfg.DefaultLabels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels())))
+	podTemplateSpec.SetAnnotations(utils.UnionMaps(k8sCfg.DefaultAnnotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations())))
+	return podTemplateSpec
 }
 
 func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMetadata *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.WorkerGroupSpec, gpuAccelerator *core.GPUAccelerator) (v1.PodTemplateSpec, error) {
@@ -585,6 +601,7 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 			},
 		},
 	}
+	envs = append(envs, logNoiseDisablingEnvVars()...)
 
 	primaryContainer.Env = append(primaryContainer.Env, envs...)
 
@@ -755,6 +772,33 @@ func getEventInfoForRayJob(ctx context.Context, logConfig logs.LogConfig, plugin
 	}, nil
 }
 
+// UpdateLinkReadiness flips the readiness of the dashboard/IDE task links in phaseInfo and
+// stamps a matching phase reason. Exported so wrappers that determine head readiness through a
+// different lookup (e.g. jobs submitted to a pre-existing cluster via ClusterSelector) reuse the
+// exact same link handling.
+func UpdateLinkReadiness(phaseInfo *pluginsCore.PhaseInfo, ready bool) {
+	if phaseInfo == nil || phaseInfo.Info() == nil {
+		return
+	}
+	for _, tl := range phaseInfo.Info().Logs {
+		if tl != nil && tl.LinkType == core.TaskLog_DASHBOARD {
+			tl.Ready = ready
+			if !ready || phaseInfo.Phase() < pluginsCore.PhaseRunning {
+				phaseInfo.WithReason("Ray dashboard is not ready")
+			} else {
+				phaseInfo.WithReason("Ray dashboard is ready")
+			}
+		} else if tl != nil && tl.LinkType == core.TaskLog_IDE {
+			tl.Ready = ready
+			if !ready || phaseInfo.Phase() != pluginsCore.PhaseRunning {
+				phaseInfo.WithReason("Vscode server is not ready")
+			} else {
+				phaseInfo.WithReason("Vscode server is ready")
+			}
+		}
+	}
+}
+
 func isRayHeadReady(ctx context.Context, rayJobName string, pluginContext k8s.PluginContext) (bool, error) {
 	podList := &v1.PodList{}
 	err := pluginContext.K8sReader().List(ctx, podList)
@@ -830,7 +874,20 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		return pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "cluster is suspended", info), nil
 	case rayv1.JobDeploymentStatusFailed:
 		failInfo := fmt.Sprintf("Failed to run Ray job %s with error: [%s] %s", rayJob.Name, rayJob.Status.Reason, rayJob.Status.Message)
+		// Honor a RECOVERABLE error.pb (written by sdk) so the task's retries fire. A failed RayJob surfaces here as a
+		// terminal phase, so -- unlike the success path -- the k8s plugin manager never reads the
+		// error file on our behalf. Key off the proto-level recoverability so only a genuine
+		// RECOVERABLE container error retries: an absent, unreadable, or malformed error file is
+		// reported by the reader as a SYSTEM error and stays terminal, preserving previous behavior.
 		phaseInfo, err = pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, failInfo, info), nil
+		if ow := pluginContext.OutputWriter(); ow != nil {
+			reader := ioutils.NewRemoteFileOutputReader(ctx, pluginContext.DataStore(), ow, 0)
+			if hasErr, readerErr := reader.IsError(ctx); readerErr == nil && hasErr {
+				if execErr, readerErr := reader.ReadError(ctx); readerErr == nil && execErr.GetRecoverability() == core.ContainerError_RECOVERABLE {
+					phaseInfo = pluginsCore.PhaseInfoRetryableFailure(flyteerr.TaskFailedWithError, failInfo, info)
+				}
+			}
+		}
 	default:
 		// We already handle all known deployment status, so this should never happen unless a future version of ray
 		// introduced a new job status.
@@ -840,23 +897,7 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	if ready, err := isRayHeadReady(ctx, rayJob.Name, pluginContext); err != nil {
 		logger.Warnf(ctx, "Failed to determine Ray dashboard readiness. Error: %v", err)
 	} else {
-		for _, tl := range info.Logs {
-			if tl != nil && tl.LinkType == core.TaskLog_DASHBOARD {
-				tl.Ready = ready
-				if !ready || phaseInfo.Phase() < pluginsCore.PhaseRunning {
-					phaseInfo.WithReason("Ray dashboard is not ready")
-				} else {
-					phaseInfo.WithReason("Ray dashboard is ready")
-				}
-			} else if tl != nil && tl.LinkType == core.TaskLog_IDE {
-				tl.Ready = ready
-				if !ready || phaseInfo.Phase() != pluginsCore.PhaseRunning {
-					phaseInfo.WithReason("Vscode server is not ready")
-				} else {
-					phaseInfo.WithReason("Vscode server is ready")
-				}
-			}
-		}
+		UpdateLinkReadiness(&phaseInfo, ready)
 	}
 
 	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)

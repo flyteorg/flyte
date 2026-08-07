@@ -366,7 +366,7 @@ func TestBuildResourceDaskHappyPath(t *testing.T) {
 	assert.Equal(t, v1.RestartPolicyAlways, schedulerSpec.RestartPolicy)
 	assert.Equal(t, defaultTestImage, schedulerSpec.Containers[0].Image)
 	assert.Equal(t, defaultResources, schedulerSpec.Containers[0].Resources)
-	assert.Equal(t, []string{"dask-scheduler"}, schedulerSpec.Containers[0].Args)
+	assert.Equal(t, []string{"dask", "scheduler"}, schedulerSpec.Containers[0].Args)
 	assert.Equal(t, expectedPorts, schedulerSpec.Containers[0].Ports)
 	// Flyte adds more environment variables to the scheduler
 	assert.Contains(t, schedulerSpec.Containers[0].Env, testEnvVars[0])
@@ -409,7 +409,8 @@ func TestBuildResourceDaskHappyPath(t *testing.T) {
 	assert.Equal(t, defaultNodeSelector, workerSpec.NodeSelector)
 	assert.Equal(t, defaultAffinity, workerSpec.Affinity)
 	assert.Equal(t, []string{
-		"dask-worker",
+		"dask",
+		"worker",
 		"--name",
 		"$(DASK_WORKER_NAME)",
 		"--nthreads",

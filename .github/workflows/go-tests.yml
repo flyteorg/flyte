@@ -25,6 +25,9 @@ jobs:
           - component: runs
             # Exclude runs/test/ which contains integration tests
             test-args: $(go list ./runs/... | grep -v /test)
+          - component: runs-api-integration
+            # API integration tests using embedded-postgres
+            test-args: ./runs/test/api/...
           - component: executor
             # Controller tests require envtest binaries (etcd + kube-apiserver)
             needs-envtest: true

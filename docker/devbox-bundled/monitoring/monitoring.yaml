@@ -1,0 +1,217 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-conf
+  namespace: monitoring
+data:
+  collector.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+            # otelconnect's cumulative payload exceeds the 4 MiB default
+            max_recv_msg_size_mib: 64
+    processors:
+      batch: {}
+      # otelconnect tags server metrics with net.peer.port (ephemeral client
+      # port); without collapsing it every series is a one-shot and rate()
+      # reads zero everywhere.
+      metricstransform:
+        transforms:
+          - include: ^rpc\..*
+            match_type: regexp
+            action: update
+            operations:
+              - action: aggregate_labels
+                label_set: [service.name, rpc.method, rpc.service, rpc.system, rpc.connect_rpc.error_code]
+                aggregation_type: sum
+    exporters:
+      prometheus:
+        endpoint: 0.0.0.0:8889
+        # turn resource attrs (service.name) into metric labels, otherwise the
+        # dashboard's `service` template variable is empty and per-service
+        # panels have nothing to group by
+        resource_to_telemetry_conversion:
+          enabled: true
+    service:
+      pipelines:
+        metrics:
+          receivers: [otlp]
+          processors: [metricstransform, batch]
+          exporters: [prometheus]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: otel-collector } }
+  template:
+    metadata:
+      labels: { app: otel-collector }
+    spec:
+      containers:
+        - name: collector
+          image: docker.io/otel/opentelemetry-collector-contrib:0.116.1
+          args: ["--config=/conf/collector.yaml"]
+          ports:
+            - { name: otlp-grpc, containerPort: 4317 }
+            - { name: prometheus, containerPort: 8889 }
+          volumeMounts: [{ name: conf, mountPath: /conf }]
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+      volumes:
+        - name: conf
+          configMap: { name: otel-collector-conf }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector
+  namespace: monitoring
+spec:
+  selector: { app: otel-collector }
+  ports:
+    - { name: otlp-grpc, port: 4317, targetPort: 4317 }
+    - { name: prometheus, port: 8889, targetPort: 8889 }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-conf
+  namespace: monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+    scrape_configs:
+      - job_name: otel-collector
+        static_configs:
+          - targets: ["otel-collector.monitoring.svc.cluster.local:8889"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: prometheus } }
+  template:
+    metadata:
+      labels: { app: prometheus }
+    spec:
+      containers:
+        - name: prometheus
+          image: docker.io/prom/prometheus:v3.1.0
+          args:
+            - --config.file=/etc/prometheus/prometheus.yml
+            - --storage.tsdb.retention.time=6h
+            - --storage.tsdb.path=/prometheus
+          ports: [{ containerPort: 9090 }]
+          volumeMounts:
+            - { name: conf, mountPath: /etc/prometheus }
+            - { name: data, mountPath: /prometheus }
+          resources:
+            requests: { cpu: 50m, memory: 256Mi }
+      volumes:
+        - name: conf
+          configMap: { name: prometheus-conf }
+        - name: data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: monitoring
+spec:
+  selector: { app: prometheus }
+  ports: [{ port: 9090, targetPort: 9090 }]
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-provisioning
+  namespace: monitoring
+data:
+  datasource.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        uid: prometheus          # the dashboard's 59 panels reference this uid
+        access: proxy
+        url: http://prometheus.monitoring.svc.cluster.local:9090
+        isDefault: true
+  dashboards.yaml: |
+    apiVersion: 1
+    providers:
+      - name: flyte
+        orgId: 1
+        folder: ""
+        type: file
+        options:
+          path: /var/lib/grafana/dashboards
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: grafana } }
+  template:
+    metadata:
+      labels: { app: grafana }
+    spec:
+      containers:
+        - name: grafana
+          image: docker.io/grafana/grafana:11.5.1
+          env:
+            # Anonymous access so the dashboard opens without a login, but as a
+            # Viewer: k3s publishes NodePorts on 0.0.0.0, so this is reachable
+            # from the LAN, and a Grafana Admin can add datasources — which makes
+            # the pod issue arbitrary requests to whatever it can reach. Viewing
+            # is all this stack is for. Basic auth stays enabled so an admin
+            # login is still available (admin/admin on first start) if you want
+            # to edit panels.
+            - { name: GF_AUTH_ANONYMOUS_ENABLED, value: "true" }
+            - { name: GF_AUTH_ANONYMOUS_ORG_ROLE, value: "Viewer" }
+          ports: [{ containerPort: 3000 }]
+          volumeMounts:
+            - { name: provisioning-ds, mountPath: /etc/grafana/provisioning/datasources }
+            - { name: provisioning-db, mountPath: /etc/grafana/provisioning/dashboards }
+            - { name: dashboards, mountPath: /var/lib/grafana/dashboards }
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+      volumes:
+        - name: provisioning-ds
+          configMap:
+            name: grafana-provisioning
+            items: [{ key: datasource.yaml, path: datasource.yaml }]
+        - name: provisioning-db
+          configMap:
+            name: grafana-provisioning
+            items: [{ key: dashboards.yaml, path: dashboards.yaml }]
+        - name: dashboards
+          configMap: { name: grafana-dashboards }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  type: NodePort
+  selector: { app: grafana }
+  ports: [{ port: 3000, targetPort: 3000, nodePort: 30300 }]

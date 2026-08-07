@@ -13,8 +13,9 @@ import (
 // pub/sub machinery (Subscribe/Unsubscribe/notifySubscribers).
 func newSubscribeTestClient() *ActionsClient {
 	return &ActionsClient{
-		bufferSize:  10,
-		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+		recordedFilter: testFilter(),
+		bufferSize:     10,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 }
 

@@ -42,6 +42,13 @@ const (
 	OrganizationLabel = "organization"
 	EmptySecretScope  = ""
 
+	// DefaultOrganization is the placeholder org for Flyte OSS v2, which has no organization
+	// concept, but whose secret fetcher still requires one. Everything that stamps the
+	// OrganizationLabel on a pod, encodes a secret name, or invalidates a cached secret must
+	// use this same value: the org is part of the cache key, so a mismatch between any two of
+	// them silently resolves to a different secret or clears a key nobody reads.
+	DefaultOrganization = "flyte"
+
 	// All of the namespace, group and key cannot contain '/' so it is safe to use '/' as a delimiter.
 	NamespaceGroupKeyDelimiter = "/"
 	rawK8sSecretsStorageFormat = valueFormatter + NamespaceGroupKeyDelimiter + valueFormatter + NamespaceGroupKeyDelimiter + valueFormatter
@@ -75,6 +82,24 @@ type EmbeddedSecretManagerInjector struct {
 
 func (i *EmbeddedSecretManagerInjector) Type() config.SecretManagerType {
 	return config.SecretManagerTypeEmbedded
+}
+
+// InvalidateCache drops the cached value(s) for a secret so the next pod admission re-reads it
+// from the fetchers. lookUpSecret caches under whichever cascade scope the fetcher resolved the
+// secret at (project+domain, domain, or org), and the caller has no way to know which one that
+// was, so all three keys are cleared.
+func (i *EmbeddedSecretManagerInjector) InvalidateCache(ctx context.Context, org, domain, project, secretName string) {
+	for _, cacheKey := range []string{
+		EncodeSecretName(org, domain, project, secretName),
+		EncodeSecretName(org, domain, EmptySecretScope, secretName),
+		EncodeSecretName(org, EmptySecretScope, EmptySecretScope, secretName),
+	} {
+		if err := i.secretCache.Delete(ctx, cacheKey); err != nil {
+			logger.Debugf(ctx, "Failed to delete cache entry [%s]: %v", cacheKey, err)
+		}
+	}
+
+	logger.Infof(ctx, "Invalidated cache entries for secret [%s/%s/%s/%s]", org, domain, project, secretName)
 }
 
 func GetSecretID(secretKey string, labels map[string]string) (string, error) {

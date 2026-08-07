@@ -7,6 +7,7 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
@@ -103,3 +104,37 @@ func TestNewTaskExecutionMetadata_UsesTaskTemplateID(t *testing.T) {
 	require.Equal(t, taskID.GetName(), got.GetName())
 	require.Equal(t, taskID.GetVersion(), got.GetVersion())
 }
+
+func TestTaskExecutionID_GetGeneratedNameWith(t *testing.T) {
+	t.Run("within max length", func(t *testing.T) {
+		execID := &taskExecutionID{
+			generatedName: "short-name",
+		}
+		name, err := execID.GetGeneratedNameWith(0, 50)
+		require.NoError(t, err)
+		require.Equal(t, "short-name", name)
+	})
+
+	t.Run("exceeds max length uses FixedLengthUniqueID", func(t *testing.T) {
+		execID := &taskExecutionID{
+			generatedName: "a-very-long-generated-name-that-exceeds-the-max-length-limit-12345",
+		}
+		maxLength := 20
+		name, err := execID.GetGeneratedNameWith(0, maxLength)
+		require.NoError(t, err)
+		require.LessOrEqual(t, len(name), maxLength)
+
+		expected, err := encoding.FixedLengthUniqueID(execID.generatedName, maxLength)
+		require.NoError(t, err)
+		require.Equal(t, expected, name)
+	})
+
+	t.Run("max length too small returns error", func(t *testing.T) {
+		execID := &taskExecutionID{
+			generatedName: "long-name",
+		}
+		_, err := execID.GetGeneratedNameWith(0, 2)
+		require.Error(t, err)
+	})
+}
+

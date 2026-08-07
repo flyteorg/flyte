@@ -54,7 +54,7 @@ func monitor(ctx context.Context, tCtx core.TaskExecutionContext, p Client, cach
 	}
 
 	if cacheItem.Phase != newPluginPhase {
-		logger.Infof(ctx, "Moving Phase for from %s to %s", cacheItem.Phase, newPluginPhase)
+		logger.Debugf(ctx, "Moving phase for %s from %s to %s", cacheItemID, cacheItem.Phase, newPluginPhase)
 	}
 
 	cacheItem.Phase = newPluginPhase

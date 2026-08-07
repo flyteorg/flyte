@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"io"
 	"time"
+
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 
 	"connectrpc.com/connect"
 	grpcstatus "google.golang.org/genproto/googleapis/rpc/status"
@@ -161,6 +162,17 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 			info.OutputsUri = v.Trace.GetOutputs().GetOutputUri()
 		}
 
+	case *workflow.RecordActionRequest_Condition:
+		spec.Spec = &workflow.ActionSpec_Condition{Condition: v.Condition}
+
+		action.ActionType = int32(workflow.ActionType_ACTION_TYPE_CONDITION)
+		// The condition name fills the task-name/function-name slots so listings
+		// and details have a display name; there is no task spec or digest.
+		action.TaskName = sql.NullString{String: v.Condition.GetName(), Valid: v.Condition.GetName() != ""}
+		action.FunctionName = v.Condition.GetName()
+
+		info.Condition = v.Condition
+
 	default:
 		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unsupported action spec type: %T", req.GetSpec()))
 	}
@@ -233,12 +245,15 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 	actionStatus := req.GetStatus()
 	var endTime *time.Time
 	if actionStatus.GetEndTime() != nil {
-		t := actionStatus.GetEndTime().AsTime()
-		endTime = &t
+		endTime = new(actionStatus.GetEndTime().AsTime())
 	} else if IsTerminalPhase(actionStatus.GetPhase()) {
 		// If no end time is provided but the phase is terminal, use now.
-		t := time.Now()
-		endTime = &t
+		endTime = new(time.Now())
+	}
+
+	var startTime *time.Time
+	if actionStatus.GetStartTime() != nil {
+		startTime = new(actionStatus.GetStartTime().AsTime())
 	}
 
 	if err := s.repo.ActionRepo().UpdateActionPhase(
@@ -248,11 +263,48 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 		actionStatus.GetAttempts(),
 		actionStatus.GetCacheStatus(),
 		endTime,
+		startTime,
 	); err != nil {
 		logger.Warnf(ctx, "UpdateActionStatus: failed to update action %s: %v", req.GetActionId().GetName(), err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
+
+	// Persist the inline signal payload (conditions only). The CR is GC'd after
+	// terminal recording, so RunInfo in the DB is the long-term record of the
+	// resolved value and the signalling actor.
+	if req.GetOutput() != nil || req.GetPrincipal() != nil {
+		if err := s.mergeRunInfoOutput(ctx, req); err != nil {
+			logger.Warnf(ctx, "UpdateActionStatus: failed to persist output for %s: %v", req.GetActionId().GetName(), err)
+			return connect.NewError(connect.CodeInternal, err)
+		}
+	}
 	return nil
+}
+
+// mergeRunInfoOutput read-modify-writes the action's RunInfo with the signal
+// output/principal from a terminal status update.
+func (s *RunService) mergeRunInfoOutput(ctx context.Context, req *workflow.UpdateActionStatusRequest) error {
+	model, err := s.repo.ActionRepo().GetAction(ctx, req.GetActionId())
+	if err != nil {
+		return err
+	}
+	info := &workflow.RunInfo{}
+	if len(model.DetailedInfo) > 0 {
+		if err := proto.Unmarshal(model.DetailedInfo, info); err != nil {
+			return err
+		}
+	}
+	if req.GetOutput() != nil {
+		info.Output = req.GetOutput()
+	}
+	if req.GetPrincipal() != nil {
+		info.Principal = req.GetPrincipal()
+	}
+	detailedInfo, err := proto.Marshal(info)
+	if err != nil {
+		return err
+	}
+	return s.repo.ActionRepo().UpdateActionDetailedInfo(ctx, req.GetActionId(), detailedInfo)
 }
 
 // RecordActionEvents records a batch of action events.

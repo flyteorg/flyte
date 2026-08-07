@@ -1,8 +1,15 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"net"
+	"net/http"
+	"net/url"
+	"strings"
+	"time"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -11,6 +18,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/v2/executor/pkg/webhook"
 	flytesecret "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	commonpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -25,10 +33,24 @@ const (
 	projectLabelKey         = "app.flyte.org/project"
 	domainLabelKey          = "app.flyte.org/domain"
 
+	// cacheInvalidationTimeout bounds the best-effort call to the webhook's invalidation
+	// endpoint so a wedged webhook can't stall secret writes.
+	cacheInvalidationTimeout = 5 * time.Second
+
+	// defaultCacheInvalidationPort is used when webhookURL names no port. Must match
+	// the webhook's cacheInvalidationPort.
+	defaultCacheInvalidationPort = "9444"
+
+	// schemeSeparator and defaultWebhookScheme fill in a scheme when webhookURL omits one.
+	schemeSeparator      = "://"
+	defaultWebhookScheme = "http" + schemeSeparator
+
+	staleWarning = "the old value may be served until the webhook cache TTL expires"
+
 	// defaultOrganization is a placeholder org used in the encoded secret ID
 	// because Flyte OSS v2 has no organization concept. It must match the
 	// organization label stamped on task pods by the executor.
-	defaultOrganization = "flyte"
+	defaultOrganization = flytesecret.DefaultOrganization
 )
 
 // Ensure SecretService implements SecretServiceHandler at compile time.
@@ -37,11 +59,126 @@ var _ secretconnect.SecretServiceHandler = (*SecretService)(nil)
 // SecretService implements the SecretService gRPC API.
 type SecretService struct {
 	k8sClient client.Client
+
+	// webhookURL is the base URL of the pod webhook's cache invalidation server — its 9444
+	// port, not the 9443 admission port. Empty disables invalidation, in which case writes
+	// take effect after the webhook's TTL.
+	webhookURL string
+	httpClient *http.Client
 }
 
-// NewSecretService creates a new SecretService.
-func NewSecretService(k8sClient client.Client) *SecretService {
-	return &SecretService{k8sClient: k8sClient}
+// NewSecretService creates a new SecretService. webhookURL is the base URL of the pod
+// webhook's cache invalidation server; pass "" to disable cache invalidation.
+func NewSecretService(k8sClient client.Client, webhookURL string) *SecretService {
+	return &SecretService{
+		k8sClient:  k8sClient,
+		webhookURL: webhookURL,
+		httpClient: &http.Client{Timeout: cacheInvalidationTimeout},
+	}
+}
+
+// invalidateWebhookSecretCache asks the pod webhook to drop any cached value for id.
+func (s *SecretService) invalidateWebhookSecretCache(ctx context.Context, id *secretpb.SecretIdentifier) {
+	if s.webhookURL == "" {
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), cacheInvalidationTimeout)
+	defer cancel()
+
+	body, err := json.Marshal(webhook.InvalidateRequest{
+		Org:     defaultOrganization,
+		Domain:  id.GetDomain(),
+		Project: id.GetProject(),
+		Name:    id.GetName(),
+	})
+	if err != nil {
+		logger.Warnf(ctx, "failed to encode cache invalidation request for %v: %v", id.GetName(), err)
+		return
+	}
+
+	targets, err := s.invalidationTargets(ctx)
+	if err != nil {
+		logger.Warnf(ctx, "failed to resolve webhook cache invalidation targets for %v: %v; %s", id.GetName(), err, staleWarning)
+		return
+	}
+
+	failed := 0
+	for _, target := range targets {
+		if err := s.postInvalidation(ctx, target, body); err != nil {
+			failed++
+			logger.Warnf(ctx, "failed to invalidate secret cache for %v on %s: %v", id.GetName(), target, err)
+		}
+	}
+
+	if failed > 0 {
+		logger.Warnf(ctx, "secret cache invalidation for %v failed on %d/%d webhook pod(s); %s", id.GetName(), failed, len(targets), staleWarning)
+		return
+	}
+
+	logger.Debugf(ctx, "invalidated webhook secret cache for %v across %d pod(s)", id.GetName(), len(targets))
+}
+
+// invalidationTargets resolves the configured host to one URL per webhook pod.
+//
+// Resolution rather than a single request is what makes this correct against a headless Service.
+func (s *SecretService) invalidationTargets(ctx context.Context) ([]string, error) {
+	raw := strings.TrimSuffix(s.webhookURL, "/")
+	if !strings.Contains(raw, schemeSeparator) {
+		raw = defaultWebhookScheme + raw
+	}
+
+	base, err := url.Parse(raw)
+	if err != nil {
+		return nil, fmt.Errorf("parsing %q: %w", s.webhookURL, err)
+	}
+
+	host := base.Hostname()
+	if host == "" {
+		return nil, fmt.Errorf("no host in %q", s.webhookURL)
+	}
+	port := base.Port()
+	if port == "" {
+		port = defaultCacheInvalidationPort
+	}
+
+	// LookupHost passes IP literals straight through, so an explicitly configured address works.
+	ips, err := net.DefaultResolver.LookupHost(ctx, host)
+	if err != nil {
+		return nil, fmt.Errorf("resolving %q: %w", host, err)
+	}
+	if len(ips) == 0 {
+		return nil, fmt.Errorf("no webhook pods resolved for %q", host)
+	}
+
+	targets := make([]string, 0, len(ips))
+	for _, ip := range ips {
+		targets = append(targets, (&url.URL{
+			Scheme: base.Scheme,
+			Host:   net.JoinHostPort(ip, port),
+			Path:   webhook.InvalidateSecretPath,
+		}).String())
+	}
+	return targets, nil
+}
+
+func (s *SecretService) postInvalidation(ctx context.Context, target string, body []byte) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, target, bytes.NewReader(body))
+	if err != nil {
+		return fmt.Errorf("building request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := s.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close() // nolint: errcheck
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("returned %s", resp.Status)
+	}
+	return nil
 }
 
 // validateScope enforces the valid scope combinations supported by the secret
@@ -97,6 +234,8 @@ func (s *SecretService) CreateSecret(ctx context.Context, req *connect.Request[s
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
+	s.invalidateWebhookSecretCache(ctx, req.Msg.GetId())
+
 	return connect.NewResponse(&secretpb.CreateSecretResponse{}), nil
 }
 
@@ -141,6 +280,8 @@ func (s *SecretService) UpdateSecret(ctx context.Context, req *connect.Request[s
 		logger.Errorf(ctx, "failed to update secret %v: %v", encodedName, err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+
+	s.invalidateWebhookSecretCache(ctx, req.Msg.GetId())
 
 	return connect.NewResponse(&secretpb.UpdateSecretResponse{}), nil
 }
@@ -198,6 +339,12 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 		},
 	}
 
+	// If the Secret is already gone
+	// (deleted out-of-band) this returns NotFound, but the webhook may still be serving the
+	// old value from cache — leaving a secret the user believes is deleted injected into pods
+	// for up to the cache TTL. Deferred so the NotFound and error paths are covered too.
+	defer s.invalidateWebhookSecretCache(ctx, req.Msg.GetId())
+
 	if err := s.k8sClient.Delete(ctx, k8sSecret); err != nil {
 		if k8sErrors.IsNotFound(err) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", req.Msg.GetId().GetName()))
@@ -207,6 +354,7 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 	}
 
 	logger.Debugf(ctx, "deleted k8s secret %v", k8sSecretName)
+
 	return connect.NewResponse(&secretpb.DeleteSecretResponse{}), nil
 }
 

@@ -92,7 +92,12 @@ func TaskSpecToLaunchFormJson(ctx context.Context, taskSpec *task.TaskSpec) (*st
 //     }
 func JSONValuesToLiterals(ctx context.Context, variableMap *core.VariableMap, values *structpb.Struct) ([]*task.NamedLiteral, error) {
 	if variableMap == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("variableMap cannot be nil"))
+		// A task with no declared inputs has no variableMap. There are no
+		// expected inputs, so treat it as empty rather than erroring: an empty
+		// payload yields no literals, and any provided values are unmapped and
+		// get ignored (debug-logged) below, consistent with how we handle
+		// unmapped fields elsewhere.
+		variableMap = &core.VariableMap{}
 	}
 	if values == nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("values cannot be nil"))
@@ -164,10 +169,10 @@ func JSONValuesToLiterals(ctx context.Context, variableMap *core.VariableMap, va
 
 	if len(unmappedFields) > 0 {
 		// Extra fields in values that don't have corresponding variables in variableMap
-		// are allowed and will be ignored (with a warning). This is intentional to avoid
+		// are allowed and will be ignored (logged at debug). This is intentional to avoid
 		// hard failures when translating literals for a task version that has a different
 		// template than the original task these inputs were derived from.
-		logger.Warnf(ctx, "found unmapped fields in JSON payload that do not correspond to any variable (ignoring): %v", unmappedFields)
+		logger.Debugf(ctx, "found unmapped fields in JSON payload that do not correspond to any variable (ignoring): %v", unmappedFields)
 	}
 
 	return literals, nil
@@ -387,8 +392,15 @@ func LiteralsToLaunchFormJson(ctx context.Context, literals []*task.NamedLiteral
 	for _, literal := range literals {
 		variable, ok := varMap[literal.GetName()]
 		if !ok {
-			logger.Errorf(ctx, "variable not found in variable map for literal: %s", literal.GetName())
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("variable not found in variable map for literal: %s", literal.GetName()))
+			// The literal has no corresponding variable in the target interface.
+			// This happens legitimately when re-converting a run's inputs against a
+			// different task version (e.g. the launch-form version selector switching
+			// versions): inputs the new task def dropped have nowhere to map. Skip
+			// them (logged at debug) instead of failing the whole conversion, so the
+			// inputs the two versions *share* are still preserved. Mirrors the
+			// unmapped-field handling in JSONValuesToLiterals.
+			logger.Debugf(ctx, "skipping literal %q with no corresponding variable in the target interface (ignoring)", literal.GetName())
+			continue
 		}
 		fieldName := literal.GetName()
 

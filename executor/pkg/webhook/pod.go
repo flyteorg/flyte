@@ -59,6 +59,12 @@ func (pm PodMutator) Handle(ctx context.Context, request admission.Request) admi
 	return admission.Allowed("No changes")
 }
 
+// SecretsMutator returns the mutator that owns the secret caches, so the cache invalidation
+// server can clear them.
+func (pm PodMutator) SecretsMutator() *secret.SecretsPodMutator {
+	return pm.secretsMutator
+}
+
 func (pm PodMutator) Register(ctx context.Context, mgr manager.Manager) error {
 	wh := &admission.Webhook{Handler: pm}
 	mutatePath := getPodMutatePath()
@@ -127,6 +133,7 @@ func (pm PodMutator) CreateMutationWebhookConfiguration(namespace string) (*admi
 				FailurePolicy:           &fail,
 				SideEffects:             &sideEffects,
 				AdmissionReviewVersions: []string{"v1", "v1beta1"},
+				NamespaceSelector:       pm.cfg.NamespaceSelector,
 				ObjectSelector: &metav1.LabelSelector{
 					MatchLabels: map[string]string{
 						secretUtils.PodLabel: secretUtils.PodLabelValue,

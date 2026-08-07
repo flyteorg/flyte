@@ -30,6 +30,8 @@ import (
 
 	"connectrpc.com/connect"
 	"go.opentelemetry.io/otel/metric"
+
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -97,9 +99,33 @@ type TaskActionReconciler struct {
 	CatalogClient     catalog.AsyncClient
 	Catalog           catalog.Client
 	eventsClient      workflowconnect.EventsProxyServiceClient
+	eventBatcher      *eventBatcher
 	cluster           string
 	MaxSystemFailures uint32
-	metrics           *taskActionMetrics
+	// RequeueDuration overrides how long to wait before reconciling a running
+	// TaskAction again. Any non-positive value means TaskActionDefaultRequeueDuration.
+	RequeueDuration time.Duration
+	metrics         *taskActionMetrics
+}
+
+// recordEvent persists a single ActionEvent, blocking until it is durably
+// written. It routes through the coalescing eventBatcher when configured
+// so concurrent reconciles' events collapse into a few multi-row commits;
+// callers still block until their batch commits, so at-least-once semantics are
+// identical to a direct Record (on error the reconcile requeues and re-emits,
+// deduped server-side by ON CONFLICT DO NOTHING). Falls back to a direct Record
+// when no batcher is set (unit tests).
+func (r *TaskActionReconciler) recordEvent(ctx context.Context, event *workflow.ActionEvent) error {
+	if err := event.Validate(); err != nil {
+		return connect.NewError(connect.CodeInvalidArgument, err)
+	}
+	if r.eventBatcher != nil {
+		return r.eventBatcher.Record(ctx, event)
+	}
+	_, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
+		Events: []*workflow.ActionEvent{event},
+	}))
+	return err
 }
 
 // isSystemRetryableFailure reports whether the plugin transition is a
@@ -124,6 +150,17 @@ func (r *TaskActionReconciler) maxSystemFailures() uint32 {
 		return DefaultMaxSystemFailures
 	}
 	return r.MaxSystemFailures
+}
+
+// requeueDuration is how long to wait before reconciling a running TaskAction
+// again. Any non-positive value falls back to TaskActionDefaultRequeueDuration.
+// It is also the cache reservation heartbeat requested from cache_service; see
+// cacheReservationHeartbeat for what that does and does not guarantee.
+func (r *TaskActionReconciler) requeueDuration() time.Duration {
+	if r.RequeueDuration <= 0 {
+		return TaskActionDefaultRequeueDuration
+	}
+	return r.RequeueDuration
 }
 
 // resetPluginResource aborts any in-flight plugin resource and clears persisted
@@ -178,7 +215,7 @@ func (r *TaskActionReconciler) recordSystemError(
 			logger.Error(updErr, "failed to persist SystemFailures counter")
 		}
 	}
-	return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 }
 
 // finalizePermanentFailure converts the TaskAction to a terminal PermanentFailure
@@ -230,6 +267,7 @@ func NewTaskActionReconciler(
 		PluginRegistry: registry,
 		DataStore:      dataStore,
 		eventsClient:   eventsClient,
+		eventBatcher:   newEventBatcher(eventsClient, otelutils.GetTracerProvider("executor")), // matches otelServiceName in executor/setup.go; noop until registered
 		cluster:        cluster,
 		metrics:        metrics,
 	}
@@ -243,8 +281,6 @@ func NewTaskActionReconciler(
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
 func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	logger := log.FromContext(ctx)
-
 	// Fetch the TaskAction instance
 	taskAction := &flyteorgv1.TaskAction{}
 	start := time.Now()
@@ -272,6 +308,26 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, nil
 	}
 
+	// Per-type dispatch. Conditions have no plugin and no pod; they reach
+	// terminal state via Signal or timeout, so they bypass the plugin path
+	// (including validateTaskAction, which requires taskType/taskTemplate).
+	switch taskAction.Spec.ActionType {
+	case flyteorgv1.ActionTypeCondition:
+		return r.reconcileCondition(ctx, taskAction, originalTaskActionInstance)
+	default: // "" or "task"
+		return r.reconcileTask(ctx, taskAction, originalTaskActionInstance)
+	}
+}
+
+// reconcileTask drives a plugin-backed task action. This is the pre-existing
+// Reconcile body, extracted verbatim for per-action-type dispatch.
+func (r *TaskActionReconciler) reconcileTask(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	originalTaskActionInstance *flyteorgv1.TaskAction,
+) (ctrl.Result, error) {
+	logger := log.FromContext(ctx)
+
 	// Validate spec fields and resolve plugin before adding the finalizer
 	// If either fails, the resource is marked terminal and not requeued — no finalizer to clean up
 	p, reason, err := validateTaskAction(taskAction, r.PluginRegistry)
@@ -284,7 +340,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		r.Recorder.Eventf(taskAction, nil, corev1.EventTypeWarning, string(eventType), "ValidatingTaskAction", "%v", err)
 		setCondition(taskAction, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue, reason, err.Error())
 		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse, reason, err.Error())
-		start = time.Now()
+		start := time.Now()
 		updErr := r.Status().Update(ctx, taskAction) // error intentionally ignored: terminal either way
 		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
 		return ctrl.Result{}, nil // terminal — do not requeue
@@ -293,7 +349,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	// Ensure finalizer is present (once validation passes)
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		controllerutil.AddFinalizer(taskAction, taskActionFinalizer)
-		start = time.Now()
+		start := time.Now()
 		updErr := r.Update(ctx, taskAction)
 		r.metrics.recordK8sOp(ctx, opUpdate, start, updErr)
 		if updErr != nil {
@@ -320,16 +376,17 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	)
 	if err != nil {
 		logger.Error(err, "failed to build task execution context")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 	}
+	alreadyRunning := taskAction.Status.PluginPhase == pluginsCore.PhaseRunning.String()
 
 	// cacheShortCircuited is true when cache handling already decided the outcome,
 	// either via cache hit or waiting on the reservation owner.
 	var cacheShortCircuited bool
-	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
+	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, alreadyRunning)
 	if err != nil {
 		logger.Error(err, "cache pre-execution handling failed")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 	}
 	// Even when cache handling short-circuits execution, we still continue through the
 	// shared reconcile tail below so the derived transition updates conditions, status,
@@ -345,7 +402,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	if transition, err = r.finalizeCacheAfterExecution(ctx, taskAction, tCtx, transition, cacheShortCircuited); err != nil {
 		logger.Error(err, "cache post-execution handling failed")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 	}
 
 	// Map transition phase to TaskAction conditions
@@ -432,7 +489,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		}
 	}
 
-	return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 }
 
 // ensureTerminalLabels adds GC-related labels to a terminal TaskAction if not already present.
@@ -491,12 +548,12 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 
 	if err := p.Abort(ctx, tCtx); err != nil {
 		logger.Error(err, "plugin Abort failed, will retry")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 	}
 
 	if err := p.Finalize(ctx, tCtx); err != nil {
 		logger.Error(err, "plugin Finalize failed, will retry")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 	}
 
 	if cacheCfg, ok, err := buildTaskCacheConfig(ctx, taskAction, tCtx); err != nil {
@@ -513,11 +570,9 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 	// buildActionEvent derives UpdatedTime from PhaseHistory, which doesn't include the
 	// abort transition. Override it so mergeEvents uses the actual abort time as end_time.
 	actionEvent.UpdatedTime = timestamppb.New(abortTime)
-	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
-		Events: []*workflow.ActionEvent{actionEvent},
-	})); err != nil {
+	if err := r.recordEvent(ctx, actionEvent); err != nil {
 		logger.Error(err, "failed to emit abort event, will retry")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 	}
 
 	return r.removeFinalizer(ctx, taskAction)
@@ -548,9 +603,7 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	}
 
 	actionEvent := r.buildActionEvent(ctx, newTaskAction, phaseInfo)
-	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
-		Events: []*workflow.ActionEvent{actionEvent},
-	})); err != nil {
+	if err := r.recordEvent(ctx, actionEvent); err != nil {
 		r.Recorder.Eventf(
 			newTaskAction,
 			nil,
@@ -565,27 +618,37 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 		return err
 	}
 
-	// The retry.RetryOnConflict will refetch the k8s resource to get the latest resource version
-	// This will resolve the conflict error caused by k8s optimistic lock when 2 reconcile loops updating the same CRD
-	if err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		latest := &flyteorgv1.TaskAction{}
-		start := time.Now()
-		getErr := r.Get(ctx, client.ObjectKeyFromObject(newTaskAction), latest)
-		r.metrics.recordK8sOp(ctx, opGet, start, getErr)
-		if getErr != nil {
-			return getErr
-		}
+	if err := r.persistStatusWithRetry(ctx, newTaskAction, func(latest *flyteorgv1.TaskAction) {
 		latest.Status = newTaskAction.Status
-		start = time.Now()
-		updErr := r.Status().Update(ctx, latest)
-		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
-		return updErr
 	}); err != nil {
 		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
 		return err
 	}
 
 	return nil
+}
+
+// persistStatusWithRetry re-fetches the TaskAction and applies the status
+// mutation on each Status().Update attempt, retrying on conflict.
+func (r *TaskActionReconciler) persistStatusWithRetry(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	apply func(latest *flyteorgv1.TaskAction),
+) error {
+	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		latest := &flyteorgv1.TaskAction{}
+		start := time.Now()
+		getErr := r.Get(ctx, client.ObjectKeyFromObject(taskAction), latest)
+		r.metrics.recordK8sOp(ctx, opGet, start, getErr)
+		if getErr != nil {
+			return getErr
+		}
+		apply(latest)
+		start = time.Now()
+		updErr := r.Status().Update(ctx, latest)
+		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
+		return updErr
+	})
 }
 
 func (r *TaskActionReconciler) buildActionEvent(
@@ -774,10 +837,9 @@ func cacheStatusFromExternalResources(resources []*pluginsCore.ExternalResource)
 }
 
 // taskActionStatusChanged reports whether any status field has changed between old and new,
-// covering plugin phase, state, state version, observability JSON, conditions, and phase history.
+// covering plugin phase/state, state version, conditions, and phase history.
 func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) bool {
-	if oldStatus.StateJSON != newStatus.StateJSON ||
-		oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
+	if oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
 		oldStatus.PluginPhase != newStatus.PluginPhase ||
 		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion ||
 		oldStatus.Attempts != newStatus.Attempts ||
@@ -860,17 +922,22 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 			flyteorgv1.ConditionReasonAborted, msg)
 	}
 
-	// Append to PhaseHistory if this is a new phase (dedup by checking last entry).
 	if phaseName != "" {
-		n := len(ta.Status.PhaseHistory)
-		if n == 0 || ta.Status.PhaseHistory[n-1].Phase != phaseName {
-			ta.Status.PhaseHistory = append(ta.Status.PhaseHistory, flyteorgv1.PhaseTransition{
-				Phase:      phaseName,
-				OccurredAt: metav1.Now(),
-				Message:    msg,
-			})
-		}
+		appendPhaseHistory(ta, phaseName, msg)
 	}
+}
+
+// appendPhaseHistory appends a phase transition to the status timeline,
+// deduping against the last entry.
+func appendPhaseHistory(ta *flyteorgv1.TaskAction, phase, msg string) {
+	if n := len(ta.Status.PhaseHistory); n > 0 && ta.Status.PhaseHistory[n-1].Phase == phase {
+		return
+	}
+	ta.Status.PhaseHistory = append(ta.Status.PhaseHistory, flyteorgv1.PhaseTransition{
+		Phase:      phase,
+		OccurredAt: metav1.Now(),
+		Message:    msg,
+	})
 }
 
 // isTerminal returns true if the TaskAction has reached a terminal condition.

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -188,6 +189,9 @@ func (s *RunService) CreateRun(
 	switch id := request.Id.(type) {
 	case *workflow.CreateRunRequest_RunId:
 		runId = request.GetRunId()
+		if err := validateRunName(runId.GetName()); err != nil {
+			return nil, err
+		}
 	case *workflow.CreateRunRequest_ProjectId:
 		runId = &common.RunIdentifier{
 			Project: id.ProjectId.Name,
@@ -257,6 +261,12 @@ func (s *RunService) CreateRun(
 		}
 		if offloaded := triggerDetails.GetSpec().GetOffloadedInputData(); offloaded != nil && request.GetInputWrapper() == nil {
 			request.InputWrapper = &workflow.CreateRunRequest_OffloadedInputData{OffloadedInputData: offloaded}
+		}
+		// Restore the run spec captured at registration (env vars, labels, annotations,
+		// interruptible, etc.) so trigger-fired runs carry them. The scheduler fires with only
+		// a TriggerName and no run spec, so without this those overrides are silently dropped.
+		if runSpec == nil {
+			runSpec = triggerDetails.GetSpec().GetRunSpec()
 		}
 		triggerKickoffArg = triggerDetails.GetAutomationSpec().GetSchedule().GetKickoffTimeInputArg()
 	}
@@ -341,10 +351,9 @@ func (s *RunService) CreateRun(
 	// decoded, not signature-verified — see Config.TrustForwardedIdentityHeaders).
 	var executedBy *common.EnrichedIdentity
 	if s.trustHeaders {
-		executedBy = identityFromHeaders(req.Header(), s.identityHeaders)
-		// Cookie path isn't enriched here: its forwarded access token is short-lived and
-		// already expired, so it relies on the claims the proxy injects into x-amzn-oidc-data.
-		executedBy = s.enricher.enrich(ctx, bearerToken(req.Header()), executedBy)
+		// resolveIdentity enriches only on the Bearer path; the cookie path relies on
+		// the claims the proxy injects (its forwarded access token is already expired).
+		executedBy = resolveIdentity(ctx, req.Header(), s.identityHeaders, s.enricher)
 	}
 
 	// Persist task spec and create a run model
@@ -643,6 +652,17 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 			setActionDetailsSpecFromActionSpec(action, model.ActionSpec)
 		}
 
+		// A signalled condition serves its resolved value inline from RunInfo —
+		// there is no outputs.pb.
+		if action.GetMetadata().GetActionType() == workflow.ActionType_ACTION_TYPE_CONDITION && info.GetOutput() != nil {
+			action.Result = &workflow.ActionDetails_SignalInfo{
+				SignalInfo: &workflow.SignalInfo{
+					SignalledBy: info.GetPrincipal(),
+					Output:      info.GetOutput(),
+				},
+			}
+		}
+
 		return nil
 	})
 
@@ -841,7 +861,8 @@ func IsTerminalPhase(phase common.ActionPhase) bool {
 	return phase == common.ActionPhase_ACTION_PHASE_FAILED ||
 		phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED ||
 		phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT ||
-		phase == common.ActionPhase_ACTION_PHASE_ABORTED
+		phase == common.ActionPhase_ACTION_PHASE_ABORTED ||
+		phase == common.ActionPhase_ACTION_PHASE_RECOVERED
 }
 
 // lastAttemptIsTerminal returns true when the highest-numbered attempt has reached a
@@ -895,6 +916,12 @@ func (s *RunService) ListRuns(
 		scopeFilter = scopeFilter.And(impl.NewRunTaskIdFilter(scope.TaskId))
 	}
 
+	// Restrict to runs that contain at least one PAUSED action (e.g. a
+	// human-in-the-loop gate node awaiting input) when requested.
+	if req.Msg.PausedActionsOnly {
+		scopeFilter = scopeFilter.And(impl.NewHasPausedActionFilter())
+	}
+
 	// Parse pagination, sort, and user-supplied filters from the common ListRequest.
 	listInput, err := impl.NewListResourceInputFromProto(req.Msg.Request, models.ActionColumnsSet)
 	if err != nil {
@@ -914,14 +941,13 @@ func (s *RunService) ListRuns(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// We fetch Limit+1 rows to detect whether a next page exists without a
-	// separate COUNT query. If we got more than Limit rows back, there is at
-	// least one more page: trim the slice and encode the last returned row's
-	// created_at as the keyset cursor for the next request.
+	// We fetch Limit+1 rows to detect whether a next page exists without a separate COUNT
+	// query. If we got more than Limit rows back, there is at least one more page: trim the
+	// slice and encode the next offset (offset+limit) as the opaque page token.
 	var nextToken string
 	if len(actions) > listInput.Limit {
 		actions = actions[:listInput.Limit]
-		nextToken = actions[len(actions)-1].CreatedAt.UTC().Format(time.RFC3339Nano)
+		nextToken = strconv.Itoa(listInput.Offset + listInput.Limit)
 	}
 
 	protoRuns := make([]*workflow.Run, len(actions))
@@ -964,14 +990,13 @@ func (s *RunService) ListActions(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// We fetch Limit+1 rows to detect whether a next page exists without a
-	// separate COUNT query. If we got more than Limit rows back, there is at
-	// least one more page: trim the slice and encode the last returned row's
-	// created_at as the keyset cursor for the next request.
+	// We fetch Limit+1 rows to detect whether a next page exists without a separate COUNT
+	// query. If we got more than Limit rows back, there is at least one more page: trim the
+	// slice and encode the next offset (offset+limit) as the opaque page token.
 	var nextToken string
 	if len(actions) > listInput.Limit {
 		actions = actions[:listInput.Limit]
-		nextToken = actions[len(actions)-1].CreatedAt.UTC().Format(time.RFC3339Nano)
+		nextToken = strconv.Itoa(listInput.Offset + listInput.Limit)
 	}
 
 	protoActions := make([]*workflow.Action, len(actions))
@@ -1009,7 +1034,8 @@ func (s *RunService) GetActionDataURIs(
 		InputsUri: info.GetInputsUri(),
 	}
 
-	if action.Phase == int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED) {
+	if action.Phase == int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED) ||
+		action.Phase == int32(common.ActionPhase_ACTION_PHASE_RECOVERED) {
 		if workflow.ActionType(action.ActionType) == workflow.ActionType_ACTION_TYPE_TRACE {
 			resp.OutputsUri = info.GetOutputsUri()
 		} else {
@@ -1078,16 +1104,60 @@ func (s *RunService) AbortAction(
 	return connect.NewResponse(&workflow.AbortActionResponse{}), nil
 }
 
-// SignalEvent resolves a paused condition action. Condition signalling is not
-// supported by this single-binary backend; downstream backends that route to a
-// dedicated actions service override this RPC.
+// SignalEvent resolves a paused condition action by forwarding the payload to
+// the actions service, which validates and writes it onto the condition CR.
 func (s *RunService) SignalEvent(
 	ctx context.Context,
-	_ *connect.Request[workflow.SignalEventRequest],
+	req *connect.Request[workflow.SignalEventRequest],
 ) (*connect.Response[workflow.SignalEventResponse], error) {
 	logger.Infof(ctx, "Received SignalEvent request")
-	return nil, connect.NewError(connect.CodeUnimplemented,
-		fmt.Errorf("SignalEvent is not supported by this backend"))
+
+	if err := req.Msg.Validate(); err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	// Record whoever the auth middleware says is calling; no authz gate (devbox).
+	var signalledBy *common.EnrichedIdentity
+	if s.trustHeaders {
+		signalledBy = identityFromHeaders(req.Header(), s.identityHeaders)
+	}
+
+	if _, err := s.actionsClient.Signal(ctx, connect.NewRequest(&actions.SignalRequest{
+		ActionId:         req.Msg.GetActionId(),
+		ParentActionName: req.Msg.GetParentActionName(),
+		Value:            payloadToLiteral(req.Msg.GetPayload()),
+		SignalledBy:      signalledBy,
+	})); err != nil {
+		logger.Errorf(ctx, "Failed to signal action %s: %v", req.Msg.GetActionId().GetName(), err)
+		// Actions-service errors (NotFound / InvalidArgument / FailedPrecondition)
+		// pass through unchanged.
+		return nil, err
+	}
+
+	return connect.NewResponse(&workflow.SignalEventResponse{}), nil
+}
+
+// payloadToLiteral converts the SignalEvent payload (bool/int/float/string)
+// into the core.Literal the actions service expects.
+func payloadToLiteral(payload *workflow.EventPayload) *core.Literal {
+	primitive := &core.Primitive{}
+	switch v := payload.GetValue().(type) {
+	case *workflow.EventPayload_BoolValue:
+		primitive.Value = &core.Primitive_Boolean{Boolean: v.BoolValue}
+	case *workflow.EventPayload_IntValue:
+		primitive.Value = &core.Primitive_Integer{Integer: v.IntValue}
+	case *workflow.EventPayload_FloatValue:
+		primitive.Value = &core.Primitive_FloatValue{FloatValue: v.FloatValue}
+	case *workflow.EventPayload_StringValue:
+		primitive.Value = &core.Primitive_StringValue{StringValue: v.StringValue}
+	default:
+		return nil
+	}
+	return &core.Literal{
+		Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: primitive},
+		}},
+	}
 }
 
 // WatchRunDetails streams run details updates from the DB.
@@ -1316,37 +1386,57 @@ func (s *RunService) listAndSendAllActions(
 	rsm *runStateManager,
 	stream *connect.ServerStream[workflow.WatchActionsResponse],
 ) error {
-	const pageSize = 100
-	offset := 0
+	// Page the initial snapshot with keyset (cursor) pagination on (created_at, name)
+	// ascending, backed by idx_actions_run_created_name. Each page is an index
+	// range-scan continuing after the previous page's last row, so the full snapshot
+	// is O(n) — OFFSET paging was O(n^2/pageSize) and made large runs (tens of
+	// thousands of actions) race the console's stream timeout, truncating the result.
+	//
+	// created_at is the primary sort so parents are inserted before their children
+	// (insertAction requires the parent node to already exist). name is a unique
+	// per-run tiebreaker giving a total order, so keyset pages never skip/overlap
+	// even when a map task bulk-creates thousands of children with identical
+	// created_at.
+	const pageSize = 1000
+	var afterCreatedAt *time.Time
+	var afterName string
 	for {
-		// Sort ascending by created_at so parent actions are inserted into the
-		// run state manager before their children. insertAction requires the
-		// parent node to already exist in the tree when a child is processed.
 		batch, err := s.repo.ActionRepo().ListActions(ctx, interfaces.ListResourceInput{
-			Filter: impl.NewRunActionsFilter(runID),
-			Limit:  pageSize,
-			Offset: offset,
+			Filter:               impl.NewRunActionsFilter(runID),
+			Limit:                pageSize,
+			KeysetAfterCreatedAt: afterCreatedAt,
+			KeysetAfterName:      afterName,
 			SortParameters: []interfaces.SortParameter{
 				impl.NewSortParameter("created_at", interfaces.SortOrderAscending),
+				impl.NewSortParameter("name", interfaces.SortOrderAscending),
 			},
 		})
 		if err != nil {
 			return err
 		}
 
+		// ListActions returns up to Limit+1 rows (the extra row is a has-more probe).
+		// Trim it and use it only to decide whether to continue; the trimmed row is
+		// re-read as the first row of the next page via the cursor, so nothing is lost.
+		hasMore := len(batch) > pageSize
+		if hasMore {
+			batch = batch[:pageSize]
+		}
+
 		updates, err := rsm.upsertActions(ctx, batch)
 		if err != nil {
 			return err
 		}
-
 		if err := s.sendChangedActions(runID, updates, stream); err != nil {
 			return err
 		}
 
-		if len(batch) < pageSize {
+		if !hasMore || len(batch) == 0 {
 			return nil
 		}
-		offset += pageSize
+		last := batch[len(batch)-1]
+		afterCreatedAt = &last.CreatedAt
+		afterName = last.Name
 	}
 }
 
@@ -1541,6 +1631,8 @@ func setActionDetailsSpecFromActionSpec(details *workflow.ActionDetails, actionS
 		if s.Trace.GetSpec() != nil {
 			details.Spec = &workflow.ActionDetails_Trace{Trace: s.Trace.GetSpec()}
 		}
+	case *workflow.ActionSpec_Condition:
+		details.Spec = &workflow.ActionDetails_Condition{Condition: s.Condition}
 	}
 }
 
@@ -1612,6 +1704,20 @@ func actionMetadataFromModel(action *models.Action) *workflow.ActionMetadata {
 			Name: action.FunctionName,
 		}
 		metadata.Spec = &workflow.ActionMetadata_Trace{Trace: traceMeta}
+	case workflow.ActionType_ACTION_TYPE_CONDITION:
+		condMeta := &workflow.ConditionActionMetadata{
+			Name: action.FunctionName,
+		}
+		// Clients type-check the payload against metadata.condition.type before signaling, pull it from the stored spec.
+		if spec := extractActionSpec(action.ActionSpec); spec != nil {
+			if cond := spec.GetCondition(); cond != nil {
+				condMeta.Type = cond.GetType()
+				if condMeta.Name == "" {
+					condMeta.Name = cond.GetName()
+				}
+			}
+		}
+		metadata.Spec = &workflow.ActionMetadata_Condition{Condition: condMeta}
 	}
 
 	return metadata

@@ -15,7 +15,6 @@ import (
 	pluginCoreMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	webapiPlugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
-	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	connectorMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/connector/mocks"
 	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -23,9 +22,6 @@ import (
 const defaultConnectorEndpoint = "localhost:8000"
 
 func TestPlugin(t *testing.T) {
-	fakeSetupContext := pluginCoreMocks.SetupContext{}
-	fakeSetupContext.On("MetricsScope").Return(promutils.NewScope("test"))
-
 	cfg := defaultConfig
 	cfg.WebAPI.Caching.Workers = 1
 	cfg.WebAPI.Caching.ResyncInterval.Duration = 5 * time.Second
@@ -39,9 +35,8 @@ func TestPlugin(t *testing.T) {
 	rayKey := RegistryKey{domain: "production", taskTypeName: "ray", taskTypeVersion: defaultTaskTypeVersion}
 	connectorRegistry := Registry{sparkKey: sparkConnector, rayKey: rayConnector}
 	plugin := Plugin{
-		metricScope: fakeSetupContext.MetricsScope(),
-		cfg:         GetConfig(),
-		registry:    connectorRegistry,
+		cfg:      GetConfig(),
+		registry: connectorRegistry,
 	}
 	t.Run("get config", func(t *testing.T) {
 		err := SetConfig(&cfg)
@@ -396,4 +391,26 @@ func TestResourceWrapper_IsTerminal(t *testing.T) {
 			assert.Equal(t, tc.terminal, r.IsTerminal())
 		})
 	}
+}
+
+func TestSetSupportedTaskType(t *testing.T) {
+	ctx := context.TODO()
+	svc := &ConnectorService{}
+
+	svc.SetSupportedTaskType(ctx, []string{"snowflake", "bigquery", "snowflake"})
+	assert.True(t, svc.ContainTaskType("snowflake"))
+	assert.True(t, svc.ContainTaskType("bigquery"))
+	assert.False(t, svc.ContainTaskType("databricks"))
+	assert.Equal(t, []string{"bigquery", "snowflake"}, svc.supportedTaskTypes)
+
+	// same set in a different order with duplicates normalizes to the same value
+	svc.SetSupportedTaskType(ctx, []string{"bigquery", "snowflake", "bigquery"})
+	assert.Equal(t, []string{"bigquery", "snowflake"}, svc.supportedTaskTypes)
+
+	svc.SetSupportedTaskType(ctx, []string{"bigquery"})
+	assert.False(t, svc.ContainTaskType("snowflake"))
+	assert.True(t, svc.ContainTaskType("bigquery"))
+
+	svc.SetSupportedTaskType(ctx, nil)
+	assert.False(t, svc.ContainTaskType("bigquery"))
 }
