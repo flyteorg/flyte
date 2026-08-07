@@ -117,6 +117,9 @@ type TaskInfo struct {
 	ExternalResources []*ExternalResource
 	// Additional reasons for this case. Note, these are not included in the phase state.
 	AdditionalReasons []ReasonInfo
+	// Name of the node the task's (primary) pod was scheduled on, when known.
+	// Only populated by single-pod execution paths; empty for multi-pod plugins.
+	NodeName string
 }
 
 func (t *TaskInfo) String() string {
