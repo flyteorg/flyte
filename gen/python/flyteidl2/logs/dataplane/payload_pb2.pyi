@@ -15,6 +15,12 @@ class LogLineOriginator(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     USER: _ClassVar[LogLineOriginator]
     SYSTEM: _ClassVar[LogLineOriginator]
 
+class LogLineSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    LOG_LINE_SOURCE_UNSPECIFIED: _ClassVar[LogLineSource]
+    LOG_LINE_SOURCE_LIVE: _ClassVar[LogLineSource]
+    LOG_LINE_SOURCE_PERSISTED: _ClassVar[LogLineSource]
+
 class LogsSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
     LIVE_OR_PERSISTED: _ClassVar[LogsSource]
@@ -23,6 +29,9 @@ class LogsSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
 UNKNOWN: LogLineOriginator
 USER: LogLineOriginator
 SYSTEM: LogLineOriginator
+LOG_LINE_SOURCE_UNSPECIFIED: LogLineSource
+LOG_LINE_SOURCE_LIVE: LogLineSource
+LOG_LINE_SOURCE_PERSISTED: LogLineSource
 LIVE_OR_PERSISTED: LogsSource
 LIVE_ONLY: LogsSource
 PERSISTED_ONLY: LogsSource
@@ -107,26 +116,30 @@ class LiveLogsOptions(_message.Message):
     def __init__(self, log_pod_status: bool = ..., log_timestamps: bool = ...) -> None: ...
 
 class LogLine(_message.Message):
-    __slots__ = ["timestamp", "message", "originator"]
+    __slots__ = ["timestamp", "message", "originator", "short_pod_name"]
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
     ORIGINATOR_FIELD_NUMBER: _ClassVar[int]
+    SHORT_POD_NAME_FIELD_NUMBER: _ClassVar[int]
     timestamp: _timestamp_pb2.Timestamp
     message: str
     originator: LogLineOriginator
-    def __init__(self, timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., message: _Optional[str] = ..., originator: _Optional[_Union[LogLineOriginator, str]] = ...) -> None: ...
+    short_pod_name: str
+    def __init__(self, timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., message: _Optional[str] = ..., originator: _Optional[_Union[LogLineOriginator, str]] = ..., short_pod_name: _Optional[str] = ...) -> None: ...
 
 class LogLines(_message.Message):
-    __slots__ = ["lines", "container_index", "container", "structured_lines"]
+    __slots__ = ["lines", "container_index", "container", "structured_lines", "source"]
     LINES_FIELD_NUMBER: _ClassVar[int]
     CONTAINER_INDEX_FIELD_NUMBER: _ClassVar[int]
     CONTAINER_FIELD_NUMBER: _ClassVar[int]
     STRUCTURED_LINES_FIELD_NUMBER: _ClassVar[int]
+    SOURCE_FIELD_NUMBER: _ClassVar[int]
     lines: _containers.RepeatedScalarFieldContainer[str]
     container_index: int
     container: ContainerIdentifier
     structured_lines: _containers.RepeatedCompositeFieldContainer[LogLine]
-    def __init__(self, lines: _Optional[_Iterable[str]] = ..., container_index: _Optional[int] = ..., container: _Optional[_Union[ContainerIdentifier, _Mapping]] = ..., structured_lines: _Optional[_Iterable[_Union[LogLine, _Mapping]]] = ...) -> None: ...
+    source: LogLineSource
+    def __init__(self, lines: _Optional[_Iterable[str]] = ..., container_index: _Optional[int] = ..., container: _Optional[_Union[ContainerIdentifier, _Mapping]] = ..., structured_lines: _Optional[_Iterable[_Union[LogLine, _Mapping]]] = ..., source: _Optional[_Union[LogLineSource, str]] = ...) -> None: ...
 
 class LogContainersList(_message.Message):
     __slots__ = ["containers"]

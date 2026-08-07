@@ -2047,6 +2047,10 @@
         },
         "originator": {
           "$ref": "#/definitions/dataplaneLogLineOriginator"
+        },
+        "short_pod_name": {
+          "type": "string",
+          "description": "Last few characters of the pod name this line came from. Enough to tell replicas apart\nper line without repeating the full generated name. Empty when the source cannot\nattribute the line to a pod."
         }
       }
     },

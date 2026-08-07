@@ -101,6 +101,17 @@ enum LogLineOriginator {
   SYSTEM = 2;
 }
 
+// By default we use live log, and it will fall back to persisted if live logs not available
+enum LogLineSource {
+  LOG_LINE_SOURCE_UNSPECIFIED = 0;
+
+  // Read from the Kubernetes API for a pod that is currently running.
+  LOG_LINE_SOURCE_LIVE = 1;
+
+  // Read from the persisted log backend.
+  LOG_LINE_SOURCE_PERSISTED = 2;
+}
+
 message LogLine {
   google.protobuf.Timestamp timestamp = 1;
 
@@ -110,6 +121,11 @@ message LogLine {
   string message = 2;
 
   LogLineOriginator originator = 3;
+
+  // Last few characters of the pod name this line came from. Enough to tell replicas apart
+  // per line without repeating the full generated name. Empty when the source cannot
+  // attribute the line to a pod.
+  string short_pod_name = 4;
 }
 
 message LogLines {
@@ -129,6 +145,9 @@ message LogLines {
   // at the ends of the lines. This lets clients know whether log emitter
   // wanted to overwrite the previous line (LF) or append a new line (CRLF).
   repeated LogLine structured_lines = 4;
+
+  // Which backend these lines were read from. Every line in a batch has the same source.
+  LogLineSource source = 5;
 }
 
 message LogContainersList {
