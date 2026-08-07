@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"sync"
 
+	executorConfig "github.com/flyteorg/flyte/v2/executor/pkg/config"
+	executorK8s "github.com/flyteorg/flyte/v2/executor/pkg/plugin/k8s"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	k8sPlugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
-
-	executorK8s "github.com/flyteorg/flyte/v2/executor/pkg/plugin/k8s"
 )
 
 // PluginRegistryIface provides access to registered plugin entries.
@@ -53,6 +53,13 @@ func (r *Registry) Initialize(ctx context.Context) error {
 
 	// Load k8s plugins
 	for _, entry := range r.pluginRegistry.GetK8sPlugins() {
+		if entry.ClusterPlugin != nil {
+			logger.Infof(ctx, "Skipping k8s plugin %q: cluster plugin entries are not supported by the executor", entry.ID)
+			continue
+		}
+		if entry.Plugin == nil {
+			return fmt.Errorf("invalid k8s plugin entry %q: Plugin is nil", entry.ID)
+		}
 		pm := executorK8s.NewPluginManager(
 			entry.ID,
 			entry.Plugin,
@@ -101,6 +108,24 @@ func (r *Registry) Initialize(ctx context.Context) error {
 		}
 
 		logger.Infof(ctx, "Registered core plugin [%s] for task types %v", entry.ID, entry.RegisteredTaskTypes)
+	}
+
+	// Apply defaultForTaskTypes overrides from config. Runs after all plugins are
+	// loaded so any plugin ID (k8s or core) can be referenced.
+	for taskType, pluginID := range executorConfig.GetTaskPluginConfig().DefaultForTaskTypes {
+		var found pluginsCore.Plugin
+		for _, pm := range r.plugins {
+			if pm.GetID() == pluginID {
+				found = pm
+				break
+			}
+		}
+		if found != nil {
+			r.plugins[taskType] = found
+			logger.Infof(ctx, "Overriding task type %q to use plugin %q (from default-for-task-types config)", taskType, pluginID)
+		} else {
+			logger.Warnf(ctx, "default-for-task-types: plugin %q not found for task type %q override", pluginID, taskType)
+		}
 	}
 
 	r.initialized = true

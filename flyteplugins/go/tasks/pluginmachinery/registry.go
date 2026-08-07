@@ -4,6 +4,8 @@ import (
 	"context"
 	"sync"
 
+	"k8s.io/apimachinery/pkg/runtime"
+
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
@@ -12,10 +14,17 @@ import (
 	internalRemote "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/internal/webapi"
 )
 
+// SchemeRegistration associates a plugin ID with its AddToScheme function.
+type SchemeRegistration struct {
+	ID          string
+	AddToScheme func(*runtime.Scheme) error
+}
+
 type taskPluginRegistry struct {
-	m          sync.Mutex
-	k8sPlugin  []k8s.PluginEntry
-	corePlugin []core.PluginEntry
+	m               sync.Mutex
+	k8sPlugin       []k8s.PluginEntry
+	corePlugin      []core.PluginEntry
+	schemeRegisters []SchemeRegistration
 }
 
 // A singleton variable that maintains a registry of all plugins. The framework uses this to access all plugins
@@ -58,12 +67,20 @@ func (p *taskPluginRegistry) RegisterK8sPlugin(info k8s.PluginEntry) {
 		logger.Panicf(context.TODO(), "K8s AsyncPlugin should be registered to handle at least one task type")
 	}
 
-	if info.Plugin == nil {
-		logger.Panicf(context.TODO(), "K8s AsyncPlugin cannot be nil")
+	if info.Plugin == nil && info.ClusterPlugin == nil {
+		logger.Panicf(context.TODO(), "K8s plugin requires either Plugin or ClusterPlugin to be set")
+	}
+
+	if info.Plugin != nil && info.ClusterPlugin != nil {
+		logger.Panicf(context.TODO(), "K8s plugin cannot set both Plugin and ClusterPlugin")
 	}
 
 	if info.ResourceToWatch == nil {
 		logger.Panicf(context.TODO(), "The framework requires a K8s resource to watch, for valid plugin registration")
+	}
+
+	if info.ClusterPlugin != nil && info.ClusterResourceToWatch == nil {
+		logger.Panicf(context.TODO(), "ClusterPlugin requires ClusterResourceToWatch to be set")
 	}
 
 	p.m.Lock()
@@ -88,6 +105,20 @@ func (p *taskPluginRegistry) RegisterCorePlugin(info core.PluginEntry) {
 	p.corePlugin = append(p.corePlugin, info)
 }
 
+// RegisterScheme registers an AddToScheme function for a plugin's CRD types.
+func (p *taskPluginRegistry) RegisterScheme(id string, addToScheme func(*runtime.Scheme) error) {
+	p.m.Lock()
+	defer p.m.Unlock()
+	p.schemeRegisters = append(p.schemeRegisters, SchemeRegistration{ID: id, AddToScheme: addToScheme})
+}
+
+// GetSchemeRegisters returns a snapshot of all registered SchemeRegistrations.
+func (p *taskPluginRegistry) GetSchemeRegisters() []SchemeRegistration {
+	p.m.Lock()
+	defer p.m.Unlock()
+	return append(p.schemeRegisters[:0:0], p.schemeRegisters...)
+}
+
 // Returns a snapshot of all the registered core plugins.
 func (p *taskPluginRegistry) GetCorePlugins() []core.PluginEntry {
 	p.m.Lock()
@@ -106,6 +137,8 @@ type TaskPluginRegistry interface {
 	RegisterK8sPlugin(info k8s.PluginEntry)
 	RegisterCorePlugin(info core.PluginEntry)
 	RegisterRemotePlugin(info webapi.PluginEntry)
+	RegisterScheme(id string, addToScheme func(*runtime.Scheme) error)
 	GetCorePlugins() []core.PluginEntry
 	GetK8sPlugins() []k8s.PluginEntry
+	GetSchemeRegisters() []SchemeRegistration
 }

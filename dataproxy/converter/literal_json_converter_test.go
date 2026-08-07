@@ -53,6 +53,29 @@ func TestLiteralsToJsonSchema(t *testing.T) {
 		assert.Equal(t, "description", testField["description"])
 	})
 
+	t.Run("literal with no matching variable is skipped, shared ones preserved", func(t *testing.T) {
+		// Re-converting a run's inputs against a *different* task version (the
+		// launch-form version selector). The original run had {name, count}; the
+		// target version only declares {name}. The extra `count` literal must be
+		// skipped rather than failing the whole conversion, so `name` survives the
+		// switch. Regression guard for the asymmetric version-switch input loss.
+		literals := []*task.NamedLiteral{
+			{Name: "name", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "kept"}}}}}}},
+			{Name: "count", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 5}}}}}}},
+		}
+		variableMap := makeVariableMap(map[string]*core.Variable{
+			"name": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}}},
+		})
+
+		resp, err := LiteralsToLaunchFormJson(context.Background(), literals, variableMap)
+		require.NoError(t, err)
+
+		properties := resp.AsMap()["properties"].(map[string]any)
+		require.Contains(t, properties, "name")
+		assert.Equal(t, "kept", properties["name"].(map[string]any)["default"])
+		assert.NotContains(t, properties, "count")
+	})
+
 	t.Run("string literal", func(t *testing.T) {
 		literals := []*task.NamedLiteral{
 			{
@@ -537,13 +560,21 @@ func TestJSONValuesToLiterals(t *testing.T) {
 		assert.Contains(t, err.Error(), "missing value for variable")
 	})
 
-	t.Run("nil variableMap", func(t *testing.T) {
+	t.Run("nil variableMap is treated as empty (no inputs)", func(t *testing.T) {
+		// A task with no declared inputs has a nil variableMap; this should
+		// yield no literals rather than erroring.
+		empty, err := structpb.NewStruct(map[string]any{})
+		require.NoError(t, err)
+		literals, err := JSONValuesToLiterals(context.Background(), nil, empty)
+		require.NoError(t, err)
+		assert.Empty(t, literals)
+
+		// Any provided values have no matching variable, so they're ignored.
 		values, err := structpb.NewStruct(map[string]any{"foo": "bar"})
 		require.NoError(t, err)
-
-		_, err = JSONValuesToLiterals(context.Background(), nil, values)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "variableMap cannot be nil")
+		literals, err = JSONValuesToLiterals(context.Background(), nil, values)
+		require.NoError(t, err)
+		assert.Empty(t, literals)
 	})
 
 	t.Run("nil values", func(t *testing.T) {

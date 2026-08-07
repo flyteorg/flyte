@@ -55,7 +55,7 @@ type daskResourceHandler struct {
 }
 
 // dashboardPrefixFromLogConfig returns the path that should be passed to
-// `dask-scheduler --dashboard-prefix` so Bokeh emits tab/WebSocket links that
+// `dask scheduler --dashboard-prefix` so Bokeh emits tab/WebSocket links that
 // resolve through the reverse-proxy chain. It reuses the existing dashboard
 // log-template (the same `linkType: dashboard` entry under
 // `plugins.dask.logs.templates` that powers the user-facing dashboard link)
@@ -206,7 +206,8 @@ func createWorkerSpec(cluster *plugins.DaskWorkerGroup, podSpec *v1.PodSpec, pri
 
 	// Set custom args
 	workerArgs := []string{
-		"dask-worker",
+		"dask",
+		"worker",
 		"--name",
 		"$(DASK_WORKER_NAME)",
 	}
@@ -272,7 +273,7 @@ func createSchedulerSpec(scheduler *plugins.DaskScheduler, clusterName string, p
 	// resolve through the reverse-proxy chain. Without this, Bokeh emits
 	// root-relative links like "/individual-task-stream" that 404 outside the
 	// dashboard mount point.
-	primaryContainer.Args = []string{"dask-scheduler"}
+	primaryContainer.Args = []string{"dask", "scheduler"}
 	if dashboardPrefix != "" {
 		primaryContainer.Args = append(primaryContainer.Args, "--dashboard-prefix", dashboardPrefix)
 	}
@@ -552,6 +553,8 @@ func init() {
 	if err := daskAPI.AddToScheme(scheme.Scheme); err != nil {
 		panic(err)
 	}
+
+	pluginmachinery.PluginRegistry().RegisterScheme(daskTaskType, daskAPI.AddToScheme)
 
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{

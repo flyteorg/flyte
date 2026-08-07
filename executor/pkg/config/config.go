@@ -12,19 +12,21 @@ const configSectionKey = "executor"
 
 var (
 	defaultConfig = &Config{
-		MetricsBindAddress:     ":10254",
-		HealthProbeBindAddress: ":8081",
-		LeaderElect:            false,
-		MetricsSecure:          true,
-		WebhookCertName:        "tls.crt",
-		WebhookCertKey:         "tls.key",
-		MetricsCertName:        "tls.crt",
-		MetricsCertKey:         "tls.key",
-		EnableHTTP2:            false,
-		EventsServiceURL:       "http://localhost:8090",
-		CacheServiceURL:        "http://localhost:8094",
-		Cluster:                "",
-		MaxSystemFailures:      3,
+		MetricsBindAddress:      ":10254",
+		HealthProbeBindAddress:  ":8081",
+		LeaderElect:             false,
+		MetricsSecure:           true,
+		WebhookCertName:         "tls.crt",
+		WebhookCertKey:          "tls.key",
+		MetricsCertName:         "tls.crt",
+		MetricsCertKey:          "tls.key",
+		EnableHTTP2:             false,
+		EventsServiceURL:        "http://localhost:8090",
+		CacheServiceURL:         "http://localhost:8094",
+		Cluster:                 "",
+		MaxSystemFailures:       3,
+		MaxConcurrentReconciles: 512,
+		RequeueDuration:         stdconfig.Duration{Duration: 10 * time.Second},
 		GC: GCConfig{
 			Interval: stdconfig.Duration{Duration: 30 * time.Minute},
 			MaxTTL:   stdconfig.Duration{Duration: 1 * time.Hour},
@@ -79,10 +81,24 @@ type Config struct {
 	// Cluster is the cluster identifier attached to action events.
 	Cluster string `json:"cluster" pflag:",Cluster identifier for action events"`
 
+	// DefaultK8sServiceAccount is assigned to task pods when the task's security
+	// context does not specify one. Empty means no account is set, so Kubernetes
+	// assigns the `default` ServiceAccount of the pod's own namespace.
+	DefaultK8sServiceAccount string `json:"defaultK8sServiceAccount" pflag:",Default Kubernetes service account for task pods when the task does not set one"`
+
 	// MaxSystemFailures bounds consecutive system-level failures (Plugin.Handle Go
 	// errors and plugin-reported system-retryable failures) before a TaskAction is
 	// converted to a permanent failure.
-	MaxSystemFailures uint32 `json:"maxSystemFailures" pflag:",Max consecutive system-level failures before forcing permanent failure"`
+	MaxSystemFailures int32 `json:"maxSystemFailures" pflag:",Max consecutive system-level failures before forcing permanent failure"`
+
+	// MaxConcurrentReconciles is the maximum number of concurrent reconcile loops for TaskActions.
+	MaxConcurrentReconciles int `json:"maxConcurrentReconciles" pflag:",Max concurrent reconcile loops for TaskActions"`
+
+	// RequeueDuration is how long the controller waits before reconciling a running
+	// TaskAction again. Lowering it makes task actions more responsive at the cost of
+	// more reconciles and more load on the plugin backends. 0 or unset means the
+	// built-in default of 10s.
+	RequeueDuration stdconfig.Duration `json:"requeueDuration" pflag:",How long to wait before reconciling a running TaskAction again. 0 means the default of 10s"`
 
 	// GC configures the garbage collector for terminal TaskActions.
 	GC GCConfig `json:"gc" pflag:",Garbage collector configuration for terminal TaskActions"`

@@ -310,6 +310,8 @@ func init() {
 		panic(err)
 	}
 
+	pluginmachinery.PluginRegistry().RegisterScheme(common.PytorchTaskType, kubeflowv1.AddToScheme)
+
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{
 			ID:                  common.PytorchTaskType,

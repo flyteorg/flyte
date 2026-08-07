@@ -1147,6 +1147,10 @@ func (m *ListRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for DisableIdentityEnrichment
+
+	// no validation rules for IncludeTotalCount
+
 	switch v := m.FilterBy.(type) {
 	case *ListRequest_Org:
 		if v == nil {
@@ -1380,6 +1384,8 @@ func (m *ListResponse) validate(all bool) error {
 	}
 
 	// no validation rules for Token
+
+	// no validation rules for TotalCount
 
 	if len(errors) > 0 {
 		return ListResponseMultiError(errors)

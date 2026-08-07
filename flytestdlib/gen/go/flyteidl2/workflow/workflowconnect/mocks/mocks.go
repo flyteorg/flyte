@@ -2348,6 +2348,74 @@ func (_c *RunServiceClient_ListRuns_Call) RunAndReturn(run func(context1 context
 	return _c
 }
 
+// SignalEvent provides a mock function for the type RunServiceClient
+func (_mock *RunServiceClient) SignalEvent(context1 context.Context, request *connect.Request[workflow.SignalEventRequest]) (*connect.Response[workflow.SignalEventResponse], error) {
+	ret := _mock.Called(context1, request)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SignalEvent")
+	}
+
+	var r0 *connect.Response[workflow.SignalEventResponse]
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.SignalEventRequest]) (*connect.Response[workflow.SignalEventResponse], error)); ok {
+		return returnFunc(context1, request)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.SignalEventRequest]) *connect.Response[workflow.SignalEventResponse]); ok {
+		r0 = returnFunc(context1, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connect.Response[workflow.SignalEventResponse])
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[workflow.SignalEventRequest]) error); ok {
+		r1 = returnFunc(context1, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// RunServiceClient_SignalEvent_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SignalEvent'
+type RunServiceClient_SignalEvent_Call struct {
+	*mock.Call
+}
+
+// SignalEvent is a helper method to define mock.On call
+//   - context1 context.Context
+//   - request *connect.Request[workflow.SignalEventRequest]
+func (_e *RunServiceClient_Expecter) SignalEvent(context1 interface{}, request interface{}) *RunServiceClient_SignalEvent_Call {
+	return &RunServiceClient_SignalEvent_Call{Call: _e.mock.On("SignalEvent", context1, request)}
+}
+
+func (_c *RunServiceClient_SignalEvent_Call) Run(run func(context1 context.Context, request *connect.Request[workflow.SignalEventRequest])) *RunServiceClient_SignalEvent_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *connect.Request[workflow.SignalEventRequest]
+		if args[1] != nil {
+			arg1 = args[1].(*connect.Request[workflow.SignalEventRequest])
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *RunServiceClient_SignalEvent_Call) Return(response *connect.Response[workflow.SignalEventResponse], err error) *RunServiceClient_SignalEvent_Call {
+	_c.Call.Return(response, err)
+	return _c
+}
+
+func (_c *RunServiceClient_SignalEvent_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[workflow.SignalEventRequest]) (*connect.Response[workflow.SignalEventResponse], error)) *RunServiceClient_SignalEvent_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // WatchActionDetails provides a mock function for the type RunServiceClient
 func (_mock *RunServiceClient) WatchActionDetails(context1 context.Context, request *connect.Request[workflow.WatchActionDetailsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionDetailsResponse], error) {
 	ret := _mock.Called(context1, request)
@@ -3459,6 +3527,74 @@ func (_c *RunServiceHandler_ListRuns_Call) Return(response *connect.Response[wor
 }
 
 func (_c *RunServiceHandler_ListRuns_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error)) *RunServiceHandler_ListRuns_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SignalEvent provides a mock function for the type RunServiceHandler
+func (_mock *RunServiceHandler) SignalEvent(context1 context.Context, request *connect.Request[workflow.SignalEventRequest]) (*connect.Response[workflow.SignalEventResponse], error) {
+	ret := _mock.Called(context1, request)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SignalEvent")
+	}
+
+	var r0 *connect.Response[workflow.SignalEventResponse]
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.SignalEventRequest]) (*connect.Response[workflow.SignalEventResponse], error)); ok {
+		return returnFunc(context1, request)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.SignalEventRequest]) *connect.Response[workflow.SignalEventResponse]); ok {
+		r0 = returnFunc(context1, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connect.Response[workflow.SignalEventResponse])
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[workflow.SignalEventRequest]) error); ok {
+		r1 = returnFunc(context1, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// RunServiceHandler_SignalEvent_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SignalEvent'
+type RunServiceHandler_SignalEvent_Call struct {
+	*mock.Call
+}
+
+// SignalEvent is a helper method to define mock.On call
+//   - context1 context.Context
+//   - request *connect.Request[workflow.SignalEventRequest]
+func (_e *RunServiceHandler_Expecter) SignalEvent(context1 interface{}, request interface{}) *RunServiceHandler_SignalEvent_Call {
+	return &RunServiceHandler_SignalEvent_Call{Call: _e.mock.On("SignalEvent", context1, request)}
+}
+
+func (_c *RunServiceHandler_SignalEvent_Call) Run(run func(context1 context.Context, request *connect.Request[workflow.SignalEventRequest])) *RunServiceHandler_SignalEvent_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *connect.Request[workflow.SignalEventRequest]
+		if args[1] != nil {
+			arg1 = args[1].(*connect.Request[workflow.SignalEventRequest])
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *RunServiceHandler_SignalEvent_Call) Return(response *connect.Response[workflow.SignalEventResponse], err error) *RunServiceHandler_SignalEvent_Call {
+	_c.Call.Return(response, err)
+	return _c
+}
+
+func (_c *RunServiceHandler_SignalEvent_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[workflow.SignalEventRequest]) (*connect.Response[workflow.SignalEventResponse], error)) *RunServiceHandler_SignalEvent_Call {
 	_c.Call.Return(run)
 	return _c
 }

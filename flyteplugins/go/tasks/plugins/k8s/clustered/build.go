@@ -13,6 +13,7 @@ import (
 	flyteerr "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	clusteredpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
@@ -44,6 +45,18 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	}
 
 	podSpec = applyInterconnect(ctx, spec.GetInterconnect(), podSpec)
+
+	// Propagate the node-execution labels/annotations onto the pod template. The plugin
+	// manager's addObjectMetadata only stamps these (incl. execution-id/node-id) on the
+	// top-level JobSet, and the JobSet controller does not copy arbitrary parent labels
+	// down to child pods. Without this, child pods lack execution-id/node-id and the
+	// node-execution-scoped K8sReader.List in getLogContext returns nothing, so no
+	// LogContext reaches the UI. Mirrors ray's buildWorkerPodTemplate.
+	cfg := config.GetK8sPluginConfig()
+	objectMeta.Labels = utils.UnionMaps(cfg.DefaultLabels, objectMeta.Labels,
+		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
+	objectMeta.Annotations = utils.UnionMaps(cfg.DefaultAnnotations, objectMeta.Annotations,
+		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
 
 	// The SDK is responsible for setting container.Command to the entrypoint module
 	// (python -m flyte.distributed._entrypoint) at serde time. The plugin stays

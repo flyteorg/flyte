@@ -20,6 +20,9 @@ message SelectClusterRequest {
     flyteidl2.app.Identifier app_id = 6;
     flyteidl2.common.ClusterPoolIdentifier cluster_pool_id = 7;
     flyteidl2.common.DomainIdentifier domain_id = 9;
+    // Names the cluster directly. this is for callers that already know
+    // the cluster and have nothing else to resolve from.
+    flyteidl2.common.ClusterIdentifier cluster_id = 10;
   }
 
   enum Operation {
@@ -32,6 +35,12 @@ message SelectClusterRequest {
     OPERATION_TAIL_LOGS = 6;
     OPERATION_GET_ACTION_ATTEMPT_METRICS = 7;
     OPERATION_USE_SECRETS = 8;
+    OPERATION_UPLOAD_TRIGGER = 9;
+    OPERATION_GET_IMAGE = 10;
+    // Data operations (uploads/reads/download links) for tracked runs. Routes to a dataplane
+    // only when the org's clusters are all directly reachable (zero trust); otherwise the
+    // server answers with its own endpoint and serves these from control-plane storage.
+    OPERATION_TRACKED_RUN_DATA = 11;
   }
 
   Operation operation = 8 [(buf.validate.field).enum = {
@@ -41,4 +50,9 @@ message SelectClusterRequest {
 
 message SelectClusterResponse {
   string cluster_endpoint = 1;
+
+  // Name of the cluster the endpoint belongs to. Empty when the request was routed to the
+  // control plane's own endpoint. Clients that persist where an artifact was written (e.g.
+  // tracked-run reporters stamping the attempt's cluster) use this to make reads routable later.
+  string cluster = 2;
 }

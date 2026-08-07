@@ -34,8 +34,11 @@ message LoggingContext {
   map<string, string> kubernetes_pod_labels = 9;
   common.Sort.Direction order = 10;
   uint64 number_of_batches = 11;
-  // +optional, Pod-name prefix used by log sources to narrow stream/pod searches.
-  string pod_name_prefix = 12;
+  // +optional. Deprecated: use pod_name_prefixes. Still populated with the task's own pod-name
+  // prefix for readers that predate pod_name_prefixes.
+  string pod_name_prefix = 12 [deprecated = true];
+  // +optional, pod-name prefixes used by log sources to narrow stream/pod searches.
+  repeated string pod_name_prefixes = 13;
 }
 
 // Parameters of environment in which logs were collected. Should contain everything

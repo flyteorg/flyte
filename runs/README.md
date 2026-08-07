@@ -18,7 +18,7 @@ The Runs Service implements the `RunService` gRPC interface using buf connect. I
 
 ### Prerequisites
 
-1. Go 1.24 or later
+1. Go 1.26.5 or later
 2. (Optional) PostgreSQL running for production use
 
 ### Quick Start with SQLite

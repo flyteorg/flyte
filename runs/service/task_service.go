@@ -96,8 +96,13 @@ func buildTriggerModels(
 			Active:      tt.GetSpec().GetActive(),
 			TaskVersion: taskId.GetVersion(),
 			Description: truncateShortDescription(tt.GetSpec().GetDescription()),
-			Inputs:      tt.GetSpec().GetInputs(),
 			RunSpec:     tt.GetSpec().GetRunSpec(),
+		}
+		// Carry over whichever input form the request used — inline literals or an offloaded URI.
+		if offloaded := tt.GetSpec().GetOffloadedInputData(); offloaded != nil {
+			spec.InputWrapper = &triggerpb.TriggerSpec_OffloadedInputData{OffloadedInputData: offloaded}
+		} else if inputs := tt.GetSpec().GetInputs(); inputs != nil {
+			spec.InputWrapper = &triggerpb.TriggerSpec_Inputs{Inputs: inputs}
 		}
 		id := &commonpb.TriggerIdentifier{
 			Name: &commonpb.TriggerName{

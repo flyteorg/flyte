@@ -4,6 +4,7 @@ from flyteidl2.common import runtime_version_pb2 as _runtime_version_pb2
 from flyteidl2.core import artifact_id_pb2 as _artifact_id_pb2
 from flyteidl2.core import security_pb2 as _security_pb2
 from flyteidl2.core import tasks_pb2 as _tasks_pb2
+from flyteidl2.task import task_definition_pb2 as _task_definition_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
@@ -27,7 +28,7 @@ class Identifier(_message.Message):
     def __init__(self, org: _Optional[str] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
 
 class Meta(_message.Message):
-    __slots__ = ["id", "revision", "labels"]
+    __slots__ = ["id", "revision", "labels", "code_bundle_uri", "source_code"]
     class LabelsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -38,10 +39,14 @@ class Meta(_message.Message):
     ID_FIELD_NUMBER: _ClassVar[int]
     REVISION_FIELD_NUMBER: _ClassVar[int]
     LABELS_FIELD_NUMBER: _ClassVar[int]
+    CODE_BUNDLE_URI_FIELD_NUMBER: _ClassVar[int]
+    SOURCE_CODE_FIELD_NUMBER: _ClassVar[int]
     id: Identifier
     revision: int
     labels: _containers.ScalarMap[str, str]
-    def __init__(self, id: _Optional[_Union[Identifier, _Mapping]] = ..., revision: _Optional[int] = ..., labels: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    code_bundle_uri: str
+    source_code: _task_definition_pb2.SourceCode
+    def __init__(self, id: _Optional[_Union[Identifier, _Mapping]] = ..., revision: _Optional[int] = ..., labels: _Optional[_Mapping[str, str]] = ..., code_bundle_uri: _Optional[str] = ..., source_code: _Optional[_Union[_task_definition_pb2.SourceCode, _Mapping]] = ...) -> None: ...
 
 class AppWrapper(_message.Message):
     __slots__ = ["host", "app", "app_id"]
@@ -64,21 +69,25 @@ class App(_message.Message):
     def __init__(self, metadata: _Optional[_Union[Meta, _Mapping]] = ..., spec: _Optional[_Union[Spec, _Mapping]] = ..., status: _Optional[_Union[Status, _Mapping]] = ...) -> None: ...
 
 class Condition(_message.Message):
-    __slots__ = ["last_transition_time", "deployment_status", "message", "revision", "actor"]
+    __slots__ = ["last_transition_time", "deployment_status", "message", "revision", "actor", "substate", "deployment_id"]
     LAST_TRANSITION_TIME_FIELD_NUMBER: _ClassVar[int]
     DEPLOYMENT_STATUS_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
     REVISION_FIELD_NUMBER: _ClassVar[int]
     ACTOR_FIELD_NUMBER: _ClassVar[int]
+    SUBSTATE_FIELD_NUMBER: _ClassVar[int]
+    DEPLOYMENT_ID_FIELD_NUMBER: _ClassVar[int]
     last_transition_time: _timestamp_pb2.Timestamp
     deployment_status: Status.DeploymentStatus
     message: str
     revision: int
     actor: _identity_pb2.EnrichedIdentity
-    def __init__(self, last_transition_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., deployment_status: _Optional[_Union[Status.DeploymentStatus, str]] = ..., message: _Optional[str] = ..., revision: _Optional[int] = ..., actor: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ...) -> None: ...
+    substate: Status.Substate
+    deployment_id: str
+    def __init__(self, last_transition_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., deployment_status: _Optional[_Union[Status.DeploymentStatus, str]] = ..., message: _Optional[str] = ..., revision: _Optional[int] = ..., actor: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., substate: _Optional[_Union[Status.Substate, str]] = ..., deployment_id: _Optional[str] = ...) -> None: ...
 
 class Status(_message.Message):
-    __slots__ = ["assigned_cluster", "current_replicas", "ingress", "created_at", "last_updated_at", "conditions", "lease_expiration", "k8s_metadata", "materialized_inputs"]
+    __slots__ = ["assigned_cluster", "current_replicas", "ingress", "created_at", "last_updated_at", "conditions", "lease_expiration", "k8s_metadata", "materialized_inputs", "last_started_at"]
     class DeploymentStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         DEPLOYMENT_STATUS_UNSPECIFIED: _ClassVar[Status.DeploymentStatus]
@@ -103,6 +112,34 @@ class Status(_message.Message):
     DEPLOYMENT_STATUS_SCALING_UP: Status.DeploymentStatus
     DEPLOYMENT_STATUS_SCALING_DOWN: Status.DeploymentStatus
     DEPLOYMENT_STATUS_DEPLOYING: Status.DeploymentStatus
+    class Substate(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        SUBSTATE_UNSPECIFIED: _ClassVar[Status.Substate]
+        PULLING_IMAGE: _ClassVar[Status.Substate]
+        INITIALIZING: _ClassVar[Status.Substate]
+        WEBHOOK_ERROR: _ClassVar[Status.Substate]
+        IMAGE_PULL_ERROR: _ClassVar[Status.Substate]
+        SECRET_MOUNT_ERROR: _ClassVar[Status.Substate]
+        CRASH_LOOP: _ClassVar[Status.Substate]
+        OOM_KILLED: _ClassVar[Status.Substate]
+        RUNNING: _ClassVar[Status.Substate]
+        SCALED_TO_ZERO: _ClassVar[Status.Substate]
+        SCALING_FROM_ZERO: _ClassVar[Status.Substate]
+        SCALING_UP: _ClassVar[Status.Substate]
+        SCALING_DOWN: _ClassVar[Status.Substate]
+    SUBSTATE_UNSPECIFIED: Status.Substate
+    PULLING_IMAGE: Status.Substate
+    INITIALIZING: Status.Substate
+    WEBHOOK_ERROR: Status.Substate
+    IMAGE_PULL_ERROR: Status.Substate
+    SECRET_MOUNT_ERROR: Status.Substate
+    CRASH_LOOP: Status.Substate
+    OOM_KILLED: Status.Substate
+    RUNNING: Status.Substate
+    SCALED_TO_ZERO: Status.Substate
+    SCALING_FROM_ZERO: Status.Substate
+    SCALING_UP: Status.Substate
+    SCALING_DOWN: Status.Substate
     ASSIGNED_CLUSTER_FIELD_NUMBER: _ClassVar[int]
     CURRENT_REPLICAS_FIELD_NUMBER: _ClassVar[int]
     INGRESS_FIELD_NUMBER: _ClassVar[int]
@@ -112,6 +149,7 @@ class Status(_message.Message):
     LEASE_EXPIRATION_FIELD_NUMBER: _ClassVar[int]
     K8S_METADATA_FIELD_NUMBER: _ClassVar[int]
     MATERIALIZED_INPUTS_FIELD_NUMBER: _ClassVar[int]
+    LAST_STARTED_AT_FIELD_NUMBER: _ClassVar[int]
     assigned_cluster: str
     current_replicas: int
     ingress: Ingress
@@ -121,7 +159,8 @@ class Status(_message.Message):
     lease_expiration: _timestamp_pb2.Timestamp
     k8s_metadata: K8sMetadata
     materialized_inputs: MaterializedInputs
-    def __init__(self, assigned_cluster: _Optional[str] = ..., current_replicas: _Optional[int] = ..., ingress: _Optional[_Union[Ingress, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., last_updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., conditions: _Optional[_Iterable[_Union[Condition, _Mapping]]] = ..., lease_expiration: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., k8s_metadata: _Optional[_Union[K8sMetadata, _Mapping]] = ..., materialized_inputs: _Optional[_Union[MaterializedInputs, _Mapping]] = ...) -> None: ...
+    last_started_at: _timestamp_pb2.Timestamp
+    def __init__(self, assigned_cluster: _Optional[str] = ..., current_replicas: _Optional[int] = ..., ingress: _Optional[_Union[Ingress, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., last_updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., conditions: _Optional[_Iterable[_Union[Condition, _Mapping]]] = ..., lease_expiration: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., k8s_metadata: _Optional[_Union[K8sMetadata, _Mapping]] = ..., materialized_inputs: _Optional[_Union[MaterializedInputs, _Mapping]] = ..., last_started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class K8sMetadata(_message.Message):
     __slots__ = ["namespace"]

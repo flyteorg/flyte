@@ -93,6 +93,35 @@ func (m *Action) validate(all bool) error {
 
 	// no validation rules for Subject
 
+	if all {
+		switch v := interface{}(m.GetRecoveredFrom()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionValidationError{
+					field:  "RecoveredFrom",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionValidationError{
+					field:  "RecoveredFrom",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRecoveredFrom()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionValidationError{
+				field:  "RecoveredFrom",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch v := m.Spec.(type) {
 	case *Action_Task:
 		if v == nil {
@@ -1212,6 +1241,39 @@ func (m *AbortRequest) validate(all bool) error {
 		// no validation rules for Reason
 	}
 
+	if m.AbortedBy != nil {
+
+		if all {
+			switch v := interface{}(m.GetAbortedBy()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AbortRequestValidationError{
+						field:  "AbortedBy",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AbortRequestValidationError{
+						field:  "AbortedBy",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetAbortedBy()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AbortRequestValidationError{
+					field:  "AbortedBy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return AbortRequestMultiError(errors)
 	}
@@ -1469,6 +1531,39 @@ func (m *SignalRequest) validate(all bool) error {
 				cause:  err,
 			}
 		}
+	}
+
+	if m.SignalledBy != nil {
+
+		if all {
+			switch v := interface{}(m.GetSignalledBy()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, SignalRequestValidationError{
+						field:  "SignalledBy",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, SignalRequestValidationError{
+						field:  "SignalledBy",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetSignalledBy()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SignalRequestValidationError{
+					field:  "SignalledBy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	if len(errors) > 0 {

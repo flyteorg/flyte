@@ -127,28 +127,14 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_kubernetes.namespace", func(t *testing.T) {
+	t.Run("Test_webhookURL", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("kubernetes.namespace", testValue)
-			if vString, err := cmdFlags.GetString("kubernetes.namespace"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Kubernetes.Namespace)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_kubernetes.clusterName", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("kubernetes.clusterName", testValue)
-			if vString, err := cmdFlags.GetString("kubernetes.clusterName"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Kubernetes.ClusterName)
+			cmdFlags.Set("webhookURL", testValue)
+			if vString, err := cmdFlags.GetString("webhookURL"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.WebhookURL)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -163,6 +149,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("kubernetes.kubeconfig", testValue)
 			if vString, err := cmdFlags.GetString("kubernetes.kubeconfig"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Kubernetes.KubeConfig)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_kubernetes.namespace", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("kubernetes.namespace", testValue)
+			if vString, err := cmdFlags.GetString("kubernetes.namespace"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Kubernetes.Namespace)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -205,6 +205,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("kubernetes.timeout", testValue)
 			if vString, err := cmdFlags.GetString("kubernetes.timeout"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Kubernetes.Timeout)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_kubernetes.clusterName", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("kubernetes.clusterName", testValue)
+			if vString, err := cmdFlags.GetString("kubernetes.clusterName"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Kubernetes.ClusterName)
 
 			} else {
 				assert.FailNow(t, err.Error())

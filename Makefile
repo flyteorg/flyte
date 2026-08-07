@@ -3,7 +3,7 @@
 CLUSTER_NAME ?= flytev2
 
 # Docker CI image configuration
-DOCKER_CI_IMAGE := ghcr.io/flyteorg/flyte/ci:v2
+DOCKER_CI_IMAGE := ghcr.io/flyteorg/flyte/ci:latest
 
 # Environment variable flags for Docker
 DOCKER_ENV_FLAGS :=
@@ -36,8 +36,8 @@ build: verify ## Build all Go service binaries
 # =============================================================================
 
 .PHONY: devbox-build
-devbox-build: ## Build the flyte devbox image (docker/devbox-bundled)
-	$(MAKE) -C docker/devbox-bundled build
+devbox-build: ## Build the flyte devbox image (docker/devbox-bundled), always re-pulling the latest UI image
+	$(MAKE) -C docker/devbox-bundled build CACHEBUST=$(shell date +%s)
 
 # Run in dev mode with extra arg FLYTE_DEV=True
 .PHONY: devbox-run
@@ -47,6 +47,16 @@ devbox-run: ## Start the flyte devbox (Knative is pre-baked into the image)
 .PHONY: devbox-stop
 devbox-stop: ## Stop the flyte devbox
 	$(MAKE) -C docker/devbox-bundled stop
+
+# Opt-in rather than bundled: the Grafana stack adds ~1.4GB unpacked to the
+# devbox image, so it is pulled on demand into a running devbox instead.
+.PHONY: devbox-monitoring
+devbox-monitoring: ## Add the Grafana/Prometheus/OTel stack to a running devbox (http://localhost:30300)
+	$(MAKE) -C docker/devbox-bundled monitoring
+
+.PHONY: devbox-monitoring-stop
+devbox-monitoring-stop: ## Remove the Grafana stack from the devbox
+	$(MAKE) -C docker/devbox-bundled monitoring-clean
 
 .PHONY: help
 help: ## Show this help message

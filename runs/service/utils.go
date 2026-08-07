@@ -7,10 +7,12 @@ import (
 	"encoding/base64"
 	"fmt"
 	"slices"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -40,6 +42,22 @@ func CoalesceNullString(s sql.NullString) string {
 		return s.String
 	}
 	return ""
+}
+
+// foldRunStartTimeIntoHash incorporates the run start time into an offloaded inputs hash when the
+// trigger binds its scheduled time to an input variable (kickoffArg, set via flyte.TriggerTime). That
+// time-bound input is not part of the offloaded blob, so without this every fire of the trigger would
+// share a cache key and a cacheable task would return stale outputs from the first fire.
+//
+// It is a no-op when the trigger has no kickoff arg (the time is not a declared input), no run start
+// time is set, OR the kickoff arg is in the task's cache_ignore_input_vars. The last case is the user
+// explicitly excluding the trigger time from the cache key (flyte.Cache(ignored_inputs=...)): folding
+// it back in would override that intent and force a cache miss every fire.
+func foldRunStartTimeIntoHash(inputsHash, kickoffArg string, ts *timestamppb.Timestamp, cacheIgnoredVars []string) string {
+	if kickoffArg == "" || ts == nil || slices.Contains(cacheIgnoredVars, kickoffArg) {
+		return inputsHash
+	}
+	return inputsHash + "|runStartTime=" + ts.AsTime().UTC().Format(time.RFC3339Nano)
 }
 
 // generateCacheKeyForTask generates a cache key for a task using a precomputed inputs hash.

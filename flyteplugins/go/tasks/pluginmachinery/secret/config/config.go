@@ -19,18 +19,24 @@ import (
 const (
 	EmbeddedSecretsFileMountInitContainerName = "init-embedded-secret"
 	DefaultSecretEnvVarPrefix                 = "_UNION_"
+
+	// DefaultSecretsNamespace is the namespace flyte-native secrets are stored in by
+	// default. The secret service writes Kubernetes Secrets here, and the webhook's
+	// embedded K8s secret fetcher reads them back — both defaults must stay in sync.
+	DefaultSecretsNamespace = "flyte"
 )
 
 var (
 	DefaultConfig = &Config{
-		SecretName:        "flyte-pod-webhook",
-		ServiceName:       "flyte-pod-webhook",
-		ServicePort:       443,
-		MetricsPrefix:     "flyte:",
-		CertDir:           "/etc/webhook/certs",
-		LocalCert:         false,
-		ListenPort:        9443,
-		SecretManagerType: SecretManagerTypeK8s,
+		SecretName:            "flyte-pod-webhook",
+		ServiceName:           "flyte-pod-webhook",
+		ServicePort:           443,
+		MetricsPrefix:         "flyte:",
+		CertDir:               "/etc/webhook/certs",
+		LocalCert:             false,
+		ListenPort:            9443,
+		CacheInvalidationPort: 9444,
+		SecretManagerType:     SecretManagerTypeEmbedded,
 		AWSSecretManagerConfig: AWSSecretManagerConfig{
 			SidecarImage: "docker.io/amazon/aws-secrets-manager-secret-sidecar:v0.1.4",
 			Resources: corev1.ResourceRequirements{
@@ -75,8 +81,12 @@ var (
 			KVVersion: KVVersion2,
 		},
 		EmbeddedSecretManagerConfig: EmbeddedSecretManagerConfig{
+			Type: EmbeddedSecretManagerTypeK8s,
+			K8sConfig: K8sConfig{
+				Namespace: DefaultSecretsNamespace,
+			},
 			FileMountInitContainer: FileMountInitContainerConfig{
-				Image: "busybox:1.28",
+				Image: "public.ecr.aws/docker/library/busybox:latest",
 				Resources: corev1.ResourceRequirements{
 					Requests: corev1.ResourceList{
 						corev1.ResourceMemory: resource.MustParse("100Mi"),
@@ -156,9 +166,12 @@ type Config struct {
 	CertDir       string `json:"certDir" pflag:",Certificate directory to use to write generated certs. Defaults to /etc/webhook/certs/"`
 	LocalCert     bool   `json:"localCert" pflag:",write certs locally. Defaults to false"`
 	ListenPort    int    `json:"listenPort" pflag:",The port to use to listen to webhook calls. Defaults to 9443"`
-	ServiceName   string `json:"serviceName" pflag:",The name of the webhook service."`
-	ServicePort   int32  `json:"servicePort" pflag:",The port on the service that hosting webhook."`
-	SecretName    string `json:"secretName" pflag:",Secret name to write generated certs to."`
+	// CacheInvalidationPort is the port of the plain-HTTP server that lets other services drop
+	// cached secret values in this process. Set to 0 to disable.
+	CacheInvalidationPort int    `json:"cacheInvalidationPort" pflag:",The port to use for the cache invalidation HTTP server. Defaults to 9444"`
+	ServiceName           string `json:"serviceName" pflag:",The name of the webhook service."`
+	ServicePort           int32  `json:"servicePort" pflag:",The port on the service that hosting webhook."`
+	SecretName            string `json:"secretName" pflag:",Secret name to write generated certs to."`
 	// Deprecated: use SecretManagerTypes instead.
 	SecretManagerType           SecretManagerType           `json:"secretManagerType" pflag:"-,Deprecated. Secret manager type to use if secrets are not found in global secrets. Ignored if secretManagerTypes is set."`
 	SecretManagerTypes          []SecretManagerType         `json:"secretManagerTypes" pflag:"-,List of secret manager types to use if secrets are not found in global secrets. In order of preference. Overrides secretManagerType if set."`
@@ -169,11 +182,12 @@ type Config struct {
 	AzureSecretManagerConfig    AzureSecretManagerConfig    `json:"azureSecretManager" pflag:",Azure Secret Manager config."`
 
 	// Ignore PFlag for Image Builder
-	ImageBuilderConfig                 ImageBuilderConfig `json:"imageBuilderConfig,omitempty" pflag:"-,"`
-	WebhookTimeout                     int32              `json:"webhookTimeout" pflag:",Timeout for webhook calls in seconds. Defaults to 30 seconds."`
-	DisableCreateMutatingWebhookConfig bool               `json:"disableCreateMutatingWebhookConfig"`
-	KubeClientConfig                   KubeClientConfig   `json:"kubeClientConfig" pflag:",Configuration to control the Kubernetes client used by the webhook"`
-	SecretEnvVarPrefix                 string             `json:"secretEnvVarPrefix" pflag:",The prefix for secret environment variables. Used by K8s, Global, and Embedded secret managers. Defaults to _UNION_"`
+	ImageBuilderConfig                 ImageBuilderConfig    `json:"imageBuilderConfig,omitempty" pflag:"-,"`
+	WebhookTimeout                     int32                 `json:"webhookTimeout" pflag:",Timeout for webhook calls in seconds. Defaults to 30 seconds."`
+	DisableCreateMutatingWebhookConfig bool                  `json:"disableCreateMutatingWebhookConfig"`
+	NamespaceSelector                  *metav1.LabelSelector `json:"namespaceSelector" pflag:"-,NamespaceSelector to scope the created MutatingWebhookConfiguration. Nil matches all namespaces."`
+	KubeClientConfig                   KubeClientConfig      `json:"kubeClientConfig" pflag:",Configuration to control the Kubernetes client used by the webhook"`
+	SecretEnvVarPrefix                 string                `json:"secretEnvVarPrefix" pflag:",The prefix for secret environment variables. Used by K8s, Global, and Embedded secret managers. Defaults to _UNION_"`
 }
 
 //go:generate enumer --type=EmbeddedSecretManagerType -json -yaml -trimprefix=EmbeddedSecretManagerType

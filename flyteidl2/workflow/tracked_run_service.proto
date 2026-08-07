@@ -1,0 +1,153 @@
+syntax = "proto3";
+
+package flyteidl2.workflow;
+
+import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/run.proto";
+import "flyteidl2/task/common.proto";
+import "flyteidl2/task/run.proto";
+import "flyteidl2/task/task_definition.proto";
+import "flyteidl2/workflow/run_definition.proto";
+import "flyteidl2/workflow/run_service.proto";
+import "google/protobuf/timestamp.proto";
+import "google/rpc/status.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
+
+// TrackedRunService records runs that are orchestrated OUTSIDE the platform: the client executes
+// the work itself — on a laptop, in CI, inside an agent framework — and reports the resulting
+// action tree here. The platform never schedules these runs and no dataplane is involved; it
+// stores what it is told and streams it back.
+//
+// Tracked runs are tracked separately from platform-orchestrated runs so that reported,
+// client-supplied state can never be mistaken for execution state the platform owns.
+//
+// The read/watch surface deliberately mirrors RunService (same request/response messages) so that
+// clients and UIs built against RunService work against tracked runs with only a service swap.
+service TrackedRunService {
+  // Register a new tracked run. The server creates the root action ("a0") in the reported state and
+  // returns the resolved run. If a run name is not provided, the server generates one.
+  rpc CreateRun(CreateTrackedRunRequest) returns (CreateRunResponse) {}
+
+  // Report state for one or more actions of a tracked run. Creates actions on first report and
+  // updates them on subsequent reports. Reports are idempotent: an event with an
+  // (attempt, version, phase) tuple that was already recorded is acknowledged as success.
+  rpc ReportActions(ReportTrackedActionsRequest) returns (ReportTrackedActionsResponse) {}
+
+  // Get detailed information about a tracked run.
+  rpc GetRunDetails(GetRunDetailsRequest) returns (GetRunDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Stream detailed information updates about a tracked run. The call will terminate when the run
+  // reaches a terminal phase.
+  rpc WatchRunDetails(WatchRunDetailsRequest) returns (stream WatchRunDetailsResponse) {}
+
+  // Get detailed information about an action of a tracked run.
+  rpc GetActionDetails(GetActionDetailsRequest) returns (GetActionDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Stream detailed information updates about an action of a tracked run. The call will terminate
+  // when the action reaches a terminal phase.
+  rpc WatchActionDetails(WatchActionDetailsRequest) returns (stream WatchActionDetailsResponse) {}
+
+  // List tracked runs based on the provided filter criteria.
+  rpc ListRuns(ListRunsRequest) returns (ListRunsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Stream updates for tracked runs based on the provided filter criteria.
+  rpc WatchRuns(WatchRunsRequest) returns (stream WatchRunsResponse) {}
+
+  // List all actions for a given tracked run.
+  rpc ListActions(ListActionsRequest) returns (ListActionsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Stream updates for actions of a given tracked run.
+  rpc WatchActions(WatchActionsRequest) returns (stream WatchActionsResponse) {}
+
+  // Abort a tracked run: mark the run and all of its non-terminal actions ABORTED on the server.
+  // The platform cannot stop the client that owns the run; subsequent reports against aborted actions
+  // are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
+  rpc AbortRun(AbortRunRequest) returns (AbortRunResponse) {}
+}
+
+// Request message for creating a tracked run.
+message CreateTrackedRunRequest {
+  oneof id {
+    option (buf.validate.oneof).required = true;
+
+    // The user provided run id.
+    common.RunIdentifier run_id = 1;
+
+    // The project id for this run. Run name will be generated.
+    common.ProjectIdentifier project_id = 2;
+  }
+
+  // The task this run executes.
+  oneof task {
+    option (buf.validate.oneof).required = true;
+
+    // The task id to use.
+    task.TaskIdentifier task_id = 3;
+
+    // The task spec to use.
+    task.TaskSpec task_spec = 4;
+  }
+
+  // Reference to the run's inputs, previously uploaded via DataProxyService.UploadMetadata.
+  optional common.OffloadedInputData offloaded_input_data = 5;
+
+  // The run spec to use. Only client-relevant fields are honored; dataplane scheduling fields
+  // (queue, cluster) are ignored for tracked runs.
+  task.RunSpec run_spec = 6;
+
+  // User-defined labels attached to this run at creation time.
+  map<string, string> labels = 7;
+
+  // Time the tracked run actually started. If unset, the server defaults it to the current time.
+  google.protobuf.Timestamp run_start_time = 8;
+}
+
+// A single action state report within a tracked run.
+message TrackedActionUpdate {
+  // The event describing this state transition. Carries the action id, attempt (starting at 1),
+  // phase, monotonically increasing version, timestamps, error info and output references
+  // (output_uri / report_uri under the control plane's storage).
+  ActionEvent event = 1 [(buf.validate.field).required = true];
+
+  // Name of the parent action if this is a nested action. Empty for the root action. Only
+  // honored on the first report of an action.
+  string parent_name = 2;
+
+  // Group this action belongs to, if applicable. Only honored on the first report of an action.
+  string group = 3;
+
+  // The action's spec. Should be provided on the first report of an action; ignored afterwards.
+  oneof spec {
+    TaskAction task = 4;
+    TraceAction trace = 5;
+  }
+
+  // Rolled-up status of the action (attempts count, start/end time).
+  ActionStatus status = 6;
+}
+
+// Request message for reporting tracked action state.
+message ReportTrackedActionsRequest {
+  // The run these action reports belong to. Every update's action id must reference this run.
+  common.RunIdentifier run_id = 1 [(buf.validate.field).required = true];
+
+  // The action state reports.
+  repeated TrackedActionUpdate updates = 2 [(buf.validate.field).repeated.min_items = 1];
+}
+
+// Response message for reporting tracked action state.
+message ReportTrackedActionsResponse {
+  // Per-update results, parallel to the request's updates. Duplicate (already recorded) events
+  // are reported as success.
+  repeated google.rpc.Status statuses = 1;
+}

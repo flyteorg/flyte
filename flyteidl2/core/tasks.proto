@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package flyteidl2.core;
 
+import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/core/execution.proto";
 import "flyteidl2/core/identifier.proto";
@@ -209,6 +210,59 @@ message TaskMetadata {
   // the per-attempt RUNNING-phase bound expressed by `timeout` (field 4).
   // Each bound is independently optional; an unspecified bound is unlimited.
   TimeoutStrategy timeouts = 22;
+
+  // If true, the backend extracts artifact metadata stamped on this task's
+  // output literals and records them as generated artifacts on the action.
+  bool produces_artifacts = 23;
+}
+
+// ReusePolicy configures reuse of a task's execution environment across invocations, so
+// environment creation cost is paid once and amortized: a warm container pool for reusable
+// container tasks or a shared long-lived cluster for cluster-backed plugins (e.g. Ray).
+// Total concurrent capacity is max_replicas * concurrency.
+message ReusePolicy {
+  option (buf.validate.message).cel = {
+    id: "reuse_policy.replica_bounds"
+    message: "max_replicas must be >= min_replicas"
+    expression: "this.max_replicas >= this.min_replicas"
+  };
+
+  // Scope bounds how widely a reusable environment may be shared.
+  enum Scope {
+    // Reuse one environment across all runs (the default). Cheapest: creation cost is paid once
+    // and amortized across every invocation everywhere.
+    GLOBAL = 0;
+
+    // Restrict reuse to a single run: each run gets its own environment, torn down with the run.
+    RUN = 1;
+
+    // PROJECT and DOMAIN scoping are reserved for future use.
+  }
+
+  // Minimum number of replicas to keep warm (a fixed-size pool uses min == max).
+  int32 min_replicas = 1 [(buf.validate.field).int32.gte = 0];
+
+  // Maximum number of replicas; the upper bound for demand-based auto-scaling.
+  int32 max_replicas = 2 [(buf.validate.field).int32.gte = 1];
+
+  // Maximum number of concurrent tasks a single replica may handle. Values > 1 are only
+  // meaningful for async tasks.
+  int32 concurrency = 3 [(buf.validate.field).int32.gte = 1];
+
+  // How long the whole reusable environment may sit idle (no running tasks) before it is torn
+  // down entirely.
+  google.protobuf.Duration idle_ttl = 4 [(buf.validate.field).duration = {
+    gte: {seconds: 0}
+  }];
+
+  // Minimum delay before an individual idle replica is scaled down during auto-scaling
+  // (distinct from idle_ttl, which governs the whole environment).
+  google.protobuf.Duration scaledown_ttl = 5 [(buf.validate.field).duration = {
+    gte: {seconds: 0}
+  }];
+
+  // How widely the reusable environment may be shared. Defaults to GLOBAL (reuse across all runs).
+  Scope scope = 6 [(buf.validate.field).enum.defined_only = true];
 }
 
 // A Task structure that uniquely identifies a task in the system
@@ -255,6 +309,10 @@ message TaskTemplate {
   // to use as required.
   // reserve the field numbers 1 through 15 for very frequently occurring message elements
   map<string, string> config = 16;
+
+  // Reuse policy for the task's execution environment (a warm container pool, or a shared,
+  // long-lived cluster for cluster-backed plugins like Ray). When unset, no reuse is configured.
+  ReusePolicy reuse_policy = 19;
 }
 
 // ----------------- First class Plugins
@@ -373,6 +431,22 @@ message DataLoadingConfig {
   // This format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding
   LiteralMapFormat format = 4;
   IOStrategy io_strategy = 5;
+
+  // FileInputLayout controls how Blob (File) and collection-of-Blob (list[File])
+  // inputs are laid out under input_path.
+  enum FileInputLayout {
+    // Each File is written directly at input_path/<var>, and each list[File]
+    // element at input_path/<var>/<index>. The original filename (and thus the
+    // extension) is dropped. This is the backwards-compatible default.
+    DIRECT = 0;
+    // Each File is written inside a per-input directory input_path/<var>/ under
+    // a name that preserves its extension (list[File] elements as
+    // input_path/<var>/<index><ext>), so tools that detect a file's format from
+    // its extension work. Consumers reference inputs by globbing the directory.
+    NAMED_DIR = 1;
+  }
+  // How File / list[File] inputs are laid out under input_path.
+  FileInputLayout file_input_layout = 6;
 }
 
 // Defines a pod spec and additional pod metadata that is created when a task is executed.

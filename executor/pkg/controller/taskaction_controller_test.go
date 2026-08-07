@@ -30,7 +30,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
@@ -174,7 +174,7 @@ var _ = Describe("TaskAction Controller", func() {
 			controllerReconciler := &TaskActionReconciler{
 				Client:         k8sClient,
 				Scheme:         k8sClient.Scheme(),
-				Recorder:       record.NewFakeRecorder(10),
+				Recorder:       events.NewFakeRecorder(10),
 				PluginRegistry: pluginRegistry,
 				DataStore:      dataStore,
 				eventsClient:   &fakeEventsClient{},
@@ -363,7 +363,7 @@ var _ = Describe("TaskAction Controller", func() {
 			r := &TaskActionReconciler{
 				Client:            k8sClient,
 				Scheme:            k8sClient.Scheme(),
-				Recorder:          record.NewFakeRecorder(10),
+				Recorder:          events.NewFakeRecorder(10),
 				MaxSystemFailures: 3,
 			}
 			ta := &flyteorgv1.TaskAction{}
@@ -387,7 +387,7 @@ var _ = Describe("TaskAction Controller", func() {
 			r := &TaskActionReconciler{
 				Client:            k8sClient,
 				Scheme:            k8sClient.Scheme(),
-				Recorder:          record.NewFakeRecorder(10),
+				Recorder:          events.NewFakeRecorder(10),
 				eventsClient:      &fakeEventsClient{},
 				MaxSystemFailures: 2,
 			}
@@ -575,7 +575,7 @@ var _ = Describe("TaskAction Controller", func() {
 			reconciler := &TaskActionReconciler{
 				Client:         k8sClient,
 				Scheme:         k8sClient.Scheme(),
-				Recorder:       record.NewFakeRecorder(10),
+				Recorder:       events.NewFakeRecorder(10),
 				PluginRegistry: pluginRegistry,
 				DataStore:      dataStore,
 				eventsClient:   recorder,

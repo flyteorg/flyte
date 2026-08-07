@@ -130,7 +130,12 @@ message CreateRunRequest {
   // Indicates client that created this run.
   RunSource source = 8;
 
-  // Next field number: 10
+  // Optional explicit run start time. The scheduler sets this to a trigger's scheduled fire time
+  // so it surfaces as flyte.ctx().run_start_time in the task. If unset, the server defaults it to
+  // the current time. Copied onto RunSpec.run_start_time before the action is enqueued.
+  google.protobuf.Timestamp run_start_time = 10;
+
+  // Next field number: 11
 }
 
 // Response message for creating a run.
@@ -277,6 +282,10 @@ message ListRunsRequest {
     // Task identifier for filtering runs
     task.TaskIdentifier task_id = 8;
   }
+
+  // When true, only return runs that contain at least one action in the
+  // PAUSED phase (e.g. a human-in-the-loop gate node awaiting input).
+  bool paused_actions_only = 9;
 }
 
 // Response message for listing runs.
@@ -387,7 +396,13 @@ message WatchWindowedActionsRequest {
   // UpdateWindow updates one or more window parameters. Sent as the
   // user scrolls, expands/collapses, or changes filters.
   message UpdateWindow {
-    string selected_item_id = 1;
+    // Window anchor: either an item id (semantic selection / deep link) or an
+    // absolute flat index (scroll-driven viewport). Exactly one must be set.
+    oneof window_anchor {
+      option (buf.validate.oneof).required = true;
+      string selected_item_id = 1;
+      uint64 anchor_flat_index = 7;
+    }
     int32 overscan_before = 2 [(buf.validate.field).int32.gte = 0];
     int32 overscan_after = 3 [(buf.validate.field).int32.gte = 0];
     map<string, NodeExpansionParams> expanded_nodes = 4;
@@ -420,8 +435,11 @@ message WatchWindowedActionsResponse {
   // Position of selected_item_id within the flat list.
   int64 selected_flat_index = 4;
 
-  // True on the response that completes the initial hydration; the
-  // client should treat this as the "first paint done" signal.
+  // True on any full-window snapshot the client should replace its
+  // window with — the initial attach snapshot, every mid-hydration
+  // resnapshot, and the final completion snapshot. Distinct from a
+  // delta (which carries only changed items). Use hydration_complete,
+  // not this, to know when the initial load is actually done.
   bool initial_snapshot_complete = 5;
 
   // Sticky truncation notices — present on every response until the
@@ -431,6 +449,12 @@ message WatchWindowedActionsResponse {
   // True when the server had to drop a tick due to backpressure; the
   // client should re-send its UpdateWindow to force a fresh snapshot.
   bool resync_hint = 7;
+
+  // True once the run's initial DB hydration has finished (the store
+  // left the HYDRATING state). Mid-hydration resnapshots carry false;
+  // the completion snapshot and all post-ready responses carry true.
+  // This is the real "first paint / loading done" signal.
+  bool hydration_complete = 8;
 }
 
 // WindowedItem is one slot in the windowed flat list — either a
@@ -453,13 +477,19 @@ message ActionLeaf {
   // Metric for this entry — wall-clock duration, running duration, or
   // setup time depending on which list the leaf appears in.
   google.protobuf.Duration duration = 3;
+  // Member's current phase, so collapsed / out-of-window rows can render
+  // status without the full action being hydrated in the window.
+  common.ActionPhase phase = 4;
+  // Member's start time (mirrors ActionStatus.start_time), for the mini
+  // table start-time column on collapsed / out-of-window rows.
+  google.protobuf.Timestamp start_time = 5;
 }
 
 // GroupAggregations carries the four top-3 outlier lists for a group.
-// Each list holds the three members with the largest metric, sorted
-// DESC.
+// Each list holds the three descendant actions (deep rollup over the
+// group's whole subtree) with the largest metric, sorted DESC.
 message GroupAggregations {
-  // Members in terminal FAILED phase, by total duration.
+  // Descendants in terminal FAILED phase, by total duration.
   repeated ActionLeaf failed = 1;
   // By total wall-clock duration (created → ended).
   repeated ActionLeaf longest_duration = 2;

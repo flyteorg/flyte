@@ -14,10 +14,10 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings";
 // Go:
 //   import (
 //     "google.golang.org/protobuf/proto"
-//     org "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/org"
+//     settings "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 //   )
-//   field := (&org.RunSettings{}).ProtoReflect().Descriptor().Fields().ByName("default_queue")
-//   desc := proto.GetExtension(field.Options(), org.E_Desc).(string)
+//   field := (&settings.RunSettings{}).ProtoReflect().Descriptor().Fields().ByName("default_queue")
+//   desc := proto.GetExtension(field.Options(), settings.E_Desc).(string)
 //
 // TypeScript (protobuf-es):
 //   import { RunSettings } from "./settings_definition_pb";
@@ -26,12 +26,21 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings";
 //   const description = getExtension(field.proto.options, desc);
 //
 // Python:
-//   from flyteidl2.org import settings_definition_pb2
+//   from flyteidl2.settings import settings_definition_pb2
 //   field = settings_definition_pb2.RunSettings.DESCRIPTOR.fields_by_name["default_queue"]
 //   description = field.GetOptions().Extensions[settings_definition_pb2.desc]
 
+// Extension numbers below come from the protobuf global extension registry,
+// which reserves 1364-1373 for Flyte. See
+// https://github.com/protocolbuffers/protobuf/blob/main/docs/options.md
+//
+// Do not use numbers from the 50000-99999 range here. That range is only safe
+// for schemas that never share a descriptor pool with third-party protos, and
+// flyteidl2 is published to buf.build, PyPI and npm. desc previously sat at
+// 50000 and collided with another published extension at the same tag, which
+// fails registration at import time for anyone importing both.
 extend google.protobuf.FieldOptions {
-  string desc = 50000;
+  string desc = 1364;
 }
 
 // SettingState controls how a setting at a given scope behaves.
@@ -113,16 +122,6 @@ message BoolSetting {
   ScopeLevel scope_level = 3;
 }
 
-// A setting that holds a list of strings.
-// Merge behavior: additive (parent-first concatenation). UNSET clears
-// accumulated values from parent scopes.
-message StringListSetting {
-  SettingState state = 1;
-  // Meaningful only when state = VALUE.
-  StringValues list_value = 2;
-  ScopeLevel scope_level = 3;
-}
-
 // A setting that holds a string-to-string map.
 // Merge behavior: child entries override parent on key conflict. UNSET clears
 // accumulated entries from parent scopes.
@@ -150,6 +149,8 @@ message QuantitySetting {
 // RunSettings controls workflow execution behavior.
 message RunSettings {
   StringSetting default_queue = 1 [(flyteidl2.settings.desc) = "Default queue for task runs"];
+  Int64Setting max_action_concurrency = 2 [(flyteidl2.settings.desc) = "Maximum number of actions of a run that may execute concurrently. 0 or unset means unlimited."];
+  StringSetting run_base_dir = 3 [(flyteidl2.settings.desc) = "Base directory for run metadata such as inputs/outputs (e.g. s3://my-bucket/prefix)"];
 }
 
 // SecuritySettings controls security-related configuration.
@@ -160,6 +161,9 @@ message SecuritySettings {
 // StorageSettings controls data storage configuration.
 message StorageSettings {
   StringSetting raw_data_path = 1 [(flyteidl2.settings.desc) = "Base path for raw data storage (e.g. s3://my-bucket/prefix)"];
+  // run_base_dir moved to RunSettings; nothing read it here.
+  reserved 2;
+  reserved "run_base_dir";
 }
 
 // TaskResourceDefaults holds resource quantity settings for a single bound
@@ -178,6 +182,15 @@ message TaskResourceSettings {
   BoolSetting mirror_limits_request = 3 [(flyteidl2.settings.desc) = "When true, resource limits mirror requests"];
 }
 
+// AppSettings controls policy for Union Apps.
+message AppSettings {
+  // When VALUE=true, apps may not be deployed with anonymous (unauthenticated)
+  // access: the control plane rejects a deploy that sets allow_anonymous=true,
+  // and the operator forces authentication on at reconcile time. This is the
+  // org-level override of the per-app SecurityContext.allow_anonymous field.
+  BoolSetting disallow_anonymous = 1 [(flyteidl2.settings.desc) = "Disallow anonymous (unauthenticated) access to apps org-wide"];
+}
+
 // Settings holds all configurable settings for a scope.
 message Settings {
   RunSettings run = 1;
@@ -187,4 +200,5 @@ message Settings {
   StringMapSetting labels = 5 [(flyteidl2.settings.desc) = "Kubernetes labels applied to task pods. Child overrides parent on key conflict."];
   StringMapSetting annotations = 6 [(flyteidl2.settings.desc) = "Kubernetes annotations applied to task pods. Child overrides parent on key conflict."];
   StringMapSetting environment_variables = 7 [(flyteidl2.settings.desc) = "Environment variables injected into task pods. Child overrides parent on key conflict."];
+  AppSettings app = 8 [(flyteidl2.settings.desc) = "Union Apps auth policy"];
 }

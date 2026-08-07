@@ -46,7 +46,7 @@ func Test_monitor(t *testing.T) {
 				Action: autorefreshcache.Update,
 			},
 		}, nil
-	}, workqueue.DefaultControllerRateLimiter(), time.Second, 1, 10, promutils.NewTestScope())
+	}, workqueue.DefaultTypedControllerRateLimiter[*autorefreshcache.Batch](), time.Second, 1, 10, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	assert.NoError(t, cacheObj.Start(ctx))

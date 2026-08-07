@@ -25,10 +25,10 @@ import (
 	actionsconnectmocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	projectMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
+	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
@@ -84,19 +84,6 @@ func newRunServiceTestClient(t *testing.T, svc *RunService) workflowconnect.RunS
 	t.Cleanup(server.Close)
 
 	return workflowconnect.NewRunServiceClient(http.DefaultClient, server.URL)
-}
-
-type mockDataProxyClient struct {
-	mock.Mock
-}
-
-func (m *mockDataProxyClient) GetActionData(
-	ctx context.Context,
-	req *connect.Request[dataproxy.GetActionDataRequest],
-) (*connect.Response[dataproxy.GetActionDataResponse], error) {
-	args := m.Called(ctx, req)
-	resp, _ := args.Get(0).(*connect.Response[dataproxy.GetActionDataResponse])
-	return resp, args.Error(1)
 }
 
 func TestGetRunDetails_WithTaskSpec(t *testing.T) {
@@ -756,31 +743,38 @@ func TestListRuns(t *testing.T) {
 		runs []*models.Run
 		err  error
 	}
+	// The page token is the running offset (strconv.Itoa(offset+limit)); the incoming
+	// token is decoded back into listInput.Offset. A request at offset 5 with limit 2 that
+	// still has a next page yields token "7".
 	testCases := []struct {
-		name    string
-		req     *common.ListRequest
-		mockRes mockListRes
-		expect  *workflow.ListRunsResponse
+		name         string
+		req          *common.ListRequest
+		expectOffset int
+		mockRes      mockListRes
+		expect       *workflow.ListRunsResponse
 	}{
 		{
 			"Empty Runs",
 			&common.ListRequest{Limit: 2},
+			0,
 			mockListRes{runs: []*models.Run{}, err: nil},
 			&workflow.ListRunsResponse{Runs: []*workflow.Run{}, Token: ""},
 		},
 		{
-			// Service fetches Limit+1 rows to detect another page. With 3 rows
-			// returned for a limit of 2, the slice is trimmed to the first 2
-			// runs and the cursor token is the trimmed last row's created_at.
+			// Service fetches Limit+1 rows to detect another page. With 3 rows returned
+			// for a limit of 2, the slice is trimmed to the first 2 runs and the next-page
+			// token is the next offset (5 + 2 = 7).
 			"list with limit 2 and token",
-			&common.ListRequest{Limit: 2, Token: sqlRes[5].CreatedAt.UTC().Format(time.RFC3339Nano)},
+			&common.ListRequest{Limit: 2, Token: "5"},
+			5,
 			mockListRes{runs: sqlRes[5:8], err: nil},
-			&workflow.ListRunsResponse{Runs: runs[5:7], Token: sqlRes[6].CreatedAt.UTC().Format(time.RFC3339Nano)},
+			&workflow.ListRunsResponse{Runs: runs[5:7], Token: "7"},
 		},
 		{
 			// Only 2 rows returned for limit 3 means no next page — token empty.
 			"list with limit 3 and token",
-			&common.ListRequest{Limit: 3, Token: sqlRes[8].CreatedAt.UTC().Format(time.RFC3339Nano)},
+			&common.ListRequest{Limit: 3, Token: "8"},
+			8,
 			mockListRes{runs: sqlRes[8:10], err: nil},
 			&workflow.ListRunsResponse{Runs: runs[8:10], Token: ""},
 		},
@@ -788,7 +782,10 @@ func TestListRuns(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			req := connect.NewRequest(&workflow.ListRunsRequest{Request: tc.req})
-			actionRepo.On("ListActions", mock.Anything, mock.Anything).Return(tc.mockRes.runs, tc.mockRes.err).Once()
+			// Assert the incoming token was decoded into listInput.Offset.
+			actionRepo.On("ListActions", mock.Anything, mock.MatchedBy(func(input interfaces.ListResourceInput) bool {
+				return input.Offset == tc.expectOffset
+			})).Return(tc.mockRes.runs, tc.mockRes.err).Once()
 			got, err := svc.ListRuns(context.Background(), req)
 			assert.NoError(t, err)
 			assert.Equal(t, len(tc.expect.Runs), len(got.Msg.Runs))
@@ -821,8 +818,9 @@ func TestListAndSendAllActionsUsesAscendingSort(t *testing.T) {
 	err = svc.listAndSendAllActions(context.Background(), runID, rsm, nil)
 	require.NoError(t, err)
 
-	require.Len(t, captured.SortParameters, 1)
+	require.Len(t, captured.SortParameters, 2)
 	assert.Equal(t, "created_at ASC", captured.SortParameters[0].GetOrderExpr())
+	assert.Equal(t, "name ASC", captured.SortParameters[1].GetOrderExpr())
 }
 
 func TestGenerateRunName(t *testing.T) {
@@ -1167,6 +1165,109 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_QUEUED, run.Action.Status.Phase)
 }
 
+// TestCreateRun_TriggerFire_CarriesRunSpecEnvVars locks in that a run fired from a trigger
+// carries the run-level env vars captured in the trigger's stored run spec. The scheduler fires
+// with only a TriggerName (no run spec), so CreateRun must restore the run spec from the trigger
+// — otherwise Trigger(env_vars=...) is silently dropped before the pod is built.
+func TestCreateRun_TriggerFire_CarriesRunSpecEnvVars(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	triggerRepo := &repoMocks.TriggerRepo{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(taskRepo)
+	repo.On("TriggerRepo").Return(triggerRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	// Trigger stored at registration with a run-level env var.
+	triggerSpecBytes, err := proto.Marshal(&triggerpb.TriggerSpec{
+		TaskVersion: "v1",
+		RunSpec: &task.RunSpec{
+			Envs: &task.Envs{
+				Values: []*core.KeyValuePair{
+					{Key: "TRIGGER_ENV", Value: "from-trigger"},
+				},
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	triggerRepo.On("GetTrigger", mock.Anything, mock.Anything).Return(&models.Trigger{
+		Project:        "myproj",
+		Domain:         "production",
+		TaskName:       "mytask",
+		Name:           "mytrigger",
+		TaskVersion:    "v1",
+		LatestRevision: 1,
+		Spec:           triggerSpecBytes,
+	}, nil).Once()
+
+	// Task referenced by the trigger.
+	taskRepo.On("GetTask", mock.Anything, mock.Anything).Return(&models.Task{}, nil).Once()
+	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Maybe()
+
+	// Capture the persisted action so we can inspect the run spec it carries.
+	var persisted *models.Action
+	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).
+		Run(func(args mock.Arguments) {
+			persisted = args.Get(1).(*models.Action)
+		}).
+		Return(&models.Run{
+			Project: "myproj",
+			Domain:  "production",
+			RunName: "rtrig1",
+			Name:    "a0",
+			Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		}, nil).Once()
+
+	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+	actionsClient.On("Enqueue", mock.Anything, mock.Anything).
+		Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{
+				Project: "myproj",
+				Domain:  "production",
+				Name:    "rtrig1",
+			},
+		},
+		Task: &workflow.CreateRunRequest_TriggerName{
+			TriggerName: &common.TriggerName{
+				Project:  "myproj",
+				Domain:   "production",
+				TaskName: "mytask",
+				Name:     "mytrigger",
+			},
+		},
+		Source: workflow.RunSource_RUN_SOURCE_SCHEDULE_TRIGGER,
+	}
+
+	_, err = svc.CreateRun(context.Background(), connect.NewRequest(req))
+	require.NoError(t, err)
+
+	require.NotNil(t, persisted, "CreateAction should have been called")
+	var gotRunSpec task.RunSpec
+	require.NoError(t, proto.Unmarshal(persisted.RunSpec, &gotRunSpec))
+	gotEnv := map[string]string{}
+	for _, kv := range gotRunSpec.GetEnvs().GetValues() {
+		gotEnv[kv.GetKey()] = kv.GetValue()
+	}
+	assert.Equal(t, "from-trigger", gotEnv["TRIGGER_ENV"],
+		"trigger-fired run must carry the trigger's run-level env vars")
+}
+
 func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
@@ -1285,72 +1386,6 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 
 	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
 	require.NoError(t, err)
-}
-
-func TestGetActionData_DelegatesToDataProxy(t *testing.T) {
-	actionID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{
-			Org:     "test-org",
-			Project: "test-project",
-			Domain:  "test-domain",
-			Name:    "rtest12345",
-		},
-		Name: "action-1",
-	}
-
-	dpClient := &mockDataProxyClient{}
-	svc := &RunService{dataProxyClient: dpClient}
-	dpClient.On("GetActionData", mock.Anything, mock.MatchedBy(func(req *connect.Request[dataproxy.GetActionDataRequest]) bool {
-		return proto.Equal(req.Msg.GetActionId(), actionID)
-	})).Return(connect.NewResponse(&dataproxy.GetActionDataResponse{
-		Inputs: &task.Inputs{
-			Literals: []*task.NamedLiteral{
-				{Name: "x", Value: newStringLiteral("input")},
-			},
-		},
-		Outputs: &task.Outputs{
-			Literals: []*task.NamedLiteral{
-				{Name: "result", Value: newStringLiteral("success")},
-			},
-		},
-	}), nil).Once()
-
-	resp, err := svc.GetActionData(context.Background(), connect.NewRequest(&workflow.GetActionDataRequest{
-		ActionId: actionID,
-	}))
-	require.NoError(t, err)
-	assert.Len(t, resp.Msg.Inputs.Literals, 1)
-	assert.Len(t, resp.Msg.Outputs.Literals, 1)
-	assert.Equal(t, "x", resp.Msg.Inputs.Literals[0].Name)
-	assert.Equal(t, "result", resp.Msg.Outputs.Literals[0].Name)
-	dpClient.AssertExpectations(t)
-}
-
-func TestGetActionData_PropagatesDataProxyError(t *testing.T) {
-	actionID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{
-			Org:     "test-org",
-			Project: "test-project",
-			Domain:  "test-domain",
-			Name:    "rtest12345",
-		},
-		Name: "action-1",
-	}
-
-	dpClient := &mockDataProxyClient{}
-	svc := &RunService{dataProxyClient: dpClient}
-	dpClient.On("GetActionData", mock.Anything, mock.Anything).Return(
-		nil, connect.NewError(connect.CodeNotFound, errors.New("action not found")),
-	).Once()
-
-	resp, err := svc.GetActionData(context.Background(), connect.NewRequest(
-		&workflow.GetActionDataRequest{
-			ActionId: actionID,
-		}))
-	assert.Nil(t, resp)
-	require.Error(t, err)
-	assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
-	dpClient.AssertExpectations(t)
 }
 
 func TestCreateRun_WithOffloadedInputData(t *testing.T) {
@@ -1535,6 +1570,57 @@ func TestGetActionDataURIs(t *testing.T) {
 		})
 		actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{
 			{Attempt: 0, Phase: int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED), Info: eventBytes},
+		}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		require.NoError(t, err)
+		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
+		assert.Equal(t, "s3://bucket/outputs/0/outputs.pb", resp.Msg.GetOutputsUri())
+	})
+
+	t.Run("recovered trace action returns outputs uri from RunInfo", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
+			ActionType: int32(workflow.ActionType_ACTION_TYPE_TRACE),
+			DetailedInfo: mustMarshalRunInfo(&workflow.RunInfo{
+				InputsUri:  "s3://bucket/inputs",
+				OutputsUri: "s3://bucket/trace-outputs",
+			}),
+		}, nil)
+
+		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+			ActionId: actionID,
+		}))
+
+		require.NoError(t, err)
+		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
+		assert.Equal(t, "s3://bucket/trace-outputs", resp.Msg.GetOutputsUri())
+	})
+
+	t.Run("recovered task returns outputs from latest attempt", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(&models.Action{
+			Phase:      int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
+			ActionType: int32(workflow.ActionType_ACTION_TYPE_TASK),
+			DetailedInfo: mustMarshalRunInfo(&workflow.RunInfo{
+				InputsUri: "s3://bucket/inputs",
+			}),
+		}, nil)
+
+		eventBytes := mustMarshalEvent(&workflow.ActionEvent{
+			Id:      actionID,
+			Attempt: 0,
+			Phase:   common.ActionPhase_ACTION_PHASE_RECOVERED,
+			Outputs: &task.OutputReferences{
+				OutputUri: "s3://bucket/outputs/0/outputs.pb",
+			},
+		})
+		actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{
+			{Attempt: 0, Phase: int32(common.ActionPhase_ACTION_PHASE_RECOVERED), Info: eventBytes},
 		}, nil)
 
 		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{

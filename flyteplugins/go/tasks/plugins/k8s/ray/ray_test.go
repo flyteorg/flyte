@@ -29,6 +29,10 @@ import (
 	k8smocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
@@ -111,6 +115,10 @@ func dummyRayTaskTemplate(id string, rayJob *plugins.RayJob) *core.TaskTemplate 
 }
 
 func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage, serviceAccount string) pluginsCore.TaskExecutionContext {
+	return dummyRayTaskContextInterruptible(taskTemplate, resources, extendedResources, containerImage, serviceAccount, true)
+}
+
+func dummyRayTaskContextInterruptible(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage, serviceAccount string, interruptible bool) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
@@ -157,7 +165,7 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 		Kind: "node",
 		Name: "blah",
 	})
-	taskExecutionMetadata.EXPECT().IsInterruptible().Return(true)
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(interruptible)
 	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
 	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return(serviceAccount)
 	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&corev1.ResourceRequirements{})
@@ -223,6 +231,300 @@ func TestBuildResourceRay(t *testing.T) {
 	ray, ok = RayResource.(*rayv1.RayJob)
 	assert.True(t, ok)
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName, GetConfig().ServiceAccount)
+}
+
+var (
+	interruptibleNSR = &corev1.NodeSelectorRequirement{
+		Key:      "interruptible",
+		Operator: corev1.NodeSelectorOpIn,
+		Values:   []string{"true"},
+	}
+	nonInterruptibleNSR = &corev1.NodeSelectorRequirement{
+		Key:      "interruptible",
+		Operator: corev1.NodeSelectorOpIn,
+		Values:   []string{"false"},
+	}
+	interruptibleNodeSelector  = map[string]string{"interruptible-node": "true"}
+	interruptibleTolerationVal = corev1.Toleration{
+		Key:      "interruptible",
+		Value:    "true",
+		Operator: corev1.TolerationOpEqual,
+		Effect:   corev1.TaintEffectNoSchedule,
+	}
+)
+
+func interruptibleK8sPluginConfig() *config.K8sPluginConfig {
+	return &config.K8sPluginConfig{
+		InterruptibleNodeSelectorRequirement:    interruptibleNSR,
+		NonInterruptibleNodeSelectorRequirement: nonInterruptibleNSR,
+		InterruptibleNodeSelector:               interruptibleNodeSelector,
+		InterruptibleTolerations:                []corev1.Toleration{interruptibleTolerationVal},
+	}
+}
+
+// countRequirement returns how many times req appears across all node selector terms.
+func countRequirement(terms []corev1.NodeSelectorTerm, req corev1.NodeSelectorRequirement) int {
+	count := 0
+	for _, term := range terms {
+		for _, e := range term.MatchExpressions {
+			if reflect.DeepEqual(e, req) {
+				count++
+			}
+		}
+	}
+	return count
+}
+
+// assertEveryTermHasRequirement asserts that every node selector term contains req
+// exactly once. This is what guarantees a non-interruptible pod cannot land on a
+// spot node via an OR'd alternative term contributed by a custom k8s_pod overlay.
+func assertEveryTermHasRequirement(t *testing.T, spec corev1.PodSpec, req corev1.NodeSelectorRequirement) {
+	t.Helper()
+	require.NotNil(t, spec.Affinity)
+	require.NotNil(t, spec.Affinity.NodeAffinity)
+	require.NotNil(t, spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution)
+	terms := spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
+	require.NotEmpty(t, terms)
+	for i, term := range terms {
+		assert.Truef(t, containsRequirement(term.MatchExpressions, req),
+			"node selector term %d is missing the expected scheduling requirement %v", i, req)
+	}
+}
+
+func containsRequirement(reqs []corev1.NodeSelectorRequirement, req corev1.NodeSelectorRequirement) bool {
+	for _, r := range reqs {
+		if reflect.DeepEqual(r, req) {
+			return true
+		}
+	}
+	return false
+}
+
+func hasToleration(tolerations []corev1.Toleration, tol corev1.Toleration) bool {
+	for _, t := range tolerations {
+		if reflect.DeepEqual(t, tol) {
+			return true
+		}
+	}
+	return false
+}
+
+// TestBuildResourceRayInterruptible verifies that the task's interruptible flag is
+// reflected on both the head and worker pod templates: interruptible tasks get the
+// interruptible node selector requirement / node selector / tolerations, and
+// non-interruptible tasks get the non-interruptible requirement and none of the
+// interruptible scheduling hints.
+func TestBuildResourceRayInterruptible(t *testing.T) {
+	for _, interruptible := range []bool{true, false} {
+		name := "non-interruptible"
+		if interruptible {
+			name = "interruptible"
+		}
+		t.Run(name, func(t *testing.T) {
+			require.NoError(t, config.SetK8sPluginConfig(interruptibleK8sPluginConfig()))
+
+			taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+			taskContext := dummyRayTaskContextInterruptible(taskTemplate, resourceRequirements, nil, "", serviceAccount, interruptible)
+			r, err := rayJobResourceHandler{}.BuildResource(context.TODO(), taskContext)
+			require.NoError(t, err)
+			rayJob, ok := r.(*rayv1.RayJob)
+			require.True(t, ok)
+
+			expectedReq := *nonInterruptibleNSR
+			if interruptible {
+				expectedReq = *interruptibleNSR
+			}
+
+			specs := map[string]corev1.PodSpec{
+				"head":   rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec,
+				"worker": rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec,
+			}
+			for group, spec := range specs {
+				t.Run(group, func(t *testing.T) {
+					assertEveryTermHasRequirement(t, spec, expectedReq)
+					// Idempotency: the requirement must appear exactly once per pod.
+					assert.Equal(t, 1, countRequirement(
+						spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+						expectedReq), "requirement should be applied exactly once")
+
+					if interruptible {
+						assert.Equal(t, "true", spec.NodeSelector["interruptible-node"])
+						assert.True(t, hasToleration(spec.Tolerations, interruptibleTolerationVal))
+						assert.Equal(t, 1, tolerationCount(spec.Tolerations, interruptibleTolerationVal),
+							"interruptible toleration should be applied exactly once")
+					} else {
+						assert.NotContains(t, spec.NodeSelector, "interruptible-node")
+						assert.False(t, hasToleration(spec.Tolerations, interruptibleTolerationVal))
+					}
+				})
+			}
+		})
+	}
+}
+
+func tolerationCount(tolerations []corev1.Toleration, tol corev1.Toleration) int {
+	count := 0
+	for _, t := range tolerations {
+		if reflect.DeepEqual(t, tol) {
+			count++
+		}
+	}
+	return count
+}
+
+// TestBuildResourceRayInterruptibleCustomAffinity is the regression test for the
+// OR-hole: when a worker's custom k8s_pod carries its own node selector term, the
+// custom-pod merge (mergo WithAppendSlice) appends it as a new OR'd term. Without
+// re-applying interruptible scheduling after the merge, that appended term lacks
+// the non-interruptible requirement, letting the pod schedule on a spot node.
+func TestBuildResourceRayInterruptibleCustomAffinity(t *testing.T) {
+	require.NoError(t, config.SetK8sPluginConfig(interruptibleK8sPluginConfig()))
+
+	customAffinityPod := &core.K8SPod{
+		PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+			Containers: []corev1.Container{{Name: "ray-worker"}},
+			Affinity: &corev1.Affinity{
+				NodeAffinity: &corev1.NodeAffinity{
+					RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+						NodeSelectorTerms: []corev1.NodeSelectorTerm{
+							{
+								MatchExpressions: []corev1.NodeSelectorRequirement{
+									{
+										Key:      "zone",
+										Operator: corev1.NodeSelectorOpIn,
+										Values:   []string{"us-east-1a"},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}),
+	}
+
+	rayJobObj := dummyRayCustomObj()
+	rayJobObj.RayCluster.WorkerGroupSpec[0].K8SPod = customAffinityPod
+	taskTemplate := dummyRayTaskTemplate("ray-id", rayJobObj)
+	// interruptible=false: every resulting node selector term (the base term and the
+	// appended custom term) must carry the non-interruptible requirement.
+	taskContext := dummyRayTaskContextInterruptible(taskTemplate, resourceRequirements, nil, "", serviceAccount, false)
+
+	r, err := rayJobResourceHandler{}.BuildResource(context.TODO(), taskContext)
+	require.NoError(t, err)
+	rayJob, ok := r.(*rayv1.RayJob)
+	require.True(t, ok)
+
+	workerSpec := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec
+	terms := workerSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
+	// Sanity: the custom term was actually appended as a separate OR'd term.
+	require.GreaterOrEqual(t, len(terms), 2, "expected the custom affinity term to be appended as a separate term")
+	assertEveryTermHasRequirement(t, workerSpec, *nonInterruptibleNSR)
+}
+
+// TestBuildResourceRayDefaultAffinityDilution probes whether a platform-injected
+// DefaultAffinity required node-selector term survives a worker's custom k8s_pod
+// that carries its own affinity term. Same OR-append mechanism as the interruptible
+// bug: if it reproduces, the appended custom term lacks the default-affinity
+// requirement, letting the pod escape the cluster's default node constraint.
+func TestBuildResourceRayDefaultAffinityDilution(t *testing.T) {
+	defaultAffinityReq := corev1.NodeSelectorRequirement{
+		Key:      "node-pool",
+		Operator: corev1.NodeSelectorOpIn,
+		Values:   []string{"flyte-dedicated"},
+	}
+	require.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		DefaultAffinity: &corev1.Affinity{
+			NodeAffinity: &corev1.NodeAffinity{
+				RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+					NodeSelectorTerms: []corev1.NodeSelectorTerm{
+						{MatchExpressions: []corev1.NodeSelectorRequirement{defaultAffinityReq}},
+					},
+				},
+			},
+		},
+	}))
+
+	// CPU-only so GPU handling does not pre-seed Affinity (which would skip
+	// DefaultAffinity application in UpdatePod).
+	cpuOnly := &corev1.ResourceRequirements{
+		Limits:   corev1.ResourceList{corev1.ResourceCPU: resource.MustParse("1000m"), corev1.ResourceMemory: resource.MustParse("1Gi")},
+		Requests: corev1.ResourceList{corev1.ResourceCPU: resource.MustParse("100m"), corev1.ResourceMemory: resource.MustParse("512Mi")},
+	}
+
+	customAffinityPod := &core.K8SPod{
+		PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+			Containers: []corev1.Container{{Name: "ray-worker"}},
+			Affinity: &corev1.Affinity{
+				NodeAffinity: &corev1.NodeAffinity{
+					RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+						NodeSelectorTerms: []corev1.NodeSelectorTerm{
+							{MatchExpressions: []corev1.NodeSelectorRequirement{
+								{Key: "zone", Operator: corev1.NodeSelectorOpIn, Values: []string{"us-east-1a"}},
+							}},
+						},
+					},
+				},
+			},
+		}),
+	}
+
+	rayJobObj := dummyRayCustomObj()
+	rayJobObj.RayCluster.WorkerGroupSpec[0].K8SPod = customAffinityPod
+	taskTemplate := dummyRayTaskTemplate("ray-id", rayJobObj)
+	taskContext := dummyRayTaskContext(taskTemplate, cpuOnly, nil, "", serviceAccount)
+
+	r, err := rayJobResourceHandler{}.BuildResource(context.TODO(), taskContext)
+	require.NoError(t, err)
+	rayJob, ok := r.(*rayv1.RayJob)
+	require.True(t, ok)
+
+	workerSpec := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec
+	terms := workerSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
+	require.GreaterOrEqual(t, len(terms), 2, "expected the custom affinity term to be appended as a separate term")
+	// If this fails, DefaultAffinity is diluted (bug). If it passes, no bug.
+	assertEveryTermHasRequirement(t, workerSpec, defaultAffinityReq)
+}
+
+func TestBuildResourceRay_DisablesLogNoiseEnv(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+	rayCtx := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+
+	rayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+	require.NoError(t, err)
+	ray, ok := rayResource.(*rayv1.RayJob)
+	require.True(t, ok)
+
+	// envOf returns the named container's env vars as name->value. The log-noise vars must land
+	// on the Ray container itself, not an injected sidecar, so select by container name rather
+	// than scanning every container in the pod.
+	envOf := func(containers []corev1.Container, containerName string) map[string]string {
+		for _, c := range containers {
+			if c.Name == containerName {
+				env := make(map[string]string, len(c.Env))
+				for _, e := range c.Env {
+					env[e.Name] = e.Value
+				}
+				return env
+			}
+		}
+		return nil
+	}
+
+	require.NotEmpty(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs, "expected at least one worker group")
+	headEnv := envOf(ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Containers, RayHeadContainerName)
+	workerEnv := envOf(ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Containers, "ray-worker")
+	require.NotNil(t, headEnv, "head pod is missing the %s container", RayHeadContainerName)
+	require.NotNil(t, workerEnv, "worker pod is missing the ray-worker container")
+
+	for _, env := range []struct{ name, value string }{
+		{"RAY_COLOR_PREFIX", "0"},
+		{"RAY_DATA_DISABLE_PROGRESS_BARS", "1"},
+	} {
+		assert.Equal(t, env.value, headEnv[env.name], "head container must set %s", env.name)
+		assert.Equal(t, env.value, workerEnv[env.name], "worker container must set %s", env.name)
+	}
 }
 
 func TestBuildResourceRayContainerImage(t *testing.T) {
@@ -614,6 +916,127 @@ func TestBuildResourceRayGroupExtendedResourcesOverride(t *testing.T) {
 	workerNodeSpec := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec
 	assert.EqualValues(t, gpuNodeSelectorTerms("nvidia-tesla-a100"),
 		workerNodeSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+}
+
+// TestBuildResourceRayGroupK8SPodGPU is a regression test for the case where the GPU
+// resource is requested only through a group's custom k8s_pod (not the task container).
+// ToK8sPodSpec applies GPU node selectors before the custom pod spec is merged, so the
+// builders must re-apply them post-merge or the device toleration and node affinity are
+// silently dropped (while the generic nvidia.com/gpu toleration, which is computed
+// post-merge, still appears).
+func TestBuildResourceRayGroupK8SPodGPU(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		GpuDeviceNodeLabel:                 "gpu-node-label",
+		GpuResourceName:                    flytek8s.ResourceNvidiaGPU,
+		AddTolerationsForExtendedResources: []string{"nvidia.com/gpu"},
+	}))
+
+	// Task-level resources do not include any GPU.
+	cpuOnlyResources := &corev1.ResourceRequirements{
+		Limits: corev1.ResourceList{
+			corev1.ResourceCPU:    resource.MustParse("1000m"),
+			corev1.ResourceMemory: resource.MustParse("1Gi"),
+		},
+		Requests: corev1.ResourceList{
+			corev1.ResourceCPU:    resource.MustParse("100m"),
+			corev1.ResourceMemory: resource.MustParse("512Mi"),
+		},
+	}
+
+	gpuResources := corev1.ResourceRequirements{
+		Limits: corev1.ResourceList{
+			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+		},
+		Requests: corev1.ResourceList{
+			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+		},
+	}
+	workerGPUPod := &core.K8SPod{
+		PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+			Containers: []corev1.Container{
+				{
+					Name:      "ray-worker",
+					Resources: gpuResources,
+				},
+			},
+		}),
+	}
+
+	expectedNodeSelectorTerms := []corev1.NodeSelectorTerm{
+		{
+			MatchExpressions: []corev1.NodeSelectorRequirement{
+				{
+					Key:      "gpu-node-label",
+					Operator: corev1.NodeSelectorOpIn,
+					Values:   []string{"nvidia-tesla-t4"},
+				},
+			},
+		},
+	}
+	expectedTolerations := []corev1.Toleration{
+		{
+			Key:      "gpu-node-label",
+			Value:    "nvidia-tesla-t4",
+			Operator: corev1.TolerationOpEqual,
+			Effect:   corev1.TaintEffectNoSchedule,
+		},
+		{
+			Key:      "nvidia.com/gpu",
+			Operator: corev1.TolerationOpExists,
+			Effect:   corev1.TaintEffectNoSchedule,
+		},
+	}
+
+	params := []struct {
+		name                   string
+		taskExtendedResources  *core.ExtendedResources
+		groupExtendedResources *core.ExtendedResources
+	}{
+		{
+			name: "accelerator from group extended resources",
+			groupExtendedResources: &core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{Device: "nvidia-tesla-t4"},
+			},
+		},
+		{
+			name: "accelerator from task extended resources",
+			taskExtendedResources: &core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{Device: "nvidia-tesla-t4"},
+			},
+		},
+	}
+
+	for _, p := range params {
+		t.Run(p.name, func(t *testing.T) {
+			rayJobObj := dummyRayCustomObj()
+			rayJobObj.RayCluster.WorkerGroupSpec[0].K8SPod = workerGPUPod
+			rayJobObj.RayCluster.WorkerGroupSpec[0].ExtendedResources = p.groupExtendedResources
+
+			taskTemplate := dummyRayTaskTemplate("ray-id", rayJobObj)
+			taskTemplate.ExtendedResources = p.taskExtendedResources
+			taskContext := dummyRayTaskContext(taskTemplate, cpuOnlyResources, nil, "", serviceAccount)
+			r, err := rayJobResourceHandler{}.BuildResource(context.TODO(), taskContext)
+			assert.NoError(t, err)
+			rayJob, ok := r.(*rayv1.RayJob)
+			assert.True(t, ok)
+
+			// The worker pod's GPU comes only from the group's k8s_pod, so the device
+			// node affinity and toleration must be applied after that merge.
+			workerNodeSpec := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec
+			assert.NotNil(t, workerNodeSpec.Affinity)
+			assert.NotNil(t, workerNodeSpec.Affinity.NodeAffinity)
+			assert.EqualValues(t, expectedNodeSelectorTerms,
+				workerNodeSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+			assert.EqualValues(t, expectedTolerations, workerNodeSpec.Tolerations)
+
+			// The head pod requests no GPU, so it must not pick up GPU scheduling
+			// constraints. (ToK8sPodSpec always initializes an empty Affinity via
+			// ApplyInterruptibleNodeAffinity, so only NodeAffinity is asserted.)
+			headNodeSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
+			assert.Nil(t, headNodeSpec.Affinity.NodeAffinity)
+			assert.Empty(t, headNodeSpec.Tolerations)
+		})
+	}
 }
 
 func TestBuildResourceRayCustomK8SPod(t *testing.T) {
@@ -1085,6 +1508,8 @@ func newPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 }
 
 func init() {
+	labeled.SetMetricKeys(contextutils.NamespaceKey)
+
 	f := defaultConfig
 	f.Logs = logs.LogConfig{
 		IsKubernetesEnabled: true,
@@ -1113,7 +1538,7 @@ func TestGetTaskPhase(t *testing.T) {
 		{rayv1.JobDeploymentStatusSuspending, pluginsCore.PhaseQueued, false},
 	}
 
-	startTime := time.Date(2024, 0, 0, 0, 0, 0, 0, time.UTC)
+	startTime := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 	endTime := startTime.Add(time.Hour)
 	podName, contName, initCont := "ray-clust-ray-head", "ray-head", "init"
 	logCtx := &core.LogContext{
@@ -1179,6 +1604,69 @@ func TestGetTaskPhase(t *testing.T) {
 				assert.Equal(t, tc.expectedCorePhase.String(), phaseInfo.Phase().String())
 				assert.Equal(t, logCtx, phaseInfo.Info().LogContext)
 			}
+		})
+	}
+}
+
+// TestGetTaskPhase_RecoverableErrorFile verifies that a failed RayJob is mapped to a *retryable*
+// failure when the task wrote a RECOVERABLE error.pb (e.g. user code raised
+// FlyteRecoverableException) and stays terminal when the error file marks a non-recoverable error
+// or is absent. This mirrors how the k8s plugin manager honors the error file for container/pod
+// tasks on the success path, which a terminal RayJob phase would otherwise bypass.
+func TestGetTaskPhase_RecoverableErrorFile(t *testing.T) {
+	ctx := context.Background()
+	handler := rayJobResourceHandler{}
+
+	newFailedRayJob := func() *rayv1.RayJob {
+		startTime := metav1.NewTime(time.Now())
+		return &rayv1.RayJob{
+			Spec: rayv1.RayJobSpec{
+				RayClusterSpec: &rayv1.RayClusterSpec{
+					HeadGroupSpec: rayv1.HeadGroupSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{Name: "ray-head", Image: "rayproject/ray:latest"},
+								},
+							},
+						},
+					},
+				},
+			},
+			Status: rayv1.RayJobStatus{
+				JobDeploymentStatus: rayv1.JobDeploymentStatusFailed,
+				RayClusterName:      "ray-clust",
+				Reason:              "AppFailed",
+				Message:             "Job entrypoint command failed with exit code 1",
+				StartTime:           &startTime,
+			},
+		}
+	}
+
+	newErrorDoc := func(kind core.ContainerError_Kind) *core.ErrorDocument {
+		return &core.ErrorDocument{Error: &core.ContainerError{
+			Code:    "USER:Unknown",
+			Message: "boom",
+			Kind:    kind,
+			Origin:  core.ExecutionError_USER,
+		}}
+	}
+
+	for _, tc := range []struct {
+		name          string
+		errorDoc      *core.ErrorDocument
+		expectedPhase pluginsCore.Phase
+	}{
+		{"recoverable error.pb maps to retryable failure", newErrorDoc(core.ContainerError_RECOVERABLE), pluginsCore.PhaseRetryableFailure},
+		{"non-recoverable error.pb stays terminal", newErrorDoc(core.ContainerError_NON_RECOVERABLE), pluginsCore.PhasePermanentFailure},
+		{"absent error.pb stays terminal", nil, pluginsCore.PhasePermanentFailure},
+		{"malformed error.pb (nil Error) stays terminal", &core.ErrorDocument{}, pluginsCore.PhasePermanentFailure},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			pluginCtx := rayPluginContextWithErrorDoc(k8s.PluginState{}, tc.errorDoc)
+			phaseInfo, err := handler.GetTaskPhase(ctx, pluginCtx, newFailedRayJob())
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedPhase.String(), phaseInfo.Phase().String())
 		})
 	}
 }
@@ -1569,9 +2057,9 @@ func TestGetPropertiesRay(t *testing.T) {
 	assert.Equal(t, expected, rayJobResourceHandler.GetProperties())
 }
 
-func rayPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
+func rayPluginContextWithErrorDoc(pluginState k8s.PluginState, errorDoc *core.ErrorDocument) *k8smocks.PluginContext {
 	pluginCtx := newPluginContext(pluginState)
-	startTime := time.Date(2024, 0, 0, 0, 0, 0, 0, time.UTC)
+	startTime := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 	endTime := startTime.Add(time.Hour)
 	podName, contName, initCont := "ray-clust-ray-head", "ray-head", "init"
 	podList := []runtime.Object{
@@ -1615,7 +2103,33 @@ func rayPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 	}
 	reader := fake.NewFakeClient(podList...)
 	pluginCtx.EXPECT().K8sReader().Return(reader)
+	wireErrorFile(pluginCtx, errorDoc)
 	return pluginCtx
+}
+
+// rayPluginContext builds a plugin context whose task error file is absent (the common case).
+func rayPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
+	return rayPluginContextWithErrorDoc(pluginState, nil)
+}
+
+// wireErrorFile backs the plugin context's OutputWriter/DataStore with an in-memory store. A
+// non-nil errorDoc is written to the task's error.pb path so GetTaskPhase can read it back; a nil
+// errorDoc leaves the store empty, modeling a task that produced no error file.
+func wireErrorFile(pluginCtx *k8smocks.PluginContext, errorDoc *core.ErrorDocument) {
+	store, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	if err != nil {
+		panic(err)
+	}
+	errPath := storage.DataReference("/error.pb")
+	if errorDoc != nil {
+		if err := store.WriteProtobuf(context.Background(), errPath, storage.Options{}, errorDoc); err != nil {
+			panic(err)
+		}
+	}
+	ow := &pluginIOMocks.OutputWriter{}
+	ow.EXPECT().GetErrorPath().Return(errPath).Maybe()
+	pluginCtx.EXPECT().OutputWriter().Return(ow).Maybe()
+	pluginCtx.EXPECT().DataStore().Return(store).Maybe()
 }
 
 func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
@@ -14,14 +15,20 @@ import (
 // It implements the controller-runtime manager.Runnable interface.
 type GarbageCollector struct {
 	client   client.Client
+	reader   client.Reader
 	interval time.Duration
 	maxTTL   time.Duration
 }
 
-// NewGarbageCollector creates a new GarbageCollector.
-func NewGarbageCollector(c client.Client, interval, maxTTL time.Duration) *GarbageCollector {
+// NewGarbageCollector creates a new GarbageCollector. reader must be an
+// uncached reader (e.g. mgr.GetAPIReader()): collect() lists with Continue
+// pagination, which the controller-runtime cache does not support
+// ("continue list option is not supported by the cache"). client is used for
+// the deletes.
+func NewGarbageCollector(c client.Client, reader client.Reader, interval, maxTTL time.Duration) *GarbageCollector {
 	return &GarbageCollector{
 		client:   c,
+		reader:   reader,
 		interval: interval,
 		maxTTL:   maxTTL,
 	}
@@ -36,6 +43,13 @@ func (gc *GarbageCollector) Start(ctx context.Context) error {
 	ticker := time.NewTicker(gc.interval)
 	defer ticker.Stop()
 
+	// Sweep once immediately on startup. time.Ticker only fires its first tick
+	// after a full interval, so without this a restart defers the first
+	// collection by the whole interval.
+	if err := gc.collect(ctx); err != nil {
+		logger.Error(err, "initial garbage collection cycle failed")
+	}
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -49,7 +63,9 @@ func (gc *GarbageCollector) Start(ctx context.Context) error {
 	}
 }
 
-const gcPageSize = 500
+// gcPageSize bounds each List page. It's a var (not const) so tests can lower
+// it to exercise the Continue pagination path without creating 500 objects.
+var gcPageSize = 500
 
 // collect lists all terminated TaskActions (paginated) and deletes those whose completed-time has expired.
 func (gc *GarbageCollector) collect(ctx context.Context) error {
@@ -71,7 +87,7 @@ func (gc *GarbageCollector) collect(ctx context.Context) error {
 			listOpts = append(listOpts, client.Continue(continueToken))
 		}
 
-		if err := gc.client.List(ctx, &taskActions, listOpts...); err != nil {
+		if err := gc.reader.List(ctx, &taskActions, listOpts...); err != nil {
 			return err
 		}
 
@@ -87,6 +103,13 @@ func (gc *GarbageCollector) collect(ctx context.Context) error {
 			// The minute-precision format is lexicographically ordered, so string comparison works.
 			if completedTime < cutoff {
 				if err := gc.client.Delete(ctx, ta); err != nil {
+					// Already gone is the desired state: a child TaskAction is
+					// often cascade-deleted (via OwnerReferences) when its parent
+					// is deleted earlier in this same pass, so the explicit delete
+					// races with the cascade and returns NotFound. Not an error.
+					if apierrors.IsNotFound(err) {
+						continue
+					}
 					logger.Error(err, "failed to delete expired TaskAction",
 						"name", ta.Name, "namespace", ta.Namespace, "completedTime", completedTime)
 					continue

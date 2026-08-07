@@ -6,6 +6,7 @@ import (
 	"sort"
 	"time"
 
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
@@ -17,6 +18,12 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	clusteredpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
+)
+
+const (
+	// jobSetRestartingConditionType is emitted by newer JobSet controllers, but the pinned v0.5.2 API package
+	// predates this constant. Keep this string check until we can bump the dependency.
+	jobSetRestartingConditionType = "RestartingJobSet"
 )
 
 func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
@@ -45,13 +52,21 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 	}
 	taskInfo := pluginsCore.TaskInfo{
 		Logs:       taskLogs,
+		LogContext: getLogContext(ctx, pluginContext, jobSet),
 		OccurredAt: &occurredAt,
 		CustomInfo: statusDetails,
 	}
+	maxRestarts := getMaxRestarts(jobSet, &spec)
 
 	condition := extractCurrentCondition(jobSet.Status.Conditions)
 	if condition == nil {
-		// JobSet exists, no terminal condition yet.
+		if hasJobSetStarted(ctx, pluginContext, jobSet) {
+			if phase, ok := maybeFastFailWorker0(ctx, pluginContext, jobSet, &taskInfo, maxRestarts, true); ok {
+				return phase, nil
+			}
+			return runningPhaseInfo(ctx, pluginContext, &taskInfo, runningReason(jobSet.Status.Restarts)), nil
+		}
+
 		return pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "pods scheduling / DNS resolving", &taskInfo), nil
 	}
 
@@ -66,38 +81,141 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 			}
 		}
 		return pluginsCore.PhaseInfoRetryableFailure(condition.Reason, condition.Message, &taskInfo), nil
+
+	case jobsetv1alpha2.JobSetConditionType(jobSetRestartingConditionType):
+		if phase, ok := maybeFastFailWorker0(ctx, pluginContext, jobSet, &taskInfo, maxRestarts, false); ok {
+			return phase, nil
+		}
+		return runningPhaseInfo(
+			ctx,
+			pluginContext,
+			&taskInfo,
+			fmt.Sprintf("restart in progress (attempt %d)", jobSet.Status.Restarts),
+		), nil
 	}
 
-	// Running: check for fast-fail before reporting PhaseRunning.
-	if phase, ok := maybeFastFailWorker0(ctx, pluginContext, jobSet, &taskInfo); ok {
+	if phase, ok := maybeFastFailWorker0(ctx, pluginContext, jobSet, &taskInfo, maxRestarts, true); ok {
 		return phase, nil
 	}
-
-	phaseInfo := pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &taskInfo)
-
-	if err := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext); err != nil {
-		return phaseInfo, err
-	}
-	return phaseInfo, nil
+	return runningPhaseInfo(ctx, pluginContext, &taskInfo, runningReason(jobSet.Status.Restarts)), nil
 }
 
-// maybeFastFailWorker0 inspects the rank-0 pod when at least one Job under the "workers"
-// ReplicatedJob has failed. Returns (phaseInfo, true) if the pod is in a terminal failed state.
-// This surfaces the failure before the JobSet controller sets JobSetFailed, reducing tail latency.
-func maybeFastFailWorker0(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet, taskInfo *pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, bool) {
-	for _, s := range jobSet.Status.ReplicatedJobsStatus {
-		if s.Name == workersReplicatedJobName && s.Failed > 0 {
-			podName := rank0PodName(jobSet.Name)
-			containerName := jobSet.Annotations[primaryContainerAnnotation]
-			phase, err := flytek8s.DemystifyFailedOrPendingPod(ctx, pluginContext, *taskInfo, jobSet.Namespace, podName, containerName)
-			if err != nil {
-				logger.Warnf(ctx, "failed to inspect rank-0 pod for fast-fail: %v", err)
-				return pluginsCore.PhaseInfoUndefined, false
-			}
-			if phase.Phase().IsFailure() {
-				return phase, true
-			}
+func runningReason(restarts int32) string {
+	return fmt.Sprintf("running (restart attempt %d)", restarts)
+}
+
+func runningPhaseInfo(
+	ctx context.Context,
+	pluginContext k8s.PluginContext,
+	taskInfo *pluginsCore.TaskInfo,
+	reason string,
+) pluginsCore.PhaseInfo {
+	phaseInfo := pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, taskInfo)
+	if reason != "" {
+		phaseInfo.WithReason(reason)
+	}
+	if err := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext); err != nil {
+		logger.Warnf(ctx, "failed to update running phase version from plugin state: %v", err)
+	}
+	return phaseInfo
+}
+
+func getMaxRestarts(jobSet *jobsetv1alpha2.JobSet, spec *clusteredpb.ClusteredTaskSpec) int32 {
+	if jobSet.Spec.FailurePolicy != nil {
+		return jobSet.Spec.FailurePolicy.MaxRestarts
+	}
+	return spec.GetFailurePolicy().GetMaxRestarts()
+}
+
+func getWorkersStatus(jobSet *jobsetv1alpha2.JobSet) *jobsetv1alpha2.ReplicatedJobStatus {
+	for i := range jobSet.Status.ReplicatedJobsStatus {
+		if jobSet.Status.ReplicatedJobsStatus[i].Name == workersReplicatedJobName {
+			return &jobSet.Status.ReplicatedJobsStatus[i]
 		}
+	}
+	return nil
+}
+
+func workersHaveFailures(jobSet *jobsetv1alpha2.JobSet) bool {
+	workersStatus := getWorkersStatus(jobSet)
+	return workersStatus != nil && workersStatus.Failed > 0
+}
+
+func isRestartBudgetExhausted(jobSet *jobsetv1alpha2.JobSet, maxRestarts int32) bool {
+	return jobSet.Status.Restarts >= maxRestarts
+}
+
+func readPluginState(ctx context.Context, pluginContext k8s.PluginContext) (k8s.PluginState, bool) {
+	pluginState := k8s.PluginState{}
+	if _, err := pluginContext.PluginStateReader().Get(&pluginState); err != nil {
+		logger.Warnf(ctx, "failed to read plugin state: %v", err)
+		return pluginState, false
+	}
+	return pluginState, true
+}
+
+func hasJobSetStarted(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet) bool {
+	if jobSet.Status.Restarts > 0 {
+		return true
+	}
+
+	if workersStatus := getWorkersStatus(jobSet); workersStatus != nil {
+		if workersStatus.Ready > 0 || workersStatus.Active > 0 || workersStatus.Succeeded > 0 {
+			return true
+		}
+		// A non-zero Failed count means rank-0 pods have run, so the JobSet has started
+		// regardless of remaining restart budget. Budget gating for surfacing the failure
+		// is enforced downstream in maybeFastFailWorker0.
+		if workersStatus.Failed > 0 {
+			return true
+		}
+	}
+
+	if pluginState, ok := readPluginState(ctx, pluginContext); ok && pluginState.Phase >= pluginsCore.PhaseRunning {
+		return true
+	}
+	return false
+}
+
+// maybeFastFailWorker0 inspects the real rank-0 pod (suffix-tolerant lookup) for pending/failed diagnostics.
+// Pending demystification is always evaluated; failed demystification is gated on exhausted restart budget.
+func maybeFastFailWorker0(
+	ctx context.Context,
+	pluginContext k8s.PluginContext,
+	jobSet *jobsetv1alpha2.JobSet,
+	taskInfo *pluginsCore.TaskInfo,
+	maxRestarts int32,
+	allowFailedPath bool,
+) (pluginsCore.PhaseInfo, bool) {
+	pod := findRank0Pod(ctx, pluginContext, jobSet)
+	if pod == nil {
+		return pluginsCore.PhaseInfoUndefined, false
+	}
+
+	if pod.Status.Phase == v1.PodPending {
+		phase, err := flytek8s.DemystifyPending(pod.Status, *taskInfo)
+		if err != nil {
+			logger.Warnf(ctx, "failed to inspect pending rank-0 pod for fast-fail: %v", err)
+			return pluginsCore.PhaseInfoUndefined, false
+		}
+		if phase.Phase().IsFailure() {
+			return phase, true
+		}
+		return pluginsCore.PhaseInfoUndefined, false
+	}
+
+	if pod.Status.Phase != v1.PodFailed || !allowFailedPath || !workersHaveFailures(jobSet) || !isRestartBudgetExhausted(jobSet, maxRestarts) {
+		return pluginsCore.PhaseInfoUndefined, false
+	}
+
+	containerName := jobSet.Annotations[primaryContainerAnnotation]
+	phase, err := flytek8s.DemystifyFailure(ctx, pod.Status, *taskInfo, containerName)
+	if err != nil {
+		logger.Warnf(ctx, "failed to inspect failed rank-0 pod for fast-fail: %v", err)
+		return pluginsCore.PhaseInfoUndefined, false
+	}
+	if phase.Phase().IsFailure() {
+		return phase, true
 	}
 	return pluginsCore.PhaseInfoUndefined, false
 }
@@ -107,9 +225,26 @@ func maybeFastFailWorker0(ctx context.Context, pluginContext k8s.PluginContext, 
 // PhaseInfoSystemRetryableFailureWithCleanup so Flyte retries without charging user's max_restarts.
 // Best-effort: if the pod is already cleaned up, returns (_, false) and the caller falls through.
 func maybeSystemRetryOnMaintenance(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet, taskInfo *pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, bool) {
-	podName := rank0PodName(jobSet.Name)
+	pod := findRank0Pod(ctx, pluginContext, jobSet)
+	if pod == nil {
+		return pluginsCore.PhaseInfoUndefined, false
+	}
+
 	containerName := jobSet.Annotations[primaryContainerAnnotation]
-	phase, err := flytek8s.DemystifyFailedOrPendingPod(ctx, pluginContext, *taskInfo, jobSet.Namespace, podName, containerName)
+	var (
+		phase pluginsCore.PhaseInfo
+		err   error
+	)
+
+	switch pod.Status.Phase {
+	case v1.PodFailed:
+		phase, err = flytek8s.DemystifyFailure(ctx, pod.Status, *taskInfo, containerName)
+	case v1.PodPending:
+		phase, err = flytek8s.DemystifyPending(pod.Status, *taskInfo)
+	default:
+		return pluginsCore.PhaseInfoUndefined, false
+	}
+
 	if err != nil {
 		logger.Warnf(ctx, "failed to inspect rank-0 pod for maintenance retry: %v", err)
 		return pluginsCore.PhaseInfoUndefined, false

@@ -35,8 +35,11 @@ var (
 			"cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
 		},
 		CoPilot: FlyteCoPilotConfig{
-			NamePrefix:           "flyte-copilot-",
-			Image:                "cr.flyte.org/flyteorg/flytecopilot:v0.0.15",
+			NamePrefix: "flyte-copilot-",
+			// The flyte-copilot binary now ships inside the flyte single-binary
+			// image (at /bin/flyte-copilot), so default to that image rather than
+			// a separate flytecopilot image. Deployments normally override this.
+			Image:                "cr.flyte.org/flyteorg/flyte-binary-v2:latest",
 			DefaultInputDataPath: "/var/flyte/inputs",
 			InputVolumeName:      "flyte-inputs",
 			DefaultOutputPath:    "/var/flyte/outputs",

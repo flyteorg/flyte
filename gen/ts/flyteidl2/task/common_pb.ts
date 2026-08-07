@@ -5,10 +5,14 @@
 import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
+import type { ArtifactInfo } from "../core/artifact_id_pb.ts";
+import { file_flyteidl2_core_artifact_id } from "../core/artifact_id_pb.ts";
 import type { Parameter } from "../core/interface_pb.ts";
 import { file_flyteidl2_core_interface } from "../core/interface_pb.ts";
 import type { KeyValuePair, Literal } from "../core/literals_pb.ts";
 import { file_flyteidl2_core_literals } from "../core/literals_pb.ts";
+import type { LiteralType } from "../core/types_pb.ts";
+import { file_flyteidl2_core_types } from "../core/types_pb.ts";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
@@ -17,7 +21,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/task/common.proto.
  */
 export const file_flyteidl2_task_common: GenFile = /*@__PURE__*/
-  fileDesc("ChtmbHl0ZWlkbDIvdGFzay9jb21tb24ucHJvdG8SDmZseXRlaWRsMi50YXNrIkwKDk5hbWVkUGFyYW1ldGVyEgwKBG5hbWUYASABKAkSLAoJcGFyYW1ldGVyGAIgASgLMhkuZmx5dGVpZGwyLmNvcmUuUGFyYW1ldGVyIooBCglGaXhlZFJhdGUSFgoFdmFsdWUYASABKA1CB7pIBCoCIAASNQoEdW5pdBgCIAEoDjIdLmZseXRlaWRsMi50YXNrLkZpeGVkUmF0ZVVuaXRCCLpIBYIBAiAAEi4KCnN0YXJ0X3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIjUKBENyb24SGwoKZXhwcmVzc2lvbhgBIAEoCUIHukgEcgIQARIQCgh0aW1lem9uZRgCIAEoCSKvAQoIU2NoZWR1bGUSKQoEcmF0ZRgBIAEoCzIZLmZseXRlaWRsMi50YXNrLkZpeGVkUmF0ZUgAEh0KD2Nyb25fZXhwcmVzc2lvbhgCIAEoCUICGAFIABIkCgRjcm9uGAQgASgLMhQuZmx5dGVpZGwyLnRhc2suQ3JvbkgAEh4KFmtpY2tvZmZfdGltZV9pbnB1dF9hcmcYAyABKAlCEwoKZXhwcmVzc2lvbhIFukgCCAEilgEKFVRyaWdnZXJBdXRvbWF0aW9uU3BlYxJBCgR0eXBlGAEgASgOMikuZmx5dGVpZGwyLnRhc2suVHJpZ2dlckF1dG9tYXRpb25TcGVjVHlwZUIIukgFggECIAASLAoIc2NoZWR1bGUYAiABKAsyGC5mbHl0ZWlkbDIudGFzay5TY2hlZHVsZUgAQgwKCmF1dG9tYXRpb24iRAoMTmFtZWRMaXRlcmFsEgwKBG5hbWUYASABKAkSJgoFdmFsdWUYAiABKAsyFy5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsIjoKEE91dHB1dFJlZmVyZW5jZXMSEgoKb3V0cHV0X3VyaRgBIAEoCRISCgpyZXBvcnRfdXJpGAIgASgJImcKBklucHV0cxIuCghsaXRlcmFscxgBIAMoCzIcLmZseXRlaWRsMi50YXNrLk5hbWVkTGl0ZXJhbBItCgdjb250ZXh0GAIgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyIjkKB091dHB1dHMSLgoIbGl0ZXJhbHMYASADKAsyHC5mbHl0ZWlkbDIudGFzay5OYW1lZExpdGVyYWwqfwoNRml4ZWRSYXRlVW5pdBIfChtGSVhFRF9SQVRFX1VOSVRfVU5TUEVDSUZJRUQQABIaChZGSVhFRF9SQVRFX1VOSVRfTUlOVVRFEAESGAoURklYRURfUkFURV9VTklUX0hPVVIQAhIXChNGSVhFRF9SQVRFX1VOSVRfREFZEAMqUwoZVHJpZ2dlckF1dG9tYXRpb25TcGVjVHlwZRIUChBUWVBFX1VOU1BFQ0lGSUVEEAASDQoJVFlQRV9OT05FEAESEQoNVFlQRV9TQ0hFRFVMRRACQrABChJjb20uZmx5dGVpZGwyLnRhc2tCC0NvbW1vblByb3RvSAJQAVoyZ2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3Rhc2uiAgNGVFiqAg5GbHl0ZWlkbDIuVGFza8oCDkZseXRlaWRsMlxUYXNr4gIaRmx5dGVpZGwyXFRhc2tcR1BCTWV0YWRhdGHqAg9GbHl0ZWlkbDI6OlRhc2tiBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_core_interface, file_flyteidl2_core_literals, file_google_protobuf_timestamp]);
+  fileDesc("ChtmbHl0ZWlkbDIvdGFzay9jb21tb24ucHJvdG8SDmZseXRlaWRsMi50YXNrIkwKDk5hbWVkUGFyYW1ldGVyEgwKBG5hbWUYASABKAkSLAoJcGFyYW1ldGVyGAIgASgLMhkuZmx5dGVpZGwyLmNvcmUuUGFyYW1ldGVyIooBCglGaXhlZFJhdGUSFgoFdmFsdWUYASABKA1CB7pIBCoCIAASNQoEdW5pdBgCIAEoDjIdLmZseXRlaWRsMi50YXNrLkZpeGVkUmF0ZVVuaXRCCLpIBYIBAiAAEi4KCnN0YXJ0X3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIjUKBENyb24SGwoKZXhwcmVzc2lvbhgBIAEoCUIHukgEcgIQARIQCgh0aW1lem9uZRgCIAEoCSKvAQoIU2NoZWR1bGUSKQoEcmF0ZRgBIAEoCzIZLmZseXRlaWRsMi50YXNrLkZpeGVkUmF0ZUgAEh0KD2Nyb25fZXhwcmVzc2lvbhgCIAEoCUICGAFIABIkCgRjcm9uGAQgASgLMhQuZmx5dGVpZGwyLnRhc2suQ3JvbkgAEh4KFmtpY2tvZmZfdGltZV9pbnB1dF9hcmcYAyABKAlCEwoKZXhwcmVzc2lvbhIFukgCCAEiVQoPQXJ0aWZhY3RUcmlnZ2VyEh4KDWFydGlmYWN0X25hbWUYASABKAlCB7pIBHICEAESDwoHdmVyc2lvbhgCIAEoCRIRCglpbnB1dF9hcmcYAyABKAkiywEKFVRyaWdnZXJBdXRvbWF0aW9uU3BlYxJBCgR0eXBlGAEgASgOMikuZmx5dGVpZGwyLnRhc2suVHJpZ2dlckF1dG9tYXRpb25TcGVjVHlwZUIIukgFggECIAASLAoIc2NoZWR1bGUYAiABKAsyGC5mbHl0ZWlkbDIudGFzay5TY2hlZHVsZUgAEjMKCGFydGlmYWN0GAMgASgLMh8uZmx5dGVpZGwyLnRhc2suQXJ0aWZhY3RUcmlnZ2VySABCDAoKYXV0b21hdGlvbiJECgxOYW1lZExpdGVyYWwSDAoEbmFtZRgBIAEoCRImCgV2YWx1ZRgCIAEoCzIXLmZseXRlaWRsMi5jb3JlLkxpdGVyYWwiOgoQT3V0cHV0UmVmZXJlbmNlcxISCgpvdXRwdXRfdXJpGAEgASgJEhIKCnJlcG9ydF91cmkYAiABKAkiZwoGSW5wdXRzEi4KCGxpdGVyYWxzGAEgAygLMhwuZmx5dGVpZGwyLnRhc2suTmFtZWRMaXRlcmFsEi0KB2NvbnRleHQYAiADKAsyHC5mbHl0ZWlkbDIuY29yZS5LZXlWYWx1ZVBhaXIiqgEKEFByb2R1Y2VkQXJ0aWZhY3QSFwoGb3V0cHV0GAEgASgJQge6SARyAhABEhUKBG5hbWUYAiABKAlCB7pIBHICEAESDwoHdmVyc2lvbhgDIAEoCRIqCgRpbmZvGAQgASgLMhwuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RJbmZvEikKBHR5cGUYBSABKAsyGy5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsVHlwZSJ3CgdPdXRwdXRzEi4KCGxpdGVyYWxzGAEgAygLMhwuZmx5dGVpZGwyLnRhc2suTmFtZWRMaXRlcmFsEjwKEnByb2R1Y2VkX2FydGlmYWN0cxgDIAMoCzIgLmZseXRlaWRsMi50YXNrLlByb2R1Y2VkQXJ0aWZhY3QqfwoNRml4ZWRSYXRlVW5pdBIfChtGSVhFRF9SQVRFX1VOSVRfVU5TUEVDSUZJRUQQABIaChZGSVhFRF9SQVRFX1VOSVRfTUlOVVRFEAESGAoURklYRURfUkFURV9VTklUX0hPVVIQAhIXChNGSVhFRF9SQVRFX1VOSVRfREFZEAMqZgoZVHJpZ2dlckF1dG9tYXRpb25TcGVjVHlwZRIUChBUWVBFX1VOU1BFQ0lGSUVEEAASDQoJVFlQRV9OT05FEAESEQoNVFlQRV9TQ0hFRFVMRRACEhEKDVRZUEVfQVJUSUZBQ1QQA0KwAQoSY29tLmZseXRlaWRsMi50YXNrQgtDb21tb25Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi90YXNrogIDRlRYqgIORmx5dGVpZGwyLlRhc2vKAg5GbHl0ZWlkbDJcVGFza+ICGkZseXRlaWRsMlxUYXNrXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpUYXNrYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_core_artifact_id, file_flyteidl2_core_interface, file_flyteidl2_core_literals, file_flyteidl2_core_types, file_google_protobuf_timestamp]);
 
 /**
  * @generated from message flyteidl2.task.NamedParameter
@@ -148,6 +152,43 @@ export const ScheduleSchema: GenMessage<Schedule> = /*@__PURE__*/
   messageDesc(file_flyteidl2_task_common, 3);
 
 /**
+ * Fires a run when a new version of the named artifact is created.
+ *
+ * @generated from message flyteidl2.task.ArtifactTrigger
+ */
+export type ArtifactTrigger = Message<"flyteidl2.task.ArtifactTrigger"> & {
+  /**
+   * Name of the artifact to watch, scoped to the trigger's org/project/domain.
+   *
+   * @generated from field: string artifact_name = 1;
+   */
+  artifactName: string;
+
+  /**
+   * Optional: fire only when exactly this version is created. Empty means any new version.
+   *
+   * @generated from field: string version = 2;
+   */
+  version: string;
+
+  /**
+   * Name of the task input variable that the triggering artifact's value will be supplied to
+   * when the run is kicked off. Mirrors Schedule.kickoff_time_input_arg. Optional; empty means
+   * the artifact is not bound to any input.
+   *
+   * @generated from field: string input_arg = 3;
+   */
+  inputArg: string;
+};
+
+/**
+ * Describes the message flyteidl2.task.ArtifactTrigger.
+ * Use `create(ArtifactTriggerSchema)` to create a new message.
+ */
+export const ArtifactTriggerSchema: GenMessage<ArtifactTrigger> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_common, 4);
+
+/**
  * @generated from message flyteidl2.task.TriggerAutomationSpec
  */
 export type TriggerAutomationSpec = Message<"flyteidl2.task.TriggerAutomationSpec"> & {
@@ -167,6 +208,12 @@ export type TriggerAutomationSpec = Message<"flyteidl2.task.TriggerAutomationSpe
      */
     value: Schedule;
     case: "schedule";
+  } | {
+    /**
+     * @generated from field: flyteidl2.task.ArtifactTrigger artifact = 3;
+     */
+    value: ArtifactTrigger;
+    case: "artifact";
   } | { case: undefined; value?: undefined };
 };
 
@@ -175,7 +222,7 @@ export type TriggerAutomationSpec = Message<"flyteidl2.task.TriggerAutomationSpe
  * Use `create(TriggerAutomationSpecSchema)` to create a new message.
  */
 export const TriggerAutomationSpecSchema: GenMessage<TriggerAutomationSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_common, 4);
+  messageDesc(file_flyteidl2_task_common, 5);
 
 /**
  * Named literal value.
@@ -203,7 +250,7 @@ export type NamedLiteral = Message<"flyteidl2.task.NamedLiteral"> & {
  * Use `create(NamedLiteralSchema)` to create a new message.
  */
 export const NamedLiteralSchema: GenMessage<NamedLiteral> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_common, 5);
+  messageDesc(file_flyteidl2_task_common, 6);
 
 /**
  * Output references.
@@ -231,7 +278,7 @@ export type OutputReferences = Message<"flyteidl2.task.OutputReferences"> & {
  * Use `create(OutputReferencesSchema)` to create a new message.
  */
 export const OutputReferencesSchema: GenMessage<OutputReferences> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_common, 6);
+  messageDesc(file_flyteidl2_task_common, 7);
 
 /**
  * Input payload for an action.
@@ -264,7 +311,60 @@ export type Inputs = Message<"flyteidl2.task.Inputs"> & {
  * Use `create(InputsSchema)` to create a new message.
  */
 export const InputsSchema: GenMessage<Inputs> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_common, 7);
+  messageDesc(file_flyteidl2_task_common, 8);
+
+/**
+ * Declares that a named output of the producing action is a new artifact
+ * version. The output's literal (in Outputs.literals) is the artifact's value;
+ * org/project/domain come from the producing action's scope at registration.
+ *
+ * @generated from message flyteidl2.task.ProducedArtifact
+ */
+export type ProducedArtifact = Message<"flyteidl2.task.ProducedArtifact"> & {
+  /**
+   * Name of the NamedLiteral in Outputs.literals this declaration refers to.
+   *
+   * @generated from field: string output = 1;
+   */
+  output: string;
+
+  /**
+   * Artifact name to register under.
+   *
+   * @generated from field: string name = 2;
+   */
+  name: string;
+
+  /**
+   * Optional explicit version. Empty means the backend derives one
+   * (<run>-<action>-<attempt>).
+   *
+   * @generated from field: string version = 3;
+   */
+  version: string;
+
+  /**
+   * Descriptive payload, copied verbatim into ArtifactSpec.info.
+   *
+   * @generated from field: flyteidl2.core.ArtifactInfo info = 4;
+   */
+  info?: ArtifactInfo;
+
+  /**
+   * The declared Flyte type of the output, copied into ArtifactSpec.type.
+   * The producing SDK is authoritative for this.
+   *
+   * @generated from field: flyteidl2.core.LiteralType type = 5;
+   */
+  type?: LiteralType;
+};
+
+/**
+ * Describes the message flyteidl2.task.ProducedArtifact.
+ * Use `create(ProducedArtifactSchema)` to create a new message.
+ */
+export const ProducedArtifactSchema: GenMessage<ProducedArtifact> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_common, 9);
 
 /**
  * Output payload for an action.
@@ -278,6 +378,16 @@ export type Outputs = Message<"flyteidl2.task.Outputs"> & {
    * @generated from field: repeated flyteidl2.task.NamedLiteral literals = 1;
    */
   literals: NamedLiteral[];
+
+  /**
+   * Artifact registration declarations for outputs wrapped as artifacts by the
+   * producing task. Field 3 (not 2) on purpose: outputs.pb blobs are sometimes
+   * cross-decoded as task.Inputs, where field 2 is `context`; field 3 is unused
+   * there, so this never aliases.
+   *
+   * @generated from field: repeated flyteidl2.task.ProducedArtifact produced_artifacts = 3;
+   */
+  producedArtifacts: ProducedArtifact[];
 };
 
 /**
@@ -285,7 +395,7 @@ export type Outputs = Message<"flyteidl2.task.Outputs"> & {
  * Use `create(OutputsSchema)` to create a new message.
  */
 export const OutputsSchema: GenMessage<Outputs> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_common, 8);
+  messageDesc(file_flyteidl2_task_common, 10);
 
 /**
  * Represents a frequency at which to run a schedule.
@@ -338,6 +448,11 @@ export enum TriggerAutomationSpecType {
    * @generated from enum value: TYPE_SCHEDULE = 2;
    */
   TYPE_SCHEDULE = 2,
+
+  /**
+   * @generated from enum value: TYPE_ARTIFACT = 3;
+   */
+  TYPE_ARTIFACT = 3,
 }
 
 /**
