@@ -370,6 +370,44 @@ message ActionAttempt {
 
   // Cache metadata for this attempt, set only for cache hits.
   common.CacheMetadata cache_metadata = 14;
+
+  // Information about the node instance this attempt's pod ran on. Taken from the
+  // last event carrying a populated instance_info; may be absent (e.g. never
+  // scheduled, cache hit, or multi-pod plugin actions which are not yet supported).
+  InstanceInfo instance_info = 15;
+}
+
+// InstanceInfo describes the cloud instance (node) an action-attempt's pod was
+// scheduled on. Populated by the executor from the node's well-known labels;
+// fields are best-effort and may be individually empty.
+message InstanceInfo {
+  // Cloud instance type, from the node's "node.kubernetes.io/instance-type"
+  // label, e.g. "p4d.24xlarge".
+  string instance_type = 1;
+
+  // Cloud provider instance ID parsed from the node's spec.providerID,
+  // e.g. "i-0abc123def456".
+  string instance_id = 2;
+
+  // Accelerator device attached to the node, from the cloud accelerator label
+  // (e.g. "cloud.google.com/gke-accelerator" on GCP). Typically empty on AWS,
+  // where the instance type alone identifies the GPU.
+  string accelerator = 3;
+
+  // Capacity type of the node, normalized to "spot" or "on-demand".
+  string capacity_type = 4;
+
+  // Availability zone, from the node's "topology.kubernetes.io/zone" label.
+  string zone = 5;
+
+  // Name of the node the pod was scheduled on (pod.spec.nodeName). Set as soon
+  // as scheduling is observed, even if the remaining fields are not resolved yet.
+  string node_name = 6;
+
+  // Escape hatch for additional executor-owned attributes. Keys are controlled
+  // by the executor (not user data); prefer promoting recurring keys to typed
+  // fields above.
+  map<string, string> attributes = 15;
 }
 
 message ClusterEvent {
@@ -442,6 +480,11 @@ message ActionEvent {
 
   // Cache metadata for this event, set only for cache hits.
   common.CacheMetadata cache_metadata = 16;
+
+  // Information about the node instance this attempt's pod is/was scheduled on.
+  // Attached by the executor when known; absent on events emitted before
+  // scheduling and for actions that run no pods.
+  InstanceInfo instance_info = 17;
 }
 
 message ActionSpec {

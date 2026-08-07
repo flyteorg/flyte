@@ -3430,6 +3430,35 @@ func (m *ActionAttempt) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetInstanceInfo()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionAttemptValidationError{
+					field:  "InstanceInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionAttemptValidationError{
+					field:  "InstanceInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInstanceInfo()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionAttemptValidationError{
+				field:  "InstanceInfo",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if m.EndTime != nil {
 
 		if all {
@@ -3573,6 +3602,119 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ActionAttemptValidationError{}
+
+// Validate checks the field values on InstanceInfo with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *InstanceInfo) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on InstanceInfo with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in InstanceInfoMultiError, or
+// nil if none found.
+func (m *InstanceInfo) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *InstanceInfo) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for InstanceType
+
+	// no validation rules for InstanceId
+
+	// no validation rules for Accelerator
+
+	// no validation rules for CapacityType
+
+	// no validation rules for Zone
+
+	// no validation rules for NodeName
+
+	// no validation rules for Attributes
+
+	if len(errors) > 0 {
+		return InstanceInfoMultiError(errors)
+	}
+
+	return nil
+}
+
+// InstanceInfoMultiError is an error wrapping multiple validation errors
+// returned by InstanceInfo.ValidateAll() if the designated constraints aren't met.
+type InstanceInfoMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m InstanceInfoMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m InstanceInfoMultiError) AllErrors() []error { return m }
+
+// InstanceInfoValidationError is the validation error returned by
+// InstanceInfo.Validate if the designated constraints aren't met.
+type InstanceInfoValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e InstanceInfoValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e InstanceInfoValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e InstanceInfoValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e InstanceInfoValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e InstanceInfoValidationError) ErrorName() string { return "InstanceInfoValidationError" }
+
+// Error satisfies the builtin error interface
+func (e InstanceInfoValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sInstanceInfo.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = InstanceInfoValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = InstanceInfoValidationError{}
 
 // Validate checks the field values on ClusterEvent with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
@@ -4165,6 +4307,35 @@ func (m *ActionEvent) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return ActionEventValidationError{
 				field:  "CacheMetadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetInstanceInfo()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionEventValidationError{
+					field:  "InstanceInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionEventValidationError{
+					field:  "InstanceInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInstanceInfo()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionEventValidationError{
+				field:  "InstanceInfo",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
