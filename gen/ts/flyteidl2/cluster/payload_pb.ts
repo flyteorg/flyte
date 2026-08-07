@@ -167,10 +167,6 @@ export enum SelectClusterRequest_Operation {
   TRACKED_RUN_DATA = 11,
 
   /**
-   * Read a cluster's own component configuration. Inherently cluster-scoped, so it is
-   * paired with a cluster_id: the configuration belongs to the named cluster and no
-   * other cluster can answer for it.
-   *
    * @generated from enum value: OPERATION_GET_CLUSTER_CONFIG = 12;
    */
   GET_CLUSTER_CONFIG = 12,

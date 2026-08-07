@@ -44,9 +44,7 @@ message SelectClusterRequest {
     OPERATION_GET_CLUSTER_CONFIG = 12;
   }
 
-  Operation operation = 8 [(buf.validate.field).enum = {
-    not_in: [0]
-  }];
+  Operation operation = 8 [(buf.validate.field).enum = {not_in: [0]}];
 }
 
 message SelectClusterResponse {

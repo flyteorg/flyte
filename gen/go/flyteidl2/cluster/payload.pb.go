@@ -41,10 +41,7 @@ const (
 	// Data operations (uploads/reads/download links) for tracked runs. Routes to a dataplane
 	// only when the org's clusters are all directly reachable (zero trust); otherwise the
 	// server answers with its own endpoint and serves these from control-plane storage.
-	SelectClusterRequest_OPERATION_TRACKED_RUN_DATA SelectClusterRequest_Operation = 11
-	// Read a cluster's own component configuration. Inherently cluster-scoped, so it is
-	// paired with a cluster_id: the configuration belongs to the named cluster and no
-	// other cluster can answer for it.
+	SelectClusterRequest_OPERATION_TRACKED_RUN_DATA   SelectClusterRequest_Operation = 11
 	SelectClusterRequest_OPERATION_GET_CLUSTER_CONFIG SelectClusterRequest_Operation = 12
 )
 
