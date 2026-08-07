@@ -6,17 +6,6 @@ import "flyteidl2/core/tasks.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins";
 
-// SubmissionMode specifies how the KubeRay operator submits the Ray job to the RayCluster.
-enum SubmissionMode {
-  // The KubeRay operator creates a submitter Kubernetes Job that runs `ray job submit`
-  // against the RayCluster. This is the default and preserves existing behavior.
-  SUBMISSION_MODE_K8S_JOB = 0;
-  // The KubeRay operator submits the Ray job by sending an HTTP request directly to
-  // the RayCluster head node. No submitter pod is created, which avoids job failures
-  // caused by eviction of the submitter pod.
-  SUBMISSION_MODE_HTTP = 1;
-}
-
 // RayJobSpec defines the desired state of RayJob
 message RayJob {
   // RayClusterSpec is the cluster template to run the job
@@ -31,9 +20,6 @@ message RayJob {
   // RuntimeEnvYAML represents the runtime environment configuration
   // provided as a multi-line YAML string.
   string runtime_env_yaml = 5;
-  // submission_mode specifies how the Ray job is submitted to the RayCluster.
-  // If not set, defaults to SUBMISSION_MODE_K8S_JOB.
-  SubmissionMode submission_mode = 6;
 }
 
 // Define Ray cluster defines the desired state of RayCluster

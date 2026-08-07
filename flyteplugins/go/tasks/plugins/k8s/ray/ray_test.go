@@ -234,31 +234,43 @@ func TestBuildResourceRay(t *testing.T) {
 }
 
 func TestBuildResourceRaySubmissionMode(t *testing.T) {
-	rayJobResourceHandler := rayJobResourceHandler{}
+	// SetConfig mutates global plugin config; restore it so later tests are unaffected.
+	originalConfig := GetConfig()
+	defer func() { assert.NoError(t, SetConfig(originalConfig)) }()
 
+	rayJobResourceHandler := rayJobResourceHandler{}
 	taskTemplate := dummyRayTaskTemplate("ray-submission-default", dummyRayCustomObj())
 	rayCtx := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
 
-	rayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+	buildWithMode := func(mode string) (*rayv1.RayJob, error) {
+		cfg := *GetConfig()
+		cfg.SubmissionMode = mode
+		if err := SetConfig(&cfg); err != nil {
+			return nil, err
+		}
+		rayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+		if err != nil {
+			return nil, err
+		}
+		ray, ok := rayResource.(*rayv1.RayJob)
+		assert.True(t, ok)
+		return ray, nil
+	}
+
+	for _, mode := range []string{"K8sJobMode", ""} {
+		ray, err := buildWithMode(mode)
+		assert.Nil(t, err)
+		assert.Equal(t, rayv1.K8sJobMode, ray.Spec.SubmissionMode)
+		assert.NotNil(t, ray.Spec.SubmitterPodTemplate)
+	}
+
+	ray, err := buildWithMode("HTTPMode")
 	assert.Nil(t, err)
-
-	ray, ok := rayResource.(*rayv1.RayJob)
-	assert.True(t, ok)
-	assert.Equal(t, rayv1.K8sJobMode, ray.Spec.SubmissionMode)
-	assert.NotNil(t, ray.Spec.SubmitterPodTemplate)
-
-	rayJobObj := dummyRayCustomObj()
-	rayJobObj.SubmissionMode = plugins.SubmissionMode_SUBMISSION_MODE_HTTP
-	taskTemplate = dummyRayTaskTemplate("ray-submission-http", rayJobObj)
-	rayCtx = dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
-
-	rayResource, err = rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
-	assert.Nil(t, err)
-
-	ray, ok = rayResource.(*rayv1.RayJob)
-	assert.True(t, ok)
 	assert.Equal(t, rayv1.HTTPMode, ray.Spec.SubmissionMode)
 	assert.Nil(t, ray.Spec.SubmitterPodTemplate)
+
+	_, err = buildWithMode("HttpMode")
+	assert.ErrorContains(t, err, "invalid ray submission mode")
 }
 
 var (

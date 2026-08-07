@@ -53,6 +53,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "shutdownAfterJobFinishes"), defaultConfig.ShutdownAfterJobFinishes, "")
 	cmdFlags.Int32(fmt.Sprintf("%v%v", prefix, "ttlSecondsAfterFinished"), defaultConfig.TTLSecondsAfterFinished, "")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "serviceType"), defaultConfig.ServiceType, "")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "submissionMode"), defaultConfig.SubmissionMode, "KubeRay job submission mode: K8sJobMode or HTTPMode")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "includeDashboard"), defaultConfig.IncludeDashboard, "")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "dashboardHost"), defaultConfig.DashboardHost, "")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "remoteClusterConfig.name"), defaultConfig.RemoteClusterConfig.Name, "Friendly name of the remote cluster")

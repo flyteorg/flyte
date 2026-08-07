@@ -305,9 +305,13 @@ func constructRayJob(ctx context.Context, taskCtx pluginsCore.TaskExecutionConte
 	}
 
 	submissionMode := rayv1.K8sJobMode
-	switch rayJob.SubmissionMode {
-	case plugins.SubmissionMode_SUBMISSION_MODE_HTTP:
+	switch cfg.SubmissionMode {
+	case string(rayv1.HTTPMode):
 		submissionMode = rayv1.HTTPMode
+	case string(rayv1.K8sJobMode), "":
+		// submissionMode already defaults to K8sJobMode
+	default:
+		return nil, fmt.Errorf("invalid ray submission mode %q: must be K8sJobMode or HTTPMode", cfg.SubmissionMode)
 	}
 
 	// A submitter pod only exists in K8sJobMode; in HTTPMode the KubeRay operator

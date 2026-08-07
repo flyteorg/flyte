@@ -93,8 +93,6 @@ func (m *RayJob) validate(all bool) error {
 
 	// no validation rules for RuntimeEnvYaml
 
-	// no validation rules for SubmissionMode
-
 	if len(errors) > 0 {
 		return RayJobMultiError(errors)
 	}
