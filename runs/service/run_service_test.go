@@ -845,6 +845,12 @@ func TestGenerateRunName(t *testing.T) {
 		name2 := generateRunName(12345)
 		assert.Equal(t, name1, name2)
 	})
+
+	t.Run("generated names pass run name validation", func(t *testing.T) {
+		for seed := int64(0); seed < 100; seed++ {
+			assert.NoError(t, validateRunName(generateRunName(seed)))
+		}
+	})
 }
 
 func TestConvertRunToProto(t *testing.T) {
@@ -1316,6 +1322,46 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 	assert.NoError(t, err)
 
 	actionsClient.AssertExpectations(t)
+}
+
+func TestCreateRun_RejectsInvalidRunName(t *testing.T) {
+	// Invalid names must be rejected before any repo or project access, so no mocks are needed.
+	svc := &RunService{}
+
+	tests := []struct {
+		name    string
+		runName string
+	}{
+		{"dot", "my.run"},
+		{"leading digit", "1run"},
+		{"uppercase", "My-Run"},
+		{"underscore", "my_run"},
+		{"leading hyphen", "-run"},
+		{"trailing hyphen", "run-"},
+		{"too long", strings.Repeat("a", runNameMaxLength+1)},
+		{"empty", ""},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := &workflow.CreateRunRequest{
+				Id: &workflow.CreateRunRequest_RunId{
+					RunId: &common.RunIdentifier{
+						Org:     "org",
+						Project: "proj",
+						Domain:  "dev",
+						Name:    tc.runName,
+					},
+				},
+				Task: &workflow.CreateRunRequest_TaskSpec{
+					TaskSpec: &task.TaskSpec{},
+				},
+			}
+
+			_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+			require.Error(t, err)
+			assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+		})
+	}
 }
 
 func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
