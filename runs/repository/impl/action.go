@@ -951,12 +951,7 @@ func (r *actionRepo) processNotifications() {
 // dedicated notify channel, avoiding connection pool contention.
 func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdentifier) {
 	payload := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
-
-	select {
-	case r.runNotifyCh <- payload:
-	case <-ctx.Done():
-		logger.Warnf(ctx, "Run NOTIFY send cancelled for %s: %v", payload, ctx.Err())
-	}
+	r.enqueueNotify(ctx, "Run", payload, r.runNotifyCh)
 }
 
 // ListRootActions lists root actions (runs) matching scope and date filters.
@@ -1112,9 +1107,15 @@ func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.Ac
 	payload := fmt.Sprintf("%s/%s/%s/%s",
 		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 
+	r.enqueueNotify(ctx, "Action", payload, r.actionNotifyCh)
+}
+
+func (r *actionRepo) enqueueNotify(ctx context.Context, kind, payload string, ch chan<- string) {
 	select {
-	case r.actionNotifyCh <- payload:
+	case ch <- payload:
 	case <-ctx.Done():
-		logger.Errorf(ctx, "Action NOTIFY send cancelled for %s: %v", payload, ctx.Err())
+		logger.Warnf(ctx, "%s NOTIFY send cancelled for %s: %v", kind, payload, ctx.Err())
+	default:
+		logger.Warnf(ctx, "%s NOTIFY queue full, dropping notification for %s", kind, payload)
 	}
 }
