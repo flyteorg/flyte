@@ -3,7 +3,7 @@ package k8s
 import (
 	"context"
 	"encoding/json"
-	"regexp"
+	"strings"
 	"testing"
 	"time"
 
@@ -90,7 +90,11 @@ func testApp(project, domain, name, image string) *flyteapp.App {
 // testKSvcName returns the KService name an app is created under. Tests derive it
 // rather than hardcoding it so the fixtures follow the naming scheme.
 func testKSvcName(project, domain, name string) string {
-	return KServiceName(&flyteapp.Identifier{Project: project, Domain: domain, Name: name})
+	n, err := KServiceName(&flyteapp.Identifier{Project: project, Domain: domain, Name: name})
+	if err != nil {
+		panic(err)
+	}
+	return n
 }
 
 func TestDeploy_Create(t *testing.T) {
@@ -113,7 +117,6 @@ func TestDeploy_Create(t *testing.T) {
 
 func TestDeploy_InjectsInternalAppEndpointPattern(t *testing.T) {
 	c := testClient(t)
-	c.cfg.NamespacedNameSuffixTemplate = "{{ project }}-{{ domain }}"
 	app := testApp("proj", "dev", "myapp", "nginx:latest")
 	require.NoError(t, c.Deploy(context.Background(), app))
 
@@ -129,7 +132,17 @@ func TestDeploy_InjectsInternalAppEndpointPattern(t *testing.T) {
 			break
 		}
 	}
-	assert.Equal(t, "http://{app_fqdn}-proj-dev.flyte.svc.cluster.local", pattern)
+	digest := NamespaceDigest(defaultOrg, "proj", "dev")
+	assert.Equal(t, "http://k-{app_fqdn}-"+digest+".flyte.svc.cluster.local", pattern)
+
+	// The contract the SDK relies on: substituting a name into the pattern has to
+	// produce the hostname of that app's KService. Assert it against a *different*
+	// app in the same namespace, since the digest is what makes one template serve
+	// every app the pod can reach.
+	resolved := strings.Replace(pattern, "{app_fqdn}", "other-app", 1)
+	assert.Equal(t,
+		"http://"+testKSvcName("proj", "dev", "other-app")+".flyte.svc.cluster.local",
+		resolved)
 }
 
 func TestDeploy_InjectsExecutionEnvVars(t *testing.T) {
@@ -698,40 +711,37 @@ func TestKServiceName(t *testing.T) {
 		{
 			desc: "standard identifier",
 			id:   &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"},
-			want: "k-myapp-nyzyrk24yeye56darerfyox46y",
+			want: "k-myapp-jfxgabkzd3hyzhaj4rahqnfoyq",
 		},
 		{
-			// Case is part of the identity — nothing else in Flyte folds it — so this
-			// must not collide with the lowercase identifier above. Only the readable
-			// prefix is lowercased, because a DNS label has to be.
-			desc: "case-variant identity hashes distinctly",
+			// Project and domain are case-sensitive, so this is a different namespace
+			// and must not collide with the identifier above. The app name is folded,
+			// because app names are case-insensitive.
+			desc: "case-variant namespace is a distinct namespace",
 			id:   &flyteapp.Identifier{Project: "PROJ", Domain: "Dev", Name: "MyApp"},
-			want: "k-myapp-eaq2xqk7hypngwmksa3d7vfyk4",
+			want: "k-myapp-ev7slkvkqb454ixplidybeeaiy",
 		},
 		{
-			desc: "app names differing only by suffix stay distinct",
+			desc: "app name is carried verbatim",
 			id:   &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "my-long-service-name-v1"},
-			want: "k-my-long-service-name-v1-lx7ylbnzddt2iphutzu2zfo62a",
+			want: "k-my-long-service-name-v1-jfxgabkzd3hyzhaj4rahqnfoyq",
 		},
 		{
-			desc: "long app name is truncated to fit the DNS label limit",
-			id: &flyteapp.Identifier{
-				Project: "proj",
-				Domain:  "dev",
-				Name:    "this-is-a-very-long-app-name-that-exceeds-the-kubernetes-dns-label-limit",
-			},
-			want: "k-this-is-a-very-long-app-name-that-6z6rtjpjidce5tijzvreclx75e",
+			// The longest name the proto admits, to show it fits without truncation.
+			desc: "name at the proto's 30-character cap fits",
+			id:   &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: strings.Repeat("a", 30)},
+			want: "k-" + strings.Repeat("a", 30) + "-jfxgabkzd3hyzhaj4rahqnfoyq",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
-			got := KServiceName(tt.id)
+			got, err := KServiceName(tt.id)
+			require.NoError(t, err)
 			assert.Equal(t, tt.want, got)
 			assert.LessOrEqual(t, len(got), maxKServiceNameLen)
 			// Must be a valid DNS-1035 label — leading letter, lowercase
-			// alphanumerics and hyphens, trailing alphanumeric — and end in the
-			// digest, with the readable prefix optional.
-			assert.Regexp(t, `^k-([a-z0-9]([-a-z0-9]*[a-z0-9])?-)?[a-z2-7]{26}$`, got)
+			// alphanumerics and hyphens, trailing alphanumeric — ending in the digest.
+			assert.Regexp(t, `^k-[a-z0-9]([-a-z0-9]*[a-z0-9])?-[a-z2-7]{26}$`, got)
 		})
 	}
 }
@@ -741,33 +751,51 @@ func TestKServiceName(t *testing.T) {
 // identities both flattened to "svc-team-prod-x" and the second app to deploy
 // would overwrite the first app's spec.
 func TestKServiceName_DistinguishesAmbiguousIdentities(t *testing.T) {
-	first := &flyteapp.Identifier{Name: "svc", Project: "team", Domain: "prod-x"}
-	second := &flyteapp.Identifier{Name: "svc", Project: "team-prod", Domain: "x"}
+	first, err := KServiceName(&flyteapp.Identifier{Name: "svc", Project: "team", Domain: "prod-x"})
+	require.NoError(t, err)
+	second, err := KServiceName(&flyteapp.Identifier{Name: "svc", Project: "team-prod", Domain: "x"})
+	require.NoError(t, err)
 
-	assert.NotEqual(t, KServiceName(first), KServiceName(second))
+	assert.NotEqual(t, first, second)
 }
 
-// TestKServiceName_TrimsHyphensAroundAppName covers app names that the proto
-// pattern forbids but nothing currently enforces. The readable segment is tidied so
-// the name never contains "--", and the result stays a valid DNS-1035 label.
-func TestKServiceName_TrimsHyphensAroundAppName(t *testing.T) {
-	// The label rule Knative applies: leading letter, lowercase alphanumerics and
-	// hyphens, trailing alphanumeric.
-	dns1035 := regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`)
+// TestKServiceName_RejectsUnrepresentableNames covers names the proto forbids but
+// that would reach us if validation were bypassed. The app name is carried literally
+// rather than hashed, so the literal segment has to be injective by itself: any
+// truncation or trimming would silently merge two apps onto one KService, which is
+// the collision this scheme exists to prevent. Rejecting is the only safe answer.
+func TestKServiceName_RejectsUnrepresentableNames(t *testing.T) {
+	names := map[string]string{
+		"empty":              "",
+		"leading hyphen":     "-foo",
+		"trailing hyphen":    "foo-",
+		"surrounding hyphen": "-foo-",
+		"only hyphens":       "---",
+		"single hyphen":      "-",
+		"underscore":         "foo_bar",
+		"dot":                "foo.bar",
+		// One over the 34-character budget the digest and prefix leave behind.
+		"over the length budget": strings.Repeat("a", maxAppNameLen+1),
+	}
+	for desc, name := range names {
+		t.Run(desc, func(t *testing.T) {
+			_, err := KServiceName(&flyteapp.Identifier{Project: "proj", Domain: "dev", Name: name})
+			assert.Error(t, err, "name %q must be rejected, not reshaped", name)
+		})
+	}
+}
 
-	names := []string{"myapp", "-foo", "foo-", "-foo-", "---", "-", "",
-		// 35+ characters, so the truncation path runs before the trim.
-		"-----------------------------------x",
-		"this-is-a-very-long-app-name-that-exceeds-the-kubernetes-dns-label-limit"}
+// TestKServiceName_NamesAreInjectiveWithinANamespace is the property the whole
+// scheme rests on now that the name is outside the digest.
+func TestKServiceName_NamesAreInjectiveWithinANamespace(t *testing.T) {
+	names := []string{"a", "app", "app1", "app-1", "1app", "myapp", "my-app",
+		"my-app-v1", "my-app-v2", strings.Repeat("a", 30), strings.Repeat("a", 29)}
 
 	seen := make(map[string]string, len(names))
 	for _, name := range names {
-		got := KServiceName(&flyteapp.Identifier{Project: "proj", Domain: "dev", Name: name})
+		got, err := KServiceName(&flyteapp.Identifier{Project: "proj", Domain: "dev", Name: name})
+		require.NoError(t, err, "name %q should be representable", name)
 
-		assert.Regexp(t, dns1035, got, "name %q produced an invalid DNS-1035 label", name)
-		assert.NotContains(t, got, "--", "name %q produced a doubled hyphen", name)
-		assert.LessOrEqual(t, len(got), maxKServiceNameLen)
-		// Trimming must not merge distinct identities — the digest keeps them apart.
 		if prev, dup := seen[got]; dup {
 			t.Errorf("names %q and %q collided on %s", prev, name, got)
 		}
@@ -775,17 +803,54 @@ func TestKServiceName_TrimsHyphensAroundAppName(t *testing.T) {
 	}
 }
 
-func TestKServiceName_OrgIsPartOfIdentity(t *testing.T) {
-	base := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
-	otherOrg := &flyteapp.Identifier{Org: "acme", Project: "proj", Domain: "dev", Name: "myapp"}
+// TestKServiceName_FoldsAppNameCase pins the assumption this scheme depends on:
+// app names are case-insensitive, so folding them merges nothing that was distinct.
+// If app names ever become case-sensitive, this scheme is unsound and this test is
+// the one that should fail.
+func TestKServiceName_FoldsAppNameCase(t *testing.T) {
+	lower, err := KServiceName(&flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"})
+	require.NoError(t, err)
+	upper, err := KServiceName(&flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "MyApp"})
+	require.NoError(t, err)
 
-	assert.NotEqual(t, KServiceName(base), KServiceName(otherOrg),
-		"apps in different orgs must not share a KService")
+	assert.Equal(t, lower, upper)
+}
+
+func TestKServiceName_OrgIsPartOfIdentity(t *testing.T) {
+	base, err := KServiceName(&flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"})
+	require.NoError(t, err)
+	otherOrg, err := KServiceName(&flyteapp.Identifier{Org: "acme", Project: "proj", Domain: "dev", Name: "myapp"})
+	require.NoError(t, err)
+
+	assert.NotEqual(t, base, otherOrg, "apps in different orgs must not share a KService")
 
 	// An unset org and an explicit default org are the same app: Get returns the
 	// default, so a client round-tripping an app must not land on a second KService.
-	defaultedOrg := &flyteapp.Identifier{Org: defaultOrg, Project: "proj", Domain: "dev", Name: "myapp"}
-	assert.Equal(t, KServiceName(base), KServiceName(defaultedOrg))
+	defaultedOrg, err := KServiceName(&flyteapp.Identifier{Org: defaultOrg, Project: "proj", Domain: "dev", Name: "myapp"})
+	require.NoError(t, err)
+	assert.Equal(t, base, defaultedOrg)
+}
+
+// TestNamespaceDigest_IsNamespaceScoped is what lets INTERNAL_APP_ENDPOINT_PATTERN
+// be a single constant template: every app in a namespace shares one digest, and no
+// two namespaces share one.
+func TestNamespaceDigest_IsNamespaceScoped(t *testing.T) {
+	digest := NamespaceDigest(defaultOrg, "proj", "dev")
+
+	assert.Len(t, digest, kServiceNameDigestLen)
+	assert.Equal(t, digest, NamespaceDigest("", "proj", "dev"), "unset org is the default org")
+
+	for _, other := range []struct{ org, project, domain string }{
+		{"acme", "proj", "dev"},
+		{defaultOrg, "other", "dev"},
+		{defaultOrg, "proj", "prod"},
+		// The #7622 ambiguity, at the namespace level.
+		{defaultOrg, "team", "prod-x"},
+		{defaultOrg, "team-prod", "x"},
+	} {
+		assert.NotEqual(t, digest, NamespaceDigest(other.org, other.project, other.domain),
+			"namespace %s/%s/%s must have its own digest", other.org, other.project, other.domain)
+	}
 }
 
 func TestIdentifierFromKService(t *testing.T) {
@@ -874,7 +939,9 @@ func TestGetApp_IngressUsesAppOrg(t *testing.T) {
 	got, err := c.GetApp(context.Background(), app.GetMetadata().GetId())
 	require.NoError(t, err)
 
-	assert.Equal(t, "https://"+KServiceName(app.GetMetadata().GetId())+".example.com",
+	name, err := KServiceName(app.GetMetadata().GetId())
+	require.NoError(t, err)
+	assert.Equal(t, "https://"+name+".example.com",
 		got.GetStatus().GetIngress().GetPublicUrl(),
 		"the reported URL must address the KService the app actually lives in")
 }
@@ -895,27 +962,12 @@ func TestKServiceToApp_RoundTripsIdentity(t *testing.T) {
 	assert.Equal(t, "proj", gotID.GetProject())
 	assert.Equal(t, "dev", gotID.GetDomain())
 	assert.Equal(t, "myapp", gotID.GetName())
-	assert.Equal(t, KServiceName(app.GetMetadata().GetId()), KServiceName(gotID),
+	deployedName, err := KServiceName(app.GetMetadata().GetId())
+	require.NoError(t, err)
+	roundTrippedName, err := KServiceName(gotID)
+	require.NoError(t, err)
+	assert.Equal(t, deployedName, roundTrippedName,
 		"the round-tripped identity must resolve to the same KService")
-}
-
-func TestRenderNamespacedSuffix(t *testing.T) {
-	tests := []struct {
-		tmpl    string
-		project string
-		domain  string
-		want    string
-	}{
-		{"{{ project }}-{{ domain }}", "myproject", "dev", "myproject-dev"},
-		{"{{ project }}-{{ domain }}", "MyProject", "Dev", "myproject-dev"},
-		{"{{ project }}-{{ domain }}", "proj", "prod", "proj-prod"},
-		{"custom-{{ domain }}", "proj", "dev", "custom-dev"},
-		{"", "proj", "dev", ""},
-	}
-	for _, tt := range tests {
-		got := renderNamespacedSuffix(tt.tmpl, tt.project, tt.domain)
-		assert.Equal(t, tt.want, got)
-	}
 }
 
 func TestPodDeploymentStatus(t *testing.T) {

@@ -41,7 +41,8 @@ type InternalAppConfig struct {
 	Enabled bool `json:"enabled" pflag:",Enable app deployment controller"`
 
 	// BaseDomain is the base domain used to generate public URLs for apps.
-	// Apps are exposed at "{name}-{project}-{domain}.{base_domain}".
+	// Apps are exposed at "k-{name}-{digest}.{base_domain}", where the digest
+	// identifies the app's org, project and domain — see k8s.KServiceName.
 	BaseDomain string `json:"baseDomain" pflag:",Base domain for app public URLs"`
 
 	// Scheme is the URL scheme used for public app URLs ("http" or "https").
@@ -64,11 +65,6 @@ type InternalAppConfig struct {
 	// processes need to connect back to the Flyte manager.
 	DefaultEnvVars map[string]string `json:"defaultEnvVars" pflag:"-,Default env vars injected into every app pod"`
 
-	// NamespacedNameSuffixTemplate is the template for generating the INTERNAL_APP_ENDPOINT_PATTERN env var.
-	// Supported variables: {{ project }}, {{ domain }}.
-	// Example: "{{ project }}-{{ domain }}"
-	NamespacedNameSuffixTemplate string `json:"namespacedNameSuffixTemplate" pflag:",Template for internal app endpoint pattern (e.g., {{ project }}-{{ domain }})"`
-
 	// WatchBufferSize is the buffer size for each subscriber's event channel.
 	// A larger value reduces the chance of dropped events under burst load.
 	WatchBufferSize int `json:"watchBufferSize" pflag:",Buffer size for watch subscriber channels"`
@@ -81,10 +77,9 @@ type InternalAppConfig struct {
 }
 
 var defaultInternalAppConfig = &InternalAppConfig{
-	DefaultRequestTimeout:        300 * time.Second,
-	MaxRequestTimeout:            3600 * time.Second,
-	WatchBufferSize:              100,
-	NamespacedNameSuffixTemplate: "{{ project }}-{{ domain }}",
+	DefaultRequestTimeout: 300 * time.Second,
+	MaxRequestTimeout:     3600 * time.Second,
+	WatchBufferSize:       100,
 }
 
 var internalAppConfigSection = config.MustRegisterSection(internalAppConfigSectionKey, defaultInternalAppConfig)

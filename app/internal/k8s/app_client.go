@@ -8,6 +8,7 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -70,12 +71,32 @@ const (
 
 	// maxKServiceNameLen is the Kubernetes DNS label limit.
 	maxKServiceNameLen = 63
+
+	// kServiceNamePrefix versions the name format and guarantees the leading
+	// letter that Knative requires; app names may start with a digit.
+	kServiceNamePrefix = "k-"
+
+	// kServiceNameDigestLen is the encoded length of a 16-byte digest in Base32.
+	kServiceNameDigestLen = 26
+
+	// maxAppNameLen is what the app name segment has left once the prefix, the
+	// digest and the "-" between them are accounted for. This is 34, comfortably
+	// above the 30-character cap the proto puts on app names, so a valid name
+	// always fits and never needs truncating.
+	maxAppNameLen = maxKServiceNameLen - len(kServiceNamePrefix) - 1 - kServiceNameDigestLen
 )
 
 // kServiceNameEncoding encodes the identity digest using only characters valid in
 // a DNS label: lowercase letters and digits, no padding.
 var kServiceNameEncoding = base32.NewEncoding("abcdefghijklmnopqrstuvwxyz234567").
 	WithPadding(base32.NoPadding)
+
+// appNameSegment matches the app names that can be carried literally in a KService
+// name: a DNS label within the length budget. It mirrors the proto's own pattern
+// (app_definition.proto) with the case range dropped, since the name is lowercased
+// before matching.
+var appNameSegment = regexp.MustCompile(
+	fmt.Sprintf(`^[a-z0-9]([-a-z0-9]{0,%d}[a-z0-9])?$`, maxAppNameLen-2))
 
 // AppK8sClientInterface defines the KService lifecycle operations for the App service.
 type AppK8sClientInterface interface {
@@ -160,7 +181,10 @@ const defaultOrg = "flyte"
 func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 	appID := app.GetMetadata().GetId()
 	ns := c.namespace
-	name := KServiceName(appID)
+	name, err := KServiceName(appID)
+	if err != nil {
+		return err
+	}
 
 	if err := k8s.EnsureNamespaceExists(ctx, c.k8sClient, ns); err != nil {
 		return fmt.Errorf("failed to ensure namespace %s: %w", ns, err)
@@ -224,7 +248,10 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 // Stop makes the app unreachable from the public gateway and scales it to zero without deleting the KService.
 func (c *AppK8sClient) Stop(ctx context.Context, appID *flyteapp.Identifier) error {
 	ns := c.namespace
-	name := KServiceName(appID)
+	name, err := KServiceName(appID)
+	if err != nil {
+		return err
+	}
 	// Make the Service cluster-local so it is not published to the external gateway,
 	// and set initial/min scale to zero so it converges to 0 pods.
 	// initial-scale=0 requires allow-zero-initial-scale=true in config-autoscaler.
@@ -268,7 +295,10 @@ func (c *AppK8sClient) Stop(ctx context.Context, appID *flyteapp.Identifier) err
 // Delete removes the KService CRD for the given app entirely.
 func (c *AppK8sClient) Delete(ctx context.Context, appID *flyteapp.Identifier) error {
 	ns := c.namespace
-	name := KServiceName(appID)
+	name, err := KServiceName(appID)
+	if err != nil {
+		return err
+	}
 	ksvc := &servingv1.Service{}
 	ksvc.Name = name
 	ksvc.Namespace = ns
@@ -440,7 +470,10 @@ func (c *AppK8sClient) StopWatching() {
 // GetApp reads the KService and returns the full App including reconstructed Spec and live Status.
 func (c *AppK8sClient) GetApp(ctx context.Context, appID *flyteapp.Identifier) (*flyteapp.App, error) {
 	ns := c.namespace
-	name := KServiceName(appID)
+	name, err := KServiceName(appID)
+	if err != nil {
+		return nil, err
+	}
 	ksvc := &servingv1.Service{}
 	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: ns}, ksvc); err != nil {
 		if k8serrors.IsNotFound(err) {
@@ -509,17 +542,23 @@ func (c *AppK8sClient) List(ctx context.Context, project, domain string, limit u
 	return apps, list.Continue, nil
 }
 
-// PublicIngress returns the deterministic public URL for an app.
+// PublicIngress returns the deterministic public URL for an app. It returns nil
+// when no base domain is configured, or when the identity has no representable
+// KService name — in both cases there is no URL to report rather than an error to
+// raise, since the app cannot exist in the first place.
 func (c *AppK8sClient) PublicIngress(id *flyteapp.Identifier) *flyteapp.Ingress {
 	if c.cfg.BaseDomain == "" {
+		return nil
+	}
+	name, err := KServiceName(id)
+	if err != nil {
 		return nil
 	}
 	scheme := c.cfg.Scheme
 	if scheme == "" {
 		scheme = "https"
 	}
-	host := strings.ToLower(fmt.Sprintf("%s.%s",
-		KServiceName(id), c.cfg.BaseDomain))
+	host := strings.ToLower(fmt.Sprintf("%s.%s", name, c.cfg.BaseDomain))
 	url := scheme + "://" + host
 	if c.cfg.IngressAppsPort != 0 {
 		url += fmt.Sprintf(":%d", c.cfg.IngressAppsPort)
@@ -529,56 +568,68 @@ func (c *AppK8sClient) PublicIngress(id *flyteapp.Identifier) *flyteapp.Ingress 
 
 // --- Helpers ---
 
-// KServiceName returns the KService name for an app, in the form
-// k-<lowercase-app-name>-<26-character-lowercase-base32-hash>.
+// NamespaceDigest returns the Base32 digest of the namespace an app lives in —
+// its org, project and domain. Every app sharing those three shares this digest,
+// which is what lets INTERNAL_APP_ENDPOINT_PATTERN be a constant template: the
+// digest is baked in at deploy time and callers substitute only the app name.
 //
-// The hash covers the app's full identity — org, project, domain and name — with
-// each field length-prefixed, so the encoding stays unambiguous whatever the
-// fields contain. The app name is included for readability only. The "k-" prefix
-// versions the format and makes the name start with a letter, as Knative requires
-// (DNS-1035).
+// Each field is length-prefixed before hashing, so the encoding stays unambiguous
+// whatever the fields contain. This is the fix for the delimiter ambiguity in
+// issue #7622: project "team" / domain "prod-x" and project "team-prod" / domain
+// "x" hash differently, where joining them with "-" made them identical.
 //
-// The identity is hashed exactly as given. Project, domain and name are
-// case-sensitive everywhere else in Flyte — nothing lowercases them, and the proto
-// constrains only their length — so folding case here would map two distinct apps
-// onto one KService. Only the readable prefix is lowercased, because a DNS label
-// must be.
-//
-// Every value here is part of the on-disk name format: changing any of them
-// renames every existing app's KService, so they are fixed rather than tunable.
-func KServiceName(id *flyteapp.Identifier) string {
+// Fields are hashed exactly as given. Project and domain are case-sensitive
+// everywhere else in Flyte — nothing lowercases them, and the proto constrains
+// only their length — so folding case here would merge two distinct namespaces.
+func NamespaceDigest(org, project, domain string) string {
 	// 16 bytes = 128 bits of digest, which Base32-encodes to 26 characters.
-	const hashBytes = 16
+	const digestBytes = 16
 
-	// Use default org if org is empty
-	org := id.GetOrg()
 	if org == "" {
 		org = defaultOrg
 	}
 
-	canonical := make([]byte, 0, len(org)+len(id.GetProject())+len(id.GetDomain())+len(id.GetName())+16)
-	for _, field := range []string{org, id.GetProject(), id.GetDomain(), id.GetName()} {
+	canonical := make([]byte, 0, len(org)+len(project)+len(domain)+12)
+	for _, field := range []string{org, project, domain} {
 		canonical = binary.BigEndian.AppendUint32(canonical, uint32(len(field)))
 		canonical = append(canonical, field...)
 	}
 
 	sum := sha256.Sum256(canonical)
-	suffix := kServiceNameEncoding.EncodeToString(sum[:hashBytes])
+	return kServiceNameEncoding.EncodeToString(sum[:digestBytes])
+}
 
-	// Reserve room for "k-" and the "-" before the suffix. Hyphens are then trimmed
-	// from both ends so neither a truncation mid-word nor an app name that already
-	// starts or ends with one yields "--". A name that is nothing but hyphens trims
-	// away entirely, leaving just the prefix and digest.
+// KServiceName returns the KService name for an app, in the form
+// k-<lowercase-app-name>-<26-character-lowercase-base32-digest>.
+//
+// The digest covers org, project and domain; the app name is carried literally.
+// Together they are unique, because an app name is unique within its namespace.
+// Keeping the name out of the digest is what makes the name reconstructible by
+// app code that knows only the target's name — see the INTERNAL_APP_ENDPOINT_PATTERN
+// injection in buildKService. The "k-" prefix versions the format and makes the
+// name start with a letter, as Knative requires (DNS-1035).
+//
+// Because the name is carried literally rather than hashed, the literal segment
+// has to be injective on its own: any mangling that maps two names together — a
+// truncation, a trimmed hyphen — would resurrect the collision this scheme exists
+// to prevent. So an unusable name is rejected rather than reshaped. Everything the
+// proto admits is usable, so this can only fire on an identity that reached us
+// without validation.
+//
+// Case is folded because app names are case-insensitive, so this merges nothing
+// that was ever distinct.
+//
+// Every value here is part of the on-disk name format: changing any of them
+// renames every existing app's KService, so they are fixed rather than tunable.
+func KServiceName(id *flyteapp.Identifier) (string, error) {
 	appName := strings.ToLower(id.GetName())
-	maxAppNameLen := maxKServiceNameLen - len("k-") - len(suffix) - 1
-	if len(appName) > maxAppNameLen {
-		appName = appName[:maxAppNameLen]
+	if !appNameSegment.MatchString(appName) {
+		return "", fmt.Errorf(
+			"app name %q cannot be encoded in a KService name: expected a DNS label of at most %d characters",
+			id.GetName(), maxAppNameLen)
 	}
-	appName = strings.Trim(appName, "-")
-	if appName == "" {
-		return "k-" + suffix
-	}
-	return "k-" + appName + "-" + suffix
+	digest := NamespaceDigest(id.GetOrg(), id.GetProject(), id.GetDomain())
+	return kServiceNamePrefix + appName + "-" + digest, nil
 }
 
 // identifierFromKService reconstructs the app identity from the KService's labels
@@ -614,15 +665,6 @@ func identifierFromKService(ksvc *servingv1.Service) (*flyteapp.Identifier, erro
 	}, nil
 }
 
-// renderNamespacedSuffix substitutes {{ project }} and {{ domain }}
-// in a template string to produce the KService name suffix used in INTERNAL_APP_ENDPOINT_PATTERN.
-func renderNamespacedSuffix(tmpl, project, domain string) string {
-	return strings.NewReplacer(
-		"{{ project }}", strings.ToLower(project),
-		"{{ domain }}", strings.ToLower(domain),
-	).Replace(tmpl)
-}
-
 // marshalSpec serializes the App Spec proto and returns the raw bytes.
 func marshalSpec(spec *flyteapp.Spec) ([]byte, error) {
 	b, err := proto.Marshal(spec)
@@ -642,7 +684,10 @@ func specSHA(specBytes []byte) string {
 func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, error) {
 	appID := app.GetMetadata().GetId()
 	spec := app.GetSpec()
-	name := KServiceName(appID)
+	name, err := KServiceName(appID)
+	if err != nil {
+		return nil, err
+	}
 	ns := c.namespace
 
 	// Use default org if org is empty
@@ -679,19 +724,21 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 		podSpec.Containers[0].Env = append(defaults, podSpec.Containers[0].Env...)
 	}
 
-	// Inject INTERNAL_APP_ENDPOINT_PATTERN so app code can construct internal cluster URLs
-	// for other apps by substituting {app_fqdn} with the target app name.
+	// Inject INTERNAL_APP_ENDPOINT_PATTERN so app code can construct internal cluster
+	// URLs for other apps by substituting {app_fqdn} with the target app name.
 	//
-	// TODO: this no longer resolves. The pattern reproduces the KService name format
-	// {name}-{project}-{domain}, which apps could rebuild by string substitution.
-	// KServiceName includes a digest of the full identity, which app code cannot
-	// compute, so every URL built from this pattern points at nothing.
+	// The digest is resolved here, at deploy time, and baked into the value. It covers
+	// only org/project/domain, so it is the same for every app the pod can address and
+	// the pattern stays a constant template — substituting the name is enough to
+	// reproduce a KService name, which app code has no way to hash for itself.
 	//
+	// This scopes discovery to the caller's own namespace, which matches what the
+	// pattern could already express before the digest existed.
 	if len(podSpec.Containers) > 0 {
-		suffix := renderNamespacedSuffix(c.cfg.NamespacedNameSuffixTemplate, project, domain)
 		podSpec.Containers[0].Env = append(podSpec.Containers[0].Env, corev1.EnvVar{
-			Name:  "INTERNAL_APP_ENDPOINT_PATTERN",
-			Value: fmt.Sprintf("http://{app_fqdn}-%s.%s.svc.cluster.local", suffix, ns),
+			Name: "INTERNAL_APP_ENDPOINT_PATTERN",
+			Value: fmt.Sprintf("http://%s{app_fqdn}-%s.%s.svc.cluster.local",
+				kServiceNamePrefix, NamespaceDigest(org, project, domain), ns),
 		})
 		// Inject execution context env vars required by flyte.init_in_cluster()
 		podSpec.Containers[0].Env = append(podSpec.Containers[0].Env,
@@ -1006,7 +1053,10 @@ func (c *AppK8sClient) kServiceToStatus(ctx context.Context, ksvc *servingv1.Ser
 // returned.
 func (c *AppK8sClient) GetReplicas(ctx context.Context, appID *flyteapp.Identifier) ([]*flyteapp.Replica, error) {
 	ns := c.namespace
-	name := KServiceName(appID)
+	name, err := KServiceName(appID)
+	if err != nil {
+		return nil, err
+	}
 
 	labels := client.MatchingLabels{labelKnativeService: name}
 	ksvc := &servingv1.Service{}
