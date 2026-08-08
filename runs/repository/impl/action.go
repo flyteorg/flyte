@@ -482,6 +482,10 @@ func (r *actionRepo) UpdateActionPhase(
 	}
 	if rowsAffected > 0 {
 		r.notifyActionUpdate(ctx, actionID)
+	} else if _, err := r.GetAction(ctx, actionID); err != nil {
+		return fmt.Errorf("%w: %s/%s/%s/%s",
+			interfaces.ErrActionNotFound,
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 	}
 
 	// If this is the root action (the run itself), also notify run subscribers

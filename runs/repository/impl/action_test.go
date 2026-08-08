@@ -183,6 +183,24 @@ func TestUpdateActionPhase_NilStartTimeUsesCreatedAt(t *testing.T) {
 	assert.Less(t, action.DurationMs.Int64, int64(5000), "without a start time, duration is created_at-based")
 }
 
+func TestUpdateActionPhase_MissingActionReturnsNotFound(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	actionID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Org: "org1", Project: "proj1", Domain: "domain1", Name: "missing-run"},
+		Name: "missing-action",
+	}
+
+	err = actionRepo.UpdateActionPhase(ctx, actionID, common.ActionPhase_ACTION_PHASE_RUNNING,
+		1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
+	require.Error(t, err)
+	assert.ErrorIs(t, err, interfaces.ErrActionNotFound)
+}
+
 func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()

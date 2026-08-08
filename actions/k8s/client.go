@@ -735,6 +735,58 @@ func (c *ActionsClient) notifySubscribers(ctx context.Context, update *ActionUpd
 // notifyRunService forwards a watch event to the internal run service.
 // On ADDED events it calls RecordAction to create the DB record.
 // On all events it calls UpdateActionStatus (when phase is meaningful) to update the actions table.
+func buildRecordActionRequest(ctx context.Context, taskAction *executorv1.TaskAction, update *ActionUpdate) *workflow.RecordActionRequest {
+	recordReq := &workflow.RecordActionRequest{
+		ActionId: update.ActionID,
+		Parent:   update.ParentActionName,
+		InputUri: taskAction.Spec.InputURI,
+		Group:    taskAction.Spec.Group,
+	}
+	if taskAction.Spec.ActionType == executorv1.ActionTypeCondition {
+		condSpec := &workflow.ConditionAction{}
+		if err := proto.Unmarshal(taskAction.Spec.ConditionSpec, condSpec); err != nil {
+			logger.Warnf(ctx, "Failed to unmarshal condition spec for %s: %v", update.ActionID.Name, err)
+		} else {
+			recordReq.Spec = &workflow.RecordActionRequest_Condition{Condition: condSpec}
+		}
+	} else if taskAction.Spec.TaskType != "" {
+		ta := &workflow.TaskAction{
+			Id: &task.TaskIdentifier{
+				Project: taskAction.Spec.Project,
+				Domain:  taskAction.Spec.Domain,
+			},
+		}
+		// Deserialize TaskTemplate to build TaskSpec
+		if len(taskAction.Spec.TaskTemplate) > 0 {
+			var tmpl core.TaskTemplate
+			if err := proto.Unmarshal(taskAction.Spec.TaskTemplate, &tmpl); err == nil {
+				if tmplID := tmpl.GetId(); tmplID != nil {
+					ta.Id.Name = tmplID.GetName()
+					ta.Id.Version = tmplID.GetVersion()
+				}
+				ta.Spec = &task.TaskSpec{
+					TaskTemplate: &tmpl,
+					ShortName:    taskAction.Spec.ShortName,
+				}
+			}
+		}
+		recordReq.Spec = &workflow.RecordActionRequest_Task{
+			Task: ta,
+		}
+	}
+	return recordReq
+}
+
+func (c *ActionsClient) recordActionInRunService(ctx context.Context, taskAction *executorv1.TaskAction, update *ActionUpdate, actionKey []byte) bool {
+	recordReq := buildRecordActionRequest(ctx, taskAction, update)
+	if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {
+		logger.Warnf(ctx, "Failed to record action in run service for %s: %v", update.ActionID.Name, err)
+		return false
+	}
+	c.recordedFilter.Add(ctx, actionKey)
+	return true
+}
+
 func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *executorv1.TaskAction, update *ActionUpdate, eventType watch.EventType) {
 	if c.runClient == nil {
 		return
@@ -744,49 +796,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 	if isDuplicate {
 		logger.Debugf(ctx, "Skipping duplicate RecordAction for %s", update.ActionID.Name)
 	} else {
-		recordReq := &workflow.RecordActionRequest{
-			ActionId: update.ActionID,
-			Parent:   update.ParentActionName,
-			InputUri: taskAction.Spec.InputURI,
-			Group:    taskAction.Spec.Group,
-		}
-		if taskAction.Spec.ActionType == executorv1.ActionTypeCondition {
-			condSpec := &workflow.ConditionAction{}
-			if err := proto.Unmarshal(taskAction.Spec.ConditionSpec, condSpec); err != nil {
-				logger.Warnf(ctx, "Failed to unmarshal condition spec for %s: %v", update.ActionID.Name, err)
-			} else {
-				recordReq.Spec = &workflow.RecordActionRequest_Condition{Condition: condSpec}
-			}
-		} else if taskAction.Spec.TaskType != "" {
-			ta := &workflow.TaskAction{
-				Id: &task.TaskIdentifier{
-					Project: taskAction.Spec.Project,
-					Domain:  taskAction.Spec.Domain,
-				},
-			}
-			// Deserialize TaskTemplate to build TaskSpec
-			if len(taskAction.Spec.TaskTemplate) > 0 {
-				var tmpl core.TaskTemplate
-				if err := proto.Unmarshal(taskAction.Spec.TaskTemplate, &tmpl); err == nil {
-					if tmplID := tmpl.GetId(); tmplID != nil {
-						ta.Id.Name = tmplID.GetName()
-						ta.Id.Version = tmplID.GetVersion()
-					}
-					ta.Spec = &task.TaskSpec{
-						TaskTemplate: &tmpl,
-						ShortName:    taskAction.Spec.ShortName,
-					}
-				}
-			}
-			recordReq.Spec = &workflow.RecordActionRequest_Task{
-				Task: ta,
-			}
-		}
-		if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {
-			logger.Warnf(ctx, "Failed to record action in run service for %s: %v", update.ActionID.Name, err)
-		} else {
-			c.recordedFilter.Add(ctx, actionKey)
-		}
+		c.recordActionInRunService(ctx, taskAction, update, actionKey)
 	}
 
 	// When a child action first appears, the parent must already be running (it
@@ -837,9 +847,28 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				}
 			}
 		}
-		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
+		resp, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq))
+		if err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
-		} else if isTerminalPhase(update.Phase) && !update.IsDeleted {
+			return
+		}
+		if connect.Code(resp.Msg.GetStatus().GetCode()) == connect.CodeNotFound {
+			logger.Warnf(ctx, "Action %s missing in run service during status update; recording and retrying", update.ActionID.Name)
+			if !c.recordActionInRunService(ctx, taskAction, update, actionKey) {
+				return
+			}
+			resp, err = c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq))
+			if err != nil {
+				logger.Warnf(ctx, "Failed to retry action status update in run service for %s: %v", update.ActionID.Name, err)
+				return
+			}
+		}
+		if code := connect.Code(resp.Msg.GetStatus().GetCode()); code != 0 {
+			logger.Warnf(ctx, "Run service returned %s while updating action status for %s: %s",
+				code.String(), update.ActionID.Name, resp.Msg.GetStatus().GetMessage())
+			return
+		}
+		if isTerminalPhase(update.Phase) && !update.IsDeleted {
 			// Skip label patching for deleted CRs — the patch would always fail
 			// with "not found" since the object is already gone.
 			if err := c.markTerminalStatusRecorded(ctx, taskAction); err != nil {
