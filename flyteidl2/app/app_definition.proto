@@ -344,15 +344,13 @@ message Input {
     // StringValue is a plain string value for the input
     string string_value = 2 [(buf.validate.field).string.min_len = 1];
 
-    // ArtifactQuery is that should result in a single artifact that will be used as the input to the app at runtime.
-    // The artifact will be pinned at the time of the app creation.
-    flyteidl2.core.ArtifactQuery artifact_query = 3;
-
-    // ArtifactId is an identifier of an artifact that will be used as the input to the app at runtime.
-    flyteidl2.core.ArtifactID artifact_id = 4;
-
     // ID of the app.
     Identifier app_id = 5;
+
+    // ArtifactId is the exact artifact version bound to this input, pinned by the
+    // client at deploy time. Recorded for lineage only; the server does not
+    // validate or resolve it.
+    flyteidl2.core.ArtifactVersionId artifact_id = 6;
   }
 }
 
