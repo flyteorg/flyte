@@ -166,6 +166,17 @@ func TestSignal(t *testing.T) {
 		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
 	})
 
+	t.Run("accepts already materialized TaskAction name", func(t *testing.T) {
+		c := newSignalledClient(t)
+		materializedID := &common.ActionIdentifier{Run: condID.Run, Name: buildTaskActionName(condID)}
+		require.NoError(t, c.Signal(ctx, materializedID, boolLiteral(true), "user@example.com"))
+
+		ta, err := c.GetTaskAction(ctx, condID)
+		require.NoError(t, err)
+		assert.True(t, proto.Equal(boolLiteral(true), SignalValueFromStatus(ctx, ta)))
+		assert.Equal(t, "user@example.com", ta.Status.SignalledBy)
+	})
+
 	t.Run("not a condition", func(t *testing.T) {
 		parentID := &common.ActionIdentifier{Run: condID.Run, Name: "run1"} // resolves to run1-a0, a task CR
 		err := newSignalledClient(t).Signal(ctx, parentID, boolLiteral(true), "u")

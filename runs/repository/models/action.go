@@ -17,6 +17,7 @@ var ActionColumnsSet = sets.New(
 	"domain",
 	"run_name",
 	"phase",
+	"action_type",
 	"run_source",
 	"created_by_subject",
 	"trigger_task_name",
