@@ -269,6 +269,11 @@ func TestBuildResourceRaySubmissionMode(t *testing.T) {
 	assert.Equal(t, rayv1.HTTPMode, ray.Spec.SubmissionMode)
 	assert.Nil(t, ray.Spec.SubmitterPodTemplate)
 
+	ray, err = buildWithMode("SidecarMode")
+	assert.Nil(t, err)
+	assert.Equal(t, rayv1.SidecarMode, ray.Spec.SubmissionMode)
+	assert.Nil(t, ray.Spec.SubmitterPodTemplate)
+
 	_, err = buildWithMode("HttpMode")
 	assert.ErrorContains(t, err, "invalid ray submission mode")
 }

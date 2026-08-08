@@ -71,9 +71,10 @@ type Config struct {
 	ServiceType string `json:"serviceType,omitempty"`
 
 	// SubmissionMode specifies how the KubeRay operator submits the Ray job to the RayCluster.
-	// Valid values are 'K8sJobMode' (default, submits via a submitter pod) and 'HTTPMode'
-	// (submits via HTTP to the head node; no submitter pod to get evicted).
-	SubmissionMode string `json:"submissionMode,omitempty" pflag:",KubeRay job submission mode: K8sJobMode or HTTPMode"`
+	// Valid values are 'K8sJobMode' (default, submits via a submitter pod),
+	// 'HTTPMode' (submits via HTTP to the head node; no submitter pod to get evicted),
+	//  and 'SidecarMode' (submitter runs as a sidecar container in the head pod).
+	SubmissionMode string `json:"submissionMode,omitempty" pflag:",KubeRay job submission mode: K8sJobMode, HTTPMode or SidecarMode"`
 
 	// IncludeDashboard is used to start a Ray Dashboard if set to true
 	IncludeDashboard bool `json:"includeDashboard,omitempty"`
