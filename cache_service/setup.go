@@ -11,6 +11,7 @@ import (
 	"github.com/flyteorg/flyte/v2/cache_service/migrations"
 	"github.com/flyteorg/flyte/v2/cache_service/service"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/connectrpc/server/interceptors"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice/v2/v2connect"
@@ -40,7 +41,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
 
-	path, handler := v2connect.NewCacheServiceHandler(service.NewCacheService(cfg, sc.DB), connect.WithInterceptors(otelInterceptor))
+	path, handler := v2connect.NewCacheServiceHandler(service.NewCacheService(cfg, sc.DB), connect.WithInterceptors(interceptors.NewErrorInterceptor(), otelInterceptor))
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted CacheService at %s", path)
 

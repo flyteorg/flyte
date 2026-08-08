@@ -9,7 +9,6 @@ import (
 	"connectrpc.com/connect"
 	"github.com/robfig/cron/v3"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	commonpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	taskpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
@@ -50,18 +49,17 @@ func (s *triggerService) DeployTrigger(
 	}
 	triggerModel, err := transformers.NewTriggerModel(ctx, id, request.GetSpec(), request.GetAutomationSpec())
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to create trigger model: %w", err)
 	}
 
 	saved, err := s.db.TriggerRepo().SaveTrigger(ctx, triggerModel, request.GetRevision())
 	if err != nil {
-		logger.Errorf(ctx, "DeployTrigger failed: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to save trigger: %w", err)
 	}
 
 	details, err := transformers.TriggerModelToTriggerDetails(ctx, saved)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to convert trigger model to trigger: %w", err)
 	}
 	return connect.NewResponse(&triggerpb.DeployTriggerResponse{Trigger: details}), nil
 }
@@ -76,11 +74,11 @@ func (s *triggerService) GetTriggerDetails(
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to get trigger details: %w", err)
 	}
 	details, err := transformers.TriggerModelToTriggerDetails(ctx, m)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to convert trigger model to trigger: %w", err)
 	}
 	return connect.NewResponse(&triggerpb.GetTriggerDetailsResponse{Trigger: details}), nil
 }
@@ -96,11 +94,11 @@ func (s *triggerService) GetTriggerRevisionDetails(
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to get trigger revision details: %w", err)
 	}
 	details, err := transformers.TriggerRevisionModelToTriggerDetails(ctx, m)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to convert trigger revision model to trigger: %w", err)
 	}
 	return connect.NewResponse(&triggerpb.GetTriggerRevisionDetailsResponse{Trigger: details}), nil
 }
@@ -134,12 +132,12 @@ func (s *triggerService) ListTriggers(
 
 	ms, err := s.db.TriggerRepo().ListTriggers(ctx, listInput)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to list triggers: %w", err)
 	}
 
 	triggers, err := transformers.TriggerModelsToTriggers(ctx, ms)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to convert triggers: %w", err)
 	}
 
 	var token string
@@ -164,12 +162,12 @@ func (s *triggerService) GetTriggerRevisionHistory(
 	ms, err := s.db.TriggerRepo().ListTriggerRevisions(ctx,
 		n.GetProject(), n.GetDomain(), n.GetTaskName(), n.GetName(), listInput)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to list trigger revision history: %w", err)
 	}
 
 	revisions, err := transformers.TriggerRevisionModelsToTriggerRevisions(ctx, ms)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to convert trigger revision model to trigger: %w", err)
 	}
 
 	var token string
@@ -186,7 +184,7 @@ func (s *triggerService) UpdateTriggers(
 	request := req.Msg
 	keys := namesToKeys(request.GetNames())
 	if err := s.db.TriggerRepo().UpdateTriggers(ctx, keys, request.GetActive()); err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to update triggers: %w", err)
 	}
 	return connect.NewResponse(&triggerpb.UpdateTriggersResponse{}), nil
 }
@@ -198,7 +196,7 @@ func (s *triggerService) DeleteTriggers(
 	request := req.Msg
 	keys := namesToKeys(request.GetNames())
 	if err := s.db.TriggerRepo().DeleteTriggers(ctx, keys); err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to delete triggers: %w", err)
 	}
 	return connect.NewResponse(&triggerpb.DeleteTriggersResponse{}), nil
 }

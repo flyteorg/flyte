@@ -8,7 +8,6 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
 	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
-	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
 )
@@ -45,8 +44,7 @@ func (s *InternalAppService) Create(
 	}
 
 	if err := s.k8s.Deploy(ctx, app); err != nil {
-		logger.Errorf(ctx, "Failed to deploy app %s: %v", app.GetMetadata().GetId().GetName(), err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("deploying app: %w", err)
 	}
 
 	app.Status = &flyteapp.Status{
@@ -82,7 +80,7 @@ func (s *InternalAppService) getApp(ctx context.Context, appID *flyteapp.Identif
 		if k8serrors.IsNotFound(err) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("getting app: %w", err)
 	}
 	return app, nil
 }
@@ -105,14 +103,12 @@ func (s *InternalAppService) Update(
 	switch app.GetSpec().GetDesiredState() {
 	case flyteapp.Spec_DESIRED_STATE_STOPPED:
 		if err := s.k8s.Stop(ctx, appID); err != nil {
-			logger.Errorf(ctx, "Failed to stop app %s: %v", appID.GetName(), err)
-			return nil, connect.NewError(connect.CodeInternal, err)
+			return nil, fmt.Errorf("stopping app: %w", err)
 		}
 	default:
 		// UNSPECIFIED, STARTED, ACTIVE — deploy/redeploy the spec.
 		if err := s.k8s.Deploy(ctx, app); err != nil {
-			logger.Errorf(ctx, "Failed to update app %s: %v", appID.GetName(), err)
-			return nil, connect.NewError(connect.CodeInternal, err)
+			return nil, fmt.Errorf("deploying app: %w", err)
 		}
 	}
 
@@ -136,8 +132,7 @@ func (s *InternalAppService) Delete(
 	}
 
 	if err := s.k8s.Delete(ctx, appID); err != nil {
-		logger.Errorf(ctx, "Failed to delete app %s: %v", appID.GetName(), err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("deleting app: %w", err)
 	}
 
 	return connect.NewResponse(&flyteapp.DeleteResponse{}), nil
@@ -167,7 +162,7 @@ func (s *InternalAppService) List(
 
 	apps, nextToken, err := s.k8s.List(ctx, project, domain, limit, token)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("listing apps: %w", err)
 	}
 
 	return connect.NewResponse(&flyteapp.ListResponse{Apps: apps, Token: nextToken}), nil
@@ -198,7 +193,7 @@ func (s *InternalAppService) Watch(
 	// Send initial snapshot so the client has current state before streaming changes.
 	snapshot, _, err := s.k8s.List(ctx, project, domain, 0, "")
 	if err != nil {
-		return connect.NewError(connect.CodeInternal, err)
+		return fmt.Errorf("listing apps: %w", err)
 	}
 	for _, app := range snapshot {
 		if appName != "" && app.GetMetadata().GetId().GetName() != appName {

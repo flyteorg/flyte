@@ -13,6 +13,7 @@ import (
 	"github.com/flyteorg/flyte/v2/dataproxy/logs"
 	"github.com/flyteorg/flyte/v2/dataproxy/service"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/connectrpc/server/interceptors"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster/clusterconnect"
@@ -41,6 +42,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
+	serverInterceptors := []connect.Interceptor{interceptors.NewErrorInterceptor(), otelInterceptor}
 
 	baseURL := sc.BaseURL
 	taskClient := taskconnect.NewTaskServiceClient(http.DefaultClient, baseURL, connect.WithInterceptors(otelInterceptor))
@@ -59,17 +61,17 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 	svc := service.NewService(*cfg, sc.DataStore, taskClient, triggerClient, runClient, projectClient, logStreamer)
 
-	path, handler := dataproxyconnect.NewDataProxyServiceHandler(svc, connect.WithInterceptors(otelInterceptor))
+	path, handler := dataproxyconnect.NewDataProxyServiceHandler(svc, connect.WithInterceptors(serverInterceptors...))
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted DataProxyService at %s", path)
 
 	clusterSvc := service.NewClusterService()
-	clusterPath, clusterHandler := clusterconnect.NewClusterServiceHandler(clusterSvc, connect.WithInterceptors(otelInterceptor))
+	clusterPath, clusterHandler := clusterconnect.NewClusterServiceHandler(clusterSvc, connect.WithInterceptors(serverInterceptors...))
 	sc.Mux.Handle(clusterPath, clusterHandler)
 	logger.Infof(ctx, "Mounted ClusterService at %s", clusterPath)
 
 	translatorSvc := NewTranslatorService(sc.DataStore, runClient, triggerClient)
-	translatorPath, translatorHandler := workflowconnect.NewTranslatorServiceHandler(translatorSvc, connect.WithInterceptors(otelInterceptor))
+	translatorPath, translatorHandler := workflowconnect.NewTranslatorServiceHandler(translatorSvc, connect.WithInterceptors(serverInterceptors...))
 	sc.Mux.Handle(translatorPath, translatorHandler)
 	logger.Infof(ctx, "Mounted TranslatorService at %s", translatorPath)
 

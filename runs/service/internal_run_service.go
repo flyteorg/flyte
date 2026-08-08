@@ -117,8 +117,7 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 
 			taskSpecModel, err := models.NewTaskSpecModel(ctx, taskSpec)
 			if err != nil {
-				logger.Warnf(ctx, "RecordAction: failed to create task spec model: %v", err)
-				return connect.NewError(connect.CodeInternal, err)
+				return fmt.Errorf("RecordAction: failed to create task spec model: %w", err)
 			}
 			if err := s.repo.TaskRepo().CreateTaskSpec(ctx, taskSpecModel); err != nil {
 				logger.Warnf(ctx, "RecordAction: failed to store task spec: %v", err)
@@ -180,22 +179,19 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 	// Marshal ActionSpec proto into bytes for storage.
 	actionSpecBytes, err := proto.Marshal(spec)
 	if err != nil {
-		logger.Warnf(ctx, "RecordAction: failed to marshal action spec: %v", err)
-		return connect.NewError(connect.CodeInternal, err)
+		return fmt.Errorf("RecordAction: failed to marshal action spec: %w", err)
 	}
 	action.ActionSpec = actionSpecBytes
 
 	// Marshal RunInfo proto into bytes for storage.
 	detailedInfo, err := proto.Marshal(info)
 	if err != nil {
-		logger.Warnf(ctx, "RecordAction: failed to marshal run info: %v", err)
-		return connect.NewError(connect.CodeInternal, err)
+		return fmt.Errorf("RecordAction: failed to marshal run info: %w", err)
 	}
 	action.DetailedInfo = detailedInfo
 
 	if _, err := s.repo.ActionRepo().CreateAction(ctx, action, false); err != nil {
-		logger.Warnf(ctx, "RecordAction: failed to create action %s: %v", actionID.GetName(), err)
-		return connect.NewError(connect.CodeInternal, err)
+		return fmt.Errorf("RecordAction: failed to create action %s: %w", actionID.GetName(), err)
 	}
 	return nil
 }
@@ -265,8 +261,7 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 		endTime,
 		startTime,
 	); err != nil {
-		logger.Warnf(ctx, "UpdateActionStatus: failed to update action %s: %v", req.GetActionId().GetName(), err)
-		return connect.NewError(connect.CodeInternal, err)
+		return fmt.Errorf("UpdateActionStatus: failed to update action %s: %w", req.GetActionId().GetName(), err)
 	}
 
 	// Persist the inline signal payload (conditions only). The CR is GC'd after
@@ -274,8 +269,7 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 	// resolved value and the signalling actor.
 	if req.GetOutput() != nil || req.GetPrincipal() != nil {
 		if err := s.mergeRunInfoOutput(ctx, req); err != nil {
-			logger.Warnf(ctx, "UpdateActionStatus: failed to persist output for %s: %v", req.GetActionId().GetName(), err)
-			return connect.NewError(connect.CodeInternal, err)
+			return fmt.Errorf("UpdateActionStatus: failed to persist output for %s: %v", req.GetActionId().GetName(), err)
 		}
 	}
 	return nil
@@ -351,14 +345,12 @@ func (s *RunService) recordEvents(ctx context.Context, events []*workflow.Action
 	for _, event := range events {
 		m, err := models.NewActionEventModel(event)
 		if err != nil {
-			logger.Warnf(ctx, "RecordActionEvents: failed to build event model for %s: %v", event.GetId().GetName(), err)
-			return connect.NewError(connect.CodeInternal, err)
+			return fmt.Errorf("RecordActionEvents: failed to build event model for %s: %v", event.GetId().GetName(), err)
 		}
 		eventModels = append(eventModels, m)
 	}
 	if err := s.repo.ActionRepo().InsertEvents(ctx, eventModels); err != nil {
-		logger.Warnf(ctx, "RecordActionEvents: failed to insert events: %v", err)
-		return connect.NewError(connect.CodeInternal, err)
+		return fmt.Errorf("RecordActionEvents: failed to insert events: %v", err)
 	}
 	return nil
 }

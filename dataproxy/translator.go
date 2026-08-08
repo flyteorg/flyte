@@ -92,7 +92,7 @@ func (s *TranslatorService) readOffloadedLiterals(
 	// Both inputs.pb and outputs.pb deserialize as task.Inputs (a NamedLiteral list).
 	var inputsOrOutputs task.Inputs
 	if err := s.dataStore.ReadProtobuf(ctx, storage.DataReference(uri), &inputsOrOutputs); err != nil {
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read literals from %s: %w", uri, err))
+		return nil, fmt.Errorf("failed to read literals from %s: %w", uri, err)
 	}
 	return inputsOrOutputs.GetLiterals(), nil
 }
@@ -119,7 +119,7 @@ func (s *TranslatorService) readTriggerLiterals(
 
 	var inputs task.Inputs
 	if err := s.dataStore.ReadProtobuf(ctx, storage.DataReference(uri), &inputs); err != nil {
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read trigger literals from %s: %w", uri, err))
+		return nil, fmt.Errorf("failed to read trigger literals from %s: %w", uri, err)
 	}
 	return inputs.GetLiterals(), nil
 }

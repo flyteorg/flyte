@@ -69,12 +69,12 @@ func (m *Manager) Get(ctx context.Context, request *cacheservicepb.GetCacheReque
 		if repositoryerrors.IsNotFound(err) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("cache entry %q not found", request.GetKey()))
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to get cache entry %q: %w", request.GetKey(), err)
 	}
 
 	metadata, err := unmarshalMetadata(output.Metadata)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to unmarshal metadata: %w", err)
 	}
 
 	return &CacheEntry{
@@ -98,7 +98,7 @@ func (m *Manager) Put(ctx context.Context, request *cacheservicepb.PutCacheReque
 	now := time.Now().UTC()
 	existing, err := m.outputs.Get(ctx, request.GetKey())
 	if err != nil && !repositoryerrors.IsNotFound(err) {
-		return connect.NewError(connect.CodeInternal, err)
+		return fmt.Errorf("failed to get existing cache entry %q: %w", request.GetKey(), err)
 	}
 
 	if err == nil {
@@ -114,7 +114,7 @@ func (m *Manager) Put(ctx context.Context, request *cacheservicepb.PutCacheReque
 	metadata := mergeMetadata(existing, request.GetOutput().GetMetadata(), now)
 	metadataBytes, err := proto.Marshal(metadata)
 	if err != nil {
-		return connect.NewError(connect.CodeInternal, err)
+		return fmt.Errorf("failed to marshal metadata: %w", err)
 	}
 
 	model := &models.CachedOutput{
@@ -124,7 +124,7 @@ func (m *Manager) Put(ctx context.Context, request *cacheservicepb.PutCacheReque
 		LastUpdated: metadata.GetLastUpdatedAt().AsTime(),
 	}
 	if err := m.outputs.Put(ctx, model); err != nil {
-		return connect.NewError(connect.CodeInternal, err)
+		return fmt.Errorf("failed to put cache entry %q: %w", request.GetKey(), err)
 	}
 
 	return nil
@@ -142,7 +142,7 @@ func (m *Manager) Delete(ctx context.Context, request *cacheservicepb.DeleteCach
 		if repositoryerrors.IsNotFound(err) {
 			return connect.NewError(connect.CodeNotFound, fmt.Errorf("cache entry %q not found", request.GetKey()))
 		}
-		return connect.NewError(connect.CodeInternal, err)
+		return fmt.Errorf("failed to delete cache entry %q: %w", request.GetKey(), err)
 	}
 	return nil
 }
@@ -173,7 +173,7 @@ func (m *Manager) GetOrExtendReservation(ctx context.Context, request *cacheserv
 
 	_, err := m.reservations.Get(ctx, reservationKey)
 	if err != nil && !repositoryerrors.IsNotFound(err) {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to get reservation %q: %w", reservationKey, err)
 	}
 
 	// Existing reservations follow one of two paths:
@@ -186,11 +186,11 @@ func (m *Manager) GetOrExtendReservation(ctx context.Context, request *cacheserv
 				// could refresh an expired one. Re-read to return the current holder.
 				current, getErr := m.reservations.Get(ctx, reservationKey)
 				if getErr != nil {
-					return nil, connect.NewError(connect.CodeInternal, getErr)
+					return nil, fmt.Errorf("failed to get reservation %q: %w", reservationKey, getErr)
 				}
 				return reservationFromModel(current), nil
 			}
-			return nil, connect.NewError(connect.CodeInternal, err)
+			return nil, fmt.Errorf("failed to get reservation %q: %w", reservationKey, err)
 		}
 		return reservationFromModel(reservation), nil
 	}
@@ -200,11 +200,11 @@ func (m *Manager) GetOrExtendReservation(ctx context.Context, request *cacheserv
 			// Another caller created the reservation after our initial read.
 			current, getErr := m.reservations.Get(ctx, reservationKey)
 			if getErr != nil {
-				return nil, connect.NewError(connect.CodeInternal, getErr)
+				return nil, fmt.Errorf("failed to get reservation %q: %w", reservationKey, getErr)
 			}
 			return reservationFromModel(current), nil
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to create reservation %q: %w", reservationKey, err)
 	}
 
 	return reservationFromModel(reservation), nil
@@ -227,7 +227,7 @@ func (m *Manager) ReleaseReservation(ctx context.Context, request *cacheservicep
 		if repositoryerrors.IsNotFound(err) {
 			return nil
 		}
-		return connect.NewError(connect.CodeInternal, err)
+		return fmt.Errorf("failed to delete reservation %q: %w", reservationKey, err)
 	}
 	return nil
 }
