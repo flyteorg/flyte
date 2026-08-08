@@ -233,18 +233,16 @@ class Link(_message.Message):
     def __init__(self, path: _Optional[str] = ..., title: _Optional[str] = ..., is_relative: bool = ...) -> None: ...
 
 class Input(_message.Message):
-    __slots__ = ["name", "string_value", "artifact_query", "artifact_id", "app_id"]
+    __slots__ = ["name", "string_value", "app_id", "artifact_id"]
     NAME_FIELD_NUMBER: _ClassVar[int]
     STRING_VALUE_FIELD_NUMBER: _ClassVar[int]
-    ARTIFACT_QUERY_FIELD_NUMBER: _ClassVar[int]
-    ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
     APP_ID_FIELD_NUMBER: _ClassVar[int]
+    ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
     name: str
     string_value: str
-    artifact_query: _artifact_id_pb2.ArtifactQuery
-    artifact_id: _artifact_id_pb2.ArtifactID
     app_id: Identifier
-    def __init__(self, name: _Optional[str] = ..., string_value: _Optional[str] = ..., artifact_query: _Optional[_Union[_artifact_id_pb2.ArtifactQuery, _Mapping]] = ..., artifact_id: _Optional[_Union[_artifact_id_pb2.ArtifactID, _Mapping]] = ..., app_id: _Optional[_Union[Identifier, _Mapping]] = ...) -> None: ...
+    artifact_id: _artifact_id_pb2.ArtifactVersionId
+    def __init__(self, name: _Optional[str] = ..., string_value: _Optional[str] = ..., app_id: _Optional[_Union[Identifier, _Mapping]] = ..., artifact_id: _Optional[_Union[_artifact_id_pb2.ArtifactVersionId, _Mapping]] = ...) -> None: ...
 
 class MaterializedInputs(_message.Message):
     __slots__ = ["items", "revision"]

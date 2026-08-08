@@ -17,7 +17,7 @@ from flyteidl2.common import identifier_pb2 as flyteidl2_dot_common_dot_identifi
 from flyteidl2.common import list_pb2 as flyteidl2_dot_common_dot_list__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1f\x66lyteidl2/app/app_payload.proto\x12\rflyteidl2.app\x1a\x1b\x62uf/validate/validate.proto\x1a\"flyteidl2/app/app_definition.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1b\x66lyteidl2/common/list.proto\"=\n\rCreateRequest\x12,\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppB\x06\xbaH\x03\xc8\x01\x01R\x03\x61pp\"6\n\x0e\x43reateResponse\x12$\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppR\x03\x61pp\"\x89\x01\n\nGetRequest\x12\x32\n\x06\x61pp_id\x18\x01 \x01(\x0b\x32\x19.flyteidl2.app.IdentifierH\x00R\x05\x61ppId\x12\x32\n\x07ingress\x18\x02 \x01(\x0b\x32\x16.flyteidl2.app.IngressH\x00R\x07ingressB\x13\n\nidentifier\x12\x05\xbaH\x02\x08\x01\"3\n\x0bGetResponse\x12$\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppR\x03\x61pp\"^\n\rUpdateRequest\x12,\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppB\x06\xbaH\x03\xc8\x01\x01R\x03\x61pp\x12\x1f\n\x06reason\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x18\x64R\x06reason\"6\n\x0eUpdateResponse\x12$\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppR\x03\x61pp\"I\n\rDeleteRequest\x12\x38\n\x06\x61pp_id\x18\x01 \x01(\x0b\x32\x19.flyteidl2.app.IdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05\x61ppId\"\x10\n\x0e\x44\x65leteResponse\"\xee\x02\n\x0bListRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12\x1b\n\x03org\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x00R\x03org\x12\x44\n\ncluster_id\x18\x03 \x01(\x0b\x32#.flyteidl2.common.ClusterIdentifierH\x00R\tclusterId\x12?\n\x07project\x18\x04 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\x07project\x12>\n\x1b\x64isable_identity_enrichment\x18\x05 \x01(\x08R\x19\x64isableIdentityEnrichment\x12.\n\x13include_total_count\x18\x06 \x01(\x08R\x11includeTotalCountB\x12\n\tfilter_by\x12\x05\xbaH\x02\x08\x01\"m\n\x0cListResponse\x12&\n\x04\x61pps\x18\x01 \x03(\x0b\x32\x12.flyteidl2.app.AppR\x04\x61pps\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\x12\x1f\n\x0btotal_count\x18\x03 \x01(\x03R\ntotalCount\"\xf7\x01\n\x0cWatchRequest\x12\x1b\n\x03org\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x00R\x03org\x12\x44\n\ncluster_id\x18\x02 \x01(\x0b\x32#.flyteidl2.common.ClusterIdentifierH\x00R\tclusterId\x12?\n\x07project\x18\x03 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\x07project\x12\x32\n\x06\x61pp_id\x18\x04 \x01(\x0b\x32\x19.flyteidl2.app.IdentifierH\x00R\x05\x61ppIdB\x0f\n\x06target\x12\x05\xbaH\x02\x08\x01\"3\n\x0b\x43reateEvent\x12$\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppR\x03\x61pp\"o\n\x0bUpdateEvent\x12\x33\n\x0bupdated_app\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppR\nupdatedApp\x12+\n\x07old_app\x18\x02 \x01(\x0b\x32\x12.flyteidl2.app.AppR\x06oldApp\"3\n\x0b\x44\x65leteEvent\x12$\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppR\x03\x61pp\"\xdb\x01\n\rWatchResponse\x12?\n\x0c\x63reate_event\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.app.CreateEventH\x00R\x0b\x63reateEvent\x12?\n\x0cupdate_event\x18\x02 \x01(\x0b\x32\x1a.flyteidl2.app.UpdateEventH\x00R\x0bupdateEvent\x12?\n\x0c\x64\x65lete_event\x18\x03 \x01(\x0b\x32\x1a.flyteidl2.app.DeleteEventH\x00R\x0b\x64\x65leteEventB\x07\n\x05\x65vent\"C\n\x13UpdateStatusRequest\x12,\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppB\x06\xbaH\x03\xc8\x01\x01R\x03\x61pp\"<\n\x14UpdateStatusResponse\x12$\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppR\x03\x61pp\"K\n\x0cLeaseRequest\x12;\n\x02id\x18\x01 \x01(\x0b\x32#.flyteidl2.common.ClusterIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x02id\"7\n\rLeaseResponse\x12&\n\x04\x61pps\x18\x01 \x03(\x0b\x32\x12.flyteidl2.app.AppR\x04\x61ppsB\xae\x01\n\x11\x63om.flyteidl2.appB\x0f\x41ppPayloadProtoH\x02P\x01Z1github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app\xa2\x02\x03\x46\x41X\xaa\x02\rFlyteidl2.App\xca\x02\rFlyteidl2\\App\xe2\x02\x19\x46lyteidl2\\App\\GPBMetadata\xea\x02\x0e\x46lyteidl2::Appb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1f\x66lyteidl2/app/app_payload.proto\x12\rflyteidl2.app\x1a\x1b\x62uf/validate/validate.proto\x1a\"flyteidl2/app/app_definition.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1b\x66lyteidl2/common/list.proto\"=\n\rCreateRequest\x12,\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppB\x06\xbaH\x03\xc8\x01\x01R\x03\x61pp\"6\n\x0e\x43reateResponse\x12$\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppR\x03\x61pp\"\x89\x01\n\nGetRequest\x12\x32\n\x06\x61pp_id\x18\x01 \x01(\x0b\x32\x19.flyteidl2.app.IdentifierH\x00R\x05\x61ppId\x12\x32\n\x07ingress\x18\x02 \x01(\x0b\x32\x16.flyteidl2.app.IngressH\x00R\x07ingressB\x13\n\nidentifier\x12\x05\xbaH\x02\x08\x01\"3\n\x0bGetResponse\x12$\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppR\x03\x61pp\"^\n\rUpdateRequest\x12,\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppB\x06\xbaH\x03\xc8\x01\x01R\x03\x61pp\x12\x1f\n\x06reason\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x18\x64R\x06reason\"6\n\x0eUpdateResponse\x12$\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppR\x03\x61pp\"I\n\rDeleteRequest\x12\x38\n\x06\x61pp_id\x18\x01 \x01(\x0b\x32\x19.flyteidl2.app.IdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05\x61ppId\"\x10\n\x0e\x44\x65leteResponse\"\x93\x01\n\x16\x43onsumedArtifactFilter\x12!\n\x07project\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x07project\x12\x1f\n\x06\x64omain\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x06\x64omain\x12\x1b\n\x04name\x18\x03 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x04name\x12\x18\n\x07version\x18\x04 \x01(\tR\x07version\"\xb3\x03\n\x0bListRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12\x1b\n\x03org\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x00R\x03org\x12\x44\n\ncluster_id\x18\x03 \x01(\x0b\x32#.flyteidl2.common.ClusterIdentifierH\x00R\tclusterId\x12?\n\x07project\x18\x04 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\x07project\x12\x43\n\x08\x61rtifact\x18\x07 \x01(\x0b\x32%.flyteidl2.app.ConsumedArtifactFilterH\x00R\x08\x61rtifact\x12>\n\x1b\x64isable_identity_enrichment\x18\x05 \x01(\x08R\x19\x64isableIdentityEnrichment\x12.\n\x13include_total_count\x18\x06 \x01(\x08R\x11includeTotalCountB\x12\n\tfilter_by\x12\x05\xbaH\x02\x08\x01\"m\n\x0cListResponse\x12&\n\x04\x61pps\x18\x01 \x03(\x0b\x32\x12.flyteidl2.app.AppR\x04\x61pps\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\x12\x1f\n\x0btotal_count\x18\x03 \x01(\x03R\ntotalCount\"\xf7\x01\n\x0cWatchRequest\x12\x1b\n\x03org\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x00R\x03org\x12\x44\n\ncluster_id\x18\x02 \x01(\x0b\x32#.flyteidl2.common.ClusterIdentifierH\x00R\tclusterId\x12?\n\x07project\x18\x03 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\x07project\x12\x32\n\x06\x61pp_id\x18\x04 \x01(\x0b\x32\x19.flyteidl2.app.IdentifierH\x00R\x05\x61ppIdB\x0f\n\x06target\x12\x05\xbaH\x02\x08\x01\"3\n\x0b\x43reateEvent\x12$\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppR\x03\x61pp\"o\n\x0bUpdateEvent\x12\x33\n\x0bupdated_app\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppR\nupdatedApp\x12+\n\x07old_app\x18\x02 \x01(\x0b\x32\x12.flyteidl2.app.AppR\x06oldApp\"3\n\x0b\x44\x65leteEvent\x12$\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppR\x03\x61pp\"\xdb\x01\n\rWatchResponse\x12?\n\x0c\x63reate_event\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.app.CreateEventH\x00R\x0b\x63reateEvent\x12?\n\x0cupdate_event\x18\x02 \x01(\x0b\x32\x1a.flyteidl2.app.UpdateEventH\x00R\x0bupdateEvent\x12?\n\x0c\x64\x65lete_event\x18\x03 \x01(\x0b\x32\x1a.flyteidl2.app.DeleteEventH\x00R\x0b\x64\x65leteEventB\x07\n\x05\x65vent\"C\n\x13UpdateStatusRequest\x12,\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppB\x06\xbaH\x03\xc8\x01\x01R\x03\x61pp\"<\n\x14UpdateStatusResponse\x12$\n\x03\x61pp\x18\x01 \x01(\x0b\x32\x12.flyteidl2.app.AppR\x03\x61pp\"K\n\x0cLeaseRequest\x12;\n\x02id\x18\x01 \x01(\x0b\x32#.flyteidl2.common.ClusterIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x02id\"7\n\rLeaseResponse\x12&\n\x04\x61pps\x18\x01 \x03(\x0b\x32\x12.flyteidl2.app.AppR\x04\x61ppsB\xae\x01\n\x11\x63om.flyteidl2.appB\x0f\x41ppPayloadProtoH\x02P\x01Z1github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app\xa2\x02\x03\x46\x41X\xaa\x02\rFlyteidl2.App\xca\x02\rFlyteidl2\\App\xe2\x02\x19\x46lyteidl2\\App\\GPBMetadata\xea\x02\x0e\x46lyteidl2::Appb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -35,6 +35,12 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _UPDATEREQUEST.fields_by_name['reason']._serialized_options = b'\272H\004r\002\030d'
   _DELETEREQUEST.fields_by_name['app_id']._options = None
   _DELETEREQUEST.fields_by_name['app_id']._serialized_options = b'\272H\003\310\001\001'
+  _CONSUMEDARTIFACTFILTER.fields_by_name['project']._options = None
+  _CONSUMEDARTIFACTFILTER.fields_by_name['project']._serialized_options = b'\272H\004r\002\020\001'
+  _CONSUMEDARTIFACTFILTER.fields_by_name['domain']._options = None
+  _CONSUMEDARTIFACTFILTER.fields_by_name['domain']._serialized_options = b'\272H\004r\002\020\001'
+  _CONSUMEDARTIFACTFILTER.fields_by_name['name']._options = None
+  _CONSUMEDARTIFACTFILTER.fields_by_name['name']._serialized_options = b'\272H\004r\002\020\001'
   _LISTREQUEST.oneofs_by_name['filter_by']._options = None
   _LISTREQUEST.oneofs_by_name['filter_by']._serialized_options = b'\272H\002\010\001'
   _LISTREQUEST.fields_by_name['org']._options = None
@@ -63,26 +69,28 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_DELETEREQUEST']._serialized_end=716
   _globals['_DELETERESPONSE']._serialized_start=718
   _globals['_DELETERESPONSE']._serialized_end=734
-  _globals['_LISTREQUEST']._serialized_start=737
-  _globals['_LISTREQUEST']._serialized_end=1103
-  _globals['_LISTRESPONSE']._serialized_start=1105
-  _globals['_LISTRESPONSE']._serialized_end=1214
-  _globals['_WATCHREQUEST']._serialized_start=1217
-  _globals['_WATCHREQUEST']._serialized_end=1464
-  _globals['_CREATEEVENT']._serialized_start=1466
-  _globals['_CREATEEVENT']._serialized_end=1517
-  _globals['_UPDATEEVENT']._serialized_start=1519
-  _globals['_UPDATEEVENT']._serialized_end=1630
-  _globals['_DELETEEVENT']._serialized_start=1632
-  _globals['_DELETEEVENT']._serialized_end=1683
-  _globals['_WATCHRESPONSE']._serialized_start=1686
-  _globals['_WATCHRESPONSE']._serialized_end=1905
-  _globals['_UPDATESTATUSREQUEST']._serialized_start=1907
-  _globals['_UPDATESTATUSREQUEST']._serialized_end=1974
-  _globals['_UPDATESTATUSRESPONSE']._serialized_start=1976
-  _globals['_UPDATESTATUSRESPONSE']._serialized_end=2036
-  _globals['_LEASEREQUEST']._serialized_start=2038
-  _globals['_LEASEREQUEST']._serialized_end=2113
-  _globals['_LEASERESPONSE']._serialized_start=2115
-  _globals['_LEASERESPONSE']._serialized_end=2170
+  _globals['_CONSUMEDARTIFACTFILTER']._serialized_start=737
+  _globals['_CONSUMEDARTIFACTFILTER']._serialized_end=884
+  _globals['_LISTREQUEST']._serialized_start=887
+  _globals['_LISTREQUEST']._serialized_end=1322
+  _globals['_LISTRESPONSE']._serialized_start=1324
+  _globals['_LISTRESPONSE']._serialized_end=1433
+  _globals['_WATCHREQUEST']._serialized_start=1436
+  _globals['_WATCHREQUEST']._serialized_end=1683
+  _globals['_CREATEEVENT']._serialized_start=1685
+  _globals['_CREATEEVENT']._serialized_end=1736
+  _globals['_UPDATEEVENT']._serialized_start=1738
+  _globals['_UPDATEEVENT']._serialized_end=1849
+  _globals['_DELETEEVENT']._serialized_start=1851
+  _globals['_DELETEEVENT']._serialized_end=1902
+  _globals['_WATCHRESPONSE']._serialized_start=1905
+  _globals['_WATCHRESPONSE']._serialized_end=2124
+  _globals['_UPDATESTATUSREQUEST']._serialized_start=2126
+  _globals['_UPDATESTATUSREQUEST']._serialized_end=2193
+  _globals['_UPDATESTATUSRESPONSE']._serialized_start=2195
+  _globals['_UPDATESTATUSRESPONSE']._serialized_end=2255
+  _globals['_LEASEREQUEST']._serialized_start=2257
+  _globals['_LEASEREQUEST']._serialized_end=2332
+  _globals['_LEASERESPONSE']._serialized_start=2334
+  _globals['_LEASERESPONSE']._serialized_end=2389
 # @@protoc_insertion_point(module_scope)
