@@ -228,6 +228,11 @@ message Status {
   // LastStartedAt is the time the app most recently started (first start or restart).
   // Unset for apps that never started, and for those last started before this field existed.
   google.protobuf.Timestamp last_started_at = 10;
+
+  // Cluster the app most recently ran on. Unlike assigned_cluster this is never cleared when the
+  // app is released, so a stopped app's persisted logs stay addressable. It is not an ownership
+  // claim — never route work with it, only reads that need to reach the cluster's data plane.
+  string last_assigned_cluster = 11;
 }
 
 message K8sMetadata {
