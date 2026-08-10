@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"go.opentelemetry.io/otel/metric"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -18,19 +19,27 @@ type GarbageCollector struct {
 	reader   client.Reader
 	interval time.Duration
 	maxTTL   time.Duration
+	metrics  *gcMetrics
 }
 
 // NewGarbageCollector creates a new GarbageCollector. reader must be an
 // uncached reader (e.g. mgr.GetAPIReader()): collect() lists with Continue
 // pagination, which the controller-runtime cache does not support
 // ("continue list option is not supported by the cache"). client is used for
-// the deletes.
-func NewGarbageCollector(c client.Client, reader client.Reader, interval, maxTTL time.Duration) *GarbageCollector {
+// the deletes. provider is the executor's OTel meter provider
+// (otelutils.GetMeterProvider(otelServiceName) in executor/setup.go).
+func NewGarbageCollector(c client.Client, reader client.Reader, interval, maxTTL time.Duration, provider metric.MeterProvider) *GarbageCollector {
+	metrics, err := newGCMetrics(provider)
+	if err != nil {
+		// Non-fatal: run unmetered rather than fail startup.
+		log.Log.Error(err, "failed to register garbage collector metrics")
+	}
 	return &GarbageCollector{
 		client:   c,
 		reader:   reader,
 		interval: interval,
 		maxTTL:   maxTTL,
+		metrics:  metrics,
 	}
 }
 
@@ -68,7 +77,9 @@ func (gc *GarbageCollector) Start(ctx context.Context) error {
 var gcPageSize = 500
 
 // collect lists all terminated TaskActions (paginated) and deletes those whose completed-time has expired.
-func (gc *GarbageCollector) collect(ctx context.Context) error {
+func (gc *GarbageCollector) collect(ctx context.Context) (err error) {
+	start := time.Now()
+	defer func() { gc.metrics.recordSweep(ctx, start, err) }()
 	logger := log.FromContext(ctx).WithName("gc")
 
 	cutoff := time.Now().UTC().Add(-gc.maxTTL).Format(labelTimeFormat)
@@ -108,13 +119,16 @@ func (gc *GarbageCollector) collect(ctx context.Context) error {
 					// is deleted earlier in this same pass, so the explicit delete
 					// races with the cascade and returns NotFound. Not an error.
 					if apierrors.IsNotFound(err) {
+						gc.metrics.recordDeletion(ctx, gcOutcomeAlreadyGone)
 						continue
 					}
 					logger.Error(err, "failed to delete expired TaskAction",
 						"name", ta.Name, "namespace", ta.Namespace, "completedTime", completedTime)
+					gc.metrics.recordDeletion(ctx, gcOutcomeFailed)
 					continue
 				}
 				deleted++
+				gc.metrics.recordDeletion(ctx, gcOutcomeDeleted)
 			}
 		}
 

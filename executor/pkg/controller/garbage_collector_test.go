@@ -7,6 +7,10 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"go.opentelemetry.io/otel/attribute"
+	metricnoop "go.opentelemetry.io/otel/metric/noop"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -64,7 +68,7 @@ var _ = Describe("GarbageCollector", func() {
 			LabelCompletedTime:     expiredTime,
 		})
 
-		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour, metricnoop.NewMeterProvider())
 		Expect(gc.collect(ctx)).To(Succeed())
 
 		ta := &flyteorgv1.TaskAction{}
@@ -80,7 +84,7 @@ var _ = Describe("GarbageCollector", func() {
 			LabelCompletedTime:     recentTime,
 		})
 
-		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour, metricnoop.NewMeterProvider())
 		Expect(gc.collect(ctx)).To(Succeed())
 
 		ta := &flyteorgv1.TaskAction{}
@@ -91,7 +95,7 @@ var _ = Describe("GarbageCollector", func() {
 	It("should retain non-terminated TaskActions", func() {
 		createTaskAction(ctx, "gc-active", nil)
 
-		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour, metricnoop.NewMeterProvider())
 		Expect(gc.collect(ctx)).To(Succeed())
 
 		ta := &flyteorgv1.TaskAction{}
@@ -100,7 +104,7 @@ var _ = Describe("GarbageCollector", func() {
 	})
 
 	It("should handle empty list gracefully", func() {
-		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour, metricnoop.NewMeterProvider())
 		Expect(gc.collect(ctx)).To(Succeed())
 	})
 
@@ -121,7 +125,7 @@ var _ = Describe("GarbageCollector", func() {
 			})
 		}
 
-		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour, metricnoop.NewMeterProvider())
 		Expect(gc.collect(ctx)).To(Succeed())
 
 		// Assert only the actions this spec created are gone -- checking the whole
@@ -144,7 +148,7 @@ var _ = Describe("GarbageCollector", func() {
 		// A long interval means the ticker will not fire during the test, so the
 		// expired TaskAction can only be deleted by the immediate startup sweep.
 		// Before the fix, Start waited a full interval before its first collect.
-		gc := NewGarbageCollector(k8sClient, k8sClient, 30*time.Minute, 1*time.Hour)
+		gc := NewGarbageCollector(k8sClient, k8sClient, 30*time.Minute, 1*time.Hour, metricnoop.NewMeterProvider())
 		startCtx, cancel := context.WithCancel(ctx)
 		doneCh := make(chan struct{})
 		go func() {
@@ -160,6 +164,51 @@ var _ = Describe("GarbageCollector", func() {
 			err := k8sClient.Get(ctx, types.NamespacedName{Name: "gc-startup", Namespace: "default"}, ta)
 			return apierrors.IsNotFound(err)
 		}, 10*time.Second, 200*time.Millisecond).Should(BeTrue(), "Start should delete the expired TaskAction via its initial sweep")
+	})
+
+	It("should record deletion and sweep metrics", func() {
+		expiredTime := time.Now().UTC().Add(-2 * time.Hour).Format(labelTimeFormat)
+		createTaskAction(ctx, "gc-metrics", map[string]string{
+			LabelTerminationStatus: LabelValueTerminated,
+			LabelCompletedTime:     expiredTime,
+		})
+
+		// Unlike the other specs, this one uses a real meter provider so the
+		// recording calls inside collect() are observable.
+		reader := sdkmetric.NewManualReader()
+		provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader))
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 1*time.Hour, provider)
+
+		Expect(gc.collect(ctx)).To(Succeed())
+
+		var rm metricdata.ResourceMetrics
+		Expect(reader.Collect(ctx, &rm)).To(Succeed())
+
+		data := map[string]metricdata.Aggregation{}
+		for _, sm := range rm.ScopeMetrics {
+			for _, m := range sm.Metrics {
+				data[m.Name] = m.Data
+			}
+		}
+
+		sum, ok := data["taskaction.gc.deletions"].(metricdata.Sum[int64])
+		Expect(ok).To(BeTrue())
+		var deleted int64
+		for _, dp := range sum.DataPoints {
+			v, found := dp.Attributes.Value(attribute.Key("outcome"))
+			Expect(found).To(BeTrue())
+			if v.AsString() == gcOutcomeDeleted {
+				deleted += dp.Value
+			}
+		}
+		// At least one: the AfterEach cleanup is asynchronous, so a TaskAction
+		// from a previous spec can still be present and get swept here too.
+		Expect(deleted).To(BeNumerically(">=", 1))
+
+		hist, ok := data["taskaction.gc.sweep.duration"].(metricdata.Histogram[float64])
+		Expect(ok).To(BeTrue())
+		Expect(hist.DataPoints).To(HaveLen(1))
+		Expect(hist.DataPoints[0].Count).To(Equal(uint64(1)))
 	})
 })
 
