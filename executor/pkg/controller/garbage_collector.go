@@ -119,15 +119,16 @@ func (gc *GarbageCollector) collect(ctx context.Context) (err error) {
 					// is deleted earlier in this same pass, so the explicit delete
 					// races with the cascade and returns NotFound. Not an error.
 					if apierrors.IsNotFound(err) {
+						gc.metrics.recordDeletion(ctx, gcOutcomeAlreadyGone)
 						continue
 					}
 					logger.Error(err, "failed to delete expired TaskAction",
 						"name", ta.Name, "namespace", ta.Namespace, "completedTime", completedTime)
-					gc.metrics.recordDeletion(ctx, err)
+					gc.metrics.recordDeletion(ctx, gcOutcomeFailed)
 					continue
 				}
 				deleted++
-				gc.metrics.recordDeletion(ctx, nil)
+				gc.metrics.recordDeletion(ctx, gcOutcomeDeleted)
 			}
 		}
 

@@ -11,6 +11,13 @@ import (
 
 const gcMeterName = "taskaction-gc"
 
+// Values for the "outcome" attribute on taskaction.gc.deletions.
+const (
+	gcOutcomeDeleted     = "deleted"
+	gcOutcomeAlreadyGone = "already_gone"
+	gcOutcomeFailed      = "failed"
+)
+
 // gcMetrics holds OTel instruments for the garbage collector.
 type gcMetrics struct {
 	deletions     metric.Int64Counter
@@ -28,7 +35,7 @@ func newGCMetrics(provider metric.MeterProvider) (*gcMetrics, error) {
 
 	deletions, err := meter.Int64Counter(
 		"taskaction.gc.deletions",
-		metric.WithDescription("TaskAction deletions issued by the garbage collector, labeled by error"),
+		metric.WithDescription("TaskAction delete attempts by the garbage collector, labeled by outcome"),
 	)
 	if err != nil {
 		return nil, err
@@ -49,14 +56,14 @@ func newGCMetrics(provider metric.MeterProvider) (*gcMetrics, error) {
 	return &gcMetrics{deletions: deletions, sweepDuration: sweepDuration}, nil
 }
 
-// recordDeletion counts one delete issued by the garbage collector. Callers skip
-// already-deleted (NotFound) objects, which are therefore counted under neither
-// error value. No-op when metrics are disabled.
-func (m *gcMetrics) recordDeletion(ctx context.Context, err error) {
+// recordDeletion counts one delete attempt by outcome: deleted, already_gone
+// (removed by cascade before the GC got to it), or failed. No-op when metrics
+// are disabled.
+func (m *gcMetrics) recordDeletion(ctx context.Context, outcome string) {
 	if m == nil || m.deletions == nil {
 		return
 	}
-	m.deletions.Add(ctx, 1, metric.WithAttributes(attribute.Bool("error", err != nil)))
+	m.deletions.Add(ctx, 1, metric.WithAttributes(attribute.String("outcome", outcome)))
 }
 
 // recordSweep records the duration of one sweep, labeled by whether the sweep

@@ -193,17 +193,17 @@ var _ = Describe("GarbageCollector", func() {
 
 		sum, ok := data["taskaction.gc.deletions"].(metricdata.Sum[int64])
 		Expect(ok).To(BeTrue())
-		var succeeded int64
+		var deleted int64
 		for _, dp := range sum.DataPoints {
-			v, found := dp.Attributes.Value(attribute.Key("error"))
+			v, found := dp.Attributes.Value(attribute.Key("outcome"))
 			Expect(found).To(BeTrue())
-			if !v.AsBool() {
-				succeeded += dp.Value
+			if v.AsString() == gcOutcomeDeleted {
+				deleted += dp.Value
 			}
 		}
 		// At least one: the AfterEach cleanup is asynchronous, so a TaskAction
-		// from a previous spec can still be present and get swept here too.d
-		Expect(succeeded).To(BeNumerically(">=", 1))
+		// from a previous spec can still be present and get swept here too.
+		Expect(deleted).To(BeNumerically(">=", 1))
 
 		hist, ok := data["taskaction.gc.sweep.duration"].(metricdata.Histogram[float64])
 		Expect(ok).To(BeTrue())

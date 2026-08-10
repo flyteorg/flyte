@@ -29,24 +29,26 @@ func TestRecordDeletion(t *testing.T) {
 	require.NotNil(t, m)
 
 	ctx := context.Background()
-	m.recordDeletion(ctx, nil)
-	m.recordDeletion(ctx, nil)
-	m.recordDeletion(ctx, errors.New("boom"))
+	m.recordDeletion(ctx, gcOutcomeDeleted)
+	m.recordDeletion(ctx, gcOutcomeDeleted)
+	m.recordDeletion(ctx, gcOutcomeAlreadyGone)
+	m.recordDeletion(ctx, gcOutcomeFailed)
 
 	sum, ok := collectMetric(t, reader, "taskaction.gc.deletions").Data.(metricdata.Sum[int64])
 	require.True(t, ok)
 
-	counts := map[bool]int64{}
+	counts := map[string]int64{}
 	for _, dp := range sum.DataPoints {
-		v, ok := dp.Attributes.Value(attribute.Key("error"))
+		v, ok := dp.Attributes.Value(attribute.Key("outcome"))
 		require.True(t, ok)
-		counts[v.AsBool()] = dp.Value
+		counts[v.AsString()] = dp.Value
 	}
-	assert.Equal(t, int64(2), counts[false])
-	assert.Equal(t, int64(1), counts[true])
+	assert.Equal(t, int64(2), counts[gcOutcomeDeleted])
+	assert.Equal(t, int64(1), counts[gcOutcomeAlreadyGone])
+	assert.Equal(t, int64(1), counts[gcOutcomeFailed])
 
 	var nilMetrics *gcMetrics
-	assert.NotPanics(t, func() { nilMetrics.recordDeletion(ctx, nil) })
+	assert.NotPanics(t, func() { nilMetrics.recordDeletion(ctx, gcOutcomeDeleted) })
 }
 
 func TestRecordSweep(t *testing.T) {
