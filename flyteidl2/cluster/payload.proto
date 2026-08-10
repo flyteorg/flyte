@@ -41,6 +41,7 @@ message SelectClusterRequest {
     // only when the org's clusters are all directly reachable (zero trust); otherwise the
     // server answers with its own endpoint and serves these from control-plane storage.
     OPERATION_TRACKED_RUN_DATA = 11;
+    OPERATION_GET_CLUSTER_CONFIG = 12;
   }
 
   Operation operation = 8 [(buf.validate.field).enum = {

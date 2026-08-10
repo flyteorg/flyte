@@ -119,6 +119,13 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 		if k8serrors.IsRequestEntityTooLargeError(err) {
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("EntityTooLarge", err.Error(), nil)), nil
 		}
+		// Admission/validation rejections (e.g. a generated object or derived child name
+		// exceeding k8s length limits) are deterministic: retrying re-submits the identical
+		// object and fails the same way, leaving the execution stuck RUNNING. Fast-fail
+		// instead of looping via UnknownTransition.
+		if k8serrors.IsInvalid(err) {
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("InvalidResource", err.Error(), nil)), nil
+		}
 		reason := k8serrors.ReasonForError(err)
 		logger.Errorf(ctx, "Failed to launch job, system error. err: %v", err)
 		return pluginsCore.UnknownTransition, errors.Wrapf(stdErrors.ErrorCode(reason), err, "failed to create resource")

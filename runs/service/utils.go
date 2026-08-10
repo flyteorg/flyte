@@ -7,12 +7,14 @@ import (
 	"encoding/base64"
 	"fmt"
 	"slices"
+	"strings"
 	"time"
 
 	"connectrpc.com/connect"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"k8s.io/apimachinery/pkg/util/validation"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -123,6 +125,25 @@ func hashInputs(inputs *task.Inputs) (string, error) {
 
 	hash := sha256.Sum256(marshaledInputs)
 	return base64.StdEncoding.EncodeToString(hash[:]), nil
+}
+
+// runNameMaxLength mirrors the cap on RunIdentifier.name in flyteidl2/common/identifier.proto.
+const runNameMaxLength = 30
+
+// validateRunName rejects run names that cannot be used verbatim in the k8s object names
+// derived from them: the TaskAction CR is named "<run name>-<action name>", and k8s plugins
+// build DNS-1035 labels (Services, child pod names) from that, so the run name itself must
+// be a valid DNS-1035 label. Server-generated names always satisfy this.
+func validateRunName(name string) error {
+	if len(name) > runNameMaxLength {
+		return connect.NewError(connect.CodeInvalidArgument,
+			fmt.Errorf("invalid run name %q: must be no more than %d characters", name, runNameMaxLength))
+	}
+	if errs := validation.IsDNS1035Label(name); len(errs) > 0 {
+		return connect.NewError(connect.CodeInvalidArgument,
+			fmt.Errorf("invalid run name %q: %s", name, strings.Join(errs, "; ")))
+	}
+	return nil
 }
 
 // validateProjectExists checks that the given project ID exists by calling the ProjectService.

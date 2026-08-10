@@ -1,14 +1,19 @@
 package spark
 
 import (
+	"time"
+
 	pluginsConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
 
 //go:generate pflags Config --default-var=defaultConfig
 
 var (
 	defaultConfig = &Config{
+		EnablePodTemplate:           true,
+		PodTemplateDetectionTimeout: config.Duration{Duration: 30 * time.Second},
 		LogConfig: LogConfig{
 			Mixed: logs.LogConfig{
 				IsKubernetesEnabled:   true,
@@ -26,6 +31,11 @@ type Config struct {
 	SparkHistoryServerURL string            `json:"spark-history-server-url" pflag:",URL for SparkHistory Server that each job will publish the execution history to."`
 	Features              []Feature         `json:"features" pflag:"-,List of optional features supported."`
 	LogConfig             LogConfig         `json:"logs" pflag:",Config for log links for spark applications."`
+	EnablePodTemplate     bool              `json:"enable-pod-template" pflag:"-,Pass the full pod spec through as the driver/executor pod template on clusters whose SparkApplication CRD supports it. Disable as a kill switch."`
+	// PodTemplateDetectionTimeout bounds the one-shot SparkApplication CRD read behind
+	// enable-pod-template. On timeout the probe reports false and the plugin stays on the
+	// legacy fields.
+	PodTemplateDetectionTimeout config.Duration `json:"pod-template-detection-timeout" pflag:"-,Timeout for the one-time SparkApplication CRD schema read that detects pod template support."`
 }
 
 type LogConfig struct {

@@ -3,15 +3,52 @@ package clustered
 import (
 	"context"
 	"regexp"
+	"strconv"
 	"strings"
 
 	v1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
+	"sigs.k8s.io/jobset/pkg/util/placement"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
+
+// dns1035LabelMaxLength is the Kubernetes limit (RFC 1035 label) that generated
+// pod, job, and service names must satisfy.
+const dns1035LabelMaxLength = 63
+
+// maxReplicasForNaming bounds the worst-case pod index we reserve room for when
+// truncating the JobSet name. The name must be derivable from the generated name
+// alone: the create path knows the replica count, but the lookup/abort path
+// (BuildIdentityResource) has no task template, so it cannot. Reserving for the
+// largest replica count we support keeps both paths producing the identical name.
+// 99999 nodes is far beyond any real distributed-training job.
+const maxReplicasForNaming = 100000
+
+// jobSetNameSuffixLen is the number of characters JobSet appends to the JobSet name
+// when deriving its longest child pod name. placement.GenPodName("", ...) yields
+// exactly the "-<replicatedJob>-<jobIdx>-<podIdx>" portion JobSet appends to the
+// JobSet name; "-abcde" mirrors the 5-char random suffix the Job controller adds.
+// This matches what the JobSet webhook validates against.
+func jobSetNameSuffixLen() int {
+	maxPodIdx := strconv.Itoa(maxReplicasForNaming - 1)
+	return len(placement.GenPodName("", workersReplicatedJobName, "0", maxPodIdx)) + len("-abcde")
+}
+
+// generatedNameMaxLength bounds the task's generated name via the plugin's
+// PluginProperties. The plugin manager stamps the object name with
+// GetGeneratedNameWith(0, GeneratedNameMaxLength) — DNS-1035-sanitized and bounded —
+// on both the create and lookup paths. JobSet's admission webhook computes the
+// longest child pod name as "<jobSetName>-<replicatedJob>-<jobIdx>-<podIdx>-<5-char
+// random suffix>" and rejects the entire JobSet if it would exceed 63 characters;
+// composed/nested tasks produce long generated names, so without this bound the
+// webhook rejects the pods, the plugin retries forever, and the execution is stuck
+// in RUNNING. jobIdx is always 0 (single ReplicatedJob with Replicas=1); podIdx is
+// reserved for the worst case (see maxReplicasForNaming) so the bound is independent
+// of the replica count.
+var generatedNameMaxLength = dns1035LabelMaxLength - jobSetNameSuffixLen()
 
 // Name of the sole ReplicatedJob in the JobSet. Pod names follow the pattern
 // <jobsetName>-<replicatedJob>-<jobIdx>-<podIdx>; we run a single ReplicatedJob

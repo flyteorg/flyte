@@ -26,6 +26,14 @@ enum RelationType {
 
   // The run was spawned as a child of the parent run (a nested or sub-run).
   RELATION_TYPE_SPAWN = 3;
+
+  // The run was launched by an automation trigger; the parent is the
+  // trigger-task run that fired it.
+  RELATION_TYPE_TRIGGERED = 4;
+
+  // The run is a trigger-task run created because the parent run produced
+  // an artifact matching the trigger.
+  RELATION_TYPE_ON_ARTIFACT = 5;
 }
 
 // Relation is a provenance link to the single parent run this run was derived from.
