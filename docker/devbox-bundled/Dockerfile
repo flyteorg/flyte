@@ -23,7 +23,7 @@ WORKDIR /flyteorg/build
 COPY bootstrap/go.mod bootstrap/go.sum ./
 RUN go mod download
 COPY bootstrap/ ./
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
+RUN --mount=type=cache,target=/root/.cache/go-build \
     go build -o dist/flyte-devbox-bootstrap cmd/bootstrap/main.go && \
     go build -o dist/embedded-postgres cmd/embedded-postgres/main.go
 

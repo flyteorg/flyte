@@ -35,9 +35,14 @@ build: verify ## Build all Go service binaries
 # Devbox Commands
 # =============================================================================
 
+# Local builds keep refreshing floating preloaded images such as flyteconsole:latest.
+# CI leaves CACHEBUST empty so buildx can restore that image layer from cache.
+DEVBOX_CACHEBUST ?= $(if $(GITHUB_ACTIONS),,$(shell date +%s))
+DEVBOX_CACHEBUST_FLAG := $(if $(DEVBOX_CACHEBUST),CACHEBUST=$(DEVBOX_CACHEBUST))
+
 .PHONY: devbox-build
-devbox-build: ## Build the flyte devbox image (docker/devbox-bundled), always re-pulling the latest UI image
-	$(MAKE) -C docker/devbox-bundled build CACHEBUST=$(shell date +%s)
+devbox-build: ## Build the flyte devbox image (docker/devbox-bundled), re-pulling the latest UI image outside CI
+	$(MAKE) -C docker/devbox-bundled build $(DEVBOX_CACHEBUST_FLAG)
 
 # Run in dev mode with extra arg FLYTE_DEV=True
 .PHONY: devbox-run
