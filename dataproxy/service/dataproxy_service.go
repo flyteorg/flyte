@@ -528,11 +528,6 @@ func (s *Service) GetActionData(
 		group.Go(func() error {
 			outputRef := storage.DataReference(urisResp.Msg.GetOutputsUri())
 			logger.Infof(groupCtx, "GetActionData: reading outputs from %s", outputRef)
-			// The blob may be an Outputs proto or (for run-level data) an Inputs
-			// proto; the field-1 literals lists are wire-compatible, and Outputs
-			// field 3 (produced_artifacts) was numbered to not collide with Inputs
-			// field 2 (context), so decoding as Outputs is safe for both and keeps
-			// the produced-artifact declarations.
 			outputs := &task.Outputs{}
 			if err := s.dataStore.ReadProtobuf(groupCtx, outputRef, outputs); err != nil {
 				if !storage.IsNotFound(err) {
