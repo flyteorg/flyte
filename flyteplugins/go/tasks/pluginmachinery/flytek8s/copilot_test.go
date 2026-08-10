@@ -45,13 +45,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		},
 		CPU:    "1024m",
 		Memory: "1024Mi",
-		StorageConfig: config.StorageConfigSources{
-			ConfigMapName: "flyte-config",
-			ConfigMapKeys: []string{"003-storage.yaml"},
-			SecretName:    "flyte-config-secret",
-			SecretKeys:    []string{"013-storage-secrets.yaml"},
-			MountPath:     "/etc/flyte/copilot",
-		},
+		CopilotStorageConfig: "flyte-copilot-storage-config-secret",
 	}
 
 	t.Run("happy stow backend", func(t *testing.T) {
@@ -62,7 +56,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		c, err := FlyteCoPilotContainer(context.TODO(), "x", cfg, []string{"hello"})
 		assert.NoError(t, err)
 
-		expectedCommand, err := CopilotCommandArgs(context.TODO(), storage.GetConfig(), cfg.StorageConfig, false)
+		expectedCommand, err := CopilotCommandArgs(context.TODO(), storage.GetConfig(), cfg.CopilotStorageConfig, false)
 		assert.NoError(t, err)
 
 		assert.Equal(t, "test-x", c.Name)
@@ -94,7 +88,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 			"endpoint":        "http://minio:9000",
 		}
 
-		command, err := CopilotCommandArgs(context.TODO(), storage.GetConfig(), cfg.StorageConfig, false)
+		command, err := CopilotCommandArgs(context.TODO(), storage.GetConfig(), cfg.CopilotStorageConfig, false)
 		assert.NoError(t, err)
 
 		joined := strings.Join(command, " ")
@@ -132,7 +126,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 			"region":          "us-east-1",
 		}
 
-		command, err := CopilotCommandArgs(context.TODO(), storage.GetConfig(), config.StorageConfigSources{}, false)
+		command, err := CopilotCommandArgs(context.TODO(), storage.GetConfig(), "", false)
 		assert.NoError(t, err)
 
 		joined := strings.Join(command, " ")
@@ -145,18 +139,19 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.NotContains(t, joined, "secret_key_path")
 
 		bare := cfg
-		bare.StorageConfig = config.StorageConfigSources{}
+		bare.CopilotStorageConfig = ""
 		c, err := FlyteCoPilotContainer(context.TODO(), "x", bare, []string{"hello"})
 		assert.NoError(t, err)
 		assert.Empty(t, c.VolumeMounts, "nothing to mount when no source is configured")
 	})
 
-	t.Run("a ConfigMap without a Secret still mounts, for backends that need no credentials", func(t *testing.T) {
-		// S3 authType=iam and gcs/azure keep everything in 003-storage.yaml, so the
-		// ConfigMap alone is a complete configuration. Deployments whose credentials the
-		// chart cannot reach (s3 secretKeyPath) must not land here: co-pilot would read the
-		// mounted files, find no credentials, and have nothing on its command line either.
-		// The chart gates that on copilotStorageComplete; this asserts the shape it emits.
+	t.Run("the Secret mounts for backends that need no credentials", func(t *testing.T) {
+		// S3 authType=iam and gcs/azure carry no credentials, but the storage settings
+		// still reach co-pilot through the same Secret — the projection does not vary by
+		// backend. Deployments whose credentials the chart cannot reach (s3
+		// secretKeyPath) must not land here: co-pilot would read the mounted file, find
+		// no credentials, and have nothing on its command line either. The chart gates
+		// that on copilotStorageComplete; this asserts the shape it emits.
 		storage.GetConfig().Type = storage.TypeStow
 		storage.GetConfig().InitContainer = "bucket"
 		storage.GetConfig().Stow.Kind = "s3"
@@ -165,20 +160,26 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 			"region":    "us-east-1",
 		}
 
-		sources := config.StorageConfigSources{
-			ConfigMapName: "flyte-config",
-			ConfigMapKeys: []string{"003-storage.yaml"},
-			MountPath:     "/etc/flyte/copilot",
-		}
-		assert.True(t, sources.Configured())
+		secretName := "flyte-copilot-storage-config-secret"
 
-		command, err := CopilotCommandArgs(context.TODO(), storage.GetConfig(), sources, false)
+		command, err := CopilotCommandArgs(context.TODO(), storage.GetConfig(), secretName, false)
 		assert.NoError(t, err)
 		assert.Contains(t, strings.Join(command, " "), "--config /etc/flyte/copilot/*.yaml")
 
-		vol := storageConfigVolume(sources)
-		assert.Len(t, vol.Projected.Sources, 1, "an unnamed Secret must not be projected")
-		assert.NotNil(t, vol.Projected.Sources[0].ConfigMap)
+		vol := storageConfigVolume(secretName)
+		assert.Len(t, vol.Projected.Sources, 1)
+		assert.NotNil(t, vol.Projected.Sources[0].Secret)
+		// Only the one key co-pilot understands: its strict-mode loader rejects
+		// sections it does not recognise, so a whole-Secret projection would stop it
+		// from starting.
+		assert.Equal(t, []v1.KeyToPath{{Key: copilotStorageConfigKey, Path: copilotStorageConfigKey}},
+			vol.Projected.Sources[0].Secret.Items)
+	})
+
+	t.Run("an unnamed Secret projects nothing", func(t *testing.T) {
+		// Deployments that predate this setting: co-pilot falls back to receiving the
+		// stow config on its command line rather than mounting an empty volume.
+		assert.Empty(t, storageConfigVolume("").Projected.Sources)
 	})
 
 	t.Run("non-s3 backends are mounted the same way", func(t *testing.T) {
@@ -190,7 +191,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 			"project_id": "flyte-gcp",
 		}
 
-		command, err := CopilotCommandArgs(context.TODO(), storage.GetConfig(), cfg.StorageConfig, false)
+		command, err := CopilotCommandArgs(context.TODO(), storage.GetConfig(), cfg.CopilotStorageConfig, false)
 		assert.NoError(t, err)
 
 		joined := strings.Join(command, " ")
@@ -218,7 +219,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(c.VolumeMounts))
 
-		expectedCommand, err := CopilotCommandArgs(context.TODO(), &storageConfigOverride, cfg.StorageConfig, true)
+		expectedCommand, err := CopilotCommandArgs(context.TODO(), &storageConfigOverride, cfg.CopilotStorageConfig, true)
 		assert.NoError(t, err)
 		assert.ElementsMatch(t, c.Command, expectedCommand)
 
@@ -375,13 +376,7 @@ func TestAddCoPilotToPod_StorageCredentialsNeverInPodSpec(t *testing.T) {
 		OutputVolumeName:     "out",
 		CPU:                  "1024m",
 		Memory:               "1024Mi",
-		StorageConfig: config.StorageConfigSources{
-			ConfigMapName: "flyte-config",
-			ConfigMapKeys: []string{"003-storage.yaml"},
-			SecretName:    "flyte-config-secret",
-			SecretKeys:    []string{"013-storage-secrets.yaml"},
-			MountPath:     "/etc/flyte/copilot",
-		},
+		CopilotStorageConfig: "flyte-copilot-storage-config-secret",
 	}
 
 	secrets := map[string]string{
@@ -440,12 +435,10 @@ func TestAddCoPilotToPod_StorageCredentialsNeverInPodSpec(t *testing.T) {
 	}
 	assert.Len(t, projected, 1, "the storage config volume must be added exactly once")
 	assert.Equal(t, int32(0400), *projected[0].Projected.DefaultMode)
-	assert.Equal(t, "flyte-config", projected[0].Projected.Sources[0].ConfigMap.Name)
-	assert.Equal(t, []v1.KeyToPath{{Key: "003-storage.yaml", Path: "003-storage.yaml"}},
-		projected[0].Projected.Sources[0].ConfigMap.Items)
-	assert.Equal(t, "flyte-config-secret", projected[0].Projected.Sources[1].Secret.Name)
-	assert.Equal(t, []v1.KeyToPath{{Key: "013-storage-secrets.yaml", Path: "013-storage-secrets.yaml"}},
-		projected[0].Projected.Sources[1].Secret.Items)
+	assert.Len(t, projected[0].Projected.Sources, 1, "the whole configuration lives in one Secret")
+	assert.Equal(t, "flyte-copilot-storage-config-secret", projected[0].Projected.Sources[0].Secret.Name)
+	assert.Equal(t, []v1.KeyToPath{{Key: copilotStorageConfigKey, Path: copilotStorageConfigKey}},
+		projected[0].Projected.Sources[0].Secret.Items)
 
 	// It must reach the co-pilot containers, and only those: the primary container runs
 	// user code and must not be able to read the credentials.
@@ -683,13 +676,7 @@ func TestAddCoPilotToPod(t *testing.T) {
 		},
 		CPU:    "1024m",
 		Memory: "1024Mi",
-		StorageConfig: config.StorageConfigSources{
-			ConfigMapName: "flyte-config",
-			ConfigMapKeys: []string{"003-storage.yaml"},
-			SecretName:    "flyte-config-secret",
-			SecretKeys:    []string{"013-storage-secrets.yaml"},
-			MountPath:     "/etc/flyte/copilot",
-		},
+		CopilotStorageConfig: "flyte-copilot-storage-config-secret",
 	}
 
 	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}

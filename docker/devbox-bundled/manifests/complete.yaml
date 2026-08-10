@@ -7813,23 +7813,19 @@ data:
       k8s:
         co-pilot:
           image: "flyte-binary-v2:sandbox"
-          # Co-pilot reads its storage configuration from these objects, projected into its
-          # containers as files, rather than receiving it on its command line — where the
+          # Co-pilot reads its storage configuration from this Secret, projected into its
+          # containers as a file, rather than receiving it on its command line — where the
           # credentials would land in every task's pod spec and be readable by anyone who can
-          # read pods. Only the named keys are projected: co-pilot parses its config in strict
-          # mode and rejects the sections it does not recognise.
+          # read pods.
           #
-          # Emitted only when those files would be a complete configuration; see
-          # copilotStorageComplete. Otherwise co-pilot falls back to receiving the stow config
-          # on its command line, as it did before.
-          storage-config:
-            mount-path: /etc/flyte/copilot
-            config-map-name: "flyte-binary-config"
-            config-map-keys:
-              - 003-storage.yaml
-            secret-name: "flyte-binary-config-secret"
-            secret-keys:
-              - 013-storage-secrets.yaml
+          # The Secret carries the whole configuration — stow settings and credentials — in a
+          # single key, because co-pilot takes the stow config all-or-nothing. The plugin
+          # fixes the key name and the mount path, so its name is all that is set here.
+          #
+          # Emitted only when that file would be complete; see copilotStorageComplete.
+          # Otherwise co-pilot falls back to receiving the stow config on its command line,
+          # as it did before.
+          copilot-storage-config: "flyte-binary-copilot-storage-config-secret"
         # Env vars injected into every task pod, so it can reach the control plane
         # to enqueue child actions and watch their state.
         #
@@ -8185,6 +8181,33 @@ stringData:
         config:
           access_key_id: "rustfs"
           secret_key: "rustfsstorage"
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-binary
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-binary-copilot-storage-config-secret
+  namespace: flyte
+stringData:
+  copilot-storage-config.yaml: |
+    storage:
+      type: stow
+      stow:
+        kind: s3
+        config:
+          region: us-east-1
+          disable_ssl: true
+          v2_signing: true
+          endpoint: http://rustfs-svc.flyte:9000
+          auth_type: accesskey
+          access_key_id: "rustfs"
+          secret_key: "rustfsstorage"
+      container: flyte-data
 type: Opaque
 ---
 apiVersion: v1
@@ -8746,8 +8769,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 77f8e3078e6a5c08729a61314634482cefa301c393665ed403c8aae0c18dfe95
-        checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
+        checksum/configuration: 014ef2cacb10a3772f5a1addb132a5f794ab0c0974cd27decb6f2d172d3a9eb1
+        checksum/configuration-secret: 2dee07702da9b4e0d8226c540f5450c3f5c3a7850b13bc3ff3ca72ccaac14733
       labels:
         app.kubernetes.io/component: flyte-binary
         app.kubernetes.io/instance: flyte-devbox

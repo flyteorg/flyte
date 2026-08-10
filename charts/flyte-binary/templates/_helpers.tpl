@@ -125,36 +125,32 @@ Get the Flyte configuration Secret name.
 {{- end -}}
 
 {{/*
-Whether the configuration Secret carries a storage credentials file (013-storage-secrets.yaml)
-for co-pilot to mount. Must stay in lockstep with the conditions guarding that key in
-config-secret.yaml: naming a key that is never written leaves every task pod stuck in
-ContainerCreating. secretKeyPath is excluded deliberately — it names a file that exists only
-in this deployment's own container, so mounting it into a task pod would stop co-pilot from
-starting; such deployments supply their own Secret via storage.copilotStorageSecretRef.
+Get the name of the Secret holding co-pilot's storage configuration.
 */}}
-{{- define "flyte-binary.configuration.copilotStorageSecretRendered" -}}
-{{- if and (eq "s3" .Values.configuration.storage.provider) (eq "accesskey" .Values.configuration.storage.providerConfig.s3.authType) -}}
-{{- .Values.configuration.storage.providerConfig.s3.secretKey -}}
-{{- end -}}
+{{- define "flyte-binary.configuration.copilotStorageSecretName" -}}
+{{- printf "%s-copilot-storage-config-secret" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
 
 {{/*
-Whether the projected files would give co-pilot a *complete* storage configuration. Co-pilot
-takes the stow config all-or-nothing — once it reads the mounted files, nothing is passed on
+Whether the projected file would give co-pilot a *complete* storage configuration. Co-pilot
+takes the stow config all-or-nothing — once it reads the mounted file, nothing is passed on
 its command line — so an incomplete mount leaves it with no credentials at all rather than
-falling back. Configuring it is therefore gated on this.
+falling back. Both rendering the Secret and pointing co-pilot at it are gated on this, and
+the two must stay in lockstep: naming a Secret that is never rendered leaves every task pod
+stuck in ContainerCreating.
 
-Complete when: the operator named the sources themselves; or the backend keeps everything in
-003-storage.yaml (gcs, azure); or S3 needs no credentials (authType=iam, resolved ambiently);
-or S3's credentials are in 013-storage-secrets.yaml.
+Complete when: the operator named a Secret themselves; or the backend keeps everything in the
+storage block (gcs, azure); or S3 needs no credentials (authType=iam, resolved ambiently); or
+S3's secretKey is a literal this chart can render.
 
-Incomplete for S3 with secretKeyPath and no copilotStorageSecretRef: 003-storage.yaml carries
-no credentials and the secret lives in a file only this deployment's container has. Those
-deployments keep receiving the stow config on the co-pilot command line, as before.
+Incomplete for S3 with secretKeyPath: the path names a file that exists only in this
+deployment's own container, so a task pod cannot read it whichever object carries the
+setting. Those deployments keep receiving the stow config on the co-pilot command line, as
+before, or supply their own Secret via storage.copilotStorageSecretRef.
 */}}
 {{- define "flyte-binary.configuration.copilotStorageComplete" -}}
 {{- with .Values.configuration.storage -}}
-{{- if or .copilotStorageConfigMapRef .copilotStorageSecretRef -}}
+{{- if .copilotStorageSecretRef -}}
 true
 {{- else if ne "s3" .provider -}}
 true

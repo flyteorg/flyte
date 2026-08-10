@@ -47,26 +47,19 @@ data:
           image: {{ printf "%s:%s" .repository .tag | quote }}
           {{- end }}
           {{- if include "flyte-binary.configuration.copilotStorageComplete" . }}
-          # Co-pilot reads its storage configuration from these objects, projected into its
-          # containers as files, rather than receiving it on its command line — where the
+          # Co-pilot reads its storage configuration from this Secret, projected into its
+          # containers as a file, rather than receiving it on its command line — where the
           # credentials would land in every task's pod spec and be readable by anyone who can
-          # read pods. Only the named keys are projected: co-pilot parses its config in strict
-          # mode and rejects the sections it does not recognise.
+          # read pods.
           #
-          # Emitted only when those files would be a complete configuration; see
-          # copilotStorageComplete. Otherwise co-pilot falls back to receiving the stow config
-          # on its command line, as it did before.
-          storage-config:
-            mount-path: /etc/flyte/copilot
-            config-map-name: {{ .Values.configuration.storage.copilotStorageConfigMapRef | default (include "flyte-binary.configuration.configMapName" .) | quote }}
-            config-map-keys:
-              - 003-storage.yaml
-            {{- $secretRef := .Values.configuration.storage.copilotStorageSecretRef | default (ternary (include "flyte-binary.configuration.configSecretName" .) "" (not (empty (include "flyte-binary.configuration.copilotStorageSecretRendered" .)))) }}
-            {{- if $secretRef }}
-            secret-name: {{ $secretRef | quote }}
-            secret-keys:
-              - 013-storage-secrets.yaml
-            {{- end }}
+          # The Secret carries the whole configuration — stow settings and credentials — in a
+          # single key, because co-pilot takes the stow config all-or-nothing. The plugin
+          # fixes the key name and the mount path, so its name is all that is set here.
+          #
+          # Emitted only when that file would be complete; see copilotStorageComplete.
+          # Otherwise co-pilot falls back to receiving the stow config on its command line,
+          # as it did before.
+          copilot-storage-config: {{ .Values.configuration.storage.copilotStorageSecretRef | default (include "flyte-binary.configuration.copilotStorageSecretName" .) | quote }}
           {{- end }}
         # Env vars injected into every task pod, so it can reach the control plane
         # to enqueue child actions and watch their state.
