@@ -12,7 +12,6 @@ import (
 	sparkOpCommon "github.com/kubeflow/spark-operator/v2/pkg/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
@@ -647,10 +646,9 @@ func (sparkResourceHandler) GetCompletionTime(resource client.Object) (time.Time
 }
 
 func init() {
-	if err := sparkOp.AddToScheme(scheme.Scheme); err != nil {
-		panic(err)
-	}
-
+	// Do not add the types to client-go's global scheme.Scheme: binaries that also link the legacy
+	// GoogleCloudPlatform spark-on-k8s-operator client would panic on registering a second Go type for
+	// the same GVK. The executor builds its scheme from the plugin registry entry below.
 	pluginmachinery.PluginRegistry().RegisterScheme(sparkTaskType, sparkOp.AddToScheme)
 
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
