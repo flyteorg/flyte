@@ -528,17 +528,15 @@ func (s *Service) GetActionData(
 		group.Go(func() error {
 			outputRef := storage.DataReference(urisResp.Msg.GetOutputsUri())
 			logger.Infof(groupCtx, "GetActionData: reading outputs from %s", outputRef)
-			var inputsOrOutputs task.Inputs
-			if err := s.dataStore.ReadProtobuf(groupCtx, outputRef, &inputsOrOutputs); err != nil {
+			outputs := &task.Outputs{}
+			if err := s.dataStore.ReadProtobuf(groupCtx, outputRef, outputs); err != nil {
 				if !storage.IsNotFound(err) {
 					logger.Errorf(groupCtx, "GetActionData: failed to read outputs from %s: %v", outputRef, err)
 					return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read outputs from %s: %w", outputRef, err))
 				}
 				logger.Debugf(groupCtx, "Outputs not found at %s (action may not have finished)", urisResp.Msg.GetOutputsUri())
 			} else {
-				resp.Outputs = &task.Outputs{
-					Literals: inputsOrOutputs.GetLiterals(),
-				}
+				resp.Outputs = outputs
 				resp.OutputsUri = urisResp.Msg.GetOutputsUri()
 				logger.Debugf(groupCtx, "Read %d output literals", len(resp.Outputs.Literals))
 			}

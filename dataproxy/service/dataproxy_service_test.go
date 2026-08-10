@@ -13,6 +13,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -555,9 +556,12 @@ func TestGetActionData(t *testing.T) {
 			{Name: "x", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 1}}}}}}},
 		},
 	}
-	storedOutputs := &task.Inputs{
+	storedOutputs := &task.Outputs{
 		Literals: []*task.NamedLiteral{
 			{Name: "o", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "result"}}}}}}},
+		},
+		ProducedArtifacts: []*task.ProducedArtifact{
+			{Output: "o", Name: "my-model", Version: "v1"},
 		},
 	}
 
@@ -690,6 +694,9 @@ func TestGetActionData(t *testing.T) {
 			if tt.expectOutputsLen > 0 {
 				assert.Equal(t, "o", resp.Msg.GetOutputs().GetLiterals()[0].GetName())
 				assert.Equal(t, tt.outputsURI, resp.Msg.GetOutputsUri())
+				// The produced-artifact declarations survive the outputs read.
+				require.Len(t, resp.Msg.GetOutputs().GetProducedArtifacts(), 1)
+				assert.Equal(t, "my-model", resp.Msg.GetOutputs().GetProducedArtifacts()[0].GetName())
 			} else {
 				assert.Empty(t, resp.Msg.GetOutputsUri())
 			}
