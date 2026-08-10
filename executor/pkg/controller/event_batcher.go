@@ -126,7 +126,6 @@ func (b *eventBatcher) flush(batch []*eventReq) {
 	ctx, span := b.tracer.Start(ctx, "eventBatcher.flush",
 		trace.WithLinks(links...),
 		trace.WithAttributes(attribute.Int("events.batch_size", len(batch))))
-	defer span.End()
 	_, err := b.client.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
 		Events: events,
 	}))
@@ -134,6 +133,7 @@ func (b *eventBatcher) flush(batch []*eventReq) {
 		span.RecordError(err)
 		span.SetStatus(otelcodes.Error, err.Error())
 	}
+	span.End()
 	for _, r := range batch {
 		r.done <- err
 	}
