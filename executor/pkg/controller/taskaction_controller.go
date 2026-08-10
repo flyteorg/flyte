@@ -45,8 +45,10 @@ import (
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
+	pluginserrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -178,9 +180,30 @@ func (r *TaskActionReconciler) resetPluginResource(
 	taskAction.Status.PluginStateVersion = 0
 }
 
+// nonRetryableErrorCodes are plugin error codes whose failures are deterministic:
+// the same input produces the same error, so retrying cannot change the outcome.
+// Note this only matches errors returned directly by a plugin; errors built from
+// a failure phase go through systemErrorFromPhaseInfo, which flattens the code
+// into the message text.
+var nonRetryableErrorCodes = []stdErrors.ErrorCode{
+	pluginserrors.BadTaskSpecification,
+	pluginserrors.MetadataTooLarge,
+}
+
+// nonRetryableCode reports the first non-retryable code found in err's cause chain.
+func nonRetryableCode(err error) (stdErrors.ErrorCode, bool) {
+	for _, code := range nonRetryableErrorCodes {
+		if stdErrors.IsCausedBy(err, code) {
+			return code, true
+		}
+	}
+	return "", false
+}
+
 // recordSystemError increments Status.SystemFailures and either requeues for
 // another attempt or, once the configured threshold is exceeded, converts the
-// TaskAction to a permanent failure. It does not touch the underlying plugin
+// TaskAction to a permanent failure. Errors carrying a non-retryable code skip
+// the counter entirely and fail immediately. It does not touch the underlying plugin
 // resource — callers that observed a failure phase should invoke
 // resetPluginResource first.
 func (r *TaskActionReconciler) recordSystemError(
@@ -191,6 +214,16 @@ func (r *TaskActionReconciler) recordSystemError(
 	handleErr error,
 ) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
+
+	if code, ok := nonRetryableCode(handleErr); ok {
+		logger.Error(handleErr, "non-retryable plugin error, failing TaskAction", "plugin", pluginID, "code", code)
+		return r.finalizePermanentFailure(ctx, taskAction, original, &core.ExecutionError{
+			Kind:    core.ExecutionError_USER,
+			Code:    code,
+			Message: handleErr.Error(),
+		})
+	}
+
 	logger.Error(handleErr, "system error from plugin", "plugin", pluginID)
 	if r.Recorder != nil {
 		r.Recorder.Eventf(taskAction, nil, corev1.EventTypeWarning, string(FailedPluginHandle), "HandlingPlugin",

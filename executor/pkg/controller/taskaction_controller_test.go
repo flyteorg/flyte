@@ -34,6 +34,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	pluginserrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	k8sPlugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -406,6 +407,33 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(ta.Status.ErrorState.Code).To(Equal(MaxSystemFailuresExceededCode))
 			Expect(ta.Status.ErrorState.Kind).To(Equal("SYSTEM"))
 			Expect(ta.Status.ErrorState.Message).To(ContainSubstring("admission webhook"))
+			Expect(isTerminal(ta)).To(BeTrue())
+		})
+
+		It("fails immediately on a non-retryable error without consuming any attempts", func() {
+			r := &TaskActionReconciler{
+				Client:            k8sClient,
+				Scheme:            k8sClient.Scheme(),
+				Recorder:          events.NewFakeRecorder(10),
+				eventsClient:      &fakeEventsClient{},
+				MaxSystemFailures: 3,
+			}
+			ta := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, ta)).To(Succeed())
+			original := ta.DeepCopy()
+			startingAttempts := ta.Status.Attempts
+
+			handleErr := pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "invalid ray submission mode %q", "HttpMode")
+
+			res, err := r.recordSystemError(ctx, ta, original, "ray", handleErr)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(res.RequeueAfter).To(BeZero(), "terminal - should not requeue")
+			Expect(ta.Status.SystemFailures).To(BeZero(), "a deterministic failure must not consume system attempts")
+			Expect(ta.Status.Attempts).To(Equal(startingAttempts), "user retry budget must not be consumed")
+			Expect(ta.Status.ErrorState).NotTo(BeNil())
+			Expect(ta.Status.ErrorState.Code).To(Equal(pluginserrors.BadTaskSpecification))
+			Expect(ta.Status.ErrorState.Kind).To(Equal("USER"))
+			Expect(ta.Status.ErrorState.Message).To(ContainSubstring("invalid ray submission mode"))
 			Expect(isTerminal(ta)).To(BeTrue())
 		})
 	})
