@@ -248,7 +248,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		if cfg.GC.MaxTTL.Duration <= 0 {
 			return fmt.Errorf("executor: gc.maxTTL must be positive when gc is enabled, got %v", cfg.GC.MaxTTL.Duration)
 		}
-		gc := controller.NewGarbageCollector(mgr.GetClient(), mgr.GetAPIReader(), cfg.GC.Interval.Duration, cfg.GC.MaxTTL.Duration)
+		gc := controller.NewGarbageCollector(mgr.GetClient(), mgr.GetAPIReader(), cfg.GC.Interval.Duration, cfg.GC.MaxTTL.Duration, otelutils.GetMeterProvider(otelServiceName))
 		if err := mgr.Add(gc); err != nil {
 			return fmt.Errorf("executor: failed to add garbage collector: %w", err)
 		}

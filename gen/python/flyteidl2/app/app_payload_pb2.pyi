@@ -59,21 +59,35 @@ class DeleteResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
+class ConsumedArtifactFilter(_message.Message):
+    __slots__ = ["project", "domain", "name", "version"]
+    PROJECT_FIELD_NUMBER: _ClassVar[int]
+    DOMAIN_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    project: str
+    domain: str
+    name: str
+    version: str
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., version: _Optional[str] = ...) -> None: ...
+
 class ListRequest(_message.Message):
-    __slots__ = ["request", "org", "cluster_id", "project", "disable_identity_enrichment", "include_total_count"]
+    __slots__ = ["request", "org", "cluster_id", "project", "artifact", "disable_identity_enrichment", "include_total_count"]
     REQUEST_FIELD_NUMBER: _ClassVar[int]
     ORG_FIELD_NUMBER: _ClassVar[int]
     CLUSTER_ID_FIELD_NUMBER: _ClassVar[int]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
+    ARTIFACT_FIELD_NUMBER: _ClassVar[int]
     DISABLE_IDENTITY_ENRICHMENT_FIELD_NUMBER: _ClassVar[int]
     INCLUDE_TOTAL_COUNT_FIELD_NUMBER: _ClassVar[int]
     request: _list_pb2.ListRequest
     org: str
     cluster_id: _identifier_pb2.ClusterIdentifier
     project: _identifier_pb2.ProjectIdentifier
+    artifact: ConsumedArtifactFilter
     disable_identity_enrichment: bool
     include_total_count: bool
-    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., cluster_id: _Optional[_Union[_identifier_pb2.ClusterIdentifier, _Mapping]] = ..., project: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., disable_identity_enrichment: bool = ..., include_total_count: bool = ...) -> None: ...
+    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., cluster_id: _Optional[_Union[_identifier_pb2.ClusterIdentifier, _Mapping]] = ..., project: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., artifact: _Optional[_Union[ConsumedArtifactFilter, _Mapping]] = ..., disable_identity_enrichment: bool = ..., include_total_count: bool = ...) -> None: ...
 
 class ListResponse(_message.Message):
     __slots__ = ["apps", "token", "total_count"]

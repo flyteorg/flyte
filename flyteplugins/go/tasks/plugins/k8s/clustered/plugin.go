@@ -22,7 +22,10 @@ type clusteredResourceHandler struct{}
 var _ k8s.Plugin = clusteredResourceHandler{}
 
 func (clusteredResourceHandler) GetProperties() k8s.PluginProperties {
-	return k8s.PluginProperties{}
+	// The plugin manager consumes this to stamp the JobSet name via
+	// GetGeneratedNameWith(0, GeneratedNameMaxLength), bounding it so derived child
+	// pod names fit the 63-char limit. See generatedNameMaxLength in util.go.
+	return k8s.PluginProperties{GeneratedNameMaxLength: &generatedNameMaxLength}
 }
 
 func (clusteredResourceHandler) IsTerminal(_ context.Context, resource client.Object) (bool, error) {
@@ -58,6 +61,9 @@ func (clusteredResourceHandler) GetCompletionTime(resource client.Object) (time.
 }
 
 func (clusteredResourceHandler) BuildIdentityResource(_ context.Context, _ pluginsCore.TaskExecutionMetadata) (client.Object, error) {
+	// No name is set here: the plugin manager's addObjectMetadata stamps the object name
+	// via GetGeneratedNameWith(0, GeneratedNameMaxLength) on both the create and lookup
+	// paths, so both resolve the same object without the plugin naming it.
 	return &jobsetv1alpha2.JobSet{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "JobSet",

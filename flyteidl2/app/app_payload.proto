@@ -64,6 +64,19 @@ message DeleteRequest {
 // Response message for deleting an app.
 message DeleteResponse {}
 
+// Filter for apps whose spec inputs reference the given artifact.
+// The artifact org is taken from the caller's organization.
+message ConsumedArtifactFilter {
+  // Project of the artifact.
+  string project = 1 [(buf.validate.field).string.min_len = 1];
+  // Domain of the artifact.
+  string domain = 2 [(buf.validate.field).string.min_len = 1];
+  // Name of the artifact.
+  string name = 3 [(buf.validate.field).string.min_len = 1];
+  // Exact artifact version. Empty matches any version.
+  string version = 4;
+}
+
 // Request message for listing apps.
 message ListRequest {
   // Common list request parameters.
@@ -78,6 +91,8 @@ message ListRequest {
     common.ClusterIdentifier cluster_id = 3;
     // Project identifier for filtering apps.
     common.ProjectIdentifier project = 4;
+    // Apps consuming the given artifact as an input.
+    ConsumedArtifactFilter artifact = 7;
   }
 
   // Disable caller identity enrichment in the response.

@@ -615,7 +615,7 @@
         },
         "name": {
           "type": "string",
-          "description": "Name of the run. Must be unique across all runs in this org, project, and domain pairing."
+          "description": "Name of the run. Must be unique across all runs in this org, project, and domain pairing.\nMust be a valid DNS-1035 label (lowercase alphanumeric or '-', starting with a letter):\nk8s object names are derived from the run name."
         }
       },
       "description": "Unique identifier of a run."
@@ -2047,6 +2047,10 @@
         },
         "originator": {
           "$ref": "#/definitions/dataplaneLogLineOriginator"
+        },
+        "short_pod_name": {
+          "type": "string",
+          "description": "Last few characters of the pod name this line came from. Enough to tell replicas apart\nper line without repeating the full generated name. Empty when the source cannot\nattribute the line to a pod."
         }
       }
     },

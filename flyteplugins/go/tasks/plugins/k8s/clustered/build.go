@@ -35,6 +35,12 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	if spec.GetReplicas() < 1 {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "replicas must be >= 1, got %d", spec.GetReplicas())
 	}
+	// generatedNameMaxLength reserves pod-index digits up to maxReplicasForNaming so the
+	// derived pod names stay within the 63-char limit. Beyond that the reservation is exceeded
+	// and the JobSet webhook would reject the pods, so fail fast with a clear spec error instead.
+	if spec.GetReplicas() > maxReplicasForNaming {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "replicas must be <= %d, got %d", maxReplicasForNaming, spec.GetReplicas())
+	}
 	if spec.GetNprocPerNode() < 1 {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nproc_per_node must be >= 1, got %d", spec.GetNprocPerNode())
 	}
@@ -77,15 +83,20 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	injectTorchRunEnv(container, &spec)
 
 	podSpec.RestartPolicy = corev1.RestartPolicyNever
-	// JobSet name doubles as the headless service / pod subdomain; both must be
-	// RFC 1123 subdomain-compatible. GeneratedName isn't guaranteed to be, so
-	// sanitize once and use the same value for both.
-	jobSetName := utils.ConvertToDNS1123SubdomainCompatibleString(taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
+	replicas := spec.GetReplicas()
+	// The plugin manager stamps the object name via GetGeneratedNameWith(0,
+	// GeneratedNameMaxLength) — sanitized to a DNS-1035 label and bounded so JobSet's
+	// derived child pod names stay within the 63-char limit (see generatedNameMaxLength
+	// in util.go). Derive the same name here for the headless service / pod subdomain,
+	// which must equal the JobSet name for pod DNS to resolve.
+	jobSetName, err := taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedNameWith(0, generatedNameMaxLength)
+	if err != nil {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "failed to derive JobSet name: %v", err)
+	}
 	if podSpec.Subdomain == "" {
 		podSpec.Subdomain = jobSetName
 	}
 
-	replicas := spec.GetReplicas()
 	completionMode := batchv1.IndexedCompletion
 	backoffLimit := int32(0)
 	jobSpec := batchv1.JobSpec{

@@ -1,14 +1,24 @@
 package k8s
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/validation/field"
+	k8sscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/ptr"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginsCoreMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
@@ -101,4 +111,54 @@ func TestAddObjectMetadata_GeneratedNameMaxLength(t *testing.T) {
 
 		assert.Equal(t, shortName, pod.GetName())
 	})
+}
+
+// metadataMock builds a TaskExecutionMetadata sufficient for addObjectMetadata, returning the
+// given generated name.
+func metadataMock(generatedName string) *pluginsCoreMock.TaskExecutionMetadata {
+	tID := &pluginsCoreMock.TaskExecutionID{}
+	tID.EXPECT().GetGeneratedName().Return(generatedName).Maybe()
+
+	meta := &pluginsCoreMock.TaskExecutionMetadata{}
+	meta.EXPECT().GetTaskExecutionID().Return(tID).Maybe()
+	meta.EXPECT().GetNamespace().Return("ns")
+	meta.EXPECT().GetAnnotations().Return(nil)
+	meta.EXPECT().GetLabels().Return(nil)
+	meta.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{})
+	return meta
+}
+
+// TestLaunchResource_InvalidCreateFastFails verifies that a deterministic admission/validation
+// rejection (e.g. a derived name exceeding k8s length limits) fast-fails instead of looping via
+// UnknownTransition and leaving the execution stuck RUNNING.
+func TestLaunchResource_InvalidCreateFastFails(t *testing.T) {
+	invalidErr := k8serrors.NewInvalid(
+		schema.GroupKind{Kind: "JobSet"}, "too-long-name",
+		field.ErrorList{field.Invalid(field.NewPath("metadata", "name"), "x", "must be no more than 63 characters")},
+	)
+	fakeClient := fake.NewClientBuilder().
+		WithScheme(k8sscheme.Scheme).
+		WithInterceptorFuncs(interceptor.Funcs{
+			Create: func(context.Context, client.WithWatch, client.Object, ...client.CreateOption) error {
+				return invalidErr
+			},
+		}).
+		Build()
+
+	kubeClient := &pluginsCoreMock.KubeClient{}
+	kubeClient.EXPECT().GetClient().Return(fakeClient)
+
+	plugin := &k8sMocks.Plugin{}
+	plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+	plugin.EXPECT().BuildResource(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+
+	tCtx := &pluginsCoreMock.TaskExecutionContext{}
+	tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("too-long-name"))
+
+	pm := NewPluginManager("test", plugin, kubeClient)
+
+	transition, err := pm.launchResource(context.Background(), tCtx)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhasePermanentFailure, transition.Info().Phase())
+	assert.Equal(t, "InvalidResource", transition.Info().Err().GetCode())
 }
