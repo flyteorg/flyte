@@ -45,7 +45,7 @@ export type TailLogsRequest = Message<"flyteidl2.app.TailLogsRequest"> & {
   } | { case: undefined; value?: undefined };
 
   /**
-   * Which backends to stream from. Defaults to LIVE_OR_PERSISTED. Use LIVE_ONLY to get the live
+   * Which backends to stream from. Defaults to PERSISTED_ONLY. Use LIVE_ONLY to get the live
    * tail without paying for a persisted-history scan, and re-request with LIVE_OR_PERSISTED when
    * the history is actually wanted.
    *

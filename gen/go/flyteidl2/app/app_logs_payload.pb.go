@@ -32,7 +32,7 @@ type TailLogsRequest struct {
 	//	*TailLogsRequest_AppId
 	//	*TailLogsRequest_ReplicaId
 	Target isTailLogsRequest_Target `protobuf_oneof:"target"`
-	// Which backends to stream from. Defaults to LIVE_OR_PERSISTED. Use LIVE_ONLY to get the live
+	// Which backends to stream from. Defaults to PERSISTED_ONLY. Use LIVE_ONLY to get the live
 	// tail without paying for a persisted-history scan, and re-request with LIVE_OR_PERSISTED when
 	// the history is actually wanted.
 	Source dataplane.LogsSource `protobuf:"varint,3,opt,name=source,proto3,enum=flyteidl2.logs.dataplane.LogsSource" json:"source,omitempty"`
