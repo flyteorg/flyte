@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/flyteorg/stow/s3"
@@ -85,13 +84,6 @@ func FlyteCoPilotContainer(ctx context.Context, name string, cfg config.FlyteCoP
 	}, nil
 }
 
-// Both exposures below are a property of the deployment's configuration, not of any one
-// task, so they are reported once per process rather than on every pod build.
-var (
-	warnOverrideExposure     sync.Once
-	warnUnconfiguredExposure sync.Once
-)
-
 // CopilotCommandArgs builds the co-pilot entrypoint.
 //
 // The stow config — endpoint and credentials alike — normally does NOT appear here.
@@ -135,17 +127,6 @@ func CopilotCommandArgs(ctx context.Context, storageConfig *storage.Config, stor
 		if !overridden {
 			return commands, nil
 		}
-		warnOverrideExposure.Do(func() {
-			logger.Warnf(ctx, "co-pilot storage-config-override is set, so the stow config is rendered "+
-				"into the task pod spec and any credentials it carries are readable by anyone who can read "+
-				"pods. Remove the override to have co-pilot read the mounted configuration instead.")
-		})
-	} else {
-		warnUnconfiguredExposure.Do(func() {
-			logger.Warnf(ctx, "co-pilot copilot-storage-config is not configured, so the stow config is "+
-				"rendered into the task pod spec and any credentials it carries are readable by anyone who "+
-				"can read pods. Set co-pilot.copilot-storage-config to close this.")
-		})
 	}
 
 	if len(storageConfig.Stow.Config) > 0 && len(storageConfig.Stow.Kind) > 0 {
