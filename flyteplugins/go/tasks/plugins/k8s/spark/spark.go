@@ -185,11 +185,15 @@ func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 	// generates (`spark-kubernetes-driver`/`spark-kubernetes-executor`); Flyte's own container
 	// names never match those, so merging it here would drop it on the floor.
 	if GetSparkConfig().EnablePodTemplate && podTemplateSupported(ctx) {
-		templatePodSpec := customPodSpec
-		if templatePodSpec == nil {
-			templatePodSpec = podSpec
+		templatePodSpec := podSpec.DeepCopy()
+		if customPodSpec != nil {
+			templatePodSpec = customPodSpec.DeepCopy()
+			// Preserve Flyte defaults when the user doesn't specify them in the custom pod spec.
+			if templatePodSpec.EnableServiceLinks == nil {
+				templatePodSpec.EnableServiceLinks = podSpec.EnableServiceLinks
+			}
 		}
-		spec.Template = &v1.PodTemplateSpec{Spec: *templatePodSpec.DeepCopy()}
+		spec.Template = &v1.PodTemplateSpec{Spec: *templatePodSpec}
 		sa := serviceAccountName(taskCtx.TaskExecutionMetadata())
 		spec.ServiceAccount = &sa
 	}
