@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,12 +19,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginsCoreMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	k8sMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 func TestAddObjectMetadata_GeneratedNameMaxLength(t *testing.T) {
@@ -161,4 +164,24 @@ func TestLaunchResource_InvalidCreateFastFails(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhasePermanentFailure, transition.Info().Phase())
 	assert.Equal(t, "InvalidResource", transition.Info().Err().GetCode())
+}
+
+func TestHandle_CorruptedPluginStateFailsPermanently(t *testing.T) {
+	stateReader := &pluginsCoreMock.PluginStateReader{}
+	// (0, err) matches PluginStateManager's contract: the version is zeroed on decode failure.
+	stateReader.EXPECT().Get(mock.Anything).Return(uint8(0), fmt.Errorf("gob: decode failed"))
+
+	tCtx := &pluginsCoreMock.TaskExecutionContext{}
+	tCtx.EXPECT().PluginStateReader().Return(stateReader)
+
+	plugin := &k8sMocks.Plugin{}
+	plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+
+	pm := NewPluginManager("test", plugin, &pluginsCoreMock.KubeClient{})
+
+	transition, err := pm.Handle(context.Background(), tCtx)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhasePermanentFailure, transition.Info().Phase())
+	assert.Equal(t, string(errors.CorruptedPluginState), transition.Info().Err().GetCode())
+	assert.Equal(t, core.ExecutionError_SYSTEM, transition.Info().Err().GetKind())
 }

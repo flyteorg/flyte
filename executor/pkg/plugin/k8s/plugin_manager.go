@@ -220,7 +220,9 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 	pluginState := PluginState{}
 	if v, err := tCtx.PluginStateReader().Get(&pluginState); err != nil {
 		if v != pluginStateVersion {
-			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure(errors.CorruptedPluginState,
+			// Failing to read plugin state is deterministic, the stored bytes don't
+			// change between reconciles, so fail permanently instead of retrying.
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemFailureWithCleanup(errors.CorruptedPluginState,
 				fmt.Sprintf("plugin state version mismatch expected [%d] got [%d]", pluginStateVersion, v), nil)), nil
 		}
 		return pluginsCore.UnknownTransition, errors.Wrapf(errors.CorruptedPluginState, err, "Failed to read unmarshal custom state")
