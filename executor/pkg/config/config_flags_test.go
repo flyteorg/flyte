@@ -337,6 +337,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_limitCacheToNamespace", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("limitCacheToNamespace", testValue)
+			if vBool, err := cmdFlags.GetBool("limitCacheToNamespace"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LimitCacheToNamespace)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_gc.interval", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

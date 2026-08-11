@@ -26,6 +26,7 @@ var (
 		Cluster:                 "",
 		MaxSystemFailures:       3,
 		MaxConcurrentReconciles: 512,
+		LimitCacheToNamespace:   false,
 		RequeueDuration:         stdconfig.Duration{Duration: 10 * time.Second},
 		GC: GCConfig{
 			Interval: stdconfig.Duration{Duration: 30 * time.Minute},
@@ -99,6 +100,20 @@ type Config struct {
 	// more reconciles and more load on the plugin backends. 0 or unset means the
 	// built-in default of 10s.
 	RequeueDuration stdconfig.Duration `json:"requeueDuration" pflag:",How long to wait before reconciling a running TaskAction again. 0 means the default of 10s"`
+
+	// LimitCacheToNamespace scopes the controller-runtime informer cache to the single
+	// namespace the executor operates in, instead of watching every namespace in the
+	// cluster.
+	//
+	// Defaults to false, which preserves the cluster-wide behaviour. On a large
+	// multi-tenant cluster the cluster-wide cache holds every Pod in the cluster and
+	// can require several GB of memory, so operators running the executor in a single
+	// namespace will usually want this enabled.
+	//
+	// Only enable this when every task pod runs in the executor's own namespace. The
+	// PodTemplate informer is unaffected and still watches every namespace, so
+	// per-namespace PodTemplate overrides keep working.
+	LimitCacheToNamespace bool `json:"limitCacheToNamespace" pflag:",Scope the informer cache to the executor's own namespace instead of the whole cluster"`
 
 	// GC configures the garbage collector for terminal TaskActions.
 	GC GCConfig `json:"gc" pflag:",Garbage collector configuration for terminal TaskActions"`

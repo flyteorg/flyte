@@ -10,6 +10,7 @@ import (
 	metricnoop "go.opentelemetry.io/otel/metric/noop"
 	toolscache "k8s.io/client-go/tools/cache"
 	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 )
@@ -112,6 +113,9 @@ func countByPhase(items []*flyteorgv1.TaskAction) map[string]int64 {
 // this is what keeps the active gauge cheap when many TaskActions exist. The indexer
 // is resolved lazily on first call, because the cache is not yet started when the
 // reconciler is constructed.
+//
+// A namespace-scoped cache (the executor's limitCacheToNamespace option) exposes no
+// indexer, so this falls back to the cache's List rather than dropping the gauge.
 func cachedPhaseCounter(c ctrlcache.Cache) func(context.Context) map[string]int64 {
 	var indexer toolscache.Indexer
 	return func(ctx context.Context) map[string]int64 {
@@ -127,7 +131,7 @@ func cachedPhaseCounter(c ctrlcache.Cache) func(context.Context) map[string]int6
 			}
 			sii, ok := informer.(toolscache.SharedIndexInformer)
 			if !ok {
-				return nil
+				return listPhaseCounts(ctx, c)
 			}
 			indexer = sii.GetIndexer()
 		}
@@ -140,6 +144,26 @@ func cachedPhaseCounter(c ctrlcache.Cache) func(context.Context) map[string]int6
 		}
 		return countByPhase(items)
 	}
+}
+
+// listPhaseCounts tallies TaskActions by phase through the cache's List, for caches
+// that do not expose an indexer.
+//
+// UnsafeDisableDeepCopy keeps this as cheap as the indexer path: a cache List otherwise
+// deep-copies every TaskAction on every collection cycle, which is the allocation churn
+// the indexer path exists to avoid, on the memory-constrained deployments that enable
+// namespace scoping in the first place. Safe here because the objects are only read for
+// their phase and never mutated or retained.
+func listPhaseCounts(ctx context.Context, c ctrlcache.Cache) map[string]int64 {
+	var list flyteorgv1.TaskActionList
+	if err := c.List(ctx, &list, client.UnsafeDisableDeepCopy); err != nil {
+		return nil
+	}
+	items := make([]*flyteorgv1.TaskAction, 0, len(list.Items))
+	for i := range list.Items {
+		items = append(items, &list.Items[i])
+	}
+	return countByPhase(items)
 }
 
 // observeCRDSize records the serialized size of a TaskAction CRD. No-op when

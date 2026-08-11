@@ -14,6 +14,9 @@ import (
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 )
 
@@ -137,4 +140,65 @@ func TestRecordK8sOp(t *testing.T) {
 	assert.NotPanics(t, func() {
 		nilMetrics.recordK8sOp(context.Background(), opGet, time.Now(), nil)
 	})
+}
+
+// stubInformer embeds the cache.Informer interface, so it deliberately does NOT
+// implement toolscache.SharedIndexInformer -- matching controller-runtime's
+// multiNamespaceInformer, which a namespace-scoped cache returns and which exposes
+// no indexer.
+type stubInformer struct {
+	ctrlcache.Informer
+}
+
+// stubNoIndexerCache mimics a namespace-scoped controller-runtime cache: its
+// informer has no indexer, so callers must fall back to List.
+type stubNoIndexerCache struct {
+	ctrlcache.Cache
+	items     []flyteorgv1.TaskAction
+	listCalls int
+	listOpts  []client.ListOption
+}
+
+func (c *stubNoIndexerCache) GetInformer(_ context.Context, _ client.Object, _ ...ctrlcache.InformerGetOption) (ctrlcache.Informer, error) {
+	return stubInformer{}, nil
+}
+
+func (c *stubNoIndexerCache) List(_ context.Context, list client.ObjectList, opts ...client.ListOption) error {
+	tal, ok := list.(*flyteorgv1.TaskActionList)
+	if !ok {
+		return errors.New("unexpected list type")
+	}
+	c.listCalls++
+	c.listOpts = opts
+	tal.Items = c.items
+	return nil
+}
+
+// TestCachedPhaseCounterFallsBackWithoutIndexer covers the namespace-scoped cache
+// path: controller-runtime returns an informer with no indexer, so the counter must
+// list through the cache rather than silently reporting nothing.
+func TestCachedPhaseCounterFallsBackWithoutIndexer(t *testing.T) {
+	c := &stubNoIndexerCache{items: []flyteorgv1.TaskAction{
+		{ObjectMeta: metav1.ObjectMeta{Name: "ta-1"}, Status: flyteorgv1.TaskActionStatus{PluginPhase: "Executing"}},
+		{ObjectMeta: metav1.ObjectMeta{Name: "ta-2"}, Status: flyteorgv1.TaskActionStatus{PluginPhase: "Executing"}},
+		{ObjectMeta: metav1.ObjectMeta{Name: "ta-3"}},
+	}}
+
+	counter := cachedPhaseCounter(c)
+	assert.Equal(t, map[string]int64{"Executing": 2, "Unknown": 1}, counter(context.Background()))
+
+	// The gauge is observed once per export, so the informer lookup is repeated rather
+	// than cached; what matters is that every cycle keeps reporting.
+	assert.Equal(t, map[string]int64{"Executing": 2, "Unknown": 1}, counter(context.Background()))
+	assert.Equal(t, 2, c.listCalls)
+
+	// Deep copying every TaskAction each cycle would reintroduce the allocation churn
+	// namespace scoping is meant to remove, so the List must opt out of it.
+	assert.Equal(t, []client.ListOption{client.UnsafeDisableDeepCopy}, c.listOpts)
+}
+
+// TestCachedPhaseCounterNilCache guards the no-cache path used when metrics are
+// registered without a manager cache.
+func TestCachedPhaseCounterNilCache(t *testing.T) {
+	assert.Nil(t, cachedPhaseCounter(nil)(context.Background()))
 }

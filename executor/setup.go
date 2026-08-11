@@ -17,6 +17,7 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	k8scache "k8s.io/client-go/tools/cache"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/metrics/filters"
@@ -117,9 +118,19 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		metricsServerOptions.KeyName = cfg.MetricsCertKey
 	}
 
+	// By default controller-runtime caches watched objects across every namespace.
+	// When the executor only ever operates in a single namespace, that cache holds
+	// every Pod in the cluster, which on a large multi-tenant cluster costs several
+	// GB of memory. LimitCacheToNamespace scopes it to sc.Namespace instead.
+	cacheOptions := cache.Options{}
+	if cfg.LimitCacheToNamespace {
+		cacheOptions.DefaultNamespaces = map[string]cache.Config{sc.Namespace: {}}
+	}
+
 	mgr, err := ctrl.NewManager(sc.K8sConfig, ctrl.Options{
 		Scheme:                 scheme,
 		Metrics:                metricsServerOptions,
+		Cache:                  cacheOptions,
 		WebhookServer:          webhook.NewServer(webhookServerOptions),
 		HealthProbeBindAddress: cfg.HealthProbeBindAddress,
 		LeaderElection:         cfg.LeaderElect,
