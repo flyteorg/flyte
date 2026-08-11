@@ -29,6 +29,57 @@ The backend's whole job is: when a sub-action is enqueued on a recovery run and 
 run already has a successful action of the same name, record it as terminal with the source's
 output URI and never execute it. Everything else is machinery in service of that.
 
+## Data flow
+
+**1 — Run creation. The only enqueue that carries a RunSpec.**
+
+```
+   ┌──────────────┐
+   │  SDK client  │
+   └──────┬───────┘
+          │  CreateRun { RunSpec.relation = RECOVER → r1 }
+          ▼
+   ┌──────────────────┐
+   │   runs service   │   validate: source run exists, is terminal,
+   └──────┬───────────┘             same project/domain
+          │  Enqueue(root action, runSpec)
+          ▼
+   ┌──────────────────┐
+   │ actions service  │   RunSpec.relation + .recover
+   └──────┬───────────┘        └─► Spec.RecoveryContext          (D1)
+          │  Create
+          ▼
+   ┌──────────────────────┐
+   │ etcd: root TaskAction│
+   └──────────────────────┘
+```
+
+**2 — One sub-action enqueue. No RunSpec on this path; the context is inherited.**
+
+```
+   ┌────────────────────────┐
+   │ SDK controller         │  runs inside the parent's task pod
+   └──────────┬─────────────┘
+              │  Enqueue(action)          ← carries no RunSpec
+              ▼
+   ┌────────────────────────────────────────────────────────┐
+   │ actions service                                        │
+   │                                                        │
+   │   1. Get parent TaskAction  ──►  RecoveryContext   (D1) │
+   │   2. gate ladder                                       │
+   │   3. still a candidate?  look the source action up     │
+   └───────┬────────────────────────────────┬───────────────┘
+           │ LookupAction(                  │  Create TaskAction
+           │   source run, action name)     │
+           ▼                                ▼
+   ┌──────────────────┐         ┌───────────────────────────────┐
+   │   runs service   │         │ etcd: TaskAction CR           │
+   │   └─ Postgres    │   (D2)  │   hit  → Spec.RecoveredFrom   │
+   └──────────────────┘         │   miss → exactly as today     │
+                                └───────────────────────────────┘
+```
+
+
 ## Constraints this repo imposes
 
 Three properties of the current architecture shape the whole design.
