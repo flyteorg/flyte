@@ -221,14 +221,12 @@ recovery that cannot happen must degrade into an ordinary execution, not an erro
 
 | # | gate | notes |
 |---|---|---|
-| 1 | is this the root action? | The root always runs fresh: nothing else re-drives the DAG. |
+| 1 | is this the root action? | The root always runs fresh |
 | 2 | is `relation_type == RELATION_TYPE_RECOVER` with a non-nil `related_to`? | Read from the inherited spec (D1). `rerun` shares the field with a different type — the type is what makes it a recovery. |
 | 3 | is the action name in `RunSpec.recover.force_rerun_actions`? | Escape hatch. Evaluated **before** any lookup. Listing a parent forces only that parent; children are decided independently, so forcing a subtree means listing all of it. |
 | 4 | do project/domain match the source run? | Scope gate. The lookup is keyed by run identity, so a cross-scope relation would read another tenant's rows and leak output URIs. `CreateRun` validation should make this unreachable; keep it as defence in depth. |
-| 5 | does the source run have an action of this name? | The Postgres point-read (D2). |
-| 6 | is that action terminal and successful? | See the open question on attempt finality below. |
 
-On all six passing: populate `Spec.RecoveredFrom` and create the CR (D3). Otherwise create the
+On all four passing: populate `Spec.RecoveredFrom` and create the CR (D3). Otherwise create the
 CR as it is created today.
 
 **Matching is action-name string equality and nothing else.** No hash comparison, no
