@@ -52,6 +52,7 @@ spec:
               number: {{ .Values.console.service.port }}
         path: {{ .Values.console.basePath }}/*
         pathType: ImplementationSpecific
+      {{- if not .Values.ingress.apiJwtIngress.enabled }}
       {{- $paths := (include "flyte-binary.ingress.apiPaths" .) | fromYamlArray }}
       {{- range $path := $paths }}
       - path: {{ $path }}
@@ -68,6 +69,7 @@ spec:
           serviceName: {{ include "flyte-binary.service.http.name" $ }}
           servicePort: {{ include "flyte-binary.service.http.port" $ }}
           {{- end }}
+      {{- end }}
       {{- end }}
       {{- if .Values.ingress.httpExtraPaths.append }}
       {{- tpl ( .Values.ingress.httpExtraPaths.append | toYaml ) . | nindent 6 }}
