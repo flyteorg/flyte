@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"testing"
 
@@ -135,6 +136,21 @@ func TestUpdateActionStatus_RejectedConditionTransitionDoesNotPersistOutput(t *t
 	}))
 	require.NoError(t, err)
 	assert.EqualValues(t, 0, resp.Msg.GetStatus().GetCode())
+}
+
+func TestUpdateActionStatus_MissingActionReturnsNotFound(t *testing.T) {
+	actionRepo, _, svc := newTestServiceWithTaskRepo(t)
+
+	actionRepo.On("UpdateActionPhase", mock.Anything, testActionID,
+		common.ActionPhase_ACTION_PHASE_SUCCEEDED, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(sql.ErrNoRows)
+
+	resp, err := svc.UpdateActionStatus(context.Background(), connect.NewRequest(&workflow.UpdateActionStatusRequest{
+		ActionId: testActionID,
+		Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED},
+	}))
+	require.NoError(t, err)
+	assert.EqualValues(t, connect.CodeNotFound, resp.Msg.GetStatus().GetCode())
 }
 
 func TestSignalEvent(t *testing.T) {

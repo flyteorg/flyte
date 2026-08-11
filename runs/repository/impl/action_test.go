@@ -308,6 +308,7 @@ func TestUpdateActionPhase_AllowsPausedTerminalTransitions(t *testing.T) {
 
 	for _, phase := range []common.ActionPhase{
 		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		common.ActionPhase_ACTION_PHASE_FAILED,
 		common.ActionPhase_ACTION_PHASE_TIMED_OUT,
 		common.ActionPhase_ACTION_PHASE_ABORTED,
 	} {
@@ -329,6 +330,39 @@ func TestUpdateActionPhase_AllowsPausedTerminalTransitions(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, int32(phase), action.Phase)
 			assert.True(t, action.EndedAt.Valid)
+		})
+	}
+}
+
+func TestUpdateActionPhase_AllowsPausedRetryTransitions(t *testing.T) {
+	db := setupActionDB(t)
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	for _, phase := range []common.ActionPhase{
+		common.ActionPhase_ACTION_PHASE_QUEUED,
+		common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES,
+		common.ActionPhase_ACTION_PHASE_INITIALIZING,
+		common.ActionPhase_ACTION_PHASE_RUNNING,
+	} {
+		t.Run(phase.String(), func(t *testing.T) {
+			actionID := &common.ActionIdentifier{
+				Run:  &common.RunIdentifier{Project: "proj1", Domain: "domain1", Name: "run1"},
+				Name: "retry-" + phase.String(),
+			}
+			_, err := actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
+			require.NoError(t, err)
+			require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
+				common.ActionPhase_ACTION_PHASE_PAUSED, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
+
+			require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
+				phase, 2, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
+
+			action, err := actionRepo.GetAction(ctx, actionID)
+			require.NoError(t, err)
+			assert.Equal(t, int32(phase), action.Phase)
+			assert.Equal(t, uint32(2), action.Attempts)
 		})
 	}
 }

@@ -280,6 +280,9 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 			return nil
 		}
 		logger.Warnf(ctx, "UpdateActionStatus: failed to update action %s: %v", req.GetActionId().GetName(), err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return connect.NewError(connect.CodeNotFound, err)
+		}
 		return connect.NewError(connect.CodeInternal, err)
 	}
 
