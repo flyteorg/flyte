@@ -162,11 +162,10 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 
 		vol := storageConfigVolume(secretName)
 		assert.Len(t, vol.Projected.Sources, 1)
-		assert.NotNil(t, vol.Projected.Sources[0].Secret)
-		// Only the one key: copilotStorageSecretRef may name a Secret the chart did not
-		// render, whose other contents should not reach a task pod.
-		assert.Equal(t, []v1.KeyToPath{{Key: copilotStorageConfigKey, Path: copilotStorageConfigKey}},
-			vol.Projected.Sources[0].Secret.Items)
+		assert.Equal(t, secretName, vol.Projected.Sources[0].Secret.Name)
+		// No Items: the Secret holds co-pilot's config, so every key in it is projected
+		// and the *.yaml glob decides what is read.
+		assert.Nil(t, vol.Projected.Sources[0].Secret.Items)
 	})
 
 	t.Run("non-s3 backends are mounted the same way", func(t *testing.T) {
@@ -416,8 +415,7 @@ func TestAddCoPilotToPod_StorageCredentialsNeverInPodSpec(t *testing.T) {
 	assert.Equal(t, int32(0400), *projected[0].Projected.DefaultMode)
 	assert.Len(t, projected[0].Projected.Sources, 1, "the whole configuration lives in one Secret")
 	assert.Equal(t, "flyte-copilot-storage-config-secret", projected[0].Projected.Sources[0].Secret.Name)
-	assert.Equal(t, []v1.KeyToPath{{Key: copilotStorageConfigKey, Path: copilotStorageConfigKey}},
-		projected[0].Projected.Sources[0].Secret.Items)
+	assert.Nil(t, projected[0].Projected.Sources[0].Secret.Items)
 
 	// Only the co-pilot containers: the primary one runs user code.
 	hasConfigMount := func(c v1.Container) bool {

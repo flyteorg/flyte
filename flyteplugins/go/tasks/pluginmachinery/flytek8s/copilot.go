@@ -23,12 +23,9 @@ import (
 )
 
 const (
-	flyteSidecarContainerName    = "uploader"
-	flyteDownloaderContainerName = "downloader"
-	copilotConfigVolumeName      = "flyte-copilot-storage-config"
-	// The .yaml suffix is load-bearing: co-pilot is pointed at MountPath/*.yaml and viper
-	// infers the format from the extension, so an unsuffixed file is silently not read.
-	copilotStorageConfigKey       = "copilot-storage-config.yaml"
+	flyteSidecarContainerName     = "uploader"
+	flyteDownloaderContainerName  = "downloader"
+	copilotConfigVolumeName       = "flyte-copilot-storage-config"
 	copilotStorageConfigMountPath = "/etc/flyte/copilot"
 )
 
@@ -174,17 +171,15 @@ func DownloadCommandArgs(fromInputsPath, outputPrefix storage.DataReference, toL
 }
 
 // storageConfigVolume projects co-pilot's storage configuration into a read-only volume.
-// Only copilotStorageConfigKey is projected rather than the whole Secret, since the name
-// can point at an operator-supplied Secret whose other contents have no business being
-// mounted into a task pod.
+// The whole Secret is projected, not a fixed key: it exists to hold co-pilot's config, so
+// its keys are co-pilot's to name — and flytestdlib globs MountPath/*.yaml and merges one
+// viper per file, so a deployment may split that config across several ordered keys. Keys
+// not ending in .yaml are mounted but never read.
 func storageConfigVolume(storageConfigSecret string) v1.Volume {
 	mode := int32(0400)
 	projections := []v1.VolumeProjection{{
 		Secret: &v1.SecretProjection{
 			LocalObjectReference: v1.LocalObjectReference{Name: storageConfigSecret},
-			Items: []v1.KeyToPath{
-				{Key: copilotStorageConfigKey, Path: copilotStorageConfigKey},
-			},
 		},
 	}}
 	return v1.Volume{
