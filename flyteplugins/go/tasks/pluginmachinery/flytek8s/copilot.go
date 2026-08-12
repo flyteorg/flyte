@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/flyteorg/stow/s3"
 	"github.com/golang/protobuf/proto" //nolint: staticcheck
 	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
@@ -104,18 +103,7 @@ func CopilotCommandArgs(storageConfig *storage.Config, storageConfigSecret strin
 	}
 
 	if len(storageConfig.Stow.Config) > 0 && len(storageConfig.Stow.Kind) > 0 {
-		isS3 := storageConfig.Stow.Kind == s3.Kind
-		// resolveSecretKey stats secret_key_path regardless of auth_type, so forwarding a
-		// path the task pod cannot open stops co-pilot from starting. Drop it only once
-		// secret_key holds the credential: newStowRawStore reads the file into that key in
-		// this very map, but only for the deployment's own config — StorageConfigOverride
-		// is never handed to a DataStore, so nothing resolves it. Forwarding the path
-		// otherwise keeps working for operators who mount the file into task pods.
-		secretKeyResolved := storageConfig.Stow.Config[s3.ConfigSecretKey] != ""
 		for key, val := range storageConfig.Stow.Config {
-			if isS3 && secretKeyResolved && key == storage.ConfigSecretKeyPath {
-				continue
-			}
 			commands = append(commands, "--storage.stow.config")
 			commands = append(commands, fmt.Sprintf("%s=%s", key, val))
 		}
