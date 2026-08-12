@@ -41,7 +41,6 @@ func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []st
 	}
 
 	storageCfg := storage.GetConfig()
-	// Use override value if provided
 	overridden := cfg.StorageConfigOverride != nil
 	if overridden {
 		storageCfg = cfg.StorageConfigOverride
@@ -76,12 +75,12 @@ func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []st
 
 // CopilotCommandArgs builds the co-pilot entrypoint. When a Secret is configured the stow
 // config is left off the command line — where it would expose the storage credentials to
-// anyone who can read pods — and co-pilot is pointed at the projected file instead.
+// anyone who can read pods — and co-pilot is pointed at the projected files instead.
 //
 // stow.config is all-or-nothing: it binds to a StringToString pflag, which viper returns
-// whole rather than merging into the file's map, so passing it drops every key it does not
+// whole rather than merging into the mounted map, so passing it drops every key it does not
 // itself carry — including the credentials. The other flags are scalars and still override
-// the file key by key.
+// the mounted config key by key.
 func CopilotCommandArgs(storageConfig *storage.Config, storageConfigSecret string, overridden bool) ([]string, error) {
 	var commands = []string{
 		"/bin/flyte-copilot",
@@ -170,11 +169,10 @@ func DownloadCommandArgs(fromInputsPath, outputPrefix storage.DataReference, toL
 	}, nil
 }
 
-// storageConfigVolume projects co-pilot's storage configuration into a read-only volume.
-// The whole Secret is projected, not a fixed key: it exists to hold co-pilot's config, so
-// its keys are co-pilot's to name — and flytestdlib globs MountPath/*.yaml and merges one
-// viper per file, so a deployment may split that config across several ordered keys. Keys
-// not ending in .yaml are mounted but never read.
+// storageConfigVolume projects the Secret holding co-pilot's storage configuration. Every
+// key is projected rather than a fixed one, since flytestdlib globs MountPath/*.yaml and
+// merges one viper per file: a deployment may split the config across several ordered keys,
+// and keys not ending in .yaml are mounted but never read.
 func storageConfigVolume(storageConfigSecret string) v1.Volume {
 	mode := int32(0400)
 	projections := []v1.VolumeProjection{{
@@ -193,8 +191,6 @@ func storageConfigVolume(storageConfigSecret string) v1.Volume {
 	}
 }
 
-// storageConfigMount is attached to the co-pilot containers only — never to the primary
-// container, which runs user code and must not be able to read the storage credentials.
 func storageConfigMount() v1.VolumeMount {
 	return v1.VolumeMount{
 		Name:      copilotConfigVolumeName,
@@ -282,7 +278,8 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 		needsUploader := iFace.Outputs != nil && len(iFace.Outputs.Variables) > 0
 
 		// Shared by both co-pilot containers, so the volume is added once and mounted from
-		// each — but never from the primary container, which runs user code.
+		// each — but never from the primary container, which runs user code and must not be
+		// able to read the storage credentials.
 		var copilotMounts []v1.VolumeMount
 		if (needsDownloader || needsUploader) && cfg.CopilotStorageConfig != "" {
 			coPilotPod.Volumes = append(coPilotPod.Volumes, storageConfigVolume(cfg.CopilotStorageConfig))

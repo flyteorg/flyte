@@ -195,16 +195,14 @@ storage:
 
 {{/*
 Whether co-pilot reads its storage configuration from a Secret rather than from its command
-line. True when the chart can render that Secret in full, or the operator supplied one.
-Rendering the Secret and pointing co-pilot at it are both gated on this and must stay in
-lockstep: naming a Secret that is never rendered leaves every task pod stuck in
+line. Rendering that Secret and pointing co-pilot at it are both gated on this and must stay
+in lockstep: naming a Secret that is never rendered leaves every task pod stuck in
 ContainerCreating.
 
-False only for S3 with secretKeyPath, which names a file that exists solely in this
-deployment's own container, so the rendered Secret would carry no usable credentials — and
-co-pilot takes the stow config all-or-nothing, so a partial file is worse than none. Those
-deployments keep the stow config on the command line, or supply their own Secret via
-storage.copilotStorageSecretRef.
+False only for S3 with secretKeyPath, which names a file living solely in this deployment's
+container, so the rendered Secret would carry no usable credentials — and co-pilot takes the
+stow config all-or-nothing, making a partial file worse than none. Those deployments keep it
+on the command line, or supply their own Secret via storage.copilotStorageSecretRef.
 */}}
 {{- define "flyte-binary.configuration.copilotStorageFromSecret" -}}
 {{- with .Values.configuration.storage -}}

@@ -104,7 +104,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		// flytestdlib globs the pattern itself; the container has no shell to expand it.
 		assert.Contains(t, joined, "--config /etc/flyte/copilot/*.yaml")
 
-		// Scalar flags still travel, and still override the mounted file key by key.
+		// Scalar flags still travel, and still override the mounted config key by key.
 		assert.Contains(t, joined, "--storage.container=bucket")
 		assert.Contains(t, joined, "--storage.limits.maxDownloadMBs=0")
 	})
@@ -207,7 +207,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.NoError(t, err)
 		assert.ElementsMatch(t, c.Command, expectedCommand)
 
-		// The override cannot be expressed in the mounted file, so honouring it means
+		// The override cannot be expressed in the mounted config, so honouring it means
 		// taking all of stow.config from the command line.
 		joined := strings.Join(c.Command, " ")
 		assert.Contains(t, joined, "project_id=flyte-gcp")

@@ -92,13 +92,11 @@ configuration:
     # metadataContainer Bucket to store Flyte metadata
     metadataContainer: "my-organization-flyte-container"
     # copilotStorageSecretRef Name of an existing Secret holding co-pilot's complete storage
-    # configuration — stow settings and credentials — in one or more .yaml keys, projected
-    # into the co-pilot containers so the credentials stay out of task pod specs. The whole
-    # Secret is mounted and every .yaml key in it is read, so it must hold nothing else.
-    # Leave empty to have the chart render that Secret itself. Set it when using
-    # configuration.externalSecretRef, or s3.secretKeyPath — the latter names a file that
-    # exists only in this deployment's container, so co-pilot cannot read it from a task pod
-    # and needs a Secret carrying the credentials inline.
+    # configuration — stow settings and credentials — in one or more .yaml keys. The whole
+    # Secret is mounted into the co-pilot containers and every .yaml key in it is read, so
+    # it must hold nothing else. Leave empty to have the chart render that Secret itself;
+    # set it when using s3.secretKeyPath, which names a file that exists only in this
+    # deployment's container and so cannot be read from a task pod.
     copilotStorageSecretRef: ""
     # provider Object store provider (Supported values: s3, gcs)
     provider: s3

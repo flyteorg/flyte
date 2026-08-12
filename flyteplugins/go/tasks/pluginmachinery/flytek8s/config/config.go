@@ -334,8 +334,8 @@ type FlyteCoPilotConfig struct {
 	// CopilotStorageConfig names a Secret — see CopilotCommandArgs.
 	StorageConfigOverride *storage.Config `json:"storage-config-override" pflag:"-,Override for the storage config to use for co-pilot"`
 	// Secret holding co-pilot's whole storage configuration, projected into the co-pilot
-	// containers as a file so the credentials stay out of the pod spec. Empty falls back
-	// to passing the stow config on the command line.
+	// containers so the credentials stay out of the pod spec. Empty falls back to passing
+	// the stow config on the command line.
 	CopilotStorageConfig string `json:"copilot-storage-config" pflag:",Secret holding co-pilot's storage configuration"`
 }
 
