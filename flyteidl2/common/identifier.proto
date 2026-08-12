@@ -94,14 +94,10 @@ message RunIdentifier {
     (buf.validate.field).string.max_len = 63
   ];
 
-  // Name of the run. Must be unique across all runs in this org, project, and domain pairing.
-  // Must be a valid DNS-1035 label (lowercase alphanumeric or '-', starting with a letter):
-  // k8s object names are derived from the run name.
-  string name = 4 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 30
-    pattern: "^[a-z]([-a-z0-9]*[a-z0-9])?$"
-  }];
+  string name = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 30
+  ];
 }
 
 // Unique identifier of an action.

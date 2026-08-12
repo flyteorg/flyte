@@ -614,8 +614,7 @@
           "description": "Domain this run belongs to."
         },
         "name": {
-          "type": "string",
-          "description": "Name of the run. Must be unique across all runs in this org, project, and domain pairing.\nMust be a valid DNS-1035 label (lowercase alphanumeric or '-', starting with a letter):\nk8s object names are derived from the run name."
+          "type": "string"
         }
       },
       "description": "Unique identifier of a run."
