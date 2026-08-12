@@ -215,6 +215,37 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.Contains(t, joined, "--config /etc/flyte/copilot/*.yaml")
 	})
 
+	t.Run("an override's secret_key_path survives, since nothing resolved it", func(t *testing.T) {
+		// storage.GetConfig() gets its secret_key_path read into secret_key by
+		// newStowRawStore, but StorageConfigOverride is never handed to a DataStore, so
+		// dropping the path here would leave co-pilot with no credential at all. The
+		// operator mounting that file into task pods is the only way this ever worked.
+		override := storage.Config{}
+		override.Type = storage.TypeStow
+		override.InitContainer = "bucket"
+		override.Stow.Kind = "s3"
+		override.Stow.Config = map[string]string{
+			"auth_type":       "accesskey",
+			"access_key_id":   "AKIAOVERRIDE",
+			"secret_key_path": "/etc/flyte/storage/secret_key",
+			"region":          "us-east-1",
+		}
+
+		command, err := CopilotCommandArgs(&override, cfg.StorageConfigSecretName, true)
+		assert.NoError(t, err)
+		joined := strings.Join(command, " ")
+		assert.Contains(t, joined, "secret_key_path=/etc/flyte/storage/secret_key")
+
+		// Once secret_key carries the credential the path is redundant, and forwarding it
+		// would make co-pilot stat a file the task pod has no reason to hold.
+		override.Stow.Config["secret_key"] = "resolved-from-file"
+		command, err = CopilotCommandArgs(&override, cfg.StorageConfigSecretName, true)
+		assert.NoError(t, err)
+		joined = strings.Join(command, " ")
+		assert.Contains(t, joined, "secret_key=resolved-from-file")
+		assert.NotContains(t, joined, "secret_key_path")
+	})
+
 	t.Run("bad-res-cpu", func(t *testing.T) {
 		old := cfg.CPU
 		cfg.CPU = "x"

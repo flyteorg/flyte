@@ -105,14 +105,15 @@ func CopilotCommandArgs(storageConfig *storage.Config, storageConfigSecret strin
 
 	if len(storageConfig.Stow.Config) > 0 && len(storageConfig.Stow.Kind) > 0 {
 		isS3 := storageConfig.Stow.Kind == s3.Kind
+		// resolveSecretKey stats secret_key_path regardless of auth_type, so forwarding a
+		// path the task pod cannot open stops co-pilot from starting. Drop it only once
+		// secret_key holds the credential: newStowRawStore reads the file into that key in
+		// this very map, but only for the deployment's own config — StorageConfigOverride
+		// is never handed to a DataStore, so nothing resolves it. Forwarding the path
+		// otherwise keeps working for operators who mount the file into task pods.
+		secretKeyResolved := storageConfig.Stow.Config[s3.ConfigSecretKey] != ""
 		for key, val := range storageConfig.Stow.Config {
-			// secret_key_path names a file that exists only in this deployment's own
-			// container, and resolveSecretKey stats it regardless of auth_type, so
-			// forwarding it stops co-pilot from starting. Dropping it loses nothing:
-			// newStowRawStore has already read that file into secret_key in this very
-			// map — it mutates storage.GetConfig().Stow.Config in place — so the
-			// credential co-pilot needs is carried by the key above.
-			if isS3 && key == storage.ConfigSecretKeyPath {
+			if isS3 && secretKeyResolved && key == storage.ConfigSecretKeyPath {
 				continue
 			}
 			commands = append(commands, "--storage.stow.config")
