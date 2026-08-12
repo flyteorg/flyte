@@ -25,21 +25,14 @@ import (
 const (
 	flyteSidecarContainerName    = "uploader"
 	flyteDownloaderContainerName = "downloader"
-	// copilotConfigVolumeName holds the projected storage configuration. Mounted on the
-	// co-pilot containers only.
-	copilotConfigVolumeName = "flyte-copilot-storage-config"
-	// copilotStorageConfigKey is the key within the Secret that co-pilot's storage
-	// configuration is written to, and the filename it is projected under. The .yaml
-	// suffix is load-bearing: co-pilot is pointed at MountPath/*.yaml, and viper infers
-	// the format from the extension — an unsuffixed file is silently not read.
-	copilotStorageConfigKey = "copilot-storage-config.yaml"
-	// copilotStorageConfigMountPath is where the Secret is projected. Fixed rather than
-	// configurable: it is a path inside a container this plugin fully controls, and
-	// nothing else is mounted there.
+	copilotConfigVolumeName      = "flyte-copilot-storage-config"
+	// The .yaml suffix is load-bearing: co-pilot is pointed at MountPath/*.yaml and viper
+	// infers the format from the extension, so an unsuffixed file is silently not read.
+	copilotStorageConfigKey       = "copilot-storage-config.yaml"
 	copilotStorageConfigMountPath = "/etc/flyte/copilot"
 )
 
-func FlyteCoPilotContainer(ctx context.Context, name string, cfg config.FlyteCoPilotConfig, args []string, volumeMounts ...v1.VolumeMount) (v1.Container, error) {
+func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []string, volumeMounts ...v1.VolumeMount) (v1.Container, error) {
 	cpu, err := resource.ParseQuantity(cfg.CPU)
 	if err != nil {
 		return v1.Container{}, err
@@ -51,13 +44,13 @@ func FlyteCoPilotContainer(ctx context.Context, name string, cfg config.FlyteCoP
 	}
 
 	storageCfg := storage.GetConfig()
-	// Use override value if provideds
+	// Use override value if provided
 	overridden := cfg.StorageConfigOverride != nil
 	if overridden {
 		storageCfg = cfg.StorageConfigOverride
 	}
 
-	command, err := CopilotCommandArgs(ctx, storageCfg, cfg.CopilotStorageConfig, overridden)
+	command, err := CopilotCommandArgs(storageCfg, cfg.CopilotStorageConfig, overridden)
 	if err != nil {
 		return v1.Container{}, err
 	}
@@ -84,30 +77,15 @@ func FlyteCoPilotContainer(ctx context.Context, name string, cfg config.FlyteCoP
 	}, nil
 }
 
-// CopilotCommandArgs builds the co-pilot entrypoint.
+// CopilotCommandArgs builds the co-pilot entrypoint. When a Secret is configured the stow
+// config is left off the command line — where it would expose the storage credentials to
+// anyone who can read pods — and co-pilot is pointed at the projected file instead.
 //
-// The stow config — endpoint and credentials alike — normally does NOT appear here.
-// Rendering it would publish the storage credentials in every task's pod spec, where any
-// principal that can read pods could recover them without access to the Secret holding
-// them. Instead AddCoPilotToPod projects the deployment's storage Secret into the co-pilot
-// containers and this function points co-pilot at it with --config, which flytestdlib globs
-// and merges (one viper per file).
-//
-// The remaining flags are all scalars, so they still override the mounted files key by
-// key — viper resolves each key from the highest-precedence source that has it. That is
-// what keeps --storage.container and friends working as operator-facing overrides.
-// storage.stow.config is the exception: it binds to a StringToString pflag, and viper
-// returns a set map flag whole rather than merging it into the file's map, so passing it
-// would silently drop every key it does not itself carry — including the credentials.
-// Hence it is all-or-nothing, and the two cases where it is rendered take all of it:
-//
-//   - No Secret configured. Deployments that predate this setting keep working exactly
-//     as before, at the cost of the exposure above — hence the warning. It closes when
-//     they set co-pilot.copilot-storage-config.
-//   - StorageConfigOverride set. The operator has deliberately given co-pilot a different
-//     storage config, and the mounted file cannot express it. Honouring the override
-//     means putting all of it on the command line, warning included.
-func CopilotCommandArgs(ctx context.Context, storageConfig *storage.Config, storageConfigSecret string, overridden bool) ([]string, error) {
+// stow.config is all-or-nothing: it binds to a StringToString pflag, which viper returns
+// whole rather than merging into the file's map, so passing it drops every key it does not
+// itself carry — including the credentials. The other flags are scalars and still override
+// the file key by key.
+func CopilotCommandArgs(storageConfig *storage.Config, storageConfigSecret string, overridden bool) ([]string, error) {
 	var commands = []string{
 		"/bin/flyte-copilot",
 		"--storage.limits.maxDownloadMBs=0",
@@ -132,9 +110,9 @@ func CopilotCommandArgs(ctx context.Context, storageConfig *storage.Config, stor
 	if len(storageConfig.Stow.Config) > 0 && len(storageConfig.Stow.Kind) > 0 {
 		isS3 := storageConfig.Stow.Kind == s3.Kind
 		for key, val := range storageConfig.Stow.Config {
-			// secret_key_path is never forwarded: it names a file in the deployment's own
-			// container, which does not exist in a task pod, and newStowRawStore stats it
-			// regardless of auth_type — so passing it stops co-pilot from starting at all.
+			// newStowRawStore stats secret_key_path regardless of auth_type, and the file
+			// exists only in this deployment's container — forwarding it would stop
+			// co-pilot from starting at all.
 			if isS3 && key == storage.ConfigSecretKeyPath {
 				continue
 			}
@@ -196,25 +174,19 @@ func DownloadCommandArgs(fromInputsPath, outputPrefix storage.DataReference, toL
 }
 
 // storageConfigVolume projects co-pilot's storage configuration into a read-only volume.
-//
-// Only copilotStorageConfigKey is projected, never the whole Secret: a deployment may keep
-// other entries in it, and anything co-pilot does not recognise is not merely wasted — its
-// strict-mode config loader rejects sections it does not know and refuses to start. The
-// projection is skipped entirely when no Secret is named, since naming a key that is never
-// written would leave the pod stuck in ContainerCreating.
+// Only copilotStorageConfigKey is projected rather than the whole Secret, since the name
+// can point at an operator-supplied Secret whose other contents have no business being
+// mounted into a task pod.
 func storageConfigVolume(storageConfigSecret string) v1.Volume {
-	// Read-only for the owner: co-pilot only reads this, and the containers run as
-	// whatever user the image declares.
 	mode := int32(0400)
-	projections := make([]v1.VolumeProjection, 0, 1)
-	if storageConfigSecret != "" {
-		projections = append(projections, v1.VolumeProjection{
-			Secret: &v1.SecretProjection{
-				LocalObjectReference: v1.LocalObjectReference{Name: storageConfigSecret},
-				Items:                keyToPaths([]string{copilotStorageConfigKey}),
+	projections := []v1.VolumeProjection{{
+		Secret: &v1.SecretProjection{
+			LocalObjectReference: v1.LocalObjectReference{Name: storageConfigSecret},
+			Items: []v1.KeyToPath{
+				{Key: copilotStorageConfigKey, Path: copilotStorageConfigKey},
 			},
-		})
-	}
+		},
+	}}
 	return v1.Volume{
 		Name: copilotConfigVolumeName,
 		VolumeSource: v1.VolumeSource{
@@ -226,28 +198,14 @@ func storageConfigVolume(storageConfigSecret string) v1.Volume {
 	}
 }
 
-// storageConfigMount is the mount matching storageConfigVolume. It is attached to the
-// co-pilot containers only — never to the primary container, which runs user code and
-// must not be able to read the storage credentials.
+// storageConfigMount is attached to the co-pilot containers only — never to the primary
+// container, which runs user code and must not be able to read the storage credentials.
 func storageConfigMount() v1.VolumeMount {
 	return v1.VolumeMount{
 		Name:      copilotConfigVolumeName,
 		MountPath: copilotStorageConfigMountPath,
 		ReadOnly:  true,
 	}
-}
-
-// keyToPaths projects each key under its own name, so the mounted filenames match the
-// keys the deployment already uses and their numeric prefixes keep ordering the merge.
-func keyToPaths(keys []string) []v1.KeyToPath {
-	if len(keys) == 0 {
-		return nil
-	}
-	items := make([]v1.KeyToPath, 0, len(keys))
-	for _, k := range keys {
-		items = append(items, v1.KeyToPath{Key: k, Path: k})
-	}
-	return items
 }
 
 func DataVolume(name string, size *resource.Quantity) v1.Volume {
@@ -328,9 +286,8 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 		needsDownloader := iFace.Inputs != nil && len(iFace.Inputs.Variables) > 0
 		needsUploader := iFace.Outputs != nil && len(iFace.Outputs.Variables) > 0
 
-		// The storage config is shared by both co-pilot containers, so the volume is added
-		// once here and mounted from each. It is deliberately absent from the primary
-		// container's mounts: that one runs user code.
+		// Shared by both co-pilot containers, so the volume is added once and mounted from
+		// each — but never from the primary container, which runs user code.
 		var copilotMounts []v1.VolumeMount
 		if (needsDownloader || needsUploader) && cfg.CopilotStorageConfig != "" {
 			coPilotPod.Volumes = append(coPilotPod.Volumes, storageConfigVolume(cfg.CopilotStorageConfig))
@@ -360,7 +317,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			if err != nil {
 				return err
 			}
-			downloader, err := FlyteCoPilotContainer(ctx, flyteDownloaderContainerName, cfg, args,
+			downloader, err := FlyteCoPilotContainer(flyteDownloaderContainerName, cfg, args,
 				append([]v1.VolumeMount{inputsVolumeMount}, copilotMounts...)...)
 			if err != nil {
 				return err
@@ -390,7 +347,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			if err != nil {
 				return err
 			}
-			sidecar, err := FlyteCoPilotContainer(ctx, flyteSidecarContainerName, cfg, args,
+			sidecar, err := FlyteCoPilotContainer(flyteSidecarContainerName, cfg, args,
 				append([]v1.VolumeMount{outputsVolumeMount}, copilotMounts...)...)
 			// Make it into sidecar container
 			restartPolicy := v1.ContainerRestartPolicyAlways

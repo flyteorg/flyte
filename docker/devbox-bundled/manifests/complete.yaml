@@ -7813,18 +7813,9 @@ data:
       k8s:
         co-pilot:
           image: "flyte-binary-v2:sandbox"
-          # Co-pilot reads its storage configuration from this Secret, projected into its
-          # containers as a file, rather than receiving it on its command line — where the
-          # credentials would land in every task's pod spec and be readable by anyone who can
-          # read pods.
-          #
-          # The Secret carries the whole configuration — stow settings and credentials — in a
-          # single key, because co-pilot takes the stow config all-or-nothing. The plugin
-          # fixes the key name and the mount path, so its name is all that is set here.
-          #
-          # Emitted only when that file would be complete; see copilotStorageComplete.
-          # Otherwise co-pilot falls back to receiving the stow config on its command line,
-          # as it did before.
+          # Co-pilot reads its storage configuration from this Secret instead of its command
+          # line, keeping the credentials out of every task's pod spec. Emitted only when
+          # that file would be complete; see copilotStorageComplete.
           copilot-storage-config: "flyte-binary-copilot-storage-config-secret"
         # Env vars injected into every task pod, so it can reach the control plane
         # to enqueue child actions and watch their state.
@@ -8769,8 +8760,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 014ef2cacb10a3772f5a1addb132a5f794ab0c0974cd27decb6f2d172d3a9eb1
-        checksum/configuration-secret: 2dee07702da9b4e0d8226c540f5450c3f5c3a7850b13bc3ff3ca72ccaac14733
+        checksum/configuration: 603c649e3c4ee78f352ca1580ae9d38c787c99b1984cabbe57c607ee4ccfb611
+        checksum/configuration-secret: b2a94c2111ea5c7d1e10bf38807f3bc2c6008946a5fb25bd923b56f4e020d316
       labels:
         app.kubernetes.io/component: flyte-binary
         app.kubernetes.io/instance: flyte-devbox

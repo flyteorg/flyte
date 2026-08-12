@@ -26,6 +26,8 @@ flyte-core-components:
 
   actions:
     kubernetes:
+      # namespace Where task pods run. The chart renders the co-pilot storage Secret here
+      # too, so when this is not the release namespace it must exist before `helm install`.
       namespace: "flyte"
       kubeconfig: ""
     watchBufferSize: 100

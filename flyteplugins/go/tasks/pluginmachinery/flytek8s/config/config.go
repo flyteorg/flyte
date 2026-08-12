@@ -49,11 +49,6 @@ var (
 			Timeout: config2.Duration{
 				Duration: time.Hour * 1,
 			},
-			// CopilotStorageConfig is intentionally unset: the Secret's name is
-			// deployment-specific. Leaving it empty falls back to rendering the stow
-			// config on the co-pilot command line, which is how deployments that predate
-			// this setting keep working — at the cost of the exposure CopilotCommandArgs
-			// warns about.
 		},
 		DefaultCPURequest:    defaultCPURequest,
 		DefaultMemoryRequest: defaultMemoryRequest,
@@ -335,24 +330,12 @@ type FlyteCoPilotConfig struct {
 	CPU     string `json:"cpu" pflag:",Used to set cpu for co-pilot containers"`
 	Memory  string `json:"memory" pflag:",Used to set memory for co-pilot containers"`
 	Storage string `json:"storage" pflag:",Default storage limit for individual inputs / outputs"`
-	// StorageConfigOverride replaces the deployment's storage config for co-pilot only.
-	// Setting it puts the stow config back on the co-pilot command line even when
-	// CopilotStorageConfig names it — see CopilotCommandArgs.
+	// Setting this puts the stow config back on the co-pilot command line even when
+	// CopilotStorageConfig names a Secret — see CopilotCommandArgs.
 	StorageConfigOverride *storage.Config `json:"storage-config-override" pflag:"-,Override for the storage config to use for co-pilot"`
-	// CopilotStorageConfig is the Secret holding co-pilot's storage configuration — the
-	// stow settings and, where the deployment has them, the credentials, together in one
-	// key. It is projected into the co-pilot containers as a file and co-pilot is pointed
-	// at it with --config, so the credentials never appear in the pod spec: recovering
-	// them requires access to the Secret rather than merely to pods.
-	//
-	// One Secret with one key, rather than settings in a ConfigMap alongside credentials
-	// in a Secret. Co-pilot takes the stow config all-or-nothing — once it reads the
-	// mounted file nothing is passed on its command line — so a configuration split
-	// across two objects fails closed the moment either half is missing or misnamed.
-	// Keeping it whole makes that unrepresentable, and leaves the Secret's name as the
-	// only deployment-specific part; the key and mount path are fixed.
-	//
-	// Empty for deployments with nothing to mount, which fall back to the command line.
+	// Secret holding co-pilot's whole storage configuration, projected into the co-pilot
+	// containers as a file so the credentials stay out of the pod spec. Empty falls back
+	// to passing the stow config on the command line.
 	CopilotStorageConfig string `json:"copilot-storage-config" pflag:",Secret holding co-pilot's storage configuration"`
 }
 

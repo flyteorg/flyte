@@ -132,21 +132,77 @@ Get the name of the Secret holding co-pilot's storage configuration.
 {{- end -}}
 
 {{/*
+The stow storage block, shared by the ConfigMap (003-storage.yaml) and co-pilot's Secret so
+the two cannot drift. Call with (dict "root" $ "withCredentials" bool); only the Secret sets
+withCredentials, since the ConfigMap keeps them in 013-storage-secrets.yaml instead.
+*/}}
+{{- define "flyte-binary.configuration.storageBlock" -}}
+{{- $root := .root -}}
+{{- $withCredentials := .withCredentials -}}
+{{- with $root.Values.configuration.storage -}}
+storage:
+  type: stow
+  stow:
+    {{- if eq "s3" .provider }}
+    {{- with .providerConfig.s3 }}
+    kind: s3
+    config:
+      region: {{ required "Region required for S3 storage provider" .region }}
+      disable_ssl: {{ .disableSSL }}
+      v2_signing: {{ .v2Signing }}
+      {{- if .endpoint }}
+      endpoint: {{ tpl .endpoint $root }}
+      {{- end }}
+      {{- if eq "iam" .authType }}
+      auth_type: iam
+      {{- else if eq "accesskey" .authType }}
+      auth_type: accesskey
+      {{- if $withCredentials }}
+      access_key_id: {{ required "Access key required for S3 storage provider" .accessKey | quote }}
+      secret_key: {{ required "secretKey required for co-pilot storage configuration" .secretKey | quote }}
+      {{- end }}
+      {{- else }}
+      {{- printf "Invalid value for S3 storage provider authentication type. Expected one of (iam, accesskey), but got: %s" .authType | fail }}
+      {{- end }}
+    {{- end }}
+    {{- else if eq "azure" .provider }}
+    {{- with .providerConfig.azure }}
+    kind: azure
+    config:
+      account: {{ .account }}
+      {{- if .key }}
+      key: {{ .key }}
+      {{- end }}
+      {{- if .configDomainSuffix }}
+      configDomainSuffix: {{ .configDomainSuffix }}
+      {{- end }}
+      {{- if .configUploadConcurrency }}
+      configUploadConcurrency: {{ .configUploadConcurrency }}
+      {{- end }}
+    {{- end }}
+    {{- else if eq "gcs" .provider }}
+    kind: google
+    config:
+      json: ""
+      project_id: {{ required "GCP project required for GCS storage provider" .providerConfig.gcs.project }}
+      scopes: https://www.googleapis.com/auth/cloud-platform
+    {{- else }}
+    {{- printf "Invalid value for storage provider. Expected one of (s3, azure, gcs), but got: %s" .provider | fail }}
+    {{- end }}
+  container: {{ required "Metadata container required" .metadataContainer }}
+{{- end }}
+{{- end -}}
+
+{{/*
 Whether the projected file would give co-pilot a *complete* storage configuration. Co-pilot
-takes the stow config all-or-nothing — once it reads the mounted file, nothing is passed on
-its command line — so an incomplete mount leaves it with no credentials at all rather than
-falling back. Both rendering the Secret and pointing co-pilot at it are gated on this, and
-the two must stay in lockstep: naming a Secret that is never rendered leaves every task pod
+takes the stow config all-or-nothing, so an incomplete mount leaves it with no credentials
+rather than falling back. Rendering the Secret and pointing co-pilot at it are both gated on
+this and must stay in lockstep: naming a Secret that is never rendered leaves every task pod
 stuck in ContainerCreating.
 
-Complete when: the operator named a Secret themselves; or the backend keeps everything in the
-storage block (gcs, azure); or S3 needs no credentials (authType=iam, resolved ambiently); or
-S3's secretKey is a literal this chart can render.
-
-Incomplete for S3 with secretKeyPath: the path names a file that exists only in this
-deployment's own container, so a task pod cannot read it whichever object carries the
-setting. Those deployments keep receiving the stow config on the co-pilot command line, as
-before, or supply their own Secret via storage.copilotStorageSecretRef.
+Incomplete only for S3 with secretKeyPath, which names a file that exists solely in this
+deployment's own container. Those deployments keep the stow config on the command line, or
+supply their own Secret via storage.copilotStorageSecretRef.
 */}}
 {{- define "flyte-binary.configuration.copilotStorageComplete" -}}
 {{- with .Values.configuration.storage -}}
