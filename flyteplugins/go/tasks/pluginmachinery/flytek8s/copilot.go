@@ -46,7 +46,7 @@ func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []st
 		storageCfg = cfg.StorageConfigOverride
 	}
 
-	command, err := CopilotCommandArgs(storageCfg, cfg.CopilotStorageConfig, overridden)
+	command, err := CopilotCommandArgs(storageCfg, cfg.StorageConfigSecretName, overridden)
 	if err != nil {
 		return v1.Container{}, err
 	}
@@ -281,8 +281,8 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 		// each — but never from the primary container, which runs user code and must not be
 		// able to read the storage credentials.
 		var copilotMounts []v1.VolumeMount
-		if (needsDownloader || needsUploader) && cfg.CopilotStorageConfig != "" {
-			coPilotPod.Volumes = append(coPilotPod.Volumes, storageConfigVolume(cfg.CopilotStorageConfig))
+		if (needsDownloader || needsUploader) && cfg.StorageConfigSecretName != "" {
+			coPilotPod.Volumes = append(coPilotPod.Volumes, storageConfigVolume(cfg.StorageConfigSecretName))
 			copilotMounts = append(copilotMounts, storageConfigMount())
 		}
 

@@ -7816,7 +7816,7 @@ data:
           # Co-pilot reads its storage configuration from this Secret instead of its command
           # line, keeping the credentials out of every task's pod spec. Omitted for the
           # deployments that cannot use it; see copilotStorageFromSecret.
-          copilot-storage-config: "flyte-binary-copilot-storage-config-secret"
+          storage-config-secret-name: "flyte-binary-copilot-storage-config-secret"
         # Env vars injected into every task pod, so it can reach the control plane
         # to enqueue child actions and watch their state.
         #
@@ -8760,7 +8760,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 75236fda961d327fb3271f102b2b9c2f26f57ddf435a11a93f7791abc7a103f6
+        checksum/configuration: 234f623bb88a11f8007d57f08b191c0d071273e46a56b910dfbba8ae6f43a34c
         checksum/configuration-secret: 652a905205b043cbc7e2d4dbb41c05679fbec92bd4aecee1b996834f797d559b
       labels:
         app.kubernetes.io/component: flyte-binary

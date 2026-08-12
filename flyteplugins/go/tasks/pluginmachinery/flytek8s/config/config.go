@@ -331,12 +331,12 @@ type FlyteCoPilotConfig struct {
 	Memory  string `json:"memory" pflag:",Used to set memory for co-pilot containers"`
 	Storage string `json:"storage" pflag:",Default storage limit for individual inputs / outputs"`
 	// Setting this puts the stow config back on the co-pilot command line even when
-	// CopilotStorageConfig names a Secret — see CopilotCommandArgs.
+	// StorageConfigSecretName is set — see CopilotCommandArgs.
 	StorageConfigOverride *storage.Config `json:"storage-config-override" pflag:"-,Override for the storage config to use for co-pilot"`
-	// Secret holding co-pilot's whole storage configuration, projected into the co-pilot
-	// containers so the credentials stay out of the pod spec. Empty falls back to passing
-	// the stow config on the command line.
-	CopilotStorageConfig string `json:"copilot-storage-config" pflag:",Secret holding co-pilot's storage configuration"`
+	// Name of the Secret holding co-pilot's whole storage configuration, projected into the
+	// co-pilot containers so the credentials stay out of the pod spec. Empty falls back to
+	// passing the stow config on the command line.
+	StorageConfigSecretName string `json:"storage-config-secret-name" pflag:",Name of the Secret holding co-pilot's storage configuration"`
 }
 
 type AcceleratorDeviceClassConfig struct {

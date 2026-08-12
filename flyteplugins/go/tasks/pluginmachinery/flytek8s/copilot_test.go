@@ -43,9 +43,9 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		StartTimeout: config2.Duration{
 			Duration: time.Second * 1,
 		},
-		CPU:                  "1024m",
-		Memory:               "1024Mi",
-		CopilotStorageConfig: "flyte-copilot-storage-config-secret",
+		CPU:                     "1024m",
+		Memory:                  "1024Mi",
+		StorageConfigSecretName: "flyte-copilot-storage-config-secret",
 	}
 
 	t.Run("happy stow backend", func(t *testing.T) {
@@ -56,7 +56,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		c, err := FlyteCoPilotContainer("x", cfg, []string{"hello"})
 		assert.NoError(t, err)
 
-		expectedCommand, err := CopilotCommandArgs(storage.GetConfig(), cfg.CopilotStorageConfig, false)
+		expectedCommand, err := CopilotCommandArgs(storage.GetConfig(), cfg.StorageConfigSecretName, false)
 		assert.NoError(t, err)
 
 		assert.Equal(t, "test-x", c.Name)
@@ -88,7 +88,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 			"endpoint":        "http://minio:9000",
 		}
 
-		command, err := CopilotCommandArgs(storage.GetConfig(), cfg.CopilotStorageConfig, false)
+		command, err := CopilotCommandArgs(storage.GetConfig(), cfg.StorageConfigSecretName, false)
 		assert.NoError(t, err)
 
 		joined := strings.Join(command, " ")
@@ -136,7 +136,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.NotContains(t, joined, "secret_key_path")
 
 		bare := cfg
-		bare.CopilotStorageConfig = ""
+		bare.StorageConfigSecretName = ""
 		c, err := FlyteCoPilotContainer("x", bare, []string{"hello"})
 		assert.NoError(t, err)
 		assert.Empty(t, c.VolumeMounts, "nothing to mount when no source is configured")
@@ -177,7 +177,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 			"project_id": "flyte-gcp",
 		}
 
-		command, err := CopilotCommandArgs(storage.GetConfig(), cfg.CopilotStorageConfig, false)
+		command, err := CopilotCommandArgs(storage.GetConfig(), cfg.StorageConfigSecretName, false)
 		assert.NoError(t, err)
 
 		joined := strings.Join(command, " ")
@@ -203,7 +203,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(c.VolumeMounts))
 
-		expectedCommand, err := CopilotCommandArgs(&storageConfigOverride, cfg.CopilotStorageConfig, true)
+		expectedCommand, err := CopilotCommandArgs(&storageConfigOverride, cfg.StorageConfigSecretName, true)
 		assert.NoError(t, err)
 		assert.ElementsMatch(t, c.Command, expectedCommand)
 
@@ -349,15 +349,15 @@ func assertContainerHasVolumeMounts(t *testing.T, cfg config.FlyteCoPilotConfig,
 func TestAddCoPilotToPod_StorageCredentialsNeverInPodSpec(t *testing.T) {
 	ctx := context.TODO()
 	cfg := config.FlyteCoPilotConfig{
-		NamePrefix:           "test-",
-		Image:                "test",
-		DefaultInputDataPath: "/in",
-		DefaultOutputPath:    "/out",
-		InputVolumeName:      "inp",
-		OutputVolumeName:     "out",
-		CPU:                  "1024m",
-		Memory:               "1024Mi",
-		CopilotStorageConfig: "flyte-copilot-storage-config-secret",
+		NamePrefix:              "test-",
+		Image:                   "test",
+		DefaultInputDataPath:    "/in",
+		DefaultOutputPath:       "/out",
+		InputVolumeName:         "inp",
+		OutputVolumeName:        "out",
+		CPU:                     "1024m",
+		Memory:                  "1024Mi",
+		StorageConfigSecretName: "flyte-copilot-storage-config-secret",
 	}
 
 	secrets := map[string]string{
@@ -650,9 +650,9 @@ func TestAddCoPilotToPod(t *testing.T) {
 		StartTimeout: config2.Duration{
 			Duration: time.Second * 1,
 		},
-		CPU:                  "1024m",
-		Memory:               "1024Mi",
-		CopilotStorageConfig: "flyte-copilot-storage-config-secret",
+		CPU:                     "1024m",
+		Memory:                  "1024Mi",
+		StorageConfigSecretName: "flyte-copilot-storage-config-secret",
 	}
 
 	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
