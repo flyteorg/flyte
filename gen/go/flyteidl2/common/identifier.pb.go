@@ -687,7 +687,8 @@ type RunIdentifier struct {
 	Project string `protobuf:"bytes,2,opt,name=project,proto3" json:"project,omitempty"`
 	// Domain this run belongs to.
 	Domain string `protobuf:"bytes,3,opt,name=domain,proto3" json:"domain,omitempty"`
-	Name   string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	// Name of the run. Must be unique across all runs in this org, project, and domain pairing.
+	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (x *RunIdentifier) Reset() {

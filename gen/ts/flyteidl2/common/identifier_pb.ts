@@ -304,6 +304,8 @@ export type RunIdentifier = Message<"flyteidl2.common.RunIdentifier"> & {
   domain: string;
 
   /**
+   * Name of the run. Must be unique across all runs in this org, project, and domain pairing.
+   *
    * @generated from field: string name = 4;
    */
   name: string;

@@ -614,7 +614,8 @@
           "description": "Domain this run belongs to."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the run. Must be unique across all runs in this org, project, and domain pairing."
         }
       },
       "description": "Unique identifier of a run."
