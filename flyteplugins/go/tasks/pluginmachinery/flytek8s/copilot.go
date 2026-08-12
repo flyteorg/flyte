@@ -106,9 +106,12 @@ func CopilotCommandArgs(storageConfig *storage.Config, storageConfigSecret strin
 	if len(storageConfig.Stow.Config) > 0 && len(storageConfig.Stow.Kind) > 0 {
 		isS3 := storageConfig.Stow.Kind == s3.Kind
 		for key, val := range storageConfig.Stow.Config {
-			// newStowRawStore stats secret_key_path regardless of auth_type, and the file
-			// exists only in this deployment's container — forwarding it would stop
-			// co-pilot from starting at all.
+			// secret_key_path names a file that exists only in this deployment's own
+			// container, and resolveSecretKey stats it regardless of auth_type, so
+			// forwarding it stops co-pilot from starting. Dropping it loses nothing:
+			// newStowRawStore has already read that file into secret_key in this very
+			// map — it mutates storage.GetConfig().Stow.Config in place — so the
+			// credential co-pilot needs is carried by the key above.
 			if isS3 && key == storage.ConfigSecretKeyPath {
 				continue
 			}
