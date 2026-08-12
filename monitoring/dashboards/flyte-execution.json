@@ -842,6 +842,136 @@
       ]
     },
     {
+      "id": 25,
+      "type": "timeseries",
+      "title": "GC deletions by outcome",
+      "description": "TaskAction GC delete attempts/sec by outcome. already_gone = removed by k8s cascade before the GC got to it; failed should stay at zero.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 33,
+        "w": 12,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (outcome)(rate(taskaction_gc_deletions_total{service_name=\"executor\"}[5m]))",
+          "legendFormat": "{{outcome}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "type": "timeseries",
+      "title": "GC sweep duration p50/p95/p99",
+      "description": "Duration of one GC sweep. Smallest histogram bucket is 100ms, so an idle-cluster p95 reads ~95ms even when sweeps take a few ms.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 33,
+        "w": 12,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "histogram_quantile(0.50, sum by (le)(rate(taskaction_gc_sweep_duration_milliseconds_bucket{service_name=\"executor\"}[5m])))",
+          "legendFormat": "p50",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "histogram_quantile(0.95, sum by (le)(rate(taskaction_gc_sweep_duration_milliseconds_bucket{service_name=\"executor\"}[5m])))",
+          "legendFormat": "p95",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "histogram_quantile(0.99, sum by (le)(rate(taskaction_gc_sweep_duration_milliseconds_bucket{service_name=\"executor\"}[5m])))",
+          "legendFormat": "p99",
+          "refId": "C"
+        }
+      ]
+    },
+    {
       "id": 13,
       "type": "row",
       "title": "Pod resources (flyte2)",
