@@ -194,17 +194,19 @@ storage:
 {{- end -}}
 
 {{/*
-Whether the projected file would give co-pilot a *complete* storage configuration. Co-pilot
-takes the stow config all-or-nothing, so an incomplete mount leaves it with no credentials
-rather than falling back. Rendering the Secret and pointing co-pilot at it are both gated on
-this and must stay in lockstep: naming a Secret that is never rendered leaves every task pod
-stuck in ContainerCreating.
+Whether co-pilot reads its storage configuration from a Secret rather than from its command
+line. True when the chart can render that Secret in full, or the operator supplied one.
+Rendering the Secret and pointing co-pilot at it are both gated on this and must stay in
+lockstep: naming a Secret that is never rendered leaves every task pod stuck in
+ContainerCreating.
 
-Incomplete only for S3 with secretKeyPath, which names a file that exists solely in this
-deployment's own container. Those deployments keep the stow config on the command line, or
-supply their own Secret via storage.copilotStorageSecretRef.
+False only for S3 with secretKeyPath, which names a file that exists solely in this
+deployment's own container, so the rendered Secret would carry no usable credentials — and
+co-pilot takes the stow config all-or-nothing, so a partial file is worse than none. Those
+deployments keep the stow config on the command line, or supply their own Secret via
+storage.copilotStorageSecretRef.
 */}}
-{{- define "flyte-binary.configuration.copilotStorageComplete" -}}
+{{- define "flyte-binary.configuration.copilotStorageFromSecret" -}}
 {{- with .Values.configuration.storage -}}
 {{- if .copilotStorageSecretRef -}}
 true

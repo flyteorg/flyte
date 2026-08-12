@@ -46,10 +46,10 @@ data:
           {{- with ( index .Values.configuration "co-pilot" ).image }}
           image: {{ printf "%s:%s" .repository .tag | quote }}
           {{- end }}
-          {{- if include "flyte-binary.configuration.copilotStorageComplete" . }}
+          {{- if include "flyte-binary.configuration.copilotStorageFromSecret" . }}
           # Co-pilot reads its storage configuration from this Secret instead of its command
-          # line, keeping the credentials out of every task's pod spec. Emitted only when
-          # that file would be complete; see copilotStorageComplete.
+          # line, keeping the credentials out of every task's pod spec. Omitted for the
+          # deployments that cannot use it; see copilotStorageFromSecret.
           copilot-storage-config: {{ .Values.configuration.storage.copilotStorageSecretRef | default (include "flyte-binary.configuration.copilotStorageSecretName" .) | quote }}
           {{- end }}
         # Env vars injected into every task pod, so it can reach the control plane
