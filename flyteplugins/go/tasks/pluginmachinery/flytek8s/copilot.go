@@ -177,7 +177,12 @@ func DownloadCommandArgs(fromInputsPath, outputPrefix storage.DataReference, toL
 // merges one viper per file: a deployment may split the config across several ordered keys,
 // and keys not ending in .yaml are mounted but never read.
 func storageConfigVolume(storageConfigSecret string) v1.Volume {
-	mode := int32(0400)
+	// 0444 rather than 0400: kubelet writes the file root-owned and only widens group
+	// permissions when the pod sets fsGroup, so 0400 is unreadable by a co-pilot container
+	// running as a non-root user — which it does whenever the deployment sets a pod-level
+	// runAsUser. The volume reaches only the co-pilot containers, so being readable inside
+	// them withholds nothing that owner-only would have.
+	mode := int32(0444)
 	projections := []v1.VolumeProjection{{
 		Secret: &v1.SecretProjection{
 			LocalObjectReference: v1.LocalObjectReference{Name: storageConfigSecret},

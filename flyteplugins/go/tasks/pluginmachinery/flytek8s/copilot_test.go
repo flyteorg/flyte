@@ -412,7 +412,9 @@ func TestAddCoPilotToPod_StorageCredentialsNeverInPodSpec(t *testing.T) {
 		}
 	}
 	assert.Len(t, projected, 1, "the storage config volume must be added exactly once")
-	assert.Equal(t, int32(0400), *projected[0].Projected.DefaultMode)
+	// Readable by any uid: kubelet writes the file root-owned and only widens group
+	// permissions when fsGroup is set, so 0400 would lock out a non-root co-pilot.
+	assert.Equal(t, int32(0444), *projected[0].Projected.DefaultMode)
 	assert.Len(t, projected[0].Projected.Sources, 1, "the whole configuration lives in one Secret")
 	assert.Equal(t, "flyte-copilot-storage-config-secret", projected[0].Projected.Sources[0].Secret.Name)
 	assert.Nil(t, projected[0].Projected.Sources[0].Secret.Items)
