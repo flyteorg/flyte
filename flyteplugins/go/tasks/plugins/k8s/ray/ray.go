@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"regexp"
 	"strconv"
 	"strings"
@@ -94,11 +95,14 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 
 	cfg := GetConfig()
 
+	// Copy rather than alias: the resolved map is filled in below and handed to the RayJob CR, so
+	// aliasing would let one task's start params edit the shared plugin config and every other CR
+	// built from those defaults.
 	headNodeRayStartParams := make(map[string]string)
 	if rayJob.GetRayCluster().GetHeadGroupSpec() != nil && rayJob.RayCluster.HeadGroupSpec.RayStartParams != nil {
-		headNodeRayStartParams = rayJob.GetRayCluster().GetHeadGroupSpec().GetRayStartParams()
+		maps.Copy(headNodeRayStartParams, rayJob.GetRayCluster().GetHeadGroupSpec().GetRayStartParams())
 	} else if headNode := cfg.Defaults.HeadNode; len(headNode.StartParameters) > 0 {
-		headNodeRayStartParams = headNode.StartParameters
+		maps.Copy(headNodeRayStartParams, headNode.StartParameters)
 	}
 
 	if _, exist := headNodeRayStartParams[IncludeDashboard]; !exist {
@@ -203,9 +207,9 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 
 		workerNodeRayStartParams := make(map[string]string)
 		if spec.RayStartParams != nil {
-			workerNodeRayStartParams = spec.GetRayStartParams()
+			maps.Copy(workerNodeRayStartParams, spec.GetRayStartParams())
 		} else if workerNode := cfg.Defaults.WorkerNode; len(workerNode.StartParameters) > 0 {
-			workerNodeRayStartParams = workerNode.StartParameters
+			maps.Copy(workerNodeRayStartParams, workerNode.StartParameters)
 		}
 
 		if _, exist := workerNodeRayStartParams[NodeIPAddress]; !exist {
