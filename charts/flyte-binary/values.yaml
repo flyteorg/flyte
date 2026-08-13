@@ -91,16 +91,6 @@ configuration:
   storage:
     # metadataContainer Bucket to store Flyte metadata
     metadataContainer: "my-organization-flyte-container"
-    # copilotStorageSecretRef Name of an existing Secret holding co-pilot's complete storage
-    # configuration — stow settings and credentials — in one or more .yaml keys. The whole
-    # Secret is mounted into the co-pilot containers and every .yaml key in it is read, so
-    # it must hold nothing else. Leave empty to have the chart render that Secret itself;
-    # set it when using s3.secretKeyPath, which names a file that exists only in this
-    # deployment's container and so cannot be read from a task pod.
-    # Cannot be combined with externalConfigMap or externalSecretRef: the chart renders no
-    # ConfigMap to carry the co-pilot key then, so set that key in your own configuration
-    # instead. The chart fails the install rather than ignoring this value in silence.
-    copilotStorageSecretRef: ""
     # provider Object store provider (Supported values: s3, gcs)
     provider: s3
     # providerConfig Additional object store provider-specific configuration
@@ -170,6 +160,16 @@ configuration:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2  # FLYTE_IMAGE
       # tag CoPilot sidecar image tag
       tag: latest  # FLYTE_TAG
+    # storageSecretRef Name of an existing Secret holding co-pilot's complete storage
+    # configuration — stow settings and credentials — in one or more .yaml keys. The whole
+    # Secret is mounted into the co-pilot containers and every .yaml key in it is read, so
+    # it must hold nothing else. Leave empty to have the chart render that Secret itself;
+    # set it when using storage.providerConfig.s3.secretKeyPath, which names a file that
+    # exists only in this deployment's container and so cannot be read from a task pod.
+    # Cannot be combined with externalConfigMap or externalSecretRef: the chart renders no
+    # ConfigMap to carry the co-pilot key then, so set that key in your own configuration
+    # instead. The chart fails the install rather than ignoring this value in silence.
+    storageSecretRef: ""
   # connectorService Flyte Connector configuration
   connectorService:
     defaultConnector:

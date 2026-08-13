@@ -50,7 +50,7 @@ data:
           # Co-pilot reads its storage configuration from this Secret instead of its command
           # line, keeping the credentials out of every task's pod spec. Omitted for the
           # deployments that cannot use it; see copilotStorageFromSecret.
-          storage-config-secret-name: {{ .Values.configuration.storage.copilotStorageSecretRef | default (include "flyte-binary.configuration.copilotStorageSecretName" .) | quote }}
+          storage-config-secret-name: {{ include "flyte-binary.configuration.copilotStorageSecretRef" . | default (include "flyte-binary.configuration.copilotStorageSecretName" .) | quote }}
           {{- end }}
         # Env vars injected into every task pod, so it can reach the control plane
         # to enqueue child actions and watch their state.

@@ -19,6 +19,7 @@ Chart for basic single Flyte executable deployment
 | configuration.annotations | object | `{}` |  |
 | configuration.co-pilot.image.repository | string | `"cr.flyte.org/flyteorg/flyte-binary-v2"` |  |
 | configuration.co-pilot.image.tag | string | `"latest"` |  |
+| configuration.co-pilot.storageSecretRef | string | `""` |  |
 | configuration.connectorService.defaultConnector.defaultTimeout | string | `"10s"` |  |
 | configuration.connectorService.defaultConnector.endpoint | string | `"k8s://flyteconnector.flyte:8000"` |  |
 | configuration.connectorService.defaultConnector.insecure | bool | `true` |  |
@@ -51,7 +52,6 @@ Chart for basic single Flyte executable deployment
 | configuration.logging.plugins.kubernetes.templateUri | string | `""` |  |
 | configuration.logging.plugins.stackdriver.enabled | bool | `false` |  |
 | configuration.logging.plugins.stackdriver.templateUri | string | `""` |  |
-| configuration.storage.copilotStorageSecretRef | string | `""` |  |
 | configuration.storage.metadataContainer | string | `"my-organization-flyte-container"` |  |
 | configuration.storage.provider | string | `"s3"` |  |
 | configuration.storage.providerConfig.azure.account | string | `"storage-account-name"` |  |

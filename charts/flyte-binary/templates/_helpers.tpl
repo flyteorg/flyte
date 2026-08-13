@@ -111,12 +111,21 @@ Flag to use external configuration.
 {{- end -}}
 
 {{/*
+The Secret an operator supplied for co-pilot, if any. Its own key rather than a field on
+configuration.storage, since it configures co-pilot rather than the deployment's storage,
+and the section name means it needs the index dance.
+*/}}
+{{- define "flyte-binary.configuration.copilotStorageSecretRef" -}}
+{{- (index .Values.configuration "co-pilot").storageSecretRef -}}
+{{- end -}}
+
+{{/*
 Fail on value combinations the chart would otherwise ignore in silence. Called from
 deployment.yaml, which renders whatever else is switched off.
 */}}
 {{- define "flyte-binary.validateValues" -}}
-{{- if and .Values.configuration.storage.copilotStorageSecretRef (include "flyte-binary.configuration.externalConfiguration" .) -}}
-{{- fail "configuration.storage.copilotStorageSecretRef has no effect while configuration.externalConfigMap or configuration.externalSecretRef is set: the chart renders no ConfigMap, and that is what would carry plugins.k8s.co-pilot.storage-config-secret-name. Set that key in your own configuration instead, then unset copilotStorageSecretRef." -}}
+{{- if and (include "flyte-binary.configuration.copilotStorageSecretRef" .) (include "flyte-binary.configuration.externalConfiguration" .) -}}
+{{- fail "configuration.co-pilot.storageSecretRef has no effect while configuration.externalConfigMap or configuration.externalSecretRef is set: the chart renders no ConfigMap, and that is what would carry plugins.k8s.co-pilot.storage-config-secret-name. Set that key in your own configuration instead, then unset storageSecretRef." -}}
 {{- end -}}
 {{- end -}}
 
@@ -221,12 +230,12 @@ it into the Secret, so err towards the Secret rather than towards the command li
 S3 with only secretKeyPath is the one credential-bearing case that stays on the command
 line: the path names a file living solely in this deployment's container, so the chart
 cannot read it to render a Secret. Those deployments supply their own via
-storage.copilotStorageSecretRef.
+co-pilot.storageSecretRef.
 */}}
 {{- define "flyte-binary.configuration.copilotStorageFromSecret" -}}
 {{- $root := . -}}
 {{- with .Values.configuration.storage -}}
-{{- if .copilotStorageSecretRef -}}
+{{- if include "flyte-binary.configuration.copilotStorageSecretRef" $root -}}
 true
 {{- else if and (eq "s3" .provider) (eq "accesskey" .providerConfig.s3.authType) .providerConfig.s3.secretKey -}}
 true
