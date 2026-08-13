@@ -333,6 +333,20 @@ func createSparkApplication(sparkJob *plugins.SparkJob, sparkConfig map[string]s
 		},
 	}
 
+	// The operator reads spec.sparkVersion to decide how pod templates are handled: its
+	// validating webhook rejects an application that carries a driver/executor template while
+	// declaring less than 3.0.0, and its submission path labels the pod for webhook mutation
+	// when the declared version is below 3.0.0 (internal/webhook/sparkapplication_validator.go
+	// and internal/controller/sparkapplication/submission.go in kubeflow/spark-operator).
+	// Left empty an application with a template is denied at admission, because an unset
+	// version parses as invalid semver and sorts below every real one.
+	//
+	// The field describes the image, which this plugin cannot inspect, so it is only declared
+	// when a template is actually attached — the one case the operator needs it for.
+	if driverSpec.sparkSpec.Template != nil || executorSpec.sparkSpec.Template != nil {
+		app.Spec.SparkVersion = GetSparkConfig().SparkVersion
+	}
+
 	if val, ok := sparkConfig["spark.batchScheduler"]; ok {
 		app.Spec.BatchScheduler = &val
 	}

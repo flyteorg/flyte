@@ -15,6 +15,12 @@ import (
 
 const sparkApplicationCRDName = "sparkapplications.sparkoperator.k8s.io"
 
+// minPodTemplateSparkVersion is the lowest spec.sparkVersion the operator accepts on an
+// application that carries a driver or executor pod template. It is the default for
+// plugins.spark.spark-version: a floor the feature is known to need, rather than a guess at
+// what the image ships.
+const minPodTemplateSparkVersion = "3.0.0"
+
 var podTemplateCapability struct {
 	once      sync.Once
 	supported bool

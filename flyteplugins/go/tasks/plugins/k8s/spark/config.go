@@ -14,6 +14,7 @@ var (
 	defaultConfig = &Config{
 		EnablePodTemplate:           true,
 		PodTemplateDetectionTimeout: config.Duration{Duration: 30 * time.Second},
+		SparkVersion:                minPodTemplateSparkVersion,
 		LogConfig: LogConfig{
 			Mixed: logs.LogConfig{
 				IsKubernetesEnabled:   true,
@@ -36,6 +37,10 @@ type Config struct {
 	// enable-pod-template. On timeout the probe reports false and the plugin stays on the
 	// legacy fields.
 	PodTemplateDetectionTimeout config.Duration `json:"pod-template-detection-timeout" pflag:"-,Timeout for the one-time SparkApplication CRD schema read that detects pod template support."`
+	// SparkVersion is declared on SparkApplications that carry a pod template. The plugin
+	// cannot inspect the image, so this defaults to the minimum the pod template feature
+	// requires; set it to the Spark version your images actually ship.
+	SparkVersion string `json:"spark-version" pflag:"-,Value for SparkApplication spec.sparkVersion on applications that carry a driver/executor pod template."`
 }
 
 type LogConfig struct {
