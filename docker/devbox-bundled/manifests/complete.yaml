@@ -7800,11 +7800,6 @@ data:
           container: container
           container_array: k8s-array
           sidecar: sidecar
-        enabled-plugins:
-        - container
-        - sidecar
-        - connector-service
-        - echo
     plugins:
       logs:
         kubernetes-enabled: false

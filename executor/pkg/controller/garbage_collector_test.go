@@ -33,8 +33,8 @@ func createTaskAction(ctx context.Context, name string, labels map[string]string
 			ActionName:    "test-action",
 			InputURI:      "/tmp/input",
 			RunOutputBase: "/tmp/output",
-			TaskType:      "python-task",
-			TaskTemplate:  buildTaskTemplateBytes("python-task", "python:3.11"),
+			TaskType:      "python",
+			TaskTemplate:  buildTaskTemplateBytes("python", "python:3.11"),
 		},
 	}
 	ExpectWithOffset(1, k8sClient.Create(ctx, ta)).To(Succeed())

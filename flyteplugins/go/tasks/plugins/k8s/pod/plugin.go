@@ -25,7 +25,7 @@ import (
 const (
 	ContainerTaskType    = "container"
 	podTaskType          = "pod"
-	pythonTaskType       = "python-task"
+	pythonTaskType       = "python"
 	rawContainerTaskType = "raw-container"
 	SidecarTaskType      = "sidecar"
 )

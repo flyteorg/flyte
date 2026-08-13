@@ -9,33 +9,48 @@ A Helm chart for the Flyte local demo cluster
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../flyte-binary | flyte-binary | v0.2.0 |
-| https://charts.bitnami.com/bitnami | minio | 12.6.7 |
+| https://deeploy-knative-serving-charts.storage.googleapis.com/ | knative-serving | 1.18.3 |
+| https://rustfs.github.io/helm | rustfs | 0.0.94 |
 | https://twuni.github.io/docker-registry.helm | docker-registry | 2.2.2 |
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| docker-registry.containerSecurityContext.runAsUser | int | `0` |  |
 | docker-registry.enabled | bool | `true` |  |
 | docker-registry.fullnameOverride | string | `"docker-registry"` |  |
 | docker-registry.image.pullPolicy | string | `"Never"` |  |
 | docker-registry.image.tag | string | `"sandbox"` |  |
-| docker-registry.persistence.enabled | bool | `false` |  |
+| docker-registry.persistence.enabled | bool | `true` |  |
+| docker-registry.persistence.existingClaim | string | `"flyte-devbox-registry-storage"` |  |
 | docker-registry.secrets.haSharedSecret | string | `"flytesandboxsecret"` |  |
+| docker-registry.securityContext.runAsUser | int | `0` |  |
 | docker-registry.service.nodePort | int | `30000` |  |
 | docker-registry.service.type | string | `"NodePort"` |  |
 | flyte-binary.clusterResourceTemplates.inlineConfigMap | string | `"{{ include \"flyte-devbox.clusterResourceTemplates.inlineConfigMap\" . }}"` |  |
-| flyte-binary.configuration.database.host | string | `"postgresql"` |  |
-| flyte-binary.configuration.database.password | string | `"postgres"` |  |
-| flyte-binary.configuration.inline.plugins.k8s.default-env-vars[0].FLYTE_AWS_ENDPOINT | string | `"http://minio.{{ .Release.Namespace }}:9000"` |  |
-| flyte-binary.configuration.inline.plugins.k8s.default-env-vars[1].FLYTE_AWS_ACCESS_KEY_ID | string | `"minio"` |  |
-| flyte-binary.configuration.inline.plugins.k8s.default-env-vars[2].FLYTE_AWS_SECRET_ACCESS_KEY | string | `"miniostorage"` |  |
+| flyte-binary.configuration.co-pilot.image.repository | string | `"flyte-binary-v2"` |  |
+| flyte-binary.configuration.co-pilot.image.tag | string | `"sandbox"` |  |
+| flyte-binary.configuration.database.postgres.host | string | `"postgresql"` |  |
+| flyte-binary.configuration.database.postgres.password | string | `"postgres"` |  |
+| flyte-binary.configuration.inline.internalApps.baseDomain | string | `"localhost"` |  |
+| flyte-binary.configuration.inline.internalApps.defaultEnvVars[0].FLYTE_AWS_ENDPOINT | string | `"http://rustfs-svc.{{ .Release.Namespace }}:9000"` |  |
+| flyte-binary.configuration.inline.internalApps.defaultEnvVars[1].FLYTE_AWS_ACCESS_KEY_ID | string | `"rustfs"` |  |
+| flyte-binary.configuration.inline.internalApps.defaultEnvVars[2].FLYTE_AWS_SECRET_ACCESS_KEY | string | `"rustfsstorage"` |  |
+| flyte-binary.configuration.inline.internalApps.defaultEnvVars[3]._U_EP_OVERRIDE | string | `"flyte-binary-http.{{ .Release.Namespace }}:8090"` |  |
+| flyte-binary.configuration.inline.internalApps.defaultEnvVars[4]._U_INSECURE | string | `"true"` |  |
+| flyte-binary.configuration.inline.internalApps.defaultEnvVars[5]._U_USE_ACTIONS | string | `"1"` |  |
+| flyte-binary.configuration.inline.internalApps.enabled | bool | `true` |  |
+| flyte-binary.configuration.inline.internalApps.ingressAppsPort | int | `30081` |  |
+| flyte-binary.configuration.inline.internalApps.scheme | string | `"http"` |  |
+| flyte-binary.configuration.inline.plugins.k8s.default-env-vars[0].FLYTE_AWS_ENDPOINT | string | `"http://rustfs-svc.{{ .Release.Namespace }}:9000"` |  |
+| flyte-binary.configuration.inline.plugins.k8s.default-env-vars[1].FLYTE_AWS_ACCESS_KEY_ID | string | `"rustfs"` |  |
+| flyte-binary.configuration.inline.plugins.k8s.default-env-vars[2].FLYTE_AWS_SECRET_ACCESS_KEY | string | `"rustfsstorage"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[3]._U_EP_OVERRIDE | string | `"flyte-binary-http.{{ .Release.Namespace }}:8090"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[4]._U_INSECURE | string | `"true"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[5]._U_USE_ACTIONS | string | `"1"` |  |
 | flyte-binary.configuration.inline.runs.database.postgres.dbName | string | `"runs"` |  |
 | flyte-binary.configuration.inline.runs.database.postgres.host | string | `"postgresql.{{ .Release.Namespace }}"` |  |
-| flyte-binary.configuration.inline.runs.database.postgres.password | string | `"postgres"` |  |
 | flyte-binary.configuration.inline.runs.database.postgres.port | int | `5432` |  |
 | flyte-binary.configuration.inline.runs.database.postgres.user | string | `"postgres"` |  |
 | flyte-binary.configuration.inline.storage.signedURL.stowConfigOverride.endpoint | string | `"http://localhost:30002"` |  |
@@ -47,16 +62,22 @@ A Helm chart for the Flyte local demo cluster
 | flyte-binary.configuration.inline.task_resources.limits.ephemeralStorage | int | `0` |  |
 | flyte-binary.configuration.inline.task_resources.limits.gpu | int | `0` |  |
 | flyte-binary.configuration.inline.task_resources.limits.memory | int | `0` |  |
+| flyte-binary.configuration.inline.webhook.embeddedSecretManagerConfig.k8sConfig.namespace | string | `"{{ .Release.Namespace }}"` |  |
+| flyte-binary.configuration.inline.webhook.embeddedSecretManagerConfig.type | string | `"K8s"` |  |
+| flyte-binary.configuration.inline.webhook.secretManagerTypes[0] | string | `"Embedded"` |  |
 | flyte-binary.configuration.inlineConfigMap | string | `"{{ include \"flyte-devbox.configuration.inlineConfigMap\" . }}"` |  |
 | flyte-binary.configuration.logging.level | int | `5` |  |
 | flyte-binary.configuration.storage.metadataContainer | string | `"flyte-data"` |  |
 | flyte-binary.configuration.storage.provider | string | `"s3"` |  |
-| flyte-binary.configuration.storage.providerConfig.s3.accessKey | string | `"minio"` |  |
+| flyte-binary.configuration.storage.providerConfig.s3.accessKey | string | `"rustfs"` |  |
 | flyte-binary.configuration.storage.providerConfig.s3.authType | string | `"accesskey"` |  |
 | flyte-binary.configuration.storage.providerConfig.s3.disableSSL | bool | `true` |  |
-| flyte-binary.configuration.storage.providerConfig.s3.endpoint | string | `"http://minio.{{ .Release.Namespace }}:9000"` |  |
-| flyte-binary.configuration.storage.providerConfig.s3.secretKey | string | `"miniostorage"` |  |
+| flyte-binary.configuration.storage.providerConfig.s3.endpoint | string | `"http://rustfs-svc.{{ .Release.Namespace }}:9000"` |  |
+| flyte-binary.configuration.storage.providerConfig.s3.secretKey | string | `"rustfsstorage"` |  |
 | flyte-binary.configuration.storage.providerConfig.s3.v2Signing | bool | `true` |  |
+| flyte-binary.console.image.pullPolicy | string | `"Never"` |  |
+| flyte-binary.console.image.repository | string | `"docker.io/unionai-oss/flyteconsole-v2"` |  |
+| flyte-binary.console.image.tag | string | `"sandbox"` |  |
 | flyte-binary.deployment.image.pullPolicy | string | `"Never"` |  |
 | flyte-binary.deployment.image.repository | string | `"flyte-binary-v2"` |  |
 | flyte-binary.deployment.image.tag | string | `"sandbox"` |  |
@@ -77,22 +98,6 @@ A Helm chart for the Flyte local demo cluster
 | flyte-binary.rbac.extraRules[0].apiGroups[0] | string | `"*"` |  |
 | flyte-binary.rbac.extraRules[0].resources[0] | string | `"*"` |  |
 | flyte-binary.rbac.extraRules[0].verbs[0] | string | `"*"` |  |
-| minio.auth.rootPassword | string | `"miniostorage"` |  |
-| minio.auth.rootUser | string | `"minio"` |  |
-| minio.defaultBuckets | string | `"flyte-data"` |  |
-| minio.enabled | bool | `true` |  |
-| minio.extraEnvVars[0].name | string | `"MINIO_BROWSER_REDIRECT_URL"` |  |
-| minio.extraEnvVars[0].value | string | `"http://localhost:30080/minio"` |  |
-| minio.fullnameOverride | string | `"minio"` |  |
-| minio.image.pullPolicy | string | `"Never"` |  |
-| minio.image.tag | string | `"sandbox"` |  |
-| minio.persistence.enabled | bool | `true` |  |
-| minio.persistence.existingClaim | string | `"{{ include \"flyte-devbox.persistence.minioVolumeName\" . }}"` |  |
-| minio.service.nodePorts.api | int | `30002` |  |
-| minio.service.type | string | `"NodePort"` |  |
-| minio.volumePermissions.enabled | bool | `true` |  |
-| minio.volumePermissions.image.pullPolicy | string | `"Never"` |  |
-| minio.volumePermissions.image.tag | string | `"sandbox"` |  |
 | postgresql.auth.postgresPassword | string | `"postgres"` |  |
 | postgresql.enabled | bool | `true` |  |
 | postgresql.fullnameOverride | string | `"postgresql"` |  |
@@ -106,9 +111,24 @@ A Helm chart for the Flyte local demo cluster
 | postgresql.volumePermissions.enabled | bool | `true` |  |
 | postgresql.volumePermissions.image.pullPolicy | string | `"Never"` |  |
 | postgresql.volumePermissions.image.tag | string | `"sandbox"` |  |
+| rustfs.enabled | bool | `true` |  |
+| rustfs.fullnameOverride | string | `"rustfs"` |  |
+| rustfs.image.repository | string | `"rustfs/rustfs"` |  |
+| rustfs.image.tag | string | `"sandbox"` |  |
+| rustfs.ingress.enabled | bool | `false` |  |
+| rustfs.mode.distributed.enabled | bool | `false` |  |
+| rustfs.mode.standalone.enabled | bool | `true` |  |
+| rustfs.mode.standalone.existingClaim.dataClaim | string | `"flyte-devbox-rustfs-storage"` |  |
+| rustfs.secret.rustfs.access_key | string | `"rustfs"` |  |
+| rustfs.secret.rustfs.secret_key | string | `"rustfsstorage"` |  |
+| rustfs.service.endpoint.nodePort | int | `30002` |  |
+| rustfs.service.type | string | `"NodePort"` |  |
+| sandbox.console.basePath | string | `"/v2"` |  |
+| sandbox.console.containerPort | int | `8080` |  |
 | sandbox.console.enabled | bool | `true` |  |
 | sandbox.console.image.pullPolicy | string | `"Never"` |  |
-| sandbox.console.image.repository | string | `"ghcr.io/flyteorg/flyte-client-v2"` |  |
-| sandbox.console.image.tag | string | `"latest"` |  |
+| sandbox.console.image.repository | string | `"docker.io/unionai-oss/flyteconsole-v2"` |  |
+| sandbox.console.image.tag | string | `"sandbox"` |  |
+| sandbox.console.service.port | int | `80` |  |
 | sandbox.dev | bool | `false` |  |
 
