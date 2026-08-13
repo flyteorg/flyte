@@ -205,24 +205,34 @@ storage:
 
 {{/*
 Whether co-pilot reads its storage configuration from a Secret rather than from its command
-line. Rendering that Secret and pointing co-pilot at it are both gated on this and must stay
-in lockstep: naming a Secret that is never rendered leaves every task pod stuck in
+line. The Secret exists to keep credentials out of every task's pod spec, so it is rendered
+only when there is a credential to keep out of them. Ambient auth (S3 authType=iam, GCS
+workload identity, Azure without a key) puts nothing sensitive on the command line, and a
+Secret carrying a region and an endpoint would be machinery protecting nothing.
+
+Rendering the Secret and pointing co-pilot at it are both gated on this and must stay in
+lockstep: naming a Secret that is never rendered leaves every task pod stuck in
 ContainerCreating.
 
-False only for S3 with secretKeyPath, which names a file living solely in this deployment's
-container, so the rendered Secret would carry no usable credentials — and co-pilot takes the
-stow config all-or-nothing, making a partial file worse than none. Those deployments keep it
-on the command line, or supply their own Secret via storage.copilotStorageSecretRef.
+configuration.inline counts, whatever it holds. The chart cannot see whether an operator
+put a session token or a GCS service-account key in there, and config-secret.yaml merges
+it into the Secret, so err towards the Secret rather than towards the command line.
+
+S3 with only secretKeyPath is the one credential-bearing case that stays on the command
+line: the path names a file living solely in this deployment's container, so the chart
+cannot read it to render a Secret. Those deployments supply their own via
+storage.copilotStorageSecretRef.
 */}}
 {{- define "flyte-binary.configuration.copilotStorageFromSecret" -}}
+{{- $root := . -}}
 {{- with .Values.configuration.storage -}}
 {{- if .copilotStorageSecretRef -}}
 true
-{{- else if ne "s3" .provider -}}
+{{- else if and (eq "s3" .provider) (eq "accesskey" .providerConfig.s3.authType) .providerConfig.s3.secretKey -}}
 true
-{{- else if ne "accesskey" .providerConfig.s3.authType -}}
+{{- else if and (eq "azure" .provider) .providerConfig.azure.key -}}
 true
-{{- else if .providerConfig.s3.secretKey -}}
+{{- else if and $root.Values.configuration.inline (hasKey $root.Values.configuration.inline "storage") -}}
 true
 {{- end -}}
 {{- end -}}
