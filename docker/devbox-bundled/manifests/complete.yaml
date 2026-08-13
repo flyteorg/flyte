@@ -7808,6 +7808,10 @@ data:
       k8s:
         co-pilot:
           image: "flyte-binary-v2:sandbox"
+          # Co-pilot reads its storage configuration from this Secret instead of its command
+          # line, keeping the credentials out of every task's pod spec. Omitted for the
+          # deployments that cannot use it; see copilotStorageFromSecret.
+          storage-config-secret-name: "flyte-binary-copilot-storage-config-secret"
         # Env vars injected into every task pod, so it can reach the control plane
         # to enqueue child actions and watch their state.
         #
@@ -8163,6 +8167,36 @@ stringData:
         config:
           access_key_id: "rustfs"
           secret_key: "rustfsstorage"
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-binary
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-binary-copilot-storage-config-secret
+  namespace: flyte
+stringData:
+  copilot-storage-config.yaml: |
+    storage:
+      container: flyte-data
+      signedURL:
+        stowConfigOverride:
+          endpoint: http://localhost:30002
+      stow:
+        config:
+          access_key_id: rustfs
+          auth_type: accesskey
+          disable_ssl: true
+          endpoint: http://rustfs-svc.flyte:9000
+          region: us-east-1
+          secret_key: rustfsstorage
+          v2_signing: true
+        kind: s3
+      type: stow
 type: Opaque
 ---
 apiVersion: v1
@@ -8701,8 +8735,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 49e259b5181cecd91e406f5453b471831e41529923b6c290ae9a3c38ac124337
-        checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
+        checksum/configuration: 234f623bb88a11f8007d57f08b191c0d071273e46a56b910dfbba8ae6f43a34c
+        checksum/configuration-secret: ff95a9986cc42dff0a114449c9b8e9a95c781b7bdd9832b31ca461423ae0b678
       labels:
         app.kubernetes.io/component: flyte-binary
         app.kubernetes.io/instance: flyte-devbox
