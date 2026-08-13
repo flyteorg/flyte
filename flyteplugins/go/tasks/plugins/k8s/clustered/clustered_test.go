@@ -10,10 +10,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation"
 	k8sscheme "k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -21,6 +23,7 @@ import (
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 	"sigs.k8s.io/jobset/pkg/util/placement"
 
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	coreMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
@@ -1090,4 +1093,24 @@ func TestBuildResource_ReplicasExceedNamingBudget(t *testing.T) {
 	_, err := handler.BuildResource(context.Background(), taskCtx)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "replicas must be <=")
+}
+
+// TestSchemeRegistration guards the contract every k8s plugin owes its host binary: the
+// CRD it watches must be reachable through PluginRegistry().GetSchemeRegisters(), which is
+// how the executor builds its scheme (executor/setup.go). Hosts that drain the registry
+// otherwise fail at Create with "no kind is registered for the type ... in scheme".
+func TestSchemeRegistration(t *testing.T) {
+	s := runtime.NewScheme()
+	found := false
+	for _, reg := range pluginmachinery.PluginRegistry().GetSchemeRegisters() {
+		if reg.ID == taskType {
+			found = true
+			require.NoError(t, reg.AddToScheme(s))
+		}
+	}
+	require.True(t, found, "clustered-task did not register an AddToScheme")
+
+	gvks, _, err := s.ObjectKinds(&jobsetv1alpha2.JobSet{})
+	require.NoError(t, err)
+	assert.NotEmpty(t, gvks)
 }
