@@ -1472,7 +1472,7 @@ func init() {
 }
 
 func TestBuildResourcePodTemplateGating(t *testing.T) {
-	assert.NoError(t, setSparkConfig(&Config{EnablePodTemplate: true, SparkVersion: "3.5.1"}))
+	assert.NoError(t, setSparkConfig(&Config{EnablePodTemplate: true}))
 	assert.NoError(t, config.SetK8sPluginConfig(defaultPluginConfig()))
 	taskTemplate := dummySparkTaskTemplateContainer("gating", dummySparkConf)
 	taskCtx := dummySparkTaskContext(taskTemplate, true)
@@ -1505,7 +1505,7 @@ func TestBuildResourcePodTemplateGating(t *testing.T) {
 
 	// sparkVersion is declared only alongside a template, since that is the only thing the
 	// operator gates on it. Without a template the field stays empty, as it has always been.
-	assert.Equal(t, "3.5.1", withTemplate.Spec.SparkVersion)
+	assert.Equal(t, minPodTemplateSparkVersion, withTemplate.Spec.SparkVersion)
 	assert.Empty(t, withoutTemplate.Spec.SparkVersion)
 
 	// The template is strictly additive: with it stripped, the objects are identical.
@@ -1520,14 +1520,14 @@ func TestBuildResourcePodTemplateGating(t *testing.T) {
 	assert.Equal(t, expected, normalized)
 }
 
-// TestDefaultSparkVersionSatisfiesOperator pins the default to the operator's own rule rather
-// than to the string "3.0.0": the validating webhook rejects a SparkApplication carrying a pod
-// template whose spec.sparkVersion compares below 3.0.0, using exactly this comparison
-// (internal/webhook/sparkapplication_validator.go). An empty default is the bug this guards --
+// TestDefaultSparkVersionSatisfiesOperator pins the declared version to the operator's own rule
+// rather than to the string "3.0.0": the validating webhook rejects a SparkApplication carrying
+// a pod template whose spec.sparkVersion compares below 3.0.0, using exactly this comparison
+// (internal/webhook/sparkapplication_validator.go). Leaving it unset is the bug this guards --
 // it parses as invalid semver and loses the comparison.
 func TestDefaultSparkVersionSatisfiesOperator(t *testing.T) {
-	assert.GreaterOrEqual(t, sparkOpUtil.CompareSemanticVersion(defaultConfig.SparkVersion, "3.0.0"), 0,
-		"default spark-version %q is rejected by the operator's pod template validation", defaultConfig.SparkVersion)
+	assert.GreaterOrEqual(t, sparkOpUtil.CompareSemanticVersion(minPodTemplateSparkVersion, "3.0.0"), 0,
+		"declared spark version %q is rejected by the operator's pod template validation", minPodTemplateSparkVersion)
 	assert.Less(t, sparkOpUtil.CompareSemanticVersion("", "3.0.0"), 0,
 		"an unset spark-version is expected to lose the comparison; the default exists to avoid it")
 }

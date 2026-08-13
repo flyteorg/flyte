@@ -333,9 +333,11 @@ func createSparkApplication(sparkJob *plugins.SparkJob, sparkConfig map[string]s
 	// version parses as invalid semver and sorts below every real one.
 	//
 	// The field describes the image, which this plugin cannot inspect, so it is only declared
-	// when a template is actually attached — the one case the operator needs it for.
+	// when a template is actually attached — the one case the operator needs it for — and only
+	// as the floor the feature requires. The operator compares nothing but that boundary, so a
+	// more precise value would buy nothing; images older than it need enable-pod-template=false.
 	if driverSpec.sparkSpec.Template != nil || executorSpec.sparkSpec.Template != nil {
-		app.Spec.SparkVersion = GetSparkConfig().SparkVersion
+		app.Spec.SparkVersion = minPodTemplateSparkVersion
 	}
 
 	if val, ok := sparkConfig["spark.batchScheduler"]; ok {
