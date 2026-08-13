@@ -52,7 +52,7 @@ func newRootTaskAction(runID *common.RunIdentifier) *actions.Action {
 			Task: &workflow.TaskAction{
 				Spec: &task.TaskSpec{
 					TaskTemplate: &core.TaskTemplate{
-						Type: "python-task",
+						Type: "python",
 						Target: &core.TaskTemplate_Container{
 							Container: &core.Container{
 								Image:   "python:3.11",
@@ -94,7 +94,7 @@ func TestEnqueueReconcile(t *testing.T) {
 	assert.Equal(t, runID.Project, ta.Spec.Project)
 	assert.Equal(t, runID.Domain, ta.Spec.Domain)
 	assert.Equal(t, runID.Name, ta.Spec.ActionName)
-	assert.Equal(t, "python-task", ta.Spec.TaskType)
+	assert.Equal(t, "python", ta.Spec.TaskType)
 	assert.NotEmpty(t, ta.Spec.TaskTemplate)
 	assert.Equal(t, "/tmp/inputs.pb", ta.Spec.InputURI)
 	assert.Equal(t, "/tmp/outputs", ta.Spec.RunOutputBase)
@@ -182,7 +182,7 @@ func TestWatchPropagation(t *testing.T) {
 			}
 			assert.Equal(t, runID.Name, update.ActionID.GetRun().GetName())
 			assert.Equal(t, runID.Name, update.ActionID.GetName())
-			assert.Equal(t, "python-task", update.TaskType)
+			assert.Equal(t, "python", update.TaskType)
 			return
 		case <-deadline:
 			t.Fatalf("timed out waiting for ActionUpdate with phase %v", expectedPhase)

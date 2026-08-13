@@ -456,13 +456,6 @@ enabled_plugins:
   tasks:
     # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
     task-plugins:
-      # -- [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config).
-      # Enable sagemaker*, athena if you install the backend plugins
-      enabled-plugins:
-        - container
-        - sidecar
-        - connector-service
-        - echo
       default-for-task-types:
         container: container
         sidecar: sidecar

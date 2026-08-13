@@ -151,8 +151,8 @@ var _ = Describe("TaskAction Controller", func() {
 						ActionName:    "test-action",
 						InputURI:      "/tmp/input",
 						RunOutputBase: "/tmp/output",
-						TaskType:      "python-task",
-						TaskTemplate:  buildTaskTemplateBytes("python-task", "python:3.11"),
+						TaskType:      "python",
+						TaskTemplate:  buildTaskTemplateBytes("python", "python:3.11"),
 					},
 				}
 				Expect(k8sClient.Create(ctx, resource)).To(Succeed())
@@ -229,8 +229,8 @@ var _ = Describe("TaskAction Controller", func() {
 					ActionName:    "test-action",
 					InputURI:      "/tmp/input",
 					RunOutputBase: "/tmp/output",
-					TaskType:      "python-task",
-					TaskTemplate:  buildTaskTemplateBytes("python-task", "python:3.11"),
+					TaskType:      "python",
+					TaskTemplate:  buildTaskTemplateBytes("python", "python:3.11"),
 				},
 			}
 			Expect(k8sClient.Create(ctx, resource)).To(Succeed())
@@ -344,8 +344,8 @@ var _ = Describe("TaskAction Controller", func() {
 					ActionName:    "test-action",
 					InputURI:      "/tmp/input",
 					RunOutputBase: "/tmp/output",
-					TaskType:      "python-task",
-					TaskTemplate:  buildTaskTemplateBytes("python-task", "python:3.11"),
+					TaskType:      "python",
+					TaskTemplate:  buildTaskTemplateBytes("python", "python:3.11"),
 				},
 			}
 			Expect(k8sClient.Create(ctx, resource)).To(Succeed())
@@ -581,8 +581,8 @@ var _ = Describe("TaskAction Controller", func() {
 					ActionName:    "abort-action",
 					InputURI:      "/tmp/input",
 					RunOutputBase: "/tmp/output",
-					TaskType:      "python-task",
-					TaskTemplate:  buildTaskTemplateBytes("python-task", "python:3.11"),
+					TaskType:      "python",
+					TaskTemplate:  buildTaskTemplateBytes("python", "python:3.11"),
 				},
 			}
 			Expect(k8sClient.Create(ctx, resource)).To(Succeed())
