@@ -73,9 +73,6 @@ func (clusteredResourceHandler) BuildIdentityResource(_ context.Context, _ plugi
 }
 
 func init() {
-	// Kept for callers that still build their client off client-go's global scheme.
-	// Unlike spark (#7819), JobSet has no competing Go type for its GVK, so this
-	// registration cannot collide.
 	if err := jobsetv1alpha2.AddToScheme(scheme.Scheme); err != nil {
 		panic(err)
 	}
