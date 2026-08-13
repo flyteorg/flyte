@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,6 +12,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	k8sscheme "k8s.io/client-go/kubernetes/scheme"
@@ -184,4 +186,62 @@ func TestHandle_CorruptedPluginStateFailsPermanently(t *testing.T) {
 	assert.Equal(t, pluginsCore.PhasePermanentFailure, transition.Info().Phase())
 	assert.Equal(t, string(errors.CorruptedPluginState), transition.Info().Err().GetCode())
 	assert.Equal(t, core.ExecutionError_SYSTEM, transition.Info().Err().GetKind())
+}
+
+// TestAddObjectMetadata_ManagedLabel verifies that the label the manager's Pod cache selects
+// on survives addObjectMetadata. NewTaskExecutionMetadata is the single injection point; this
+// asserts nothing here drops it, since a Pod without the label is invisible to the executor
+// that created it and checkResourcePhase would report it as deleted externally.
+func TestAddObjectMetadata_ManagedLabel(t *testing.T) {
+	newManager := func(t *testing.T) *PluginManager {
+		mockPlugin := k8sMocks.NewPlugin(t)
+		mockPlugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+		return NewPluginManager("test-plugin", mockPlugin, nil)
+	}
+
+	// Mirrors what NewTaskExecutionMetadata injects into every task's labels.
+	managedLabels := map[string]string{
+		flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue,
+	}
+
+	newMeta := func(labels map[string]string) *pluginsCoreMock.TaskExecutionMetadata {
+		tID := &pluginsCoreMock.TaskExecutionID{}
+		tID.EXPECT().GetGeneratedName().Return("name").Maybe()
+		meta := &pluginsCoreMock.TaskExecutionMetadata{}
+		meta.EXPECT().GetTaskExecutionID().Return(tID).Maybe()
+		meta.EXPECT().GetNamespace().Return("ns")
+		meta.EXPECT().GetAnnotations().Return(nil)
+		meta.EXPECT().GetLabels().Return(labels)
+		meta.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{})
+		return meta
+	}
+
+	t.Run("propagates to the object", func(t *testing.T) {
+		pod := &v1.Pod{}
+		newManager(t).addObjectMetadata(newMeta(managedLabels), pod, &config.K8sPluginConfig{})
+
+		assert.Equal(t, flytek8s.ManagedLabelValue, pod.GetLabels()[flytek8s.ManagedLabelKey])
+	})
+
+	t.Run("matches the selector the manager cache is configured with", func(t *testing.T) {
+		pod := &v1.Pod{}
+		newManager(t).addObjectMetadata(newMeta(managedLabels), pod, &config.K8sPluginConfig{})
+
+		selector := labels.SelectorFromSet(labels.Set{
+			flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue,
+		})
+		assert.True(t, selector.Matches(labels.Set(pod.GetLabels())))
+	})
+
+	t.Run("not dropped by platform defaults or labels already on the object", func(t *testing.T) {
+		pod := &v1.Pod{ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{flytek8s.ManagedLabelKey: "object-value"},
+		}}
+		cfg := &config.K8sPluginConfig{
+			DefaultLabels: map[string]string{flytek8s.ManagedLabelKey: "default-value"},
+		}
+		newManager(t).addObjectMetadata(newMeta(managedLabels), pod, cfg)
+
+		assert.Equal(t, flytek8s.ManagedLabelValue, pod.GetLabels()[flytek8s.ManagedLabelKey])
+	})
 }

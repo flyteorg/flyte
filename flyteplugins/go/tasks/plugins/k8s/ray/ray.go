@@ -511,7 +511,8 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 		ObjectMeta: *objectMeta,
 	}
 	cfg := config.GetK8sPluginConfig()
-	podTemplateSpec.SetLabels(utils.UnionMaps(cfg.DefaultLabels, podTemplateSpec.GetLabels(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()), spec.GetK8SPod().GetMetadata().GetLabels()))
+	podTemplateSpec.SetLabels(utils.UnionMaps(cfg.DefaultLabels, podTemplateSpec.GetLabels(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()), spec.GetK8SPod().GetMetadata().GetLabels(),
+		map[string]string{flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue}))
 	podTemplateSpec.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()), spec.GetK8SPod().GetMetadata().GetAnnotations()))
 
 	return podTemplateSpec, nil
@@ -675,7 +676,8 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 		ObjectMeta: *objectMetadata,
 	}
 	cfg := config.GetK8sPluginConfig()
-	podTemplateSpec.SetLabels(utils.UnionMaps(cfg.DefaultLabels, podTemplateSpec.GetLabels(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()), spec.GetK8SPod().GetMetadata().GetLabels()))
+	podTemplateSpec.SetLabels(utils.UnionMaps(cfg.DefaultLabels, podTemplateSpec.GetLabels(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()), spec.GetK8SPod().GetMetadata().GetLabels(),
+		map[string]string{flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue}))
 	podTemplateSpec.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()), spec.GetK8SPod().GetMetadata().GetAnnotations()))
 	return podTemplateSpec, nil
 }

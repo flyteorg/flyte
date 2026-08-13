@@ -1,12 +1,16 @@
 package plugin
 
 import (
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -135,5 +139,43 @@ func TestTaskExecutionID_GetGeneratedNameWith(t *testing.T) {
 		}
 		_, err := execID.GetGeneratedNameWith(0, 2)
 		require.Error(t, err)
+	})
+}
+
+func TestNewTaskExecutionMetadata_ManagedLabel(t *testing.T) {
+	// The manager cache selects on this label, so a Pod without it is invisible
+	// to the executor. Plugins merge these labels into the Pod templates they
+	// build, which is how operator-created Pods inherit it.
+	newMeta := func(labels map[string]string) pluginsCore.TaskExecutionMetadata {
+		meta, err := NewTaskExecutionMetadata(&flyteorgv1.TaskAction{
+			ObjectMeta: metav1.ObjectMeta{Labels: labels},
+			Spec: flyteorgv1.TaskActionSpec{
+				Project:       "project",
+				Domain:        "development",
+				RunName:       "run-name",
+				ActionName:    "action-name",
+				RunOutputBase: "s3://bucket/run",
+			},
+		})
+		require.NoError(t, err)
+		return meta
+	}
+
+	t.Run("always set", func(t *testing.T) {
+		require.Equal(t, flytek8s.ManagedLabelValue,
+			newMeta(nil).GetLabels()[flytek8s.ManagedLabelKey])
+	})
+
+	t.Run("matches the cache selector", func(t *testing.T) {
+		selector := labels.SelectorFromSet(labels.Set{
+			flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue,
+		})
+		require.True(t, selector.Matches(labels.Set(newMeta(nil).GetLabels())))
+	})
+
+	t.Run("user labels cannot override it", func(t *testing.T) {
+		meta := newMeta(map[string]string{flytek8s.ManagedLabelKey: "false"})
+		require.Equal(t, flytek8s.ManagedLabelValue,
+			meta.GetLabels()[flytek8s.ManagedLabelKey])
 	})
 }
