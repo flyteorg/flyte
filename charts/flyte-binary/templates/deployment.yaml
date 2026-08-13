@@ -1,3 +1,4 @@
+{{- include "flyte-binary.validateValues" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

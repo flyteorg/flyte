@@ -97,6 +97,9 @@ configuration:
     # it must hold nothing else. Leave empty to have the chart render that Secret itself;
     # set it when using s3.secretKeyPath, which names a file that exists only in this
     # deployment's container and so cannot be read from a task pod.
+    # Cannot be combined with externalConfigMap or externalSecretRef: the chart renders no
+    # ConfigMap to carry the co-pilot key then, so set that key in your own configuration
+    # instead. The chart fails the install rather than ignoring this value in silence.
     copilotStorageSecretRef: ""
     # provider Object store provider (Supported values: s3, gcs)
     provider: s3

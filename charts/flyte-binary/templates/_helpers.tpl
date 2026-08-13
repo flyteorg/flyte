@@ -111,6 +111,16 @@ Flag to use external configuration.
 {{- end -}}
 
 {{/*
+Fail on value combinations the chart would otherwise ignore in silence. Called from
+deployment.yaml, which renders whatever else is switched off.
+*/}}
+{{- define "flyte-binary.validateValues" -}}
+{{- if and .Values.configuration.storage.copilotStorageSecretRef (include "flyte-binary.configuration.externalConfiguration" .) -}}
+{{- fail "configuration.storage.copilotStorageSecretRef has no effect while configuration.externalConfigMap or configuration.externalSecretRef is set: the chart renders no ConfigMap, and that is what would carry plugins.k8s.co-pilot.storage-config-secret-name. Set that key in your own configuration instead, then unset copilotStorageSecretRef." -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Get the Flyte configuration ConfigMap name.
 */}}
 {{- define "flyte-binary.configuration.configMapName" -}}
