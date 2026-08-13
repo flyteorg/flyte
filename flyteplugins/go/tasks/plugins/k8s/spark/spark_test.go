@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -1289,10 +1290,10 @@ func TestGetCompletionTime_WrongResourceType(t *testing.T) {
 
 // TestBuildResourceSparkExecutorAffinityDilution probes whether the non-interruptible
 // node-selector requirement (interruptible=false) survives on a Spark executor whose
-// custom executorPod carries its own node-affinity term. Spark merges the executor
-// overlay (spark.go createExecutorSpec) but re-applies no scheduling afterwards, so
-// this is the Spark analogue of the Ray OR-append dilution. If it fails, the appended
-// custom term lacks the non-interruptible requirement (bug); if it passes, no bug.
+// custom executorPod carries its own node-affinity term. The custom pod spec is handed
+// to the operator as the pod template rather than merged into the pod spec Flyte builds,
+// so it can no longer dilute the platform requirements on the explicit SparkPodSpec
+// fields — the operator treats those as overrides of the template.
 func TestBuildResourceSparkExecutorAffinityDilution(t *testing.T) {
 	sparkResourceHandler := sparkResourceHandler{}
 	defaultConfig := defaultPluginConfig()
@@ -1336,7 +1337,7 @@ func TestBuildResourceSparkExecutorAffinityDilution(t *testing.T) {
 	require.NotNil(t, sparkApp.Spec.Executor.Affinity)
 	require.NotNil(t, sparkApp.Spec.Executor.Affinity.NodeAffinity)
 	terms := sparkApp.Spec.Executor.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
-	require.GreaterOrEqual(t, len(terms), 2, "expected the custom executor affinity term to be appended as a separate term")
+	require.NotEmpty(t, terms)
 	for i, term := range terms {
 		found := false
 		for _, e := range term.MatchExpressions {
@@ -1347,6 +1348,114 @@ func TestBuildResourceSparkExecutorAffinityDilution(t *testing.T) {
 		}
 		assert.Truef(t, found, "executor node selector term %d is missing the non-interruptible requirement", i)
 	}
+
+	// The custom term rides on the template instead, where the explicit fields above win.
+	require.NotNil(t, sparkApp.Spec.Executor.Template)
+	assert.Equal(t, executorPodSpec.Affinity, sparkApp.Spec.Executor.Template.Spec.Affinity)
+}
+
+// TestBuildResourceCustomPodSpecPassthrough covers the driver/executor pod specs reaching
+// the operator verbatim as the pod template. They used to be merged onto the pod spec Flyte
+// builds, which matches containers by name — and the container Flyte generates is named
+// after the task execution ID, so a container the user named anything else (the operator's
+// own `spark-kubernetes-{driver,executor}`, or `primary`) was silently dropped. Worse, a
+// `primary_container_name` that named such a container failed the task outright with
+// "invalid TaskSpecification, container [...] not defined".
+func TestBuildResourceCustomPodSpecPassthrough(t *testing.T) {
+	require.NoError(t, setSparkConfig(&Config{EnablePodTemplate: true}))
+	require.NoError(t, config.SetK8sPluginConfig(defaultPluginConfig()))
+	setPodTemplateSupportedForTest(true)
+
+	customPodSpec := func(containerName string) *corev1.PodSpec {
+		return &corev1.PodSpec{
+			Containers: []corev1.Container{{
+				Name: containerName,
+				Resources: corev1.ResourceRequirements{
+					Requests: corev1.ResourceList{corev1.ResourceEphemeralStorage: resource.MustParse("9Gi")},
+				},
+			}},
+		}
+	}
+	driverPodSpec := customPodSpec("spark-kubernetes-driver")
+	executorPodSpec := customPodSpec("primary")
+
+	driverPodSpecPb, err := utils.MarshalObjToStruct(driverPodSpec)
+	require.NoError(t, err)
+	executorPodSpecPb, err := utils.MarshalObjToStruct(executorPodSpec)
+	require.NoError(t, err)
+
+	sparkJob := dummySparkCustomObj(dummySparkConf)
+	sparkJob.DriverPod = &core.K8SPod{PodSpec: driverPodSpecPb, PrimaryContainerName: "spark-kubernetes-driver"}
+	sparkJob.ExecutorPod = &core.K8SPod{PodSpec: executorPodSpecPb, PrimaryContainerName: "primary"}
+
+	sparkJobJSON, err := utils.MarshalToString(sparkJob)
+	require.NoError(t, err)
+	structObj := structpb.Struct{}
+	require.NoError(t, stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj))
+	taskTemplate := &core.TaskTemplate{
+		Id:     &core.Identifier{Name: "spark-custom-pod"},
+		Type:   "container",
+		Target: &core.TaskTemplate_Container{Container: &core.Container{Image: testImage, Args: testArgs, Env: dummyEnvVars}},
+		Custom: &structObj,
+	}
+
+	res, err := sparkResourceHandler{}.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
+	require.NoError(t, err, "a primary_container_name that does not name a Flyte-generated container must not fail the task")
+	sparkApp, ok := res.(*sj.SparkApplication)
+	require.True(t, ok)
+
+	require.NotNil(t, sparkApp.Spec.Driver.Template)
+	assert.Equal(t, driverPodSpec.Containers, sparkApp.Spec.Driver.Template.Spec.Containers)
+	require.NotNil(t, sparkApp.Spec.Executor.Template)
+	assert.Equal(t, executorPodSpec.Containers, sparkApp.Spec.Executor.Template.Spec.Containers)
+
+	// The explicit fields still come from the pod spec Flyte builds, not from the template.
+	assert.Equal(t, testImage, *sparkApp.Spec.Driver.Image)
+	assert.Equal(t, testImage, *sparkApp.Spec.Executor.Image)
+}
+
+// TestBuildResourceCustomPodSpecDroppedWithoutTemplateSupport pins the accepted tradeoff:
+// the template is the only path a custom driver/executor pod spec travels, so on a cluster
+// whose SparkApplication CRD predates `spec.driver.template` it does not apply at all.
+func TestBuildResourceCustomPodSpecDroppedWithoutTemplateSupport(t *testing.T) {
+	require.NoError(t, setSparkConfig(&Config{EnablePodTemplate: true}))
+	require.NoError(t, config.SetK8sPluginConfig(defaultPluginConfig()))
+	setPodTemplateSupportedForTest(false)
+	defer setPodTemplateSupportedForTest(true)
+
+	executorPodSpec := &corev1.PodSpec{
+		NodeSelector: map[string]string{"custom": "true"},
+		Containers: []corev1.Container{{
+			Name: "primary",
+			Resources: corev1.ResourceRequirements{
+				Requests: corev1.ResourceList{corev1.ResourceEphemeralStorage: resource.MustParse("9Gi")},
+			},
+		}},
+	}
+	podSpecPb, err := utils.MarshalObjToStruct(executorPodSpec)
+	require.NoError(t, err)
+
+	sparkJob := dummySparkCustomObj(dummySparkConf)
+	sparkJob.ExecutorPod = &core.K8SPod{PodSpec: podSpecPb, PrimaryContainerName: "primary"}
+
+	sparkJobJSON, err := utils.MarshalToString(sparkJob)
+	require.NoError(t, err)
+	structObj := structpb.Struct{}
+	require.NoError(t, stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj))
+	taskTemplate := &core.TaskTemplate{
+		Id:     &core.Identifier{Name: "spark-custom-pod-legacy-crd"},
+		Type:   "container",
+		Target: &core.TaskTemplate_Container{Container: &core.Container{Image: testImage, Args: testArgs, Env: dummyEnvVars}},
+		Custom: &structObj,
+	}
+
+	res, err := sparkResourceHandler{}.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
+	require.NoError(t, err)
+	sparkApp, ok := res.(*sj.SparkApplication)
+	require.True(t, ok)
+
+	assert.Nil(t, sparkApp.Spec.Executor.Template)
+	assert.NotContains(t, sparkApp.Spec.Executor.NodeSelector, "custom")
 }
 
 // setPodTemplateSupportedForTest overrides the once-per-process CRD capability probe.
