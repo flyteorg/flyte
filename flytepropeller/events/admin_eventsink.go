@@ -66,36 +66,41 @@ func (s *adminEventSink) Sink(ctx context.Context, message proto.Message) error 
 
 	// Validate submission with rate limiter and send admin event
 	if s.rateLimiter.Allow() {
+		var sendErr error
 		switch eventMessage := message.(type) {
 		case *event.WorkflowExecutionEvent:
 			request := &admin.WorkflowExecutionEventRequest{
 				Event: eventMessage,
 			}
 
-			_, err := s.adminClient.CreateWorkflowEvent(ctx, request)
-			if err != nil {
-				return errors.WrapError(err)
-			}
+			_, sendErr = s.adminClient.CreateWorkflowEvent(ctx, request)
 		case *event.NodeExecutionEvent:
 			request := &admin.NodeExecutionEventRequest{
 				Event: eventMessage,
 			}
 
-			_, err := s.adminClient.CreateNodeEvent(ctx, request)
-			if err != nil {
-				return errors.WrapError(err)
-			}
+			_, sendErr = s.adminClient.CreateNodeEvent(ctx, request)
 		case *event.TaskExecutionEvent:
 			request := &admin.TaskExecutionEventRequest{
 				Event: eventMessage,
 			}
 
-			_, err := s.adminClient.CreateTaskEvent(ctx, request)
-			if err != nil {
-				return errors.WrapError(err)
-			}
+			_, sendErr = s.adminClient.CreateTaskEvent(ctx, request)
 		default:
 			return fmt.Errorf("unknown event type [%s]", eventMessage.String())
+		}
+
+		if sendErr != nil {
+			wrapped := errors.WrapError(sendErr)
+			if errors.IsAlreadyExists(wrapped) {
+				// Admin already holds this event, so re-sending it can never succeed. Record the id
+				// so later re-emits are answered by the filter.Contains check above instead of
+				// spending rate limiter capacity that other executions need. The check returns this
+				// same error code, so callers see no change.
+				s.filter.Add(ctx, id)
+			}
+
+			return wrapped
 		}
 	} else {
 		return &errors.EventError{Code: errors.ResourceExhausted,
