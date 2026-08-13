@@ -131,9 +131,11 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.Contains(t, joined, "secret_key=fallback-secret")
 		assert.Contains(t, joined, "auth_type=accesskey")
 		assert.NotContains(t, joined, "--config")
-		// secret_key_path is dropped even here: it names a file that does not exist in a
-		// task pod, and forwarding it stops co-pilot from starting at all.
-		assert.NotContains(t, joined, "secret_key_path")
+		// The stow config is passed through as configured, secret_key_path included. It
+		// points at a file in this deployment's own container, so deployments using it must
+		// mount that file into their task pods for co-pilot to start — same as before the
+		// Secret existed.
+		assert.Contains(t, joined, "secret_key_path=/etc/flyte/storage/secret_key")
 
 		bare := cfg
 		bare.StorageConfigSecretName = ""
@@ -215,11 +217,10 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.Contains(t, joined, "--config /etc/flyte/copilot/*.yaml")
 	})
 
-	t.Run("an override's secret_key_path survives, since nothing resolved it", func(t *testing.T) {
-		// storage.GetConfig() gets its secret_key_path read into secret_key by
-		// newStowRawStore, but StorageConfigOverride is never handed to a DataStore, so
-		// dropping the path here would leave co-pilot with no credential at all. The
-		// operator mounting that file into task pods is the only way this ever worked.
+	t.Run("an override is forwarded as configured", func(t *testing.T) {
+		// StorageConfigOverride is never handed to a DataStore, so unlike the deployment's
+		// own config nothing has resolved secret_key_path into secret_key. Forwarding it
+		// verbatim is the only way an override that relies on it can work.
 		override := storage.Config{}
 		override.Type = storage.TypeStow
 		override.InitContainer = "bucket"
@@ -235,15 +236,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.NoError(t, err)
 		joined := strings.Join(command, " ")
 		assert.Contains(t, joined, "secret_key_path=/etc/flyte/storage/secret_key")
-
-		// Once secret_key carries the credential the path is redundant, and forwarding it
-		// would make co-pilot stat a file the task pod has no reason to hold.
-		override.Stow.Config["secret_key"] = "resolved-from-file"
-		command, err = CopilotCommandArgs(&override, cfg.StorageConfigSecretName, true)
-		assert.NoError(t, err)
-		joined = strings.Join(command, " ")
-		assert.Contains(t, joined, "secret_key=resolved-from-file")
-		assert.NotContains(t, joined, "secret_key_path")
+		assert.Contains(t, joined, "access_key_id=AKIAOVERRIDE")
 	})
 
 	t.Run("bad-res-cpu", func(t *testing.T) {
@@ -869,4 +862,69 @@ func TestAddCoPilotToPod(t *testing.T) {
 	t.Run("nil", func(t *testing.T) {
 		assert.NoError(t, AddCoPilotToPod(ctx, cfg, nil, nil, taskMetadata, inputPaths, opath, nil))
 	})
+}
+
+// The backward-compatible path: no Secret configured, so copilotMounts stays nil and the
+// co-pilot containers get only their own data volume, exactly as before this setting existed.
+func TestAddCoPilotToPod_NoStorageSecret(t *testing.T) {
+	ctx := context.TODO()
+	cfg := config.FlyteCoPilotConfig{
+		NamePrefix:           "test-",
+		Image:                "test",
+		DefaultInputDataPath: "/in",
+		DefaultOutputPath:    "/out",
+		InputVolumeName:      "inp",
+		OutputVolumeName:     "out",
+		CPU:                  "1024m",
+		Memory:               "1024Mi",
+	}
+
+	original := storage.GetConfig().Stow.Config
+	defer func() { storage.GetConfig().Stow.Config = original }()
+	storage.GetConfig().Stow.Config = map[string]string{"access_key_id": "AKIA", "secret_key": "sk"}
+	storage.GetConfig().Stow.Kind = "s3"
+
+	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
+	overrides := &pluginsCoreMock.TaskOverrides{}
+	overrides.EXPECT().GetResources().Return(resourceRequirements)
+	taskMetadata.EXPECT().GetOverrides().Return(overrides)
+	taskExecutionID := &pluginsCoreMock.TaskExecutionID{}
+	taskExecutionID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
+		TaskId: &core.Identifier{Name: "task"},
+	})
+	taskMetadata.EXPECT().GetTaskExecutionID().Return(taskExecutionID)
+
+	inputPaths := &pluginsIOMock.InputFilePaths{}
+	inputPaths.EXPECT().GetInputPath().Return("s3://input/inputs.pb")
+	opath := &pluginsIOMock.OutputFilePaths{}
+	opath.EXPECT().GetRawOutputPrefix().Return("s3://raw")
+	opath.EXPECT().GetOutputPrefixPath().Return("s3://output")
+
+	pod := v1.PodSpec{}
+	iface := &core.TypedInterface{
+		Inputs: &core.VariableMap{Variables: []*core.VariableEntry{
+			{Key: "x", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
+		}},
+		Outputs: &core.VariableMap{Variables: []*core.VariableEntry{
+			{Key: "o", Value: &core.Variable{Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
+		}},
+	}
+	pilot := &core.DataLoadingConfig{Enabled: true, InputPath: "in", OutputPath: "out"}
+
+	assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot))
+
+	for _, v := range pod.Volumes {
+		assert.NotEqual(t, copilotConfigVolumeName, v.Name, "no Secret configured, so no config volume")
+	}
+
+	// Each co-pilot container still gets its own data volume, and nothing else.
+	assert.NotEmpty(t, pod.InitContainers)
+	for _, c := range append(append([]v1.Container{}, pod.InitContainers...), pod.Containers...) {
+		for _, m := range c.VolumeMounts {
+			assert.NotEqual(t, copilotConfigVolumeName, m.Name)
+		}
+	}
+	for _, c := range pod.InitContainers {
+		assert.Len(t, c.VolumeMounts, 1, "container %q should mount only its data volume", c.Name)
+	}
 }
