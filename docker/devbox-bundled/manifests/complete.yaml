@@ -8187,18 +8187,21 @@ metadata:
 stringData:
   copilot-storage-config.yaml: |
     storage:
-      type: stow
-      stow:
-        kind: s3
-        config:
-          region: us-east-1
-          disable_ssl: true
-          v2_signing: true
-          endpoint: http://rustfs-svc.flyte:9000
-          auth_type: accesskey
-          access_key_id: "rustfs"
-          secret_key: "rustfsstorage"
       container: flyte-data
+      signedURL:
+        stowConfigOverride:
+          endpoint: http://localhost:30002
+      stow:
+        config:
+          access_key_id: rustfs
+          auth_type: accesskey
+          disable_ssl: true
+          endpoint: http://rustfs-svc.flyte:9000
+          region: us-east-1
+          secret_key: rustfsstorage
+          v2_signing: true
+        kind: s3
+      type: stow
 type: Opaque
 ---
 apiVersion: v1
@@ -8761,7 +8764,7 @@ spec:
     metadata:
       annotations:
         checksum/configuration: 234f623bb88a11f8007d57f08b191c0d071273e46a56b910dfbba8ae6f43a34c
-        checksum/configuration-secret: 652a905205b043cbc7e2d4dbb41c05679fbec92bd4aecee1b996834f797d559b
+        checksum/configuration-secret: ff95a9986cc42dff0a114449c9b8e9a95c781b7bdd9832b31ca461423ae0b678
       labels:
         app.kubernetes.io/component: flyte-binary
         app.kubernetes.io/instance: flyte-devbox
