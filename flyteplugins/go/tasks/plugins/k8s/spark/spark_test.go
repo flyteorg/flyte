@@ -1605,13 +1605,9 @@ func TestBuildResourcePodTemplateRenamesTaskContainer(t *testing.T) {
 }
 
 // TestBuildResourcePodTemplateCustomPodSpec pins the other half of the contract: a
-// user-supplied driver/executor pod spec is written against what the operator generates, so it
-// already carries the operator's container names and never the task entrypoint. It is passed
-// through verbatim -- the rename and entrypoint strip apply only to Flyte's own pod spec.
-//
-// Spark still has to be told which container to adopt, and for a custom spec the user is the one
-// who says which is primary (core.K8SPod.primary_container_name). When they don't, the conf is
-// left unset, which is Spark's first-container default either way.
+// user-supplied driver/executor pod spec is expected to name its container the way the operator
+// and Spark do, so it is passed through verbatim -- the rename and entrypoint strip apply only
+// to Flyte's own pod spec.
 func TestBuildResourcePodTemplateCustomPodSpec(t *testing.T) {
 	assert.NoError(t, setSparkConfig(&Config{EnablePodTemplate: true}))
 	assert.NoError(t, config.SetK8sPluginConfig(defaultPluginConfig()))
@@ -1625,71 +1621,52 @@ func TestBuildResourcePodTemplateCustomPodSpec(t *testing.T) {
 			Args:    []string{"--user-flag"},
 		}}}
 	}
+	driverPodSpec := customPodSpec(defaultDriverPrimaryContainerName)
+	executorPodSpec := customPodSpec(defaultExecutorPrimaryContainerName)
 
-	build := func(t *testing.T, driverPrimary, executorPrimary string) (*sj.SparkApplication, *corev1.PodSpec, *corev1.PodSpec) {
-		t.Helper()
-		driverPodSpec := customPodSpec(defaultDriverPrimaryContainerName)
-		executorPodSpec := customPodSpec(defaultExecutorPrimaryContainerName)
+	driverPodSpecPb, err := utils.MarshalObjToStruct(driverPodSpec)
+	require.NoError(t, err)
+	executorPodSpecPb, err := utils.MarshalObjToStruct(executorPodSpec)
+	require.NoError(t, err)
 
-		driverPodSpecPb, err := utils.MarshalObjToStruct(driverPodSpec)
-		require.NoError(t, err)
-		executorPodSpecPb, err := utils.MarshalObjToStruct(executorPodSpec)
-		require.NoError(t, err)
+	sparkJob := dummySparkCustomObj(dummySparkConf)
+	sparkJob.DriverPod = &core.K8SPod{PodSpec: driverPodSpecPb, PrimaryContainerName: defaultDriverPrimaryContainerName}
+	sparkJob.ExecutorPod = &core.K8SPod{PodSpec: executorPodSpecPb, PrimaryContainerName: defaultExecutorPrimaryContainerName}
 
-		sparkJob := dummySparkCustomObj(dummySparkConf)
-		sparkJob.DriverPod = &core.K8SPod{PodSpec: driverPodSpecPb, PrimaryContainerName: driverPrimary}
-		sparkJob.ExecutorPod = &core.K8SPod{PodSpec: executorPodSpecPb, PrimaryContainerName: executorPrimary}
-
-		sparkJobJSON, err := utils.MarshalToString(sparkJob)
-		require.NoError(t, err)
-		structObj := structpb.Struct{}
-		require.NoError(t, stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj))
-		taskTemplate := &core.TaskTemplate{
-			Id:     &core.Identifier{Name: "spark-custom-pod-template"},
-			Type:   "container",
-			Target: &core.TaskTemplate_Container{Container: &core.Container{Image: testImage, Args: testArgs, Env: dummyEnvVars}},
-			Custom: &structObj,
-		}
-
-		resource, err := sparkResourceHandler{}.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
-		require.NoError(t, err)
-		return resource.(*sj.SparkApplication), driverPodSpec, executorPodSpec
+	sparkJobJSON, err := utils.MarshalToString(sparkJob)
+	require.NoError(t, err)
+	structObj := structpb.Struct{}
+	require.NoError(t, stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj))
+	taskTemplate := &core.TaskTemplate{
+		Id:     &core.Identifier{Name: "spark-custom-pod-template"},
+		Type:   "container",
+		Target: &core.TaskTemplate_Container{Container: &core.Container{Image: testImage, Args: testArgs, Env: dummyEnvVars}},
+		Custom: &structObj,
 	}
 
-	t.Run("passed through verbatim", func(t *testing.T) {
-		sparkApp, driverPodSpec, executorPodSpec := build(t, defaultDriverPrimaryContainerName, defaultExecutorPrimaryContainerName)
+	resource, err := sparkResourceHandler{}.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
+	require.NoError(t, err)
+	sparkApp := resource.(*sj.SparkApplication)
 
-		for _, tc := range []struct {
-			role     string
-			expected *corev1.PodSpec
-			template *corev1.PodTemplateSpec
-		}{
-			{"driver", driverPodSpec, sparkApp.Spec.Driver.Template},
-			{"executor", executorPodSpec, sparkApp.Spec.Executor.Template},
-		} {
-			require.NotNil(t, tc.template, "%s template missing", tc.role)
-			require.Len(t, tc.template.Spec.Containers, 1, "%s template was rewritten", tc.role)
-			assert.Equal(t, tc.expected.Containers[0].Name, tc.template.Spec.Containers[0].Name)
-			assert.Equal(t, tc.expected.Containers[0].Command, tc.template.Spec.Containers[0].Command,
-				"%s custom pod spec must be passed through verbatim", tc.role)
-			assert.Equal(t, tc.expected.Containers[0].Args, tc.template.Spec.Containers[0].Args)
-		}
-	})
+	for _, tc := range []struct {
+		role     string
+		expected *corev1.PodSpec
+		template *corev1.PodTemplateSpec
+	}{
+		{"driver", driverPodSpec, sparkApp.Spec.Driver.Template},
+		{"executor", executorPodSpec, sparkApp.Spec.Executor.Template},
+	} {
+		require.NotNil(t, tc.template, "%s template missing", tc.role)
+		require.Len(t, tc.template.Spec.Containers, 1, "%s template was rewritten", tc.role)
+		assert.Equal(t, tc.expected.Containers[0].Name, tc.template.Spec.Containers[0].Name)
+		assert.Equal(t, tc.expected.Containers[0].Command, tc.template.Spec.Containers[0].Command,
+			"%s custom pod spec must be passed through verbatim", tc.role)
+		assert.Equal(t, tc.expected.Containers[0].Args, tc.template.Spec.Containers[0].Args)
+	}
 
-	t.Run("declared primary container names the one Spark adopts", func(t *testing.T) {
-		sparkApp, _, _ := build(t, defaultDriverPrimaryContainerName, defaultExecutorPrimaryContainerName)
-
-		assert.Equal(t, defaultDriverPrimaryContainerName,
-			sparkApp.Spec.SparkConf[sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName])
-		assert.Equal(t, defaultExecutorPrimaryContainerName,
-			sparkApp.Spec.SparkConf[sparkOpCommon.SparkKubernetesExecutorPodTemplateContainerName])
-	})
-
-	t.Run("no declared primary container leaves the conf unset", func(t *testing.T) {
-		sparkApp, _, _ := build(t, "", "")
-
-		// Spark's own first-container default applies, exactly as before this plugin set the conf.
-		assert.NotContains(t, sparkApp.Spec.SparkConf, sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName)
-		assert.NotContains(t, sparkApp.Spec.SparkConf, sparkOpCommon.SparkKubernetesExecutorPodTemplateContainerName)
-	})
+	// The container Spark adopts is named the same way whoever wrote the template.
+	assert.Equal(t, defaultDriverPrimaryContainerName,
+		sparkApp.Spec.SparkConf[sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName])
+	assert.Equal(t, defaultExecutorPrimaryContainerName,
+		sparkApp.Spec.SparkConf[sparkOpCommon.SparkKubernetesExecutorPodTemplateContainerName])
 }
