@@ -29,13 +29,9 @@ import (
 )
 
 const (
-	KindSparkApplication = "SparkApplication"
-	sparkDriverUI        = "sparkDriverUI"
-	sparkHistoryUI       = "sparkHistoryUI"
-	// The names the operator's mutating webhook looks for (findContainer in
-	// internal/webhook/sparkpod_defaulter.go), which are also the names Spark gives the
-	// containers it builds. The driver name is what the log links and pod demystification
-	// below expect to find in the pod.
+	KindSparkApplication                = "SparkApplication"
+	sparkDriverUI                       = "sparkDriverUI"
+	sparkHistoryUI                      = "sparkHistoryUI"
 	defaultDriverPrimaryContainerName   = sparkOpCommon.SparkDriverContainerName
 	defaultExecutorPrimaryContainerName = sparkOpCommon.Spark3DefaultExecutorContainerName
 )
@@ -154,10 +150,12 @@ func serviceAccountName(metadata pluginsCore.TaskExecutionMetadata) string {
 
 // sparkContainerName is the name the operator and Spark expect for the role's container:
 // defaultDriverPrimaryContainerName or defaultExecutorPrimaryContainerName.
+// customPrimaryContainerName is the primary container the user declared on their own
+// driver/executor pod spec, if any.
 //
-// The second return value is the template container Spark should adopt, empty when the plugin
-// cannot say -- see the podTemplateContainerName note below.
-func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, podSpec, customPodSpec *v1.PodSpec, container *v1.Container, sparkContainerName string) (*sparkOp.SparkPodSpec, string) {
+// The second return value is the template container Spark should adopt, empty when no template
+// is attached or when a custom pod spec named no primary container.
+func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, podSpec, customPodSpec *v1.PodSpec, container *v1.Container, sparkContainerName, customPrimaryContainerName string) (*sparkOp.SparkPodSpec, string) {
 	annotations := utils.UnionMaps(config.GetK8sPluginConfig().DefaultAnnotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
 	labels := utils.UnionMaps(config.GetK8sPluginConfig().DefaultLabels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 
@@ -237,7 +235,11 @@ func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 		sa := serviceAccountName(taskCtx.TaskExecutionMetadata())
 		spec.ServiceAccount = &sa
 
-		if customPodSpec == nil {
+		if customPodSpec != nil {
+			// The user names their own primary container; an empty or absent one leaves the
+			// conf unset, which is Spark's first-container default either way.
+			templateContainerName = customPrimaryContainerName
+		} else {
 			templateContainerName = sparkContainerName
 		}
 	}
@@ -277,11 +279,10 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 	if err != nil {
 		return nil, err
 	}
-	sparkPodSpec, templateContainerName := createSparkPodSpec(ctx, nonInterruptibleTaskCtx, podSpec, customPodSpec, primaryContainer, defaultDriverPrimaryContainerName)
+	sparkPodSpec, templateContainerName := createSparkPodSpec(ctx, nonInterruptibleTaskCtx, podSpec, customPodSpec, primaryContainer, defaultDriverPrimaryContainerName, driverPod.GetPrimaryContainerName())
 	// Spark adopts the container named here, falling back to the first one in the template.
 	// Without this a pod template that orders a sidecar ahead of the task container has Spark
-	// run the sidecar as the driver. Left unset for a custom pod spec, whose primary container
-	// this plugin does not choose.
+	// run the sidecar as the driver.
 	if templateContainerName != "" {
 		sparkConfig[sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName] = templateContainerName
 	}
@@ -331,7 +332,7 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 	if err != nil {
 		return nil, err
 	}
-	sparkPodSpec, templateContainerName := createSparkPodSpec(ctx, taskCtx, podSpec, customPodSpec, primaryContainer, defaultExecutorPrimaryContainerName)
+	sparkPodSpec, templateContainerName := createSparkPodSpec(ctx, taskCtx, podSpec, customPodSpec, primaryContainer, defaultExecutorPrimaryContainerName, executorPod.GetPrimaryContainerName())
 	if templateContainerName != "" {
 		sparkConfig[sparkOpCommon.SparkKubernetesExecutorPodTemplateContainerName] = templateContainerName
 	}
