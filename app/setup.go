@@ -10,6 +10,7 @@ import (
 	stdlibapp "github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/sentryutils"
 
 	appconfig "github.com/flyteorg/flyte/v2/app/config"
 	appinternal "github.com/flyteorg/flyte/v2/app/internal"
@@ -18,6 +19,12 @@ import (
 )
 
 const otelServiceName = "app-service"
+
+// sentryOperations names the procedures worth counting, so an OSS count can be
+// compared against the same operation counted by the SDK.
+var sentryOperations = map[string]string{
+	appconnect.AppServiceCreateProcedure: "deploy_app",
+}
 
 // SetupInternal registers the data plane InternalAppService on the SetupContext mux.
 // It must be called before Setup so the proxy can reach /internal/... on the same mux.
@@ -45,6 +52,19 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
 
+	// Sentry is on by default with the hardcoded DSN; FLYTE_DISABLE_SENTRY=true opts out.
+	interceptors := []connect.Interceptor{otelInterceptor}
+	if sentryutils.Init(ctx, otelServiceName) {
+		interceptors = append(interceptors, sentryutils.Interceptor(sentryOperations))
+		// Sentry sends async; flush buffered events/metrics on shutdown so they
+		// aren't lost when the pod stops.
+		sc.AddWorker("app-sentry-flush", func(ctx context.Context) error {
+			<-ctx.Done()
+			sentryutils.Flush()
+			return nil
+		})
+	}
+
 	internalAppURL := cfg.InternalAppServiceURL
 	if sc.BaseURL != "" {
 		internalAppURL = sc.BaseURL
@@ -58,7 +78,7 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 
 	appSvc := service.NewAppService(internalClient, cfg.CacheTTL)
 
-	path, handler := appconnect.NewAppServiceHandler(appSvc, connect.WithInterceptors(otelInterceptor))
+	path, handler := appconnect.NewAppServiceHandler(appSvc, connect.WithInterceptors(interceptors...))
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted AppService at %s", path)
 
