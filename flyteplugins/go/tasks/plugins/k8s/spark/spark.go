@@ -29,10 +29,15 @@ import (
 )
 
 const (
-	KindSparkApplication              = "SparkApplication"
-	sparkDriverUI                     = "sparkDriverUI"
-	sparkHistoryUI                    = "sparkHistoryUI"
-	defaultDriverPrimaryContainerName = "spark-kubernetes-driver"
+	KindSparkApplication = "SparkApplication"
+	sparkDriverUI        = "sparkDriverUI"
+	sparkHistoryUI       = "sparkHistoryUI"
+	// The names the operator's mutating webhook looks for (findContainer in
+	// internal/webhook/sparkpod_defaulter.go), which are also the names Spark gives the
+	// containers it builds. The driver name is what the log links and pod demystification
+	// below expect to find in the pod.
+	defaultDriverPrimaryContainerName   = sparkOpCommon.SparkDriverContainerName
+	defaultExecutorPrimaryContainerName = sparkOpCommon.Spark3DefaultExecutorContainerName
 )
 
 var featureRegex = regexp.MustCompile(`^spark.((flyteorg)|(flyte)).(.+).enabled$`)
@@ -147,7 +152,9 @@ func serviceAccountName(metadata pluginsCore.TaskExecutionMetadata) string {
 	return name
 }
 
-func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, podSpec, customPodSpec *v1.PodSpec, container *v1.Container) *sparkOp.SparkPodSpec {
+// sparkContainerName is the name the operator and Spark expect for the role's container:
+// defaultDriverPrimaryContainerName or defaultExecutorPrimaryContainerName.
+func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, podSpec, customPodSpec *v1.PodSpec, container *v1.Container, sparkContainerName string) *sparkOp.SparkPodSpec {
 	annotations := utils.UnionMaps(config.GetK8sPluginConfig().DefaultAnnotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
 	labels := utils.UnionMaps(config.GetK8sPluginConfig().DefaultLabels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 
@@ -192,19 +199,30 @@ func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 			if templatePodSpec.EnableServiceLinks == nil {
 				templatePodSpec.EnableServiceLinks = podSpec.EnableServiceLinks
 			}
-		}
-		// Spark adopts one container from the template as the driver/executor and writes its
-		// own args onto it (`driver --properties-file ... --class ...`), but leaves `command`
-		// alone because it expects the image entrypoint to consume those args. Flyte's
-		// container carries the task entrypoint in `command`, so leaving it in place makes
-		// the kubelet run `a0 <task args> driver --properties-file ...` and the task CLI
-		// rejects Spark's flags. Drop it: on this container the entrypoint belongs to Spark.
-		// Indexed rather than via flytek8s.GetContainer, which returns a pointer to the range
-		// copy: writes through it are discarded. Nothing matches when the user supplied their
-		// own driver/executor pod spec, whose containers are named for what the operator
-		// generates rather than for the task.
-		for i := range templatePodSpec.Containers {
-			if templatePodSpec.Containers[i].Name == container.Name {
+		} else {
+			// Only Flyte's own pod spec is adjusted here. A custom driver/executor pod spec is
+			// passed through verbatim: it is written against what the operator generates, so
+			// its containers already carry the name below and never the task entrypoint.
+			//
+			// Indexed rather than via flytek8s.GetContainer, which returns a pointer to the
+			// range copy, so writes through it are discarded.
+			for i := range templatePodSpec.Containers {
+				if templatePodSpec.Containers[i].Name != container.Name {
+					continue
+				}
+				// The operator's mutating webhook patches the container it finds by name --
+				// spark-kubernetes-driver, or executor/spark-kubernetes-executor -- and leaves
+				// the pod alone when none matches (findContainer in
+				// internal/webhook/sparkpod_defaulter.go). Under the task's own container name
+				// every volume, mount and env the operator manages would be dropped.
+				templatePodSpec.Containers[i].Name = sparkContainerName
+
+				// Spark writes its own arguments onto this container (`driver
+				// --properties-file ... --class ...`) but leaves command alone, expecting the
+				// image entrypoint to consume them. Leaving the task entrypoint in place makes
+				// the kubelet run `a0 <task args> driver --properties-file ...`, which the task
+				// CLI rejects. The task arguments still reach the application through
+				// spec.arguments.
 				templatePodSpec.Containers[i].Command = nil
 				templatePodSpec.Containers[i].Args = nil
 				break
@@ -251,7 +269,7 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 	if err != nil {
 		return nil, err
 	}
-	sparkPodSpec := createSparkPodSpec(ctx, nonInterruptibleTaskCtx, podSpec, customPodSpec, primaryContainer)
+	sparkPodSpec := createSparkPodSpec(ctx, nonInterruptibleTaskCtx, podSpec, customPodSpec, primaryContainer, defaultDriverPrimaryContainerName)
 	serviceAccountName := serviceAccountName(nonInterruptibleTaskCtx.TaskExecutionMetadata())
 	sparkPodSpec.ServiceAccount = &serviceAccountName
 	spec := driverSpec{
@@ -298,7 +316,7 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 	if err != nil {
 		return nil, err
 	}
-	sparkPodSpec := createSparkPodSpec(ctx, taskCtx, podSpec, customPodSpec, primaryContainer)
+	sparkPodSpec := createSparkPodSpec(ctx, taskCtx, podSpec, customPodSpec, primaryContainer, defaultExecutorPrimaryContainerName)
 	spec := executorSpec{
 		primaryContainer,
 		&sparkOp.ExecutorSpec{

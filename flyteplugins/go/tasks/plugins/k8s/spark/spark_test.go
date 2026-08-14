@@ -1532,15 +1532,20 @@ func TestDefaultSparkVersionSatisfiesOperator(t *testing.T) {
 		"an unset spark-version is expected to lose the comparison; the default exists to avoid it")
 }
 
-// TestBuildResourcePodTemplateDropsTaskEntrypoint covers the driver failing with
-// "No such option '--properties-file'". Spark adopts a container from the template and writes
-// its own driver arguments onto it, but leaves command alone -- it expects the image entrypoint
-// to consume them. With the task entrypoint still in command the kubelet runs
-// `a0 <task args> driver --properties-file ...` and the task CLI rejects Spark's flags.
+// TestBuildResourcePodTemplateRenamesTaskContainer covers two things the operator and Spark
+// require of the template's task container.
 //
-// The task arguments must survive on spec.arguments, which is how spark-submit passes them to
-// the application; only the container-level copy goes away.
-func TestBuildResourcePodTemplateDropsTaskEntrypoint(t *testing.T) {
+// The name: the operator's mutating webhook patches the container it finds by name and leaves
+// the pod alone when none matches (findContainer in internal/webhook/sparkpod_defaulter.go), and
+// the plugin's own log links and pod demystification look for the same driver name. Under the
+// task's container name all of that misses.
+//
+// The entrypoint: Spark writes its own arguments onto this container but leaves command alone,
+// expecting the image entrypoint to consume them. With the task entrypoint still there the
+// kubelet runs `a0 <task args> driver --properties-file ...` and the task CLI fails with
+// "No such option '--properties-file'". The task arguments must survive on spec.arguments,
+// which is how spark-submit passes them to the application.
+func TestBuildResourcePodTemplateRenamesTaskContainer(t *testing.T) {
 	assert.NoError(t, setSparkConfig(&Config{EnablePodTemplate: true}))
 	assert.NoError(t, config.SetK8sPluginConfig(defaultPluginConfig()))
 	setPodTemplateSupportedForTest(true)
@@ -1558,22 +1563,89 @@ func TestBuildResourcePodTemplateDropsTaskEntrypoint(t *testing.T) {
 
 	for _, tc := range []struct {
 		role     string
+		expected string
 		template *corev1.PodTemplateSpec
 	}{
-		{"driver", sparkApp.Spec.Driver.Template},
-		{"executor", sparkApp.Spec.Executor.Template},
+		{"driver", defaultDriverPrimaryContainerName, sparkApp.Spec.Driver.Template},
+		{"executor", defaultExecutorPrimaryContainerName, sparkApp.Spec.Executor.Template},
 	} {
 		require.NotNil(t, tc.template, "%s template missing", tc.role)
-		templateContainer, err := flytek8s.GetContainer(&tc.template.Spec, primary.Name)
-		require.NoError(t, err, "%s template lost the primary container", tc.role)
-		assert.Nil(t, templateContainer.Command, "%s template must not carry the task entrypoint", tc.role)
-		assert.Nil(t, templateContainer.Args, "%s template must not carry the task args", tc.role)
 
-		// Sidecars keep theirs: Spark leaves every other container in the template alone.
+		taskContainer, err := flytek8s.GetContainer(&tc.template.Spec, tc.expected)
+		require.NoErrorf(t, err, "%s template has no %q container", tc.role, tc.expected)
+		assert.Nil(t, taskContainer.Command, "%s template must not carry the task entrypoint", tc.role)
+		assert.Nil(t, taskContainer.Args, "%s template must not carry the task args", tc.role)
+
+		_, err = flytek8s.GetContainer(&tc.template.Spec, primary.Name)
+		assert.Errorf(t, err, "%s template still carries the task container name", tc.role)
+
+		// Sidecars are left alone: only the container Spark adopts is rewritten.
 		sidecar, err := flytek8s.GetContainer(&tc.template.Spec, "secondary")
 		require.NoError(t, err)
 		assert.NotEmpty(t, sidecar.Args, "%s template dropped a sidecar's args", tc.role)
 	}
 
 	assert.Equal(t, testArgs, sparkApp.Spec.Arguments, "task args must still reach spark-submit")
+}
+
+// TestBuildResourcePodTemplateCustomPodSpecUntouched pins the other half of the contract: a
+// user-supplied driver/executor pod spec is written against what the operator generates, so it
+// already carries the operator's container names and never the task entrypoint. It is passed
+// through verbatim -- the rewrite above applies only to Flyte's own pod spec.
+func TestBuildResourcePodTemplateCustomPodSpecUntouched(t *testing.T) {
+	assert.NoError(t, setSparkConfig(&Config{EnablePodTemplate: true}))
+	assert.NoError(t, config.SetK8sPluginConfig(defaultPluginConfig()))
+	setPodTemplateSupportedForTest(true)
+
+	customPodSpec := func(name string) *corev1.PodSpec {
+		return &corev1.PodSpec{Containers: []corev1.Container{{
+			Name:    name,
+			Image:   testImage,
+			Command: []string{"user-entrypoint"},
+			Args:    []string{"--user-flag"},
+		}}}
+	}
+	driverPodSpec := customPodSpec(defaultDriverPrimaryContainerName)
+	executorPodSpec := customPodSpec(defaultExecutorPrimaryContainerName)
+
+	driverPodSpecPb, err := utils.MarshalObjToStruct(driverPodSpec)
+	require.NoError(t, err)
+	executorPodSpecPb, err := utils.MarshalObjToStruct(executorPodSpec)
+	require.NoError(t, err)
+
+	sparkJob := dummySparkCustomObj(dummySparkConf)
+	sparkJob.DriverPod = &core.K8SPod{PodSpec: driverPodSpecPb, PrimaryContainerName: defaultDriverPrimaryContainerName}
+	sparkJob.ExecutorPod = &core.K8SPod{PodSpec: executorPodSpecPb, PrimaryContainerName: defaultExecutorPrimaryContainerName}
+
+	sparkJobJSON, err := utils.MarshalToString(sparkJob)
+	require.NoError(t, err)
+	structObj := structpb.Struct{}
+	require.NoError(t, stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj))
+	taskTemplate := &core.TaskTemplate{
+		Id:     &core.Identifier{Name: "spark-custom-pod-untouched"},
+		Type:   "container",
+		Target: &core.TaskTemplate_Container{Container: &core.Container{Image: testImage, Args: testArgs, Env: dummyEnvVars}},
+		Custom: &structObj,
+	}
+
+	taskCtx := dummySparkTaskContext(taskTemplate, false)
+	resource, err := sparkResourceHandler{}.BuildResource(context.TODO(), taskCtx)
+	require.NoError(t, err)
+	sparkApp := resource.(*sj.SparkApplication)
+
+	for _, tc := range []struct {
+		role     string
+		expected *corev1.PodSpec
+		template *corev1.PodTemplateSpec
+	}{
+		{"driver", driverPodSpec, sparkApp.Spec.Driver.Template},
+		{"executor", executorPodSpec, sparkApp.Spec.Executor.Template},
+	} {
+		require.NotNil(t, tc.template, "%s template missing", tc.role)
+		require.Len(t, tc.template.Spec.Containers, 1, "%s template was rewritten", tc.role)
+		assert.Equal(t, tc.expected.Containers[0].Name, tc.template.Spec.Containers[0].Name)
+		assert.Equal(t, tc.expected.Containers[0].Command, tc.template.Spec.Containers[0].Command,
+			"%s custom pod spec must be passed through verbatim", tc.role)
+		assert.Equal(t, tc.expected.Containers[0].Args, tc.template.Spec.Containers[0].Args)
+	}
 }
