@@ -20,9 +20,7 @@ import (
 // dsn is hardcoded and is not user configuration
 const dsn = "https://d0e3f0a470b8e1333411eff583cf4004@o4507249423810560.ingest.us.sentry.io/4511135180128256"
 
-// operationMetric is the counter every instrumented operation increments. The
-// SDK emits the same metric name and "operation" attribute values, so an OSS
-// count subtracted from an SDK count gives the non-OSS share of that operation.
+// operationMetric is the counter every instrumented operation increments.
 const operationMetric = "flyte.operation"
 
 var (

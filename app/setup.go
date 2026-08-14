@@ -20,8 +20,6 @@ import (
 
 const otelServiceName = "app-service"
 
-// sentryOperations names the procedures worth counting, so an OSS count can be
-// compared against the same operation counted by the SDK.
 var sentryOperations = map[string]string{
 	appconnect.AppServiceCreateProcedure: "deploy_app",
 }
