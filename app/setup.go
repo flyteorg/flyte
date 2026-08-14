@@ -52,12 +52,9 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
 
-	// Sentry is on by default with the hardcoded DSN; FLYTE_DISABLE_SENTRY=true opts out.
 	interceptors := []connect.Interceptor{otelInterceptor}
 	if sentryutils.Init(ctx, otelServiceName) {
 		interceptors = append(interceptors, sentryutils.Interceptor(sentryOperations))
-		// Sentry sends async; flush buffered events/metrics on shutdown so they
-		// aren't lost when the pod stops.
 		sc.AddWorker("app-sentry-flush", func(ctx context.Context) error {
 			<-ctx.Done()
 			sentryutils.Flush()

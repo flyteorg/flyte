@@ -34,8 +34,6 @@ import (
 
 const otelServiceName = "runs-service"
 
-// sentryOperations names the procedures worth counting, so an OSS count can be
-// compared against the same operation counted by the SDK.
 var sentryOperations = map[string]string{
 	workflowconnect.RunServiceCreateRunProcedure:        "create_run",
 	taskconnect.TaskServiceDeployTaskProcedure:          "deploy_task",
@@ -82,12 +80,9 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
 
-	// Sentry is on by default with the hardcoded DSN; FLYTE_DISABLE_SENTRY=true opts out.
 	interceptors := []connect.Interceptor{otelInterceptor}
 	if sentryutils.Init(ctx, otelServiceName) {
 		interceptors = append(interceptors, sentryutils.Interceptor(sentryOperations), deployTriggerInterceptor())
-		// Sentry sends async; flush buffered events/metrics on shutdown so they
-		// aren't lost when the pod stops.
 		sc.AddWorker("sentry-flush", func(ctx context.Context) error {
 			<-ctx.Done()
 			sentryutils.Flush()

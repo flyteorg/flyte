@@ -37,8 +37,7 @@ func Disabled() bool {
 }
 
 // Init initializes the process-wide Sentry client and reports whether
-// reporting is on. Several services call it while setting up; the client is
-// global, so the first caller wins and names the environment.
+// reporting is on.
 func Init(ctx context.Context, environment string) bool {
 	initOnce.Do(func() {
 		if Disabled() {
