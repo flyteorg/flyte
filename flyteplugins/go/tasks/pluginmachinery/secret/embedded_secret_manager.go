@@ -137,7 +137,13 @@ func encodeSecretName(components *SecretNameComponents) string {
 	return EncodeSecretName(components.Org, components.Domain, components.Project, components.Name)
 }
 
-func (i *EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, components *SecretNameComponents) (*SecretValue, string, error) {
+type resolvedSecret struct {
+	value               *SecretValue
+	secretID            string
+	imagePullSecretName string
+}
+
+func (i *EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, components *SecretNameComponents) (*resolvedSecret, error) {
 	componentsCopy := *components // Create a copy to avoid modifying the original
 
 	// Compute encoded IDs for each scope in priority order.
@@ -168,7 +174,7 @@ func (i *EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, compon
 	for _, scope := range scopes {
 		if cachedValue, err := i.secretCache.Get(ctx, scope.secretID); err == nil {
 			logger.Debugf(ctx, "Found secret [%s] in cache.", scope.secretID)
-			return &cachedValue, scope.imagePullSecretName, nil
+			return &resolvedSecret{&cachedValue, scope.secretID, scope.imagePullSecretName}, nil
 		}
 
 		for _, secretFetcher := range i.secretFetchers {
@@ -177,17 +183,17 @@ func (i *EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, compon
 				if cacheErr := i.secretCache.Set(ctx, scope.secretID, *secretValue); cacheErr != nil {
 					logger.Warnf(ctx, "Failed to cache secret [%s]: %v", scope.secretID, cacheErr)
 				}
-				return secretValue, scope.imagePullSecretName, nil
+				return &resolvedSecret{secretValue, scope.secretID, scope.imagePullSecretName}, nil
 			}
 			if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
-				return nil, "", err
+				return nil, err
 			}
 			// NotFound from this fetcher — try the next fetcher at the same scope.
 		}
 		// All fetchers reported NotFound at this scope — fall through to the next broader scope.
 	}
 
-	return nil, "", stdlibErrors.Errorf(ErrCodeSecretNotFoundAcrossAllScopes, SecretSecretNotFoundAcrossAllScopes)
+	return nil, stdlibErrors.Errorf(ErrCodeSecretNotFoundAcrossAllScopes, SecretSecretNotFoundAcrossAllScopes)
 }
 
 // addImagePullSecretToPod adds an image pull secret to a pod if it doesn't already exist
@@ -296,32 +302,32 @@ func (i *EmbeddedSecretManagerInjector) Inject(
 		return pod, false, err
 	}
 
-	secretValue, k8sImagePullSecretName, err := i.lookUpSecret(ctx, secretNameComponents)
+	resolved, err := i.lookUpSecret(ctx, secretNameComponents)
 	if err != nil {
 		return pod, false, err
 	}
+	secretValue := resolved.value
 
 	switch secret.MountRequirement {
 	case core.Secret_ANY:
 		fallthrough
 	case core.Secret_ENV_VAR:
-		var stringValue string
-		if secretValue.StringValue != "" {
-			stringValue = secretValue.StringValue
-		} else {
-			// GCP secrets store values as binary only. This means a secret could be
-			// defined as a file, but mounted as an environment variable.
-			// We could fail this path for AWS, but for consistent behaviour between
-			// AWS and GCP we will allow this path for AWS as well.
-			if !utf8.Valid(secretValue.BinaryValue) {
-				return pod, false, fmt.Errorf(
-					"secret %q is attempted to be mounted as an environment variable, "+
-						"but has a binary value that is not a valid UTF-8 string; mount "+
-						"as a file instead", secret.Key)
-			}
-			stringValue = string(secretValue.BinaryValue)
+		// GCP secrets store values as binary only. This means a secret could be
+		// defined as a file, but mounted as an environment variable.
+		// We could fail this path for AWS, but for consistent behaviour between
+		// AWS and GCP we will allow this path for AWS as well.
+		if secretValue.StringValue == "" && !utf8.Valid(secretValue.BinaryValue) {
+			return pod, false, fmt.Errorf(
+				"secret %q is attempted to be mounted as an environment variable, "+
+					"but has a binary value that is not a valid UTF-8 string; mount "+
+					"as a file instead", secret.Key)
 		}
-		i.injectAsEnvVar(secret, stringValue, pod)
+		secretRef, err := i.envVarSecretRef(ctx, secretNameComponents, resolved.secretID, pod.GetNamespace())
+		if err != nil {
+			logger.Errorf(ctx, "Failed to inject secret [%v] as an environment variable: %v", secret.Key, err)
+			return pod, false, err
+		}
+		i.injectAsEnvVar(secret, secretRef, pod)
 	case core.Secret_FILE:
 		secretBytes := secretValue.BinaryValue
 		if len(secretValue.StringValue) > 0 {
@@ -335,7 +341,7 @@ func (i *EmbeddedSecretManagerInjector) Inject(
 	}
 
 	if i.cfg.ImagePullSecrets.Enabled {
-		pod, err = i.findAndAddImagePullSecret(ctx, k8sImagePullSecretName, pod)
+		pod, err = i.findAndAddImagePullSecret(ctx, resolved.imagePullSecretName, pod)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to add image pull secret [%s]: %v", secretNameComponents.Name, err)
 			return pod, false, err
@@ -345,7 +351,7 @@ func (i *EmbeddedSecretManagerInjector) Inject(
 	return pod, true, nil
 }
 
-func (i *EmbeddedSecretManagerInjector) injectAsEnvVar(secret *core.Secret, secretValue string, pod *corev1.Pod) {
+func (i *EmbeddedSecretManagerInjector) injectAsEnvVar(secret *core.Secret, secretRef *corev1.SecretKeySelector, pod *corev1.Pod) {
 	valueEnvVarName := i.parentCfg.SecretEnvVarPrefix + strings.ToUpper(secret.GetKey())
 	if secret.GetEnvVar() != "" {
 		valueEnvVarName = secret.EnvVar
@@ -356,12 +362,46 @@ func (i *EmbeddedSecretManagerInjector) injectAsEnvVar(secret *core.Secret, secr
 			Value: i.parentCfg.SecretEnvVarPrefix,
 		},
 		{
-			Name:  valueEnvVarName,
-			Value: secretValue,
+			Name: valueEnvVarName,
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: secretRef,
+			},
 		},
 	}
 	pod.Spec.InitContainers = AppendEnvVars(pod.Spec.InitContainers, envVars...)
 	pod.Spec.Containers = AppendEnvVars(pod.Spec.Containers, envVars...)
+}
+
+func (i *EmbeddedSecretManagerInjector) envVarSecretRef(
+	ctx context.Context,
+	components *SecretNameComponents,
+	secretID string,
+	namespace string,
+) (*corev1.SecretKeySelector, error) {
+	name := EncodeK8sSecretName(secretID)
+
+	if namespace == "" {
+		return nil, fmt.Errorf("cannot mount secret [%s]: pod has no namespace, so Kubernetes secret [%s] was not looked up", components.Name, name)
+	}
+
+	storedSecret := &corev1.Secret{}
+	if err := i.k8sClient.Get(ctx, types.NamespacedName{Name: name, Namespace: namespace}, storedSecret); err != nil {
+		if k8sError.IsNotFound(err) {
+			return nil, fmt.Errorf("cannot mount secret [%s]: it is not stored in a Kubernetes secret %s/%s", components.Name, namespace, name)
+		}
+
+		return nil, fmt.Errorf("failed to look up secret %s/%s: %w", namespace, name, err)
+	}
+
+	if _, found := storedSecret.Data[secretID]; !found {
+		return nil, fmt.Errorf("cannot mount secret [%s]: secret %s/%s has no key %s", components.Name, namespace, name, secretID)
+	}
+
+	logger.Debugf(ctx, "Referencing secret %s/%s for %s", namespace, name, components)
+	return &corev1.SecretKeySelector{
+		LocalObjectReference: corev1.LocalObjectReference{Name: name},
+		Key:                  secretID,
+	}, nil
 }
 
 func (i *EmbeddedSecretManagerInjector) injectAsFile(secret *core.Secret, secretValue []byte, pod *corev1.Pod) {
