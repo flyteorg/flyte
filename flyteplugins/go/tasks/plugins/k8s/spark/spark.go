@@ -29,10 +29,11 @@ import (
 )
 
 const (
-	KindSparkApplication              = "SparkApplication"
-	sparkDriverUI                     = "sparkDriverUI"
-	sparkHistoryUI                    = "sparkHistoryUI"
-	defaultDriverPrimaryContainerName = "spark-kubernetes-driver"
+	KindSparkApplication                = "SparkApplication"
+	sparkDriverUI                       = "sparkDriverUI"
+	sparkHistoryUI                      = "sparkHistoryUI"
+	defaultDriverPrimaryContainerName   = sparkOpCommon.SparkDriverContainerName
+	defaultExecutorPrimaryContainerName = sparkOpCommon.Spark3DefaultExecutorContainerName
 )
 
 var featureRegex = regexp.MustCompile(`^spark.((flyteorg)|(flyte)).(.+).enabled$`)
@@ -147,7 +148,7 @@ func serviceAccountName(metadata pluginsCore.TaskExecutionMetadata) string {
 	return name
 }
 
-func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, podSpec, customPodSpec *v1.PodSpec, container *v1.Container) *sparkOp.SparkPodSpec {
+func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, podSpec, customPodSpec *v1.PodSpec, container *v1.Container, sparkContainerName string) *sparkOp.SparkPodSpec {
 	annotations := utils.UnionMaps(config.GetK8sPluginConfig().DefaultAnnotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
 	labels := utils.UnionMaps(config.GetK8sPluginConfig().DefaultLabels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 
@@ -192,7 +193,21 @@ func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 			if templatePodSpec.EnableServiceLinks == nil {
 				templatePodSpec.EnableServiceLinks = podSpec.EnableServiceLinks
 			}
+		} else {
+			for i := range templatePodSpec.Containers {
+				if templatePodSpec.Containers[i].Name != container.Name {
+					continue
+				}
+				// The operator's mutating webhook patches the container it finds by name --
+				// spark-kubernetes-driver, or executor/spark-kubernetes-executor.
+				templatePodSpec.Containers[i].Name = sparkContainerName
+				// SparkApplication already set the command and args, so we don't need to set it in the primary pod again.
+				templatePodSpec.Containers[i].Command = nil
+				templatePodSpec.Containers[i].Args = nil
+				break
+			}
 		}
+
 		spec.Template = &v1.PodTemplateSpec{Spec: *templatePodSpec}
 		sa := serviceAccountName(taskCtx.TaskExecutionMetadata())
 		spec.ServiceAccount = &sa
@@ -233,7 +248,10 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 	if err != nil {
 		return nil, err
 	}
-	sparkPodSpec := createSparkPodSpec(ctx, nonInterruptibleTaskCtx, podSpec, customPodSpec, primaryContainer)
+	sparkPodSpec := createSparkPodSpec(ctx, nonInterruptibleTaskCtx, podSpec, customPodSpec, primaryContainer, defaultDriverPrimaryContainerName)
+	if sparkPodSpec.Template != nil {
+		sparkConfig[sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName] = defaultDriverPrimaryContainerName
+	}
 	serviceAccountName := serviceAccountName(nonInterruptibleTaskCtx.TaskExecutionMetadata())
 	sparkPodSpec.ServiceAccount = &serviceAccountName
 	spec := driverSpec{
@@ -280,7 +298,10 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 	if err != nil {
 		return nil, err
 	}
-	sparkPodSpec := createSparkPodSpec(ctx, taskCtx, podSpec, customPodSpec, primaryContainer)
+	sparkPodSpec := createSparkPodSpec(ctx, taskCtx, podSpec, customPodSpec, primaryContainer, defaultExecutorPrimaryContainerName)
+	if sparkPodSpec.Template != nil {
+		sparkConfig[sparkOpCommon.SparkKubernetesExecutorPodTemplateContainerName] = defaultExecutorPrimaryContainerName
+	}
 	spec := executorSpec{
 		primaryContainer,
 		&sparkOp.ExecutorSpec{
