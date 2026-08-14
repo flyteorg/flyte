@@ -148,9 +148,6 @@ func serviceAccountName(metadata pluginsCore.TaskExecutionMetadata) string {
 	return name
 }
 
-// sparkContainerName is the name the operator and Spark expect for the role's container:
-// defaultDriverPrimaryContainerName or defaultExecutorPrimaryContainerName. A custom
-// driver/executor pod spec is expected to name its own container that way already.
 func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, podSpec, customPodSpec *v1.PodSpec, container *v1.Container, sparkContainerName string) *sparkOp.SparkPodSpec {
 	annotations := utils.UnionMaps(config.GetK8sPluginConfig().DefaultAnnotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
 	labels := utils.UnionMaps(config.GetK8sPluginConfig().DefaultLabels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
@@ -184,15 +181,10 @@ func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 	// The legacy fields above are always populated so the object stays valid on clusters whose
 	// CRD/operator predate pod-template support (unknown fields are pruned by the API server
 	// there). Where the CRD accepts it, additionally pass a pod spec through as the pod template;
-	// the operator treats explicit fields as overrides of the template.
-	//
-	// Either way the role's container ends up named `spark-kubernetes-driver` /
-	// `spark-kubernetes-executor`: Flyte's own container is renamed below, and a custom
-	// driver/executor pod spec is expected to use those names already, so it is passed through
-	// verbatim. Spark keeps whatever name the template gives the container it adopts
-	// (BasicDriverFeatureStep: `.withName(Option(pod.container.getName).getOrElse(...))`), and
-	// the operator's webhook only patches a container it finds by those names, as do this
-	// plugin's log links.
+	// the operator treats explicit fields as overrides of the template. The user's driver/executor
+	// pod spec is passed through verbatim so the operator can patch it onto the container it
+	// generates (`spark-kubernetes-driver`/`spark-kubernetes-executor`); Flyte's own container
+	// names never match those, so merging it here would drop it on the floor.
 	if GetSparkConfig().EnablePodTemplate && podTemplateSupported(ctx) {
 		templatePodSpec := podSpec.DeepCopy()
 		if customPodSpec != nil {
@@ -209,7 +201,7 @@ func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 				// The operator's mutating webhook patches the container it finds by name --
 				// spark-kubernetes-driver, or executor/spark-kubernetes-executor.
 				templatePodSpec.Containers[i].Name = sparkContainerName
-				// SparkApplication already set the command and args, so we don't need to set it in the primary pod again
+				// SparkApplication already set the command and args, so we don't need to set it in the primary pod again.
 				templatePodSpec.Containers[i].Command = nil
 				templatePodSpec.Containers[i].Args = nil
 				break
@@ -257,9 +249,6 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 		return nil, err
 	}
 	sparkPodSpec := createSparkPodSpec(ctx, nonInterruptibleTaskCtx, podSpec, customPodSpec, primaryContainer, defaultDriverPrimaryContainerName)
-	// Spark adopts the container named here, falling back to the first one in the template.
-	// Without this a pod template that orders a sidecar ahead of the driver container has Spark
-	// run the sidecar as the driver.
 	if sparkPodSpec.Template != nil {
 		sparkConfig[sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName] = defaultDriverPrimaryContainerName
 	}
