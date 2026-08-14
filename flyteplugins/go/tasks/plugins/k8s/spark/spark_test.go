@@ -11,6 +11,7 @@ import (
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	sj "github.com/kubeflow/spark-operator/v2/api/v1beta2"
 	sparkOp "github.com/kubeflow/spark-operator/v2/api/v1beta2"
+	sparkOpCommon "github.com/kubeflow/spark-operator/v2/pkg/common"
 	sparkOpUtil "github.com/kubeflow/spark-operator/v2/pkg/util"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -1517,6 +1518,14 @@ func TestBuildResourcePodTemplateGating(t *testing.T) {
 	expected := withoutTemplate.DeepCopy()
 	delete(normalized.Spec.SparkConf, "spark.kubernetes.driverEnv.FLYTE_START_TIME")
 	delete(expected.Spec.SparkConf, "spark.kubernetes.driverEnv.FLYTE_START_TIME")
+	// Template-only: they name the container Spark should adopt from the template.
+	assert.Equal(t, defaultDriverPrimaryContainerName,
+		normalized.Spec.SparkConf[sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName])
+	assert.Equal(t, defaultExecutorPrimaryContainerName,
+		normalized.Spec.SparkConf[sparkOpCommon.SparkKubernetesExecutorPodTemplateContainerName])
+	assert.NotContains(t, expected.Spec.SparkConf, sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName)
+	delete(normalized.Spec.SparkConf, sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName)
+	delete(normalized.Spec.SparkConf, sparkOpCommon.SparkKubernetesExecutorPodTemplateContainerName)
 	assert.Equal(t, expected, normalized)
 }
 
@@ -1586,6 +1595,13 @@ func TestBuildResourcePodTemplateRenamesTaskContainer(t *testing.T) {
 	}
 
 	assert.Equal(t, testArgs, sparkApp.Spec.Arguments, "task args must still reach spark-submit")
+
+	// Spark picks the first container in the template unless told which one to adopt, so a pod
+	// template that orders a sidecar first would otherwise have it run as the driver.
+	assert.Equal(t, defaultDriverPrimaryContainerName,
+		sparkApp.Spec.SparkConf[sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName])
+	assert.Equal(t, defaultExecutorPrimaryContainerName,
+		sparkApp.Spec.SparkConf[sparkOpCommon.SparkKubernetesExecutorPodTemplateContainerName])
 }
 
 // TestBuildResourcePodTemplateCustomPodSpecUntouched pins the other half of the contract: a
@@ -1648,4 +1664,9 @@ func TestBuildResourcePodTemplateCustomPodSpecUntouched(t *testing.T) {
 			"%s custom pod spec must be passed through verbatim", tc.role)
 		assert.Equal(t, tc.expected.Containers[0].Args, tc.template.Spec.Containers[0].Args)
 	}
+
+	// The plugin does not choose a custom pod spec's primary container, so it does not tell
+	// Spark which one to adopt either -- that stays Spark's own first-container default.
+	assert.NotContains(t, sparkApp.Spec.SparkConf, sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName)
+	assert.NotContains(t, sparkApp.Spec.SparkConf, sparkOpCommon.SparkKubernetesExecutorPodTemplateContainerName)
 }
