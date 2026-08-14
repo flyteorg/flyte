@@ -5,22 +5,20 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
-	"github.com/getsentry/sentry-go"
-	"github.com/getsentry/sentry-go/attribute"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/sentryutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
 	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
+	taskpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
@@ -36,40 +34,25 @@ import (
 
 const otelServiceName = "runs-service"
 
-// sentryDSN is hardcoded and is not user configuration
-const sentryDSN = "https://d0e3f0a470b8e1333411eff583cf4004@o4507249423810560.ingest.us.sentry.io/4511135180128256"
-
-// sentryDisabled honors FLYTE_DISABLE_SENTRY, unset or unparsable means enabled.
-func sentryDisabled() bool {
-	disabled, _ := strconv.ParseBool(os.Getenv("FLYTE_DISABLE_SENTRY"))
-	return disabled
+var sentryOperations = map[string]string{
+	workflowconnect.RunServiceCreateRunProcedure:        "create_run",
+	taskconnect.TaskServiceDeployTaskProcedure:          "deploy_task",
+	triggerconnect.TriggerServiceDeployTriggerProcedure: "deploy_trigger",
 }
 
-// sentryInterceptor reports server-side CreateRun failures to Sentry and emits
-// a "flyte.operation" counter per CreateRun call. Client-caused errors
-// (invalid argument, not found, ...) are intentionally not reported as
-// exceptions.
-func sentryInterceptor() connect.UnaryInterceptorFunc {
+// deployTriggerInterceptor counts the triggers that ride along inside a
+// DeployTask request. TriggerService.DeployTrigger only ever sees standalone
+// trigger deploys, so without this the deploy_trigger count misses every
+// trigger declared on a task.
+func deployTriggerInterceptor() connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
 			resp, err := next(ctx, req)
-			if req.Spec().Procedure == workflowconnect.RunServiceCreateRunProcedure {
-				attrs := []attribute.Builder{attribute.String("operation", "create_run")}
-				if err != nil {
-					attrs = append(attrs,
-						attribute.String("status", "error"),
-						attribute.String("error_code", connect.CodeOf(err).String()),
-					)
-					switch connect.CodeOf(err) {
-					case connect.CodeInternal, connect.CodeUnknown, connect.CodeDataLoss:
-						hub := sentry.CurrentHub().Clone()
-						hub.Scope().SetTag("procedure", req.Spec().Procedure)
-						hub.CaptureException(err)
-					}
-				} else {
-					attrs = append(attrs, attribute.String("status", "success"))
-				}
-				sentry.NewMeter(ctx).Count("flyte.operation", 1, sentry.WithAttributes(attrs...))
+			if err != nil || req.Spec().Procedure != taskconnect.TaskServiceDeployTaskProcedure {
+				return resp, err
+			}
+			if deployReq, ok := req.Any().(*taskpb.DeployTaskRequest); ok && len(deployReq.Triggers) > 0 {
+				sentryutils.Count(ctx, "deploy_trigger", int64(len(deployReq.Triggers)))
 			}
 			return resp, err
 		}
@@ -97,25 +80,14 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
 
-	// Sentry is on by default with the hardcoded DSN; FLYTE_DISABLE_SENTRY=true opts out.
-	runsInterceptors := []connect.Interceptor{otelInterceptor}
-	if !sentryDisabled() {
-		if err := sentry.Init(sentry.ClientOptions{
-			Dsn:         sentryDSN,
-			Environment: otelServiceName,
-		}); err != nil {
-			logger.Errorf(ctx, "failed to initialize sentry, continuing without it: %v", err)
-		} else {
-			runsInterceptors = append(runsInterceptors, sentryInterceptor())
-			// Sentry sends async; flush buffered events/metrics on shutdown so they
-			// aren't lost when the pod stops.
-			sc.AddWorker("sentry-flush", func(ctx context.Context) error {
-				<-ctx.Done()
-				sentry.Flush(2 * time.Second)
-				return nil
-			})
-			logger.Infof(ctx, "Sentry error reporting enabled")
-		}
+	interceptors := []connect.Interceptor{otelInterceptor}
+	if sentryutils.Init(ctx, otelServiceName) {
+		interceptors = append(interceptors, sentryutils.Interceptor(sentryOperations), deployTriggerInterceptor())
+		sc.AddWorker("sentry-flush", func(ctx context.Context) error {
+			<-ctx.Done()
+			sentryutils.Flush()
+			return nil
+		})
 	}
 
 	repo, err := repository.NewRepository(sc.DB, cfg.Database)
@@ -157,7 +129,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	runsSvc := service.NewRunService(repo, actionsClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
 	taskSvc := service.NewTaskService(repo, projectClient)
 
-	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc, connect.WithInterceptors(runsInterceptors...))
+	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc, connect.WithInterceptors(interceptors...))
 	sc.Mux.Handle(runsPath, runsHandler)
 	logger.Infof(ctx, "Mounted RunService at %s", runsPath)
 
@@ -165,7 +137,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(internalRunsPath, internalRunsHandler)
 	logger.Infof(ctx, "Mounted InternalRunService at %s", internalRunsPath)
 
-	taskPath, taskHandler := taskconnect.NewTaskServiceHandler(taskSvc, connect.WithInterceptors(otelInterceptor))
+	taskPath, taskHandler := taskconnect.NewTaskServiceHandler(taskSvc, connect.WithInterceptors(interceptors...))
 	sc.Mux.Handle(taskPath, taskHandler)
 	logger.Infof(ctx, "Mounted TaskService at %s", taskPath)
 
@@ -187,7 +159,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	logger.Infof(ctx, "Mounted OAuth2 metadata at /.well-known/oauth-authorization-server")
 
 	triggerSvc := service.NewTriggerService(repo)
-	triggerPath, triggerHandler := triggerconnect.NewTriggerServiceHandler(triggerSvc, connect.WithInterceptors(otelInterceptor))
+	triggerPath, triggerHandler := triggerconnect.NewTriggerServiceHandler(triggerSvc, connect.WithInterceptors(interceptors...))
 	sc.Mux.Handle(triggerPath, triggerHandler)
 	logger.Infof(ctx, "Mounted TriggerService at %s", triggerPath)
 
