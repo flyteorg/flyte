@@ -82,6 +82,12 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		flytesecret.OrganizationLabel: flytesecret.DefaultOrganization,
 		flytesecret.ProjectLabel:      ta.Spec.Project,
 		flytesecret.DomainLabel:       ta.Spec.Domain,
+		// Marks every Pod this executor is responsible for, including the ones
+		// operators expand from the Pod templates embedded in a plugin's CRD.
+		// The manager cache selects on this label, so a Pod that does not carry
+		// it is invisible to the executor. Plugins merge these labels into the
+		// Pod templates they build, so setting it here covers all of them.
+		flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue,
 	}
 	if securityContext != nil && len(securityContext.Secrets) > 0 {
 		secretsMap, err = secrets.MarshalSecretsToMapStrings(securityContext.Secrets)

@@ -53,6 +53,16 @@ const FlyteEnableVscode = "_F_E_VS"
 // to compute fractional GPU usage as slices/7.
 const GpuPartitionSlicesLabel = "platform.union.ai/gpu-partition-slices"
 
+// ManagedLabelKey and ManagedLabelValue mark the Pods the executor is responsible for.
+// The executor's informer cache selects on this label so it does not have to hold every
+// Pod in the cluster, so anything the executor needs to observe must carry it. It lives
+// here rather than in the executor because the plugins that build Pod templates have to
+// keep it intact.
+const (
+	ManagedLabelKey   = "flyte.org/managed"
+	ManagedLabelValue = "true"
+)
+
 var migPartitionRegexp = regexp.MustCompile(`^(\d+)g\.\d+gb$`)
 
 // parseMigSlices extracts the compute slice count from a MIG partition size string
