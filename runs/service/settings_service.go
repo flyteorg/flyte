@@ -85,7 +85,44 @@ func (s *SettingsService) UpdateSettings(
 	ctx context.Context,
 	req *connect.Request[settings.UpdateSettingsRequest],
 ) (*connect.Response[settings.UpdateSettingsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("not implemented yet"))
+	key := req.Msg.GetKey()
+	if key == nil || req.Msg.GetSettings() == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("key and settings are required"))
+	}
+	if key.GetProject() != "" && key.GetDomain() == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("a project-scope key requires a domain"))
+	}
+	if req.Msg.GetVersion() == 0 {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("a version is required; use CreateSettings for a new record"))
+	}
+
+	data, err := protojson.Marshal(req.Msg.GetSettings())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	model := &models.Settings{
+		Key:     models.EncodeSettingsKey(key.GetOrg(), key.GetDomain(), key.GetProject()),
+		Data:    data,
+		Version: req.Msg.GetVersion(),
+	}
+
+	// Pure update, not upsert: a missing record surfaces as a version conflict,
+	// and clients with version 0 are directed to CreateSettings (see SettingsRecord).
+	if err := s.settingsRepo.UpdateSettings(ctx, model); err != nil {
+		if errors.Is(err, interfaces.ErrSettingsVersionConflict) {
+			return nil, connect.NewError(connect.CodeFailedPrecondition, err)
+		}
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	return connect.NewResponse(&settings.UpdateSettingsResponse{
+		SettingsRecord: &settings.SettingsRecord{
+			Key:      key,
+			Settings: req.Msg.GetSettings(),
+			Version:  model.Version,
+		},
+	}), nil
 }
 
 var _ settingsconnect.SettingsServiceHandler = (*SettingsService)(nil)
