@@ -193,6 +193,24 @@ func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 				templatePodSpec.EnableServiceLinks = podSpec.EnableServiceLinks
 			}
 		}
+		// Spark adopts one container from the template as the driver/executor and writes its
+		// own args onto it (`driver --properties-file ... --class ...`), but leaves `command`
+		// alone because it expects the image entrypoint to consume those args. Flyte's
+		// container carries the task entrypoint in `command`, so leaving it in place makes
+		// the kubelet run `a0 <task args> driver --properties-file ...` and the task CLI
+		// rejects Spark's flags. Drop it: on this container the entrypoint belongs to Spark.
+		// Indexed rather than via flytek8s.GetContainer, which returns a pointer to the range
+		// copy: writes through it are discarded. Nothing matches when the user supplied their
+		// own driver/executor pod spec, whose containers are named for what the operator
+		// generates rather than for the task.
+		for i := range templatePodSpec.Containers {
+			if templatePodSpec.Containers[i].Name == container.Name {
+				templatePodSpec.Containers[i].Command = nil
+				templatePodSpec.Containers[i].Args = nil
+				break
+			}
+		}
+
 		spec.Template = &v1.PodTemplateSpec{Spec: *templatePodSpec}
 		sa := serviceAccountName(taskCtx.TaskExecutionMetadata())
 		spec.ServiceAccount = &sa

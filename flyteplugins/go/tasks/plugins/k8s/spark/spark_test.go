@@ -1531,3 +1531,49 @@ func TestDefaultSparkVersionSatisfiesOperator(t *testing.T) {
 	assert.Less(t, sparkOpUtil.CompareSemanticVersion("", "3.0.0"), 0,
 		"an unset spark-version is expected to lose the comparison; the default exists to avoid it")
 }
+
+// TestBuildResourcePodTemplateDropsTaskEntrypoint covers the driver failing with
+// "No such option '--properties-file'". Spark adopts a container from the template and writes
+// its own driver arguments onto it, but leaves command alone -- it expects the image entrypoint
+// to consume them. With the task entrypoint still in command the kubelet runs
+// `a0 <task args> driver --properties-file ...` and the task CLI rejects Spark's flags.
+//
+// The task arguments must survive on spec.arguments, which is how spark-submit passes them to
+// the application; only the container-level copy goes away.
+func TestBuildResourcePodTemplateDropsTaskEntrypoint(t *testing.T) {
+	assert.NoError(t, setSparkConfig(&Config{EnablePodTemplate: true}))
+	assert.NoError(t, config.SetK8sPluginConfig(defaultPluginConfig()))
+	setPodTemplateSupportedForTest(true)
+
+	podSpec := dummyPodSpec()
+	primary := &podSpec.Containers[0] // "primary"; dummyPodSpec's "init" is an init container
+	primary.Command = []string{"a0"}
+	require.NotEmpty(t, primary.Args, "fixture must carry args for this test to mean anything")
+
+	taskTemplate := dummySparkTaskTemplatePod("entrypoint", dummySparkConf, podSpec)
+	taskCtx := dummySparkTaskContext(taskTemplate, false)
+	resource, err := sparkResourceHandler{}.BuildResource(context.TODO(), taskCtx)
+	require.NoError(t, err)
+	sparkApp := resource.(*sj.SparkApplication)
+
+	for _, tc := range []struct {
+		role     string
+		template *corev1.PodTemplateSpec
+	}{
+		{"driver", sparkApp.Spec.Driver.Template},
+		{"executor", sparkApp.Spec.Executor.Template},
+	} {
+		require.NotNil(t, tc.template, "%s template missing", tc.role)
+		templateContainer, err := flytek8s.GetContainer(&tc.template.Spec, primary.Name)
+		require.NoError(t, err, "%s template lost the primary container", tc.role)
+		assert.Nil(t, templateContainer.Command, "%s template must not carry the task entrypoint", tc.role)
+		assert.Nil(t, templateContainer.Args, "%s template must not carry the task args", tc.role)
+
+		// Sidecars keep theirs: Spark leaves every other container in the template alone.
+		sidecar, err := flytek8s.GetContainer(&tc.template.Spec, "secondary")
+		require.NoError(t, err)
+		assert.NotEmpty(t, sidecar.Args, "%s template dropped a sidecar's args", tc.role)
+	}
+
+	assert.Equal(t, testArgs, sparkApp.Spec.Arguments, "task args must still reach spark-submit")
+}
