@@ -95,8 +95,8 @@ func TestDeployTaskReportsOnlyServerSideFailures(t *testing.T) {
 	}
 }
 
-// The operation names have to match the ones flyte-sdk emits, or an OSS count
-// cannot be subtracted from an SDK count.
+// The operation names have to match the ones flyte-sdk emits, or the two
+// sides of the same counter do not line up.
 func TestSentryOperationNamesMatchSDK(t *testing.T) {
 	assert.Equal(t, map[string]string{
 		"/flyteidl2.workflow.RunService/CreateRun":        "create_run",
