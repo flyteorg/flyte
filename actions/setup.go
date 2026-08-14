@@ -11,6 +11,7 @@ import (
 	actionsk8s "github.com/flyteorg/flyte/v2/actions/k8s"
 	"github.com/flyteorg/flyte/v2/actions/service"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/connectrpc/server/interceptors"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
@@ -73,7 +74,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 	actionsSvc := service.NewActionsService(actionsClient)
 
-	path, handler := actionsconnect.NewActionsServiceHandler(actionsSvc, connect.WithInterceptors(otelInterceptor))
+	path, handler := actionsconnect.NewActionsServiceHandler(actionsSvc, connect.WithInterceptors(interceptors.NewErrorInterceptor(), otelInterceptor))
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted ActionsService at %s", path)
 

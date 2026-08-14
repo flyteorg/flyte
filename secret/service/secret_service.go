@@ -230,8 +230,7 @@ func (s *SecretService) CreateSecret(ctx context.Context, req *connect.Request[s
 		if k8sErrors.IsAlreadyExists(err) {
 			return nil, connect.NewError(connect.CodeAlreadyExists, err)
 		}
-		logger.Errorf(ctx, "failed to create secret %v: %v", encodedName, err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to create k8s secret: %w", err)
 	}
 
 	s.invalidateWebhookSecretCache(ctx, req.Msg.GetId())
@@ -258,8 +257,7 @@ func (s *SecretService) UpdateSecret(ctx context.Context, req *connect.Request[s
 		if k8sErrors.IsNotFound(err) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", req.Msg.GetId().GetName()))
 		}
-		logger.Errorf(ctx, "failed to get secret %v: %v", encodedName, err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to get secret %v: %w", req.Msg.GetId().GetName(), err)
 	}
 
 	switch v := req.Msg.GetSecretSpec().GetValue().(type) {
@@ -277,8 +275,7 @@ func (s *SecretService) UpdateSecret(ctx context.Context, req *connect.Request[s
 		if k8sErrors.IsNotFound(err) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", req.Msg.GetId().GetName()))
 		}
-		logger.Errorf(ctx, "failed to update secret %v: %v", encodedName, err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to update secret %v: %w", req.Msg.GetId().GetName(), err)
 	}
 
 	s.invalidateWebhookSecretCache(ctx, req.Msg.GetId())
@@ -304,8 +301,7 @@ func (s *SecretService) GetSecret(ctx context.Context, req *connect.Request[secr
 		if k8sErrors.IsNotFound(err) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", req.Msg.GetId().GetName()))
 		}
-		logger.Errorf(ctx, "failed to get secret %v: %v", encodedName, err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to get k8s secret %v: %w", req.Msg.GetId().GetName(), err)
 	}
 
 	return connect.NewResponse(&secretpb.GetSecretResponse{
@@ -349,8 +345,7 @@ func (s *SecretService) DeleteSecret(ctx context.Context, req *connect.Request[s
 		if k8sErrors.IsNotFound(err) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("secret %v not found", req.Msg.GetId().GetName()))
 		}
-		logger.Errorf(ctx, "failed to delete secret %v: %v", encodedName, err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to delete k8s secret %v: %w", req.Msg.GetId().GetName(), err)
 	}
 
 	logger.Debugf(ctx, "deleted k8s secret %v", k8sSecretName)
@@ -384,8 +379,7 @@ func (s *SecretService) ListSecrets(ctx context.Context, req *connect.Request[se
 	}
 
 	if err := s.k8sClient.List(ctx, k8sSecretList, listOpts...); err != nil {
-		logger.Errorf(ctx, "failed to list secrets: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to list k8s secrets: %w", err)
 	}
 
 	rawSecrets := make([]*secretpb.Secret, 0, len(k8sSecretList.Items))

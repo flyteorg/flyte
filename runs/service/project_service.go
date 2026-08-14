@@ -52,7 +52,7 @@ func (s *ProjectService) CreateProject(
 			logger.Warnf(ctx, "Project already exists, identifier: %s, name: %s", model.Identifier, model.Name)
 			return nil, connect.NewError(connect.CodeAlreadyExists, err)
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to create project: %w", err)
 	}
 
 	return connect.NewResponse(&project.CreateProjectResponse{}), nil
@@ -80,7 +80,7 @@ func (s *ProjectService) UpdateProject(
 		if errors.Is(err, interfaces.ErrProjectNotFound) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to update project: %w", err)
 	}
 
 	return connect.NewResponse(&project.UpdateProjectResponse{}), nil
@@ -102,12 +102,12 @@ func (s *ProjectService) GetProject(
 		if errors.Is(err, interfaces.ErrProjectNotFound) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to get project: %w", err)
 	}
 
 	projectProto, err := transformers.ProjectModelToProject(model, s.domains)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to convert project: %w", err)
 	}
 
 	return connect.NewResponse(&project.GetProjectResponse{
@@ -135,14 +135,14 @@ func (s *ProjectService) ListProjects(
 
 	projects, err := s.projectRepo.ListProjects(ctx, listInput)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, fmt.Errorf("failed to list projects: %w", err)
 	}
 
 	projectProtos := make([]*project.Project, 0, len(projects))
 	for _, p := range projects {
 		projectProto, convErr := transformers.ProjectModelToProject(p, s.domains)
 		if convErr != nil {
-			return nil, connect.NewError(connect.CodeInternal, convErr)
+			return nil, fmt.Errorf("failed to convert project: %w", convErr)
 		}
 		projectProtos = append(projectProtos, projectProto)
 	}

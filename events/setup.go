@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/v2/events/config"
 	"github.com/flyteorg/flyte/v2/events/service"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/connectrpc/server/interceptors"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
@@ -42,7 +43,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 	eventsSvc := service.NewEventsProxyService(runClient)
 
-	path, handler := workflowconnect.NewEventsProxyServiceHandler(eventsSvc, connect.WithInterceptors(otelInterceptor))
+	path, handler := workflowconnect.NewEventsProxyServiceHandler(eventsSvc, connect.WithInterceptors(interceptors.NewErrorInterceptor(), otelInterceptor))
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted EventsProxyService at %s", path)
 

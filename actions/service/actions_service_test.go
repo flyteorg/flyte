@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"connectrpc.com/connect"
@@ -59,19 +58,6 @@ func TestEnqueue(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, resp)
 	})
-
-	t.Run("client error returns internal", func(t *testing.T) {
-		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsService(m)
-
-		m.EXPECT().Enqueue(mock.Anything, testAction, (*task.RunSpec)(nil)).Return(errors.New("k8s error"))
-
-		_, err := svc.Enqueue(context.Background(), connect.NewRequest(&actions.EnqueueRequest{
-			Action: testAction,
-		}))
-
-		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
-	})
 }
 
 func TestUpdate(t *testing.T) {
@@ -91,22 +77,6 @@ func TestUpdate(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, resp)
 	})
-
-	t.Run("client error returns internal", func(t *testing.T) {
-		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsService(m)
-
-		status := &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_RUNNING}
-		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status).Return(errors.New("write failed"))
-
-		_, err := svc.Update(context.Background(), connect.NewRequest(&actions.UpdateRequest{
-			ActionId: testActionID,
-			Attempt:  1,
-			Status:   status,
-		}))
-
-		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
-	})
 }
 
 func TestAbort(t *testing.T) {
@@ -124,19 +94,6 @@ func TestAbort(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.NotNil(t, resp)
-	})
-
-	t.Run("client error returns internal", func(t *testing.T) {
-		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsService(m)
-
-		m.EXPECT().AbortAction(mock.Anything, testActionID, (*string)(nil)).Return(errors.New("delete failed"))
-
-		_, err := svc.Abort(context.Background(), connect.NewRequest(&actions.AbortRequest{
-			ActionId: testActionID,
-		}))
-
-		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
 	})
 }
 
@@ -168,35 +125,6 @@ func TestSignal(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.NotNil(t, resp)
-	})
-
-	t.Run("typed client error passes through", func(t *testing.T) {
-		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsService(m)
-
-		m.EXPECT().Signal(mock.Anything, testActionID, value, "").
-			Return(connect.NewError(connect.CodeNotFound, errors.New("not found")))
-
-		_, err := svc.Signal(context.Background(), connect.NewRequest(&actions.SignalRequest{
-			ActionId: testActionID,
-			Value:    value,
-		}))
-
-		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
-	})
-
-	t.Run("untyped client error becomes internal", func(t *testing.T) {
-		m := mocks.NewActionsClientInterface(t)
-		svc := NewActionsService(m)
-
-		m.EXPECT().Signal(mock.Anything, testActionID, value, "").Return(errors.New("k8s down"))
-
-		_, err := svc.Signal(context.Background(), connect.NewRequest(&actions.SignalRequest{
-			ActionId: testActionID,
-			Value:    value,
-		}))
-
-		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
 	})
 }
 

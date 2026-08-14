@@ -7,6 +7,7 @@ import (
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/connectrpc/server/interceptors"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/secret/secretconnect"
@@ -34,7 +35,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
 
-	path, handler := secretconnect.NewSecretServiceHandler(svc, connect.WithInterceptors(otelInterceptor))
+	path, handler := secretconnect.NewSecretServiceHandler(svc, connect.WithInterceptors(interceptors.NewErrorInterceptor(), otelInterceptor))
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted SecretService at %s", path)
 

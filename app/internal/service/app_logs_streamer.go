@@ -51,7 +51,7 @@ func (s *K8sAppLogStreamer) TailLogs(ctx context.Context, replicaID *flyteapp.Re
 		if k8serrors.IsNotFound(err) {
 			return connect.NewError(connect.CodeNotFound, fmt.Errorf("pod %s not found in namespace %s", podName, ns))
 		}
-		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get pod: %w", err))
+		return fmt.Errorf("failed to get pod: %w", err)
 	}
 
 	containerName := pickUserContainer(pod)
@@ -76,7 +76,7 @@ func (s *K8sAppLogStreamer) TailLogs(ctx context.Context, replicaID *flyteapp.Re
 
 	logStream, err := s.clientset.CoreV1().Pods(ns).GetLogs(podName, opts).Stream(streamCtx)
 	if err != nil {
-		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to stream pod logs: %w", err))
+		return fmt.Errorf("failed to stream pod logs: %w", err)
 	}
 	defer logStream.Close() //nolint:errcheck
 
@@ -84,7 +84,7 @@ func (s *K8sAppLogStreamer) TailLogs(ctx context.Context, replicaID *flyteapp.Re
 		return send(&flyteapp.LogLines{StructuredLines: lines})
 	})
 	if err != nil {
-		return connect.NewError(connect.CodeInternal, fmt.Errorf("error reading log stream: %w", err))
+		return fmt.Errorf("error reading log stream: %w", err)
 	}
 	return nil
 }

@@ -8,6 +8,7 @@ import (
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
 	stdlibapp "github.com/flyteorg/flyte/v2/flytestdlib/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/connectrpc/server/interceptors"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 
@@ -44,6 +45,7 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
+	serverInterceptors := []connect.Interceptor{interceptors.NewErrorInterceptor(), otelInterceptor}
 
 	internalAppURL := cfg.InternalAppServiceURL
 	if sc.BaseURL != "" {
@@ -58,7 +60,7 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 
 	appSvc := service.NewAppService(internalClient, cfg.CacheTTL)
 
-	path, handler := appconnect.NewAppServiceHandler(appSvc, connect.WithInterceptors(otelInterceptor))
+	path, handler := appconnect.NewAppServiceHandler(appSvc, connect.WithInterceptors(serverInterceptors...))
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted AppService at %s", path)
 
@@ -68,7 +70,7 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 		connect.WithInterceptors(otelInterceptor),
 	)
 	logsSvc := service.NewAppLogsService(internalLogsClient)
-	logsPath, logsHandler := appconnect.NewAppLogsServiceHandler(logsSvc, connect.WithInterceptors(otelInterceptor))
+	logsPath, logsHandler := appconnect.NewAppLogsServiceHandler(logsSvc, connect.WithInterceptors(serverInterceptors...))
 	sc.Mux.Handle(logsPath, logsHandler)
 	logger.Infof(ctx, "Mounted AppLogsService at %s", logsPath)
 
