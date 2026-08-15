@@ -36,7 +36,59 @@ func (s *SettingsService) GetSettingsForEdit(
 	ctx context.Context,
 	req *connect.Request[settings.GetSettingsForEditRequest],
 ) (*connect.Response[settings.GetSettingsForEditResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("not implemented yet"))
+	key := req.Msg.GetKey()
+	if key == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("key is required"))
+	}
+	if key.GetProject() != "" && key.GetDomain() == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("a project-scope key requires a domain"))
+	}
+
+	// One partial key per scope level covered by the request, broadest first,
+	// as GetSettingsForEditResponse requires. Order comes from this list; the
+	// repo returns rows unordered.
+	levelKeys := []*settings.SettingsKey{{Org: key.GetOrg()}}
+	if key.GetDomain() != "" {
+		levelKeys = append(levelKeys, &settings.SettingsKey{Org: key.GetOrg(), Domain: key.GetDomain()})
+	}
+	if key.GetProject() != "" {
+		levelKeys = append(levelKeys, &settings.SettingsKey{Org: key.GetOrg(), Domain: key.GetDomain(), Project: key.GetProject()})
+	}
+
+	storageKeys := make([]string, 0, len(levelKeys))
+	for _, lk := range levelKeys {
+		storageKeys = append(storageKeys, models.EncodeSettingsKey(lk.GetOrg(), lk.GetDomain(), lk.GetProject()))
+	}
+
+	rows, err := s.settingsRepo.GetSettingsByKeys(ctx, storageKeys)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	rowsByKey := make(map[string]*models.Settings, len(rows))
+	for _, row := range rows {
+		rowsByKey[row.Key] = row
+	}
+
+	levels := make([]*settings.SettingsRecord, 0, len(levelKeys))
+	for i, lk := range levelKeys {
+		// Absent level: empty settings, version 0 — the client's signal to use
+		// CreateSettings there (see SettingsRecord in the proto).
+		record := &settings.SettingsRecord{Key: lk, Settings: &settings.Settings{}}
+		if row := rowsByKey[storageKeys[i]]; row != nil {
+			stored := &settings.Settings{}
+			if err := protojson.Unmarshal(row.Data, stored); err != nil {
+				return nil, connect.NewError(connect.CodeInternal, err)
+			}
+			record.Settings = stored
+			record.Version = row.Version
+		}
+		levels = append(levels, record)
+	}
+
+	return connect.NewResponse(&settings.GetSettingsForEditResponse{
+		RequestedKey: key,
+		Levels:       levels,
+	}), nil
 }
 
 func (s *SettingsService) CreateSettings(
