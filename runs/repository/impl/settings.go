@@ -25,6 +25,10 @@ func NewSettingsRepo(db *sqlx.DB) interfaces.SettingsRepo {
 }
 
 func (r *settingsRepo) CreateSettings(ctx context.Context, settings *models.Settings) error {
+	if len(settings.Data) == 0 {
+		return fmt.Errorf("settings data is required: %s", settings.Key)
+	}
+
 	now := time.Now().UTC()
 	settings.CreatedAt = now
 	settings.UpdatedAt = now
