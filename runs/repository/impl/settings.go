@@ -90,9 +90,12 @@ func (r *settingsRepo) UpdateSettings(ctx context.Context, settings *models.Sett
 	if err != nil {
 		return fmt.Errorf("failed to get rows affected: %w", err)
 	}
-	// Zero rows: the caller's version is stale (or the row is gone);
-	// either way the caller must re-read, so report it as a conflict.
+	// Zero rows means the version was stale or the row does not exist.
+	// We distinguish it, so callers know whether to retry or to create.
 	if rowsAffected == 0 {
+		if _, getErr := r.GetSettings(ctx, settings.Key); getErr != nil {
+			return getErr
+		}
 		return fmt.Errorf("%w: %s", interfaces.ErrSettingsVersionConflict, settings.Key)
 	}
 

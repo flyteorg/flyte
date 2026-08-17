@@ -120,3 +120,15 @@ func TestUpdateSettings_VersionConflict(t *testing.T) {
 	require.JSONEq(t, string(writer.Data), string(got.Data))
 	require.True(t, got.UpdatedAt.After(got.CreatedAt))
 }
+
+func TestUpdateSettings_NotFound(t *testing.T) {
+	repo := setupSettingTest(t)
+	ctx := context.Background()
+
+	stale := &models.Settings{
+		Key:     models.EncodeSettingsKey("", "nowhere", ""),
+		Data:    []byte(`{}`),
+		Version: 1,
+	}
+	require.ErrorIs(t, repo.UpdateSettings(ctx, stale), interfaces.ErrSettingsNotFound)
+}
