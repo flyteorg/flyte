@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"fmt"
+	"strconv"
 
 	"google.golang.org/protobuf/proto"
 	v1 "k8s.io/api/core/v1"
@@ -22,6 +23,24 @@ import (
 
 var _ pluginsCore.TaskExecutionMetadata = &taskExecutionMetadata{}
 var _ pluginsCore.TaskExecutionID = &taskExecutionID{}
+
+const (
+	// Labels stamped on task pods so external per-pod metrics (DCGM, cAdvisor,
+	// kube-state-metrics) can be joined back to Flyte semantics. They are bare
+	// names, matching the project/domain/organization labels already injected,
+	// which kube-state-metrics surfaces as `label_run`, `label_action`,
+	// `label_attempt` and `label_task_name`.
+
+	// RunLabel carries the name of the run that owns the action.
+	RunLabel = "run"
+	// ActionLabel carries the name of the action the pod is executing.
+	ActionLabel = "action"
+	// AttemptLabel carries the 1-based attempt number, so the pod of a retried
+	// action can be told apart from the pods of its earlier attempts.
+	AttemptLabel = "attempt"
+	// TaskNameLabel carries the registered task name from the task template.
+	TaskNameLabel = "task-name"
+)
 
 type taskExecutionID struct {
 	generatedName string
@@ -114,6 +133,13 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 	maxAttempts := maxAttemptsFromTaskTemplate(ta.Spec.TaskTemplate)
 	taskID := taskIDFromTaskTemplate(ta.Spec.TaskTemplate)
 
+	// Identify the pod in Flyte terms so per-pod metric series can be joined back to
+	// the run, action and attempt that produced them.
+	setSanitizedLabel(injectLabels, RunLabel, ta.Spec.RunName)
+	setSanitizedLabel(injectLabels, ActionLabel, ta.Spec.ActionName)
+	injectLabels[AttemptLabel] = strconv.FormatUint(uint64(retryAttempt)+1, 10)
+	setSanitizedLabel(injectLabels, TaskNameLabel, taskID.GetName())
+
 	return &taskExecutionMetadata{
 		ownerID: types.NamespacedName{
 			Name:      ta.Name,
@@ -151,6 +177,14 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		securityContext: securityContext,
 		serviceAccount:  resolveServiceAccount(securityContext, executorconfig.GetConfig().DefaultK8sServiceAccount),
 	}, nil
+}
+
+// setSanitizedLabel stamps a label only when the value survives sanitization, so pods
+// never carry an empty label that would look like a real, blank value to a metrics query.
+func setSanitizedLabel(labels map[string]string, key, value string) {
+	if sanitized := pluginsUtils.SanitizeLabelValue(value); sanitized != "" {
+		labels[key] = sanitized
+	}
 }
 
 func buildGeneratedName(ta *flyteorgv1.TaskAction) string {
