@@ -159,9 +159,12 @@ func (s *SettingsService) UpdateSettings(
 		Version: req.Msg.GetVersion(),
 	}
 
-	// Pure update, not upsert: a missing record surfaces as a version conflict,
-	// and clients with version 0 are directed to CreateSettings (see SettingsRecord).
+	// Pure update, not upsert: a missing record returns NotFound (use
+	// CreateSettings), a stale version returns FailedPrecondition.
 	if err := s.settingsRepo.UpdateSettings(ctx, model); err != nil {
+		if errors.Is(err, interfaces.ErrSettingsNotFound) {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
 		if errors.Is(err, interfaces.ErrSettingsVersionConflict) {
 			return nil, connect.NewError(connect.CodeFailedPrecondition, err)
 		}
