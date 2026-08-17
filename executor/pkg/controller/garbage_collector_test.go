@@ -92,6 +92,21 @@ var _ = Describe("GarbageCollector", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
+	It("should delete terminal TaskActions immediately when maxTTL is zero", func() {
+		recentTime := time.Now().UTC().Format(labelTimeFormat)
+		createTaskAction(ctx, "gc-immediate", map[string]string{
+			LabelTerminationStatus: LabelValueTerminated,
+			LabelCompletedTime:     recentTime,
+		})
+
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 0, metricnoop.NewMeterProvider())
+		Expect(gc.collect(ctx)).To(Succeed())
+
+		ta := &flyteorgv1.TaskAction{}
+		err := k8sClient.Get(ctx, types.NamespacedName{Name: "gc-immediate", Namespace: "default"}, ta)
+		Expect(apierrors.IsNotFound(err)).To(BeTrue())
+	})
+
 	It("should retain non-terminated TaskActions", func() {
 		createTaskAction(ctx, "gc-active", nil)
 
