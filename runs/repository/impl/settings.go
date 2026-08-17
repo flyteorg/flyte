@@ -77,6 +77,10 @@ func (r *settingsRepo) GetSettingsByKeys(ctx context.Context, keys []string) ([]
 }
 
 func (r *settingsRepo) UpdateSettings(ctx context.Context, settings *models.Settings) error {
+	if len(settings.Data) == 0 {
+		return fmt.Errorf("settings data is required: %s", settings.Key)
+	}
+
 	now := time.Now().UTC()
 
 	result, err := r.db.ExecContext(ctx,
