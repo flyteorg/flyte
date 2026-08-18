@@ -10,6 +10,7 @@ import (
 
 const (
 	imagePullPrefix = "img-pull"
+	envVarPrefix    = "env-var"
 )
 
 const (
@@ -24,11 +25,23 @@ var (
 	ImagePullLabels = map[string]string{
 		secretTypeLabel: "image-pull-secret",
 	}
+
+	EnvVarLabels = map[string]string{
+		secretTypeLabel: "env-var-secret",
+	}
 )
 
 // ToImagePullK8sName generates a Kubernetes secret name based on the provided secret name components.
 // The name includes a consistent hash of the components to ensure uniqueness, be Kubernetes compliant, and avoid collisions.
 func ToImagePullK8sName(components SecretNameComponents) string {
+	return toScopedK8sName(imagePullPrefix, components)
+}
+
+func ToEnvVarK8sName(components SecretNameComponents) string {
+	return toScopedK8sName(envVarPrefix, components)
+}
+
+func toScopedK8sName(prefix string, components SecretNameComponents) string {
 	// Create a deterministic string representation of the components
 	componentStr := fmt.Sprintf("%s:%s:%s:%s",
 		components.Org,
@@ -40,13 +53,23 @@ func ToImagePullK8sName(components SecretNameComponents) string {
 	h := sha256.New()
 	h.Write([]byte(componentStr))
 	hash := fmt.Sprintf("%x", h.Sum(nil))
-	return fmt.Sprintf("%s-%s", imagePullPrefix, hash[:16])
+	return fmt.Sprintf("%s-%s", prefix, hash[:16])
 }
 
 // ToImagePullK8sLabels generates a map of labels that can be used to identify the image pull Kubernetes secret.
 // These labels are intended to supplement the hashed secret name and provide additional metadata.
 func ToImagePullK8sLabels(components SecretNameComponents) map[string]string {
 	return utils.UnionMaps(ImagePullLabels, map[string]string{
+		// TODO Create a function that cleans the values of the labels to be Kubernetes compliant
+		orgLabel:        sanitizeLabelValue(components.Org),
+		projectLabel:    sanitizeLabelValue(components.Project),
+		domainLabel:     sanitizeLabelValue(components.Domain),
+		secretNameLabel: sanitizeLabelValue(components.Name),
+	})
+}
+
+func ToEnvVarK8sLabels(components SecretNameComponents) map[string]string {
+	return utils.UnionMaps(EnvVarLabels, map[string]string{
 		// TODO Create a function that cleans the values of the labels to be Kubernetes compliant
 		orgLabel:        sanitizeLabelValue(components.Org),
 		projectLabel:    sanitizeLabelValue(components.Project),
