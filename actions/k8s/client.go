@@ -310,29 +310,31 @@ func (c *ActionsClient) Signal(ctx context.Context, actionID *common.ActionIdent
 
 	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		taskAction := &executorv1.TaskAction{}
-		resolvedTaskActionName, err := c.getTaskActionForSignal(ctx, actionID, taskActionName, taskAction)
-		if err != nil {
-			return err
+		if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: taskActionName, Namespace: c.namespace}, taskAction); err != nil {
+			if apierrors.IsNotFound(err) {
+				return connect.NewError(connect.CodeNotFound, fmt.Errorf("condition action %s not found", taskActionName))
+			}
+			return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 		}
 		if taskAction.Spec.ActionType != executorv1.ActionTypeCondition {
 			return connect.NewError(connect.CodeFailedPrecondition,
-				fmt.Errorf("action %s is not a condition", resolvedTaskActionName))
+				fmt.Errorf("action %s is not a condition", taskActionName))
 		}
 		if existing := SignalValueFromStatus(ctx, taskAction); existing != nil {
 			if proto.Equal(existing, value) {
 				return nil // idempotent retry of the same signal
 			}
 			return connect.NewError(connect.CodeFailedPrecondition,
-				fmt.Errorf("condition %s already signalled with a different value", resolvedTaskActionName))
+				fmt.Errorf("condition %s already signalled with a different value", taskActionName))
 		}
 		if isTerminalPhase(GetPhaseFromConditions(taskAction)) {
 			return connect.NewError(connect.CodeFailedPrecondition,
-				fmt.Errorf("condition %s already completed", resolvedTaskActionName))
+				fmt.Errorf("condition %s already completed", taskActionName))
 		}
 
 		condSpec := &workflow.ConditionAction{}
 		if err := proto.Unmarshal(taskAction.Spec.ConditionSpec, condSpec); err != nil {
-			return fmt.Errorf("failed to unmarshal condition spec for %s: %w", resolvedTaskActionName, err)
+			return fmt.Errorf("failed to unmarshal condition spec for %s: %w", taskActionName, err)
 		}
 		if declared := condSpec.GetType().GetSimple(); declared != kind {
 			return connect.NewError(connect.CodeInvalidArgument,
@@ -346,34 +348,9 @@ func (c *ActionsClient) Signal(ctx context.Context, actionID *common.ActionIdent
 		if err := c.k8sClient.Status().Update(ctx, taskAction); err != nil {
 			return err
 		}
-		logger.Infof(ctx, "Signalled condition TaskAction %s (by %q)", resolvedTaskActionName, signalledBy)
+		logger.Infof(ctx, "Signalled condition TaskAction %s (by %q)", taskActionName, signalledBy)
 		return nil
 	})
-}
-
-func (c *ActionsClient) getTaskActionForSignal(
-	ctx context.Context,
-	actionID *common.ActionIdentifier,
-	taskActionName string,
-	taskAction *executorv1.TaskAction,
-) (string, error) {
-	key := client.ObjectKey{Name: taskActionName, Namespace: c.namespace}
-	if err := c.k8sClient.Get(ctx, key, taskAction); err == nil {
-		return taskActionName, nil
-	} else if !apierrors.IsNotFound(err) {
-		return "", fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
-	}
-
-	if actionID.GetName() != "" && actionID.GetName() != taskActionName {
-		rawKey := client.ObjectKey{Name: actionID.GetName(), Namespace: c.namespace}
-		if err := c.k8sClient.Get(ctx, rawKey, taskAction); err == nil {
-			return actionID.GetName(), nil
-		} else if !apierrors.IsNotFound(err) {
-			return "", fmt.Errorf("failed to get TaskAction %s: %w", actionID.GetName(), err)
-		}
-	}
-
-	return "", connect.NewError(connect.CodeNotFound, fmt.Errorf("condition action %s not found", taskActionName))
 }
 
 // literalPrimitiveKind maps a concrete signal Literal to the SimpleType it
