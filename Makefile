@@ -36,7 +36,7 @@ build: verify ## Build all Go service binaries
 # =============================================================================
 
 # Local builds keep refreshing floating preloaded images such as flyteconsole:latest.
-# CI leaves CACHEBUST empty so buildx can restore that image layer from cache.
+# In CI we omit CACHEBUST (Dockerfile defaults it to 0) so buildx can restore the preload layer from cache.
 DEVBOX_CACHEBUST ?= $(if $(GITHUB_ACTIONS),,$(shell date +%s))
 DEVBOX_CACHEBUST_FLAG := $(if $(DEVBOX_CACHEBUST),CACHEBUST=$(DEVBOX_CACHEBUST))
 
