@@ -105,8 +105,9 @@ func (s *SettingsService) CreateSettings(
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("a project-scope key requires a domain"))
 	}
 
-	// Currently we store the Settings message as a raw protojson, sparse storage
-	// (prune/hydrate) arrives with the resolution work (RFC #7775 task 2.1)
+	// Settings are stored as full protojson. Sparse storage (PruneInherited /
+	// Hydrate) is RFC #7775 task 2.1, a prerequisite of this handler that is
+	// not implemented yet.
 	data, err := protojson.Marshal(req.Msg.GetSettings())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
