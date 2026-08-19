@@ -440,6 +440,20 @@ func (r *actionRepo) UpdateActionPhase(
 		int32(common.ActionPhase_ACTION_PHASE_FAILED),
 		int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
 	}
+	// A paused action may settle into any terminal phase. This case needs stating
+	// separately because the `phase <= $n` guard below reads the enum's numeric
+	// order as the lifecycle order, and PAUSED breaks that assumption: it was
+	// appended after the terminal phases, so PAUSED (9) sorts above SUCCEEDED (5).
+	// Without this, signalling a condition updates zero rows — silently, since a
+	// no-op update also skips notifyActionUpdate, so the change never reaches the
+	// watch stream either and the console keeps offering the signal input.
+	terminalPhases := []int32{
+		int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+		int32(common.ActionPhase_ACTION_PHASE_FAILED),
+		int32(common.ActionPhase_ACTION_PHASE_ABORTED),
+		int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
+		int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
+	}
 
 	var queryBuilder strings.Builder
 	var args []interface{}
@@ -467,9 +481,10 @@ func (r *actionRepo) UpdateActionPhase(
 		argIdx++
 	}
 
-	queryBuilder.WriteString(fmt.Sprintf(" WHERE project = $%d AND domain = $%d AND run_name = $%d AND name = $%d AND (phase <= $%d OR phase = ANY($%d))", //nolint: staticcheck
-		argIdx, argIdx+1, argIdx+2, argIdx+3, argIdx+4, argIdx+5))
-	args = append(args, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase, pq.Array(retryablePhases))
+	queryBuilder.WriteString(fmt.Sprintf(" WHERE project = $%d AND domain = $%d AND run_name = $%d AND name = $%d AND (phase <= $%d OR phase = ANY($%d) OR (phase = $%d AND $%d = ANY($%d)))", //nolint: staticcheck
+		argIdx, argIdx+1, argIdx+2, argIdx+3, argIdx+4, argIdx+5, argIdx+6, argIdx+4, argIdx+7))
+	args = append(args, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase,
+		pq.Array(retryablePhases), int32(common.ActionPhase_ACTION_PHASE_PAUSED), pq.Array(terminalPhases))
 
 	result, err := r.db.ExecContext(ctx, queryBuilder.String(), args...)
 	if err != nil {
