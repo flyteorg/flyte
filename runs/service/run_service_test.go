@@ -1867,3 +1867,50 @@ func TestGetActionLogContext(t *testing.T) {
 		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
 	})
 }
+
+// The console decides an action is a signalable condition from metadata.spec
+// alone. The watch stream builds its own metadata rather than reusing
+// actionMetadataFromModel, so the condition arm has to be kept in step: without
+// it a paused condition streams as an ordinary action and the UI renders no way
+// to signal it.
+func TestConvertNodeUpdateToEnrichedProto_ConditionMetadata(t *testing.T) {
+	svc := &RunService{}
+	runID := &common.RunIdentifier{Project: "p", Domain: "d", Name: "r1"}
+
+	condType := &core.LiteralType{
+		Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+	}
+	specBytes, err := proto.Marshal(&workflow.ActionSpec{
+		Spec: &workflow.ActionSpec_Condition{
+			Condition: &workflow.ConditionAction{
+				Name: "approve-item",
+				Type: condType,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	enriched := svc.convertNodeUpdateToEnrichedProto(runID, &nodeUpdate{
+		Node: &node{
+			Action: &models.Action{
+				Project:      "p",
+				Domain:       "d",
+				RunName:      "r1",
+				Name:         "cond1",
+				Phase:        int32(common.ActionPhase_ACTION_PHASE_PAUSED),
+				ActionType:   int32(workflow.ActionType_ACTION_TYPE_CONDITION),
+				FunctionName: "approve-item",
+				ActionSpec:   specBytes,
+			},
+		},
+		MeetsFilter: true,
+	})
+
+	require.NotNil(t, enriched)
+	condMeta := enriched.GetAction().GetMetadata().GetCondition()
+	require.NotNil(t, condMeta, "condition metadata must be set, otherwise the console cannot classify the action")
+	assert.Equal(t, "approve-item", condMeta.GetName())
+	// The declared type drives which input the console renders, and the payload
+	// type check before signaling.
+	assert.Equal(t, core.SimpleType_STRING, condMeta.GetType().GetSimple())
+}

@@ -1007,3 +1007,83 @@ func TestUpdateActionPhase_AbortedDoesNotInsertEvent(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 0, count, "UpdateActionPhase(ABORTED) must not insert a synthetic action_events row")
 }
+
+// PAUSED sorts above every terminal phase in the enum, so the monotonic
+// `phase <= $n` guard would reject a signalled condition's transition to
+// SUCCEEDED and update zero rows. A no-op update also skips notifyActionUpdate,
+// so the console would never learn the condition resolved and would keep
+// offering the signal input.
+func TestUpdateActionPhase_PausedSettlesIntoTerminal(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	for _, tc := range []struct {
+		name     string
+		terminal common.ActionPhase
+	}{
+		{"signalled", common.ActionPhase_ACTION_PHASE_SUCCEEDED},
+		{"timed out", common.ActionPhase_ACTION_PHASE_TIMED_OUT},
+		{"aborted", common.ActionPhase_ACTION_PHASE_ABORTED},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			actionID := &common.ActionIdentifier{
+				Run: &common.RunIdentifier{
+					Org: "org1", Project: "proj1", Domain: "domain1", Name: "run1",
+				},
+				Name: "cond-" + tc.name,
+			}
+			_, err := actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
+			require.NoError(t, err)
+
+			require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
+				common.ActionPhase_ACTION_PHASE_PAUSED, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
+			paused, err := actionRepo.GetAction(ctx, actionID)
+			require.NoError(t, err)
+			require.Equal(t, int32(common.ActionPhase_ACTION_PHASE_PAUSED), paused.Phase)
+
+			endTime := time.Now()
+			require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
+				tc.terminal, 1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil))
+
+			action, err := actionRepo.GetAction(ctx, actionID)
+			require.NoError(t, err)
+			assert.Equal(t, int32(tc.terminal), action.Phase,
+				"a paused action must be able to settle into %s", tc.terminal)
+			assert.True(t, action.EndedAt.Valid)
+		})
+	}
+}
+
+// The paused exception is deliberately one-way: it lets a paused action settle,
+// not resume. A stale RUNNING event arriving after the pause must still be
+// rejected, exactly as the monotonic guard rejects it today.
+func TestUpdateActionPhase_PausedDoesNotResume(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org: "org1", Project: "proj1", Domain: "domain1", Name: "run1",
+		},
+		Name: "paused-action",
+	}
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
+		common.ActionPhase_ACTION_PHASE_PAUSED, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
+
+	require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
+		common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
+
+	action, err := actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_PAUSED), action.Phase,
+		"a non-terminal update must not move an action out of PAUSED")
+}

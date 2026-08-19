@@ -1956,7 +1956,18 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 		metadata.EnvironmentName = action.EnvironmentName.String
 
 	case workflow.ActionType_ACTION_TYPE_CONDITION:
-		// Unhandled for now
+		condMeta := &workflow.ConditionActionMetadata{
+			Name: action.FunctionName,
+		}
+		if spec := extractActionSpec(action.ActionSpec); spec != nil {
+			if cond := spec.GetCondition(); cond != nil {
+				condMeta.Type = cond.GetType()
+				if condMeta.Name == "" {
+					condMeta.Name = cond.GetName()
+				}
+			}
+		}
+		metadata.Spec = &workflow.ActionMetadata_Condition{Condition: condMeta}
 	case workflow.ActionType_ACTION_TYPE_UNSPECIFIED:
 		// No-op, this should never happen.
 	}
