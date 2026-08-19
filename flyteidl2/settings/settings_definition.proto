@@ -201,4 +201,5 @@ message Settings {
   StringMapSetting annotations = 6 [(flyteidl2.settings.desc) = "Kubernetes annotations applied to task pods. Child overrides parent on key conflict."];
   StringMapSetting environment_variables = 7 [(flyteidl2.settings.desc) = "Environment variables injected into task pods. Child overrides parent on key conflict."];
   AppSettings app = 8 [(flyteidl2.settings.desc) = "Union Apps auth policy"];
+  StringSetting pod_template_name = 9 [(flyteidl2.settings.desc) = "Name of the Kubernetes PodTemplate used as the base for task pods"];
 }

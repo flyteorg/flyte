@@ -158,7 +158,7 @@ class AppSettings(_message.Message):
     def __init__(self, disallow_anonymous: _Optional[_Union[BoolSetting, _Mapping]] = ...) -> None: ...
 
 class Settings(_message.Message):
-    __slots__ = ["run", "security", "storage", "task_resource", "labels", "annotations", "environment_variables", "app"]
+    __slots__ = ["run", "security", "storage", "task_resource", "labels", "annotations", "environment_variables", "app", "pod_template_name"]
     RUN_FIELD_NUMBER: _ClassVar[int]
     SECURITY_FIELD_NUMBER: _ClassVar[int]
     STORAGE_FIELD_NUMBER: _ClassVar[int]
@@ -167,6 +167,7 @@ class Settings(_message.Message):
     ANNOTATIONS_FIELD_NUMBER: _ClassVar[int]
     ENVIRONMENT_VARIABLES_FIELD_NUMBER: _ClassVar[int]
     APP_FIELD_NUMBER: _ClassVar[int]
+    POD_TEMPLATE_NAME_FIELD_NUMBER: _ClassVar[int]
     run: RunSettings
     security: SecuritySettings
     storage: StorageSettings
@@ -175,4 +176,5 @@ class Settings(_message.Message):
     annotations: StringMapSetting
     environment_variables: StringMapSetting
     app: AppSettings
-    def __init__(self, run: _Optional[_Union[RunSettings, _Mapping]] = ..., security: _Optional[_Union[SecuritySettings, _Mapping]] = ..., storage: _Optional[_Union[StorageSettings, _Mapping]] = ..., task_resource: _Optional[_Union[TaskResourceSettings, _Mapping]] = ..., labels: _Optional[_Union[StringMapSetting, _Mapping]] = ..., annotations: _Optional[_Union[StringMapSetting, _Mapping]] = ..., environment_variables: _Optional[_Union[StringMapSetting, _Mapping]] = ..., app: _Optional[_Union[AppSettings, _Mapping]] = ...) -> None: ...
+    pod_template_name: StringSetting
+    def __init__(self, run: _Optional[_Union[RunSettings, _Mapping]] = ..., security: _Optional[_Union[SecuritySettings, _Mapping]] = ..., storage: _Optional[_Union[StorageSettings, _Mapping]] = ..., task_resource: _Optional[_Union[TaskResourceSettings, _Mapping]] = ..., labels: _Optional[_Union[StringMapSetting, _Mapping]] = ..., annotations: _Optional[_Union[StringMapSetting, _Mapping]] = ..., environment_variables: _Optional[_Union[StringMapSetting, _Mapping]] = ..., app: _Optional[_Union[AppSettings, _Mapping]] = ..., pod_template_name: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
