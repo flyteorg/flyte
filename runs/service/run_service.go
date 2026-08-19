@@ -1956,13 +1956,9 @@ func (s *RunService) convertNodeUpdateToEnrichedProto(
 		metadata.EnvironmentName = action.EnvironmentName.String
 
 	case workflow.ActionType_ACTION_TYPE_CONDITION:
-		// Mirrors actionMetadataFromModel. The console decides an action is a
-		// condition from metadata.spec alone, so leaving this unset renders a
-		// paused condition as an ordinary action with no way to signal it.
 		condMeta := &workflow.ConditionActionMetadata{
 			Name: action.FunctionName,
 		}
-		// Clients type-check the payload against metadata.condition.type before signaling, pull it from the stored spec.
 		if spec := extractActionSpec(action.ActionSpec); spec != nil {
 			if cond := spec.GetCondition(); cond != nil {
 				condMeta.Type = cond.GetType()

@@ -440,13 +440,6 @@ func (r *actionRepo) UpdateActionPhase(
 		int32(common.ActionPhase_ACTION_PHASE_FAILED),
 		int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
 	}
-	// A paused action may settle into any terminal phase. This case needs stating
-	// separately because the `phase <= $n` guard below reads the enum's numeric
-	// order as the lifecycle order, and PAUSED breaks that assumption: it was
-	// appended after the terminal phases, so PAUSED (9) sorts above SUCCEEDED (5).
-	// Without this, signalling a condition updates zero rows — silently, since a
-	// no-op update also skips notifyActionUpdate, so the change never reaches the
-	// watch stream either and the console keeps offering the signal input.
 	terminalPhases := []int32{
 		int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
 		int32(common.ActionPhase_ACTION_PHASE_FAILED),
