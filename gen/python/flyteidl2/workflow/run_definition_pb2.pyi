@@ -293,7 +293,7 @@ class ActionDetails(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., metadata: _Optional[_Union[ActionMetadata, _Mapping]] = ..., status: _Optional[_Union[ActionStatus, _Mapping]] = ..., error_info: _Optional[_Union[ErrorInfo, _Mapping]] = ..., abort_info: _Optional[_Union[AbortInfo, _Mapping]] = ..., signal_info: _Optional[_Union[SignalInfo, _Mapping]] = ..., task: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., trace: _Optional[_Union[_task_definition_pb2.TraceSpec, _Mapping]] = ..., condition: _Optional[_Union[ConditionAction, _Mapping]] = ..., attempts: _Optional[_Iterable[_Union[ActionAttempt, _Mapping]]] = ...) -> None: ...
 
 class ActionAttempt(_message.Message):
-    __slots__ = ["phase", "start_time", "end_time", "error_info", "attempt", "log_info", "outputs", "logs_available", "cache_status", "cluster_events", "phase_transitions", "cluster", "log_context", "cache_metadata"]
+    __slots__ = ["phase", "start_time", "end_time", "error_info", "attempt", "log_info", "outputs", "logs_available", "cache_status", "cluster_events", "phase_transitions", "cluster", "log_context", "cache_metadata", "instance_info"]
     PHASE_FIELD_NUMBER: _ClassVar[int]
     START_TIME_FIELD_NUMBER: _ClassVar[int]
     END_TIME_FIELD_NUMBER: _ClassVar[int]
@@ -308,6 +308,7 @@ class ActionAttempt(_message.Message):
     CLUSTER_FIELD_NUMBER: _ClassVar[int]
     LOG_CONTEXT_FIELD_NUMBER: _ClassVar[int]
     CACHE_METADATA_FIELD_NUMBER: _ClassVar[int]
+    INSTANCE_INFO_FIELD_NUMBER: _ClassVar[int]
     phase: _phase_pb2.ActionPhase
     start_time: _timestamp_pb2.Timestamp
     end_time: _timestamp_pb2.Timestamp
@@ -322,7 +323,33 @@ class ActionAttempt(_message.Message):
     cluster: str
     log_context: _execution_pb2.LogContext
     cache_metadata: _cache_pb2.CacheMetadata
-    def __init__(self, phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., error_info: _Optional[_Union[ErrorInfo, _Mapping]] = ..., attempt: _Optional[int] = ..., log_info: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., outputs: _Optional[_Union[_common_pb2.OutputReferences, _Mapping]] = ..., logs_available: bool = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., cluster_events: _Optional[_Iterable[_Union[ClusterEvent, _Mapping]]] = ..., phase_transitions: _Optional[_Iterable[_Union[PhaseTransition, _Mapping]]] = ..., cluster: _Optional[str] = ..., log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ..., cache_metadata: _Optional[_Union[_cache_pb2.CacheMetadata, _Mapping]] = ...) -> None: ...
+    instance_info: InstanceInfo
+    def __init__(self, phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., error_info: _Optional[_Union[ErrorInfo, _Mapping]] = ..., attempt: _Optional[int] = ..., log_info: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., outputs: _Optional[_Union[_common_pb2.OutputReferences, _Mapping]] = ..., logs_available: bool = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., cluster_events: _Optional[_Iterable[_Union[ClusterEvent, _Mapping]]] = ..., phase_transitions: _Optional[_Iterable[_Union[PhaseTransition, _Mapping]]] = ..., cluster: _Optional[str] = ..., log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ..., cache_metadata: _Optional[_Union[_cache_pb2.CacheMetadata, _Mapping]] = ..., instance_info: _Optional[_Union[InstanceInfo, _Mapping]] = ...) -> None: ...
+
+class InstanceInfo(_message.Message):
+    __slots__ = ["instance_type", "instance_id", "accelerator", "capacity_type", "zone", "node_name", "attributes"]
+    class AttributesEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    INSTANCE_TYPE_FIELD_NUMBER: _ClassVar[int]
+    INSTANCE_ID_FIELD_NUMBER: _ClassVar[int]
+    ACCELERATOR_FIELD_NUMBER: _ClassVar[int]
+    CAPACITY_TYPE_FIELD_NUMBER: _ClassVar[int]
+    ZONE_FIELD_NUMBER: _ClassVar[int]
+    NODE_NAME_FIELD_NUMBER: _ClassVar[int]
+    ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
+    instance_type: str
+    instance_id: str
+    accelerator: str
+    capacity_type: str
+    zone: str
+    node_name: str
+    attributes: _containers.ScalarMap[str, str]
+    def __init__(self, instance_type: _Optional[str] = ..., instance_id: _Optional[str] = ..., accelerator: _Optional[str] = ..., capacity_type: _Optional[str] = ..., zone: _Optional[str] = ..., node_name: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class ClusterEvent(_message.Message):
     __slots__ = ["occurred_at", "message"]
@@ -343,7 +370,7 @@ class PhaseTransition(_message.Message):
     def __init__(self, phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class ActionEvent(_message.Message):
-    __slots__ = ["id", "attempt", "phase", "version", "start_time", "updated_time", "end_time", "error_info", "log_info", "log_context", "cluster", "outputs", "cache_status", "cluster_events", "reported_time", "cache_metadata"]
+    __slots__ = ["id", "attempt", "phase", "version", "start_time", "updated_time", "end_time", "error_info", "log_info", "log_context", "cluster", "outputs", "cache_status", "cluster_events", "reported_time", "cache_metadata", "instance_info"]
     ID_FIELD_NUMBER: _ClassVar[int]
     ATTEMPT_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
@@ -360,6 +387,7 @@ class ActionEvent(_message.Message):
     CLUSTER_EVENTS_FIELD_NUMBER: _ClassVar[int]
     REPORTED_TIME_FIELD_NUMBER: _ClassVar[int]
     CACHE_METADATA_FIELD_NUMBER: _ClassVar[int]
+    INSTANCE_INFO_FIELD_NUMBER: _ClassVar[int]
     id: _identifier_pb2.ActionIdentifier
     attempt: int
     phase: _phase_pb2.ActionPhase
@@ -376,7 +404,8 @@ class ActionEvent(_message.Message):
     cluster_events: _containers.RepeatedCompositeFieldContainer[ClusterEvent]
     reported_time: _timestamp_pb2.Timestamp
     cache_metadata: _cache_pb2.CacheMetadata
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., version: _Optional[int] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., error_info: _Optional[_Union[ErrorInfo, _Mapping]] = ..., log_info: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ..., cluster: _Optional[str] = ..., outputs: _Optional[_Union[_common_pb2.OutputReferences, _Mapping]] = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., cluster_events: _Optional[_Iterable[_Union[ClusterEvent, _Mapping]]] = ..., reported_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., cache_metadata: _Optional[_Union[_cache_pb2.CacheMetadata, _Mapping]] = ...) -> None: ...
+    instance_info: InstanceInfo
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., version: _Optional[int] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., error_info: _Optional[_Union[ErrorInfo, _Mapping]] = ..., log_info: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ..., cluster: _Optional[str] = ..., outputs: _Optional[_Union[_common_pb2.OutputReferences, _Mapping]] = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., cluster_events: _Optional[_Iterable[_Union[ClusterEvent, _Mapping]]] = ..., reported_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., cache_metadata: _Optional[_Union[_cache_pb2.CacheMetadata, _Mapping]] = ..., instance_info: _Optional[_Union[InstanceInfo, _Mapping]] = ...) -> None: ...
 
 class ActionSpec(_message.Message):
     __slots__ = ["action_id", "parent_action_name", "run_spec", "input_uri", "run_output_base", "task", "condition", "trace", "group"]
