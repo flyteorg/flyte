@@ -786,9 +786,14 @@ func toActionErrorInfo(err *core.ExecutionError) *workflow.ErrorInfo {
 	if err == nil {
 		return nil
 	}
+	// Code and GpuFault are carried through as they are. They are the parts of the
+	// failure the user can act on, and this event is the only place they reach the
+	// console and the SDK from.
 	out := &workflow.ErrorInfo{
-		Message: err.GetMessage(),
-		Kind:    workflow.ErrorInfo_KIND_UNSPECIFIED,
+		Message:  err.GetMessage(),
+		Kind:     workflow.ErrorInfo_KIND_UNSPECIFIED,
+		Code:     err.GetCode(),
+		GpuFault: err.GetGpuFault(),
 	}
 	switch err.GetKind() {
 	case core.ExecutionError_USER:

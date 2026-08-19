@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"k8s.io/apimachinery/pkg/labels"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -13,7 +15,6 @@ import (
 	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	k8sscheme "k8s.io/client-go/kubernetes/scheme"
@@ -27,6 +28,7 @@ import (
 	pluginsCoreMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/gpufault"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	k8sMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -275,6 +277,202 @@ func TestHandle_CorruptedPluginStateFailsPermanently(t *testing.T) {
 	assert.Equal(t, pluginsCore.PhasePermanentFailure, transition.Info().Phase())
 	assert.Equal(t, string(errors.CorruptedPluginState), transition.Info().Err().GetCode())
 	assert.Equal(t, core.ExecutionError_SYSTEM, transition.Info().Err().GetKind())
+}
+
+// fakeEventWatcher stands in for the informer-backed watcher and records the window it
+// was asked for, so a test can assert that classification looks at the whole attempt.
+type fakeEventWatcher struct {
+	events            map[watchedObjectKey][]*eventInfo
+	lastCreatedAfter  time.Time
+	lastRecordedAfter time.Time
+}
+
+func (w *fakeEventWatcher) List(objectKey watchedObjectKey, createdAfter time.Time, recordedAfter time.Time) []*eventInfo {
+	w.lastCreatedAfter = createdAfter
+	w.lastRecordedAfter = recordedAfter
+	return w.events[objectKey]
+}
+
+func gpuFaultEvent(code int, severity gpufault.Severity, createdAt time.Time) *eventInfo {
+	message := gpufault.FormatEventMessage(
+		gpufault.Fault{
+			Kind:     gpufault.KindXid,
+			Code:     code,
+			Name:     gpufault.NameFor(gpufault.KindXid, code),
+			Severity: severity,
+			PCI:      "0000:3b:00.0",
+		},
+		gpufault.Attribution{NodeName: "ip-10-0-0-1", GPUUUID: "GPU-1234", GPUIndex: 0},
+	)
+	return &eventInfo{Message: message, Reason: "GPUXidError", CreatedAt: createdAt, RecordedAt: createdAt}
+}
+
+func failedPod() *v1.Pod {
+	pod := &v1.Pod{
+		TypeMeta:   metav1.TypeMeta{Kind: "Pod", APIVersion: "v1"},
+		ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "pod"},
+	}
+	return pod
+}
+
+func TestClassifyGpuFailure(t *testing.T) {
+	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
+	base := time.Date(2026, 8, 19, 10, 0, 0, 0, time.UTC)
+
+	tests := []struct {
+		name        string
+		events      []*eventInfo
+		phaseInfo   pluginsCore.PhaseInfo
+		wantPhase   pluginsCore.Phase
+		wantCode    string
+		wantKind    core.ExecutionError_ErrorKind
+		wantFault   bool
+		wantMessage string
+	}{
+		{
+			name:      "a critical xid makes the failure a system retryable one",
+			events:    []*eventInfo{gpuFaultEvent(79, gpufault.SeverityCritical, base)},
+			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("UnknownError", "Pod failed", nil),
+			wantPhase: pluginsCore.PhaseRetryableFailure,
+			wantCode:  gpufault.CodeGpuFallenOffBus,
+			wantKind:  core.ExecutionError_SYSTEM,
+			wantFault: true,
+		},
+		{
+			name:      "a user xid names the failure but keeps the verdict",
+			events:    []*eventInfo{gpuFaultEvent(31, gpufault.SeverityUser, base)},
+			phaseInfo: pluginsCore.PhaseInfoFailure("UnknownError", "exit code 1", nil),
+			wantPhase: pluginsCore.PhasePermanentFailure,
+			wantCode:  gpufault.CodeGpuXidError,
+			wantKind:  core.ExecutionError_USER,
+			wantFault: true,
+		},
+		{
+			name:      "a warning only rides along",
+			events:    []*eventInfo{gpuFaultEvent(92, gpufault.SeverityWarn, base)},
+			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("OOMKilled", "oom", nil),
+			wantPhase: pluginsCore.PhaseRetryableFailure,
+			wantCode:  "OOMKilled",
+			wantKind:  core.ExecutionError_USER,
+			wantFault: true,
+		},
+		{
+			name: "events that are not gpu faults are ignored",
+			events: []*eventInfo{
+				{Message: "Back-off restarting failed container", CreatedAt: base, RecordedAt: base},
+			},
+			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("OOMKilled", "oom", nil),
+			wantPhase: pluginsCore.PhaseRetryableFailure,
+			wantCode:  "OOMKilled",
+			wantKind:  core.ExecutionError_USER,
+			wantFault: false,
+		},
+		{
+			name:      "no events at all",
+			events:    nil,
+			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("OOMKilled", "oom", nil),
+			wantPhase: pluginsCore.PhaseRetryableFailure,
+			wantCode:  "OOMKilled",
+			wantKind:  core.ExecutionError_USER,
+			wantFault: false,
+		},
+		{
+			name: "the first critical fault of the attempt wins",
+			events: []*eventInfo{
+				gpuFaultEvent(31, gpufault.SeverityUser, base),
+				gpuFaultEvent(74, gpufault.SeverityCritical, base.Add(time.Second)),
+				gpuFaultEvent(79, gpufault.SeverityCritical, base.Add(2*time.Second)),
+			},
+			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("UnknownError", "Pod failed", nil),
+			wantPhase: pluginsCore.PhaseRetryableFailure,
+			wantCode:  gpufault.CodeGpuNvlinkError,
+			wantKind:  core.ExecutionError_SYSTEM,
+			wantFault: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			watcher := &fakeEventWatcher{events: map[watchedObjectKey][]*eventInfo{key: tt.events}}
+			pm := NewPluginManager("test-plugin", nil, nil)
+			pm.eventWatcher = watcher
+
+			got := pm.classifyGpuFailure(failedPod(), tt.phaseInfo)
+
+			assert.Equal(t, tt.wantPhase, got.Phase())
+			require.NotNil(t, got.Err())
+			assert.Equal(t, tt.wantCode, got.Err().GetCode())
+			assert.Equal(t, tt.wantKind, got.Err().GetKind())
+			if tt.wantFault {
+				assert.NotNil(t, got.Err().GetGpuFault())
+			} else {
+				assert.Nil(t, got.Err().GetGpuFault())
+			}
+			// The whole attempt is searched, not just what arrived since the watermark.
+			assert.True(t, watcher.lastCreatedAfter.IsZero())
+			assert.True(t, watcher.lastRecordedAfter.IsZero())
+		})
+	}
+}
+
+func TestClassifyGpuFailureSkips(t *testing.T) {
+	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
+	base := time.Date(2026, 8, 19, 10, 0, 0, 0, time.UTC)
+	events := map[watchedObjectKey][]*eventInfo{key: {gpuFaultEvent(79, gpufault.SeverityCritical, base)}}
+
+	tests := []struct {
+		name      string
+		resource  client.Object
+		phaseInfo pluginsCore.PhaseInfo
+		noWatcher bool
+	}{
+		{
+			name:      "the task did not fail",
+			resource:  failedPod(),
+			phaseInfo: pluginsCore.PhaseInfoRunning(1, nil),
+		},
+		{
+			name:      "the task succeeded",
+			resource:  failedPod(),
+			phaseInfo: pluginsCore.PhaseInfoSuccess(nil),
+		},
+		{
+			name: "the resource is not a pod",
+			resource: &v1.Service{
+				TypeMeta:   metav1.TypeMeta{Kind: "Pod", APIVersion: "v1"},
+				ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "pod"},
+			},
+			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("UnknownError", "Pod failed", nil),
+		},
+		{
+			name:      "there is no event watcher",
+			resource:  failedPod(),
+			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("UnknownError", "Pod failed", nil),
+			noWatcher: true,
+		},
+		{
+			name:      "there is no resource",
+			resource:  nil,
+			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("UnknownError", "Pod failed", nil),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pm := NewPluginManager("test-plugin", nil, nil)
+			if !tt.noWatcher {
+				pm.eventWatcher = &fakeEventWatcher{events: events}
+			}
+
+			got := pm.classifyGpuFailure(tt.resource, tt.phaseInfo)
+
+			assert.Equal(t, tt.phaseInfo.Phase(), got.Phase())
+			if tt.phaseInfo.Err() != nil {
+				assert.Equal(t, tt.phaseInfo.Err().GetCode(), got.Err().GetCode())
+				assert.Nil(t, got.Err().GetGpuFault())
+			}
+		})
+	}
 }
 
 // TestAddObjectMetadata_ManagedLabel verifies that the label the manager's Pod cache selects

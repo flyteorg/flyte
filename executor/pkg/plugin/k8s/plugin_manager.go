@@ -9,6 +9,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8stypes "k8s.io/apimachinery/pkg/types"
@@ -18,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/gpufault"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	pluginsUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
@@ -270,6 +272,7 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 			lastEventUpdate,
 			lastEventRecordedAt,
 		)
+		phaseInfo = pm.classifyGpuFailure(resource, phaseInfo)
 		transition.SetInfo(phaseInfo)
 	}
 
@@ -331,12 +334,7 @@ func (pm *PluginManager) attachRecentObjectEvents(
 		return phaseInfo, lastEventUpdate, lastEventRecordedAt
 	}
 
-	objectKey := watchedObjectKey{
-		Namespace: resource.GetNamespace(),
-		Name:      resource.GetName(),
-		Kind:      resource.GetObjectKind().GroupVersionKind().Kind,
-	}
-	recentEvents := pm.eventWatcher.List(objectKey, lastEventUpdate, lastEventRecordedAt)
+	recentEvents := pm.eventWatcher.List(objectKeyFor(resource), lastEventUpdate, lastEventRecordedAt)
 	if len(recentEvents) == 0 {
 		return phaseInfo, lastEventUpdate, lastEventRecordedAt
 	}
@@ -355,6 +353,46 @@ func (pm *PluginManager) attachRecentObjectEvents(
 	}
 
 	return phaseInfo, lastEventUpdate, lastEventRecordedAt
+}
+
+func objectKeyFor(resource client.Object) watchedObjectKey {
+	return watchedObjectKey{
+		Namespace: resource.GetNamespace(),
+		Name:      resource.GetName(),
+		Kind:      resource.GetObjectKind().GroupVersionKind().Kind,
+	}
+}
+
+// classifyGpuFailure folds the GPU faults recorded against a failed attempt's pod into
+// the failure the plugin reported, so that a fault the node saw becomes the code and
+// the message the user reads. Anything that is not a failed pod is left alone.
+func (pm *PluginManager) classifyGpuFailure(
+	resource client.Object,
+	phaseInfo pluginsCore.PhaseInfo,
+) pluginsCore.PhaseInfo {
+	if pm.eventWatcher == nil || resource == nil || !phaseInfo.Phase().IsFailure() {
+		return phaseInfo
+	}
+	if _, isPod := resource.(*v1.Pod); !isPod {
+		return phaseInfo
+	}
+
+	// Every event recorded on the pod, not only the ones since the last watermark. The
+	// Xid that killed the task is usually recorded rounds before the pod's status catches
+	// up with it, and by then the watermark has moved past it.
+	events := pm.eventWatcher.List(objectKeyFor(resource), time.Time{}, time.Time{})
+	if len(events) == 0 {
+		return phaseInfo
+	}
+
+	faults := make([]*core.GpuFault, 0, len(events))
+	for _, event := range events {
+		if fault := gpufault.FromEventMessage(event.Message); fault != nil {
+			faults = append(faults, fault)
+		}
+	}
+
+	return gpufault.ClassifyFailure(phaseInfo, faults)
 }
 
 // Abort implements pluginsCore.Plugin. Called when the task should be killed/aborted.
