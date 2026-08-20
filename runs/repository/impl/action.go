@@ -518,6 +518,7 @@ func (r *actionRepo) UpdateActionDetailedInfo(ctx context.Context, actionID *com
 	if rowsAffected == 0 {
 		return sql.ErrNoRows
 	}
+	r.notifyActionUpdate(ctx, actionID)
 	return nil
 }
 

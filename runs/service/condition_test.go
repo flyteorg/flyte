@@ -211,3 +211,44 @@ func TestGetActionDetails_ConditionWithSignalInfo(t *testing.T) {
 	assert.True(t, proto.Equal(testBoolLiteral(true), details.GetSignalInfo().GetOutput()))
 	assert.True(t, proto.Equal(principal, details.GetSignalInfo().GetSignalledBy()))
 }
+
+// The signalled value lives in detailed_info, but only the phase update notifies
+// action watchers — and WatchActionDetails closes its stream as soon as it sees
+// the terminal phase. Persisting RunInfo first is what makes that single
+// notification carry the resolved value, so pin the ordering.
+func TestUpdateActionStatus_PersistsSignalOutputBeforePhase(t *testing.T) {
+	actionRepo, _, svc := newTestServiceWithTaskRepo(t)
+
+	var calls []string
+
+	actionRepo.On("GetAction", mock.Anything, testActionID).Return(&models.Action{
+		Project:    testActionID.Run.Project,
+		Domain:     testActionID.Run.Domain,
+		RunName:    testActionID.Run.Name,
+		Name:       testActionID.Name,
+		ActionType: int32(workflow.ActionType_ACTION_TYPE_CONDITION),
+	}, nil)
+	actionRepo.On("UpdateActionDetailedInfo", mock.Anything, testActionID, mock.Anything).
+		Run(func(args mock.Arguments) {
+			calls = append(calls, "detailedInfo")
+			info := &workflow.RunInfo{}
+			require.NoError(t, proto.Unmarshal(args.Get(2).([]byte), info))
+			assert.True(t, proto.Equal(testBoolLiteral(true), info.GetOutput()))
+		}).
+		Return(nil)
+	actionRepo.On("UpdateActionPhase", mock.Anything, testActionID,
+		common.ActionPhase_ACTION_PHASE_SUCCEEDED, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Run(func(mock.Arguments) { calls = append(calls, "phase") }).
+		Return(nil)
+
+	resp, err := svc.UpdateActionStatus(context.Background(), connect.NewRequest(&workflow.UpdateActionStatusRequest{
+		ActionId: testActionID,
+		Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED},
+		Output:   testBoolLiteral(true),
+	}))
+	require.NoError(t, err)
+	assert.EqualValues(t, 0, resp.Msg.GetStatus().GetCode())
+
+	assert.Equal(t, []string{"detailedInfo", "phase"}, calls,
+		"RunInfo must be persisted before the phase update that notifies watchers")
+}
