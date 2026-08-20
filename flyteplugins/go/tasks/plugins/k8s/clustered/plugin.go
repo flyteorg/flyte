@@ -77,6 +77,8 @@ func init() {
 		panic(err)
 	}
 
+	pluginmachinery.PluginRegistry().RegisterScheme(taskType, jobsetv1alpha2.AddToScheme)
+
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{
 			ID:                  taskType,

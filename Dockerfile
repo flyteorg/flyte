@@ -9,6 +9,9 @@ ENV CGO_ENABLED=0
 
 WORKDIR /flyteorg/build
 
+COPY go.mod go.sum ./
+RUN mkdir flyteidl2 flyteplugins flytestdlib && go mod download
+
 COPY dataproxy dataproxy
 COPY executor executor
 COPY flytecopilot flytecopilot
@@ -23,12 +26,10 @@ COPY runs runs
 COPY cache_service cache_service
 COPY secret secret
 
-COPY go.mod go.sum ./
-RUN go mod download
 COPY manager manager
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
+RUN --mount=type=cache,target=/root/.cache/go-build \
     go build -v -o dist/flyte ./manager/cmd/
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
+RUN --mount=type=cache,target=/root/.cache/go-build \
     go build -v -o dist/flyte-copilot ./flytecopilot
 
 

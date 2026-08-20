@@ -76,13 +76,27 @@ func (gc *GarbageCollector) Start(ctx context.Context) error {
 // it to exercise the Continue pagination path without creating 500 objects.
 var gcPageSize = 500
 
+func shouldDeleteTerminalTaskAction(completedTime string, maxTTL time.Duration, now time.Time) bool {
+	if completedTime == "" {
+		return false
+	}
+	if maxTTL <= 0 {
+		return true
+	}
+
+	// The minute-precision format is lexicographically ordered, so string comparison works.
+	cutoff := now.UTC().Add(-maxTTL).Format(labelTimeFormat)
+	return completedTime < cutoff
+}
+
 // collect lists all terminated TaskActions (paginated) and deletes those whose completed-time has expired.
+// A non-positive maxTTL means terminal TaskActions are deleted on the next GC cycle.
 func (gc *GarbageCollector) collect(ctx context.Context) (err error) {
 	start := time.Now()
 	defer func() { gc.metrics.recordSweep(ctx, start, err) }()
 	logger := log.FromContext(ctx).WithName("gc")
 
-	cutoff := time.Now().UTC().Add(-gc.maxTTL).Format(labelTimeFormat)
+	now := time.Now().UTC()
 	deleted := 0
 	total := 0
 	continueToken := ""
@@ -111,8 +125,7 @@ func (gc *GarbageCollector) collect(ctx context.Context) (err error) {
 				continue
 			}
 
-			// The minute-precision format is lexicographically ordered, so string comparison works.
-			if completedTime < cutoff {
+			if shouldDeleteTerminalTaskAction(completedTime, gc.maxTTL, now) {
 				if err := gc.client.Delete(ctx, ta); err != nil {
 					// Already gone is the desired state: a child TaskAction is
 					// often cascade-deleted (via OwnerReferences) when its parent

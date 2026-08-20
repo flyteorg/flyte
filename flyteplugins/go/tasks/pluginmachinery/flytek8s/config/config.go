@@ -327,10 +327,16 @@ type FlyteCoPilotConfig struct {
 	// Timeout for upload
 	Timeout config2.Duration `json:"timeout" pflag:"-,Max time to allow for uploads to complete."`
 	// Resources for CoPilot Containers
-	CPU                   string          `json:"cpu" pflag:",Used to set cpu for co-pilot containers"`
-	Memory                string          `json:"memory" pflag:",Used to set memory for co-pilot containers"`
-	Storage               string          `json:"storage" pflag:",Default storage limit for individual inputs / outputs"`
+	CPU     string `json:"cpu" pflag:",Used to set cpu for co-pilot containers"`
+	Memory  string `json:"memory" pflag:",Used to set memory for co-pilot containers"`
+	Storage string `json:"storage" pflag:",Default storage limit for individual inputs / outputs"`
+	// Setting this puts the stow config back on the co-pilot command line even when
+	// StorageConfigSecretName is set — see CopilotCommandArgs.
 	StorageConfigOverride *storage.Config `json:"storage-config-override" pflag:"-,Override for the storage config to use for co-pilot"`
+	// Name of the Secret holding co-pilot's whole storage configuration, projected into the
+	// co-pilot containers so the credentials stay out of the pod spec. Empty falls back to
+	// passing the stow config on the command line.
+	StorageConfigSecretName string `json:"storage-config-secret-name" pflag:",Name of the Secret holding co-pilot's storage configuration"`
 }
 
 type AcceleratorDeviceClassConfig struct {

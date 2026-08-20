@@ -14,6 +14,7 @@ import (
 )
 
 const sparkApplicationCRDName = "sparkapplications.sparkoperator.k8s.io"
+const minPodTemplateSparkVersion = "3.0.0"
 
 var podTemplateCapability struct {
 	once      sync.Once

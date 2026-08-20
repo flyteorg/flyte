@@ -440,6 +440,13 @@ func (r *actionRepo) UpdateActionPhase(
 		int32(common.ActionPhase_ACTION_PHASE_FAILED),
 		int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
 	}
+	terminalPhases := []int32{
+		int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+		int32(common.ActionPhase_ACTION_PHASE_FAILED),
+		int32(common.ActionPhase_ACTION_PHASE_ABORTED),
+		int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
+		int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
+	}
 
 	var queryBuilder strings.Builder
 	var args []interface{}
@@ -467,9 +474,10 @@ func (r *actionRepo) UpdateActionPhase(
 		argIdx++
 	}
 
-	queryBuilder.WriteString(fmt.Sprintf(" WHERE project = $%d AND domain = $%d AND run_name = $%d AND name = $%d AND (phase <= $%d OR phase = ANY($%d))", //nolint: staticcheck
-		argIdx, argIdx+1, argIdx+2, argIdx+3, argIdx+4, argIdx+5))
-	args = append(args, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase, pq.Array(retryablePhases))
+	queryBuilder.WriteString(fmt.Sprintf(" WHERE project = $%d AND domain = $%d AND run_name = $%d AND name = $%d AND (phase <= $%d OR phase = ANY($%d) OR (phase = $%d AND $%d = ANY($%d)))", //nolint: staticcheck
+		argIdx, argIdx+1, argIdx+2, argIdx+3, argIdx+4, argIdx+5, argIdx+6, argIdx+4, argIdx+7))
+	args = append(args, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, phase,
+		pq.Array(retryablePhases), int32(common.ActionPhase_ACTION_PHASE_PAUSED), pq.Array(terminalPhases))
 
 	result, err := r.db.ExecContext(ctx, queryBuilder.String(), args...)
 	if err != nil {
@@ -510,6 +518,7 @@ func (r *actionRepo) UpdateActionDetailedInfo(ctx context.Context, actionID *com
 	if rowsAffected == 0 {
 		return sql.ErrNoRows
 	}
+	r.notifyActionUpdate(ctx, actionID)
 	return nil
 }
 

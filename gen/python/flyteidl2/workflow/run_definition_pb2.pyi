@@ -325,12 +325,28 @@ class ActionAttempt(_message.Message):
     def __init__(self, phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., error_info: _Optional[_Union[ErrorInfo, _Mapping]] = ..., attempt: _Optional[int] = ..., log_info: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., outputs: _Optional[_Union[_common_pb2.OutputReferences, _Mapping]] = ..., logs_available: bool = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., cluster_events: _Optional[_Iterable[_Union[ClusterEvent, _Mapping]]] = ..., phase_transitions: _Optional[_Iterable[_Union[PhaseTransition, _Mapping]]] = ..., cluster: _Optional[str] = ..., log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ..., cache_metadata: _Optional[_Union[_cache_pb2.CacheMetadata, _Mapping]] = ...) -> None: ...
 
 class ClusterEvent(_message.Message):
-    __slots__ = ["occurred_at", "message"]
+    __slots__ = ["occurred_at", "message", "type", "reason", "source_component", "count"]
+    class Type(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        TYPE_UNSPECIFIED: _ClassVar[ClusterEvent.Type]
+        TYPE_NORMAL: _ClassVar[ClusterEvent.Type]
+        TYPE_WARNING: _ClassVar[ClusterEvent.Type]
+    TYPE_UNSPECIFIED: ClusterEvent.Type
+    TYPE_NORMAL: ClusterEvent.Type
+    TYPE_WARNING: ClusterEvent.Type
     OCCURRED_AT_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
+    REASON_FIELD_NUMBER: _ClassVar[int]
+    SOURCE_COMPONENT_FIELD_NUMBER: _ClassVar[int]
+    COUNT_FIELD_NUMBER: _ClassVar[int]
     occurred_at: _timestamp_pb2.Timestamp
     message: str
-    def __init__(self, occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., message: _Optional[str] = ...) -> None: ...
+    type: ClusterEvent.Type
+    reason: str
+    source_component: str
+    count: int
+    def __init__(self, occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., message: _Optional[str] = ..., type: _Optional[_Union[ClusterEvent.Type, str]] = ..., reason: _Optional[str] = ..., source_component: _Optional[str] = ..., count: _Optional[int] = ...) -> None: ...
 
 class PhaseTransition(_message.Message):
     __slots__ = ["phase", "start_time", "end_time"]

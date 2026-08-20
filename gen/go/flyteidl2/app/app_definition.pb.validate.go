@@ -1106,6 +1106,8 @@ func (m *Status) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for LastAssignedCluster
+
 	if len(errors) > 0 {
 		return StatusMultiError(errors)
 	}

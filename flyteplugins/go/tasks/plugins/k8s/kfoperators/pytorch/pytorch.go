@@ -136,12 +136,22 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 		delete(jobSpec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeMaster)
 	}
 
+	// Propagate the task's pod metadata (k8s_pod / pod_template labels and annotations) onto the CR
+	// itself, as the ray and dask plugins do. The replica pod templates already receive this metadata
+	// via common.ToReplicaSpec; without this the CR only gets the execution-level labels that the
+	// plugin manager stamps on every resource.
+	_, objectMeta, _, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
+	if err != nil {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
+	}
+
 	job := &kubeflowv1.PyTorchJob{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       kubeflowv1.PyTorchJobKind,
 			APIVersion: kubeflowv1.SchemeGroupVersion.String(),
 		},
-		Spec: jobSpec,
+		ObjectMeta: *objectMeta,
+		Spec:       jobSpec,
 	}
 
 	return job, nil

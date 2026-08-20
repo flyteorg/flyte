@@ -1,6 +1,7 @@
 package converter
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"fmt"
@@ -642,7 +643,15 @@ func literalTypeToJsonSchema(ctx context.Context, literalType *core.LiteralType)
 				}
 				return metadataMap, nil
 			}
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("missing metadata for struct type"))
+			// A STRUCT carries no metadata when the SDK had no schema to attach,
+			// e.g. dict[int, int] — which is a STRUCT only because a LiteralMap
+			// can't hold non-string keys. Erroring here fails the whole
+			// conversion (the console then shows "Unable to load outputs"), so
+			// fall back to an open object instead.
+			return map[string]any{
+				"type":                 "object",
+				"additionalProperties": true,
+			}, nil
 		case core.SimpleType_ERROR:
 			return errorTypeToJsonSchema(), nil
 		case core.SimpleType_BINARY:
@@ -1047,6 +1056,63 @@ func findMatchingUnionVariant(ctx context.Context, value any, variants []*core.L
 	return nil, nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("%s", errMsg))
 }
 
+// decodeMsgpackToJSON decodes msgpack bytes (the encoding the SDK uses for
+// STRUCT literals: dataclasses, pydantic models, and dicts that aren't
+// map[string, T]) into JSON-compatible values.
+//
+// The default msgpack.Unmarshal into `any` decodes maps as map[string]any and
+// therefore fails outright on non-string keys, e.g. a task returning
+// dict[int, int] — which is exactly why those outputs used to fall back to an
+// unreadable base64 blob. Decode maps untyped instead and stringify the keys,
+// since JSON objects only have string keys.
+func decodeMsgpackToJSON(data []byte) (any, error) {
+	dec := msgpack.NewDecoder(bytes.NewReader(data))
+	dec.SetMapDecoder(func(d *msgpack.Decoder) (any, error) { return d.DecodeUntypedMap() })
+	// Loose decoding yields int64/float64/string rather than sized types
+	// (int8, uint16, ...), which structpb doesn't accept.
+	dec.UseLooseInterfaceDecoding(true)
+
+	var decoded any
+	if err := dec.Decode(&decoded); err != nil {
+		return nil, err
+	}
+	return jsonSafeValue(decoded), nil
+}
+
+// jsonSafeValue rewrites the output of an untyped msgpack decode into values
+// structpb (and thus JSON) accepts: map keys become strings and raw bytes
+// become base64.
+func jsonSafeValue(v any) any {
+	switch t := v.(type) {
+	case map[any]any:
+		m := make(map[string]any, len(t))
+		for k, val := range t {
+			key, ok := k.(string)
+			if !ok {
+				key = fmt.Sprint(k)
+			}
+			m[key] = jsonSafeValue(val)
+		}
+		return m
+	case map[string]any:
+		m := make(map[string]any, len(t))
+		for k, val := range t {
+			m[k] = jsonSafeValue(val)
+		}
+		return m
+	case []any:
+		s := make([]any, len(t))
+		for i, val := range t {
+			s[i] = jsonSafeValue(val)
+		}
+		return s
+	case []byte:
+		return base64.StdEncoding.EncodeToString(t)
+	default:
+		return v
+	}
+}
+
 // literalToJsonValues converts a core.Literal to a JSON-compatible value.
 func literalToJsonValues(ctx context.Context, literal *core.Literal) (any, error) {
 	if literal == nil {
@@ -1085,8 +1151,7 @@ func literalToJsonValues(ctx context.Context, literal *core.Literal) (any, error
 		case *core.Scalar_Binary:
 			// Try to decode as msgpack, fallback to base64 encoded string
 			if s.Binary != nil && len(s.Binary.GetValue()) > 0 {
-				var decoded any
-				err := msgpack.Unmarshal(s.Binary.GetValue(), &decoded)
+				decoded, err := decodeMsgpackToJSON(s.Binary.GetValue())
 				if err == nil {
 					return decoded, nil
 				}

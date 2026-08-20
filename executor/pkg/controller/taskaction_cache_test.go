@@ -318,7 +318,7 @@ func newCacheableTaskAction(t *testing.T, discoverable bool, serializable bool) 
 			Name:         "task-name",
 			Version:      "task-version",
 		},
-		Type: "python-task",
+		Type: "python",
 		Metadata: &corepb.TaskMetadata{
 			Discoverable:         discoverable,
 			DiscoveryVersion:     "discovery-v1",
@@ -352,7 +352,7 @@ func newCacheableTaskAction(t *testing.T, discoverable bool, serializable bool) 
 			InputURI:      "mem://bucket/inputs.pb",
 			RunOutputBase: "mem://bucket/run-output",
 			CacheKey:      "precomputed-cache-key",
-			TaskType:      "python-task",
+			TaskType:      "python",
 			TaskTemplate:  taskTemplateBytes,
 		},
 	}

@@ -98,6 +98,21 @@ type ExternalResource struct {
 type ReasonInfo struct {
 	Reason     string
 	OccurredAt *time.Time
+	// KubernetesEvent carries structured metadata about the Kubernetes object event this reason
+	// originated from, when applicable.
+	KubernetesEvent *K8sEventMetadata
+}
+
+// K8sEventMetadata describes the Kubernetes object event a reason originated from.
+type K8sEventMetadata struct {
+	// Type is the Kubernetes event type, "Normal" or "Warning".
+	Type string
+	// Reason is the machine-readable, CamelCase reason, e.g. "FailedMount".
+	Reason string
+	// SourceComponent is the emitting component, e.g. "kubelet" or "default-scheduler".
+	SourceComponent string
+	// Count is the number of occurrences the cluster had observed when the event was recorded.
+	Count int32
 }
 
 type TaskInfo struct {

@@ -466,6 +466,52 @@ func TestBuildResourcePytorch(t *testing.T) {
 	}
 }
 
+func TestBuildResourcePytorchPodTemplateMetadataOnCR(t *testing.T) {
+	const crPodTemplateName = "pytorch-cr-pod-template"
+	crPodTemplateLabels := map[string]string{"pod-template-label": "pod-template-label-value"}
+	crPodTemplateAnnotations := map[string]string{"pod-template-annotation": "pod-template-annotation-value"}
+
+	crPodTemplate := &corev1.PodTemplate{
+		ObjectMeta: v1.ObjectMeta{
+			Name: crPodTemplateName,
+		},
+		Template: corev1.PodTemplateSpec{
+			ObjectMeta: v1.ObjectMeta{
+				Labels:      crPodTemplateLabels,
+				Annotations: crPodTemplateAnnotations,
+			},
+		},
+	}
+	flytek8s.DefaultPodTemplateStore.Store(crPodTemplate)
+	defer flytek8s.DefaultPodTemplateStore.Delete(crPodTemplate)
+
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+
+	taskTemplate := dummyPytorchTaskTemplate("job-pod-template", dummyPytorchCustomObj(100))
+	taskTemplate.Metadata = &core.TaskMetadata{PodTemplateName: crPodTemplateName}
+
+	res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, ""))
+	assert.NoError(t, err)
+	assert.NotNil(t, res)
+
+	pytorchJob, ok := res.(*kubeflowv1.PyTorchJob)
+	assert.True(t, ok)
+
+	// The pod metadata must land on the CR itself, not only on the replica pod templates.
+	for k, v := range crPodTemplateLabels {
+		assert.Equal(t, v, pytorchJob.Labels[k])
+	}
+	for k, v := range crPodTemplateAnnotations {
+		assert.Equal(t, v, pytorchJob.Annotations[k])
+	}
+
+	for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
+		for k, v := range crPodTemplateLabels {
+			assert.Equal(t, v, replicaSpec.Template.Labels[k])
+		}
+	}
+}
+
 func TestBuildResourcePytorchContainerImage(t *testing.T) {
 	assert.NoError(t, flytek8sConfig.SetK8sPluginConfig(&flytek8sConfig.K8sPluginConfig{}))
 

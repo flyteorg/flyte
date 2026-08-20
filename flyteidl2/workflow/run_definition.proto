@@ -379,7 +379,28 @@ message ClusterEvent {
   // message is the explanation for the most recent phase transition or status update.
   string message = 2;
 
-  // TODO add event_kind or event_type with a fixed set of classification values like "ScaleUp, OutOfResources... etc."
+  // Severity of the source Kubernetes event.
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_NORMAL = 1;
+    TYPE_WARNING = 2;
+  }
+
+  // type mirrors the Kubernetes event type when this entry originated from a Kubernetes object
+  // event. TYPE_UNSPECIFIED for entries synthesized from phase transitions.
+  Type type = 3;
+
+  // reason is the machine-readable, CamelCase reason of the source Kubernetes event, e.g.
+  // "FailedMount", "Pulling", "BackOff". Empty when unknown.
+  string reason = 4;
+
+  // source_component identifies the component that emitted the source event, e.g. "kubelet" or
+  // "default-scheduler". Empty when unknown.
+  string source_component = 5;
+
+  // count is the number of occurrences the cluster had observed for the source event when it was
+  // recorded, when known (0 otherwise). Repeating events are recorded once, with their count.
+  int32 count = 6;
 }
 
 message PhaseTransition {

@@ -2,11 +2,13 @@ package converter
 
 import (
 	"context"
+	"encoding/base64"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/vmihailenco/msgpack/v5"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -625,4 +627,53 @@ func createSimpleDataclassLiteralSingleType() ([]*task.NamedLiteral, *core.Varia
 	})
 
 	return literals, variableMap
+}
+
+func TestMsgpackBinaryLiteralToJson(t *testing.T) {
+	// STRUCT is what the SDK uses for dicts it can't express as a LiteralMap
+	// (non-string keys) as well as for dataclasses/pydantic models.
+	structVariableMap := makeVariableMap(map[string]*core.Variable{
+		"o0": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRUCT}}},
+	})
+
+	binaryLiteral := func(value []byte) []*task.NamedLiteral {
+		return []*task.NamedLiteral{
+			{Name: "o0", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+				Value: &core.Scalar_Binary{Binary: &core.Binary{Value: value, Tag: "msgpack"}},
+			}}}},
+		}
+	}
+
+	defaultValue := func(t *testing.T, literals []*task.NamedLiteral) any {
+		t.Helper()
+		result, err := LiteralsToLaunchFormJson(context.Background(), literals, structVariableMap)
+		require.NoError(t, err)
+		properties := result.AsMap()["properties"].(map[string]any)
+		return properties["o0"].(map[string]any)["default"]
+	}
+
+	t.Run("int-keyed map decodes instead of falling back to base64", func(t *testing.T) {
+		// dict[int, int] returned by a real task; keys are stringified for JSON
+		// and numbers land as float64 once through structpb.
+		raw, err := base64.StdEncoding.DecodeString("hQNuBGMBcwVRAl8=")
+		require.NoError(t, err)
+
+		assert.Equal(t, map[string]any{
+			"1": float64(115), "2": float64(95), "3": float64(110), "4": float64(99), "5": float64(81),
+		}, defaultValue(t, binaryLiteral(raw)))
+	})
+
+	t.Run("string-keyed map still decodes", func(t *testing.T) {
+		raw, err := msgpack.Marshal(map[string]any{"a": 1, "nested": map[string]any{"b": true}})
+		require.NoError(t, err)
+
+		assert.Equal(t, map[string]any{
+			"a": float64(1), "nested": map[string]any{"b": true},
+		}, defaultValue(t, binaryLiteral(raw)))
+	})
+
+	t.Run("non-msgpack bytes still fall back to base64", func(t *testing.T) {
+		raw := []byte{0xc1, 0xc1, 0xc1}
+		assert.Equal(t, base64.StdEncoding.EncodeToString(raw), defaultValue(t, binaryLiteral(raw)))
+	})
 }

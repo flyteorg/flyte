@@ -10,6 +10,8 @@ import (
 
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/informers"
@@ -17,6 +19,8 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	k8scache "k8s.io/client-go/tools/cache"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/metrics/filters"
@@ -117,9 +121,29 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		metricsServerOptions.KeyName = cfg.MetricsCertKey
 	}
 
+	// controller-runtime caches every watched object across all namespaces, so the
+	// manager would otherwise hold every Pod in the cluster. On a large multi-tenant
+	// cluster that costs several GB of resident memory and OOMKills the executor.
+	//
+	// Restrict the cache to the Pods belonging to this executor. NewTaskExecutionMetadata
+	// puts the label on every task's execution labels, which each plugin merges into the
+	// object it builds, so both the Pods the executor creates directly and the ones an
+	// operator derives from a plugin's CRD (Ray head/worker, Kubeflow replicas, Dask
+	// scheduler/worker) carry it.
+	cacheOptions := cache.Options{
+		ByObject: map[client.Object]cache.ByObject{
+			&corev1.Pod{}: {
+				Label: labels.SelectorFromSet(labels.Set{
+					flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue,
+				}),
+			},
+		},
+	}
+
 	mgr, err := ctrl.NewManager(sc.K8sConfig, ctrl.Options{
 		Scheme:                 scheme,
 		Metrics:                metricsServerOptions,
+		Cache:                  cacheOptions,
 		WebhookServer:          webhook.NewServer(webhookServerOptions),
 		HealthProbeBindAddress: cfg.HealthProbeBindAddress,
 		LeaderElection:         cfg.LeaderElect,
@@ -245,9 +269,6 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	if cfg.GC.Interval.Duration > 0 {
-		if cfg.GC.MaxTTL.Duration <= 0 {
-			return fmt.Errorf("executor: gc.maxTTL must be positive when gc is enabled, got %v", cfg.GC.MaxTTL.Duration)
-		}
 		gc := controller.NewGarbageCollector(mgr.GetClient(), mgr.GetAPIReader(), cfg.GC.Interval.Duration, cfg.GC.MaxTTL.Duration, otelutils.GetMeterProvider(otelServiceName))
 		if err := mgr.Add(gc); err != nil {
 			return fmt.Errorf("executor: failed to add garbage collector: %w", err)

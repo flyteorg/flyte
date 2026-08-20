@@ -33,8 +33,8 @@ func createTaskAction(ctx context.Context, name string, labels map[string]string
 			ActionName:    "test-action",
 			InputURI:      "/tmp/input",
 			RunOutputBase: "/tmp/output",
-			TaskType:      "python-task",
-			TaskTemplate:  buildTaskTemplateBytes("python-task", "python:3.11"),
+			TaskType:      "python",
+			TaskTemplate:  buildTaskTemplateBytes("python", "python:3.11"),
 		},
 	}
 	ExpectWithOffset(1, k8sClient.Create(ctx, ta)).To(Succeed())
@@ -90,6 +90,21 @@ var _ = Describe("GarbageCollector", func() {
 		ta := &flyteorgv1.TaskAction{}
 		err := k8sClient.Get(ctx, types.NamespacedName{Name: "gc-recent", Namespace: "default"}, ta)
 		Expect(err).NotTo(HaveOccurred())
+	})
+
+	It("should delete terminal TaskActions immediately when maxTTL is zero", func() {
+		recentTime := time.Now().UTC().Format(labelTimeFormat)
+		createTaskAction(ctx, "gc-immediate", map[string]string{
+			LabelTerminationStatus: LabelValueTerminated,
+			LabelCompletedTime:     recentTime,
+		})
+
+		gc := NewGarbageCollector(k8sClient, k8sClient, 1*time.Minute, 0, metricnoop.NewMeterProvider())
+		Expect(gc.collect(ctx)).To(Succeed())
+
+		ta := &flyteorgv1.TaskAction{}
+		err := k8sClient.Get(ctx, types.NamespacedName{Name: "gc-immediate", Namespace: "default"}, ta)
+		Expect(apierrors.IsNotFound(err)).To(BeTrue())
 	})
 
 	It("should retain non-terminated TaskActions", func() {
