@@ -245,3 +245,44 @@ func TestAddObjectMetadata_ManagedLabel(t *testing.T) {
 		assert.Equal(t, flytek8s.ManagedLabelValue, pod.GetLabels()[flytek8s.ManagedLabelKey])
 	})
 }
+
+func TestAddObjectMetadata_StampsTaskLabelsOnPod(t *testing.T) {
+	taskExecID := pluginsCoreMock.NewTaskExecutionID(t)
+	taskExecID.EXPECT().GetGeneratedName().Return("run-name-action-name-0")
+
+	taskMeta := pluginsCoreMock.NewTaskExecutionMetadata(t)
+	taskMeta.EXPECT().GetNamespace().Return("project-development")
+	taskMeta.EXPECT().GetAnnotations().Return(map[string]string{"flyte/annotation": "value"})
+	taskMeta.EXPECT().GetLabels().Return(map[string]string{
+		"project":   "project",
+		"domain":    "development",
+		"run":       "run-name",
+		"action":    "action-name",
+		"attempt":   "2",
+		"task-name": "my_module.my_task",
+	})
+	taskMeta.EXPECT().GetTaskExecutionID().Return(taskExecID)
+	taskMeta.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{Name: "owner"})
+
+	plugin := k8sMocks.NewPlugin(t)
+	plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+
+	pm := NewPluginManager("test", plugin, nil)
+
+	pod := &v1.Pod{}
+	pm.addObjectMetadata(taskMeta, pod, &config.K8sPluginConfig{
+		DefaultLabels: map[string]string{"cluster": "default"},
+	})
+
+	assert.Equal(t, map[string]string{
+		"cluster":   "default",
+		"project":   "project",
+		"domain":    "development",
+		"run":       "run-name",
+		"action":    "action-name",
+		"attempt":   "2",
+		"task-name": "my_module.my_task",
+	}, pod.GetLabels())
+	assert.Equal(t, "project-development", pod.GetNamespace())
+	assert.Equal(t, "run-name-action-name-0", pod.GetName())
+}
