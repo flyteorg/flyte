@@ -70,12 +70,33 @@ func FromEventMessage(msg string) *core.GpuFault {
 	if !ok {
 		return nil
 	}
-	// The severity in the message tail is display data from whoever wrote the
-	// event. Classification decides retry budgets and, later, quarantine, so it
-	// re-derives severity from this package's own table: a message cannot talk a
-	// consumer into treating an unknown or user-class code as critical.
-	fault.Severity = SeverityFor(fault.Kind, fault.Code)
+	// The severity in the message tail is written by whoever created the event, so
+	// classification does not let it raise the alarm above this package's own table:
+	// a message cannot talk a consumer into treating an unknown or user-class code
+	// as critical. It may lower it, though. The emitter reads context the table
+	// cannot see, such as the driver labelling an NVSwitch SXid non-fatal, and a
+	// downgrade is safe to trust: making a fault less alarming gains an attacker
+	// nothing that staying silent would not.
+	table := SeverityFor(fault.Kind, fault.Code)
+	if severityRank(fault.Severity) > severityRank(table) {
+		fault.Severity = table
+	}
 	return ToProto(fault, attribution)
+}
+
+// severityRank orders severities by how loudly they classify. Unknown severities
+// rank lowest so a garbled tail can never outrank the table.
+func severityRank(s Severity) int {
+	switch s {
+	case SeverityUser:
+		return 1
+	case SeverityWarn:
+		return 2
+	case SeverityCritical:
+		return 3
+	default:
+		return 0
+	}
 }
 
 func kindToProto(k Kind) core.GpuFault_Kind {
