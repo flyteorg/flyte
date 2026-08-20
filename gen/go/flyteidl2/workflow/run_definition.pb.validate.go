@@ -3627,6 +3627,14 @@ func (m *ClusterEvent) validate(all bool) error {
 
 	// no validation rules for Message
 
+	// no validation rules for Type
+
+	// no validation rules for Reason
+
+	// no validation rules for SourceComponent
+
+	// no validation rules for Count
+
 	if len(errors) > 0 {
 		return ClusterEventMultiError(errors)
 	}
