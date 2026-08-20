@@ -113,6 +113,7 @@ func TestClassifyFailureCritical(t *testing.T) {
 		name          string
 		phase         pluginsCore.PhaseInfo
 		faults        []*core.GpuFault
+		wantPhase     pluginsCore.Phase
 		wantCode      string
 		wantFaultCode uint32
 	}{
@@ -124,9 +125,10 @@ func TestClassifyFailureCritical(t *testing.T) {
 			wantFaultCode: 79,
 		},
 		{
-			name:          "permanent failure becomes system retryable",
+			name:          "permanent failure stays permanent but becomes the system's",
 			phase:         pluginsCore.PhaseInfoFailure("Error", "Pod failed", nil),
 			faults:        []*core.GpuFault{gpuFault(48, SeverityCritical)},
+			wantPhase:     pluginsCore.PhasePermanentFailure,
 			wantCode:      CodeGpuEccUncorrectable,
 			wantFaultCode: 48,
 		},
@@ -157,7 +159,11 @@ func TestClassifyFailureCritical(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := ClassifyFailure(tt.phase, tt.faults)
 
-			assert.Equal(t, pluginsCore.PhaseRetryableFailure, got.Phase())
+			wantPhase := tt.wantPhase
+			if wantPhase == pluginsCore.PhaseUndefined {
+				wantPhase = pluginsCore.PhaseRetryableFailure
+			}
+			assert.Equal(t, wantPhase, got.Phase())
 			require.NotNil(t, got.Err())
 			assert.Equal(t, tt.wantCode, got.Err().GetCode())
 			assert.Equal(t, core.ExecutionError_SYSTEM, got.Err().GetKind())

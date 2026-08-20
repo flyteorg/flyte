@@ -368,6 +368,17 @@ func TestClassifyGpuFailure(t *testing.T) {
 			wantFault: false,
 		},
 		{
+			name: "a gpu-health message under an ordinary reason is not trusted",
+			events: []*eventInfo{
+				{Message: "Back-off restarting failed container", CreatedAt: base, RecordedAt: base},
+			},
+			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("OOMKilled", "oom", nil),
+			wantPhase: pluginsCore.PhaseRetryableFailure,
+			wantCode:  "OOMKilled",
+			wantKind:  core.ExecutionError_USER,
+			wantFault: false,
+		},
+		{
 			name:      "no events at all",
 			events:    nil,
 			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("OOMKilled", "oom", nil),
@@ -408,8 +419,9 @@ func TestClassifyGpuFailure(t *testing.T) {
 			} else {
 				assert.Nil(t, got.Err().GetGpuFault())
 			}
-			// The whole attempt is searched, not just what arrived since the watermark.
-			assert.True(t, watcher.lastCreatedAfter.IsZero())
+			// The search ignores the round watermark but is bounded by the relevance
+			// window, so an old fault cannot reclassify a much later failure.
+			assert.WithinDuration(t, time.Now().Add(-gpuFaultRelevanceWindow), watcher.lastCreatedAfter, 5*time.Second)
 			assert.True(t, watcher.lastRecordedAfter.IsZero())
 		})
 	}

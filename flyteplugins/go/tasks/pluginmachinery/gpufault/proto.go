@@ -70,6 +70,11 @@ func FromEventMessage(msg string) *core.GpuFault {
 	if !ok {
 		return nil
 	}
+	// The severity in the message tail is display data from whoever wrote the
+	// event. Classification decides retry budgets and, later, quarantine, so it
+	// re-derives severity from this package's own table: a message cannot talk a
+	// consumer into treating an unknown or user-class code as critical.
+	fault.Severity = SeverityFor(fault.Kind, fault.Code)
 	return ToProto(fault, attribution)
 }
 

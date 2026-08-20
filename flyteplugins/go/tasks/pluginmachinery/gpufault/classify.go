@@ -84,17 +84,22 @@ func ClassifyFailure(phase pluginsCore.PhaseInfo, faults []*core.GpuFault) plugi
 	if fault, f, a := firstOfSeverity(faults, SeverityCritical); fault != nil {
 		// A critical Xid means the device or the node is no longer trustworthy: the
 		// workload did not cause it and rerunning in place would most likely hit the
-		// same hardware. Charging it to the user's retry budget would burn attempts on
-		// a broken machine, so the failure becomes a system retryable one. Once phase 3
-		// quarantines the node, the reschedule also lands somewhere else.
-		out := pluginsCore.PhaseInfoSystemRetryableFailure(
-			CodeFor(f),
-			prependSentence(f, a, phase.Err().GetMessage()),
-			phase.Info(),
-		)
-		carryOver(out.Err(), phase.Err())
-		out.Err().GpuFault = fault
-		return preserveShape(phase, out)
+		// same hardware. A retryable failure therefore stops charging the user's
+		// budget and becomes a system retry; once phase 3 quarantines the node, the
+		// reschedule also lands somewhere else. A permanent failure stays permanent:
+		// the fault does not make an unrunnable task runnable, it only reclassifies
+		// whose problem the failure is.
+		err := cloneExecutionError(phase.Err())
+		err.Kind = core.ExecutionError_SYSTEM
+		// A specific code the plugin worked out, such as OOMKilled, names something
+		// the fault does not explain away; only meaningless codes give way to the
+		// fault's own.
+		if isGenericCode(err.GetCode()) {
+			err.Code = CodeFor(f)
+		}
+		err.Message = prependSentence(f, a, err.GetMessage())
+		err.GpuFault = fault
+		return keepVerdict(phase, err)
 	}
 
 	if fault, f, a := firstOfSeverity(faults, SeverityUser); fault != nil {
@@ -130,10 +135,15 @@ func firstOfSeverity(faults []*core.GpuFault, severity Severity) (*core.GpuFault
 	return nil, Fault{}, Attribution{}
 }
 
-// keepVerdict rebuilds the failure with the phase and error kind the plugin chose,
-// changing only what the fault added to the error.
+// keepVerdict rebuilds the failure with the phase the plugin chose, changing only
+// what the fault added to the error, and keeps the cleanup flag: a pod that had to
+// be cleaned up before classification still has to be cleaned up after it.
 func keepVerdict(phase pluginsCore.PhaseInfo, err *core.ExecutionError) pluginsCore.PhaseInfo {
-	return preserveShape(phase, pluginsCore.PhaseInfoFailed(phase.Phase(), err, phase.Info()))
+	out := pluginsCore.PhaseInfoFailed(phase.Phase(), err, phase.Info())
+	if phase.CleanupOnFailure() {
+		out = out.WithCleanupOnFailure()
+	}
+	return preserveShape(phase, out)
 }
 
 // preserveShape carries over the parts of a PhaseInfo the failure constructors do not
@@ -144,18 +154,6 @@ func preserveShape(phase pluginsCore.PhaseInfo, out pluginsCore.PhaseInfo) plugi
 		out.WithReason(reason)
 	}
 	return out
-}
-
-// carryOver copies the fields of the original error that describe the failure rather
-// than classify it, so that reclassifying does not lose them.
-func carryOver(out *core.ExecutionError, previous *core.ExecutionError) {
-	if out == nil || previous == nil {
-		return
-	}
-	out.ErrorUri = previous.GetErrorUri()
-	out.Timestamp = previous.GetTimestamp()
-	out.Worker = previous.GetWorker()
-	out.Recoverability = previous.GetRecoverability()
 }
 
 func cloneExecutionError(err *core.ExecutionError) *core.ExecutionError {
