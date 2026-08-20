@@ -930,6 +930,11 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		return pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "cluster is suspended", info), nil
 	case rayv1.JobDeploymentStatusFailed:
 		failInfo := fmt.Sprintf("Failed to run Ray job %s with error: [%s] %s", rayJob.Name, rayJob.Status.Reason, rayJob.Status.Message)
+		if rayJob.Status.Reason == rayv1.JobDeploymentStatusTransitionGracePeriodExceeded {
+			// KubeRay never observed the RayJob's final status, so the job's outcome is unknown and the
+			// task's code may never have run. Retry on a fresh cluster instead of blaming the task.
+			return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(flyteerr.TaskFailedWithError, failInfo, info), nil
+		}
 		// Honor a RECOVERABLE error.pb (written by sdk) so the task's retries fire. A failed RayJob surfaces here as a
 		// terminal phase, so -- unlike the success path -- the k8s plugin manager never reads the
 		// error file on our behalf. Key off the proto-level recoverability so only a genuine

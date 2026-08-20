@@ -1716,6 +1716,76 @@ func TestGetTaskPhase_RecoverableErrorFile(t *testing.T) {
 	}
 }
 
+// TestGetTaskPhase_DeploymentStatusTransitionGracePeriodExceeded verifies that a RayJob failed by
+// KubeRay's status-transition grace period is mapped to a *system* retryable failure with cleanup,
+// while a genuine application failure stays a terminal user failure.
+func TestGetTaskPhase_DeploymentStatusTransitionGracePeriodExceeded(t *testing.T) {
+	ctx := context.Background()
+	handler := rayJobResourceHandler{}
+
+	newFailedRayJob := func(reason rayv1.JobFailedReason, message string) *rayv1.RayJob {
+		startTime := metav1.NewTime(time.Now())
+		return &rayv1.RayJob{
+			Spec: rayv1.RayJobSpec{
+				RayClusterSpec: &rayv1.RayClusterSpec{
+					HeadGroupSpec: rayv1.HeadGroupSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{Name: "ray-head", Image: "rayproject/ray:latest"},
+								},
+							},
+						},
+					},
+				},
+			},
+			Status: rayv1.RayJobStatus{
+				JobDeploymentStatus: rayv1.JobDeploymentStatusFailed,
+				RayClusterName:      "ray-clust",
+				Reason:              reason,
+				Message:             message,
+				StartTime:           &startTime,
+			},
+		}
+	}
+
+	for _, tc := range []struct {
+		name            string
+		reason          rayv1.JobFailedReason
+		message         string
+		expectedPhase   pluginsCore.Phase
+		expectedKind    core.ExecutionError_ErrorKind
+		expectedCleanup bool
+	}{
+		{
+			name:            "status transition grace period exceeded is a retryable system failure",
+			reason:          rayv1.JobDeploymentStatusTransitionGracePeriodExceeded,
+			message:         "The JobDeploymentStatus transition from Running to Complete exceeded the grace period",
+			expectedPhase:   pluginsCore.PhaseRetryableFailure,
+			expectedKind:    core.ExecutionError_SYSTEM,
+			expectedCleanup: true,
+		},
+		{
+			name:            "app failure stays a terminal user failure",
+			reason:          rayv1.AppFailed,
+			message:         "Job entrypoint command failed with exit code 1",
+			expectedPhase:   pluginsCore.PhasePermanentFailure,
+			expectedKind:    core.ExecutionError_USER,
+			expectedCleanup: false,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			pluginCtx := rayPluginContext(k8s.PluginState{})
+			phaseInfo, err := handler.GetTaskPhase(ctx, pluginCtx, newFailedRayJob(tc.reason, tc.message))
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedPhase.String(), phaseInfo.Phase().String())
+			assert.Equal(t, tc.expectedKind, phaseInfo.Err().GetKind())
+			assert.Equal(t, tc.expectedCleanup, phaseInfo.CleanupOnFailure())
+			assert.Contains(t, phaseInfo.Err().GetMessage(), tc.message)
+		})
+	}
+}
+
 func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
 
