@@ -256,6 +256,16 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 		startTime = new(actionStatus.GetStartTime().AsTime())
 	}
 
+	// Persist the inline signal payload (conditions only). The CR is GC'd after
+	// terminal recording, so RunInfo in the DB is the long-term record of the
+	// resolved value and the signalling actor.
+	if req.GetOutput() != nil || req.GetPrincipal() != nil {
+		if err := s.mergeRunInfoOutput(ctx, req); err != nil {
+			logger.Warnf(ctx, "UpdateActionStatus: failed to persist output for %s: %v", req.GetActionId().GetName(), err)
+			return connect.NewError(connect.CodeInternal, err)
+		}
+	}
+
 	if err := s.repo.ActionRepo().UpdateActionPhase(
 		ctx,
 		req.GetActionId(),
@@ -269,15 +279,6 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 		return connect.NewError(connect.CodeInternal, err)
 	}
 
-	// Persist the inline signal payload (conditions only). The CR is GC'd after
-	// terminal recording, so RunInfo in the DB is the long-term record of the
-	// resolved value and the signalling actor.
-	if req.GetOutput() != nil || req.GetPrincipal() != nil {
-		if err := s.mergeRunInfoOutput(ctx, req); err != nil {
-			logger.Warnf(ctx, "UpdateActionStatus: failed to persist output for %s: %v", req.GetActionId().GetName(), err)
-			return connect.NewError(connect.CodeInternal, err)
-		}
-	}
 	return nil
 }
 

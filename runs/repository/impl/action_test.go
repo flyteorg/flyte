@@ -21,6 +21,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -1086,4 +1087,64 @@ func TestUpdateActionPhase_PausedDoesNotResume(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_PAUSED), action.Phase,
 		"a non-terminal update must not move an action out of PAUSED")
+}
+
+// A condition's signalled value is written to detailed_info outside any phase
+// transition, so that write has to notify watchers on its own.
+func TestUpdateActionDetailedInfo_NotifiesWatchers(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	repo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	repoImpl := repo.(*actionRepo)
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "org1",
+			Project: "proj1",
+			Domain:  "domain1",
+			Name:    "run1",
+		},
+		Name: "action1",
+	}
+
+	ctx := context.Background()
+
+	// Register the watcher before the action exists so the creation
+	// notification is deterministically ours to drain.
+	watchCtx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	updates := make(chan *models.Action, 2)
+	errs := make(chan error, 1)
+	go repo.WatchActionUpdates(watchCtx, actionID, updates, errs)
+
+	require.Eventually(t, func() bool {
+		repoImpl.mu.RLock()
+		defer repoImpl.mu.RUnlock()
+		return len(repoImpl.actionSubscribers) > 0
+	}, 2*time.Second, 10*time.Millisecond, "timed out waiting for watcher registration")
+
+	_, err = repo.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	select {
+	case <-updates:
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for creation notification")
+	}
+
+	detailedInfo, err := proto.Marshal(&workflow.RunInfo{InputsUri: "s3://bucket/inputs.pb"})
+	require.NoError(t, err)
+	require.NoError(t, repo.UpdateActionDetailedInfo(ctx, actionID, detailedInfo))
+
+	select {
+	case action := <-updates:
+		require.Equal(t, actionID.Name, action.Name)
+		assert.Equal(t, detailedInfo, action.DetailedInfo)
+	case err := <-errs:
+		require.NoError(t, err)
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for detailed_info notification")
+	}
 }
