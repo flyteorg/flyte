@@ -1,7 +1,7 @@
 # Run Recovery — design
 
 Status: proposal
-Scope: `actions/`, `executor/`, `runs/`, plus the client surface in `flyte-sdk`
+Scope: `actions/`, `executor/`, `runs/`
 
 ## What recovery is
 
@@ -75,84 +75,6 @@ output URI and never execute it. Everything else is machinery in service of that
                                 └───────────────────────────────┘
 ```
 
-
-## SDK changes
-
-The wire format needs nothing new — the SDK already sends `RunSpec.relation` and
-`RunSpec.recover`, and already treats `ACTION_PHASE_RECOVERED` as terminal. What changes is the
-surface: recovery becomes its own command with narrower semantics than the flag it replaces.
-Paths below are in the `flyte-sdk` repo.
-
-**S1 — `flyte recover <run>` as a first-class command.** New `src/flyte/cli/_recover.py`,
-registered in `cli/main.py` (import, the command-group list, `add_command`). Surface:
-
-```
-flyte recover <run> [-p/-d] [--name NAME] [--follow] [--force-rerun-action NAME]...
-```
-
-It calls the existing no-substitution rerun path — `with_runcontext(mode="remote",
-recover=True, ...).rerun(run)` — which fetches the source run's task spec from the platform
-rather than bundling local code. That is what makes the recovery run reuse the source's
-`code_bundle_uri` (carried on `TaskMetadata`) and container image verbatim, with no repackaging
-step; the guarantee falls out of the path chosen, so it needs no new machinery. Deliberately
-**not** offered in v1: `--env`, `--label`, and every other `RunSpec` override. They are easy to
-add later and impossible to withdraw.
-
-**S2 — delete `flyte rerun --recover`.** `cli/_rerun.py:46-59` (both options), `:98-99` (the
-`--force-rerun-action requires --recover` guard, which is vacuous once recovery is its own
-command), `:129` (the passthrough). No deprecation alias: nothing in this repo has ever read
-`RunSpec.relation`, so the flag has never done anything and has no users to migrate. The twelve
-recover assertions in `tests/cli/test_rerun.py` move to a new `tests/cli/test_recover.py`.
-
-**S3 — reject substituted code.** `Runner.rerun(task_template=...)` composes with `recover=True`
-today (`_run.py:1406-1412`; `_resolve_recover_ref` returns the source name regardless), which is
-exactly the combination the new semantics forbid — new code against reused actions. Guard it in
-`Runner.rerun`.
-
-**S4 — no escape hatch for missing source outputs.** `--allow-missing-outputs` must not appear on
-`flyte recover`, and `allow_missing_source_outputs` must be rejected alongside `recover` in the
-runner. The flag exists because a plain rerun needs only the source run's *inputs*, so vanished
-outputs are harmless; under recovery the source outputs **are** the deliverable, and proceeding
-guarantees that every recovered action fails when its output is consumed. Consequences in
-`_run.py:1440-1487`: on the recovery path the `GetActionData` 404 is unconditionally fatal, so
-the `if "inputs" in str(e.message)` split — which the code itself notes is a race — never has to
-be resolved there; and the two error messages that point users at `flyte run ... --recover-from`
-(`:1457`, `:1470`) must stop doing so.
-
-This has a payoff for the backend: a recovery run reaches `CreateRun` only if the source run's
-inputs and outputs were both readable moments earlier. Not a guarantee they survive until a
-recovered output is consumed — nothing checks that, and nothing should — but the known-missing
-case is off the table.
-
-**S5 — chained recovery keeps pointing at the immediate parent.** `_apply_overrides` clears
-inherited provenance and sets `related_to` to the run being recovered (`_run.py:620-625`), so
-recovering a recovery run points at the previous recovery, not at the original. Keep it: each hop
-already carries a fully-resolved output URI, so flattening the chain client-side would buy
-nothing. This is the main path rather than an edge case — durability means a run that failed on
-an intermittent fault gets recovered, and if it fails again it gets recovered again — and it is
-why the lookup must accept a source action whose phase is `RECOVERED` (gate 5 below).
-
-**S6 — open: the client cannot tell whether the backend implements recovery.** The only gate
-today checks that `RunSpec.relation` exists in the linked `flyteidl2` build (`_run.py:660-665`),
-which says nothing about the server. Against a backend without this feature, `flyte recover`
-silently degrades into a full rerun — the worst failure mode available, because it looks like it
-worked. A flag that never did anything could get away with that; a command named `recover`
-cannot. Needs a real signal, and the cheapest one is on this side of the wire: have `CreateRun`
-reject `RELATION_TYPE_RECOVER` until it is implemented, rather than accepting and ignoring it.
-
-**Not changing, but load-bearing.** Two existing SDK behaviours the backend design depends on;
-both are contracts now, and breaking either silently breaks recovery:
-
-- `ACTION_PHASE_RECOVERED` is terminal and success-equivalent in `ActionPhase`
-  (`src/flyte/models.py:779-800`) and in the in-task controller's `Action.is_terminal`
-  (`src/flyte/_internal/controllers/remote/_action.py:63-75`), which consumes the update's
-  `output_uri` as the action's realized output. D3 states the obligations this puts on the
-  executor.
-- The exclusions in `generate_task_identity_hash` (`_internal/runtime/convert.py:793-812`) exist
-  specifically so recovery can match; ENG26-831 closed the three known name instabilities
-  (`tests/flyte/internal/runtime/test_action_name_stability_gaps.py`), leaving sets of unsortable
-  elements as a documented limitation. Any future change to the hash's inputs is an
-  API-compatibility change for recovery.
 
 ## Constraints this repo imposes
 
@@ -333,11 +255,15 @@ and short-circuit in `Reconcile` **before** any plugin dispatch, writing the ter
 from the spec. No pod is ever created.
 
 **The status this writes is not the status the normal path computes.** Two fields must come from
-`RecoveredFrom` rather than from the usual derivation, and both are load-bearing for the client
-(see "What the client sends, and what it expects back"):
+`RecoveredFrom` rather than from the usual derivation, and both are load-bearing for the SDK
+controller running inside the parent's task pod:
 
-- **Phase** is `ACTION_PHASE_RECOVERED`, not `SUCCEEDED`.
-- **Output URI** is `RecoveredFrom.OutputUri`. The normal path calls `outputRefs`
+- **Phase** is `ACTION_PHASE_RECOVERED` (wire value 10), not `SUCCEEDED`. The client already
+  treats it as terminal and success-equivalent, and a recovered child never executes in this run,
+  so the watch stream is the controller's only signal — report a phase it does not consider
+  terminal and it re-watches forever while the run hangs.
+- **Output URI** is `RecoveredFrom.OutputUri`, the source run's location, which the controller
+  records as the action's realized output and consumes as-is. The normal path calls `outputRefs`
   (`executor/pkg/controller/taskaction_controller.go:715-728`), which derives the URI from *this*
   run's `RunOutputBase` and action name — for an action that never executed, that points at a
   location nothing ever wrote.
@@ -364,6 +290,14 @@ recovery that cannot happen must degrade into an ordinary execution, not an erro
 
 On all five passing: populate `Spec.RecoveredFrom` and create the CR (D3). Otherwise create the
 CR as it is created today.
+
+**Recovering a recovery run is the main path, not an edge case.** Durability means a run that
+died on an intermittent fault gets recovered, and if it dies again it gets recovered again. The
+client points `related_to` at the run being recovered — the previous recovery, not the original —
+so the second recovery's lookups land on rows whose phase is `RECOVERED` and whose output URI
+already points a hop or more further back. Hence gate 5. Copy the URI through unchanged and do
+not resolve the chain: every hop already carries a fully-resolved URI, so a single point-read
+stays a single point-read however long the chain grows.
 
 **Matching is action-name string equality and nothing else.** No hash comparison, no
 task-version check, no spec diff. "Changed" is an emergent property of the SDK's action name,
@@ -401,13 +335,12 @@ via `ActionMetadata.relation` / a `recovered_from` field.
 
 | area | change |
 |---|---|
-| `runs/service/run_service.go` | Validate the relation on `CreateRun`: `related_to` non-empty, same project/domain, source run exists and is terminal. Reject `RunSpec.recover` when the type is not `RECOVER`. Persist the relation. Until the rest of this lands, reject `RELATION_TYPE_RECOVER` outright rather than accepting and ignoring it (see S6). |
+| `runs/service/run_service.go` | Validate the relation on `CreateRun`: `related_to` non-empty, same project/domain, source run exists and is terminal. Reject `RunSpec.recover` when the type is not `RECOVER`. Persist the relation. Until the rest of this lands, reject `RELATION_TYPE_RECOVER` outright rather than accepting and ignoring it — the client cannot tell an unimplemented backend from a recovery that matched nothing, and a silent full rerun is the worst of the available failures. |
 | `runs/` | Add an `InternalRunService` RPC looking an action up by `(project, domain, run_name, name)`, returning phase, attempts, cache status and the output URI, plus the repository query behind it. The output URI is not a column on `actions`: a trace action carries it in `detailed_info.outputs_uri`, a task action in the last attempt's `action_events.info`, and a `RECOVERED` action has no attempt rows at all — it must be readable for all three. |
 | `executor/api/v1/taskaction_types.go` | Add `RecoveryContext` and `RecoveredFrom` to `TaskActionSpec`; regenerate CRDs. |
 | `executor/pkg/controller/taskaction_controller.go` | Short-circuit on `Spec.RecoveredFrom` ahead of plugin dispatch; write the terminal status with phase `RECOVERED` and the source output URI, bypassing `outputRefs` (see D3). |
 | `actions/k8s/client.go` | Propagate `RecoveryContext` in `applyRunSpecToTaskAction` and `inheritRunContextFromParentTaskAction`; make the `Action_Condition` branch inherit it too (see D1); run the gate ladder in `Enqueue`; populate `RecoveredFrom` via the `InternalRunServiceClient` the struct already holds. |
 | metrics | The three counters above. |
-| `flyte-sdk` | S1–S4: add `flyte recover`, delete `flyte rerun --recover`, reject substituted code and `allow_missing_source_outputs` under recovery. Independent of everything above — the flag it replaces has never done anything, so the command can ship against a backend that still rejects `RELATION_TYPE_RECOVER`. |
 
 Suggested order: D1 first — it is independently verifiable (stamp the relation, assert it
 appears on every child CR) and unblocks everything else.
