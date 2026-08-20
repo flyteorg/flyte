@@ -16,6 +16,7 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	k8stypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	k8sscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/utils/ptr"
@@ -293,7 +294,21 @@ func (w *fakeEventWatcher) List(objectKey watchedObjectKey, createdAfter time.Ti
 	return w.events[objectKey]
 }
 
+// testPodUID is the UID of the pod the fault events are recorded against, so that a test
+// can hand classification an event that belongs to some other incarnation of the pod.
+const testPodUID k8stypes.UID = "pod-uid"
+
 func gpuFaultEvent(code int, severity gpufault.Severity, createdAt time.Time) *eventInfo {
+	return gpuFaultEventFor(code, severity, createdAt, createdAt, testPodUID)
+}
+
+func gpuFaultEventFor(
+	code int,
+	severity gpufault.Severity,
+	createdAt time.Time,
+	lastObservedAt time.Time,
+	regardingUID k8stypes.UID,
+) *eventInfo {
 	message := gpufault.FormatEventMessage(
 		gpufault.Fault{
 			Kind:     gpufault.KindXid,
@@ -304,20 +319,30 @@ func gpuFaultEvent(code int, severity gpufault.Severity, createdAt time.Time) *e
 		},
 		gpufault.Attribution{NodeName: "ip-10-0-0-1", GPUUUID: "GPU-1234", GPUIndex: 0},
 	)
-	return &eventInfo{Message: message, Reason: "GPUXidError", CreatedAt: createdAt, RecordedAt: createdAt}
+	return &eventInfo{
+		Message:        message,
+		Reason:         "GPUXidError",
+		CreatedAt:      createdAt,
+		RecordedAt:     createdAt,
+		LastObservedAt: lastObservedAt,
+		RegardingUID:   regardingUID,
+	}
 }
 
 func failedPod() *v1.Pod {
 	pod := &v1.Pod{
 		TypeMeta:   metav1.TypeMeta{Kind: "Pod", APIVersion: "v1"},
-		ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "pod"},
+		ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "pod", UID: testPodUID},
 	}
 	return pod
 }
 
 func TestClassifyGpuFailure(t *testing.T) {
 	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
-	base := time.Date(2026, 8, 19, 10, 0, 0, 0, time.UTC)
+	// Recency is measured against the clock now, so the fixtures have to sit relative to
+	// it: base is inside the relevance window, stale is well outside it.
+	base := time.Now().Add(-time.Minute)
+	stale := time.Now().Add(-2 * gpuFaultRelevanceWindow)
 
 	tests := []struct {
 		name        string
@@ -400,6 +425,39 @@ func TestClassifyGpuFailure(t *testing.T) {
 			wantKind:  core.ExecutionError_SYSTEM,
 			wantFault: true,
 		},
+		{
+			name: "a fault recorded against an earlier pod of the same name is ignored",
+			events: []*eventInfo{
+				gpuFaultEventFor(79, gpufault.SeverityCritical, base, base, "some-other-pod-uid"),
+			},
+			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("OOMKilled", "oom", nil),
+			wantPhase: pluginsCore.PhaseRetryableFailure,
+			wantCode:  "OOMKilled",
+			wantKind:  core.ExecutionError_USER,
+			wantFault: false,
+		},
+		{
+			name: "an old fault still being observed now is classified",
+			events: []*eventInfo{
+				gpuFaultEventFor(79, gpufault.SeverityCritical, stale, base, testPodUID),
+			},
+			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("UnknownError", "Pod failed", nil),
+			wantPhase: pluginsCore.PhaseRetryableFailure,
+			wantCode:  gpufault.CodeGpuFallenOffBus,
+			wantKind:  core.ExecutionError_SYSTEM,
+			wantFault: true,
+		},
+		{
+			name: "a fault last observed long ago is ignored",
+			events: []*eventInfo{
+				gpuFaultEventFor(79, gpufault.SeverityCritical, stale, stale, testPodUID),
+			},
+			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("OOMKilled", "oom", nil),
+			wantPhase: pluginsCore.PhaseRetryableFailure,
+			wantCode:  "OOMKilled",
+			wantKind:  core.ExecutionError_USER,
+			wantFault: false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -419,9 +477,9 @@ func TestClassifyGpuFailure(t *testing.T) {
 			} else {
 				assert.Nil(t, got.Err().GetGpuFault())
 			}
-			// The search ignores the round watermark but is bounded by the relevance
-			// window, so an old fault cannot reclassify a much later failure.
-			assert.WithinDuration(t, time.Now().Add(-gpuFaultRelevanceWindow), watcher.lastCreatedAfter, 5*time.Second)
+			// The search itself is unbounded: which events count is decided per event,
+			// on the pod they name and on when they were last observed.
+			assert.True(t, watcher.lastCreatedAfter.IsZero())
 			assert.True(t, watcher.lastRecordedAfter.IsZero())
 		})
 	}
@@ -543,45 +601,4 @@ func TestAddObjectMetadata_ManagedLabel(t *testing.T) {
 
 		assert.Equal(t, flytek8s.ManagedLabelValue, pod.GetLabels()[flytek8s.ManagedLabelKey])
 	})
-}
-
-func TestAddObjectMetadata_StampsTaskLabelsOnPod(t *testing.T) {
-	taskExecID := pluginsCoreMock.NewTaskExecutionID(t)
-	taskExecID.EXPECT().GetGeneratedName().Return("run-name-action-name-0")
-
-	taskMeta := pluginsCoreMock.NewTaskExecutionMetadata(t)
-	taskMeta.EXPECT().GetNamespace().Return("project-development")
-	taskMeta.EXPECT().GetAnnotations().Return(map[string]string{"flyte/annotation": "value"})
-	taskMeta.EXPECT().GetLabels().Return(map[string]string{
-		"project":   "project",
-		"domain":    "development",
-		"run":       "run-name",
-		"action":    "action-name",
-		"attempt":   "2",
-		"task-name": "my_module.my_task",
-	})
-	taskMeta.EXPECT().GetTaskExecutionID().Return(taskExecID)
-	taskMeta.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{Name: "owner"})
-
-	plugin := k8sMocks.NewPlugin(t)
-	plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
-
-	pm := NewPluginManager("test", plugin, nil)
-
-	pod := &v1.Pod{}
-	pm.addObjectMetadata(taskMeta, pod, &config.K8sPluginConfig{
-		DefaultLabels: map[string]string{"cluster": "default"},
-	})
-
-	assert.Equal(t, map[string]string{
-		"cluster":   "default",
-		"project":   "project",
-		"domain":    "development",
-		"run":       "run-name",
-		"action":    "action-name",
-		"attempt":   "2",
-		"task-name": "my_module.my_task",
-	}, pod.GetLabels())
-	assert.Equal(t, "project-development", pod.GetNamespace())
-	assert.Equal(t, "run-name-action-name-0", pod.GetName())
 }

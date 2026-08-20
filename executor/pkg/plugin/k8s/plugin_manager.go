@@ -366,10 +366,10 @@ func objectKeyFor(resource client.Object) watchedObjectKey {
 // classifyGpuFailure folds the GPU faults recorded against a failed attempt's pod into
 // the failure the plugin reported, so that a fault the node saw becomes the code and
 // the message the user reads. Anything that is not a failed pod is left alone.
-// gpuFaultRelevanceWindow bounds how far back a recorded GPU fault can still shape
-// the classification of a failure. Ten minutes covers the gap between a fault and
-// the pod status catching up with it, without letting a fault from a previous task
-// on a long-lived pod resurface later.
+// gpuFaultRelevanceWindow bounds how long a fault stays relevant to a new failure on the
+// same pod. Which pod a fault belongs to is settled by the UID, not by this window; ten
+// minutes only covers the gap between a fault and the pod status catching up with it, so
+// that a fault the node saw much earlier does not explain an unrelated later failure.
 const gpuFaultRelevanceWindow = 10 * time.Minute
 
 func (pm *PluginManager) classifyGpuFailure(
@@ -383,13 +383,11 @@ func (pm *PluginManager) classifyGpuFailure(
 		return phaseInfo
 	}
 
-	// Recent events on the pod, not only the ones since the last watermark: the Xid
-	// that killed the task is usually recorded rounds before the pod's status catches
-	// up with it, and by then the watermark has moved past it. The window bounds the
-	// other direction: a fault recorded long before this failure says nothing about
-	// it, and on a long-lived pod an old critical fault must not reclassify every
-	// later, unrelated failure.
-	events := pm.eventWatcher.List(objectKeyFor(resource), time.Now().Add(-gpuFaultRelevanceWindow), time.Time{})
+	// Every event cached for the pod, not only the ones since the last watermark: the
+	// Xid that killed the task is usually recorded rounds before the pod's status
+	// catches up with it, and by then the watermark has moved past it. What bounds the
+	// search is the identity and the recency of each event, checked below.
+	events := pm.eventWatcher.List(objectKeyFor(resource), time.Time{}, time.Time{})
 	if len(events) == 0 {
 		return phaseInfo
 	}
@@ -399,6 +397,23 @@ func (pm *PluginManager) classifyGpuFailure(
 		// Only events the GPU fault emitter wrote, recognized by their reason, are
 		// parsed; the message prefix alone is free text anyone can put in an event.
 		if event.Reason != gpufault.EventReasonXid && event.Reason != gpufault.EventReasonSXid {
+			continue
+		}
+		// Events are cached under the pod's namespace and name, which a recreated pod
+		// reuses, so the fault has to have been recorded against this very pod. Entries
+		// cached before the watcher tracked the UID carry none, and are taken as they
+		// were before, on the name they were cached under.
+		if event.RegardingUID != "" && event.RegardingUID != resource.GetUID() {
+			continue
+		}
+		// A fault that keeps repeating is aggregated into one event, so its last
+		// observation is what says whether it is still going on; only the events with
+		// no observation time of their own fall back to when they were created.
+		observedAt := event.LastObservedAt
+		if observedAt.IsZero() {
+			observedAt = event.CreatedAt
+		}
+		if time.Since(observedAt) > gpuFaultRelevanceWindow {
 			continue
 		}
 		if fault := gpufault.FromEventMessage(event.Message); fault != nil {
