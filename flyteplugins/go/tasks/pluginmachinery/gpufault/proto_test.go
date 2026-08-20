@@ -107,3 +107,14 @@ func TestFromEventMessageIgnoresOtherEvents(t *testing.T) {
 		})
 	}
 }
+
+func TestFromEventMessageSeverityIsCappedByTheTable(t *testing.T) {
+	// The tail may lower the table's verdict but never raise it.
+	up := FromEventMessage("[gpu-health] [CRITICAL] Xid 31 (GPU memory page fault) on GPU 0. xid=31 severity=critical gpu_index=0")
+	require.NotNil(t, up)
+	assert.Equal(t, core.GpuFault_SEVERITY_USER, up.GetSeverity())
+
+	down := FromEventMessage("[gpu-health] [WARN] SXid 12028 on NVSwitch 0000:05:00.0. sxid=12028 severity=warn pci=0000:05:00.0")
+	require.NotNil(t, down)
+	assert.Equal(t, core.GpuFault_SEVERITY_WARN, down.GetSeverity())
+}
