@@ -1,6 +1,7 @@
 package secret
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"fmt"
@@ -356,37 +357,82 @@ func (i *EmbeddedSecretManagerInjector) upsertEnvVarSecret(
 	pod *corev1.Pod,
 ) (string, error) {
 	k8sSecretName := ToEnvVarK8sName(components)
+	desiredSecret := newEnvVarSecret(k8sSecretName, pod.GetNamespace(), components, secretValue)
+	if err := i.k8sClient.Create(ctx, desiredSecret); err == nil {
+		return k8sSecretName, nil
+	} else if !k8sError.IsAlreadyExists(err) {
+		return "", fmt.Errorf("failed to create env var secret [%s] in namespace [%s]: %w", k8sSecretName, pod.GetNamespace(), err)
+	}
+
 	namespacedName := types.NamespacedName{Name: k8sSecretName, Namespace: pod.GetNamespace()}
 	k8sSecret := &corev1.Secret{}
 	err := i.k8sClient.Get(ctx, namespacedName, k8sSecret)
-	if err != nil && k8sError.IsNotFound(err) {
-		newSecret := &corev1.Secret{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      k8sSecretName,
-				Namespace: pod.GetNamespace(),
-				Labels:    ToEnvVarK8sLabels(components),
-			},
-			Type: corev1.SecretTypeOpaque,
-			Data: map[string][]byte{
-				EmbeddedSecretsEnvVarKey: secretValue,
-			},
-		}
-		if err := i.k8sClient.Create(ctx, newSecret); err != nil {
-			return "", fmt.Errorf("failed to create env var secret [%s] in namespace [%s]: %w", k8sSecretName, pod.GetNamespace(), err)
-		}
+	if k8sError.IsNotFound(err) {
+		// Another admission path may have just created the Secret through the API
+		// server while this process's informer cache has not observed it yet. The
+		// pod can safely reference the Secret name in that case.
 		return k8sSecretName, nil
 	} else if err != nil {
-		return "", fmt.Errorf("failed to check for env var secret [%s] in namespace [%s]: %w", k8sSecretName, pod.GetNamespace(), err)
+		return "", fmt.Errorf("failed to get env var secret [%s] in namespace [%s]: %w", k8sSecretName, pod.GetNamespace(), err)
 	}
 
+	if !envVarSecretNeedsPatch(k8sSecret, components, secretValue) {
+		return k8sSecretName, nil
+	}
+
+	originalSecret := k8sSecret.DeepCopy()
+	if k8sSecret.Labels == nil {
+		k8sSecret.Labels = map[string]string{}
+	}
+	for key, value := range ToEnvVarK8sLabels(components) {
+		k8sSecret.Labels[key] = value
+	}
 	if k8sSecret.Data == nil {
 		k8sSecret.Data = map[string][]byte{}
 	}
 	k8sSecret.Data[EmbeddedSecretsEnvVarKey] = secretValue
-	if err := i.k8sClient.Update(ctx, k8sSecret); err != nil {
-		return "", fmt.Errorf("failed to update env var secret [%s] in namespace [%s]: %w", k8sSecretName, pod.GetNamespace(), err)
+	if err := i.k8sClient.Patch(ctx, k8sSecret, client.MergeFrom(originalSecret)); err != nil {
+		return "", fmt.Errorf("failed to patch env var secret [%s] in namespace [%s]: %w", k8sSecretName, pod.GetNamespace(), err)
 	}
 	return k8sSecretName, nil
+}
+
+func newEnvVarSecret(
+	name string,
+	namespace string,
+	components SecretNameComponents,
+	secretValue []byte,
+) *corev1.Secret {
+	return &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: namespace,
+			Labels:    ToEnvVarK8sLabels(components),
+		},
+		Type: corev1.SecretTypeOpaque,
+		Data: map[string][]byte{
+			EmbeddedSecretsEnvVarKey: secretValue,
+		},
+	}
+}
+
+func envVarSecretNeedsPatch(
+	k8sSecret *corev1.Secret,
+	components SecretNameComponents,
+	secretValue []byte,
+) bool {
+	if k8sSecret.Type != corev1.SecretTypeOpaque {
+		return true
+	}
+	if !bytes.Equal(k8sSecret.Data[EmbeddedSecretsEnvVarKey], secretValue) {
+		return true
+	}
+	for key, value := range ToEnvVarK8sLabels(components) {
+		if k8sSecret.Labels[key] != value {
+			return true
+		}
+	}
+	return false
 }
 
 func (i *EmbeddedSecretManagerInjector) injectAsEnvVar(

@@ -51,9 +51,6 @@ func expectEnvVarSecretCreate(
 	t.Helper()
 	k8sSecretName := ToEnvVarK8sName(components)
 	mockClient.
-		On("Get", ctx, types.NamespacedName{Name: k8sSecretName, Namespace: namespace}, &corev1.Secret{}).
-		Return(k8sError.NewNotFound(corev1.Resource("secret"), k8sSecretName))
-	mockClient.
 		On("Create", ctx, &corev1.Secret{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      k8sSecretName,
@@ -67,6 +64,88 @@ func expectEnvVarSecretCreate(
 		}).
 		Return(nil)
 	return k8sSecretName
+}
+
+func TestEmbeddedSecretManagerInjector_UpsertEnvVarSecretAlreadyExistsWithStaleCache(t *testing.T) {
+	ctx := context.Background()
+	components := SecretNameComponents{Org: "org", Domain: "domain", Project: "project", Name: "secret"}
+	pod := &corev1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: "pod-namespace"}}
+	k8sSecretName := ToEnvVarK8sName(components)
+
+	mockClient := &mocks.MockableControllerRuntimeClient{}
+	mockClient.
+		On("Create", ctx, newEnvVarSecret(k8sSecretName, pod.GetNamespace(), components, []byte("secret-value"))).
+		Return(k8sError.NewAlreadyExists(corev1.Resource("secret"), k8sSecretName))
+	mockClient.
+		On("Get", ctx, types.NamespacedName{Name: k8sSecretName, Namespace: pod.GetNamespace()}, &corev1.Secret{}).
+		Return(k8sError.NewNotFound(corev1.Resource("secret"), k8sSecretName))
+
+	injector := &EmbeddedSecretManagerInjector{k8sClient: mockClient}
+	gotName, err := injector.upsertEnvVarSecret(ctx, components, []byte("secret-value"), pod)
+
+	assert.NoError(t, err)
+	assert.Equal(t, k8sSecretName, gotName)
+	mockClient.AssertNotCalled(t, "Patch", mock.Anything, mock.Anything, mock.Anything)
+}
+
+func TestEmbeddedSecretManagerInjector_UpsertEnvVarSecretSkipsUnchangedExistingSecret(t *testing.T) {
+	ctx := context.Background()
+	components := SecretNameComponents{Org: "org", Domain: "domain", Project: "project", Name: "secret"}
+	pod := &corev1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: "pod-namespace"}}
+	secretValue := []byte("secret-value")
+	k8sSecretName := ToEnvVarK8sName(components)
+
+	mockClient := &mocks.MockableControllerRuntimeClient{}
+	mockClient.
+		On("Create", ctx, newEnvVarSecret(k8sSecretName, pod.GetNamespace(), components, secretValue)).
+		Return(k8sError.NewAlreadyExists(corev1.Resource("secret"), k8sSecretName))
+	mockClient.
+		On("Get", ctx, types.NamespacedName{Name: k8sSecretName, Namespace: pod.GetNamespace()}, &corev1.Secret{}).
+		Run(func(args mock.Arguments) {
+			secret := args.Get(2).(*corev1.Secret)
+			*secret = *newEnvVarSecret(k8sSecretName, pod.GetNamespace(), components, secretValue)
+		}).
+		Return(nil)
+
+	injector := &EmbeddedSecretManagerInjector{k8sClient: mockClient}
+	gotName, err := injector.upsertEnvVarSecret(ctx, components, secretValue, pod)
+
+	assert.NoError(t, err)
+	assert.Equal(t, k8sSecretName, gotName)
+	mockClient.AssertNotCalled(t, "Patch", mock.Anything, mock.Anything, mock.Anything)
+}
+
+func TestEmbeddedSecretManagerInjector_UpsertEnvVarSecretPatchesChangedExistingSecret(t *testing.T) {
+	ctx := context.Background()
+	components := SecretNameComponents{Org: "org", Domain: "domain", Project: "project", Name: "secret"}
+	pod := &corev1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: "pod-namespace"}}
+	k8sSecretName := ToEnvVarK8sName(components)
+
+	mockClient := &mocks.MockableControllerRuntimeClient{}
+	mockClient.
+		On("Create", ctx, newEnvVarSecret(k8sSecretName, pod.GetNamespace(), components, []byte("new-value"))).
+		Return(k8sError.NewAlreadyExists(corev1.Resource("secret"), k8sSecretName))
+	mockClient.
+		On("Get", ctx, types.NamespacedName{Name: k8sSecretName, Namespace: pod.GetNamespace()}, &corev1.Secret{}).
+		Run(func(args mock.Arguments) {
+			secret := args.Get(2).(*corev1.Secret)
+			*secret = *newEnvVarSecret(k8sSecretName, pod.GetNamespace(), components, []byte("old-value"))
+		}).
+		Return(nil)
+	mockClient.
+		On("Patch", ctx, mock.AnythingOfType("*v1.Secret"), mock.Anything).
+		Run(func(args mock.Arguments) {
+			secret := args.Get(1).(*corev1.Secret)
+			assert.Equal(t, []byte("new-value"), secret.Data[EmbeddedSecretsEnvVarKey])
+			assert.Equal(t, ToEnvVarK8sLabels(components), secret.Labels)
+		}).
+		Return(nil)
+
+	injector := &EmbeddedSecretManagerInjector{k8sClient: mockClient}
+	gotName, err := injector.upsertEnvVarSecret(ctx, components, []byte("new-value"), pod)
+
+	assert.NoError(t, err)
+	assert.Equal(t, k8sSecretName, gotName)
 }
 
 func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
