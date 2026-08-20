@@ -8,6 +8,14 @@ import (
 
 // MessagePrefix marks every message the GPU health emitter writes. Consumers filter
 // on it, so it must never change.
+// Kubernetes Event reasons the GPU fault emitter uses. Consumers filter on these
+// before parsing the message, so ordinary events never reach the parser and a
+// free-text message alone cannot pose as a fault report.
+const (
+	EventReasonXid  = "GPUXidError"
+	EventReasonSXid = "GPUSXidError"
+)
+
 const MessagePrefix = "[gpu-health]"
 
 // The event message is two halves. The first is a sentence a human reads in the run's

@@ -44,14 +44,19 @@ var userXids = map[int]bool{
 // reset or replaced.
 var criticalXids = map[int]bool{
 	48:  true,
+	62:  true,
 	63:  true,
 	64:  true,
 	74:  true,
 	79:  true,
 	94:  true,
 	95:  true,
+	109: true,
 	119: true,
 	120: true,
+	// 140 must stay in step with CodeFor, which maps it to CodeGpuEccUncorrectable:
+	// an unrecovered ECC error is a device fault, not a warning.
+	140: true,
 }
 
 // warnXids are codes that are neither the workload's fault nor immediately fatal.
