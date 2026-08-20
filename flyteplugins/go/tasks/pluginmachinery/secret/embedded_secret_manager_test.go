@@ -248,7 +248,7 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 
 			secretCache := newAlwaysMissCache(t)
 			parentCfg := &config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix}
-			injector := NewEmbeddedSecretManagerInjector(config.EmbeddedSecretManagerConfig{}, []SecretFetcher{gcpSecretsFetcher}, mockClient, testReferenceNamespace, secretCache, parentCfg)
+			injector := NewEmbeddedSecretManagerInjector(config.EmbeddedSecretManagerConfig{Type: config.EmbeddedSecretManagerTypeK8s, K8sConfig: config.K8sConfig{Namespace: testPodNamespace}}, []SecretFetcher{gcpSecretsFetcher}, mockClient, testReferenceNamespace, secretCache, parentCfg)
 
 			actualP, injected, err := injector.Inject(ctx, inputSecret, tt.pod)
 			assert.Equal(t, tt.expectedInjected, injected)
@@ -399,7 +399,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToOrganization(t *testi
 
 			secretCache := newAlwaysMissCache(t)
 			injector := NewEmbeddedSecretManagerInjector(
-				config.EmbeddedSecretManagerConfig{},
+				config.EmbeddedSecretManagerConfig{Type: config.EmbeddedSecretManagerTypeK8s, K8sConfig: config.K8sConfig{Namespace: testPodNamespace}},
 				[]SecretFetcher{secretFetcherMock{
 					Secrets: map[string]SecretValue{
 						orgSecretID: {
@@ -459,7 +459,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToDomain(t *testing.T) 
 
 	secretCache := newAlwaysMissCache(t)
 	injector := NewEmbeddedSecretManagerInjector(
-		config.EmbeddedSecretManagerConfig{},
+		config.EmbeddedSecretManagerConfig{Type: config.EmbeddedSecretManagerTypeK8s, K8sConfig: config.K8sConfig{Namespace: testPodNamespace}},
 		[]SecretFetcher{secretFetcherMock{
 			Secrets: map[string]SecretValue{
 				"u__org__o-apple__domain____project____key__secret1": {
@@ -530,7 +530,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T)
 
 	secretCache := newAlwaysMissCache(t)
 	injector := NewEmbeddedSecretManagerInjector(
-		config.EmbeddedSecretManagerConfig{},
+		config.EmbeddedSecretManagerConfig{Type: config.EmbeddedSecretManagerTypeK8s, K8sConfig: config.K8sConfig{Namespace: testPodNamespace}},
 		[]SecretFetcher{secretFetcherMock{
 			Secrets: map[string]SecretValue{
 				"u__org__o-apple__domain____project____key__secret1": {
@@ -594,7 +594,7 @@ func TestEmbeddedSecretManagerInjector_LookUpSecret_StaleOrgCacheDoesNotMaskProj
 	expectStoredSecret(mockClient, projectDomainID, testPodNamespace)
 
 	injector := NewEmbeddedSecretManagerInjector(
-		config.EmbeddedSecretManagerConfig{},
+		config.EmbeddedSecretManagerConfig{Type: config.EmbeddedSecretManagerTypeK8s, K8sConfig: config.K8sConfig{Namespace: testPodNamespace}},
 		[]SecretFetcher{secretFetcherMock{
 			Secrets: map[string]SecretValue{
 				projectDomainID: {StringValue: "fresh project value"},
@@ -635,7 +635,7 @@ func TestEmbeddedSecretManagerInjector_InjectAsEnvVar_ReferencesStoredSecret(t *
 
 	newInjector := func(t *testing.T, mockClient *mocks.MockableControllerRuntimeClient) SecretsInjector {
 		return NewEmbeddedSecretManagerInjector(
-			config.EmbeddedSecretManagerConfig{},
+			config.EmbeddedSecretManagerConfig{Type: config.EmbeddedSecretManagerTypeK8s, K8sConfig: config.K8sConfig{Namespace: testPodNamespace}},
 			[]SecretFetcher{secretFetcherMock{
 				Secrets: map[string]SecretValue{secretID: {StringValue: "fruits"}},
 			}},
@@ -691,7 +691,7 @@ func TestEmbeddedSecretManagerInjector_InjectAsEnvVar_ReferencesStoredSecret(t *
 			Return(nil)
 
 		pod, injected, err := newInjector(t, mockClient).Inject(ctx, &core.Secret{Key: "secret1"}, newPod())
-		assert.ErrorContains(t, err, "has no key")
+		assert.ErrorContains(t, err, "it is not stored in a Kubernetes secret")
 		assert.False(t, injected)
 		assert.Empty(t, pod.Spec.Containers[0].Env)
 	})
@@ -713,7 +713,7 @@ func TestEmbeddedSecretManagerInjector_InjectAsEnvVar_FailsWithoutNamespace(t *t
 
 	mockClient := &mocks.MockableControllerRuntimeClient{}
 	injector := NewEmbeddedSecretManagerInjector(
-		config.EmbeddedSecretManagerConfig{},
+		config.EmbeddedSecretManagerConfig{Type: config.EmbeddedSecretManagerTypeK8s, K8sConfig: config.K8sConfig{Namespace: testPodNamespace}},
 		[]SecretFetcher{secretFetcherMock{
 			Secrets: map[string]SecretValue{
 				"u__org__o-apple__domain__d-cherry__project__p-banana__key__secret1": {StringValue: "fruits"},
@@ -724,7 +724,7 @@ func TestEmbeddedSecretManagerInjector_InjectAsEnvVar_FailsWithoutNamespace(t *t
 	)
 
 	pod, injected, err := injector.Inject(ctx, &core.Secret{Key: "secret1"}, pod)
-	assert.ErrorContains(t, err, "pod has no namespace")
+	assert.ErrorContains(t, err, "pod namespace [] does not match the Kubernetes secret manager namespace")
 	assert.False(t, injected)
 	assert.Empty(t, pod.Spec.Containers[0].Env)
 }
@@ -778,6 +778,8 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 	}
 
 	enabledConfig := config.EmbeddedSecretManagerConfig{
+		Type:      config.EmbeddedSecretManagerTypeK8s,
+		K8sConfig: config.K8sConfig{Namespace: testNamespace},
 		ImagePullSecrets: config.ImagePullSecretsConfig{
 			Enabled: true,
 		},
@@ -867,7 +869,7 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 
 		secretCache := newAlwaysMissCache(t)
 		injector := NewEmbeddedSecretManagerInjector(
-			config.EmbeddedSecretManagerConfig{},
+			config.EmbeddedSecretManagerConfig{Type: config.EmbeddedSecretManagerTypeK8s, K8sConfig: config.K8sConfig{Namespace: testPodNamespace}},
 			[]SecretFetcher{secretFetcherMock{
 				Secrets: map[string]SecretValue{
 					secretName: {
