@@ -140,6 +140,11 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 	injectLabels[AttemptLabel] = strconv.FormatUint(uint64(retryAttempt)+1, 10)
 	setSanitizedLabel(injectLabels, TaskNameLabel, taskID.GetName())
 
+	interruptible := ta.Spec.Interruptible
+	if interruptible == nil {
+		interruptible = interruptibleFromTaskTemplate(ta.Spec.TaskTemplate)
+	}
+
 	return &taskExecutionMetadata{
 		ownerID: types.NamespacedName{
 			Name:      ta.Name,
@@ -173,7 +178,7 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		maxAttempts:     maxAttempts,
 		overrides:       overrides,
 		envVars:         envVars,
-		interruptible:   ta.Spec.Interruptible != nil && *ta.Spec.Interruptible,
+		interruptible:   interruptible != nil && *interruptible,
 		securityContext: securityContext,
 		serviceAccount:  resolveServiceAccount(securityContext, executorconfig.GetConfig().DefaultK8sServiceAccount),
 	}, nil
@@ -197,6 +202,26 @@ func attemptToRetry(attempt uint32) uint32 {
 		return 0
 	}
 	return attempt - 1
+}
+
+// interruptibleFromTaskTemplate gives the task template's interruptible flag, or nil when the
+// template does not declare one.
+func interruptibleFromTaskTemplate(data []byte) *bool {
+	if len(data) == 0 {
+		return nil
+	}
+
+	tmpl := &core.TaskTemplate{}
+	if err := proto.Unmarshal(data, tmpl); err != nil {
+		return nil
+	}
+
+	md := tmpl.GetMetadata()
+	if md == nil || md.GetInterruptibleValue() == nil {
+		return nil
+	}
+
+	return ptr.To(md.GetInterruptible())
 }
 
 // maxAttemptsFromTaskTemplate give the max attempts (retries + 1) from the task template.
