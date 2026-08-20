@@ -10,9 +10,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/genproto/googleapis/rpc/status"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
@@ -159,6 +164,64 @@ func TestNotifyRunService_UpdateActionStatusIncludesAttemptsAndCacheStatus(t *te
 	c.notifyRunService(ctx, ta, update, watch.Modified)
 
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+}
+
+// TestNotifyRunService_RejectedStatusUpdateSkipsTerminalLabel covers the bug
+// where UpdateActionStatus reports the rejection in-band via resp.Status
+// instead of a transport error. Before the fix, notifyRunService only checked
+// the transport error, so a rejected terminal update was still marked
+// terminal-status-recorded, permanently preventing retries.
+func TestNotifyRunService_RejectedStatusUpdateSkipsTerminalLabel(t *testing.T) {
+	ctx := context.Background()
+
+	scheme := runtime.NewScheme()
+	require.NoError(t, executorv1.AddToScheme(scheme))
+
+	ta := &executorv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{Name: "run1-action-5", Namespace: flyteNamespace},
+		Spec: executorv1.TaskActionSpec{
+			Project:    "proj",
+			Domain:     "dev",
+			RunName:    "run1",
+			ActionName: "action-5",
+		},
+	}
+
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+	c := &ActionsClient{
+		runClient:   mockClient,
+		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+		k8sClient: fake.NewClientBuilder().
+			WithScheme(scheme).
+			WithObjects(ta.DeepCopy()).
+			Build(),
+	}
+
+	update := &ActionUpdate{
+		ActionID: &common.ActionIdentifier{
+			Run:  &common.RunIdentifier{Project: "proj", Domain: "dev", Name: "run1"},
+			Name: "action-5",
+		},
+		Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+	}
+
+	// Transport succeeds (err == nil), but the run service rejects the write
+	// in-band — e.g. a DB failure — and reports it via resp.Status.
+	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.UpdateActionStatusResponse]{
+			Msg: &workflow.UpdateActionStatusResponse{
+				Status: &status.Status{Code: int32(codes.Internal), Message: "db write failed"},
+			},
+		}, nil).Once()
+
+	c.notifyRunService(ctx, ta, update, watch.Modified)
+
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+
+	var got executorv1.TaskAction
+	require.NoError(t, c.k8sClient.Get(ctx, client.ObjectKeyFromObject(ta), &got))
+	assert.NotEqual(t, "true", got.GetLabels()[labelTerminalStatusRecorded],
+		"terminal-status-recorded must not be set when the run service rejects the update")
 }
 
 func TestBuildTaskActionName(t *testing.T) {
