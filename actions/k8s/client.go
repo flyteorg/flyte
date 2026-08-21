@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -782,8 +783,17 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Task: ta,
 			}
 		}
-		if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {
+		// RecordAction reports rejections in the response body, not as a transport
+		// error, so the body status has to be checked before memoizing the key —
+		// otherwise a rejected action is never recorded and never retried.
+		resp, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq))
+		if err != nil {
 			logger.Warnf(ctx, "Failed to record action in run service for %s: %v", update.ActionID.Name, err)
+		} else if resp == nil || resp.Msg == nil || resp.Msg.GetStatus() == nil {
+			logger.Warnf(ctx, "Run service returned no RecordAction status for %s", update.ActionID.Name)
+		} else if status := resp.Msg.GetStatus(); status.GetCode() != int32(code.Code_OK) {
+			logger.Warnf(ctx, "Run service rejected RecordAction for %s with code %d: %s",
+				update.ActionID.Name, status.GetCode(), status.GetMessage())
 		} else {
 			c.recordedFilter.Add(ctx, actionKey)
 		}
