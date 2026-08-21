@@ -23,8 +23,7 @@ func NewSettingsService(settingsRepo interfaces.SettingsRepo) *SettingsService {
 	return &SettingsService{settingsRepo: settingsRepo}
 }
 
-// GetSettings returns resolved, merged settings. Resolution requires the
-// merge engine (RFC #7775 task 2.2), which is not implemented yet.
+// GetSettings returns resolved, merged settings.
 func (s *SettingsService) GetSettings(
 	ctx context.Context,
 	req *connect.Request[settings.GetSettingsRequest],
@@ -76,7 +75,7 @@ func (s *SettingsService) GetSettingsForEdit(
 		record := &settings.SettingsRecord{Key: lk, Settings: &settings.Settings{}}
 		if row := rowsByKey[storageKeys[i]]; row != nil {
 			stored := &settings.Settings{}
-			if err := protojson.Unmarshal(row.Data, stored); err != nil {
+			if err := (protojson.UnmarshalOptions{DiscardUnknown: true}).Unmarshal(row.Data, stored); err != nil {
 				return nil, connect.NewError(connect.CodeInternal, err)
 			}
 			record.Settings = stored
@@ -105,9 +104,6 @@ func (s *SettingsService) CreateSettings(
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("a project-scope key requires a domain"))
 	}
 
-	// Settings are stored as full protojson. Sparse storage (PruneInherited /
-	// Hydrate) is RFC #7775 task 2.1, a prerequisite of this handler that is
-	// not implemented yet.
 	data, err := protojson.Marshal(req.Msg.GetSettings())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
