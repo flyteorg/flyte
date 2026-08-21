@@ -118,3 +118,9 @@ func TestFromEventMessageSeverityIsCappedByTheTable(t *testing.T) {
 	require.NotNil(t, down)
 	assert.Equal(t, core.GpuFault_SEVERITY_WARN, down.GetSeverity())
 }
+
+func TestFromEventMessageUnknownSeverityFallsBackToTable(t *testing.T) {
+	got := FromEventMessage("[gpu-health] [CRITICAL] Xid 79 (GPU has fallen off the bus) on GPU 0. xid=79 severity=fatal gpu_index=0")
+	require.NotNil(t, got)
+	assert.Equal(t, core.GpuFault_SEVERITY_CRITICAL, got.GetSeverity())
+}

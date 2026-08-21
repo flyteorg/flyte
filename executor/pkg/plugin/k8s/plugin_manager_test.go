@@ -485,6 +485,39 @@ func TestClassifyGpuFailure(t *testing.T) {
 	}
 }
 
+func TestClassifyGpuFailureIdentity(t *testing.T) {
+	base := time.Now().Add(-time.Minute)
+	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
+	phase := pluginsCore.PhaseInfoRetryableFailure("UnknownError", "Pod failed", nil)
+
+	t.Run("an event without a regarding UID is not trusted", func(t *testing.T) {
+		watcher := &fakeEventWatcher{events: map[watchedObjectKey][]*eventInfo{
+			key: {gpuFaultEventFor(79, gpufault.SeverityCritical, base, base, "")},
+		}}
+		pm := NewPluginManager("test-plugin", nil, nil)
+		pm.eventWatcher = watcher
+		got := pm.classifyGpuFailure(failedPod(), phase)
+		assert.Nil(t, got.Err().GetGpuFault())
+		assert.Equal(t, "UnknownError", got.Err().GetCode())
+	})
+
+	t.Run("a pod whose UID is unknown is matched by name", func(t *testing.T) {
+		// The pod was deleted before this round saw it, so the identity object the
+		// manager builds carries no UID. The fault recorded against the pod name
+		// must still classify the failure.
+		watcher := &fakeEventWatcher{events: map[watchedObjectKey][]*eventInfo{
+			key: {gpuFaultEvent(79, gpufault.SeverityCritical, base)},
+		}}
+		pm := NewPluginManager("test-plugin", nil, nil)
+		pm.eventWatcher = watcher
+		pod := failedPod()
+		pod.UID = ""
+		got := pm.classifyGpuFailure(pod, phase)
+		assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
+		assert.NotNil(t, got.Err().GetGpuFault())
+	})
+}
+
 func TestClassifyGpuFailureSkips(t *testing.T) {
 	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
 	base := time.Date(2026, 8, 19, 10, 0, 0, 0, time.UTC)

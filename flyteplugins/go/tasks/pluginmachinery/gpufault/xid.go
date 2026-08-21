@@ -106,6 +106,8 @@ func ParseSeverity(s string) Severity {
 	case SeverityWarn:
 		return SeverityWarn
 	default:
-		return SeverityWarn
+		// Unknown labels are reported as such rather than guessed at, so that a
+		// consumer falls back to its own table instead of silently downgrading.
+		return ""
 	}
 }

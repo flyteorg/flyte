@@ -58,6 +58,10 @@ var genericCodes = map[string]bool{
 	"Unknown":      true,
 	"UnknownError": true,
 	"Error":        true,
+	// DemystifyFailure's verdict for a pod that was killed or vanished without the
+	// kubelet recording why. That is exactly the shape a hardware GPU fault leaves
+	// behind, so a recorded fault is the better name for it.
+	"Interrupted": true,
 }
 
 // exitCodeStyle matches a code that is only the container's exit status, for example
