@@ -803,8 +803,11 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Phase: common.ActionPhase_ACTION_PHASE_RUNNING,
 			},
 		}
-		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(parentStatusReq)); err != nil {
+		if resp, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(parentStatusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to promote parent action %s to RUNNING: %v", update.ParentActionName, err)
+		} else if code := resp.Msg.GetStatus().GetCode(); code != 0 {
+			logger.Warnf(ctx, "Run service rejected promoting parent action %s to RUNNING: code=%d message=%s",
+				update.ParentActionName, code, resp.Msg.GetStatus().GetMessage())
 		}
 	}
 
@@ -837,8 +840,11 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				}
 			}
 		}
-		if _, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
+		if resp, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
+		} else if code := resp.Msg.GetStatus().GetCode(); code != 0 {
+			logger.Warnf(ctx, "Run service rejected action status update for %s: code=%d message=%s",
+				update.ActionID.Name, code, resp.Msg.GetStatus().GetMessage())
 		} else if isTerminalPhase(update.Phase) && !update.IsDeleted {
 			// Skip label patching for deleted CRs — the patch would always fail
 			// with "not found" since the object is already gone.
