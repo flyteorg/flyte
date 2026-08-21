@@ -9,6 +9,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8stypes "k8s.io/apimachinery/pkg/types"
@@ -18,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/gpufault"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	pluginsUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
@@ -270,6 +272,7 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 			lastEventUpdate,
 			lastEventRecordedAt,
 		)
+		phaseInfo = pm.classifyGpuFailure(resource, phaseInfo)
 		transition.SetInfo(phaseInfo)
 	}
 
@@ -331,12 +334,7 @@ func (pm *PluginManager) attachRecentObjectEvents(
 		return phaseInfo, lastEventUpdate, lastEventRecordedAt
 	}
 
-	objectKey := watchedObjectKey{
-		Namespace: resource.GetNamespace(),
-		Name:      resource.GetName(),
-		Kind:      resource.GetObjectKind().GroupVersionKind().Kind,
-	}
-	recentEvents := pm.eventWatcher.List(objectKey, lastEventUpdate, lastEventRecordedAt)
+	recentEvents := pm.eventWatcher.List(objectKeyFor(resource), lastEventUpdate, lastEventRecordedAt)
 	if len(recentEvents) == 0 {
 		return phaseInfo, lastEventUpdate, lastEventRecordedAt
 	}
@@ -355,6 +353,107 @@ func (pm *PluginManager) attachRecentObjectEvents(
 	}
 
 	return phaseInfo, lastEventUpdate, lastEventRecordedAt
+}
+
+func objectKeyFor(resource client.Object) watchedObjectKey {
+	return watchedObjectKey{
+		Namespace: resource.GetNamespace(),
+		Name:      resource.GetName(),
+		Kind:      resource.GetObjectKind().GroupVersionKind().Kind,
+	}
+}
+
+// gpuFaultRelevanceWindow bounds how long before a failure a fault can still explain
+// it. Which pod a fault belongs to is settled by the UID when the pod's UID is known
+// (see classifyGpuFailure for the one case it is not); the window only separates the
+// fault that explains this failure from one the node saw much earlier. It is measured
+// from the failure's own time, not from when classification runs, so a slow reconcile
+// cannot age a fault out. Thirty minutes spans the slow paths between a fault and the
+// failure it causes: a container left wedged after a bus fault until the kubelet gives
+// up on it, and a node going NotReady with its pods evicted only after the
+// node-monitor grace period and eviction timeout.
+const gpuFaultRelevanceWindow = 30 * time.Minute
+
+// gpuFaultAfterFailureSlack is how far past the failure time a fault observation may
+// land and still count. The kernel line and the container's termination are stamped by
+// different processes on the same node and the daemon reads the kernel log with a small
+// lag, so a fault can be recorded moments after the failure it caused; anything much
+// later than that happened after the failure and cannot explain it.
+const gpuFaultAfterFailureSlack = 2 * time.Minute
+
+// classifyGpuFailure folds the GPU faults recorded against a failed attempt's pod into
+// the failure the plugin reported, so that a fault the node saw becomes the code and
+// the message the user reads. Anything that is not a failed pod is left alone.
+func (pm *PluginManager) classifyGpuFailure(
+	resource client.Object,
+	phaseInfo pluginsCore.PhaseInfo,
+) pluginsCore.PhaseInfo {
+	if pm.eventWatcher == nil || resource == nil || !phaseInfo.Phase().IsFailure() {
+		return phaseInfo
+	}
+	if _, isPod := resource.(*v1.Pod); !isPod {
+		return phaseInfo
+	}
+
+	// Every event cached for the pod, not only the ones since the last watermark: the
+	// Xid that killed the task is usually recorded rounds before the pod's status
+	// catches up with it, and by then the watermark has moved past it. What bounds the
+	// search is the identity and the recency of each event, checked below.
+	// The failure's own time anchors relevance. The pod plugin stamps it from the
+	// container's termination, which the kubelet recorded on the same node and clock
+	// as the fault events; when a plugin did not, the classification time stands in.
+	failureAt := time.Now()
+	if info := phaseInfo.Info(); info != nil && info.OccurredAt != nil && !info.OccurredAt.IsZero() {
+		failureAt = *info.OccurredAt
+	}
+
+	events := pm.eventWatcher.List(objectKeyFor(resource), time.Time{}, time.Time{})
+	if len(events) == 0 {
+		return phaseInfo
+	}
+
+	faults := make([]*core.GpuFault, 0, len(events))
+	for _, event := range events {
+		// Only events the GPU fault emitter wrote, recognized by their reason, are
+		// parsed; the message prefix alone is free text anyone can put in an event.
+		if event.Reason != gpufault.EventReasonXid && event.Reason != gpufault.EventReasonSXid {
+			continue
+		}
+		// Events are cached under the pod's namespace and name, which a recreated pod
+		// reuses, so the fault has to have been recorded against this very pod.
+		// Identity is the event's regarding UID against the pod's. An event without one
+		// is rejected: the API server does not fill that field, so its absence is a
+		// client that did not say which object it meant. The pod's own UID is unknown
+		// when the pod was deleted before this round reached it; the name match the
+		// cache is keyed on is then all there is, and it is used knowingly: a same-name
+		// replacement pod's faults could be credited here, a deliberate trade against
+		// losing every fault on the path where the hardware most clearly failed.
+		if event.RegardingUID == "" {
+			continue
+		}
+		if resource.GetUID() != "" && event.RegardingUID != resource.GetUID() {
+			continue
+		}
+		// A fault that keeps repeating is aggregated into one event, so its last
+		// observation is what says whether it is still going on; only the events with
+		// no observation time of their own fall back to when they were created. The
+		// observation is measured against the failure, not against now: the fault has
+		// to precede the failure by at most the window, and may follow it only by the
+		// slack, so a future-dated or later fault never explains an earlier failure.
+		observedAt := event.LastObservedAt
+		if observedAt.IsZero() {
+			observedAt = event.CreatedAt
+		}
+		if lead := failureAt.Sub(observedAt); lead > gpuFaultRelevanceWindow || lead < -gpuFaultAfterFailureSlack {
+			logger.Debugf(context.TODO(), "ignoring GPU fault event %q on %s: observed %s relative to the failure, outside the relevance window", event.Reason, objectKeyFor(resource).Name, (-lead).Round(time.Second))
+			continue
+		}
+		if fault := gpufault.FromEventMessage(event.Message); fault != nil {
+			faults = append(faults, fault)
+		}
+	}
+
+	return gpufault.ClassifyFailure(phaseInfo, faults)
 }
 
 // Abort implements pluginsCore.Plugin. Called when the task should be killed/aborted.
