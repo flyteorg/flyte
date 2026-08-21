@@ -108,12 +108,17 @@ func ClassifyFailure(phase pluginsCore.PhaseInfo, faults []*core.GpuFault) plugi
 
 	if fault, f, a := firstOfSeverity(faults, SeverityUser); fault != nil {
 		// A user Xid is the workload's own doing, for example an out-of-bounds access
-		// (Xid 31). The verdict the plugin reached stands; all this adds is a name for
-		// what went wrong, so that the user reads "GPU memory page fault" instead of a
-		// bare exit code.
+		// (Xid 31). When the plugin had a reason of its own (the container was OOM
+		// killed, the node shut down) that verdict stands and the fault only adds a
+		// name for what the GPU saw. When all the plugin could say is that the pod
+		// died, the fault is the explanation, and the error becomes the user's: a
+		// kernel that faults will fault again, so replaying it against the system
+		// retry budget would burn thirty attempts to reach the same answer. Whether
+		// the failure is retryable or permanent is still the plugin's call.
 		err := cloneExecutionError(phase.Err())
 		if isGenericCode(err.GetCode()) {
 			err.Code = CodeGpuXidError
+			err.Kind = core.ExecutionError_USER
 		}
 		err.Message = prependSentence(f, a, err.GetMessage())
 		err.GpuFault = fault

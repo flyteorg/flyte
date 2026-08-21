@@ -28,10 +28,13 @@
 // wants to land on different hardware.
 //
 // A user fault, such as Xid 31 (a GPU memory page fault from an out-of-bounds access),
-// leaves the plugin's verdict alone: same phase, same error kind, same retry budget.
-// It only names the failure, replacing a generic code such as UnknownError or a bare
-// exit status with CodeGpuXidError and putting the driver's sentence in front of the
-// message.
+// keeps the phase the plugin chose, retryable or permanent. If the plugin had a
+// reason of its own for the failure (OOMKilled, a node shutdown) the error keeps its
+// code and kind and the fault only adds the driver's sentence to the message. If the
+// plugin's code was generic, UnknownError, Interrupted or a bare exit status, the
+// fault is the explanation: the code becomes CodeGpuXidError and the kind becomes
+// USER, so a workload that faults its own GPU spends its own retries rather than the
+// platform's.
 //
 // A warning-only fault changes nothing at all beyond attaching the fault, so that the
 // console can show what the GPU reported while the task was running.

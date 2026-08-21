@@ -238,12 +238,20 @@ func TestClassifyFailureUser(t *testing.T) {
 			wantErrKind: core.ExecutionError_USER,
 		},
 		{
-			name:      "a system failure keeps its kind",
-			phase:     pluginsCore.PhaseInfoSystemRetryableFailure("Interrupted", "node shut down", nil),
+			name:      "a system failure with no reason of its own becomes the user's",
+			phase:     pluginsCore.PhaseInfoSystemRetryableFailure("Interrupted", "pod was killed", nil),
 			wantPhase: pluginsCore.PhaseRetryableFailure,
-			// Interrupted is the kubelet-left-no-reason verdict, so a recorded fault
-			// is the better name for it.
+			// Interrupted is the kubelet-left-no-reason verdict. A user fault is that
+			// reason, so the failure counts against the user's retries, not the
+			// platform's.
 			wantCode:    CodeGpuXidError,
+			wantErrKind: core.ExecutionError_USER,
+		},
+		{
+			name:        "a system failure with a reason of its own keeps its kind",
+			phase:       pluginsCore.PhaseInfoSystemRetryableFailure("NodeShutdown", "node shut down", nil),
+			wantPhase:   pluginsCore.PhaseRetryableFailure,
+			wantCode:    "NodeShutdown",
 			wantErrKind: core.ExecutionError_SYSTEM,
 		},
 	}
