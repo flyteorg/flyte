@@ -305,7 +305,7 @@ func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdent
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("action not found")
+			return nil, interfaces.ErrActionNotFound
 		}
 		return nil, fmt.Errorf("failed to get action: %w", err)
 	}

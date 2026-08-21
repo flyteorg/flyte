@@ -341,6 +341,12 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, nil
 	}
 
+	// A recovered action reuses a prior run's result and must never execute, so this comes
+	// before any per-type dispatch.
+	if taskAction.Spec.RecoveredFrom != nil {
+		return r.reconcileRecovered(ctx, taskAction, originalTaskActionInstance)
+	}
+
 	// Per-type dispatch. Conditions have no plugin and no pod; they reach
 	// terminal state via Signal or timeout, so they bypass the plugin path
 	// (including validateTaskAction, which requires taskType/taskTemplate).
@@ -689,14 +695,7 @@ func (r *TaskActionReconciler) buildActionEvent(
 	taskAction *flyteorgv1.TaskAction,
 	phaseInfo pluginsCore.PhaseInfo,
 ) *workflow.ActionEvent {
-	actionID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{
-			Project: taskAction.Spec.Project,
-			Domain:  taskAction.Spec.Domain,
-			Name:    taskAction.Spec.RunName,
-		},
-		Name: taskAction.Spec.ActionName,
-	}
+	actionID := actionIdentifierOf(taskAction)
 
 	info := phaseInfo.Info()
 	updatedTime := updatedTimestamp(taskAction.Status.PhaseHistory)
@@ -756,7 +755,7 @@ func outputRefs(ctx context.Context, taskAction *flyteorgv1.TaskAction) *task.Ou
 	}
 	base := strings.TrimRight(string(prefix), "/")
 	return &task.OutputReferences{
-		OutputUri: base + "/outputs.pb",
+		OutputUri: plugin.OutputsFileURI(base),
 		ReportUri: base + "/report.html",
 	}
 }
