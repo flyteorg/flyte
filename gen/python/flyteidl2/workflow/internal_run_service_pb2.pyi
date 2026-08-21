@@ -1,6 +1,8 @@
 from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import identity_pb2 as _identity_pb2
+from flyteidl2.common import phase_pb2 as _phase_pb2
+from flyteidl2.core import catalog_pb2 as _catalog_pb2
 from flyteidl2.core import literals_pb2 as _literals_pb2
 from flyteidl2.workflow import run_definition_pb2 as _run_definition_pb2
 from google.rpc import status_pb2 as _status_pb2
@@ -132,3 +134,23 @@ class RecordActionEventStreamResponse(_message.Message):
     response: RecordActionEventResponse
     nonce: int
     def __init__(self, response: _Optional[_Union[RecordActionEventResponse, _Mapping]] = ..., nonce: _Optional[int] = ...) -> None: ...
+
+class LookupActionRequest(_message.Message):
+    __slots__ = ["action_id"]
+    ACTION_ID_FIELD_NUMBER: _ClassVar[int]
+    action_id: _identifier_pb2.ActionIdentifier
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ...) -> None: ...
+
+class LookupActionResponse(_message.Message):
+    __slots__ = ["found", "phase", "attempts", "cache_status", "output_uri"]
+    FOUND_FIELD_NUMBER: _ClassVar[int]
+    PHASE_FIELD_NUMBER: _ClassVar[int]
+    ATTEMPTS_FIELD_NUMBER: _ClassVar[int]
+    CACHE_STATUS_FIELD_NUMBER: _ClassVar[int]
+    OUTPUT_URI_FIELD_NUMBER: _ClassVar[int]
+    found: bool
+    phase: _phase_pb2.ActionPhase
+    attempts: int
+    cache_status: _catalog_pb2.CatalogCacheStatus
+    output_uri: str
+    def __init__(self, found: bool = ..., phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., attempts: _Optional[int] = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., output_uri: _Optional[str] = ...) -> None: ...
