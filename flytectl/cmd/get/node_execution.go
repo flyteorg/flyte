@@ -3,6 +3,7 @@ package get
 import (
 	"context"
 	"fmt"
+	"math"
 	"sort"
 	"strconv"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 var nodeExecutionColumns = []printer.Column{
@@ -259,7 +261,55 @@ func extractLiteralMap(literalMap *core.LiteralMap) (map[string]interface{}, err
 		if err != nil {
 			return nil, err
 		}
-		m[key] = extractedLiteralVal
+		m[key] = jsonSafe(extractedLiteralVal)
 	}
 	return m, nil
+}
+
+// jsonSafe replaces the non-finite floats an extracted literal can hold with
+// nil. A task may legitimately output one (a metric that came out NaN, say),
+// and encoding/json refuses them, so without this the whole detailed view -
+// every node of the execution, in every output format - fails to print.
+func jsonSafe(value interface{}) interface{} {
+	switch typedValue := value.(type) {
+	case float64:
+		if math.IsNaN(typedValue) || math.IsInf(typedValue, 0) {
+			return nil
+		}
+	case float32:
+		if math.IsNaN(float64(typedValue)) || math.IsInf(float64(typedValue), 0) {
+			return nil
+		}
+	case map[string]interface{}:
+		for key, item := range typedValue {
+			typedValue[key] = jsonSafe(item)
+		}
+	case []interface{}:
+		for index, item := range typedValue {
+			typedValue[index] = jsonSafe(item)
+		}
+	case *structpb.Struct:
+		for _, field := range typedValue.GetFields() {
+			jsonSafeStructValue(field)
+		}
+	}
+	return value
+}
+
+// jsonSafeStructValue nulls out the same floats inside a generic literal.
+func jsonSafeStructValue(value *structpb.Value) {
+	switch kind := value.GetKind().(type) {
+	case *structpb.Value_NumberValue:
+		if math.IsNaN(kind.NumberValue) || math.IsInf(kind.NumberValue, 0) {
+			value.Kind = &structpb.Value_NullValue{}
+		}
+	case *structpb.Value_StructValue:
+		for _, field := range kind.StructValue.GetFields() {
+			jsonSafeStructValue(field)
+		}
+	case *structpb.Value_ListValue:
+		for _, item := range kind.ListValue.GetValues() {
+			jsonSafeStructValue(item)
+		}
+	}
 }
