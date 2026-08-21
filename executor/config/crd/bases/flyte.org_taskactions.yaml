@@ -128,6 +128,50 @@ spec:
                 maxLength: 63
                 minLength: 1
                 type: string
+              recoveredFrom:
+                description: |-
+                  RecoveredFrom marks this action as recovered from a prior run's result. It is carried on
+                  the spec rather than the status because status is a subresource that Create drops, and a
+                  single Create is what keeps the reconciler from starting the task before it is marked.
+                properties:
+                  attempts:
+                    description: Attempts the source action took.
+                    format: int32
+                    type: integer
+                  cacheStatus:
+                    description: CacheStatus is the core.CatalogCacheStatus the source
+                      action reported.
+                    format: int32
+                    type: integer
+                  outputUri:
+                    description: |-
+                      OutputUri is where the source action's outputs live. Consumed as-is; never recomputed
+                      from this run's output base.
+                    type: string
+                  sourceRunName:
+                    description: SourceRunName is the run the result came from.
+                    maxLength: 30
+                    minLength: 1
+                    type: string
+                required:
+                - sourceRunName
+                type: object
+              recoveryContext:
+                description: |-
+                  RecoveryContext is the run-scoped input to the recovery decision, stamped on the root
+                  from RunSpec and inherited by every descendant.
+                properties:
+                  forceRerunActions:
+                    description: ForceRerunActions mirrors RunSpec.recover.force_rerun_actions.
+                    items:
+                      type: string
+                    type: array
+                  relation:
+                    description: Relation is the proto-serialized common.Relation
+                      naming the run being recovered.
+                    format: byte
+                    type: string
+                type: object
               runName:
                 description: RunName is the name of the run this action belongs to
                 maxLength: 30

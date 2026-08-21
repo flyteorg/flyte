@@ -222,6 +222,11 @@ func (r *recordingRunClient) RecordActionEvents(_ context.Context, _ *connect.Re
 	return connect.NewResponse(&workflow.RecordActionEventsResponse{}), nil
 }
 
+// No run under test is a recovery, so every lookup is a miss.
+func (r *recordingRunClient) LookupAction(_ context.Context, _ *connect.Request[workflow.LookupActionRequest]) (*connect.Response[workflow.LookupActionResponse], error) {
+	return connect.NewResponse(&workflow.LookupActionResponse{Found: false}), nil
+}
+
 func (r *recordingRunClient) RecordActionStream(_ context.Context) *connect.BidiStreamForClient[workflow.RecordActionStreamRequest, workflow.RecordActionStreamResponse] {
 	panic("not used in tests")
 }

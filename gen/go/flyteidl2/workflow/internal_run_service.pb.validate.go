@@ -17,6 +17,10 @@ import (
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/types/known/anypb"
+
+	common "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+
+	core "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 // ensure the imports are used
@@ -33,6 +37,10 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = common.ActionPhase(0)
+
+	_ = core.CatalogCacheStatus(0)
 )
 
 // Validate checks the field values on RecordActionRequest with the rules
@@ -2238,3 +2246,246 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RecordActionEventStreamResponseValidationError{}
+
+// Validate checks the field values on LookupActionRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *LookupActionRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LookupActionRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LookupActionRequestMultiError, or nil if none found.
+func (m *LookupActionRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LookupActionRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetActionId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LookupActionRequestValidationError{
+					field:  "ActionId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LookupActionRequestValidationError{
+					field:  "ActionId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetActionId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LookupActionRequestValidationError{
+				field:  "ActionId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LookupActionRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// LookupActionRequestMultiError is an error wrapping multiple validation
+// errors returned by LookupActionRequest.ValidateAll() if the designated
+// constraints aren't met.
+type LookupActionRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LookupActionRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LookupActionRequestMultiError) AllErrors() []error { return m }
+
+// LookupActionRequestValidationError is the validation error returned by
+// LookupActionRequest.Validate if the designated constraints aren't met.
+type LookupActionRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LookupActionRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LookupActionRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LookupActionRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LookupActionRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LookupActionRequestValidationError) ErrorName() string {
+	return "LookupActionRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LookupActionRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLookupActionRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LookupActionRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LookupActionRequestValidationError{}
+
+// Validate checks the field values on LookupActionResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *LookupActionResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LookupActionResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LookupActionResponseMultiError, or nil if none found.
+func (m *LookupActionResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LookupActionResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Found
+
+	// no validation rules for Phase
+
+	// no validation rules for Attempts
+
+	// no validation rules for CacheStatus
+
+	// no validation rules for OutputUri
+
+	if len(errors) > 0 {
+		return LookupActionResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// LookupActionResponseMultiError is an error wrapping multiple validation
+// errors returned by LookupActionResponse.ValidateAll() if the designated
+// constraints aren't met.
+type LookupActionResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LookupActionResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LookupActionResponseMultiError) AllErrors() []error { return m }
+
+// LookupActionResponseValidationError is the validation error returned by
+// LookupActionResponse.Validate if the designated constraints aren't met.
+type LookupActionResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LookupActionResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LookupActionResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LookupActionResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LookupActionResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LookupActionResponseValidationError) ErrorName() string {
+	return "LookupActionResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LookupActionResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLookupActionResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LookupActionResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LookupActionResponseValidationError{}

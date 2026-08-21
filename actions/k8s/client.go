@@ -63,7 +63,8 @@ type ActionsClient struct {
 	bufferSize int
 	runClient  workflowconnect.InternalRunServiceClient
 	// recordedFilter deduplicates RecordAction calls across watch reconnects.
-	recordedFilter fastcheck.Filter
+	recordedFilter  fastcheck.Filter
+	recoveryMetrics *recoveryMetrics
 
 	// Watch management
 	mu sync.RWMutex
@@ -119,6 +120,7 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, n
 		return nil, fmt.Errorf("actions: failed to create RecordAction dedup filter (size=%d): %w", recordFilterSize, err)
 	}
 	c.recordedFilter = filter
+	c.recoveryMetrics = newRecoveryMetrics(scope)
 
 	return c, nil
 }
@@ -138,17 +140,8 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 			return fmt.Errorf("failed to ensure namespace %s: %w", c.namespace, err)
 		}
 		taskAction := c.newTaskActionCR(actionID, executorv1.ActionTypeTask, isRoot)
-		// Set OwnerReference to parent so K8s cascades deletion to children.
-		if !isRoot {
-			parentTaskAction, err := c.setParentOwnership(ctx, taskAction, actionID.Run, *action.ParentActionName)
-			if err != nil {
-				return err
-			}
-			// For child actions, inherit parent's run context
-			inheritRunContextFromParentTaskAction(taskAction, parentTaskAction)
-		} else {
-			// For root action, apply the RunSpec to TaskAction
-			applyRunSpecToTaskAction(taskAction, runSpec)
+		if err := c.applyRunContext(ctx, taskAction, action, runSpec, isRoot); err != nil {
+			return err
 		}
 
 		// Build and set the ActionSpec for the executor.
@@ -157,6 +150,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 			return fmt.Errorf("failed to set action spec: %w", err)
 		}
 		taskAction.Spec.CacheKey = extractTaskCacheKey(action)
+		taskAction.Spec.RecoveredFrom = c.resolveRecoveredFrom(ctx, taskAction, action, isRoot)
 
 		// Embed the inline TaskTemplate if present.
 		if err := embedTaskTemplate(action, taskAction, runSpec); err != nil {
@@ -179,10 +173,8 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 			return fmt.Errorf("failed to ensure namespace %s: %w", c.namespace, err)
 		}
 		taskAction := c.newTaskActionCR(actionID, executorv1.ActionTypeCondition, isRoot)
-		if !isRoot {
-			if _, err := c.setParentOwnership(ctx, taskAction, actionID.Run, *action.ParentActionName); err != nil {
-				return err
-			}
+		if err := c.applyRunContext(ctx, taskAction, action, runSpec, isRoot); err != nil {
+			return err
 		}
 
 		actionSpec := buildActionSpec(action, runSpec)
@@ -190,6 +182,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 			return fmt.Errorf("failed to set action spec: %w", err)
 		}
 		taskAction.Spec.ActionType = executorv1.ActionTypeCondition
+		taskAction.Spec.RecoveredFrom = c.resolveRecoveredFrom(ctx, taskAction, action, isRoot)
 		condBytes, err := proto.Marshal(cond)
 		if err != nil {
 			return fmt.Errorf("failed to marshal condition spec: %w", err)
@@ -872,6 +865,9 @@ func GetPhaseFromConditions(taskAction *executorv1.TaskAction) common.ActionPhas
 		switch cond.Type {
 		case string(executorv1.ConditionTypeSucceeded):
 			if cond.Status == "True" {
+				if cond.Reason == string(executorv1.ConditionReasonRecovered) {
+					return common.ActionPhase_ACTION_PHASE_RECOVERED
+				}
 				return common.ActionPhase_ACTION_PHASE_SUCCEEDED
 			}
 		case string(executorv1.ConditionTypeFailed):
@@ -1001,6 +997,11 @@ func buildTaskActionName(actionID *common.ActionIdentifier) string {
 // It uses the same path structure as the executor's ComputeActionOutputPath so that
 // the SDK can find outputs written by the executor.
 func BuildOutputUri(ctx context.Context, ta *executorv1.TaskAction) string {
+	// A recovered action wrote nothing under this run's base; its result is the source run's.
+	// RecoveredFrom carries the outputs file, this returns the directory the SDK joins onto.
+	if ta.Spec.RecoveredFrom != nil {
+		return plugin.OutputPrefixOf(ta.Spec.RecoveredFrom.OutputUri)
+	}
 	if ta.Spec.RunOutputBase == "" {
 		return ""
 	}
@@ -1043,12 +1044,56 @@ func buildActionSpec(action *actions.Action, runSpec *task.RunSpec) *workflow.Ac
 	return actionSpec
 }
 
-func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.RunSpec) {
+// applyRunContext sets the OwnerReference on the parent and applies the run context reaching
+// this action: from the RunSpec for the root, from the parent CR for everything else.
+func (c *ActionsClient) applyRunContext(
+	ctx context.Context,
+	taskAction *executorv1.TaskAction,
+	action *actions.Action,
+	runSpec *task.RunSpec,
+	isRoot bool,
+) error {
+	if isRoot {
+		return applyRunSpecToTaskAction(taskAction, runSpec)
+	}
+	parentTaskAction, err := c.setParentOwnership(ctx, taskAction, action.ActionId.Run, *action.ParentActionName)
+	if err != nil {
+		return err
+	}
+	// child actions inherit run context from parent
+	inheritRunContextFromParentTaskAction(taskAction, parentTaskAction)
+	return nil
+}
+
+// recoveryContextFromRunSpec returns nil for any run that is not a recovery.
+func recoveryContextFromRunSpec(runSpec *task.RunSpec) (*executorv1.RecoveryContext, error) {
+	relation := runSpec.GetRelation()
+	if relation.GetRelationType() != common.RelationType_RELATION_TYPE_RECOVER {
+		return nil, nil
+	}
+	relationBytes, err := proto.Marshal(relation)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal recovery relation: %w", err)
+	}
+	return &executorv1.RecoveryContext{
+		Relation:          relationBytes,
+		ForceRerunActions: runSpec.GetRecover().GetForceRerunActions(),
+	}, nil
+}
+
+func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.RunSpec) error {
 	if runSpec == nil {
 		taskAction.Spec.EnvVars = nil
 		taskAction.Spec.Interruptible = nil
-		return
+		taskAction.Spec.RecoveryContext = nil
+		return nil
 	}
+
+	recoveryContext, err := recoveryContextFromRunSpec(runSpec)
+	if err != nil {
+		return err
+	}
+	taskAction.Spec.RecoveryContext = recoveryContext
 
 	taskAction.Spec.EnvVars = keyValuePairsToMap(runSpec.GetEnvs().GetValues())
 	if runSpec.GetInterruptible() != nil {
@@ -1072,12 +1117,15 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 			taskAction.Annotations[key] = value
 		}
 	}
+
+	return nil
 }
 
 func inheritRunContextFromParentTaskAction(taskAction *executorv1.TaskAction, parentTaskAction *executorv1.TaskAction) {
 	if taskAction == nil || parentTaskAction == nil {
 		return
 	}
+	taskAction.Spec.RecoveryContext = parentTaskAction.Spec.RecoveryContext.DeepCopy()
 	taskAction.Spec.EnvVars = cloneStringMap(parentTaskAction.Spec.EnvVars)
 	if len(parentTaskAction.Annotations) > 0 {
 		if taskAction.Annotations == nil {

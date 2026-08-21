@@ -276,6 +276,16 @@ func (s *RunService) CreateRun(
 	}
 	request.RunSpec = runSpec
 
+	// Check if this is a recovery run and validate it if yes
+	if runSpec.GetRelation().GetRelationType() == common.RelationType_RELATION_TYPE_RECOVER {
+		if err := s.validateRecovery(ctx, runId, runSpec); err != nil {
+			return nil, err
+		}
+	} else if runSpec.GetRecover() != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument,
+			fmt.Errorf("run_spec.recover is only valid with relation_type RELATION_TYPE_RECOVER"))
+	}
+
 	// Stamp the run start time, but only for SDKs that understand it (>= 2.3.6) — older task
 	// templates have no {{.runStartTime}} placeholder, so leaving it unset keeps the executor from
 	// substituting anything. The scheduler sets CreateRunRequest.run_start_time to a trigger's
