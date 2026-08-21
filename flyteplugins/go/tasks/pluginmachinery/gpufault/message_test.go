@@ -186,3 +186,11 @@ func TestFormatEventMessageSanitizesProcessName(t *testing.T) {
 	require.True(t, ok)
 	assert.Equal(t, "my_train_job", parsed.Process)
 }
+
+func TestParseEventMessageToleratesAggregatedPrefix(t *testing.T) {
+	msg := "(combined from similar events): [gpu-health] [CRITICAL] Xid 79 (GPU has fallen off the bus) on GPU 0 GPU-abc. xid=79 severity=critical gpu_uuid=GPU-abc gpu_index=0 pci=0000:3b:00.0 node=n1"
+	f, a, ok := ParseEventMessage(msg)
+	require.True(t, ok)
+	assert.Equal(t, 79, f.Code)
+	assert.Equal(t, "GPU-abc", a.GPUUUID)
+}

@@ -370,7 +370,7 @@ func objectKeyFor(resource client.Object) watchedObjectKey {
 // same pod. Which pod a fault belongs to is settled by the UID, not by this window; ten
 // minutes only covers the gap between a fault and the pod status catching up with it, so
 // that a fault the node saw much earlier does not explain an unrelated later failure.
-const gpuFaultRelevanceWindow = 10 * time.Minute
+const gpuFaultRelevanceWindow = 30 * time.Minute
 
 func (pm *PluginManager) classifyGpuFailure(
 	resource client.Object,
@@ -403,7 +403,15 @@ func (pm *PluginManager) classifyGpuFailure(
 		// reuses, so the fault has to have been recorded against this very pod. Entries
 		// cached before the watcher tracked the UID carry none, and are taken as they
 		// were before, on the name they were cached under.
-		if event.RegardingUID != "" && event.RegardingUID != resource.GetUID() {
+		// Identity is the event's regarding UID against the pod's. An event without
+		// one is rejected: the API server does not fill that field, so its absence
+		// is a client that did not say which object it meant, not a legacy entry.
+		// The pod side can be unknown when the pod was deleted before this round
+		// reached it; then the name match the cache is keyed on has to do.
+		if event.RegardingUID == "" {
+			continue
+		}
+		if resource.GetUID() != "" && event.RegardingUID != resource.GetUID() {
 			continue
 		}
 		// A fault that keeps repeating is aggregated into one event, so its last
@@ -413,7 +421,8 @@ func (pm *PluginManager) classifyGpuFailure(
 		if observedAt.IsZero() {
 			observedAt = event.CreatedAt
 		}
-		if time.Since(observedAt) > gpuFaultRelevanceWindow {
+		if age := time.Since(observedAt); age > gpuFaultRelevanceWindow {
+			logger.Debugf(context.TODO(), "ignoring GPU fault event %q on %s: last observed %s ago, outside the relevance window", event.Reason, objectKeyFor(resource).Name, age.Round(time.Second))
 			continue
 		}
 		if fault := gpufault.FromEventMessage(event.Message); fault != nil {

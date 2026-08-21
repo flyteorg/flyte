@@ -54,8 +54,8 @@ func TestParseSeverity(t *testing.T) {
 		{in: "user", want: SeverityUser},
 		{in: "warn", want: SeverityWarn},
 		{in: "critical", want: SeverityCritical},
-		{in: "something-new", want: SeverityWarn},
-		{in: "", want: SeverityWarn},
+		{in: "something-new", want: ""},
+		{in: "", want: ""},
 	}
 
 	for _, tt := range tests {

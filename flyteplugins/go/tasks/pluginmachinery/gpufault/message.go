@@ -117,8 +117,13 @@ func gpuPhrase(f Fault, a Attribution) string {
 // that is not one of ours, which is how consumers tell a GPU fault event apart from
 // every other event recorded on the same pod.
 func ParseEventMessage(msg string) (Fault, Attribution, bool) {
-	if !strings.HasPrefix(msg, MessagePrefix) {
+	// The recorder's aggregator rewrites a note to "(combined from similar events):
+	// <note>" once enough distinct messages share an aggregate key, so the contract
+	// prefix is located rather than required at offset zero.
+	if at := strings.Index(msg, MessagePrefix); at < 0 {
 		return Fault{}, Attribution{}, false
+	} else {
+		msg = msg[at:]
 	}
 
 	kind := KindXid
@@ -157,7 +162,9 @@ func ParseEventMessage(msg string) (Fault, Attribution, bool) {
 		Process:  fields[keyProcess],
 	}
 	if sev, ok := fields[keySeverity]; ok {
-		fault.Severity = ParseSeverity(sev)
+		if parsed := ParseSeverity(sev); parsed != "" {
+			fault.Severity = parsed
+		}
 	}
 	if pid, err := strconv.Atoi(fields[keyPID]); err == nil {
 		fault.PID = pid

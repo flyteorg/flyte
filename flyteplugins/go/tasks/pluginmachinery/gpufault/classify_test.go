@@ -68,7 +68,7 @@ func TestIsGenericCode(t *testing.T) {
 		{code: "ExitCode1", want: true},
 		{code: "exit-code-137", want: true},
 		{code: "OOMKilled", want: false},
-		{code: "Interrupted", want: false},
+		{code: "Interrupted", want: true},
 		{code: "PrimaryContainerNotFound", want: false},
 	}
 
@@ -238,10 +238,12 @@ func TestClassifyFailureUser(t *testing.T) {
 			wantErrKind: core.ExecutionError_USER,
 		},
 		{
-			name:        "a system failure keeps its kind",
-			phase:       pluginsCore.PhaseInfoSystemRetryableFailure("Interrupted", "node shut down", nil),
-			wantPhase:   pluginsCore.PhaseRetryableFailure,
-			wantCode:    "Interrupted",
+			name:      "a system failure keeps its kind",
+			phase:     pluginsCore.PhaseInfoSystemRetryableFailure("Interrupted", "node shut down", nil),
+			wantPhase: pluginsCore.PhaseRetryableFailure,
+			// Interrupted is the kubelet-left-no-reason verdict, so a recorded fault
+			// is the better name for it.
+			wantCode:    CodeGpuXidError,
 			wantErrKind: core.ExecutionError_SYSTEM,
 		},
 	}
