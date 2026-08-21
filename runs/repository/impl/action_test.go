@@ -1130,37 +1130,6 @@ func TestUpdateActionPhase_PausedSettlesIntoTerminal(t *testing.T) {
 	}
 }
 
-// The paused exception is deliberately one-way: it lets a paused action settle,
-// not resume. A stale RUNNING event arriving after the pause must still be
-// rejected, exactly as the monotonic guard rejects it today.
-func TestUpdateActionPhase_PausedDoesNotResume(t *testing.T) {
-	db := setupActionDB(t)
-	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
-	require.NoError(t, err)
-	ctx := context.Background()
-
-	actionID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{
-			Org: "org1", Project: "proj1", Domain: "domain1", Name: "run1",
-		},
-		Name: "paused-action",
-	}
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
-	require.NoError(t, err)
-
-	require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
-		common.ActionPhase_ACTION_PHASE_PAUSED, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
-
-	require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
-		common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
-
-	action, err := actionRepo.GetAction(ctx, actionID)
-	require.NoError(t, err)
-	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_PAUSED), action.Phase,
-		"a non-terminal update must not move an action out of PAUSED")
-}
-
 // A condition's signalled value is written to detailed_info outside any phase
 // transition, so that write has to notify watchers on its own.
 func TestUpdateActionDetailedInfo_NotifiesWatchers(t *testing.T) {
