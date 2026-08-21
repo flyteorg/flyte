@@ -237,7 +237,7 @@ class EnrichedAction(_message.Message):
     def __init__(self, action: _Optional[_Union[Action, _Mapping]] = ..., meets_filter: bool = ..., children_phase_counts: _Optional[_Mapping[int, int]] = ...) -> None: ...
 
 class ErrorInfo(_message.Message):
-    __slots__ = ["message", "kind"]
+    __slots__ = ["message", "kind", "code", "gpu_fault"]
     class Kind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         KIND_UNSPECIFIED: _ClassVar[ErrorInfo.Kind]
@@ -248,9 +248,13 @@ class ErrorInfo(_message.Message):
     KIND_SYSTEM: ErrorInfo.Kind
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
     KIND_FIELD_NUMBER: _ClassVar[int]
+    CODE_FIELD_NUMBER: _ClassVar[int]
+    GPU_FAULT_FIELD_NUMBER: _ClassVar[int]
     message: str
     kind: ErrorInfo.Kind
-    def __init__(self, message: _Optional[str] = ..., kind: _Optional[_Union[ErrorInfo.Kind, str]] = ...) -> None: ...
+    code: str
+    gpu_fault: _execution_pb2.GpuFault
+    def __init__(self, message: _Optional[str] = ..., kind: _Optional[_Union[ErrorInfo.Kind, str]] = ..., code: _Optional[str] = ..., gpu_fault: _Optional[_Union[_execution_pb2.GpuFault, _Mapping]] = ...) -> None: ...
 
 class AbortInfo(_message.Message):
     __slots__ = ["reason", "aborted_by"]
@@ -325,7 +329,7 @@ class ActionAttempt(_message.Message):
     def __init__(self, phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., error_info: _Optional[_Union[ErrorInfo, _Mapping]] = ..., attempt: _Optional[int] = ..., log_info: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., outputs: _Optional[_Union[_common_pb2.OutputReferences, _Mapping]] = ..., logs_available: bool = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., cluster_events: _Optional[_Iterable[_Union[ClusterEvent, _Mapping]]] = ..., phase_transitions: _Optional[_Iterable[_Union[PhaseTransition, _Mapping]]] = ..., cluster: _Optional[str] = ..., log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ..., cache_metadata: _Optional[_Union[_cache_pb2.CacheMetadata, _Mapping]] = ...) -> None: ...
 
 class ClusterEvent(_message.Message):
-    __slots__ = ["occurred_at", "message", "type", "reason", "source_component", "count"]
+    __slots__ = ["occurred_at", "message", "type", "reason", "source_component", "count", "gpu_fault"]
     class Type(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         TYPE_UNSPECIFIED: _ClassVar[ClusterEvent.Type]
@@ -340,13 +344,15 @@ class ClusterEvent(_message.Message):
     REASON_FIELD_NUMBER: _ClassVar[int]
     SOURCE_COMPONENT_FIELD_NUMBER: _ClassVar[int]
     COUNT_FIELD_NUMBER: _ClassVar[int]
+    GPU_FAULT_FIELD_NUMBER: _ClassVar[int]
     occurred_at: _timestamp_pb2.Timestamp
     message: str
     type: ClusterEvent.Type
     reason: str
     source_component: str
     count: int
-    def __init__(self, occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., message: _Optional[str] = ..., type: _Optional[_Union[ClusterEvent.Type, str]] = ..., reason: _Optional[str] = ..., source_component: _Optional[str] = ..., count: _Optional[int] = ...) -> None: ...
+    gpu_fault: _execution_pb2.GpuFault
+    def __init__(self, occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., message: _Optional[str] = ..., type: _Optional[_Union[ClusterEvent.Type, str]] = ..., reason: _Optional[str] = ..., source_component: _Optional[str] = ..., count: _Optional[int] = ..., gpu_fault: _Optional[_Union[_execution_pb2.GpuFault, _Mapping]] = ...) -> None: ...
 
 class PhaseTransition(_message.Message):
     __slots__ = ["phase", "start_time", "end_time"]
