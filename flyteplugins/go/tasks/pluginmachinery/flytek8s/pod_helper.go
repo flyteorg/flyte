@@ -40,6 +40,16 @@ const SIGKILL = 137
 // unsignedSIGKILL = 256 - 9
 const unsignedSIGKILL = 247
 
+// ContainerFailed is reported when the task's container exited with a non-zero status of its own
+// accord and the container runtime gave no more specific reason.
+const ContainerFailed = "ContainerFailed"
+
+// maxUserExitCode is the highest exit status attributable to the application itself. A process
+// killed by signal N is reported as 128+N, so the band above 127 means something terminated the
+// process rather than the process choosing to fail. Graceful eviction, drain and preemption all
+// send SIGTERM first, which surfaces as 143.
+const maxUserExitCode = 127
+
 const defaultContainerTemplateName = "default"
 const defaultInitContainerTemplateName = "default-init"
 const primaryContainerTemplateName = "primary"
@@ -1600,6 +1610,21 @@ func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore
 					containerState.Terminated.ExitCode,
 					containerState.Terminated.Reason,
 					containerState.Terminated.Message)
+			}
+		}
+	}
+
+	// A container that exited non-zero on its own is the application reporting failure, not the
+	// missing kubelet record the fallback below assumes. Only main containers are considered: the
+	// co-pilot runs as init containers. When a pod has exactly one main container, that
+	// container's exit status is taken as the task's result.
+	if code == "UnknownError" && len(status.ContainerStatuses) == 1 {
+		if t := status.ContainerStatuses[0].State.Terminated; t != nil &&
+			t.ExitCode > 0 && t.ExitCode <= maxUserExitCode {
+			if t.Reason != "" {
+				code = t.Reason
+			} else {
+				code = ContainerFailed
 			}
 		}
 	}
