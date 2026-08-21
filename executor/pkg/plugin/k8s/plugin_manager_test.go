@@ -485,6 +485,35 @@ func TestClassifyGpuFailure(t *testing.T) {
 	}
 }
 
+func TestClassifyGpuFailureRelevanceIsAnchoredOnTheFailure(t *testing.T) {
+	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
+	failedAt := time.Now().Add(-2 * time.Hour)
+	phase := pluginsCore.PhaseInfoRetryableFailure("UnknownError", "Pod failed", &pluginsCore.TaskInfo{OccurredAt: &failedAt})
+
+	t.Run("a fault just before an old failure still classifies a late reconcile", func(t *testing.T) {
+		observed := failedAt.Add(-5 * time.Minute)
+		watcher := &fakeEventWatcher{events: map[watchedObjectKey][]*eventInfo{
+			key: {gpuFaultEventFor(79, gpufault.SeverityCritical, observed, observed, testPodUID)},
+		}}
+		pm := NewPluginManager("test-plugin", nil, nil)
+		pm.eventWatcher = watcher
+		got := pm.classifyGpuFailure(failedPod(), phase)
+		assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
+	})
+
+	t.Run("a fault observed well after the failure does not explain it", func(t *testing.T) {
+		observed := failedAt.Add(10 * time.Minute)
+		watcher := &fakeEventWatcher{events: map[watchedObjectKey][]*eventInfo{
+			key: {gpuFaultEventFor(79, gpufault.SeverityCritical, observed, observed, testPodUID)},
+		}}
+		pm := NewPluginManager("test-plugin", nil, nil)
+		pm.eventWatcher = watcher
+		got := pm.classifyGpuFailure(failedPod(), phase)
+		assert.Equal(t, "UnknownError", got.Err().GetCode())
+		assert.Nil(t, got.Err().GetGpuFault())
+	})
+}
+
 func TestClassifyGpuFailureIdentity(t *testing.T) {
 	base := time.Now().Add(-time.Minute)
 	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
