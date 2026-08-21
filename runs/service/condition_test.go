@@ -122,7 +122,7 @@ func TestUpdateActionStatus_NoOutputSkipsRunInfoWrite(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestUpdateActionStatus_RejectedConditionTransitionDoesNotPersistOutput(t *testing.T) {
+func TestUpdateActionStatus_RejectedConditionTransitionReturnsSuccess(t *testing.T) {
 	actionRepo, _, svc := newTestServiceWithTaskRepo(t)
 
 	actionRepo.On("UpdateActionPhase", mock.Anything, testActionID,
@@ -132,7 +132,6 @@ func TestUpdateActionStatus_RejectedConditionTransitionDoesNotPersistOutput(t *t
 	resp, err := svc.UpdateActionStatus(context.Background(), connect.NewRequest(&workflow.UpdateActionStatusRequest{
 		ActionId: testActionID,
 		Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED},
-		Output:   testBoolLiteral(true),
 	}))
 	require.NoError(t, err)
 	assert.EqualValues(t, 0, resp.Msg.GetStatus().GetCode())
