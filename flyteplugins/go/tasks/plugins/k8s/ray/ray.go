@@ -371,6 +371,22 @@ func injectLogsSidecar(primaryContainer *v1.Container, podSpec *v1.PodSpec) {
 	podSpec.Containers = append(podSpec.Containers, *sidecar)
 }
 
+// logNoiseDisablingEnvVars turns off Ray's terminal-oriented log decorations (ANSI-colored log
+// prefixes and Ray Data progress bars), which are unreadable once collected from a non-interactive
+// pod. Shared by the head and worker builders to keep the two in sync.
+func logNoiseDisablingEnvVars() []v1.EnvVar {
+	return []v1.EnvVar{
+		{
+			Name:  "RAY_COLOR_PREFIX",
+			Value: "0",
+		},
+		{
+			Name:  "RAY_DATA_DISABLE_PROGRESS_BARS",
+			Value: "1",
+		},
+	}
+}
+
 func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.HeadGroupSpec) (v1.PodTemplateSpec, error) {
 	// Some configs are copy from  https://github.com/ray-project/kuberay/blob/b72e6bdcd9b8c77a9dc6b5da8560910f3a0c3ffd/apiserver/pkg/util/cluster.go#L97
 	// They should always be the same, so we could hard code here.
@@ -386,6 +402,7 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 			},
 		},
 	}
+	envs = append(envs, logNoiseDisablingEnvVars()...)
 
 	primaryContainer.Args = []string{}
 
@@ -512,6 +529,7 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 			},
 		},
 	}
+	envs = append(envs, logNoiseDisablingEnvVars()...)
 
 	primaryContainer.Env = append(primaryContainer.Env, envs...)
 
