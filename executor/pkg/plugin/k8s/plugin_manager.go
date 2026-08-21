@@ -363,15 +363,17 @@ func objectKeyFor(resource client.Object) watchedObjectKey {
 	}
 }
 
+// gpuFaultRelevanceWindow bounds how long a fault stays relevant to a new failure on the
+// same pod. Which pod a fault belongs to is settled by the UID, not by this window; the
+// window only separates the fault that explains this failure from one the node saw
+// much earlier. Thirty minutes spans the slow paths between the two: a container left
+// wedged after a bus fault until the kubelet gives up on it, and a node going NotReady
+// with its pods evicted only after the node-monitor grace period and eviction timeout.
+const gpuFaultRelevanceWindow = 30 * time.Minute
+
 // classifyGpuFailure folds the GPU faults recorded against a failed attempt's pod into
 // the failure the plugin reported, so that a fault the node saw becomes the code and
 // the message the user reads. Anything that is not a failed pod is left alone.
-// gpuFaultRelevanceWindow bounds how long a fault stays relevant to a new failure on the
-// same pod. Which pod a fault belongs to is settled by the UID, not by this window; ten
-// minutes only covers the gap between a fault and the pod status catching up with it, so
-// that a fault the node saw much earlier does not explain an unrelated later failure.
-const gpuFaultRelevanceWindow = 30 * time.Minute
-
 func (pm *PluginManager) classifyGpuFailure(
 	resource client.Object,
 	phaseInfo pluginsCore.PhaseInfo,
