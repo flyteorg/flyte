@@ -645,12 +645,6 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		if resp, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
 		} else if code := resp.Msg.GetStatus().GetCode(); code != 0 {
-			// UpdateActionStatus never returns a transport error for an in-band
-			// rejection (e.g. a DB failure) — the run service reports it via
-			// resp.Status instead. Without this check, a rejected terminal
-			// update still gets marked terminal-status-recorded below, and the
-			// action is stuck in a non-terminal phase with no visible error
-			// and no further retries.
 			logger.Warnf(ctx, "Run service rejected action status update for %s: code=%d message=%s",
 				update.ActionID.Name, code, resp.Msg.GetStatus().GetMessage())
 		} else if isTerminalPhase(update.Phase) && !update.IsDeleted {
