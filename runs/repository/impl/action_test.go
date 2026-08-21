@@ -300,6 +300,73 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 	assert.Equal(t, uint32(2), action.Attempts)
 }
 
+func TestUpdateActionPhase_AllowsPausedTerminalTransitions(t *testing.T) {
+	db := setupActionDB(t)
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	for _, phase := range []common.ActionPhase{
+		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		common.ActionPhase_ACTION_PHASE_FAILED,
+		common.ActionPhase_ACTION_PHASE_TIMED_OUT,
+		common.ActionPhase_ACTION_PHASE_ABORTED,
+	} {
+		t.Run(phase.String(), func(t *testing.T) {
+			actionID := &common.ActionIdentifier{
+				Run:  &common.RunIdentifier{Project: "proj1", Domain: "domain1", Name: "run1"},
+				Name: phase.String(),
+			}
+			_, err := actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
+			require.NoError(t, err)
+			require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
+				common.ActionPhase_ACTION_PHASE_PAUSED, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
+
+			endTime := time.Now()
+			require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
+				phase, 1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil))
+
+			action, err := actionRepo.GetAction(ctx, actionID)
+			require.NoError(t, err)
+			assert.Equal(t, int32(phase), action.Phase)
+			assert.True(t, action.EndedAt.Valid)
+		})
+	}
+}
+
+func TestUpdateActionPhase_AllowsPausedRetryTransitions(t *testing.T) {
+	db := setupActionDB(t)
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	for _, phase := range []common.ActionPhase{
+		common.ActionPhase_ACTION_PHASE_QUEUED,
+		common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES,
+		common.ActionPhase_ACTION_PHASE_INITIALIZING,
+		common.ActionPhase_ACTION_PHASE_RUNNING,
+	} {
+		t.Run(phase.String(), func(t *testing.T) {
+			actionID := &common.ActionIdentifier{
+				Run:  &common.RunIdentifier{Project: "proj1", Domain: "domain1", Name: "run1"},
+				Name: "retry-" + phase.String(),
+			}
+			_, err := actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
+			require.NoError(t, err)
+			require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
+				common.ActionPhase_ACTION_PHASE_PAUSED, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
+
+			require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
+				phase, 2, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
+
+			action, err := actionRepo.GetAction(ctx, actionID)
+			require.NoError(t, err)
+			assert.Equal(t, int32(phase), action.Phase)
+			assert.Equal(t, uint32(2), action.Attempts)
+		})
+	}
+}
+
 func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
@@ -326,11 +393,11 @@ func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
-	// Try to downgrade from RUNNING to QUEUED — should be a no-op (phase guard)
+	// Try to downgrade from RUNNING to QUEUED — should be rejected by the phase guard.
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_QUEUED, 1,
 		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
-	require.NoError(t, err)
+	require.ErrorIs(t, err, interfaces.ErrPhaseTransitionRejected)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
 	require.NoError(t, err)
@@ -365,11 +432,16 @@ func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 		core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil)
 	require.NoError(t, err)
 
-	// Try to downgrade from SUCCEEDED to QUEUED — should be a no-op
-	err = actionRepo.UpdateActionPhase(ctx, actionID,
-		common.ActionPhase_ACTION_PHASE_QUEUED, 2,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
-	require.NoError(t, err)
+	for _, phase := range []common.ActionPhase{
+		common.ActionPhase_ACTION_PHASE_QUEUED,
+		common.ActionPhase_ACTION_PHASE_FAILED,
+		common.ActionPhase_ACTION_PHASE_TIMED_OUT,
+	} {
+		// Delayed updates must not overwrite a completed action.
+		err = actionRepo.UpdateActionPhase(ctx, actionID, phase, 2,
+			core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
+		require.ErrorIs(t, err, interfaces.ErrPhaseTransitionRejected)
+	}
 
 	action, err := actionRepo.GetAction(ctx, actionID)
 	require.NoError(t, err)
@@ -1056,37 +1128,6 @@ func TestUpdateActionPhase_PausedSettlesIntoTerminal(t *testing.T) {
 			assert.True(t, action.EndedAt.Valid)
 		})
 	}
-}
-
-// The paused exception is deliberately one-way: it lets a paused action settle,
-// not resume. A stale RUNNING event arriving after the pause must still be
-// rejected, exactly as the monotonic guard rejects it today.
-func TestUpdateActionPhase_PausedDoesNotResume(t *testing.T) {
-	db := setupActionDB(t)
-	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
-	require.NoError(t, err)
-	ctx := context.Background()
-
-	actionID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{
-			Org: "org1", Project: "proj1", Domain: "domain1", Name: "run1",
-		},
-		Name: "paused-action",
-	}
-	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
-	require.NoError(t, err)
-
-	require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
-		common.ActionPhase_ACTION_PHASE_PAUSED, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
-
-	require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
-		common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
-
-	action, err := actionRepo.GetAction(ctx, actionID)
-	require.NoError(t, err)
-	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_PAUSED), action.Phase,
-		"a non-terminal update must not move an action out of PAUSED")
 }
 
 // A condition's signalled value is written to detailed_info outside any phase
