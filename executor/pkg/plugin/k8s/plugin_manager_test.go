@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -166,6 +167,94 @@ func TestLaunchResource_InvalidCreateFastFails(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhasePermanentFailure, transition.Info().Phase())
 	assert.Equal(t, "InvalidResource", transition.Info().Err().GetCode())
+}
+
+// A validating admission webhook rejecting the pod spec surfaces as HTTP 400, which is neither
+// Forbidden nor Invalid: without its own branch it reaches the catch-all and the executor keeps
+// retrying a request that can never succeed.
+func TestLaunchResourceErrors(t *testing.T) {
+	tests := []struct {
+		name      string
+		createErr error
+		wantPhase pluginsCore.Phase
+		wantCode  string
+		wantErr   bool
+	}{
+		{
+			name:      "webhook 400 fails",
+			createErr: k8serrors.NewBadRequest(`admission webhook "validate.example.com" denied the request: spec.containers[0].image is required`),
+			wantPhase: pluginsCore.PhasePermanentFailure,
+			wantCode:  "BadRequest",
+		},
+		{
+			// A rejection can also arrive with no reason set and a bare 400; IsBadRequest
+			// falls back to the status code for that shape.
+			name: "bare 400 fails",
+			createErr: &k8serrors.StatusError{ErrStatus: metav1.Status{
+				Status:  metav1.StatusFailure,
+				Code:    http.StatusBadRequest,
+				Message: "the server rejected our request",
+			}},
+			wantPhase: pluginsCore.PhasePermanentFailure,
+			wantCode:  "BadRequest",
+		},
+		{
+			name: "invalid fails",
+			createErr: k8serrors.NewInvalid(
+				schema.GroupKind{Kind: "Pod"}, "name",
+				field.ErrorList{field.Invalid(field.NewPath("metadata", "name"), "x", "must be no more than 63 characters")},
+			),
+			wantPhase: pluginsCore.PhasePermanentFailure,
+			wantCode:  "InvalidResource",
+		},
+		{
+			name:      "forbidden retries",
+			createErr: k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("exceeded quota")),
+			wantPhase: pluginsCore.PhaseRetryableFailure,
+			wantCode:  "RuntimeFailure",
+		},
+		{
+			name:      "unknown retries",
+			createErr: k8serrors.NewInternalError(fmt.Errorf("etcd unavailable")),
+			wantErr:   true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fakeClient := fake.NewClientBuilder().
+				WithScheme(k8sscheme.Scheme).
+				WithInterceptorFuncs(interceptor.Funcs{
+					Create: func(context.Context, client.WithWatch, client.Object, ...client.CreateOption) error {
+						return tt.createErr
+					},
+				}).
+				Build()
+
+			kubeClient := &pluginsCoreMock.KubeClient{}
+			kubeClient.EXPECT().GetClient().Return(fakeClient)
+
+			plugin := &k8sMocks.Plugin{}
+			plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+			plugin.EXPECT().BuildResource(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+
+			tCtx := &pluginsCoreMock.TaskExecutionContext{}
+			tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("name"))
+
+			pm := NewPluginManager("test", plugin, kubeClient)
+
+			transition, err := pm.launchResource(context.Background(), tCtx)
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Equal(t, pluginsCore.UnknownTransition, transition)
+				return
+			}
+			assert.NoError(t, err)
+			assert.Equal(t, tt.wantPhase, transition.Info().Phase())
+			assert.Equal(t, tt.wantCode, transition.Info().Err().GetCode())
+			assert.Equal(t, core.ExecutionError_USER, transition.Info().Err().GetKind())
+		})
+	}
 }
 
 func TestHandle_CorruptedPluginStateFailsPermanently(t *testing.T) {
