@@ -16,7 +16,6 @@
 [![Version](https://img.shields.io/pypi/v/flyte?label=version&color=blue)](https://pypi.org/project/flyte/)
 [![Python](https://img.shields.io/pypi/pyversions/flyte?color=brightgreen)](https://pypi.org/project/flyte/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-orange)](LICENSE)
-[![Try in Browser](https://img.shields.io/badge/Try%20in%20Browser-Live%20Demo-7652a2)](https://flyte2intro.apps.demo.hosted.unionai.cloud/)
 [![Docs](https://img.shields.io/badge/Docs-flyte-blue)](https://www.union.ai/docs/v2/flyte/user-guide/running-locally/)
 [![SDK Reference](https://img.shields.io/badge/SDK%20Reference-API-brightgreen)](https://www.union.ai/docs/v2/byoc/api-reference/flyte-sdk/)
 [![CLI Reference](https://img.shields.io/badge/CLI%20Reference-API-brightgreen)](https://www.union.ai/docs/v2/byoc/api-reference/flyte-cli/)
@@ -138,8 +137,6 @@ uv pip install flyte[tui]
 ```
 
 [![Watch the local development experience](https://img.youtube.com/vi/lsfy-7DbbRM/maxresdefault.jpg)](https://www.youtube.com/watch?v=lsfy-7DbbRM)
-
-**[Try the hosted demo in your browser](https://flyte2intro.apps.demo.hosted.unionai.cloud/)** — no installation required.
 
 ## Open Source Backend
 
