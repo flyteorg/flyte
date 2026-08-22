@@ -40,6 +40,114 @@ func newAlwaysMissCache(t *testing.T) *cacheMocks.CacheInterface[SecretValue] {
 	return m
 }
 
+func expectEnvVarSecretCreate(
+	t *testing.T,
+	mockClient *mocks.MockableControllerRuntimeClient,
+	ctx context.Context,
+	namespace string,
+	components SecretNameComponents,
+	secretValue []byte,
+) string {
+	t.Helper()
+	k8sSecretName := ToEnvVarK8sName(components)
+	mockClient.
+		On("Create", ctx, &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      k8sSecretName,
+				Namespace: namespace,
+				Labels:    ToEnvVarK8sLabels(components),
+			},
+			Type: corev1.SecretTypeOpaque,
+			Data: map[string][]byte{
+				EmbeddedSecretsEnvVarKey: secretValue,
+			},
+		}).
+		Return(nil)
+	return k8sSecretName
+}
+
+func TestEmbeddedSecretManagerInjector_UpsertEnvVarSecretAlreadyExistsWithStaleCache(t *testing.T) {
+	ctx := context.Background()
+	components := SecretNameComponents{Org: "org", Domain: "domain", Project: "project", Name: "secret"}
+	pod := &corev1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: "pod-namespace"}}
+	k8sSecretName := ToEnvVarK8sName(components)
+
+	mockClient := &mocks.MockableControllerRuntimeClient{}
+	mockClient.
+		On("Create", ctx, newEnvVarSecret(k8sSecretName, pod.GetNamespace(), components, []byte("secret-value"))).
+		Return(k8sError.NewAlreadyExists(corev1.Resource("secret"), k8sSecretName))
+	mockClient.
+		On("Get", ctx, types.NamespacedName{Name: k8sSecretName, Namespace: pod.GetNamespace()}, &corev1.Secret{}).
+		Return(k8sError.NewNotFound(corev1.Resource("secret"), k8sSecretName))
+
+	injector := &EmbeddedSecretManagerInjector{k8sClient: mockClient}
+	gotName, err := injector.upsertEnvVarSecret(ctx, components, []byte("secret-value"), pod)
+
+	assert.NoError(t, err)
+	assert.Equal(t, k8sSecretName, gotName)
+	mockClient.AssertNotCalled(t, "Patch", mock.Anything, mock.Anything, mock.Anything)
+}
+
+func TestEmbeddedSecretManagerInjector_UpsertEnvVarSecretSkipsUnchangedExistingSecret(t *testing.T) {
+	ctx := context.Background()
+	components := SecretNameComponents{Org: "org", Domain: "domain", Project: "project", Name: "secret"}
+	pod := &corev1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: "pod-namespace"}}
+	secretValue := []byte("secret-value")
+	k8sSecretName := ToEnvVarK8sName(components)
+
+	mockClient := &mocks.MockableControllerRuntimeClient{}
+	mockClient.
+		On("Create", ctx, newEnvVarSecret(k8sSecretName, pod.GetNamespace(), components, secretValue)).
+		Return(k8sError.NewAlreadyExists(corev1.Resource("secret"), k8sSecretName))
+	mockClient.
+		On("Get", ctx, types.NamespacedName{Name: k8sSecretName, Namespace: pod.GetNamespace()}, &corev1.Secret{}).
+		Run(func(args mock.Arguments) {
+			secret := args.Get(2).(*corev1.Secret)
+			*secret = *newEnvVarSecret(k8sSecretName, pod.GetNamespace(), components, secretValue)
+		}).
+		Return(nil)
+
+	injector := &EmbeddedSecretManagerInjector{k8sClient: mockClient}
+	gotName, err := injector.upsertEnvVarSecret(ctx, components, secretValue, pod)
+
+	assert.NoError(t, err)
+	assert.Equal(t, k8sSecretName, gotName)
+	mockClient.AssertNotCalled(t, "Patch", mock.Anything, mock.Anything, mock.Anything)
+}
+
+func TestEmbeddedSecretManagerInjector_UpsertEnvVarSecretPatchesChangedExistingSecret(t *testing.T) {
+	ctx := context.Background()
+	components := SecretNameComponents{Org: "org", Domain: "domain", Project: "project", Name: "secret"}
+	pod := &corev1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: "pod-namespace"}}
+	k8sSecretName := ToEnvVarK8sName(components)
+
+	mockClient := &mocks.MockableControllerRuntimeClient{}
+	mockClient.
+		On("Create", ctx, newEnvVarSecret(k8sSecretName, pod.GetNamespace(), components, []byte("new-value"))).
+		Return(k8sError.NewAlreadyExists(corev1.Resource("secret"), k8sSecretName))
+	mockClient.
+		On("Get", ctx, types.NamespacedName{Name: k8sSecretName, Namespace: pod.GetNamespace()}, &corev1.Secret{}).
+		Run(func(args mock.Arguments) {
+			secret := args.Get(2).(*corev1.Secret)
+			*secret = *newEnvVarSecret(k8sSecretName, pod.GetNamespace(), components, []byte("old-value"))
+		}).
+		Return(nil)
+	mockClient.
+		On("Patch", ctx, mock.AnythingOfType("*v1.Secret"), mock.Anything).
+		Run(func(args mock.Arguments) {
+			secret := args.Get(1).(*corev1.Secret)
+			assert.Equal(t, []byte("new-value"), secret.Data[EmbeddedSecretsEnvVarKey])
+			assert.Equal(t, ToEnvVarK8sLabels(components), secret.Labels)
+		}).
+		Return(nil)
+
+	injector := &EmbeddedSecretManagerInjector{k8sClient: mockClient}
+	gotName, err := injector.upsertEnvVarSecret(ctx, components, []byte("new-value"), pod)
+
+	assert.NoError(t, err)
+	assert.Equal(t, k8sSecretName, gotName)
+}
+
 func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 	ctx = context.Background()
 	gcpClient = &mocks.GCPSecretManagerClient{}
@@ -181,8 +289,21 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 						{
 							Env: []corev1.EnvVar{
 								{
-									Name:  "_UNION_SECRETID",
-									Value: secretValue,
+									Name: "_UNION_SECRETID",
+									ValueFrom: &corev1.EnvVarSource{
+										SecretKeyRef: &corev1.SecretKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: ToEnvVarK8sName(SecretNameComponents{
+													Org:     OrganizationLabel,
+													Domain:  "",
+													Project: "",
+													Name:    secretIDKey,
+												}),
+											},
+											Key:      EmbeddedSecretsEnvVarKey,
+											Optional: lo.ToPtr(false),
+										},
+									},
 								},
 								{
 									Name:  SecretEnvVarPrefix,
@@ -209,6 +330,12 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 			mockClient := &mocks.MockableControllerRuntimeClient{}
 
 			if tt.expectedInjected {
+				expectEnvVarSecretCreate(t, mockClient, ctx, "", SecretNameComponents{
+					Org:     OrganizationLabel,
+					Domain:  "",
+					Project: "",
+					Name:    secretIDKey,
+				}, []byte(secretValue))
 				mockClient.
 					On("Get", ctx, types.NamespacedName{Name: tt.expectedK8sSecretName, Namespace: testReferenceNamespace}, &corev1.Secret{}).
 					Return(k8sError.NewNotFound(corev1.Resource("secret"), tt.expectedK8sSecretName))
@@ -352,6 +479,12 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToOrganization(t *testi
 			}
 
 			mockClient := &mocks.MockableControllerRuntimeClient{}
+			envVarSecretName := expectEnvVarSecretCreate(t, mockClient, ctx, "", SecretNameComponents{
+				Org:     "o-apple",
+				Domain:  "",
+				Project: "",
+				Name:    "secret1",
+			}, []byte("fruits"))
 			kubernetesSecretName := ToImagePullK8sName(SecretNameComponents{
 				Org:     "o-apple",
 				Domain:  "",
@@ -376,7 +509,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToOrganization(t *testi
 			pod, injected, err := injector.Inject(ctx, tt.secret, pod)
 			assert.NoError(t, err)
 			assert.True(t, injected)
-			assert.True(t, podHasSecretInjected(pod, "secret1", "fruits", tt.secret.GetEnvVar()))
+			assert.True(t, podHasSecretInjected(pod, "secret1", envVarSecretName, tt.secret.GetEnvVar()))
 
 		})
 	}
@@ -401,6 +534,12 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToDomain(t *testing.T) 
 	}
 
 	mockClient := &mocks.MockableControllerRuntimeClient{}
+	envVarSecretName := expectEnvVarSecretCreate(t, mockClient, ctx, "", SecretNameComponents{
+		Org:     "o-apple",
+		Domain:  "d-cherry",
+		Project: "",
+		Name:    "secret1",
+	}, []byte("fruits @ domain"))
 	kubernetesSecretName1 := ToImagePullK8sName(SecretNameComponents{
 		Org:     "o-apple",
 		Domain:  "",
@@ -437,7 +576,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToDomain(t *testing.T) 
 	pod, injected, err := injector.Inject(ctx, secret, pod)
 	assert.NoError(t, err)
 	assert.True(t, injected)
-	assert.True(t, podHasSecretInjected(pod, "secret1", "fruits @ domain", ""))
+	assert.True(t, podHasSecretInjected(pod, "secret1", envVarSecretName, ""))
 }
 
 func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T) {
@@ -459,6 +598,12 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T)
 	}
 
 	mockClient := &mocks.MockableControllerRuntimeClient{}
+	envVarSecretName := expectEnvVarSecretCreate(t, mockClient, ctx, "", SecretNameComponents{
+		Org:     "o-apple",
+		Domain:  "d-cherry",
+		Project: "p-banana",
+		Name:    "secret1",
+	}, []byte("fruits @ project"))
 	kubernetesSecretName1 := ToImagePullK8sName(SecretNameComponents{
 		Org:     "o-apple",
 		Domain:  "",
@@ -507,7 +652,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T)
 	pod, injected, err := injector.Inject(ctx, secret, pod)
 	assert.NoError(t, err)
 	assert.True(t, injected)
-	assert.True(t, podHasSecretInjected(pod, "secret1", "fruits @ project", ""))
+	assert.True(t, podHasSecretInjected(pod, "secret1", envVarSecretName, ""))
 }
 
 // TestEmbeddedSecretManagerInjector_LookUpSecret_StaleOrgCacheDoesNotMaskProjectScope
@@ -544,6 +689,12 @@ func TestEmbeddedSecretManagerInjector_LookUpSecret_StaleOrgCacheDoesNotMaskProj
 	// image pull mirroring path calls Get on the controller-runtime client for
 	// the org-scoped image-pull Secret; return NotFound so the happy path runs.
 	mockClient := &mocks.MockableControllerRuntimeClient{}
+	envVarSecretName := expectEnvVarSecretCreate(t, mockClient, ctx, "", SecretNameComponents{
+		Org:     "o-apple",
+		Domain:  "d-cherry",
+		Project: "p-banana",
+		Name:    "secret1",
+	}, []byte("fresh project value"))
 	orgImagePullName := ToImagePullK8sName(SecretNameComponents{Org: "o-apple", Name: "secret1"})
 	mockClient.
 		On("Get", ctx, types.NamespacedName{Name: orgImagePullName, Namespace: testReferenceNamespace}, &corev1.Secret{}).
@@ -565,7 +716,7 @@ func TestEmbeddedSecretManagerInjector_LookUpSecret_StaleOrgCacheDoesNotMaskProj
 	assert.NoError(t, err)
 	assert.True(t, injected)
 	// Must pick up the newly-created project+domain value, not the stale cached org value.
-	assert.True(t, podHasSecretInjected(pod, "secret1", "fresh project value", ""))
+	assert.True(t, podHasSecretInjected(pod, "secret1", envVarSecretName, ""))
 }
 
 func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
@@ -625,6 +776,12 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 		testPod := pod.DeepCopy()
 
 		mockClient := &mocks.MockableControllerRuntimeClient{}
+		expectEnvVarSecretCreate(t, mockClient, ctx, testNamespace, SecretNameComponents{
+			Org:     testOrganization,
+			Domain:  testDomain,
+			Project: testProject,
+			Name:    testSecretName,
+		}, []byte("test-credentials"))
 		mockClient.
 			On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName, Namespace: testReferenceNamespace}, &corev1.Secret{}).
 			Run(func(args mock.Arguments) {
@@ -662,6 +819,12 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 		testPod := pod.DeepCopy()
 
 		mockClient := &mocks.MockableControllerRuntimeClient{}
+		expectEnvVarSecretCreate(t, mockClient, ctx, testNamespace, SecretNameComponents{
+			Org:     testOrganization,
+			Domain:  testDomain,
+			Project: testProject,
+			Name:    testSecretName,
+		}, []byte("test-credentials"))
 		mockClient.
 			On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName, Namespace: testReferenceNamespace}, &corev1.Secret{}).
 			Run(func(args mock.Arguments) {
@@ -699,6 +862,12 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 		testPod := pod.DeepCopy()
 
 		mockClient := &mocks.MockableControllerRuntimeClient{}
+		expectEnvVarSecretCreate(t, mockClient, ctx, testNamespace, SecretNameComponents{
+			Org:     testOrganization,
+			Domain:  testDomain,
+			Project: testProject,
+			Name:    testSecretName,
+		}, []byte("test-credentials"))
 
 		secretCache := newAlwaysMissCache(t)
 		injector := NewEmbeddedSecretManagerInjector(
@@ -715,9 +884,6 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 		assert.NoError(t, err)
 		assert.True(t, injected)
 		assert.Nil(t, resultPod.Spec.ImagePullSecrets)
-
-		mockClient.AssertNotCalled(t, "Get", mock.Anything, mock.Anything, mock.Anything)
-		mockClient.AssertNotCalled(t, "Create", mock.Anything, mock.Anything)
 	})
 
 	t.Run("image pull secret is not scoped to project or domain", func(t *testing.T) {
@@ -733,6 +899,12 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 		orgBasedReferenceImagePullSecret := referenceImagePullSecret.DeepCopy()
 		orgBasedReferenceImagePullSecret.SetName(orgBasedKubernetesSecretName)
 		mockClient := &mocks.MockableControllerRuntimeClient{}
+		expectEnvVarSecretCreate(t, mockClient, ctx, testNamespace, SecretNameComponents{
+			Org:     testOrganization,
+			Domain:  "",
+			Project: "",
+			Name:    testSecretName,
+		}, []byte("test-credentials"))
 		mockClient.
 			On("Get", ctx, types.NamespacedName{Name: orgBasedKubernetesSecretName, Namespace: testReferenceNamespace}, &corev1.Secret{}).
 			Run(func(args mock.Arguments) {
@@ -769,7 +941,7 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 	})
 }
 
-func podHasSecretInjected(pod *corev1.Pod, secretKey string, secretValue string, envVar string) bool {
+func podHasSecretInjected(pod *corev1.Pod, secretKey string, k8sSecretName string, envVar string) bool {
 	// When Secret.EnvVar is set the injector emits a single value env var with
 	// that name; otherwise it emits the auto-generated <prefix><KEY> name.
 	expectedName := config.DefaultSecretEnvVarPrefix + strings.ToUpper(secretKey)
@@ -778,7 +950,12 @@ func podHasSecretInjected(pod *corev1.Pod, secretKey string, secretValue string,
 	}
 	return lo.EveryBy(pod.Spec.Containers, func(container corev1.Container) bool {
 		hasValueEnvVar := lo.ContainsBy(container.Env, func(env corev1.EnvVar) bool {
-			return env.Name == expectedName && env.Value == secretValue
+			return env.Name == expectedName &&
+				env.Value == "" &&
+				env.ValueFrom != nil &&
+				env.ValueFrom.SecretKeyRef != nil &&
+				env.ValueFrom.SecretKeyRef.Name == k8sSecretName &&
+				env.ValueFrom.SecretKeyRef.Key == EmbeddedSecretsEnvVarKey
 		})
 		hasPrefixEnvVar := lo.ContainsBy(container.Env, func(env corev1.EnvVar) bool {
 			return env.Name == SecretEnvVarPrefix && env.Value == config.DefaultSecretEnvVarPrefix
