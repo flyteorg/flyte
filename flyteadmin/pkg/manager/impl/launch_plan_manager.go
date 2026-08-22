@@ -266,6 +266,51 @@ func (m *LaunchPlanManager) disableLaunchPlan(ctx context.Context, request *admi
 	return &admin.LaunchPlanUpdateResponse{}, nil
 }
 
+func (m *LaunchPlanManager) archiveLaunchPlan(ctx context.Context, request *admin.LaunchPlanUpdateRequest) (
+	*admin.LaunchPlanUpdateResponse, error) {
+	if err := validation.ValidateIdentifier(request.GetId(), common.LaunchPlan); err != nil {
+		logger.Debugf(ctx, "can't archive launch plan [%+v] with invalid identifier: %v", request.GetId(), err)
+		return nil, err
+	}
+	launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, request.GetId())
+	if err != nil {
+		logger.Debugf(ctx, "couldn't find launch plan [%+v] to archive with err: %v", request.GetId(), err)
+		return nil, err
+	}
+
+	err = m.updateLaunchPlanModelState(&launchPlanModel, admin.LaunchPlanState_ARCHIVED)
+	if err != nil {
+		logger.Debugf(ctx, "failed to archive launch plan [%+v] with err: %v", request.GetId(), err)
+		return nil, err
+	}
+
+	var launchPlanSpec admin.LaunchPlanSpec
+	err = proto.Unmarshal(launchPlanModel.Spec, &launchPlanSpec)
+	if err != nil {
+		logger.Errorf(ctx, "failed to unmarshal launch plan spec when archiving %+v", request.GetId())
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal,
+			"failed to unmarshal launch plan spec when archiving %+v", request.GetId())
+	}
+	if launchPlanSpec.GetEntityMetadata() != nil && launchPlanSpec.GetEntityMetadata().GetSchedule() != nil {
+		err = m.disableSchedule(ctx, &core.Identifier{
+			Project: launchPlanModel.Project,
+			Domain:  launchPlanModel.Domain,
+			Name:    launchPlanModel.Name,
+			Version: launchPlanModel.Version,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+	err = m.db.LaunchPlanRepo().Update(ctx, launchPlanModel)
+	if err != nil {
+		logger.Debugf(ctx, "Failed to update launchPlanModel with ID [%+v] with err %v", request.GetId(), err)
+		return nil, err
+	}
+	logger.Debugf(ctx, "archived launch plan: [%+v]", request.GetId())
+	return &admin.LaunchPlanUpdateResponse{}, nil
+}
+
 func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request *admin.LaunchPlanUpdateRequest) (
 	*admin.LaunchPlanUpdateResponse, error) {
 	newlyActiveLaunchPlanModel, err := m.db.LaunchPlanRepo().Get(ctx, repoInterfaces.Identifier{
@@ -339,6 +384,8 @@ func (m *LaunchPlanManager) UpdateLaunchPlan(ctx context.Context, request *admin
 		return m.disableLaunchPlan(ctx, request)
 	case admin.LaunchPlanState_ACTIVE:
 		return m.enableLaunchPlan(ctx, request)
+	case admin.LaunchPlanState_ARCHIVED:
+		return m.archiveLaunchPlan(ctx, request)
 	default:
 		return nil, errors.NewFlyteAdminErrorf(
 			codes.InvalidArgument, "Unrecognized launch plan state %v for update for launch plan [%+v]",
