@@ -25,8 +25,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 
-	// TODO @pvditt fix
-	//propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -42,6 +40,7 @@ const unsignedSIGKILL = 247
 
 const defaultContainerTemplateName = "default"
 const defaultInitContainerTemplateName = "default-init"
+const acceleratedInputsVolumeName = "union-persistent-data-volume"
 const primaryContainerTemplateName = "primary"
 const primaryInitContainerTemplateName = "primary-init"
 const PrimaryContainerKey = "primary_container_name"
@@ -687,10 +686,9 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		return nil, nil, err
 	}
 
-	// TODO @pvditt
-	//if propellerCfg.GetConfig().AcceleratedInputs.Enabled {
-	//	ApplyAcceleratedInputsSpec(podSpec, primaryContainerName)
-	//}
+	if config.GetK8sPluginConfig().AcceleratedInputs.Enabled {
+		ApplyAcceleratedInputsSpec(podSpec, primaryContainerName)
+	}
 
 	// GPU accelerator
 	if extendedResources.GetGpuAccelerator() != nil {
@@ -1154,29 +1152,51 @@ func applyAcceleratorDeviceClassPodTemplate(
 	return mergedPodSpec, nil
 }
 
-// TODO @pvditt
-//func ApplyAcceleratedInputsSpec(spec *v1.PodSpec, primaryName string) {
-//	cfg := propellerCfg.GetConfig().AcceleratedInputs
-//	hostPathType := v1.HostPathDirectory
-//	spec.Volumes = append(spec.Volumes, v1.Volume{
-//		Name: "union-persistent-data-volume",
-//		VolumeSource: v1.VolumeSource{
-//			HostPath: &v1.HostPathVolumeSource{
-//				Path: cfg.VolumePath,
-//				Type: &hostPathType,
-//			},
-//		},
-//	})
-//	for i, cont := range spec.Containers {
-//		if cont.Name == primaryName {
-//			spec.Containers[i].VolumeMounts = append(cont.VolumeMounts, v1.VolumeMount{
-//				Name:      "union-persistent-data-volume",
-//				ReadOnly:  true,
-//				MountPath: cfg.LocalPathPrefix,
-//			})
-//		}
-//	}
-//}
+// ApplyAcceleratedInputsSpec mounts the accelerated datasets hostPath volume into the
+// pod's primary container, read-only. The volume and the primary-container mount are
+// checked independently so a pod template that already carries one of them (e.g. the
+// volume mounted only in a sidecar) still ends up with both.
+func ApplyAcceleratedInputsSpec(spec *v1.PodSpec, primaryName string) {
+	cfg := config.GetK8sPluginConfig().AcceleratedInputs
+	hasVolume := false
+	for _, vol := range spec.Volumes {
+		if vol.Name == acceleratedInputsVolumeName {
+			hasVolume = true
+			break
+		}
+	}
+	if !hasVolume {
+		hostPathType := v1.HostPathDirectory
+		spec.Volumes = append(spec.Volumes, v1.Volume{
+			Name: acceleratedInputsVolumeName,
+			VolumeSource: v1.VolumeSource{
+				HostPath: &v1.HostPathVolumeSource{
+					Path: cfg.VolumePath,
+					Type: &hostPathType,
+				},
+			},
+		})
+	}
+	for i, cont := range spec.Containers {
+		if cont.Name != primaryName {
+			continue
+		}
+		hasMount := false
+		for _, mount := range cont.VolumeMounts {
+			if mount.Name == acceleratedInputsVolumeName {
+				hasMount = true
+				break
+			}
+		}
+		if !hasMount {
+			spec.Containers[i].VolumeMounts = append(cont.VolumeMounts, v1.VolumeMount{
+				Name:      acceleratedInputsVolumeName,
+				ReadOnly:  true,
+				MountPath: cfg.LocalPathPrefix,
+			})
+		}
+	}
+}
 
 func BuildIdentityPod() *v1.Pod {
 	return &v1.Pod{
