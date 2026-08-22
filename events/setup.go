@@ -3,7 +3,6 @@ package events
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
@@ -38,7 +37,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if sc.BaseURL != "" {
 		runServiceURL = sc.BaseURL
 	}
-	runClient := workflowconnect.NewInternalRunServiceClient(http.DefaultClient, runServiceURL, connect.WithInterceptors(otelInterceptor))
+	runClient := workflowconnect.NewInternalRunServiceClient(app.InternalHTTPClient(), runServiceURL, connect.WithInterceptors(otelInterceptor))
 
 	eventsSvc := service.NewEventsProxyService(runClient)
 
