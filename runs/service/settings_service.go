@@ -39,11 +39,8 @@ func (s *SettingsService) GetSettingsForEdit(
 	req *connect.Request[settings.GetSettingsForEditRequest],
 ) (*connect.Response[settings.GetSettingsForEditResponse], error) {
 	key := req.Msg.GetKey()
-	if key == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("key is required"))
-	}
-	if key.GetProject() != "" && key.GetDomain() == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("a project-scope key requires a domain"))
+	if err := validateSettingsKey(key); err != nil {
+		return nil, err
 	}
 
 	// One partial key per scope level covered by the request, broadest first,
@@ -100,11 +97,14 @@ func (s *SettingsService) CreateSettings(
 	// The buf.validate annotations on these protos are not enforced by the
 	// generated Go code, so required fields and key shape are checked by hand
 	key := req.Msg.GetKey()
-	if key == nil || req.Msg.GetSettings() == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("key and settings are required"))
+	if err := validateSettingsKey(key); err != nil {
+		return nil, err
 	}
-	if key.GetProject() != "" && key.GetDomain() == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("a project-scope key requires a domain"))
+	if req.Msg.GetSettings() == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("settings is required"))
+	}
+	if err := validateSettings(req.Msg.GetSettings()); err != nil {
+		return nil, err
 	}
 
 	data, err := protojson.Marshal(req.Msg.GetSettings())
@@ -138,11 +138,14 @@ func (s *SettingsService) UpdateSettings(
 	req *connect.Request[settings.UpdateSettingsRequest],
 ) (*connect.Response[settings.UpdateSettingsResponse], error) {
 	key := req.Msg.GetKey()
-	if key == nil || req.Msg.GetSettings() == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("key and settings are required"))
+	if err := validateSettingsKey(key); err != nil {
+		return nil, err
 	}
-	if key.GetProject() != "" && key.GetDomain() == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("a project-scope key requires a domain"))
+	if req.Msg.GetSettings() == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("settings is required"))
+	}
+	if err := validateSettings(req.Msg.GetSettings()); err != nil {
+		return nil, err
 	}
 	if req.Msg.GetVersion() == 0 {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("a version is required; use CreateSettings for a new record"))
@@ -221,6 +224,16 @@ func validateSettings(s *settings.Settings) error {
 		return err
 	}
 	return validateTaskResourceDefaults("task_resource.max", s.GetTaskResource().GetMax())
+}
+
+func validateSettingsKey(key *settings.SettingsKey) error {
+	if key == nil {
+		return connect.NewError(connect.CodeInvalidArgument, errors.New("key is required"))
+	}
+	if key.GetProject() != "" && key.GetDomain() == "" {
+		return connect.NewError(connect.CodeInvalidArgument, errors.New("a project-scope key requires a domain"))
+	}
+	return nil
 }
 
 var _ settingsconnect.SettingsServiceHandler = (*SettingsService)(nil)
