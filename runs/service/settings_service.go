@@ -94,8 +94,6 @@ func (s *SettingsService) CreateSettings(
 	ctx context.Context,
 	req *connect.Request[settings.CreateSettingsRequest],
 ) (*connect.Response[settings.CreateSettingsResponse], error) {
-	// The buf.validate annotations on these protos are not enforced by the
-	// generated Go code, so required fields and key shape are checked by hand
 	key := req.Msg.GetKey()
 	if err := validateSettingsKey(key); err != nil {
 		return nil, err
@@ -183,16 +181,34 @@ func (s *SettingsService) UpdateSettings(
 	}), nil
 }
 
+// validateSettingsKey checks the key shape by hand: the buf.validate annotations on
+// these protos are not enforced by the generated Go code, so required fields and scope
+// rules are checked here instead.
+func validateSettingsKey(key *settings.SettingsKey) error {
+	if key == nil {
+		return connect.NewError(connect.CodeInvalidArgument, errors.New("key is required"))
+	}
+	if key.GetProject() != "" && key.GetDomain() == "" {
+		return connect.NewError(connect.CodeInvalidArgument, errors.New("a project-scope key requires a domain"))
+	}
+	return nil
+}
+
+// validateMaxActionConcurrency enforces the bounds on a per-run concurrency cap: 0 means
+// unlimited and 1 is rejected. The ceiling is MaxUint32 because the resolved value is
+// applied to RunSpec.max_action_concurrency, which is a uint32.
 func validateMaxActionConcurrency(setting *settings.Int64Setting) error {
 	if setting.GetState() != settings.SettingState_SETTING_STATE_VALUE {
 		return nil
 	}
 	if v := setting.GetIntValue(); v < 0 || v == 1 || v > math.MaxUint32 {
-		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid max_action_concurrency %d: must be 0 (unlimited) or at least 2", v))
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid max_action_concurrency %d: must be 0 (unlimited) or between 2 and %d", v, math.MaxUint32))
 	}
 	return nil
 }
 
+// validateQuantity checks that a quantity leaf holds a value Kubernetes can parse.
+// name is the dot-path used in the error message, e.g. "task_resource.max.memory".
 func validateQuantity(name string, setting *settings.QuantitySetting) error {
 	if setting.GetState() != settings.SettingState_SETTING_STATE_VALUE {
 		return nil
@@ -224,16 +240,6 @@ func validateSettings(s *settings.Settings) error {
 		return err
 	}
 	return validateTaskResourceDefaults("task_resource.max", s.GetTaskResource().GetMax())
-}
-
-func validateSettingsKey(key *settings.SettingsKey) error {
-	if key == nil {
-		return connect.NewError(connect.CodeInvalidArgument, errors.New("key is required"))
-	}
-	if key.GetProject() != "" && key.GetDomain() == "" {
-		return connect.NewError(connect.CodeInvalidArgument, errors.New("a project-scope key requires a domain"))
-	}
-	return nil
 }
 
 var _ settingsconnect.SettingsServiceHandler = (*SettingsService)(nil)
