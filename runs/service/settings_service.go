@@ -3,10 +3,13 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
+	"math"
 
 	"connectrpc.com/connect"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"google.golang.org/protobuf/encoding/protojson"
+	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings/settingsconnect"
@@ -175,6 +178,49 @@ func (s *SettingsService) UpdateSettings(
 			Version:  model.Version,
 		},
 	}), nil
+}
+
+func validateMaxActionConcurrency(setting *settings.Int64Setting) error {
+	if setting.GetState() != settings.SettingState_SETTING_STATE_VALUE {
+		return nil
+	}
+	if v := setting.GetIntValue(); v < 0 || v == 1 || v > math.MaxUint32 {
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid max_action_concurrency %d: must be 0 (unlimited) or at least 2", v))
+	}
+	return nil
+}
+
+func validateQuantity(name string, setting *settings.QuantitySetting) error {
+	if setting.GetState() != settings.SettingState_SETTING_STATE_VALUE {
+		return nil
+	}
+	if _, err := resource.ParseQuantity(setting.GetQuantityValue()); err != nil {
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid %s %q: %w", name, setting.GetQuantityValue(), err))
+	}
+	return nil
+}
+
+func validateTaskResourceDefaults(bound string, d *settings.TaskResourceDefaults) error {
+	if err := validateQuantity(bound+".cpu", d.GetCpu()); err != nil {
+		return err
+	}
+	if err := validateQuantity(bound+".gpu", d.GetGpu()); err != nil {
+		return err
+	}
+	if err := validateQuantity(bound+".memory", d.GetMemory()); err != nil {
+		return err
+	}
+	return validateQuantity(bound+".storage", d.GetStorage())
+}
+
+func validateSettings(s *settings.Settings) error {
+	if err := validateMaxActionConcurrency(s.GetRun().GetMaxActionConcurrency()); err != nil {
+		return err
+	}
+	if err := validateTaskResourceDefaults("task_resource.min", s.GetTaskResource().GetMin()); err != nil {
+		return err
+	}
+	return validateTaskResourceDefaults("task_resource.max", s.GetTaskResource().GetMax())
 }
 
 var _ settingsconnect.SettingsServiceHandler = (*SettingsService)(nil)
