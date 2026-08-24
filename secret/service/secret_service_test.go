@@ -13,6 +13,7 @@ import (
 	"sync/atomic"
 
 	"connectrpc.com/connect"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
@@ -261,6 +262,53 @@ func TestSecretService_WritesInvalidateCache(t *testing.T) {
 
 	want := webhook.InvalidateRequest{Org: defaultOrganization, Domain: "development", Project: "flytesnacks", Name: "my-secret"}
 	assert.Equal(t, []webhook.InvalidateRequest{want, want, want}, got)
+}
+
+func TestSecretService_AuthenticatedCacheInvalidation(t *testing.T) {
+	ctx := context.Background()
+	var tokenRequests atomic.Int32
+	mux := http.NewServeMux()
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
+
+	mux.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
+		tokenRequests.Add(1)
+		clientID, clientSecret, ok := r.BasicAuth()
+		if !ok {
+			require.NoError(t, r.ParseForm())
+			clientID, clientSecret = r.Form.Get("client_id"), r.Form.Get("client_secret")
+		}
+		assert.Equal(t, "secret-service", clientID)
+		assert.Equal(t, "secret", clientSecret)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = fmt.Fprint(w, `{"access_token":"webhook-token","token_type":"Bearer","expires_in":3600}`)
+	})
+	mux.HandleFunc("/.well-known/oauth-authorization-server", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = fmt.Fprintf(w, `{"token_endpoint":%q}`, srv.URL+"/token")
+	})
+	mux.HandleFunc(webhook.InvalidateSecretPath, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "Bearer webhook-token", r.Header.Get("Authorization"))
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	s, err := NewSecretServiceWithConfig(ctx, newTestClient(t), serviceclient.ServiceConfig{
+		URL: srv.URL,
+		Auth: serviceclient.AuthConfig{
+			Type:         serviceclient.AuthTypeOAuth2ClientCredentials,
+			IssuerURL:    srv.URL,
+			ClientID:     "secret-service",
+			ClientSecret: "secret",
+		},
+	})
+	require.NoError(t, err)
+
+	_, err = s.CreateSecret(ctx, connect.NewRequest(&secretpb.CreateSecretRequest{
+		Id:         &secretpb.SecretIdentifier{Project: "flytesnacks", Domain: "development", Name: "my-secret"},
+		SecretSpec: &secretpb.SecretSpec{Value: &secretpb.SecretSpec_BinaryValue{BinaryValue: []byte("v")}},
+	}))
+	require.NoError(t, err)
+	assert.Equal(t, int32(1), tokenRequests.Load())
 }
 
 // Invalidation is best-effort: the secret is already durably written when it runs, so an

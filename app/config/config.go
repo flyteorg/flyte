@@ -4,13 +4,14 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 )
 
 // AppConfig holds configuration for the control plane AppService.
 type AppConfig struct {
-	// InternalAppServiceURL is the base URL of the InternalAppService (data plane).
+	// InternalAppService configures the InternalAppService client (data plane).
 	// In unified mode this is overridden by the shared mux BaseURL.
-	InternalAppServiceURL string `json:"internalAppServiceUrl" pflag:",URL of the internal app service"`
+	InternalAppService serviceclient.ServiceConfig `json:"internalAppService" pflag:",Internal app service client configuration"`
 
 	// CacheTTL is the TTL for the in-memory app status cache.
 	// Defaults to 30s. Set to 0 to disable caching.
@@ -20,8 +21,8 @@ type AppConfig struct {
 const appConfigSectionKey = "apps"
 
 var defaultAppConfig = &AppConfig{
-	InternalAppServiceURL: "http://localhost:8091",
-	CacheTTL:              30 * time.Second,
+	InternalAppService: serviceclient.ServiceConfig{URL: "http://localhost:8091"},
+	CacheTTL:           30 * time.Second,
 }
 
 var appConfigSection = config.MustRegisterSection(appConfigSectionKey, defaultAppConfig)

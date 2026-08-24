@@ -60,7 +60,14 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.clusterName"), defaultConfig.Kubernetes.ClusterName, "Logical name of the Kubernetes cluster")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "watchBufferSize"), defaultConfig.WatchBufferSize, "Buffer size for watch channels")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "watchWorkers"), defaultConfig.WatchWorkers, "Number of parallel worker goroutines for processing watch events")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runServiceUrl"), defaultConfig.RunServiceURL, "Base URL of the internal run service")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.url"), defaultConfig.RunService.URL, "Internal run service base URL")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.type"), string(defaultConfig.RunService.Auth.Type), "Internal run service authentication type")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.issuerUrl"), defaultConfig.RunService.Auth.IssuerURL, "Internal run service OAuth 2.0 issuer URL")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.clientId"), defaultConfig.RunService.Auth.ClientID, "Internal run service OAuth 2.0 client ID")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.clientSecret"), defaultConfig.RunService.Auth.ClientSecret, "Internal run service OAuth 2.0 client secret")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.clientSecretFile"), defaultConfig.RunService.Auth.ClientSecretFile, "File containing the internal run service OAuth 2.0 client secret")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "runService.auth.scopes"), defaultConfig.RunService.Auth.Scopes, "Internal run service OAuth 2.0 scopes")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.audience"), defaultConfig.RunService.Auth.Audience, "Internal run service OAuth 2.0 token audience")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "recordFilterSize"), defaultConfig.RecordFilterSize, "Size of the oppo bloom filter for deduplicating RecordAction calls")
 	return cmdFlags
 }
