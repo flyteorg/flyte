@@ -30,6 +30,8 @@ jobs:
             contributor, please reply here and a maintainer will review your PR.
 
             We appreciate your contribution and apologize if this is a false positive!
+          # -- Enabled checks --
+          require-pr-template: true # AI generated pull requests typically don't follow the template
 
           # -- Disabled checks (keep minimal) --
           min-profile-completeness: 0
