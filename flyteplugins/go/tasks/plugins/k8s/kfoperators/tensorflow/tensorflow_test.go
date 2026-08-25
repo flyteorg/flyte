@@ -47,8 +47,15 @@ var (
 	dummyAnnotations = map[string]string{
 		"annotation-key": "annotation-value",
 	}
+	// The attempt labels are what NewTaskExecutionMetadata stamps on every task, and what
+	// the framework selects on to find the replica pods the operator derives from these
+	// templates, so the fixture carries them alongside a plain user label.
 	dummyLabels = map[string]string{
-		"label-key": "label-value",
+		"label-key":              "label-value",
+		flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue,
+		flytek8s.RunLabel:        "run-abc",
+		flytek8s.ActionLabel:     "a0",
+		flytek8s.AttemptLabel:    "1",
 	}
 
 	resourceRequirements = &corev1.ResourceRequirements{
