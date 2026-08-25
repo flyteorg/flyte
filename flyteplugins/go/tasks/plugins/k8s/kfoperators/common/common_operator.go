@@ -9,6 +9,9 @@ import (
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	v1 "k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/selection"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	flyteerr "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
@@ -28,6 +31,37 @@ const (
 	MPITaskType        = "mpi"
 	PytorchTaskType    = "pytorch"
 )
+
+// ChildPods names the replica pods the training operator expands from the templates a
+// kubeflow plugin built. It is the shared implementation of k8s.ChildPodDiscovery for
+// PyTorchJob, MPIJob and TFJob, which all get their replica pods from the same operator
+// and so all carry the same job-name label.
+//
+// The selector is the attempt's own labels, which every replica template carries through
+// ToReplicaSpec, narrowed by the job the pods belong to. Unlike Ray's cluster name the job
+// name is the CR's own name, so it is known from the moment the resource exists and the
+// selector is never partial.
+func ChildPods(
+	_ context.Context,
+	taskCtx pluginsCore.TaskExecutionMetadata,
+	resource client.Object,
+) (labels.Selector, error) {
+	if resource == nil {
+		return nil, fmt.Errorf("expected a kubeflow job, got nothing")
+	}
+
+	selector := flytek8s.AttemptPodSelector(taskCtx)
+	if selector == nil {
+		return nil, nil
+	}
+
+	requirement, err := labels.NewRequirement(kubeflowv1.JobNameLabel, selection.Equals, []string{resource.GetName()})
+	if err != nil {
+		return nil, err
+	}
+
+	return selector.Add(*requirement), nil
+}
 
 // ExtractCurrentCondition will return the first job condition for tensorflow/pytorch
 func ExtractCurrentCondition(jobConditions []kubeflowv1.JobCondition) (kubeflowv1.JobCondition, error) {
