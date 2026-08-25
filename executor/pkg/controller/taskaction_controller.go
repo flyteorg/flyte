@@ -30,12 +30,14 @@ import (
 
 	"connectrpc.com/connect"
 	"go.opentelemetry.io/otel/metric"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/utils/clock"
 	ctrl "sigs.k8s.io/controller-runtime"
 	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -69,6 +71,10 @@ const (
 	// MaxSystemFailuresExceededCode is the ExecutionError.Code stamped on
 	// TaskActions that hit the system-failure ceiling.
 	MaxSystemFailuresExceededCode = "MaxSystemFailuresExceeded"
+
+	// TaskExecutionTimedOutCode is the stable ExecutionError.Code for a task
+	// attempt that exhausts its configured max runtime.
+	TaskExecutionTimedOutCode = "TaskExecutionTimedOut"
 
 	// LabelTerminationStatus marks a TaskAction as terminated for GC discovery.
 	LabelTerminationStatus = "flyte.org/termination-status"
@@ -107,6 +113,7 @@ type TaskActionReconciler struct {
 	// RequeueDuration overrides how long to wait before reconciling a running
 	// TaskAction again. Any non-positive value means TaskActionDefaultRequeueDuration.
 	RequeueDuration time.Duration
+	Clock           clock.Clock
 	metrics         *taskActionMetrics
 }
 
@@ -165,6 +172,296 @@ func (r *TaskActionReconciler) requeueDuration() time.Duration {
 	return r.RequeueDuration
 }
 
+func (r *TaskActionReconciler) now() time.Time {
+	if r.Clock != nil {
+		return r.Clock.Now()
+	}
+	return time.Now()
+}
+
+func maxRuntimeFromTaskTemplate(data []byte) (time.Duration, error) {
+	if len(data) == 0 {
+		return 0, nil
+	}
+
+	taskTemplate := &core.TaskTemplate{}
+	if err := proto.Unmarshal(data, taskTemplate); err != nil {
+		return 0, fmt.Errorf("unmarshal task template: %w", err)
+	}
+
+	timeout := taskTemplate.GetMetadata().GetTimeout()
+	if timeout == nil {
+		return 0, nil
+	}
+	if err := timeout.CheckValid(); err != nil {
+		return 0, fmt.Errorf("invalid task timeout: %w", err)
+	}
+	maxRuntime := timeout.AsDuration()
+	if maxRuntime < 0 {
+		return 0, fmt.Errorf("invalid task timeout: duration must not be negative")
+	}
+	if maxRuntime > 0 {
+		return maxRuntime, nil
+	}
+	return 0, nil
+}
+
+func taskAttemptDeadline(taskAction *flyteorgv1.TaskAction, maxRuntime time.Duration) (time.Time, bool) {
+	if maxRuntime <= 0 || taskAction.Status.AttemptStartedAt == nil {
+		return time.Time{}, false
+	}
+	return taskAction.Status.AttemptStartedAt.Add(maxRuntime), true
+}
+
+func (r *TaskActionReconciler) timeoutAwareRequeue(
+	taskAction *flyteorgv1.TaskAction,
+	maxRuntime time.Duration,
+) ctrl.Result {
+	requeueAfter := r.requeueDuration()
+	deadline, ok := taskAttemptDeadline(taskAction, maxRuntime)
+	if !ok {
+		return ctrl.Result{RequeueAfter: requeueAfter}
+	}
+
+	untilDeadline := deadline.Sub(r.now())
+	if untilDeadline <= 0 {
+		return ctrl.Result{Requeue: true}
+	}
+	if untilDeadline < requeueAfter {
+		requeueAfter = untilDeadline
+	}
+	return ctrl.Result{RequeueAfter: requeueAfter}
+}
+
+func runningTransitionTime(taskAction *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo, now time.Time) time.Time {
+	attempt := observedAttempts(taskAction)
+	var queuedCount uint32
+	for _, transition := range taskAction.Status.PhaseHistory {
+		if transition.Phase == string(flyteorgv1.ConditionReasonQueued) {
+			queuedCount++
+		}
+	}
+	var queuedAt time.Time
+	var foundQueued bool
+	var startedAt time.Time
+	for i := len(taskAction.Status.PhaseHistory) - 1; i >= 0; i-- {
+		transition := taskAction.Status.PhaseHistory[i]
+		if transition.Phase == string(flyteorgv1.ConditionReasonQueued) {
+			foundQueued = true
+			queuedAt = transition.OccurredAt.Time
+			break
+		}
+		if transition.Phase == string(flyteorgv1.ConditionReasonExecuting) &&
+			!transition.OccurredAt.IsZero() &&
+			!transition.OccurredAt.After(now) &&
+			(startedAt.IsZero() || transition.OccurredAt.Time.Before(startedAt)) {
+			startedAt = transition.OccurredAt.Time
+		}
+	}
+	if attempt > 1 && queuedCount < attempt-1 {
+		foundQueued = false
+		queuedAt = time.Time{}
+		startedAt = time.Time{}
+	}
+
+	if info.Phase() == pluginsCore.PhaseRunning {
+		taskInfo := info.Info()
+		if taskInfo != nil && taskInfo.OccurredAt != nil {
+			occurredAt := *taskInfo.OccurredAt
+			if !occurredAt.IsZero() &&
+				!occurredAt.After(now) &&
+				(!foundQueued || (!queuedAt.IsZero() && !occurredAt.Before(queuedAt))) &&
+				(attempt == 1 || foundQueued) &&
+				(startedAt.IsZero() || occurredAt.Before(startedAt)) {
+				startedAt = occurredAt
+			}
+		}
+	}
+	if !startedAt.IsZero() {
+		return startedAt
+	}
+	return now
+}
+
+func transitionCompletedByDeadline(info pluginsCore.PhaseInfo, deadline time.Time) bool {
+	taskInfo := info.Info()
+	return info.Phase().IsTerminal() &&
+		taskInfo != nil &&
+		taskInfo.OccurredAt != nil &&
+		!taskInfo.OccurredAt.IsZero() &&
+		!taskInfo.OccurredAt.After(deadline)
+}
+
+func shouldTimeoutTransition(info pluginsCore.PhaseInfo, deadline, now time.Time) bool {
+	if now.Before(deadline) {
+		return false
+	}
+	if info.Phase().IsTerminal() {
+		return !transitionCompletedByDeadline(info, deadline)
+	}
+	return true
+}
+
+func (r *TaskActionReconciler) persistAttemptStartedAt(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	startedAt time.Time,
+) error {
+	candidate := metav1.NewTime(startedAt)
+	persisted := candidate
+	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
+		if latest.Status.AttemptStartedAt == nil {
+			latest.Status.AttemptStartedAt = &candidate
+		}
+		persisted = *latest.Status.AttemptStartedAt
+	}); err != nil {
+		return err
+	}
+	taskAction.Status.AttemptStartedAt = &persisted
+	return nil
+}
+
+func (r *TaskActionReconciler) persistTimeoutPending(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	deadline time.Time,
+	stateMgr *plugin.PluginStateManager,
+) error {
+	candidate := metav1.NewTime(deadline)
+	persisted := candidate
+	state, stateVersion, stateWritten := stateMgr.GetNewState()
+	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
+		if latest.Status.TimeoutAt == nil {
+			latest.Status.TimeoutAt = &candidate
+		}
+		persisted = *latest.Status.TimeoutAt
+		if stateWritten {
+			latest.Status.PluginState = state
+			latest.Status.PluginStateVersion = stateVersion
+		}
+	}); err != nil {
+		return err
+	}
+
+	taskAction.Status.TimeoutAt = &persisted
+	if stateWritten {
+		taskAction.Status.PluginState = state
+		taskAction.Status.PluginStateVersion = stateVersion
+	}
+	return nil
+}
+
+func (r *TaskActionReconciler) reconcileTimedOutAttempt(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	original *flyteorgv1.TaskAction,
+	p pluginsCore.Plugin,
+	tCtx pluginsCore.TaskExecutionContext,
+	maxRuntime time.Duration,
+) (ctrl.Result, error) {
+	logger := log.FromContext(ctx)
+
+	reservationErr := r.maintainCacheReservation(ctx, taskAction, tCtx)
+	if reservationErr != nil {
+		logger.Error(reservationErr, "failed to maintain cache reservation during timeout cleanup")
+	}
+
+	if err := p.Abort(ctx, tCtx); err != nil {
+		logger.Error(err, "failed to abort timed out task attempt, will retry")
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+	}
+	if err := p.Finalize(ctx, tCtx); err != nil {
+		logger.Error(err, "failed to finalize timed out task attempt, will retry")
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+	}
+
+	currentAttempts := observedAttempts(taskAction)
+	maxAttempts := tCtx.TaskExecutionMetadata().GetMaxAttempts()
+	deadline := taskAction.Status.TimeoutAt.Time
+	timeoutInfo := pluginsCore.PhaseInfoRetryableFailure(
+		TaskExecutionTimedOutCode,
+		fmt.Sprintf(
+			"task attempt %d exceeded its max runtime of %s",
+			currentAttempts,
+			maxRuntime,
+		),
+		&pluginsCore.TaskInfo{OccurredAt: &deadline},
+	)
+
+	if currentAttempts < maxAttempts {
+		if reservationErr != nil {
+			return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+		}
+
+		// Publish the TIMED_OUT event for this attempt before advancing the status.
+		// If the subsequent status write fails, the next reconcile will re-publish
+		// this event (at-least-once delivery). Consumers must tolerate duplicate
+		// TIMED_OUT events for the same attempt.
+		timeoutEvent := r.buildActionEvent(ctx, taskAction, timeoutInfo)
+		if err := r.recordEvent(ctx, timeoutEvent); err != nil {
+			logger.Error(err, "failed to persist timed out attempt event, will retry")
+			return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+		}
+
+		queuedAt := r.now()
+		transition := pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(
+			queuedAt,
+			pluginsCore.DefaultPhaseVersion,
+			"restarting task after max-runtime timeout",
+		))
+		phaseInfo := transition.Info()
+
+		taskAction.Status.Attempts = currentAttempts + 1
+		taskAction.Status.AttemptStartedAt = nil
+		taskAction.Status.TimeoutAt = nil
+		taskAction.Status.PluginState = nil
+		taskAction.Status.PluginStateVersion = 0
+		taskAction.Status.PluginPhase = phaseInfo.Phase().String()
+		taskAction.Status.PluginPhaseVersion = phaseInfo.Version()
+		taskAction.Status.SystemFailures = 0
+		taskAction.Status.CacheStatus = observedCacheStatus(phaseInfo.Info())
+		mapPhaseToConditions(taskAction, phaseInfo)
+
+		actionSpec, _ := taskAction.Spec.GetActionSpec()
+		if actionSpec != nil {
+			taskAction.Status.StateJSON = createStateJSON(actionSpec, phaseInfo.Phase().String())
+		}
+
+		if err := r.updateTaskActionStatus(ctx, original, taskAction, phaseInfo); err != nil {
+			return ctrl.Result{}, err
+		}
+		return ctrl.Result{Requeue: true}, nil
+	}
+
+	if err := r.releaseTaskCacheReservation(ctx, taskAction, tCtx); err != nil {
+		logger.Error(err, "failed to release cache reservation after terminal timeout, will retry")
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+	}
+
+	phaseInfo := pluginsCore.PhaseInfoFailed(
+		pluginsCore.PhasePermanentFailure,
+		timeoutInfo.Err(),
+		timeoutInfo.Info(),
+	)
+	mapPhaseToConditions(taskAction, phaseInfo)
+	taskAction.Status.PluginPhase = phaseInfo.Phase().String()
+	taskAction.Status.PluginPhaseVersion = phaseInfo.Version()
+	taskAction.Status.SystemFailures = 0
+
+	actionSpec, _ := taskAction.Spec.GetActionSpec()
+	if actionSpec != nil {
+		taskAction.Status.StateJSON = createStateJSON(actionSpec, phaseInfo.Phase().String())
+	}
+
+	if err := r.updateTaskActionStatus(ctx, original, taskAction, phaseInfo); err != nil {
+		return ctrl.Result{}, err
+	}
+	if err := r.ensureTerminalLabels(ctx, taskAction); err != nil {
+		return ctrl.Result{}, err
+	}
+	return ctrl.Result{}, nil
+}
+
 // resetPluginResource aborts any in-flight plugin resource and clears persisted
 // plugin state so the next reconcile starts fresh from PluginPhaseNotStarted.
 func (r *TaskActionReconciler) resetPluginResource(
@@ -212,6 +509,7 @@ func (r *TaskActionReconciler) recordSystemError(
 	original *flyteorgv1.TaskAction,
 	pluginID string,
 	handleErr error,
+	maxRuntime time.Duration,
 ) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
@@ -248,7 +546,7 @@ func (r *TaskActionReconciler) recordSystemError(
 			logger.Error(updErr, "failed to persist SystemFailures counter")
 		}
 	}
-	return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+	return r.timeoutAwareRequeue(taskAction, maxRuntime), nil
 }
 
 // finalizePermanentFailure converts the TaskAction to a terminal PermanentFailure
@@ -392,6 +690,11 @@ func (r *TaskActionReconciler) reconcileTask(
 		return ctrl.Result{}, nil
 	}
 
+	maxRuntime, err := maxRuntimeFromTaskTemplate(taskAction.Spec.TaskTemplate)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
 	// Build PluginStateManager from persisted state
 	stateMgr := plugin.NewPluginStateManager(
 		taskAction.Status.PluginState,
@@ -409,7 +712,18 @@ func (r *TaskActionReconciler) reconcileTask(
 	)
 	if err != nil {
 		logger.Error(err, "failed to build task execution context")
-		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+		return r.timeoutAwareRequeue(taskAction, maxRuntime), nil
+	}
+
+	if taskAction.Status.TimeoutAt != nil {
+		return r.reconcileTimedOutAttempt(
+			ctx,
+			taskAction,
+			originalTaskActionInstance,
+			p,
+			tCtx,
+			maxRuntime,
+		)
 	}
 	alreadyRunning := taskAction.Status.PluginPhase == pluginsCore.PhaseRunning.String()
 
@@ -419,7 +733,11 @@ func (r *TaskActionReconciler) reconcileTask(
 	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, alreadyRunning)
 	if err != nil {
 		logger.Error(err, "cache pre-execution handling failed")
-		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+		deadline, hasDeadline := taskAttemptDeadline(taskAction, maxRuntime)
+		if !hasDeadline || r.now().Before(deadline) {
+			return r.timeoutAwareRequeue(taskAction, maxRuntime), nil
+		}
+		cacheShortCircuited = false
 	}
 	// Even when cache handling short-circuits execution, we still continue through the
 	// shared reconcile tail below so the derived transition updates conditions, status,
@@ -429,21 +747,72 @@ func (r *TaskActionReconciler) reconcileTask(
 	if !cacheShortCircuited {
 		transition, err = p.Handle(ctx, tCtx)
 		if err != nil {
-			return r.recordSystemError(ctx, taskAction, originalTaskActionInstance, p.GetID(), err)
+			if deadline, hasDeadline := taskAttemptDeadline(taskAction, maxRuntime); hasDeadline && !r.now().Before(deadline) {
+				if err := r.persistTimeoutPending(ctx, taskAction, deadline, stateMgr); err != nil {
+					return ctrl.Result{}, err
+				}
+				return r.reconcileTimedOutAttempt(
+					ctx,
+					taskAction,
+					originalTaskActionInstance,
+					p,
+					tCtx,
+					maxRuntime,
+				)
+			}
+			return r.recordSystemError(ctx, taskAction, originalTaskActionInstance, p.GetID(), err, maxRuntime)
+		}
+	}
+
+	phaseInfo := transition.Info()
+	if maxRuntime > 0 && taskAction.Status.AttemptStartedAt == nil &&
+		(phaseInfo.Phase() == pluginsCore.PhaseRunning || alreadyRunning) {
+		startedAt := runningTransitionTime(taskAction, phaseInfo, r.now())
+		if err := r.persistAttemptStartedAt(ctx, taskAction, startedAt); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+
+	if deadline, hasDeadline := taskAttemptDeadline(taskAction, maxRuntime); hasDeadline {
+		now := r.now()
+		if phaseInfo.Phase().IsTerminal() &&
+			!transitionCompletedByDeadline(phaseInfo, deadline) &&
+			now.Before(deadline) {
+			return r.timeoutAwareRequeue(taskAction, maxRuntime), nil
+		}
+		if shouldTimeoutTransition(phaseInfo, deadline, now) {
+			if err := r.persistTimeoutPending(ctx, taskAction, deadline, stateMgr); err != nil {
+				return ctrl.Result{}, err
+			}
+			return r.reconcileTimedOutAttempt(
+				ctx,
+				taskAction,
+				originalTaskActionInstance,
+				p,
+				tCtx,
+				maxRuntime,
+			)
 		}
 	}
 
 	if transition, err = r.finalizeCacheAfterExecution(ctx, taskAction, tCtx, transition, cacheShortCircuited); err != nil {
 		logger.Error(err, "cache post-execution handling failed")
-		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+		return r.timeoutAwareRequeue(taskAction, maxRuntime), nil
 	}
 
 	// Map transition phase to TaskAction conditions
-	phaseInfo := transition.Info()
+	phaseInfo = transition.Info()
 
 	if !cacheShortCircuited && isSystemRetryableFailure(phaseInfo) {
 		r.resetPluginResource(ctx, taskAction, p, tCtx)
-		return r.recordSystemError(ctx, taskAction, originalTaskActionInstance, p.GetID(), systemErrorFromPhaseInfo(phaseInfo))
+		return r.recordSystemError(
+			ctx,
+			taskAction,
+			originalTaskActionInstance,
+			p.GetID(),
+			systemErrorFromPhaseInfo(phaseInfo),
+			maxRuntime,
+		)
 	}
 
 	// Reset the consecutive system-failure counter on any non-system-error
@@ -468,7 +837,7 @@ func (r *TaskActionReconciler) reconcileTask(
 			restartAttempts = currentAttempts + 1
 			logger.Info("restarting task in-place", "attempt", currentAttempts+1, "maxAttempts", maxAttempts)
 			// Override the transition to Queued so the TaskAction stays non-terminal.
-			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "restarting task"))
+			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(r.now(), pluginsCore.DefaultPhaseVersion, "restarting task"))
 			phaseInfo = transition.Info()
 		} else {
 			// All retries exhausted — convert to a permanent (terminal) failure.
@@ -504,6 +873,8 @@ func (r *TaskActionReconciler) reconcileTask(
 		taskAction.Status.Attempts = restartAttempts
 		taskAction.Status.PluginState = nil
 		taskAction.Status.PluginStateVersion = 0
+		taskAction.Status.AttemptStartedAt = nil
+		taskAction.Status.TimeoutAt = nil
 	}
 
 	taskAction.Status.PluginPhase = phaseInfo.Phase().String()
@@ -522,7 +893,7 @@ func (r *TaskActionReconciler) reconcileTask(
 		}
 	}
 
-	return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+	return r.timeoutAwareRequeue(taskAction, maxRuntime), nil
 }
 
 // ensureTerminalLabels adds GC-related labels to a terminal TaskAction if not already present.
@@ -713,6 +1084,12 @@ func (r *TaskActionReconciler) buildActionEvent(
 		ClusterEvents: toClusterEvents(phaseInfo, updatedTime),
 		ReportedTime:  timestamppb.New(time.Now()),
 	}
+	if isTaskExecutionTimedOut(phaseInfo) {
+		event.Phase = common.ActionPhase_ACTION_PHASE_TIMED_OUT
+		if taskAction.Status.TimeoutAt != nil {
+			event.UpdatedTime = timestamppb.New(taskAction.Status.TimeoutAt.Time)
+		}
+	}
 
 	if info != nil {
 		event.LogInfo = info.Logs
@@ -819,6 +1196,10 @@ func errorStateFromExecError(err *core.ExecutionError) *flyteorgv1.ErrorState {
 	}
 }
 
+func isTaskExecutionTimedOut(info pluginsCore.PhaseInfo) bool {
+	return info.Err() != nil && info.Err().GetCode() == TaskExecutionTimedOutCode
+}
+
 func toClusterEvents(phaseInfo pluginsCore.PhaseInfo, fallbackTime *timestamppb.Timestamp) []*workflow.ClusterEvent {
 	info := phaseInfo.Info()
 	if phaseInfo.Reason() == "" && (info == nil || len(info.AdditionalReasons) == 0) {
@@ -877,7 +1258,9 @@ func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) b
 		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion ||
 		oldStatus.Attempts != newStatus.Attempts ||
 		oldStatus.SystemFailures != newStatus.SystemFailures ||
-		oldStatus.CacheStatus != newStatus.CacheStatus {
+		oldStatus.CacheStatus != newStatus.CacheStatus ||
+		!reflect.DeepEqual(oldStatus.AttemptStartedAt, newStatus.AttemptStartedAt) ||
+		!reflect.DeepEqual(oldStatus.TimeoutAt, newStatus.TimeoutAt) {
 		return true
 	}
 
@@ -925,16 +1308,20 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 			flyteorgv1.ConditionReasonCompleted, msg)
 
 	case pluginsCore.PhasePermanentFailure:
-		phaseName = string(flyteorgv1.ConditionReasonPermanentFailure)
+		reason := flyteorgv1.ConditionReasonPermanentFailure
+		if isTaskExecutionTimedOut(info) {
+			reason = flyteorgv1.ConditionReasonTimedOut
+		}
+		phaseName = string(reason)
 		msg = info.Reason()
 		if info.Err() != nil {
 			msg = info.Err().GetMessage()
 			ta.Status.ErrorState = errorStateFromExecError(info.Err())
 		}
 		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
-			flyteorgv1.ConditionReasonPermanentFailure, msg)
+			reason, msg)
 		setCondition(ta, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue,
-			flyteorgv1.ConditionReasonPermanentFailure, msg)
+			reason, msg)
 
 	case pluginsCore.PhaseRetryableFailure:
 		phaseName = string(flyteorgv1.ConditionReasonRetryableFailure)
@@ -1065,6 +1452,9 @@ func validateTaskAction(taskAction *flyteorgv1.TaskAction, registry pluginResolv
 	if len(missing) > 0 {
 		return nil, flyteorgv1.ConditionReasonInvalidSpec,
 			fmt.Errorf("required spec fields are empty: %v", missing)
+	}
+	if _, err := maxRuntimeFromTaskTemplate(taskAction.Spec.TaskTemplate); err != nil {
+		return nil, flyteorgv1.ConditionReasonInvalidSpec, err
 	}
 
 	p, err := registry.ResolvePlugin(taskAction.Spec.TaskType)

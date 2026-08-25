@@ -6,8 +6,11 @@ import (
 	"strings"
 	"testing"
 
+	"google.golang.org/protobuf/proto"
+
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 // mockPluginResolver is a test double for pluginResolver.
@@ -32,6 +35,10 @@ func (mockPlugin) Abort(_ context.Context, _ pluginsCore.TaskExecutionContext) e
 func (mockPlugin) Finalize(_ context.Context, _ pluginsCore.TaskExecutionContext) error { return nil }
 
 func validTaskAction() *flyteorgv1.TaskAction {
+	taskTemplate, err := proto.Marshal(&core.TaskTemplate{Type: "container"})
+	if err != nil {
+		panic(err)
+	}
 	return &flyteorgv1.TaskAction{
 		Spec: flyteorgv1.TaskActionSpec{
 			RunName:       "my-run",
@@ -39,7 +46,7 @@ func validTaskAction() *flyteorgv1.TaskAction {
 			Domain:        "my-domain",
 			ActionName:    "my-action",
 			TaskType:      "container",
-			TaskTemplate:  []byte(`{}`),
+			TaskTemplate:  taskTemplate,
 			InputURI:      "s3://bucket/input",
 			RunOutputBase: "s3://bucket/output",
 		},

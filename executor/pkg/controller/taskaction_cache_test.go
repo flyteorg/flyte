@@ -304,6 +304,40 @@ func TestHandleCacheAfterExecutionReleasesReservationOnFailure(t *testing.T) {
 	assert.True(t, released)
 }
 
+func TestTimeoutMaintainsSerializedCacheReservationUntilTerminal(t *testing.T) {
+	ensureTestMetricKeys()
+	ctx := context.Background()
+	taskAction, dataStore := newCacheableTaskAction(t, true, true)
+	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
+
+	extended := 0
+	released := 0
+	r := &TaskActionReconciler{
+		DataStore: dataStore,
+		Catalog: &stubCatalogClient{
+			getOrExtendReservationFunc: func(_ context.Context, _ catalog.Key, ownerID string, heartbeat time.Duration) (*cacheservice.Reservation, error) {
+				extended++
+				assert.Equal(t, "default/cacheable-action", ownerID)
+				assert.Equal(t, TaskActionDefaultRequeueDuration, heartbeat)
+				return &cacheservice.Reservation{OwnerId: ownerID}, nil
+			},
+			releaseReservationFunc: func(_ context.Context, _ catalog.Key, ownerID string) error {
+				released++
+				assert.Equal(t, "default/cacheable-action", ownerID)
+				return nil
+			},
+		},
+	}
+
+	require.NoError(t, r.maintainCacheReservation(ctx, taskAction, tCtx))
+	require.NoError(t, r.maintainCacheReservation(ctx, taskAction, tCtx))
+	assert.Equal(t, 2, extended)
+	assert.Zero(t, released)
+
+	require.NoError(t, r.releaseTaskCacheReservation(ctx, taskAction, tCtx))
+	assert.Equal(t, 1, released)
+}
+
 func newCacheableTaskAction(t *testing.T, discoverable bool, serializable bool) (*flyteorgv1.TaskAction, *storage.DataStore) {
 	t.Helper()
 
