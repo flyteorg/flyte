@@ -24,22 +24,16 @@ import (
 var _ pluginsCore.TaskExecutionMetadata = &taskExecutionMetadata{}
 var _ pluginsCore.TaskExecutionID = &taskExecutionID{}
 
+// Labels stamped on task pods so external per-pod metrics (DCGM, cAdvisor,
+// kube-state-metrics) can be joined back to Flyte semantics, and so the framework can
+// find the pods belonging to one attempt of one action. They are defined in flytek8s
+// alongside the managed label, because the plugins that build pod templates have to keep
+// them intact for the pods an operator derives from those templates to carry them.
 const (
-	// Labels stamped on task pods so external per-pod metrics (DCGM, cAdvisor,
-	// kube-state-metrics) can be joined back to Flyte semantics. They are bare
-	// names, matching the project/domain/organization labels already injected,
-	// which kube-state-metrics surfaces as `label_run`, `label_action`,
-	// `label_attempt` and `label_task_name`.
-
-	// RunLabel carries the name of the run that owns the action.
-	RunLabel = "run"
-	// ActionLabel carries the name of the action the pod is executing.
-	ActionLabel = "action"
-	// AttemptLabel carries the 1-based attempt number, so the pod of a retried
-	// action can be told apart from the pods of its earlier attempts.
-	AttemptLabel = "attempt"
-	// TaskNameLabel carries the registered task name from the task template.
-	TaskNameLabel = "task-name"
+	RunLabel      = flytek8s.RunLabel
+	ActionLabel   = flytek8s.ActionLabel
+	AttemptLabel  = flytek8s.AttemptLabel
+	TaskNameLabel = flytek8s.TaskNameLabel
 )
 
 type taskExecutionID struct {
