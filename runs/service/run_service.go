@@ -690,9 +690,10 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 	action.Attempts = attempts
 
 	switch action.GetStatus().GetPhase() {
-	case common.ActionPhase_ACTION_PHASE_FAILED:
+	case common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_TIMED_OUT:
 		// Get action error from last attempt. Events are eventually consistent, so we may not have
-		// information from the latest attempt yet.
+		// information from the latest attempt yet. A timed-out action carries its
+		// error the same way a failed one does, so it resolves through this path too.
 		numAttempts := len(action.GetAttempts())
 		if numAttempts > 0 && action.GetAttempts()[numAttempts-1].GetAttempt() == action.GetStatus().GetAttempts() {
 			action.Result = &workflow.ActionDetails_ErrorInfo{
@@ -2068,7 +2069,10 @@ func (s *RunService) buildTaskGroups(ctx context.Context, req *workflow.WatchGro
 
 		phase := common.ActionPhase(action.Phase)
 		g.phaseCounts[phase]++
-		if phase == common.ActionPhase_ACTION_PHASE_FAILED {
+		// A timed-out action did not succeed, so it counts toward the fail rate;
+		// phaseCounts still reports the two separately.
+		if phase == common.ActionPhase_ACTION_PHASE_FAILED ||
+			phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT {
 			g.failCount++
 		}
 

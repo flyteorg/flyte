@@ -792,19 +792,42 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(fake.finalizeCalls).To(Equal(1))
 		})
 
-		It("bootstraps an existing Running action from its earliest current-attempt history", func() {
+		It("anchors the attempt clock on the plugin's reported start time", func() {
+			const timeout = time.Hour
+			now := time.Date(2026, time.August, 25, 4, 0, 0, 0, time.UTC)
+			startedAt := now.Add(-10 * time.Minute)
+			fakeClock := testingclock.NewFakeClock(now)
+			fake := &fakePlugin{
+				id:          "timeout-plugin",
+				transitions: []pluginsCore.Transition{runningTransition(startedAt)},
+			}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			nn := createTaskAction(
+				"timeout-anchor-plugin",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", timeout, 0),
+			)
+
+			result, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			Expect(err).NotTo(HaveOccurred())
+			// Ten minutes of the budget are already spent, so the next visit is
+			// scheduled for the deadline rather than a full requeue interval away.
+			Expect(result.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
+			Expect(getTaskAction(nn).Status.AttemptStartedAt.Time).To(BeTemporally("==", startedAt))
+		})
+
+		It("bootstraps an action already Running from its recorded Executing transition", func() {
 			const timeout = 2 * time.Hour
 			now := time.Date(2026, time.August, 25, 4, 0, 0, 0, time.UTC)
 			queuedAt := now.Add(-2 * time.Hour)
-			firstExecutingAt := now.Add(-90 * time.Minute)
-			laterExecutingAt := now.Add(-time.Hour)
+			executingAt := now.Add(-90 * time.Minute)
 			fakeClock := testingclock.NewFakeClock(now)
+			// A terminal report, so there is no live Running phase to anchor on —
+			// the state an upgrade mid-attempt leaves behind.
 			fake := &fakePlugin{
 				id: "timeout-plugin",
 				transitions: []pluginsCore.Transition{
-					pluginsCore.DoTransition(pluginsCore.PhaseInfoRunning(
-						pluginsCore.DefaultPhaseVersion,
-						&pluginsCore.TaskInfo{},
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoSuccess(
+						&pluginsCore.TaskInfo{OccurredAt: &now},
 					)),
 				},
 			}
@@ -818,75 +841,52 @@ var _ = Describe("TaskAction Controller", func() {
 			resource.Status.PluginPhase = pluginsCore.PhaseRunning.String()
 			resource.Status.PhaseHistory = []flyteorgv1.PhaseTransition{
 				{Phase: string(flyteorgv1.ConditionReasonQueued), OccurredAt: metav1.NewTime(queuedAt)},
-				{Phase: string(flyteorgv1.ConditionReasonExecuting), OccurredAt: metav1.NewTime(firstExecutingAt)},
-				{Phase: string(flyteorgv1.ConditionReasonExecuting), OccurredAt: metav1.NewTime(laterExecutingAt)},
+				{Phase: string(flyteorgv1.ConditionReasonExecuting), OccurredAt: metav1.NewTime(executingAt)},
 			}
 			Expect(k8sClient.Status().Update(ctx, resource)).To(Succeed())
 
-			result, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			_, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
 			Expect(err).NotTo(HaveOccurred())
-			Expect(result.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
 			persisted := getTaskAction(nn)
-			Expect(persisted.Status.AttemptStartedAt.Time).To(BeTemporally("==", firstExecutingAt))
-			Expect(isTerminal(persisted)).To(BeFalse())
+			Expect(persisted.Status.AttemptStartedAt.Time).To(BeTemporally("==", executingAt))
+			// 90 minutes into a 2 hour budget: the run completed inside it.
+			Expect(persisted.Status.TimeoutAt).To(BeNil())
+			Expect(fake.abortCalls).To(BeZero())
 		})
 
-		It("does not bootstrap a retried attempt from history before its latest Queued boundary", func() {
+		It("ignores a reported start time from before the attempt was queued", func() {
 			const timeout = time.Hour
 			now := time.Date(2026, time.August, 25, 4, 0, 0, 0, time.UTC)
 			previousQueuedAt := now.Add(-4 * time.Hour)
 			previousExecutingAt := now.Add(-3 * time.Hour)
 			retryQueuedAt := now.Add(-10 * time.Minute)
-			currentExecutingAt := now.Add(-5 * time.Minute)
-			cases := []struct {
-				name          string
-				currentStart  *time.Time
-				expectedStart time.Time
-			}{
-				{name: "plugin-stale", expectedStart: now},
-				{name: "current-history", currentStart: &currentExecutingAt, expectedStart: currentExecutingAt},
+			fakeClock := testingclock.NewFakeClock(now)
+			// The plugin reports the *previous* attempt's start time. Taking it at
+			// face value would expire attempt 2 the moment it starts.
+			fake := &fakePlugin{
+				id:          "timeout-plugin",
+				transitions: []pluginsCore.Transition{runningTransition(previousExecutingAt)},
 			}
-
-			for _, testCase := range cases {
-				fakeClock := testingclock.NewFakeClock(now)
-				fake := &fakePlugin{
-					id:          "timeout-plugin",
-					transitions: []pluginsCore.Transition{runningTransition(previousExecutingAt)},
-				}
-				r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
-				name := "timeout-rb-stale"
-				if testCase.name == "current-history" {
-					name = "timeout-rb-history"
-				}
-				nn := createTaskAction(
-					name,
-					buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", timeout, 1),
-				)
-				resource := getTaskAction(nn)
-				resource.Status.Attempts = 2
-				resource.Status.PluginPhase = pluginsCore.PhaseRunning.String()
-				resource.Status.PhaseHistory = []flyteorgv1.PhaseTransition{
-					{Phase: string(flyteorgv1.ConditionReasonQueued), OccurredAt: metav1.NewTime(previousQueuedAt)},
-					{Phase: string(flyteorgv1.ConditionReasonExecuting), OccurredAt: metav1.NewTime(previousExecutingAt)},
-					{Phase: string(flyteorgv1.ConditionReasonQueued), OccurredAt: metav1.NewTime(retryQueuedAt)},
-				}
-				if testCase.currentStart != nil {
-					resource.Status.PhaseHistory = append(
-						resource.Status.PhaseHistory,
-						flyteorgv1.PhaseTransition{
-							Phase:      string(flyteorgv1.ConditionReasonExecuting),
-							OccurredAt: metav1.NewTime(*testCase.currentStart),
-						},
-					)
-				}
-				Expect(k8sClient.Status().Update(ctx, resource)).To(Succeed())
-
-				_, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(getTaskAction(nn).Status.AttemptStartedAt.Time).To(
-					BeTemporally("==", testCase.expectedStart),
-				)
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			nn := createTaskAction(
+				"timeout-stale-start",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", timeout, 1),
+			)
+			resource := getTaskAction(nn)
+			resource.Status.Attempts = 2
+			resource.Status.PhaseHistory = []flyteorgv1.PhaseTransition{
+				{Phase: string(flyteorgv1.ConditionReasonQueued), OccurredAt: metav1.NewTime(previousQueuedAt)},
+				{Phase: string(flyteorgv1.ConditionReasonExecuting), OccurredAt: metav1.NewTime(previousExecutingAt)},
+				{Phase: string(flyteorgv1.ConditionReasonQueued), OccurredAt: metav1.NewTime(retryQueuedAt)},
 			}
+			Expect(k8sClient.Status().Update(ctx, resource)).To(Succeed())
+
+			_, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			Expect(err).NotTo(HaveOccurred())
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.AttemptStartedAt.Time).To(BeTemporally("==", now))
+			Expect(persisted.Status.TimeoutAt).To(BeNil())
+			Expect(fake.abortCalls).To(BeZero())
 		})
 
 		It("uses authoritative completion time after controller downtime", func() {
@@ -954,16 +954,20 @@ var _ = Describe("TaskAction Controller", func() {
 			}
 		})
 
-		It("waits for the local deadline before classifying future terminal reports", func() {
+		It("honours a terminal result observed inside the deadline whatever it reports", func() {
+			// The bound is enforced against the controller clock. A task seen
+			// finishing with half its budget left has not overrun, however
+			// unusable the timestamp it came with — a skewed or absent
+			// completion time must not manufacture a timeout.
 			const timeout = time.Minute
 			base := time.Date(2026, time.August, 25, 0, 0, 0, 0, time.UTC)
-			cases := []string{"late", "missing", "zero"}
+			cases := []string{"future", "missing", "zero"}
 
 			for i, testCase := range cases {
 				startedAt := base.Add(time.Duration(i) * time.Hour)
-				lateCompletion := startedAt.Add(timeout + time.Second)
+				futureCompletion := startedAt.Add(timeout + time.Second)
 				zeroCompletion := time.Time{}
-				info := &pluginsCore.TaskInfo{OccurredAt: &lateCompletion}
+				info := &pluginsCore.TaskInfo{OccurredAt: &futureCompletion}
 				if testCase == "missing" {
 					info = &pluginsCore.TaskInfo{}
 				} else if testCase == "zero" {
@@ -977,9 +981,10 @@ var _ = Describe("TaskAction Controller", func() {
 						pluginsCore.DoTransition(pluginsCore.PhaseInfoSuccess(info)),
 					},
 				}
-				r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+				recorded := &recordingEventsClient{}
+				r := newReconciler(fake, fakeClock, recorded, nil)
 				nn := createTaskAction(
-					"timeout-future-"+testCase,
+					"timeout-inside-"+testCase,
 					buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", timeout, 0),
 				)
 				request := reconcile.Request{NamespacedName: nn}
@@ -987,17 +992,67 @@ var _ = Describe("TaskAction Controller", func() {
 				_, err := r.Reconcile(ctx, request)
 				Expect(err).NotTo(HaveOccurred())
 				fakeClock.Step(timeout / 2)
-				result, err := r.Reconcile(ctx, request)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(result.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
-				Expect(isTerminal(getTaskAction(nn))).To(BeFalse())
-				Expect(fake.abortCalls).To(BeZero())
-
-				fakeClock.Step(timeout / 2)
 				_, err = r.Reconcile(ctx, request)
 				Expect(err).NotTo(HaveOccurred())
-				Expect(isTerminal(getTaskAction(nn))).To(BeTrue())
+
+				persisted := getTaskAction(nn)
+				Expect(isTerminal(persisted)).To(BeTrue())
+				Expect(persisted.Status.TimeoutAt).To(BeNil())
+				Expect(fake.abortCalls).To(BeZero())
+				allEvents := recorded.RecordedEvents()
+				Expect(allEvents[len(allEvents)-1].GetPhase()).To(
+					Equal(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+				)
+			}
+		})
+
+		It("times out a terminal result that cannot prove it finished in time", func() {
+			// Same unusable timestamps, but now observed after the deadline: the
+			// task cannot show it finished inside its budget, so the bound wins.
+			const timeout = time.Minute
+			base := time.Date(2026, time.August, 25, 0, 0, 0, 0, time.UTC)
+			cases := []string{"future", "missing", "zero"}
+
+			for i, testCase := range cases {
+				startedAt := base.Add(time.Duration(i) * time.Hour)
+				futureCompletion := startedAt.Add(timeout + time.Second)
+				zeroCompletion := time.Time{}
+				info := &pluginsCore.TaskInfo{OccurredAt: &futureCompletion}
+				if testCase == "missing" {
+					info = &pluginsCore.TaskInfo{}
+				} else if testCase == "zero" {
+					info = &pluginsCore.TaskInfo{OccurredAt: &zeroCompletion}
+				}
+				fakeClock := testingclock.NewFakeClock(startedAt)
+				fake := &fakePlugin{
+					id: "timeout-plugin",
+					transitions: []pluginsCore.Transition{
+						runningTransition(startedAt),
+						pluginsCore.DoTransition(pluginsCore.PhaseInfoSuccess(info)),
+					},
+				}
+				recorded := &recordingEventsClient{}
+				r := newReconciler(fake, fakeClock, recorded, nil)
+				nn := createTaskAction(
+					"timeout-outside-"+testCase,
+					buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", timeout, 0),
+				)
+				request := reconcile.Request{NamespacedName: nn}
+
+				_, err := r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				fakeClock.Step(timeout)
+				_, err = r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+
+				persisted := getTaskAction(nn)
+				Expect(isTerminal(persisted)).To(BeTrue())
+				Expect(persisted.Status.ErrorState.Code).To(Equal(TaskExecutionTimedOutCode))
 				Expect(fake.abortCalls).To(Equal(1))
+				allEvents := recorded.RecordedEvents()
+				Expect(allEvents[len(allEvents)-1].GetPhase()).To(
+					Equal(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
+				)
 			}
 		})
 
