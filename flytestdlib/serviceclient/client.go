@@ -9,12 +9,16 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-const oauthAuthorizationServerMetadataPath = "/.well-known/oauth-authorization-server"
+const (
+	oauthAuthorizationServerMetadataPath = "/.well-known/oauth-authorization-server"
+	defaultDiscoveryTimeout              = 10 * time.Second
+)
 
 // ServiceConfig describes a downstream service and how to authenticate to it.
 type ServiceConfig struct {
@@ -128,6 +132,9 @@ func newOAuth2ClientCredentialsClient(ctx context.Context, base *http.Client, au
 }
 
 func discoverTokenURL(ctx context.Context, httpClient *http.Client, issuerURL string) (string, error) {
+	discoveryCtx, cancel := context.WithTimeout(ctx, defaultDiscoveryTimeout)
+	defer cancel()
+
 	issuer, err := url.Parse(issuerURL)
 	if err != nil || issuer.Scheme == "" || issuer.Host == "" {
 		return "", fmt.Errorf("service client oauth2: invalid issuerUrl %q", issuerURL)
@@ -136,7 +143,7 @@ func discoverTokenURL(ctx context.Context, httpClient *http.Client, issuerURL st
 	issuer.RawQuery = ""
 	issuer.Fragment = ""
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, issuer.String(), nil)
+	req, err := http.NewRequestWithContext(discoveryCtx, http.MethodGet, issuer.String(), nil)
 	if err != nil {
 		return "", fmt.Errorf("service client oauth2: create metadata request: %w", err)
 	}
