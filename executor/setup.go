@@ -260,6 +260,9 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("executor: maxSystemFailures must be non-negative, got %d", cfg.MaxSystemFailures)
 	}
 	reconciler.MaxSystemFailures = uint32(cfg.MaxSystemFailures)
+	if cfg.InterruptibleFailureThreshold == 0 {
+		return fmt.Errorf("executor: interruptibleFailureThreshold must not be zero; use -1 to fall back on the last attempt, or a value above the retry budget to disable the fallback")
+	}
 	if cfg.RequeueDuration.Duration < 0 {
 		return fmt.Errorf("executor: requeueDuration must not be negative, got %v", cfg.RequeueDuration.Duration)
 	}

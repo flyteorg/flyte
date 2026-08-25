@@ -34,6 +34,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	executorconfig "github.com/flyteorg/flyte/v2/executor/pkg/config"
 	pluginserrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	k8sPlugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
@@ -320,7 +321,7 @@ var _ = Describe("TaskAction Controller", func() {
 	Context("maxSystemFailures", func() {
 		It("returns the default when MaxSystemFailures is zero", func() {
 			r := &TaskActionReconciler{}
-			Expect(r.maxSystemFailures()).To(Equal(DefaultMaxSystemFailures))
+			Expect(r.maxSystemFailures()).To(Equal(executorconfig.DefaultMaxSystemFailures))
 		})
 
 		It("returns the configured value when set", func() {
