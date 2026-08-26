@@ -2,6 +2,15 @@ package gpufault
 
 import "fmt"
 
+// The tables below are transcribed from NVIDIA's Xid Errors guide, which is the
+// authority on what each code means and on whether the driver blames the application,
+// the hardware or something else:
+//
+//	https://docs.nvidia.com/deploy/xid-errors/
+//
+// Anything changed here should be checked against that document first. NVIDIA adds
+// codes with driver releases, so the tables are deliberately not exhaustive.
+
 // xidNames is the human name NVIDIA documents for each Xid code. It does not need to
 // be exhaustive: unknown codes fall back to "Xid <n>" so a new driver release never
 // makes a fault get dropped on the floor.
