@@ -514,6 +514,59 @@ func TestClassifyGpuFailureRelevanceIsAnchoredOnTheFailure(t *testing.T) {
 	})
 }
 
+// TestClassifyGpuFailureRelevanceIsAnInterval covers the shape of a fault event that a
+// single timestamp cannot express. A fault that keeps repeating is aggregated into one
+// event whose last observation moves with every repeat, so the event says it was first
+// recorded at one time and was still firing at another. What decides relevance is whether
+// that stretch of time reaches the failure.
+func TestClassifyGpuFailureRelevanceIsAnInterval(t *testing.T) {
+	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
+	failedAt := time.Now().Add(-30 * time.Minute)
+	phase := pluginsCore.PhaseInfoRetryableFailure("UnknownError", "Pod failed", &pluginsCore.TaskInfo{OccurredAt: &failedAt})
+
+	classify := func(t *testing.T, createdAt, lastObservedAt time.Time) pluginsCore.PhaseInfo {
+		t.Helper()
+		watcher := &fakeEventWatcher{events: map[watchedObjectKey][]*eventInfo{
+			key: {gpuFaultEventFor(79, gpufault.SeverityCritical, createdAt, lastObservedAt, testPodUID)},
+		}}
+		pm := NewPluginManager("test-plugin", nil, nil)
+		pm.eventWatcher = watcher
+		return pm.classifyGpuFailure(failedPod(), phase)
+	}
+
+	t.Run("a fault that started before the failure and kept firing after it explains it", func(t *testing.T) {
+		// The GPU faulted a minute before the container died and went on faulting for
+		// eleven minutes afterwards, which is what dying hardware does. Judging this by
+		// its last observation alone would discard it, and the longer the hardware kept
+		// faulting the more certainly it would be discarded.
+		got := classify(t, failedAt.Add(-time.Minute), failedAt.Add(11*time.Minute))
+		assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
+		assert.NotNil(t, got.Err().GetGpuFault())
+	})
+
+	t.Run("a fault older than the window but still firing at the failure explains it", func(t *testing.T) {
+		// First recorded forty minutes before the failure, so outside the window, but
+		// still going when the task died. Judging this by its creation alone would
+		// discard it.
+		got := classify(t, failedAt.Add(-40*time.Minute), failedAt)
+		assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
+		assert.NotNil(t, got.Err().GetGpuFault())
+	})
+
+	t.Run("a fault that only started after the failure does not explain it", func(t *testing.T) {
+		started := failedAt.Add(gpuFaultAfterFailureSlack + time.Minute)
+		got := classify(t, started, started.Add(5*time.Minute))
+		assert.Equal(t, "UnknownError", got.Err().GetCode())
+		assert.Nil(t, got.Err().GetGpuFault())
+	})
+
+	t.Run("a fault that stopped firing before the window opened does not explain it", func(t *testing.T) {
+		got := classify(t, failedAt.Add(-90*time.Minute), failedAt.Add(-40*time.Minute))
+		assert.Equal(t, "UnknownError", got.Err().GetCode())
+		assert.Nil(t, got.Err().GetGpuFault())
+	})
+}
+
 func TestClassifyGpuFailureIdentity(t *testing.T) {
 	base := time.Now().Add(-time.Minute)
 	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
