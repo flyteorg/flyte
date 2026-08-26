@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/golang/protobuf/proto" //nolint: staticcheck
@@ -25,8 +26,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 
-	// TODO @pvditt fix
-	//propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -600,6 +599,41 @@ func hasExternalLinkType(taskTemplate *core.TaskTemplate) bool {
 	return exists
 }
 
+// PodSpecMutator is a hook applied to every pod spec built through
+// ApplyFlytePodConfiguration, after its own construction and template merging.
+// Individual plugins may still adapt the returned spec afterward (e.g. translate
+// it into CRD fields), which can drop mutator changes. Mutators let embedding
+// applications extend pod construction without forking this package. A mutator
+// must be idempotent: the same spec may pass through pod construction more than
+// once.
+type PodSpecMutator func(spec *v1.PodSpec, primaryContainerName string) error
+
+var podSpecMutators struct {
+	m        sync.Mutex
+	mutators []PodSpecMutator
+}
+
+// RegisterPodSpecMutator registers a mutator applied to every pod spec built by
+// ApplyFlytePodConfiguration. Register at startup, before any pods are built.
+func RegisterPodSpecMutator(mutator PodSpecMutator) {
+	podSpecMutators.m.Lock()
+	defer podSpecMutators.m.Unlock()
+	podSpecMutators.mutators = append(podSpecMutators.mutators, mutator)
+}
+
+func applyPodSpecMutators(spec *v1.PodSpec, primaryContainerName string) error {
+	podSpecMutators.m.Lock()
+	mutators := podSpecMutators.mutators
+	podSpecMutators.m.Unlock()
+
+	for _, mutate := range mutators {
+		if err := mutate(spec, primaryContainerName); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // ApplyFlytePodConfiguration updates the PodSpec and ObjectMeta with various Flyte configuration. This includes
 // applying default k8s configuration, applying overrides (resources etc.), injecting copilot containers, and merging with the
 // configuration PodTemplate (if exists).
@@ -697,11 +731,6 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		return nil, nil, err
 	}
 
-	// TODO @pvditt
-	//if propellerCfg.GetConfig().AcceleratedInputs.Enabled {
-	//	ApplyAcceleratedInputsSpec(podSpec, primaryContainerName)
-	//}
-
 	// GPU accelerator
 	if extendedResources.GetGpuAccelerator() != nil {
 		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
@@ -726,6 +755,11 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	// Override container image if necessary
 	if len(tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage()) > 0 {
 		ApplyContainerImageOverride(podSpec, tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage(), primaryContainerName)
+	}
+
+	// apply registered pod spec mutators last so they observe the fully built spec
+	if err := applyPodSpecMutators(podSpec, primaryContainerName); err != nil {
+		return nil, nil, err
 	}
 
 	return podSpec, objectMeta, nil
@@ -1163,30 +1197,6 @@ func applyAcceleratorDeviceClassPodTemplate(
 
 	return mergedPodSpec, nil
 }
-
-// TODO @pvditt
-//func ApplyAcceleratedInputsSpec(spec *v1.PodSpec, primaryName string) {
-//	cfg := propellerCfg.GetConfig().AcceleratedInputs
-//	hostPathType := v1.HostPathDirectory
-//	spec.Volumes = append(spec.Volumes, v1.Volume{
-//		Name: "union-persistent-data-volume",
-//		VolumeSource: v1.VolumeSource{
-//			HostPath: &v1.HostPathVolumeSource{
-//				Path: cfg.VolumePath,
-//				Type: &hostPathType,
-//			},
-//		},
-//	})
-//	for i, cont := range spec.Containers {
-//		if cont.Name == primaryName {
-//			spec.Containers[i].VolumeMounts = append(cont.VolumeMounts, v1.VolumeMount{
-//				Name:      "union-persistent-data-volume",
-//				ReadOnly:  true,
-//				MountPath: cfg.LocalPathPrefix,
-//			})
-//		}
-//	}
-//}
 
 func BuildIdentityPod() *v1.Pod {
 	return &v1.Pod{
