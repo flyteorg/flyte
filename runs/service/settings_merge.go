@@ -153,3 +153,59 @@ func mergeStringMapSettings(levels []*settings.StringMapSetting) *settings.Strin
 		ScopeLevel: level,
 	}
 }
+
+// mergeTaskResourceDefaults resolves one resource bound (min or max) across the level
+// chain. It holds no merge rules of its own: it regroups the four dimensions by level
+// and delegates each to mergeQuantitySettings. Returns nil when no dimension resolved.
+func mergeTaskResourceDefaults(levels []*settings.TaskResourceDefaults) *settings.TaskResourceDefaults {
+	cpu := make([]*settings.QuantitySetting, len(levels))
+	gpu := make([]*settings.QuantitySetting, len(levels))
+	memory := make([]*settings.QuantitySetting, len(levels))
+	storage := make([]*settings.QuantitySetting, len(levels))
+
+	for i, l := range levels {
+		cpu[i] = l.GetCpu()
+		gpu[i] = l.GetGpu()
+		memory[i] = l.GetMemory()
+		storage[i] = l.GetStorage()
+	}
+
+	out := &settings.TaskResourceDefaults{
+		Cpu:     mergeQuantitySettings(cpu),
+		Gpu:     mergeQuantitySettings(gpu),
+		Memory:  mergeQuantitySettings(memory),
+		Storage: mergeQuantitySettings(storage),
+	}
+
+	if out.Cpu == nil && out.Gpu == nil && out.Memory == nil && out.Storage == nil {
+		return nil
+	}
+	return out
+}
+
+// mergeTaskResourceSettings resolves the task_resource group across the level chain.
+// It holds no merge rules of its own: it regroups min, max, and mirror_limits_request
+// by level and delegates each. Returns nil when no level set anything under
+// task_resource, so the merged output carries no empty group.
+func mergeTaskResourceSettings(levels []*settings.TaskResourceSettings) *settings.TaskResourceSettings {
+	minLevels := make([]*settings.TaskResourceDefaults, len(levels))
+	maxLevels := make([]*settings.TaskResourceDefaults, len(levels))
+	mirror := make([]*settings.BoolSetting, len(levels))
+
+	for i, l := range levels {
+		minLevels[i] = l.GetMin()
+		maxLevels[i] = l.GetMax()
+		mirror[i] = l.GetMirrorLimitsRequest()
+	}
+
+	out := &settings.TaskResourceSettings{
+		Min:                 mergeTaskResourceDefaults(minLevels),
+		Max:                 mergeTaskResourceDefaults(maxLevels),
+		MirrorLimitsRequest: mergeBoolSettings(mirror),
+	}
+
+	if out.Min == nil && out.Max == nil && out.MirrorLimitsRequest == nil {
+		return nil
+	}
+	return out
+}
