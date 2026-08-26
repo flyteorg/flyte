@@ -41,6 +41,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 
@@ -222,17 +223,24 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
 
-	eventsServiceURL := sc.BaseURL
-	if eventsServiceURL == "" {
-		eventsServiceURL = cfg.EventsServiceURL
+	eventsServiceCfg := cfg.EventsService
+	cacheServiceCfg := cfg.CacheService
+	if sc.BaseURL != "" {
+		eventsServiceCfg.URL = sc.BaseURL
+		cacheServiceCfg.URL = sc.BaseURL
 	}
-	eventsClient := workflowconnect.NewEventsProxyServiceClient(http.DefaultClient, eventsServiceURL, connect.WithInterceptors(otelInterceptor))
+
+	eventsHTTPClient, err := serviceclient.NewHTTPClient(ctx, http.DefaultClient, eventsServiceCfg)
+	if err != nil {
+		return fmt.Errorf("executor: configure events service client: %w", err)
+	}
+	cacheHTTPClient, err := serviceclient.NewHTTPClient(ctx, http.DefaultClient, cacheServiceCfg)
+	if err != nil {
+		return fmt.Errorf("executor: configure cache service client: %w", err)
+	}
+	eventsClient := workflowconnect.NewEventsProxyServiceClient(eventsHTTPClient, eventsServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
 	catalogCfg := catalog.GetConfig()
-	cacheServiceURL := sc.BaseURL
-	if cacheServiceURL == "" {
-		cacheServiceURL = cfg.CacheServiceURL
-	}
-	cacheClient := cachecatalog.NewHTTPClient(dataStore, cacheServiceURL, catalogCfg.MaxCacheAge.Duration, connect.WithInterceptors(otelInterceptor))
+	cacheClient := cachecatalog.NewClient(cacheHTTPClient, dataStore, cacheServiceCfg.URL, catalogCfg.MaxCacheAge.Duration, connect.WithInterceptors(otelInterceptor))
 	asyncCatalogClient, err := catalog.NewAsyncClient(cacheClient, *catalogCfg, promutils.NewScope("executor:catalog"))
 	if err != nil {
 		return fmt.Errorf("executor: failed to create catalog cache client: %w", err)

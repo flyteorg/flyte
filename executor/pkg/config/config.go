@@ -4,6 +4,7 @@ import (
 	"time"
 
 	stdconfig "github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 )
 
 const configSectionKey = "executor"
@@ -25,8 +26,8 @@ var (
 		MetricsCertName:               "tls.crt",
 		MetricsCertKey:                "tls.key",
 		EnableHTTP2:                   false,
-		EventsServiceURL:              "http://localhost:8090",
-		CacheServiceURL:               "http://localhost:8094",
+		EventsService:                 serviceclient.ServiceConfig{URL: "http://localhost:8090"},
+		CacheService:                  serviceclient.ServiceConfig{URL: "http://localhost:8094"},
 		Cluster:                       "",
 		MaxSystemFailures:             int32(DefaultMaxSystemFailures),
 		InterruptibleFailureThreshold: -1,
@@ -77,11 +78,11 @@ type Config struct {
 	// EnableHTTP2 enables HTTP/2 for the metrics and webhook servers.
 	EnableHTTP2 bool `json:"enableHTTP2" pflag:",Enable HTTP/2 for metrics and webhook servers"`
 
-	// EventsServiceURL is the URL of the event Service for reporting action state updates.
-	EventsServiceURL string `json:"EventsServiceURL" pflag:",URL of the Event Service for action event updates"`
+	// EventsService configures the event service used for action state updates.
+	EventsService serviceclient.ServiceConfig `json:"eventsService" pflag:",Event service client configuration"`
 
-	// CacheServiceURL is the URL of the cache service for catalog operations.
-	CacheServiceURL string `json:"cacheServiceURL" pflag:",URL of the cache service for task cache operations"`
+	// CacheService configures the cache service used for catalog operations.
+	CacheService serviceclient.ServiceConfig `json:"cacheService" pflag:",Cache service client configuration"`
 
 	// Cluster is the cluster identifier attached to action events.
 	Cluster string `json:"cluster" pflag:",Cluster identifier for action events"`

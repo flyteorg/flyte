@@ -11,6 +11,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/sentryutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 
 	appconfig "github.com/flyteorg/flyte/v2/app/config"
 	appinternal "github.com/flyteorg/flyte/v2/app/internal"
@@ -33,7 +34,7 @@ func SetupInternal(ctx context.Context, sc *stdlibapp.SetupContext) error {
 // Setup registers the control plane AppService handler on the SetupContext mux.
 // In unified mode (sc.BaseURL set), the proxy routes to InternalAppService on
 // the same mux via the /internal prefix — no network hop. In split mode,
-// cfg.InternalAppServiceURL points at the data plane host.
+// cfg.InternalAppService points at the data plane host.
 func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	cfg := appconfig.GetAppConfig()
 
@@ -60,14 +61,19 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 		})
 	}
 
-	internalAppURL := cfg.InternalAppServiceURL
+	internalAppServiceCfg := cfg.InternalAppService
 	if sc.BaseURL != "" {
-		internalAppURL = sc.BaseURL
+		internalAppServiceCfg.URL = sc.BaseURL
 	}
+	internalHTTPClient, err := serviceclient.NewHTTPClient(ctx, http.DefaultClient, internalAppServiceCfg)
+	if err != nil {
+		return fmt.Errorf("app: configure internal app service client: %w", err)
+	}
+	internalAppURL := internalAppServiceCfg.URL + "/internal"
 
 	internalClient := appconnect.NewAppServiceClient(
-		http.DefaultClient,
-		internalAppURL+"/internal",
+		internalHTTPClient,
+		internalAppURL,
 		connect.WithInterceptors(otelInterceptor),
 	)
 
@@ -78,8 +84,8 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	logger.Infof(ctx, "Mounted AppService at %s", path)
 
 	internalLogsClient := appconnect.NewAppLogsServiceClient(
-		http.DefaultClient,
-		internalAppURL+"/internal",
+		internalHTTPClient,
+		internalAppURL,
 		connect.WithInterceptors(otelInterceptor),
 	)
 	logsSvc := service.NewAppLogsService(internalLogsClient)

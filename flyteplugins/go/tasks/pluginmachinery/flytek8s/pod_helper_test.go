@@ -3156,6 +3156,107 @@ func TestDemystifyFailure(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("non-zero exit with no reason is a user error", func(t *testing.T) {
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Phase: v1.PodFailed,
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					Name: "abc123-n0-0",
+					State: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							ExitCode: 2,
+						},
+					},
+				},
+			},
+		}, pluginsCore.TaskInfo{}, "")
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, ContainerFailed, phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+	})
+
+	t.Run("exit 127 is still a user error", func(t *testing.T) {
+		// 127 is the inclusive upper bound: a missing binary or bad entrypoint is
+		// the user's failure, not the platform's.
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Phase: v1.PodFailed,
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					Name: "abc123-n0-0",
+					State: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason:   "Error",
+							ExitCode: 127,
+						},
+					},
+				},
+			},
+		}, pluginsCore.TaskInfo{}, "")
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "Error", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+	})
+
+	t.Run("non-zero exit alongside a co-pilot init container", func(t *testing.T) {
+		// The co-pilot runs as init containers, so it must not count towards the
+		// single main container guard.
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Phase: v1.PodFailed,
+			InitContainerStatuses: []v1.ContainerStatus{
+				{
+					Name: "flyte-copilot-uploader",
+					State: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason:   "Completed",
+							ExitCode: 0,
+						},
+					},
+				},
+			},
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					Name: "abc123-n0-0",
+					State: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason:   "Error",
+							ExitCode: 5,
+						},
+					},
+				},
+			},
+		}, pluginsCore.TaskInfo{}, "")
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "Error", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+	})
+
+	t.Run("exit above 127 stays a system error", func(t *testing.T) {
+		// Anything above maxUserExitCode is 128+N, so something killed the process
+		// rather than the process choosing to fail. Eviction, drain and preemption
+		// send SIGTERM first (143), and those must not burn user retries.
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Phase: v1.PodFailed,
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					Name: "abc123-n0-0",
+					State: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason:   "Error",
+							ExitCode: 128,
+						},
+					},
+				},
+			},
+		}, pluginsCore.TaskInfo{}, "")
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, Interrupted, phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
+	})
 }
 
 func TestDemystifyPending_testcases(t *testing.T) {

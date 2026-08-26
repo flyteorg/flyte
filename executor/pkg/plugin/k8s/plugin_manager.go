@@ -126,6 +126,12 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 		if k8serrors.IsInvalid(err) {
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("InvalidResource", err.Error(), nil)), nil
 		}
+		// Same for HTTP 400, which is what a validating admission webhook returns when it
+		// rejects the spec outright. Distinct code from InvalidResource because a webhook
+		// rejection and a field the apiserver itself found invalid are different diagnoses.
+		if k8serrors.IsBadRequest(err) {
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("BadRequest", err.Error(), nil)), nil
+		}
 		reason := k8serrors.ReasonForError(err)
 		logger.Errorf(ctx, "Failed to launch job, system error. err: %v", err)
 		return pluginsCore.UnknownTransition, errors.Wrapf(stdErrors.ErrorCode(reason), err, "failed to create resource")

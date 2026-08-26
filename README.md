@@ -3,9 +3,13 @@
 >
 > Read more in the announcement [here](https://www.union.ai/blog-post/flyte-2-is-generally-available-the-durable-open-source-ai-runtime).
 >
-> Want to try Flyte 2 locally? Run the [Devbox](https://www.union.ai/docs/v2/flyte/user-guide/get-started/run-modes/running-devbox/).
+> Want to try Flyte 2 locally? Run the **[Devbox locally](https://www.union.ai/docs/v2/flyte/user-guide/get-started/run-modes/running-devbox/)**,
+> or you can try it on Github Codespaces.
+>
+> [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flyteorg/flyte-devbox-codespace?quickstart=1)
 >
 > Looking for Flyte 1? Go to the [master](https://github.com/flyteorg/flyte/tree/master) branch, where Flyte 1 is now maintained.
+
 
 ---
 
@@ -16,7 +20,6 @@
 [![Version](https://img.shields.io/pypi/v/flyte?label=version&color=blue)](https://pypi.org/project/flyte/)
 [![Python](https://img.shields.io/pypi/pyversions/flyte?color=brightgreen)](https://pypi.org/project/flyte/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-orange)](LICENSE)
-[![Try in Browser](https://img.shields.io/badge/Try%20in%20Browser-Live%20Demo-7652a2)](https://flyte2intro.apps.demo.hosted.unionai.cloud/)
 [![Docs](https://img.shields.io/badge/Docs-flyte-blue)](https://www.union.ai/docs/v2/flyte/user-guide/running-locally/)
 [![SDK Reference](https://img.shields.io/badge/SDK%20Reference-API-brightgreen)](https://www.union.ai/docs/v2/byoc/api-reference/flyte-sdk/)
 [![CLI Reference](https://img.shields.io/badge/CLI%20Reference-API-brightgreen)](https://www.union.ai/docs/v2/byoc/api-reference/flyte-cli/)
@@ -26,6 +29,12 @@ Flyte is a Graduated project of the [LF AI & Data Foundation](https://lfaidata.f
 <a href="https://lfaidata.foundation/projects/flyte/">
   <img src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/readme/flyte_and_lf.png" alt="Flyte and LF AI & Data Logo" width="250">
 </a>
+
+## 10 minutes to Flyte 2
+
+The quickest way to get a feel for Flyte 2 is in this notebook:
+
+[![Try In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/unionai/unionai-examples/blob/main/v2/user-guide/getting-started/ten_minutes_to_flyte.ipynb)
 
 ## Install
 
@@ -139,8 +148,6 @@ uv pip install flyte[tui]
 
 [![Watch the local development experience](https://img.youtube.com/vi/lsfy-7DbbRM/maxresdefault.jpg)](https://www.youtube.com/watch?v=lsfy-7DbbRM)
 
-**[Try the hosted demo in your browser](https://flyte2intro.apps.demo.hosted.unionai.cloud/)** — no installation required.
-
 ## Open Source Backend
 
 The open source backend for Flyte 2 is **coming soon**. This repository will contain the Kubernetes-native backend infrastructure for deploying Flyte 2 as a distributed, multi-node service. See the [Backend README](docs/BACKEND_README.md) for the current state of the backend, protocol buffer definitions, and contribution guide.
@@ -150,6 +157,7 @@ If you need an enterprise-ready, production-grade backend for Flyte 2 today, it 
 ## Learn More
 
 - **[Try DevBox](https://www.union.ai/docs/v2/flyte/user-guide/get-started/run-modes/running-devbox/)** - Get started
+- **[Try Devbox in Github Codespaces](https://codespaces.new/flyteorg/flyte-devbox-codespace?quickstart=1)** - Get started in the browser
 - **[SDK Reference](https://www.union.ai/docs/v2/byoc/api-reference/flyte-sdk/)** — API reference docs
 - **[CLI Reference](https://www.union.ai/docs/v2/byoc/api-reference/flyte-cli/)** — CLI docs
 - **[flyte-sdk](https://github.com/flyteorg/flyte-sdk)** — The Flyte 2 Python SDK repository

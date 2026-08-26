@@ -930,19 +930,22 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		return pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "cluster is suspended", info), nil
 	case rayv1.JobDeploymentStatusFailed:
 		failInfo := fmt.Sprintf("Failed to run Ray job %s with error: [%s] %s", rayJob.Name, rayJob.Status.Reason, rayJob.Status.Message)
-		// Honor a RECOVERABLE error.pb (written by sdk) so the task's retries fire. A failed RayJob surfaces here as a
-		// terminal phase, so -- unlike the success path -- the k8s plugin manager never reads the
-		// error file on our behalf. Key off the proto-level recoverability so only a genuine
-		// RECOVERABLE container error retries: an absent, unreadable, or malformed error file is
-		// reported by the reader as a SYSTEM error and stays terminal, preserving previous behavior.
 		phaseInfo, err = pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, failInfo, info), nil
+		taskErrorAbsent := false
+		// A task error is authoritative; use KubeRay's fallback only when no error file exists.
 		if ow := pluginContext.OutputWriter(); ow != nil {
 			reader := ioutils.NewRemoteFileOutputReader(ctx, pluginContext.DataStore(), ow, 0)
-			if hasErr, readerErr := reader.IsError(ctx); readerErr == nil && hasErr {
-				if execErr, readerErr := reader.ReadError(ctx); readerErr == nil && execErr.GetRecoverability() == core.ContainerError_RECOVERABLE {
-					phaseInfo = pluginsCore.PhaseInfoRetryableFailure(flyteerr.TaskFailedWithError, failInfo, info)
+			if hasErr, readerErr := reader.IsError(ctx); readerErr == nil {
+				taskErrorAbsent = !hasErr
+				if hasErr {
+					if execErr, readerErr := reader.ReadError(ctx); readerErr == nil && execErr.GetRecoverability() == core.ContainerError_RECOVERABLE {
+						phaseInfo = pluginsCore.PhaseInfoRetryableFailure(flyteerr.TaskFailedWithError, failInfo, info)
+					}
 				}
 			}
+		}
+		if taskErrorAbsent && rayJob.Status.Reason == rayv1.JobDeploymentStatusTransitionGracePeriodExceeded {
+			phaseInfo = pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(flyteerr.TaskFailedWithError, failInfo, info)
 		}
 	default:
 		// We already handle all known deployment status, so this should never happen unless a future version of ray
