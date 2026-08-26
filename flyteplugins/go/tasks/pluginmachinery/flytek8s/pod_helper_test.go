@@ -2033,30 +2033,6 @@ func TestToK8sPod(t *testing.T) {
 		}
 	})
 
-	// TODO @pvditt
-	//t.Run("AcceleratedInputsEnabled", func(t *testing.T) {
-	//	cfg := propellerCfg.GetConfig()
-	//	cfg.AcceleratedInputs.Enabled = true
-	//	cfg.AcceleratedInputs.VolumePath = "/test/path"
-	//	cfg.AcceleratedInputs.LocalPathPrefix = "/test/local"
-	//	defer func() { cfg.AcceleratedInputs.Enabled = false }()
-	//	x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
-	//
-	//	p, _, _, err := ToK8sPodSpec(ctx, x)
-	//
-	//	assert.NoError(t, err)
-	//	if assert.Len(t, p.Volumes, 1) {
-	//		vol := p.Volumes[0]
-	//		assert.Equal(t, "union-persistent-data-volume", vol.Name)
-	//		assert.Equal(t, cfg.AcceleratedInputs.VolumePath, vol.HostPath.Path)
-	//	}
-	//	if assert.Len(t, p.Containers, 1) && assert.Len(t, p.Containers[0].VolumeMounts, 1) {
-	//		mount := p.Containers[0].VolumeMounts[0]
-	//		assert.Equal(t, "union-persistent-data-volume", mount.Name)
-	//		assert.Equal(t, cfg.AcceleratedInputs.LocalPathPrefix, mount.MountPath)
-	//		assert.True(t, mount.ReadOnly)
-	//	}
-	//})
 }
 
 func TestToK8sPodContainerImage(t *testing.T) {
@@ -4495,4 +4471,47 @@ func TestApplySharedMemory(t *testing.T) {
 
 		})
 	}
+}
+func TestApplyPodSpecMutators(t *testing.T) {
+	previous := podSpecMutators.mutators
+	defer func() { podSpecMutators.mutators = previous }()
+
+	t.Run("mutators applied in registration order", func(t *testing.T) {
+		podSpecMutators.mutators = nil
+		RegisterPodSpecMutator(func(spec *v1.PodSpec, primaryContainerName string) error {
+			spec.NodeSelector = map[string]string{"first": primaryContainerName}
+			return nil
+		})
+		RegisterPodSpecMutator(func(spec *v1.PodSpec, primaryContainerName string) error {
+			spec.NodeSelector["second"] = primaryContainerName
+			return nil
+		})
+		spec := &v1.PodSpec{}
+
+		assert.NoError(t, applyPodSpecMutators(spec, "primary"))
+		assert.Equal(t, map[string]string{"first": "primary", "second": "primary"}, spec.NodeSelector)
+	})
+
+	t.Run("mutator error propagates", func(t *testing.T) {
+		podSpecMutators.mutators = nil
+		RegisterPodSpecMutator(func(spec *v1.PodSpec, primaryContainerName string) error {
+			return fmt.Errorf("mutator failure")
+		})
+
+		assert.ErrorContains(t, applyPodSpecMutators(&v1.PodSpec{}, "primary"), "mutator failure")
+	})
+
+	t.Run("applied by pod construction", func(t *testing.T) {
+		podSpecMutators.mutators = nil
+		RegisterPodSpecMutator(func(spec *v1.PodSpec, primaryContainerName string) error {
+			spec.NodeSelector = map[string]string{"mutated-for": primaryContainerName}
+			return nil
+		})
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
+
+		p, _, primaryContainerName, err := ToK8sPodSpec(context.TODO(), x)
+
+		assert.NoError(t, err)
+		assert.Equal(t, map[string]string{"mutated-for": primaryContainerName}, p.NodeSelector)
+	})
 }
