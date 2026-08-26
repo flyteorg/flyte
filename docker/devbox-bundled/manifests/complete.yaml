@@ -7792,7 +7792,8 @@ data:
         namespace: 'flyte'
         qps: 100
         timeout: 30s
-      webhookURL: http://flyte-binary-webhook-headless.flyte.svc:9444
+      webhook:
+        url: http://flyte-binary-webhook-headless.flyte.svc:9444
   001-plugins.yaml: |
     tasks:
       task-plugins:

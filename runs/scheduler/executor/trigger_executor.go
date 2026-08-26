@@ -31,6 +31,8 @@ type TriggerExecutor struct {
 type TriggerExecutorConfig struct {
 	// BaseURL is the URL of the runs service (e.g. "http://localhost:8090").
 	BaseURL string
+	// HTTPClient is the client used for outbound RunService calls.
+	HTTPClient connect.HTTPClient
 	// QPS is the token-bucket rate for CreateRun calls (tokens/second).
 	QPS float64
 	// Burst is the token-bucket burst size.
@@ -41,8 +43,12 @@ type TriggerExecutorConfig struct {
 
 // NewTriggerExecutor constructs a TriggerExecutor.
 func NewTriggerExecutor(cfg TriggerExecutorConfig) *TriggerExecutor {
+	httpClient := cfg.HTTPClient
+	if httpClient == nil {
+		httpClient = http.DefaultClient
+	}
 	return &TriggerExecutor{
-		runClient: workflowconnect.NewRunServiceClient(http.DefaultClient, cfg.BaseURL, cfg.ClientOpts...),
+		runClient: workflowconnect.NewRunServiceClient(httpClient, cfg.BaseURL, cfg.ClientOpts...),
 		limiter:   rate.NewLimiter(rate.Limit(cfg.QPS), cfg.Burst),
 	}
 }
