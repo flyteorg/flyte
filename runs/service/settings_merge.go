@@ -111,3 +111,45 @@ func mergeQuantitySettings(levels []*settings.QuantitySetting) *settings.Quantit
 
 	return out
 }
+
+// mergeStringMapSettings resolves one string-map leaf across the level chain.
+// Unlike scalars, every level contributes: entries accumulate parent first with
+// child entries overwriting on key conflict, and a level in state UNSET clears
+// everything accumulated above it. ScopeLevel records the most specific level
+// that contributed, since entries may come from several levels.
+func mergeStringMapSettings(levels []*settings.StringMapSetting) *settings.StringMapSetting {
+	entries := map[string]string{}
+	var state settings.SettingState
+	var level settings.ScopeLevel
+
+	for i, s := range levels {
+		switch s.GetState() {
+		case settings.SettingState_SETTING_STATE_INHERIT:
+			continue
+		case settings.SettingState_SETTING_STATE_UNSET:
+			entries = map[string]string{}
+		default:
+			for k, v := range s.GetMapValue().GetEntries() {
+				entries[k] = v
+			}
+		}
+		state = s.GetState()
+		level = scopeLevelAt(i)
+	}
+
+	// state is still its zero value when no level contributed.
+	if state == settings.SettingState_SETTING_STATE_INHERIT {
+		return nil
+	}
+	if state == settings.SettingState_SETTING_STATE_UNSET {
+		return &settings.StringMapSetting{
+			State:      settings.SettingState_SETTING_STATE_UNSET,
+			ScopeLevel: level,
+		}
+	}
+	return &settings.StringMapSetting{
+		State:      settings.SettingState_SETTING_STATE_VALUE,
+		MapValue:   &settings.StringMap{Entries: entries},
+		ScopeLevel: level,
+	}
+}
