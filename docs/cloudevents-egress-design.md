@@ -73,6 +73,35 @@ v2 proposed          [NEW] = added by this document; everything else exists toda
                                                new consumers land here
 ```
 
+### Protobuf
+
+The wiring above has nowhere to land, because the payload type does not exist. v2 needs a
+`CloudEventActionExecution` to carry an action's events, and nothing in `flyteidl2` defines one
+— the directory contains no cloudevent proto at all.
+
+v1 defines four, in `flyteidl/protos/flyteidl/event/cloudevents.proto`:
+
+| message | wraps | adds |
+|---|---|---|
+| `CloudEventWorkflowExecution` | `WorkflowExecutionEvent` | output_interface, artifact_ids, reference_execution, principal, launch_plan_id, labels |
+| `CloudEventNodeExecution` | `NodeExecutionEvent` | task_exec_id, output_interface, artifact_ids, principal, launch_plan_id, labels |
+| `CloudEventTaskExecution` | `TaskExecutionEvent` | labels |
+| `CloudEventExecutionStart` | — (no nested event) | execution_id, launch_plan_id, workflow_id, artifact_ids, artifact_trackers, principal |
+
+**v2 should collapse the three execution messages into one.** v1 split them because workflow,
+node and task executions are three different types. v2 has one recursive type: an action, whose
+root action is the run. A single `CloudEventActionExecution` covers what took three messages,
+and the fields it needs are close to what `action_events` already stores:
+
+```
+CloudEventActionExecution
+  project, domain, run_name, name     the action identity
+  attempt, phase, version             the event's position in the action's history
+  info, error_kind                    the event payload as recorded
+  <control-plane context>             the v1 pattern: whatever a broker consumer
+                                      cannot ask Flyte for after the fact
+```
+
 ## Where the publisher attaches
 
 `InsertEvents` (`runs/repository/impl/action.go:117`) is the only writer of `action_events`,
