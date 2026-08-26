@@ -209,3 +209,125 @@ func mergeTaskResourceSettings(levels []*settings.TaskResourceSettings) *setting
 	}
 	return out
 }
+
+// mergeRunSettings resolves the run group across the level chain. Like the other
+// group mergers it holds no rules of its own, only regrouping and delegation.
+// Returns nil when no level set anything under run.
+func mergeRunSettings(levels []*settings.RunSettings) *settings.RunSettings {
+	defaultQueue := make([]*settings.StringSetting, len(levels))
+	maxActionConcurrency := make([]*settings.Int64Setting, len(levels))
+	runBaseDir := make([]*settings.StringSetting, len(levels))
+
+	for i, l := range levels {
+		defaultQueue[i] = l.GetDefaultQueue()
+		maxActionConcurrency[i] = l.GetMaxActionConcurrency()
+		runBaseDir[i] = l.GetRunBaseDir()
+	}
+
+	out := &settings.RunSettings{
+		DefaultQueue:         mergeStringSettings(defaultQueue),
+		MaxActionConcurrency: mergeInt64Settings(maxActionConcurrency),
+		RunBaseDir:           mergeStringSettings(runBaseDir),
+	}
+
+	if out.DefaultQueue == nil && out.MaxActionConcurrency == nil && out.RunBaseDir == nil {
+		return nil
+	}
+	return out
+}
+
+// mergeSecuritySettings resolves the security group across the level chain. Like the
+// other group mergers it holds no rules of its own. Returns nil when nothing resolved.
+func mergeSecuritySettings(levels []*settings.SecuritySettings) *settings.SecuritySettings {
+	serviceAccount := make([]*settings.StringSetting, len(levels))
+
+	for i, l := range levels {
+		serviceAccount[i] = l.GetServiceAccount()
+	}
+
+	out := &settings.SecuritySettings{
+		ServiceAccount: mergeStringSettings(serviceAccount),
+	}
+
+	if out.ServiceAccount == nil {
+		return nil
+	}
+	return out
+}
+
+// mergeStorageSettings resolves the storage group across the level chain. Like the
+// other group mergers it holds no rules of its own. Returns nil when nothing resolved.
+func mergeStorageSettings(levels []*settings.StorageSettings) *settings.StorageSettings {
+	rawDataPath := make([]*settings.StringSetting, len(levels))
+
+	for i, l := range levels {
+		rawDataPath[i] = l.GetRawDataPath()
+	}
+
+	out := &settings.StorageSettings{
+		RawDataPath: mergeStringSettings(rawDataPath),
+	}
+
+	if out.RawDataPath == nil {
+		return nil
+	}
+	return out
+}
+
+// mergeAppSettings resolves the app group across the level chain. Like the other
+// group mergers it holds no rules of its own. Returns nil when nothing resolved.
+func mergeAppSettings(levels []*settings.AppSettings) *settings.AppSettings {
+	disallowAnonymous := make([]*settings.BoolSetting, len(levels))
+
+	for i, l := range levels {
+		disallowAnonymous[i] = l.GetDisallowAnonymous()
+	}
+
+	out := &settings.AppSettings{
+		DisallowAnonymous: mergeBoolSettings(disallowAnonymous),
+	}
+
+	if out.DisallowAnonymous == nil {
+		return nil
+	}
+	return out
+}
+
+// mergeSettings resolves a full settings document across the level chain. Callers
+// pass one entry per level, broadest first, using nil for levels with no stored
+// record.
+func mergeSettings(levels []*settings.Settings) *settings.Settings {
+	run := make([]*settings.RunSettings, len(levels))
+	security := make([]*settings.SecuritySettings, len(levels))
+	storage := make([]*settings.StorageSettings, len(levels))
+	taskResource := make([]*settings.TaskResourceSettings, len(levels))
+	labels := make([]*settings.StringMapSetting, len(levels))
+	annotations := make([]*settings.StringMapSetting, len(levels))
+	envVars := make([]*settings.StringMapSetting, len(levels))
+	app := make([]*settings.AppSettings, len(levels))
+	podTemplateName := make([]*settings.StringSetting, len(levels))
+
+	for i, l := range levels {
+		run[i] = l.GetRun()
+		security[i] = l.GetSecurity()
+		storage[i] = l.GetStorage()
+		taskResource[i] = l.GetTaskResource()
+		labels[i] = l.GetLabels()
+		annotations[i] = l.GetAnnotations()
+		envVars[i] = l.GetEnvironmentVariables()
+		app[i] = l.GetApp()
+		podTemplateName[i] = l.GetPodTemplateName()
+	}
+
+	return &settings.Settings{
+		Run:                  mergeRunSettings(run),
+		Security:             mergeSecuritySettings(security),
+		Storage:              mergeStorageSettings(storage),
+		TaskResource:         mergeTaskResourceSettings(taskResource),
+		Labels:               mergeStringMapSettings(labels),
+		Annotations:          mergeStringMapSettings(annotations),
+		EnvironmentVariables: mergeStringMapSettings(envVars),
+		App:                  mergeAppSettings(app),
+		PodTemplateName:      mergeStringSettings(podTemplateName),
+	}
+}
