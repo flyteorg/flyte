@@ -58,6 +58,10 @@ func newTestActionUpdate(actionName string) (*executorv1.TaskAction, *ActionUpda
 
 func acceptedRecordActionResponse() *connect.Response[workflow.RecordActionResponse] {
 	return connect.NewResponse(&workflow.RecordActionResponse{
+		ActionId: &common.ActionIdentifier{
+			Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "run"},
+			Name: "action",
+		},
 		Status: &status.Status{Code: int32(code.Code_OK)},
 	})
 }
