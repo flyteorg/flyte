@@ -92,6 +92,16 @@ func TestMergeStringSettings(t *testing.T) {
 			levels: []*settings.StringSetting{str(stateValue, "default")},
 			want:   &settings.StringSetting{State: stateValue, StringValue: "default", ScopeLevel: levelOrg},
 		},
+		{
+			name:   "unset at org with nothing below",
+			levels: []*settings.StringSetting{str(stateUnset, ""), nil, nil},
+			want:   &settings.StringSetting{State: stateUnset, ScopeLevel: levelOrg},
+		},
+		{
+			name:   "domain is the only level that sets it",
+			levels: []*settings.StringSetting{nil, str(stateValue, "fast"), nil},
+			want:   &settings.StringSetting{State: stateValue, StringValue: "fast", ScopeLevel: levelDomain},
+		},
 	}
 
 	for _, tt := range tests {
