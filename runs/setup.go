@@ -102,19 +102,20 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if sc.BaseURL != "" {
 		actionsServiceCfg.URL = sc.BaseURL
 	}
-	serviceHTTPClient, err := serviceclient.NewHTTPClient(ctx, http.DefaultClient, actionsServiceCfg)
+	actionsHTTPClient, err := serviceclient.NewHTTPClient(ctx, http.DefaultClient, actionsServiceCfg)
 	if err != nil {
 		return fmt.Errorf("runs: configure actions service client: %w", err)
 	}
 	actionsClient := actionsconnect.NewActionsServiceClient(
-		serviceHTTPClient,
+		actionsHTTPClient,
 		actionsServiceCfg.URL,
 		connect.WithInterceptors(otelInterceptor),
 	)
 
+	runsServiceURL := fmt.Sprintf("http://localhost:%d", cfg.Server.Port)
 	projectClient := projectconnect.NewProjectServiceClient(
-		serviceHTTPClient,
-		actionsServiceCfg.URL,
+		http.DefaultClient,
+		runsServiceURL,
 		connect.WithInterceptors(otelInterceptor),
 	)
 	abortReconciler := service.NewAbortReconciler(repo, actionsClient, service.AbortReconcilerConfig{
@@ -187,7 +188,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	if cfg.TriggerScheduler.Enabled {
-		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, serviceHTTPClient, actionsServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
+		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, http.DefaultClient, runsServiceURL, connect.WithInterceptors(otelInterceptor))
 		sc.AddWorker("trigger-scheduler", worker)
 		logger.Infof(ctx, "Registered trigger-scheduler worker")
 	}
