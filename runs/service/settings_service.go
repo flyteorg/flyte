@@ -105,29 +105,9 @@ func (s *SettingsService) GetSettingsForEdit(
 		return nil, err
 	}
 
-	// One partial key per scope level covered by the request, broadest first,
-	// as GetSettingsForEditResponse requires. Order comes from this list; the
-	// repo returns rows unordered.
-	levelKeys := []*settings.SettingsKey{{Org: key.GetOrg()}}
-	if key.GetDomain() != "" {
-		levelKeys = append(levelKeys, &settings.SettingsKey{Org: key.GetOrg(), Domain: key.GetDomain()})
-	}
-	if key.GetProject() != "" {
-		levelKeys = append(levelKeys, &settings.SettingsKey{Org: key.GetOrg(), Domain: key.GetDomain(), Project: key.GetProject()})
-	}
-
-	storageKeys := make([]string, 0, len(levelKeys))
-	for _, lk := range levelKeys {
-		storageKeys = append(storageKeys, models.EncodeSettingsKey(lk.GetOrg(), lk.GetDomain(), lk.GetProject()))
-	}
-
-	rows, err := s.settingsRepo.GetSettingsByKeys(ctx, storageKeys)
+	levelKeys, rows, err := s.fetchLevels(ctx, key)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
-	}
-	rowsByKey := make(map[string]*models.Settings, len(rows))
-	for _, row := range rows {
-		rowsByKey[row.Key] = row
 	}
 
 	levels := make([]*settings.SettingsRecord, 0, len(levelKeys))
@@ -135,7 +115,7 @@ func (s *SettingsService) GetSettingsForEdit(
 		// Absent level: empty settings, version 0 — the client's signal to use
 		// CreateSettings there (see SettingsRecord in the proto).
 		record := &settings.SettingsRecord{Key: lk, Settings: &settings.Settings{}}
-		if row := rowsByKey[storageKeys[i]]; row != nil {
+		if row := rows[i]; row != nil {
 			stored := &settings.Settings{}
 			if err := (protojson.UnmarshalOptions{DiscardUnknown: true}).Unmarshal(row.Data, stored); err != nil {
 				return nil, connect.NewError(connect.CodeInternal, err)
