@@ -1641,14 +1641,22 @@ func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore
 
 	// If the code remains 'UnknownError', it indicates that the kubelet did not have a chance
 	// to record a more specific failure before the node was terminated or preempted.
-	// In such cases, we classify the error as system-level and accept false positives
+	// In such cases, we classify the error as system-level and accept false positives.
+	// The node vanishing is an interruption, and 'UnknownError' says nothing to the user,
+	// so the code is replaced rather than kept.
 	if code == "UnknownError" {
 		isSystemError = true
+		code = Interrupted
 	}
 
 	if isSystemError {
 		logger.Warnf(ctx, "Pod failed with a system error. Code: %s, Message: %s", code, message)
-		return pluginsCore.PhaseInfoSystemRetryableFailure(Interrupted, message, &info), nil
+		// Report the code we worked out rather than flattening every system error to
+		// 'Interrupted'. A retryable status reason such as 'Shutdown' or 'NodeShutdown'
+		// tells the user what actually happened to the node, and it is the only place
+		// that information exists by the time the failure reaches them. The SIGKILL and
+		// vanished-node branches above set 'Interrupted' on purpose and still report it.
+		return pluginsCore.PhaseInfoSystemRetryableFailure(code, message, &info), nil
 	}
 
 	logger.Warnf(ctx, "Pod failed with a user error. Code: %s, Message: %s", code, message)

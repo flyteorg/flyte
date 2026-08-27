@@ -3013,6 +3013,8 @@ func TestDemystifySuccess(t *testing.T) {
 func TestDemystifyFailure(t *testing.T) {
 	ctx := context.TODO()
 
+	// The kubelet recorded nothing before the node went away, so there is no more
+	// specific code to report than the interruption itself.
 	t.Run("unknown-error", func(t *testing.T) {
 		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{}, pluginsCore.TaskInfo{}, "")
 		assert.Nil(t, err)
@@ -3088,47 +3090,50 @@ func TestDemystifyFailure(t *testing.T) {
 		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
 	})
 
-	t.Run("GKE node preemption", func(t *testing.T) {
-		for _, reason := range []string{
-			"Terminated",
-			"Shutdown",
-			"NodeShutdown",
-		} {
-			t.Run(reason, func(t *testing.T) {
-				message := "Test pod status message"
-				phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
-					Message: message,
-					Reason:  reason,
-					// Can't always rely on GCP returining container statuses when node is preempted
+	// A system error keeps the status reason as its code. The reason is the only record
+	// of what happened to the node, so flattening every one of them to 'Interrupted'
+	// would leave the user with nothing to act on.
+	t.Run("system errors keep their status reason as the code", func(t *testing.T) {
+		tests := []struct {
+			name     string
+			status   v1.PodStatus
+			wantCode string
+		}{
+			{
+				name:     "GKE node preemption reported as Terminated",
+				status:   v1.PodStatus{Message: "Test pod status message", Reason: "Terminated", ContainerStatuses: []v1.ContainerStatus{}},
+				wantCode: "Terminated",
+			},
+			{
+				name:     "GKE node preemption reported as Shutdown",
+				status:   v1.PodStatus{Message: "Test pod status message", Reason: "Shutdown", ContainerStatuses: []v1.ContainerStatus{}},
+				wantCode: "Shutdown",
+			},
+			{
+				name:     "GKE node preemption reported as NodeShutdown",
+				status:   v1.PodStatus{Message: "Test pod status message", Reason: "NodeShutdown", ContainerStatuses: []v1.ContainerStatus{}},
+				wantCode: "NodeShutdown",
+			},
+			{
+				name: "kubelet admission denies the pod due to a missing node label",
+				status: v1.PodStatus{
+					Message:           "Pod was rejected: Predicate NodeAffinity failed: node(s) didn't match Pod's node affinity/selector",
+					Reason:            "NodeAffinity",
+					Phase:             v1.PodFailed,
 					ContainerStatuses: []v1.ContainerStatus{},
-				}, pluginsCore.TaskInfo{}, "")
-				assert.Nil(t, err)
-				assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-				assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
-				assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
-				assert.Equal(t, message, phaseInfo.Err().GetMessage())
-			})
+				},
+				wantCode: "NodeAffinity",
+			},
 		}
-	})
 
-	t.Run("Kubelet admission denies pod due to missing node label", func(t *testing.T) {
-		for _, reason := range []string{
-			"NodeAffinity",
-		} {
-			t.Run(reason, func(t *testing.T) {
-				message := "Pod was rejected: Predicate NodeAffinity failed: node(s) didn't match Pod's node affinity/selector"
-				phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
-					Message: message,
-					Reason:  reason,
-					Phase:   v1.PodFailed,
-					// Can't always rely on GCP returining container statuses when node is preempted
-					ContainerStatuses: []v1.ContainerStatus{},
-				}, pluginsCore.TaskInfo{}, "")
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				phaseInfo, err := DemystifyFailure(ctx, tt.status, pluginsCore.TaskInfo{}, "")
 				assert.Nil(t, err)
 				assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-				assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
+				assert.Equal(t, tt.wantCode, phaseInfo.Err().GetCode())
 				assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
-				assert.Equal(t, message, phaseInfo.Err().GetMessage())
+				assert.Equal(t, tt.status.Message, phaseInfo.Err().GetMessage())
 			})
 		}
 	})
