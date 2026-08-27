@@ -124,9 +124,10 @@ func (s *TranslatorService) readTriggerLiterals(
 	// reader does the same: the executor re-appends it via ioutils.NewInputFilePaths, and
 	// CreateRun records inputs_uri as inputPrefix + "/inputs.pb". Tolerate a URI that already
 	// names the file so a full path keeps working.
-	inputRef := storage.DataReference(strings.TrimRight(uri, "/") + "/" + ioutils.InputsSuffix)
-	if strings.HasSuffix(uri, "/"+ioutils.InputsSuffix) {
-		inputRef = storage.DataReference(uri)
+	trimmed := strings.TrimRight(uri, "/")
+	inputRef := storage.DataReference(trimmed + "/" + ioutils.InputsSuffix)
+	if strings.HasSuffix(trimmed, "/"+ioutils.InputsSuffix) {
+		inputRef = storage.DataReference(trimmed)
 	}
 
 	var inputs task.Inputs
