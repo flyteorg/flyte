@@ -78,3 +78,15 @@ class ListArtifactNamesResponse(_message.Message):
     groups: _containers.RepeatedCompositeFieldContainer[ArtifactGroup]
     token: str
     def __init__(self, groups: _Optional[_Iterable[_Union[ArtifactGroup, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
+
+class ListArtifactMetadataKeysRequest(_message.Message):
+    __slots__ = ["project_id"]
+    PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
+    project_id: _identifier_pb2.ProjectIdentifier
+    def __init__(self, project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ...) -> None: ...
+
+class ListArtifactMetadataKeysResponse(_message.Message):
+    __slots__ = ["keys"]
+    KEYS_FIELD_NUMBER: _ClassVar[int]
+    keys: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, keys: _Optional[_Iterable[str]] = ...) -> None: ...
