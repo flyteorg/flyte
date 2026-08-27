@@ -15,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster/clusterconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
@@ -42,11 +43,18 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
 
-	baseURL := sc.BaseURL
-	taskClient := taskconnect.NewTaskServiceClient(http.DefaultClient, baseURL, connect.WithInterceptors(otelInterceptor))
-	triggerClient := triggerconnect.NewTriggerServiceClient(http.DefaultClient, baseURL, connect.WithInterceptors(otelInterceptor))
-	runClient := workflowconnect.NewRunServiceClient(http.DefaultClient, baseURL, connect.WithInterceptors(otelInterceptor))
-	projectClient := projectconnect.NewProjectServiceClient(http.DefaultClient, baseURL, connect.WithInterceptors(otelInterceptor))
+	runServiceCfg := cfg.RunService
+	if sc.BaseURL != "" {
+		runServiceCfg.URL = sc.BaseURL
+	}
+	runHTTPClient, err := serviceclient.NewHTTPClient(ctx, http.DefaultClient, runServiceCfg)
+	if err != nil {
+		return fmt.Errorf("dataproxy: configure runs service client: %w", err)
+	}
+	taskClient := taskconnect.NewTaskServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
+	triggerClient := triggerconnect.NewTriggerServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
+	runClient := workflowconnect.NewRunServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
+	projectClient := projectconnect.NewProjectServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
 
 	var logStreamer logs.LogStreamer
 	if sc.K8sConfig != nil {

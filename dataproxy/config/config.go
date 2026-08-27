@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 
@@ -19,6 +20,7 @@ var defaultConfig = &DataProxyConfig{
 	Download: DataProxyDownloadConfig{
 		MaxExpiresIn: config.Duration{Duration: 3600000000000}, // 1 hour
 	},
+	RunService: serviceclient.ServiceConfig{URL: "http://localhost:8090"},
 }
 
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
@@ -26,6 +28,10 @@ var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
 type DataProxyConfig struct {
 	Upload   DataProxyUploadConfig   `json:"upload" pflag:",Defines data proxy upload configuration."`
 	Download DataProxyDownloadConfig `json:"download" pflag:",Defines data proxy download configuration."`
+
+	// RunService configures the Runs service client. The Runs component also
+	// hosts the Task, Trigger, and Project APIs used by dataproxy.
+	RunService serviceclient.ServiceConfig `json:"runService" pflag:",Runs service client configuration."`
 }
 
 // GetConfig returns the parsed data proxy configuration

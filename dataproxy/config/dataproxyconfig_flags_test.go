@@ -169,4 +169,18 @@ func TestDataProxyConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_runService.url", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("runService.url", testValue)
+			if vString, err := cmdFlags.GetString("runService.url"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.RunService.URL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

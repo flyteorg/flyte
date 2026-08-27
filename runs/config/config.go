@@ -61,8 +61,7 @@ type Config struct {
 	// Watch/streaming settings
 	WatchBufferSize int `json:"watchBufferSize" pflag:",Buffer size for watch streams"`
 
-	// ActionsService configures the actions service client. The same service base
-	// URL is used for project lookups and scheduler calls to the runs service.
+	// ActionsService configures the actions service client.
 	ActionsService serviceclient.ServiceConfig `json:"actionsService" pflag:",Actions service client configuration"`
 
 	// StoragePrefix is the base URI for storing run data (inputs, outputs)
