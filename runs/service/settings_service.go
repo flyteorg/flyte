@@ -3,10 +3,13 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
+	"math"
 
 	"connectrpc.com/connect"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"google.golang.org/protobuf/encoding/protojson"
+	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings/settingsconnect"
@@ -36,11 +39,8 @@ func (s *SettingsService) GetSettingsForEdit(
 	req *connect.Request[settings.GetSettingsForEditRequest],
 ) (*connect.Response[settings.GetSettingsForEditResponse], error) {
 	key := req.Msg.GetKey()
-	if key == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("key is required"))
-	}
-	if key.GetProject() != "" && key.GetDomain() == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("a project-scope key requires a domain"))
+	if err := validateSettingsKey(key); err != nil {
+		return nil, err
 	}
 
 	// One partial key per scope level covered by the request, broadest first,
@@ -94,14 +94,15 @@ func (s *SettingsService) CreateSettings(
 	ctx context.Context,
 	req *connect.Request[settings.CreateSettingsRequest],
 ) (*connect.Response[settings.CreateSettingsResponse], error) {
-	// The buf.validate annotations on these protos are not enforced by the
-	// generated Go code, so required fields and key shape are checked by hand
 	key := req.Msg.GetKey()
-	if key == nil || req.Msg.GetSettings() == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("key and settings are required"))
+	if err := validateSettingsKey(key); err != nil {
+		return nil, err
 	}
-	if key.GetProject() != "" && key.GetDomain() == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("a project-scope key requires a domain"))
+	if req.Msg.GetSettings() == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("settings is required"))
+	}
+	if err := validateSettings(req.Msg.GetSettings()); err != nil {
+		return nil, err
 	}
 
 	data, err := protojson.Marshal(req.Msg.GetSettings())
@@ -135,11 +136,14 @@ func (s *SettingsService) UpdateSettings(
 	req *connect.Request[settings.UpdateSettingsRequest],
 ) (*connect.Response[settings.UpdateSettingsResponse], error) {
 	key := req.Msg.GetKey()
-	if key == nil || req.Msg.GetSettings() == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("key and settings are required"))
+	if err := validateSettingsKey(key); err != nil {
+		return nil, err
 	}
-	if key.GetProject() != "" && key.GetDomain() == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("a project-scope key requires a domain"))
+	if req.Msg.GetSettings() == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("settings is required"))
+	}
+	if err := validateSettings(req.Msg.GetSettings()); err != nil {
+		return nil, err
 	}
 	if req.Msg.GetVersion() == 0 {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("a version is required; use CreateSettings for a new record"))
@@ -175,6 +179,67 @@ func (s *SettingsService) UpdateSettings(
 			Version:  model.Version,
 		},
 	}), nil
+}
+
+// validateSettingsKey checks the key shape by hand: the buf.validate annotations on
+// these protos are not enforced by the generated Go code, so required fields and scope
+// rules are checked here instead.
+func validateSettingsKey(key *settings.SettingsKey) error {
+	if key == nil {
+		return connect.NewError(connect.CodeInvalidArgument, errors.New("key is required"))
+	}
+	if key.GetProject() != "" && key.GetDomain() == "" {
+		return connect.NewError(connect.CodeInvalidArgument, errors.New("a project-scope key requires a domain"))
+	}
+	return nil
+}
+
+// validateMaxActionConcurrency enforces the bounds on a per-run concurrency cap: 0 means
+// unlimited and 1 is rejected. The ceiling is MaxUint32 because the resolved value is
+// applied to RunSpec.max_action_concurrency, which is a uint32.
+func validateMaxActionConcurrency(setting *settings.Int64Setting) error {
+	if setting.GetState() != settings.SettingState_SETTING_STATE_VALUE {
+		return nil
+	}
+	if v := setting.GetIntValue(); v < 0 || v == 1 || v > math.MaxUint32 {
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid max_action_concurrency %d: must be 0 (unlimited) or between 2 and %d", v, math.MaxUint32))
+	}
+	return nil
+}
+
+// validateQuantity checks that a quantity leaf holds a value Kubernetes can parse.
+// name is the dot-path used in the error message, e.g. "task_resource.max.memory".
+func validateQuantity(name string, setting *settings.QuantitySetting) error {
+	if setting.GetState() != settings.SettingState_SETTING_STATE_VALUE {
+		return nil
+	}
+	if _, err := resource.ParseQuantity(setting.GetQuantityValue()); err != nil {
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid %s %q: %w", name, setting.GetQuantityValue(), err))
+	}
+	return nil
+}
+
+func validateTaskResourceDefaults(bound string, d *settings.TaskResourceDefaults) error {
+	if err := validateQuantity(bound+".cpu", d.GetCpu()); err != nil {
+		return err
+	}
+	if err := validateQuantity(bound+".gpu", d.GetGpu()); err != nil {
+		return err
+	}
+	if err := validateQuantity(bound+".memory", d.GetMemory()); err != nil {
+		return err
+	}
+	return validateQuantity(bound+".storage", d.GetStorage())
+}
+
+func validateSettings(s *settings.Settings) error {
+	if err := validateMaxActionConcurrency(s.GetRun().GetMaxActionConcurrency()); err != nil {
+		return err
+	}
+	if err := validateTaskResourceDefaults("task_resource.min", s.GetTaskResource().GetMin()); err != nil {
+		return err
+	}
+	return validateTaskResourceDefaults("task_resource.max", s.GetTaskResource().GetMax())
 }
 
 var _ settingsconnect.SettingsServiceHandler = (*SettingsService)(nil)
