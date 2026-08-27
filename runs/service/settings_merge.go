@@ -7,7 +7,7 @@ import (
 )
 
 // scopeLevelAt maps a position in the level chain to the scope it represents.
-// Callers build the chain broadest first: instance, domain, project.
+// Callers build the chain broadest first: org, domain, project.
 func scopeLevelAt(i int) settings.ScopeLevel {
 	switch i {
 	case 0:
@@ -19,97 +19,68 @@ func scopeLevelAt(i int) settings.ScopeLevel {
 	}
 }
 
-// mergeStringSettings resolves one string leaf across the level chain. The last
-// level whose state is not INHERIT wins, so UNSET at a child level blocks a
-// value set higher up. Returns nil when no level had an opinion.
-func mergeStringSettings(levels []*settings.StringSetting) *settings.StringSetting {
-	var winner *settings.StringSetting
-	var level settings.ScopeLevel
+// scalarSetting is the shared shape of the scalar leaf wrappers: a proto message
+// carrying a SettingState.
+type scalarSetting interface {
+	proto.Message
+	GetState() settings.SettingState
+}
+
+// mergeScalar resolves one scalar leaf across the level chain: the last level whose
+// state is not INHERIT wins, so an UNSET child blocks a value set above it, and nil
+// comes back when nothing did. setLevel stamps the winning scope onto the copy,
+// because a generic constraint can require methods but not fields.
+func mergeScalar[T scalarSetting](levels []T, setLevel func(T, settings.ScopeLevel)) T {
+	var out T
+	won := -1
 
 	for i, s := range levels {
 		if s.GetState() == settings.SettingState_SETTING_STATE_INHERIT {
 			continue
 		}
-		winner = s
-		level = scopeLevelAt(i)
-	}
-	if winner == nil {
-		return nil
+		won = i
 	}
 
-	out := proto.Clone(winner).(*settings.StringSetting)
-	out.ScopeLevel = level
+	if won < 0 {
+		return out
+	}
 
+	out = proto.Clone(levels[won]).(T)
+	setLevel(out, scopeLevelAt(won))
 	return out
+}
+
+// mergeStringSettings resolves one string leaf across the level chain. The last
+// level whose state is not INHERIT wins, so UNSET at a child level blocks a
+// value set higher up. Returns nil when no level had an opinion.
+func mergeStringSettings(levels []*settings.StringSetting) *settings.StringSetting {
+	return mergeScalar(levels, func(s *settings.StringSetting, level settings.ScopeLevel) {
+		s.ScopeLevel = level
+	})
 }
 
 // mergeInt64Settings resolves one int64 leaf across the level chain, following the
 // same rule as mergeStringSettings.
 func mergeInt64Settings(levels []*settings.Int64Setting) *settings.Int64Setting {
-	var winner *settings.Int64Setting
-	var level settings.ScopeLevel
-
-	for i, s := range levels {
-		if s.GetState() == settings.SettingState_SETTING_STATE_INHERIT {
-			continue
-		}
-		winner = s
-		level = scopeLevelAt(i)
-	}
-	if winner == nil {
-		return nil
-	}
-
-	out := proto.Clone(winner).(*settings.Int64Setting)
-	out.ScopeLevel = level
-
-	return out
+	return mergeScalar(levels, func(s *settings.Int64Setting, level settings.ScopeLevel) {
+		s.ScopeLevel = level
+	})
 }
 
 // mergeBoolSettings resolves one bool leaf across the level chain, following the
 // same rule as mergeStringSettings.
 func mergeBoolSettings(levels []*settings.BoolSetting) *settings.BoolSetting {
-	var winner *settings.BoolSetting
-	var level settings.ScopeLevel
-
-	for i, s := range levels {
-		if s.GetState() == settings.SettingState_SETTING_STATE_INHERIT {
-			continue
-		}
-		winner = s
-		level = scopeLevelAt(i)
-	}
-	if winner == nil {
-		return nil
-	}
-
-	out := proto.Clone(winner).(*settings.BoolSetting)
-	out.ScopeLevel = level
-
-	return out
+	return mergeScalar(levels, func(s *settings.BoolSetting, level settings.ScopeLevel) {
+		s.ScopeLevel = level
+	})
 }
 
 // mergeQuantitySettings resolves one quantity leaf across the level chain, following
 // the same rule as mergeStringSettings.
 func mergeQuantitySettings(levels []*settings.QuantitySetting) *settings.QuantitySetting {
-	var winner *settings.QuantitySetting
-	var level settings.ScopeLevel
-
-	for i, s := range levels {
-		if s.GetState() == settings.SettingState_SETTING_STATE_INHERIT {
-			continue
-		}
-		winner = s
-		level = scopeLevelAt(i)
-	}
-	if winner == nil {
-		return nil
-	}
-
-	out := proto.Clone(winner).(*settings.QuantitySetting)
-	out.ScopeLevel = level
-
-	return out
+	return mergeScalar(levels, func(s *settings.QuantitySetting, level settings.ScopeLevel) {
+		s.ScopeLevel = level
+	})
 }
 
 // mergeStringMapSettings resolves one string-map leaf across the level chain.

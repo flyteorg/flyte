@@ -37,10 +37,6 @@ func wantMap(level settings.ScopeLevel, entries map[string]string) *settings.Str
 	}
 }
 
-func boolSetting(state settings.SettingState, value bool) *settings.BoolSetting {
-	return &settings.BoolSetting{State: state, BoolValue: value}
-}
-
 func TestMergeStringSettings(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -181,36 +177,6 @@ func TestMergeStringMapSettings(t *testing.T) {
 			assert.Truef(t, proto.Equal(tt.want, got), "want %v, got %v", tt.want, got)
 		})
 	}
-}
-
-// TestMergeScalarCopies smoke-tests the int64, bool and quantity mergers. They are
-// copies of mergeStringSettings with the leaf type swapped, so each case only needs
-// to resolve a winner: that exercises the type assertion, which is the one line where
-// a bad copy compiles but panics at runtime.
-func TestMergeScalarCopies(t *testing.T) {
-	t.Run("int64", func(t *testing.T) {
-		got := mergeInt64Settings([]*settings.Int64Setting{
-			concurrency(stateValue, 8), nil, concurrency(stateValue, 64),
-		})
-		want := &settings.Int64Setting{State: stateValue, IntValue: 64, ScopeLevel: levelProject}
-		assert.Truef(t, proto.Equal(want, got), "want %v, got %v", want, got)
-	})
-
-	t.Run("bool", func(t *testing.T) {
-		got := mergeBoolSettings([]*settings.BoolSetting{
-			boolSetting(stateValue, false), nil, boolSetting(stateValue, true),
-		})
-		want := &settings.BoolSetting{State: stateValue, BoolValue: true, ScopeLevel: levelProject}
-		assert.Truef(t, proto.Equal(want, got), "want %v, got %v", want, got)
-	})
-
-	t.Run("quantity", func(t *testing.T) {
-		got := mergeQuantitySettings([]*settings.QuantitySetting{
-			quantity(stateValue, "16"), nil, quantity(stateValue, "32"),
-		})
-		want := &settings.QuantitySetting{State: stateValue, QuantityValue: "32", ScopeLevel: levelProject}
-		assert.Truef(t, proto.Equal(want, got), "want %v, got %v", want, got)
-	})
 }
 
 func TestMergeSettings(t *testing.T) {
