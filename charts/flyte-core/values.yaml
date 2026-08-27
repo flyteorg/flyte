@@ -1,0 +1,609 @@
+# nameOverride changes the chart label name and sets a resource name prefix.
+nameOverride: ""
+# fullnameOverride sets a resource name prefix without changing chart labels.
+fullnameOverride: ""
+# commonLabels are added to every resource and pod.
+commonLabels: {}
+# commonAnnotations are added to every resource.
+commonAnnotations: {}
+
+# imagePullSecrets are attached to all Flyte core pods.
+imagePullSecrets: []
+
+# components configures each independently scalable Flyte service.
+components:
+  runs:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: cr.flyte.org/flyteorg/flyte-binary-v2
+      tag: latest  # FLYTE_TAG
+      pullPolicy: IfNotPresent
+    command: [/usr/bin/tini, -g, --, /usr/local/bin/flyte]
+    args: [--component, runs, --config, /etc/flyte/config.d/*.yaml]
+    extraEnv: []
+    envFrom: []
+    resources: {}
+    podLabels: {}
+    podAnnotations: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    topologySpreadConstraints: []
+    priorityClassName: ""
+    serviceAccountName: ""
+    podSecurityContext: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: [ALL]
+    livenessProbe: {}
+    readinessProbe: {}
+    startupProbe: {}
+    extraVolumeMounts: []
+    extraVolumes: []
+    initContainers: []
+    sidecars: []
+    strategy: {}
+    extraPodSpec: {}
+    service:
+      type: ClusterIP
+      annotations: {}
+      labels: {}
+      clusterIP: ""
+  actions:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: cr.flyte.org/flyteorg/flyte-binary-v2
+      tag: latest  # FLYTE_TAG
+      pullPolicy: IfNotPresent
+    command: [/usr/bin/tini, -g, --, /usr/local/bin/flyte]
+    args: [--component, actions, --config, /etc/flyte/config.d/*.yaml]
+    extraEnv: []
+    envFrom: []
+    resources: {}
+    podLabels: {}
+    podAnnotations: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    topologySpreadConstraints: []
+    priorityClassName: ""
+    serviceAccountName: ""
+    podSecurityContext: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: [ALL]
+    livenessProbe: {}
+    readinessProbe: {}
+    startupProbe: {}
+    extraVolumeMounts: []
+    extraVolumes: []
+    initContainers: []
+    sidecars: []
+    strategy: {}
+    extraPodSpec: {}
+    service:
+      type: ClusterIP
+      annotations: {}
+      labels: {}
+      clusterIP: ""
+  events:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: cr.flyte.org/flyteorg/flyte-binary-v2
+      tag: latest  # FLYTE_TAG
+      pullPolicy: IfNotPresent
+    command: [/usr/bin/tini, -g, --, /usr/local/bin/flyte]
+    args: [--component, events, --config, /etc/flyte/config.d/*.yaml]
+    extraEnv: []
+    envFrom: []
+    resources: {}
+    podLabels: {}
+    podAnnotations: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    topologySpreadConstraints: []
+    priorityClassName: ""
+    serviceAccountName: ""
+    podSecurityContext: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: [ALL]
+    livenessProbe: {}
+    readinessProbe: {}
+    startupProbe: {}
+    extraVolumeMounts: []
+    extraVolumes: []
+    initContainers: []
+    sidecars: []
+    strategy: {}
+    extraPodSpec: {}
+    service:
+      type: ClusterIP
+      annotations: {}
+      labels: {}
+      clusterIP: ""
+  secret:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: cr.flyte.org/flyteorg/flyte-binary-v2
+      tag: latest  # FLYTE_TAG
+      pullPolicy: IfNotPresent
+    command: [/usr/bin/tini, -g, --, /usr/local/bin/flyte]
+    args: [--component, secret, --config, /etc/flyte/config.d/*.yaml]
+    extraEnv: []
+    envFrom: []
+    resources: {}
+    podLabels: {}
+    podAnnotations: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    topologySpreadConstraints: []
+    priorityClassName: ""
+    serviceAccountName: ""
+    podSecurityContext: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: [ALL]
+    livenessProbe: {}
+    readinessProbe: {}
+    startupProbe: {}
+    extraVolumeMounts: []
+    extraVolumes: []
+    initContainers: []
+    sidecars: []
+    strategy: {}
+    extraPodSpec: {}
+    service:
+      type: ClusterIP
+      annotations: {}
+      labels: {}
+      clusterIP: ""
+  cache:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: cr.flyte.org/flyteorg/flyte-binary-v2
+      tag: latest  # FLYTE_TAG
+      pullPolicy: IfNotPresent
+    command: [/usr/bin/tini, -g, --, /usr/local/bin/flyte]
+    args: [--component, cache, --config, /etc/flyte/config.d/*.yaml]
+    extraEnv: []
+    envFrom: []
+    resources: {}
+    podLabels: {}
+    podAnnotations: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    topologySpreadConstraints: []
+    priorityClassName: ""
+    serviceAccountName: ""
+    podSecurityContext: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: [ALL]
+    livenessProbe: {}
+    readinessProbe: {}
+    startupProbe: {}
+    extraVolumeMounts: []
+    extraVolumes: []
+    initContainers: []
+    sidecars: []
+    strategy: {}
+    extraPodSpec: {}
+    service:
+      type: ClusterIP
+      annotations: {}
+      labels: {}
+      clusterIP: ""
+  app:
+    # Apps require Knative Serving to be installed in the cluster.
+    enabled: false
+    replicaCount: 1
+    image:
+      repository: cr.flyte.org/flyteorg/flyte-binary-v2
+      tag: latest  # FLYTE_TAG
+      pullPolicy: IfNotPresent
+    command: [/usr/bin/tini, -g, --, /usr/local/bin/flyte]
+    args: [--component, app, --config, /etc/flyte/config.d/*.yaml]
+    extraEnv: []
+    envFrom: []
+    resources: {}
+    podLabels: {}
+    podAnnotations: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    topologySpreadConstraints: []
+    priorityClassName: ""
+    serviceAccountName: ""
+    podSecurityContext: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: [ALL]
+    livenessProbe: {}
+    readinessProbe: {}
+    startupProbe: {}
+    extraVolumeMounts: []
+    extraVolumes: []
+    initContainers: []
+    sidecars: []
+    strategy: {}
+    extraPodSpec: {}
+    service:
+      type: ClusterIP
+      annotations: {}
+      labels: {}
+      clusterIP: ""
+  dataproxy:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: cr.flyte.org/flyteorg/flyte-binary-v2
+      tag: latest  # FLYTE_TAG
+      pullPolicy: IfNotPresent
+    command: [/usr/bin/tini, -g, --, /usr/local/bin/flyte]
+    args: [--component, dataproxy, --config, /etc/flyte/config.d/*.yaml]
+    extraEnv: []
+    envFrom: []
+    resources: {}
+    podLabels: {}
+    podAnnotations: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    topologySpreadConstraints: []
+    priorityClassName: ""
+    serviceAccountName: ""
+    podSecurityContext: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: [ALL]
+    livenessProbe: {}
+    readinessProbe: {}
+    startupProbe: {}
+    extraVolumeMounts: []
+    extraVolumes: []
+    initContainers: []
+    sidecars: []
+    strategy: {}
+    extraPodSpec: {}
+    service:
+      type: ClusterIP
+      annotations: {}
+      labels: {}
+      clusterIP: ""
+  executor:
+    enabled: true
+    image:
+      repository: cr.flyte.org/flyteorg/flyte-binary-v2
+      tag: latest  # FLYTE_TAG
+      pullPolicy: IfNotPresent
+    command: [/usr/bin/tini, -g, --, /usr/local/bin/flyte]
+    args: [--component, executor, --config, /etc/flyte/config.d/*.yaml]
+    extraEnv: []
+    envFrom: []
+    resources: {}
+    podLabels: {}
+    podAnnotations: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    topologySpreadConstraints: []
+    priorityClassName: ""
+    serviceAccountName: ""
+    podSecurityContext: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: [ALL]
+    livenessProbe: {}
+    readinessProbe: {}
+    startupProbe: {}
+    extraVolumeMounts: []
+    extraVolumes: []
+    initContainers: []
+    sidecars: []
+    strategy: {}
+    extraPodSpec: {}
+    service:
+      type: ClusterIP
+      annotations: {}
+      labels: {}
+      clusterIP: ""
+
+# configuration is rendered once and projected into every component pod.
+configuration:
+  # externalConfigMap and externalSecretRef replace the generated configuration.
+  # When either is set, the external configuration must include all component
+  # service URLs as well as database and storage settings.
+  externalConfigMap: ""
+  externalSecretRef: ""
+  inlineConfigMap: ""
+  inlineSecretRef: ""
+  extraInlineConfigMapRefs: []
+  extraInlineSecretRefs: []
+  inline:
+    plugins:
+      k8s:
+        co-pilot:
+          image: '{{ printf "%s:%s" .Values.configuration.coPilot.image.repository .Values.configuration.coPilot.image.tag }}'
+        # Environment variables injected into every task pod. The endpoint
+        # defaults to the actions service. Inline configuration is rendered
+        # with tpl, so chart templates such as .Release.Namespace and
+        # flyte-core helpers can be used in overrides.
+        default-env-vars:
+          - _U_EP_OVERRIDE: '{{ printf "%s:%s" (include "flyte-core.componentServiceHost" (dict "root" . "component" "actions")) (include "flyte-core.componentPort" (dict "root" . "component" "actions")) }}'
+          - _U_INSECURE: "true"
+          - _U_USE_ACTIONS: "1"
+
+  logging:
+    level: 1
+    showSource: true
+
+  kubernetes:
+    namespace: '{{ .Release.Namespace }}'
+    kubeconfig: ""
+    qps: 1000
+    burst: 2000
+    timeout: 30s
+    clusterName: flyte
+
+  database:
+    maxIdleConnections: 10
+    maxOpenConnections: 100
+    connMaxLifeTime: 1h
+    postgres:
+      host: 127.0.0.1
+      readReplicaHost: ""
+      port: 5432
+      dbname: flyte
+      username: postgres
+      # password is written only to the generated configuration Secret.
+      password: ""
+      # passwordPath may point at a file mounted with component extra volumes.
+      passwordPath: ""
+      options: sslmode=disable
+      debug: false
+
+  storage:
+    metadataContainer: my-organization-flyte-container
+    provider: s3
+    providerConfig:
+      s3:
+        region: us-east-1
+        disableSSL: false
+        v2Signing: false
+        endpoint: ""
+        authType: iam
+        accessKey: ""
+        secretKey: ""
+        secretKeyPath: ""
+      gcs:
+        project: my-organization-gcp-project
+      azure:
+        account: storage-account-name
+        key: ""
+        configDomainSuffix: ""
+        configUploadConcurrency: 4
+
+  runs:
+    actionsService:
+      url: http://actions:8080
+    server:
+      host: 0.0.0.0
+      port: 8080
+    watchBufferSize: 100
+    storagePrefix: s3://flyte-data
+    seedProjects:
+      - flytesnacks
+    domains:
+      - id: development
+        name: Development
+      - id: staging
+        name: Staging
+      - id: production
+        name: Production
+    triggerScheduler:
+      enabled: true
+      resyncInterval: 30s
+      maxCatchupRunsPerLoop: 100
+      executionQps: 10
+      executionBurst: 20
+    trustForwardedIdentityHeaders: true
+    identityHeaders:
+      claimsJwtHeader: X-Amzn-Oidc-Data
+      subjectHeader: X-Amzn-Oidc-Identity
+      emailHeader: ""
+    authMetadata: {}
+
+  actions:
+    runService:
+      url: http://runs:8080
+    server:
+      host: 0.0.0.0
+      port: 8080
+    watchBufferSize: 1000
+    watchWorkers: 100
+    recordFilterSize: 8388608
+
+  events:
+    runService:
+      url: http://runs:8080
+    server:
+      host: 0.0.0.0
+      port: 8080
+
+  cache:
+    server:
+      host: 0.0.0.0
+      port: 8080
+    heartbeatGracePeriodMultiplier: 3
+    maxReservationHeartbeat: 10s
+
+  dataproxy:
+    runService:
+      url: http://runs:8080
+    server:
+      host: 0.0.0.0
+      port: 8080
+    upload:
+      maxSize: 100Mi
+      maxExpiresIn: 1h
+      defaultFileNameLength: 20
+      storagePrefix: uploads
+    download:
+      maxExpiresIn: 1h
+
+  secret:
+    server:
+      host: 0.0.0.0
+      port: 8080
+    webhookURL: ""
+
+  executor:
+    eventsService:
+      url: http://events:8080
+    cacheService:
+      url: http://cache:8080
+    metricsPort: 10254
+    healthProbePort: 8081
+    leaderElect: false
+    metricsSecure: false
+    enableHTTP2: false
+    cluster: ""
+    maxSystemFailures: 3
+    maxConcurrentReconciles: 512
+    requeueDuration: 10s
+    gc:
+      interval: 30m
+      maxTTL: 1h
+
+  app:
+    internalAppService:
+      url: http://localhost:8080
+    server:
+      host: 0.0.0.0
+      port: 8080
+    cacheTtl: 30s
+  internalApps:
+    enabled: true
+    baseDomain: ""
+    scheme: https
+    ingressAppsPort: 0
+    defaultRequestTimeout: 300s
+    maxRequestTimeout: 3600s
+    namespacedNameSuffixTemplate: '{{ project }}-{{ domain }}'
+    watchBufferSize: 100
+    defaultServiceAccount: ""
+    defaultEnvVars: {}
+
+  webhook:
+    listenPort: 9443
+    cacheInvalidationPort: 9444
+    webhookTimeout: 30
+
+  coPilot:
+    image:
+      repository: cr.flyte.org/flyteorg/flyte-binary-v2 # FLYTE_IMAGE
+      tag: latest  # FLYTE_TAG
+
+# waitForDatabase is added to components that use PostgreSQL.
+waitForDatabase:
+  enabled: true
+  image:
+    repository: postgres
+    tag: 15-alpine
+    pullPolicy: IfNotPresent
+  command: []
+  args: []
+  resources: {}
+  securityContext: {}
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+  labels: {}
+
+rbac:
+  create: true
+  annotations: {}
+  labels: {}
+  extraRules: []
+
+ingress:
+  # create enables ingress resources.
+  create: false
+  labels: {}
+  host: ""
+  commonAnnotations: {}
+  httpAnnotations: {}
+  ingressClassName: ""
+  httpIngressClassName: ""
+  tls: []
+  httpTls: []
+  httpExtraPaths:
+    prepend: []
+    append: []
+  # apiJwtIngress creates a separate ingress for API requests authenticated with bearer tokens.
+  apiJwtIngress:
+    enabled: false
+    host: ""
+    annotations: {}
+    ingressClassName: ""
+    tls: []
+  # wellknownIngress creates a separate unauthenticated ingress for auth discovery endpoints.
+  wellknownIngress:
+    enabled: false
+    host: ""
+    annotations: {}
+    ingressClassName: ""
+    tls: []
+
+console:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: ghcr.io/unionai-oss/flyteconsole-v2 # FLYTECONSOLE_IMAGE
+    tag: latest # FLYTECONSOLE_TAG
+    pullPolicy: IfNotPresent
+  imagePullSecrets: []
+  basePath: /v2
+  containerPort: 8080
+  env: []
+  resources: {}
+  podLabels: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  securityContext: {}
+  service:
+    type: ClusterIP
+    port: 80
+    annotations: {}
+
+enabledPlugins:
+  tasks:
+    task-plugins:
+      default-for-task-types:
+        container: container
+        sidecar: sidecar
+        container_array: k8s-array
+
+flyteconnector:
+  enabled: false

@@ -19,7 +19,9 @@ const otelServiceName = "secret-service"
 // Setup registers the SecretService handler on the SetupContext mux.
 // Requires sc.K8sClient and sc.Namespace to be set.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
-	svc, err := service.NewSecretServiceWithConfig(ctx, sc.K8sClient, config.GetConfig().Webhook)
+	cfg := config.GetConfig()
+
+	svc, err := service.NewSecretServiceWithConfig(ctx, sc.K8sClient, cfg.Webhook)
 	if err != nil {
 		return fmt.Errorf("secret: configure webhook service client: %w", err)
 	}

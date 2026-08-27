@@ -1,0 +1,31 @@
+{{- if and (not (include "flyte-core.externalConfiguration" .)) .Values.components.runs.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flyte-core.componentConfigMapName" (dict "root" . "component" "runs") }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "flyte-core.componentLabels" (dict "root" . "component" "runs") | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+data:
+  000-core.yaml: |
+    {{- include "flyte-core.config.logger" . | nindent 4 }}
+    runs:
+      {{- toYaml .Values.configuration.runs | nindent 6 }}
+  002-database.yaml: |
+    {{- include "flyte-core.config.database" . | nindent 4 }}
+    {{- $database := deepCopy .Values.configuration.database }}
+    {{- if $database.postgres }}{{- $_ := unset $database.postgres "password" }}{{- end }}
+    runs:
+      database:
+        {{- tpl (toYaml $database) . | nindent 8 }}
+  003-storage.yaml: |
+    {{- include "flyte-core.config.storage" . | nindent 4 }}
+  {{- with .Values.configuration.inline }}
+  100-inline.yaml: |
+    {{- tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+{{- end }}
