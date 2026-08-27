@@ -3,10 +3,12 @@ package dataproxy
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"connectrpc.com/connect"
 
 	"github.com/flyteorg/flyte/v2/dataproxy/converter"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
@@ -117,9 +119,19 @@ func (s *TranslatorService) readTriggerLiterals(
 			fmt.Errorf("trigger %s has no offloaded input data", triggerID.GetName().GetName()))
 	}
 
+	// UploadInputs writes the literals to <dir>/inputs.pb but reports the *directory* as
+	// OffloadedInputData.uri, so the suffix has to be appended before reading. Every other
+	// reader does the same: the executor re-appends it via ioutils.NewInputFilePaths, and
+	// CreateRun records inputs_uri as inputPrefix + "/inputs.pb". Tolerate a URI that already
+	// names the file so a full path keeps working.
+	inputRef := storage.DataReference(strings.TrimRight(uri, "/") + "/" + ioutils.InputsSuffix)
+	if strings.HasSuffix(uri, "/"+ioutils.InputsSuffix) {
+		inputRef = storage.DataReference(uri)
+	}
+
 	var inputs task.Inputs
-	if err := s.dataStore.ReadProtobuf(ctx, storage.DataReference(uri), &inputs); err != nil {
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read trigger literals from %s: %w", uri, err))
+	if err := s.dataStore.ReadProtobuf(ctx, inputRef, &inputs); err != nil {
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read trigger literals from %s: %w", inputRef, err))
 	}
 	return inputs.GetLiterals(), nil
 }
