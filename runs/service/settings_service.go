@@ -26,12 +26,74 @@ func NewSettingsService(settingsRepo interfaces.SettingsRepo) *SettingsService {
 	return &SettingsService{settingsRepo: settingsRepo}
 }
 
+// fetchLevels returns the scope levels covered by key, broadest first, together with
+// the stored row for each. The two slices align by position, and a nil row means no
+// record exists at that level. Order comes from the key ladder; the repo returns rows
+// unordered.
+func (s *SettingsService) fetchLevels(ctx context.Context, key *settings.SettingsKey) ([]*settings.SettingsKey, []*models.Settings, error) {
+	levelKeys := []*settings.SettingsKey{{Org: key.GetOrg()}}
+	if key.GetDomain() != "" {
+		levelKeys = append(levelKeys, &settings.SettingsKey{Org: key.GetOrg(), Domain: key.GetDomain()})
+	}
+	if key.GetProject() != "" {
+		levelKeys = append(levelKeys, &settings.SettingsKey{Org: key.GetOrg(), Domain: key.GetDomain(), Project: key.GetProject()})
+	}
+
+	storageKeys := make([]string, 0, len(levelKeys))
+	for _, lk := range levelKeys {
+		storageKeys = append(storageKeys, models.EncodeSettingsKey(lk.GetOrg(), lk.GetDomain(), lk.GetProject()))
+	}
+
+	rows, err := s.settingsRepo.GetSettingsByKeys(ctx, storageKeys)
+	if err != nil {
+		return nil, nil, err
+	}
+	rowsByKey := make(map[string]*models.Settings, len(rows))
+	for _, row := range rows {
+		rowsByKey[row.Key] = row
+	}
+
+	aligned := make([]*models.Settings, len(levelKeys))
+	for i := range levelKeys {
+		aligned[i] = rowsByKey[storageKeys[i]]
+	}
+	return levelKeys, aligned, nil
+}
+
 // GetSettings returns resolved, merged settings.
 func (s *SettingsService) GetSettings(
 	ctx context.Context,
 	req *connect.Request[settings.GetSettingsRequest],
 ) (*connect.Response[settings.GetSettingsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("settings resolution engine not implemented yet"))
+	key := req.Msg.GetKey()
+	if err := validateSettingsKey(key); err != nil {
+		return nil, err
+	}
+
+	_, rows, err := s.fetchLevels(ctx, key)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	levels := make([]*settings.Settings, len(rows))
+	for i, row := range rows {
+		if row == nil {
+			continue
+		}
+		stored := &settings.Settings{}
+		if err := (protojson.UnmarshalOptions{DiscardUnknown: true}).Unmarshal(row.Data, stored); err != nil {
+			return nil, connect.NewError(connect.CodeInternal, err)
+		}
+		levels[i] = stored
+	}
+	// Merged settings do not correspond to a stored row, so the record carries no
+	// version. Clients that need one for an update use GetSettingsForEdit.
+	return connect.NewResponse(&settings.GetSettingsResponse{
+		SettingsRecord: &settings.SettingsRecord{
+			Key:      key,
+			Settings: mergeSettings(levels),
+		},
+	}), nil
 }
 
 func (s *SettingsService) GetSettingsForEdit(
