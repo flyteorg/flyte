@@ -104,7 +104,7 @@ class RuntimeMetadata(_message.Message):
     def __init__(self, type: _Optional[_Union[RuntimeMetadata.RuntimeType, str]] = ..., version: _Optional[str] = ..., flavor: _Optional[str] = ...) -> None: ...
 
 class TaskMetadata(_message.Message):
-    __slots__ = ["discoverable", "runtime", "timeout", "retries", "discovery_version", "deprecated_error_message", "interruptible", "cache_serializable", "tags", "pod_template_name", "cache_ignore_input_vars", "is_eager", "generates_deck", "metadata", "debuggable", "log_links", "image_build_run", "is_entrypoint", "code_bundle_uri", "timeouts", "produces_artifacts"]
+    __slots__ = ["discoverable", "runtime", "timeout", "retries", "discovery_version", "deprecated_error_message", "interruptible", "cache_serializable", "tags", "pod_template_name", "cache_ignore_input_vars", "is_eager", "generates_deck", "metadata", "debuggable", "log_links", "image_build_run", "is_entrypoint", "code_bundle_uri", "timeouts", "produces_artifacts", "cache_ttl"]
     class TagsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -133,6 +133,7 @@ class TaskMetadata(_message.Message):
     CODE_BUNDLE_URI_FIELD_NUMBER: _ClassVar[int]
     TIMEOUTS_FIELD_NUMBER: _ClassVar[int]
     PRODUCES_ARTIFACTS_FIELD_NUMBER: _ClassVar[int]
+    CACHE_TTL_FIELD_NUMBER: _ClassVar[int]
     discoverable: bool
     runtime: RuntimeMetadata
     timeout: _duration_pb2.Duration
@@ -154,7 +155,8 @@ class TaskMetadata(_message.Message):
     code_bundle_uri: str
     timeouts: _literals_pb2.TimeoutStrategy
     produces_artifacts: bool
-    def __init__(self, discoverable: bool = ..., runtime: _Optional[_Union[RuntimeMetadata, _Mapping]] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., discovery_version: _Optional[str] = ..., deprecated_error_message: _Optional[str] = ..., interruptible: bool = ..., cache_serializable: bool = ..., tags: _Optional[_Mapping[str, str]] = ..., pod_template_name: _Optional[str] = ..., cache_ignore_input_vars: _Optional[_Iterable[str]] = ..., is_eager: bool = ..., generates_deck: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., metadata: _Optional[_Union[K8sObjectMetadata, _Mapping]] = ..., debuggable: bool = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., image_build_run: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., is_entrypoint: bool = ..., code_bundle_uri: _Optional[str] = ..., timeouts: _Optional[_Union[_literals_pb2.TimeoutStrategy, _Mapping]] = ..., produces_artifacts: bool = ...) -> None: ...
+    cache_ttl: _duration_pb2.Duration
+    def __init__(self, discoverable: bool = ..., runtime: _Optional[_Union[RuntimeMetadata, _Mapping]] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., discovery_version: _Optional[str] = ..., deprecated_error_message: _Optional[str] = ..., interruptible: bool = ..., cache_serializable: bool = ..., tags: _Optional[_Mapping[str, str]] = ..., pod_template_name: _Optional[str] = ..., cache_ignore_input_vars: _Optional[_Iterable[str]] = ..., is_eager: bool = ..., generates_deck: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., metadata: _Optional[_Union[K8sObjectMetadata, _Mapping]] = ..., debuggable: bool = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., image_build_run: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., is_entrypoint: bool = ..., code_bundle_uri: _Optional[str] = ..., timeouts: _Optional[_Union[_literals_pb2.TimeoutStrategy, _Mapping]] = ..., produces_artifacts: bool = ..., cache_ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
 
 class ReusePolicy(_message.Message):
     __slots__ = ["min_replicas", "max_replicas", "concurrency", "idle_ttl", "scaledown_ttl", "scope"]
