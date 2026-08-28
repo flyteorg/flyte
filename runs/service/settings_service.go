@@ -105,6 +105,7 @@ func (s *SettingsService) CreateSettings(
 		return nil, err
 	}
 
+	pruneSettings(req.Msg.GetSettings())
 	data, err := protojson.Marshal(req.Msg.GetSettings())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
@@ -149,6 +150,7 @@ func (s *SettingsService) UpdateSettings(
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("a version is required; use CreateSettings for a new record"))
 	}
 
+	pruneSettings(req.Msg.GetSettings())
 	data, err := protojson.Marshal(req.Msg.GetSettings())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
