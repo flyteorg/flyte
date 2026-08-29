@@ -2388,9 +2388,9 @@
           "type": "boolean",
           "description": "If true, the backend extracts artifact metadata stamped on this task's\noutput literals and records them as generated artifacts on the action."
         },
-        "cache_ttl": {
+        "cache_max_age": {
           "type": "string",
-          "description": "Time-to-live for cached results. If set, overrides the platform default.\nCached results older than this are treated as cache misses.\nZero disables age-based expiration."
+          "description": "Maximum age of a cached result that this task will reuse.\nIf unset, the platform default is used. Zero allows cached results to be\nreused regardless of age. This policy is not stored with cached results."
         }
       },
       "title": "Task Metadata"

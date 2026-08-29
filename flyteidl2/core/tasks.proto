@@ -215,10 +215,10 @@ message TaskMetadata {
   // output literals and records them as generated artifacts on the action.
   bool produces_artifacts = 23;
 
-  // Time-to-live for cached results. If set, overrides the platform default.
-  // Cached results older than this are treated as cache misses.
-  // Zero disables age-based expiration.
-  google.protobuf.Duration cache_ttl = 24 [(buf.validate.field).duration = {
+  // Maximum age of a cached result that this task will reuse.
+  // If unset, the platform default is used. Zero allows cached results to be
+  // reused regardless of age. This policy is not stored with cached results.
+  google.protobuf.Duration cache_max_age = 24 [(buf.validate.field).duration = {
     gte: {seconds: 0}
   }];
 }
