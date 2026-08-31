@@ -14,7 +14,7 @@ import (
 )
 
 // mustJSON unmarshals a protojson literal from settings_customer_flow.md into
-// msg, failing the test on bad input
+// msg, failing the test on bad input.
 func mustJSON(t *testing.T, in string, msg proto.Message) {
 	t.Helper()
 	require.NoError(t, protojson.Unmarshal([]byte(in), msg))
