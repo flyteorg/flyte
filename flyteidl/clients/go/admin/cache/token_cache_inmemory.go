@@ -4,15 +4,27 @@ import (
 	"fmt"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"golang.org/x/oauth2"
 )
 
+// condWaitTimeout bounds CondWait. Cond-style notification has no memory: a
+// broadcast that fires between a waiter's decision to wait and the wait itself
+// is lost, and a refresher that exits without broadcasting never wakes anyone.
+// The bound turns both cases into a short delay followed by the caller's
+// retry instead of a permanent hang of the calling goroutine.
+// Var, not const, so tests can shorten it.
+var condWaitTimeout = 30 * time.Second
+
 type TokenCacheInMemoryProvider struct {
-	token      atomic.Value
-	mu         *sync.Mutex
-	condLocker *NoopLocker
-	cond       *sync.Cond
+	token atomic.Value
+	mu    *sync.Mutex
+
+	// notify is closed and replaced on every CondBroadcast; waiters select on
+	// the channel they observed, so a broadcast wakes exactly the waiters that
+	// started waiting before it.
+	notify atomic.Pointer[chan struct{}]
 }
 
 func (t *TokenCacheInMemoryProvider) SaveToken(token *oauth2.Token) error {
@@ -45,27 +57,20 @@ func (t *TokenCacheInMemoryProvider) Unlock() {
 	t.mu.Unlock()
 }
 
-// CondWait  adds the current go routine to the condition waitlist and waits for another go routine to notify using CondBroadcast
-// The current usage is that one who was able to acquire the lock using TryLock is the one who gets a valid token and notifies all the waitlist requesters so that they can use the new valid token.
-// It also locks the Locker in the condition variable as the semantics of Wait is that it unlocks the Locker after adding
-// the consumer to the waitlist and before blocking on notification.
-// We use the condLocker which is noOp locker to get added to waitlist for notifications.
-// The underlying notifcationList doesn't need to be guarded as it implementation is atomic and is thread safe
-// Refer https://go.dev/src/runtime/sema.go
-// Following is the function and its comments
-// notifyListAdd adds the caller to a notify list such that it can receive
-// notifications. The caller must eventually call notifyListWait to wait for
-// such a notification, passing the returned ticket number.
-//
-//	func notifyListAdd(l *notifyList) uint32 {
-//		// This may be called concurrently, for example, when called from
-//		// sync.Cond.Wait while holding a RWMutex in read mode.
-//		return l.wait.Add(1) - 1
-//	}
+// CondWait blocks until another goroutine calls CondBroadcast, or until
+// condWaitTimeout elapses — whichever comes first. The current usage is that
+// the goroutine that acquired the lock via TryLock refreshes the token and
+// broadcasts so waiters can retry with the new token. The timeout guarantees a
+// waiter is never parked forever when the broadcast is missed (raced) or never
+// sent (refresh failed); after waking it simply retries and, if the token is
+// still invalid, fails or refreshes on its own.
 func (t *TokenCacheInMemoryProvider) CondWait() {
-	t.condLocker.Lock()
-	t.cond.Wait()
-	t.condLocker.Unlock()
+	ch := *t.notify.Load()
+
+	select {
+	case <-ch:
+	case <-time.After(condWaitTimeout):
+	}
 }
 
 // NoopLocker has empty implementation of Locker interface
@@ -78,17 +83,22 @@ func (*NoopLocker) Lock() {
 func (*NoopLocker) Unlock() {
 }
 
-// CondBroadcast signals the condition.
+// CondBroadcast wakes every goroutine currently blocked in CondWait by closing
+// the notification channel and installing a fresh one for future waiters.
+// Swap guarantees each concurrent broadcaster closes a distinct channel, so a
+// channel is never closed twice.
 func (t *TokenCacheInMemoryProvider) CondBroadcast() {
-	t.cond.Broadcast()
+	newCh := make(chan struct{})
+	old := t.notify.Swap(&newCh)
+	close(*old)
 }
 
 func NewTokenCacheInMemoryProvider() *TokenCacheInMemoryProvider {
-	condLocker := &NoopLocker{}
-	return &TokenCacheInMemoryProvider{
-		mu:         &sync.Mutex{},
-		token:      atomic.Value{},
-		condLocker: condLocker,
-		cond:       sync.NewCond(condLocker),
+	t := &TokenCacheInMemoryProvider{
+		mu:    &sync.Mutex{},
+		token: atomic.Value{},
 	}
+	ch := make(chan struct{})
+	t.notify.Store(&ch)
+	return t
 }

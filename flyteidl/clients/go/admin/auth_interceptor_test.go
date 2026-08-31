@@ -220,6 +220,9 @@ func Test_newAuthInterceptor(t *testing.T) {
 		assert.Error(t, err)
 		assert.Truef(t, f.IsInitialized(), "PerRPCCredentialFuture should be initialized")
 		assert.False(t, f.Get().RequireTransportSecurity(), "Insecure should be true leading to RequireTLS false")
+		// The refresh failed, but waiters must still be woken — a return without
+		// a broadcast would leave CondWait-ers parked forever.
+		c.AssertCalled(t, "CondBroadcast")
 	})
 
 	t.Run("Already authenticated", func(t *testing.T) {
