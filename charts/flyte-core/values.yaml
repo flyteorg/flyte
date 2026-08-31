@@ -472,7 +472,8 @@ configuration:
     server:
       host: 0.0.0.0
       port: 8080
-    webhookURL: ""
+    webhook:
+      url: '{{ printf "http://%s:%v" (include "flyte-core.executorCacheServiceHost" .) .Values.configuration.webhook.cacheInvalidationPort }}'
 
   executor:
     eventsService:

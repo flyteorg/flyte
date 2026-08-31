@@ -439,7 +439,7 @@ Distributed Flyte 2 core services
 | configuration.runs.watchBufferSize | int | `100` |  |
 | configuration.secret.server.host | string | `"0.0.0.0"` |  |
 | configuration.secret.server.port | int | `8080` |  |
-| configuration.secret.webhookURL | string | `""` |  |
+| configuration.secret.webhook.url | string | `"{{ printf \"http://%s:%v\" (include \"flyte-core.executorCacheServiceHost\" .) .Values.configuration.webhook.cacheInvalidationPort }}"` |  |
 | configuration.storage.metadataContainer | string | `"my-organization-flyte-container"` |  |
 | configuration.storage.provider | string | `"s3"` |  |
 | configuration.storage.providerConfig.azure.account | string | `"storage-account-name"` |  |
@@ -521,4 +521,3 @@ Distributed Flyte 2 core services
 | waitForDatabase.image.tag | string | `"15-alpine"` |  |
 | waitForDatabase.resources | object | `{}` |  |
 | waitForDatabase.securityContext | object | `{}` |  |
-
