@@ -126,6 +126,10 @@ flyte-binary:
         path: /readyz
         port: http
       periodSeconds: 1
+    resources:
+      reqeusts:
+        cpu: "1"
+        memory: 2Gi
     waitForDB:
       image:
         repository: bitnami/postgresql
@@ -149,6 +153,13 @@ flyte-binary:
 rustfs:
   enabled: true
   fullnameOverride: rustfs
+  config:
+    rustfs:
+      log_level: "error"
+  resources:
+    reqeusts:
+      cpu: 1
+      memory: 2Gi
   mode:
     standalone:
       enabled: true
