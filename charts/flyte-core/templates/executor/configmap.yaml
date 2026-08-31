@@ -1,4 +1,4 @@
-{{- if and (not (include "flyte-core.externalConfiguration" .)) .Values.components.executor.enabled }}
+  {{- if and (not (include "flyte-core.externalConfiguration" .)) .Values.components.executor.enabled }}
 {{- $executorConfig := omit .Values.configuration.executor "metricsPort" "healthProbePort" }}
 apiVersion: v1
 kind: ConfigMap
@@ -25,7 +25,6 @@ data:
       {{- end }}
     webhook:
       localCert: true
-      certDir: /var/run/flyte/certs
       secretName: {{ include "flyte-core.webhookSecretName" . }}
       serviceName: {{ include "flyte-core.componentName" (dict "root" . "component" "executor") }}
       servicePort: {{ .Values.configuration.webhook.listenPort }}
