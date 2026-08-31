@@ -336,13 +336,13 @@ Distributed Flyte 2 core services
 | components.secret.tolerations | list | `[]` |  |
 | components.secret.topologySpreadConstraints | list | `[]` |  |
 | configuration.actions.recordFilterSize | int | `8388608` |  |
-| configuration.actions.runService.url | string | `"http://runs:8080"` |  |
+| configuration.actions.runService.url | string | `"{{ include \"flyte-core.componentServiceURL\" (dict \"root\" . \"component\" \"runs\") }}"` |  |
 | configuration.actions.server.host | string | `"0.0.0.0"` |  |
 | configuration.actions.server.port | int | `8080` |  |
 | configuration.actions.watchBufferSize | int | `1000` |  |
 | configuration.actions.watchWorkers | int | `100` |  |
 | configuration.app.cacheTtl | string | `"30s"` |  |
-| configuration.app.internalAppService.url | string | `"http://localhost:8080"` |  |
+| configuration.app.internalAppService.url | string | `"{{ include \"flyte-core.componentServiceURL\" (dict \"root\" . \"component\" \"app\") }}"` |  |
 | configuration.app.server.host | string | `"0.0.0.0"` |  |
 | configuration.app.server.port | int | `8080` |  |
 | configuration.cache.heartbeatGracePeriodMultiplier | int | `3` |  |
@@ -364,20 +364,20 @@ Distributed Flyte 2 core services
 | configuration.database.postgres.readReplicaHost | string | `""` |  |
 | configuration.database.postgres.username | string | `"postgres"` |  |
 | configuration.dataproxy.download.maxExpiresIn | string | `"1h"` |  |
-| configuration.dataproxy.runService.url | string | `"http://runs:8080"` |  |
+| configuration.dataproxy.runService.url | string | `"{{ include \"flyte-core.componentServiceURL\" (dict \"root\" . \"component\" \"runs\") }}"` |  |
 | configuration.dataproxy.server.host | string | `"0.0.0.0"` |  |
 | configuration.dataproxy.server.port | int | `8080` |  |
 | configuration.dataproxy.upload.defaultFileNameLength | int | `20` |  |
 | configuration.dataproxy.upload.maxExpiresIn | string | `"1h"` |  |
 | configuration.dataproxy.upload.maxSize | string | `"100Mi"` |  |
 | configuration.dataproxy.upload.storagePrefix | string | `"uploads"` |  |
-| configuration.events.runService.url | string | `"http://runs:8080"` |  |
+| configuration.events.runService.url | string | `"{{ include \"flyte-core.componentServiceURL\" (dict \"root\" . \"component\" \"runs\") }}"` |  |
 | configuration.events.server.host | string | `"0.0.0.0"` |  |
 | configuration.events.server.port | int | `8080` |  |
-| configuration.executor.cacheService.url | string | `"http://cache:8080"` |  |
+| configuration.executor.cacheService.url | string | `"{{ include \"flyte-core.componentServiceURL\" (dict \"root\" . \"component\" \"cache\") }}"` |  |
 | configuration.executor.cluster | string | `""` |  |
 | configuration.executor.enableHTTP2 | bool | `false` |  |
-| configuration.executor.eventsService.url | string | `"http://events:8080"` |  |
+| configuration.executor.eventsService.url | string | `"{{ include \"flyte-core.componentServiceURL\" (dict \"root\" . \"component\" \"events\") }}"` |  |
 | configuration.executor.gc.interval | string | `"30m"` |  |
 | configuration.executor.gc.maxTTL | string | `"1h"` |  |
 | configuration.executor.healthProbePort | int | `8081` |  |
@@ -415,7 +415,7 @@ Distributed Flyte 2 core services
 | configuration.kubernetes.timeout | string | `"30s"` |  |
 | configuration.logging.level | int | `1` |  |
 | configuration.logging.showSource | bool | `true` |  |
-| configuration.runs.actionsService.url | string | `"http://actions:8080"` |  |
+| configuration.runs.actionsService.url | string | `"{{ include \"flyte-core.componentServiceURL\" (dict \"root\" . \"component\" \"actions\") }}"` |  |
 | configuration.runs.authMetadata | object | `{}` |  |
 | configuration.runs.domains[0].id | string | `"development"` |  |
 | configuration.runs.domains[0].name | string | `"Development"` |  |
@@ -439,7 +439,7 @@ Distributed Flyte 2 core services
 | configuration.runs.watchBufferSize | int | `100` |  |
 | configuration.secret.server.host | string | `"0.0.0.0"` |  |
 | configuration.secret.server.port | int | `8080` |  |
-| configuration.secret.webhook.url | string | `"{{ printf \"http://%s:%v\" (include \"flyte-core.executorCacheServiceHost\" .) .Values.configuration.webhook.cacheInvalidationPort }}"` |  |
+| configuration.secret.webhook.url | string | `"{{ include \"flyte-core.executorCacheServiceURL\" . }}"` |  |
 | configuration.storage.metadataContainer | string | `"my-organization-flyte-container"` |  |
 | configuration.storage.provider | string | `"s3"` |  |
 | configuration.storage.providerConfig.azure.account | string | `"storage-account-name"` |  |

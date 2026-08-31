@@ -402,7 +402,7 @@ configuration:
 
   runs:
     actionsService:
-      url: http://actions:8080
+      url: '{{ include "flyte-core.componentServiceURL" (dict "root" . "component" "actions") }}'
     server:
       host: 0.0.0.0
       port: 8080
@@ -432,7 +432,7 @@ configuration:
 
   actions:
     runService:
-      url: http://runs:8080
+      url: '{{ include "flyte-core.componentServiceURL" (dict "root" . "component" "runs") }}'
     server:
       host: 0.0.0.0
       port: 8080
@@ -442,7 +442,7 @@ configuration:
 
   events:
     runService:
-      url: http://runs:8080
+      url: '{{ include "flyte-core.componentServiceURL" (dict "root" . "component" "runs") }}'
     server:
       host: 0.0.0.0
       port: 8080
@@ -456,7 +456,7 @@ configuration:
 
   dataproxy:
     runService:
-      url: http://runs:8080
+      url: '{{ include "flyte-core.componentServiceURL" (dict "root" . "component" "runs") }}'
     server:
       host: 0.0.0.0
       port: 8080
@@ -473,13 +473,13 @@ configuration:
       host: 0.0.0.0
       port: 8080
     webhook:
-      url: '{{ printf "http://%s:%v" (include "flyte-core.executorCacheServiceHost" .) .Values.configuration.webhook.cacheInvalidationPort }}'
+      url: '{{ include "flyte-core.executorCacheServiceURL" . }}'
 
   executor:
     eventsService:
-      url: http://events:8080
+      url: '{{ include "flyte-core.componentServiceURL" (dict "root" . "component" "events") }}'
     cacheService:
-      url: http://cache:8080
+      url: '{{ include "flyte-core.componentServiceURL" (dict "root" . "component" "cache") }}'
     metricsPort: 10254
     healthProbePort: 8081
     leaderElect: false
@@ -495,7 +495,7 @@ configuration:
 
   app:
     internalAppService:
-      url: http://localhost:8080
+      url: '{{ include "flyte-core.componentServiceURL" (dict "root" . "component" "app") }}'
     server:
       host: 0.0.0.0
       port: 8080

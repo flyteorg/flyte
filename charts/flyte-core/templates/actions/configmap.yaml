@@ -16,7 +16,7 @@ data:
     actions:
       kubernetes:
         {{- tpl (toYaml .Values.configuration.kubernetes) . | nindent 8 }}
-      {{- toYaml .Values.configuration.actions | nindent 6 }}
+      {{- tpl (toYaml .Values.configuration.actions) . | nindent 6 }}
   {{- with .Values.configuration.inline }}
   100-inline.yaml: |
     {{- tpl (toYaml .) $ | nindent 4 }}

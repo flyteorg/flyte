@@ -17,7 +17,7 @@ data:
       kubernetes:
         {{- tpl (toYaml .Values.configuration.kubernetes) . | nindent 8 }}
     apps:
-      {{- toYaml .Values.configuration.app | nindent 6 }}
+      {{- tpl (toYaml .Values.configuration.app) . | nindent 6 }}
     internalApps:
       {{- with .Values.configuration.internalApps }}
       {{- toYaml . | nindent 6 }}

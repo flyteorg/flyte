@@ -93,7 +93,11 @@ app.kubernetes.io/component: {{ .component }}
 {{- end -}}
 
 {{- define "flyte-core.executorCacheServiceHost" -}}
-{{- include "flyte-core.executorCacheServiceName" . -}}
+{{- printf "%s.%s" (include "flyte-core.executorCacheServiceName" .) .Release.Namespace -}}
+{{- end -}}
+
+{{- define "flyte-core.executorCacheServiceURL" -}}
+{{- printf "http://%s:%v" (include "flyte-core.executorCacheServiceHost" .) .Values.configuration.webhook.cacheInvalidationPort -}}
 {{- end -}}
 
 {{- define "flyte-core.webhookSecretName" -}}

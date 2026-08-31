@@ -14,7 +14,7 @@ data:
   000-core.yaml: |
     {{- include "flyte-core.config.logger" . | nindent 4 }}
     events:
-      {{- toYaml .Values.configuration.events | nindent 6 }}
+      {{- tpl (toYaml .Values.configuration.events) . | nindent 6 }}
   {{- with .Values.configuration.inline }}
   100-inline.yaml: |
     {{- tpl (toYaml .) $ | nindent 4 }}

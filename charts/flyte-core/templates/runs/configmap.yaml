@@ -14,7 +14,7 @@ data:
   000-core.yaml: |
     {{- include "flyte-core.config.logger" . | nindent 4 }}
     runs:
-      {{- toYaml .Values.configuration.runs | nindent 6 }}
+      {{- tpl (toYaml .Values.configuration.runs) . | nindent 6 }}
   002-database.yaml: |
     {{- include "flyte-core.config.database" . | nindent 4 }}
     {{- $database := deepCopy .Values.configuration.database }}

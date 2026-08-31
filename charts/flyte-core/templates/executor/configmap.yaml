@@ -21,7 +21,7 @@ data:
       metricsBindAddress: {{ printf ":%v" .Values.configuration.executor.metricsPort | quote }}
       healthProbeBindAddress: {{ printf ":%v" .Values.configuration.executor.healthProbePort | quote }}
       {{- with $executorConfig }}
-      {{- toYaml . | nindent 6 }}
+      {{- tpl (toYaml .) $ | nindent 6 }}
       {{- end }}
     webhook:
       localCert: true

@@ -17,7 +17,7 @@ data:
       kubernetes:
         {{- tpl (toYaml .Values.configuration.kubernetes) . | nindent 8 }}
     dataproxy:
-      {{- toYaml .Values.configuration.dataproxy | nindent 6 }}
+      {{- tpl (toYaml .Values.configuration.dataproxy) . | nindent 6 }}
   003-storage.yaml: |
     {{- include "flyte-core.config.storage" . | nindent 4 }}
   {{- with .Values.configuration.inline }}
