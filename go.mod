@@ -56,7 +56,7 @@ require (
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.12.1
 	github.com/vmihailenco/msgpack/v5 v5.4.1
-	go.opentelemetry.io/otel v1.45.0
+	go.opentelemetry.io/otel v1.46.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.17.0
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.45.0
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.45.0
@@ -64,10 +64,10 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.45.0
 	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.45.0
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.45.0
-	go.opentelemetry.io/otel/metric v1.45.0
+	go.opentelemetry.io/otel/metric v1.46.0
 	go.opentelemetry.io/otel/sdk v1.45.0
 	go.opentelemetry.io/otel/sdk/metric v1.45.0
-	go.opentelemetry.io/otel/trace v1.45.0
+	go.opentelemetry.io/otel/trace v1.46.0
 	golang.org/x/exp v0.0.0-20251219203646-944ab1f22d93
 	golang.org/x/mod v0.40.0 // indirect
 	golang.org/x/oauth2 v0.36.0
