@@ -6,6 +6,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/util/sets"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common/mocks"
 )
 
 func neighbors(adjList map[string][]string) func(nodeId string) sets.String {
@@ -40,6 +44,29 @@ func assertCycle(t *testing.T, startNode string, adjList map[string][]string) {
 	assert.True(t, detected)
 	assert.NotEqual(t, 0, len(cycle))
 	t.Logf("Cycle: %v", strings.Join(cycle, ","))
+}
+
+func TestToInterfaceProviderMap(t *testing.T) {
+	provider := mocks.NewInterfaceProvider(t)
+	id := &core.Identifier{Name: "task"}
+	provider.EXPECT().GetID().Return(id)
+
+	providers := toInterfaceProviderMap([]common.InterfaceProvider{provider})
+
+	assert.Len(t, providers, 1)
+	assert.Same(t, provider, providers[id.String()])
+}
+
+func TestToCompiledWorkflows(t *testing.T) {
+	workflows := []*core.WorkflowTemplate{
+		{Id: &core.Identifier{Name: "workflow-1"}},
+		{Id: &core.Identifier{Name: "workflow-2"}},
+	}
+
+	assert.Equal(t, []*core.CompiledWorkflow{
+		{Template: workflows[0]},
+		{Template: workflows[1]},
+	}, toCompiledWorkflows(workflows...))
 }
 
 func TestDetectCycle(t *testing.T) {
