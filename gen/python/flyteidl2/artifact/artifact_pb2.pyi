@@ -48,16 +48,18 @@ class ArtifactSource(_message.Message):
     def __init__(self, task_action: _Optional[_Union[TaskActionSource, _Mapping]] = ..., external_ref: _Optional[str] = ...) -> None: ...
 
 class ArtifactSpec(_message.Message):
-    __slots__ = ["value", "type", "info", "source"]
+    __slots__ = ["value", "type", "info", "source", "parent_version"]
     VALUE_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     INFO_FIELD_NUMBER: _ClassVar[int]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
+    PARENT_VERSION_FIELD_NUMBER: _ClassVar[int]
     value: _literals_pb2.Literal
     type: _types_pb2.LiteralType
     info: _artifact_id_pb2.ArtifactInfo
     source: ArtifactSource
-    def __init__(self, value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., info: _Optional[_Union[_artifact_id_pb2.ArtifactInfo, _Mapping]] = ..., source: _Optional[_Union[ArtifactSource, _Mapping]] = ...) -> None: ...
+    parent_version: str
+    def __init__(self, value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., info: _Optional[_Union[_artifact_id_pb2.ArtifactInfo, _Mapping]] = ..., source: _Optional[_Union[ArtifactSource, _Mapping]] = ..., parent_version: _Optional[str] = ...) -> None: ...
 
 class Artifact(_message.Message):
     __slots__ = ["artifact_id", "spec", "created_at", "created_by"]

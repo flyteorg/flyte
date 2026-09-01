@@ -2517,6 +2517,10 @@
         "type": {
           "$ref": "#/definitions/coreLiteralType",
           "description": "The declared Flyte type of the output, copied into ArtifactSpec.type.\nThe producing SDK is authoritative for this."
+        },
+        "parent_version": {
+          "type": "string",
+          "description": "Optional version of this same artifact name that the produced version was\nderived from, copied verbatim into ArtifactSpec.parent_version. Set by the\nproducing task when it derives a new version from one it consumed, so the\nresulting lineage branches instead of reading as a linear chain."
         }
       },
       "description": "Declares that a named output of the producing action is a new artifact\nversion. The output's literal (in Outputs.literals) is the artifact's value;\norg/project/domain come from the producing action's scope at registration."

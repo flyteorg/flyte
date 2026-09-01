@@ -1383,6 +1383,8 @@ func (m *ProducedArtifact) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for ParentVersion
+
 	if len(errors) > 0 {
 		return ProducedArtifactMultiError(errors)
 	}
