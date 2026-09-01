@@ -11,6 +11,10 @@ const configSectionKey = "dataproxy"
 //go:generate pflags DataProxyConfig --default-var=defaultConfig
 
 var defaultConfig = &DataProxyConfig{
+	Server: ServerConfig{
+		Port: 8088,
+		Host: "0.0.0.0",
+	},
 	Upload: DataProxyUploadConfig{
 		MaxSize:               resource.MustParse("100Mi"),
 		MaxExpiresIn:          config.Duration{Duration: 3600000000000}, // 1 hour
@@ -26,12 +30,21 @@ var defaultConfig = &DataProxyConfig{
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
 
 type DataProxyConfig struct {
+	// Server configures the standalone DataProxy service HTTP listener.
+	Server ServerConfig `json:"server"`
+
 	Upload   DataProxyUploadConfig   `json:"upload" pflag:",Defines data proxy upload configuration."`
 	Download DataProxyDownloadConfig `json:"download" pflag:",Defines data proxy download configuration."`
 
 	// RunService configures the Runs service client. The Runs component also
 	// hosts the Task, Trigger, and Project APIs used by dataproxy.
 	RunService serviceclient.ServiceConfig `json:"runService" pflag:",Runs service client configuration."`
+}
+
+// ServerConfig holds HTTP server configuration.
+type ServerConfig struct {
+	Port int    `json:"port" pflag:",Port to bind the HTTP server"`
+	Host string `json:"host" pflag:",Host to bind the HTTP server"`
 }
 
 // GetConfig returns the parsed data proxy configuration

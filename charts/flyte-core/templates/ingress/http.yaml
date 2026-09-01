@@ -1,0 +1,92 @@
+{{- if .Values.ingress.create }}
+{{- $apiRoutes := include "flyte-core.ingress.apiRoutes" . | fromYamlArray }}
+{{- $wellknownRoutes := include "flyte-core.ingress.wellknownRoutes" . | fromYamlArray }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "flyte-core.resourceName" (dict "root" . "name" "http") }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "flyte-core.labels" . | nindent 4 }}
+    {{- with .Values.ingress.labels }}
+    {{- tpl (toYaml .) $ | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.commonAnnotations .Values.ingress.commonAnnotations .Values.ingress.httpAnnotations }}
+  annotations:
+    {{- with .Values.commonAnnotations }}
+    {{- tpl (toYaml .) $ | nindent 4 }}
+    {{- end }}
+    {{- with .Values.ingress.commonAnnotations }}
+    {{- tpl (toYaml .) $ | nindent 4 }}
+    {{- end }}
+    {{- with .Values.ingress.httpAnnotations }}
+    {{- tpl (toYaml .) $ | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  {{- if .Values.ingress.httpIngressClassName }}
+  ingressClassName: {{ .Values.ingress.httpIngressClassName | quote }}
+  {{- else if .Values.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  {{- end }}
+  {{- if .Values.ingress.httpTls }}
+  tls:
+    {{- tpl (toYaml .Values.ingress.httpTls) . | nindent 4 }}
+  {{- else if .Values.ingress.tls }}
+  tls:
+    {{- tpl (toYaml .Values.ingress.tls) . | nindent 4 }}
+  {{- end }}
+  rules:
+    - {{- with .Values.ingress.host }}
+      host: {{ tpl . $ | quote }}
+      {{- end }}
+      http:
+        paths:
+          {{- with .Values.ingress.httpExtraPaths.prepend }}
+          {{- tpl (toYaml .) $ | nindent 10 }}
+          {{- end }}
+          {{- if .Values.console.enabled }}
+          - path: {{ .Values.console.basePath }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "flyte-core.consoleName" . }}
+                port:
+                  number: {{ .Values.console.service.port }}
+          {{- end }}
+          {{- if not .Values.ingress.apiJwtIngress.enabled }}
+          {{- range $route := $apiRoutes }}
+          {{- $component := index $.Values.components $route.component }}
+          {{- if $component.enabled }}
+          {{- range $path := $route.paths }}
+          - path: {{ $path }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "flyte-core.componentName" (dict "root" $ "component" $route.component) }}
+                port:
+                  number: {{ include "flyte-core.componentPort" (dict "root" $ "component" $route.component) }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if not .Values.ingress.wellknownIngress.enabled }}
+          {{- range $route := $wellknownRoutes }}
+          {{- $component := index $.Values.components $route.component }}
+          {{- if $component.enabled }}
+          {{- range $path := $route.paths }}
+          - path: {{ $path }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "flyte-core.componentName" (dict "root" $ "component" $route.component) }}
+                port:
+                  number: {{ include "flyte-core.componentPort" (dict "root" $ "component" $route.component) }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- with .Values.ingress.httpExtraPaths.append }}
+          {{- tpl (toYaml .) $ | nindent 10 }}
+          {{- end }}
+{{- end }}

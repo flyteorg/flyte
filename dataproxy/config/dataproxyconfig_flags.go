@@ -50,6 +50,8 @@ func (DataProxyConfig) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg DataProxyConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("DataProxyConfig", pflag.ExitOnError)
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "server.port"), defaultConfig.Server.Port, "Port to bind the HTTP server")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "server.host"), defaultConfig.Server.Host, "Host to bind the HTTP server")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "upload.maxSize"), defaultConfig.Upload.MaxSize.String(), "Maximum allowed upload size.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "upload.maxExpiresIn"), defaultConfig.Upload.MaxExpiresIn.String(), "Maximum allowed expiration duration.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "upload.defaultFileNameLength"), defaultConfig.Upload.DefaultFileNameLength, "Default length for the generated file name if file name not provided in the request.")

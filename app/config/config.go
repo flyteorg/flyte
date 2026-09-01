@@ -9,6 +9,9 @@ import (
 
 // AppConfig holds configuration for the control plane AppService.
 type AppConfig struct {
+	// Server configures the standalone App service HTTP listener.
+	Server ServerConfig `json:"server"`
+
 	// InternalAppService configures the InternalAppService client (data plane).
 	// In unified mode this is overridden by the shared mux BaseURL.
 	InternalAppService serviceclient.ServiceConfig `json:"internalAppService" pflag:",Internal app service client configuration"`
@@ -18,9 +21,19 @@ type AppConfig struct {
 	CacheTTL time.Duration `json:"cacheTtl" pflag:",TTL for app status cache"`
 }
 
+// ServerConfig holds HTTP server configuration.
+type ServerConfig struct {
+	Port int    `json:"port" pflag:",Port to bind the HTTP server"`
+	Host string `json:"host" pflag:",Host to bind the HTTP server"`
+}
+
 const appConfigSectionKey = "apps"
 
 var defaultAppConfig = &AppConfig{
+	Server: ServerConfig{
+		Host: "0.0.0.0",
+		Port: 8095,
+	},
 	InternalAppService: serviceclient.ServiceConfig{URL: "http://localhost:8091"},
 	CacheTTL:           30 * time.Second,
 }

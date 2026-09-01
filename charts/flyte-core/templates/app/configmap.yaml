@@ -1,0 +1,29 @@
+{{- if and (not (include "flyte-core.externalConfiguration" .)) .Values.components.app.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flyte-core.componentConfigMapName" (dict "root" . "component" "app") }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "flyte-core.componentLabels" (dict "root" . "component" "app") | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+data:
+  000-core.yaml: |
+    {{- include "flyte-core.config.logger" . | nindent 4 }}
+    actions:
+      kubernetes:
+        {{- tpl (toYaml .Values.configuration.kubernetes) . | nindent 8 }}
+    apps:
+      {{- tpl (toYaml .Values.configuration.app) . | nindent 6 }}
+    internalApps:
+      {{- with .Values.configuration.internalApps }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+  {{- with .Values.configuration.inline }}
+  100-inline.yaml: |
+    {{- tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+{{- end }}

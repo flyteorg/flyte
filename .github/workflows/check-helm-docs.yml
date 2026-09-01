@@ -41,12 +41,18 @@ jobs:
         run: go install "github.com/norwoodj/helm-docs/cmd/helm-docs@${HELM_DOCS_VERSION}"
 
       - name: Regenerate chart README
-        run: helm-docs --chart-search-root=charts/flyte-binary
+        run: |
+          helm-docs --chart-search-root=charts/flyte-binary
+          helm-docs --chart-search-root=charts/flyte-core
 
       - name: Verify README is up to date
         run: |
-          if ! git diff --exit-code -- charts/flyte-binary/README.md; then
-            echo "::error::charts/flyte-binary/README.md is out of date."
-            echo "Run 'helm-docs --chart-search-root=charts/flyte-binary' (helm-docs ${HELM_DOCS_VERSION}) and commit the result."
+          if ! git diff --exit-code -- \
+            charts/flyte-binary/README.md \
+            charts/flyte-core/README.md; then
+            echo "::error::One or more chart READMEs are out of date."
+            echo "Run these commands with helm-docs ${HELM_DOCS_VERSION} and commit the results:"
+            echo "  helm-docs --chart-search-root=charts/flyte-binary"
+            echo "  helm-docs --chart-search-root=charts/flyte-core"
             exit 1
           fi
