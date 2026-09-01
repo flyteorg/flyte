@@ -62,4 +62,32 @@ func TestDetectCycle(t *testing.T) {
 
 		assertCycle(t, "1", cyclic)
 	})
+
+	t.Run("Reconverging", func(t *testing.T) {
+		reconverging := map[string][]string{
+			"root":     {"left", "right"},
+			"left":     {"shared-a", "shared-b"},
+			"right":    {"shared-a", "shared-b"},
+			"shared-a": {"leaf"},
+			"shared-b": {"leaf"},
+		}
+		visits := make(map[string]int)
+
+		cycle, visited, detected := detectCycle("root", func(nodeID string) sets.String {
+			visits[nodeID]++
+			return neighbors(reconverging)(nodeID)
+		})
+
+		assert.False(t, detected)
+		assert.Empty(t, cycle)
+		assert.Equal(t, uniqueNodesCount(reconverging), len(visited))
+		assert.Equal(t, map[string]int{
+			"root":     1,
+			"left":     1,
+			"right":    1,
+			"shared-a": 1,
+			"shared-b": 1,
+			"leaf":     1,
+		}, visits)
+	})
 }
