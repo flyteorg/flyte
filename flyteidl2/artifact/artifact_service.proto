@@ -74,7 +74,11 @@ message GetArtifactResponse {
 message ListArtifactsRequest {
   // Common list request parameters (limit, token, filters).
   // Supported filters: field "name" with CONTAINS,
-  // field "created_at" with GREATER_THAN (RFC3339 timestamp value).
+  // field "created_at" with GREATER_THAN (RFC3339 timestamp value),
+  // and field "user_metadata.<key>" targeting one key of the artifact's
+  // user_metadata map, with EQUAL, NOT_EQUAL, VALUE_IN, VALUE_NOT_IN,
+  // EXISTS or NOT_EXISTS. Values for one key are ORed; separate keys are
+  // ANDed.
   common.ListRequest request = 1;
 
   // Project scope for the listing. organization is stamped by the server.
@@ -96,7 +100,10 @@ message ListArtifactsResponse {
 // request message for listing distinct artifact names.
 message ListArtifactNamesRequest {
   // Common list request parameters (limit, token, filters).
-  // Supported filters: field "name" with CONTAINS.
+  // Supported filters: field "name" with CONTAINS, and field
+  // "user_metadata.<key>" as described on ListArtifactsRequest. A name is
+  // listed when any of its versions matches, represented by the newest
+  // matching version.
   common.ListRequest request = 1;
 
   // Project scope for the listing. organization is stamped by the server.
