@@ -702,6 +702,8 @@ func (m *ArtifactSpec) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for ParentVersion
+
 	if len(errors) > 0 {
 		return ArtifactSpecMultiError(errors)
 	}
