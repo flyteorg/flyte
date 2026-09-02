@@ -48,19 +48,25 @@ func (r RootOptions) UploadError(ctx context.Context, code string, recvErr error
 	if recvErr == nil {
 		recvErr = fmt.Errorf("unknown error")
 	}
+	return r.UploadErrorDocument(ctx, &core.ErrorDocument{
+		Error: &core.ContainerError{
+			Code:    code,
+			Message: recvErr.Error(),
+			Kind:    core.ContainerError_RECOVERABLE,
+		},
+	}, prefix)
+}
+
+// UploadErrorDocument writes document where the plugin's output reader looks
+// for a task's error, leaving its kind and origin as the caller set them.
+func (r RootOptions) UploadErrorDocument(ctx context.Context, document *core.ErrorDocument, prefix storage.DataReference) error {
 	errorPath, err := r.Store.ConstructReference(ctx, prefix, r.errorOutputName)
 	if err != nil {
 		logger.Errorf(ctx, "failed to create error file path err: %s", err)
 		return err
 	}
 	logger.Infof(ctx, "Uploading Error file to path [%s], errFile: %s", errorPath, r.errorOutputName)
-	return r.Store.WriteProtobuf(ctx, errorPath, storage.Options{}, &core.ErrorDocument{
-		Error: &core.ContainerError{
-			Code:    code,
-			Message: recvErr.Error(),
-			Kind:    core.ContainerError_RECOVERABLE,
-		},
-	})
+	return r.Store.WriteProtobuf(ctx, errorPath, storage.Options{}, document)
 }
 
 // NewDataCommand returns a new instance of the co-pilot root command
