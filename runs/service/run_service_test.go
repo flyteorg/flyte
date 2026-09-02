@@ -13,10 +13,12 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
@@ -35,6 +37,32 @@ import (
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
+
+// noSettings returns a settings repo reporting no stored rows, so run creation
+// resolves to empty settings and the applier changes nothing.
+func noSettings(t *testing.T) *repoMocks.SettingsRepo {
+	m := &repoMocks.SettingsRepo{}
+	m.On("GetSettingsByKeys", mock.Anything, mock.Anything).Return(nil, nil)
+	return m
+}
+
+// settingsWithQueue returns a settings repo holding one org-level row that sets the
+// default queue. The row key must match what fetchLevels asks for, or the lookup
+// aligns to nothing.
+func settingsWithQueue(t *testing.T, org, queue string) *repoMocks.SettingsRepo {
+	t.Helper()
+	data, err := protojson.Marshal(&settings.Settings{
+		Run: &settings.RunSettings{
+			DefaultQueue: &settings.StringSetting{State: stateValue, StringValue: queue},
+		},
+	})
+	require.NoError(t, err)
+
+	m := &repoMocks.SettingsRepo{}
+	m.On("GetSettingsByKeys", mock.Anything, mock.Anything).
+		Return([]*models.Settings{{Key: models.EncodeSettingsKey(org, "", ""), Data: data, Version: 1}}, nil)
+	return m
+}
 
 // newMockProjectClientAlwaysOK returns a mock ProjectServiceClient whose GetProject always succeeds.
 func newMockProjectClientAlwaysOK(t *testing.T) *projectMocks.ProjectServiceClient {
@@ -546,6 +574,7 @@ func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
+		settingsRepo:  noSettings(t),
 		actionsClient: actionsClient,
 		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
@@ -1068,6 +1097,7 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
+		settingsRepo:  noSettings(t),
 		actionsClient: actionsClient,
 		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
@@ -1126,6 +1156,7 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
+		settingsRepo:  noSettings(t),
 		actionsClient: actionsClient,
 		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
@@ -1190,6 +1221,7 @@ func TestCreateRun_TriggerFire_CarriesRunSpecEnvVars(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
+		settingsRepo:  noSettings(t),
 		actionsClient: actionsClient,
 		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
@@ -1287,6 +1319,7 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
+		settingsRepo:  noSettings(t),
 		actionsClient: actionsClient,
 		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
@@ -1377,6 +1410,7 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
+		settingsRepo:  noSettings(t),
 		actionsClient: actionsClient,
 		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
@@ -1434,6 +1468,65 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 	require.NoError(t, err)
 }
 
+// TestCreateRun_AppliesSettingsQueue proves the applier is actually wired into run
+// creation: the request names no queue, and the value stored on the run comes from
+// the org's settings row.
+func TestCreateRun_AppliesSettingsQueue(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(taskRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		settingsRepo:  settingsWithQueue(t, "org", "fast-queue"),
+		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{
+				Org:     "org",
+				Project: "proj",
+				Domain:  "dev",
+				Name:    "rq-123",
+			},
+		},
+		InputWrapper: &workflow.CreateRunRequest_Inputs{Inputs: &task.Inputs{}},
+		Task: &workflow.CreateRunRequest_TaskSpec{
+			TaskSpec: &task.TaskSpec{},
+		},
+	}
+
+	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+
+	actionRepo.On("CreateAction", mock.Anything, mock.MatchedBy(func(m *models.Run) bool {
+		var rs task.RunSpec
+		_ = proto.Unmarshal(m.RunSpec, &rs)
+		return rs.GetQueue() == "fast-queue"
+	}), mock.Anything).Return(&models.Run{
+		Project: "proj",
+		Domain:  "dev",
+		Name:    "rq-123",
+	}, nil).Once()
+
+	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
+		return req.Msg.GetRunSpec().GetQueue() == "fast-queue"
+	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	require.NoError(t, err)
+}
+
 func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
@@ -1447,6 +1540,7 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
+		settingsRepo:  noSettings(t),
 		actionsClient: actionsClient,
 		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
