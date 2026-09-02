@@ -114,6 +114,9 @@ func TestMain(m *testing.M) {
 		exitCode = 1
 		return
 	}
+
+	settingsRepo := impl.NewSettingsRepo(testDB)
+
 	// Services validate project existence through the ProjectService client, so mount a
 	// real ProjectService on the same mux (mirrors production unified mode in setup.go).
 	endpointURL := fmt.Sprintf("http://localhost:%d", testPort)
@@ -123,7 +126,7 @@ func TestMain(m *testing.M) {
 
 	// Create RunService with a no-op actions client (points at test server; not used by watch tests)
 	actionsClient := actionsconnect.NewActionsServiceClient(http.DefaultClient, endpointURL)
-	runSvc := service.NewRunService(repo, actionsClient, projectClient, "", nil, nil, "", true, config.GetConfig().IdentityHeaders)
+	runSvc := service.NewRunService(repo, settingsRepo, actionsClient, projectClient, "", nil, nil, "", true, config.GetConfig().IdentityHeaders)
 
 	// Setup HTTP server
 	mux := http.NewServeMux()
@@ -139,7 +142,7 @@ func TestMain(m *testing.M) {
 	internalRunPath, internalRunHandler := workflowconnect.NewInternalRunServiceHandler(runSvc)
 	mux.Handle(internalRunPath, internalRunHandler)
 
-	settingsSvc := service.NewSettingsService(impl.NewSettingsRepo(testDB))
+	settingsSvc := service.NewSettingsService(settingsRepo)
 	settingsPath, settingsHandler := settingsconnect.NewSettingsServiceHandler(settingsSvc)
 	mux.Handle(settingsPath, settingsHandler)
 

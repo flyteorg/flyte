@@ -97,6 +97,8 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("runs: failed to create repository: %w", err)
 	}
 
+	settingsRepo := impl.NewSettingsRepo(sc.DB)
+
 	// In unified mode, intra-service calls go through the same mux.
 	actionsServiceCfg := cfg.ActionsService
 	if sc.BaseURL != "" {
@@ -129,7 +131,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return abortReconciler.Run(ctx)
 	})
 
-	runsSvc := service.NewRunService(repo, actionsClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
+	runsSvc := service.NewRunService(repo, settingsRepo, actionsClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
 	taskSvc := service.NewTaskService(repo, projectClient)
 
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc, connect.WithInterceptors(interceptors...))
@@ -178,7 +180,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(projectPath, projectHandler)
 	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
 
-	settingsSvc := service.NewSettingsService(impl.NewSettingsRepo(sc.DB))
+	settingsSvc := service.NewSettingsService(settingsRepo)
 	settingsPath, settingsHandler := settingsconnect.NewSettingsServiceHandler(settingsSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(settingsPath, settingsHandler)
 	logger.Infof(ctx, "Mounted SettingsService at %s", settingsPath)
