@@ -37,9 +37,13 @@ jobs:
           node-version: "24.x"
           registry-url: "https://registry.npmjs.org"
       - name: Update npm
-        # Trusted publishing needs npm >= 11.5.1; make sure we are past it
-        # regardless of what the setup-node runtime bundles.
-        run: npm install -g npm@latest && npm --version
+        # Trusted publishing needs npm >= 11.5.1; stay within major 11 so the
+        # publish behavior does not shift under us.
+        run: npm install -g npm@11 && npm --version
+      - name: Install dependencies
+        # Before the version stamp below: npm ci verifies package.json against
+        # the lockfile, which still carries the 0.0.0-develop placeholder.
+        run: npm ci
       - name: Set version in npm package
         run: |
           REF="${{ inputs.tag || github.ref }}"
@@ -48,8 +52,6 @@ jobs:
           VERSION="${VERSION#v}"
           VERSION=$VERSION make update_npmversion
         shell: bash
-      - name: Install dependencies
-        run: npm install
       - name: Publish
         # No NODE_AUTH_TOKEN on purpose: with a trusted publisher configured,
         # npm exchanges the workflow's OIDC token for publish credentials and
