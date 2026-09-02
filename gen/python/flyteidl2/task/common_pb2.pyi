@@ -117,20 +117,20 @@ class Inputs(_message.Message):
     def __init__(self, literals: _Optional[_Iterable[_Union[NamedLiteral, _Mapping]]] = ..., context: _Optional[_Iterable[_Union[_literals_pb2.KeyValuePair, _Mapping]]] = ...) -> None: ...
 
 class ProducedArtifact(_message.Message):
-    __slots__ = ["output", "name", "version", "info", "type", "parent_version"]
+    __slots__ = ["output", "name", "version", "info", "type", "parent_artifact"]
     OUTPUT_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     INFO_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
-    PARENT_VERSION_FIELD_NUMBER: _ClassVar[int]
+    PARENT_ARTIFACT_FIELD_NUMBER: _ClassVar[int]
     output: str
     name: str
     version: str
     info: _artifact_id_pb2.ArtifactInfo
     type: _types_pb2.LiteralType
-    parent_version: str
-    def __init__(self, output: _Optional[str] = ..., name: _Optional[str] = ..., version: _Optional[str] = ..., info: _Optional[_Union[_artifact_id_pb2.ArtifactInfo, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., parent_version: _Optional[str] = ...) -> None: ...
+    parent_artifact: _artifact_id_pb2.ArtifactVersionId
+    def __init__(self, output: _Optional[str] = ..., name: _Optional[str] = ..., version: _Optional[str] = ..., info: _Optional[_Union[_artifact_id_pb2.ArtifactInfo, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., parent_artifact: _Optional[_Union[_artifact_id_pb2.ArtifactVersionId, _Mapping]] = ...) -> None: ...
 
 class Outputs(_message.Message):
     __slots__ = ["literals", "produced_artifacts"]
