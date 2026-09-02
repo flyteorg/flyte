@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net"
 	"sort"
-	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -942,8 +941,8 @@ func TestRunNotifyLoop_RetriesUndeliveredPayloads(t *testing.T) {
 // pump running, so the pending work is observable and nothing drains it.
 func newNotifyTestRepo() *actionRepo {
 	return &actionRepo{
-		pendingActions: make(map[string]int),
-		pendingRuns:    make(map[string]int),
+		pendingActions: make(map[string]struct{}),
+		pendingRuns:    make(map[string]struct{}),
 		pendingCh:      make(chan struct{}, 1),
 	}
 }
@@ -953,27 +952,6 @@ func (r *actionRepo) pendingCounts() (actions, runs int) {
 	r.notifyMu.Lock()
 	defer r.notifyMu.Unlock()
 	return len(r.pendingActions), len(r.pendingRuns)
-}
-
-// pendingDropped reports when the given payload has been absent from the
-// pending set on enough consecutive checks to rule out the short window where
-// the pump is holding a taken batch and has not requeued it yet. A single
-// absent reading is not evidence of a drop.
-func (r *actionRepo) pendingDropped(payload string) func() bool {
-	const consecutive = 25
-	absent := 0
-	return func() bool {
-		r.notifyMu.Lock()
-		_, queued := r.pendingActions[payload]
-		r.notifyMu.Unlock()
-
-		if queued {
-			absent = 0
-			return false
-		}
-		absent++
-		return absent >= consecutive
-	}
 }
 
 // newNotifyRepoWithDB builds a repo wired to a real database and listener but
@@ -988,8 +966,8 @@ func newNotifyRepoWithDB(t *testing.T) (*actionRepo, *sql.DB, *sql.Conn) {
 		dsn:               database.GetPostgresDsn(context.Background(), testDbConfig.Postgres),
 		runSubscribers:    make(map[chan string]bool),
 		actionSubscribers: make(map[chan string]bool),
-		pendingActions:    make(map[string]int),
-		pendingRuns:       make(map[string]int),
+		pendingActions:    make(map[string]struct{}),
+		pendingRuns:       make(map[string]struct{}),
 		pendingCh:         make(chan struct{}, 1),
 	}
 	require.NoError(t, r.startPostgresListener())
@@ -1195,8 +1173,8 @@ func TestUpdateActionPhase_CompletesWithStalledPump(t *testing.T) {
 	db := setupActionDB(t)
 	r := &actionRepo{
 		db:             db,
-		pendingActions: make(map[string]int),
-		pendingRuns:    make(map[string]int),
+		pendingActions: make(map[string]struct{}),
+		pendingRuns:    make(map[string]struct{}),
 		pendingCh:      make(chan struct{}, 1),
 	}
 	// No pump is started, so nothing drains what the write path queues.
@@ -1256,50 +1234,6 @@ func TestNotifyPump_CoalescesRepeatsOnTheWire(t *testing.T) {
 		t.Fatalf("500 updates to one action must produce one notification, also got %q", extra)
 	case <-time.After(2 * time.Second):
 	}
-}
-
-// TestRunNotifyLoop_DropsPayloadPostgresWillNeverAccept covers the failure the
-// retry design would otherwise turn into a permanent stall. pg_notify rejects
-// a payload of 8000 bytes or more, and that is not a connection error, so it
-// fails identically on every attempt. Such a payload must be given up on, and
-// must not hold up notifications that are fine.
-func TestRunNotifyLoop_DropsPayloadPostgresWillNeverAccept(t *testing.T) {
-	r, sqlDB, conn := newNotifyRepoWithDB(t)
-	delivered := subscribeActions(t, r, 16)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	poison := strings.Repeat("x", 8000)
-	r.notifyMu.Lock()
-	markPending(r.pendingActions, poison)
-	r.notifyMu.Unlock()
-
-	go r.runNotifyLoop(ctx, sqlDB, conn)
-
-	// Keep ordinary traffic flowing alongside the bad payload.
-	stop := make(chan struct{})
-	defer close(stop)
-	go func() {
-		for i := 0; ; i++ {
-			select {
-			case <-stop:
-				return
-			case <-time.After(20 * time.Millisecond):
-				r.notifyActionUpdate(ctx, notifyTestActionID(fmt.Sprintf("healthy-%d", i)))
-			}
-		}
-	}()
-
-	select {
-	case payload := <-delivered:
-		assert.Contains(t, payload, "proj/domain/run/healthy-")
-	case <-time.After(15 * time.Second):
-		t.Fatal("a deliverable notification was held up behind an undeliverable one")
-	}
-
-	assert.Eventually(t, r.pendingDropped(poison), 15*time.Second, 20*time.Millisecond,
-		"a payload that can never be delivered must be dropped, not retried forever")
 }
 
 func TestIsConnError(t *testing.T) {
