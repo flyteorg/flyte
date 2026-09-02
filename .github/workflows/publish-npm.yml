@@ -4,41 +4,54 @@ on:
   push:
     tags:
       - 'v*'
+  # Re-publish an existing tag whose tag-push run failed (e.g. before npm
+  # trusted publishing was configured). The workflow definition is taken from
+  # the ref the dispatch runs on; the package content comes from the tag.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing vX.Y.Z tag to publish"
+        required: true
+        type: string
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/flyteorg/flyte/ci:v2
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+    # npm trusted publishing: the job authenticates to registry.npmjs.org with
+    # a GitHub OIDC token instead of a long-lived NPM_TOKEN secret. Requires
+    # the @flyteorg/flyteidl2 package on npmjs.com to list this repository and
+    # workflow file as a trusted publisher.
+    permissions:
+      contents: read
+      id-token: write
     defaults:
       run:
         working-directory: ./gen/ts/
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Debug Info
-        run: |
-          pwd
-          ls -la
-      - uses: actions/setup-node@v1
         with:
-          node-version: "20.x"
+          ref: ${{ inputs.tag || github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.x"
           registry-url: "https://registry.npmjs.org"
+      - name: Update npm
+        # Trusted publishing needs npm >= 11.5.1; make sure we are past it
+        # regardless of what the setup-node runtime bundles.
+        run: npm install -g npm@latest && npm --version
       - name: Set version in npm package
         run: |
+          REF="${{ inputs.tag || github.ref }}"
           # v1.2.3 get 1.2.3
-          VERSION=$(echo "${GITHUB_REF#refs/tags/v}")
+          VERSION="${REF#refs/tags/}"
+          VERSION="${VERSION#v}"
           VERSION=$VERSION make update_npmversion
         shell: bash
-
       - name: Install dependencies
         run: npm install
       - name: Publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          NPM_REGISTRY_URL="https://registry.npmjs.org/"
-          npm publish --access=public --registry $NPM_REGISTRY_URL
+        # No NODE_AUTH_TOKEN on purpose: with a trusted publisher configured,
+        # npm exchanges the workflow's OIDC token for publish credentials and
+        # attaches provenance automatically.
+        run: npm publish --access=public
