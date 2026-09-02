@@ -94,7 +94,7 @@ require (
 require (
 	github.com/Masterminds/semver/v3 v3.5.0
 	github.com/alicebob/miniredis/v2 v2.38.0
-	github.com/getsentry/sentry-go v0.48.0
+	github.com/getsentry/sentry-go v0.49.0
 	github.com/kubeflow/spark-operator/v2 v2.5.2
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/apiextensions-apiserver v0.37.0
