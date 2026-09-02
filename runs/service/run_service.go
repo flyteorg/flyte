@@ -14,6 +14,7 @@ import (
 
 	"connectrpc.com/connect"
 	semver "github.com/Masterminds/semver/v3"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -40,6 +41,7 @@ import (
 // RunService implements the RunServiceHandler interface
 type RunService struct {
 	repo            interfaces.Repository
+	settingsRepo    interfaces.SettingsRepo
 	actionsClient   actionsconnect.ActionsServiceClient
 	projectClient   projectconnect.ProjectServiceClient
 	storagePrefix   string
@@ -143,6 +145,7 @@ func (s *RunService) WatchGroups(ctx context.Context, req *connect.Request[workf
 // NewRunService creates a new RunService instance
 func NewRunService(
 	repo interfaces.Repository,
+	settingsRepo interfaces.SettingsRepo,
 	actionsClient actionsconnect.ActionsServiceClient,
 	projectClient projectconnect.ProjectServiceClient,
 	storagePrefix string,
@@ -154,6 +157,7 @@ func NewRunService(
 ) *RunService {
 	return &RunService{
 		repo:            repo,
+		settingsRepo:    settingsRepo,
 		actionsClient:   actionsClient,
 		projectClient:   projectClient,
 		storagePrefix:   storagePrefix,
@@ -275,6 +279,19 @@ func (s *RunService) CreateRun(
 		runSpec = &task.RunSpec{}
 	}
 	request.RunSpec = runSpec
+
+	// Settings sit between an explicit request value and the static config defaults
+	// applied below. Org is empty when the caller passed a ProjectId rather than a
+	// RunId; the storage key encoder normalizes that to the default org.
+	resolved, err := resolveSettings(ctx, s.settingsRepo, &settings.SettingsKey{
+		Org:     runId.GetOrg(),
+		Domain:  runId.GetDomain(),
+		Project: runId.GetProject(),
+	})
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	applyRunSettings(runSpec, resolved)
 
 	// Stamp the run start time, but only for SDKs that understand it (>= 2.3.6) — older task
 	// templates have no {{.runStartTime}} placeholder, so leaving it unset keeps the executor from
