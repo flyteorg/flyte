@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Existing vX.Y.Z tag to publish"
+        description: "Existing vX.Y.Z tag to publish (tag name only; resolved under refs/tags/)"
         required: true
         type: string
 
@@ -31,7 +31,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.tag || github.ref }}
+          # Dispatch inputs are pinned into the tag namespace so a branch name
+          # or SHA cannot be published: checkout fails fast unless
+          # refs/tags/<input> exists. Tag-push runs use the pushed ref.
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: "24.x"
