@@ -342,7 +342,7 @@ func TestClassifyGpuFailure(t *testing.T) {
 	// Recency is measured against the clock now, so the fixtures have to sit relative to
 	// it: base is inside the relevance window, stale is well outside it.
 	base := time.Now().Add(-time.Minute)
-	stale := time.Now().Add(-2 * gpuFaultRelevanceWindow)
+	stale := time.Now().Add(-2 * gpufault.RelevanceWindow)
 
 	tests := []struct {
 		name        string
@@ -554,7 +554,7 @@ func TestClassifyGpuFailureRelevanceIsAnInterval(t *testing.T) {
 	})
 
 	t.Run("a fault that only started after the failure does not explain it", func(t *testing.T) {
-		started := failedAt.Add(gpuFaultAfterFailureSlack + time.Minute)
+		started := failedAt.Add(gpufault.AfterFailureSlack + time.Minute)
 		got := classify(t, started, started.Add(5*time.Minute))
 		assert.Equal(t, "UnknownError", got.Err().GetCode())
 		assert.Nil(t, got.Err().GetGpuFault())
