@@ -32,6 +32,37 @@ type Uploader struct {
 	errorFileName           string
 }
 
+// ContainerError is the failure a container declared by writing a
+// core.ErrorDocument to its error file, as opposed to a failure of the upload
+// itself. The document travels to the blob store untouched, so the kind and
+// origin the container chose are the ones flyte acts on.
+type ContainerError struct {
+	Document *core.ErrorDocument
+}
+
+func (e ContainerError) Error() string {
+	return e.Document.GetError().GetMessage()
+}
+
+// errorDocument reads an error file as a core.ErrorDocument, reporting whether
+// it is one. A document is recognised by its structure and not by re-encoding
+// to the same bytes: the wire format is not canonical, so field order, varint
+// width and a field a newer idl added all differ legitimately between
+// encoders, and rejecting those would discard the kind and origin the
+// container chose. proto.Unmarshal does accept some plain text by chance, but
+// such a parse leaves the error's own fields empty, and a document with
+// neither a code nor a message says nothing the plain-text path cannot.
+func errorDocument(raw []byte) (*core.ErrorDocument, bool) {
+	document := &core.ErrorDocument{}
+	if err := proto.Unmarshal(raw, document); err != nil {
+		return nil, false
+	}
+	if document.GetError().GetCode() == "" && document.GetError().GetMessage() == "" {
+		return nil, false
+	}
+	return document, true
+}
+
 type dirFile struct {
 	path string
 	info os.FileInfo
@@ -135,6 +166,9 @@ func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, f
 		b, err := os.ReadFile(errFile)
 		if err != nil {
 			return err
+		}
+		if document, ok := errorDocument(b); ok {
+			return ContainerError{Document: document}
 		}
 		return errors.Errorf("User Error: %s", string(b))
 	}
