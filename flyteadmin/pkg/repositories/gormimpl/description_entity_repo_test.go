@@ -35,7 +35,7 @@ func TestGetDescriptionEntity(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 	// Only match on queries that append expected filters
-	GlobalMock.NewMock().WithQuery(`SELECT * FROM "description_entities" WHERE project = $1 AND domain = $2 AND name = $3 AND version = $4 LIMIT 1`).
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "description_entities" WHERE resource_type = $1 AND project = $2 AND domain = $3 AND name = $4 AND version = $5 LIMIT 1`).
 		WithReply(descriptionEntities)
 	output, err = descriptionEntityRepo.Get(context.Background(), interfaces.GetDescriptionEntityInput{
 		ResourceType: resourceType,
@@ -107,19 +107,23 @@ func TestGetDescriptionEntityFilters(t *testing.T) {
 	entity := common.ResourceTypeToEntity[resourceType]
 	assert.NoError(t, err)
 
+	resourceTypeFilter, err := common.NewSingleValueFilter(entity, common.Equal, ResourceType, int32(resourceType))
+	assert.NoError(t, err)
+	assert.Equal(t, filters[0], resourceTypeFilter)
+
 	projectFilter, err := common.NewSingleValueFilter(entity, common.Equal, Project, project)
 	assert.NoError(t, err)
-	assert.Equal(t, filters[0], projectFilter)
+	assert.Equal(t, filters[1], projectFilter)
 
 	domainFilter, err := common.NewSingleValueFilter(entity, common.Equal, Domain, domain)
 	assert.NoError(t, err)
-	assert.Equal(t, filters[1], domainFilter)
+	assert.Equal(t, filters[2], domainFilter)
 
 	nameFilter, err := common.NewSingleValueFilter(entity, common.Equal, Name, name)
 	assert.NoError(t, err)
-	assert.Equal(t, filters[2], nameFilter)
+	assert.Equal(t, filters[3], nameFilter)
 
 	versionFilter, err := common.NewSingleValueFilter(entity, common.Equal, Version, version)
 	assert.NoError(t, err)
-	assert.Equal(t, filters[3], versionFilter)
+	assert.Equal(t, filters[4], versionFilter)
 }
