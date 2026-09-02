@@ -44,6 +44,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	executorconfig "github.com/flyteorg/flyte/v2/executor/pkg/config"
 	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
 	pluginserrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
@@ -61,10 +62,6 @@ import (
 const (
 	TaskActionDefaultRequeueDuration = 10 * time.Second
 	taskActionFinalizer              = "flyte.org/plugin-finalizer"
-
-	// DefaultMaxSystemFailures bounds consecutive system errors before the
-	// TaskAction is forced to PermanentFailure.
-	DefaultMaxSystemFailures uint32 = 3
 
 	// MaxSystemFailuresExceededCode is the ExecutionError.Code stamped on
 	// TaskActions that hit the system-failure ceiling.
@@ -149,7 +146,7 @@ func systemErrorFromPhaseInfo(phaseInfo pluginsCore.PhaseInfo) error {
 
 func (r *TaskActionReconciler) maxSystemFailures() uint32 {
 	if r.MaxSystemFailures == 0 {
-		return DefaultMaxSystemFailures
+		return executorconfig.DefaultMaxSystemFailures
 	}
 	return r.MaxSystemFailures
 }

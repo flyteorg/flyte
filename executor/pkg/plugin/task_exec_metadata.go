@@ -74,8 +74,12 @@ type taskExecutionMetadata struct {
 	overrides       pluginsCore.TaskOverrides
 	envVars         map[string]string
 	interruptible   bool
-	securityContext *core.SecurityContext
-	serviceAccount  string
+	// interruptibleFailureThreshold is reported to plugins that make their own
+	// scheduling decisions, such as connectors; the pod path is already resolved
+	// into interruptible by the time this metadata is built.
+	interruptibleFailureThreshold int32
+	securityContext               *core.SecurityContext
+	serviceAccount                string
 }
 
 func resolveServiceAccount(securityContext *core.SecurityContext, defaultSA string) string {
@@ -140,6 +144,15 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 	injectLabels[AttemptLabel] = strconv.FormatUint(uint64(retryAttempt)+1, 10)
 	setSanitizedLabel(injectLabels, TaskNameLabel, taskID.GetName())
 
+	interruptible := ta.Spec.Interruptible
+	if interruptible == nil {
+		interruptible = interruptibleFromTaskTemplate(ta.Spec.TaskTemplate)
+	}
+	cfg := executorconfig.GetConfig()
+	isInterruptible := interruptible != nil && *interruptible &&
+		!interruptibleThresholdReached(retryAttempt, ta.Status.SystemFailures, maxAttempts,
+			maxSystemAttempts(cfg.MaxSystemFailures), cfg.InterruptibleFailureThreshold)
+
 	return &taskExecutionMetadata{
 		ownerID: types.NamespacedName{
 			Name:      ta.Name,
@@ -168,14 +181,15 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 			UID:        ta.UID,
 			Controller: ptr.To(true),
 		},
-		labels:          pluginsUtils.UnionMaps(ta.Labels, injectLabels),
-		annotations:     pluginsUtils.UnionMaps(ta.Annotations, secretsMap),
-		maxAttempts:     maxAttempts,
-		overrides:       overrides,
-		envVars:         envVars,
-		interruptible:   ta.Spec.Interruptible != nil && *ta.Spec.Interruptible,
-		securityContext: securityContext,
-		serviceAccount:  resolveServiceAccount(securityContext, executorconfig.GetConfig().DefaultK8sServiceAccount),
+		labels:                        pluginsUtils.UnionMaps(ta.Labels, injectLabels),
+		annotations:                   pluginsUtils.UnionMaps(ta.Annotations, secretsMap),
+		maxAttempts:                   maxAttempts,
+		overrides:                     overrides,
+		envVars:                       envVars,
+		interruptible:                 isInterruptible,
+		interruptibleFailureThreshold: cfg.InterruptibleFailureThreshold,
+		securityContext:               securityContext,
+		serviceAccount:                resolveServiceAccount(securityContext, cfg.DefaultK8sServiceAccount),
 	}, nil
 }
 
@@ -197,6 +211,67 @@ func attemptToRetry(attempt uint32) uint32 {
 		return 0
 	}
 	return attempt - 1
+}
+
+// interruptibleThresholdReached reports whether a task has burned enough attempts to be moved
+// off interruptible capacity. Either budget tripping is enough, because a reclaimed node can
+// be charged to the system-failure budget or to the task's own retries. An interruptible task
+// always gets at least one attempt on interruptible capacity, even when it has no retries.
+func interruptibleThresholdReached(retryAttempt, systemFailures, maxAttempts, maxSystemAttempts uint32, threshold int32) bool {
+	if retryAttempt == 0 && systemFailures == 0 {
+		return false
+	}
+
+	return aboveInterruptibleFailureThreshold(retryAttempt, maxAttempts, threshold) ||
+		aboveInterruptibleFailureThreshold(systemFailures, maxSystemAttempts, threshold)
+}
+
+// aboveInterruptibleFailureThreshold applies the threshold to one attempt budget. A positive
+// threshold is an absolute count of burnt attempts; a non-positive one is complementary to the
+// budget's maximum, so -1 covers only the final attempt.
+func aboveInterruptibleFailureThreshold(burnt, maxAttempts uint32, threshold int32) bool {
+	if threshold > 0 {
+		return burnt >= uint32(threshold)
+	}
+
+	// A complement at or beyond the maximum would wrap the subtraction below, which would
+	// silently keep the task interruptible forever rather than covering every attempt.
+	complement := uint32(-threshold)
+	if complement >= maxAttempts {
+		return true
+	}
+
+	return burnt >= maxAttempts-complement
+}
+
+// maxSystemAttempts gives the number of attempts the system-failure budget allows, treating an
+// unset maximum the same way the reconciler's maxSystemFailures does.
+func maxSystemAttempts(maxSystemFailures int32) uint32 {
+	if maxSystemFailures <= 0 {
+		return executorconfig.DefaultMaxSystemFailures + 1
+	}
+
+	return uint32(maxSystemFailures) + 1
+}
+
+// interruptibleFromTaskTemplate gives the task template's interruptible flag, or nil when the
+// template does not declare one.
+func interruptibleFromTaskTemplate(data []byte) *bool {
+	if len(data) == 0 {
+		return nil
+	}
+
+	tmpl := &core.TaskTemplate{}
+	if err := proto.Unmarshal(data, tmpl); err != nil {
+		return nil
+	}
+
+	md := tmpl.GetMetadata()
+	if md == nil || md.GetInterruptibleValue() == nil {
+		return nil
+	}
+
+	return ptr.To(md.GetInterruptible())
 }
 
 // maxAttemptsFromTaskTemplate give the max attempts (retries + 1) from the task template.
@@ -271,14 +346,16 @@ func (m *taskExecutionMetadata) GetOwnerID() types.NamespacedName { return m.own
 func (m *taskExecutionMetadata) GetTaskExecutionID() pluginsCore.TaskExecutionID {
 	return m.taskExecutionID
 }
-func (m *taskExecutionMetadata) GetNamespace() string                       { return m.namespace }
-func (m *taskExecutionMetadata) GetOwnerReference() metav1.OwnerReference   { return m.ownerReference }
-func (m *taskExecutionMetadata) GetLabels() map[string]string               { return m.labels }
-func (m *taskExecutionMetadata) GetAnnotations() map[string]string          { return m.annotations }
-func (m *taskExecutionMetadata) GetMaxAttempts() uint32                     { return m.maxAttempts }
-func (m *taskExecutionMetadata) GetK8sServiceAccount() string               { return m.serviceAccount }
-func (m *taskExecutionMetadata) IsInterruptible() bool                      { return m.interruptible }
-func (m *taskExecutionMetadata) GetInterruptibleFailureThreshold() int32    { return 0 }
+func (m *taskExecutionMetadata) GetNamespace() string                     { return m.namespace }
+func (m *taskExecutionMetadata) GetOwnerReference() metav1.OwnerReference { return m.ownerReference }
+func (m *taskExecutionMetadata) GetLabels() map[string]string             { return m.labels }
+func (m *taskExecutionMetadata) GetAnnotations() map[string]string        { return m.annotations }
+func (m *taskExecutionMetadata) GetMaxAttempts() uint32                   { return m.maxAttempts }
+func (m *taskExecutionMetadata) GetK8sServiceAccount() string             { return m.serviceAccount }
+func (m *taskExecutionMetadata) IsInterruptible() bool                    { return m.interruptible }
+func (m *taskExecutionMetadata) GetInterruptibleFailureThreshold() int32 {
+	return m.interruptibleFailureThreshold
+}
 func (m *taskExecutionMetadata) GetEnvironmentVariables() map[string]string { return m.envVars }
 func (m *taskExecutionMetadata) GetConsoleURL() string                      { return "" }
 
