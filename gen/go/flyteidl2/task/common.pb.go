@@ -779,7 +779,9 @@ type ProducedArtifact struct {
 	// branches instead of reading as a linear chain. Empty key fields inherit
 	// the produced artifact's own scope and name, so a bare {version: "v1"}
 	// declares the previous version of this same artifact as parent; a set name
-	// records cross-artifact derivation.
+	// records cross-artifact derivation. Only the name may differ: non-empty
+	// scope fields (org/project/domain) must match the produced artifact's own
+	// scope — cross-project or cross-domain lineage is rejected at registration.
 	ParentArtifact *core.ArtifactVersionId `protobuf:"bytes,6,opt,name=parent_artifact,json=parentArtifact,proto3" json:"parent_artifact,omitempty"`
 }
 

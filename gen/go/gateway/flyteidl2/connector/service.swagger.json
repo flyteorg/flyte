@@ -858,7 +858,7 @@
       "properties": {
         "project": {
           "type": "string",
-          "description": "Project and domain and suffix needs to be unique across a given artifact store."
+          "description": "Project and domain and suffix needs to be unique across a given artifact store.\nLength bounds match artifact.ArtifactName; fields stay optional because an\nempty field means \"inherit from context\" in several uses (e.g.\nartifact.ArtifactSpec.parent_artifact)."
         },
         "domain": {
           "type": "string"
@@ -2520,7 +2520,7 @@
         },
         "parent_artifact": {
           "$ref": "#/definitions/coreArtifactVersionId",
-          "description": "Optional artifact version the produced version was derived from, copied\nverbatim into ArtifactSpec.parent_artifact. Set by the producing task when\nit derives a new version from one it consumed, so the resulting lineage\nbranches instead of reading as a linear chain. Empty key fields inherit\nthe produced artifact's own scope and name, so a bare {version: \"v1\"}\ndeclares the previous version of this same artifact as parent; a set name\nrecords cross-artifact derivation."
+          "description": "Optional artifact version the produced version was derived from, copied\nverbatim into ArtifactSpec.parent_artifact. Set by the producing task when\nit derives a new version from one it consumed, so the resulting lineage\nbranches instead of reading as a linear chain. Empty key fields inherit\nthe produced artifact's own scope and name, so a bare {version: \"v1\"}\ndeclares the previous version of this same artifact as parent; a set name\nrecords cross-artifact derivation. Only the name may differ: non-empty\nscope fields (org/project/domain) must match the produced artifact's own\nscope — cross-project or cross-domain lineage is rejected at registration."
         }
       },
       "description": "Declares that a named output of the producing action is a new artifact\nversion. The output's literal (in Outputs.literals) is the artifact's value;\norg/project/domain come from the producing action's scope at registration."

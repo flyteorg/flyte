@@ -156,7 +156,9 @@ message ProducedArtifact {
   // branches instead of reading as a linear chain. Empty key fields inherit
   // the produced artifact's own scope and name, so a bare {version: "v1"}
   // declares the previous version of this same artifact as parent; a set name
-  // records cross-artifact derivation.
+  // records cross-artifact derivation. Only the name may differ: non-empty
+  // scope fields (org/project/domain) must match the produced artifact's own
+  // scope — cross-project or cross-domain lineage is rejected at registration.
   flyteidl2.core.ArtifactVersionId parent_artifact = 6;
 }
 

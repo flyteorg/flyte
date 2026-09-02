@@ -9,10 +9,13 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core";
 
 message ArtifactKey {
   // Project and domain and suffix needs to be unique across a given artifact store.
-  string project = 1;
-  string domain = 2;
-  string name = 3;
-  string org = 4;
+  // Length bounds match artifact.ArtifactName; fields stay optional because an
+  // empty field means "inherit from context" in several uses (e.g.
+  // artifact.ArtifactSpec.parent_artifact).
+  string project = 1 [(buf.validate.field).string.max_len = 64];
+  string domain = 2 [(buf.validate.field).string.max_len = 64];
+  string name = 3 [(buf.validate.field).string.max_len = 255];
+  string org = 4 [(buf.validate.field).string.max_len = 63];
 }
 
 // Identity of one artifact version. Unlike the legacy ArtifactID below, this
@@ -20,7 +23,7 @@ message ArtifactKey {
 // values (core.Literal.artifact_id) and referenced by v2 artifact APIs.
 message ArtifactVersionId {
   ArtifactKey key = 1;
-  string version = 2;
+  string version = 2 [(buf.validate.field).string.max_len = 255];
 }
 
 // Reference to a previously uploaded card (model/data card) describing an
