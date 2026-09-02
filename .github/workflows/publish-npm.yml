@@ -48,12 +48,17 @@ jobs:
         # the lockfile, which still carries the 0.0.0-develop placeholder.
         run: npm ci
       - name: Set version in npm package
+        # The dispatch input reaches the shell through env, never by expression
+        # interpolation into the script, so quotes/newlines in it cannot inject
+        # shell. Empty on tag-push runs, where the pushed ref carries the tag.
+        env:
+          TAG_INPUT: ${{ inputs.tag }}
         run: |
-          REF="${{ inputs.tag || github.ref }}"
+          REF="${TAG_INPUT:-$GITHUB_REF}"
           # v1.2.3 get 1.2.3
           VERSION="${REF#refs/tags/}"
           VERSION="${VERSION#v}"
-          VERSION=$VERSION make update_npmversion
+          VERSION="$VERSION" make update_npmversion
         shell: bash
       - name: Publish
         # No NODE_AUTH_TOKEN on purpose: with a trusted publisher configured,
