@@ -94,10 +94,16 @@ message ArtifactSpec {
   // running task) declare it at creation time; it is immutable afterwards.
   ArtifactSource source = 6;
 
-  // Optional lineage: the version of THIS artifact (same org/project/domain/
-  // name) that this version was derived from. Empty means no declared parent,
-  // which is the normal case for a first version or an independently produced
-  // one.
+  // Optional lineage: the artifact version this one was derived from. Unset
+  // means no declared parent, which is the normal case for a first version or
+  // an independently produced one.
+  //
+  // The parent must live in this artifact's own org/project/domain; empty
+  // scope fields on the key inherit the artifact's own scope, and an empty
+  // key name inherits the artifact's own name — so a bare {version: "v1"}
+  // declares the previous version of this same artifact as parent. The name
+  // MAY differ, so lineage can express derivation across artifacts (a model
+  // deriving from a dataset version).
   //
   // Recording the parent explicitly is what makes version history a forest
   // rather than a chain: a new version may branch off any earlier version, not
@@ -107,7 +113,7 @@ message ArtifactSpec {
   // Stored as given and never resolved: the referenced version is not required
   // to exist (publication order is not guaranteed), so readers walking lineage
   // must tolerate a dangling parent. Immutable after creation.
-  string parent_version = 7 [(buf.validate.field).string.max_len = 255];
+  core.ArtifactVersionId parent_artifact = 7;
 }
 
 // A fully materialized artifact as stored by the service.

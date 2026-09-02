@@ -2518,9 +2518,9 @@
           "$ref": "#/definitions/coreLiteralType",
           "description": "The declared Flyte type of the output, copied into ArtifactSpec.type.\nThe producing SDK is authoritative for this."
         },
-        "parent_version": {
-          "type": "string",
-          "description": "Optional version of this same artifact name that the produced version was\nderived from, copied verbatim into ArtifactSpec.parent_version. Set by the\nproducing task when it derives a new version from one it consumed, so the\nresulting lineage branches instead of reading as a linear chain."
+        "parent_artifact": {
+          "$ref": "#/definitions/coreArtifactVersionId",
+          "description": "Optional artifact version the produced version was derived from, copied\nverbatim into ArtifactSpec.parent_artifact. Set by the producing task when\nit derives a new version from one it consumed, so the resulting lineage\nbranches instead of reading as a linear chain. Empty key fields inherit\nthe produced artifact's own scope and name, so a bare {version: \"v1\"}\ndeclares the previous version of this same artifact as parent; a set name\nrecords cross-artifact derivation."
         }
       },
       "description": "Declares that a named output of the producing action is a new artifact\nversion. The output's literal (in Outputs.literals) is the artifact's value;\norg/project/domain come from the producing action's scope at registration."

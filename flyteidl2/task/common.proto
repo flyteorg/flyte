@@ -150,11 +150,14 @@ message ProducedArtifact {
   // The producing SDK is authoritative for this.
   flyteidl2.core.LiteralType type = 5;
 
-  // Optional version of this same artifact name that the produced version was
-  // derived from, copied verbatim into ArtifactSpec.parent_version. Set by the
-  // producing task when it derives a new version from one it consumed, so the
-  // resulting lineage branches instead of reading as a linear chain.
-  string parent_version = 6 [(buf.validate.field).string.max_len = 255];
+  // Optional artifact version the produced version was derived from, copied
+  // verbatim into ArtifactSpec.parent_artifact. Set by the producing task when
+  // it derives a new version from one it consumed, so the resulting lineage
+  // branches instead of reading as a linear chain. Empty key fields inherit
+  // the produced artifact's own scope and name, so a bare {version: "v1"}
+  // declares the previous version of this same artifact as parent; a set name
+  // records cross-artifact derivation.
+  flyteidl2.core.ArtifactVersionId parent_artifact = 6;
 }
 
 // Output payload for an action.

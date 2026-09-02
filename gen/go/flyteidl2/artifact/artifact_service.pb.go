@@ -245,11 +245,11 @@ type ListArtifactsRequest struct {
 	// Common list request parameters (limit, token, filters).
 	// Supported filters: field "name" with CONTAINS,
 	// field "created_at" with GREATER_THAN (RFC3339 timestamp value),
-	// field "parent_version" with EQUAL, which lists the versions that declare
-	// the given version as their parent — the downward direction of lineage,
-	// which the stored pointer alone cannot be followed in. Because a parent
-	// version is only unique within one artifact name, that filter requires
-	// `name` below to be set.
+	// and the pair "parent_name" + "parent_version", each with EQUAL and always
+	// together, which lists the versions (of any name in the project) that
+	// declare the given artifact version as their parent — the downward
+	// direction of lineage, which the stored pointer alone cannot be followed
+	// in.
 	Request *common.ListRequest `protobuf:"bytes,1,opt,name=request,proto3" json:"request,omitempty"`
 	// Project scope for the listing. organization is stamped by the server.
 	ProjectId *common.ProjectIdentifier `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
