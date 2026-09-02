@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyte/v2
 
-go 1.26.5
+go 1.27.1
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2
@@ -10,10 +10,13 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.2
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.14.1
 	github.com/Azure/azure-sdk-for-go/sdk/security/keyvault/azsecrets v1.5.0
+	github.com/Masterminds/semver/v3 v3.5.0
+	github.com/alicebob/miniredis/v2 v2.39.0
 	github.com/aws/aws-sdk-go v1.55.8
 	github.com/aws/aws-sdk-go-v2 v1.47.1
 	github.com/aws/aws-sdk-go-v2/config v1.33.6
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.50.1
+	github.com/aws/smithy-go v1.28.2
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
 	github.com/coocood/freecache v1.2.7
 	github.com/dask/dask-kubernetes/v2023 v2023.0.0-20230626103304-abd02cd17b26
@@ -22,9 +25,11 @@ require (
 	github.com/eko/gocache/store/redis/v4 v4.2.12
 	github.com/ernesto-jimenez/gogen v0.0.0-20180125220232-d7d4131e6607
 	github.com/fatih/color v1.19.0
+	github.com/fatih/structtag v1.2.0
 	github.com/fergusstrange/embedded-postgres v1.34.0
 	github.com/flyteorg/stow v0.5.0
 	github.com/fsnotify/fsnotify v1.10.1
+	github.com/getsentry/sentry-go v0.49.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-test/deep v1.1.1
 	github.com/go-viper/mapstructure/v2 v2.5.0
@@ -37,6 +42,7 @@ require (
 	github.com/imdario/mergo v0.3.16
 	github.com/jackc/pgx/v5 v5.11.0
 	github.com/jmoiron/sqlx v1.4.0
+	github.com/kubeflow/spark-operator/v2 v2.5.2
 	github.com/kubeflow/training-operator v1.9.4
 	github.com/lib/pq v1.12.3
 	github.com/magiconair/properties v1.18.12
@@ -70,18 +76,20 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.47.0
 	go.opentelemetry.io/otel/trace v1.47.0
 	golang.org/x/exp v0.0.0-20260908205506-85c1c2202aba
-	golang.org/x/mod v0.41.0 // indirect
 	golang.org/x/oauth2 v0.37.0
 	golang.org/x/sync v0.23.0
 	golang.org/x/time v0.16.0
+	golang.org/x/tools v0.50.0
 	google.golang.org/api v0.300.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260928230214-8a89bd6388cc
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260928230214-8a89bd6388cc
 	google.golang.org/grpc v1.84.0
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v2 v2.4.0
+	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.37.1
+	k8s.io/apiextensions-apiserver v0.37.0
 	k8s.io/apimachinery v0.37.1
 	k8s.io/client-go v0.37.1
 	k8s.io/klog/v2 v2.140.0
@@ -90,18 +98,6 @@ require (
 	knative.dev/serving v0.50.0
 	sigs.k8s.io/controller-runtime v0.25.2
 	sigs.k8s.io/jobset v0.12.0
-)
-
-require (
-	github.com/Masterminds/semver/v3 v3.5.0
-	github.com/alicebob/miniredis/v2 v2.39.0
-	github.com/aws/smithy-go v1.28.2
-	github.com/fatih/structtag v1.2.0
-	github.com/getsentry/sentry-go v0.49.0
-	github.com/kubeflow/spark-operator/v2 v2.5.2
-	golang.org/x/tools v0.51.0
-	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/apiextensions-apiserver v0.37.1
 )
 
 require (
@@ -231,6 +227,7 @@ require (
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/crypto v0.57.0 // indirect
+	golang.org/x/mod v0.41.0 // indirect
 	golang.org/x/net v0.59.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
 	golang.org/x/term v0.46.0 // indirect

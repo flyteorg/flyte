@@ -19,7 +19,7 @@ The executor uses conditions to track task progress:
 ## Getting Started
 
 ### Prerequisites
-- go version v1.26.5+
+- go version v1.27.1+
 - docker version 17.03+.
 - kubectl version v1.11.3+.
 - Access to a Kubernetes v1.11.3+ cluster.
@@ -147,4 +147,3 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
