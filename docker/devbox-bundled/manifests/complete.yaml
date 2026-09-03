@@ -6885,6 +6885,13 @@ spec:
                       action reported.
                     format: int32
                     type: integer
+                  output:
+                    description: |-
+                      Output is the proto-serialized core.Literal a recovered condition settled on. Conditions
+                      have no outputs file, so OutputUri is empty for them and this carries the result instead;
+                      tasks and traces leave it unset.
+                    format: byte
+                    type: string
                   outputUri:
                     description: |-
                       OutputUri is where the source action's outputs live. Consumed as-is; never recomputed
