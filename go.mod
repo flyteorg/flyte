@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyte/v2
 
-go 1.26.5
+go 1.27.1
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260709200747-435963d16310.1
@@ -10,6 +10,8 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.14.0
 	github.com/Azure/azure-sdk-for-go/sdk/security/keyvault/azsecrets v1.5.0
+	github.com/Masterminds/semver/v3 v3.5.0
+	github.com/alicebob/miniredis/v2 v2.38.0
 	github.com/aws/aws-sdk-go v1.55.8
 	github.com/aws/aws-sdk-go-v2 v1.44.0
 	github.com/aws/aws-sdk-go-v2/config v1.32.39
@@ -24,6 +26,7 @@ require (
 	github.com/fergusstrange/embedded-postgres v1.34.0
 	github.com/flyteorg/stow v0.3.13
 	github.com/fsnotify/fsnotify v1.10.1
+	github.com/getsentry/sentry-go v0.48.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-test/deep v1.1.1
 	github.com/go-viper/mapstructure/v2 v2.5.0
@@ -36,6 +39,7 @@ require (
 	github.com/imdario/mergo v0.3.16
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/jmoiron/sqlx v1.4.0
+	github.com/kubeflow/spark-operator/v2 v2.5.2
 	github.com/kubeflow/training-operator v1.9.4
 	github.com/lib/pq v1.12.3
 	github.com/magiconair/properties v1.18.11
@@ -69,7 +73,6 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.46.0
 	go.opentelemetry.io/otel/trace v1.46.0
 	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f
-	golang.org/x/mod v0.40.0 // indirect
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sync v0.22.0
 	golang.org/x/time v0.15.0
@@ -79,8 +82,10 @@ require (
 	google.golang.org/grpc v1.83.1
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v2 v2.4.0
+	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.37.0
+	k8s.io/apiextensions-apiserver v0.36.3
 	k8s.io/apimachinery v0.37.0
 	k8s.io/client-go v0.37.0
 	k8s.io/klog/v2 v2.140.0
@@ -89,15 +94,6 @@ require (
 	knative.dev/serving v0.50.0
 	sigs.k8s.io/controller-runtime v0.24.1
 	sigs.k8s.io/jobset v0.12.0
-)
-
-require (
-	github.com/Masterminds/semver/v3 v3.5.0
-	github.com/alicebob/miniredis/v2 v2.38.0
-	github.com/getsentry/sentry-go v0.49.0
-	github.com/kubeflow/spark-operator/v2 v2.5.2
-	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/apiextensions-apiserver v0.37.0
 )
 
 require (
@@ -214,6 +210,7 @@ require (
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/crypto v0.55.0 // indirect
+	golang.org/x/mod v0.40.0 // indirect
 	golang.org/x/net v0.58.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/term v0.45.0 // indirect
