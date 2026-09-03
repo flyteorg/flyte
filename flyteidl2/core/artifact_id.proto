@@ -8,9 +8,10 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core";
 
 message ArtifactKey {
-  // Project and domain and suffix needs to be unique across a given artifact store.
-  // Length bounds match artifact.ArtifactName; fields stay optional because an
-  // empty field means "inherit from context" in several uses (e.g.
+  // Identifies one artifact within an artifact store: the (org, project,
+  // domain, name) tuple must be unique. Length bounds match
+  // artifact.ArtifactName; fields stay optional because an empty field means
+  // "inherit from context" in several uses (e.g.
   // artifact.ArtifactSpec.parent_artifacts).
   string project = 1 [(buf.validate.field).string.max_len = 64];
   string domain = 2 [(buf.validate.field).string.max_len = 64];

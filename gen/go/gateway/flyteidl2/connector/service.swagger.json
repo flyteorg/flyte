@@ -858,7 +858,7 @@
       "properties": {
         "project": {
           "type": "string",
-          "description": "Project and domain and suffix needs to be unique across a given artifact store.\nLength bounds match artifact.ArtifactName; fields stay optional because an\nempty field means \"inherit from context\" in several uses (e.g.\nartifact.ArtifactSpec.parent_artifacts)."
+          "description": "Identifies one artifact within an artifact store: the (org, project,\ndomain, name) tuple must be unique. Length bounds match\nartifact.ArtifactName; fields stay optional because an empty field means\n\"inherit from context\" in several uses (e.g.\nartifact.ArtifactSpec.parent_artifacts)."
         },
         "domain": {
           "type": "string"

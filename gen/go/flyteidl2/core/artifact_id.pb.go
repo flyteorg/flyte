@@ -128,9 +128,10 @@ type ArtifactKey struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Project and domain and suffix needs to be unique across a given artifact store.
-	// Length bounds match artifact.ArtifactName; fields stay optional because an
-	// empty field means "inherit from context" in several uses (e.g.
+	// Identifies one artifact within an artifact store: the (org, project,
+	// domain, name) tuple must be unique. Length bounds match
+	// artifact.ArtifactName; fields stay optional because an empty field means
+	// "inherit from context" in several uses (e.g.
 	// artifact.ArtifactSpec.parent_artifacts).
 	Project string `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
 	Domain  string `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
