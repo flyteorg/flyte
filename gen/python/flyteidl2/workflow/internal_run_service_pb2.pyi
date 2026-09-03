@@ -142,15 +142,15 @@ class LookupActionRequest(_message.Message):
     def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ...) -> None: ...
 
 class LookupActionResponse(_message.Message):
-    __slots__ = ["found", "phase", "attempts", "cache_status", "output_uri"]
-    FOUND_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["phase", "attempts", "cache_status", "output_uri", "output"]
     PHASE_FIELD_NUMBER: _ClassVar[int]
     ATTEMPTS_FIELD_NUMBER: _ClassVar[int]
     CACHE_STATUS_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_URI_FIELD_NUMBER: _ClassVar[int]
-    found: bool
+    OUTPUT_FIELD_NUMBER: _ClassVar[int]
     phase: _phase_pb2.ActionPhase
     attempts: int
     cache_status: _catalog_pb2.CatalogCacheStatus
     output_uri: str
-    def __init__(self, found: bool = ..., phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., attempts: _Optional[int] = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., output_uri: _Optional[str] = ...) -> None: ...
+    output: _literals_pb2.Literal
+    def __init__(self, phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., attempts: _Optional[int] = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., output_uri: _Optional[str] = ..., output: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ...) -> None: ...
