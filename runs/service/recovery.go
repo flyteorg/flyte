@@ -51,7 +51,9 @@ func (s *RunService) validateRecovery(ctx context.Context, runID *common.RunIden
 }
 
 // LookupAction reports one action of a prior run for the enqueue-time recovery decision.
-// A missing action is found = false, not an error; errors mean the lookup itself failed.
+// An action the source run does not have is NOT_FOUND — an ordinary outcome for a recovery,
+// and one the caller must keep distinct from a lookup that failed. Every other error means
+// the lookup itself broke.
 func (s *RunService) LookupAction(
 	ctx context.Context,
 	req *connect.Request[workflow.LookupActionRequest],
@@ -64,13 +66,13 @@ func (s *RunService) LookupAction(
 	action, err := s.repo.ActionRepo().GetAction(ctx, actionID)
 	if err != nil {
 		if errors.Is(err, interfaces.ErrActionNotFound) {
-			return connect.NewResponse(&workflow.LookupActionResponse{Found: false}), nil
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf(
+				"run %s has no action %s", actionID.GetRun().GetName(), actionID.GetName()))
 		}
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	resp := &workflow.LookupActionResponse{
-		Found:       true,
 		Phase:       common.ActionPhase(action.Phase),
 		Attempts:    action.Attempts,
 		CacheStatus: action.CacheStatus,

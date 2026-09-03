@@ -188,11 +188,13 @@ message LookupActionRequest {
   flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
 }
 
-// Response message for looking up an action of a prior run. A missing action is reported as
-// found = false rather than an error: recovery is fail-open, and a miss is an ordinary outcome.
+// Response message for looking up an action of a prior run. An action the run does not have
+// is reported as NOT_FOUND; a response therefore always describes an action that exists.
 message LookupActionResponse {
-  // Whether the run has an action of that name.
-  bool found = 1;
+  // Was `bool found = 1`, replaced by the NOT_FOUND status. Reserved so a rebuilt client of
+  // the old shape cannot read a later field as the boolean it expects.
+  reserved 1;
+  reserved "found";
 
   // Phase the action settled in.
   flyteidl2.common.ActionPhase phase = 2;

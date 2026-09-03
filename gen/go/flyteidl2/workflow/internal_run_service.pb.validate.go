@@ -2400,8 +2400,6 @@ func (m *LookupActionResponse) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Found
-
 	// no validation rules for Phase
 
 	// no validation rules for Attempts

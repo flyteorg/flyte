@@ -113,6 +113,10 @@ func (c *ActionsClient) resolveRecoveredFrom(
 		ActionId: &common.ActionIdentifier{Run: source, Name: actionName},
 	}))
 	if err != nil {
+		if connect.CodeOf(err) == connect.CodeNotFound {
+			c.recoveryMetrics.fresh(rerunReasonMissing)
+			return nil
+		}
 		logger.Warnf(ctx, "recovery: lookup of %s in run %s failed, running fresh: %v",
 			actionName, source.GetName(), err)
 		c.recoveryMetrics.lookupFailed()
@@ -120,9 +124,6 @@ func (c *ActionsClient) resolveRecoveredFrom(
 	}
 
 	switch {
-	case !resp.Msg.GetFound():
-		c.recoveryMetrics.fresh(rerunReasonMissing)
-		return nil
 	case !isRecoverablePhase(resp.Msg.GetPhase()):
 		c.recoveryMetrics.fresh(rerunReasonNonFinal)
 		return nil
