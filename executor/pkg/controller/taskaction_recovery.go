@@ -45,6 +45,12 @@ func (r *TaskActionReconciler) reconcileRecovered(
 	appendPhaseHistory(taskAction, string(flyteorgv1.ConditionReasonRecovered), msg)
 	taskAction.Status.Attempts = recoveredAttempts(recovered)
 	taskAction.Status.CacheStatus = core.CatalogCacheStatus(recovered.CacheStatus)
+	// Replay the source run's signal so a recovered condition reports the value it settled on
+	// instead of pausing for a new one. Set before the change check so it is persisted with the
+	// rest of the status, and read back by the actions watcher as the terminal Output.
+	if len(recovered.Output) > 0 {
+		taskAction.Status.SignalValue = recovered.Output
+	}
 
 	if !taskActionStatusChanged(original.Status, taskAction.Status) {
 		return ctrl.Result{}, nil

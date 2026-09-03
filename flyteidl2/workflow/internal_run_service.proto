@@ -205,4 +205,9 @@ message LookupActionResponse {
 
   // Location of the action's outputs, empty when it produced none.
   string output_uri = 5;
+
+  // For ACTION_TYPE_CONDITION actions, the resolved signal payload. Conditions carry their
+  // result inline rather than in an outputs file, so output_uri stays empty for them and
+  // this is the only thing a recovery has to hand downstream. Tasks and traces leave it unset.
+  optional flyteidl2.core.Literal output = 6;
 }

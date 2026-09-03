@@ -9,6 +9,7 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
@@ -81,7 +82,30 @@ func (s *RunService) LookupAction(
 	}
 	resp.OutputUri = outputURI
 
+	output, err := resolveConditionOutput(action)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	resp.Output = output
+
 	return connect.NewResponse(resp), nil
+}
+
+// resolveConditionOutput returns the resolved signal value of a condition action, or nil for
+// every other action type. A signalled condition has no outputs file — its result is a Literal
+// on the action's RunInfo — so this is the only thing a recovery of one can hand downstream.
+func resolveConditionOutput(action *models.Action) (*core.Literal, error) {
+	if workflow.ActionType(action.ActionType) != workflow.ActionType_ACTION_TYPE_CONDITION {
+		return nil, nil
+	}
+	if len(action.DetailedInfo) == 0 {
+		return nil, nil
+	}
+	info := &workflow.RunInfo{}
+	if err := proto.Unmarshal(action.DetailedInfo, info); err != nil {
+		return nil, err
+	}
+	return info.GetOutput(), nil
 }
 
 // resolveOutputURI returns where an action's outputs live, or "" when it has none. A trace

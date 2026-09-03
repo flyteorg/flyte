@@ -197,6 +197,38 @@ func TestLookupAction_TraceActionReadsDetailedInfo(t *testing.T) {
 	assert.Equal(t, "s3://bucket/r1/trace1/outputs.pb", resp.Msg.GetOutputUri())
 }
 
+// A signalled condition has no outputs file: its result is a Literal on the RunInfo, and it
+// is the only thing a recovery of that condition can hand downstream.
+func TestLookupAction_ConditionReturnsInlineSignalValue(t *testing.T) {
+	actionRepo, svc := newRecoveryTestService(t)
+	actionID := lookupActionID("r1", "cond1")
+
+	signal := &core.Literal{
+		Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{
+				Value: &core.Primitive_Boolean{Boolean: true},
+			}},
+		}},
+	}
+	info, err := proto.Marshal(&workflow.RunInfo{Output: signal})
+	require.NoError(t, err)
+	actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).
+		Return(&models.Action{
+			Phase:        int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			ActionType:   int32(workflow.ActionType_ACTION_TYPE_CONDITION),
+			DetailedInfo: info,
+		}, nil).Once()
+	actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).
+		Return([]*models.ActionEvent{}, nil).Once()
+
+	resp, err := svc.LookupAction(context.Background(),
+		connect.NewRequest(&workflow.LookupActionRequest{ActionId: actionID}))
+	require.NoError(t, err)
+	assert.Empty(t, resp.Msg.GetOutputUri(), "a condition writes no outputs file")
+	require.NotNil(t, resp.Msg.GetOutput())
+	assert.True(t, proto.Equal(signal, resp.Msg.GetOutput()))
+}
+
 // An action that succeeded without producing outputs is found, with no URI to hand back.
 func TestLookupAction_NoOutputsYieldsEmptyURI(t *testing.T) {
 	actionRepo, svc := newRecoveryTestService(t)

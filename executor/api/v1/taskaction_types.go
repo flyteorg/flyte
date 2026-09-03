@@ -220,6 +220,12 @@ type RecoveredFrom struct {
 	// +optional
 	OutputUri string `json:"outputUri,omitempty"`
 
+	// Output is the proto-serialized core.Literal a recovered condition settled on. Conditions
+	// have no outputs file, so OutputUri is empty for them and this carries the result instead;
+	// tasks and traces leave it unset.
+	// +optional
+	Output []byte `json:"output,omitempty"`
+
 	// Attempts the source action took.
 	// +optional
 	Attempts uint32 `json:"attempts,omitempty"`

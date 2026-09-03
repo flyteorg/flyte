@@ -823,7 +823,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		}
 		// On terminal SUCCEEDED of a signalled condition, ship the resolved
 		// value and actor to the run-service DB.
-		if update.Phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED && update.SignalValue != nil {
+		if isConditionResultPhase(update.Phase) && update.SignalValue != nil {
 			statusReq.Output = update.SignalValue
 			if taskAction.Status.SignalledBy != "" {
 				statusReq.Principal = &common.EnrichedIdentity{
@@ -1088,7 +1088,7 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 		taskAction.Spec.RecoveryContext = nil
 		return nil
 	}
-	
+
 	recoveryContext, err := recoveryContextFromRunSpec(runSpec)
 	if err != nil {
 		return err

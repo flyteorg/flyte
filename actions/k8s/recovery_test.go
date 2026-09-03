@@ -127,6 +127,36 @@ func TestResolveRecoveredFrom_HitStampsSourceResult(t *testing.T) {
 	assert.Equal(t, int32(core.CatalogCacheStatus_CACHE_HIT), got.CacheStatus)
 }
 
+// A signalled condition settles with an inline Literal and no outputs file. Gating on the
+// URI alone re-ran it, and a fresh condition pauses for a signal the source run was already
+// given — so the run being recovered hung instead of finishing.
+func TestResolveRecoveredFrom_SignalledConditionIsAHit(t *testing.T) {
+	runClient, c := newGateTestClient(t)
+	signal := &core.Literal{
+		Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{
+				Value: &core.Primitive_Boolean{Boolean: true},
+			}},
+		}},
+	}
+	runClient.EXPECT().LookupAction(mock.Anything, mock.Anything).
+		Return(lookupResponse(&workflow.LookupActionResponse{
+			Found:  true,
+			Phase:  common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+			Output: signal,
+		}), nil).Once()
+
+	got := c.resolveRecoveredFrom(context.Background(),
+		taskActionWith(recoveryContextFor("r1")), childAction("a1"), false)
+
+	require.NotNil(t, got, "a condition with an inline result must recover")
+	assert.Empty(t, got.OutputUri)
+
+	roundTripped := &core.Literal{}
+	require.NoError(t, proto.Unmarshal(got.Output, roundTripped))
+	assert.True(t, proto.Equal(signal, roundTripped))
+}
+
 // Chained recovery is the ordinary path: recovering a recovery run lands on RECOVERED rows
 // whose URI already points further back.
 func TestResolveRecoveredFrom_RecoveredSourceIsAHit(t *testing.T) {

@@ -5,6 +5,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"google.golang.org/protobuf/proto"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -105,6 +106,41 @@ var _ = Describe("Recovered TaskAction Controller", func() {
 
 			By("surfacing as RECOVERED to the actions service, not SUCCEEDED")
 			Expect(actionsk8s.GetPhaseFromConditions(ta)).To(Equal(common.ActionPhase_ACTION_PHASE_RECOVERED))
+		})
+
+		It("replays a recovered condition's signal instead of pausing for a new one", func() {
+			signal, err := proto.Marshal(&core.Literal{
+				Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+					Value: &core.Scalar_Primitive{Primitive: &core.Primitive{
+						Value: &core.Primitive_Boolean{Boolean: true},
+					}},
+				}},
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			ta := newRecoveredTaskAction(nn.Name, &flyteorgv1.RecoveredFrom{
+				SourceRunName: "source-run",
+				Output:        signal,
+			})
+			// A condition has no plugin and no outputs file; the recovered branch must win
+			// over the per-type dispatch that would otherwise park it in Paused.
+			ta.Spec.ActionType = flyteorgv1.ActionTypeCondition
+			ta.Spec.TaskType = ""
+			Expect(k8sClient.Create(ctx, ta)).To(Succeed())
+
+			recorder := &recordingEventsClient{}
+			_, err = newReconciler(recorder).Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			Expect(err).NotTo(HaveOccurred())
+
+			got := getTaskAction(nn)
+			Expect(isTerminal(got)).To(BeTrue())
+			Expect(meta.FindStatusCondition(got.Status.Conditions,
+				string(flyteorgv1.ConditionTypeSucceeded)).Reason).
+				To(Equal(string(flyteorgv1.ConditionReasonRecovered)))
+
+			By("carrying the source run's resolved value so the actions watcher can ship it")
+			Expect(got.Status.SignalValue).To(Equal(signal))
+			Expect(actionsk8s.SignalValueFromStatus(ctx, got)).NotTo(BeNil())
 		})
 
 		It("re-reconciles without emitting a second event", func() {

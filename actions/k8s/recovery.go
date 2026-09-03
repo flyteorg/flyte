@@ -126,16 +126,33 @@ func (c *ActionsClient) resolveRecoveredFrom(
 	case !isRecoverablePhase(resp.Msg.GetPhase()):
 		c.recoveryMetrics.fresh(rerunReasonNonFinal)
 		return nil
-	case resp.Msg.GetOutputUri() == "":
-		// Nothing to hand downstream, so reusing the row would only hide a re-run.
+	case resp.Msg.GetOutputUri() == "" && resp.Msg.GetOutput() == nil:
+		// Nothing to hand downstream, so reusing the row would only hide a re-run. A
+		// signalled condition has no outputs file but does carry an inline Literal, so
+		// the two are checked together — gating on the URI alone re-ran every condition,
+		// which then paused for a signal the source run had already been given.
 		c.recoveryMetrics.fresh(rerunReasonNoOutput)
 		return nil
+	}
+
+	// A condition's result rides in the CR rather than in object storage.
+	var output []byte
+	if literal := resp.Msg.GetOutput(); literal != nil {
+		marshaled, err := proto.Marshal(literal)
+		if err != nil {
+			logger.Warnf(ctx, "recovery: failed to marshal output of %s in run %s, running fresh: %v",
+				actionName, source.GetName(), err)
+			c.recoveryMetrics.fresh(rerunReasonNoOutput)
+			return nil
+		}
+		output = marshaled
 	}
 
 	c.recoveryMetrics.hit()
 	return &executorv1.RecoveredFrom{
 		SourceRunName: source.GetName(),
 		OutputUri:     resp.Msg.GetOutputUri(),
+		Output:        output,
 		Attempts:      resp.Msg.GetAttempts(),
 		CacheStatus:   int32(resp.Msg.GetCacheStatus()),
 	}
@@ -144,6 +161,14 @@ func (c *ActionsClient) resolveRecoveredFrom(
 // RECOVERED counts: recovering a recovery run is the ordinary way a run survives repeated
 // intermittent failures, and its output URI is already fully resolved.
 func isRecoverablePhase(phase common.ActionPhase) bool {
+	return phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED ||
+		phase == common.ActionPhase_ACTION_PHASE_RECOVERED
+}
+
+// isConditionResultPhase reports the terminal phases in which a condition action carries a
+// resolved signal value: SUCCEEDED when it was signalled in this run, RECOVERED when the
+// value was replayed from the run being recovered.
+func isConditionResultPhase(phase common.ActionPhase) bool {
 	return phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED ||
 		phase == common.ActionPhase_ACTION_PHASE_RECOVERED
 }

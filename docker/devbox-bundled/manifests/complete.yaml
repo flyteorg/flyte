@@ -8780,7 +8780,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 73498ed48a4a737de04a3c1297e3c0e172b0919cdf6d6bfc7dc43bd102f4d1e8
+        checksum/configuration: 21a742d07793d02ffa71b00e29bf0ac75148c13c48a68838f9ffb85af7f6bc82
         checksum/configuration-secret: ff95a9986cc42dff0a114449c9b8e9a95c781b7bdd9832b31ca461423ae0b678
       labels:
         app.kubernetes.io/component: flyte-binary
