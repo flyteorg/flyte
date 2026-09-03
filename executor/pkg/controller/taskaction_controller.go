@@ -374,9 +374,9 @@ func (r *TaskActionReconciler) reconcileTask(
 		setCondition(taskAction, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue, reason, err.Error())
 		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse, reason, err.Error())
 		start := time.Now()
-		updErr := r.Status().Update(ctx, taskAction) // error intentionally ignored: terminal either way
+		updErr := r.Status().Update(ctx, taskAction)
 		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
-		return ctrl.Result{}, nil // terminal — do not requeue
+		return ctrl.Result{}, updErr
 	}
 
 	// Ensure finalizer is present (once validation passes)

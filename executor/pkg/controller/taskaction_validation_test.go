@@ -2,9 +2,15 @@ package controller
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
+
+	"k8s.io/client-go/tools/events"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
@@ -107,5 +113,40 @@ func TestValidateTaskAction_PluginNotFound(t *testing.T) {
 	}
 	if reason != flyteorgv1.ConditionReasonPluginNotFound {
 		t.Errorf("expected reason %q, got %q", flyteorgv1.ConditionReasonPluginNotFound, reason)
+	}
+}
+
+func TestReconcileTask_ValidationStatusUpdate(t *testing.T) {
+	statusErr := errors.New("status update failed")
+	for _, tc := range []struct {
+		name      string
+		updateErr error
+	}{
+		{name: "success"},
+		{name: "failure", updateErr: statusErr},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			k8sClient := fake.NewClientBuilder().
+				WithInterceptorFuncs(interceptor.Funcs{
+					SubResourceUpdate: func(context.Context, client.Client, string, client.Object, ...client.SubResourceUpdateOption) error {
+						return tc.updateErr
+					},
+				}).
+				Build()
+			reconciler := &TaskActionReconciler{
+				Client:   k8sClient,
+				Recorder: events.NewFakeRecorder(1),
+			}
+			taskAction := validTaskAction()
+			taskAction.Spec.RunName = ""
+
+			_, err := reconciler.reconcileTask(context.Background(), taskAction, taskAction.DeepCopy())
+			if !errors.Is(err, tc.updateErr) {
+				t.Fatalf("expected %v, got %v", tc.updateErr, err)
+			}
+			if !isTerminal(taskAction) {
+				t.Fatal("expected validation failure to remain terminal")
+			}
+		})
 	}
 }
