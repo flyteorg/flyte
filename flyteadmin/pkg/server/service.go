@@ -97,12 +97,7 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 		grpcprometheus.EnableHandlingTimeHistogram()
 	}
 
-	// Not yet implemented for streaming
 	tracerProvider := otelutils.GetTracerProvider(otelutils.AdminServerTracer)
-	otelUnaryServerInterceptor := otelgrpc.UnaryServerInterceptor(
-		otelgrpc.WithTracerProvider(tracerProvider),
-		otelgrpc.WithPropagators(propagation.TraceContext{}),
-	)
 
 	adminScope := scope.NewSubScope("admin")
 	recoveryInterceptor := middleware.NewRecoveryInterceptor(adminScope)
@@ -115,7 +110,6 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 			// recovery interceptor should always be first in order to handle any panics in the middleware or server
 			recoveryInterceptor.UnaryServerInterceptor(),
 			grpcprometheus.UnaryServerInterceptor,
-			otelUnaryServerInterceptor,
 			auth.GetAuthenticationCustomMetadataInterceptor(authCtx),
 			grpcauth.UnaryServerInterceptor(auth.GetAuthenticationInterceptor(authCtx)),
 			auth.AuthenticationLoggingInterceptor,
@@ -127,7 +121,6 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 			// recovery interceptor should always be first in order to handle any panics in the middleware or server
 			recoveryInterceptor.UnaryServerInterceptor(),
 			grpcprometheus.UnaryServerInterceptor,
-			otelUnaryServerInterceptor,
 		)
 	}
 
@@ -140,6 +133,10 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	serverOpts := []grpc.ServerOption{
 		grpc.StreamInterceptor(chainedStreamInterceptors),
 		grpc.UnaryInterceptor(chainedUnaryInterceptors),
+		grpc.StatsHandler(otelgrpc.NewServerHandler(
+			otelgrpc.WithTracerProvider(tracerProvider),
+			otelgrpc.WithPropagators(propagation.TraceContext{}),
+		)),
 	}
 	if cfg.GrpcConfig.MaxMessageSizeBytes > 0 {
 		serverOpts = append(serverOpts, grpc.MaxRecvMsgSize(cfg.GrpcConfig.MaxMessageSizeBytes), grpc.MaxSendMsgSize(cfg.GrpcConfig.MaxMessageSizeBytes))
