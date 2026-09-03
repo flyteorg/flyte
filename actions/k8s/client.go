@@ -1082,7 +1082,7 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 		taskAction.Spec.RecoveryContext = nil
 		return nil
 	}
-
+	
 	recoveryContext, err := recoveryContextFromRunSpec(runSpec)
 	if err != nil {
 		return err
