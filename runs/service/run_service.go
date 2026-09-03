@@ -866,20 +866,29 @@ func IsTerminalPhase(phase common.ActionPhase) bool {
 		phase == common.ActionPhase_ACTION_PHASE_RECOVERED
 }
 
-// lastAttemptIsTerminal returns true when the highest-numbered attempt has reached a
-// terminal phase. Used by WatchActionDetails to close the stream only after action_events
-// reflects the terminal transition, not just the actions table.
-func lastAttemptIsTerminal(attempts []*workflow.ActionAttempt) bool {
+// actionStreamComplete reports whether WatchActionDetails has nothing further to
+// deliver. Attempt-level terminality alone is not enough to close on: a timed-out
+// attempt emits a terminal TIMED_OUT event for attempt N while the action restarts
+// as attempt N+1 in the same reconcile, so closing on the event alone ends the
+// stream mid-retry. Nor is the actions table alone: it can be terminal before
+// action_events reflects it. The stream is complete only when both agree — the
+// action's own phase is terminal, and the highest-numbered attempt is terminal
+// and is the action's current attempt.
+func actionStreamComplete(details *workflow.ActionDetails) bool {
+	attempts := details.GetAttempts()
 	if len(attempts) == 0 {
 		return false
 	}
-	var last *workflow.ActionAttempt
+	last := attempts[0]
 	for _, a := range attempts {
-		if last == nil || a.GetAttempt() > last.GetAttempt() {
+		if a.GetAttempt() > last.GetAttempt() {
 			last = a
 		}
 	}
-	return IsTerminalPhase(last.GetPhase())
+	status := details.GetStatus()
+	return IsTerminalPhase(status.GetPhase()) &&
+		IsTerminalPhase(last.GetPhase()) &&
+		last.GetAttempt() == status.GetAttempts()
 }
 
 // GetActionData is deprecated and no longer implemented. Clients should use
@@ -1241,8 +1250,9 @@ func (s *RunService) WatchActionDetails(
 		return err
 	}
 
-	// Close only once action_events reflects the terminal phase, not just actions table.
-	if lastAttemptIsTerminal(details.GetAttempts()) {
+	// Close only once the action is terminal AND action_events reflects it — a
+	// terminal event for a retrying attempt must not end the stream.
+	if actionStreamComplete(details) {
 		return nil
 	}
 
@@ -1270,8 +1280,8 @@ func (s *RunService) WatchActionDetails(
 			}); err != nil {
 				return err
 			}
-			// Close once action_events reflects the terminal phase.
-			if lastAttemptIsTerminal(details.GetAttempts()) {
+			// Close once the action is terminal and action_events reflects it.
+			if actionStreamComplete(details) {
 				return nil
 			}
 		}
