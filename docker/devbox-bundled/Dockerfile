@@ -100,4 +100,11 @@ VOLUME /var/lib/flyte/storage
 ENV SSL_CERT_DIR /var/lib/flyte/config/ca-certificates
 
 ENTRYPOINT [ "/bin/k3d-entrypoint.sh" ]
-CMD [ "server", "--disable=servicelb", "--disable=metrics-server" ]
+CMD [ "server", "--disable=servicelb", "--disable=metrics-server", \
+      #"--kubelet-arg=system-reserved=cpu=1500m,memory=3Gi", \
+      #"--kubelet-arg=kube-reserved=cpu=500m,memory=1Gi", \
+      "--kube-apiserver-arg=max-requests-inflight=3000", \
+      "--kube-apiserver-arg=max-mutating-requests-inflight=3000", \
+      "--kube-controller-manager-arg=kube-api-burst=3000", \
+      "--kube-controller-manager-arg=kube-api-qps=3000" \
+    ]
