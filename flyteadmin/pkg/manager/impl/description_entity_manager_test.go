@@ -127,6 +127,17 @@ func TestDescriptionEntityManagerDistinguishesResourceType(t *testing.T) {
 	require.Len(t, list.GetDescriptionEntities(), 1)
 	assert.Equal(t, core.ResourceType_WORKFLOW, list.GetDescriptionEntities()[0].GetId().GetResourceType())
 	assert.Equal(t, "workflow", list.GetDescriptionEntities()[0].GetShortDescription())
+
+	list, err = manager.ListDescriptionEntity(context.Background(), &admin.DescriptionEntityListRequest{
+		Id: &admin.NamedEntityIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
+		Limit: 10,
+	})
+	require.NoError(t, err)
+	require.Len(t, list.GetDescriptionEntities(), 2)
 }
 
 func TestDescriptionEntityManager_List(t *testing.T) {
