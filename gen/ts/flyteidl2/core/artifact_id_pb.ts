@@ -23,7 +23,7 @@ export type ArtifactKey = Message<"flyteidl2.core.ArtifactKey"> & {
    * Project and domain and suffix needs to be unique across a given artifact store.
    * Length bounds match artifact.ArtifactName; fields stay optional because an
    * empty field means "inherit from context" in several uses (e.g.
-   * artifact.ArtifactSpec.parent_artifact).
+   * artifact.ArtifactSpec.parent_artifacts).
    *
    * @generated from field: string project = 1;
    */

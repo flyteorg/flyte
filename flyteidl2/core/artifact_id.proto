@@ -11,7 +11,7 @@ message ArtifactKey {
   // Project and domain and suffix needs to be unique across a given artifact store.
   // Length bounds match artifact.ArtifactName; fields stay optional because an
   // empty field means "inherit from context" in several uses (e.g.
-  // artifact.ArtifactSpec.parent_artifact).
+  // artifact.ArtifactSpec.parent_artifacts).
   string project = 1 [(buf.validate.field).string.max_len = 64];
   string domain = 2 [(buf.validate.field).string.max_len = 64];
   string name = 3 [(buf.validate.field).string.max_len = 255];
