@@ -14,10 +14,12 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/sentryutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
 	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings/settingsconnect"
 	taskpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
@@ -96,23 +98,24 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	// In unified mode, intra-service calls go through the same mux.
-	actionsURL := cfg.ActionsServiceURL
+	actionsServiceCfg := cfg.ActionsService
 	if sc.BaseURL != "" {
-		actionsURL = sc.BaseURL
+		actionsServiceCfg.URL = sc.BaseURL
+	}
+	actionsHTTPClient, err := serviceclient.NewHTTPClient(ctx, http.DefaultClient, actionsServiceCfg)
+	if err != nil {
+		return fmt.Errorf("runs: configure actions service client: %w", err)
 	}
 	actionsClient := actionsconnect.NewActionsServiceClient(
-		http.DefaultClient,
-		actionsURL,
+		actionsHTTPClient,
+		actionsServiceCfg.URL,
 		connect.WithInterceptors(otelInterceptor),
 	)
 
-	projectsURL := sc.BaseURL
-	if projectsURL == "" {
-		projectsURL = cfg.ActionsServiceURL
-	}
+	runsServiceURL := fmt.Sprintf("http://localhost:%d", cfg.Server.Port)
 	projectClient := projectconnect.NewProjectServiceClient(
 		http.DefaultClient,
-		projectsURL,
+		runsServiceURL,
 		connect.WithInterceptors(otelInterceptor),
 	)
 	abortReconciler := service.NewAbortReconciler(repo, actionsClient, service.AbortReconcilerConfig{
@@ -175,16 +178,17 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(projectPath, projectHandler)
 	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
 
+	settingsSvc := service.NewSettingsService(impl.NewSettingsRepo(sc.DB))
+	settingsPath, settingsHandler := settingsconnect.NewSettingsServiceHandler(settingsSvc, connect.WithInterceptors(otelInterceptor))
+	sc.Mux.Handle(settingsPath, settingsHandler)
+	logger.Infof(ctx, "Mounted SettingsService at %s", settingsPath)
+
 	if err := seedProjects(ctx, impl.NewProjectRepo(sc.DB), cfg.SeedProjects); err != nil {
 		return fmt.Errorf("runs: failed to seed projects: %w", err)
 	}
 
 	if cfg.TriggerScheduler.Enabled {
-		runsURL := cfg.ActionsServiceURL
-		if sc.BaseURL != "" {
-			runsURL = sc.BaseURL
-		}
-		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, runsURL, connect.WithInterceptors(otelInterceptor))
+		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, http.DefaultClient, runsServiceURL, connect.WithInterceptors(otelInterceptor))
 		sc.AddWorker("trigger-scheduler", worker)
 		logger.Infof(ctx, "Registered trigger-scheduler worker")
 	}

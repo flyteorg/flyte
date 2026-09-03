@@ -9,7 +9,7 @@ import type { ActionIdentifier } from "../common/identifier_pb.ts";
 import { file_flyteidl2_common_identifier } from "../common/identifier_pb.ts";
 import type { EnrichedIdentity } from "../common/identity_pb.ts";
 import { file_flyteidl2_common_identity } from "../common/identity_pb.ts";
-import type { ArtifactInfo } from "../core/artifact_id_pb.ts";
+import type { ArtifactInfo, ArtifactVersionId } from "../core/artifact_id_pb.ts";
 import { file_flyteidl2_core_artifact_id } from "../core/artifact_id_pb.ts";
 import type { Literal } from "../core/literals_pb.ts";
 import { file_flyteidl2_core_literals } from "../core/literals_pb.ts";
@@ -23,7 +23,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/artifact/artifact.proto.
  */
 export const file_flyteidl2_artifact_artifact: GenFile = /*@__PURE__*/
-  fileDesc("CiFmbHl0ZWlkbDIvYXJ0aWZhY3QvYXJ0aWZhY3QucHJvdG8SEmZseXRlaWRsMi5hcnRpZmFjdCJ1CgxBcnRpZmFjdE5hbWUSFAoDb3JnGAEgASgJQge6SARyAhg/EhoKB3Byb2plY3QYAiABKAlCCbpIBnIEEAEYQBIZCgZkb21haW4YAyABKAlCCbpIBnIEEAEYQBIYCgRuYW1lGAQgASgJQgq6SAdyBRABGP8BImkKEkFydGlmYWN0SWRlbnRpZmllchI2CgRuYW1lGAEgASgLMiAuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0TmFtZUIGukgDyAEBEhsKB3ZlcnNpb24YAiABKAlCCrpIB3IFEAEY/wEiXwoQVGFza0FjdGlvblNvdXJjZRI6CgZhY3Rpb24YASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIPCgdhdHRlbXB0GAIgASgNInkKDkFydGlmYWN0U291cmNlEjsKC3Rhc2tfYWN0aW9uGAEgASgLMiQuZmx5dGVpZGwyLmFydGlmYWN0LlRhc2tBY3Rpb25Tb3VyY2VIABIgCgxleHRlcm5hbF9yZWYYAiABKAlCCLpIBXIDGIAISABCCAoGc291cmNlItEBCgxBcnRpZmFjdFNwZWMSLgoFdmFsdWUYASABKAsyFy5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsQga6SAPIAQESMQoEdHlwZRgCIAEoCzIbLmZseXRlaWRsMi5jb3JlLkxpdGVyYWxUeXBlQga6SAPIAQESKgoEaW5mbxgDIAEoCzIcLmZseXRlaWRsMi5jb3JlLkFydGlmYWN0SW5mbxIyCgZzb3VyY2UYBiABKAsyIi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RTb3VyY2Ui3wEKCEFydGlmYWN0EjsKC2FydGlmYWN0X2lkGAEgASgLMiYuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0SWRlbnRpZmllchIuCgRzcGVjGAIgASgLMiAuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0U3BlYxIuCgpjcmVhdGVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBI2CgpjcmVhdGVkX2J5GAQgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5FbnJpY2hlZElkZW50aXR5QsoBChZjb20uZmx5dGVpZGwyLmFydGlmYWN0Qg1BcnRpZmFjdFByb3RvSAJQAVo2Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2FydGlmYWN0ogIDRkFYqgISRmx5dGVpZGwyLkFydGlmYWN0ygISRmx5dGVpZGwyXEFydGlmYWN04gIeRmx5dGVpZGwyXEFydGlmYWN0XEdQQk1ldGFkYXRh6gITRmx5dGVpZGwyOjpBcnRpZmFjdGIGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_identity, file_flyteidl2_core_artifact_id, file_flyteidl2_core_literals, file_flyteidl2_core_types, file_google_protobuf_timestamp]);
+  fileDesc("CiFmbHl0ZWlkbDIvYXJ0aWZhY3QvYXJ0aWZhY3QucHJvdG8SEmZseXRlaWRsMi5hcnRpZmFjdCJ1CgxBcnRpZmFjdE5hbWUSFAoDb3JnGAEgASgJQge6SARyAhg/EhoKB3Byb2plY3QYAiABKAlCCbpIBnIEEAEYQBIZCgZkb21haW4YAyABKAlCCbpIBnIEEAEYQBIYCgRuYW1lGAQgASgJQgq6SAdyBRABGP8BImkKEkFydGlmYWN0SWRlbnRpZmllchI2CgRuYW1lGAEgASgLMiAuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0TmFtZUIGukgDyAEBEhsKB3ZlcnNpb24YAiABKAlCCrpIB3IFEAEY/wEiXwoQVGFza0FjdGlvblNvdXJjZRI6CgZhY3Rpb24YASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIPCgdhdHRlbXB0GAIgASgNInkKDkFydGlmYWN0U291cmNlEjsKC3Rhc2tfYWN0aW9uGAEgASgLMiQuZmx5dGVpZGwyLmFydGlmYWN0LlRhc2tBY3Rpb25Tb3VyY2VIABIgCgxleHRlcm5hbF9yZWYYAiABKAlCCLpIBXIDGIAISABCCAoGc291cmNlIo0CCgxBcnRpZmFjdFNwZWMSLgoFdmFsdWUYASABKAsyFy5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsQga6SAPIAQESMQoEdHlwZRgCIAEoCzIbLmZseXRlaWRsMi5jb3JlLkxpdGVyYWxUeXBlQga6SAPIAQESKgoEaW5mbxgDIAEoCzIcLmZseXRlaWRsMi5jb3JlLkFydGlmYWN0SW5mbxIyCgZzb3VyY2UYBiABKAsyIi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RTb3VyY2USOgoPcGFyZW50X2FydGlmYWN0GAcgASgLMiEuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RWZXJzaW9uSWQi3wEKCEFydGlmYWN0EjsKC2FydGlmYWN0X2lkGAEgASgLMiYuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0SWRlbnRpZmllchIuCgRzcGVjGAIgASgLMiAuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0U3BlYxIuCgpjcmVhdGVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBI2CgpjcmVhdGVkX2J5GAQgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5FbnJpY2hlZElkZW50aXR5QsoBChZjb20uZmx5dGVpZGwyLmFydGlmYWN0Qg1BcnRpZmFjdFByb3RvSAJQAVo2Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2FydGlmYWN0ogIDRkFYqgISRmx5dGVpZGwyLkFydGlmYWN0ygISRmx5dGVpZGwyXEFydGlmYWN04gIeRmx5dGVpZGwyXEFydGlmYWN0XEdQQk1ldGFkYXRh6gITRmx5dGVpZGwyOjpBcnRpZmFjdGIGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_identity, file_flyteidl2_core_artifact_id, file_flyteidl2_core_literals, file_flyteidl2_core_types, file_google_protobuf_timestamp]);
 
 /**
  * Identifies an artifact name within an org, project and domain.
@@ -201,6 +201,31 @@ export type ArtifactSpec = Message<"flyteidl2.artifact.ArtifactSpec"> & {
    * @generated from field: flyteidl2.artifact.ArtifactSource source = 6;
    */
   source?: ArtifactSource;
+
+  /**
+   * Optional lineage: the artifact version this one was derived from. Unset
+   * means no declared parent, which is the normal case for a first version or
+   * an independently produced one.
+   *
+   * The parent must live in this artifact's own org/project/domain; empty
+   * scope fields on the key inherit the artifact's own scope, and an empty
+   * key name inherits the artifact's own name — so a bare {version: "v1"}
+   * declares the previous version of this same artifact as parent. The name
+   * MAY differ, so lineage can express derivation across artifacts (a model
+   * deriving from a dataset version).
+   *
+   * Recording the parent explicitly is what makes version history a forest
+   * rather than a chain: a new version may branch off any earlier version, not
+   * just the most recently created one, so two versions derived from the same
+   * ancestor are siblings rather than one appearing to descend from the other.
+   *
+   * Stored as given and never resolved: the referenced version is not required
+   * to exist (publication order is not guaranteed), so readers walking lineage
+   * must tolerate a dangling parent. Immutable after creation.
+   *
+   * @generated from field: flyteidl2.core.ArtifactVersionId parent_artifact = 7;
+   */
+  parentArtifact?: ArtifactVersionId;
 };
 
 /**

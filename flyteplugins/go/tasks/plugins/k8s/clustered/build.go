@@ -110,6 +110,23 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 		},
 	}
 
+	if spec.GetFailurePolicy().GetRestartOnHostMaintenance() {
+		// Fail the Job with reason PodFailurePolicy when a pod is terminated by an
+		// involuntary disruption (DisruptionTarget: drain, eviction API, preemption,
+		// taint eviction). The net effect matches backoffLimit=0, but the distinct
+		// failure reason lets the JobSet failurePolicy rule (failure.go) restart the
+		// set without charging maxRestarts. Requires RestartPolicyNever (set above).
+		jobSpec.PodFailurePolicy = &batchv1.PodFailurePolicy{
+			Rules: []batchv1.PodFailurePolicyRule{{
+				Action: batchv1.PodFailurePolicyActionFailJob,
+				OnPodConditions: []batchv1.PodFailurePolicyOnPodConditionsPattern{{
+					Type:   corev1.DisruptionTarget,
+					Status: corev1.ConditionTrue,
+				}},
+			}},
+		}
+	}
+
 	failurePolicy, err := buildFailurePolicy(&spec)
 	if err != nil {
 		return nil, err

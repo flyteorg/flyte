@@ -19,11 +19,13 @@ func Start(
 	ctx context.Context,
 	triggerRepo interfaces.TriggerRepo,
 	cfg config.TriggerSchedulerConfig,
+	httpClient connect.HTTPClient,
 	baseURL string,
 	clientOpts ...connect.ClientOption,
 ) func(ctx context.Context) error {
 	exec := executor.NewTriggerExecutor(executor.TriggerExecutorConfig{
 		BaseURL:    baseURL,
+		HTTPClient: httpClient,
 		QPS:        cfg.ExecutionQPS,
 		Burst:      cfg.ExecutionBurst,
 		ClientOpts: clientOpts,

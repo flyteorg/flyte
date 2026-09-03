@@ -4,41 +4,74 @@ on:
   push:
     tags:
       - 'v*'
+  # Re-publish an existing tag whose tag-push run failed (e.g. before npm
+  # trusted publishing was configured). The workflow definition is taken from
+  # the ref the dispatch runs on; the package content comes from the tag.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing vX.Y.Z tag to publish (tag name only; resolved under refs/tags/)"
+        required: true
+        type: string
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/flyteorg/flyte/ci:v2
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+    # npm trusted publishing: the job authenticates to registry.npmjs.org with
+    # a GitHub OIDC token instead of a long-lived NPM_TOKEN secret. Requires
+    # the @flyteorg/flyteidl2 package on npmjs.com to list this repository and
+    # workflow file as a trusted publisher.
+    permissions:
+      contents: read
+      id-token: write
     defaults:
       run:
         working-directory: ./gen/ts/
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Debug Info
-        run: |
-          pwd
-          ls -la
-      - uses: actions/setup-node@v1
         with:
-          node-version: "20.x"
+          # Dispatch runs always resolve under the tag namespace, keyed on the
+          # event (not input truthiness) so an empty input yields "refs/tags/"
+          # and fails the checkout rather than falling back to the branch ref.
+          # A branch name or SHA cannot be published either: checkout fails
+          # fast unless refs/tags/<input> exists. Tag-push runs use the
+          # pushed ref.
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.x"
           registry-url: "https://registry.npmjs.org"
-      - name: Set version in npm package
-        run: |
-          # v1.2.3 get 1.2.3
-          VERSION=$(echo "${GITHUB_REF#refs/tags/v}")
-          VERSION=$VERSION make update_npmversion
-        shell: bash
-
+      - name: Update npm
+        # Trusted publishing needs npm >= 11.5.1; stay within major 11 so the
+        # publish behavior does not shift under us.
+        run: npm install -g npm@11 && npm --version
       - name: Install dependencies
-        run: npm install
-      - name: Publish
+        # Before the version stamp below: npm ci verifies package.json against
+        # the lockfile, which still carries the 0.0.0-develop placeholder.
+        run: npm ci
+      - name: Set version in npm package
+        # The dispatch input reaches the shell through env, never by expression
+        # interpolation into the script, so quotes/newlines in it cannot inject
+        # shell. Empty on tag-push runs, where the pushed ref carries the tag.
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          TAG_INPUT: ${{ inputs.tag }}
         run: |
-          NPM_REGISTRY_URL="https://registry.npmjs.org/"
-          npm publish --access=public --registry $NPM_REGISTRY_URL
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            # Keyed on the event, matching the checkout above: an empty input
+            # must fail here, never fall back to the branch ref.
+            [ -n "$TAG_INPUT" ] || { echo "inputs.tag must be a vX.Y.Z tag"; exit 1; }
+            REF="$TAG_INPUT"
+          else
+            REF="$GITHUB_REF"
+          fi
+          # v1.2.3 get 1.2.3
+          VERSION="${REF#refs/tags/}"
+          VERSION="${VERSION#v}"
+          VERSION="$VERSION" make update_npmversion
+        shell: bash
+      - name: Publish
+        # No NODE_AUTH_TOKEN on purpose: with a trusted publisher configured,
+        # npm exchanges the workflow's OIDC token for publish credentials and
+        # attaches provenance automatically.
+        run: npm publish --access=public

@@ -3,6 +3,14 @@
 
 # Data Proxy Configuration
 dataproxy:
+  server:
+    host: "0.0.0.0"
+    port: 8088
+
+  # Runs service used for run, task, trigger, and project requests.
+  runService:
+    url: "http://localhost:8090"
+
   upload:
     # Maximum size for uploads (100MB)
     maxSize: "100Mi"

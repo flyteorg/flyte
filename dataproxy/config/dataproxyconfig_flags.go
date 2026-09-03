@@ -50,10 +50,20 @@ func (DataProxyConfig) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg DataProxyConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("DataProxyConfig", pflag.ExitOnError)
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "server.port"), defaultConfig.Server.Port, "Port to bind the HTTP server")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "server.host"), defaultConfig.Server.Host, "Host to bind the HTTP server")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "upload.maxSize"), defaultConfig.Upload.MaxSize.String(), "Maximum allowed upload size.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "upload.maxExpiresIn"), defaultConfig.Upload.MaxExpiresIn.String(), "Maximum allowed expiration duration.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "upload.defaultFileNameLength"), defaultConfig.Upload.DefaultFileNameLength, "Default length for the generated file name if file name not provided in the request.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "upload.storagePrefix"), defaultConfig.Upload.StoragePrefix, "Storage prefix to use for all upload requests.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "download.maxExpiresIn"), defaultConfig.Download.MaxExpiresIn.String(), "Maximum allowed expiration duration.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.url"), defaultConfig.RunService.URL, "Runs service base URL")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.type"), string(defaultConfig.RunService.Auth.Type), "Runs service authentication type")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.issuerUrl"), defaultConfig.RunService.Auth.IssuerURL, "Runs service OAuth 2.0 issuer URL")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.clientId"), defaultConfig.RunService.Auth.ClientID, "Runs service OAuth 2.0 client ID")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.clientSecret"), defaultConfig.RunService.Auth.ClientSecret, "Runs service OAuth 2.0 client secret")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.clientSecretFile"), defaultConfig.RunService.Auth.ClientSecretFile, "File containing the Runs service OAuth 2.0 client secret")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "runService.auth.scopes"), defaultConfig.RunService.Auth.Scopes, "Runs service OAuth 2.0 scopes")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.audience"), defaultConfig.RunService.Auth.Audience, "Runs service OAuth 2.0 token audience")
 	return cmdFlags
 }

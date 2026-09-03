@@ -9184,8 +9184,8 @@ metadata:
 spec:
   redirectRegex:
     permanent: false
-    regex: ^(https?://[^/]+)/?$
-    replacement: ${1}/v2
+    regex: ^https?://[^/]+/?$
+    replacement: /v2
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration

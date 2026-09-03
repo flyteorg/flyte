@@ -214,6 +214,13 @@ message TaskMetadata {
   // If true, the backend extracts artifact metadata stamped on this task's
   // output literals and records them as generated artifacts on the action.
   bool produces_artifacts = 23;
+
+  // Maximum age of a cached result that this task will reuse.
+  // If unset, the platform default is used. Zero allows cached results to be
+  // reused regardless of age. This policy is not stored with cached results.
+  google.protobuf.Duration cache_max_age = 24 [(buf.validate.field).duration = {
+    gte: {seconds: 0}
+  }];
 }
 
 // ReusePolicy configures reuse of a task's execution environment across invocations, so

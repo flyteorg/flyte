@@ -138,6 +138,24 @@ func TestConvertProtoFilters_DisallowedColumn(t *testing.T) {
 	assert.Contains(t, err.Error(), "invalid filter field")
 }
 
+func TestConvertProtoFilters_ActionTypeColumn(t *testing.T) {
+	protoFilters := []*common.Filter{
+		{
+			Field:    "action_type",
+			Function: common.Filter_EQUAL,
+			Values:   []string{"3"},
+		},
+	}
+
+	filter, err := ConvertProtoFilters(protoFilters, models.ActionColumnsSet)
+	require.NoError(t, err)
+
+	expr, err := filter.QueryExpression("")
+	require.NoError(t, err)
+	assert.Equal(t, "action_type = ?", expr.Query)
+	assert.Equal(t, []interface{}{"3"}, expr.Args)
+}
+
 func TestConvertProtoFilters_EmptyList(t *testing.T) {
 	filter, err := ConvertProtoFilters([]*common.Filter{}, sets.New[string]())
 	require.NoError(t, err)

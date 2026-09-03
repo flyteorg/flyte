@@ -31,6 +31,13 @@ service ArtifactService {
   rpc ListArtifactNames(ListArtifactNamesRequest) returns (ListArtifactNamesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
+  // List the distinct user_metadata keys seen on recently created artifacts
+  // within a project, for filter suggestions. Keys only, never values; the
+  // set is sorted, capped, and may be served from a short-lived cache.
+  rpc ListArtifactMetadataKeys(ListArtifactMetadataKeysRequest) returns (ListArtifactMetadataKeysResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 // request message for creating an artifact.
@@ -67,7 +74,12 @@ message GetArtifactResponse {
 message ListArtifactsRequest {
   // Common list request parameters (limit, token, filters).
   // Supported filters: field "name" with CONTAINS,
-  // field "created_at" with GREATER_THAN (RFC3339 timestamp value).
+  // field "created_at" with GREATER_THAN (RFC3339 timestamp value),
+  // and the pair "parent_name" + "parent_version", each with EQUAL and always
+  // together, which lists the versions (of any name in the project) that
+  // declare the given artifact version as their parent — the downward
+  // direction of lineage, which the stored pointer alone cannot be followed
+  // in.
   common.ListRequest request = 1;
 
   // Project scope for the listing. organization is stamped by the server.
@@ -112,4 +124,17 @@ message ListArtifactNamesResponse {
 
   // Pagination token for the next page; empty when exhausted.
   string token = 2;
+}
+
+// request message for listing distinct user_metadata keys.
+message ListArtifactMetadataKeysRequest {
+  // Project scope for the listing. organization is stamped by the server.
+  common.ProjectIdentifier project_id = 1 [(buf.validate.field).required = true];
+}
+
+// response message for listing distinct user_metadata keys.
+message ListArtifactMetadataKeysResponse {
+  // Sorted, deduplicated keys. Capped server-side; reflects a recent window of
+  // artifacts, so keys only present on older versions may be absent.
+  repeated string keys = 1;
 }

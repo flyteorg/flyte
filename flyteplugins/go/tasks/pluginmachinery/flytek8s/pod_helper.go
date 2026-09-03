@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/golang/protobuf/proto" //nolint: staticcheck
@@ -25,8 +26,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 
-	// TODO @pvditt fix
-	//propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -39,6 +38,16 @@ const SIGKILL = 137
 
 // unsignedSIGKILL = 256 - 9
 const unsignedSIGKILL = 247
+
+// ContainerFailed is reported when the task's container exited with a non-zero status of its own
+// accord and the container runtime gave no more specific reason.
+const ContainerFailed = "ContainerFailed"
+
+// maxUserExitCode is the highest exit status attributable to the application itself. A process
+// killed by signal N is reported as 128+N, so the band above 127 means something terminated the
+// process rather than the process choosing to fail. Graceful eviction, drain and preemption all
+// send SIGTERM first, which surfaces as 143.
+const maxUserExitCode = 127
 
 const defaultContainerTemplateName = "default"
 const defaultInitContainerTemplateName = "default-init"
@@ -590,6 +599,41 @@ func hasExternalLinkType(taskTemplate *core.TaskTemplate) bool {
 	return exists
 }
 
+// PodSpecMutator is a hook applied to every pod spec built through
+// ApplyFlytePodConfiguration, after its own construction and template merging.
+// Individual plugins may still adapt the returned spec afterward (e.g. translate
+// it into CRD fields), which can drop mutator changes. Mutators let embedding
+// applications extend pod construction without forking this package. A mutator
+// must be idempotent: the same spec may pass through pod construction more than
+// once.
+type PodSpecMutator func(spec *v1.PodSpec, primaryContainerName string) error
+
+var podSpecMutators struct {
+	m        sync.Mutex
+	mutators []PodSpecMutator
+}
+
+// RegisterPodSpecMutator registers a mutator applied to every pod spec built by
+// ApplyFlytePodConfiguration. Register at startup, before any pods are built.
+func RegisterPodSpecMutator(mutator PodSpecMutator) {
+	podSpecMutators.m.Lock()
+	defer podSpecMutators.m.Unlock()
+	podSpecMutators.mutators = append(podSpecMutators.mutators, mutator)
+}
+
+func applyPodSpecMutators(spec *v1.PodSpec, primaryContainerName string) error {
+	podSpecMutators.m.Lock()
+	mutators := podSpecMutators.mutators
+	podSpecMutators.m.Unlock()
+
+	for _, mutate := range mutators {
+		if err := mutate(spec, primaryContainerName); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // ApplyFlytePodConfiguration updates the PodSpec and ObjectMeta with various Flyte configuration. This includes
 // applying default k8s configuration, applying overrides (resources etc.), injecting copilot containers, and merging with the
 // configuration PodTemplate (if exists).
@@ -687,11 +731,6 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		return nil, nil, err
 	}
 
-	// TODO @pvditt
-	//if propellerCfg.GetConfig().AcceleratedInputs.Enabled {
-	//	ApplyAcceleratedInputsSpec(podSpec, primaryContainerName)
-	//}
-
 	// GPU accelerator
 	if extendedResources.GetGpuAccelerator() != nil {
 		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
@@ -716,6 +755,11 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	// Override container image if necessary
 	if len(tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage()) > 0 {
 		ApplyContainerImageOverride(podSpec, tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage(), primaryContainerName)
+	}
+
+	// apply registered pod spec mutators last so they observe the fully built spec
+	if err := applyPodSpecMutators(podSpec, primaryContainerName); err != nil {
+		return nil, nil, err
 	}
 
 	return podSpec, objectMeta, nil
@@ -1154,30 +1198,6 @@ func applyAcceleratorDeviceClassPodTemplate(
 	return mergedPodSpec, nil
 }
 
-// TODO @pvditt
-//func ApplyAcceleratedInputsSpec(spec *v1.PodSpec, primaryName string) {
-//	cfg := propellerCfg.GetConfig().AcceleratedInputs
-//	hostPathType := v1.HostPathDirectory
-//	spec.Volumes = append(spec.Volumes, v1.Volume{
-//		Name: "union-persistent-data-volume",
-//		VolumeSource: v1.VolumeSource{
-//			HostPath: &v1.HostPathVolumeSource{
-//				Path: cfg.VolumePath,
-//				Type: &hostPathType,
-//			},
-//		},
-//	})
-//	for i, cont := range spec.Containers {
-//		if cont.Name == primaryName {
-//			spec.Containers[i].VolumeMounts = append(cont.VolumeMounts, v1.VolumeMount{
-//				Name:      "union-persistent-data-volume",
-//				ReadOnly:  true,
-//				MountPath: cfg.LocalPathPrefix,
-//			})
-//		}
-//	}
-//}
-
 func BuildIdentityPod() *v1.Pod {
 	return &v1.Pod{
 		TypeMeta: metav1.TypeMeta{
@@ -1604,16 +1624,39 @@ func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore
 		}
 	}
 
+	// A container that exited non-zero on its own is the application reporting failure, not the
+	// missing kubelet record the fallback below assumes. Only main containers are considered: the
+	// co-pilot runs as init containers. When a pod has exactly one main container, that
+	// container's exit status is taken as the task's result.
+	if code == "UnknownError" && len(status.ContainerStatuses) == 1 {
+		if t := status.ContainerStatuses[0].State.Terminated; t != nil &&
+			t.ExitCode > 0 && t.ExitCode <= maxUserExitCode {
+			if t.Reason != "" {
+				code = t.Reason
+			} else {
+				code = ContainerFailed
+			}
+		}
+	}
+
 	// If the code remains 'UnknownError', it indicates that the kubelet did not have a chance
 	// to record a more specific failure before the node was terminated or preempted.
-	// In such cases, we classify the error as system-level and accept false positives
+	// In such cases, we classify the error as system-level and accept false positives.
+	// The node vanishing is an interruption, and 'UnknownError' says nothing to the user,
+	// so the code is replaced rather than kept.
 	if code == "UnknownError" {
 		isSystemError = true
+		code = Interrupted
 	}
 
 	if isSystemError {
 		logger.Warnf(ctx, "Pod failed with a system error. Code: %s, Message: %s", code, message)
-		return pluginsCore.PhaseInfoSystemRetryableFailure(Interrupted, message, &info), nil
+		// Report the code we worked out rather than flattening every system error to
+		// 'Interrupted'. A retryable status reason such as 'Shutdown' or 'NodeShutdown'
+		// tells the user what actually happened to the node, and it is the only place
+		// that information exists by the time the failure reaches them. The SIGKILL and
+		// vanished-node branches above set 'Interrupted' on purpose and still report it.
+		return pluginsCore.PhaseInfoSystemRetryableFailure(code, message, &info), nil
 	}
 
 	logger.Warnf(ctx, "Pod failed with a user error. Code: %s, Message: %s", code, message)

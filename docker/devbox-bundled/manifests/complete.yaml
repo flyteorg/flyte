@@ -7836,7 +7836,8 @@ data:
         namespace: 'flyte'
         qps: 100
         timeout: 30s
-      webhookURL: http://flyte-binary-webhook-headless.flyte.svc:9444
+      webhook:
+        url: http://flyte-binary-webhook-headless.flyte.svc:9444
   001-plugins.yaml: |
     tasks:
       task-plugins:
@@ -9787,8 +9788,8 @@ metadata:
 spec:
   redirectRegex:
     permanent: false
-    regex: ^(https?://[^/]+)/?$
-    replacement: ${1}/v2
+    regex: ^https?://[^/]+/?$
+    replacement: /v2
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration

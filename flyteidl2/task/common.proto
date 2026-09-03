@@ -149,6 +149,15 @@ message ProducedArtifact {
   // The declared Flyte type of the output, copied into ArtifactSpec.type.
   // The producing SDK is authoritative for this.
   flyteidl2.core.LiteralType type = 5;
+
+  // Optional artifact version the produced version was derived from, copied
+  // verbatim into ArtifactSpec.parent_artifact. Set by the producing task when
+  // it derives a new version from one it consumed, so the resulting lineage
+  // branches instead of reading as a linear chain. Empty key fields inherit
+  // the produced artifact's own scope and name, so a bare {version: "v1"}
+  // declares the previous version of this same artifact as parent; a set name
+  // records cross-artifact derivation.
+  flyteidl2.core.ArtifactVersionId parent_artifact = 6;
 }
 
 // Output payload for an action.

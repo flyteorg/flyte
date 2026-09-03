@@ -17,7 +17,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/artifact/artifact_service.proto.
  */
 export const file_flyteidl2_artifact_artifact_service: GenFile = /*@__PURE__*/
-  fileDesc("CilmbHl0ZWlkbDIvYXJ0aWZhY3QvYXJ0aWZhY3Rfc2VydmljZS5wcm90bxISZmx5dGVpZGwyLmFydGlmYWN0IpQBChVDcmVhdGVBcnRpZmFjdFJlcXVlc3QSQwoLYXJ0aWZhY3RfaWQYASABKAsyJi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RJZGVudGlmaWVyQga6SAPIAQESNgoEc3BlYxgCIAEoCzIgLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdFNwZWNCBrpIA8gBASJIChZDcmVhdGVBcnRpZmFjdFJlc3BvbnNlEi4KCGFydGlmYWN0GAEgASgLMhwuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0IngKEkdldEFydGlmYWN0UmVxdWVzdBI2CgRuYW1lGAEgASgLMiAuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0TmFtZUIGukgDyAEBEh4KB3ZlcnNpb24YAiABKAlCCLpIBXIDGP8BSACIAQFCCgoIX3ZlcnNpb24iRQoTR2V0QXJ0aWZhY3RSZXNwb25zZRIuCghhcnRpZmFjdBgBIAEoCzIcLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdCKtAQoUTGlzdEFydGlmYWN0c1JlcXVlc3QSLgoHcmVxdWVzdBgBIAEoCzIdLmZseXRlaWRsMi5jb21tb24uTGlzdFJlcXVlc3QSPwoKcHJvamVjdF9pZBgCIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJCBrpIA8gBARIbCgRuYW1lGAMgASgJQgi6SAVyAxj/AUgAiAEBQgcKBV9uYW1lIlcKFUxpc3RBcnRpZmFjdHNSZXNwb25zZRIvCglhcnRpZmFjdHMYASADKAsyHC5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3QSDQoFdG9rZW4YAiABKAkiiwEKGExpc3RBcnRpZmFjdE5hbWVzUmVxdWVzdBIuCgdyZXF1ZXN0GAEgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5MaXN0UmVxdWVzdBI/Cgpwcm9qZWN0X2lkGAIgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckIGukgDyAEBIk8KDUFydGlmYWN0R3JvdXASLAoGbGF0ZXN0GAEgASgLMhwuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0EhAKCHZlcnNpb25zGAIgASgEIl0KGUxpc3RBcnRpZmFjdE5hbWVzUmVzcG9uc2USMQoGZ3JvdXBzGAEgAygLMiEuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0R3JvdXASDQoFdG9rZW4YAiABKAkywwMKD0FydGlmYWN0U2VydmljZRJpCg5DcmVhdGVBcnRpZmFjdBIpLmZseXRlaWRsMi5hcnRpZmFjdC5DcmVhdGVBcnRpZmFjdFJlcXVlc3QaKi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQ3JlYXRlQXJ0aWZhY3RSZXNwb25zZSIAEmMKC0dldEFydGlmYWN0EiYuZmx5dGVpZGwyLmFydGlmYWN0LkdldEFydGlmYWN0UmVxdWVzdBonLmZseXRlaWRsMi5hcnRpZmFjdC5HZXRBcnRpZmFjdFJlc3BvbnNlIgOQAgESaQoNTGlzdEFydGlmYWN0cxIoLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RzUmVxdWVzdBopLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RzUmVzcG9uc2UiA5ACARJ1ChFMaXN0QXJ0aWZhY3ROYW1lcxIsLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3ROYW1lc1JlcXVlc3QaLS5mbHl0ZWlkbDIuYXJ0aWZhY3QuTGlzdEFydGlmYWN0TmFtZXNSZXNwb25zZSIDkAIBQtEBChZjb20uZmx5dGVpZGwyLmFydGlmYWN0QhRBcnRpZmFjdFNlcnZpY2VQcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9hcnRpZmFjdKICA0ZBWKoCEkZseXRlaWRsMi5BcnRpZmFjdMoCEkZseXRlaWRsMlxBcnRpZmFjdOICHkZseXRlaWRsMlxBcnRpZmFjdFxHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6QXJ0aWZhY3RiBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_artifact_artifact, file_flyteidl2_common_identifier, file_flyteidl2_common_list]);
+  fileDesc("CilmbHl0ZWlkbDIvYXJ0aWZhY3QvYXJ0aWZhY3Rfc2VydmljZS5wcm90bxISZmx5dGVpZGwyLmFydGlmYWN0IpQBChVDcmVhdGVBcnRpZmFjdFJlcXVlc3QSQwoLYXJ0aWZhY3RfaWQYASABKAsyJi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RJZGVudGlmaWVyQga6SAPIAQESNgoEc3BlYxgCIAEoCzIgLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdFNwZWNCBrpIA8gBASJIChZDcmVhdGVBcnRpZmFjdFJlc3BvbnNlEi4KCGFydGlmYWN0GAEgASgLMhwuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0IngKEkdldEFydGlmYWN0UmVxdWVzdBI2CgRuYW1lGAEgASgLMiAuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0TmFtZUIGukgDyAEBEh4KB3ZlcnNpb24YAiABKAlCCLpIBXIDGP8BSACIAQFCCgoIX3ZlcnNpb24iRQoTR2V0QXJ0aWZhY3RSZXNwb25zZRIuCghhcnRpZmFjdBgBIAEoCzIcLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdCKtAQoUTGlzdEFydGlmYWN0c1JlcXVlc3QSLgoHcmVxdWVzdBgBIAEoCzIdLmZseXRlaWRsMi5jb21tb24uTGlzdFJlcXVlc3QSPwoKcHJvamVjdF9pZBgCIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJCBrpIA8gBARIbCgRuYW1lGAMgASgJQgi6SAVyAxj/AUgAiAEBQgcKBV9uYW1lIlcKFUxpc3RBcnRpZmFjdHNSZXNwb25zZRIvCglhcnRpZmFjdHMYASADKAsyHC5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3QSDQoFdG9rZW4YAiABKAkiiwEKGExpc3RBcnRpZmFjdE5hbWVzUmVxdWVzdBIuCgdyZXF1ZXN0GAEgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5MaXN0UmVxdWVzdBI/Cgpwcm9qZWN0X2lkGAIgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckIGukgDyAEBIk8KDUFydGlmYWN0R3JvdXASLAoGbGF0ZXN0GAEgASgLMhwuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0EhAKCHZlcnNpb25zGAIgASgEIl0KGUxpc3RBcnRpZmFjdE5hbWVzUmVzcG9uc2USMQoGZ3JvdXBzGAEgAygLMiEuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0R3JvdXASDQoFdG9rZW4YAiABKAkiYgofTGlzdEFydGlmYWN0TWV0YWRhdGFLZXlzUmVxdWVzdBI/Cgpwcm9qZWN0X2lkGAEgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckIGukgDyAEBIjAKIExpc3RBcnRpZmFjdE1ldGFkYXRhS2V5c1Jlc3BvbnNlEgwKBGtleXMYASADKAky0AQKD0FydGlmYWN0U2VydmljZRJpCg5DcmVhdGVBcnRpZmFjdBIpLmZseXRlaWRsMi5hcnRpZmFjdC5DcmVhdGVBcnRpZmFjdFJlcXVlc3QaKi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQ3JlYXRlQXJ0aWZhY3RSZXNwb25zZSIAEmMKC0dldEFydGlmYWN0EiYuZmx5dGVpZGwyLmFydGlmYWN0LkdldEFydGlmYWN0UmVxdWVzdBonLmZseXRlaWRsMi5hcnRpZmFjdC5HZXRBcnRpZmFjdFJlc3BvbnNlIgOQAgESaQoNTGlzdEFydGlmYWN0cxIoLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RzUmVxdWVzdBopLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RzUmVzcG9uc2UiA5ACARJ1ChFMaXN0QXJ0aWZhY3ROYW1lcxIsLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3ROYW1lc1JlcXVlc3QaLS5mbHl0ZWlkbDIuYXJ0aWZhY3QuTGlzdEFydGlmYWN0TmFtZXNSZXNwb25zZSIDkAIBEooBChhMaXN0QXJ0aWZhY3RNZXRhZGF0YUtleXMSMy5mbHl0ZWlkbDIuYXJ0aWZhY3QuTGlzdEFydGlmYWN0TWV0YWRhdGFLZXlzUmVxdWVzdBo0LmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RNZXRhZGF0YUtleXNSZXNwb25zZSIDkAIBQtEBChZjb20uZmx5dGVpZGwyLmFydGlmYWN0QhRBcnRpZmFjdFNlcnZpY2VQcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9hcnRpZmFjdKICA0ZBWKoCEkZseXRlaWRsMi5BcnRpZmFjdMoCEkZseXRlaWRsMlxBcnRpZmFjdOICHkZseXRlaWRsMlxBcnRpZmFjdFxHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6QXJ0aWZhY3RiBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_artifact_artifact, file_flyteidl2_common_identifier, file_flyteidl2_common_list]);
 
 /**
  * request message for creating an artifact.
@@ -125,7 +125,12 @@ export type ListArtifactsRequest = Message<"flyteidl2.artifact.ListArtifactsRequ
   /**
    * Common list request parameters (limit, token, filters).
    * Supported filters: field "name" with CONTAINS,
-   * field "created_at" with GREATER_THAN (RFC3339 timestamp value).
+   * field "created_at" with GREATER_THAN (RFC3339 timestamp value),
+   * and the pair "parent_name" + "parent_version", each with EQUAL and always
+   * together, which lists the versions (of any name in the project) that
+   * declare the given artifact version as their parent — the downward
+   * direction of lineage, which the stored pointer alone cannot be followed
+   * in.
    *
    * @generated from field: flyteidl2.common.ListRequest request = 1;
    */
@@ -265,6 +270,49 @@ export const ListArtifactNamesResponseSchema: GenMessage<ListArtifactNamesRespon
   messageDesc(file_flyteidl2_artifact_artifact_service, 8);
 
 /**
+ * request message for listing distinct user_metadata keys.
+ *
+ * @generated from message flyteidl2.artifact.ListArtifactMetadataKeysRequest
+ */
+export type ListArtifactMetadataKeysRequest = Message<"flyteidl2.artifact.ListArtifactMetadataKeysRequest"> & {
+  /**
+   * Project scope for the listing. organization is stamped by the server.
+   *
+   * @generated from field: flyteidl2.common.ProjectIdentifier project_id = 1;
+   */
+  projectId?: ProjectIdentifier;
+};
+
+/**
+ * Describes the message flyteidl2.artifact.ListArtifactMetadataKeysRequest.
+ * Use `create(ListArtifactMetadataKeysRequestSchema)` to create a new message.
+ */
+export const ListArtifactMetadataKeysRequestSchema: GenMessage<ListArtifactMetadataKeysRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact_service, 9);
+
+/**
+ * response message for listing distinct user_metadata keys.
+ *
+ * @generated from message flyteidl2.artifact.ListArtifactMetadataKeysResponse
+ */
+export type ListArtifactMetadataKeysResponse = Message<"flyteidl2.artifact.ListArtifactMetadataKeysResponse"> & {
+  /**
+   * Sorted, deduplicated keys. Capped server-side; reflects a recent window of
+   * artifacts, so keys only present on older versions may be absent.
+   *
+   * @generated from field: repeated string keys = 1;
+   */
+  keys: string[];
+};
+
+/**
+ * Describes the message flyteidl2.artifact.ListArtifactMetadataKeysResponse.
+ * Use `create(ListArtifactMetadataKeysResponseSchema)` to create a new message.
+ */
+export const ListArtifactMetadataKeysResponseSchema: GenMessage<ListArtifactMetadataKeysResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact_service, 10);
+
+/**
  * ArtifactService provides a minimal interface for publishing and retrieving
  * typed artifacts.
  *
@@ -312,6 +360,18 @@ export const ArtifactService: GenService<{
     methodKind: "unary";
     input: typeof ListArtifactNamesRequestSchema;
     output: typeof ListArtifactNamesResponseSchema;
+  },
+  /**
+   * List the distinct user_metadata keys seen on recently created artifacts
+   * within a project, for filter suggestions. Keys only, never values; the
+   * set is sorted, capped, and may be served from a short-lived cache.
+   *
+   * @generated from rpc flyteidl2.artifact.ArtifactService.ListArtifactMetadataKeys
+   */
+  listArtifactMetadataKeys: {
+    methodKind: "unary";
+    input: typeof ListArtifactMetadataKeysRequestSchema;
+    output: typeof ListArtifactMetadataKeysResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_flyteidl2_artifact_artifact_service, 0);

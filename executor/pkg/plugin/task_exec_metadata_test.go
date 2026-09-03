@@ -1,17 +1,20 @@
 package plugin
 
 import (
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/util/validation"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	flytesecret "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
@@ -178,4 +181,90 @@ func TestNewTaskExecutionMetadata_ManagedLabel(t *testing.T) {
 		require.Equal(t, flytek8s.ManagedLabelValue,
 			meta.GetLabels()[flytek8s.ManagedLabelKey])
 	})
+}
+
+func TestNewTaskExecutionMetadata_StampsIdentifyingLabels(t *testing.T) {
+	taskTemplate, err := proto.Marshal(&core.TaskTemplate{
+		Id: &core.Identifier{Name: "my_module.my_task"},
+	})
+	require.NoError(t, err)
+
+	taskAction := &flyteorgv1.TaskAction{
+		Spec: flyteorgv1.TaskActionSpec{
+			Project:       "project",
+			Domain:        "development",
+			RunName:       "run-name",
+			ActionName:    "action-name",
+			RunOutputBase: "s3://bucket/run",
+			TaskTemplate:  taskTemplate,
+		},
+		Status: flyteorgv1.TaskActionStatus{Attempts: 3},
+	}
+
+	meta, err := NewTaskExecutionMetadata(taskAction)
+	require.NoError(t, err)
+
+	labels := meta.GetLabels()
+	require.Equal(t, "run-name", labels[RunLabel])
+	require.Equal(t, "action-name", labels[ActionLabel])
+	// Attempts are 1-based, and the third attempt is the second retry.
+	require.Equal(t, "3", labels[AttemptLabel])
+	require.Equal(t, "my_module.my_task", labels[TaskNameLabel])
+
+	// The labels injected for secret scoping are still there.
+	require.Equal(t, "project", labels[flytesecret.ProjectLabel])
+	require.Equal(t, "development", labels[flytesecret.DomainLabel])
+}
+
+func TestNewTaskExecutionMetadata_LabelsAreSanitizedAndOptional(t *testing.T) {
+	longName := strings.Repeat("a", 70)
+	taskTemplate, err := proto.Marshal(&core.TaskTemplate{
+		Id: &core.Identifier{Name: longName},
+	})
+	require.NoError(t, err)
+
+	taskAction := &flyteorgv1.TaskAction{
+		Spec: flyteorgv1.TaskActionSpec{
+			Project:      "project",
+			Domain:       "development",
+			RunName:      "run/name:with bad chars",
+			TaskTemplate: taskTemplate,
+		},
+	}
+
+	meta, err := NewTaskExecutionMetadata(taskAction)
+	require.NoError(t, err)
+
+	labels := meta.GetLabels()
+	require.Equal(t, "run-name-with-bad-chars", labels[RunLabel])
+	require.Len(t, labels[TaskNameLabel], 63)
+	// A first attempt that has not been recorded yet still reads as attempt 1.
+	require.Equal(t, "1", labels[AttemptLabel])
+	// An empty action name is left unstamped rather than stamped blank.
+	require.NotContains(t, labels, ActionLabel)
+
+	for key, value := range labels {
+		require.Empty(t, validation.IsValidLabelValue(value), "label %s has invalid value %q", key, value)
+	}
+}
+
+func TestNewTaskExecutionMetadata_CRDLabelsDoNotClobberIdentifyingLabels(t *testing.T) {
+	taskAction := &flyteorgv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{RunLabel: "spoofed", "team": "data"},
+		},
+		Spec: flyteorgv1.TaskActionSpec{
+			Project:    "project",
+			Domain:     "development",
+			RunName:    "run-name",
+			ActionName: "action-name",
+		},
+	}
+
+	meta, err := NewTaskExecutionMetadata(taskAction)
+	require.NoError(t, err)
+
+	labels := meta.GetLabels()
+	require.Equal(t, "run-name", labels[RunLabel])
+	require.Equal(t, "data", labels["team"])
 }

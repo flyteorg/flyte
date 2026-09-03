@@ -2387,6 +2387,10 @@
         "produces_artifacts": {
           "type": "boolean",
           "description": "If true, the backend extracts artifact metadata stamped on this task's\noutput literals and records them as generated artifacts on the action."
+        },
+        "cache_max_age": {
+          "type": "string",
+          "description": "Maximum age of a cached result that this task will reuse.\nIf unset, the platform default is used. Zero allows cached results to be\nreused regardless of age. This policy is not stored with cached results."
         }
       },
       "title": "Task Metadata"
@@ -2513,6 +2517,10 @@
         "type": {
           "$ref": "#/definitions/coreLiteralType",
           "description": "The declared Flyte type of the output, copied into ArtifactSpec.type.\nThe producing SDK is authoritative for this."
+        },
+        "parent_artifact": {
+          "$ref": "#/definitions/coreArtifactVersionId",
+          "description": "Optional artifact version the produced version was derived from, copied\nverbatim into ArtifactSpec.parent_artifact. Set by the producing task when\nit derives a new version from one it consumed, so the resulting lineage\nbranches instead of reading as a linear chain. Empty key fields inherit\nthe produced artifact's own scope and name, so a bare {version: \"v1\"}\ndeclares the previous version of this same artifact as parent; a set name\nrecords cross-artifact derivation."
         }
       },
       "description": "Declares that a named output of the producing action is a new artifact\nversion. The output's literal (in Outputs.literals) is the artifact's value;\norg/project/domain come from the producing action's scope at registration."

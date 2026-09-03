@@ -1,0 +1,71 @@
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "flyte-core.clusterRoleName" . }}
+  labels:
+    {{- include "flyte-core.labels" . | nindent 4 }}
+    {{- with .Values.rbac.labels }}
+    {{- tpl (toYaml .) $ | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.commonAnnotations .Values.rbac.annotations }}
+  annotations:
+    {{- with .Values.commonAnnotations }}
+    {{- tpl (toYaml .) $ | nindent 4 }}
+    {{- end }}
+    {{- with .Values.rbac.annotations }}
+    {{- tpl (toYaml .) $ | nindent 4 }}
+    {{- end }}
+  {{- end }}
+rules:
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["create", "get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["podtemplates"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["", "events.k8s.io"]
+    resources: ["events"]
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+  - apiGroups: ["flyte.org"]
+    resources: ["taskactions", "taskactions/status", "taskactions/finalizers"]
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+  - apiGroups: ["admissionregistration.k8s.io"]
+    resources: ["mutatingwebhookconfigurations"]
+    verbs: ["create", "get", "list", "patch", "update", "watch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+  - apiGroups: ["", "coordination.k8s.io"]
+    resources: ["configmaps", "leases"]
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+  {{- if .Values.components.app.enabled }}
+  - apiGroups: ["serving.knative.dev"]
+    resources: ["services", "revisions", "configurations", "routes"]
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+  {{- end }}
+  {{- with .Values.rbac.extraRules }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "flyte-core.resourceName" (dict "root" . "name" "cluster-role-binding") }}
+  labels:
+    {{- include "flyte-core.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "flyte-core.clusterRoleName" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "flyte-core.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace | quote }}
+{{- end }}

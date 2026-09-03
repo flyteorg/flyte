@@ -29,6 +29,9 @@ class ArtifactService(Protocol):
     async def list_artifact_names(self, request: flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactNamesRequest, ctx: RequestContext) -> flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactNamesResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def list_artifact_metadata_keys(self, request: flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysRequest, ctx: RequestContext) -> flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
 
 class ArtifactServiceASGIApplication(ConnectASGIApplication[ArtifactService]):
     def __init__(self, service: ArtifactService | AsyncGenerator[ArtifactService], *, interceptors: Iterable[Interceptor]=(), read_max_bytes: int | None = None, compressions: Iterable[Compression] | None = None) -> None:
@@ -74,6 +77,16 @@ class ArtifactServiceASGIApplication(ConnectASGIApplication[ArtifactService]):
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.list_artifact_names,
+                ),
+                "/flyteidl2.artifact.ArtifactService/ListArtifactMetadataKeys": Endpoint.unary(
+                    method=MethodInfo(
+                        name="ListArtifactMetadataKeys",
+                        service_name="flyteidl2.artifact.ArtifactService",
+                        input=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysRequest,
+                        output=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.list_artifact_metadata_keys,
                 ),
             },
             interceptors=interceptors,
@@ -174,6 +187,28 @@ class ArtifactServiceClient(ConnectClient):
             use_get=use_get,
         )
 
+    async def list_artifact_metadata_keys(
+        self,
+        request: flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListArtifactMetadataKeys",
+                service_name="flyteidl2.artifact.ArtifactService",
+                input=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysRequest,
+                output=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
 
 class ArtifactServiceSync(Protocol):
     def create_artifact(self, request: flyteidl2_dot_artifact_dot_artifact__service__pb2.CreateArtifactRequest, ctx: RequestContext) -> flyteidl2_dot_artifact_dot_artifact__service__pb2.CreateArtifactResponse:
@@ -183,6 +218,8 @@ class ArtifactServiceSync(Protocol):
     def list_artifacts(self, request: flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactsRequest, ctx: RequestContext) -> flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactsResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def list_artifact_names(self, request: flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactNamesRequest, ctx: RequestContext) -> flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactNamesResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def list_artifact_metadata_keys(self, request: flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysRequest, ctx: RequestContext) -> flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
@@ -229,6 +266,16 @@ class ArtifactServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.list_artifact_names,
+                ),
+                "/flyteidl2.artifact.ArtifactService/ListArtifactMetadataKeys": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="ListArtifactMetadataKeys",
+                        service_name="flyteidl2.artifact.ArtifactService",
+                        input=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysRequest,
+                        output=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.list_artifact_metadata_keys,
                 ),
             },
             interceptors=interceptors,
@@ -322,6 +369,28 @@ class ArtifactServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.artifact.ArtifactService",
                 input=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactNamesRequest,
                 output=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactNamesResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def list_artifact_metadata_keys(
+        self,
+        request: flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListArtifactMetadataKeys",
+                service_name="flyteidl2.artifact.ArtifactService",
+                input=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysRequest,
+                output=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysResponse,
                 idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,

@@ -15,7 +15,7 @@ from google.protobuf import duration_pb2 as google_dot_protobuf_dot_duration__pb
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1e\x66lyteidl2/core/execution.proto\x12\x0e\x66lyteidl2.core\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xa7\x01\n\x11WorkflowExecution\"\x91\x01\n\x05Phase\x12\r\n\tUNDEFINED\x10\x00\x12\n\n\x06QUEUED\x10\x01\x12\x0b\n\x07RUNNING\x10\x02\x12\x0e\n\nSUCCEEDING\x10\x03\x12\r\n\tSUCCEEDED\x10\x04\x12\x0b\n\x07\x46\x41ILING\x10\x05\x12\n\n\x06\x46\x41ILED\x10\x06\x12\x0b\n\x07\x41\x42ORTED\x10\x07\x12\r\n\tTIMED_OUT\x10\x08\x12\x0c\n\x08\x41\x42ORTING\x10\t\"\xb6\x01\n\rNodeExecution\"\xa4\x01\n\x05Phase\x12\r\n\tUNDEFINED\x10\x00\x12\n\n\x06QUEUED\x10\x01\x12\x0b\n\x07RUNNING\x10\x02\x12\r\n\tSUCCEEDED\x10\x03\x12\x0b\n\x07\x46\x41ILING\x10\x04\x12\n\n\x06\x46\x41ILED\x10\x05\x12\x0b\n\x07\x41\x42ORTED\x10\x06\x12\x0b\n\x07SKIPPED\x10\x07\x12\r\n\tTIMED_OUT\x10\x08\x12\x13\n\x0f\x44YNAMIC_RUNNING\x10\t\x12\r\n\tRECOVERED\x10\n\"\xac\x01\n\rTaskExecution\"\x9a\x01\n\x05Phase\x12\r\n\tUNDEFINED\x10\x00\x12\n\n\x06QUEUED\x10\x01\x12\x0b\n\x07RUNNING\x10\x02\x12\r\n\tSUCCEEDED\x10\x03\x12\x0b\n\x07\x41\x42ORTED\x10\x04\x12\n\n\x06\x46\x41ILED\x10\x05\x12\x10\n\x0cINITIALIZING\x10\x06\x12\x19\n\x15WAITING_FOR_RESOURCES\x10\x07\x12\x14\n\x10RETRYABLE_FAILED\x10\x08\"\xe8\x02\n\x0e\x45xecutionError\x12\x12\n\x04\x63ode\x18\x01 \x01(\tR\x04\x63ode\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\x12\x1b\n\terror_uri\x18\x03 \x01(\tR\x08\x65rrorUri\x12<\n\x04kind\x18\x04 \x01(\x0e\x32(.flyteidl2.core.ExecutionError.ErrorKindR\x04kind\x12\x38\n\ttimestamp\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\ttimestamp\x12\x16\n\x06worker\x18\x06 \x01(\tR\x06worker\x12K\n\x0erecoverability\x18\x07 \x01(\x0e\x32#.flyteidl2.core.ContainerError.KindR\x0erecoverability\".\n\tErrorKind\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x08\n\x04USER\x10\x01\x12\n\n\x06SYSTEM\x10\x02\"\xe7\x01\n\x0e\x43ontainerError\x12\x12\n\x04\x63ode\x18\x01 \x01(\tR\x04\x63ode\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\x12\x37\n\x04kind\x18\x03 \x01(\x0e\x32#.flyteidl2.core.ContainerError.KindR\x04kind\x12@\n\x06origin\x18\x04 \x01(\x0e\x32(.flyteidl2.core.ExecutionError.ErrorKindR\x06origin\",\n\x04Kind\x12\x13\n\x0fNON_RECOVERABLE\x10\x00\x12\x0f\n\x0bRECOVERABLE\x10\x01\"E\n\rErrorDocument\x12\x34\n\x05\x65rror\x18\x01 \x01(\x0b\x32\x1e.flyteidl2.core.ContainerErrorR\x05\x65rror\"\xd5\x03\n\x07TaskLog\x12\x10\n\x03uri\x18\x01 \x01(\tR\x03uri\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\x12L\n\x0emessage_format\x18\x03 \x01(\x0e\x32%.flyteidl2.core.TaskLog.MessageFormatR\rmessageFormat\x12+\n\x03ttl\x18\x04 \x01(\x0b\x32\x19.google.protobuf.DurationR\x03ttl\x12*\n\x10ShowWhilePending\x18\x05 \x01(\x08R\x10ShowWhilePending\x12*\n\x10HideOnceFinished\x18\x06 \x01(\x08R\x10HideOnceFinished\x12=\n\tlink_type\x18\x07 \x01(\x0e\x32 .flyteidl2.core.TaskLog.LinkTypeR\x08linkType\x12\x14\n\x05ready\x18\x08 \x01(\x08R\x05ready\x12\x19\n\x08icon_uri\x18\t \x01(\tR\x07iconUri\"/\n\rMessageFormat\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x07\n\x03\x43SV\x10\x01\x12\x08\n\x04JSON\x10\x02\"0\n\x08LinkType\x12\x0c\n\x08\x45XTERNAL\x10\x00\x12\r\n\tDASHBOARD\x10\x01\x12\x07\n\x03IDE\x10\x02\"\x84\x02\n\nLogContext\x12\x31\n\x04pods\x18\x01 \x03(\x0b\x32\x1d.flyteidl2.core.PodLogContextR\x04pods\x12(\n\x10primary_pod_name\x18\x02 \x01(\tR\x0eprimaryPodName\x12\x41\n\tconnector\x18\x03 \x01(\x0b\x32#.flyteidl2.core.ConnectorLogContextR\tconnector\x12*\n\x0fpod_name_prefix\x18\x04 \x01(\tB\x02\x18\x01R\rpodNamePrefix\x12*\n\x11pod_name_prefixes\x18\x05 \x03(\tR\x0fpodNamePrefixes\"1\n\x13\x43onnectorLogContext\x12\x1a\n\x08\x65ndpoint\x18\x01 \x01(\tR\x08\x65ndpoint\"\x8b\x02\n\rPodLogContext\x12\x1c\n\tnamespace\x18\x01 \x01(\tR\tnamespace\x12\x19\n\x08pod_name\x18\x02 \x01(\tR\x07podName\x12@\n\ncontainers\x18\x03 \x03(\x0b\x32 .flyteidl2.core.ContainerContextR\ncontainers\x12\x34\n\x16primary_container_name\x18\x04 \x01(\tR\x14primaryContainerName\x12I\n\x0finit_containers\x18\x05 \x03(\x0b\x32 .flyteidl2.core.ContainerContextR\x0einitContainers\"\xaf\x02\n\x10\x43ontainerContext\x12%\n\x0e\x63ontainer_name\x18\x01 \x01(\tR\rcontainerName\x12I\n\x07process\x18\x02 \x01(\x0b\x32/.flyteidl2.core.ContainerContext.ProcessContextR\x07process\x1a\xa8\x01\n\x0eProcessContext\x12L\n\x14\x63ontainer_start_time\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x12\x63ontainerStartTime\x12H\n\x12\x63ontainer_end_time\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x10\x63ontainerEndTime\"Z\n\x14QualityOfServiceSpec\x12\x42\n\x0fqueueing_budget\x18\x01 \x01(\x0b\x32\x19.google.protobuf.DurationR\x0equeueingBudget\"\xd0\x01\n\x10QualityOfService\x12;\n\x04tier\x18\x01 \x01(\x0e\x32%.flyteidl2.core.QualityOfService.TierH\x00R\x04tier\x12:\n\x04spec\x18\x02 \x01(\x0b\x32$.flyteidl2.core.QualityOfServiceSpecH\x00R\x04spec\"4\n\x04Tier\x12\r\n\tUNDEFINED\x10\x00\x12\x08\n\x04HIGH\x10\x01\x12\n\n\x06MEDIUM\x10\x02\x12\x07\n\x03LOW\x10\x03\x42\r\n\x0b\x64\x65signationB\xb3\x01\n\x12\x63om.flyteidl2.coreB\x0e\x45xecutionProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core\xa2\x02\x03\x46\x43X\xaa\x02\x0e\x46lyteidl2.Core\xca\x02\x0e\x46lyteidl2\\Core\xe2\x02\x1a\x46lyteidl2\\Core\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Coreb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1e\x66lyteidl2/core/execution.proto\x12\x0e\x66lyteidl2.core\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xa7\x01\n\x11WorkflowExecution\"\x91\x01\n\x05Phase\x12\r\n\tUNDEFINED\x10\x00\x12\n\n\x06QUEUED\x10\x01\x12\x0b\n\x07RUNNING\x10\x02\x12\x0e\n\nSUCCEEDING\x10\x03\x12\r\n\tSUCCEEDED\x10\x04\x12\x0b\n\x07\x46\x41ILING\x10\x05\x12\n\n\x06\x46\x41ILED\x10\x06\x12\x0b\n\x07\x41\x42ORTED\x10\x07\x12\r\n\tTIMED_OUT\x10\x08\x12\x0c\n\x08\x41\x42ORTING\x10\t\"\xb6\x01\n\rNodeExecution\"\xa4\x01\n\x05Phase\x12\r\n\tUNDEFINED\x10\x00\x12\n\n\x06QUEUED\x10\x01\x12\x0b\n\x07RUNNING\x10\x02\x12\r\n\tSUCCEEDED\x10\x03\x12\x0b\n\x07\x46\x41ILING\x10\x04\x12\n\n\x06\x46\x41ILED\x10\x05\x12\x0b\n\x07\x41\x42ORTED\x10\x06\x12\x0b\n\x07SKIPPED\x10\x07\x12\r\n\tTIMED_OUT\x10\x08\x12\x13\n\x0f\x44YNAMIC_RUNNING\x10\t\x12\r\n\tRECOVERED\x10\n\"\xac\x01\n\rTaskExecution\"\x9a\x01\n\x05Phase\x12\r\n\tUNDEFINED\x10\x00\x12\n\n\x06QUEUED\x10\x01\x12\x0b\n\x07RUNNING\x10\x02\x12\r\n\tSUCCEEDED\x10\x03\x12\x0b\n\x07\x41\x42ORTED\x10\x04\x12\n\n\x06\x46\x41ILED\x10\x05\x12\x10\n\x0cINITIALIZING\x10\x06\x12\x19\n\x15WAITING_FOR_RESOURCES\x10\x07\x12\x14\n\x10RETRYABLE_FAILED\x10\x08\"\x9f\x03\n\x0e\x45xecutionError\x12\x12\n\x04\x63ode\x18\x01 \x01(\tR\x04\x63ode\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\x12\x1b\n\terror_uri\x18\x03 \x01(\tR\x08\x65rrorUri\x12<\n\x04kind\x18\x04 \x01(\x0e\x32(.flyteidl2.core.ExecutionError.ErrorKindR\x04kind\x12\x38\n\ttimestamp\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\ttimestamp\x12\x16\n\x06worker\x18\x06 \x01(\tR\x06worker\x12K\n\x0erecoverability\x18\x07 \x01(\x0e\x32#.flyteidl2.core.ContainerError.KindR\x0erecoverability\x12\x35\n\tgpu_fault\x18\x08 \x01(\x0b\x32\x18.flyteidl2.core.GpuFaultR\x08gpuFault\".\n\tErrorKind\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x08\n\x04USER\x10\x01\x12\n\n\x06SYSTEM\x10\x02\"\xeb\x03\n\x08GpuFault\x12\x31\n\x04kind\x18\x01 \x01(\x0e\x32\x1d.flyteidl2.core.GpuFault.KindR\x04kind\x12\x12\n\x04\x63ode\x18\x02 \x01(\rR\x04\x63ode\x12\x12\n\x04name\x18\x03 \x01(\tR\x04name\x12=\n\x08severity\x18\x04 \x01(\x0e\x32!.flyteidl2.core.GpuFault.SeverityR\x08severity\x12\x19\n\x08gpu_uuid\x18\x05 \x01(\tR\x07gpuUuid\x12 \n\tgpu_index\x18\x06 \x01(\rH\x00R\x08gpuIndex\x88\x01\x01\x12\x1c\n\npci_bus_id\x18\x07 \x01(\tR\x08pciBusId\x12\x12\n\x04node\x18\x08 \x01(\tR\x04node\x12\x10\n\x03pid\x18\t \x01(\rR\x03pid\x12\x18\n\x07process\x18\n \x01(\tR\x07process\"9\n\x04Kind\x12\x14\n\x10KIND_UNSPECIFIED\x10\x00\x12\x0c\n\x08KIND_XID\x10\x01\x12\r\n\tKIND_SXID\x10\x02\"a\n\x08Severity\x12\x18\n\x14SEVERITY_UNSPECIFIED\x10\x00\x12\x11\n\rSEVERITY_USER\x10\x01\x12\x11\n\rSEVERITY_WARN\x10\x02\x12\x15\n\x11SEVERITY_CRITICAL\x10\x03\x42\x0c\n\n_gpu_index\"\xe7\x01\n\x0e\x43ontainerError\x12\x12\n\x04\x63ode\x18\x01 \x01(\tR\x04\x63ode\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\x12\x37\n\x04kind\x18\x03 \x01(\x0e\x32#.flyteidl2.core.ContainerError.KindR\x04kind\x12@\n\x06origin\x18\x04 \x01(\x0e\x32(.flyteidl2.core.ExecutionError.ErrorKindR\x06origin\",\n\x04Kind\x12\x13\n\x0fNON_RECOVERABLE\x10\x00\x12\x0f\n\x0bRECOVERABLE\x10\x01\"E\n\rErrorDocument\x12\x34\n\x05\x65rror\x18\x01 \x01(\x0b\x32\x1e.flyteidl2.core.ContainerErrorR\x05\x65rror\"\xd5\x03\n\x07TaskLog\x12\x10\n\x03uri\x18\x01 \x01(\tR\x03uri\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\x12L\n\x0emessage_format\x18\x03 \x01(\x0e\x32%.flyteidl2.core.TaskLog.MessageFormatR\rmessageFormat\x12+\n\x03ttl\x18\x04 \x01(\x0b\x32\x19.google.protobuf.DurationR\x03ttl\x12*\n\x10ShowWhilePending\x18\x05 \x01(\x08R\x10ShowWhilePending\x12*\n\x10HideOnceFinished\x18\x06 \x01(\x08R\x10HideOnceFinished\x12=\n\tlink_type\x18\x07 \x01(\x0e\x32 .flyteidl2.core.TaskLog.LinkTypeR\x08linkType\x12\x14\n\x05ready\x18\x08 \x01(\x08R\x05ready\x12\x19\n\x08icon_uri\x18\t \x01(\tR\x07iconUri\"/\n\rMessageFormat\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x07\n\x03\x43SV\x10\x01\x12\x08\n\x04JSON\x10\x02\"0\n\x08LinkType\x12\x0c\n\x08\x45XTERNAL\x10\x00\x12\r\n\tDASHBOARD\x10\x01\x12\x07\n\x03IDE\x10\x02\"\x84\x02\n\nLogContext\x12\x31\n\x04pods\x18\x01 \x03(\x0b\x32\x1d.flyteidl2.core.PodLogContextR\x04pods\x12(\n\x10primary_pod_name\x18\x02 \x01(\tR\x0eprimaryPodName\x12\x41\n\tconnector\x18\x03 \x01(\x0b\x32#.flyteidl2.core.ConnectorLogContextR\tconnector\x12*\n\x0fpod_name_prefix\x18\x04 \x01(\tB\x02\x18\x01R\rpodNamePrefix\x12*\n\x11pod_name_prefixes\x18\x05 \x03(\tR\x0fpodNamePrefixes\"1\n\x13\x43onnectorLogContext\x12\x1a\n\x08\x65ndpoint\x18\x01 \x01(\tR\x08\x65ndpoint\"\x8b\x02\n\rPodLogContext\x12\x1c\n\tnamespace\x18\x01 \x01(\tR\tnamespace\x12\x19\n\x08pod_name\x18\x02 \x01(\tR\x07podName\x12@\n\ncontainers\x18\x03 \x03(\x0b\x32 .flyteidl2.core.ContainerContextR\ncontainers\x12\x34\n\x16primary_container_name\x18\x04 \x01(\tR\x14primaryContainerName\x12I\n\x0finit_containers\x18\x05 \x03(\x0b\x32 .flyteidl2.core.ContainerContextR\x0einitContainers\"\xaf\x02\n\x10\x43ontainerContext\x12%\n\x0e\x63ontainer_name\x18\x01 \x01(\tR\rcontainerName\x12I\n\x07process\x18\x02 \x01(\x0b\x32/.flyteidl2.core.ContainerContext.ProcessContextR\x07process\x1a\xa8\x01\n\x0eProcessContext\x12L\n\x14\x63ontainer_start_time\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x12\x63ontainerStartTime\x12H\n\x12\x63ontainer_end_time\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x10\x63ontainerEndTime\"Z\n\x14QualityOfServiceSpec\x12\x42\n\x0fqueueing_budget\x18\x01 \x01(\x0b\x32\x19.google.protobuf.DurationR\x0equeueingBudget\"\xd0\x01\n\x10QualityOfService\x12;\n\x04tier\x18\x01 \x01(\x0e\x32%.flyteidl2.core.QualityOfService.TierH\x00R\x04tier\x12:\n\x04spec\x18\x02 \x01(\x0b\x32$.flyteidl2.core.QualityOfServiceSpecH\x00R\x04spec\"4\n\x04Tier\x12\r\n\tUNDEFINED\x10\x00\x12\x08\n\x04HIGH\x10\x01\x12\n\n\x06MEDIUM\x10\x02\x12\x07\n\x03LOW\x10\x03\x42\r\n\x0b\x64\x65signationB\xb3\x01\n\x12\x63om.flyteidl2.coreB\x0e\x45xecutionProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core\xa2\x02\x03\x46\x43X\xaa\x02\x0e\x46lyteidl2.Core\xca\x02\x0e\x46lyteidl2\\Core\xe2\x02\x1a\x46lyteidl2\\Core\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Coreb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -38,35 +38,41 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_TASKEXECUTION_PHASE']._serialized_start=489
   _globals['_TASKEXECUTION_PHASE']._serialized_end=643
   _globals['_EXECUTIONERROR']._serialized_start=646
-  _globals['_EXECUTIONERROR']._serialized_end=1006
-  _globals['_EXECUTIONERROR_ERRORKIND']._serialized_start=960
-  _globals['_EXECUTIONERROR_ERRORKIND']._serialized_end=1006
-  _globals['_CONTAINERERROR']._serialized_start=1009
-  _globals['_CONTAINERERROR']._serialized_end=1240
-  _globals['_CONTAINERERROR_KIND']._serialized_start=1196
-  _globals['_CONTAINERERROR_KIND']._serialized_end=1240
-  _globals['_ERRORDOCUMENT']._serialized_start=1242
-  _globals['_ERRORDOCUMENT']._serialized_end=1311
-  _globals['_TASKLOG']._serialized_start=1314
-  _globals['_TASKLOG']._serialized_end=1783
-  _globals['_TASKLOG_MESSAGEFORMAT']._serialized_start=1686
-  _globals['_TASKLOG_MESSAGEFORMAT']._serialized_end=1733
-  _globals['_TASKLOG_LINKTYPE']._serialized_start=1735
-  _globals['_TASKLOG_LINKTYPE']._serialized_end=1783
-  _globals['_LOGCONTEXT']._serialized_start=1786
-  _globals['_LOGCONTEXT']._serialized_end=2046
-  _globals['_CONNECTORLOGCONTEXT']._serialized_start=2048
-  _globals['_CONNECTORLOGCONTEXT']._serialized_end=2097
-  _globals['_PODLOGCONTEXT']._serialized_start=2100
-  _globals['_PODLOGCONTEXT']._serialized_end=2367
-  _globals['_CONTAINERCONTEXT']._serialized_start=2370
-  _globals['_CONTAINERCONTEXT']._serialized_end=2673
-  _globals['_CONTAINERCONTEXT_PROCESSCONTEXT']._serialized_start=2505
-  _globals['_CONTAINERCONTEXT_PROCESSCONTEXT']._serialized_end=2673
-  _globals['_QUALITYOFSERVICESPEC']._serialized_start=2675
-  _globals['_QUALITYOFSERVICESPEC']._serialized_end=2765
-  _globals['_QUALITYOFSERVICE']._serialized_start=2768
-  _globals['_QUALITYOFSERVICE']._serialized_end=2976
-  _globals['_QUALITYOFSERVICE_TIER']._serialized_start=2909
-  _globals['_QUALITYOFSERVICE_TIER']._serialized_end=2961
+  _globals['_EXECUTIONERROR']._serialized_end=1061
+  _globals['_EXECUTIONERROR_ERRORKIND']._serialized_start=1015
+  _globals['_EXECUTIONERROR_ERRORKIND']._serialized_end=1061
+  _globals['_GPUFAULT']._serialized_start=1064
+  _globals['_GPUFAULT']._serialized_end=1555
+  _globals['_GPUFAULT_KIND']._serialized_start=1385
+  _globals['_GPUFAULT_KIND']._serialized_end=1442
+  _globals['_GPUFAULT_SEVERITY']._serialized_start=1444
+  _globals['_GPUFAULT_SEVERITY']._serialized_end=1541
+  _globals['_CONTAINERERROR']._serialized_start=1558
+  _globals['_CONTAINERERROR']._serialized_end=1789
+  _globals['_CONTAINERERROR_KIND']._serialized_start=1745
+  _globals['_CONTAINERERROR_KIND']._serialized_end=1789
+  _globals['_ERRORDOCUMENT']._serialized_start=1791
+  _globals['_ERRORDOCUMENT']._serialized_end=1860
+  _globals['_TASKLOG']._serialized_start=1863
+  _globals['_TASKLOG']._serialized_end=2332
+  _globals['_TASKLOG_MESSAGEFORMAT']._serialized_start=2235
+  _globals['_TASKLOG_MESSAGEFORMAT']._serialized_end=2282
+  _globals['_TASKLOG_LINKTYPE']._serialized_start=2284
+  _globals['_TASKLOG_LINKTYPE']._serialized_end=2332
+  _globals['_LOGCONTEXT']._serialized_start=2335
+  _globals['_LOGCONTEXT']._serialized_end=2595
+  _globals['_CONNECTORLOGCONTEXT']._serialized_start=2597
+  _globals['_CONNECTORLOGCONTEXT']._serialized_end=2646
+  _globals['_PODLOGCONTEXT']._serialized_start=2649
+  _globals['_PODLOGCONTEXT']._serialized_end=2916
+  _globals['_CONTAINERCONTEXT']._serialized_start=2919
+  _globals['_CONTAINERCONTEXT']._serialized_end=3222
+  _globals['_CONTAINERCONTEXT_PROCESSCONTEXT']._serialized_start=3054
+  _globals['_CONTAINERCONTEXT_PROCESSCONTEXT']._serialized_end=3222
+  _globals['_QUALITYOFSERVICESPEC']._serialized_start=3224
+  _globals['_QUALITYOFSERVICESPEC']._serialized_end=3314
+  _globals['_QUALITYOFSERVICE']._serialized_start=3317
+  _globals['_QUALITYOFSERVICE']._serialized_end=3525
+  _globals['_QUALITYOFSERVICE_TIER']._serialized_start=3458
+  _globals['_QUALITYOFSERVICE_TIER']._serialized_end=3510
 # @@protoc_insertion_point(module_scope)
