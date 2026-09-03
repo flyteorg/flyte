@@ -128,9 +128,9 @@ export type ListArtifactsRequest = Message<"flyteidl2.artifact.ListArtifactsRequ
    * field "created_at" with GREATER_THAN (RFC3339 timestamp value),
    * and the pair "parent_name" + "parent_version", each with EQUAL and always
    * together, which lists the versions (of any name in the project) that
-   * declare the given artifact version as their parent — the downward
-   * direction of lineage, which the stored pointer alone cannot be followed
-   * in.
+   * declare the given artifact version among their parents. This serves the
+   * downward direction of lineage: the stored parent pointers only walk
+   * upwards, so finding a version's children requires this filter.
    *
    * @generated from field: flyteidl2.common.ListRequest request = 1;
    */

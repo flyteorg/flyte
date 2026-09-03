@@ -858,7 +858,7 @@
       "properties": {
         "project": {
           "type": "string",
-          "description": "Project and domain and suffix needs to be unique across a given artifact store."
+          "description": "Identifies one artifact within an artifact store: the (org, project,\ndomain, name) tuple must be unique. Length bounds match\nartifact.ArtifactName; fields stay optional because an empty field means\n\"inherit from context\" in several uses (e.g.\nartifact.ArtifactSpec.parent_artifacts)."
         },
         "domain": {
           "type": "string"
@@ -2518,9 +2518,13 @@
           "$ref": "#/definitions/coreLiteralType",
           "description": "The declared Flyte type of the output, copied into ArtifactSpec.type.\nThe producing SDK is authoritative for this."
         },
-        "parent_artifact": {
-          "$ref": "#/definitions/coreArtifactVersionId",
-          "description": "Optional artifact version the produced version was derived from, copied\nverbatim into ArtifactSpec.parent_artifact. Set by the producing task when\nit derives a new version from one it consumed, so the resulting lineage\nbranches instead of reading as a linear chain. Empty key fields inherit\nthe produced artifact's own scope and name, so a bare {version: \"v1\"}\ndeclares the previous version of this same artifact as parent; a set name\nrecords cross-artifact derivation."
+        "parent_artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreArtifactVersionId"
+          },
+          "description": "Optional artifact versions the produced version was derived from, copied\nverbatim into ArtifactSpec.parent_artifacts. Set by the producing task\nwhen it derives a new version from versions it consumed; one entry is\nplain derivation, several record a merge, so the resulting lineage forms\na DAG instead of reading as a linear chain. Order is preserved: the first\nentry is the primary parent. Empty key fields inherit the produced\nartifact's own scope and name, so a bare {version: \"v1\"} declares the\nprevious version of this same artifact as a parent; a set name records\ncross-artifact derivation. Only the name may differ: non-empty scope\nfields (org/project/domain) must match the produced artifact's own scope."
         }
       },
       "description": "Declares that a named output of the producing action is a new artifact\nversion. The output's literal (in Outputs.literals) is the artifact's value;\norg/project/domain come from the producing action's scope at registration."
