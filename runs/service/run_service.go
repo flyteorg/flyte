@@ -281,8 +281,7 @@ func (s *RunService) CreateRun(
 	request.RunSpec = runSpec
 
 	// Settings sit between an explicit request value and the static config defaults
-	// applied below. Org is empty when the caller passed a ProjectId rather than a
-	// RunId; the storage key encoder normalizes that to the default org.
+	// applied below.
 	resolved, err := resolveSettings(ctx, s.settingsRepo, &settings.SettingsKey{
 		Org:     runId.GetOrg(),
 		Domain:  runId.GetDomain(),
