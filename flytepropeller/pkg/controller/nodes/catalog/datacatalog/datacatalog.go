@@ -486,12 +486,12 @@ func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection boo
 	retryInterceptor := grpcRetry.UnaryClientInterceptor(grpcOptions...)
 
 	tracerProvider := otelutils.GetTracerProvider(otelutils.DataCatalogClientTracer)
+	opts = append(opts, grpc.WithStatsHandler(otelgrpc.NewClientHandler(
+		otelgrpc.WithTracerProvider(tracerProvider),
+		otelgrpc.WithPropagators(propagation.TraceContext{}),
+	)))
 	opts = append(opts, grpc.WithChainUnaryInterceptor(
 		grpcPrometheus.UnaryClientInterceptor,
-		otelgrpc.UnaryClientInterceptor(
-			otelgrpc.WithTracerProvider(tracerProvider),
-			otelgrpc.WithPropagators(propagation.TraceContext{}),
-		),
 		retryInterceptor))
 	clientConn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {

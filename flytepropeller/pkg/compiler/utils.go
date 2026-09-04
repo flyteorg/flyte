@@ -48,7 +48,9 @@ func detectCycle(startNode string, neighbors func(nodeId string) sets.String) (c
 		if visiting.Has(nodeId) {
 			return []common.NodeID{}, true
 		}
-
+		if visited.Has(nodeId) {
+			return []common.NodeID{}, false
+		}
 		visiting.Insert(nodeId)
 		visited.Insert(nodeId)
 
