@@ -1,6 +1,7 @@
 package data
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -30,6 +31,31 @@ type Uploader struct {
 	store                   *storage.DataStore
 	aggregateOutputFileName string
 	errorFileName           string
+}
+
+// ContainerError is the failure a container declared by writing a
+// core.ErrorDocument to its error file, as opposed to a failure of the upload
+// itself. The document travels to the blob store untouched, so the kind and
+// origin the container chose are the ones flyte acts on.
+type ContainerError struct {
+	Document *core.ErrorDocument
+}
+
+func (e ContainerError) Error() string {
+	return e.Document.GetError().GetMessage()
+}
+
+// errorDocument reads an error file as a core.ErrorDocument, reporting whether
+// it is one. Only bytes that re-encode to themselves are: proto.Unmarshal
+// accepts some plain text by chance, and taking such a file for a document
+// would swallow the message the container meant to send.
+func errorDocument(raw []byte) (*core.ErrorDocument, bool) {
+	document := &core.ErrorDocument{}
+	if err := proto.Unmarshal(raw, document); err != nil || document.GetError() == nil {
+		return nil, false
+	}
+	canonical, err := proto.Marshal(document)
+	return document, err == nil && bytes.Equal(canonical, raw)
 }
 
 type dirFile struct {
@@ -135,6 +161,9 @@ func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, f
 		b, err := os.ReadFile(errFile)
 		if err != nil {
 			return err
+		}
+		if document, ok := errorDocument(b); ok {
+			return ContainerError{Document: document}
 		}
 		return errors.Errorf("User Error: %s", string(b))
 	}
