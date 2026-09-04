@@ -79,6 +79,12 @@ func getDescriptionEntityFilters(resourceType core.ResourceType, project string,
 	entity := common.ResourceTypeToEntity[resourceType]
 
 	filters := make([]common.InlineFilter, 0)
+	resourceTypeFilter, err := common.NewSingleValueFilter(entity, common.Equal, ResourceType, int32(resourceType))
+	if err != nil {
+		return nil, err
+	}
+	filters = append(filters, resourceTypeFilter)
+
 	projectFilter, err := common.NewSingleValueFilter(entity, common.Equal, Project, project)
 	if err != nil {
 		return nil, err
