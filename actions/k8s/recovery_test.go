@@ -110,7 +110,6 @@ func TestResolveRecoveredFrom_HitStampsSourceResult(t *testing.T) {
 	runClient, c := newGateTestClient(t)
 	runClient.EXPECT().LookupAction(mock.Anything, mock.Anything).
 		Return(lookupResponse(&workflow.LookupActionResponse{
-			Found:       true,
 			Phase:       common.ActionPhase_ACTION_PHASE_SUCCEEDED,
 			Attempts:    2,
 			CacheStatus: core.CatalogCacheStatus_CACHE_HIT,
@@ -141,7 +140,6 @@ func TestResolveRecoveredFrom_SignalledConditionIsAHit(t *testing.T) {
 	}
 	runClient.EXPECT().LookupAction(mock.Anything, mock.Anything).
 		Return(lookupResponse(&workflow.LookupActionResponse{
-			Found:  true,
 			Phase:  common.ActionPhase_ACTION_PHASE_SUCCEEDED,
 			Output: signal,
 		}), nil).Once()
@@ -163,7 +161,6 @@ func TestResolveRecoveredFrom_RecoveredSourceIsAHit(t *testing.T) {
 	runClient, c := newGateTestClient(t)
 	runClient.EXPECT().LookupAction(mock.Anything, mock.Anything).
 		Return(lookupResponse(&workflow.LookupActionResponse{
-			Found:     true,
 			Phase:     common.ActionPhase_ACTION_PHASE_RECOVERED,
 			OutputUri: "s3://bucket/r0/a1/1/outputs.pb",
 		}), nil).Once()
@@ -175,20 +172,32 @@ func TestResolveRecoveredFrom_RecoveredSourceIsAHit(t *testing.T) {
 	assert.Equal(t, "s3://bucket/r0/a1/1/outputs.pb", got.OutputUri)
 }
 
-func TestResolveRecoveredFrom_MissAndUnusableSourcesRunFresh(t *testing.T) {
+// A source run that never had this action reports NOT_FOUND. That is an ordinary recovery
+// outcome, not a lookup failure, so it runs fresh without touching the failure counter —
+// the distinction TestResolveRecoveredFrom_LookupFailureRunsFresh covers from the other side.
+func TestResolveRecoveredFrom_MissingActionRunsFresh(t *testing.T) {
+	runClient, c := newGateTestClient(t)
+	runClient.EXPECT().LookupAction(mock.Anything, mock.Anything).
+		Return(nil, connect.NewError(connect.CodeNotFound, assert.AnError)).Once()
+
+	got := c.resolveRecoveredFrom(context.Background(),
+		taskActionWith(recoveryContextFor("r1")), childAction("a1"), false)
+	assert.Nil(t, got)
+}
+
+func TestResolveRecoveredFrom_UnusableSourcesRunFresh(t *testing.T) {
 	for _, tc := range []struct {
 		name string
 		resp *workflow.LookupActionResponse
 	}{
-		{"missing", &workflow.LookupActionResponse{Found: false}},
 		{"failed", &workflow.LookupActionResponse{
-			Found: true, Phase: common.ActionPhase_ACTION_PHASE_FAILED, OutputUri: "s3://x",
+			Phase: common.ActionPhase_ACTION_PHASE_FAILED, OutputUri: "s3://x",
 		}},
 		{"aborted", &workflow.LookupActionResponse{
-			Found: true, Phase: common.ActionPhase_ACTION_PHASE_ABORTED, OutputUri: "s3://x",
+			Phase: common.ActionPhase_ACTION_PHASE_ABORTED, OutputUri: "s3://x",
 		}},
 		{"succeeded without outputs", &workflow.LookupActionResponse{
-			Found: true, Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+			Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED,
 		}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {

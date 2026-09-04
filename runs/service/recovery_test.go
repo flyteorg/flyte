@@ -123,17 +123,19 @@ func lookupActionID(run, name string) *common.ActionIdentifier {
 	return &common.ActionIdentifier{Run: sourceRunID(run), Name: name}
 }
 
-func TestLookupAction_MissingActionIsNotAnError(t *testing.T) {
+// A miss is NOT_FOUND, and the caller keys its fail-open path off exactly that code
+// (actions/k8s/recovery.go), so the code itself is the contract — not just "an error".
+func TestLookupAction_MissingActionIsNotFound(t *testing.T) {
 	actionRepo, svc := newRecoveryTestService(t)
 	actionID := lookupActionID("r1", "a5")
 
 	actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).
 		Return(nil, interfaces.ErrActionNotFound).Once()
 
-	resp, err := svc.LookupAction(context.Background(),
+	_, err := svc.LookupAction(context.Background(),
 		connect.NewRequest(&workflow.LookupActionRequest{ActionId: actionID}))
-	require.NoError(t, err)
-	assert.False(t, resp.Msg.GetFound())
+	require.Error(t, err)
+	assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
 }
 
 // A failing lookup must stay distinguishable from a miss: the caller counts them separately.
@@ -170,7 +172,6 @@ func TestLookupAction_TaskActionReadsLastAttemptOutputs(t *testing.T) {
 	resp, err := svc.LookupAction(context.Background(),
 		connect.NewRequest(&workflow.LookupActionRequest{ActionId: actionID}))
 	require.NoError(t, err)
-	assert.True(t, resp.Msg.GetFound())
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, resp.Msg.GetPhase())
 	assert.Equal(t, uint32(2), resp.Msg.GetAttempts())
 	assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT, resp.Msg.GetCacheStatus())
@@ -245,7 +246,6 @@ func TestLookupAction_NoOutputsYieldsEmptyURI(t *testing.T) {
 	resp, err := svc.LookupAction(context.Background(),
 		connect.NewRequest(&workflow.LookupActionRequest{ActionId: actionID}))
 	require.NoError(t, err)
-	assert.True(t, resp.Msg.GetFound())
 	assert.Empty(t, resp.Msg.GetOutputUri())
 }
 

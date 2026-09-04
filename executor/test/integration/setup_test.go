@@ -22,6 +22,7 @@ package integration
 
 import (
 	"context"
+	"errors"
 	"log"
 	"os"
 	"path/filepath"
@@ -222,9 +223,9 @@ func (r *recordingRunClient) RecordActionEvents(_ context.Context, _ *connect.Re
 	return connect.NewResponse(&workflow.RecordActionEventsResponse{}), nil
 }
 
-// No run under test is a recovery, so every lookup is a miss.
+// No run under test is a recovery, so every lookup is a miss — reported as NOT_FOUND.
 func (r *recordingRunClient) LookupAction(_ context.Context, _ *connect.Request[workflow.LookupActionRequest]) (*connect.Response[workflow.LookupActionResponse], error) {
-	return connect.NewResponse(&workflow.LookupActionResponse{Found: false}), nil
+	return nil, connect.NewError(connect.CodeNotFound, errors.New("no recovery source under test"))
 }
 
 func (r *recordingRunClient) RecordActionStream(_ context.Context) *connect.BidiStreamForClient[workflow.RecordActionStreamRequest, workflow.RecordActionStreamResponse] {
