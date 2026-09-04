@@ -852,6 +852,33 @@ func TestNotifyActionUpdate_PayloadWithSpecialChars(t *testing.T) {
 	}
 }
 
+func TestNotifyActionUpdate_DropsWhenQueueFull(t *testing.T) {
+	r := &actionRepo{
+		actionNotifyCh: make(chan string, 1),
+		runNotifyCh:    make(chan string, 1),
+	}
+	r.actionNotifyCh <- "already-queued"
+
+	actionID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Project: "proj", Domain: "domain", Name: "run"},
+		Name: "action",
+	}
+
+	done := make(chan struct{})
+	go func() {
+		r.notifyActionUpdate(context.Background(), actionID)
+		close(done)
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(100 * time.Millisecond):
+		t.Fatal("notifyActionUpdate blocked on a full queue")
+	}
+
+	assert.Equal(t, "already-queued", <-r.actionNotifyCh)
+}
+
 func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
 	r := &actionRepo{
 
@@ -877,6 +904,30 @@ func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
 	case <-ctx.Done():
 		t.Fatal("timed out waiting for payload on runNotifyCh")
 	}
+}
+
+func TestNotifyRunUpdate_DropsWhenQueueFull(t *testing.T) {
+	r := &actionRepo{
+		actionNotifyCh: make(chan string, 1),
+		runNotifyCh:    make(chan string, 1),
+	}
+	r.runNotifyCh <- "already-queued"
+
+	runID := &common.RunIdentifier{Project: "proj", Domain: "domain", Name: "run"}
+
+	done := make(chan struct{})
+	go func() {
+		r.notifyRunUpdate(context.Background(), runID)
+		close(done)
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(100 * time.Millisecond):
+		t.Fatal("notifyRunUpdate blocked on a full queue")
+	}
+
+	assert.Equal(t, "already-queued", <-r.runNotifyCh)
 }
 
 func TestIsConnError(t *testing.T) {
