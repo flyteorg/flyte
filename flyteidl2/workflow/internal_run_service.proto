@@ -5,6 +5,8 @@ package flyteidl2.workflow;
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/identity.proto";
+import "flyteidl2/common/phase.proto";
+import "flyteidl2/core/catalog.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/workflow/run_definition.proto";
 import "google/rpc/status.proto";
@@ -29,6 +31,9 @@ service InternalRunService {
 
   // Record a new action event (streaming implementation).
   rpc RecordActionEventStream(stream RecordActionEventStreamRequest) returns (stream RecordActionEventStreamResponse) {}
+
+  // Look up a single action of a prior run, for the enqueue-time recovery decision.
+  rpc LookupAction(LookupActionRequest) returns (LookupActionResponse) {}
 }
 
 // Request message for recording an action.
@@ -175,4 +180,36 @@ message RecordActionEventStreamResponse {
 
   // The nonce is used to correlate the request with the response.
   int64 nonce = 2;
+}
+
+// Request message for looking up an action of a prior run.
+message LookupActionRequest {
+  // The action to look up, named in the run it belongs to.
+  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+}
+
+// Response message for looking up an action of a prior run. An action the run does not have
+// is reported as NOT_FOUND; a response therefore always describes an action that exists.
+message LookupActionResponse {
+  // Was `bool found = 1`, replaced by the NOT_FOUND status. Reserved so a rebuilt client of
+  // the old shape cannot read a later field as the boolean it expects.
+  reserved 1;
+  reserved "found";
+
+  // Phase the action settled in.
+  flyteidl2.common.ActionPhase phase = 2;
+
+  // Number of attempts the action took.
+  uint32 attempts = 3;
+
+  // Cache status the action reported.
+  flyteidl2.core.CatalogCacheStatus cache_status = 4;
+
+  // Location of the action's outputs, empty when it produced none.
+  string output_uri = 5;
+
+  // For ACTION_TYPE_CONDITION actions, the resolved signal payload. Conditions carry their
+  // result inline rather than in an outputs file, so output_uri stays empty for them and
+  // this is the only thing a recovery has to hand downstream. Tasks and traces leave it unset.
+  optional flyteidl2.core.Literal output = 6;
 }

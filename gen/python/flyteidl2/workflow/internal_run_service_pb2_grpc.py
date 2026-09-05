@@ -44,6 +44,11 @@ class InternalRunServiceStub(object):
                 request_serializer=flyteidl2_dot_workflow_dot_internal__run__service__pb2.RecordActionEventStreamRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_workflow_dot_internal__run__service__pb2.RecordActionEventStreamResponse.FromString,
                 )
+        self.LookupAction = channel.unary_unary(
+                '/flyteidl2.workflow.InternalRunService/LookupAction',
+                request_serializer=flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionResponse.FromString,
+                )
 
 
 class InternalRunServiceServicer(object):
@@ -91,6 +96,13 @@ class InternalRunServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def LookupAction(self, request, context):
+        """Look up a single action of a prior run, for the enqueue-time recovery decision.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_InternalRunServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -123,6 +135,11 @@ def add_InternalRunServiceServicer_to_server(servicer, server):
                     servicer.RecordActionEventStream,
                     request_deserializer=flyteidl2_dot_workflow_dot_internal__run__service__pb2.RecordActionEventStreamRequest.FromString,
                     response_serializer=flyteidl2_dot_workflow_dot_internal__run__service__pb2.RecordActionEventStreamResponse.SerializeToString,
+            ),
+            'LookupAction': grpc.unary_unary_rpc_method_handler(
+                    servicer.LookupAction,
+                    request_deserializer=flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionRequest.FromString,
+                    response_serializer=flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -233,5 +250,22 @@ class InternalRunService(object):
         return grpc.experimental.stream_stream(request_iterator, target, '/flyteidl2.workflow.InternalRunService/RecordActionEventStream',
             flyteidl2_dot_workflow_dot_internal__run__service__pb2.RecordActionEventStreamRequest.SerializeToString,
             flyteidl2_dot_workflow_dot_internal__run__service__pb2.RecordActionEventStreamResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def LookupAction(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.workflow.InternalRunService/LookupAction',
+            flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionRequest.SerializeToString,
+            flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -44,7 +44,10 @@ help: ## Display this help.
 .PHONY: manifests
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) rbac:roleName=manager-role crd webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+	# Every chart that ships the CRD needs the regenerated copy. A chart left out silently
+	# serves a stale schema, and the apiserver prunes the fields it does not know about.
 	cp config/crd/bases/*.yaml ../charts/flyte-binary/templates/crds/
+	cp config/crd/bases/*.yaml ../charts/flyte-core/templates/crds/
 
 .PHONY: generate
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
