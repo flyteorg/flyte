@@ -56,11 +56,15 @@ func newTestActionUpdate(actionName string) (*executorv1.TaskAction, *ActionUpda
 	return ta, update
 }
 
-func acceptedRecordActionResponse() *connect.Response[workflow.RecordActionResponse] {
+func acceptedRecordActionResponse(taskAction *executorv1.TaskAction) *connect.Response[workflow.RecordActionResponse] {
 	return connect.NewResponse(&workflow.RecordActionResponse{
 		ActionId: &common.ActionIdentifier{
-			Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "run"},
-			Name: "action",
+			Run: &common.RunIdentifier{
+				Project: taskAction.Spec.Project,
+				Domain:  taskAction.Spec.Domain,
+				Name:    taskAction.Spec.RunName,
+			},
+			Name: taskAction.Spec.ActionName,
 		},
 		Status: &status.Status{Code: int32(code.Code_OK)},
 	})
@@ -84,7 +88,7 @@ func TestNotifyRunService_DeduplicateRecordAction(t *testing.T) {
 
 	// Expect RecordAction called exactly once
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(acceptedRecordActionResponse(), nil).Once()
+		Return(acceptedRecordActionResponse(ta), nil).Once()
 
 	// First Added event — should call RecordAction
 	c.notifyRunService(ctx, ta, update, watch.Added)
@@ -116,7 +120,7 @@ func TestNotifyRunService_FailedRecordAllowsRetry(t *testing.T) {
 		Return((*connect.Response[workflow.RecordActionResponse])(nil), fmt.Errorf("transient error")).Once()
 	// Second call succeeds
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(acceptedRecordActionResponse(), nil).Once()
+		Return(acceptedRecordActionResponse(ta), nil).Once()
 
 	// First event — RecordAction fails, should NOT add to filter
 	c.notifyRunService(ctx, ta, update, watch.Added)
@@ -263,7 +267,7 @@ func TestNotifyRunService_UpdateActionStatusIncludesAttemptsAndCacheStatus(t *te
 	})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
 	// First-sight MODIFIED now also records (deduped via the mandatory filter).
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(acceptedRecordActionResponse(), nil).Maybe()
+		Return(acceptedRecordActionResponse(ta), nil).Maybe()
 
 	c.notifyRunService(ctx, ta, update, watch.Modified)
 
@@ -596,7 +600,7 @@ func TestNotifyRunService_ChildAddedPromotesParentToRunning(t *testing.T) {
 
 	// Expect RecordAction for the child
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(acceptedRecordActionResponse(), nil).Once()
+		Return(acceptedRecordActionResponse(ta), nil).Once()
 
 	// Expect UpdateActionStatus for the PARENT with RUNNING phase
 	mockClient.On("UpdateActionStatus", mock.Anything, mock.MatchedBy(func(req *connect.Request[workflow.UpdateActionStatusRequest]) bool {
@@ -647,7 +651,7 @@ func TestNotifyRunService_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testi
 
 	// First ADDED event (cold start, not in bloom filter): should process normally
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(acceptedRecordActionResponse(), nil).Once()
+		Return(acceptedRecordActionResponse(ta), nil).Once()
 	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
 		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil)
 	c.notifyRunService(ctx, ta, update, watch.Added)
@@ -703,7 +707,7 @@ func TestNotifyRunService_ProcessesNonTerminalAddedEvents(t *testing.T) {
 
 	// Non-terminal ADDED events should be processed normally
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(acceptedRecordActionResponse(), nil).Once()
+		Return(acceptedRecordActionResponse(ta), nil).Once()
 	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
 		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
 
@@ -731,7 +735,7 @@ func TestNotifyRunService_DuplicateAddedSkipsRecordAction(t *testing.T) {
 
 	// First call — should process normally
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(acceptedRecordActionResponse(), nil).Once()
+		Return(acceptedRecordActionResponse(ta), nil).Once()
 	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
 		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil)
 	c.notifyRunService(ctx, ta, update, watch.Added)
@@ -761,7 +765,7 @@ func TestNotifyRunService_TerminalDuplicateRepairsTimestamps(t *testing.T) {
 
 	// First call — should process normally (RecordAction + UpdateActionStatus)
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(acceptedRecordActionResponse(), nil).Once()
+		Return(acceptedRecordActionResponse(ta), nil).Once()
 	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
 		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Times(2)
 	c.notifyRunService(ctx, ta, update, watch.Added)
@@ -788,7 +792,7 @@ func TestNotifyRunService_RootActionAddedDoesNotPromoteParent(t *testing.T) {
 	ta, update := newTestActionUpdate("action-root")
 
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(acceptedRecordActionResponse(), nil).Once()
+		Return(acceptedRecordActionResponse(ta), nil).Once()
 
 	c.notifyRunService(ctx, ta, update, watch.Added)
 
@@ -902,7 +906,7 @@ func TestHandleWatchEvent_CoalescedReadsLatestPhase(t *testing.T) {
 	}
 
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(acceptedRecordActionResponse(), nil).Once()
+		Return(acceptedRecordActionResponse(succeededTaskAction("a3")), nil).Once()
 	// Accept exactly one status update, and ONLY if it is SUCCEEDED. A RUNNING update
 	// would be an unexpected call and fail the test.
 	mockClient.On("UpdateActionStatus", mock.Anything, mock.MatchedBy(func(req *connect.Request[workflow.UpdateActionStatusRequest]) bool {
@@ -947,7 +951,7 @@ func TestHandleWatchEvent_CreateThenDeleteStillRecords(t *testing.T) {
 
 	// Step 2: the DELETE tombstone (still carries Spec) must create the row, then abort it.
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(acceptedRecordActionResponse(), nil).Once()
+		Return(acceptedRecordActionResponse(runningTaskAction("d1")), nil).Once()
 	mockClient.On("UpdateActionStatus", mock.Anything, mock.MatchedBy(func(req *connect.Request[workflow.UpdateActionStatusRequest]) bool {
 		return req.Msg.GetStatus().GetPhase() == common.ActionPhase_ACTION_PHASE_ABORTED
 	})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
