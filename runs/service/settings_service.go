@@ -31,7 +31,24 @@ func (s *SettingsService) GetSettings(
 	ctx context.Context,
 	req *connect.Request[settings.GetSettingsRequest],
 ) (*connect.Response[settings.GetSettingsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("settings resolution engine not implemented yet"))
+	key := req.Msg.GetKey()
+	if err := validateSettingsKey(key); err != nil {
+		return nil, err
+	}
+
+	resolved, err := resolveSettings(ctx, s.settingsRepo, key)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	// Merged settings do not correspond to a stored row, so the record carries no
+	// version. Clients that need one for an update use GetSettingsForEdit.
+	return connect.NewResponse(&settings.GetSettingsResponse{
+		SettingsRecord: &settings.SettingsRecord{
+			Key:      key,
+			Settings: resolved,
+		},
+	}), nil
 }
 
 func (s *SettingsService) GetSettingsForEdit(
@@ -43,29 +60,9 @@ func (s *SettingsService) GetSettingsForEdit(
 		return nil, err
 	}
 
-	// One partial key per scope level covered by the request, broadest first,
-	// as GetSettingsForEditResponse requires. Order comes from this list; the
-	// repo returns rows unordered.
-	levelKeys := []*settings.SettingsKey{{Org: key.GetOrg()}}
-	if key.GetDomain() != "" {
-		levelKeys = append(levelKeys, &settings.SettingsKey{Org: key.GetOrg(), Domain: key.GetDomain()})
-	}
-	if key.GetProject() != "" {
-		levelKeys = append(levelKeys, &settings.SettingsKey{Org: key.GetOrg(), Domain: key.GetDomain(), Project: key.GetProject()})
-	}
-
-	storageKeys := make([]string, 0, len(levelKeys))
-	for _, lk := range levelKeys {
-		storageKeys = append(storageKeys, models.EncodeSettingsKey(lk.GetOrg(), lk.GetDomain(), lk.GetProject()))
-	}
-
-	rows, err := s.settingsRepo.GetSettingsByKeys(ctx, storageKeys)
+	levelKeys, rows, err := fetchLevels(ctx, s.settingsRepo, key)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
-	}
-	rowsByKey := make(map[string]*models.Settings, len(rows))
-	for _, row := range rows {
-		rowsByKey[row.Key] = row
 	}
 
 	levels := make([]*settings.SettingsRecord, 0, len(levelKeys))
@@ -73,9 +70,9 @@ func (s *SettingsService) GetSettingsForEdit(
 		// Absent level: empty settings, version 0 — the client's signal to use
 		// CreateSettings there (see SettingsRecord in the proto).
 		record := &settings.SettingsRecord{Key: lk, Settings: &settings.Settings{}}
-		if row := rowsByKey[storageKeys[i]]; row != nil {
-			stored := &settings.Settings{}
-			if err := (protojson.UnmarshalOptions{DiscardUnknown: true}).Unmarshal(row.Data, stored); err != nil {
+		if row := rows[i]; row != nil {
+			stored, err := decodeStored(row)
+			if err != nil {
 				return nil, connect.NewError(connect.CodeInternal, err)
 			}
 			record.Settings = stored
@@ -105,6 +102,7 @@ func (s *SettingsService) CreateSettings(
 		return nil, err
 	}
 
+	pruneSettings(req.Msg.GetSettings())
 	data, err := protojson.Marshal(req.Msg.GetSettings())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
@@ -149,6 +147,7 @@ func (s *SettingsService) UpdateSettings(
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("a version is required; use CreateSettings for a new record"))
 	}
 
+	pruneSettings(req.Msg.GetSettings())
 	data, err := protojson.Marshal(req.Msg.GetSettings())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)

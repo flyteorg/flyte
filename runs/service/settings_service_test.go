@@ -332,7 +332,7 @@ func TestGetSettingsForEdit_AllLevels(t *testing.T) {
 	require.Len(t, levels, 3)
 
 	// Each level carries only what it stores. Nothing is merged, which is the job
-	// of GetSettings, which is not implemented yet.
+	// of GetSettings.
 	assert.True(t, proto.Equal(orgKey, levels[0].GetKey()))
 	assert.True(t, proto.Equal(envSettings("LOG_LEVEL", "org"), levels[0].GetSettings()))
 	assert.Equal(t, uint64(1), levels[0].GetVersion())
@@ -574,4 +574,57 @@ func TestValidateSettings(t *testing.T) {
 			assert.Contains(t, err.Error(), tt.wantPath)
 		})
 	}
+}
+
+func TestGetSettings_MergesAcrossLevels(t *testing.T) {
+	ctx := context.Background()
+	svc := setupSettingsService(t)
+
+	orgKey := &settings.SettingsKey{Org: "acme"}
+	projectKey := &settings.SettingsKey{Org: "acme", Domain: "development", Project: "recsys"}
+
+	_, err := svc.CreateSettings(ctx, connect.NewRequest(&settings.CreateSettingsRequest{
+		Key:      orgKey,
+		Settings: envSettings("LOG_LEVEL", "info"),
+	}))
+	require.NoError(t, err)
+
+	_, err = svc.CreateSettings(ctx, connect.NewRequest(&settings.CreateSettingsRequest{
+		Key:      projectKey,
+		Settings: envSettings("TEAM", "ml"),
+	}))
+	require.NoError(t, err)
+
+	resp, err := svc.GetSettings(ctx, connect.NewRequest(&settings.GetSettingsRequest{
+		Key: projectKey,
+	}))
+	require.NoError(t, err)
+
+	record := resp.Msg.GetSettingsRecord()
+	assert.True(t, proto.Equal(projectKey, record.GetKey()))
+
+	// Entries from both levels, with no domain row in between.
+	assert.Equal(t, map[string]string{"LOG_LEVEL": "info", "TEAM": "ml"},
+		record.GetSettings().GetEnvironmentVariables().GetMapValue().GetEntries())
+	assert.Equal(t, levelProject, record.GetSettings().GetEnvironmentVariables().GetScopeLevel())
+
+	// Merged settings are not a stored row, so no version comes back even though
+	// both stored rows are at version 1.
+	assert.Equal(t, uint64(0), record.GetVersion())
+}
+
+func TestGetSettings_NothingStored(t *testing.T) {
+	ctx := context.Background()
+	svc := setupSettingsService(t)
+
+	resp, err := svc.GetSettings(ctx, connect.NewRequest(&settings.GetSettingsRequest{
+		Key: &settings.SettingsKey{Org: "acme", Domain: "development", Project: "recsys"},
+	}))
+	require.NoError(t, err)
+
+	record := resp.Msg.GetSettingsRecord()
+	require.NotNil(t, record)
+	require.NotNil(t, record.GetSettings())
+	assert.Nil(t, record.GetSettings().GetEnvironmentVariables())
+	assert.Equal(t, uint64(0), record.GetVersion())
 }

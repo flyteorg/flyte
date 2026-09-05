@@ -27,3 +27,16 @@ func TestRunServiceAuthConfigDecoding(t *testing.T) {
 	assert.Equal(t, "https://identity.example.com", actual.RunService.Auth.IssuerURL)
 	assert.Equal(t, "dataproxy-service", actual.RunService.Auth.ClientID)
 }
+
+func TestServerConfigDecoding(t *testing.T) {
+	actual := DataProxyConfig{}
+	require.NoError(t, decode_DataProxyConfig(map[string]any{
+		"server": map[string]any{
+			"host": "127.0.0.1",
+			"port": 8088,
+		},
+	}, &actual))
+
+	assert.Equal(t, "127.0.0.1", actual.Server.Host)
+	assert.Equal(t, 8088, actual.Server.Port)
+}

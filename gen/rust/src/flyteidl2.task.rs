@@ -417,6 +417,18 @@ pub struct ProducedArtifact {
     /// The producing SDK is authoritative for this.
     #[prost(message, optional, tag="5")]
     pub r#type: ::core::option::Option<super::core::LiteralType>,
+    /// Optional artifact versions the produced version was derived from, copied
+    /// verbatim into ArtifactSpec.parent_artifacts. Set by the producing task
+    /// when it derives a new version from versions it consumed; one entry is
+    /// plain derivation, several record a merge, so the resulting lineage forms
+    /// a DAG instead of reading as a linear chain. Order is preserved: the first
+    /// entry is the primary parent. Empty key fields inherit the produced
+    /// artifact's own scope and name, so a bare {version: "v1"} declares the
+    /// previous version of this same artifact as a parent; a set name records
+    /// cross-artifact derivation. Only the name may differ: non-empty scope
+    /// fields (org/project/domain) must match the produced artifact's own scope.
+    #[prost(message, repeated, tag="6")]
+    pub parent_artifacts: ::prost::alloc::vec::Vec<super::core::ArtifactVersionId>,
 }
 /// Output payload for an action.
 #[allow(clippy::derive_partial_eq_without_eq)]

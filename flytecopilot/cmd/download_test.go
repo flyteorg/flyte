@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/v2/flyteidl2/clients/go/coreutils"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -151,7 +152,7 @@ func TestDownloadOptions_Download(t *testing.T) {
 		dopts.RootOptions = &RootOptions{
 			Scope:           s,
 			Store:           store,
-			errorOutputName: "errors.pb",
+			errorOutputName: ioutils.ErrorsSuffix,
 		}
 
 		assert.NoError(t, store.WriteProtobuf(ctx, storage.DataReference(inputPath), storage.Options{}, &core.LiteralMap{
@@ -177,7 +178,7 @@ func TestDownloadOptions_Download(t *testing.T) {
 		}))
 		err = dopts.Download(ctx)
 		assert.NoError(t, err, "Download Operation failed")
-		errFile, err := store.ConstructReference(ctx, storage.DataReference(outputPath), "errors.pb")
+		errFile, err := store.ConstructReference(ctx, storage.DataReference(outputPath), ioutils.ErrorsSuffix)
 		assert.NoError(t, err)
 		errProto := &core.ErrorDocument{}
 		err = store.ReadProtobuf(ctx, errFile, errProto)

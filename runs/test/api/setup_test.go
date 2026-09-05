@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings/settingsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/config"
@@ -138,6 +139,10 @@ func TestMain(m *testing.M) {
 	internalRunPath, internalRunHandler := workflowconnect.NewInternalRunServiceHandler(runSvc)
 	mux.Handle(internalRunPath, internalRunHandler)
 
+	settingsSvc := service.NewSettingsService(impl.NewSettingsRepo(testDB))
+	settingsPath, settingsHandler := settingsconnect.NewSettingsServiceHandler(settingsSvc)
+	mux.Handle(settingsPath, settingsHandler)
+
 	// Add health check
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -232,7 +237,7 @@ func cleanupTestDB(t *testing.T) {
 	// Truncate known tables. The projects table is excluded so the shared fixture
 	// project created in TestMain survives across tests.
 	tables := []string{
-		"action_events", "actions", "runs", "tasks",
+		"action_events", "actions", "runs", "tasks", "settings",
 	}
 	for _, table := range tables {
 		if _, err := testDB.Exec(fmt.Sprintf("DELETE FROM %s", table)); err != nil {
