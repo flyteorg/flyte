@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"container/heap"
 	"context"
 	"database/sql"
 	"database/sql/driver"
@@ -36,10 +37,79 @@ type actionRepo struct {
 	actionSubscribers map[chan string]bool
 	mu                sync.RWMutex
 
-	// Dedicated channels for async NOTIFY to avoid pool contention
-	actionNotifyCh chan string
-	runNotifyCh    chan string
+	notifyMu           sync.Mutex
+	pendingActions     map[string]time.Time
+	pendingActionQueue pendingNotificationHeap
+	pendingRuns        map[string]time.Time
+	pendingRunQueue    pendingNotificationHeap
+	pendingCh          chan struct{}
 }
+
+type pendingNotification struct {
+	payload    string
+	enqueuedAt time.Time
+	sequence   uint64
+}
+
+type pendingNotificationHeap struct {
+	items     []pendingNotification
+	positions map[string]int
+	nextSeq   uint64
+}
+
+func newPendingNotificationHeap(capacity int) pendingNotificationHeap {
+	return pendingNotificationHeap{
+		items:     make([]pendingNotification, 0, capacity),
+		positions: make(map[string]int, capacity),
+	}
+}
+
+func (h pendingNotificationHeap) Len() int { return len(h.items) }
+
+func (h pendingNotificationHeap) Less(i, j int) bool {
+	if h.items[i].enqueuedAt.Equal(h.items[j].enqueuedAt) {
+		return h.items[i].sequence < h.items[j].sequence
+	}
+	return h.items[i].enqueuedAt.Before(h.items[j].enqueuedAt)
+}
+
+func (h pendingNotificationHeap) Swap(i, j int) {
+	h.items[i], h.items[j] = h.items[j], h.items[i]
+	h.positions[h.items[i].payload] = i
+	h.positions[h.items[j].payload] = j
+}
+
+func (h *pendingNotificationHeap) Push(value interface{}) {
+	notification := value.(pendingNotification)
+	if notification.sequence > h.nextSeq {
+		h.nextSeq = notification.sequence
+	}
+	h.positions[notification.payload] = len(h.items)
+	h.items = append(h.items, notification)
+}
+
+func (h *pendingNotificationHeap) Pop() interface{} {
+	last := len(h.items) - 1
+	notification := h.items[last]
+	h.items = h.items[:last]
+	delete(h.positions, notification.payload)
+	return notification
+}
+
+func (h *pendingNotificationHeap) drain() []pendingNotification {
+	notifications := make([]pendingNotification, 0, h.Len())
+	for h.Len() > 0 {
+		notifications = append(notifications, heap.Pop(h).(pendingNotification))
+	}
+	return notifications
+}
+
+const (
+	notificationBufferLimit     = 50_000
+	pendingNotificationCapacity = 256
+	notifyRetryMinBackoff       = 50 * time.Millisecond
+	notifyRetryMaxBackoff       = 5 * time.Second
+)
 
 // NewActionRepo creates a new PostgreSQL repository
 func NewActionRepo(db *sqlx.DB, dbConfig database.DbConfig) (interfaces.ActionRepo, error) {
@@ -51,8 +121,11 @@ func NewActionRepo(db *sqlx.DB, dbConfig database.DbConfig) (interfaces.ActionRe
 		actionSubscribers: make(map[chan string]bool),
 	}
 
-	repo.actionNotifyCh = make(chan string, 256)
-	repo.runNotifyCh = make(chan string, 256)
+	repo.pendingActions = make(map[string]time.Time, pendingNotificationCapacity)
+	repo.pendingActionQueue = newPendingNotificationHeap(pendingNotificationCapacity)
+	repo.pendingRuns = make(map[string]time.Time, pendingNotificationCapacity)
+	repo.pendingRunQueue = newPendingNotificationHeap(pendingNotificationCapacity)
+	repo.pendingCh = make(chan struct{}, 1)
 
 	if err := repo.startPostgresListener(); err != nil {
 		return nil, fmt.Errorf("failed to start postgres listener: %w", err)
@@ -956,16 +1029,92 @@ func (r *actionRepo) processNotifications() {
 	}
 }
 
-// notifyRunUpdate sends a notification about a run update via the
-// dedicated notify channel, avoiding connection pool contention.
-func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdentifier) {
+func (r *actionRepo) notifyRunUpdate(_ context.Context, runID *common.RunIdentifier) {
 	payload := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
+	r.markRunPending(payload)
+}
 
+func (r *actionRepo) markRunPending(payload string) {
+	r.notifyMu.Lock()
+	enqueuePending(r.pendingRuns, &r.pendingRunQueue, payload, time.Now(), notificationBufferLimit)
+	r.notifyMu.Unlock()
+	r.signalPending()
+}
+
+func (r *actionRepo) signalPending() {
 	select {
-	case r.runNotifyCh <- payload:
-	case <-ctx.Done():
-		logger.Warnf(ctx, "Run NOTIFY send cancelled for %s: %v", payload, ctx.Err())
+	case r.pendingCh <- struct{}{}:
+	default:
 	}
+}
+
+func (r *actionRepo) takePendingNotifications() (actions, runs []pendingNotification) {
+	r.notifyMu.Lock()
+	defer r.notifyMu.Unlock()
+
+	actions, runs = r.pendingActionQueue.drain(), r.pendingRunQueue.drain()
+	r.pendingActions = make(map[string]time.Time, pendingNotificationCapacity)
+	r.pendingActionQueue = newPendingNotificationHeap(pendingNotificationCapacity)
+	r.pendingRuns = make(map[string]time.Time, pendingNotificationCapacity)
+	r.pendingRunQueue = newPendingNotificationHeap(pendingNotificationCapacity)
+	return actions, runs
+}
+
+func (r *actionRepo) mergePendingActions(actions []pendingNotification) {
+	if len(actions) == 0 {
+		return
+	}
+	r.notifyMu.Lock()
+	for _, notification := range actions {
+		if _, exists := r.pendingActions[notification.payload]; exists {
+			if index, found := r.pendingActionQueue.positions[notification.payload]; found && notification.enqueuedAt.Before(r.pendingActionQueue.items[index].enqueuedAt) {
+				heap.Remove(&r.pendingActionQueue, index)
+				heap.Push(&r.pendingActionQueue, notification)
+			}
+			continue
+		}
+		enqueuePending(r.pendingActions, &r.pendingActionQueue, notification.payload, notification.enqueuedAt, notificationBufferLimit)
+	}
+	r.notifyMu.Unlock()
+}
+
+func (r *actionRepo) mergePendingRuns(runs []pendingNotification) {
+	if len(runs) == 0 {
+		return
+	}
+	r.notifyMu.Lock()
+	for _, notification := range runs {
+		if _, exists := r.pendingRuns[notification.payload]; exists {
+			if index, found := r.pendingRunQueue.positions[notification.payload]; found && notification.enqueuedAt.Before(r.pendingRunQueue.items[index].enqueuedAt) {
+				heap.Remove(&r.pendingRunQueue, index)
+				heap.Push(&r.pendingRunQueue, notification)
+			}
+			continue
+		}
+		enqueuePending(r.pendingRuns, &r.pendingRunQueue, notification.payload, notification.enqueuedAt, notificationBufferLimit)
+	}
+	r.notifyMu.Unlock()
+}
+
+func enqueuePending(pending map[string]time.Time, queue *pendingNotificationHeap, payload string, now time.Time, limit int) {
+	if _, exists := pending[payload]; exists {
+		pending[payload] = now
+		return
+	}
+	if len(pending) >= limit {
+		var oldestPayload string
+		var oldestTime time.Time
+		for candidate, timestamp := range pending {
+			if oldestTime.IsZero() || timestamp.Before(oldestTime) {
+				oldestPayload, oldestTime = candidate, timestamp
+			}
+		}
+		heap.Remove(queue, queue.positions[oldestPayload])
+		delete(pending, oldestPayload)
+	}
+	pending[payload] = now
+	queue.nextSeq++
+	heap.Push(queue, pendingNotification{payload: payload, enqueuedAt: now, sequence: queue.nextSeq})
 }
 
 // ListRootActions lists root actions (runs) matching scope and date filters.
@@ -1021,7 +1170,7 @@ func (r *actionRepo) startNotifyLoop() error {
 		return fmt.Errorf("acquire dedicated NOTIFY connection: %w", err)
 	}
 
-	go r.runNotifyLoop(sqlDB, conn)
+	go r.runNotifyLoop(context.Background(), sqlDB, conn)
 	return nil
 }
 
@@ -1042,10 +1191,7 @@ func isConnError(err error) bool {
 	return false
 }
 
-// runNotifyLoop processes notify channels using the given connection.
-// On connection errors it attempts to reconnect; if reconnection fails
-// the error is logged and the notification is skipped.
-func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
+func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql.Conn) {
 	defer func() {
 		if conn != nil {
 			conn.Close() //nolint:errcheck
@@ -1061,69 +1207,82 @@ func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
 			return
 		}
 		var err error
-		conn, err = sqlDB.Conn(context.Background())
+		conn, err = sqlDB.Conn(ctx)
 		if err != nil {
-			logger.Errorf(context.Background(), "Failed to re-acquire NOTIFY connection: %v", err)
+			logger.Errorf(ctx, "Failed to re-acquire NOTIFY connection: %v", err)
 			conn = nil
 		}
 	}
 
-	execNotify := func(channel, payload string) {
+	execNotify := func(channel, payload string) bool {
 		if conn == nil {
 			reconnect()
 		}
 		if conn == nil {
-			logger.Errorf(context.Background(), "No NOTIFY connection available, dropping %s notification", channel)
-			return
+			logger.Errorf(ctx, "No NOTIFY connection available, keeping %s notification pending", channel)
+			return false
 		}
-		if _, err := conn.ExecContext(context.Background(), "SELECT pg_notify($1, $2)", channel, payload); err != nil {
-			logger.Errorf(context.Background(), "Failed to NOTIFY %s: %v", channel, err)
+		if _, err := conn.ExecContext(ctx, "SELECT pg_notify($1, $2)", channel, payload); err != nil {
+			logger.Errorf(ctx, "Failed to NOTIFY %s: %v", channel, err)
 			if isConnError(err) {
 				reconnect()
 			}
+			return false
 		}
+		return true
 	}
 
-	drainAndExec := func(channel, firstPayload string, ch <-chan string) {
-		execNotify(channel, firstPayload)
-		for {
-			select {
-			case payload, ok := <-ch:
-				if !ok {
-					return
-				}
-				execNotify(channel, payload)
-			default:
-				return
+	emit := func(channel string, payloads []pendingNotification) []pendingNotification {
+		for i, notification := range payloads {
+			if !execNotify(channel, notification.payload) {
+				return payloads[i:]
 			}
 		}
+		return nil
 	}
 
+	backoff := notifyRetryMinBackoff
 	for {
 		select {
-		case payload, ok := <-r.actionNotifyCh:
-			if !ok {
-				return
-			}
-			drainAndExec("action_updates", payload, r.actionNotifyCh)
-		case payload, ok := <-r.runNotifyCh:
-			if !ok {
-				return
-			}
-			drainAndExec("run_updates", payload, r.runNotifyCh)
+		case <-ctx.Done():
+			return
+		case <-r.pendingCh:
+		}
+
+		actions, runs := r.takePendingNotifications()
+		retryActions := emit("action_updates", actions)
+		retryRuns := emit("run_updates", runs)
+
+		if len(retryActions) == 0 && len(retryRuns) == 0 {
+			backoff = notifyRetryMinBackoff
+			continue
+		}
+
+		r.mergePendingActions(retryActions)
+		r.mergePendingRuns(retryRuns)
+		r.signalPending()
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(backoff):
+		}
+		backoff *= 2
+		if backoff > notifyRetryMaxBackoff {
+			backoff = notifyRetryMaxBackoff
 		}
 	}
 }
 
-// notifyActionUpdate sends a notification about an action update via the
-// dedicated notify channel, avoiding connection pool contention.
-func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.ActionIdentifier) {
+func (r *actionRepo) notifyActionUpdate(_ context.Context, actionID *common.ActionIdentifier) {
 	payload := fmt.Sprintf("%s/%s/%s/%s",
 		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 
-	select {
-	case r.actionNotifyCh <- payload:
-	case <-ctx.Done():
-		logger.Errorf(ctx, "Action NOTIFY send cancelled for %s: %v", payload, ctx.Err())
-	}
+	r.markActionPending(payload)
+}
+
+func (r *actionRepo) markActionPending(payload string) {
+	r.notifyMu.Lock()
+	enqueuePending(r.pendingActions, &r.pendingActionQueue, payload, time.Now(), notificationBufferLimit)
+	r.notifyMu.Unlock()
+	r.signalPending()
 }

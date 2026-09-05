@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net"
 	"sort"
+	"sync"
 	"testing"
 	"time"
 
@@ -822,11 +823,7 @@ func TestInsertEvents_Empty(t *testing.T) {
 }
 
 func TestNotifyActionUpdate_PayloadWithSpecialChars(t *testing.T) {
-	r := &actionRepo{
-
-		actionNotifyCh: make(chan string, 256),
-		runNotifyCh:    make(chan string, 256),
-	}
+	r := newNotifyTestRepo()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
@@ -844,20 +841,12 @@ func TestNotifyActionUpdate_PayloadWithSpecialChars(t *testing.T) {
 
 	r.notifyActionUpdate(ctx, actionID)
 
-	select {
-	case payload := <-r.actionNotifyCh:
-		assert.Equal(t, "proj/domain/run'; DROP TABLE actions; --/action", payload)
-	case <-ctx.Done():
-		t.Fatal("timed out waiting for payload on actionNotifyCh")
-	}
+	actions, _ := r.takePendingNotifications()
+	assert.Contains(t, notificationPayloads(actions), "proj/domain/run'; DROP TABLE actions; --/action")
 }
 
 func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
-	r := &actionRepo{
-
-		actionNotifyCh: make(chan string, 256),
-		runNotifyCh:    make(chan string, 256),
-	}
+	r := newNotifyTestRepo()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
@@ -871,11 +860,425 @@ func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
 
 	r.notifyRunUpdate(ctx, runID)
 
+	_, runs := r.takePendingNotifications()
+	assert.Contains(t, notificationPayloads(runs), "proj/domain/run'); SELECT pg_sleep(10); --")
+}
+
+func TestNotifyUpdates_QueueDistinctPayloadsInOrder(t *testing.T) {
+	r := newNotifyTestRepo()
+	ctx := context.Background()
+
+	for _, name := range []string{"first-action", "second-action", "first-action"} {
+		r.notifyActionUpdate(ctx, notifyTestActionID(name))
+	}
+	for _, name := range []string{"first-run", "second-run", "first-run"} {
+		r.notifyRunUpdate(ctx, &common.RunIdentifier{Project: "proj", Domain: "domain", Name: name})
+	}
+
+	actions, runs := r.takePendingNotifications()
+	assert.Equal(t, []string{
+		"proj/domain/run/first-action",
+		"proj/domain/run/second-action",
+	}, notificationPayloads(actions))
+	assert.Equal(t, []string{
+		"proj/domain/first-run",
+		"proj/domain/second-run",
+	}, notificationPayloads(runs))
+}
+
+func TestMergePendingActions_RetriesBeforeNewPayloads(t *testing.T) {
+	r := newNotifyTestRepo()
+
+	r.markActionPending("first")
+	r.markActionPending("second")
+	retry, _ := r.takePendingNotifications()
+
+	r.markActionPending("second")
+	r.markActionPending("third")
+	r.mergePendingActions(retry)
+
+	actions, _ := r.takePendingNotifications()
+	assert.Equal(t, []string{"first", "second", "third"}, notificationPayloads(actions))
+}
+
+func TestEnqueuePending_EvictsLeastRecentlyUpdatedPayload(t *testing.T) {
+	pending := make(map[string]time.Time)
+	queue := newPendingNotificationHeap(2)
+	now := time.Now()
+
+	enqueuePending(pending, &queue, "first", now, 2)
+	enqueuePending(pending, &queue, "second", now.Add(time.Second), 2)
+	enqueuePending(pending, &queue, "third", now.Add(2*time.Second), 2)
+
+	assert.NotContains(t, pending, "first")
+	assert.Contains(t, pending, "second")
+	assert.Contains(t, pending, "third")
+
+	enqueuePending(pending, &queue, "second", now.Add(3*time.Second), 2)
+	assert.Equal(t, []string{"second", "third"}, notificationPayloads(queue.drain()))
+	assert.Equal(t, now.Add(3*time.Second), pending["second"])
+}
+
+func notificationPayloads(notifications []pendingNotification) []string {
+	payloads := make([]string, len(notifications))
+	for i, notification := range notifications {
+		payloads[i] = notification.payload
+	}
+	return payloads
+}
+
+// TestNotifyActionUpdate_KeepsWakeupAfterContextCancel covers the loss path
+// that existed before: a client disconnecting mid-request used to discard a
+// wakeup that other watchers still needed.
+func TestNotifyActionUpdate_KeepsWakeupAfterContextCancel(t *testing.T) {
+	r := newNotifyTestRepo()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	r.notifyActionUpdate(ctx, notifyTestActionID("cancelled-caller"))
+	r.notifyRunUpdate(ctx, &common.RunIdentifier{Project: "proj", Domain: "domain", Name: "run"})
+
+	actions, runs := r.takePendingNotifications()
+	assert.Contains(t, notificationPayloads(actions), "proj/domain/run/cancelled-caller")
+	assert.Contains(t, notificationPayloads(runs), "proj/domain/run")
+}
+
+// TestRunNotifyLoop_RetriesUndeliveredPayloads verifies that a failed
+// pg_notify keeps the payload pending instead of dropping it. A nil connection
+// with no database to reconnect to is the simplest permanent failure. The
+// whole batch must survive, not just the payload that failed first: a dead
+// connection aborts the drain rather than retrying the connection per payload.
+func TestRunNotifyLoop_RetriesUndeliveredPayloads(t *testing.T) {
+	r := newNotifyTestRepo()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	for i := 0; i < 3; i++ {
+		r.notifyActionUpdate(ctx, notifyTestActionID(fmt.Sprintf("undeliverable-%d", i)))
+	}
+	for i := 0; i < 2; i++ {
+		r.notifyRunUpdate(ctx, &common.RunIdentifier{
+			Project: "proj", Domain: "domain", Name: fmt.Sprintf("run-%d", i),
+		})
+	}
+
+	loopDone := make(chan struct{})
+	go func() {
+		defer close(loopDone)
+		r.runNotifyLoop(ctx, nil, nil)
+	}()
+
+	// Let the pump take the payloads, fail to deliver them, and requeue.
+	assert.Eventually(t, func() bool {
+		actions, runs := r.pendingCounts()
+		return actions == 3 && runs == 2
+	}, 5*time.Second, 20*time.Millisecond, "undelivered payloads must stay pending for retry")
+
+	cancel()
 	select {
-	case payload := <-r.runNotifyCh:
-		assert.Equal(t, "proj/domain/run'); SELECT pg_sleep(10); --", payload)
-	case <-ctx.Done():
-		t.Fatal("timed out waiting for payload on runNotifyCh")
+	case <-loopDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("runNotifyLoop did not return after its context was cancelled")
+	}
+}
+
+// newNotifyTestRepo builds a repo with the notify plumbing initialized but no
+// pump running, so the pending work is observable and nothing drains it.
+func newNotifyTestRepo() *actionRepo {
+	return &actionRepo{
+		pendingActions:     make(map[string]time.Time, pendingNotificationCapacity),
+		pendingActionQueue: newPendingNotificationHeap(pendingNotificationCapacity),
+		pendingRuns:        make(map[string]time.Time, pendingNotificationCapacity),
+		pendingRunQueue:    newPendingNotificationHeap(pendingNotificationCapacity),
+		pendingCh:          make(chan struct{}, 1),
+	}
+}
+
+// pendingCounts reports how many payloads are queued for the pump.
+func (r *actionRepo) pendingCounts() (actions, runs int) {
+	r.notifyMu.Lock()
+	defer r.notifyMu.Unlock()
+	return r.pendingActionQueue.Len(), r.pendingRunQueue.Len()
+}
+
+// newNotifyRepoWithDB builds a repo wired to a real database and listener but
+// with no pump running, so a test can drive runNotifyLoop itself and watch
+// what actually reaches the wire.
+func newNotifyRepoWithDB(t *testing.T) (*actionRepo, *sql.DB, *sql.Conn) {
+	t.Helper()
+	db := setupActionDB(t)
+
+	r := &actionRepo{
+		db:                 db,
+		dsn:                database.GetPostgresDsn(context.Background(), testDbConfig.Postgres),
+		runSubscribers:     make(map[chan string]bool),
+		actionSubscribers:  make(map[chan string]bool),
+		pendingActions:     make(map[string]time.Time, pendingNotificationCapacity),
+		pendingActionQueue: newPendingNotificationHeap(pendingNotificationCapacity),
+		pendingRuns:        make(map[string]time.Time, pendingNotificationCapacity),
+		pendingRunQueue:    newPendingNotificationHeap(pendingNotificationCapacity),
+		pendingCh:          make(chan struct{}, 1),
+	}
+	require.NoError(t, r.startPostgresListener())
+
+	conn, err := db.DB.Conn(context.Background())
+	require.NoError(t, err)
+	t.Cleanup(func() { conn.Close() }) //nolint:errcheck
+
+	return r, db.DB, conn
+}
+
+// subscribeActions registers a raw subscriber the way WatchActionUpdates does.
+func subscribeActions(t *testing.T, r *actionRepo, size int) chan string {
+	t.Helper()
+	ch := make(chan string, size)
+	r.mu.Lock()
+	r.actionSubscribers[ch] = true
+	r.mu.Unlock()
+	t.Cleanup(func() {
+		r.mu.Lock()
+		delete(r.actionSubscribers, ch)
+		r.mu.Unlock()
+	})
+	return ch
+}
+
+func notifyTestActionID(name string) *common.ActionIdentifier {
+	return &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "domain", Name: "run"},
+		Name: name,
+	}
+}
+
+// TestNotifyActionUpdate_DoesNotBlockOnStalledPump pins the property the write
+// path depends on: the row is already committed by the time we notify, so a
+// stalled pump must never turn into RPC latency.
+func TestNotifyActionUpdate_DoesNotBlockOnStalledPump(t *testing.T) {
+	r := newNotifyTestRepo()
+
+	// No pump is running, so nothing consumes what the writer produces. Push
+	// far more updates than any fixed-size buffer would hold.
+	const updates = 5000
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for i := 0; i < updates; i++ {
+			r.notifyActionUpdate(ctx, notifyTestActionID(fmt.Sprintf("action-%d", i)))
+		}
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("notifyActionUpdate blocked while the notify pump was stalled")
+	}
+}
+
+// TestNotifyRunUpdate_DoesNotBlockOnStalledPump is the run-side twin of the
+// test above; both notify paths share the same pump.
+func TestNotifyRunUpdate_DoesNotBlockOnStalledPump(t *testing.T) {
+	r := newNotifyTestRepo()
+
+	const updates = 5000
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for i := 0; i < updates; i++ {
+			r.notifyRunUpdate(ctx, &common.RunIdentifier{
+				Org: "org", Project: "proj", Domain: "domain", Name: fmt.Sprintf("run-%d", i),
+			})
+		}
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("notifyRunUpdate blocked while the notify pump was stalled")
+	}
+}
+
+// TestWatchActionUpdates_DeliversPhaseChange exercises the full product path
+// against a real database: UpdateActionPhase writes the row, the notify pump
+// issues pg_notify, the listener fans out to subscribers, and the watcher
+// re-reads the action. It guards the other half of the contract, that making
+// the writer non-blocking must not lose a wakeup.
+func TestWatchActionUpdates_DeliversPhaseChange(t *testing.T) {
+	db := setupActionDB(t)
+	repo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	repoImpl, ok := repo.(*actionRepo)
+	require.True(t, ok)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	actionID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Project: "p", Domain: "d", Name: "run-watch"},
+		Name: "watched-action",
+	}
+	_, err = repo.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	updates := make(chan *models.Action, 8)
+	errs := make(chan error, 8)
+	go repo.WatchActionUpdates(ctx, actionID, updates, errs)
+
+	require.Eventually(t, func() bool {
+		repoImpl.mu.RLock()
+		defer repoImpl.mu.RUnlock()
+		return len(repoImpl.actionSubscribers) > 0
+	}, 2*time.Second, 10*time.Millisecond, "timed out waiting for watcher registration")
+
+	require.NoError(t, repo.UpdateActionPhase(ctx, actionID,
+		common.ActionPhase_ACTION_PHASE_RUNNING, 0, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
+
+	// CreateAction notifies as well, so the watcher can legitimately see the
+	// initial phase first. Wait for the transition we triggered.
+	deadline := time.After(15 * time.Second)
+	for {
+		select {
+		case got := <-updates:
+			if got.Phase == int32(common.ActionPhase_ACTION_PHASE_RUNNING) {
+				return
+			}
+		case err := <-errs:
+			t.Fatalf("watch reported an error: %v", err)
+		case <-deadline:
+			t.Fatal("phase change never reached the watcher")
+		}
+	}
+}
+
+// TestNotifyPump_ConcurrentWritersDeliverEveryAction runs many writers against
+// a live pump and a real database, and checks the delivery half of the
+// contract: every action that was notified reaches the wire. The stalled-pump
+// tests above own the "writers never block" half.
+func TestNotifyPump_ConcurrentWritersDeliverEveryAction(t *testing.T) {
+	db := setupActionDB(t)
+	repoIface, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	repo, ok := repoIface.(*actionRepo)
+	require.True(t, ok)
+
+	const writers = 40
+	const perWriter = 25
+	const total = writers * perWriter
+
+	// Subscribe the way WatchActionUpdates does, so we observe what actually
+	// came back through pg_notify and the listener.
+	delivered := make(chan string, 4*total)
+	repo.mu.Lock()
+	repo.actionSubscribers[delivered] = true
+	repo.mu.Unlock()
+	defer func() {
+		repo.mu.Lock()
+		delete(repo.actionSubscribers, delivered)
+		repo.mu.Unlock()
+	}()
+
+	ctx := context.Background()
+	var wg sync.WaitGroup
+	for w := 0; w < writers; w++ {
+		wg.Add(1)
+		go func(w int) {
+			defer wg.Done()
+			for i := 0; i < perWriter; i++ {
+				repo.notifyActionUpdate(ctx, notifyTestActionID(fmt.Sprintf("a-%d-%d", w, i)))
+			}
+		}(w)
+	}
+	wg.Wait()
+
+	seen := make(map[string]struct{}, total)
+	deadline := time.After(60 * time.Second)
+	for len(seen) < total {
+		select {
+		case payload := <-delivered:
+			seen[payload] = struct{}{}
+		case <-deadline:
+			t.Fatalf("only %d of %d notifications were delivered", len(seen), total)
+		}
+	}
+
+	for w := 0; w < writers; w++ {
+		for i := 0; i < perWriter; i++ {
+			assert.Contains(t, seen, fmt.Sprintf("proj/domain/run/a-%d-%d", w, i))
+		}
+	}
+}
+
+// TestUpdateActionPhase_CompletesWithStalledPump is the acceptance criterion
+// the issue states directly: with the pump stalled the writer returns
+// immediately and the row is still written.
+func TestUpdateActionPhase_CompletesWithStalledPump(t *testing.T) {
+	db := setupActionDB(t)
+	r := &actionRepo{
+		db:                 db,
+		pendingActions:     make(map[string]time.Time, pendingNotificationCapacity),
+		pendingActionQueue: newPendingNotificationHeap(pendingNotificationCapacity),
+		pendingRuns:        make(map[string]time.Time, pendingNotificationCapacity),
+		pendingRunQueue:    newPendingNotificationHeap(pendingNotificationCapacity),
+		pendingCh:          make(chan struct{}, 1),
+	}
+	// No pump is started, so nothing drains what the write path queues.
+
+	ctx := context.Background()
+	actionID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Project: "p", Domain: "d", Name: "run-stalled"},
+		Name: "stalled-action",
+	}
+	_, err := r.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	// Back the queue up past what the old 256-slot buffer could hold.
+	for i := 0; i < 300; i++ {
+		r.notifyActionUpdate(ctx, notifyTestActionID(fmt.Sprintf("backlog-%d", i)))
+	}
+
+	start := time.Now()
+	require.NoError(t, r.UpdateActionPhase(ctx, actionID,
+		common.ActionPhase_ACTION_PHASE_RUNNING, 0, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
+	assert.Less(t, time.Since(start), 2*time.Second, "the write must not wait on a stalled pump")
+
+	action, err := r.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_RUNNING), action.Phase,
+		"the row must still be written while the pump is stalled")
+
+	actions, _ := r.pendingCounts()
+	assert.Equal(t, 301, actions, "the notification must be queued rather than dropped")
+}
+
+func TestNotifyPump_DeliversPendingActionsFIFO(t *testing.T) {
+	r, sqlDB, conn := newNotifyRepoWithDB(t)
+	delivered := subscribeActions(t, r, 512)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	for i := 0; i < 500; i++ {
+		r.notifyActionUpdate(ctx, notifyTestActionID(fmt.Sprintf("action-%03d", i)))
+	}
+
+	go r.runNotifyLoop(ctx, sqlDB, conn)
+
+	for i := 0; i < 500; i++ {
+		select {
+		case payload := <-delivered:
+			assert.Equal(t, fmt.Sprintf("proj/domain/run/action-%03d", i), payload)
+		case <-time.After(15 * time.Second):
+			t.Fatalf("notification %d was never delivered", i)
+		}
 	}
 }
 
@@ -927,19 +1330,17 @@ func TestIsConnError(t *testing.T) {
 func TestRunNotifyLoop_NilConnNoPanic(t *testing.T) {
 	// Verify that runNotifyLoop handles a nil connection gracefully
 	// (e.g. after a failed reconnect) instead of panicking.
-	r := &actionRepo{
+	r := newNotifyTestRepo()
 
-		actionNotifyCh: make(chan string, 256),
-		runNotifyCh:    make(chan string, 256),
-	}
+	// Queue a notification, then cancel so the loop exits after one attempt.
+	r.notifyActionUpdate(context.Background(), notifyTestActionID("action"))
 
-	// Send a notification, then close the channel so the loop exits.
-	r.actionNotifyCh <- "proj/domain/run/action"
-	close(r.actionNotifyCh)
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+	defer cancel()
 
-	// Pass a nil conn — should not panic.
+	// Pass a nil conn: should not panic.
 	assert.NotPanics(t, func() {
-		r.runNotifyLoop(nil, nil)
+		r.runNotifyLoop(ctx, nil, nil)
 	})
 }
 
