@@ -864,20 +864,67 @@ func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
 	assert.Contains(t, runs, "proj/domain/run'); SELECT pg_sleep(10); --")
 }
 
-// TestNotifyActionUpdate_CoalescesRepeats checks the property that makes a set
-// safe here: repeated updates to one action between drains collapse into a
-// single wakeup, because the listener re-reads the latest state anyway.
-func TestNotifyActionUpdate_CoalescesRepeats(t *testing.T) {
+func TestNotifyUpdates_QueueDistinctPayloadsInOrder(t *testing.T) {
 	r := newNotifyTestRepo()
 	ctx := context.Background()
 
-	for i := 0; i < 500; i++ {
-		r.notifyActionUpdate(ctx, notifyTestActionID("same-action"))
+	for _, name := range []string{"first-action", "second-action", "first-action"} {
+		r.notifyActionUpdate(ctx, notifyTestActionID(name))
 	}
-	r.notifyActionUpdate(ctx, notifyTestActionID("other-action"))
+	for _, name := range []string{"first-run", "second-run", "first-run"} {
+		r.notifyRunUpdate(ctx, &common.RunIdentifier{Project: "proj", Domain: "domain", Name: name})
+	}
 
-	actions, _ := r.pendingCounts()
-	assert.Equal(t, 2, actions, "repeated updates to one action must collapse into one pending entry")
+	actions, runs := r.takePendingNotifications()
+	assert.Equal(t, []string{
+		"proj/domain/run/first-action",
+		"proj/domain/run/second-action",
+	}, notificationPayloads(actions))
+	assert.Equal(t, []string{
+		"proj/domain/first-run",
+		"proj/domain/second-run",
+	}, notificationPayloads(runs))
+}
+
+func TestMergePendingActions_RetriesBeforeNewPayloads(t *testing.T) {
+	r := newNotifyTestRepo()
+
+	r.markActionPending("first")
+	r.markActionPending("second")
+	retry, _ := r.takePendingNotifications()
+
+	r.markActionPending("second")
+	r.markActionPending("third")
+	r.mergePendingActions(retry)
+
+	actions, _ := r.takePendingNotifications()
+	assert.Equal(t, []string{"first", "second", "third"}, notificationPayloads(actions))
+}
+
+func TestEnqueuePending_EvictsLeastRecentlyUpdatedPayload(t *testing.T) {
+	pending := make(map[string]time.Time)
+	queue := newPendingNotificationHeap(2)
+	now := time.Now()
+
+	enqueuePending(pending, &queue, "first", now, 2)
+	enqueuePending(pending, &queue, "second", now.Add(time.Second), 2)
+	enqueuePending(pending, &queue, "third", now.Add(2*time.Second), 2)
+
+	assert.NotContains(t, pending, "first")
+	assert.Contains(t, pending, "second")
+	assert.Contains(t, pending, "third")
+
+	enqueuePending(pending, &queue, "second", now.Add(3*time.Second), 2)
+	assert.Equal(t, []string{"second", "third"}, notificationPayloads(queue.drain()))
+	assert.Equal(t, now.Add(3*time.Second), pending["second"])
+}
+
+func notificationPayloads(notifications []pendingNotification) []string {
+	payloads := make([]string, len(notifications))
+	for i, notification := range notifications {
+		payloads[i] = notification.payload
+	}
+	return payloads
 }
 
 // TestNotifyActionUpdate_KeepsWakeupAfterContextCancel covers the loss path
@@ -941,9 +988,11 @@ func TestRunNotifyLoop_RetriesUndeliveredPayloads(t *testing.T) {
 // pump running, so the pending work is observable and nothing drains it.
 func newNotifyTestRepo() *actionRepo {
 	return &actionRepo{
-		pendingActions: make(map[string]struct{}),
-		pendingRuns:    make(map[string]struct{}),
-		pendingCh:      make(chan struct{}, 1),
+		pendingActions:     make(map[string]time.Time, pendingNotificationCapacity),
+		pendingActionQueue: newPendingNotificationHeap(pendingNotificationCapacity),
+		pendingRuns:        make(map[string]time.Time, pendingNotificationCapacity),
+		pendingRunQueue:    newPendingNotificationHeap(pendingNotificationCapacity),
+		pendingCh:          make(chan struct{}, 1),
 	}
 }
 
@@ -951,7 +1000,7 @@ func newNotifyTestRepo() *actionRepo {
 func (r *actionRepo) pendingCounts() (actions, runs int) {
 	r.notifyMu.Lock()
 	defer r.notifyMu.Unlock()
-	return len(r.pendingActions), len(r.pendingRuns)
+	return r.pendingActionQueue.Len(), r.pendingRunQueue.Len()
 }
 
 // newNotifyRepoWithDB builds a repo wired to a real database and listener but
@@ -962,13 +1011,15 @@ func newNotifyRepoWithDB(t *testing.T) (*actionRepo, *sql.DB, *sql.Conn) {
 	db := setupActionDB(t)
 
 	r := &actionRepo{
-		db:                db,
-		dsn:               database.GetPostgresDsn(context.Background(), testDbConfig.Postgres),
-		runSubscribers:    make(map[chan string]bool),
-		actionSubscribers: make(map[chan string]bool),
-		pendingActions:    make(map[string]struct{}),
-		pendingRuns:       make(map[string]struct{}),
-		pendingCh:         make(chan struct{}, 1),
+		db:                 db,
+		dsn:                database.GetPostgresDsn(context.Background(), testDbConfig.Postgres),
+		runSubscribers:     make(map[chan string]bool),
+		actionSubscribers:  make(map[chan string]bool),
+		pendingActions:     make(map[string]time.Time, pendingNotificationCapacity),
+		pendingActionQueue: newPendingNotificationHeap(pendingNotificationCapacity),
+		pendingRuns:        make(map[string]time.Time, pendingNotificationCapacity),
+		pendingRunQueue:    newPendingNotificationHeap(pendingNotificationCapacity),
+		pendingCh:          make(chan struct{}, 1),
 	}
 	require.NoError(t, r.startPostgresListener())
 
@@ -1172,10 +1223,12 @@ func TestNotifyPump_ConcurrentWritersDeliverEveryAction(t *testing.T) {
 func TestUpdateActionPhase_CompletesWithStalledPump(t *testing.T) {
 	db := setupActionDB(t)
 	r := &actionRepo{
-		db:             db,
-		pendingActions: make(map[string]struct{}),
-		pendingRuns:    make(map[string]struct{}),
-		pendingCh:      make(chan struct{}, 1),
+		db:                 db,
+		pendingActions:     make(map[string]time.Time, pendingNotificationCapacity),
+		pendingActionQueue: newPendingNotificationHeap(pendingNotificationCapacity),
+		pendingRuns:        make(map[string]time.Time, pendingNotificationCapacity),
+		pendingRunQueue:    newPendingNotificationHeap(pendingNotificationCapacity),
+		pendingCh:          make(chan struct{}, 1),
 	}
 	// No pump is started, so nothing drains what the write path queues.
 
@@ -1206,33 +1259,26 @@ func TestUpdateActionPhase_CompletesWithStalledPump(t *testing.T) {
 	assert.Equal(t, 301, actions, "the notification must be queued rather than dropped")
 }
 
-// TestNotifyPump_CoalescesRepeatsOnTheWire checks the collapse where it counts,
-// on the wire rather than in the map. Every update is queued before the pump
-// starts, so the whole burst is one drain.
-func TestNotifyPump_CoalescesRepeatsOnTheWire(t *testing.T) {
+func TestNotifyPump_DeliversPendingActionsFIFO(t *testing.T) {
 	r, sqlDB, conn := newNotifyRepoWithDB(t)
-	delivered := subscribeActions(t, r, 64)
+	delivered := subscribeActions(t, r, 512)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	for i := 0; i < 500; i++ {
-		r.notifyActionUpdate(ctx, notifyTestActionID("busy-action"))
+		r.notifyActionUpdate(ctx, notifyTestActionID(fmt.Sprintf("action-%03d", i)))
 	}
 
 	go r.runNotifyLoop(ctx, sqlDB, conn)
 
-	select {
-	case payload := <-delivered:
-		assert.Equal(t, "proj/domain/run/busy-action", payload)
-	case <-time.After(15 * time.Second):
-		t.Fatal("the coalesced notification was never delivered")
-	}
-
-	select {
-	case extra := <-delivered:
-		t.Fatalf("500 updates to one action must produce one notification, also got %q", extra)
-	case <-time.After(2 * time.Second):
+	for i := 0; i < 500; i++ {
+		select {
+		case payload := <-delivered:
+			assert.Equal(t, fmt.Sprintf("proj/domain/run/action-%03d", i), payload)
+		case <-time.After(15 * time.Second):
+			t.Fatalf("notification %d was never delivered", i)
+		}
 	}
 }
 
