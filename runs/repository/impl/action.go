@@ -105,7 +105,7 @@ func (h *pendingNotificationHeap) drain() []pendingNotification {
 }
 
 const (
-	notificationBufferLimit     = 1_000_000
+	notificationBufferLimit     = 50_000
 	pendingNotificationCapacity = 256
 	notifyRetryMinBackoff       = 50 * time.Millisecond
 	notifyRetryMaxBackoff       = 5 * time.Second
