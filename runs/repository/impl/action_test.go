@@ -842,7 +842,7 @@ func TestNotifyActionUpdate_PayloadWithSpecialChars(t *testing.T) {
 	r.notifyActionUpdate(ctx, actionID)
 
 	actions, _ := r.takePendingNotifications()
-	assert.Contains(t, actions, "proj/domain/run'; DROP TABLE actions; --/action")
+	assert.Contains(t, notificationPayloads(actions), "proj/domain/run'; DROP TABLE actions; --/action")
 }
 
 func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
@@ -861,7 +861,7 @@ func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
 	r.notifyRunUpdate(ctx, runID)
 
 	_, runs := r.takePendingNotifications()
-	assert.Contains(t, runs, "proj/domain/run'); SELECT pg_sleep(10); --")
+	assert.Contains(t, notificationPayloads(runs), "proj/domain/run'); SELECT pg_sleep(10); --")
 }
 
 func TestNotifyUpdates_QueueDistinctPayloadsInOrder(t *testing.T) {
@@ -940,8 +940,8 @@ func TestNotifyActionUpdate_KeepsWakeupAfterContextCancel(t *testing.T) {
 	r.notifyRunUpdate(ctx, &common.RunIdentifier{Project: "proj", Domain: "domain", Name: "run"})
 
 	actions, runs := r.takePendingNotifications()
-	assert.Contains(t, actions, "proj/domain/run/cancelled-caller")
-	assert.Contains(t, runs, "proj/domain/run")
+	assert.Contains(t, notificationPayloads(actions), "proj/domain/run/cancelled-caller")
+	assert.Contains(t, notificationPayloads(runs), "proj/domain/run")
 }
 
 // TestRunNotifyLoop_RetriesUndeliveredPayloads verifies that a failed
