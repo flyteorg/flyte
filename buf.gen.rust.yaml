@@ -9,7 +9,6 @@ plugins:
     out: gen/rust/src
     opt:
       - file_descriptor_set
-      - type_attribute=.=#[pyo3::pyclass(dict\, get_all\, set_all)]
       - compile_well_known_types
   - remote: buf.build/community/neoeinstein-tonic:v0.4.1
     out: gen/rust/src
