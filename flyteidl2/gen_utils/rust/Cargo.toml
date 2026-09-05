@@ -6,8 +6,6 @@ description = "Rust bindings and utilities for FlyteIDL protobufs."
 license = "Apache-2.0"
 
 [dependencies]
-pyo3 = { version = "0.24", features = ["experimental-async"] }
-pyo3-async-runtimes = { version = "0.24", features = ["tokio-runtime"] }
 tokio = { version = "1.0", features = ["full"] }
 tonic = "0.12.3"
 prost = { version = "0.13.5", features = ["std"] }
@@ -24,10 +22,6 @@ pbjson = { version = "0.7.0" }
 pbjson-types = { version = "0.7.0" }
 protobuf = { version = "4.31.1-release" }
 prost-build = "0.14"
-quote = "1.0"
-syn = { version = "2.0", features = ["full", "extra-traits"] }
-prettyplease = "0.2"
-regex = "1.11.1"
 
 [lib]
 name = "flyteidl2"
@@ -41,10 +35,6 @@ default = []
 [build-dependencies]
 prost-build = "0.14"
 pbjson-build = { version = "0.7.0" }
-quote = "1.0"
-syn = { version = "2.0", features = ["full", "extra-traits"] }
-prettyplease = "0.2"
-regex = "1.10"
 
 #[profile.dev.build-override]
 #debug = true
