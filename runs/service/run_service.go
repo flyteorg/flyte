@@ -866,19 +866,18 @@ func IsTerminalPhase(phase common.ActionPhase) bool {
 		phase == common.ActionPhase_ACTION_PHASE_RECOVERED
 }
 
-// actionStreamComplete reports whether WatchActionDetails has nothing further to
-// deliver. Attempt-level terminality alone is not enough to close on: a timed-out
-// attempt emits a terminal TIMED_OUT event for attempt N while the action restarts
-// as attempt N+1 in the same reconcile, so closing on the event alone ends the
-// stream mid-retry. Nor is the actions table alone: it can be terminal before
-// action_events reflects it. The stream is complete only when both agree — the
-// action's own phase is terminal, and the highest-numbered attempt is terminal
-// and is the action's current attempt.
+func IsFailedPhase(phase common.ActionPhase) bool {
+	return phase == common.ActionPhase_ACTION_PHASE_FAILED ||
+		phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT
+}
+
 func actionStreamComplete(details *workflow.ActionDetails) bool {
 	attempts := details.GetAttempts()
 	if len(attempts) == 0 {
 		return false
 	}
+
+	// Get the last attempt
 	last := attempts[0]
 	for _, a := range attempts {
 		if a.GetAttempt() > last.GetAttempt() {
@@ -886,8 +885,8 @@ func actionStreamComplete(details *workflow.ActionDetails) bool {
 		}
 	}
 	status := details.GetStatus()
-	return IsTerminalPhase(status.GetPhase()) &&
-		IsTerminalPhase(last.GetPhase()) &&
+	return IsTerminalPhase(status.GetPhase()) && // Make sure the action's retries are all completed
+		IsTerminalPhase(last.GetPhase()) && // Make sure the last attempt is in terminal phase
 		last.GetAttempt() == status.GetAttempts()
 }
 
@@ -2079,10 +2078,8 @@ func (s *RunService) buildTaskGroups(ctx context.Context, req *workflow.WatchGro
 
 		phase := common.ActionPhase(action.Phase)
 		g.phaseCounts[phase]++
-		// A timed-out action did not succeed, so it counts toward the fail rate;
-		// phaseCounts still reports the two separately.
-		if phase == common.ActionPhase_ACTION_PHASE_FAILED ||
-			phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT {
+
+		if IsFailedPhase(phase) {
 			g.failCount++
 		}
 

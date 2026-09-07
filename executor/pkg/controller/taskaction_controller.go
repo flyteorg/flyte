@@ -179,9 +179,7 @@ func (r *TaskActionReconciler) now() time.Time {
 	return time.Now()
 }
 
-// maxRuntimeFromTaskTemplate reads TaskMetadata.timeout — the per-attempt max
-// runtime — from the inline task template. A missing or zero timeout means
-// unlimited. Mirrors maxAttemptsFromTaskTemplate in executor/pkg/plugin.
+// maxRuntimeFromTaskTemplate reads TaskMetadata.timeout — the per-attempt max runtime
 func maxRuntimeFromTaskTemplate(data []byte) (time.Duration, error) {
 	if len(data) == 0 {
 		return 0, nil
