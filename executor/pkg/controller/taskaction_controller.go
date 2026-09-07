@@ -723,9 +723,9 @@ func (r *TaskActionReconciler) reconcileTask(
 		setCondition(taskAction, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue, reason, err.Error())
 		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse, reason, err.Error())
 		start := time.Now()
-		updErr := r.Status().Update(ctx, taskAction) // error intentionally ignored: terminal either way
+		updErr := r.Status().Update(ctx, taskAction)
 		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
-		return ctrl.Result{}, nil // terminal — do not requeue
+		return ctrl.Result{}, updErr
 	}
 
 	// Ensure finalizer is present (once validation passes)
@@ -1191,9 +1191,14 @@ func toActionErrorInfo(err *core.ExecutionError) *workflow.ErrorInfo {
 	if err == nil {
 		return nil
 	}
+	// Code and GpuFault are carried through as they are. They are the parts of the
+	// failure the user can act on, and this event is the only place they reach the
+	// console and the SDK from.
 	out := &workflow.ErrorInfo{
-		Message: err.GetMessage(),
-		Kind:    workflow.ErrorInfo_KIND_UNSPECIFIED,
+		Message:  err.GetMessage(),
+		Kind:     workflow.ErrorInfo_KIND_UNSPECIFIED,
+		Code:     err.GetCode(),
+		GpuFault: err.GetGpuFault(),
 	}
 	switch err.GetKind() {
 	case core.ExecutionError_USER:

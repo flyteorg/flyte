@@ -15,7 +15,7 @@ from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n flyteidl2/core/artifact_id.proto\x12\x0e\x66lyteidl2.core\x1a\x1b\x62uf/validate/validate.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"e\n\x0b\x41rtifactKey\x12\x18\n\x07project\x18\x01 \x01(\tR\x07project\x12\x16\n\x06\x64omain\x18\x02 \x01(\tR\x06\x64omain\x12\x12\n\x04name\x18\x03 \x01(\tR\x04name\x12\x10\n\x03org\x18\x04 \x01(\tR\x03org\"\\\n\x11\x41rtifactVersionId\x12-\n\x03key\x18\x01 \x01(\x0b\x32\x1b.flyteidl2.core.ArtifactKeyR\x03key\x12\x18\n\x07version\x18\x02 \x01(\tR\x07version\"h\n\x0c\x41rtifactCard\x12\x1a\n\x03uri\x18\x01 \x01(\tB\x08\xbaH\x05r\x03\x18\x80\x08R\x03uri\x12\x1f\n\x06\x66ormat\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x18\x10R\x06\x66ormat\x12\x1b\n\x04type\x18\x03 \x01(\tB\x07\xbaH\x04r\x02\x18\x10R\x04type\"\x82\x02\n\x0c\x41rtifactInfo\x12*\n\x0b\x64\x65scription\x18\x01 \x01(\tB\x08\xbaH\x05r\x03\x18\xff\x01R\x0b\x64\x65scription\x12S\n\ruser_metadata\x18\x02 \x03(\x0b\x32..flyteidl2.core.ArtifactInfo.UserMetadataEntryR\x0cuserMetadata\x12\x30\n\x04\x63\x61rd\x18\x03 \x01(\x0b\x32\x1c.flyteidl2.core.ArtifactCardR\x04\x63\x61rd\x1a?\n\x11UserMetadataEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\xd1\x01\n\x13\x41rtifactBindingData\x12%\n\rpartition_key\x18\x05 \x01(\tH\x00R\x0cpartitionKey\x12\x35\n\x16\x62ind_to_time_partition\x18\x06 \x01(\x08H\x00R\x13\x62indToTimePartition\x12\x44\n\x0etime_transform\x18\x07 \x01(\x0b\x32\x1d.flyteidl2.core.TimeTransformR\rtimeTransformB\x10\n\x0epartition_dataJ\x04\x08\x01\x10\x05\"W\n\rTimeTransform\x12\x1c\n\ttransform\x18\x01 \x01(\tR\ttransform\x12(\n\x02op\x18\x02 \x01(\x0e\x32\x18.flyteidl2.core.OperatorR\x02op\"$\n\x10InputBindingData\x12\x10\n\x03var\x18\x01 \x01(\tR\x03var\"\x10\n\x0eRuntimeBinding\"\xdf\x02\n\nLabelValue\x12#\n\x0cstatic_value\x18\x01 \x01(\tH\x00R\x0bstaticValue\x12;\n\ntime_value\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x00R\ttimeValue\x12R\n\x11triggered_binding\x18\x03 \x01(\x0b\x32#.flyteidl2.core.ArtifactBindingDataH\x00R\x10triggeredBinding\x12G\n\rinput_binding\x18\x04 \x01(\x0b\x32 .flyteidl2.core.InputBindingDataH\x00R\x0cinputBinding\x12I\n\x0fruntime_binding\x18\x05 \x01(\x0b\x32\x1e.flyteidl2.core.RuntimeBindingH\x00R\x0eruntimeBindingB\x07\n\x05value\"\x9f\x01\n\nPartitions\x12;\n\x05value\x18\x01 \x03(\x0b\x32%.flyteidl2.core.Partitions.ValueEntryR\x05value\x1aT\n\nValueEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x30\n\x05value\x18\x02 \x01(\x0b\x32\x1a.flyteidl2.core.LabelValueR\x05value:\x02\x38\x01\"\x80\x01\n\rTimePartition\x12\x30\n\x05value\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.core.LabelValueR\x05value\x12=\n\x0bgranularity\x18\x02 \x01(\x0e\x32\x1b.flyteidl2.core.GranularityR\x0bgranularity\"\xe8\x01\n\nArtifactID\x12>\n\x0c\x61rtifact_key\x18\x01 \x01(\x0b\x32\x1b.flyteidl2.core.ArtifactKeyR\x0b\x61rtifactKey\x12\x18\n\x07version\x18\x02 \x01(\tR\x07version\x12:\n\npartitions\x18\x03 \x01(\x0b\x32\x1a.flyteidl2.core.PartitionsR\npartitions\x12\x44\n\x0etime_partition\x18\x04 \x01(\x0b\x32\x1d.flyteidl2.core.TimePartitionR\rtimePartition\"\x7f\n\x0b\x41rtifactTag\x12>\n\x0c\x61rtifact_key\x18\x01 \x01(\x0b\x32\x1b.flyteidl2.core.ArtifactKeyR\x0b\x61rtifactKey\x12\x30\n\x05value\x18\x02 \x01(\x0b\x32\x1a.flyteidl2.core.LabelValueR\x05value\"\xf3\x01\n\rArtifactQuery\x12=\n\x0b\x61rtifact_id\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.core.ArtifactIDH\x00R\nartifactId\x12@\n\x0c\x61rtifact_tag\x18\x02 \x01(\x0b\x32\x1b.flyteidl2.core.ArtifactTagH\x00R\x0b\x61rtifactTag\x12\x12\n\x03uri\x18\x03 \x01(\tH\x00R\x03uri\x12?\n\x07\x62inding\x18\x04 \x01(\x0b\x32#.flyteidl2.core.ArtifactBindingDataH\x00R\x07\x62indingB\x0c\n\nidentifier*B\n\x0bGranularity\x12\t\n\x05UNSET\x10\x00\x12\n\n\x06MINUTE\x10\x01\x12\x08\n\x04HOUR\x10\x02\x12\x07\n\x03\x44\x41Y\x10\x03\x12\t\n\x05MONTH\x10\x04*\x1f\n\x08Operator\x12\t\n\x05MINUS\x10\x00\x12\x08\n\x04PLUS\x10\x01\x42\xb4\x01\n\x12\x63om.flyteidl2.coreB\x0f\x41rtifactIdProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core\xa2\x02\x03\x46\x43X\xaa\x02\x0e\x46lyteidl2.Core\xca\x02\x0e\x46lyteidl2\\Core\xe2\x02\x1a\x46lyteidl2\\Core\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Coreb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n flyteidl2/core/artifact_id.proto\x12\x0e\x66lyteidl2.core\x1a\x1b\x62uf/validate/validate.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8a\x01\n\x0b\x41rtifactKey\x12!\n\x07project\x18\x01 \x01(\tB\x07\xbaH\x04r\x02\x18@R\x07project\x12\x1f\n\x06\x64omain\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x18@R\x06\x64omain\x12\x1c\n\x04name\x18\x03 \x01(\tB\x08\xbaH\x05r\x03\x18\xff\x01R\x04name\x12\x19\n\x03org\x18\x04 \x01(\tB\x07\xbaH\x04r\x02\x18?R\x03org\"f\n\x11\x41rtifactVersionId\x12-\n\x03key\x18\x01 \x01(\x0b\x32\x1b.flyteidl2.core.ArtifactKeyR\x03key\x12\"\n\x07version\x18\x02 \x01(\tB\x08\xbaH\x05r\x03\x18\xff\x01R\x07version\"h\n\x0c\x41rtifactCard\x12\x1a\n\x03uri\x18\x01 \x01(\tB\x08\xbaH\x05r\x03\x18\x80\x08R\x03uri\x12\x1f\n\x06\x66ormat\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x18\x10R\x06\x66ormat\x12\x1b\n\x04type\x18\x03 \x01(\tB\x07\xbaH\x04r\x02\x18\x10R\x04type\"\x82\x02\n\x0c\x41rtifactInfo\x12*\n\x0b\x64\x65scription\x18\x01 \x01(\tB\x08\xbaH\x05r\x03\x18\xff\x01R\x0b\x64\x65scription\x12S\n\ruser_metadata\x18\x02 \x03(\x0b\x32..flyteidl2.core.ArtifactInfo.UserMetadataEntryR\x0cuserMetadata\x12\x30\n\x04\x63\x61rd\x18\x03 \x01(\x0b\x32\x1c.flyteidl2.core.ArtifactCardR\x04\x63\x61rd\x1a?\n\x11UserMetadataEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\xd1\x01\n\x13\x41rtifactBindingData\x12%\n\rpartition_key\x18\x05 \x01(\tH\x00R\x0cpartitionKey\x12\x35\n\x16\x62ind_to_time_partition\x18\x06 \x01(\x08H\x00R\x13\x62indToTimePartition\x12\x44\n\x0etime_transform\x18\x07 \x01(\x0b\x32\x1d.flyteidl2.core.TimeTransformR\rtimeTransformB\x10\n\x0epartition_dataJ\x04\x08\x01\x10\x05\"W\n\rTimeTransform\x12\x1c\n\ttransform\x18\x01 \x01(\tR\ttransform\x12(\n\x02op\x18\x02 \x01(\x0e\x32\x18.flyteidl2.core.OperatorR\x02op\"$\n\x10InputBindingData\x12\x10\n\x03var\x18\x01 \x01(\tR\x03var\"\x10\n\x0eRuntimeBinding\"\xdf\x02\n\nLabelValue\x12#\n\x0cstatic_value\x18\x01 \x01(\tH\x00R\x0bstaticValue\x12;\n\ntime_value\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampH\x00R\ttimeValue\x12R\n\x11triggered_binding\x18\x03 \x01(\x0b\x32#.flyteidl2.core.ArtifactBindingDataH\x00R\x10triggeredBinding\x12G\n\rinput_binding\x18\x04 \x01(\x0b\x32 .flyteidl2.core.InputBindingDataH\x00R\x0cinputBinding\x12I\n\x0fruntime_binding\x18\x05 \x01(\x0b\x32\x1e.flyteidl2.core.RuntimeBindingH\x00R\x0eruntimeBindingB\x07\n\x05value\"\x9f\x01\n\nPartitions\x12;\n\x05value\x18\x01 \x03(\x0b\x32%.flyteidl2.core.Partitions.ValueEntryR\x05value\x1aT\n\nValueEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x30\n\x05value\x18\x02 \x01(\x0b\x32\x1a.flyteidl2.core.LabelValueR\x05value:\x02\x38\x01\"\x80\x01\n\rTimePartition\x12\x30\n\x05value\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.core.LabelValueR\x05value\x12=\n\x0bgranularity\x18\x02 \x01(\x0e\x32\x1b.flyteidl2.core.GranularityR\x0bgranularity\"\xe8\x01\n\nArtifactID\x12>\n\x0c\x61rtifact_key\x18\x01 \x01(\x0b\x32\x1b.flyteidl2.core.ArtifactKeyR\x0b\x61rtifactKey\x12\x18\n\x07version\x18\x02 \x01(\tR\x07version\x12:\n\npartitions\x18\x03 \x01(\x0b\x32\x1a.flyteidl2.core.PartitionsR\npartitions\x12\x44\n\x0etime_partition\x18\x04 \x01(\x0b\x32\x1d.flyteidl2.core.TimePartitionR\rtimePartition\"\x7f\n\x0b\x41rtifactTag\x12>\n\x0c\x61rtifact_key\x18\x01 \x01(\x0b\x32\x1b.flyteidl2.core.ArtifactKeyR\x0b\x61rtifactKey\x12\x30\n\x05value\x18\x02 \x01(\x0b\x32\x1a.flyteidl2.core.LabelValueR\x05value\"\xf3\x01\n\rArtifactQuery\x12=\n\x0b\x61rtifact_id\x18\x01 \x01(\x0b\x32\x1a.flyteidl2.core.ArtifactIDH\x00R\nartifactId\x12@\n\x0c\x61rtifact_tag\x18\x02 \x01(\x0b\x32\x1b.flyteidl2.core.ArtifactTagH\x00R\x0b\x61rtifactTag\x12\x12\n\x03uri\x18\x03 \x01(\tH\x00R\x03uri\x12?\n\x07\x62inding\x18\x04 \x01(\x0b\x32#.flyteidl2.core.ArtifactBindingDataH\x00R\x07\x62indingB\x0c\n\nidentifier*B\n\x0bGranularity\x12\t\n\x05UNSET\x10\x00\x12\n\n\x06MINUTE\x10\x01\x12\x08\n\x04HOUR\x10\x02\x12\x07\n\x03\x44\x41Y\x10\x03\x12\t\n\x05MONTH\x10\x04*\x1f\n\x08Operator\x12\t\n\x05MINUS\x10\x00\x12\x08\n\x04PLUS\x10\x01\x42\xb4\x01\n\x12\x63om.flyteidl2.coreB\x0f\x41rtifactIdProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core\xa2\x02\x03\x46\x43X\xaa\x02\x0e\x46lyteidl2.Core\xca\x02\x0e\x46lyteidl2\\Core\xe2\x02\x1a\x46lyteidl2\\Core\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Coreb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,6 +23,16 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'flyteidl2.core.artifact_id_
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\022com.flyteidl2.coreB\017ArtifactIdProtoH\002P\001Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core\242\002\003FCX\252\002\016Flyteidl2.Core\312\002\016Flyteidl2\\Core\342\002\032Flyteidl2\\Core\\GPBMetadata\352\002\017Flyteidl2::Core'
+  _ARTIFACTKEY.fields_by_name['project']._options = None
+  _ARTIFACTKEY.fields_by_name['project']._serialized_options = b'\272H\004r\002\030@'
+  _ARTIFACTKEY.fields_by_name['domain']._options = None
+  _ARTIFACTKEY.fields_by_name['domain']._serialized_options = b'\272H\004r\002\030@'
+  _ARTIFACTKEY.fields_by_name['name']._options = None
+  _ARTIFACTKEY.fields_by_name['name']._serialized_options = b'\272H\005r\003\030\377\001'
+  _ARTIFACTKEY.fields_by_name['org']._options = None
+  _ARTIFACTKEY.fields_by_name['org']._serialized_options = b'\272H\004r\002\030?'
+  _ARTIFACTVERSIONID.fields_by_name['version']._options = None
+  _ARTIFACTVERSIONID.fields_by_name['version']._serialized_options = b'\272H\005r\003\030\377\001'
   _ARTIFACTCARD.fields_by_name['uri']._options = None
   _ARTIFACTCARD.fields_by_name['uri']._serialized_options = b'\272H\005r\003\030\200\010'
   _ARTIFACTCARD.fields_by_name['format']._options = None
@@ -35,40 +45,40 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _ARTIFACTINFO.fields_by_name['description']._serialized_options = b'\272H\005r\003\030\377\001'
   _PARTITIONS_VALUEENTRY._options = None
   _PARTITIONS_VALUEENTRY._serialized_options = b'8\001'
-  _globals['_GRANULARITY']._serialized_start=2292
-  _globals['_GRANULARITY']._serialized_end=2358
-  _globals['_OPERATOR']._serialized_start=2360
-  _globals['_OPERATOR']._serialized_end=2391
-  _globals['_ARTIFACTKEY']._serialized_start=114
-  _globals['_ARTIFACTKEY']._serialized_end=215
-  _globals['_ARTIFACTVERSIONID']._serialized_start=217
-  _globals['_ARTIFACTVERSIONID']._serialized_end=309
-  _globals['_ARTIFACTCARD']._serialized_start=311
-  _globals['_ARTIFACTCARD']._serialized_end=415
-  _globals['_ARTIFACTINFO']._serialized_start=418
-  _globals['_ARTIFACTINFO']._serialized_end=676
-  _globals['_ARTIFACTINFO_USERMETADATAENTRY']._serialized_start=613
-  _globals['_ARTIFACTINFO_USERMETADATAENTRY']._serialized_end=676
-  _globals['_ARTIFACTBINDINGDATA']._serialized_start=679
-  _globals['_ARTIFACTBINDINGDATA']._serialized_end=888
-  _globals['_TIMETRANSFORM']._serialized_start=890
-  _globals['_TIMETRANSFORM']._serialized_end=977
-  _globals['_INPUTBINDINGDATA']._serialized_start=979
-  _globals['_INPUTBINDINGDATA']._serialized_end=1015
-  _globals['_RUNTIMEBINDING']._serialized_start=1017
-  _globals['_RUNTIMEBINDING']._serialized_end=1033
-  _globals['_LABELVALUE']._serialized_start=1036
-  _globals['_LABELVALUE']._serialized_end=1387
-  _globals['_PARTITIONS']._serialized_start=1390
-  _globals['_PARTITIONS']._serialized_end=1549
-  _globals['_PARTITIONS_VALUEENTRY']._serialized_start=1465
-  _globals['_PARTITIONS_VALUEENTRY']._serialized_end=1549
-  _globals['_TIMEPARTITION']._serialized_start=1552
-  _globals['_TIMEPARTITION']._serialized_end=1680
-  _globals['_ARTIFACTID']._serialized_start=1683
-  _globals['_ARTIFACTID']._serialized_end=1915
-  _globals['_ARTIFACTTAG']._serialized_start=1917
-  _globals['_ARTIFACTTAG']._serialized_end=2044
-  _globals['_ARTIFACTQUERY']._serialized_start=2047
-  _globals['_ARTIFACTQUERY']._serialized_end=2290
+  _globals['_GRANULARITY']._serialized_start=2340
+  _globals['_GRANULARITY']._serialized_end=2406
+  _globals['_OPERATOR']._serialized_start=2408
+  _globals['_OPERATOR']._serialized_end=2439
+  _globals['_ARTIFACTKEY']._serialized_start=115
+  _globals['_ARTIFACTKEY']._serialized_end=253
+  _globals['_ARTIFACTVERSIONID']._serialized_start=255
+  _globals['_ARTIFACTVERSIONID']._serialized_end=357
+  _globals['_ARTIFACTCARD']._serialized_start=359
+  _globals['_ARTIFACTCARD']._serialized_end=463
+  _globals['_ARTIFACTINFO']._serialized_start=466
+  _globals['_ARTIFACTINFO']._serialized_end=724
+  _globals['_ARTIFACTINFO_USERMETADATAENTRY']._serialized_start=661
+  _globals['_ARTIFACTINFO_USERMETADATAENTRY']._serialized_end=724
+  _globals['_ARTIFACTBINDINGDATA']._serialized_start=727
+  _globals['_ARTIFACTBINDINGDATA']._serialized_end=936
+  _globals['_TIMETRANSFORM']._serialized_start=938
+  _globals['_TIMETRANSFORM']._serialized_end=1025
+  _globals['_INPUTBINDINGDATA']._serialized_start=1027
+  _globals['_INPUTBINDINGDATA']._serialized_end=1063
+  _globals['_RUNTIMEBINDING']._serialized_start=1065
+  _globals['_RUNTIMEBINDING']._serialized_end=1081
+  _globals['_LABELVALUE']._serialized_start=1084
+  _globals['_LABELVALUE']._serialized_end=1435
+  _globals['_PARTITIONS']._serialized_start=1438
+  _globals['_PARTITIONS']._serialized_end=1597
+  _globals['_PARTITIONS_VALUEENTRY']._serialized_start=1513
+  _globals['_PARTITIONS_VALUEENTRY']._serialized_end=1597
+  _globals['_TIMEPARTITION']._serialized_start=1600
+  _globals['_TIMEPARTITION']._serialized_end=1728
+  _globals['_ARTIFACTID']._serialized_start=1731
+  _globals['_ARTIFACTID']._serialized_end=1963
+  _globals['_ARTIFACTTAG']._serialized_start=1965
+  _globals['_ARTIFACTTAG']._serialized_end=2092
+  _globals['_ARTIFACTQUERY']._serialized_start=2095
+  _globals['_ARTIFACTQUERY']._serialized_end=2338
 # @@protoc_insertion_point(module_scope)

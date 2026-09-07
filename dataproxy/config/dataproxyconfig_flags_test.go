@@ -99,6 +99,27 @@ func TestDataProxyConfig_SetFlags(t *testing.T) {
 	cmdFlags := actual.GetPFlagSet("")
 	assert.True(t, cmdFlags.HasFlags())
 
+	t.Run("Test_server.port", func(t *testing.T) {
+		t.Run("Override", func(t *testing.T) {
+			cmdFlags.Set("server.port", "8088")
+			if vInt, err := cmdFlags.GetInt("server.port"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vInt), &actual.Server.Port)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_server.host", func(t *testing.T) {
+		t.Run("Override", func(t *testing.T) {
+			cmdFlags.Set("server.host", "127.0.0.1")
+			if vString, err := cmdFlags.GetString("server.host"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.Server.Host)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+
 	t.Run("Test_upload.maxSize", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -163,6 +184,20 @@ func TestDataProxyConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("download.maxExpiresIn", testValue)
 			if vString, err := cmdFlags.GetString("download.maxExpiresIn"); err == nil {
 				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.Download.MaxExpiresIn)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_runService.url", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("runService.url", testValue)
+			if vString, err := cmdFlags.GetString("runService.url"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.RunService.URL)
 
 			} else {
 				assert.FailNow(t, err.Error())

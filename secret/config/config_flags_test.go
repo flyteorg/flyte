@@ -127,14 +127,14 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_webhookURL", func(t *testing.T) {
+	t.Run("Test_webhook.url", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("webhookURL", testValue)
-			if vString, err := cmdFlags.GetString("webhookURL"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.WebhookURL)
+			cmdFlags.Set("webhook.url", testValue)
+			if vString, err := cmdFlags.GetString("webhook.url"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Webhook.URL)
 
 			} else {
 				assert.FailNow(t, err.Error())

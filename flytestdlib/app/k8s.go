@@ -8,6 +8,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
@@ -76,6 +77,22 @@ func InitKubernetesClient(ctx context.Context, cfg K8sConfig, scheme *runtime.Sc
 	}
 
 	return k8sClient, restConfig, nil
+}
+
+// InitKubernetesCache creates the shared controller-runtime cache used by
+// standalone services that install informer handlers. The caller is responsible
+// for starting the returned cache with SetupContext.AddWorker.
+func InitKubernetesCache(restConfig *rest.Config, scheme *runtime.Scheme) (ctrlcache.Cache, error) {
+	opts := ctrlcache.Options{}
+	if scheme != nil {
+		opts.Scheme = scheme
+	}
+
+	k8sCache, err := ctrlcache.New(restConfig, opts)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create Kubernetes cache: %w", err)
+	}
+	return k8sCache, nil
 }
 
 func buildRESTConfig(ctx context.Context, kubeconfig string) (*rest.Config, error) {

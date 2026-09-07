@@ -309,14 +309,14 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_actionsServiceUrl", func(t *testing.T) {
+	t.Run("Test_actionsService.url", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("actionsServiceUrl", testValue)
-			if vString, err := cmdFlags.GetString("actionsServiceUrl"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ActionsServiceURL)
+			cmdFlags.Set("actionsService.url", testValue)
+			if vString, err := cmdFlags.GetString("actionsService.url"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ActionsService.URL)
 
 			} else {
 				assert.FailNow(t, err.Error())

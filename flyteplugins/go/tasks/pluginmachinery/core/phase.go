@@ -185,12 +185,21 @@ func (p PhaseInfo) CleanupOnFailure() bool {
 
 func (p PhaseInfo) WithVersion(version uint32) PhaseInfo {
 	return PhaseInfo{
-		phase:   p.phase,
-		version: version,
-		info:    p.info,
-		err:     p.err,
-		reason:  p.reason,
+		phase:            p.phase,
+		version:          version,
+		info:             p.info,
+		err:              p.err,
+		reason:           p.reason,
+		cleanupOnFailure: p.cleanupOnFailure,
 	}
+}
+
+// WithCleanupOnFailure returns a copy of this PhaseInfo with the cleanup flag set,
+// for callers that rebuild a failure and must not lose the original's cleanup
+// requirement.
+func (p PhaseInfo) WithCleanupOnFailure() PhaseInfo {
+	p.cleanupOnFailure = true
+	return p
 }
 
 func (p *PhaseInfo) WithReason(reason string) {

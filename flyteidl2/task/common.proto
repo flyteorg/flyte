@@ -149,6 +149,18 @@ message ProducedArtifact {
   // The declared Flyte type of the output, copied into ArtifactSpec.type.
   // The producing SDK is authoritative for this.
   flyteidl2.core.LiteralType type = 5;
+
+  // Optional artifact versions the produced version was derived from, copied
+  // verbatim into ArtifactSpec.parent_artifacts. Set by the producing task
+  // when it derives a new version from versions it consumed; one entry is
+  // plain derivation, several record a merge, so the resulting lineage forms
+  // a DAG instead of reading as a linear chain. Order is preserved: the first
+  // entry is the primary parent. Empty key fields inherit the produced
+  // artifact's own scope and name, so a bare {version: "v1"} declares the
+  // previous version of this same artifact as a parent; a set name records
+  // cross-artifact derivation. Only the name may differ: non-empty scope
+  // fields (org/project/domain) must match the produced artifact's own scope.
+  repeated flyteidl2.core.ArtifactVersionId parent_artifacts = 6 [(buf.validate.field).repeated.max_items = 32];
 }
 
 // Output payload for an action.

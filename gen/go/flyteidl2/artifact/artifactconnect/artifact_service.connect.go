@@ -45,15 +45,19 @@ const (
 	// ArtifactServiceListArtifactNamesProcedure is the fully-qualified name of the ArtifactService's
 	// ListArtifactNames RPC.
 	ArtifactServiceListArtifactNamesProcedure = "/flyteidl2.artifact.ArtifactService/ListArtifactNames"
+	// ArtifactServiceListArtifactMetadataKeysProcedure is the fully-qualified name of the
+	// ArtifactService's ListArtifactMetadataKeys RPC.
+	ArtifactServiceListArtifactMetadataKeysProcedure = "/flyteidl2.artifact.ArtifactService/ListArtifactMetadataKeys"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	artifactServiceServiceDescriptor                 = artifact.File_flyteidl2_artifact_artifact_service_proto.Services().ByName("ArtifactService")
-	artifactServiceCreateArtifactMethodDescriptor    = artifactServiceServiceDescriptor.Methods().ByName("CreateArtifact")
-	artifactServiceGetArtifactMethodDescriptor       = artifactServiceServiceDescriptor.Methods().ByName("GetArtifact")
-	artifactServiceListArtifactsMethodDescriptor     = artifactServiceServiceDescriptor.Methods().ByName("ListArtifacts")
-	artifactServiceListArtifactNamesMethodDescriptor = artifactServiceServiceDescriptor.Methods().ByName("ListArtifactNames")
+	artifactServiceServiceDescriptor                        = artifact.File_flyteidl2_artifact_artifact_service_proto.Services().ByName("ArtifactService")
+	artifactServiceCreateArtifactMethodDescriptor           = artifactServiceServiceDescriptor.Methods().ByName("CreateArtifact")
+	artifactServiceGetArtifactMethodDescriptor              = artifactServiceServiceDescriptor.Methods().ByName("GetArtifact")
+	artifactServiceListArtifactsMethodDescriptor            = artifactServiceServiceDescriptor.Methods().ByName("ListArtifacts")
+	artifactServiceListArtifactNamesMethodDescriptor        = artifactServiceServiceDescriptor.Methods().ByName("ListArtifactNames")
+	artifactServiceListArtifactMetadataKeysMethodDescriptor = artifactServiceServiceDescriptor.Methods().ByName("ListArtifactMetadataKeys")
 )
 
 // ArtifactServiceClient is a client for the flyteidl2.artifact.ArtifactService service.
@@ -68,6 +72,10 @@ type ArtifactServiceClient interface {
 	// the latest version's full record and the total version count. Ordered by
 	// the latest version's creation time, newest first.
 	ListArtifactNames(context.Context, *connect.Request[artifact.ListArtifactNamesRequest]) (*connect.Response[artifact.ListArtifactNamesResponse], error)
+	// List the distinct user_metadata keys seen on recently created artifacts
+	// within a project, for filter suggestions. Keys only, never values; the
+	// set is sorted, capped, and may be served from a short-lived cache.
+	ListArtifactMetadataKeys(context.Context, *connect.Request[artifact.ListArtifactMetadataKeysRequest]) (*connect.Response[artifact.ListArtifactMetadataKeysResponse], error)
 }
 
 // NewArtifactServiceClient constructs a client for the flyteidl2.artifact.ArtifactService service.
@@ -107,15 +115,23 @@ func NewArtifactServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
+		listArtifactMetadataKeys: connect.NewClient[artifact.ListArtifactMetadataKeysRequest, artifact.ListArtifactMetadataKeysResponse](
+			httpClient,
+			baseURL+ArtifactServiceListArtifactMetadataKeysProcedure,
+			connect.WithSchema(artifactServiceListArtifactMetadataKeysMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // artifactServiceClient implements ArtifactServiceClient.
 type artifactServiceClient struct {
-	createArtifact    *connect.Client[artifact.CreateArtifactRequest, artifact.CreateArtifactResponse]
-	getArtifact       *connect.Client[artifact.GetArtifactRequest, artifact.GetArtifactResponse]
-	listArtifacts     *connect.Client[artifact.ListArtifactsRequest, artifact.ListArtifactsResponse]
-	listArtifactNames *connect.Client[artifact.ListArtifactNamesRequest, artifact.ListArtifactNamesResponse]
+	createArtifact           *connect.Client[artifact.CreateArtifactRequest, artifact.CreateArtifactResponse]
+	getArtifact              *connect.Client[artifact.GetArtifactRequest, artifact.GetArtifactResponse]
+	listArtifacts            *connect.Client[artifact.ListArtifactsRequest, artifact.ListArtifactsResponse]
+	listArtifactNames        *connect.Client[artifact.ListArtifactNamesRequest, artifact.ListArtifactNamesResponse]
+	listArtifactMetadataKeys *connect.Client[artifact.ListArtifactMetadataKeysRequest, artifact.ListArtifactMetadataKeysResponse]
 }
 
 // CreateArtifact calls flyteidl2.artifact.ArtifactService.CreateArtifact.
@@ -138,6 +154,11 @@ func (c *artifactServiceClient) ListArtifactNames(ctx context.Context, req *conn
 	return c.listArtifactNames.CallUnary(ctx, req)
 }
 
+// ListArtifactMetadataKeys calls flyteidl2.artifact.ArtifactService.ListArtifactMetadataKeys.
+func (c *artifactServiceClient) ListArtifactMetadataKeys(ctx context.Context, req *connect.Request[artifact.ListArtifactMetadataKeysRequest]) (*connect.Response[artifact.ListArtifactMetadataKeysResponse], error) {
+	return c.listArtifactMetadataKeys.CallUnary(ctx, req)
+}
+
 // ArtifactServiceHandler is an implementation of the flyteidl2.artifact.ArtifactService service.
 type ArtifactServiceHandler interface {
 	// Create a new artifact version.
@@ -150,6 +171,10 @@ type ArtifactServiceHandler interface {
 	// the latest version's full record and the total version count. Ordered by
 	// the latest version's creation time, newest first.
 	ListArtifactNames(context.Context, *connect.Request[artifact.ListArtifactNamesRequest]) (*connect.Response[artifact.ListArtifactNamesResponse], error)
+	// List the distinct user_metadata keys seen on recently created artifacts
+	// within a project, for filter suggestions. Keys only, never values; the
+	// set is sorted, capped, and may be served from a short-lived cache.
+	ListArtifactMetadataKeys(context.Context, *connect.Request[artifact.ListArtifactMetadataKeysRequest]) (*connect.Response[artifact.ListArtifactMetadataKeysResponse], error)
 }
 
 // NewArtifactServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -185,6 +210,13 @@ func NewArtifactServiceHandler(svc ArtifactServiceHandler, opts ...connect.Handl
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
+	artifactServiceListArtifactMetadataKeysHandler := connect.NewUnaryHandler(
+		ArtifactServiceListArtifactMetadataKeysProcedure,
+		svc.ListArtifactMetadataKeys,
+		connect.WithSchema(artifactServiceListArtifactMetadataKeysMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.artifact.ArtifactService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ArtifactServiceCreateArtifactProcedure:
@@ -195,6 +227,8 @@ func NewArtifactServiceHandler(svc ArtifactServiceHandler, opts ...connect.Handl
 			artifactServiceListArtifactsHandler.ServeHTTP(w, r)
 		case ArtifactServiceListArtifactNamesProcedure:
 			artifactServiceListArtifactNamesHandler.ServeHTTP(w, r)
+		case ArtifactServiceListArtifactMetadataKeysProcedure:
+			artifactServiceListArtifactMetadataKeysHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -218,4 +252,8 @@ func (UnimplementedArtifactServiceHandler) ListArtifacts(context.Context, *conne
 
 func (UnimplementedArtifactServiceHandler) ListArtifactNames(context.Context, *connect.Request[artifact.ListArtifactNamesRequest]) (*connect.Response[artifact.ListArtifactNamesResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.artifact.ArtifactService.ListArtifactNames is not implemented"))
+}
+
+func (UnimplementedArtifactServiceHandler) ListArtifactMetadataKeys(context.Context, *connect.Request[artifact.ListArtifactMetadataKeysRequest]) (*connect.Response[artifact.ListArtifactMetadataKeysResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.artifact.ArtifactService.ListArtifactMetadataKeys is not implemented"))
 }

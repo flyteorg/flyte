@@ -400,6 +400,35 @@ func (m *ExecutionError) validate(all bool) error {
 
 	// no validation rules for Recoverability
 
+	if all {
+		switch v := interface{}(m.GetGpuFault()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ExecutionErrorValidationError{
+					field:  "GpuFault",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ExecutionErrorValidationError{
+					field:  "GpuFault",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetGpuFault()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExecutionErrorValidationError{
+				field:  "GpuFault",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return ExecutionErrorMultiError(errors)
 	}
@@ -477,6 +506,127 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ExecutionErrorValidationError{}
+
+// Validate checks the field values on GpuFault with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *GpuFault) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GpuFault with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GpuFaultMultiError, or nil
+// if none found.
+func (m *GpuFault) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GpuFault) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Kind
+
+	// no validation rules for Code
+
+	// no validation rules for Name
+
+	// no validation rules for Severity
+
+	// no validation rules for GpuUuid
+
+	// no validation rules for PciBusId
+
+	// no validation rules for Node
+
+	// no validation rules for Pid
+
+	// no validation rules for Process
+
+	if m.GpuIndex != nil {
+		// no validation rules for GpuIndex
+	}
+
+	if len(errors) > 0 {
+		return GpuFaultMultiError(errors)
+	}
+
+	return nil
+}
+
+// GpuFaultMultiError is an error wrapping multiple validation errors returned
+// by GpuFault.ValidateAll() if the designated constraints aren't met.
+type GpuFaultMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GpuFaultMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GpuFaultMultiError) AllErrors() []error { return m }
+
+// GpuFaultValidationError is the validation error returned by
+// GpuFault.Validate if the designated constraints aren't met.
+type GpuFaultValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GpuFaultValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GpuFaultValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GpuFaultValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GpuFaultValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GpuFaultValidationError) ErrorName() string { return "GpuFaultValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GpuFaultValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGpuFault.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GpuFaultValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GpuFaultValidationError{}
 
 // Validate checks the field values on ContainerError with the rules defined in
 // the proto definition for this message. If any rules are violated, the first

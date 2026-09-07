@@ -93,6 +93,31 @@ message ArtifactSpec {
   // SDK, which stamps this automatically when publishing from inside a
   // running task) declare it at creation time; it is immutable afterwards.
   ArtifactSource source = 6;
+
+  // Optional lineage: the artifact versions this one was derived from. Empty
+  // means no declared parents, which is the normal case for a first version or
+  // an independently produced one. One entry is plain derivation; several
+  // entries record a merge (git-style), making version history a DAG rather
+  // than a chain: a new version may branch off any earlier version — or
+  // combine more than one — so two versions derived from the same ancestor
+  // are siblings rather than one appearing to descend from the other.
+  //
+  // Order is preserved and meaningful: the first entry is the primary parent
+  // (the version this one is "a new revision of"), later entries are the
+  // versions merged in. Duplicate parents (after inheritance is applied) are
+  // rejected.
+  //
+  // Every parent must live in this artifact's own org/project/domain; empty
+  // scope fields on a key inherit the artifact's own scope, and an empty
+  // key name inherits the artifact's own name — so a bare {version: "v1"}
+  // declares the previous version of this same artifact as a parent. The name
+  // MAY differ, so lineage can express derivation across artifacts (a model
+  // deriving from a dataset version).
+  //
+  // Stored as given and never resolved: referenced versions are not required
+  // to exist (publication order is not guaranteed), so readers walking lineage
+  // must tolerate dangling parents. Immutable after creation.
+  repeated core.ArtifactVersionId parent_artifacts = 7 [(buf.validate.field).repeated.max_items = 32];
 }
 
 // A fully materialized artifact as stored by the service.

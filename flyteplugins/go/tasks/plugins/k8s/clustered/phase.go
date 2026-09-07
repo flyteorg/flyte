@@ -20,12 +20,6 @@ import (
 	clusteredpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
 
-const (
-	// jobSetRestartingConditionType is emitted by newer JobSet controllers, but the pinned v0.5.2 API package
-	// predates this constant. Keep this string check until we can bump the dependency.
-	jobSetRestartingConditionType = "RestartingJobSet"
-)
-
 func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 	jobSet, ok := resource.(*jobsetv1alpha2.JobSet)
 	if !ok {
@@ -82,7 +76,7 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 		}
 		return pluginsCore.PhaseInfoRetryableFailure(condition.Reason, condition.Message, &taskInfo), nil
 
-	case jobsetv1alpha2.JobSetConditionType(jobSetRestartingConditionType):
+	case jobsetv1alpha2.JobSetRestarting:
 		if phase, ok := maybeFastFailWorker0(ctx, pluginContext, jobSet, &taskInfo, maxRestarts, false); ok {
 			return phase, nil
 		}
@@ -142,7 +136,11 @@ func workersHaveFailures(jobSet *jobsetv1alpha2.JobSet) bool {
 }
 
 func isRestartBudgetExhausted(jobSet *jobsetv1alpha2.JobSet, maxRestarts int32) bool {
-	return jobSet.Status.Restarts >= maxRestarts
+	// Status.Restarts counts every whole-set restart, including free host-maintenance
+	// restarts (RestartJobSetAndIgnoreMaxRestarts). Only RestartsCountTowardsMax is
+	// charged against maxRestarts, so compare that — otherwise free restarts would
+	// falsely trip the fast-fail path while the JobSet controller is still restarting.
+	return jobSet.Status.RestartsCountTowardsMax >= maxRestarts
 }
 
 func readPluginState(ctx context.Context, pluginContext k8s.PluginContext) (k8s.PluginState, bool) {

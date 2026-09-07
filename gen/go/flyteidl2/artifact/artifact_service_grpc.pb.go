@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ArtifactService_CreateArtifact_FullMethodName    = "/flyteidl2.artifact.ArtifactService/CreateArtifact"
-	ArtifactService_GetArtifact_FullMethodName       = "/flyteidl2.artifact.ArtifactService/GetArtifact"
-	ArtifactService_ListArtifacts_FullMethodName     = "/flyteidl2.artifact.ArtifactService/ListArtifacts"
-	ArtifactService_ListArtifactNames_FullMethodName = "/flyteidl2.artifact.ArtifactService/ListArtifactNames"
+	ArtifactService_CreateArtifact_FullMethodName           = "/flyteidl2.artifact.ArtifactService/CreateArtifact"
+	ArtifactService_GetArtifact_FullMethodName              = "/flyteidl2.artifact.ArtifactService/GetArtifact"
+	ArtifactService_ListArtifacts_FullMethodName            = "/flyteidl2.artifact.ArtifactService/ListArtifacts"
+	ArtifactService_ListArtifactNames_FullMethodName        = "/flyteidl2.artifact.ArtifactService/ListArtifactNames"
+	ArtifactService_ListArtifactMetadataKeys_FullMethodName = "/flyteidl2.artifact.ArtifactService/ListArtifactMetadataKeys"
 )
 
 // ArtifactServiceClient is the client API for ArtifactService service.
@@ -39,6 +40,10 @@ type ArtifactServiceClient interface {
 	// the latest version's full record and the total version count. Ordered by
 	// the latest version's creation time, newest first.
 	ListArtifactNames(ctx context.Context, in *ListArtifactNamesRequest, opts ...grpc.CallOption) (*ListArtifactNamesResponse, error)
+	// List the distinct user_metadata keys seen on recently created artifacts
+	// within a project, for filter suggestions. Keys only, never values; the
+	// set is sorted, capped, and may be served from a short-lived cache.
+	ListArtifactMetadataKeys(ctx context.Context, in *ListArtifactMetadataKeysRequest, opts ...grpc.CallOption) (*ListArtifactMetadataKeysResponse, error)
 }
 
 type artifactServiceClient struct {
@@ -85,6 +90,15 @@ func (c *artifactServiceClient) ListArtifactNames(ctx context.Context, in *ListA
 	return out, nil
 }
 
+func (c *artifactServiceClient) ListArtifactMetadataKeys(ctx context.Context, in *ListArtifactMetadataKeysRequest, opts ...grpc.CallOption) (*ListArtifactMetadataKeysResponse, error) {
+	out := new(ListArtifactMetadataKeysResponse)
+	err := c.cc.Invoke(ctx, ArtifactService_ListArtifactMetadataKeys_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArtifactServiceServer is the server API for ArtifactService service.
 // All implementations should embed UnimplementedArtifactServiceServer
 // for forward compatibility
@@ -99,6 +113,10 @@ type ArtifactServiceServer interface {
 	// the latest version's full record and the total version count. Ordered by
 	// the latest version's creation time, newest first.
 	ListArtifactNames(context.Context, *ListArtifactNamesRequest) (*ListArtifactNamesResponse, error)
+	// List the distinct user_metadata keys seen on recently created artifacts
+	// within a project, for filter suggestions. Keys only, never values; the
+	// set is sorted, capped, and may be served from a short-lived cache.
+	ListArtifactMetadataKeys(context.Context, *ListArtifactMetadataKeysRequest) (*ListArtifactMetadataKeysResponse, error)
 }
 
 // UnimplementedArtifactServiceServer should be embedded to have forward compatible implementations.
@@ -116,6 +134,9 @@ func (UnimplementedArtifactServiceServer) ListArtifacts(context.Context, *ListAr
 }
 func (UnimplementedArtifactServiceServer) ListArtifactNames(context.Context, *ListArtifactNamesRequest) (*ListArtifactNamesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListArtifactNames not implemented")
+}
+func (UnimplementedArtifactServiceServer) ListArtifactMetadataKeys(context.Context, *ListArtifactMetadataKeysRequest) (*ListArtifactMetadataKeysResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListArtifactMetadataKeys not implemented")
 }
 
 // UnsafeArtifactServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -201,6 +222,24 @@ func _ArtifactService_ListArtifactNames_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArtifactService_ListArtifactMetadataKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListArtifactMetadataKeysRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArtifactServiceServer).ListArtifactMetadataKeys(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArtifactService_ListArtifactMetadataKeys_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArtifactServiceServer).ListArtifactMetadataKeys(ctx, req.(*ListArtifactMetadataKeysRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArtifactService_ServiceDesc is the grpc.ServiceDesc for ArtifactService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -223,6 +262,10 @@ var ArtifactService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListArtifactNames",
 			Handler:    _ArtifactService_ListArtifactNames_Handler,
+		},
+		{
+			MethodName: "ListArtifactMetadataKeys",
+			Handler:    _ArtifactService_ListArtifactMetadataKeys_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -5,6 +5,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 )
 
 const configSectionKey = "runs"
@@ -16,10 +17,12 @@ var defaultConfig = &Config{
 		Port: 8090,
 		Host: "0.0.0.0",
 	},
-	WatchBufferSize:   100,
-	ActionsServiceURL: "http://localhost:8090",
-	StoragePrefix:     "file:///tmp/flyte/data",
-	SeedProjects:      []string{"flytesnacks"},
+	WatchBufferSize: 100,
+	ActionsService: serviceclient.ServiceConfig{
+		URL: "http://localhost:8090",
+	},
+	StoragePrefix: "file:///tmp/flyte/data",
+	SeedProjects:  []string{"flytesnacks"},
 	Domains: []DomainConfig{
 		{ID: "development", Name: "Development"},
 		{ID: "production", Name: "Production"},
@@ -58,8 +61,8 @@ type Config struct {
 	// Watch/streaming settings
 	WatchBufferSize int `json:"watchBufferSize" pflag:",Buffer size for watch streams"`
 
-	// Actions service URL for enqueuing actions
-	ActionsServiceURL string `json:"actionsServiceUrl" pflag:",URL of the actions service"`
+	// ActionsService configures the actions service client.
+	ActionsService serviceclient.ServiceConfig `json:"actionsService" pflag:",Actions service client configuration"`
 
 	// StoragePrefix is the base URI for storing run data (inputs, outputs)
 	// e.g. "s3://my-bucket" or "gs://my-bucket" or "file:///tmp/flyte/data"

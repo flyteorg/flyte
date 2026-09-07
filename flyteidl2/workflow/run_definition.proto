@@ -274,6 +274,14 @@ message ErrorInfo {
 
   // Error kind.
   Kind kind = 2;
+
+  // Short failure code from the plugin's ExecutionError, for example "OOMKilled",
+  // "Interrupted" or "GpuFallenOffBus". Empty when the producer did not set one.
+  string code = 3;
+
+  // Mirrors ExecutionError.gpu_fault: set when the failure was classified as caused
+  // by or coincident with a GPU fault.
+  flyteidl2.core.GpuFault gpu_fault = 4;
 }
 
 // AbortInfo captures details of an aborted run.
@@ -401,6 +409,13 @@ message ClusterEvent {
   // count is the number of occurrences the cluster had observed for the source event when it was
   // recorded, when known (0 otherwise). Repeating events are recorded once, with their count.
   int32 count = 6;
+
+  // gpu_fault is set when this event reports a GPU fault (an NVIDIA Xid or an
+  // NVSwitch SXid) that was attributed to this attempt. The message still
+  // carries the human-readable form; this field carries the same fault as data
+  // so that consumers can classify, filter, and render it without parsing the
+  // message. Unset for every other kind of cluster event.
+  flyteidl2.core.GpuFault gpu_fault = 7;
 }
 
 message PhaseTransition {

@@ -130,6 +130,12 @@ func WithProjectDomain(ctx context.Context, project, domain string) context.Cont
 	return context.WithValue(c, DomainKey, domain)
 }
 
+// WithCluster gets a new context with Organization and ClusterName values set.
+func WithCluster(ctx context.Context, organization, name string) context.Context {
+	c := context.WithValue(ctx, OrganizationKey, organization)
+	return context.WithValue(c, ClusterNameKey, name)
+}
+
 // WithTaskID gets a new context with WorkflowName set.
 func WithTaskID(ctx context.Context, taskID string) context.Context {
 	return context.WithValue(ctx, TaskIDKey, taskID)

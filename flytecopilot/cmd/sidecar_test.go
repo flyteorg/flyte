@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/v2/flytecopilot/cmd/containerwatcher"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -77,7 +78,7 @@ func TestUploadOptions_Upload(t *testing.T) {
 			RootOptions: &RootOptions{
 				Scope:           s,
 				Store:           store,
-				errorOutputName: "errors.pb",
+				errorOutputName: ioutils.ErrorsSuffix,
 			},
 			remoteOutputsPrefix: outputPath,
 			metadataFormat:      core.DataLoadingConfig_JSON.String(),
@@ -89,7 +90,7 @@ func TestUploadOptions_Upload(t *testing.T) {
 		}
 
 		assert.NoError(t, uopts.Sidecar(ctx))
-		v, err := store.Head(ctx, "/output/errors.pb")
+		v, err := store.Head(ctx, storage.DataReference("/output/"+ioutils.ErrorsSuffix))
 		assert.NoError(t, err)
 		assert.True(t, v.Exists())
 	})

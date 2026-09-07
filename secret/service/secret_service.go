@@ -21,6 +21,7 @@ import (
 	"github.com/flyteorg/flyte/v2/executor/pkg/webhook"
 	flytesecret "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 	commonpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	secretpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/secret"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/secret/secretconnect"
@@ -75,6 +76,24 @@ func NewSecretService(k8sClient client.Client, webhookURL string) *SecretService
 		webhookURL: webhookURL,
 		httpClient: &http.Client{Timeout: cacheInvalidationTimeout},
 	}
+}
+
+// NewSecretServiceWithConfig creates a SecretService with an optionally
+// authenticated webhook cache-invalidation client. An empty URL disables
+// invalidation.
+func NewSecretServiceWithConfig(ctx context.Context, k8sClient client.Client, webhookCfg serviceclient.ServiceConfig) (*SecretService, error) {
+	if webhookCfg.URL == "" {
+		return NewSecretService(k8sClient, ""), nil
+	}
+	httpClient, err := serviceclient.NewHTTPClient(ctx, &http.Client{Timeout: cacheInvalidationTimeout}, webhookCfg)
+	if err != nil {
+		return nil, err
+	}
+	return &SecretService{
+		k8sClient:  k8sClient,
+		webhookURL: webhookCfg.URL,
+		httpClient: httpClient,
+	}, nil
 }
 
 // invalidateWebhookSecretCache asks the pod webhook to drop any cached value for id.

@@ -69,8 +69,13 @@ metadata:
   labels: {{- include "flyte-devbox.labels" . | nindent 4 }}
 spec:
   redirectRegex:
-    regex: "^(https?://[^/]+)/?$"
-    replacement: "${1}{{ $consoleBasePath }}"
+    # Replace the whole URL with just the path, so the browser receives a
+    # relative redirect (Location: /v2) and resolves it against the URL it
+    # actually requested. Echoing back the scheme+host captured from the
+    # request breaks behind proxies that rewrite Host (e.g. GitHub Codespaces
+    # forwarded addresses), where Traefik would see localhost:30080.
+    regex: "^https?://[^/]+/?$"
+    replacement: "{{ $consoleBasePath }}"
     # Temporary, so browsers don't cache the hop if the console ever moves.
     permanent: false
 ---

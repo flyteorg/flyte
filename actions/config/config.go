@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 )
 
 const configSectionKey = "actions"
@@ -24,7 +25,7 @@ var defaultConfig = &Config{
 	// Each entry includes a DeepCopy() of the TaskAction; tune carefully to avoid large memory spikes under backlog.
 	WatchBufferSize: 1000,
 	WatchWorkers:    100,
-	RunServiceURL:   "http://localhost:8090",
+	RunService:      serviceclient.ServiceConfig{URL: "http://localhost:8090"},
 	// 8M slots × 8 bytes/pointer = 64 MB; can track ~8M unique actions.
 	RecordFilterSize: 1 << 23,
 }
@@ -47,8 +48,8 @@ type Config struct {
 	// Events for the same TaskAction are always routed to the same worker to preserve ordering.
 	WatchWorkers int `json:"watchWorkers" pflag:",Number of parallel worker goroutines for processing watch events"`
 
-	// RunServiceURL is the base URL for the internal run service.
-	RunServiceURL string `json:"runServiceUrl" pflag:",Base URL of the internal run service"`
+	// RunService configures the internal run service client.
+	RunService serviceclient.ServiceConfig `json:"runService" pflag:",Internal run service client configuration"`
 
 	// RecordFilterSize is the size of the bloom filter used to deduplicate RecordAction calls.
 	RecordFilterSize int `json:"recordFilterSize" pflag:",Size of the oppo bloom filter for deduplicating RecordAction calls"`

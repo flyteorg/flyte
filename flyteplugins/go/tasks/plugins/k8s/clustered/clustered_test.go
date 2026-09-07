@@ -175,6 +175,8 @@ func TestBuildResource_HappyPath(t *testing.T) {
 	assert.Equal(t, int32(4), *jobSpec.Completions)
 	assert.Equal(t, batchv1.IndexedCompletion, *jobSpec.CompletionMode)
 	assert.Equal(t, int32(0), *jobSpec.BackoffLimit)
+	// Without restart_on_host_maintenance the inner Job carries no podFailurePolicy.
+	assert.Nil(t, jobSpec.PodFailurePolicy)
 
 	// The node-execution labels/annotations must be propagated onto the pod template so
 	// JobSet child pods carry execution-id/node-id; otherwise the node-execution-scoped
@@ -218,6 +220,41 @@ func TestBuildResource_PrimaryContainerPreserved(t *testing.T) {
 
 	// Primary container name must be retrievable from the JobSet at status time.
 	assert.Equal(t, primary.Name, jobSet.Annotations[primaryContainerAnnotation])
+}
+
+func TestBuildResource_HostMaintenance(t *testing.T) {
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:      2,
+		NprocPerNode:  1,
+		FailurePolicy: &clusteredpb.ClusterFailurePolicy{MaxRestarts: 1, RestartOnHostMaintenance: true},
+	}
+	taskTemplate := buildTaskTemplate(spec)
+	taskCtx := dummyTaskCtx(taskTemplate)
+
+	handler := clusteredResourceHandler{}
+	obj, err := handler.BuildResource(context.Background(), taskCtx)
+	assert.NoError(t, err)
+
+	jobSet := obj.(*jobsetv1alpha2.JobSet)
+
+	// JobSet failurePolicy carries the free-restart rule.
+	require.NotNil(t, jobSet.Spec.FailurePolicy)
+	assert.Equal(t, int32(1), jobSet.Spec.FailurePolicy.MaxRestarts)
+	require.Len(t, jobSet.Spec.FailurePolicy.Rules, 1)
+	assert.Equal(t, jobsetv1alpha2.RestartJobSetAndIgnoreMaxRestarts, jobSet.Spec.FailurePolicy.Rules[0].Action)
+
+	// The inner Job fails with reason PodFailurePolicy on DisruptionTarget so the
+	// JobSet rule can distinguish maintenance disruptions from ordinary failures.
+	jobSpec := jobSet.Spec.ReplicatedJobs[0].Template.Spec
+	require.NotNil(t, jobSpec.PodFailurePolicy)
+	require.Len(t, jobSpec.PodFailurePolicy.Rules, 1)
+	rule := jobSpec.PodFailurePolicy.Rules[0]
+	assert.Equal(t, batchv1.PodFailurePolicyActionFailJob, rule.Action)
+	require.Len(t, rule.OnPodConditions, 1)
+	assert.Equal(t, corev1.DisruptionTarget, rule.OnPodConditions[0].Type)
+	assert.Equal(t, corev1.ConditionTrue, rule.OnPodConditions[0].Status)
+	// podFailurePolicy requires restartPolicy Never on the pod template.
+	assert.Equal(t, corev1.RestartPolicyNever, jobSpec.Template.Spec.RestartPolicy)
 }
 
 // --- injectTorchRunEnv tests ---
@@ -309,6 +346,37 @@ func TestBuildFailurePolicy_MaxRestarts(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, fp)
 	assert.Equal(t, int32(3), fp.MaxRestarts)
+	// Without restart_on_host_maintenance no rules are emitted — every restart
+	// counts against the budget.
+	assert.Empty(t, fp.Rules)
+}
+
+func TestBuildFailurePolicy_HostMaintenance(t *testing.T) {
+	spec := &clusteredpb.ClusteredTaskSpec{
+		FailurePolicy: &clusteredpb.ClusterFailurePolicy{MaxRestarts: 3, RestartOnHostMaintenance: true},
+	}
+	fp, err := buildFailurePolicy(spec)
+	assert.NoError(t, err)
+	require.NotNil(t, fp)
+	assert.Equal(t, int32(3), fp.MaxRestarts)
+	require.Len(t, fp.Rules, 1)
+	assert.Equal(t, hostMaintenanceRuleName, fp.Rules[0].Name)
+	assert.Equal(t, jobsetv1alpha2.RestartJobSetAndIgnoreMaxRestarts, fp.Rules[0].Action)
+	assert.Equal(t, []string{batchv1.JobReasonPodFailurePolicy}, fp.Rules[0].OnJobFailureReasons)
+}
+
+func TestBuildFailurePolicy_HostMaintenance_ZeroMaxRestarts(t *testing.T) {
+	// max_restarts=0 (the default) must not drop the policy when the flag is set:
+	// ordinary failures fail immediately, maintenance disruptions still restart free.
+	spec := &clusteredpb.ClusteredTaskSpec{
+		FailurePolicy: &clusteredpb.ClusterFailurePolicy{MaxRestarts: 0, RestartOnHostMaintenance: true},
+	}
+	fp, err := buildFailurePolicy(spec)
+	assert.NoError(t, err)
+	require.NotNil(t, fp)
+	assert.Equal(t, int32(0), fp.MaxRestarts)
+	require.Len(t, fp.Rules, 1)
+	assert.Equal(t, jobsetv1alpha2.RestartJobSetAndIgnoreMaxRestarts, fp.Rules[0].Action)
 }
 
 func TestBuildFailurePolicy_Zero(t *testing.T) {
@@ -600,6 +668,54 @@ func TestGetTaskPhase_MaintenanceRetry_SystemFailure(t *testing.T) {
 	assert.Equal(t, core.ExecutionError_SYSTEM, phase.Err().GetKind())
 }
 
+func TestGetTaskPhase_FreeRestartsDoNotExhaustBudget(t *testing.T) {
+	// Free host-maintenance restarts bump Status.Restarts but not
+	// Status.RestartsCountTowardsMax. Even with Restarts well past maxRestarts and a
+	// failed rank-0 pod visible, the fast-fail path must not fire while the charged
+	// count is within budget — the JobSet controller is still restarting the set.
+	js := makeJobSet("", "", false)
+	js.Status.Restarts = 3
+	js.Status.RestartsCountTowardsMax = 0
+	js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
+		{Name: workersReplicatedJobName, Failed: 1, Active: 1},
+	}
+	js.Status.Conditions = []metav1.Condition{
+		{Type: "SomeActiveCondition", Status: metav1.ConditionTrue, LastTransitionTime: metav1.NewTime(time.Now())},
+	}
+
+	pod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      rank0PodName(testJobName) + "-abc12",
+			Namespace: testNS,
+		},
+		Status: corev1.PodStatus{
+			Phase:  corev1.PodFailed,
+			Reason: "Error",
+			ContainerStatuses: []corev1.ContainerStatus{
+				{
+					Name: "primary",
+					State: corev1.ContainerState{
+						Terminated: &corev1.ContainerStateTerminated{ExitCode: 1, Reason: "Error"},
+					},
+				},
+			},
+		},
+	}
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pod).Build()
+
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:      2,
+		NprocPerNode:  1,
+		FailurePolicy: &clusteredpb.ClusterFailurePolicy{MaxRestarts: 1, RestartOnHostMaintenance: true},
+	}
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), fakeClient)
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+}
+
 func TestFindRank0Pod_SuffixedAndDeterministic(t *testing.T) {
 	oldFailed := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -639,6 +755,7 @@ func TestGetTaskPhase_FastFail_FailedWithBudgetRemainingReturnsRunning(t *testin
 	js := makeJobSet("", "", false)
 	js.Spec.FailurePolicy = &jobsetv1alpha2.FailurePolicy{MaxRestarts: 2}
 	js.Status.Restarts = 1
+	js.Status.RestartsCountTowardsMax = 1
 	js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
 		{Name: workersReplicatedJobName, Failed: 1, Active: 1},
 	}
@@ -674,6 +791,8 @@ func TestGetTaskPhase_FastFail_FailedWithBudgetExhaustedReturnsRetryableFailure(
 	js := makeJobSet("", "", false)
 	js.Spec.FailurePolicy = &jobsetv1alpha2.FailurePolicy{MaxRestarts: 1}
 	js.Status.Restarts = 1
+	// Ordinary (non-maintenance) restarts are charged: the controller bumps both counters.
+	js.Status.RestartsCountTowardsMax = 1
 	js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
 		{Name: workersReplicatedJobName, Failed: 1, Active: 1},
 	}
@@ -792,7 +911,7 @@ func TestGetTaskPhase_RestartingCondition_ReportsRunningWithAttempt(t *testing.T
 		{Name: workersReplicatedJobName, Failed: 1},
 	}
 	js.Status.Conditions = []metav1.Condition{
-		{Type: jobSetRestartingConditionType, Status: metav1.ConditionTrue, LastTransitionTime: metav1.NewTime(time.Now())},
+		{Type: string(jobsetv1alpha2.JobSetRestarting), Status: metav1.ConditionTrue, LastTransitionTime: metav1.NewTime(time.Now())},
 	}
 
 	pod := &corev1.Pod{

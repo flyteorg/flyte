@@ -51,6 +51,55 @@ func TestNewTaskExecutionMetadata_UsesProjectedRunContext(t *testing.T) {
 	require.True(t, meta.IsInterruptible())
 }
 
+func TestNewTaskExecutionMetadata_Interruptible(t *testing.T) {
+	marshalTemplate := func(t *testing.T, tmpl *core.TaskTemplate) []byte {
+		data, err := proto.Marshal(tmpl)
+		require.NoError(t, err)
+		return data
+	}
+	templateWith := func(t *testing.T, interruptible bool) []byte {
+		return marshalTemplate(t, &core.TaskTemplate{
+			Metadata: &core.TaskMetadata{
+				InterruptibleValue: &core.TaskMetadata_Interruptible{Interruptible: interruptible},
+			},
+		})
+	}
+	newMeta := func(t *testing.T, runLevel *bool, taskTemplate []byte) pluginsCore.TaskExecutionMetadata {
+		meta, err := NewTaskExecutionMetadata(&flyteorgv1.TaskAction{
+			Spec: flyteorgv1.TaskActionSpec{
+				Project:       "project",
+				Domain:        "development",
+				RunName:       "run-name",
+				ActionName:    "action-name",
+				RunOutputBase: "s3://bucket/run",
+				Interruptible: runLevel,
+				TaskTemplate:  taskTemplate,
+			},
+		})
+		require.NoError(t, err)
+		return meta
+	}
+
+	t.Run("defaults to false", func(t *testing.T) {
+		require.False(t, newMeta(t, nil, nil).IsInterruptible())
+	})
+
+	t.Run("template metadata applies when run level is unset", func(t *testing.T) {
+		require.True(t, newMeta(t, nil, templateWith(t, true)).IsInterruptible())
+		require.False(t, newMeta(t, nil, templateWith(t, false)).IsInterruptible())
+	})
+
+	t.Run("template without the flag leaves the default", func(t *testing.T) {
+		require.False(t, newMeta(t, nil, marshalTemplate(t, &core.TaskTemplate{Metadata: &core.TaskMetadata{}})).IsInterruptible())
+	})
+
+	t.Run("run level wins over template metadata", func(t *testing.T) {
+		runTrue, runFalse := true, false
+		require.True(t, newMeta(t, &runTrue, templateWith(t, false)).IsInterruptible())
+		require.False(t, newMeta(t, &runFalse, templateWith(t, true)).IsInterruptible())
+	})
+}
+
 func TestNewTaskExecutionMetadata_UserEnvVarsCannotClobberInternal(t *testing.T) {
 	taskAction := &flyteorgv1.TaskAction{
 		Spec: flyteorgv1.TaskActionSpec{

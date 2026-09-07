@@ -19,6 +19,7 @@ import (
 	pluginsCoreMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginsIOMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	config2 "github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
@@ -268,7 +269,7 @@ func TestDownloadCommandArgs(t *testing.T) {
 	}
 	d, err := DownloadCommandArgs("s3://from", "s3://output-meta", "/to", core.DataLoadingConfig_JSON, core.DataLoadingConfig_NAMED_DIR, iFace)
 	assert.NoError(t, err)
-	expected := []string{"download", "--from-remote", "s3://from", "--to-output-prefix", "s3://output-meta", "--to-local-dir", "/to", "--format", "JSON", "--file-input-layout", "NAMED_DIR", "--input-interface", "<interface>"}
+	expected := []string{"download", "--from-remote", "s3://from", "--to-output-prefix", "s3://output-meta", "--to-local-dir", "/to", "--format", "JSON", "--file-input-layout", "NAMED_DIR", "--err-output-name", ioutils.ErrorsSuffix, "--input-interface", "<interface>"}
 	if assert.Len(t, d, len(expected)) {
 		for i := 0; i < len(expected)-1; i++ {
 			assert.Equal(t, expected[i], d[i])
@@ -303,7 +304,7 @@ func TestSidecarCommandArgs(t *testing.T) {
 	}
 	d, err := SidecarCommandArgs("/from", "s3://output-meta", "s3://raw-output", time.Hour*1, iFace)
 	assert.NoError(t, err)
-	expected := []string{"sidecar", "--timeout", "1h0m0s", "--to-raw-output", "s3://raw-output", "--to-output-prefix", "s3://output-meta", "--from-local-dir", "/from", "--interface", "<interface>"}
+	expected := []string{"sidecar", "--timeout", "1h0m0s", "--to-raw-output", "s3://raw-output", "--to-output-prefix", "s3://output-meta", "--from-local-dir", "/from", "--err-output-name", ioutils.ErrorsSuffix, "--interface", "<interface>"}
 	if assert.Len(t, d, len(expected)) {
 		for i := 0; i < len(expected)-1; i++ {
 			assert.Equal(t, expected[i], d[i])

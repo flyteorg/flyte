@@ -1322,3 +1322,240 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListArtifactNamesResponseValidationError{}
+
+// Validate checks the field values on ListArtifactMetadataKeysRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListArtifactMetadataKeysRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListArtifactMetadataKeysRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// ListArtifactMetadataKeysRequestMultiError, or nil if none found.
+func (m *ListArtifactMetadataKeysRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListArtifactMetadataKeysRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetProjectId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListArtifactMetadataKeysRequestValidationError{
+					field:  "ProjectId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListArtifactMetadataKeysRequestValidationError{
+					field:  "ProjectId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetProjectId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListArtifactMetadataKeysRequestValidationError{
+				field:  "ProjectId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ListArtifactMetadataKeysRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListArtifactMetadataKeysRequestMultiError is an error wrapping multiple
+// validation errors returned by ListArtifactMetadataKeysRequest.ValidateAll()
+// if the designated constraints aren't met.
+type ListArtifactMetadataKeysRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListArtifactMetadataKeysRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListArtifactMetadataKeysRequestMultiError) AllErrors() []error { return m }
+
+// ListArtifactMetadataKeysRequestValidationError is the validation error
+// returned by ListArtifactMetadataKeysRequest.Validate if the designated
+// constraints aren't met.
+type ListArtifactMetadataKeysRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListArtifactMetadataKeysRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListArtifactMetadataKeysRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListArtifactMetadataKeysRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListArtifactMetadataKeysRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListArtifactMetadataKeysRequestValidationError) ErrorName() string {
+	return "ListArtifactMetadataKeysRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListArtifactMetadataKeysRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListArtifactMetadataKeysRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListArtifactMetadataKeysRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListArtifactMetadataKeysRequestValidationError{}
+
+// Validate checks the field values on ListArtifactMetadataKeysResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *ListArtifactMetadataKeysResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListArtifactMetadataKeysResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// ListArtifactMetadataKeysResponseMultiError, or nil if none found.
+func (m *ListArtifactMetadataKeysResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListArtifactMetadataKeysResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return ListArtifactMetadataKeysResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListArtifactMetadataKeysResponseMultiError is an error wrapping multiple
+// validation errors returned by
+// ListArtifactMetadataKeysResponse.ValidateAll() if the designated
+// constraints aren't met.
+type ListArtifactMetadataKeysResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListArtifactMetadataKeysResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListArtifactMetadataKeysResponseMultiError) AllErrors() []error { return m }
+
+// ListArtifactMetadataKeysResponseValidationError is the validation error
+// returned by ListArtifactMetadataKeysResponse.Validate if the designated
+// constraints aren't met.
+type ListArtifactMetadataKeysResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListArtifactMetadataKeysResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListArtifactMetadataKeysResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListArtifactMetadataKeysResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListArtifactMetadataKeysResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListArtifactMetadataKeysResponseValidationError) ErrorName() string {
+	return "ListArtifactMetadataKeysResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListArtifactMetadataKeysResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListArtifactMetadataKeysResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListArtifactMetadataKeysResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListArtifactMetadataKeysResponseValidationError{}

@@ -12,6 +12,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
 
@@ -34,11 +35,15 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
 
-	runServiceURL := cfg.RunServiceURL
+	runServiceCfg := cfg.RunService
 	if sc.BaseURL != "" {
-		runServiceURL = sc.BaseURL
+		runServiceCfg.URL = sc.BaseURL
 	}
-	runClient := workflowconnect.NewInternalRunServiceClient(http.DefaultClient, runServiceURL, connect.WithInterceptors(otelInterceptor))
+	runHTTPClient, err := serviceclient.NewHTTPClient(ctx, http.DefaultClient, runServiceCfg)
+	if err != nil {
+		return fmt.Errorf("events: configure run service client: %w", err)
+	}
+	runClient := workflowconnect.NewInternalRunServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
 
 	eventsSvc := service.NewEventsProxyService(runClient)
 

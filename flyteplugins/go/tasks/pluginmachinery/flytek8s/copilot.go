@@ -16,6 +16,7 @@ import (
 	core2 "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -131,6 +132,11 @@ func SidecarCommandArgs(fromLocalPath string, outputPrefix, rawOutputPath storag
 		outputPrefix.String(),
 		"--from-local-dir",
 		fromLocalPath,
+		// Pin the error document's name to the one the output reader looks for, so an
+		// upload failure is read back as the RECOVERABLE task error co-pilot recorded
+		// instead of surfacing as a missing outputs.pb system error.
+		"--err-output-name",
+		ioutils.ErrorsSuffix,
 		"--interface",
 		base64.StdEncoding.EncodeToString(b),
 	}, nil
@@ -156,6 +162,10 @@ func DownloadCommandArgs(fromInputsPath, outputPrefix storage.DataReference, toL
 		format.String(),
 		"--file-input-layout",
 		layout.String(),
+		// See SidecarCommandArgs: the downloader writes its error document to the same
+		// prefix, and it has to carry the name the output reader reads.
+		"--err-output-name",
+		ioutils.ErrorsSuffix,
 		"--input-interface",
 		base64.StdEncoding.EncodeToString(b),
 	}, nil

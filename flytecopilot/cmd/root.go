@@ -32,7 +32,7 @@ type RootOptions struct {
 	Store          *storage.DataStore
 	configAccessor config.Accessor
 	cfgFile        string
-	// The actual key name that should be created under the remote prefix where the error document is written of the form errors.pb
+	// The actual key name that should be created under the remote prefix where the error document is written of the form error.pb
 	errorOutputName string
 }
 
@@ -101,7 +101,7 @@ func NewDataCommand() *cobra.Command {
 
 	command.PersistentFlags().StringVar(&rootOpts.cfgFile, "config", "", "config file (default is $HOME/config.yaml)")
 	command.PersistentFlags().BoolVarP(&rootOpts.showSource, "show-source", "s", false, "Show line number for errors")
-	command.PersistentFlags().StringVar(&rootOpts.errorOutputName, "err-output-name", "errors.pb", "Actual key name under the prefix where the error protobuf should be written to")
+	command.PersistentFlags().StringVar(&rootOpts.errorOutputName, "err-output-name", "error.pb", "Actual key name under the prefix where the error protobuf should be written to")
 
 	rootOpts.configAccessor = viper.NewAccessor(config.Options{StrictMode: true})
 	// Here you will define your flags and configuration settings. Cobra supports persistent flags, which, if defined

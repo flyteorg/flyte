@@ -14,6 +14,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/sentryutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
 	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
@@ -97,23 +98,24 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	// In unified mode, intra-service calls go through the same mux.
-	actionsURL := cfg.ActionsServiceURL
+	actionsServiceCfg := cfg.ActionsService
 	if sc.BaseURL != "" {
-		actionsURL = sc.BaseURL
+		actionsServiceCfg.URL = sc.BaseURL
+	}
+	actionsHTTPClient, err := serviceclient.NewHTTPClient(ctx, http.DefaultClient, actionsServiceCfg)
+	if err != nil {
+		return fmt.Errorf("runs: configure actions service client: %w", err)
 	}
 	actionsClient := actionsconnect.NewActionsServiceClient(
-		http.DefaultClient,
-		actionsURL,
+		actionsHTTPClient,
+		actionsServiceCfg.URL,
 		connect.WithInterceptors(otelInterceptor),
 	)
 
-	projectsURL := sc.BaseURL
-	if projectsURL == "" {
-		projectsURL = cfg.ActionsServiceURL
-	}
+	runsServiceURL := fmt.Sprintf("http://localhost:%d", cfg.Server.Port)
 	projectClient := projectconnect.NewProjectServiceClient(
 		http.DefaultClient,
-		projectsURL,
+		runsServiceURL,
 		connect.WithInterceptors(otelInterceptor),
 	)
 	abortReconciler := service.NewAbortReconciler(repo, actionsClient, service.AbortReconcilerConfig{
@@ -186,11 +188,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	if cfg.TriggerScheduler.Enabled {
-		runsURL := cfg.ActionsServiceURL
-		if sc.BaseURL != "" {
-			runsURL = sc.BaseURL
-		}
-		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, runsURL, connect.WithInterceptors(otelInterceptor))
+		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, http.DefaultClient, runsServiceURL, connect.WithInterceptors(otelInterceptor))
 		sc.AddWorker("trigger-scheduler", worker)
 		logger.Infof(ctx, "Registered trigger-scheduler worker")
 	}
