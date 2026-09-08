@@ -822,46 +822,50 @@ func TestInsertEvents_Empty(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestNotifyActionUpdate_PayloadWithSpecialChars(t *testing.T) {
-	r := newNotifyTestRepo()
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	// Payload with single quotes that would cause SQL injection with string interpolation.
-	actionID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{
-			Org:     "org",
-			Project: "proj",
-			Domain:  "domain",
-			Name:    "run'; DROP TABLE actions; --",
+func TestNotifyUpdates_PayloadWithSpecialChars(t *testing.T) {
+	tests := []struct {
+		name        string
+		notify      func(*actionRepo, context.Context)
+		wantActions []string
+		wantRuns    []string
+	}{
+		{
+			name: "action",
+			notify: func(r *actionRepo, ctx context.Context) {
+				r.notifyActionUpdate(ctx, &common.ActionIdentifier{
+					Run: &common.RunIdentifier{
+						Org: "org", Project: "proj", Domain: "domain", Name: "run'; DROP TABLE actions; --",
+					},
+					Name: "action",
+				})
+			},
+			wantActions: []string{"proj/domain/run'; DROP TABLE actions; --/action"},
+			wantRuns:    []string{},
 		},
-		Name: "action",
+		{
+			name: "run",
+			notify: func(r *actionRepo, ctx context.Context) {
+				r.notifyRunUpdate(ctx, &common.RunIdentifier{
+					Org: "org", Project: "proj", Domain: "domain", Name: "run'); SELECT pg_sleep(10); --",
+				})
+			},
+			wantActions: []string{},
+			wantRuns:    []string{"proj/domain/run'); SELECT pg_sleep(10); --"},
+		},
 	}
 
-	r.notifyActionUpdate(ctx, actionID)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := newNotifyTestRepo()
 
-	actions, _ := r.takePendingNotifications()
-	assert.Contains(t, actions, "proj/domain/run'; DROP TABLE actions; --/action")
-}
+			// Single quotes must be queued as payload data, never interpolated into SQL.
+			tt.notify(r, context.Background())
 
-func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
-	r := newNotifyTestRepo()
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	runID := &common.RunIdentifier{
-		Org:     "org",
-		Project: "proj",
-		Domain:  "domain",
-		Name:    "run'); SELECT pg_sleep(10); --",
+			actions, runs := r.takePendingNotifications()
+			assert.Equal(t, tt.wantActions, actions)
+			assert.Equal(t, tt.wantRuns, runs)
+		})
 	}
-
-	r.notifyRunUpdate(ctx, runID)
-
-	_, runs := r.takePendingNotifications()
-	assert.Contains(t, runs, "proj/domain/run'); SELECT pg_sleep(10); --")
 }
 
 func TestNotifyUpdates_QueueDistinctPayloadsInOrder(t *testing.T) {
