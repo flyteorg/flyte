@@ -179,6 +179,15 @@ func (r *TaskActionReconciler) now() time.Time {
 	return time.Now()
 }
 
+// mutateTaskActionState updates the CR state only when the Put/Reset is called by plugin in this reconcile round
+func mutateTaskActionState(taskAction *flyteorgv1.TaskAction, stateMgr *plugin.PluginStateManager) {
+	state, stateVersion, stateWritten := stateMgr.GetNewState()
+	if stateWritten {
+		taskAction.Status.PluginState = state
+		taskAction.Status.PluginStateVersion = stateVersion
+	}
+}
+
 // maxRuntimeFromTaskTemplate reads TaskMetadata.timeout — the per-attempt max runtime
 func maxRuntimeFromTaskTemplate(data []byte) (time.Duration, error) {
 	if len(data) == 0 {
@@ -204,8 +213,7 @@ func maxRuntimeFromTaskTemplate(data []byte) (time.Duration, error) {
 	return maxRuntime, nil
 }
 
-// taskAttemptDeadline is when the current attempt exhausts its max runtime.
-// It reports false while the attempt has no recorded start or no configured bound.
+// taskAttemptDeadline return the deadline of current attempt
 func taskAttemptDeadline(taskAction *flyteorgv1.TaskAction, maxRuntime time.Duration) (time.Time, bool) {
 	if maxRuntime <= 0 || taskAction.Status.AttemptStartedAt == nil {
 		return time.Time{}, false
@@ -213,12 +221,14 @@ func taskAttemptDeadline(taskAction *flyteorgv1.TaskAction, maxRuntime time.Dura
 	return taskAction.Status.AttemptStartedAt.Add(maxRuntime), true
 }
 
+// timeoutAwareRequeue is called whenever the controller is going to requeue a CR
 func (r *TaskActionReconciler) timeoutAwareRequeue(
 	taskAction *flyteorgv1.TaskAction,
 	maxRuntime time.Duration,
 ) ctrl.Result {
 	requeueAfter := r.requeueDuration()
 	deadline, ok := taskAttemptDeadline(taskAction, maxRuntime)
+	// No timeout set for the action, we can requeue directly
 	if !ok {
 		return ctrl.Result{RequeueAfter: requeueAfter}
 	}
@@ -227,6 +237,7 @@ func (r *TaskActionReconciler) timeoutAwareRequeue(
 	if untilDeadline <= 0 {
 		return ctrl.Result{Requeue: true}
 	}
+	// We must make sure the requeue interval not exceeding the timeout timestampt
 	if untilDeadline < requeueAfter {
 		requeueAfter = untilDeadline
 	}
@@ -235,12 +246,6 @@ func (r *TaskActionReconciler) timeoutAwareRequeue(
 
 // attemptOverran reports whether the attempt's deadline has passed without a
 // result that provably predates it.
-//
-// The bound is enforced against the controller clock: a terminal transition
-// observed before the deadline always wins, whatever timestamp it carries. From
-// the deadline onward a terminal transition only wins if it proves it finished
-// in time via TaskInfo.OccurredAt. A terminal report carrying no usable
-// timestamp is indistinguishable from an overrun, so the bound takes precedence.
 func attemptOverran(info pluginsCore.PhaseInfo, deadline, now time.Time) bool {
 	if now.Before(deadline) {
 		return false
@@ -255,9 +260,8 @@ func attemptOverran(info pluginsCore.PhaseInfo, deadline, now time.Time) bool {
 	return taskInfo.OccurredAt.After(deadline)
 }
 
-// lastPhaseTransition is when the controller most recently recorded this
-// TaskAction entering phase, if it did and the entry carries a usable timestamp.
-func lastPhaseTransition(
+// getPhaseLastTransitionTime return the last transition time of a phase
+func getPhaseLastTransitionTime(
 	taskAction *flyteorgv1.TaskAction,
 	phase flyteorgv1.TaskActionConditionReason,
 ) (time.Time, bool) {
@@ -275,54 +279,44 @@ func lastPhaseTransition(
 }
 
 // recordAttemptStart anchors the attempt clock the first time this attempt is
-// seen Running. It is a no-op once AttemptStartedAt is set, and is skipped
-// entirely for unbounded tasks.
-//
-// A live Running report anchors on the plugin's own start time, so polling delay
-// between the task starting and the controller noticing does not silently extend
-// the budget. Anything the plugin reports from before this attempt was queued is
-// stale and ignored — honouring it would expire a fresh attempt on arrival and
-// burn the whole retry budget in a loop.
-//
-// alreadyRunning covers an action already Running before this field was
-// populated: an upgrade, or a status write lost mid-attempt. No authoritative
-// start time is recoverable there, so it falls back to the recorded Executing
-// transition — necessarily this attempt's, since a retry rewrites PluginPhase to
-// Queued — and to now when even that is missing.
+// seen Running.
 func (r *TaskActionReconciler) recordAttemptStart(
 	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
 	info pluginsCore.PhaseInfo,
-	maxRuntime time.Duration,
-	alreadyRunning bool,
+	isCRPhaseRunning bool,
 ) error {
-	if maxRuntime <= 0 || taskAction.Status.AttemptStartedAt != nil {
+	// Skip if startedAt already marked in CR
+	if taskAction.Status.AttemptStartedAt != nil {
 		return nil
 	}
-	running := info.Phase() == pluginsCore.PhaseRunning
-	if !running && !alreadyRunning {
+	isPluginPhaseRunning := info.Phase() == pluginsCore.PhaseRunning
+	// Skip if the plugin state and CR state is not in running phase yet
+	if !isPluginPhaseRunning && !isCRPhaseRunning {
 		return nil
 	}
 
-	var reported time.Time
-	var haveReported bool
-	if running {
+	var markedPhaseRunningTime time.Time
+	var isMarkedRunning bool
+	startedAt := r.now()
+	if isPluginPhaseRunning {
+		// Plugin phase turned into running but haven't marked CR started at, so we mark CR running here
 		if taskInfo := info.Info(); taskInfo != nil && taskInfo.OccurredAt != nil && !taskInfo.OccurredAt.IsZero() {
-			reported, haveReported = *taskInfo.OccurredAt, true
+			markedPhaseRunningTime, isMarkedRunning = *taskInfo.OccurredAt, true
 		}
 	} else {
-		reported, haveReported = lastPhaseTransition(taskAction, flyteorgv1.ConditionReasonExecuting)
+		// This is for backward compatible. For the users upgrade the backend while CR's are still running,
+		// we should make sure those CR's startedAt are marked too.
+		markedPhaseRunningTime, isMarkedRunning = getPhaseLastTransitionTime(taskAction, flyteorgv1.ConditionReasonExecuting)
 	}
 
-	queuedAt, haveQueued := lastPhaseTransition(taskAction, flyteorgv1.ConditionReasonQueued)
-	if haveQueued && reported.Before(queuedAt) {
-		haveReported = false
+	// Make sure the running phase time comes after queued time
+	markedPhaseQueuedTime, isMarkedQueued := getPhaseLastTransitionTime(taskAction, flyteorgv1.ConditionReasonQueued)
+	if isMarkedRunning && isMarkedQueued && !markedPhaseRunningTime.Before(markedPhaseQueuedTime) {
+		startedAt = markedPhaseRunningTime
 	}
 
-	startedAt := r.now()
-	if haveReported && reported.Before(startedAt) {
-		startedAt = reported
-	}
+	// Persisted startedAt into CRD
 	return r.persistAttemptStartedAt(ctx, taskAction, startedAt)
 }
 
@@ -334,17 +328,16 @@ func (r *TaskActionReconciler) persistAttemptStartedAt(
 	taskAction *flyteorgv1.TaskAction,
 	startedAt time.Time,
 ) error {
-	candidate := metav1.NewTime(startedAt)
-	persisted := candidate
+	finalStartedAt := metav1.NewTime(startedAt)
 	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
 		if latest.Status.AttemptStartedAt == nil {
-			latest.Status.AttemptStartedAt = &candidate
+			latest.Status.AttemptStartedAt = &finalStartedAt
 		}
-		persisted = *latest.Status.AttemptStartedAt
+		finalStartedAt = *latest.Status.AttemptStartedAt
 	}); err != nil {
 		return err
 	}
-	taskAction.Status.AttemptStartedAt = &persisted
+	taskAction.Status.AttemptStartedAt = &finalStartedAt
 	return nil
 }
 
@@ -357,35 +350,25 @@ func (r *TaskActionReconciler) markTimeoutPending(
 	deadline time.Time,
 	stateMgr *plugin.PluginStateManager,
 ) error {
-	candidate := metav1.NewTime(deadline)
-	persisted := candidate
-	state, stateVersion, stateWritten := stateMgr.GetNewState()
+	finalDeadline := metav1.NewTime(deadline)
 	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
 		if latest.Status.TimeoutAt == nil {
-			latest.Status.TimeoutAt = &candidate
+			latest.Status.TimeoutAt = &finalDeadline
 		}
-		persisted = *latest.Status.TimeoutAt
-		if stateWritten {
-			latest.Status.PluginState = state
-			latest.Status.PluginStateVersion = stateVersion
-		}
+		finalDeadline = *latest.Status.TimeoutAt
+		mutateTaskActionState(latest, stateMgr)
 	}); err != nil {
 		return err
 	}
 
-	taskAction.Status.TimeoutAt = &persisted
-	if stateWritten {
-		taskAction.Status.PluginState = state
-		taskAction.Status.PluginStateVersion = stateVersion
-	}
+	taskAction.Status.TimeoutAt = &finalDeadline
+	mutateTaskActionState(taskAction, stateMgr)
 	return nil
 }
 
 // timeOutAttempt ends the current attempt at deadline. Persisting
-// Status.TimeoutAt before touching the plugin is what makes cleanup resumable:
-// once it is set, reconcileTask re-enters cleanup rather than handling the
-// plugin again, so a crash mid-abort cannot leave the task running unbounded.
-func (r *TaskActionReconciler) timeOutAttempt(
+// Status.
+func (r *TaskActionReconciler) setAttemptTimeout(
 	ctx context.Context,
 	taskAction, original *flyteorgv1.TaskAction,
 	p pluginsCore.Plugin,
@@ -446,10 +429,7 @@ func (r *TaskActionReconciler) reconcileTimedOutAttempt(
 	)
 
 	if willRetry {
-		// Publish TIMED_OUT for this attempt before advancing the status. If the
-		// status write then fails, the next reconcile re-publishes it; the events
-		// service dedupes on insert (see recordEvent), so this stays at-least-once
-		// end to end rather than pushing the problem onto consumers.
+		// Publish TIMED_OUT for this attempt before advancing the status.
 		timeoutEvent := r.buildActionEvent(ctx, taskAction, timeoutInfo)
 		if err := r.recordEvent(ctx, timeoutEvent); err != nil {
 			logger.Error(err, "failed to persist timed out attempt event, will retry")
@@ -776,13 +756,14 @@ func (r *TaskActionReconciler) reconcileTask(
 	// cacheShortCircuited is true when cache handling already decided the outcome,
 	// either via cache hit or waiting on the reservation owner.
 	var cacheShortCircuited bool
+	deadline, hasDeadline := taskAttemptDeadline(taskAction, maxRuntime)
 	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, alreadyRunning)
 	if err != nil {
 		logger.Error(err, "cache pre-execution handling failed")
 		// Yield to the deadline if there is one: a cache that keeps failing must
 		// not be able to hold an attempt open past its max runtime.
-		if deadline, hasDeadline := taskAttemptDeadline(taskAction, maxRuntime); hasDeadline && !r.now().Before(deadline) {
-			return r.timeOutAttempt(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, maxRuntime, deadline)
+		if hasDeadline && !r.now().Before(deadline) {
+			return r.setAttemptTimeout(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, maxRuntime, deadline)
 		}
 		return r.timeoutAwareRequeue(taskAction, maxRuntime), nil
 	}
@@ -797,7 +778,7 @@ func (r *TaskActionReconciler) reconcileTask(
 	}
 
 	if handleErr == nil {
-		if err := r.recordAttemptStart(ctx, taskAction, transition.Info(), maxRuntime, alreadyRunning); err != nil {
+		if err := r.recordAttemptStart(ctx, taskAction, transition.Info(), alreadyRunning); err != nil {
 			return ctrl.Result{}, err
 		}
 	}
@@ -805,15 +786,9 @@ func (r *TaskActionReconciler) reconcileTask(
 	// Enforce the per-attempt max runtime. A Handle failure at or past the
 	// deadline can no longer establish that the attempt finished in time, so it
 	// ends the attempt too instead of consuming a system-failure retry.
-	if deadline, hasDeadline := taskAttemptDeadline(taskAction, maxRuntime); hasDeadline {
-		var overran bool
-		if handleErr != nil {
-			overran = !r.now().Before(deadline)
-		} else {
-			overran = attemptOverran(transition.Info(), deadline, r.now())
-		}
-		if overran {
-			return r.timeOutAttempt(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, maxRuntime, deadline)
+	if hasDeadline {
+		if overran := attemptOverran(transition.Info(), deadline, r.now()); overran {
+			return r.setAttemptTimeout(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, maxRuntime, deadline)
 		}
 	}
 

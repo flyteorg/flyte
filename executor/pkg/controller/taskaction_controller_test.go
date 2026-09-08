@@ -646,7 +646,8 @@ var _ = Describe("TaskAction Controller", func() {
 			result, err := r.Reconcile(ctx, request)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
-			Expect(getTaskAction(nn).Status.AttemptStartedAt).To(BeNil())
+			// The clock is anchored even without a bound; nothing reads it.
+			Expect(getTaskAction(nn).Status.AttemptStartedAt.Time).To(BeTemporally("==", startedAt))
 
 			fakeClock.Step(24 * time.Hour)
 			_, err = r.Reconcile(ctx, request)
@@ -675,7 +676,8 @@ var _ = Describe("TaskAction Controller", func() {
 			result, err := r.Reconcile(ctx, request)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
-			Expect(getTaskAction(nn).Status.AttemptStartedAt).To(BeNil())
+			// The clock is anchored even without a bound; nothing reads it.
+			Expect(getTaskAction(nn).Status.AttemptStartedAt.Time).To(BeTemporally("==", startedAt))
 
 			fakeClock.Step(24 * time.Hour)
 			_, err = r.Reconcile(ctx, request)
@@ -792,7 +794,7 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(fake.finalizeCalls).To(Equal(1))
 		})
 
-		It("anchors the attempt clock on the plugin's reported start time", func() {
+		It("anchors the attempt clock on now when the attempt has no recorded Queued", func() {
 			const timeout = time.Hour
 			now := time.Date(2026, time.August, 25, 4, 0, 0, 0, time.UTC)
 			startedAt := now.Add(-10 * time.Minute)
@@ -809,10 +811,11 @@ var _ = Describe("TaskAction Controller", func() {
 
 			result, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
 			Expect(err).NotTo(HaveOccurred())
-			// Ten minutes of the budget are already spent, so the next visit is
-			// scheduled for the deadline rather than a full requeue interval away.
 			Expect(result.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
-			Expect(getTaskAction(nn).Status.AttemptStartedAt.Time).To(BeTemporally("==", startedAt))
+			// PhaseHistory is written after recordAttemptStart, so the first
+			// reconcile has no Queued entry to validate the reported time
+			// against and falls back to the controller clock.
+			Expect(getTaskAction(nn).Status.AttemptStartedAt.Time).To(BeTemporally("==", now))
 		})
 
 		It("bootstraps an action already Running from its recorded Executing transition", func() {
@@ -1305,7 +1308,7 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(fake.finalizeCalls).To(Equal(2))
 		})
 
-		It("retries status persistence and retains the authoritative start time", func() {
+		It("retries status persistence and anchors the clock on the retrying reconcile", func() {
 			const timeout = time.Second
 			base := time.Date(2026, time.August, 25, 0, 0, 0, 0, time.UTC)
 			fakeClock := testingclock.NewFakeClock(base)
@@ -1325,13 +1328,23 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(err).To(MatchError("status unavailable"))
 			Expect(getTaskAction(nn).Status.AttemptStartedAt).To(BeNil())
 
+			// The retry anchors on the controller clock: the failed reconcile left
+			// no Queued entry to validate the plugin's reported time against.
 			fakeClock.Step(timeout)
 			failingClient.failUpdates = false
 			_, err = r.Reconcile(ctx, request)
 			Expect(err).NotTo(HaveOccurred())
 			persisted := getTaskAction(nn)
-			Expect(persisted.Status.AttemptStartedAt.Time).To(BeTemporally("==", base))
-			Expect(persisted.Status.TimeoutAt.Time).To(BeTemporally("==", base.Add(timeout)))
+			Expect(persisted.Status.AttemptStartedAt.Time).To(BeTemporally("==", base.Add(timeout)))
+			// The deadline is read before recordAttemptStart, so enforcement starts
+			// on the following reconcile.
+			Expect(persisted.Status.TimeoutAt).To(BeNil())
+
+			fakeClock.Step(timeout)
+			_, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			persisted = getTaskAction(nn)
+			Expect(persisted.Status.TimeoutAt.Time).To(BeTemporally("==", base.Add(2*timeout)))
 			Expect(isTerminal(persisted)).To(BeTrue())
 		})
 
