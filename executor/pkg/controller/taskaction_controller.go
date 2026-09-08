@@ -188,7 +188,9 @@ func mutateTaskActionState(taskAction *flyteorgv1.TaskAction, stateMgr *plugin.P
 	}
 }
 
-// maxRuntimeFromTaskTemplate reads TaskMetadata.timeout — the per-attempt max runtime
+// maxRuntimeFromTaskTemplate reads TaskMetadata.timeout — the per-attempt max runtime.
+// Falls back to timeouts.deadline, which is an absolute cross-attempt bound, so
+// enforcing it per attempt is an approximation.
 func maxRuntimeFromTaskTemplate(data []byte) (time.Duration, error) {
 	if len(data) == 0 {
 		return 0, nil
@@ -200,6 +202,9 @@ func maxRuntimeFromTaskTemplate(data []byte) (time.Duration, error) {
 	}
 
 	timeout := taskTemplate.GetMetadata().GetTimeout()
+	if timeout == nil {
+		timeout = taskTemplate.GetMetadata().GetTimeouts().GetDeadline()
+	}
 	if timeout == nil {
 		return 0, nil
 	}
