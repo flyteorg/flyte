@@ -842,7 +842,7 @@ func TestNotifyActionUpdate_PayloadWithSpecialChars(t *testing.T) {
 	r.notifyActionUpdate(ctx, actionID)
 
 	actions, _ := r.takePendingNotifications()
-	assert.Contains(t, notificationPayloads(actions), "proj/domain/run'; DROP TABLE actions; --/action")
+	assert.Contains(t, actions, "proj/domain/run'; DROP TABLE actions; --/action")
 }
 
 func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
@@ -861,7 +861,7 @@ func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
 	r.notifyRunUpdate(ctx, runID)
 
 	_, runs := r.takePendingNotifications()
-	assert.Contains(t, notificationPayloads(runs), "proj/domain/run'); SELECT pg_sleep(10); --")
+	assert.Contains(t, runs, "proj/domain/run'); SELECT pg_sleep(10); --")
 }
 
 func TestNotifyUpdates_QueueDistinctPayloadsInOrder(t *testing.T) {
@@ -879,11 +879,11 @@ func TestNotifyUpdates_QueueDistinctPayloadsInOrder(t *testing.T) {
 	assert.Equal(t, []string{
 		"proj/domain/run/first-action",
 		"proj/domain/run/second-action",
-	}, notificationPayloads(actions))
+	}, actions)
 	assert.Equal(t, []string{
 		"proj/domain/first-run",
 		"proj/domain/second-run",
-	}, notificationPayloads(runs))
+	}, runs)
 }
 
 func TestMergePendingActions_RetriesBeforeNewPayloads(t *testing.T) {
@@ -898,33 +898,23 @@ func TestMergePendingActions_RetriesBeforeNewPayloads(t *testing.T) {
 	r.mergePendingActions(retry)
 
 	actions, _ := r.takePendingNotifications()
-	assert.Equal(t, []string{"first", "second", "third"}, notificationPayloads(actions))
+	assert.Equal(t, []string{"first", "second", "third"}, actions)
 }
 
-func TestEnqueuePending_EvictsLeastRecentlyUpdatedPayload(t *testing.T) {
-	pending := make(map[string]time.Time)
-	queue := newPendingNotificationHeap(2)
-	now := time.Now()
+func TestEnqueuePending_EvictsOldestPayload(t *testing.T) {
+	pending := make(map[string]struct{})
+	queue := make([]string, 0, 2)
 
-	enqueuePending(pending, &queue, "first", now, 2)
-	enqueuePending(pending, &queue, "second", now.Add(time.Second), 2)
-	enqueuePending(pending, &queue, "third", now.Add(2*time.Second), 2)
+	enqueuePending(pending, &queue, "first", 2)
+	enqueuePending(pending, &queue, "second", 2)
+	enqueuePending(pending, &queue, "third", 2)
 
 	assert.NotContains(t, pending, "first")
 	assert.Contains(t, pending, "second")
 	assert.Contains(t, pending, "third")
 
-	enqueuePending(pending, &queue, "second", now.Add(3*time.Second), 2)
-	assert.Equal(t, []string{"second", "third"}, notificationPayloads(queue.drain()))
-	assert.Equal(t, now.Add(3*time.Second), pending["second"])
-}
-
-func notificationPayloads(notifications []pendingNotification) []string {
-	payloads := make([]string, len(notifications))
-	for i, notification := range notifications {
-		payloads[i] = notification.payload
-	}
-	return payloads
+	enqueuePending(pending, &queue, "second", 2)
+	assert.Equal(t, []string{"second", "third"}, queue)
 }
 
 // TestNotifyActionUpdate_KeepsWakeupAfterContextCancel covers the loss path
@@ -940,8 +930,8 @@ func TestNotifyActionUpdate_KeepsWakeupAfterContextCancel(t *testing.T) {
 	r.notifyRunUpdate(ctx, &common.RunIdentifier{Project: "proj", Domain: "domain", Name: "run"})
 
 	actions, runs := r.takePendingNotifications()
-	assert.Contains(t, notificationPayloads(actions), "proj/domain/run/cancelled-caller")
-	assert.Contains(t, notificationPayloads(runs), "proj/domain/run")
+	assert.Contains(t, actions, "proj/domain/run/cancelled-caller")
+	assert.Contains(t, runs, "proj/domain/run")
 }
 
 // TestRunNotifyLoop_RetriesUndeliveredPayloads verifies that a failed
@@ -988,10 +978,10 @@ func TestRunNotifyLoop_RetriesUndeliveredPayloads(t *testing.T) {
 // pump running, so the pending work is observable and nothing drains it.
 func newNotifyTestRepo() *actionRepo {
 	return &actionRepo{
-		pendingActions:     make(map[string]time.Time, pendingNotificationCapacity),
-		pendingActionQueue: newPendingNotificationHeap(pendingNotificationCapacity),
-		pendingRuns:        make(map[string]time.Time, pendingNotificationCapacity),
-		pendingRunQueue:    newPendingNotificationHeap(pendingNotificationCapacity),
+		pendingActions:     make(map[string]struct{}, pendingNotificationCapacity),
+		pendingActionQueue: make([]string, 0, pendingNotificationCapacity),
+		pendingRuns:        make(map[string]struct{}, pendingNotificationCapacity),
+		pendingRunQueue:    make([]string, 0, pendingNotificationCapacity),
 		pendingCh:          make(chan struct{}, 1),
 	}
 }
@@ -1000,7 +990,7 @@ func newNotifyTestRepo() *actionRepo {
 func (r *actionRepo) pendingCounts() (actions, runs int) {
 	r.notifyMu.Lock()
 	defer r.notifyMu.Unlock()
-	return r.pendingActionQueue.Len(), r.pendingRunQueue.Len()
+	return len(r.pendingActionQueue), len(r.pendingRunQueue)
 }
 
 // newNotifyRepoWithDB builds a repo wired to a real database and listener but
@@ -1015,10 +1005,10 @@ func newNotifyRepoWithDB(t *testing.T) (*actionRepo, *sql.DB, *sql.Conn) {
 		dsn:                database.GetPostgresDsn(context.Background(), testDbConfig.Postgres),
 		runSubscribers:     make(map[chan string]bool),
 		actionSubscribers:  make(map[chan string]bool),
-		pendingActions:     make(map[string]time.Time, pendingNotificationCapacity),
-		pendingActionQueue: newPendingNotificationHeap(pendingNotificationCapacity),
-		pendingRuns:        make(map[string]time.Time, pendingNotificationCapacity),
-		pendingRunQueue:    newPendingNotificationHeap(pendingNotificationCapacity),
+		pendingActions:     make(map[string]struct{}, pendingNotificationCapacity),
+		pendingActionQueue: make([]string, 0, pendingNotificationCapacity),
+		pendingRuns:        make(map[string]struct{}, pendingNotificationCapacity),
+		pendingRunQueue:    make([]string, 0, pendingNotificationCapacity),
 		pendingCh:          make(chan struct{}, 1),
 	}
 	require.NoError(t, r.startPostgresListener())
@@ -1224,10 +1214,10 @@ func TestUpdateActionPhase_CompletesWithStalledPump(t *testing.T) {
 	db := setupActionDB(t)
 	r := &actionRepo{
 		db:                 db,
-		pendingActions:     make(map[string]time.Time, pendingNotificationCapacity),
-		pendingActionQueue: newPendingNotificationHeap(pendingNotificationCapacity),
-		pendingRuns:        make(map[string]time.Time, pendingNotificationCapacity),
-		pendingRunQueue:    newPendingNotificationHeap(pendingNotificationCapacity),
+		pendingActions:     make(map[string]struct{}, pendingNotificationCapacity),
+		pendingActionQueue: make([]string, 0, pendingNotificationCapacity),
+		pendingRuns:        make(map[string]struct{}, pendingNotificationCapacity),
+		pendingRunQueue:    make([]string, 0, pendingNotificationCapacity),
 		pendingCh:          make(chan struct{}, 1),
 	}
 	// No pump is started, so nothing drains what the write path queues.

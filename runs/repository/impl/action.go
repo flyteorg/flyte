@@ -1,7 +1,6 @@
 package impl
 
 import (
-	"container/heap"
 	"context"
 	"database/sql"
 	"database/sql/driver"
@@ -38,74 +37,15 @@ type actionRepo struct {
 	mu                sync.RWMutex
 
 	notifyMu           sync.Mutex
-	pendingActions     map[string]time.Time
-	pendingActionQueue pendingNotificationHeap
-	pendingRuns        map[string]time.Time
-	pendingRunQueue    pendingNotificationHeap
+	pendingActions     map[string]struct{}
+	pendingActionQueue []string
+	pendingRuns        map[string]struct{}
+	pendingRunQueue    []string
 	pendingCh          chan struct{}
 }
 
-type pendingNotification struct {
-	payload    string
-	enqueuedAt time.Time
-	sequence   uint64
-}
-
-type pendingNotificationHeap struct {
-	items     []pendingNotification
-	positions map[string]int
-	nextSeq   uint64
-}
-
-func newPendingNotificationHeap(capacity int) pendingNotificationHeap {
-	return pendingNotificationHeap{
-		items:     make([]pendingNotification, 0, capacity),
-		positions: make(map[string]int, capacity),
-	}
-}
-
-func (h pendingNotificationHeap) Len() int { return len(h.items) }
-
-func (h pendingNotificationHeap) Less(i, j int) bool {
-	if h.items[i].enqueuedAt.Equal(h.items[j].enqueuedAt) {
-		return h.items[i].sequence < h.items[j].sequence
-	}
-	return h.items[i].enqueuedAt.Before(h.items[j].enqueuedAt)
-}
-
-func (h pendingNotificationHeap) Swap(i, j int) {
-	h.items[i], h.items[j] = h.items[j], h.items[i]
-	h.positions[h.items[i].payload] = i
-	h.positions[h.items[j].payload] = j
-}
-
-func (h *pendingNotificationHeap) Push(value interface{}) {
-	notification := value.(pendingNotification)
-	if notification.sequence > h.nextSeq {
-		h.nextSeq = notification.sequence
-	}
-	h.positions[notification.payload] = len(h.items)
-	h.items = append(h.items, notification)
-}
-
-func (h *pendingNotificationHeap) Pop() interface{} {
-	last := len(h.items) - 1
-	notification := h.items[last]
-	h.items = h.items[:last]
-	delete(h.positions, notification.payload)
-	return notification
-}
-
-func (h *pendingNotificationHeap) drain() []pendingNotification {
-	notifications := make([]pendingNotification, 0, h.Len())
-	for h.Len() > 0 {
-		notifications = append(notifications, heap.Pop(h).(pendingNotification))
-	}
-	return notifications
-}
-
 const (
-	notificationBufferLimit     = 50_000
+	notificationBufferLimit     = 65_000
 	pendingNotificationCapacity = 256
 	notifyRetryMinBackoff       = 50 * time.Millisecond
 	notifyRetryMaxBackoff       = 5 * time.Second
@@ -121,10 +61,10 @@ func NewActionRepo(db *sqlx.DB, dbConfig database.DbConfig) (interfaces.ActionRe
 		actionSubscribers: make(map[chan string]bool),
 	}
 
-	repo.pendingActions = make(map[string]time.Time, pendingNotificationCapacity)
-	repo.pendingActionQueue = newPendingNotificationHeap(pendingNotificationCapacity)
-	repo.pendingRuns = make(map[string]time.Time, pendingNotificationCapacity)
-	repo.pendingRunQueue = newPendingNotificationHeap(pendingNotificationCapacity)
+	repo.pendingActions = make(map[string]struct{}, pendingNotificationCapacity)
+	repo.pendingActionQueue = make([]string, 0, pendingNotificationCapacity)
+	repo.pendingRuns = make(map[string]struct{}, pendingNotificationCapacity)
+	repo.pendingRunQueue = make([]string, 0, pendingNotificationCapacity)
 	repo.pendingCh = make(chan struct{}, 1)
 
 	if err := repo.startPostgresListener(); err != nil {
@@ -1036,7 +976,7 @@ func (r *actionRepo) notifyRunUpdate(_ context.Context, runID *common.RunIdentif
 
 func (r *actionRepo) markRunPending(payload string) {
 	r.notifyMu.Lock()
-	enqueuePending(r.pendingRuns, &r.pendingRunQueue, payload, time.Now(), notificationBufferLimit)
+	enqueuePending(r.pendingRuns, &r.pendingRunQueue, payload, notificationBufferLimit)
 	r.notifyMu.Unlock()
 	r.signalPending()
 }
@@ -1048,73 +988,56 @@ func (r *actionRepo) signalPending() {
 	}
 }
 
-func (r *actionRepo) takePendingNotifications() (actions, runs []pendingNotification) {
+func (r *actionRepo) takePendingNotifications() (actions, runs []string) {
 	r.notifyMu.Lock()
 	defer r.notifyMu.Unlock()
 
-	actions, runs = r.pendingActionQueue.drain(), r.pendingRunQueue.drain()
-	r.pendingActions = make(map[string]time.Time, pendingNotificationCapacity)
-	r.pendingActionQueue = newPendingNotificationHeap(pendingNotificationCapacity)
-	r.pendingRuns = make(map[string]time.Time, pendingNotificationCapacity)
-	r.pendingRunQueue = newPendingNotificationHeap(pendingNotificationCapacity)
+	actions, runs = r.pendingActionQueue, r.pendingRunQueue
+	r.pendingActions = make(map[string]struct{}, pendingNotificationCapacity)
+	r.pendingActionQueue = make([]string, 0, pendingNotificationCapacity)
+	r.pendingRuns = make(map[string]struct{}, pendingNotificationCapacity)
+	r.pendingRunQueue = make([]string, 0, pendingNotificationCapacity)
 	return actions, runs
 }
 
-func (r *actionRepo) mergePendingActions(actions []pendingNotification) {
+func (r *actionRepo) mergePendingActions(actions []string) {
 	if len(actions) == 0 {
 		return
 	}
 	r.notifyMu.Lock()
-	for _, notification := range actions {
-		if _, exists := r.pendingActions[notification.payload]; exists {
-			if index, found := r.pendingActionQueue.positions[notification.payload]; found && notification.enqueuedAt.Before(r.pendingActionQueue.items[index].enqueuedAt) {
-				heap.Remove(&r.pendingActionQueue, index)
-				heap.Push(&r.pendingActionQueue, notification)
-			}
-			continue
-		}
-		enqueuePending(r.pendingActions, &r.pendingActionQueue, notification.payload, notification.enqueuedAt, notificationBufferLimit)
-	}
+	r.pendingActions, r.pendingActionQueue = mergePending(actions, r.pendingActionQueue)
 	r.notifyMu.Unlock()
 }
 
-func (r *actionRepo) mergePendingRuns(runs []pendingNotification) {
+func (r *actionRepo) mergePendingRuns(runs []string) {
 	if len(runs) == 0 {
 		return
 	}
 	r.notifyMu.Lock()
-	for _, notification := range runs {
-		if _, exists := r.pendingRuns[notification.payload]; exists {
-			if index, found := r.pendingRunQueue.positions[notification.payload]; found && notification.enqueuedAt.Before(r.pendingRunQueue.items[index].enqueuedAt) {
-				heap.Remove(&r.pendingRunQueue, index)
-				heap.Push(&r.pendingRunQueue, notification)
-			}
-			continue
-		}
-		enqueuePending(r.pendingRuns, &r.pendingRunQueue, notification.payload, notification.enqueuedAt, notificationBufferLimit)
-	}
+	r.pendingRuns, r.pendingRunQueue = mergePending(runs, r.pendingRunQueue)
 	r.notifyMu.Unlock()
 }
 
-func enqueuePending(pending map[string]time.Time, queue *pendingNotificationHeap, payload string, now time.Time, limit int) {
+func mergePending(retry, queued []string) (map[string]struct{}, []string) {
+	pending := make(map[string]struct{}, len(retry)+len(queued))
+	queue := make([]string, 0, len(retry)+len(queued))
+	for _, payload := range append(retry, queued...) {
+		enqueuePending(pending, &queue, payload, notificationBufferLimit)
+	}
+	return pending, queue
+}
+
+func enqueuePending(pending map[string]struct{}, queue *[]string, payload string, limit int) {
 	if _, exists := pending[payload]; exists {
-		pending[payload] = now
 		return
 	}
 	if len(pending) >= limit {
-		var oldestPayload string
-		var oldestTime time.Time
-		for candidate, timestamp := range pending {
-			if oldestTime.IsZero() || timestamp.Before(oldestTime) {
-				oldestPayload, oldestTime = candidate, timestamp
-			}
-		}
-		heap.Remove(queue, queue.positions[oldestPayload])
-		delete(pending, oldestPayload)
+		delete(pending, (*queue)[0])
+		(*queue)[0] = ""
+		*queue = (*queue)[1:]
 	}
-	pending[payload] = now
-	queue.nextSeq++
-	heap.Push(queue, pendingNotification{payload: payload, enqueuedAt: now, sequence: queue.nextSeq})
+	pending[payload] = struct{}{}
+	*queue = append(*queue, payload)
 }
 
 // ListRootActions lists root actions (runs) matching scope and date filters.
@@ -1232,9 +1155,9 @@ func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql
 		return true
 	}
 
-	emit := func(channel string, payloads []pendingNotification) []pendingNotification {
-		for i, notification := range payloads {
-			if !execNotify(channel, notification.payload) {
+	emit := func(channel string, payloads []string) []string {
+		for i, payload := range payloads {
+			if !execNotify(channel, payload) {
 				return payloads[i:]
 			}
 		}
@@ -1282,7 +1205,7 @@ func (r *actionRepo) notifyActionUpdate(_ context.Context, actionID *common.Acti
 
 func (r *actionRepo) markActionPending(payload string) {
 	r.notifyMu.Lock()
-	enqueuePending(r.pendingActions, &r.pendingActionQueue, payload, time.Now(), notificationBufferLimit)
+	enqueuePending(r.pendingActions, &r.pendingActionQueue, payload, notificationBufferLimit)
 	r.notifyMu.Unlock()
 	r.signalPending()
 }
