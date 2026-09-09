@@ -1,21 +1,3 @@
-// mod test_foo;
-
-// mod serde;
-
-// mod serde_impl;
-
-use pyo3;
-use pyo3::prelude::*;
-// use crate::HeartbeatResponse;
-// include!("flyteidl.common.rs");
-// include!("flyteidl.workflow.rs");
-// include!("flyteidl.workflow.tonic.rs");
-// inculde!("flyteidl.logs.dataplane.rs");
-// include!("flyteidl.core.rs");
-// include!("google.rpc.rs");
-// include!("validate.rs");
-
-// use crate::*;
 // Re-export all generated protobuf modules
 pub mod flyteidl {
 
@@ -61,6 +43,14 @@ pub mod flyteidl {
         include!("flyteidl2.task.rs");
     }
 
+    pub mod dataproxy {
+        include!("flyteidl2.dataproxy.rs");
+    }
+
+    pub mod cluster {
+        include!("flyteidl2.cluster.rs");
+    }
+
     pub mod trigger {
         include!("flyteidl2.trigger.rs");
     }
@@ -70,7 +60,6 @@ pub mod flyteidl {
     }
 }
 
-// use pyo3_prost::pyclass_for_prost_struct;
 pub mod google {
     pub mod rpc {
         include!("google.rpc.rs");
@@ -90,18 +79,6 @@ pub mod validate {
     //         include!("validate.serde.rs");
     //     }
 }
-
-// Include the generated Box<T> implementations
-include!(concat!(env!("OUT_DIR"), "/boxed_impls.rs"));
-// pub mod serde {
-//     include!(concat!(env!("OUT_DIR"), "/serde_impls.rs"));
-// }
-pub mod pymodules {
-    include!(concat!(env!("OUT_DIR"), "/pymodules.rs"));
-}
-
-include!(concat!(env!("OUT_DIR"), "/serde_impls.rs"));
-// include!("serde_impl.rs");
 
 //
 // // Re-export commonly used types at the root level for convenience
