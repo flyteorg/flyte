@@ -90,6 +90,10 @@ const (
 
 	// ConditionReasonTimedOut indicates a condition action passed its deadline unsignalled (Failed=True)
 	ConditionReasonTimedOut TaskActionConditionReason = "TimedOut"
+
+	// ConditionReasonRecovered indicates the action reused a prior run's result and never
+	// executed (Succeeded=True). Reported as ACTION_PHASE_RECOVERED, not SUCCEEDED.
+	ConditionReasonRecovered TaskActionConditionReason = "Recovered"
 )
 
 // ActionType values for TaskActionSpec.ActionType.
@@ -190,6 +194,55 @@ type TaskActionSpec struct {
 	// +optional
 	// +kubebuilder:validation:MaxLength=256
 	Group string `json:"group,omitempty"`
+
+	// RecoveryContext is the run-scoped input to the recovery decision, stamped on the root
+	// from RunSpec and inherited by every descendant.
+	// +optional
+	RecoveryContext *RecoveryContext `json:"recoveryContext,omitempty"`
+
+	// RecoveredFrom marks this action as recovered from a prior run's result. It is carried on
+	// the spec rather than the status because status is a subresource that Create drops, and a
+	// single Create is what keeps the reconciler from starting the task before it is marked.
+	// +optional
+	RecoveredFrom *RecoveredFrom `json:"recoveredFrom,omitempty"`
+}
+
+// RecoveredFrom is the source action's result, reused verbatim.
+type RecoveredFrom struct {
+	// SourceRunName is the run the result came from.
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=30
+	SourceRunName string `json:"sourceRunName"`
+
+	// OutputUri is where the source action's outputs live. Consumed as-is; never recomputed
+	// from this run's output base.
+	// +optional
+	OutputUri string `json:"outputUri,omitempty"`
+
+	// Output is the proto-serialized core.Literal a recovered condition settled on. Conditions
+	// have no outputs file, so OutputUri is empty for them and this carries the result instead;
+	// tasks and traces leave it unset.
+	// +optional
+	Output []byte `json:"output,omitempty"`
+
+	// Attempts the source action took.
+	// +optional
+	Attempts uint32 `json:"attempts,omitempty"`
+
+	// CacheStatus is the core.CatalogCacheStatus the source action reported.
+	// +optional
+	CacheStatus int32 `json:"cacheStatus,omitempty"`
+}
+
+type RecoveryContext struct {
+	// Relation is the proto-serialized common.Relation naming the run being recovered.
+	// +optional
+	Relation []byte `json:"relation,omitempty"`
+
+	// ForceRerunActions mirrors RunSpec.recover.force_rerun_actions.
+	// +optional
+	ForceRerunActions []string `json:"forceRerunActions,omitempty"`
 }
 
 func (in *TaskActionSpec) GetActionSpec() (*workflow.ActionSpec, error) {

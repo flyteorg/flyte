@@ -229,6 +229,74 @@ func (_m *InternalRunServiceClient) EXPECT() *InternalRunServiceClient_Expecter 
 	return &InternalRunServiceClient_Expecter{mock: &_m.Mock}
 }
 
+// LookupAction provides a mock function for the type InternalRunServiceClient
+func (_mock *InternalRunServiceClient) LookupAction(context1 context.Context, request *connect.Request[workflow.LookupActionRequest]) (*connect.Response[workflow.LookupActionResponse], error) {
+	ret := _mock.Called(context1, request)
+
+	if len(ret) == 0 {
+		panic("no return value specified for LookupAction")
+	}
+
+	var r0 *connect.Response[workflow.LookupActionResponse]
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.LookupActionRequest]) (*connect.Response[workflow.LookupActionResponse], error)); ok {
+		return returnFunc(context1, request)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.LookupActionRequest]) *connect.Response[workflow.LookupActionResponse]); ok {
+		r0 = returnFunc(context1, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connect.Response[workflow.LookupActionResponse])
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[workflow.LookupActionRequest]) error); ok {
+		r1 = returnFunc(context1, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// InternalRunServiceClient_LookupAction_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LookupAction'
+type InternalRunServiceClient_LookupAction_Call struct {
+	*mock.Call
+}
+
+// LookupAction is a helper method to define mock.On call
+//   - context1 context.Context
+//   - request *connect.Request[workflow.LookupActionRequest]
+func (_e *InternalRunServiceClient_Expecter) LookupAction(context1 interface{}, request interface{}) *InternalRunServiceClient_LookupAction_Call {
+	return &InternalRunServiceClient_LookupAction_Call{Call: _e.mock.On("LookupAction", context1, request)}
+}
+
+func (_c *InternalRunServiceClient_LookupAction_Call) Run(run func(context1 context.Context, request *connect.Request[workflow.LookupActionRequest])) *InternalRunServiceClient_LookupAction_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *connect.Request[workflow.LookupActionRequest]
+		if args[1] != nil {
+			arg1 = args[1].(*connect.Request[workflow.LookupActionRequest])
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *InternalRunServiceClient_LookupAction_Call) Return(response *connect.Response[workflow.LookupActionResponse], err error) *InternalRunServiceClient_LookupAction_Call {
+	_c.Call.Return(response, err)
+	return _c
+}
+
+func (_c *InternalRunServiceClient_LookupAction_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[workflow.LookupActionRequest]) (*connect.Response[workflow.LookupActionResponse], error)) *InternalRunServiceClient_LookupAction_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // RecordAction provides a mock function for the type InternalRunServiceClient
 func (_mock *InternalRunServiceClient) RecordAction(context1 context.Context, request *connect.Request[workflow.RecordActionRequest]) (*connect.Response[workflow.RecordActionResponse], error) {
 	ret := _mock.Called(context1, request)
@@ -617,6 +685,74 @@ type InternalRunServiceHandler_Expecter struct {
 
 func (_m *InternalRunServiceHandler) EXPECT() *InternalRunServiceHandler_Expecter {
 	return &InternalRunServiceHandler_Expecter{mock: &_m.Mock}
+}
+
+// LookupAction provides a mock function for the type InternalRunServiceHandler
+func (_mock *InternalRunServiceHandler) LookupAction(context1 context.Context, request *connect.Request[workflow.LookupActionRequest]) (*connect.Response[workflow.LookupActionResponse], error) {
+	ret := _mock.Called(context1, request)
+
+	if len(ret) == 0 {
+		panic("no return value specified for LookupAction")
+	}
+
+	var r0 *connect.Response[workflow.LookupActionResponse]
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.LookupActionRequest]) (*connect.Response[workflow.LookupActionResponse], error)); ok {
+		return returnFunc(context1, request)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[workflow.LookupActionRequest]) *connect.Response[workflow.LookupActionResponse]); ok {
+		r0 = returnFunc(context1, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*connect.Response[workflow.LookupActionResponse])
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[workflow.LookupActionRequest]) error); ok {
+		r1 = returnFunc(context1, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// InternalRunServiceHandler_LookupAction_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LookupAction'
+type InternalRunServiceHandler_LookupAction_Call struct {
+	*mock.Call
+}
+
+// LookupAction is a helper method to define mock.On call
+//   - context1 context.Context
+//   - request *connect.Request[workflow.LookupActionRequest]
+func (_e *InternalRunServiceHandler_Expecter) LookupAction(context1 interface{}, request interface{}) *InternalRunServiceHandler_LookupAction_Call {
+	return &InternalRunServiceHandler_LookupAction_Call{Call: _e.mock.On("LookupAction", context1, request)}
+}
+
+func (_c *InternalRunServiceHandler_LookupAction_Call) Run(run func(context1 context.Context, request *connect.Request[workflow.LookupActionRequest])) *InternalRunServiceHandler_LookupAction_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *connect.Request[workflow.LookupActionRequest]
+		if args[1] != nil {
+			arg1 = args[1].(*connect.Request[workflow.LookupActionRequest])
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *InternalRunServiceHandler_LookupAction_Call) Return(response *connect.Response[workflow.LookupActionResponse], err error) *InternalRunServiceHandler_LookupAction_Call {
+	_c.Call.Return(response, err)
+	return _c
+}
+
+func (_c *InternalRunServiceHandler_LookupAction_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[workflow.LookupActionRequest]) (*connect.Response[workflow.LookupActionResponse], error)) *InternalRunServiceHandler_LookupAction_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // RecordAction provides a mock function for the type InternalRunServiceHandler

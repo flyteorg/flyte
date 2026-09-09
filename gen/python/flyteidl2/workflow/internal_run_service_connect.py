@@ -35,6 +35,9 @@ class InternalRunService(Protocol):
     def record_action_event_stream(self, request: AsyncIterator[flyteidl2_dot_workflow_dot_internal__run__service__pb2.RecordActionEventStreamRequest], ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_workflow_dot_internal__run__service__pb2.RecordActionEventStreamResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def lookup_action(self, request: flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
 
 class InternalRunServiceASGIApplication(ConnectASGIApplication[InternalRunService]):
     def __init__(self, service: InternalRunService | AsyncGenerator[InternalRunService], *, interceptors: Iterable[Interceptor]=(), read_max_bytes: int | None = None, compressions: Iterable[Compression] | None = None) -> None:
@@ -100,6 +103,16 @@ class InternalRunServiceASGIApplication(ConnectASGIApplication[InternalRunServic
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.record_action_event_stream,
+                ),
+                "/flyteidl2.workflow.InternalRunService/LookupAction": Endpoint.unary(
+                    method=MethodInfo(
+                        name="LookupAction",
+                        service_name="flyteidl2.workflow.InternalRunService",
+                        input=flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionRequest,
+                        output=flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.lookup_action,
                 ),
             },
             interceptors=interceptors,
@@ -234,6 +247,26 @@ class InternalRunServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    async def lookup_action(
+        self,
+        request: flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="LookupAction",
+                service_name="flyteidl2.workflow.InternalRunService",
+                input=flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionRequest,
+                output=flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
 
 class InternalRunServiceSync(Protocol):
     def record_action(self, request: flyteidl2_dot_workflow_dot_internal__run__service__pb2.RecordActionRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_internal__run__service__pb2.RecordActionResponse:
@@ -247,6 +280,8 @@ class InternalRunServiceSync(Protocol):
     def record_action_events(self, request: flyteidl2_dot_workflow_dot_internal__run__service__pb2.RecordActionEventsRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_internal__run__service__pb2.RecordActionEventsResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def record_action_event_stream(self, request: Iterator[flyteidl2_dot_workflow_dot_internal__run__service__pb2.RecordActionEventStreamRequest], ctx: RequestContext) -> Iterator[flyteidl2_dot_workflow_dot_internal__run__service__pb2.RecordActionEventStreamResponse]:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def lookup_action(self, request: flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionRequest, ctx: RequestContext) -> flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
@@ -313,6 +348,16 @@ class InternalRunServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.record_action_event_stream,
+                ),
+                "/flyteidl2.workflow.InternalRunService/LookupAction": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="LookupAction",
+                        service_name="flyteidl2.workflow.InternalRunService",
+                        input=flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionRequest,
+                        output=flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.lookup_action,
                 ),
             },
             interceptors=interceptors,
@@ -441,6 +486,26 @@ class InternalRunServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.workflow.InternalRunService",
                 input=flyteidl2_dot_workflow_dot_internal__run__service__pb2.RecordActionEventStreamRequest,
                 output=flyteidl2_dot_workflow_dot_internal__run__service__pb2.RecordActionEventStreamResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def lookup_action(
+        self,
+        request: flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="LookupAction",
+                service_name="flyteidl2.workflow.InternalRunService",
+                input=flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionRequest,
+                output=flyteidl2_dot_workflow_dot_internal__run__service__pb2.LookupActionResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
             ),
             headers=headers,

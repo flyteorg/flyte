@@ -51,6 +51,9 @@ const (
 	// InternalRunServiceRecordActionEventStreamProcedure is the fully-qualified name of the
 	// InternalRunService's RecordActionEventStream RPC.
 	InternalRunServiceRecordActionEventStreamProcedure = "/flyteidl2.workflow.InternalRunService/RecordActionEventStream"
+	// InternalRunServiceLookupActionProcedure is the fully-qualified name of the InternalRunService's
+	// LookupAction RPC.
+	InternalRunServiceLookupActionProcedure = "/flyteidl2.workflow.InternalRunService/LookupAction"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -62,6 +65,7 @@ var (
 	internalRunServiceUpdateActionStatusStreamMethodDescriptor = internalRunServiceServiceDescriptor.Methods().ByName("UpdateActionStatusStream")
 	internalRunServiceRecordActionEventsMethodDescriptor       = internalRunServiceServiceDescriptor.Methods().ByName("RecordActionEvents")
 	internalRunServiceRecordActionEventStreamMethodDescriptor  = internalRunServiceServiceDescriptor.Methods().ByName("RecordActionEventStream")
+	internalRunServiceLookupActionMethodDescriptor             = internalRunServiceServiceDescriptor.Methods().ByName("LookupAction")
 )
 
 // InternalRunServiceClient is a client for the flyteidl2.workflow.InternalRunService service.
@@ -78,6 +82,8 @@ type InternalRunServiceClient interface {
 	RecordActionEvents(context.Context, *connect.Request[workflow.RecordActionEventsRequest]) (*connect.Response[workflow.RecordActionEventsResponse], error)
 	// Record a new action event (streaming implementation).
 	RecordActionEventStream(context.Context) *connect.BidiStreamForClient[workflow.RecordActionEventStreamRequest, workflow.RecordActionEventStreamResponse]
+	// Look up a single action of a prior run, for the enqueue-time recovery decision.
+	LookupAction(context.Context, *connect.Request[workflow.LookupActionRequest]) (*connect.Response[workflow.LookupActionResponse], error)
 }
 
 // NewInternalRunServiceClient constructs a client for the flyteidl2.workflow.InternalRunService
@@ -126,6 +132,12 @@ func NewInternalRunServiceClient(httpClient connect.HTTPClient, baseURL string, 
 			connect.WithSchema(internalRunServiceRecordActionEventStreamMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		lookupAction: connect.NewClient[workflow.LookupActionRequest, workflow.LookupActionResponse](
+			httpClient,
+			baseURL+InternalRunServiceLookupActionProcedure,
+			connect.WithSchema(internalRunServiceLookupActionMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -137,6 +149,7 @@ type internalRunServiceClient struct {
 	updateActionStatusStream *connect.Client[workflow.UpdateActionStatusStreamRequest, workflow.UpdateActionStatusStreamResponse]
 	recordActionEvents       *connect.Client[workflow.RecordActionEventsRequest, workflow.RecordActionEventsResponse]
 	recordActionEventStream  *connect.Client[workflow.RecordActionEventStreamRequest, workflow.RecordActionEventStreamResponse]
+	lookupAction             *connect.Client[workflow.LookupActionRequest, workflow.LookupActionResponse]
 }
 
 // RecordAction calls flyteidl2.workflow.InternalRunService.RecordAction.
@@ -169,6 +182,11 @@ func (c *internalRunServiceClient) RecordActionEventStream(ctx context.Context) 
 	return c.recordActionEventStream.CallBidiStream(ctx)
 }
 
+// LookupAction calls flyteidl2.workflow.InternalRunService.LookupAction.
+func (c *internalRunServiceClient) LookupAction(ctx context.Context, req *connect.Request[workflow.LookupActionRequest]) (*connect.Response[workflow.LookupActionResponse], error) {
+	return c.lookupAction.CallUnary(ctx, req)
+}
+
 // InternalRunServiceHandler is an implementation of the flyteidl2.workflow.InternalRunService
 // service.
 type InternalRunServiceHandler interface {
@@ -184,6 +202,8 @@ type InternalRunServiceHandler interface {
 	RecordActionEvents(context.Context, *connect.Request[workflow.RecordActionEventsRequest]) (*connect.Response[workflow.RecordActionEventsResponse], error)
 	// Record a new action event (streaming implementation).
 	RecordActionEventStream(context.Context, *connect.BidiStream[workflow.RecordActionEventStreamRequest, workflow.RecordActionEventStreamResponse]) error
+	// Look up a single action of a prior run, for the enqueue-time recovery decision.
+	LookupAction(context.Context, *connect.Request[workflow.LookupActionRequest]) (*connect.Response[workflow.LookupActionResponse], error)
 }
 
 // NewInternalRunServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -228,6 +248,12 @@ func NewInternalRunServiceHandler(svc InternalRunServiceHandler, opts ...connect
 		connect.WithSchema(internalRunServiceRecordActionEventStreamMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	internalRunServiceLookupActionHandler := connect.NewUnaryHandler(
+		InternalRunServiceLookupActionProcedure,
+		svc.LookupAction,
+		connect.WithSchema(internalRunServiceLookupActionMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.workflow.InternalRunService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case InternalRunServiceRecordActionProcedure:
@@ -242,6 +268,8 @@ func NewInternalRunServiceHandler(svc InternalRunServiceHandler, opts ...connect
 			internalRunServiceRecordActionEventsHandler.ServeHTTP(w, r)
 		case InternalRunServiceRecordActionEventStreamProcedure:
 			internalRunServiceRecordActionEventStreamHandler.ServeHTTP(w, r)
+		case InternalRunServiceLookupActionProcedure:
+			internalRunServiceLookupActionHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -273,4 +301,8 @@ func (UnimplementedInternalRunServiceHandler) RecordActionEvents(context.Context
 
 func (UnimplementedInternalRunServiceHandler) RecordActionEventStream(context.Context, *connect.BidiStream[workflow.RecordActionEventStreamRequest, workflow.RecordActionEventStreamResponse]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.InternalRunService.RecordActionEventStream is not implemented"))
+}
+
+func (UnimplementedInternalRunServiceHandler) LookupAction(context.Context, *connect.Request[workflow.LookupActionRequest]) (*connect.Response[workflow.LookupActionResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.InternalRunService.LookupAction is not implemented"))
 }

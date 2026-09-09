@@ -1,11 +1,14 @@
 # Common Go Makefile for Flyte services
 # Include this file in service-specific Makefiles and set the required variables:
 #   SERVICE_NAME - Name of the service (e.g., "manager", "runs", "queue")
-#   CMD_PATH     - Path to main.go relative to service directory (default: cmd/main.go)
+#   CMD_PATH     - Package to build, relative to the service directory (default: ./cmd).
+#                  Keep this a package, not a single file: `go build cmd/main.go` compiles
+#                  that file alone, so a sibling file in the same package silently drops out
+#                  and the build fails on its symbols as undefined.
 #   BIN_DIR      - Directory for binaries (default: bin)
 
 # Set defaults
-CMD_PATH ?= cmd/main.go
+CMD_PATH ?= ./cmd
 BIN_DIR ?= bin
 BIN_NAME ?= $(SERVICE_NAME)
 GOLANGCI_LINT_VERSION ?= v2.12.2
