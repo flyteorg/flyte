@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
-	"google.golang.org/genproto/googleapis/rpc/code"
+	rpccode "google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -783,15 +783,16 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Task: ta,
 			}
 		}
-		// RecordAction reports rejections in the response body, not as a transport
-		// error, so the body status has to be checked before memoizing the key —
-		// otherwise a rejected action is never recorded and never retried.
+		// RecordAction reports rejections in the response body rather than as a
+		// transport error, so the body status has to be checked before memoizing
+		// the key. Otherwise a rejected action is memoized as recorded and is
+		// never retried.
 		resp, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq))
 		if err != nil {
 			logger.Warnf(ctx, "Failed to record action in run service for %s: %v", update.ActionID.Name, err)
 		} else if resp == nil || resp.Msg == nil || resp.Msg.GetStatus() == nil {
 			logger.Warnf(ctx, "Run service returned no RecordAction status for %s", update.ActionID.Name)
-		} else if status := resp.Msg.GetStatus(); status.GetCode() != int32(code.Code_OK) {
+		} else if status := resp.Msg.GetStatus(); status.GetCode() != int32(rpccode.Code_OK) {
 			logger.Warnf(ctx, "Run service rejected RecordAction for %s with code %d: %s",
 				update.ActionID.Name, status.GetCode(), status.GetMessage())
 		} else {

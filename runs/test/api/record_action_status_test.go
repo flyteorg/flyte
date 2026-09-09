@@ -54,6 +54,8 @@ func TestRecordActionReturnsRepositoryFailureInBody(t *testing.T) {
 }
 
 func renameActionsTable(ctx context.Context, from string, to string) error {
+	// Table identifiers cannot be bind parameters, so the names are concatenated.
+	// Both callers pass string literals, so nothing here comes from user input.
 	_, err := testDB.ExecContext(ctx, "ALTER TABLE "+from+" RENAME TO "+to)
 	return err
 }
