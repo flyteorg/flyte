@@ -166,7 +166,7 @@ func TestNotifyRunService_MissingResponseAllowsRetry(t *testing.T) {
 	}
 }
 
-func TestNotifyRunService_RejectedRecordAllowsRetry(t *testing.T) {
+func TestNotifyRunService_InternalFailureAllowsRetry(t *testing.T) {
 	ctx := context.Background()
 
 	mockClient := runmocks.NewInternalRunServiceClient(t)
@@ -180,26 +180,26 @@ func TestNotifyRunService_RejectedRecordAllowsRetry(t *testing.T) {
 		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 
-	ta, update := newTestActionUpdate("action-rejected")
+	ta, update := newTestActionUpdate("action-internal-failure")
 
-	// The run service reports rejections in the response body with a nil
+	// The run service reports repository failures in the response body with a nil
 	// transport error, so the first two calls look like successes to connect.
-	rejected := connect.NewResponse(&workflow.RecordActionResponse{
+	failed := connect.NewResponse(&workflow.RecordActionResponse{
 		ActionId: update.ActionID,
 		Status: &status.Status{
-			Code:    int32(code.Code_INVALID_ARGUMENT),
-			Message: "unsupported action spec type: <nil>",
+			Code:    int32(code.Code_INTERNAL),
+			Message: "failed to create action: transient database error",
 		},
 	})
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(rejected, nil).Twice()
+		Return(failed, nil).Twice()
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
 		Return(connect.NewResponse(&workflow.RecordActionResponse{
 			ActionId: update.ActionID,
 			Status:   &status.Status{Code: int32(code.Code_OK)},
 		}), nil).Once()
 
-	// First event — rejected, so the action must stay retryable.
+	// First event fails, so the action must stay retryable.
 	c.notifyRunService(ctx, ta, update, watch.Added)
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
 
