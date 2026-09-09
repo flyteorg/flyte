@@ -6906,6 +6906,13 @@ spec:
           status:
             description: status defines the observed state of TaskAction
             properties:
+              attemptStartedAt:
+                description: |-
+                  AttemptStartedAt is when the current user attempt first entered the Running phase.
+                  It is persisted independently from ActionEvent publication so max-runtime
+                  enforcement survives controller and event-service outages.
+                format: date-time
+                type: string
               attempts:
                 description: Attempts is the latest observed action attempt number,
                   starting from 1.
@@ -7075,6 +7082,13 @@ spec:
                   maximum, the TaskAction is converted to a permanent failure.
                 format: int32
                 type: integer
+              timeoutAt:
+                description: |-
+                  TimeoutAt is the max-runtime deadline for an expired current attempt.
+                  While set on a non-terminal action, timeout cleanup is pending and the
+                  plugin resource must not be handled or recreated.
+                format: date-time
+                type: string
             type: object
         required:
         - spec
@@ -8736,7 +8750,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 73498ed48a4a737de04a3c1297e3c0e172b0919cdf6d6bfc7dc43bd102f4d1e8
+        checksum/configuration: 21a742d07793d02ffa71b00e29bf0ac75148c13c48a68838f9ffb85af7f6bc82
         checksum/configuration-secret: ff95a9986cc42dff0a114449c9b8e9a95c781b7bdd9832b31ca461423ae0b678
       labels:
         app.kubernetes.io/component: flyte-binary

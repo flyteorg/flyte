@@ -690,9 +690,10 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 	action.Attempts = attempts
 
 	switch action.GetStatus().GetPhase() {
-	case common.ActionPhase_ACTION_PHASE_FAILED:
+	case common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_TIMED_OUT:
 		// Get action error from last attempt. Events are eventually consistent, so we may not have
-		// information from the latest attempt yet.
+		// information from the latest attempt yet. A timed-out action carries its
+		// error the same way a failed one does, so it resolves through this path too.
 		numAttempts := len(action.GetAttempts())
 		if numAttempts > 0 && action.GetAttempts()[numAttempts-1].GetAttempt() == action.GetStatus().GetAttempts() {
 			action.Result = &workflow.ActionDetails_ErrorInfo{
@@ -865,20 +866,28 @@ func IsTerminalPhase(phase common.ActionPhase) bool {
 		phase == common.ActionPhase_ACTION_PHASE_RECOVERED
 }
 
-// lastAttemptIsTerminal returns true when the highest-numbered attempt has reached a
-// terminal phase. Used by WatchActionDetails to close the stream only after action_events
-// reflects the terminal transition, not just the actions table.
-func lastAttemptIsTerminal(attempts []*workflow.ActionAttempt) bool {
+func IsFailedPhase(phase common.ActionPhase) bool {
+	return phase == common.ActionPhase_ACTION_PHASE_FAILED ||
+		phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT
+}
+
+func actionStreamComplete(details *workflow.ActionDetails) bool {
+	attempts := details.GetAttempts()
 	if len(attempts) == 0 {
 		return false
 	}
-	var last *workflow.ActionAttempt
+
+	// Get the last attempt
+	last := attempts[0]
 	for _, a := range attempts {
-		if last == nil || a.GetAttempt() > last.GetAttempt() {
+		if a.GetAttempt() > last.GetAttempt() {
 			last = a
 		}
 	}
-	return IsTerminalPhase(last.GetPhase())
+	status := details.GetStatus()
+	return IsTerminalPhase(status.GetPhase()) && // Make sure the action's retries are all completed
+		IsTerminalPhase(last.GetPhase()) && // Make sure the last attempt is in terminal phase
+		last.GetAttempt() == status.GetAttempts()
 }
 
 // GetActionData is deprecated and no longer implemented. Clients should use
@@ -1240,8 +1249,9 @@ func (s *RunService) WatchActionDetails(
 		return err
 	}
 
-	// Close only once action_events reflects the terminal phase, not just actions table.
-	if lastAttemptIsTerminal(details.GetAttempts()) {
+	// Close only once the action is terminal AND action_events reflects it — a
+	// terminal event for a retrying attempt must not end the stream.
+	if actionStreamComplete(details) {
 		return nil
 	}
 
@@ -1269,8 +1279,8 @@ func (s *RunService) WatchActionDetails(
 			}); err != nil {
 				return err
 			}
-			// Close once action_events reflects the terminal phase.
-			if lastAttemptIsTerminal(details.GetAttempts()) {
+			// Close once the action is terminal and action_events reflects it.
+			if actionStreamComplete(details) {
 				return nil
 			}
 		}
@@ -2068,7 +2078,8 @@ func (s *RunService) buildTaskGroups(ctx context.Context, req *workflow.WatchGro
 
 		phase := common.ActionPhase(action.Phase)
 		g.phaseCounts[phase]++
-		if phase == common.ActionPhase_ACTION_PHASE_FAILED {
+
+		if IsFailedPhase(phase) {
 			g.failCount++
 		}
 

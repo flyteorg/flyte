@@ -88,7 +88,9 @@ const (
 	// ConditionReasonSignaled indicates a condition action received its signal (Succeeded=True)
 	ConditionReasonSignaled TaskActionConditionReason = "Signaled"
 
-	// ConditionReasonTimedOut indicates a condition action passed its deadline unsignalled (Failed=True)
+	// ConditionReasonTimedOut indicates the action reached its deadline (Failed=True).
+	// This applies to both condition actions that were not signalled in time and to
+	// task actions whose per-attempt max-runtime was exhausted.
 	ConditionReasonTimedOut TaskActionConditionReason = "TimedOut"
 )
 
@@ -293,6 +295,18 @@ type TaskActionStatus struct {
 	// Attempts is the latest observed action attempt number, starting from 1.
 	// +optional
 	Attempts uint32 `json:"attempts,omitempty"`
+
+	// AttemptStartedAt is when the current user attempt first entered the Running phase.
+	// It is persisted independently from ActionEvent publication so max-runtime
+	// enforcement survives controller and event-service outages.
+	// +optional
+	AttemptStartedAt *metav1.Time `json:"attemptStartedAt,omitempty"`
+
+	// TimeoutAt is the max-runtime deadline for an expired current attempt.
+	// While set on a non-terminal action, timeout cleanup is pending and the
+	// plugin resource must not be handled or recreated.
+	// +optional
+	TimeoutAt *metav1.Time `json:"timeoutAt,omitempty"`
 
 	// SystemFailures counts system-level failures observed during reconciliation —
 	// either Go errors returned from Plugin.Handle (e.g. transient k8s API errors,

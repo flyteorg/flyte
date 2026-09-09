@@ -164,6 +164,13 @@ spec:
           status:
             description: status defines the observed state of TaskAction
             properties:
+              attemptStartedAt:
+                description: |-
+                  AttemptStartedAt is when the current user attempt first entered the Running phase.
+                  It is persisted independently from ActionEvent publication so max-runtime
+                  enforcement survives controller and event-service outages.
+                format: date-time
+                type: string
               attempts:
                 description: Attempts is the latest observed action attempt number,
                   starting from 1.
@@ -333,6 +340,13 @@ spec:
                   maximum, the TaskAction is converted to a permanent failure.
                 format: int32
                 type: integer
+              timeoutAt:
+                description: |-
+                  TimeoutAt is the max-runtime deadline for an expired current attempt.
+                  While set on a non-terminal action, timeout cleanup is pending and the
+                  plugin resource must not be handled or recreated.
+                format: date-time
+                type: string
             type: object
         required:
         - spec

@@ -182,6 +182,36 @@ func (r *TaskActionReconciler) releaseCacheReservation(ctx context.Context, cach
 	return r.Catalog.ReleaseReservation(ctx, cacheCfg.key, cacheCfg.ownerID)
 }
 
+func (r *TaskActionReconciler) maintainCacheReservation(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	tCtx pluginsCore.TaskExecutionContext,
+) error {
+	cacheCfg, ok, err := buildTaskCacheConfig(ctx, taskAction, tCtx)
+	if err != nil || !ok || r.Catalog == nil || !cacheCfg.serializable {
+		return err
+	}
+	_, err = r.Catalog.GetOrExtendReservation(
+		ctx,
+		cacheCfg.key,
+		cacheCfg.ownerID,
+		r.cacheReservationHeartbeat(),
+	)
+	return err
+}
+
+func (r *TaskActionReconciler) releaseTaskCacheReservation(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	tCtx pluginsCore.TaskExecutionContext,
+) error {
+	cacheCfg, ok, err := buildTaskCacheConfig(ctx, taskAction, tCtx)
+	if err != nil || !ok {
+		return err
+	}
+	return r.releaseCacheReservation(ctx, cacheCfg)
+}
+
 func cacheMetadataForUpload(tCtx pluginsCore.TaskExecutionContext, taskID *corepb.Identifier) catalog.Metadata {
 	taskExecID := proto.Clone(tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()).(*corepb.TaskExecutionIdentifier)
 	taskExecID.TaskId = proto.Clone(taskID).(*corepb.Identifier)
