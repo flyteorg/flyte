@@ -125,6 +125,10 @@ message ListArtifactNamesResponse {
 message ListArtifactMetadataKeysRequest {
   // Project scope for the listing. organization is stamped by the server.
   common.ProjectIdentifier project_id = 1 [(buf.validate.field).required = true];
+
+  // Optional exact artifact name; when set, only keys present on that
+  // artifact's versions are returned.
+  optional string name = 2 [(buf.validate.field).string.max_len = 255];
 }
 
 // response message for listing distinct user_metadata keys.

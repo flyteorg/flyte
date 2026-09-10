@@ -1374,6 +1374,10 @@ func (m *ListArtifactMetadataKeysRequest) validate(all bool) error {
 		}
 	}
 
+	if m.Name != nil {
+		// no validation rules for Name
+	}
+
 	if len(errors) > 0 {
 		return ListArtifactMetadataKeysRequestMultiError(errors)
 	}
