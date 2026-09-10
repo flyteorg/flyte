@@ -33,6 +33,7 @@ import (
 
 var active = int32(admin.LaunchPlanState_ACTIVE)
 var inactive = int32(admin.LaunchPlanState_INACTIVE)
+var archived = int32(admin.LaunchPlanState_ARCHIVED)
 var mockScheduler = &mocks.EventScheduler{}
 var launchPlanIdentifier = &core.Identifier{
 	ResourceType: core.ResourceType_LAUNCH_PLAN,
@@ -979,6 +980,138 @@ func TestDisableLaunchPlan_DatabaseError(t *testing.T) {
 	})
 	assert.EqualError(t, err, expectedError.Error(),
 		"Errors on setting the desired launch plan to inactive should propagate")
+}
+
+func TestArchiveLaunchPlan(t *testing.T) {
+	repository := getMockRepositoryForLpTest()
+
+	lpGetFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
+		assert.Equal(t, project, input.Project)
+		assert.Equal(t, domain, input.Domain)
+		assert.Equal(t, name, input.Name)
+		assert.Equal(t, version, input.Version)
+		specWithSchedule := admin.LaunchPlanSpec{
+			EntityMetadata: &admin.LaunchPlanMetadata{
+				Schedule: &admin.Schedule{
+					ScheduleExpression: &admin.Schedule_CronExpression{
+						CronExpression: "foo",
+					},
+				},
+			},
+		}
+		specWithScheduleBytes, _ := proto.Marshal(&specWithSchedule)
+		return models.LaunchPlan{
+			LaunchPlanKey: models.LaunchPlanKey{
+				Project: input.Project,
+				Domain:  input.Domain,
+				Name:    input.Name,
+				Version: input.Version,
+			},
+			State: &active,
+			Spec:  specWithScheduleBytes,
+		}, nil
+	}
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(lpGetFunc)
+	archiveFunc := func(toArchive models.LaunchPlan) error {
+		assert.Equal(t, project, toArchive.Project)
+		assert.Equal(t, domain, toArchive.Domain)
+		assert.Equal(t, name, toArchive.Name)
+		assert.Equal(t, version, toArchive.Version)
+		assert.Equal(t, archived, *toArchive.State)
+		return nil
+	}
+
+	var removeScheduleFuncCalled bool
+	mockScheduler := &mocks.EventScheduler{}
+	mockScheduler.EXPECT().RemoveSchedule(mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
+			assert.True(t, proto.Equal(launchPlanNamedIdentifier, input.Identifier))
+			removeScheduleFuncCalled = true
+			return nil
+		})
+
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetUpdateCallback(archiveFunc)
+
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
+	_, err := lpManager.UpdateLaunchPlan(context.Background(), &admin.LaunchPlanUpdateRequest{
+		Id:    launchPlanIdentifier,
+		State: admin.LaunchPlanState_ARCHIVED,
+	})
+	assert.NoError(t, err)
+	assert.True(t, removeScheduleFuncCalled)
+}
+
+func TestArchiveLaunchPlan_NoSchedule(t *testing.T) {
+	repository := getMockRepositoryForLpTest()
+
+	lpGetFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
+		specNoSchedule := admin.LaunchPlanSpec{}
+		specBytes, _ := proto.Marshal(&specNoSchedule)
+		return models.LaunchPlan{
+			LaunchPlanKey: models.LaunchPlanKey{
+				Project: input.Project,
+				Domain:  input.Domain,
+				Name:    input.Name,
+				Version: input.Version,
+			},
+			State: &active,
+			Spec:  specBytes,
+		}, nil
+	}
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(lpGetFunc)
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetUpdateCallback(func(toArchive models.LaunchPlan) error {
+		assert.Equal(t, archived, *toArchive.State)
+		return nil
+	})
+
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
+	_, err := lpManager.UpdateLaunchPlan(context.Background(), &admin.LaunchPlanUpdateRequest{
+		Id:    launchPlanIdentifier,
+		State: admin.LaunchPlanState_ARCHIVED,
+	})
+	assert.NoError(t, err)
+}
+
+func TestArchiveLaunchPlan_DatabaseError(t *testing.T) {
+	repository := getMockRepositoryForLpTest()
+	expectedError := errors.New("expected error")
+
+	lpGetFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
+		return models.LaunchPlan{}, expectedError
+	}
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(lpGetFunc)
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
+	_, err := lpManager.UpdateLaunchPlan(context.Background(), &admin.LaunchPlanUpdateRequest{
+		Id:    launchPlanIdentifier,
+		State: admin.LaunchPlanState_ARCHIVED,
+	})
+	assert.EqualError(t, err, expectedError.Error(),
+		"Failures on getting the existing launch plan should propagate")
+
+	lpGetFunc = func(input interfaces.Identifier) (models.LaunchPlan, error) {
+		return models.LaunchPlan{
+			LaunchPlanKey: models.LaunchPlanKey{
+				Project: input.Project,
+				Domain:  input.Domain,
+				Name:    input.Name,
+				Version: input.Version,
+			},
+			State: &active,
+		}, nil
+	}
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(lpGetFunc)
+	archiveFunc := func(toArchive models.LaunchPlan) error {
+		assert.Equal(t, archived, *toArchive.State)
+		return expectedError
+	}
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetUpdateCallback(archiveFunc)
+	lpManager = NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
+	_, err = lpManager.UpdateLaunchPlan(context.Background(), &admin.LaunchPlanUpdateRequest{
+		Id:    launchPlanIdentifier,
+		State: admin.LaunchPlanState_ARCHIVED,
+	})
+	assert.EqualError(t, err, expectedError.Error(),
+		"Errors on setting the desired launch plan to archived should propagate")
 }
 
 func TestEnableLaunchPlan(t *testing.T) {

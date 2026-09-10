@@ -47,7 +47,7 @@ func TestLaunchPlanCanBeArchived(t *testing.T) {
 				t, "UpdateLaunchPlan", s.Ctx,
 				mock.MatchedBy(
 					func(r *admin.LaunchPlanUpdateRequest) bool {
-						return r.GetState() == admin.LaunchPlanState_INACTIVE
+						return r.GetState() == admin.LaunchPlanState_ARCHIVED
 					}))
 		})
 }
