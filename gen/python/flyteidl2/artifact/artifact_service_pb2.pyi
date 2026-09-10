@@ -80,10 +80,12 @@ class ListArtifactNamesResponse(_message.Message):
     def __init__(self, groups: _Optional[_Iterable[_Union[ArtifactGroup, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
 
 class ListArtifactMetadataKeysRequest(_message.Message):
-    __slots__ = ["project_id"]
+    __slots__ = ["project_id", "name"]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
     project_id: _identifier_pb2.ProjectIdentifier
-    def __init__(self, project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ...) -> None: ...
+    name: str
+    def __init__(self, project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., name: _Optional[str] = ...) -> None: ...
 
 class ListArtifactMetadataKeysResponse(_message.Message):
     __slots__ = ["keys"]
