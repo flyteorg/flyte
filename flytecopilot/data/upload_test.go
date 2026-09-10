@@ -162,7 +162,7 @@ func TestUploader_RecursiveUpload_ContainerErrorDocument(t *testing.T) {
 
 	err = u.RecursiveUpload(context.TODO(), &core.VariableMap{}, tmpDir, "output", "raw")
 
-	var containerErr ContainerError
+	var containerErr RawContainerError
 	if assert.ErrorAs(t, err, &containerErr) {
 		assert.True(t, proto.Equal(document, containerErr.Document))
 	}
@@ -195,7 +195,7 @@ func TestUploader_RecursiveUpload_ContainerErrorDocumentFromAnotherEncoder(t *te
 
 	err = u.RecursiveUpload(context.TODO(), &core.VariableMap{}, tmpDir, "output", "raw")
 
-	var containerErr ContainerError
+	var containerErr RawContainerError
 	if assert.ErrorAs(t, err, &containerErr) {
 		assert.Equal(t, "BenchmarkFailed", containerErr.Document.GetError().GetCode())
 		assert.Equal(t, "the model rejected the prompt", containerErr.Document.GetError().GetMessage())
@@ -220,7 +220,7 @@ func TestUploader_RecursiveUpload_ContainerErrorMessage(t *testing.T) {
 
 	err = u.RecursiveUpload(context.TODO(), &core.VariableMap{}, tmpDir, "output", "raw")
 
-	var containerErr ContainerError
+	var containerErr RawContainerError
 	assert.NotErrorAs(t, err, &containerErr)
 	assert.EqualError(t, err, "User Error: failed")
 }

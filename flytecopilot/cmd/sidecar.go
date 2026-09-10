@@ -116,12 +116,11 @@ func (u *UploadOptions) Sidecar(ctx context.Context) error {
 
 	if err := u.uploader(ctx); err != nil {
 		logger.Errorf(ctx, "Uploading failed, err %s", err)
-		// A container that declared its own failure has already said whether it
-		// can be retried and whose fault it is; only the upload's own failures
-		// are ours to classify, and those are worth another attempt.
-		var containerErr data.ContainerError
-		if errors.As(err, &containerErr) {
-			if err := u.UploadErrorDocument(ctx, containerErr.Document, storage.DataReference(u.remoteOutputsPrefix)); err != nil {
+		var rawContainerErr data.RawContainerError
+		if errors.As(err, &rawContainerErr) {
+			// When it is a flyte error with error code and message, we should upload the the error directly
+			// The executor will decide whether this is a retryable error
+			if err := u.UploadErrorDocument(ctx, rawContainerErr.Document, storage.DataReference(u.remoteOutputsPrefix)); err != nil {
 				logger.Errorf(ctx, "Failed to write error document, err :%s", err)
 				return err
 			}

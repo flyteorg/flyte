@@ -32,27 +32,18 @@ type Uploader struct {
 	errorFileName           string
 }
 
-// ContainerError is the failure a container declared by writing a
-// core.ErrorDocument to its error file, as opposed to a failure of the upload
-// itself. The document travels to the blob store untouched, so the kind and
-// origin the container chose are the ones flyte acts on.
-type ContainerError struct {
+// RawContainerError is the failure raised by the raw container
+type RawContainerError struct {
 	Document *core.ErrorDocument
 }
 
-func (e ContainerError) Error() string {
+func (e RawContainerError) Error() string {
 	return e.Document.GetError().GetMessage()
 }
 
-// errorDocument reads an error file as a core.ErrorDocument, reporting whether
-// it is one. A document is recognised by its structure and not by re-encoding
-// to the same bytes: the wire format is not canonical, so field order, varint
-// width and a field a newer idl added all differ legitimately between
-// encoders, and rejecting those would discard the kind and origin the
-// container chose. proto.Unmarshal does accept some plain text by chance, but
-// such a parse leaves the error's own fields empty, and a document with
-// neither a code nor a message says nothing the plain-text path cannot.
-func errorDocument(raw []byte) (*core.ErrorDocument, bool) {
+// readErrorDocument unmarshall the error file into flyte error document
+// The unmarshall will fail if it is not a flyte error
+func readErrorDocument(raw []byte) (*core.ErrorDocument, bool) {
 	document := &core.ErrorDocument{}
 	if err := proto.Unmarshal(raw, document); err != nil {
 		return nil, false
@@ -154,6 +145,7 @@ func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, f
 	defer cancel()
 
 	errFile := path.Join(fromPath, u.errorFileName)
+	// TODO(alex): The error like info.Size() > 1024*1024 should be non-retriable too
 	if info, err := os.Stat(errFile); err != nil {
 		if !os.IsNotExist(err) {
 			return err
@@ -167,8 +159,8 @@ func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, f
 		if err != nil {
 			return err
 		}
-		if document, ok := errorDocument(b); ok {
-			return ContainerError{Document: document}
+		if document, ok := readErrorDocument(b); ok {
+			return RawContainerError{Document: document}
 		}
 		return errors.Errorf("User Error: %s", string(b))
 	}
