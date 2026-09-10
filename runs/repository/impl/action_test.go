@@ -879,6 +879,48 @@ func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
 	}
 }
 
+func TestBuildNotifyBatchQuery(t *testing.T) {
+	query, args := buildNotifyBatchQuery("action_updates", []string{
+		"proj/domain/run/action",
+		"proj/domain/run'; DROP TABLE actions; --/action",
+		"proj/domain/run/next-action",
+	})
+
+	assert.Equal(t, "SELECT pg_notify($1, $2), pg_notify($1, $3), pg_notify($1, $4)", query)
+	assert.Equal(t, []any{
+		"action_updates",
+		"proj/domain/run/action",
+		"proj/domain/run'; DROP TABLE actions; --/action",
+		"proj/domain/run/next-action",
+	}, args)
+}
+
+func TestDrainNotifyBatchDrainsBufferedPayloads(t *testing.T) {
+	ch := make(chan string, 3)
+	ch <- "second"
+	ch <- "third"
+	ch <- "fourth"
+
+	payloads := drainNotifyBatch("first", ch)
+
+	assert.Equal(t, []string{"first", "second", "third", "fourth"}, payloads)
+	assert.Empty(t, ch)
+}
+
+func TestDrainNotifyBatchRespectsBatchCap(t *testing.T) {
+	ch := make(chan string, notifyBatchMaxPayloads+5)
+	for i := 1; i < notifyBatchMaxPayloads+6; i++ {
+		ch <- fmt.Sprintf("payload-%d", i)
+	}
+
+	payloads := drainNotifyBatch("payload-0", ch)
+
+	assert.Len(t, payloads, notifyBatchMaxPayloads)
+	assert.Equal(t, "payload-0", payloads[0])
+	assert.Equal(t, fmt.Sprintf("payload-%d", notifyBatchMaxPayloads-1), payloads[len(payloads)-1])
+	assert.Len(t, ch, 6)
+}
+
 func TestIsConnError(t *testing.T) {
 	tests := []struct {
 		name   string
