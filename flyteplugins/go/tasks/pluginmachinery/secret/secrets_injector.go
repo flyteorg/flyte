@@ -106,7 +106,7 @@ func newSecretsInjector(
 			return nil, fmt.Errorf("failed to create cache factory: %w", err)
 		}
 
-		secretCache, err := stdlibCache.New[SecretValue]("secret_cache", cacheConfig.Type, cacheFactory, nil, scope.NewSubScope("secret_value"))
+		secretCache, err := cacheFactory.New[SecretValue]("secret_cache", cacheConfig.Type, nil, scope.NewSubScope("secret_value"))
 		if err != nil {
 			logger.Errorf(ctx, "Failed to create secret cache: %v", err)
 			return nil, fmt.Errorf("failed to create secret cache: %w", err)

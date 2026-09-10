@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -769,8 +770,7 @@ func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.Actio
 	reportURI := ""
 	lastEvent := events[len(events)-1]
 	var logContext *core.LogContext
-	for i := len(events) - 1; i >= 0; i-- {
-		event := events[i]
+	for _, event := range slices.Backward(events) {
 		if event.GetLogContext() != nil && logContext == nil {
 			logContext = event.GetLogContext()
 			streamingLogsAvailable = true
@@ -784,9 +784,9 @@ func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.Actio
 		if reportURI == "" && event.GetOutputs().GetReportUri() != "" {
 			reportURI = event.GetOutputs().GetReportUri()
 		}
-		phase := events[i].GetPhase()
+		phase := event.GetPhase()
 		if IsTerminalPhase(phase) {
-			lastEvent = events[i]
+			lastEvent = event
 		}
 	}
 
