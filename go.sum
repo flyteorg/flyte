@@ -128,8 +128,8 @@ github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/eko/gocache/lib/v4 v4.2.4 h1:BRKeSVesCA+ujcdS72GhAwMmJcYnp46DRu7w9ZL8Gp8=
 github.com/eko/gocache/lib/v4 v4.2.4/go.mod h1:Zus8mwmaPu1VYOzfomb+Dvx2wV7fT5jDRbHYtQM6MEY=
-github.com/eko/gocache/store/freecache/v4 v4.2.4 h1:QaRYnoh4eEEL/NYDJl7HqRHhp9rlwR0LSRgek8+PYrY=
-github.com/eko/gocache/store/freecache/v4 v4.2.4/go.mod h1:bSQzTOqmidOM7NARAKU67cRfZyEnME8FHU77ICl9b8E=
+github.com/eko/gocache/store/freecache/v4 v4.2.7 h1:i1OkSbfzhm0y/K8yEgcpQe5dCqkTXaKFE1MXVt/6PT4=
+github.com/eko/gocache/store/freecache/v4 v4.2.7/go.mod h1:tzja9HMWCFbKUxtYs6zHfDSxtVM6r1HEn0955HMz5/g=
 github.com/eko/gocache/store/redis/v4 v4.2.6 h1:btD3TIFAgujZAsvTEBTaDfNTSAf+GO32il0HQ5MIqCI=
 github.com/eko/gocache/store/redis/v4 v4.2.6/go.mod h1:0PMef3sy4AonKqrxdnUsIKDAMtqNyJI4e6asTo00XrE=
 github.com/emicklei/go-restful/v3 v3.13.0 h1:C4Bl2xDndpU6nJ4bc1jXd+uTmYPVUwkD6bFY/oTyCes=

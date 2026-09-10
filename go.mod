@@ -18,7 +18,7 @@ require (
 	github.com/coocood/freecache v1.2.7
 	github.com/dask/dask-kubernetes/v2023 v2023.0.0-20230626103304-abd02cd17b26
 	github.com/eko/gocache/lib/v4 v4.2.4
-	github.com/eko/gocache/store/freecache/v4 v4.2.4
+	github.com/eko/gocache/store/freecache/v4 v4.2.7
 	github.com/eko/gocache/store/redis/v4 v4.2.6
 	github.com/fatih/color v1.19.0
 	github.com/fergusstrange/embedded-postgres v1.34.0
