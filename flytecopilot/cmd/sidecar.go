@@ -33,12 +33,13 @@ type UploadOptions struct {
 	// Local directory path where the sidecar should look for outputs.
 	localDirectoryPath string
 	// Non primitive types will be dumped in this output format
-	metadataFormat   string
-	uploadMode       string
-	timeout          time.Duration
-	typedInterface   []byte
-	startWatcherType containerwatcher.WatcherType
-	exitWatcherType  containerwatcher.WatcherType
+	metadataFormat    string
+	uploadMode        string
+	concurrencyPerCPU int
+	timeout           time.Duration
+	typedInterface    []byte
+	startWatcherType  containerwatcher.WatcherType
+	exitWatcherType   containerwatcher.WatcherType
 }
 
 func (u *UploadOptions) createWatcher(_ context.Context, w containerwatcher.WatcherType) (containerwatcher.Watcher, error) {
@@ -99,7 +100,7 @@ func (u *UploadOptions) uploader(ctx context.Context) error {
 		return err
 	}
 
-	dl := data.NewUploader(ctx, u.Store, core.DataLoadingConfig_LiteralMapFormat(f), core.IOStrategy_UploadMode(m), ErrorFile)
+	dl := data.NewUploader(ctx, u.Store, core.DataLoadingConfig_LiteralMapFormat(f), core.IOStrategy_UploadMode(m), ErrorFile, u.concurrencyPerCPU)
 
 	childCtx, cancelFn := context.WithTimeout(ctx, u.timeout)
 	defer cancelFn()
@@ -145,6 +146,7 @@ func NewUploadCommand(opts *RootOptions) *cobra.Command {
 	uploadCmd.Flags().StringVarP(&uploadOptions.localDirectoryPath, "from-local-dir", "f", "", "The local directory on disk where data will be available for upload.")
 	uploadCmd.Flags().StringVarP(&uploadOptions.metadataFormat, "format", "m", core.DataLoadingConfig_JSON.String(), fmt.Sprintf("What should be the output format for the primitive and structured types. Options [%v]", GetFormatVals()))
 	uploadCmd.Flags().StringVarP(&uploadOptions.uploadMode, "upload-mode", "u", core.IOStrategy_UPLOAD_ON_EXIT.String(), fmt.Sprintf("When should upload start/upload mode. Options [%v]", GetUploadModeVals()))
+	uploadCmd.Flags().IntVar(&uploadOptions.concurrencyPerCPU, "concurrency-per-cpu", data.DefaultConcurrencyPerCPU, "Concurrency multiplier used to cap concurrent upload workers. Effective concurrency is CPU*concurrency-per-cpu.")
 	uploadCmd.Flags().StringVarP(&uploadOptions.metaOutputName, "meta-output-name", "", "outputs.pb", "The key name under the remoteOutputPrefix that should be return to provide meta information about the outputs on successful execution")
 	uploadCmd.Flags().DurationVarP(&uploadOptions.timeout, "timeout", "t", time.Hour*1, "Max time to allow for uploads to complete, default is 1H")
 	uploadCmd.Flags().BytesBase64VarP(&uploadOptions.typedInterface, "interface", "i", nil, "Typed Interface - core.TypedInterface, base64 encoded string of the serialized protobuf")

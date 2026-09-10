@@ -30,6 +30,7 @@ type Uploader struct {
 	store                   *storage.DataStore
 	aggregateOutputFileName string
 	errorFileName           string
+	concurrencyPerCPU       int
 }
 
 type dirFile struct {
@@ -99,18 +100,24 @@ func (u Uploader) handleBlobTypeMultipart(ctx context.Context, localPath string,
 
 	childCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
+	concurrency := getConcurrency(u.concurrencyPerCPU)
+	sem := make(chan struct{}, concurrency)
 	fileUploader := make([]futures.Future, 0, len(files))
 	for _, f := range files {
 		pth := f.path
 		ref := f.ref
 		size := f.info.Size()
+		if err := acquireSemaphore(childCtx, sem); err != nil {
+			cancel()
+			return nil, errors.Wrapf(err, "context canceled while scheduling upload from [%s]", localPath)
+		}
 		fileUploader = append(fileUploader, futures.NewAsyncFuture(childCtx, func(i2 context.Context) (i interface{}, e error) {
+			defer func() { <-sem }()
 			return nil, UploadFileToStorage(i2, pth, ref, size, u.store)
 		}))
 	}
 
 	for _, f := range fileUploader {
-		// TODO maybe we should have timeouts, or we can have a global timeout at the top level
 		_, err := f.Get(ctx)
 		if err != nil {
 			return nil, err
@@ -198,11 +205,12 @@ func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, f
 	return nil
 }
 
-func NewUploader(_ context.Context, store *storage.DataStore, format core.DataLoadingConfig_LiteralMapFormat, mode core.IOStrategy_UploadMode, errorFileName string) Uploader {
+func NewUploader(_ context.Context, store *storage.DataStore, format core.DataLoadingConfig_LiteralMapFormat, mode core.IOStrategy_UploadMode, errorFileName string, concurrencyPerCPU int) Uploader {
 	return Uploader{
-		format:        format,
-		store:         store,
-		errorFileName: errorFileName,
-		mode:          mode,
+		format:            format,
+		store:             store,
+		errorFileName:     errorFileName,
+		mode:              mode,
+		concurrencyPerCPU: sanitizeConcurrencyPerCPU(concurrencyPerCPU),
 	}
 }
