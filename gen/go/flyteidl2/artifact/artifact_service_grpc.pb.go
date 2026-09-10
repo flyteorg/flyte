@@ -24,6 +24,7 @@ const (
 	ArtifactService_ListArtifacts_FullMethodName            = "/flyteidl2.artifact.ArtifactService/ListArtifacts"
 	ArtifactService_ListArtifactNames_FullMethodName        = "/flyteidl2.artifact.ArtifactService/ListArtifactNames"
 	ArtifactService_ListArtifactMetadataKeys_FullMethodName = "/flyteidl2.artifact.ArtifactService/ListArtifactMetadataKeys"
+	ArtifactService_DeleteArtifact_FullMethodName           = "/flyteidl2.artifact.ArtifactService/DeleteArtifact"
 )
 
 // ArtifactServiceClient is the client API for ArtifactService service.
@@ -44,6 +45,12 @@ type ArtifactServiceClient interface {
 	// within a project, for filter suggestions. Keys only, never values; the
 	// set is sorted, capped, and may be served from a short-lived cache.
 	ListArtifactMetadataKeys(ctx context.Context, in *ListArtifactMetadataKeysRequest, opts ...grpc.CallOption) (*ListArtifactMetadataKeysResponse, error)
+	// Delete one artifact version. The version is required and must be
+	// explicit: the "latest" alias is rejected so a caller can never delete a
+	// version other than the one it named. Returns NOT_FOUND when the version
+	// does not exist. Deleting the last version removes the artifact name from
+	// the listings. Offloaded data the value references is not touched.
+	DeleteArtifact(ctx context.Context, in *DeleteArtifactRequest, opts ...grpc.CallOption) (*DeleteArtifactResponse, error)
 }
 
 type artifactServiceClient struct {
@@ -99,6 +106,15 @@ func (c *artifactServiceClient) ListArtifactMetadataKeys(ctx context.Context, in
 	return out, nil
 }
 
+func (c *artifactServiceClient) DeleteArtifact(ctx context.Context, in *DeleteArtifactRequest, opts ...grpc.CallOption) (*DeleteArtifactResponse, error) {
+	out := new(DeleteArtifactResponse)
+	err := c.cc.Invoke(ctx, ArtifactService_DeleteArtifact_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArtifactServiceServer is the server API for ArtifactService service.
 // All implementations should embed UnimplementedArtifactServiceServer
 // for forward compatibility
@@ -117,6 +133,12 @@ type ArtifactServiceServer interface {
 	// within a project, for filter suggestions. Keys only, never values; the
 	// set is sorted, capped, and may be served from a short-lived cache.
 	ListArtifactMetadataKeys(context.Context, *ListArtifactMetadataKeysRequest) (*ListArtifactMetadataKeysResponse, error)
+	// Delete one artifact version. The version is required and must be
+	// explicit: the "latest" alias is rejected so a caller can never delete a
+	// version other than the one it named. Returns NOT_FOUND when the version
+	// does not exist. Deleting the last version removes the artifact name from
+	// the listings. Offloaded data the value references is not touched.
+	DeleteArtifact(context.Context, *DeleteArtifactRequest) (*DeleteArtifactResponse, error)
 }
 
 // UnimplementedArtifactServiceServer should be embedded to have forward compatible implementations.
@@ -137,6 +159,9 @@ func (UnimplementedArtifactServiceServer) ListArtifactNames(context.Context, *Li
 }
 func (UnimplementedArtifactServiceServer) ListArtifactMetadataKeys(context.Context, *ListArtifactMetadataKeysRequest) (*ListArtifactMetadataKeysResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListArtifactMetadataKeys not implemented")
+}
+func (UnimplementedArtifactServiceServer) DeleteArtifact(context.Context, *DeleteArtifactRequest) (*DeleteArtifactResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteArtifact not implemented")
 }
 
 // UnsafeArtifactServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -240,6 +265,24 @@ func _ArtifactService_ListArtifactMetadataKeys_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArtifactService_DeleteArtifact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteArtifactRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArtifactServiceServer).DeleteArtifact(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArtifactService_DeleteArtifact_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArtifactServiceServer).DeleteArtifact(ctx, req.(*DeleteArtifactRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArtifactService_ServiceDesc is the grpc.ServiceDesc for ArtifactService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -266,6 +309,10 @@ var ArtifactService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListArtifactMetadataKeys",
 			Handler:    _ArtifactService_ListArtifactMetadataKeys_Handler,
+		},
+		{
+			MethodName: "DeleteArtifact",
+			Handler:    _ArtifactService_DeleteArtifact_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

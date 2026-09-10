@@ -92,3 +92,13 @@ class ListArtifactMetadataKeysResponse(_message.Message):
     KEYS_FIELD_NUMBER: _ClassVar[int]
     keys: _containers.RepeatedScalarFieldContainer[str]
     def __init__(self, keys: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class DeleteArtifactRequest(_message.Message):
+    __slots__ = ["artifact_id"]
+    ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
+    artifact_id: _artifact_pb2.ArtifactIdentifier
+    def __init__(self, artifact_id: _Optional[_Union[_artifact_pb2.ArtifactIdentifier, _Mapping]] = ...) -> None: ...
+
+class DeleteArtifactResponse(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...

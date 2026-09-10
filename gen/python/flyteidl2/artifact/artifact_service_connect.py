@@ -32,6 +32,9 @@ class ArtifactService(Protocol):
     async def list_artifact_metadata_keys(self, request: flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysRequest, ctx: RequestContext) -> flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def delete_artifact(self, request: flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactRequest, ctx: RequestContext) -> flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
 
 class ArtifactServiceASGIApplication(ConnectASGIApplication[ArtifactService]):
     def __init__(self, service: ArtifactService | AsyncGenerator[ArtifactService], *, interceptors: Iterable[Interceptor]=(), read_max_bytes: int | None = None, compressions: Iterable[Compression] | None = None) -> None:
@@ -87,6 +90,16 @@ class ArtifactServiceASGIApplication(ConnectASGIApplication[ArtifactService]):
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.list_artifact_metadata_keys,
+                ),
+                "/flyteidl2.artifact.ArtifactService/DeleteArtifact": Endpoint.unary(
+                    method=MethodInfo(
+                        name="DeleteArtifact",
+                        service_name="flyteidl2.artifact.ArtifactService",
+                        input=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactRequest,
+                        output=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactResponse,
+                        idempotency_level=IdempotencyLevel.IDEMPOTENT,
+                    ),
+                    function=svc.delete_artifact,
                 ),
             },
             interceptors=interceptors,
@@ -209,6 +222,26 @@ class ArtifactServiceClient(ConnectClient):
             use_get=use_get,
         )
 
+    async def delete_artifact(
+        self,
+        request: flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="DeleteArtifact",
+                service_name="flyteidl2.artifact.ArtifactService",
+                input=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactRequest,
+                output=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactResponse,
+                idempotency_level=IdempotencyLevel.IDEMPOTENT,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
 
 class ArtifactServiceSync(Protocol):
     def create_artifact(self, request: flyteidl2_dot_artifact_dot_artifact__service__pb2.CreateArtifactRequest, ctx: RequestContext) -> flyteidl2_dot_artifact_dot_artifact__service__pb2.CreateArtifactResponse:
@@ -220,6 +253,8 @@ class ArtifactServiceSync(Protocol):
     def list_artifact_names(self, request: flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactNamesRequest, ctx: RequestContext) -> flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactNamesResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def list_artifact_metadata_keys(self, request: flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysRequest, ctx: RequestContext) -> flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def delete_artifact(self, request: flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactRequest, ctx: RequestContext) -> flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
@@ -276,6 +311,16 @@ class ArtifactServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.list_artifact_metadata_keys,
+                ),
+                "/flyteidl2.artifact.ArtifactService/DeleteArtifact": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="DeleteArtifact",
+                        service_name="flyteidl2.artifact.ArtifactService",
+                        input=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactRequest,
+                        output=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactResponse,
+                        idempotency_level=IdempotencyLevel.IDEMPOTENT,
+                    ),
+                    function=service.delete_artifact,
                 ),
             },
             interceptors=interceptors,
@@ -396,4 +441,24 @@ class ArtifactServiceClientSync(ConnectClientSync):
             headers=headers,
             timeout_ms=timeout_ms,
             use_get=use_get,
+        )
+
+    def delete_artifact(
+        self,
+        request: flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="DeleteArtifact",
+                service_name="flyteidl2.artifact.ArtifactService",
+                input=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactRequest,
+                output=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactResponse,
+                idempotency_level=IdempotencyLevel.IDEMPOTENT,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
         )

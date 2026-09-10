@@ -17,7 +17,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/artifact/artifact_service.proto.
  */
 export const file_flyteidl2_artifact_artifact_service: GenFile = /*@__PURE__*/
-  fileDesc("CilmbHl0ZWlkbDIvYXJ0aWZhY3QvYXJ0aWZhY3Rfc2VydmljZS5wcm90bxISZmx5dGVpZGwyLmFydGlmYWN0IpQBChVDcmVhdGVBcnRpZmFjdFJlcXVlc3QSQwoLYXJ0aWZhY3RfaWQYASABKAsyJi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RJZGVudGlmaWVyQga6SAPIAQESNgoEc3BlYxgCIAEoCzIgLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdFNwZWNCBrpIA8gBASJIChZDcmVhdGVBcnRpZmFjdFJlc3BvbnNlEi4KCGFydGlmYWN0GAEgASgLMhwuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0IngKEkdldEFydGlmYWN0UmVxdWVzdBI2CgRuYW1lGAEgASgLMiAuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0TmFtZUIGukgDyAEBEh4KB3ZlcnNpb24YAiABKAlCCLpIBXIDGP8BSACIAQFCCgoIX3ZlcnNpb24iRQoTR2V0QXJ0aWZhY3RSZXNwb25zZRIuCghhcnRpZmFjdBgBIAEoCzIcLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdCKtAQoUTGlzdEFydGlmYWN0c1JlcXVlc3QSLgoHcmVxdWVzdBgBIAEoCzIdLmZseXRlaWRsMi5jb21tb24uTGlzdFJlcXVlc3QSPwoKcHJvamVjdF9pZBgCIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJCBrpIA8gBARIbCgRuYW1lGAMgASgJQgi6SAVyAxj/AUgAiAEBQgcKBV9uYW1lIlcKFUxpc3RBcnRpZmFjdHNSZXNwb25zZRIvCglhcnRpZmFjdHMYASADKAsyHC5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3QSDQoFdG9rZW4YAiABKAkiiwEKGExpc3RBcnRpZmFjdE5hbWVzUmVxdWVzdBIuCgdyZXF1ZXN0GAEgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5MaXN0UmVxdWVzdBI/Cgpwcm9qZWN0X2lkGAIgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckIGukgDyAEBIk8KDUFydGlmYWN0R3JvdXASLAoGbGF0ZXN0GAEgASgLMhwuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0EhAKCHZlcnNpb25zGAIgASgEIl0KGUxpc3RBcnRpZmFjdE5hbWVzUmVzcG9uc2USMQoGZ3JvdXBzGAEgAygLMiEuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0R3JvdXASDQoFdG9rZW4YAiABKAkiiAEKH0xpc3RBcnRpZmFjdE1ldGFkYXRhS2V5c1JlcXVlc3QSPwoKcHJvamVjdF9pZBgBIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJCBrpIA8gBARIbCgRuYW1lGAIgASgJQgi6SAVyAxj/AUgAiAEBQgcKBV9uYW1lIjAKIExpc3RBcnRpZmFjdE1ldGFkYXRhS2V5c1Jlc3BvbnNlEgwKBGtleXMYASADKAky0AQKD0FydGlmYWN0U2VydmljZRJpCg5DcmVhdGVBcnRpZmFjdBIpLmZseXRlaWRsMi5hcnRpZmFjdC5DcmVhdGVBcnRpZmFjdFJlcXVlc3QaKi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQ3JlYXRlQXJ0aWZhY3RSZXNwb25zZSIAEmMKC0dldEFydGlmYWN0EiYuZmx5dGVpZGwyLmFydGlmYWN0LkdldEFydGlmYWN0UmVxdWVzdBonLmZseXRlaWRsMi5hcnRpZmFjdC5HZXRBcnRpZmFjdFJlc3BvbnNlIgOQAgESaQoNTGlzdEFydGlmYWN0cxIoLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RzUmVxdWVzdBopLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RzUmVzcG9uc2UiA5ACARJ1ChFMaXN0QXJ0aWZhY3ROYW1lcxIsLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3ROYW1lc1JlcXVlc3QaLS5mbHl0ZWlkbDIuYXJ0aWZhY3QuTGlzdEFydGlmYWN0TmFtZXNSZXNwb25zZSIDkAIBEooBChhMaXN0QXJ0aWZhY3RNZXRhZGF0YUtleXMSMy5mbHl0ZWlkbDIuYXJ0aWZhY3QuTGlzdEFydGlmYWN0TWV0YWRhdGFLZXlzUmVxdWVzdBo0LmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RNZXRhZGF0YUtleXNSZXNwb25zZSIDkAIBQtEBChZjb20uZmx5dGVpZGwyLmFydGlmYWN0QhRBcnRpZmFjdFNlcnZpY2VQcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9hcnRpZmFjdKICA0ZBWKoCEkZseXRlaWRsMi5BcnRpZmFjdMoCEkZseXRlaWRsMlxBcnRpZmFjdOICHkZseXRlaWRsMlxBcnRpZmFjdFxHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6QXJ0aWZhY3RiBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_artifact_artifact, file_flyteidl2_common_identifier, file_flyteidl2_common_list]);
+  fileDesc("CilmbHl0ZWlkbDIvYXJ0aWZhY3QvYXJ0aWZhY3Rfc2VydmljZS5wcm90bxISZmx5dGVpZGwyLmFydGlmYWN0IpQBChVDcmVhdGVBcnRpZmFjdFJlcXVlc3QSQwoLYXJ0aWZhY3RfaWQYASABKAsyJi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RJZGVudGlmaWVyQga6SAPIAQESNgoEc3BlYxgCIAEoCzIgLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdFNwZWNCBrpIA8gBASJIChZDcmVhdGVBcnRpZmFjdFJlc3BvbnNlEi4KCGFydGlmYWN0GAEgASgLMhwuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0IngKEkdldEFydGlmYWN0UmVxdWVzdBI2CgRuYW1lGAEgASgLMiAuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0TmFtZUIGukgDyAEBEh4KB3ZlcnNpb24YAiABKAlCCLpIBXIDGP8BSACIAQFCCgoIX3ZlcnNpb24iRQoTR2V0QXJ0aWZhY3RSZXNwb25zZRIuCghhcnRpZmFjdBgBIAEoCzIcLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdCKtAQoUTGlzdEFydGlmYWN0c1JlcXVlc3QSLgoHcmVxdWVzdBgBIAEoCzIdLmZseXRlaWRsMi5jb21tb24uTGlzdFJlcXVlc3QSPwoKcHJvamVjdF9pZBgCIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJCBrpIA8gBARIbCgRuYW1lGAMgASgJQgi6SAVyAxj/AUgAiAEBQgcKBV9uYW1lIlcKFUxpc3RBcnRpZmFjdHNSZXNwb25zZRIvCglhcnRpZmFjdHMYASADKAsyHC5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3QSDQoFdG9rZW4YAiABKAkiiwEKGExpc3RBcnRpZmFjdE5hbWVzUmVxdWVzdBIuCgdyZXF1ZXN0GAEgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5MaXN0UmVxdWVzdBI/Cgpwcm9qZWN0X2lkGAIgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckIGukgDyAEBIk8KDUFydGlmYWN0R3JvdXASLAoGbGF0ZXN0GAEgASgLMhwuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0EhAKCHZlcnNpb25zGAIgASgEIl0KGUxpc3RBcnRpZmFjdE5hbWVzUmVzcG9uc2USMQoGZ3JvdXBzGAEgAygLMiEuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0R3JvdXASDQoFdG9rZW4YAiABKAkiiAEKH0xpc3RBcnRpZmFjdE1ldGFkYXRhS2V5c1JlcXVlc3QSPwoKcHJvamVjdF9pZBgBIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJCBrpIA8gBARIbCgRuYW1lGAIgASgJQgi6SAVyAxj/AUgAiAEBQgcKBV9uYW1lIjAKIExpc3RBcnRpZmFjdE1ldGFkYXRhS2V5c1Jlc3BvbnNlEgwKBGtleXMYASADKAkiXAoVRGVsZXRlQXJ0aWZhY3RSZXF1ZXN0EkMKC2FydGlmYWN0X2lkGAEgASgLMiYuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0SWRlbnRpZmllckIGukgDyAEBIhgKFkRlbGV0ZUFydGlmYWN0UmVzcG9uc2UyvgUKD0FydGlmYWN0U2VydmljZRJpCg5DcmVhdGVBcnRpZmFjdBIpLmZseXRlaWRsMi5hcnRpZmFjdC5DcmVhdGVBcnRpZmFjdFJlcXVlc3QaKi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQ3JlYXRlQXJ0aWZhY3RSZXNwb25zZSIAEmMKC0dldEFydGlmYWN0EiYuZmx5dGVpZGwyLmFydGlmYWN0LkdldEFydGlmYWN0UmVxdWVzdBonLmZseXRlaWRsMi5hcnRpZmFjdC5HZXRBcnRpZmFjdFJlc3BvbnNlIgOQAgESaQoNTGlzdEFydGlmYWN0cxIoLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RzUmVxdWVzdBopLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RzUmVzcG9uc2UiA5ACARJ1ChFMaXN0QXJ0aWZhY3ROYW1lcxIsLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3ROYW1lc1JlcXVlc3QaLS5mbHl0ZWlkbDIuYXJ0aWZhY3QuTGlzdEFydGlmYWN0TmFtZXNSZXNwb25zZSIDkAIBEooBChhMaXN0QXJ0aWZhY3RNZXRhZGF0YUtleXMSMy5mbHl0ZWlkbDIuYXJ0aWZhY3QuTGlzdEFydGlmYWN0TWV0YWRhdGFLZXlzUmVxdWVzdBo0LmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RNZXRhZGF0YUtleXNSZXNwb25zZSIDkAIBEmwKDkRlbGV0ZUFydGlmYWN0EikuZmx5dGVpZGwyLmFydGlmYWN0LkRlbGV0ZUFydGlmYWN0UmVxdWVzdBoqLmZseXRlaWRsMi5hcnRpZmFjdC5EZWxldGVBcnRpZmFjdFJlc3BvbnNlIgOQAgJC0QEKFmNvbS5mbHl0ZWlkbDIuYXJ0aWZhY3RCFEFydGlmYWN0U2VydmljZVByb3RvSAJQAVo2Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2FydGlmYWN0ogIDRkFYqgISRmx5dGVpZGwyLkFydGlmYWN0ygISRmx5dGVpZGwyXEFydGlmYWN04gIeRmx5dGVpZGwyXEFydGlmYWN0XEdQQk1ldGFkYXRh6gITRmx5dGVpZGwyOjpBcnRpZmFjdGIGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_artifact_artifact, file_flyteidl2_common_identifier, file_flyteidl2_common_list]);
 
 /**
  * request message for creating an artifact.
@@ -123,9 +123,13 @@ export const GetArtifactResponseSchema: GenMessage<GetArtifactResponse> = /*@__P
  */
 export type ListArtifactsRequest = Message<"flyteidl2.artifact.ListArtifactsRequest"> & {
   /**
-   * Common list request parameters (limit, token, filters).
+   * Common list request parameters (limit, token, filters, sort).
+   * Supported sort keys (sort_by_fields, at most one): "created_at",
+   * "version" and "created_by"; the default is created_at, newest first.
    * Supported filters: field "name" with CONTAINS,
    * field "created_at" with GREATER_THAN (RFC3339 timestamp value),
+   * field "created_by" with EQUAL or VALUE_IN (creator subjects, ORed),
+   * fields "source_run", "source_action" and "source_external_ref" with EQUAL,
    * and the pair "parent_name" + "parent_version", each with EQUAL and always
    * together, which lists the versions (of any name in the project) that
    * declare the given artifact version among their parents. This serves the
@@ -192,7 +196,10 @@ export const ListArtifactsResponseSchema: GenMessage<ListArtifactsResponse> = /*
  */
 export type ListArtifactNamesRequest = Message<"flyteidl2.artifact.ListArtifactNamesRequest"> & {
   /**
-   * Common list request parameters (limit, token, filters).
+   * Common list request parameters (limit, token, filters, sort).
+   * Supported sort keys (sort_by_fields, at most one): "created_at" (the
+   * latest version's creation time), "name" and "created_by"; the default is
+   * created_at, newest first.
    * Supported filters: field "name" with CONTAINS.
    *
    * @generated from field: flyteidl2.common.ListRequest request = 1;
@@ -321,6 +328,43 @@ export const ListArtifactMetadataKeysResponseSchema: GenMessage<ListArtifactMeta
   messageDesc(file_flyteidl2_artifact_artifact_service, 10);
 
 /**
+ * request message for deleting one artifact version.
+ *
+ * @generated from message flyteidl2.artifact.DeleteArtifactRequest
+ */
+export type DeleteArtifactRequest = Message<"flyteidl2.artifact.DeleteArtifactRequest"> & {
+  /**
+   * Fully qualified id (name + version) of the version to delete. The
+   * version must be explicit; "latest" is rejected.
+   *
+   * @generated from field: flyteidl2.artifact.ArtifactIdentifier artifact_id = 1;
+   */
+  artifactId?: ArtifactIdentifier;
+};
+
+/**
+ * Describes the message flyteidl2.artifact.DeleteArtifactRequest.
+ * Use `create(DeleteArtifactRequestSchema)` to create a new message.
+ */
+export const DeleteArtifactRequestSchema: GenMessage<DeleteArtifactRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact_service, 11);
+
+/**
+ * response message for deleting an artifact version.
+ *
+ * @generated from message flyteidl2.artifact.DeleteArtifactResponse
+ */
+export type DeleteArtifactResponse = Message<"flyteidl2.artifact.DeleteArtifactResponse"> & {
+};
+
+/**
+ * Describes the message flyteidl2.artifact.DeleteArtifactResponse.
+ * Use `create(DeleteArtifactResponseSchema)` to create a new message.
+ */
+export const DeleteArtifactResponseSchema: GenMessage<DeleteArtifactResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact_service, 12);
+
+/**
  * ArtifactService provides a minimal interface for publishing and retrieving
  * typed artifacts.
  *
@@ -380,6 +424,20 @@ export const ArtifactService: GenService<{
     methodKind: "unary";
     input: typeof ListArtifactMetadataKeysRequestSchema;
     output: typeof ListArtifactMetadataKeysResponseSchema;
+  },
+  /**
+   * Delete one artifact version. The version is required and must be
+   * explicit: the "latest" alias is rejected so a caller can never delete a
+   * version other than the one it named. Returns NOT_FOUND when the version
+   * does not exist. Deleting the last version removes the artifact name from
+   * the listings. Offloaded data the value references is not touched.
+   *
+   * @generated from rpc flyteidl2.artifact.ArtifactService.DeleteArtifact
+   */
+  deleteArtifact: {
+    methodKind: "unary";
+    input: typeof DeleteArtifactRequestSchema;
+    output: typeof DeleteArtifactResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_flyteidl2_artifact_artifact_service, 0);
