@@ -130,8 +130,8 @@ github.com/eko/gocache/lib/v4 v4.2.4 h1:BRKeSVesCA+ujcdS72GhAwMmJcYnp46DRu7w9ZL8
 github.com/eko/gocache/lib/v4 v4.2.4/go.mod h1:Zus8mwmaPu1VYOzfomb+Dvx2wV7fT5jDRbHYtQM6MEY=
 github.com/eko/gocache/store/freecache/v4 v4.2.7 h1:i1OkSbfzhm0y/K8yEgcpQe5dCqkTXaKFE1MXVt/6PT4=
 github.com/eko/gocache/store/freecache/v4 v4.2.7/go.mod h1:tzja9HMWCFbKUxtYs6zHfDSxtVM6r1HEn0955HMz5/g=
-github.com/eko/gocache/store/redis/v4 v4.2.6 h1:btD3TIFAgujZAsvTEBTaDfNTSAf+GO32il0HQ5MIqCI=
-github.com/eko/gocache/store/redis/v4 v4.2.6/go.mod h1:0PMef3sy4AonKqrxdnUsIKDAMtqNyJI4e6asTo00XrE=
+github.com/eko/gocache/store/redis/v4 v4.2.9 h1:Dafz4TAKptvZrDkmxkwbiU2a1T0Dfuor8pWCD89lJio=
+github.com/eko/gocache/store/redis/v4 v4.2.9/go.mod h1:Wa5VOIScCZoy1eyB/rhNt4HcADeWqSOUHQ5cjZmF+V0=
 github.com/emicklei/go-restful/v3 v3.13.0 h1:C4Bl2xDndpU6nJ4bc1jXd+uTmYPVUwkD6bFY/oTyCes=
 github.com/emicklei/go-restful/v3 v3.13.0/go.mod h1:6n3XBCmQQb25CM2LCACGz8ukIrRry+4bhvbpWn3mrbc=
 github.com/envoyproxy/go-control-plane v0.14.0 h1:hbG2kr4RuFj222B6+7T83thSPqLjwBIfQawTkC++2HA=
