@@ -282,7 +282,7 @@ func (s *RunService) CreateRun(
 
 	// Settings sit between an explicit request value and the static config defaults
 	// applied below.
-	resolved, err := resolveSettings(ctx, s.settingsRepo, &settings.SettingsKey{
+	resolveSettings, err := resolveSettings(ctx, s.settingsRepo, &settings.SettingsKey{
 		Org:     runId.GetOrg(),
 		Domain:  runId.GetDomain(),
 		Project: runId.GetProject(),
@@ -290,7 +290,7 @@ func (s *RunService) CreateRun(
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
-	applyRunSettings(runSpec, resolved)
+	applyRunSettings(runSpec, resolveSettings)
 
 	// Stamp the run start time, but only for SDKs that understand it (>= 2.3.6) — older task
 	// templates have no {{.runStartTime}} placeholder, so leaving it unset keeps the executor from
