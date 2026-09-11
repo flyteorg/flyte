@@ -49,7 +49,7 @@ func noSettings(t *testing.T) *repoMocks.SettingsRepo {
 // settingsWithQueue returns a settings repo holding one org-level row that sets the
 // default queue. The row key must match what fetchLevels asks for, or the lookup
 // aligns to nothing.
-func settingsWithQueue(t *testing.T, org, queue string) *repoMocks.SettingsRepo {
+func settingsWithQueue(t *testing.T, queue string) *repoMocks.SettingsRepo {
 	t.Helper()
 	data, err := protojson.Marshal(&settings.Settings{
 		Run: &settings.RunSettings{
@@ -60,7 +60,7 @@ func settingsWithQueue(t *testing.T, org, queue string) *repoMocks.SettingsRepo 
 
 	m := &repoMocks.SettingsRepo{}
 	m.On("GetSettingsByKeys", mock.Anything, mock.Anything).
-		Return([]*models.Settings{{Key: models.EncodeSettingsKey(org, "", ""), Data: data, Version: 1}}, nil)
+		Return([]*models.Settings{{Key: models.EncodeSettingsKey("", ""), Data: data, Version: 1}}, nil)
 	return m
 }
 
@@ -1484,7 +1484,7 @@ func TestCreateRun_AppliesSettingsQueue(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
-		settingsRepo:  settingsWithQueue(t, "org", "fast-queue"),
+		settingsRepo:  settingsWithQueue(t, "fast-queue"),
 		actionsClient: actionsClient,
 		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
