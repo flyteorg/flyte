@@ -38,6 +38,15 @@ service ArtifactService {
   rpc ListArtifactMetadataKeys(ListArtifactMetadataKeysRequest) returns (ListArtifactMetadataKeysResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
+  // Delete one artifact version. The version is required and must be
+  // explicit: the "latest" alias is rejected so a caller can never delete a
+  // version other than the one it named. Returns NOT_FOUND when the version
+  // does not exist. Deleting the last version removes the artifact name from
+  // the listings. Offloaded data the value references is not touched.
+  rpc DeleteArtifact(DeleteArtifactRequest) returns (DeleteArtifactResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
 }
 
 // request message for creating an artifact.
@@ -72,9 +81,13 @@ message GetArtifactResponse {
 
 // request message for listing artifacts.
 message ListArtifactsRequest {
-  // Common list request parameters (limit, token, filters).
+  // Common list request parameters (limit, token, filters, sort).
+  // Supported sort keys (sort_by_fields, at most one): "created_at",
+  // "version" and "created_by"; the default is created_at, newest first.
   // Supported filters: field "name" with CONTAINS,
   // field "created_at" with GREATER_THAN (RFC3339 timestamp value),
+  // field "created_by" with EQUAL or VALUE_IN (creator subjects, ORed),
+  // fields "source_run", "source_action" and "source_external_ref" with EQUAL,
   // and the pair "parent_name" + "parent_version", each with EQUAL and always
   // together, which lists the versions (of any name in the project) that
   // declare the given artifact version among their parents. This serves the
@@ -100,7 +113,10 @@ message ListArtifactsResponse {
 
 // request message for listing distinct artifact names.
 message ListArtifactNamesRequest {
-  // Common list request parameters (limit, token, filters).
+  // Common list request parameters (limit, token, filters, sort).
+  // Supported sort keys (sort_by_fields, at most one): "created_at" (the
+  // latest version's creation time), "name" and "created_by"; the default is
+  // created_at, newest first.
   // Supported filters: field "name" with CONTAINS.
   common.ListRequest request = 1;
 
@@ -142,3 +158,13 @@ message ListArtifactMetadataKeysResponse {
   // artifacts, so keys only present on older versions may be absent.
   repeated string keys = 1;
 }
+
+// request message for deleting one artifact version.
+message DeleteArtifactRequest {
+  // Fully qualified id (name + version) of the version to delete. The
+  // version must be explicit; "latest" is rejected.
+  ArtifactIdentifier artifact_id = 1 [(buf.validate.field).required = true];
+}
+
+// response message for deleting an artifact version.
+message DeleteArtifactResponse {}

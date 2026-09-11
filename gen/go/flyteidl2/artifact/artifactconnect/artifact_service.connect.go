@@ -48,6 +48,9 @@ const (
 	// ArtifactServiceListArtifactMetadataKeysProcedure is the fully-qualified name of the
 	// ArtifactService's ListArtifactMetadataKeys RPC.
 	ArtifactServiceListArtifactMetadataKeysProcedure = "/flyteidl2.artifact.ArtifactService/ListArtifactMetadataKeys"
+	// ArtifactServiceDeleteArtifactProcedure is the fully-qualified name of the ArtifactService's
+	// DeleteArtifact RPC.
+	ArtifactServiceDeleteArtifactProcedure = "/flyteidl2.artifact.ArtifactService/DeleteArtifact"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -58,6 +61,7 @@ var (
 	artifactServiceListArtifactsMethodDescriptor            = artifactServiceServiceDescriptor.Methods().ByName("ListArtifacts")
 	artifactServiceListArtifactNamesMethodDescriptor        = artifactServiceServiceDescriptor.Methods().ByName("ListArtifactNames")
 	artifactServiceListArtifactMetadataKeysMethodDescriptor = artifactServiceServiceDescriptor.Methods().ByName("ListArtifactMetadataKeys")
+	artifactServiceDeleteArtifactMethodDescriptor           = artifactServiceServiceDescriptor.Methods().ByName("DeleteArtifact")
 )
 
 // ArtifactServiceClient is a client for the flyteidl2.artifact.ArtifactService service.
@@ -76,6 +80,12 @@ type ArtifactServiceClient interface {
 	// within a project, for filter suggestions. Keys only, never values; the
 	// set is sorted, capped, and may be served from a short-lived cache.
 	ListArtifactMetadataKeys(context.Context, *connect.Request[artifact.ListArtifactMetadataKeysRequest]) (*connect.Response[artifact.ListArtifactMetadataKeysResponse], error)
+	// Delete one artifact version. The version is required and must be
+	// explicit: the "latest" alias is rejected so a caller can never delete a
+	// version other than the one it named. Returns NOT_FOUND when the version
+	// does not exist. Deleting the last version removes the artifact name from
+	// the listings. Offloaded data the value references is not touched.
+	DeleteArtifact(context.Context, *connect.Request[artifact.DeleteArtifactRequest]) (*connect.Response[artifact.DeleteArtifactResponse], error)
 }
 
 // NewArtifactServiceClient constructs a client for the flyteidl2.artifact.ArtifactService service.
@@ -122,6 +132,13 @@ func NewArtifactServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
+		deleteArtifact: connect.NewClient[artifact.DeleteArtifactRequest, artifact.DeleteArtifactResponse](
+			httpClient,
+			baseURL+ArtifactServiceDeleteArtifactProcedure,
+			connect.WithSchema(artifactServiceDeleteArtifactMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyIdempotent),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -132,6 +149,7 @@ type artifactServiceClient struct {
 	listArtifacts            *connect.Client[artifact.ListArtifactsRequest, artifact.ListArtifactsResponse]
 	listArtifactNames        *connect.Client[artifact.ListArtifactNamesRequest, artifact.ListArtifactNamesResponse]
 	listArtifactMetadataKeys *connect.Client[artifact.ListArtifactMetadataKeysRequest, artifact.ListArtifactMetadataKeysResponse]
+	deleteArtifact           *connect.Client[artifact.DeleteArtifactRequest, artifact.DeleteArtifactResponse]
 }
 
 // CreateArtifact calls flyteidl2.artifact.ArtifactService.CreateArtifact.
@@ -159,6 +177,11 @@ func (c *artifactServiceClient) ListArtifactMetadataKeys(ctx context.Context, re
 	return c.listArtifactMetadataKeys.CallUnary(ctx, req)
 }
 
+// DeleteArtifact calls flyteidl2.artifact.ArtifactService.DeleteArtifact.
+func (c *artifactServiceClient) DeleteArtifact(ctx context.Context, req *connect.Request[artifact.DeleteArtifactRequest]) (*connect.Response[artifact.DeleteArtifactResponse], error) {
+	return c.deleteArtifact.CallUnary(ctx, req)
+}
+
 // ArtifactServiceHandler is an implementation of the flyteidl2.artifact.ArtifactService service.
 type ArtifactServiceHandler interface {
 	// Create a new artifact version.
@@ -175,6 +198,12 @@ type ArtifactServiceHandler interface {
 	// within a project, for filter suggestions. Keys only, never values; the
 	// set is sorted, capped, and may be served from a short-lived cache.
 	ListArtifactMetadataKeys(context.Context, *connect.Request[artifact.ListArtifactMetadataKeysRequest]) (*connect.Response[artifact.ListArtifactMetadataKeysResponse], error)
+	// Delete one artifact version. The version is required and must be
+	// explicit: the "latest" alias is rejected so a caller can never delete a
+	// version other than the one it named. Returns NOT_FOUND when the version
+	// does not exist. Deleting the last version removes the artifact name from
+	// the listings. Offloaded data the value references is not touched.
+	DeleteArtifact(context.Context, *connect.Request[artifact.DeleteArtifactRequest]) (*connect.Response[artifact.DeleteArtifactResponse], error)
 }
 
 // NewArtifactServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -217,6 +246,13 @@ func NewArtifactServiceHandler(svc ArtifactServiceHandler, opts ...connect.Handl
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
+	artifactServiceDeleteArtifactHandler := connect.NewUnaryHandler(
+		ArtifactServiceDeleteArtifactProcedure,
+		svc.DeleteArtifact,
+		connect.WithSchema(artifactServiceDeleteArtifactMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyIdempotent),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.artifact.ArtifactService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ArtifactServiceCreateArtifactProcedure:
@@ -229,6 +265,8 @@ func NewArtifactServiceHandler(svc ArtifactServiceHandler, opts ...connect.Handl
 			artifactServiceListArtifactNamesHandler.ServeHTTP(w, r)
 		case ArtifactServiceListArtifactMetadataKeysProcedure:
 			artifactServiceListArtifactMetadataKeysHandler.ServeHTTP(w, r)
+		case ArtifactServiceDeleteArtifactProcedure:
+			artifactServiceDeleteArtifactHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -256,4 +294,8 @@ func (UnimplementedArtifactServiceHandler) ListArtifactNames(context.Context, *c
 
 func (UnimplementedArtifactServiceHandler) ListArtifactMetadataKeys(context.Context, *connect.Request[artifact.ListArtifactMetadataKeysRequest]) (*connect.Response[artifact.ListArtifactMetadataKeysResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.artifact.ArtifactService.ListArtifactMetadataKeys is not implemented"))
+}
+
+func (UnimplementedArtifactServiceHandler) DeleteArtifact(context.Context, *connect.Request[artifact.DeleteArtifactRequest]) (*connect.Response[artifact.DeleteArtifactResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.artifact.ArtifactService.DeleteArtifact is not implemented"))
 }

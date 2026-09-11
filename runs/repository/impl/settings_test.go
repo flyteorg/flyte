@@ -20,7 +20,7 @@ func TestCreateAndGetSettings_RoundTrip(t *testing.T) {
 	repo := setupSettingTest(t)
 	ctx := context.Background()
 
-	key := models.EncodeSettingsKey("", "development", "")
+	key := models.EncodeSettingsKey("development", "")
 	created := &models.Settings{
 		Key:  key,
 		Data: []byte(`{"environmentVariables":{"state":"VALUE", "values":{"LOG_LEVEL": "debug"}}}`),
@@ -40,7 +40,7 @@ func TestCreateSettings_AlreadyExists(t *testing.T) {
 	repo := setupSettingTest(t)
 	ctx := context.Background()
 
-	key := models.EncodeSettingsKey("", "development", "recsys")
+	key := models.EncodeSettingsKey("development", "recsys")
 	first := &models.Settings{Key: key, Data: []byte(`{}`)}
 	require.NoError(t, repo.CreateSettings(ctx, first))
 
@@ -57,7 +57,7 @@ func TestGetSettings_NotFound(t *testing.T) {
 	repo := setupSettingTest(t)
 	ctx := context.Background()
 
-	got, err := repo.GetSettings(ctx, models.EncodeSettingsKey("", "nowhere", ""))
+	got, err := repo.GetSettings(ctx, models.EncodeSettingsKey("nowhere", ""))
 	require.ErrorIs(t, err, interfaces.ErrSettingsNotFound)
 	require.Nil(t, got)
 }
@@ -66,9 +66,9 @@ func TestGetSettingsByKeys_MissingRowsAreNotErrors(t *testing.T) {
 	repo := setupSettingTest(t)
 	ctx := context.Background()
 
-	instanceKey := models.EncodeSettingsKey("", "", "")
-	domainKey := models.EncodeSettingsKey("", "development", "")
-	projectKey := models.EncodeSettingsKey("", "development", "recsys")
+	instanceKey := models.EncodeSettingsKey("", "")
+	domainKey := models.EncodeSettingsKey("development", "")
+	projectKey := models.EncodeSettingsKey("development", "recsys")
 
 	require.NoError(t, repo.CreateSettings(ctx, &models.Settings{Key: instanceKey, Data: []byte(`{}`)}))
 	require.NoError(t, repo.CreateSettings(ctx, &models.Settings{Key: domainKey, Data: []byte(`{}`)}))
@@ -91,7 +91,7 @@ func TestUpdateSettings_VersionConflict(t *testing.T) {
 	repo := setupSettingTest(t)
 	ctx := context.Background()
 
-	key := models.EncodeSettingsKey("", "development", "recsys")
+	key := models.EncodeSettingsKey("development", "recsys")
 
 	// The row is born at version 1.
 	writer := &models.Settings{Key: key, Data: []byte(`{"run":{"defaultQueue":{"state":"VALUE","stringValue":"cpu-pool"}}}`)}
@@ -126,7 +126,7 @@ func TestUpdateSettings_NotFound(t *testing.T) {
 	ctx := context.Background()
 
 	stale := &models.Settings{
-		Key:     models.EncodeSettingsKey("", "nowhere", ""),
+		Key:     models.EncodeSettingsKey("nowhere", ""),
 		Data:    []byte(`{}`),
 		Version: 1,
 	}

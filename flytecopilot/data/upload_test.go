@@ -9,7 +9,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/golang/protobuf/proto" //nolint: staticcheck
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/encoding/protowire"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
@@ -129,4 +131,96 @@ func TestUploader_RecursiveUpload(t *testing.T) {
 			assert.Equal(t, body, string(b), "content mismatch for %s", rel)
 		}
 	})
+}
+
+// A container reports its own failure by writing the error file. Writing a
+// core.ErrorDocument there is how it declares a permanent failure: the
+// document has to survive the trip untouched, or the kind and origin it chose
+// are lost and the failure comes back retryable.
+func TestUploader_RecursiveUpload_ContainerErrorDocument(t *testing.T) {
+	tmpDir, err := os.MkdirTemp("", "upload_test")
+	assert.NoError(t, err)
+	defer func() {
+		assert.NoError(t, os.RemoveAll(tmpDir))
+	}()
+
+	document := &core.ErrorDocument{
+		Error: &core.ContainerError{
+			Code:    "BenchmarkFailed",
+			Message: "the model rejected the prompt",
+			Kind:    core.ContainerError_NON_RECOVERABLE,
+			Origin:  core.ExecutionError_USER,
+		},
+	}
+	raw, err := proto.Marshal(document)
+	assert.NoError(t, err)
+	assert.NoError(t, os.WriteFile(path.Join(tmpDir, "error"), raw, os.ModePerm)) // #nosec G306
+
+	store, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+	u := NewUploader(context.TODO(), store, core.DataLoadingConfig_JSON, core.IOStrategy_UPLOAD_ON_EXIT, "error")
+
+	err = u.RecursiveUpload(context.TODO(), &core.VariableMap{}, tmpDir, "output", "raw")
+
+	var containerErr RawContainerError
+	if assert.ErrorAs(t, err, &containerErr) {
+		assert.True(t, proto.Equal(document, containerErr.Document))
+	}
+}
+
+// A document another encoder wrote, with the fields out of order and carrying
+// a field this binary does not know, is still a document.
+func TestUploader_RecursiveUpload_ContainerErrorDocumentFromAnotherEncoder(t *testing.T) {
+	tmpDir, err := os.MkdirTemp("", "upload_test")
+	assert.NoError(t, err)
+	defer func() {
+		assert.NoError(t, os.RemoveAll(tmpDir))
+	}()
+
+	containerError := protowire.AppendTag(nil, 4, protowire.VarintType)
+	containerError = protowire.AppendVarint(containerError, uint64(core.ExecutionError_USER))
+	containerError = protowire.AppendTag(containerError, 2, protowire.BytesType)
+	containerError = protowire.AppendString(containerError, "the model rejected the prompt")
+	containerError = protowire.AppendTag(containerError, 1, protowire.BytesType)
+	containerError = protowire.AppendString(containerError, "BenchmarkFailed")
+	containerError = protowire.AppendTag(containerError, 99, protowire.VarintType)
+	containerError = protowire.AppendVarint(containerError, 1)
+	raw := protowire.AppendTag(nil, 1, protowire.BytesType)
+	raw = protowire.AppendBytes(raw, containerError)
+	assert.NoError(t, os.WriteFile(path.Join(tmpDir, "error"), raw, os.ModePerm)) // #nosec G306
+
+	store, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+	u := NewUploader(context.TODO(), store, core.DataLoadingConfig_JSON, core.IOStrategy_UPLOAD_ON_EXIT, "error")
+
+	err = u.RecursiveUpload(context.TODO(), &core.VariableMap{}, tmpDir, "output", "raw")
+
+	var containerErr RawContainerError
+	if assert.ErrorAs(t, err, &containerErr) {
+		assert.Equal(t, "BenchmarkFailed", containerErr.Document.GetError().GetCode())
+		assert.Equal(t, "the model rejected the prompt", containerErr.Document.GetError().GetMessage())
+		assert.Equal(t, core.ExecutionError_USER, containerErr.Document.GetError().GetOrigin())
+	}
+}
+
+// An error file that is not a document still reaches flyte as the message the
+// container wrote.
+func TestUploader_RecursiveUpload_ContainerErrorMessage(t *testing.T) {
+	tmpDir, err := os.MkdirTemp("", "upload_test")
+	assert.NoError(t, err)
+	defer func() {
+		assert.NoError(t, os.RemoveAll(tmpDir))
+	}()
+
+	assert.NoError(t, os.WriteFile(path.Join(tmpDir, "error"), []byte("failed"), os.ModePerm)) // #nosec G306
+
+	store, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+	u := NewUploader(context.TODO(), store, core.DataLoadingConfig_JSON, core.IOStrategy_UPLOAD_ON_EXIT, "error")
+
+	err = u.RecursiveUpload(context.TODO(), &core.VariableMap{}, tmpDir, "output", "raw")
+
+	var containerErr RawContainerError
+	assert.NotErrorAs(t, err, &containerErr)
+	assert.EqualError(t, err, "User Error: failed")
 }

@@ -41,6 +41,11 @@ class ArtifactServiceStub(object):
                 request_serializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysResponse.FromString,
                 )
+        self.DeleteArtifact = channel.unary_unary(
+                '/flyteidl2.artifact.ArtifactService/DeleteArtifact',
+                request_serializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactResponse.FromString,
+                )
 
 
 class ArtifactServiceServicer(object):
@@ -87,6 +92,17 @@ class ArtifactServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def DeleteArtifact(self, request, context):
+        """Delete one artifact version. The version is required and must be
+        explicit: the "latest" alias is rejected so a caller can never delete a
+        version other than the one it named. Returns NOT_FOUND when the version
+        does not exist. Deleting the last version removes the artifact name from
+        the listings. Offloaded data the value references is not touched.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ArtifactServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -114,6 +130,11 @@ def add_ArtifactServiceServicer_to_server(servicer, server):
                     servicer.ListArtifactMetadataKeys,
                     request_deserializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysRequest.FromString,
                     response_serializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysResponse.SerializeToString,
+            ),
+            'DeleteArtifact': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteArtifact,
+                    request_deserializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactRequest.FromString,
+                    response_serializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -209,5 +230,22 @@ class ArtifactService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.artifact.ArtifactService/ListArtifactMetadataKeys',
             flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysRequest.SerializeToString,
             flyteidl2_dot_artifact_dot_artifact__service__pb2.ListArtifactMetadataKeysResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def DeleteArtifact(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.artifact.ArtifactService/DeleteArtifact',
+            flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactRequest.SerializeToString,
+            flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
