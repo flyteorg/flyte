@@ -189,6 +189,15 @@ message AppSettings {
   // and the operator forces authentication on at reconcile time. This is the
   // org-level override of the per-app SecurityContext.allow_anonymous field.
   BoolSetting disallow_anonymous = 1 [(flyteidl2.settings.desc) = "Disallow anonymous (unauthenticated) access to apps org-wide"];
+
+  // Selects how an app's public URL is composed. Tokens:
+  //   "shared" (default, or any unrecognized/empty value) — one tenant-wide DNS
+  //     name for the app regardless of which data plane serves it (today's behavior).
+  //   "dataplane_specific" — a per-data-plane DNS name, so the same app can run on
+  //     more than one data plane at distinct URLs.
+  // "edge_proxy" is reserved for a future single-balanced-DNS strategy and is not
+  // yet a valid value. Unset delegates to the parent scope, then defaults to shared.
+  StringSetting app_dns_strategy = 2 [(flyteidl2.settings.desc) = "App public-URL DNS strategy: 'shared' (default) or 'dataplane_specific'"];
 }
 
 // Settings holds all configurable settings for a scope.
