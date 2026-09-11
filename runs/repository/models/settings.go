@@ -15,21 +15,11 @@ type Settings struct {
 	UpdatedAt time.Time `db:"updated_at"`
 }
 
-// DefaultOrg mirrors secret.DefaultOrganization; duplicated so runs/ doesn't
-// take a flyteplugins import for one constant.
-const DefaultOrg = "flyte"
-
-// NormalizeOrg returns DefaultOrg for an empty org, otherwise org unchanged.
-func NormalizeOrg(org string) string {
-	if org == "" {
-		return DefaultOrg
-	}
-	return org
-}
-
-// EncodeSettingsKey encodes a settings scope as "v1:{org}:{domain}:{project}".
-// Empty org is normalized to DefaultOrg; empty domain/project segments are
-// kept, so an instance-level key looks like "v1:flyte::".
-func EncodeSettingsKey(org, domain, project string) string {
-	return fmt.Sprintf("v1:%s:%s:%s", NormalizeOrg(org), domain, project)
+// EncodeSettingsKey encodes a settings scope as "v1::{domain}:{project}".
+// The org segment is always empty: OSS Flyte has no organization concept, so
+// settings are stored and looked up under the same key whatever org a client
+// sends. Empty domain/project segments are kept, so an instance-level key
+// looks like "v1:::".
+func EncodeSettingsKey(domain, project string) string {
+	return fmt.Sprintf("v1::%s:%s", domain, project)
 }

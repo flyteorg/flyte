@@ -109,7 +109,7 @@ func (s *SettingsService) CreateSettings(
 	}
 
 	model := &models.Settings{
-		Key:  models.EncodeSettingsKey(key.GetOrg(), key.GetDomain(), key.GetProject()),
+		Key:  models.EncodeSettingsKey(key.GetDomain(), key.GetProject()),
 		Data: data,
 	}
 
@@ -154,7 +154,7 @@ func (s *SettingsService) UpdateSettings(
 	}
 
 	model := &models.Settings{
-		Key:     models.EncodeSettingsKey(key.GetOrg(), key.GetDomain(), key.GetProject()),
+		Key:     models.EncodeSettingsKey(key.GetDomain(), key.GetProject()),
 		Data:    data,
 		Version: req.Msg.GetVersion(),
 	}
