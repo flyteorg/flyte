@@ -32,6 +32,28 @@ type Uploader struct {
 	errorFileName           string
 }
 
+// RawContainerError is the failure raised by the raw container
+type RawContainerError struct {
+	Document *core.ErrorDocument
+}
+
+func (e RawContainerError) Error() string {
+	return e.Document.GetError().GetMessage()
+}
+
+// readErrorDocument unmarshall the error file into flyte error document
+// The unmarshall will fail if it is not a flyte error
+func readErrorDocument(raw []byte) (*core.ErrorDocument, bool) {
+	document := &core.ErrorDocument{}
+	if err := proto.Unmarshal(raw, document); err != nil {
+		return nil, false
+	}
+	if document.GetError().GetCode() == "" && document.GetError().GetMessage() == "" {
+		return nil, false
+	}
+	return document, true
+}
+
 type dirFile struct {
 	path string
 	info os.FileInfo
@@ -123,6 +145,7 @@ func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, f
 	defer cancel()
 
 	errFile := path.Join(fromPath, u.errorFileName)
+	// TODO(alex): The error like info.Size() > 1024*1024 should be non-retriable too
 	if info, err := os.Stat(errFile); err != nil {
 		if !os.IsNotExist(err) {
 			return err
@@ -135,6 +158,9 @@ func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, f
 		b, err := os.ReadFile(errFile)
 		if err != nil {
 			return err
+		}
+		if document, ok := readErrorDocument(b); ok {
+			return RawContainerError{Document: document}
 		}
 		return errors.Errorf("User Error: %s", string(b))
 	}
