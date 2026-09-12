@@ -30,7 +30,7 @@ import (
 	pluginIOMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	plugink8s "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	k8smocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	clusteredpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
@@ -43,7 +43,7 @@ const (
 
 // buildTaskTemplate builds a TaskTemplate with the given ClusteredTaskSpec packed into Custom.
 func buildTaskTemplate(spec *clusteredpb.ClusteredTaskSpec) *core.TaskTemplate {
-	custom, err := utils.MarshalObjToStruct(spec) //nolint:staticcheck
+	custom, err := utils.MarshalObjToStruct(spec)
 	if err != nil {
 		panic(err)
 	}
