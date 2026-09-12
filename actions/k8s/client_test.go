@@ -350,6 +350,7 @@ func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
 				"owner": "sdk",
 			},
 		},
+		PodTemplateName: "gpu-template",
 	})
 
 	require.NotNil(t, taskAction.Spec.Interruptible)
@@ -359,6 +360,7 @@ func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
 	assert.Equal(t, "run1", taskAction.Labels["flyte.org/run"])
 	assert.Equal(t, "platform", taskAction.Labels["team"])
 	assert.Equal(t, "sdk", taskAction.Annotations["owner"])
+	assert.Equal(t, "gpu-template", taskAction.Spec.PodTemplateName)
 }
 
 func TestInheritRunContextFromParentTaskAction(t *testing.T) {
@@ -377,7 +379,8 @@ func TestInheritRunContextFromParentTaskAction(t *testing.T) {
 				"TRACE_ID": "abc123",
 				"TEAM":     "platform",
 			},
-			Interruptible: &interruptible,
+			Interruptible:   &interruptible,
+			PodTemplateName: "gpu-template",
 		},
 	}
 
@@ -398,6 +401,7 @@ func TestInheritRunContextFromParentTaskAction(t *testing.T) {
 	assert.Equal(t, "platform", child.Labels["team"])
 	assert.Equal(t, "run1", child.Labels["flyte.org/run"])
 	assert.Equal(t, "sdk", child.Annotations["owner"])
+	assert.Equal(t, "gpu-template", child.Spec.PodTemplateName)
 
 	// Verify deep copy (child mutation must not mutate parent map).
 	child.Spec.EnvVars["TRACE_ID"] = "mutated"
