@@ -1171,6 +1171,7 @@ func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction
 	taskAction.Spec.ShortName = taskSpec.Task.Spec.ShortName
 
 	tmpl = substituteRunStartTime(tmpl, runSpec.GetRunStartTime())
+	tmpl = applyPodTemplateName(tmpl, taskAction.Spec.PodTemplateName)
 
 	data, err := proto.Marshal(tmpl)
 	if err != nil {
@@ -1197,6 +1198,26 @@ func substituteRunStartTime(tmpl *core.TaskTemplate, ts *timestamppb.Timestamp) 
 	for i, arg := range args {
 		args[i] = strings.ReplaceAll(arg, runStartTimeTemplateVar, value)
 	}
+	return cloned
+}
+
+// applyPodTemplateName returns a TaskTemplate whose metadata names the given pod template.
+// It returns the input unchanged when the name is empty or the task already named one itself,
+// so an explicit choice always wins. The template is cloned before mutation so the caller's
+// proto - which may be persisted separately as the registered task spec - is not affected.
+func applyPodTemplateName(tmpl *core.TaskTemplate, name string) *core.TaskTemplate {
+	if name == "" {
+		return tmpl
+	}
+	if tmpl.GetMetadata().GetPodTemplateName() != "" {
+		return tmpl
+	}
+
+	cloned := proto.Clone(tmpl).(*core.TaskTemplate)
+	if cloned.Metadata == nil {
+		cloned.Metadata = &core.TaskMetadata{}
+	}
+	cloned.Metadata.PodTemplateName = name
 	return cloned
 }
 
