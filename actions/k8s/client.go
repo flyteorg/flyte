@@ -1047,10 +1047,12 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 	if runSpec == nil {
 		taskAction.Spec.EnvVars = nil
 		taskAction.Spec.Interruptible = nil
+		taskAction.Spec.PodTemplateName = ""
 		return
 	}
 
 	taskAction.Spec.EnvVars = keyValuePairsToMap(runSpec.GetEnvs().GetValues())
+	taskAction.Spec.PodTemplateName = runSpec.GetPodTemplateName()
 	if runSpec.GetInterruptible() != nil {
 		value := runSpec.GetInterruptible().GetValue()
 		taskAction.Spec.Interruptible = &value
@@ -1079,6 +1081,7 @@ func inheritRunContextFromParentTaskAction(taskAction *executorv1.TaskAction, pa
 		return
 	}
 	taskAction.Spec.EnvVars = cloneStringMap(parentTaskAction.Spec.EnvVars)
+	taskAction.Spec.PodTemplateName = parentTaskAction.Spec.PodTemplateName
 	if len(parentTaskAction.Annotations) > 0 {
 		if taskAction.Annotations == nil {
 			taskAction.Annotations = map[string]string{}
