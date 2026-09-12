@@ -86,7 +86,7 @@ class Recover(_message.Message):
     def __init__(self, force_rerun_actions: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class RunSpec(_message.Message):
-    __slots__ = ["labels", "annotations", "envs", "interruptible", "overwrite_cache", "queue", "raw_data_storage", "security_context", "cache_config", "notification_rule_name", "notification_rules", "run_start_time", "max_action_concurrency", "run_base_dir", "related_to", "cluster_pool", "task_spec_source", "relation", "recover"]
+    __slots__ = ["labels", "annotations", "envs", "interruptible", "overwrite_cache", "queue", "raw_data_storage", "security_context", "cache_config", "notification_rule_name", "notification_rules", "run_start_time", "max_action_concurrency", "run_base_dir", "related_to", "cluster_pool", "task_spec_source", "relation", "recover", "pod_template_name"]
     LABELS_FIELD_NUMBER: _ClassVar[int]
     ANNOTATIONS_FIELD_NUMBER: _ClassVar[int]
     ENVS_FIELD_NUMBER: _ClassVar[int]
@@ -106,6 +106,7 @@ class RunSpec(_message.Message):
     TASK_SPEC_SOURCE_FIELD_NUMBER: _ClassVar[int]
     RELATION_FIELD_NUMBER: _ClassVar[int]
     RECOVER_FIELD_NUMBER: _ClassVar[int]
+    POD_TEMPLATE_NAME_FIELD_NUMBER: _ClassVar[int]
     labels: Labels
     annotations: Annotations
     envs: Envs
@@ -125,7 +126,8 @@ class RunSpec(_message.Message):
     task_spec_source: TaskSpecSource
     relation: _run_pb2.Relation
     recover: Recover
-    def __init__(self, labels: _Optional[_Union[Labels, _Mapping]] = ..., annotations: _Optional[_Union[Annotations, _Mapping]] = ..., envs: _Optional[_Union[Envs, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., queue: _Optional[str] = ..., raw_data_storage: _Optional[_Union[RawDataStorage, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., cache_config: _Optional[_Union[CacheConfig, _Mapping]] = ..., notification_rule_name: _Optional[str] = ..., notification_rules: _Optional[_Union[InlineRuleList, _Mapping]] = ..., run_start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., max_action_concurrency: _Optional[int] = ..., run_base_dir: _Optional[str] = ..., related_to: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., cluster_pool: _Optional[str] = ..., task_spec_source: _Optional[_Union[TaskSpecSource, str]] = ..., relation: _Optional[_Union[_run_pb2.Relation, _Mapping]] = ..., recover: _Optional[_Union[Recover, _Mapping]] = ...) -> None: ...
+    pod_template_name: str
+    def __init__(self, labels: _Optional[_Union[Labels, _Mapping]] = ..., annotations: _Optional[_Union[Annotations, _Mapping]] = ..., envs: _Optional[_Union[Envs, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., queue: _Optional[str] = ..., raw_data_storage: _Optional[_Union[RawDataStorage, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., cache_config: _Optional[_Union[CacheConfig, _Mapping]] = ..., notification_rule_name: _Optional[str] = ..., notification_rules: _Optional[_Union[InlineRuleList, _Mapping]] = ..., run_start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., max_action_concurrency: _Optional[int] = ..., run_base_dir: _Optional[str] = ..., related_to: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., cluster_pool: _Optional[str] = ..., task_spec_source: _Optional[_Union[TaskSpecSource, str]] = ..., relation: _Optional[_Union[_run_pb2.Relation, _Mapping]] = ..., recover: _Optional[_Union[Recover, _Mapping]] = ..., pod_template_name: _Optional[str] = ...) -> None: ...
 
 class InlineRuleList(_message.Message):
     __slots__ = ["rules"]
