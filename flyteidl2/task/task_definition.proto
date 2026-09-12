@@ -45,6 +45,14 @@ message TaskName {
 
 // TaskIdentifier is the unique identifier for a task.
 message TaskIdentifier {
+  // Exactly one of `version` (an immutable literal) or `alias` (a mutable pointer
+  // resolved server-side) selects which task version this identifier addresses.
+  option (buf.validate.message).cel = {
+    id: "task_identifier.selector"
+    message: "exactly one of version or alias must be set"
+    expression: "(this.version != '') != (this.alias != '')"
+  };
+
   // Org this task belongs to.
   string org = 1 [
     (buf.validate.field).string.min_len = 1,
@@ -69,11 +77,14 @@ message TaskIdentifier {
     (buf.validate.field).string.max_len = 255
   ];
 
-  // Version of the task.
-  string version = 5 [
-    (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 63
-  ];
+  // Version of the task. Immutable once deployed. Mutually exclusive with `alias`;
+  // min_len is not enforced per-field because an alias-selected identifier leaves it unset.
+  string version = 5 [(buf.validate.field).string.max_len = 63];
+
+  // Alias selecting the task version, e.g. "prod". Mutable pointer to an immutable
+  // version, resolved server-side at Get/CreateRun time. Mutually exclusive with `version`.
+  // Lives in its own namespace, so an alias "prod" never collides with a version "prod".
+  string alias = 6 [(buf.validate.field).string.max_len = 63];
 }
 
 message TaskTriggersSummary {

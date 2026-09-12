@@ -19,10 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	TaskService_DeployTask_FullMethodName     = "/flyteidl2.task.TaskService/DeployTask"
-	TaskService_GetTaskDetails_FullMethodName = "/flyteidl2.task.TaskService/GetTaskDetails"
-	TaskService_ListTasks_FullMethodName      = "/flyteidl2.task.TaskService/ListTasks"
-	TaskService_ListVersions_FullMethodName   = "/flyteidl2.task.TaskService/ListVersions"
+	TaskService_DeployTask_FullMethodName          = "/flyteidl2.task.TaskService/DeployTask"
+	TaskService_GetTaskDetails_FullMethodName      = "/flyteidl2.task.TaskService/GetTaskDetails"
+	TaskService_ListTasks_FullMethodName           = "/flyteidl2.task.TaskService/ListTasks"
+	TaskService_ListVersions_FullMethodName        = "/flyteidl2.task.TaskService/ListVersions"
+	TaskService_SetTaskAlias_FullMethodName        = "/flyteidl2.task.TaskService/SetTaskAlias"
+	TaskService_GetTaskAlias_FullMethodName        = "/flyteidl2.task.TaskService/GetTaskAlias"
+	TaskService_ListTaskAliases_FullMethodName     = "/flyteidl2.task.TaskService/ListTaskAliases"
+	TaskService_DeleteTaskAlias_FullMethodName     = "/flyteidl2.task.TaskService/DeleteTaskAlias"
+	TaskService_GetTaskAliasHistory_FullMethodName = "/flyteidl2.task.TaskService/GetTaskAliasHistory"
 )
 
 // TaskServiceClient is the client API for TaskService service.
@@ -37,6 +42,19 @@ type TaskServiceClient interface {
 	ListTasks(ctx context.Context, in *ListTasksRequest, opts ...grpc.CallOption) (*ListTasksResponse, error)
 	// Lists all versions for a task.
 	ListVersions(ctx context.Context, in *ListVersionsRequest, opts ...grpc.CallOption) (*ListVersionsResponse, error)
+	// Create an alias, or move an existing one to a different version. This is the
+	// promote/rollback operation: deliberate, audited, and never a side effect of
+	// deploying. Carries its own authz action so "may promote, may not deploy" is
+	// expressible.
+	SetTaskAlias(ctx context.Context, in *SetTaskAliasRequest, opts ...grpc.CallOption) (*SetTaskAliasResponse, error)
+	// Resolve an alias to its current version, with who moved it there and when.
+	GetTaskAlias(ctx context.Context, in *GetTaskAliasRequest, opts ...grpc.CallOption) (*GetTaskAliasResponse, error)
+	// List every alias defined for a task.
+	ListTaskAliases(ctx context.Context, in *ListTaskAliasesRequest, opts ...grpc.CallOption) (*ListTaskAliasesResponse, error)
+	// Remove an alias. The versions it pointed at are unaffected.
+	DeleteTaskAlias(ctx context.Context, in *DeleteTaskAliasRequest, opts ...grpc.CallOption) (*DeleteTaskAliasResponse, error)
+	// Full move history for one alias: every from -> to, who, when.
+	GetTaskAliasHistory(ctx context.Context, in *GetTaskAliasHistoryRequest, opts ...grpc.CallOption) (*GetTaskAliasHistoryResponse, error)
 }
 
 type taskServiceClient struct {
@@ -83,6 +101,51 @@ func (c *taskServiceClient) ListVersions(ctx context.Context, in *ListVersionsRe
 	return out, nil
 }
 
+func (c *taskServiceClient) SetTaskAlias(ctx context.Context, in *SetTaskAliasRequest, opts ...grpc.CallOption) (*SetTaskAliasResponse, error) {
+	out := new(SetTaskAliasResponse)
+	err := c.cc.Invoke(ctx, TaskService_SetTaskAlias_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) GetTaskAlias(ctx context.Context, in *GetTaskAliasRequest, opts ...grpc.CallOption) (*GetTaskAliasResponse, error) {
+	out := new(GetTaskAliasResponse)
+	err := c.cc.Invoke(ctx, TaskService_GetTaskAlias_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) ListTaskAliases(ctx context.Context, in *ListTaskAliasesRequest, opts ...grpc.CallOption) (*ListTaskAliasesResponse, error) {
+	out := new(ListTaskAliasesResponse)
+	err := c.cc.Invoke(ctx, TaskService_ListTaskAliases_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) DeleteTaskAlias(ctx context.Context, in *DeleteTaskAliasRequest, opts ...grpc.CallOption) (*DeleteTaskAliasResponse, error) {
+	out := new(DeleteTaskAliasResponse)
+	err := c.cc.Invoke(ctx, TaskService_DeleteTaskAlias_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) GetTaskAliasHistory(ctx context.Context, in *GetTaskAliasHistoryRequest, opts ...grpc.CallOption) (*GetTaskAliasHistoryResponse, error) {
+	out := new(GetTaskAliasHistoryResponse)
+	err := c.cc.Invoke(ctx, TaskService_GetTaskAliasHistory_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TaskServiceServer is the server API for TaskService service.
 // All implementations should embed UnimplementedTaskServiceServer
 // for forward compatibility
@@ -95,6 +158,19 @@ type TaskServiceServer interface {
 	ListTasks(context.Context, *ListTasksRequest) (*ListTasksResponse, error)
 	// Lists all versions for a task.
 	ListVersions(context.Context, *ListVersionsRequest) (*ListVersionsResponse, error)
+	// Create an alias, or move an existing one to a different version. This is the
+	// promote/rollback operation: deliberate, audited, and never a side effect of
+	// deploying. Carries its own authz action so "may promote, may not deploy" is
+	// expressible.
+	SetTaskAlias(context.Context, *SetTaskAliasRequest) (*SetTaskAliasResponse, error)
+	// Resolve an alias to its current version, with who moved it there and when.
+	GetTaskAlias(context.Context, *GetTaskAliasRequest) (*GetTaskAliasResponse, error)
+	// List every alias defined for a task.
+	ListTaskAliases(context.Context, *ListTaskAliasesRequest) (*ListTaskAliasesResponse, error)
+	// Remove an alias. The versions it pointed at are unaffected.
+	DeleteTaskAlias(context.Context, *DeleteTaskAliasRequest) (*DeleteTaskAliasResponse, error)
+	// Full move history for one alias: every from -> to, who, when.
+	GetTaskAliasHistory(context.Context, *GetTaskAliasHistoryRequest) (*GetTaskAliasHistoryResponse, error)
 }
 
 // UnimplementedTaskServiceServer should be embedded to have forward compatible implementations.
@@ -112,6 +188,21 @@ func (UnimplementedTaskServiceServer) ListTasks(context.Context, *ListTasksReque
 }
 func (UnimplementedTaskServiceServer) ListVersions(context.Context, *ListVersionsRequest) (*ListVersionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListVersions not implemented")
+}
+func (UnimplementedTaskServiceServer) SetTaskAlias(context.Context, *SetTaskAliasRequest) (*SetTaskAliasResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetTaskAlias not implemented")
+}
+func (UnimplementedTaskServiceServer) GetTaskAlias(context.Context, *GetTaskAliasRequest) (*GetTaskAliasResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTaskAlias not implemented")
+}
+func (UnimplementedTaskServiceServer) ListTaskAliases(context.Context, *ListTaskAliasesRequest) (*ListTaskAliasesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTaskAliases not implemented")
+}
+func (UnimplementedTaskServiceServer) DeleteTaskAlias(context.Context, *DeleteTaskAliasRequest) (*DeleteTaskAliasResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteTaskAlias not implemented")
+}
+func (UnimplementedTaskServiceServer) GetTaskAliasHistory(context.Context, *GetTaskAliasHistoryRequest) (*GetTaskAliasHistoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTaskAliasHistory not implemented")
 }
 
 // UnsafeTaskServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -197,6 +288,96 @@ func _TaskService_ListVersions_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TaskService_SetTaskAlias_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetTaskAliasRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).SetTaskAlias(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_SetTaskAlias_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).SetTaskAlias(ctx, req.(*SetTaskAliasRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_GetTaskAlias_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTaskAliasRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).GetTaskAlias(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_GetTaskAlias_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).GetTaskAlias(ctx, req.(*GetTaskAliasRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_ListTaskAliases_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTaskAliasesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).ListTaskAliases(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_ListTaskAliases_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).ListTaskAliases(ctx, req.(*ListTaskAliasesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_DeleteTaskAlias_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteTaskAliasRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).DeleteTaskAlias(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_DeleteTaskAlias_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).DeleteTaskAlias(ctx, req.(*DeleteTaskAliasRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_GetTaskAliasHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTaskAliasHistoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).GetTaskAliasHistory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_GetTaskAliasHistory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).GetTaskAliasHistory(ctx, req.(*GetTaskAliasHistoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TaskService_ServiceDesc is the grpc.ServiceDesc for TaskService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -219,6 +400,26 @@ var TaskService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListVersions",
 			Handler:    _TaskService_ListVersions_Handler,
+		},
+		{
+			MethodName: "SetTaskAlias",
+			Handler:    _TaskService_SetTaskAlias_Handler,
+		},
+		{
+			MethodName: "GetTaskAlias",
+			Handler:    _TaskService_GetTaskAlias_Handler,
+		},
+		{
+			MethodName: "ListTaskAliases",
+			Handler:    _TaskService_ListTaskAliases_Handler,
+		},
+		{
+			MethodName: "DeleteTaskAlias",
+			Handler:    _TaskService_DeleteTaskAlias_Handler,
+		},
+		{
+			MethodName: "GetTaskAliasHistory",
+			Handler:    _TaskService_GetTaskAliasHistory_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
