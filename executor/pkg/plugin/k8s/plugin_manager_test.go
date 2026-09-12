@@ -466,7 +466,7 @@ func TestClassifyGpuFailure(t *testing.T) {
 			pm := NewPluginManager("test-plugin", nil, nil)
 			pm.eventWatcher = watcher
 
-			got := pm.classifyGpuFailure(failedPod(), tt.phaseInfo)
+			got := pm.classifyGpuFailure(context.Background(), nil, failedPod(), tt.phaseInfo)
 
 			assert.Equal(t, tt.wantPhase, got.Phase())
 			require.NotNil(t, got.Err())
@@ -497,7 +497,7 @@ func TestClassifyGpuFailureRelevanceIsAnchoredOnTheFailure(t *testing.T) {
 		}}
 		pm := NewPluginManager("test-plugin", nil, nil)
 		pm.eventWatcher = watcher
-		got := pm.classifyGpuFailure(failedPod(), phase)
+		got := pm.classifyGpuFailure(context.Background(), nil, failedPod(), phase)
 		assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
 	})
 
@@ -508,7 +508,7 @@ func TestClassifyGpuFailureRelevanceIsAnchoredOnTheFailure(t *testing.T) {
 		}}
 		pm := NewPluginManager("test-plugin", nil, nil)
 		pm.eventWatcher = watcher
-		got := pm.classifyGpuFailure(failedPod(), phase)
+		got := pm.classifyGpuFailure(context.Background(), nil, failedPod(), phase)
 		assert.Equal(t, "UnknownError", got.Err().GetCode())
 		assert.Nil(t, got.Err().GetGpuFault())
 	})
@@ -531,7 +531,7 @@ func TestClassifyGpuFailureRelevanceIsAnInterval(t *testing.T) {
 		}}
 		pm := NewPluginManager("test-plugin", nil, nil)
 		pm.eventWatcher = watcher
-		return pm.classifyGpuFailure(failedPod(), phase)
+		return pm.classifyGpuFailure(context.Background(), nil, failedPod(), phase)
 	}
 
 	t.Run("a fault that started before the failure and kept firing after it explains it", func(t *testing.T) {
@@ -639,7 +639,7 @@ func TestClassifyGpuFailureAnchorsOnThePodNotItsStartTime(t *testing.T) {
 	pm := NewPluginManager("test-plugin", nil, nil)
 	pm.eventWatcher = watcher
 
-	got := pm.classifyGpuFailure(pod, phase)
+	got := pm.classifyGpuFailure(context.Background(), nil, pod, phase)
 
 	assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
 	assert.Equal(t, core.ExecutionError_SYSTEM, got.Err().GetKind())
@@ -657,7 +657,7 @@ func TestClassifyGpuFailureIdentity(t *testing.T) {
 		}}
 		pm := NewPluginManager("test-plugin", nil, nil)
 		pm.eventWatcher = watcher
-		got := pm.classifyGpuFailure(failedPod(), phase)
+		got := pm.classifyGpuFailure(context.Background(), nil, failedPod(), phase)
 		assert.Nil(t, got.Err().GetGpuFault())
 		assert.Equal(t, "UnknownError", got.Err().GetCode())
 	})
@@ -673,7 +673,7 @@ func TestClassifyGpuFailureIdentity(t *testing.T) {
 		pm.eventWatcher = watcher
 		pod := failedPod()
 		pod.UID = ""
-		got := pm.classifyGpuFailure(pod, phase)
+		got := pm.classifyGpuFailure(context.Background(), nil, pod, phase)
 		assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
 		assert.NotNil(t, got.Err().GetGpuFault())
 	})
@@ -701,14 +701,6 @@ func TestClassifyGpuFailureSkips(t *testing.T) {
 			phaseInfo: pluginsCore.PhaseInfoSuccess(nil),
 		},
 		{
-			name: "the resource is not a pod",
-			resource: &v1.Service{
-				TypeMeta:   metav1.TypeMeta{Kind: "Pod", APIVersion: "v1"},
-				ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "pod"},
-			},
-			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("UnknownError", "Pod failed", nil),
-		},
-		{
 			name:      "there is no event watcher",
 			resource:  failedPod(),
 			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("UnknownError", "Pod failed", nil),
@@ -728,7 +720,7 @@ func TestClassifyGpuFailureSkips(t *testing.T) {
 				pm.eventWatcher = &fakeEventWatcher{events: events}
 			}
 
-			got := pm.classifyGpuFailure(tt.resource, tt.phaseInfo)
+			got := pm.classifyGpuFailure(context.Background(), nil, tt.resource, tt.phaseInfo)
 
 			assert.Equal(t, tt.phaseInfo.Phase(), got.Phase())
 			if tt.phaseInfo.Err() != nil {

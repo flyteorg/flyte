@@ -69,6 +69,12 @@ func dummyTaskCtx(taskTemplate *core.TaskTemplate) *coreMocks.TaskExecutionConte
 // dummyTaskCtxWithGeneratedName is dummyTaskCtx with a caller-supplied generated name, used to
 // exercise the long composed/nested-name truncation path.
 func dummyTaskCtxWithGeneratedName(taskTemplate *core.TaskTemplate, generatedName string) *coreMocks.TaskExecutionContext {
+	return dummyTaskCtxWithLabels(taskTemplate, generatedName, map[string]string{"execution-id": "my-exec", "node-id": "n1"})
+}
+
+// dummyTaskCtxWithLabels is dummyTaskCtxWithGeneratedName with caller-supplied execution
+// labels, used to exercise the attempt identity the framework finds child pods by.
+func dummyTaskCtxWithLabels(taskTemplate *core.TaskTemplate, generatedName string, executionLabels map[string]string) *coreMocks.TaskExecutionContext {
 	taskCtx := &coreMocks.TaskExecutionContext{}
 
 	inputReader := &pluginIOMocks.InputReader{}
@@ -121,7 +127,7 @@ func dummyTaskCtxWithGeneratedName(taskTemplate *core.TaskTemplate, generatedNam
 	meta.EXPECT().GetTaskExecutionID().Return(tID)
 	meta.EXPECT().GetNamespace().Return(testNS)
 	meta.EXPECT().GetAnnotations().Return(map[string]string{"flyte.org/test-annotation": "av"})
-	meta.EXPECT().GetLabels().Return(map[string]string{"execution-id": "my-exec", "node-id": "n1"})
+	meta.EXPECT().GetLabels().Return(executionLabels)
 	meta.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{Kind: "node", Name: "n1"})
 	meta.EXPECT().IsInterruptible().Return(false)
 	meta.EXPECT().GetOverrides().Return(overrides)

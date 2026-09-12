@@ -119,6 +119,10 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 }
 
 func dummyRayTaskContextInterruptible(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage, serviceAccount string, interruptible bool) pluginsCore.TaskExecutionContext {
+	return dummyRayTaskContextWithLabels(taskTemplate, resources, extendedResources, containerImage, serviceAccount, interruptible, map[string]string{"label-1": "val1"})
+}
+
+func dummyRayTaskContextWithLabels(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage, serviceAccount string, interruptible bool, executionLabels map[string]string) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
@@ -160,7 +164,7 @@ func dummyRayTaskContextInterruptible(taskTemplate *core.TaskTemplate, resources
 	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
 	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
 	taskExecutionMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
-	taskExecutionMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetLabels().Return(executionLabels)
 	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",

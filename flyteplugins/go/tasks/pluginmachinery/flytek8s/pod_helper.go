@@ -16,6 +16,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -71,6 +72,90 @@ const (
 	ManagedLabelKey   = "flyte.org/managed"
 	ManagedLabelValue = "true"
 )
+
+// Labels identifying which attempt of which action a Pod belongs to. They are stamped on
+// every task's execution metadata and every plugin merges that metadata into the Pod
+// templates it builds, so an operator that expands one of those templates carries them
+// onto the Pods it creates. They live here for the same reason ManagedLabelKey does: the
+// plugins that build Pod templates have to keep them intact, and the framework has to be
+// able to select on them afterwards.
+//
+// They are bare names, matching the project/domain/organization labels already injected,
+// which kube-state-metrics surfaces as label_run, label_action and label_attempt.
+const (
+	// RunLabel carries the name of the run that owns the action.
+	RunLabel = "run"
+	// ActionLabel carries the name of the action the pod is executing.
+	ActionLabel = "action"
+	// AttemptLabel carries the 1-based attempt number, so the pods of a retried action
+	// can be told apart from the pods of its earlier attempts.
+	AttemptLabel = "attempt"
+	// TaskNameLabel carries the registered task name from the task template.
+	TaskNameLabel = "task-name"
+)
+
+// attemptPodLabelKeys are the labels that together identify one attempt of one action.
+// All of them have to be present for a selector to be exact.
+var attemptPodLabelKeys = []string{ManagedLabelKey, RunLabel, ActionLabel, AttemptLabel}
+
+// AttemptIdentityLabels returns the subset of the task's execution labels that identifies
+// this attempt of this action, or nil when any of them is missing.
+//
+// A plugin that lets a user supply their own labels for the Pod templates it builds has to
+// re-apply these last, the way it already re-applies the managed label: a user label named
+// run, action or attempt would otherwise overwrite the identity, and a Pod whose identity
+// has been overwritten is one AttemptPodSelector cannot find. The selector is built from
+// the same key set, so the two can never disagree about which labels have to survive.
+func AttemptIdentityLabels(taskCtx pluginsCore.TaskExecutionMetadata) map[string]string {
+	if taskCtx == nil {
+		return nil
+	}
+
+	podLabels := taskCtx.GetLabels()
+	identity := make(map[string]string, len(attemptPodLabelKeys))
+	for _, key := range attemptPodLabelKeys {
+		value, ok := podLabels[key]
+		if !ok || value == "" {
+			return nil
+		}
+		identity[key] = value
+	}
+
+	return identity
+}
+
+// PreservedPodLabels are the labels a plugin must apply last to every Pod template it
+// builds, after any labels the user supplied, so that nothing a user writes can take the
+// Pod out of the executor's reach. That is the managed label, which the Pod cache selects
+// on, together with the attempt identity the framework looks a Pod up by.
+//
+// The managed label is always present. The identity labels are present whenever the task
+// carries a complete one, which is the same condition under which AttemptPodSelector will
+// go looking for them.
+func PreservedPodLabels(taskCtx pluginsCore.TaskExecutionMetadata) map[string]string {
+	preserved := map[string]string{ManagedLabelKey: ManagedLabelValue}
+	for key, value := range AttemptIdentityLabels(taskCtx) {
+		preserved[key] = value
+	}
+	return preserved
+}
+
+// AttemptPodSelector selects the Pods belonging to this attempt of this action, including
+// the ones an operator expanded from a Pod template a plugin built. It matches only on the
+// labels the framework stamps, so it holds whichever operator created the Pod.
+//
+// It returns nil when any of those labels is missing from the task's execution metadata.
+// The run and action labels go through sanitization and are dropped when nothing survives
+// it, and a selector missing one of them would match another action's Pods, so refusing to
+// select anything is the only safe answer.
+func AttemptPodSelector(taskCtx pluginsCore.TaskExecutionMetadata) labels.Selector {
+	identity := AttemptIdentityLabels(taskCtx)
+	if identity == nil {
+		return nil
+	}
+
+	return labels.SelectorFromValidatedSet(labels.Set(identity))
+}
 
 var migPartitionRegexp = regexp.MustCompile(`^(\d+)g\.\d+gb$`)
 
