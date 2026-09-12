@@ -36,10 +36,20 @@ type actionRepo struct {
 	actionSubscribers map[chan string]bool
 	mu                sync.RWMutex
 
-	// Dedicated channels for async NOTIFY to avoid pool contention
-	actionNotifyCh chan string
-	runNotifyCh    chan string
+	notifyMu           sync.Mutex
+	pendingActions     map[string]struct{}
+	pendingActionQueue []string
+	pendingRuns        map[string]struct{}
+	pendingRunQueue    []string
+	pendingCh          chan struct{}
 }
+
+const (
+	notificationBufferLimit     = 65_000
+	pendingNotificationCapacity = 256
+	notifyRetryMinBackoff       = 50 * time.Millisecond
+	notifyRetryMaxBackoff       = 5 * time.Second
+)
 
 // NewActionRepo creates a new PostgreSQL repository
 func NewActionRepo(db *sqlx.DB, dbConfig database.DbConfig) (interfaces.ActionRepo, error) {
@@ -51,8 +61,11 @@ func NewActionRepo(db *sqlx.DB, dbConfig database.DbConfig) (interfaces.ActionRe
 		actionSubscribers: make(map[chan string]bool),
 	}
 
-	repo.actionNotifyCh = make(chan string, 256)
-	repo.runNotifyCh = make(chan string, 256)
+	repo.pendingActions = make(map[string]struct{}, pendingNotificationCapacity)
+	repo.pendingActionQueue = make([]string, 0, pendingNotificationCapacity)
+	repo.pendingRuns = make(map[string]struct{}, pendingNotificationCapacity)
+	repo.pendingRunQueue = make([]string, 0, pendingNotificationCapacity)
+	repo.pendingCh = make(chan struct{}, 1)
 
 	if err := repo.startPostgresListener(); err != nil {
 		return nil, fmt.Errorf("failed to start postgres listener: %w", err)
@@ -956,16 +969,75 @@ func (r *actionRepo) processNotifications() {
 	}
 }
 
-// notifyRunUpdate sends a notification about a run update via the
-// dedicated notify channel, avoiding connection pool contention.
-func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdentifier) {
+func (r *actionRepo) notifyRunUpdate(_ context.Context, runID *common.RunIdentifier) {
 	payload := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
+	r.markRunPending(payload)
+}
 
+func (r *actionRepo) markRunPending(payload string) {
+	r.notifyMu.Lock()
+	enqueuePending(r.pendingRuns, &r.pendingRunQueue, payload, notificationBufferLimit)
+	r.notifyMu.Unlock()
+	r.signalPending()
+}
+
+func (r *actionRepo) signalPending() {
 	select {
-	case r.runNotifyCh <- payload:
-	case <-ctx.Done():
-		logger.Warnf(ctx, "Run NOTIFY send cancelled for %s: %v", payload, ctx.Err())
+	case r.pendingCh <- struct{}{}:
+	default:
 	}
+}
+
+func (r *actionRepo) takePendingNotifications() (actions, runs []string) {
+	r.notifyMu.Lock()
+	defer r.notifyMu.Unlock()
+
+	actions, runs = r.pendingActionQueue, r.pendingRunQueue
+	r.pendingActions = make(map[string]struct{}, pendingNotificationCapacity)
+	r.pendingActionQueue = make([]string, 0, pendingNotificationCapacity)
+	r.pendingRuns = make(map[string]struct{}, pendingNotificationCapacity)
+	r.pendingRunQueue = make([]string, 0, pendingNotificationCapacity)
+	return actions, runs
+}
+
+func (r *actionRepo) mergePendingActions(actions []string) {
+	if len(actions) == 0 {
+		return
+	}
+	r.notifyMu.Lock()
+	r.pendingActions, r.pendingActionQueue = mergePending(actions, r.pendingActionQueue)
+	r.notifyMu.Unlock()
+}
+
+func (r *actionRepo) mergePendingRuns(runs []string) {
+	if len(runs) == 0 {
+		return
+	}
+	r.notifyMu.Lock()
+	r.pendingRuns, r.pendingRunQueue = mergePending(runs, r.pendingRunQueue)
+	r.notifyMu.Unlock()
+}
+
+func mergePending(retry, queued []string) (map[string]struct{}, []string) {
+	pending := make(map[string]struct{}, len(retry)+len(queued))
+	queue := make([]string, 0, len(retry)+len(queued))
+	for _, payload := range append(retry, queued...) {
+		enqueuePending(pending, &queue, payload, notificationBufferLimit)
+	}
+	return pending, queue
+}
+
+func enqueuePending(pending map[string]struct{}, queue *[]string, payload string, limit int) {
+	if _, exists := pending[payload]; exists {
+		return
+	}
+	if len(pending) >= limit {
+		delete(pending, (*queue)[0])
+		(*queue)[0] = ""
+		*queue = (*queue)[1:]
+	}
+	pending[payload] = struct{}{}
+	*queue = append(*queue, payload)
 }
 
 // ListRootActions lists root actions (runs) matching scope and date filters.
@@ -1021,7 +1093,7 @@ func (r *actionRepo) startNotifyLoop() error {
 		return fmt.Errorf("acquire dedicated NOTIFY connection: %w", err)
 	}
 
-	go r.runNotifyLoop(sqlDB, conn)
+	go r.runNotifyLoop(context.Background(), sqlDB, conn)
 	return nil
 }
 
@@ -1042,10 +1114,7 @@ func isConnError(err error) bool {
 	return false
 }
 
-// runNotifyLoop processes notify channels using the given connection.
-// On connection errors it attempts to reconnect; if reconnection fails
-// the error is logged and the notification is skipped.
-func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
+func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql.Conn) {
 	defer func() {
 		if conn != nil {
 			conn.Close() //nolint:errcheck
@@ -1061,69 +1130,82 @@ func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
 			return
 		}
 		var err error
-		conn, err = sqlDB.Conn(context.Background())
+		conn, err = sqlDB.Conn(ctx)
 		if err != nil {
-			logger.Errorf(context.Background(), "Failed to re-acquire NOTIFY connection: %v", err)
+			logger.Errorf(ctx, "Failed to re-acquire NOTIFY connection: %v", err)
 			conn = nil
 		}
 	}
 
-	execNotify := func(channel, payload string) {
+	execNotify := func(channel, payload string) bool {
 		if conn == nil {
 			reconnect()
 		}
 		if conn == nil {
-			logger.Errorf(context.Background(), "No NOTIFY connection available, dropping %s notification", channel)
-			return
+			logger.Errorf(ctx, "No NOTIFY connection available, keeping %s notification pending", channel)
+			return false
 		}
-		if _, err := conn.ExecContext(context.Background(), "SELECT pg_notify($1, $2)", channel, payload); err != nil {
-			logger.Errorf(context.Background(), "Failed to NOTIFY %s: %v", channel, err)
+		if _, err := conn.ExecContext(ctx, "SELECT pg_notify($1, $2)", channel, payload); err != nil {
+			logger.Errorf(ctx, "Failed to NOTIFY %s: %v", channel, err)
 			if isConnError(err) {
 				reconnect()
 			}
+			return false
 		}
+		return true
 	}
 
-	drainAndExec := func(channel, firstPayload string, ch <-chan string) {
-		execNotify(channel, firstPayload)
-		for {
-			select {
-			case payload, ok := <-ch:
-				if !ok {
-					return
-				}
-				execNotify(channel, payload)
-			default:
-				return
+	emit := func(channel string, payloads []string) []string {
+		for i, payload := range payloads {
+			if !execNotify(channel, payload) {
+				return payloads[i:]
 			}
 		}
+		return nil
 	}
 
+	backoff := notifyRetryMinBackoff
 	for {
 		select {
-		case payload, ok := <-r.actionNotifyCh:
-			if !ok {
-				return
-			}
-			drainAndExec("action_updates", payload, r.actionNotifyCh)
-		case payload, ok := <-r.runNotifyCh:
-			if !ok {
-				return
-			}
-			drainAndExec("run_updates", payload, r.runNotifyCh)
+		case <-ctx.Done():
+			return
+		case <-r.pendingCh:
+		}
+
+		actions, runs := r.takePendingNotifications()
+		retryActions := emit("action_updates", actions)
+		retryRuns := emit("run_updates", runs)
+
+		if len(retryActions) == 0 && len(retryRuns) == 0 {
+			backoff = notifyRetryMinBackoff
+			continue
+		}
+
+		r.mergePendingActions(retryActions)
+		r.mergePendingRuns(retryRuns)
+		r.signalPending()
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(backoff):
+		}
+		backoff *= 2
+		if backoff > notifyRetryMaxBackoff {
+			backoff = notifyRetryMaxBackoff
 		}
 	}
 }
 
-// notifyActionUpdate sends a notification about an action update via the
-// dedicated notify channel, avoiding connection pool contention.
-func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.ActionIdentifier) {
+func (r *actionRepo) notifyActionUpdate(_ context.Context, actionID *common.ActionIdentifier) {
 	payload := fmt.Sprintf("%s/%s/%s/%s",
 		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 
-	select {
-	case r.actionNotifyCh <- payload:
-	case <-ctx.Done():
-		logger.Errorf(ctx, "Action NOTIFY send cancelled for %s: %v", payload, ctx.Err())
-	}
+	r.markActionPending(payload)
+}
+
+func (r *actionRepo) markActionPending(payload string) {
+	r.notifyMu.Lock()
+	enqueuePending(r.pendingActions, &r.pendingActionQueue, payload, notificationBufferLimit)
+	r.notifyMu.Unlock()
+	r.signalPending()
 }
