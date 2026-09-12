@@ -30,7 +30,7 @@ import (
 	pluginIOMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	plugink8s "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	k8smocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	clusteredpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
@@ -43,7 +43,7 @@ const (
 
 // buildTaskTemplate builds a TaskTemplate with the given ClusteredTaskSpec packed into Custom.
 func buildTaskTemplate(spec *clusteredpb.ClusteredTaskSpec) *core.TaskTemplate {
-	custom, err := utils.MarshalObjToStruct(spec) //nolint:staticcheck
+	custom, err := utils.MarshalObjToStruct(spec)
 	if err != nil {
 		panic(err)
 	}
@@ -62,13 +62,13 @@ func buildTaskTemplate(spec *clusteredpb.ClusteredTaskSpec) *core.TaskTemplate {
 }
 
 // dummyTaskCtx builds a minimal task execution context suitable for BuildResource tests.
-func dummyTaskCtx(taskTemplate *core.TaskTemplate) *coreMocks.TaskExecutionContext {
-	return dummyTaskCtxWithGeneratedName(taskTemplate, testJobName)
+func dummyTaskCtx(taskTemplate *core.TaskTemplate, podTemplate *core.K8SPod) *coreMocks.TaskExecutionContext {
+	return dummyTaskCtxWithGeneratedName(taskTemplate, testJobName, podTemplate)
 }
 
 // dummyTaskCtxWithGeneratedName is dummyTaskCtx with a caller-supplied generated name, used to
 // exercise the long composed/nested-name truncation path.
-func dummyTaskCtxWithGeneratedName(taskTemplate *core.TaskTemplate, generatedName string) *coreMocks.TaskExecutionContext {
+func dummyTaskCtxWithGeneratedName(taskTemplate *core.TaskTemplate, generatedName string, podTemplate *core.K8SPod) *coreMocks.TaskExecutionContext {
 	taskCtx := &coreMocks.TaskExecutionContext{}
 
 	inputReader := &pluginIOMocks.InputReader{}
@@ -115,7 +115,7 @@ func dummyTaskCtxWithGeneratedName(taskTemplate *core.TaskTemplate, generatedNam
 	})
 	overrides.EXPECT().GetExtendedResources().Return(nil)
 	overrides.EXPECT().GetContainerImage().Return("")
-	overrides.EXPECT().GetPodTemplate().Return(nil)
+	overrides.EXPECT().GetPodTemplate().Return(podTemplate)
 
 	meta := &coreMocks.TaskExecutionMetadata{}
 	meta.EXPECT().GetTaskExecutionID().Return(tID)
@@ -151,7 +151,7 @@ func TestBuildResource_HappyPath(t *testing.T) {
 		FailurePolicy: &clusteredpb.ClusterFailurePolicy{MaxRestarts: 3},
 	}
 	taskTemplate := buildTaskTemplate(spec)
-	taskCtx := dummyTaskCtx(taskTemplate)
+	taskCtx := dummyTaskCtx(taskTemplate, nil)
 
 	handler := clusteredResourceHandler{}
 	obj, err := handler.BuildResource(context.Background(), taskCtx)
@@ -187,6 +187,66 @@ func TestBuildResource_HappyPath(t *testing.T) {
 	assert.Equal(t, "av", podMeta.Annotations["flyte.org/test-annotation"])
 }
 
+func TestBuildResource_PropagatesPodTemplateMetadataToJobSet(t *testing.T) {
+	spec := &clusteredpb.ClusteredTaskSpec{
+		Replicas:     2,
+		NprocPerNode: 1,
+		Runtime: &clusteredpb.Runtime{
+			Kind: &clusteredpb.Runtime_Torchrun{
+				Torchrun: &clusteredpb.TorchRuntime{},
+			},
+		},
+	}
+
+	podSpec, err := utils.MarshalObjToStruct(corev1.PodSpec{
+		Containers: []corev1.Container{
+			{
+				Name:  "primary",
+				Image: testImage,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	podTemplate := &core.K8SPod{
+		Metadata: &core.K8SObjectMetadata{
+			Labels: map[string]string{
+				"kueue.x-k8s.io/queue-name": "test-queue",
+				"flyte.org/execution":       "user-provided",
+			},
+			Annotations: map[string]string{
+				"example.org/custom":       "value",
+				"flyte.org/task-type":      "user-provided",
+				primaryContainerAnnotation: "user-provided",
+			},
+		},
+		PodSpec:              podSpec,
+		PrimaryContainerName: "primary",
+	}
+	taskCtx := dummyTaskCtx(buildTaskTemplate(spec), podTemplate)
+
+	obj, err := clusteredResourceHandler{}.BuildResource(context.Background(), taskCtx)
+	require.NoError(t, err)
+
+	jobSet, ok := obj.(*jobsetv1alpha2.JobSet)
+	require.True(t, ok, "expected *JobSet")
+
+	podMeta := jobSet.Spec.ReplicatedJobs[0].Template.Spec.Template.ObjectMeta
+
+	// Confirm the fixture reached the existing child pod-template path.
+	assert.Equal(t, "test-queue", podMeta.Labels["kueue.x-k8s.io/queue-name"])
+	assert.Equal(t, "value", podMeta.Annotations["example.org/custom"])
+
+	// The same metadata must be available to controllers watching the parent JobSet.
+	assert.Equal(t, "test-queue", jobSet.Labels["kueue.x-k8s.io/queue-name"])
+	assert.Equal(t, "value", jobSet.Annotations["example.org/custom"])
+
+	// Flyte-owned parent metadata must take precedence over user-provided values.
+	assert.Equal(t, "my-exec", jobSet.Labels["flyte.org/execution"])
+	assert.Equal(t, taskType, jobSet.Annotations["flyte.org/task-type"])
+	assert.Equal(t, "primary", jobSet.Annotations[primaryContainerAnnotation])
+}
+
 func TestBuildResource_PrimaryContainerPreserved(t *testing.T) {
 	// The plugin no longer rewrites container.Command — the SDK does that at
 	// serde time (design §3.2 / §3.8). Here we assert the plugin passes the
@@ -202,7 +262,7 @@ func TestBuildResource_PrimaryContainerPreserved(t *testing.T) {
 		},
 	}
 	taskTemplate := buildTaskTemplate(spec)
-	taskCtx := dummyTaskCtx(taskTemplate)
+	taskCtx := dummyTaskCtx(taskTemplate, nil)
 
 	handler := clusteredResourceHandler{}
 	obj, err := handler.BuildResource(context.Background(), taskCtx)
@@ -229,7 +289,7 @@ func TestBuildResource_HostMaintenance(t *testing.T) {
 		FailurePolicy: &clusteredpb.ClusterFailurePolicy{MaxRestarts: 1, RestartOnHostMaintenance: true},
 	}
 	taskTemplate := buildTaskTemplate(spec)
-	taskCtx := dummyTaskCtx(taskTemplate)
+	taskCtx := dummyTaskCtx(taskTemplate, nil)
 
 	handler := clusteredResourceHandler{}
 	obj, err := handler.BuildResource(context.Background(), taskCtx)
@@ -1175,7 +1235,7 @@ func TestBuildResource_NameMatchesManagerStamp(t *testing.T) {
 			},
 		},
 	}
-	taskCtx := dummyTaskCtxWithGeneratedName(buildTaskTemplate(spec), longGeneratedName)
+	taskCtx := dummyTaskCtxWithGeneratedName(buildTaskTemplate(spec), longGeneratedName, nil)
 	handler := clusteredResourceHandler{}
 
 	created, err := handler.BuildResource(context.Background(), taskCtx)
@@ -1206,7 +1266,7 @@ func TestBuildResource_ReplicasExceedNamingBudget(t *testing.T) {
 			Kind: &clusteredpb.Runtime_Torchrun{Torchrun: &clusteredpb.TorchRuntime{}},
 		},
 	}
-	taskCtx := dummyTaskCtx(buildTaskTemplate(spec))
+	taskCtx := dummyTaskCtx(buildTaskTemplate(spec), nil)
 	handler := clusteredResourceHandler{}
 
 	_, err := handler.BuildResource(context.Background(), taskCtx)

@@ -143,13 +143,13 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      jobSetName,
 			Namespace: taskCtx.TaskExecutionMetadata().GetNamespace(),
-			Labels: map[string]string{
+			Labels: utils.UnionMaps(objectMeta.Labels, map[string]string{
 				"flyte.org/execution": sanitizeLabelValue(taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().GetNodeExecutionId().GetExecutionId().GetName()),
-			},
-			Annotations: map[string]string{
+			}),
+			Annotations: utils.UnionMaps(objectMeta.Annotations, map[string]string{
 				"flyte.org/task-type":      taskType,
 				primaryContainerAnnotation: primaryContainerName,
-			},
+			}),
 		},
 		Spec: jobsetv1alpha2.JobSetSpec{
 			Network: &jobsetv1alpha2.Network{
