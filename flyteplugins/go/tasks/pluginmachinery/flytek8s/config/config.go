@@ -69,6 +69,7 @@ var (
 		GpuResourceName:           ResourceNvidiaGPU,
 		AcceleratorDevices: map[string]string{
 			// NVIDIA GPUs
+			"A2":            "nvidia-a2",
 			"A10":           "nvidia-a10",
 			"A10G":          "nvidia-a10g",
 			"A100":          "nvidia-tesla-a100",
