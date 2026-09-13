@@ -37,6 +37,20 @@ var testDbConfig = database.DbConfig{
 	},
 }
 
+var testNotificationConfig = NewNotificationConfig(
+	notificationBufferLimit,
+	notifyRetryMinBackoff,
+	notifyRetryMaxBackoff,
+)
+
+func newTestActionRepo(db *sqlx.DB, dbConfig database.DbConfig) (interfaces.ActionRepo, error) {
+	return NewActionRepo(
+		db,
+		dbConfig,
+		testNotificationConfig,
+	)
+}
+
 func setupActionDB(t *testing.T) *sqlx.DB {
 	db := setupDB(t)
 	t.Cleanup(func() {
@@ -49,7 +63,7 @@ func setupActionDB(t *testing.T) *sqlx.DB {
 func TestCreateRun(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -88,7 +102,7 @@ func TestCreateRun(t *testing.T) {
 func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -131,7 +145,7 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 func TestUpdateActionPhase_StartTimeCorrectsDuration(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -163,7 +177,7 @@ func TestUpdateActionPhase_StartTimeCorrectsDuration(t *testing.T) {
 func TestUpdateActionPhase_NilStartTimeUsesCreatedAt(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -188,7 +202,7 @@ func TestUpdateActionPhase_NilStartTimeUsesCreatedAt(t *testing.T) {
 func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	repo, err := NewActionRepo(db, testDbConfig)
+	repo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	repoImpl := repo.(*actionRepo)
 
@@ -260,7 +274,7 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -304,7 +318,7 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -342,7 +356,7 @@ func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -381,7 +395,7 @@ func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 func TestListRuns(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -457,7 +471,7 @@ func TestListRuns(t *testing.T) {
 func TestListRuns_HasPausedActionFilter(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -548,7 +562,7 @@ func TestListRuns_SearchFilter(t *testing.T) {
 func TestListActions_KeysetPagination(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -630,7 +644,7 @@ func TestListActions_KeysetPagination(t *testing.T) {
 func TestListActions_OffsetPagination(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -689,7 +703,7 @@ func TestListActions_OffsetPagination(t *testing.T) {
 func TestListActions_OffsetPaginationClientSortTiedCreatedAt(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -732,7 +746,7 @@ func TestListActions_OffsetPaginationClientSortTiedCreatedAt(t *testing.T) {
 
 func setupActionEventDB(t *testing.T) (*sqlx.DB, *actionRepo) {
 	db := setupActionDB(t)
-	r, err := NewActionRepo(db, testDbConfig)
+	r, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	repo := r.(*actionRepo)
 	return db, repo
@@ -972,6 +986,88 @@ func TestEnqueuePending_EvictsOldestPayload(t *testing.T) {
 	assert.Equal(t, []string{"second", "third"}, queue)
 }
 
+func TestNotificationBufferLimitConfig(t *testing.T) {
+	notificationConfig := NewNotificationConfig(
+		pendingNotificationCapacity,
+		testNotificationConfig.retryMinBackoff,
+		testNotificationConfig.retryMaxBackoff,
+	)
+	r := newNotifyTestRepoWithConfig(notificationConfig)
+
+	for i := 0; i <= pendingNotificationCapacity; i++ {
+		r.markActionPending(fmt.Sprintf("action-%d", i))
+	}
+
+	actions, _ := r.takePendingNotifications()
+	require.Len(t, actions, pendingNotificationCapacity)
+	assert.Equal(t, "action-1", actions[0])
+	assert.Equal(t, fmt.Sprintf("action-%d", pendingNotificationCapacity), actions[len(actions)-1])
+}
+
+func TestNewNotificationConfig(t *testing.T) {
+	tests := map[string]struct {
+		bufferLimit     int
+		retryMinBackoff time.Duration
+		retryMaxBackoff time.Duration
+		want            NotificationConfig
+	}{
+		"valid": {
+			bufferLimit:     1_000,
+			retryMinBackoff: time.Second,
+			retryMaxBackoff: 10 * time.Second,
+			want: NotificationConfig{
+				bufferLimit:     1_000,
+				retryMinBackoff: time.Second,
+				retryMaxBackoff: 10 * time.Second,
+			},
+		},
+		"zero buffer limit": {
+			retryMinBackoff: notifyRetryMinBackoff,
+			retryMaxBackoff: notifyRetryMaxBackoff,
+			want:            testNotificationConfig,
+		},
+		"buffer limit below pending capacity": {
+			bufferLimit:     pendingNotificationCapacity - 1,
+			retryMinBackoff: notifyRetryMinBackoff,
+			retryMaxBackoff: notifyRetryMaxBackoff,
+			want:            testNotificationConfig,
+		},
+		"buffer limit equals pending capacity": {
+			bufferLimit:     pendingNotificationCapacity,
+			retryMinBackoff: notifyRetryMinBackoff,
+			retryMaxBackoff: notifyRetryMaxBackoff,
+			want: NotificationConfig{
+				bufferLimit:     pendingNotificationCapacity,
+				retryMinBackoff: notifyRetryMinBackoff,
+				retryMaxBackoff: notifyRetryMaxBackoff,
+			},
+		},
+		"zero retry min backoff": {
+			bufferLimit:     notificationBufferLimit,
+			retryMaxBackoff: notifyRetryMaxBackoff,
+			want:            testNotificationConfig,
+		},
+		"zero retry max backoff": {
+			bufferLimit:     notificationBufferLimit,
+			retryMinBackoff: notifyRetryMinBackoff,
+			want:            testNotificationConfig,
+		},
+		"retry max below min": {
+			bufferLimit:     notificationBufferLimit,
+			retryMinBackoff: 2 * time.Second,
+			retryMaxBackoff: time.Second,
+			want:            testNotificationConfig,
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			actual := NewNotificationConfig(tt.bufferLimit, tt.retryMinBackoff, tt.retryMaxBackoff)
+			require.Equal(t, tt.want, actual)
+		})
+	}
+}
+
 // TestNotifyActionUpdate_KeepsWakeupAfterContextCancel covers the loss path
 // that existed before: a client disconnecting mid-request used to discard a
 // wakeup that other watchers still needed.
@@ -1032,12 +1128,17 @@ func TestRunNotifyLoop_RetriesUndeliveredPayloads(t *testing.T) {
 // newNotifyTestRepo builds a repo with the notify plumbing initialized but no
 // pump running, so the pending work is observable and nothing drains it.
 func newNotifyTestRepo() *actionRepo {
+	return newNotifyTestRepoWithConfig(testNotificationConfig)
+}
+
+func newNotifyTestRepoWithConfig(notificationConfig NotificationConfig) *actionRepo {
 	return &actionRepo{
 		pendingActions:     make(map[string]struct{}, pendingNotificationCapacity),
 		pendingActionQueue: make([]string, 0, pendingNotificationCapacity),
 		pendingRuns:        make(map[string]struct{}, pendingNotificationCapacity),
 		pendingRunQueue:    make([]string, 0, pendingNotificationCapacity),
 		pendingCh:          make(chan struct{}, 1),
+		notificationConfig: notificationConfig,
 	}
 }
 
@@ -1065,6 +1166,7 @@ func newNotifyRepoWithDB(t *testing.T) (*actionRepo, *sql.DB, *sql.Conn) {
 		pendingRuns:        make(map[string]struct{}, pendingNotificationCapacity),
 		pendingRunQueue:    make([]string, 0, pendingNotificationCapacity),
 		pendingCh:          make(chan struct{}, 1),
+		notificationConfig: testNotificationConfig,
 	}
 	require.NoError(t, r.startPostgresListener())
 
@@ -1159,7 +1261,7 @@ func TestNotifyRunUpdate_DoesNotBlockOnStalledPump(t *testing.T) {
 // the writer non-blocking must not lose a wakeup.
 func TestWatchActionUpdates_DeliversPhaseChange(t *testing.T) {
 	db := setupActionDB(t)
-	repo, err := NewActionRepo(db, testDbConfig)
+	repo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	repoImpl, ok := repo.(*actionRepo)
 	require.True(t, ok)
@@ -1210,7 +1312,7 @@ func TestWatchActionUpdates_DeliversPhaseChange(t *testing.T) {
 // tests above own the "writers never block" half.
 func TestNotifyPump_ConcurrentWritersDeliverEveryAction(t *testing.T) {
 	db := setupActionDB(t)
-	repoIface, err := NewActionRepo(db, testDbConfig)
+	repoIface, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	repo, ok := repoIface.(*actionRepo)
 	require.True(t, ok)
@@ -1274,6 +1376,7 @@ func TestUpdateActionPhase_CompletesWithStalledPump(t *testing.T) {
 		pendingRuns:        make(map[string]struct{}, pendingNotificationCapacity),
 		pendingRunQueue:    make([]string, 0, pendingNotificationCapacity),
 		pendingCh:          make(chan struct{}, 1),
+		notificationConfig: testNotificationConfig,
 	}
 	// No pump is started, so nothing drains what the write path queues.
 
@@ -1425,7 +1528,7 @@ func TestInsertEvents_WithLogContext(t *testing.T) {
 // RecordActionEvents before the TaskAction finalizer is removed.
 func TestUpdateActionPhase_AbortedDoesNotInsertEvent(t *testing.T) {
 	db := setupActionDB(t)
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -1463,7 +1566,7 @@ func TestUpdateActionPhase_AbortedDoesNotInsertEvent(t *testing.T) {
 func TestUpdateActionPhase_PausedSettlesIntoTerminal(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -1510,7 +1613,7 @@ func TestUpdateActionPhase_PausedSettlesIntoTerminal(t *testing.T) {
 func TestUpdateActionPhase_PausedDoesNotResume(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -1540,7 +1643,7 @@ func TestUpdateActionPhase_PausedDoesNotResume(t *testing.T) {
 func TestUpdateActionDetailedInfo_NotifiesWatchers(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	repo, err := NewActionRepo(db, testDbConfig)
+	repo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	repoImpl := repo.(*actionRepo)
 

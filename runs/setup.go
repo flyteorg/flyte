@@ -92,7 +92,15 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		})
 	}
 
-	repo, err := repository.NewRepository(sc.DB, cfg.Database)
+	repo, err := repository.NewRepository(
+		sc.DB,
+		cfg.Database,
+		repository.NewNotificationConfig(
+			cfg.NotificationBufferLimit,
+			cfg.NotifyRetryMinBackoff.Duration,
+			cfg.NotifyRetryMaxBackoff.Duration,
+		),
+	)
 	if err != nil {
 		return fmt.Errorf("runs: failed to create repository: %w", err)
 	}
