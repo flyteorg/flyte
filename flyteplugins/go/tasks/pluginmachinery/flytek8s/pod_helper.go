@@ -1685,6 +1685,49 @@ func GetLastTransitionOccurredAt(pod *v1.Pod) metav1.Time {
 	return lastTransitionTime
 }
 
+// PodFailureTime is the time a pod's own trouble is anchored on, which is what a GPU
+// fault's relevance is measured against (see gpufault.RelevantToFailure).
+//
+// A container's termination is stamped by the kubelet on the same node and clock as the
+// fault events, so it is the closest thing to the moment a fault would have to explain. A
+// pod on its way out without a terminated container is anchored on its deletion, which is
+// what an eviction leaves behind.
+//
+// Only then does the time the caller already had stand in, and it is the last resort on
+// purpose. Callers typically get it from GetLastTransitionOccurredAt above, which for a
+// pod that failed while its containers were still running reports the time the container
+// started, not the time anything went wrong. Anchoring a long-running task on its own
+// start would put every real fault outside the window and quietly find nothing. Pass the
+// zero time when there is no such time to offer, and the current time is used instead.
+//
+// Init containers are not eligible, which is where this parts company with
+// GetLastTransitionOccurredAt. They finish before the workload starts, and a native
+// sidecar declared among them is reaped after everything else, so either would anchor on
+// a moment that has nothing to do with when the work died.
+func PodFailureTime(pod *v1.Pod, occurredAt time.Time) time.Time {
+	latest := time.Time{}
+	for _, status := range pod.Status.ContainerStatuses {
+		terminated := status.State.Terminated
+		if terminated == nil || terminated.FinishedAt.IsZero() {
+			continue
+		}
+		if terminated.FinishedAt.After(latest) {
+			latest = terminated.FinishedAt.Time
+		}
+	}
+
+	switch {
+	case !latest.IsZero():
+		return latest
+	case pod.DeletionTimestamp != nil && !pod.DeletionTimestamp.IsZero():
+		return pod.DeletionTimestamp.Time
+	case !occurredAt.IsZero():
+		return occurredAt
+	default:
+		return time.Now()
+	}
+}
+
 func GetReportedAt(pod *v1.Pod) metav1.Time {
 	var reportedAt metav1.Time
 	for _, condition := range pod.Status.Conditions {
