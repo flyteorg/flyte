@@ -23,7 +23,43 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-const rootActionName = "a0"
+const (
+	rootActionName              = "a0"
+	pendingNotificationCapacity = 256
+	notificationBufferLimit     = 65_000
+	notifyRetryMinBackoff       = 50 * time.Millisecond
+	notifyRetryMaxBackoff       = 5 * time.Second
+)
+
+// NotificationConfig configures the pending notification queues and delivery retries.
+type NotificationConfig struct {
+	bufferLimit     int
+	retryMinBackoff time.Duration
+	retryMaxBackoff time.Duration
+}
+
+// NewNotificationConfig creates a notification config, replacing invalid values with defaults.
+func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff time.Duration) NotificationConfig {
+	if bufferLimit < pendingNotificationCapacity {
+		bufferLimit = notificationBufferLimit
+	}
+	if retryMinBackoff <= 0 {
+		retryMinBackoff = notifyRetryMinBackoff
+	}
+	if retryMaxBackoff <= 0 {
+		retryMaxBackoff = notifyRetryMaxBackoff
+	}
+	if retryMaxBackoff < retryMinBackoff {
+		retryMinBackoff = notifyRetryMinBackoff
+		retryMaxBackoff = notifyRetryMaxBackoff
+	}
+
+	return NotificationConfig{
+		bufferLimit:     bufferLimit,
+		retryMinBackoff: retryMinBackoff,
+		retryMaxBackoff: retryMaxBackoff,
+	}
+}
 
 // actionRepo implements actionRepo interface using PostgreSQL
 type actionRepo struct {
@@ -42,23 +78,22 @@ type actionRepo struct {
 	pendingRuns        map[string]struct{}
 	pendingRunQueue    []string
 	pendingCh          chan struct{}
+	notificationConfig NotificationConfig
 }
 
-const (
-	notificationBufferLimit     = 65_000
-	pendingNotificationCapacity = 256
-	notifyRetryMinBackoff       = 50 * time.Millisecond
-	notifyRetryMaxBackoff       = 5 * time.Second
-)
-
 // NewActionRepo creates a new PostgreSQL repository
-func NewActionRepo(db *sqlx.DB, dbConfig database.DbConfig) (interfaces.ActionRepo, error) {
+func NewActionRepo(
+	db *sqlx.DB,
+	dbConfig database.DbConfig,
+	notificationConfig NotificationConfig,
+) (interfaces.ActionRepo, error) {
 	dsn := database.GetPostgresDsn(context.Background(), dbConfig.Postgres)
 	repo := &actionRepo{
-		db:                db,
-		dsn:               dsn,
-		runSubscribers:    make(map[chan string]bool),
-		actionSubscribers: make(map[chan string]bool),
+		db:                 db,
+		dsn:                dsn,
+		runSubscribers:     make(map[chan string]bool),
+		actionSubscribers:  make(map[chan string]bool),
+		notificationConfig: notificationConfig,
 	}
 
 	repo.pendingActions = make(map[string]struct{}, pendingNotificationCapacity)
@@ -976,7 +1011,7 @@ func (r *actionRepo) notifyRunUpdate(_ context.Context, runID *common.RunIdentif
 
 func (r *actionRepo) markRunPending(payload string) {
 	r.notifyMu.Lock()
-	enqueuePending(r.pendingRuns, &r.pendingRunQueue, payload, notificationBufferLimit)
+	enqueuePending(r.pendingRuns, &r.pendingRunQueue, payload, r.notificationConfig.bufferLimit)
 	r.notifyMu.Unlock()
 	r.signalPending()
 }
@@ -1005,7 +1040,7 @@ func (r *actionRepo) mergePendingActions(actions []string) {
 		return
 	}
 	r.notifyMu.Lock()
-	r.pendingActions, r.pendingActionQueue = mergePending(actions, r.pendingActionQueue)
+	r.pendingActions, r.pendingActionQueue = mergePending(actions, r.pendingActionQueue, r.notificationConfig.bufferLimit)
 	r.notifyMu.Unlock()
 }
 
@@ -1014,15 +1049,15 @@ func (r *actionRepo) mergePendingRuns(runs []string) {
 		return
 	}
 	r.notifyMu.Lock()
-	r.pendingRuns, r.pendingRunQueue = mergePending(runs, r.pendingRunQueue)
+	r.pendingRuns, r.pendingRunQueue = mergePending(runs, r.pendingRunQueue, r.notificationConfig.bufferLimit)
 	r.notifyMu.Unlock()
 }
 
-func mergePending(retry, queued []string) (map[string]struct{}, []string) {
+func mergePending(retry, queued []string, limit int) (map[string]struct{}, []string) {
 	pending := make(map[string]struct{}, len(retry)+len(queued))
 	queue := make([]string, 0, len(retry)+len(queued))
 	for _, payload := range append(retry, queued...) {
-		enqueuePending(pending, &queue, payload, notificationBufferLimit)
+		enqueuePending(pending, &queue, payload, limit)
 	}
 	return pending, queue
 }
@@ -1164,7 +1199,7 @@ func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql
 		return nil
 	}
 
-	backoff := notifyRetryMinBackoff
+	backoff := r.notificationConfig.retryMinBackoff
 	for {
 		select {
 		case <-ctx.Done():
@@ -1177,7 +1212,7 @@ func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql
 		retryRuns := emit("run_updates", runs)
 
 		if len(retryActions) == 0 && len(retryRuns) == 0 {
-			backoff = notifyRetryMinBackoff
+			backoff = r.notificationConfig.retryMinBackoff
 			continue
 		}
 
@@ -1190,8 +1225,8 @@ func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql
 		case <-time.After(backoff):
 		}
 		backoff *= 2
-		if backoff > notifyRetryMaxBackoff {
-			backoff = notifyRetryMaxBackoff
+		if backoff > r.notificationConfig.retryMaxBackoff {
+			backoff = r.notificationConfig.retryMaxBackoff
 		}
 	}
 }
@@ -1205,7 +1240,7 @@ func (r *actionRepo) notifyActionUpdate(_ context.Context, actionID *common.Acti
 
 func (r *actionRepo) markActionPending(payload string) {
 	r.notifyMu.Lock()
-	enqueuePending(r.pendingActions, &r.pendingActionQueue, payload, notificationBufferLimit)
+	enqueuePending(r.pendingActions, &r.pendingActionQueue, payload, r.notificationConfig.bufferLimit)
 	r.notifyMu.Unlock()
 	r.signalPending()
 }

@@ -309,6 +309,48 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_notificationBufferLimit", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("notificationBufferLimit", testValue)
+			if vInt, err := cmdFlags.GetInt("notificationBufferLimit"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.NotificationBufferLimit)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_notifyRetryMinBackoff", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.NotifyRetryMinBackoff.String()
+
+			cmdFlags.Set("notifyRetryMinBackoff", testValue)
+			if vString, err := cmdFlags.GetString("notifyRetryMinBackoff"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.NotifyRetryMinBackoff)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_notifyRetryMaxBackoff", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.NotifyRetryMaxBackoff.String()
+
+			cmdFlags.Set("notifyRetryMaxBackoff", testValue)
+			if vString, err := cmdFlags.GetString("notifyRetryMaxBackoff"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.NotifyRetryMaxBackoff)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_actionsService.url", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
