@@ -25,4 +25,16 @@ func applyRunSettings(spec *task.RunSpec, resolved *settings.Settings) {
 		concurrency.GetState() == settings.SettingState_SETTING_STATE_VALUE {
 		spec.MaxActionConcurrency = uint32(concurrency.GetIntValue())
 	}
+
+	// Base for run metadata (inputs.pb, outputs.pb), not for user blobs.
+	if baseDir := resolved.GetRun().GetRunBaseDir(); spec.GetRunBaseDir() == "" &&
+		baseDir.GetState() == settings.SettingState_SETTING_STATE_VALUE {
+		spec.RunBaseDir = baseDir.GetStringValue()
+	}
+
+	// RawDataStorage carries only this prefix, so replacing the message loses nothing.
+	if rawDataPath := resolved.GetStorage().GetRawDataPath(); spec.GetRawDataStorage().GetRawDataPrefix() == "" &&
+		rawDataPath.GetState() == settings.SettingState_SETTING_STATE_VALUE {
+		spec.RawDataStorage = &task.RawDataStorage{RawDataPrefix: rawDataPath.GetStringValue()}
+	}
 }

@@ -305,11 +305,12 @@ func (s *RunService) CreateRun(
 	}
 
 	// Compute storage URIs before DB insert so they're persisted in the ActionSpec.
-	// runSpec.RunBaseDir overrides the configured storagePrefix when set; it must
-	// resolve to the same base UploadInputs used (UploadInputsRequest.base_dir) so the
-	// run reads offloaded inputs from where they were written.
-	// TODO: consult org/project/domain settings (StorageSettings.run_base_dir) here as
-	// the middle tier once settings lookup lands; it must be applied in UploadInputs too.
+	// runSpec.RunBaseDir overrides the configured storagePrefix when set, either by the
+	// request or from settings above; it must resolve to the same base UploadInputs used
+	// (UploadInputsRequest.base_dir) so the run reads offloaded inputs from where they
+	// were written.
+	// TODO: UploadInputs does not consult settings, so a base that came from settings
+	// applies to run metadata but not to offloaded inputs.
 	runBase := s.storagePrefix
 	if rb := runSpec.GetRunBaseDir(); rb != "" {
 		runBase = rb
