@@ -263,6 +263,69 @@ func NewDeployedByFilter(deployedBy string) interfaces.Filter {
 	return NewEqualFilter("deployed_by", deployedBy)
 }
 
+// SearchField is the synthetic filter field behind the console's run search box. A filter
+// on it matches runs whose run name OR task name satisfies the predicate, which the flat,
+// AND-ed common.Filter list cannot express on its own. It is not a column: the run service
+// resolves it with SplitSearchFilters before the generic allow-list conversion
+// (ConvertProtoFilters) sees the request. The Union cloud run service accepts the same
+// field, so one console request works against both backends.
+const SearchField = "search"
+
+// searchFunctions maps the proto filter functions accepted on SearchField to their SQL
+// expression. Contains (case-sensitive or not) is what the search box sends; EQUAL lets a
+// caller holding a full run name match it exactly instead of with a wildcard scan.
+var searchFunctions = map[common.Filter_Function]interfaces.FilterExpression{
+	common.Filter_EQUAL:                     interfaces.FilterExpressionEqual,
+	common.Filter_CONTAINS:                  interfaces.FilterExpressionContains,
+	common.Filter_CONTAINS_CASE_INSENSITIVE: interfaces.FilterExpressionContainsCaseInsensitive,
+}
+
+// NewSearchFilter builds the `run_name <op> ? OR task_name <op> ?` predicate for a
+// SearchField filter. The OR is parenthesized by compositeFilter, so it composes safely
+// with the AND-ed scope filters callers add around it.
+func NewSearchFilter(fn common.Filter_Function, values []string) (interfaces.Filter, error) {
+	expression, ok := searchFunctions[fn]
+	if !ok {
+		return nil, fmt.Errorf("unsupported filter function %s for field %q; expected EQUAL, CONTAINS or CONTAINS_CASE_INSENSITIVE", fn, SearchField)
+	}
+	if len(values) != 1 {
+		return nil, fmt.Errorf("filter on field %q expects a single value, got %d", SearchField, len(values))
+	}
+	term := values[0]
+	if term == "" {
+		return nil, fmt.Errorf("filter on field %q requires a non-empty value", SearchField)
+	}
+	runName := &basicFilter{field: "run_name", expression: expression, value: term}
+	taskName := &basicFilter{field: "task_name", expression: expression, value: term}
+	return runName.Or(taskName), nil
+}
+
+// SplitSearchFilters partitions proto filters into a single combined SearchField predicate
+// (nil when there is none; several are AND-ed) and the remaining plain column filters.
+// Callers pass the remaining filters to ConvertProtoFilters, which validates fields against
+// the column allow-list and would otherwise reject the synthetic field, and AND the returned
+// predicate in separately.
+func SplitSearchFilters(filters []*common.Filter) (interfaces.Filter, []*common.Filter, error) {
+	var search interfaces.Filter
+	remaining := make([]*common.Filter, 0, len(filters))
+	for _, f := range filters {
+		if f.GetField() != SearchField {
+			remaining = append(remaining, f)
+			continue
+		}
+		sf, err := NewSearchFilter(f.GetFunction(), f.GetValues())
+		if err != nil {
+			return nil, nil, err
+		}
+		if search == nil {
+			search = sf
+		} else {
+			search = search.And(sf)
+		}
+	}
+	return search, remaining, nil
+}
+
 // ConvertProtoFilters converts proto filters to our Filter interfaces.
 // allowedColumns is checked to prevent SQL injection via user-supplied field names.
 func ConvertProtoFilters(protoFilters []*common.Filter, allowedColumns sets.Set[string]) (interfaces.Filter, error) {
