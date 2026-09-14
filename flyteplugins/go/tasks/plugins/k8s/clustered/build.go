@@ -15,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	stdutils "github.com/flyteorg/flyte/v2/flytestdlib/utils"
 	clusteredpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
 
@@ -28,7 +29,7 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	}
 
 	var spec clusteredpb.ClusteredTaskSpec
-	if err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &spec); err != nil { //nolint:staticcheck
+	if err = stdutils.UnmarshalStructToPb(taskTemplate.GetCustom(), &spec); err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid ClusteredTaskSpec: %v", err)
 	}
 
