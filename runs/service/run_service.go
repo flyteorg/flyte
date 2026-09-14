@@ -309,8 +309,6 @@ func (s *RunService) CreateRun(
 	// request or from settings above; it must resolve to the same base UploadInputs used
 	// (UploadInputsRequest.base_dir) so the run reads offloaded inputs from where they
 	// were written.
-	// TODO: UploadInputs does not consult settings, so a base that came from settings
-	// applies to run metadata but not to offloaded inputs.
 	runBase := s.storagePrefix
 	if rb := runSpec.GetRunBaseDir(); rb != "" {
 		runBase = rb
