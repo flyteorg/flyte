@@ -14,8 +14,8 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	clusteredpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
@@ -29,7 +29,7 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 	// Read spec for failure-policy flags (restart_on_host_maintenance).
 	var spec clusteredpb.ClusteredTaskSpec
 	if taskTemplate, err := pluginContext.TaskReader().Read(ctx); err == nil && taskTemplate != nil {
-		if err := utils.UnmarshalStruct(taskTemplate.GetCustom(), &spec); err != nil { //nolint:staticcheck
+		if err := utils.UnmarshalStructToPb(taskTemplate.GetCustom(), &spec); err != nil {
 			logger.Warningf(ctx, "failed to unmarshal ClusteredTaskSpec: %v", err)
 		}
 	}
@@ -40,7 +40,7 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 	}
 
 	occurredAt := time.Now()
-	statusDetails, err := utils.MarshalObjToStruct(jobSet.Status) //nolint:staticcheck
+	statusDetails, err := utils.MarshalObjToStruct(jobSet.Status)
 	if err != nil {
 		logger.Warnf(ctx, "failed to marshal JobSet status for task info: %v", err)
 	}
