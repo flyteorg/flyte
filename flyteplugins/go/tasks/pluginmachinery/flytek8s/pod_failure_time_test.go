@@ -129,10 +129,19 @@ func TestDeclaredPrimaryContainerName(t *testing.T) {
 		assert.Equal(t, "the-real-work", DeclaredPrimaryContainerName(pod))
 	})
 
-	t.Run("prefers the upstream default-container annotation", func(t *testing.T) {
+	t.Run("the flyte annotation outranks default-container", func(t *testing.T) {
+		// default-container is a kubectl display convenience a user may point at a
+		// sidecar; the framework's own stamp decides fault classification.
+		pod := withSidecarFirst(map[string]string{
+			"kubectl.kubernetes.io/default-container": "istio-proxy",
+			PrimaryContainerKey:                       "the-real-work",
+		})
+		assert.Equal(t, "the-real-work", DeclaredPrimaryContainerName(pod))
+	})
+
+	t.Run("default-container answers when flyte stamped nothing", func(t *testing.T) {
 		pod := withSidecarFirst(map[string]string{
 			"kubectl.kubernetes.io/default-container": "the-real-work",
-			PrimaryContainerKey:                       "something-else",
 		})
 		assert.Equal(t, "the-real-work", DeclaredPrimaryContainerName(pod))
 	})

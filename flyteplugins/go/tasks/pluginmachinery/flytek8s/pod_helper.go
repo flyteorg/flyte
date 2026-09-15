@@ -1854,10 +1854,16 @@ func GetReportedAt(pod *v1.Pod) metav1.Time {
 // finished cannot act on a guess, because the container it happens to pick may be an
 // injected sidecar.
 func DeclaredPrimaryContainerName(pod *v1.Pod) string {
-	if defaultContainer := pod.Annotations["kubectl.kubernetes.io/default-container"]; defaultContainer != "" {
-		return defaultContainer
+	// Flyte's own annotation outranks the kubectl one. The framework stamps it at
+	// build time on every template it owns, while default-container is a kubectl
+	// display convenience a user may point at a sidecar through pod metadata; a
+	// user-facing preference must not decide which container's exit settles fault
+	// classification. The kubectl annotation still answers for pods Flyte did not
+	// stamp, where any declaration beats guessing.
+	if primary := pod.Annotations[PrimaryContainerKey]; primary != "" {
+		return primary
 	}
-	return pod.Annotations[PrimaryContainerKey]
+	return pod.Annotations["kubectl.kubernetes.io/default-container"]
 }
 
 func GetPrimaryContainerName(pod *v1.Pod) string {
