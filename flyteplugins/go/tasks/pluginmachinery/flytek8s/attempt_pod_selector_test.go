@@ -140,9 +140,31 @@ func TestPreservedPodLabels(t *testing.T) {
 
 		preserved := PreservedPodLabels(metadataWithLabels(incomplete))
 		assert.Equal(t, ManagedLabelValue, preserved[ManagedLabelKey])
-		assert.NotContains(t, preserved, ActionLabel)
+		// Each label is preserved on its own. A run name that sanitization emptied is not
+		// there to protect, but the labels that survived still are.
+		assert.NotContains(t, preserved, RunLabel)
+		assert.Equal(t, "a0", preserved[ActionLabel])
 
 		assert.Equal(t, map[string]string{ManagedLabelKey: ManagedLabelValue}, PreservedPodLabels(nil))
+	})
+
+	t.Run("preserves the task name the metrics are joined on", func(t *testing.T) {
+		// The task name takes no part in selection, so it is absent from the selector's
+		// keys on purpose. It still has to survive a user label of the same name, because
+		// the per-pod metrics collectors scrape are joined on it and a user value would
+		// point those joins at the wrong task.
+		preserved := PreservedPodLabels(metadataWithLabels(completeAttemptLabels()))
+		assert.Equal(t, "train", preserved[TaskNameLabel])
+
+		selector := AttemptPodSelector(metadataWithLabels(completeAttemptLabels()))
+		require.NotNil(t, selector)
+		assert.NotContains(t, selector.String(), TaskNameLabel)
+
+		// A pod whose task name a user overwrote still matches, since selection does not
+		// look at it, which is exactly why preserving it needs its own guarantee.
+		podLabels := completeAttemptLabels()
+		podLabels[TaskNameLabel] = "not-this-task"
+		assert.True(t, selector.Matches(labels.Set(podLabels)))
 	})
 }
 

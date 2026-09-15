@@ -108,3 +108,46 @@ func TestPodFailureTimeDoesNotAnchorOnAStartTime(t *testing.T) {
 	assert.Equal(t, startedAt.Unix(), GetLastTransitionOccurredAt(pod).Unix())
 	assert.Equal(t, evictedAt, PodFailureTime(pod, GetLastTransitionOccurredAt(pod).Time))
 }
+
+// DeclaredPrimaryContainerName answers a narrower question than GetPrimaryContainerName:
+// which container was actually declared to be the task's own work, with no guessing. A
+// caller deciding whether that work finished cannot act on a guess, because the container
+// GetPrimaryContainerName falls back to may be an injected sidecar.
+func TestDeclaredPrimaryContainerName(t *testing.T) {
+	withSidecarFirst := func(annotations map[string]string) *v1.Pod {
+		return &v1.Pod{
+			ObjectMeta: metav1.ObjectMeta{Name: "pod", Annotations: annotations},
+			Spec: v1.PodSpec{Containers: []v1.Container{
+				{Name: "istio-proxy"},
+				{Name: "the-real-work"},
+			}},
+		}
+	}
+
+	t.Run("reads the flyte annotation", func(t *testing.T) {
+		pod := withSidecarFirst(map[string]string{PrimaryContainerKey: "the-real-work"})
+		assert.Equal(t, "the-real-work", DeclaredPrimaryContainerName(pod))
+	})
+
+	t.Run("prefers the upstream default-container annotation", func(t *testing.T) {
+		pod := withSidecarFirst(map[string]string{
+			"kubectl.kubernetes.io/default-container": "the-real-work",
+			PrimaryContainerKey:                       "something-else",
+		})
+		assert.Equal(t, "the-real-work", DeclaredPrimaryContainerName(pod))
+	})
+
+	t.Run("declares nothing when nothing was annotated", func(t *testing.T) {
+		pod := withSidecarFirst(nil)
+		assert.Empty(t, DeclaredPrimaryContainerName(pod))
+
+		// GetPrimaryContainerName still guesses, and here it guesses the sidecar. That is
+		// the whole reason the two are separate.
+		assert.Equal(t, "istio-proxy", GetPrimaryContainerName(pod))
+	})
+
+	t.Run("leaves GetPrimaryContainerName unchanged when annotated", func(t *testing.T) {
+		pod := withSidecarFirst(map[string]string{PrimaryContainerKey: "the-real-work"})
+		assert.Equal(t, "the-real-work", GetPrimaryContainerName(pod))
+	})
+}

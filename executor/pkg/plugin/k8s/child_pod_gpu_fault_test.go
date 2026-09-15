@@ -133,6 +133,15 @@ func podEventKey(name string) watchedObjectKey {
 	return watchedObjectKey{Namespace: childPodNamespace, Name: name, Kind: "Pod"}
 }
 
+// crdFailureWithCode is a failure reported with a code of the plugin's own, the way the
+// CRD plugins really do: ray reports TaskFailedWithError, kubeflow DownstreamSystemError,
+// clustered a JobSet condition reason. ClassifyFailure leaves such a code alone, which is
+// why the code cannot be what tells a classified failure from an unclassified one.
+func crdFailureWithCode(code string) pluginsCore.PhaseInfo {
+	now := time.Now()
+	return pluginsCore.PhaseInfoRetryableFailure(code, "the job failed", &pluginsCore.TaskInfo{OccurredAt: &now})
+}
+
 func crdFailure() pluginsCore.PhaseInfo {
 	// Every CRD plugin stamps the failure with the time of the reconcile that noticed it,
 	// which is why a child pod's own termination is the better anchor.
@@ -487,10 +496,91 @@ func TestAttachFaultingPod(t *testing.T) {
 		assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
 		assert.Empty(t, got.Info().AdditionalReasons)
 	})
+
+	// The codes below are the ones the CRD plugins actually report. ClassifyFailure keeps
+	// them, so a gate that looked for a gpufault code never opened in production and the
+	// faulting pod was never named on any real distributed task.
+	for _, code := range []string{"TaskFailedWithError", "DownstreamSystemError"} {
+		t.Run("names the pod when the plugin reported its own code "+code, func(t *testing.T) {
+			observed := time.Now().Add(-time.Minute)
+			events := map[watchedObjectKey][]*eventInfo{
+				podEventKey("job-worker-1"): {gpuFaultEventFor(79, gpufault.SeverityCritical, observed, observed, "worker-1-uid")},
+			}
+			pm := childPodManager(t, childPodPlugin{}, events,
+				workerPod(workerPodOpts{name: "job-worker-0", uid: "worker-0-uid", finishedAt: observed}),
+				workerPod(workerPodOpts{name: "job-worker-1", uid: "worker-1-uid", finishedAt: observed}),
+			)
+
+			got := pm.classifyGpuFailure(
+				context.Background(), childPodTaskContext(t, attemptLabels()), trackedJobSet(), crdFailureWithCode(code))
+
+			// The plugin's own code stands, and the fault still explains the failure.
+			assert.Equal(t, code, got.Err().GetCode())
+			assert.Equal(t, core.ExecutionError_SYSTEM, got.Err().GetKind())
+			require.NotNil(t, got.Err().GetGpuFault())
+			require.Len(t, got.Info().AdditionalReasons, 1)
+			assert.Equal(t, "GPU fault recorded on pod job-worker-1", got.Info().AdditionalReasons[0].Reason)
+		})
+	}
+
+	t.Run("names the pod on the generic code path too", func(t *testing.T) {
+		observed := time.Now().Add(-time.Minute)
+		events := map[watchedObjectKey][]*eventInfo{
+			podEventKey("job-worker-0"): {gpuFaultEventFor(79, gpufault.SeverityCritical, observed, observed, "worker-0-uid")},
+		}
+		pm := childPodManager(t, childPodPlugin{}, events,
+			workerPod(workerPodOpts{name: "job-worker-0", uid: "worker-0-uid", finishedAt: observed}),
+		)
+
+		got := pm.classifyGpuFailure(
+			context.Background(), childPodTaskContext(t, attemptLabels()), trackedJobSet(), crdFailureWithCode("UnknownError"))
+
+		assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
+		require.Len(t, got.Info().AdditionalReasons, 1)
+		assert.Equal(t, "GPU fault recorded on pod job-worker-0", got.Info().AdditionalReasons[0].Reason)
+	})
+
+	t.Run("names the pod for a user fault that named the failure", func(t *testing.T) {
+		observed := time.Now().Add(-time.Minute)
+		events := map[watchedObjectKey][]*eventInfo{
+			podEventKey("job-worker-0"): {gpuFaultEventFor(31, gpufault.SeverityUser, observed, observed, "worker-0-uid")},
+		}
+		pm := childPodManager(t, childPodPlugin{}, events,
+			workerPod(workerPodOpts{name: "job-worker-0", uid: "worker-0-uid", finishedAt: observed}),
+		)
+
+		got := pm.classifyGpuFailure(
+			context.Background(), childPodTaskContext(t, attemptLabels()), trackedJobSet(), crdFailureWithCode("TaskFailedWithError"))
+
+		require.NotNil(t, got.Err().GetGpuFault())
+		require.Len(t, got.Info().AdditionalReasons, 1)
+		assert.Equal(t, "GPU fault recorded on pod job-worker-0", got.Info().AdditionalReasons[0].Reason)
+	})
 }
 
-// The anchor itself is podFailureTime, covered in plugin_manager_test.go. What is specific
-// to a child pod is the bound against the attempt's own failure.
+// TestClassifyFailureKeepsFaultIdentity pins the invariant attachFaultingPod relies on to
+// find the pod a fault came from: ClassifyFailure has to hand the very same fault through,
+// not a copy. If it ever starts cloning, this fails here rather than silently costing every
+// distributed failure the one line that says which worker to look at.
+func TestClassifyFailureKeepsFaultIdentity(t *testing.T) {
+	faults := []*core.GpuFault{
+		gpufault.ToProto(
+			gpufault.Fault{Kind: gpufault.KindXid, Code: 31, Severity: gpufault.SeverityUser},
+			gpufault.Attribution{GPUIndex: gpufault.UnknownGPUIndex}),
+		gpufault.ToProto(
+			gpufault.Fault{Kind: gpufault.KindXid, Code: 79, Severity: gpufault.SeverityCritical},
+			gpufault.Attribution{GPUIndex: gpufault.UnknownGPUIndex}),
+	}
+
+	got := gpufault.ClassifyFailure(crdFailureWithCode("TaskFailedWithError"), faults)
+
+	require.NotNil(t, got.Err().GetGpuFault())
+	assert.Same(t, faults[1], got.Err().GetGpuFault(),
+		"ClassifyFailure must pass the settled fault through by identity; attachFaultingPod matches on the pointer")
+}
+
+// The anchor itself is flytek8s.PodFailureTime, covered in its own package. What is
+// specific to a child pod is the bound against the attempt's own failure.
 func TestChildPodFailureTime(t *testing.T) {
 	failureAt := time.Date(2026, 8, 25, 12, 0, 0, 0, time.UTC)
 
@@ -516,9 +606,126 @@ func TestChildPodFailureTime(t *testing.T) {
 		assert.Equal(t, failureAt, childPodFailureTime(pod, failureAt))
 	})
 
-	t.Run("does not bound against a failure time the plugin never reported", func(t *testing.T) {
-		// With no reported time podFailureTime falls back to now, and bounding that
-		// against the zero time would anchor every pod in 1970.
+	t.Run("bounds against now when the plugin reported no failure time", func(t *testing.T) {
+		// A zero failure time is not a bound of its own; taking it literally would anchor
+		// every pod in 1970. Now stands in, which is also what flytek8s.PodFailureTime
+		// falls back to, so the anchor and the bound agree.
 		assert.WithinDuration(t, time.Now(), childPodFailureTime(&v1.Pod{}, time.Time{}), time.Minute)
 	})
+}
+
+// primaryPod is a worker whose primary container is declared, the way every plugin that
+// builds a child pod template now stamps it.
+func primaryPod(name string, uid k8stypes.UID, statuses ...v1.ContainerStatus) *v1.Pod {
+	pod := workerPod(workerPodOpts{name: name, uid: uid, phase: v1.PodRunning})
+	pod.Annotations = map[string]string{flytek8s.PrimaryContainerKey: "primary"}
+	pod.Status.ContainerStatuses = statuses
+	return pod
+}
+
+func terminatedContainer(name string, exitCode int32) v1.ContainerStatus {
+	return v1.ContainerStatus{
+		Name:  name,
+		State: v1.ContainerState{Terminated: &v1.ContainerStateTerminated{ExitCode: exitCode}},
+	}
+}
+
+func runningContainer(name string) v1.ContainerStatus {
+	return v1.ContainerStatus{Name: name, State: v1.ContainerState{Running: &v1.ContainerStateRunning{}}}
+}
+
+// What decides whether a worker is finished is the container running the task's own work,
+// not every container in the pod. Judging by all of them mistakes a pod held open by a
+// sidecar for one still working, and a pod whose helper exited early for one that is done.
+func TestPodSucceeded(t *testing.T) {
+	t.Run("a worker held Running by a sidecar has still finished", func(t *testing.T) {
+		// The shape a legacy-injected service mesh proxy leaves behind: the work exited
+		// cleanly, the proxy never will, and the pod stays Running forever.
+		pod := primaryPod("job-worker-0", "worker-0-uid",
+			terminatedContainer("primary", 0),
+			runningContainer("istio-proxy"),
+		)
+		assert.True(t, podSucceeded(pod))
+	})
+
+	t.Run("a worker whose helper exited first has not finished", func(t *testing.T) {
+		pod := primaryPod("job-worker-0", "worker-0-uid",
+			runningContainer("primary"),
+			terminatedContainer("log-shipper", 0),
+		)
+		assert.False(t, podSucceeded(pod))
+	})
+
+	t.Run("a worker whose primary is crash-looping has not finished", func(t *testing.T) {
+		pod := primaryPod("job-worker-0", "worker-0-uid",
+			terminatedContainer("primary", 1),
+			runningContainer("istio-proxy"),
+		)
+		assert.False(t, podSucceeded(pod))
+	})
+
+	t.Run("an undeclared primary falls back to judging every container", func(t *testing.T) {
+		pod := workerPod(workerPodOpts{name: "job-worker-0", uid: "worker-0-uid", phase: v1.PodRunning})
+		pod.Status.ContainerStatuses = []v1.ContainerStatus{
+			terminatedContainer("a", 0),
+			runningContainer("b"),
+		}
+		assert.False(t, podSucceeded(pod))
+
+		pod.Status.ContainerStatuses = []v1.ContainerStatus{
+			terminatedContainer("a", 0),
+			terminatedContainer("b", 0),
+		}
+		assert.True(t, podSucceeded(pod))
+	})
+
+	t.Run("a declared primary missing from the statuses falls back too", func(t *testing.T) {
+		pod := primaryPod("job-worker-0", "worker-0-uid", terminatedContainer("some-other-container", 0))
+		assert.True(t, podSucceeded(pod))
+	})
+
+	t.Run("the kubelet's own verdict still wins", func(t *testing.T) {
+		pod := primaryPod("job-worker-0", "worker-0-uid", runningContainer("primary"))
+		pod.Status.Phase = v1.PodSucceeded
+		assert.True(t, podSucceeded(pod))
+	})
+}
+
+// A sidecar-held worker that faulted must not be excluded from classification's reach just
+// because its proxy is still running, which is the end-to-end form of the case above.
+func TestClassifyGpuFailureSkipsSidecarHeldSucceededWorker(t *testing.T) {
+	observed := time.Now().Add(-time.Minute)
+	events := map[watchedObjectKey][]*eventInfo{
+		podEventKey("job-worker-0"): {gpuFaultEventFor(79, gpufault.SeverityCritical, observed, observed, "worker-0-uid")},
+	}
+	done := primaryPod("job-worker-0", "worker-0-uid",
+		terminatedContainer("primary", 0),
+		runningContainer("istio-proxy"),
+	)
+	pm := childPodManager(t, childPodPlugin{}, events, done)
+
+	got := pm.classifyGpuFailure(
+		context.Background(), childPodTaskContext(t, attemptLabels()), trackedJobSet(), crdFailureWithCode("TaskFailedWithError"))
+
+	// The worker finished its work, so its fault cannot be why the job failed.
+	assert.Equal(t, "TaskFailedWithError", got.Err().GetCode())
+	assert.Nil(t, got.Err().GetGpuFault())
+}
+
+// A plugin that reports no failure time of its own still has to bound a child pod's anchor,
+// or a pod the operator has not finished tearing down anchors at the moment of the reconcile
+// and sweeps in every fault the node has recorded since.
+func TestChildPodFailureTimeBoundsAZeroFailureTime(t *testing.T) {
+	pod := &v1.Pod{Status: v1.PodStatus{ContainerStatuses: []v1.ContainerStatus{
+		runningContainer("primary"),
+	}}}
+
+	before := time.Now()
+	anchor := childPodFailureTime(pod, time.Time{})
+	assert.WithinRange(t, anchor, before, time.Now().Add(time.Second))
+
+	// A deletion stamped in the future is bounded to now rather than taken at face value.
+	future := metav1.NewTime(time.Now().Add(30 * time.Minute))
+	pod.DeletionTimestamp = &future
+	assert.WithinDuration(t, time.Now(), childPodFailureTime(pod, time.Time{}), time.Minute)
 }

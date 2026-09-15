@@ -94,9 +94,20 @@ const (
 	TaskNameLabel = "task-name"
 )
 
-// attemptPodLabelKeys are the labels that together identify one attempt of one action.
-// All of them have to be present for a selector to be exact.
-var attemptPodLabelKeys = []string{ManagedLabelKey, RunLabel, ActionLabel, AttemptLabel}
+// attemptSelectionLabelKeys are the labels that together identify one attempt of one
+// action. They are what a Pod is looked up by, so all of them have to be present for a
+// selector to be exact.
+var attemptSelectionLabelKeys = []string{ManagedLabelKey, RunLabel, ActionLabel, AttemptLabel}
+
+// preservedLabelKeys are the labels a plugin must re-apply after any labels a user
+// supplied. It is the selection identity plus the task name.
+//
+// The two lists differ on purpose and neither is derived from the other. The task name
+// takes no part in finding a Pod, so adding it to the selector would only narrow a match
+// that is already exact. It is preserved anyway because the per-pod metrics that external
+// collectors scrape are joined on it, and a user label of the same name would silently
+// point those joins at the wrong task.
+var preservedLabelKeys = append(append([]string{}, attemptSelectionLabelKeys...), TaskNameLabel)
 
 // AttemptIdentityLabels returns the subset of the task's execution labels that identifies
 // this attempt of this action, or nil when any of them is missing.
@@ -112,8 +123,8 @@ func AttemptIdentityLabels(taskCtx pluginsCore.TaskExecutionMetadata) map[string
 	}
 
 	podLabels := taskCtx.GetLabels()
-	identity := make(map[string]string, len(attemptPodLabelKeys))
-	for _, key := range attemptPodLabelKeys {
+	identity := make(map[string]string, len(attemptSelectionLabelKeys))
+	for _, key := range attemptSelectionLabelKeys {
 		value, ok := podLabels[key]
 		if !ok || value == "" {
 			return nil
@@ -126,16 +137,23 @@ func AttemptIdentityLabels(taskCtx pluginsCore.TaskExecutionMetadata) map[string
 
 // PreservedPodLabels are the labels a plugin must apply last to every Pod template it
 // builds, after any labels the user supplied, so that nothing a user writes can take the
-// Pod out of the executor's reach. That is the managed label, which the Pod cache selects
-// on, together with the attempt identity the framework looks a Pod up by.
+// Pod out of the executor's reach or misattribute what it was doing. That is the managed
+// label the Pod cache selects on, the attempt identity the framework looks a Pod up by,
+// and the task name the per-pod metrics are joined on.
 //
-// The managed label is always present. The identity labels are present whenever the task
-// carries a complete one, which is the same condition under which AttemptPodSelector will
-// go looking for them.
+// The managed label is always present. Each of the others is preserved when the task
+// carries it; one that sanitization emptied is simply not there to protect.
 func PreservedPodLabels(taskCtx pluginsCore.TaskExecutionMetadata) map[string]string {
 	preserved := map[string]string{ManagedLabelKey: ManagedLabelValue}
-	for key, value := range AttemptIdentityLabels(taskCtx) {
-		preserved[key] = value
+	if taskCtx == nil {
+		return preserved
+	}
+
+	podLabels := taskCtx.GetLabels()
+	for _, key := range preservedLabelKeys {
+		if value := podLabels[key]; value != "" {
+			preserved[key] = value
+		}
 	}
 	return preserved
 }
@@ -1826,14 +1844,25 @@ func GetReportedAt(pod *v1.Pod) metav1.Time {
 	return reportedAt
 }
 
-func GetPrimaryContainerName(pod *v1.Pod) string {
-	defaultContainer := pod.Annotations["kubectl.kubernetes.io/default-container"]
-	if defaultContainer != "" {
+// DeclaredPrimaryContainerName is the name of the container running the task's own work,
+// when something actually said which one that is. It reads only the annotations, so an
+// empty result means nobody declared a primary container, not that the pod has none.
+//
+// GetPrimaryContainerName below answers a different question: it always names some
+// container, guessing the first one when nothing was declared. That guess is right often
+// enough for logs and diagnostics, but a caller deciding whether the task's own work
+// finished cannot act on a guess, because the container it happens to pick may be an
+// injected sidecar.
+func DeclaredPrimaryContainerName(pod *v1.Pod) string {
+	if defaultContainer := pod.Annotations["kubectl.kubernetes.io/default-container"]; defaultContainer != "" {
 		return defaultContainer
 	}
-	primaryContainer := pod.Annotations[PrimaryContainerKey]
-	if primaryContainer != "" {
-		return primaryContainer
+	return pod.Annotations[PrimaryContainerKey]
+}
+
+func GetPrimaryContainerName(pod *v1.Pod) string {
+	if declared := DeclaredPrimaryContainerName(pod); declared != "" {
+		return declared
 	}
 
 	for _, container := range pod.Spec.Containers {

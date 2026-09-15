@@ -14,7 +14,6 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8stypes "k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -440,22 +439,10 @@ func (pm *PluginManager) classifyGpuFailure(
 
 	classified := gpufault.ClassifyFailure(phaseInfo, faults)
 	if namesTheFaultingPod {
-		classified = attachFaultingPod(classified, observed)
+		classified = attachFaultingPod(ctx, classified, observed)
 	}
 	return classified
 }
-
-// gpuFaultCodes are the codes ClassifyFailure puts on a failure it settled with a fault.
-// Their presence is how the caller tells a failure the fault explained from one the fault
-// only rode along with.
-var gpuFaultCodes = sets.NewString(
-	gpufault.CodeGpuXidError,
-	gpufault.CodeGpuFallenOffBus,
-	gpufault.CodeGpuEccUncorrectable,
-	gpufault.CodeGpuRowRemapPending,
-	gpufault.CodeGpuNvlinkError,
-	gpufault.CodeGpuGspError,
-)
 
 // attachFaultingPod names the one pod whose fault the classification settled on. The fault
 // sentence carries the Xid, the GPU and the node but not the pod, which on a job with many
@@ -467,15 +454,33 @@ var gpuFaultCodes = sets.NewString(
 // would put a misleading reason on a failure the faults did not explain, for example a
 // plain OOMKilled that a warning happened to coincide with, and would emit one cluster
 // event per pod when a whole node's worth of GPUs faults at once.
-func attachFaultingPod(phaseInfo pluginsCore.PhaseInfo, observed []observedFault) pluginsCore.PhaseInfo {
+func attachFaultingPod(
+	ctx context.Context,
+	phaseInfo pluginsCore.PhaseInfo,
+	observed []observedFault,
+) pluginsCore.PhaseInfo {
 	info := phaseInfo.Info()
-	if info == nil || !gpuFaultCodes.Has(phaseInfo.Err().GetCode()) {
+
+	// The fault the classification settled on is the one it put on the error. Its presence
+	// is the only reliable sign that a fault was folded in: the code is not, because
+	// ClassifyFailure only replaces a code the plugin had no real opinion about, and the
+	// CRD plugins all report codes of their own (TaskFailedWithError, DownstreamSystemError,
+	// a JobSet condition reason) which it correctly leaves alone.
+	settled := phaseInfo.Err().GetGpuFault()
+	if info == nil || settled == nil {
 		return phaseInfo
 	}
 
-	// The fault the classification kept is carried on the error, so matching it back by
-	// identity finds the pod it came from without repeating the precedence rules.
-	settled := phaseInfo.Err().GetGpuFault()
+	// A warning rides along as data without deciding anything, so the failure is still
+	// whatever the plugin said it was. Pointing at a pod there would send the user after
+	// hardware that did not cause their failure.
+	if fault, _ := gpufault.FromProto(settled); fault.Severity == gpufault.SeverityWarn {
+		return phaseInfo
+	}
+
+	// Matching the settled fault back by identity finds the pod it came from without
+	// repeating the precedence rules. It holds only while ClassifyFailure passes the very
+	// same fault through rather than a copy of it, which is pinned by a test.
 	for _, o := range observed {
 		if o.fault != settled || o.podName == "" {
 			continue
@@ -488,6 +493,11 @@ func attachFaultingPod(phaseInfo pluginsCore.PhaseInfo, observed []observedFault
 		return phaseInfo
 	}
 
+	// The fault came from one of these pods, so failing to find it again means the identity
+	// the match relies on has been broken upstream. Say so rather than quietly dropping the
+	// one piece of information that tells the user which worker to look at.
+	logger.Warnf(ctx, "GPU fault classified for %s but no observed pod matched it; the faulting pod cannot be named",
+		phaseInfo.Err().GetCode())
 	return phaseInfo
 }
 
@@ -556,8 +566,19 @@ func (pm *PluginManager) faultsOnChildPods(
 }
 
 // podSucceeded reports whether this pod finished its work. The phase is the kubelet's own
-// verdict; the container check catches the pod whose containers have all exited cleanly
-// but whose phase has not caught up yet.
+// verdict; the container checks below catch the pod whose work is done but whose phase has
+// not caught up, or never will.
+//
+// What settles it is the container running the task's own work. A worker that finished
+// cleanly can be held Running indefinitely by a sidecar that does not know to stop, which
+// is what a legacy-injected service mesh proxy does, and judging such a pod by all its
+// containers would call it unfinished forever. The reverse matters just as much: a helper
+// container that exited first must not make a pod look finished while the real work is
+// still running, or still crash-looping.
+//
+// Only a declared primary container counts. When nobody declared one there is nothing to
+// tell the work apart from its helpers, so the older rule stands: every container has to
+// have exited cleanly.
 func podSucceeded(pod *v1.Pod) bool {
 	if pod.Status.Phase == v1.PodSucceeded {
 		return true
@@ -565,6 +586,19 @@ func podSucceeded(pod *v1.Pod) bool {
 	if pod.Status.Phase != v1.PodRunning || len(pod.Status.ContainerStatuses) == 0 {
 		return false
 	}
+
+	if primary := flytek8s.DeclaredPrimaryContainerName(pod); primary != "" {
+		for _, status := range pod.Status.ContainerStatuses {
+			if status.Name != primary {
+				continue
+			}
+			terminated := status.State.Terminated
+			return terminated != nil && terminated.ExitCode == 0
+		}
+		// The declared primary is not among the statuses yet. Nothing is known about the
+		// work, so fall through rather than guess.
+	}
+
 	for _, status := range pod.Status.ContainerStatuses {
 		terminated := status.State.Terminated
 		if terminated == nil || terminated.ExitCode != 0 {
@@ -585,8 +619,18 @@ func podSucceeded(pod *v1.Pod) bool {
 // failure, is what excluding succeeded pods above bounds.
 func childPodFailureTime(pod *v1.Pod, failureAt time.Time) time.Time {
 	anchor := flytek8s.PodFailureTime(pod, failureAt)
-	if !failureAt.IsZero() && anchor.After(failureAt) {
-		return failureAt
+
+	// A plugin that reported no failure time at all still has to be bounded, or a pod the
+	// operator has not finished tearing down anchors at the moment of this reconcile and
+	// sweeps in every fault the node has recorded since. Now is the closest thing to the
+	// failure there is in that case, and PodFailureTime has already used it as its own last
+	// resort, so the two agree.
+	bound := failureAt
+	if bound.IsZero() {
+		bound = time.Now()
+	}
+	if anchor.After(bound) {
+		return bound
 	}
 	return anchor
 }
