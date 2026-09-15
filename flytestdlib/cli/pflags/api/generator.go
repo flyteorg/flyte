@@ -560,7 +560,11 @@ func NewGenerator(pkg, targetTypeName, defaultVariableName string, shouldBindDef
 
 func loadPackage(pkg string) (*types.Package, error) {
 	config := &packages.Config{
-		Mode: packages.NeedTypes | packages.NeedTypesInfo | packages.NeedDeps | packages.NeedImports,
+		// Keep source type information for the target package, including its
+		// unexported defaults. Imported fields, tags, and methods are available
+		// from export data; NeedDeps would type-check every dependency's source
+		// again for each pflags invocation.
+		Mode: packages.NeedTypes | packages.NeedTypesInfo | packages.NeedImports,
 		Logf: logger.InfofNoCtx,
 	}
 
