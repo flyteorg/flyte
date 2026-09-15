@@ -342,7 +342,7 @@ func TestClassifyGpuFailure(t *testing.T) {
 	// Recency is measured against the clock now, so the fixtures have to sit relative to
 	// it: base is inside the relevance window, stale is well outside it.
 	base := time.Now().Add(-time.Minute)
-	stale := time.Now().Add(-2 * gpuFaultRelevanceWindow)
+	stale := time.Now().Add(-2 * gpufault.RelevanceWindow)
 
 	tests := []struct {
 		name        string
@@ -554,7 +554,7 @@ func TestClassifyGpuFailureRelevanceIsAnInterval(t *testing.T) {
 	})
 
 	t.Run("a fault that only started after the failure does not explain it", func(t *testing.T) {
-		started := failedAt.Add(gpuFaultAfterFailureSlack + time.Minute)
+		started := failedAt.Add(gpufault.AfterFailureSlack + time.Minute)
 		got := classify(t, started, started.Add(5*time.Minute))
 		assert.Equal(t, "UnknownError", got.Err().GetCode())
 		assert.Nil(t, got.Err().GetGpuFault())
@@ -564,48 +564,6 @@ func TestClassifyGpuFailureRelevanceIsAnInterval(t *testing.T) {
 		got := classify(t, failedAt.Add(-90*time.Minute), failedAt.Add(-40*time.Minute))
 		assert.Equal(t, "UnknownError", got.Err().GetCode())
 		assert.Nil(t, got.Err().GetGpuFault())
-	})
-}
-
-func TestPodFailureTime(t *testing.T) {
-	occurredAt := time.Date(2026, 8, 25, 12, 0, 0, 0, time.UTC)
-
-	t.Run("prefers the latest container termination", func(t *testing.T) {
-		first := occurredAt.Add(-10 * time.Minute)
-		last := occurredAt.Add(-2 * time.Minute)
-		pod := &v1.Pod{Status: v1.PodStatus{ContainerStatuses: []v1.ContainerStatus{
-			{State: v1.ContainerState{Terminated: &v1.ContainerStateTerminated{FinishedAt: metav1.NewTime(first)}}},
-			{State: v1.ContainerState{Terminated: &v1.ContainerStateTerminated{FinishedAt: metav1.NewTime(last)}}},
-		}}}
-		assert.Equal(t, last, podFailureTime(pod, occurredAt))
-	})
-
-	t.Run("ignores init containers", func(t *testing.T) {
-		// An init container finished long before the work started, and a native sidecar
-		// declared among the init containers is reaped after everything else. Anchoring on
-		// either would put every real fault outside the window.
-		initFinished := occurredAt.Add(-3 * time.Hour)
-		pod := &v1.Pod{Status: v1.PodStatus{
-			InitContainerStatuses: []v1.ContainerStatus{
-				{State: v1.ContainerState{Terminated: &v1.ContainerStateTerminated{FinishedAt: metav1.NewTime(initFinished)}}},
-			},
-			ContainerStatuses: []v1.ContainerStatus{
-				{State: v1.ContainerState{Running: &v1.ContainerStateRunning{}}},
-			},
-		}}
-		assert.Equal(t, occurredAt, podFailureTime(pod, occurredAt))
-	})
-
-	t.Run("falls back to the deletion timestamp", func(t *testing.T) {
-		deletedAt := occurredAt.Add(-time.Minute)
-		deletion := metav1.NewTime(deletedAt)
-		pod := &v1.Pod{ObjectMeta: metav1.ObjectMeta{DeletionTimestamp: &deletion}}
-		assert.Equal(t, deletedAt, podFailureTime(pod, occurredAt))
-	})
-
-	t.Run("falls back to the reported time, then to now", func(t *testing.T) {
-		assert.Equal(t, occurredAt, podFailureTime(&v1.Pod{}, occurredAt))
-		assert.WithinDuration(t, time.Now(), podFailureTime(&v1.Pod{}, time.Time{}), time.Minute)
 	})
 }
 
