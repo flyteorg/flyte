@@ -3,6 +3,7 @@ package ray
 import (
 	"context"
 	"testing"
+	"time"
 
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
 	"github.com/stretchr/testify/assert"
@@ -11,10 +12,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
@@ -59,20 +62,17 @@ func TestRayChildPods(t *testing.T) {
 		assert.False(t, selector.Matches(labels.Set(podLabels)))
 	})
 
-	t.Run("falls back to the attempt alone before the cluster is named", func(t *testing.T) {
-		// KubeRay appends a random suffix to the cluster name, so it is only knowable
-		// from the RayJob's status. Until it is reported the attempt labels stand alone,
-		// which is still exact to one attempt of one action.
+	t.Run("looks at nothing before the cluster is named", func(t *testing.T) {
+		// KubeRay fills the cluster name in before it creates the RayCluster, so an empty
+		// one means no pod exists yet and there is nothing to find. Falling back to the
+		// attempt labels alone would search anyway, and those are sanitized and truncated
+		// to 63 characters, so two long action names sharing a prefix collapse onto one
+		// value and another action's pods would answer for this one.
 		selector, err := rayJobResourceHandler{}.ChildPods(
 			context.TODO(), attemptMetadata(attemptExecutionLabels()), rayJobWithCluster("test-namespace", ""))
 
 		require.NoError(t, err)
-		require.NotNil(t, selector)
-		assert.True(t, selector.Matches(labels.Set(attemptExecutionLabels())))
-
-		other := attemptExecutionLabels()
-		other[flytek8s.ActionLabel] = "a1"
-		assert.False(t, selector.Matches(labels.Set(other)))
+		assert.Nil(t, selector)
 	})
 
 	t.Run("declines when the attempt cannot be identified", func(t *testing.T) {
@@ -194,4 +194,24 @@ func TestRayChildPodsMatchTheTemplatesTheyCameFrom(t *testing.T) {
 			assert.True(t, attemptOnly.Matches(labels.Set(podLabels)))
 		})
 	}
+}
+
+// TestRayTaskInfoCarriesOccurredAt pins the time the framework measures a GPU fault's
+// relevance against, and bounds a child pod's own anchor to. Ray left it unset, which made
+// attemptFailedAt zero: the clamp on a child pod's anchor was skipped, so a worker the
+// operator had not finished tearing down anchored at the moment of the reconcile and swept
+// in every fault the node had recorded since.
+func TestRayTaskInfoCarriesOccurredAt(t *testing.T) {
+	rayJob := &rayv1.RayJob{
+		ObjectMeta: metav1.ObjectMeta{Namespace: "test-namespace", Name: "job"},
+		Status:     rayv1.RayJobStatus{RayClusterName: "job-abcde"},
+	}
+
+	before := time.Now()
+	info, err := getEventInfoForRayJob(
+		context.TODO(), logs.LogConfig{}, rayPluginContext(k8s.PluginState{}), rayJob)
+	require.NoError(t, err)
+	require.NotNil(t, info.OccurredAt)
+	assert.False(t, info.OccurredAt.IsZero())
+	assert.WithinRange(t, *info.OccurredAt, before, time.Now().Add(time.Second))
 }

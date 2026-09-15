@@ -317,7 +317,11 @@ func ToReplicaSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext
 	OverridePrimaryContainerName(podSpec, oldPrimaryContainerName, primaryContainerName)
 
 	cfg := config.GetK8sPluginConfig()
-	objectMeta.Annotations = utils.UnionMaps(cfg.DefaultAnnotations, objectMeta.Annotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
+	objectMeta.Annotations = utils.UnionMaps(cfg.DefaultAnnotations, objectMeta.Annotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()),
+		// The operator's webhook forces every replica container to this one name, which
+		// OverridePrimaryContainerName above has just applied, so it is what the task's own
+		// work runs under and what tells it from an injected sidecar.
+		map[string]string{flytek8s.PrimaryContainerKey: primaryContainerName})
 	objectMeta.Labels = utils.UnionMaps(cfg.DefaultLabels, objectMeta.Labels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 
 	replicas := int32(0)

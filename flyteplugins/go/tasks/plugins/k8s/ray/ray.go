@@ -49,6 +49,7 @@ const (
 	DisableUsageStatsStartParameter    = "disable-usage-stats"
 	DisableUsageStatsStartParameterVal = "true"
 	RayHeadContainerName               = "ray-head"
+	RayWorkerContainerName             = "ray-worker"
 	// rayClusterLabelKey is KubeRay's RayClusterLabelKey. KubeRay puts it on every head
 	// and worker pod it creates, naming the RayCluster the pod belongs to, and overwrites
 	// whatever the pod template had in that key. Copied from KubeRay rather than imported
@@ -563,7 +564,10 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 		// overwrite the identity the framework finds this pod by, and a pod it cannot
 		// find is one whose GPU faults never reach the failure.
 		flytek8s.PreservedPodLabels(taskCtx.TaskExecutionMetadata())))
-	podTemplateSpec.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()), spec.GetK8SPod().GetMetadata().GetAnnotations()))
+	podTemplateSpec.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()), spec.GetK8SPod().GetMetadata().GetAnnotations(),
+		// Names the container doing the task's own work, so a reader of this pod can tell
+		// it from an injected sidecar that may outlive it.
+		map[string]string{flytek8s.PrimaryContainerKey: primaryContainer.Name}))
 
 	return podTemplateSpec, nil
 }
@@ -609,7 +613,7 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 	// Some configs are copy from  https://github.com/ray-project/kuberay/blob/b72e6bdcd9b8c77a9dc6b5da8560910f3a0c3ffd/apiserver/pkg/util/cluster.go#L185
 	// They should always be the same, so we could hard code here.
 
-	primaryContainer.Name = "ray-worker"
+	primaryContainer.Name = RayWorkerContainerName
 
 	primaryContainer.Args = []string{}
 
@@ -626,7 +630,7 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 			Name: "CPU_REQUEST",
 			ValueFrom: &v1.EnvVarSource{
 				ResourceFieldRef: &v1.ResourceFieldSelector{
-					ContainerName: "ray-worker",
+					ContainerName: RayWorkerContainerName,
 					Resource:      "requests.cpu",
 				},
 			},
@@ -635,7 +639,7 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 			Name: "CPU_LIMITS",
 			ValueFrom: &v1.EnvVarSource{
 				ResourceFieldRef: &v1.ResourceFieldSelector{
-					ContainerName: "ray-worker",
+					ContainerName: RayWorkerContainerName,
 					Resource:      "limits.cpu",
 				},
 			},
@@ -644,7 +648,7 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 			Name: "MEMORY_REQUESTS",
 			ValueFrom: &v1.EnvVarSource{
 				ResourceFieldRef: &v1.ResourceFieldSelector{
-					ContainerName: "ray-worker",
+					ContainerName: RayWorkerContainerName,
 					Resource:      "requests.cpu",
 				},
 			},
@@ -653,7 +657,7 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 			Name: "MEMORY_LIMITS",
 			ValueFrom: &v1.EnvVarSource{
 				ResourceFieldRef: &v1.ResourceFieldSelector{
-					ContainerName: "ray-worker",
+					ContainerName: RayWorkerContainerName,
 					Resource:      "limits.cpu",
 				},
 			},
@@ -735,7 +739,10 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 		// overwrite the identity the framework finds this pod by, and a pod it cannot
 		// find is one whose GPU faults never reach the failure.
 		flytek8s.PreservedPodLabels(taskCtx.TaskExecutionMetadata())))
-	podTemplateSpec.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()), spec.GetK8SPod().GetMetadata().GetAnnotations()))
+	podTemplateSpec.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()), spec.GetK8SPod().GetMetadata().GetAnnotations(),
+		// Names the container doing the task's own work, so a reader of this pod can tell
+		// it from an injected sidecar that may outlive it.
+		map[string]string{flytek8s.PrimaryContainerKey: primaryContainer.Name}))
 	return podTemplateSpec, nil
 }
 
@@ -780,11 +787,12 @@ func (rayJobResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx 
 //
 // The selector is the attempt's own labels, which the head and worker templates carry
 // (see buildHeadPodTemplate and buildWorkerPodTemplate), narrowed by the RayCluster the
-// pods belong to. The cluster name is only knowable from the RayJob's status, because
-// KubeRay appends a random suffix to it; until the operator reports it the attempt labels
-// stand alone. That is not a wider search in any sense that matters: run, action and
-// attempt already pin the selector to this one attempt of this one action, so the worst it
-// can add is the job submitter pod, which has no GPU and so no faults to contribute.
+// pods belong to. Both halves are required. The attempt labels alone are not exact: they
+// are sanitized and truncated to the 63 characters a label value allows, so two long
+// action names sharing a prefix collapse onto one value, and a selector built from them
+// would reach another action's pods. The cluster name is what makes the match exact, and
+// it is only knowable from the RayJob's status because KubeRay appends a random suffix
+// to it.
 func (rayJobResourceHandler) ChildPods(
 	_ context.Context,
 	taskCtx pluginsCore.TaskExecutionMetadata,
@@ -800,15 +808,23 @@ func (rayJobResourceHandler) ChildPods(
 		return nil, nil
 	}
 
-	if clusterName := rayJob.Status.RayClusterName; clusterName != "" {
-		requirement, err := labels.NewRequirement(rayClusterLabelKey, selection.Equals, []string{clusterName})
-		if err != nil {
-			return nil, err
-		}
-		selector = selector.Add(*requirement)
+	clusterName := rayJob.Status.RayClusterName
+	if clusterName == "" {
+		// KubeRay fills the cluster name in before it creates the RayCluster, so an empty
+		// one means no pod of this job exists yet and there is nothing on record to find.
+		// Selecting on the attempt labels alone would look anyway, and those labels are
+		// sanitized and truncated to 63 characters, so two long action names that share a
+		// prefix collapse onto the same value and one action's pods would answer for
+		// another's. Looking at nothing is the only safe answer, and it costs nothing.
+		return nil, nil
 	}
 
-	return selector, nil
+	requirement, err := labels.NewRequirement(rayClusterLabelKey, selection.Equals, []string{clusterName})
+	if err != nil {
+		return nil, err
+	}
+
+	return selector.Add(*requirement), nil
 }
 
 func getEventInfoForRayJob(ctx context.Context, logConfig logs.LogConfig, pluginContext k8s.PluginContext, rayJob *rayv1.RayJob) (*pluginsCore.TaskInfo, error) {
@@ -881,9 +897,16 @@ func getEventInfoForRayJob(ctx context.Context, logConfig logs.LogConfig, plugin
 		taskLogs = append(taskLogs, dashboardURLOutput.TaskLogs...)
 	}
 
+	// The other CRD plugins all stamp this, and the framework needs it: it is the failure
+	// time a GPU fault's relevance is measured against, and the bound a child pod's own
+	// anchor is held to. Leaving it unset let a worker still held Running anchor at the
+	// moment of classification instead.
+	occurredAt := time.Now()
+
 	return &pluginsCore.TaskInfo{
 		Logs:       taskLogs,
 		LogContext: logContextForPods(rayJob.Name, podList.Items),
+		OccurredAt: &occurredAt,
 	}, nil
 }
 

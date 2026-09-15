@@ -3,6 +3,7 @@ package clustered
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -11,6 +12,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
+	jobsetconstants "sigs.k8s.io/jobset/pkg/constants"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
@@ -55,8 +57,17 @@ func (clusteredResourceHandler) IsTerminal(_ context.Context, resource client.Ob
 // framework tracks nothing of, since it tracks the JobSet.
 //
 // The selector is the attempt's own labels, which build.go merges onto every child pod
-// template, narrowed by the JobSet the pods belong to. The JobSet's name is its own, so
-// the selector is never partial.
+// template, narrowed by the JobSet the pods belong to and by the restart generation the
+// pods were created in.
+//
+// The generation matters because a JobSet restart recreates every child pod under the same
+// JobSet name, so name alone would pool the pods of every generation this attempt has been
+// through and let a fault from a long-dead generation explain the failure of the current
+// one. The controller stamps each generation's pods with its own restart-attempt number,
+// and the JobSet's Status.Restarts is that number for the generation now running: the
+// restart budget being exhausted is what ends the attempt, and it does not increment on the
+// way out. While a restart is in flight the two disagree for an instant, and the selector
+// then matches nothing rather than the wrong generation, which is the direction to fail in.
 func (clusteredResourceHandler) ChildPods(
 	_ context.Context,
 	taskCtx pluginsCore.TaskExecutionMetadata,
@@ -72,12 +83,18 @@ func (clusteredResourceHandler) ChildPods(
 		return nil, nil
 	}
 
-	requirement, err := labels.NewRequirement(jobsetv1alpha2.JobSetNameKey, selection.Equals, []string{jobSet.Name})
+	name, err := labels.NewRequirement(jobsetv1alpha2.JobSetNameKey, selection.Equals, []string{jobSet.Name})
 	if err != nil {
 		return nil, err
 	}
 
-	return selector.Add(*requirement), nil
+	generation, err := labels.NewRequirement(
+		jobsetconstants.RestartsKey, selection.Equals, []string{strconv.Itoa(int(jobSet.Status.Restarts))})
+	if err != nil {
+		return nil, err
+	}
+
+	return selector.Add(*name, *generation), nil
 }
 
 func (clusteredResourceHandler) GetCompletionTime(resource client.Object) (time.Time, error) {
