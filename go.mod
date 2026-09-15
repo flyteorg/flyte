@@ -3,7 +3,7 @@ module github.com/flyteorg/flyte/v2
 go 1.26.5
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260709200747-435963d16310.1
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2
 	cloud.google.com/go/secretmanager v1.21.0
 	connectrpc.com/connect v1.20.0
 	connectrpc.com/otelconnect v0.9.0
