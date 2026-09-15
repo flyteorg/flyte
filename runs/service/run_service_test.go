@@ -824,6 +824,66 @@ func TestListRuns(t *testing.T) {
 	}
 }
 
+// TestListRuns_SearchFilter verifies the console's synthetic "search" filter is resolved
+// into the run-name-or-task-name predicate before the allow-list parser sees the request,
+// that plain column filters still pass through alongside it, and that the caller's request
+// is not mutated.
+func TestListRuns_SearchFilter(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+
+	var captured interfaces.ListResourceInput
+	actionRepo.On("ListActions", mock.Anything, mock.MatchedBy(func(input interfaces.ListResourceInput) bool {
+		captured = input
+		return true
+	})).Return([]*models.Run{}, nil).Once()
+
+	listReq := &common.ListRequest{
+		Limit: 10,
+		Filters: []*common.Filter{
+			{Field: "search", Function: common.Filter_CONTAINS_CASE_INSENSITIVE, Values: []string{"abc"}},
+			{Field: "phase", Function: common.Filter_EQUAL, Values: []string{"2"}},
+		},
+	}
+	_, err := svc.ListRuns(context.Background(), connect.NewRequest(&workflow.ListRunsRequest{
+		ScopeBy: &workflow.ListRunsRequest_ProjectId{ProjectId: &common.ProjectIdentifier{Name: "p", Domain: "d"}},
+		Request: listReq,
+	}))
+	require.NoError(t, err)
+
+	require.NotNil(t, captured.Filter)
+	expr, err := captured.Filter.QueryExpression("")
+	require.NoError(t, err)
+	assert.Contains(t, expr.Query, "(LOWER(run_name) LIKE LOWER(?)) OR (LOWER(task_name) LIKE LOWER(?))")
+	assert.Contains(t, expr.Query, "phase = ?")
+	assert.Contains(t, expr.Args, "%abc%")
+
+	// The request handed in by the caller still carries the search filter.
+	require.Len(t, listReq.Filters, 2)
+	assert.Equal(t, "search", listReq.Filters[0].GetField())
+}
+
+// TestListRuns_RejectsBadSearchFilter verifies a search filter with an unsupported operator
+// is an InvalidArgument and never reaches the repository. The service is built inline
+// because newTestService requires the repository accessor to be used, and this path must
+// fail before it is.
+func TestListRuns_RejectsBadSearchFilter(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{} // no expectations: any ListActions call fails the test
+	repo := &repoMocks.Repository{}
+	repo.On("ActionRepo").Maybe().Return(actionRepo)
+	svc := &RunService{repo: repo}
+	t.Cleanup(func() { actionRepo.AssertExpectations(t) })
+
+	_, err := svc.ListRuns(context.Background(), connect.NewRequest(&workflow.ListRunsRequest{
+		ScopeBy: &workflow.ListRunsRequest_ProjectId{ProjectId: &common.ProjectIdentifier{Name: "p", Domain: "d"}},
+		Request: &common.ListRequest{
+			Limit:   10,
+			Filters: []*common.Filter{{Field: "search", Function: common.Filter_GREATER_THAN, Values: []string{"abc"}}},
+		},
+	}))
+	require.Error(t, err)
+	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+}
+
 // TestListAndSendAllActionsUsesAscendingSort guards against regressing the
 // default repo sort order leaking into the WatchActions seed path. Children
 // have a later created_at than their parents; if ListActions returns rows in

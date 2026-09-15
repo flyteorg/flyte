@@ -947,8 +947,24 @@ func (s *RunService) ListRuns(
 		scopeFilter = scopeFilter.And(impl.NewHasPausedActionFilter())
 	}
 
+	// The console's run search box arrives as a filter on the synthetic "search" field
+	// (run name OR task name). Resolve it here and AND it onto the scope filter: the
+	// generic parser below validates fields against the action column allow-list and
+	// would reject it.
+	listReq := req.Msg.Request
+	searchFilter, remainingFilters, err := impl.SplitSearchFilters(listReq.GetFilters())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+	if searchFilter != nil {
+		scopeFilter = scopeFilter.And(searchFilter)
+		// Clone so the caller's request is not mutated when the search filter is stripped.
+		listReq = proto.Clone(listReq).(*common.ListRequest)
+		listReq.Filters = remainingFilters
+	}
+
 	// Parse pagination, sort, and user-supplied filters from the common ListRequest.
-	listInput, err := impl.NewListResourceInputFromProto(req.Msg.Request, models.ActionColumnsSet)
+	listInput, err := impl.NewListResourceInputFromProto(listReq, models.ActionColumnsSet)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}

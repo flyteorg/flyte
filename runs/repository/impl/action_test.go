@@ -488,6 +488,57 @@ func TestListRuns_HasPausedActionFilter(t *testing.T) {
 	assert.False(t, runs[0].ParentActionName.Valid, "only the root action should be returned")
 }
 
+// TestListRuns_SearchFilter runs the console's run search predicate against a real
+// database: one term must match either the run name or the task name, case-insensitively,
+// and EQUAL on a full run name must select exactly that run.
+func TestListRuns_SearchFilter(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	// Run names are unrelated to task names so a match is attributable to one column.
+	for _, a := range []*models.Action{
+		{Project: "proj1", Domain: "domain1", RunName: "runone-abc", Name: rootActionName,
+			TaskName: sql.NullString{String: "env1.searchfn", Valid: true},
+			Phase:    int32(common.ActionPhase_ACTION_PHASE_RUNNING)},
+		{Project: "proj1", Domain: "domain1", RunName: "runtwo-abc", Name: rootActionName,
+			TaskName: sql.NullString{String: "env2.otherfn", Valid: true},
+			Phase:    int32(common.ActionPhase_ACTION_PHASE_RUNNING)},
+	} {
+		_, err := actionRepo.CreateAction(ctx, a, false)
+		require.NoError(t, err)
+	}
+
+	search := func(t *testing.T, fn common.Filter_Function, term string) []string {
+		t.Helper()
+		filter, err := NewSearchFilter(fn, []string{term})
+		require.NoError(t, err)
+		runs, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+			Filter: NewIsRootActionFilter().And(filter),
+			Limit:  50,
+		})
+		require.NoError(t, err)
+		names := make([]string, 0, len(runs))
+		for _, r := range runs {
+			names = append(names, r.RunName)
+		}
+		return names
+	}
+
+	assert.ElementsMatch(t, []string{"runone-abc"}, search(t, common.Filter_CONTAINS_CASE_INSENSITIVE, "RUNONE"),
+		"matches the run name case-insensitively")
+	assert.ElementsMatch(t, []string{"runone-abc"}, search(t, common.Filter_CONTAINS_CASE_INSENSITIVE, "searchfn"),
+		"matches the task name")
+	assert.ElementsMatch(t, []string{"runone-abc", "runtwo-abc"}, search(t, common.Filter_CONTAINS_CASE_INSENSITIVE, "abc"),
+		"matches either column across runs")
+	assert.ElementsMatch(t, []string{"runtwo-abc"}, search(t, common.Filter_EQUAL, "runtwo-abc"),
+		"EQUAL selects exactly the named run")
+	assert.Empty(t, search(t, common.Filter_CONTAINS_CASE_INSENSITIVE, "nomatch"),
+		"a term matching neither column returns nothing")
+}
+
 // TestListActions_KeysetPagination covers the O(n) keyset paging used by the
 // WatchActions snapshot: pages continue after the previous page's (created_at, name)
 // instead of by OFFSET. It forces tied created_at (the bulk-created map-task case) so
