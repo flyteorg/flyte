@@ -148,7 +148,7 @@ Regularly sync with upstream:
 
 ```bash
 git fetch upstream
-git rebase upstream/v2
+git rebase upstream/main
 ```
 
 ### CI Checks on Pull Requests from Forks
@@ -337,7 +337,7 @@ git push origin feature/your-feature-name
 1. Go to the [Flyte repository](https://github.com/flyteorg/flyte)
 2. Click "New Pull Request"
 3. Select your fork and branch
-4. Target the `v2` branch (not `main`)
+4. Target the `main` branch
 5. Fill out the PR template with:
    - Description of changes
    - Motivation and context
