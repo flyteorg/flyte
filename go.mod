@@ -20,7 +20,9 @@ require (
 	github.com/eko/gocache/lib/v4 v4.2.4
 	github.com/eko/gocache/store/freecache/v4 v4.2.4
 	github.com/eko/gocache/store/redis/v4 v4.2.6
+	github.com/ernesto-jimenez/gogen v0.0.0-20180125220232-d7d4131e6607
 	github.com/fatih/color v1.19.0
+	github.com/fatih/structtag v1.2.0
 	github.com/fergusstrange/embedded-postgres v1.34.0
 	github.com/flyteorg/stow v0.3.13
 	github.com/fsnotify/fsnotify v1.10.1
@@ -218,7 +220,7 @@ require (
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/term v0.45.0 // indirect
 	golang.org/x/text v0.41.0 // indirect
-	golang.org/x/tools v0.49.0 // indirect
+	golang.org/x/tools v0.49.0
 	gomodules.xyz/jsonpatch/v2 v2.5.0 // indirect
 	google.golang.org/genproto v0.0.0-20260715232425-e75dac1f907d // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
