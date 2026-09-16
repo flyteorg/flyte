@@ -8,6 +8,7 @@ import "flyteidl2/common/phase.proto";
 import "flyteidl2/common/run.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/security.proto";
+import "flyteidl2/core/tasks.proto";
 import "flyteidl2/notification/definition.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
@@ -180,6 +181,11 @@ message RunSpec {
   // RELATION_TYPE_RECOVER: the run recovers relation.related_to — its successful
   // actions are reused and only failed/changed ones re-execute. See Recover.
   Recover recover = 19;
+
+  // Resource defaults for every action in this run. requests fill each request dimension a task template leaves
+  // unset; limits are the per-dimension maximum. Resolved by the server at creation from the org, project and domain
+  // task_resource settings; a caller-supplied value is currently overwritten.
+  flyteidl2.core.Resources task_resource_defaults = 20;
 }
 
 message InlineRuleList {
