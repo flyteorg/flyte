@@ -5,13 +5,11 @@ import (
 	"fmt"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 type InMemoryOutputReader struct {
 	literals *core.LiteralMap
-	DeckPath *storage.DataReference
 	err      *io.ExecutionError
 }
 
@@ -42,14 +40,9 @@ func (r InMemoryOutputReader) Read(_ context.Context) (*core.LiteralMap, *io.Exe
 	return r.literals, r.err, nil
 }
 
-func (r InMemoryOutputReader) DeckExists(_ context.Context) (bool, error) {
-	return r.DeckPath != nil, nil
-}
-
-func NewInMemoryOutputReader(literals *core.LiteralMap, DeckPath *storage.DataReference, err *io.ExecutionError) InMemoryOutputReader {
+func NewInMemoryOutputReader(literals *core.LiteralMap, err *io.ExecutionError) InMemoryOutputReader {
 	return InMemoryOutputReader{
 		literals: literals,
-		DeckPath: DeckPath,
 		err:      err,
 	}
 }

@@ -112,7 +112,7 @@ func (c *Client) Get(ctx context.Context, key catalog.Key) (catalog.Entry, error
 		return catalog.Entry{}, err
 	}
 
-	outputReader := ioutils.NewInMemoryOutputReader(outputs, nil, nil)
+	outputReader := ioutils.NewInMemoryOutputReader(outputs, nil)
 	status := catalog.NewStatus(corepb.CatalogCacheStatus_CACHE_HIT, newCatalogMetadata(output.GetMetadata(), source))
 	return catalog.NewCatalogEntry(outputReader, status), nil
 }

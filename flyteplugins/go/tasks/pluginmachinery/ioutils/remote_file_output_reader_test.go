@@ -13,36 +13,11 @@ import (
 	"google.golang.org/protobuf/runtime/protoiface"
 )
 
-type MemoryMetadata struct {
-	exists     bool
-	size       int64
-	etag       string
-	contentMD5 string
-}
-
-func (m MemoryMetadata) ContentMD5() string {
-	return m.contentMD5
-}
-
-func (m MemoryMetadata) Size() int64 {
-	return m.size
-}
-
-func (m MemoryMetadata) Exists() bool {
-	return m.exists
-}
-
-func (m MemoryMetadata) Etag() string {
-	return m.etag
-}
-
 func TestReadOrigin(t *testing.T) {
 	ctx := context.TODO()
 
 	opath := &pluginsIOMock.OutputFilePaths{}
 	opath.EXPECT().GetErrorPath().Return("")
-	deckPath := "deck.html"
-	opath.EXPECT().GetDeckPath().Return(storage.DataReference(deckPath))
 
 	t.Run("user", func(t *testing.T) {
 		errorDoc := &core.ErrorDocument{
@@ -60,10 +35,6 @@ func TestReadOrigin(t *testing.T) {
 			casted.Error = errorDoc.Error
 		}).Return(nil)
 
-		store.EXPECT().Head(ctx, storage.DataReference("deck.html")).Return(MemoryMetadata{
-			exists: true,
-		}, nil)
-
 		r := RemoteFileOutputReader{
 			OutPath:        opath,
 			store:          store,
@@ -78,9 +49,6 @@ func TestReadOrigin(t *testing.T) {
 		// travels on the wire to downstream services. Without this, all errors
 		// surface as the proto3 zero (NON_RECOVERABLE) regardless of intent.
 		assert.Equal(t, core.ContainerError_NON_RECOVERABLE, ee.GetRecoverability())
-		exists, err := r.DeckExists(ctx)
-		assert.NoError(t, err)
-		assert.True(t, exists)
 	})
 
 	t.Run("system", func(t *testing.T) {
