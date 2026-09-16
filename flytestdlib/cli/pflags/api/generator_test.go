@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"flag"
 	"go/token"
 	"go/types"
@@ -70,7 +69,7 @@ func TestNewGenerator(t *testing.T) {
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
-			ctx := context.Background()
+			ctx := t.Context()
 			p, err := g.Generate(ctx)
 			if !assert.NoError(t, err) {
 				t.FailNow()
@@ -132,7 +131,7 @@ func TestNewGenerator(t *testing.T) {
 
 func TestBuildFieldForMap(t *testing.T) {
 	t.Run("supported : StringToString", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		key := types.Typ[types.String]
 		elem := types.Typ[types.String]
 		typesMap := types.NewMap(key, elem)
@@ -147,7 +146,7 @@ func TestBuildFieldForMap(t *testing.T) {
 		assert.Equal(t, defaultValue, fieldInfo.DefaultValue)
 	})
 	t.Run("unsupported : not a string type map", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		key := types.Typ[types.Bool]
 		elem := types.Typ[types.Bool]
 		typesMap := types.NewMap(key, elem)
@@ -162,7 +161,7 @@ func TestBuildFieldForMap(t *testing.T) {
 		assert.Equal(t, "nil", fieldInfo.DefaultValue)
 	})
 	t.Run("unsupported : elem not a basic type", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		key := types.Typ[types.String]
 		elem := &types.Interface{}
 		typesMap := types.NewMap(key, elem)
@@ -179,7 +178,7 @@ func TestBuildFieldForMap(t *testing.T) {
 		assert.Equal(t, "", fieldInfo.DefaultValue)
 	})
 	t.Run("supported : StringToFloat64", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		key := types.Typ[types.String]
 		elem := types.Typ[types.Float64]
 		typesMap := types.NewMap(key, elem)
@@ -197,7 +196,7 @@ func TestBuildFieldForMap(t *testing.T) {
 
 func TestDiscoverFieldsRecursive(t *testing.T) {
 	t.Run("empty struct", func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		defaultValueAccessor := "defaultAccessor"
 		fieldPath := "field.Path"
 		pkg := types.NewPackage("p", "p")
