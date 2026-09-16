@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,7 +13,7 @@ func TestGeneratorRetainsImportedTypesAndUnexportedDefaults(t *testing.T) {
 		"Config", "defaultConfig", false,
 	)
 	require.NoError(t, err)
-	provider, err := generator.Generate(context.Background())
+	provider, err := generator.Generate(t.Context())
 	require.NoError(t, err)
 
 	fields := make(map[string]FieldInfo)
