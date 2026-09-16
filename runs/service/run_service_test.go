@@ -46,22 +46,28 @@ func noSettings(t *testing.T) *repoMocks.SettingsRepo {
 	return m
 }
 
-// settingsWithQueue returns a settings repo holding one org-level row that sets the
-// default queue. The row key must match what fetchLevels asks for, or the lookup
-// aligns to nothing.
-func settingsWithQueue(t *testing.T, queue string) *repoMocks.SettingsRepo {
+// settingsRepoWith returns a settings repo holding one org-level row with the given
+// settings. The row key must match what fetchLevels asks for, or the lookup aligns
+// to nothing.
+func settingsRepoWith(t *testing.T, s *settings.Settings) *repoMocks.SettingsRepo {
 	t.Helper()
-	data, err := protojson.Marshal(&settings.Settings{
-		Run: &settings.RunSettings{
-			DefaultQueue: &settings.StringSetting{State: stateValue, StringValue: queue},
-		},
-	})
+	data, err := protojson.Marshal(s)
 	require.NoError(t, err)
 
 	m := &repoMocks.SettingsRepo{}
 	m.On("GetSettingsByKeys", mock.Anything, mock.Anything).
 		Return([]*models.Settings{{Key: models.EncodeSettingsKey("", ""), Data: data, Version: 1}}, nil)
 	return m
+}
+
+// settingsWithQueue returns a settings repo whose one row sets the default queue.
+func settingsWithQueue(t *testing.T, queue string) *repoMocks.SettingsRepo {
+	t.Helper()
+	return settingsRepoWith(t, &settings.Settings{
+		Run: &settings.RunSettings{
+			DefaultQueue: &settings.StringSetting{State: stateValue, StringValue: queue},
+		},
+	})
 }
 
 // newMockProjectClientAlwaysOK returns a mock ProjectServiceClient whose GetProject always succeeds.
@@ -1395,6 +1401,37 @@ func TestCreateRun_RejectsInvalidRunName(t *testing.T) {
 			assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 		})
 	}
+}
+
+func TestCreateRun_RejectsInvalidPodTemplateName(t *testing.T) {
+	// Only the settings and project lookups run before the check. Everything else stays
+	// nil on purpose: were the check missing, the write path would panic and fail the test.
+	svc := &RunService{
+		settingsRepo: settingsRepoWith(t, &settings.Settings{
+			PodTemplateName: &settings.StringSetting{State: stateValue, StringValue: "GPU Template"},
+		}),
+		projectClient: newMockProjectClientAlwaysOK(t),
+	}
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{
+				Org:     "org",
+				Project: "proj",
+				Domain:  "dev",
+				Name:    "rq-123",
+			},
+		},
+		InputWrapper: &workflow.CreateRunRequest_Inputs{Inputs: &task.Inputs{}},
+		Task: &workflow.CreateRunRequest_TaskSpec{
+			TaskSpec: &task.TaskSpec{},
+		},
+	}
+
+	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	require.Error(t, err)
+	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+	assert.ErrorContains(t, err, "pod template name")
 }
 
 func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
