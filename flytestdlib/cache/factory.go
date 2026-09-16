@@ -86,7 +86,7 @@ func NewFactory(ctx context.Context, c *Config, secretManager SecretManager, sco
 }
 
 // New creates a new cache with the given name and load function.
-func New[T any](name string, cacheType Type, f Factory, loadFunc cache.LoadFunction[T], scope promutils.Scope) (cache.CacheInterface[T], error) {
+func (f Factory) New[T any](name string, cacheType Type, loadFunc cache.LoadFunction[T], scope promutils.Scope) (cache.CacheInterface[T], error) {
 	scope = scope.NewSubScope(name)
 	var cacheManager cache.CacheInterface[any]
 	inMemoryStoreCache := cache.New[any](f.inMemoryCache)
