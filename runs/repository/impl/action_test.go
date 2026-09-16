@@ -509,7 +509,7 @@ func TestListRuns_HasPausedActionFilter(t *testing.T) {
 func TestListRuns_SearchFilter(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := newTestActionRepo(db, testDbConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
