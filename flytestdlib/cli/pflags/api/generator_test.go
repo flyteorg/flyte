@@ -5,7 +5,6 @@ import (
 	"flag"
 	"go/token"
 	"go/types"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -20,8 +19,8 @@ var update = flag.Bool("update", false, "Updates testdata")
 
 // If v is a pointer, it will get its element value or the zero value of the element type.
 // If v is not a pointer, it will return it as is.
-func elemValueOrNil(v interface{}) interface{} {
-	if t := reflect.TypeOf(v); t.Kind() == reflect.Ptr {
+func elemValueOrNil(v any) any {
+	if t := reflect.TypeOf(v); t.Kind() == reflect.Pointer {
 		if reflect.ValueOf(v).IsNil() {
 			return reflect.Zero(t.Elem()).Interface()
 		}
@@ -77,14 +76,14 @@ func TestNewGenerator(t *testing.T) {
 				t.FailNow()
 			}
 
-			codeOutput, err := ioutil.TempFile("", "output-*.go")
+			codeOutput, err := os.CreateTemp("", "output-*.go")
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
 
 			defer func() { assert.NoError(t, os.Remove(codeOutput.Name())) }()
 
-			testOutput, err := ioutil.TempFile("", "output-*_test.go")
+			testOutput, err := os.CreateTemp("", "output-*_test.go")
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
@@ -94,10 +93,10 @@ func TestNewGenerator(t *testing.T) {
 			assert.NoError(t, p.WriteCodeFile(codeOutput.Name()))
 			assert.NoError(t, p.WriteTestFile(testOutput.Name()))
 
-			codeBytes, err := ioutil.ReadFile(codeOutput.Name())
+			codeBytes, err := os.ReadFile(codeOutput.Name())
 			assert.NoError(t, err)
 
-			testBytes, err := ioutil.ReadFile(testOutput.Name())
+			testBytes, err := os.ReadFile(testOutput.Name())
 			assert.NoError(t, err)
 
 			var goldenFilePath string
@@ -110,15 +109,15 @@ func TestNewGenerator(t *testing.T) {
 			}
 
 			if *update {
-				assert.NoError(t, ioutil.WriteFile(goldenFilePath, codeBytes, 0600))
-				assert.NoError(t, ioutil.WriteFile(goldenTestFilePath, testBytes, 0600))
+				assert.NoError(t, os.WriteFile(goldenFilePath, codeBytes, 0600))
+				assert.NoError(t, os.WriteFile(goldenTestFilePath, testBytes, 0600))
 			}
 
-			goldenOutput, err := ioutil.ReadFile(filepath.Clean(goldenFilePath))
+			goldenOutput, err := os.ReadFile(filepath.Clean(goldenFilePath))
 			assert.NoError(t, err)
 			assert.Equal(t, string(goldenOutput), string(codeBytes))
 
-			goldenTestOutput, err := ioutil.ReadFile(filepath.Clean(goldenTestFilePath))
+			goldenTestOutput, err := os.ReadFile(filepath.Clean(goldenTestFilePath))
 			assert.NoError(t, err)
 			assert.Equal(t, string(goldenTestOutput), string(testBytes))
 		})
