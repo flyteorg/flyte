@@ -6,11 +6,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 )
 
 func TestRemoteFileOutputWriter(t *testing.T) {
+	labeled.SetMetricKeys(contextutils.ExecIDKey)
 	ctx := context.TODO()
 	memStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.Nil(t, err)
