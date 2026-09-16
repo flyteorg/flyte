@@ -24,6 +24,9 @@ spec:
   {{- else }}
   maxUnavailable: {{ $budget.maxUnavailable | toJson }}
   {{- end }}
+  {{- with $budget.unhealthyPodEvictionPolicy }}
+  unhealthyPodEvictionPolicy: {{ . | quote }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "flyte-core.componentSelectorLabels" (dict "root" $ "component" $name) | nindent 6 }}

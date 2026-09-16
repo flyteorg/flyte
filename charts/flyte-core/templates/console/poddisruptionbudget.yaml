@@ -23,6 +23,9 @@ spec:
   {{- else }}
   maxUnavailable: {{ $budget.maxUnavailable | toJson }}
   {{- end }}
+  {{- with $budget.unhealthyPodEvictionPolicy }}
+  unhealthyPodEvictionPolicy: {{ . | quote }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "flyte-core.name" . }}
