@@ -28,6 +28,8 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings/settingsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
@@ -39,25 +41,27 @@ import (
 type Service struct {
 	dataproxyconnect.UnimplementedDataProxyServiceHandler
 
-	cfg           config.DataProxyConfig
-	dataStore     *storage.DataStore
-	taskClient    taskconnect.TaskServiceClient
-	triggerClient triggerconnect.TriggerServiceClient
-	runClient     workflowconnect.RunServiceClient
-	projectClient projectconnect.ProjectServiceClient
-	logStreamer   logs.LogStreamer
+	cfg            config.DataProxyConfig
+	dataStore      *storage.DataStore
+	taskClient     taskconnect.TaskServiceClient
+	triggerClient  triggerconnect.TriggerServiceClient
+	runClient      workflowconnect.RunServiceClient
+	projectClient  projectconnect.ProjectServiceClient
+	settingsClient settingsconnect.SettingsServiceClient
+	logStreamer    logs.LogStreamer
 }
 
 // NewService creates a new DataProxyService instance.
-func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient, runClient workflowconnect.RunServiceClient, projectClient projectconnect.ProjectServiceClient, logStreamer logs.LogStreamer) *Service {
+func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient, runClient workflowconnect.RunServiceClient, projectClient projectconnect.ProjectServiceClient, settingsClient settingsconnect.SettingsServiceClient, logStreamer logs.LogStreamer) *Service {
 	return &Service{
-		cfg:           cfg,
-		dataStore:     dataStore,
-		taskClient:    taskClient,
-		triggerClient: triggerClient,
-		runClient:     runClient,
-		projectClient: projectClient,
-		logStreamer:   logStreamer,
+		cfg:            cfg,
+		dataStore:      dataStore,
+		taskClient:     taskClient,
+		triggerClient:  triggerClient,
+		runClient:      runClient,
+		projectClient:  projectClient,
+		settingsClient: settingsClient,
+		logStreamer:    logStreamer,
 	}
 }
 
@@ -275,11 +279,19 @@ func (s *Service) UploadInputs(
 	// When base_dir is set it is a full path used verbatim, bucket and all, so it becomes
 	// the base reference directly (enabling cross-bucket writes); otherwise inputs go
 	// under the configured Upload.StoragePrefix within the operator's base container.
-	// TODO: consult org/project/domain settings (StorageSettings.run_base_dir) here as the
-	// middle tier once settings lookup lands; it must be applied in CreateRun too.
+	// A request without base_dir takes run_base_dir from org/project/domain settings
+	// instead, the same middle tier CreateRun applies, and uses it the same way.
+	base := strings.TrimRight(req.Msg.GetBaseDir(), "/")
+	if base == "" {
+		base, err = s.runBaseDirFromSettings(ctx, org, domain, project)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	var baseRef storage.DataReference
 	var pathComponents []string
-	if base := strings.TrimRight(req.Msg.GetBaseDir(), "/"); base != "" {
+	if base != "" {
 		baseRef = storage.DataReference(base)
 		pathComponents = []string{org, project, domain, "offloaded-inputs", inputsHash}
 	} else {
@@ -463,6 +475,25 @@ func (s *Service) resolveTaskTemplate(ctx context.Context, req *dataproxy.Upload
 	default:
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("task is required"))
 	}
+}
+
+// runBaseDirFromSettings returns the run_base_dir resolved from settings for the given
+// scope, or "" when no scope sets one. A failed lookup fails the upload rather than
+// falling back, matching CreateRun, so inputs never silently land outside a configured base.
+func (s *Service) runBaseDirFromSettings(ctx context.Context, org, domain, project string) (string, error) {
+	resp, err := s.settingsClient.GetSettings(ctx, connect.NewRequest(&settings.GetSettingsRequest{
+		Key: &settings.SettingsKey{Org: org, Domain: domain, Project: project},
+	}))
+	if err != nil {
+		logger.Errorf(ctx, "Failed to resolve settings for %s/%s: %v", project, domain, err)
+		return "", connect.NewError(connect.CodeInternal, fmt.Errorf("failed to resolve settings: %w", err))
+	}
+
+	baseDir := resp.Msg.GetSettingsRecord().GetSettings().GetRun().GetRunBaseDir()
+	if baseDir.GetState() != settings.SettingState_SETTING_STATE_VALUE {
+		return "", nil
+	}
+	return strings.TrimRight(baseDir.GetStringValue(), "/"), nil
 }
 
 // filterInputs returns a new Inputs with cache-ignored variables removed.
