@@ -38,6 +38,10 @@ Distributed Flyte 2 core services
 | components.actions.livenessProbe | object | `{}` |  |
 | components.actions.nodeSelector | object | `{}` |  |
 | components.actions.podAnnotations | object | `{}` |  |
+| components.actions.podDisruptionBudget.enabled | bool | `false` |  |
+| components.actions.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| components.actions.podDisruptionBudget.minAvailable | string | `nil` |  |
+| components.actions.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | components.actions.podLabels | object | `{}` |  |
 | components.actions.podSecurityContext | object | `{}` |  |
 | components.actions.priorityClassName | string | `""` |  |
@@ -78,6 +82,10 @@ Distributed Flyte 2 core services
 | components.app.livenessProbe | object | `{}` |  |
 | components.app.nodeSelector | object | `{}` |  |
 | components.app.podAnnotations | object | `{}` |  |
+| components.app.podDisruptionBudget.enabled | bool | `false` |  |
+| components.app.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| components.app.podDisruptionBudget.minAvailable | string | `nil` |  |
+| components.app.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | components.app.podLabels | object | `{}` |  |
 | components.app.podSecurityContext | object | `{}` |  |
 | components.app.priorityClassName | string | `""` |  |
@@ -118,6 +126,10 @@ Distributed Flyte 2 core services
 | components.cache.livenessProbe | object | `{}` |  |
 | components.cache.nodeSelector | object | `{}` |  |
 | components.cache.podAnnotations | object | `{}` |  |
+| components.cache.podDisruptionBudget.enabled | bool | `false` |  |
+| components.cache.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| components.cache.podDisruptionBudget.minAvailable | string | `nil` |  |
+| components.cache.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | components.cache.podLabels | object | `{}` |  |
 | components.cache.podSecurityContext | object | `{}` |  |
 | components.cache.priorityClassName | string | `""` |  |
@@ -158,6 +170,10 @@ Distributed Flyte 2 core services
 | components.dataproxy.livenessProbe | object | `{}` |  |
 | components.dataproxy.nodeSelector | object | `{}` |  |
 | components.dataproxy.podAnnotations | object | `{}` |  |
+| components.dataproxy.podDisruptionBudget.enabled | bool | `false` |  |
+| components.dataproxy.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| components.dataproxy.podDisruptionBudget.minAvailable | string | `nil` |  |
+| components.dataproxy.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | components.dataproxy.podLabels | object | `{}` |  |
 | components.dataproxy.podSecurityContext | object | `{}` |  |
 | components.dataproxy.priorityClassName | string | `""` |  |
@@ -198,6 +214,10 @@ Distributed Flyte 2 core services
 | components.events.livenessProbe | object | `{}` |  |
 | components.events.nodeSelector | object | `{}` |  |
 | components.events.podAnnotations | object | `{}` |  |
+| components.events.podDisruptionBudget.enabled | bool | `false` |  |
+| components.events.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| components.events.podDisruptionBudget.minAvailable | string | `nil` |  |
+| components.events.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | components.events.podLabels | object | `{}` |  |
 | components.events.podSecurityContext | object | `{}` |  |
 | components.events.priorityClassName | string | `""` |  |
@@ -238,6 +258,10 @@ Distributed Flyte 2 core services
 | components.executor.livenessProbe | object | `{}` |  |
 | components.executor.nodeSelector | object | `{}` |  |
 | components.executor.podAnnotations | object | `{}` |  |
+| components.executor.podDisruptionBudget.enabled | bool | `false` |  |
+| components.executor.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| components.executor.podDisruptionBudget.minAvailable | string | `nil` |  |
+| components.executor.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | components.executor.podLabels | object | `{}` |  |
 | components.executor.podSecurityContext | object | `{}` |  |
 | components.executor.priorityClassName | string | `""` |  |
@@ -277,6 +301,10 @@ Distributed Flyte 2 core services
 | components.runs.livenessProbe | object | `{}` |  |
 | components.runs.nodeSelector | object | `{}` |  |
 | components.runs.podAnnotations | object | `{}` |  |
+| components.runs.podDisruptionBudget.enabled | bool | `false` |  |
+| components.runs.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| components.runs.podDisruptionBudget.minAvailable | string | `nil` |  |
+| components.runs.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | components.runs.podLabels | object | `{}` |  |
 | components.runs.podSecurityContext | object | `{}` |  |
 | components.runs.priorityClassName | string | `""` |  |
@@ -317,6 +345,10 @@ Distributed Flyte 2 core services
 | components.secret.livenessProbe | object | `{}` |  |
 | components.secret.nodeSelector | object | `{}` |  |
 | components.secret.podAnnotations | object | `{}` |  |
+| components.secret.podDisruptionBudget.enabled | bool | `false` |  |
+| components.secret.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| components.secret.podDisruptionBudget.minAvailable | string | `nil` |  |
+| components.secret.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | components.secret.podLabels | object | `{}` |  |
 | components.secret.podSecurityContext | object | `{}` |  |
 | components.secret.priorityClassName | string | `""` |  |
@@ -469,6 +501,10 @@ Distributed Flyte 2 core services
 | console.imagePullSecrets | list | `[]` |  |
 | console.nodeSelector | object | `{}` |  |
 | console.podAnnotations | object | `{}` |  |
+| console.podDisruptionBudget.enabled | bool | `false` |  |
+| console.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| console.podDisruptionBudget.minAvailable | string | `nil` |  |
+| console.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | console.podLabels | object | `{}` |  |
 | console.replicaCount | int | `1` |  |
 | console.resources | object | `{}` |  |
