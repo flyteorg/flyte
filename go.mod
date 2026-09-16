@@ -20,6 +20,7 @@ require (
 	github.com/eko/gocache/lib/v4 v4.4.0
 	github.com/eko/gocache/store/freecache/v4 v4.2.10
 	github.com/eko/gocache/store/redis/v4 v4.2.12
+	github.com/ernesto-jimenez/gogen v0.0.0-20180125220232-d7d4131e6607
 	github.com/fatih/color v1.19.0
 	github.com/fergusstrange/embedded-postgres v1.34.0
 	github.com/flyteorg/stow v0.3.13
@@ -94,8 +95,10 @@ require (
 require (
 	github.com/Masterminds/semver/v3 v3.5.0
 	github.com/alicebob/miniredis/v2 v2.39.0
+	github.com/fatih/structtag v1.2.0
 	github.com/getsentry/sentry-go v0.49.0
 	github.com/kubeflow/spark-operator/v2 v2.5.2
+	golang.org/x/tools v0.49.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/apiextensions-apiserver v0.37.0
 )
@@ -218,7 +221,6 @@ require (
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/term v0.45.0 // indirect
 	golang.org/x/text v0.41.0 // indirect
-	golang.org/x/tools v0.49.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.5.0 // indirect
 	google.golang.org/genproto v0.0.0-20260715232425-e75dac1f907d // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
