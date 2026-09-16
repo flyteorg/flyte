@@ -152,10 +152,12 @@ class TaskResourceSettings(_message.Message):
     def __init__(self, min: _Optional[_Union[TaskResourceDefaults, _Mapping]] = ..., max: _Optional[_Union[TaskResourceDefaults, _Mapping]] = ..., mirror_limits_request: _Optional[_Union[BoolSetting, _Mapping]] = ...) -> None: ...
 
 class AppSettings(_message.Message):
-    __slots__ = ["disallow_anonymous"]
+    __slots__ = ["disallow_anonymous", "app_dns_strategy"]
     DISALLOW_ANONYMOUS_FIELD_NUMBER: _ClassVar[int]
+    APP_DNS_STRATEGY_FIELD_NUMBER: _ClassVar[int]
     disallow_anonymous: BoolSetting
-    def __init__(self, disallow_anonymous: _Optional[_Union[BoolSetting, _Mapping]] = ...) -> None: ...
+    app_dns_strategy: StringSetting
+    def __init__(self, disallow_anonymous: _Optional[_Union[BoolSetting, _Mapping]] = ..., app_dns_strategy: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
 
 class Settings(_message.Message):
     __slots__ = ["run", "security", "storage", "task_resource", "labels", "annotations", "environment_variables", "app", "pod_template_name"]
