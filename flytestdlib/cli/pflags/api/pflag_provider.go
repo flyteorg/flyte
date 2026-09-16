@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"go/types"
-	"io/ioutil"
+	"os"
 	"time"
 
 	"github.com/ernesto-jimenez/gogen/imports"
@@ -51,7 +51,7 @@ func (p PFlagProvider) WriteTestFile(outputFilePath string) error {
 }
 
 func (p PFlagProvider) writeToFile(buffer *bytes.Buffer, fileName string) error {
-	return ioutil.WriteFile(fileName, buffer.Bytes(), 0600)
+	return os.WriteFile(fileName, buffer.Bytes(), 0600)
 }
 
 // generate evaluates the generator and writes the output to buffer. targetFileName is used only to influence how imports are

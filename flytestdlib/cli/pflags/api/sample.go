@@ -53,7 +53,7 @@ func (c *ComplexJSONType) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
-	var v interface{}
+	var v any
 	if err := json.Unmarshal(b, &v); err != nil {
 		return err
 	}
