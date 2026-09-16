@@ -123,6 +123,12 @@ spec:
                 maxLength: 30
                 minLength: 1
                 type: string
+              podTemplateName:
+                description: |-
+                  PodTemplateName is the run-scoped pod template name projected from RunSpec.
+                  Stamped onto tasks that do not name one themselves.
+                maxLength: 253
+                type: string
               project:
                 description: Project this action belongs to
                 maxLength: 63

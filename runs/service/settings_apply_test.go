@@ -14,6 +14,10 @@ func runSettings(queue *settings.StringSetting, concurrency *settings.Int64Setti
 	}
 }
 
+func podTemplateSettings(name *settings.StringSetting) *settings.Settings {
+	return &settings.Settings{PodTemplateName: name}
+}
+
 func TestApplyRunSettings(t *testing.T) {
 	tests := []struct {
 		name            string
@@ -21,6 +25,7 @@ func TestApplyRunSettings(t *testing.T) {
 		resolved        *settings.Settings
 		wantQueue       string
 		wantConcurrency uint32
+		wantPodTemplate string
 	}{
 		{
 			name:      "empty queue takes the settings value",
@@ -68,6 +73,24 @@ func TestApplyRunSettings(t *testing.T) {
 			spec:     nil,
 			resolved: runSettings(&settings.StringSetting{State: stateValue, StringValue: "fast-queue"}, nil),
 		},
+		{
+			name:            "empty pod template takes the settings value",
+			spec:            &task.RunSpec{},
+			resolved:        podTemplateSettings(&settings.StringSetting{State: stateValue, StringValue: "gpu-template"}),
+			wantPodTemplate: "gpu-template",
+		},
+		{
+			name:            "an explicit pod template wins over settings",
+			spec:            &task.RunSpec{PodTemplateName: "user-template"},
+			resolved:        podTemplateSettings(&settings.StringSetting{State: stateValue, StringValue: "gpu-template"}),
+			wantPodTemplate: "user-template",
+		},
+		{
+			name:            "a pod template in INHERIT contributes nothing",
+			spec:            &task.RunSpec{},
+			resolved:        podTemplateSettings(&settings.StringSetting{State: stateInherit, StringValue: "gpu-template"}),
+			wantPodTemplate: "",
+		},
 	}
 
 	for _, tt := range tests {
@@ -75,6 +98,7 @@ func TestApplyRunSettings(t *testing.T) {
 			applyRunSettings(tt.spec, tt.resolved)
 			assert.Equal(t, tt.wantQueue, tt.spec.GetQueue())
 			assert.Equal(t, tt.wantConcurrency, tt.spec.GetMaxActionConcurrency())
+			assert.Equal(t, tt.wantPodTemplate, tt.spec.GetPodTemplateName())
 		})
 	}
 }

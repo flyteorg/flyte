@@ -180,6 +180,11 @@ message RunSpec {
   // RELATION_TYPE_RECOVER: the run recovers relation.related_to — its successful
   // actions are reused and only failed/changed ones re-execute. See Recover.
   Recover recover = 19;
+
+  // Run-scoped pod template name, projected onto tasks that do not name one
+  // themselves. Set by the server from settings; a task's own
+  // TaskMetadata.pod_template_name always wins.
+  string pod_template_name = 20;
 }
 
 message InlineRuleList {
