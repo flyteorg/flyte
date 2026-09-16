@@ -127,8 +127,16 @@ class RunSpec(_message.Message):
     task_spec_source: TaskSpecSource
     relation: _run_pb2.Relation
     recover: Recover
-    task_resource_defaults: _tasks_pb2.Resources
-    def __init__(self, labels: _Optional[_Union[Labels, _Mapping]] = ..., annotations: _Optional[_Union[Annotations, _Mapping]] = ..., envs: _Optional[_Union[Envs, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., queue: _Optional[str] = ..., raw_data_storage: _Optional[_Union[RawDataStorage, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., cache_config: _Optional[_Union[CacheConfig, _Mapping]] = ..., notification_rule_name: _Optional[str] = ..., notification_rules: _Optional[_Union[InlineRuleList, _Mapping]] = ..., run_start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., max_action_concurrency: _Optional[int] = ..., run_base_dir: _Optional[str] = ..., related_to: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., cluster_pool: _Optional[str] = ..., task_spec_source: _Optional[_Union[TaskSpecSource, str]] = ..., relation: _Optional[_Union[_run_pb2.Relation, _Mapping]] = ..., recover: _Optional[_Union[Recover, _Mapping]] = ..., task_resource_defaults: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ...) -> None: ...
+    task_resource_defaults: TaskResourceDefaults
+    def __init__(self, labels: _Optional[_Union[Labels, _Mapping]] = ..., annotations: _Optional[_Union[Annotations, _Mapping]] = ..., envs: _Optional[_Union[Envs, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., queue: _Optional[str] = ..., raw_data_storage: _Optional[_Union[RawDataStorage, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., cache_config: _Optional[_Union[CacheConfig, _Mapping]] = ..., notification_rule_name: _Optional[str] = ..., notification_rules: _Optional[_Union[InlineRuleList, _Mapping]] = ..., run_start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., max_action_concurrency: _Optional[int] = ..., run_base_dir: _Optional[str] = ..., related_to: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., cluster_pool: _Optional[str] = ..., task_spec_source: _Optional[_Union[TaskSpecSource, str]] = ..., relation: _Optional[_Union[_run_pb2.Relation, _Mapping]] = ..., recover: _Optional[_Union[Recover, _Mapping]] = ..., task_resource_defaults: _Optional[_Union[TaskResourceDefaults, _Mapping]] = ...) -> None: ...
+
+class TaskResourceDefaults(_message.Message):
+    __slots__ = ["requests", "max"]
+    REQUESTS_FIELD_NUMBER: _ClassVar[int]
+    MAX_FIELD_NUMBER: _ClassVar[int]
+    requests: _containers.RepeatedCompositeFieldContainer[_tasks_pb2.Resources.ResourceEntry]
+    max: _containers.RepeatedCompositeFieldContainer[_tasks_pb2.Resources.ResourceEntry]
+    def __init__(self, requests: _Optional[_Iterable[_Union[_tasks_pb2.Resources.ResourceEntry, _Mapping]]] = ..., max: _Optional[_Iterable[_Union[_tasks_pb2.Resources.ResourceEntry, _Mapping]]] = ...) -> None: ...
 
 class InlineRuleList(_message.Message):
     __slots__ = ["rules"]

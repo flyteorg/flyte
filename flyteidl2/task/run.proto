@@ -182,10 +182,20 @@ message RunSpec {
   // actions are reused and only failed/changed ones re-execute. See Recover.
   Recover recover = 19;
 
-  // Resource defaults for every action in this run. requests fill each request dimension a task template leaves
-  // unset; limits are the per-dimension maximum. Resolved by the server at creation from the org, project and domain
-  // task_resource settings; a caller-supplied value is currently overwritten.
-  flyteidl2.core.Resources task_resource_defaults = 20;
+  // Resource defaults for every action in this run. Resolved by the server at creation from the org, project and
+  // domain task_resource settings; a caller-supplied value is currently overwritten.
+  TaskResourceDefaults task_resource_defaults = 20;
+}
+
+// Resolved task_resource settings for a run: what a task pod gets when its template is silent, and the ceiling
+// either way. Deliberately not a flyteidl2.core.Resources: max is a ceiling on both a task's requests and its
+// limits, not a Kubernetes limit.
+message TaskResourceDefaults {
+  // Request for each dimension a task template leaves unset (task_resource.min, capped at max).
+  repeated flyteidl2.core.Resources.ResourceEntry requests = 1;
+
+  // Per-dimension cap on a task's requests and limits (task_resource.max).
+  repeated flyteidl2.core.Resources.ResourceEntry max = 2;
 }
 
 message InlineRuleList {
