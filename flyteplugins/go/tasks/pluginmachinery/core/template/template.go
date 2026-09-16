@@ -10,9 +10,6 @@
 //     to be unique per retry and finally one will be saved as the output path
 //   - {{ .PerRetryUniqueKey }} A key/id/str that is generated per retry and is guaranteed to be unique. Useful in query
 //     manipulations
-//   - {{ .TaskTemplatePath }} A path in blobstore/metadata store (e.g. s3, gcs etc) to where an offloaded version of the
-//     task template exists and can be accessed by the container / task execution environment. The template is a
-//     a serialized protobuf
 //   - {{ .PrevCheckpointPrefix }} A path to the checkpoint directory for the previous attempt. If this is the first attempt
 //     then this is replaced by an empty string
 //   - {{ .CheckpointOutputPrefix }} A Flyte aware path where the current execution should write the checkpoints.
@@ -46,7 +43,6 @@ var outputRegex = regexp.MustCompile(`(?i){{\s*[\.$]OutputPrefix\s*}}`)
 var inputVarRegex = regexp.MustCompile(`(?i){{\s*[\.$]Inputs\.(?P<input_name>[^}\s]+)\s*}}`)
 var rawOutputDataPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]RawOutputDataPrefix\s*}}`)
 var perRetryUniqueKey = regexp.MustCompile(`(?i){{\s*[\.$]PerRetryUniqueKey\s*}}`)
-var taskTemplateRegex = regexp.MustCompile(`(?i){{\s*[\.$]TaskTemplatePath\s*}}`)
 var prevCheckpointPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]PrevCheckpointPrefix\s*}}`)
 var currCheckpointPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]CheckpointOutputPrefix\s*}}`)
 var namespaceRegex = regexp.MustCompile(`(?i){{\s*[\.$]Namespace\s*}}`)
@@ -69,7 +65,6 @@ type Parameters struct {
 	TaskExecMetadata  core.TaskExecutionMetadata
 	Inputs            io.InputReader
 	OutputPath        io.OutputFilePaths
-	Task              core.TaskTemplatePath
 	IncludeConsoleURL bool
 }
 
@@ -142,17 +137,6 @@ func render(ctx context.Context, inputTemplate string, params Parameters, values
 	val = prevCheckpointPrefixRegex.ReplaceAllString(val, values.prevCheckpointPrefix)
 	val = currCheckpointPrefixRegex.ReplaceAllString(val, values.checkpointOutputPrefix)
 	val = perRetryUniqueKey.ReplaceAllString(val, values.perRetryUniqueKey)
-
-	// For Task template, we will replace only if there is a match. This is because, task template replacement
-	// may be expensive, as we may offload
-	if taskTemplateRegex.MatchString(val) {
-		p, err := params.Task.Path(ctx)
-		if err != nil {
-			logger.Debugf(ctx, "Failed to substitute Task Template reference - reason %s", err)
-			return "", err
-		}
-		val = taskTemplateRegex.ReplaceAllString(val, p.String())
-	}
 
 	// Replace namespace last, in case it was embedded in other templates
 	val = namespaceRegex.ReplaceAllString(val, params.TaskExecMetadata.GetNamespace())

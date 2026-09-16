@@ -263,7 +263,6 @@ func ToK8sContainer(ctx context.Context, tCtx pluginscore.TaskExecutionContext) 
 		TaskExecMetadata: tCtx.TaskExecutionMetadata(),
 		Inputs:           tCtx.InputReader(),
 		OutputPath:       tCtx.OutputWriter(),
-		Task:             tCtx.TaskReader(),
 	}
 
 	if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, ResourceCustomizationModeMergeExistingResources, container, extendedResources); err != nil {

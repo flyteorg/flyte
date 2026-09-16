@@ -96,7 +96,6 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 		TaskExecMetadata: taskMetadata,
 		Inputs:           in,
 		OutputPath:       out,
-		Task:             nil,
 	}
 	t.Run("nothing to substitute", func(t *testing.T) {
 		actual, err := Render(context.TODO(), []string{
@@ -132,7 +131,6 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			TaskExecMetadata: taskMetadata,
 			Inputs:           in,
 			OutputPath:       out,
-			Task:             nil,
 		}
 		actual, err := Render(context.TODO(), []string{
 			"hello",
@@ -212,7 +210,6 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			TaskExecMetadata: taskMetadata,
 			Inputs:           in,
 			OutputPath:       out,
-			Task:             nil,
 		}
 		actual, err := Render(context.TODO(), []string{
 			"hello",
@@ -241,7 +238,6 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			TaskExecMetadata: taskMetadata,
 			Inputs:           in,
 			OutputPath:       out,
-			Task:             nil,
 		}
 		actual, err := Render(context.TODO(), []string{
 			"hello",
@@ -270,7 +266,6 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			TaskExecMetadata: taskMetadata,
 			Inputs:           in,
 			OutputPath:       out,
-			Task:             nil,
 		}
 		actual, err := Render(context.TODO(), []string{
 			"hello",
@@ -295,7 +290,6 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			TaskExecMetadata: taskMetadata,
 			Inputs:           in,
 			OutputPath:       out,
-			Task:             nil,
 		}
 
 		actual, err := Render(context.TODO(), []string{
@@ -328,7 +322,6 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			TaskExecMetadata: taskMetadata,
 			Inputs:           in,
 			OutputPath:       out,
-			Task:             nil,
 		}
 		actual, err := Render(context.TODO(), []string{
 			`SELECT
@@ -359,7 +352,6 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			TaskExecMetadata: taskMetadata,
 			Inputs:           in,
 			OutputPath:       out,
-			Task:             nil,
 		}
 		_, err := Render(context.TODO(), []string{
 			"hello",
@@ -380,7 +372,6 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			TaskExecMetadata: taskMetadata,
 			Inputs:           in,
 			OutputPath:       out,
-			Task:             nil,
 		}
 		actual, err := Render(context.TODO(), []string{
 			"hello",
@@ -411,52 +402,6 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			"world",
 			"s3://custom-bucket",
 		}, actual)
-	})
-
-	t.Run("sub task template happy", func(t *testing.T) {
-		ctx := context.TODO()
-		tMock := &pluginsCoreMocks.TaskTemplatePath{}
-		tMock.EXPECT().Path(ctx).Return("s3://task-path", nil)
-		params := Parameters{
-			TaskExecMetadata: taskMetadata,
-			Inputs:           in,
-			OutputPath:       out,
-			Task:             tMock,
-		}
-
-		actual, err := Render(ctx, []string{
-			"hello",
-			"{{ .perRetryUniqueKey }}",
-			"world",
-			"{{ .taskTemplatePath }}",
-		}, params)
-		assert.NoError(t, err)
-		assert.Equal(t, []string{
-			"hello",
-			"per_retry_unique_key",
-			"world",
-			"s3://task-path",
-		}, actual)
-	})
-
-	t.Run("sub task template error", func(t *testing.T) {
-		ctx := context.TODO()
-		tMock := &pluginsCoreMocks.TaskTemplatePath{}
-		tMock.EXPECT().Path(ctx).Return("", fmt.Errorf("error"))
-		params := Parameters{
-			TaskExecMetadata: taskMetadata,
-			Inputs:           in,
-			OutputPath:       out,
-			Task:             tMock,
-		}
-
-		_, err := Render(ctx, []string{
-			"hello",
-			"{{ .perRetryUniqueKey }}",
-			"world",
-			"{{ .taskTemplatePath }}",
-		}, params)
-		assert.Error(t, err)
 	})
 
 	t.Run("missing checkpoint args", func(t *testing.T) {

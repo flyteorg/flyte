@@ -145,7 +145,6 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 			TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
 			Inputs:           taskCtx.InputReader(),
 			OutputPath:       taskCtx.OutputWriter(),
-			Task:             taskCtx.TaskReader(),
 		}
 		argTemplate = taskTemplate.GetContainer().GetArgs()
 		modifiedArgs, err := template.Render(ctx, taskTemplate.GetContainer().GetArgs(), templateParameters)

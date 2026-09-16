@@ -97,10 +97,6 @@ type inlineTaskReader struct {
 	data []byte
 }
 
-func (r *inlineTaskReader) Path(_ context.Context) (storage.DataReference, error) {
-	return "inline://taskTemplate", nil
-}
-
 func (r *inlineTaskReader) Read(_ context.Context) (*core.TaskTemplate, error) {
 	t := &core.TaskTemplate{}
 	if err := proto.Unmarshal(r.data, t); err != nil {
