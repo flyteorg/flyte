@@ -450,7 +450,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 	var opReader io.OutputReader
 	if outputs != nil {
 		logger.Debugf(ctx, "ConnectorDeployment returned an output.")
-		opReader = ioutils.NewInMemoryOutputReader(outputs, nil)
+		opReader = ioutils.NewInMemoryOutputReader(outputs, nil, nil)
 	} else {
 		logger.Debugf(ctx, "ConnectorDeployment didn't return any output, assuming file based outputs.")
 		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), 0)
