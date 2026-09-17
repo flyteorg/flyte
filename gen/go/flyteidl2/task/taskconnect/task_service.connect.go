@@ -43,15 +43,35 @@ const (
 	// TaskServiceListVersionsProcedure is the fully-qualified name of the TaskService's ListVersions
 	// RPC.
 	TaskServiceListVersionsProcedure = "/flyteidl2.task.TaskService/ListVersions"
+	// TaskServiceSetTaskAliasProcedure is the fully-qualified name of the TaskService's SetTaskAlias
+	// RPC.
+	TaskServiceSetTaskAliasProcedure = "/flyteidl2.task.TaskService/SetTaskAlias"
+	// TaskServiceGetTaskAliasProcedure is the fully-qualified name of the TaskService's GetTaskAlias
+	// RPC.
+	TaskServiceGetTaskAliasProcedure = "/flyteidl2.task.TaskService/GetTaskAlias"
+	// TaskServiceListTaskAliasesProcedure is the fully-qualified name of the TaskService's
+	// ListTaskAliases RPC.
+	TaskServiceListTaskAliasesProcedure = "/flyteidl2.task.TaskService/ListTaskAliases"
+	// TaskServiceDeleteTaskAliasProcedure is the fully-qualified name of the TaskService's
+	// DeleteTaskAlias RPC.
+	TaskServiceDeleteTaskAliasProcedure = "/flyteidl2.task.TaskService/DeleteTaskAlias"
+	// TaskServiceGetTaskAliasHistoryProcedure is the fully-qualified name of the TaskService's
+	// GetTaskAliasHistory RPC.
+	TaskServiceGetTaskAliasHistoryProcedure = "/flyteidl2.task.TaskService/GetTaskAliasHistory"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	taskServiceServiceDescriptor              = task.File_flyteidl2_task_task_service_proto.Services().ByName("TaskService")
-	taskServiceDeployTaskMethodDescriptor     = taskServiceServiceDescriptor.Methods().ByName("DeployTask")
-	taskServiceGetTaskDetailsMethodDescriptor = taskServiceServiceDescriptor.Methods().ByName("GetTaskDetails")
-	taskServiceListTasksMethodDescriptor      = taskServiceServiceDescriptor.Methods().ByName("ListTasks")
-	taskServiceListVersionsMethodDescriptor   = taskServiceServiceDescriptor.Methods().ByName("ListVersions")
+	taskServiceServiceDescriptor                   = task.File_flyteidl2_task_task_service_proto.Services().ByName("TaskService")
+	taskServiceDeployTaskMethodDescriptor          = taskServiceServiceDescriptor.Methods().ByName("DeployTask")
+	taskServiceGetTaskDetailsMethodDescriptor      = taskServiceServiceDescriptor.Methods().ByName("GetTaskDetails")
+	taskServiceListTasksMethodDescriptor           = taskServiceServiceDescriptor.Methods().ByName("ListTasks")
+	taskServiceListVersionsMethodDescriptor        = taskServiceServiceDescriptor.Methods().ByName("ListVersions")
+	taskServiceSetTaskAliasMethodDescriptor        = taskServiceServiceDescriptor.Methods().ByName("SetTaskAlias")
+	taskServiceGetTaskAliasMethodDescriptor        = taskServiceServiceDescriptor.Methods().ByName("GetTaskAlias")
+	taskServiceListTaskAliasesMethodDescriptor     = taskServiceServiceDescriptor.Methods().ByName("ListTaskAliases")
+	taskServiceDeleteTaskAliasMethodDescriptor     = taskServiceServiceDescriptor.Methods().ByName("DeleteTaskAlias")
+	taskServiceGetTaskAliasHistoryMethodDescriptor = taskServiceServiceDescriptor.Methods().ByName("GetTaskAliasHistory")
 )
 
 // TaskServiceClient is a client for the flyteidl2.task.TaskService service.
@@ -64,6 +84,19 @@ type TaskServiceClient interface {
 	ListTasks(context.Context, *connect.Request[task.ListTasksRequest]) (*connect.Response[task.ListTasksResponse], error)
 	// Lists all versions for a task.
 	ListVersions(context.Context, *connect.Request[task.ListVersionsRequest]) (*connect.Response[task.ListVersionsResponse], error)
+	// Create an alias, or move an existing one to a different version. This is the
+	// promote/rollback operation: deliberate, audited, and never a side effect of
+	// deploying. Carries its own authz action so "may promote, may not deploy" is
+	// expressible.
+	SetTaskAlias(context.Context, *connect.Request[task.SetTaskAliasRequest]) (*connect.Response[task.SetTaskAliasResponse], error)
+	// Resolve an alias to its current version, with who moved it there and when.
+	GetTaskAlias(context.Context, *connect.Request[task.GetTaskAliasRequest]) (*connect.Response[task.GetTaskAliasResponse], error)
+	// List every alias defined for a task.
+	ListTaskAliases(context.Context, *connect.Request[task.ListTaskAliasesRequest]) (*connect.Response[task.ListTaskAliasesResponse], error)
+	// Remove an alias. The versions it pointed at are unaffected.
+	DeleteTaskAlias(context.Context, *connect.Request[task.DeleteTaskAliasRequest]) (*connect.Response[task.DeleteTaskAliasResponse], error)
+	// Full move history for one alias: every from -> to, who, when.
+	GetTaskAliasHistory(context.Context, *connect.Request[task.GetTaskAliasHistoryRequest]) (*connect.Response[task.GetTaskAliasHistoryResponse], error)
 }
 
 // NewTaskServiceClient constructs a client for the flyteidl2.task.TaskService service. By default,
@@ -103,15 +136,53 @@ func NewTaskServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
+		setTaskAlias: connect.NewClient[task.SetTaskAliasRequest, task.SetTaskAliasResponse](
+			httpClient,
+			baseURL+TaskServiceSetTaskAliasProcedure,
+			connect.WithSchema(taskServiceSetTaskAliasMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		getTaskAlias: connect.NewClient[task.GetTaskAliasRequest, task.GetTaskAliasResponse](
+			httpClient,
+			baseURL+TaskServiceGetTaskAliasProcedure,
+			connect.WithSchema(taskServiceGetTaskAliasMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
+		listTaskAliases: connect.NewClient[task.ListTaskAliasesRequest, task.ListTaskAliasesResponse](
+			httpClient,
+			baseURL+TaskServiceListTaskAliasesProcedure,
+			connect.WithSchema(taskServiceListTaskAliasesMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
+		deleteTaskAlias: connect.NewClient[task.DeleteTaskAliasRequest, task.DeleteTaskAliasResponse](
+			httpClient,
+			baseURL+TaskServiceDeleteTaskAliasProcedure,
+			connect.WithSchema(taskServiceDeleteTaskAliasMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		getTaskAliasHistory: connect.NewClient[task.GetTaskAliasHistoryRequest, task.GetTaskAliasHistoryResponse](
+			httpClient,
+			baseURL+TaskServiceGetTaskAliasHistoryProcedure,
+			connect.WithSchema(taskServiceGetTaskAliasHistoryMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // taskServiceClient implements TaskServiceClient.
 type taskServiceClient struct {
-	deployTask     *connect.Client[task.DeployTaskRequest, task.DeployTaskResponse]
-	getTaskDetails *connect.Client[task.GetTaskDetailsRequest, task.GetTaskDetailsResponse]
-	listTasks      *connect.Client[task.ListTasksRequest, task.ListTasksResponse]
-	listVersions   *connect.Client[task.ListVersionsRequest, task.ListVersionsResponse]
+	deployTask          *connect.Client[task.DeployTaskRequest, task.DeployTaskResponse]
+	getTaskDetails      *connect.Client[task.GetTaskDetailsRequest, task.GetTaskDetailsResponse]
+	listTasks           *connect.Client[task.ListTasksRequest, task.ListTasksResponse]
+	listVersions        *connect.Client[task.ListVersionsRequest, task.ListVersionsResponse]
+	setTaskAlias        *connect.Client[task.SetTaskAliasRequest, task.SetTaskAliasResponse]
+	getTaskAlias        *connect.Client[task.GetTaskAliasRequest, task.GetTaskAliasResponse]
+	listTaskAliases     *connect.Client[task.ListTaskAliasesRequest, task.ListTaskAliasesResponse]
+	deleteTaskAlias     *connect.Client[task.DeleteTaskAliasRequest, task.DeleteTaskAliasResponse]
+	getTaskAliasHistory *connect.Client[task.GetTaskAliasHistoryRequest, task.GetTaskAliasHistoryResponse]
 }
 
 // DeployTask calls flyteidl2.task.TaskService.DeployTask.
@@ -134,6 +205,31 @@ func (c *taskServiceClient) ListVersions(ctx context.Context, req *connect.Reque
 	return c.listVersions.CallUnary(ctx, req)
 }
 
+// SetTaskAlias calls flyteidl2.task.TaskService.SetTaskAlias.
+func (c *taskServiceClient) SetTaskAlias(ctx context.Context, req *connect.Request[task.SetTaskAliasRequest]) (*connect.Response[task.SetTaskAliasResponse], error) {
+	return c.setTaskAlias.CallUnary(ctx, req)
+}
+
+// GetTaskAlias calls flyteidl2.task.TaskService.GetTaskAlias.
+func (c *taskServiceClient) GetTaskAlias(ctx context.Context, req *connect.Request[task.GetTaskAliasRequest]) (*connect.Response[task.GetTaskAliasResponse], error) {
+	return c.getTaskAlias.CallUnary(ctx, req)
+}
+
+// ListTaskAliases calls flyteidl2.task.TaskService.ListTaskAliases.
+func (c *taskServiceClient) ListTaskAliases(ctx context.Context, req *connect.Request[task.ListTaskAliasesRequest]) (*connect.Response[task.ListTaskAliasesResponse], error) {
+	return c.listTaskAliases.CallUnary(ctx, req)
+}
+
+// DeleteTaskAlias calls flyteidl2.task.TaskService.DeleteTaskAlias.
+func (c *taskServiceClient) DeleteTaskAlias(ctx context.Context, req *connect.Request[task.DeleteTaskAliasRequest]) (*connect.Response[task.DeleteTaskAliasResponse], error) {
+	return c.deleteTaskAlias.CallUnary(ctx, req)
+}
+
+// GetTaskAliasHistory calls flyteidl2.task.TaskService.GetTaskAliasHistory.
+func (c *taskServiceClient) GetTaskAliasHistory(ctx context.Context, req *connect.Request[task.GetTaskAliasHistoryRequest]) (*connect.Response[task.GetTaskAliasHistoryResponse], error) {
+	return c.getTaskAliasHistory.CallUnary(ctx, req)
+}
+
 // TaskServiceHandler is an implementation of the flyteidl2.task.TaskService service.
 type TaskServiceHandler interface {
 	// Deploy a task.
@@ -144,6 +240,19 @@ type TaskServiceHandler interface {
 	ListTasks(context.Context, *connect.Request[task.ListTasksRequest]) (*connect.Response[task.ListTasksResponse], error)
 	// Lists all versions for a task.
 	ListVersions(context.Context, *connect.Request[task.ListVersionsRequest]) (*connect.Response[task.ListVersionsResponse], error)
+	// Create an alias, or move an existing one to a different version. This is the
+	// promote/rollback operation: deliberate, audited, and never a side effect of
+	// deploying. Carries its own authz action so "may promote, may not deploy" is
+	// expressible.
+	SetTaskAlias(context.Context, *connect.Request[task.SetTaskAliasRequest]) (*connect.Response[task.SetTaskAliasResponse], error)
+	// Resolve an alias to its current version, with who moved it there and when.
+	GetTaskAlias(context.Context, *connect.Request[task.GetTaskAliasRequest]) (*connect.Response[task.GetTaskAliasResponse], error)
+	// List every alias defined for a task.
+	ListTaskAliases(context.Context, *connect.Request[task.ListTaskAliasesRequest]) (*connect.Response[task.ListTaskAliasesResponse], error)
+	// Remove an alias. The versions it pointed at are unaffected.
+	DeleteTaskAlias(context.Context, *connect.Request[task.DeleteTaskAliasRequest]) (*connect.Response[task.DeleteTaskAliasResponse], error)
+	// Full move history for one alias: every from -> to, who, when.
+	GetTaskAliasHistory(context.Context, *connect.Request[task.GetTaskAliasHistoryRequest]) (*connect.Response[task.GetTaskAliasHistoryResponse], error)
 }
 
 // NewTaskServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -179,6 +288,39 @@ func NewTaskServiceHandler(svc TaskServiceHandler, opts ...connect.HandlerOption
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
+	taskServiceSetTaskAliasHandler := connect.NewUnaryHandler(
+		TaskServiceSetTaskAliasProcedure,
+		svc.SetTaskAlias,
+		connect.WithSchema(taskServiceSetTaskAliasMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	taskServiceGetTaskAliasHandler := connect.NewUnaryHandler(
+		TaskServiceGetTaskAliasProcedure,
+		svc.GetTaskAlias,
+		connect.WithSchema(taskServiceGetTaskAliasMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
+	taskServiceListTaskAliasesHandler := connect.NewUnaryHandler(
+		TaskServiceListTaskAliasesProcedure,
+		svc.ListTaskAliases,
+		connect.WithSchema(taskServiceListTaskAliasesMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
+	taskServiceDeleteTaskAliasHandler := connect.NewUnaryHandler(
+		TaskServiceDeleteTaskAliasProcedure,
+		svc.DeleteTaskAlias,
+		connect.WithSchema(taskServiceDeleteTaskAliasMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	taskServiceGetTaskAliasHistoryHandler := connect.NewUnaryHandler(
+		TaskServiceGetTaskAliasHistoryProcedure,
+		svc.GetTaskAliasHistory,
+		connect.WithSchema(taskServiceGetTaskAliasHistoryMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.task.TaskService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case TaskServiceDeployTaskProcedure:
@@ -189,6 +331,16 @@ func NewTaskServiceHandler(svc TaskServiceHandler, opts ...connect.HandlerOption
 			taskServiceListTasksHandler.ServeHTTP(w, r)
 		case TaskServiceListVersionsProcedure:
 			taskServiceListVersionsHandler.ServeHTTP(w, r)
+		case TaskServiceSetTaskAliasProcedure:
+			taskServiceSetTaskAliasHandler.ServeHTTP(w, r)
+		case TaskServiceGetTaskAliasProcedure:
+			taskServiceGetTaskAliasHandler.ServeHTTP(w, r)
+		case TaskServiceListTaskAliasesProcedure:
+			taskServiceListTaskAliasesHandler.ServeHTTP(w, r)
+		case TaskServiceDeleteTaskAliasProcedure:
+			taskServiceDeleteTaskAliasHandler.ServeHTTP(w, r)
+		case TaskServiceGetTaskAliasHistoryProcedure:
+			taskServiceGetTaskAliasHistoryHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -212,4 +364,24 @@ func (UnimplementedTaskServiceHandler) ListTasks(context.Context, *connect.Reque
 
 func (UnimplementedTaskServiceHandler) ListVersions(context.Context, *connect.Request[task.ListVersionsRequest]) (*connect.Response[task.ListVersionsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.task.TaskService.ListVersions is not implemented"))
+}
+
+func (UnimplementedTaskServiceHandler) SetTaskAlias(context.Context, *connect.Request[task.SetTaskAliasRequest]) (*connect.Response[task.SetTaskAliasResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.task.TaskService.SetTaskAlias is not implemented"))
+}
+
+func (UnimplementedTaskServiceHandler) GetTaskAlias(context.Context, *connect.Request[task.GetTaskAliasRequest]) (*connect.Response[task.GetTaskAliasResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.task.TaskService.GetTaskAlias is not implemented"))
+}
+
+func (UnimplementedTaskServiceHandler) ListTaskAliases(context.Context, *connect.Request[task.ListTaskAliasesRequest]) (*connect.Response[task.ListTaskAliasesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.task.TaskService.ListTaskAliases is not implemented"))
+}
+
+func (UnimplementedTaskServiceHandler) DeleteTaskAlias(context.Context, *connect.Request[task.DeleteTaskAliasRequest]) (*connect.Response[task.DeleteTaskAliasResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.task.TaskService.DeleteTaskAlias is not implemented"))
+}
+
+func (UnimplementedTaskServiceHandler) GetTaskAliasHistory(context.Context, *connect.Request[task.GetTaskAliasHistoryRequest]) (*connect.Response[task.GetTaskAliasHistoryResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.task.TaskService.GetTaskAliasHistory is not implemented"))
 }
