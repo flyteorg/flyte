@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"sort"
 	"sync"
 	"time"
 
@@ -273,7 +274,7 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 			lastEventUpdate,
 			lastEventRecordedAt,
 		)
-		phaseInfo = pm.classifyGpuFailure(resource, phaseInfo)
+		phaseInfo = pm.classifyGpuFailure(ctx, tCtx, resource, phaseInfo)
 		transition.SetInfo(phaseInfo)
 	}
 
@@ -364,32 +365,294 @@ func objectKeyFor(resource client.Object) watchedObjectKey {
 	}
 }
 
-// classifyGpuFailure folds the GPU faults recorded against a failed attempt's pod into
-// the failure the plugin reported, so that a fault the node saw becomes the code and
-// the message the user reads. Anything that is not a failed pod is left alone.
+// observedFault is a fault recorded against one pod, kept with the times that order it and
+// the pod it was observed on. The pod name is what tells the user which worker of a
+// distributed job the fault happened on.
+type observedFault struct {
+	fault *core.GpuFault
+	// createdAt is when the fault was first recorded, which is when it happened. It is
+	// what orders faults gathered from several pods into the single sequence
+	// ClassifyFailure expects, so that the first fault of a severity is the earliest.
+	createdAt time.Time
+	podName   string
+}
+
+// classifyGpuFailure folds the GPU faults recorded against a failed attempt's pods into
+// the failure the plugin reported, so that a fault the node saw becomes the code and the
+// message the user reads. Anything that is not a failure is left alone.
+//
+// The pods it looks at are the tracked resource itself when the plugin tracks a Pod, and
+// otherwise the child pods the plugin names through k8s.ChildPodDiscovery. A plugin that
+// tracks a CRD and does not implement that interface contributes no pods and so no faults,
+// which is exactly what it did before the interface existed.
 func (pm *PluginManager) classifyGpuFailure(
+	ctx context.Context,
+	tCtx pluginsCore.TaskExecutionContext,
 	resource client.Object,
 	phaseInfo pluginsCore.PhaseInfo,
 ) pluginsCore.PhaseInfo {
 	if pm.eventWatcher == nil || resource == nil || !phaseInfo.Phase().IsFailure() {
 		return phaseInfo
 	}
-	if _, isPod := resource.(*v1.Pod); !isPod {
+
+	// Every event cached for a pod, not only the ones since the last watermark: the Xid
+	// that killed the task is usually recorded rounds before the pod's status catches up
+	// with it, and by then the watermark has moved past it. What bounds the search is the
+	// identity and the recency of each event.
+	//
+	// The attempt's own failure time is what a child pod's anchor is bounded by, and what
+	// stands in for a pod that offers nothing better. Every CRD plugin stamps it with the
+	// time of the reconcile that noticed the failure rather than with anything the kubelet
+	// recorded, which is why each pod is anchored on itself below.
+	attemptFailedAt := phaseInfoOccurredAt(phaseInfo)
+
+	// A plugin that tracks the Pod is looking at the pod the failure is already reported
+	// against, so naming it again would tell the user nothing. Only a CRD's child pods
+	// need naming, which is what namesTheFaultingPod tracks.
+	var observed []observedFault
+	namesTheFaultingPod := false
+	if pod, isPod := resource.(*v1.Pod); isPod {
+		observed = pm.faultsOnPod(
+			ctx, objectKeyFor(resource), resource.GetUID(), flytek8s.PodFailureTime(pod, attemptFailedAt))
+	} else {
+		observed = pm.faultsOnChildPods(ctx, tCtx, resource, attemptFailedAt)
+		namesTheFaultingPod = true
+	}
+	if len(observed) == 0 {
 		return phaseInfo
 	}
 
-	// Every event cached for the pod, not only the ones since the last watermark: the
-	// Xid that killed the task is usually recorded rounds before the pod's status
-	// catches up with it, and by then the watermark has moved past it. What bounds the
-	// search is the identity and the recency of each event, checked below.
-	failureAt := flytek8s.PodFailureTime(resource.(*v1.Pod), phaseInfoOccurredAt(phaseInfo))
+	// ClassifyFailure reads the list as a sequence in time, taking the first fault of the
+	// severity it settles on. Faults gathered from several pods arrive grouped by pod, so
+	// they have to be put back in order for first to mean earliest. The order is on when
+	// each fault was first recorded, not on when it was last seen: a fault that is still
+	// repeating has a later last observation than a one-shot fault that followed it, and
+	// ordering on that would let a downstream symptom outrank the root cause.
+	sort.SliceStable(observed, func(i, j int) bool {
+		return observed[i].createdAt.Before(observed[j].createdAt)
+	})
 
-	events := pm.eventWatcher.List(objectKeyFor(resource), time.Time{}, time.Time{})
+	faults := make([]*core.GpuFault, 0, len(observed))
+	for _, o := range observed {
+		faults = append(faults, o.fault)
+	}
+
+	classified := gpufault.ClassifyFailure(phaseInfo, faults)
+	if namesTheFaultingPod {
+		classified = attachFaultingPod(ctx, classified, observed)
+	}
+	return classified
+}
+
+// attachFaultingPod names the one pod whose fault the classification settled on. The fault
+// sentence carries the Xid, the GPU and the node but not the pod, which on a job with many
+// workers is not enough to act on, and the pod is not part of the fault contract itself
+// because a fault reported as an event on a pod already says which pod it is about to
+// anyone reading the event.
+//
+// Only the fault that decided the verdict is named. Naming every pod that saw any fault
+// would put a misleading reason on a failure the faults did not explain, for example a
+// plain OOMKilled that a warning happened to coincide with, and would emit one cluster
+// event per pod when a whole node's worth of GPUs faults at once.
+func attachFaultingPod(
+	ctx context.Context,
+	phaseInfo pluginsCore.PhaseInfo,
+	observed []observedFault,
+) pluginsCore.PhaseInfo {
+	info := phaseInfo.Info()
+
+	// The fault the classification settled on is the one it put on the error. Its presence
+	// is the only reliable sign that a fault was folded in: the code is not, because
+	// ClassifyFailure only replaces a code the plugin had no real opinion about, and the
+	// CRD plugins all report codes of their own (TaskFailedWithError, DownstreamSystemError,
+	// a JobSet condition reason) which it correctly leaves alone.
+	settled := phaseInfo.Err().GetGpuFault()
+	if info == nil || settled == nil {
+		return phaseInfo
+	}
+
+	// A warning rides along as data without deciding anything, so the failure is still
+	// whatever the plugin said it was. Pointing at a pod there would send the user after
+	// hardware that did not cause their failure.
+	if fault, _ := gpufault.FromProto(settled); fault.Severity == gpufault.SeverityWarn {
+		return phaseInfo
+	}
+
+	// Matching the settled fault back by identity finds the pod it came from without
+	// repeating the precedence rules. It holds only while ClassifyFailure passes the very
+	// same fault through rather than a copy of it, which is pinned by a test.
+	for _, o := range observed {
+		if o.fault != settled || o.podName == "" {
+			continue
+		}
+		occurredAt := o.createdAt
+		info.AdditionalReasons = append(info.AdditionalReasons, pluginsCore.ReasonInfo{
+			Reason:     fmt.Sprintf("GPU fault recorded on pod %s", o.podName),
+			OccurredAt: &occurredAt,
+		})
+		return phaseInfo
+	}
+
+	// The fault came from one of these pods, so failing to find it again means the identity
+	// the match relies on has been broken upstream. Say so rather than quietly dropping the
+	// one piece of information that tells the user which worker to look at.
+	logger.Warnf(ctx, "GPU fault classified for %s but no observed pod matched it; the faulting pod cannot be named",
+		phaseInfo.Err().GetCode())
+	return phaseInfo
+}
+
+// faultsOnChildPods gathers the faults recorded against the pods an operator expanded from
+// the resource this plugin tracks. A plugin that cannot name its child pods, either because
+// it does not implement the interface or because it declined for this resource, contributes
+// nothing: there is no safe wider search, since an operator's child pod names carry a random
+// suffix and the events are cached under those names.
+func (pm *PluginManager) faultsOnChildPods(
+	ctx context.Context,
+	tCtx pluginsCore.TaskExecutionContext,
+	resource client.Object,
+	failureAt time.Time,
+) []observedFault {
+	discovery, ok := pm.plugin.(k8s.ChildPodDiscovery)
+	if !ok || tCtx == nil {
+		return nil
+	}
+
+	tracked := fmt.Sprintf("%s/%s", resource.GetNamespace(), resource.GetName())
+
+	selector, err := discovery.ChildPods(ctx, tCtx.TaskExecutionMetadata(), resource)
+	if err != nil {
+		logger.Warnf(ctx, "plugin [%s] failed to name the child pods of %s: %v", pm.GetID(), tracked, err)
+		return nil
+	}
+	if selector == nil {
+		logger.Debugf(ctx, "plugin [%s] did not name the child pods of %s, so its GPU faults are not classified",
+			pm.GetID(), tracked)
+		return nil
+	}
+
+	podList := &v1.PodList{}
+	listOptions := []client.ListOption{
+		client.InNamespace(resource.GetNamespace()),
+		client.MatchingLabelsSelector{Selector: selector},
+	}
+	if err := pm.kubeClient.GetClient().List(ctx, podList, listOptions...); err != nil {
+		logger.Warnf(ctx, "failed to list the child pods of %s for GPU fault classification: %v", tracked, err)
+		return nil
+	}
+	if len(podList.Items) == 0 {
+		// The pods are gone by the time the failure is classified, most often because the
+		// operator tore them down with the job. Nothing can be recovered: the events are
+		// cached under pod names that are not derivable without the pods.
+		logger.Debugf(ctx, "no child pods left for %s matching %s, so any GPU fault on them is not classified",
+			tracked, selector.String())
+		return nil
+	}
+
+	var observed []observedFault
+	for i := range podList.Items {
+		pod := &podList.Items[i]
+		// A worker that finished its work cannot be the reason the job failed. It may
+		// still have logged a fault mid-run, and crediting that to another pod's failure
+		// would turn a plain user error into a hardware one. A pod that is still running
+		// is kept: a worker wedged on a GPU that fell off the bus is exactly the case
+		// this path exists for.
+		if podSucceeded(pod) {
+			continue
+		}
+		podKey := watchedObjectKey{Namespace: pod.Namespace, Name: pod.Name, Kind: "Pod"}
+		observed = append(observed, pm.faultsOnPod(ctx, podKey, pod.UID, childPodFailureTime(pod, failureAt))...)
+	}
+	return observed
+}
+
+// podSucceeded reports whether this pod finished its work. The phase is the kubelet's own
+// verdict; the container checks below catch the pod whose work is done but whose phase has
+// not caught up, or never will.
+//
+// What settles it is the container running the task's own work. A worker that finished
+// cleanly can be held Running indefinitely by a sidecar that does not know to stop, which
+// is what a legacy-injected service mesh proxy does, and judging such a pod by all its
+// containers would call it unfinished forever. The reverse matters just as much: a helper
+// container that exited first must not make a pod look finished while the real work is
+// still running, or still crash-looping.
+//
+// Only a declared primary container counts. When nobody declared one there is nothing to
+// tell the work apart from its helpers, so the older rule stands: every container has to
+// have exited cleanly.
+func podSucceeded(pod *v1.Pod) bool {
+	if pod.Status.Phase == v1.PodSucceeded {
+		return true
+	}
+	if pod.Status.Phase != v1.PodRunning || len(pod.Status.ContainerStatuses) == 0 {
+		return false
+	}
+
+	if primary := flytek8s.DeclaredPrimaryContainerName(pod); primary != "" {
+		for _, status := range pod.Status.ContainerStatuses {
+			if status.Name != primary {
+				continue
+			}
+			terminated := status.State.Terminated
+			return terminated != nil && terminated.ExitCode == 0
+		}
+		// The declared primary is not among the statuses yet. Nothing is known about the
+		// work, so fall through rather than guess.
+	}
+
+	for _, status := range pod.Status.ContainerStatuses {
+		terminated := status.State.Terminated
+		if terminated == nil || terminated.ExitCode != 0 {
+			return false
+		}
+	}
+	return true
+}
+
+// childPodFailureTime is podFailureTime bounded by the attempt's own failure.
+//
+// A child pod is anchored on itself, so a worker that died an hour before the operator
+// admitted the job had failed is judged against its own death, which is the whole point of
+// anchoring per pod. What it must not do is anchor later than the failure: an operator
+// tearing its pods down long after the job failed would otherwise let faults recorded in
+// the meantime explain it, and the slack after the failure is deliberately small. The risk
+// the earlier direction leaves, a fault from a pod's earlier life explaining an unrelated
+// failure, is what excluding succeeded pods above bounds.
+func childPodFailureTime(pod *v1.Pod, failureAt time.Time) time.Time {
+	anchor := flytek8s.PodFailureTime(pod, failureAt)
+
+	// A plugin that reported no failure time at all still has to be bounded, or a pod the
+	// operator has not finished tearing down anchors at the moment of this reconcile and
+	// sweeps in every fault the node has recorded since. Now is the closest thing to the
+	// failure there is in that case, and PodFailureTime has already used it as its own last
+	// resort, so the two agree.
+	bound := failureAt
+	if bound.IsZero() {
+		bound = time.Now()
+	}
+	if anchor.After(bound) {
+		return bound
+	}
+	return anchor
+}
+
+// faultsOnPod reads the faults recorded against one pod.
+//
+// It takes every event cached for the pod, not only the ones since the last watermark: the
+// Xid that killed the task is usually recorded rounds before the pod's status catches up
+// with it, and by then the watermark has moved past it. What bounds the search is the
+// identity and the recency of each event, checked below.
+func (pm *PluginManager) faultsOnPod(
+	ctx context.Context,
+	podKey watchedObjectKey,
+	podUID k8stypes.UID,
+	failureAt time.Time,
+) []observedFault {
+	events := pm.eventWatcher.List(podKey, time.Time{}, time.Time{})
 	if len(events) == 0 {
-		return phaseInfo
+		return nil
 	}
 
-	faults := make([]*core.GpuFault, 0, len(events))
+	observed := make([]observedFault, 0, len(events))
 	for _, event := range events {
 		// Only events the GPU fault emitter wrote, recognized by their reason, are
 		// parsed; the message prefix alone is free text anyone can put in an event.
@@ -404,25 +667,29 @@ func (pm *PluginManager) classifyGpuFailure(
 		// when the pod was deleted before this round reached it; the name match the
 		// cache is keyed on is then all there is, and it is used knowingly: a same-name
 		// replacement pod's faults could be credited here, a deliberate trade against
-		// losing every fault on the path where the hardware most clearly failed.
+		// losing every fault on the path where the hardware most clearly failed. A child
+		// pod always arrives with its UID, because it was read out of the cache as an
+		// object rather than named from the task, so it never takes that trade.
 		if event.RegardingUID == "" {
 			continue
 		}
-		if resource.GetUID() != "" && event.RegardingUID != resource.GetUID() {
+		if podUID != "" && event.RegardingUID != podUID {
 			continue
 		}
 		if !gpufault.RelevantToFailure(event.CreatedAt, event.LastObservedAt, failureAt) {
-			logger.Debugf(context.TODO(),
+			logger.Debugf(ctx,
 				"ignoring GPU fault event %q on %s: active %s to %s, which does not reach the failure at %s",
-				event.Reason, objectKeyFor(resource).Name, event.CreatedAt, event.LastObservedAt, failureAt)
+				event.Reason, podKey.Name, event.CreatedAt, event.LastObservedAt, failureAt)
 			continue
 		}
 		if fault := gpufault.FromEventMessage(event.Message); fault != nil {
-			faults = append(faults, fault)
+			// The last observation decided relevance above; what orders the fault against
+			// the others is when it was first recorded, which is when it happened.
+			observed = append(observed, observedFault{fault: fault, createdAt: event.CreatedAt, podName: podKey.Name})
 		}
 	}
 
-	return gpufault.ClassifyFailure(phaseInfo, faults)
+	return observed
 }
 
 // phaseInfoOccurredAt is the time the plugin put on the failure, or the zero time when it
