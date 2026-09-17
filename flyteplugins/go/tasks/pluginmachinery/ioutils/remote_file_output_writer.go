@@ -34,8 +34,17 @@ func (w RemoteFileOutputPaths) GetOutputPath() storage.DataReference {
 	return constructPath(w.store, w.outputPrefix, OutputsSuffix)
 }
 
+func (w RemoteFileOutputPaths) GetDeckPath() storage.DataReference {
+	deckSuffix := GetConfig().RemoteFileOutputPathsConfig.DeckFilename
+	return constructPath(w.store, w.outputPrefix, deckSuffix)
+}
+
 func (w RemoteFileOutputPaths) GetErrorPath() storage.DataReference {
 	return constructPath(w.store, w.outputPrefix, ErrorsSuffix)
+}
+
+func (w RemoteFileOutputPaths) GetFuturesPath() storage.DataReference {
+	return constructPath(w.store, w.outputPrefix, FuturesSuffix)
 }
 
 // RemoteFileOutputWriter adds storage Write APIs to output paths / keys. In retrospect, the `path` should be
