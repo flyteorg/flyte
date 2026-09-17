@@ -57,14 +57,14 @@ func buildFieldForSlice(ctx context.Context, t SliceOrArray, name, goName, usage
 	emptyDefaultValue := `[]string{}`
 	elem := types.Unalias(t.Elem())
 	if b, ok := elem.(*types.Basic); !ok {
-		logger.Infof(ctx, "Elem of type [%v] is not a basic type. It must be json unmarshalable or generation will fail.", elem)
+		logger.Debugf(ctx, "Elem of type [%v] is not a basic type. It must be json unmarshalable or generation will fail.", elem)
 		if !isJSONUnmarshaler(elem) {
 			return FieldInfo{},
 				fmt.Errorf("slice of type [%v] is not supported. Only basic slices or slices of json-unmarshalable types are supported",
 					elem.String())
 		}
 	} else {
-		logger.Infof(ctx, "Elem of type [%v] is a basic type. Will use a pflag as a Slice.", b)
+		logger.Debugf(ctx, "Elem of type [%v] is a basic type. Will use a pflag as a Slice.", b)
 		strategy = SliceJoined
 		FlagMethodName = fmt.Sprintf("%vSlice", capitalize(b.Name()))
 		typ = types.NewSlice(b)
@@ -99,13 +99,13 @@ func buildFieldForMap(ctx context.Context, t *types.Map, name, goName, usage, de
 	mapKey := types.Unalias(t.Key())
 	mapElem := types.Unalias(t.Elem())
 	if k, ok := mapKey.(*types.Basic); !ok || k.Kind() != types.String {
-		logger.Infof(ctx, "Key of type [%v] is not a basic type. It must be json unmarshalable or generation will fail.", mapElem)
+		logger.Debugf(ctx, "Key of type [%v] is not a basic type. It must be json unmarshalable or generation will fail.", mapElem)
 	} else if v, valueOk := mapElem.(*types.Basic); !valueOk && !isJSONUnmarshaler(mapElem) {
 		return FieldInfo{},
 			fmt.Errorf("map of type [%v] is not supported. Only basic slices or slices of json-unmarshalable types are supported",
 				mapElem.String())
 	} else {
-		logger.Infof(ctx, "Map[%v]%v is supported. using pflag maps.", k, mapElem)
+		logger.Debugf(ctx, "Map[%v]%v is supported. using pflag maps.", k, mapElem)
 		strategy = Raw
 		if valueOk {
 			FlagMethodName = fmt.Sprintf("StringTo%v", capitalize(v.Name()))
@@ -183,7 +183,7 @@ func pflagValueTypesToList(m map[string]PFlagValueType) []PFlagValueType {
 // If passed a non-empty defaultValueAccessor, it'll be used to fill in default values instead of any default value
 // specified in pflag tag.
 func discoverFieldsRecursive(ctx context.Context, workingDirPkg string, typ *types.Named, defaultValueAccessor, fieldPath string, bindDefaultVar bool) ([]FieldInfo, []PFlagValueType, error) {
-	logger.Printf(ctx, "Finding all fields in [%v.%v.%v]",
+	logger.Debugf(ctx, "Finding all fields in [%v.%v.%v]",
 		typ.Obj().Pkg().Path(), typ.Obj().Pkg().Name(), typ.Obj().Name())
 
 	ctx = logger.WithIndent(ctx, indent)
@@ -220,7 +220,7 @@ func discoverFieldsRecursive(ctx context.Context, workingDirPkg string, typ *typ
 		}
 
 		if tag.DefaultValue == "-" {
-			logger.Infof(ctx, "Skipping field [%s], as '-' value detected", tag.Name)
+			logger.Debugf(ctx, "Skipping field [%s], as '-' value detected", tag.Name)
 			continue
 		}
 
@@ -279,13 +279,13 @@ func discoverFieldsRecursive(ctx context.Context, workingDirPkg string, typ *typ
 
 					// Don't do anything, we will generate PFlagValue implementation to use this.
 				} else if isJSONMarshaler(t) {
-					logger.Infof(ctx, "Field [%v] of type [%v] does not implement Stringer interface."+
+					logger.Debugf(ctx, "Field [%v] of type [%v] does not implement Stringer interface."+
 						" Will use %s.mustMarshalJSON() to get its default value.", defaultValueAccessor, variable.Name(), t.String())
 					defaultValue = fmt.Sprintf("%s.mustMarshalJSON(%s)", defaultValueAccessor, defaultValue)
 					bindDefaultVarForField = false
 					testValue = defaultValue
 				} else {
-					logger.Infof(ctx, "Field [%v] of type [%v] does not implement Stringer interface."+
+					logger.Debugf(ctx, "Field [%v] of type [%v] does not implement Stringer interface."+
 						" Will use %s.mustMarshalJSON() to get its default value.", defaultValueAccessor, variable.Name(), t.String())
 					defaultValue = fmt.Sprintf("%s.mustJsonMarshal(%s)", defaultValueAccessor, defaultValue)
 					bindDefaultVarForField = false
@@ -297,10 +297,10 @@ func discoverFieldsRecursive(ctx context.Context, workingDirPkg string, typ *typ
 				testValue = `"1"`
 			}
 
-			logger.Infof(ctx, "[%v] is of a Named type (struct) with default value [%v].", tag.Name, tag.DefaultValue)
+			logger.Debugf(ctx, "[%v] is of a Named type (struct) with default value [%v].", tag.Name, tag.DefaultValue)
 
 			if jsonUnmarshaler {
-				logger.Infof(logger.WithIndent(ctx, indent), "Type is json unmarhslalable.")
+				logger.Debugf(logger.WithIndent(ctx, indent), "Type is json unmarhslalable.")
 
 				addField(typ, FieldInfo{
 					Name:               tag.Name,
@@ -316,7 +316,7 @@ func discoverFieldsRecursive(ctx context.Context, workingDirPkg string, typ *typ
 					LocalTypeName:      t.Obj().Name(),
 				})
 			} else {
-				logger.Infof(ctx, "Traversing fields in type.")
+				logger.Debugf(ctx, "Traversing fields in type.")
 
 				nested, otherPflagValueTypes, err := discoverFieldsRecursive(logger.WithIndent(ctx, indent), workingDirPkg, t, defaultValueAccessor, appendAccessors(fieldPath, variable.Name()), bindDefaultVar)
 				if err != nil {
@@ -344,7 +344,7 @@ func discoverFieldsRecursive(ctx context.Context, workingDirPkg string, typ *typ
 				}
 			}
 		case *types.Slice:
-			logger.Infof(ctx, "[%v] is of a slice type with default value [%v].", tag.Name, tag.DefaultValue)
+			logger.Debugf(ctx, "[%v] is of a slice type with default value [%v].", tag.Name, tag.DefaultValue)
 			defaultValue := tag.DefaultValue
 			if len(defaultValueAccessor) > 0 {
 				defaultValue = appendAccessors(defaultValueAccessor, fieldPath, variable.Name())
@@ -357,7 +357,7 @@ func discoverFieldsRecursive(ctx context.Context, workingDirPkg string, typ *typ
 
 			addField(typ, f)
 		case *types.Array:
-			logger.Infof(ctx, "[%v] is of an array type with default value [%v].", tag.Name, tag.DefaultValue)
+			logger.Debugf(ctx, "[%v] is of an array type with default value [%v].", tag.Name, tag.DefaultValue)
 			defaultValue := tag.DefaultValue
 
 			f, err := buildFieldForSlice(logger.WithIndent(ctx, indent), t, tag.Name, variable.Name(), tag.Usage, defaultValue, bindDefaultVar)
@@ -367,7 +367,7 @@ func discoverFieldsRecursive(ctx context.Context, workingDirPkg string, typ *typ
 
 			addField(typ, f)
 		case *types.Map:
-			logger.Infof(ctx, "[%v] is of a map type with default value [%v].", tag.Name, tag.DefaultValue)
+			logger.Debugf(ctx, "[%v] is of a map type with default value [%v].", tag.Name, tag.DefaultValue)
 			defaultValue := tag.DefaultValue
 			if len(defaultValueAccessor) > 0 {
 				defaultValue = appendAccessors(defaultValueAccessor, fieldPath, variable.Name())
@@ -445,7 +445,7 @@ func buildBasicField(ctx context.Context, tag Tag, t *types.Basic, defaultValueA
 		tag.DefaultValue = fmt.Sprintf("*new(%v)", t.String())
 	}
 
-	logger.Infof(ctx, "[%v] is of a basic type with default value [%v].", tag.Name, tag.DefaultValue)
+	logger.Debugf(ctx, "[%v] is of a basic type with default value [%v].", tag.Name, tag.DefaultValue)
 
 	isAllowed := false
 	for _, k := range allowedKinds {
@@ -517,7 +517,7 @@ func NewGenerator(pkg, targetTypeName, defaultVariableName string, shouldBindDef
 		}
 
 		pkg = gogenutil.StripGopath(pkg)
-		logger.InfofNoCtx("Loading package from path [%v]", pkg)
+		logger.Debugf(ctx, "Loading package from path [%v]", pkg)
 	}
 
 	targetPackage, err := loadPackage(pkg)
@@ -545,9 +545,9 @@ func NewGenerator(pkg, targetTypeName, defaultVariableName string, shouldBindDef
 	}
 
 	if defaultVar != nil {
-		logger.Infof(ctx, "Using default variable with name [%v] to assign all default values.", defaultVariableName)
+		logger.Debugf(ctx, "Using default variable with name [%v] to assign all default values.", defaultVariableName)
 	} else {
-		logger.Infof(ctx, "Using default values defined in tags if any.")
+		logger.Debugf(ctx, "Using default values defined in tags if any.")
 	}
 
 	return &PFlagProviderGenerator{
@@ -565,7 +565,9 @@ func loadPackage(pkg string) (*types.Package, error) {
 		// from export data; NeedDeps would type-check every dependency's source
 		// again for each pflags invocation.
 		Mode: packages.NeedTypes | packages.NeedTypesInfo | packages.NeedImports,
-		Logf: logger.InfofNoCtx,
+		Logf: func(format string, args ...any) {
+			logger.Debugf(context.Background(), format, args...)
+		},
 	}
 
 	loadedPkgs, err := packages.Load(config, pkg)
