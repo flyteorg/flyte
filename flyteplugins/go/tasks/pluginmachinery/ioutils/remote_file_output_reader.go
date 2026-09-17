@@ -127,6 +127,15 @@ func (r RemoteFileOutputReader) GetOutputPath() storage.DataReference {
 	return r.OutPath.GetOutputPath()
 }
 
+func (r RemoteFileOutputReader) DeckExists(ctx context.Context) (bool, error) {
+	md, err := r.store.Head(ctx, r.OutPath.GetDeckPath())
+	if err != nil {
+		return false, err
+	}
+
+	return md.Exists(), nil
+}
+
 func NewRemoteFileOutputReader(_ context.Context, store storage.ComposedProtobufStore, outPaths io.OutputFilePaths, maxDatasetSize int64) RemoteFileOutputReader {
 	// Note: even though the data store retrieval checks against GetLimitMegabytes, there might be external
 	// storage implementations, so we keep this check here as well.
