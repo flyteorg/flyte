@@ -332,66 +332,6 @@ func (_m *OutputReader) EXPECT() *OutputReader_Expecter {
 	return &OutputReader_Expecter{mock: &_m.Mock}
 }
 
-// DeckExists provides a mock function for the type OutputReader
-func (_mock *OutputReader) DeckExists(ctx context.Context) (bool, error) {
-	ret := _mock.Called(ctx)
-
-	if len(ret) == 0 {
-		panic("no return value specified for DeckExists")
-	}
-
-	var r0 bool
-	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context) (bool, error)); ok {
-		return returnFunc(ctx)
-	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context) bool); ok {
-		r0 = returnFunc(ctx)
-	} else {
-		r0 = ret.Get(0).(bool)
-	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = returnFunc(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-	return r0, r1
-}
-
-// OutputReader_DeckExists_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeckExists'
-type OutputReader_DeckExists_Call struct {
-	*mock.Call
-}
-
-// DeckExists is a helper method to define mock.On call
-//   - ctx context.Context
-func (_e *OutputReader_Expecter) DeckExists(ctx interface{}) *OutputReader_DeckExists_Call {
-	return &OutputReader_DeckExists_Call{Call: _e.mock.On("DeckExists", ctx)}
-}
-
-func (_c *OutputReader_DeckExists_Call) Run(run func(ctx context.Context)) *OutputReader_DeckExists_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		run(
-			arg0,
-		)
-	})
-	return _c
-}
-
-func (_c *OutputReader_DeckExists_Call) Return(b bool, err error) *OutputReader_DeckExists_Call {
-	_c.Call.Return(b, err)
-	return _c
-}
-
-func (_c *OutputReader_DeckExists_Call) RunAndReturn(run func(ctx context.Context) (bool, error)) *OutputReader_DeckExists_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // Exists provides a mock function for the type OutputReader
 func (_mock *OutputReader) Exists(ctx context.Context) (bool, error) {
 	ret := _mock.Called(ctx)
@@ -950,50 +890,6 @@ func (_c *OutputFilePaths_GetCheckpointPrefix_Call) RunAndReturn(run func() stor
 	return _c
 }
 
-// GetDeckPath provides a mock function for the type OutputFilePaths
-func (_mock *OutputFilePaths) GetDeckPath() storage.DataReference {
-	ret := _mock.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetDeckPath")
-	}
-
-	var r0 storage.DataReference
-	if returnFunc, ok := ret.Get(0).(func() storage.DataReference); ok {
-		r0 = returnFunc()
-	} else {
-		r0 = ret.Get(0).(storage.DataReference)
-	}
-	return r0
-}
-
-// OutputFilePaths_GetDeckPath_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetDeckPath'
-type OutputFilePaths_GetDeckPath_Call struct {
-	*mock.Call
-}
-
-// GetDeckPath is a helper method to define mock.On call
-func (_e *OutputFilePaths_Expecter) GetDeckPath() *OutputFilePaths_GetDeckPath_Call {
-	return &OutputFilePaths_GetDeckPath_Call{Call: _e.mock.On("GetDeckPath")}
-}
-
-func (_c *OutputFilePaths_GetDeckPath_Call) Run(run func()) *OutputFilePaths_GetDeckPath_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run()
-	})
-	return _c
-}
-
-func (_c *OutputFilePaths_GetDeckPath_Call) Return(dataReference storage.DataReference) *OutputFilePaths_GetDeckPath_Call {
-	_c.Call.Return(dataReference)
-	return _c
-}
-
-func (_c *OutputFilePaths_GetDeckPath_Call) RunAndReturn(run func() storage.DataReference) *OutputFilePaths_GetDeckPath_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // GetErrorPath provides a mock function for the type OutputFilePaths
 func (_mock *OutputFilePaths) GetErrorPath() storage.DataReference {
 	ret := _mock.Called()
@@ -1281,50 +1177,6 @@ func (_c *OutputWriter_GetCheckpointPrefix_Call) Return(dataReference storage.Da
 }
 
 func (_c *OutputWriter_GetCheckpointPrefix_Call) RunAndReturn(run func() storage.DataReference) *OutputWriter_GetCheckpointPrefix_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetDeckPath provides a mock function for the type OutputWriter
-func (_mock *OutputWriter) GetDeckPath() storage.DataReference {
-	ret := _mock.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetDeckPath")
-	}
-
-	var r0 storage.DataReference
-	if returnFunc, ok := ret.Get(0).(func() storage.DataReference); ok {
-		r0 = returnFunc()
-	} else {
-		r0 = ret.Get(0).(storage.DataReference)
-	}
-	return r0
-}
-
-// OutputWriter_GetDeckPath_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetDeckPath'
-type OutputWriter_GetDeckPath_Call struct {
-	*mock.Call
-}
-
-// GetDeckPath is a helper method to define mock.On call
-func (_e *OutputWriter_Expecter) GetDeckPath() *OutputWriter_GetDeckPath_Call {
-	return &OutputWriter_GetDeckPath_Call{Call: _e.mock.On("GetDeckPath")}
-}
-
-func (_c *OutputWriter_GetDeckPath_Call) Run(run func()) *OutputWriter_GetDeckPath_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run()
-	})
-	return _c
-}
-
-func (_c *OutputWriter_GetDeckPath_Call) Return(dataReference storage.DataReference) *OutputWriter_GetDeckPath_Call {
-	_c.Call.Return(dataReference)
-	return _c
-}
-
-func (_c *OutputWriter_GetDeckPath_Call) RunAndReturn(run func() storage.DataReference) *OutputWriter_GetDeckPath_Call {
 	_c.Call.Return(run)
 	return _c
 }

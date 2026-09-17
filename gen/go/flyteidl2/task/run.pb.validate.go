@@ -1027,14 +1027,12 @@ func (m *RunSpec) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for PodTemplateName
-
 	if all {
-		switch v := interface{}(m.GetTaskResourceDefaults()).(type) {
+		switch v := interface{}(m.GetDefaultSettings()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, RunSpecValidationError{
-					field:  "TaskResourceDefaults",
+					field:  "DefaultSettings",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -1042,16 +1040,16 @@ func (m *RunSpec) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, RunSpecValidationError{
-					field:  "TaskResourceDefaults",
+					field:  "DefaultSettings",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetTaskResourceDefaults()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetDefaultSettings()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RunSpecValidationError{
-				field:  "TaskResourceDefaults",
+				field:  "DefaultSettings",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -1192,6 +1190,137 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RunSpecValidationError{}
+
+// Validate checks the field values on DefaultSettings with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *DefaultSettings) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DefaultSettings with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DefaultSettingsMultiError, or nil if none found.
+func (m *DefaultSettings) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DefaultSettings) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for PodTemplateName
+
+	if all {
+		switch v := interface{}(m.GetTaskResourceDefaults()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DefaultSettingsValidationError{
+					field:  "TaskResourceDefaults",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DefaultSettingsValidationError{
+					field:  "TaskResourceDefaults",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTaskResourceDefaults()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultSettingsValidationError{
+				field:  "TaskResourceDefaults",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DefaultSettingsMultiError(errors)
+	}
+
+	return nil
+}
+
+// DefaultSettingsMultiError is an error wrapping multiple validation errors
+// returned by DefaultSettings.ValidateAll() if the designated constraints
+// aren't met.
+type DefaultSettingsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DefaultSettingsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DefaultSettingsMultiError) AllErrors() []error { return m }
+
+// DefaultSettingsValidationError is the validation error returned by
+// DefaultSettings.Validate if the designated constraints aren't met.
+type DefaultSettingsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DefaultSettingsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DefaultSettingsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DefaultSettingsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DefaultSettingsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DefaultSettingsValidationError) ErrorName() string { return "DefaultSettingsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DefaultSettingsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDefaultSettings.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DefaultSettingsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DefaultSettingsValidationError{}
 
 // Validate checks the field values on TaskResourceDefaults with the rules
 // defined in the proto definition for this message. If any rules are

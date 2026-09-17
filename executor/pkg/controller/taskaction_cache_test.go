@@ -96,7 +96,7 @@ func TestHandleCacheBeforeExecutionHit(t *testing.T) {
 		DataStore: dataStore,
 		Catalog: &stubCatalogClient{
 			getFunc: func(context.Context, catalog.Key) (catalog.Entry, error) {
-				return catalog.NewCatalogEntry(ioutils.NewInMemoryOutputReader(expected, nil, nil), catalog.NewStatus(corepb.CatalogCacheStatus_CACHE_HIT, nil)), nil
+				return catalog.NewCatalogEntry(ioutils.NewInMemoryOutputReader(expected, nil), catalog.NewStatus(corepb.CatalogCacheStatus_CACHE_HIT, nil)), nil
 			},
 		},
 	}
@@ -246,7 +246,7 @@ func TestHandleCacheAfterExecutionWritesBackAndReleasesReservation(t *testing.T)
 	ctx := context.Background()
 	taskAction, dataStore := newCacheableTaskAction(t, true, true)
 	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
-	require.NoError(t, tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(&corepb.LiteralMap{}, nil, nil)))
+	require.NoError(t, tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(&corepb.LiteralMap{}, nil)))
 
 	putCalled := false
 	released := false

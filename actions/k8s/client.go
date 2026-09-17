@@ -1052,7 +1052,7 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 	}
 
 	taskAction.Spec.EnvVars = keyValuePairsToMap(runSpec.GetEnvs().GetValues())
-	taskAction.Spec.PodTemplateName = runSpec.GetPodTemplateName()
+	taskAction.Spec.PodTemplateName = runSpec.GetDefaultSettings().GetPodTemplateName()
 	if runSpec.GetInterruptible() != nil {
 		value := runSpec.GetInterruptible().GetValue()
 		taskAction.Spec.Interruptible = &value

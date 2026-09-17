@@ -529,13 +529,9 @@ type RunSpec struct {
 	// RELATION_TYPE_RECOVER: the run recovers relation.related_to — its successful
 	// actions are reused and only failed/changed ones re-execute. See Recover.
 	Recover *Recover `protobuf:"bytes,19,opt,name=recover,proto3" json:"recover,omitempty"`
-	// Run-scoped pod template name, projected onto tasks that do not name one
-	// themselves. Set by the server from settings; a task's own
-	// TaskMetadata.pod_template_name always wins.
-	PodTemplateName string `protobuf:"bytes,20,opt,name=pod_template_name,json=podTemplateName,proto3" json:"pod_template_name,omitempty"`
-	// Resource defaults for every action in this run. Resolved by the server at creation from the org, project and
-	// domain task_resource settings; a caller-supplied value is currently overwritten.
-	TaskResourceDefaults *TaskResourceDefaults `protobuf:"bytes,21,opt,name=task_resource_defaults,json=taskResourceDefaults,proto3" json:"task_resource_defaults,omitempty"`
+	// Run-scoped defaults, projected onto every task in the run that does not
+	// set the corresponding value itself. Set by the server from settings.
+	DefaultSettings *DefaultSettings `protobuf:"bytes,20,opt,name=default_settings,json=defaultSettings,proto3" json:"default_settings,omitempty"`
 }
 
 func (x *RunSpec) Reset() {
@@ -712,16 +708,9 @@ func (x *RunSpec) GetRecover() *Recover {
 	return nil
 }
 
-func (x *RunSpec) GetPodTemplateName() string {
+func (x *RunSpec) GetDefaultSettings() *DefaultSettings {
 	if x != nil {
-		return x.PodTemplateName
-	}
-	return ""
-}
-
-func (x *RunSpec) GetTaskResourceDefaults() *TaskResourceDefaults {
-	if x != nil {
-		return x.TaskResourceDefaults
+		return x.DefaultSettings
 	}
 	return nil
 }
@@ -742,6 +731,67 @@ func (*RunSpec_NotificationRuleName) isRunSpec_NotificationSettings() {}
 
 func (*RunSpec_NotificationRules) isRunSpec_NotificationSettings() {}
 
+// DefaultSettings holds run-scoped defaults applied to tasks in a run. Each field
+// only fills in a value the task leaves unset; a task's own choice always wins.
+type DefaultSettings struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Pod template name, projected onto tasks that do not name one themselves.
+	// A task's own TaskMetadata.pod_template_name always wins.
+	PodTemplateName string `protobuf:"bytes,1,opt,name=pod_template_name,json=podTemplateName,proto3" json:"pod_template_name,omitempty"`
+	// Resource defaults for every action in this run. Resolved by the server at creation from the org, project and
+	// domain task_resource settings; a caller-supplied value is currently overwritten.
+	TaskResourceDefaults *TaskResourceDefaults `protobuf:"bytes,2,opt,name=task_resource_defaults,json=taskResourceDefaults,proto3" json:"task_resource_defaults,omitempty"`
+}
+
+func (x *DefaultSettings) Reset() {
+	*x = DefaultSettings{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_run_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DefaultSettings) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DefaultSettings) ProtoMessage() {}
+
+func (x *DefaultSettings) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_run_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DefaultSettings.ProtoReflect.Descriptor instead.
+func (*DefaultSettings) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_run_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *DefaultSettings) GetPodTemplateName() string {
+	if x != nil {
+		return x.PodTemplateName
+	}
+	return ""
+}
+
+func (x *DefaultSettings) GetTaskResourceDefaults() *TaskResourceDefaults {
+	if x != nil {
+		return x.TaskResourceDefaults
+	}
+	return nil
+}
+
 // Resolved task_resource settings for a run: what a task pod gets when its template is silent, and the ceiling
 // either way. Deliberately not a flyteidl2.core.Resources: max is a ceiling on both a task's requests and its
 // limits, not a Kubernetes limit.
@@ -759,7 +809,7 @@ type TaskResourceDefaults struct {
 func (x *TaskResourceDefaults) Reset() {
 	*x = TaskResourceDefaults{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_task_run_proto_msgTypes[7]
+		mi := &file_flyteidl2_task_run_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -772,7 +822,7 @@ func (x *TaskResourceDefaults) String() string {
 func (*TaskResourceDefaults) ProtoMessage() {}
 
 func (x *TaskResourceDefaults) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_task_run_proto_msgTypes[7]
+	mi := &file_flyteidl2_task_run_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -785,7 +835,7 @@ func (x *TaskResourceDefaults) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskResourceDefaults.ProtoReflect.Descriptor instead.
 func (*TaskResourceDefaults) Descriptor() ([]byte, []int) {
-	return file_flyteidl2_task_run_proto_rawDescGZIP(), []int{7}
+	return file_flyteidl2_task_run_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *TaskResourceDefaults) GetRequests() []*core.Resources_ResourceEntry {
@@ -813,7 +863,7 @@ type InlineRuleList struct {
 func (x *InlineRuleList) Reset() {
 	*x = InlineRuleList{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_task_run_proto_msgTypes[8]
+		mi := &file_flyteidl2_task_run_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -826,7 +876,7 @@ func (x *InlineRuleList) String() string {
 func (*InlineRuleList) ProtoMessage() {}
 
 func (x *InlineRuleList) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_task_run_proto_msgTypes[8]
+	mi := &file_flyteidl2_task_run_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -839,7 +889,7 @@ func (x *InlineRuleList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InlineRuleList.ProtoReflect.Descriptor instead.
 func (*InlineRuleList) Descriptor() ([]byte, []int) {
-	return file_flyteidl2_task_run_proto_rawDescGZIP(), []int{8}
+	return file_flyteidl2_task_run_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *InlineRuleList) GetRules() []*InlineRule {
@@ -865,7 +915,7 @@ type InlineRule struct {
 func (x *InlineRule) Reset() {
 	*x = InlineRule{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_task_run_proto_msgTypes[9]
+		mi := &file_flyteidl2_task_run_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -878,7 +928,7 @@ func (x *InlineRule) String() string {
 func (*InlineRule) ProtoMessage() {}
 
 func (x *InlineRule) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_task_run_proto_msgTypes[9]
+	mi := &file_flyteidl2_task_run_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -891,7 +941,7 @@ func (x *InlineRule) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InlineRule.ProtoReflect.Descriptor instead.
 func (*InlineRule) Descriptor() ([]byte, []int) {
-	return file_flyteidl2_task_run_proto_rawDescGZIP(), []int{9}
+	return file_flyteidl2_task_run_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *InlineRule) GetOnPhases() []common.ActionPhase {
@@ -1004,7 +1054,7 @@ var file_flyteidl2_task_run_proto_rawDesc = []byte{
 	0x5f, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x42, 0x0c,
 	0xba, 0x48, 0x09, 0x92, 0x01, 0x06, 0x22, 0x04, 0x72, 0x02, 0x10, 0x01, 0x52, 0x11, 0x66, 0x6f,
 	0x72, 0x63, 0x65, 0x52, 0x65, 0x72, 0x75, 0x6e, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x22,
-	0xe6, 0x09, 0x0a, 0x07, 0x52, 0x75, 0x6e, 0x53, 0x70, 0x65, 0x63, 0x12, 0x2e, 0x0a, 0x06, 0x6c,
+	0xaa, 0x09, 0x0a, 0x07, 0x52, 0x75, 0x6e, 0x53, 0x70, 0x65, 0x63, 0x12, 0x2e, 0x0a, 0x06, 0x6c,
 	0x61, 0x62, 0x65, 0x6c, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x66, 0x6c,
 	0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x4c, 0x61, 0x62,
 	0x65, 0x6c, 0x73, 0x52, 0x06, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x73, 0x12, 0x3d, 0x0a, 0x0b, 0x61,
@@ -1071,18 +1121,24 @@ var file_flyteidl2_task_run_proto_rawDesc = []byte{
 	0x6e, 0x52, 0x08, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x31, 0x0a, 0x07, 0x72,
 	0x65, 0x63, 0x6f, 0x76, 0x65, 0x72, 0x18, 0x13, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x66,
 	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x52, 0x65,
-	0x63, 0x6f, 0x76, 0x65, 0x72, 0x52, 0x07, 0x72, 0x65, 0x63, 0x6f, 0x76, 0x65, 0x72, 0x12, 0x2a,
-	0x0a, 0x11, 0x70, 0x6f, 0x64, 0x5f, 0x74, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x5f, 0x6e,
-	0x61, 0x6d, 0x65, 0x18, 0x14, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x70, 0x6f, 0x64, 0x54, 0x65,
-	0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x5a, 0x0a, 0x16, 0x74, 0x61,
-	0x73, 0x6b, 0x5f, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x5f, 0x64, 0x65, 0x66, 0x61,
-	0x75, 0x6c, 0x74, 0x73, 0x18, 0x15, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x66, 0x6c, 0x79,
-	0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x54, 0x61, 0x73, 0x6b,
-	0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x73,
-	0x52, 0x14, 0x74, 0x61, 0x73, 0x6b, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x44, 0x65,
-	0x66, 0x61, 0x75, 0x6c, 0x74, 0x73, 0x42, 0x17, 0x0a, 0x15, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69,
-	0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x52,
-	0x07, 0x63, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x22, 0x96, 0x01, 0x0a, 0x14, 0x54, 0x61, 0x73,
+	0x63, 0x6f, 0x76, 0x65, 0x72, 0x52, 0x07, 0x72, 0x65, 0x63, 0x6f, 0x76, 0x65, 0x72, 0x12, 0x4a,
+	0x0a, 0x10, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x5f, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e,
+	0x67, 0x73, 0x18, 0x14, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65,
+	0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x44, 0x65, 0x66, 0x61, 0x75, 0x6c,
+	0x74, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x52, 0x0f, 0x64, 0x65, 0x66, 0x61, 0x75,
+	0x6c, 0x74, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x42, 0x17, 0x0a, 0x15, 0x6e, 0x6f,
+	0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x73, 0x65, 0x74, 0x74, 0x69,
+	0x6e, 0x67, 0x73, 0x52, 0x07, 0x63, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x22, 0x99, 0x01, 0x0a,
+	0x0f, 0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73,
+	0x12, 0x2a, 0x0a, 0x11, 0x70, 0x6f, 0x64, 0x5f, 0x74, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65,
+	0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x70, 0x6f, 0x64,
+	0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x5a, 0x0a, 0x16,
+	0x74, 0x61, 0x73, 0x6b, 0x5f, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x5f, 0x64, 0x65,
+	0x66, 0x61, 0x75, 0x6c, 0x74, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x66,
+	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x54, 0x61,
+	0x73, 0x6b, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x44, 0x65, 0x66, 0x61, 0x75, 0x6c,
+	0x74, 0x73, 0x52, 0x14, 0x74, 0x61, 0x73, 0x6b, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x73, 0x22, 0x96, 0x01, 0x0a, 0x14, 0x54, 0x61, 0x73,
 	0x6b, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74,
 	0x73, 0x12, 0x43, 0x0a, 0x08, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x73, 0x18, 0x01, 0x20,
 	0x03, 0x28, 0x0b, 0x32, 0x27, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e,
@@ -1169,7 +1225,7 @@ func file_flyteidl2_task_run_proto_rawDescGZIP() []byte {
 }
 
 var file_flyteidl2_task_run_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_flyteidl2_task_run_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_flyteidl2_task_run_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_flyteidl2_task_run_proto_goTypes = []interface{}{
 	(CacheLookupScope)(0),                       // 0: flyteidl2.task.CacheLookupScope
 	(TaskSpecSource)(0),                         // 1: flyteidl2.task.TaskSpecSource
@@ -1180,50 +1236,52 @@ var file_flyteidl2_task_run_proto_goTypes = []interface{}{
 	(*CacheConfig)(nil),                         // 6: flyteidl2.task.CacheConfig
 	(*Recover)(nil),                             // 7: flyteidl2.task.Recover
 	(*RunSpec)(nil),                             // 8: flyteidl2.task.RunSpec
-	(*TaskResourceDefaults)(nil),                // 9: flyteidl2.task.TaskResourceDefaults
-	(*InlineRuleList)(nil),                      // 10: flyteidl2.task.InlineRuleList
-	(*InlineRule)(nil),                          // 11: flyteidl2.task.InlineRule
-	nil,                                         // 12: flyteidl2.task.Labels.ValuesEntry
-	nil,                                         // 13: flyteidl2.task.Annotations.ValuesEntry
-	(*core.KeyValuePair)(nil),                   // 14: flyteidl2.core.KeyValuePair
-	(*wrapperspb.BoolValue)(nil),                // 15: google.protobuf.BoolValue
-	(*core.SecurityContext)(nil),                // 16: flyteidl2.core.SecurityContext
-	(*timestamppb.Timestamp)(nil),               // 17: google.protobuf.Timestamp
-	(*common.RunIdentifier)(nil),                // 18: flyteidl2.common.RunIdentifier
-	(*common.Relation)(nil),                     // 19: flyteidl2.common.Relation
-	(*core.Resources_ResourceEntry)(nil),        // 20: flyteidl2.core.Resources.ResourceEntry
-	(common.ActionPhase)(0),                     // 21: flyteidl2.common.ActionPhase
-	(*notification.DeliveryConfigTemplate)(nil), // 22: flyteidl2.notification.DeliveryConfigTemplate
+	(*DefaultSettings)(nil),                     // 9: flyteidl2.task.DefaultSettings
+	(*TaskResourceDefaults)(nil),                // 10: flyteidl2.task.TaskResourceDefaults
+	(*InlineRuleList)(nil),                      // 11: flyteidl2.task.InlineRuleList
+	(*InlineRule)(nil),                          // 12: flyteidl2.task.InlineRule
+	nil,                                         // 13: flyteidl2.task.Labels.ValuesEntry
+	nil,                                         // 14: flyteidl2.task.Annotations.ValuesEntry
+	(*core.KeyValuePair)(nil),                   // 15: flyteidl2.core.KeyValuePair
+	(*wrapperspb.BoolValue)(nil),                // 16: google.protobuf.BoolValue
+	(*core.SecurityContext)(nil),                // 17: flyteidl2.core.SecurityContext
+	(*timestamppb.Timestamp)(nil),               // 18: google.protobuf.Timestamp
+	(*common.RunIdentifier)(nil),                // 19: flyteidl2.common.RunIdentifier
+	(*common.Relation)(nil),                     // 20: flyteidl2.common.Relation
+	(*core.Resources_ResourceEntry)(nil),        // 21: flyteidl2.core.Resources.ResourceEntry
+	(common.ActionPhase)(0),                     // 22: flyteidl2.common.ActionPhase
+	(*notification.DeliveryConfigTemplate)(nil), // 23: flyteidl2.notification.DeliveryConfigTemplate
 }
 var file_flyteidl2_task_run_proto_depIdxs = []int32{
-	12, // 0: flyteidl2.task.Labels.values:type_name -> flyteidl2.task.Labels.ValuesEntry
-	13, // 1: flyteidl2.task.Annotations.values:type_name -> flyteidl2.task.Annotations.ValuesEntry
-	14, // 2: flyteidl2.task.Envs.values:type_name -> flyteidl2.core.KeyValuePair
+	13, // 0: flyteidl2.task.Labels.values:type_name -> flyteidl2.task.Labels.ValuesEntry
+	14, // 1: flyteidl2.task.Annotations.values:type_name -> flyteidl2.task.Annotations.ValuesEntry
+	15, // 2: flyteidl2.task.Envs.values:type_name -> flyteidl2.core.KeyValuePair
 	0,  // 3: flyteidl2.task.CacheConfig.cache_lookup_scope:type_name -> flyteidl2.task.CacheLookupScope
 	2,  // 4: flyteidl2.task.RunSpec.labels:type_name -> flyteidl2.task.Labels
 	3,  // 5: flyteidl2.task.RunSpec.annotations:type_name -> flyteidl2.task.Annotations
 	4,  // 6: flyteidl2.task.RunSpec.envs:type_name -> flyteidl2.task.Envs
-	15, // 7: flyteidl2.task.RunSpec.interruptible:type_name -> google.protobuf.BoolValue
+	16, // 7: flyteidl2.task.RunSpec.interruptible:type_name -> google.protobuf.BoolValue
 	5,  // 8: flyteidl2.task.RunSpec.raw_data_storage:type_name -> flyteidl2.task.RawDataStorage
-	16, // 9: flyteidl2.task.RunSpec.security_context:type_name -> flyteidl2.core.SecurityContext
+	17, // 9: flyteidl2.task.RunSpec.security_context:type_name -> flyteidl2.core.SecurityContext
 	6,  // 10: flyteidl2.task.RunSpec.cache_config:type_name -> flyteidl2.task.CacheConfig
-	10, // 11: flyteidl2.task.RunSpec.notification_rules:type_name -> flyteidl2.task.InlineRuleList
-	17, // 12: flyteidl2.task.RunSpec.run_start_time:type_name -> google.protobuf.Timestamp
-	18, // 13: flyteidl2.task.RunSpec.related_to:type_name -> flyteidl2.common.RunIdentifier
+	11, // 11: flyteidl2.task.RunSpec.notification_rules:type_name -> flyteidl2.task.InlineRuleList
+	18, // 12: flyteidl2.task.RunSpec.run_start_time:type_name -> google.protobuf.Timestamp
+	19, // 13: flyteidl2.task.RunSpec.related_to:type_name -> flyteidl2.common.RunIdentifier
 	1,  // 14: flyteidl2.task.RunSpec.task_spec_source:type_name -> flyteidl2.task.TaskSpecSource
-	19, // 15: flyteidl2.task.RunSpec.relation:type_name -> flyteidl2.common.Relation
+	20, // 15: flyteidl2.task.RunSpec.relation:type_name -> flyteidl2.common.Relation
 	7,  // 16: flyteidl2.task.RunSpec.recover:type_name -> flyteidl2.task.Recover
-	9,  // 17: flyteidl2.task.RunSpec.task_resource_defaults:type_name -> flyteidl2.task.TaskResourceDefaults
-	20, // 18: flyteidl2.task.TaskResourceDefaults.requests:type_name -> flyteidl2.core.Resources.ResourceEntry
-	20, // 19: flyteidl2.task.TaskResourceDefaults.max:type_name -> flyteidl2.core.Resources.ResourceEntry
-	11, // 20: flyteidl2.task.InlineRuleList.rules:type_name -> flyteidl2.task.InlineRule
-	21, // 21: flyteidl2.task.InlineRule.on_phases:type_name -> flyteidl2.common.ActionPhase
-	22, // 22: flyteidl2.task.InlineRule.delivery_template:type_name -> flyteidl2.notification.DeliveryConfigTemplate
-	23, // [23:23] is the sub-list for method output_type
-	23, // [23:23] is the sub-list for method input_type
-	23, // [23:23] is the sub-list for extension type_name
-	23, // [23:23] is the sub-list for extension extendee
-	0,  // [0:23] is the sub-list for field type_name
+	9,  // 17: flyteidl2.task.RunSpec.default_settings:type_name -> flyteidl2.task.DefaultSettings
+	10, // 18: flyteidl2.task.DefaultSettings.task_resource_defaults:type_name -> flyteidl2.task.TaskResourceDefaults
+	21, // 19: flyteidl2.task.TaskResourceDefaults.requests:type_name -> flyteidl2.core.Resources.ResourceEntry
+	21, // 20: flyteidl2.task.TaskResourceDefaults.max:type_name -> flyteidl2.core.Resources.ResourceEntry
+	12, // 21: flyteidl2.task.InlineRuleList.rules:type_name -> flyteidl2.task.InlineRule
+	22, // 22: flyteidl2.task.InlineRule.on_phases:type_name -> flyteidl2.common.ActionPhase
+	23, // 23: flyteidl2.task.InlineRule.delivery_template:type_name -> flyteidl2.notification.DeliveryConfigTemplate
+	24, // [24:24] is the sub-list for method output_type
+	24, // [24:24] is the sub-list for method input_type
+	24, // [24:24] is the sub-list for extension type_name
+	24, // [24:24] is the sub-list for extension extendee
+	0,  // [0:24] is the sub-list for field type_name
 }
 
 func init() { file_flyteidl2_task_run_proto_init() }
@@ -1317,7 +1375,7 @@ func file_flyteidl2_task_run_proto_init() {
 			}
 		}
 		file_flyteidl2_task_run_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TaskResourceDefaults); i {
+			switch v := v.(*DefaultSettings); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1329,7 +1387,7 @@ func file_flyteidl2_task_run_proto_init() {
 			}
 		}
 		file_flyteidl2_task_run_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*InlineRuleList); i {
+			switch v := v.(*TaskResourceDefaults); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1341,6 +1399,18 @@ func file_flyteidl2_task_run_proto_init() {
 			}
 		}
 		file_flyteidl2_task_run_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*InlineRuleList); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_run_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*InlineRule); i {
 			case 0:
 				return &v.state
@@ -1357,7 +1427,7 @@ func file_flyteidl2_task_run_proto_init() {
 		(*RunSpec_NotificationRuleName)(nil),
 		(*RunSpec_NotificationRules)(nil),
 	}
-	file_flyteidl2_task_run_proto_msgTypes[9].OneofWrappers = []interface{}{
+	file_flyteidl2_task_run_proto_msgTypes[10].OneofWrappers = []interface{}{
 		(*InlineRule_DeliveryConfigName)(nil),
 		(*InlineRule_DeliveryTemplate)(nil),
 	}
@@ -1367,7 +1437,7 @@ func file_flyteidl2_task_run_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_flyteidl2_task_run_proto_rawDesc,
 			NumEnums:      2,
-			NumMessages:   12,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

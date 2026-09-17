@@ -6,12 +6,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 func TestInMemoryOutputReader(t *testing.T) {
-	deckPath := storage.DataReference("s3://bucket/key")
 	lt := map[string]*flyteIdlCore.Literal{
 		"results": {
 			Value: &flyteIdlCore.Literal_Scalar{
@@ -23,9 +21,8 @@ func TestInMemoryOutputReader(t *testing.T) {
 			},
 		},
 	}
-	or := NewInMemoryOutputReader(&flyteIdlCore.LiteralMap{Literals: lt}, &deckPath, nil)
+	or := NewInMemoryOutputReader(&flyteIdlCore.LiteralMap{Literals: lt}, nil)
 
-	assert.Equal(t, &deckPath, or.DeckPath)
 	ctx := context.TODO()
 
 	ok, err := or.IsError(ctx)
