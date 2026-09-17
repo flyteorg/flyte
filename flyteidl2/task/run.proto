@@ -8,6 +8,7 @@ import "flyteidl2/common/phase.proto";
 import "flyteidl2/common/run.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/security.proto";
+import "flyteidl2/core/tasks.proto";
 import "flyteidl2/notification/definition.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
@@ -192,6 +193,21 @@ message DefaultSettings {
   // Pod template name, projected onto tasks that do not name one themselves.
   // A task's own TaskMetadata.pod_template_name always wins.
   string pod_template_name = 1;
+
+  // Resource defaults for every action in this run. Resolved by the server at creation from the org, project and
+  // domain task_resource settings; a caller-supplied value is currently overwritten.
+  TaskResourceDefaults task_resource_defaults = 2;
+}
+
+// Resolved task_resource settings for a run: what a task pod gets when its template is silent, and the ceiling
+// either way. Deliberately not a flyteidl2.core.Resources: max is a ceiling on both a task's requests and its
+// limits, not a Kubernetes limit.
+message TaskResourceDefaults {
+  // Request for each dimension a task template leaves unset (task_resource.min, capped at max).
+  repeated flyteidl2.core.Resources.ResourceEntry requests = 1;
+
+  // Per-dimension cap on a task's requests and limits (task_resource.max).
+  repeated flyteidl2.core.Resources.ResourceEntry max = 2;
 }
 
 message InlineRuleList {
