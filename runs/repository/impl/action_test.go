@@ -1060,9 +1060,7 @@ func TestNewNotificationConfig(t *testing.T) {
 	}
 }
 
-// TestNotifyActionUpdate_KeepsWakeupAfterContextCancel covers the loss path
-// that existed before: a client disconnecting mid-request used to discard a
-// wakeup that other watchers still needed.
+// A canceled request must not discard pending notifications.
 func TestNotifyActionUpdate_KeepsWakeupAfterContextCancel(t *testing.T) {
 	r := newNotifyTestRepo(testNotificationConfig)
 
@@ -1077,11 +1075,7 @@ func TestNotifyActionUpdate_KeepsWakeupAfterContextCancel(t *testing.T) {
 	assert.Contains(t, runs, "proj/domain/run")
 }
 
-// TestRunNotifyLoop_RetriesUndeliveredPayloads verifies that a failed
-// pg_notify keeps the payload pending instead of dropping it. A nil connection
-// with no database to reconnect to is the simplest permanent failure. The
-// whole batch must survive, not just the payload that failed first: a dead
-// connection aborts the drain rather than retrying the connection per payload.
+// A failed pg_notify must keep the remaining batch pending for retry.
 func TestRunNotifyLoop_RetriesUndeliveredPayloads(t *testing.T) {
 	r := newNotifyTestRepo(testNotificationConfig)
 
@@ -1117,8 +1111,6 @@ func TestRunNotifyLoop_RetriesUndeliveredPayloads(t *testing.T) {
 	}
 }
 
-// newNotifyTestRepo builds a repo with the notify plumbing initialized but no
-// pump running, so the pending work is observable and nothing drains it.
 func newNotifyTestRepo(notificationConfig NotificationConfig) *actionRepo {
 	return &actionRepo{
 		pendingActions:     make(map[string]struct{}, pendingNotificationCapacity),
@@ -1130,16 +1122,12 @@ func newNotifyTestRepo(notificationConfig NotificationConfig) *actionRepo {
 	}
 }
 
-// pendingCounts reports how many payloads are queued for the pump.
 func (r *actionRepo) pendingCounts() (actions, runs int) {
 	r.notifyMu.Lock()
 	defer r.notifyMu.Unlock()
 	return len(r.pendingActionQueue), len(r.pendingRunQueue)
 }
 
-// newNotifyRepoWithDB builds a repo wired to a real database and listener but
-// with no pump running, so a test can drive runNotifyLoop itself and watch
-// what actually reaches the wire.
 func newNotifyRepoWithDB(t *testing.T) (*actionRepo, *sql.DB, *sql.Conn) {
 	t.Helper()
 	db := setupActionDB(t)
@@ -1187,14 +1175,10 @@ func notifyTestActionID(name string) *common.ActionIdentifier {
 	}
 }
 
-// TestNotifyActionUpdate_DoesNotBlockOnStalledPump pins the property the write
-// path depends on: the row is already committed by the time we notify, so a
-// stalled pump must never turn into RPC latency.
+// Notifications must not block when the pump is stalled.
 func TestNotifyActionUpdate_DoesNotBlockOnStalledPump(t *testing.T) {
 	r := newNotifyTestRepo(testNotificationConfig)
 
-	// No pump is running, so nothing consumes what the writer produces. Push
-	// far more updates than any fixed-size buffer would hold.
 	const updates = 5000
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -1215,8 +1199,7 @@ func TestNotifyActionUpdate_DoesNotBlockOnStalledPump(t *testing.T) {
 	}
 }
 
-// TestNotifyRunUpdate_DoesNotBlockOnStalledPump is the run-side twin of the
-// test above; both notify paths share the same pump.
+// Run notifications must not block when the pump is stalled.
 func TestNotifyRunUpdate_DoesNotBlockOnStalledPump(t *testing.T) {
 	r := newNotifyTestRepo(testNotificationConfig)
 
@@ -1242,11 +1225,7 @@ func TestNotifyRunUpdate_DoesNotBlockOnStalledPump(t *testing.T) {
 	}
 }
 
-// TestWatchActionUpdates_DeliversPhaseChange exercises the full product path
-// against a real database: UpdateActionPhase writes the row, the notify pump
-// issues pg_notify, the listener fans out to subscribers, and the watcher
-// re-reads the action. It guards the other half of the contract, that making
-// the writer non-blocking must not lose a wakeup.
+// Phase changes must reach watchers through PostgreSQL notifications.
 func TestWatchActionUpdates_DeliversPhaseChange(t *testing.T) {
 	db := setupActionDB(t)
 	repo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
@@ -1294,10 +1273,7 @@ func TestWatchActionUpdates_DeliversPhaseChange(t *testing.T) {
 	}
 }
 
-// TestNotifyPump_ConcurrentWritersDeliverEveryAction runs many writers against
-// a live pump and a real database, and checks the delivery half of the
-// contract: every action that was notified reaches the wire. The stalled-pump
-// tests above own the "writers never block" half.
+// Concurrent writers must deliver every action notification.
 func TestNotifyPump_ConcurrentWritersDeliverEveryAction(t *testing.T) {
 	db := setupActionDB(t)
 	repoIface, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
@@ -1357,15 +1333,8 @@ func TestNotifyPump_ConcurrentWritersDeliverEveryAction(t *testing.T) {
 // immediately and the row is still written.
 func TestUpdateActionPhase_CompletesWithStalledPump(t *testing.T) {
 	db := setupActionDB(t)
-	r := &actionRepo{
-		db:                 db,
-		pendingActions:     make(map[string]struct{}, pendingNotificationCapacity),
-		pendingActionQueue: make([]string, 0, pendingNotificationCapacity),
-		pendingRuns:        make(map[string]struct{}, pendingNotificationCapacity),
-		pendingRunQueue:    make([]string, 0, pendingNotificationCapacity),
-		pendingCh:          make(chan struct{}, 1),
-		notificationConfig: testNotificationConfig,
-	}
+	r := newNotifyTestRepo(testNotificationConfig)
+	r.db = db
 	// No pump is started, so nothing drains what the write path queues.
 
 	ctx := context.Background()
@@ -1474,7 +1443,7 @@ func TestRunNotifyLoop_NilConnNoPanic(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
 
-	// Pass a nil conn: should not panic.
+	// Pass a nil conn - should not panic.
 	assert.NotPanics(t, func() {
 		r.runNotifyLoop(ctx, nil, nil)
 	})
