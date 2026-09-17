@@ -125,7 +125,7 @@ spec:
                 type: string
               podTemplateName:
                 description: |-
-                  PodTemplateName is the run-scoped pod template name projected from RunSpec.
+                  PodTemplateName is the run-scoped pod template name projected from RunSpec.DefaultSettings.
                   Stamped onto tasks that do not name one themselves.
                 maxLength: 253
                 type: string

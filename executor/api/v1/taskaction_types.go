@@ -188,7 +188,7 @@ type TaskActionSpec struct {
 	// +optional
 	Interruptible *bool `json:"interruptible,omitempty"`
 
-	// PodTemplateName is the run-scoped pod template name projected from RunSpec.
+	// PodTemplateName is the run-scoped pod template name projected from RunSpec.DefaultSettings.
 	// Stamped onto tasks that do not name one themselves.
 	// +optional
 	// +kubebuilder:validation:MaxLength=253
