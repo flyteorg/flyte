@@ -1027,6 +1027,8 @@ func (m *RunSpec) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for PodTemplateName
+
 	if all {
 		switch v := interface{}(m.GetTaskResourceDefaults()).(type) {
 		case interface{ ValidateAll() error }:

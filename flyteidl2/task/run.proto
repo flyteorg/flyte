@@ -182,9 +182,14 @@ message RunSpec {
   // actions are reused and only failed/changed ones re-execute. See Recover.
   Recover recover = 19;
 
+  // Run-scoped pod template name, projected onto tasks that do not name one
+  // themselves. Set by the server from settings; a task's own
+  // TaskMetadata.pod_template_name always wins.
+  string pod_template_name = 20;
+
   // Resource defaults for every action in this run. Resolved by the server at creation from the org, project and
   // domain task_resource settings; a caller-supplied value is currently overwritten.
-  TaskResourceDefaults task_resource_defaults = 20;
+  TaskResourceDefaults task_resource_defaults = 21;
 }
 
 // Resolved task_resource settings for a run: what a task pod gets when its template is silent, and the ceiling

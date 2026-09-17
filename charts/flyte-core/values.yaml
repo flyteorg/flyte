@@ -24,6 +24,13 @@ components:
     extraEnv: []
     envFrom: []
     resources: {}
+    # Opt-in protection against voluntary evictions. Set exactly one budget.
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: null
+      maxUnavailable: 1
+      # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+      unhealthyPodEvictionPolicy: ""
     podLabels: {}
     podAnnotations: {}
     nodeSelector: {}
@@ -63,6 +70,13 @@ components:
     extraEnv: []
     envFrom: []
     resources: {}
+    # Opt-in protection against voluntary evictions. Set exactly one budget.
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: null
+      maxUnavailable: 1
+      # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+      unhealthyPodEvictionPolicy: ""
     podLabels: {}
     podAnnotations: {}
     nodeSelector: {}
@@ -102,6 +116,13 @@ components:
     extraEnv: []
     envFrom: []
     resources: {}
+    # Opt-in protection against voluntary evictions. Set exactly one budget.
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: null
+      maxUnavailable: 1
+      # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+      unhealthyPodEvictionPolicy: ""
     podLabels: {}
     podAnnotations: {}
     nodeSelector: {}
@@ -141,6 +162,13 @@ components:
     extraEnv: []
     envFrom: []
     resources: {}
+    # Opt-in protection against voluntary evictions. Set exactly one budget.
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: null
+      maxUnavailable: 1
+      # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+      unhealthyPodEvictionPolicy: ""
     podLabels: {}
     podAnnotations: {}
     nodeSelector: {}
@@ -180,6 +208,13 @@ components:
     extraEnv: []
     envFrom: []
     resources: {}
+    # Opt-in protection against voluntary evictions. Set exactly one budget.
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: null
+      maxUnavailable: 1
+      # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+      unhealthyPodEvictionPolicy: ""
     podLabels: {}
     podAnnotations: {}
     nodeSelector: {}
@@ -220,6 +255,13 @@ components:
     extraEnv: []
     envFrom: []
     resources: {}
+    # Opt-in protection against voluntary evictions. Set exactly one budget.
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: null
+      maxUnavailable: 1
+      # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+      unhealthyPodEvictionPolicy: ""
     podLabels: {}
     podAnnotations: {}
     nodeSelector: {}
@@ -259,6 +301,13 @@ components:
     extraEnv: []
     envFrom: []
     resources: {}
+    # Opt-in protection against voluntary evictions. Set exactly one budget.
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: null
+      maxUnavailable: 1
+      # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+      unhealthyPodEvictionPolicy: ""
     podLabels: {}
     podAnnotations: {}
     nodeSelector: {}
@@ -297,6 +346,13 @@ components:
     extraEnv: []
     envFrom: []
     resources: {}
+    # Opt-in protection against voluntary evictions. Set exactly one budget.
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: null
+      maxUnavailable: 1
+      # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+      unhealthyPodEvictionPolicy: ""
     podLabels: {}
     podAnnotations: {}
     nodeSelector: {}
@@ -578,6 +634,13 @@ ingress:
 console:
   enabled: true
   replicaCount: 1
+  # Opt-in protection against voluntary evictions. Set exactly one budget.
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: null
+    maxUnavailable: 1
+    # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+    unhealthyPodEvictionPolicy: ""
   image:
     repository: ghcr.io/unionai-oss/flyteconsole-v2 # FLYTECONSOLE_IMAGE
     tag: latest # FLYTECONSOLE_TAG
