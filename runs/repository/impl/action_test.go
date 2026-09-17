@@ -52,6 +52,48 @@ func setupActionDB(t *testing.T) *sqlx.DB {
 	return db
 }
 
+func newNotifyTestRepo(notificationConfig NotificationConfig) *actionRepo {
+	return &actionRepo{
+		pendingActions:     make(map[string]struct{}, pendingNotificationCapacity),
+		pendingActionQueue: make([]string, 0, pendingNotificationCapacity),
+		pendingRuns:        make(map[string]struct{}, pendingNotificationCapacity),
+		pendingRunQueue:    make([]string, 0, pendingNotificationCapacity),
+		pendingCh:          make(chan struct{}, 1),
+		notificationConfig: notificationConfig,
+	}
+}
+
+func (r *actionRepo) pendingCounts() (actions, runs int) {
+	r.notifyMu.Lock()
+	defer r.notifyMu.Unlock()
+	return len(r.pendingActionQueue), len(r.pendingRunQueue)
+}
+
+func newNotifyRepoWithDB(t *testing.T) (*actionRepo, *sql.DB, *sql.Conn) {
+	t.Helper()
+	db := setupActionDB(t)
+
+	r := &actionRepo{
+		db:                 db,
+		dsn:                database.GetPostgresDsn(context.Background(), testDbConfig.Postgres),
+		runSubscribers:     make(map[chan string]bool),
+		actionSubscribers:  make(map[chan string]bool),
+		pendingActions:     make(map[string]struct{}, pendingNotificationCapacity),
+		pendingActionQueue: make([]string, 0, pendingNotificationCapacity),
+		pendingRuns:        make(map[string]struct{}, pendingNotificationCapacity),
+		pendingRunQueue:    make([]string, 0, pendingNotificationCapacity),
+		pendingCh:          make(chan struct{}, 1),
+		notificationConfig: testNotificationConfig,
+	}
+	require.NoError(t, r.startPostgresListener())
+
+	conn, err := db.DB.Conn(context.Background())
+	require.NoError(t, err)
+	t.Cleanup(func() { conn.Close() }) //nolint:errcheck
+
+	return r, db.DB, conn
+}
+
 func TestCreateRun(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
@@ -1109,48 +1151,6 @@ func TestRunNotifyLoop_RetriesUndeliveredPayloads(t *testing.T) {
 	case <-time.After(5 * time.Second):
 		t.Fatal("runNotifyLoop did not return after its context was cancelled")
 	}
-}
-
-func newNotifyTestRepo(notificationConfig NotificationConfig) *actionRepo {
-	return &actionRepo{
-		pendingActions:     make(map[string]struct{}, pendingNotificationCapacity),
-		pendingActionQueue: make([]string, 0, pendingNotificationCapacity),
-		pendingRuns:        make(map[string]struct{}, pendingNotificationCapacity),
-		pendingRunQueue:    make([]string, 0, pendingNotificationCapacity),
-		pendingCh:          make(chan struct{}, 1),
-		notificationConfig: notificationConfig,
-	}
-}
-
-func (r *actionRepo) pendingCounts() (actions, runs int) {
-	r.notifyMu.Lock()
-	defer r.notifyMu.Unlock()
-	return len(r.pendingActionQueue), len(r.pendingRunQueue)
-}
-
-func newNotifyRepoWithDB(t *testing.T) (*actionRepo, *sql.DB, *sql.Conn) {
-	t.Helper()
-	db := setupActionDB(t)
-
-	r := &actionRepo{
-		db:                 db,
-		dsn:                database.GetPostgresDsn(context.Background(), testDbConfig.Postgres),
-		runSubscribers:     make(map[chan string]bool),
-		actionSubscribers:  make(map[chan string]bool),
-		pendingActions:     make(map[string]struct{}, pendingNotificationCapacity),
-		pendingActionQueue: make([]string, 0, pendingNotificationCapacity),
-		pendingRuns:        make(map[string]struct{}, pendingNotificationCapacity),
-		pendingRunQueue:    make([]string, 0, pendingNotificationCapacity),
-		pendingCh:          make(chan struct{}, 1),
-		notificationConfig: testNotificationConfig,
-	}
-	require.NoError(t, r.startPostgresListener())
-
-	conn, err := db.DB.Conn(context.Background())
-	require.NoError(t, err)
-	t.Cleanup(func() { conn.Close() }) //nolint:errcheck
-
-	return r, db.DB, conn
 }
 
 // subscribeActions registers a raw subscriber the way WatchActionUpdates does.
