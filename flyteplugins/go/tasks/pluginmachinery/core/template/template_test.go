@@ -45,10 +45,6 @@ type dummyOutputPaths struct {
 	checkpointPath      storage.DataReference
 }
 
-func (d dummyOutputPaths) GetDeckPath() storage.DataReference {
-	panic("should not be called")
-}
-
 func (d dummyOutputPaths) GetPreviousCheckpointsPrefix() storage.DataReference {
 	return d.prevCheckpointPath
 }
