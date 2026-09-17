@@ -1328,14 +1328,11 @@ func TestNotifyPump_ConcurrentWritersDeliverEveryAction(t *testing.T) {
 	}
 }
 
-// TestUpdateActionPhase_CompletesWithStalledPump is the acceptance criterion
-// the issue states directly: with the pump stalled the writer returns
-// immediately and the row is still written.
+// Phase updates must complete while the notification pump is stalled.
 func TestUpdateActionPhase_CompletesWithStalledPump(t *testing.T) {
 	db := setupActionDB(t)
 	r := newNotifyTestRepo(testNotificationConfig)
 	r.db = db
-	// No pump is started, so nothing drains what the write path queues.
 
 	ctx := context.Background()
 	actionID := &common.ActionIdentifier{
@@ -1345,7 +1342,6 @@ func TestUpdateActionPhase_CompletesWithStalledPump(t *testing.T) {
 	_, err := r.CreateAction(ctx, models.NewActionModel(actionID), false)
 	require.NoError(t, err)
 
-	// Back the queue up past what the old 256-slot buffer could hold.
 	for i := 0; i < 300; i++ {
 		r.notifyActionUpdate(ctx, notifyTestActionID(fmt.Sprintf("backlog-%d", i)))
 	}
@@ -1443,7 +1439,7 @@ func TestRunNotifyLoop_NilConnNoPanic(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
 
-	// Pass a nil conn - should not panic.
+	// Pass a nil conn — should not panic.
 	assert.NotPanics(t, func() {
 		r.runNotifyLoop(ctx, nil, nil)
 	})
