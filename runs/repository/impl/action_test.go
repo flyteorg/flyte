@@ -984,7 +984,8 @@ func TestNotificationBufferLimitConfig(t *testing.T) {
 		testNotificationConfig.retryMinBackoff,
 		testNotificationConfig.retryMaxBackoff,
 	)
-	r := newNotifyTestRepoWithConfig(notificationConfig)
+	r := newNotifyTestRepo()
+	r.notificationConfig = notificationConfig
 
 	for i := 0; i <= pendingNotificationCapacity; i++ {
 		r.markActionPending(fmt.Sprintf("action-%d", i))
@@ -1120,17 +1121,13 @@ func TestRunNotifyLoop_RetriesUndeliveredPayloads(t *testing.T) {
 // newNotifyTestRepo builds a repo with the notify plumbing initialized but no
 // pump running, so the pending work is observable and nothing drains it.
 func newNotifyTestRepo() *actionRepo {
-	return newNotifyTestRepoWithConfig(testNotificationConfig)
-}
-
-func newNotifyTestRepoWithConfig(notificationConfig NotificationConfig) *actionRepo {
 	return &actionRepo{
 		pendingActions:     make(map[string]struct{}, pendingNotificationCapacity),
 		pendingActionQueue: make([]string, 0, pendingNotificationCapacity),
 		pendingRuns:        make(map[string]struct{}, pendingNotificationCapacity),
 		pendingRunQueue:    make([]string, 0, pendingNotificationCapacity),
 		pendingCh:          make(chan struct{}, 1),
-		notificationConfig: notificationConfig,
+		notificationConfig: testNotificationConfig,
 	}
 }
 
