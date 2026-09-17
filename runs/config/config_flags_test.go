@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/stretchr/testify/assert"
@@ -326,11 +327,12 @@ func TestConfig_SetFlags(t *testing.T) {
 	t.Run("Test_notifyRetryMinBackoff", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := defaultConfig.NotifyRetryMinBackoff.String()
+			testValue := "100ms"
 
 			cmdFlags.Set("notifyRetryMinBackoff", testValue)
 			if vString, err := cmdFlags.GetString("notifyRetryMinBackoff"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.NotifyRetryMinBackoff)
+				assert.Equal(t, 100*time.Millisecond, actual.NotifyRetryMinBackoff.Duration)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -340,11 +342,12 @@ func TestConfig_SetFlags(t *testing.T) {
 	t.Run("Test_notifyRetryMaxBackoff", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := defaultConfig.NotifyRetryMaxBackoff.String()
+			testValue := "200s"
 
 			cmdFlags.Set("notifyRetryMaxBackoff", testValue)
 			if vString, err := cmdFlags.GetString("notifyRetryMaxBackoff"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.NotifyRetryMaxBackoff)
+				assert.Equal(t, 200*time.Second, actual.NotifyRetryMaxBackoff.Duration)
 
 			} else {
 				assert.FailNow(t, err.Error())
