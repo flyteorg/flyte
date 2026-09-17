@@ -913,7 +913,7 @@ func TestNotifyUpdates_PayloadWithSpecialChars(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := newNotifyTestRepo()
+			r := newNotifyTestRepo(testNotificationConfig)
 
 			// Single quotes must be queued as payload data, never interpolated into SQL.
 			tt.notify(r, context.Background())
@@ -925,8 +925,8 @@ func TestNotifyUpdates_PayloadWithSpecialChars(t *testing.T) {
 	}
 }
 
-func TestNotifyUpdates_QueueDistinctPayloadsInOrder(t *testing.T) {
-	r := newNotifyTestRepo()
+func TestNotifyUpdates_DistinctAndFIFO(t *testing.T) {
+	r := newNotifyTestRepo(testNotificationConfig)
 	ctx := context.Background()
 
 	for _, name := range []string{"first-action", "second-action", "first-action"} {
@@ -947,12 +947,13 @@ func TestNotifyUpdates_QueueDistinctPayloadsInOrder(t *testing.T) {
 	}, runs)
 }
 
-func TestMergePendingActions_RetriesBeforeNewPayloads(t *testing.T) {
-	r := newNotifyTestRepo()
+func TestMergePendingActions_DistinctAndFIFO(t *testing.T) {
+	r := newNotifyTestRepo(testNotificationConfig)
 
 	r.markActionPending("first")
 	r.markActionPending("second")
 	retry, _ := r.takePendingNotifications()
+	assert.Equal(t, []string{"first", "second"}, retry)
 
 	r.markActionPending("second")
 	r.markActionPending("third")
@@ -962,7 +963,7 @@ func TestMergePendingActions_RetriesBeforeNewPayloads(t *testing.T) {
 	assert.Equal(t, []string{"first", "second", "third"}, actions)
 }
 
-func TestEnqueuePending_EvictsOldestPayload(t *testing.T) {
+func TestEnqueuePending_EvictsOldestWhenFull(t *testing.T) {
 	pending := make(map[string]struct{})
 	queue := make([]string, 0, 2)
 
@@ -979,13 +980,11 @@ func TestEnqueuePending_EvictsOldestPayload(t *testing.T) {
 }
 
 func TestNotificationBufferLimitConfig(t *testing.T) {
-	notificationConfig := NewNotificationConfig(
+	r := newNotifyTestRepo(NewNotificationConfig(
 		pendingNotificationCapacity,
 		testNotificationConfig.retryMinBackoff,
 		testNotificationConfig.retryMaxBackoff,
-	)
-	r := newNotifyTestRepo()
-	r.notificationConfig = notificationConfig
+	))
 
 	for i := 0; i <= pendingNotificationCapacity; i++ {
 		r.markActionPending(fmt.Sprintf("action-%d", i))
@@ -1065,7 +1064,7 @@ func TestNewNotificationConfig(t *testing.T) {
 // that existed before: a client disconnecting mid-request used to discard a
 // wakeup that other watchers still needed.
 func TestNotifyActionUpdate_KeepsWakeupAfterContextCancel(t *testing.T) {
-	r := newNotifyTestRepo()
+	r := newNotifyTestRepo(testNotificationConfig)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
@@ -1084,7 +1083,7 @@ func TestNotifyActionUpdate_KeepsWakeupAfterContextCancel(t *testing.T) {
 // whole batch must survive, not just the payload that failed first: a dead
 // connection aborts the drain rather than retrying the connection per payload.
 func TestRunNotifyLoop_RetriesUndeliveredPayloads(t *testing.T) {
-	r := newNotifyTestRepo()
+	r := newNotifyTestRepo(testNotificationConfig)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -1120,14 +1119,14 @@ func TestRunNotifyLoop_RetriesUndeliveredPayloads(t *testing.T) {
 
 // newNotifyTestRepo builds a repo with the notify plumbing initialized but no
 // pump running, so the pending work is observable and nothing drains it.
-func newNotifyTestRepo() *actionRepo {
+func newNotifyTestRepo(notificationConfig NotificationConfig) *actionRepo {
 	return &actionRepo{
 		pendingActions:     make(map[string]struct{}, pendingNotificationCapacity),
 		pendingActionQueue: make([]string, 0, pendingNotificationCapacity),
 		pendingRuns:        make(map[string]struct{}, pendingNotificationCapacity),
 		pendingRunQueue:    make([]string, 0, pendingNotificationCapacity),
 		pendingCh:          make(chan struct{}, 1),
-		notificationConfig: testNotificationConfig,
+		notificationConfig: notificationConfig,
 	}
 }
 
@@ -1192,7 +1191,7 @@ func notifyTestActionID(name string) *common.ActionIdentifier {
 // path depends on: the row is already committed by the time we notify, so a
 // stalled pump must never turn into RPC latency.
 func TestNotifyActionUpdate_DoesNotBlockOnStalledPump(t *testing.T) {
-	r := newNotifyTestRepo()
+	r := newNotifyTestRepo(testNotificationConfig)
 
 	// No pump is running, so nothing consumes what the writer produces. Push
 	// far more updates than any fixed-size buffer would hold.
@@ -1219,7 +1218,7 @@ func TestNotifyActionUpdate_DoesNotBlockOnStalledPump(t *testing.T) {
 // TestNotifyRunUpdate_DoesNotBlockOnStalledPump is the run-side twin of the
 // test above; both notify paths share the same pump.
 func TestNotifyRunUpdate_DoesNotBlockOnStalledPump(t *testing.T) {
-	r := newNotifyTestRepo()
+	r := newNotifyTestRepo(testNotificationConfig)
 
 	const updates = 5000
 
@@ -1467,7 +1466,7 @@ func TestIsConnError(t *testing.T) {
 func TestRunNotifyLoop_NilConnNoPanic(t *testing.T) {
 	// Verify that runNotifyLoop handles a nil connection gracefully
 	// (e.g. after a failed reconnect) instead of panicking.
-	r := newNotifyTestRepo()
+	r := newNotifyTestRepo(testNotificationConfig)
 
 	// Queue a notification, then cancel so the loop exits after one attempt.
 	r.notifyActionUpdate(context.Background(), notifyTestActionID("action"))
