@@ -181,10 +181,17 @@ message RunSpec {
   // actions are reused and only failed/changed ones re-execute. See Recover.
   Recover recover = 19;
 
-  // Run-scoped pod template name, projected onto tasks that do not name one
-  // themselves. Set by the server from settings; a task's own
-  // TaskMetadata.pod_template_name always wins.
-  string pod_template_name = 20;
+  // Run-scoped defaults, projected onto every task in the run that does not
+  // set the corresponding value itself. Set by the server from settings.
+  DefaultSettings default_settings = 20;
+}
+
+// DefaultSettings holds run-scoped defaults applied to tasks in a run. Each field
+// only fills in a value the task leaves unset; a task's own choice always wins.
+message DefaultSettings {
+  // Pod template name, projected onto tasks that do not name one themselves.
+  // A task's own TaskMetadata.pod_template_name always wins.
+  string pod_template_name = 1;
 }
 
 message InlineRuleList {

@@ -81,7 +81,7 @@ func TestApplyRunSettings(t *testing.T) {
 		},
 		{
 			name:            "an explicit pod template wins over settings",
-			spec:            &task.RunSpec{PodTemplateName: "user-template"},
+			spec:            &task.RunSpec{DefaultSettings: &task.DefaultSettings{PodTemplateName: "user-template"}},
 			resolved:        podTemplateSettings(&settings.StringSetting{State: stateValue, StringValue: "gpu-template"}),
 			wantPodTemplate: "user-template",
 		},
@@ -98,7 +98,7 @@ func TestApplyRunSettings(t *testing.T) {
 			applyRunSettings(tt.spec, tt.resolved)
 			assert.Equal(t, tt.wantQueue, tt.spec.GetQueue())
 			assert.Equal(t, tt.wantConcurrency, tt.spec.GetMaxActionConcurrency())
-			assert.Equal(t, tt.wantPodTemplate, tt.spec.GetPodTemplateName())
+			assert.Equal(t, tt.wantPodTemplate, tt.spec.GetDefaultSettings().GetPodTemplateName())
 		})
 	}
 }

@@ -350,7 +350,9 @@ func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
 				"owner": "sdk",
 			},
 		},
-		PodTemplateName: "gpu-template",
+		DefaultSettings: &task.DefaultSettings{
+			PodTemplateName: "gpu-template",
+		},
 	})
 
 	require.NotNil(t, taskAction.Spec.Interruptible)
