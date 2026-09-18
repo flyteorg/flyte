@@ -648,7 +648,6 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	templateParameters := template.Parameters{
 		Inputs:            tCtx.InputReader(),
 		OutputPath:        tCtx.OutputWriter(),
-		Task:              tCtx.TaskReader(),
 		TaskExecMetadata:  tCtx.TaskExecutionMetadata(),
 		IncludeConsoleURL: hasExternalLinkType(taskTemplate),
 	}

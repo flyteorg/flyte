@@ -10,9 +10,6 @@ import (
 const (
 	// InputsSuffix specifies the name of the file that contains the task inputs in the form core.LiteralMap
 	InputsSuffix = "inputs.pb"
-	// TaskTemplateSuffix In case a task requests for a task template, it is passed into the task using this filename.
-	// The format is of type core.TaskTemplate
-	TaskTemplateSuffix = "task.pb"
 	// FuturesSuffix specifies that for dynamic workflows, the futures files is written with this filename/suffix.
 	// The format is core.DynamicJobSpec
 	FuturesSuffix = "futures.pb"
@@ -44,11 +41,6 @@ func constructPath(store storage.ReferenceConstructor, base storage.DataReferenc
 	}
 
 	return res
-}
-
-// GetTaskTemplatePath returns a protobuf file path where TaskTemplate is stored
-func GetTaskTemplatePath(ctx context.Context, store storage.ReferenceConstructor, base storage.DataReference) (storage.DataReference, error) {
-	return store.ConstructReference(ctx, base, TaskTemplateSuffix)
 }
 
 // GetIndexLookupPath returns the indexpath suffixed to IndexLookupSuffix
