@@ -1417,6 +1417,59 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(isTerminal(persisted)).To(BeFalse())
 			Expect(fake.abortCalls).To(Equal(1))
 		})
+
+		It("reports the system failure before relaunching the attempt in place", func() {
+			base := time.Date(2026, time.September, 18, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			preemptedAt := base.Add(time.Minute)
+			const code = "WorkloadEvictedDueToPreempted"
+			const message = "Pod was terminated by an external controller: Preempted to accommodate a workload"
+			fake := &fakePlugin{
+				id: "kueue-plugin",
+				transitions: []pluginsCore.Transition{
+					runningTransition(base),
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(
+						code,
+						message,
+						&pluginsCore.TaskInfo{OccurredAt: &preemptedAt},
+					)),
+				},
+			}
+			recorded := &recordingEventsClient{}
+			r := newReconciler(fake, fakeClock, recorded, nil)
+			nn := createTaskAction(
+				"system-retry-reported",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+			request := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			fakeClock.Step(time.Minute)
+			_, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+
+			events := recorded.RecordedEvents()
+			Expect(len(events)).To(BeNumerically(">=", 2))
+			Expect(events[len(events)-2].GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_RUNNING))
+			retry := events[len(events)-1]
+			Expect(retry.GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_QUEUED))
+			Expect(retry.GetAttempt()).To(Equal(uint32(1)))
+			Expect(retry.GetErrorInfo()).To(BeNil())
+			Expect(retry.GetClusterEvents()).To(HaveLen(2))
+			Expect(retry.GetClusterEvents()[0].GetMessage()).To(Equal(systemRetryReason))
+			warning := retry.GetClusterEvents()[1]
+			Expect(warning.GetType()).To(Equal(workflow.ClusterEvent_TYPE_WARNING))
+			Expect(warning.GetReason()).To(Equal(code))
+			Expect(warning.GetMessage()).To(Equal("[" + code + "] " + message))
+			Expect(warning.GetOccurredAt().AsTime()).To(BeTemporally("==", preemptedAt))
+
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.SystemFailures).To(Equal(uint32(1)))
+			Expect(persisted.Status.PluginState).To(BeNil())
+			Expect(isTerminal(persisted)).To(BeFalse())
+			Expect(fake.abortCalls).To(Equal(1))
+		})
 	})
 
 	Context("resetPluginResource", func() {
