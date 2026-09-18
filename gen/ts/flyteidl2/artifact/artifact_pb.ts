@@ -9,7 +9,7 @@ import type { ActionIdentifier } from "../common/identifier_pb.ts";
 import { file_flyteidl2_common_identifier } from "../common/identifier_pb.ts";
 import type { EnrichedIdentity } from "../common/identity_pb.ts";
 import { file_flyteidl2_common_identity } from "../common/identity_pb.ts";
-import type { ArtifactInfo, ArtifactVersionId } from "../core/artifact_id_pb.ts";
+import type { ArtifactInfo, ArtifactVersionId, Granularity, Partitions, TimePartition } from "../core/artifact_id_pb.ts";
 import { file_flyteidl2_core_artifact_id } from "../core/artifact_id_pb.ts";
 import type { Literal } from "../core/literals_pb.ts";
 import { file_flyteidl2_core_literals } from "../core/literals_pb.ts";
@@ -23,7 +23,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/artifact/artifact.proto.
  */
 export const file_flyteidl2_artifact_artifact: GenFile = /*@__PURE__*/
-  fileDesc("CiFmbHl0ZWlkbDIvYXJ0aWZhY3QvYXJ0aWZhY3QucHJvdG8SEmZseXRlaWRsMi5hcnRpZmFjdCJ1CgxBcnRpZmFjdE5hbWUSFAoDb3JnGAEgASgJQge6SARyAhg/EhoKB3Byb2plY3QYAiABKAlCCbpIBnIEEAEYQBIZCgZkb21haW4YAyABKAlCCbpIBnIEEAEYQBIYCgRuYW1lGAQgASgJQgq6SAdyBRABGP8BImkKEkFydGlmYWN0SWRlbnRpZmllchI2CgRuYW1lGAEgASgLMiAuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0TmFtZUIGukgDyAEBEhsKB3ZlcnNpb24YAiABKAlCCrpIB3IFEAEY/wEiXwoQVGFza0FjdGlvblNvdXJjZRI6CgZhY3Rpb24YASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIPCgdhdHRlbXB0GAIgASgNInkKDkFydGlmYWN0U291cmNlEjsKC3Rhc2tfYWN0aW9uGAEgASgLMiQuZmx5dGVpZGwyLmFydGlmYWN0LlRhc2tBY3Rpb25Tb3VyY2VIABIgCgxleHRlcm5hbF9yZWYYAiABKAlCCLpIBXIDGIAISABCCAoGc291cmNlIpgCCgxBcnRpZmFjdFNwZWMSLgoFdmFsdWUYASABKAsyFy5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsQga6SAPIAQESMQoEdHlwZRgCIAEoCzIbLmZseXRlaWRsMi5jb3JlLkxpdGVyYWxUeXBlQga6SAPIAQESKgoEaW5mbxgDIAEoCzIcLmZseXRlaWRsMi5jb3JlLkFydGlmYWN0SW5mbxIyCgZzb3VyY2UYBiABKAsyIi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RTb3VyY2USRQoQcGFyZW50X2FydGlmYWN0cxgHIAMoCzIhLmZseXRlaWRsMi5jb3JlLkFydGlmYWN0VmVyc2lvbklkQgi6SAWSAQIQICLfAQoIQXJ0aWZhY3QSOwoLYXJ0aWZhY3RfaWQYASABKAsyJi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RJZGVudGlmaWVyEi4KBHNwZWMYAiABKAsyIC5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RTcGVjEi4KCmNyZWF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjYKCmNyZWF0ZWRfYnkYBCABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkVucmljaGVkSWRlbnRpdHlCygEKFmNvbS5mbHl0ZWlkbDIuYXJ0aWZhY3RCDUFydGlmYWN0UHJvdG9IAlABWjZnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvYXJ0aWZhY3SiAgNGQViqAhJGbHl0ZWlkbDIuQXJ0aWZhY3TKAhJGbHl0ZWlkbDJcQXJ0aWZhY3TiAh5GbHl0ZWlkbDJcQXJ0aWZhY3RcR1BCTWV0YWRhdGHqAhNGbHl0ZWlkbDI6OkFydGlmYWN0YgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_identity, file_flyteidl2_core_artifact_id, file_flyteidl2_core_literals, file_flyteidl2_core_types, file_google_protobuf_timestamp]);
+  fileDesc("CiFmbHl0ZWlkbDIvYXJ0aWZhY3QvYXJ0aWZhY3QucHJvdG8SEmZseXRlaWRsMi5hcnRpZmFjdCJ1CgxBcnRpZmFjdE5hbWUSFAoDb3JnGAEgASgJQge6SARyAhg/EhoKB3Byb2plY3QYAiABKAlCCbpIBnIEEAEYQBIZCgZkb21haW4YAyABKAlCCbpIBnIEEAEYQBIYCgRuYW1lGAQgASgJQgq6SAdyBRABGP8BImkKEkFydGlmYWN0SWRlbnRpZmllchI2CgRuYW1lGAEgASgLMiAuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0TmFtZUIGukgDyAEBEhsKB3ZlcnNpb24YAiABKAlCCrpIB3IFEAEY/wEiXAoQVGltZVBhcnRpdGlvbktleRIWCgNrZXkYASABKAlCCbpIBnIEEAEYQBIwCgtncmFudWxhcml0eRgCIAEoDjIbLmZseXRlaWRsMi5jb3JlLkdyYW51bGFyaXR5IoEBChdBcnRpZmFjdFBhcnRpdGlvblNjaGVtYRI8Cg50aW1lX3BhcnRpdGlvbhgBIAEoCzIkLmZseXRlaWRsMi5hcnRpZmFjdC5UaW1lUGFydGl0aW9uS2V5EigKDnBhcnRpdGlvbl9rZXlzGAIgAygJQhC6SA2SAQoQECIGcgQQARhAIqYBChdQYXJ0aXRpb25TY2hlbWFNaXNtYXRjaBI9CghleHBlY3RlZBgBIAEoCzIrLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdFBhcnRpdGlvblNjaGVtYRI7CgZhY3R1YWwYAiABKAsyKy5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RQYXJ0aXRpb25TY2hlbWESDwoHbWVzc2FnZRgDIAEoCSJfChBUYXNrQWN0aW9uU291cmNlEjoKBmFjdGlvbhgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBEg8KB2F0dGVtcHQYAiABKA0ieQoOQXJ0aWZhY3RTb3VyY2USOwoLdGFza19hY3Rpb24YASABKAsyJC5mbHl0ZWlkbDIuYXJ0aWZhY3QuVGFza0FjdGlvblNvdXJjZUgAEiAKDGV4dGVybmFsX3JlZhgCIAEoCUIIukgFcgMYgAhIAEIICgZzb3VyY2Ui/wIKDEFydGlmYWN0U3BlYxIuCgV2YWx1ZRgBIAEoCzIXLmZseXRlaWRsMi5jb3JlLkxpdGVyYWxCBrpIA8gBARIxCgR0eXBlGAIgASgLMhsuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbFR5cGVCBrpIA8gBARIqCgRpbmZvGAMgASgLMhwuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RJbmZvEjIKBnNvdXJjZRgGIAEoCzIiLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdFNvdXJjZRJFChBwYXJlbnRfYXJ0aWZhY3RzGAcgAygLMiEuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RWZXJzaW9uSWRCCLpIBZIBAhAgEi4KCnBhcnRpdGlvbnMYCCABKAsyGi5mbHl0ZWlkbDIuY29yZS5QYXJ0aXRpb25zEjUKDnRpbWVfcGFydGl0aW9uGAkgASgLMh0uZmx5dGVpZGwyLmNvcmUuVGltZVBhcnRpdGlvbiKvAgoIQXJ0aWZhY3QSOwoLYXJ0aWZhY3RfaWQYASABKAsyJi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RJZGVudGlmaWVyEi4KBHNwZWMYAiABKAsyIC5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RTcGVjEi4KCmNyZWF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjYKCmNyZWF0ZWRfYnkYBCABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkVucmljaGVkSWRlbnRpdHkSTgoZcGFydGl0aW9uX3NjaGVtYV9taXNtYXRjaBgFIAEoCzIrLmZseXRlaWRsMi5hcnRpZmFjdC5QYXJ0aXRpb25TY2hlbWFNaXNtYXRjaELKAQoWY29tLmZseXRlaWRsMi5hcnRpZmFjdEINQXJ0aWZhY3RQcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9hcnRpZmFjdKICA0ZBWKoCEkZseXRlaWRsMi5BcnRpZmFjdMoCEkZseXRlaWRsMlxBcnRpZmFjdOICHkZseXRlaWRsMlxBcnRpZmFjdFxHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6QXJ0aWZhY3RiBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_identity, file_flyteidl2_core_artifact_id, file_flyteidl2_core_literals, file_flyteidl2_core_types, file_google_protobuf_timestamp]);
 
 /**
  * Identifies an artifact name within an org, project and domain.
@@ -95,6 +95,104 @@ export const ArtifactIdentifierSchema: GenMessage<ArtifactIdentifier> = /*@__PUR
   messageDesc(file_flyteidl2_artifact_artifact, 1);
 
 /**
+ * The name and granularity of an artifact's time partition.
+ *
+ * @generated from message flyteidl2.artifact.TimePartitionKey
+ */
+export type TimePartitionKey = Message<"flyteidl2.artifact.TimePartitionKey"> & {
+  /**
+   * Dimension name, e.g. "date" or "hour".
+   *
+   * @generated from field: string key = 1;
+   */
+  key: string;
+
+  /**
+   * Granularity every version's time value is floored to. UNSET reads as DAY.
+   *
+   * @generated from field: flyteidl2.core.Granularity granularity = 2;
+   */
+  granularity: Granularity;
+};
+
+/**
+ * Describes the message flyteidl2.artifact.TimePartitionKey.
+ * Use `create(TimePartitionKeySchema)` to create a new message.
+ */
+export const TimePartitionKeySchema: GenMessage<TimePartitionKey> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact, 2);
+
+/**
+ * The partition keys of an artifact name: at most one time partition plus any
+ * number of string partitions. Partitions are identity: the keys are fixed for
+ * the artifact name by its first version (or by DeclareArtifact) and every
+ * later version must carry exactly these keys. Changing the keys is a new
+ * artifact name, not a new version.
+ *
+ * @generated from message flyteidl2.artifact.ArtifactPartitionSchema
+ */
+export type ArtifactPartitionSchema = Message<"flyteidl2.artifact.ArtifactPartitionSchema"> & {
+  /**
+   * The time dimension, if the artifact has one.
+   *
+   * @generated from field: flyteidl2.artifact.TimePartitionKey time_partition = 1;
+   */
+  timePartition?: TimePartitionKey;
+
+  /**
+   * String dimension names, in declaration order.
+   *
+   * @generated from field: repeated string partition_keys = 2;
+   */
+  partitionKeys: string[];
+};
+
+/**
+ * Describes the message flyteidl2.artifact.ArtifactPartitionSchema.
+ * Use `create(ArtifactPartitionSchemaSchema)` to create a new message.
+ */
+export const ArtifactPartitionSchemaSchema: GenMessage<ArtifactPartitionSchema> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact, 3);
+
+/**
+ * Recorded on a version whose partition keys did not match the artifact's
+ * schema. The version is stored, so nothing is lost, but it is not
+ * addressable by partition: partition filters, latest-per-partition listings,
+ * partition value listings and partition triggers all skip it.
+ *
+ * @generated from message flyteidl2.artifact.PartitionSchemaMismatch
+ */
+export type PartitionSchemaMismatch = Message<"flyteidl2.artifact.PartitionSchemaMismatch"> & {
+  /**
+   * The artifact's schema.
+   *
+   * @generated from field: flyteidl2.artifact.ArtifactPartitionSchema expected = 1;
+   */
+  expected?: ArtifactPartitionSchema;
+
+  /**
+   * The keys the version carried.
+   *
+   * @generated from field: flyteidl2.artifact.ArtifactPartitionSchema actual = 2;
+   */
+  actual?: ArtifactPartitionSchema;
+
+  /**
+   * Human readable explanation, including the fix.
+   *
+   * @generated from field: string message = 3;
+   */
+  message: string;
+};
+
+/**
+ * Describes the message flyteidl2.artifact.PartitionSchemaMismatch.
+ * Use `create(PartitionSchemaMismatchSchema)` to create a new message.
+ */
+export const PartitionSchemaMismatchSchema: GenMessage<PartitionSchemaMismatch> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact, 4);
+
+/**
  * The task action attempt that produced an artifact. A dedicated message
  * (rather than common.ActionAttemptIdentifier) because producing attempts are
  * 0-based while that identifier validates attempt > 0.
@@ -120,7 +218,7 @@ export type TaskActionSource = Message<"flyteidl2.artifact.TaskActionSource"> & 
  * Use `create(TaskActionSourceSchema)` to create a new message.
  */
 export const TaskActionSourceSchema: GenMessage<TaskActionSource> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_artifact_artifact, 2);
+  messageDesc(file_flyteidl2_artifact_artifact, 5);
 
 /**
  * Provenance of an artifact: what produced it. An unset oneof means the
@@ -160,7 +258,7 @@ export type ArtifactSource = Message<"flyteidl2.artifact.ArtifactSource"> & {
  * Use `create(ArtifactSourceSchema)` to create a new message.
  */
 export const ArtifactSourceSchema: GenMessage<ArtifactSource> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_artifact_artifact, 3);
+  messageDesc(file_flyteidl2_artifact_artifact, 6);
 
 /**
  * User-provided specification of an artifact.
@@ -230,6 +328,24 @@ export type ArtifactSpec = Message<"flyteidl2.artifact.ArtifactSpec"> & {
    * @generated from field: repeated flyteidl2.core.ArtifactVersionId parent_artifacts = 7;
    */
   parentArtifacts: ArtifactVersionId[];
+
+  /**
+   * String partitions of this version, e.g. region=us. Each value must be a
+   * LabelValue.static_value. The set of keys is fixed per artifact name by the
+   * first version (see ArtifactPartitionSchema).
+   *
+   * @generated from field: flyteidl2.core.Partitions partitions = 8;
+   */
+  partitions?: Partitions;
+
+  /**
+   * The time partition of this version: a LabelValue.time_value, floored to the
+   * granularity, under the key. An unset key defaults from the granularity
+   * ("hour" for HOUR, "date" otherwise); an UNSET granularity defaults to DAY.
+   *
+   * @generated from field: flyteidl2.core.TimePartition time_partition = 9;
+   */
+  timePartition?: TimePartition;
 };
 
 /**
@@ -237,7 +353,7 @@ export type ArtifactSpec = Message<"flyteidl2.artifact.ArtifactSpec"> & {
  * Use `create(ArtifactSpecSchema)` to create a new message.
  */
 export const ArtifactSpecSchema: GenMessage<ArtifactSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_artifact_artifact, 4);
+  messageDesc(file_flyteidl2_artifact_artifact, 7);
 
 /**
  * A fully materialized artifact as stored by the service.
@@ -270,6 +386,15 @@ export type Artifact = Message<"flyteidl2.artifact.Artifact"> & {
    * @generated from field: flyteidl2.common.EnrichedIdentity created_by = 4;
    */
   createdBy?: EnrichedIdentity;
+
+  /**
+   * Set by the service when the version's partition keys did not match the
+   * artifact's schema; unset for a consistent version. See
+   * PartitionSchemaMismatch for what the flag means.
+   *
+   * @generated from field: flyteidl2.artifact.PartitionSchemaMismatch partition_schema_mismatch = 5;
+   */
+  partitionSchemaMismatch?: PartitionSchemaMismatch;
 };
 
 /**
@@ -277,5 +402,5 @@ export type Artifact = Message<"flyteidl2.artifact.Artifact"> & {
  * Use `create(ArtifactSchema)` to create a new message.
  */
 export const ArtifactSchema: GenMessage<Artifact> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_artifact_artifact, 5);
+  messageDesc(file_flyteidl2_artifact_artifact, 8);
 

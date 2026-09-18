@@ -6,6 +6,8 @@ import "buf/validate/validate.proto";
 import "flyteidl2/artifact/artifact.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/list.proto";
+import "flyteidl2/core/artifact_id.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/artifact";
 
@@ -46,6 +48,26 @@ service ArtifactService {
   // the listings. Offloaded data the value references is not touched.
   rpc DeleteArtifact(DeleteArtifactRequest) returns (DeleteArtifactResponse) {
     option idempotency_level = IDEMPOTENT;
+  }
+
+  // Declare an artifact name's partition schema ahead of any version. Succeeds
+  // when the name has no schema yet or an equal one; FAILED_PRECONDITION when a
+  // different schema is already fixed (by an earlier declaration or a first
+  // version). Changing the keys is a new artifact name.
+  rpc DeclareArtifact(DeclareArtifactRequest) returns (DeclareArtifactResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+
+  // Get an artifact name's partition schema. NOT_FOUND when the name has
+  // neither a declaration nor a version.
+  rpc GetArtifactSchema(GetArtifactSchemaRequest) returns (GetArtifactSchemaResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // List the distinct values one partition key has among an artifact's
+  // addressable versions, optionally scoped by partition filters, sorted.
+  rpc ListPartitionValues(ListPartitionValuesRequest) returns (ListPartitionValuesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
 
@@ -93,6 +115,14 @@ message ListArtifactsRequest {
   // declare the given artifact version among their parents. This serves the
   // downward direction of lineage: the stored parent pointers only walk
   // upwards, so finding a version's children requires this filter.
+  //
+  // Partition filters: field "partition.<key>" with EQUAL, NOT_EQUAL, VALUE_IN
+  // or VALUE_NOT_IN on a string partition; field "time_partition" with EQUAL,
+  // GREATER_THAN, GREATER_THAN_OR_EQUAL, LESS_THAN or LESS_THAN_OR_EQUAL and an
+  // RFC3339 value, so a range is two filters; field "schema_mismatch" with
+  // EQUAL "true" or "false". Any partition filter, like latest_per_partition,
+  // only considers versions whose partition keys match the artifact's schema.
+  // "time_partition" is also a sort key.
   common.ListRequest request = 1;
 
   // Project scope for the listing. organization is stamped by the server.
@@ -101,6 +131,12 @@ message ListArtifactsRequest {
   // Optional exact name; when set, lists all versions of that artifact,
   // newest first.
   optional string name = 3 [(buf.validate.field).string.max_len = 255];
+
+  // When set, return only the newest version of each distinct partition among
+  // the matches, so a range over the time partition yields one version per
+  // partition. Versions with a partition schema mismatch are excluded. Requires
+  // name to be set.
+  bool latest_per_partition = 4;
 }
 
 // response message for listing artifacts.
@@ -132,6 +168,18 @@ message ArtifactGroup {
 
   // Total number of versions published under this name.
   uint64 versions = 2;
+
+  // The artifact's partition keys; unset when the artifact has none.
+  ArtifactPartitionSchema partition_schema = 3;
+
+  // The newest time partition among the artifact's addressable versions;
+  // unset when the artifact has no time partition.
+  google.protobuf.Timestamp latest_time_partition = 4;
+
+  // The distinct string partitions present at latest_time_partition (or, for
+  // an artifact without a time partition, across all addressable versions),
+  // capped at 32.
+  repeated core.Partitions latest_partitions = 5;
 }
 
 // response message for listing distinct artifact names.
@@ -157,6 +205,68 @@ message ListArtifactMetadataKeysResponse {
   // Sorted, deduplicated keys. Capped server-side; reflects a recent window of
   // artifacts, so keys only present on older versions may be absent.
   repeated string keys = 1;
+}
+
+// request message for declaring an artifact's partition schema.
+message DeclareArtifactRequest {
+  // Name of the artifact. org is stamped by the server.
+  ArtifactName name = 1 [(buf.validate.field).required = true];
+
+  // The partition keys to fix for the name.
+  ArtifactPartitionSchema partition_schema = 2 [(buf.validate.field).required = true];
+}
+
+// response message for declaring an artifact's partition schema.
+message DeclareArtifactResponse {
+  // The schema as stored.
+  ArtifactPartitionSchema partition_schema = 1;
+}
+
+// request message for getting an artifact's partition schema.
+message GetArtifactSchemaRequest {
+  // Name of the artifact. org is stamped by the server.
+  ArtifactName name = 1 [(buf.validate.field).required = true];
+}
+
+// response message for getting an artifact's partition schema.
+message GetArtifactSchemaResponse {
+  // The partition keys. An empty schema (no time partition, no keys) means the
+  // artifact exists and is not partitioned.
+  ArtifactPartitionSchema partition_schema = 1;
+
+  // Whether the schema was fixed by a first version (false) or by an explicit
+  // declaration (true).
+  bool declared = 2;
+}
+
+// request message for listing the values of one partition key.
+message ListPartitionValuesRequest {
+  // limit (default 100, max 1000) and filters. Supported filters are the
+  // partition filters of ListArtifactsRequest: "partition.<key>" and
+  // "time_partition", which scope the versions whose values are listed.
+  common.ListRequest request = 1;
+
+  // Project scope. organization is stamped by the server.
+  common.ProjectIdentifier project_id = 2 [(buf.validate.field).required = true];
+
+  // Name of the artifact.
+  string name = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 255
+  ];
+
+  // The partition key to list: a string partition key, or the time partition
+  // key, whose values are returned as RFC3339 timestamps.
+  string key = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+}
+
+// response message for listing the values of one partition key.
+message ListPartitionValuesResponse {
+  // Distinct values, sorted ascending. Time partition values are RFC3339.
+  repeated string values = 1;
 }
 
 // request message for deleting one artifact version.

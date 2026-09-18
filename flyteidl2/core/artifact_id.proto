@@ -74,6 +74,7 @@ enum Granularity {
   HOUR = 2;
   DAY = 3; // default
   MONTH = 4;
+  WEEK = 5;
 }
 
 enum Operator {
@@ -112,6 +113,12 @@ message Partitions {
 message TimePartition {
   LabelValue value = 1;
   Granularity granularity = 2;
+
+  // Name of the time dimension, e.g. "date". When empty on an artifact
+  // version, the artifact service defaults it from the granularity: "hour"
+  // for HOUR, "date" otherwise, so artifacts agree on the name without
+  // coordination.
+  string key = 3 [(buf.validate.field).string.max_len = 64];
 }
 
 message ArtifactID {
