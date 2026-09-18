@@ -218,9 +218,10 @@ func (x *TimePartitionKey) GetGranularity() core.Granularity {
 
 // The partition keys of an artifact name: at most one time partition plus any
 // number of string partitions. Partitions are identity: the keys are fixed for
-// the artifact name by its first version (or by DeclareArtifact) and every
-// later version must carry exactly these keys. Changing the keys is a new
-// artifact name, not a new version.
+// the artifact name by its first partitioned version, or by DeclareArtifact (a
+// version without partitions fixes nothing), and every later version must
+// carry exactly these keys. Changing the keys is a new artifact name, not a
+// new version.
 type ArtifactPartitionSchema struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -542,7 +543,7 @@ type ArtifactSpec struct {
 	ParentArtifacts []*core.ArtifactVersionId `protobuf:"bytes,7,rep,name=parent_artifacts,json=parentArtifacts,proto3" json:"parent_artifacts,omitempty"`
 	// String partitions of this version, e.g. region=us. Each value must be a
 	// LabelValue.static_value. The set of keys is fixed per artifact name by the
-	// first version (see ArtifactPartitionSchema).
+	// first partitioned version (see ArtifactPartitionSchema).
 	Partitions *core.Partitions `protobuf:"bytes,8,opt,name=partitions,proto3" json:"partitions,omitempty"`
 	// The time partition of this version: a LabelValue.time_value, floored to the
 	// granularity, under the key. An unset key defaults from the granularity

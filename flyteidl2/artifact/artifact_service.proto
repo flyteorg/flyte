@@ -234,7 +234,7 @@ message GetArtifactSchemaResponse {
   // artifact exists and is not partitioned.
   ArtifactPartitionSchema partition_schema = 1;
 
-  // Whether the schema was fixed by a first version (false) or by an explicit
+  // Whether the schema was fixed by a first partitioned version (false) or by an explicit
   // declaration (true).
   bool declared = 2;
 }

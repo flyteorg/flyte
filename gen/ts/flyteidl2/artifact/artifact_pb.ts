@@ -125,9 +125,10 @@ export const TimePartitionKeySchema: GenMessage<TimePartitionKey> = /*@__PURE__*
 /**
  * The partition keys of an artifact name: at most one time partition plus any
  * number of string partitions. Partitions are identity: the keys are fixed for
- * the artifact name by its first version (or by DeclareArtifact) and every
- * later version must carry exactly these keys. Changing the keys is a new
- * artifact name, not a new version.
+ * the artifact name by its first partitioned version, or by DeclareArtifact (a
+ * version without partitions fixes nothing), and every later version must
+ * carry exactly these keys. Changing the keys is a new artifact name, not a
+ * new version.
  *
  * @generated from message flyteidl2.artifact.ArtifactPartitionSchema
  */
@@ -332,7 +333,7 @@ export type ArtifactSpec = Message<"flyteidl2.artifact.ArtifactSpec"> & {
   /**
    * String partitions of this version, e.g. region=us. Each value must be a
    * LabelValue.static_value. The set of keys is fixed per artifact name by the
-   * first version (see ArtifactPartitionSchema).
+   * first partitioned version (see ArtifactPartitionSchema).
    *
    * @generated from field: flyteidl2.core.Partitions partitions = 8;
    */

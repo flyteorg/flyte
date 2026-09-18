@@ -876,7 +876,7 @@ type GetArtifactSchemaResponse struct {
 	// The partition keys. An empty schema (no time partition, no keys) means the
 	// artifact exists and is not partitioned.
 	PartitionSchema *ArtifactPartitionSchema `protobuf:"bytes,1,opt,name=partition_schema,json=partitionSchema,proto3" json:"partition_schema,omitempty"`
-	// Whether the schema was fixed by a first version (false) or by an explicit
+	// Whether the schema was fixed by a first partitioned version (false) or by an explicit
 	// declaration (true).
 	Declared bool `protobuf:"varint,2,opt,name=declared,proto3" json:"declared,omitempty"`
 }

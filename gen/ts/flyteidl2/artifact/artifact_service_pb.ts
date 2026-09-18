@@ -458,7 +458,7 @@ export type GetArtifactSchemaResponse = Message<"flyteidl2.artifact.GetArtifactS
   partitionSchema?: ArtifactPartitionSchema;
 
   /**
-   * Whether the schema was fixed by a first version (false) or by an explicit
+   * Whether the schema was fixed by a first partitioned version (false) or by an explicit
    * declaration (true).
    *
    * @generated from field: bool declared = 2;
