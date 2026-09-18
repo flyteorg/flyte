@@ -1155,7 +1155,8 @@
         "MINUTE",
         "HOUR",
         "DAY",
-        "MONTH"
+        "MONTH",
+        "WEEK"
       ],
       "default": "UNSET",
       "title": "- DAY: default"
@@ -1868,6 +1869,10 @@
         },
         "granularity": {
           "$ref": "#/definitions/coreGranularity"
+        },
+        "key": {
+          "type": "string",
+          "description": "Name of the time dimension, e.g. \"date\". When empty on an artifact\nversion, the artifact service defaults it from the granularity: \"hour\"\nfor HOUR, \"date\" otherwise, so artifacts agree on the name without\ncoordination."
         }
       }
     },
@@ -2525,6 +2530,14 @@
             "$ref": "#/definitions/coreArtifactVersionId"
           },
           "description": "Optional artifact versions the produced version was derived from, copied\nverbatim into ArtifactSpec.parent_artifacts. Set by the producing task\nwhen it derives a new version from versions it consumed; one entry is\nplain derivation, several record a merge, so the resulting lineage forms\na DAG instead of reading as a linear chain. Order is preserved: the first\nentry is the primary parent. Empty key fields inherit the produced\nartifact's own scope and name, so a bare {version: \"v1\"} declares the\nprevious version of this same artifact as a parent; a set name records\ncross-artifact derivation. Only the name may differ: non-empty scope\nfields (org/project/domain) must match the produced artifact's own scope."
+        },
+        "partitions": {
+          "$ref": "#/definitions/corePartitions",
+          "description": "String partitions of the produced version, copied verbatim into\nArtifactSpec.partitions."
+        },
+        "time_partition": {
+          "$ref": "#/definitions/coreTimePartition",
+          "description": "Time partition of the produced version, copied verbatim into\nArtifactSpec.time_partition."
         }
       },
       "description": "Declares that a named output of the producing action is a new artifact\nversion. The output's literal (in Outputs.literals) is the artifact's value;\norg/project/domain come from the producing action's scope at registration."

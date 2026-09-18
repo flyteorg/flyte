@@ -2,6 +2,8 @@ from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.artifact import artifact_pb2 as _artifact_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import list_pb2 as _list_pb2
+from flyteidl2.core import artifact_id_pb2 as _artifact_id_pb2
+from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -38,14 +40,16 @@ class GetArtifactResponse(_message.Message):
     def __init__(self, artifact: _Optional[_Union[_artifact_pb2.Artifact, _Mapping]] = ...) -> None: ...
 
 class ListArtifactsRequest(_message.Message):
-    __slots__ = ["request", "project_id", "name"]
+    __slots__ = ["request", "project_id", "name", "latest_per_partition"]
     REQUEST_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
+    LATEST_PER_PARTITION_FIELD_NUMBER: _ClassVar[int]
     request: _list_pb2.ListRequest
     project_id: _identifier_pb2.ProjectIdentifier
     name: str
-    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., name: _Optional[str] = ...) -> None: ...
+    latest_per_partition: bool
+    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., name: _Optional[str] = ..., latest_per_partition: bool = ...) -> None: ...
 
 class ListArtifactsResponse(_message.Message):
     __slots__ = ["artifacts", "token"]
@@ -64,12 +68,18 @@ class ListArtifactNamesRequest(_message.Message):
     def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ...) -> None: ...
 
 class ArtifactGroup(_message.Message):
-    __slots__ = ["latest", "versions"]
+    __slots__ = ["latest", "versions", "partition_schema", "latest_time_partition", "latest_partitions"]
     LATEST_FIELD_NUMBER: _ClassVar[int]
     VERSIONS_FIELD_NUMBER: _ClassVar[int]
+    PARTITION_SCHEMA_FIELD_NUMBER: _ClassVar[int]
+    LATEST_TIME_PARTITION_FIELD_NUMBER: _ClassVar[int]
+    LATEST_PARTITIONS_FIELD_NUMBER: _ClassVar[int]
     latest: _artifact_pb2.Artifact
     versions: int
-    def __init__(self, latest: _Optional[_Union[_artifact_pb2.Artifact, _Mapping]] = ..., versions: _Optional[int] = ...) -> None: ...
+    partition_schema: _artifact_pb2.ArtifactPartitionSchema
+    latest_time_partition: _timestamp_pb2.Timestamp
+    latest_partitions: _containers.RepeatedCompositeFieldContainer[_artifact_id_pb2.Partitions]
+    def __init__(self, latest: _Optional[_Union[_artifact_pb2.Artifact, _Mapping]] = ..., versions: _Optional[int] = ..., partition_schema: _Optional[_Union[_artifact_pb2.ArtifactPartitionSchema, _Mapping]] = ..., latest_time_partition: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., latest_partitions: _Optional[_Iterable[_Union[_artifact_id_pb2.Partitions, _Mapping]]] = ...) -> None: ...
 
 class ListArtifactNamesResponse(_message.Message):
     __slots__ = ["groups", "token"]
@@ -92,6 +102,52 @@ class ListArtifactMetadataKeysResponse(_message.Message):
     KEYS_FIELD_NUMBER: _ClassVar[int]
     keys: _containers.RepeatedScalarFieldContainer[str]
     def __init__(self, keys: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class DeclareArtifactRequest(_message.Message):
+    __slots__ = ["name", "partition_schema"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    PARTITION_SCHEMA_FIELD_NUMBER: _ClassVar[int]
+    name: _artifact_pb2.ArtifactName
+    partition_schema: _artifact_pb2.ArtifactPartitionSchema
+    def __init__(self, name: _Optional[_Union[_artifact_pb2.ArtifactName, _Mapping]] = ..., partition_schema: _Optional[_Union[_artifact_pb2.ArtifactPartitionSchema, _Mapping]] = ...) -> None: ...
+
+class DeclareArtifactResponse(_message.Message):
+    __slots__ = ["partition_schema"]
+    PARTITION_SCHEMA_FIELD_NUMBER: _ClassVar[int]
+    partition_schema: _artifact_pb2.ArtifactPartitionSchema
+    def __init__(self, partition_schema: _Optional[_Union[_artifact_pb2.ArtifactPartitionSchema, _Mapping]] = ...) -> None: ...
+
+class GetArtifactSchemaRequest(_message.Message):
+    __slots__ = ["name"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    name: _artifact_pb2.ArtifactName
+    def __init__(self, name: _Optional[_Union[_artifact_pb2.ArtifactName, _Mapping]] = ...) -> None: ...
+
+class GetArtifactSchemaResponse(_message.Message):
+    __slots__ = ["partition_schema", "declared"]
+    PARTITION_SCHEMA_FIELD_NUMBER: _ClassVar[int]
+    DECLARED_FIELD_NUMBER: _ClassVar[int]
+    partition_schema: _artifact_pb2.ArtifactPartitionSchema
+    declared: bool
+    def __init__(self, partition_schema: _Optional[_Union[_artifact_pb2.ArtifactPartitionSchema, _Mapping]] = ..., declared: bool = ...) -> None: ...
+
+class ListPartitionValuesRequest(_message.Message):
+    __slots__ = ["request", "project_id", "name", "key"]
+    REQUEST_FIELD_NUMBER: _ClassVar[int]
+    PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    KEY_FIELD_NUMBER: _ClassVar[int]
+    request: _list_pb2.ListRequest
+    project_id: _identifier_pb2.ProjectIdentifier
+    name: str
+    key: str
+    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., name: _Optional[str] = ..., key: _Optional[str] = ...) -> None: ...
+
+class ListPartitionValuesResponse(_message.Message):
+    __slots__ = ["values"]
+    VALUES_FIELD_NUMBER: _ClassVar[int]
+    values: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, values: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class DeleteArtifactRequest(_message.Message):
     __slots__ = ["artifact_id"]
