@@ -141,6 +141,17 @@ func (r *TaskActionReconciler) recordEvent(ctx context.Context, event *workflow.
 // relaunched in place after a system failure.
 const systemRetryReason = "restarting task after system failure"
 
+// systemRetryEventVersionBase is where the versions of system-retry events start.
+//
+// Action events are stored under (action, attempt, phase, version) and a duplicate key is
+// dropped on insert. A system retry keeps the attempt it is retrying and reports the same
+// Queued phase the launch events of that attempt already used, so it needs versions that
+// cannot collide with theirs. Plugins number their versions upwards from zero, one step at
+// a time, so a billion versions away is somewhere they cannot reach. The ceiling is the
+// store's, which keeps this column in a signed 32-bit integer: anything at or above 1<<31
+// fails to encode.
+const systemRetryEventVersionBase uint32 = 1 << 30
+
 // isSystemRetryableFailure reports whether the plugin transition is a
 // PhaseRetryableFailure with kind=SYSTEM (as produced by PhaseInfoSystemRetryableFailure).
 func isSystemRetryableFailure(phaseInfo pluginsCore.PhaseInfo) bool {
@@ -546,7 +557,11 @@ func (r *TaskActionReconciler) recordSystemRetry(
 		info.Logs = failureInfo.Logs
 		info.LogContext = failureInfo.LogContext
 	}
-	queued := pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, systemRetryReason, info)
+	// The consecutive system-failure count places this retry within the reserved range: it
+	// is stable while this failure is being retried, so republishing after a failed send
+	// lands on the same row and stays idempotent, and it moves on with the next failure.
+	version := systemRetryEventVersionBase + taskAction.Status.SystemFailures
+	queued := pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, version, systemRetryReason, info)
 	return r.recordEvent(ctx, r.buildActionEvent(ctx, taskAction, queued))
 }
 
@@ -852,10 +867,12 @@ func (r *TaskActionReconciler) reconcileTask(
 		// The attempt is relaunched in place and nothing past this point reports
 		// the failure that caused it: recordSystemError persists a counter and a
 		// Kubernetes event on the TaskAction, not an action event. Publish it
-		// first, so the user can read why the action went back to Queued.
+		// first, so the user can read why the action went back to Queued. The
+		// event only explains the retry, so a failure to publish is logged and
+		// left behind: holding the attempt back for it would turn a missing
+		// explanation into a stuck task.
 		if err := r.recordSystemRetry(ctx, taskAction, phaseInfo); err != nil {
-			logger.Error(err, "failed to persist system retry event, will retry")
-			return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+			logger.Error(err, "failed to publish system retry event, continuing with the retry")
 		}
 		r.resetPluginResource(ctx, taskAction, p, tCtx)
 		return r.recordSystemError(
