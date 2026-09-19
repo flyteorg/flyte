@@ -16,13 +16,49 @@ Update Flyte resource; e.g., to activate a project:
 
  flytectl update project -p flytesnacks --activate
 
+Configure through yaml file is also supported. Simply pass the name of the
+subcommand to "kind" field followed by the subcommand's config.
+Example: content of config.yaml:
+
+.. code-block:: yaml
+
+    ---
+    kind: workflow-execution-config
+    domain: production
+    max_parallelism: 5
+    project: flytesnacks
+    raw_output_data_config:
+      output_location_prefix: s3://example-data
+    security_context:
+      run_as:
+        k8s_service_account: not-demo
+    ---
+    kind: project
+    name: flytesnacks-new
+    id: flytesnacks
+
+::
+
+ flytectl update --attrFile config.yaml
+
+It is equivalent to run workflow-execution-config and project subcommands separately.
+
+Usage
+
+
+::
+
+  flytectl update [flags]
 
 Options
 ~~~~~~~
 
 ::
 
-  -h, --help   help for update
+      --attrFile strings   attribute file names to be used for updating attribute for the resource type.
+      --dryRun             execute command without making any modifications.
+      --force              do not ask for an acknowledgement during updates.
+  -h, --help               help for update
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
