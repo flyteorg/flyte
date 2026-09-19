@@ -2,12 +2,16 @@ package interfaces
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
+
+// ErrPhaseTransitionRejected indicates that an action exists but cannot enter the requested phase.
+var ErrPhaseTransitionRejected = errors.New("action phase transition rejected")
 
 // ActionRepo defines the interface for actions/runs data access
 type ActionRepo interface {
