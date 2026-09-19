@@ -96,9 +96,10 @@ func (d dynamicNodeTaskNodeHandler) produceDynamicWorkflow(ctx context.Context, 
 	dCtx, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 	if err != nil {
 		if stdErrors.IsCausedBy(err, utils.ErrorCodeUser) {
+			isPermanent := !stdErrors.IsCausedBy(err, utils.ErrorCodeSystem)
 			return handler.DoTransition(handler.TransitionTypeEphemeral,
 				handler.PhaseInfoFailure(core.ExecutionError_USER, "DynamicWorkflowBuildFailed", err.Error(), nil),
-			), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: err.Error()}, nil
+			), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: err.Error(), IsFailurePermanent: isPermanent}, nil
 		}
 		return handler.Transition{}, handler.DynamicNodeState{}, err
 	}
@@ -123,9 +124,10 @@ func (d dynamicNodeTaskNodeHandler) handleDynamicSubNodes(ctx context.Context, n
 	dCtx, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 	if err != nil {
 		if stdErrors.IsCausedBy(err, utils.ErrorCodeUser) {
+			isPermanent := !stdErrors.IsCausedBy(err, utils.ErrorCodeSystem)
 			return handler.DoTransition(handler.TransitionTypeEphemeral,
 				handler.PhaseInfoFailure(core.ExecutionError_USER, "DynamicWorkflowBuildFailed", err.Error(), nil),
-			), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: err.Error()}, nil
+			), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: err.Error(), IsFailurePermanent: isPermanent}, nil
 		}
 		// Mostly a system error or unknown
 		return handler.Transition{}, handler.DynamicNodeState{}, err
