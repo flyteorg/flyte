@@ -350,6 +350,56 @@ func TestBuildResourceRayEntrypointPreservesEmptyArgs(t *testing.T) {
 	assert.Contains(t, rayJobObj.Spec.Entrypoint, "vars '' resolver")
 }
 
+func TestBuildResourceRayDisablesLogNoise(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+
+	taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+	rayCtx := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+	r, err := rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+	assert.Nil(t, err)
+	require.NotNil(t, r)
+
+	rayJob, ok := r.(*rayv1.RayJob)
+	require.True(t, ok)
+	require.NotEmpty(t, rayJob.Spec.RayClusterSpec.WorkerGroupSpecs)
+
+	// Select by container name: the vars belong on the Ray container, not on an injected sidecar.
+	envByContainer := func(containers []corev1.Container, name string) map[string]string {
+		for _, cnt := range containers {
+			if cnt.Name != name {
+				continue
+			}
+			env := make(map[string]string, len(cnt.Env))
+			for _, e := range cnt.Env {
+				env[e.Name] = e.Value
+			}
+			return env
+		}
+		return nil
+	}
+
+	headEnv := envByContainer(rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Containers, "ray-head")
+	workerEnv := envByContainer(rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Containers, "ray-worker")
+	require.NotNil(t, headEnv)
+	require.NotNil(t, workerEnv)
+
+	fixtures := []struct {
+		name  string
+		value string
+	}{
+		{name: "RAY_COLOR_PREFIX", value: "0"},
+		{name: "RAY_DATA_DISABLE_PROGRESS_BARS", value: "1"},
+	}
+
+	for _, f := range fixtures {
+		t.Run(f.name, func(t *testing.T) {
+			assert.Equal(t, f.value, headEnv[f.name], "head container")
+			assert.Equal(t, f.value, workerEnv[f.name], "worker container")
+		})
+	}
+}
+
 func TestBuildPodTemplate(t *testing.T) {
 	taskTemplate := dummyRayTaskTemplate("id", dummyRayCustomObj())
 	resources := &corev1.ResourceRequirements{

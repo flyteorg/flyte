@@ -1,7 +1,9 @@
 package get
 
 import (
+	"encoding/json"
 	"fmt"
+	"math"
 	"testing"
 	"time"
 
@@ -13,6 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -323,4 +326,61 @@ func TestExtractLiteralMapError(t *testing.T) {
 	literalMap, err = extractLiteralMap(&core.LiteralMap{})
 	assert.Nil(t, err)
 	assert.Equal(t, len(literalMap), 0)
+}
+
+func floatLiteral(value float64) *core.Literal {
+	return &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+		Value: &core.Scalar_Primitive{Primitive: &core.Primitive{
+			Value: &core.Primitive_FloatValue{FloatValue: value},
+		}},
+	}}}
+}
+
+func TestExtractLiteralMapNonFiniteFloats(t *testing.T) {
+	t.Run("primitive", func(t *testing.T) {
+		literalMap, err := extractLiteralMap(&core.LiteralMap{Literals: map[string]*core.Literal{
+			"nan":      floatLiteral(math.NaN()),
+			"inf":      floatLiteral(math.Inf(1)),
+			"negInf":   floatLiteral(math.Inf(-1)),
+			"accuracy": floatLiteral(0.5),
+		}})
+		assert.Nil(t, err)
+		assert.Equal(t, map[string]interface{}{
+			"nan": nil, "inf": nil, "negInf": nil, "accuracy": 0.5,
+		}, literalMap)
+
+		_, err = json.Marshal(literalMap)
+		assert.Nil(t, err)
+	})
+
+	t.Run("inside a map literal", func(t *testing.T) {
+		literalMap, err := extractLiteralMap(&core.LiteralMap{Literals: map[string]*core.Literal{
+			"o0": {Value: &core.Literal_Map{Map: &core.LiteralMap{
+				Literals: map[string]*core.Literal{"Average Bytes": floatLiteral(math.NaN())},
+			}}},
+		}})
+		assert.Nil(t, err)
+		assert.Equal(t, map[string]interface{}{
+			"o0": map[string]interface{}{"Average Bytes": nil},
+		}, literalMap)
+
+		_, err = json.Marshal(literalMap)
+		assert.Nil(t, err)
+	})
+
+	t.Run("inside a generic literal", func(t *testing.T) {
+		generic, err := structpb.NewStruct(map[string]interface{}{"scores": []interface{}{0.5}})
+		assert.Nil(t, err)
+		generic.Fields["scores"].GetListValue().Values[0] = structpb.NewNumberValue(math.NaN())
+
+		literalMap, err := extractLiteralMap(&core.LiteralMap{Literals: map[string]*core.Literal{
+			"o0": {Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+				Value: &core.Scalar_Generic{Generic: generic},
+			}}},
+		}})
+		assert.Nil(t, err)
+
+		_, err = json.Marshal(literalMap)
+		assert.Nil(t, err)
+	})
 }

@@ -6,8 +6,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
+	repoErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -72,6 +77,67 @@ func TestDescriptionEntityManager_Get(t *testing.T) {
 	})
 	assert.Error(t, err)
 	assert.Nil(t, response)
+}
+
+func TestDescriptionEntityManagerDistinguishesResourceType(t *testing.T) {
+	db, err := gorm.Open(sqlite.Open("file:description-entity-resource-type?mode=memory&cache=shared"))
+	require.NoError(t, err)
+	sqlDB, err := db.DB()
+	require.NoError(t, err)
+	t.Cleanup(func() { require.NoError(t, sqlDB.Close()) })
+	require.NoError(t, db.Exec(`
+		CREATE TABLE description_entities (
+			resource_type INTEGER NOT NULL,
+			project TEXT NOT NULL,
+			domain TEXT NOT NULL,
+			name TEXT NOT NULL,
+			version TEXT NOT NULL,
+			short_description TEXT,
+			PRIMARY KEY (resource_type, project, domain, name, version)
+		)
+	`).Error)
+	require.NoError(t, db.Exec(
+		`INSERT INTO description_entities
+			(resource_type, project, domain, name, version, short_description)
+		 VALUES (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?)`,
+		core.ResourceType_TASK, project, domain, name, version, "task",
+		core.ResourceType_WORKFLOW, project, domain, name, version, "workflow",
+	).Error)
+
+	repository := repositories.NewGormRepo(db, repoErrors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	manager := NewDescriptionEntityManager(repository, getMockConfigForDETest(), mockScope.NewTestScope())
+
+	response, err := manager.GetDescriptionEntity(context.Background(), &admin.ObjectGetRequest{
+		Id: &descriptionEntityIdentifier,
+	})
+	require.NoError(t, err)
+	assert.Equal(t, core.ResourceType_WORKFLOW, response.GetId().GetResourceType())
+	assert.Equal(t, "workflow", response.GetShortDescription())
+
+	list, err := manager.ListDescriptionEntity(context.Background(), &admin.DescriptionEntityListRequest{
+		ResourceType: core.ResourceType_WORKFLOW,
+		Id: &admin.NamedEntityIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
+		Limit: 10,
+	})
+	require.NoError(t, err)
+	require.Len(t, list.GetDescriptionEntities(), 1)
+	assert.Equal(t, core.ResourceType_WORKFLOW, list.GetDescriptionEntities()[0].GetId().GetResourceType())
+	assert.Equal(t, "workflow", list.GetDescriptionEntities()[0].GetShortDescription())
+
+	list, err = manager.ListDescriptionEntity(context.Background(), &admin.DescriptionEntityListRequest{
+		Id: &admin.NamedEntityIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
+		Limit: 10,
+	})
+	require.NoError(t, err)
+	require.Len(t, list.GetDescriptionEntities(), 2)
 }
 
 func TestDescriptionEntityManager_List(t *testing.T) {
