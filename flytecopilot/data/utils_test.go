@@ -3,6 +3,8 @@ package data
 import (
 	"bytes"
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path"
 	"testing"
@@ -92,6 +94,18 @@ func TestDownloadFromHttp(t *testing.T) {
 
 	_, err = DownloadFileFromHTTP(context.TODO(), badLoc)
 	assert.Error(t, err)
+}
+
+func TestDownloadFromHttpReturnsErrorForNonSuccessStatus(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		http.Error(w, "boom", http.StatusBadGateway)
+	}))
+	defer server.Close()
+
+	_, err := DownloadFileFromHTTP(context.TODO(), storage.DataReference(server.URL))
+	if assert.Error(t, err) {
+		assert.Contains(t, err.Error(), "received HTTP status 502")
+	}
 }
 
 func TestDownloadFromStorage(t *testing.T) {
