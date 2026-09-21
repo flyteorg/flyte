@@ -12,6 +12,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -237,22 +238,22 @@ func TestEnableDisableLaunchPlan(t *testing.T) {
 	createWorkflowReq := getWorkflowCreateRequest()
 
 	_, err := client.CreateWorkflow(ctx, &createWorkflowReq)
-	assert.Nil(t, err)
+	require.NoError(t, err, "create workflow")
 
 	createLaunchPlanReq := getLaunchPlanCreateRequest(createWorkflowReq.Id)
 	_, err = client.CreateLaunchPlan(ctx, &createLaunchPlanReq)
-	assert.Nil(t, err)
+	require.NoError(t, err, "create launch plan")
 
 	// Test that enabling a launch plan succeeds.
 	_, err = client.UpdateLaunchPlan(ctx, &admin.LaunchPlanUpdateRequest{
 		Id:    &launchPlanIdentifier,
 		State: admin.LaunchPlanState_ACTIVE,
 	})
-	assert.Nil(t, err)
+	require.NoError(t, err, "activate launch plan")
 	enabledLaunchPlan, err := client.GetLaunchPlan(ctx, &admin.ObjectGetRequest{
 		Id: createLaunchPlanReq.Id,
 	})
-	assert.Nil(t, err)
+	require.NoError(t, err, "get active launch plan")
 	assert.Equal(t, admin.LaunchPlanState_ACTIVE, enabledLaunchPlan.Closure.State)
 
 	// Make sure successive calls to set active are ... successful.
@@ -260,11 +261,11 @@ func TestEnableDisableLaunchPlan(t *testing.T) {
 		Id:    createLaunchPlanReq.Id,
 		State: admin.LaunchPlanState_ACTIVE,
 	})
-	assert.Nil(t, err)
+	require.NoError(t, err, "activate launch plan again")
 	enabledLaunchPlan, err = client.GetLaunchPlan(ctx, &admin.ObjectGetRequest{
 		Id: createLaunchPlanReq.Id,
 	})
-	assert.Nil(t, err)
+	require.NoError(t, err, "get active launch plan again")
 	assert.Equal(t, admin.LaunchPlanState_ACTIVE, enabledLaunchPlan.Closure.State)
 
 	// Test that disabling a launch plan succeeds.
@@ -272,12 +273,12 @@ func TestEnableDisableLaunchPlan(t *testing.T) {
 		Id:    &launchPlanIdentifier,
 		State: admin.LaunchPlanState_INACTIVE,
 	})
-	assert.Nil(t, err)
+	require.NoError(t, err, "deactivate launch plan")
 
 	disabledLaunchPlan, err := client.GetLaunchPlan(ctx, &admin.ObjectGetRequest{
 		Id: createLaunchPlanReq.Id,
 	})
-	assert.Nil(t, err)
+	require.NoError(t, err, "get inactive launch plan")
 	assert.Equal(t, admin.LaunchPlanState_INACTIVE, disabledLaunchPlan.Closure.State)
 }
 
