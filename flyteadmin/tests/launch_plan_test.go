@@ -294,18 +294,18 @@ func TestUpdateActiveLaunchPlanVersion(t *testing.T) {
 	createWorkflowReq := getWorkflowCreateRequest()
 
 	_, err := client.CreateWorkflow(ctx, &createWorkflowReq)
-	assert.Nil(t, err)
+	require.NoError(t, err, "create workflow")
 
 	// Create a test launch plan and set it to active.
 	createLaunchPlanReq := getLaunchPlanCreateRequest(createWorkflowReq.Id)
 	_, err = client.CreateLaunchPlan(ctx, &createLaunchPlanReq)
-	assert.Nil(t, err)
+	require.NoError(t, err, "create original launch plan")
 
 	_, err = client.UpdateLaunchPlan(ctx, &admin.LaunchPlanUpdateRequest{
 		Id:    &launchPlanIdentifier,
 		State: admin.LaunchPlanState_ACTIVE,
 	})
-	assert.Nil(t, err)
+	require.NoError(t, err, "activate original launch plan")
 
 	// Create a new version of the launch plan and set that to active.
 	newIdentifier := core.Identifier{
@@ -318,25 +318,25 @@ func TestUpdateActiveLaunchPlanVersion(t *testing.T) {
 	createNewLaunchPlanReq := getLaunchPlanCreateRequest(createWorkflowReq.Id)
 	createNewLaunchPlanReq.Id = &newIdentifier
 	_, err = client.CreateLaunchPlan(ctx, &createNewLaunchPlanReq)
-	assert.Nil(t, err)
+	require.NoError(t, err, "create new launch plan version")
 
 	_, err = client.UpdateLaunchPlan(ctx, &admin.LaunchPlanUpdateRequest{
 		Id:    &newIdentifier,
 		State: admin.LaunchPlanState_ACTIVE,
 	})
-	assert.Nil(t, err)
+	require.NoError(t, err, "activate new launch plan version")
 
 	enabledLaunchPlan, err := client.GetLaunchPlan(ctx, &admin.ObjectGetRequest{
 		Id: &newIdentifier,
 	})
-	assert.Nil(t, err)
+	require.NoError(t, err, "get new launch plan version")
 	assert.Equal(t, admin.LaunchPlanState_ACTIVE, enabledLaunchPlan.Closure.State)
 
 	// Assert that by enabling a specific launch version admin also disables the previously active version.
 	disabledLaunchPlan, err := client.GetLaunchPlan(ctx, &admin.ObjectGetRequest{
 		Id: &launchPlanIdentifier,
 	})
-	assert.Nil(t, err)
+	require.NoError(t, err, "get original launch plan version")
 	assert.Equal(t, admin.LaunchPlanState_INACTIVE, disabledLaunchPlan.Closure.State)
 }
 
