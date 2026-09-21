@@ -308,6 +308,12 @@ func TestDecorateEnvVars(t *testing.T) {
 	expectedOffloaded = append(expectedOffloaded, v12.EnvVar{Name: "_F_L_MAX_SIZE_MB", Value: "42"})
 
 	aggregated := append(expected, v12.EnvVar{Name: "k", Value: "v"})
+	// A name present in the template and again in the execution metadata collapses to one entry:
+	// the template's position, the execution metadata's value.
+	collided := append([]v12.EnvVar{{Name: "x", Value: "y"}, {Name: "k", Value: "v"}}, GetContextEnvVars(ctx)...)
+	collided = append(collided, GetExecutionEnvVars(mockTaskExecutionIdentifier{}, "")...)
+	withinTemplate := append([]v12.EnvVar{{Name: "k", Value: "last"}}, GetContextEnvVars(ctx)...)
+	withinTemplate = append(withinTemplate, GetExecutionEnvVars(mockTaskExecutionIdentifier{}, "")...)
 	type args struct {
 		envVars []v12.EnvVar
 		id      pluginsCore.TaskExecutionID
@@ -378,6 +384,30 @@ func TestDecorateEnvVars(t *testing.T) {
 			additionalEnv,
 			"",
 			aggregated,
+		},
+		{
+			// CRD-backed resources reject duplicate env names; the run-level value must win, as
+			// kubelet would resolve it for a Pod.
+			"template-and-execution-collision",
+			args{envVars: []v12.EnvVar{{Name: "x", Value: "y"}, {Name: "k", Value: "template"}}, id: mockTaskExecutionIdentifier{}},
+			emptyEnvVar,
+			emptyEnvVar,
+			false,
+			emptyEnvVar,
+			additionalEnv,
+			"",
+			collided,
+		},
+		{
+			"duplicate-within-template",
+			args{envVars: []v12.EnvVar{{Name: "k", Value: "first"}, {Name: "k", Value: "last"}}, id: mockTaskExecutionIdentifier{}},
+			emptyEnvVar,
+			emptyEnvVar,
+			false,
+			emptyEnvVar,
+			emptyEnvVar,
+			"",
+			withinTemplate,
 		},
 	}
 	for _, tt := range tests {
