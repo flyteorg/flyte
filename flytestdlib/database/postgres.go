@@ -7,9 +7,11 @@ import (
 	"os"
 	"strings"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
-
+	awsConfig "github.com/aws/aws-sdk-go-v2/config"
+	rdsauth "github.com/aws/aws-sdk-go-v2/feature/rds/auth"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -41,8 +43,27 @@ func resolvePassword(ctx context.Context, passwordVal, passwordPath string) stri
 	return password
 }
 
+// Generates a short-lived AWS RDS IAM auth token from ambient AWS credentials.
+func buildIAMAuthToken(ctx context.Context, pgConfig PostgresConfig, host string) (string, error) {
+	awsCfg, err := awsConfig.LoadDefaultConfig(ctx, awsConfig.WithRegion(pgConfig.Region))
+	if err != nil {
+		return "", fmt.Errorf("failed to load AWS config for RDS IAM auth: %w", err)
+	}
+	endpoint := fmt.Sprintf("%s:%d", host, pgConfig.Port)
+	token, err := rdsauth.BuildAuthToken(ctx, endpoint, pgConfig.Region, pgConfig.User, awsCfg.Credentials)
+	if err != nil {
+		return "", fmt.Errorf("failed to build RDS IAM auth token: %w", err)
+	}
+	return token, nil
+}
+
 // Produces the DSN (data source name) for opening a postgres db connection.
 func GetPostgresDsn(ctx context.Context, pgConfig PostgresConfig) string {
+	if pgConfig.AuthType == AuthTypeIAM {
+		// Password is attached per-connection by openPostgresDB's BeforeConnect hook instead.
+		return fmt.Sprintf("host=%s port=%d dbname=%s user=%s %s",
+			pgConfig.Host, pgConfig.Port, pgConfig.DbName, pgConfig.User, pgConfig.ExtraOptions)
+	}
 	password := resolvePassword(ctx, pgConfig.Password, pgConfig.PasswordPath)
 	if len(password) == 0 {
 		// The password-less case is included for development environments.
@@ -55,6 +76,10 @@ func GetPostgresDsn(ctx context.Context, pgConfig PostgresConfig) string {
 
 // Produces the DSN (data source name) for the read replica for opening a postgres db connection.
 func getPostgresReadDsn(ctx context.Context, pgConfig PostgresConfig) string {
+	if pgConfig.AuthType == AuthTypeIAM {
+		return fmt.Sprintf("host=%s port=%d dbname=%s user=%s %s",
+			pgConfig.ReadReplicaHost, pgConfig.Port, pgConfig.DbName, pgConfig.User, pgConfig.ExtraOptions)
+	}
 	password := resolvePassword(ctx, pgConfig.Password, pgConfig.PasswordPath)
 	if len(password) == 0 {
 		// The password-less case is included for development environments.
@@ -65,10 +90,34 @@ func getPostgresReadDsn(ctx context.Context, pgConfig PostgresConfig) string {
 		pgConfig.ReadReplicaHost, pgConfig.Port, pgConfig.DbName, pgConfig.User, password, pgConfig.ExtraOptions)
 }
 
+// Opens dsn, minting a fresh RDS IAM auth token per physical connection when AuthTypeIAM is set.
+func openPostgresDB(ctx context.Context, dsn string, pgConfig PostgresConfig, host string) (*sqlx.DB, error) {
+	switch pgConfig.AuthType {
+	case AuthTypeIAM:
+		connConfig, err := pgx.ParseConfig(dsn)
+		if err != nil {
+			return nil, err
+		}
+
+		sqlDB := stdlib.OpenDB(*connConfig, stdlib.OptionBeforeConnect(
+			func(ctx context.Context, cc *pgx.ConnConfig) error {
+				token, err := buildIAMAuthToken(ctx, pgConfig, host)
+				if err != nil {
+					return err
+				}
+				cc.Password = token
+				return nil
+			}))
+		return sqlx.NewDb(sqlDB, "pgx"), nil
+	default:
+		return sqlx.Open("pgx", dsn)
+	}
+}
+
 // CreatePostgresDbIfNotExists creates DB if it doesn't exist for the passed in config
 func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig) (*sqlx.DB, error) {
 	dsn := GetPostgresDsn(ctx, pgConfig)
-	db, err := sqlx.Open("pgx", dsn)
+	db, err := openPostgresDB(ctx, dsn, pgConfig, pgConfig.Host)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +140,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig) (
 	defaultDbPgConfig := pgConfig
 	defaultDbPgConfig.DbName = defaultDB
 	defaultDsn := GetPostgresDsn(ctx, defaultDbPgConfig)
-	defaultDb, err := sqlx.Open("pgx", defaultDsn)
+	defaultDb, err := openPostgresDB(ctx, defaultDsn, defaultDbPgConfig, defaultDbPgConfig.Host)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +165,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig) (
 	}
 
 	// Now try connecting to the db again
-	db, err = sqlx.Open("pgx", dsn)
+	db, err = openPostgresDB(ctx, dsn, pgConfig, pgConfig.Host)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +181,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig) (
 // CreatePostgresReadOnlyDbConnection creates readonly DB connection and returns the sqlx.DB object and error
 func CreatePostgresReadOnlyDbConnection(ctx context.Context, pgConfig PostgresConfig) (*sqlx.DB, error) {
 	dsn := getPostgresReadDsn(ctx, pgConfig)
-	db, err := sqlx.Open("pgx", dsn)
+	db, err := openPostgresDB(ctx, dsn, pgConfig, pgConfig.ReadReplicaHost)
 	if err != nil {
 		return nil, err
 	}

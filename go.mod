@@ -95,6 +95,7 @@ require (
 require (
 	github.com/Masterminds/semver/v3 v3.5.0
 	github.com/alicebob/miniredis/v2 v2.39.0
+	github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.7.3
 	github.com/fatih/structtag v1.2.0
 	github.com/getsentry/sentry-go v0.49.0
 	github.com/kubeflow/spark-operator/v2 v2.5.2

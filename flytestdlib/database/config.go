@@ -9,6 +9,9 @@ import (
 const (
 	database    = "database"
 	postgresStr = "postgres"
+
+	AuthTypePassword = "password"
+	AuthTypeIAM      = "iam"
 )
 
 //go:generate pflags DbConfig --default-var=defaultConfig
@@ -26,6 +29,7 @@ var defaultConfig = &DbConfig{
 		User:            postgresStr,
 		Password:        postgresStr,
 		ExtraOptions:    "sslmode=disable",
+		AuthType:        AuthTypePassword,
 	},
 }
 var configSection = config.MustRegisterSection(database, defaultConfig)
@@ -51,6 +55,8 @@ type PostgresConfig struct {
 	PasswordPath string `json:"passwordPath" pflag:",Points to the file containing the database password."`
 	ExtraOptions string `json:"options" pflag:",See http://gorm.io/docs/connecting_to_the_database.html for available options passed, in addition to the above."`
 	Debug        bool   `json:"debug" pflag:" Whether or not to start the database connection with debug mode enabled."`
+	AuthType     string `json:"authType" pflag:",Either 'password' (default) or 'iam'. When 'iam', a short-lived AWS RDS IAM auth token is used instead of Password/PasswordPath."`
+	Region       string `json:"region" pflag:",The AWS region of the RDS instance. Required when AuthType is 'iam'."`
 }
 
 var emptyPostgresConfig = PostgresConfig{}
