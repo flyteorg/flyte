@@ -13,7 +13,7 @@ require (
 	github.com/spf13/pflag v1.0.10
 	golang.org/x/sync v0.23.0
 	gorm.io/driver/postgres v1.6.2
-	sigs.k8s.io/controller-runtime v0.25.0
+	sigs.k8s.io/controller-runtime v0.25.1
 )
 
 require (
