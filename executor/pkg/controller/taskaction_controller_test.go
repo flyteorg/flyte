@@ -137,6 +137,18 @@ func (c *retryEventRejectingClient) Record(ctx context.Context, req *connect.Req
 	return c.recordingEventsClient.Record(ctx, req)
 }
 
+// systemRetryEvents picks out the events a system retry published, which are the only
+// ones versioned from systemRetryEventVersionBase.
+func systemRetryEvents(events []*workflow.ActionEvent) []*workflow.ActionEvent {
+	var out []*workflow.ActionEvent
+	for _, e := range events {
+		if e.GetVersion() >= systemRetryEventVersionBase {
+			out = append(out, e)
+		}
+	}
+	return out
+}
+
 type failingStatusClient struct {
 	client.Client
 	failUpdates bool
@@ -1490,9 +1502,110 @@ var _ = Describe("TaskAction Controller", func() {
 
 			persisted := getTaskAction(nn)
 			Expect(persisted.Status.SystemFailures).To(Equal(uint32(1)))
+			Expect(persisted.Status.SystemRetries).To(Equal(uint32(1)))
 			Expect(persisted.Status.PluginState).To(BeNil())
 			Expect(isTerminal(persisted)).To(BeFalse())
 			Expect(fake.abortCalls).To(Equal(1))
+		})
+
+		It("gives every system retry of an attempt its own event version", func() {
+			base := time.Date(2026, time.September, 21, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			preempted := func(at time.Time) pluginsCore.Transition {
+				return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(
+					"WorkloadEvictedDueToPreempted",
+					"preempted",
+					&pluginsCore.TaskInfo{OccurredAt: &at},
+				))
+			}
+			// Preempted, relaunched and running again, then preempted a second time: the
+			// progress in between puts the consecutive failure count back to zero.
+			fake := &fakePlugin{
+				id: "kueue-plugin",
+				transitions: []pluginsCore.Transition{
+					runningTransition(base),
+					preempted(base.Add(time.Minute)),
+					runningTransition(base.Add(2 * time.Minute)),
+					preempted(base.Add(3 * time.Minute)),
+				},
+			}
+			recorded := &recordingEventsClient{}
+			r := newReconciler(fake, fakeClock, recorded, nil)
+			nn := createTaskAction(
+				"system-retry-twice",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+			request := reconcile.Request{NamespacedName: nn}
+
+			for i := 0; i < len(fake.transitions); i++ {
+				_, err := r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				fakeClock.Step(time.Minute)
+			}
+
+			// Both retries belong to attempt 1 and report Queued, so the version is all
+			// that keeps the store from dropping the second as a duplicate of the first.
+			retries := systemRetryEvents(recorded.RecordedEvents())
+			Expect(retries).To(HaveLen(2))
+			for _, retry := range retries {
+				Expect(retry.GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_QUEUED))
+				Expect(retry.GetAttempt()).To(Equal(uint32(1)))
+			}
+			Expect(retries[0].GetVersion()).To(Equal(systemRetryEventVersionBase))
+			Expect(retries[1].GetVersion()).To(Equal(systemRetryEventVersionBase + 1))
+
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.Attempts).To(Equal(uint32(1)))
+			Expect(persisted.Status.SystemFailures).To(Equal(uint32(1)), "the failures were not consecutive")
+			Expect(persisted.Status.SystemRetries).To(Equal(uint32(2)))
+			Expect(isTerminal(persisted)).To(BeFalse())
+		})
+
+		It("republishes a system retry under the same version until it is persisted", func() {
+			base := time.Date(2026, time.September, 21, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			preemptedAt := base.Add(time.Minute)
+			fake := &fakePlugin{
+				id: "kueue-plugin",
+				transitions: []pluginsCore.Transition{
+					runningTransition(base),
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(
+						"WorkloadEvictedDueToPreempted",
+						"preempted",
+						&pluginsCore.TaskInfo{OccurredAt: &preemptedAt},
+					)),
+				},
+			}
+			recorded := &recordingEventsClient{}
+			failingClient := &failingStatusClient{Client: k8sClient}
+			r := newReconciler(fake, fakeClock, recorded, failingClient)
+			nn := createTaskAction(
+				"system-retry-republished",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+			request := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+
+			// The event goes out but the status does not, so the next reconcile meets the
+			// same failure with the same counters and publishes it again.
+			fakeClock.Step(time.Minute)
+			failingClient.failUpdates = true
+			_, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(getTaskAction(nn).Status.SystemRetries).To(BeZero())
+
+			fakeClock.Step(time.Minute)
+			failingClient.failUpdates = false
+			_, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+
+			retries := systemRetryEvents(recorded.RecordedEvents())
+			Expect(retries).To(HaveLen(2))
+			Expect(retries[0].GetVersion()).To(Equal(systemRetryEventVersionBase))
+			Expect(retries[1].GetVersion()).To(Equal(systemRetryEventVersionBase), "the store drops it as a duplicate")
+			Expect(getTaskAction(nn).Status.SystemRetries).To(Equal(uint32(1)))
 		})
 
 		It("retries even when the system retry event cannot be published", func() {

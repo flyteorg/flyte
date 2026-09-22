@@ -260,6 +260,102 @@ func TestLaunchResourceErrors(t *testing.T) {
 	}
 }
 
+// A launch that finds a resource already under its name adopts it only when that resource is
+// alive: after a system retry the previous incarnation can still be draining its grace period
+// under the same name, and adopting it would rediscover its deletion next round and retry again,
+// once per reconcile, until it is finally gone.
+func TestLaunchResource_AlreadyExists(t *testing.T) {
+	now := metav1.Now()
+	tests := []struct {
+		name      string
+		existing  *v1.Pod
+		wantPhase pluginsCore.Phase
+	}{
+		{
+			name:      "a live resource is adopted",
+			existing:  &v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "name", Namespace: "ns"}},
+			wantPhase: pluginsCore.PhaseQueued,
+		},
+		{
+			name: "a draining resource is waited out",
+			existing: &v1.Pod{ObjectMeta: metav1.ObjectMeta{
+				Name:              "name",
+				Namespace:         "ns",
+				DeletionTimestamp: &now,
+				Finalizers:        []string{"flyte/flytek8s"},
+			}},
+			wantPhase: pluginsCore.PhaseWaitingForResources,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fakeClient := fake.NewClientBuilder().
+				WithScheme(k8sscheme.Scheme).
+				WithObjects(tt.existing).
+				Build()
+
+			kubeClient := &pluginsCoreMock.KubeClient{}
+			kubeClient.EXPECT().GetClient().Return(fakeClient)
+
+			plugin := &k8sMocks.Plugin{}
+			plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+			plugin.EXPECT().BuildResource(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+
+			tCtx := &pluginsCoreMock.TaskExecutionContext{}
+			tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("name"))
+
+			pm := NewPluginManager("test", plugin, kubeClient)
+
+			transition, err := pm.launchResource(context.Background(), tCtx)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.wantPhase, transition.Info().Phase())
+		})
+	}
+}
+
+// While the previous resource drains, Handle leaves the plugin at NotStarted, so the next round
+// launches again rather than checking on a resource that is not this attempt's and finding it
+// deleted once more.
+func TestHandle_WaitsForPreviousResourceToDrain(t *testing.T) {
+	now := metav1.Now()
+	draining := &v1.Pod{ObjectMeta: metav1.ObjectMeta{
+		Name:              "name",
+		Namespace:         "ns",
+		DeletionTimestamp: &now,
+		Finalizers:        []string{"flyte/flytek8s"},
+	}}
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(draining).Build()
+	kubeClient := &pluginsCoreMock.KubeClient{}
+	kubeClient.EXPECT().GetClient().Return(fakeClient)
+
+	// Zero state: the plugin has not started this incarnation, as after a system retry.
+	stateReader := &pluginsCoreMock.PluginStateReader{}
+	stateReader.EXPECT().Get(mock.Anything).Return(uint8(pluginStateVersion), nil)
+	var written PluginState
+	stateWriter := &pluginsCoreMock.PluginStateWriter{}
+	stateWriter.EXPECT().Put(uint8(pluginStateVersion), mock.Anything).Run(func(_ uint8, v interface{}) {
+		written = *(v.(*PluginState))
+	}).Return(nil)
+
+	tCtx := &pluginsCoreMock.TaskExecutionContext{}
+	tCtx.EXPECT().PluginStateReader().Return(stateReader)
+	tCtx.EXPECT().PluginStateWriter().Return(stateWriter)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("name"))
+
+	plugin := &k8sMocks.Plugin{}
+	plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+	plugin.EXPECT().BuildResource(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+
+	pm := NewPluginManager("test", plugin, kubeClient)
+
+	transition, err := pm.Handle(context.Background(), tCtx)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseWaitingForResources, transition.Info().Phase())
+	assert.Equal(t, PluginPhaseNotStarted, written.Phase)
+	assert.Equal(t, pluginsCore.PhaseWaitingForResources, written.K8sPluginState.Phase)
+}
+
 func TestHandle_CorruptedPluginStateFailsPermanently(t *testing.T) {
 	stateReader := &pluginsCoreMock.PluginStateReader{}
 	// (0, err) matches PluginStateManager's contract: the version is zeroed on decode failure.

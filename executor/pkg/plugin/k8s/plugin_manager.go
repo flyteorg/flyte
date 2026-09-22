@@ -128,6 +128,15 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 	logger.Infof(ctx, "Creating Object: Type:[%v], Object:[%v/%v]", o.GetObjectKind().GroupVersionKind(), o.GetNamespace(), o.GetName())
 
 	err = pm.kubeClient.GetClient().Create(ctx, o)
+	if k8serrors.IsAlreadyExists(err) && !pm.canAdoptExisting(ctx, o) {
+		// The name is taken by the previous incarnation of this resource, still draining
+		// its grace period after a system retry aborted it. It is not this launch's
+		// resource: adopting it would only rediscover its deletion next round, abort and
+		// reset again, and land back here, once per reconcile until it is gone, reporting
+		// the same failure to the user each time. Wait for the name to free up instead.
+		return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResources(
+			time.Now(), pluginsCore.DefaultPhaseVersion, "waiting for the previous resource to be deleted")), nil
+	}
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
 		if k8serrors.IsForbidden(err) {
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil)), nil
@@ -154,6 +163,18 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 	}
 
 	return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "task submitted to K8s")), nil
+}
+
+// canAdoptExisting reports whether the resource a launch collided with can stand in for
+// the one it meant to create: it is there and not being deleted. That is the resource of
+// a launch whose state did not persist. A resource on its way out is not, and neither is
+// one that cannot be read; the next round can tell. o is overwritten with what the
+// cluster holds under its name.
+func (pm *PluginManager) canAdoptExisting(ctx context.Context, o client.Object) bool {
+	if err := pm.kubeClient.GetClient().Get(ctx, client.ObjectKeyFromObject(o), o); err != nil {
+		return false
+	}
+	return o.GetDeletionTimestamp() == nil
 }
 
 func (pm *PluginManager) getResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (client.Object, error) {

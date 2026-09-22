@@ -557,10 +557,12 @@ func (r *TaskActionReconciler) recordSystemRetry(
 		info.Logs = failureInfo.Logs
 		info.LogContext = failureInfo.LogContext
 	}
-	// The consecutive system-failure count places this retry within the reserved range: it
-	// is stable while this failure is being retried, so republishing after a failed send
-	// lands on the same row and stays idempotent, and it moves on with the next failure.
-	version := systemRetryEventVersionBase + taskAction.Status.SystemFailures
+	// The system-retry count places this retry within the reserved range: it holds until
+	// the retry is persisted, so republishing after a failed status update lands on the
+	// same row and stays idempotent, and it moves on with every retry after that. The
+	// consecutive system-failure count would not do: it goes back to zero as soon as the
+	// relaunched attempt makes progress, and the next failure would reuse a spent version.
+	version := systemRetryEventVersionBase + taskAction.Status.SystemRetries
 	queued := pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, version, systemRetryReason, info)
 	return r.recordEvent(ctx, r.buildActionEvent(ctx, taskAction, queued))
 }
@@ -874,6 +876,10 @@ func (r *TaskActionReconciler) reconcileTask(
 		if err := r.recordSystemRetry(ctx, taskAction, phaseInfo); err != nil {
 			logger.Error(err, "failed to publish system retry event, continuing with the retry")
 		}
+		// Spent whether or not the event went out: a skipped version costs nothing, a
+		// reused one drops the next retry's event. recordSystemError persists it along
+		// with the failure count.
+		taskAction.Status.SystemRetries++
 		r.resetPluginResource(ctx, taskAction, p, tCtx)
 		return r.recordSystemError(
 			ctx,
@@ -1351,6 +1357,7 @@ func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) b
 		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion ||
 		oldStatus.Attempts != newStatus.Attempts ||
 		oldStatus.SystemFailures != newStatus.SystemFailures ||
+		oldStatus.SystemRetries != newStatus.SystemRetries ||
 		oldStatus.CacheStatus != newStatus.CacheStatus ||
 		!oldStatus.AttemptStartedAt.Equal(newStatus.AttemptStartedAt) ||
 		!oldStatus.TimeoutAt.Equal(newStatus.TimeoutAt) {
