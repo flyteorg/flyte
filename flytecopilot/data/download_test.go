@@ -3,6 +3,8 @@ package data
 import (
 	"bytes"
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"testing"
@@ -95,6 +97,65 @@ func TestHandleBlobMultipart(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, result)
 	})
+}
+
+// httpListingStore mimics stow's S3 backend, whose List reports items as public
+// https URLs (https://s3-<region>.amazonaws.com/<bucket>/<key>) rather than s3:// refs.
+type httpListingStore struct {
+	storage.ComposedProtobufStore
+	host string
+}
+
+func (s httpListingStore) List(ctx context.Context, reference storage.DataReference, maxItems int, cursor storage.Cursor) ([]storage.DataReference, storage.Cursor, error) {
+	items, next, err := s.ComposedProtobufStore.List(ctx, reference, maxItems, cursor)
+	for i, item := range items {
+		_, container, key, splitErr := item.Split()
+		if splitErr != nil {
+			return nil, next, splitErr
+		}
+		items[i] = storage.DataReference(s.host + "/" + container + "/" + key)
+	}
+	return items, next, err
+}
+
+func TestHandleBlobMultipartListReturnsHTTPURLs(t *testing.T) {
+	// The public URL is not readable without credentials, as on a private S3 bucket.
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusForbidden)
+		_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?><Error><Code>AccessDenied</Code></Error>`))
+	}))
+	defer srv.Close()
+
+	ctx := context.Background()
+	base, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+	files := map[string]string{
+		"info.json":            `{"k": 31}`,
+		"nested/deep_file.bin": "nested content",
+	}
+	for rel, content := range files {
+		err = base.WriteRaw(ctx, storage.DataReference("mem://container/sm/run-n0-0/index/"+rel), 0, storage.Options{}, bytes.NewReader([]byte(content)))
+		assert.NoError(t, err)
+	}
+
+	s := storage.NewCompositeDataStore(base.ReferenceConstructor, httpListingStore{ComposedProtobufStore: base.ComposedProtobufStore, host: srv.URL})
+	d := Downloader{store: s}
+	blob := &core.Blob{
+		Uri:      "mem://container/sm/run-n0-0/index",
+		Metadata: &core.BlobMetadata{Type: &core.BlobType{Dimensionality: core.BlobType_MULTIPART}},
+	}
+
+	toPath := filepath.Join(t.TempDir(), "inputs", "index")
+	result, err := d.handleBlob(ctx, blob, toPath)
+	assert.NoError(t, err)
+	assert.Equal(t, toPath, result)
+
+	for rel, content := range files {
+		got, err := os.ReadFile(filepath.Join(toPath, rel))
+		if assert.NoError(t, err) {
+			assert.Equal(t, content, string(got), "file %s must hold the stored bytes, not the HTTP error body", rel)
+		}
+	}
 }
 
 func TestHandleBlobSinglePart(t *testing.T) {
