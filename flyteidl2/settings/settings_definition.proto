@@ -180,6 +180,11 @@ message TaskResourceSettings {
   TaskResourceDefaults min = 1 [(flyteidl2.settings.desc) = "Minimum resource requests applied to task pods"];
   TaskResourceDefaults max = 2 [(flyteidl2.settings.desc) = "Maximum resource limits applied to task pods"];
   BoolSetting mirror_limits_request = 3 [(flyteidl2.settings.desc) = "When true, resource limits mirror requests"];
+  // The GPU a task gets when it requests GPUs (e.g. gpu=1) without naming an accelerator, in the SDK's
+  // spelling of the device (e.g. "T4", "A100", "L4", "H100"); a task's own accelerator (gpu="T4:1") always
+  // wins. The server resolves it to a full GPUAccelerator on RunSpec.default_settings.task_resource_defaults.
+  // With no default set, a task that requests GPUs without naming one cannot be scheduled.
+  StringSetting default_gpu_device = 4 [(flyteidl2.settings.desc) = "Default GPU device for tasks that request GPUs without naming an accelerator, in SDK spelling (e.g. \"T4\", \"A100\")"];
 }
 
 // AppSettings controls policy for Union Apps.

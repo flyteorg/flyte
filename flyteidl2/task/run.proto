@@ -208,6 +208,12 @@ message TaskResourceDefaults {
 
   // Per-dimension cap on a task's requests and limits (task_resource.max).
   repeated flyteidl2.core.Resources.ResourceEntry max = 2;
+
+  // Accelerator applied to a task that requests GPUs and names no accelerator of its own
+  // (task_resource.default_gpu_device, resolved by the server to a device class, device and
+  // partitioning). A task's own accelerator always wins. Unset means no default: such a task
+  // cannot be scheduled, because every GPU request must name the device it runs on.
+  flyteidl2.core.GPUAccelerator default_gpu_accelerator = 3;
 }
 
 message InlineRuleList {

@@ -142,14 +142,16 @@ class TaskResourceDefaults(_message.Message):
     def __init__(self, cpu: _Optional[_Union[QuantitySetting, _Mapping]] = ..., gpu: _Optional[_Union[QuantitySetting, _Mapping]] = ..., memory: _Optional[_Union[QuantitySetting, _Mapping]] = ..., storage: _Optional[_Union[QuantitySetting, _Mapping]] = ...) -> None: ...
 
 class TaskResourceSettings(_message.Message):
-    __slots__ = ["min", "max", "mirror_limits_request"]
+    __slots__ = ["min", "max", "mirror_limits_request", "default_gpu_device"]
     MIN_FIELD_NUMBER: _ClassVar[int]
     MAX_FIELD_NUMBER: _ClassVar[int]
     MIRROR_LIMITS_REQUEST_FIELD_NUMBER: _ClassVar[int]
+    DEFAULT_GPU_DEVICE_FIELD_NUMBER: _ClassVar[int]
     min: TaskResourceDefaults
     max: TaskResourceDefaults
     mirror_limits_request: BoolSetting
-    def __init__(self, min: _Optional[_Union[TaskResourceDefaults, _Mapping]] = ..., max: _Optional[_Union[TaskResourceDefaults, _Mapping]] = ..., mirror_limits_request: _Optional[_Union[BoolSetting, _Mapping]] = ...) -> None: ...
+    default_gpu_device: StringSetting
+    def __init__(self, min: _Optional[_Union[TaskResourceDefaults, _Mapping]] = ..., max: _Optional[_Union[TaskResourceDefaults, _Mapping]] = ..., mirror_limits_request: _Optional[_Union[BoolSetting, _Mapping]] = ..., default_gpu_device: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
 
 class AppSettings(_message.Message):
     __slots__ = ["disallow_anonymous", "app_dns_strategy"]
