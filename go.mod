@@ -41,7 +41,7 @@ require (
 	github.com/lib/pq v1.12.3
 	github.com/magiconair/properties v1.18.12
 	github.com/onsi/ginkgo/v2 v2.32.2
-	github.com/onsi/gomega v1.43.0
+	github.com/onsi/gomega v1.43.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.24.1
 	github.com/prometheus/common v0.71.0
