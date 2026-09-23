@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.settings;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/core/tasks.proto";
 import "google/protobuf/descriptor.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings";
@@ -142,6 +143,16 @@ message QuantitySetting {
   ScopeLevel scope_level = 3;
 }
 
+// A setting that holds an accelerator: a device from the AcceleratorModel
+// list (GPUAccelerator.device is that value's accelerator_name string), an
+// optional partition size, and a device class.
+message AcceleratorSetting {
+  SettingState state = 1;
+  // Meaningful only when state = VALUE.
+  flyteidl2.core.GPUAccelerator accelerator_value = 2;
+  ScopeLevel scope_level = 3;
+}
+
 // ---------------------------------------------------------------------------
 // Domain messages
 // ---------------------------------------------------------------------------
@@ -180,6 +191,7 @@ message TaskResourceSettings {
   TaskResourceDefaults min = 1 [(flyteidl2.settings.desc) = "Minimum resource requests applied to task pods"];
   TaskResourceDefaults max = 2 [(flyteidl2.settings.desc) = "Maximum resource limits applied to task pods"];
   BoolSetting mirror_limits_request = 3 [(flyteidl2.settings.desc) = "When true, resource limits mirror requests"];
+  AcceleratorSetting default_accelerator = 4 [(flyteidl2.settings.desc) = "Accelerator applied to a task that requests GPUs but names none"];
 }
 
 // AppSettings controls policy for Union Apps.

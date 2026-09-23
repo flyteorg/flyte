@@ -9,6 +9,7 @@ import "flyteidl2/core/identifier.proto";
 import "flyteidl2/core/interface.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/core/security.proto";
+import "google/protobuf/descriptor.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/wrappers.proto";
@@ -45,6 +46,77 @@ message Resources {
   // Defines a set of bounds (e.g. min/max) within which the task can reliably run. ResourceNames must be unique
   // within the list.
   repeated ResourceEntry limits = 2;
+}
+
+extend google.protobuf.EnumValueOptions {
+  // The canonical string for an AcceleratorModel value: what the SDK writes
+  // into GPUAccelerator.device, what the control plane stores and compares,
+  // and what a dataplane maps to its cloud's node label.
+  //
+  // 1365 is from the block 1364-1373 registered for Flyte in the protobuf
+  // global extension registry (protocolbuffers/protobuf#29013); 1364 is
+  // settings.desc. Never use 50000-99999 here: flyteidl2 is published, and
+  // that range collides with other published schemas (#7776).
+  string accelerator_name = 1365;
+}
+
+// The canonical list of accelerators. One value per concrete device,
+// matched by exact equality: NVIDIA_A100 (40GB) and NVIDIA_A100_80GB are
+// two devices. The string on each value is exactly what the SDK writes
+// into GPUAccelerator.device for that type today (flyte-sdk
+// resources_serde.ACCELERATOR_DEVICE_MAP, else the type name verbatim),
+// so existing tasks and SDKs already carry canonical values. Numbered in
+// blocks of 100 per DeviceClass so each block can grow.
+enum AcceleratorModel {
+  ACCELERATOR_MODEL_UNSPECIFIED = 0;
+
+  // NVIDIA_GPU
+  NVIDIA_K80 = 1 [(accelerator_name) = "nvidia-tesla-k80"];
+  NVIDIA_M60 = 2 [(accelerator_name) = "nvidia-tesla-m60"];
+  NVIDIA_P4 = 3 [(accelerator_name) = "nvidia-tesla-p4"];
+  NVIDIA_P100 = 4 [(accelerator_name) = "nvidia-tesla-p100"];
+  NVIDIA_V100 = 5 [(accelerator_name) = "nvidia-tesla-v100"];
+  NVIDIA_T4 = 6 [(accelerator_name) = "nvidia-tesla-t4"];
+  NVIDIA_A10 = 7 [(accelerator_name) = "nvidia-a10"];
+  NVIDIA_A10G = 8 [(accelerator_name) = "nvidia-a10g"];
+  NVIDIA_A100 = 9 [(accelerator_name) = "nvidia-tesla-a100"];
+  NVIDIA_A100_80GB = 10 [(accelerator_name) = "nvidia-a100-80gb"];
+  NVIDIA_L4 = 11 [(accelerator_name) = "nvidia-l4"];
+  NVIDIA_L40S = 12 [(accelerator_name) = "nvidia-l40s"];
+  NVIDIA_H100 = 13 [(accelerator_name) = "nvidia-tesla-h100"];
+  NVIDIA_H100_MEGA_80GB = 14 [(accelerator_name) = "H100 MEGA 80G"];
+  NVIDIA_H200 = 15 [(accelerator_name) = "H200"];
+  NVIDIA_B200 = 16 [(accelerator_name) = "B200"];
+  NVIDIA_GB200 = 17 [(accelerator_name) = "GB200"];
+  NVIDIA_GB10 = 18 [(accelerator_name) = "GB10"];
+  NVIDIA_RTX_PRO_6000 = 19 [(accelerator_name) = "RTX PRO 6000"];
+
+  // GOOGLE_TPU
+  GOOGLE_TPU_V5E = 100 [(accelerator_name) = "tpu-v5-lite-podslice"];
+  GOOGLE_TPU_V5P = 101 [(accelerator_name) = "tpu-v5p-slice"];
+  GOOGLE_TPU_V6E = 102 [(accelerator_name) = "tpu-v6e-slice"];
+
+  // AMAZON_NEURON
+  AMAZON_INF1 = 200 [(accelerator_name) = "Inf1"];
+  AMAZON_INF2 = 201 [(accelerator_name) = "Inf2"];
+  AMAZON_TRN1 = 202 [(accelerator_name) = "Trn1"];
+  AMAZON_TRN1N = 203 [(accelerator_name) = "Trn1n"];
+  AMAZON_TRN2 = 204 [(accelerator_name) = "Trn2"];
+  AMAZON_TRN2U = 205 [(accelerator_name) = "Trn2u"];
+
+  // AMD_GPU
+  AMD_MI100 = 300 [(accelerator_name) = "MI100"];
+  AMD_MI210 = 301 [(accelerator_name) = "MI210"];
+  AMD_MI250 = 302 [(accelerator_name) = "MI250"];
+  AMD_MI250X = 303 [(accelerator_name) = "MI250X"];
+  AMD_MI300A = 304 [(accelerator_name) = "MI300A"];
+  AMD_MI300X = 305 [(accelerator_name) = "MI300X"];
+  AMD_MI325X = 306 [(accelerator_name) = "MI325X"];
+  AMD_MI350X = 307 [(accelerator_name) = "MI350X"];
+  AMD_MI355X = 308 [(accelerator_name) = "MI355X"];
+
+  // HABANA_GAUDI
+  HABANA_GAUDI1 = 400 [(accelerator_name) = "Gaudi1"];
 }
 
 // Metadata associated with the GPU accelerator to allocate to a task. Contains
