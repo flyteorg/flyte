@@ -11,6 +11,7 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"k8s.io/apimachinery/pkg/api/resource"
 
+	"github.com/flyteorg/flyte/v2/flyteidl2/clients/go/coreutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings/settingsconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
@@ -231,6 +232,20 @@ func validateTaskResourceDefaults(bound string, d *settings.TaskResourceDefaults
 	return validateQuantity(bound+".storage", d.GetStorage())
 }
 
+// validateDefaultAccelerator checks that the accelerator a task_resource.default_accelerator
+// setting holds is a device the AcceleratorModel list knows, of the class it declares.
+// Rejecting it here is what keeps an unknown spelling from sending every untyped GPU
+// request of a scope to a node label that does not exist.
+func validateDefaultAccelerator(setting *settings.AcceleratorSetting) error {
+	if setting.GetState() != settings.SettingState_SETTING_STATE_VALUE {
+		return nil
+	}
+	if err := coreutils.ValidateAccelerator(setting.GetAcceleratorValue()); err != nil {
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid task_resource.default_accelerator: %w", err))
+	}
+	return nil
+}
+
 func validateSettings(s *settings.Settings) error {
 	if err := validateMaxActionConcurrency(s.GetRun().GetMaxActionConcurrency()); err != nil {
 		return err
@@ -238,7 +253,10 @@ func validateSettings(s *settings.Settings) error {
 	if err := validateTaskResourceDefaults("task_resource.min", s.GetTaskResource().GetMin()); err != nil {
 		return err
 	}
-	return validateTaskResourceDefaults("task_resource.max", s.GetTaskResource().GetMax())
+	if err := validateTaskResourceDefaults("task_resource.max", s.GetTaskResource().GetMax()); err != nil {
+		return err
+	}
+	return validateDefaultAccelerator(s.GetTaskResource().GetDefaultAccelerator())
 }
 
 var _ settingsconnect.SettingsServiceHandler = (*SettingsService)(nil)

@@ -190,6 +190,9 @@ func TestMergeSettings(t *testing.T) {
 	domain := &settings.Settings{
 		Run:      &settings.RunSettings{DefaultQueue: str(stateValue, "fast-queue")},
 		Security: &settings.SecuritySettings{ServiceAccount: str(stateValue, "runner")},
+		TaskResource: &settings.TaskResourceSettings{
+			DefaultAccelerator: accelerator(stateValue, "nvidia-tesla-t4"),
+		},
 	}
 	project := &settings.Settings{
 		EnvironmentVariables: strMap(stateValue, map[string]string{"TEAM": "ml"}),
@@ -215,6 +218,12 @@ func TestMergeSettings(t *testing.T) {
 		assert.Nil(t, got.GetTaskResource().GetMin())
 	})
 
+	t.Run("the default accelerator resolves beside the bounds", func(t *testing.T) {
+		got := got.GetTaskResource().GetDefaultAccelerator()
+		assert.Equal(t, "nvidia-tesla-t4", got.GetAcceleratorValue().GetDevice())
+		assert.Equal(t, levelDomain, got.GetScopeLevel())
+	})
+
 	t.Run("maps accumulate across levels", func(t *testing.T) {
 		assert.Equal(t, map[string]string{"LOG_LEVEL": "info", "TEAM": "ml"},
 			got.GetEnvironmentVariables().GetMapValue().GetEntries())
@@ -227,6 +236,25 @@ func TestMergeSettings(t *testing.T) {
 		assert.Nil(t, got.GetAnnotations())
 		assert.Nil(t, got.GetRun().GetMaxActionConcurrency())
 	})
+}
+
+// A task_resource group whose only leaf is the default accelerator resolves
+// to that leaf, not to nil.
+func TestMergeSettings_TaskResourceAcceleratorAlone(t *testing.T) {
+	org := &settings.Settings{TaskResource: &settings.TaskResourceSettings{
+		DefaultAccelerator: accelerator(stateValue, "nvidia-l4"),
+	}}
+	got := mergeSettings([]*settings.Settings{org, {}, {}})
+	require.NotNil(t, got.GetTaskResource())
+	assert.Equal(t, "nvidia-l4", got.GetTaskResource().GetDefaultAccelerator().GetAcceleratorValue().GetDevice())
+	assert.Equal(t, levelOrg, got.GetTaskResource().GetDefaultAccelerator().GetScopeLevel())
+
+	unset := &settings.Settings{TaskResource: &settings.TaskResourceSettings{
+		DefaultAccelerator: &settings.AcceleratorSetting{State: settings.SettingState_SETTING_STATE_UNSET},
+	}}
+	got = mergeSettings([]*settings.Settings{org, unset, {}})
+	assert.Equal(t, settings.SettingState_SETTING_STATE_UNSET, got.GetTaskResource().GetDefaultAccelerator().GetState(),
+		"an UNSET child blocks the org default")
 }
 
 func TestMergeSettings_NothingStored(t *testing.T) {

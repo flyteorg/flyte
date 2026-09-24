@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 )
@@ -40,6 +41,11 @@ func quantity(state settings.SettingState, value string) *settings.QuantitySetti
 
 func concurrency(state settings.SettingState, value int64) *settings.Int64Setting {
 	return &settings.Int64Setting{State: state, IntValue: value}
+}
+
+// accelerator builds an AcceleratorSetting for an NVIDIA device in wire spelling.
+func accelerator(state settings.SettingState, device string) *settings.AcceleratorSetting {
+	return &settings.AcceleratorSetting{State: state, AcceleratorValue: &core.GPUAccelerator{Device: device}}
 }
 
 func TestSettingsCRUD(t *testing.T) {
@@ -532,10 +538,17 @@ func TestValidateSettings(t *testing.T) {
 		assert.NoError(t, validateSettings(&settings.Settings{
 			Run: &settings.RunSettings{MaxActionConcurrency: concurrency(stateValue, 64)},
 			TaskResource: &settings.TaskResourceSettings{
-				Min: &settings.TaskResourceDefaults{Cpu: quantity(stateValue, "500m")},
-				Max: &settings.TaskResourceDefaults{Cpu: quantity(stateValue, "16")},
+				Min:                &settings.TaskResourceDefaults{Cpu: quantity(stateValue, "500m")},
+				Max:                &settings.TaskResourceDefaults{Cpu: quantity(stateValue, "16")},
+				DefaultAccelerator: accelerator(stateValue, "nvidia-tesla-t4"),
 			},
 		}))
+	})
+
+	t.Run("an inherited or unset default accelerator is not checked", func(t *testing.T) {
+		assert.NoError(t, validateSettings(&settings.Settings{TaskResource: &settings.TaskResourceSettings{
+			DefaultAccelerator: &settings.AcceleratorSetting{State: settings.SettingState_SETTING_STATE_UNSET},
+		}}))
 	})
 
 	tests := []struct {
@@ -556,6 +569,20 @@ func TestValidateSettings(t *testing.T) {
 				Max: &settings.TaskResourceDefaults{Memory: quantity(stateValue, "apple")},
 			}},
 			wantPath: "task_resource.max.memory",
+		},
+		{
+			name: "unknown default accelerator device names the setting",
+			input: &settings.Settings{TaskResource: &settings.TaskResourceSettings{
+				DefaultAccelerator: accelerator(stateValue, "T4"),
+			}},
+			wantPath: "task_resource.default_accelerator",
+		},
+		{
+			name: "default accelerator of the wrong class is rejected",
+			input: &settings.Settings{TaskResource: &settings.TaskResourceSettings{
+				DefaultAccelerator: accelerator(stateValue, "tpu-v5p-slice"),
+			}},
+			wantPath: "is a GOOGLE_TPU, not a NVIDIA_GPU",
 		},
 		{
 			name: "bad concurrency is reported",
