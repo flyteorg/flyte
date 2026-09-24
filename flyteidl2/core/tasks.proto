@@ -62,37 +62,47 @@ extend google.protobuf.EnumValueOptions {
 
 // The canonical list of accelerators. One value per concrete device,
 // matched by exact equality: NVIDIA_A100 (40GB) and NVIDIA_A100_80GB are
-// two devices. Strings are lower-case, vendor first, dashes only:
-// <vendor>-<model>[-<memory>][-<variant>]. Numbered in blocks of 100 per
-// DeviceClass so each block can grow.
+// two devices. Numbered in blocks of 100 per DeviceClass so each block can
+// grow.
+//
+// accelerator_name is the string a task pod is scheduled by: what the SDK
+// writes into GPUAccelerator.device today (flyte-sdk ACCELERATOR_DEVICE_MAP,
+// itself the cloud providers' node label values: `nvidia-tesla-t4`,
+// `nvidia-a100-80gb`, `tpu-v5p-slice`), and what queue caps and node shapes
+// are recorded in. Devices the SDK still passes through by their short name
+// (H200, B200, …) carry the node label the dataplane resolves that short
+// name to (flytek8s accelerator-devices), so the two spellings agree once
+// the SDK maps them. New devices follow <vendor>-<model>[-<memory>]
+// [-<variant>], lower-case, dashes only.
 enum AcceleratorModel {
   ACCELERATOR_MODEL_UNSPECIFIED = 0;
 
   // NVIDIA_GPU
-  NVIDIA_K80 = 1 [(accelerator_name) = "nvidia-k80"];
-  NVIDIA_M60 = 2 [(accelerator_name) = "nvidia-m60"];
-  NVIDIA_P4 = 3 [(accelerator_name) = "nvidia-p4"];
-  NVIDIA_P100 = 4 [(accelerator_name) = "nvidia-p100"];
-  NVIDIA_V100 = 5 [(accelerator_name) = "nvidia-v100"];
-  NVIDIA_T4 = 6 [(accelerator_name) = "nvidia-t4"];
+  NVIDIA_K80 = 1 [(accelerator_name) = "nvidia-tesla-k80"];
+  NVIDIA_M60 = 2 [(accelerator_name) = "nvidia-tesla-m60"];
+  NVIDIA_P4 = 3 [(accelerator_name) = "nvidia-tesla-p4"];
+  NVIDIA_P100 = 4 [(accelerator_name) = "nvidia-tesla-p100"];
+  NVIDIA_V100 = 5 [(accelerator_name) = "nvidia-tesla-v100"];
+  NVIDIA_T4 = 6 [(accelerator_name) = "nvidia-tesla-t4"];
   NVIDIA_A10 = 7 [(accelerator_name) = "nvidia-a10"];
   NVIDIA_A10G = 8 [(accelerator_name) = "nvidia-a10g"];
-  NVIDIA_A100 = 9 [(accelerator_name) = "nvidia-a100"];
+  NVIDIA_A100 = 9 [(accelerator_name) = "nvidia-tesla-a100"];
   NVIDIA_A100_80GB = 10 [(accelerator_name) = "nvidia-a100-80gb"];
   NVIDIA_L4 = 11 [(accelerator_name) = "nvidia-l4"];
   NVIDIA_L40S = 12 [(accelerator_name) = "nvidia-l40s"];
-  NVIDIA_H100 = 13 [(accelerator_name) = "nvidia-h100"];
+  NVIDIA_H100 = 13 [(accelerator_name) = "nvidia-tesla-h100"];
   NVIDIA_H100_MEGA_80GB = 14 [(accelerator_name) = "nvidia-h100-mega-80gb"];
   NVIDIA_H200 = 15 [(accelerator_name) = "nvidia-h200"];
   NVIDIA_B200 = 16 [(accelerator_name) = "nvidia-b200"];
   NVIDIA_GB200 = 17 [(accelerator_name) = "nvidia-gb200"];
   NVIDIA_GB10 = 18 [(accelerator_name) = "nvidia-gb10"];
   NVIDIA_RTX_PRO_6000 = 19 [(accelerator_name) = "nvidia-rtx-pro-6000"];
+  NVIDIA_A2 = 20 [(accelerator_name) = "nvidia-a2"];
 
   // GOOGLE_TPU
-  GOOGLE_TPU_V5E = 100 [(accelerator_name) = "google-tpu-v5e"];
-  GOOGLE_TPU_V5P = 101 [(accelerator_name) = "google-tpu-v5p"];
-  GOOGLE_TPU_V6E = 102 [(accelerator_name) = "google-tpu-v6e"];
+  GOOGLE_TPU_V5E = 100 [(accelerator_name) = "tpu-v5-lite-podslice"];
+  GOOGLE_TPU_V5P = 101 [(accelerator_name) = "tpu-v5p-slice"];
+  GOOGLE_TPU_V6E = 102 [(accelerator_name) = "tpu-v6e-slice"];
 
   // AMAZON_NEURON
   AMAZON_INF1 = 200 [(accelerator_name) = "aws-inf1"];
