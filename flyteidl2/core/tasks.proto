@@ -148,6 +148,11 @@ message GPUAccelerator {
   }
   // The class of accelerator device. Defaults to NVIDIA_GPU if not specified.
   DeviceClass device_class = 4;
+
+  // The accelerator as a value of the canonical list. When set, readers use
+  // it instead of device; device stays for SDKs and stored tasks that predate
+  // this field.
+  AcceleratorModel accelerator_model = 5;
 }
 
 // Metadata associated with configuring a shared memory volume for a task.

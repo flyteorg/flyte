@@ -779,6 +779,52 @@
         }
       }
     },
+    "coreAcceleratorModel": {
+      "type": "string",
+      "enum": [
+        "ACCELERATOR_MODEL_UNSPECIFIED",
+        "NVIDIA_K80",
+        "NVIDIA_M60",
+        "NVIDIA_P4",
+        "NVIDIA_P100",
+        "NVIDIA_V100",
+        "NVIDIA_T4",
+        "NVIDIA_A10",
+        "NVIDIA_A10G",
+        "NVIDIA_A100",
+        "NVIDIA_A100_80GB",
+        "NVIDIA_L4",
+        "NVIDIA_L40S",
+        "NVIDIA_H100",
+        "NVIDIA_H100_MEGA_80GB",
+        "NVIDIA_H200",
+        "NVIDIA_B200",
+        "NVIDIA_GB200",
+        "NVIDIA_GB10",
+        "NVIDIA_RTX_PRO_6000",
+        "GOOGLE_TPU_V5E",
+        "GOOGLE_TPU_V5P",
+        "GOOGLE_TPU_V6E",
+        "AMAZON_INF1",
+        "AMAZON_INF2",
+        "AMAZON_TRN1",
+        "AMAZON_TRN1N",
+        "AMAZON_TRN2",
+        "AMAZON_TRN2U",
+        "AMD_MI100",
+        "AMD_MI210",
+        "AMD_MI250",
+        "AMD_MI250X",
+        "AMD_MI300A",
+        "AMD_MI300X",
+        "AMD_MI325X",
+        "AMD_MI350X",
+        "AMD_MI355X",
+        "HABANA_GAUDI1"
+      ],
+      "default": "ACCELERATOR_MODEL_UNSPECIFIED",
+      "description": "The canonical list of accelerators. One value per concrete device,\nmatched by exact equality: NVIDIA_A100 (40GB) and NVIDIA_A100_80GB are\ntwo devices. Strings are lower-case, vendor first, dashes only:\n\u003cvendor\u003e-\u003cmodel\u003e[-\u003cmemory\u003e][-\u003cvariant\u003e]. Numbered in blocks of 100 per\nDeviceClass so each block can grow.\n\n - NVIDIA_K80: NVIDIA_GPU\n - GOOGLE_TPU_V5E: GOOGLE_TPU\n - AMAZON_INF1: AMAZON_NEURON\n - AMD_MI100: AMD_GPU\n - HABANA_GAUDI1: HABANA_GAUDI"
+    },
     "coreArtifactBindingData": {
       "type": "object",
       "properties": {
@@ -1144,6 +1190,10 @@
         "device_class": {
           "$ref": "#/definitions/GPUAcceleratorDeviceClass",
           "description": "The class of accelerator device. Defaults to NVIDIA_GPU if not specified."
+        },
+        "accelerator_model": {
+          "$ref": "#/definitions/coreAcceleratorModel",
+          "description": "The accelerator as a value of the canonical list. When set, readers use\nit instead of device; device stays for SDKs and stored tasks that predate\nthis field."
         }
       },
       "description": "Metadata associated with the GPU accelerator to allocate to a task. Contains\ninformation about device type, and for multi-instance GPUs, the partition size to\nuse."
