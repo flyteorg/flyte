@@ -13,7 +13,6 @@ import (
 	cmdUtil "github.com/flyteorg/flyte/flytectl/pkg/commandutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const (
@@ -28,6 +27,13 @@ Deactivates a ` + "`launch plan <https://docs.flyte.org/en/latest/user_guide/pro
 ::
 
  flytectl update launchplan -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --version v1 --deactivate
+
+Archives a launch plan version, marking it as old/unused. Archived launch plans can be filtered out
+of list queries using ne(state,2) and any active schedule is disabled. Archived launch plans can
+still be used to launch executions:
+::
+
+ flytectl update launchplan -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --version v1 --archive
 
 Usage
 `
@@ -47,15 +53,19 @@ func updateLPFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandCont
 
 	activate := launchplan.UConfig.Activate
 	archive := launchplan.UConfig.Archive
+	deactivate := launchplan.UConfig.Deactivate
 
-	var deactivate bool
-	if archive {
-		deprecatedCommandWarning(ctx, "archive", "deactivate")
-		deactivate = true
-	} else {
-		deactivate = launchplan.UConfig.Deactivate
+	setCount := 0
+	if activate {
+		setCount++
 	}
-	if activate == deactivate && deactivate {
+	if deactivate {
+		setCount++
+	}
+	if archive {
+		setCount++
+	}
+	if setCount > 1 {
 		return errors.New(clierrors.ErrInvalidBothStateUpdate)
 	}
 
@@ -64,6 +74,8 @@ func updateLPFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandCont
 		newState = admin.LaunchPlanState_ACTIVE
 	} else if deactivate {
 		newState = admin.LaunchPlanState_INACTIVE
+	} else if archive {
+		newState = admin.LaunchPlanState_ARCHIVED
 	}
 
 	id := &core.Identifier{
@@ -115,8 +127,4 @@ func updateLPFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandCont
 	fmt.Printf("updated launch plan successfully on %s", name)
 
 	return nil
-}
-
-func deprecatedCommandWarning(ctx context.Context, oldCommand string, newCommand string) {
-	logger.Warningf(ctx, "--%v is deprecated, Please use --%v", oldCommand, newCommand)
 }
