@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 )
@@ -558,6 +559,13 @@ func TestValidateSettings(t *testing.T) {
 			wantPath: "task_resource.max.memory",
 		},
 		{
+			name: "non-canonical default accelerator names its path",
+			input: &settings.Settings{TaskResource: &settings.TaskResourceSettings{
+				DefaultAccelerator: accel(stateValue, "H100"),
+			}},
+			wantPath: "task_resource.default_accelerator",
+		},
+		{
 			name: "bad concurrency is reported",
 			input: &settings.Settings{Run: &settings.RunSettings{
 				MaxActionConcurrency: concurrency(stateValue, 1),
@@ -627,4 +635,41 @@ func TestGetSettings_NothingStored(t *testing.T) {
 	require.NotNil(t, record.GetSettings())
 	assert.Nil(t, record.GetSettings().GetEnvironmentVariables())
 	assert.Equal(t, uint64(0), record.GetVersion())
+}
+
+func TestValidateDefaultAccelerator(t *testing.T) {
+	tests := []struct {
+		name    string
+		setting *settings.AcceleratorSetting
+		wantErr bool
+	}{
+		{"nil leaf", nil, false},
+		{"inherit ignores its value", accel(stateInherit, "bogus"), false},
+		{"unset ignores its value", accel(stateUnset, ""), false},
+		{"canonical nvidia", accel(stateValue, "nvidia-h100"), false},
+		{"canonical with memory", accel(stateValue, "nvidia-a100-80gb"), false},
+		{"canonical tpu", accel(stateValue, "google-tpu-v5e"), false},
+		{"old SDK short name is rejected", accel(stateValue, "H100"), true},
+		{"old SDK long name is rejected", accel(stateValue, "nvidia-tesla-h100"), true},
+		{"unknown device is rejected", accel(stateValue, "nvidia-h9000"), true},
+		{"value with no accelerator is rejected", accel(stateValue, ""), true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateDefaultAccelerator(tt.setting)
+			if tt.wantErr {
+				require.Error(t, err)
+				assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+				return
+			}
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestCanonicalAcceleratorNamesCoversEveryModel(t *testing.T) {
+	values := core.AcceleratorModel(0).Descriptor().Values()
+	// Every value but UNSPECIFIED carries a name.
+	assert.Len(t, canonicalAcceleratorNames, values.Len()-1)
 }

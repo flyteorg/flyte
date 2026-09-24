@@ -5,6 +5,7 @@ from flyteidl2.core import identifier_pb2 as _identifier_pb2_1
 from flyteidl2.core import interface_pb2 as _interface_pb2
 from flyteidl2.core import literals_pb2 as _literals_pb2
 from flyteidl2.core import security_pb2 as _security_pb2
+from google.protobuf import descriptor_pb2 as _descriptor_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import struct_pb2 as _struct_pb2
 from google.protobuf import wrappers_pb2 as _wrappers_pb2
@@ -15,6 +16,89 @@ from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
+
+class AcceleratorModel(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    ACCELERATOR_MODEL_UNSPECIFIED: _ClassVar[AcceleratorModel]
+    NVIDIA_K80: _ClassVar[AcceleratorModel]
+    NVIDIA_M60: _ClassVar[AcceleratorModel]
+    NVIDIA_P4: _ClassVar[AcceleratorModel]
+    NVIDIA_P100: _ClassVar[AcceleratorModel]
+    NVIDIA_V100: _ClassVar[AcceleratorModel]
+    NVIDIA_T4: _ClassVar[AcceleratorModel]
+    NVIDIA_A10: _ClassVar[AcceleratorModel]
+    NVIDIA_A10G: _ClassVar[AcceleratorModel]
+    NVIDIA_A100: _ClassVar[AcceleratorModel]
+    NVIDIA_A100_80GB: _ClassVar[AcceleratorModel]
+    NVIDIA_L4: _ClassVar[AcceleratorModel]
+    NVIDIA_L40S: _ClassVar[AcceleratorModel]
+    NVIDIA_H100: _ClassVar[AcceleratorModel]
+    NVIDIA_H100_MEGA_80GB: _ClassVar[AcceleratorModel]
+    NVIDIA_H200: _ClassVar[AcceleratorModel]
+    NVIDIA_B200: _ClassVar[AcceleratorModel]
+    NVIDIA_GB200: _ClassVar[AcceleratorModel]
+    NVIDIA_GB10: _ClassVar[AcceleratorModel]
+    NVIDIA_RTX_PRO_6000: _ClassVar[AcceleratorModel]
+    GOOGLE_TPU_V5E: _ClassVar[AcceleratorModel]
+    GOOGLE_TPU_V5P: _ClassVar[AcceleratorModel]
+    GOOGLE_TPU_V6E: _ClassVar[AcceleratorModel]
+    AMAZON_INF1: _ClassVar[AcceleratorModel]
+    AMAZON_INF2: _ClassVar[AcceleratorModel]
+    AMAZON_TRN1: _ClassVar[AcceleratorModel]
+    AMAZON_TRN1N: _ClassVar[AcceleratorModel]
+    AMAZON_TRN2: _ClassVar[AcceleratorModel]
+    AMAZON_TRN2U: _ClassVar[AcceleratorModel]
+    AMD_MI100: _ClassVar[AcceleratorModel]
+    AMD_MI210: _ClassVar[AcceleratorModel]
+    AMD_MI250: _ClassVar[AcceleratorModel]
+    AMD_MI250X: _ClassVar[AcceleratorModel]
+    AMD_MI300A: _ClassVar[AcceleratorModel]
+    AMD_MI300X: _ClassVar[AcceleratorModel]
+    AMD_MI325X: _ClassVar[AcceleratorModel]
+    AMD_MI350X: _ClassVar[AcceleratorModel]
+    AMD_MI355X: _ClassVar[AcceleratorModel]
+    HABANA_GAUDI1: _ClassVar[AcceleratorModel]
+ACCELERATOR_MODEL_UNSPECIFIED: AcceleratorModel
+NVIDIA_K80: AcceleratorModel
+NVIDIA_M60: AcceleratorModel
+NVIDIA_P4: AcceleratorModel
+NVIDIA_P100: AcceleratorModel
+NVIDIA_V100: AcceleratorModel
+NVIDIA_T4: AcceleratorModel
+NVIDIA_A10: AcceleratorModel
+NVIDIA_A10G: AcceleratorModel
+NVIDIA_A100: AcceleratorModel
+NVIDIA_A100_80GB: AcceleratorModel
+NVIDIA_L4: AcceleratorModel
+NVIDIA_L40S: AcceleratorModel
+NVIDIA_H100: AcceleratorModel
+NVIDIA_H100_MEGA_80GB: AcceleratorModel
+NVIDIA_H200: AcceleratorModel
+NVIDIA_B200: AcceleratorModel
+NVIDIA_GB200: AcceleratorModel
+NVIDIA_GB10: AcceleratorModel
+NVIDIA_RTX_PRO_6000: AcceleratorModel
+GOOGLE_TPU_V5E: AcceleratorModel
+GOOGLE_TPU_V5P: AcceleratorModel
+GOOGLE_TPU_V6E: AcceleratorModel
+AMAZON_INF1: AcceleratorModel
+AMAZON_INF2: AcceleratorModel
+AMAZON_TRN1: AcceleratorModel
+AMAZON_TRN1N: AcceleratorModel
+AMAZON_TRN2: AcceleratorModel
+AMAZON_TRN2U: AcceleratorModel
+AMD_MI100: AcceleratorModel
+AMD_MI210: AcceleratorModel
+AMD_MI250: AcceleratorModel
+AMD_MI250X: AcceleratorModel
+AMD_MI300A: AcceleratorModel
+AMD_MI300X: AcceleratorModel
+AMD_MI325X: AcceleratorModel
+AMD_MI350X: AcceleratorModel
+AMD_MI355X: AcceleratorModel
+HABANA_GAUDI1: AcceleratorModel
+ACCELERATOR_NAME_FIELD_NUMBER: _ClassVar[int]
+accelerator_name: _descriptor.FieldDescriptor
 
 class Resources(_message.Message):
     __slots__ = ["requests", "limits"]
@@ -46,7 +130,7 @@ class Resources(_message.Message):
     def __init__(self, requests: _Optional[_Iterable[_Union[Resources.ResourceEntry, _Mapping]]] = ..., limits: _Optional[_Iterable[_Union[Resources.ResourceEntry, _Mapping]]] = ...) -> None: ...
 
 class GPUAccelerator(_message.Message):
-    __slots__ = ["device", "unpartitioned", "partition_size", "device_class"]
+    __slots__ = ["device", "unpartitioned", "partition_size", "device_class", "accelerator_model"]
     class DeviceClass(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         NVIDIA_GPU: _ClassVar[GPUAccelerator.DeviceClass]
@@ -63,11 +147,13 @@ class GPUAccelerator(_message.Message):
     UNPARTITIONED_FIELD_NUMBER: _ClassVar[int]
     PARTITION_SIZE_FIELD_NUMBER: _ClassVar[int]
     DEVICE_CLASS_FIELD_NUMBER: _ClassVar[int]
+    ACCELERATOR_MODEL_FIELD_NUMBER: _ClassVar[int]
     device: str
     unpartitioned: bool
     partition_size: str
     device_class: GPUAccelerator.DeviceClass
-    def __init__(self, device: _Optional[str] = ..., unpartitioned: bool = ..., partition_size: _Optional[str] = ..., device_class: _Optional[_Union[GPUAccelerator.DeviceClass, str]] = ...) -> None: ...
+    accelerator_model: AcceleratorModel
+    def __init__(self, device: _Optional[str] = ..., unpartitioned: bool = ..., partition_size: _Optional[str] = ..., device_class: _Optional[_Union[GPUAccelerator.DeviceClass, str]] = ..., accelerator_model: _Optional[_Union[AcceleratorModel, str]] = ...) -> None: ...
 
 class SharedMemory(_message.Message):
     __slots__ = ["mount_path", "mount_name", "size_limit"]
