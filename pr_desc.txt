@@ -13,6 +13,25 @@ On a miss, the lookup retries the table under the other spellings the compiled-i
 
 A direct row always wins, legacy spellings resolve exactly as they did, and a string outside the default table behaves as before. The only new outcome is a hit where there was a miss.
 
+## Example
+
+A cluster whose H200 nodes carry the label value `my-custom-h200`.
+
+**Before any of this.** `flyte.GPU("H200")` has no entry in the SDK map, so the task carries the device string `H200`. The lookup upper-cases it and finds the default row `"H200": "nvidia-h200"`, so the pod asks for a node labelled `nvidia-h200` and pends. The fix was an override in helm values:
+
+```yaml
+accelerator-devices:
+  - H200: my-custom-h200
+```
+
+Since an override replaces the whole default, the cluster's table is now that one row. `H200` resolves to `my-custom-h200` and tasks run.
+
+**After the canonical names, without this change.** The `default_accelerator` setting, and later the SDK, emit `nvidia-h200`, which upper-cases to `NVIDIA-H200`. The one-row table has no such key, the lookup falls back to the raw string, the pod asks for a node labelled `nvidia-h200`, and pends again. The only fix is a second row in every such override.
+
+**With this change.** The miss on `NVIDIA-H200` is not final. The code asks the compiled-in default table, not the override, which other spellings name the same device: in the default, `H200`, `NVIDIA-H200` and `nvidia-h200` all point at `nvidia-h200`, so the aliases of `NVIDIA-H200` are just `H200`. It retries the cluster's table with `H200`, hits the row, and the pod asks for `my-custom-h200`. The override is unchanged.
+
+The default table is consulted only for which spellings are the same device. The override stays the only source of which label value the nodes carry.
+
 ## Tests
 
 `config_test.go` pins the alias sets for a canonical name, an H100, a name whose label equals itself, a legacy spelling, an unknown string, and that an override does not change them. `utils_test.go` resolves canonical names through a table keyed like the EKS Auto Mode example, checks a direct row beats an alias, and that a name with no row under any spelling still falls back.
