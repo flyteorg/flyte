@@ -472,6 +472,19 @@ For ``authType: Pkce`` set ``authorizationUrl`` (the provider's ``authorization_
 instead. ``tokenType`` applies to ``authType: ExternalCommand`` too, so a command that prints an ID token can be sent
 with the ``IDToken`` scheme.
 
+Provider notes. The client only needs the standard device authorization grant and a token response with an
+``id_token`` (and a ``refresh_token`` for silent renewal), so it works with any compliant provider. What differs is
+how the provider adds ``flyteadmin``'s client id to the ID token's ``aud`` claim:
+
+* **Dex**: list the CLI client in the Flyte client's ``trustedPeers`` and request
+  ``audience:server:client_id:<flyteadmin client id>``.
+* **Keycloak**: add an *Audience* protocol mapper to the CLI client with ``flyteadmin``'s client as the included
+  audience, and enable *OAuth 2.0 Device Authorization Grant* on the CLI client.
+* Providers that only ever issue ID tokens with the requesting client as the audience (for example Okta, Auth0,
+  Microsoft Entra ID, Google) need the CLI to use ``flyteadmin``'s own client id, so the ID token is issued for that
+  client. This works when the provider lets that client use the device grant with just its client id, as Entra ID
+  does with "Allow public client flows"; otherwise the provider cannot be used this way today.
+
 ***************************
 Custom Authorization Server
 ***************************
