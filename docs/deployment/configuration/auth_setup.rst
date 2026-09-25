@@ -428,6 +428,63 @@ Apply OIDC Configuration
    It should now be possible to go to Flyte UI and be prompted for authentication. Flytectl should automatically pickup the change and start prompting for authentication as well.
    If you want to use an external OAuth2 provider for App authentication, please continue reading into the next section.
 
+Headless login with device flow and ID tokens
+---------------------------------------------
+
+Flyte's built-in authorization server does not implement the device authorization grant
+(`RFC 8628 <https://datatracker.ietf.org/doc/html/rfc8628>`_), so on a host without a browser ``flytectl`` (and any
+other client built on the Go admin client) cannot obtain a token from it. Instead, the client can run the device flow
+directly against the OIDC provider configured in ``userAuth.openId`` and send the resulting ID token to ``flyteadmin``.
+``flyteadmin`` accepts ID tokens from that provider over gRPC with the ``IDToken`` scheme, which is the same identity
+the UI login uses, so no ``flyteadmin`` changes are needed.
+
+The OIDC provider needs:
+
+* A public client for the CLI that is allowed to use the device authorization grant.
+* ID tokens for that client that carry ``flyteadmin``'s own client id (``userAuth.openId.clientId``) in the ``aud``
+  claim. With Dex, add the CLI client to the Flyte client's ``trustedPeers`` and request the scope
+  ``audience:server:client_id:<flyteadmin client id>``. Other providers have equivalent audience settings.
+
+Then configure the client:
+
+.. code-block:: yaml
+
+   admin:
+     endpoint: dns:///flyte.example.com
+     authType: DeviceFlow
+     # The provider's device_authorization_endpoint and token_endpoint, taken from its
+     # /.well-known/openid-configuration document. Setting them switches the device flow from
+     # flyteadmin's authorization server to the provider.
+     deviceAuthorizationUrl: https://dex.example.com/device/code
+     tokenUrl: https://dex.example.com/token
+     # Send the OIDC id_token as "IDToken <jwt>" instead of the access token as "Bearer <jwt>".
+     tokenType: IDToken
+     # Client id and scopes registered with the OIDC provider. Both are required with deviceAuthorizationUrl.
+     clientId: flytectl
+     scopes:
+       - openid
+       - email
+       - profile
+       - offline_access
+       - "audience:server:client_id:flyteadmin"
+
+For ``authType: Pkce`` set ``authorizationUrl`` (the provider's ``authorization_endpoint``) and ``tokenUrl``
+instead. ``tokenType`` applies to ``authType: ExternalCommand`` too, so a command that prints an ID token can be sent
+with the ``IDToken`` scheme.
+
+Provider notes. The client only needs the standard device authorization grant and a token response with an
+``id_token`` (and a ``refresh_token`` for silent renewal), so it works with any compliant provider. What differs is
+how the provider adds ``flyteadmin``'s client id to the ID token's ``aud`` claim:
+
+* **Dex**: list the CLI client in the Flyte client's ``trustedPeers`` and request
+  ``audience:server:client_id:<flyteadmin client id>``.
+* **Keycloak**: add an *Audience* protocol mapper to the CLI client with ``flyteadmin``'s client as the included
+  audience, and enable *OAuth 2.0 Device Authorization Grant* on the CLI client.
+* Providers that only ever issue ID tokens with the requesting client as the audience (for example Okta, Auth0,
+  Microsoft Entra ID, Google) need the CLI to use ``flyteadmin``'s own client id, so the ID token is issued for that
+  client. This works when the provider lets that client use the device grant with just its client id, as Entra ID
+  does with "Allow public client flows"; otherwise the provider cannot be used this way today.
+
 ***************************
 Custom Authorization Server
 ***************************
