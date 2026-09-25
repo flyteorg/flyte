@@ -365,6 +365,48 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_authorizationUrl", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("authorizationUrl", testValue)
+			if vString, err := cmdFlags.GetString("authorizationUrl"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AuthorizationURL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_deviceAuthorizationUrl", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("deviceAuthorizationUrl", testValue)
+			if vString, err := cmdFlags.GetString("deviceAuthorizationUrl"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DeviceAuthorizationURL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_tokenType", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("tokenType", testValue)
+			if vString, err := cmdFlags.GetString("tokenType"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.TokenType)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_authorizationHeader", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

@@ -42,4 +42,5 @@ type DeviceAccessTokenResponse struct {
 	oauth2.Token
 	Error     string `json:"error"`
 	ExpiresIn int64  `json:"expires_in"` // relative seconds from now
+	IDToken   string `json:"id_token"`   // OIDC id_token, present when the openid scope was requested
 }

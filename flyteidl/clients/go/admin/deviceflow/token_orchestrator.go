@@ -133,13 +133,17 @@ func (t TokenOrchestrator) PollTokenEndpoint(ctx context.Context, tokReq DeviceA
 			if secs := tokResp.ExpiresIn; secs > 0 {
 				tokResp.Token.Expiry = time.Now().Add(time.Duration(secs) * time.Second)
 			}
+			token, err := t.ClientConfig.PrepareTokenWithIDToken(&tokResp.Token, tokResp.IDToken)
+			if err != nil {
+				return nil, err
+			}
 			// Got the auth token in the response and save it in the cache
-			err = t.TokenCache.SaveToken(&tokResp.Token)
+			err = t.TokenCache.SaveToken(token)
 			// Saving into the cache is only considered to be a warning in this case.
 			if err != nil {
 				logger.Warnf(ctx, "failed to save token in the token cache. Error: %w", err)
 			}
-			return &tokResp.Token, nil
+			return token, nil
 		}
 		fmt.Printf("Waiting for %v secs\n", pollInterval.Seconds())
 		time.Sleep(pollInterval)
