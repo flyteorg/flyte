@@ -6,7 +6,10 @@
 package config
 
 import (
+	"maps"
+	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -483,4 +486,45 @@ func GetK8sPluginConfig() *K8sPluginConfig {
 // SetK8sPluginConfig should be used for TESTING ONLY, It Sets current value for the config.
 func SetK8sPluginConfig(cfg *K8sPluginConfig) error {
 	return K8sPluginConfigSection.SetConfig(cfg)
+}
+
+// defaultAcceleratorDevices is the compiled-in accelerator-devices table,
+// copied before any config file is applied so an override cannot reach it.
+var defaultAcceleratorDevices = maps.Clone(defaultK8sConfig.AcceleratorDevices)
+
+var (
+	acceleratorAliasesOnce sync.Once
+	acceleratorAliases     map[string][]string
+)
+
+// AcceleratorDeviceAliases returns the other spellings the compiled-in
+// accelerator-devices table has for the accelerator that key names: the node
+// label it resolves to by default, upper-cased, and every other default key
+// that resolves to that label. For a canonical name (a
+// flyteidl2.core.AcceleratorModel accelerator_name) those are the spellings
+// SDKs wrote before the canonical list existed, so an accelerator-devices
+// table overridden per cluster and keyed on them still resolves the canonical
+// name. Sorted; nil when key is not in the default table.
+func AcceleratorDeviceAliases(key string) []string {
+	acceleratorAliasesOnce.Do(func() {
+		byLabel := map[string][]string{}
+		for k, label := range defaultAcceleratorDevices {
+			byLabel[label] = append(byLabel[label], strings.ToUpper(k))
+		}
+		acceleratorAliases = make(map[string][]string, len(defaultAcceleratorDevices))
+		for k, label := range defaultAcceleratorDevices {
+			k = strings.ToUpper(k)
+			seen := map[string]bool{k: true}
+			var out []string
+			for _, alias := range append([]string{strings.ToUpper(label)}, byLabel[label]...) {
+				if !seen[alias] {
+					seen[alias] = true
+					out = append(out, alias)
+				}
+			}
+			sort.Strings(out)
+			acceleratorAliases[k] = out
+		}
+	})
+	return acceleratorAliases[strings.ToUpper(key)]
 }

@@ -193,6 +193,48 @@ func TestGetNormalizedAcceleratorDevice(t *testing.T) {
 	})
 }
 
+// An accelerator-devices override replaces the whole default table. One
+// keyed on the spellings older SDKs write, like the EKS Auto Mode example in
+// the dataplane chart, must still resolve a canonical AcceleratorModel name.
+func TestGetNormalizedAcceleratorDevice_OverriddenTableKeyedOnLegacySpellings(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		AcceleratorDevices: map[string]string{
+			"NVIDIA-TESLA-T4":   "t4",
+			"NVIDIA-TESLA-A100": "a100",
+			"NVIDIA-TESLA-H100": "h100",
+			"H200":              "h200",
+			"TRN1":              "trn1",
+			"NVIDIA-L4":         "l4-direct",
+			"L4":                "l4-legacy",
+		},
+	}))
+
+	t.Run("canonical name resolves through the legacy SDK spelling", func(t *testing.T) {
+		assert.Equal(t, "t4", GetNormalizedAcceleratorDevice("nvidia-t4"))
+		assert.Equal(t, "a100", GetNormalizedAcceleratorDevice("nvidia-a100"))
+		assert.Equal(t, "h100", GetNormalizedAcceleratorDevice("nvidia-h100"), "H100 had no default row of its own")
+	})
+
+	t.Run("canonical name resolves through a pass-through short name", func(t *testing.T) {
+		assert.Equal(t, "h200", GetNormalizedAcceleratorDevice("nvidia-h200"))
+		assert.Equal(t, "trn1", GetNormalizedAcceleratorDevice("aws-trn1"))
+	})
+
+	t.Run("a direct row wins over an alias", func(t *testing.T) {
+		assert.Equal(t, "l4-direct", GetNormalizedAcceleratorDevice("nvidia-l4"))
+	})
+
+	t.Run("legacy spellings are unchanged", func(t *testing.T) {
+		assert.Equal(t, "t4", GetNormalizedAcceleratorDevice("nvidia-tesla-t4"))
+		assert.Equal(t, "l4-legacy", GetNormalizedAcceleratorDevice("L4"))
+	})
+
+	t.Run("nothing to retry with falls back to the device", func(t *testing.T) {
+		assert.Equal(t, "nvidia-l40s", GetNormalizedAcceleratorDevice("nvidia-l40s"), "no row under any spelling")
+		assert.Equal(t, "custom-device", GetNormalizedAcceleratorDevice("custom-device"), "not in the default table")
+	})
+}
+
 func TestGetAcceleratorResourceName(t *testing.T) {
 	t.Run("returns device class specific resource name", func(t *testing.T) {
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{

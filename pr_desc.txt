@@ -1,0 +1,26 @@
+## Overview
+
+`GetNormalizedAcceleratorDevice` maps a task's `gpu_accelerator.device` string to the node label value the pod's node affinity and toleration carry. It looks the string up in the `accelerator-devices` table and falls back to the string itself.
+
+That table can be overridden per cluster, and an override replaces the whole default (the config loader zeroes a field before applying a file's value). The dataplane chart's own EKS Auto Mode example does exactly that, keyed on the spellings SDKs write today (`NVIDIA-TESLA-T4`) because Auto Mode labels nodes `t4`. Such a table has none of the canonical `AcceleratorModel` names that #8078 added to the default, so once anything emits `nvidia-t4` — the `default_accelerator` setting now, SDK tasks later — the lookup misses, the pod asks for a node labelled `nvidia-t4`, and pends forever.
+
+## Change
+
+On a miss, the lookup retries the table under the other spellings the compiled-in default has for the same accelerator, before falling back:
+
+- `config.AcceleratorDeviceAliases(key)`: for a key in the default table, the node label it resolves to by default (upper-cased) plus every other default key that resolves to that label. For `NVIDIA-T4` that is `NVIDIA-TESLA-T4` and `T4`; for `NVIDIA-H100`, whose short-name row points elsewhere, it is `NVIDIA-TESLA-H100` alone. Derived once from a copy of the default table taken at init, so an override cannot reach it, and there is no second hand-written list to drift.
+- `GetNormalizedAcceleratorDevice`: direct hit, then each alias in order, then the device string as before.
+
+A direct row always wins, legacy spellings resolve exactly as they did, and a string outside the default table behaves as before. The only new outcome is a hit where there was a miss.
+
+## Tests
+
+`config_test.go` pins the alias sets for a canonical name, an H100, a name whose label equals itself, a legacy spelling, an unknown string, and that an override does not change them. `utils_test.go` resolves canonical names through a table keyed like the EKS Auto Mode example, checks a direct row beats an alias, and that a name with no row under any spelling still falls back.
+
+## Rollout
+
+Same function exists in the unionai/flyte fork for propeller v1, the operator's app pods and the executions dry run; that copy gets the identical change separately.
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+https://claude.ai/code/session_015SgmdpM5SY1Har5J6Lu4EZ

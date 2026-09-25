@@ -98,13 +98,22 @@ func GetServiceAccountNameFromTaskExecutionMetadata(taskExecutionMetadata plugin
 	return serviceAccount
 }
 
-// getNormalizedAcceleratorDevice returns the normalized name for the given device.
+// GetNormalizedAcceleratorDevice returns the normalized name for the given device.
 // This should map to the node label that the corresponding nodes are provisioned with.
-// Falls back to the original device name if the device is not configured.
+// A device missing from the accelerator-devices table is retried under the
+// other spellings the default table has for the same accelerator, so a table
+// overridden per cluster and keyed on the names older SDKs wrote still
+// resolves a canonical name. Falls back to the original device name.
 func GetNormalizedAcceleratorDevice(device string) string {
 	cfg := config.GetK8sPluginConfig()
-	if normalized, ok := cfg.AcceleratorDevices[strings.ToUpper(device)]; ok {
+	key := strings.ToUpper(device)
+	if normalized, ok := cfg.AcceleratorDevices[key]; ok {
 		return normalized
+	}
+	for _, alias := range config.AcceleratorDeviceAliases(key) {
+		if normalized, ok := cfg.AcceleratorDevices[alias]; ok {
+			return normalized
+		}
 	}
 	return device
 }
