@@ -87,5 +87,10 @@ func DownloadFileFromHTTP(ctx context.Context, ref storage.DataReference) (io.Re
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to download from url :%s", ref)
 	}
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		_ = resp.Body.Close()
+		return nil, fmt.Errorf("failed to download from url %s, received HTTP status %d %s", ref, resp.StatusCode, resp.Status)
+	}
+	logger.Infof(ctx, "HTTP download started: [%s], status=%d, content-length=%s", ref, resp.StatusCode, resp.Header.Get("Content-Length"))
 	return resp.Body, nil
 }

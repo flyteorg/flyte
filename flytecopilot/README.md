@@ -12,6 +12,9 @@ This is achieved using `flyte-copilot` a binary that runs in 2 modes,
 $ flyte-copilot downloader
 ```
 
+Useful flag:
+- `--concurrency-per-cpu`: Limits parallel download work. Effective concurrency is `GOMAXPROCS * concurrency-per-cpu` (with a max cap).
+
 In K8s `flyte-copilot downloader` can be run as part of the init containers with the download volume mounted. This guarantees that the metadata and any data (if configured)
 is downloaded before the main container starts up. 
 
@@ -26,6 +29,9 @@ is downloaded before the main container starts up.
 ```bash
 $ flyte-copilot sidecar
 ```   
+
+Useful flag:
+- `--concurrency-per-cpu`: Limits parallel upload work. Effective concurrency is `GOMAXPROCS * concurrency-per-cpu` (with a max cap).
 
 ### Raw notes
   Solution 1:
