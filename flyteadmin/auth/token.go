@@ -106,11 +106,40 @@ func GRPCGetIdentityFromIDToken(ctx context.Context, clientID string, provider *
 		return nil, errors.Errorf(ErrJwtValidation, "%v token is blank", IDTokenScheme)
 	}
 
+	return grpcIdentityFromIDTokenString(ctx, tokenStr, clientID, provider)
+}
+
+// GRPCGetIdentityFromBearerIDToken handles clients that present an OIDC ID token from the configured userAuth
+// provider with the Bearer scheme instead of the IDToken scheme, for example flytectl's ExternalCommand auth type,
+// which always sends its token as Bearer. It is tried only after the bearer token failed validation as an access
+// token, and the token is verified exactly as an IDToken-scheme token would be.
+func GRPCGetIdentityFromBearerIDToken(ctx context.Context, clientID string, provider *oidc.Provider) (
+	interfaces.IdentityContext, error) {
+
+	if provider == nil {
+		return nil, errors.Errorf(ErrJwtValidation, "no OIDC provider configured to validate a bearer token as an ID token")
+	}
+
+	tokenStr, err := grpcauth.AuthFromMD(ctx, BearerScheme)
+	if err != nil {
+		return nil, errors.Wrapf(ErrJwtValidation, err, "Could not retrieve bearer token from metadata")
+	}
+
+	if tokenStr == "" {
+		return nil, errors.Errorf(ErrJwtValidation, "%v token is blank", BearerScheme)
+	}
+
+	return grpcIdentityFromIDTokenString(ctx, tokenStr, clientID, provider)
+}
+
+func grpcIdentityFromIDTokenString(ctx context.Context, tokenStr, clientID string, provider *oidc.Provider) (
+	interfaces.IdentityContext, error) {
+
 	meta := metautils.ExtractIncoming(ctx)
 	userInfoDecoded := meta.Get(UserInfoMDKey)
 	userInfo := &service.UserInfoResponse{}
 	if len(userInfoDecoded) > 0 {
-		err = json.Unmarshal([]byte(userInfoDecoded), userInfo)
+		err := json.Unmarshal([]byte(userInfoDecoded), userInfo)
 		if err != nil {
 			logger.Infof(ctx, "Could not unmarshal user info from metadata %v", err)
 		}
