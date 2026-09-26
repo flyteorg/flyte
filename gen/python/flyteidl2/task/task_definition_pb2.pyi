@@ -29,18 +29,20 @@ class TaskName(_message.Message):
     def __init__(self, org: _Optional[str] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
 
 class TaskIdentifier(_message.Message):
-    __slots__ = ["org", "project", "domain", "name", "version"]
+    __slots__ = ["org", "project", "domain", "name", "version", "alias"]
     ORG_FIELD_NUMBER: _ClassVar[int]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
+    ALIAS_FIELD_NUMBER: _ClassVar[int]
     org: str
     project: str
     domain: str
     name: str
     version: str
-    def __init__(self, org: _Optional[str] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., version: _Optional[str] = ...) -> None: ...
+    alias: str
+    def __init__(self, org: _Optional[str] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., version: _Optional[str] = ..., alias: _Optional[str] = ...) -> None: ...
 
 class TaskTriggersSummary(_message.Message):
     __slots__ = ["details", "stats"]

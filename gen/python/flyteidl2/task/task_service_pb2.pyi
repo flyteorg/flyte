@@ -99,3 +99,105 @@ class ListVersionsResponse(_message.Message):
     versions: _containers.RepeatedCompositeFieldContainer[ListVersionsResponse.VersionResponse]
     token: str
     def __init__(self, versions: _Optional[_Iterable[_Union[ListVersionsResponse.VersionResponse, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
+
+class TaskAliasName(_message.Message):
+    __slots__ = ["task_name", "alias"]
+    TASK_NAME_FIELD_NUMBER: _ClassVar[int]
+    ALIAS_FIELD_NUMBER: _ClassVar[int]
+    task_name: _task_definition_pb2.TaskName
+    alias: str
+    def __init__(self, task_name: _Optional[_Union[_task_definition_pb2.TaskName, _Mapping]] = ..., alias: _Optional[str] = ...) -> None: ...
+
+class TaskAlias(_message.Message):
+    __slots__ = ["name", "version", "set_by", "set_at"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    SET_BY_FIELD_NUMBER: _ClassVar[int]
+    SET_AT_FIELD_NUMBER: _ClassVar[int]
+    name: TaskAliasName
+    version: str
+    set_by: _identity_pb2.EnrichedIdentity
+    set_at: _timestamp_pb2.Timestamp
+    def __init__(self, name: _Optional[_Union[TaskAliasName, _Mapping]] = ..., version: _Optional[str] = ..., set_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., set_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+
+class TaskAliasRevision(_message.Message):
+    __slots__ = ["from_version", "to_version", "changed_by", "changed_at"]
+    FROM_VERSION_FIELD_NUMBER: _ClassVar[int]
+    TO_VERSION_FIELD_NUMBER: _ClassVar[int]
+    CHANGED_BY_FIELD_NUMBER: _ClassVar[int]
+    CHANGED_AT_FIELD_NUMBER: _ClassVar[int]
+    from_version: str
+    to_version: str
+    changed_by: _identity_pb2.EnrichedIdentity
+    changed_at: _timestamp_pb2.Timestamp
+    def __init__(self, from_version: _Optional[str] = ..., to_version: _Optional[str] = ..., changed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., changed_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+
+class SetTaskAliasRequest(_message.Message):
+    __slots__ = ["name", "version"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    name: TaskAliasName
+    version: str
+    def __init__(self, name: _Optional[_Union[TaskAliasName, _Mapping]] = ..., version: _Optional[str] = ...) -> None: ...
+
+class SetTaskAliasResponse(_message.Message):
+    __slots__ = ["alias", "previous_version"]
+    ALIAS_FIELD_NUMBER: _ClassVar[int]
+    PREVIOUS_VERSION_FIELD_NUMBER: _ClassVar[int]
+    alias: TaskAlias
+    previous_version: str
+    def __init__(self, alias: _Optional[_Union[TaskAlias, _Mapping]] = ..., previous_version: _Optional[str] = ...) -> None: ...
+
+class GetTaskAliasRequest(_message.Message):
+    __slots__ = ["name"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    name: TaskAliasName
+    def __init__(self, name: _Optional[_Union[TaskAliasName, _Mapping]] = ...) -> None: ...
+
+class GetTaskAliasResponse(_message.Message):
+    __slots__ = ["alias"]
+    ALIAS_FIELD_NUMBER: _ClassVar[int]
+    alias: TaskAlias
+    def __init__(self, alias: _Optional[_Union[TaskAlias, _Mapping]] = ...) -> None: ...
+
+class ListTaskAliasesRequest(_message.Message):
+    __slots__ = ["task_name", "request"]
+    TASK_NAME_FIELD_NUMBER: _ClassVar[int]
+    REQUEST_FIELD_NUMBER: _ClassVar[int]
+    task_name: _task_definition_pb2.TaskName
+    request: _list_pb2.ListRequest
+    def __init__(self, task_name: _Optional[_Union[_task_definition_pb2.TaskName, _Mapping]] = ..., request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ...) -> None: ...
+
+class ListTaskAliasesResponse(_message.Message):
+    __slots__ = ["aliases", "token"]
+    ALIASES_FIELD_NUMBER: _ClassVar[int]
+    TOKEN_FIELD_NUMBER: _ClassVar[int]
+    aliases: _containers.RepeatedCompositeFieldContainer[TaskAlias]
+    token: str
+    def __init__(self, aliases: _Optional[_Iterable[_Union[TaskAlias, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
+
+class DeleteTaskAliasRequest(_message.Message):
+    __slots__ = ["name"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    name: TaskAliasName
+    def __init__(self, name: _Optional[_Union[TaskAliasName, _Mapping]] = ...) -> None: ...
+
+class DeleteTaskAliasResponse(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class GetTaskAliasHistoryRequest(_message.Message):
+    __slots__ = ["name", "request"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    REQUEST_FIELD_NUMBER: _ClassVar[int]
+    name: TaskAliasName
+    request: _list_pb2.ListRequest
+    def __init__(self, name: _Optional[_Union[TaskAliasName, _Mapping]] = ..., request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ...) -> None: ...
+
+class GetTaskAliasHistoryResponse(_message.Message):
+    __slots__ = ["revisions", "token"]
+    REVISIONS_FIELD_NUMBER: _ClassVar[int]
+    TOKEN_FIELD_NUMBER: _ClassVar[int]
+    revisions: _containers.RepeatedCompositeFieldContainer[TaskAliasRevision]
+    token: str
+    def __init__(self, revisions: _Optional[_Iterable[_Union[TaskAliasRevision, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...

@@ -19,7 +19,7 @@ from flyteidl2.task import task_definition_pb2 as flyteidl2_dot_task_dot_task__d
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!flyteidl2/task/task_service.proto\x12\x0e\x66lyteidl2.task\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1f\x66lyteidl2/common/identity.proto\x1a\x1b\x66lyteidl2/common/list.proto\x1a$flyteidl2/task/task_definition.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc3\x01\n\x11\x44\x65ployTaskRequest\x12?\n\x07task_id\x18\x01 \x01(\x0b\x32\x1e.flyteidl2.task.TaskIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x06taskId\x12\x34\n\x04spec\x18\x02 \x01(\x0b\x32\x18.flyteidl2.task.TaskSpecB\x06\xbaH\x03\xc8\x01\x01R\x04spec\x12\x37\n\x08triggers\x18\x03 \x03(\x0b\x32\x1b.flyteidl2.task.TaskTriggerR\x08triggers\"\x14\n\x12\x44\x65ployTaskResponse\"X\n\x15GetTaskDetailsRequest\x12?\n\x07task_id\x18\x01 \x01(\x0b\x32\x1e.flyteidl2.task.TaskIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x06taskId\"O\n\x16GetTaskDetailsResponse\x12\x35\n\x07\x64\x65tails\x18\x01 \x01(\x0b\x32\x1b.flyteidl2.task.TaskDetailsR\x07\x64\x65tails\"\xfa\x02\n\x10ListTasksRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12\x1b\n\x03org\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x00R\x03org\x12\x44\n\nproject_id\x18\x03 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\tprojectId\x12Q\n\rknown_filters\x18\x04 \x03(\x0b\x32,.flyteidl2.task.ListTasksRequest.KnownFilterR\x0cknownFilters\x1a\x64\n\x0bKnownFilter\x12!\n\x0b\x64\x65ployed_by\x18\x01 \x01(\tH\x00R\ndeployedBy\x12%\n\ris_entrypoint\x18\x02 \x01(\x08H\x00R\x0cisEntrypointB\x0b\n\tfilter_byB\x11\n\x08scope_by\x12\x05\xbaH\x02\x08\x01\"\xf8\x01\n\x11ListTasksResponse\x12*\n\x05tasks\x18\x01 \x03(\x0b\x32\x14.flyteidl2.task.TaskR\x05tasks\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\x12O\n\x08metadata\x18\x03 \x01(\x0b\x32\x33.flyteidl2.task.ListTasksResponse.ListTasksMetadataR\x08metadata\x1aP\n\x11ListTasksMetadata\x12\x14\n\x05total\x18\x01 \x01(\rR\x05total\x12%\n\x0e\x66iltered_total\x18\x02 \x01(\rR\rfilteredTotal\"\x8d\x01\n\x13ListVersionsRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12=\n\ttask_name\x18\x02 \x01(\x0b\x32\x18.flyteidl2.task.TaskNameB\x06\xbaH\x03\xc8\x01\x01R\x08taskName\"\x93\x03\n\x14ListVersionsResponse\x12P\n\x08versions\x18\x01 \x03(\x0b\x32\x34.flyteidl2.task.ListVersionsResponse.VersionResponseR\x08versions\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\x1a\x92\x02\n\x0fVersionResponse\x12\x18\n\x07version\x18\x01 \x01(\tR\x07version\x12\x43\n\x0b\x64\x65ployed_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01R\ndeployedAt\x12K\n\x0b\x64\x65ployed_by\x18\x03 \x01(\x0b\x32\".flyteidl2.common.EnrichedIdentityB\x06\xbaH\x03\xc8\x01\x01R\ndeployedBy\x12\x44\n\nlatest_run\x18\x04 \x01(\x0b\x32 .flyteidl2.task.LatestRunSummaryH\x00R\tlatestRun\x88\x01\x01\x42\r\n\x0b_latest_run2\x81\x03\n\x0bTaskService\x12U\n\nDeployTask\x12!.flyteidl2.task.DeployTaskRequest\x1a\".flyteidl2.task.DeployTaskResponse\"\x00\x12\x64\n\x0eGetTaskDetails\x12%.flyteidl2.task.GetTaskDetailsRequest\x1a&.flyteidl2.task.GetTaskDetailsResponse\"\x03\x90\x02\x01\x12U\n\tListTasks\x12 .flyteidl2.task.ListTasksRequest\x1a!.flyteidl2.task.ListTasksResponse\"\x03\x90\x02\x01\x12^\n\x0cListVersions\x12#.flyteidl2.task.ListVersionsRequest\x1a$.flyteidl2.task.ListVersionsResponse\"\x03\x90\x02\x01\x42\xb5\x01\n\x12\x63om.flyteidl2.taskB\x10TaskServiceProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task\xa2\x02\x03\x46TX\xaa\x02\x0e\x46lyteidl2.Task\xca\x02\x0e\x46lyteidl2\\Task\xe2\x02\x1a\x46lyteidl2\\Task\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Taskb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!flyteidl2/task/task_service.proto\x12\x0e\x66lyteidl2.task\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1f\x66lyteidl2/common/identity.proto\x1a\x1b\x66lyteidl2/common/list.proto\x1a$flyteidl2/task/task_definition.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc3\x01\n\x11\x44\x65ployTaskRequest\x12?\n\x07task_id\x18\x01 \x01(\x0b\x32\x1e.flyteidl2.task.TaskIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x06taskId\x12\x34\n\x04spec\x18\x02 \x01(\x0b\x32\x18.flyteidl2.task.TaskSpecB\x06\xbaH\x03\xc8\x01\x01R\x04spec\x12\x37\n\x08triggers\x18\x03 \x03(\x0b\x32\x1b.flyteidl2.task.TaskTriggerR\x08triggers\"\x14\n\x12\x44\x65ployTaskResponse\"X\n\x15GetTaskDetailsRequest\x12?\n\x07task_id\x18\x01 \x01(\x0b\x32\x1e.flyteidl2.task.TaskIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x06taskId\"O\n\x16GetTaskDetailsResponse\x12\x35\n\x07\x64\x65tails\x18\x01 \x01(\x0b\x32\x1b.flyteidl2.task.TaskDetailsR\x07\x64\x65tails\"\xfa\x02\n\x10ListTasksRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12\x1b\n\x03org\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x00R\x03org\x12\x44\n\nproject_id\x18\x03 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\tprojectId\x12Q\n\rknown_filters\x18\x04 \x03(\x0b\x32,.flyteidl2.task.ListTasksRequest.KnownFilterR\x0cknownFilters\x1a\x64\n\x0bKnownFilter\x12!\n\x0b\x64\x65ployed_by\x18\x01 \x01(\tH\x00R\ndeployedBy\x12%\n\ris_entrypoint\x18\x02 \x01(\x08H\x00R\x0cisEntrypointB\x0b\n\tfilter_byB\x11\n\x08scope_by\x12\x05\xbaH\x02\x08\x01\"\xf8\x01\n\x11ListTasksResponse\x12*\n\x05tasks\x18\x01 \x03(\x0b\x32\x14.flyteidl2.task.TaskR\x05tasks\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\x12O\n\x08metadata\x18\x03 \x01(\x0b\x32\x33.flyteidl2.task.ListTasksResponse.ListTasksMetadataR\x08metadata\x1aP\n\x11ListTasksMetadata\x12\x14\n\x05total\x18\x01 \x01(\rR\x05total\x12%\n\x0e\x66iltered_total\x18\x02 \x01(\rR\rfilteredTotal\"\x8d\x01\n\x13ListVersionsRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12=\n\ttask_name\x18\x02 \x01(\x0b\x32\x18.flyteidl2.task.TaskNameB\x06\xbaH\x03\xc8\x01\x01R\x08taskName\"\x93\x03\n\x14ListVersionsResponse\x12P\n\x08versions\x18\x01 \x03(\x0b\x32\x34.flyteidl2.task.ListVersionsResponse.VersionResponseR\x08versions\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\x1a\x92\x02\n\x0fVersionResponse\x12\x18\n\x07version\x18\x01 \x01(\tR\x07version\x12\x43\n\x0b\x64\x65ployed_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01R\ndeployedAt\x12K\n\x0b\x64\x65ployed_by\x18\x03 \x01(\x0b\x32\".flyteidl2.common.EnrichedIdentityB\x06\xbaH\x03\xc8\x01\x01R\ndeployedBy\x12\x44\n\nlatest_run\x18\x04 \x01(\x0b\x32 .flyteidl2.task.LatestRunSummaryH\x00R\tlatestRun\x88\x01\x01\x42\r\n\x0b_latest_run\"o\n\rTaskAliasName\x12=\n\ttask_name\x18\x01 \x01(\x0b\x32\x18.flyteidl2.task.TaskNameB\x06\xbaH\x03\xc8\x01\x01R\x08taskName\x12\x1f\n\x05\x61lias\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x05\x61lias\"\xce\x01\n\tTaskAlias\x12\x39\n\x04name\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.task.TaskAliasNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12\x18\n\x07version\x18\x02 \x01(\tR\x07version\x12\x39\n\x06set_by\x18\x03 \x01(\x0b\x32\".flyteidl2.common.EnrichedIdentityR\x05setBy\x12\x31\n\x06set_at\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x05setAt\"\xd3\x01\n\x11TaskAliasRevision\x12!\n\x0c\x66rom_version\x18\x01 \x01(\tR\x0b\x66romVersion\x12\x1d\n\nto_version\x18\x02 \x01(\tR\ttoVersion\x12\x41\n\nchanged_by\x18\x03 \x01(\x0b\x32\".flyteidl2.common.EnrichedIdentityR\tchangedBy\x12\x39\n\nchanged_at\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tchangedAt\"u\n\x13SetTaskAliasRequest\x12\x39\n\x04name\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.task.TaskAliasNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12#\n\x07version\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18?R\x07version\"r\n\x14SetTaskAliasResponse\x12/\n\x05\x61lias\x18\x01 \x01(\x0b\x32\x19.flyteidl2.task.TaskAliasR\x05\x61lias\x12)\n\x10previous_version\x18\x02 \x01(\tR\x0fpreviousVersion\"P\n\x13GetTaskAliasRequest\x12\x39\n\x04name\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.task.TaskAliasNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\"G\n\x14GetTaskAliasResponse\x12/\n\x05\x61lias\x18\x01 \x01(\x0b\x32\x19.flyteidl2.task.TaskAliasR\x05\x61lias\"\x90\x01\n\x16ListTaskAliasesRequest\x12=\n\ttask_name\x18\x01 \x01(\x0b\x32\x18.flyteidl2.task.TaskNameB\x06\xbaH\x03\xc8\x01\x01R\x08taskName\x12\x37\n\x07request\x18\x02 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\"d\n\x17ListTaskAliasesResponse\x12\x33\n\x07\x61liases\x18\x01 \x03(\x0b\x32\x19.flyteidl2.task.TaskAliasR\x07\x61liases\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\"S\n\x16\x44\x65leteTaskAliasRequest\x12\x39\n\x04name\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.task.TaskAliasNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\"\x19\n\x17\x44\x65leteTaskAliasResponse\"\x90\x01\n\x1aGetTaskAliasHistoryRequest\x12\x39\n\x04name\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.task.TaskAliasNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12\x37\n\x07request\x18\x02 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\"t\n\x1bGetTaskAliasHistoryResponse\x12?\n\trevisions\x18\x01 \x03(\x0b\x32!.flyteidl2.task.TaskAliasRevisionR\trevisions\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token2\x82\x07\n\x0bTaskService\x12U\n\nDeployTask\x12!.flyteidl2.task.DeployTaskRequest\x1a\".flyteidl2.task.DeployTaskResponse\"\x00\x12\x64\n\x0eGetTaskDetails\x12%.flyteidl2.task.GetTaskDetailsRequest\x1a&.flyteidl2.task.GetTaskDetailsResponse\"\x03\x90\x02\x01\x12U\n\tListTasks\x12 .flyteidl2.task.ListTasksRequest\x1a!.flyteidl2.task.ListTasksResponse\"\x03\x90\x02\x01\x12^\n\x0cListVersions\x12#.flyteidl2.task.ListVersionsRequest\x1a$.flyteidl2.task.ListVersionsResponse\"\x03\x90\x02\x01\x12[\n\x0cSetTaskAlias\x12#.flyteidl2.task.SetTaskAliasRequest\x1a$.flyteidl2.task.SetTaskAliasResponse\"\x00\x12^\n\x0cGetTaskAlias\x12#.flyteidl2.task.GetTaskAliasRequest\x1a$.flyteidl2.task.GetTaskAliasResponse\"\x03\x90\x02\x01\x12g\n\x0fListTaskAliases\x12&.flyteidl2.task.ListTaskAliasesRequest\x1a\'.flyteidl2.task.ListTaskAliasesResponse\"\x03\x90\x02\x01\x12\x64\n\x0f\x44\x65leteTaskAlias\x12&.flyteidl2.task.DeleteTaskAliasRequest\x1a\'.flyteidl2.task.DeleteTaskAliasResponse\"\x00\x12s\n\x13GetTaskAliasHistory\x12*.flyteidl2.task.GetTaskAliasHistoryRequest\x1a+.flyteidl2.task.GetTaskAliasHistoryResponse\"\x03\x90\x02\x01\x42\xb5\x01\n\x12\x63om.flyteidl2.taskB\x10TaskServiceProtoH\x02P\x01Z2github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task\xa2\x02\x03\x46TX\xaa\x02\x0e\x46lyteidl2.Task\xca\x02\x0e\x46lyteidl2\\Task\xe2\x02\x1a\x46lyteidl2\\Task\\GPBMetadata\xea\x02\x0f\x46lyteidl2::Taskb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -43,12 +43,36 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _LISTVERSIONSRESPONSE_VERSIONRESPONSE.fields_by_name['deployed_at']._serialized_options = b'\272H\003\310\001\001'
   _LISTVERSIONSRESPONSE_VERSIONRESPONSE.fields_by_name['deployed_by']._options = None
   _LISTVERSIONSRESPONSE_VERSIONRESPONSE.fields_by_name['deployed_by']._serialized_options = b'\272H\003\310\001\001'
+  _TASKALIASNAME.fields_by_name['task_name']._options = None
+  _TASKALIASNAME.fields_by_name['task_name']._serialized_options = b'\272H\003\310\001\001'
+  _TASKALIASNAME.fields_by_name['alias']._options = None
+  _TASKALIASNAME.fields_by_name['alias']._serialized_options = b'\272H\006r\004\020\001\030?'
+  _TASKALIAS.fields_by_name['name']._options = None
+  _TASKALIAS.fields_by_name['name']._serialized_options = b'\272H\003\310\001\001'
+  _SETTASKALIASREQUEST.fields_by_name['name']._options = None
+  _SETTASKALIASREQUEST.fields_by_name['name']._serialized_options = b'\272H\003\310\001\001'
+  _SETTASKALIASREQUEST.fields_by_name['version']._options = None
+  _SETTASKALIASREQUEST.fields_by_name['version']._serialized_options = b'\272H\006r\004\020\001\030?'
+  _GETTASKALIASREQUEST.fields_by_name['name']._options = None
+  _GETTASKALIASREQUEST.fields_by_name['name']._serialized_options = b'\272H\003\310\001\001'
+  _LISTTASKALIASESREQUEST.fields_by_name['task_name']._options = None
+  _LISTTASKALIASESREQUEST.fields_by_name['task_name']._serialized_options = b'\272H\003\310\001\001'
+  _DELETETASKALIASREQUEST.fields_by_name['name']._options = None
+  _DELETETASKALIASREQUEST.fields_by_name['name']._serialized_options = b'\272H\003\310\001\001'
+  _GETTASKALIASHISTORYREQUEST.fields_by_name['name']._options = None
+  _GETTASKALIASHISTORYREQUEST.fields_by_name['name']._serialized_options = b'\272H\003\310\001\001'
   _TASKSERVICE.methods_by_name['GetTaskDetails']._options = None
   _TASKSERVICE.methods_by_name['GetTaskDetails']._serialized_options = b'\220\002\001'
   _TASKSERVICE.methods_by_name['ListTasks']._options = None
   _TASKSERVICE.methods_by_name['ListTasks']._serialized_options = b'\220\002\001'
   _TASKSERVICE.methods_by_name['ListVersions']._options = None
   _TASKSERVICE.methods_by_name['ListVersions']._serialized_options = b'\220\002\001'
+  _TASKSERVICE.methods_by_name['GetTaskAlias']._options = None
+  _TASKSERVICE.methods_by_name['GetTaskAlias']._serialized_options = b'\220\002\001'
+  _TASKSERVICE.methods_by_name['ListTaskAliases']._options = None
+  _TASKSERVICE.methods_by_name['ListTaskAliases']._serialized_options = b'\220\002\001'
+  _TASKSERVICE.methods_by_name['GetTaskAliasHistory']._options = None
+  _TASKSERVICE.methods_by_name['GetTaskAliasHistory']._serialized_options = b'\220\002\001'
   _globals['_DEPLOYTASKREQUEST']._serialized_start=251
   _globals['_DEPLOYTASKREQUEST']._serialized_end=446
   _globals['_DEPLOYTASKRESPONSE']._serialized_start=448
@@ -71,6 +95,32 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_LISTVERSIONSRESPONSE']._serialized_end=1821
   _globals['_LISTVERSIONSRESPONSE_VERSIONRESPONSE']._serialized_start=1547
   _globals['_LISTVERSIONSRESPONSE_VERSIONRESPONSE']._serialized_end=1821
-  _globals['_TASKSERVICE']._serialized_start=1824
-  _globals['_TASKSERVICE']._serialized_end=2209
+  _globals['_TASKALIASNAME']._serialized_start=1823
+  _globals['_TASKALIASNAME']._serialized_end=1934
+  _globals['_TASKALIAS']._serialized_start=1937
+  _globals['_TASKALIAS']._serialized_end=2143
+  _globals['_TASKALIASREVISION']._serialized_start=2146
+  _globals['_TASKALIASREVISION']._serialized_end=2357
+  _globals['_SETTASKALIASREQUEST']._serialized_start=2359
+  _globals['_SETTASKALIASREQUEST']._serialized_end=2476
+  _globals['_SETTASKALIASRESPONSE']._serialized_start=2478
+  _globals['_SETTASKALIASRESPONSE']._serialized_end=2592
+  _globals['_GETTASKALIASREQUEST']._serialized_start=2594
+  _globals['_GETTASKALIASREQUEST']._serialized_end=2674
+  _globals['_GETTASKALIASRESPONSE']._serialized_start=2676
+  _globals['_GETTASKALIASRESPONSE']._serialized_end=2747
+  _globals['_LISTTASKALIASESREQUEST']._serialized_start=2750
+  _globals['_LISTTASKALIASESREQUEST']._serialized_end=2894
+  _globals['_LISTTASKALIASESRESPONSE']._serialized_start=2896
+  _globals['_LISTTASKALIASESRESPONSE']._serialized_end=2996
+  _globals['_DELETETASKALIASREQUEST']._serialized_start=2998
+  _globals['_DELETETASKALIASREQUEST']._serialized_end=3081
+  _globals['_DELETETASKALIASRESPONSE']._serialized_start=3083
+  _globals['_DELETETASKALIASRESPONSE']._serialized_end=3108
+  _globals['_GETTASKALIASHISTORYREQUEST']._serialized_start=3111
+  _globals['_GETTASKALIASHISTORYREQUEST']._serialized_end=3255
+  _globals['_GETTASKALIASHISTORYRESPONSE']._serialized_start=3257
+  _globals['_GETTASKALIASHISTORYRESPONSE']._serialized_end=3373
+  _globals['_TASKSERVICE']._serialized_start=3376
+  _globals['_TASKSERVICE']._serialized_end=4274
 # @@protoc_insertion_point(module_scope)

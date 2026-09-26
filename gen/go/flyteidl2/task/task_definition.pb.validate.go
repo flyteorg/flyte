@@ -178,6 +178,8 @@ func (m *TaskIdentifier) validate(all bool) error {
 
 	// no validation rules for Version
 
+	// no validation rules for Alias
+
 	if len(errors) > 0 {
 		return TaskIdentifierMultiError(errors)
 	}
