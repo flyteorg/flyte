@@ -458,6 +458,9 @@ Distributed Flyte 2 core services
 | configuration.runs.identityHeaders.claimsJwtHeader | string | `"X-Amzn-Oidc-Data"` |  |
 | configuration.runs.identityHeaders.emailHeader | string | `""` |  |
 | configuration.runs.identityHeaders.subjectHeader | string | `"X-Amzn-Oidc-Identity"` |  |
+| configuration.runs.notificationBufferLimit | int | `65000` |  |
+| configuration.runs.notifyRetryMaxBackoff | string | `"5s"` |  |
+| configuration.runs.notifyRetryMinBackoff | string | `"50ms"` |  |
 | configuration.runs.seedProjects[0] | string | `"flytesnacks"` |  |
 | configuration.runs.server.host | string | `"0.0.0.0"` |  |
 | configuration.runs.server.port | int | `8080` |  |
