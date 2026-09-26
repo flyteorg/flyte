@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/testutil"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -16,6 +18,10 @@ func newSubscribeTestClient() *ActionsClient {
 		recordedFilter: testFilter(),
 		bufferSize:     10,
 		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+		droppedSubscriberUpdates: prometheus.NewCounter(prometheus.CounterOpts{
+			Name: "test_dropped_subscriber_updates",
+			Help: "test counter",
+		}),
 	}
 }
 
@@ -70,4 +76,17 @@ func TestUnsubscribeScopedByRun(t *testing.T) {
 
 	// Notifying after unsubscribe must not panic or deliver.
 	c.notifySubscribers(context.Background(), childUpdate("runA", "child1", "a0"))
+}
+
+func TestNotifySubscribersCountsDroppedUpdates(t *testing.T) {
+	c := newSubscribeTestClient()
+	c.bufferSize = 1
+
+	ch := c.Subscribe("runA", "a0")
+	ch <- childUpdate("runA", "existing", "a0")
+
+	c.notifySubscribers(context.Background(), childUpdate("runA", "dropped", "a0"))
+
+	assert.Equal(t, 1.0, testutil.ToFloat64(c.droppedSubscriberUpdates))
+	assert.Equal(t, "existing", (<-ch).ActionID.GetName())
 }
