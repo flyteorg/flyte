@@ -95,6 +95,7 @@ Options
       --imagePullOptions.platform string       Forces a specific platform's image to be pulled.'
       --imagePullOptions.registryAuth string   The base64 encoded credentials for the registry.
       --imagePullPolicy ImagePullPolicy        Optional. Defines the image pull behavior [Always/IfNotPresent/Never] (default Always)
+      --port string                            Optional. Specify the port for the Kubernetes in the sandbox. (default "6443")
       --pre                                    Optional. Pre release Version of flyte will be used for sandbox.
       --source string                          deprecated,  path of your source code,  please build images with local daemon
       --version string                         Version of flyte. Only supports flyte releases greater than v0.10.0

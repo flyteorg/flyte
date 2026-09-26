@@ -58,13 +58,16 @@ Usage
 
 func updateClusterResourceAttributesFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	updateConfig := clusterresourceattribute.DefaultUpdateConfig
-	if len(updateConfig.AttrFile) == 0 {
-		return fmt.Errorf("attrFile is mandatory while calling update for cluster resource attribute")
-	}
 
 	clustrResourceAttrFileConfig := clusterresourceattribute.AttrFileConfig{}
-	if err := sconfig.ReadConfigFromFile(&clustrResourceAttrFileConfig, updateConfig.AttrFile); err != nil {
-		return err
+	if updateConfig.AttrFile != "" {
+		if err := sconfig.ReadConfigFromFile(&clustrResourceAttrFileConfig, updateConfig.AttrFile); err != nil {
+			return err
+		}
+	} else if *clusterresourceattribute.DefaultAttrFileConfig == clustrResourceAttrFileConfig {
+		return fmt.Errorf("attrFile is mandatory while calling update for cluster resource attribute")
+	} else {
+		clustrResourceAttrFileConfig = *clusterresourceattribute.DefaultAttrFileConfig
 	}
 
 	// Get project domain workflow name from the read file.
