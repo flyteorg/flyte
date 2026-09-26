@@ -49,6 +49,10 @@ const ContainerFailed = "ContainerFailed"
 // send SIGTERM first, which surfaces as 143.
 const maxUserExitCode = 127
 
+// terminationMessageReadFailure is what the kubelet records in a container's termination message
+// when it cannot reach the container's log to read it. The accompanying exit code is fabricated.
+const terminationMessageReadFailure = "Error on reading termination message from logs"
+
 const defaultContainerTemplateName = "default"
 const defaultInitContainerTemplateName = "default-init"
 const primaryContainerTemplateName = "primary"
@@ -1630,7 +1634,7 @@ func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore
 	// container's exit status is taken as the task's result.
 	if code == "UnknownError" && len(status.ContainerStatuses) == 1 {
 		if t := status.ContainerStatuses[0].State.Terminated; t != nil &&
-			t.ExitCode > 0 && t.ExitCode <= maxUserExitCode {
+			t.ExitCode > 0 && t.ExitCode <= maxUserExitCode && !isTerminationStatusSynthesized(t) {
 			if t.Reason != "" {
 				code = t.Reason
 			} else {
@@ -1661,6 +1665,15 @@ func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore
 
 	logger.Warnf(ctx, "Pod failed with a user error. Code: %s, Message: %s", code, message)
 	return pluginsCore.PhaseInfoRetryableFailure(code, message, &info), nil
+}
+
+// isTerminationStatusSynthesized reports whether a container's terminated status was fabricated by
+// the runtime rather than observed from the application. When the pod is torn down before the
+// container finishes, the kubelet cannot read the termination log and reports a placeholder exit
+// code, in practice 2. That code says nothing about what the container did, so it must not be used
+// to attribute the failure to the user.
+func isTerminationStatusSynthesized(t *v1.ContainerStateTerminated) bool {
+	return t != nil && strings.Contains(t.Message, terminationMessageReadFailure)
 }
 
 func GetLastTransitionOccurredAt(pod *v1.Pod) metav1.Time {
