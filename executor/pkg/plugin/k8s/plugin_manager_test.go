@@ -260,6 +260,102 @@ func TestLaunchResourceErrors(t *testing.T) {
 	}
 }
 
+// A launch that finds a resource already under its name adopts it only when that resource is
+// alive: after a system retry the previous incarnation can still be draining its grace period
+// under the same name, and adopting it would rediscover its deletion next round and retry again,
+// once per reconcile, until it is finally gone.
+func TestLaunchResource_AlreadyExists(t *testing.T) {
+	now := metav1.Now()
+	tests := []struct {
+		name      string
+		existing  *v1.Pod
+		wantPhase pluginsCore.Phase
+	}{
+		{
+			name:      "a live resource is adopted",
+			existing:  &v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "name", Namespace: "ns"}},
+			wantPhase: pluginsCore.PhaseQueued,
+		},
+		{
+			name: "a draining resource is waited out",
+			existing: &v1.Pod{ObjectMeta: metav1.ObjectMeta{
+				Name:              "name",
+				Namespace:         "ns",
+				DeletionTimestamp: &now,
+				Finalizers:        []string{"flyte/flytek8s"},
+			}},
+			wantPhase: pluginsCore.PhaseWaitingForResources,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fakeClient := fake.NewClientBuilder().
+				WithScheme(k8sscheme.Scheme).
+				WithObjects(tt.existing).
+				Build()
+
+			kubeClient := &pluginsCoreMock.KubeClient{}
+			kubeClient.EXPECT().GetClient().Return(fakeClient)
+
+			plugin := &k8sMocks.Plugin{}
+			plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+			plugin.EXPECT().BuildResource(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+
+			tCtx := &pluginsCoreMock.TaskExecutionContext{}
+			tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("name"))
+
+			pm := NewPluginManager("test", plugin, kubeClient)
+
+			transition, err := pm.launchResource(context.Background(), tCtx)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.wantPhase, transition.Info().Phase())
+		})
+	}
+}
+
+// While the previous resource drains, Handle leaves the plugin at NotStarted, so the next round
+// launches again rather than checking on a resource that is not this attempt's and finding it
+// deleted once more.
+func TestHandle_WaitsForPreviousResourceToDrain(t *testing.T) {
+	now := metav1.Now()
+	draining := &v1.Pod{ObjectMeta: metav1.ObjectMeta{
+		Name:              "name",
+		Namespace:         "ns",
+		DeletionTimestamp: &now,
+		Finalizers:        []string{"flyte/flytek8s"},
+	}}
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(draining).Build()
+	kubeClient := &pluginsCoreMock.KubeClient{}
+	kubeClient.EXPECT().GetClient().Return(fakeClient)
+
+	// Zero state: the plugin has not started this incarnation, as after a system retry.
+	stateReader := &pluginsCoreMock.PluginStateReader{}
+	stateReader.EXPECT().Get(mock.Anything).Return(uint8(pluginStateVersion), nil)
+	var written PluginState
+	stateWriter := &pluginsCoreMock.PluginStateWriter{}
+	stateWriter.EXPECT().Put(uint8(pluginStateVersion), mock.Anything).Run(func(_ uint8, v interface{}) {
+		written = *(v.(*PluginState))
+	}).Return(nil)
+
+	tCtx := &pluginsCoreMock.TaskExecutionContext{}
+	tCtx.EXPECT().PluginStateReader().Return(stateReader)
+	tCtx.EXPECT().PluginStateWriter().Return(stateWriter)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("name"))
+
+	plugin := &k8sMocks.Plugin{}
+	plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+	plugin.EXPECT().BuildResource(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+
+	pm := NewPluginManager("test", plugin, kubeClient)
+
+	transition, err := pm.Handle(context.Background(), tCtx)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseWaitingForResources, transition.Info().Phase())
+	assert.Equal(t, PluginPhaseNotStarted, written.Phase)
+	assert.Equal(t, pluginsCore.PhaseWaitingForResources, written.K8sPluginState.Phase)
+}
+
 func TestHandle_CorruptedPluginStateFailsPermanently(t *testing.T) {
 	stateReader := &pluginsCoreMock.PluginStateReader{}
 	// (0, err) matches PluginStateManager's contract: the version is zeroed on decode failure.
@@ -753,4 +849,183 @@ func TestAddObjectMetadata_ManagedLabel(t *testing.T) {
 
 		assert.Equal(t, flytek8s.ManagedLabelValue, pod.GetLabels()[flytek8s.ManagedLabelKey])
 	})
+}
+
+func TestClassifyExternalTermination(t *testing.T) {
+	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
+	base := time.Date(2026, 9, 18, 10, 0, 0, 0, time.UTC)
+	const kueueMessage = "Preempted to accommodate a workload (UID: 1234, JobUID: 5678) due to prioritization in the ClusterQueue"
+	const explained = "Pod was terminated by an external controller: " + kueueMessage
+
+	stopped := func(uid k8stypes.UID, at time.Time, message string) *eventInfo {
+		return &eventInfo{
+			Message: message, Reason: "Stopped", CreatedAt: at, RecordedAt: at, LastObservedAt: at, RegardingUID: uid,
+		}
+	}
+	terminatingPod := func() *v1.Pod {
+		pod := failedPod()
+		pod.Status.Conditions = []v1.PodCondition{{
+			Type:    v1.PodConditionType("TerminationTarget"),
+			Status:  v1.ConditionTrue,
+			Reason:  "WorkloadEvictedDueToPreempted",
+			Message: kueueMessage,
+		}}
+		return pod
+	}
+	// The identity pod is what the manager has when the pod is already gone: name and
+	// kind, but no UID and no status.
+	identityPod := func() *v1.Pod {
+		return &v1.Pod{
+			TypeMeta:   metav1.TypeMeta{Kind: "Pod", APIVersion: "v1"},
+			ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "pod"},
+		}
+	}
+	deletedInfo := &pluginsCore.TaskInfo{OccurredAt: &base}
+	const deletedMessage = "object [ns/pod] terminated unexpectedly in the background"
+	const goneMessage = "resource not found, name [ns/pod]"
+	deleted := func() pluginsCore.PhaseInfo {
+		return pluginsCore.PhaseInfoSystemRetryableFailure(codeUnexpectedObjectDeletion, deletedMessage, deletedInfo)
+	}
+	gone := func() pluginsCore.PhaseInfo {
+		return pluginsCore.PhaseInfoSystemRetryableFailure(codeResourceDeletedExternally, goneMessage, nil)
+	}
+
+	tests := []struct {
+		name        string
+		resource    client.Object
+		events      []*eventInfo
+		phaseInfo   pluginsCore.PhaseInfo
+		noWatcher   bool
+		wantCode    string
+		wantMessage string
+		wantInfo    *pluginsCore.TaskInfo
+	}{
+		{
+			name:        "a pod caught mid-deletion reports the controller's reason",
+			resource:    terminatingPod(),
+			phaseInfo:   deleted(),
+			wantCode:    "WorkloadEvictedDueToPreempted",
+			wantMessage: explained,
+			wantInfo:    deletedInfo,
+		},
+		{
+			name:      "a pod mid-deletion without the condition is left alone",
+			resource:  failedPod(),
+			phaseInfo: deleted(),
+		},
+		{
+			name:        "a pod that is gone gets its Stopped event appended",
+			resource:    failedPod(),
+			events:      []*eventInfo{stopped(testPodUID, base, kueueMessage)},
+			phaseInfo:   gone(),
+			wantCode:    codeResourceDeletedExternally,
+			wantMessage: goneMessage + "; last event [Stopped]: " + kueueMessage,
+		},
+		{
+			name:     "the latest Stopped event wins",
+			resource: failedPod(),
+			events: []*eventInfo{
+				stopped(testPodUID, base.Add(time.Minute), kueueMessage),
+				stopped(testPodUID, base, "Not admitted by cluster queue"),
+			},
+			phaseInfo:   gone(),
+			wantCode:    codeResourceDeletedExternally,
+			wantMessage: goneMessage + "; last event [Stopped]: " + kueueMessage,
+		},
+		{
+			name:      "a Stopped event of another incarnation of the pod is not credited",
+			resource:  failedPod(),
+			events:    []*eventInfo{stopped("other-uid", base, kueueMessage)},
+			phaseInfo: gone(),
+		},
+		{
+			name:      "a Stopped event without a regarding UID is not trusted",
+			resource:  failedPod(),
+			events:    []*eventInfo{stopped("", base, kueueMessage)},
+			phaseInfo: gone(),
+		},
+		{
+			name:        "a pod whose UID is unknown takes the event on the name alone",
+			resource:    identityPod(),
+			events:      []*eventInfo{stopped("other-uid", base, kueueMessage)},
+			phaseInfo:   gone(),
+			wantCode:    codeResourceDeletedExternally,
+			wantMessage: goneMessage + "; last event [Stopped]: " + kueueMessage,
+		},
+		{
+			name:     "events other than Stopped are ignored",
+			resource: failedPod(),
+			events: []*eventInfo{{
+				Message: "Back-off restarting failed container", Reason: "BackOff",
+				CreatedAt: base, RecordedAt: base, LastObservedAt: base, RegardingUID: testPodUID,
+			}},
+			phaseInfo: gone(),
+		},
+		{
+			name:      "a failure the plugin classified itself is left alone",
+			resource:  terminatingPod(),
+			events:    []*eventInfo{stopped(testPodUID, base, kueueMessage)},
+			phaseInfo: pluginsCore.PhaseInfoSystemRetryableFailure("WorkloadEvictedDueToPreempted", explained+"\r\n[primary] terminated with exit code (137).", nil),
+		},
+		{
+			name:      "a user failure is left alone",
+			resource:  terminatingPod(),
+			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("OOMKilled", "oom", nil),
+		},
+		{
+			name:      "a running task is left alone",
+			resource:  terminatingPod(),
+			phaseInfo: pluginsCore.PhaseInfoRunning(1, nil),
+		},
+		{
+			name: "the resource is not a pod",
+			resource: &v1.Service{
+				TypeMeta:   metav1.TypeMeta{Kind: "Pod", APIVersion: "v1"},
+				ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "pod"},
+			},
+			phaseInfo: deleted(),
+		},
+		{
+			name:      "there is no event watcher",
+			resource:  failedPod(),
+			events:    []*eventInfo{stopped(testPodUID, base, kueueMessage)},
+			phaseInfo: gone(),
+			noWatcher: true,
+		},
+		{
+			name:      "there is no resource",
+			resource:  nil,
+			phaseInfo: gone(),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pm := NewPluginManager("test-plugin", nil, nil)
+			if !tt.noWatcher {
+				pm.eventWatcher = &fakeEventWatcher{events: map[watchedObjectKey][]*eventInfo{key: tt.events}}
+			}
+
+			got := pm.classifyExternalTermination(tt.resource, tt.phaseInfo)
+
+			assert.Equal(t, tt.phaseInfo.Phase(), got.Phase())
+			if tt.wantCode == "" {
+				// Left alone: the failure, if any, is reported exactly as it came in.
+				if tt.phaseInfo.Err() == nil {
+					assert.Nil(t, got.Err())
+					return
+				}
+				assert.Equal(t, tt.phaseInfo.Err().GetCode(), got.Err().GetCode())
+				assert.Equal(t, tt.phaseInfo.Err().GetMessage(), got.Err().GetMessage())
+				assert.Equal(t, tt.phaseInfo.Err().GetKind(), got.Err().GetKind())
+				return
+			}
+			assert.Equal(t, tt.wantCode, got.Err().GetCode())
+			assert.Equal(t, tt.wantMessage, got.Err().GetMessage())
+			assert.Equal(t, core.ExecutionError_SYSTEM, got.Err().GetKind())
+			if tt.wantInfo != nil {
+				assert.Same(t, tt.wantInfo, got.Info())
+			}
+		})
+	}
 }

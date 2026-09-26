@@ -137,6 +137,21 @@ func (r *TaskActionReconciler) recordEvent(ctx context.Context, event *workflow.
 	return err
 }
 
+// systemRetryReason is the reason on the Queued event published when an attempt is
+// relaunched in place after a system failure.
+const systemRetryReason = "restarting task after system failure"
+
+// systemRetryEventVersionBase is where the versions of system-retry events start.
+//
+// Action events are stored under (action, attempt, phase, version) and a duplicate key is
+// dropped on insert. A system retry keeps the attempt it is retrying and reports the same
+// Queued phase the launch events of that attempt already used, so it needs versions that
+// cannot collide with theirs. Plugins number their versions upwards from zero, one step at
+// a time, so a billion versions away is somewhere they cannot reach. The ceiling is the
+// store's, which keeps this column in a signed 32-bit integer: anything at or above 1<<31
+// fails to encode.
+const systemRetryEventVersionBase uint32 = 1 << 30
+
 // isSystemRetryableFailure reports whether the plugin transition is a
 // PhaseRetryableFailure with kind=SYSTEM (as produced by PhaseInfoSystemRetryableFailure).
 func isSystemRetryableFailure(phaseInfo pluginsCore.PhaseInfo) bool {
@@ -511,6 +526,47 @@ func (r *TaskActionReconciler) resetPluginResource(
 	taskAction.Status.PluginStateVersion = 0
 }
 
+// recordSystemRetry publishes the system failure an attempt is about to be retried
+// from, in place and under the same attempt number. The action is reported Queued,
+// which is where the relaunch takes it, and the failure travels as a warning cluster
+// event carrying the plugin's code and message, so it lands in the attempt's event
+// stream where the user can read it. The attempt's logs ride along, so the pod that
+// failed stays reachable from the event.
+func (r *TaskActionReconciler) recordSystemRetry(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	failure pluginsCore.PhaseInfo,
+) error {
+	occurredAt := r.now()
+	failureInfo := failure.Info()
+	if failureInfo != nil && failureInfo.OccurredAt != nil {
+		occurredAt = *failureInfo.OccurredAt
+	}
+	info := &pluginsCore.TaskInfo{
+		OccurredAt: &occurredAt,
+		AdditionalReasons: []pluginsCore.ReasonInfo{{
+			Reason:     systemErrorFromPhaseInfo(failure).Error(),
+			OccurredAt: &occurredAt,
+			KubernetesEvent: &pluginsCore.K8sEventMetadata{
+				Type:   corev1.EventTypeWarning,
+				Reason: failure.Err().GetCode(),
+			},
+		}},
+	}
+	if failureInfo != nil {
+		info.Logs = failureInfo.Logs
+		info.LogContext = failureInfo.LogContext
+	}
+	// The system-retry count places this retry within the reserved range: it holds until
+	// the retry is persisted, so republishing after a failed status update lands on the
+	// same row and stays idempotent, and it moves on with every retry after that. The
+	// consecutive system-failure count would not do: it goes back to zero as soon as the
+	// relaunched attempt makes progress, and the next failure would reuse a spent version.
+	version := systemRetryEventVersionBase + taskAction.Status.SystemRetries
+	queued := pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, version, systemRetryReason, info)
+	return r.recordEvent(ctx, r.buildActionEvent(ctx, taskAction, queued))
+}
+
 // nonRetryableErrorCodes are plugin error codes whose failures are deterministic:
 // the same input produces the same error, so retrying cannot change the outcome.
 // Note this only matches errors returned directly by a plugin; errors built from
@@ -810,6 +866,20 @@ func (r *TaskActionReconciler) reconcileTask(
 	phaseInfo := transition.Info()
 
 	if !cacheShortCircuited && isSystemRetryableFailure(phaseInfo) {
+		// The attempt is relaunched in place and nothing past this point reports
+		// the failure that caused it: recordSystemError persists a counter and a
+		// Kubernetes event on the TaskAction, not an action event. Publish it
+		// first, so the user can read why the action went back to Queued. The
+		// event only explains the retry, so a failure to publish is logged and
+		// left behind: holding the attempt back for it would turn a missing
+		// explanation into a stuck task.
+		if err := r.recordSystemRetry(ctx, taskAction, phaseInfo); err != nil {
+			logger.Error(err, "failed to publish system retry event, continuing with the retry")
+		}
+		// Spent whether or not the event went out: a skipped version costs nothing, a
+		// reused one drops the next retry's event. recordSystemError persists it along
+		// with the failure count.
+		taskAction.Status.SystemRetries++
 		r.resetPluginResource(ctx, taskAction, p, tCtx)
 		return r.recordSystemError(
 			ctx,
@@ -1243,9 +1313,27 @@ func toClusterEvents(phaseInfo pluginsCore.PhaseInfo, fallbackTime *timestamppb.
 		} else {
 			e.OccurredAt = fallbackTime
 		}
+		if k8sEvent := reason.KubernetesEvent; k8sEvent != nil {
+			e.Type = clusterEventType(k8sEvent.Type)
+			e.Reason = k8sEvent.Reason
+			e.SourceComponent = k8sEvent.SourceComponent
+			e.Count = k8sEvent.Count
+		}
 		out = append(out, e)
 	}
 	return out
+}
+
+// clusterEventType maps a Kubernetes event type onto the cluster event's own.
+func clusterEventType(eventType string) workflow.ClusterEvent_Type {
+	switch eventType {
+	case corev1.EventTypeNormal:
+		return workflow.ClusterEvent_TYPE_NORMAL
+	case corev1.EventTypeWarning:
+		return workflow.ClusterEvent_TYPE_WARNING
+	default:
+		return workflow.ClusterEvent_TYPE_UNSPECIFIED
+	}
 }
 
 func cacheStatusFromExternalResources(resources []*pluginsCore.ExternalResource) core.CatalogCacheStatus {
@@ -1269,6 +1357,7 @@ func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) b
 		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion ||
 		oldStatus.Attempts != newStatus.Attempts ||
 		oldStatus.SystemFailures != newStatus.SystemFailures ||
+		oldStatus.SystemRetries != newStatus.SystemRetries ||
 		oldStatus.CacheStatus != newStatus.CacheStatus ||
 		!oldStatus.AttemptStartedAt.Equal(newStatus.AttemptStartedAt) ||
 		!oldStatus.TimeoutAt.Equal(newStatus.TimeoutAt) {

@@ -9,6 +9,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"google.golang.org/protobuf/proto"
 	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +29,18 @@ import (
 )
 
 const pluginStateVersion = 1
+
+const (
+	// codeResourceDeletedExternally is the failure reported when the plugin's resource is
+	// gone from the cluster before the plugin saw it end.
+	codeResourceDeletedExternally = "ResourceDeletedExternally"
+	// codeUnexpectedObjectDeletion is the failure reported when the plugin's resource is
+	// being deleted while the plugin still considers it running.
+	codeUnexpectedObjectDeletion = "UnexpectedObjectDeletion"
+	// stoppedEventReason is the reason of the event Kueue's job framework records on a pod
+	// it stops, carrying the same message it puts on the pod's TerminationTarget condition.
+	stoppedEventReason = "Stopped"
+)
 
 // PluginPhase tracks the high-level phase of the PluginManager's state machine.
 type PluginPhase uint8
@@ -115,6 +128,15 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 	logger.Infof(ctx, "Creating Object: Type:[%v], Object:[%v/%v]", o.GetObjectKind().GroupVersionKind(), o.GetNamespace(), o.GetName())
 
 	err = pm.kubeClient.GetClient().Create(ctx, o)
+	if k8serrors.IsAlreadyExists(err) && !pm.canAdoptExisting(ctx, o) {
+		// The name is taken by the previous incarnation of this resource, still draining
+		// its grace period after a system retry aborted it. It is not this launch's
+		// resource: adopting it would only rediscover its deletion next round, abort and
+		// reset again, and land back here, once per reconcile until it is gone, reporting
+		// the same failure to the user each time. Wait for the name to free up instead.
+		return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResources(
+			time.Now(), pluginsCore.DefaultPhaseVersion, "waiting for the previous resource to be deleted")), nil
+	}
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
 		if k8serrors.IsForbidden(err) {
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil)), nil
@@ -143,6 +165,18 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 	return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "task submitted to K8s")), nil
 }
 
+// canAdoptExisting reports whether the resource a launch collided with can stand in for
+// the one it meant to create: it is there and not being deleted. That is the resource of
+// a launch whose state did not persist. A resource on its way out is not, and neither is
+// one that cannot be read; the next round can tell. o is overwritten with what the
+// cluster holds under its name.
+func (pm *PluginManager) canAdoptExisting(ctx context.Context, o client.Object) bool {
+	if err := pm.kubeClient.GetClient().Get(ctx, client.ObjectKeyFromObject(o), o); err != nil {
+		return false
+	}
+	return o.GetDeletionTimestamp() == nil
+}
+
 func (pm *PluginManager) getResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
 	o, err := pm.plugin.BuildIdentityResource(ctx, tCtx.TaskExecutionMetadata())
 	if err != nil {
@@ -161,7 +195,7 @@ func (pm *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCor
 		if k8serrors.IsNotFound(err) || k8serrors.IsGone(err) || k8serrors.IsResourceExpired(err) {
 			logger.Warningf(ctx, "Failed to find the Resource with name: %v. Error: %v", nsName, err)
 			failureReason := fmt.Sprintf("resource not found, name [%s]. reason: %s", nsName.String(), err.Error())
-			return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure("ResourceDeletedExternally", failureReason, nil)), nil
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(codeResourceDeletedExternally, failureReason, nil)), nil
 		}
 		logger.Warningf(ctx, "Failed to retrieve Resource Details with name: %v. Error: %v", nsName, err)
 		return pluginsCore.UnknownTransition, err
@@ -218,7 +252,7 @@ func (pm *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCor
 
 	if !p.Phase().IsTerminal() && o.GetDeletionTimestamp() != nil {
 		failureReason := fmt.Sprintf("object [%s] terminated unexpectedly in the background", nsName.String())
-		return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure("UnexpectedObjectDeletion", failureReason, nil)), nil
+		return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(codeUnexpectedObjectDeletion, failureReason, nil)), nil
 	}
 
 	return pluginsCore.DoTransition(p), nil
@@ -273,6 +307,7 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 			lastEventUpdate,
 			lastEventRecordedAt,
 		)
+		phaseInfo = pm.classifyExternalTermination(resource, phaseInfo)
 		phaseInfo = pm.classifyGpuFailure(resource, phaseInfo)
 		transition.SetInfo(phaseInfo)
 	}
@@ -423,6 +458,77 @@ func (pm *PluginManager) classifyGpuFailure(
 	}
 
 	return gpufault.ClassifyFailure(phaseInfo, faults)
+}
+
+// classifyExternalTermination folds what an external controller left behind on a pod it
+// stopped into the failure this manager reported for the pod's disappearance, so the user
+// reads that controller's reason (for Kueue, why the Workload was preempted) instead of a
+// bare deletion. Only the two failures the manager reports without looking at the pod are
+// touched; a pod the plugin itself classified is left alone, and so is anything that is
+// not a failed pod.
+//
+// A pod caught on its way out still carries the reason as its TerminationTarget
+// condition. A pod that is already gone left only its events behind, cached under a name
+// a replacement pod reuses, so its Stopped event is credited only when the event's
+// regarding UID is the pod's, or when the pod's UID is unknown because it vanished before
+// this round reached it (the same trade classifyGpuFailure makes).
+func (pm *PluginManager) classifyExternalTermination(
+	resource client.Object,
+	phaseInfo pluginsCore.PhaseInfo,
+) pluginsCore.PhaseInfo {
+	if resource == nil || !phaseInfo.Phase().IsFailure() || phaseInfo.Err() == nil {
+		return phaseInfo
+	}
+	pod, isPod := resource.(*v1.Pod)
+	if !isPod {
+		return phaseInfo
+	}
+
+	switch phaseInfo.Err().GetCode() {
+	case codeUnexpectedObjectDeletion:
+		c := flytek8s.GetTerminationTarget(pod.Status)
+		if c == nil {
+			return phaseInfo
+		}
+		return pluginsCore.PhaseInfoSystemRetryableFailure(
+			flytek8s.ExternalTerminationCode(c),
+			flytek8s.ExternalTerminationMessage(c),
+			phaseInfo.Info(),
+		)
+	case codeResourceDeletedExternally:
+		message, found := pm.stoppedEventMessage(pod)
+		if !found {
+			return phaseInfo
+		}
+		execErr := proto.Clone(phaseInfo.Err()).(*core.ExecutionError)
+		execErr.Message = fmt.Sprintf("%s; last event [%s]: %s", execErr.GetMessage(), stoppedEventReason, message)
+		return pluginsCore.PhaseInfoFailed(phaseInfo.Phase(), execErr, phaseInfo.Info())
+	}
+	return phaseInfo
+}
+
+// stoppedEventMessage is the message of the latest Stopped event recorded against the pod,
+// when there is one that can be credited to this pod.
+func (pm *PluginManager) stoppedEventMessage(pod *v1.Pod) (string, bool) {
+	if pm.eventWatcher == nil {
+		return "", false
+	}
+	var latest *eventInfo
+	for _, event := range pm.eventWatcher.List(objectKeyFor(pod), time.Time{}, time.Time{}) {
+		if event.Reason != stoppedEventReason || event.RegardingUID == "" {
+			continue
+		}
+		if pod.GetUID() != "" && event.RegardingUID != pod.GetUID() {
+			continue
+		}
+		if latest == nil || event.CreatedAt.After(latest.CreatedAt) {
+			latest = event
+		}
+	}
+	if latest == nil {
+		return "", false
+	}
+	return latest.Message, true
 }
 
 // phaseInfoOccurredAt is the time the plugin put on the failure, or the zero time when it
