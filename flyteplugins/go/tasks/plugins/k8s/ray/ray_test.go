@@ -1287,7 +1287,7 @@ func TestGetTaskPhaseTaskError(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, tc.expectedPhase, phase.Phase())
 			require.NotNil(t, phase.Err())
-			assert.Equal(t, tc.expectedKind, phase.Err().Kind)
+			assert.Equal(t, tc.expectedKind, phase.Err().GetKind())
 			assert.True(t, phase.CleanupOnFailure())
 		})
 	}
