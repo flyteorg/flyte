@@ -25,8 +25,7 @@ import (
 
 const (
 	rootActionName              = "a0"
-	pendingNotificationCapacity = 256
-	notificationBufferLimit     = 65_000
+	defaultNotificationBufferSize = 256
 	notifyRetryMinBackoff       = 50 * time.Millisecond
 	notifyRetryMaxBackoff       = 5 * time.Second
 )
@@ -38,10 +37,10 @@ type NotificationConfig struct {
 	retryMaxBackoff time.Duration
 }
 
-// NewNotificationConfig creates a notification config, replacing invalid values with defaults.
+// NewNotificationConfig creates a notification config, normalizing invalid values.
 func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff time.Duration) NotificationConfig {
-	if bufferLimit < pendingNotificationCapacity {
-		bufferLimit = notificationBufferLimit
+	if bufferLimit < defaultNotificationBufferSize {
+		bufferLimit = defaultNotificationBufferSize
 	}
 	if retryMinBackoff <= 0 {
 		retryMinBackoff = notifyRetryMinBackoff
@@ -96,10 +95,10 @@ func NewActionRepo(
 		notificationConfig: notificationConfig,
 	}
 
-	repo.pendingActions = make(map[string]struct{}, pendingNotificationCapacity)
-	repo.pendingActionQueue = make([]string, 0, pendingNotificationCapacity)
-	repo.pendingRuns = make(map[string]struct{}, pendingNotificationCapacity)
-	repo.pendingRunQueue = make([]string, 0, pendingNotificationCapacity)
+	repo.pendingActions = make(map[string]struct{}, defaultNotificationBufferSize)
+	repo.pendingActionQueue = make([]string, 0, defaultNotificationBufferSize)
+	repo.pendingRuns = make(map[string]struct{}, defaultNotificationBufferSize)
+	repo.pendingRunQueue = make([]string, 0, defaultNotificationBufferSize)
 	repo.pendingCh = make(chan struct{}, 1)
 
 	if err := repo.startPostgresListener(); err != nil {
@@ -1028,10 +1027,10 @@ func (r *actionRepo) takePendingNotifications() (actions, runs []string) {
 	defer r.notifyMu.Unlock()
 
 	actions, runs = r.pendingActionQueue, r.pendingRunQueue
-	r.pendingActions = make(map[string]struct{}, pendingNotificationCapacity)
-	r.pendingActionQueue = make([]string, 0, pendingNotificationCapacity)
-	r.pendingRuns = make(map[string]struct{}, pendingNotificationCapacity)
-	r.pendingRunQueue = make([]string, 0, pendingNotificationCapacity)
+	r.pendingActions = make(map[string]struct{}, defaultNotificationBufferSize)
+	r.pendingActionQueue = make([]string, 0, defaultNotificationBufferSize)
+	r.pendingRuns = make(map[string]struct{}, defaultNotificationBufferSize)
+	r.pendingRunQueue = make([]string, 0, defaultNotificationBufferSize)
 	return actions, runs
 }
 

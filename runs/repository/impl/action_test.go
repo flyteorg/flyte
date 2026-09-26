@@ -37,8 +37,11 @@ var testDbConfig = database.DbConfig{
 	},
 }
 
+// Recommended value based on 50K-scale performance testing.
+const testNotificationBufferLimit = 65_000
+
 var testNotificationConfig = NewNotificationConfig(
-	notificationBufferLimit,
+	testNotificationBufferLimit,
 	notifyRetryMinBackoff,
 	notifyRetryMaxBackoff,
 )
@@ -54,10 +57,10 @@ func setupActionDB(t *testing.T) *sqlx.DB {
 
 func newNotifyTestRepo(notificationConfig NotificationConfig) *actionRepo {
 	return &actionRepo{
-		pendingActions:     make(map[string]struct{}, pendingNotificationCapacity),
-		pendingActionQueue: make([]string, 0, pendingNotificationCapacity),
-		pendingRuns:        make(map[string]struct{}, pendingNotificationCapacity),
-		pendingRunQueue:    make([]string, 0, pendingNotificationCapacity),
+		pendingActions:     make(map[string]struct{}, defaultNotificationBufferSize),
+		pendingActionQueue: make([]string, 0, defaultNotificationBufferSize),
+		pendingRuns:        make(map[string]struct{}, defaultNotificationBufferSize),
+		pendingRunQueue:    make([]string, 0, defaultNotificationBufferSize),
 		pendingCh:          make(chan struct{}, 1),
 		notificationConfig: notificationConfig,
 	}
@@ -78,10 +81,10 @@ func newNotifyRepoWithDB(t *testing.T) (*actionRepo, *sql.DB, *sql.Conn) {
 		dsn:                database.GetPostgresDsn(context.Background(), testDbConfig.Postgres),
 		runSubscribers:     make(map[chan string]bool),
 		actionSubscribers:  make(map[chan string]bool),
-		pendingActions:     make(map[string]struct{}, pendingNotificationCapacity),
-		pendingActionQueue: make([]string, 0, pendingNotificationCapacity),
-		pendingRuns:        make(map[string]struct{}, pendingNotificationCapacity),
-		pendingRunQueue:    make([]string, 0, pendingNotificationCapacity),
+		pendingActions:     make(map[string]struct{}, defaultNotificationBufferSize),
+		pendingActionQueue: make([]string, 0, defaultNotificationBufferSize),
+		pendingRuns:        make(map[string]struct{}, defaultNotificationBufferSize),
+		pendingRunQueue:    make([]string, 0, defaultNotificationBufferSize),
 		pendingCh:          make(chan struct{}, 1),
 		notificationConfig: testNotificationConfig,
 	}
@@ -1023,19 +1026,19 @@ func TestEnqueuePending_EvictsOldestWhenFull(t *testing.T) {
 
 func TestNotificationBufferLimitConfig(t *testing.T) {
 	r := newNotifyTestRepo(NewNotificationConfig(
-		pendingNotificationCapacity,
+		defaultNotificationBufferSize,
 		testNotificationConfig.retryMinBackoff,
 		testNotificationConfig.retryMaxBackoff,
 	))
 
-	for i := 0; i <= pendingNotificationCapacity; i++ {
+	for i := 0; i <= defaultNotificationBufferSize; i++ {
 		r.markActionPending(fmt.Sprintf("action-%d", i))
 	}
 
 	actions, _ := r.takePendingNotifications()
-	require.Len(t, actions, pendingNotificationCapacity)
+	require.Len(t, actions, defaultNotificationBufferSize)
 	assert.Equal(t, "action-1", actions[0])
-	assert.Equal(t, fmt.Sprintf("action-%d", pendingNotificationCapacity), actions[len(actions)-1])
+	assert.Equal(t, fmt.Sprintf("action-%d", defaultNotificationBufferSize), actions[len(actions)-1])
 }
 
 func TestNewNotificationConfig(t *testing.T) {
@@ -1058,36 +1061,44 @@ func TestNewNotificationConfig(t *testing.T) {
 		"zero buffer limit": {
 			retryMinBackoff: notifyRetryMinBackoff,
 			retryMaxBackoff: notifyRetryMaxBackoff,
-			want:            testNotificationConfig,
+			want: NotificationConfig{
+				bufferLimit:     defaultNotificationBufferSize,
+				retryMinBackoff: notifyRetryMinBackoff,
+				retryMaxBackoff: notifyRetryMaxBackoff,
+			},
 		},
 		"buffer limit below pending capacity": {
-			bufferLimit:     pendingNotificationCapacity - 1,
-			retryMinBackoff: notifyRetryMinBackoff,
-			retryMaxBackoff: notifyRetryMaxBackoff,
-			want:            testNotificationConfig,
-		},
-		"buffer limit equals pending capacity": {
-			bufferLimit:     pendingNotificationCapacity,
+			bufferLimit:     defaultNotificationBufferSize - 1,
 			retryMinBackoff: notifyRetryMinBackoff,
 			retryMaxBackoff: notifyRetryMaxBackoff,
 			want: NotificationConfig{
-				bufferLimit:     pendingNotificationCapacity,
+				bufferLimit:     defaultNotificationBufferSize,
+				retryMinBackoff: notifyRetryMinBackoff,
+				retryMaxBackoff: notifyRetryMaxBackoff,
+			},
+		},
+		"buffer limit equals pending capacity": {
+			bufferLimit:     defaultNotificationBufferSize,
+			retryMinBackoff: notifyRetryMinBackoff,
+			retryMaxBackoff: notifyRetryMaxBackoff,
+			want: NotificationConfig{
+				bufferLimit:     defaultNotificationBufferSize,
 				retryMinBackoff: notifyRetryMinBackoff,
 				retryMaxBackoff: notifyRetryMaxBackoff,
 			},
 		},
 		"zero retry min backoff": {
-			bufferLimit:     notificationBufferLimit,
+			bufferLimit:     testNotificationBufferLimit,
 			retryMaxBackoff: notifyRetryMaxBackoff,
 			want:            testNotificationConfig,
 		},
 		"zero retry max backoff": {
-			bufferLimit:     notificationBufferLimit,
+			bufferLimit:     testNotificationBufferLimit,
 			retryMinBackoff: notifyRetryMinBackoff,
 			want:            testNotificationConfig,
 		},
 		"retry max below min": {
-			bufferLimit:     notificationBufferLimit,
+			bufferLimit:     testNotificationBufferLimit,
 			retryMinBackoff: 2 * time.Second,
 			retryMaxBackoff: time.Second,
 			want:            testNotificationConfig,
