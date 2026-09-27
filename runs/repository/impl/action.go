@@ -1138,6 +1138,7 @@ func enqueuePending(
 		return
 	}
 	if len(pending) >= limit {
+		logger.Warnf(context.Background(), "Notification buffer full, dropping buffer=%s payload=%s", bufferFrom, (*queue)[0])
 		delete(pending, (*queue)[0])
 		(*queue)[0] = ""
 		*queue = (*queue)[1:]
