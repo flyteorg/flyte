@@ -14,6 +14,9 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
+	metricnoop "go.opentelemetry.io/otel/metric/noop"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -24,17 +27,53 @@ import (
 )
 
 const (
-	rootActionName              = "a0"
-	defaultNotificationBufferSize = 256
-	notifyRetryMinBackoff       = 50 * time.Millisecond
-	notifyRetryMaxBackoff       = 5 * time.Second
+	rootActionName                                   = "a0"
+	defaultNotificationBufferSize                    = 256
+	notifyRetryMinBackoff                            = 50 * time.Millisecond
+	notifyRetryMaxBackoff                            = 5 * time.Second
+	notificationMeterName                            = "runs-repository"
+	notificationDeletedMetricName                    = "runs.notification.evictions"
+	notificationBufferAction      notificationBuffer = "action"
+	notificationBufferRun         notificationBuffer = "run"
 )
+
+type notificationBuffer string
 
 // NotificationConfig configures the pending notification queues and delivery retries.
 type NotificationConfig struct {
 	bufferLimit     int
 	retryMinBackoff time.Duration
 	retryMaxBackoff time.Duration
+}
+
+type notificationMetrics struct {
+	notifyDeletedCount metric.Int64Counter
+}
+
+func newNotificationMetrics(provider metric.MeterProvider) (*notificationMetrics, error) {
+	if provider == nil {
+		return nil, nil
+	}
+	if _, ok := provider.(metricnoop.MeterProvider); ok {
+		return nil, nil
+	}
+
+	notifyDeletedCount, err := provider.Meter(notificationMeterName).Int64Counter(
+		notificationDeletedMetricName,
+		metric.WithDescription("Pending notifications evicted because the notification queue reached its limit"),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &notificationMetrics{notifyDeletedCount: notifyDeletedCount}, nil
+}
+
+func (m *notificationMetrics) recordDeleted(ctx context.Context, bufferFrom notificationBuffer, count int64) {
+	if m == nil || m.notifyDeletedCount == nil || count == 0 {
+		return
+	}
+	m.notifyDeletedCount.Add(ctx, count, metric.WithAttributes(attribute.String("buffer_from", string(bufferFrom))))
 }
 
 // NewNotificationConfig creates a notification config, normalizing invalid values.
@@ -71,13 +110,14 @@ type actionRepo struct {
 	actionSubscribers map[chan string]bool
 	mu                sync.RWMutex
 
-	notifyMu           sync.Mutex
-	pendingActions     map[string]struct{}
-	pendingActionQueue []string
-	pendingRuns        map[string]struct{}
-	pendingRunQueue    []string
-	pendingCh          chan struct{}
-	notificationConfig NotificationConfig
+	notifyMu            sync.Mutex
+	pendingActions      map[string]struct{}
+	pendingActionQueue  []string
+	pendingRuns         map[string]struct{}
+	pendingRunQueue     []string
+	pendingCh           chan struct{}
+	notificationConfig  NotificationConfig
+	notificationMetrics *notificationMetrics
 }
 
 // NewActionRepo creates a new PostgreSQL repository
@@ -85,14 +125,25 @@ func NewActionRepo(
 	db *sqlx.DB,
 	dbConfig database.DbConfig,
 	notificationConfig NotificationConfig,
+	meterProviders ...metric.MeterProvider,
 ) (interfaces.ActionRepo, error) {
+	var meterProvider metric.MeterProvider
+	if len(meterProviders) > 0 {
+		meterProvider = meterProviders[0]
+	}
+	notificationMetrics, err := newNotificationMetrics(meterProvider)
+	if err != nil {
+		return nil, fmt.Errorf("register notification metrics: %w", err)
+	}
+
 	dsn := database.GetPostgresDsn(context.Background(), dbConfig.Postgres)
 	repo := &actionRepo{
-		db:                 db,
-		dsn:                dsn,
-		runSubscribers:     make(map[chan string]bool),
-		actionSubscribers:  make(map[chan string]bool),
-		notificationConfig: notificationConfig,
+		db:                  db,
+		dsn:                 dsn,
+		runSubscribers:      make(map[chan string]bool),
+		actionSubscribers:   make(map[chan string]bool),
+		notificationConfig:  notificationConfig,
+		notificationMetrics: notificationMetrics,
 	}
 
 	repo.pendingActions = make(map[string]struct{}, defaultNotificationBufferSize)
@@ -1010,7 +1061,10 @@ func (r *actionRepo) notifyRunUpdate(_ context.Context, runID *common.RunIdentif
 
 func (r *actionRepo) markRunPending(payload string) {
 	r.notifyMu.Lock()
-	enqueuePending(r.pendingRuns, &r.pendingRunQueue, payload, r.notificationConfig.bufferLimit)
+	enqueuePending(
+		r.pendingRuns, &r.pendingRunQueue, payload, r.notificationConfig.bufferLimit,
+		r.notificationMetrics, notificationBufferRun,
+	)
 	r.notifyMu.Unlock()
 	r.signalPending()
 }
@@ -1039,7 +1093,10 @@ func (r *actionRepo) mergePendingActions(actions []string) {
 		return
 	}
 	r.notifyMu.Lock()
-	r.pendingActions, r.pendingActionQueue = mergePending(actions, r.pendingActionQueue, r.notificationConfig.bufferLimit)
+	r.pendingActions, r.pendingActionQueue = mergePending(
+		actions, r.pendingActionQueue, r.notificationConfig.bufferLimit,
+		r.notificationMetrics, notificationBufferAction,
+	)
 	r.notifyMu.Unlock()
 }
 
@@ -1048,20 +1105,35 @@ func (r *actionRepo) mergePendingRuns(runs []string) {
 		return
 	}
 	r.notifyMu.Lock()
-	r.pendingRuns, r.pendingRunQueue = mergePending(runs, r.pendingRunQueue, r.notificationConfig.bufferLimit)
+	r.pendingRuns, r.pendingRunQueue = mergePending(
+		runs, r.pendingRunQueue, r.notificationConfig.bufferLimit,
+		r.notificationMetrics, notificationBufferRun,
+	)
 	r.notifyMu.Unlock()
 }
 
-func mergePending(retry, queued []string, limit int) (map[string]struct{}, []string) {
+func mergePending(
+	retry, queued []string,
+	limit int,
+	metrics *notificationMetrics,
+	bufferFrom notificationBuffer,
+) (map[string]struct{}, []string) {
 	pending := make(map[string]struct{}, len(retry)+len(queued))
 	queue := make([]string, 0, len(retry)+len(queued))
 	for _, payload := range append(retry, queued...) {
-		enqueuePending(pending, &queue, payload, limit)
+		enqueuePending(pending, &queue, payload, limit, metrics, bufferFrom)
 	}
 	return pending, queue
 }
 
-func enqueuePending(pending map[string]struct{}, queue *[]string, payload string, limit int) {
+func enqueuePending(
+	pending map[string]struct{},
+	queue *[]string,
+	payload string,
+	limit int,
+	metrics *notificationMetrics,
+	bufferFrom notificationBuffer,
+) {
 	if _, exists := pending[payload]; exists {
 		return
 	}
@@ -1069,6 +1141,7 @@ func enqueuePending(pending map[string]struct{}, queue *[]string, payload string
 		delete(pending, (*queue)[0])
 		(*queue)[0] = ""
 		*queue = (*queue)[1:]
+		metrics.recordDeleted(context.Background(), bufferFrom, 1)
 	}
 	pending[payload] = struct{}{}
 	*queue = append(*queue, payload)
@@ -1239,7 +1312,10 @@ func (r *actionRepo) notifyActionUpdate(_ context.Context, actionID *common.Acti
 
 func (r *actionRepo) markActionPending(payload string) {
 	r.notifyMu.Lock()
-	enqueuePending(r.pendingActions, &r.pendingActionQueue, payload, r.notificationConfig.bufferLimit)
+	enqueuePending(
+		r.pendingActions, &r.pendingActionQueue, payload, r.notificationConfig.bufferLimit,
+		r.notificationMetrics, notificationBufferAction,
+	)
 	r.notifyMu.Unlock()
 	r.signalPending()
 }

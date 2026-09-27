@@ -13,6 +13,7 @@ import (
 	"connectrpc.com/connect"
 	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 	"github.com/jmoiron/sqlx"
+	metricnoop "go.opentelemetry.io/otel/metric/noop"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
@@ -117,6 +118,7 @@ func TestMain(m *testing.M) {
 			runsConfig.NotifyRetryMinBackoff.Duration,
 			runsConfig.NotifyRetryMaxBackoff.Duration,
 		),
+		metricnoop.NewMeterProvider(),
 	)
 	if err != nil {
 		log.Printf("Failed to create repository: %v", err)

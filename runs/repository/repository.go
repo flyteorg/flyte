@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"go.opentelemetry.io/otel/metric"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
@@ -31,11 +32,13 @@ func NewRepository(
 	db *sqlx.DB,
 	dbConfig database.DbConfig,
 	notificationConfig NotificationConfig,
+	meterProvider metric.MeterProvider,
 ) (interfaces.Repository, error) {
 	actionRepo, err := impl.NewActionRepo(
 		db,
 		dbConfig,
 		notificationConfig,
+		meterProvider,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create action repo: %w", err)

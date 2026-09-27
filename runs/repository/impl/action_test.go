@@ -22,6 +22,10 @@ import (
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/attribute"
+	metricnoop "go.opentelemetry.io/otel/metric/noop"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -1012,16 +1016,79 @@ func TestEnqueuePending_EvictsOldestWhenFull(t *testing.T) {
 	pending := make(map[string]struct{})
 	queue := make([]string, 0, 2)
 
-	enqueuePending(pending, &queue, "first", 2)
-	enqueuePending(pending, &queue, "second", 2)
-	enqueuePending(pending, &queue, "third", 2)
+	enqueuePending(pending, &queue, "first", 2, nil, notificationBufferAction)
+	enqueuePending(pending, &queue, "second", 2, nil, notificationBufferAction)
+	enqueuePending(pending, &queue, "third", 2, nil, notificationBufferAction)
 
 	assert.NotContains(t, pending, "first")
 	assert.Contains(t, pending, "second")
 	assert.Contains(t, pending, "third")
 
-	enqueuePending(pending, &queue, "second", 2)
+	enqueuePending(pending, &queue, "second", 2, nil, notificationBufferAction)
 	assert.Equal(t, []string{"second", "third"}, queue)
+}
+
+func TestNewNotificationMetricsNoop(t *testing.T) {
+	metrics, err := newNotificationMetrics(metricnoop.NewMeterProvider())
+	require.NoError(t, err)
+	assert.Nil(t, metrics)
+}
+
+func TestNotificationEvictionsMetric(t *testing.T) {
+	reader := sdkmetric.NewManualReader()
+	provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader))
+
+	metrics, err := newNotificationMetrics(provider)
+	require.NoError(t, err)
+	require.NotNil(t, metrics)
+
+	repo := &actionRepo{
+		pendingActions:      make(map[string]struct{}),
+		pendingActionQueue:  make([]string, 0, 2),
+		pendingRuns:         make(map[string]struct{}),
+		pendingRunQueue:     make([]string, 0, 2),
+		pendingCh:           make(chan struct{}, 1),
+		notificationConfig:  NotificationConfig{bufferLimit: 2},
+		notificationMetrics: metrics,
+	}
+
+	repo.markActionPending("action-1")
+	repo.markActionPending("action-2")
+	repo.markActionPending("action-3")
+	repo.markActionPending("action-2") // A duplicate does not evict another notification.
+
+	repo.markRunPending("run-1")
+	repo.markRunPending("run-2")
+	repo.mergePendingRuns([]string{"retry-1", "retry-2"})
+
+	sum, ok := collectNotificationMetric(t, reader, notificationDeletedMetricName).Data.(metricdata.Sum[int64])
+	require.True(t, ok)
+
+	counts := make(map[string]int64)
+	for _, point := range sum.DataPoints {
+		bufferFrom, ok := point.Attributes.Value(attribute.Key("buffer_from"))
+		require.True(t, ok)
+		counts[bufferFrom.AsString()] = point.Value
+	}
+	assert.Equal(t, map[string]int64{
+		string(notificationBufferAction): 1,
+		string(notificationBufferRun):    2,
+	}, counts)
+}
+
+func collectNotificationMetric(t *testing.T, reader *sdkmetric.ManualReader, name string) metricdata.Metrics {
+	t.Helper()
+	var resourceMetrics metricdata.ResourceMetrics
+	require.NoError(t, reader.Collect(context.Background(), &resourceMetrics))
+	for _, scopeMetrics := range resourceMetrics.ScopeMetrics {
+		for _, collectedMetric := range scopeMetrics.Metrics {
+			if collectedMetric.Name == name {
+				return collectedMetric
+			}
+		}
+	}
+	t.Fatalf("metric %q not found", name)
+	return metricdata.Metrics{}
 }
 
 func TestNotificationBufferLimitConfig(t *testing.T) {
