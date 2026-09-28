@@ -266,10 +266,12 @@ func TestLaunchResourceErrors(t *testing.T) {
 // once per reconcile, until it is finally gone.
 func TestLaunchResource_AlreadyExists(t *testing.T) {
 	now := metav1.Now()
+	longAgo := metav1.NewTime(time.Now().Add(-time.Hour))
 	tests := []struct {
 		name      string
 		existing  *v1.Pod
 		wantPhase pluginsCore.Phase
+		wantCode  string
 	}{
 		{
 			name:      "a live resource is adopted",
@@ -285,6 +287,19 @@ func TestLaunchResource_AlreadyExists(t *testing.T) {
 				Finalizers:        []string{"flyte/flytek8s"},
 			}},
 			wantPhase: pluginsCore.PhaseWaitingForResources,
+		},
+		{
+			// Stuck terminating well past its grace period, the resource may never free the
+			// name: the launch fails into the system-retry budget rather than waiting forever.
+			name: "a resource stuck terminating fails the launch",
+			existing: &v1.Pod{ObjectMeta: metav1.ObjectMeta{
+				Name:              "name",
+				Namespace:         "ns",
+				DeletionTimestamp: &longAgo,
+				Finalizers:        []string{"flyte/flytek8s"},
+			}},
+			wantPhase: pluginsCore.PhaseRetryableFailure,
+			wantCode:  codePreviousResourceStuckTerminating,
 		},
 	}
 
@@ -310,8 +325,34 @@ func TestLaunchResource_AlreadyExists(t *testing.T) {
 			transition, err := pm.launchResource(context.Background(), tCtx)
 			assert.NoError(t, err)
 			assert.Equal(t, tt.wantPhase, transition.Info().Phase())
+			assert.Equal(t, tt.wantCode, transition.Info().Err().GetCode())
+			if tt.wantCode != "" {
+				assert.Equal(t, core.ExecutionError_SYSTEM, transition.Info().Err().GetKind())
+			}
 		})
 	}
+}
+
+func TestStuckTerminating(t *testing.T) {
+	deletedAt := func(ago time.Duration) client.Object {
+		ts := metav1.NewTime(time.Now().Add(-ago))
+		return &v1.Pod{ObjectMeta: metav1.ObjectMeta{DeletionTimestamp: &ts}}
+	}
+
+	_, stuck := stuckTerminating(deletedAt(10*time.Minute), 5*time.Minute)
+	assert.True(t, stuck, "terminating past the grace period")
+
+	_, stuck = stuckTerminating(deletedAt(time.Minute), 5*time.Minute)
+	assert.False(t, stuck, "still within the grace period")
+
+	_, stuck = stuckTerminating(deletedAt(-time.Minute), 5*time.Minute)
+	assert.False(t, stuck, "deletion grace period not yet over")
+
+	_, stuck = stuckTerminating(deletedAt(time.Hour), 0)
+	assert.False(t, stuck, "a zero grace period waits indefinitely")
+
+	_, stuck = stuckTerminating(&v1.Pod{}, 5*time.Minute)
+	assert.False(t, stuck, "an unread resource carries no deletion timestamp")
 }
 
 // While the previous resource drains, Handle leaves the plugin at NotStarted, so the next round

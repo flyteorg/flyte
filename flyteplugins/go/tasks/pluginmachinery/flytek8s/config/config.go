@@ -64,6 +64,9 @@ var (
 		PodPendingTimeout: config2.Duration{
 			Duration: 0,
 		},
+		TerminatingResourceGracePeriod: config2.Duration{
+			Duration: time.Minute * 5,
+		},
 		GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
 		GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
 		GpuResourceName:           ResourceNvidiaGPU,
@@ -243,6 +246,13 @@ type K8sPluginConfig struct {
 	// pending phase past this timeout, it will be inferred to be a permanent
 	// issue, and the corresponding task marked as failed
 	PodPendingTimeout config2.Duration `json:"pod-pending-timeout" pflag:"-,Time to wait while pod is stuck in pending."`
+
+	// Time a relaunch waits, past the end of its deletion grace period, for a previous
+	// incarnation of the resource still holding its name to go away. A resource stuck
+	// terminating longer than this (an unreachable node, a finalizer that never clears)
+	// fails the launch with a system-retryable error instead of waiting forever. Zero
+	// waits indefinitely.
+	TerminatingResourceGracePeriod config2.Duration `json:"terminating-resource-grace-period" pflag:"-,Time to wait past its deletion grace period for a previous resource stuck terminating before failing the launch."`
 
 	// The node label that specifies the attached GPU device.
 	GpuDeviceNodeLabel string `json:"gpu-device-node-label" pflag:"-,The node label that specifies the attached GPU device."`

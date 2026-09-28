@@ -37,6 +37,9 @@ const (
 	// codeUnexpectedObjectDeletion is the failure reported when the plugin's resource is
 	// being deleted while the plugin still considers it running.
 	codeUnexpectedObjectDeletion = "UnexpectedObjectDeletion"
+	// codePreviousResourceStuckTerminating is the failure reported when a launch has waited
+	// too long for the previous incarnation of its resource to finish terminating.
+	codePreviousResourceStuckTerminating = "PreviousResourceStuckTerminating"
 	// stoppedEventReason is the reason of the event Kueue's job framework records on a pod
 	// it stops, carrying the same message it puts on the pod's TerminationTarget condition.
 	stoppedEventReason = "Stopped"
@@ -133,7 +136,17 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 		// its grace period after a system retry aborted it. It is not this launch's
 		// resource: adopting it would only rediscover its deletion next round, abort and
 		// reset again, and land back here, once per reconcile until it is gone, reporting
-		// the same failure to the user each time. Wait for the name to free up instead.
+		// the same failure to the user each time. Wait for the name to free up instead,
+		// but not forever: a resource stuck terminating well past its grace period (an
+		// unreachable node, a finalizer that never clears) may never free it, so fail the
+		// launch and let the system-retry budget bound it.
+		if stuckFor, stuck := stuckTerminating(o, config.GetK8sPluginConfig().TerminatingResourceGracePeriod.Duration); stuck {
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(
+				codePreviousResourceStuckTerminating,
+				fmt.Sprintf("previous resource [%s] is still terminating %s past its deletion grace period",
+					client.ObjectKeyFromObject(o), stuckFor.Round(time.Second)),
+				nil)), nil
+		}
 		return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResources(
 			time.Now(), pluginsCore.DefaultPhaseVersion, "waiting for the previous resource to be deleted")), nil
 	}
@@ -175,6 +188,18 @@ func (pm *PluginManager) canAdoptExisting(ctx context.Context, o client.Object) 
 		return false
 	}
 	return o.GetDeletionTimestamp() == nil
+}
+
+// stuckTerminating reports how long o has been terminating past the end of its deletion
+// grace period, and whether that exceeds gracePeriod. A resource that could not be read
+// carries no deletion timestamp and is never stuck; a zero gracePeriod disables the bound.
+func stuckTerminating(o client.Object, gracePeriod time.Duration) (time.Duration, bool) {
+	deletion := o.GetDeletionTimestamp()
+	if gracePeriod <= 0 || deletion == nil {
+		return 0, false
+	}
+	stuckFor := time.Since(deletion.Time)
+	return stuckFor, stuckFor > gracePeriod
 }
 
 func (pm *PluginManager) getResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
