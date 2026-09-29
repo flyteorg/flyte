@@ -910,7 +910,8 @@
           "type": "string"
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Characters are restricted so a (name, version) pair can be encoded\nunambiguously into one scalar — see ArtifactVersionId.version."
         },
         "org": {
           "type": "string"
@@ -935,7 +936,8 @@
           "$ref": "#/definitions/coreArtifactKey"
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "description": "A (name, version) pair identifies a parent in\nartifact.ArtifactSpec.parent_artifacts, and storage encodes that pair\ninto a single scalar to index it. Restricting the character set is what\nmakes that encoding injective: without it, name=\"a@v1\"/version=\"b\" and\nname=\"a\"/version=\"v1@b\" collide and a lineage query returns the wrong\nchildren. Empty is still allowed (it means \"inherit\")."
         }
       },
       "description": "Identity of one artifact version. Unlike the legacy ArtifactID below, this\ncarries no partition machinery — it is the minimal identity stamped onto\nvalues (core.Literal.artifact_id) and referenced by v2 artifact APIs."
