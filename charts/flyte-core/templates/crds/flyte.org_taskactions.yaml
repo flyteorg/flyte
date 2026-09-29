@@ -123,6 +123,12 @@ spec:
                 maxLength: 30
                 minLength: 1
                 type: string
+              podTemplateName:
+                description: |-
+                  PodTemplateName is the run-scoped pod template name projected from RunSpec.DefaultSettings.
+                  Stamped onto tasks that do not name one themselves.
+                maxLength: 253
+                type: string
               project:
                 description: Project this action belongs to
                 maxLength: 63
@@ -164,6 +170,13 @@ spec:
           status:
             description: status defines the observed state of TaskAction
             properties:
+              attemptStartedAt:
+                description: |-
+                  AttemptStartedAt is when the current user attempt first entered the Running phase.
+                  It is persisted independently from ActionEvent publication so max-runtime
+                  enforcement survives controller and event-service outages.
+                format: date-time
+                type: string
               attempts:
                 description: Attempts is the latest observed action attempt number,
                   starting from 1.
@@ -333,6 +346,20 @@ spec:
                   maximum, the TaskAction is converted to a permanent failure.
                 format: int32
                 type: integer
+              systemRetries:
+                description: |-
+                  SystemRetries counts the times this TaskAction was relaunched in place after a
+                  system-retryable failure. Unlike SystemFailures it is never reset, so it gives
+                  each system-retry event a version no earlier one used.
+                format: int32
+                type: integer
+              timeoutAt:
+                description: |-
+                  TimeoutAt is the max-runtime deadline for an expired current attempt.
+                  While set on a non-terminal action, timeout cleanup is pending and the
+                  plugin resource must not be handled or recreated.
+                format: date-time
+                type: string
             type: object
         required:
         - spec
