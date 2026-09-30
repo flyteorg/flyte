@@ -88,6 +88,7 @@ enum AcceleratorModel {
   NVIDIA_GB200 = 17 [(accelerator_name) = "nvidia-gb200"];
   NVIDIA_GB10 = 18 [(accelerator_name) = "nvidia-gb10"];
   NVIDIA_RTX_PRO_6000 = 19 [(accelerator_name) = "nvidia-rtx-pro-6000"];
+  NVIDIA_RTX_PRO_4500 = 20 [(accelerator_name) = "nvidia-rtx-pro-4500"];
 
   // GOOGLE_TPU
   GOOGLE_TPU_V5E = 100 [(accelerator_name) = "google-tpu-v5e"];
