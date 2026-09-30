@@ -39,6 +39,7 @@ class AcceleratorModel(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     NVIDIA_GB200: _ClassVar[AcceleratorModel]
     NVIDIA_GB10: _ClassVar[AcceleratorModel]
     NVIDIA_RTX_PRO_6000: _ClassVar[AcceleratorModel]
+    NVIDIA_RTX_PRO_4500: _ClassVar[AcceleratorModel]
     GOOGLE_TPU_V5E: _ClassVar[AcceleratorModel]
     GOOGLE_TPU_V5P: _ClassVar[AcceleratorModel]
     GOOGLE_TPU_V6E: _ClassVar[AcceleratorModel]
@@ -78,6 +79,7 @@ NVIDIA_B200: AcceleratorModel
 NVIDIA_GB200: AcceleratorModel
 NVIDIA_GB10: AcceleratorModel
 NVIDIA_RTX_PRO_6000: AcceleratorModel
+NVIDIA_RTX_PRO_4500: AcceleratorModel
 GOOGLE_TPU_V5E: AcceleratorModel
 GOOGLE_TPU_V5P: AcceleratorModel
 GOOGLE_TPU_V6E: AcceleratorModel

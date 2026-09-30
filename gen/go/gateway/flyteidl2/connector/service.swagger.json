@@ -802,6 +802,7 @@
         "NVIDIA_GB200",
         "NVIDIA_GB10",
         "NVIDIA_RTX_PRO_6000",
+        "NVIDIA_RTX_PRO_4500",
         "GOOGLE_TPU_V5E",
         "GOOGLE_TPU_V5P",
         "GOOGLE_TPU_V6E",
