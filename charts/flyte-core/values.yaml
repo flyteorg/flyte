@@ -463,6 +463,9 @@ configuration:
       host: 0.0.0.0
       port: 8080
     watchBufferSize: 100
+    notificationBufferLimit: 65000
+    notifyRetryMinBackoff: 50ms
+    notifyRetryMaxBackoff: 5s
     storagePrefix: s3://flyte-data
     seedProjects:
       - flytesnacks

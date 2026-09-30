@@ -73,9 +73,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
+	meterProvider := otelutils.GetMeterProvider(otelServiceName)
 	otelInterceptor, err := otelconnect.NewInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
-		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
+		otelconnect.WithMeterProvider(meterProvider),
 		otelconnect.WithoutServerPeerAttributes(),
 	)
 	if err != nil {
@@ -92,7 +93,16 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		})
 	}
 
-	repo, err := repository.NewRepository(sc.DB, cfg.Database)
+	repo, err := repository.NewRepository(
+		sc.DB,
+		cfg.Database,
+		repository.NewNotificationConfig(
+			cfg.NotificationBufferLimit,
+			cfg.NotifyRetryMinBackoff.Duration,
+			cfg.NotifyRetryMaxBackoff.Duration,
+		),
+		meterProvider,
+	)
 	if err != nil {
 		return fmt.Errorf("runs: failed to create repository: %w", err)
 	}
