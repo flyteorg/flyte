@@ -25,6 +25,8 @@ import (
 
 const rootActionName = "a0"
 
+const notifyBatchMaxPayloads = 1024
+
 // actionRepo implements actionRepo interface using PostgreSQL
 type actionRepo struct {
 	db       *sqlx.DB
@@ -1042,6 +1044,33 @@ func isConnError(err error) bool {
 	return false
 }
 
+func buildNotifyBatchQuery(channel string, payloads []string) (string, []any) {
+	notifyCalls := make([]string, 0, len(payloads))
+	args := make([]any, 0, len(payloads)+1)
+	args = append(args, channel)
+	for i, payload := range payloads {
+		notifyCalls = append(notifyCalls, fmt.Sprintf("pg_notify($1, $%d)", i+2))
+		args = append(args, payload)
+	}
+	return "SELECT " + strings.Join(notifyCalls, ", "), args
+}
+
+func drainNotifyBatch(firstPayload string, ch <-chan string) []string {
+	payloads := []string{firstPayload}
+	for len(payloads) < notifyBatchMaxPayloads {
+		select {
+		case payload, ok := <-ch:
+			if !ok {
+				return payloads
+			}
+			payloads = append(payloads, payload)
+		default:
+			return payloads
+		}
+	}
+	return payloads
+}
+
 // runNotifyLoop processes notify channels using the given connection.
 // On connection errors it attempts to reconnect; if reconnection fails
 // the error is logged and the notification is skipped.
@@ -1068,35 +1097,38 @@ func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
 		}
 	}
 
-	execNotify := func(channel, payload string) {
-		if conn == nil {
-			reconnect()
-		}
-		if conn == nil {
-			logger.Errorf(context.Background(), "No NOTIFY connection available, dropping %s notification", channel)
+	execNotifyBatch := func(channel string, payloads []string) {
+		if len(payloads) == 0 {
 			return
 		}
-		if _, err := conn.ExecContext(context.Background(), "SELECT pg_notify($1, $2)", channel, payload); err != nil {
-			logger.Errorf(context.Background(), "Failed to NOTIFY %s: %v", channel, err)
-			if isConnError(err) {
+
+		query, args := buildNotifyBatchQuery(channel, payloads)
+		for {
+			if conn == nil {
 				reconnect()
 			}
+			if conn == nil {
+				logger.Errorf(context.Background(), "No NOTIFY connection available for %s batch of %d notifications", channel, len(payloads))
+				if sqlDB == nil {
+					return
+				}
+				time.Sleep(100 * time.Millisecond)
+				continue
+			}
+			if _, err := conn.ExecContext(context.Background(), query, args...); err != nil {
+				logger.Errorf(context.Background(), "Failed to NOTIFY %s batch of %d notifications: %v", channel, len(payloads), err)
+				if isConnError(err) {
+					reconnect()
+				}
+				time.Sleep(100 * time.Millisecond)
+				continue
+			}
+			return
 		}
 	}
 
 	drainAndExec := func(channel, firstPayload string, ch <-chan string) {
-		execNotify(channel, firstPayload)
-		for {
-			select {
-			case payload, ok := <-ch:
-				if !ok {
-					return
-				}
-				execNotify(channel, payload)
-			default:
-				return
-			}
-		}
+		execNotifyBatch(channel, drainNotifyBatch(firstPayload, ch))
 	}
 
 	for {
