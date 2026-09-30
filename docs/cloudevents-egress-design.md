@@ -1,7 +1,6 @@
-# CloudEvents egress — design
+# CloudEvents V2 design
 
 Status: proposal
-Scope: `runs/`
 Tracks: flyteorg/flyte#7829
 
 ## What is missing
@@ -10,10 +9,9 @@ Flyte 1 pushed every execution event to a message broker. Systems outside Flyte 
 catalogs, alerting, cost accounting, pipelines in other orchestrators — subscribed to a topic
 and reacted. They never talked to Flyte, and Flyte never knew they existed.
 
-Flyte 2 records more events than v1 did, in a queryable table, with a live stream on top. What
-it does not do is push them anywhere. Every consumer must now hold a long-lived gRPC stream
-against the control plane, which makes each of them a client Flyte has to serve, keep
-connected, and survive restarts with.
+Flyte 2 record the event into k8s event directly. The user can use 3rd party exporter to watch
+the events and store into their own down stream pipeline(e.g. Kafka, LOKI). This approach will
+decouple flyte's event system and users pipeline implementation. 
 
 ```
 v1
@@ -29,181 +27,256 @@ v1
                                             consumers are decoupled;
                                             admin never knows they exist
 
-v2 proposed          [NEW] = added by this document; everything else exists today
+v2 proposed
 
-+----------------------------------------------------------------------+
-| InsertEvents()                      runs/repository/impl/action.go   |
-|   the only writer of action_events                                   |
-+-----------+--------------------+-------------------------+-----------+
-            |                    |                         |
-            | 1. INSERT          | 2. hand off       [NEW] | 3. notifyActionUpdate()
-            |    (commit)        |    events in hand       |    id only, per-action
-            v                    v                         v
-+----------------------+ +--------------------+ +----------------------------+
-| action_events        | | publisher    [NEW] | | pg_notify action_updates   |
-|   the durable record | |   Flyte event      | |   -> actionSubscribers     |
-|   no cursor column   | |   -> CloudEvent    | |      channel full: DROPPED |
-+----------+-----------+ +---------+----------+ +-------------+--------------+
-           ^                       |                          |
-           |                       |                          v
-           |                       |             +-------------------------+
-           |                       |             | watch streams           |
-           |                       |             |   console / CLI         |
-           |                       |             |   existing subscribers  |
-           |                       |             +-------------------------+
-           |                       |
-           +-----------------------+  [NEW] on restart, publisher re-reads
-                                   |         SELECT ... WHERE > cursor, to
-                                   |         cover the crash window: rows
-                                   v         committed but never published
-                +--------------------------------------+
-                | sender                         [NEW] |
-                |   one per transport                  |
-                +------------------+-------------------+
-                                   v
-                   +---------------------+     +---------------------+
-                   | broker        [NEW] |---->| lineage / catalog   |
-                   |                     |     +---------------------+
-                   | operator-run,       |     +---------------------+
-                   | not shipped by      |---->| alerting            |
-                   | Flyte               |     +---------------------+
-                   |                     |     +---------------------+
-                   |                     |---->| downstream pipeline |
-                   +---------------------+     +---------------------+
-                                               new consumers land here
++---------------------------------------+
+| TaskActionReconciler                  |
+| recordEvent :127                      |
++------+--------------------------------+
+       |
+       |  4 call sites: :454 timeout  :567 system retry
+       |               :1053 abort   :1086 status changed
+       v
++---------------------------------------+
+| level filter (new)                    |
+| terminal / info / debug               |
++------+--------------------------------+
+       |
+       |  Eventf(taskAction, ...)  regarding = TaskAction
+       v
++---------------------------------------+
+| apiserver  events.k8s.io/v1           |
++------+--------------------------------+
+  note <= 1024 B, TTL 1h
+       |
+       |  core/v1 informer, OnAdd
+       v
++---------------------------------------+
+| kubernetes-event-exporter             |
++------+--------------------------------+
+  route match: involvedObject.kind=TaskAction
+       |
+       +--------------+--------------+
+       v              v              v
+  +---------+   +---------+   +-----------+
+  | Kafka   |   | Loki    |   | webhook   |
+  +---------+   +---------+   +-----------+
 ```
 
-### Protobuf
+### Envelope action event into k8s event
 
-The wiring above has nowhere to land, because the payload type does not exist. v2 needs a
-`CloudEventActionExecution` to carry an action's events, and nothing in `flyteidl2` defines one
-— the directory contains no cloudevent proto at all.
+v1 needed a proto because it owned the wire. This design does not: the envelope is the
+Kubernetes Event object, and the exporter serializes it. 
 
-v1 defines four, in `flyteidl/protos/flyteidl/event/cloudevents.proto`:
+v1 defined four messages in `flyteidl/protos/flyteidl/event/cloudevents.proto`
+(`CloudEventWorkflowExecution`, `CloudEventNodeExecution`, `CloudEventTaskExecution`,
+`CloudEventExecutionStart`), because workflow, node and task executions were three different
+types. v2 has one recursive type — an action, whose root action is the run — so the three
+collapse into one payload shape, close to what `action_events` already stores:
 
-| message | wraps | adds |
+```go
+// Annotation keys are the external contract: exporter templates read them by name.
+const (
+	annPrefix      = "flyte.org/"
+	annProject     = annPrefix + "project"
+	annDomain      = annPrefix + "domain"
+	annRunName     = annPrefix + "run-name"
+	annActionName  = annPrefix + "action-name"
+	annAttempt     = annPrefix + "attempt"
+	annPhase       = annPrefix + "phase"
+	annVersion     = annPrefix + "version"
+	annErrorKind   = annPrefix + "error-kind"
+	annErrorCode   = annPrefix + "error-code"
+	annInfo        = annPrefix + "info"     // jsonpb of ActionEvent
+	annLaunchPlan  = annPrefix + "launch-plan"
+	annPrincipal   = annPrefix + "principal"
+	annCluster     = annPrefix + "cluster"
+)
+
+// noteLimit is the apiserver's NoteLengthLimit. Exceeding it rejects the event.
+const noteLimit = 1024
+
+func buildActionEventK8s(
+	taskAction *flyteorgv1.TaskAction,
+	event *workflow.ActionEvent,
+	instance string,
+) (*eventsv1.Event, error) {
+	info, err := protojson.Marshal(event)
+	if err != nil {
+		return nil, err
+	}
+
+	ann := map[string]string{
+		annProject:    event.GetId().GetRun().GetProject(),
+		annDomain:     event.GetId().GetRun().GetDomain(),
+		annRunName:    event.GetId().GetRun().GetName(),
+		annActionName: event.GetId().GetName(),
+		annAttempt:    strconv.FormatUint(uint64(event.GetAttempt()), 10),
+		annPhase:      event.GetPhase().String(),
+		annVersion:    strconv.FormatUint(uint64(event.GetVersion()), 10),
+		annCluster:    event.GetCluster(),
+		annInfo:       string(info),
+	}
+	if e := event.GetErrorInfo(); e != nil {
+		ann[annErrorKind] = e.GetKind().String()
+		ann[annErrorCode] = e.GetCode()
+	}
+	for k, v := range controlPlaneContext(taskAction) {
+		ann[k] = v
+	}
+
+	return &eventsv1.Event{
+		ObjectMeta: metav1.ObjectMeta{
+			GenerateName: taskAction.Name + ".",
+			Namespace:    taskAction.Namespace, // must equal Regarding.Namespace
+			Annotations:  ann,
+		},
+		EventTime:           metav1.NewMicroTime(event.GetReportedTime().AsTime()), // required
+		ReportingController: "taskaction-controller",
+		ReportingInstance:   instance, // required, <= 128 chars
+		Type:                eventType(event),   // Normal | Warning
+		Reason:              eventReason(event), // ActionSucceeded | ActionFailed | SystemRetry | ...
+		Action:              "Reconciling",
+		Note:                truncateRunes(humanSummary(event), noteLimit),
+		Regarding: corev1.ObjectReference{
+			APIVersion: flyteorgv1.GroupVersion.String(),
+			Kind:       "TaskAction",
+			Namespace:  taskAction.Namespace,
+			Name:       taskAction.Name,
+			UID:        taskAction.UID,
+		},
+	}, nil
+}
+
+// truncateRunes cuts on a rune boundary; a byte cut can emit invalid UTF-8 and the
+// apiserver rejects the whole event.
+func truncateRunes(s string, max int) string {
+	if len(s) <= max {
+		return s
+	}
+	for max > 0 && !utf8.RuneStart(s[max]) {
+		max--
+	}
+	return s[:max]
+}
+```
+
+`Eventf` cannot set annotations — `events.EventRecorder` exposes only `Eventf` — so an event
+carrying the payload is created directly with the client, which gives up the EventCorrelator's
+aggregation and spam filter. Terminal events take that trade; `info` and `debug` levels stay on
+`Eventf` with `note` alone.
+
+The exporter watches `core/v1`, so route matchers use that spelling: `note` ↔ `message`,
+`regarding` ↔ `involvedObject`, `reportingController` ↔ `source.component`. One store, two
+views, translated by the apiserver.
+
+## How to export and watch events
+
+Flyte ships no exporter and no broker client. Once the events are on the apiserver, getting
+them to a queue is an off-the-shelf problem: an operator deploys a third-party event exporter,
+points it at the events Flyte emits, and routes them wherever they want.
+[resmoio/kubernetes-event-exporter](https://github.com/resmoio/kubernetes-event-exporter) is the
+reference — it watches cluster events, filters them with a routing tree, and ships them to
+Kafka, Loki, Elasticsearch, SNS/SQS, webhooks and a dozen other sinks. Config only:
+
+```yaml
+route:
+  routes:
+    - match:
+        - receiver: flyte-kafka
+          kind: TaskAction                        # core/v1 spelling of regarding.kind
+          reportingController: taskaction-controller
+receivers:
+  - name: flyte-kafka
+    kafka:
+      topic: flyte-action-events
+      brokers: ["kafka-0:9092"]
+      layout:
+        reason: "{{ .Reason }}"
+        action: "{{ index .ObjectMeta.Annotations \"flyte.org/action-name\" }}"
+        phase: "{{ index .ObjectMeta.Annotations \"flyte.org/phase\" }}"
+        payload: "{{ index .ObjectMeta.Annotations \"flyte.org/info\" | fromJson }}"
+```
+
+The annotation keys from the previous section are the whole interface. A consumer subscribes to
+the topic and never touches the Kubernetes API.
+
+**This is a platform-operator component, not a user one.** The exporter watches events across
+the cluster and needs RBAC of its own. Users consume the queue; they are not expected to hold a
+kubeconfig for an execution cluster.
+
+## Log level filter
+
+Not every action event is worth an object in etcd. An operator sets one level in the executor's
+config, and the executor emits a Kubernetes Event only for events at or above it. Everything
+below is still written to `action_events` as it is today — the filter decides what gets a
+Kubernetes Event, never what gets recorded.
+
+```yaml
+executor:
+  events:
+    # off | terminal | info | debug   (default: off)
+    k8sEventLevel: terminal
+```
+
+| Level | Emits | Volume per attempt |
 |---|---|---|
-| `CloudEventWorkflowExecution` | `WorkflowExecutionEvent` | output_interface, artifact_ids, reference_execution, principal, launch_plan_id, labels |
-| `CloudEventNodeExecution` | `NodeExecutionEvent` | task_exec_id, output_interface, artifact_ids, principal, launch_plan_id, labels |
-| `CloudEventTaskExecution` | `TaskExecutionEvent` | labels |
-| `CloudEventExecutionStart` | — (no nested event) | execution_id, launch_plan_id, workflow_id, artifact_ids, artifact_trackers, principal |
+| `off` | nothing | 0 |
+| `terminal` | succeeded, failed, aborted, timed out, system retry | ~1–2 |
+| `info` | the above plus phase transitions (queued, initializing, running) | ~4–6 |
+| `debug` | the above plus every phase-version bump, which is one per batch of cluster events picked up by `attachRecentObjectEvents` | 10+, unbounded for a task that keeps producing cluster events |
 
-**v2 should collapse the three execution messages into one.** v1 split them because workflow,
-node and task executions are three different types. v2 has one recursive type: an action, whose
-root action is the run. A single `CloudEventActionExecution` covers what took three messages,
-and the fields it needs are close to what `action_events` already stores:
+```go
+type EventLevel uint8
 
-```
-CloudEventActionExecution
-  project, domain, run_name, name     the action identity
-  attempt, phase, version             the event's position in the action's history
-  info, error_kind                    the event payload as recorded
-  <control-plane context>             the v1 pattern: whatever a broker consumer
-                                      cannot ask Flyte for after the fact
-```
+const (
+	EventLevelOff EventLevel = iota
+	EventLevelTerminal
+	EventLevelInfo
+	EventLevelDebug
+)
 
-## Where the publisher attaches
+// eventLevelOf classifies an action event. Terminal phases and system retries are what an
+// external consumer acts on; a version bump is detail.
+func eventLevelOf(event *workflow.ActionEvent, prevPhase common.ActionPhase) EventLevel {
+	switch {
+	case isTerminalPhase(event.GetPhase()), event.GetReason() == systemRetryReason:
+		return EventLevelTerminal
+	case event.GetPhase() != prevPhase:
+		return EventLevelInfo
+	default:
+		return EventLevelDebug // same phase, higher version
+	}
+}
 
-`InsertEvents` (`runs/repository/impl/action.go:117`) is the only writer of `action_events`,
-and it already has the `[]*models.ActionEvent` batch in hand. That is the hook: the publisher
-takes the same slice the INSERT just committed. No re-read on the happy path.
-
-The obvious alternative — subscribe to `action_updates` alongside the watch streams — is worse
-on three counts:
-
-- **The payload is an id.** `notifyActionUpdate` sends `project/domain/run/name` and nothing
-  else (`action.go:1120`). A subscriber has to read the table anyway.
-- **It is deduped per action.** A batch of N events for one action produces one notification
-  (`action.go:160`). The signal does not tell you how many events to go fetch.
-- **Most of it is not events.** Six of the seven `notifyActionUpdate` call sites write no
-  `action_events` row at all — `CreateAction`, `UpdateActionPhase`, `AbortAction`, `AbortRun`,
-  `UpdateActionState`, `NotifyStateUpdate`. `action_test.go:1008` asserts the phase update must
-  *not* synthesize one. A publisher on that channel would mostly wake up and find nothing.
-
-**Hand off, do not send inline.** `InsertEvents` sits on the executor's write path; a broker
-round trip must not extend a commit. The publisher takes the batch onto its own queue and the
-caller returns.
-
-## The crash window, and what it costs
-
-Handing off in-process means an event can be committed and never published: the queue is
-memory, and a restart between the commit and the drain loses whatever it held. Closing that is
-the only reason the publisher ever reads `action_events` back — not because the notification
-lacks content, but because nothing else survives the restart.
-
-That reconcile needs a cursor, and **the table cannot currently support one**:
-
-```sql
--- runs/migrations/sql/20260408110000_init_schema.sql:56
-PRIMARY KEY (project, domain, run_name, name, attempt, phase, version)
--- no serial column; created_at is unindexed
+func (r *TaskActionReconciler) emitK8sEvent(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	event *workflow.ActionEvent,
+	prevPhase common.ActionPhase,
+) {
+	if r.K8sEventLevel == EventLevelOff || eventLevelOf(event, prevPhase) > r.K8sEventLevel {
+		return
+	}
+	// Terminal events carry the payload in annotations, so they bypass the recorder.
+	if eventLevelOf(event, prevPhase) == EventLevelTerminal {
+		ev, err := buildActionEventK8s(taskAction, event, r.reportingInstance)
+		if err == nil {
+			err = r.Create(ctx, ev)
+		}
+		if err != nil {
+			log.FromContext(ctx).Error(err, "failed to emit action k8s event")
+		}
+		return
+	}
+	r.Recorder.Eventf(taskAction, nil, eventType(event), eventReason(event),
+		"Reconciling", "%s", humanSummary(event))
+}
 ```
 
-The composite key is not globally monotonic, so there is no "everything after X" to scan.
-`created_at` cannot stand in: it defaults to `CURRENT_TIMESTAMP`, which is transaction start
-time, so a long transaction commits rows *behind* a high-water mark already advanced past them
-and the reconcile skips them silently.
+The hook is `recordEvent` (`taskaction_controller.go:127`). All four emitters funnel through it
+— timeout (`:454`), system retry (`:567`), abort (`:1053`) and the status-change path (`:1086`)
+— so the filter belongs there and nowhere else. Placing it at the call sites guarantees one gets
+missed.
 
-So this design has a prerequisite: either a monotonic `BIGSERIAL` column on `action_events`
-with an index, or a separate outbox table written in the same transaction as the INSERT — which
-`InsertEvents` would have to become, since it commits per chunk today (`action.go:126`). The
-outbox costs a write per event and a reaper; the serial column costs a migration on a hot table
-and still leaves a small ordering gap between sequence assignment and commit visibility, which
-a "re-scan the last N seconds" overlap covers. Pick one before implementing — the rest of the
-publisher design does not depend on which.
 
-## What carries over from v1
-
-v1 split the feature along a seam worth keeping: a **publisher** that turns a Flyte event into
-a CloudEvent, and a **sender** that puts a CloudEvent on a wire. The publisher knows the Flyte
-domain and nothing about brokers; the sender knows brokers and nothing about Flyte.
-
-```
-+--------------------------------------+
-| PUBLISHER                            |
-|   knows Flyte events                 |
-|   decides what an event looks like   |
-|   on the wire: type, id, time, data  |
-+------------------+-------------------+
-                   |
-                   v
-+--------------------------------------+
-|          one narrow interface        |  <-- the seam
-+------------------+-------------------+
-                   |
-      +------------+------------+------------+
-      v            v            v            v
-+-----------+ +---------+ +-----------+ +---------+
-| Kafka     | | NATS    | | cloud     | | no-op   |
-| sender    | | sender  | | pub/sub   | |         |
-+-----+-----+ +----+----+ +-----+-----+ +---------+
-      v            v            v
-+-----------+ +---------+ +-----------+
-| operator's brokers -- not shipped or run by Flyte  |
-+---------------------------------------------------+
-```
-
-**The sender half transfers almost unchanged.** Four transports, one interface, and the
-envelope conventions that go with them — a stable id that doubles as the consumer's
-deduplication key, a payload encoding that survives protobuf `oneof` fields, a schema
-reference that lets a consumer validate without asking Flyte. None of that depends on the
-Flyte data model, and it was working in production for years.
-
-**The publisher half does not transfer.** v1's is written against workflow, node and task
-executions. v2 has runs and actions. Mapping one onto the other is the substantive design work
-here, and it is what #7829 asks to be documented.
-
-## Turning it on
-
-Config only, resolved once at startup. No per-run parameter, no launch-time opt-in, nothing in
-the SDK surface: an operator enables egress for a deployment, and every event flows.
-
-This mirrors v1, and the shape is worth repeating for two reasons. Operators already know it.
-And the alternative — letting individual runs choose — makes the event stream unreliable as a
-source of truth, because a consumer can no longer assume that silence means nothing happened.
-
-Two properties the config gate should preserve:
-
-- **Off by default.** A deployment that says nothing about egress publishes nothing.
-- **Filterable.** An operator who wants only terminal events should be able to say so without
-  filtering client-side, because the cost of the events they do not want is paid on the wire.
