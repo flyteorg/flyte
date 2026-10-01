@@ -871,6 +871,12 @@ func (r *TaskActionReconciler) reconcileTask(
 		return ctrl.Result{}, nil
 	}
 
+	// A retried attempt waits out its retry backoff before the plugin launches it.
+	if remaining := r.backoffRemaining(taskAction); remaining > 0 {
+		return ctrl.Result{RequeueAfter: remaining}, nil
+	}
+	taskAction.Status.NextAttemptAt = nil
+
 	// Build PluginStateManager from persisted state
 	stateMgr := plugin.NewPluginStateManager(
 		taskAction.Status.PluginState,
@@ -903,11 +909,6 @@ func (r *TaskActionReconciler) reconcileTask(
 			maxRuntime,
 		)
 	}
-	// A retried attempt waits out its retry backoff before the plugin launches it.
-	if remaining := r.backoffRemaining(taskAction); remaining > 0 {
-		return ctrl.Result{RequeueAfter: remaining}, nil
-	}
-	taskAction.Status.NextAttemptAt = nil
 	alreadyRunning := taskAction.Status.PluginPhase == pluginsCore.PhaseRunning.String()
 
 	// cacheShortCircuited is true when cache handling already decided the outcome,
