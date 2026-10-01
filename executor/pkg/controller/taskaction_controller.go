@@ -564,6 +564,9 @@ func (r *TaskActionReconciler) reconcileTimedOutAttempt(
 		if err := r.applyTimeoutPhase(ctx, taskAction, original, phaseInfo); err != nil {
 			return ctrl.Result{}, err
 		}
+		if remaining := r.backoffRemaining(taskAction); remaining > 0 {
+			return ctrl.Result{RequeueAfter: remaining}, nil
+		}
 		return ctrl.Result{Requeue: true}, nil
 	}
 
