@@ -1050,3 +1050,114 @@ func writeTestFileWithSize(ctx context.Context, t *testing.T, s *StowStore, path
 
 	return reference
 }
+
+// mockStowCopierContainer is a container that also copies on the server side.
+type mockStowCopierContainer struct {
+	*mockStowContainer
+	copyCB func(ctx context.Context, src stow.Item, name string) (stow.Item, error)
+}
+
+func (m *mockStowCopierContainer) Copy(ctx context.Context, src stow.Item, name string) (stow.Item, error) {
+	return m.copyCB(ctx, src, name)
+}
+
+func TestStowStore_CopyRaw(t *testing.T) {
+	const container = "container"
+	const source = DataReference("s3://container/src/outputs.pb")
+	const destination = DataReference("s3://container/dst/outputs.pb")
+
+	newStore := func(t *testing.T, c stow.Container) *StowStore {
+		s, err := NewStowRawStore(fQNFn["s3"](container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id == container {
+					return c, nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+		}, nil, false, metrics)
+		assert.NoError(t, err)
+		return s
+	}
+
+	// newContainer returns a container holding the source item. Any Put fails the test unless the
+	// naive copy is expected. The source is over the download limit when it must not be downloaded.
+	newContainer := func(t *testing.T, putAllowed bool) (*mockStowContainer, *int) {
+		puts := 0
+		size := int64(1 << 30)
+		if putAllowed {
+			size = 1
+		}
+		c := newMockStowContainer(container)
+		c.items["src/outputs.pb"] = mockStowItem{url: "src/outputs.pb", size: size}
+		c.putCB = func(name string, r io.Reader, size int64, metadata map[string]interface{}) (stow.Item, error) {
+			puts++
+			if !putAllowed {
+				t.Errorf("unexpected Put of [%v]", name)
+			}
+			return mockStowItem{url: name, size: size}, nil
+		}
+		return c, &puts
+	}
+
+	t.Run("server side", func(t *testing.T) {
+		base, _ := newContainer(t, false)
+		var copied []string
+		s := newStore(t, &mockStowCopierContainer{
+			mockStowContainer: base,
+			copyCB: func(_ context.Context, src stow.Item, name string) (stow.Item, error) {
+				copied = append(copied, src.ID()+" -> "+name)
+				return mockStowItem{url: name}, nil
+			},
+		})
+
+		assert.NoError(t, s.CopyRaw(context.Background(), source, destination, Options{}))
+		assert.Equal(t, []string{"src/outputs.pb -> dst/outputs.pb"}, copied)
+	})
+
+	t.Run("source not found", func(t *testing.T) {
+		base, _ := newContainer(t, false)
+		s := newStore(t, &mockStowCopierContainer{
+			mockStowContainer: base,
+			copyCB: func(context.Context, stow.Item, string) (stow.Item, error) {
+				t.Error("unexpected Copy")
+				return nil, nil
+			},
+		})
+
+		err := s.CopyRaw(context.Background(), "s3://container/missing/outputs.pb", destination, Options{})
+		assert.True(t, IsNotFound(err), "got %v", err)
+	})
+
+	t.Run("copy fails", func(t *testing.T) {
+		base, _ := newContainer(t, false)
+		s := newStore(t, &mockStowCopierContainer{
+			mockStowContainer: base,
+			copyCB: func(context.Context, stow.Item, string) (stow.Item, error) {
+				return nil, fmt.Errorf("access denied")
+			},
+		})
+
+		assert.ErrorContains(t, s.CopyRaw(context.Background(), source, destination, Options{}), "access denied")
+	})
+
+	t.Run("copy not supported falls back", func(t *testing.T) {
+		base, puts := newContainer(t, true)
+		s := newStore(t, &mockStowCopierContainer{
+			mockStowContainer: base,
+			copyCB: func(context.Context, stow.Item, string) (stow.Item, error) {
+				return nil, stow.ErrCopyNotSupported
+			},
+		})
+
+		assert.NoError(t, s.CopyRaw(context.Background(), source, destination, Options{}))
+		assert.Equal(t, 1, *puts)
+	})
+
+	t.Run("container without copy falls back", func(t *testing.T) {
+		base, puts := newContainer(t, true)
+		s := newStore(t, base)
+
+		assert.NoError(t, s.CopyRaw(context.Background(), source, destination, Options{}))
+		assert.Equal(t, 1, *puts)
+	})
+}

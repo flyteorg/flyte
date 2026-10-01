@@ -504,6 +504,58 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 	return nil
 }
 
+// CopyRaw copies source to destination. When the destination container implements stow.Copier the
+// copy runs on the server side, so the content never passes through this process. Otherwise it falls
+// back to copyImpl, which reads the whole object into memory.
+func (s *StowStore) CopyRaw(ctx context.Context, source, destination DataReference, opts Options) error {
+	_, srcContainerName, srcKey, err := source.Split()
+	if err != nil {
+		s.metrics.BadReference.Inc(ctx)
+		return err
+	}
+
+	_, dstContainerName, dstKey, err := destination.Split()
+	if err != nil {
+		s.metrics.BadReference.Inc(ctx)
+		return err
+	}
+
+	dstContainer, err := s.getContainer(ctx, locationIDMain, dstContainerName)
+	if err != nil {
+		return err
+	}
+
+	copier, ok := dstContainer.(stow.Copier)
+	if !ok {
+		return s.copyImpl.CopyRaw(ctx, source, destination, opts)
+	}
+
+	srcContainer, err := s.getContainer(ctx, locationIDMain, srcContainerName)
+	if err != nil {
+		return err
+	}
+
+	item, err := srcContainer.Item(srcKey)
+	if err != nil {
+		incFailureCounterForError(ctx, s.metrics.ReadFailure, err)
+		return errs.Wrapf(err, "path:%v", source)
+	}
+
+	t := s.copyImpl.metrics.CopyLatency.Start(ctx)
+	_, err = copier.Copy(ctx, item, dstKey)
+	t.Stop()
+	if errs.Is(err, stow.ErrCopyNotSupported) {
+		return s.copyImpl.CopyRaw(ctx, source, destination, opts)
+	}
+
+	if err != nil {
+		incFailureCounterForError(ctx, s.metrics.WriteFailure, err)
+		return errs.Wrapf(err, "Failed to copy [%v] to [%v].", source, destination)
+	}
+
+	return nil
+}
+
 // Delete removes the referenced data from the blob store.
 func (s *StowStore) Delete(ctx context.Context, reference DataReference) error {
 	_, c, k, err := reference.Split()
