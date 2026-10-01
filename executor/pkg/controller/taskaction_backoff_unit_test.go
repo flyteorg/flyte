@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"math"
 	"testing"
 	"time"
 
@@ -35,18 +34,6 @@ func TestRetryBackoffDelay(t *testing.T) {
 			backoff: &core.Backoff{Base: durationpb.New(30 * time.Second)},
 			retry:   5,
 			want:    30 * time.Second,
-		},
-		{
-			name:    "no cap grows unbounded",
-			backoff: &core.Backoff{Base: durationpb.New(time.Second), Factor: proto.Float64(2)},
-			retry:   10,
-			want:    1024 * time.Second,
-		},
-		{
-			name:    "overflow clamps to the maximum duration",
-			backoff: &core.Backoff{Base: durationpb.New(time.Second), Factor: proto.Float64(2)},
-			retry:   100,
-			want:    math.MaxInt64,
 		},
 	}
 	for _, tc := range tests {

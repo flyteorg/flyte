@@ -247,10 +247,34 @@ func retryBackoffFromTaskTemplate(data []byte) (*core.Backoff, error) {
 	return taskTemplate.GetMetadata().GetRetries().GetBackoff(), nil
 }
 
+// validateRetryBackoff enforces the Backoff contract from flyteidl2/core/literals.proto:
+// non-negative durations, a finite factor >= 1, and a cap whenever factor > 1.
+func validateRetryBackoff(backoff *core.Backoff) error {
+	if backoff == nil {
+		return nil
+	}
+	if base := backoff.GetBase(); base != nil && (base.CheckValid() != nil || base.AsDuration() < 0) {
+		return fmt.Errorf("invalid retry backoff: base must be a non-negative duration, got %v", base)
+	}
+	if limit := backoff.GetCap(); limit != nil && (limit.CheckValid() != nil || limit.AsDuration() < 0) {
+		return fmt.Errorf("invalid retry backoff: cap must be a non-negative duration, got %v", limit)
+	}
+	if backoff.Factor != nil {
+		factor := backoff.GetFactor()
+		if math.IsNaN(factor) || math.IsInf(factor, 0) || factor < 1 {
+			return fmt.Errorf("invalid retry backoff: factor must be a finite number >= 1, got %v", factor)
+		}
+		if factor > 1 && backoff.GetCap() == nil {
+			return fmt.Errorf("invalid retry backoff: cap is required when factor > 1")
+		}
+	}
+	return nil
+}
+
 // retryBackoffDelay is how long the retry-th user retry (0-indexed) waits before it
 // launches: min(base * factor**retry, cap), the formula the SDKs document for
-// Backoff. A factor at or below 1 (or none) keeps the delay constant; without a cap
-// it grows unbounded.
+// Backoff. A factor at or below 1 (or none) keeps the delay constant. The backoff has
+// already passed validateRetryBackoff, so a growing delay always has a cap.
 func retryBackoffDelay(backoff *core.Backoff, retry uint32) time.Duration {
 	base := backoff.GetBase()
 	if base == nil || base.CheckValid() != nil || base.AsDuration() <= 0 {
@@ -262,9 +286,6 @@ func retryBackoffDelay(backoff *core.Backoff, retry uint32) time.Duration {
 	}
 	if limit := backoff.GetCap(); limit != nil && limit.CheckValid() == nil {
 		seconds = math.Min(seconds, limit.AsDuration().Seconds())
-	}
-	if seconds >= float64(math.MaxInt64)/float64(time.Second) {
-		return math.MaxInt64
 	}
 	return time.Duration(seconds * float64(time.Second))
 }
@@ -1635,6 +1656,13 @@ func validateTaskAction(taskAction *flyteorgv1.TaskAction, registry pluginResolv
 	}
 	maxRuntime, err := maxRuntimeFromTaskTemplate(taskAction.Spec.TaskTemplate)
 	if err != nil {
+		return nil, 0, flyteorgv1.ConditionReasonInvalidSpec, err
+	}
+	backoff, err := retryBackoffFromTaskTemplate(taskAction.Spec.TaskTemplate)
+	if err != nil {
+		return nil, 0, flyteorgv1.ConditionReasonInvalidSpec, err
+	}
+	if err := validateRetryBackoff(backoff); err != nil {
 		return nil, 0, flyteorgv1.ConditionReasonInvalidSpec, err
 	}
 
