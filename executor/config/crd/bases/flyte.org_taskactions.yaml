@@ -275,6 +275,13 @@ spec:
                     description: Message is the human-readable error message.
                     type: string
                 type: object
+              nextAttemptAt:
+                description: |-
+                  NextAttemptAt is the earliest time the next user attempt may launch, set when a
+                  failed attempt is retried under a RetryStrategy with a backoff. While it lies in
+                  the future the plugin is not handled; it is cleared when the attempt launches.
+                format: date-time
+                type: string
               phaseHistory:
                 description: |-
                   PhaseHistory is an append-only log of phase transitions. Unlike conditions
