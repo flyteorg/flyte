@@ -505,9 +505,10 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 }
 
 // CopyRaw copies source to destination. When the destination container implements stow.Copier the
-// copy runs on the server side, so the content never passes through this process. Otherwise it falls
-// back to copyImpl, which reads the whole object into memory.
-func (s *StowStore) CopyRaw(ctx context.Context, source, destination DataReference, opts Options) error {
+// copy runs on the server side, so the content never passes through this process. Otherwise the
+// content is streamed from the source to the destination, which holds only the upload buffers of
+// the backend in memory instead of the whole object.
+func (s *StowStore) CopyRaw(ctx context.Context, source, destination DataReference, _ Options) error {
 	_, srcContainerName, srcKey, err := source.Split()
 	if err != nil {
 		s.metrics.BadReference.Inc(ctx)
@@ -520,17 +521,12 @@ func (s *StowStore) CopyRaw(ctx context.Context, source, destination DataReferen
 		return err
 	}
 
-	dstContainer, err := s.getContainer(ctx, locationIDMain, dstContainerName)
+	srcContainer, err := s.getContainer(ctx, locationIDMain, srcContainerName)
 	if err != nil {
 		return err
 	}
 
-	copier, ok := dstContainer.(stow.Copier)
-	if !ok {
-		return s.copyImpl.CopyRaw(ctx, source, destination, opts)
-	}
-
-	srcContainer, err := s.getContainer(ctx, locationIDMain, srcContainerName)
+	dstContainer, err := s.getContainer(ctx, locationIDMain, dstContainerName)
 	if err != nil {
 		return err
 	}
@@ -541,11 +537,15 @@ func (s *StowStore) CopyRaw(ctx context.Context, source, destination DataReferen
 		return errs.Wrapf(err, "path:%v", source)
 	}
 
-	t := s.copyImpl.metrics.CopyLatency.Start(ctx)
-	_, err = copier.Copy(ctx, item, dstKey)
-	t.Stop()
+	defer s.copyImpl.metrics.CopyLatency.Start(ctx).Stop()
+
+	err = stow.ErrCopyNotSupported
+	if copier, ok := dstContainer.(stow.Copier); ok {
+		_, err = copier.Copy(ctx, item, dstKey)
+	}
+
 	if errs.Is(err, stow.ErrCopyNotSupported) {
-		return s.copyImpl.CopyRaw(ctx, source, destination, opts)
+		err = streamItem(item, dstContainer, dstKey)
 	}
 
 	if err != nil {
@@ -554,6 +554,30 @@ func (s *StowStore) CopyRaw(ctx context.Context, source, destination DataReferen
 	}
 
 	return nil
+}
+
+// streamItem uploads item to the container as name, reading it as the upload consumes it.
+func streamItem(item stow.Item, container stow.Container, name string) error {
+	size, err := item.Size()
+	if err != nil {
+		return err
+	}
+
+	metadata, err := item.Metadata()
+	if err != nil {
+		return err
+	}
+
+	reader, err := item.Open()
+	if err != nil {
+		return err
+	}
+	_, err = container.Put(name, reader, size, metadata)
+	if closeErr := reader.Close(); err == nil {
+		err = closeErr
+	}
+
+	return err
 }
 
 // Delete removes the referenced data from the blob store.

@@ -1079,21 +1079,22 @@ func TestStowStore_CopyRaw(t *testing.T) {
 		return s
 	}
 
-	// newContainer returns a container holding the source item. Any Put fails the test unless the
-	// naive copy is expected. The source is over the download limit when it must not be downloaded.
+	// newContainer returns a container holding the source item, which is over the download limit:
+	// no copy may read it through ReadRaw. Any Put fails the test unless a streamed copy is expected.
 	newContainer := func(t *testing.T, putAllowed bool) (*mockStowContainer, *int) {
 		puts := 0
-		size := int64(1 << 30)
-		if putAllowed {
-			size = 1
-		}
 		c := newMockStowContainer(container)
-		c.items["src/outputs.pb"] = mockStowItem{url: "src/outputs.pb", size: size}
+		c.items["src/outputs.pb"] = mockStowItem{url: "src/outputs.pb", size: 1 << 30}
 		c.putCB = func(name string, r io.Reader, size int64, metadata map[string]interface{}) (stow.Item, error) {
 			puts++
 			if !putAllowed {
 				t.Errorf("unexpected Put of [%v]", name)
 			}
+			// The reader is the opened source item, handed over as is: nothing was buffered.
+			_, buffered := r.(*bytes.Reader)
+			assert.False(t, buffered, "source was buffered before the upload")
+			assert.Equal(t, "dst/outputs.pb", name)
+			assert.Equal(t, int64(1<<30), size)
 			return mockStowItem{url: name, size: size}, nil
 		}
 		return c, &puts
@@ -1140,7 +1141,7 @@ func TestStowStore_CopyRaw(t *testing.T) {
 		assert.ErrorContains(t, s.CopyRaw(context.Background(), source, destination, Options{}), "access denied")
 	})
 
-	t.Run("copy not supported falls back", func(t *testing.T) {
+	t.Run("copy not supported streams", func(t *testing.T) {
 		base, puts := newContainer(t, true)
 		s := newStore(t, &mockStowCopierContainer{
 			mockStowContainer: base,
@@ -1153,7 +1154,7 @@ func TestStowStore_CopyRaw(t *testing.T) {
 		assert.Equal(t, 1, *puts)
 	})
 
-	t.Run("container without copy falls back", func(t *testing.T) {
+	t.Run("container without copy streams", func(t *testing.T) {
 		base, puts := newContainer(t, true)
 		s := newStore(t, base)
 
