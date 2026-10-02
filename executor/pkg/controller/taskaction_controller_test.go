@@ -1648,6 +1648,124 @@ var _ = Describe("TaskAction Controller", func() {
 		})
 	})
 
+	Context("terminal failure cleanup", func() {
+		ctx := context.Background()
+		var created []types.NamespacedName
+
+		createTaskAction := func(name string) types.NamespacedName {
+			nn := types.NamespacedName{Name: name, Namespace: "default"}
+			Expect(k8sClient.Create(ctx, &flyteorgv1.TaskAction{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:       nn.Name,
+					Namespace:  nn.Namespace,
+					Finalizers: []string{taskActionFinalizer},
+				},
+				Spec: flyteorgv1.TaskActionSpec{
+					RunName:       "cleanup-run",
+					Project:       "cleanup-project",
+					Domain:        "cleanup-domain",
+					ActionName:    name,
+					InputURI:      "file:///tmp/input",
+					RunOutputBase: "file:///tmp/output",
+					TaskType:      "timeout-test",
+					TaskTemplate:  buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", 0, 0),
+				},
+			})).To(Succeed())
+			created = append(created, nn)
+			return nn
+		}
+
+		newReconciler := func(fake *fakePlugin, eventsClient workflowconnect.EventsProxyServiceClient) *TaskActionReconciler {
+			return &TaskActionReconciler{
+				Client:         k8sClient,
+				Scheme:         k8sClient.Scheme(),
+				Recorder:       events.NewFakeRecorder(20),
+				PluginRegistry: newFakePluginRegistry(fake),
+				DataStore:      dataStore,
+				eventsClient:   eventsClient,
+			}
+		}
+
+		failingWith := func(failure pluginsCore.PhaseInfo) *fakePlugin {
+			return &fakePlugin{
+				id:          "cleanup-plugin",
+				transitions: []pluginsCore.Transition{pluginsCore.DoTransition(failure)},
+			}
+		}
+
+		reconcileFailure := func(name string, failure pluginsCore.PhaseInfo) (*fakePlugin, *flyteorgv1.TaskAction) {
+			nn := createTaskAction(name)
+			fake := failingWith(failure)
+			_, err := newReconciler(fake, &recordingEventsClient{}).Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			Expect(err).NotTo(HaveOccurred())
+
+			persisted := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+			return fake, persisted
+		}
+
+		AfterEach(func() {
+			for _, nn := range created {
+				resource := &flyteorgv1.TaskAction{}
+				if err := k8sClient.Get(ctx, nn, resource); err != nil {
+					Expect(errors.IsNotFound(err)).To(BeTrue())
+					continue
+				}
+				resource.Finalizers = nil
+				Expect(k8sClient.Update(ctx, resource)).To(Succeed())
+				Expect(k8sClient.Delete(ctx, resource)).To(Succeed())
+			}
+			created = nil
+		})
+
+		It("aborts the plugin resource when a permanent failure requests cleanup", func() {
+			now := time.Now()
+			fake, persisted := reconcileFailure("cleanup-permanent", pluginsCore.PhaseInfoFailureWithCleanup(
+				"ContainerCannotRun", "container cannot run", &pluginsCore.TaskInfo{OccurredAt: &now}))
+
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(fake.abortCalls).To(Equal(1))
+		})
+
+		It("aborts the plugin resource when the last attempt fails with cleanup requested", func() {
+			now := time.Now()
+			fake, persisted := reconcileFailure("cleanup-retries-exhausted", pluginsCore.PhaseInfoRetryableFailureWithCleanup(
+				"ImagePullBackOff", "image pull back-off", &pluginsCore.TaskInfo{OccurredAt: &now}))
+
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.ErrorState.Code).To(Equal("ImagePullBackOff"))
+			Expect(fake.abortCalls).To(Equal(1))
+		})
+
+		It("leaves the plugin resource alone when the failure does not request cleanup", func() {
+			now := time.Now()
+			fake, persisted := reconcileFailure("cleanup-not-requested", pluginsCore.PhaseInfoFailure(
+				"OrdinaryFailure", "ordinary failure", &pluginsCore.TaskInfo{OccurredAt: &now}))
+
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(fake.abortCalls).To(BeZero())
+		})
+
+		It("keeps the plugin resource until the failure is persisted", func() {
+			now := time.Now()
+			nn := createTaskAction("cleanup-after-persist")
+			fake := failingWith(pluginsCore.PhaseInfoFailureWithCleanup(
+				"ContainerCannotRun", "container cannot run", &pluginsCore.TaskInfo{OccurredAt: &now}))
+			r := newReconciler(fake, &failingEventsClient{failures: 1})
+
+			_, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			Expect(err).To(HaveOccurred())
+			Expect(fake.abortCalls).To(BeZero())
+
+			_, err = r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			Expect(err).NotTo(HaveOccurred())
+			persisted := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(fake.abortCalls).To(Equal(1))
+		})
+	})
+
 	Context("resetPluginResource", func() {
 		It("aborts the plugin and clears persisted plugin state", func() {
 			r := &TaskActionReconciler{}
