@@ -293,7 +293,8 @@ func retryBackoffDelay(backoff *core.Backoff, retry uint32) time.Duration {
 // scheduleNextAttempt stamps Status.NextAttemptAt for the retry replacing a failed
 // attempt, per the task's retry backoff. failedAttempts is how many attempts have
 // failed so far, so the retry being scheduled is the (failedAttempts-1)-th, 0-indexed.
-// Without a backoff the retry launches at once.
+// Without a backoff, or with one the proto contract rejects, the retry launches at
+// once: an executor upgrade must not fail an in-flight action over its pacing.
 func (r *TaskActionReconciler) scheduleNextAttempt(
 	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
@@ -301,8 +302,11 @@ func (r *TaskActionReconciler) scheduleNextAttempt(
 ) {
 	taskAction.Status.NextAttemptAt = nil
 	backoff, err := retryBackoffFromTaskTemplate(taskAction.Spec.TaskTemplate)
+	if err == nil {
+		err = validateRetryBackoff(backoff)
+	}
 	if err != nil {
-		log.FromContext(ctx).Error(err, "failed to read the retry backoff, retrying without delay")
+		log.FromContext(ctx).Error(err, "ignoring the retry backoff, retrying without delay")
 		return
 	}
 	if delay := retryBackoffDelay(backoff, failedAttempts-1); delay > 0 {
@@ -1662,14 +1666,6 @@ func validateTaskAction(taskAction *flyteorgv1.TaskAction, registry pluginResolv
 	if err != nil {
 		return nil, 0, flyteorgv1.ConditionReasonInvalidSpec, err
 	}
-	backoff, err := retryBackoffFromTaskTemplate(taskAction.Spec.TaskTemplate)
-	if err != nil {
-		return nil, 0, flyteorgv1.ConditionReasonInvalidSpec, err
-	}
-	if err := validateRetryBackoff(backoff); err != nil {
-		return nil, 0, flyteorgv1.ConditionReasonInvalidSpec, err
-	}
-
 	p, err := registry.ResolvePlugin(taskAction.Spec.TaskType)
 	if err != nil {
 		return nil, 0, flyteorgv1.ConditionReasonPluginNotFound,

@@ -4,13 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math"
 	"strings"
 	"testing"
-	"time"
 
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/durationpb"
 	"k8s.io/client-go/tools/events"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -106,60 +103,6 @@ func TestValidateTaskAction_MissingFields(t *testing.T) {
 			}
 			if !strings.Contains(err.Error(), tc.expectedField) {
 				t.Errorf("expected error to mention %q, got: %v", tc.expectedField, err)
-			}
-			if reason != flyteorgv1.ConditionReasonInvalidSpec {
-				t.Errorf("expected reason %q, got %q", flyteorgv1.ConditionReasonInvalidSpec, reason)
-			}
-		})
-	}
-}
-
-func taskTemplateWithBackoff(backoff *core.Backoff) []byte {
-	taskTemplate, err := proto.Marshal(&core.TaskTemplate{
-		Type:     "container",
-		Metadata: &core.TaskMetadata{Retries: &core.RetryStrategy{Retries: 2, Backoff: backoff}},
-	})
-	if err != nil {
-		panic(err)
-	}
-	return taskTemplate
-}
-
-func TestValidateTaskAction_RetryBackoff(t *testing.T) {
-	resolver := &mockPluginResolver{plugin: mockPlugin{}}
-
-	ta := validTaskAction()
-	ta.Spec.TaskTemplate = taskTemplateWithBackoff(&core.Backoff{
-		Base:   durationpb.New(10 * time.Second),
-		Factor: proto.Float64(2),
-		Cap:    durationpb.New(10 * time.Minute),
-	})
-	if _, _, _, err := validateTaskAction(ta, resolver); err != nil {
-		t.Fatalf("expected a capped exponential backoff to be accepted, got: %v", err)
-	}
-
-	cases := []struct {
-		name    string
-		backoff *core.Backoff
-	}{
-		{"factor below 1", &core.Backoff{Base: durationpb.New(time.Second), Factor: proto.Float64(0.5)}},
-		{"factor NaN", &core.Backoff{Base: durationpb.New(time.Second), Factor: proto.Float64(math.NaN())}},
-		{"factor infinite", &core.Backoff{Base: durationpb.New(time.Second), Factor: proto.Float64(math.Inf(1))}},
-		{"factor above 1 without cap", &core.Backoff{Base: durationpb.New(time.Second), Factor: proto.Float64(2)}},
-		{"negative base", &core.Backoff{Base: durationpb.New(-time.Second)}},
-		{"negative cap", &core.Backoff{Base: durationpb.New(time.Second), Cap: durationpb.New(-time.Second)}},
-	}
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			ta := validTaskAction()
-			ta.Spec.TaskTemplate = taskTemplateWithBackoff(tc.backoff)
-			_, _, reason, err := validateTaskAction(ta, resolver)
-			if err == nil {
-				t.Fatal("expected error, got nil")
-			}
-			if !strings.Contains(err.Error(), "backoff") {
-				t.Errorf("expected error to mention backoff, got: %v", err)
 			}
 			if reason != flyteorgv1.ConditionReasonInvalidSpec {
 				t.Errorf("expected reason %q, got %q", flyteorgv1.ConditionReasonInvalidSpec, reason)
