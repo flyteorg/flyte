@@ -1837,7 +1837,8 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(phases).To(ContainElement(common.ActionPhase_ACTION_PHASE_ABORTED))
 		})
 
-		It("should keep a terminal TaskAction from emitting an ACTION_PHASE_ABORTED event", func() {
+		It("should finalize a terminal TaskAction without aborting it or emitting ACTION_PHASE_ABORTED", func() {
+			fake := &fakePlugin{id: "timeout-plugin"}
 			terminalResource := &flyteorgv1.TaskAction{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:       "abort-terminal-resource",
@@ -1851,8 +1852,8 @@ var _ = Describe("TaskAction Controller", func() {
 					ActionName:    "terminal-action",
 					InputURI:      "/tmp/input",
 					RunOutputBase: "/tmp/output",
-					TaskType:      "python",
-					TaskTemplate:  buildTaskTemplateBytes("python", "python:3.11"),
+					TaskType:      "timeout-test",
+					TaskTemplate:  buildTaskTemplateBytes("timeout-test", "busybox"),
 				},
 			}
 			Expect(k8sClient.Create(ctx, terminalResource)).To(Succeed())
@@ -1871,7 +1872,7 @@ var _ = Describe("TaskAction Controller", func() {
 				Client:         k8sClient,
 				Scheme:         k8sClient.Scheme(),
 				Recorder:       events.NewFakeRecorder(10),
-				PluginRegistry: pluginRegistry,
+				PluginRegistry: newFakePluginRegistry(fake),
 				DataStore:      dataStore,
 				eventsClient:   recorder,
 			}
@@ -1881,6 +1882,8 @@ var _ = Describe("TaskAction Controller", func() {
 			})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.RequeueAfter).To(BeZero())
+			Expect(fake.abortCalls).To(BeZero())
+			Expect(fake.finalizeCalls).To(Equal(1))
 
 			deleted := &flyteorgv1.TaskAction{}
 			Expect(errors.IsNotFound(k8sClient.Get(ctx, types.NamespacedName{Name: "abort-terminal-resource", Namespace: "default"}, deleted))).To(BeTrue())
