@@ -1141,19 +1141,6 @@ func TestStowStore_CopyRaw(t *testing.T) {
 		assert.ErrorContains(t, s.CopyRaw(context.Background(), source, destination, Options{}), "access denied")
 	})
 
-	t.Run("copy not supported streams", func(t *testing.T) {
-		base, puts := newContainer(t, true)
-		s := newStore(t, &mockStowCopierContainer{
-			mockStowContainer: base,
-			copyCB: func(context.Context, stow.Item, string) (stow.Item, error) {
-				return nil, stow.ErrCopyNotSupported
-			},
-		})
-
-		assert.NoError(t, s.CopyRaw(context.Background(), source, destination, Options{}))
-		assert.Equal(t, 1, *puts)
-	})
-
 	t.Run("container without copy streams", func(t *testing.T) {
 		base, puts := newContainer(t, true)
 		s := newStore(t, base)

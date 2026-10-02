@@ -504,10 +504,10 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 	return nil
 }
 
-// CopyRaw copies source to destination. When the destination container implements stow.Copier the
-// copy runs on the server side, so the content never passes through this process. Otherwise the
-// content is streamed from the source to the destination, which holds only the upload buffers of
-// the backend in memory instead of the whole object.
+// CopyRaw copies source to destination. A container that implements stow.Copier makes the copy
+// itself, on the server side when the backend supports it. Otherwise the content is streamed from
+// the source to the destination, which holds only the upload buffers of the backend in memory
+// instead of the whole object.
 func (s *StowStore) CopyRaw(ctx context.Context, source, destination DataReference, _ Options) error {
 	_, srcContainerName, srcKey, err := source.Split()
 	if err != nil {
@@ -539,12 +539,9 @@ func (s *StowStore) CopyRaw(ctx context.Context, source, destination DataReferen
 
 	defer s.copyImpl.metrics.CopyLatency.Start(ctx).Stop()
 
-	err = stow.ErrCopyNotSupported
 	if copier, ok := dstContainer.(stow.Copier); ok {
 		_, err = copier.Copy(ctx, item, dstKey)
-	}
-
-	if errs.Is(err, stow.ErrCopyNotSupported) {
+	} else {
 		err = streamItem(item, dstContainer, dstKey)
 	}
 
