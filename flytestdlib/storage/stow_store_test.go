@@ -786,7 +786,8 @@ func TestStowStore_WriteRaw(t *testing.T) {
 	})
 	t.Run("data that cannot be read again is an error, not a silent loss", func(t *testing.T) {
 		s, created, createCalled := newStore(t, noSuchBucket)
-		err := s.WriteRaw(t.Context(), DataReference("s3://container/path"), 5, Options{}, io.LimitReader(bytes.NewReader([]byte("hello")), 5))
+		raw := io.LimitReader(bytes.NewReader([]byte("hello")), 5)
+		err := s.WriteRaw(t.Context(), DataReference("s3://container/path"), 5, Options{}, raw)
 		assert.ErrorContains(t, err, "cannot be read again")
 		assert.True(t, *createCalled)
 		assert.Empty(t, created.items)

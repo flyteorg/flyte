@@ -503,7 +503,7 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 			if err == nil {
 				s.dynamicContainerMap.Store(locationIDMain.String()+c, container)
 				if !canRetry {
-					err = fmt.Errorf("container [%v] did not exist and was created, but the data cannot be read again to retry the write", c)
+					err = fmt.Errorf("container [%v] was created, but the data cannot be read again to retry the write", c)
 				} else if _, err = seeker.Seek(start, io.SeekStart); err == nil {
 					_, err = container.Put(k, raw, size, opts.Metadata)
 				}
