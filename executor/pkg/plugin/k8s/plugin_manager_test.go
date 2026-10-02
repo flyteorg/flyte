@@ -1070,3 +1070,40 @@ func TestClassifyExternalTermination(t *testing.T) {
 		})
 	}
 }
+
+// TestCheckResourcePhase_GracefulDeleteIsNotUnexpectedDeletion covers
+// https://github.com/flyteorg/flyte/issues/8066: a pod under a graceful delete carries a
+// DeletionTimestamp and stays non-terminal for its whole grace period, which is not a one-shot
+// condition. Reporting it as UnexpectedObjectDeletion (a SYSTEM-retryable failure) on every
+// reconcile drives the controller to reset plugin state and recreate a pod under the same name,
+// which collides with the still-terminating original (AlreadyExists) and livelocks. A pod that is
+// merely shutting down should be observed, not failed.
+func TestCheckResourcePhase_GracefulDeleteIsNotUnexpectedDeletion(t *testing.T) {
+	pod := failedPod()
+	pod.Status.Phase = v1.PodRunning
+	deletion := metav1.NewTime(time.Now())
+	pod.DeletionTimestamp = &deletion
+	// A real apiserver only carries a deletionTimestamp while at least one finalizer remains;
+	// the fake client enforces the same invariant.
+	pod.Finalizers = []string{"kubernetes"}
+
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pod).Build()
+
+	kubeClient := &pluginsCoreMock.KubeClient{}
+	kubeClient.EXPECT().GetClient().Return(fakeClient)
+
+	runningInfo := pluginsCore.PhaseInfoRunning(0, nil)
+	plugin := &k8sMocks.Plugin{}
+	plugin.EXPECT().GetTaskPhase(mock.Anything, mock.Anything, mock.Anything).Return(runningInfo, nil)
+
+	pm := NewPluginManager("test-plugin", plugin, kubeClient)
+
+	tCtx := &pluginsCoreMock.TaskExecutionContext{}
+	queryObj := &v1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: pod.Namespace, Name: pod.Name}}
+	k8sState := &k8s.PluginState{}
+
+	transition, err := pm.checkResourcePhase(context.Background(), tCtx, queryObj, k8sState)
+	require.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRunning, transition.Info().Phase())
+	assert.NotEqual(t, "UnexpectedObjectDeletion", transition.Info().Err().GetCode())
+}
