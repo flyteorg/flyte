@@ -23,11 +23,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/durationpb"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	actionsk8s "github.com/flyteorg/flyte/v2/actions/k8s"
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	"github.com/flyteorg/flyte/v2/executor/pkg/controller"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -188,4 +192,40 @@ func TestWatchPropagation(t *testing.T) {
 			t.Fatalf("timed out waiting for ActionUpdate with phase %v", expectedPhase)
 		}
 	}
+}
+
+func TestQueuedTimeoutReconcile(t *testing.T) {
+	runID := &common.RunIdentifier{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "development",
+		Name:    uniqueRunName("qt-run"),
+	}
+	action := newRootTaskAction(runID)
+	action.GetTask().GetSpec().GetTaskTemplate().GetMetadata().Timeouts = &core.TimeoutStrategy{
+		QueuedTimeout: durationpb.New(5 * time.Second),
+	}
+	require.NoError(t, actionsClient.Enqueue(ctx, action, nil))
+
+	crKey := types.NamespacedName{Name: runID.Name + "-a0", Namespace: "flyte"}
+	req := reconcile.Request{NamespacedName: crKey}
+
+	_, err := reconciler.Reconcile(ctx, req)
+	require.NoError(t, err)
+
+	ta := &flyteorgv1.TaskAction{}
+	require.NoError(t, k8sClient.Get(ctx, crKey, ta))
+	queuedAt := metav1.NewTime(time.Now().Add(-time.Minute))
+	ta.Status.Attempts = 1
+	ta.Status.PluginPhase = pluginsCore.PhaseQueued.String()
+	ta.Status.AttemptQueuedAt = &queuedAt
+	require.NoError(t, k8sClient.Status().Update(ctx, ta))
+
+	_, err = reconciler.Reconcile(ctx, req)
+	require.NoError(t, err)
+
+	require.NoError(t, k8sClient.Get(ctx, crKey, ta))
+	assert.NotNil(t, ta.Status.ErrorState)
+	assert.Equal(t, controller.TaskExecutionTimedOutCode, ta.Status.ErrorState.Code)
+	assert.Contains(t, ta.Status.ErrorState.Message, "queued timeout")
 }
