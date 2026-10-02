@@ -1004,6 +1004,9 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		return ctrl.Result{}, nil
 	}
+	if isTerminal(taskAction) {
+		return r.removeFinalizer(ctx, taskAction)
+	}
 
 	p, err := r.PluginRegistry.ResolvePlugin(taskAction.Spec.TaskType)
 	if err != nil {
