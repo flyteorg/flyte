@@ -864,6 +864,8 @@ func (r *TaskActionReconciler) reconcileTask(
 
 	// Map transition phase to TaskAction conditions
 	phaseInfo := transition.Info()
+	// Read before an exhausted retry is rebuilt as a permanent failure, which drops it.
+	cleanupOnFailure := phaseInfo.CleanupOnFailure()
 
 	if !cacheShortCircuited && isSystemRetryableFailure(phaseInfo) {
 		// The attempt is relaunched in place and nothing past this point reports
@@ -927,6 +929,13 @@ func (r *TaskActionReconciler) reconcileTask(
 			}
 			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoFailed(pluginsCore.PhasePermanentFailure, execErr, phaseInfo.Info()))
 			phaseInfo = transition.Info()
+		}
+	}
+	// A failure that requests cleanup can leave a live resource, such as a pod still pulling its
+	// image, that would otherwise start after the action is reported failed.
+	if !cacheShortCircuited && cleanupOnFailure && phaseInfo.Phase() == pluginsCore.PhasePermanentFailure {
+		if abortErr := p.Abort(ctx, tCtx); abortErr != nil {
+			logger.Error(abortErr, "failed to abort plugin resource after terminal failure")
 		}
 	}
 	mapPhaseToConditions(taskAction, phaseInfo)

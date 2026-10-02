@@ -23,7 +23,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	apimeta "k8s.io/apimachinery/pkg/api/meta"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	actionsk8s "github.com/flyteorg/flyte/v2/actions/k8s"
@@ -188,4 +193,74 @@ func TestWatchPropagation(t *testing.T) {
 			t.Fatalf("timed out waiting for ActionUpdate with phase %v", expectedPhase)
 		}
 	}
+}
+
+// TestImagePullFailureDeletesPod verifies that a task pod stuck pulling its image is
+// deleted when the action fails, so it cannot start once the image becomes available.
+func TestImagePullFailureDeletesPod(t *testing.T) {
+	runID := &common.RunIdentifier{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "development",
+		Name:    uniqueRunName("pull-fail"),
+	}
+	require.NoError(t, actionsClient.Enqueue(ctx, newRootTaskAction(runID), nil))
+
+	key := types.NamespacedName{Name: runID.Name + "-a0", Namespace: "flyte"}
+	req := reconcile.Request{NamespacedName: key}
+	ta := &flyteorgv1.TaskAction{}
+	pod := &corev1.Pod{}
+	require.Eventually(t, func() bool {
+		if _, err := reconciler.Reconcile(ctx, req); err != nil {
+			return false
+		}
+		if err := k8sClient.Get(ctx, key, ta); err != nil {
+			return false
+		}
+		pods := &corev1.PodList{}
+		if err := k8sClient.List(ctx, pods, client.InNamespace(key.Namespace)); err != nil {
+			return false
+		}
+		for i := range pods.Items {
+			for _, ref := range pods.Items[i].OwnerReferences {
+				if ref.UID == ta.UID {
+					*pod = pods.Items[i]
+					return true
+				}
+			}
+		}
+		return false
+	}, 15*time.Second, 200*time.Millisecond, "the pod plugin should create the task pod")
+
+	stuckSince := metav1.NewTime(time.Now().Add(-time.Hour))
+	pod.Status = corev1.PodStatus{
+		Phase: corev1.PodPending,
+		Conditions: []corev1.PodCondition{
+			{Type: corev1.PodScheduled, Status: corev1.ConditionTrue, LastTransitionTime: stuckSince},
+			{Type: corev1.PodReady, Status: corev1.ConditionFalse, Reason: "ContainersNotReady", LastTransitionTime: stuckSince},
+		},
+		ContainerStatuses: []corev1.ContainerStatus{{
+			Name:  pod.Spec.Containers[0].Name,
+			Image: pod.Spec.Containers[0].Image,
+			State: corev1.ContainerState{Waiting: &corev1.ContainerStateWaiting{
+				Reason:  "ImagePullBackOff",
+				Message: "Back-off pulling image",
+			}},
+		}},
+	}
+	require.NoError(t, k8sClient.Status().Update(ctx, pod))
+
+	require.Eventually(t, func() bool {
+		if _, err := reconciler.Reconcile(ctx, req); err != nil {
+			return false
+		}
+		if err := k8sClient.Get(ctx, key, ta); err != nil {
+			return false
+		}
+		return apimeta.IsStatusConditionTrue(ta.Status.Conditions, string(flyteorgv1.ConditionTypeFailed))
+	}, 15*time.Second, 200*time.Millisecond, "the action should fail once the image pull grace period has passed")
+
+	err := k8sClient.Get(ctx, client.ObjectKeyFromObject(pod), &corev1.Pod{})
+	t.Logf("pod %s after the action failed: %v", pod.Name, err)
+	assert.True(t, apierrors.IsNotFound(err), "the failed action's pod %s should be deleted, got %v", pod.Name, err)
 }
