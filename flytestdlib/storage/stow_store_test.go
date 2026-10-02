@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+	"syscall"
 	"testing"
 	"time"
 
@@ -177,13 +178,41 @@ func (mockStowItem) Metadata() (map[string]interface{}, error) {
 }
 
 func TestAwsBucketIsNotFound(t *testing.T) {
-	t.Run("detect is not found", func(t *testing.T) {
-		err := awserr.New(s32.ErrCodeNoSuchBucket, "foo", errors2.New("foo"))
-		assert.True(t, awsBucketIsNotFound(err))
+	for name, err := range errorWrappings(awserr.New(s32.ErrCodeNoSuchBucket, "foo", errors2.New("foo"))) {
+		t.Run("detect is not found/"+name, func(t *testing.T) {
+			assert.True(t, awsBucketIsNotFound(err))
+		})
+	}
+	for name, err := range errorWrappings(awserr.New(s32.ErrCodeInvalidObjectState, "foo", errors2.New("foo"))) {
+		t.Run("do not detect random errors/"+name, func(t *testing.T) {
+			assert.False(t, awsBucketIsNotFound(err))
+		})
+	}
+	t.Run("do not detect non aws errors", func(t *testing.T) {
+		assert.False(t, awsBucketIsNotFound(errors2.New("foo")))
+		assert.False(t, awsBucketIsNotFound(nil))
 	})
-	t.Run("do not detect random errors", func(t *testing.T) {
-		err := awserr.New(s32.ErrCodeInvalidObjectState, "foo", errors2.New("foo"))
-		assert.False(t, awsBucketIsNotFound(err))
+}
+
+func TestAwsBucketAlreadyExists(t *testing.T) {
+	for name, err := range errorWrappings(awserr.New(s32.ErrCodeBucketAlreadyOwnedByYou, "foo", errors2.New("foo"))) {
+		t.Run("detect already owned/"+name, func(t *testing.T) {
+			assert.True(t, awsBucketAlreadyExists(err))
+		})
+	}
+	for name, err := range errorWrappings(&os.PathError{Err: syscall.EEXIST}) {
+		t.Run("detect file exists/"+name, func(t *testing.T) {
+			assert.True(t, awsBucketAlreadyExists(err))
+		})
+	}
+	for name, err := range errorWrappings(awserr.New(s32.ErrCodeNoSuchBucket, "foo", errors2.New("foo"))) {
+		t.Run("do not detect random errors/"+name, func(t *testing.T) {
+			assert.False(t, awsBucketAlreadyExists(err))
+		})
+	}
+	t.Run("do not detect non aws errors", func(t *testing.T) {
+		assert.False(t, awsBucketAlreadyExists(errors2.New("foo")))
+		assert.False(t, awsBucketAlreadyExists(nil))
 	})
 }
 
@@ -728,6 +757,33 @@ func TestStowStore_WriteRaw(t *testing.T) {
 			return false
 		})
 		assert.True(t, containerStoredInDynamicContainerMap)
+	})
+	t.Run("create container when not found, stow wraps with %w", func(t *testing.T) {
+		var createCalled bool
+		s, err := NewStowRawStore(fn(container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id == container {
+					mockStowContainer := newMockStowContainer(container)
+					mockStowContainer.putCB = func(string, io.Reader, int64, map[string]interface{}) (stow.Item, error) {
+						noSuchBucket := awserr.New(s32.ErrCodeNoSuchBucket, "foo", errors2.New("foo"))
+						return nil, fmt.Errorf("PutObject, putting object: %w", noSuchBucket)
+					}
+					return mockStowContainer, nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+			CreateContainerCb: func(name string) (stow.Container, error) {
+				createCalled = true
+				if name == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+		}, nil, true, metrics)
+		assert.NoError(t, err)
+		err = s.WriteRaw(t.Context(), DataReference("s3://container/path"), 0, Options{}, bytes.NewReader([]byte{}))
+		assert.NoError(t, err)
+		assert.True(t, createCalled)
 	})
 	t.Run("bubble up generic put errors", func(t *testing.T) {
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{

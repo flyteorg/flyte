@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -177,7 +178,8 @@ func RegisterStowKind(kind string, f func(string) DataReference) error {
 
 // Checks if the error is AWS S3 bucket not found error
 func awsBucketIsNotFound(err error) bool {
-	if awsErr, errOk := errs.Cause(err).(awserr.Error); errOk {
+	var awsErr awserr.Error
+	if stdErrors.As(err, &awsErr) {
 		return awsErr.Code() == s32.ErrCodeNoSuchBucket
 	}
 
@@ -190,7 +192,8 @@ func awsBucketAlreadyExists(err error) bool {
 		return true
 	}
 
-	if awsErr, errOk := errs.Cause(err).(awserr.Error); errOk {
+	var awsErr awserr.Error
+	if stdErrors.As(err, &awsErr) {
 		return awsErr.Code() == s32.ErrCodeBucketAlreadyOwnedByYou
 	}
 
