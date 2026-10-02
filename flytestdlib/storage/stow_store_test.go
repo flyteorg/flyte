@@ -770,6 +770,36 @@ func TestStowStore_WriteRaw(t *testing.T) {
 		assert.True(t, *createCalled)
 		assert.Contains(t, created.items, "path")
 	})
+	t.Run("container created concurrently is loaded and written to", func(t *testing.T) {
+		existing := newMockStowContainer(container)
+		puts := 0
+		s, err := NewStowRawStore(fn(container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id != container {
+					return nil, fmt.Errorf("container is not supported")
+				}
+				// The first lookup is the configured container, whose bucket is gone. The next
+				// one is the reload after another writer created the bucket.
+				if puts == 0 {
+					missing := newMockStowContainer(container)
+					missing.putCB = func(string, io.Reader, int64, map[string]interface{}) (stow.Item, error) {
+						puts++
+						return nil, noSuchBucket
+					}
+					return missing, nil
+				}
+				return existing, nil
+			},
+			CreateContainerCb: func(string) (stow.Container, error) {
+				return nil, awserr.New(s32.ErrCodeBucketAlreadyOwnedByYou, "foo", errors2.New("foo"))
+			},
+		}, nil, true, metrics)
+		assert.NoError(t, err)
+
+		err = s.WriteRaw(t.Context(), DataReference("s3://container/path"), 5, Options{}, bytes.NewReader([]byte("hello")))
+		assert.NoError(t, err)
+		assert.Contains(t, existing.items, "path")
+	})
 	t.Run("write again continues from where the reader started", func(t *testing.T) {
 		s, created, _ := newStore(t, noSuchBucket)
 		var written []byte

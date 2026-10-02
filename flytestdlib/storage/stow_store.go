@@ -276,6 +276,15 @@ func (s *StowStore) createContainer(ctx context.Context, locID locationID, conta
 	if err != nil && !awsBucketAlreadyExists(err) && !IsExists(err) {
 		return nil, fmt.Errorf("unable to initialize container [%v]. Error: %v", container, err)
 	}
+
+	// The container already exists, e.g. a concurrent writer created it first, and the backend
+	// returned no container along with that error.
+	if c == nil {
+		c, err = s.getLocation(locID).Container(container)
+		if err != nil {
+			return nil, fmt.Errorf("unable to load existing container [%v]. Error: %w", container, err)
+		}
+	}
 	return c, nil
 }
 
