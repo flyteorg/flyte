@@ -156,8 +156,8 @@ github.com/felixge/httpsnoop v1.1.0 h1:3YtUj32ZZkqZtt3sZZsClsymw/QDuVfpNhoA31zeO
 github.com/felixge/httpsnoop v1.1.0/go.mod h1:Zqxgdd+1Rkcz8euOqdr7lqgCRJztwr5hp9vDSi5UZCE=
 github.com/fergusstrange/embedded-postgres v1.34.0 h1:c6RKhPKFsLVU+Tdxsx8q0UxCHsvZZ/iShAnljRBXs6s=
 github.com/fergusstrange/embedded-postgres v1.34.0/go.mod h1:w0YvnCgf19o6tskInrOOACtnqfVlOvluz3hlNLY7tRk=
-github.com/flyteorg/stow v0.3.13 h1:y393AZ9/GTX9n8wKQjicy3OylvhB66KtlaiZMGRIvF4=
-github.com/flyteorg/stow v0.3.13/go.mod h1:nyaBf8ZWkpHWkKIl4rqKI2uXfPx+VbL0PmEtvq4Pxkc=
+github.com/flyteorg/stow v0.4.0 h1:/8NkN0gS2O4A8IseiyoCFojxyCuFgGqOhOPdGT5kLqA=
+github.com/flyteorg/stow v0.4.0/go.mod h1:G/SB49T4eVq/4HJ0x7ulZ5ZFlbe+x4jcOt9zki5DwN0=
 github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHkI4W8=
 github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
 github.com/fsnotify/fsnotify v1.10.1 h1:b0/UzAf9yR5rhf3RPm9gf3ehBPpf0oZKIjtpKrx59Ho=

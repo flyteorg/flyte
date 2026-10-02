@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	stdErrors "errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -177,7 +178,8 @@ func RegisterStowKind(kind string, f func(string) DataReference) error {
 
 // Checks if the error is AWS S3 bucket not found error
 func awsBucketIsNotFound(err error) bool {
-	if awsErr, errOk := errs.Cause(err).(awserr.Error); errOk {
+	var awsErr awserr.Error
+	if stdErrors.As(err, &awsErr) {
 		return awsErr.Code() == s32.ErrCodeNoSuchBucket
 	}
 
@@ -190,7 +192,8 @@ func awsBucketAlreadyExists(err error) bool {
 		return true
 	}
 
-	if awsErr, errOk := errs.Cause(err).(awserr.Error); errOk {
+	var awsErr awserr.Error
+	if stdErrors.As(err, &awsErr) {
 		return awsErr.Code() == s32.ErrCodeBucketAlreadyOwnedByYou
 	}
 
@@ -272,6 +275,15 @@ func (s *StowStore) createContainer(ctx context.Context, locID locationID, conta
 	c, err := s.getLocation(locID).CreateContainer(container)
 	if err != nil && !awsBucketAlreadyExists(err) && !IsExists(err) {
 		return nil, fmt.Errorf("unable to initialize container [%v]. Error: %v", container, err)
+	}
+
+	// The container already exists, e.g. a concurrent writer created it first, and the backend
+	// returned no container along with that error.
+	if c == nil {
+		c, err = s.getLocation(locID).Container(container)
+		if err != nil {
+			return nil, fmt.Errorf("unable to load existing container [%v]. Error: %w", container, err)
+		}
 	}
 	return c, nil
 }
@@ -478,6 +490,15 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 		return err
 	}
 
+	// A failed write may have consumed part of raw, so remember where it started to be able to
+	// write again.
+	seeker, canRetry := raw.(io.Seeker)
+	var start int64
+	if canRetry {
+		start, err = seeker.Seek(0, io.SeekCurrent)
+		canRetry = err == nil
+	}
+
 	t1 := s.metrics.WriteLatency.Start(ctx)
 	t2 := s.metrics.WriteLatencyHist.Start(ctx)
 	_, err = container.Put(k, raw, size, opts.Metadata)
@@ -485,17 +506,71 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 	t2.Stop()
 
 	if err != nil {
-		// If this error is due to the bucket not existing, first attempt to create it and retry the getContainer call.
+		// If this error is due to the bucket not existing, create it and write again.
 		if IsNotFound(err) || awsBucketIsNotFound(err) {
 			container, err = s.CreateContainer(ctx, c)
 			if err == nil {
-				s.dynamicContainerMap.Store(container, c)
+				s.dynamicContainerMap.Store(locationIDMain.String()+c, container)
+				if !canRetry {
+					err = fmt.Errorf("container [%v] was created, but the data cannot be read again to retry the write", c)
+				} else if _, err = seeker.Seek(start, io.SeekStart); err == nil {
+					_, err = container.Put(k, raw, size, opts.Metadata)
+				}
 			}
 		}
 		if err != nil {
 			incFailureCounterForError(ctx, s.metrics.WriteFailure, err)
 			return errs.Wrapf(err, "Failed to write data [%vb] to path [%v].", size, k)
 		}
+	}
+
+	return nil
+}
+
+// CopyRaw copies source to destination. A container that implements stow.Copier makes the copy
+// itself, on the server side when the backend supports it. Otherwise the content is streamed from
+// the source to the destination, which holds only the upload buffers of the backend in memory
+// instead of the whole object.
+func (s *StowStore) CopyRaw(ctx context.Context, source, destination DataReference, _ Options) error {
+	_, srcContainerName, srcKey, err := source.Split()
+	if err != nil {
+		s.metrics.BadReference.Inc(ctx)
+		return err
+	}
+
+	_, dstContainerName, dstKey, err := destination.Split()
+	if err != nil {
+		s.metrics.BadReference.Inc(ctx)
+		return err
+	}
+
+	srcContainer, err := s.getContainer(ctx, locationIDMain, srcContainerName)
+	if err != nil {
+		return err
+	}
+
+	dstContainer, err := s.getContainer(ctx, locationIDMain, dstContainerName)
+	if err != nil {
+		return err
+	}
+
+	item, err := srcContainer.Item(srcKey)
+	if err != nil {
+		incFailureCounterForError(ctx, s.metrics.ReadFailure, err)
+		return errs.Wrapf(err, "path:%v", source)
+	}
+
+	defer s.copyImpl.metrics.CopyLatency.Start(ctx).Stop()
+
+	if copier, ok := dstContainer.(stow.Copier); ok {
+		_, err = copier.Copy(ctx, item, dstKey)
+	} else {
+		_, err = stow.StreamCopy(ctx, dstContainer, item, dstKey)
+	}
+
+	if err != nil {
+		incFailureCounterForError(ctx, s.metrics.WriteFailure, err)
+		return errs.Wrapf(err, "Failed to copy [%v] to [%v].", source, destination)
 	}
 
 	return nil

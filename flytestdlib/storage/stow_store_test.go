@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+	"syscall"
 	"testing"
 	"time"
 
@@ -177,13 +178,41 @@ func (mockStowItem) Metadata() (map[string]interface{}, error) {
 }
 
 func TestAwsBucketIsNotFound(t *testing.T) {
-	t.Run("detect is not found", func(t *testing.T) {
-		err := awserr.New(s32.ErrCodeNoSuchBucket, "foo", errors2.New("foo"))
-		assert.True(t, awsBucketIsNotFound(err))
+	for name, err := range errorWrappings(awserr.New(s32.ErrCodeNoSuchBucket, "foo", errors2.New("foo"))) {
+		t.Run("detect is not found/"+name, func(t *testing.T) {
+			assert.True(t, awsBucketIsNotFound(err))
+		})
+	}
+	for name, err := range errorWrappings(awserr.New(s32.ErrCodeInvalidObjectState, "foo", errors2.New("foo"))) {
+		t.Run("do not detect random errors/"+name, func(t *testing.T) {
+			assert.False(t, awsBucketIsNotFound(err))
+		})
+	}
+	t.Run("do not detect non aws errors", func(t *testing.T) {
+		assert.False(t, awsBucketIsNotFound(errors2.New("foo")))
+		assert.False(t, awsBucketIsNotFound(nil))
 	})
-	t.Run("do not detect random errors", func(t *testing.T) {
-		err := awserr.New(s32.ErrCodeInvalidObjectState, "foo", errors2.New("foo"))
-		assert.False(t, awsBucketIsNotFound(err))
+}
+
+func TestAwsBucketAlreadyExists(t *testing.T) {
+	for name, err := range errorWrappings(awserr.New(s32.ErrCodeBucketAlreadyOwnedByYou, "foo", errors2.New("foo"))) {
+		t.Run("detect already owned/"+name, func(t *testing.T) {
+			assert.True(t, awsBucketAlreadyExists(err))
+		})
+	}
+	for name, err := range errorWrappings(&os.PathError{Err: syscall.EEXIST}) {
+		t.Run("detect file exists/"+name, func(t *testing.T) {
+			assert.True(t, awsBucketAlreadyExists(err))
+		})
+	}
+	for name, err := range errorWrappings(awserr.New(s32.ErrCodeNoSuchBucket, "foo", errors2.New("foo"))) {
+		t.Run("do not detect random errors/"+name, func(t *testing.T) {
+			assert.False(t, awsBucketAlreadyExists(err))
+		})
+	}
+	t.Run("do not detect non aws errors", func(t *testing.T) {
+		assert.False(t, awsBucketAlreadyExists(errors2.New("foo")))
+		assert.False(t, awsBucketAlreadyExists(nil))
 	})
 }
 
@@ -694,14 +723,17 @@ func TestStowStore_WriteRaw(t *testing.T) {
 	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
 	const container = "container"
 	fn := fQNFn["s3"]
-	t.Run("create container when not found", func(t *testing.T) {
-		var createCalled bool
+	// newStore returns a store whose configured container fails every Put with putErr, and the
+	// container CreateContainer hands out.
+	newStore := func(t *testing.T, putErr error) (*StowStore, *mockStowContainer, *bool) {
+		created := newMockStowContainer(container)
+		createCalled := false
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
 			ContainerCb: func(id string) (stow.Container, error) {
 				if id == container {
 					mockStowContainer := newMockStowContainer(container)
-					mockStowContainer.putCB = func(name string, r io.Reader, size int64, metadata map[string]interface{}) (stow.Item, error) {
-						return nil, awserr.New(s32.ErrCodeNoSuchBucket, "foo", errors2.New("foo"))
+					mockStowContainer.putCB = func(string, io.Reader, int64, map[string]interface{}) (stow.Item, error) {
+						return nil, putErr
 					}
 					return mockStowContainer, nil
 				}
@@ -710,24 +742,85 @@ func TestStowStore_WriteRaw(t *testing.T) {
 			CreateContainerCb: func(name string) (stow.Container, error) {
 				createCalled = true
 				if name == container {
-					return newMockStowContainer(container), nil
+					return created, nil
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
 		}, nil, true, metrics)
 		assert.NoError(t, err)
-		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 0, Options{}, bytes.NewReader([]byte{}))
+		return s, created, &createCalled
+	}
+	noSuchBucket := awserr.New(s32.ErrCodeNoSuchBucket, "foo", errors2.New("foo"))
+
+	t.Run("create container when not found and write again", func(t *testing.T) {
+		s, created, createCalled := newStore(t, noSuchBucket)
+		err := s.WriteRaw(t.Context(), DataReference("s3://container/path"), 5, Options{}, bytes.NewReader([]byte("hello")))
 		assert.NoError(t, err)
-		assert.True(t, createCalled)
-		var containerStoredInDynamicContainerMap bool
-		s.dynamicContainerMap.Range(func(key, value interface{}) bool {
-			if value == container {
-				containerStoredInDynamicContainerMap = true
-				return true
-			}
-			return false
-		})
-		assert.True(t, containerStoredInDynamicContainerMap)
+		assert.True(t, *createCalled)
+		// The object was written to the created container, which is now the one in use.
+		assert.Contains(t, created.items, "path")
+		stored, ok := s.dynamicContainerMap.Load(locationIDMain.String() + container)
+		assert.True(t, ok)
+		assert.Same(t, created, stored)
+	})
+	t.Run("create container when not found, stow wraps with %w", func(t *testing.T) {
+		s, created, createCalled := newStore(t, fmt.Errorf("PutObject, putting object: %w", noSuchBucket))
+		err := s.WriteRaw(t.Context(), DataReference("s3://container/path"), 5, Options{}, bytes.NewReader([]byte("hello")))
+		assert.NoError(t, err)
+		assert.True(t, *createCalled)
+		assert.Contains(t, created.items, "path")
+	})
+	t.Run("container created concurrently is loaded and written to", func(t *testing.T) {
+		existing := newMockStowContainer(container)
+		puts := 0
+		s, err := NewStowRawStore(fn(container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id != container {
+					return nil, fmt.Errorf("container is not supported")
+				}
+				// The first lookup is the configured container, whose bucket is gone. The next
+				// one is the reload after another writer created the bucket.
+				if puts == 0 {
+					missing := newMockStowContainer(container)
+					missing.putCB = func(string, io.Reader, int64, map[string]interface{}) (stow.Item, error) {
+						puts++
+						return nil, noSuchBucket
+					}
+					return missing, nil
+				}
+				return existing, nil
+			},
+			CreateContainerCb: func(string) (stow.Container, error) {
+				return nil, awserr.New(s32.ErrCodeBucketAlreadyOwnedByYou, "foo", errors2.New("foo"))
+			},
+		}, nil, true, metrics)
+		assert.NoError(t, err)
+
+		err = s.WriteRaw(t.Context(), DataReference("s3://container/path"), 5, Options{}, bytes.NewReader([]byte("hello")))
+		assert.NoError(t, err)
+		assert.Contains(t, existing.items, "path")
+	})
+	t.Run("write again continues from where the reader started", func(t *testing.T) {
+		s, created, _ := newStore(t, noSuchBucket)
+		var written []byte
+		created.putCB = func(_ string, r io.Reader, _ int64, _ map[string]interface{}) (stow.Item, error) {
+			var err error
+			written, err = io.ReadAll(r)
+			return mockStowItem{}, err
+		}
+		reader := bytes.NewReader([]byte("skip hello"))
+		_, err := reader.Seek(5, io.SeekStart)
+		assert.NoError(t, err)
+		assert.NoError(t, s.WriteRaw(t.Context(), DataReference("s3://container/path"), 5, Options{}, reader))
+		assert.Equal(t, "hello", string(written))
+	})
+	t.Run("data that cannot be read again is an error, not a silent loss", func(t *testing.T) {
+		s, created, createCalled := newStore(t, noSuchBucket)
+		raw := io.LimitReader(bytes.NewReader([]byte("hello")), 5)
+		err := s.WriteRaw(t.Context(), DataReference("s3://container/path"), 5, Options{}, raw)
+		assert.ErrorContains(t, err, "cannot be read again")
+		assert.True(t, *createCalled)
+		assert.Empty(t, created.items)
 	})
 	t.Run("bubble up generic put errors", func(t *testing.T) {
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
@@ -993,4 +1086,103 @@ func writeTestFileWithSize(ctx context.Context, t *testing.T, s *StowStore, path
 	assert.True(t, metadata.Exists())
 
 	return reference
+}
+
+// mockStowCopierContainer is a container that also copies on the server side.
+type mockStowCopierContainer struct {
+	*mockStowContainer
+	copyCB func(ctx context.Context, src stow.Item, name string) (stow.Item, error)
+}
+
+func (m *mockStowCopierContainer) Copy(ctx context.Context, src stow.Item, name string) (stow.Item, error) {
+	return m.copyCB(ctx, src, name)
+}
+
+func TestStowStore_CopyRaw(t *testing.T) {
+	const container = "container"
+	const source = DataReference("s3://container/src/outputs.pb")
+	const destination = DataReference("s3://container/dst/outputs.pb")
+
+	newStore := func(t *testing.T, c stow.Container) *StowStore {
+		s, err := NewStowRawStore(fQNFn["s3"](container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id == container {
+					return c, nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+		}, nil, false, metrics)
+		assert.NoError(t, err)
+		return s
+	}
+
+	// newContainer returns a container holding the source item, which is over the download limit:
+	// no copy may read it through ReadRaw. Any Put fails the test unless a streamed copy is expected.
+	newContainer := func(t *testing.T, putAllowed bool) (*mockStowContainer, *int) {
+		puts := 0
+		c := newMockStowContainer(container)
+		c.items["src/outputs.pb"] = mockStowItem{url: "src/outputs.pb", size: 1 << 30}
+		c.putCB = func(name string, r io.Reader, size int64, metadata map[string]interface{}) (stow.Item, error) {
+			puts++
+			if !putAllowed {
+				t.Errorf("unexpected Put of [%v]", name)
+			}
+			// The reader is the opened source item, handed over as is: nothing was buffered.
+			_, buffered := r.(*bytes.Reader)
+			assert.False(t, buffered, "source was buffered before the upload")
+			assert.Equal(t, "dst/outputs.pb", name)
+			assert.Equal(t, int64(1<<30), size)
+			return mockStowItem{url: name, size: size}, nil
+		}
+		return c, &puts
+	}
+
+	t.Run("server side", func(t *testing.T) {
+		base, _ := newContainer(t, false)
+		var copied []string
+		s := newStore(t, &mockStowCopierContainer{
+			mockStowContainer: base,
+			copyCB: func(_ context.Context, src stow.Item, name string) (stow.Item, error) {
+				copied = append(copied, src.ID()+" -> "+name)
+				return mockStowItem{url: name}, nil
+			},
+		})
+
+		assert.NoError(t, s.CopyRaw(context.Background(), source, destination, Options{}))
+		assert.Equal(t, []string{"src/outputs.pb -> dst/outputs.pb"}, copied)
+	})
+
+	t.Run("source not found", func(t *testing.T) {
+		base, _ := newContainer(t, false)
+		s := newStore(t, &mockStowCopierContainer{
+			mockStowContainer: base,
+			copyCB: func(context.Context, stow.Item, string) (stow.Item, error) {
+				t.Error("unexpected Copy")
+				return nil, nil
+			},
+		})
+
+		err := s.CopyRaw(context.Background(), "s3://container/missing/outputs.pb", destination, Options{})
+		assert.True(t, IsNotFound(err), "got %v", err)
+	})
+
+	t.Run("copy fails", func(t *testing.T) {
+		base, _ := newContainer(t, false)
+		s := newStore(t, &mockStowCopierContainer{
+			mockStowContainer: base,
+			copyCB: func(context.Context, stow.Item, string) (stow.Item, error) {
+				return nil, fmt.Errorf("access denied")
+			},
+		})
+
+		assert.ErrorContains(t, s.CopyRaw(context.Background(), source, destination, Options{}), "access denied")
+	})
+
+	t.Run("container without copy streams", func(t *testing.T) {
+		base, puts := newContainer(t, true)
+		s := newStore(t, base)
+
+		assert.NoError(t, s.CopyRaw(context.Background(), source, destination, Options{}))
+		assert.Equal(t, 1, *puts)
+	})
 }

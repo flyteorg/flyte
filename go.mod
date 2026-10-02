@@ -23,7 +23,7 @@ require (
 	github.com/ernesto-jimenez/gogen v0.0.0-20180125220232-d7d4131e6607
 	github.com/fatih/color v1.19.0
 	github.com/fergusstrange/embedded-postgres v1.34.0
-	github.com/flyteorg/stow v0.3.13
+	github.com/flyteorg/stow v0.4.0
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-test/deep v1.1.1
