@@ -481,6 +481,15 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 		return err
 	}
 
+	// A failed write may have consumed part of raw, so remember where it started to be able to
+	// write again.
+	seeker, canRetry := raw.(io.Seeker)
+	var start int64
+	if canRetry {
+		start, err = seeker.Seek(0, io.SeekCurrent)
+		canRetry = err == nil
+	}
+
 	t1 := s.metrics.WriteLatency.Start(ctx)
 	t2 := s.metrics.WriteLatencyHist.Start(ctx)
 	_, err = container.Put(k, raw, size, opts.Metadata)
@@ -488,11 +497,16 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 	t2.Stop()
 
 	if err != nil {
-		// If this error is due to the bucket not existing, first attempt to create it and retry the getContainer call.
+		// If this error is due to the bucket not existing, create it and write again.
 		if IsNotFound(err) || awsBucketIsNotFound(err) {
 			container, err = s.CreateContainer(ctx, c)
 			if err == nil {
-				s.dynamicContainerMap.Store(container, c)
+				s.dynamicContainerMap.Store(locationIDMain.String()+c, container)
+				if !canRetry {
+					err = fmt.Errorf("container [%v] did not exist and was created, but the data cannot be read again to retry the write", c)
+				} else if _, err = seeker.Seek(start, io.SeekStart); err == nil {
+					_, err = container.Put(k, raw, size, opts.Metadata)
+				}
 			}
 		}
 		if err != nil {
@@ -542,7 +556,7 @@ func (s *StowStore) CopyRaw(ctx context.Context, source, destination DataReferen
 	if copier, ok := dstContainer.(stow.Copier); ok {
 		_, err = copier.Copy(ctx, item, dstKey)
 	} else {
-		err = streamItem(item, dstContainer, dstKey)
+		_, err = stow.StreamCopy(ctx, dstContainer, item, dstKey)
 	}
 
 	if err != nil {
@@ -551,30 +565,6 @@ func (s *StowStore) CopyRaw(ctx context.Context, source, destination DataReferen
 	}
 
 	return nil
-}
-
-// streamItem uploads item to the container as name, reading it as the upload consumes it.
-func streamItem(item stow.Item, container stow.Container, name string) error {
-	size, err := item.Size()
-	if err != nil {
-		return err
-	}
-
-	metadata, err := item.Metadata()
-	if err != nil {
-		return err
-	}
-
-	reader, err := item.Open()
-	if err != nil {
-		return err
-	}
-	_, err = container.Put(name, reader, size, metadata)
-	if closeErr := reader.Close(); err == nil {
-		err = closeErr
-	}
-
-	return err
 }
 
 // Delete removes the referenced data from the blob store.

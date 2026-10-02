@@ -723,50 +723,17 @@ func TestStowStore_WriteRaw(t *testing.T) {
 	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
 	const container = "container"
 	fn := fQNFn["s3"]
-	t.Run("create container when not found", func(t *testing.T) {
-		var createCalled bool
-		s, err := NewStowRawStore(fn(container), &mockStowLoc{
-			ContainerCb: func(id string) (stow.Container, error) {
-				if id == container {
-					mockStowContainer := newMockStowContainer(container)
-					mockStowContainer.putCB = func(name string, r io.Reader, size int64, metadata map[string]interface{}) (stow.Item, error) {
-						return nil, awserr.New(s32.ErrCodeNoSuchBucket, "foo", errors2.New("foo"))
-					}
-					return mockStowContainer, nil
-				}
-				return nil, fmt.Errorf("container is not supported")
-			},
-			CreateContainerCb: func(name string) (stow.Container, error) {
-				createCalled = true
-				if name == container {
-					return newMockStowContainer(container), nil
-				}
-				return nil, fmt.Errorf("container is not supported")
-			},
-		}, nil, true, metrics)
-		assert.NoError(t, err)
-		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 0, Options{}, bytes.NewReader([]byte{}))
-		assert.NoError(t, err)
-		assert.True(t, createCalled)
-		var containerStoredInDynamicContainerMap bool
-		s.dynamicContainerMap.Range(func(key, value interface{}) bool {
-			if value == container {
-				containerStoredInDynamicContainerMap = true
-				return true
-			}
-			return false
-		})
-		assert.True(t, containerStoredInDynamicContainerMap)
-	})
-	t.Run("create container when not found, stow wraps with %w", func(t *testing.T) {
-		var createCalled bool
+	// newStore returns a store whose configured container fails every Put with putErr, and the
+	// container CreateContainer hands out.
+	newStore := func(t *testing.T, putErr error) (*StowStore, *mockStowContainer, *bool) {
+		created := newMockStowContainer(container)
+		createCalled := false
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
 			ContainerCb: func(id string) (stow.Container, error) {
 				if id == container {
 					mockStowContainer := newMockStowContainer(container)
 					mockStowContainer.putCB = func(string, io.Reader, int64, map[string]interface{}) (stow.Item, error) {
-						noSuchBucket := awserr.New(s32.ErrCodeNoSuchBucket, "foo", errors2.New("foo"))
-						return nil, fmt.Errorf("PutObject, putting object: %w", noSuchBucket)
+						return nil, putErr
 					}
 					return mockStowContainer, nil
 				}
@@ -775,15 +742,54 @@ func TestStowStore_WriteRaw(t *testing.T) {
 			CreateContainerCb: func(name string) (stow.Container, error) {
 				createCalled = true
 				if name == container {
-					return newMockStowContainer(container), nil
+					return created, nil
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
 		}, nil, true, metrics)
 		assert.NoError(t, err)
-		err = s.WriteRaw(t.Context(), DataReference("s3://container/path"), 0, Options{}, bytes.NewReader([]byte{}))
+		return s, created, &createCalled
+	}
+	noSuchBucket := awserr.New(s32.ErrCodeNoSuchBucket, "foo", errors2.New("foo"))
+
+	t.Run("create container when not found and write again", func(t *testing.T) {
+		s, created, createCalled := newStore(t, noSuchBucket)
+		err := s.WriteRaw(t.Context(), DataReference("s3://container/path"), 5, Options{}, bytes.NewReader([]byte("hello")))
 		assert.NoError(t, err)
-		assert.True(t, createCalled)
+		assert.True(t, *createCalled)
+		// The object was written to the created container, which is now the one in use.
+		assert.Contains(t, created.items, "path")
+		stored, ok := s.dynamicContainerMap.Load(locationIDMain.String() + container)
+		assert.True(t, ok)
+		assert.Same(t, created, stored)
+	})
+	t.Run("create container when not found, stow wraps with %w", func(t *testing.T) {
+		s, created, createCalled := newStore(t, fmt.Errorf("PutObject, putting object: %w", noSuchBucket))
+		err := s.WriteRaw(t.Context(), DataReference("s3://container/path"), 5, Options{}, bytes.NewReader([]byte("hello")))
+		assert.NoError(t, err)
+		assert.True(t, *createCalled)
+		assert.Contains(t, created.items, "path")
+	})
+	t.Run("write again continues from where the reader started", func(t *testing.T) {
+		s, created, _ := newStore(t, noSuchBucket)
+		var written []byte
+		created.putCB = func(_ string, r io.Reader, _ int64, _ map[string]interface{}) (stow.Item, error) {
+			var err error
+			written, err = io.ReadAll(r)
+			return mockStowItem{}, err
+		}
+		reader := bytes.NewReader([]byte("skip hello"))
+		_, err := reader.Seek(5, io.SeekStart)
+		assert.NoError(t, err)
+		assert.NoError(t, s.WriteRaw(t.Context(), DataReference("s3://container/path"), 5, Options{}, reader))
+		assert.Equal(t, "hello", string(written))
+	})
+	t.Run("data that cannot be read again is an error, not a silent loss", func(t *testing.T) {
+		s, created, createCalled := newStore(t, noSuchBucket)
+		err := s.WriteRaw(t.Context(), DataReference("s3://container/path"), 5, Options{}, io.LimitReader(bytes.NewReader([]byte("hello")), 5))
+		assert.ErrorContains(t, err, "cannot be read again")
+		assert.True(t, *createCalled)
+		assert.Empty(t, created.items)
 	})
 	t.Run("bubble up generic put errors", func(t *testing.T) {
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
