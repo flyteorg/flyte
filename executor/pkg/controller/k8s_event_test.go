@@ -3,9 +3,16 @@ package controller
 import (
 	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 
+	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
@@ -26,6 +33,9 @@ func TestTruncateUTF8(t *testing.T) {
 		{name: "sentence over max", s: "the task failed after three retries", max: 15, expected: "the task failed"},
 		{name: "zero max", s: "task failed", max: 0, expected: ""},
 		{name: "message over note limit", s: longMessage, max: 1024, expected: longMessage[:1024]},
+		// "task " is 5 bytes and each euro sign is 3, so byte 9 is inside the second euro sign.
+		{name: "cut inside a multi-byte character", s: "task \u20ac\u20ac!", max: 9, expected: "task \u20ac"},
+		{name: "invalid byte inside the limit", s: "ab\xffcd", max: 10, expected: "abcd"},
 	}
 
 	for _, tt := range tests {
@@ -33,8 +43,84 @@ func TestTruncateUTF8(t *testing.T) {
 			got := truncateUTF8(tt.s, tt.max)
 			assert.Equal(t, tt.expected, got)
 			assert.LessOrEqual(t, len(got), tt.max)
+			assert.True(t, utf8.ValidString(got))
 		})
 	}
+}
+
+// testTaskAction returns the TaskAction that the k8s event of an action event refers to.
+func testTaskAction() *flyteorgv1.TaskAction {
+	return &flyteorgv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "run1-a0",
+			Namespace: "flytesnacks-development",
+			UID:       types.UID("uid-1"),
+		},
+	}
+}
+
+func TestBuildActionEventK8s(t *testing.T) {
+	taskAction := testTaskAction()
+
+	t.Run("fields the apiserver checks", func(t *testing.T) {
+		event := testActionEvent(common.ActionPhase_ACTION_PHASE_SUCCEEDED, 0)
+
+		ev, err := buildActionEventK8s(taskAction, event, "taskaction-controller-host1")
+		assert.NoError(t, err)
+
+		assert.Equal(t, taskAction.Namespace, ev.Namespace)
+		assert.Equal(t, ev.Namespace, ev.Regarding.Namespace)
+		assert.Equal(t, taskAction.Name+".", ev.GenerateName)
+		assert.Equal(t, flyteorgv1.GroupVersion.String(), ev.Regarding.APIVersion)
+		assert.Equal(t, "TaskAction", ev.Regarding.Kind)
+		assert.Equal(t, taskAction.Name, ev.Regarding.Name)
+		assert.Equal(t, taskAction.UID, ev.Regarding.UID)
+
+		assert.NotEmpty(t, ev.Type)
+		assert.NotEmpty(t, ev.Reason)
+		assert.NotEmpty(t, ev.Action)
+		assert.NotEmpty(t, ev.ReportingController)
+		assert.Equal(t, "taskaction-controller-host1", ev.ReportingInstance)
+	})
+
+	t.Run("no error annotations without error info", func(t *testing.T) {
+		event := testActionEvent(common.ActionPhase_ACTION_PHASE_SUCCEEDED, 0)
+
+		ev, err := buildActionEventK8s(taskAction, event, "taskaction-controller-host1")
+		assert.NoError(t, err)
+
+		_, ok := ev.Annotations[annErrorKind]
+		assert.False(t, ok)
+		_, ok = ev.Annotations[annErrorCode]
+		assert.False(t, ok)
+	})
+
+	t.Run("error annotations with error info", func(t *testing.T) {
+		event := testActionEvent(common.ActionPhase_ACTION_PHASE_FAILED, 0)
+		event.ErrorInfo = &workflow.ErrorInfo{
+			Kind:    workflow.ErrorInfo_KIND_USER,
+			Code:    "OOMKilled",
+			Message: "container exceeded its memory limit",
+		}
+
+		ev, err := buildActionEventK8s(taskAction, event, "taskaction-controller-host1")
+		assert.NoError(t, err)
+
+		assert.Equal(t, "KIND_USER", ev.Annotations[annErrorKind])
+		assert.Equal(t, "OOMKilled", ev.Annotations[annErrorCode])
+	})
+
+	t.Run("info annotation decodes to the original event", func(t *testing.T) {
+		event := testActionEvent(common.ActionPhase_ACTION_PHASE_FAILED, 3)
+		event.ErrorInfo = &workflow.ErrorInfo{Kind: workflow.ErrorInfo_KIND_SYSTEM, Code: "Evicted"}
+
+		ev, err := buildActionEventK8s(taskAction, event, "taskaction-controller-host1")
+		assert.NoError(t, err)
+
+		decoded := &workflow.ActionEvent{}
+		assert.NoError(t, protojson.Unmarshal([]byte(ev.Annotations[annInfo]), decoded))
+		assert.True(t, proto.Equal(event, decoded))
+	})
 }
 
 // testActionEvent returns an event for action a0 of run run1, attempt 1.
@@ -76,4 +162,76 @@ func TestEventLevelOf(t *testing.T) {
 			assert.Equal(t, tt.expected, got)
 		})
 	}
+}
+
+func TestEventType(t *testing.T) {
+	tests := []struct {
+		name     string
+		phase    common.ActionPhase
+		version  uint32
+		expected string
+	}{
+		{"running", common.ActionPhase_ACTION_PHASE_RUNNING, 0, corev1.EventTypeNormal},
+		{"succeeded", common.ActionPhase_ACTION_PHASE_SUCCEEDED, 0, corev1.EventTypeNormal},
+		{"aborted is requested, not a fault", common.ActionPhase_ACTION_PHASE_ABORTED, 0, corev1.EventTypeNormal},
+		{"failed", common.ActionPhase_ACTION_PHASE_FAILED, 0, corev1.EventTypeWarning},
+		{"timed out", common.ActionPhase_ACTION_PHASE_TIMED_OUT, 0, corev1.EventTypeWarning},
+		{"system retry", common.ActionPhase_ACTION_PHASE_QUEUED, systemRetryEventVersionBase, corev1.EventTypeWarning},
+		{"queued", common.ActionPhase_ACTION_PHASE_QUEUED, 0, corev1.EventTypeNormal}}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, eventType(testActionEvent(tt.phase, tt.version)))
+		})
+	}
+}
+
+func TestEventReason(t *testing.T) {
+	t.Run("system retry is checked before the phase", func(t *testing.T) {
+		event := testActionEvent(common.ActionPhase_ACTION_PHASE_QUEUED, systemRetryEventVersionBase)
+		assert.Equal(t, string(ReasonActionSystemRetry), eventReason(event))
+	})
+
+	t.Run("failed", func(t *testing.T) {
+		event := testActionEvent(common.ActionPhase_ACTION_PHASE_FAILED, 0)
+		assert.Equal(t, string(ReasonActionFailed), eventReason(event))
+	})
+
+	t.Run("every phase has a valid reason", func(t *testing.T) {
+		for value, name := range common.ActionPhase_name {
+			event := testActionEvent(common.ActionPhase(value), 0)
+			reason := eventReason(event)
+			assert.NotEmpty(t, reason, name)
+			assert.LessOrEqual(t, len(reason), 128, name)
+		}
+	})
+}
+
+func TestHumanSummary(t *testing.T) {
+	t.Run("no error", func(t *testing.T) {
+		event := testActionEvent(common.ActionPhase_ACTION_PHASE_TIMED_OUT, 0)
+		assert.Equal(t, "action a0 attempt 1 timed out", humanSummary(event))
+	})
+
+	t.Run("system retry", func(t *testing.T) {
+		event := testActionEvent(common.ActionPhase_ACTION_PHASE_QUEUED, systemRetryEventVersionBase)
+		assert.Equal(t, "action a0 attempt 1 restarted after a system failure", humanSummary(event))
+	})
+
+	t.Run("with error", func(t *testing.T) {
+		event := testActionEvent(common.ActionPhase_ACTION_PHASE_FAILED, 0)
+		event.ErrorInfo = &workflow.ErrorInfo{
+			Kind:    workflow.ErrorInfo_KIND_USER,
+			Code:    "OOMKilled",
+			Message: "container exceeded its memory limit",
+		}
+		assert.Equal(t,
+			`action a0 attempt 1 failed: USER error "OOMKilled": container exceeded its memory limit`,
+			humanSummary(event))
+	})
+
+	t.Run("long message fits in the note", func(t *testing.T) {
+		event := testActionEvent(common.ActionPhase_ACTION_PHASE_FAILED, 0)
+		event.ErrorInfo = &workflow.ErrorInfo{Message: strings.Repeat("stack frame ", 200)}
+		assert.LessOrEqual(t, len(humanSummary(event)), noteLimit)
+	})
 }
