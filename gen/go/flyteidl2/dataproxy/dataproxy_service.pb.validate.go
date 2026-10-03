@@ -106,6 +106,8 @@ func (m *CreateUploadLocationRequest) validate(all bool) error {
 
 	// no validation rules for ContentLength
 
+	// no validation rules for RunSource
+
 	if len(errors) > 0 {
 		return CreateUploadLocationRequestMultiError(errors)
 	}

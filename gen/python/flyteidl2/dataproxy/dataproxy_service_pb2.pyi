@@ -26,7 +26,7 @@ ARTIFACT_TYPE_REPORT: ArtifactType
 ARTIFACT_TYPE_CODE_BUNDLE: ArtifactType
 
 class CreateUploadLocationRequest(_message.Message):
-    __slots__ = ["project", "domain", "filename", "expires_in", "content_md5", "filename_root", "add_content_md5_metadata", "org", "content_length"]
+    __slots__ = ["project", "domain", "filename", "expires_in", "content_md5", "filename_root", "add_content_md5_metadata", "org", "content_length", "run_source"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     FILENAME_FIELD_NUMBER: _ClassVar[int]
@@ -36,6 +36,7 @@ class CreateUploadLocationRequest(_message.Message):
     ADD_CONTENT_MD5_METADATA_FIELD_NUMBER: _ClassVar[int]
     ORG_FIELD_NUMBER: _ClassVar[int]
     CONTENT_LENGTH_FIELD_NUMBER: _ClassVar[int]
+    RUN_SOURCE_FIELD_NUMBER: _ClassVar[int]
     project: str
     domain: str
     filename: str
@@ -45,7 +46,8 @@ class CreateUploadLocationRequest(_message.Message):
     add_content_md5_metadata: bool
     org: str
     content_length: int
-    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., filename: _Optional[str] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., content_md5: _Optional[bytes] = ..., filename_root: _Optional[str] = ..., add_content_md5_metadata: bool = ..., org: _Optional[str] = ..., content_length: _Optional[int] = ...) -> None: ...
+    run_source: _run_definition_pb2.RunSource
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., filename: _Optional[str] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., content_md5: _Optional[bytes] = ..., filename_root: _Optional[str] = ..., add_content_md5_metadata: bool = ..., org: _Optional[str] = ..., content_length: _Optional[int] = ..., run_source: _Optional[_Union[_run_definition_pb2.RunSource, str]] = ...) -> None: ...
 
 class CreateUploadLocationResponse(_message.Message):
     __slots__ = ["signed_url", "native_url", "expires_at", "headers"]

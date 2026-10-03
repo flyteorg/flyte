@@ -91,6 +91,14 @@ message CreateUploadLocationRequest {
   // This is validated against the platform's maximum upload size if provided.
   // +optional
   int64 content_length = 9;
+
+  // Source of the run this upload belongs to. The service uses this to route the
+  // artifact to the matching storage instead of inferring intent from the shape of
+  // filename_root: RUN_SOURCE_TRACKED marks tracked-run metadata (inputs.pb /
+  // outputs.pb / report.html) served from control-plane-owned tracked-runs storage;
+  // anything else keeps the standard behavior.
+  // +optional
+  workflow.RunSource run_source = 10;
 }
 
 // CreateUploadLocationResponse specifies the response for the CreateUploadLocation API.
