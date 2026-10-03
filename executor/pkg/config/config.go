@@ -9,25 +9,30 @@ import (
 
 const configSectionKey = "executor"
 
+// DefaultMaxSystemFailures bounds consecutive system errors before a TaskAction
+// is forced to PermanentFailure, applied wherever MaxSystemFailures is unset.
+const DefaultMaxSystemFailures uint32 = 3
+
 //go:generate pflags Config --default-var=defaultConfig
 
 var (
 	defaultConfig = &Config{
-		MetricsBindAddress:      ":10254",
-		HealthProbeBindAddress:  ":8081",
-		LeaderElect:             false,
-		MetricsSecure:           true,
-		WebhookCertName:         "tls.crt",
-		WebhookCertKey:          "tls.key",
-		MetricsCertName:         "tls.crt",
-		MetricsCertKey:          "tls.key",
-		EnableHTTP2:             false,
-		EventsService:           serviceclient.ServiceConfig{URL: "http://localhost:8090"},
-		CacheService:            serviceclient.ServiceConfig{URL: "http://localhost:8094"},
-		Cluster:                 "",
-		MaxSystemFailures:       3,
-		MaxConcurrentReconciles: 512,
-		RequeueDuration:         stdconfig.Duration{Duration: 10 * time.Second},
+		MetricsBindAddress:            ":10254",
+		HealthProbeBindAddress:        ":8081",
+		LeaderElect:                   false,
+		MetricsSecure:                 true,
+		WebhookCertName:               "tls.crt",
+		WebhookCertKey:                "tls.key",
+		MetricsCertName:               "tls.crt",
+		MetricsCertKey:                "tls.key",
+		EnableHTTP2:                   false,
+		EventsService:                 serviceclient.ServiceConfig{URL: "http://localhost:8090"},
+		CacheService:                  serviceclient.ServiceConfig{URL: "http://localhost:8094"},
+		Cluster:                       "",
+		MaxSystemFailures:             int32(DefaultMaxSystemFailures),
+		InterruptibleFailureThreshold: -1,
+		MaxConcurrentReconciles:       512,
+		RequeueDuration:               stdconfig.Duration{Duration: 10 * time.Second},
 		GC: GCConfig{
 			Interval: stdconfig.Duration{Duration: 30 * time.Minute},
 			MaxTTL:   stdconfig.Duration{Duration: 1 * time.Hour},
@@ -91,6 +96,16 @@ type Config struct {
 	// errors and plugin-reported system-retryable failures) before a TaskAction is
 	// converted to a permanent failure.
 	MaxSystemFailures int32 `json:"maxSystemFailures" pflag:",Max consecutive system-level failures before forcing permanent failure"`
+
+	// InterruptibleFailureThreshold is the attempt count at which an interruptible
+	// task stops being scheduled on interruptible capacity, so a task cannot burn
+	// every attempt on capacity that keeps being reclaimed. Positive values are an
+	// absolute count of burnt attempts; negative values are complementary to the
+	// maximum, so -1 moves only the final attempt to non-interruptible capacity. A
+	// value above the maximum disables the fallback; zero is rejected at startup.
+	// An interruptible task always gets at least one attempt on interruptible
+	// capacity.
+	InterruptibleFailureThreshold int32 `json:"interruptibleFailureThreshold" pflag:",Attempt count at which an interruptible task falls back to non-interruptible capacity. Negative values are complementary to the maximum (-1 runs the last attempt on non-interruptible capacity); zero is rejected"`
 
 	// MaxConcurrentReconciles is the maximum number of concurrent reconcile loops for TaskActions.
 	MaxConcurrentReconciles int `json:"maxConcurrentReconciles" pflag:",Max concurrent reconcile loops for TaskActions"`
