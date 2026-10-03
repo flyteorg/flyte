@@ -211,6 +211,74 @@ func TestNotifyRunService_RejectedStatusUpdateSkipsTerminalLabel(t *testing.T) {
 		"terminal-status-recorded must not be set when the run service rejects the update")
 }
 
+func TestNotifyRunService_RecordAndRetryWhenStatusUpdateReturnsNotFound(t *testing.T) {
+	ctx := context.Background()
+
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	require.NoError(t, err)
+
+	c := &ActionsClient{
+		runClient:      mockClient,
+		recordedFilter: filter,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	ta, update := newTestActionUpdate("action-missing-row")
+	update.Phase = common.ActionPhase_ACTION_PHASE_RUNNING
+	actionKey := []byte(buildTaskActionName(update.ActionID))
+	c.recordedFilter.Add(ctx, actionKey)
+
+	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.UpdateActionStatusResponse]{
+			Msg: &workflow.UpdateActionStatusResponse{
+				Status: &status.Status{
+					Code:    int32(codes.NotFound),
+					Message: "action not found",
+				},
+			},
+		}, nil).Once()
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
+	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
+
+	c.notifyRunService(ctx, ta, update, watch.Modified)
+
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
+	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 2)
+}
+
+func TestNotifyRunService_RetriesRecordActionWhenRunServiceRejectsRecord(t *testing.T) {
+	ctx := context.Background()
+
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	require.NoError(t, err)
+
+	c := &ActionsClient{
+		runClient:      mockClient,
+		recordedFilter: filter,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+
+	ta, update := newTestActionUpdate("action-record-retry")
+
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.RecordActionResponse]{
+			Msg: &workflow.RecordActionResponse{
+				Status: &status.Status{Code: int32(codes.Internal), Message: "db write failed"},
+			},
+		}, nil).Once()
+	mockClient.On("RecordAction", mock.Anything, mock.Anything).
+		Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
+
+	c.notifyRunService(ctx, ta, update, watch.Added)
+	c.notifyRunService(ctx, ta, update, watch.Added)
+
+	mockClient.AssertNumberOfCalls(t, "RecordAction", 2)
+}
+
 func TestBuildTaskActionName(t *testing.T) {
 	runID := &common.RunIdentifier{
 		Project: "project",

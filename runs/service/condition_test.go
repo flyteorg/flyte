@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 
 	"connectrpc.com/connect"
@@ -16,6 +17,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
@@ -118,6 +120,21 @@ func TestUpdateActionStatus_NoOutputSkipsRunInfoWrite(t *testing.T) {
 		Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_RUNNING},
 	}))
 	require.NoError(t, err)
+}
+
+func TestUpdateActionStatus_MissingActionReturnsNotFoundStatus(t *testing.T) {
+	actionRepo, _, svc := newTestServiceWithTaskRepo(t)
+
+	actionRepo.On("UpdateActionPhase", mock.Anything, testActionID,
+		common.ActionPhase_ACTION_PHASE_RUNNING, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(fmt.Errorf("%w: missing", interfaces.ErrActionNotFound))
+
+	resp, err := svc.UpdateActionStatus(context.Background(), connect.NewRequest(&workflow.UpdateActionStatusRequest{
+		ActionId: testActionID,
+		Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_RUNNING},
+	}))
+	require.NoError(t, err)
+	assert.EqualValues(t, connect.CodeNotFound, resp.Msg.GetStatus().GetCode())
 }
 
 func TestSignalEvent(t *testing.T) {

@@ -403,7 +403,9 @@ func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdent
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("action not found")
+			return nil, fmt.Errorf("%w: %s/%s/%s/%s",
+				interfaces.ErrActionNotFound,
+				actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 		}
 		return nil, fmt.Errorf("failed to get action: %w", err)
 	}
@@ -588,6 +590,13 @@ func (r *actionRepo) UpdateActionPhase(
 	}
 	if rowsAffected > 0 {
 		r.notifyActionUpdate(ctx, actionID)
+	} else if _, err := r.GetAction(ctx, actionID); err != nil {
+		if !errors.Is(err, interfaces.ErrActionNotFound) {
+			return fmt.Errorf("failed to verify action after status update matched no rows: %w", err)
+		}
+		return fmt.Errorf("%w: %s/%s/%s/%s",
+			interfaces.ErrActionNotFound,
+			actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 	}
 
 	// If this is the root action (the run itself), also notify run subscribers
