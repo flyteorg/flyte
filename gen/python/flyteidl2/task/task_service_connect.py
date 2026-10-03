@@ -29,6 +29,21 @@ class TaskService(Protocol):
     async def list_versions(self, request: flyteidl2_dot_task_dot_task__service__pb2.ListVersionsRequest, ctx: RequestContext) -> flyteidl2_dot_task_dot_task__service__pb2.ListVersionsResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def set_task_alias(self, request: flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasRequest, ctx: RequestContext) -> flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def get_task_alias(self, request: flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasRequest, ctx: RequestContext) -> flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def list_task_aliases(self, request: flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesRequest, ctx: RequestContext) -> flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def delete_task_alias(self, request: flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasRequest, ctx: RequestContext) -> flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def get_task_alias_history(self, request: flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryRequest, ctx: RequestContext) -> flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
 
 class TaskServiceASGIApplication(ConnectASGIApplication[TaskService]):
     def __init__(self, service: TaskService | AsyncGenerator[TaskService], *, interceptors: Iterable[Interceptor]=(), read_max_bytes: int | None = None, compressions: Iterable[Compression] | None = None) -> None:
@@ -74,6 +89,56 @@ class TaskServiceASGIApplication(ConnectASGIApplication[TaskService]):
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.list_versions,
+                ),
+                "/flyteidl2.task.TaskService/SetTaskAlias": Endpoint.unary(
+                    method=MethodInfo(
+                        name="SetTaskAlias",
+                        service_name="flyteidl2.task.TaskService",
+                        input=flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasRequest,
+                        output=flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.set_task_alias,
+                ),
+                "/flyteidl2.task.TaskService/GetTaskAlias": Endpoint.unary(
+                    method=MethodInfo(
+                        name="GetTaskAlias",
+                        service_name="flyteidl2.task.TaskService",
+                        input=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasRequest,
+                        output=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.get_task_alias,
+                ),
+                "/flyteidl2.task.TaskService/ListTaskAliases": Endpoint.unary(
+                    method=MethodInfo(
+                        name="ListTaskAliases",
+                        service_name="flyteidl2.task.TaskService",
+                        input=flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesRequest,
+                        output=flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.list_task_aliases,
+                ),
+                "/flyteidl2.task.TaskService/DeleteTaskAlias": Endpoint.unary(
+                    method=MethodInfo(
+                        name="DeleteTaskAlias",
+                        service_name="flyteidl2.task.TaskService",
+                        input=flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasRequest,
+                        output=flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.delete_task_alias,
+                ),
+                "/flyteidl2.task.TaskService/GetTaskAliasHistory": Endpoint.unary(
+                    method=MethodInfo(
+                        name="GetTaskAliasHistory",
+                        service_name="flyteidl2.task.TaskService",
+                        input=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryRequest,
+                        output=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=svc.get_task_alias_history,
                 ),
             },
             interceptors=interceptors,
@@ -174,6 +239,112 @@ class TaskServiceClient(ConnectClient):
             use_get=use_get,
         )
 
+    async def set_task_alias(
+        self,
+        request: flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="SetTaskAlias",
+                service_name="flyteidl2.task.TaskService",
+                input=flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasRequest,
+                output=flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def get_task_alias(
+        self,
+        request: flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetTaskAlias",
+                service_name="flyteidl2.task.TaskService",
+                input=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasRequest,
+                output=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    async def list_task_aliases(
+        self,
+        request: flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListTaskAliases",
+                service_name="flyteidl2.task.TaskService",
+                input=flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesRequest,
+                output=flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    async def delete_task_alias(
+        self,
+        request: flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="DeleteTaskAlias",
+                service_name="flyteidl2.task.TaskService",
+                input=flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasRequest,
+                output=flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    async def get_task_alias_history(
+        self,
+        request: flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetTaskAliasHistory",
+                service_name="flyteidl2.task.TaskService",
+                input=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryRequest,
+                output=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
 
 class TaskServiceSync(Protocol):
     def deploy_task(self, request: flyteidl2_dot_task_dot_task__service__pb2.DeployTaskRequest, ctx: RequestContext) -> flyteidl2_dot_task_dot_task__service__pb2.DeployTaskResponse:
@@ -183,6 +354,16 @@ class TaskServiceSync(Protocol):
     def list_tasks(self, request: flyteidl2_dot_task_dot_task__service__pb2.ListTasksRequest, ctx: RequestContext) -> flyteidl2_dot_task_dot_task__service__pb2.ListTasksResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def list_versions(self, request: flyteidl2_dot_task_dot_task__service__pb2.ListVersionsRequest, ctx: RequestContext) -> flyteidl2_dot_task_dot_task__service__pb2.ListVersionsResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def set_task_alias(self, request: flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasRequest, ctx: RequestContext) -> flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def get_task_alias(self, request: flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasRequest, ctx: RequestContext) -> flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def list_task_aliases(self, request: flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesRequest, ctx: RequestContext) -> flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def delete_task_alias(self, request: flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasRequest, ctx: RequestContext) -> flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def get_task_alias_history(self, request: flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryRequest, ctx: RequestContext) -> flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
@@ -229,6 +410,56 @@ class TaskServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.list_versions,
+                ),
+                "/flyteidl2.task.TaskService/SetTaskAlias": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="SetTaskAlias",
+                        service_name="flyteidl2.task.TaskService",
+                        input=flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasRequest,
+                        output=flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.set_task_alias,
+                ),
+                "/flyteidl2.task.TaskService/GetTaskAlias": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="GetTaskAlias",
+                        service_name="flyteidl2.task.TaskService",
+                        input=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasRequest,
+                        output=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.get_task_alias,
+                ),
+                "/flyteidl2.task.TaskService/ListTaskAliases": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="ListTaskAliases",
+                        service_name="flyteidl2.task.TaskService",
+                        input=flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesRequest,
+                        output=flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.list_task_aliases,
+                ),
+                "/flyteidl2.task.TaskService/DeleteTaskAlias": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="DeleteTaskAlias",
+                        service_name="flyteidl2.task.TaskService",
+                        input=flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasRequest,
+                        output=flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.delete_task_alias,
+                ),
+                "/flyteidl2.task.TaskService/GetTaskAliasHistory": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="GetTaskAliasHistory",
+                        service_name="flyteidl2.task.TaskService",
+                        input=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryRequest,
+                        output=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryResponse,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+                    ),
+                    function=service.get_task_alias_history,
                 ),
             },
             interceptors=interceptors,
@@ -322,6 +553,112 @@ class TaskServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.task.TaskService",
                 input=flyteidl2_dot_task_dot_task__service__pb2.ListVersionsRequest,
                 output=flyteidl2_dot_task_dot_task__service__pb2.ListVersionsResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def set_task_alias(
+        self,
+        request: flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="SetTaskAlias",
+                service_name="flyteidl2.task.TaskService",
+                input=flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasRequest,
+                output=flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def get_task_alias(
+        self,
+        request: flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetTaskAlias",
+                service_name="flyteidl2.task.TaskService",
+                input=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasRequest,
+                output=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def list_task_aliases(
+        self,
+        request: flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="ListTaskAliases",
+                service_name="flyteidl2.task.TaskService",
+                input=flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesRequest,
+                output=flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesResponse,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+            use_get=use_get,
+        )
+
+    def delete_task_alias(
+        self,
+        request: flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="DeleteTaskAlias",
+                service_name="flyteidl2.task.TaskService",
+                input=flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasRequest,
+                output=flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def get_task_alias_history(
+        self,
+        request: flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+        use_get: bool = False,
+    ) -> flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetTaskAliasHistory",
+                service_name="flyteidl2.task.TaskService",
+                input=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryRequest,
+                output=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryResponse,
                 idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,

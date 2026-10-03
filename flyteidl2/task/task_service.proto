@@ -30,6 +30,30 @@ service TaskService {
   rpc ListVersions(ListVersionsRequest) returns (ListVersionsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
+  // Create an alias, or move an existing one to a different version. This is the
+  // promote/rollback operation: deliberate, audited, and never a side effect of
+  // deploying. Carries its own authz action so "may promote, may not deploy" is
+  // expressible.
+  rpc SetTaskAlias(SetTaskAliasRequest) returns (SetTaskAliasResponse) {}
+
+  // Resolve an alias to its current version, with who moved it there and when.
+  rpc GetTaskAlias(GetTaskAliasRequest) returns (GetTaskAliasResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // List every alias defined for a task.
+  rpc ListTaskAliases(ListTaskAliasesRequest) returns (ListTaskAliasesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Remove an alias. The versions it pointed at are unaffected.
+  rpc DeleteTaskAlias(DeleteTaskAliasRequest) returns (DeleteTaskAliasResponse) {}
+
+  // Full move history for one alias: every from -> to, who, when.
+  rpc GetTaskAliasHistory(GetTaskAliasHistoryRequest) returns (GetTaskAliasHistoryResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 // Request message for deploying a task.
@@ -133,5 +157,101 @@ message ListVersionsResponse {
   repeated VersionResponse versions = 1;
 
   // Pagination token for the next page of versions.
+  string token = 2;
+}
+
+// Names one alias on one task. Aliases are scoped per (org, project, domain, task
+// name), so "prod" in staging and "prod" in production are distinct pointers.
+message TaskAliasName {
+  TaskName task_name = 1 [(buf.validate.field).required = true];
+
+  string alias = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+}
+
+// A mutable named pointer to an immutable task version.
+message TaskAlias {
+  TaskAliasName name = 1 [(buf.validate.field).required = true];
+
+  // The immutable version this alias currently resolves to.
+  string version = 2;
+
+  // Identity that last set or moved this alias.
+  common.EnrichedIdentity set_by = 3;
+
+  // When it was last set or moved.
+  google.protobuf.Timestamp set_at = 4;
+}
+
+// One entry in an alias's move history.
+message TaskAliasRevision {
+  // Version the alias pointed at before this change. Empty when the alias was created.
+  string from_version = 1;
+
+  // Version the alias pointed at after this change.
+  string to_version = 2;
+
+  common.EnrichedIdentity changed_by = 3;
+
+  google.protobuf.Timestamp changed_at = 4;
+}
+
+message SetTaskAliasRequest {
+  TaskAliasName name = 1 [(buf.validate.field).required = true];
+
+  // Target version. Must already be deployed; setting an alias to a version that
+  // does not exist is an error rather than a pointer that fails at launch time.
+  string version = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+}
+
+message SetTaskAliasResponse {
+  TaskAlias alias = 1;
+
+  // Version the alias pointed at before this call. Empty when it was just created.
+  // Lets a client render "prod: v1.4.0 -> v1.7.0" without a second lookup.
+  string previous_version = 2;
+}
+
+message GetTaskAliasRequest {
+  TaskAliasName name = 1 [(buf.validate.field).required = true];
+}
+
+message GetTaskAliasResponse {
+  TaskAlias alias = 1;
+}
+
+message ListTaskAliasesRequest {
+  TaskName task_name = 1 [(buf.validate.field).required = true];
+
+  common.ListRequest request = 2;
+}
+
+message ListTaskAliasesResponse {
+  repeated TaskAlias aliases = 1;
+
+  string token = 2;
+}
+
+message DeleteTaskAliasRequest {
+  TaskAliasName name = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteTaskAliasResponse {}
+
+message GetTaskAliasHistoryRequest {
+  TaskAliasName name = 1 [(buf.validate.field).required = true];
+
+  common.ListRequest request = 2;
+}
+
+message GetTaskAliasHistoryResponse {
+  // Newest first.
+  repeated TaskAliasRevision revisions = 1;
+
   string token = 2;
 }

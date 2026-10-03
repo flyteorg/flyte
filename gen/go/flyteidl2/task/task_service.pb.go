@@ -509,6 +509,726 @@ func (x *ListVersionsResponse) GetToken() string {
 	return ""
 }
 
+// Names one alias on one task. Aliases are scoped per (org, project, domain, task
+// name), so "prod" in staging and "prod" in production are distinct pointers.
+type TaskAliasName struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TaskName *TaskName `protobuf:"bytes,1,opt,name=task_name,json=taskName,proto3" json:"task_name,omitempty"`
+	Alias    string    `protobuf:"bytes,2,opt,name=alias,proto3" json:"alias,omitempty"`
+}
+
+func (x *TaskAliasName) Reset() {
+	*x = TaskAliasName{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_task_service_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TaskAliasName) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TaskAliasName) ProtoMessage() {}
+
+func (x *TaskAliasName) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_task_service_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TaskAliasName.ProtoReflect.Descriptor instead.
+func (*TaskAliasName) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_task_service_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *TaskAliasName) GetTaskName() *TaskName {
+	if x != nil {
+		return x.TaskName
+	}
+	return nil
+}
+
+func (x *TaskAliasName) GetAlias() string {
+	if x != nil {
+		return x.Alias
+	}
+	return ""
+}
+
+// A mutable named pointer to an immutable task version.
+type TaskAlias struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name *TaskAliasName `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The immutable version this alias currently resolves to.
+	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
+	// Identity that last set or moved this alias.
+	SetBy *common.EnrichedIdentity `protobuf:"bytes,3,opt,name=set_by,json=setBy,proto3" json:"set_by,omitempty"`
+	// When it was last set or moved.
+	SetAt *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=set_at,json=setAt,proto3" json:"set_at,omitempty"`
+}
+
+func (x *TaskAlias) Reset() {
+	*x = TaskAlias{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_task_service_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TaskAlias) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TaskAlias) ProtoMessage() {}
+
+func (x *TaskAlias) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_task_service_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TaskAlias.ProtoReflect.Descriptor instead.
+func (*TaskAlias) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_task_service_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *TaskAlias) GetName() *TaskAliasName {
+	if x != nil {
+		return x.Name
+	}
+	return nil
+}
+
+func (x *TaskAlias) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *TaskAlias) GetSetBy() *common.EnrichedIdentity {
+	if x != nil {
+		return x.SetBy
+	}
+	return nil
+}
+
+func (x *TaskAlias) GetSetAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.SetAt
+	}
+	return nil
+}
+
+// One entry in an alias's move history.
+type TaskAliasRevision struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Version the alias pointed at before this change. Empty when the alias was created.
+	FromVersion string `protobuf:"bytes,1,opt,name=from_version,json=fromVersion,proto3" json:"from_version,omitempty"`
+	// Version the alias pointed at after this change.
+	ToVersion string                   `protobuf:"bytes,2,opt,name=to_version,json=toVersion,proto3" json:"to_version,omitempty"`
+	ChangedBy *common.EnrichedIdentity `protobuf:"bytes,3,opt,name=changed_by,json=changedBy,proto3" json:"changed_by,omitempty"`
+	ChangedAt *timestamppb.Timestamp   `protobuf:"bytes,4,opt,name=changed_at,json=changedAt,proto3" json:"changed_at,omitempty"`
+}
+
+func (x *TaskAliasRevision) Reset() {
+	*x = TaskAliasRevision{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_task_service_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TaskAliasRevision) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TaskAliasRevision) ProtoMessage() {}
+
+func (x *TaskAliasRevision) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_task_service_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TaskAliasRevision.ProtoReflect.Descriptor instead.
+func (*TaskAliasRevision) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_task_service_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *TaskAliasRevision) GetFromVersion() string {
+	if x != nil {
+		return x.FromVersion
+	}
+	return ""
+}
+
+func (x *TaskAliasRevision) GetToVersion() string {
+	if x != nil {
+		return x.ToVersion
+	}
+	return ""
+}
+
+func (x *TaskAliasRevision) GetChangedBy() *common.EnrichedIdentity {
+	if x != nil {
+		return x.ChangedBy
+	}
+	return nil
+}
+
+func (x *TaskAliasRevision) GetChangedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ChangedAt
+	}
+	return nil
+}
+
+type SetTaskAliasRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name *TaskAliasName `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Target version. Must already be deployed; setting an alias to a version that
+	// does not exist is an error rather than a pointer that fails at launch time.
+	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
+}
+
+func (x *SetTaskAliasRequest) Reset() {
+	*x = SetTaskAliasRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_task_service_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SetTaskAliasRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetTaskAliasRequest) ProtoMessage() {}
+
+func (x *SetTaskAliasRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_task_service_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetTaskAliasRequest.ProtoReflect.Descriptor instead.
+func (*SetTaskAliasRequest) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_task_service_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *SetTaskAliasRequest) GetName() *TaskAliasName {
+	if x != nil {
+		return x.Name
+	}
+	return nil
+}
+
+func (x *SetTaskAliasRequest) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+type SetTaskAliasResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Alias *TaskAlias `protobuf:"bytes,1,opt,name=alias,proto3" json:"alias,omitempty"`
+	// Version the alias pointed at before this call. Empty when it was just created.
+	// Lets a client render "prod: v1.4.0 -> v1.7.0" without a second lookup.
+	PreviousVersion string `protobuf:"bytes,2,opt,name=previous_version,json=previousVersion,proto3" json:"previous_version,omitempty"`
+}
+
+func (x *SetTaskAliasResponse) Reset() {
+	*x = SetTaskAliasResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_task_service_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SetTaskAliasResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetTaskAliasResponse) ProtoMessage() {}
+
+func (x *SetTaskAliasResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_task_service_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetTaskAliasResponse.ProtoReflect.Descriptor instead.
+func (*SetTaskAliasResponse) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_task_service_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *SetTaskAliasResponse) GetAlias() *TaskAlias {
+	if x != nil {
+		return x.Alias
+	}
+	return nil
+}
+
+func (x *SetTaskAliasResponse) GetPreviousVersion() string {
+	if x != nil {
+		return x.PreviousVersion
+	}
+	return ""
+}
+
+type GetTaskAliasRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name *TaskAliasName `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+}
+
+func (x *GetTaskAliasRequest) Reset() {
+	*x = GetTaskAliasRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_task_service_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetTaskAliasRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTaskAliasRequest) ProtoMessage() {}
+
+func (x *GetTaskAliasRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_task_service_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTaskAliasRequest.ProtoReflect.Descriptor instead.
+func (*GetTaskAliasRequest) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_task_service_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GetTaskAliasRequest) GetName() *TaskAliasName {
+	if x != nil {
+		return x.Name
+	}
+	return nil
+}
+
+type GetTaskAliasResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Alias *TaskAlias `protobuf:"bytes,1,opt,name=alias,proto3" json:"alias,omitempty"`
+}
+
+func (x *GetTaskAliasResponse) Reset() {
+	*x = GetTaskAliasResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_task_service_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetTaskAliasResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTaskAliasResponse) ProtoMessage() {}
+
+func (x *GetTaskAliasResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_task_service_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTaskAliasResponse.ProtoReflect.Descriptor instead.
+func (*GetTaskAliasResponse) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_task_service_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GetTaskAliasResponse) GetAlias() *TaskAlias {
+	if x != nil {
+		return x.Alias
+	}
+	return nil
+}
+
+type ListTaskAliasesRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TaskName *TaskName           `protobuf:"bytes,1,opt,name=task_name,json=taskName,proto3" json:"task_name,omitempty"`
+	Request  *common.ListRequest `protobuf:"bytes,2,opt,name=request,proto3" json:"request,omitempty"`
+}
+
+func (x *ListTaskAliasesRequest) Reset() {
+	*x = ListTaskAliasesRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_task_service_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListTaskAliasesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListTaskAliasesRequest) ProtoMessage() {}
+
+func (x *ListTaskAliasesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_task_service_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListTaskAliasesRequest.ProtoReflect.Descriptor instead.
+func (*ListTaskAliasesRequest) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_task_service_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *ListTaskAliasesRequest) GetTaskName() *TaskName {
+	if x != nil {
+		return x.TaskName
+	}
+	return nil
+}
+
+func (x *ListTaskAliasesRequest) GetRequest() *common.ListRequest {
+	if x != nil {
+		return x.Request
+	}
+	return nil
+}
+
+type ListTaskAliasesResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Aliases []*TaskAlias `protobuf:"bytes,1,rep,name=aliases,proto3" json:"aliases,omitempty"`
+	Token   string       `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
+}
+
+func (x *ListTaskAliasesResponse) Reset() {
+	*x = ListTaskAliasesResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_task_service_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListTaskAliasesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListTaskAliasesResponse) ProtoMessage() {}
+
+func (x *ListTaskAliasesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_task_service_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListTaskAliasesResponse.ProtoReflect.Descriptor instead.
+func (*ListTaskAliasesResponse) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_task_service_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ListTaskAliasesResponse) GetAliases() []*TaskAlias {
+	if x != nil {
+		return x.Aliases
+	}
+	return nil
+}
+
+func (x *ListTaskAliasesResponse) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+type DeleteTaskAliasRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name *TaskAliasName `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+}
+
+func (x *DeleteTaskAliasRequest) Reset() {
+	*x = DeleteTaskAliasRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_task_service_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteTaskAliasRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteTaskAliasRequest) ProtoMessage() {}
+
+func (x *DeleteTaskAliasRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_task_service_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteTaskAliasRequest.ProtoReflect.Descriptor instead.
+func (*DeleteTaskAliasRequest) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_task_service_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *DeleteTaskAliasRequest) GetName() *TaskAliasName {
+	if x != nil {
+		return x.Name
+	}
+	return nil
+}
+
+type DeleteTaskAliasResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *DeleteTaskAliasResponse) Reset() {
+	*x = DeleteTaskAliasResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_task_service_proto_msgTypes[18]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteTaskAliasResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteTaskAliasResponse) ProtoMessage() {}
+
+func (x *DeleteTaskAliasResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_task_service_proto_msgTypes[18]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteTaskAliasResponse.ProtoReflect.Descriptor instead.
+func (*DeleteTaskAliasResponse) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_task_service_proto_rawDescGZIP(), []int{18}
+}
+
+type GetTaskAliasHistoryRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name    *TaskAliasName      `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Request *common.ListRequest `protobuf:"bytes,2,opt,name=request,proto3" json:"request,omitempty"`
+}
+
+func (x *GetTaskAliasHistoryRequest) Reset() {
+	*x = GetTaskAliasHistoryRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_task_service_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetTaskAliasHistoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTaskAliasHistoryRequest) ProtoMessage() {}
+
+func (x *GetTaskAliasHistoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_task_service_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTaskAliasHistoryRequest.ProtoReflect.Descriptor instead.
+func (*GetTaskAliasHistoryRequest) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_task_service_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *GetTaskAliasHistoryRequest) GetName() *TaskAliasName {
+	if x != nil {
+		return x.Name
+	}
+	return nil
+}
+
+func (x *GetTaskAliasHistoryRequest) GetRequest() *common.ListRequest {
+	if x != nil {
+		return x.Request
+	}
+	return nil
+}
+
+type GetTaskAliasHistoryResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Newest first.
+	Revisions []*TaskAliasRevision `protobuf:"bytes,1,rep,name=revisions,proto3" json:"revisions,omitempty"`
+	Token     string               `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
+}
+
+func (x *GetTaskAliasHistoryResponse) Reset() {
+	*x = GetTaskAliasHistoryResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl2_task_task_service_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetTaskAliasHistoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTaskAliasHistoryResponse) ProtoMessage() {}
+
+func (x *GetTaskAliasHistoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl2_task_task_service_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTaskAliasHistoryResponse.ProtoReflect.Descriptor instead.
+func (*GetTaskAliasHistoryResponse) Descriptor() ([]byte, []int) {
+	return file_flyteidl2_task_task_service_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GetTaskAliasHistoryResponse) GetRevisions() []*TaskAliasRevision {
+	if x != nil {
+		return x.Revisions
+	}
+	return nil
+}
+
+func (x *GetTaskAliasHistoryResponse) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
 type ListTasksRequest_KnownFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -524,7 +1244,7 @@ type ListTasksRequest_KnownFilter struct {
 func (x *ListTasksRequest_KnownFilter) Reset() {
 	*x = ListTasksRequest_KnownFilter{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_task_task_service_proto_msgTypes[8]
+		mi := &file_flyteidl2_task_task_service_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -537,7 +1257,7 @@ func (x *ListTasksRequest_KnownFilter) String() string {
 func (*ListTasksRequest_KnownFilter) ProtoMessage() {}
 
 func (x *ListTasksRequest_KnownFilter) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_task_task_service_proto_msgTypes[8]
+	mi := &file_flyteidl2_task_task_service_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -606,7 +1326,7 @@ type ListTasksResponse_ListTasksMetadata struct {
 func (x *ListTasksResponse_ListTasksMetadata) Reset() {
 	*x = ListTasksResponse_ListTasksMetadata{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_task_task_service_proto_msgTypes[9]
+		mi := &file_flyteidl2_task_task_service_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -619,7 +1339,7 @@ func (x *ListTasksResponse_ListTasksMetadata) String() string {
 func (*ListTasksResponse_ListTasksMetadata) ProtoMessage() {}
 
 func (x *ListTasksResponse_ListTasksMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_task_task_service_proto_msgTypes[9]
+	mi := &file_flyteidl2_task_task_service_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -666,7 +1386,7 @@ type ListVersionsResponse_VersionResponse struct {
 func (x *ListVersionsResponse_VersionResponse) Reset() {
 	*x = ListVersionsResponse_VersionResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl2_task_task_service_proto_msgTypes[10]
+		mi := &file_flyteidl2_task_task_service_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -679,7 +1399,7 @@ func (x *ListVersionsResponse_VersionResponse) String() string {
 func (*ListVersionsResponse_VersionResponse) ProtoMessage() {}
 
 func (x *ListVersionsResponse_VersionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl2_task_task_service_proto_msgTypes[10]
+	mi := &file_flyteidl2_task_task_service_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -839,7 +1559,104 @@ var file_flyteidl2_task_task_service_proto_rawDesc = []byte{
 	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x4c, 0x61,
 	0x74, 0x65, 0x73, 0x74, 0x52, 0x75, 0x6e, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x48, 0x00,
 	0x52, 0x09, 0x6c, 0x61, 0x74, 0x65, 0x73, 0x74, 0x52, 0x75, 0x6e, 0x88, 0x01, 0x01, 0x42, 0x0d,
-	0x0a, 0x0b, 0x5f, 0x6c, 0x61, 0x74, 0x65, 0x73, 0x74, 0x5f, 0x72, 0x75, 0x6e, 0x32, 0x81, 0x03,
+	0x0a, 0x0b, 0x5f, 0x6c, 0x61, 0x74, 0x65, 0x73, 0x74, 0x5f, 0x72, 0x75, 0x6e, 0x22, 0x6f, 0x0a,
+	0x0d, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x3d,
+	0x0a, 0x09, 0x74, 0x61, 0x73, 0x6b, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x18, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61,
+	0x73, 0x6b, 0x2e, 0x54, 0x61, 0x73, 0x6b, 0x4e, 0x61, 0x6d, 0x65, 0x42, 0x06, 0xba, 0x48, 0x03,
+	0xc8, 0x01, 0x01, 0x52, 0x08, 0x74, 0x61, 0x73, 0x6b, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x1f, 0x0a,
+	0x05, 0x61, 0x6c, 0x69, 0x61, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x09, 0xba, 0x48,
+	0x06, 0x72, 0x04, 0x10, 0x01, 0x18, 0x3f, 0x52, 0x05, 0x61, 0x6c, 0x69, 0x61, 0x73, 0x22, 0xce,
+	0x01, 0x0a, 0x09, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x12, 0x39, 0x0a, 0x04,
+	0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x66, 0x6c, 0x79,
+	0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x54, 0x61, 0x73, 0x6b,
+	0x41, 0x6c, 0x69, 0x61, 0x73, 0x4e, 0x61, 0x6d, 0x65, 0x42, 0x06, 0xba, 0x48, 0x03, 0xc8, 0x01,
+	0x01, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69,
+	0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f,
+	0x6e, 0x12, 0x39, 0x0a, 0x06, 0x73, 0x65, 0x74, 0x5f, 0x62, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x22, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x63, 0x6f,
+	0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x45, 0x6e, 0x72, 0x69, 0x63, 0x68, 0x65, 0x64, 0x49, 0x64, 0x65,
+	0x6e, 0x74, 0x69, 0x74, 0x79, 0x52, 0x05, 0x73, 0x65, 0x74, 0x42, 0x79, 0x12, 0x31, 0x0a, 0x06,
+	0x73, 0x65, 0x74, 0x5f, 0x61, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67,
+	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54,
+	0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x05, 0x73, 0x65, 0x74, 0x41, 0x74, 0x22,
+	0xd3, 0x01, 0x0a, 0x11, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x52, 0x65, 0x76,
+	0x69, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x21, 0x0a, 0x0c, 0x66, 0x72, 0x6f, 0x6d, 0x5f, 0x76, 0x65,
+	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x66, 0x72, 0x6f,
+	0x6d, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x1d, 0x0a, 0x0a, 0x74, 0x6f, 0x5f, 0x76,
+	0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x74, 0x6f,
+	0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x41, 0x0a, 0x0a, 0x63, 0x68, 0x61, 0x6e, 0x67,
+	0x65, 0x64, 0x5f, 0x62, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x22, 0x2e, 0x66, 0x6c,
+	0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x45,
+	0x6e, 0x72, 0x69, 0x63, 0x68, 0x65, 0x64, 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x52,
+	0x09, 0x63, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x64, 0x42, 0x79, 0x12, 0x39, 0x0a, 0x0a, 0x63, 0x68,
+	0x61, 0x6e, 0x67, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a,
+	0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66,
+	0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x63, 0x68, 0x61, 0x6e,
+	0x67, 0x65, 0x64, 0x41, 0x74, 0x22, 0x75, 0x0a, 0x13, 0x53, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b,
+	0x41, 0x6c, 0x69, 0x61, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x39, 0x0a, 0x04,
+	0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x66, 0x6c, 0x79,
+	0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x54, 0x61, 0x73, 0x6b,
+	0x41, 0x6c, 0x69, 0x61, 0x73, 0x4e, 0x61, 0x6d, 0x65, 0x42, 0x06, 0xba, 0x48, 0x03, 0xc8, 0x01,
+	0x01, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x23, 0x0a, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69,
+	0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x09, 0xba, 0x48, 0x06, 0x72, 0x04, 0x10,
+	0x01, 0x18, 0x3f, 0x52, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x22, 0x72, 0x0a, 0x14,
+	0x53, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2f, 0x0a, 0x05, 0x61, 0x6c, 0x69, 0x61, 0x73, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e,
+	0x74, 0x61, 0x73, 0x6b, 0x2e, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x52, 0x05,
+	0x61, 0x6c, 0x69, 0x61, 0x73, 0x12, 0x29, 0x0a, 0x10, 0x70, 0x72, 0x65, 0x76, 0x69, 0x6f, 0x75,
+	0x73, 0x5f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0f, 0x70, 0x72, 0x65, 0x76, 0x69, 0x6f, 0x75, 0x73, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e,
+	0x22, 0x50, 0x0a, 0x13, 0x47, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x39, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c,
+	0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73,
+	0x4e, 0x61, 0x6d, 0x65, 0x42, 0x06, 0xba, 0x48, 0x03, 0xc8, 0x01, 0x01, 0x52, 0x04, 0x6e, 0x61,
+	0x6d, 0x65, 0x22, 0x47, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69,
+	0x61, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2f, 0x0a, 0x05, 0x61, 0x6c,
+	0x69, 0x61, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x66, 0x6c, 0x79, 0x74,
+	0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x54, 0x61, 0x73, 0x6b, 0x41,
+	0x6c, 0x69, 0x61, 0x73, 0x52, 0x05, 0x61, 0x6c, 0x69, 0x61, 0x73, 0x22, 0x90, 0x01, 0x0a, 0x16,
+	0x4c, 0x69, 0x73, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x65, 0x73, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x3d, 0x0a, 0x09, 0x74, 0x61, 0x73, 0x6b, 0x5f, 0x6e,
+	0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x66, 0x6c, 0x79, 0x74,
+	0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x54, 0x61, 0x73, 0x6b, 0x4e,
+	0x61, 0x6d, 0x65, 0x42, 0x06, 0xba, 0x48, 0x03, 0xc8, 0x01, 0x01, 0x52, 0x08, 0x74, 0x61, 0x73,
+	0x6b, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x37, 0x0a, 0x07, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64,
+	0x6c, 0x32, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x52, 0x07, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x64,
+	0x0a, 0x17, 0x4c, 0x69, 0x73, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x65,
+	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x33, 0x0a, 0x07, 0x61, 0x6c, 0x69,
+	0x61, 0x73, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x66, 0x6c, 0x79,
+	0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x54, 0x61, 0x73, 0x6b,
+	0x41, 0x6c, 0x69, 0x61, 0x73, 0x52, 0x07, 0x61, 0x6c, 0x69, 0x61, 0x73, 0x65, 0x73, 0x12, 0x14,
+	0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74,
+	0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x53, 0x0a, 0x16, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x54, 0x61,
+	0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x39,
+	0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x66,
+	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x54, 0x61,
+	0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x4e, 0x61, 0x6d, 0x65, 0x42, 0x06, 0xba, 0x48, 0x03,
+	0xc8, 0x01, 0x01, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x19, 0x0a, 0x17, 0x44, 0x65, 0x6c,
+	0x65, 0x74, 0x65, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x90, 0x01, 0x0a, 0x1a, 0x47, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b,
+	0x41, 0x6c, 0x69, 0x61, 0x73, 0x48, 0x69, 0x73, 0x74, 0x6f, 0x72, 0x79, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x39, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x1d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61,
+	0x73, 0x6b, 0x2e, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x4e, 0x61, 0x6d, 0x65,
+	0x42, 0x06, 0xba, 0x48, 0x03, 0xc8, 0x01, 0x01, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x37,
+	0x0a, 0x07, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x1d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x63, 0x6f, 0x6d, 0x6d,
+	0x6f, 0x6e, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x52, 0x07,
+	0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x74, 0x0a, 0x1b, 0x47, 0x65, 0x74, 0x54, 0x61,
+	0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x48, 0x69, 0x73, 0x74, 0x6f, 0x72, 0x79, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3f, 0x0a, 0x09, 0x72, 0x65, 0x76, 0x69, 0x73, 0x69,
+	0x6f, 0x6e, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x21, 0x2e, 0x66, 0x6c, 0x79, 0x74,
+	0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x54, 0x61, 0x73, 0x6b, 0x41,
+	0x6c, 0x69, 0x61, 0x73, 0x52, 0x65, 0x76, 0x69, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x09, 0x72, 0x65,
+	0x76, 0x69, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x32, 0x82, 0x07,
 	0x0a, 0x0b, 0x54, 0x61, 0x73, 0x6b, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x55, 0x0a,
 	0x0a, 0x44, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x54, 0x61, 0x73, 0x6b, 0x12, 0x21, 0x2e, 0x66, 0x6c,
 	0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x44, 0x65, 0x70,
@@ -864,19 +1681,51 @@ var file_flyteidl2_task_task_service_proto_rawDesc = []byte{
 	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x24, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64,
 	0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x56, 0x65, 0x72, 0x73,
 	0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x03, 0x90, 0x02,
-	0x01, 0x42, 0xb5, 0x01, 0x0a, 0x12, 0x63, 0x6f, 0x6d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69,
-	0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x42, 0x10, 0x54, 0x61, 0x73, 0x6b, 0x53, 0x65,
-	0x72, 0x76, 0x69, 0x63, 0x65, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x48, 0x02, 0x50, 0x01, 0x5a, 0x32,
-	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65,
-	0x6f, 0x72, 0x67, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x67, 0x65, 0x6e,
-	0x2f, 0x67, 0x6f, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2f, 0x74, 0x61,
-	0x73, 0x6b, 0xa2, 0x02, 0x03, 0x46, 0x54, 0x58, 0xaa, 0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74, 0x65,
-	0x69, 0x64, 0x6c, 0x32, 0x2e, 0x54, 0x61, 0x73, 0x6b, 0xca, 0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74,
-	0x65, 0x69, 0x64, 0x6c, 0x32, 0x5c, 0x54, 0x61, 0x73, 0x6b, 0xe2, 0x02, 0x1a, 0x46, 0x6c, 0x79,
-	0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x5c, 0x54, 0x61, 0x73, 0x6b, 0x5c, 0x47, 0x50, 0x42, 0x4d,
-	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0f, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69,
-	0x64, 0x6c, 0x32, 0x3a, 0x3a, 0x54, 0x61, 0x73, 0x6b, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x01, 0x12, 0x5b, 0x0a, 0x0c, 0x53, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61,
+	0x73, 0x12, 0x23, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61,
+	0x73, 0x6b, 0x2e, 0x53, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x24, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64,
+	0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x53, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41,
+	0x6c, 0x69, 0x61, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x5e,
+	0x0a, 0x0c, 0x47, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x12, 0x23,
+	0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e,
+	0x47, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x24, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e,
+	0x74, 0x61, 0x73, 0x6b, 0x2e, 0x47, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61,
+	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x03, 0x90, 0x02, 0x01, 0x12, 0x67,
+	0x0a, 0x0f, 0x4c, 0x69, 0x73, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x65,
+	0x73, 0x12, 0x26, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61,
+	0x73, 0x6b, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73,
+	0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x27, 0x2e, 0x66, 0x6c, 0x79, 0x74,
+	0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x54,
+	0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x03, 0x90, 0x02, 0x01, 0x12, 0x64, 0x0a, 0x0f, 0x44, 0x65, 0x6c, 0x65, 0x74,
+	0x65, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x12, 0x26, 0x2e, 0x66, 0x6c, 0x79,
+	0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x44, 0x65, 0x6c, 0x65,
+	0x74, 0x65, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x27, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74,
+	0x61, 0x73, 0x6b, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c,
+	0x69, 0x61, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x73, 0x0a,
+	0x13, 0x47, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x48, 0x69, 0x73,
+	0x74, 0x6f, 0x72, 0x79, 0x12, 0x2a, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32,
+	0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x47, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69,
+	0x61, 0x73, 0x48, 0x69, 0x73, 0x74, 0x6f, 0x72, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x2b, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73,
+	0x6b, 0x2e, 0x47, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x6c, 0x69, 0x61, 0x73, 0x48, 0x69,
+	0x73, 0x74, 0x6f, 0x72, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x03, 0x90,
+	0x02, 0x01, 0x42, 0xb5, 0x01, 0x0a, 0x12, 0x63, 0x6f, 0x6d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65,
+	0x69, 0x64, 0x6c, 0x32, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x42, 0x10, 0x54, 0x61, 0x73, 0x6b, 0x53,
+	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x48, 0x02, 0x50, 0x01, 0x5a,
+	0x32, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x6c, 0x79, 0x74,
+	0x65, 0x6f, 0x72, 0x67, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x67, 0x65,
+	0x6e, 0x2f, 0x67, 0x6f, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2f, 0x74,
+	0x61, 0x73, 0x6b, 0xa2, 0x02, 0x03, 0x46, 0x54, 0x58, 0xaa, 0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74,
+	0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x54, 0x61, 0x73, 0x6b, 0xca, 0x02, 0x0e, 0x46, 0x6c, 0x79,
+	0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x5c, 0x54, 0x61, 0x73, 0x6b, 0xe2, 0x02, 0x1a, 0x46, 0x6c,
+	0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x5c, 0x54, 0x61, 0x73, 0x6b, 0x5c, 0x47, 0x50, 0x42,
+	0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0f, 0x46, 0x6c, 0x79, 0x74, 0x65,
+	0x69, 0x64, 0x6c, 0x32, 0x3a, 0x3a, 0x54, 0x61, 0x73, 0x6b, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -891,7 +1740,7 @@ func file_flyteidl2_task_task_service_proto_rawDescGZIP() []byte {
 	return file_flyteidl2_task_task_service_proto_rawDescData
 }
 
-var file_flyteidl2_task_task_service_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_flyteidl2_task_task_service_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_flyteidl2_task_task_service_proto_goTypes = []interface{}{
 	(*DeployTaskRequest)(nil),                    // 0: flyteidl2.task.DeployTaskRequest
 	(*DeployTaskResponse)(nil),                   // 1: flyteidl2.task.DeployTaskResponse
@@ -901,51 +1750,91 @@ var file_flyteidl2_task_task_service_proto_goTypes = []interface{}{
 	(*ListTasksResponse)(nil),                    // 5: flyteidl2.task.ListTasksResponse
 	(*ListVersionsRequest)(nil),                  // 6: flyteidl2.task.ListVersionsRequest
 	(*ListVersionsResponse)(nil),                 // 7: flyteidl2.task.ListVersionsResponse
-	(*ListTasksRequest_KnownFilter)(nil),         // 8: flyteidl2.task.ListTasksRequest.KnownFilter
-	(*ListTasksResponse_ListTasksMetadata)(nil),  // 9: flyteidl2.task.ListTasksResponse.ListTasksMetadata
-	(*ListVersionsResponse_VersionResponse)(nil), // 10: flyteidl2.task.ListVersionsResponse.VersionResponse
-	(*TaskIdentifier)(nil),                       // 11: flyteidl2.task.TaskIdentifier
-	(*TaskSpec)(nil),                             // 12: flyteidl2.task.TaskSpec
-	(*TaskTrigger)(nil),                          // 13: flyteidl2.task.TaskTrigger
-	(*TaskDetails)(nil),                          // 14: flyteidl2.task.TaskDetails
-	(*common.ListRequest)(nil),                   // 15: flyteidl2.common.ListRequest
-	(*common.ProjectIdentifier)(nil),             // 16: flyteidl2.common.ProjectIdentifier
-	(*Task)(nil),                                 // 17: flyteidl2.task.Task
-	(*TaskName)(nil),                             // 18: flyteidl2.task.TaskName
-	(*timestamppb.Timestamp)(nil),                // 19: google.protobuf.Timestamp
-	(*common.EnrichedIdentity)(nil),              // 20: flyteidl2.common.EnrichedIdentity
-	(*LatestRunSummary)(nil),                     // 21: flyteidl2.task.LatestRunSummary
+	(*TaskAliasName)(nil),                        // 8: flyteidl2.task.TaskAliasName
+	(*TaskAlias)(nil),                            // 9: flyteidl2.task.TaskAlias
+	(*TaskAliasRevision)(nil),                    // 10: flyteidl2.task.TaskAliasRevision
+	(*SetTaskAliasRequest)(nil),                  // 11: flyteidl2.task.SetTaskAliasRequest
+	(*SetTaskAliasResponse)(nil),                 // 12: flyteidl2.task.SetTaskAliasResponse
+	(*GetTaskAliasRequest)(nil),                  // 13: flyteidl2.task.GetTaskAliasRequest
+	(*GetTaskAliasResponse)(nil),                 // 14: flyteidl2.task.GetTaskAliasResponse
+	(*ListTaskAliasesRequest)(nil),               // 15: flyteidl2.task.ListTaskAliasesRequest
+	(*ListTaskAliasesResponse)(nil),              // 16: flyteidl2.task.ListTaskAliasesResponse
+	(*DeleteTaskAliasRequest)(nil),               // 17: flyteidl2.task.DeleteTaskAliasRequest
+	(*DeleteTaskAliasResponse)(nil),              // 18: flyteidl2.task.DeleteTaskAliasResponse
+	(*GetTaskAliasHistoryRequest)(nil),           // 19: flyteidl2.task.GetTaskAliasHistoryRequest
+	(*GetTaskAliasHistoryResponse)(nil),          // 20: flyteidl2.task.GetTaskAliasHistoryResponse
+	(*ListTasksRequest_KnownFilter)(nil),         // 21: flyteidl2.task.ListTasksRequest.KnownFilter
+	(*ListTasksResponse_ListTasksMetadata)(nil),  // 22: flyteidl2.task.ListTasksResponse.ListTasksMetadata
+	(*ListVersionsResponse_VersionResponse)(nil), // 23: flyteidl2.task.ListVersionsResponse.VersionResponse
+	(*TaskIdentifier)(nil),                       // 24: flyteidl2.task.TaskIdentifier
+	(*TaskSpec)(nil),                             // 25: flyteidl2.task.TaskSpec
+	(*TaskTrigger)(nil),                          // 26: flyteidl2.task.TaskTrigger
+	(*TaskDetails)(nil),                          // 27: flyteidl2.task.TaskDetails
+	(*common.ListRequest)(nil),                   // 28: flyteidl2.common.ListRequest
+	(*common.ProjectIdentifier)(nil),             // 29: flyteidl2.common.ProjectIdentifier
+	(*Task)(nil),                                 // 30: flyteidl2.task.Task
+	(*TaskName)(nil),                             // 31: flyteidl2.task.TaskName
+	(*common.EnrichedIdentity)(nil),              // 32: flyteidl2.common.EnrichedIdentity
+	(*timestamppb.Timestamp)(nil),                // 33: google.protobuf.Timestamp
+	(*LatestRunSummary)(nil),                     // 34: flyteidl2.task.LatestRunSummary
 }
 var file_flyteidl2_task_task_service_proto_depIdxs = []int32{
-	11, // 0: flyteidl2.task.DeployTaskRequest.task_id:type_name -> flyteidl2.task.TaskIdentifier
-	12, // 1: flyteidl2.task.DeployTaskRequest.spec:type_name -> flyteidl2.task.TaskSpec
-	13, // 2: flyteidl2.task.DeployTaskRequest.triggers:type_name -> flyteidl2.task.TaskTrigger
-	11, // 3: flyteidl2.task.GetTaskDetailsRequest.task_id:type_name -> flyteidl2.task.TaskIdentifier
-	14, // 4: flyteidl2.task.GetTaskDetailsResponse.details:type_name -> flyteidl2.task.TaskDetails
-	15, // 5: flyteidl2.task.ListTasksRequest.request:type_name -> flyteidl2.common.ListRequest
-	16, // 6: flyteidl2.task.ListTasksRequest.project_id:type_name -> flyteidl2.common.ProjectIdentifier
-	8,  // 7: flyteidl2.task.ListTasksRequest.known_filters:type_name -> flyteidl2.task.ListTasksRequest.KnownFilter
-	17, // 8: flyteidl2.task.ListTasksResponse.tasks:type_name -> flyteidl2.task.Task
-	9,  // 9: flyteidl2.task.ListTasksResponse.metadata:type_name -> flyteidl2.task.ListTasksResponse.ListTasksMetadata
-	15, // 10: flyteidl2.task.ListVersionsRequest.request:type_name -> flyteidl2.common.ListRequest
-	18, // 11: flyteidl2.task.ListVersionsRequest.task_name:type_name -> flyteidl2.task.TaskName
-	10, // 12: flyteidl2.task.ListVersionsResponse.versions:type_name -> flyteidl2.task.ListVersionsResponse.VersionResponse
-	19, // 13: flyteidl2.task.ListVersionsResponse.VersionResponse.deployed_at:type_name -> google.protobuf.Timestamp
-	20, // 14: flyteidl2.task.ListVersionsResponse.VersionResponse.deployed_by:type_name -> flyteidl2.common.EnrichedIdentity
-	21, // 15: flyteidl2.task.ListVersionsResponse.VersionResponse.latest_run:type_name -> flyteidl2.task.LatestRunSummary
-	0,  // 16: flyteidl2.task.TaskService.DeployTask:input_type -> flyteidl2.task.DeployTaskRequest
-	2,  // 17: flyteidl2.task.TaskService.GetTaskDetails:input_type -> flyteidl2.task.GetTaskDetailsRequest
-	4,  // 18: flyteidl2.task.TaskService.ListTasks:input_type -> flyteidl2.task.ListTasksRequest
-	6,  // 19: flyteidl2.task.TaskService.ListVersions:input_type -> flyteidl2.task.ListVersionsRequest
-	1,  // 20: flyteidl2.task.TaskService.DeployTask:output_type -> flyteidl2.task.DeployTaskResponse
-	3,  // 21: flyteidl2.task.TaskService.GetTaskDetails:output_type -> flyteidl2.task.GetTaskDetailsResponse
-	5,  // 22: flyteidl2.task.TaskService.ListTasks:output_type -> flyteidl2.task.ListTasksResponse
-	7,  // 23: flyteidl2.task.TaskService.ListVersions:output_type -> flyteidl2.task.ListVersionsResponse
-	20, // [20:24] is the sub-list for method output_type
-	16, // [16:20] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	24, // 0: flyteidl2.task.DeployTaskRequest.task_id:type_name -> flyteidl2.task.TaskIdentifier
+	25, // 1: flyteidl2.task.DeployTaskRequest.spec:type_name -> flyteidl2.task.TaskSpec
+	26, // 2: flyteidl2.task.DeployTaskRequest.triggers:type_name -> flyteidl2.task.TaskTrigger
+	24, // 3: flyteidl2.task.GetTaskDetailsRequest.task_id:type_name -> flyteidl2.task.TaskIdentifier
+	27, // 4: flyteidl2.task.GetTaskDetailsResponse.details:type_name -> flyteidl2.task.TaskDetails
+	28, // 5: flyteidl2.task.ListTasksRequest.request:type_name -> flyteidl2.common.ListRequest
+	29, // 6: flyteidl2.task.ListTasksRequest.project_id:type_name -> flyteidl2.common.ProjectIdentifier
+	21, // 7: flyteidl2.task.ListTasksRequest.known_filters:type_name -> flyteidl2.task.ListTasksRequest.KnownFilter
+	30, // 8: flyteidl2.task.ListTasksResponse.tasks:type_name -> flyteidl2.task.Task
+	22, // 9: flyteidl2.task.ListTasksResponse.metadata:type_name -> flyteidl2.task.ListTasksResponse.ListTasksMetadata
+	28, // 10: flyteidl2.task.ListVersionsRequest.request:type_name -> flyteidl2.common.ListRequest
+	31, // 11: flyteidl2.task.ListVersionsRequest.task_name:type_name -> flyteidl2.task.TaskName
+	23, // 12: flyteidl2.task.ListVersionsResponse.versions:type_name -> flyteidl2.task.ListVersionsResponse.VersionResponse
+	31, // 13: flyteidl2.task.TaskAliasName.task_name:type_name -> flyteidl2.task.TaskName
+	8,  // 14: flyteidl2.task.TaskAlias.name:type_name -> flyteidl2.task.TaskAliasName
+	32, // 15: flyteidl2.task.TaskAlias.set_by:type_name -> flyteidl2.common.EnrichedIdentity
+	33, // 16: flyteidl2.task.TaskAlias.set_at:type_name -> google.protobuf.Timestamp
+	32, // 17: flyteidl2.task.TaskAliasRevision.changed_by:type_name -> flyteidl2.common.EnrichedIdentity
+	33, // 18: flyteidl2.task.TaskAliasRevision.changed_at:type_name -> google.protobuf.Timestamp
+	8,  // 19: flyteidl2.task.SetTaskAliasRequest.name:type_name -> flyteidl2.task.TaskAliasName
+	9,  // 20: flyteidl2.task.SetTaskAliasResponse.alias:type_name -> flyteidl2.task.TaskAlias
+	8,  // 21: flyteidl2.task.GetTaskAliasRequest.name:type_name -> flyteidl2.task.TaskAliasName
+	9,  // 22: flyteidl2.task.GetTaskAliasResponse.alias:type_name -> flyteidl2.task.TaskAlias
+	31, // 23: flyteidl2.task.ListTaskAliasesRequest.task_name:type_name -> flyteidl2.task.TaskName
+	28, // 24: flyteidl2.task.ListTaskAliasesRequest.request:type_name -> flyteidl2.common.ListRequest
+	9,  // 25: flyteidl2.task.ListTaskAliasesResponse.aliases:type_name -> flyteidl2.task.TaskAlias
+	8,  // 26: flyteidl2.task.DeleteTaskAliasRequest.name:type_name -> flyteidl2.task.TaskAliasName
+	8,  // 27: flyteidl2.task.GetTaskAliasHistoryRequest.name:type_name -> flyteidl2.task.TaskAliasName
+	28, // 28: flyteidl2.task.GetTaskAliasHistoryRequest.request:type_name -> flyteidl2.common.ListRequest
+	10, // 29: flyteidl2.task.GetTaskAliasHistoryResponse.revisions:type_name -> flyteidl2.task.TaskAliasRevision
+	33, // 30: flyteidl2.task.ListVersionsResponse.VersionResponse.deployed_at:type_name -> google.protobuf.Timestamp
+	32, // 31: flyteidl2.task.ListVersionsResponse.VersionResponse.deployed_by:type_name -> flyteidl2.common.EnrichedIdentity
+	34, // 32: flyteidl2.task.ListVersionsResponse.VersionResponse.latest_run:type_name -> flyteidl2.task.LatestRunSummary
+	0,  // 33: flyteidl2.task.TaskService.DeployTask:input_type -> flyteidl2.task.DeployTaskRequest
+	2,  // 34: flyteidl2.task.TaskService.GetTaskDetails:input_type -> flyteidl2.task.GetTaskDetailsRequest
+	4,  // 35: flyteidl2.task.TaskService.ListTasks:input_type -> flyteidl2.task.ListTasksRequest
+	6,  // 36: flyteidl2.task.TaskService.ListVersions:input_type -> flyteidl2.task.ListVersionsRequest
+	11, // 37: flyteidl2.task.TaskService.SetTaskAlias:input_type -> flyteidl2.task.SetTaskAliasRequest
+	13, // 38: flyteidl2.task.TaskService.GetTaskAlias:input_type -> flyteidl2.task.GetTaskAliasRequest
+	15, // 39: flyteidl2.task.TaskService.ListTaskAliases:input_type -> flyteidl2.task.ListTaskAliasesRequest
+	17, // 40: flyteidl2.task.TaskService.DeleteTaskAlias:input_type -> flyteidl2.task.DeleteTaskAliasRequest
+	19, // 41: flyteidl2.task.TaskService.GetTaskAliasHistory:input_type -> flyteidl2.task.GetTaskAliasHistoryRequest
+	1,  // 42: flyteidl2.task.TaskService.DeployTask:output_type -> flyteidl2.task.DeployTaskResponse
+	3,  // 43: flyteidl2.task.TaskService.GetTaskDetails:output_type -> flyteidl2.task.GetTaskDetailsResponse
+	5,  // 44: flyteidl2.task.TaskService.ListTasks:output_type -> flyteidl2.task.ListTasksResponse
+	7,  // 45: flyteidl2.task.TaskService.ListVersions:output_type -> flyteidl2.task.ListVersionsResponse
+	12, // 46: flyteidl2.task.TaskService.SetTaskAlias:output_type -> flyteidl2.task.SetTaskAliasResponse
+	14, // 47: flyteidl2.task.TaskService.GetTaskAlias:output_type -> flyteidl2.task.GetTaskAliasResponse
+	16, // 48: flyteidl2.task.TaskService.ListTaskAliases:output_type -> flyteidl2.task.ListTaskAliasesResponse
+	18, // 49: flyteidl2.task.TaskService.DeleteTaskAlias:output_type -> flyteidl2.task.DeleteTaskAliasResponse
+	20, // 50: flyteidl2.task.TaskService.GetTaskAliasHistory:output_type -> flyteidl2.task.GetTaskAliasHistoryResponse
+	42, // [42:51] is the sub-list for method output_type
+	33, // [33:42] is the sub-list for method input_type
+	33, // [33:33] is the sub-list for extension type_name
+	33, // [33:33] is the sub-list for extension extendee
+	0,  // [0:33] is the sub-list for field type_name
 }
 
 func init() { file_flyteidl2_task_task_service_proto_init() }
@@ -1052,7 +1941,7 @@ func file_flyteidl2_task_task_service_proto_init() {
 			}
 		}
 		file_flyteidl2_task_task_service_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListTasksRequest_KnownFilter); i {
+			switch v := v.(*TaskAliasName); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1064,7 +1953,7 @@ func file_flyteidl2_task_task_service_proto_init() {
 			}
 		}
 		file_flyteidl2_task_task_service_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListTasksResponse_ListTasksMetadata); i {
+			switch v := v.(*TaskAlias); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1076,6 +1965,162 @@ func file_flyteidl2_task_task_service_proto_init() {
 			}
 		}
 		file_flyteidl2_task_task_service_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TaskAliasRevision); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_task_service_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SetTaskAliasRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_task_service_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SetTaskAliasResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_task_service_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetTaskAliasRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_task_service_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetTaskAliasResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_task_service_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListTaskAliasesRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_task_service_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListTaskAliasesResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_task_service_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteTaskAliasRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_task_service_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteTaskAliasResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_task_service_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetTaskAliasHistoryRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_task_service_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetTaskAliasHistoryResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_task_service_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListTasksRequest_KnownFilter); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_task_service_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListTasksResponse_ListTasksMetadata); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl2_task_task_service_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListVersionsResponse_VersionResponse); i {
 			case 0:
 				return &v.state
@@ -1092,18 +2137,18 @@ func file_flyteidl2_task_task_service_proto_init() {
 		(*ListTasksRequest_Org)(nil),
 		(*ListTasksRequest_ProjectId)(nil),
 	}
-	file_flyteidl2_task_task_service_proto_msgTypes[8].OneofWrappers = []interface{}{
+	file_flyteidl2_task_task_service_proto_msgTypes[21].OneofWrappers = []interface{}{
 		(*ListTasksRequest_KnownFilter_DeployedBy)(nil),
 		(*ListTasksRequest_KnownFilter_IsEntrypoint)(nil),
 	}
-	file_flyteidl2_task_task_service_proto_msgTypes[10].OneofWrappers = []interface{}{}
+	file_flyteidl2_task_task_service_proto_msgTypes[23].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_flyteidl2_task_task_service_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
