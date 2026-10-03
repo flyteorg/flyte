@@ -74,6 +74,13 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID, consoleURL string) []v1
 			Name:  "FLYTE_ATTEMPT_NUMBER",
 			Value: attemptNumber,
 		},
+		{
+			// 1-based attempt ordinal, matching the wire/API convention
+			// (ActionAttemptIdentifier, console). FLYTE_ATTEMPT_NUMBER above is the
+			// 0-based retry index and is kept for existing SDK/user-code readers.
+			Name:  "FLYTE_ATTEMPT",
+			Value: strconv.Itoa(int(id.GetID().RetryAttempt) + 1),
+		},
 	}
 
 	if len(consoleURL) > 0 {
