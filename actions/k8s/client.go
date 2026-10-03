@@ -327,7 +327,7 @@ func (c *ActionsClient) Signal(ctx context.Context, actionID *common.ActionIdent
 			return connect.NewError(connect.CodeFailedPrecondition,
 				fmt.Errorf("condition %s already signalled with a different value", taskActionName))
 		}
-		if isTerminalPhase(GetPhaseFromConditions(taskAction)) {
+		if IsTerminalPhase(GetPhaseFromConditions(taskAction)) {
 			return connect.NewError(connect.CodeFailedPrecondition,
 				fmt.Errorf("condition %s already completed", taskActionName))
 		}
@@ -668,7 +668,7 @@ func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, e
 	}
 
 	phase := GetPhaseFromConditions(taskAction)
-	if eventType == watch.Deleted && !isTerminalPhase(phase) {
+	if eventType == watch.Deleted && !IsTerminalPhase(phase) {
 		// Only force ABORTED if the action wasn't already in a terminal phase.
 		// Otherwise a missed-delete tombstone or post-terminal CR cleanup would
 		// overwrite a recorded Succeeded/Failed status with Aborted.
@@ -845,7 +845,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		} else if code := resp.Msg.GetStatus().GetCode(); code != 0 {
 			logger.Warnf(ctx, "Run service rejected action status update for %s: code=%d message=%s",
 				update.ActionID.Name, code, resp.Msg.GetStatus().GetMessage())
-		} else if isTerminalPhase(update.Phase) && !update.IsDeleted {
+		} else if IsTerminalPhase(update.Phase) && !update.IsDeleted {
 			// Skip label patching for deleted CRs — the patch would always fail
 			// with "not found" since the object is already gone.
 			if err := c.markTerminalStatusRecorded(ctx, taskAction); err != nil {
@@ -899,7 +899,8 @@ func GetPhaseFromConditions(taskAction *executorv1.TaskAction) common.ActionPhas
 	return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
 }
 
-func isTerminalPhase(phase common.ActionPhase) bool {
+// IsTerminalPhase reports whether phase ends an action attempt.
+func IsTerminalPhase(phase common.ActionPhase) bool {
 	return phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED ||
 		phase == common.ActionPhase_ACTION_PHASE_FAILED ||
 		phase == common.ActionPhase_ACTION_PHASE_ABORTED ||
