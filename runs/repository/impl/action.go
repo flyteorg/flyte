@@ -31,9 +31,11 @@ const (
 	defaultNotificationBufferSize                    = 256
 	notifyRetryMinBackoff                            = 50 * time.Millisecond
 	notifyRetryMaxBackoff                            = 5 * time.Second
-	notifyBatchSize                                  = 1000
+	notifyBatchSize                                  = 100
+	notifySubscriberBufferSize                       = notifyBatchSize * 3 / 2
 	notificationMeterName                            = "runs-repository"
 	notificationDeletedMetricName                    = "runs.notification.evictions"
+	notificationDroppedMetricName                    = "runs.notification.subscriber_drops"
 	notificationBufferAction      notificationBuffer = "action"
 	notificationBufferRun         notificationBuffer = "run"
 )
@@ -48,7 +50,8 @@ type NotificationConfig struct {
 }
 
 type notificationMetrics struct {
-	notifyDeletedCount metric.Int64Counter
+	notifyDeletedCount           metric.Int64Counter
+	subscriberDroppedNotifyCount metric.Int64Counter
 }
 
 func newNotificationMetrics(provider metric.MeterProvider) (*notificationMetrics, error) {
@@ -67,7 +70,18 @@ func newNotificationMetrics(provider metric.MeterProvider) (*notificationMetrics
 		return nil, err
 	}
 
-	return &notificationMetrics{notifyDeletedCount: notifyDeletedCount}, nil
+	subscriberDroppedNotifyCount, err := provider.Meter(notificationMeterName).Int64Counter(
+		notificationDroppedMetricName,
+		metric.WithDescription("Notifications dropped because a subscriber channel was full"),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &notificationMetrics{
+		notifyDeletedCount:           notifyDeletedCount,
+		subscriberDroppedNotifyCount: subscriberDroppedNotifyCount,
+	}, nil
 }
 
 func (m *notificationMetrics) recordDeleted(ctx context.Context, bufferFrom notificationBuffer, count int64) {
@@ -75,6 +89,13 @@ func (m *notificationMetrics) recordDeleted(ctx context.Context, bufferFrom noti
 		return
 	}
 	m.notifyDeletedCount.Add(ctx, count, metric.WithAttributes(attribute.String("buffer_from", string(bufferFrom))))
+}
+
+func (m *notificationMetrics) recordSubscriberDropped(ctx context.Context, bufferFrom notificationBuffer, count int64) {
+	if m == nil || m.subscriberDroppedNotifyCount == nil || count == 0 {
+		return
+	}
+	m.subscriberDroppedNotifyCount.Add(ctx, count, metric.WithAttributes(attribute.String("buffer_from", string(bufferFrom))))
 }
 
 // NewNotificationConfig creates a notification config, normalizing invalid values.
@@ -766,7 +787,7 @@ func (r *actionRepo) WatchStateUpdates(ctx context.Context, updates chan<- *comm
 // WatchRunUpdates watches for run updates via LISTEN/NOTIFY
 func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Run, errs chan<- error) {
 	runKey := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
-	notifCh := make(chan string, 100)
+	notifCh := make(chan string, notifySubscriberBufferSize)
 
 	r.mu.Lock()
 	r.runSubscribers[notifCh] = true
@@ -805,7 +826,7 @@ func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdent
 
 // WatchAllRunUpdates watches for all run updates via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error) {
-	notifCh := make(chan string, 100)
+	notifCh := make(chan string, notifySubscriberBufferSize)
 
 	r.mu.Lock()
 	r.runSubscribers[notifCh] = true
@@ -858,7 +879,7 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 // WatchAllActionUpdates watches for all action updates for a run via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	runPrefix := fmt.Sprintf("%s/%s/%s/", runID.Project, runID.Domain, runID.Name)
-	notifCh := make(chan string, 100)
+	notifCh := make(chan string, notifySubscriberBufferSize)
 
 	r.mu.Lock()
 	r.actionSubscribers[notifCh] = true
@@ -926,7 +947,7 @@ func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.Ru
 func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.ActionIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	targetPayload := fmt.Sprintf("%s/%s/%s/%s",
 		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
-	notifCh := make(chan string, 100)
+	notifCh := make(chan string, notifySubscriberBufferSize)
 
 	r.mu.Lock()
 	r.actionSubscribers[notifCh] = true
@@ -1027,6 +1048,7 @@ func (r *actionRepo) processNotifications() {
 					default:
 						// Channel full, skip this subscriber
 						logger.Warnf(context.Background(), "Run subscriber channel full, dropping notification")
+						r.notificationMetrics.recordSubscriberDropped(context.Background(), notificationBufferRun, 1)
 					}
 				}
 				r.mu.RUnlock()
@@ -1039,6 +1061,7 @@ func (r *actionRepo) processNotifications() {
 					case ch <- notif.Extra:
 					default:
 						logger.Warnf(context.Background(), "Action subscriber channel full, dropping notification payload=%s", notif.Extra)
+						r.notificationMetrics.recordSubscriberDropped(context.Background(), notificationBufferAction, 1)
 					}
 				}
 				r.mu.RUnlock()
