@@ -272,6 +272,11 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("executor: requeueDuration must not be negative, got %v", cfg.RequeueDuration.Duration)
 	}
 	reconciler.RequeueDuration = cfg.RequeueDuration.Duration
+	k8sEventLevel, err := controller.ParseEventLevel(cfg.K8sEventLevel)
+	if err != nil {
+		return fmt.Errorf("executor: %w", err)
+	}
+	reconciler.K8sEventLevel = k8sEventLevel
 	if err := reconciler.SetupWithManager(mgr, cfg.MaxConcurrentReconciles); err != nil {
 		return fmt.Errorf("executor: failed to setup controller: %w", err)
 	}
