@@ -31,6 +31,7 @@ const (
 	defaultNotificationBufferSize                    = 256
 	notifyRetryMinBackoff                            = 50 * time.Millisecond
 	notifyRetryMaxBackoff                            = 5 * time.Second
+	notifyBatchSize                                  = 1000
 	notificationMeterName                            = "runs-repository"
 	notificationDeletedMetricName                    = "runs.notification.evictions"
 	notificationBufferAction      notificationBuffer = "action"
@@ -1245,16 +1246,16 @@ func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql
 		}
 	}
 
-	execNotify := func(channel, payload string) bool {
+	execNotify := func(channel, query string, args []any) bool {
 		if conn == nil {
 			reconnect()
 		}
 		if conn == nil {
-			logger.Errorf(ctx, "No NOTIFY connection available, keeping %s notification pending", channel)
+			logger.Errorf(ctx, "No NOTIFY connection available, keeping %s notifications pending", channel)
 			return false
 		}
-		if _, err := conn.ExecContext(ctx, "SELECT pg_notify($1, $2)", channel, payload); err != nil {
-			logger.Errorf(ctx, "Failed to NOTIFY %s: %v", channel, err)
+		if _, err := conn.ExecContext(ctx, query, args...); err != nil {
+			logger.Errorf(ctx, "Failed to NOTIFY %s notifications: %v", channel, err)
 			if isConnError(err) {
 				reconnect()
 			}
@@ -1264,9 +1265,21 @@ func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql
 	}
 
 	emit := func(channel string, payloads []string) []string {
-		for i, payload := range payloads {
-			if !execNotify(channel, payload) {
-				return payloads[i:]
+		for start := 0; start < len(payloads); start += notifyBatchSize {
+			chunk := payloads[start:min(start+notifyBatchSize, len(payloads))]
+			var query strings.Builder
+			query.WriteString("SELECT ")
+			args := make([]any, 0, len(chunk)+1)
+			args = append(args, channel)
+			for i, payload := range chunk {
+				if i > 0 {
+					query.WriteString(", ")
+				}
+				fmt.Fprintf(&query, "pg_notify($1, $%d)", i+2)
+				args = append(args, payload)
+			}
+			if !execNotify(channel, query.String(), args) {
+				return payloads[start:]
 			}
 		}
 		return nil

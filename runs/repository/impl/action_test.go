@@ -1461,6 +1461,30 @@ func TestNotifyPump_DeliversPendingActionsFIFO(t *testing.T) {
 	}
 }
 
+func TestNotifyPump_BatchedDeliveryAcrossChunks(t *testing.T) {
+	r, sqlDB, conn := newNotifyRepoWithDB(t)
+	const total = 2*notifyBatchSize + 5
+	delivered := subscribeActions(t, r, total)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	for i := 0; i < total; i++ {
+		r.notifyActionUpdate(ctx, notifyTestActionID(fmt.Sprintf("action-%04d", i)))
+	}
+
+	go r.runNotifyLoop(ctx, sqlDB, conn)
+
+	for i := 0; i < total; i++ {
+		select {
+		case payload := <-delivered:
+			assert.Equal(t, fmt.Sprintf("proj/domain/run/action-%04d", i), payload)
+		case <-time.After(15 * time.Second):
+			t.Fatalf("notification %d was never delivered", i)
+		}
+	}
+}
+
 func TestIsConnError(t *testing.T) {
 	tests := []struct {
 		name   string
