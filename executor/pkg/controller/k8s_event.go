@@ -28,6 +28,22 @@ const (
 	EventLevelDebug
 )
 
+// ParseEventLevel parses the executor's k8sEventLevel config value.
+func ParseEventLevel(s string) (EventLevel, error) {
+	switch s {
+	case "off":
+		return EventLevelOff, nil
+	case "terminal":
+		return EventLevelTerminal, nil
+	case "info":
+		return EventLevelInfo, nil
+	case "debug":
+		return EventLevelDebug, nil
+	default:
+		return EventLevelOff, fmt.Errorf("unknown k8s event level %q, want off, terminal, info or debug", s)
+	}
+}
+
 const (
 	annPrefix     = "flyte.org/"
 	annProject    = annPrefix + "project"
@@ -97,7 +113,7 @@ func buildActionEventK8s(
 
 	return &eventsv1.Event{
 		ObjectMeta: metav1.ObjectMeta{
-			GenerateName: taskAction.Name + ".",
+			GenerateName: taskAction.Name + "-",
 			Namespace:    taskAction.Namespace, // must equal Regarding.Namespace
 			Annotations:  ann,
 		},

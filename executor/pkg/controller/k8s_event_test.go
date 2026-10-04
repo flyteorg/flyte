@@ -1,16 +1,21 @@
 package controller
 
 import (
+	"context"
 	"strings"
 	"testing"
 	"unicode/utf8"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	corev1 "k8s.io/api/core/v1"
+	eventsv1 "k8s.io/api/events/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/events"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -70,7 +75,7 @@ func TestBuildActionEventK8s(t *testing.T) {
 
 		assert.Equal(t, taskAction.Namespace, ev.Namespace)
 		assert.Equal(t, ev.Namespace, ev.Regarding.Namespace)
-		assert.Equal(t, taskAction.Name+".", ev.GenerateName)
+		assert.Equal(t, taskAction.Name+"-", ev.GenerateName)
 		assert.Equal(t, flyteorgv1.GroupVersion.String(), ev.Regarding.APIVersion)
 		assert.Equal(t, "TaskAction", ev.Regarding.Kind)
 		assert.Equal(t, taskAction.Name, ev.Regarding.Name)
@@ -234,4 +239,69 @@ func TestHumanSummary(t *testing.T) {
 		event.ErrorInfo = &workflow.ErrorInfo{Message: strings.Repeat("stack frame ", 200)}
 		assert.LessOrEqual(t, len(humanSummary(event)), noteLimit)
 	})
+}
+
+func TestEmitK8sEvent(t *testing.T) {
+	tests := []struct {
+		name          string
+		level         EventLevel
+		phase         common.ActionPhase
+		prevPhase     common.ActionPhase
+		createdReason string
+		recorded      string
+	}{
+		{
+			name:          "terminal event is created through the client",
+			level:         EventLevelTerminal,
+			phase:         common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+			prevPhase:     common.ActionPhase_ACTION_PHASE_RUNNING,
+			createdReason: string(ReasonActionSucceeded),
+		},
+		{
+			name:      "phase change at info goes through the recorder",
+			level:     EventLevelInfo,
+			phase:     common.ActionPhase_ACTION_PHASE_RUNNING,
+			prevPhase: common.ActionPhase_ACTION_PHASE_QUEUED,
+			recorded:  "Normal ActionRunning action a0 attempt 1 running",
+		},
+		{
+			name:      "phase change at terminal is filtered",
+			level:     EventLevelTerminal,
+			phase:     common.ActionPhase_ACTION_PHASE_RUNNING,
+			prevPhase: common.ActionPhase_ACTION_PHASE_QUEUED,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+			k8sClient := fake.NewClientBuilder().Build()
+			recorder := events.NewFakeRecorder(1)
+			reconciler := &TaskActionReconciler{
+				Client:            k8sClient,
+				Recorder:          recorder,
+				K8sEventLevel:     tt.level,
+				reportingInstance: "taskaction-controller-host1",
+			}
+
+			reconciler.emitK8sEvent(ctx, testTaskAction(), testActionEvent(tt.phase, 0), tt.prevPhase)
+
+			created := &eventsv1.EventList{}
+			require.NoError(t, k8sClient.List(ctx, created))
+			if tt.createdReason == "" {
+				assert.Empty(t, created.Items)
+			} else {
+				require.Len(t, created.Items, 1)
+				assert.Equal(t, tt.createdReason, created.Items[0].Reason)
+				assert.Equal(t, "taskaction-controller-host1", created.Items[0].ReportingInstance)
+			}
+
+			select {
+			case got := <-recorder.Events:
+				assert.Equal(t, tt.recorded, got)
+			default:
+				assert.Empty(t, tt.recorded)
+			}
+		})
+	}
 }
