@@ -3594,6 +3594,77 @@ func TestTerminateExecution_AlreadyTerminated(t *testing.T) {
 	assert.Equal(t, codes.FailedPrecondition, s.Code())
 }
 
+func TestTerminateExecution_OwnershipEnforced(t *testing.T) {
+	startTime := time.Now()
+	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+		return models.Execution{
+			ExecutionKey: models.ExecutionKey{Project: "project", Domain: "domain", Name: "name"},
+			BaseModel:    models.BaseModel{ID: uint(8)},
+			Spec:         getExpectedSpecBytes(),
+			Phase:        core.WorkflowExecution_QUEUED.String(),
+			LaunchPlanID: uint(1),
+			WorkflowID:   uint(2),
+			StartedAt:    &startTime,
+			Cluster:      testCluster,
+			User:         principal,
+		}, nil
+	}
+
+	for _, test := range []struct {
+		name       string
+		caller     string
+		wantDenied bool
+	}{
+		{name: "owner may terminate", caller: principal},
+		{name: "stranger may not", caller: "stranger-sub", wantDenied: true},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			var updated bool
+			repository := repositoryMocks.NewMockRepository()
+			repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
+			repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(
+				func(ctx context.Context, execution models.Execution) error {
+					updated = true
+					return nil
+				})
+
+			mockExecutor := workflowengineMocks.WorkflowExecutor{}
+			mockExecutor.EXPECT().Abort(mock.Anything, mock.Anything).Return(nil)
+			mockExecutor.EXPECT().ID().Return("customMockExecutor")
+			r := plugins.NewRegistry()
+			r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
+
+			config := getMockExecutionsConfigProvider()
+			config.ApplicationConfiguration().GetTopLevelConfig().TerminateAuthz =
+				runtimeInterfaces.TerminateAuthzConfig{Enabled: true}
+
+			execManager := NewExecutionManager(repository, r, config, getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+
+			identity, err := auth.NewIdentityContext("", test.caller, "", time.Now(), sets.NewString(), nil, nil)
+			assert.NoError(t, err)
+			_, err = execManager.TerminateExecution(
+				identity.WithContext(context.Background()), &admin.ExecutionTerminateRequest{
+					Id: &core.WorkflowExecutionIdentifier{
+						Project: "project",
+						Domain:  "domain",
+						Name:    "name",
+					},
+					Cause: "abort cause",
+				})
+
+			if !test.wantDenied {
+				assert.NoError(t, err)
+				assert.True(t, updated)
+				return
+			}
+			assert.Error(t, err)
+			assert.Equal(t, codes.PermissionDenied, err.(flyteAdminErrors.FlyteAdminError).Code())
+			assert.False(t, updated)
+			mockExecutor.AssertNotCalled(t, "Abort", mock.Anything, mock.Anything)
+		})
+	}
+}
+
 func TestGetExecutionData(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
@@ -6481,4 +6552,115 @@ func TestAddIdentityAnnotations(t *testing.T) {
 		assert.Equal(t, "value", result["existing"])
 	})
 
+}
+
+func TestAuthorizeTerminate(t *testing.T) {
+	const owner = "owner-sub-uuid"
+	setupConfig := func(cfg runtimeInterfaces.TerminateAuthzConfig) runtimeInterfaces.Configuration {
+		mockConfig := runtimeMocks.NewMockConfigurationProvider(
+			testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
+		mockConfig.ApplicationConfiguration().GetTopLevelConfig().TerminateAuthz = cfg
+		return mockConfig
+	}
+	enabled := runtimeInterfaces.TerminateAuthzConfig{Enabled: true}
+	withAdmins := func(identities, groups []string) runtimeInterfaces.TerminateAuthzConfig {
+		return runtimeInterfaces.TerminateAuthzConfig{
+			Enabled: true, AdminIdentities: identities, AdminGroups: groups, GroupsClaim: "groups",
+		}
+	}
+	withSystem := runtimeInterfaces.TerminateAuthzConfig{
+		Enabled: true, SystemIdentities: []string{"flyte_propeller_sa"},
+	}
+	withExemptLauncher := runtimeInterfaces.TerminateAuthzConfig{
+		Enabled: true, ExemptLaunchers: []string{"shared-sa-sub"},
+	}
+
+	tests := []struct {
+		name       string
+		cfg        runtimeInterfaces.TerminateAuthzConfig
+		callerSub  string
+		callerApp  string
+		email      string
+		claims     map[string]interface{}
+		recorded   string
+		mode       int32
+		parentID   uint
+		wantDenied bool
+	}{
+		{name: "owner terminates own execution", cfg: enabled, callerSub: owner, recorded: owner},
+		{name: "stranger is denied", cfg: enabled, callerSub: "stranger-sub", recorded: owner, wantDenied: true},
+		{name: "disabled config allows a stranger", callerSub: "stranger-sub", recorded: owner},
+		{name: "execution with no recorded user stays terminable", cfg: enabled, callerSub: "stranger-sub"},
+		{name: "anonymous caller is denied", cfg: enabled, recorded: owner, wantDenied: true},
+		{
+			name: "admin by subject", cfg: withAdmins([]string{"admin-sub"}, nil),
+			callerSub: "admin-sub", recorded: owner,
+		},
+		{
+			name: "admin by email", cfg: withAdmins([]string{"ops@example.com"}, nil),
+			callerSub: "stranger-sub", email: "ops@example.com", recorded: owner,
+		},
+		{
+			name: "admin by app id", cfg: withAdmins([]string{"terminator_sso"}, nil),
+			callerSub: "stranger-sub", callerApp: "terminator_sso", recorded: owner,
+		},
+		{
+			name: "admin by group, path-prefixed by the idp", cfg: withAdmins(nil, []string{"team_admin"}),
+			callerSub: "stranger-sub", recorded: owner,
+			claims: map[string]interface{}{"groups": []interface{}{"/team_admin"}},
+		},
+		{
+			name: "group claim not carried by this client is denied", cfg: withAdmins(nil, []string{"team_admin"}),
+			callerSub: "stranger-sub", recorded: owner, wantDenied: true,
+		},
+		{
+			name: "non-admin group is denied", cfg: withAdmins(nil, []string{"team_admin"}),
+			callerSub: "stranger-sub", recorded: owner, wantDenied: true,
+			claims: map[string]interface{}{"groups": []interface{}{"everyone"}},
+		},
+		{
+			name: "a scheduled execution has no owner to protect", cfg: enabled,
+			callerSub: "stranger-sub", recorded: owner,
+			mode: int32(admin.ExecutionMetadata_SCHEDULED),
+		},
+		{
+			name: "propeller cascades an abort to a child execution", cfg: withSystem,
+			callerSub: "propeller-sub", callerApp: "flyte_propeller_sa", recorded: owner,
+			mode: int32(admin.ExecutionMetadata_CHILD_WORKFLOW), parentID: 7,
+		},
+		{
+			name: "a system identity may not terminate a top-level execution", cfg: withSystem,
+			callerSub: "propeller-sub", callerApp: "flyte_propeller_sa", recorded: owner,
+			wantDenied: true,
+		},
+		{
+			name: "anyone may terminate what an exempt launcher submitted", cfg: withExemptLauncher,
+			callerSub: "stranger-sub", recorded: "shared-sa-sub",
+		},
+		{
+			name: "an exempt launcher does not open up anyone else's executions", cfg: withExemptLauncher,
+			callerSub: "stranger-sub", recorded: owner, wantDenied: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			manager := ExecutionManager{config: setupConfig(test.cfg)}
+			userInfo := &service.UserInfoResponse{Email: test.email}
+			identity, err := auth.NewIdentityContext(
+				"", test.callerSub, test.callerApp, time.Now(), sets.NewString(), userInfo, test.claims)
+			assert.NoError(t, err)
+
+			err = manager.authorizeTerminate(
+				identity.WithContext(context.Background()),
+				models.Execution{User: test.recorded, Mode: test.mode, ParentNodeExecutionID: test.parentID})
+
+			if !test.wantDenied {
+				assert.NoError(t, err)
+				return
+			}
+			assert.Error(t, err)
+			assert.Equal(t, codes.PermissionDenied, err.(flyteAdminErrors.FlyteAdminError).Code())
+		})
+	}
 }

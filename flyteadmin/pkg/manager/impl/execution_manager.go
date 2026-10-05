@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strconv"
 	"sync"
 	"time"
@@ -109,6 +110,44 @@ func getExecutionContext(ctx context.Context, id *core.WorkflowExecutionIdentifi
 func getUser(ctx context.Context) string {
 	identityContext := auth.IdentityContextFromContext(ctx)
 	return identityContext.UserID()
+}
+
+// authorizeTerminate returns PermissionDenied unless the caller is allowed to terminate the execution.
+func (m *ExecutionManager) authorizeTerminate(ctx context.Context, execution models.Execution) error {
+	cfg := m.config.ApplicationConfiguration().GetTopLevelConfig().GetTerminateAuthz()
+	if !cfg.Enabled || execution.User == "" || getUser(ctx) == execution.User {
+		return nil
+	}
+
+	// Scheduled executions are owned by the scheduler, not a user.
+	if execution.Mode == int32(admin.ExecutionMetadata_SCHEDULED) {
+		return nil
+	}
+
+	if slices.Contains(cfg.ExemptLaunchers, execution.User) {
+		return nil
+	}
+
+	identity := auth.IdentityContextFromContext(ctx)
+
+	// Lets flytepropeller cascade aborts to child executions.
+	if execution.ParentNodeExecutionID != 0 && auth.MatchesIdentity(identity, cfg.SystemIdentities) {
+		return nil
+	}
+
+	if isTerminateAdmin(identity, cfg) {
+		logger.Infof(ctx, "admin [%s] terminating execution launched by [%s]", getUser(ctx), execution.User)
+		return nil
+	}
+
+	logger.Infof(ctx, "denied terminate by [%s] on execution launched by [%s]", getUser(ctx), execution.User)
+	return errors.NewFlyteAdminError(codes.PermissionDenied,
+		"only the user who launched this execution may terminate it")
+}
+
+func isTerminateAdmin(identity auth.IdentityContext, cfg runtimeInterfaces.TerminateAuthzConfig) bool {
+	return auth.MatchesIdentity(identity, cfg.AdminIdentities) ||
+		auth.HasGroup(identity, cfg.GroupsClaim, cfg.AdminGroups)
 }
 
 func (m *ExecutionManager) populateExecutionQueue(
@@ -1924,6 +1963,11 @@ func (m *ExecutionManager) TerminateExecution(
 	})
 	if err != nil {
 		logger.Infof(ctx, "couldn't find execution [%+v] to save termination cause", request.GetId())
+		return nil, err
+	}
+
+	// Before the phase check, so a denied caller learns nothing about the execution.
+	if err := m.authorizeTerminate(ctx, executionModel); err != nil {
 		return nil, err
 	}
 
