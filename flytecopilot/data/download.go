@@ -9,6 +9,7 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -30,7 +31,43 @@ type Downloader struct {
 	format core.DataLoadingConfig_LiteralMapFormat
 	store  *storage.DataStore
 	// TODO support download mode
-	mode core.IOStrategy_DownloadMode
+	mode              core.IOStrategy_DownloadMode
+	concurrencyPerCPU int
+}
+
+const DefaultConcurrencyPerCPU = 4
+const MaxConcurrency = 1024
+
+func sanitizeConcurrencyPerCPU(concurrencyPerCPU int) int {
+	if concurrencyPerCPU <= 0 {
+		return DefaultConcurrencyPerCPU
+	}
+	return concurrencyPerCPU
+}
+
+func getConcurrency(concurrencyPerCPU int) int {
+	cpus := runtime.GOMAXPROCS(0)
+	factor := sanitizeConcurrencyPerCPU(concurrencyPerCPU)
+
+	concurrency := cpus * factor
+	if concurrency < 1 {
+		concurrency = 1
+	}
+	if concurrency > MaxConcurrency {
+		concurrency = MaxConcurrency
+	}
+	return concurrency
+}
+
+// acquireSemaphore attempts to acquire a slot from the semaphore channel.
+// It respects context cancellation so callers are not blocked indefinitely.
+func acquireSemaphore(ctx context.Context, sem chan struct{}) error {
+	select {
+	case sem <- struct{}{}:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }
 
 // TODO add timeout and rate limit
@@ -101,10 +138,19 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		// We use Mutex to avoid race conditions when updating counters and creating directories
 		var mu sync.Mutex
 		var wg sync.WaitGroup
+		concurrency := getConcurrency(d.concurrencyPerCPU)
+		sem := make(chan struct{}, concurrency)
+		var acquireErr error
 		for _, absPath := range absPaths {
+			absPath := absPath
 
+			if err := acquireSemaphore(ctx, sem); err != nil {
+				acquireErr = err
+				break
+			}
 			wg.Add(1)
 			go func() {
+				defer func() { <-sem }()
 				defer wg.Done()
 				defer func() {
 					if err := recover(); err != nil {
@@ -216,6 +262,9 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		}
 		// Go routines are synchronized with a WaitGroup to prevent goroutine leaks.
 		wg.Wait()
+		if acquireErr != nil {
+			return nil, errors.Wrapf(acquireErr, "context canceled while downloading multipart blob from [%s]", blobRef)
+		}
 		if downloadSuccess != itemCount || readerCloseSuccessCount != itemCount || writerCloseSuccessCount != itemCount {
 			return nil, errors.Errorf(
 				"Failed to copy %d out of %d remote files from [%s] to local [%s].\n"+
@@ -475,6 +524,8 @@ func (d Downloader) RecursiveDownload(ctx context.Context, inputs *core.LiteralM
 		return VarMap{}, nil, nil
 	}
 	f := make(FutureMap, len(inputs.GetLiterals()))
+	concurrency := getConcurrency(d.concurrencyPerCPU)
+	sem := make(chan struct{}, concurrency)
 	for variable, literal := range inputs.GetLiterals() {
 		if literal.GetOffloadedMetadata() != nil {
 			offloadedMetadataURI := literal.GetOffloadedMetadata().GetUri()
@@ -488,7 +539,11 @@ func (d Downloader) RecursiveDownload(ctx context.Context, inputs *core.LiteralM
 		}
 		varPath := path.Join(dir, variable)
 		lit := literal
+		if err := acquireSemaphore(childCtx, sem); err != nil {
+			return nil, nil, errors.Wrapf(err, "context canceled while scheduling download for variable [%s]", variable)
+		}
 		f[variable] = futures.NewAsyncFuture(childCtx, func(ctx2 context.Context) (interface{}, error) {
+			defer func() { <-sem }()
 			v, lit, err := d.handleLiteral(ctx2, lit, varPath, writePrimitiveToFile)
 			if err != nil {
 				return nil, err
@@ -565,10 +620,11 @@ func (d Downloader) DownloadInputs(ctx context.Context, inputRef storage.DataRef
 	return nil
 }
 
-func NewDownloader(_ context.Context, store *storage.DataStore, format core.DataLoadingConfig_LiteralMapFormat, mode core.IOStrategy_DownloadMode) Downloader {
+func NewDownloader(_ context.Context, store *storage.DataStore, format core.DataLoadingConfig_LiteralMapFormat, mode core.IOStrategy_DownloadMode, concurrencyPerCPU int) Downloader {
 	return Downloader{
-		format: format,
-		store:  store,
-		mode:   mode,
+		format:            format,
+		store:             store,
+		mode:              mode,
+		concurrencyPerCPU: sanitizeConcurrencyPerCPU(concurrencyPerCPU),
 	}
 }
