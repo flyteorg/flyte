@@ -177,7 +177,7 @@ func TestPullDockerImage(t *testing.T) {
 }
 
 func TestStartContainer(t *testing.T) {
-	p1, p2, _ := GetSandboxPorts()
+	p1, p2, _ := GetSandboxPorts(nil)
 
 	t.Run("Successfully create a container", func(t *testing.T) {
 		setupSandbox()
@@ -508,3 +508,36 @@ func TestCopyFile(t *testing.T) {
 		assert.Equal(t, myErr, err)
 	})
 }
+
+func TestGetSandboxPorts(t *testing.T) {
+	t.Run("Default sandbox ports", func(t *testing.T) {
+		exposedPorts, portBindings, err := GetSandboxPorts(nil)
+		assert.Nil(t, err)
+		assert.Equal(t, 6, len(exposedPorts))
+		assert.Equal(t, 6, len(portBindings))
+		assert.Equal(t, 2, len(portBindings["30081/tcp"]))
+	})
+
+	t.Run("Empty slice returns default sandbox ports", func(t *testing.T) {
+		exposedPorts, portBindings, err := GetSandboxPorts([]string{})
+		assert.Nil(t, err)
+		assert.Equal(t, 6, len(exposedPorts))
+		assert.Equal(t, 6, len(portBindings))
+		assert.Equal(t, 2, len(portBindings["30081/tcp"]))
+	})
+
+	t.Run("Custom sandbox ports", func(t *testing.T) {
+		customPorts := []string{"30080:30081", "30086:30086"}
+		exposedPorts, portBindings, err := GetSandboxPorts(customPorts)
+		assert.Nil(t, err)
+		assert.Equal(t, 2, len(exposedPorts))
+		assert.Equal(t, 2, len(portBindings))
+	})
+
+	t.Run("Invalid custom sandbox ports", func(t *testing.T) {
+		invalidPorts := []string{"invalid-port-format"}
+		_, _, err := GetSandboxPorts(invalidPorts)
+		assert.NotNil(t, err)
+	})
+}
+
