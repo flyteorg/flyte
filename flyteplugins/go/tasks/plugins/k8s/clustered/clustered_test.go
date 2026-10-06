@@ -587,10 +587,35 @@ func TestGetTaskPhase_Failure(t *testing.T) {
 	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
 }
 
-func TestGetTaskPhase_Running(t *testing.T) {
+func TestGetTaskPhase_UnknownActiveCondition_NotStarted_Initializing(t *testing.T) {
 	suspend := false
 	js := makeJobSet("", "", suspend)
-	// An active condition with an unrecognized type → falls through to Running.
+	// An active condition with an unrecognized type no longer implies Running: with no
+	// Ready workers the gang has not started, so this is still Initializing.
+	js.Status.Conditions = []metav1.Condition{
+		{
+			Type:               "SomeActiveCondition",
+			Status:             metav1.ConditionTrue,
+			LastTransitionTime: metav1.NewTime(time.Now()),
+		},
+	}
+
+	spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), emptyK8sReader())
+
+	handler := clusteredResourceHandler{}
+	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseInitializing, phase.Phase())
+	assert.Contains(t, phase.Reason(), "waiting for all 2 workers")
+}
+
+func TestGetTaskPhase_Running_AllWorkersReady(t *testing.T) {
+	js := makeJobSet("", "", false)
+	// Ready counts child Jobs: 1 means every pod of the single workers Job is up.
+	js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
+		{Name: workersReplicatedJobName, Ready: 1, Active: 1},
+	}
 	js.Status.Conditions = []metav1.Condition{
 		{
 			Type:               "SomeActiveCondition",
@@ -613,11 +638,11 @@ func TestGetTaskPhase_Running(t *testing.T) {
 func TestGetTaskPhase_FastFail_NoJobsFailed(t *testing.T) {
 	// When no jobs have failed in ReplicatedJobsStatus, the fast-fail path is not taken.
 	js := makeJobSet("", "", false)
-	// Explicitly set workers status with Failed=0.
+	// Explicitly set workers status with Failed=0. Active counts child Jobs with any
+	// pod, so Active alone means pods exist, not that the gang is up.
 	js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
 		{Name: "workers", Failed: 0, Active: 2},
 	}
-	// Add an active condition so the switch falls through to running.
 	js.Status.Conditions = []metav1.Condition{
 		{
 			Type:               "SomeActiveCondition",
@@ -632,8 +657,8 @@ func TestGetTaskPhase_FastFail_NoJobsFailed(t *testing.T) {
 	handler := clusteredResourceHandler{}
 	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
 	assert.NoError(t, err)
-	// No pod inspection happens — returns Running.
-	assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+	// No rank-0 pod to inspect and no Ready workers: the gang is still forming.
+	assert.Equal(t, pluginsCore.PhaseInitializing, phase.Phase())
 }
 
 func TestGetTaskPhase_MaintenanceRetry_FlagFalse(t *testing.T) {
@@ -1073,10 +1098,14 @@ func TestGetTaskPhase_LogContext(t *testing.T) {
 		return pod
 	}
 
-	// jobSet annotates the authoritative primary container name at build time.
+	// jobSet annotates the authoritative primary container name at build time. Ready=1
+	// on the workers Job marks the gang as fully up, which is what makes it Running.
 	makeRunningJobSet := func() *jobsetv1alpha2.JobSet {
 		js := makeJobSet("", "", false)
 		js.Annotations = map[string]string{primaryContainerAnnotation: primaryContainer}
+		js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
+			{Name: workersReplicatedJobName, Ready: 1, Active: 1},
+		}
 		js.Status.Conditions = []metav1.Condition{
 			{Type: "SomeActiveCondition", Status: metav1.ConditionTrue, LastTransitionTime: metav1.NewTime(time.Now())},
 		}

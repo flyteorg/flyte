@@ -59,7 +59,11 @@ const workersReplicatedJobName = "workers"
 // the primary container name without re-running flytek8s.ToK8sPodSpec.
 const primaryContainerAnnotation = "flyte.org/primary-container"
 
-// (kueue): Gang admission via Kueue is not yet wired.
+// Gang admission: a JobSet held suspended by an external admission gate (Kueue's
+// JobSet integration flips spec.suspend) is reported as WaitingForResources until the
+// gate releases it, and as a GangEvicted system retry if the gate revokes a gang that
+// had already fully started. See phase.go. Build-time wiring (queue label and
+// spec.suspend on creation) is gated by plugin config.
 
 var (
 	labelSanitizeRE = regexp.MustCompile(`[^a-zA-Z0-9._-]`)

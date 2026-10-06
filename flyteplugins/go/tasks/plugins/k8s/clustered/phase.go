@@ -13,6 +13,7 @@ import (
 
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/gang"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
@@ -53,30 +54,36 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 	maxRestarts := getMaxRestarts(jobSet, &spec)
 
 	condition := extractCurrentCondition(jobSet.Status.Conditions)
-	if condition == nil {
-		if hasJobSetStarted(ctx, pluginContext, jobSet) {
-			if phase, ok := maybeFastFailWorker0(ctx, pluginContext, jobSet, &taskInfo, maxRestarts, true); ok {
-				return phase, nil
-			}
-			return runningPhaseInfo(ctx, pluginContext, &taskInfo, runningReason(jobSet.Status.Restarts)), nil
-		}
+	if condition != nil {
+		// Terminal conditions win over everything else; a suspended JobSet is never terminal.
+		switch jobsetv1alpha2.JobSetConditionType(condition.Type) {
+		case jobsetv1alpha2.JobSetCompleted:
+			return pluginsCore.PhaseInfoSuccess(&taskInfo), nil
 
-		return pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "pods scheduling / DNS resolving", &taskInfo), nil
+		case jobsetv1alpha2.JobSetFailed:
+			if spec.GetFailurePolicy().GetRestartOnHostMaintenance() {
+				if phase, ok := maybeSystemRetryOnMaintenance(ctx, pluginContext, jobSet, &taskInfo); ok {
+					return phase, nil
+				}
+			}
+			return pluginsCore.PhaseInfoRetryableFailure(condition.Reason, condition.Message, &taskInfo), nil
+		}
 	}
 
-	switch jobsetv1alpha2.JobSetConditionType(condition.Type) {
-	case jobsetv1alpha2.JobSetCompleted:
-		return pluginsCore.PhaseInfoSuccess(&taskInfo), nil
+	started := hasJobSetStarted(ctx, pluginContext, jobSet)
 
-	case jobsetv1alpha2.JobSetFailed:
-		if spec.GetFailurePolicy().GetRestartOnHostMaintenance() {
-			if phase, ok := maybeSystemRetryOnMaintenance(ctx, pluginContext, jobSet, &taskInfo); ok {
-				return phase, nil
-			}
+	// An admission gate (Kueue's JobSet integration) holds the JobSet through
+	// spec.suspend: no pods exist while it is held. This must never look like
+	// Running, because the executors anchor max_runtime on the first Running and
+	// stop queued_timeout there.
+	if isSuspended(jobSet, condition) {
+		if started {
+			return evictedPhaseInfo(ctx, jobSet, &taskInfo, condition), nil
 		}
-		return pluginsCore.PhaseInfoRetryableFailure(condition.Reason, condition.Message, &taskInfo), nil
+		return holdPhase(ctx, pluginContext, &taskInfo, condition), nil
+	}
 
-	case jobsetv1alpha2.JobSetRestarting:
+	if condition != nil && jobsetv1alpha2.JobSetConditionType(condition.Type) == jobsetv1alpha2.JobSetRestarting {
 		if phase, ok := maybeFastFailWorker0(ctx, pluginContext, jobSet, &taskInfo, maxRestarts, false); ok {
 			return phase, nil
 		}
@@ -88,6 +95,18 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 		), nil
 	}
 
+	if !started {
+		// Pending-pod diagnostics (image pull, unschedulable) and an exhausted restart
+		// budget still surface while the gang is forming.
+		if phase, ok := maybeFastFailWorker0(ctx, pluginContext, jobSet, &taskInfo, maxRestarts, true); ok {
+			return phase, nil
+		}
+		return pluginsCore.PhaseInfoInitializing(
+			occurredAt, pluginsCore.DefaultPhaseVersion, initializingReason(&spec), &taskInfo,
+		), nil
+	}
+
+	// Started, and no condition we act on (or an unrecognised one): the gang is running.
 	if phase, ok := maybeFastFailWorker0(ctx, pluginContext, jobSet, &taskInfo, maxRestarts, true); ok {
 		return phase, nil
 	}
@@ -96,6 +115,105 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 
 func runningReason(restarts int32) string {
 	return fmt.Sprintf("running (restart attempt %d)", restarts)
+}
+
+func initializingReason(spec *clusteredpb.ClusteredTaskSpec) string {
+	if replicas := spec.GetReplicas(); replicas > 0 {
+		return fmt.Sprintf("waiting for all %d workers to be ready (pods scheduling / DNS resolving)", replicas)
+	}
+	return "waiting for all workers to be ready (pods scheduling / DNS resolving)"
+}
+
+// evictionSource names the admission gate that flips spec.suspend on our JobSets.
+// Only Kueue's JobSet integration does that today; the plugin itself sets suspend
+// only at creation, and only when Kueue is enabled.
+const evictionSource = "kueue"
+
+// evictionPolicy decides how a post-start eviction is reported. Plugin config
+// (plugins.clustered.kueue.evict-as-system-retry) takes this over once it exists.
+var evictionPolicy = gang.Policy{AsSystemRetry: true}
+
+// isSuspended reports whether an admission gate is holding the JobSet. spec.suspend
+// is checked as well as the condition because the first poll after creation can run
+// before the JobSet controller has written Suspended=True.
+func isSuspended(jobSet *jobsetv1alpha2.JobSet, condition *metav1.Condition) bool {
+	if jobSet.Spec.Suspend != nil && *jobSet.Spec.Suspend {
+		return true
+	}
+	return condition != nil && jobsetv1alpha2.JobSetConditionType(condition.Type) == jobsetv1alpha2.JobSetSuspended
+}
+
+// holdPhase reports a gang the gate is holding before it ever fully started.
+//
+// The phase never moves backwards. Once the plugin has reported Initializing for a
+// partial start that the gate then released, it keeps reporting Initializing while
+// the gate requeues the gang in place: phases are monotonic within an attempt for
+// everything downstream of the plugin, so a lower phase would only be dropped.
+func holdPhase(
+	ctx context.Context,
+	pluginContext k8s.PluginContext,
+	taskInfo *pluginsCore.TaskInfo,
+	condition *metav1.Condition,
+) pluginsCore.PhaseInfo {
+	occurredAt := time.Now()
+	if taskInfo.OccurredAt != nil {
+		occurredAt = *taskInfo.OccurredAt
+	}
+	detail := ""
+	if condition != nil && condition.Message != "" {
+		detail = ": " + condition.Message
+	}
+
+	var phaseInfo pluginsCore.PhaseInfo
+	pluginState, ok := readPluginState(ctx, pluginContext)
+	if ok && pluginState.Phase >= pluginsCore.PhaseInitializing && pluginState.Phase < pluginsCore.PhaseSuccess {
+		phaseInfo = pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion,
+			"released by admission gate before all workers were ready; waiting for re-admission"+detail, taskInfo)
+	} else {
+		phaseInfo = pluginsCore.PhaseInfoWaitingForResourcesInfo(occurredAt, pluginsCore.DefaultPhaseVersion,
+			"waiting for gang admission"+detail, taskInfo)
+	}
+	if err := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext); err != nil {
+		logger.Warnf(ctx, "failed to update hold phase version from plugin state: %v", err)
+	}
+	return phaseInfo
+}
+
+// evictedPhaseInfo reports a gang the gate revoked after it had fully started. The
+// JobSet is re-suspended and its pods are gone, so the attempt is over: the gang
+// package decides whether that is charged as a system or a user retry.
+func evictedPhaseInfo(
+	ctx context.Context,
+	jobSet *jobsetv1alpha2.JobSet,
+	taskInfo *pluginsCore.TaskInfo,
+	condition *metav1.Condition,
+) pluginsCore.PhaseInfo {
+	occurredAt := time.Now()
+	if taskInfo.OccurredAt != nil {
+		occurredAt = *taskInfo.OccurredAt
+	}
+	message := "JobSet suspended after the gang had started; admission was revoked"
+	if condition != nil && condition.Message != "" {
+		message += " (" + condition.Message + ")"
+	}
+
+	action, execErr := gang.Decide(gang.Eviction{
+		Source:     evictionSource,
+		Reason:     gang.ReasonUnknown,
+		Message:    message,
+		Started:    true,
+		OccurredAt: occurredAt,
+	}, evictionPolicy)
+	switch action {
+	case gang.UserRetry:
+		return pluginsCore.PhaseInfoRetryableFailureWithCleanup(execErr.GetCode(), execErr.GetMessage(), taskInfo)
+	case gang.SystemRetry:
+		return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(execErr.GetCode(), execErr.GetMessage(), taskInfo)
+	default:
+		// Decide never holds a started gang; never report Running for a JobSet with no pods.
+		logger.Warnf(ctx, "unexpected gang action %s for started JobSet %s/%s", action, jobSet.Namespace, jobSet.Name)
+		return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(gang.CodeGangEvicted, message, taskInfo)
+	}
 }
 
 func runningPhaseInfo(
@@ -152,19 +270,26 @@ func readPluginState(ctx context.Context, pluginContext k8s.PluginContext) (k8s.
 	return pluginState, true
 }
 
+// hasJobSetStarted reports whether the whole gang has been up at least once in this
+// attempt.
+//
+// JobSet's ReplicatedJobStatus counts child Jobs, not pods: with one Job of N pods,
+// Active becomes 1 as soon as any pod exists and Ready becomes 1 only when all N are
+// up. Ready (or Succeeded) is therefore the signal, never Active. The stored plugin
+// phase is sticky: once Running has been reported the gang counts as started for
+// the rest of the attempt, which is what turns a later suspension into an eviction
+// instead of a hold; executors clear plugin state when they relaunch. Restarts > 0
+// keeps the existing restart semantics: a whole-set restart needs a prior child
+// failure, by which point the gang had started. A Failed count alone does not mean
+// started; the failure still surfaces through maybeFastFailWorker0 on the
+// not-started path.
 func hasJobSetStarted(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet) bool {
 	if jobSet.Status.Restarts > 0 {
 		return true
 	}
 
 	if workersStatus := getWorkersStatus(jobSet); workersStatus != nil {
-		if workersStatus.Ready > 0 || workersStatus.Active > 0 || workersStatus.Succeeded > 0 {
-			return true
-		}
-		// A non-zero Failed count means rank-0 pods have run, so the JobSet has started
-		// regardless of remaining restart budget. Budget gating for surfacing the failure
-		// is enforced downstream in maybeFastFailWorker0.
-		if workersStatus.Failed > 0 {
+		if workersStatus.Ready > 0 || workersStatus.Succeeded > 0 {
 			return true
 		}
 	}
