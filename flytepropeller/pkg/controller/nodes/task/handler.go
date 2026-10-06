@@ -52,10 +52,11 @@ const (
 )
 
 type metrics struct {
-	pluginPanics           labeled.Counter
-	unsupportedTaskType    labeled.Counter
-	pluginExecutionLatency labeled.StopWatch
-	pluginQueueLatency     labeled.StopWatch
+	pluginPanics            labeled.Counter
+	unsupportedTaskType     labeled.Counter
+	pluginExecutionLatency  labeled.StopWatch
+	pluginQueueLatency      labeled.StopWatch
+	pluginInitializeLatency labeled.StopWatch
 
 	// TODO We should have a metric to capture custom state size
 	scope promutils.Scope
@@ -553,6 +554,14 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 		}
 	}
 
+	// Emit the initializing latency if the task has just transitioned from Initializing to Running.
+	if ts.PluginPhase == pluginCore.PhaseInitializing &&
+		pluginTrns.pInfo.Phase() == pluginCore.PhaseRunning {
+		if !ts.LastPhaseUpdatedAt.IsZero() {
+			t.metrics.pluginInitializeLatency.Observe(ctx, ts.LastPhaseUpdatedAt, time.Now())
+		}
+	}
+
 	if pluginTrns.pInfo.Phase() == ts.PluginPhase {
 		if pluginTrns.pInfo.Version() == ts.PluginPhaseVersion {
 			logger.Debugf(ctx, "p+Version previously seen .. no event will be sent")
@@ -800,12 +809,20 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	}
 
 	// STEP 6: Persist the plugin state
+	// Only refresh LastPhaseUpdatedAt when the phase itself changes; intra-phase
+	// version bumps (e.g. emitted by MaybeUpdatePhaseVersion when a plugin's
+	// reason string changes) must not reset it, otherwise duration metrics like
+	// plugin_queue_latency lose their start anchor and undercount.
+	lastPhaseUpdatedAt := ts.LastPhaseUpdatedAt
+	if ts.PluginPhase != pluginTrns.pInfo.Phase() {
+		lastPhaseUpdatedAt = time.Now()
+	}
 	err = nCtx.NodeStateWriter().PutTaskNodeState(handler.TaskNodeState{
 		PluginState:                        pluginTrns.pluginState,
 		PluginStateVersion:                 pluginTrns.pluginStateVersion,
 		PluginPhase:                        pluginTrns.pInfo.Phase(),
 		PluginPhaseVersion:                 pluginTrns.pInfo.Version(),
-		LastPhaseUpdatedAt:                 time.Now(),
+		LastPhaseUpdatedAt:                 lastPhaseUpdatedAt,
 		PreviousNodeExecutionCheckpointURI: ts.PreviousNodeExecutionCheckpointURI,
 		CleanupOnFailure:                   ts.CleanupOnFailure || pluginTrns.pInfo.CleanupOnFailure(),
 	})
@@ -1060,11 +1077,12 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 		pluginsForType: make(map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin),
 		taskMetricsMap: make(map[MetricKey]*taskMetrics),
 		metrics: &metrics{
-			pluginPanics:           labeled.NewCounter("plugin_panic", "Task plugin panicked when trying to execute a Handler.", scope),
-			unsupportedTaskType:    labeled.NewCounter("unsupported_tasktype", "No Handler plugin configured for Handler type", scope),
-			pluginExecutionLatency: labeled.NewStopWatch("plugin_exec_latency", "Time taken to invoke plugin for one round", time.Microsecond, scope),
-			pluginQueueLatency:     labeled.NewStopWatch("plugin_queue_latency", "Time spent by plugin in queued phase", time.Microsecond, scope),
-			scope:                  scope,
+			pluginPanics:            labeled.NewCounter("plugin_panic", "Task plugin panicked when trying to execute a Handler.", scope),
+			unsupportedTaskType:     labeled.NewCounter("unsupported_tasktype", "No Handler plugin configured for Handler type", scope),
+			pluginExecutionLatency:  labeled.NewStopWatch("plugin_exec_latency", "Time taken to invoke plugin for one round", time.Microsecond, scope),
+			pluginQueueLatency:      labeled.NewStopWatch("plugin_queue_latency", "Time spent by plugin in queued phase", time.Microsecond, scope),
+			pluginInitializeLatency: labeled.NewStopWatch("plugin_initialize_latency", "Time spent by plugin in initializing phase", time.Microsecond, scope),
+			scope:                   scope,
 		},
 		pluginScope:      scope.NewSubScope("plugin"),
 		kubeClient:       kubeClient,

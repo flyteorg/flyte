@@ -334,10 +334,10 @@ func TestInProcessing(t *testing.T) {
 
 	assert.False(t, cache.inProcessing("test"))
 
-	cache.processing.Store("test", time.Now())
+	cache.processing.Store("test", fakeClock.Now())
 	assert.True(t, cache.inProcessing("test"))
 
-	cache.processing.Store("test1", time.Now().Add(syncPeriod*-11))
+	cache.processing.Store("test1", fakeClock.Now().Add(syncPeriod*-11))
 	assert.False(t, cache.inProcessing("test1"))
 	_, found := cache.processing.Load("test1")
 	assert.False(t, found)

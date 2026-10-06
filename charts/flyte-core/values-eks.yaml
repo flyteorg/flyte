@@ -55,6 +55,7 @@ flytescheduler: {}
 #
 
 datacatalog:
+  enabled: true
   replicaCount: 2
   serviceAccount:
     # -- If the service account is created by you, make this false

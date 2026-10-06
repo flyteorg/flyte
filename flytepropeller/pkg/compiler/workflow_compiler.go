@@ -32,6 +32,7 @@
 package compiler
 
 import (
+	"sort"
 	"strings"
 
 	// #noSA1019
@@ -216,13 +217,16 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 		}
 	}
 
-	// Add explicitly and implicitly declared edges
-	for nodeID, n := range wf.Nodes {
+	// Add explicitly and implicitly declared edges.
+	// Sort node IDs for deterministic iteration — Go map order is random,
+	// and the edge order affects the compiled workflow digest.
+	sortedNodeIDs := sortedKeys(wf.Nodes)
+	for _, nodeID := range sortedNodeIDs {
 		if nodeID == c.StartNodeID {
 			continue
 		}
 
-		wf.AddEdges(n, c.EdgeDirectionBidirectional, errs.NewScope())
+		wf.AddEdges(wf.Nodes[nodeID], c.EdgeDirectionBidirectional, errs.NewScope())
 	}
 
 	if fg.GetTemplate().GetFailureNode() != nil {
@@ -232,7 +236,8 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 	}
 
 	// Add execution edges for orphan nodes that don't have any inward/outward edges.
-	for nodeID := range wf.Nodes {
+	// Reuse sortedNodeIDs for deterministic iteration.
+	for _, nodeID := range sortedNodeIDs {
 		if nodeID == c.StartNodeID || nodeID == c.EndNodeID {
 			continue
 		}
@@ -287,6 +292,16 @@ func (w workflowBuilder) validateAllRequirements(errs errors.CompileErrors) bool
 	}
 
 	return !errs.HasErrors()
+}
+
+// sortedKeys returns the keys of a map in sorted order for deterministic iteration.
+func sortedKeys[V any](m map[string]V) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return keys
 }
 
 // CompileWorkflow compiles a flyte workflow a and all of its dependencies into a single executable Workflow. Refer to

@@ -32,10 +32,7 @@ const (
 	ErrReplaceCmdTemplate     stdErrors.ErrorCode = "CMD_TEMPLATE_FAILED"
 	FlyteK8sArrayIndexVarName string              = "FLYTE_K8S_ARRAY_INDEX"
 	finalizer                 string              = "flyte.org/finalizer-array"
-	// Old non-domain-qualified finalizer for backwards compatibility
-	// This should eventually be removed
-	oldFinalizer    string = "flyte/array"
-	JobIndexVarName string = "BATCH_JOB_ARRAY_INDEX_VAR_NAME"
+	JobIndexVarName           string              = "BATCH_JOB_ARRAY_INDEX_VAR_NAME"
 )
 
 var (
@@ -150,8 +147,7 @@ func clearFinalizer(ctx context.Context, o client.Object, kubeClient pluginsCore
 	// Checking for the old finalizer too for backwards compatibility. This should eventually be removed
 	// Go does short-circuiting so we have to make sure both are removed
 	finalizerRemoved := controllerutil.RemoveFinalizer(o, finalizer)
-	oldFinalizerRemoved := controllerutil.RemoveFinalizer(o, oldFinalizer)
-	if finalizerRemoved || oldFinalizerRemoved {
+	if finalizerRemoved {
 		err := kubeClient.GetClient().Update(ctx, o)
 		if err != nil && !isK8sObjectNotExists(err) {
 			logger.Warningf(ctx, "Failed to clear finalizer for Resource with name: %v/%v. Error: %v", o.GetNamespace(), o.GetName(), err)
@@ -166,10 +162,10 @@ func clearFinalizer(ctx context.Context, o client.Object, kubeClient pluginsCore
 // launchSubtask creates a k8s pod defined by the SubTaskExecutionContext and Config.
 func launchSubtask(ctx context.Context, stCtx SubTaskExecutionContext, cfg *Config, kubeClient pluginsCore.KubeClient) (pluginsCore.PhaseInfo, error) {
 	o, err := podPlugin.DefaultPodPlugin.BuildResource(ctx, stCtx)
-	pod := o.(*v1.Pod)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
+	pod := o.(*v1.Pod)
 
 	addMetadata(stCtx, cfg, config.GetK8sPluginConfig(), pod)
 

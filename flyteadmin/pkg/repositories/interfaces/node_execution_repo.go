@@ -22,8 +22,6 @@ type NodeExecutionRepoInterface interface {
 	List(ctx context.Context, input ListResourceInput) (NodeExecutionCollectionOutput, error)
 	// Exists returns whether a matching execution exists.
 	Exists(ctx context.Context, input NodeExecutionResource) (bool, error)
-	// Returns count of node executions matching query parameters.
-	Count(ctx context.Context, input CountResourceInput) (int64, error)
 }
 
 type NodeExecutionResource struct {

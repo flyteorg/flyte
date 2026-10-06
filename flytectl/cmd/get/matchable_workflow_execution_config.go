@@ -8,10 +8,9 @@ import (
 	sconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflowexecutionconfig"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytectl/pkg/ext"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 const (
@@ -141,7 +140,7 @@ func getWorkflowExecutionConfigFunc(ctx context.Context, args []string, cmdCtx c
 	// Updates the workflowExecutionConfigFileConfig with the fetched matchable attribute
 	if err := FetchAndUnDecorateMatchableAttr(ctx, project, domain, workflowName, cmdCtx.AdminFetcherExt(),
 		&workflowExecutionConfigFileConfig, admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG); err != nil {
-		if grpcError := status.Code(err); grpcError == codes.NotFound && workflowexecutionconfig.DefaultFetchConfig.Gen {
+		if ext.IsNotFoundError(err) && workflowexecutionconfig.DefaultFetchConfig.Gen {
 			fmt.Println("Generating a sample workflow execution config file")
 			workflowExecutionConfigFileConfig = getSampleWorkflowExecutionFileConfig(project, domain, workflowName)
 		} else {

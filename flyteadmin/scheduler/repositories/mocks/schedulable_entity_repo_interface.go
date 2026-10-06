@@ -163,63 +163,6 @@ func (_c *SchedulableEntityRepoInterface_Deactivate_Call) RunAndReturn(run func(
 	return _c
 }
 
-// Get provides a mock function with given fields: ctx, ID
-func (_m *SchedulableEntityRepoInterface) Get(ctx context.Context, ID models.SchedulableEntityKey) (models.SchedulableEntity, error) {
-	ret := _m.Called(ctx, ID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for Get")
-	}
-
-	var r0 models.SchedulableEntity
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.SchedulableEntityKey) (models.SchedulableEntity, error)); ok {
-		return rf(ctx, ID)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, models.SchedulableEntityKey) models.SchedulableEntity); ok {
-		r0 = rf(ctx, ID)
-	} else {
-		r0 = ret.Get(0).(models.SchedulableEntity)
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, models.SchedulableEntityKey) error); ok {
-		r1 = rf(ctx, ID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// SchedulableEntityRepoInterface_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
-type SchedulableEntityRepoInterface_Get_Call struct {
-	*mock.Call
-}
-
-// Get is a helper method to define mock.On call
-//   - ctx context.Context
-//   - ID models.SchedulableEntityKey
-func (_e *SchedulableEntityRepoInterface_Expecter) Get(ctx interface{}, ID interface{}) *SchedulableEntityRepoInterface_Get_Call {
-	return &SchedulableEntityRepoInterface_Get_Call{Call: _e.mock.On("Get", ctx, ID)}
-}
-
-func (_c *SchedulableEntityRepoInterface_Get_Call) Run(run func(ctx context.Context, ID models.SchedulableEntityKey)) *SchedulableEntityRepoInterface_Get_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(models.SchedulableEntityKey))
-	})
-	return _c
-}
-
-func (_c *SchedulableEntityRepoInterface_Get_Call) Return(_a0 models.SchedulableEntity, _a1 error) *SchedulableEntityRepoInterface_Get_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *SchedulableEntityRepoInterface_Get_Call) RunAndReturn(run func(context.Context, models.SchedulableEntityKey) (models.SchedulableEntity, error)) *SchedulableEntityRepoInterface_Get_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // GetAll provides a mock function with given fields: ctx
 func (_m *SchedulableEntityRepoInterface) GetAll(ctx context.Context) ([]models.SchedulableEntity, error) {
 	ret := _m.Called(ctx)

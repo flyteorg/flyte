@@ -12,6 +12,11 @@ template:
       {{- with .Values.flytepropeller.podAnnotations }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
+      prometheus.io/path: "/metrics"
+      prometheus.io/port: {{ index .Values.configmap.core.propeller "prof-port" | quote }}
+      {{- with .Values.flytepropeller.prometheus.enabled }}
+      prometheus.io/scrape: "true"
+      {{- end }}
     labels: {{ include "flytepropeller.labels" . | nindent 6 }}
       app: {{ index .Values.configmap.core.manager "pod-application" }}
   spec:
@@ -34,6 +39,11 @@ template:
         valueFrom:
           fieldRef:
             fieldPath: metadata.name
+      {{- if .Values.flytepropeller.podEnv -}}
+      {{- with .Values.flytepropeller.podEnv -}}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- end }}
       image: "{{ .Values.flytepropeller.image.repository }}:{{ .Values.flytepropeller.image.tag }}"
       imagePullPolicy: "{{ .Values.flytepropeller.image.pullPolicy }}"
       name: {{ index .Values.configmap.core.manager "pod-template-container-name" }}
@@ -41,24 +51,36 @@ template:
       - containerPort: {{ index .Values.configmap.core.propeller "prof-port" }}
       resources: {{ toYaml .Values.flytepropeller.resources | nindent 8 }}
       volumeMounts:
-        - name: config-volume
-          mountPath: /etc/flyte/config
-        {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
-        - name: auth
-          mountPath: /etc/secrets/
-        {{- end }}
+      - name: config-volume
+        mountPath: /etc/flyte/config
+      {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
+      - name: auth
+        mountPath: /etc/secrets/
+      {{- end }}
+      {{- with .Values.flytepropeller.additionalVolumeMounts -}}
+      {{ tpl (toYaml .) $ | nindent 6 }}
+      {{- end }}
       {{- if .Values.flytepropeller.terminationMessagePolicy }}
       terminationMessagePolicy: "{{ .Values.flytepropeller.terminationMessagePolicy }}"
       {{- end }}
     serviceAccountName: {{ template "flytepropeller.name" . }}
     volumes:
-    - configMap:
-        name: flyte-propeller-config
+    - projected:
+        sources:
+          - configMap:
+              name: flyte-propeller-config
+        {{- if .Values.storage.secretName }}
+          - secret:
+              name: {{ .Values.storage.secretName }}
+        {{- end }}
       name: config-volume
     {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
     - name: auth
       secret:
         secretName: flyte-secret-auth
+    {{- end }}
+    {{- with .Values.flytepropeller.additionalVolumes -}}
+    {{ tpl (toYaml .) $ | nindent 4 }}
     {{- end }}
     {{- with .Values.flytepropeller.nodeSelector }}
     nodeSelector: {{ tpl (toYaml .) $ | nindent 6 }}

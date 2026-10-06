@@ -427,36 +427,3 @@ func TestNodeExecutionExists(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, exists)
 }
-
-func TestCountNodeExecutions(t *testing.T) {
-	nodeExecutionRepo := NewNodeExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
-
-	GlobalMock := mocket.Catcher.Reset()
-	GlobalMock.NewMock().WithQuery(
-		`SELECT count(*) FROM "node_executions"`).WithReply([]map[string]interface{}{{"rows": 2}})
-
-	count, err := nodeExecutionRepo.Count(context.Background(), interfaces.CountResourceInput{})
-	assert.NoError(t, err)
-	assert.Equal(t, int64(2), count)
-}
-
-func TestCountNodeExecutions_Filters(t *testing.T) {
-	nodeExecutionRepo := NewNodeExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
-
-	GlobalMock := mocket.Catcher.Reset()
-	GlobalMock.NewMock().WithQuery(
-		`SELECT count(*) FROM "node_executions" WHERE node_executions.phase = $1 AND "node_executions"."error_code" IS NULL`).WithReply([]map[string]interface{}{{"rows": 3}})
-
-	count, err := nodeExecutionRepo.Count(context.Background(), interfaces.CountResourceInput{
-		InlineFilters: []common.InlineFilter{
-			getEqualityFilter(common.NodeExecution, "phase", core.NodeExecution_FAILED.String()),
-		},
-		MapFilters: []common.MapFilter{
-			common.NewMapFilter(map[string]interface{}{
-				"\"node_executions\".\"error_code\"": nil,
-			}),
-		},
-	})
-	assert.NoError(t, err)
-	assert.Equal(t, int64(3), count)
-}

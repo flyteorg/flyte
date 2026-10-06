@@ -52,7 +52,7 @@ func DumpTaskResourceAttr(matchableAttrConfig interface{}, fileName string) erro
 		if err := WriteConfigToFile(matchableAttrConfig, fileName); err != nil {
 			return fmt.Errorf("error dumping in file due to %v", err)
 		}
-		fmt.Printf("wrote the config to file %v", fileName)
+		fmt.Printf("wrote the config to file %v\n", fileName)
 	} else {
 		fmt.Printf("%v", String(matchableAttrConfig))
 	}

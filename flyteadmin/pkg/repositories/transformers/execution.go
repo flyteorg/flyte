@@ -112,6 +112,17 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 
 	activeExecution := int32(admin.ExecutionState_EXECUTION_ACTIVE)
 
+	// Populate the top-level ErrorKind/ErrorCode columns at create time so executions that
+	// fail before the propeller event path (e.g. accept-time validation failures) are
+	// queryable without deserializing the closure (mirrors UpdateExecutionModelState).
+	var errorKind, errorCode *string
+	if execErr := closure.GetError(); execErr != nil {
+		kind := execErr.GetKind().String()
+		code := execErr.GetCode()
+		errorKind = &kind
+		errorCode = &code
+	}
+
 	executionModel := &models.Execution{
 		ExecutionKey: models.ExecutionKey{
 			Project: input.WorkflowExecutionID.GetProject(),
@@ -132,6 +143,8 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 		User:                  requestSpec.GetMetadata().GetPrincipal(),
 		State:                 &activeExecution,
 		LaunchEntity:          strings.ToLower(input.LaunchEntity.String()),
+		ErrorKind:             errorKind,
+		ErrorCode:             errorCode,
 	}
 	// A reference launch entity can be one of either or a task OR launch plan. Traditionally, workflows are executed
 	// with a reference launch plan which is why this behavior is the default below.

@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"k8s.io/apimachinery/pkg/api/resource"
-
-	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
@@ -22,8 +19,6 @@ type ServerConfig struct {
 	Master               string                `json:"master" pflag:",The address of the Kubernetes API server."`
 	Security             ServerSecurityOptions `json:"security"`
 	GrpcConfig           GrpcConfig            `json:"grpc"`
-	// Deprecated: please use auth.AppAuth.ThirdPartyConfig instead.
-	DeprecatedThirdPartyConfig authConfig.ThirdPartyConfigOptions `json:"thirdPartyConfig" pflag:",Deprecated please use auth.appAuth.thirdPartyConfig instead."`
 
 	DataProxy                      DataProxyConfig  `json:"dataProxy" pflag:",Defines data proxy configuration."`
 	ReadHeaderTimeoutSeconds       int              `json:"readHeaderTimeoutSeconds" pflag:",The amount of time allowed to read request headers."`
@@ -41,10 +36,9 @@ type DataProxyDownloadConfig struct {
 }
 
 type DataProxyUploadConfig struct {
-	MaxSize               resource.Quantity `json:"maxSize" pflag:",Maximum allowed upload size."`
-	MaxExpiresIn          config.Duration   `json:"maxExpiresIn" pflag:",Maximum allowed expiration duration."`
-	DefaultFileNameLength int               `json:"defaultFileNameLength" pflag:",Default length for the generated file name if not provided in the request."`
-	StoragePrefix         string            `json:"storagePrefix" pflag:",Storage prefix to use for all upload requests."`
+	MaxExpiresIn          config.Duration `json:"maxExpiresIn" pflag:",Maximum allowed expiration duration."`
+	DefaultFileNameLength int             `json:"defaultFileNameLength" pflag:",Default length for the generated file name if not provided in the request."`
+	StoragePrefix         string          `json:"storagePrefix" pflag:",Storage prefix to use for all upload requests."`
 }
 
 type GrpcConfig struct {
@@ -74,7 +68,6 @@ type ServerSecurityOptions struct {
 	// InsecureCookieHeader should only be set in the case where we want to serve cookies with the header "Secure" set to false.
 	// This is useful for local development and *never* in production.
 	InsecureCookieHeader bool `json:"insecureCookieHeader"`
-	AuditAccess          bool `json:"auditAccess"`
 
 	// These options are here to allow deployments where the Flyte UI (Console) is served from a different domain/port.
 	// Note that CORS only applies to Admin's API endpoints. The health check endpoint for instance is unaffected.
@@ -107,7 +100,6 @@ var defaultServerConfig = &ServerConfig{
 	},
 	DataProxy: DataProxyConfig{
 		Upload: DataProxyUploadConfig{
-			MaxSize:               resource.MustParse("6Mi"),
 			MaxExpiresIn:          config.Duration{Duration: time.Hour},
 			DefaultFileNameLength: 20,
 		},

@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/clientcmd/api/latest"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
@@ -97,6 +98,22 @@ func Test_CreateMutationWebhookConfiguration(t *testing.T) {
 		c, err := pm.CreateMutationWebhookConfiguration("my-namespace")
 		assert.NoError(t, err)
 		assert.NotNil(t, c)
+		assert.Nil(t, c.Webhooks[0].NamespaceSelector)
+	})
+
+	t.Run("With namespace selector", func(t *testing.T) {
+		selector := &metav1.LabelSelector{
+			MatchLabels: map[string]string{"kubernetes.io/metadata.name": "my-namespace"},
+		}
+		pm := NewPodMutator(&config.Config{
+			CertDir:           "testdata",
+			ServiceName:       "my-service",
+			NamespaceSelector: selector,
+		}, latest.Scheme, promutils.NewTestScope())
+
+		c, err := pm.CreateMutationWebhookConfiguration("my-namespace")
+		assert.NoError(t, err)
+		assert.Equal(t, selector, c.Webhooks[0].NamespaceSelector)
 	})
 }
 

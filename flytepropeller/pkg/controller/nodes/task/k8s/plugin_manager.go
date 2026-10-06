@@ -46,9 +46,6 @@ import (
 
 const (
 	finalizer = "flyte.org/finalizer-k8s"
-	// Old non-domain-qualified finalizer for backwards compatibility
-	// This should eventually be removed
-	oldFinalizer = "flyte/flytek8s"
 )
 
 const pluginStateVersion = 1
@@ -262,8 +259,14 @@ func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Tas
 		} else if k8serrors.IsForbidden(err) {
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil)), nil
 		} else if k8serrors.IsBadRequest(err) || k8serrors.IsInvalid(err) {
+			// BadRequest (HTTP 400) and Invalid (HTTP 422) errors are intrinsic
+			// to the request payload and not transient. The most common source
+			// is a validating admission webhook rejecting the pod spec; retrying
+			// with the same input will produce the same rejection. Treat as a
+			// permanent failure so the validation error surfaces to the user
+			// instead of exhausting the workflow's retry budget.
 			logger.Errorf(ctx, "Badly formatted resource for plugin [%s], err %s", e.id, err)
-			// return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("BadTaskFormat", err.Error(), nil)), nil
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("BadTaskFormat", err.Error(), nil)), nil
 		} else if k8serrors.IsRequestEntityTooLargeError(err) {
 			logger.Errorf(ctx, "Badly formatted resource for plugin [%s], err %s", e.id, err)
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("EntityTooLarge", err.Error(), nil)), nil
@@ -487,8 +490,7 @@ func (e *PluginManager) clearFinalizer(ctx context.Context, o client.Object) err
 	// Checking for the old finalizer too for backwards compatibility. This should eventually be removed
 	// Go does short-circuiting and we have to make sure both are removed
 	finalizerRemoved := controllerutil.RemoveFinalizer(o, finalizer)
-	oldFinalizerRemoved := controllerutil.RemoveFinalizer(o, oldFinalizer)
-	if finalizerRemoved || oldFinalizerRemoved {
+	if finalizerRemoved {
 		// Patch finalizers to reduce conflicts caused by a stale informer cache vs full Update().
 		err := e.kubeClient.GetClient().Patch(ctx, o, client.MergeFrom(original))
 		if err != nil && !isK8sObjectNotExists(err) {

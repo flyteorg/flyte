@@ -43,8 +43,9 @@ func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
 	secretsWebhook := NewPodMutator(cfg, mgr.GetScheme(), webhookScope)
 
 	// Creates a MutationConfig to instruct ApiServer to call this service whenever a Pod is being created.
-	err = createMutationConfig(ctx, kubeClient, secretsWebhook, defaultNamespace)
-	if err != nil {
+	if cfg.DisableCreateMutatingWebhookConfig {
+		logger.Infof(ctx, "Skipping MutatingWebhookConfiguration creation, disabled by config")
+	} else if err = createMutationConfig(ctx, kubeClient, secretsWebhook, defaultNamespace); err != nil {
 		return err
 	}
 

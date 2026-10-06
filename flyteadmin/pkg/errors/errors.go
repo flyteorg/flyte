@@ -16,6 +16,22 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
+// maxErrorMessageBytes is the maximum size for gRPC error messages. gRPC has a
+// default MaxSendMsgSize of 4MB. The jsondiff output for large workflows can
+// exceed this limit, causing RST_STREAM INTERNAL_ERROR instead of a proper
+// error status. We cap at 3MB to leave room for gRPC framing and metadata.
+const maxErrorMessageBytes = 3 * 1024 * 1024
+
+// truncateErrorMessage truncates a message to stay within gRPC message size
+// limits. When truncated, appends a note indicating the diff was cut short.
+func truncateErrorMessage(msg string) string {
+	if len(msg) <= maxErrorMessageBytes {
+		return msg
+	}
+	const suffix = "\n\n... [diff truncated — exceeded gRPC max message size]"
+	return msg[:maxErrorMessageBytes-len(suffix)] + suffix
+}
+
 type FlyteAdminError interface {
 	Error() string
 	Code() codes.Code
@@ -135,7 +151,7 @@ func NewTaskExistsDifferentStructureError(ctx context.Context, request *admin.Ta
 
 	errorMsg += strings.Join(rs, "\n")
 
-	return NewFlyteAdminError(codes.InvalidArgument, errorMsg)
+	return NewFlyteAdminError(codes.InvalidArgument, truncateErrorMessage(errorMsg))
 }
 
 func NewTaskExistsIdenticalStructureError() FlyteAdminError {
@@ -149,7 +165,7 @@ func NewWorkflowExistsDifferentStructureError(ctx context.Context, request *admi
 	rdiff, _ := jsondiff.Compare(newSpec, oldSpec)
 	rs := compareJsons(diff, rdiff)
 
-	errorMsg += strings.Join(rs, "\n")
+	errorMsg = truncateErrorMessage(errorMsg + strings.Join(rs, "\n"))
 
 	statusErr, transformationErr := NewFlyteAdminError(codes.InvalidArgument, errorMsg).WithDetails(&admin.CreateWorkflowFailureReason{
 		Reason: &admin.CreateWorkflowFailureReason_ExistsDifferentStructure{
@@ -189,7 +205,7 @@ func NewLaunchPlanExistsDifferentStructureError(ctx context.Context, request *ad
 
 	errorMsg += strings.Join(rs, "\n")
 
-	return NewFlyteAdminError(codes.InvalidArgument, errorMsg)
+	return NewFlyteAdminError(codes.InvalidArgument, truncateErrorMessage(errorMsg))
 }
 
 func NewLaunchPlanExistsIdenticalStructureError() FlyteAdminError {

@@ -8,6 +8,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
@@ -55,15 +56,24 @@ func (d *DescriptionEntityManager) ListDescriptionEntity(ctx context.Context, re
 		ctx = contextutils.WithTaskID(ctx, request.GetId().GetName())
 	}
 
+	entity := common.ResourceTypeToEntity[request.GetResourceType()]
 	filters, err := util.GetDbFilters(util.FilterSpec{
 		Project:        request.GetId().GetProject(),
 		Domain:         request.GetId().GetDomain(),
 		Name:           request.GetId().GetName(),
 		RequestFilters: request.GetFilters(),
-	}, common.ResourceTypeToEntity[request.GetResourceType()])
+	}, entity)
 	if err != nil {
 		logger.Error(ctx, "failed to get database filter")
 		return nil, err
+	}
+	if request.GetResourceType() != core.ResourceType_UNSPECIFIED {
+		resourceTypeFilter, err := common.NewSingleValueFilter(
+			entity, common.Equal, shared.ResourceType, int32(request.GetResourceType()))
+		if err != nil {
+			return nil, err
+		}
+		filters = append([]common.InlineFilter{resourceTypeFilter}, filters...)
 	}
 
 	sortParameter, err := common.NewSortParameter(request.GetSortBy(), models.DescriptionEntityColumns)

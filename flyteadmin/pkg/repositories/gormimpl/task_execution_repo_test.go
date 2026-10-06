@@ -293,36 +293,3 @@ func TestListTaskExecutionsForNodeAndExecution(t *testing.T) {
 		assert.Equal(t, time.Hour, taskExecution.Duration)
 	}
 }
-
-func TestCountTaskExecutions(t *testing.T) {
-	taskExecutionRepo := NewTaskExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
-
-	GlobalMock := mocket.Catcher.Reset()
-	GlobalMock.NewMock().WithQuery(
-		`SELECT count(*) FROM "task_executions"`).WithReply([]map[string]interface{}{{"rows": 2}})
-
-	count, err := taskExecutionRepo.Count(context.Background(), interfaces.CountResourceInput{})
-	assert.NoError(t, err)
-	assert.Equal(t, int64(2), count)
-}
-
-func TestCountTaskExecutions_Filters(t *testing.T) {
-	taskExecutionRepo := NewTaskExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
-
-	GlobalMock := mocket.Catcher.Reset()
-	GlobalMock.NewMock().WithQuery(
-		`SELECT count(*) FROM "task_executions" WHERE task_executions.phase = $1 AND "task_execution_updated_at" IS NULL`).WithReply([]map[string]interface{}{{"rows": 3}})
-
-	count, err := taskExecutionRepo.Count(context.Background(), interfaces.CountResourceInput{
-		InlineFilters: []common.InlineFilter{
-			getEqualityFilter(common.TaskExecution, "phase", core.TaskExecution_FAILED.String()),
-		},
-		MapFilters: []common.MapFilter{
-			common.NewMapFilter(map[string]interface{}{
-				"task_execution_updated_at": nil,
-			}),
-		},
-	})
-	assert.NoError(t, err)
-	assert.Equal(t, int64(3), count)
-}

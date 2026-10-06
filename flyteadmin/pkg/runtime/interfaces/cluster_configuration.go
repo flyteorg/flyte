@@ -19,7 +19,6 @@ type ClusterConfig struct {
 }
 
 type Auth struct {
-	Type      string `json:"type"`
 	TokenPath string `json:"tokenPath"`
 	CertPath  string `json:"certPath"`
 }

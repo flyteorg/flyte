@@ -239,4 +239,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_disableCreateMutatingWebhookConfig", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("disableCreateMutatingWebhookConfig", testValue)
+			if vBool, err := cmdFlags.GetBool("disableCreateMutatingWebhookConfig"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.DisableCreateMutatingWebhookConfig)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

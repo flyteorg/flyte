@@ -1,111 +1,13 @@
 package database
 
 import (
-	"context"
 	"errors"
-	"io/ioutil"
 	"net"
-	"os"
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestResolvePassword(t *testing.T) {
-	password := "123abc"
-	tmpFile, err := os.CreateTemp("", "prefix")
-	if err != nil {
-		t.Errorf("Couldn't open temp file: %v", err)
-	}
-	defer tmpFile.Close()
-	if _, err = tmpFile.WriteString(password); err != nil {
-		t.Errorf("Couldn't write to temp file: %v", err)
-	}
-	resolvedPassword := resolvePassword(context.TODO(), "", tmpFile.Name())
-	assert.Equal(t, resolvedPassword, password)
-}
-
-func TestGetPostgresDsn(t *testing.T) {
-	pgConfig := PostgresConfig{
-		Host:         "localhost",
-		Port:         5432,
-		DbName:       "postgres",
-		User:         "postgres",
-		ExtraOptions: "sslmode=disable",
-	}
-	t.Run("no password", func(t *testing.T) {
-		dsn := getPostgresDsn(context.TODO(), pgConfig)
-		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres sslmode=disable", dsn)
-	})
-	t.Run("with password", func(t *testing.T) {
-		pgConfig.Password = "pass"
-		dsn := getPostgresDsn(context.TODO(), pgConfig)
-		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres password=pass sslmode=disable", dsn)
-
-	})
-	t.Run("with password, no extra", func(t *testing.T) {
-		pgConfig.Password = "pass"
-		pgConfig.ExtraOptions = ""
-		dsn := getPostgresDsn(context.TODO(), pgConfig)
-		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres password=pass ", dsn)
-	})
-	t.Run("with password path", func(t *testing.T) {
-		password := "123abc"
-		tmpFile, err := ioutil.TempFile("", "prefix")
-		if err != nil {
-			t.Errorf("Couldn't open temp file: %v", err)
-		}
-		defer tmpFile.Close()
-		if _, err = tmpFile.WriteString(password); err != nil {
-			t.Errorf("Couldn't write to temp file: %v", err)
-		}
-		pgConfig.PasswordPath = tmpFile.Name()
-		dsn := getPostgresDsn(context.TODO(), pgConfig)
-		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres password=123abc ", dsn)
-	})
-}
-
-func TestGetPostgresReadDsn(t *testing.T) {
-	pgConfig := PostgresConfig{
-		Host:            "localhost",
-		ReadReplicaHost: "readReplicaHost",
-		Port:            5432,
-		DbName:          "postgres",
-		User:            "postgres",
-		ExtraOptions:    "sslmode=disable",
-	}
-	t.Run("no password", func(t *testing.T) {
-		dsn := getPostgresReadDsn(context.TODO(), pgConfig)
-		assert.Equal(t, "host=readReplicaHost port=5432 dbname=postgres user=postgres sslmode=disable", dsn)
-	})
-	t.Run("with password", func(t *testing.T) {
-		pgConfig.Password = "passw"
-		dsn := getPostgresReadDsn(context.TODO(), pgConfig)
-		assert.Equal(t, "host=readReplicaHost port=5432 dbname=postgres user=postgres password=passw sslmode=disable", dsn)
-
-	})
-	t.Run("with password, no extra", func(t *testing.T) {
-		pgConfig.Password = "passwo"
-		pgConfig.ExtraOptions = ""
-		dsn := getPostgresReadDsn(context.TODO(), pgConfig)
-		assert.Equal(t, "host=readReplicaHost port=5432 dbname=postgres user=postgres password=passwo ", dsn)
-	})
-	t.Run("with password path", func(t *testing.T) {
-		password := "1234abc"
-		tmpFile, err := ioutil.TempFile("", "prefix")
-		if err != nil {
-			t.Errorf("Couldn't open temp file: %v", err)
-		}
-		defer tmpFile.Close()
-		if _, err = tmpFile.WriteString(password); err != nil {
-			t.Errorf("Couldn't write to temp file: %v", err)
-		}
-		pgConfig.PasswordPath = tmpFile.Name()
-		dsn := getPostgresReadDsn(context.TODO(), pgConfig)
-		assert.Equal(t, "host=readReplicaHost port=5432 dbname=postgres user=postgres password=1234abc ", dsn)
-	})
-}
 
 type wrappedError struct {
 	err error

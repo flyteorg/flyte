@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 	"time"
@@ -26,10 +28,16 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
+	"github.com/flyteorg/stow/local"
 )
 
 const (
@@ -348,6 +356,56 @@ func TestBuildResourceRayEntrypointPreservesEmptyArgs(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.Contains(t, rayJobObj.Spec.Entrypoint, "vars '' resolver")
+}
+
+func TestBuildResourceRayDisablesLogNoise(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+
+	taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+	rayCtx := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+	r, err := rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+	assert.Nil(t, err)
+	require.NotNil(t, r)
+
+	rayJob, ok := r.(*rayv1.RayJob)
+	require.True(t, ok)
+	require.NotEmpty(t, rayJob.Spec.RayClusterSpec.WorkerGroupSpecs)
+
+	// Select by container name: the vars belong on the Ray container, not on an injected sidecar.
+	envByContainer := func(containers []corev1.Container, name string) map[string]string {
+		for _, cnt := range containers {
+			if cnt.Name != name {
+				continue
+			}
+			env := make(map[string]string, len(cnt.Env))
+			for _, e := range cnt.Env {
+				env[e.Name] = e.Value
+			}
+			return env
+		}
+		return nil
+	}
+
+	headEnv := envByContainer(rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Containers, "ray-head")
+	workerEnv := envByContainer(rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Containers, "ray-worker")
+	require.NotNil(t, headEnv)
+	require.NotNil(t, workerEnv)
+
+	fixtures := []struct {
+		name  string
+		value string
+	}{
+		{name: "RAY_COLOR_PREFIX", value: "0"},
+		{name: "RAY_DATA_DISABLE_PROGRESS_BARS", value: "1"},
+	}
+
+	for _, f := range fixtures {
+		t.Run(f.name, func(t *testing.T) {
+			assert.Equal(t, f.value, headEnv[f.name], "head container")
+			assert.Equal(t, f.value, workerEnv[f.name], "worker container")
+		})
+	}
 }
 
 func TestBuildPodTemplate(t *testing.T) {
@@ -1122,7 +1180,8 @@ func TestGetTaskPhaseFailedRetryable(t *testing.T) {
 	// reason and message from the RayJob status.
 	ctx := context.Background()
 	rayJobResourceHandler := rayJobResourceHandler{}
-	pluginCtx := newPluginContext(k8s.PluginState{})
+	pluginCtx := newPluginContext(k8s.PluginState{}).(*mocks2.PluginContext)
+	pluginCtx.EXPECT().OutputWriter().Return(nil).Maybe()
 
 	rayObject := &rayv1.RayJob{
 		ObjectMeta: metav1.ObjectMeta{
@@ -1139,6 +1198,99 @@ func TestGetTaskPhaseFailedRetryable(t *testing.T) {
 	assert.Contains(t, phaseInfo.Err().GetMessage(), "test-ray-job")
 	assert.Contains(t, phaseInfo.Err().GetMessage(), "OOMKilled")
 	assert.Contains(t, phaseInfo.Err().GetMessage(), "head node ran out of memory")
+}
+
+func TestGetTaskPhaseTaskError(t *testing.T) {
+	labeled.SetMetricKeys(contextutils.ExecIDKey)
+	cases := []struct {
+		name          string
+		writeError    bool
+		corrupt       bool
+		oversized     bool
+		origin        core.ExecutionError_ErrorKind
+		recoverable   bool
+		expectedPhase pluginsCore.Phase
+		expectedKind  core.ExecutionError_ErrorKind
+	}{
+		{
+			name: "permanent user error", writeError: true, origin: core.ExecutionError_USER,
+			expectedPhase: pluginsCore.PhasePermanentFailure, expectedKind: core.ExecutionError_USER,
+		},
+		{
+			name: "recoverable user error", writeError: true, origin: core.ExecutionError_USER, recoverable: true,
+			expectedPhase: pluginsCore.PhaseRetryableFailure, expectedKind: core.ExecutionError_USER,
+		},
+		{
+			name: "system error keeps system retry", writeError: true, origin: core.ExecutionError_SYSTEM,
+			expectedPhase: pluginsCore.PhaseRetryableFailure, expectedKind: core.ExecutionError_SYSTEM,
+		},
+		{
+			name:          "missing error keeps system retry",
+			expectedPhase: pluginsCore.PhaseRetryableFailure, expectedKind: core.ExecutionError_SYSTEM,
+		},
+		{
+			name: "corrupt error keeps system retry", corrupt: true,
+			expectedPhase: pluginsCore.PhaseRetryableFailure, expectedKind: core.ExecutionError_SYSTEM,
+		},
+		{
+			name: "oversized error keeps system retry", oversized: true,
+			expectedPhase: pluginsCore.PhaseRetryableFailure, expectedKind: core.ExecutionError_SYSTEM,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := context.Background()
+			directory := t.TempDir()
+			store, err := storage.NewDataStore(&storage.Config{
+				Type:                  storage.TypeLocal,
+				InitContainer:         directory,
+				MultiContainerEnabled: true,
+				Stow: storage.StowConfig{
+					Kind:   local.Kind,
+					Config: map[string]string{local.ConfigKeyPath: "/"},
+				},
+				Limits: storage.LimitsConfig{GetLimitMegabytes: 2},
+			}, promutils.NewTestScope())
+			require.NoError(t, err)
+			paths := ioutils.NewReadOnlyOutputFilePaths(ctx, store, storage.DataReference("file://"+directory))
+			writer := ioutils.NewRemoteFileOutputWriter(ctx, store, paths)
+			if tc.writeError {
+				kind := core.ContainerError_NON_RECOVERABLE
+				if tc.recoverable {
+					kind = core.ContainerError_RECOVERABLE
+				}
+				require.NoError(t, store.WriteProtobuf(ctx, paths.GetErrorPath(), storage.Options{}, &core.ErrorDocument{
+					Error: &core.ContainerError{Code: "task-error", Message: "task failed", Kind: kind, Origin: tc.origin},
+				}))
+			}
+			if tc.corrupt {
+				require.NoError(t, os.WriteFile(filepath.Join(directory, ioutils.ErrorsSuffix), []byte{0xff}, 0o600))
+			}
+			if tc.oversized {
+				file, err := os.Create(filepath.Join(directory, ioutils.ErrorsSuffix))
+				require.NoError(t, err)
+				require.NoError(t, file.Truncate(storage.GetConfig().Limits.GetLimitMegabytes*storage.MiB+1))
+				require.NoError(t, file.Close())
+			}
+			pluginContext := newPluginContext(k8s.PluginState{}).(*mocks2.PluginContext)
+			pluginContext.EXPECT().OutputWriter().Return(writer)
+			pluginContext.EXPECT().DataStore().Return(store)
+			job := &rayv1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{Name: "failed-ray-job"},
+				Status: rayv1.RayJobStatus{
+					JobDeploymentStatus: rayv1.JobDeploymentStatusFailed,
+					Reason:              rayv1.AppFailed,
+					Message:             "driver exited",
+				},
+			}
+			phase, err := (rayJobResourceHandler{}).GetTaskPhase(ctx, pluginContext, job)
+			require.NoError(t, err)
+			assert.Equal(t, tc.expectedPhase, phase.Phase())
+			require.NotNil(t, phase.Err())
+			assert.Equal(t, tc.expectedKind, phase.Err().GetKind())
+			assert.True(t, phase.CleanupOnFailure())
+		})
+	}
 }
 
 func newPluginContext(pluginState k8s.PluginState) k8s.PluginContext {
@@ -1202,7 +1354,8 @@ func init() {
 func TestGetTaskPhase(t *testing.T) {
 	ctx := context.Background()
 	rayJobResourceHandler := rayJobResourceHandler{}
-	pluginCtx := newPluginContext(k8s.PluginState{})
+	pluginCtx := newPluginContext(k8s.PluginState{}).(*mocks2.PluginContext)
+	pluginCtx.EXPECT().OutputWriter().Return(nil).Maybe()
 
 	testCases := []struct {
 		rayJobPhase       rayv1.JobDeploymentStatus
@@ -1252,6 +1405,30 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, phaseInfo.Version(), pluginsCore.DefaultPhaseVersion+1)
+}
+
+// A new RayJob (empty JobDeploymentStatus) must still go through
+// MaybeUpdatePhaseVersionFromPluginContext so that updates (e.g. log links) are
+// reflected via a phase version bump rather than being dropped by an early exit.
+func TestGetTaskPhaseNewJobIncreasePhaseVersion(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+
+	ctx := context.TODO()
+
+	pluginState := k8s.PluginState{
+		Phase:        pluginsCore.PhaseQueued,
+		PhaseVersion: pluginsCore.DefaultPhaseVersion,
+		Reason:       "task submitted to K8s",
+	}
+	pluginCtx := newPluginContext(pluginState)
+
+	rayObject := &rayv1.RayJob{}
+	rayObject.Status.JobDeploymentStatus = rayv1.JobDeploymentStatusNew
+	phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
+
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseQueued.String(), phaseInfo.Phase().String())
+	assert.Equal(t, pluginsCore.DefaultPhaseVersion+1, phaseInfo.Version())
 }
 
 func TestGetEventInfo_LogTemplates(t *testing.T) {

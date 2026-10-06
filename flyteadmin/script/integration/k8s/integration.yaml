@@ -152,7 +152,7 @@ spec:
           persistentVolumeClaim:
             claimName: minio-volume-claim
       containers:
-        - image: "minio/minio:edge"
+        - image: "quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z"
           name: minio
           env:
             - name: MINIO_ACCESS_KEY

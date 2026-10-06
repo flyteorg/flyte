@@ -226,6 +226,12 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 							tokenCache.CondWait()
 							return nil
 						}
+						// Wake waiters on every exit path (deferred LIFO: unlock
+						// first, then broadcast). Returning without a broadcast —
+						// e.g. on a MaterializeCredentials failure — would leave
+						// CondWait-ers parked until the next successful refresh,
+						// which may never come.
+						defer tokenCache.CondBroadcast()
 						defer tokenCache.Unlock()
 						_, err := tokenCache.PurgeIfEquals(t)
 						if err != nil && !errors.Is(err, cache.ErrNotFound) {
@@ -239,7 +245,6 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 							return fmt.Errorf("authentication error! Original Error: %w, Auth Error: %w", err, newErr)
 						}
 
-						tokenCache.CondBroadcast()
 						return nil
 					}()
 

@@ -199,6 +199,7 @@ func (pm PodMutator) CreateMutationWebhookConfiguration(namespace string) (*admi
 					"v1",
 					"v1beta1",
 				},
+				NamespaceSelector: pm.cfg.NamespaceSelector,
 				ObjectSelector: &metav1.LabelSelector{
 					MatchLabels: map[string]string{
 						secrets.PodLabel: secrets.PodLabelValue,

@@ -61,57 +61,65 @@ func (u Uploader) handleBlobType(ctx context.Context, localPath string, toPath s
 	if err != nil {
 		return nil, err
 	}
-	if info.IsDir() {
-		var files []dirFile
-		err := filepath.Walk(localPath, func(path string, info os.FileInfo, err error) error {
+	if !info.IsDir() {
+		size := info.Size()
+		// Should we make this a go routine as well, so that we can introduce timeouts
+		return coreutils.MakeLiteralForBlob(toPath, false, ""), UploadFileToStorage(ctx, fpath, toPath, size, u.store)
+	}
+	return u.handleBlobTypeMultipart(ctx, localPath, toPath)
+}
+
+func (u Uploader) handleBlobTypeMultipart(ctx context.Context, localPath string, toPath storage.DataReference) (*core.Literal, error) {
+	var files []dirFile
+	err := filepath.Walk(localPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			logger.Errorf(ctx, "encountered error when uploading multipart blob, %s", err)
+			return err
+		}
+		if info.IsDir() {
+			logger.Warnf(ctx, "Currently nested directories are not supported in multipart blob uploads, for directory @ %s", path)
+		} else {
+			ref, err := u.store.ConstructReference(ctx, toPath, info.Name())
 			if err != nil {
-				logger.Errorf(ctx, "encountered error when uploading multipart blob, %s", err)
 				return err
 			}
-			if info.IsDir() {
-				logger.Warnf(ctx, "Currently nested directories are not supported in multipart blob uploads, for directory @ %s", path)
-			} else {
-				ref, err := u.store.ConstructReference(ctx, toPath, info.Name())
-				if err != nil {
-					return err
-				}
-				files = append(files, dirFile{
-					path: path,
-					info: info,
-					ref:  ref,
-				})
-			}
-			return nil
-		})
+			files = append(files, dirFile{
+				path: path,
+				info: info,
+				ref:  ref,
+			})
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	logger.Infof(ctx, "Found [%d] files for multipart blob upload from [%s]", len(files), localPath)
+
+	childCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	fileUploader := make([]futures.Future, 0, len(files))
+	for _, f := range files {
+		pth := f.path
+		ref := f.ref
+		size := f.info.Size()
+		fileUploader = append(fileUploader, futures.NewAsyncFuture(childCtx, func(i2 context.Context) (i interface{}, e error) {
+			return nil, UploadFileToStorage(i2, pth, ref, size, u.store)
+		}))
+	}
+
+	for _, f := range fileUploader {
+		// TODO maybe we should have timeouts, or we can have a global timeout at the top level
+		_, err := f.Get(ctx)
 		if err != nil {
 			return nil, err
 		}
-
-		childCtx, cancel := context.WithCancel(ctx)
-		defer cancel()
-		fileUploader := make([]futures.Future, 0, len(files))
-		for _, f := range files {
-			pth := f.path
-			ref := f.ref
-			size := f.info.Size()
-			fileUploader = append(fileUploader, futures.NewAsyncFuture(childCtx, func(i2 context.Context) (i interface{}, e error) {
-				return nil, UploadFileToStorage(i2, pth, ref, size, u.store)
-			}))
-		}
-
-		for _, f := range fileUploader {
-			// TODO maybe we should have timeouts, or we can have a global timeout at the top level
-			_, err := f.Get(ctx)
-			if err != nil {
-				return nil, err
-			}
-		}
-
-		return coreutils.MakeLiteralForBlob(toPath, false, ""), nil
 	}
-	size := info.Size()
-	// Should we make this a go routine as well, so that we can introduce timeouts
-	return coreutils.MakeLiteralForBlob(toPath, false, ""), UploadFileToStorage(ctx, fpath, toPath, size, u.store)
+
+	logger.Infof(ctx, "Successfully uploaded multipart blob from [%s] to [%s]", localPath, toPath)
+
+	return coreutils.MakeLiteralForBlob(toPath, true, ""), nil
 }
 
 func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, fromPath string, metaOutputPath, dataRawPath storage.DataReference) error {

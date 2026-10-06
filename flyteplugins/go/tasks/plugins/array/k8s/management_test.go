@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/net/context"
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	v1 "k8s.io/api/core/v1"
@@ -151,6 +152,59 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 	tCtx.EXPECT().DataStore().Return(dataStore)
 	tCtx.EXPECT().PluginStateReader().Return(pluginStateReader)
 	return tCtx
+}
+
+func TestLaunchSubtaskBuildError(t *testing.T) {
+	ctx := context.Background()
+	tCtx := getMockTaskExecutionContext(ctx, 1)
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	require.NoError(t, err)
+	podSpec, err := structpb.NewStruct(map[string]interface{}{
+		"containers": []interface{}{map[string]interface{}{"name": "main", "image": "busybox"}},
+	})
+	require.NoError(t, err)
+	taskTemplate.Target = &core2.TaskTemplate_K8SPod{
+		K8SPod: &core2.K8SPod{PodSpec: podSpec},
+	}
+	stCtx, err := NewSubTaskExecutionContext(ctx, tCtx, taskTemplate, 0, 0, 0, 0)
+	require.NoError(t, err)
+
+	phase, err := launchSubtask(ctx, stCtx, &Config{}, nil)
+
+	require.ErrorContains(t, err, "config missing [primary_container_name] key")
+	assert.Equal(t, core.PhaseUndefined, phase.Phase())
+}
+
+func TestLaunchAndCheckSubTasksStateBuildError(t *testing.T) {
+	for _, releaseErr := range []error{nil, fmt.Errorf("resource release failed")} {
+		t.Run(fmt.Sprintf("release error: %v", releaseErr), func(t *testing.T) {
+			ctx := context.Background()
+			tCtx := getMockTaskExecutionContext(ctx, 1)
+			taskTemplate, err := tCtx.TaskReader().Read(ctx)
+			require.NoError(t, err)
+			taskTemplate.Target = &core2.TaskTemplate_K8SPod{K8SPod: &core2.K8SPod{}}
+
+			resourceManager := &mocks.ResourceManager{}
+			resourceManager.EXPECT().AllocateResource(mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				Return(core.AllocationStatusGranted, nil).Once()
+			resourceManager.EXPECT().ReleaseResource(mock.Anything, mock.Anything, mock.Anything).
+				Return(releaseErr).Once()
+			tCtx.EXPECT().ResourceManager().Return(resourceManager)
+			cfg := &Config{ResourceConfig: ResourceConfig{PrimaryLabel: "pods", Limit: 1}}
+			state := &arrayCore.State{
+				CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
+				ExecutionArraySize:   1,
+				OriginalArraySize:    1,
+				OriginalMinSuccesses: 1,
+				IndexesToCache:       arrayCore.InvertBitSet(bitarray.NewBitSet(1), 1),
+			}
+
+			_, _, err = LaunchAndCheckSubTasksState(ctx, tCtx, nil, cfg, nil, "/prefix/", "/prefix-sand/", state)
+
+			require.ErrorContains(t, err, "a K8sPod with a defined pod spec")
+			resourceManager.AssertExpectations(t)
+		})
+	}
 }
 
 func TestCheckSubTasksState(t *testing.T) {

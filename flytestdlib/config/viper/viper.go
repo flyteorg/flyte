@@ -289,6 +289,7 @@ func (v viperAccessor) parseViperConfig(root config.Section) error {
 		}
 
 		restoreCaseSensitiveArrayKeys(settings, rawSettings)
+		restoreDottedMapKeys(settings, rawSettings)
 	}
 
 	return v.parseViperConfigRecursive(root, settings)
@@ -321,6 +322,84 @@ func restoreCaseSensitiveArrayKeys(viperData, rawData map[string]interface{}) {
 				restoreCaseSensitiveArrayKeys(viperVal.(map[string]interface{}), rawMap)
 			}
 		}
+	}
+}
+
+// restoreDottedMapKeys undoes viper's splitting of dotted YAML keys.
+//
+//   - Viper hard-codes "." as its key delimiter and splits every key on it,
+//     so a YAML leaf key like "test.annotation" arrives in viperData as the
+//     nested map {"test": {"annotation": ...}}.
+//   - rawData is the authoritative source for what the user wrote.
+//   - We walk rawData, detect dotted keys, drop the nested skeleton from
+//     viperData, and reinsert the value under its original dotted key.
+func restoreDottedMapKeys(viperData, rawData map[string]interface{}) {
+	for rawKey, rawVal := range rawData {
+		if strings.Contains(rawKey, keyDelim) {
+			// Drop the nested skeleton viper built from this dotted key, then
+			// reinsert the raw value under the original key. Lowercase the
+			// path because viper lowercases all keys.
+			pruneSplitPath(viperData, strings.Split(strings.ToLower(rawKey), keyDelim))
+			viperData[rawKey] = rawVal
+			continue
+		}
+
+		// rawVal may itself be a map containing dotted keys deeper down
+		// (e.g. annotations: {test.annotation: ...}); recurse to fix them.
+		viperKey, ok := findViperKey(viperData, rawKey)
+		if !ok {
+			continue
+		}
+		if rawMap, ok := rawVal.(map[string]interface{}); ok {
+			if viperMap, ok := viperData[viperKey].(map[string]interface{}); ok {
+				restoreDottedMapKeys(viperMap, rawMap)
+			}
+		}
+	}
+}
+
+// findViperKey returns the key in viperData that case-insensitively matches
+// rawKey. Viper lowercases all keys internally, but raw YAML preserves the
+// original casing, so we must scan.
+func findViperKey(viperData map[string]interface{}, rawKey string) (string, bool) {
+	for k := range viperData {
+		if strings.EqualFold(k, rawKey) {
+			return k, true
+		}
+	}
+	return "", false
+}
+
+// pruneSplitPath removes the nested-map skeleton viper created when it split a
+// dotted key on ".". It walks the path top-down, deleting only nodes that
+// have no remaining children, so sibling keys that share a prefix are left
+// intact (e.g. removing "a.b.c" must not drop "a.b.d").
+func pruneSplitPath(m map[string]interface{}, parts []string) {
+	if len(parts) == 0 {
+		return
+	}
+	head := parts[0]
+	child, ok := m[head]
+	if !ok {
+		// head not in the map m, directly return.
+		return
+	}
+	if len(parts) == 1 {
+		// Leaf of the split path — this is the value viper produced from the
+		// dotted key. Drop it; the caller will reinsert the raw value.
+		delete(m, head)
+		return
+	}
+	childMap, ok := child.(map[string]interface{})
+	if !ok {
+		// Path diverges from what viper would have produced; leave alone.
+		return
+	}
+	pruneSplitPath(childMap, parts[1:])
+	// Drop the parent if recursion emptied it — keeps the cleanup tight so we
+	// don't leave behind empty intermediate maps from the split.
+	if len(childMap) == 0 {
+		delete(m, head)
 	}
 }
 

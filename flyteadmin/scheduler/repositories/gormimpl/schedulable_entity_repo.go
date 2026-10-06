@@ -82,35 +82,6 @@ func (r *SchedulableEntityRepo) GetAll(ctx context.Context) ([]models.Schedulabl
 	return schedulableEntities, nil
 }
 
-func (r *SchedulableEntityRepo) Get(ctx context.Context, ID models.SchedulableEntityKey) (models.SchedulableEntity, error) {
-	var schedulableEntity models.SchedulableEntity
-	timer := r.metrics.GetDuration.Start()
-	tx := r.db.Where(&models.SchedulableEntity{
-		SchedulableEntityKey: models.SchedulableEntityKey{
-			Project: ID.Project,
-			Domain:  ID.Domain,
-			Name:    ID.Name,
-			Version: ID.Version,
-		},
-	}).Take(&schedulableEntity)
-	timer.Stop()
-
-	if tx.Error != nil {
-		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
-			return models.SchedulableEntity{},
-				adminErrors.GetMissingEntityError("schedulable entity", &core.Identifier{
-					Project: ID.Project,
-					Domain:  ID.Domain,
-					Name:    ID.Name,
-					Version: ID.Version,
-				})
-		}
-		return models.SchedulableEntity{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
-
-	return schedulableEntity, nil
-}
-
 // Helper function to activate and deactivate a schedule
 func activateOrDeactivate(r *SchedulableEntityRepo, ID models.SchedulableEntityKey, activate bool) error {
 	timer := r.metrics.GetDuration.Start()

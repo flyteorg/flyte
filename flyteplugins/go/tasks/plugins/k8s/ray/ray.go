@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"regexp"
 	"strconv"
 	"strings"
@@ -26,9 +27,11 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	pluginsUtils "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
@@ -94,11 +97,14 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 
 	cfg := GetConfig()
 
+	// Copy rather than alias: the resolved map is filled in below and handed to the RayJob CR, so
+	// aliasing would let one task's start params edit the shared plugin config and every other CR
+	// built from those defaults.
 	headNodeRayStartParams := make(map[string]string)
 	if rayJob.GetRayCluster().GetHeadGroupSpec() != nil && rayJob.RayCluster.HeadGroupSpec.RayStartParams != nil {
-		headNodeRayStartParams = rayJob.GetRayCluster().GetHeadGroupSpec().GetRayStartParams()
+		maps.Copy(headNodeRayStartParams, rayJob.GetRayCluster().GetHeadGroupSpec().GetRayStartParams())
 	} else if headNode := cfg.Defaults.HeadNode; len(headNode.StartParameters) > 0 {
-		headNodeRayStartParams = headNode.StartParameters
+		maps.Copy(headNodeRayStartParams, headNode.StartParameters)
 	}
 
 	if _, exist := headNodeRayStartParams[IncludeDashboard]; !exist {
@@ -203,9 +209,9 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 
 		workerNodeRayStartParams := make(map[string]string)
 		if spec.RayStartParams != nil {
-			workerNodeRayStartParams = spec.GetRayStartParams()
+			maps.Copy(workerNodeRayStartParams, spec.GetRayStartParams())
 		} else if workerNode := cfg.Defaults.WorkerNode; len(workerNode.StartParameters) > 0 {
-			workerNodeRayStartParams = workerNode.StartParameters
+			maps.Copy(workerNodeRayStartParams, workerNode.StartParameters)
 		}
 
 		if _, exist := workerNodeRayStartParams[NodeIPAddress]; !exist {
@@ -367,6 +373,22 @@ func injectLogsSidecar(primaryContainer *v1.Container, podSpec *v1.PodSpec) {
 	podSpec.Containers = append(podSpec.Containers, *sidecar)
 }
 
+// logNoiseDisablingEnvVars turns off Ray's terminal-oriented log decorations (ANSI-colored log
+// prefixes and Ray Data progress bars), which are unreadable once collected from a non-interactive
+// pod. Shared by the head and worker builders to keep the two in sync.
+func logNoiseDisablingEnvVars() []v1.EnvVar {
+	return []v1.EnvVar{
+		{
+			Name:  "RAY_COLOR_PREFIX",
+			Value: "0",
+		},
+		{
+			Name:  "RAY_DATA_DISABLE_PROGRESS_BARS",
+			Value: "1",
+		},
+	}
+}
+
 func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.HeadGroupSpec) (v1.PodTemplateSpec, error) {
 	// Some configs are copy from  https://github.com/ray-project/kuberay/blob/b72e6bdcd9b8c77a9dc6b5da8560910f3a0c3ffd/apiserver/pkg/util/cluster.go#L97
 	// They should always be the same, so we could hard code here.
@@ -382,6 +404,7 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 			},
 		},
 	}
+	envs = append(envs, logNoiseDisablingEnvVars()...)
 
 	primaryContainer.Args = []string{}
 
@@ -508,6 +531,7 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 			},
 		},
 	}
+	envs = append(envs, logNoiseDisablingEnvVars()...)
 
 	primaryContainer.Env = append(primaryContainer.Env, envs...)
 
@@ -671,14 +695,12 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
-	if len(rayJob.Status.JobDeploymentStatus) == 0 {
-		return pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "Scheduling", info), nil
-	}
-
 	var phaseInfo pluginsCore.PhaseInfo
 
 	// KubeRay creates a Ray cluster first, and then submits a Ray job to the cluster
 	switch rayJob.Status.JobDeploymentStatus {
+	case rayv1.JobDeploymentStatusNew:
+		phaseInfo, err = pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "Scheduling", info), nil
 	case rayv1.JobDeploymentStatusInitializing:
 		phaseInfo, err = pluginsCore.PhaseInfoInitializing(pluginsCore.DefaultPhaseVersion, "cluster is creating", info), nil
 	case rayv1.JobDeploymentStatusRunning:
@@ -692,6 +714,24 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	case rayv1.JobDeploymentStatusFailed:
 		failInfo := fmt.Sprintf("Failed to run Ray job %s with error: [%s] %s", rayJob.Name, rayJob.Status.Reason, rayJob.Status.Message)
 		phaseInfo, err = pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(flyteerr.TaskFailedWithError, failInfo, info), nil
+		if writer := pluginContext.OutputWriter(); writer != nil {
+			reader := ioutils.NewRemoteFileOutputReader(ctx, pluginContext.DataStore(), writer, 0)
+			hasError, readErr := reader.IsError(ctx)
+			if readErr != nil {
+				logger.Warnf(ctx, "Failed to check Ray task error file; retaining system retry: %v", readErr)
+			} else if hasError {
+				taskError, readErr := reader.ReadError(ctx)
+				if readErr != nil {
+					logger.Warnf(ctx, "Failed to read Ray task error file; retaining system retry: %v", readErr)
+				} else if taskError.Kind == core.ExecutionError_USER {
+					if taskError.IsRecoverable {
+						phaseInfo = pluginsCore.PhaseInfoRetryableFailureWithCleanup(flyteerr.TaskFailedWithError, failInfo, info)
+					} else {
+						phaseInfo = pluginsCore.PhaseInfoFailureWithCleanup(flyteerr.TaskFailedWithError, failInfo, info)
+					}
+				}
+			}
+		}
 	default:
 		// We already handle all known deployment status, so this should never happen unless a future version of ray
 		// introduced a new job status.

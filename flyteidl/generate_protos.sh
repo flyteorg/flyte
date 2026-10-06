@@ -7,8 +7,8 @@ rm -rf $DIR/gen
 # Override system locale during protos/docs generation to ensure consistent sorting (differences in system locale could e.g. lead to differently ordered docs)
 export LC_ALL=C.UTF-8
 
-# Buf migration
-docker run -u $(id -u):$(id -g) -e "BUF_CACHE_DIR=/tmp/cache" --volume "$(pwd):/workspace" --workdir /workspace bufbuild/buf generate
+# Pin Buf because its bundled well-known protobuf types affect Swagger descriptions.
+docker run -u $(id -u):$(id -g) -e "BUF_CACHE_DIR=/tmp/cache" --volume "$(pwd):/workspace" --workdir /workspace bufbuild/buf:1.57.2 generate
 
 # Unfortunately the python protoc plugin does not add __init__.py files to the generated code
 # (as described in https://github.com/protocolbuffers/protobuf/issues/881). One of the
