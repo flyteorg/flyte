@@ -150,6 +150,8 @@ func (m *ClusteredTaskSpec) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for QueueName
+
 	if len(errors) > 0 {
 		return ClusteredTaskSpecMultiError(errors)
 	}

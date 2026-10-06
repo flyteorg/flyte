@@ -26,20 +26,22 @@ INFINIBAND: Interconnect
 ROCE: Interconnect
 
 class ClusteredTaskSpec(_message.Message):
-    __slots__ = ["replicas", "nproc_per_node", "runtime", "interconnect", "failure_policy", "ttl_seconds_after_finished"]
+    __slots__ = ["replicas", "nproc_per_node", "runtime", "interconnect", "failure_policy", "ttl_seconds_after_finished", "queue_name"]
     REPLICAS_FIELD_NUMBER: _ClassVar[int]
     NPROC_PER_NODE_FIELD_NUMBER: _ClassVar[int]
     RUNTIME_FIELD_NUMBER: _ClassVar[int]
     INTERCONNECT_FIELD_NUMBER: _ClassVar[int]
     FAILURE_POLICY_FIELD_NUMBER: _ClassVar[int]
     TTL_SECONDS_AFTER_FINISHED_FIELD_NUMBER: _ClassVar[int]
+    QUEUE_NAME_FIELD_NUMBER: _ClassVar[int]
     replicas: int
     nproc_per_node: int
     runtime: Runtime
     interconnect: Interconnect
     failure_policy: ClusterFailurePolicy
     ttl_seconds_after_finished: _wrappers_pb2.UInt32Value
-    def __init__(self, replicas: _Optional[int] = ..., nproc_per_node: _Optional[int] = ..., runtime: _Optional[_Union[Runtime, _Mapping]] = ..., interconnect: _Optional[_Union[Interconnect, str]] = ..., failure_policy: _Optional[_Union[ClusterFailurePolicy, _Mapping]] = ..., ttl_seconds_after_finished: _Optional[_Union[_wrappers_pb2.UInt32Value, _Mapping]] = ...) -> None: ...
+    queue_name: str
+    def __init__(self, replicas: _Optional[int] = ..., nproc_per_node: _Optional[int] = ..., runtime: _Optional[_Union[Runtime, _Mapping]] = ..., interconnect: _Optional[_Union[Interconnect, str]] = ..., failure_policy: _Optional[_Union[ClusterFailurePolicy, _Mapping]] = ..., ttl_seconds_after_finished: _Optional[_Union[_wrappers_pb2.UInt32Value, _Mapping]] = ..., queue_name: _Optional[str] = ...) -> None: ...
 
 class Runtime(_message.Message):
     __slots__ = ["torchrun"]

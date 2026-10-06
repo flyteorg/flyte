@@ -26,6 +26,10 @@ message ClusteredTaskSpec {
 
   // If set, the JobSet is deleted this many seconds after it finishes (success or failure).
   google.protobuf.UInt32Value ttl_seconds_after_finished = 6;
+
+  // Kueue LocalQueue to submit this task's JobSet to. Only used when Kueue gang admission is enabled in the
+  // clustered plugin's configuration; empty uses the queue configured there.
+  string queue_name = 7;
 }
 
 // Tagged union of supported launchers. Phase 1: TorchRun only.
