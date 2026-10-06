@@ -26,22 +26,22 @@ INFINIBAND: Interconnect
 ROCE: Interconnect
 
 class ClusteredTaskSpec(_message.Message):
-    __slots__ = ["replicas", "nproc_per_node", "runtime", "interconnect", "failure_policy", "ttl_seconds_after_finished", "queue_name"]
+    __slots__ = ["replicas", "nproc_per_node", "runtime", "interconnect", "failure_policy", "ttl_seconds_after_finished", "kueue"]
     REPLICAS_FIELD_NUMBER: _ClassVar[int]
     NPROC_PER_NODE_FIELD_NUMBER: _ClassVar[int]
     RUNTIME_FIELD_NUMBER: _ClassVar[int]
     INTERCONNECT_FIELD_NUMBER: _ClassVar[int]
     FAILURE_POLICY_FIELD_NUMBER: _ClassVar[int]
     TTL_SECONDS_AFTER_FINISHED_FIELD_NUMBER: _ClassVar[int]
-    QUEUE_NAME_FIELD_NUMBER: _ClassVar[int]
+    KUEUE_FIELD_NUMBER: _ClassVar[int]
     replicas: int
     nproc_per_node: int
     runtime: Runtime
     interconnect: Interconnect
     failure_policy: ClusterFailurePolicy
     ttl_seconds_after_finished: _wrappers_pb2.UInt32Value
-    queue_name: str
-    def __init__(self, replicas: _Optional[int] = ..., nproc_per_node: _Optional[int] = ..., runtime: _Optional[_Union[Runtime, _Mapping]] = ..., interconnect: _Optional[_Union[Interconnect, str]] = ..., failure_policy: _Optional[_Union[ClusterFailurePolicy, _Mapping]] = ..., ttl_seconds_after_finished: _Optional[_Union[_wrappers_pb2.UInt32Value, _Mapping]] = ..., queue_name: _Optional[str] = ...) -> None: ...
+    kueue: KueueSettings
+    def __init__(self, replicas: _Optional[int] = ..., nproc_per_node: _Optional[int] = ..., runtime: _Optional[_Union[Runtime, _Mapping]] = ..., interconnect: _Optional[_Union[Interconnect, str]] = ..., failure_policy: _Optional[_Union[ClusterFailurePolicy, _Mapping]] = ..., ttl_seconds_after_finished: _Optional[_Union[_wrappers_pb2.UInt32Value, _Mapping]] = ..., kueue: _Optional[_Union[KueueSettings, _Mapping]] = ...) -> None: ...
 
 class Runtime(_message.Message):
     __slots__ = ["torchrun"]
@@ -64,3 +64,9 @@ class ClusterFailurePolicy(_message.Message):
     max_restarts: int
     restart_on_host_maintenance: bool
     def __init__(self, max_restarts: _Optional[int] = ..., restart_on_host_maintenance: bool = ...) -> None: ...
+
+class KueueSettings(_message.Message):
+    __slots__ = ["queue_name"]
+    QUEUE_NAME_FIELD_NUMBER: _ClassVar[int]
+    queue_name: str
+    def __init__(self, queue_name: _Optional[str] = ...) -> None: ...

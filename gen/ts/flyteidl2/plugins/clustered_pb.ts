@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/plugins/clustered.proto.
  */
 export const file_flyteidl2_plugins_clustered: GenFile = /*@__PURE__*/
-  fileDesc("CiFmbHl0ZWlkbDIvcGx1Z2lucy9jbHVzdGVyZWQucHJvdG8SEWZseXRlaWRsMi5wbHVnaW5zIsoCChFDbHVzdGVyZWRUYXNrU3BlYxIZCghyZXBsaWNhcxgBIAEoBUIHukgEGgIgABIfCg5ucHJvY19wZXJfbm9kZRgCIAEoBUIHukgEGgIgABIrCgdydW50aW1lGAMgASgLMhouZmx5dGVpZGwyLnBsdWdpbnMuUnVudGltZRI1CgxpbnRlcmNvbm5lY3QYBCABKA4yHy5mbHl0ZWlkbDIucGx1Z2lucy5JbnRlcmNvbm5lY3QSPwoOZmFpbHVyZV9wb2xpY3kYBSABKAsyJy5mbHl0ZWlkbDIucGx1Z2lucy5DbHVzdGVyRmFpbHVyZVBvbGljeRJAChp0dGxfc2Vjb25kc19hZnRlcl9maW5pc2hlZBgGIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5VSW50MzJWYWx1ZRISCgpxdWV1ZV9uYW1lGAcgASgJIkYKB1J1bnRpbWUSMwoIdG9yY2hydW4YASABKAsyHy5mbHl0ZWlkbDIucGx1Z2lucy5Ub3JjaFJ1bnRpbWVIAEIGCgRraW5kIloKDFRvcmNoUnVudGltZRI0CgxyZHp2X2JhY2tlbmQYASABKA4yHi5mbHl0ZWlkbDIucGx1Z2lucy5SZHp2QmFja2VuZBIUCgxtYXhfcmVzdGFydHMYAiABKAUiUQoUQ2x1c3RlckZhaWx1cmVQb2xpY3kSFAoMbWF4X3Jlc3RhcnRzGAEgASgFEiMKG3Jlc3RhcnRfb25faG9zdF9tYWludGVuYW5jZRgCIAEoCCojCgtSZHp2QmFja2VuZBIKCgZTVEFUSUMQABIICgRDMTBEEAEqOgoMSW50ZXJjb25uZWN0EgcKA1RDUBAAEgcKA0VGQRABEg4KCklORklOSUJBTkQQAhIICgRST0NFEANCxQEKFWNvbS5mbHl0ZWlkbDIucGx1Z2luc0IOQ2x1c3RlcmVkUHJvdG9IAlABWjVnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvcGx1Z2luc6ICA0ZQWKoCEUZseXRlaWRsMi5QbHVnaW5zygIRRmx5dGVpZGwyXFBsdWdpbnPiAh1GbHl0ZWlkbDJcUGx1Z2luc1xHUEJNZXRhZGF0YeoCEkZseXRlaWRsMjo6UGx1Z2luc2IGcHJvdG8z", [file_buf_validate_validate, file_google_protobuf_wrappers]);
+  fileDesc("CiFmbHl0ZWlkbDIvcGx1Z2lucy9jbHVzdGVyZWQucHJvdG8SEWZseXRlaWRsMi5wbHVnaW5zIucCChFDbHVzdGVyZWRUYXNrU3BlYxIZCghyZXBsaWNhcxgBIAEoBUIHukgEGgIgABIfCg5ucHJvY19wZXJfbm9kZRgCIAEoBUIHukgEGgIgABIrCgdydW50aW1lGAMgASgLMhouZmx5dGVpZGwyLnBsdWdpbnMuUnVudGltZRI1CgxpbnRlcmNvbm5lY3QYBCABKA4yHy5mbHl0ZWlkbDIucGx1Z2lucy5JbnRlcmNvbm5lY3QSPwoOZmFpbHVyZV9wb2xpY3kYBSABKAsyJy5mbHl0ZWlkbDIucGx1Z2lucy5DbHVzdGVyRmFpbHVyZVBvbGljeRJAChp0dGxfc2Vjb25kc19hZnRlcl9maW5pc2hlZBgGIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5VSW50MzJWYWx1ZRIvCgVrdWV1ZRgHIAEoCzIgLmZseXRlaWRsMi5wbHVnaW5zLkt1ZXVlU2V0dGluZ3MiRgoHUnVudGltZRIzCgh0b3JjaHJ1bhgBIAEoCzIfLmZseXRlaWRsMi5wbHVnaW5zLlRvcmNoUnVudGltZUgAQgYKBGtpbmQiWgoMVG9yY2hSdW50aW1lEjQKDHJkenZfYmFja2VuZBgBIAEoDjIeLmZseXRlaWRsMi5wbHVnaW5zLlJkenZCYWNrZW5kEhQKDG1heF9yZXN0YXJ0cxgCIAEoBSJRChRDbHVzdGVyRmFpbHVyZVBvbGljeRIUCgxtYXhfcmVzdGFydHMYASABKAUSIwobcmVzdGFydF9vbl9ob3N0X21haW50ZW5hbmNlGAIgASgIIiMKDUt1ZXVlU2V0dGluZ3MSEgoKcXVldWVfbmFtZRgBIAEoCSojCgtSZHp2QmFja2VuZBIKCgZTVEFUSUMQABIICgRDMTBEEAEqOgoMSW50ZXJjb25uZWN0EgcKA1RDUBAAEgcKA0VGQRABEg4KCklORklOSUJBTkQQAhIICgRST0NFEANCxQEKFWNvbS5mbHl0ZWlkbDIucGx1Z2luc0IOQ2x1c3RlcmVkUHJvdG9IAlABWjVnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvcGx1Z2luc6ICA0ZQWKoCEUZseXRlaWRsMi5QbHVnaW5zygIRRmx5dGVpZGwyXFBsdWdpbnPiAh1GbHl0ZWlkbDJcUGx1Z2luc1xHUEJNZXRhZGF0YeoCEkZseXRlaWRsMjo6UGx1Z2luc2IGcHJvdG8z", [file_buf_validate_validate, file_google_protobuf_wrappers]);
 
 /**
  * Top-level spec for a clustered task execution. Packed into TaskTemplate.custom.
@@ -63,12 +63,12 @@ export type ClusteredTaskSpec = Message<"flyteidl2.plugins.ClusteredTaskSpec"> &
   ttlSecondsAfterFinished?: number;
 
   /**
-   * Kueue LocalQueue to submit this task's JobSet to. Only used when Kueue gang admission is enabled in the
-   * clustered plugin's configuration; empty uses the queue configured there.
+   * Settings for clusters that gate JobSets with Kueue. Ignored unless Kueue gang admission is enabled in the
+   * clustered plugin's configuration.
    *
-   * @generated from field: string queue_name = 7;
+   * @generated from field: flyteidl2.plugins.KueueSettings kueue = 7;
    */
-  queueName: string;
+  kueue?: KueueSettings;
 };
 
 /**
@@ -164,6 +164,27 @@ export type ClusterFailurePolicy = Message<"flyteidl2.plugins.ClusterFailurePoli
  */
 export const ClusterFailurePolicySchema: GenMessage<ClusterFailurePolicy> = /*@__PURE__*/
   messageDesc(file_flyteidl2_plugins_clustered, 3);
+
+/**
+ * Per-task Kueue settings for a clustered task.
+ *
+ * @generated from message flyteidl2.plugins.KueueSettings
+ */
+export type KueueSettings = Message<"flyteidl2.plugins.KueueSettings"> & {
+  /**
+   * Kueue LocalQueue to submit this task's JobSet to. Empty uses the queue configured in the clustered plugin.
+   *
+   * @generated from field: string queue_name = 1;
+   */
+  queueName: string;
+};
+
+/**
+ * Describes the message flyteidl2.plugins.KueueSettings.
+ * Use `create(KueueSettingsSchema)` to create a new message.
+ */
+export const KueueSettingsSchema: GenMessage<KueueSettings> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_plugins_clustered, 4);
 
 /**
  * Rendezvous backend for torchrun.
