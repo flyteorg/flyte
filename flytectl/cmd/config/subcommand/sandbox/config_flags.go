@@ -67,4 +67,3 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringSliceVar(&DefaultConfig.Ports, fmt.Sprintf("%v%v", prefix, "ports"), DefaultConfig.Ports, "Optional. Custom port mappings for sandbox.")
 	return cmdFlags
 }
-

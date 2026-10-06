@@ -308,4 +308,3 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 }
-
