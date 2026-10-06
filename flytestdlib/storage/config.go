@@ -6,6 +6,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	redisconfig "github.com/flyteorg/flyte/v2/flytestdlib/redis"
 	"github.com/flyteorg/stow/s3"
 )
 
@@ -98,19 +99,8 @@ type HTTPClientConfig struct {
 	IdleConnTimeout     config.Duration `json:"idleConnTimeout" pflag:",Maximum amount of time an idle connection remains open. Zero means use the http.DefaultTransport value."`
 }
 
-// RedisConfig defines the connection for a redis-backed raw store, selected with type: redis.
-// Objects are stored as redis string values keyed by the path portion of the DataReference
-// (redis://<addr>/<key>), which keeps references interoperable with the flyte-sdk redis plugin.
-type RedisConfig struct {
-	// Addr is the host:port of the redis server.
-	Addr string `json:"addr"`
-	// Username for redis ACL authentication (redis 6+), if required.
-	Username string `json:"username"`
-	// Password for redis authentication, if required.
-	Password string `json:"password"`
-	// DB is the logical database to select after connecting.
-	DB int `json:"db"`
-}
+// RedisConfig is the shared Redis client configuration for the raw store.
+type RedisConfig = redisconfig.Config
 
 // StowConfig defines configs for stow as defined in github.com/flyteorg/stow
 type StowConfig struct {
