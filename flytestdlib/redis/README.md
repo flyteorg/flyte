@@ -44,3 +44,17 @@ requires directly configured passwords. `useTLS` enables TLS in all modes.
 
 Storage listings scan all cluster masters and deduplicate the results. Reference
 URLs use the first configured endpoint as their host.
+
+To enable OpenTelemetry instrumentation on clients created by `NewClient`, supply
+providers as runtime options:
+
+```go
+client, err := cfg.NewClient(ctx,
+    redis.WithTracerProvider(tracerProvider),
+    redis.WithMeterProvider(meterProvider),
+)
+```
+
+Tracing and metrics are enabled independently through `redisotel` only when the
+corresponding non-nil provider is supplied. These options apply to standalone,
+cluster, and Sentinel clients. The caller owns the providers and their shutdown.

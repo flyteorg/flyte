@@ -3,8 +3,12 @@ package redis
 import (
 	"context"
 	"crypto/tls"
+
 	"github.com/pkg/errors"
+	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
+	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
@@ -18,7 +22,9 @@ type SecretManager interface {
 type Option func(*configOptions)
 
 type configOptions struct {
-	secretManager SecretManager
+	secretManager  SecretManager
+	tracerProvider trace.TracerProvider
+	meterProvider  metric.MeterProvider
 }
 
 // WithSecretManager supplies the manager used to resolve Redis and Sentinel password secrets.
@@ -26,6 +32,24 @@ func WithSecretManager(secretManager SecretManager) Option {
 	return func(options *configOptions) {
 		options.secretManager = secretManager
 	}
+}
+
+// WithTracerProvider enables Redis OpenTelemetry tracing with the supplied provider.
+func WithTracerProvider(provider trace.TracerProvider) Option {
+	return func(options *configOptions) { options.tracerProvider = provider }
+}
+
+// WithMeterProvider enables Redis OpenTelemetry metrics with the supplied provider.
+func WithMeterProvider(provider metric.MeterProvider) Option {
+	return func(options *configOptions) { options.meterProvider = provider }
+}
+
+func resolveOptions(opts []Option) configOptions {
+	var options configOptions
+	for _, opt := range opts {
+		opt(&options)
+	}
+	return options
 }
 
 // Config contains the Redis client settings shared by cache and storage.
@@ -176,10 +200,10 @@ func (r Config) Addresses() []string {
 // GetUniversalOptions resolves settings for standalone, cluster, or Sentinel clients.
 // Use WithSecretManager when a password secret is configured.
 func (r Config) GetUniversalOptions(ctx context.Context, opts ...Option) (*redis.UniversalOptions, error) {
-	var options configOptions
-	for _, opt := range opts {
-		opt(&options)
-	}
+	return r.getUniversalOptions(ctx, resolveOptions(opts))
+}
+
+func (r Config) getUniversalOptions(ctx context.Context, options configOptions) (*redis.UniversalOptions, error) {
 	secretManager := options.secretManager
 	if len(r.PasswordSecretName) > 0 {
 		if secretManager == nil {
@@ -258,14 +282,30 @@ func (r Config) GetUniversalOptions(ctx context.Context, opts ...Option) (*redis
 // NewClient creates the client selected by the configured addresses and MasterName.
 // Use WithSecretManager when a password secret is configured.
 func (r Config) NewClient(ctx context.Context, opts ...Option) (redis.UniversalClient, error) {
-	options, err := r.GetUniversalOptions(ctx, opts...)
+	runtimeOptions := resolveOptions(opts)
+	options, err := r.getUniversalOptions(ctx, runtimeOptions)
 	if err != nil {
 		return nil, err
 	}
+	var client redis.UniversalClient
 	if r.MasterName == "" && !r.IsClusterMode && len(options.Addrs) <= 1 {
 		simple := options.Simple()
 		simple.Network = r.Network
-		return redis.NewClient(simple), nil
+		client = redis.NewClient(simple)
+	} else {
+		client = redis.NewUniversalClient(options)
 	}
-	return redis.NewUniversalClient(options), nil
+	if runtimeOptions.tracerProvider != nil {
+		if err := redisotel.InstrumentTracing(client, redisotel.WithTracerProvider(runtimeOptions.tracerProvider)); err != nil {
+			_ = client.Close()
+			return nil, errors.Wrap(err, "failed to instrument Redis tracing")
+		}
+	}
+	if runtimeOptions.meterProvider != nil {
+		if err := redisotel.InstrumentMetrics(client, redisotel.WithMeterProvider(runtimeOptions.meterProvider)); err != nil {
+			_ = client.Close()
+			return nil, errors.Wrap(err, "failed to instrument Redis metrics")
+		}
+	}
+	return client, nil
 }
