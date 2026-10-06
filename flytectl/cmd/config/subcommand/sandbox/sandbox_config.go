@@ -1,6 +1,8 @@
 package sandbox
 
 import (
+	"fmt"
+
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 )
 
@@ -42,20 +44,21 @@ type Config struct {
 
 	Force bool `json:"force" pflag:",Optional. Forcefully delete existing sandbox cluster if it exists."`
 
-Port string `json:"port" pflag:",Optional. Specify the port for Kubernetes in the sandbox."`
+	// Allow user to specify the port for the sandbox
+	Port string `json:"port" pflag:",Optional. Specify the port for the Kubernetes in the sandbox."`
 
-// Allow user to specify the port for the sandbox
-Ports []string `json:"ports" pflag:",Optional. Custom port mappings for sandbox."`
+	// Allow user to specify custom port mappings for the sandbox
+	Ports []string `json:"ports" pflag:",Optional. Custom port mappings for sandbox."`
 }
 
 //go:generate pflags Config --default-var DefaultConfig --bind-default-var
 var (
 	DefaultConfig = &Config{
-	Port:  "6443",
-	Ports: []string{}, // Default port mappings
-}
+		Port: "6443", // Default port for the sandbox
+	}
 )
 
 func (c Config) GetK8sEndpoint() string {
-	return "https://127.0.0.1:30086"
+	return fmt.Sprintf("https://127.0.0.1:%s", c.Port)
 }
+

@@ -121,7 +121,6 @@ func GetDevPorts() (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, error
 
 // GetSandboxPorts will return sandbox ports
 func GetSandboxPorts(customPorts []string) (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, error) {
-
 	if len(customPorts) > 0 {
 		return nat.ParsePortSpecs(customPorts)
 	}
@@ -138,7 +137,6 @@ func GetSandboxPorts(customPorts []string) (map[nat.Port]struct{}, map[nat.Port]
 		"0.0.0.0:30089:30089", // Postgres Port
 	})
 }
-
 
 // GetDemoPorts will return demo ports
 func GetDemoPorts(k8sPort string) (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, error) {
