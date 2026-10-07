@@ -337,7 +337,7 @@ func GetAuthenticationInterceptor(authCtx interfaces.AuthenticationContext) func
 		// Only enforcement logic is present. The default case is to let things through.
 		if (isFromHTTP && !authCtx.Options().DisableForHTTP) ||
 			(!isFromHTTP && !authCtx.Options().DisableForGrpc) {
-			err := fmt.Errorf("id token err: %w, access token err: %w, bearer id token err: %w", fmt.Errorf("access token err: %w", accessTokenErr), idTokenErr, bearerIDTokenErr)
+err := fmt.Errorf("access token err: %w, id token err: %w, bearer id token err: %w", accessTokenErr, idTokenErr, bearerIDTokenErr)
 			return ctx, status.Errorf(codes.Unauthenticated, "token parse error %s", err)
 		}
 
