@@ -132,7 +132,7 @@ func TestPreservedPodLabels(t *testing.T) {
 		assert.Equal(t, "kept", podLabels["their-label"])
 	})
 
-	t.Run("always carries the managed label", func(t *testing.T) {
+	t.Run("carries the managed label when the task does", func(t *testing.T) {
 		// Even when the attempt cannot be identified, the label the Pod cache selects on
 		// has to survive, or the executor cannot see its own pod at all.
 		incomplete := completeAttemptLabels()
@@ -144,8 +144,19 @@ func TestPreservedPodLabels(t *testing.T) {
 		// there to protect, but the labels that survived still are.
 		assert.NotContains(t, preserved, RunLabel)
 		assert.Equal(t, "a0", preserved[ActionLabel])
+	})
 
-		assert.Equal(t, map[string]string{ManagedLabelKey: ManagedLabelValue}, PreservedPodLabels(nil))
+	t.Run("never adds the managed label a task lacks", func(t *testing.T) {
+		// A framework that runs these plugins without this executor's Pod cache doesn't
+		// mark its tasks as managed, and its pods must not claim to be.
+		unmanaged := completeAttemptLabels()
+		delete(unmanaged, ManagedLabelKey)
+
+		preserved := PreservedPodLabels(metadataWithLabels(unmanaged))
+		assert.NotContains(t, preserved, ManagedLabelKey)
+		assert.Equal(t, "a0", preserved[ActionLabel])
+
+		assert.Empty(t, PreservedPodLabels(nil))
 	})
 
 	t.Run("preserves the task name the metrics are joined on", func(t *testing.T) {

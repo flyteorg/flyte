@@ -183,15 +183,19 @@ func AttemptIdentityLabels(taskCtx pluginsCore.TaskExecutionMetadata) map[string
 // label the Pod cache selects on, the attempt identity the framework looks a Pod up by,
 // and the task name the per-pod metrics are joined on.
 //
-// The managed label is always present. Each of the others is preserved when the task
-// carries it; one that sanitization emptied is simply not there to protect.
+// Each label is preserved when the task carries it; one that sanitization emptied is
+// simply not there to protect. The managed label comes from the task too, so a
+// framework that doesn't manage Pods through this executor never gets it stamped.
 func PreservedPodLabels(taskCtx pluginsCore.TaskExecutionMetadata) map[string]string {
-	preserved := map[string]string{ManagedLabelKey: ManagedLabelValue}
+	preserved := map[string]string{}
 	if taskCtx == nil {
 		return preserved
 	}
 
 	podLabels := taskCtx.GetLabels()
+	if podLabels[ManagedLabelKey] == ManagedLabelValue {
+		preserved[ManagedLabelKey] = ManagedLabelValue
+	}
 	for _, key := range preservedLabelKeys {
 		if value := podLabels[key]; value != "" {
 			preserved[key] = value
