@@ -457,8 +457,12 @@ func (d Downloader) handleLiteral(ctx context.Context, lit *core.Literal, filePa
 }
 
 // singleBlob returns the Blob of a single-dimensional Blob literal, or nil if
-// the literal is not a single Blob.
+// the literal is not a single Blob. A union literal (e.g. an Optional[File]
+// input that is set) is unwrapped to its value, so it stages like a plain File.
 func singleBlob(lit *core.Literal) *core.Blob {
+	if u := lit.GetScalar().GetUnion(); u != nil {
+		return singleBlob(u.GetValue())
+	}
 	b := lit.GetScalar().GetBlob()
 	if b == nil || b.GetMetadata().GetType().GetDimensionality() != core.BlobType_SINGLE {
 		return nil
