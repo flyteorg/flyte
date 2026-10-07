@@ -3,6 +3,8 @@ package redis
 import (
 	"context"
 	"crypto/tls"
+	"os"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/extra/redisotel/v9"
@@ -93,6 +95,11 @@ type Config struct {
 	// or the User Password when connecting to a Redis 6.0 instance, or greater,
 	// that is using the Redis ACL system.
 	Password string `json:"password"`
+
+	// PasswordPath points to a file containing the Redis password. Its contents are
+	// trimmed of surrounding whitespace, as with Postgres. Takes precedence over
+	// Password and PasswordSecretName.
+	PasswordPath string `json:"passwordPath" pflag:",Points to the file containing the Redis password."`
 
 	// PasswordSecretName is the name of the secret that contains the password.
 	PasswordSecretName string
@@ -205,7 +212,13 @@ func (r Config) GetUniversalOptions(ctx context.Context, opts ...Option) (*redis
 
 func (r Config) getUniversalOptions(ctx context.Context, options configOptions) (*redis.UniversalOptions, error) {
 	secretManager := options.secretManager
-	if len(r.PasswordSecretName) > 0 {
+	if r.PasswordPath != "" {
+		password, err := os.ReadFile(r.PasswordPath)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to read Redis password from path %s", r.PasswordPath)
+		}
+		r.Password = strings.TrimSpace(string(password))
+	} else if len(r.PasswordSecretName) > 0 {
 		if secretManager == nil {
 			return nil, errors.Errorf("password secret %s requires a secret manager", r.PasswordSecretName)
 		}

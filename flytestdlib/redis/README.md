@@ -40,7 +40,13 @@ Cluster supports database 0 only. Cluster and Sentinel connections use TCP.
 
 `passwordSecretName` and `sentinelPasswordSecretName` resolve passwords through
 an injected `SecretManager`. Cache supplies that manager; storage currently
-requires directly configured passwords. `useTLS` enables TLS in all modes.
+supports inline passwords or password files. `useTLS` enables TLS in all modes.
+
+`passwordPath` loads the Redis password from a file, trimming surrounding
+whitespace like the Postgres config. A non-empty path takes precedence over
+`password` and `passwordSecretName`; file read failures return an error. It is
+supported in standalone, cluster, and Sentinel modes (for the Redis server
+password, independently of Sentinel credentials).
 
 Storage listings scan all cluster masters and deduplicate the results. Reference
 URLs use the first configured endpoint as their host.

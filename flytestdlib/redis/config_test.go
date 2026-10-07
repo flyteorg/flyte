@@ -3,6 +3,8 @@ package redis
 import (
 	"context"
 	"errors"
+	"os"
+	"path/filepath"
 	"testing"
 
 	goredis "github.com/redis/go-redis/v9"
@@ -117,4 +119,36 @@ func TestOptionalSecretManager(t *testing.T) {
 	require.NoError(t, err)
 	t.Cleanup(func() { require.NoError(t, client.Close()) })
 	assert.Equal(t, "resolved", client.(*goredis.Client).Options().Password)
+}
+
+func TestPasswordPath(t *testing.T) {
+	ctx := context.Background()
+	path := filepath.Join(t.TempDir(), "password")
+	require.NoError(t, os.WriteFile(path, []byte(" \tfile-password\r\n"), 0600))
+	for _, cfg := range []Config{
+		{Addr: "localhost:6379"},
+		{Addrs: []string{"one:6379", "two:6379"}},
+		{Addrs: []string{"sentinel:26379"}, MasterName: "primary", SentinelPassword: "sentinel-password"},
+	} {
+		cfg.Password = "inline"
+		cfg.PasswordSecretName = "unused-secret"
+		cfg.PasswordPath = path
+		opts, err := cfg.GetUniversalOptions(ctx)
+		require.NoError(t, err)
+		assert.Equal(t, "file-password", opts.Password)
+		assert.Equal(t, cfg.SentinelPassword, opts.SentinelPassword)
+		assert.Equal(t, "inline", cfg.Password)
+	}
+	cfg := Config{Password: "inline", PasswordPath: path + "-missing"}
+	_, err := cfg.GetUniversalOptions(ctx)
+	require.ErrorIs(t, err, os.ErrNotExist)
+	_, err = cfg.NewClient(ctx)
+	require.ErrorIs(t, err, os.ErrNotExist)
+	cfg.PasswordPath = filepath.Dir(path)
+	_, err = cfg.GetUniversalOptions(ctx)
+	require.ErrorContains(t, err, "failed to read Redis password")
+	cfg.PasswordPath = ""
+	opts, err := cfg.GetUniversalOptions(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, "inline", opts.Password)
 }
