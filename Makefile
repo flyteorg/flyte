@@ -164,7 +164,7 @@ mocks:
 	@$(MAKE) sep
 
 .PHONY: gen-local
-gen-local: buf mocks go-tidy ## Generate everything using local tools (requires buf, go, cargo, uv)
+gen-local: buf mocks go-tidy dry-run-python ## Generate everything using local tools (requires buf, go, cargo, uv)
 	@echo '⚡  Finished generating everything in the gen directory (local)'
 	@$(MAKE) sep
 
