@@ -3,10 +3,10 @@
 //
 // The first gate is Kueue holding JobSets suspended, but nothing in this package
 // knows about JobSets, Kubernetes or Kueue: the plugin that observes the gate
-// builds an Eviction descriptor, and the executors share the decision, the error
-// codes and the budget accounting defined here. Keep it a leaf package that
-// imports nothing heavier than the generated protobuf types, so any component that
-// schedules or retries gangs can depend on it.
+// decides that a started gang was evicted and describes it with an Eviction, and
+// the executors share the error codes and the budget accounting defined here.
+// Keep it a leaf package that imports nothing heavier than the generated protobuf
+// types, so any component that schedules or retries gangs can depend on it.
 package gang
 
 import (
@@ -41,8 +41,9 @@ const (
 	ReasonDeactivated      Reason = "Deactivated"
 )
 
-// Eviction describes one gate decision about a gang. The edge that observes the
-// gate builds it; nothing here is specific to that edge.
+// Eviction describes a gate revoking a gang that had already fully started. A gang
+// the gate holds before it ever started is not an eviction: nothing was lost, so
+// the caller keeps waiting instead of building one.
 type Eviction struct {
 	// Source names the gate that made the decision, e.g. "kueue". Informational.
 	Source string
@@ -50,15 +51,11 @@ type Eviction struct {
 	Reason Reason
 	// Message is the gate's own explanation, if it gave one.
 	Message string
-	// Started is true when the whole gang was up at least once in this attempt.
-	// It decides whether anything was lost: a gang that never fully started can
-	// simply be held until the gate re-admits it.
-	Started bool
 	// OccurredAt is when the edge observed the decision.
 	OccurredAt time.Time
 }
 
-// Policy configures how a post-start eviction is reported.
+// Policy configures how an eviction is reported.
 type Policy struct {
 	// AsSystemRetry reports the eviction as a SYSTEM-retryable failure, which the
 	// executors turn into a fresh attempt without charging user retries. When
@@ -67,44 +64,13 @@ type Policy struct {
 	AsSystemRetry bool
 }
 
-// Action is what the caller should do with an evicted gang.
-type Action int
-
-const (
-	// Hold means the gang never fully started: keep reporting the current phase
-	// and let the gate re-admit it. Nothing was lost and no restart is burned.
-	Hold Action = iota
-	// SystemRetry means the gang had started: report a SYSTEM-retryable failure so
-	// the executor discards the resource and re-runs the attempt.
-	SystemRetry
-	// UserRetry is SystemRetry charged to the user's retry budget instead.
-	UserRetry
-)
-
-func (a Action) String() string {
-	switch a {
-	case Hold:
-		return "Hold"
-	case SystemRetry:
-		return "SystemRetry"
-	case UserRetry:
-		return "UserRetry"
-	default:
-		return fmt.Sprintf("Action(%d)", int(a))
-	}
-}
-
-// Decide maps an Eviction to an Action. The returned error is nil for Hold and
-// otherwise carries CodeGangEvicted with the kind implied by the policy.
-func Decide(e Eviction, p Policy) (Action, *core.ExecutionError) {
-	if !e.Started {
-		return Hold, nil
-	}
-	action, kind := UserRetry, core.ExecutionError_USER
+// Error returns the GangEvicted error for e, with the kind implied by the policy.
+func (e Eviction) Error(p Policy) *core.ExecutionError {
+	kind := core.ExecutionError_USER
 	if p.AsSystemRetry {
-		action, kind = SystemRetry, core.ExecutionError_SYSTEM
+		kind = core.ExecutionError_SYSTEM
 	}
-	return action, &core.ExecutionError{
+	return &core.ExecutionError{
 		Code:    CodeGangEvicted,
 		Message: e.describe(),
 		Kind:    kind,

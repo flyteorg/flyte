@@ -99,23 +99,31 @@ func shouldPreferRank0Pod(candidate, current *v1.Pod) bool {
 	return candidate.CreationTimestamp.After(current.CreationTimestamp.Time)
 }
 
-// findRank0Pod locates the rank-0 pod among this execution's child pods.
-//
-// The plugin's K8sReader already scopes List calls to this node execution's namespace and
-// execution-id/node-id labels (propagated onto the pod template in build.go), so the returned
-// pods belong to this JobSet. We keep an explicit namespace filter as defense-in-depth and then
-// prefix-match the real pod name, which carries a random suffix assigned by the Job controller.
-// Returns nil when not found or when listing pods fails.
-func findRank0Pod(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet) *v1.Pod {
+// listWorkerPods lists this JobSet's worker pods. The JobSet controller labels every pod
+// it creates with the JobSet and ReplicatedJob names, so the selector matches exactly
+// this JobSet's workers. Returns nil when listing fails.
+func listWorkerPods(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet) []v1.Pod {
 	podList := &v1.PodList{}
-	if err := pluginContext.K8sReader().List(ctx, podList, client.InNamespace(jobSet.Namespace)); err != nil {
-		logger.Warnf(ctx, "failed to list pods for JobSet %s/%s rank-0 lookup: %v", jobSet.Namespace, jobSet.Name, err)
+	if err := pluginContext.K8sReader().List(ctx, podList,
+		client.InNamespace(jobSet.Namespace),
+		client.MatchingLabels{
+			jobsetv1alpha2.JobSetNameKey:        jobSet.Name,
+			jobsetv1alpha2.ReplicatedJobNameKey: workersReplicatedJobName,
+		},
+	); err != nil {
+		logger.Warnf(ctx, "failed to list worker pods for JobSet %s/%s: %v", jobSet.Namespace, jobSet.Name, err)
 		return nil
 	}
+	return podList.Items
+}
 
+// selectRank0Pod picks the rank-0 pod among the worker pods by prefix-matching the real
+// pod name, which carries a random suffix assigned by the Job controller. Returns nil
+// when there is none.
+func selectRank0Pod(jobSet *jobsetv1alpha2.JobSet, pods []v1.Pod) *v1.Pod {
 	var selected *v1.Pod
-	for i := range podList.Items {
-		pod := &podList.Items[i]
+	for i := range pods {
+		pod := &pods[i]
 		if !isRank0PodName(jobSet.Name, pod.Name) {
 			continue
 		}

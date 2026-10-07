@@ -466,6 +466,14 @@ func TestBuildFailurePolicy_Negative(t *testing.T) {
 
 // --- GetTaskPhase tests ---
 
+// workerPodLabels are the labels the JobSet controller puts on testJobName's worker pods.
+func workerPodLabels() map[string]string {
+	return map[string]string{
+		jobsetv1alpha2.JobSetNameKey:        testJobName,
+		jobsetv1alpha2.ReplicatedJobNameKey: workersReplicatedJobName,
+	}
+}
+
 func makeJobSet(condType jobsetv1alpha2.JobSetConditionType, status metav1.ConditionStatus, suspend bool) *jobsetv1alpha2.JobSet {
 	js := &jobsetv1alpha2.JobSet{
 		ObjectMeta: metav1.ObjectMeta{Name: testJobName, Namespace: testNS},
@@ -554,13 +562,15 @@ func TestGetTaskPhase_Initializing(t *testing.T) {
 	suspend := false
 	js := makeJobSet("", "", suspend)
 
+	// Every worker has a node, none is Ready yet.
 	spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
-	pCtx := dummyPluginCtx(buildTaskTemplate(spec), emptyK8sReader())
+	pCtx := dummyPluginCtx(buildTaskTemplate(spec), workerPodsReader(workerPodScheduled, workerPodScheduled))
 
 	handler := clusteredResourceHandler{}
 	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseInitializing, phase.Phase())
+	assert.Equal(t, "0 of 2 workers ready", phase.Reason())
 }
 
 func TestGetTaskPhase_Success(t *testing.T) {
@@ -587,11 +597,12 @@ func TestGetTaskPhase_Failure(t *testing.T) {
 	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
 }
 
-func TestGetTaskPhase_UnknownActiveCondition_NotStarted_Initializing(t *testing.T) {
+func TestGetTaskPhase_UnknownActiveCondition_NotStarted_WaitingForResources(t *testing.T) {
 	suspend := false
 	js := makeJobSet("", "", suspend)
-	// An active condition with an unrecognized type no longer implies Running: with no
-	// Ready workers the gang has not started, so this is still Initializing.
+	// An active condition with an unrecognized type does not imply Running: with no
+	// Ready workers the gang has not started, and with no pods on nodes it is waiting
+	// for resources.
 	js.Status.Conditions = []metav1.Condition{
 		{
 			Type:               "SomeActiveCondition",
@@ -606,8 +617,8 @@ func TestGetTaskPhase_UnknownActiveCondition_NotStarted_Initializing(t *testing.
 	handler := clusteredResourceHandler{}
 	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
 	assert.NoError(t, err)
-	assert.Equal(t, pluginsCore.PhaseInitializing, phase.Phase())
-	assert.Contains(t, phase.Reason(), "waiting for all 2 workers")
+	assert.Equal(t, pluginsCore.PhaseWaitingForResources, phase.Phase())
+	assert.Equal(t, "0 of 2 workers scheduled", phase.Reason())
 }
 
 func TestGetTaskPhase_Running_AllWorkersReady(t *testing.T) {
@@ -657,8 +668,8 @@ func TestGetTaskPhase_FastFail_NoJobsFailed(t *testing.T) {
 	handler := clusteredResourceHandler{}
 	phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
 	assert.NoError(t, err)
-	// No rank-0 pod to inspect and no Ready workers: the gang is still forming.
-	assert.Equal(t, pluginsCore.PhaseInitializing, phase.Phase())
+	// No rank-0 pod to inspect and no worker on a node: the gang is still forming.
+	assert.Equal(t, pluginsCore.PhaseWaitingForResources, phase.Phase())
 }
 
 func TestGetTaskPhase_MaintenanceRetry_FlagFalse(t *testing.T) {
@@ -695,6 +706,7 @@ func TestGetTaskPhase_FastFail_Worker0Failed(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      rank0PodName(testJobName) + "-abc12",
 			Namespace: testNS,
+			Labels:    workerPodLabels(),
 		},
 		Status: corev1.PodStatus{
 			Phase:  corev1.PodFailed,
@@ -731,6 +743,7 @@ func TestGetTaskPhase_MaintenanceRetry_SystemFailure(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      rank0PodName(testJobName) + "-abc12",
 			Namespace: testNS,
+			Labels:    workerPodLabels(),
 		},
 		Status: corev1.PodStatus{
 			Phase:  corev1.PodFailed,
@@ -772,6 +785,7 @@ func TestGetTaskPhase_FreeRestartsDoNotExhaustBudget(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      rank0PodName(testJobName) + "-abc12",
 			Namespace: testNS,
+			Labels:    workerPodLabels(),
 		},
 		Status: corev1.PodStatus{
 			Phase:  corev1.PodFailed,
@@ -801,11 +815,12 @@ func TestGetTaskPhase_FreeRestartsDoNotExhaustBudget(t *testing.T) {
 	assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
 }
 
-func TestFindRank0Pod_SuffixedAndDeterministic(t *testing.T) {
+func TestListWorkerPods_SelectRank0Pod_SuffixedAndDeterministic(t *testing.T) {
 	oldFailed := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:              rank0PodName(testJobName) + "-aaaa1",
 			Namespace:         testNS,
+			Labels:            workerPodLabels(),
 			CreationTimestamp: metav1.NewTime(time.Now().Add(-2 * time.Minute)),
 		},
 		Status: corev1.PodStatus{Phase: corev1.PodFailed},
@@ -814,6 +829,7 @@ func TestFindRank0Pod_SuffixedAndDeterministic(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name:              rank0PodName(testJobName) + "-bbbb2",
 			Namespace:         testNS,
+			Labels:            workerPodLabels(),
 			CreationTimestamp: metav1.NewTime(time.Now()),
 		},
 		Status: corev1.PodStatus{Phase: corev1.PodRunning},
@@ -822,17 +838,34 @@ func TestFindRank0Pod_SuffixedAndDeterministic(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      testJobName + "-workers-0-1-ccccc",
 			Namespace: testNS,
+			Labels:    workerPodLabels(),
 		},
 		Status: corev1.PodStatus{Phase: corev1.PodRunning},
 	}
-	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(oldFailed, newRunning, otherPod).Build()
+	// Same namespace and name prefix, but another JobSet's pod: the label selector excludes it.
+	otherJobSet := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      rank0PodName(testJobName) + "-zzzz9",
+			Namespace: testNS,
+			Labels: map[string]string{
+				jobsetv1alpha2.JobSetNameKey:        "another-jobset",
+				jobsetv1alpha2.ReplicatedJobNameKey: workersReplicatedJobName,
+			},
+			CreationTimestamp: metav1.NewTime(time.Now().Add(time.Minute)),
+		},
+		Status: corev1.PodStatus{Phase: corev1.PodRunning},
+	}
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).
+		WithObjects(oldFailed, newRunning, otherPod, otherJobSet).Build()
 
 	pCtx := &k8smocks.PluginContext{}
 	pCtx.EXPECT().K8sReader().Return(fakeClient)
 
 	js := makeJobSet("", "", false)
-	pod := findRank0Pod(context.Background(), pCtx, js)
-	assert.NotNil(t, pod)
+	pods := listWorkerPods(context.Background(), pCtx, js)
+	assert.Len(t, pods, 3, "only this JobSet's worker pods are listed")
+	pod := selectRank0Pod(js, pods)
+	require.NotNil(t, pod)
 	assert.Equal(t, newRunning.Name, pod.Name)
 }
 
@@ -849,7 +882,11 @@ func TestGetTaskPhase_FastFail_FailedWithBudgetRemainingReturnsRunning(t *testin
 	}
 
 	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{Name: rank0PodName(testJobName) + "-abc12", Namespace: testNS},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      rank0PodName(testJobName) + "-abc12",
+			Namespace: testNS,
+			Labels:    workerPodLabels(),
+		},
 		Status: corev1.PodStatus{
 			Phase: corev1.PodFailed,
 			ContainerStatuses: []corev1.ContainerStatus{
@@ -886,7 +923,11 @@ func TestGetTaskPhase_FastFail_FailedWithBudgetExhaustedReturnsRetryableFailure(
 	}
 
 	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{Name: rank0PodName(testJobName) + "-abc12", Namespace: testNS},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      rank0PodName(testJobName) + "-abc12",
+			Namespace: testNS,
+			Labels:    workerPodLabels(),
+		},
 		Status: corev1.PodStatus{
 			Phase: corev1.PodFailed,
 			ContainerStatuses: []corev1.ContainerStatus{
@@ -919,7 +960,11 @@ func TestGetTaskPhase_FastFail_PendingImagePullRegardlessBudget(t *testing.T) {
 
 	oldTransition := metav1.NewTime(time.Now().Add(-24 * time.Hour))
 	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{Name: rank0PodName(testJobName) + "-abc12", Namespace: testNS},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      rank0PodName(testJobName) + "-abc12",
+			Namespace: testNS,
+			Labels:    workerPodLabels(),
+		},
 		Status: corev1.PodStatus{
 			Phase: corev1.PodPending,
 			Conditions: []corev1.PodCondition{
@@ -965,7 +1010,11 @@ func TestGetTaskPhase_NoCondition_ZeroBudgetFailureFastFails(t *testing.T) {
 	}
 
 	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{Name: rank0PodName(testJobName) + "-abc12", Namespace: testNS},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      rank0PodName(testJobName) + "-abc12",
+			Namespace: testNS,
+			Labels:    workerPodLabels(),
+		},
 		Status: corev1.PodStatus{
 			Phase: corev1.PodFailed,
 			ContainerStatuses: []corev1.ContainerStatus{
@@ -1000,7 +1049,11 @@ func TestGetTaskPhase_RestartingCondition_ReportsRunningWithAttempt(t *testing.T
 	}
 
 	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{Name: rank0PodName(testJobName) + "-abc12", Namespace: testNS},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      rank0PodName(testJobName) + "-abc12",
+			Namespace: testNS,
+			Labels:    workerPodLabels(),
+		},
 		Status: corev1.PodStatus{
 			Phase: corev1.PodFailed,
 			ContainerStatuses: []corev1.ContainerStatus{
@@ -1082,6 +1135,7 @@ func TestGetTaskPhase_LogContext(t *testing.T) {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      name,
 				Namespace: testNS,
+				Labels:    workerPodLabels(),
 			},
 			Spec: corev1.PodSpec{
 				Containers: []corev1.Container{{Name: primaryContainer}, {Name: sidecarContainer}},

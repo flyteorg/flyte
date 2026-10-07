@@ -2,6 +2,7 @@ package clustered
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -10,6 +11,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sscheme "k8s.io/client-go/kubernetes/scheme"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
@@ -168,9 +170,9 @@ func TestGetTaskPhase_Suspended_TerminalConditionWins(t *testing.T) {
 	assert.Equal(t, pluginsCore.PhaseSuccess, phase.Phase())
 }
 
-func TestGetTaskPhase_Resumed_NoPods_Initializing(t *testing.T) {
-	// After the gate releases the JobSet, the controller writes Suspended=False
-	// (reason ResumeJobs). No true condition and no Ready workers: Initializing.
+func TestGetTaskPhase_Resumed_NoPods_WaitingForResources(t *testing.T) {
+	// After the gate admits the JobSet, the controller writes Suspended=False (reason
+	// ResumeJobs). No true condition and no worker pod on a node yet: still waiting.
 	js := makeJobSet("", "", false)
 	js.Status.Conditions = []metav1.Condition{
 		{
@@ -187,19 +189,77 @@ func TestGetTaskPhase_Resumed_NoPods_Initializing(t *testing.T) {
 
 	phase, err := clusteredResourceHandler{}.GetTaskPhase(context.Background(), pCtx, js)
 	require.NoError(t, err)
-	assert.Equal(t, pluginsCore.PhaseInitializing, phase.Phase())
+	assert.Equal(t, pluginsCore.PhaseWaitingForResources, phase.Phase())
+	assert.Equal(t, "0 of 2 workers scheduled", phase.Reason())
 }
 
 func TestGetTaskPhase_ActiveNotReady_Initializing(t *testing.T) {
+	// Active counts child Jobs with any pod: both pods have nodes, one is Ready.
 	js := makeJobSet("", "", false)
 	js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
 		{Name: workersReplicatedJobName, Active: 1},
 	}
-	pCtx := dummyPluginCtx(twoNodeSpec(), emptyK8sReader())
+	pCtx := dummyPluginCtx(twoNodeSpec(), workerPodsReader(workerPodReady, workerPodScheduled))
 
 	phase, err := clusteredResourceHandler{}.GetTaskPhase(context.Background(), pCtx, js)
 	require.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseInitializing, phase.Phase())
+	assert.Equal(t, "1 of 2 workers ready", phase.Reason())
+}
+
+func TestGetTaskPhase_WorkerUnscheduled_WaitingForResources(t *testing.T) {
+	// Admitted, but one worker has no node: Initializing would claim every pod has one.
+	js := makeJobSet("", "", false)
+	pCtx := dummyPluginCtx(twoNodeSpec(), workerPodsReader(workerPodReady, workerPodUnscheduled))
+
+	phase, err := clusteredResourceHandler{}.GetTaskPhase(context.Background(), pCtx, js)
+	require.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseWaitingForResources, phase.Phase())
+	assert.Equal(t, "1 of 2 workers scheduled (Unschedulable: 0/1 nodes are available: 1 Insufficient memory.)",
+		phase.Reason(), "the scheduler's reason for the first unscheduled worker is surfaced")
+}
+
+func TestGetTaskPhase_TerminatingWorkerNotCounted(t *testing.T) {
+	// A pod being deleted (for example from a released gang) is not part of the gang.
+	js := makeJobSet("", "", false)
+	pods := workerPods(workerPodScheduled, workerPodScheduled)
+	now := metav1.Now()
+	pods[1].DeletionTimestamp = &now
+	pods[1].Finalizers = []string{"test/keep"}
+	reader := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pods[0], pods[1]).Build()
+	pCtx := dummyPluginCtx(twoNodeSpec(), reader)
+
+	phase, err := clusteredResourceHandler{}.GetTaskPhase(context.Background(), pCtx, js)
+	require.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseWaitingForResources, phase.Phase())
+	assert.Equal(t, "1 of 2 workers scheduled", phase.Reason())
+}
+
+func TestGetTaskPhase_PriorInitializing_Unscheduled_StaysInitializing(t *testing.T) {
+	// A re-admitted gang scheduling again after it had reached Initializing: a lower
+	// phase would be dropped downstream, so the phase holds and the reason updates.
+	js := makeJobSet("", "", false)
+	pCtx := dummyPluginCtxWithState(twoNodeSpec(), workerPodsReader(workerPodUnscheduled, workerPodUnscheduled),
+		plugink8s.PluginState{Phase: pluginsCore.PhaseInitializing, PhaseVersion: 3, Reason: "1 of 2 workers ready"}, nil)
+
+	phase, err := clusteredResourceHandler{}.GetTaskPhase(context.Background(), pCtx, js)
+	require.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseInitializing, phase.Phase())
+	assert.Contains(t, phase.Reason(), "0 of 2 workers scheduled")
+	assert.Equal(t, uint32(4), phase.Version(), "reason changed within the same phase, so the version is bumped")
+}
+
+func TestGetTaskPhase_NonRank0PendingFailure_FastFails(t *testing.T) {
+	// Fatal pending problems are classified on every worker, not only rank 0.
+	js := makeJobSet("", "", false)
+	pods := workerPods(workerPodScheduled, workerPodScheduled)
+	pods[1].Status = imagePullBackOffStatus()
+	reader := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pods[0], pods[1]).Build()
+	pCtx := dummyPluginCtx(twoNodeSpec(), reader)
+
+	phase, err := clusteredResourceHandler{}.GetTaskPhase(context.Background(), pCtx, js)
+	require.NoError(t, err)
+	assert.True(t, phase.Phase().IsFailure(), "got %s", phase.Phase())
 }
 
 func TestGetTaskPhase_PendingImagePull_NotStarted_FastFails(t *testing.T) {
@@ -209,29 +269,13 @@ func TestGetTaskPhase_PendingImagePull_NotStarted_FastFails(t *testing.T) {
 	js.Status.ReplicatedJobsStatus = []jobsetv1alpha2.ReplicatedJobStatus{
 		{Name: workersReplicatedJobName, Active: 1},
 	}
-	oldTransition := metav1.NewTime(time.Now().Add(-24 * time.Hour))
 	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{Name: rank0PodName(testJobName) + "-abc12", Namespace: testNS},
-		Status: corev1.PodStatus{
-			Phase: corev1.PodPending,
-			Conditions: []corev1.PodCondition{
-				{
-					Type:               corev1.PodReady,
-					Status:             corev1.ConditionFalse,
-					Reason:             "ContainersNotReady",
-					LastTransitionTime: oldTransition,
-				},
-			},
-			ContainerStatuses: []corev1.ContainerStatus{
-				{
-					Name:  primaryContainerName,
-					Ready: false,
-					State: corev1.ContainerState{
-						Waiting: &corev1.ContainerStateWaiting{Reason: "ImagePullBackOff", Message: "Back-off pulling image"},
-					},
-				},
-			},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      rank0PodName(testJobName) + "-abc12",
+			Namespace: testNS,
+			Labels:    workerPodLabels(),
 		},
+		Status: imagePullBackOffStatus(),
 	}
 	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pod).Build()
 	pCtx := dummyPluginCtx(twoNodeSpec(), fakeClient)
@@ -239,6 +283,81 @@ func TestGetTaskPhase_PendingImagePull_NotStarted_FastFails(t *testing.T) {
 	phase, err := clusteredResourceHandler{}.GetTaskPhase(context.Background(), pCtx, js)
 	require.NoError(t, err)
 	assert.True(t, phase.Phase().IsFailure(), "got %s", phase.Phase())
+}
+
+// imagePullBackOffStatus is a pending pod that has failed to pull its image for long
+// enough that DemystifyPending reports a failure.
+func imagePullBackOffStatus() corev1.PodStatus {
+	return corev1.PodStatus{
+		Phase: corev1.PodPending,
+		Conditions: []corev1.PodCondition{
+			{
+				Type:               corev1.PodReady,
+				Status:             corev1.ConditionFalse,
+				Reason:             "ContainersNotReady",
+				LastTransitionTime: metav1.NewTime(time.Now().Add(-24 * time.Hour)),
+			},
+		},
+		ContainerStatuses: []corev1.ContainerStatus{
+			{
+				Name:  primaryContainerName,
+				Ready: false,
+				State: corev1.ContainerState{
+					Waiting: &corev1.ContainerStateWaiting{Reason: "ImagePullBackOff", Message: "Back-off pulling image"},
+				},
+			},
+		},
+	}
+}
+
+// workerPodState is how far a worker pod has got.
+type workerPodState int
+
+const (
+	workerPodUnscheduled workerPodState = iota // pending, no node
+	workerPodScheduled                         // on a node, not Ready
+	workerPodReady                             // on a node and Ready
+)
+
+// workerPods builds testJobName's worker pods, in index order (index 0 is rank 0).
+func workerPods(states ...workerPodState) []*corev1.Pod {
+	pods := make([]*corev1.Pod, 0, len(states))
+	for i, state := range states {
+		pod := &corev1.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      fmt.Sprintf("%s-%s-0-%d-abc%02d", testJobName, workersReplicatedJobName, i, i),
+				Namespace: testNS,
+				Labels:    workerPodLabels(),
+			},
+			Status: corev1.PodStatus{Phase: corev1.PodPending},
+		}
+		switch state {
+		case workerPodUnscheduled:
+			pod.Status.Conditions = []corev1.PodCondition{{
+				Type:    corev1.PodScheduled,
+				Status:  corev1.ConditionFalse,
+				Reason:  corev1.PodReasonUnschedulable,
+				Message: "0/1 nodes are available: 1 Insufficient memory.",
+			}}
+		case workerPodScheduled:
+			pod.Spec.NodeName = "node-a"
+		case workerPodReady:
+			pod.Spec.NodeName = "node-a"
+			pod.Status.Phase = corev1.PodRunning
+			pod.Status.Conditions = []corev1.PodCondition{{Type: corev1.PodReady, Status: corev1.ConditionTrue}}
+		}
+		pods = append(pods, pod)
+	}
+	return pods
+}
+
+// workerPodsReader serves workerPods(states...) to the plugin.
+func workerPodsReader(states ...workerPodState) client.Reader {
+	builder := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme)
+	for _, pod := range workerPods(states...) {
+		builder = builder.WithObjects(pod)
+	}
+	return builder.Build()
 }
 
 // workers returns a JobSet status whose workers ReplicatedJob has the given counts.
@@ -279,8 +398,7 @@ func TestHasJobSetStarted_Table(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			js := makeJobSet("", "", false)
 			js.Status = tt.status
-			pCtx := dummyPluginCtxWithState(twoNodeSpec(), emptyK8sReader(), tt.state, nil)
-			assert.Equal(t, tt.want, hasJobSetStarted(context.Background(), pCtx, js))
+			assert.Equal(t, tt.want, hasJobSetStarted(js, tt.state))
 		})
 	}
 }
