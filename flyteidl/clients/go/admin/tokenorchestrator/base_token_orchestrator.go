@@ -31,6 +31,12 @@ func (t BaseTokenOrchestrator) RefreshToken(ctx context.Context, token *oauth2.T
 		return nil, err
 	}
 
+	refreshedToken, err = t.ClientConfig.PrepareToken(refreshedToken)
+	if err != nil {
+		logger.Warnf(ctx, "refreshed token is unusable due to %v and will be doing re-auth", err)
+		return nil, err
+	}
+
 	if refreshedToken != nil {
 		logger.Debugf(ctx, "got a response from the refresh grant for old expiry %v with new expiry %v",
 			token.Expiry, refreshedToken.Expiry)

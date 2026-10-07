@@ -46,7 +46,7 @@ type Config struct {
 	PerRetryTimeout       config.Duration `json:"perRetryTimeout" pflag:",gRPC per retry timeout"`
 	MaxRetries            int             `json:"maxRetries" pflag:",Max number of gRPC retries"`
 	MaxMessageSizeBytes   int             `json:"maxMessageSizeBytes" pflag:",The max size in bytes for incoming gRPC messages"`
-	AuthType              AuthType        `json:"authType" pflag:",Type of OAuth2 flow used for communicating with admin.ClientSecret,Pkce,ExternalCommand are valid values"`
+	AuthType              AuthType        `json:"authType" pflag:",Type of OAuth2 flow used for communicating with admin.ClientSecret,Pkce,ExternalCommand,DeviceFlow are valid values"`
 	TokenRefreshWindow    config.Duration `json:"tokenRefreshWindow" pflag:",Max duration between token refresh attempt and token expiry."`
 	// Deprecated: settings will be discovered dynamically
 	DeprecatedUseAuth    bool     `json:"useAuth" pflag:",Deprecated: Auth will be enabled/disabled based on admin's dynamically discovered information."`
@@ -62,7 +62,28 @@ type Config struct {
 	// Deprecated: This will now be discovered through admin's anonymously accessible metadata.
 	DeprecatedAuthorizationServerURL string `json:"authorizationServerUrl" pflag:",This is the URL to your IdP's authorization server. It'll default to Endpoint"`
 	// If not provided, it'll be discovered through admin's anonymously accessible metadata endpoint.
+	// Together with AuthorizationURL or DeviceAuthorizationURL it also points the Pkce and DeviceFlow auth types at
+	// another authorization server.
 	TokenURL string `json:"tokenUrl" pflag:",OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided."`
+
+	// AuthorizationURL optionally runs the Pkce auth type against this authorization endpoint and TokenURL instead of
+	// the endpoints admin advertises, for example those of admin's userAuth OIDC provider. ClientID, Scopes and
+	// Audience from this config are then used instead of admin's public client config, since the client has to be
+	// registered with that server. The value is the provider's authorization_endpoint (OpenID Connect Discovery 1.0,
+	// RFC 8414).
+	AuthorizationURL string `json:"authorizationUrl" pflag:",OPTIONAL: Authorization endpoint to use for the Pkce auth type instead of the one admin advertises. Requires tokenUrl, clientId and scopes."`
+	// DeviceAuthorizationURL optionally runs the DeviceFlow auth type against this device authorization endpoint
+	// (RFC 8628) and TokenURL instead of the endpoints admin advertises, for example those of admin's userAuth OIDC
+	// provider. ClientID, Scopes and Audience from this config are then used instead of admin's public client config,
+	// since the client has to be registered with that server. The value is the provider's
+	// device_authorization_endpoint (RFC 8628 section 4).
+	DeviceAuthorizationURL string `json:"deviceAuthorizationUrl" pflag:",OPTIONAL: Device authorization endpoint to use for the DeviceFlow auth type instead of the one admin advertises. Requires tokenUrl, clientId and scopes."`
+	// TokenType is the scheme used when sending the token to admin for the Pkce, DeviceFlow and ExternalCommand auth
+	// types. Bearer (the default) sends the OAuth2 access token. IDToken sends the OIDC id_token from the token response
+	// instead, which admin validates against its userAuth OIDC provider; this lets a client authenticate through that
+	// provider directly (see AuthorizationURL and DeviceAuthorizationURL) when admin's own authorization server does not
+	// offer the flow it needs, such as the device authorization grant.
+	TokenType string `json:"tokenType" pflag:",OPTIONAL: Scheme used to send the token to admin: Bearer (default) or IDToken. IDToken sends the OIDC id_token instead of the access token."`
 
 	// See the implementation of the 'grpcAuthorizationHeader' option in Flyte Admin for more information. But
 	// basically we want to be able to use a different string to pass the token from this client to the the Admin service

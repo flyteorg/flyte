@@ -51,6 +51,13 @@ func getAuthServerCallbackHandler(c *oauth.Config, codeVerifier string, tokenCha
 			_, _ = rw.Write([]byte(fmt.Sprintf(`<p>Couldn't get access token due to error: %s</p>`, err.Error())))
 			return
 		}
+
+		token, err = c.PrepareToken(token)
+		if err != nil {
+			errorChannel <- err
+			_, _ = rw.Write([]byte(fmt.Sprintf(`<p>Couldn't get access token due to error: %s</p>`, err.Error())))
+			return
+		}
 		_, _ = rw.Write([]byte(`<p>Cool! Your authentication was successful and you can close the window.<p>`))
 		tokenChannel <- token
 	}
