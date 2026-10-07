@@ -672,6 +672,8 @@ func (m *ListArtifactsRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for LatestPerPartition
+
 	if m.Name != nil {
 		// no validation rules for Name
 	}
@@ -1106,6 +1108,98 @@ func (m *ArtifactGroup) validate(all bool) error {
 	}
 
 	// no validation rules for Versions
+
+	if all {
+		switch v := interface{}(m.GetPartitionSchema()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ArtifactGroupValidationError{
+					field:  "PartitionSchema",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ArtifactGroupValidationError{
+					field:  "PartitionSchema",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPartitionSchema()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ArtifactGroupValidationError{
+				field:  "PartitionSchema",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetLatestTimePartition()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ArtifactGroupValidationError{
+					field:  "LatestTimePartition",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ArtifactGroupValidationError{
+					field:  "LatestTimePartition",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLatestTimePartition()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ArtifactGroupValidationError{
+				field:  "LatestTimePartition",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetLatestPartitions() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ArtifactGroupValidationError{
+						field:  fmt.Sprintf("LatestPartitions[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ArtifactGroupValidationError{
+						field:  fmt.Sprintf("LatestPartitions[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ArtifactGroupValidationError{
+					field:  fmt.Sprintf("LatestPartitions[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	if len(errors) > 0 {
 		return ArtifactGroupMultiError(errors)
@@ -1563,6 +1657,828 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListArtifactMetadataKeysResponseValidationError{}
+
+// Validate checks the field values on DeclareArtifactRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeclareArtifactRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeclareArtifactRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeclareArtifactRequestMultiError, or nil if none found.
+func (m *DeclareArtifactRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeclareArtifactRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetName()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DeclareArtifactRequestValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DeclareArtifactRequestValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetName()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DeclareArtifactRequestValidationError{
+				field:  "Name",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetPartitionSchema()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DeclareArtifactRequestValidationError{
+					field:  "PartitionSchema",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DeclareArtifactRequestValidationError{
+					field:  "PartitionSchema",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPartitionSchema()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DeclareArtifactRequestValidationError{
+				field:  "PartitionSchema",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DeclareArtifactRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeclareArtifactRequestMultiError is an error wrapping multiple validation
+// errors returned by DeclareArtifactRequest.ValidateAll() if the designated
+// constraints aren't met.
+type DeclareArtifactRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeclareArtifactRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeclareArtifactRequestMultiError) AllErrors() []error { return m }
+
+// DeclareArtifactRequestValidationError is the validation error returned by
+// DeclareArtifactRequest.Validate if the designated constraints aren't met.
+type DeclareArtifactRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeclareArtifactRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeclareArtifactRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeclareArtifactRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeclareArtifactRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeclareArtifactRequestValidationError) ErrorName() string {
+	return "DeclareArtifactRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeclareArtifactRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeclareArtifactRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeclareArtifactRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeclareArtifactRequestValidationError{}
+
+// Validate checks the field values on DeclareArtifactResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeclareArtifactResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeclareArtifactResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeclareArtifactResponseMultiError, or nil if none found.
+func (m *DeclareArtifactResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeclareArtifactResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPartitionSchema()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DeclareArtifactResponseValidationError{
+					field:  "PartitionSchema",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DeclareArtifactResponseValidationError{
+					field:  "PartitionSchema",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPartitionSchema()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DeclareArtifactResponseValidationError{
+				field:  "PartitionSchema",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DeclareArtifactResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeclareArtifactResponseMultiError is an error wrapping multiple validation
+// errors returned by DeclareArtifactResponse.ValidateAll() if the designated
+// constraints aren't met.
+type DeclareArtifactResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeclareArtifactResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeclareArtifactResponseMultiError) AllErrors() []error { return m }
+
+// DeclareArtifactResponseValidationError is the validation error returned by
+// DeclareArtifactResponse.Validate if the designated constraints aren't met.
+type DeclareArtifactResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeclareArtifactResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeclareArtifactResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeclareArtifactResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeclareArtifactResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeclareArtifactResponseValidationError) ErrorName() string {
+	return "DeclareArtifactResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeclareArtifactResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeclareArtifactResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeclareArtifactResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeclareArtifactResponseValidationError{}
+
+// Validate checks the field values on GetArtifactSchemaRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetArtifactSchemaRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetArtifactSchemaRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetArtifactSchemaRequestMultiError, or nil if none found.
+func (m *GetArtifactSchemaRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetArtifactSchemaRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetName()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetArtifactSchemaRequestValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetArtifactSchemaRequestValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetName()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetArtifactSchemaRequestValidationError{
+				field:  "Name",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetArtifactSchemaRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetArtifactSchemaRequestMultiError is an error wrapping multiple validation
+// errors returned by GetArtifactSchemaRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetArtifactSchemaRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetArtifactSchemaRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetArtifactSchemaRequestMultiError) AllErrors() []error { return m }
+
+// GetArtifactSchemaRequestValidationError is the validation error returned by
+// GetArtifactSchemaRequest.Validate if the designated constraints aren't met.
+type GetArtifactSchemaRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetArtifactSchemaRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetArtifactSchemaRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetArtifactSchemaRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetArtifactSchemaRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetArtifactSchemaRequestValidationError) ErrorName() string {
+	return "GetArtifactSchemaRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetArtifactSchemaRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetArtifactSchemaRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetArtifactSchemaRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetArtifactSchemaRequestValidationError{}
+
+// Validate checks the field values on GetArtifactSchemaResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetArtifactSchemaResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetArtifactSchemaResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetArtifactSchemaResponseMultiError, or nil if none found.
+func (m *GetArtifactSchemaResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetArtifactSchemaResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPartitionSchema()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetArtifactSchemaResponseValidationError{
+					field:  "PartitionSchema",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetArtifactSchemaResponseValidationError{
+					field:  "PartitionSchema",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPartitionSchema()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetArtifactSchemaResponseValidationError{
+				field:  "PartitionSchema",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Declared
+
+	if len(errors) > 0 {
+		return GetArtifactSchemaResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetArtifactSchemaResponseMultiError is an error wrapping multiple validation
+// errors returned by GetArtifactSchemaResponse.ValidateAll() if the
+// designated constraints aren't met.
+type GetArtifactSchemaResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetArtifactSchemaResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetArtifactSchemaResponseMultiError) AllErrors() []error { return m }
+
+// GetArtifactSchemaResponseValidationError is the validation error returned by
+// GetArtifactSchemaResponse.Validate if the designated constraints aren't met.
+type GetArtifactSchemaResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetArtifactSchemaResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetArtifactSchemaResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetArtifactSchemaResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetArtifactSchemaResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetArtifactSchemaResponseValidationError) ErrorName() string {
+	return "GetArtifactSchemaResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetArtifactSchemaResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetArtifactSchemaResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetArtifactSchemaResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetArtifactSchemaResponseValidationError{}
+
+// Validate checks the field values on ListPartitionValuesRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListPartitionValuesRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListPartitionValuesRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListPartitionValuesRequestMultiError, or nil if none found.
+func (m *ListPartitionValuesRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListPartitionValuesRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetRequest()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListPartitionValuesRequestValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListPartitionValuesRequestValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRequest()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListPartitionValuesRequestValidationError{
+				field:  "Request",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetProjectId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListPartitionValuesRequestValidationError{
+					field:  "ProjectId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListPartitionValuesRequestValidationError{
+					field:  "ProjectId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetProjectId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListPartitionValuesRequestValidationError{
+				field:  "ProjectId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Name
+
+	// no validation rules for Key
+
+	if len(errors) > 0 {
+		return ListPartitionValuesRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListPartitionValuesRequestMultiError is an error wrapping multiple
+// validation errors returned by ListPartitionValuesRequest.ValidateAll() if
+// the designated constraints aren't met.
+type ListPartitionValuesRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListPartitionValuesRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListPartitionValuesRequestMultiError) AllErrors() []error { return m }
+
+// ListPartitionValuesRequestValidationError is the validation error returned
+// by ListPartitionValuesRequest.Validate if the designated constraints aren't met.
+type ListPartitionValuesRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListPartitionValuesRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListPartitionValuesRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListPartitionValuesRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListPartitionValuesRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListPartitionValuesRequestValidationError) ErrorName() string {
+	return "ListPartitionValuesRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListPartitionValuesRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListPartitionValuesRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListPartitionValuesRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListPartitionValuesRequestValidationError{}
+
+// Validate checks the field values on ListPartitionValuesResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListPartitionValuesResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListPartitionValuesResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListPartitionValuesResponseMultiError, or nil if none found.
+func (m *ListPartitionValuesResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListPartitionValuesResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return ListPartitionValuesResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListPartitionValuesResponseMultiError is an error wrapping multiple
+// validation errors returned by ListPartitionValuesResponse.ValidateAll() if
+// the designated constraints aren't met.
+type ListPartitionValuesResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListPartitionValuesResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListPartitionValuesResponseMultiError) AllErrors() []error { return m }
+
+// ListPartitionValuesResponseValidationError is the validation error returned
+// by ListPartitionValuesResponse.Validate if the designated constraints
+// aren't met.
+type ListPartitionValuesResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListPartitionValuesResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListPartitionValuesResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListPartitionValuesResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListPartitionValuesResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListPartitionValuesResponseValidationError) ErrorName() string {
+	return "ListPartitionValuesResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListPartitionValuesResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListPartitionValuesResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListPartitionValuesResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListPartitionValuesResponseValidationError{}
 
 // Validate checks the field values on DeleteArtifactRequest with the rules
 // defined in the proto definition for this message. If any rules are

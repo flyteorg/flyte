@@ -9,8 +9,10 @@ import (
 	"connectrpc.com/connect"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/api/resource"
 
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings/settingsconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
@@ -231,6 +233,36 @@ func validateTaskResourceDefaults(bound string, d *settings.TaskResourceDefaults
 	return validateQuantity(bound+".storage", d.GetStorage())
 }
 
+// canonicalAcceleratorNames is every accelerator_name string declared on
+// core.AcceleratorModel, read once from the enum's descriptor.
+var canonicalAcceleratorNames = func() map[string]bool {
+	names := map[string]bool{}
+	values := core.AcceleratorModel(0).Descriptor().Values()
+	for i := 0; i < values.Len(); i++ {
+		if name, ok := proto.GetExtension(values.Get(i).Options(), core.E_AcceleratorName).(string); ok && name != "" {
+			names[name] = true
+		}
+	}
+	return names
+}()
+
+// validateDefaultAccelerator requires a default accelerator in VALUE state to
+// name a device from the canonical list (core.AcceleratorModel's
+// accelerator_name strings). Unlike a task's own gpu_accelerator, which keeps
+// accepting every spelling an SDK has ever written, a setting is new and so
+// only takes canonical values.
+func validateDefaultAccelerator(setting *settings.AcceleratorSetting) error {
+	if setting.GetState() != settings.SettingState_SETTING_STATE_VALUE {
+		return nil
+	}
+	device := setting.GetAcceleratorValue().GetDevice()
+	if !canonicalAcceleratorNames[device] {
+		return connect.NewError(connect.CodeInvalidArgument,
+			fmt.Errorf("invalid task_resource.default_accelerator device %q: must be one of the flyteidl2.core.AcceleratorModel accelerator_name values", device))
+	}
+	return nil
+}
+
 func validateSettings(s *settings.Settings) error {
 	if err := validateMaxActionConcurrency(s.GetRun().GetMaxActionConcurrency()); err != nil {
 		return err
@@ -238,7 +270,10 @@ func validateSettings(s *settings.Settings) error {
 	if err := validateTaskResourceDefaults("task_resource.min", s.GetTaskResource().GetMin()); err != nil {
 		return err
 	}
-	return validateTaskResourceDefaults("task_resource.max", s.GetTaskResource().GetMax())
+	if err := validateTaskResourceDefaults("task_resource.max", s.GetTaskResource().GetMax()); err != nil {
+		return err
+	}
+	return validateDefaultAccelerator(s.GetTaskResource().GetDefaultAccelerator())
 }
 
 var _ settingsconnect.SettingsServiceHandler = (*SettingsService)(nil)

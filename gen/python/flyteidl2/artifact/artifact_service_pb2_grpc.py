@@ -46,6 +46,21 @@ class ArtifactServiceStub(object):
                 request_serializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactResponse.FromString,
                 )
+        self.DeclareArtifact = channel.unary_unary(
+                '/flyteidl2.artifact.ArtifactService/DeclareArtifact',
+                request_serializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeclareArtifactRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeclareArtifactResponse.FromString,
+                )
+        self.GetArtifactSchema = channel.unary_unary(
+                '/flyteidl2.artifact.ArtifactService/GetArtifactSchema',
+                request_serializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.GetArtifactSchemaRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.GetArtifactSchemaResponse.FromString,
+                )
+        self.ListPartitionValues = channel.unary_unary(
+                '/flyteidl2.artifact.ArtifactService/ListPartitionValues',
+                request_serializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListPartitionValuesRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListPartitionValuesResponse.FromString,
+                )
 
 
 class ArtifactServiceServicer(object):
@@ -103,6 +118,32 @@ class ArtifactServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def DeclareArtifact(self, request, context):
+        """Declare an artifact name's partition schema ahead of any version. Succeeds
+        when the name has no schema yet or an equal one; FAILED_PRECONDITION when a
+        different schema is already fixed (by an earlier declaration or a first
+        version). Changing the keys is a new artifact name.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetArtifactSchema(self, request, context):
+        """Get an artifact name's partition schema. NOT_FOUND when the name has
+        neither a declaration nor a version.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ListPartitionValues(self, request, context):
+        """List the distinct values one partition key has among an artifact's
+        addressable versions, optionally scoped by partition filters, sorted.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ArtifactServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -135,6 +176,21 @@ def add_ArtifactServiceServicer_to_server(servicer, server):
                     servicer.DeleteArtifact,
                     request_deserializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactRequest.FromString,
                     response_serializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactResponse.SerializeToString,
+            ),
+            'DeclareArtifact': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeclareArtifact,
+                    request_deserializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeclareArtifactRequest.FromString,
+                    response_serializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.DeclareArtifactResponse.SerializeToString,
+            ),
+            'GetArtifactSchema': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetArtifactSchema,
+                    request_deserializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.GetArtifactSchemaRequest.FromString,
+                    response_serializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.GetArtifactSchemaResponse.SerializeToString,
+            ),
+            'ListPartitionValues': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListPartitionValues,
+                    request_deserializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListPartitionValuesRequest.FromString,
+                    response_serializer=flyteidl2_dot_artifact_dot_artifact__service__pb2.ListPartitionValuesResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -247,5 +303,56 @@ class ArtifactService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.artifact.ArtifactService/DeleteArtifact',
             flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactRequest.SerializeToString,
             flyteidl2_dot_artifact_dot_artifact__service__pb2.DeleteArtifactResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def DeclareArtifact(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.artifact.ArtifactService/DeclareArtifact',
+            flyteidl2_dot_artifact_dot_artifact__service__pb2.DeclareArtifactRequest.SerializeToString,
+            flyteidl2_dot_artifact_dot_artifact__service__pb2.DeclareArtifactResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetArtifactSchema(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.artifact.ArtifactService/GetArtifactSchema',
+            flyteidl2_dot_artifact_dot_artifact__service__pb2.GetArtifactSchemaRequest.SerializeToString,
+            flyteidl2_dot_artifact_dot_artifact__service__pb2.GetArtifactSchemaResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ListPartitionValues(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.artifact.ArtifactService/ListPartitionValues',
+            flyteidl2_dot_artifact_dot_artifact__service__pb2.ListPartitionValuesRequest.SerializeToString,
+            flyteidl2_dot_artifact_dot_artifact__service__pb2.ListPartitionValuesResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

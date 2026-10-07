@@ -188,6 +188,12 @@ type TaskActionSpec struct {
 	// +optional
 	Interruptible *bool `json:"interruptible,omitempty"`
 
+	// PodTemplateName is the run-scoped pod template name projected from RunSpec.DefaultSettings.
+	// Stamped onto tasks that do not name one themselves.
+	// +optional
+	// +kubebuilder:validation:MaxLength=253
+	PodTemplateName string `json:"podTemplateName,omitempty"`
+
 	// Group is the group this action belongs to, if applicable.
 	// +optional
 	// +kubebuilder:validation:MaxLength=256
@@ -315,6 +321,12 @@ type TaskActionStatus struct {
 	// maximum, the TaskAction is converted to a permanent failure.
 	// +optional
 	SystemFailures uint32 `json:"systemFailures,omitempty"`
+
+	// SystemRetries counts the times this TaskAction was relaunched in place after a
+	// system-retryable failure. Unlike SystemFailures it is never reset, so it gives
+	// each system-retry event a version no earlier one used.
+	// +optional
+	SystemRetries uint32 `json:"systemRetries,omitempty"`
 
 	// CacheStatus is the latest observed cache lookup result for this action.
 	// +optional

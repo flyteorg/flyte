@@ -87,5 +87,10 @@ func DownloadFileFromHTTP(ctx context.Context, ref storage.DataReference) (io.Re
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to download from url :%s", ref)
 	}
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		// Don't hand back an error page (e.g. an S3 AccessDenied XML body) as file content.
+		_ = resp.Body.Close()
+		return nil, fmt.Errorf("failed to download from url %s: unexpected status %s", ref, resp.Status)
+	}
 	return resp.Body, nil
 }

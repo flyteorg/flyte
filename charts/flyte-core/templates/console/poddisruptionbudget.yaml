@@ -1,0 +1,34 @@
+{{- $budget := default dict .Values.console.podDisruptionBudget }}
+{{- if and .Values.console.enabled $budget.enabled }}
+{{- $hasMin := ne $budget.minAvailable nil }}
+{{- $hasMax := ne $budget.maxUnavailable nil }}
+{{- if eq $hasMin $hasMax }}
+{{- fail "console.podDisruptionBudget: set exactly one of minAvailable or maxUnavailable (set the other to null)" }}
+{{- end }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "flyte-core.consoleName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "flyte-core.labels" . | nindent 4 }}
+    app.kubernetes.io/component: console
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if $hasMin }}
+  minAvailable: {{ $budget.minAvailable | toJson }}
+  {{- else }}
+  maxUnavailable: {{ $budget.maxUnavailable | toJson }}
+  {{- end }}
+  {{- with $budget.unhealthyPodEvictionPolicy }}
+  unhealthyPodEvictionPolicy: {{ . | quote }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "flyte-core.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: console
+{{- end }}

@@ -1473,6 +1473,8 @@ func (m *Spec) validate(all bool) error {
 
 	// no validation rules for ClusterPool
 
+	// no validation rules for Cluster
+
 	if all {
 		switch v := interface{}(m.GetImages()).(type) {
 		case interface{ ValidateAll() error }:

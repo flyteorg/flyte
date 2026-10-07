@@ -32,6 +32,32 @@ class ArtifactIdentifier(_message.Message):
     version: str
     def __init__(self, name: _Optional[_Union[ArtifactName, _Mapping]] = ..., version: _Optional[str] = ...) -> None: ...
 
+class TimePartitionKey(_message.Message):
+    __slots__ = ["key", "granularity"]
+    KEY_FIELD_NUMBER: _ClassVar[int]
+    GRANULARITY_FIELD_NUMBER: _ClassVar[int]
+    key: str
+    granularity: _artifact_id_pb2.Granularity
+    def __init__(self, key: _Optional[str] = ..., granularity: _Optional[_Union[_artifact_id_pb2.Granularity, str]] = ...) -> None: ...
+
+class ArtifactPartitionSchema(_message.Message):
+    __slots__ = ["time_partition", "partition_keys"]
+    TIME_PARTITION_FIELD_NUMBER: _ClassVar[int]
+    PARTITION_KEYS_FIELD_NUMBER: _ClassVar[int]
+    time_partition: TimePartitionKey
+    partition_keys: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, time_partition: _Optional[_Union[TimePartitionKey, _Mapping]] = ..., partition_keys: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class PartitionSchemaMismatch(_message.Message):
+    __slots__ = ["expected", "actual", "message"]
+    EXPECTED_FIELD_NUMBER: _ClassVar[int]
+    ACTUAL_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    expected: ArtifactPartitionSchema
+    actual: ArtifactPartitionSchema
+    message: str
+    def __init__(self, expected: _Optional[_Union[ArtifactPartitionSchema, _Mapping]] = ..., actual: _Optional[_Union[ArtifactPartitionSchema, _Mapping]] = ..., message: _Optional[str] = ...) -> None: ...
+
 class TaskActionSource(_message.Message):
     __slots__ = ["action", "attempt"]
     ACTION_FIELD_NUMBER: _ClassVar[int]
@@ -49,27 +75,33 @@ class ArtifactSource(_message.Message):
     def __init__(self, task_action: _Optional[_Union[TaskActionSource, _Mapping]] = ..., external_ref: _Optional[str] = ...) -> None: ...
 
 class ArtifactSpec(_message.Message):
-    __slots__ = ["value", "type", "info", "source", "parent_artifacts"]
+    __slots__ = ["value", "type", "info", "source", "parent_artifacts", "partitions", "time_partition"]
     VALUE_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     INFO_FIELD_NUMBER: _ClassVar[int]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     PARENT_ARTIFACTS_FIELD_NUMBER: _ClassVar[int]
+    PARTITIONS_FIELD_NUMBER: _ClassVar[int]
+    TIME_PARTITION_FIELD_NUMBER: _ClassVar[int]
     value: _literals_pb2.Literal
     type: _types_pb2.LiteralType
     info: _artifact_id_pb2.ArtifactInfo
     source: ArtifactSource
     parent_artifacts: _containers.RepeatedCompositeFieldContainer[_artifact_id_pb2.ArtifactVersionId]
-    def __init__(self, value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., info: _Optional[_Union[_artifact_id_pb2.ArtifactInfo, _Mapping]] = ..., source: _Optional[_Union[ArtifactSource, _Mapping]] = ..., parent_artifacts: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactVersionId, _Mapping]]] = ...) -> None: ...
+    partitions: _artifact_id_pb2.Partitions
+    time_partition: _artifact_id_pb2.TimePartition
+    def __init__(self, value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., info: _Optional[_Union[_artifact_id_pb2.ArtifactInfo, _Mapping]] = ..., source: _Optional[_Union[ArtifactSource, _Mapping]] = ..., parent_artifacts: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactVersionId, _Mapping]]] = ..., partitions: _Optional[_Union[_artifact_id_pb2.Partitions, _Mapping]] = ..., time_partition: _Optional[_Union[_artifact_id_pb2.TimePartition, _Mapping]] = ...) -> None: ...
 
 class Artifact(_message.Message):
-    __slots__ = ["artifact_id", "spec", "created_at", "created_by"]
+    __slots__ = ["artifact_id", "spec", "created_at", "created_by", "partition_schema_mismatch"]
     ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
     SPEC_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     CREATED_BY_FIELD_NUMBER: _ClassVar[int]
+    PARTITION_SCHEMA_MISMATCH_FIELD_NUMBER: _ClassVar[int]
     artifact_id: ArtifactIdentifier
     spec: ArtifactSpec
     created_at: _timestamp_pb2.Timestamp
     created_by: _identity_pb2.EnrichedIdentity
-    def __init__(self, artifact_id: _Optional[_Union[ArtifactIdentifier, _Mapping]] = ..., spec: _Optional[_Union[ArtifactSpec, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., created_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ...) -> None: ...
+    partition_schema_mismatch: PartitionSchemaMismatch
+    def __init__(self, artifact_id: _Optional[_Union[ArtifactIdentifier, _Mapping]] = ..., spec: _Optional[_Union[ArtifactSpec, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., created_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., partition_schema_mismatch: _Optional[_Union[PartitionSchemaMismatch, _Mapping]] = ...) -> None: ...

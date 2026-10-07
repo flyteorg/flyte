@@ -15,9 +15,11 @@ from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
 from flyteidl2.artifact import artifact_pb2 as flyteidl2_dot_artifact_dot_artifact__pb2
 from flyteidl2.common import identifier_pb2 as flyteidl2_dot_common_dot_identifier__pb2
 from flyteidl2.common import list_pb2 as flyteidl2_dot_common_dot_list__pb2
+from flyteidl2.core import artifact_id_pb2 as flyteidl2_dot_core_dot_artifact__id__pb2
+from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n)flyteidl2/artifact/artifact_service.proto\x12\x12\x66lyteidl2.artifact\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/artifact/artifact.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1b\x66lyteidl2/common/list.proto\"\xa6\x01\n\x15\x43reateArtifactRequest\x12O\n\x0b\x61rtifact_id\x18\x01 \x01(\x0b\x32&.flyteidl2.artifact.ArtifactIdentifierB\x06\xbaH\x03\xc8\x01\x01R\nartifactId\x12<\n\x04spec\x18\x02 \x01(\x0b\x32 .flyteidl2.artifact.ArtifactSpecB\x06\xbaH\x03\xc8\x01\x01R\x04spec\"R\n\x16\x43reateArtifactResponse\x12\x38\n\x08\x61rtifact\x18\x01 \x01(\x0b\x32\x1c.flyteidl2.artifact.ArtifactR\x08\x61rtifact\"\x87\x01\n\x12GetArtifactRequest\x12<\n\x04name\x18\x01 \x01(\x0b\x32 .flyteidl2.artifact.ArtifactNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12\'\n\x07version\x18\x02 \x01(\tB\x08\xbaH\x05r\x03\x18\xff\x01H\x00R\x07version\x88\x01\x01\x42\n\n\x08_version\"O\n\x13GetArtifactResponse\x12\x38\n\x08\x61rtifact\x18\x01 \x01(\x0b\x32\x1c.flyteidl2.artifact.ArtifactR\x08\x61rtifact\"\xc7\x01\n\x14ListArtifactsRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12J\n\nproject_id\x18\x02 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierB\x06\xbaH\x03\xc8\x01\x01R\tprojectId\x12!\n\x04name\x18\x03 \x01(\tB\x08\xbaH\x05r\x03\x18\xff\x01H\x00R\x04name\x88\x01\x01\x42\x07\n\x05_name\"i\n\x15ListArtifactsResponse\x12:\n\tartifacts\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.artifact.ArtifactR\tartifacts\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\"\x9f\x01\n\x18ListArtifactNamesRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12J\n\nproject_id\x18\x02 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierB\x06\xbaH\x03\xc8\x01\x01R\tprojectId\"a\n\rArtifactGroup\x12\x34\n\x06latest\x18\x01 \x01(\x0b\x32\x1c.flyteidl2.artifact.ArtifactR\x06latest\x12\x1a\n\x08versions\x18\x02 \x01(\x04R\x08versions\"l\n\x19ListArtifactNamesResponse\x12\x39\n\x06groups\x18\x01 \x03(\x0b\x32!.flyteidl2.artifact.ArtifactGroupR\x06groups\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\"\x99\x01\n\x1fListArtifactMetadataKeysRequest\x12J\n\nproject_id\x18\x01 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierB\x06\xbaH\x03\xc8\x01\x01R\tprojectId\x12!\n\x04name\x18\x02 \x01(\tB\x08\xbaH\x05r\x03\x18\xff\x01H\x00R\x04name\x88\x01\x01\x42\x07\n\x05_name\"6\n ListArtifactMetadataKeysResponse\x12\x12\n\x04keys\x18\x01 \x03(\tR\x04keys\"h\n\x15\x44\x65leteArtifactRequest\x12O\n\x0b\x61rtifact_id\x18\x01 \x01(\x0b\x32&.flyteidl2.artifact.ArtifactIdentifierB\x06\xbaH\x03\xc8\x01\x01R\nartifactId\"\x18\n\x16\x44\x65leteArtifactResponse2\xbe\x05\n\x0f\x41rtifactService\x12i\n\x0e\x43reateArtifact\x12).flyteidl2.artifact.CreateArtifactRequest\x1a*.flyteidl2.artifact.CreateArtifactResponse\"\x00\x12\x63\n\x0bGetArtifact\x12&.flyteidl2.artifact.GetArtifactRequest\x1a\'.flyteidl2.artifact.GetArtifactResponse\"\x03\x90\x02\x01\x12i\n\rListArtifacts\x12(.flyteidl2.artifact.ListArtifactsRequest\x1a).flyteidl2.artifact.ListArtifactsResponse\"\x03\x90\x02\x01\x12u\n\x11ListArtifactNames\x12,.flyteidl2.artifact.ListArtifactNamesRequest\x1a-.flyteidl2.artifact.ListArtifactNamesResponse\"\x03\x90\x02\x01\x12\x8a\x01\n\x18ListArtifactMetadataKeys\x12\x33.flyteidl2.artifact.ListArtifactMetadataKeysRequest\x1a\x34.flyteidl2.artifact.ListArtifactMetadataKeysResponse\"\x03\x90\x02\x01\x12l\n\x0e\x44\x65leteArtifact\x12).flyteidl2.artifact.DeleteArtifactRequest\x1a*.flyteidl2.artifact.DeleteArtifactResponse\"\x03\x90\x02\x02\x42\xd1\x01\n\x16\x63om.flyteidl2.artifactB\x14\x41rtifactServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/artifact\xa2\x02\x03\x46\x41X\xaa\x02\x12\x46lyteidl2.Artifact\xca\x02\x12\x46lyteidl2\\Artifact\xe2\x02\x1e\x46lyteidl2\\Artifact\\GPBMetadata\xea\x02\x13\x46lyteidl2::Artifactb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n)flyteidl2/artifact/artifact_service.proto\x12\x12\x66lyteidl2.artifact\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/artifact/artifact.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1b\x66lyteidl2/common/list.proto\x1a flyteidl2/core/artifact_id.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xa6\x01\n\x15\x43reateArtifactRequest\x12O\n\x0b\x61rtifact_id\x18\x01 \x01(\x0b\x32&.flyteidl2.artifact.ArtifactIdentifierB\x06\xbaH\x03\xc8\x01\x01R\nartifactId\x12<\n\x04spec\x18\x02 \x01(\x0b\x32 .flyteidl2.artifact.ArtifactSpecB\x06\xbaH\x03\xc8\x01\x01R\x04spec\"R\n\x16\x43reateArtifactResponse\x12\x38\n\x08\x61rtifact\x18\x01 \x01(\x0b\x32\x1c.flyteidl2.artifact.ArtifactR\x08\x61rtifact\"\x87\x01\n\x12GetArtifactRequest\x12<\n\x04name\x18\x01 \x01(\x0b\x32 .flyteidl2.artifact.ArtifactNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12\'\n\x07version\x18\x02 \x01(\tB\x08\xbaH\x05r\x03\x18\xff\x01H\x00R\x07version\x88\x01\x01\x42\n\n\x08_version\"O\n\x13GetArtifactResponse\x12\x38\n\x08\x61rtifact\x18\x01 \x01(\x0b\x32\x1c.flyteidl2.artifact.ArtifactR\x08\x61rtifact\"\xf9\x01\n\x14ListArtifactsRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12J\n\nproject_id\x18\x02 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierB\x06\xbaH\x03\xc8\x01\x01R\tprojectId\x12!\n\x04name\x18\x03 \x01(\tB\x08\xbaH\x05r\x03\x18\xff\x01H\x00R\x04name\x88\x01\x01\x12\x30\n\x14latest_per_partition\x18\x04 \x01(\x08R\x12latestPerPartitionB\x07\n\x05_name\"i\n\x15ListArtifactsResponse\x12:\n\tartifacts\x18\x01 \x03(\x0b\x32\x1c.flyteidl2.artifact.ArtifactR\tartifacts\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\"\x9f\x01\n\x18ListArtifactNamesRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12J\n\nproject_id\x18\x02 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierB\x06\xbaH\x03\xc8\x01\x01R\tprojectId\"\xd2\x02\n\rArtifactGroup\x12\x34\n\x06latest\x18\x01 \x01(\x0b\x32\x1c.flyteidl2.artifact.ArtifactR\x06latest\x12\x1a\n\x08versions\x18\x02 \x01(\x04R\x08versions\x12V\n\x10partition_schema\x18\x03 \x01(\x0b\x32+.flyteidl2.artifact.ArtifactPartitionSchemaR\x0fpartitionSchema\x12N\n\x15latest_time_partition\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x13latestTimePartition\x12G\n\x11latest_partitions\x18\x05 \x03(\x0b\x32\x1a.flyteidl2.core.PartitionsR\x10latestPartitions\"l\n\x19ListArtifactNamesResponse\x12\x39\n\x06groups\x18\x01 \x03(\x0b\x32!.flyteidl2.artifact.ArtifactGroupR\x06groups\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\"\x99\x01\n\x1fListArtifactMetadataKeysRequest\x12J\n\nproject_id\x18\x01 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierB\x06\xbaH\x03\xc8\x01\x01R\tprojectId\x12!\n\x04name\x18\x02 \x01(\tB\x08\xbaH\x05r\x03\x18\xff\x01H\x00R\x04name\x88\x01\x01\x42\x07\n\x05_name\"6\n ListArtifactMetadataKeysResponse\x12\x12\n\x04keys\x18\x01 \x03(\tR\x04keys\"\xb6\x01\n\x16\x44\x65\x63lareArtifactRequest\x12<\n\x04name\x18\x01 \x01(\x0b\x32 .flyteidl2.artifact.ArtifactNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12^\n\x10partition_schema\x18\x02 \x01(\x0b\x32+.flyteidl2.artifact.ArtifactPartitionSchemaB\x06\xbaH\x03\xc8\x01\x01R\x0fpartitionSchema\"q\n\x17\x44\x65\x63lareArtifactResponse\x12V\n\x10partition_schema\x18\x01 \x01(\x0b\x32+.flyteidl2.artifact.ArtifactPartitionSchemaR\x0fpartitionSchema\"X\n\x18GetArtifactSchemaRequest\x12<\n\x04name\x18\x01 \x01(\x0b\x32 .flyteidl2.artifact.ArtifactNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\"\x8f\x01\n\x19GetArtifactSchemaResponse\x12V\n\x10partition_schema\x18\x01 \x01(\x0b\x32+.flyteidl2.artifact.ArtifactPartitionSchemaR\x0fpartitionSchema\x12\x1a\n\x08\x64\x65\x63lared\x18\x02 \x01(\x08R\x08\x64\x65\x63lared\"\xde\x01\n\x1aListPartitionValuesRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12J\n\nproject_id\x18\x02 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierB\x06\xbaH\x03\xc8\x01\x01R\tprojectId\x12\x1e\n\x04name\x18\x03 \x01(\tB\n\xbaH\x07r\x05\x10\x01\x18\xff\x01R\x04name\x12\x1b\n\x03key\x18\x04 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18@R\x03key\"5\n\x1bListPartitionValuesResponse\x12\x16\n\x06values\x18\x01 \x03(\tR\x06values\"h\n\x15\x44\x65leteArtifactRequest\x12O\n\x0b\x61rtifact_id\x18\x01 \x01(\x0b\x32&.flyteidl2.artifact.ArtifactIdentifierB\x06\xbaH\x03\xc8\x01\x01R\nartifactId\"\x18\n\x16\x44\x65leteArtifactResponse2\xa3\x08\n\x0f\x41rtifactService\x12i\n\x0e\x43reateArtifact\x12).flyteidl2.artifact.CreateArtifactRequest\x1a*.flyteidl2.artifact.CreateArtifactResponse\"\x00\x12\x63\n\x0bGetArtifact\x12&.flyteidl2.artifact.GetArtifactRequest\x1a\'.flyteidl2.artifact.GetArtifactResponse\"\x03\x90\x02\x01\x12i\n\rListArtifacts\x12(.flyteidl2.artifact.ListArtifactsRequest\x1a).flyteidl2.artifact.ListArtifactsResponse\"\x03\x90\x02\x01\x12u\n\x11ListArtifactNames\x12,.flyteidl2.artifact.ListArtifactNamesRequest\x1a-.flyteidl2.artifact.ListArtifactNamesResponse\"\x03\x90\x02\x01\x12\x8a\x01\n\x18ListArtifactMetadataKeys\x12\x33.flyteidl2.artifact.ListArtifactMetadataKeysRequest\x1a\x34.flyteidl2.artifact.ListArtifactMetadataKeysResponse\"\x03\x90\x02\x01\x12l\n\x0e\x44\x65leteArtifact\x12).flyteidl2.artifact.DeleteArtifactRequest\x1a*.flyteidl2.artifact.DeleteArtifactResponse\"\x03\x90\x02\x02\x12o\n\x0f\x44\x65\x63lareArtifact\x12*.flyteidl2.artifact.DeclareArtifactRequest\x1a+.flyteidl2.artifact.DeclareArtifactResponse\"\x03\x90\x02\x02\x12u\n\x11GetArtifactSchema\x12,.flyteidl2.artifact.GetArtifactSchemaRequest\x1a-.flyteidl2.artifact.GetArtifactSchemaResponse\"\x03\x90\x02\x01\x12{\n\x13ListPartitionValues\x12..flyteidl2.artifact.ListPartitionValuesRequest\x1a/.flyteidl2.artifact.ListPartitionValuesResponse\"\x03\x90\x02\x01\x42\xd1\x01\n\x16\x63om.flyteidl2.artifactB\x14\x41rtifactServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/artifact\xa2\x02\x03\x46\x41X\xaa\x02\x12\x46lyteidl2.Artifact\xca\x02\x12\x46lyteidl2\\Artifact\xe2\x02\x1e\x46lyteidl2\\Artifact\\GPBMetadata\xea\x02\x13\x46lyteidl2::Artifactb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -43,6 +45,18 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _LISTARTIFACTMETADATAKEYSREQUEST.fields_by_name['project_id']._serialized_options = b'\272H\003\310\001\001'
   _LISTARTIFACTMETADATAKEYSREQUEST.fields_by_name['name']._options = None
   _LISTARTIFACTMETADATAKEYSREQUEST.fields_by_name['name']._serialized_options = b'\272H\005r\003\030\377\001'
+  _DECLAREARTIFACTREQUEST.fields_by_name['name']._options = None
+  _DECLAREARTIFACTREQUEST.fields_by_name['name']._serialized_options = b'\272H\003\310\001\001'
+  _DECLAREARTIFACTREQUEST.fields_by_name['partition_schema']._options = None
+  _DECLAREARTIFACTREQUEST.fields_by_name['partition_schema']._serialized_options = b'\272H\003\310\001\001'
+  _GETARTIFACTSCHEMAREQUEST.fields_by_name['name']._options = None
+  _GETARTIFACTSCHEMAREQUEST.fields_by_name['name']._serialized_options = b'\272H\003\310\001\001'
+  _LISTPARTITIONVALUESREQUEST.fields_by_name['project_id']._options = None
+  _LISTPARTITIONVALUESREQUEST.fields_by_name['project_id']._serialized_options = b'\272H\003\310\001\001'
+  _LISTPARTITIONVALUESREQUEST.fields_by_name['name']._options = None
+  _LISTPARTITIONVALUESREQUEST.fields_by_name['name']._serialized_options = b'\272H\007r\005\020\001\030\377\001'
+  _LISTPARTITIONVALUESREQUEST.fields_by_name['key']._options = None
+  _LISTPARTITIONVALUESREQUEST.fields_by_name['key']._serialized_options = b'\272H\006r\004\020\001\030@'
   _DELETEARTIFACTREQUEST.fields_by_name['artifact_id']._options = None
   _DELETEARTIFACTREQUEST.fields_by_name['artifact_id']._serialized_options = b'\272H\003\310\001\001'
   _ARTIFACTSERVICE.methods_by_name['GetArtifact']._options = None
@@ -55,32 +69,50 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _ARTIFACTSERVICE.methods_by_name['ListArtifactMetadataKeys']._serialized_options = b'\220\002\001'
   _ARTIFACTSERVICE.methods_by_name['DeleteArtifact']._options = None
   _ARTIFACTSERVICE.methods_by_name['DeleteArtifact']._serialized_options = b'\220\002\002'
-  _globals['_CREATEARTIFACTREQUEST']._serialized_start=194
-  _globals['_CREATEARTIFACTREQUEST']._serialized_end=360
-  _globals['_CREATEARTIFACTRESPONSE']._serialized_start=362
-  _globals['_CREATEARTIFACTRESPONSE']._serialized_end=444
-  _globals['_GETARTIFACTREQUEST']._serialized_start=447
-  _globals['_GETARTIFACTREQUEST']._serialized_end=582
-  _globals['_GETARTIFACTRESPONSE']._serialized_start=584
-  _globals['_GETARTIFACTRESPONSE']._serialized_end=663
-  _globals['_LISTARTIFACTSREQUEST']._serialized_start=666
-  _globals['_LISTARTIFACTSREQUEST']._serialized_end=865
-  _globals['_LISTARTIFACTSRESPONSE']._serialized_start=867
-  _globals['_LISTARTIFACTSRESPONSE']._serialized_end=972
-  _globals['_LISTARTIFACTNAMESREQUEST']._serialized_start=975
-  _globals['_LISTARTIFACTNAMESREQUEST']._serialized_end=1134
-  _globals['_ARTIFACTGROUP']._serialized_start=1136
-  _globals['_ARTIFACTGROUP']._serialized_end=1233
-  _globals['_LISTARTIFACTNAMESRESPONSE']._serialized_start=1235
-  _globals['_LISTARTIFACTNAMESRESPONSE']._serialized_end=1343
-  _globals['_LISTARTIFACTMETADATAKEYSREQUEST']._serialized_start=1346
-  _globals['_LISTARTIFACTMETADATAKEYSREQUEST']._serialized_end=1499
-  _globals['_LISTARTIFACTMETADATAKEYSRESPONSE']._serialized_start=1501
-  _globals['_LISTARTIFACTMETADATAKEYSRESPONSE']._serialized_end=1555
-  _globals['_DELETEARTIFACTREQUEST']._serialized_start=1557
-  _globals['_DELETEARTIFACTREQUEST']._serialized_end=1661
-  _globals['_DELETEARTIFACTRESPONSE']._serialized_start=1663
-  _globals['_DELETEARTIFACTRESPONSE']._serialized_end=1687
-  _globals['_ARTIFACTSERVICE']._serialized_start=1690
-  _globals['_ARTIFACTSERVICE']._serialized_end=2392
+  _ARTIFACTSERVICE.methods_by_name['DeclareArtifact']._options = None
+  _ARTIFACTSERVICE.methods_by_name['DeclareArtifact']._serialized_options = b'\220\002\002'
+  _ARTIFACTSERVICE.methods_by_name['GetArtifactSchema']._options = None
+  _ARTIFACTSERVICE.methods_by_name['GetArtifactSchema']._serialized_options = b'\220\002\001'
+  _ARTIFACTSERVICE.methods_by_name['ListPartitionValues']._options = None
+  _ARTIFACTSERVICE.methods_by_name['ListPartitionValues']._serialized_options = b'\220\002\001'
+  _globals['_CREATEARTIFACTREQUEST']._serialized_start=261
+  _globals['_CREATEARTIFACTREQUEST']._serialized_end=427
+  _globals['_CREATEARTIFACTRESPONSE']._serialized_start=429
+  _globals['_CREATEARTIFACTRESPONSE']._serialized_end=511
+  _globals['_GETARTIFACTREQUEST']._serialized_start=514
+  _globals['_GETARTIFACTREQUEST']._serialized_end=649
+  _globals['_GETARTIFACTRESPONSE']._serialized_start=651
+  _globals['_GETARTIFACTRESPONSE']._serialized_end=730
+  _globals['_LISTARTIFACTSREQUEST']._serialized_start=733
+  _globals['_LISTARTIFACTSREQUEST']._serialized_end=982
+  _globals['_LISTARTIFACTSRESPONSE']._serialized_start=984
+  _globals['_LISTARTIFACTSRESPONSE']._serialized_end=1089
+  _globals['_LISTARTIFACTNAMESREQUEST']._serialized_start=1092
+  _globals['_LISTARTIFACTNAMESREQUEST']._serialized_end=1251
+  _globals['_ARTIFACTGROUP']._serialized_start=1254
+  _globals['_ARTIFACTGROUP']._serialized_end=1592
+  _globals['_LISTARTIFACTNAMESRESPONSE']._serialized_start=1594
+  _globals['_LISTARTIFACTNAMESRESPONSE']._serialized_end=1702
+  _globals['_LISTARTIFACTMETADATAKEYSREQUEST']._serialized_start=1705
+  _globals['_LISTARTIFACTMETADATAKEYSREQUEST']._serialized_end=1858
+  _globals['_LISTARTIFACTMETADATAKEYSRESPONSE']._serialized_start=1860
+  _globals['_LISTARTIFACTMETADATAKEYSRESPONSE']._serialized_end=1914
+  _globals['_DECLAREARTIFACTREQUEST']._serialized_start=1917
+  _globals['_DECLAREARTIFACTREQUEST']._serialized_end=2099
+  _globals['_DECLAREARTIFACTRESPONSE']._serialized_start=2101
+  _globals['_DECLAREARTIFACTRESPONSE']._serialized_end=2214
+  _globals['_GETARTIFACTSCHEMAREQUEST']._serialized_start=2216
+  _globals['_GETARTIFACTSCHEMAREQUEST']._serialized_end=2304
+  _globals['_GETARTIFACTSCHEMARESPONSE']._serialized_start=2307
+  _globals['_GETARTIFACTSCHEMARESPONSE']._serialized_end=2450
+  _globals['_LISTPARTITIONVALUESREQUEST']._serialized_start=2453
+  _globals['_LISTPARTITIONVALUESREQUEST']._serialized_end=2675
+  _globals['_LISTPARTITIONVALUESRESPONSE']._serialized_start=2677
+  _globals['_LISTPARTITIONVALUESRESPONSE']._serialized_end=2730
+  _globals['_DELETEARTIFACTREQUEST']._serialized_start=2732
+  _globals['_DELETEARTIFACTREQUEST']._serialized_end=2836
+  _globals['_DELETEARTIFACTRESPONSE']._serialized_start=2838
+  _globals['_DELETEARTIFACTRESPONSE']._serialized_end=2862
+  _globals['_ARTIFACTSERVICE']._serialized_start=2865
+  _globals['_ARTIFACTSERVICE']._serialized_end=3924
 # @@protoc_insertion_point(module_scope)

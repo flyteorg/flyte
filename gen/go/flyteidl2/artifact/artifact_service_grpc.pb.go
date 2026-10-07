@@ -25,6 +25,9 @@ const (
 	ArtifactService_ListArtifactNames_FullMethodName        = "/flyteidl2.artifact.ArtifactService/ListArtifactNames"
 	ArtifactService_ListArtifactMetadataKeys_FullMethodName = "/flyteidl2.artifact.ArtifactService/ListArtifactMetadataKeys"
 	ArtifactService_DeleteArtifact_FullMethodName           = "/flyteidl2.artifact.ArtifactService/DeleteArtifact"
+	ArtifactService_DeclareArtifact_FullMethodName          = "/flyteidl2.artifact.ArtifactService/DeclareArtifact"
+	ArtifactService_GetArtifactSchema_FullMethodName        = "/flyteidl2.artifact.ArtifactService/GetArtifactSchema"
+	ArtifactService_ListPartitionValues_FullMethodName      = "/flyteidl2.artifact.ArtifactService/ListPartitionValues"
 )
 
 // ArtifactServiceClient is the client API for ArtifactService service.
@@ -51,6 +54,17 @@ type ArtifactServiceClient interface {
 	// does not exist. Deleting the last version removes the artifact name from
 	// the listings. Offloaded data the value references is not touched.
 	DeleteArtifact(ctx context.Context, in *DeleteArtifactRequest, opts ...grpc.CallOption) (*DeleteArtifactResponse, error)
+	// Declare an artifact name's partition schema ahead of any version. Succeeds
+	// when the name has no schema yet or an equal one; FAILED_PRECONDITION when a
+	// different schema is already fixed (by an earlier declaration or a first
+	// version). Changing the keys is a new artifact name.
+	DeclareArtifact(ctx context.Context, in *DeclareArtifactRequest, opts ...grpc.CallOption) (*DeclareArtifactResponse, error)
+	// Get an artifact name's partition schema. NOT_FOUND when the name has
+	// neither a declaration nor a version.
+	GetArtifactSchema(ctx context.Context, in *GetArtifactSchemaRequest, opts ...grpc.CallOption) (*GetArtifactSchemaResponse, error)
+	// List the distinct values one partition key has among an artifact's
+	// addressable versions, optionally scoped by partition filters, sorted.
+	ListPartitionValues(ctx context.Context, in *ListPartitionValuesRequest, opts ...grpc.CallOption) (*ListPartitionValuesResponse, error)
 }
 
 type artifactServiceClient struct {
@@ -115,6 +129,33 @@ func (c *artifactServiceClient) DeleteArtifact(ctx context.Context, in *DeleteAr
 	return out, nil
 }
 
+func (c *artifactServiceClient) DeclareArtifact(ctx context.Context, in *DeclareArtifactRequest, opts ...grpc.CallOption) (*DeclareArtifactResponse, error) {
+	out := new(DeclareArtifactResponse)
+	err := c.cc.Invoke(ctx, ArtifactService_DeclareArtifact_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *artifactServiceClient) GetArtifactSchema(ctx context.Context, in *GetArtifactSchemaRequest, opts ...grpc.CallOption) (*GetArtifactSchemaResponse, error) {
+	out := new(GetArtifactSchemaResponse)
+	err := c.cc.Invoke(ctx, ArtifactService_GetArtifactSchema_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *artifactServiceClient) ListPartitionValues(ctx context.Context, in *ListPartitionValuesRequest, opts ...grpc.CallOption) (*ListPartitionValuesResponse, error) {
+	out := new(ListPartitionValuesResponse)
+	err := c.cc.Invoke(ctx, ArtifactService_ListPartitionValues_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArtifactServiceServer is the server API for ArtifactService service.
 // All implementations should embed UnimplementedArtifactServiceServer
 // for forward compatibility
@@ -139,6 +180,17 @@ type ArtifactServiceServer interface {
 	// does not exist. Deleting the last version removes the artifact name from
 	// the listings. Offloaded data the value references is not touched.
 	DeleteArtifact(context.Context, *DeleteArtifactRequest) (*DeleteArtifactResponse, error)
+	// Declare an artifact name's partition schema ahead of any version. Succeeds
+	// when the name has no schema yet or an equal one; FAILED_PRECONDITION when a
+	// different schema is already fixed (by an earlier declaration or a first
+	// version). Changing the keys is a new artifact name.
+	DeclareArtifact(context.Context, *DeclareArtifactRequest) (*DeclareArtifactResponse, error)
+	// Get an artifact name's partition schema. NOT_FOUND when the name has
+	// neither a declaration nor a version.
+	GetArtifactSchema(context.Context, *GetArtifactSchemaRequest) (*GetArtifactSchemaResponse, error)
+	// List the distinct values one partition key has among an artifact's
+	// addressable versions, optionally scoped by partition filters, sorted.
+	ListPartitionValues(context.Context, *ListPartitionValuesRequest) (*ListPartitionValuesResponse, error)
 }
 
 // UnimplementedArtifactServiceServer should be embedded to have forward compatible implementations.
@@ -162,6 +214,15 @@ func (UnimplementedArtifactServiceServer) ListArtifactMetadataKeys(context.Conte
 }
 func (UnimplementedArtifactServiceServer) DeleteArtifact(context.Context, *DeleteArtifactRequest) (*DeleteArtifactResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteArtifact not implemented")
+}
+func (UnimplementedArtifactServiceServer) DeclareArtifact(context.Context, *DeclareArtifactRequest) (*DeclareArtifactResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeclareArtifact not implemented")
+}
+func (UnimplementedArtifactServiceServer) GetArtifactSchema(context.Context, *GetArtifactSchemaRequest) (*GetArtifactSchemaResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetArtifactSchema not implemented")
+}
+func (UnimplementedArtifactServiceServer) ListPartitionValues(context.Context, *ListPartitionValuesRequest) (*ListPartitionValuesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListPartitionValues not implemented")
 }
 
 // UnsafeArtifactServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -283,6 +344,60 @@ func _ArtifactService_DeleteArtifact_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArtifactService_DeclareArtifact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeclareArtifactRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArtifactServiceServer).DeclareArtifact(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArtifactService_DeclareArtifact_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArtifactServiceServer).DeclareArtifact(ctx, req.(*DeclareArtifactRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArtifactService_GetArtifactSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetArtifactSchemaRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArtifactServiceServer).GetArtifactSchema(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArtifactService_GetArtifactSchema_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArtifactServiceServer).GetArtifactSchema(ctx, req.(*GetArtifactSchemaRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArtifactService_ListPartitionValues_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPartitionValuesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArtifactServiceServer).ListPartitionValues(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArtifactService_ListPartitionValues_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArtifactServiceServer).ListPartitionValues(ctx, req.(*ListPartitionValuesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArtifactService_ServiceDesc is the grpc.ServiceDesc for ArtifactService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -313,6 +428,18 @@ var ArtifactService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteArtifact",
 			Handler:    _ArtifactService_DeleteArtifact_Handler,
+		},
+		{
+			MethodName: "DeclareArtifact",
+			Handler:    _ArtifactService_DeclareArtifact_Handler,
+		},
+		{
+			MethodName: "GetArtifactSchema",
+			Handler:    _ArtifactService_GetArtifactSchema_Handler,
+		},
+		{
+			MethodName: "ListPartitionValues",
+			Handler:    _ArtifactService_ListPartitionValues_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

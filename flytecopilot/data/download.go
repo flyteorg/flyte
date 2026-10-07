@@ -115,31 +115,11 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				}()
 
 				ref := storage.DataReference(absPath)
-				scheme, _, prefix, err := ref.Split()
+				_, _, prefix, err := ref.Split()
 				if err != nil {
 					logger.Errorf(ctx, "Failed to parse [%s] [%s]", ref, err)
 					return
 				}
-				var reader io.ReadCloser
-				if scheme == "http" || scheme == "https" {
-					reader, err = DownloadFileFromHTTP(ctx, ref)
-				} else {
-					reader, err = DownloadFileFromStorage(ctx, ref, d.store)
-				}
-				if err != nil {
-					logger.Errorf(ctx, "Failed to download from ref [%s]", ref)
-					return
-				}
-				defer func() {
-					err := reader.Close()
-					if err != nil {
-						logger.Errorf(ctx, "failed to close Blob read stream @ref [%s].\n"+
-							"Error: %s", ref, err)
-					}
-					mu.Lock()
-					readerCloseSuccessCount++
-					mu.Unlock()
-				}()
 
 				// Strip the base path from the item prefix to get the relative path
 				// For HTTP/HTTPS URLs: prefix includes bucket + path (e.g., "bucket/sm/akm6s4bgd6lwx6fhzf58-n0-0/705fe4570586b256a5b0e5fd598b4c28/sample.txt")
@@ -176,6 +156,36 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				// Remove leading slash if it exists
 				relativePath = strings.TrimPrefix(relativePath, "/")
 				logger.Debugf(ctx, "Extracting file from %s, using relative path %s", absPath, relativePath)
+
+				// List may return items as public http(s) URLs even when the blob lives in
+				// cloud storage (e.g. stow reports S3 items as https://s3-<region>.amazonaws.com/...).
+				// Fetching those with a plain HTTP client is unauthenticated and fails on private
+				// buckets, so read the item back through the store using the blob's own scheme.
+				// Only blobs whose URI is itself http(s) are fetched over HTTP.
+				var reader io.ReadCloser
+				if scheme == "http" || scheme == "https" {
+					reader, err = DownloadFileFromHTTP(ctx, ref)
+				} else {
+					itemRef := ref
+					if strings.HasPrefix(absPath, "http") {
+						itemRef = storage.DataReference(strings.TrimSuffix(blobRef.String(), "/") + "/" + relativePath)
+					}
+					reader, err = DownloadFileFromStorage(ctx, itemRef, d.store)
+				}
+				if err != nil {
+					logger.Errorf(ctx, "Failed to download from ref [%s]: %s", ref, err)
+					return
+				}
+				defer func() {
+					err := reader.Close()
+					if err != nil {
+						logger.Errorf(ctx, "failed to close Blob read stream @ref [%s].\n"+
+							"Error: %s", ref, err)
+					}
+					mu.Lock()
+					readerCloseSuccessCount++
+					mu.Unlock()
+				}()
 
 				newPath := filepath.Join(toPath, relativePath)
 				dir := filepath.Dir(newPath)
@@ -447,8 +457,12 @@ func (d Downloader) handleLiteral(ctx context.Context, lit *core.Literal, filePa
 }
 
 // singleBlob returns the Blob of a single-dimensional Blob literal, or nil if
-// the literal is not a single Blob.
+// the literal is not a single Blob. A union literal (e.g. an Optional[File]
+// input that is set) is unwrapped to its value, so it stages like a plain File.
 func singleBlob(lit *core.Literal) *core.Blob {
+	if u := lit.GetScalar().GetUnion(); u != nil {
+		return singleBlob(u.GetValue())
+	}
 	b := lit.GetScalar().GetBlob()
 	if b == nil || b.GetMetadata().GetType().GetDimensionality() != core.BlobType_SINGLE {
 		return nil

@@ -628,6 +628,10 @@ func (m *ArtifactTrigger) validate(all bool) error {
 
 	// no validation rules for InputArg
 
+	// no validation rules for Partitions
+
+	// no validation rules for PartitionInputArgs
+
 	if len(errors) > 0 {
 		return ArtifactTriggerMultiError(errors)
 	}
@@ -1415,6 +1419,64 @@ func (m *ProducedArtifact) validate(all bool) error {
 			}
 		}
 
+	}
+
+	if all {
+		switch v := interface{}(m.GetPartitions()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ProducedArtifactValidationError{
+					field:  "Partitions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ProducedArtifactValidationError{
+					field:  "Partitions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPartitions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ProducedArtifactValidationError{
+				field:  "Partitions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetTimePartition()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ProducedArtifactValidationError{
+					field:  "TimePartition",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ProducedArtifactValidationError{
+					field:  "TimePartition",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTimePartition()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ProducedArtifactValidationError{
+				field:  "TimePartition",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	if len(errors) > 0 {

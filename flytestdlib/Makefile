@@ -20,6 +20,8 @@ generate:
 
 .PHONY: compile
 compile:
+	mkdir -p ./bin
+	go build -o ./bin/pflags ./cli/pflags
 
 
 .PHONY: test_unit_codecov

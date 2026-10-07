@@ -24,8 +24,9 @@ type backendFactory func(ctx context.Context, scheme string, ref DataReference, 
 // not present in the registry falls back to the primary store, preserving the pre-routing behavior
 // where a single configured store handled every reference.
 //
-// CopyRaw is implemented via copyImpl pointed at the router itself, so cross-scheme copies (e.g.
-// redis -> s3, s3 -> gs) work through plain ReadRaw/WriteRaw against the appropriate backends.
+// CopyRaw hands a copy within one backend to that backend, which may copy on the server side. A
+// cross-scheme copy (e.g. redis -> s3, s3 -> gs) goes through copyImpl pointed at the router itself,
+// i.e. plain ReadRaw/WriteRaw against the appropriate backends.
 type routingStore struct {
 	copyImpl
 	cfg          *Config
@@ -95,6 +96,24 @@ func (s *routingStore) cacheKey(scheme string, reference DataReference) string {
 		}
 	}
 	return scheme
+}
+
+func (s *routingStore) CopyRaw(ctx context.Context, source, destination DataReference, opts Options) error {
+	srcStore, err := s.storeFor(ctx, source)
+	if err != nil {
+		return err
+	}
+
+	dstStore, err := s.storeFor(ctx, destination)
+	if err != nil {
+		return err
+	}
+
+	if srcStore == dstStore {
+		return srcStore.CopyRaw(ctx, source, destination, opts)
+	}
+
+	return s.copyImpl.CopyRaw(ctx, source, destination, opts)
 }
 
 // GetBaseContainerFQN returns the primary store's base container; other schemes are reachable only
@@ -176,7 +195,7 @@ func defaultBackendRegistry() map[string]backendFactory {
 }
 
 // newRoutingStore builds a routing RawStore seeded with an eagerly-constructed primary store
-// registered under primaryScheme. CopyRaw is wired to route through the store itself.
+// registered under primaryScheme. Cross-backend CopyRaw is wired to route through the store itself.
 func newRoutingStore(cfg *Config, httpClient *http.Client, primaryScheme string, primaryStore RawStore, metrics *dataStoreMetrics) RawStore {
 	self := &routingStore{
 		cfg:          cfg,

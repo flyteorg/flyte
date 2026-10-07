@@ -261,6 +261,96 @@ pub mod artifact_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        pub async fn declare_artifact(
+            &mut self,
+            request: impl tonic::IntoRequest<super::DeclareArtifactRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::DeclareArtifactResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.artifact.ArtifactService/DeclareArtifact",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "flyteidl2.artifact.ArtifactService",
+                        "DeclareArtifact",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn get_artifact_schema(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetArtifactSchemaRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetArtifactSchemaResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.artifact.ArtifactService/GetArtifactSchema",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "flyteidl2.artifact.ArtifactService",
+                        "GetArtifactSchema",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        pub async fn list_partition_values(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ListPartitionValuesRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ListPartitionValuesResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.artifact.ArtifactService/ListPartitionValues",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "flyteidl2.artifact.ArtifactService",
+                        "ListPartitionValues",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -310,6 +400,27 @@ pub mod artifact_service_server {
             request: tonic::Request<super::DeleteArtifactRequest>,
         ) -> std::result::Result<
             tonic::Response<super::DeleteArtifactResponse>,
+            tonic::Status,
+        >;
+        async fn declare_artifact(
+            &self,
+            request: tonic::Request<super::DeclareArtifactRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::DeclareArtifactResponse>,
+            tonic::Status,
+        >;
+        async fn get_artifact_schema(
+            &self,
+            request: tonic::Request<super::GetArtifactSchemaRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::GetArtifactSchemaResponse>,
+            tonic::Status,
+        >;
+        async fn list_partition_values(
+            &self,
+            request: tonic::Request<super::ListPartitionValuesRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::ListPartitionValuesResponse>,
             tonic::Status,
         >;
     }
@@ -654,6 +765,147 @@ pub mod artifact_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let method = DeleteArtifactSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.artifact.ArtifactService/DeclareArtifact" => {
+                    #[allow(non_camel_case_types)]
+                    struct DeclareArtifactSvc<T: ArtifactService>(pub Arc<T>);
+                    impl<
+                        T: ArtifactService,
+                    > tonic::server::UnaryService<super::DeclareArtifactRequest>
+                    for DeclareArtifactSvc<T> {
+                        type Response = super::DeclareArtifactResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::DeclareArtifactRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as ArtifactService>::declare_artifact(&inner, request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = DeclareArtifactSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.artifact.ArtifactService/GetArtifactSchema" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetArtifactSchemaSvc<T: ArtifactService>(pub Arc<T>);
+                    impl<
+                        T: ArtifactService,
+                    > tonic::server::UnaryService<super::GetArtifactSchemaRequest>
+                    for GetArtifactSchemaSvc<T> {
+                        type Response = super::GetArtifactSchemaResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::GetArtifactSchemaRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as ArtifactService>::get_artifact_schema(&inner, request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = GetArtifactSchemaSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.artifact.ArtifactService/ListPartitionValues" => {
+                    #[allow(non_camel_case_types)]
+                    struct ListPartitionValuesSvc<T: ArtifactService>(pub Arc<T>);
+                    impl<
+                        T: ArtifactService,
+                    > tonic::server::UnaryService<super::ListPartitionValuesRequest>
+                    for ListPartitionValuesSvc<T> {
+                        type Response = super::ListPartitionValuesResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ListPartitionValuesRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as ArtifactService>::list_partition_values(
+                                        &inner,
+                                        request,
+                                    )
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = ListPartitionValuesSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

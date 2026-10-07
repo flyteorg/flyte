@@ -297,6 +297,13 @@ message Spec {
   // ClusterPool to place this app on. By default it'll use the default cluster pool.
   string cluster_pool = 6;
 
+  // Pins this app to a specific cluster by name (the app is placed on that cluster
+  // rather than load-balanced across a pool). Mutually exclusive with cluster_pool:
+  // setting both is rejected. When set, the control plane leases the app only to the
+  // named cluster; when empty, placement falls back to cluster_pool (empty pool =
+  // the default pool).
+  string cluster = 16;
+
   // Set of image specifications for the app.
   ImageSpecSet images = 7;
 

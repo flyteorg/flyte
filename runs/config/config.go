@@ -17,7 +17,10 @@ var defaultConfig = &Config{
 		Port: 8090,
 		Host: "0.0.0.0",
 	},
-	WatchBufferSize: 100,
+	WatchBufferSize:         100,
+	NotificationBufferLimit: 65_000,
+	NotifyRetryMinBackoff:   config.Duration{Duration: 50 * time.Millisecond},
+	NotifyRetryMaxBackoff:   config.Duration{Duration: 5 * time.Second},
 	ActionsService: serviceclient.ServiceConfig{
 		URL: "http://localhost:8090",
 	},
@@ -60,6 +63,15 @@ type Config struct {
 
 	// Watch/streaming settings
 	WatchBufferSize int `json:"watchBufferSize" pflag:",Buffer size for watch streams"`
+
+	// NotificationBufferLimit is the maximum number of pending entries in each action or run queue.
+	NotificationBufferLimit int `json:"notificationBufferLimit" pflag:",Maximum pending entries in each notification queue"`
+
+	// NotifyRetryMinBackoff is the initial delay after notification delivery fails.
+	NotifyRetryMinBackoff config.Duration `json:"notifyRetryMinBackoff" pflag:",Initial notification retry delay"`
+
+	// NotifyRetryMaxBackoff caps the notification retry delay.
+	NotifyRetryMaxBackoff config.Duration `json:"notifyRetryMaxBackoff" pflag:",Maximum notification retry delay"`
 
 	// ActionsService configures the actions service client.
 	ActionsService serviceclient.ServiceConfig `json:"actionsService" pflag:",Actions service client configuration"`

@@ -25,4 +25,13 @@ func applyRunSettings(spec *task.RunSpec, resolved *settings.Settings) {
 		concurrency.GetState() == settings.SettingState_SETTING_STATE_VALUE {
 		spec.MaxActionConcurrency = uint32(concurrency.GetIntValue())
 	}
+
+	// Projected onto tasks that name no template of their own, at action creation.
+	if podTemplate := resolved.GetPodTemplateName(); spec.GetDefaultSettings().GetPodTemplateName() == "" &&
+		podTemplate.GetState() == settings.SettingState_SETTING_STATE_VALUE {
+		if spec.DefaultSettings == nil {
+			spec.DefaultSettings = &task.DefaultSettings{}
+		}
+		spec.DefaultSettings.PodTemplateName = podTemplate.GetStringValue()
+	}
 }

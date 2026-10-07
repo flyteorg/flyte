@@ -73,14 +73,32 @@ class Schedule(_message.Message):
     def __init__(self, rate: _Optional[_Union[FixedRate, _Mapping]] = ..., cron_expression: _Optional[str] = ..., cron: _Optional[_Union[Cron, _Mapping]] = ..., kickoff_time_input_arg: _Optional[str] = ...) -> None: ...
 
 class ArtifactTrigger(_message.Message):
-    __slots__ = ["artifact_name", "version", "input_arg"]
+    __slots__ = ["artifact_name", "version", "input_arg", "partitions", "partition_input_args"]
+    class PartitionsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    class PartitionInputArgsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     ARTIFACT_NAME_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     INPUT_ARG_FIELD_NUMBER: _ClassVar[int]
+    PARTITIONS_FIELD_NUMBER: _ClassVar[int]
+    PARTITION_INPUT_ARGS_FIELD_NUMBER: _ClassVar[int]
     artifact_name: str
     version: str
     input_arg: str
-    def __init__(self, artifact_name: _Optional[str] = ..., version: _Optional[str] = ..., input_arg: _Optional[str] = ...) -> None: ...
+    partitions: _containers.ScalarMap[str, str]
+    partition_input_args: _containers.ScalarMap[str, str]
+    def __init__(self, artifact_name: _Optional[str] = ..., version: _Optional[str] = ..., input_arg: _Optional[str] = ..., partitions: _Optional[_Mapping[str, str]] = ..., partition_input_args: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class TriggerAutomationSpec(_message.Message):
     __slots__ = ["type", "schedule", "artifact"]
@@ -117,20 +135,24 @@ class Inputs(_message.Message):
     def __init__(self, literals: _Optional[_Iterable[_Union[NamedLiteral, _Mapping]]] = ..., context: _Optional[_Iterable[_Union[_literals_pb2.KeyValuePair, _Mapping]]] = ...) -> None: ...
 
 class ProducedArtifact(_message.Message):
-    __slots__ = ["output", "name", "version", "info", "type", "parent_artifacts"]
+    __slots__ = ["output", "name", "version", "info", "type", "parent_artifacts", "partitions", "time_partition"]
     OUTPUT_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     INFO_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     PARENT_ARTIFACTS_FIELD_NUMBER: _ClassVar[int]
+    PARTITIONS_FIELD_NUMBER: _ClassVar[int]
+    TIME_PARTITION_FIELD_NUMBER: _ClassVar[int]
     output: str
     name: str
     version: str
     info: _artifact_id_pb2.ArtifactInfo
     type: _types_pb2.LiteralType
     parent_artifacts: _containers.RepeatedCompositeFieldContainer[_artifact_id_pb2.ArtifactVersionId]
-    def __init__(self, output: _Optional[str] = ..., name: _Optional[str] = ..., version: _Optional[str] = ..., info: _Optional[_Union[_artifact_id_pb2.ArtifactInfo, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., parent_artifacts: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactVersionId, _Mapping]]] = ...) -> None: ...
+    partitions: _artifact_id_pb2.Partitions
+    time_partition: _artifact_id_pb2.TimePartition
+    def __init__(self, output: _Optional[str] = ..., name: _Optional[str] = ..., version: _Optional[str] = ..., info: _Optional[_Union[_artifact_id_pb2.ArtifactInfo, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., parent_artifacts: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactVersionId, _Mapping]]] = ..., partitions: _Optional[_Union[_artifact_id_pb2.Partitions, _Mapping]] = ..., time_partition: _Optional[_Union[_artifact_id_pb2.TimePartition, _Mapping]] = ...) -> None: ...
 
 class Outputs(_message.Message):
     __slots__ = ["literals", "produced_artifacts"]
