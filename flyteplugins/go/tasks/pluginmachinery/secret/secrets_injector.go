@@ -3,6 +3,7 @@ package secret
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	corev1 "k8s.io/api/core/v1"
 	k8sRuntime "k8s.io/apimachinery/pkg/runtime"
@@ -29,6 +30,7 @@ func newSecretsInjector(
 	webhookConfig *config.Config,
 	globalSecretManagerConfig *secretmanager.Config,
 	podNamespace string,
+	limitNamespace string,
 	scope promutils.Scope,
 ) (SecretsInjector, error) {
 	switch secretManagerType {
@@ -64,28 +66,45 @@ func newSecretsInjector(
 			return nil, fmt.Errorf("failed to add core v1 to scheme: %w", err)
 		}
 
-		secretInformerCache, err := ctrlcache.New(kubeConfig, ctrlcache.Options{
-			Scheme: ctrlRuntimeScheme,
-		})
-		if err != nil {
-			return nil, fmt.Errorf("failed to create informer cache: %w", err)
-		}
-
-		go func() {
-			if err := secretInformerCache.Start(ctx); err != nil {
-				logger.Errorf(ctx, "secret informer cache stopped: %v", err)
+		// The k8s client backs the image-pull-secret path (reference secret lookup + mirroring
+		// into the pod namespace) and, for the K8s embedded type, the stored-secret check. Both
+		// are on the admission hot path, so reads go through a Secret informer — but only one
+		// scoped to the namespaces those reads hit. When neither feature is in use the client
+		// is direct and no informer (and no cluster-wide Secret watch) is started.
+		clientOpts := client.Options{Scheme: ctrlRuntimeScheme}
+		if useInformer, namespaces := secretInformerNamespaces(webhookConfig, podNamespace, limitNamespace); useInformer {
+			cacheOpts := ctrlcache.Options{Scheme: ctrlRuntimeScheme}
+			if len(namespaces) > 0 {
+				cacheOpts.DefaultNamespaces = make(map[string]ctrlcache.Config, len(namespaces))
+				for _, ns := range namespaces {
+					cacheOpts.DefaultNamespaces[ns] = ctrlcache.Config{}
+				}
 			}
-		}()
-		if !secretInformerCache.WaitForCacheSync(ctx) {
-			return nil, fmt.Errorf("secret informer cache failed to sync")
+			logger.Infof(ctx, "Starting Secret informer for namespaces %v (empty = all)", namespaces)
+			secretInformerCache, err := ctrlcache.New(kubeConfig, cacheOpts)
+			if err != nil {
+				return nil, fmt.Errorf("failed to create informer cache: %w", err)
+			}
+
+			// Explicitly register the Secret informer so the cache only watches Secrets and so
+			// WaitForCacheSync below actually blocks on the initial Secret list.
+			if _, err := secretInformerCache.GetInformer(ctx, &corev1.Secret{}); err != nil {
+				return nil, fmt.Errorf("failed to register Secret informer: %w", err)
+			}
+
+			go func() {
+				if err := secretInformerCache.Start(ctx); err != nil {
+					logger.Errorf(ctx, "secret informer cache stopped: %v", err)
+				}
+			}()
+			if !secretInformerCache.WaitForCacheSync(ctx) {
+				return nil, fmt.Errorf("secret informer cache failed to sync")
+			}
+
+			clientOpts.Cache = &client.CacheOptions{Reader: secretInformerCache}
 		}
 
-		ctrlRuntimeClient, err := client.New(kubeConfig, client.Options{
-			Scheme: ctrlRuntimeScheme,
-			Cache: &client.CacheOptions{
-				Reader: secretInformerCache,
-			},
-		})
+		ctrlRuntimeClient, err := client.New(kubeConfig, clientOpts)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create controller-runtime client: %w", err)
 		}
@@ -119,4 +138,52 @@ func newSecretsInjector(
 	default:
 		return nil, fmt.Errorf("unrecognized secret manager type [%v]", secretManagerType)
 	}
+}
+
+// AllNamespaces is the limitNamespace value meaning "no namespace limit". An empty
+// limitNamespace means the same.
+const AllNamespaces = "all"
+
+// secretInformerNamespaces decides whether the embedded secret manager's k8s client should be
+// backed by a Secret informer and, if so, which namespaces it must watch. An empty namespace list
+// means all namespaces.
+//
+//   - Image pull secrets read the reference secret from podNamespace and get/create the mirrored
+//     secret in each task pod's namespace. Pods are confined to limitNamespace when it is set, so
+//     the informer watches {limitNamespace, podNamespace}; otherwise it is cluster-wide.
+//   - The K8s embedded type checks the stored secret in K8sConfig.Namespace only.
+//
+// With neither feature in use, no informer is needed.
+func secretInformerNamespaces(webhookConfig *config.Config, podNamespace, limitNamespace string) (bool, []string) {
+	embeddedCfg := webhookConfig.EmbeddedSecretManagerConfig
+	imagePull := embeddedCfg.ImagePullSecrets.Enabled
+	k8sType := embeddedCfg.Type == config.EmbeddedSecretManagerTypeK8s
+	if !imagePull && !k8sType {
+		return false, nil
+	}
+
+	unlimited := limitNamespace == "" || limitNamespace == AllNamespaces
+	if imagePull && unlimited {
+		return true, nil
+	}
+
+	var namespaces []string
+	add := func(ns string) {
+		if ns != "" && !slices.Contains(namespaces, ns) {
+			namespaces = append(namespaces, ns)
+		}
+	}
+	if imagePull {
+		add(limitNamespace)
+		add(podNamespace)
+	}
+	if k8sType {
+		add(embeddedCfg.K8sConfig.Namespace)
+	}
+	if len(namespaces) == 0 {
+		// K8s type with no namespace configured: fall back to a direct client rather than
+		// silently watching every Secret in the cluster.
+		return false, nil
+	}
+	return true, namespaces
 }
