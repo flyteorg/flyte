@@ -2,6 +2,7 @@ package task
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/go-test/deep"
@@ -119,5 +120,52 @@ func Test_cacheFlyteWorkflow(t *testing.T) {
 		actual, err := r.GetCompiledWorkflow(ctx, location)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(expected, actual))
+	})
+}
+
+func Test_cacheFlyteWorkflowLargerThanCacheEntry(t *testing.T) {
+	// freecache rejects entries larger than 1/1024 of its size, so a 1MB cache can't hold a ~1KB+ CRD.
+	store, err := storage.NewDataStore(&storage.Config{
+		Type:  storage.TypeMemory,
+		Cache: storage.CachingConfig{MaxSizeMegabytes: 1},
+	}, promutils.NewTestScope())
+	assert.NoError(t, err)
+
+	nodes := map[v1alpha1.NodeID]*v1alpha1.NodeSpec{}
+	for i := 0; i < 100; i++ {
+		id := fmt.Sprintf("node-%d", i)
+		nodes[id] = &v1alpha1.NodeSpec{ID: id, Name: id}
+	}
+	expected := &v1alpha1.FlyteWorkflow{
+		WorkflowSpec: &v1alpha1.WorkflowSpec{
+			ID:    "abc",
+			Nodes: nodes,
+			Connections: v1alpha1.Connections{
+				Downstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{},
+				Upstream:   map[v1alpha1.NodeID][]v1alpha1.NodeID{},
+			},
+			DeprecatedConnections: v1alpha1.DeprecatedConnections{
+				DownstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{},
+				UpstreamEdges:   map[v1alpha1.NodeID][]v1alpha1.NodeID{},
+			},
+		},
+	}
+
+	ctx := context.TODO()
+	r := RemoteFileWorkflowStore{store: store}
+
+	t.Run("put and get CRD", func(t *testing.T) {
+		location := storage.DataReference("somekey/futures_compiled.pb")
+		assert.NoError(t, r.PutFlyteWorkflowCRD(ctx, expected, location))
+		actual, err := r.GetWorkflowCRD(ctx, location)
+		assert.NoError(t, err)
+		if diff := deep.Equal(expected, actual); len(diff) > 0 {
+			t.Errorf("GetWorkflowCRD() Diff = %v", diff)
+		}
+	})
+
+	t.Run("get missing CRD", func(t *testing.T) {
+		_, err := r.GetWorkflowCRD(ctx, storage.DataReference("somekey/missing.pb"))
+		assert.Error(t, err)
 	})
 }
