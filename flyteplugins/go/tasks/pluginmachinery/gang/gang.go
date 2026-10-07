@@ -12,7 +12,6 @@ package gang
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"google.golang.org/protobuf/proto"
 
@@ -51,8 +50,6 @@ type Eviction struct {
 	Reason Reason
 	// Message is the gate's own explanation, if it gave one.
 	Message string
-	// OccurredAt is when the edge observed the decision.
-	OccurredAt time.Time
 }
 
 // Policy configures how an eviction is reported.
@@ -64,8 +61,8 @@ type Policy struct {
 	AsSystemRetry bool
 }
 
-// Error returns the GangEvicted error for e, with the kind implied by the policy.
-func (e Eviction) Error(p Policy) *core.ExecutionError {
+// ExecutionError returns the GangEvicted error for e, with the kind implied by the policy.
+func (e Eviction) ExecutionError(p Policy) *core.ExecutionError {
 	kind := core.ExecutionError_USER
 	if p.AsSystemRetry {
 		kind = core.ExecutionError_SYSTEM

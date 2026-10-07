@@ -3,6 +3,7 @@ package clustered
 import (
 	"context"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -219,6 +220,21 @@ func TestGetTaskPhase_WorkerUnscheduled_WaitingForResources(t *testing.T) {
 		phase.Reason(), "the scheduler's reason for the first unscheduled worker is surfaced")
 }
 
+func TestGetTaskPhase_WorkerUnscheduled_LongSchedulerMessageIsCapped(t *testing.T) {
+	js := makeJobSet("", "", false)
+	pods := workerPods(workerPodReady, workerPodUnscheduled)
+	pods[1].Status.Conditions[0].Message = strings.Repeat("0/1 nodes are available: 1 Insufficient memory. ", 20)
+	reader := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pods[0], pods[1]).Build()
+	pCtx := dummyPluginCtx(twoNodeSpec(), reader)
+
+	phase, err := clusteredResourceHandler{}.GetTaskPhase(context.Background(), pCtx, js)
+	require.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseWaitingForResources, phase.Phase())
+	assert.True(t, strings.HasSuffix(phase.Reason(), "…)"), "reason %q is not capped", phase.Reason())
+	maxLen := len("1 of 2 workers scheduled (Unschedulable: )") + maxSchedulingDetailLen + len("…")
+	assert.LessOrEqual(t, len(phase.Reason()), maxLen)
+}
+
 func TestGetTaskPhase_TerminatingWorkerNotCounted(t *testing.T) {
 	// A pod being deleted (for example from a released gang) is not part of the gang.
 	js := makeJobSet("", "", false)
@@ -310,6 +326,9 @@ func imagePullBackOffStatus() corev1.PodStatus {
 	}
 }
 
+// testNodeName is the node the scheduled worker pods in these fixtures run on.
+const testNodeName = "node-a"
+
 // workerPodState is how far a worker pod has got.
 type workerPodState int
 
@@ -340,9 +359,9 @@ func workerPods(states ...workerPodState) []*corev1.Pod {
 				Message: "0/1 nodes are available: 1 Insufficient memory.",
 			}}
 		case workerPodScheduled:
-			pod.Spec.NodeName = "node-a"
+			pod.Spec.NodeName = testNodeName
 		case workerPodReady:
-			pod.Spec.NodeName = "node-a"
+			pod.Spec.NodeName = testNodeName
 			pod.Status.Phase = corev1.PodRunning
 			pod.Status.Conditions = []corev1.PodCondition{{Type: corev1.PodReady, Status: corev1.ConditionTrue}}
 		}

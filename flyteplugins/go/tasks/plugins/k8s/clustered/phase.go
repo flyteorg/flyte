@@ -61,8 +61,7 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 	condition := extractCurrentCondition(jobSet.Status.Conditions)
 	suspended := isSuspended(jobSet, condition)
 	started := hasJobSetStarted(jobSet, pluginState)
-	pods := listWorkerPods(ctx, pluginContext, jobSet)
-	rank0 := selectRank0Pod(jobSet, pods)
+	pods := currentRestartPods(jobSet, listWorkerPods(ctx, pluginContext, jobSet))
 	maxRestarts := getMaxRestarts(jobSet, &spec)
 
 	// 1. Is it over? A suspended JobSet is never terminal.
@@ -72,7 +71,7 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 
 	case jobsetv1alpha2.JobSetFailed:
 		if spec.GetFailurePolicy().GetRestartOnHostMaintenance() {
-			if phase, ok := maybeSystemRetryOnMaintenance(ctx, jobSet, rank0, &taskInfo); ok {
+			if phase, ok := maybeSystemRetryOnMaintenance(ctx, jobSet, pods, &taskInfo); ok {
 				return phase, nil
 			}
 		}
@@ -82,9 +81,9 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 	// 2. Has the whole gang ever been up?
 	var phaseInfo pluginsCore.PhaseInfo
 	if started {
-		phaseInfo = afterStart(ctx, jobSet, condition, suspended, rank0, maxRestarts, &taskInfo)
+		phaseInfo = afterStart(ctx, jobSet, condition, suspended, pods, maxRestarts, &taskInfo)
 	} else {
-		phaseInfo = beforeStart(ctx, jobSet, condition, suspended, pods, rank0, maxRestarts, pluginState, &taskInfo)
+		phaseInfo = beforeStart(ctx, jobSet, condition, suspended, pods, maxRestarts, pluginState, &taskInfo)
 	}
 
 	// A new reason within the same phase needs a new version, or its event is dropped
@@ -105,7 +104,6 @@ func beforeStart(
 	condition *metav1.Condition,
 	suspended bool,
 	pods []v1.Pod,
-	rank0 *v1.Pod,
 	maxRestarts int32,
 	pluginState k8s.PluginState,
 	taskInfo *pluginsCore.TaskInfo,
@@ -128,7 +126,7 @@ func beforeStart(
 		return waiting(reason + conditionDetail(condition))
 	}
 
-	if phase, ok := failedBeforeStart(ctx, jobSet, pods, rank0, maxRestarts, taskInfo); ok {
+	if phase, ok := fatalFailure(ctx, jobSet, pods, maxRestarts, taskInfo); ok {
 		return phase
 	}
 
@@ -147,7 +145,7 @@ func afterStart(
 	jobSet *jobsetv1alpha2.JobSet,
 	condition *metav1.Condition,
 	suspended bool,
-	rank0 *v1.Pod,
+	pods []v1.Pod,
 	maxRestarts int32,
 	taskInfo *pluginsCore.TaskInfo,
 ) pluginsCore.PhaseInfo {
@@ -157,16 +155,13 @@ func afterStart(
 	}
 
 	if conditionType(condition) == jobsetv1alpha2.JobSetRestarting {
-		if phase, ok := pendingFailure(ctx, rank0, taskInfo); ok {
+		if phase, ok := pendingFailure(ctx, pods, taskInfo); ok {
 			return phase
 		}
 		return runningPhaseInfo(taskInfo, fmt.Sprintf("restart in progress (attempt %d)", jobSet.Status.Restarts))
 	}
 
-	if phase, ok := pendingFailure(ctx, rank0, taskInfo); ok {
-		return phase
-	}
-	if phase, ok := failedWithBudgetExhausted(ctx, jobSet, rank0, maxRestarts, taskInfo); ok {
+	if phase, ok := fatalFailure(ctx, jobSet, pods, maxRestarts, taskInfo); ok {
 		return phase
 	}
 	return runningPhaseInfo(taskInfo, runningReason(jobSet.Status.Restarts))
@@ -203,11 +198,10 @@ func evictedPhaseInfo(condition *metav1.Condition, taskInfo *pluginsCore.TaskInf
 	}
 
 	execErr := gang.Eviction{
-		Source:     evictionSource,
-		Reason:     gang.ReasonUnknown,
-		Message:    message,
-		OccurredAt: *taskInfo.OccurredAt,
-	}.Error(evictionPolicy)
+		Source:  evictionSource,
+		Reason:  gang.ReasonUnknown,
+		Message: message,
+	}.ExecutionError(evictionPolicy)
 	if execErr.GetKind() == core.ExecutionError_SYSTEM {
 		return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(execErr.GetCode(), execErr.GetMessage(), taskInfo)
 	}
@@ -277,10 +271,19 @@ func countWorkers(pods []v1.Pod) (scheduled, ready int, unscheduledDetail string
 	return scheduled, ready, unscheduledDetail
 }
 
+// maxSchedulingDetailLen bounds the scheduler's message in the phase reason. The
+// scheduler appends preemption and claim details that can run to several hundred
+// characters; the first part is what tells the user why the pod has no node.
+const maxSchedulingDetailLen = 200
+
 func schedulingDetail(pod *v1.Pod) string {
 	for _, c := range pod.Status.Conditions {
 		if c.Type == v1.PodScheduled && c.Status == v1.ConditionFalse && c.Message != "" {
-			return fmt.Sprintf(" (%s: %s)", c.Reason, c.Message)
+			message := c.Message
+			if len(message) > maxSchedulingDetailLen {
+				message = message[:maxSchedulingDetailLen] + "…"
+			}
+			return fmt.Sprintf(" (%s: %s)", c.Reason, message)
 		}
 	}
 	return ""
@@ -360,60 +363,64 @@ func hasJobSetStarted(jobSet *jobsetv1alpha2.JobSet, pluginState k8s.PluginState
 	return pluginState.Phase >= pluginsCore.PhaseRunning
 }
 
-// failedBeforeStart surfaces problems a forming gang will not recover from by
-// waiting: a fatal pending state on any worker pod, or rank 0 failing with the
-// restart budget used up.
-func failedBeforeStart(
+// fatalFailure surfaces problems the gang will not recover from by waiting: a fatal
+// pending state on any worker, or a failed worker once the JobSet has no restarts left.
+func fatalFailure(
 	ctx context.Context,
 	jobSet *jobsetv1alpha2.JobSet,
 	pods []v1.Pod,
-	rank0 *v1.Pod,
 	maxRestarts int32,
 	taskInfo *pluginsCore.TaskInfo,
 ) (pluginsCore.PhaseInfo, bool) {
+	if phase, ok := pendingFailure(ctx, pods, taskInfo); ok {
+		return phase, true
+	}
+	return failedWithBudgetExhausted(ctx, jobSet, pods, maxRestarts, taskInfo)
+}
+
+// pendingFailure reports the first pending worker whose state is fatal (for example an
+// image that cannot be pulled), as classified by DemystifyPending.
+func pendingFailure(ctx context.Context, pods []v1.Pod, taskInfo *pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, bool) {
 	for i := range pods {
-		if phase, ok := pendingFailure(ctx, &pods[i], taskInfo); ok {
+		pod := &pods[i]
+		if pod.Status.Phase != v1.PodPending {
+			continue
+		}
+		phase, err := flytek8s.DemystifyPending(pod.Status, *taskInfo)
+		if err != nil {
+			logger.Warnf(ctx, "failed to inspect pending pod %s for fast-fail: %v", pod.Name, err)
+			continue
+		}
+		if phase.Phase().IsFailure() {
 			return phase, true
 		}
 	}
-	return failedWithBudgetExhausted(ctx, jobSet, rank0, maxRestarts, taskInfo)
-}
-
-// pendingFailure reports a pending pod whose state is fatal (for example an image
-// that cannot be pulled), as classified by DemystifyPending.
-func pendingFailure(ctx context.Context, pod *v1.Pod, taskInfo *pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, bool) {
-	if pod == nil || pod.Status.Phase != v1.PodPending {
-		return pluginsCore.PhaseInfoUndefined, false
-	}
-	phase, err := flytek8s.DemystifyPending(pod.Status, *taskInfo)
-	if err != nil {
-		logger.Warnf(ctx, "failed to inspect pending pod %s for fast-fail: %v", pod.Name, err)
-		return pluginsCore.PhaseInfoUndefined, false
-	}
-	if phase.Phase().IsFailure() {
-		return phase, true
-	}
 	return pluginsCore.PhaseInfoUndefined, false
 }
 
-// failedWithBudgetExhausted reports a failed rank-0 pod once the JobSet has no
+// failedWithBudgetExhausted reports the first worker to fail once the JobSet has no
 // restarts left, so the failure is surfaced before the JobSet controller writes Failed.
+// The earliest failure is the root cause; the ranks that failed after it were torn down
+// because of it.
 func failedWithBudgetExhausted(
 	ctx context.Context,
 	jobSet *jobsetv1alpha2.JobSet,
-	rank0 *v1.Pod,
+	pods []v1.Pod,
 	maxRestarts int32,
 	taskInfo *pluginsCore.TaskInfo,
 ) (pluginsCore.PhaseInfo, bool) {
-	if rank0 == nil || rank0.Status.Phase != v1.PodFailed ||
-		!workersHaveFailures(jobSet) || !isRestartBudgetExhausted(jobSet, maxRestarts) {
+	if !workersHaveFailures(jobSet) || !isRestartBudgetExhausted(jobSet, maxRestarts) {
+		return pluginsCore.PhaseInfoUndefined, false
+	}
+	pod := firstFailedPod(pods)
+	if pod == nil {
 		return pluginsCore.PhaseInfoUndefined, false
 	}
 
 	containerName := jobSet.Annotations[primaryContainerAnnotation]
-	phase, err := flytek8s.DemystifyFailure(ctx, rank0.Status, *taskInfo, containerName)
+	phase, err := flytek8s.DemystifyFailure(ctx, pod.Status, *taskInfo, containerName)
 	if err != nil {
-		logger.Warnf(ctx, "failed to inspect failed rank-0 pod for fast-fail: %v", err)
+		logger.Warnf(ctx, "failed to inspect failed pod %s for fast-fail: %v", pod.Name, err)
 		return pluginsCore.PhaseInfoUndefined, false
 	}
 	if phase.Phase().IsFailure() {
@@ -422,45 +429,64 @@ func failedWithBudgetExhausted(
 	return pluginsCore.PhaseInfoUndefined, false
 }
 
-// maybeSystemRetryOnMaintenance inspects the rank-0 pod after a JobSetFailed condition.
-// If the pod was evicted due to host maintenance (system-retryable), returns
-// PhaseInfoSystemRetryableFailureWithCleanup so Flyte retries without charging user's max_restarts.
-// Best-effort: if the pod is already cleaned up, returns (_, false) and the caller falls through.
+// maybeSystemRetryOnMaintenance inspects the workers after a JobSetFailed condition. If
+// the gang went down because a worker was evicted for host maintenance (system-retryable),
+// returns PhaseInfoSystemRetryableFailureWithCleanup so Flyte retries without charging
+// user's max_restarts.
+//
+// Only the earliest failure is classified: it is the cause, and the workers that failed
+// after it were torn down because of it. A torn-down worker is SIGKILLed, which on its
+// own would be classified as a system failure and turn a user's crash into a free retry.
+// Best-effort: if the pods are already cleaned up, returns (_, false) and the caller falls through.
 func maybeSystemRetryOnMaintenance(
 	ctx context.Context,
 	jobSet *jobsetv1alpha2.JobSet,
-	rank0 *v1.Pod,
+	pods []v1.Pod,
 	taskInfo *pluginsCore.TaskInfo,
 ) (pluginsCore.PhaseInfo, bool) {
-	if rank0 == nil {
-		return pluginsCore.PhaseInfoUndefined, false
-	}
-
 	containerName := jobSet.Annotations[primaryContainerAnnotation]
-	var (
-		phase pluginsCore.PhaseInfo
-		err   error
-	)
-
-	switch rank0.Status.Phase {
-	case v1.PodFailed:
-		phase, err = flytek8s.DemystifyFailure(ctx, rank0.Status, *taskInfo, containerName)
-	case v1.PodPending:
-		phase, err = flytek8s.DemystifyPending(rank0.Status, *taskInfo)
-	default:
-		return pluginsCore.PhaseInfoUndefined, false
+	if pod := firstFailedPod(pods); pod != nil {
+		phase, err := flytek8s.DemystifyFailure(ctx, pod.Status, *taskInfo, containerName)
+		if err != nil {
+			logger.Warnf(ctx, "failed to inspect failed pod %s for maintenance retry: %v", pod.Name, err)
+			return pluginsCore.PhaseInfoUndefined, false
+		}
+		return maintenanceRetry(phase, pod, taskInfo)
 	}
 
-	if err != nil {
-		logger.Warnf(ctx, "failed to inspect rank-0 pod for maintenance retry: %v", err)
-		return pluginsCore.PhaseInfoUndefined, false
-	}
-	if phase.Phase() == pluginsCore.PhaseRetryableFailure && phase.Err() != nil && phase.Err().GetKind() == core.ExecutionError_SYSTEM {
-		return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(
-			"HostMaintenance", "pod evicted due to host maintenance; retrying without charging max_restarts", taskInfo,
-		), true
+	// No worker failed: a pending worker can still carry a system-level reason.
+	for i := range pods {
+		pod := &pods[i]
+		if pod.Status.Phase != v1.PodPending {
+			continue
+		}
+		phase, err := flytek8s.DemystifyPending(pod.Status, *taskInfo)
+		if err != nil {
+			logger.Warnf(ctx, "failed to inspect pending pod %s for maintenance retry: %v", pod.Name, err)
+			continue
+		}
+		if retry, ok := maintenanceRetry(phase, pod, taskInfo); ok {
+			return retry, true
+		}
 	}
 	return pluginsCore.PhaseInfoUndefined, false
+}
+
+// maintenanceRetry turns a system-retryable pod failure into the HostMaintenance retry.
+func maintenanceRetry(
+	phase pluginsCore.PhaseInfo,
+	pod *v1.Pod,
+	taskInfo *pluginsCore.TaskInfo,
+) (pluginsCore.PhaseInfo, bool) {
+	if phase.Phase() != pluginsCore.PhaseRetryableFailure || phase.Err() == nil ||
+		phase.Err().GetKind() != core.ExecutionError_SYSTEM {
+		return pluginsCore.PhaseInfoUndefined, false
+	}
+	return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(
+		"HostMaintenance",
+		fmt.Sprintf("pod %s evicted due to host maintenance; retrying without charging max_restarts", pod.Name),
+		taskInfo,
+	), true
 }
 
 // extractCurrentCondition returns the most recently transitioned condition with Status=True, or nil.

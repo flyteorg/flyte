@@ -11,7 +11,7 @@ import (
 
 const kueueSource = "kueue"
 
-func TestEvictionError(t *testing.T) {
+func TestEvictionExecutionError(t *testing.T) {
 	tests := []struct {
 		name     string
 		policy   Policy
@@ -26,7 +26,7 @@ func TestEvictionError(t *testing.T) {
 				Source:  kueueSource,
 				Reason:  ReasonPreempted,
 				Message: "Preempted to accommodate a higher priority Workload",
-			}.Error(tt.policy)
+			}.ExecutionError(tt.policy)
 			require.NotNil(t, err)
 			assert.Equal(t, CodeGangEvicted, err.GetCode())
 			assert.Equal(t, tt.wantKind, err.GetKind())
@@ -35,19 +35,19 @@ func TestEvictionError(t *testing.T) {
 	}
 }
 
-func TestEvictionError_MessageComposition(t *testing.T) {
+func TestEvictionExecutionError_MessageComposition(t *testing.T) {
 	system := Policy{AsSystemRetry: true}
 
 	err := Eviction{
 		Source:  kueueSource,
 		Reason:  ReasonPodsReadyTimeout,
 		Message: "  Exceeded the PodsReady timeout ns/wl  ",
-	}.Error(system)
+	}.ExecutionError(system)
 	assert.Equal(t, "gang evicted by kueue (PodsReadyTimeout): Exceeded the PodsReady timeout ns/wl", err.GetMessage())
 
-	assert.Equal(t, "gang evicted", Eviction{}.Error(system).GetMessage())
+	assert.Equal(t, "gang evicted", Eviction{}.ExecutionError(system).GetMessage())
 
-	err = Eviction{Source: kueueSource, Reason: ReasonUnknown}.Error(system)
+	err = Eviction{Source: kueueSource, Reason: ReasonUnknown}.ExecutionError(system)
 	assert.Equal(t, "gang evicted by kueue", err.GetMessage(), "Unknown reason is not printed")
 }
 
