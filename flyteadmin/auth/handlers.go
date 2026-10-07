@@ -337,7 +337,7 @@ func GetAuthenticationInterceptor(authCtx interfaces.AuthenticationContext) func
 		// Only enforcement logic is present. The default case is to let things through.
 		if (isFromHTTP && !authCtx.Options().DisableForHTTP) ||
 			(!isFromHTTP && !authCtx.Options().DisableForGrpc) {
-err := fmt.Errorf("access token err: %w, id token err: %w, bearer id token err: %w", accessTokenErr, idTokenErr, bearerIDTokenErr)
+			err := fmt.Errorf("access token err: %w, id token err: %w, bearer id token err: %w", accessTokenErr, idTokenErr, bearerIDTokenErr)
 			return ctx, status.Errorf(codes.Unauthenticated, "token parse error %s", err)
 		}
 
@@ -446,10 +446,12 @@ func IdentityContextFromRequest(ctx context.Context, req *http.Request, authCtx 
 				return identityCtx, nil
 			}
 
-			// The bearer token may be an ID token from the userAuth provider sent with the wrong scheme.
-			if provider := authCtx.OidcProvider(); provider != nil {
-				identityCtx, idTokenErr := IdentityContextFromIDTokenToken(ctx, tokenStr, authCtx.Options().UserAuth.OpenID.ClientID,
-					provider, nil)
+			// The bearer token may be an ID token from the userAuth provider sent with the wrong scheme. An empty
+			// client id would make ParseIDTokenAndValidate skip the audience, issuer and expiry checks, so the
+			// fallback requires one.
+			clientID := authCtx.Options().UserAuth.OpenID.ClientID
+			if provider := authCtx.OidcProvider(); provider != nil && clientID != "" {
+				identityCtx, idTokenErr := IdentityContextFromIDTokenToken(ctx, tokenStr, clientID, provider, nil)
 				if idTokenErr == nil {
 					return identityCtx, nil
 				}

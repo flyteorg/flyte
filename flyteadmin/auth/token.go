@@ -120,6 +120,12 @@ func GRPCGetIdentityFromBearerIDToken(ctx context.Context, clientID string, prov
 		return nil, errors.Errorf(ErrJwtValidation, "no OIDC provider configured to validate a bearer token as an ID token")
 	}
 
+	// With an empty client id ParseIDTokenAndValidate skips the audience, issuer and expiry checks; never fall back
+	// to ID token validation in that mode.
+	if clientID == "" {
+		return nil, errors.Errorf(ErrJwtValidation, "no OIDC client id configured; a bearer token is not validated as an ID token")
+	}
+
 	tokenStr, err := grpcauth.AuthFromMD(ctx, BearerScheme)
 	if err != nil {
 		return nil, errors.Wrapf(ErrJwtValidation, err, "Could not retrieve bearer token from metadata")
