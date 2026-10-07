@@ -16,8 +16,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	s32 "github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/smithy-go"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -178,12 +177,12 @@ func (mockStowItem) Metadata() (map[string]interface{}, error) {
 }
 
 func TestAwsBucketIsNotFound(t *testing.T) {
-	for name, err := range errorWrappings(awserr.New(s32.ErrCodeNoSuchBucket, "foo", errors2.New("foo"))) {
+	for name, err := range errorWrappings(&smithy.GenericAPIError{Code: awsErrCodeNoSuchBucket, Message: "foo"}) {
 		t.Run("detect is not found/"+name, func(t *testing.T) {
 			assert.True(t, awsBucketIsNotFound(err))
 		})
 	}
-	for name, err := range errorWrappings(awserr.New(s32.ErrCodeInvalidObjectState, "foo", errors2.New("foo"))) {
+	for name, err := range errorWrappings(&smithy.GenericAPIError{Code: "InvalidObjectState", Message: "foo"}) {
 		t.Run("do not detect random errors/"+name, func(t *testing.T) {
 			assert.False(t, awsBucketIsNotFound(err))
 		})
@@ -195,7 +194,7 @@ func TestAwsBucketIsNotFound(t *testing.T) {
 }
 
 func TestAwsBucketAlreadyExists(t *testing.T) {
-	for name, err := range errorWrappings(awserr.New(s32.ErrCodeBucketAlreadyOwnedByYou, "foo", errors2.New("foo"))) {
+	for name, err := range errorWrappings(&smithy.GenericAPIError{Code: awsErrCodeBucketAlreadyOwnedByYou, Message: "foo"}) {
 		t.Run("detect already owned/"+name, func(t *testing.T) {
 			assert.True(t, awsBucketAlreadyExists(err))
 		})
@@ -205,7 +204,7 @@ func TestAwsBucketAlreadyExists(t *testing.T) {
 			assert.True(t, awsBucketAlreadyExists(err))
 		})
 	}
-	for name, err := range errorWrappings(awserr.New(s32.ErrCodeNoSuchBucket, "foo", errors2.New("foo"))) {
+	for name, err := range errorWrappings(&smithy.GenericAPIError{Code: awsErrCodeNoSuchBucket, Message: "foo"}) {
 		t.Run("do not detect random errors/"+name, func(t *testing.T) {
 			assert.False(t, awsBucketAlreadyExists(err))
 		})
@@ -750,7 +749,7 @@ func TestStowStore_WriteRaw(t *testing.T) {
 		assert.NoError(t, err)
 		return s, created, &createCalled
 	}
-	noSuchBucket := awserr.New(s32.ErrCodeNoSuchBucket, "foo", errors2.New("foo"))
+	noSuchBucket := &smithy.GenericAPIError{Code: awsErrCodeNoSuchBucket, Message: "foo"}
 
 	t.Run("create container when not found and write again", func(t *testing.T) {
 		s, created, createCalled := newStore(t, noSuchBucket)
@@ -791,7 +790,7 @@ func TestStowStore_WriteRaw(t *testing.T) {
 				return existing, nil
 			},
 			CreateContainerCb: func(string) (stow.Container, error) {
-				return nil, awserr.New(s32.ErrCodeBucketAlreadyOwnedByYou, "foo", errors2.New("foo"))
+				return nil, &smithy.GenericAPIError{Code: awsErrCodeBucketAlreadyOwnedByYou, Message: "foo"}
 			},
 		}, nil, true, metrics)
 		assert.NoError(t, err)
@@ -1184,5 +1183,223 @@ func TestStowStore_CopyRaw(t *testing.T) {
 
 		assert.NoError(t, s.CopyRaw(context.Background(), source, destination, Options{}))
 		assert.Equal(t, 1, *puts)
+	})
+}
+
+// contextRecorder keeps the contexts the stow methods with a context are called with.
+type contextRecorder struct {
+	got map[string]context.Context
+}
+
+func (r *contextRecorder) record(method string, ctx context.Context) {
+	r.got[method] = ctx
+}
+
+// contextStowLoc, contextStowContainer and contextStowItem have the stow methods with a context
+// on top of the mocks without one.
+type contextStowLoc struct {
+	mockStowLoc
+	*contextRecorder
+}
+
+func (l contextStowLoc) ContainerContext(ctx context.Context, id string) (stow.Container, error) {
+	l.record("Container", ctx)
+	return l.Container(id)
+}
+
+func (l contextStowLoc) CreateContainerContext(ctx context.Context, name string) (stow.Container, error) {
+	l.record("CreateContainer", ctx)
+	return l.CreateContainer(name)
+}
+
+func (l contextStowLoc) ContainersContext(context.Context, string, string, int) ([]stow.Container, string, error) {
+	return nil, "", fmt.Errorf("not implemented")
+}
+
+func (l contextStowLoc) RemoveContainerContext(context.Context, string) error {
+	return fmt.Errorf("not implemented")
+}
+
+func (l contextStowLoc) ItemByURLContext(context.Context, *url.URL) (stow.Item, error) {
+	return nil, fmt.Errorf("not implemented")
+}
+
+type contextStowContainer struct {
+	*mockStowContainer
+	*contextRecorder
+}
+
+func (c contextStowContainer) ItemContext(ctx context.Context, id string) (stow.Item, error) {
+	c.record("Item", ctx)
+	item, err := c.Item(id)
+	if err != nil {
+		return nil, err
+	}
+	return contextStowItem{Item: item, contextRecorder: c.contextRecorder}, nil
+}
+
+func (c contextStowContainer) ItemsContext(ctx context.Context, prefix, cursor string, count int) ([]stow.Item, string, error) {
+	c.record("Items", ctx)
+	return c.Items(prefix, cursor, count)
+}
+
+func (c contextStowContainer) RemoveItemContext(ctx context.Context, id string) error {
+	c.record("RemoveItem", ctx)
+	return c.RemoveItem(id)
+}
+
+func (c contextStowContainer) PutContext(ctx context.Context, name string, r io.Reader, size int64, metadata map[string]interface{}) (stow.Item, error) {
+	c.record("Put", ctx)
+	return c.Put(name, r, size, metadata)
+}
+
+type contextStowItem struct {
+	stow.Item
+	*contextRecorder
+}
+
+func (i contextStowItem) OpenContext(ctx context.Context) (io.ReadCloser, error) {
+	i.record("Open", ctx)
+	return i.Open()
+}
+
+func (i contextStowItem) ETagContext(ctx context.Context) (string, error) {
+	i.record("ETag", ctx)
+	return i.ETag()
+}
+
+func (i contextStowItem) LastModContext(ctx context.Context) (time.Time, error) {
+	i.record("LastMod", ctx)
+	return i.LastMod()
+}
+
+func (i contextStowItem) MetadataContext(ctx context.Context) (map[string]interface{}, error) {
+	i.record("Metadata", ctx)
+	return i.Metadata()
+}
+
+type contextTestKey struct{}
+
+func TestStowStore_PassesContext(t *testing.T) {
+	const container = "container"
+	ref := DataReference("s3://container/path")
+	ctx := context.WithValue(t.Context(), contextTestKey{}, "value")
+
+	newStore := func(t *testing.T) (*StowStore, *contextRecorder) {
+		recorder := &contextRecorder{got: map[string]context.Context{}}
+		c := contextStowContainer{mockStowContainer: newMockStowContainer(container), contextRecorder: recorder}
+		s, err := NewStowRawStore(fQNFn["s3"](container), contextStowLoc{
+			contextRecorder: recorder,
+			mockStowLoc: mockStowLoc{
+				ContainerCb:       func(string) (stow.Container, error) { return c, nil },
+				CreateContainerCb: func(string) (stow.Container, error) { return c, nil },
+			},
+		}, nil, true, metrics)
+		require.NoError(t, err)
+		// forget the contexts of the store's construction
+		clear(recorder.got)
+		return s, recorder
+	}
+
+	// assertPassed checks that each of the stow methods was called with ctx and no other one was.
+	assertPassed := func(t *testing.T, recorder *contextRecorder, methods ...string) {
+		t.Helper()
+		assert.Len(t, recorder.got, len(methods))
+		for _, method := range methods {
+			assert.Equal(t, ctx, recorder.got[method], method)
+		}
+	}
+
+	write := func(t *testing.T, s *StowStore) {
+		t.Helper()
+		require.NoError(t, s.WriteRaw(ctx, ref, 0, Options{}, bytes.NewReader([]byte{})))
+	}
+
+	t.Run("WriteRaw", func(t *testing.T) {
+		s, recorder := newStore(t)
+		write(t, s)
+		assertPassed(t, recorder, "Put")
+	})
+
+	t.Run("Head", func(t *testing.T) {
+		s, recorder := newStore(t)
+		write(t, s)
+		metadata, err := s.Head(ctx, ref)
+		require.NoError(t, err)
+		assert.True(t, metadata.Exists())
+		assertPassed(t, recorder, "Put", "Item", "Metadata", "ETag")
+	})
+
+	t.Run("ReadRaw", func(t *testing.T) {
+		s, recorder := newStore(t)
+		write(t, s)
+		r, err := s.ReadRaw(ctx, ref)
+		require.NoError(t, err)
+		require.NoError(t, r.Close())
+		assertPassed(t, recorder, "Put", "Item", "Open")
+	})
+
+	t.Run("List", func(t *testing.T) {
+		s, recorder := newStore(t)
+		_, _, err := s.List(ctx, ref, 10, NewCursorAtStart())
+		require.NoError(t, err)
+		assertPassed(t, recorder, "Items")
+	})
+
+	t.Run("Delete", func(t *testing.T) {
+		s, recorder := newStore(t)
+		write(t, s)
+		require.NoError(t, s.Delete(ctx, ref))
+		assertPassed(t, recorder, "Put", "RemoveItem")
+	})
+
+	t.Run("CopyRaw", func(t *testing.T) {
+		s, recorder := newStore(t)
+		write(t, s)
+		require.NoError(t, s.CopyRaw(ctx, ref, DataReference("s3://container/copy"), Options{}))
+		// the container of the test is no stow.Copier, so the copy is streamed
+		assertPassed(t, recorder, "Put", "Item", "Metadata", "Open")
+	})
+
+	t.Run("LoadContainer", func(t *testing.T) {
+		s, recorder := newStore(t)
+		_, err := s.LoadContainer(ctx, "other", false)
+		require.NoError(t, err)
+		assertPassed(t, recorder, "Container")
+	})
+
+	t.Run("LoadContainer creates a missing container", func(t *testing.T) {
+		recorder := &contextRecorder{got: map[string]context.Context{}}
+		s := &StowStore{loc: contextStowLoc{
+			contextRecorder: recorder,
+			mockStowLoc: mockStowLoc{
+				ContainerCb:       func(string) (stow.Container, error) { return nil, stow.ErrNotFound },
+				CreateContainerCb: func(string) (stow.Container, error) { return newMockStowContainer(container), nil },
+			},
+		}}
+		_, err := s.LoadContainer(ctx, container, true)
+		require.NoError(t, err)
+		assertPassed(t, recorder, "Container", "CreateContainer")
+	})
+
+	t.Run("a cancelled context stops a store without context methods", func(t *testing.T) {
+		c := newMockStowContainer(container)
+		s, err := NewStowRawStore(fQNFn["s3"](container), &mockStowLoc{
+			ContainerCb:       func(string) (stow.Container, error) { return c, nil },
+			CreateContainerCb: func(string) (stow.Container, error) { return c, nil },
+		}, nil, false, metrics)
+		require.NoError(t, err)
+
+		cancelled, cancel := context.WithCancel(ctx)
+		cancel()
+		assert.ErrorIs(t, s.WriteRaw(cancelled, ref, 0, Options{}, bytes.NewReader([]byte{})), context.Canceled)
+		_, err = s.Head(cancelled, ref)
+		assert.ErrorIs(t, err, context.Canceled)
+		_, err = s.ReadRaw(cancelled, ref)
+		assert.ErrorIs(t, err, context.Canceled)
+		_, _, err = s.List(cancelled, ref, 10, NewCursorAtStart())
+		assert.ErrorIs(t, err, context.Canceled)
+		assert.ErrorIs(t, s.Delete(cancelled, ref), context.Canceled)
+		assert.Empty(t, c.items)
 	})
 }
