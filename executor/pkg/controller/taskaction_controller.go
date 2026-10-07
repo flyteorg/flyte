@@ -50,6 +50,7 @@ import (
 	pluginserrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/gang"
 	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -110,6 +111,9 @@ type TaskActionReconciler struct {
 	eventBatcher      *eventBatcher
 	cluster           string
 	MaxSystemFailures uint32
+	// MaxGangEvictions bounds the gang evictions and admission timeouts a TaskAction may be
+	// relaunched after (Status.GangEvictions). Zero means unlimited.
+	MaxGangEvictions uint32
 	// RequeueDuration overrides how long to wait before reconciling a running
 	// TaskAction again. Any non-positive value means TaskActionDefaultRequeueDuration.
 	RequeueDuration time.Duration
@@ -639,6 +643,53 @@ func (r *TaskActionReconciler) recordSystemError(
 	return r.timeoutAwareRequeue(taskAction, maxRuntime), nil
 }
 
+// gangEvictionBudget is the budget Status.GangEvictions is checked against.
+func (r *TaskActionReconciler) gangEvictionBudget() gang.Budget {
+	return gang.Budget{Max: r.MaxGangEvictions}
+}
+
+// gangEvictionsExceededError is the permanent failure for a gang that was evicted or not
+// admitted more often than the budget allows. It carries the last failure, so the user
+// reads why the gang kept being sent back.
+func gangEvictionsExceededError(evictions, limit uint32, last *core.ExecutionError) *core.ExecutionError {
+	return &core.ExecutionError{
+		Kind: core.ExecutionError_SYSTEM,
+		Code: gang.CodeGangEvictionsExceeded,
+		Message: fmt.Sprintf("gang was evicted or not admitted %d times, over the limit of %d; last: [%s] %s",
+			evictions, limit, last.GetCode(), last.GetMessage()),
+	}
+}
+
+// recordGangRelaunch persists the eviction count after a gang eviction or admission timeout
+// and requeues the TaskAction so the gang is relaunched. Unlike recordSystemError it leaves
+// SystemFailures alone: the budget was checked before the retry event was published.
+func (r *TaskActionReconciler) recordGangRelaunch(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	original *flyteorgv1.TaskAction,
+	pluginID string,
+	failure pluginsCore.PhaseInfo,
+	maxRuntime time.Duration,
+) (ctrl.Result, error) {
+	logger := log.FromContext(ctx)
+	logger.Info("relaunching gang", "plugin", pluginID, "code", failure.Err().GetCode(),
+		"gangEvictions", taskAction.Status.GangEvictions, "limit", r.MaxGangEvictions)
+	if r.Recorder != nil {
+		r.Recorder.Eventf(taskAction, nil, corev1.EventTypeWarning, failure.Err().GetCode(), "HandlingPlugin",
+			"Gang relaunched (%d of limit %d): %s", taskAction.Status.GangEvictions, r.MaxGangEvictions,
+			failure.Err().GetMessage())
+	}
+	if taskActionStatusChanged(original.Status, taskAction.Status) {
+		start := time.Now()
+		updErr := r.Status().Update(ctx, taskAction)
+		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
+		if updErr != nil {
+			logger.Error(updErr, "failed to persist GangEvictions counter")
+		}
+	}
+	return r.timeoutAwareRequeue(taskAction, maxRuntime), nil
+}
+
 // finalizePermanentFailure converts the TaskAction to a terminal PermanentFailure
 // with the given ExecutionError and stamps GC labels.
 func (r *TaskActionReconciler) finalizePermanentFailure(
@@ -866,6 +917,18 @@ func (r *TaskActionReconciler) reconcileTask(
 	phaseInfo := transition.Info()
 
 	if !cacheShortCircuited && isSystemRetryableFailure(phaseInfo) {
+		// A gang taken back by its admission gate, or held past the admission timeout, is
+		// expected in a shared queue and is relaunched like any system retry, but it is
+		// counted against its own budget: SystemFailures resets as soon as the relaunched
+		// gang reports progress, so it would never stop a gang that keeps being evicted,
+		// and its small limit is meant for a broken platform, not for preemption.
+		gangRelaunch := gang.UsesEvictionBudget(phaseInfo.Err())
+		if gangRelaunch && r.gangEvictionBudget().Exhausted(taskAction.Status.GangEvictions) {
+			taskAction.Status.GangEvictions++
+			r.resetPluginResource(ctx, taskAction, p, tCtx)
+			return r.finalizePermanentFailure(ctx, taskAction, originalTaskActionInstance,
+				gangEvictionsExceededError(taskAction.Status.GangEvictions, r.MaxGangEvictions, phaseInfo.Err()))
+		}
 		// The attempt is relaunched in place and nothing past this point reports
 		// the failure that caused it: recordSystemError persists a counter and a
 		// Kubernetes event on the TaskAction, not an action event. Publish it
@@ -881,6 +944,10 @@ func (r *TaskActionReconciler) reconcileTask(
 		// with the failure count.
 		taskAction.Status.SystemRetries++
 		r.resetPluginResource(ctx, taskAction, p, tCtx)
+		if gangRelaunch {
+			taskAction.Status.GangEvictions++
+			return r.recordGangRelaunch(ctx, taskAction, originalTaskActionInstance, p.GetID(), phaseInfo, maxRuntime)
+		}
 		return r.recordSystemError(
 			ctx,
 			taskAction,
@@ -1358,6 +1425,7 @@ func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) b
 		oldStatus.Attempts != newStatus.Attempts ||
 		oldStatus.SystemFailures != newStatus.SystemFailures ||
 		oldStatus.SystemRetries != newStatus.SystemRetries ||
+		oldStatus.GangEvictions != newStatus.GangEvictions ||
 		oldStatus.CacheStatus != newStatus.CacheStatus ||
 		!oldStatus.AttemptStartedAt.Equal(newStatus.AttemptStartedAt) ||
 		!oldStatus.TimeoutAt.Equal(newStatus.TimeoutAt) {

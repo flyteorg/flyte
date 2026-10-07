@@ -275,6 +275,15 @@ spec:
                     description: Message is the human-readable error message.
                     type: string
                 type: object
+              gangEvictions:
+                description: |-
+                  GangEvictions counts the times an admission gate took this TaskAction's gang back
+                  after it had started, or held it past the plugin's admission timeout, and it was
+                  relaunched. These are expected in a shared queue, so they are bounded by their own
+                  budget instead of SystemFailures; unlike SystemFailures this is never reset, so the
+                  budget covers the whole TaskAction across attempts.
+                format: int32
+                type: integer
               phaseHistory:
                 description: |-
                   PhaseHistory is an append-only log of phase transitions. Unlike conditions

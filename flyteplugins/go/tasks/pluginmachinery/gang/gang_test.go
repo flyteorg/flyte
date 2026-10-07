@@ -101,3 +101,18 @@ func TestBudget(t *testing.T) {
 	assert.True(t, Budget{Max: 3}.Exhausted(3))
 	assert.True(t, Budget{Max: 3}.Exhausted(4))
 }
+
+func TestUsesEvictionBudget(t *testing.T) {
+	sys := func(code string) *core.ExecutionError {
+		return &core.ExecutionError{Kind: core.ExecutionError_SYSTEM, Code: code}
+	}
+	usr := func(code string) *core.ExecutionError {
+		return &core.ExecutionError{Kind: core.ExecutionError_USER, Code: code}
+	}
+	assert.True(t, UsesEvictionBudget(sys(CodeGangEvicted)))
+	assert.True(t, UsesEvictionBudget(sys(CodeGangAdmissionTimeout)))
+	assert.False(t, UsesEvictionBudget(usr(CodeGangEvicted)), "a user-kind eviction is charged to the task's retries")
+	assert.False(t, UsesEvictionBudget(usr(CodeGangAdmissionTimeout)))
+	assert.False(t, UsesEvictionBudget(sys("ResourceDeletedExternally")))
+	assert.False(t, UsesEvictionBudget(nil))
+}

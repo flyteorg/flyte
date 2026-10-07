@@ -40,6 +40,7 @@ import (
 	executorplugin "github.com/flyteorg/flyte/v2/executor/pkg/plugin"
 	pluginserrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/gang"
 	k8sPlugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -1645,6 +1646,219 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(persisted.Status.PluginState).To(BeNil(), "the plugin resource was reset")
 			Expect(isTerminal(persisted)).To(BeFalse())
 			Expect(fake.abortCalls).To(Equal(1))
+		})
+
+		gangEvicted := func(at time.Time) pluginsCore.Transition {
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(
+				gang.CodeGangEvicted,
+				"gang evicted by kueue: JobSet suspended after the gang had started",
+				&pluginsCore.TaskInfo{OccurredAt: &at},
+			))
+		}
+		admissionTimedOut := func(at time.Time) pluginsCore.Transition {
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(
+				gang.CodeGangAdmissionTimeout,
+				"JobSet was not admitted within 3m0s (admission-timeout)",
+				&pluginsCore.TaskInfo{OccurredAt: &at},
+			))
+		}
+		const clusteredPluginID = "clustered-plugin"
+		reconcileAll := func(
+			r *TaskActionReconciler, fake *fakePlugin, nn types.NamespacedName, fakeClock *testingclock.FakeClock,
+		) {
+			for i := 0; i < len(fake.transitions); i++ {
+				_, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+				Expect(err).NotTo(HaveOccurred())
+				fakeClock.Step(time.Minute)
+			}
+		}
+
+		It("counts gang evictions apart from system failures and never resets them", func() {
+			base := time.Date(2026, time.October, 7, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			// Evicted, relaunched and running again, twice: the progress in between would
+			// put SystemFailures back to zero, but the eviction count keeps going.
+			fake := &fakePlugin{
+				id: clusteredPluginID,
+				transitions: []pluginsCore.Transition{
+					runningTransition(base),
+					gangEvicted(base.Add(time.Minute)),
+					runningTransition(base.Add(2 * time.Minute)),
+					gangEvicted(base.Add(3 * time.Minute)),
+					runningTransition(base.Add(4 * time.Minute)),
+				},
+			}
+			recorded := &recordingEventsClient{}
+			r := newReconciler(fake, fakeClock, recorded, nil)
+			r.MaxGangEvictions = 10
+			nn := createTaskAction(
+				"gang-evictions-counted",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+
+			reconcileAll(r, fake, nn, fakeClock)
+
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.GangEvictions).To(Equal(uint32(2)))
+			Expect(persisted.Status.SystemFailures).To(BeZero(), "evictions do not count as system failures")
+			Expect(persisted.Status.SystemRetries).To(Equal(uint32(2)), "each eviction is still a system retry")
+			Expect(persisted.Status.Attempts).To(Equal(uint32(1)), "no user retry is spent")
+			Expect(isTerminal(persisted)).To(BeFalse())
+			Expect(fake.abortCalls).To(Equal(2))
+			Expect(systemRetryEvents(recorded.RecordedEvents())).To(HaveLen(2))
+		})
+
+		It("fails with GangEvictionsExceeded once the budget is spent", func() {
+			base := time.Date(2026, time.October, 7, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			fake := &fakePlugin{
+				id: clusteredPluginID,
+				transitions: []pluginsCore.Transition{
+					runningTransition(base),
+					gangEvicted(base.Add(time.Minute)),
+					runningTransition(base.Add(2 * time.Minute)),
+					gangEvicted(base.Add(3 * time.Minute)),
+				},
+			}
+			recorded := &recordingEventsClient{}
+			r := newReconciler(fake, fakeClock, recorded, nil)
+			r.MaxGangEvictions = 1
+			nn := createTaskAction(
+				"gang-evictions-exceeded",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+
+			reconcileAll(r, fake, nn, fakeClock)
+
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.ErrorState).NotTo(BeNil())
+			Expect(persisted.Status.ErrorState.Code).To(Equal(gang.CodeGangEvictionsExceeded))
+			Expect(persisted.Status.ErrorState.Message).To(ContainSubstring("2 times, over the limit of 1"))
+			Expect(persisted.Status.ErrorState.Message).To(ContainSubstring("last: [" + gang.CodeGangEvicted + "]"))
+			Expect(persisted.Status.GangEvictions).To(Equal(uint32(2)))
+			Expect(persisted.Status.Attempts).To(Equal(uint32(1)), "the task's own retries are not used")
+			Expect(systemRetryEvents(recorded.RecordedEvents())).To(HaveLen(1), "no retry event for the eviction that failed")
+			Expect(fake.abortCalls).To(Equal(2), "the evicted resource is cleaned up both times")
+		})
+
+		It("counts admission timeouts against the same budget", func() {
+			base := time.Date(2026, time.October, 7, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			waiting := func(at time.Time) pluginsCore.Transition {
+				return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResourcesInfo(
+					at, pluginsCore.DefaultPhaseVersion, "waiting for gang admission",
+					&pluginsCore.TaskInfo{OccurredAt: &at},
+				))
+			}
+			// A gang that can never be admitted: each relaunch waits, times out, and the
+			// waiting in between would reset SystemFailures, so only the budget ends it.
+			fake := &fakePlugin{
+				id: clusteredPluginID,
+				transitions: []pluginsCore.Transition{
+					waiting(base),
+					admissionTimedOut(base.Add(time.Minute)),
+					waiting(base.Add(2 * time.Minute)),
+					admissionTimedOut(base.Add(3 * time.Minute)),
+					waiting(base.Add(4 * time.Minute)),
+					admissionTimedOut(base.Add(5 * time.Minute)),
+				},
+			}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			r.MaxGangEvictions = 2
+			nn := createTaskAction(
+				"gang-admission-timeouts",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+
+			reconcileAll(r, fake, nn, fakeClock)
+
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.ErrorState.Code).To(Equal(gang.CodeGangEvictionsExceeded))
+			Expect(persisted.Status.ErrorState.Message).To(ContainSubstring("last: [" + gang.CodeGangAdmissionTimeout + "]"))
+			Expect(persisted.Status.GangEvictions).To(Equal(uint32(3)))
+			Expect(persisted.Status.SystemFailures).To(BeZero())
+		})
+
+		It("treats a zero budget as unlimited", func() {
+			base := time.Date(2026, time.October, 7, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			fake := &fakePlugin{
+				id: clusteredPluginID,
+				transitions: []pluginsCore.Transition{
+					runningTransition(base),
+					gangEvicted(base.Add(time.Minute)),
+					gangEvicted(base.Add(2 * time.Minute)),
+					gangEvicted(base.Add(3 * time.Minute)),
+					runningTransition(base.Add(4 * time.Minute)),
+				},
+			}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			nn := createTaskAction(
+				"gang-evictions-unlimited",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+
+			reconcileAll(r, fake, nn, fakeClock)
+
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeFalse())
+			Expect(persisted.Status.GangEvictions).To(Equal(uint32(3)))
+		})
+
+		It("charges a user-kind eviction to the task's retries, not the eviction budget", func() {
+			base := time.Date(2026, time.October, 7, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			at := base.Add(time.Minute)
+			fake := &fakePlugin{
+				id: clusteredPluginID,
+				transitions: []pluginsCore.Transition{
+					runningTransition(base),
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailureWithCleanup(
+						gang.CodeGangEvicted, "gang evicted by kueue", &pluginsCore.TaskInfo{OccurredAt: &at},
+					)),
+				},
+			}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			r.MaxGangEvictions = 1
+			nn := createTaskAction(
+				"gang-eviction-user-kind",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+
+			reconcileAll(r, fake, nn, fakeClock)
+
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.GangEvictions).To(BeZero())
+			Expect(persisted.Status.Attempts).To(Equal(uint32(2)), "a new attempt started")
+		})
+
+		It("leaves other system failures on SystemFailures", func() {
+			base := time.Date(2026, time.October, 7, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			at := base.Add(time.Minute)
+			fake := &fakePlugin{
+				id: clusteredPluginID,
+				transitions: []pluginsCore.Transition{
+					runningTransition(base),
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(
+						"ResourceDeletedExternally", "node lost", &pluginsCore.TaskInfo{OccurredAt: &at},
+					)),
+				},
+			}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			r.MaxGangEvictions = 1
+			nn := createTaskAction(
+				"gang-other-system-failure",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+
+			reconcileAll(r, fake, nn, fakeClock)
+
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.SystemFailures).To(Equal(uint32(1)))
+			Expect(persisted.Status.GangEvictions).To(BeZero())
 		})
 	})
 

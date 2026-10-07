@@ -328,6 +328,14 @@ type TaskActionStatus struct {
 	// +optional
 	SystemRetries uint32 `json:"systemRetries,omitempty"`
 
+	// GangEvictions counts the times an admission gate took this TaskAction's gang back
+	// after it had started, or held it past the plugin's admission timeout, and it was
+	// relaunched. These are expected in a shared queue, so they are bounded by their own
+	// budget instead of SystemFailures; unlike SystemFailures this is never reset, so the
+	// budget covers the whole TaskAction across attempts.
+	// +optional
+	GangEvictions uint32 `json:"gangEvictions,omitempty"`
+
 	// CacheStatus is the latest observed cache lookup result for this action.
 	// +optional
 	CacheStatus core.CatalogCacheStatus `json:"cacheStatus,omitempty"`

@@ -26,6 +26,7 @@ var (
 		CacheService:            serviceclient.ServiceConfig{URL: "http://localhost:8094"},
 		Cluster:                 "",
 		MaxSystemFailures:       3,
+		MaxGangEvictions:        10,
 		MaxConcurrentReconciles: 512,
 		RequeueDuration:         stdconfig.Duration{Duration: 10 * time.Second},
 		GC: GCConfig{
@@ -91,6 +92,11 @@ type Config struct {
 	// errors and plugin-reported system-retryable failures) before a TaskAction is
 	// converted to a permanent failure.
 	MaxSystemFailures int32 `json:"maxSystemFailures" pflag:",Max consecutive system-level failures before forcing permanent failure"`
+
+	// MaxGangEvictions bounds how many times a gang may be evicted by an admission gate, or
+	// time out waiting for admission, and be relaunched, over the whole TaskAction. These do
+	// not count toward MaxSystemFailures. Zero means unlimited.
+	MaxGangEvictions int32 `json:"maxGangEvictions" pflag:",Gang evictions allowed per TaskAction; 0 is unlimited"`
 
 	// MaxConcurrentReconciles is the maximum number of concurrent reconcile loops for TaskActions.
 	MaxConcurrentReconciles int `json:"maxConcurrentReconciles" pflag:",Max concurrent reconcile loops for TaskActions"`

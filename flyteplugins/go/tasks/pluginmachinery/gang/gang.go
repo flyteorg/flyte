@@ -30,8 +30,9 @@ const (
 	CodeGangEvictionsExceeded = "GangEvictionsExceeded"
 
 	// CodeGangAdmissionTimeout is the SYSTEM error code reported when a gate held a gang
-	// that never started for longer than the configured admission timeout. It is an
-	// ordinary system retry, not an eviction: nothing had run.
+	// that never started for longer than the configured admission timeout. It is not an
+	// eviction (nothing had run), but it is relaunched and charged to the same budget, so
+	// a gang that can never be admitted does not retry forever.
 	CodeGangAdmissionTimeout = "GangAdmissionTimeout"
 )
 
@@ -59,10 +60,11 @@ type Eviction struct {
 
 // Policy configures how an eviction is reported.
 type Policy struct {
-	// AsSystemRetry reports the eviction as a SYSTEM-retryable failure, which the
-	// executors turn into a fresh attempt without charging user retries. When
-	// false it is reported as a USER-retryable failure instead, which keeps the
-	// gate's own in-place requeue semantics for deployments that prefer them.
+	// AsSystemRetry reports the eviction as a SYSTEM-retryable failure: the executors
+	// relaunch the attempt in place without charging user retries, and count it against
+	// the eviction budget. When false it is reported as a USER-retryable failure: it
+	// starts a new attempt and is charged to the task's own retries instead. Either way
+	// the gang is relaunched as a new resource.
 	AsSystemRetry bool
 }
 
@@ -103,6 +105,14 @@ func IsEviction(err *core.ExecutionError) bool {
 	return err != nil && err.GetKind() == core.ExecutionError_SYSTEM && err.GetCode() == CodeGangEvicted
 }
 
+// UsesEvictionBudget reports whether err is relaunched against the eviction budget
+// rather than the ordinary system-failure count: a system-retryable gang eviction, or a
+// gang that timed out waiting for admission.
+func UsesEvictionBudget(err *core.ExecutionError) bool {
+	return IsEviction(err) ||
+		(err != nil && err.GetKind() == core.ExecutionError_SYSTEM && err.GetCode() == CodeGangAdmissionTimeout)
+}
+
 // ReasonFromKueueMessage classifies the message Kueue records on the job's
 // "Stopped" event (v0.19) when it evicts a workload.
 func ReasonFromKueueMessage(msg string) Reason {
@@ -135,13 +145,14 @@ func WithMessage(err *core.ExecutionError, msg string) *core.ExecutionError {
 	return out
 }
 
-// Budget bounds how many times one attempt may be evicted before the executor
-// gives up on it. Max == 0 means unlimited.
+// Budget bounds how many times a gang may be relaunched after an eviction or an
+// admission timeout before the executor gives up on it. Max == 0 means unlimited.
 type Budget struct {
 	Max uint32
 }
 
-// Exhausted reports whether evictions has reached the budget.
+// Exhausted reports whether evictions, the relaunches already spent, has reached the
+// budget, so the next eviction must fail instead of being relaunched.
 func (b Budget) Exhausted(evictions uint32) bool {
 	return b.Max > 0 && evictions >= b.Max
 }

@@ -268,6 +268,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("executor: maxSystemFailures must be non-negative, got %d", cfg.MaxSystemFailures)
 	}
 	reconciler.MaxSystemFailures = uint32(cfg.MaxSystemFailures)
+	if cfg.MaxGangEvictions < 0 {
+		return fmt.Errorf("executor: maxGangEvictions must be non-negative, got %d", cfg.MaxGangEvictions)
+	}
+	reconciler.MaxGangEvictions = uint32(cfg.MaxGangEvictions)
 	if cfg.RequeueDuration.Duration < 0 {
 		return fmt.Errorf("executor: requeueDuration must not be negative, got %v", cfg.RequeueDuration.Duration)
 	}
