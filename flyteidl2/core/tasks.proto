@@ -396,6 +396,22 @@ message TaskTemplate {
   // Reuse policy for the task's execution environment (a warm container pool, or a shared,
   // long-lived cluster for cluster-backed plugins like Ray). When unset, no reuse is configured.
   ReusePolicy reuse_policy = 19;
+
+  // The kind of worker that runs this task. The scheduler sends the task only to workers of
+  // this kind; while none has room it waits. Unspecified is the default worker, which runs
+  // containers and plugin tasks.
+  WorkerKind worker_kind = 20;
+}
+
+// The kinds of worker that run tasks. A worker of a kind may further limit itself to some task
+// types and versions of that kind.
+enum WorkerKind {
+  // The default worker: runs containers, and plugin and connector tasks.
+  WORKER_KIND_UNSPECIFIED = 0;
+
+  // Runs sandboxed orchestrator source in an interpreter, with no container
+  // (flyte.sandbox.orchestrator).
+  WORKER_KIND_SANDBOX = 1;
 }
 
 // ----------------- First class Plugins
