@@ -93,6 +93,10 @@ func (p *fakeOIDCProvider) idToken(t *testing.T, audience string) string {
 }
 
 func newBearerIDTokenAuthContext(t *testing.T, provider *oidc.Provider) *mocks.AuthenticationContext {
+	return newBearerIDTokenAuthContextWithClientID(t, provider, testIDTokenClientID)
+}
+
+func newBearerIDTokenAuthContextWithClientID(t *testing.T, provider *oidc.Provider, clientID string) *mocks.AuthenticationContext {
 	resourceServer := &mocks.OAuth2ResourceServer{}
 	resourceServer.EXPECT().ValidateAccessToken(mock.Anything, mock.Anything, mock.Anything).
 		Return(nil, fmt.Errorf("not an access token issued by this server"))
@@ -100,7 +104,7 @@ func newBearerIDTokenAuthContext(t *testing.T, provider *oidc.Provider) *mocks.A
 	authCtx := &mocks.AuthenticationContext{}
 	authCtx.EXPECT().Options().Return(&config.Config{
 		AuthorizedURIs: []stdconfig.URL{{URL: url.URL{Scheme: "https", Host: "flyte.example.com"}}},
-		UserAuth:       config.UserAuthConfig{OpenID: config.OpenIDOptions{ClientID: testIDTokenClientID}},
+		UserAuth:       config.UserAuthConfig{OpenID: config.OpenIDOptions{ClientID: clientID}},
 	})
 	authCtx.EXPECT().OAuth2ResourceServer().Return(resourceServer)
 	authCtx.EXPECT().OidcProvider().Return(provider)
@@ -162,6 +166,53 @@ func TestGetAuthenticationInterceptor_BearerIDToken(t *testing.T) {
 		assert.Error(t, err)
 		assert.Equal(t, codes.Unauthenticated, status.Code(err))
 	})
+
+	// An empty client id makes ParseIDTokenAndValidate skip the audience, issuer and expiry checks, so the fallback
+	// must not run at all in that configuration, even for a token the provider signed.
+	t.Run("empty client id never validates a bearer token as an id token", func(t *testing.T) {
+		authCtx := newBearerIDTokenAuthContextWithClientID(t, provider, "")
+		ctx := metadata.NewIncomingContext(context.Background(),
+			metadata.Pairs(DefaultAuthorizationHeader, BearerScheme+" "+idp.idToken(t, testIDTokenClientID)))
+
+		_, err := GetAuthenticationInterceptor(authCtx)(ctx)
+		assert.Error(t, err)
+		assert.Equal(t, codes.Unauthenticated, status.Code(err))
+		assert.Contains(t, err.Error(), "no OIDC client id configured")
+	})
+}
+
+func TestGRPCGetIdentityFromBearerIDToken(t *testing.T) {
+	idp := newFakeOIDCProvider(t)
+	defer idp.server.Close()
+	provider := idp.provider(t)
+
+	t.Run("no authorization metadata", func(t *testing.T) {
+		_, err := GRPCGetIdentityFromBearerIDToken(context.Background(), testIDTokenClientID, provider)
+		assert.Error(t, err)
+	})
+
+	t.Run("blank bearer token", func(t *testing.T) {
+		ctx := metadata.NewIncomingContext(context.Background(), metadata.Pairs(DefaultAuthorizationHeader, BearerScheme+" "))
+		_, err := GRPCGetIdentityFromBearerIDToken(ctx, testIDTokenClientID, provider)
+		assert.Error(t, err)
+	})
+
+	t.Run("nil provider", func(t *testing.T) {
+		ctx := metadata.NewIncomingContext(context.Background(),
+			metadata.Pairs(DefaultAuthorizationHeader, BearerScheme+" "+idp.idToken(t, testIDTokenClientID)))
+		_, err := GRPCGetIdentityFromBearerIDToken(ctx, testIDTokenClientID, nil)
+		assert.Error(t, err)
+	})
+
+	t.Run("valid token with user info metadata", func(t *testing.T) {
+		ctx := metadata.NewIncomingContext(context.Background(), metadata.Pairs(
+			DefaultAuthorizationHeader, BearerScheme+" "+idp.idToken(t, testIDTokenClientID),
+			UserInfoMDKey, `{"email":"from-metadata@example.com"}`))
+		identityCtx, err := GRPCGetIdentityFromBearerIDToken(ctx, testIDTokenClientID, provider)
+		assert.NoError(t, err)
+		assert.Equal(t, testIDTokenSubject, identityCtx.UserID())
+		assert.Equal(t, "from-metadata@example.com", identityCtx.UserInfo().GetEmail())
+	})
 }
 
 func TestIdentityContextFromRequest_BearerIDToken(t *testing.T) {
@@ -188,5 +239,26 @@ func TestIdentityContextFromRequest_BearerIDToken(t *testing.T) {
 		identityCtx, err := IdentityContextFromRequest(ctx, req, authCtx)
 		assert.Error(t, err)
 		assert.Nil(t, identityCtx)
+	})
+
+	t.Run("empty client id never validates a bearer token as an id token", func(t *testing.T) {
+		authCtx := newBearerIDTokenAuthContextWithClientID(t, provider, "")
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/projects", nil)
+		req.Header.Set(DefaultAuthorizationHeader, BearerScheme+" "+idp.idToken(t, testIDTokenClientID))
+
+		identityCtx, err := IdentityContextFromRequest(ctx, req, authCtx)
+		assert.Error(t, err)
+		assert.Nil(t, identityCtx)
+	})
+
+	t.Run("no provider configured returns the access token error", func(t *testing.T) {
+		authCtx := newBearerIDTokenAuthContext(t, nil)
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/projects", nil)
+		req.Header.Set(DefaultAuthorizationHeader, BearerScheme+" "+idp.idToken(t, testIDTokenClientID))
+
+		identityCtx, err := IdentityContextFromRequest(ctx, req, authCtx)
+		assert.Error(t, err)
+		assert.Nil(t, identityCtx)
+		assert.Contains(t, err.Error(), "not an access token issued by this server")
 	})
 }
