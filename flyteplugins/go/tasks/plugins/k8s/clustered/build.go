@@ -3,10 +3,15 @@ package clustered
 import (
 	"context"
 	"math"
+	"strconv"
+	"strings"
+	"time"
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/validation"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
@@ -16,6 +21,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	stdutils "github.com/flyteorg/flyte/v2/flytestdlib/utils"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	clusteredpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
 
@@ -82,6 +88,7 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	container := &podSpec.Containers[primaryIdx]
 
 	injectTorchRunEnv(container, &spec)
+	injectStartupTimeoutEnv(container, GetConfig().StartupTimeout.Duration)
 
 	podSpec.RestartPolicy = corev1.RestartPolicyNever
 	replicas := spec.GetReplicas()
@@ -172,6 +179,10 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 		},
 	}
 
+	if err := applyKueue(jobSet, &GetConfig().Kueue, userLabelSources(taskTemplate, taskCtx)); err != nil {
+		return nil, err
+	}
+
 	if ttl := spec.GetTtlSecondsAfterFinished(); ttl != nil {
 		v := ttl.GetValue()
 		if v > math.MaxInt32 {
@@ -182,4 +193,80 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	}
 
 	return jobSet, nil
+}
+
+// kueueQueueNameLabel is the label Kueue reads to pick the LocalQueue a job is submitted to.
+const kueueQueueNameLabel = "kueue.x-k8s.io/queue-name"
+
+// startupTimeoutEnv carries the per-worker startup budget, in whole seconds, to the launcher.
+const startupTimeoutEnv = "FLYTE_CLUSTERED_STARTUP_TIMEOUT"
+
+// labelSource is a set of labels a user controls, named for error messages.
+type labelSource struct {
+	name   string
+	labels map[string]string
+}
+
+// userLabelSources are the labels a user can set on a task: the task's pod template, a
+// pod-template override, and the execution's labels. Platform-owned labels (default labels
+// and named base pod templates) are not included.
+func userLabelSources(taskTemplate *core.TaskTemplate, taskCtx pluginsCore.TaskExecutionContext) []labelSource {
+	meta := taskCtx.TaskExecutionMetadata()
+	return []labelSource{
+		{name: "the task's pod template", labels: taskTemplate.GetK8SPod().GetMetadata().GetLabels()},
+		{name: "the pod template override", labels: meta.GetOverrides().GetPodTemplate().GetMetadata().GetLabels()},
+		{name: "the execution labels", labels: meta.GetLabels()},
+	}
+}
+
+// applyKueue submits the JobSet to the configured Kueue queue: it is created suspended so the
+// gang is admitted as a whole, and labelled with the queue. The queue is set by the platform
+// only. A task that names a different queue through userSources is rejected rather than
+// silently moved, so the user learns that the label has no effect; naming the configured
+// queue is accepted. The label is kept off the pod template so pods carry no queue of their
+// own. A disabled config leaves the JobSet as is.
+func applyKueue(jobSet *jobsetv1alpha2.JobSet, cfg *KueueConfig, userSources []labelSource) error {
+	if !cfg.Enabled {
+		return nil
+	}
+	queue := strings.TrimSpace(cfg.QueueName)
+	if queue == "" {
+		return flyteerr.Errorf(flyteerr.BadTaskSpecification,
+			"plugins.clustered.kueue.queue-name must be set when Kueue is enabled")
+	}
+	if errs := validation.IsValidLabelValue(queue); len(errs) > 0 {
+		return flyteerr.Errorf(flyteerr.BadTaskSpecification,
+			"invalid plugins.clustered.kueue.queue-name %q: %s", queue, strings.Join(errs, "; "))
+	}
+
+	if jobSet.Labels == nil {
+		jobSet.Labels = map[string]string{}
+	}
+	for _, source := range userSources {
+		if chosen, ok := source.labels[kueueQueueNameLabel]; ok && chosen != queue {
+			return flyteerr.Errorf(flyteerr.BadTaskSpecification,
+				"%s set %s=%q, but the Kueue queue is set by the platform (%q); remove the label",
+				source.name, kueueQueueNameLabel, chosen, queue)
+		}
+	}
+
+	jobSet.Labels[kueueQueueNameLabel] = queue
+	// on pod template we delete the label
+	for i := range jobSet.Spec.ReplicatedJobs {
+		delete(jobSet.Spec.ReplicatedJobs[i].Template.Spec.Template.Labels, kueueQueueNameLabel)
+	}
+	jobSet.Spec.Suspend = ptr.To(true)
+	return nil
+}
+
+// injectStartupTimeoutEnv tells every worker how long to wait for its peers. A zero budget
+// leaves the container untouched so the launcher keeps its default.
+func injectStartupTimeoutEnv(container *corev1.Container, budget time.Duration) {
+	seconds := int64(budget / time.Second)
+	if seconds <= 0 {
+		return
+	}
+	container.Env = upsertEnv(container.Env, []corev1.EnvVar{
+		{Name: startupTimeoutEnv, Value: strconv.FormatInt(seconds, 10)},
+	})
 }

@@ -28,6 +28,11 @@ const (
 	// CodeGangEvictionsExceeded is the SYSTEM error code reported when a gang has been
 	// evicted more times than the eviction budget allows.
 	CodeGangEvictionsExceeded = "GangEvictionsExceeded"
+
+	// CodeGangAdmissionTimeout is the SYSTEM error code reported when a gate held a gang
+	// that never started for longer than the configured admission timeout. It is an
+	// ordinary system retry, not an eviction: nothing had run.
+	CodeGangAdmissionTimeout = "GangAdmissionTimeout"
 )
 
 // Reason classifies why a gate released or evicted a gang.

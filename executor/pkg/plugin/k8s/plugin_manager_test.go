@@ -15,6 +15,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	k8stypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -29,6 +30,7 @@ import (
 	pluginsCoreMock "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/gang"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/gpufault"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	k8sMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
@@ -1067,6 +1069,118 @@ func TestClassifyExternalTermination(t *testing.T) {
 			if tt.wantInfo != nil {
 				assert.Same(t, tt.wantInfo, got.Info())
 			}
+		})
+	}
+}
+
+func TestAppendGateReason(t *testing.T) {
+	const jobSetUID = k8stypes.UID("jobset-uid")
+	key := watchedObjectKey{Namespace: "ns", Name: "js", Kind: "JobSet"}
+	base := time.Date(2026, 10, 7, 10, 0, 0, 0, time.UTC)
+	const kueueMessage = "Preempted to accommodate a workload (UID: 1234, JobUID: 5678) " +
+		"due to prioritization in the ClusterQueue"
+	const evictedMessage = "gang evicted by kueue: JobSet suspended after the gang had started; admission was revoked"
+
+	jobSet := func() client.Object {
+		u := &unstructured.Unstructured{}
+		u.SetAPIVersion("jobset.x-k8s.io/v1alpha2")
+		u.SetKind("JobSet")
+		u.SetNamespace("ns")
+		u.SetName("js")
+		u.SetUID(jobSetUID)
+		return u
+	}
+	stopped := func(uid k8stypes.UID, at time.Time, message string) *eventInfo {
+		return &eventInfo{
+			Message: message, Reason: "Stopped", CreatedAt: at, RecordedAt: at, LastObservedAt: at, RegardingUID: uid,
+		}
+	}
+	info := &pluginsCore.TaskInfo{OccurredAt: &base}
+	evicted := func() pluginsCore.PhaseInfo {
+		return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(gang.CodeGangEvicted, evictedMessage, info).
+			WithVersion(3)
+	}
+
+	tests := []struct {
+		name        string
+		events      []*eventInfo
+		phaseInfo   pluginsCore.PhaseInfo
+		noWatcher   bool
+		wantMessage string
+	}{
+		{
+			name:        "the gate's Stopped event is appended",
+			events:      []*eventInfo{stopped(jobSetUID, base, kueueMessage)},
+			phaseInfo:   evicted(),
+			wantMessage: evictedMessage + "; gate: " + kueueMessage,
+		},
+		{
+			name: "the latest Stopped event wins",
+			events: []*eventInfo{
+				stopped(jobSetUID, base, "Not admitted by cluster queue"),
+				stopped(jobSetUID, base.Add(time.Minute), kueueMessage),
+			},
+			phaseInfo:   evicted(),
+			wantMessage: evictedMessage + "; gate: " + kueueMessage,
+		},
+		{
+			name:      "an event of another object with the same name is not credited",
+			events:    []*eventInfo{stopped("other-uid", base, kueueMessage)},
+			phaseInfo: evicted(),
+		},
+		{
+			name:      "no event leaves the failure as is",
+			phaseInfo: evicted(),
+		},
+		{
+			name:      "there is no event watcher",
+			events:    []*eventInfo{stopped(jobSetUID, base, kueueMessage)},
+			phaseInfo: evicted(),
+			noWatcher: true,
+		},
+		{
+			name:        "a user-kind eviction gets the reason too and stays user-kind",
+			events:      []*eventInfo{stopped(jobSetUID, base, kueueMessage)},
+			phaseInfo:   pluginsCore.PhaseInfoRetryableFailureWithCleanup(gang.CodeGangEvicted, evictedMessage, info),
+			wantMessage: evictedMessage + "; gate: " + kueueMessage,
+		},
+		{
+			name:      "a running task is left alone",
+			events:    []*eventInfo{stopped(jobSetUID, base, kueueMessage)},
+			phaseInfo: pluginsCore.PhaseInfoRunning(1, info),
+		},
+		{
+			name:   "other system failures are left alone",
+			events: []*eventInfo{stopped(jobSetUID, base, kueueMessage)},
+			phaseInfo: pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(
+				gang.CodeGangAdmissionTimeout, "not admitted", info),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pm := NewPluginManager("test-plugin", nil, nil)
+			if !tt.noWatcher {
+				pm.eventWatcher = &fakeEventWatcher{events: map[watchedObjectKey][]*eventInfo{key: tt.events}}
+			}
+
+			got := pm.appendGateReason(jobSet(), tt.phaseInfo)
+
+			assert.Equal(t, tt.phaseInfo.Phase(), got.Phase())
+			if tt.phaseInfo.Err() == nil {
+				assert.Nil(t, got.Err())
+				return
+			}
+			assert.Equal(t, tt.phaseInfo.Err().GetCode(), got.Err().GetCode())
+			assert.Equal(t, tt.phaseInfo.Err().GetKind(), got.Err().GetKind())
+			assert.Equal(t, tt.phaseInfo.CleanupOnFailure(), got.CleanupOnFailure())
+			assert.Equal(t, tt.phaseInfo.Version(), got.Version())
+			if tt.wantMessage == "" {
+				assert.Equal(t, tt.phaseInfo.Err().GetMessage(), got.Err().GetMessage())
+				return
+			}
+			assert.Equal(t, tt.wantMessage, got.Err().GetMessage())
+			assert.Same(t, info, got.Info())
 		})
 	}
 }

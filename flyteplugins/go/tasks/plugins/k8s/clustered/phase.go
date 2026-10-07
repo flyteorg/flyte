@@ -86,6 +86,13 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 		phaseInfo = beforeStart(ctx, jobSet, condition, suspended, pods, maxRestarts, pluginState, &taskInfo)
 	}
 
+	// The tree is built so that a non-terminal phase never moves backwards: downstream drops
+	// a lower phase and its reason. If one ever does, say so instead of losing it silently.
+	if !phaseInfo.Phase().IsTerminal() && !pluginState.Phase.IsTerminal() && phaseInfo.Phase() < pluginState.Phase {
+		logger.Warnf(ctx, "JobSet %s/%s: computed phase %s is behind the reported phase %s (%s); it will be dropped",
+			jobSet.Namespace, jobSet.Name, phaseInfo.Phase(), pluginState.Phase, phaseInfo.Reason())
+	}
+
 	// A new reason within the same phase needs a new version, or its event is dropped
 	// as a duplicate of the previous one.
 	k8s.MaybeUpdatePhaseVersion(&phaseInfo, &pluginState)
@@ -119,6 +126,9 @@ func beforeStart(
 
 	// Not admitted yet: the gate holds the JobSet and no pods exist.
 	if suspended {
+		if phase, ok := admissionTimedOut(jobSet, GetConfig().Kueue.AdmissionTimeout.Duration, taskInfo); ok {
+			return phase
+		}
 		reason := "waiting for gang admission"
 		if reachedInitializing {
 			reason = "released by admission gate before all workers were ready; waiting for re-admission"
@@ -182,9 +192,33 @@ func runningPhaseInfo(taskInfo *pluginsCore.TaskInfo, reason string) pluginsCore
 // only at creation, and only when Kueue is enabled.
 const evictionSource = "kueue"
 
-// evictionPolicy decides how a post-start eviction is reported. Plugin config
-// (plugins.clustered.kueue.evict-as-system-retry) takes this over once it exists.
-var evictionPolicy = gang.Policy{AsSystemRetry: true}
+// evictionPolicy decides how a post-start eviction is reported
+// (plugins.clustered.kueue.evict-as-system-retry).
+func evictionPolicy() gang.Policy {
+	return gang.Policy{AsSystemRetry: GetConfig().Kueue.EvictAsSystemRetry}
+}
+
+// admissionTimedOut fails a JobSet that has been held suspended without ever starting for
+// longer than the admission timeout, measured from its creation. It is a system retry: the
+// next attempt is a fresh JobSet that queues again. A zero timeout disables it.
+func admissionTimedOut(
+	jobSet *jobsetv1alpha2.JobSet,
+	timeout time.Duration,
+	taskInfo *pluginsCore.TaskInfo,
+) (pluginsCore.PhaseInfo, bool) {
+	if timeout <= 0 || jobSet.CreationTimestamp.IsZero() {
+		return pluginsCore.PhaseInfoUndefined, false
+	}
+	held := taskInfo.OccurredAt.Sub(jobSet.CreationTimestamp.Time)
+	if held <= timeout {
+		return pluginsCore.PhaseInfoUndefined, false
+	}
+	return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(
+		gang.CodeGangAdmissionTimeout,
+		fmt.Sprintf("JobSet was not admitted within %s (admission-timeout); held for %s", timeout, held.Round(time.Second)),
+		taskInfo,
+	), true
+}
 
 // evictedPhaseInfo reports a gang the gate revoked after it had fully started. The
 // attempt is over: the policy decides whether it is charged as a system or a user
@@ -201,7 +235,7 @@ func evictedPhaseInfo(condition *metav1.Condition, taskInfo *pluginsCore.TaskInf
 		Source:  evictionSource,
 		Reason:  gang.ReasonUnknown,
 		Message: message,
-	}.ExecutionError(evictionPolicy)
+	}.ExecutionError(evictionPolicy())
 	if execErr.GetKind() == core.ExecutionError_SYSTEM {
 		return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(execErr.GetCode(), execErr.GetMessage(), taskInfo)
 	}

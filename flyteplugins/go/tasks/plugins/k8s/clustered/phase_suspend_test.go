@@ -144,9 +144,7 @@ func TestGetTaskPhase_Suspended_ReadyStatus_GangEvicted(t *testing.T) {
 }
 
 func TestGetTaskPhase_Suspended_UserRetryPolicy(t *testing.T) {
-	prev := evictionPolicy
-	evictionPolicy = gang.Policy{AsSystemRetry: false}
-	t.Cleanup(func() { evictionPolicy = prev })
+	withConfig(t, func(c *Config) { c.Kueue.EvictAsSystemRetry = false })
 
 	js := makeJobSet(jobsetv1alpha2.JobSetSuspended, metav1.ConditionTrue, true)
 	pCtx := dummyPluginCtxWithState(twoNodeSpec(), emptyK8sReader(),
