@@ -21,7 +21,6 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/gang"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/gpufault"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	pluginsUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
@@ -334,7 +333,6 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 			lastEventRecordedAt,
 		)
 		phaseInfo = pm.classifyExternalTermination(resource, phaseInfo)
-		phaseInfo = pm.appendGateReason(resource, phaseInfo)
 		phaseInfo = pm.classifyGpuFailure(resource, phaseInfo)
 		transition.SetInfo(phaseInfo)
 	}
@@ -534,18 +532,18 @@ func (pm *PluginManager) classifyExternalTermination(
 	return phaseInfo
 }
 
-// stoppedEventMessage is the message of the latest Stopped event recorded against the object,
-// when there is one that can be credited to this object.
-func (pm *PluginManager) stoppedEventMessage(o client.Object) (string, bool) {
+// stoppedEventMessage is the message of the latest Stopped event recorded against the pod,
+// when there is one that can be credited to this pod.
+func (pm *PluginManager) stoppedEventMessage(pod *v1.Pod) (string, bool) {
 	if pm.eventWatcher == nil {
 		return "", false
 	}
 	var latest *eventInfo
-	for _, event := range pm.eventWatcher.List(objectKeyFor(o), time.Time{}, time.Time{}) {
+	for _, event := range pm.eventWatcher.List(objectKeyFor(pod), time.Time{}, time.Time{}) {
 		if event.Reason != stoppedEventReason || event.RegardingUID == "" {
 			continue
 		}
-		if o.GetUID() != "" && event.RegardingUID != o.GetUID() {
+		if pod.GetUID() != "" && event.RegardingUID != pod.GetUID() {
 			continue
 		}
 		if latest == nil || event.CreatedAt.After(latest.CreatedAt) {
@@ -556,35 +554,6 @@ func (pm *PluginManager) stoppedEventMessage(o client.Object) (string, bool) {
 		return "", false
 	}
 	return latest.Message, true
-}
-
-// appendGateReason appends the admission gate's own explanation to a gang eviction the
-// plugin reported. The plugin sees only that the gate suspended a running gang; the gate
-// (Kueue) records why on the suspended object as a Stopped event, for example the workload
-// that preempted it. Only events whose regarding UID is the object's are credited. The
-// failure keeps its code, its kind (system or user, as the plugin's eviction policy chose)
-// and its cleanup.
-//
-// The latest Stopped event is used. If the gate's event for this eviction has not reached
-// the cache yet, that can be an earlier release of the same object before it started; it
-// only affects the message.
-func (pm *PluginManager) appendGateReason(
-	resource client.Object,
-	phaseInfo pluginsCore.PhaseInfo,
-) pluginsCore.PhaseInfo {
-	if resource == nil || !phaseInfo.Phase().IsFailure() || phaseInfo.Err().GetCode() != gang.CodeGangEvicted {
-		return phaseInfo
-	}
-	message, found := pm.stoppedEventMessage(resource)
-	if !found {
-		return phaseInfo
-	}
-	execErr := gang.WithMessage(phaseInfo.Err(), message)
-	enriched := pluginsCore.PhaseInfoFailed(phaseInfo.Phase(), execErr, phaseInfo.Info())
-	if phaseInfo.CleanupOnFailure() {
-		enriched = enriched.WithCleanupOnFailure()
-	}
-	return enriched.WithVersion(phaseInfo.Version())
 }
 
 // phaseInfoOccurredAt is the time the plugin put on the failure, or the zero time when it

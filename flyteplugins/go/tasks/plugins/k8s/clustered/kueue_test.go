@@ -2,270 +2,290 @@ package clustered
 
 import (
 	"context"
-	"fmt"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
+	k8stypes "k8s.io/apimachinery/pkg/types"
+	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
-	flyteerr "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	coreMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/gang"
 	plugink8s "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
-	stdconfig "github.com/flyteorg/flyte/v2/flytestdlib/config"
-	stdutils "github.com/flyteorg/flyte/v2/flytestdlib/utils"
+	k8smocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	clusteredpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
 
 const (
-	platformQueue    = "platform-queue"
-	teamQueue        = "team-a"
-	execLabelsSource = "the execution labels"
+	testJobSetUID    = k8stypes.UID("jobset-uid")
+	testQueue        = "team-a"
+	preemptedMessage = "Preempted to accommodate a workload (UID: 1234) due to prioritization in the ClusterQueue"
 )
 
-// withConfig applies edit to a copy of the default plugin config for the duration of the test.
-func withConfig(t *testing.T, edit func(*Config)) {
-	t.Helper()
-	prev := *GetConfig()
-	cfg := defaultConfig
-	edit(&cfg)
-	require.NoError(t, SetConfig(&cfg))
-	t.Cleanup(func() { require.NoError(t, SetConfig(&prev)) })
+// inadmissible is the QuotaReserved condition Kueue writes when it cannot admit a Workload.
+func inadmissible(message string) map[string]interface{} {
+	return workloadCond(workloadConditionQuotaReserved, "False", quotaReservedInadmissible, message)
 }
 
-func kueueTestSpec() *clusteredpb.ClusteredTaskSpec {
-	return &clusteredpb.ClusteredTaskSpec{
-		Replicas:     2,
-		NprocPerNode: 1,
-		Runtime: &clusteredpb.Runtime{
-			Kind: &clusteredpb.Runtime_Torchrun{Torchrun: &clusteredpb.TorchRuntime{}},
+func workloadCond(conditionType, status, reason, message string) map[string]interface{} {
+	return map[string]interface{}{"type": conditionType, "status": status, "reason": reason, "message": message}
+}
+
+// workload is a Kueue Workload for the JobSet with the given UID, as Kueue writes it.
+func workload(jobSetUID k8stypes.UID, conditions ...map[string]interface{}) *unstructured.Unstructured {
+	items := make([]interface{}, 0, len(conditions))
+	for _, c := range conditions {
+		items = append(items, c)
+	}
+	return &unstructured.Unstructured{Object: map[string]interface{}{
+		"apiVersion": kueueAPIVersion,
+		"kind":       "Workload",
+		"metadata": map[string]interface{}{
+			"name":      "jobset-" + testJobName + "-abcde",
+			"namespace": testNS,
+			"labels":    map[string]interface{}{kueueJobUIDLabel: string(jobSetUID)},
 		},
-	}
+		"status": map[string]interface{}{"conditions": items},
+	}}
 }
 
-// podTemplateWithQueueLabel is a pod template whose user labels try to pick a Kueue queue.
-func podTemplateWithQueueLabel(t *testing.T, queue string) *core.K8SPod {
-	podSpec, err := stdutils.MarshalObjToStruct(corev1.PodSpec{
-		Containers: []corev1.Container{{Name: primaryContainerName, Image: testImage}},
-	})
-	require.NoError(t, err)
-	return &core.K8SPod{
-		Metadata:             &core.K8SObjectMetadata{Labels: map[string]string{kueueQueueNameLabel: queue}},
-		PodSpec:              podSpec,
-		PrimaryContainerName: primaryContainerName,
-	}
-}
-
-func buildJobSet(t *testing.T, podTemplate *core.K8SPod) *jobsetv1alpha2.JobSet {
+// readerWith serves the given Kueue objects. It uses its own scheme because the fake client
+// registers unknown unstructured kinds into the scheme it is given.
+func readerWith(t *testing.T, objects ...client.Object) client.Reader {
 	t.Helper()
-	obj, err := clusteredResourceHandler{}.BuildResource(context.Background(),
-		dummyTaskCtx(buildTaskTemplate(kueueTestSpec()), podTemplate))
-	require.NoError(t, err)
-	jobSet, ok := obj.(*jobsetv1alpha2.JobSet)
-	require.True(t, ok)
-	return jobSet
+	scheme := runtime.NewScheme()
+	require.NoError(t, clientgoscheme.AddToScheme(scheme))
+	return fake.NewClientBuilder().WithScheme(scheme).WithObjects(objects...).Build()
 }
 
-func primaryEnv(jobSet *jobsetv1alpha2.JobSet) map[string]string {
-	env := map[string]string{}
-	for _, c := range jobSet.Spec.ReplicatedJobs[0].Template.Spec.Template.Spec.Containers {
-		if c.Name != jobSet.Annotations[primaryContainerAnnotation] {
-			continue
+// kueuePluginCtx is a plugin context for an attempt of a task with maxAttempts attempts.
+func kueuePluginCtx(
+	reader client.Reader, state plugink8s.PluginState, retryAttempt, maxAttempts uint32,
+) *k8smocks.PluginContext {
+	pCtx := &k8smocks.PluginContext{}
+	taskReader := &coreMocks.TaskReader{}
+	taskReader.EXPECT().Read(mock.Anything).Return(twoNodeSpec(), nil)
+	pCtx.EXPECT().TaskReader().Return(taskReader)
+	pCtx.EXPECT().K8sReader().Return(reader)
+
+	tID := &coreMocks.TaskExecutionID{}
+	tID.EXPECT().GetID().Return(&core.TaskExecutionIdentifier{
+		NodeExecutionId: &core.NodeExecutionIdentifier{
+			ExecutionId: &core.WorkflowExecutionIdentifier{Name: "exec"},
+		},
+		RetryAttempt: retryAttempt,
+	})
+	tID.EXPECT().GetGeneratedName().Return(testJobName)
+	tID.EXPECT().GetUniqueNodeID().Return("node-id").Maybe()
+	meta := &coreMocks.TaskExecutionMetadata{}
+	meta.EXPECT().GetTaskExecutionID().Return(tID)
+	meta.EXPECT().GetMaxAttempts().Return(maxAttempts).Maybe()
+	pCtx.EXPECT().TaskExecutionMetadata().Return(meta)
+
+	stateReader := &coreMocks.PluginStateReader{}
+	stateReader.EXPECT().Get(mock.Anything).RunAndReturn(func(v interface{}) (uint8, error) {
+		if s, ok := v.(*plugink8s.PluginState); ok {
+			*s = state
 		}
-		for _, e := range c.Env {
-			env[e.Name] = e.Value
-		}
-	}
-	return env
+		return 0, nil
+	})
+	pCtx.EXPECT().PluginStateReader().Return(stateReader)
+	return pCtx
 }
 
-func TestBuildResource_KueueDisabled_Unchanged(t *testing.T) {
-	baseline := buildJobSet(t, podTemplateWithQueueLabel(t, "test-queue"))
-
-	// Every other Kueue setting is ignored while Kueue is disabled.
-	withConfig(t, func(c *Config) {
-		c.Kueue = KueueConfig{
-			Enabled:            false,
-			QueueName:          "other-queue",
-			EvictAsSystemRetry: false,
-			AdmissionTimeout:   stdconfig.Duration{Duration: time.Minute},
-		}
-	})
-	got := buildJobSet(t, podTemplateWithQueueLabel(t, "test-queue"))
-
-	assert.Equal(t, baseline, got)
-	assert.Nil(t, got.Spec.Suspend)
-	// Without Kueue enabled the plugin does not own the label: it passes through as before.
-	assert.Equal(t, "test-queue", got.Labels[kueueQueueNameLabel])
-}
-
-func TestBuildResource_KueueEnabled_LabelAndSuspend(t *testing.T) {
-	withConfig(t, func(c *Config) { c.Kueue.Enabled = true })
-
-	jobSet := buildJobSet(t, nil)
-
-	assert.Equal(t, "user-queue", jobSet.Labels[kueueQueueNameLabel])
-	require.NotNil(t, jobSet.Spec.Suspend)
-	assert.True(t, *jobSet.Spec.Suspend)
-}
-
-func TestBuildResource_KueueEnabled_UserQueueRejected(t *testing.T) {
-	withConfig(t, func(c *Config) {
-		c.Kueue.Enabled = true
-		c.Kueue.QueueName = platformQueue
-	})
-
-	_, err := clusteredResourceHandler{}.BuildResource(context.Background(),
-		dummyTaskCtx(buildTaskTemplate(kueueTestSpec()), podTemplateWithQueueLabel(t, "chosen-by-user")))
-
-	require.Error(t, err)
-	assert.ErrorContains(t, err, "["+flyteerr.BadTaskSpecification+"]")
-	assert.ErrorContains(t, err, "the pod template override")
-	assert.ErrorContains(t, err, `"chosen-by-user"`)
-	assert.ErrorContains(t, err, fmt.Sprintf("%q", platformQueue))
-}
-
-func TestBuildResource_KueueEnabled_UserNamesConfiguredQueue(t *testing.T) {
-	withConfig(t, func(c *Config) {
-		c.Kueue.Enabled = true
-		c.Kueue.QueueName = platformQueue
-	})
-
-	jobSet := buildJobSet(t, podTemplateWithQueueLabel(t, platformQueue))
-
-	assert.Equal(t, platformQueue, jobSet.Labels[kueueQueueNameLabel])
-	podLabels := jobSet.Spec.ReplicatedJobs[0].Template.Spec.Template.Labels
-	assert.NotContains(t, podLabels, kueueQueueNameLabel, "pods must not carry a queue of their own")
-	assert.Equal(t, "my-exec", podLabels["execution-id"], "other labels are untouched")
-}
-
-func TestApplyKueue_UserSources(t *testing.T) {
-	cfg := &KueueConfig{Enabled: true, QueueName: platformQueue}
-	newJobSet := func() *jobsetv1alpha2.JobSet {
-		return &jobsetv1alpha2.JobSet{Spec: jobsetv1alpha2.JobSetSpec{
-			ReplicatedJobs: []jobsetv1alpha2.ReplicatedJob{{Name: workersReplicatedJobName}},
-		}}
-	}
-
-	t.Run("execution label naming another queue is rejected", func(t *testing.T) {
-		err := applyKueue(newJobSet(), cfg, []labelSource{
-			{name: execLabelsSource, labels: map[string]string{kueueQueueNameLabel: teamQueue}},
-		})
-		require.Error(t, err)
-		assert.ErrorContains(t, err, execLabelsSource)
-	})
-
-	t.Run("no user label is labelled and suspended", func(t *testing.T) {
-		js := newJobSet()
-		require.NoError(t, applyKueue(js, cfg, []labelSource{{name: execLabelsSource}}))
-		assert.Equal(t, platformQueue, js.Labels[kueueQueueNameLabel])
-		require.NotNil(t, js.Spec.Suspend)
-		assert.True(t, *js.Spec.Suspend)
-	})
-
-	t.Run("disabled ignores user labels", func(t *testing.T) {
-		js := newJobSet()
-		require.NoError(t, applyKueue(js, &KueueConfig{QueueName: platformQueue}, []labelSource{
-			{name: execLabelsSource, labels: map[string]string{kueueQueueNameLabel: teamQueue}},
-		}))
-		assert.Nil(t, js.Spec.Suspend)
-		assert.NotContains(t, js.Labels, kueueQueueNameLabel)
-	})
-}
-
-func TestBuildResource_KueueEnabled_InvalidQueueName(t *testing.T) {
-	for name, queue := range map[string]string{
-		"empty":         "  ",
-		"invalid label": "not a/valid label",
-	} {
-		t.Run(name, func(t *testing.T) {
-			withConfig(t, func(c *Config) {
-				c.Kueue.Enabled = true
-				c.Kueue.QueueName = queue
-			})
-			_, err := clusteredResourceHandler{}.BuildResource(context.Background(),
-				dummyTaskCtx(buildTaskTemplate(kueueTestSpec()), nil))
-			require.Error(t, err)
-			assert.ErrorContains(t, err, "["+flyteerr.BadTaskSpecification+"]")
-			assert.ErrorContains(t, err, "plugins.clustered.kueue.queue-name")
-		})
-	}
-}
-
-func TestBuildResource_StartupTimeout(t *testing.T) {
-	t.Run("injected in whole seconds", func(t *testing.T) {
-		withConfig(t, func(c *Config) {
-			c.StartupTimeout = stdconfig.Duration{Duration: 20*time.Minute + 500*time.Millisecond}
-		})
-		assert.Equal(t, "1200", primaryEnv(buildJobSet(t, nil))[startupTimeoutEnv])
-	})
-	t.Run("independent of Kueue", func(t *testing.T) {
-		withConfig(t, func(c *Config) {
-			c.StartupTimeout = stdconfig.Duration{Duration: time.Minute}
-			c.Kueue.Enabled = true
-		})
-		assert.Equal(t, "60", primaryEnv(buildJobSet(t, nil))[startupTimeoutEnv])
-	})
-	t.Run("unset leaves the launcher default", func(t *testing.T) {
-		assert.NotContains(t, primaryEnv(buildJobSet(t, nil)), startupTimeoutEnv)
-	})
-}
-
-// suspendedSince is a never-started JobSet held suspended since created.
-func suspendedSince(created time.Time) *jobsetv1alpha2.JobSet {
+// suspendedJobSet is a JobSet Kueue holds or took back, in queue testQueue.
+func suspendedJobSet() *jobsetv1alpha2.JobSet {
 	js := makeJobSet(jobsetv1alpha2.JobSetSuspended, metav1.ConditionTrue, true)
-	js.CreationTimestamp = metav1.NewTime(created)
+	js.UID = testJobSetUID
+	js.Labels = map[string]string{kueueQueueNameLabel: testQueue}
 	return js
 }
 
-func TestGetTaskPhase_AdmissionTimeout(t *testing.T) {
-	ctx := context.Background()
+var startedState = plugink8s.PluginState{Phase: pluginsCore.PhaseRunning, PhaseVersion: 1}
 
-	t.Run("exceeded is a system retry with cleanup", func(t *testing.T) {
-		withConfig(t, func(c *Config) { c.Kueue.AdmissionTimeout = stdconfig.Duration{Duration: 2 * time.Hour} })
+func TestGetTaskPhase_Evicted_ClassifiedByWorkloadReason(t *testing.T) {
+	tests := []struct {
+		name         string
+		workload     *unstructured.Unstructured
+		retryAttempt uint32
+		maxAttempts  uint32
+		wantKind     core.ExecutionError_ErrorKind
+		wantInMsg    []string
+	}{
+		{
+			name: "preemption is the user's and uses a retry",
+			workload: workload(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "True", evictedByPreemption, preemptedMessage),
+				workloadCond(workloadConditionPreempted, "True", "InClusterQueue", preemptedMessage)),
+			maxAttempts: 3,
+			wantKind:    core.ExecutionError_USER,
+			wantInMsg: []string{"gang evicted by kueue (Preempted, InClusterQueue)", preemptedMessage,
+				"uses one of the task's retries (1 left after it)"},
+		},
+		{
+			name: "preemption on the last attempt says the task fails",
+			workload: workload(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "True", evictedByPreemption, preemptedMessage)),
+			retryAttempt: 2,
+			maxAttempts:  3,
+			wantKind:     core.ExecutionError_USER,
+			wantInMsg:    []string{"none are left, so the task fails"},
+		},
+		{
+			name: "the user's maximum execution time is the user's",
+			workload: workload(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "True", evictedByMaximumExecutionTime,
+					"exceeding the maximum execution time")),
+			maxAttempts: 2,
+			wantKind:    core.ExecutionError_USER,
+			wantInMsg:   []string{"(" + evictedByMaximumExecutionTime + ")", "uses the task's last retry"},
+		},
+		{
+			name: "an operator deactivating it is a system retry",
+			workload: workload(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "True", "Deactivated", "The workload is deactivated")),
+			maxAttempts: 3,
+			wantKind:    core.ExecutionError_SYSTEM,
+			wantInMsg:   []string{"(Deactivated): The workload is deactivated", "does not count against the task's retries"},
+		},
+		{
+			name: "a stopped queue is a system retry",
+			workload: workload(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "True", "ClusterQueueStopped", "The ClusterQueue is stopped")),
+			wantKind:  core.ExecutionError_SYSTEM,
+			wantInMsg: []string{"(ClusterQueueStopped)"},
+		},
+		{
+			name: "node failures are a system retry",
+			workload: workload(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "True", "NodeFailures", "node lost")),
+			wantKind: core.ExecutionError_SYSTEM,
+		},
+		{
+			name:      "no Workload for this JobSet is a system retry",
+			workload:  workload("another-jobset", workloadCond(workloadConditionEvicted, "True", evictedByPreemption, "")),
+			wantKind:  core.ExecutionError_SYSTEM,
+			wantInMsg: []string{"gang evicted by kueue; this does not count against the task's retries"},
+		},
+		{
+			name: "an Evicted condition that is not true is a system retry",
+			workload: workload(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "False", evictedByPreemption, "")),
+			wantKind: core.ExecutionError_SYSTEM,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pCtx := kueuePluginCtx(readerWith(t, tt.workload), startedState, tt.retryAttempt, tt.maxAttempts)
 
-		phase, err := clusteredResourceHandler{}.GetTaskPhase(ctx,
-			dummyPluginCtx(twoNodeSpec(), emptyK8sReader()), suspendedSince(time.Now().Add(-3*time.Hour)))
-		require.NoError(t, err)
+			phase, err := clusteredResourceHandler{}.GetTaskPhase(context.Background(), pCtx, suspendedJobSet())
+			require.NoError(t, err)
 
-		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
-		require.NotNil(t, phase.Err())
-		assert.Equal(t, gang.CodeGangAdmissionTimeout, phase.Err().GetCode())
-		assert.Equal(t, core.ExecutionError_SYSTEM, phase.Err().GetKind())
-		assert.Contains(t, phase.Err().GetMessage(), "not admitted within 2h0m0s")
-		assert.True(t, phase.CleanupOnFailure())
-		assert.False(t, gang.IsEviction(phase.Err()), "nothing ran, so it is not charged to the eviction budget")
-	})
+			assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
+			require.NotNil(t, phase.Err())
+			assert.Equal(t, gang.CodeGangEvicted, phase.Err().GetCode())
+			assert.Equal(t, tt.wantKind, phase.Err().GetKind())
+			assert.True(t, phase.CleanupOnFailure(), "the evicted JobSet is always cleaned up")
+			for _, want := range tt.wantInMsg {
+				assert.Contains(t, phase.Err().GetMessage(), want)
+			}
+		})
+	}
+}
 
-	t.Run("not yet exceeded keeps holding", func(t *testing.T) {
-		withConfig(t, func(c *Config) { c.Kueue.AdmissionTimeout = stdconfig.Duration{Duration: 2 * time.Hour} })
+func TestGetTaskPhase_Held_MissingLocalQueue_FailsAsUserError(t *testing.T) {
+	wl := workload(testJobSetUID,
+		inadmissible("LocalQueue "+testQueue+" doesn't exist"))
+	pCtx := kueuePluginCtx(readerWith(t, wl), plugink8s.PluginState{}, 0, 3)
 
-		phase, err := clusteredResourceHandler{}.GetTaskPhase(ctx,
-			dummyPluginCtx(twoNodeSpec(), emptyK8sReader()), suspendedSince(time.Now().Add(-time.Hour)))
-		require.NoError(t, err)
-		assert.Equal(t, pluginsCore.PhaseWaitingForResources, phase.Phase())
-	})
+	phase, err := clusteredResourceHandler{}.GetTaskPhase(context.Background(), pCtx, suspendedJobSet())
+	require.NoError(t, err)
 
-	t.Run("disabled keeps holding", func(t *testing.T) {
-		phase, err := clusteredResourceHandler{}.GetTaskPhase(ctx,
-			dummyPluginCtx(twoNodeSpec(), emptyK8sReader()), suspendedSince(time.Now().Add(-48*time.Hour)))
-		require.NoError(t, err)
-		assert.Equal(t, pluginsCore.PhaseWaitingForResources, phase.Phase())
-	})
+	assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase(), "not retried: the queue will not appear")
+	require.NotNil(t, phase.Err())
+	assert.Equal(t, codeQueueNotFound, phase.Err().GetCode())
+	assert.Equal(t, core.ExecutionError_USER, phase.Err().GetKind())
+	assert.Contains(t, phase.Err().GetMessage(), `"`+testQueue+`"`)
+	assert.True(t, phase.CleanupOnFailure())
+}
 
-	t.Run("a started gang is evicted, not timed out", func(t *testing.T) {
-		withConfig(t, func(c *Config) { c.Kueue.AdmissionTimeout = stdconfig.Duration{Duration: time.Minute} })
+func TestGetTaskPhase_Held_KeepsWaiting(t *testing.T) {
+	tests := []struct {
+		name     string
+		workload *unstructured.Unstructured
+		noLabel  bool
+	}{
+		{
+			name: "an inactive queue is the platform's, so the gang keeps waiting",
+			workload: workload(testJobSetUID,
+				inadmissible("LocalQueue "+testQueue+" is inactive")),
+		},
+		{
+			name: "a missing queue other than the one the JobSet names is not this JobSet's",
+			workload: workload(testJobSetUID,
+				inadmissible("LocalQueue other doesn't exist")),
+		},
+		{
+			name: "waiting for quota",
+			workload: workload(testJobSetUID,
+				workloadCond(workloadConditionQuotaReserved, "False", "Pending", "couldn't assign flavors to pod set workers")),
+		},
+		{
+			name:     "no Workload yet",
+			workload: workload("another-jobset"),
+		},
+		{
+			name:    "no queue label",
+			noLabel: true,
+			workload: workload(testJobSetUID,
+				inadmissible("LocalQueue "+testQueue+" doesn't exist")),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			js := suspendedJobSet()
+			if tt.noLabel {
+				js.Labels = nil
+			}
+			pCtx := kueuePluginCtx(readerWith(t, tt.workload), plugink8s.PluginState{}, 0, 3)
 
-		pCtx := dummyPluginCtxWithState(twoNodeSpec(), emptyK8sReader(),
-			plugink8s.PluginState{Phase: pluginsCore.PhaseRunning, PhaseVersion: 1}, nil)
-		phase, err := clusteredResourceHandler{}.GetTaskPhase(ctx, pCtx, suspendedSince(time.Now().Add(-time.Hour)))
-		require.NoError(t, err)
-		require.NotNil(t, phase.Err())
-		assert.Equal(t, gang.CodeGangEvicted, phase.Err().GetCode())
-	})
+			phase, err := clusteredResourceHandler{}.GetTaskPhase(context.Background(), pCtx, js)
+			require.NoError(t, err)
+			assert.Equal(t, pluginsCore.PhaseWaitingForResources, phase.Phase())
+			assert.Contains(t, phase.Reason(), "waiting for gang admission")
+		})
+	}
+}
+
+func TestWorkloadForJobSet_NewestWins(t *testing.T) {
+	older := workload(testJobSetUID)
+	older.SetName("older")
+	older.SetCreationTimestamp(metav1.Unix(100, 0))
+	newer := workload(testJobSetUID)
+	newer.SetName("newer")
+	newer.SetCreationTimestamp(metav1.Unix(200, 0))
+
+	wl, err := workloadForJobSet(context.Background(), readerWith(t, older, newer), suspendedJobSet())
+	require.NoError(t, err)
+	require.NotNil(t, wl)
+	assert.Equal(t, "newer", wl.GetName())
+
+	wl, err = workloadForJobSet(context.Background(), nil, suspendedJobSet())
+	require.NoError(t, err)
+	assert.Nil(t, wl, "no reader means no Workload")
+}
+
+func TestClassifyEviction_Unreadable(t *testing.T) {
+	assert.Equal(t, gang.Eviction{Source: evictionSource}, classifyEviction(nil))
+	malformed := workload(testJobSetUID)
+	malformed.Object["status"] = "not a map"
+	assert.False(t, classifyEviction(malformed).UserCaused)
 }

@@ -896,6 +896,10 @@ func (r *TaskActionReconciler) reconcileTask(
 	// toward the permanent-failure threshold.
 	taskAction.Status.SystemFailures = 0
 
+	// Whether the plugin asked for its resource to be deleted if this failure ends the task.
+	// Read it before the retry block below, which rebuilds a final failure without the flag.
+	cleanupOnFailure := phaseInfo.CleanupOnFailure()
+
 	// In-place task restart on USER-kind retryable failure: bump Status.Attempts
 	// and relaunch the pod under the same TaskAction.
 	var restartAttempts uint32
@@ -929,6 +933,16 @@ func (r *TaskActionReconciler) reconcileTask(
 			phaseInfo = transition.Info()
 		}
 	}
+	// A task that fails for good keeps its resource until the TaskAction is garbage collected.
+	// A plugin asks for cleanup when that resource would otherwise keep going: a gang an admission
+	// gate took back is re-admitted by the gate and would run again for a task that has already
+	// failed. Delete it now, as a retry above already does.
+	if !cacheShortCircuited && cleanupOnFailure && phaseInfo.Phase() == pluginsCore.PhasePermanentFailure {
+		if abortErr := p.Abort(ctx, tCtx); abortErr != nil {
+			logger.Error(abortErr, "failed to clean up the resource of a failed task")
+		}
+	}
+
 	mapPhaseToConditions(taskAction, phaseInfo)
 
 	// Update StateJSON for observability

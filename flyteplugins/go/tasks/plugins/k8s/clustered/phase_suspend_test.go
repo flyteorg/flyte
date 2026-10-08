@@ -107,9 +107,9 @@ func TestGetTaskPhase_Suspended_PriorWaitingForResources_StaysWaiting(t *testing
 
 func TestGetTaskPhase_Suspended_AfterRunning_GangEvictedSystemRetry(t *testing.T) {
 	// Sticky Running in plugin state means the gang was fully up in this attempt.
-	// Kueue re-suspended it (preemption, pods-ready recovery, deactivation): the
-	// attempt is over and must be charged as a GangEvicted system retry, never
-	// reported as Running or Queued.
+	// Kueue re-suspended it: the attempt is over and is reported as GangEvicted, never
+	// as Running or Queued. With no readable Workload the cause is unknown, so it is a
+	// system retry that does not use the task's retries.
 	js := makeJobSet(jobsetv1alpha2.JobSetSuspended, metav1.ConditionTrue, true)
 	js.Status.Conditions[0].Message = "jobset is suspended"
 	pCtx := dummyPluginCtxWithState(twoNodeSpec(), emptyK8sReader(),
@@ -121,10 +121,9 @@ func TestGetTaskPhase_Suspended_AfterRunning_GangEvictedSystemRetry(t *testing.T
 	require.NotNil(t, phase.Err())
 	assert.Equal(t, gang.CodeGangEvicted, phase.Err().GetCode())
 	assert.Equal(t, core.ExecutionError_SYSTEM, phase.Err().GetKind())
-	assert.True(t, gang.IsEviction(phase.Err()))
 	assert.True(t, phase.CleanupOnFailure())
 	assert.Contains(t, phase.Err().GetMessage(), "gang evicted by kueue")
-	assert.Contains(t, phase.Err().GetMessage(), "jobset is suspended")
+	assert.Contains(t, phase.Err().GetMessage(), "does not count against the task's retries")
 }
 
 func TestGetTaskPhase_Suspended_ReadyStatus_GangEvicted(t *testing.T) {
@@ -141,22 +140,6 @@ func TestGetTaskPhase_Suspended_ReadyStatus_GangEvicted(t *testing.T) {
 	require.NotNil(t, phase.Err())
 	assert.Equal(t, gang.CodeGangEvicted, phase.Err().GetCode())
 	assert.Equal(t, core.ExecutionError_SYSTEM, phase.Err().GetKind())
-}
-
-func TestGetTaskPhase_Suspended_UserRetryPolicy(t *testing.T) {
-	withConfig(t, func(c *Config) { c.Kueue.EvictAsSystemRetry = false })
-
-	js := makeJobSet(jobsetv1alpha2.JobSetSuspended, metav1.ConditionTrue, true)
-	pCtx := dummyPluginCtxWithState(twoNodeSpec(), emptyK8sReader(),
-		plugink8s.PluginState{Phase: pluginsCore.PhaseRunning, PhaseVersion: 1}, nil)
-
-	phase, err := clusteredResourceHandler{}.GetTaskPhase(context.Background(), pCtx, js)
-	require.NoError(t, err)
-	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
-	require.NotNil(t, phase.Err())
-	assert.Equal(t, gang.CodeGangEvicted, phase.Err().GetCode())
-	assert.Equal(t, core.ExecutionError_USER, phase.Err().GetKind())
-	assert.False(t, gang.IsEviction(phase.Err()), "user-kind evictions are charged to user retries")
 }
 
 func TestGetTaskPhase_Suspended_TerminalConditionWins(t *testing.T) {
