@@ -172,4 +172,8 @@ Chart for basic single Flyte executable deployment
 | serviceAccount.imagePullSecrets | list | `[]` |  |
 | serviceAccount.labels | object | `{}` |  |
 | serviceAccount.name | string | `""` |  |
+| serviceMonitor.enabled | bool | `false` |  |
+| serviceMonitor.interval | string | `"60s"` |  |
+| serviceMonitor.labels | object | `{}` |  |
+| serviceMonitor.scrapeTimeout | string | `"30s"` |  |
 
