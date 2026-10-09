@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"encoding/json"
 	"strings"
 	"testing"
 	"unicode/utf8"
@@ -115,6 +116,20 @@ func TestBuildActionEventK8s(t *testing.T) {
 		assert.Equal(t, "OOMKilled", ev.Annotations[annErrorCode])
 	})
 
+	t.Run("control plane context lands on the event", func(t *testing.T) {
+		child := testTaskAction()
+		parent := "a0"
+		child.Spec.ParentActionName = &parent
+		child.Spec.TaskType = "container"
+		event := testActionEvent(common.ActionPhase_ACTION_PHASE_SUCCEEDED, 0)
+
+		ev, err := buildActionEventK8s(child, event, "taskaction-controller-host1")
+		assert.NoError(t, err)
+
+		assert.Equal(t, "a0", ev.Annotations[annParentActionName])
+		assert.Equal(t, "container", ev.Annotations[annTaskType])
+	})
+
 	t.Run("info annotation decodes to the original event", func(t *testing.T) {
 		event := testActionEvent(common.ActionPhase_ACTION_PHASE_FAILED, 3)
 		event.ErrorInfo = &workflow.ErrorInfo{Kind: workflow.ErrorInfo_KIND_SYSTEM, Code: "Evicted"}
@@ -125,6 +140,56 @@ func TestBuildActionEventK8s(t *testing.T) {
 		decoded := &workflow.ActionEvent{}
 		assert.NoError(t, protojson.Unmarshal([]byte(ev.Annotations[annInfo]), decoded))
 		assert.True(t, proto.Equal(event, decoded))
+	})
+}
+
+func TestControlPlaneContext(t *testing.T) {
+	t.Run("root action without labels sets nothing", func(t *testing.T) {
+		taskAction := testTaskAction()
+		taskAction.Labels = map[string]string{"flyte.org/run": "run1", "flyte.org/is-root": "true"}
+
+		assert.Empty(t, controlPlaneContext(taskAction))
+	})
+
+	t.Run("child action sets parent, task type and group", func(t *testing.T) {
+		taskAction := testTaskAction()
+		parent := "a0"
+		taskAction.Spec.ParentActionName = &parent
+		taskAction.Spec.TaskType = "spark"
+		taskAction.Spec.Group = "map-1"
+
+		got := controlPlaneContext(taskAction)
+
+		assert.Equal(t, map[string]string{
+			annParentActionName: "a0",
+			annTaskType:         "spark",
+			annGroup:            "map-1",
+		}, got)
+	})
+
+	t.Run("empty parent name counts as root", func(t *testing.T) {
+		taskAction := testTaskAction()
+		empty := ""
+		taskAction.Spec.ParentActionName = &empty
+
+		_, ok := controlPlaneContext(taskAction)[annParentActionName]
+		assert.False(t, ok)
+	})
+
+	t.Run("user labels become one JSON annotation without flyte.org keys", func(t *testing.T) {
+		taskAction := testTaskAction()
+		taskAction.Labels = map[string]string{
+			"flyte.org/run":     "run1",
+			"flyte.org/is-root": "true",
+			"team":              "ml",
+			"cost-center":       "123",
+		}
+
+		got := controlPlaneContext(taskAction)
+
+		decoded := map[string]string{}
+		require.NoError(t, json.Unmarshal([]byte(got[annLabels]), &decoded))
+		assert.Equal(t, map[string]string{"team": "ml", "cost-center": "123"}, decoded)
 	})
 }
 
