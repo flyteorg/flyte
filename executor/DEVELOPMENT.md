@@ -16,9 +16,9 @@ We recommend using kind to create a Kubernetes cluster for local development.
 Currently, flyte-v2 use go v1.26 for development.
 
 ```sh
-go install golang.org/dl/go1.26.5@latest
-go1.26.5 download
-export GOROOT=$(go1.26.5 env GOROOT)
+go install golang.org/dl/go1.27.2@latest
+go1.27.2 download
+export GOROOT=$(go1.27.2 env GOROOT)
 export PATH="$GOROOT/bin:$PATH"
 ```
 
