@@ -1646,6 +1646,94 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(isTerminal(persisted)).To(BeFalse())
 			Expect(fake.abortCalls).To(Equal(1))
 		})
+
+		const cleanupPluginID = "cleanup-plugin"
+
+		It("cleans up the resource when a retryable failure with cleanup has no retries left", func() {
+			base := time.Date(2026, time.October, 7, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			evictedAt := base.Add(time.Minute)
+			fake := &fakePlugin{
+				id: cleanupPluginID,
+				transitions: []pluginsCore.Transition{
+					runningTransition(base),
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailureWithCleanup(
+						"GangEvicted", "gang evicted by kueue (Preempted)", &pluginsCore.TaskInfo{OccurredAt: &evictedAt},
+					)),
+				},
+			}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			nn := createTaskAction(
+				"cleanup-no-retries-left",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 0),
+			)
+			request := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			fakeClock.Step(time.Minute)
+			_, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.ErrorState.Code).To(Equal("GangEvicted"))
+			Expect(fake.abortCalls).To(Equal(1), "the resource is deleted so it cannot run again")
+		})
+
+		It("cleans up the resource when the plugin reports a permanent failure with cleanup", func() {
+			base := time.Date(2026, time.October, 7, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			failedAt := base.Add(time.Minute)
+			fake := &fakePlugin{
+				id: cleanupPluginID,
+				transitions: []pluginsCore.Transition{
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoFailed(
+						pluginsCore.PhasePermanentFailure,
+						&core.ExecutionError{Kind: core.ExecutionError_USER, Code: "KueueLocalQueueNotFound", Message: "no such queue"},
+						&pluginsCore.TaskInfo{OccurredAt: &failedAt},
+					).WithCleanupOnFailure()),
+				},
+			}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			nn := createTaskAction(
+				"cleanup-permanent-failure",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+
+			_, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			Expect(err).NotTo(HaveOccurred())
+
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.ErrorState.Code).To(Equal("KueueLocalQueueNotFound"))
+			Expect(persisted.Status.Attempts).To(Equal(uint32(1)), "a permanent failure is not retried")
+			Expect(fake.abortCalls).To(Equal(1))
+		})
+
+		It("leaves the resource alone for a permanent failure without cleanup", func() {
+			base := time.Date(2026, time.October, 7, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			failedAt := base.Add(time.Minute)
+			fake := &fakePlugin{
+				id: cleanupPluginID,
+				transitions: []pluginsCore.Transition{
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure(
+						"OrdinaryFailure", "ordinary failure", &pluginsCore.TaskInfo{OccurredAt: &failedAt},
+					)),
+				},
+			}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			nn := createTaskAction(
+				"no-cleanup-permanent-failure",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+
+			_, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(isTerminal(getTaskAction(nn))).To(BeTrue())
+			Expect(fake.abortCalls).To(BeZero())
+		})
 	})
 
 	Context("resetPluginResource", func() {
