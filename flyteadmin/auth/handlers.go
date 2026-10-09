@@ -325,10 +325,19 @@ func GetAuthenticationInterceptor(authCtx interfaces.AuthenticationContext) func
 		}
 		logger.Debugf(ctx, "Failed to parse ID Token from context. Error: %v", idTokenErr)
 
+		// The bearer token may be an ID token from the userAuth provider sent with the wrong scheme.
+		identityContext, bearerIDTokenErr := GRPCGetIdentityFromBearerIDToken(ctx, authCtx.Options().UserAuth.OpenID.ClientID,
+			authCtx.OidcProvider())
+
+		if bearerIDTokenErr == nil {
+			return SetContextForIdentity(ctx, identityContext), nil
+		}
+		logger.Debugf(ctx, "Bearer token is not an ID Token either. Error: %v", bearerIDTokenErr)
+
 		// Only enforcement logic is present. The default case is to let things through.
 		if (isFromHTTP && !authCtx.Options().DisableForHTTP) ||
 			(!isFromHTTP && !authCtx.Options().DisableForGrpc) {
-			err := fmt.Errorf("id token err: %w, access token err: %w", fmt.Errorf("access token err: %w", accessTokenErr), idTokenErr)
+			err := fmt.Errorf("access token err: %w, id token err: %w, bearer id token err: %w", accessTokenErr, idTokenErr, bearerIDTokenErr)
 			return ctx, status.Errorf(codes.Unauthenticated, "token parse error %s", err)
 		}
 
@@ -430,8 +439,27 @@ func IdentityContextFromRequest(ctx context.Context, req *http.Request, authCtx 
 	if len(headerValue) > 0 {
 		logger.Debugf(ctx, "Found authorization header at [%v] header. Validating.", authHeader)
 		if strings.HasPrefix(headerValue, BearerScheme+" ") {
+			tokenStr := strings.TrimPrefix(headerValue, BearerScheme+" ")
 			expectedAudience := GetPublicURL(ctx, req, authCtx.Options()).String()
-			return authCtx.OAuth2ResourceServer().ValidateAccessToken(ctx, expectedAudience, strings.TrimPrefix(headerValue, BearerScheme+" "))
+			identityCtx, accessTokenErr := authCtx.OAuth2ResourceServer().ValidateAccessToken(ctx, expectedAudience, tokenStr)
+			if accessTokenErr == nil {
+				return identityCtx, nil
+			}
+
+			// The bearer token may be an ID token from the userAuth provider sent with the wrong scheme. An empty
+			// client id would make ParseIDTokenAndValidate skip the audience, issuer and expiry checks, so the
+			// fallback requires one.
+			clientID := authCtx.Options().UserAuth.OpenID.ClientID
+			if provider := authCtx.OidcProvider(); provider != nil && clientID != "" {
+				identityCtx, idTokenErr := IdentityContextFromIDTokenToken(ctx, tokenStr, clientID, provider, nil)
+				if idTokenErr == nil {
+					return identityCtx, nil
+				}
+
+				return nil, fmt.Errorf("access token err: %w, bearer id token err: %v", accessTokenErr, idTokenErr)
+			}
+
+			return nil, accessTokenErr
 		}
 	}
 
