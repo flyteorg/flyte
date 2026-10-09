@@ -343,6 +343,18 @@ service:
   # extraPorts Additional ports to add to Flyte service
   extraPorts: []
 
+# serviceMonitor Configure a Prometheus Operator ServiceMonitor for Flyte
+# Requires the ServiceMonitor CRD and an `http-metrics` port on the http service (see `service.extraPorts`)
+serviceMonitor:
+  # enabled Create a ServiceMonitor for Flyte
+  enabled: false
+  # interval Interval at which Prometheus scrapes metrics
+  interval: 60s
+  # scrapeTimeout Timeout for each scrape request
+  scrapeTimeout: 30s
+  # labels Add labels to the ServiceMonitor, e.g. those required by your Prometheus to discover it
+  labels: {}
+
 # ingress Configure ingress for Flyte
 ingress:
   # create Create ingress resources
