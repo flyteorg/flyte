@@ -1924,6 +1924,65 @@ var _ = Describe("TaskAction Controller", func() {
 			}
 			Expect(phases).To(ContainElement(common.ActionPhase_ACTION_PHASE_ABORTED))
 		})
+
+		It("should finalize a terminal TaskAction without aborting it or emitting ACTION_PHASE_ABORTED", func() {
+			fake := &fakePlugin{id: "timeout-plugin"}
+			terminalResource := &flyteorgv1.TaskAction{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:       "abort-terminal-resource",
+					Namespace:  "default",
+					Finalizers: []string{taskActionFinalizer},
+				},
+				Spec: flyteorgv1.TaskActionSpec{
+					RunName:       "terminal-run",
+					Project:       "terminal-project",
+					Domain:        "terminal-domain",
+					ActionName:    "terminal-action",
+					InputURI:      "/tmp/input",
+					RunOutputBase: "/tmp/output",
+					TaskType:      "timeout-test",
+					TaskTemplate:  buildTaskTemplateBytes("timeout-test", "busybox"),
+				},
+			}
+			Expect(k8sClient.Create(ctx, terminalResource)).To(Succeed())
+			terminalResource.Status.Conditions = []metav1.Condition{{
+				Type:               string(flyteorgv1.ConditionTypeSucceeded),
+				Status:             metav1.ConditionTrue,
+				Reason:             string(flyteorgv1.ConditionReasonCompleted),
+				Message:            "TaskAction completed successfully",
+				LastTransitionTime: metav1.Now(),
+			}}
+			Expect(k8sClient.Status().Update(ctx, terminalResource)).To(Succeed())
+			Expect(k8sClient.Delete(ctx, terminalResource)).To(Succeed())
+
+			recorder := &recordingEventsClient{}
+			reconciler := &TaskActionReconciler{
+				Client:         k8sClient,
+				Scheme:         k8sClient.Scheme(),
+				Recorder:       events.NewFakeRecorder(10),
+				PluginRegistry: newFakePluginRegistry(fake),
+				DataStore:      dataStore,
+				eventsClient:   recorder,
+			}
+
+			result, err := reconciler.Reconcile(ctx, reconcile.Request{
+				NamespacedName: types.NamespacedName{Name: "abort-terminal-resource", Namespace: "default"},
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.RequeueAfter).To(BeZero())
+			Expect(fake.abortCalls).To(BeZero())
+			Expect(fake.finalizeCalls).To(Equal(1))
+
+			deleted := &flyteorgv1.TaskAction{}
+			Expect(errors.IsNotFound(k8sClient.Get(ctx, types.NamespacedName{Name: "abort-terminal-resource", Namespace: "default"}, deleted))).To(BeTrue())
+
+			recorded := recorder.RecordedEvents()
+			phases := make([]interface{}, 0, len(recorded))
+			for _, e := range recorded {
+				phases = append(phases, e.GetPhase())
+			}
+			Expect(phases).NotTo(ContainElement(common.ActionPhase_ACTION_PHASE_ABORTED))
+		})
 	})
 
 	Context("toClusterEvents", func() {

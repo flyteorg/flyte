@@ -1018,6 +1018,7 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		return ctrl.Result{}, nil
 	}
+	terminal := isTerminal(taskAction)
 
 	p, err := r.PluginRegistry.ResolvePlugin(taskAction.Spec.TaskType)
 	if err != nil {
@@ -1040,9 +1041,12 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 		return r.removeFinalizer(ctx, taskAction)
 	}
 
-	if err := p.Abort(ctx, tCtx); err != nil {
-		logger.Error(err, "plugin Abort failed, will retry")
-		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+	// A terminal action already has its outcome; aborting it would report it as ABORTED.
+	if !terminal {
+		if err := p.Abort(ctx, tCtx); err != nil {
+			logger.Error(err, "plugin Abort failed, will retry")
+			return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+		}
 	}
 
 	if err := p.Finalize(ctx, tCtx); err != nil {
@@ -1056,6 +1060,10 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 		if err := r.releaseCacheReservation(ctx, cacheCfg); err != nil {
 			logger.Error(err, "failed to release cache reservation during finalization cleanup")
 		}
+	}
+
+	if terminal {
+		return r.removeFinalizer(ctx, taskAction)
 	}
 
 	abortTime := time.Now()
