@@ -25,8 +25,8 @@ func TestNewHTTPClientAuthenticatesAndReusesToken(t *testing.T) {
 	var tokenRequests atomic.Int32
 	var discoveryRequests atomic.Int32
 	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
-	t.Cleanup(server.Close)
+	server := httptest.NewTestServer(t, mux)
+	baseClient := server.Client()
 
 	mux.HandleFunc("/oauth2/default"+oauthAuthorizationServerMetadataPath, func(w http.ResponseWriter, _ *http.Request) {
 		discoveryRequests.Add(1)
@@ -64,7 +64,7 @@ func TestNewHTTPClientAuthenticatesAndReusesToken(t *testing.T) {
 			Audience:     "flyte-services",
 		},
 	}
-	client, err := NewHTTPClient(context.Background(), server.Client(), cfg)
+	client, err := NewHTTPClient(context.Background(), baseClient, cfg)
 	require.NoError(t, err)
 
 	for range 2 {
@@ -85,8 +85,8 @@ func TestNewHTTPClientReadsClientSecretFile(t *testing.T) {
 	require.NoError(t, secretFile.Close())
 
 	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
-	t.Cleanup(server.Close)
+	server := httptest.NewTestServer(t, mux)
+	baseClient := server.Client()
 	mux.HandleFunc(oauthAuthorizationServerMetadataPath, func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = io.WriteString(w, `{"token_endpoint":"`+server.URL+`/token"}`)
@@ -109,7 +109,7 @@ func TestNewHTTPClientReadsClientSecretFile(t *testing.T) {
 		_, _ = io.WriteString(w, `{"access_token":"token","token_type":"Bearer","expires_in":3600}`)
 	})
 
-	client, err := NewHTTPClient(context.Background(), server.Client(), ServiceConfig{
+	client, err := NewHTTPClient(context.Background(), baseClient, ServiceConfig{
 		URL: server.URL,
 		Auth: AuthConfig{
 			Type:             AuthTypeOAuth2ClientCredentials,
