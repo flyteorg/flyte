@@ -238,6 +238,24 @@ func buildTaskTemplateBytesWithTimeoutAndRetries(
 	return data
 }
 
+func buildTaskTemplateBytesWithQueuedTimeoutAndRetries(
+	taskType, image string,
+	queuedTimeout time.Duration,
+	retries uint32,
+) []byte {
+	tmpl := &core.TaskTemplate{}
+	Expect(proto.Unmarshal(buildTaskTemplateBytes(taskType, image), tmpl)).To(Succeed())
+	if queuedTimeout >= 0 {
+		tmpl.Metadata.Timeouts = &core.TimeoutStrategy{
+			QueuedTimeout: durationpb.New(queuedTimeout),
+		}
+	}
+	tmpl.Metadata.Retries = &core.RetryStrategy{Retries: retries}
+	data, err := proto.Marshal(tmpl)
+	Expect(err).NotTo(HaveOccurred())
+	return data
+}
+
 type fakeCorePluginRegistry struct {
 	plugin *fakePlugin
 }
@@ -517,7 +535,7 @@ var _ = Describe("TaskAction Controller", func() {
 			original := ta.DeepCopy()
 			startingAttempts := ta.Status.Attempts
 
-			res, err := r.recordSystemError(ctx, ta, original, "pod", errFakeWebhookDenied, 0)
+			res, err := r.recordSystemError(ctx, ta, original, "pod", errFakeWebhookDenied, 0, 0)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(res.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
 			Expect(ta.Status.SystemFailures).To(Equal(uint32(1)))
@@ -544,7 +562,7 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(k8sClient.Get(ctx, nn, ta)).To(Succeed())
 			original := ta.DeepCopy()
 
-			res, err := r.recordSystemError(ctx, ta, original, "pod", errFakeWebhookDenied, 0)
+			res, err := r.recordSystemError(ctx, ta, original, "pod", errFakeWebhookDenied, 0, 0)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(res.RequeueAfter).To(BeZero(), "terminal — should not requeue")
 			Expect(ta.Status.SystemFailures).To(Equal(uint32(3)))
@@ -570,7 +588,7 @@ var _ = Describe("TaskAction Controller", func() {
 
 			handleErr := pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "invalid ray submission mode %q", "HttpMode")
 
-			res, err := r.recordSystemError(ctx, ta, original, "ray", handleErr, 0)
+			res, err := r.recordSystemError(ctx, ta, original, "ray", handleErr, 0, 0)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(res.RequeueAfter).To(BeZero(), "terminal - should not requeue")
 			Expect(ta.Status.SystemFailures).To(BeZero(), "a deterministic failure must not consume system attempts")
@@ -684,6 +702,54 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(fake.handleCalls).To(Equal(2))
 			Expect(fake.abortCalls).To(BeZero())
 			Expect(isTerminal(getTaskAction(nn))).To(BeFalse())
+		})
+
+		It("does not time out a queued task after queued_timeout elapses", func() {
+			const queuedTimeout = 2 * time.Second
+			base := time.Date(2026, time.August, 25, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			fake := &fakePlugin{
+				id: "timeout-plugin",
+				transitions: []pluginsCore.Transition{
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(
+						base,
+						pluginsCore.DefaultPhaseVersion,
+						"queued",
+					)),
+				},
+			}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			nn := createTaskAction(
+				"queued-timeout-missing",
+				buildTaskTemplateBytesWithQueuedTimeoutAndRetries("timeout-test", "busybox", queuedTimeout, 0),
+			)
+			request := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(getTaskAction(nn).Status.Conditions).To(ContainElement(And(
+				HaveField("Type", string(flyteorgv1.ConditionTypeProgressing)),
+				HaveField("Reason", string(flyteorgv1.ConditionReasonQueued)),
+			)))
+
+			fakeClock.Step(queuedTimeout)
+			_, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.ErrorState).To(Equal(&flyteorgv1.ErrorState{
+				Code:    TaskExecutionTimedOutCode,
+				Kind:    "USER",
+				Message: "task attempt 1 exceeded its queued timeout of 2s",
+			}))
+			Expect(persisted.Status.Conditions).To(ContainElement(And(
+				HaveField("Type", string(flyteorgv1.ConditionTypeFailed)),
+				HaveField("Status", metav1.ConditionTrue),
+				HaveField("Reason", string(flyteorgv1.ConditionReasonTimedOut)),
+			)))
+			Expect(fake.abortCalls).To(Equal(1))
+			Expect(fake.finalizeCalls).To(Equal(1))
 		})
 
 		It("leaves a valid zero max runtime unlimited", func() {
