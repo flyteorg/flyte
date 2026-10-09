@@ -99,7 +99,7 @@ require (
 	github.com/fatih/structtag v1.2.0
 	github.com/getsentry/sentry-go v0.49.0
 	github.com/kubeflow/spark-operator/v2 v2.5.2
-	golang.org/x/tools v0.50.0
+	golang.org/x/tools v0.51.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/apiextensions-apiserver v0.37.1
 )
