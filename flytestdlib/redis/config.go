@@ -74,6 +74,9 @@ type Config struct {
 	SentinelUsername           string `json:"sentinelUsername,omitempty"`
 	SentinelPassword           string `json:"sentinelPassword,omitempty"`
 	SentinelPasswordSecretName string `json:"sentinelPasswordSecretName,omitempty"`
+	// SentinelPasswordPath loads the Sentinel password from a file, trimming
+	// surrounding whitespace. Takes precedence over SentinelPassword and SentinelPasswordSecretName.
+	SentinelPasswordPath string `json:"sentinelPasswordPath,omitempty" pflag:",Points to the file containing the Sentinel password."`
 	// Cluster routing and redirection settings. ReadOnly also selects Sentinel replicas.
 	MaxRedirects   int  `json:"maxRedirects,omitempty"`
 	ReadOnly       bool `json:"readOnly,omitempty"`
@@ -240,7 +243,13 @@ func (r Config) getUniversalOptions(ctx context.Context, options configOptions) 
 
 	var err error
 	sentinelPassword := r.SentinelPassword
-	if r.SentinelPasswordSecretName != "" {
+	if r.SentinelPasswordPath != "" {
+		password, err := os.ReadFile(r.SentinelPasswordPath)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to read Sentinel password from path %s", r.SentinelPasswordPath)
+		}
+		sentinelPassword = strings.TrimSpace(string(password))
+	} else if r.SentinelPasswordSecretName != "" {
 		if secretManager == nil {
 			return nil, errors.Errorf("password secret %s requires a secret manager", r.SentinelPasswordSecretName)
 		}

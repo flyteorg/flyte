@@ -46,7 +46,9 @@ supports inline passwords or password files. `useTLS` enables TLS in all modes.
 whitespace like the Postgres config. A non-empty path takes precedence over
 `password` and `passwordSecretName`; file read failures return an error. It is
 supported in standalone, cluster, and Sentinel modes (for the Redis server
-password, independently of Sentinel credentials).
+password, independently of Sentinel credentials). `sentinelPasswordPath` provides
+the same behavior for the Sentinel password, taking precedence over
+`sentinelPassword` and `sentinelPasswordSecretName`.
 
 Storage listings scan all cluster masters and deduplicate the results. Reference
 URLs use the first configured endpoint as their host.

@@ -152,3 +152,43 @@ func TestPasswordPath(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "inline", opts.Password)
 }
+
+func TestSentinelPasswordPath(t *testing.T) {
+	ctx := context.Background()
+	path := filepath.Join(t.TempDir(), "sentinel-password")
+	require.NoError(t, os.WriteFile(path, []byte(" \tfile-sentinel-password\r\n"), 0600))
+	cfg := Config{
+		Addrs: []string{"sentinel:26379"}, MasterName: "primary",
+		Password: "redis-password", SentinelPassword: "inline-sentinel-password",
+		SentinelPasswordSecretName: "unused-secret", SentinelPasswordPath: path,
+	}
+	opts, err := cfg.GetUniversalOptions(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, "file-sentinel-password", opts.Failover().SentinelPassword)
+	assert.Equal(t, "redis-password", opts.Password)
+	assert.Equal(t, "inline-sentinel-password", cfg.SentinelPassword)
+
+	cfg.PasswordPath = filepath.Join(filepath.Dir(path), "redis-password")
+	require.NoError(t, os.WriteFile(cfg.PasswordPath, []byte("file-redis-password\n"), 0600))
+	opts, err = cfg.GetUniversalOptions(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, "file-redis-password", opts.Password)
+	assert.Equal(t, "file-sentinel-password", opts.SentinelPassword)
+
+	cfg.SentinelPasswordPath = path + "-missing"
+	_, err = cfg.GetUniversalOptions(ctx)
+	require.ErrorIs(t, err, os.ErrNotExist)
+	_, err = cfg.NewClient(ctx)
+	require.ErrorIs(t, err, os.ErrNotExist)
+	cfg.SentinelPasswordPath = filepath.Dir(path)
+	_, err = cfg.GetUniversalOptions(ctx)
+	require.ErrorContains(t, err, "failed to read Sentinel password")
+	cfg.SentinelPasswordPath = ""
+	opts, err = cfg.GetUniversalOptions(ctx, WithSecretManager(testSecretManager{password: "secret-sentinel-password"}))
+	require.NoError(t, err)
+	assert.Equal(t, "secret-sentinel-password", opts.SentinelPassword)
+	cfg.SentinelPasswordSecretName = ""
+	opts, err = cfg.GetUniversalOptions(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, "inline-sentinel-password", opts.SentinelPassword)
+}
