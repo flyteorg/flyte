@@ -25,6 +25,7 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	redisconfig "github.com/flyteorg/flyte/v2/flytestdlib/redis"
 )
 
 type Factory struct {
@@ -40,18 +41,16 @@ func (f Factory) Type() Type {
 	return f.cfg.Type
 }
 
-type SecretManager interface {
-	Get(ctx context.Context, key string) (string, error)
-}
+// SecretManager resolves named Redis password secrets.
+type SecretManager = redisconfig.SecretManager
 
 // NewRedisClient initializes a new redis client with the given options.
-func NewRedisClient(ctx context.Context, cfg RedisOptions, secretManager SecretManager, scope promutils.Scope) (*redis.Client, error) {
-	redisOptions, err := cfg.GetOptions(ctx, secretManager)
+func NewRedisClient(ctx context.Context, cfg RedisOptions, secretManager SecretManager, scope promutils.Scope) (redis.UniversalClient, error) {
+	redisClient, err := cfg.NewClient(ctx, redisconfig.WithSecretManager(secretManager))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get redis options: %w", err)
 	}
 
-	redisClient := redis.NewClient(redisOptions)
 	redisClientScope := scope.NewSubScope("redis")
 	collector := redisprometheus.NewCollector(redisClientScope.CurrentScope(), "", redisClient)
 	prometheus.MustRegister(collector)
