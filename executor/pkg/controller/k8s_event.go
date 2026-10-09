@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -56,9 +57,14 @@ const (
 	annErrorKind  = annPrefix + "error-kind"
 	annErrorCode  = annPrefix + "error-code"
 	annInfo       = annPrefix + "info" // ActionEvent as protojson, default options
-	annLaunchPlan = annPrefix + "launch-plan"
-	annPrincipal  = annPrefix + "principal"
 	annCluster    = annPrefix + "cluster"
+
+	// Control plane context: what the runs service wrote on the TaskAction and the
+	// action event does not carry.
+	annParentActionName = annPrefix + "parent-action-name"
+	annTaskType         = annPrefix + "task-type"
+	annGroup            = annPrefix + "group"
+	annLabels           = annPrefix + "labels" // user labels from the RunSpec, as a JSON object
 )
 
 // noteLimit is the apiserver's NoteLengthLimit. Exceeding it rejects the event.
@@ -106,10 +112,9 @@ func buildActionEventK8s(
 		ann[annErrorKind] = e.GetKind().String()
 		ann[annErrorCode] = e.GetCode()
 	}
-	// TODO: implement this later
-	// for k, v := range controlPlaneContext(taskAction) {
-	// 	ann[k] = v
-	// }
+	for k, v := range controlPlaneContext(taskAction) {
+		ann[k] = v
+	}
 
 	return &eventsv1.Event{
 		ObjectMeta: metav1.ObjectMeta{
@@ -133,6 +138,35 @@ func buildActionEventK8s(
 			UID:        taskAction.UID,
 		},
 	}, nil
+}
+
+// controlPlaneContext returns the annotations that carry what the runs service wrote on
+// taskAction: its place in the action tree, its plugin type, its group, and the user
+// labels from the RunSpec. A key is omitted when the TaskAction has no value for it.
+func controlPlaneContext(taskAction *flyteorgv1.TaskAction) map[string]string {
+	ann := map[string]string{}
+	if parent := taskAction.Spec.ParentActionName; parent != nil && *parent != "" {
+		ann[annParentActionName] = *parent
+	}
+	if taskAction.Spec.TaskType != "" {
+		ann[annTaskType] = taskAction.Spec.TaskType
+	}
+	if taskAction.Spec.Group != "" {
+		ann[annGroup] = taskAction.Spec.Group
+	}
+
+	userLabels := map[string]string{}
+	for k, v := range taskAction.Labels {
+		if !strings.HasPrefix(k, annPrefix) {
+			userLabels[k] = v
+		}
+	}
+	if len(userLabels) > 0 {
+		if b, err := json.Marshal(userLabels); err == nil {
+			ann[annLabels] = string(b)
+		}
+	}
+	return ann
 }
 
 // eventType returns Warning for events that need attention and Normal for the rest.
