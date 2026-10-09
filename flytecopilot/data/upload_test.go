@@ -7,7 +7,9 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/golang/protobuf/proto" //nolint: staticcheck
 	"github.com/stretchr/testify/assert"
@@ -131,6 +133,79 @@ func TestUploader_RecursiveUpload(t *testing.T) {
 			assert.Equal(t, body, string(b), "content mismatch for %s", rel)
 		}
 	})
+}
+
+// countingRawStore records the most writes it has seen in flight at once.
+type countingRawStore struct {
+	storage.ComposedProtobufStore
+	mu       sync.Mutex
+	inFlight int
+	maxSeen  int
+}
+
+func (s *countingRawStore) WriteRaw(ctx context.Context, reference storage.DataReference, size int64, opts storage.Options, raw io.Reader) error {
+	s.mu.Lock()
+	s.inFlight++
+	s.maxSeen = max(s.maxSeen, s.inFlight)
+	s.mu.Unlock()
+	defer func() {
+		s.mu.Lock()
+		s.inFlight--
+		s.mu.Unlock()
+	}()
+	// Hold the write open long enough for the other uploads to pile up behind it.
+	time.Sleep(5 * time.Millisecond)
+	return s.ComposedProtobufStore.WriteRaw(ctx, reference, size, opts, raw)
+}
+
+// Every file of every directory output must upload, but no more than
+// maxConcurrentFileUploads at once across all the outputs: the storage client
+// can buffer each file in memory, so an unbounded fan-out over a large
+// directory runs the sidecar out of memory.
+func TestUploader_RecursiveUpload_BoundsConcurrentFileUploads(t *testing.T) {
+	tmpDir := t.TempDir()
+	const filesPerOutput = 40
+	outputs := []string{"x", "y"}
+	vmap := &core.VariableMap{}
+	for _, name := range outputs {
+		vmap.Variables = append(vmap.Variables, &core.VariableEntry{
+			Key: name,
+			Value: &core.Variable{
+				Type: &core.LiteralType{Type: &core.LiteralType_Blob{Blob: &core.BlobType{Dimensionality: core.BlobType_MULTIPART}}},
+			},
+		})
+		assert.NoError(t, os.MkdirAll(path.Join(tmpDir, name), os.ModePerm)) // #nosec G301
+		for i := range filesPerOutput {
+			assert.NoError(t, os.WriteFile(path.Join(tmpDir, name, fmt.Sprintf("%d.txt", i)), []byte(name), os.ModePerm)) // #nosec G306
+		}
+	}
+
+	mem, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+	counter := &countingRawStore{ComposedProtobufStore: mem.ComposedProtobufStore}
+	store := storage.NewCompositeDataStore(mem.ReferenceConstructor, counter)
+
+	outputRef := storage.DataReference("output")
+	u := NewUploader(context.TODO(), store, core.DataLoadingConfig_JSON, core.IOStrategy_UPLOAD_ON_EXIT, "error")
+	assert.NoError(t, u.RecursiveUpload(context.TODO(), vmap, tmpDir, outputRef, storage.DataReference("raw")))
+
+	assert.Equal(t, maxConcurrentFileUploads, counter.maxSeen)
+
+	literals := &core.LiteralMap{}
+	assert.NoError(t, store.ReadProtobuf(context.TODO(), outputRef, literals))
+	for _, name := range outputs {
+		base := storage.DataReference(literals.GetLiterals()[name].GetScalar().GetBlob().GetUri())
+		for i := range filesPerOutput {
+			ref, err := store.ConstructReference(context.TODO(), base, fmt.Sprintf("%d.txt", i))
+			assert.NoError(t, err)
+			r, err := store.ReadRaw(context.TODO(), ref)
+			assert.NoError(t, err, "%s does not exist", ref)
+			b, err := io.ReadAll(r)
+			assert.NoError(t, err)
+			assert.NoError(t, r.Close())
+			assert.Equal(t, name, string(b))
+		}
+	}
 }
 
 // A container reports its own failure by writing the error file. Writing a
