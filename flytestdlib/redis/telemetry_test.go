@@ -44,8 +44,14 @@ func TestNewClientTelemetry(t *testing.T) {
 			require.NoError(t, err)
 			t.Cleanup(func() { require.NoError(t, client.Close()) })
 			require.NoError(t, client.Ping(ctx).Err())
+			require.NoError(t, client.Set(ctx, "private-key", "private-value", 0).Err())
 			if tc.tracing {
 				require.NotEmpty(t, exporter.GetSpans())
+				for _, span := range exporter.GetSpans() {
+					for _, attr := range span.Attributes {
+						require.NotEqual(t, "db.statement", string(attr.Key))
+					}
+				}
 			} else {
 				require.Empty(t, exporter.GetSpans())
 			}

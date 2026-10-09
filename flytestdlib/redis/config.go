@@ -309,7 +309,10 @@ func (r Config) NewClient(ctx context.Context, opts ...Option) (redis.UniversalC
 		client = redis.NewUniversalClient(options)
 	}
 	if runtimeOptions.tracerProvider != nil {
-		if err := redisotel.InstrumentTracing(client, redisotel.WithTracerProvider(runtimeOptions.tracerProvider)); err != nil {
+		if err := redisotel.InstrumentTracing(client,
+			redisotel.WithTracerProvider(runtimeOptions.tracerProvider),
+			redisotel.WithDBStatement(false),
+		); err != nil {
 			_ = client.Close()
 			return nil, errors.Wrap(err, "failed to instrument Redis tracing")
 		}
