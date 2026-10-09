@@ -177,8 +177,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install uv
-          uv pip install --system flytekit==1.15.0 flytekitplugins-deck-standard==1.15.0 "numpy<2.0.0" pyarrow pandas
+          # PyArrow 17 supports the NumPy 1.x version used by these tests.
+          uv pip install --system flytekit==1.15.0 flytekitplugins-deck-standard==1.15.0 "numpy<2.0.0" pyarrow==17.0.0 pandas
           uv pip freeze
+          python -c "import pyarrow.parquet"
       - name: Checkout flytesnacks
         uses: actions/checkout@v4
         with:
@@ -267,8 +269,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install uv
-          uv pip install --system flytekit flytekitplugins-deck-standard "numpy<2.0.0" pyarrow pandas
+          # PyArrow 17 supports the NumPy 1.x version used by these tests.
+          uv pip install --system flytekit flytekitplugins-deck-standard "numpy<2.0.0" pyarrow==17.0.0 pandas
           uv pip freeze
+          python -c "import pyarrow.parquet"
       - name: Checkout flytesnacks
         uses: actions/checkout@v4
         with:
