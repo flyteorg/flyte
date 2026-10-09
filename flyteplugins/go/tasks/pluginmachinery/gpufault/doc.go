@@ -12,11 +12,12 @@
 //
 // The consumer in this repository is the Kubernetes plugin manager in the executor.
 // The event watcher already forwards every event recorded on a task's pod into the
-// attempt's cluster events; when an attempt ends in failure the plugin manager reads
-// the events back, turns each GPU fault message into a core.GpuFault with
-// FromEventMessage, and hands the list to ClassifyFailure along with the failure the
-// plugin reported. The fault ends up on ExecutionError.gpu_fault, which reaches the
-// console and the SDK as typed data, so nobody downstream parses the message text.
+// attempt's cluster events, each carrying its fault as data when FromPodEvent trusts
+// it. When an attempt ends in failure the plugin manager reads the events back, keeps
+// the faults FromPodEvent trusts and RelevantToFailure places near the failure, and
+// hands the list to ClassifyFailure along with the failure the plugin reported. The
+// fault ends up on ExecutionError.gpu_fault, which reaches the console and the SDK as
+// typed data, so nobody downstream parses the message text.
 //
 // ClassifyFailure only ever looks at a failed attempt, and only when at least one
 // fault was recorded. What it does depends on the worst severity it finds.

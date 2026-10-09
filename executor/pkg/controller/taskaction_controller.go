@@ -1333,6 +1333,9 @@ func toClusterEvents(phaseInfo pluginsCore.PhaseInfo, fallbackTime *timestamppb.
 			e.SourceComponent = k8sEvent.SourceComponent
 			e.Count = k8sEvent.Count
 		}
+		// The fault is carried over as the plugin attached it, which it does only for an
+		// event it trusts. The message is never parsed for one here.
+		e.GpuFault = reason.GpuFault
 		out = append(out, e)
 	}
 	return out
