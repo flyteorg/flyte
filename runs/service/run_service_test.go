@@ -1524,7 +1524,7 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 			},
 		},
 		InputWrapper: &workflow.CreateRunRequest_Inputs{
-			&task.Inputs{
+			Inputs: &task.Inputs{
 				Context: []*core.KeyValuePair{
 					{Key: "trace_id", Value: "root-abc"},
 				},
