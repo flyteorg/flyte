@@ -28,6 +28,7 @@ var (
 		MaxSystemFailures:       3,
 		MaxConcurrentReconciles: 512,
 		RequeueDuration:         stdconfig.Duration{Duration: 10 * time.Second},
+		K8sEventLevel:           "off",
 		GC: GCConfig{
 			Interval: stdconfig.Duration{Duration: 30 * time.Minute},
 			MaxTTL:   stdconfig.Duration{Duration: 1 * time.Hour},
@@ -100,6 +101,11 @@ type Config struct {
 	// more reconciles and more load on the plugin backends. 0 or unset means the
 	// built-in default of 10s.
 	RequeueDuration stdconfig.Duration `json:"requeueDuration" pflag:",How long to wait before reconciling a running TaskAction again. 0 means the default of 10s"`
+
+	// K8sEventLevel selects which action events are also emitted as Kubernetes Events
+	// on their TaskAction: off, terminal, info or debug. Every action event is still
+	// recorded to the events service. Unknown values fail executor startup.
+	K8sEventLevel string `json:"k8sEventLevel" pflag:",Action events to emit as k8s Events: off, terminal, info or debug"`
 
 	// GC configures the garbage collector for terminal TaskActions.
 	GC GCConfig `json:"gc" pflag:",Garbage collector configuration for terminal TaskActions"`
