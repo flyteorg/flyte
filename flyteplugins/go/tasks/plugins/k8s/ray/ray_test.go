@@ -119,6 +119,12 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 }
 
 func dummyRayTaskContextInterruptible(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage, serviceAccount string, interruptible bool) pluginsCore.TaskExecutionContext {
+	// The executor stamps the managed label on every task's metadata, so the default context does too.
+	return dummyRayTaskContextWithLabels(taskTemplate, resources, extendedResources, containerImage, serviceAccount, interruptible,
+		map[string]string{"label-1": "val1", flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue})
+}
+
+func dummyRayTaskContextWithLabels(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage, serviceAccount string, interruptible bool, executionLabels map[string]string) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
@@ -160,7 +166,7 @@ func dummyRayTaskContextInterruptible(taskTemplate *core.TaskTemplate, resources
 	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
 	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
 	taskExecutionMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
-	taskExecutionMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetLabels().Return(executionLabels)
 	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
@@ -208,7 +214,7 @@ func TestBuildResourceRay(t *testing.T) {
 			"dashboard-host": "0.0.0.0", "disable-usage-stats": "true", "include-dashboard": "true",
 			"node-ip-address": "$MY_POD_IP", "num-cpus": "1",
 		})
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
+	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1", flytek8s.PrimaryContainerKey: RayHeadContainerName})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1", flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
 
@@ -219,7 +225,7 @@ func TestBuildResourceRay(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].GroupName, workerGroupName)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.ServiceAccountName, serviceAccount)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"disable-usage-stats": "true", "node-ip-address": "$MY_POD_IP"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1"})
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1", flytek8s.PrimaryContainerKey: RayWorkerContainerName})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1", flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
 
@@ -1278,7 +1284,7 @@ func TestDefaultStartParameters(t *testing.T) {
 			"dashboard-host": "0.0.0.0", "disable-usage-stats": "true", "include-dashboard": "true",
 			"node-ip-address": "$MY_POD_IP",
 		})
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
+	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1", flytek8s.PrimaryContainerKey: RayHeadContainerName})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1", flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
 
@@ -1289,7 +1295,7 @@ func TestDefaultStartParameters(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].GroupName, workerGroupName)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.ServiceAccountName, serviceAccount)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"disable-usage-stats": "true", "node-ip-address": "$MY_POD_IP"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1"})
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1", flytek8s.PrimaryContainerKey: RayWorkerContainerName})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1", flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
 }
@@ -2547,6 +2553,25 @@ func TestBuildResourceRayManagedLabelNotOverridable(t *testing.T) {
 
 	workerLabels := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.GetLabels()
 	assert.Equal(t, flytek8s.ManagedLabelValue, workerLabels[flytek8s.ManagedLabelKey])
+}
+
+// TestBuildResourceRayUnmanagedTask verifies that a task whose metadata isn't marked as
+// managed builds Pods without the managed label, so a framework that runs this plugin
+// without the executor's Pod cache never has its pods claim to be managed.
+func TestBuildResourceRayUnmanagedTask(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+
+	taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+	rayCtx := dummyRayTaskContextWithLabels(taskTemplate, resourceRequirements, nil, "", serviceAccount, true,
+		map[string]string{"label-1": "val1"})
+
+	resource, err := rayJobResourceHandler{}.BuildResource(context.TODO(), rayCtx)
+	assert.NoError(t, err)
+	rayJob, ok := resource.(*rayv1.RayJob)
+	assert.True(t, ok)
+
+	assert.NotContains(t, rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.GetLabels(), flytek8s.ManagedLabelKey)
+	assert.NotContains(t, rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.GetLabels(), flytek8s.ManagedLabelKey)
 }
 
 func TestBuildAutoscalerOptions(t *testing.T) {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
@@ -168,6 +169,31 @@ type GarbageCollectable interface {
 	// Note: The external garbage collector uses PluginEntry.ResourceToWatch to determine
 	// which resource type to delete. If a plugin creates additional resources that require
 	// cleanup, this interface will need to be extended to return those resources.
+}
+
+// ChildPodDiscovery is an optional interface a Plugin whose tracked resource is not a Pod
+// can implement so the framework can find the Pods an operator expanded from that resource.
+//
+// The framework tracks one object per task. For a plugin that tracks a Pod that object is
+// also where the kubelet and the node's daemons record what happened, but for a plugin that
+// tracks a CRD the interesting records land on the worker Pods the operator derived from
+// the templates the plugin built, which the framework otherwise has no way to name. A
+// plugin that does not implement this is treated as having no child Pods, which is what the
+// framework assumed before the interface existed.
+type ChildPodDiscovery interface {
+	// ChildPods returns the label selector that selects the Pods belonging to this attempt
+	// of this resource. They live in the resource's own namespace, which the caller already
+	// holds, so only the selector is the plugin's to decide.
+	//
+	// A nil selector means the plugin cannot name its child Pods and the caller must then
+	// look at no Pods at all rather than widen the search. Implementations should combine
+	// flytek8s.AttemptPodSelector, which is exact to one attempt of one action whichever
+	// operator created the Pod, with a label their own operator applies.
+	ChildPods(
+		ctx context.Context,
+		taskCtx pluginsCore.TaskExecutionMetadata,
+		resource client.Object,
+	) (labels.Selector, error)
 }
 
 // An optional interface a Plugin can implement to override its default OnAbort finalizer (deletion of the underlying resource).
