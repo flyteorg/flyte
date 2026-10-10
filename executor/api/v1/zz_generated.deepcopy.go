@@ -173,6 +173,10 @@ func (in *TaskActionStatus) DeepCopyInto(out *TaskActionStatus) {
 		in, out := &in.TimeoutAt, &out.TimeoutAt
 		*out = (*in).DeepCopy()
 	}
+	if in.NextAttemptAt != nil {
+		in, out := &in.NextAttemptAt, &out.NextAttemptAt
+		*out = (*in).DeepCopy()
+	}
 	if in.Conditions != nil {
 		in, out := &in.Conditions, &out.Conditions
 		*out = make([]metav1.Condition, len(*in))
