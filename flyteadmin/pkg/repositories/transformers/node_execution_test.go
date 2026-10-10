@@ -228,6 +228,48 @@ func TestAddTerminalState_DeckURIInFailedExecution(t *testing.T) {
 	assert.Equal(t, DeckURI, closure.GetDeckUri())
 }
 
+func TestAddTerminalState_DeckURI(t *testing.T) {
+	const eventDeckURI = "fake://bucket/other/deck.html"
+	testCases := []struct {
+		name            string
+		phase           core.NodeExecution_Phase
+		eventDeckURI    string
+		expectedDeckURI string
+	}{
+		{"aborted without deck keeps recorded deck", core.NodeExecution_ABORTED, "", DeckURI},
+		{"aborted with deck uses event deck", core.NodeExecution_ABORTED, eventDeckURI, eventDeckURI},
+		{"timed out without deck keeps recorded deck", core.NodeExecution_TIMED_OUT, "", DeckURI},
+		{"timed out with deck uses event deck", core.NodeExecution_TIMED_OUT, eventDeckURI, eventDeckURI},
+		{"failed without deck clears recorded deck", core.NodeExecution_FAILED, "", ""},
+		{"succeeded without deck clears recorded deck", core.NodeExecution_SUCCEEDED, "", ""},
+		{"succeeded with deck uses event deck", core.NodeExecution_SUCCEEDED, eventDeckURI, eventDeckURI},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			request := admin.NodeExecutionEventRequest{
+				Event: &event.NodeExecutionEvent{
+					Phase:      tc.phase,
+					OccurredAt: occurredAtProto,
+					DeckUri:    tc.eventDeckURI,
+				},
+			}
+			startedAt := occurredAt.Add(-time.Minute)
+			startedAtProto, _ := ptypes.TimestampProto(startedAt)
+			nodeExecutionModel := models.NodeExecution{
+				StartedAt: &startedAt,
+			}
+			closure := admin.NodeExecutionClosure{
+				StartedAt: startedAtProto,
+				DeckUri:   DeckURI,
+			}
+			err := addTerminalState(context.TODO(), &request, &nodeExecutionModel, &closure,
+				interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
+			assert.Nil(t, err)
+			assert.Equal(t, tc.expectedDeckURI, closure.GetDeckUri())
+		})
+	}
+}
+
 func TestCreateNodeExecutionModel(t *testing.T) {
 	parentTaskExecID := uint(8)
 	request := &admin.NodeExecutionEventRequest{
@@ -522,6 +564,46 @@ func TestUpdateNodeExecutionModel(t *testing.T) {
 			interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
 		assert.Nil(t, err)
 		assert.Equal(t, nodeExecutionModel.InputURI, testInputURI)
+	})
+	t.Run("aborted node keeps deck uri", func(t *testing.T) {
+		nodeExecutionModel := models.NodeExecution{
+			Phase: core.NodeExecution_UNDEFINED.String(),
+		}
+		runningRequest := admin.NodeExecutionEventRequest{
+			Event: &event.NodeExecutionEvent{
+				Phase:      core.NodeExecution_RUNNING,
+				OccurredAt: occurredAtProto,
+				DeckUri:    DeckURI,
+			},
+		}
+		err := UpdateNodeExecutionModel(context.TODO(), &runningRequest, &nodeExecutionModel, nil, "",
+			interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
+		assert.Nil(t, err)
+
+		abortedAt := occurredAt.Add(time.Minute)
+		abortedAtProto, _ := ptypes.TimestampProto(abortedAt)
+		abortedRequest := admin.NodeExecutionEventRequest{
+			Event: &event.NodeExecutionEvent{
+				Phase:      core.NodeExecution_ABORTED,
+				OccurredAt: abortedAtProto,
+				OutputResult: &event.NodeExecutionEvent_Error{
+					Error: &core.ExecutionError{
+						Code:    "NodeAborted",
+						Message: "aborted by user",
+					},
+				},
+			},
+		}
+		err = UpdateNodeExecutionModel(context.TODO(), &abortedRequest, &nodeExecutionModel, nil, "",
+			interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
+		assert.Nil(t, err)
+		assert.Equal(t, core.NodeExecution_ABORTED.String(), nodeExecutionModel.Phase)
+
+		var closure admin.NodeExecutionClosure
+		assert.NoError(t, proto.Unmarshal(nodeExecutionModel.Closure, &closure))
+		assert.Equal(t, core.NodeExecution_ABORTED, closure.GetPhase())
+		assert.Equal(t, "NodeAborted", closure.GetError().GetCode())
+		assert.Equal(t, DeckURI, closure.GetDeckUri())
 	})
 }
 

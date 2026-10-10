@@ -93,7 +93,19 @@ func addTerminalState(
 		nodeExecutionModel.ErrorKind = &k
 		nodeExecutionModel.ErrorCode = &request.Event.GetError().Code
 	}
-	closure.DeckUri = request.GetEvent().GetDeckUri()
+	switch request.GetEvent().GetPhase() {
+	case core.NodeExecution_ABORTED, core.NodeExecution_TIMED_OUT:
+		// Propeller reports these phases from the node executor without consulting the task handler, so their events
+		// never carry a deck URI. Keep the one recorded by earlier events instead of erasing it, so the deck stays
+		// viewable after the node is stopped.
+		if len(request.GetEvent().GetDeckUri()) > 0 {
+			closure.DeckUri = request.GetEvent().GetDeckUri()
+		}
+	default:
+		// For the other terminal phases an empty deck URI is meaningful: the task handler drops it when the task
+		// finished without writing a deck.
+		closure.DeckUri = request.GetEvent().GetDeckUri()
+	}
 
 	return nil
 }
