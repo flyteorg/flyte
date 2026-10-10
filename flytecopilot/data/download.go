@@ -37,6 +37,19 @@ type Downloader struct {
 
 // TODO add timeout and rate limit
 // TODO use chunk to download
+// inBlobDir reports whether a listed item is inside the multipart blob whose key is basePrefix,
+// rather than a sibling whose key merely starts with it. HTTP(S) items are kept as listed.
+func inBlobDir(item storage.DataReference, basePrefix string) bool {
+	if strings.HasPrefix(string(item), "http") {
+		return true
+	}
+	_, _, key, err := item.Split()
+	if err != nil {
+		return true // let the download report the bad reference
+	}
+	return basePrefix == "" || strings.HasPrefix(key, basePrefix+"/")
+}
+
 func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath string) (interface{}, error) {
 	/*
 			   handleBlob handles the retrieval and local storage of blob data, including support for both single and multipart blob types.
@@ -87,11 +100,20 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				return nil, err
 			}
 			for _, item := range items {
+				if !inBlobDir(item, basePrefix) {
+					// Object stores list by key prefix, so a listing of ".../dir" also
+					// returns siblings such as ".../dir_info.json". Keep only the blob's own parts.
+					logger.Debugf(ctx, "Skipping [%s]: not under multipart blob [%s]", item, blobRef)
+					continue
+				}
 				absPaths = append(absPaths, item.String())
 			}
 			if storage.IsCursorEnd(cursor) {
 				break
 			}
+		}
+		if len(absPaths) == 0 {
+			return nil, errors.Errorf("no items under multipart blob [%s]", blobRef)
 		}
 
 		// Track the count of successful downloads and the total number of items

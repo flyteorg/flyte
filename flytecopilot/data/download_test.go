@@ -5,6 +5,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -68,6 +69,43 @@ func TestHandleBlobMultipart(t *testing.T) {
 		}
 	})
 
+	t.Run("Sibling Sharing The Prefix Is Not Downloaded", func(t *testing.T) {
+		mem, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+		assert.NoError(t, err)
+		s := storage.NewCompositeDataStore(mem.ReferenceConstructor, rawPrefixListStore{mem.ComposedProtobufStore})
+
+		inside := storage.DataReference("mem://container/oz/results/index/part.bin")
+		err = s.WriteRaw(context.Background(), inside, 0, storage.Options{}, bytes.NewReader([]byte("inside")))
+		assert.NoError(t, err)
+		// A sibling whose key starts with the directory's key, but is not in it.
+		sibling := storage.DataReference("mem://container/oz/results/index_info.json")
+		err = s.WriteRaw(context.Background(), sibling, 0, storage.Options{}, bytes.NewReader([]byte("sibling")))
+		assert.NoError(t, err)
+
+		d := Downloader{store: s}
+		blob := &core.Blob{
+			Uri: "mem://container/oz/results/index",
+			Metadata: &core.BlobMetadata{
+				Type: &core.BlobType{
+					Dimensionality: core.BlobType_MULTIPART,
+				},
+			},
+		}
+
+		testPath := filepath.Join(t.TempDir(), "inputs", "index")
+		result, err := d.handleBlob(context.Background(), blob, testPath)
+		assert.NoError(t, err)
+		assert.Equal(t, testPath, result)
+
+		entries, err := os.ReadDir(testPath)
+		assert.NoError(t, err)
+		var names []string
+		for _, e := range entries {
+			names = append(names, e.Name())
+		}
+		assert.Equal(t, []string{"part.bin"}, names)
+	})
+
 	t.Run("No Items", func(t *testing.T) {
 		s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 		assert.NoError(t, err)
@@ -95,6 +133,25 @@ func TestHandleBlobMultipart(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, result)
 	})
+}
+
+// rawPrefixListStore lists by raw key prefix, as object stores do (the in-memory store lists
+// "<prefix>/"): a listing of ".../dir" also returns ".../dir_info.json".
+type rawPrefixListStore struct {
+	storage.ComposedProtobufStore
+}
+
+func (s rawPrefixListStore) List(ctx context.Context, reference storage.DataReference, maxItems int, cursor storage.Cursor) ([]storage.DataReference, storage.Cursor, error) {
+	ref := string(reference)
+	parent := storage.DataReference(ref[:strings.LastIndex(ref, "/")])
+	items, next, err := s.ComposedProtobufStore.List(ctx, parent, maxItems, cursor)
+	var matched []storage.DataReference
+	for _, item := range items {
+		if strings.HasPrefix(string(item), string(reference)) {
+			matched = append(matched, item)
+		}
+	}
+	return matched, next, err
 }
 
 func TestHandleBlobSinglePart(t *testing.T) {
