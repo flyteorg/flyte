@@ -457,7 +457,7 @@ func (m *ExecutionManager) fetchClusterAssignment(ctx context.Context, project, 
 
 func (m *ExecutionManager) launchSingleTaskExecution(
 	ctx context.Context, request *admin.ExecutionCreateRequest, requestedAt time.Time) (
-	context.Context, *models.Execution, error) {
+	context.Context, *models.Execution, []*models.ExecutionTag, error) {
 
 	taskModel, err := m.db.TaskRepo().Get(ctx, repositoryInterfaces.Identifier{
 		Project: request.GetSpec().GetLaunchPlan().GetProject(),
@@ -466,11 +466,11 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		Version: request.GetSpec().GetLaunchPlan().GetVersion(),
 	})
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	task, err := transformers.FromTaskModel(taskModel)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	// Prepare a skeleton workflow and launch plan
@@ -479,17 +479,17 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		util.CreateOrGetWorkflowModel(ctx, request, m.db, m.workflowManager, m.namedEntityManager, taskIdentifier, &task)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to created skeleton workflow for [%+v] with err: %v", taskIdentifier, err)
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	workflow, err := transformers.FromWorkflowModel(*workflowModel)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	launchPlan, err := util.CreateOrGetLaunchPlan(ctx, m.db, m.config, m.namedEntityManager, taskIdentifier,
 		workflow.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetInterface(), workflowModel.ID, request.GetSpec())
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	executionInputs, err := validation.CheckAndFetchInputsForExecution(
@@ -501,7 +501,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		logger.Debugf(ctx, "Failed to CheckAndFetchInputsForExecution with request.Inputs: %+v"+
 			"fixed inputs: %+v and expected inputs: %+v with err %v",
 			request.GetInputs(), launchPlan.GetSpec().GetFixedInputs(), launchPlan.GetClosure().GetExpectedInputs(), err)
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	name := util.GetExecutionName(request)
@@ -539,7 +539,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 
 	err = getClosureGroup.Wait()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	closure.CreatedAt = workflow.GetClosure().GetCreatedAt()
 	workflow.Closure = closure
@@ -559,7 +559,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	var sourceExecutionID uint
 	parentNodeExecutionID, sourceExecutionID, err = m.getInheritedExecMetadata(ctx, requestSpec, workflowExecutionID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	// Dynamically assign task resource defaults.
@@ -573,7 +573,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 
 	executionConfig, err := m.getExecutionConfig(ctx, request, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	var labels map[string]string
@@ -583,7 +583,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 
 	labels, err = m.addProjectLabels(ctx, request.GetProject(), labels)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	var annotations map[string]string
@@ -600,7 +600,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 
 	clusterAssignment, err := m.getClusterAssignment(ctx, request)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	var executionClusterLabel *admin.ExecutionClusterLabel
@@ -623,7 +623,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 
 	overrides, err := m.addPluginOverrides(ctx, workflowExecutionID, workflowExecutionID.GetName(), "")
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	if overrides != nil {
 		executionParameters.TaskPluginOverrides = overrides
@@ -635,7 +635,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 
 	err = offloadInputsGroup.Wait()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
@@ -654,7 +654,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		m.systemMetrics.PropellerFailures.Inc()
 		logger.Infof(ctx, "Failed to execute workflow %+v with execution id %+v and inputs %+v with err %v",
 			request, &workflowExecutionID, request.GetInputs(), err)
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	executionCreatedAt := time.Now()
 	acceptanceDelay := executionCreatedAt.Sub(requestedAt)
@@ -673,7 +673,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		notificationsSettings = make([]*admin.Notification, 0)
 	}
 
-	executionModel, err := transformers.CreateExecutionModel(transformers.CreateExecutionModelInput{
+	createExecModelInput := transformers.CreateExecutionModelInput{
 		WorkflowExecutionID: workflowExecutionID,
 		RequestSpec:         requestSpec,
 		TaskID:              taskModel.ID,
@@ -690,14 +690,22 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		SecurityContext:       executionConfig.GetSecurityContext(),
 		LaunchEntity:          taskIdentifier.GetResourceType(),
 		Namespace:             namespace,
-	})
+	}
+	executionModel, err := transformers.CreateExecutionModel(createExecModelInput)
 	if err != nil {
 		logger.Infof(ctx, "Failed to create execution model in transformer for id: [%+v] with err: %v",
 			workflowExecutionID, err)
-		return nil, nil, err
+		return nil, nil, nil, err
+	}
+
+	executionTagModel, err := transformers.CreateExecutionTagModel(createExecModelInput)
+	if err != nil {
+		logger.Infof(ctx, "Failed to create execution tag model in transformer for id: [%+v] with err: %v",
+			workflowExecutionID, err)
+		return nil, nil, nil, err
 	}
 	m.userMetrics.WorkflowExecutionInputBytes.Observe(float64(proto.Size(request.GetInputs())))
-	return ctx, executionModel, nil
+	return ctx, executionModel, executionTagModel, nil
 }
 
 func resolveAuthRole(request *admin.ExecutionCreateRequest, launchPlan *admin.LaunchPlan) *admin.AuthRole {
@@ -892,8 +900,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	if request.GetSpec().GetLaunchPlan().GetResourceType() == core.ResourceType_TASK {
 		logger.Debugf(ctx, "Launching single task execution with [%+v]", request.GetSpec().GetLaunchPlan())
 		// When tasks can have defaults this will need to handle Artifacts as well.
-		ctx, model, err := m.launchSingleTaskExecution(ctx, request, requestedAt)
-		return ctx, model, nil, err
+		return m.launchSingleTaskExecution(ctx, request, requestedAt)
 	}
 	return m.launchExecution(ctx, request, requestedAt)
 }

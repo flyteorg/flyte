@@ -4860,6 +4860,24 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 	// test again to ensure existing launchplan retrieval works
 	_, err = execManager.CreateExecution(context.TODO(), request, time.Now())
 	assert.NoError(t, err)
+
+	// test that requested labels and tags are recorded as execution tags, as they are for launch plan executions
+	request.Spec.Labels = &admin.Labels{
+		Values: map[string]string{"team": "ml"},
+	}
+	request.Spec.Tags = []string{"nightly"}
+	_, _, executionTagModel, err := execManager.(*ExecutionManager).launchExecutionAndPrepareModel(
+		context.TODO(), request, time.Now())
+	assert.NoError(t, err)
+	executionKey := models.ExecutionKey{
+		Project: "flytekit",
+		Domain:  "production",
+		Name:    "singletaskexec",
+	}
+	assert.ElementsMatch(t, []*models.ExecutionTag{
+		{ExecutionKey: executionKey, Key: "team", Value: "ml"},
+		{ExecutionKey: executionKey, Key: "nightly"},
+	}, executionTagModel)
 }
 
 func TestGetExecutionConfigOverrides(t *testing.T) {
