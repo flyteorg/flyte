@@ -435,6 +435,16 @@ func (w *fakeEventWatcher) List(objectKey watchedObjectKey, createdAfter time.Ti
 // can hand classification an event that belongs to some other incarnation of the pod.
 const testPodUID k8stypes.UID = "pod-uid"
 
+// testNodeName is the node the pod ran on, and so the only node a fault event about it
+// may be reported from.
+const testNodeName = "ip-10-0-0-1"
+
+// otherNodeName is a node the pod did not run on.
+const otherNodeName = "ip-10-0-0-2"
+
+// ordinaryReason is an event reason the GPU fault emitter never uses.
+const ordinaryReason = "BackOff"
+
 func gpuFaultEvent(code int, severity gpufault.Severity, createdAt time.Time) *eventInfo {
 	return gpuFaultEventFor(code, severity, createdAt, createdAt, testPodUID)
 }
@@ -454,7 +464,7 @@ func gpuFaultEventFor(
 			Severity: severity,
 			PCI:      "0000:3b:00.0",
 		},
-		gpufault.Attribution{NodeName: "ip-10-0-0-1", GPUUUID: "GPU-1234", GPUIndex: 0},
+		gpufault.Attribution{NodeName: testNodeName, GPUUUID: "GPU-1234", GPUIndex: 0},
 	)
 	return &eventInfo{
 		Message:        message,
@@ -463,6 +473,7 @@ func gpuFaultEventFor(
 		RecordedAt:     createdAt,
 		LastObservedAt: lastObservedAt,
 		RegardingUID:   regardingUID,
+		ReportingNode:  testNodeName,
 	}
 }
 
@@ -470,8 +481,16 @@ func failedPod() *v1.Pod {
 	pod := &v1.Pod{
 		TypeMeta:   metav1.TypeMeta{Kind: "Pod", APIVersion: "v1"},
 		ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "pod", UID: testPodUID},
+		Spec:       v1.PodSpec{NodeName: testNodeName},
 	}
 	return pod
+}
+
+// reportedFrom is the event as if it had been reported from the given node.
+func reportedFrom(event *eventInfo, node string) *eventInfo {
+	out := *event
+	out.ReportingNode = node
+	return &out
 }
 
 func TestClassifyGpuFailure(t *testing.T) {
@@ -531,9 +550,11 @@ func TestClassifyGpuFailure(t *testing.T) {
 		},
 		{
 			name: "a gpu-health message under an ordinary reason is not trusted",
-			events: []*eventInfo{
-				{Message: "Back-off restarting failed container", CreatedAt: base, RecordedAt: base},
-			},
+			events: func() []*eventInfo {
+				event := gpuFaultEvent(79, gpufault.SeverityCritical, base)
+				event.Reason = ordinaryReason
+				return []*eventInfo{event}
+			}(),
 			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("OOMKilled", "oom", nil),
 			wantPhase: pluginsCore.PhaseRetryableFailure,
 			wantCode:  "OOMKilled",
@@ -771,6 +792,111 @@ func TestClassifyGpuFailureIdentity(t *testing.T) {
 		got := pm.classifyGpuFailure(pod, phase)
 		assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
 		assert.NotNil(t, got.Err().GetGpuFault())
+	})
+}
+
+func TestClassifyGpuFailureReportingNode(t *testing.T) {
+	base := time.Now().Add(-time.Minute)
+	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
+	phase := pluginsCore.PhaseInfoRetryableFailure("UnknownError", "Pod failed", nil)
+
+	classify := func(t *testing.T, pod *v1.Pod, event *eventInfo) pluginsCore.PhaseInfo {
+		t.Helper()
+		pm := NewPluginManager("test-plugin", nil, nil)
+		pm.eventWatcher = &fakeEventWatcher{events: map[watchedObjectKey][]*eventInfo{key: {event}}}
+		return pm.classifyGpuFailure(pod, phase)
+	}
+	fault := gpuFaultEvent(79, gpufault.SeverityCritical, base)
+
+	t.Run("a fault reported from another node is not classified", func(t *testing.T) {
+		// The emitter can only record events for its own node, so this one was not
+		// written by the emitter that watched the pod's GPUs.
+		got := classify(t, failedPod(), reportedFrom(fault, otherNodeName))
+		assert.Equal(t, "UnknownError", got.Err().GetCode())
+		assert.Nil(t, got.Err().GetGpuFault())
+	})
+
+	t.Run("a fault that names no reporting node is not classified when the pod's node is known", func(t *testing.T) {
+		got := classify(t, failedPod(), reportedFrom(fault, ""))
+		assert.Equal(t, "UnknownError", got.Err().GetCode())
+		assert.Nil(t, got.Err().GetGpuFault())
+	})
+
+	t.Run("a pod that was never scheduled has no faults", func(t *testing.T) {
+		pod := failedPod()
+		pod.Spec.NodeName = ""
+		got := classify(t, pod, fault)
+		assert.Equal(t, "UnknownError", got.Err().GetCode())
+		assert.Nil(t, got.Err().GetGpuFault())
+	})
+
+	t.Run("a deleted pod takes the fault from whichever node reported it", func(t *testing.T) {
+		// The identity object of a pod that is already gone carries neither its UID nor
+		// its node, so the name match is all there is, the same trade as for the UID.
+		pod := failedPod()
+		pod.UID = ""
+		pod.Spec.NodeName = ""
+		got := classify(t, pod, reportedFrom(fault, otherNodeName))
+		assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
+		assert.NotNil(t, got.Err().GetGpuFault())
+	})
+}
+
+// TestAttachRecentObjectEventsGpuFault covers the fault carried as data on each attached
+// reason. It is set only when the event passes the same trust rule classification uses;
+// every other reason, a GPU fault message under some other reason included, has none.
+func TestAttachRecentObjectEventsGpuFault(t *testing.T) {
+	base := time.Now().Add(-time.Minute)
+	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
+	trusted := gpuFaultEvent(79, gpufault.SeverityCritical, base)
+	otherReason := gpuFaultEvent(79, gpufault.SeverityCritical, base.Add(time.Second))
+	otherReason.Reason = ordinaryReason
+	otherNode := reportedFrom(gpuFaultEvent(79, gpufault.SeverityCritical, base.Add(2*time.Second)), otherNodeName)
+	otherPodAt := base.Add(3 * time.Second)
+	otherPod := gpuFaultEventFor(79, gpufault.SeverityCritical, otherPodAt, otherPodAt, "some-other-pod-uid")
+	ordinaryAt := base.Add(4 * time.Second)
+	ordinary := &eventInfo{Message: "Pulling image", Reason: "Pulling", CreatedAt: ordinaryAt, RecordedAt: ordinaryAt}
+
+	attach := func(t *testing.T, resource client.Object) []pluginsCore.ReasonInfo {
+		t.Helper()
+		pm := NewPluginManager("test-plugin", nil, nil)
+		pm.eventWatcher = &fakeEventWatcher{events: map[watchedObjectKey][]*eventInfo{
+			key: {trusted, otherReason, otherNode, otherPod, ordinary},
+		}}
+		got, _, _ := pm.attachRecentObjectEvents(resource, pluginsCore.PhaseInfoRunning(1, &pluginsCore.TaskInfo{}),
+			k8s.PluginState{}, time.Time{}, time.Time{})
+		require.NotNil(t, got.Info())
+		reasons := got.Info().AdditionalReasons
+		require.Len(t, reasons, 5)
+		return reasons
+	}
+
+	t.Run("on a pod", func(t *testing.T) {
+		reasons := attach(t, failedPod())
+		require.NotNil(t, reasons[0].GpuFault)
+		assert.Equal(t, uint32(79), reasons[0].GpuFault.GetCode())
+		assert.Equal(t, testNodeName, reasons[0].GpuFault.GetNode())
+		for _, reason := range reasons[1:] {
+			assert.Nil(t, reason.GpuFault, reason.Reason)
+		}
+	})
+
+	t.Run("on a pod that was never scheduled", func(t *testing.T) {
+		pod := failedPod()
+		pod.Spec.NodeName = ""
+		for _, reason := range attach(t, pod) {
+			assert.Nil(t, reason.GpuFault, reason.Reason)
+		}
+	})
+
+	t.Run("on something that is not a pod", func(t *testing.T) {
+		resource := &v1.Service{
+			TypeMeta:   metav1.TypeMeta{Kind: "Pod", APIVersion: "v1"},
+			ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "pod", UID: testPodUID},
+		}
+		for _, reason := range attach(t, resource) {
+			assert.Nil(t, reason.GpuFault, reason.Reason)
+		}
 	})
 }
 

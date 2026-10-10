@@ -27,6 +27,10 @@ type eventInfo struct {
 	// cached by namespace, name and kind, all of which a recreated object reuses, so this
 	// is what tells one incarnation of an object from the next.
 	RegardingUID k8stypes.UID
+	// ReportingNode is the node the event was reported from. A node agent's credentials
+	// are usually limited to events for its own node, so this is what tells an event
+	// written on the node an object ran on from one written anywhere else.
+	ReportingNode string
 	// LastObservedAt is the freshest time the source saw this event. Kubernetes aggregates
 	// a repeating event by updating the same object rather than creating a new one, so
 	// CreatedAt only says when the first occurrence was seen.
@@ -75,8 +79,11 @@ func (w *controllerRuntimeEventWatcher) OnUpdate(_, newObj interface{}) {
 
 // store records an event, or refreshes the entry an earlier occurrence of the same event
 // left behind. A refresh only moves what the newer occurrence actually tells us, the
-// identity and the last observed time; the times the entry was first created and first
-// recorded stay put, so a caller listing by watermark does not see the event again.
+// identity, the node it was reported from and the last observed time; the times the
+// entry was first created and first recorded stay put, so a caller listing by watermark
+// does not see the event again. The reporting node is taken as the object says it now
+// rather than kept from before, so an event rewritten to name another node is judged on
+// what it says.
 func (w *controllerRuntimeEventWatcher) store(obj interface{}) {
 	event, ok := obj.(*eventsv1.Event)
 	if !ok || event == nil {
@@ -105,6 +112,7 @@ func (w *controllerRuntimeEventWatcher) store(obj interface{}) {
 		RecordedAt:     time.Now(),
 		Reason:         event.Reason,
 		RegardingUID:   event.Regarding.UID,
+		ReportingNode:  reportingNode(event),
 		LastObservedAt: lastObservedTime(event),
 	}
 
@@ -121,6 +129,16 @@ func (w *controllerRuntimeEventWatcher) store(obj interface{}) {
 	// The entry is replaced rather than mutated: List hands out these pointers, and a
 	// reader may still be looking at the one it got.
 	eventInfos.eventInfos[eventKey] = info
+}
+
+// reportingNode is the node the event says it was reported from. Recorders on the
+// events API fill in the reporting instance; older ones only fill in the source host,
+// which the events API carries over as the deprecated source.
+func reportingNode(event *eventsv1.Event) string {
+	if event.ReportingInstance != "" {
+		return event.ReportingInstance
+	}
+	return event.DeprecatedSource.Host
 }
 
 // lastObservedTime is the freshest occurrence the event reports. An aggregated event
