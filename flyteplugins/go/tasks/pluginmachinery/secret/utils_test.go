@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
+	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -479,4 +480,34 @@ func Test_EncodeDecodeSecretName_Bijectivity(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestClusterScopedSecretName(t *testing.T) {
+	tests := []struct {
+		name        string
+		secretName  string
+		clusterName string
+		want        string
+	}{
+		{name: "empty cluster returns name unchanged", secretName: EagerSecretKey, clusterName: "", want: EagerSecretKey},
+		{
+			name: "cluster is appended", secretName: EagerSecretKey,
+			clusterName: "dp-gcp-default", want: "EAGER_API_KEY-dp-gcp-default",
+		},
+		{
+			name: "distinct clusters yield distinct names", secretName: EagerSecretKey,
+			clusterName: "dp-aws-default", want: "EAGER_API_KEY-dp-aws-default",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, ClusterScopedSecretName(tt.secretName, tt.clusterName))
+		})
+	}
+}
+
+func TestIsClusterScopedSecretKey(t *testing.T) {
+	assert.True(t, IsClusterScopedSecretKey(EagerSecretKey))
+	assert.False(t, IsClusterScopedSecretKey("secret1"))
+	assert.False(t, IsClusterScopedSecretKey(""))
 }

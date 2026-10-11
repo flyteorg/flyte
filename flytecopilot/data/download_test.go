@@ -232,6 +232,36 @@ func TestNamedDirLayoutPreservesExtensions(t *testing.T) {
 	}
 }
 
+func unionLit(value *core.Literal) *core.Literal {
+	return &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Union{Union: &core.Union{Value: value}}}}}
+}
+
+func TestNamedDirLayoutStagesOptionalFileLikeFile(t *testing.T) {
+	s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+	d := Downloader{store: s, layout: core.DataLoadingConfig_NAMED_DIR}
+
+	dir := t.TempDir()
+	inputs := &core.LiteralMap{Literals: map[string]*core.Literal{
+		// Optional[File] that is set: serialized as a union wrapping the blob.
+		"reads_2": unionLit(writeBlobLit(t, s, "sample_R2.fastq.gz")),
+		// Optional[File] left unset: a union wrapping none, so nothing is staged as a file.
+		"decoys": unionLit(&core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_NoneType{NoneType: &core.Void{}}}}}),
+	}}
+	_, _, err = d.RecursiveDownload(context.Background(), inputs, dir, true)
+	assert.NoError(t, err)
+
+	// Same per-input dir + original basename as a plain File, so a glob over reads_2/ finds it.
+	info, statErr := os.Stat(filepath.Join(dir, "reads_2", "sample_R2.fastq.gz"))
+	if assert.NoError(t, statErr) {
+		assert.False(t, info.IsDir())
+	}
+	// An unset optional must not become a per-input dir, so a glob over decoys/ matches nothing.
+	if info, statErr := os.Stat(filepath.Join(dir, "decoys")); statErr == nil {
+		assert.False(t, info.IsDir())
+	}
+}
+
 func TestNamedDirLayoutDedupesCollidingBasenames(t *testing.T) {
 	s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)

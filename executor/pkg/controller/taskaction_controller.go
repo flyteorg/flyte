@@ -864,8 +864,6 @@ func (r *TaskActionReconciler) reconcileTask(
 
 	// Map transition phase to TaskAction conditions
 	phaseInfo := transition.Info()
-	// Read before an exhausted retry is rebuilt as a permanent failure, which drops it.
-	cleanupOnFailure := phaseInfo.CleanupOnFailure()
 
 	if !cacheShortCircuited && isSystemRetryableFailure(phaseInfo) {
 		// The attempt is relaunched in place and nothing past this point reports
@@ -897,6 +895,10 @@ func (r *TaskActionReconciler) reconcileTask(
 	// transition so transient blips earlier in the lifecycle don't accumulate
 	// toward the permanent-failure threshold.
 	taskAction.Status.SystemFailures = 0
+
+	// Whether the plugin asked for its resource to be deleted if this failure ends the task.
+	// Read it before the retry block below, which rebuilds a final failure without the flag.
+	cleanupOnFailure := phaseInfo.CleanupOnFailure()
 
 	// In-place task restart on USER-kind retryable failure: bump Status.Attempts
 	// and relaunch the pod under the same TaskAction.
@@ -931,8 +933,8 @@ func (r *TaskActionReconciler) reconcileTask(
 			phaseInfo = transition.Info()
 		}
 	}
-	// A failure that requests cleanup can leave a live resource, such as a pod still pulling its
-	// image, that would otherwise start after the action is reported failed.
+	// A pod still pulling its image or an evicted gang could start again after the task fails.
+	// Delete the resource after the failure is recorded when the plugin requests cleanup.
 	abortAfterFailure := !cacheShortCircuited && cleanupOnFailure && phaseInfo.Phase() == pluginsCore.PhasePermanentFailure
 	mapPhaseToConditions(taskAction, phaseInfo)
 
