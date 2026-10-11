@@ -311,6 +311,17 @@ Distributed Flyte 2 core services
 | components.runs.readinessProbe | object | `{}` |  |
 | components.runs.replicaCount | int | `1` |  |
 | components.runs.resources | object | `{}` |  |
+| components.runs.retention.activeDeadlineSeconds | int | `1500` |  |
+| components.runs.retention.age | string | `"2160h"` |  |
+| components.runs.retention.backoffLimit | int | `1` |  |
+| components.runs.retention.batchSize | int | `100` |  |
+| components.runs.retention.dryRun | bool | `true` |  |
+| components.runs.retention.enabled | bool | `false` |  |
+| components.runs.retention.maxRuntime | string | `"20m"` |  |
+| components.runs.retention.resources | object | `{}` |  |
+| components.runs.retention.schedule | string | `"0 3 * * *"` |  |
+| components.runs.retention.suspend | bool | `false` |  |
+| components.runs.retention.timeZone | string | `"Etc/UTC"` |  |
 | components.runs.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | components.runs.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | components.runs.service.annotations | object | `{}` |  |

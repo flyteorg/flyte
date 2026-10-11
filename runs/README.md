@@ -456,3 +456,71 @@ Check logs for detailed error messages. Common issues:
 - Config file not found (use `--config` flag)
 - Database connection failed
 - Port already in use
+
+## Run history retention
+
+`runs-retention` is a separate one-shot executable packaged in both the runs
+service image and the main Flyte image at `/usr/local/bin/runs-retention`.
+Build locally with `make -C runs build-retention`:
+
+```sh
+runs/bin/runs-retention --config runs/config-postgres.yaml \
+  --retention-age 2160h --batch-size 100 --max-runtime 20m --dry-run
+```
+
+Dry-run is the default. To delete eligible history, pass `--dry-run=false`.
+The runs service must first apply the retention migration; the job does not
+apply migrations or start servers, schedulers, or reconcilers. It uses the same
+top-level `database` configuration as the service. Use the primary database,
+not a read replica. The job's advisory lock reserves one pool connection while
+cleanup transactions use the pool separately.
+
+Retention age is measured from the root action's `ended_at`, with a fixed cutoff
+per invocation. Only succeeded, failed, aborted, timed-out, and recovered roots
+are eligible. Runs with unknown/nonterminal children or pending abort cleanup
+are skipped. Runs with missing completion times are preserved. Cleanup deletes
+all associated `action_events` and `actions`, retaining projects, settings,
+tasks, shared task specs, triggers, and trigger revisions. Object storage data
+and external logs need separate lifecycle policies.
+
+Candidate pages use keyset pagination. Each run is rechecked and deleted in its
+own transaction; deletion of its events and actions commits together. An advisory
+lock prevents overlapping retention jobs, including manual invocations. Existing
+action rows are locked while eligibility is rechecked to serialize cleanup with
+state updates. The binary lock only coordinates retention jobs, not service
+writers. Late or concurrent inserts can recreate history after cleanup; there
+are no insert guards or permanent records of deleted runs.
+
+The batch size limits candidate runs per page, not action/event rows. Each run's
+transaction uses the remaining overall runtime budget. Cleanup runs until no
+eligible work remains, the overall runtime
+limit is reached, it is interrupted, or an error occurs. `--max-runtime` defaults
+to 20m and also bounds initial database connection setup. Runtime exhaustion,
+interruption, or database failures return a nonzero exit; the active transaction
+is rolled back and previously committed progress is retained.
+JSON output reports cutoff, committed run/action/event counts (candidate counts
+for dry-run), and whether another job held the lock. Progress is also logged after each candidate page. PostgreSQL autovacuum
+makes deleted space reusable; cleanup does not shrink database files directly.
+
+### Helm CronJob
+
+The `flyte-core` chart defaults to no retention CronJob. Enable a daily dry-run:
+
+```yaml
+components:
+  runs:
+    retention:
+      enabled: true
+      schedule: "0 3 * * *"
+      timeZone: "Etc/UTC"
+      age: 2160h
+      dryRun: true
+```
+
+After reviewing candidate counts, set `dryRun: false` to enable deletion.
+Use an image built with the retention binary. The job shares the runs deployment's
+configuration projections, credentials, environment, service account, and extra
+volumes; it has independent resource limits under `retention.resources`.
+`retention.suspend` pauses scheduling. Runtime, job deadline,
+and retry count are configurable. Deploy the upgraded runs
+service first so the migration is present before enabling the CronJob.
