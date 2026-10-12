@@ -97,6 +97,9 @@ func workerPod(opts workerPodOpts) *v1.Pod {
 			UID:       opts.uid,
 			Labels:    podLabels,
 		},
+		// Every worker ran on the node the test fault events are reported from, so the
+		// trust rule on the reporting node holds for each of them.
+		Spec:   v1.PodSpec{NodeName: testNodeName},
 		Status: v1.PodStatus{Phase: opts.phase},
 	}
 	if !opts.finishedAt.IsZero() {

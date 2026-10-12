@@ -1954,5 +1954,26 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(events[1].GetMessage()).To(Equal("Head pod pending"))
 			Expect(events[1].GetOccurredAt().AsTime()).To(Equal(eventOccurredAt))
 		})
+
+		It("should carry a reason's gpu fault over as data and never read one from the text", func() {
+			occurredAt := time.Date(2026, 4, 2, 10, 0, 0, 0, time.UTC)
+			fault := &core.GpuFault{Kind: core.GpuFault_KIND_XID, Code: 79, Node: "ip-10-0-0-1"}
+			faultMessage := "[gpu-health] [critical] Xid 79 (GPU has fallen off the bus) on GPU 0. xid=79 severity=critical"
+
+			phaseInfo := pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &pluginsCore.TaskInfo{
+				OccurredAt: &occurredAt,
+				AdditionalReasons: []pluginsCore.ReasonInfo{
+					{Reason: faultMessage, OccurredAt: &occurredAt, GpuFault: fault},
+					// The plugin did not trust this one, so the message alone must not
+					// turn into a fault.
+					{Reason: faultMessage, OccurredAt: &occurredAt},
+				},
+			})
+
+			events := toClusterEvents(phaseInfo, timestamppb.New(occurredAt))
+			Expect(events).To(HaveLen(2))
+			Expect(proto.Equal(events[0].GetGpuFault(), fault)).To(BeTrue())
+			Expect(events[1].GetGpuFault()).To(BeNil())
+		})
 	})
 })
