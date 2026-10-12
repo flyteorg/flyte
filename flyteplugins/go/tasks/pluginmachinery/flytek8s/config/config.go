@@ -6,6 +6,7 @@
 package config
 
 import (
+	"maps"
 	"strings"
 	"time"
 
@@ -95,6 +96,15 @@ var (
 			"RTX PRO 6000":  "nvidia-rtx-pro-6000",
 			"T4":            "nvidia-tesla-t4",
 			"V100":          "nvidia-tesla-v100",
+
+			// Time-sliced or MPS-shared NVIDIA GPUs. Nodes in a shared pool carry
+			// the plain model's label with a "-shared" suffix, so a task asking
+			// for a shared device lands only on those nodes.
+			"A10 SHARED":  "nvidia-a10-shared",
+			"A10G SHARED": "nvidia-a10g-shared",
+			"L4 SHARED":   "nvidia-l4-shared",
+			"L40S SHARED": "nvidia-l40s-shared",
+			"T4 SHARED":   "nvidia-tesla-t4-shared",
 
 			// Google Cloud TPUs
 			"V5E": "tpu-v5-lite-podslice",
@@ -237,6 +247,10 @@ var (
 	// K8sPluginConfigSection provides a singular top level config section for all plugins.
 	// If you are a plugin developer writing a k8s plugin, register your config section as a subsection to this.
 	K8sPluginConfigSection = config.MustRegisterSubSection(k8sPluginConfigSectionKey, &defaultK8sConfig)
+
+	// defaultAcceleratorDevices is the built-in accelerator device map with upper-cased keys. Configured
+	// accelerator devices are merged over it, so setting one entry does not drop the rest.
+	defaultAcceleratorDevices = upperCaseKeys(defaultK8sConfig.AcceleratorDevices)
 )
 
 // K8sPluginConfig should be used to configure per-pod defaults for the entire platform. This allows adding global defaults
@@ -500,7 +514,23 @@ func GetK8sPluginConfig() *K8sPluginConfig {
 	}
 	cfg.AcceleratorDeviceClasses = acceleratorDeviceClasses
 
+	// The config loader replaces the default accelerator device map instead of merging into it, and viper lowercases
+	// its keys. Merge the configured entries over the defaults with upper-cased keys to match the lookup.
+	acceleratorDevices := maps.Clone(defaultAcceleratorDevices)
+	for name, label := range cfg.AcceleratorDevices {
+		acceleratorDevices[strings.ToUpper(name)] = label
+	}
+	cfg.AcceleratorDevices = acceleratorDevices
+
 	return cfg
+}
+
+func upperCaseKeys(m map[string]string) map[string]string {
+	upper := make(map[string]string, len(m))
+	for key, value := range m {
+		upper[strings.ToUpper(key)] = value
+	}
+	return upper
 }
 
 // SetK8sPluginConfig should be used for TESTING ONLY, It Sets current value for the config.
