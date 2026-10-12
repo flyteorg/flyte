@@ -524,3 +524,26 @@ volumes; it has independent resource limits under `retention.resources`.
 `retention.suspend` pauses scheduling. Runtime, job deadline,
 and retry count are configurable. Deploy the upgraded runs
 service first so the migration is present before enabling the CronJob.
+
+### Retention telemetry
+
+The binary uses the shared `otel` configuration with service name
+`runs-retention`. Configure an OTLP exporter to send metrics to your collector;
+the default `otel.type: noop` does not export telemetry. Metrics are exported
+at shutdown with a separate 10-second budget, even if cleanup failed or timed out.
+
+| Metric | Type | Attributes | Meaning |
+| --- | --- | --- | --- |
+| `runs.retention.duration` | Histogram, seconds | `result`, `dry_run` | Invocation duration including connection setup |
+| `runs.retention.deleted` | Counter | `entity` | Committed cleanup counts for `run`, `action`, and `action_event` |
+
+The duration histogram records one observation per invocation, so its count
+provides invocation totals. The `result` label is `success`, `failure`, or
+`skipped` when another job holds the lock.
+
+Deleted counts are recorded after each run transaction commits, so partial
+progress is counted even if a later transaction fails. Dry-run estimates and
+rolled-back deletions do not increment this counter. Runs are counted separately
+from action rows; the action count includes the root action. No run identifiers
+are used as metric attributes. Telemetry initialization failures occur before
+these metrics can be recorded; exporter failures are logged.

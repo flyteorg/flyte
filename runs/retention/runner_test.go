@@ -32,6 +32,7 @@ func TestRetention(t *testing.T) {
 	require.NoError(t, err)
 	t.Cleanup(func() { require.NoError(t, testDB.Close()) })
 	require.NoError(t, migrations.RunMigrations(t.Context(), testDB))
+	defaultMetrics, _ := testMetrics(t)
 
 	// Subtests share this database and run sequentially, resetting their data.
 	reset := func(t *testing.T) {
@@ -55,6 +56,7 @@ func TestRetention(t *testing.T) {
 
 	t.Run("Cleanup", func(t *testing.T) {
 		reset(t)
+		metrics, reader := testMetrics(t)
 		old := time.Now().Add(-48 * time.Hour)
 		action(t, "expired", "expired", nil, 5, old, nil)
 		action(t, "expired", "child", "expired", 10, old, nil)
@@ -71,21 +73,23 @@ func TestRetention(t *testing.T) {
 		require.NoError(t, err)
 		o := options()
 		o.DryRun = true
-		result, err := Run(context.Background(), testDB, o)
+		result, err := Run(context.Background(), testDB, o, metrics)
 		require.NoError(t, err)
 		require.EqualValues(t, 2, result.Runs)
 		require.EqualValues(t, 3, result.Actions)
 		require.EqualValues(t, 1, result.Events)
 		require.Equal(t, 11, count(t, "actions"))
+		require.Empty(t, deletedTotals(t, reader))
 		o.DryRun = false
-		result, err = Run(context.Background(), testDB, o)
+		result, err = Run(context.Background(), testDB, o, metrics)
 		require.NoError(t, err)
 		require.EqualValues(t, 2, result.Runs)
 		require.Equal(t, 8, count(t, "actions"))
 		require.Equal(t, 0, count(t, "action_events"))
-		result, err = Run(context.Background(), testDB, o)
+		result, err = Run(context.Background(), testDB, o, metrics)
 		require.NoError(t, err)
 		require.Zero(t, result.Runs)
+		require.Equal(t, map[string]int64{"run": 2, "action": 3, "action_event": 1}, deletedTotals(t, reader))
 
 	})
 
@@ -106,6 +110,7 @@ func TestRetention(t *testing.T) {
 
 	t.Run("Rollback", func(t *testing.T) {
 		reset(t)
+		metrics, reader := testMetrics(t)
 		old := time.Now().Add(-48 * time.Hour)
 		action(t, "rollback", "rollback", nil, 5, old, nil)
 		_, err := testDB.Exec(`INSERT INTO action_events(project,domain,run_name,name,attempt,phase,version) VALUES ('p','d','rollback','rollback',0,5,0)`)
@@ -114,8 +119,28 @@ func TestRetention(t *testing.T) {
 	 CREATE TRIGGER fail_retention_delete BEFORE DELETE ON actions FOR EACH ROW EXECUTE FUNCTION fail_retention_delete()`)
 		require.NoError(t, err)
 		defer testDB.Exec(`DROP TRIGGER fail_retention_delete ON actions; DROP FUNCTION fail_retention_delete()`)
-		_, err = Run(context.Background(), testDB, options())
+		_, err = Run(context.Background(), testDB, options(), metrics)
 		require.ErrorContains(t, err, "test delete failure")
+		require.Equal(t, 1, count(t, "actions"))
+		require.Equal(t, 1, count(t, "action_events"))
+		require.Empty(t, deletedTotals(t, reader))
+	})
+
+	t.Run("MetricsPreserveCommittedProgressOnFailure", func(t *testing.T) {
+		reset(t)
+		metrics, reader := testMetrics(t)
+		action(t, "committed", "committed", nil, 5, time.Now().Add(-49*time.Hour), nil)
+		action(t, "failed", "failed", nil, 5, time.Now().Add(-48*time.Hour), nil)
+		_, err := testDB.Exec(`INSERT INTO action_events(project,domain,run_name,name,attempt,phase,version) VALUES ('p','d','committed','committed',0,5,0),('p','d','failed','failed',0,5,0)`)
+		require.NoError(t, err)
+		_, err = testDB.Exec(`CREATE FUNCTION fail_partial_retention_delete() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF OLD.run_name='failed' THEN RAISE EXCEPTION 'partial cleanup failure'; END IF; RETURN OLD; END; $$;
+        CREATE TRIGGER fail_partial_retention_delete BEFORE DELETE ON actions FOR EACH ROW EXECUTE FUNCTION fail_partial_retention_delete()`)
+		require.NoError(t, err)
+		defer testDB.Exec(`DROP TRIGGER fail_partial_retention_delete ON actions; DROP FUNCTION fail_partial_retention_delete()`)
+		result, err := Run(context.Background(), testDB, options(), metrics)
+		require.ErrorContains(t, err, "partial cleanup failure")
+		require.EqualValues(t, 1, result.Runs)
+		require.Equal(t, map[string]int64{"run": 1, "action": 1, "action_event": 1}, deletedTotals(t, reader))
 		require.Equal(t, 1, count(t, "actions"))
 		require.Equal(t, 1, count(t, "action_events"))
 	})
@@ -127,7 +152,7 @@ func TestRetention(t *testing.T) {
 		defer tx.Rollback()
 		_, err = tx.Exec(`SELECT pg_advisory_xact_lock(714239801,1)`)
 		require.NoError(t, err)
-		result, err := Run(context.Background(), testDB, options())
+		result, err := Run(context.Background(), testDB, options(), defaultMetrics)
 		require.NoError(t, err)
 		require.True(t, result.LockUnavailable)
 	})
@@ -173,7 +198,7 @@ func TestRetention(t *testing.T) {
 		_, err = testDB.Exec(`INSERT INTO task_specs(digest,spec) VALUES ('retention-test-spec','\\x01') ON CONFLICT DO NOTHING`)
 		require.NoError(t, err)
 		defer testDB.Exec(`DELETE FROM task_specs WHERE digest='retention-test-spec'`)
-		result, err := Run(context.Background(), testDB, options())
+		result, err := Run(context.Background(), testDB, options(), defaultMetrics)
 		require.NoError(t, err)
 		require.EqualValues(t, 1, result.Runs)
 		require.Equal(t, 2, count(t, "actions"))
@@ -194,7 +219,7 @@ func TestRetention(t *testing.T) {
 		o := options()
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 		defer cancel()
-		result, err := Run(ctx, testDB, o)
+		result, err := Run(ctx, testDB, o, defaultMetrics)
 		require.Error(t, err)
 		require.ErrorIs(t, ctx.Err(), context.DeadlineExceeded)
 		require.Zero(t, result.Runs)
@@ -211,7 +236,7 @@ func TestRetention(t *testing.T) {
 		require.NoError(t, err)
 		o := options()
 		o.MaxRuntime = 100 * time.Millisecond
-		result, err := Run(context.Background(), testDB, o)
+		result, err := Run(context.Background(), testDB, o, defaultMetrics)
 		require.Error(t, err)
 		require.Zero(t, result.Runs)
 		require.Equal(t, 1, count(t, "actions"))

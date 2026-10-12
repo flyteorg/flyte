@@ -54,7 +54,9 @@ const runWhere = `project=$1 AND domain=$2 AND run_name=$3`
 
 // Run requires migrations to have been applied by the runs service. It never
 // starts service workers or performs DDL, including during dry-run.
-func Run(ctx context.Context, db *sqlx.DB, o Options) (Result, error) {
+// It counts each committed deletion, even if a later run fails. The caller
+// records invocation duration/result to include connection setup.
+func Run(ctx context.Context, db *sqlx.DB, o Options, metrics *Metrics) (Result, error) {
 	result := Result{Cutoff: time.Now().UTC().Add(-o.Age), DryRun: o.DryRun}
 	if err := o.Validate(); err != nil {
 		return result, err
@@ -102,6 +104,7 @@ func Run(ctx context.Context, db *sqlx.DB, o Options) (Result, error) {
 			if err != nil {
 				return result, fmt.Errorf("purge %s/%s/%s: %w", key.Project, key.Domain, key.RunName, err)
 			}
+			metrics.recordCleanup(ctx, counts, o.DryRun)
 			result.Runs += counts.Runs
 			result.Actions += counts.Actions
 			result.Events += counts.Events
