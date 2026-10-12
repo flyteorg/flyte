@@ -4711,3 +4711,116 @@ func TestGetTerminationTarget(t *testing.T) {
 	assert.Equal(t, "Pod was terminated by an external controller (NotAdmitted)",
 		ExternalTerminationMessage(&v1.PodCondition{Reason: "NotAdmitted"}))
 }
+
+// migMixedConfig configures the NVIDIA device class the way a cluster running the device plugin
+// with migStrategy=mixed would, using partitionResourceName as the per-partition template. The
+// previous config comes back when the test ends, since other tests reload only part of it.
+func migMixedConfig(t *testing.T, partitionResourceName string) {
+	prev := *config.GetK8sPluginConfig()
+	t.Cleanup(func() { assert.NoError(t, config.SetK8sPluginConfig(&prev)) })
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		GpuResourceName: ResourceNvidiaGPU,
+		AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+			core.GPUAccelerator_NVIDIA_GPU.String(): {
+				ResourceName:           ResourceNvidiaGPU,
+				DeviceNodeLabel:        "gpu-device",
+				PartitionSizeNodeLabel: "gpu-partition-size",
+				PartitionResourceName:  partitionResourceName,
+			},
+		},
+		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
+			ResourceNvidiaGPU: {{Key: "flyte/gpu", Value: "dedicated", Operator: v1.TolerationOpEqual, Effect: v1.TaintEffectNoSchedule}},
+		},
+		AddTolerationsForExtendedResources: []string{ResourceNvidiaGPU},
+	}))
+}
+
+func TestToK8sPodSpecMIGMixedStrategy(t *testing.T) {
+	const migResource = v1.ResourceName("nvidia.com/mig-1g.5gb")
+	gpuTol := v1.Toleration{Key: "flyte/gpu", Value: "dedicated", Operator: v1.TolerationOpEqual, Effect: v1.TaintEffectNoSchedule}
+	deviceTol := v1.Toleration{Key: "gpu-device", Value: "nvidia-tesla-a100", Operator: v1.TolerationOpEqual, Effect: v1.TaintEffectNoSchedule}
+	extendedTol := v1.Toleration{Key: ResourceNvidiaGPU, Operator: v1.TolerationOpExists, Effect: v1.TaintEffectNoSchedule}
+	partitionTol := v1.Toleration{Key: "gpu-partition-size", Value: "1g.5gb", Operator: v1.TolerationOpEqual, Effect: v1.TaintEffectNoSchedule}
+	deviceNsr := v1.NodeSelectorRequirement{Key: "gpu-device", Operator: v1.NodeSelectorOpIn, Values: []string{"nvidia-tesla-a100"}}
+	partitionNsr := v1.NodeSelectorRequirement{Key: "gpu-partition-size", Operator: v1.NodeSelectorOpIn, Values: []string{"1g.5gb"}}
+
+	partitioned := &core.GPUAccelerator{
+		Device:             "nvidia-tesla-a100",
+		PartitionSizeValue: &core.GPUAccelerator_PartitionSize{PartitionSize: "1g.5gb"},
+	}
+	unpartitioned := &core.GPUAccelerator{Device: "nvidia-tesla-a100"}
+
+	build := func(t *testing.T, accelerator *core.GPUAccelerator, gpuName v1.ResourceName) (*v1.PodSpec, *metav1.ObjectMeta) {
+		taskTemplate := dummyTaskTemplate()
+		taskTemplate.ExtendedResources = &core.ExtendedResources{GpuAccelerator: accelerator}
+		taskContext := dummyExecContext(taskTemplate, &v1.ResourceRequirements{
+			Requests: v1.ResourceList{gpuName: resource.MustParse("2")},
+			Limits:   v1.ResourceList{gpuName: resource.MustParse("2")},
+		}, nil, "", nil)
+		p, m, _, err := ToK8sPodSpec(context.TODO(), taskContext)
+		assert.NoError(t, err)
+		return p, m
+	}
+
+	for _, gpuName := range []v1.ResourceName{resourceGPU, ResourceNvidiaGPU} {
+		t.Run(fmt.Sprintf("template with partition requests the MIG resource (%s)", gpuName), func(t *testing.T) {
+			migMixedConfig(t, "nvidia.com/mig-{partition}")
+			p, m := build(t, partitioned, gpuName)
+
+			res := p.Containers[0].Resources
+			assert.Equal(t, resource.MustParse("2"), res.Requests[migResource])
+			assert.Equal(t, resource.MustParse("2"), res.Limits[migResource])
+			assert.NotContains(t, res.Requests, ResourceNvidiaGPU)
+			assert.NotContains(t, res.Limits, ResourceNvidiaGPU)
+			assert.NotContains(t, res.Limits, v1.ResourceName(resourceGPU))
+
+			assert.Equal(t,
+				[]v1.NodeSelectorTerm{{MatchExpressions: []v1.NodeSelectorRequirement{deviceNsr}}},
+				p.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+			assert.ElementsMatch(t, []v1.Toleration{gpuTol, deviceTol, extendedTol}, p.Tolerations)
+			assert.Equal(t, "1", m.Labels[GpuPartitionSlicesLabel])
+		})
+	}
+
+	t.Run("no template keeps the partition size affinity", func(t *testing.T) {
+		migMixedConfig(t, "")
+		p, _ := build(t, partitioned, resourceGPU)
+
+		res := p.Containers[0].Resources
+		assert.Equal(t, resource.MustParse("2"), res.Limits[ResourceNvidiaGPU])
+		assert.NotContains(t, res.Limits, migResource)
+		assert.Equal(t,
+			[]v1.NodeSelectorTerm{{MatchExpressions: []v1.NodeSelectorRequirement{deviceNsr, partitionNsr}}},
+			p.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+		assert.ElementsMatch(t, []v1.Toleration{gpuTol, deviceTol, partitionTol, extendedTol}, p.Tolerations)
+	})
+
+	t.Run("template without partition requests whole GPUs", func(t *testing.T) {
+		migMixedConfig(t, "nvidia.com/mig-{partition}")
+		p, _ := build(t, unpartitioned, resourceGPU)
+
+		res := p.Containers[0].Resources
+		assert.Equal(t, resource.MustParse("2"), res.Limits[ResourceNvidiaGPU])
+		assert.Len(t, res.Limits, 3)
+		assert.Equal(t,
+			[]v1.NodeSelectorTerm{{MatchExpressions: []v1.NodeSelectorRequirement{deviceNsr}}},
+			p.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+		assert.ElementsMatch(t, []v1.Toleration{gpuTol, deviceTol, extendedTol}, p.Tolerations)
+	})
+
+	t.Run("template with explicit unpartitioned keeps the unpartitioned affinity", func(t *testing.T) {
+		migMixedConfig(t, "nvidia.com/mig-{partition}")
+		p, _ := build(t, &core.GPUAccelerator{
+			Device:             "nvidia-tesla-a100",
+			PartitionSizeValue: &core.GPUAccelerator_Unpartitioned{Unpartitioned: true},
+		}, resourceGPU)
+
+		assert.Equal(t, resource.MustParse("2"), p.Containers[0].Resources.Limits[ResourceNvidiaGPU])
+		assert.Equal(t,
+			[]v1.NodeSelectorTerm{{MatchExpressions: []v1.NodeSelectorRequirement{
+				deviceNsr,
+				{Key: "gpu-partition-size", Operator: v1.NodeSelectorOpDoesNotExist},
+			}}},
+			p.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+	})
+}

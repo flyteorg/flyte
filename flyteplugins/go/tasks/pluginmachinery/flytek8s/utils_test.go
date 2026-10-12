@@ -527,3 +527,51 @@ func TestPodRequiresAccelerator(t *testing.T) {
 		assert.False(t, podRequiresAccelerator(podSpec))
 	})
 }
+
+func TestPartitionResourceNames(t *testing.T) {
+	migMixedConfig(t, "nvidia.com/mig-{partition}")
+	partitioned := &core.GPUAccelerator{
+		DeviceClass:        core.GPUAccelerator_NVIDIA_GPU,
+		PartitionSizeValue: &core.GPUAccelerator_PartitionSize{PartitionSize: "1g.24gb"},
+	}
+
+	t.Run("renders the template for a partition", func(t *testing.T) {
+		assert.Equal(t, v1.ResourceName("nvidia.com/mig-1g.24gb"), getAcceleratorResourceName(partitioned))
+		assert.Equal(t, v1.ResourceName("nvidia.com/gpu"), getAcceleratorResourceName(&core.GPUAccelerator{}))
+	})
+
+	t.Run("matches rendered names only", func(t *testing.T) {
+		assert.True(t, matchesPartitionResourceName("nvidia.com/mig-{partition}", "nvidia.com/mig-1g.5gb"))
+		assert.False(t, matchesPartitionResourceName("nvidia.com/mig-{partition}", "nvidia.com/mig-"))
+		assert.False(t, matchesPartitionResourceName("nvidia.com/mig-{partition}", "nvidia.com/gpu"))
+		assert.True(t, matchesPartitionResourceName("example.com/{partition}-slice", "example.com/2x2-slice"))
+		assert.False(t, matchesPartitionResourceName("example.com/{partition}-slice", "example.com/2x2"))
+		assert.True(t, matchesPartitionResourceName("example.com/slice", "example.com/slice"))
+	})
+
+	t.Run("maps partition resources to the device class resource", func(t *testing.T) {
+		base, ok := acceleratorBaseResourceName("nvidia.com/mig-1g.5gb")
+		assert.True(t, ok)
+		assert.Equal(t, v1.ResourceName("nvidia.com/gpu"), base)
+
+		base, ok = acceleratorBaseResourceName("nvidia.com/gpu")
+		assert.True(t, ok)
+		assert.Equal(t, v1.ResourceName("nvidia.com/gpu"), base)
+
+		_, ok = acceleratorBaseResourceName(v1.ResourceCPU)
+		assert.False(t, ok)
+	})
+
+	t.Run("pod with a partition resource requires an accelerator", func(t *testing.T) {
+		assert.True(t, podRequiresAccelerator(&v1.PodSpec{Containers: []v1.Container{{
+			Resources: v1.ResourceRequirements{Limits: v1.ResourceList{"nvidia.com/mig-1g.5gb": resource.MustParse("1")}},
+		}}}))
+	})
+
+	t.Run("no template leaves partition names unrecognized", func(t *testing.T) {
+		migMixedConfig(t, "")
+		assert.Equal(t, v1.ResourceName("nvidia.com/gpu"), getAcceleratorResourceName(partitioned))
+		_, ok := acceleratorBaseResourceName("nvidia.com/mig-1g.5gb")
+		assert.False(t, ok)
+	})
+}

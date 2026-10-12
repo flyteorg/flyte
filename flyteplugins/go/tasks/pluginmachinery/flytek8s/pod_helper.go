@@ -398,6 +398,9 @@ func getAcceleratorConfig(gpuAccelerator *core.GPUAccelerator) config.Accelerato
 			if deviceClassConfig.PartitionSizeNodeLabel != "" {
 				accelConfig.PartitionSizeNodeLabel = deviceClassConfig.PartitionSizeNodeLabel
 			}
+			// The partition resource name template has no global counterpart, so it only
+			// comes from the device class.
+			accelConfig.PartitionResourceName = deviceClassConfig.PartitionResourceName
 			// Override unpartitioned node selector requirement if specified
 			if deviceClassConfig.UnpartitionedNodeSelectorRequirement != nil {
 				accelConfig.UnpartitionedNodeSelectorRequirement = deviceClassConfig.UnpartitionedNodeSelectorRequirement
@@ -480,6 +483,11 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelera
 			partitionSizeTol = accelConfig.UnpartitionedToleration
 		}
 	case *core.GPUAccelerator_PartitionSize:
+		if _, ok := partitionResourceName(accelConfig, gpuAccelerator); ok {
+			// The container asks for the per-partition resource, which only nodes that
+			// offer this partition advertise, so no partition size affinity is needed.
+			break
+		}
 		partitionSizeNsr = &v1.NodeSelectorRequirement{
 			Key:      accelConfig.PartitionSizeNodeLabel,
 			Operator: v1.NodeSelectorOpIn,
@@ -869,20 +877,27 @@ func AddTolerationsForExtendedResources(podSpec *v1.PodSpec) *v1.PodSpec {
 		podSpec = &v1.PodSpec{}
 	}
 
-	resources := sets.NewString()
-	for _, container := range podSpec.Containers {
-		for _, extendedResource := range config.GetK8sPluginConfig().AddTolerationsForExtendedResources {
-			if _, ok := container.Resources.Requests[v1.ResourceName(extendedResource)]; ok {
-				resources.Insert(extendedResource)
+	// A per-partition accelerator resource such as nvidia.com/mig-1g.5gb also counts as a
+	// request for its device class's resource name, because the partitioned nodes carry the
+	// same taints as the rest of that device class.
+	requested := sets.NewString()
+	collectRequested := func(containers []v1.Container) {
+		for _, container := range containers {
+			for name := range container.Resources.Requests {
+				requested.Insert(name.String())
+				if base, ok := acceleratorBaseResourceName(name); ok {
+					requested.Insert(base.String())
+				}
 			}
 		}
 	}
+	collectRequested(podSpec.Containers)
+	collectRequested(podSpec.InitContainers)
 
-	for _, container := range podSpec.InitContainers {
-		for _, extendedResource := range config.GetK8sPluginConfig().AddTolerationsForExtendedResources {
-			if _, ok := container.Resources.Requests[v1.ResourceName(extendedResource)]; ok {
-				resources.Insert(extendedResource)
-			}
+	resources := sets.NewString()
+	for _, extendedResource := range config.GetK8sPluginConfig().AddTolerationsForExtendedResources {
+		if requested.Has(extendedResource) {
+			resources.Insert(extendedResource)
 		}
 	}
 
