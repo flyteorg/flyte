@@ -1910,6 +1910,10 @@
         "reuse_policy": {
           "$ref": "#/definitions/coreReusePolicy",
           "description": "Reuse policy for the task's execution environment (a warm container pool, or a shared,\nlong-lived cluster for cluster-backed plugins like Ray). When unset, no reuse is configured."
+        },
+        "worker_kind": {
+          "$ref": "#/definitions/coreWorkerKind",
+          "description": "The kind of worker that runs this task. The scheduler sends the task only to workers of\nthis kind; while none has room it waits. Unspecified is the default worker, which runs\ncontainers and plugin tasks."
         }
       },
       "description": "A Task structure that uniquely identifies a task in the system\nTasks are registered as a first step in the system."
@@ -2069,6 +2073,15 @@
     "coreVoid": {
       "type": "object",
       "description": "Used to denote a nil/null/None assignment to a scalar value. The underlying LiteralType for Void is intentionally\nundefined since it can be assigned to a scalar of any LiteralType."
+    },
+    "coreWorkerKind": {
+      "type": "string",
+      "enum": [
+        "WORKER_KIND_UNSPECIFIED",
+        "WORKER_KIND_SANDBOX"
+      ],
+      "default": "WORKER_KIND_UNSPECIFIED",
+      "description": "The kinds of worker that run tasks. A worker of a kind may further limit itself to some task\ntypes and versions of that kind.\n\n - WORKER_KIND_UNSPECIFIED: The default worker: runs containers, and plugin and connector tasks.\n - WORKER_KIND_SANDBOX: Runs sandboxed orchestrator source in an interpreter, with no container\n(flyte.sandbox.orchestrator)."
     },
     "coreWorkflowExecutionIdentifier": {
       "type": "object",

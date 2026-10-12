@@ -1508,6 +1508,8 @@ func (m *TaskTemplate) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for WorkerKind
+
 	switch v := m.Target.(type) {
 	case *TaskTemplate_Container:
 		if v == nil {
