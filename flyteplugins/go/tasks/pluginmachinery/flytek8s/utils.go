@@ -109,12 +109,64 @@ func GetNormalizedAcceleratorDevice(device string) string {
 	return device
 }
 
-// getAcceleratorResourceName returns the Kubernetes resource name for the given device class.
-// Falls back to the legacy GpuResourceName if the device class is not configured.
+// partitionPlaceholder is replaced with the task's partition size when rendering a device
+// class's PartitionResourceName template.
+const partitionPlaceholder = "{partition}"
+
+// getAcceleratorResourceName returns the Kubernetes resource name for the given accelerator.
+// A partitioned accelerator whose device class sets PartitionResourceName gets the rendered
+// per-partition name. Otherwise this is the device class's ResourceName, falling back to the
+// legacy GpuResourceName if the device class is not configured.
 func getAcceleratorResourceName(accelerator *core.GPUAccelerator) v1.ResourceName {
 	// Use the shared helper function to get the accelerator config
 	accelConfig := getAcceleratorConfig(accelerator)
+	if name, ok := partitionResourceName(accelConfig, accelerator); ok {
+		return name
+	}
 	return accelConfig.ResourceName
+}
+
+// partitionResourceName renders the device class's PartitionResourceName template for the
+// accelerator's partition size. It returns false when the template is unset or the accelerator
+// does not ask for a partition size, in which case callers use ResourceName as before.
+func partitionResourceName(accelConfig config.AcceleratorDeviceClassConfig, accelerator *core.GPUAccelerator) (v1.ResourceName, bool) {
+	partition := accelerator.GetPartitionSize()
+	if accelConfig.PartitionResourceName == "" || partition == "" {
+		return "", false
+	}
+	return v1.ResourceName(strings.ReplaceAll(accelConfig.PartitionResourceName, partitionPlaceholder, partition)), true
+}
+
+// matchesPartitionResourceName reports whether name could have been rendered from the
+// PartitionResourceName template tmpl for some non-empty partition size.
+func matchesPartitionResourceName(tmpl string, name v1.ResourceName) bool {
+	prefix, suffix, found := strings.Cut(tmpl, partitionPlaceholder)
+	if !found {
+		return string(name) == tmpl
+	}
+	s := string(name)
+	return len(s) > len(prefix)+len(suffix) && strings.HasPrefix(s, prefix) && strings.HasSuffix(s, suffix)
+}
+
+// acceleratorBaseResourceName maps an accelerator resource name to its device class's resource
+// name. A name rendered from a device class's PartitionResourceName template, such as
+// nvidia.com/mig-1g.5gb, maps to that class's ResourceName, and a plain accelerator resource
+// name maps to itself. The second result is false for names that are not accelerator resources.
+func acceleratorBaseResourceName(name v1.ResourceName) (v1.ResourceName, bool) {
+	if _, ok := getAllAcceleratorResourceNames()[name]; ok {
+		return name, true
+	}
+	cfg := config.GetK8sPluginConfig()
+	for _, deviceClassConfig := range cfg.AcceleratorDeviceClasses {
+		if deviceClassConfig.PartitionResourceName == "" || !matchesPartitionResourceName(deviceClassConfig.PartitionResourceName, name) {
+			continue
+		}
+		if deviceClassConfig.ResourceName != "" {
+			return deviceClassConfig.ResourceName, true
+		}
+		return cfg.GpuResourceName, true //nolint: staticcheck
+	}
+	return "", false
 }
 
 // getAllAcceleratorResourceNames returns the Kubernetes resource names for all accelerator devices.
@@ -134,12 +186,12 @@ func getAllAcceleratorResourceNames() map[v1.ResourceName]struct{} {
 	return acceleratorResourceNames
 }
 
-// podRequiresAccelerator returns true if any container in the pod requires any accelerator devices.
+// podRequiresAccelerator returns true if any container in the pod requires any accelerator
+// devices, including per-partition accelerator resources.
 func podRequiresAccelerator(podSpec *v1.PodSpec) bool {
-	acceleratorResourceNames := getAllAcceleratorResourceNames()
 	for _, cnt := range podSpec.Containers {
-		for resourceName := range acceleratorResourceNames {
-			if _, ok := cnt.Resources.Limits[resourceName]; ok {
+		for resourceName := range cnt.Resources.Limits {
+			if _, ok := acceleratorBaseResourceName(resourceName); ok {
 				return true
 			}
 		}

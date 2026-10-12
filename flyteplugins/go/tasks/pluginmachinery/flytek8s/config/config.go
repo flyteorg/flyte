@@ -445,6 +445,16 @@ type AcceleratorDeviceClassConfig struct {
 	// The node label that specifies the attached accelerator partition size.
 	PartitionSizeNodeLabel string `json:"partition-size-node-label" pflag:"-,The node label that specifies the attached partition size."`
 
+	// Optional template for the Kubernetes resource name a task requests when it asks for a
+	// specific partition of this device class. Every "{partition}" in the template is replaced
+	// with the task's partition size, so "nvidia.com/mig-{partition}" turns a 1g.5gb partition
+	// into a request for nvidia.com/mig-1g.5gb. Set it on clusters whose NVIDIA device plugin runs
+	// with migStrategy=mixed, which offers each MIG profile as its own resource. A partitioned
+	// request then asks for the rendered name in place of ResourceName, with the same count, and
+	// gets no partition size node affinity or toleration, because only nodes that offer that
+	// profile can satisfy the resource. Requests without a partition size still use ResourceName.
+	PartitionResourceName string `json:"partition-resource-name" pflag:"-,Template for the resource name requested for a partition, such as nvidia.com/mig-{partition}."`
+
 	// Override for node selector requirement added to pods intended for unpartitioned nodes.
 	UnpartitionedNodeSelectorRequirement *v1.NodeSelectorRequirement `json:"unpartitioned-node-selector-requirement" pflag:"-,Override for node selector requirement added to pods intended for unpartitioned nodes."`
 
