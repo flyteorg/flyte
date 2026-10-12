@@ -48,6 +48,7 @@ var testNotificationConfig = NewNotificationConfig(
 	testNotificationBufferLimit,
 	notifyRetryMinBackoff,
 	notifyRetryMaxBackoff,
+	defaultWatchBufferSize,
 )
 
 func setupActionDB(t *testing.T) *sqlx.DB {
@@ -1096,6 +1097,7 @@ func TestNotificationBufferLimitConfig(t *testing.T) {
 		defaultNotificationBufferSize,
 		testNotificationConfig.retryMinBackoff,
 		testNotificationConfig.retryMaxBackoff,
+		testNotificationConfig.watchBufferSize,
 	))
 
 	for i := 0; i <= defaultNotificationBufferSize; i++ {
@@ -1113,17 +1115,26 @@ func TestNewNotificationConfig(t *testing.T) {
 		bufferLimit     int
 		retryMinBackoff time.Duration
 		retryMaxBackoff time.Duration
+		watchBufferSize int
 		want            NotificationConfig
 	}{
 		"valid": {
 			bufferLimit:     1_000,
 			retryMinBackoff: time.Second,
 			retryMaxBackoff: 10 * time.Second,
+			watchBufferSize: 1_000,
 			want: NotificationConfig{
 				bufferLimit:     1_000,
 				retryMinBackoff: time.Second,
 				retryMaxBackoff: 10 * time.Second,
+				watchBufferSize: 1_000,
 			},
+		},
+		"zero watch buffer size": {
+			bufferLimit:     testNotificationBufferLimit,
+			retryMinBackoff: notifyRetryMinBackoff,
+			retryMaxBackoff: notifyRetryMaxBackoff,
+			want:            testNotificationConfig,
 		},
 		"zero buffer limit": {
 			retryMinBackoff: notifyRetryMinBackoff,
@@ -1132,6 +1143,7 @@ func TestNewNotificationConfig(t *testing.T) {
 				bufferLimit:     defaultNotificationBufferSize,
 				retryMinBackoff: notifyRetryMinBackoff,
 				retryMaxBackoff: notifyRetryMaxBackoff,
+				watchBufferSize: defaultWatchBufferSize,
 			},
 		},
 		"buffer limit below pending capacity": {
@@ -1142,6 +1154,7 @@ func TestNewNotificationConfig(t *testing.T) {
 				bufferLimit:     defaultNotificationBufferSize,
 				retryMinBackoff: notifyRetryMinBackoff,
 				retryMaxBackoff: notifyRetryMaxBackoff,
+				watchBufferSize: defaultWatchBufferSize,
 			},
 		},
 		"buffer limit equals pending capacity": {
@@ -1152,6 +1165,7 @@ func TestNewNotificationConfig(t *testing.T) {
 				bufferLimit:     defaultNotificationBufferSize,
 				retryMinBackoff: notifyRetryMinBackoff,
 				retryMaxBackoff: notifyRetryMaxBackoff,
+				watchBufferSize: defaultWatchBufferSize,
 			},
 		},
 		"zero retry min backoff": {
@@ -1174,7 +1188,7 @@ func TestNewNotificationConfig(t *testing.T) {
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			actual := NewNotificationConfig(tt.bufferLimit, tt.retryMinBackoff, tt.retryMaxBackoff)
+			actual := NewNotificationConfig(tt.bufferLimit, tt.retryMinBackoff, tt.retryMaxBackoff, tt.watchBufferSize)
 			require.Equal(t, tt.want, actual)
 		})
 	}
