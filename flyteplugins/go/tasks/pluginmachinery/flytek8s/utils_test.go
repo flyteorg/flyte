@@ -193,6 +193,49 @@ func TestGetNormalizedAcceleratorDevice(t *testing.T) {
 	})
 }
 
+func TestGetNormalizedAcceleratorDevice_MergesDefaults(t *testing.T) {
+	t.Run("partial override keeps defaults", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratorDevices: map[string]string{
+				"T4": "custom-t4",
+			},
+		}))
+		assert.Equal(t, "custom-t4", GetNormalizedAcceleratorDevice("T4"))
+		assert.Equal(t, "nvidia-tesla-a100", GetNormalizedAcceleratorDevice("A100"))
+		assert.Equal(t, "nvidia-l4", GetNormalizedAcceleratorDevice("L4"))
+		assert.Equal(t, "tpu-v5p-slice", GetNormalizedAcceleratorDevice("V5P"))
+	})
+
+	t.Run("lowercase configured key resolves", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratorDevices: map[string]string{
+				"my-gpu": "custom-label",
+				"l4":     "custom-l4",
+			},
+		}))
+		assert.Equal(t, "custom-label", GetNormalizedAcceleratorDevice("my-gpu"))
+		assert.Equal(t, "custom-label", GetNormalizedAcceleratorDevice("MY-GPU"))
+		assert.Equal(t, "custom-l4", GetNormalizedAcceleratorDevice("L4"))
+		assert.Equal(t, "nvidia-tesla-t4", GetNormalizedAcceleratorDevice("T4"))
+	})
+
+	t.Run("mixed case default key resolves", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+		assert.Equal(t, "nvidia-l40s", GetNormalizedAcceleratorDevice("L40s"))
+		assert.Equal(t, "nvidia-l40s", GetNormalizedAcceleratorDevice("L40S"))
+	})
+
+	t.Run("shared device resolves to shared label", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+		assert.Equal(t, "nvidia-tesla-t4-shared", GetNormalizedAcceleratorDevice("T4 shared"))
+		assert.Equal(t, "nvidia-l4-shared", GetNormalizedAcceleratorDevice("L4 SHARED"))
+		assert.Equal(t, "nvidia-a10g-shared", GetNormalizedAcceleratorDevice("A10G shared"))
+		assert.Equal(t, "nvidia-a10-shared", GetNormalizedAcceleratorDevice("a10 shared"))
+		assert.Equal(t, "nvidia-l40s-shared", GetNormalizedAcceleratorDevice("L40S shared"))
+		assert.Equal(t, "nvidia-tesla-t4", GetNormalizedAcceleratorDevice("T4"))
+	})
+}
+
 func TestGetAcceleratorResourceName(t *testing.T) {
 	t.Run("returns device class specific resource name", func(t *testing.T) {
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
