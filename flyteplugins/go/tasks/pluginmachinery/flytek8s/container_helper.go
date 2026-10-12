@@ -131,21 +131,57 @@ func adjustResourceRequirement(resourceName v1.ResourceName, resourceRequirement
 }
 
 // SanitizeGPUResourceRequirements converts generic 'gpu' resource requirements to the desired accelerator resource name.
+// When the accelerator asks for a partition and its device class sets PartitionResourceName, the
+// desired name is the rendered per-partition resource, and requirements already expressed in the
+// device class's ResourceName are moved to it as well, keeping the same count.
 func SanitizeGPUResourceRequirements(resources *v1.ResourceRequirements, accelerator *core.GPUAccelerator) {
 	resourceName := config.GetK8sPluginConfig().GpuResourceName //nolint: staticcheck
 	if accelerator != nil {
 		resourceName = getAcceleratorResourceName(accelerator)
+		if baseName := getAcceleratorConfig(accelerator).ResourceName; baseName != resourceName {
+			renameResource(resources, baseName, resourceName)
+		}
 	}
 
-	if res, found := resources.Requests[resourceGPU]; found {
-		resources.Requests[resourceName] = res
-		delete(resources.Requests, resourceGPU)
+	renameResource(resources, resourceGPU, resourceName)
+}
+
+// renameResource moves the request and limit for resource from to resource to.
+func renameResource(resources *v1.ResourceRequirements, from, to v1.ResourceName) {
+	if res, found := resources.Requests[from]; found {
+		resources.Requests[to] = res
+		delete(resources.Requests, from)
 	}
 
-	if res, found := resources.Limits[resourceGPU]; found {
-		resources.Limits[resourceName] = res
-		delete(resources.Limits, resourceGPU)
+	if res, found := resources.Limits[from]; found {
+		resources.Limits[to] = res
+		delete(resources.Limits, from)
 	}
+}
+
+// acceleratorPlatformResources returns the platform resources to apply to the accelerator
+// resource name. A per-partition resource without platform values of its own uses the values
+// configured for its device class's resource name, so a platform GPU limit also caps the
+// number of partitions a task can request.
+func acceleratorPlatformResources(name v1.ResourceName, platformResources v1.ResourceRequirements) v1.ResourceRequirements {
+	base, ok := acceleratorBaseResourceName(name)
+	if !ok || base == name {
+		return platformResources
+	}
+	_, hasRequest := platformResources.Requests[name]
+	_, hasLimit := platformResources.Limits[name]
+	if hasRequest || hasLimit {
+		return platformResources
+	}
+
+	out := v1.ResourceRequirements{Requests: v1.ResourceList{}, Limits: v1.ResourceList{}}
+	if q, found := platformResources.Requests[base]; found {
+		out.Requests[name] = q
+	}
+	if q, found := platformResources.Limits[base]; found {
+		out.Limits[name] = q
+	}
+	return out
 }
 
 // ApplyResourceOverrides handles resource resolution, allocation and validation. Primarily, it ensures that container
@@ -178,14 +214,19 @@ func ApplyResourceOverrides(resources, platformResources v1.ResourceRequirements
 	// TODO: Make configurable. 1/15/2019 Flyte Cluster doesn't support setting storage requests/limits.
 	// https://github.com/kubernetes/enhancements/issues/362
 
-	// Check for accelerator resources (GPU, TPU, Neuron, etc.)
-	acceleratorResourceNames := getAllAcceleratorResourceNames()
-	for acceleratorResourceName := range acceleratorResourceNames {
-		_, requested := resources.Requests[acceleratorResourceName]
-		_, limited := resources.Limits[acceleratorResourceName]
-		if requested || limited {
-			adjustResourceRequirement(acceleratorResourceName, resources, platformResources, assignIfUnset)
+	// Check for accelerator resources (GPU, TPU, Neuron, etc.), including per-partition
+	// resources such as nvidia.com/mig-1g.5gb.
+	acceleratorResourceNames := make(map[v1.ResourceName]struct{})
+	for _, list := range []v1.ResourceList{resources.Requests, resources.Limits} {
+		for name := range list {
+			if _, ok := acceleratorBaseResourceName(name); ok {
+				acceleratorResourceNames[name] = struct{}{}
+			}
 		}
+	}
+	for acceleratorResourceName := range acceleratorResourceNames {
+		adjustResourceRequirement(acceleratorResourceName, resources,
+			acceleratorPlatformResources(acceleratorResourceName, platformResources), assignIfUnset)
 	}
 
 	return resources
