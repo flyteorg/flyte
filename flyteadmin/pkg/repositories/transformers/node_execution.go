@@ -42,7 +42,9 @@ func addNodeRunningState(request *admin.NodeExecutionEventRequest, nodeExecution
 			"failed to marshal occurredAt into a timestamp proto with error: %v", err)
 	}
 	closure.StartedAt = startedAtProto
-	closure.DeckUri = request.GetEvent().GetDeckUri()
+	if len(request.GetEvent().GetDeckUri()) > 0 {
+		closure.DeckUri = request.GetEvent().GetDeckUri()
+	}
 	return nil
 }
 
@@ -93,7 +95,9 @@ func addTerminalState(
 		nodeExecutionModel.ErrorKind = &k
 		nodeExecutionModel.ErrorCode = &request.Event.GetError().Code
 	}
-	closure.DeckUri = request.GetEvent().GetDeckUri()
+	if len(request.GetEvent().GetDeckUri()) > 0 {
+		closure.DeckUri = request.GetEvent().GetDeckUri()
+	}
 
 	return nil
 }
