@@ -174,7 +174,7 @@ func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, envFroms []v1.Env
 	// A deployment that opted out of telemetry opts out its task pods too, so
 	// the SDK inside them stays quiet. Last, so the task env cannot undo it.
 	if telemetry.Disabled() {
-		envVars = append(envVars, v1.EnvVar{Name: telemetry.DisableEnvVar, Value: "true"})
+		envVars = append(envVars, v1.EnvVar{Name: telemetry.DisableEnvVar, Value: "1"})
 	}
 
 	for _, secretName := range config.GetK8sPluginConfig().DefaultEnvFromSecrets {

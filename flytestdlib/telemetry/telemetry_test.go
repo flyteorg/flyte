@@ -24,7 +24,7 @@ func TestDisabled(t *testing.T) {
 			for _, n := range disableEnvVars {
 				t.Setenv(n, "")
 			}
-			t.Setenv("FLYTE_DISABLE_TELEMETRY", value)
+			t.Setenv(DisableEnvVar, value)
 			assert.False(t, Disabled())
 		})
 	}

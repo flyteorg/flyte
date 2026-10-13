@@ -616,7 +616,7 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 					env = append(env, ev)
 				}
 			}
-			podSpec.Containers[0].Env = append(env, corev1.EnvVar{Name: telemetry.DisableEnvVar, Value: "true"})
+			podSpec.Containers[0].Env = append(env, corev1.EnvVar{Name: telemetry.DisableEnvVar, Value: "1"})
 		}
 	}
 

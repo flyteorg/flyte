@@ -1,6 +1,6 @@
 // Package sentryutils reports Flyte operation counts and server-side failures
 // to Sentry. The DSN is hardcoded and is not user configuration;
-// FLYTE_DISABLE_TELEMETRY=true opts out (DO_NOT_TRACK=1 and the legacy
+// DO_NOT_TRACK=1 opts out (FLYTE_DISABLE_TELEMETRY=true and the legacy
 // FLYTE_DISABLE_SENTRY=true are honored too).
 package sentryutils
 
@@ -28,7 +28,7 @@ var (
 	enabled  bool
 )
 
-// Disabled honors the shared telemetry opt-out (FLYTE_DISABLE_TELEMETRY).
+// Disabled honors the shared telemetry opt-out (DO_NOT_TRACK).
 func Disabled() bool {
 	return telemetry.Disabled()
 }

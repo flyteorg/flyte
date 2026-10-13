@@ -327,7 +327,7 @@ service:
 
 # telemetry Crash reports and usage counts Flyte sends to its maintainers, and the console's analytics tags.
 telemetry:
-  # -- Set to false to opt out. Sets FLYTE_DISABLE_TELEMETRY=true on the backend and the console; the backend passes it on to the task and app pods it creates.
+  # -- Set to false to opt out. Sets DO_NOT_TRACK=1 (https://consoledonottrack.com) on the backend and the console; the backend passes it on to the task and app pods it creates.
   enabled: true
 
 # console Configure the Flyte web console (flyteconsole v2)

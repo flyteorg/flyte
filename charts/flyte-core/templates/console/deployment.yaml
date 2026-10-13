@@ -53,8 +53,8 @@ spec:
           {{- if or .Values.console.env (include "flyte-core.telemetryDisabled" .) }}
           env:
             {{- if include "flyte-core.telemetryDisabled" . }}
-            - name: FLYTE_DISABLE_TELEMETRY
-              value: "true"
+            - name: DO_NOT_TRACK
+              value: "1"
             {{- end }}
             {{- with .Values.console.env }}
             {{- tpl (toYaml .) $ | nindent 12 }}

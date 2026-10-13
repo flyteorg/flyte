@@ -576,7 +576,7 @@ Distributed Flyte 2 core services
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.labels | object | `{}` |  |
 | serviceAccount.name | string | `""` |  |
-| telemetry.enabled | bool | `true` | Set to false to opt out. Sets FLYTE_DISABLE_TELEMETRY=true on the backend and the console; the backend passes it on to the task and app pods it creates. |
+| telemetry.enabled | bool | `true` | Set to false to opt out. Sets DO_NOT_TRACK=1 (https://consoledonottrack.com) on the backend and the console; the backend passes it on to the task and app pods it creates. |
 | waitForDatabase.args | list | `[]` |  |
 | waitForDatabase.command | list | `[]` |  |
 | waitForDatabase.enabled | bool | `true` |  |

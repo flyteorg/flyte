@@ -1135,7 +1135,7 @@ func TestDeploy_TelemetryOptOutReachesApps(t *testing.T) {
 				t.Setenv(name, "")
 			}
 			if disabled {
-				t.Setenv("FLYTE_DISABLE_TELEMETRY", "true")
+				t.Setenv("DO_NOT_TRACK", "1")
 			}
 			c := testClient(t)
 			app := testApp("proj", "dev", "myapp", "nginx:latest")
@@ -1147,12 +1147,12 @@ func TestDeploy_TelemetryOptOutReachesApps(t *testing.T) {
 
 			var got []string
 			for _, e := range ksvc.Spec.Template.Spec.Containers[0].Env {
-				if e.Name == "FLYTE_DISABLE_TELEMETRY" {
+				if e.Name == "DO_NOT_TRACK" {
 					got = append(got, e.Value)
 				}
 			}
 			if disabled {
-				assert.Equal(t, []string{"true"}, got)
+				assert.Equal(t, []string{"1"}, got)
 			} else {
 				assert.Empty(t, got)
 			}
