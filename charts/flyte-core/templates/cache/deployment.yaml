@@ -14,7 +14,9 @@ metadata:
     {{- tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
 spec:
+  {{- if not $component.autoscaling.enabled }}
   replicas: {{ $component.replicaCount }}
+  {{- end }}
   {{- with $component.strategy }}
   strategy:
     {{- toYaml . | nindent 4 }}
