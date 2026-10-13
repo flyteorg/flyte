@@ -138,14 +138,24 @@ func partitionResourceName(accelConfig config.AcceleratorDeviceClassConfig, acce
 }
 
 // matchesPartitionResourceName reports whether name could have been rendered from the
-// PartitionResourceName template tmpl for some non-empty partition size.
+// PartitionResourceName template tmpl for some non-empty partition size. The partition size
+// starts where the first placeholder does, so each candidate ending is rendered back through the
+// template, which also covers templates that repeat the placeholder.
 func matchesPartitionResourceName(tmpl string, name v1.ResourceName) bool {
-	prefix, suffix, found := strings.Cut(tmpl, partitionPlaceholder)
-	if !found {
-		return string(name) == tmpl
-	}
+	prefix, _, found := strings.Cut(tmpl, partitionPlaceholder)
 	s := string(name)
-	return len(s) > len(prefix)+len(suffix) && strings.HasPrefix(s, prefix) && strings.HasSuffix(s, suffix)
+	if !found {
+		return s == tmpl
+	}
+	if !strings.HasPrefix(s, prefix) {
+		return false
+	}
+	for end := len(prefix) + 1; end <= len(s); end++ {
+		if strings.ReplaceAll(tmpl, partitionPlaceholder, s[len(prefix):end]) == s {
+			return true
+		}
+	}
+	return false
 }
 
 // acceleratorBaseResourceName maps an accelerator resource name to its device class's resource

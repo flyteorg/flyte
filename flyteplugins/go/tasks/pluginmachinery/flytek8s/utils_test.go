@@ -547,6 +547,8 @@ func TestPartitionResourceNames(t *testing.T) {
 		assert.True(t, matchesPartitionResourceName("example.com/{partition}-slice", "example.com/2x2-slice"))
 		assert.False(t, matchesPartitionResourceName("example.com/{partition}-slice", "example.com/2x2"))
 		assert.True(t, matchesPartitionResourceName("example.com/slice", "example.com/slice"))
+		assert.True(t, matchesPartitionResourceName("example.com/{partition}-{partition}", "example.com/1g-1g"))
+		assert.False(t, matchesPartitionResourceName("example.com/{partition}-{partition}", "example.com/1g-2g"))
 	})
 
 	t.Run("maps partition resources to the device class resource", func(t *testing.T) {
