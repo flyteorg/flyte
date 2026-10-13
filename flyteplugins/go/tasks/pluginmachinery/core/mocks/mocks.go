@@ -27,10 +27,19 @@ func NewTaskTemplatePath(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *TaskTemplatePath {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &TaskTemplatePath{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -81,7 +90,7 @@ type TaskTemplatePath_Path_Call struct {
 
 // Path is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *TaskTemplatePath_Expecter) Path(ctx interface{}) *TaskTemplatePath_Path_Call {
+func (_e *TaskTemplatePath_Expecter) Path(ctx any) *TaskTemplatePath_Path_Call {
 	return &TaskTemplatePath_Path_Call{Call: _e.mock.On("Path", ctx)}
 }
 
@@ -114,10 +123,19 @@ func NewTaskReader(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *TaskReader {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &TaskReader{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -168,7 +186,7 @@ type TaskReader_Path_Call struct {
 
 // Path is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *TaskReader_Expecter) Path(ctx interface{}) *TaskReader_Path_Call {
+func (_e *TaskReader_Expecter) Path(ctx any) *TaskReader_Path_Call {
 	return &TaskReader_Path_Call{Call: _e.mock.On("Path", ctx)}
 }
 
@@ -230,7 +248,7 @@ type TaskReader_Read_Call struct {
 
 // Read is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *TaskReader_Expecter) Read(ctx interface{}) *TaskReader_Read_Call {
+func (_e *TaskReader_Expecter) Read(ctx any) *TaskReader_Read_Call {
 	return &TaskReader_Read_Call{Call: _e.mock.On("Read", ctx)}
 }
 
@@ -263,10 +281,19 @@ func NewTaskExecutionContext(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *TaskExecutionContext {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &TaskExecutionContext{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -796,10 +823,19 @@ func NewEventsRecorder(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *EventsRecorder {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &EventsRecorder{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -842,7 +878,7 @@ type EventsRecorder_RecordRaw_Call struct {
 // RecordRaw is a helper method to define mock.On call
 //   - ctx context.Context
 //   - ev core0.PhaseInfo
-func (_e *EventsRecorder_Expecter) RecordRaw(ctx interface{}, ev interface{}) *EventsRecorder_RecordRaw_Call {
+func (_e *EventsRecorder_Expecter) RecordRaw(ctx any, ev any) *EventsRecorder_RecordRaw_Call {
 	return &EventsRecorder_RecordRaw_Call{Call: _e.mock.On("RecordRaw", ctx, ev)}
 }
 
@@ -880,10 +916,19 @@ func NewTaskOverrides(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *TaskOverrides {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &TaskOverrides{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -1181,10 +1226,19 @@ func NewTaskExecutionID(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *TaskExecutionID {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &TaskExecutionID{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -1280,7 +1334,7 @@ type TaskExecutionID_GetGeneratedNameWith_Call struct {
 // GetGeneratedNameWith is a helper method to define mock.On call
 //   - minLength int
 //   - maxLength int
-func (_e *TaskExecutionID_Expecter) GetGeneratedNameWith(minLength interface{}, maxLength interface{}) *TaskExecutionID_GetGeneratedNameWith_Call {
+func (_e *TaskExecutionID_Expecter) GetGeneratedNameWith(minLength any, maxLength any) *TaskExecutionID_GetGeneratedNameWith_Call {
 	return &TaskExecutionID_GetGeneratedNameWith_Call{Call: _e.mock.On("GetGeneratedNameWith", minLength, maxLength)}
 }
 
@@ -1408,10 +1462,19 @@ func NewTaskExecutionMetadata(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *TaskExecutionMetadata {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &TaskExecutionMetadata{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -2153,10 +2216,19 @@ func NewKubeClient(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *KubeClient {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &KubeClient{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -2272,10 +2344,19 @@ func NewPlugin(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *Plugin {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &Plugin{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -2318,7 +2399,7 @@ type Plugin_Abort_Call struct {
 // Abort is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx core0.TaskExecutionContext
-func (_e *Plugin_Expecter) Abort(ctx interface{}, tCtx interface{}) *Plugin_Abort_Call {
+func (_e *Plugin_Expecter) Abort(ctx any, tCtx any) *Plugin_Abort_Call {
 	return &Plugin_Abort_Call{Call: _e.mock.On("Abort", ctx, tCtx)}
 }
 
@@ -2375,7 +2456,7 @@ type Plugin_Finalize_Call struct {
 // Finalize is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx core0.TaskExecutionContext
-func (_e *Plugin_Expecter) Finalize(ctx interface{}, tCtx interface{}) *Plugin_Finalize_Call {
+func (_e *Plugin_Expecter) Finalize(ctx any, tCtx any) *Plugin_Finalize_Call {
 	return &Plugin_Finalize_Call{Call: _e.mock.On("Finalize", ctx, tCtx)}
 }
 
@@ -2529,7 +2610,7 @@ type Plugin_Handle_Call struct {
 // Handle is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx core0.TaskExecutionContext
-func (_e *Plugin_Expecter) Handle(ctx interface{}, tCtx interface{}) *Plugin_Handle_Call {
+func (_e *Plugin_Expecter) Handle(ctx any, tCtx any) *Plugin_Handle_Call {
 	return &Plugin_Handle_Call{Call: _e.mock.On("Handle", ctx, tCtx)}
 }
 
@@ -2567,10 +2648,19 @@ func NewResourceRegistrar(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *ResourceRegistrar {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &ResourceRegistrar{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -2614,7 +2704,7 @@ type ResourceRegistrar_RegisterResourceQuota_Call struct {
 //   - ctx context.Context
 //   - namespace core0.ResourceNamespace
 //   - quota int
-func (_e *ResourceRegistrar_Expecter) RegisterResourceQuota(ctx interface{}, namespace interface{}, quota interface{}) *ResourceRegistrar_RegisterResourceQuota_Call {
+func (_e *ResourceRegistrar_Expecter) RegisterResourceQuota(ctx any, namespace any, quota any) *ResourceRegistrar_RegisterResourceQuota_Call {
 	return &ResourceRegistrar_RegisterResourceQuota_Call{Call: _e.mock.On("RegisterResourceQuota", ctx, namespace, quota)}
 }
 
@@ -2657,10 +2747,19 @@ func NewResourceManager(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *ResourceManager {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &ResourceManager{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -2714,7 +2813,7 @@ type ResourceManager_AllocateResource_Call struct {
 //   - namespace core0.ResourceNamespace
 //   - allocationToken string
 //   - constraintsSpec core0.ResourceConstraintsSpec
-func (_e *ResourceManager_Expecter) AllocateResource(ctx interface{}, namespace interface{}, allocationToken interface{}, constraintsSpec interface{}) *ResourceManager_AllocateResource_Call {
+func (_e *ResourceManager_Expecter) AllocateResource(ctx any, namespace any, allocationToken any, constraintsSpec any) *ResourceManager_AllocateResource_Call {
 	return &ResourceManager_AllocateResource_Call{Call: _e.mock.On("AllocateResource", ctx, namespace, allocationToken, constraintsSpec)}
 }
 
@@ -2826,7 +2925,7 @@ type ResourceManager_ReleaseResource_Call struct {
 //   - ctx context.Context
 //   - namespace core0.ResourceNamespace
 //   - allocationToken string
-func (_e *ResourceManager_Expecter) ReleaseResource(ctx interface{}, namespace interface{}, allocationToken interface{}) *ResourceManager_ReleaseResource_Call {
+func (_e *ResourceManager_Expecter) ReleaseResource(ctx any, namespace any, allocationToken any) *ResourceManager_ReleaseResource_Call {
 	return &ResourceManager_ReleaseResource_Call{Call: _e.mock.On("ReleaseResource", ctx, namespace, allocationToken)}
 }
 
@@ -2869,10 +2968,19 @@ func NewSecretManager(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *SecretManager {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &SecretManager{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -2924,7 +3032,7 @@ type SecretManager_Get_Call struct {
 // Get is a helper method to define mock.On call
 //   - ctx context.Context
 //   - key string
-func (_e *SecretManager_Expecter) Get(ctx interface{}, key interface{}) *SecretManager_Get_Call {
+func (_e *SecretManager_Expecter) Get(ctx any, key any) *SecretManager_Get_Call {
 	return &SecretManager_Get_Call{Call: _e.mock.On("Get", ctx, key)}
 }
 
@@ -2962,10 +3070,19 @@ func NewSetupContext(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *SetupContext {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &SetupContext{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -3309,10 +3426,19 @@ func NewPluginStateWriter(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *PluginStateWriter {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &PluginStateWriter{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -3355,7 +3481,7 @@ type PluginStateWriter_Put_Call struct {
 // Put is a helper method to define mock.On call
 //   - stateVersion uint8
 //   - v interface{}
-func (_e *PluginStateWriter_Expecter) Put(stateVersion interface{}, v interface{}) *PluginStateWriter_Put_Call {
+func (_e *PluginStateWriter_Expecter) Put(stateVersion any, v any) *PluginStateWriter_Put_Call {
 	return &PluginStateWriter_Put_Call{Call: _e.mock.On("Put", stateVersion, v)}
 }
 
@@ -3437,10 +3563,19 @@ func NewPluginStateReader(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *PluginStateReader {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &PluginStateReader{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -3491,7 +3626,7 @@ type PluginStateReader_Get_Call struct {
 
 // Get is a helper method to define mock.On call
 //   - t interface{}
-func (_e *PluginStateReader_Expecter) Get(t interface{}) *PluginStateReader_Get_Call {
+func (_e *PluginStateReader_Expecter) Get(t any) *PluginStateReader_Get_Call {
 	return &PluginStateReader_Get_Call{Call: _e.mock.On("Get", t)}
 }
 

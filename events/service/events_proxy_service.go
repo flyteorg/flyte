@@ -2,9 +2,9 @@ package service
 
 import (
 	"context"
-	"fmt"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
@@ -20,29 +20,29 @@ func NewEventsProxyService(runClient workflowconnect.InternalRunServiceClient) *
 }
 
 // Record accepts action events and forwards them synchronously to the run service.
-func (s *EventsProxyService) Record(ctx context.Context, req *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
+func (s *EventsProxyService) Record(ctx context.Context, req *workflow.RecordRequest) (*workflow.RecordResponse, error) {
 	if s.runClient == nil {
-		return nil, connect.NewError(connect.CodeFailedPrecondition, fmt.Errorf("run client is not initialized"))
+		return nil, connect.Errorf(connect.CodeFailedPrecondition, "run client is not initialized")
 	}
-	if err := req.Msg.Validate(); err != nil {
+	if err := req.Validate(); err != nil {
 		logger.Errorf(ctx, "invalid EventsProxyService.Record request: %v", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
-	if len(req.Msg.GetEvents()) == 0 {
-		return connect.NewResponse(&workflow.RecordResponse{}), nil
+	if len(req.GetEvents()) == 0 {
+		return &workflow.RecordResponse{}, nil
 	}
 
-	recordEventReq := &workflow.RecordActionEventsRequest{Events: req.Msg.GetEvents()}
-	recordActionResp, err := s.runClient.RecordActionEvents(ctx, connect.NewRequest(recordEventReq))
+	recordEventReq := &workflow.RecordActionEventsRequest{Events: req.GetEvents()}
+	recordActionResp, err := s.runClient.RecordActionEvents(ctx, recordEventReq)
 	if err != nil {
 		logger.Warnf(ctx, "failed to forward action events to run service: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
-	status := recordActionResp.Msg.GetStatus()
+	status := recordActionResp.GetStatus()
 	if status != nil && status.Code != 0 {
 		logger.Warnf(ctx, "run service returned non-ok status for action events: code=%d, msg=%s", status.Code, status.Message)
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("run service failed: %s", status.Message))
+		return nil, connect.Errorf(connect.CodeInternal, "run service failed: %s", status.Message)
 	}
 
-	return connect.NewResponse(&workflow.RecordResponse{}), nil
+	return &workflow.RecordResponse{}, nil
 }

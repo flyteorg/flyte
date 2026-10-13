@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"github.com/jmoiron/sqlx"
+
 	cacheconfig "github.com/flyteorg/flyte/v2/cache_service/config"
 	"github.com/flyteorg/flyte/v2/cache_service/manager"
 	"github.com/flyteorg/flyte/v2/cache_service/repository"
 	cacheservicepb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice"
 	cacheservicev2 "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice/v2"
-	"github.com/jmoiron/sqlx"
 )
 
 type CacheService struct {
@@ -29,78 +30,78 @@ func NewCacheService(cfg *cacheconfig.Config, db *sqlx.DB) *CacheService {
 	}
 }
 
-func (s *CacheService) Get(ctx context.Context, req *connect.Request[cacheservicev2.GetCacheRequest]) (*connect.Response[cacheservicepb.GetCacheResponse], error) {
-	if err := validateRequest(req.Msg); err != nil {
+func (s *CacheService) Get(ctx context.Context, req *cacheservicev2.GetCacheRequest) (*cacheservicepb.GetCacheResponse, error) {
+	if err := validateRequest(req); err != nil {
 		return nil, err
 	}
-	base := req.Msg.GetBaseRequest()
+	base := req.GetBaseRequest()
 	if base == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("base_request is required"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "base_request is required")
 	}
 	if err := validateBaseKey(base.GetKey()); err != nil {
 		return nil, err
 	}
-	entry, err := s.manager.Get(ctx, &cacheservicepb.GetCacheRequest{Key: scopedKey(base.GetKey(), req.Msg.GetIdentifier())})
+	entry, err := s.manager.Get(ctx, &cacheservicepb.GetCacheRequest{Key: scopedKey(base.GetKey(), req.GetIdentifier())})
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&cacheservicepb.GetCacheResponse{
+	return &cacheservicepb.GetCacheResponse{
 		Output: &cacheservicepb.CachedOutput{
 			Output:   &cacheservicepb.CachedOutput_OutputUri{OutputUri: entry.OutputURI},
 			Metadata: entry.Metadata,
 		},
-	}), nil
+	}, nil
 }
 
-func (s *CacheService) Put(ctx context.Context, req *connect.Request[cacheservicev2.PutCacheRequest]) (*connect.Response[cacheservicepb.PutCacheResponse], error) {
-	if err := validateRequest(req.Msg); err != nil {
+func (s *CacheService) Put(ctx context.Context, req *cacheservicev2.PutCacheRequest) (*cacheservicepb.PutCacheResponse, error) {
+	if err := validateRequest(req); err != nil {
 		return nil, err
 	}
-	base := req.Msg.GetBaseRequest()
+	base := req.GetBaseRequest()
 	if base == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("base_request is required"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "base_request is required")
 	}
 	if err := validateBaseKey(base.GetKey()); err != nil {
 		return nil, err
 	}
 	if base.GetOutput() == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("base_request.output is required"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "base_request.output is required")
 	}
 	managerReq := &cacheservicepb.PutCacheRequest{
-		Key:       scopedKey(base.GetKey(), req.Msg.GetIdentifier()),
+		Key:       scopedKey(base.GetKey(), req.GetIdentifier()),
 		Output:    base.GetOutput(),
 		Overwrite: base.GetOverwrite(),
 	}
 	if err := s.manager.Put(ctx, managerReq); err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&cacheservicepb.PutCacheResponse{}), nil
+	return &cacheservicepb.PutCacheResponse{}, nil
 }
 
-func (s *CacheService) Delete(ctx context.Context, req *connect.Request[cacheservicev2.DeleteCacheRequest]) (*connect.Response[cacheservicepb.DeleteCacheResponse], error) {
-	if err := validateRequest(req.Msg); err != nil {
+func (s *CacheService) Delete(ctx context.Context, req *cacheservicev2.DeleteCacheRequest) (*cacheservicepb.DeleteCacheResponse, error) {
+	if err := validateRequest(req); err != nil {
 		return nil, err
 	}
-	base := req.Msg.GetBaseRequest()
+	base := req.GetBaseRequest()
 	if base == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("base_request is required"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "base_request is required")
 	}
 	if err := validateBaseKey(base.GetKey()); err != nil {
 		return nil, err
 	}
-	if err := s.manager.Delete(ctx, &cacheservicepb.DeleteCacheRequest{Key: scopedKey(base.GetKey(), req.Msg.GetIdentifier())}); err != nil {
+	if err := s.manager.Delete(ctx, &cacheservicepb.DeleteCacheRequest{Key: scopedKey(base.GetKey(), req.GetIdentifier())}); err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&cacheservicepb.DeleteCacheResponse{}), nil
+	return &cacheservicepb.DeleteCacheResponse{}, nil
 }
 
-func (s *CacheService) GetOrExtendReservation(ctx context.Context, req *connect.Request[cacheservicev2.GetOrExtendReservationRequest]) (*connect.Response[cacheservicepb.GetOrExtendReservationResponse], error) {
-	if err := validateRequest(req.Msg); err != nil {
+func (s *CacheService) GetOrExtendReservation(ctx context.Context, req *cacheservicev2.GetOrExtendReservationRequest) (*cacheservicepb.GetOrExtendReservationResponse, error) {
+	if err := validateRequest(req); err != nil {
 		return nil, err
 	}
-	base := req.Msg.GetBaseRequest()
+	base := req.GetBaseRequest()
 	if base == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("base_request is required"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "base_request is required")
 	}
 	if err := validateBaseKey(base.GetKey()); err != nil {
 		return nil, err
@@ -109,7 +110,7 @@ func (s *CacheService) GetOrExtendReservation(ctx context.Context, req *connect.
 		return nil, err
 	}
 	managerReq := &cacheservicepb.GetOrExtendReservationRequest{
-		Key:               scopedKey(base.GetKey(), req.Msg.GetIdentifier()),
+		Key:               scopedKey(base.GetKey(), req.GetIdentifier()),
 		OwnerId:           base.GetOwnerId(),
 		HeartbeatInterval: base.GetHeartbeatInterval(),
 	}
@@ -117,18 +118,18 @@ func (s *CacheService) GetOrExtendReservation(ctx context.Context, req *connect.
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&cacheservicepb.GetOrExtendReservationResponse{
+	return &cacheservicepb.GetOrExtendReservationResponse{
 		Reservation: reservation,
-	}), nil
+	}, nil
 }
 
-func (s *CacheService) ReleaseReservation(ctx context.Context, req *connect.Request[cacheservicev2.ReleaseReservationRequest]) (*connect.Response[cacheservicepb.ReleaseReservationResponse], error) {
-	if err := validateRequest(req.Msg); err != nil {
+func (s *CacheService) ReleaseReservation(ctx context.Context, req *cacheservicev2.ReleaseReservationRequest) (*cacheservicepb.ReleaseReservationResponse, error) {
+	if err := validateRequest(req); err != nil {
 		return nil, err
 	}
-	base := req.Msg.GetBaseRequest()
+	base := req.GetBaseRequest()
 	if base == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("base_request is required"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "base_request is required")
 	}
 	if err := validateBaseKey(base.GetKey()); err != nil {
 		return nil, err
@@ -137,13 +138,13 @@ func (s *CacheService) ReleaseReservation(ctx context.Context, req *connect.Requ
 		return nil, err
 	}
 	managerReq := &cacheservicepb.ReleaseReservationRequest{
-		Key:     scopedKey(base.GetKey(), req.Msg.GetIdentifier()),
+		Key:     scopedKey(base.GetKey(), req.GetIdentifier()),
 		OwnerId: base.GetOwnerId(),
 	}
 	if err := s.manager.ReleaseReservation(ctx, managerReq); err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&cacheservicepb.ReleaseReservationResponse{}), nil
+	return &cacheservicepb.ReleaseReservationResponse{}, nil
 }
 
 type validatableRequest interface {
@@ -152,21 +153,21 @@ type validatableRequest interface {
 
 func validateRequest(msg validatableRequest) error {
 	if err := msg.Validate(); err != nil {
-		return connect.NewError(connect.CodeInvalidArgument, err)
+		return connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
 	return nil
 }
 
 func validateBaseKey(key string) error {
 	if key == "" {
-		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("base_request.key is required"))
+		return connect.Errorf(connect.CodeInvalidArgument, "base_request.key is required")
 	}
 	return nil
 }
 
 func validateOwnerID(ownerID string) error {
 	if ownerID == "" {
-		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("base_request.owner_id is required"))
+		return connect.Errorf(connect.CodeInvalidArgument, "base_request.owner_id is required")
 	}
 	return nil
 }

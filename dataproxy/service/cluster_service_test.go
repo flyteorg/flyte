@@ -4,15 +4,20 @@ import (
 	"context"
 	"testing"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connectinprocess"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster/clusterconnect"
 )
 
 func TestSelectCluster_ReturnsSchemeQualifiedEndpoint(t *testing.T) {
 	svc := NewClusterService()
+	server := connect.NewServer()
+	clusterconnect.RegisterClusterServiceHandler(server, svc)
+	client := clusterconnect.NewClusterServiceClient(connect.NewClient(connectinprocess.New(server)))
 
 	tests := []struct {
 		name     string
@@ -30,16 +35,17 @@ func TestSelectCluster_ReturnsSchemeQualifiedEndpoint(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := connect.NewRequest(&cluster.SelectClusterRequest{})
+			req := &cluster.SelectClusterRequest{}
+			ctx, info := connect.NewClientContext(context.Background())
 			if tt.host != "" {
-				req.Header().Set("Host", tt.host)
+				info.RequestHeader().Set("Host", tt.host)
 			}
 			if tt.fwdProto != "" {
-				req.Header().Set("X-Forwarded-Proto", tt.fwdProto)
+				info.RequestHeader().Set("X-Forwarded-Proto", tt.fwdProto)
 			}
-			resp, err := svc.SelectCluster(context.Background(), req)
+			resp, err := client.SelectCluster(ctx, req)
 			require.NoError(t, err)
-			assert.Equal(t, tt.want, resp.Msg.GetClusterEndpoint())
+			assert.Equal(t, tt.want, resp.GetClusterEndpoint())
 		})
 	}
 }

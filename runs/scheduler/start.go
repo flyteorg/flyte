@@ -4,7 +4,9 @@ import (
 	"context"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
+
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
@@ -19,9 +21,9 @@ func Start(
 	ctx context.Context,
 	triggerRepo interfaces.TriggerRepo,
 	cfg config.TriggerSchedulerConfig,
-	httpClient connect.HTTPClient,
+	httpClient connecthttp.HTTPClient,
 	baseURL string,
-	clientOpts ...connect.ClientOption,
+	clientOpts ...connect.ClientInterceptor,
 ) func(ctx context.Context) error {
 	exec := executor.NewTriggerExecutor(executor.TriggerExecutorConfig{
 		BaseURL:    baseURL,

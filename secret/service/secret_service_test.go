@@ -2,8 +2,6 @@ package service
 
 import (
 	"context"
-	"testing"
-
 	"encoding/json"
 	"fmt"
 	"net"
@@ -11,9 +9,9 @@ import (
 	"net/http/httptest"
 	"strconv"
 	"sync/atomic"
+	"testing"
 
-	"connectrpc.com/connect"
-	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
+	"connectrpc.com/connect/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
@@ -24,6 +22,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/executor/pkg/webhook"
 	flytesecret "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 	secretpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/secret"
 )
 
@@ -101,26 +100,26 @@ func TestSecretService_CreateThenGet(t *testing.T) {
 		Name:    "my-secret",
 	}
 
-	_, err := s.CreateSecret(ctx, connect.NewRequest(&secretpb.CreateSecretRequest{
+	_, err := s.CreateSecret(ctx, &secretpb.CreateSecretRequest{
 		Id: id,
 		SecretSpec: &secretpb.SecretSpec{
 			Value: &secretpb.SecretSpec_BinaryValue{BinaryValue: []byte("shhh")},
 		},
-	}))
+	})
 	require.NoError(t, err)
 
-	resp, err := s.GetSecret(ctx, connect.NewRequest(&secretpb.GetSecretRequest{Id: id}))
+	resp, err := s.GetSecret(ctx, &secretpb.GetSecretRequest{Id: id})
 	require.NoError(t, err)
-	assert.Equal(t, id.Name, resp.Msg.GetSecret().GetId().GetName())
+	assert.Equal(t, id.Name, resp.GetSecret().GetId().GetName())
 }
 
 func TestSecretService_GetNotFound_UsesOriginalName(t *testing.T) {
 	k := newTestClient(t)
 	s := NewSecretService(k, "")
 	ctx := context.Background()
-	_, err := s.GetSecret(ctx, connect.NewRequest(&secretpb.GetSecretRequest{
+	_, err := s.GetSecret(ctx, &secretpb.GetSecretRequest{
 		Id: &secretpb.SecretIdentifier{Name: "my-secret1"},
-	}))
+	})
 	require.Error(t, err)
 	// Error surfaces the user-facing name, not the internal encoded form.
 	assert.Contains(t, err.Error(), "my-secret1")
@@ -139,30 +138,30 @@ func TestSecretService_List_FiltersByScope(t *testing.T) {
 		{Domain: "d", Project: "p", Name: "pp"}, // project+domain
 	}
 	for _, id := range secrets {
-		_, err := s.CreateSecret(ctx, connect.NewRequest(&secretpb.CreateSecretRequest{
+		_, err := s.CreateSecret(ctx, &secretpb.CreateSecretRequest{
 			Id:         id,
 			SecretSpec: &secretpb.SecretSpec{Value: &secretpb.SecretSpec_BinaryValue{BinaryValue: []byte("v")}},
-		}))
+		})
 		require.NoError(t, err)
 	}
 
 	// Empty request returns everything.
-	resp, err := s.ListSecrets(ctx, connect.NewRequest(&secretpb.ListSecretsRequest{}))
+	resp, err := s.ListSecrets(ctx, &secretpb.ListSecretsRequest{})
 	require.NoError(t, err)
-	assert.Len(t, resp.Msg.GetSecrets(), 3)
+	assert.Len(t, resp.GetSecrets(), 3)
 
 	// Domain-only request returns every secret that carries that domain
 	// label (domain-scoped and project+domain-scoped both qualify).
-	resp, err = s.ListSecrets(ctx, connect.NewRequest(&secretpb.ListSecretsRequest{Domain: "d"}))
+	resp, err = s.ListSecrets(ctx, &secretpb.ListSecretsRequest{Domain: "d"})
 	require.NoError(t, err)
-	names := namesOf(resp.Msg.GetSecrets())
+	names := namesOf(resp.GetSecrets())
 	assert.ElementsMatch(t, []string{"dd", "pp"}, names)
 
 	// Project+domain request returns only that scope.
-	resp, err = s.ListSecrets(ctx, connect.NewRequest(&secretpb.ListSecretsRequest{Domain: "d", Project: "p"}))
+	resp, err = s.ListSecrets(ctx, &secretpb.ListSecretsRequest{Domain: "d", Project: "p"})
 	require.NoError(t, err)
-	require.Len(t, resp.Msg.GetSecrets(), 1)
-	assert.Equal(t, "pp", resp.Msg.GetSecrets()[0].GetId().GetName())
+	require.Len(t, resp.GetSecrets(), 1)
+	assert.Equal(t, "pp", resp.GetSecrets()[0].GetId().GetName())
 }
 
 func namesOf(secrets []*secretpb.Secret) []string {
@@ -176,7 +175,7 @@ func namesOf(secrets []*secretpb.Secret) []string {
 func TestSecretService_List_RejectsProjectWithoutDomain(t *testing.T) {
 	k := newTestClient(t)
 	s := NewSecretService(k, "")
-	_, err := s.ListSecrets(context.Background(), connect.NewRequest(&secretpb.ListSecretsRequest{Project: "flytesnacks"}))
+	_, err := s.ListSecrets(context.Background(), &secretpb.ListSecretsRequest{Project: "flytesnacks"})
 	require.Error(t, err)
 }
 
@@ -253,11 +252,11 @@ func TestSecretService_WritesInvalidateCache(t *testing.T) {
 	spec := &secretpb.SecretSpec{Value: &secretpb.SecretSpec_BinaryValue{BinaryValue: []byte("v")}}
 	s := NewSecretService(newTestClient(t), srv.URL)
 
-	_, err := s.CreateSecret(ctx, connect.NewRequest(&secretpb.CreateSecretRequest{Id: id, SecretSpec: spec}))
+	_, err := s.CreateSecret(ctx, &secretpb.CreateSecretRequest{Id: id, SecretSpec: spec})
 	require.NoError(t, err)
-	_, err = s.UpdateSecret(ctx, connect.NewRequest(&secretpb.UpdateSecretRequest{Id: id, SecretSpec: spec}))
+	_, err = s.UpdateSecret(ctx, &secretpb.UpdateSecretRequest{Id: id, SecretSpec: spec})
 	require.NoError(t, err)
-	_, err = s.DeleteSecret(ctx, connect.NewRequest(&secretpb.DeleteSecretRequest{Id: id}))
+	_, err = s.DeleteSecret(ctx, &secretpb.DeleteSecretRequest{Id: id})
 	require.NoError(t, err)
 
 	want := webhook.InvalidateRequest{Org: defaultOrganization, Domain: "development", Project: "flytesnacks", Name: "my-secret"}
@@ -303,10 +302,10 @@ func TestSecretService_AuthenticatedCacheInvalidation(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	_, err = s.CreateSecret(ctx, connect.NewRequest(&secretpb.CreateSecretRequest{
+	_, err = s.CreateSecret(ctx, &secretpb.CreateSecretRequest{
 		Id:         &secretpb.SecretIdentifier{Project: "flytesnacks", Domain: "development", Name: "my-secret"},
 		SecretSpec: &secretpb.SecretSpec{Value: &secretpb.SecretSpec_BinaryValue{BinaryValue: []byte("v")}},
-	}))
+	})
 	require.NoError(t, err)
 	assert.Equal(t, int32(1), tokenRequests.Load())
 }
@@ -329,10 +328,10 @@ func TestSecretService_InvalidationFailureDoesNotFailWrite(t *testing.T) {
 	} {
 		t.Run(name, func(t *testing.T) {
 			s := NewSecretService(newTestClient(t), url)
-			_, err := s.CreateSecret(context.Background(), connect.NewRequest(&secretpb.CreateSecretRequest{
+			_, err := s.CreateSecret(context.Background(), &secretpb.CreateSecretRequest{
 				Id:         &secretpb.SecretIdentifier{Domain: "development", Name: "s"},
 				SecretSpec: spec,
-			}))
+			})
 			require.NoError(t, err)
 		})
 	}
@@ -351,9 +350,9 @@ func TestSecretService_DeleteInvalidatesEvenWhenNotFound(t *testing.T) {
 	defer srv.Close()
 
 	s := NewSecretService(newTestClient(t), srv.URL)
-	_, err := s.DeleteSecret(context.Background(), connect.NewRequest(&secretpb.DeleteSecretRequest{
+	_, err := s.DeleteSecret(context.Background(), &secretpb.DeleteSecretRequest{
 		Id: &secretpb.SecretIdentifier{Domain: "development", Name: "never-created"},
-	}))
+	})
 
 	require.Error(t, err, "deleting a missing secret should still report NotFound")
 	assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
@@ -381,10 +380,10 @@ func TestSecretService_InvalidationFansOutToEveryResolvedAddress(t *testing.T) {
 	}()
 
 	s := NewSecretService(newTestClient(t), fmt.Sprintf("http://localhost:%s", port))
-	_, err = s.CreateSecret(context.Background(), connect.NewRequest(&secretpb.CreateSecretRequest{
+	_, err = s.CreateSecret(context.Background(), &secretpb.CreateSecretRequest{
 		Id:         &secretpb.SecretIdentifier{Domain: "development", Name: "fanout"},
 		SecretSpec: &secretpb.SecretSpec{Value: &secretpb.SecretSpec_BinaryValue{BinaryValue: []byte("v")}},
-	}))
+	})
 	require.NoError(t, err)
 
 	for _, ip := range ips {

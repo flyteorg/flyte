@@ -2,10 +2,13 @@ package api
 
 import (
 	"context"
+	"errors"
+	"io"
 	"testing"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -29,14 +32,14 @@ func createTestAction(
 	t.Helper()
 	actionID := &common.ActionIdentifier{Run: runID, Name: actionName}
 
-	_, err := internalClient.RecordAction(ctx, connect.NewRequest(&workflow.RecordActionRequest{
+	_, err := internalClient.RecordAction(ctx, &workflow.RecordActionRequest{
 		ActionId: actionID,
 		Spec: &workflow.RecordActionRequest_Task{
 			Task: &workflow.TaskAction{
 				Spec: taskSpec,
 			},
 		},
-	}))
+	})
 	require.NoError(t, err)
 }
 
@@ -48,9 +51,9 @@ func recordActionEvent(
 	event *workflow.ActionEvent,
 ) {
 	t.Helper()
-	_, err := internalClient.RecordActionEvents(ctx, connect.NewRequest(&workflow.RecordActionEventsRequest{
+	_, err := internalClient.RecordActionEvents(ctx, &workflow.RecordActionEventsRequest{
 		Events: []*workflow.ActionEvent{event},
-	}))
+	})
 	require.NoError(t, err)
 }
 
@@ -59,8 +62,8 @@ func TestWatchActionDetails_StreamedUpdateIncludesFullDetails(t *testing.T) {
 
 	ctx := context.Background()
 	httpClient := newClient()
-	runClient := workflowconnect.NewRunServiceClient(httpClient, endpoint)
-	internalClient := workflowconnect.NewInternalRunServiceClient(httpClient, endpoint)
+	runClient := workflowconnect.NewRunServiceClient(connect.NewClient(connecthttp.NewTransport(httpClient, endpoint, connecthttp.WithReadMaxBytes(0))))
+	internalClient := workflowconnect.NewInternalRunServiceClient(connect.NewClient(connecthttp.NewTransport(httpClient, endpoint, connecthttp.WithReadMaxBytes(0))))
 
 	runID := &common.RunIdentifier{
 		Org:     testOrg,
@@ -94,15 +97,16 @@ func TestWatchActionDetails_StreamedUpdateIncludesFullDetails(t *testing.T) {
 	// Start watching
 	watchCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	stream, err := runClient.WatchActionDetails(watchCtx, connect.NewRequest(&workflow.WatchActionDetailsRequest{
+	stream, err := runClient.WatchActionDetails(watchCtx, &workflow.WatchActionDetailsRequest{
 		ActionId: actionID,
-	}))
+	})
 	require.NoError(t, err)
 	defer stream.Close()
 
 	// First message: initial state
-	require.True(t, stream.Receive())
-	initial := stream.Msg().Details
+	streamMsg1, streamErr1 := stream.Receive()
+	require.NoError(t, streamErr1)
+	initial := streamMsg1.Details
 	require.NotNil(t, initial)
 
 	// Verify initial includes task spec
@@ -119,8 +123,8 @@ func TestWatchActionDetails_StreamedUpdateIncludesErrorInfo(t *testing.T) {
 
 	ctx := context.Background()
 	httpClient := newClient()
-	runClient := workflowconnect.NewRunServiceClient(httpClient, endpoint)
-	internalClient := workflowconnect.NewInternalRunServiceClient(httpClient, endpoint)
+	runClient := workflowconnect.NewRunServiceClient(connect.NewClient(connecthttp.NewTransport(httpClient, endpoint, connecthttp.WithReadMaxBytes(0))))
+	internalClient := workflowconnect.NewInternalRunServiceClient(connect.NewClient(connecthttp.NewTransport(httpClient, endpoint, connecthttp.WithReadMaxBytes(0))))
 
 	runID := &common.RunIdentifier{
 		Org:     testOrg,
@@ -134,13 +138,13 @@ func TestWatchActionDetails_StreamedUpdateIncludesErrorInfo(t *testing.T) {
 	createTestAction(t, ctx, internalClient, runID, actionName, nil)
 
 	// Update action status to FAILED
-	_, err := internalClient.UpdateActionStatus(ctx, connect.NewRequest(&workflow.UpdateActionStatusRequest{
+	_, err := internalClient.UpdateActionStatus(ctx, &workflow.UpdateActionStatusRequest{
 		ActionId: actionID,
 		Status: &workflow.ActionStatus{
 			Phase:    common.ActionPhase_ACTION_PHASE_FAILED,
 			Attempts: 1,
 		},
-	}))
+	})
 	require.NoError(t, err)
 
 	// Record a FAILED event with error info (attempt is 1-indexed to match status.Attempts)
@@ -160,15 +164,16 @@ func TestWatchActionDetails_StreamedUpdateIncludesErrorInfo(t *testing.T) {
 	// Start watching
 	watchCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	stream, err := runClient.WatchActionDetails(watchCtx, connect.NewRequest(&workflow.WatchActionDetailsRequest{
+	stream, err := runClient.WatchActionDetails(watchCtx, &workflow.WatchActionDetailsRequest{
 		ActionId: actionID,
-	}))
+	})
 	require.NoError(t, err)
 	defer stream.Close()
 
 	// First message: initial state should include error info
-	require.True(t, stream.Receive())
-	initial := stream.Msg().Details
+	streamMsg2, streamErr2 := stream.Receive()
+	require.NoError(t, streamErr2)
+	initial := streamMsg2.Details
 	require.NotNil(t, initial)
 	assert.NotNil(t, initial.GetErrorInfo())
 	assert.Equal(t, "task failed with OOM", initial.GetErrorInfo().GetMessage())
@@ -179,12 +184,12 @@ func TestWatchActionDetails_GetActionNotFound(t *testing.T) {
 
 	ctx := context.Background()
 	httpClient := newClient()
-	runClient := workflowconnect.NewRunServiceClient(httpClient, endpoint)
+	runClient := workflowconnect.NewRunServiceClient(connect.NewClient(connecthttp.NewTransport(httpClient, endpoint, connecthttp.WithReadMaxBytes(0))))
 
 	// Request details for an action that doesn't exist
 	watchCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	stream, err := runClient.WatchActionDetails(watchCtx, connect.NewRequest(&workflow.WatchActionDetailsRequest{
+	stream, err := runClient.WatchActionDetails(watchCtx, &workflow.WatchActionDetailsRequest{
 		ActionId: &common.ActionIdentifier{
 			Run: &common.RunIdentifier{
 				Org:     testOrg,
@@ -194,13 +199,14 @@ func TestWatchActionDetails_GetActionNotFound(t *testing.T) {
 			},
 			Name: "nonexistent-action",
 		},
-	}))
+	})
 	require.NoError(t, err)
 	defer stream.Close()
 
 	// Should fail on first receive since action doesn't exist
-	assert.False(t, stream.Receive())
-	assert.Error(t, stream.Err())
+	streamMsg3, streamErr3 := stream.Receive()
+	_ = streamMsg3
+	assert.Error(t, streamErr3)
 }
 
 // TestWatchActionDetails_StaysOpenAcrossTimeoutRetry covers the #7910 review
@@ -214,8 +220,8 @@ func TestWatchActionDetails_StaysOpenAcrossTimeoutRetry(t *testing.T) {
 
 	ctx := context.Background()
 	httpClient := newClient()
-	runClient := workflowconnect.NewRunServiceClient(httpClient, endpoint)
-	internalClient := workflowconnect.NewInternalRunServiceClient(httpClient, endpoint)
+	runClient := workflowconnect.NewRunServiceClient(connect.NewClient(connecthttp.NewTransport(httpClient, endpoint, connecthttp.WithReadMaxBytes(0))))
+	internalClient := workflowconnect.NewInternalRunServiceClient(connect.NewClient(connecthttp.NewTransport(httpClient, endpoint, connecthttp.WithReadMaxBytes(0))))
 
 	runID := &common.RunIdentifier{
 		Org:     testOrg,
@@ -230,13 +236,13 @@ func TestWatchActionDetails_StaysOpenAcrossTimeoutRetry(t *testing.T) {
 
 	updateStatus := func(phase common.ActionPhase, attempts uint32) {
 		t.Helper()
-		_, err := internalClient.UpdateActionStatus(ctx, connect.NewRequest(&workflow.UpdateActionStatusRequest{
+		_, err := internalClient.UpdateActionStatus(ctx, &workflow.UpdateActionStatusRequest{
 			ActionId: actionID,
 			Status: &workflow.ActionStatus{
 				Phase:    phase,
 				Attempts: attempts,
 			},
-		}))
+		})
 		require.NoError(t, err)
 	}
 
@@ -257,13 +263,14 @@ func TestWatchActionDetails_StaysOpenAcrossTimeoutRetry(t *testing.T) {
 
 	watchCtx, cancel := context.WithTimeout(ctx, 20*time.Second)
 	defer cancel()
-	stream, err := runClient.WatchActionDetails(watchCtx, connect.NewRequest(&workflow.WatchActionDetailsRequest{
+	stream, err := runClient.WatchActionDetails(watchCtx, &workflow.WatchActionDetailsRequest{
 		ActionId: actionID,
-	}))
+	})
 	require.NoError(t, err)
 	defer stream.Close()
 
-	require.True(t, stream.Receive(), "initial state: %v", stream.Err())
+	_, streamErr4 := stream.Receive()
+	require.NoError(t, streamErr4)
 
 	// Attempt 1 times out and the action retries — event first, row second, the
 	// executor's ordering. The terminal TIMED_OUT event for attempt 1 lands while
@@ -282,15 +289,24 @@ func TestWatchActionDetails_StaysOpenAcrossTimeoutRetry(t *testing.T) {
 	// message is the terminal attempt 2.
 	var last *workflow.ActionDetails
 	sawAttempt2 := false
-	for stream.Receive() {
-		last = stream.Msg().Details
+	var streamErr error
+	for {
+		msg, err := stream.Receive()
+		if err != nil {
+			streamErr = err
+			break
+		}
+		last = msg.Details
 		for _, a := range last.GetAttempts() {
 			if a.GetAttempt() == 2 {
 				sawAttempt2 = true
 			}
 		}
 	}
-	require.NoError(t, stream.Err(), "stream must close cleanly, not on ctx timeout")
+	if errors.Is(streamErr, io.EOF) {
+		streamErr = nil
+	}
+	require.NoError(t, streamErr, "stream must close cleanly, not on ctx timeout")
 	require.NotNil(t, last, "expected at least one update after the mid-retry timeout")
 	assert.True(t, sawAttempt2, "stream closed before the retry attempt was ever delivered")
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_TIMED_OUT, last.GetStatus().GetPhase())

@@ -7,7 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -22,64 +23,64 @@ type mockInternalClient struct {
 	mock.Mock
 }
 
-func (m *mockInternalClient) Create(ctx context.Context, req *connect.Request[flyteapp.CreateRequest]) (*connect.Response[flyteapp.CreateResponse], error) {
+func (m *mockInternalClient) Create(ctx context.Context, req *flyteapp.CreateRequest) (*flyteapp.CreateResponse, error) {
 	args := m.Called(ctx, req)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*connect.Response[flyteapp.CreateResponse]), args.Error(1)
+	return args.Get(0).(*flyteapp.CreateResponse), args.Error(1)
 }
 
-func (m *mockInternalClient) Get(ctx context.Context, req *connect.Request[flyteapp.GetRequest]) (*connect.Response[flyteapp.GetResponse], error) {
+func (m *mockInternalClient) Get(ctx context.Context, req *flyteapp.GetRequest) (*flyteapp.GetResponse, error) {
 	args := m.Called(ctx, req)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*connect.Response[flyteapp.GetResponse]), args.Error(1)
+	return args.Get(0).(*flyteapp.GetResponse), args.Error(1)
 }
 
-func (m *mockInternalClient) Update(ctx context.Context, req *connect.Request[flyteapp.UpdateRequest]) (*connect.Response[flyteapp.UpdateResponse], error) {
+func (m *mockInternalClient) Update(ctx context.Context, req *flyteapp.UpdateRequest) (*flyteapp.UpdateResponse, error) {
 	args := m.Called(ctx, req)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*connect.Response[flyteapp.UpdateResponse]), args.Error(1)
+	return args.Get(0).(*flyteapp.UpdateResponse), args.Error(1)
 }
 
-func (m *mockInternalClient) UpdateStatus(ctx context.Context, req *connect.Request[flyteapp.UpdateStatusRequest]) (*connect.Response[flyteapp.UpdateStatusResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, nil)
+func (m *mockInternalClient) UpdateStatus(ctx context.Context, req *flyteapp.UpdateStatusRequest) (*flyteapp.UpdateStatusResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "")
 }
 
-func (m *mockInternalClient) Delete(ctx context.Context, req *connect.Request[flyteapp.DeleteRequest]) (*connect.Response[flyteapp.DeleteResponse], error) {
+func (m *mockInternalClient) Delete(ctx context.Context, req *flyteapp.DeleteRequest) (*flyteapp.DeleteResponse, error) {
 	args := m.Called(ctx, req)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*connect.Response[flyteapp.DeleteResponse]), args.Error(1)
+	return args.Get(0).(*flyteapp.DeleteResponse), args.Error(1)
 }
 
-func (m *mockInternalClient) List(ctx context.Context, req *connect.Request[flyteapp.ListRequest]) (*connect.Response[flyteapp.ListResponse], error) {
+func (m *mockInternalClient) List(ctx context.Context, req *flyteapp.ListRequest) (*flyteapp.ListResponse, error) {
 	args := m.Called(ctx, req)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*connect.Response[flyteapp.ListResponse]), args.Error(1)
+	return args.Get(0).(*flyteapp.ListResponse), args.Error(1)
 }
 
-func (m *mockInternalClient) Watch(ctx context.Context, req *connect.Request[flyteapp.WatchRequest]) (*connect.ServerStreamForClient[flyteapp.WatchResponse], error) {
+func (m *mockInternalClient) Watch(ctx context.Context, req *flyteapp.WatchRequest) (appconnect.AppServiceWatchClientStream, error) {
 	args := m.Called(ctx, req)
 	if args.Get(0) == nil {
-		return nil, args.Error(1)
+		return appconnect.AppServiceWatchClientStream{}, args.Error(1)
 	}
-	return args.Get(0).(*connect.ServerStreamForClient[flyteapp.WatchResponse]), args.Error(1)
+	return args.Get(0).(appconnect.AppServiceWatchClientStream), args.Error(1)
 }
 
-func (m *mockInternalClient) Lease(ctx context.Context, req *connect.Request[flyteapp.LeaseRequest]) (*connect.ServerStreamForClient[flyteapp.LeaseResponse], error) {
+func (m *mockInternalClient) Lease(ctx context.Context, req *flyteapp.LeaseRequest) (appconnect.AppServiceLeaseClientStream, error) {
 	args := m.Called(ctx, req)
 	if args.Get(0) == nil {
-		return nil, args.Error(1)
+		return appconnect.AppServiceLeaseClientStream{}, args.Error(1)
 	}
-	return args.Get(0).(*connect.ServerStreamForClient[flyteapp.LeaseResponse]), args.Error(1)
+	return args.Get(0).(appconnect.AppServiceLeaseClientStream), args.Error(1)
 }
 
 // --- helpers ---
@@ -113,14 +114,14 @@ func TestGet_CacheMiss_CallsInternal(t *testing.T) {
 	appID := testAppID()
 	app := testApp()
 	internal.On("Get", mock.Anything, mock.Anything).Return(
-		connect.NewResponse(&flyteapp.GetResponse{App: app}), nil,
+		&flyteapp.GetResponse{App: app}, nil,
 	)
 
-	resp, err := svc.Get(context.Background(), connect.NewRequest(&flyteapp.GetRequest{
+	resp, err := svc.Get(context.Background(), &flyteapp.GetRequest{
 		Identifier: &flyteapp.GetRequest_AppId{AppId: appID},
-	}))
+	})
 	require.NoError(t, err)
-	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE, resp.Msg.App.Status.Conditions[0].DeploymentStatus)
+	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE, resp.App.Status.Conditions[0].DeploymentStatus)
 	internal.AssertExpectations(t)
 }
 
@@ -133,11 +134,11 @@ func TestGet_CacheHit_SkipsInternal(t *testing.T) {
 	svc.cache.Add(cacheKey(appID), testApp())
 
 	// Internal should NOT be called.
-	resp, err := svc.Get(context.Background(), connect.NewRequest(&flyteapp.GetRequest{
+	resp, err := svc.Get(context.Background(), &flyteapp.GetRequest{
 		Identifier: &flyteapp.GetRequest_AppId{AppId: appID},
-	}))
+	})
 	require.NoError(t, err)
-	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE, resp.Msg.App.Status.Conditions[0].DeploymentStatus)
+	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE, resp.App.Status.Conditions[0].DeploymentStatus)
 	internal.AssertNotCalled(t, "Get")
 }
 
@@ -151,12 +152,12 @@ func TestGet_CacheExpired_CallsInternal(t *testing.T) {
 
 	app := testApp()
 	internal.On("Get", mock.Anything, mock.Anything).Return(
-		connect.NewResponse(&flyteapp.GetResponse{App: app}), nil,
+		&flyteapp.GetResponse{App: app}, nil,
 	)
 
-	_, err := svc.Get(context.Background(), connect.NewRequest(&flyteapp.GetRequest{
+	_, err := svc.Get(context.Background(), &flyteapp.GetRequest{
 		Identifier: &flyteapp.GetRequest_AppId{AppId: appID},
-	}))
+	})
 	require.NoError(t, err)
 	internal.AssertExpectations(t)
 }
@@ -188,12 +189,12 @@ func TestGet_TransitionalState_SkipsCache(t *testing.T) {
 
 	// Internal is called twice because the response is never cached.
 	internal.On("Get", mock.Anything, mock.Anything).Return(
-		connect.NewResponse(&flyteapp.GetResponse{App: stoppedApp}), nil,
+		&flyteapp.GetResponse{App: stoppedApp}, nil,
 	).Times(2)
 
-	req := connect.NewRequest(&flyteapp.GetRequest{
+	req := &flyteapp.GetRequest{
 		Identifier: &flyteapp.GetRequest_AppId{AppId: appID},
-	})
+	}
 	_, err := svc.Get(context.Background(), req)
 	require.NoError(t, err)
 	_, err = svc.Get(context.Background(), req)
@@ -227,12 +228,12 @@ func TestGet_StoppedWithDesiredStopped_Caches(t *testing.T) {
 
 	// Internal called once; second call served from cache.
 	internal.On("Get", mock.Anything, mock.Anything).Return(
-		connect.NewResponse(&flyteapp.GetResponse{App: stoppedApp}), nil,
+		&flyteapp.GetResponse{App: stoppedApp}, nil,
 	).Once()
 
-	req := connect.NewRequest(&flyteapp.GetRequest{
+	req := &flyteapp.GetRequest{
 		Identifier: &flyteapp.GetRequest_AppId{AppId: appID},
-	})
+	}
 	_, err := svc.Get(context.Background(), req)
 	require.NoError(t, err)
 	_, err = svc.Get(context.Background(), req)
@@ -254,10 +255,10 @@ func TestCreate_InvalidatesCache(t *testing.T) {
 	svc.cache.Add(cacheKey(app.Metadata.Id), app)
 
 	internal.On("Create", mock.Anything, mock.Anything).Return(
-		connect.NewResponse(&flyteapp.CreateResponse{App: app}), nil,
+		&flyteapp.CreateResponse{App: app}, nil,
 	)
 
-	_, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{App: app}))
+	_, err := svc.Create(context.Background(), &flyteapp.CreateRequest{App: app})
 	require.NoError(t, err)
 
 	_, hit := svc.cache.Get(cacheKey(app.Metadata.Id))
@@ -273,10 +274,10 @@ func TestUpdate_InvalidatesCache(t *testing.T) {
 	svc.cache.Add(cacheKey(app.Metadata.Id), app)
 
 	internal.On("Update", mock.Anything, mock.Anything).Return(
-		connect.NewResponse(&flyteapp.UpdateResponse{App: app}), nil,
+		&flyteapp.UpdateResponse{App: app}, nil,
 	)
 
-	_, err := svc.Update(context.Background(), connect.NewRequest(&flyteapp.UpdateRequest{App: app}))
+	_, err := svc.Update(context.Background(), &flyteapp.UpdateRequest{App: app})
 	require.NoError(t, err)
 
 	_, hit := svc.cache.Get(cacheKey(app.Metadata.Id))
@@ -292,10 +293,10 @@ func TestDelete_InvalidatesCache(t *testing.T) {
 	svc.cache.Add(cacheKey(appID), testApp())
 
 	internal.On("Delete", mock.Anything, mock.Anything).Return(
-		connect.NewResponse(&flyteapp.DeleteResponse{}), nil,
+		&flyteapp.DeleteResponse{}, nil,
 	)
 
-	_, err := svc.Delete(context.Background(), connect.NewRequest(&flyteapp.DeleteRequest{AppId: appID}))
+	_, err := svc.Delete(context.Background(), &flyteapp.DeleteRequest{AppId: appID})
 	require.NoError(t, err)
 
 	_, hit := svc.cache.Get(cacheKey(appID))
@@ -310,12 +311,12 @@ func TestList_AlwaysCallsInternal(t *testing.T) {
 	svc := NewAppService(internal, 30*time.Second)
 
 	internal.On("List", mock.Anything, mock.Anything).Return(
-		connect.NewResponse(&flyteapp.ListResponse{Apps: []*flyteapp.App{testApp()}}), nil,
+		&flyteapp.ListResponse{Apps: []*flyteapp.App{testApp()}}, nil,
 	)
 
-	resp, err := svc.List(context.Background(), connect.NewRequest(&flyteapp.ListRequest{}))
+	resp, err := svc.List(context.Background(), &flyteapp.ListRequest{})
 	require.NoError(t, err)
-	assert.Len(t, resp.Msg.Apps, 1)
+	assert.Len(t, resp.Apps, 1)
 	internal.AssertExpectations(t)
 }
 
@@ -326,7 +327,11 @@ func TestWatch_ProxiesStream(t *testing.T) {
 	internal := &mockInternalClient{}
 	svc := NewAppService(internal, 30*time.Second)
 
-	path, handler := appconnect.NewAppServiceHandler(svc)
+	handlerServer := connect.NewServer()
+	appconnect.RegisterAppServiceHandler(handlerServer, svc)
+	path := "/" + appconnect.AppServiceName + "/"
+	handler := http.NewServeMux()
+	connecthttp.Mount(handler, handlerServer, connecthttp.WithReadMaxBytes(0))
 	mux := http.NewServeMux()
 	mux.Handle(path, handler)
 	server := httptest.NewServer(mux)
@@ -334,20 +339,23 @@ func TestWatch_ProxiesStream(t *testing.T) {
 
 	// Mount InternalAppService on the same test server at /internal so the
 	// proxy can route to it.
-	internalSvcPath, internalSvcHandler := appconnect.NewAppServiceHandler(
-		&echoWatchService{app: testApp()},
-	)
+	internalSvcHandlerServer := connect.NewServer()
+	appconnect.RegisterAppServiceHandler(internalSvcHandlerServer, &echoWatchService{app: testApp()})
+	internalSvcPath := "/" + appconnect.AppServiceName + "/"
+	internalSvcHandler := http.NewServeMux()
+	connecthttp.Mount(internalSvcHandler, internalSvcHandlerServer, connecthttp.WithReadMaxBytes(0))
 	mux.Handle("/internal"+internalSvcPath, http.StripPrefix("/internal", internalSvcHandler))
 
 	// Point AppService proxy at the internal path on the same server.
-	svc.internalClient = appconnect.NewAppServiceClient(http.DefaultClient, server.URL+"/internal")
+	svc.internalClient = appconnect.NewAppServiceClient(connect.NewClient(connecthttp.NewTransport(http.DefaultClient, server.URL+"/internal", connecthttp.WithReadMaxBytes(0))))
 
-	client := appconnect.NewAppServiceClient(http.DefaultClient, server.URL)
-	stream, err := client.Watch(context.Background(), connect.NewRequest(&flyteapp.WatchRequest{}))
+	client := appconnect.NewAppServiceClient(connect.NewClient(connecthttp.NewTransport(http.DefaultClient, server.URL, connecthttp.WithReadMaxBytes(0))))
+	stream, err := client.Watch(context.Background(), &flyteapp.WatchRequest{})
 	require.NoError(t, err)
 
-	require.True(t, stream.Receive())
-	assert.Equal(t, "myapp", stream.Msg().GetCreateEvent().GetApp().GetMetadata().GetId().GetName())
+	streamMsg1, streamErr1 := stream.Receive()
+	require.NoError(t, streamErr1)
+	assert.Equal(t, "myapp", streamMsg1.GetCreateEvent().GetApp().GetMetadata().GetId().GetName())
 	stream.Close()
 }
 
@@ -359,8 +367,8 @@ type echoWatchService struct {
 
 func (e *echoWatchService) Watch(
 	_ context.Context,
-	_ *connect.Request[flyteapp.WatchRequest],
-	stream *connect.ServerStream[flyteapp.WatchResponse],
+	_ *flyteapp.WatchRequest,
+	stream appconnect.AppServiceWatchServerStream,
 ) error {
 	return stream.Send(&flyteapp.WatchResponse{
 		Event: &flyteapp.WatchResponse_CreateEvent{

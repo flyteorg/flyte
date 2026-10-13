@@ -2,10 +2,9 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"golang.org/x/sync/semaphore"
 
 	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
@@ -43,20 +42,20 @@ var _ appconnect.AppLogsServiceHandler = (*InternalAppLogsService)(nil)
 // TailLogs streams log lines for the given app or replica.
 func (s *InternalAppLogsService) TailLogs(
 	ctx context.Context,
-	req *connect.Request[flyteapp.TailLogsRequest],
-	stream *connect.ServerStream[flyteapp.TailLogsResponse],
+	req *flyteapp.TailLogsRequest,
+	stream appconnect.AppLogsServiceTailLogsServerStream,
 ) error {
 	if !s.sem.TryAcquire(1) {
-		return connect.NewError(connect.CodeResourceExhausted, fmt.Errorf("too many concurrent log streams"))
+		return connect.Errorf(connect.CodeResourceExhausted, "too many concurrent log streams")
 	}
 	defer s.sem.Release(1)
 
-	replicas, err := s.resolveReplicas(ctx, req.Msg)
+	replicas, err := s.resolveReplicas(ctx, req)
 	if err != nil {
 		return err
 	}
 	if len(replicas) == 0 {
-		return connect.NewError(connect.CodeNotFound, fmt.Errorf("no replicas found"))
+		return connect.Errorf(connect.CodeNotFound, "no replicas found")
 	}
 
 	// Send initial replica list so the client knows which replicas will be streamed.
@@ -118,11 +117,11 @@ func (s *InternalAppLogsService) resolveReplicas(ctx context.Context, req *flyte
 	switch t := req.GetTarget().(type) {
 	case *flyteapp.TailLogsRequest_AppId:
 		if t.AppId == nil {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("app_id is required"))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "app_id is required")
 		}
 		replicas, err := s.k8s.GetReplicas(ctx, t.AppId)
 		if err != nil {
-			return nil, connect.NewError(connect.CodeInternal, err)
+			return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 		}
 		ids := make([]*flyteapp.ReplicaIdentifier, 0, len(replicas))
 		for _, r := range replicas {
@@ -131,10 +130,10 @@ func (s *InternalAppLogsService) resolveReplicas(ctx context.Context, req *flyte
 		return ids, nil
 	case *flyteapp.TailLogsRequest_ReplicaId:
 		if t.ReplicaId == nil || t.ReplicaId.GetAppId() == nil || t.ReplicaId.GetName() == "" {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("replica_id with app_id and name is required"))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "replica_id with app_id and name is required")
 		}
 		return []*flyteapp.ReplicaIdentifier{t.ReplicaId}, nil
 	default:
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("target (app_id or replica_id) is required"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "target (app_id or replica_id) is required")
 	}
 }

@@ -27,10 +27,19 @@ func NewMockableControllerRuntimeClient(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *MockableControllerRuntimeClient {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &MockableControllerRuntimeClient{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -51,11 +60,11 @@ func (_m *MockableControllerRuntimeClient) EXPECT() *MockableControllerRuntimeCl
 // Apply provides a mock function for the type MockableControllerRuntimeClient
 func (_mock *MockableControllerRuntimeClient) Apply(ctx context.Context, obj runtime.ApplyConfiguration, opts ...client.ApplyOption) error {
 	// client.ApplyOption
-	_va := make([]interface{}, len(opts))
+	_va := make([]any, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, obj)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -82,9 +91,9 @@ type MockableControllerRuntimeClient_Apply_Call struct {
 //   - ctx context.Context
 //   - obj runtime.ApplyConfiguration
 //   - opts ...client.ApplyOption
-func (_e *MockableControllerRuntimeClient_Expecter) Apply(ctx interface{}, obj interface{}, opts ...interface{}) *MockableControllerRuntimeClient_Apply_Call {
+func (_e *MockableControllerRuntimeClient_Expecter) Apply(ctx any, obj any, opts ...any) *MockableControllerRuntimeClient_Apply_Call {
 	return &MockableControllerRuntimeClient_Apply_Call{Call: _e.mock.On("Apply",
-		append([]interface{}{ctx, obj}, opts...)...)}
+		append([]any{ctx, obj}, opts...)...)}
 }
 
 func (_c *MockableControllerRuntimeClient_Apply_Call) Run(run func(ctx context.Context, obj runtime.ApplyConfiguration, opts ...client.ApplyOption)) *MockableControllerRuntimeClient_Apply_Call {
@@ -127,11 +136,11 @@ func (_c *MockableControllerRuntimeClient_Apply_Call) RunAndReturn(run func(ctx 
 // Create provides a mock function for the type MockableControllerRuntimeClient
 func (_mock *MockableControllerRuntimeClient) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
 	// client.CreateOption
-	_va := make([]interface{}, len(opts))
+	_va := make([]any, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, obj)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -158,9 +167,9 @@ type MockableControllerRuntimeClient_Create_Call struct {
 //   - ctx context.Context
 //   - obj client.Object
 //   - opts ...client.CreateOption
-func (_e *MockableControllerRuntimeClient_Expecter) Create(ctx interface{}, obj interface{}, opts ...interface{}) *MockableControllerRuntimeClient_Create_Call {
+func (_e *MockableControllerRuntimeClient_Expecter) Create(ctx any, obj any, opts ...any) *MockableControllerRuntimeClient_Create_Call {
 	return &MockableControllerRuntimeClient_Create_Call{Call: _e.mock.On("Create",
-		append([]interface{}{ctx, obj}, opts...)...)}
+		append([]any{ctx, obj}, opts...)...)}
 }
 
 func (_c *MockableControllerRuntimeClient_Create_Call) Run(run func(ctx context.Context, obj client.Object, opts ...client.CreateOption)) *MockableControllerRuntimeClient_Create_Call {
@@ -203,11 +212,11 @@ func (_c *MockableControllerRuntimeClient_Create_Call) RunAndReturn(run func(ctx
 // Delete provides a mock function for the type MockableControllerRuntimeClient
 func (_mock *MockableControllerRuntimeClient) Delete(ctx context.Context, obj client.Object, opts ...client.DeleteOption) error {
 	// client.DeleteOption
-	_va := make([]interface{}, len(opts))
+	_va := make([]any, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, obj)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -234,9 +243,9 @@ type MockableControllerRuntimeClient_Delete_Call struct {
 //   - ctx context.Context
 //   - obj client.Object
 //   - opts ...client.DeleteOption
-func (_e *MockableControllerRuntimeClient_Expecter) Delete(ctx interface{}, obj interface{}, opts ...interface{}) *MockableControllerRuntimeClient_Delete_Call {
+func (_e *MockableControllerRuntimeClient_Expecter) Delete(ctx any, obj any, opts ...any) *MockableControllerRuntimeClient_Delete_Call {
 	return &MockableControllerRuntimeClient_Delete_Call{Call: _e.mock.On("Delete",
-		append([]interface{}{ctx, obj}, opts...)...)}
+		append([]any{ctx, obj}, opts...)...)}
 }
 
 func (_c *MockableControllerRuntimeClient_Delete_Call) Run(run func(ctx context.Context, obj client.Object, opts ...client.DeleteOption)) *MockableControllerRuntimeClient_Delete_Call {
@@ -279,11 +288,11 @@ func (_c *MockableControllerRuntimeClient_Delete_Call) RunAndReturn(run func(ctx
 // DeleteAllOf provides a mock function for the type MockableControllerRuntimeClient
 func (_mock *MockableControllerRuntimeClient) DeleteAllOf(ctx context.Context, obj client.Object, opts ...client.DeleteAllOfOption) error {
 	// client.DeleteAllOfOption
-	_va := make([]interface{}, len(opts))
+	_va := make([]any, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, obj)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -310,9 +319,9 @@ type MockableControllerRuntimeClient_DeleteAllOf_Call struct {
 //   - ctx context.Context
 //   - obj client.Object
 //   - opts ...client.DeleteAllOfOption
-func (_e *MockableControllerRuntimeClient_Expecter) DeleteAllOf(ctx interface{}, obj interface{}, opts ...interface{}) *MockableControllerRuntimeClient_DeleteAllOf_Call {
+func (_e *MockableControllerRuntimeClient_Expecter) DeleteAllOf(ctx any, obj any, opts ...any) *MockableControllerRuntimeClient_DeleteAllOf_Call {
 	return &MockableControllerRuntimeClient_DeleteAllOf_Call{Call: _e.mock.On("DeleteAllOf",
-		append([]interface{}{ctx, obj}, opts...)...)}
+		append([]any{ctx, obj}, opts...)...)}
 }
 
 func (_c *MockableControllerRuntimeClient_DeleteAllOf_Call) Run(run func(ctx context.Context, obj client.Object, opts ...client.DeleteAllOfOption)) *MockableControllerRuntimeClient_DeleteAllOf_Call {
@@ -355,11 +364,11 @@ func (_c *MockableControllerRuntimeClient_DeleteAllOf_Call) RunAndReturn(run fun
 // Get provides a mock function for the type MockableControllerRuntimeClient
 func (_mock *MockableControllerRuntimeClient) Get(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
 	// client.GetOption
-	_va := make([]interface{}, len(opts))
+	_va := make([]any, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, key, obj)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -387,9 +396,9 @@ type MockableControllerRuntimeClient_Get_Call struct {
 //   - key client.ObjectKey
 //   - obj client.Object
 //   - opts ...client.GetOption
-func (_e *MockableControllerRuntimeClient_Expecter) Get(ctx interface{}, key interface{}, obj interface{}, opts ...interface{}) *MockableControllerRuntimeClient_Get_Call {
+func (_e *MockableControllerRuntimeClient_Expecter) Get(ctx any, key any, obj any, opts ...any) *MockableControllerRuntimeClient_Get_Call {
 	return &MockableControllerRuntimeClient_Get_Call{Call: _e.mock.On("Get",
-		append([]interface{}{ctx, key, obj}, opts...)...)}
+		append([]any{ctx, key, obj}, opts...)...)}
 }
 
 func (_c *MockableControllerRuntimeClient_Get_Call) Run(run func(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption)) *MockableControllerRuntimeClient_Get_Call {
@@ -467,7 +476,7 @@ type MockableControllerRuntimeClient_GroupVersionKindFor_Call struct {
 
 // GroupVersionKindFor is a helper method to define mock.On call
 //   - obj runtime.Object
-func (_e *MockableControllerRuntimeClient_Expecter) GroupVersionKindFor(obj interface{}) *MockableControllerRuntimeClient_GroupVersionKindFor_Call {
+func (_e *MockableControllerRuntimeClient_Expecter) GroupVersionKindFor(obj any) *MockableControllerRuntimeClient_GroupVersionKindFor_Call {
 	return &MockableControllerRuntimeClient_GroupVersionKindFor_Call{Call: _e.mock.On("GroupVersionKindFor", obj)}
 }
 
@@ -527,7 +536,7 @@ type MockableControllerRuntimeClient_IsObjectNamespaced_Call struct {
 
 // IsObjectNamespaced is a helper method to define mock.On call
 //   - obj runtime.Object
-func (_e *MockableControllerRuntimeClient_Expecter) IsObjectNamespaced(obj interface{}) *MockableControllerRuntimeClient_IsObjectNamespaced_Call {
+func (_e *MockableControllerRuntimeClient_Expecter) IsObjectNamespaced(obj any) *MockableControllerRuntimeClient_IsObjectNamespaced_Call {
 	return &MockableControllerRuntimeClient_IsObjectNamespaced_Call{Call: _e.mock.On("IsObjectNamespaced", obj)}
 }
 
@@ -557,11 +566,11 @@ func (_c *MockableControllerRuntimeClient_IsObjectNamespaced_Call) RunAndReturn(
 // List provides a mock function for the type MockableControllerRuntimeClient
 func (_mock *MockableControllerRuntimeClient) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
 	// client.ListOption
-	_va := make([]interface{}, len(opts))
+	_va := make([]any, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, list)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -588,9 +597,9 @@ type MockableControllerRuntimeClient_List_Call struct {
 //   - ctx context.Context
 //   - list client.ObjectList
 //   - opts ...client.ListOption
-func (_e *MockableControllerRuntimeClient_Expecter) List(ctx interface{}, list interface{}, opts ...interface{}) *MockableControllerRuntimeClient_List_Call {
+func (_e *MockableControllerRuntimeClient_Expecter) List(ctx any, list any, opts ...any) *MockableControllerRuntimeClient_List_Call {
 	return &MockableControllerRuntimeClient_List_Call{Call: _e.mock.On("List",
-		append([]interface{}{ctx, list}, opts...)...)}
+		append([]any{ctx, list}, opts...)...)}
 }
 
 func (_c *MockableControllerRuntimeClient_List_Call) Run(run func(ctx context.Context, list client.ObjectList, opts ...client.ListOption)) *MockableControllerRuntimeClient_List_Call {
@@ -633,11 +642,11 @@ func (_c *MockableControllerRuntimeClient_List_Call) RunAndReturn(run func(ctx c
 // Patch provides a mock function for the type MockableControllerRuntimeClient
 func (_mock *MockableControllerRuntimeClient) Patch(ctx context.Context, obj client.Object, patch client.Patch, opts ...client.PatchOption) error {
 	// client.PatchOption
-	_va := make([]interface{}, len(opts))
+	_va := make([]any, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, obj, patch)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -665,9 +674,9 @@ type MockableControllerRuntimeClient_Patch_Call struct {
 //   - obj client.Object
 //   - patch client.Patch
 //   - opts ...client.PatchOption
-func (_e *MockableControllerRuntimeClient_Expecter) Patch(ctx interface{}, obj interface{}, patch interface{}, opts ...interface{}) *MockableControllerRuntimeClient_Patch_Call {
+func (_e *MockableControllerRuntimeClient_Expecter) Patch(ctx any, obj any, patch any, opts ...any) *MockableControllerRuntimeClient_Patch_Call {
 	return &MockableControllerRuntimeClient_Patch_Call{Call: _e.mock.On("Patch",
-		append([]interface{}{ctx, obj, patch}, opts...)...)}
+		append([]any{ctx, obj, patch}, opts...)...)}
 }
 
 func (_c *MockableControllerRuntimeClient_Patch_Call) Run(run func(ctx context.Context, obj client.Object, patch client.Patch, opts ...client.PatchOption)) *MockableControllerRuntimeClient_Patch_Call {
@@ -876,7 +885,7 @@ type MockableControllerRuntimeClient_SubResource_Call struct {
 
 // SubResource is a helper method to define mock.On call
 //   - subResource string
-func (_e *MockableControllerRuntimeClient_Expecter) SubResource(subResource interface{}) *MockableControllerRuntimeClient_SubResource_Call {
+func (_e *MockableControllerRuntimeClient_Expecter) SubResource(subResource any) *MockableControllerRuntimeClient_SubResource_Call {
 	return &MockableControllerRuntimeClient_SubResource_Call{Call: _e.mock.On("SubResource", subResource)}
 }
 
@@ -906,11 +915,11 @@ func (_c *MockableControllerRuntimeClient_SubResource_Call) RunAndReturn(run fun
 // Update provides a mock function for the type MockableControllerRuntimeClient
 func (_mock *MockableControllerRuntimeClient) Update(ctx context.Context, obj client.Object, opts ...client.UpdateOption) error {
 	// client.UpdateOption
-	_va := make([]interface{}, len(opts))
+	_va := make([]any, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, obj)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -937,9 +946,9 @@ type MockableControllerRuntimeClient_Update_Call struct {
 //   - ctx context.Context
 //   - obj client.Object
 //   - opts ...client.UpdateOption
-func (_e *MockableControllerRuntimeClient_Expecter) Update(ctx interface{}, obj interface{}, opts ...interface{}) *MockableControllerRuntimeClient_Update_Call {
+func (_e *MockableControllerRuntimeClient_Expecter) Update(ctx any, obj any, opts ...any) *MockableControllerRuntimeClient_Update_Call {
 	return &MockableControllerRuntimeClient_Update_Call{Call: _e.mock.On("Update",
-		append([]interface{}{ctx, obj}, opts...)...)}
+		append([]any{ctx, obj}, opts...)...)}
 }
 
 func (_c *MockableControllerRuntimeClient_Update_Call) Run(run func(ctx context.Context, obj client.Object, opts ...client.UpdateOption)) *MockableControllerRuntimeClient_Update_Call {
@@ -985,10 +994,19 @@ func NewGlobalSecretProvider(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *GlobalSecretProvider {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &GlobalSecretProvider{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -1040,7 +1058,7 @@ type GlobalSecretProvider_GetForSecret_Call struct {
 // GetForSecret is a helper method to define mock.On call
 //   - ctx context.Context
 //   - secret *core.Secret
-func (_e *GlobalSecretProvider_Expecter) GetForSecret(ctx interface{}, secret interface{}) *GlobalSecretProvider_GetForSecret_Call {
+func (_e *GlobalSecretProvider_Expecter) GetForSecret(ctx any, secret any) *GlobalSecretProvider_GetForSecret_Call {
 	return &GlobalSecretProvider_GetForSecret_Call{Call: _e.mock.On("GetForSecret", ctx, secret)}
 }
 
@@ -1078,10 +1096,19 @@ func NewAWSSecretManagerClient(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *AWSSecretManagerClient {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &AWSSecretManagerClient{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -1102,11 +1129,11 @@ func (_m *AWSSecretManagerClient) EXPECT() *AWSSecretManagerClient_Expecter {
 // GetSecretValue provides a mock function for the type AWSSecretManagerClient
 func (_mock *AWSSecretManagerClient) GetSecretValue(context1 context.Context, getSecretValueInput *secretsmanager.GetSecretValueInput, fns ...func(*secretsmanager.Options)) (*secretsmanager.GetSecretValueOutput, error) {
 	// func(*secretsmanager.Options)
-	_va := make([]interface{}, len(fns))
+	_va := make([]any, len(fns))
 	for _i := range fns {
 		_va[_i] = fns[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, context1, getSecretValueInput)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -1144,9 +1171,9 @@ type AWSSecretManagerClient_GetSecretValue_Call struct {
 //   - context1 context.Context
 //   - getSecretValueInput *secretsmanager.GetSecretValueInput
 //   - fns ...func(*secretsmanager.Options)
-func (_e *AWSSecretManagerClient_Expecter) GetSecretValue(context1 interface{}, getSecretValueInput interface{}, fns ...interface{}) *AWSSecretManagerClient_GetSecretValue_Call {
+func (_e *AWSSecretManagerClient_Expecter) GetSecretValue(context1 any, getSecretValueInput any, fns ...any) *AWSSecretManagerClient_GetSecretValue_Call {
 	return &AWSSecretManagerClient_GetSecretValue_Call{Call: _e.mock.On("GetSecretValue",
-		append([]interface{}{context1, getSecretValueInput}, fns...)...)}
+		append([]any{context1, getSecretValueInput}, fns...)...)}
 }
 
 func (_c *AWSSecretManagerClient_GetSecretValue_Call) Run(run func(context1 context.Context, getSecretValueInput *secretsmanager.GetSecretValueInput, fns ...func(*secretsmanager.Options))) *AWSSecretManagerClient_GetSecretValue_Call {
@@ -1192,10 +1219,19 @@ func NewGCPSecretManagerClient(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *GCPSecretManagerClient {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &GCPSecretManagerClient{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -1216,11 +1252,11 @@ func (_m *GCPSecretManagerClient) EXPECT() *GCPSecretManagerClient_Expecter {
 // AccessSecretVersion provides a mock function for the type GCPSecretManagerClient
 func (_mock *GCPSecretManagerClient) AccessSecretVersion(ctx context.Context, req *secretmanagerpb.AccessSecretVersionRequest, opts ...gax.CallOption) (*secretmanagerpb.AccessSecretVersionResponse, error) {
 	// gax.CallOption
-	_va := make([]interface{}, len(opts))
+	_va := make([]any, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, req)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -1258,9 +1294,9 @@ type GCPSecretManagerClient_AccessSecretVersion_Call struct {
 //   - ctx context.Context
 //   - req *secretmanagerpb.AccessSecretVersionRequest
 //   - opts ...gax.CallOption
-func (_e *GCPSecretManagerClient_Expecter) AccessSecretVersion(ctx interface{}, req interface{}, opts ...interface{}) *GCPSecretManagerClient_AccessSecretVersion_Call {
+func (_e *GCPSecretManagerClient_Expecter) AccessSecretVersion(ctx any, req any, opts ...any) *GCPSecretManagerClient_AccessSecretVersion_Call {
 	return &GCPSecretManagerClient_AccessSecretVersion_Call{Call: _e.mock.On("AccessSecretVersion",
-		append([]interface{}{ctx, req}, opts...)...)}
+		append([]any{ctx, req}, opts...)...)}
 }
 
 func (_c *GCPSecretManagerClient_AccessSecretVersion_Call) Run(run func(ctx context.Context, req *secretmanagerpb.AccessSecretVersionRequest, opts ...gax.CallOption)) *GCPSecretManagerClient_AccessSecretVersion_Call {
@@ -1306,10 +1342,19 @@ func NewAzureKeyVaultClient(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *AzureKeyVaultClient {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &AzureKeyVaultClient{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -1363,7 +1408,7 @@ type AzureKeyVaultClient_GetSecret_Call struct {
 //   - name string
 //   - version string
 //   - options *azsecrets.GetSecretOptions
-func (_e *AzureKeyVaultClient_Expecter) GetSecret(ctx interface{}, name interface{}, version interface{}, options interface{}) *AzureKeyVaultClient_GetSecret_Call {
+func (_e *AzureKeyVaultClient_Expecter) GetSecret(ctx any, name any, version any, options any) *AzureKeyVaultClient_GetSecret_Call {
 	return &AzureKeyVaultClient_GetSecret_Call{Call: _e.mock.On("GetSecret", ctx, name, version, options)}
 }
 
@@ -1411,10 +1456,19 @@ func NewSecretsInjector(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *SecretsInjector {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &SecretsInjector{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -1475,7 +1529,7 @@ type SecretsInjector_Inject_Call struct {
 //   - ctx context.Context
 //   - secrets *core.Secret
 //   - p *v1.Pod
-func (_e *SecretsInjector_Expecter) Inject(ctx interface{}, secrets interface{}, p interface{}) *SecretsInjector_Inject_Call {
+func (_e *SecretsInjector_Expecter) Inject(ctx any, secrets any, p any) *SecretsInjector_Inject_Call {
 	return &SecretsInjector_Inject_Call{Call: _e.mock.On("Inject", ctx, secrets, p)}
 }
 
@@ -1529,7 +1583,7 @@ type SecretsInjector_InvalidateCache_Call struct {
 //   - domain string
 //   - project string
 //   - secretName string
-func (_e *SecretsInjector_Expecter) InvalidateCache(ctx interface{}, org interface{}, domain interface{}, project interface{}, secretName interface{}) *SecretsInjector_InvalidateCache_Call {
+func (_e *SecretsInjector_Expecter) InvalidateCache(ctx any, org any, domain any, project any, secretName any) *SecretsInjector_InvalidateCache_Call {
 	return &SecretsInjector_InvalidateCache_Call{Call: _e.mock.On("InvalidateCache", ctx, org, domain, project, secretName)}
 }
 

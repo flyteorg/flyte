@@ -28,7 +28,8 @@ import (
 	"sync"
 	"testing"
 
-	"connectrpc.com/connect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+
 	"go.opentelemetry.io/otel/metric/noop"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/events"
@@ -197,8 +198,8 @@ func firstEnvTestBinaryDir() string {
 // fakeEventsClient is a no-op EventsProxyServiceClient for the reconciler.
 type fakeEventsClient struct{}
 
-func (f *fakeEventsClient) Record(_ context.Context, _ *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
-	return connect.NewResponse(&workflow.RecordResponse{}), nil
+func (f *fakeEventsClient) Record(_ context.Context, _ *workflow.RecordRequest) (*workflow.RecordResponse, error) {
+	return &workflow.RecordResponse{}, nil
 }
 
 type recordingEventsClient struct {
@@ -206,11 +207,11 @@ type recordingEventsClient struct {
 	events []*workflow.ActionEvent
 }
 
-func (r *recordingEventsClient) Record(_ context.Context, req *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
+func (r *recordingEventsClient) Record(_ context.Context, req *workflow.RecordRequest) (*workflow.RecordResponse, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.events = append(r.events, req.Msg.GetEvents()...)
-	return connect.NewResponse(&workflow.RecordResponse{}), nil
+	r.events = append(r.events, req.GetEvents()...)
+	return &workflow.RecordResponse{}, nil
 }
 
 func (r *recordingEventsClient) RecordedEvents() []*workflow.ActionEvent {
@@ -230,33 +231,33 @@ type recordingRunClient struct {
 	statusUpdates []*workflow.UpdateActionStatusRequest
 }
 
-func (r *recordingRunClient) RecordAction(_ context.Context, req *connect.Request[workflow.RecordActionRequest]) (*connect.Response[workflow.RecordActionResponse], error) {
+func (r *recordingRunClient) RecordAction(_ context.Context, req *workflow.RecordActionRequest) (*workflow.RecordActionResponse, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.recorded = append(r.recorded, req.Msg)
-	return connect.NewResponse(&workflow.RecordActionResponse{}), nil
+	r.recorded = append(r.recorded, req)
+	return &workflow.RecordActionResponse{}, nil
 }
 
-func (r *recordingRunClient) UpdateActionStatus(_ context.Context, req *connect.Request[workflow.UpdateActionStatusRequest]) (*connect.Response[workflow.UpdateActionStatusResponse], error) {
+func (r *recordingRunClient) UpdateActionStatus(_ context.Context, req *workflow.UpdateActionStatusRequest) (*workflow.UpdateActionStatusResponse, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.statusUpdates = append(r.statusUpdates, req.Msg)
-	return connect.NewResponse(&workflow.UpdateActionStatusResponse{}), nil
+	r.statusUpdates = append(r.statusUpdates, req)
+	return &workflow.UpdateActionStatusResponse{}, nil
 }
 
-func (r *recordingRunClient) RecordActionEvents(_ context.Context, _ *connect.Request[workflow.RecordActionEventsRequest]) (*connect.Response[workflow.RecordActionEventsResponse], error) {
-	return connect.NewResponse(&workflow.RecordActionEventsResponse{}), nil
+func (r *recordingRunClient) RecordActionEvents(_ context.Context, _ *workflow.RecordActionEventsRequest) (*workflow.RecordActionEventsResponse, error) {
+	return &workflow.RecordActionEventsResponse{}, nil
 }
 
-func (r *recordingRunClient) RecordActionStream(_ context.Context) *connect.BidiStreamForClient[workflow.RecordActionStreamRequest, workflow.RecordActionStreamResponse] {
+func (r *recordingRunClient) RecordActionStream(_ context.Context) (workflowconnect.InternalRunServiceRecordActionStreamClientStream, error) {
 	panic("not used in tests")
 }
 
-func (r *recordingRunClient) UpdateActionStatusStream(_ context.Context) *connect.BidiStreamForClient[workflow.UpdateActionStatusStreamRequest, workflow.UpdateActionStatusStreamResponse] {
+func (r *recordingRunClient) UpdateActionStatusStream(_ context.Context) (workflowconnect.InternalRunServiceUpdateActionStatusStreamClientStream, error) {
 	panic("not used in tests")
 }
 
-func (r *recordingRunClient) RecordActionEventStream(_ context.Context) *connect.BidiStreamForClient[workflow.RecordActionEventStreamRequest, workflow.RecordActionEventStreamResponse] {
+func (r *recordingRunClient) RecordActionEventStream(_ context.Context) (workflowconnect.InternalRunServiceRecordActionEventStreamClientStream, error) {
 	panic("not used in tests")
 }
 

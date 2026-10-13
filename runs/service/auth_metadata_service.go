@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
@@ -66,20 +66,20 @@ var _ authconnect.AuthMetadataServiceHandler = (*AuthMetadataService)(nil)
 // GetPublicClientConfig returns the public (CLI/SDK) OAuth2 client settings.
 func (s *AuthMetadataService) GetPublicClientConfig(
 	_ context.Context,
-	_ *connect.Request[auth.GetPublicClientConfigRequest],
-) (*connect.Response[auth.GetPublicClientConfigResponse], error) {
+	_ *auth.GetPublicClientConfigRequest,
+) (*auth.GetPublicClientConfigResponse, error) {
 	authMetadataKey := s.cfg.AuthorizationMetadataKey
 	if authMetadataKey == "" {
 		authMetadataKey = "authorization"
 	}
-	return connect.NewResponse(&auth.GetPublicClientConfigResponse{
+	return &auth.GetPublicClientConfigResponse{
 		ClientId:                 s.cfg.FlyteClient.ClientID,
 		RedirectUri:              s.cfg.FlyteClient.RedirectURI,
 		Scopes:                   s.cfg.FlyteClient.Scopes,
 		AuthorizationMetadataKey: authMetadataKey,
 		Audience:                 s.cfg.FlyteClient.Audience,
 		DataplaneDomain:          s.dataplaneDomain,
-	}), nil
+	}, nil
 }
 
 // GetOAuth2Metadata proxies the configured external authorization server's
@@ -89,11 +89,11 @@ func (s *AuthMetadataService) GetPublicClientConfig(
 // deployment and any upstream (ALB) JWT validation keyed to the same issuer.
 func (s *AuthMetadataService) GetOAuth2Metadata(
 	ctx context.Context,
-	_ *connect.Request[auth.GetOAuth2MetadataRequest],
-) (*connect.Response[auth.GetOAuth2MetadataResponse], error) {
+	_ *auth.GetOAuth2MetadataRequest,
+) (*auth.GetOAuth2MetadataResponse, error) {
 	if s.cfg.ExternalAuthServerBaseURL == "" {
 		return nil, connect.NewError(connect.CodeUnimplemented,
-			errors.New("oauth2 metadata is not configured; set runs.authMetadata.externalAuthServerBaseUrl"))
+			"oauth2 metadata is not configured; set runs.authMetadata.externalAuthServerBaseUrl")
 	}
 
 	// Serve from cache while fresh; only successful fetches are cached.
@@ -101,18 +101,18 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 	if s.cachedMetadata != nil && time.Now().Before(s.cacheExpiry) {
 		cached := proto.Clone(s.cachedMetadata).(*auth.GetOAuth2MetadataResponse)
 		s.mu.RUnlock()
-		return connect.NewResponse(cached), nil
+		return cached, nil
 	}
 	s.mu.RUnlock()
 
 	baseURL, err := url.Parse(s.cfg.ExternalAuthServerBaseURL)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal,
-			fmt.Errorf("invalid external auth server base URL %q: %w", s.cfg.ExternalAuthServerBaseURL, err))
+			fmt.Errorf("invalid external auth server base URL %q: %w", s.cfg.ExternalAuthServerBaseURL, err).Error())
 	}
 	if baseURL.Scheme == "" || baseURL.Host == "" {
-		return nil, connect.NewError(connect.CodeInternal,
-			fmt.Errorf("external auth server base URL must be absolute (include scheme and host): %q", s.cfg.ExternalAuthServerBaseURL))
+		return nil, connect.Errorf(connect.CodeInternal,
+			"external auth server base URL must be absolute (include scheme and host): %q", s.cfg.ExternalAuthServerBaseURL)
 	}
 
 	// Issuer URLs conventionally do not end with a '/', but metadata URLs are
@@ -126,13 +126,13 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 	relURL, err := url.Parse(metadataPath)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal,
-			fmt.Errorf("invalid external metadata path %q: %w", metadataPath, err))
+			fmt.Errorf("invalid external metadata path %q: %w", metadataPath, err).Error())
 	}
 	// MetadataURL is expected to be a relative path resolved against BaseURL.
 	// Reject absolute, scheme-relative, or root-relative paths so BaseURL cannot be bypassed.
 	if relURL.IsAbs() || relURL.Host != "" || strings.HasPrefix(relURL.Path, "/") {
-		return nil, connect.NewError(connect.CodeInternal,
-			fmt.Errorf("external metadata path must be relative to externalAuthServerBaseUrl (no leading '/'), got %q", metadataPath))
+		return nil, connect.Errorf(connect.CodeInternal,
+			"external metadata path must be relative to externalAuthServerBaseUrl (no leading '/'), got %q", metadataPath)
 	}
 	externalMetadataURL := baseURL.ResolveReference(relURL)
 
@@ -154,27 +154,27 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 		case errors.As(err, &connectErr):
 			return nil, err
 		case errors.Is(err, context.Canceled):
-			return nil, connect.NewError(connect.CodeCanceled, err)
+			return nil, connect.NewError(connect.CodeCanceled, err.Error()).WithCause(err)
 		case errors.Is(err, context.DeadlineExceeded):
-			return nil, connect.NewError(connect.CodeDeadlineExceeded, err)
+			return nil, connect.NewError(connect.CodeDeadlineExceeded, err.Error()).WithCause(err)
 		default:
-			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("failed to fetch OAuth2 metadata: %w", err))
+			return nil, connect.NewError(connect.CodeUnavailable, fmt.Errorf("failed to fetch OAuth2 metadata: %w", err).Error())
 		}
 	}
 	defer func() { _ = response.Body.Close() }()
 
 	raw, err := io.ReadAll(io.LimitReader(response.Body, maxMetadataBodySize+1))
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read OAuth2 metadata response: %w", err))
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read OAuth2 metadata response: %w", err).Error())
 	}
 	if len(raw) > maxMetadataBodySize {
-		return nil, connect.NewError(connect.CodeInternal,
-			fmt.Errorf("OAuth2 metadata response exceeds %d bytes", maxMetadataBodySize))
+		return nil, connect.Errorf(connect.CodeInternal,
+			"OAuth2 metadata response exceeds %d bytes", maxMetadataBodySize)
 	}
 
 	resp := &auth.GetOAuth2MetadataResponse{}
 	if err := unmarshalResp(response, raw, resp); err != nil {
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to unmarshal OAuth2 metadata: %w", err))
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to unmarshal OAuth2 metadata: %w", err).Error())
 	}
 
 	s.mu.Lock()
@@ -182,7 +182,7 @@ func (s *AuthMetadataService) GetOAuth2Metadata(
 	s.cacheExpiry = time.Now().Add(metadataCacheTTL)
 	s.mu.Unlock()
 
-	return connect.NewResponse(resp), nil
+	return resp, nil
 }
 
 // OAuth2MetadataHTTPHandler serves the OAuth2 authorization-server metadata
@@ -195,14 +195,14 @@ func OAuth2MetadataHTTPHandler(svc *AuthMetadataService) http.Handler {
 			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
-		resp, err := svc.GetOAuth2Metadata(r.Context(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
+		resp, err := svc.GetOAuth2Metadata(r.Context(), &auth.GetOAuth2MetadataRequest{})
 		if err != nil {
 			http.Error(w, err.Error(), connectCodeToHTTPStatus(err))
 			return
 		}
 		// Marshal with proto3 JSON (camelCase) to match what flyteadmin and
 		// other flyte clients expect from this endpoint.
-		body, marshalErr := protojson.Marshal(resp.Msg)
+		body, marshalErr := protojson.Marshal(resp)
 		if marshalErr != nil {
 			http.Error(w, marshalErr.Error(), http.StatusInternalServerError)
 			return
@@ -286,8 +286,8 @@ func sendAndRetryHTTPRequest(ctx context.Context, client *http.Client, targetURL
 		// Unavailable, so clients see an accurate status.
 		if resp.StatusCode >= http.StatusBadRequest && resp.StatusCode < http.StatusInternalServerError {
 			_ = resp.Body.Close()
-			return nil, connect.NewError(connect.CodeInternal,
-				fmt.Errorf("non-retryable status code %d from %s", resp.StatusCode, targetURL))
+			return nil, connect.Errorf(connect.CodeInternal,
+				"non-retryable status code %d from %s", resp.StatusCode, targetURL)
 		}
 
 		_ = resp.Body.Close()
