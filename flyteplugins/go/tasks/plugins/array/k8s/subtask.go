@@ -162,10 +162,10 @@ func clearFinalizer(ctx context.Context, o client.Object, kubeClient pluginsCore
 // launchSubtask creates a k8s pod defined by the SubTaskExecutionContext and Config.
 func launchSubtask(ctx context.Context, stCtx SubTaskExecutionContext, cfg *Config, kubeClient pluginsCore.KubeClient) (pluginsCore.PhaseInfo, error) {
 	o, err := podPlugin.DefaultPodPlugin.BuildResource(ctx, stCtx)
-	pod := o.(*v1.Pod)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
+	pod := o.(*v1.Pod)
 
 	addMetadata(stCtx, cfg, config.GetK8sPluginConfig(), pod)
 

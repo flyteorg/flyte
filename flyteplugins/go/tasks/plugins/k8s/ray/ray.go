@@ -27,9 +27,11 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	pluginsUtils "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
@@ -712,6 +714,24 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	case rayv1.JobDeploymentStatusFailed:
 		failInfo := fmt.Sprintf("Failed to run Ray job %s with error: [%s] %s", rayJob.Name, rayJob.Status.Reason, rayJob.Status.Message)
 		phaseInfo, err = pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(flyteerr.TaskFailedWithError, failInfo, info), nil
+		if writer := pluginContext.OutputWriter(); writer != nil {
+			reader := ioutils.NewRemoteFileOutputReader(ctx, pluginContext.DataStore(), writer, 0)
+			hasError, readErr := reader.IsError(ctx)
+			if readErr != nil {
+				logger.Warnf(ctx, "Failed to check Ray task error file; retaining system retry: %v", readErr)
+			} else if hasError {
+				taskError, readErr := reader.ReadError(ctx)
+				if readErr != nil {
+					logger.Warnf(ctx, "Failed to read Ray task error file; retaining system retry: %v", readErr)
+				} else if taskError.Kind == core.ExecutionError_USER {
+					if taskError.IsRecoverable {
+						phaseInfo = pluginsCore.PhaseInfoRetryableFailureWithCleanup(flyteerr.TaskFailedWithError, failInfo, info)
+					} else {
+						phaseInfo = pluginsCore.PhaseInfoFailureWithCleanup(flyteerr.TaskFailedWithError, failInfo, info)
+					}
+				}
+			}
+		}
 	default:
 		// We already handle all known deployment status, so this should never happen unless a future version of ray
 		// introduced a new job status.
