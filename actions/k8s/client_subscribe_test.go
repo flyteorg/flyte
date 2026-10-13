@@ -2,7 +2,9 @@ package k8s
 
 import (
 	"context"
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -15,7 +17,7 @@ func newSubscribeTestClient() *ActionsClient {
 	return &ActionsClient{
 		recordedFilter: testFilter(),
 		bufferSize:     10,
-		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+		subscribers:    make(map[string]map[chan *ActionUpdate]*subscription),
 	}
 }
 
@@ -42,18 +44,86 @@ func TestSubscribeIsScopedByRun(t *testing.T) {
 	// An update for runA's child must reach only runA's subscriber.
 	c.notifySubscribers(context.Background(), childUpdate("runA", "child1", "a0"))
 
-	select {
-	case got := <-chA:
-		assert.Equal(t, "runA", got.ActionID.GetRun().GetName())
-	default:
-		t.Fatal("runA subscriber did not receive its own update")
-	}
+	got := receive(t, chA)
+	assert.Equal(t, "runA", got.ActionID.GetRun().GetName())
 
 	select {
 	case leaked := <-chB:
 		t.Fatalf("runB subscriber leaked a runA update: %+v", leaked)
-	default:
+	case <-time.After(50 * time.Millisecond):
 		// expected: no cross-run delivery
+	}
+}
+
+// A parent only learns a child finished from that child's terminal update, so a
+// burst bigger than the channel buffer must still deliver every child's update.
+func TestNotifySubscribersNeverDrops(t *testing.T) {
+	c := newSubscribeTestClient()
+	ch := c.Subscribe("runA", "a0")
+
+	const children = 1000 // 100x the test client's bufferSize of 10
+	for i := range children {
+		c.notifySubscribers(context.Background(), childUpdate("runA", fmt.Sprintf("child%d", i), "a0"))
+	}
+
+	seen := make(map[string]bool, children)
+	for range children {
+		seen[receive(t, ch).ActionID.GetName()] = true
+	}
+	assert.Len(t, seen, children)
+}
+
+// While a child's update is waiting to be delivered, a newer one for the same
+// child replaces it, so the stream sees the child's latest phase.
+func TestNotifySubscribersCoalescesPerChild(t *testing.T) {
+	sub := &subscription{
+		out:     make(chan *ActionUpdate),
+		pending: make(map[string]*ActionUpdate),
+		wake:    make(chan struct{}, 1),
+		done:    make(chan struct{}),
+	}
+	running := childUpdate("runA", "child1", "a0")
+	running.Phase = common.ActionPhase_ACTION_PHASE_RUNNING
+	sub.notify(running)
+	sub.notify(childUpdate("runA", "child2", "a0"))
+	sub.notify(childUpdate("runA", "child1", "a0"))
+
+	// No pump is running, so the three updates are still parked.
+	first, second := sub.next(), sub.next()
+	assert.Nil(t, sub.next())
+	assert.Equal(t, "child1", first.ActionID.GetName())
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, first.Phase)
+	assert.Equal(t, "child2", second.ActionID.GetName())
+}
+
+func TestUnsubscribeClosesChannel(t *testing.T) {
+	c := newSubscribeTestClient()
+	ch := c.Subscribe("runA", "a0")
+	c.notifySubscribers(context.Background(), childUpdate("runA", "child1", "a0"))
+	c.Unsubscribe("runA", "a0", ch)
+
+	// The pump may deliver what it already held, then must close the channel.
+	timeout := time.After(time.Second)
+	for {
+		select {
+		case _, ok := <-ch:
+			if !ok {
+				return
+			}
+		case <-timeout:
+			t.Fatal("channel not closed after Unsubscribe")
+		}
+	}
+}
+
+func receive(t *testing.T, ch chan *ActionUpdate) *ActionUpdate {
+	t.Helper()
+	select {
+	case update := <-ch:
+		return update
+	case <-time.After(time.Second):
+		t.Fatal("subscriber did not receive an update")
+		return nil
 	}
 }
 
