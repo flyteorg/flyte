@@ -5,110 +5,125 @@
 package appconnect
 
 import (
-	connect "connectrpc.com/connect"
+	connect "connectrpc.com/connect/v2"
 	context "context"
-	errors "errors"
 	app "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
-	http "net/http"
-	strings "strings"
+	sync "sync"
 )
-
-// This is a compile-time assertion to ensure that this generated file and the connect package are
-// compatible. If you get a compiler error that this constant is not defined, this code was
-// generated with a version of connect newer than the one compiled into your binary. You can fix the
-// problem by either regenerating this code with an older version of connect or updating the connect
-// version compiled into your binary.
-const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// AppLogsServiceName is the fully-qualified name of the AppLogsService service.
 	AppLogsServiceName = "flyteidl2.app.AppLogsService"
 )
 
-// These constants are the fully-qualified names of the RPCs defined in this package. They're
-// exposed at runtime as Spec.Procedure and as the final two segments of the HTTP route.
+// These constants are the procedure names of the RPCs defined in this package. They're exposed at
+// runtime as Spec.Procedure and as the final two segments of the HTTP route.
 //
 // Note that these are different from the fully-qualified method names used by
 // google.golang.org/protobuf/reflect/protoreflect. To convert from these constants to
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// AppLogsServiceTailLogsProcedure is the fully-qualified name of the AppLogsService's TailLogs RPC.
+	// AppLogsServiceTailLogsProcedure is the procedure name of the AppLogsService's TailLogs RPC.
 	AppLogsServiceTailLogsProcedure = "/flyteidl2.app.AppLogsService/TailLogs"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	appLogsServiceServiceDescriptor        = app.File_flyteidl2_app_app_logs_service_proto.Services().ByName("AppLogsService")
-	appLogsServiceTailLogsMethodDescriptor = appLogsServiceServiceDescriptor.Methods().ByName("TailLogs")
+	appLogsServiceTailLogsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeServer,
+			Schema:           app.File_flyteidl2_app_app_logs_service_proto.Services().ByName("AppLogsService").Methods().ByName("TailLogs"),
+			Procedure:        AppLogsServiceTailLogsProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
 )
 
 // AppLogsServiceClient is a client for the flyteidl2.app.AppLogsService service.
 type AppLogsServiceClient interface {
-	TailLogs(context.Context, *connect.Request[app.TailLogsRequest]) (*connect.ServerStreamForClient[app.TailLogsResponse], error)
+	TailLogs(context.Context, *app.TailLogsRequest) (AppLogsServiceTailLogsClientStream, error)
 }
 
-// NewAppLogsServiceClient constructs a client for the flyteidl2.app.AppLogsService service. By
-// default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
-// and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
-// connect.WithGRPC() or connect.WithGRPCWeb() options.
-//
-// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
-// http://api.acme.com or https://acme.com/grpc).
-func NewAppLogsServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) AppLogsServiceClient {
-	baseURL = strings.TrimRight(baseURL, "/")
-	return &appLogsServiceClient{
-		tailLogs: connect.NewClient[app.TailLogsRequest, app.TailLogsResponse](
-			httpClient,
-			baseURL+AppLogsServiceTailLogsProcedure,
-			connect.WithSchema(appLogsServiceTailLogsMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
+// NewAppLogsServiceClient constructs a client for the flyteidl2.app.AppLogsService service.
+// Multiple service clients may share a single connect.Client.
+func NewAppLogsServiceClient(client *connect.Client) AppLogsServiceClient {
+	return &appLogsServiceClient{client: client}
+}
+
+// AppLogsServiceTailLogsClientStream is the client stream for the AppLogsService's TailLogs RPC.
+type AppLogsServiceTailLogsClientStream struct {
+	stream connect.ClientStream
+}
+
+// Receive returns the next response message from the server.
+func (s AppLogsServiceTailLogsClientStream) Receive() (*app.TailLogsResponse, error) {
+	var res app.TailLogsResponse
+	if err := s.stream.Receive(&res); err != nil {
+		return nil, err
 	}
+	return &res, nil
 }
 
-// appLogsServiceClient implements AppLogsServiceClient.
-type appLogsServiceClient struct {
-	tailLogs *connect.Client[app.TailLogsRequest, app.TailLogsResponse]
-}
-
-// TailLogs calls flyteidl2.app.AppLogsService.TailLogs.
-func (c *appLogsServiceClient) TailLogs(ctx context.Context, req *connect.Request[app.TailLogsRequest]) (*connect.ServerStreamForClient[app.TailLogsResponse], error) {
-	return c.tailLogs.CallServerStream(ctx, req)
+// Close releases the stream's resources. It is idempotent and is typically deferred to clean up a
+// stream abandoned before io.EOF.
+func (s AppLogsServiceTailLogsClientStream) Close() error {
+	return s.stream.Close()
 }
 
 // AppLogsServiceHandler is an implementation of the flyteidl2.app.AppLogsService service.
 type AppLogsServiceHandler interface {
-	TailLogs(context.Context, *connect.Request[app.TailLogsRequest], *connect.ServerStream[app.TailLogsResponse]) error
+	TailLogs(context.Context, *app.TailLogsRequest, AppLogsServiceTailLogsServerStream) error
 }
 
-// NewAppLogsServiceHandler builds an HTTP handler from the service implementation. It returns the
-// path on which to mount the handler and the handler itself.
-//
-// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
-// and JSON codecs. They also support gzip compression.
-func NewAppLogsServiceHandler(svc AppLogsServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	appLogsServiceTailLogsHandler := connect.NewServerStreamHandler(
-		AppLogsServiceTailLogsProcedure,
-		svc.TailLogs,
-		connect.WithSchema(appLogsServiceTailLogsMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
+// RegisterAppLogsServiceHandler registers svc as the flyteidl2.app.AppLogsService implementation on
+// server.
+func RegisterAppLogsServiceHandler(server *connect.Server, svc AppLogsServiceHandler) {
+	adapter := appLogsServiceHandler{svc: svc}
+	server.Register(
+		connect.Method{Spec: appLogsServiceTailLogsSpec(), Handler: adapter.tailLogs},
 	)
-	return "/flyteidl2.app.AppLogsService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case AppLogsServiceTailLogsProcedure:
-			appLogsServiceTailLogsHandler.ServeHTTP(w, r)
-		default:
-			http.NotFound(w, r)
-		}
-	})
+}
+
+// AppLogsServiceTailLogsServerStream is the server stream for the AppLogsService's TailLogs RPC.
+type AppLogsServiceTailLogsServerStream struct {
+	stream connect.ServerStream
+}
+
+// SendHeaders flushes the response headers without a message. The first Send does this implicitly.
+func (s AppLogsServiceTailLogsServerStream) SendHeaders() error {
+	return s.stream.SendHeaders()
+}
+
+// Send sends a response message to the client.
+func (s AppLogsServiceTailLogsServerStream) Send(res *app.TailLogsResponse) error {
+	return s.stream.Send(res)
 }
 
 // UnimplementedAppLogsServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedAppLogsServiceHandler struct{}
 
-func (UnimplementedAppLogsServiceHandler) TailLogs(context.Context, *connect.Request[app.TailLogsRequest], *connect.ServerStream[app.TailLogsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.app.AppLogsService.TailLogs is not implemented"))
+func (UnimplementedAppLogsServiceHandler) TailLogs(context.Context, *app.TailLogsRequest, AppLogsServiceTailLogsServerStream) error {
+	return connect.NewError(connect.CodeUnimplemented, "flyteidl2.app.AppLogsService.TailLogs is not implemented")
+}
+
+type appLogsServiceClient struct {
+	client *connect.Client
+}
+
+func (c *appLogsServiceClient) TailLogs(ctx context.Context, req *app.TailLogsRequest) (AppLogsServiceTailLogsClientStream, error) {
+	stream, err := c.client.CallServerStream(ctx, appLogsServiceTailLogsSpec(), req)
+	if err != nil {
+		return AppLogsServiceTailLogsClientStream{}, err
+	}
+	return AppLogsServiceTailLogsClientStream{stream: stream}, nil
+}
+
+type appLogsServiceHandler struct{ svc AppLogsServiceHandler }
+
+func (h appLogsServiceHandler) tailLogs(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req app.TailLogsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	return h.svc.TailLogs(ctx, &req, AppLogsServiceTailLogsServerStream{stream: stream})
 }

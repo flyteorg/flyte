@@ -5,109 +5,94 @@
 package clusterconnect
 
 import (
-	connect "connectrpc.com/connect"
+	connect "connectrpc.com/connect/v2"
 	context "context"
-	errors "errors"
 	cluster "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster"
-	http "net/http"
-	strings "strings"
+	sync "sync"
 )
-
-// This is a compile-time assertion to ensure that this generated file and the connect package are
-// compatible. If you get a compiler error that this constant is not defined, this code was
-// generated with a version of connect newer than the one compiled into your binary. You can fix the
-// problem by either regenerating this code with an older version of connect or updating the connect
-// version compiled into your binary.
-const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// ClusterServiceName is the fully-qualified name of the ClusterService service.
 	ClusterServiceName = "flyteidl2.cluster.ClusterService"
 )
 
-// These constants are the fully-qualified names of the RPCs defined in this package. They're
-// exposed at runtime as Spec.Procedure and as the final two segments of the HTTP route.
+// These constants are the procedure names of the RPCs defined in this package. They're exposed at
+// runtime as Spec.Procedure and as the final two segments of the HTTP route.
 //
 // Note that these are different from the fully-qualified method names used by
 // google.golang.org/protobuf/reflect/protoreflect. To convert from these constants to
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// ClusterServiceSelectClusterProcedure is the fully-qualified name of the ClusterService's
-	// SelectCluster RPC.
+	// ClusterServiceSelectClusterProcedure is the procedure name of the ClusterService's SelectCluster
+	// RPC.
 	ClusterServiceSelectClusterProcedure = "/flyteidl2.cluster.ClusterService/SelectCluster"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	clusterServiceServiceDescriptor             = cluster.File_flyteidl2_cluster_service_proto.Services().ByName("ClusterService")
-	clusterServiceSelectClusterMethodDescriptor = clusterServiceServiceDescriptor.Methods().ByName("SelectCluster")
+	clusterServiceSelectClusterSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     cluster.File_flyteidl2_cluster_service_proto.Services().ByName("ClusterService").Methods().ByName("SelectCluster"),
+			Procedure:  ClusterServiceSelectClusterProcedure,
+		}
+	})
 )
 
 // ClusterServiceClient is a client for the flyteidl2.cluster.ClusterService service.
 type ClusterServiceClient interface {
-	SelectCluster(context.Context, *connect.Request[cluster.SelectClusterRequest]) (*connect.Response[cluster.SelectClusterResponse], error)
+	SelectCluster(context.Context, *cluster.SelectClusterRequest) (*cluster.SelectClusterResponse, error)
 }
 
-// NewClusterServiceClient constructs a client for the flyteidl2.cluster.ClusterService service. By
-// default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
-// and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
-// connect.WithGRPC() or connect.WithGRPCWeb() options.
-//
-// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
-// http://api.acme.com or https://acme.com/grpc).
-func NewClusterServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ClusterServiceClient {
-	baseURL = strings.TrimRight(baseURL, "/")
-	return &clusterServiceClient{
-		selectCluster: connect.NewClient[cluster.SelectClusterRequest, cluster.SelectClusterResponse](
-			httpClient,
-			baseURL+ClusterServiceSelectClusterProcedure,
-			connect.WithSchema(clusterServiceSelectClusterMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-	}
-}
-
-// clusterServiceClient implements ClusterServiceClient.
-type clusterServiceClient struct {
-	selectCluster *connect.Client[cluster.SelectClusterRequest, cluster.SelectClusterResponse]
-}
-
-// SelectCluster calls flyteidl2.cluster.ClusterService.SelectCluster.
-func (c *clusterServiceClient) SelectCluster(ctx context.Context, req *connect.Request[cluster.SelectClusterRequest]) (*connect.Response[cluster.SelectClusterResponse], error) {
-	return c.selectCluster.CallUnary(ctx, req)
+// NewClusterServiceClient constructs a client for the flyteidl2.cluster.ClusterService service.
+// Multiple service clients may share a single connect.Client.
+func NewClusterServiceClient(client *connect.Client) ClusterServiceClient {
+	return &clusterServiceClient{client: client}
 }
 
 // ClusterServiceHandler is an implementation of the flyteidl2.cluster.ClusterService service.
 type ClusterServiceHandler interface {
-	SelectCluster(context.Context, *connect.Request[cluster.SelectClusterRequest]) (*connect.Response[cluster.SelectClusterResponse], error)
+	SelectCluster(context.Context, *cluster.SelectClusterRequest) (*cluster.SelectClusterResponse, error)
 }
 
-// NewClusterServiceHandler builds an HTTP handler from the service implementation. It returns the
-// path on which to mount the handler and the handler itself.
-//
-// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
-// and JSON codecs. They also support gzip compression.
-func NewClusterServiceHandler(svc ClusterServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	clusterServiceSelectClusterHandler := connect.NewUnaryHandler(
-		ClusterServiceSelectClusterProcedure,
-		svc.SelectCluster,
-		connect.WithSchema(clusterServiceSelectClusterMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
+// RegisterClusterServiceHandler registers svc as the flyteidl2.cluster.ClusterService
+// implementation on server.
+func RegisterClusterServiceHandler(server *connect.Server, svc ClusterServiceHandler) {
+	adapter := clusterServiceHandler{svc: svc}
+	server.Register(
+		connect.Method{Spec: clusterServiceSelectClusterSpec(), Handler: adapter.selectCluster},
 	)
-	return "/flyteidl2.cluster.ClusterService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case ClusterServiceSelectClusterProcedure:
-			clusterServiceSelectClusterHandler.ServeHTTP(w, r)
-		default:
-			http.NotFound(w, r)
-		}
-	})
 }
 
 // UnimplementedClusterServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedClusterServiceHandler struct{}
 
-func (UnimplementedClusterServiceHandler) SelectCluster(context.Context, *connect.Request[cluster.SelectClusterRequest]) (*connect.Response[cluster.SelectClusterResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.cluster.ClusterService.SelectCluster is not implemented"))
+func (UnimplementedClusterServiceHandler) SelectCluster(context.Context, *cluster.SelectClusterRequest) (*cluster.SelectClusterResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.cluster.ClusterService.SelectCluster is not implemented")
+}
+
+type clusterServiceClient struct {
+	client *connect.Client
+}
+
+func (c *clusterServiceClient) SelectCluster(ctx context.Context, req *cluster.SelectClusterRequest) (*cluster.SelectClusterResponse, error) {
+	var res cluster.SelectClusterResponse
+	if err := c.client.CallUnary(ctx, clusterServiceSelectClusterSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+type clusterServiceHandler struct{ svc ClusterServiceHandler }
+
+func (h clusterServiceHandler) selectCluster(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req cluster.SelectClusterRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.SelectCluster(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
 }

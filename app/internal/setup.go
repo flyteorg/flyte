@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"net/http"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"connectrpc.com/otelconnect"
-	stdlibapp "github.com/flyteorg/flyte/v2/flytestdlib/app"
-	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
-	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 
 	appconfig "github.com/flyteorg/flyte/v2/app/internal/config"
 	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
 	"github.com/flyteorg/flyte/v2/app/internal/service"
+	stdlibapp "github.com/flyteorg/flyte/v2/flytestdlib/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
 )
 
@@ -48,7 +49,7 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext, cfg *appconfig.Inter
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
-	otelInterceptor, err := otelconnect.NewInterceptor(
+	otelInterceptor, err := otelconnect.NewServerInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
 		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
 	)
@@ -56,7 +57,11 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext, cfg *appconfig.Inter
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
 
-	path, handler := appconnect.NewAppServiceHandler(internalAppSvc, connect.WithInterceptors(otelInterceptor))
+	handlerServer := connect.NewServer(otelInterceptor)
+	appconnect.RegisterAppServiceHandler(handlerServer, internalAppSvc)
+	path := "/" + appconnect.AppServiceName + "/"
+	handler := http.NewServeMux()
+	connecthttp.Mount(handler, handlerServer, connecthttp.WithReadMaxBytes(0))
 	sc.Mux.Handle("/internal"+path, http.StripPrefix("/internal", handler))
 	logger.Infof(ctx, "Mounted InternalAppService at /internal%s", path)
 
@@ -66,7 +71,11 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext, cfg *appconfig.Inter
 			return fmt.Errorf("internalapp: failed to create log streamer: %w", err)
 		}
 		logsSvc := service.NewInternalAppLogsService(appK8sClient, streamer)
-		logsPath, logsHandler := appconnect.NewAppLogsServiceHandler(logsSvc, connect.WithInterceptors(otelInterceptor))
+		logsHandlerServer := connect.NewServer(otelInterceptor)
+		appconnect.RegisterAppLogsServiceHandler(logsHandlerServer, logsSvc)
+		logsPath := "/" + appconnect.AppLogsServiceName + "/"
+		logsHandler := http.NewServeMux()
+		connecthttp.Mount(logsHandler, logsHandlerServer, connecthttp.WithReadMaxBytes(0))
 		sc.Mux.Handle("/internal"+logsPath, http.StripPrefix("/internal", logsHandler))
 		logger.Infof(ctx, "Mounted InternalAppLogsService at /internal%s", logsPath)
 	} else {

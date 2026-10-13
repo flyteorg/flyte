@@ -22,10 +22,19 @@ func NewPluginContext(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *PluginContext {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &PluginContext{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -371,10 +380,19 @@ func NewPlugin(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *Plugin {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &Plugin{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -428,7 +446,7 @@ type Plugin_BuildIdentityResource_Call struct {
 // BuildIdentityResource is a helper method to define mock.On call
 //   - ctx context.Context
 //   - taskCtx core.TaskExecutionMetadata
-func (_e *Plugin_Expecter) BuildIdentityResource(ctx interface{}, taskCtx interface{}) *Plugin_BuildIdentityResource_Call {
+func (_e *Plugin_Expecter) BuildIdentityResource(ctx any, taskCtx any) *Plugin_BuildIdentityResource_Call {
 	return &Plugin_BuildIdentityResource_Call{Call: _e.mock.On("BuildIdentityResource", ctx, taskCtx)}
 }
 
@@ -450,8 +468,8 @@ func (_c *Plugin_BuildIdentityResource_Call) Run(run func(ctx context.Context, t
 	return _c
 }
 
-func (_c *Plugin_BuildIdentityResource_Call) Return(v client.Object, err error) *Plugin_BuildIdentityResource_Call {
-	_c.Call.Return(v, err)
+func (_c *Plugin_BuildIdentityResource_Call) Return(object client.Object, err error) *Plugin_BuildIdentityResource_Call {
+	_c.Call.Return(object, err)
 	return _c
 }
 
@@ -496,7 +514,7 @@ type Plugin_BuildResource_Call struct {
 // BuildResource is a helper method to define mock.On call
 //   - ctx context.Context
 //   - taskCtx core.TaskExecutionContext
-func (_e *Plugin_Expecter) BuildResource(ctx interface{}, taskCtx interface{}) *Plugin_BuildResource_Call {
+func (_e *Plugin_Expecter) BuildResource(ctx any, taskCtx any) *Plugin_BuildResource_Call {
 	return &Plugin_BuildResource_Call{Call: _e.mock.On("BuildResource", ctx, taskCtx)}
 }
 
@@ -518,8 +536,8 @@ func (_c *Plugin_BuildResource_Call) Run(run func(ctx context.Context, taskCtx c
 	return _c
 }
 
-func (_c *Plugin_BuildResource_Call) Return(v client.Object, err error) *Plugin_BuildResource_Call {
-	_c.Call.Return(v, err)
+func (_c *Plugin_BuildResource_Call) Return(object client.Object, err error) *Plugin_BuildResource_Call {
+	_c.Call.Return(object, err)
 	return _c
 }
 
@@ -561,7 +579,7 @@ type Plugin_GetCompletionTime_Call struct {
 
 // GetCompletionTime is a helper method to define mock.On call
 //   - resource client.Object
-func (_e *Plugin_Expecter) GetCompletionTime(resource interface{}) *Plugin_GetCompletionTime_Call {
+func (_e *Plugin_Expecter) GetCompletionTime(resource any) *Plugin_GetCompletionTime_Call {
 	return &Plugin_GetCompletionTime_Call{Call: _e.mock.On("GetCompletionTime", resource)}
 }
 
@@ -667,7 +685,7 @@ type Plugin_GetTaskPhase_Call struct {
 //   - ctx context.Context
 //   - pluginContext k8s.PluginContext
 //   - resource client.Object
-func (_e *Plugin_Expecter) GetTaskPhase(ctx interface{}, pluginContext interface{}, resource interface{}) *Plugin_GetTaskPhase_Call {
+func (_e *Plugin_Expecter) GetTaskPhase(ctx any, pluginContext any, resource any) *Plugin_GetTaskPhase_Call {
 	return &Plugin_GetTaskPhase_Call{Call: _e.mock.On("GetTaskPhase", ctx, pluginContext, resource)}
 }
 
@@ -738,7 +756,7 @@ type Plugin_IsTerminal_Call struct {
 // IsTerminal is a helper method to define mock.On call
 //   - ctx context.Context
 //   - resource client.Object
-func (_e *Plugin_Expecter) IsTerminal(ctx interface{}, resource interface{}) *Plugin_IsTerminal_Call {
+func (_e *Plugin_Expecter) IsTerminal(ctx any, resource any) *Plugin_IsTerminal_Call {
 	return &Plugin_IsTerminal_Call{Call: _e.mock.On("IsTerminal", ctx, resource)}
 }
 
@@ -776,10 +794,19 @@ func NewClusterPlugin(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *ClusterPlugin {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &ClusterPlugin{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -833,7 +860,7 @@ type ClusterPlugin_BuildClusterIdentityResource_Call struct {
 // BuildClusterIdentityResource is a helper method to define mock.On call
 //   - ctx context.Context
 //   - taskMeta core.TaskExecutionMetadata
-func (_e *ClusterPlugin_Expecter) BuildClusterIdentityResource(ctx interface{}, taskMeta interface{}) *ClusterPlugin_BuildClusterIdentityResource_Call {
+func (_e *ClusterPlugin_Expecter) BuildClusterIdentityResource(ctx any, taskMeta any) *ClusterPlugin_BuildClusterIdentityResource_Call {
 	return &ClusterPlugin_BuildClusterIdentityResource_Call{Call: _e.mock.On("BuildClusterIdentityResource", ctx, taskMeta)}
 }
 
@@ -855,8 +882,8 @@ func (_c *ClusterPlugin_BuildClusterIdentityResource_Call) Run(run func(ctx cont
 	return _c
 }
 
-func (_c *ClusterPlugin_BuildClusterIdentityResource_Call) Return(v client.Object, err error) *ClusterPlugin_BuildClusterIdentityResource_Call {
-	_c.Call.Return(v, err)
+func (_c *ClusterPlugin_BuildClusterIdentityResource_Call) Return(object client.Object, err error) *ClusterPlugin_BuildClusterIdentityResource_Call {
+	_c.Call.Return(object, err)
 	return _c
 }
 
@@ -901,7 +928,7 @@ type ClusterPlugin_BuildClusterResource_Call struct {
 // BuildClusterResource is a helper method to define mock.On call
 //   - ctx context.Context
 //   - taskCtx core.TaskExecutionContext
-func (_e *ClusterPlugin_Expecter) BuildClusterResource(ctx interface{}, taskCtx interface{}) *ClusterPlugin_BuildClusterResource_Call {
+func (_e *ClusterPlugin_Expecter) BuildClusterResource(ctx any, taskCtx any) *ClusterPlugin_BuildClusterResource_Call {
 	return &ClusterPlugin_BuildClusterResource_Call{Call: _e.mock.On("BuildClusterResource", ctx, taskCtx)}
 }
 
@@ -923,8 +950,8 @@ func (_c *ClusterPlugin_BuildClusterResource_Call) Run(run func(ctx context.Cont
 	return _c
 }
 
-func (_c *ClusterPlugin_BuildClusterResource_Call) Return(v client.Object, err error) *ClusterPlugin_BuildClusterResource_Call {
-	_c.Call.Return(v, err)
+func (_c *ClusterPlugin_BuildClusterResource_Call) Return(object client.Object, err error) *ClusterPlugin_BuildClusterResource_Call {
+	_c.Call.Return(object, err)
 	return _c
 }
 
@@ -969,7 +996,7 @@ type ClusterPlugin_BuildJobIdentityResource_Call struct {
 // BuildJobIdentityResource is a helper method to define mock.On call
 //   - ctx context.Context
 //   - taskMeta core.TaskExecutionMetadata
-func (_e *ClusterPlugin_Expecter) BuildJobIdentityResource(ctx interface{}, taskMeta interface{}) *ClusterPlugin_BuildJobIdentityResource_Call {
+func (_e *ClusterPlugin_Expecter) BuildJobIdentityResource(ctx any, taskMeta any) *ClusterPlugin_BuildJobIdentityResource_Call {
 	return &ClusterPlugin_BuildJobIdentityResource_Call{Call: _e.mock.On("BuildJobIdentityResource", ctx, taskMeta)}
 }
 
@@ -991,8 +1018,8 @@ func (_c *ClusterPlugin_BuildJobIdentityResource_Call) Run(run func(ctx context.
 	return _c
 }
 
-func (_c *ClusterPlugin_BuildJobIdentityResource_Call) Return(v client.Object, err error) *ClusterPlugin_BuildJobIdentityResource_Call {
-	_c.Call.Return(v, err)
+func (_c *ClusterPlugin_BuildJobIdentityResource_Call) Return(object client.Object, err error) *ClusterPlugin_BuildJobIdentityResource_Call {
+	_c.Call.Return(object, err)
 	return _c
 }
 
@@ -1038,7 +1065,7 @@ type ClusterPlugin_BuildJobResource_Call struct {
 //   - ctx context.Context
 //   - taskCtx core.TaskExecutionContext
 //   - clusterName string
-func (_e *ClusterPlugin_Expecter) BuildJobResource(ctx interface{}, taskCtx interface{}, clusterName interface{}) *ClusterPlugin_BuildJobResource_Call {
+func (_e *ClusterPlugin_Expecter) BuildJobResource(ctx any, taskCtx any, clusterName any) *ClusterPlugin_BuildJobResource_Call {
 	return &ClusterPlugin_BuildJobResource_Call{Call: _e.mock.On("BuildJobResource", ctx, taskCtx, clusterName)}
 }
 
@@ -1065,8 +1092,8 @@ func (_c *ClusterPlugin_BuildJobResource_Call) Run(run func(ctx context.Context,
 	return _c
 }
 
-func (_c *ClusterPlugin_BuildJobResource_Call) Return(v client.Object, err error) *ClusterPlugin_BuildJobResource_Call {
-	_c.Call.Return(v, err)
+func (_c *ClusterPlugin_BuildJobResource_Call) Return(object client.Object, err error) *ClusterPlugin_BuildJobResource_Call {
+	_c.Call.Return(object, err)
 	return _c
 }
 
@@ -1109,7 +1136,7 @@ type ClusterPlugin_GetClusterName_Call struct {
 // GetClusterName is a helper method to define mock.On call
 //   - ctx context.Context
 //   - taskCtx core.TaskExecutionContext
-func (_e *ClusterPlugin_Expecter) GetClusterName(ctx interface{}, taskCtx interface{}) *ClusterPlugin_GetClusterName_Call {
+func (_e *ClusterPlugin_Expecter) GetClusterName(ctx any, taskCtx any) *ClusterPlugin_GetClusterName_Call {
 	return &ClusterPlugin_GetClusterName_Call{Call: _e.mock.On("GetClusterName", ctx, taskCtx)}
 }
 
@@ -1176,7 +1203,7 @@ type ClusterPlugin_GetJobPhase_Call struct {
 //   - ctx context.Context
 //   - pluginContext k8s.PluginContext
 //   - job client.Object
-func (_e *ClusterPlugin_Expecter) GetJobPhase(ctx interface{}, pluginContext interface{}, job interface{}) *ClusterPlugin_GetJobPhase_Call {
+func (_e *ClusterPlugin_Expecter) GetJobPhase(ctx any, pluginContext any, job any) *ClusterPlugin_GetJobPhase_Call {
 	return &ClusterPlugin_GetJobPhase_Call{Call: _e.mock.On("GetJobPhase", ctx, pluginContext, job)}
 }
 
@@ -1292,7 +1319,7 @@ type ClusterPlugin_IsClusterReady_Call struct {
 //   - ctx context.Context
 //   - pluginContext k8s.PluginContext
 //   - cluster client.Object
-func (_e *ClusterPlugin_Expecter) IsClusterReady(ctx interface{}, pluginContext interface{}, cluster interface{}) *ClusterPlugin_IsClusterReady_Call {
+func (_e *ClusterPlugin_Expecter) IsClusterReady(ctx any, pluginContext any, cluster any) *ClusterPlugin_IsClusterReady_Call {
 	return &ClusterPlugin_IsClusterReady_Call{Call: _e.mock.On("IsClusterReady", ctx, pluginContext, cluster)}
 }
 
@@ -1343,7 +1370,7 @@ type ClusterPlugin_StartCleanup_Call struct {
 // StartCleanup is a helper method to define mock.On call
 //   - ctx context.Context
 //   - kubeClient core.KubeClient
-func (_e *ClusterPlugin_Expecter) StartCleanup(ctx interface{}, kubeClient interface{}) *ClusterPlugin_StartCleanup_Call {
+func (_e *ClusterPlugin_Expecter) StartCleanup(ctx any, kubeClient any) *ClusterPlugin_StartCleanup_Call {
 	return &ClusterPlugin_StartCleanup_Call{Call: _e.mock.On("StartCleanup", ctx, kubeClient)}
 }
 
@@ -1381,10 +1408,19 @@ func NewGarbageCollectable(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *GarbageCollectable {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &GarbageCollectable{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -1435,7 +1471,7 @@ type GarbageCollectable_GetCompletionTime_Call struct {
 
 // GetCompletionTime is a helper method to define mock.On call
 //   - resource client.Object
-func (_e *GarbageCollectable_Expecter) GetCompletionTime(resource interface{}) *GarbageCollectable_GetCompletionTime_Call {
+func (_e *GarbageCollectable_Expecter) GetCompletionTime(resource any) *GarbageCollectable_GetCompletionTime_Call {
 	return &GarbageCollectable_GetCompletionTime_Call{Call: _e.mock.On("GetCompletionTime", resource)}
 }
 
@@ -1496,7 +1532,7 @@ type GarbageCollectable_IsTerminal_Call struct {
 // IsTerminal is a helper method to define mock.On call
 //   - ctx context.Context
 //   - resource client.Object
-func (_e *GarbageCollectable_Expecter) IsTerminal(ctx interface{}, resource interface{}) *GarbageCollectable_IsTerminal_Call {
+func (_e *GarbageCollectable_Expecter) IsTerminal(ctx any, resource any) *GarbageCollectable_IsTerminal_Call {
 	return &GarbageCollectable_IsTerminal_Call{Call: _e.mock.On("IsTerminal", ctx, resource)}
 }
 
@@ -1534,10 +1570,19 @@ func NewPluginAbortOverride(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *PluginAbortOverride {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &PluginAbortOverride{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -1590,7 +1635,7 @@ type PluginAbortOverride_OnAbort_Call struct {
 //   - ctx context.Context
 //   - tCtx core.TaskExecutionContext
 //   - resource client.Object
-func (_e *PluginAbortOverride_Expecter) OnAbort(ctx interface{}, tCtx interface{}, resource interface{}) *PluginAbortOverride_OnAbort_Call {
+func (_e *PluginAbortOverride_Expecter) OnAbort(ctx any, tCtx any, resource any) *PluginAbortOverride_OnAbort_Call {
 	return &PluginAbortOverride_OnAbort_Call{Call: _e.mock.On("OnAbort", ctx, tCtx, resource)}
 }
 

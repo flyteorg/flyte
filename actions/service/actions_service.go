@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 
 	"github.com/flyteorg/flyte/v2/actions/k8s"
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
@@ -23,19 +23,19 @@ type ActionsService struct {
 }
 
 // Signal delivers a value to a paused condition action.
-func (s *ActionsService) Signal(ctx context.Context, req *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error) {
+func (s *ActionsService) Signal(ctx context.Context, req *actions.SignalRequest) (*actions.SignalResponse, error) {
 	logger.Infof(ctx, "ActionsService.Signal called")
 
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	if err := req.Validate(); err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
 
-	if err := s.client.Signal(ctx, req.Msg.ActionId, req.Msg.Value, principalSubject(req.Msg.GetSignalledBy())); err != nil {
+	if err := s.client.Signal(ctx, req.ActionId, req.Value, principalSubject(req.GetSignalledBy())); err != nil {
 		logger.Errorf(ctx, "Failed to signal action: %v", err)
 		return nil, toConnectError(err)
 	}
 
-	return connect.NewResponse(&actions.SignalResponse{}), nil
+	return &actions.SignalResponse{}, nil
 }
 
 // principalSubject extracts a storable subject string from the caller identity.
@@ -53,7 +53,7 @@ func toConnectError(err error) error {
 	if errors.As(err, &connectErr) {
 		return err
 	}
-	return connect.NewError(connect.CodeInternal, err)
+	return connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 }
 
 // NewActionsService creates a new ActionsService.
@@ -67,40 +67,40 @@ var _ actionsconnect.ActionsServiceHandler = (*ActionsService)(nil)
 // Enqueue queues a new action for execution.
 func (s *ActionsService) Enqueue(
 	ctx context.Context,
-	req *connect.Request[actions.EnqueueRequest],
-) (*connect.Response[actions.EnqueueResponse], error) {
+	req *actions.EnqueueRequest,
+) (*actions.EnqueueResponse, error) {
 	logger.Infof(ctx, "ActionsService.Enqueue called")
 
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	if err := req.Validate(); err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
 
-	if err := s.client.Enqueue(ctx, req.Msg.Action, req.Msg.RunSpec); err != nil {
+	if err := s.client.Enqueue(ctx, req.Action, req.RunSpec); err != nil {
 		logger.Errorf(ctx, "Failed to enqueue action: %v", err)
 		return nil, toConnectError(err)
 	}
 
-	return connect.NewResponse(&actions.EnqueueResponse{}), nil
+	return &actions.EnqueueResponse{}, nil
 }
 
 // WatchForUpdates watches for updates to the state of actions.
 func (s *ActionsService) WatchForUpdates(
 	ctx context.Context,
-	req *connect.Request[actions.WatchForUpdatesRequest],
-	stream *connect.ServerStream[actions.WatchForUpdatesResponse],
+	req *actions.WatchForUpdatesRequest,
+	stream actionsconnect.ActionsServiceWatchForUpdatesServerStream,
 ) error {
 	logger.Infof(ctx, "ActionsService.WatchForUpdates stream started")
 
 	var parentActionID *common.ActionIdentifier
-	switch filter := req.Msg.Filter.(type) {
+	switch filter := req.Filter.(type) {
 	case *actions.WatchForUpdatesRequest_ParentActionId:
 		parentActionID = filter.ParentActionId
 	default:
-		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("filter is required"))
+		return connect.Errorf(connect.CodeInvalidArgument, "filter is required")
 	}
 
 	if parentActionID == nil {
-		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("parent_action_id is required"))
+		return connect.Errorf(connect.CodeInvalidArgument, "parent_action_id is required")
 	}
 
 	// Subscribe before listing to avoid missing events between snapshot and watch.
@@ -110,7 +110,7 @@ func (s *ActionsService) WatchForUpdates(
 	// Send initial state snapshot.
 	childActions, err := s.client.ListChildActions(ctx, parentActionID)
 	if err != nil {
-		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to list child actions: %w", err))
+		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to list child actions: %w", err).Error())
 	}
 
 	for _, action := range childActions {
@@ -176,39 +176,39 @@ func (s *ActionsService) WatchForUpdates(
 // Update updates the status of an action.
 func (s *ActionsService) Update(
 	ctx context.Context,
-	req *connect.Request[actions.UpdateRequest],
-) (*connect.Response[actions.UpdateResponse], error) {
+	req *actions.UpdateRequest,
+) (*actions.UpdateResponse, error) {
 	logger.Infof(ctx, "ActionsService.Update called")
 
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	if err := req.Validate(); err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
 
-	if err := s.client.PutStatus(ctx, req.Msg.ActionId, req.Msg.Attempt, req.Msg.Status); err != nil {
+	if err := s.client.PutStatus(ctx, req.ActionId, req.Attempt, req.Status); err != nil {
 		logger.Errorf(ctx, "Failed to update action: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
-	return connect.NewResponse(&actions.UpdateResponse{}), nil
+	return &actions.UpdateResponse{}, nil
 }
 
 // Abort aborts a queued or running action, cascading to descendants.
 func (s *ActionsService) Abort(
 	ctx context.Context,
-	req *connect.Request[actions.AbortRequest],
-) (*connect.Response[actions.AbortResponse], error) {
+	req *actions.AbortRequest,
+) (*actions.AbortResponse, error) {
 	logger.Infof(ctx, "ActionsService.Abort called")
 
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	if err := req.Validate(); err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
 
-	if err := s.client.AbortAction(ctx, req.Msg.ActionId, req.Msg.Reason); err != nil {
+	if err := s.client.AbortAction(ctx, req.ActionId, req.Reason); err != nil {
 		logger.Errorf(ctx, "Failed to abort action: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
-	return connect.NewResponse(&actions.AbortResponse{}), nil
+	return &actions.AbortResponse{}, nil
 }
 
 // taskActionToUpdate converts a TaskAction CR to a workflow.ActionUpdate.

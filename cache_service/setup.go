@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"connectrpc.com/otelconnect"
+
 	"github.com/flyteorg/flyte/v2/cache_service/config"
 	"github.com/flyteorg/flyte/v2/cache_service/migrations"
 	"github.com/flyteorg/flyte/v2/cache_service/service"
@@ -35,12 +37,16 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	tracerProvider := otelutils.GetTracerProvider(otelServiceName)
 	meterProvider := otelutils.GetMeterProvider(otelServiceName)
 
-	otelInterceptor, err := otelconnect.NewInterceptor(otelconnect.WithTracerProvider(tracerProvider), otelconnect.WithMeterProvider(meterProvider))
+	otelInterceptor, err := otelconnect.NewServerInterceptor(otelconnect.WithTracerProvider(tracerProvider), otelconnect.WithMeterProvider(meterProvider))
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
 
-	path, handler := v2connect.NewCacheServiceHandler(service.NewCacheService(cfg, sc.DB), connect.WithInterceptors(otelInterceptor))
+	handlerServer := connect.NewServer(otelInterceptor)
+	v2connect.RegisterCacheServiceHandler(handlerServer, service.NewCacheService(cfg, sc.DB))
+	path := "/" + v2connect.CacheServiceName + "/"
+	handler := http.NewServeMux()
+	connecthttp.Mount(handler, handlerServer, connecthttp.WithReadMaxBytes(0))
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted CacheService at %s", path)
 

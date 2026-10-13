@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
@@ -12,6 +12,7 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 )
 
 func TestGetPrimaryPodAndContainer_HappyPath(t *testing.T) {
@@ -101,7 +102,7 @@ func TestTailLogs_PodNotFound(t *testing.T) {
 	streamer := &K8sLogStreamer{clientset: clientset}
 	logCtx := newTestLogContext("missing-pod", "default", "main")
 
-	err := streamer.TailLogs(context.Background(), logCtx, nil)
+	err := streamer.TailLogs(context.Background(), logCtx, dataproxyconnect.DataProxyServiceTailLogsServerStream{})
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
 	assert.Contains(t, err.Error(), "not found")

@@ -2,10 +2,9 @@ package service
 
 import (
 	"context"
-	"errors"
 	"testing"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -43,13 +42,13 @@ func TestRecordAction_Condition(t *testing.T) {
 		Run(func(args mock.Arguments) { created = args.Get(1).(*models.Action) }).
 		Return(&models.Action{}, nil)
 
-	resp, err := svc.RecordAction(context.Background(), connect.NewRequest(&workflow.RecordActionRequest{
+	resp, err := svc.RecordAction(context.Background(), &workflow.RecordActionRequest{
 		ActionId: testActionID,
 		Parent:   "a0",
 		Spec:     &workflow.RecordActionRequest_Condition{Condition: testCondition},
-	}))
+	})
 	require.NoError(t, err)
-	assert.EqualValues(t, 0, resp.Msg.GetStatus().GetCode())
+	assert.EqualValues(t, 0, resp.GetStatus().GetCode())
 
 	require.NotNil(t, created)
 	assert.Equal(t, int32(workflow.ActionType_ACTION_TYPE_CONDITION), created.ActionType)
@@ -87,14 +86,14 @@ func TestUpdateActionStatus_PersistsOutput(t *testing.T) {
 		Run(func(args mock.Arguments) { savedInfo = args.Get(2).([]byte) }).
 		Return(nil)
 
-	resp, err := svc.UpdateActionStatus(context.Background(), connect.NewRequest(&workflow.UpdateActionStatusRequest{
+	resp, err := svc.UpdateActionStatus(context.Background(), &workflow.UpdateActionStatusRequest{
 		ActionId:  testActionID,
 		Status:    &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED},
 		Output:    testBoolLiteral(true),
 		Principal: principal,
-	}))
+	})
 	require.NoError(t, err)
-	assert.EqualValues(t, 0, resp.Msg.GetStatus().GetCode())
+	assert.EqualValues(t, 0, resp.GetStatus().GetCode())
 
 	info := &workflow.RunInfo{}
 	require.NoError(t, proto.Unmarshal(savedInfo, info))
@@ -113,10 +112,10 @@ func TestUpdateActionStatus_NoOutputSkipsRunInfoWrite(t *testing.T) {
 	// No GetAction/UpdateActionDetailedInfo expectations: AssertExpectations
 	// fails if the RunInfo write path runs.
 
-	_, err := svc.UpdateActionStatus(context.Background(), connect.NewRequest(&workflow.UpdateActionStatusRequest{
+	_, err := svc.UpdateActionStatus(context.Background(), &workflow.UpdateActionStatusRequest{
 		ActionId: testActionID,
 		Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_RUNNING},
-	}))
+	})
 	require.NoError(t, err)
 }
 
@@ -133,22 +132,22 @@ func TestSignalEvent(t *testing.T) {
 
 	t.Run("forwards converted literal to actions service", func(t *testing.T) {
 		actionsClient, svc := newSvc(t)
-		actionsClient.EXPECT().Signal(mock.Anything, mock.MatchedBy(func(r *connect.Request[actions.SignalRequest]) bool {
-			return proto.Equal(r.Msg.GetValue(), testBoolLiteral(true)) &&
-				r.Msg.GetActionId().GetName() == testActionID.Name &&
-				r.Msg.GetParentActionName() == "a0"
-		})).Return(connect.NewResponse(&actions.SignalResponse{}), nil)
+		actionsClient.EXPECT().Signal(mock.Anything, mock.MatchedBy(func(r *actions.SignalRequest) bool {
+			return proto.Equal(r.GetValue(), testBoolLiteral(true)) &&
+				r.GetActionId().GetName() == testActionID.Name &&
+				r.GetParentActionName() == "a0"
+		})).Return(&actions.SignalResponse{}, nil)
 
-		_, err := svc.SignalEvent(context.Background(), connect.NewRequest(req))
+		_, err := svc.SignalEvent(context.Background(), req)
 		assert.NoError(t, err)
 	})
 
 	t.Run("actions service error passes through", func(t *testing.T) {
 		actionsClient, svc := newSvc(t)
 		actionsClient.EXPECT().Signal(mock.Anything, mock.Anything).
-			Return(nil, connect.NewError(connect.CodeFailedPrecondition, errors.New("already completed")))
+			Return(nil, connect.NewError(connect.CodeFailedPrecondition, "already completed"))
 
-		_, err := svc.SignalEvent(context.Background(), connect.NewRequest(req))
+		_, err := svc.SignalEvent(context.Background(), req)
 		assert.Equal(t, connect.CodeFailedPrecondition, connect.CodeOf(err))
 	})
 }
@@ -198,12 +197,12 @@ func TestGetActionDetails_ConditionWithSignalInfo(t *testing.T) {
 	}, nil)
 	actionRepo.On("ListEvents", mock.Anything, testActionID, 500).Return([]*models.ActionEvent{}, nil)
 
-	resp, err := svc.GetActionDetails(context.Background(), connect.NewRequest(&workflow.GetActionDetailsRequest{
+	resp, err := svc.GetActionDetails(context.Background(), &workflow.GetActionDetailsRequest{
 		ActionId: testActionID,
-	}))
+	})
 	require.NoError(t, err)
 
-	details := resp.Msg.GetDetails()
+	details := resp.GetDetails()
 	assert.Equal(t, workflow.ActionType_ACTION_TYPE_CONDITION, details.GetMetadata().GetActionType())
 	assert.Equal(t, "approve", details.GetMetadata().GetCondition().GetName())
 	assert.True(t, proto.Equal(testCondition, details.GetCondition()))
@@ -241,13 +240,13 @@ func TestUpdateActionStatus_PersistsSignalOutputBeforePhase(t *testing.T) {
 		Run(func(mock.Arguments) { calls = append(calls, "phase") }).
 		Return(nil)
 
-	resp, err := svc.UpdateActionStatus(context.Background(), connect.NewRequest(&workflow.UpdateActionStatusRequest{
+	resp, err := svc.UpdateActionStatus(context.Background(), &workflow.UpdateActionStatusRequest{
 		ActionId: testActionID,
 		Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED},
 		Output:   testBoolLiteral(true),
-	}))
+	})
 	require.NoError(t, err)
-	assert.EqualValues(t, 0, resp.Msg.GetStatus().GetCode())
+	assert.EqualValues(t, 0, resp.GetStatus().GetCode())
 
 	assert.Equal(t, []string{"detailedInfo", "phase"}, calls,
 		"RunInfo must be persisted before the phase update that notifies watchers")

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -31,31 +31,31 @@ func init() {
 }
 
 type stubCacheService struct {
-	getFunc                    func(context.Context, *connect.Request[cacheservicev2.GetCacheRequest]) (*connect.Response[cacheservicepb.GetCacheResponse], error)
-	putFunc                    func(context.Context, *connect.Request[cacheservicev2.PutCacheRequest]) (*connect.Response[cacheservicepb.PutCacheResponse], error)
-	getOrExtendReservationFunc func(context.Context, *connect.Request[cacheservicev2.GetOrExtendReservationRequest]) (*connect.Response[cacheservicepb.GetOrExtendReservationResponse], error)
-	releaseReservationFunc     func(context.Context, *connect.Request[cacheservicev2.ReleaseReservationRequest]) (*connect.Response[cacheservicepb.ReleaseReservationResponse], error)
+	getFunc                    func(context.Context, *cacheservicev2.GetCacheRequest) (*cacheservicepb.GetCacheResponse, error)
+	putFunc                    func(context.Context, *cacheservicev2.PutCacheRequest) (*cacheservicepb.PutCacheResponse, error)
+	getOrExtendReservationFunc func(context.Context, *cacheservicev2.GetOrExtendReservationRequest) (*cacheservicepb.GetOrExtendReservationResponse, error)
+	releaseReservationFunc     func(context.Context, *cacheservicev2.ReleaseReservationRequest) (*cacheservicepb.ReleaseReservationResponse, error)
 }
 
 var _ v2connect.CacheServiceClient = (*stubCacheService)(nil)
 
-func (s *stubCacheService) Get(ctx context.Context, req *connect.Request[cacheservicev2.GetCacheRequest]) (*connect.Response[cacheservicepb.GetCacheResponse], error) {
+func (s *stubCacheService) Get(ctx context.Context, req *cacheservicev2.GetCacheRequest) (*cacheservicepb.GetCacheResponse, error) {
 	return s.getFunc(ctx, req)
 }
 
-func (s *stubCacheService) Put(ctx context.Context, req *connect.Request[cacheservicev2.PutCacheRequest]) (*connect.Response[cacheservicepb.PutCacheResponse], error) {
+func (s *stubCacheService) Put(ctx context.Context, req *cacheservicev2.PutCacheRequest) (*cacheservicepb.PutCacheResponse, error) {
 	return s.putFunc(ctx, req)
 }
 
-func (s *stubCacheService) Delete(context.Context, *connect.Request[cacheservicev2.DeleteCacheRequest]) (*connect.Response[cacheservicepb.DeleteCacheResponse], error) {
+func (s *stubCacheService) Delete(context.Context, *cacheservicev2.DeleteCacheRequest) (*cacheservicepb.DeleteCacheResponse, error) {
 	return nil, nil
 }
 
-func (s *stubCacheService) GetOrExtendReservation(ctx context.Context, req *connect.Request[cacheservicev2.GetOrExtendReservationRequest]) (*connect.Response[cacheservicepb.GetOrExtendReservationResponse], error) {
+func (s *stubCacheService) GetOrExtendReservation(ctx context.Context, req *cacheservicev2.GetOrExtendReservationRequest) (*cacheservicepb.GetOrExtendReservationResponse, error) {
 	return s.getOrExtendReservationFunc(ctx, req)
 }
 
-func (s *stubCacheService) ReleaseReservation(ctx context.Context, req *connect.Request[cacheservicev2.ReleaseReservationRequest]) (*connect.Response[cacheservicepb.ReleaseReservationResponse], error) {
+func (s *stubCacheService) ReleaseReservation(ctx context.Context, req *cacheservicev2.ReleaseReservationRequest) (*cacheservicepb.ReleaseReservationResponse, error) {
 	return s.releaseReservationFunc(ctx, req)
 }
 
@@ -108,8 +108,8 @@ func TestBuildCacheKeyIgnoresPrecomputedCacheKeyShortcut(t *testing.T) {
 func TestGetMapsNotFound(t *testing.T) {
 	store := newTestDataStore(t)
 	client := NewWithServiceClient(&stubCacheService{
-		getFunc: func(context.Context, *connect.Request[cacheservicev2.GetCacheRequest]) (*connect.Response[cacheservicepb.GetCacheResponse], error) {
-			return nil, connect.NewError(connect.CodeNotFound, assert.AnError)
+		getFunc: func(context.Context, *cacheservicev2.GetCacheRequest) (*cacheservicepb.GetCacheResponse, error) {
+			return nil, connect.NewError(connect.CodeNotFound, assert.AnError.Error()).WithCause(assert.AnError)
 		},
 	}, store, 0)
 
@@ -123,9 +123,9 @@ func TestPutUsesOutputURI(t *testing.T) {
 	var got *cacheservicev2.PutCacheRequest
 
 	client := NewWithServiceClient(&stubCacheService{
-		putFunc: func(_ context.Context, req *connect.Request[cacheservicev2.PutCacheRequest]) (*connect.Response[cacheservicepb.PutCacheResponse], error) {
-			got = req.Msg
-			return connect.NewResponse(&cacheservicepb.PutCacheResponse{}), nil
+		putFunc: func(_ context.Context, req *cacheservicev2.PutCacheRequest) (*cacheservicepb.PutCacheResponse, error) {
+			got = req
+			return &cacheservicepb.PutCacheResponse{}, nil
 		},
 	}, store, 0)
 
@@ -144,16 +144,16 @@ func TestPutUsesOutputURI(t *testing.T) {
 func TestGetOrExtendReservationPassesHeartbeat(t *testing.T) {
 	store := newTestDataStore(t)
 	client := NewWithServiceClient(&stubCacheService{
-		getOrExtendReservationFunc: func(_ context.Context, req *connect.Request[cacheservicev2.GetOrExtendReservationRequest]) (*connect.Response[cacheservicepb.GetOrExtendReservationResponse], error) {
-			assert.Equal(t, "owner-1", req.Msg.GetBaseRequest().GetOwnerId())
-			assert.Equal(t, 5*time.Second, req.Msg.GetBaseRequest().GetHeartbeatInterval().AsDuration())
-			return connect.NewResponse(&cacheservicepb.GetOrExtendReservationResponse{
+		getOrExtendReservationFunc: func(_ context.Context, req *cacheservicev2.GetOrExtendReservationRequest) (*cacheservicepb.GetOrExtendReservationResponse, error) {
+			assert.Equal(t, "owner-1", req.GetBaseRequest().GetOwnerId())
+			assert.Equal(t, 5*time.Second, req.GetBaseRequest().GetHeartbeatInterval().AsDuration())
+			return &cacheservicepb.GetOrExtendReservationResponse{
 				Reservation: &cacheservicepb.Reservation{
-					Key:               req.Msg.GetBaseRequest().GetKey(),
-					OwnerId:           req.Msg.GetBaseRequest().GetOwnerId(),
+					Key:               req.GetBaseRequest().GetKey(),
+					OwnerId:           req.GetBaseRequest().GetOwnerId(),
 					HeartbeatInterval: durationpb.New(5 * time.Second),
 				},
-			}), nil
+			}, nil
 		},
 	}, store, 0)
 
@@ -177,8 +177,8 @@ func TestGetRespectsMaxCacheAge(t *testing.T) {
 	store := newTestDataStore(t)
 	key := newCatalogKey(t)
 	client := NewWithServiceClient(&stubCacheService{
-		getFunc: func(context.Context, *connect.Request[cacheservicev2.GetCacheRequest]) (*connect.Response[cacheservicepb.GetCacheResponse], error) {
-			return connect.NewResponse(&cacheservicepb.GetCacheResponse{
+		getFunc: func(context.Context, *cacheservicev2.GetCacheRequest) (*cacheservicepb.GetCacheResponse, error) {
+			return &cacheservicepb.GetCacheResponse{
 				Output: &cacheservicepb.CachedOutput{
 					Output: &cacheservicepb.CachedOutput_OutputUri{
 						OutputUri: "s3://bucket/prefix/outputs.pb",
@@ -188,7 +188,7 @@ func TestGetRespectsMaxCacheAge(t *testing.T) {
 						LastUpdatedAt:    timestamppb.New(time.Now().Add(-2 * time.Hour)),
 					},
 				},
-			}), nil
+			}, nil
 		},
 	}, store, time.Hour)
 

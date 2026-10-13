@@ -2,12 +2,12 @@ package runs
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"github.com/getsentry/sentry-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -22,25 +22,29 @@ type stubTaskService struct {
 	err error
 }
 
-func (s *stubTaskService) DeployTask(context.Context, *connect.Request[taskpb.DeployTaskRequest]) (*connect.Response[taskpb.DeployTaskResponse], error) {
+func (s *stubTaskService) DeployTask(context.Context, *taskpb.DeployTaskRequest) (*taskpb.DeployTaskResponse, error) {
 	if s.err != nil {
 		return nil, s.err
 	}
-	return connect.NewResponse(&taskpb.DeployTaskResponse{}), nil
+	return &taskpb.DeployTaskResponse{}, nil
 }
 
 // newTestClient serves svc behind the same interceptor chain Setup installs.
 func newTestClient(t *testing.T, svc taskconnect.TaskServiceHandler) taskconnect.TaskServiceClient {
 	t.Helper()
 	mux := http.NewServeMux()
-	path, handler := taskconnect.NewTaskServiceHandler(svc, connect.WithInterceptors(
+	handlerServer := connect.NewServer(
 		sentryutils.Interceptor(sentryOperations),
 		deployTriggerInterceptor(),
-	))
+	)
+	taskconnect.RegisterTaskServiceHandler(handlerServer, svc)
+	path := "/" + taskconnect.TaskServiceName + "/"
+	handler := http.NewServeMux()
+	connecthttp.Mount(handler, handlerServer, connecthttp.WithReadMaxBytes(0))
 	mux.Handle(path, handler)
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
-	return taskconnect.NewTaskServiceClient(srv.Client(), srv.URL)
+	return taskconnect.NewTaskServiceClient(connect.NewClient(connecthttp.NewTransport(srv.Client(), srv.URL, connecthttp.WithReadMaxBytes(0))))
 }
 
 // bindMockTransport swaps in a Sentry client whose events the test can read.
@@ -64,9 +68,9 @@ func TestDeployTaskInterceptorsArePassThrough(t *testing.T) {
 	bindMockTransport(t)
 	client := newTestClient(t, &stubTaskService{})
 
-	resp, err := client.DeployTask(context.Background(), connect.NewRequest(&taskpb.DeployTaskRequest{
+	resp, err := client.DeployTask(context.Background(), &taskpb.DeployTaskRequest{
 		Triggers: []*taskpb.TaskTrigger{{Name: "nightly"}, {Name: "on-merge"}},
-	}))
+	})
 	require.NoError(t, err)
 	assert.NotNil(t, resp)
 }
@@ -85,10 +89,10 @@ func TestDeployTaskReportsOnlyServerSideFailures(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			transport := bindMockTransport(t)
 			client := newTestClient(t, &stubTaskService{
-				err: connect.NewError(tc.code, errors.New("boom")),
+				err: connect.NewError(tc.code, "boom"),
 			})
 
-			_, err := client.DeployTask(context.Background(), connect.NewRequest(&taskpb.DeployTaskRequest{}))
+			_, err := client.DeployTask(context.Background(), &taskpb.DeployTaskRequest{})
 			require.Error(t, err)
 			assert.Len(t, transport.Events(), tc.wantEvents)
 		})

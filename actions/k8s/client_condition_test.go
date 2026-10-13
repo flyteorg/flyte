@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -228,9 +228,9 @@ func TestNotifyRunService_Condition(t *testing.T) {
 		ta.Spec.ActionType = executorv1.ActionTypeCondition
 		ta.Spec.ConditionSpec = condSpecBytes
 
-		mockClient.EXPECT().RecordAction(mock.Anything, mock.MatchedBy(func(r *connect.Request[workflow.RecordActionRequest]) bool {
-			return r.Msg.GetCondition().GetName() == "approve"
-		})).Return(&connect.Response[workflow.RecordActionResponse]{}, nil)
+		mockClient.EXPECT().RecordAction(mock.Anything, mock.MatchedBy(func(r *workflow.RecordActionRequest) bool {
+			return r.GetCondition().GetName() == "approve"
+		})).Return(&workflow.RecordActionResponse{}, nil)
 
 		c.notifyRunService(ctx, ta, update, watch.Added)
 	})
@@ -252,10 +252,10 @@ func TestNotifyRunService_Condition(t *testing.T) {
 		c.recordedFilter = filter
 		c.recordedFilter.Add(ctx, []byte(buildTaskActionName(update.ActionID)))
 
-		mockClient.EXPECT().UpdateActionStatus(mock.Anything, mock.MatchedBy(func(r *connect.Request[workflow.UpdateActionStatusRequest]) bool {
-			return proto.Equal(r.Msg.GetOutput(), boolLiteral(true)) &&
-				r.Msg.GetPrincipal().GetUser().GetId().GetSubject() == "user@example.com"
-		})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil)
+		mockClient.EXPECT().UpdateActionStatus(mock.Anything, mock.MatchedBy(func(r *workflow.UpdateActionStatusRequest) bool {
+			return proto.Equal(r.GetOutput(), boolLiteral(true)) &&
+				r.GetPrincipal().GetUser().GetId().GetSubject() == "user@example.com"
+		})).Return(&workflow.UpdateActionStatusResponse{}, nil)
 
 		c.notifyRunService(ctx, ta, update, watch.Modified)
 	})

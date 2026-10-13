@@ -7,7 +7,6 @@ package mocks
 import (
 	"context"
 
-	"connectrpc.com/connect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	mock "github.com/stretchr/testify/mock"
 )
@@ -18,10 +17,19 @@ func NewProjectServiceClient(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *ProjectServiceClient {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &ProjectServiceClient{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -40,27 +48,27 @@ func (_m *ProjectServiceClient) EXPECT() *ProjectServiceClient_Expecter {
 }
 
 // CreateProject provides a mock function for the type ProjectServiceClient
-func (_mock *ProjectServiceClient) CreateProject(context1 context.Context, request *connect.Request[project.CreateProjectRequest]) (*connect.Response[project.CreateProjectResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ProjectServiceClient) CreateProject(context1 context.Context, createProjectRequest *project.CreateProjectRequest) (*project.CreateProjectResponse, error) {
+	ret := _mock.Called(context1, createProjectRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateProject")
 	}
 
-	var r0 *connect.Response[project.CreateProjectResponse]
+	var r0 *project.CreateProjectResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[project.CreateProjectRequest]) (*connect.Response[project.CreateProjectResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *project.CreateProjectRequest) (*project.CreateProjectResponse, error)); ok {
+		return returnFunc(context1, createProjectRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[project.CreateProjectRequest]) *connect.Response[project.CreateProjectResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *project.CreateProjectRequest) *project.CreateProjectResponse); ok {
+		r0 = returnFunc(context1, createProjectRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[project.CreateProjectResponse])
+			r0 = ret.Get(0).(*project.CreateProjectResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[project.CreateProjectRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *project.CreateProjectRequest) error); ok {
+		r1 = returnFunc(context1, createProjectRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -74,20 +82,20 @@ type ProjectServiceClient_CreateProject_Call struct {
 
 // CreateProject is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[project.CreateProjectRequest]
-func (_e *ProjectServiceClient_Expecter) CreateProject(context1 interface{}, request interface{}) *ProjectServiceClient_CreateProject_Call {
-	return &ProjectServiceClient_CreateProject_Call{Call: _e.mock.On("CreateProject", context1, request)}
+//   - createProjectRequest *project.CreateProjectRequest
+func (_e *ProjectServiceClient_Expecter) CreateProject(context1 any, createProjectRequest any) *ProjectServiceClient_CreateProject_Call {
+	return &ProjectServiceClient_CreateProject_Call{Call: _e.mock.On("CreateProject", context1, createProjectRequest)}
 }
 
-func (_c *ProjectServiceClient_CreateProject_Call) Run(run func(context1 context.Context, request *connect.Request[project.CreateProjectRequest])) *ProjectServiceClient_CreateProject_Call {
+func (_c *ProjectServiceClient_CreateProject_Call) Run(run func(context1 context.Context, createProjectRequest *project.CreateProjectRequest)) *ProjectServiceClient_CreateProject_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[project.CreateProjectRequest]
+		var arg1 *project.CreateProjectRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[project.CreateProjectRequest])
+			arg1 = args[1].(*project.CreateProjectRequest)
 		}
 		run(
 			arg0,
@@ -97,38 +105,38 @@ func (_c *ProjectServiceClient_CreateProject_Call) Run(run func(context1 context
 	return _c
 }
 
-func (_c *ProjectServiceClient_CreateProject_Call) Return(response *connect.Response[project.CreateProjectResponse], err error) *ProjectServiceClient_CreateProject_Call {
-	_c.Call.Return(response, err)
+func (_c *ProjectServiceClient_CreateProject_Call) Return(createProjectResponse *project.CreateProjectResponse, err error) *ProjectServiceClient_CreateProject_Call {
+	_c.Call.Return(createProjectResponse, err)
 	return _c
 }
 
-func (_c *ProjectServiceClient_CreateProject_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[project.CreateProjectRequest]) (*connect.Response[project.CreateProjectResponse], error)) *ProjectServiceClient_CreateProject_Call {
+func (_c *ProjectServiceClient_CreateProject_Call) RunAndReturn(run func(context1 context.Context, createProjectRequest *project.CreateProjectRequest) (*project.CreateProjectResponse, error)) *ProjectServiceClient_CreateProject_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetProject provides a mock function for the type ProjectServiceClient
-func (_mock *ProjectServiceClient) GetProject(context1 context.Context, request *connect.Request[project.GetProjectRequest]) (*connect.Response[project.GetProjectResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ProjectServiceClient) GetProject(context1 context.Context, getProjectRequest *project.GetProjectRequest) (*project.GetProjectResponse, error) {
+	ret := _mock.Called(context1, getProjectRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetProject")
 	}
 
-	var r0 *connect.Response[project.GetProjectResponse]
+	var r0 *project.GetProjectResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[project.GetProjectRequest]) (*connect.Response[project.GetProjectResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *project.GetProjectRequest) (*project.GetProjectResponse, error)); ok {
+		return returnFunc(context1, getProjectRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[project.GetProjectRequest]) *connect.Response[project.GetProjectResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *project.GetProjectRequest) *project.GetProjectResponse); ok {
+		r0 = returnFunc(context1, getProjectRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[project.GetProjectResponse])
+			r0 = ret.Get(0).(*project.GetProjectResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[project.GetProjectRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *project.GetProjectRequest) error); ok {
+		r1 = returnFunc(context1, getProjectRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -142,20 +150,20 @@ type ProjectServiceClient_GetProject_Call struct {
 
 // GetProject is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[project.GetProjectRequest]
-func (_e *ProjectServiceClient_Expecter) GetProject(context1 interface{}, request interface{}) *ProjectServiceClient_GetProject_Call {
-	return &ProjectServiceClient_GetProject_Call{Call: _e.mock.On("GetProject", context1, request)}
+//   - getProjectRequest *project.GetProjectRequest
+func (_e *ProjectServiceClient_Expecter) GetProject(context1 any, getProjectRequest any) *ProjectServiceClient_GetProject_Call {
+	return &ProjectServiceClient_GetProject_Call{Call: _e.mock.On("GetProject", context1, getProjectRequest)}
 }
 
-func (_c *ProjectServiceClient_GetProject_Call) Run(run func(context1 context.Context, request *connect.Request[project.GetProjectRequest])) *ProjectServiceClient_GetProject_Call {
+func (_c *ProjectServiceClient_GetProject_Call) Run(run func(context1 context.Context, getProjectRequest *project.GetProjectRequest)) *ProjectServiceClient_GetProject_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[project.GetProjectRequest]
+		var arg1 *project.GetProjectRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[project.GetProjectRequest])
+			arg1 = args[1].(*project.GetProjectRequest)
 		}
 		run(
 			arg0,
@@ -165,38 +173,38 @@ func (_c *ProjectServiceClient_GetProject_Call) Run(run func(context1 context.Co
 	return _c
 }
 
-func (_c *ProjectServiceClient_GetProject_Call) Return(response *connect.Response[project.GetProjectResponse], err error) *ProjectServiceClient_GetProject_Call {
-	_c.Call.Return(response, err)
+func (_c *ProjectServiceClient_GetProject_Call) Return(getProjectResponse *project.GetProjectResponse, err error) *ProjectServiceClient_GetProject_Call {
+	_c.Call.Return(getProjectResponse, err)
 	return _c
 }
 
-func (_c *ProjectServiceClient_GetProject_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[project.GetProjectRequest]) (*connect.Response[project.GetProjectResponse], error)) *ProjectServiceClient_GetProject_Call {
+func (_c *ProjectServiceClient_GetProject_Call) RunAndReturn(run func(context1 context.Context, getProjectRequest *project.GetProjectRequest) (*project.GetProjectResponse, error)) *ProjectServiceClient_GetProject_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // ListProjects provides a mock function for the type ProjectServiceClient
-func (_mock *ProjectServiceClient) ListProjects(context1 context.Context, request *connect.Request[project.ListProjectsRequest]) (*connect.Response[project.ListProjectsResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ProjectServiceClient) ListProjects(context1 context.Context, listProjectsRequest *project.ListProjectsRequest) (*project.ListProjectsResponse, error) {
+	ret := _mock.Called(context1, listProjectsRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListProjects")
 	}
 
-	var r0 *connect.Response[project.ListProjectsResponse]
+	var r0 *project.ListProjectsResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[project.ListProjectsRequest]) (*connect.Response[project.ListProjectsResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *project.ListProjectsRequest) (*project.ListProjectsResponse, error)); ok {
+		return returnFunc(context1, listProjectsRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[project.ListProjectsRequest]) *connect.Response[project.ListProjectsResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *project.ListProjectsRequest) *project.ListProjectsResponse); ok {
+		r0 = returnFunc(context1, listProjectsRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[project.ListProjectsResponse])
+			r0 = ret.Get(0).(*project.ListProjectsResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[project.ListProjectsRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *project.ListProjectsRequest) error); ok {
+		r1 = returnFunc(context1, listProjectsRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -210,20 +218,20 @@ type ProjectServiceClient_ListProjects_Call struct {
 
 // ListProjects is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[project.ListProjectsRequest]
-func (_e *ProjectServiceClient_Expecter) ListProjects(context1 interface{}, request interface{}) *ProjectServiceClient_ListProjects_Call {
-	return &ProjectServiceClient_ListProjects_Call{Call: _e.mock.On("ListProjects", context1, request)}
+//   - listProjectsRequest *project.ListProjectsRequest
+func (_e *ProjectServiceClient_Expecter) ListProjects(context1 any, listProjectsRequest any) *ProjectServiceClient_ListProjects_Call {
+	return &ProjectServiceClient_ListProjects_Call{Call: _e.mock.On("ListProjects", context1, listProjectsRequest)}
 }
 
-func (_c *ProjectServiceClient_ListProjects_Call) Run(run func(context1 context.Context, request *connect.Request[project.ListProjectsRequest])) *ProjectServiceClient_ListProjects_Call {
+func (_c *ProjectServiceClient_ListProjects_Call) Run(run func(context1 context.Context, listProjectsRequest *project.ListProjectsRequest)) *ProjectServiceClient_ListProjects_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[project.ListProjectsRequest]
+		var arg1 *project.ListProjectsRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[project.ListProjectsRequest])
+			arg1 = args[1].(*project.ListProjectsRequest)
 		}
 		run(
 			arg0,
@@ -233,38 +241,38 @@ func (_c *ProjectServiceClient_ListProjects_Call) Run(run func(context1 context.
 	return _c
 }
 
-func (_c *ProjectServiceClient_ListProjects_Call) Return(response *connect.Response[project.ListProjectsResponse], err error) *ProjectServiceClient_ListProjects_Call {
-	_c.Call.Return(response, err)
+func (_c *ProjectServiceClient_ListProjects_Call) Return(listProjectsResponse *project.ListProjectsResponse, err error) *ProjectServiceClient_ListProjects_Call {
+	_c.Call.Return(listProjectsResponse, err)
 	return _c
 }
 
-func (_c *ProjectServiceClient_ListProjects_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[project.ListProjectsRequest]) (*connect.Response[project.ListProjectsResponse], error)) *ProjectServiceClient_ListProjects_Call {
+func (_c *ProjectServiceClient_ListProjects_Call) RunAndReturn(run func(context1 context.Context, listProjectsRequest *project.ListProjectsRequest) (*project.ListProjectsResponse, error)) *ProjectServiceClient_ListProjects_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // UpdateProject provides a mock function for the type ProjectServiceClient
-func (_mock *ProjectServiceClient) UpdateProject(context1 context.Context, request *connect.Request[project.UpdateProjectRequest]) (*connect.Response[project.UpdateProjectResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ProjectServiceClient) UpdateProject(context1 context.Context, updateProjectRequest *project.UpdateProjectRequest) (*project.UpdateProjectResponse, error) {
+	ret := _mock.Called(context1, updateProjectRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateProject")
 	}
 
-	var r0 *connect.Response[project.UpdateProjectResponse]
+	var r0 *project.UpdateProjectResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[project.UpdateProjectRequest]) (*connect.Response[project.UpdateProjectResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *project.UpdateProjectRequest) (*project.UpdateProjectResponse, error)); ok {
+		return returnFunc(context1, updateProjectRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[project.UpdateProjectRequest]) *connect.Response[project.UpdateProjectResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *project.UpdateProjectRequest) *project.UpdateProjectResponse); ok {
+		r0 = returnFunc(context1, updateProjectRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[project.UpdateProjectResponse])
+			r0 = ret.Get(0).(*project.UpdateProjectResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[project.UpdateProjectRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *project.UpdateProjectRequest) error); ok {
+		r1 = returnFunc(context1, updateProjectRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -278,20 +286,20 @@ type ProjectServiceClient_UpdateProject_Call struct {
 
 // UpdateProject is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[project.UpdateProjectRequest]
-func (_e *ProjectServiceClient_Expecter) UpdateProject(context1 interface{}, request interface{}) *ProjectServiceClient_UpdateProject_Call {
-	return &ProjectServiceClient_UpdateProject_Call{Call: _e.mock.On("UpdateProject", context1, request)}
+//   - updateProjectRequest *project.UpdateProjectRequest
+func (_e *ProjectServiceClient_Expecter) UpdateProject(context1 any, updateProjectRequest any) *ProjectServiceClient_UpdateProject_Call {
+	return &ProjectServiceClient_UpdateProject_Call{Call: _e.mock.On("UpdateProject", context1, updateProjectRequest)}
 }
 
-func (_c *ProjectServiceClient_UpdateProject_Call) Run(run func(context1 context.Context, request *connect.Request[project.UpdateProjectRequest])) *ProjectServiceClient_UpdateProject_Call {
+func (_c *ProjectServiceClient_UpdateProject_Call) Run(run func(context1 context.Context, updateProjectRequest *project.UpdateProjectRequest)) *ProjectServiceClient_UpdateProject_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[project.UpdateProjectRequest]
+		var arg1 *project.UpdateProjectRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[project.UpdateProjectRequest])
+			arg1 = args[1].(*project.UpdateProjectRequest)
 		}
 		run(
 			arg0,
@@ -301,12 +309,12 @@ func (_c *ProjectServiceClient_UpdateProject_Call) Run(run func(context1 context
 	return _c
 }
 
-func (_c *ProjectServiceClient_UpdateProject_Call) Return(response *connect.Response[project.UpdateProjectResponse], err error) *ProjectServiceClient_UpdateProject_Call {
-	_c.Call.Return(response, err)
+func (_c *ProjectServiceClient_UpdateProject_Call) Return(updateProjectResponse *project.UpdateProjectResponse, err error) *ProjectServiceClient_UpdateProject_Call {
+	_c.Call.Return(updateProjectResponse, err)
 	return _c
 }
 
-func (_c *ProjectServiceClient_UpdateProject_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[project.UpdateProjectRequest]) (*connect.Response[project.UpdateProjectResponse], error)) *ProjectServiceClient_UpdateProject_Call {
+func (_c *ProjectServiceClient_UpdateProject_Call) RunAndReturn(run func(context1 context.Context, updateProjectRequest *project.UpdateProjectRequest) (*project.UpdateProjectResponse, error)) *ProjectServiceClient_UpdateProject_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -317,10 +325,19 @@ func NewProjectServiceHandler(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *ProjectServiceHandler {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &ProjectServiceHandler{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -339,27 +356,27 @@ func (_m *ProjectServiceHandler) EXPECT() *ProjectServiceHandler_Expecter {
 }
 
 // CreateProject provides a mock function for the type ProjectServiceHandler
-func (_mock *ProjectServiceHandler) CreateProject(context1 context.Context, request *connect.Request[project.CreateProjectRequest]) (*connect.Response[project.CreateProjectResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ProjectServiceHandler) CreateProject(context1 context.Context, createProjectRequest *project.CreateProjectRequest) (*project.CreateProjectResponse, error) {
+	ret := _mock.Called(context1, createProjectRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateProject")
 	}
 
-	var r0 *connect.Response[project.CreateProjectResponse]
+	var r0 *project.CreateProjectResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[project.CreateProjectRequest]) (*connect.Response[project.CreateProjectResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *project.CreateProjectRequest) (*project.CreateProjectResponse, error)); ok {
+		return returnFunc(context1, createProjectRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[project.CreateProjectRequest]) *connect.Response[project.CreateProjectResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *project.CreateProjectRequest) *project.CreateProjectResponse); ok {
+		r0 = returnFunc(context1, createProjectRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[project.CreateProjectResponse])
+			r0 = ret.Get(0).(*project.CreateProjectResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[project.CreateProjectRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *project.CreateProjectRequest) error); ok {
+		r1 = returnFunc(context1, createProjectRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -373,20 +390,20 @@ type ProjectServiceHandler_CreateProject_Call struct {
 
 // CreateProject is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[project.CreateProjectRequest]
-func (_e *ProjectServiceHandler_Expecter) CreateProject(context1 interface{}, request interface{}) *ProjectServiceHandler_CreateProject_Call {
-	return &ProjectServiceHandler_CreateProject_Call{Call: _e.mock.On("CreateProject", context1, request)}
+//   - createProjectRequest *project.CreateProjectRequest
+func (_e *ProjectServiceHandler_Expecter) CreateProject(context1 any, createProjectRequest any) *ProjectServiceHandler_CreateProject_Call {
+	return &ProjectServiceHandler_CreateProject_Call{Call: _e.mock.On("CreateProject", context1, createProjectRequest)}
 }
 
-func (_c *ProjectServiceHandler_CreateProject_Call) Run(run func(context1 context.Context, request *connect.Request[project.CreateProjectRequest])) *ProjectServiceHandler_CreateProject_Call {
+func (_c *ProjectServiceHandler_CreateProject_Call) Run(run func(context1 context.Context, createProjectRequest *project.CreateProjectRequest)) *ProjectServiceHandler_CreateProject_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[project.CreateProjectRequest]
+		var arg1 *project.CreateProjectRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[project.CreateProjectRequest])
+			arg1 = args[1].(*project.CreateProjectRequest)
 		}
 		run(
 			arg0,
@@ -396,38 +413,38 @@ func (_c *ProjectServiceHandler_CreateProject_Call) Run(run func(context1 contex
 	return _c
 }
 
-func (_c *ProjectServiceHandler_CreateProject_Call) Return(response *connect.Response[project.CreateProjectResponse], err error) *ProjectServiceHandler_CreateProject_Call {
-	_c.Call.Return(response, err)
+func (_c *ProjectServiceHandler_CreateProject_Call) Return(createProjectResponse *project.CreateProjectResponse, err error) *ProjectServiceHandler_CreateProject_Call {
+	_c.Call.Return(createProjectResponse, err)
 	return _c
 }
 
-func (_c *ProjectServiceHandler_CreateProject_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[project.CreateProjectRequest]) (*connect.Response[project.CreateProjectResponse], error)) *ProjectServiceHandler_CreateProject_Call {
+func (_c *ProjectServiceHandler_CreateProject_Call) RunAndReturn(run func(context1 context.Context, createProjectRequest *project.CreateProjectRequest) (*project.CreateProjectResponse, error)) *ProjectServiceHandler_CreateProject_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetProject provides a mock function for the type ProjectServiceHandler
-func (_mock *ProjectServiceHandler) GetProject(context1 context.Context, request *connect.Request[project.GetProjectRequest]) (*connect.Response[project.GetProjectResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ProjectServiceHandler) GetProject(context1 context.Context, getProjectRequest *project.GetProjectRequest) (*project.GetProjectResponse, error) {
+	ret := _mock.Called(context1, getProjectRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetProject")
 	}
 
-	var r0 *connect.Response[project.GetProjectResponse]
+	var r0 *project.GetProjectResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[project.GetProjectRequest]) (*connect.Response[project.GetProjectResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *project.GetProjectRequest) (*project.GetProjectResponse, error)); ok {
+		return returnFunc(context1, getProjectRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[project.GetProjectRequest]) *connect.Response[project.GetProjectResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *project.GetProjectRequest) *project.GetProjectResponse); ok {
+		r0 = returnFunc(context1, getProjectRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[project.GetProjectResponse])
+			r0 = ret.Get(0).(*project.GetProjectResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[project.GetProjectRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *project.GetProjectRequest) error); ok {
+		r1 = returnFunc(context1, getProjectRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -441,20 +458,20 @@ type ProjectServiceHandler_GetProject_Call struct {
 
 // GetProject is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[project.GetProjectRequest]
-func (_e *ProjectServiceHandler_Expecter) GetProject(context1 interface{}, request interface{}) *ProjectServiceHandler_GetProject_Call {
-	return &ProjectServiceHandler_GetProject_Call{Call: _e.mock.On("GetProject", context1, request)}
+//   - getProjectRequest *project.GetProjectRequest
+func (_e *ProjectServiceHandler_Expecter) GetProject(context1 any, getProjectRequest any) *ProjectServiceHandler_GetProject_Call {
+	return &ProjectServiceHandler_GetProject_Call{Call: _e.mock.On("GetProject", context1, getProjectRequest)}
 }
 
-func (_c *ProjectServiceHandler_GetProject_Call) Run(run func(context1 context.Context, request *connect.Request[project.GetProjectRequest])) *ProjectServiceHandler_GetProject_Call {
+func (_c *ProjectServiceHandler_GetProject_Call) Run(run func(context1 context.Context, getProjectRequest *project.GetProjectRequest)) *ProjectServiceHandler_GetProject_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[project.GetProjectRequest]
+		var arg1 *project.GetProjectRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[project.GetProjectRequest])
+			arg1 = args[1].(*project.GetProjectRequest)
 		}
 		run(
 			arg0,
@@ -464,38 +481,38 @@ func (_c *ProjectServiceHandler_GetProject_Call) Run(run func(context1 context.C
 	return _c
 }
 
-func (_c *ProjectServiceHandler_GetProject_Call) Return(response *connect.Response[project.GetProjectResponse], err error) *ProjectServiceHandler_GetProject_Call {
-	_c.Call.Return(response, err)
+func (_c *ProjectServiceHandler_GetProject_Call) Return(getProjectResponse *project.GetProjectResponse, err error) *ProjectServiceHandler_GetProject_Call {
+	_c.Call.Return(getProjectResponse, err)
 	return _c
 }
 
-func (_c *ProjectServiceHandler_GetProject_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[project.GetProjectRequest]) (*connect.Response[project.GetProjectResponse], error)) *ProjectServiceHandler_GetProject_Call {
+func (_c *ProjectServiceHandler_GetProject_Call) RunAndReturn(run func(context1 context.Context, getProjectRequest *project.GetProjectRequest) (*project.GetProjectResponse, error)) *ProjectServiceHandler_GetProject_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // ListProjects provides a mock function for the type ProjectServiceHandler
-func (_mock *ProjectServiceHandler) ListProjects(context1 context.Context, request *connect.Request[project.ListProjectsRequest]) (*connect.Response[project.ListProjectsResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ProjectServiceHandler) ListProjects(context1 context.Context, listProjectsRequest *project.ListProjectsRequest) (*project.ListProjectsResponse, error) {
+	ret := _mock.Called(context1, listProjectsRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListProjects")
 	}
 
-	var r0 *connect.Response[project.ListProjectsResponse]
+	var r0 *project.ListProjectsResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[project.ListProjectsRequest]) (*connect.Response[project.ListProjectsResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *project.ListProjectsRequest) (*project.ListProjectsResponse, error)); ok {
+		return returnFunc(context1, listProjectsRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[project.ListProjectsRequest]) *connect.Response[project.ListProjectsResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *project.ListProjectsRequest) *project.ListProjectsResponse); ok {
+		r0 = returnFunc(context1, listProjectsRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[project.ListProjectsResponse])
+			r0 = ret.Get(0).(*project.ListProjectsResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[project.ListProjectsRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *project.ListProjectsRequest) error); ok {
+		r1 = returnFunc(context1, listProjectsRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -509,20 +526,20 @@ type ProjectServiceHandler_ListProjects_Call struct {
 
 // ListProjects is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[project.ListProjectsRequest]
-func (_e *ProjectServiceHandler_Expecter) ListProjects(context1 interface{}, request interface{}) *ProjectServiceHandler_ListProjects_Call {
-	return &ProjectServiceHandler_ListProjects_Call{Call: _e.mock.On("ListProjects", context1, request)}
+//   - listProjectsRequest *project.ListProjectsRequest
+func (_e *ProjectServiceHandler_Expecter) ListProjects(context1 any, listProjectsRequest any) *ProjectServiceHandler_ListProjects_Call {
+	return &ProjectServiceHandler_ListProjects_Call{Call: _e.mock.On("ListProjects", context1, listProjectsRequest)}
 }
 
-func (_c *ProjectServiceHandler_ListProjects_Call) Run(run func(context1 context.Context, request *connect.Request[project.ListProjectsRequest])) *ProjectServiceHandler_ListProjects_Call {
+func (_c *ProjectServiceHandler_ListProjects_Call) Run(run func(context1 context.Context, listProjectsRequest *project.ListProjectsRequest)) *ProjectServiceHandler_ListProjects_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[project.ListProjectsRequest]
+		var arg1 *project.ListProjectsRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[project.ListProjectsRequest])
+			arg1 = args[1].(*project.ListProjectsRequest)
 		}
 		run(
 			arg0,
@@ -532,38 +549,38 @@ func (_c *ProjectServiceHandler_ListProjects_Call) Run(run func(context1 context
 	return _c
 }
 
-func (_c *ProjectServiceHandler_ListProjects_Call) Return(response *connect.Response[project.ListProjectsResponse], err error) *ProjectServiceHandler_ListProjects_Call {
-	_c.Call.Return(response, err)
+func (_c *ProjectServiceHandler_ListProjects_Call) Return(listProjectsResponse *project.ListProjectsResponse, err error) *ProjectServiceHandler_ListProjects_Call {
+	_c.Call.Return(listProjectsResponse, err)
 	return _c
 }
 
-func (_c *ProjectServiceHandler_ListProjects_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[project.ListProjectsRequest]) (*connect.Response[project.ListProjectsResponse], error)) *ProjectServiceHandler_ListProjects_Call {
+func (_c *ProjectServiceHandler_ListProjects_Call) RunAndReturn(run func(context1 context.Context, listProjectsRequest *project.ListProjectsRequest) (*project.ListProjectsResponse, error)) *ProjectServiceHandler_ListProjects_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // UpdateProject provides a mock function for the type ProjectServiceHandler
-func (_mock *ProjectServiceHandler) UpdateProject(context1 context.Context, request *connect.Request[project.UpdateProjectRequest]) (*connect.Response[project.UpdateProjectResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ProjectServiceHandler) UpdateProject(context1 context.Context, updateProjectRequest *project.UpdateProjectRequest) (*project.UpdateProjectResponse, error) {
+	ret := _mock.Called(context1, updateProjectRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateProject")
 	}
 
-	var r0 *connect.Response[project.UpdateProjectResponse]
+	var r0 *project.UpdateProjectResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[project.UpdateProjectRequest]) (*connect.Response[project.UpdateProjectResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *project.UpdateProjectRequest) (*project.UpdateProjectResponse, error)); ok {
+		return returnFunc(context1, updateProjectRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[project.UpdateProjectRequest]) *connect.Response[project.UpdateProjectResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *project.UpdateProjectRequest) *project.UpdateProjectResponse); ok {
+		r0 = returnFunc(context1, updateProjectRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[project.UpdateProjectResponse])
+			r0 = ret.Get(0).(*project.UpdateProjectResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[project.UpdateProjectRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *project.UpdateProjectRequest) error); ok {
+		r1 = returnFunc(context1, updateProjectRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -577,20 +594,20 @@ type ProjectServiceHandler_UpdateProject_Call struct {
 
 // UpdateProject is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[project.UpdateProjectRequest]
-func (_e *ProjectServiceHandler_Expecter) UpdateProject(context1 interface{}, request interface{}) *ProjectServiceHandler_UpdateProject_Call {
-	return &ProjectServiceHandler_UpdateProject_Call{Call: _e.mock.On("UpdateProject", context1, request)}
+//   - updateProjectRequest *project.UpdateProjectRequest
+func (_e *ProjectServiceHandler_Expecter) UpdateProject(context1 any, updateProjectRequest any) *ProjectServiceHandler_UpdateProject_Call {
+	return &ProjectServiceHandler_UpdateProject_Call{Call: _e.mock.On("UpdateProject", context1, updateProjectRequest)}
 }
 
-func (_c *ProjectServiceHandler_UpdateProject_Call) Run(run func(context1 context.Context, request *connect.Request[project.UpdateProjectRequest])) *ProjectServiceHandler_UpdateProject_Call {
+func (_c *ProjectServiceHandler_UpdateProject_Call) Run(run func(context1 context.Context, updateProjectRequest *project.UpdateProjectRequest)) *ProjectServiceHandler_UpdateProject_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[project.UpdateProjectRequest]
+		var arg1 *project.UpdateProjectRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[project.UpdateProjectRequest])
+			arg1 = args[1].(*project.UpdateProjectRequest)
 		}
 		run(
 			arg0,
@@ -600,12 +617,12 @@ func (_c *ProjectServiceHandler_UpdateProject_Call) Run(run func(context1 contex
 	return _c
 }
 
-func (_c *ProjectServiceHandler_UpdateProject_Call) Return(response *connect.Response[project.UpdateProjectResponse], err error) *ProjectServiceHandler_UpdateProject_Call {
-	_c.Call.Return(response, err)
+func (_c *ProjectServiceHandler_UpdateProject_Call) Return(updateProjectResponse *project.UpdateProjectResponse, err error) *ProjectServiceHandler_UpdateProject_Call {
+	_c.Call.Return(updateProjectResponse, err)
 	return _c
 }
 
-func (_c *ProjectServiceHandler_UpdateProject_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[project.UpdateProjectRequest]) (*connect.Response[project.UpdateProjectResponse], error)) *ProjectServiceHandler_UpdateProject_Call {
+func (_c *ProjectServiceHandler_UpdateProject_Call) RunAndReturn(run func(context1 context.Context, updateProjectRequest *project.UpdateProjectRequest) (*project.UpdateProjectResponse, error)) *ProjectServiceHandler_UpdateProject_Call {
 	_c.Call.Return(run)
 	return _c
 }

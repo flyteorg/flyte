@@ -6,7 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"connectrpc.com/otelconnect"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -17,17 +18,18 @@ import (
 )
 
 func main() {
-	otelInterceptor, err := otelconnect.NewInterceptor()
+	otelInterceptor, err := otelconnect.NewClientInterceptor()
 	if err != nil {
 		log.Fatalf("Failed to create otel interceptor: %v", err)
 	}
 
 	// Create a client
-	client := workflowconnect.NewRunServiceClient(
+	client := workflowconnect.NewRunServiceClient(connect.NewClient(connecthttp.NewTransport(
 		http.DefaultClient,
 		"http://localhost:8090",
-		connect.WithInterceptors(otelInterceptor),
-	)
+		connecthttp.WithReadMaxBytes(0),
+	), otelInterceptor,
+	))
 
 	ctx := context.Background()
 
@@ -59,11 +61,11 @@ func main() {
 		},
 	}
 
-	createResp, err := client.CreateRun(ctx, connect.NewRequest(createRunReq))
+	createResp, err := client.CreateRun(ctx, createRunReq)
 	if err != nil {
 		log.Fatalf("Failed to create run: %v", err)
 	}
-	fmt.Printf("✓ Run created successfully: %+v\n\n", createResp.Msg.Run.Action.Id.Run.Name)
+	fmt.Printf("✓ Run created successfully: %+v\n\n", createResp.Run.Action.Id.Run.Name)
 
 	// Test 2: Create another run with ProjectId (auto-generated name)
 	fmt.Println("Test 2: Creating a run with auto-generated name...")
@@ -92,11 +94,11 @@ func main() {
 		},
 	}
 
-	createResp2, err := client.CreateRun(ctx, connect.NewRequest(createRunReq2))
+	createResp2, err := client.CreateRun(ctx, createRunReq2)
 	if err != nil {
 		log.Fatalf("Failed to create second run: %v", err)
 	}
-	runName := createResp2.Msg.Run.Action.Id.Run.Name
+	runName := createResp2.Run.Action.Id.Run.Name
 	fmt.Printf("✓ Run with auto-generated name created: %s\n\n", runName)
 
 	// Test 3: Get run details
@@ -110,11 +112,11 @@ func main() {
 		},
 	}
 
-	getRunResp, err := client.GetRunDetails(ctx, connect.NewRequest(getRunReq))
+	getRunResp, err := client.GetRunDetails(ctx, getRunReq)
 	if err != nil {
 		log.Fatalf("Failed to get run details: %v", err)
 	}
-	fmt.Printf("✓ Retrieved run details: %+v\n\n", getRunResp.Msg)
+	fmt.Printf("✓ Retrieved run details: %+v\n\n", getRunResp)
 
 	// Test 4: List runs
 	fmt.Println("Test 4: Listing runs...")
@@ -131,11 +133,11 @@ func main() {
 		},
 	}
 
-	listRunsResp, err := client.ListRuns(ctx, connect.NewRequest(listRunsReq))
+	listRunsResp, err := client.ListRuns(ctx, listRunsReq)
 	if err != nil {
 		log.Fatalf("Failed to list runs: %v", err)
 	}
-	fmt.Printf("✓ Found %d runs\n\n", len(listRunsResp.Msg.Runs))
+	fmt.Printf("✓ Found %d runs\n\n", len(listRunsResp.Runs))
 
 	// Test 5: List actions for a run
 	fmt.Println("Test 5: Listing actions for the run...")
@@ -151,22 +153,22 @@ func main() {
 		},
 	}
 
-	listActionsResp, err := client.ListActions(ctx, connect.NewRequest(listActionsReq))
+	listActionsResp, err := client.ListActions(ctx, listActionsReq)
 	if err != nil {
 		log.Fatalf("Failed to list actions: %v", err)
 	}
-	fmt.Printf("✓ Found %d actions\n\n", len(listActionsResp.Msg.Actions))
+	fmt.Printf("✓ Found %d actions\n\n", len(listActionsResp.Actions))
 
 	// Test 6: Abort an action
-	if len(listActionsResp.Msg.Actions) > 0 {
+	if len(listActionsResp.Actions) > 0 {
 		fmt.Println("Test 6: Aborting an action...")
-		actionToAbort := listActionsResp.Msg.Actions[0]
+		actionToAbort := listActionsResp.Actions[0]
 		abortActionReq := &workflow.AbortActionRequest{
 			ActionId: actionToAbort.Id,
 			Reason:   "Testing abort functionality",
 		}
 
-		_, err = client.AbortAction(ctx, connect.NewRequest(abortActionReq))
+		_, err = client.AbortAction(ctx, abortActionReq)
 		if err != nil {
 			log.Fatalf("Failed to abort action: %v", err)
 		}
@@ -185,7 +187,7 @@ func main() {
 		Reason: strPtr("Testing run abort functionality"),
 	}
 
-	_, err = client.AbortRun(ctx, connect.NewRequest(abortRunReq))
+	_, err = client.AbortRun(ctx, abortRunReq)
 	if err != nil {
 		log.Fatalf("Failed to abort run: %v", err)
 	}

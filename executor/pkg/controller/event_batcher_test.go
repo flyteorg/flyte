@@ -6,7 +6,6 @@ import (
 	"sync"
 	"testing"
 
-	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -24,9 +23,9 @@ type batchTestClient struct {
 	err     error
 }
 
-func (f *batchTestClient) Record(_ context.Context, req *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
+func (f *batchTestClient) Record(_ context.Context, req *workflow.RecordRequest) (*workflow.RecordResponse, error) {
 	f.mu.Lock()
-	n := len(req.Msg.GetEvents())
+	n := len(req.GetEvents())
 	f.batches = append(f.batches, n)
 	f.total += n
 	err := f.err
@@ -34,7 +33,7 @@ func (f *batchTestClient) Record(_ context.Context, req *connect.Request[workflo
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&workflow.RecordResponse{}), nil
+	return &workflow.RecordResponse{}, nil
 }
 
 func ev() *workflow.ActionEvent { return &workflow.ActionEvent{} }

@@ -5,17 +5,18 @@ import (
 	"fmt"
 	"net/http"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"connectrpc.com/otelconnect"
+
+	appconfig "github.com/flyteorg/flyte/v2/app/config"
+	appinternal "github.com/flyteorg/flyte/v2/app/internal"
+	"github.com/flyteorg/flyte/v2/app/service"
 	stdlibapp "github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/sentryutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
-
-	appconfig "github.com/flyteorg/flyte/v2/app/config"
-	appinternal "github.com/flyteorg/flyte/v2/app/internal"
-	"github.com/flyteorg/flyte/v2/app/service"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
 )
 
@@ -42,7 +43,7 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
-	otelInterceptor, err := otelconnect.NewInterceptor(
+	otelInterceptor, err := otelconnect.NewServerInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
 		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
 	)
@@ -50,7 +51,15 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
 
-	interceptors := []connect.Interceptor{otelInterceptor}
+	otelClientInterceptor, err := otelconnect.NewClientInterceptor(
+		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
+		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
+	)
+	if err != nil {
+		return fmt.Errorf("creating otel client interceptor: %w", err)
+	}
+
+	interceptors := []connect.ServerInterceptor{otelInterceptor}
 	if sentryutils.Init(ctx, otelServiceName) {
 		interceptors = append(interceptors, sentryutils.Interceptor(sentryOperations))
 		sc.AddWorker("app-sentry-flush", func(ctx context.Context) error {
@@ -70,25 +79,35 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	}
 	internalAppURL := internalAppServiceCfg.URL + "/internal"
 
-	internalClient := appconnect.NewAppServiceClient(
+	internalClient := appconnect.NewAppServiceClient(connect.NewClient(connecthttp.NewTransport(
 		internalHTTPClient,
 		internalAppURL,
-		connect.WithInterceptors(otelInterceptor),
-	)
+		connecthttp.WithReadMaxBytes(0),
+	), otelClientInterceptor,
+	))
 
 	appSvc := service.NewAppService(internalClient, cfg.CacheTTL)
 
-	path, handler := appconnect.NewAppServiceHandler(appSvc, connect.WithInterceptors(interceptors...))
+	handlerServer := connect.NewServer(interceptors...)
+	appconnect.RegisterAppServiceHandler(handlerServer, appSvc)
+	path := "/" + appconnect.AppServiceName + "/"
+	handler := http.NewServeMux()
+	connecthttp.Mount(handler, handlerServer, connecthttp.WithReadMaxBytes(0))
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted AppService at %s", path)
 
-	internalLogsClient := appconnect.NewAppLogsServiceClient(
+	internalLogsClient := appconnect.NewAppLogsServiceClient(connect.NewClient(connecthttp.NewTransport(
 		internalHTTPClient,
 		internalAppURL,
-		connect.WithInterceptors(otelInterceptor),
-	)
+		connecthttp.WithReadMaxBytes(0),
+	), otelClientInterceptor,
+	))
 	logsSvc := service.NewAppLogsService(internalLogsClient)
-	logsPath, logsHandler := appconnect.NewAppLogsServiceHandler(logsSvc, connect.WithInterceptors(otelInterceptor))
+	logsHandlerServer := connect.NewServer(otelInterceptor)
+	appconnect.RegisterAppLogsServiceHandler(logsHandlerServer, logsSvc)
+	logsPath := "/" + appconnect.AppLogsServiceName + "/"
+	logsHandler := http.NewServeMux()
+	connecthttp.Mount(logsHandler, logsHandlerServer, connecthttp.WithReadMaxBytes(0))
 	sc.Mux.Handle(logsPath, logsHandler)
 	logger.Infof(ctx, "Mounted AppLogsService at %s", logsPath)
 

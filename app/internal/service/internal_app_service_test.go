@@ -2,11 +2,13 @@ package service
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -117,12 +119,16 @@ func testAppWithStatus(phase flyteapp.Status_DeploymentStatus) *flyteapp.App {
 
 func newTestClient(t *testing.T, k8s *mockAppK8sClient) appconnect.AppServiceClient {
 	svc := NewInternalAppService(k8s)
-	path, handler := appconnect.NewAppServiceHandler(svc)
+	handlerServer := connect.NewServer()
+	appconnect.RegisterAppServiceHandler(handlerServer, svc)
+	path := "/" + appconnect.AppServiceName + "/"
+	handler := http.NewServeMux()
+	connecthttp.Mount(handler, handlerServer, connecthttp.WithReadMaxBytes(0))
 	mux := http.NewServeMux()
 	mux.Handle("/internal"+path, http.StripPrefix("/internal", handler))
 	server := httptest.NewServer(mux)
 	t.Cleanup(server.Close)
-	return appconnect.NewAppServiceClient(http.DefaultClient, server.URL+"/internal")
+	return appconnect.NewAppServiceClient(connect.NewClient(connecthttp.NewTransport(http.DefaultClient, server.URL+"/internal", connecthttp.WithReadMaxBytes(0))))
 }
 
 // --- Create ---
@@ -136,20 +142,20 @@ func TestCreate_Success(t *testing.T) {
 	k8s.On("Deploy", mock.Anything, app).Return(nil)
 	k8s.On("PublicIngress", app.Metadata.Id).Return(ingress)
 
-	resp, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{App: app}))
+	resp, err := svc.Create(context.Background(), &flyteapp.CreateRequest{App: app})
 	require.NoError(t, err)
 	// Conditions are written by handleKServiceEvent, not by Create directly.
-	assert.Empty(t, resp.Msg.App.Status.Conditions)
-	assert.Equal(t, ingress.PublicUrl, resp.Msg.App.Status.Ingress.PublicUrl)
+	assert.Empty(t, resp.App.Status.Conditions)
+	assert.Equal(t, ingress.PublicUrl, resp.App.Status.Ingress.PublicUrl)
 	k8s.AssertExpectations(t)
 }
 
 func TestCreate_MissingID(t *testing.T) {
 	svc := NewInternalAppService(&mockAppK8sClient{})
 
-	_, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{
+	_, err := svc.Create(context.Background(), &flyteapp.CreateRequest{
 		App: &flyteapp.App{Spec: testApp().Spec},
-	}))
+	})
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 }
@@ -157,9 +163,9 @@ func TestCreate_MissingID(t *testing.T) {
 func TestCreate_MissingSpec(t *testing.T) {
 	svc := NewInternalAppService(&mockAppK8sClient{})
 
-	_, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{
+	_, err := svc.Create(context.Background(), &flyteapp.CreateRequest{
 		App: &flyteapp.App{Metadata: &flyteapp.Meta{Id: testAppID()}},
-	}))
+	})
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 }
@@ -167,12 +173,12 @@ func TestCreate_MissingSpec(t *testing.T) {
 func TestCreate_MissingPayload(t *testing.T) {
 	svc := NewInternalAppService(&mockAppK8sClient{})
 
-	_, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{
+	_, err := svc.Create(context.Background(), &flyteapp.CreateRequest{
 		App: &flyteapp.App{
 			Metadata: &flyteapp.Meta{Id: testAppID()},
 			Spec:     &flyteapp.Spec{},
 		},
-	}))
+	})
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 }
@@ -186,9 +192,9 @@ func TestCreate_IngressWithPort(t *testing.T) {
 	k8s.On("Deploy", mock.Anything, app).Return(nil)
 	k8s.On("PublicIngress", app.Metadata.Id).Return(ingress)
 
-	resp, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{App: app}))
+	resp, err := svc.Create(context.Background(), &flyteapp.CreateRequest{App: app})
 	require.NoError(t, err)
-	assert.Equal(t, ingress.PublicUrl, resp.Msg.App.Status.Ingress.PublicUrl)
+	assert.Equal(t, ingress.PublicUrl, resp.App.Status.Ingress.PublicUrl)
 	k8s.AssertExpectations(t)
 }
 
@@ -200,9 +206,9 @@ func TestCreate_NoBaseDomain_NoIngress(t *testing.T) {
 	k8s.On("Deploy", mock.Anything, app).Return(nil)
 	k8s.On("PublicIngress", app.Metadata.Id).Return((*flyteapp.Ingress)(nil))
 
-	resp, err := svc.Create(context.Background(), connect.NewRequest(&flyteapp.CreateRequest{App: app}))
+	resp, err := svc.Create(context.Background(), &flyteapp.CreateRequest{App: app})
 	require.NoError(t, err)
-	assert.Nil(t, resp.Msg.App.Status.Ingress)
+	assert.Nil(t, resp.App.Status.Ingress)
 	k8s.AssertExpectations(t)
 }
 
@@ -215,18 +221,18 @@ func TestGet_Success(t *testing.T) {
 	appID := testAppID()
 	k8s.On("GetApp", mock.Anything, appID).Return(testAppWithStatus(flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE), nil)
 
-	resp, err := svc.Get(context.Background(), connect.NewRequest(&flyteapp.GetRequest{
+	resp, err := svc.Get(context.Background(), &flyteapp.GetRequest{
 		Identifier: &flyteapp.GetRequest_AppId{AppId: appID},
-	}))
+	})
 	require.NoError(t, err)
-	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE, resp.Msg.App.Status.Conditions[0].DeploymentStatus)
+	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_ACTIVE, resp.App.Status.Conditions[0].DeploymentStatus)
 	k8s.AssertExpectations(t)
 }
 
 func TestGet_MissingAppID(t *testing.T) {
 	svc := NewInternalAppService(&mockAppK8sClient{})
 
-	_, err := svc.Get(context.Background(), connect.NewRequest(&flyteapp.GetRequest{}))
+	_, err := svc.Get(context.Background(), &flyteapp.GetRequest{})
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 }
@@ -241,9 +247,9 @@ func TestUpdate_Deploy(t *testing.T) {
 	k8s.On("Deploy", mock.Anything, app).Return(nil)
 	k8s.On("GetApp", mock.Anything, app.Metadata.Id).Return(testAppWithStatus(flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING), nil)
 
-	resp, err := svc.Update(context.Background(), connect.NewRequest(&flyteapp.UpdateRequest{App: app}))
+	resp, err := svc.Update(context.Background(), &flyteapp.UpdateRequest{App: app})
 	require.NoError(t, err)
-	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING, resp.Msg.App.Status.Conditions[0].DeploymentStatus)
+	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_DEPLOYING, resp.App.Status.Conditions[0].DeploymentStatus)
 	k8s.AssertExpectations(t)
 }
 
@@ -256,18 +262,18 @@ func TestUpdate_Stop(t *testing.T) {
 	k8s.On("Stop", mock.Anything, app.Metadata.Id).Return(nil)
 	k8s.On("GetApp", mock.Anything, app.Metadata.Id).Return(testAppWithStatus(flyteapp.Status_DEPLOYMENT_STATUS_STOPPED), nil)
 
-	resp, err := svc.Update(context.Background(), connect.NewRequest(&flyteapp.UpdateRequest{App: app}))
+	resp, err := svc.Update(context.Background(), &flyteapp.UpdateRequest{App: app})
 	require.NoError(t, err)
-	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_STOPPED, resp.Msg.App.Status.Conditions[0].DeploymentStatus)
+	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_STOPPED, resp.App.Status.Conditions[0].DeploymentStatus)
 	k8s.AssertExpectations(t)
 }
 
 func TestUpdate_MissingID(t *testing.T) {
 	svc := NewInternalAppService(&mockAppK8sClient{})
 
-	_, err := svc.Update(context.Background(), connect.NewRequest(&flyteapp.UpdateRequest{
+	_, err := svc.Update(context.Background(), &flyteapp.UpdateRequest{
 		App: &flyteapp.App{},
-	}))
+	})
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 }
@@ -281,7 +287,7 @@ func TestDelete_Success(t *testing.T) {
 	appID := testAppID()
 	k8s.On("Delete", mock.Anything, appID).Return(nil)
 
-	_, err := svc.Delete(context.Background(), connect.NewRequest(&flyteapp.DeleteRequest{AppId: appID}))
+	_, err := svc.Delete(context.Background(), &flyteapp.DeleteRequest{AppId: appID})
 	require.NoError(t, err)
 	k8s.AssertExpectations(t)
 }
@@ -289,7 +295,7 @@ func TestDelete_Success(t *testing.T) {
 func TestDelete_MissingID(t *testing.T) {
 	svc := NewInternalAppService(&mockAppK8sClient{})
 
-	_, err := svc.Delete(context.Background(), connect.NewRequest(&flyteapp.DeleteRequest{}))
+	_, err := svc.Delete(context.Background(), &flyteapp.DeleteRequest{})
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 }
@@ -303,15 +309,15 @@ func TestList_ByProject(t *testing.T) {
 	apps := []*flyteapp.App{testApp()}
 	k8s.On("List", mock.Anything, "proj", "dev", uint32(10), "tok").Return(apps, "nexttok", nil)
 
-	resp, err := svc.List(context.Background(), connect.NewRequest(&flyteapp.ListRequest{
+	resp, err := svc.List(context.Background(), &flyteapp.ListRequest{
 		FilterBy: &flyteapp.ListRequest_Project{
 			Project: &common.ProjectIdentifier{Name: "proj", Domain: "dev"},
 		},
 		Request: &common.ListRequest{Limit: 10, Token: "tok"},
-	}))
+	})
 	require.NoError(t, err)
-	assert.Len(t, resp.Msg.Apps, 1)
-	assert.Equal(t, "nexttok", resp.Msg.Token)
+	assert.Len(t, resp.Apps, 1)
+	assert.Equal(t, "nexttok", resp.Token)
 	k8s.AssertExpectations(t)
 }
 
@@ -321,9 +327,9 @@ func TestList_NoFilter(t *testing.T) {
 
 	k8s.On("List", mock.Anything, "", "", uint32(0), "").Return([]*flyteapp.App{}, "", nil)
 
-	resp, err := svc.List(context.Background(), connect.NewRequest(&flyteapp.ListRequest{}))
+	resp, err := svc.List(context.Background(), &flyteapp.ListRequest{})
 	require.NoError(t, err)
-	assert.Empty(t, resp.Msg.Apps)
+	assert.Empty(t, resp.Apps)
 	k8s.AssertExpectations(t)
 }
 
@@ -340,12 +346,14 @@ func TestWatch_AppIDTarget(t *testing.T) {
 	k8s.On("Unsubscribe", "myapp", ch).Return()
 
 	client := newTestClient(t, k8s)
-	stream, err := client.Watch(context.Background(), connect.NewRequest(&flyteapp.WatchRequest{
+	stream, err := client.Watch(context.Background(), &flyteapp.WatchRequest{
 		Target: &flyteapp.WatchRequest_AppId{AppId: testAppID()},
-	}))
+	})
 	require.NoError(t, err)
 
 	// No snapshot apps, channel closed — stream ends immediately.
-	assert.False(t, stream.Receive())
+	streamMsg1, streamErr1 := stream.Receive()
+	_ = streamMsg1
+	assert.ErrorIs(t, streamErr1, io.EOF)
 	k8s.AssertExpectations(t)
 }

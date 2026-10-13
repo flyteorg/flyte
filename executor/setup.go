@@ -8,7 +8,8 @@ import (
 	"os"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"connectrpc.com/otelconnect"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -32,11 +33,14 @@ import (
 	"github.com/flyteorg/flyte/v2/executor/pkg/controller"
 	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
 	webhookPkg "github.com/flyteorg/flyte/v2/executor/pkg/webhook"
+	_ "github.com/flyteorg/flyte/v2/executor/plugins"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 	cachecatalog "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog/cache_service"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	webhookConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
+	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/clustered"
+	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/pod"
 	connectorplugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/webapi/connector"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
@@ -44,10 +48,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
-
-	_ "github.com/flyteorg/flyte/v2/executor/plugins"
-	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/clustered"
-	_ "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/pod"
 )
 
 var scheme = runtime.NewScheme()
@@ -214,7 +214,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
-	otelInterceptor, err := otelconnect.NewInterceptor(
+	otelInterceptor, err := otelconnect.NewClientInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
 		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
 	)
@@ -237,9 +237,9 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err != nil {
 		return fmt.Errorf("executor: configure cache service client: %w", err)
 	}
-	eventsClient := workflowconnect.NewEventsProxyServiceClient(eventsHTTPClient, eventsServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
+	eventsClient := workflowconnect.NewEventsProxyServiceClient(connect.NewClient(connecthttp.NewTransport(eventsHTTPClient, eventsServiceCfg.URL, connecthttp.WithReadMaxBytes(0)), otelInterceptor))
 	catalogCfg := catalog.GetConfig()
-	cacheClient := cachecatalog.NewClient(cacheHTTPClient, dataStore, cacheServiceCfg.URL, catalogCfg.MaxCacheAge.Duration, connect.WithInterceptors(otelInterceptor))
+	cacheClient := cachecatalog.NewClient(cacheHTTPClient, dataStore, cacheServiceCfg.URL, catalogCfg.MaxCacheAge.Duration, otelInterceptor)
 	asyncCatalogClient, err := catalog.NewAsyncClient(cacheClient, *catalogCfg, promutils.NewScope("executor:catalog"))
 	if err != nil {
 		return fmt.Errorf("executor: failed to create catalog cache client: %w", err)

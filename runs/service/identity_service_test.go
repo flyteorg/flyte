@@ -6,22 +6,27 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connectinprocess"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/runs/config"
 )
 
-// userInfoReq builds a UserInfoRequest carrying the given headers.
-func userInfoReq(headers map[string]string) *connect.Request[auth.UserInfoRequest] {
-	req := connect.NewRequest(&auth.UserInfoRequest{})
+// callUserInfo sends headers through a real v2 call context.
+func callUserInfo(ctx context.Context, svc *IdentityService, headers map[string]string) (*auth.UserInfoResponse, error) {
+	server := connect.NewServer()
+	authconnect.RegisterIdentityServiceHandler(server, svc)
+	client := authconnect.NewIdentityServiceClient(connect.NewClient(connectinprocess.New(server)))
+	ctx, info := connect.NewClientContext(ctx)
 	for k, v := range headers {
-		req.Header().Set(k, v)
+		info.RequestHeader().Set(k, v)
 	}
-	return req
+	return client.UserInfo(ctx, &auth.UserInfoRequest{})
 }
 
 func TestIdentityService_UserInfo(t *testing.T) {
@@ -97,7 +102,7 @@ func TestIdentityService_UserInfo(t *testing.T) {
 			// No auth-server URL: the enricher is nil, so no userinfo round-trip.
 			svc := NewIdentityService("", true, tt.cfg)
 
-			resp, err := svc.UserInfo(context.Background(), userInfoReq(tt.headers))
+			resp, err := callUserInfo(context.Background(), svc, tt.headers)
 
 			if tt.wantCode != 0 {
 				require.Error(t, err)
@@ -108,11 +113,11 @@ func TestIdentityService_UserInfo(t *testing.T) {
 
 			require.NoError(t, err)
 			require.NotNil(t, resp)
-			assert.Equal(t, tt.want.GetSubject(), resp.Msg.GetSubject())
-			assert.Equal(t, tt.want.GetName(), resp.Msg.GetName())
-			assert.Equal(t, tt.want.GetGivenName(), resp.Msg.GetGivenName())
-			assert.Equal(t, tt.want.GetFamilyName(), resp.Msg.GetFamilyName())
-			assert.Equal(t, tt.want.GetEmail(), resp.Msg.GetEmail())
+			assert.Equal(t, tt.want.GetSubject(), resp.GetSubject())
+			assert.Equal(t, tt.want.GetName(), resp.GetName())
+			assert.Equal(t, tt.want.GetGivenName(), resp.GetGivenName())
+			assert.Equal(t, tt.want.GetFamilyName(), resp.GetFamilyName())
+			assert.Equal(t, tt.want.GetEmail(), resp.GetEmail())
 		})
 	}
 }
@@ -122,9 +127,9 @@ func TestIdentityService_UserInfo(t *testing.T) {
 func TestIdentityService_UserInfo_UntrustedHeadersRejected(t *testing.T) {
 	svc := NewIdentityService("", false, albCfg)
 
-	resp, err := svc.UserInfo(context.Background(), userInfoReq(map[string]string{
+	resp, err := callUserInfo(context.Background(), svc, map[string]string{
 		"X-Amzn-Oidc-Data": jwt(`{"sub":"00u123","given_name":"Spoofed","family_name":"User","email":"attacker@example.com"}`),
-	}))
+	})
 
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeUnauthenticated, connect.CodeOf(err))
@@ -139,14 +144,14 @@ func TestIdentityService_UserInfo_EnrichesBearerViaUserinfo(t *testing.T) {
 
 	svc := NewIdentityService(srv.URL, true, albCfg)
 
-	resp, err := svc.UserInfo(context.Background(), userInfoReq(map[string]string{
+	resp, err := callUserInfo(context.Background(), svc, map[string]string{
 		"Authorization": "Bearer " + jwt(`{"sub":"0oa-client-id"}`),
-	}))
+	})
 
 	require.NoError(t, err)
-	assert.Equal(t, "00u-real", resp.Msg.GetSubject(), "userinfo subject must win over the token's")
-	assert.Equal(t, "Kevin Su", resp.Msg.GetName())
-	assert.Equal(t, "kevin@union.ai", resp.Msg.GetEmail())
+	assert.Equal(t, "00u-real", resp.GetSubject(), "userinfo subject must win over the token's")
+	assert.Equal(t, "Kevin Su", resp.GetName())
+	assert.Equal(t, "kevin@union.ai", resp.GetEmail())
 }
 
 // A userinfo outage must not fail whoami — the subject-only identity still answers
@@ -157,13 +162,13 @@ func TestIdentityService_UserInfo_UserinfoFailureFallsBackToSubject(t *testing.T
 
 	svc := NewIdentityService(srv.URL, true, albCfg)
 
-	resp, err := svc.UserInfo(context.Background(), userInfoReq(map[string]string{
+	resp, err := callUserInfo(context.Background(), svc, map[string]string{
 		"Authorization": "Bearer " + jwt(`{"sub":"00u-token"}`),
-	}))
+	})
 
 	require.NoError(t, err)
-	assert.Equal(t, "00u-token", resp.Msg.GetSubject())
-	assert.Empty(t, resp.Msg.GetEmail())
+	assert.Equal(t, "00u-token", resp.GetSubject())
+	assert.Empty(t, resp.GetEmail())
 }
 
 func TestUserInfoFromUser_NameFromFirstLast(t *testing.T) {

@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
@@ -233,10 +233,10 @@ func (r *AbortReconciler) processTask(ctx context.Context, task abortTask) {
 	}
 
 	reason := task.reason
-	_, abortErr := r.actionsClient.Abort(ctx, connect.NewRequest(&actions.AbortRequest{
+	_, abortErr := r.actionsClient.Abort(ctx, &actions.AbortRequest{
 		ActionId: task.actionID,
 		Reason:   &reason,
-	}))
+	})
 
 	if abortErr == nil || isAlreadyTerminated(abortErr) {
 		// Success (or already gone — treat as success).

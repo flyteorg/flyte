@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"github.com/vmihailenco/msgpack/v5"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -74,7 +74,7 @@ func TaskSpecToLaunchFormJson(ctx context.Context, taskSpec *task.TaskSpec) (*st
 	pbStruct, err := structpb.NewStruct(rootSchema)
 	if err != nil {
 		logger.Errorf(ctx, "error converting root schema to structpb: %v", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("error converting root schema to structpb: %v", err))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "error converting root schema to structpb: %v", err)
 	}
 	return pbStruct, nil
 }
@@ -101,7 +101,7 @@ func JSONValuesToLiterals(ctx context.Context, variableMap *core.VariableMap, va
 		variableMap = &core.VariableMap{}
 	}
 	if values == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("values cannot be nil"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "values cannot be nil")
 	}
 
 	valueMap := values.AsMap()
@@ -131,9 +131,9 @@ func JSONValuesToLiterals(ctx context.Context, variableMap *core.VariableMap, va
 
 			// For non-optional (or misconfigured) variables, still treat a missing
 			// value as an error.
-			return nil, connect.NewError(
+			return nil, connect.Errorf(
 				connect.CodeInvalidArgument,
-				fmt.Errorf("missing value for variable %q in JSON payload", name),
+				"missing value for variable %q in JSON payload", name,
 			)
 		}
 
@@ -142,7 +142,7 @@ func JSONValuesToLiterals(ctx context.Context, variableMap *core.VariableMap, va
 			logger.Errorf(ctx, "error converting json value to literal for field '%s'. ValueType: [%T] Type: [%+v] Err: %v", name, rawValue, variable.GetType(), err)
 			return nil, connect.NewError(
 				connect.CodeInvalidArgument,
-				fmt.Errorf("error converting field %q to literal: %w", name, err),
+				fmt.Errorf("error converting field %q to literal: %w", name, err).Error(),
 			)
 		}
 
@@ -240,7 +240,7 @@ func LaunchFormJsonToLiterals(ctx context.Context, jsonSchema *structpb.Struct) 
 	properties, ok := schemaMap["properties"].(map[string]any)
 	if !ok {
 		logger.Errorf(ctx, "missing or invalid properties in JSON schema: [%+v]", jsonSchema)
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("missing or invalid properties in JSON schema"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "missing or invalid properties in JSON schema")
 	}
 
 	var literals []*task.NamedLiteral
@@ -249,7 +249,7 @@ func LaunchFormJsonToLiterals(ctx context.Context, jsonSchema *structpb.Struct) 
 		fieldSchema, ok := fieldSchemaInterface.(map[string]any)
 		if !ok {
 			logger.Errorf(ctx, "invalid field schema for field %s: [%+v]", fieldName, fieldSchemaInterface)
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid field schema for field %s", fieldName))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "invalid field schema for field %s", fieldName)
 		}
 
 		// Add title back to schema for existing parsing logic
@@ -352,7 +352,7 @@ func LaunchFormJsonToLiterals(ctx context.Context, jsonSchema *structpb.Struct) 
 			literal, err = jsonValueToLiteralWithFieldName(ctx, defaultValue, literalType, fieldName)
 			if err != nil {
 				logger.Errorf(ctx, "error converting default value to literal for field '%s'. Default value: [%v] Type: [%+v] Err: %v", fieldName, defaultValue, literalType, err)
-				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("error converting field '%s' to literal: %v", fieldName, err))
+				return nil, connect.Errorf(connect.CodeInvalidArgument, "error converting field '%s' to literal: %v", fieldName, err)
 			}
 			// Skip null values - if literal is nil, don't add it to the list
 			if literal == nil {
@@ -435,7 +435,7 @@ func LiteralsToLaunchFormJson(ctx context.Context, literals []*task.NamedLiteral
 	pbStruct, err := structpb.NewStruct(rootSchema)
 	if err != nil {
 		logger.Errorf(ctx, "error converting root schema to structpb: %v", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("error converting root schema to structpb: %v", err))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "error converting root schema to structpb: %v", err)
 	}
 	return pbStruct, nil
 }
@@ -451,7 +451,7 @@ func buildFieldSchemaFromVariable(ctx context.Context, fieldName string, variabl
 	jsonType, err := literalTypeToJsonSchema(ctx, literalType)
 	if err != nil {
 		logger.Errorf(ctx, "error converting literal type to JSON schema. LiteralType: [%+v] Err: %v", literalType, err)
-		return nil, false, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("error converting literal type to JSON schema: %v", err))
+		return nil, false, connect.Errorf(connect.CodeInvalidArgument, "error converting literal type to JSON schema: %v", err)
 	}
 
 	// Build field schema
@@ -661,7 +661,7 @@ func literalTypeToJsonSchema(ctx context.Context, literalType *core.LiteralType)
 			}, nil
 		default:
 			logger.Errorf(ctx, "unknown simple type: %s", t.Simple)
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unknown simple type: %s", t.Simple))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "unknown simple type: %s", t.Simple)
 		}
 	case *core.LiteralType_Blob:
 		// Build properties with defaults from BlobType if available
@@ -712,7 +712,7 @@ func literalTypeToJsonSchema(ctx context.Context, literalType *core.LiteralType)
 		literalType, err := literalTypeToJsonSchema(ctx, t.CollectionType)
 		if err != nil {
 			logger.Errorf(ctx, "error converting collection type to JSON schema. CollectionType: [%+v] Err: %v", t.CollectionType, err)
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("error converting collection type to JSON schema: %v", err))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "error converting collection type to JSON schema: %v", err)
 		}
 		return map[string]any{
 			"type":  "array",
@@ -722,7 +722,7 @@ func literalTypeToJsonSchema(ctx context.Context, literalType *core.LiteralType)
 		literalType, err := literalTypeToJsonSchema(ctx, t.MapValueType)
 		if err != nil {
 			logger.Errorf(ctx, "error converting map value type to JSON schema. MapValueType: [%+v] Err: %v", t.MapValueType, err)
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("error converting union variant to JSON schema: %v", err))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "error converting union variant to JSON schema: %v", err)
 		}
 		return map[string]any{
 			"type":                 "object",
@@ -752,7 +752,7 @@ func literalTypeToJsonSchema(ctx context.Context, literalType *core.LiteralType)
 		for _, variant := range t.UnionType.GetVariants() {
 			variantSchema, err := literalTypeToJsonSchema(ctx, variant)
 			if err != nil {
-				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("error converting union variant to JSON schema: %v", err))
+				return nil, connect.Errorf(connect.CodeInvalidArgument, "error converting union variant to JSON schema: %v", err)
 			}
 
 			// Extract title from variant type
@@ -770,9 +770,9 @@ func literalTypeToJsonSchema(ctx context.Context, literalType *core.LiteralType)
 			"format": "union",
 		}, nil
 	case *core.LiteralType_Schema:
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("deprecated schema type"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "deprecated schema type")
 	default:
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unknown type %s", t))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "unknown type %s", t)
 	}
 }
 
@@ -877,13 +877,13 @@ func createNoneTypeLiteralForOptionalField(ctx context.Context, literalType *cor
 	unionType, ok := literalType.GetType().(*core.LiteralType_UnionType)
 	if !ok {
 		logger.Errorf(ctx, "expected union type for optional field: %s", fieldName)
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("expected union type for optional field: %s", fieldName))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "expected union type for optional field: %s", fieldName)
 	}
 
 	nullVariant := findNullVariantInUnionType(unionType)
 	if nullVariant == nil {
 		logger.Errorf(ctx, "optional field but could not find null variant in union type: %s", fieldName)
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("optional field but could not find null variant in union type: %s", fieldName))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "optional field but could not find null variant in union type: %s", fieldName)
 	}
 
 	literal := createNoneTypeUnionLiteralFromVariant(nullVariant)
@@ -933,14 +933,14 @@ func createNoneTypeUnionLiteralFromVariant(variant *core.LiteralType) *core.Lite
 func parseUnionSchema(oneOf any) (*core.LiteralType, error) {
 	oneOfSlice, ok := oneOf.([]any)
 	if !ok {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid oneOf schema format"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "invalid oneOf schema format")
 	}
 
 	var variants []*core.LiteralType
 	for i, variant := range oneOfSlice {
 		variantMap, ok := variant.(map[string]any)
 		if !ok {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid union variant format at index %d", i))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "invalid union variant format at index %d", i)
 		}
 
 		// Preserve structure field before removing title (structure is needed for union variant matching)
@@ -954,7 +954,7 @@ func parseUnionSchema(oneOf any) (*core.LiteralType, error) {
 
 		variantType, err := jsonSchemaToLiteralType(variantMap)
 		if err != nil {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("error parsing union variant at index %d: %v", i, err))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "error parsing union variant at index %d: %v", i, err)
 		}
 
 		// Ensure structure tag is set on the variant type
@@ -1051,9 +1051,9 @@ func findMatchingUnionVariant(ctx context.Context, value any, variants []*core.L
 		errMsg = fmt.Sprintf("field '%s': %s", fieldName, errMsg)
 	}
 	if lastErr != nil {
-		return nil, nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("%s (last error: %v)", errMsg, lastErr))
+		return nil, nil, connect.Errorf(connect.CodeInvalidArgument, "%s (last error: %v)", errMsg, lastErr)
 	}
-	return nil, nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("%s", errMsg))
+	return nil, nil, connect.Errorf(connect.CodeInvalidArgument, "%s", errMsg)
 }
 
 // decodeMsgpackToJSON decodes msgpack bytes (the encoding the SDK uses for
@@ -1117,7 +1117,7 @@ func jsonSafeValue(v any) any {
 func literalToJsonValues(ctx context.Context, literal *core.Literal) (any, error) {
 	if literal == nil {
 		logger.Errorf(ctx, "literal cannot be nil")
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("literal cannot be nil"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "literal cannot be nil")
 	}
 	switch v := literal.GetValue().(type) {
 	case *core.Literal_Scalar:
@@ -1137,16 +1137,16 @@ func literalToJsonValues(ctx context.Context, literal *core.Literal) (any, error
 					return p.Datetime.AsTime().Format(time.RFC3339), nil
 				}
 				logger.Errorf(ctx, "datetime cannot be nil")
-				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("datetime cannot be nil"))
+				return nil, connect.Errorf(connect.CodeInvalidArgument, "datetime cannot be nil")
 			case *core.Primitive_Duration:
 				if p.Duration != nil {
 					return p.Duration.AsDuration().String(), nil
 				}
 				logger.Errorf(ctx, "duration cannot be nil")
-				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("duration cannot be nil"))
+				return nil, connect.Errorf(connect.CodeInvalidArgument, "duration cannot be nil")
 			default:
 				logger.Errorf(ctx, "unknown primitive type: %T", p)
-				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unknown primitive type"))
+				return nil, connect.Errorf(connect.CodeInvalidArgument, "unknown primitive type")
 			}
 		case *core.Scalar_Binary:
 			// Try to decode as msgpack, fallback to base64 encoded string
@@ -1162,13 +1162,13 @@ func literalToJsonValues(ctx context.Context, literal *core.Literal) (any, error
 				return base64.StdEncoding.EncodeToString(s.Binary.GetValue()), nil
 			}
 			logger.Errorf(ctx, "binary cannot be nil")
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("binary cannot be nil"))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "binary cannot be nil")
 		case *core.Scalar_Generic:
 			if s.Generic != nil {
 				return s.Generic.AsMap(), nil
 			}
 			logger.Errorf(ctx, "generic map cannot be nil")
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("generic cannot be nil"))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "generic cannot be nil")
 		case *core.Scalar_Union:
 			return unionToValue(ctx, v)
 		case *core.Scalar_Blob:
@@ -1189,13 +1189,13 @@ func literalToJsonValues(ctx context.Context, literal *core.Literal) (any, error
 				"dimensionality": dimString,
 			}, nil
 		case *core.Scalar_Schema:
-			return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("unimplemented schema type"))
+			return nil, connect.Errorf(connect.CodeUnimplemented, "unimplemented schema type")
 		case *core.Scalar_NoneType:
 			return map[string]any{
 				"type": "null",
 			}, nil
 		case *core.Scalar_Error:
-			return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("unimplemented error type"))
+			return nil, connect.Errorf(connect.CodeUnimplemented, "unimplemented error type")
 		case *core.Scalar_StructuredDataset:
 			return map[string]any{
 				"uri":    s.StructuredDataset.GetUri(),
@@ -1203,7 +1203,7 @@ func literalToJsonValues(ctx context.Context, literal *core.Literal) (any, error
 			}, nil
 		default:
 			logger.Errorf(ctx, "unknown scalar type: %T", v)
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unknown scalar type"))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "unknown scalar type")
 		}
 	case *core.Literal_Collection:
 		return collectionToValue(ctx, v)
@@ -1211,16 +1211,16 @@ func literalToJsonValues(ctx context.Context, literal *core.Literal) (any, error
 		return mapToValue(ctx, v)
 	case *core.Literal_OffloadedMetadata:
 		// TODO: implement offloaded metadata conversion
-		return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("unimplemented offloaded metadata type"))
+		return nil, connect.Errorf(connect.CodeUnimplemented, "unimplemented offloaded metadata type")
 	default:
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unknown literal type"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "unknown literal type")
 	}
 }
 
 func mapToValue(ctx context.Context, literal *core.Literal_Map) (any, error) {
 	if literal == nil || literal.Map == nil {
 		logger.Infof(ctx, "map cannot be nil")
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("map cannot be nil"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "map cannot be nil")
 	}
 
 	result := make(map[string]any)
@@ -1240,14 +1240,14 @@ func unionToValue(ctx context.Context, literal *core.Literal_Scalar) (any, error
 	case *core.Scalar_Union:
 		if s.Union == nil {
 			logger.Errorf(ctx, "union cannot be nil")
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("union cannot be nil"))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "union cannot be nil")
 		}
 
 		// Get the underlying value from the union
 		unionValue := s.Union.GetValue()
 		if unionValue == nil {
 			logger.Errorf(ctx, "union value cannot be nil")
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("union value cannot be nil"))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "union value cannot be nil")
 		}
 
 		// Convert the underlying literal to JSON value
@@ -1261,13 +1261,13 @@ func unionToValue(ctx context.Context, literal *core.Literal_Scalar) (any, error
 
 	default:
 		logger.Errorf(ctx, "invalid union literal, expected Scalar_Union but got %T", s)
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid union literal type"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "invalid union literal type")
 	}
 }
 
 func collectionToValue(ctx context.Context, collection *core.Literal_Collection) (any, error) {
 	if collection == nil || collection.Collection == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("collection cannot be nil"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "collection cannot be nil")
 	}
 
 	if len(collection.Collection.GetLiterals()) == 0 {
@@ -1306,7 +1306,7 @@ func jsonSchemaToLiteralType(schema map[string]any) (*core.LiteralType, error) {
 	schemaType, ok := schema["type"].(string)
 	if !ok {
 		logger.Infof(context.Background(), "missing 'type' in json schema: %+v", schema)
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("missing 'type' in json"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "missing 'type' in json")
 	}
 
 	switch schemaType {
@@ -1514,9 +1514,9 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 			// If no NONE variant found, fall through to error for non-optional unions
 		}
 		// For non-union types or unions without NONE variant, null is not allowed
-		return nil, connect.NewError(
+		return nil, connect.Errorf(
 			connect.CodeInvalidArgument,
-			fmt.Errorf("null value provided for non-optional variable %q", fieldName),
+			"null value provided for non-optional variable %q", fieldName,
 		)
 	}
 
@@ -1540,7 +1540,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 				}, nil
 			}
 			logger.Errorf(ctx, "invalid string value type: %T, value: %v", value, value)
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid string value type: %T", value))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "invalid string value type: %T", value)
 		case core.SimpleType_INTEGER:
 			// Handle both int64 (from structpb) and float64 (from JSON unmarshaling)
 			var intNum int64
@@ -1552,7 +1552,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 				intNum = int64(num)
 			} else {
 				logger.Errorf(ctx, "invalid integer value type: %T, value: %v", value, value)
-				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid integer value type: %T", value))
+				return nil, connect.Errorf(connect.CodeInvalidArgument, "invalid integer value type: %T", value)
 			}
 			return &core.Literal{
 				Value: &core.Literal_Scalar{
@@ -1578,7 +1578,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 				floatNum = float64(num)
 			} else {
 				logger.Errorf(ctx, "invalid float value type: %T, value: %v", value, value)
-				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid float value type: %T", value))
+				return nil, connect.Errorf(connect.CodeInvalidArgument, "invalid float value type: %T", value)
 			}
 			return &core.Literal{
 				Value: &core.Literal_Scalar{
@@ -1610,7 +1610,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 				}, nil
 			}
 			logger.Errorf(ctx, "invalid boolean value type: %T, value: %v", value, value)
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid boolean value type: %T", value))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "invalid boolean value type: %T", value)
 		case core.SimpleType_NONE:
 			// For none type, create a none literal regardless of input value
 			return &core.Literal{
@@ -1628,7 +1628,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 				metadata, err := structpb.NewStruct(structValue)
 				if err != nil {
 					logger.Errorf(ctx, "error creating structpb.Struct from value: %v, error: %v", structValue, err)
-					return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("error creating struct from value: %v", err))
+					return nil, connect.Errorf(connect.CodeInvalidArgument, "error creating struct from value: %v", err)
 				}
 				return &core.Literal{
 					Value: &core.Literal_Scalar{
@@ -1641,7 +1641,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 				}, nil
 			}
 			logger.Errorf(ctx, "invalid struct value type: %T, value: %v", value, value)
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid struct value type: %T, expected map[string]any", value))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "invalid struct value type: %T, expected map[string]any", value)
 		case core.SimpleType_DURATION:
 			var dtn *durationpb.Duration
 			if str, ok := value.(string); ok {
@@ -1650,7 +1650,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 					seconds, err := strconv.ParseInt(str, 10, 64)
 					if err != nil {
 						logger.Errorf(ctx, "error parsing duration seconds when converting json to literal. String: [%s] Err: %v", str, err)
-						return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("error parsing duration seconds when converting json to literal"))
+						return nil, connect.Errorf(connect.CodeInvalidArgument, "error parsing duration seconds when converting json to literal")
 					}
 
 					dtn = &durationpb.Duration{
@@ -1661,7 +1661,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 					duration, err := time.ParseDuration(str)
 					if err != nil {
 						logger.Errorf(ctx, "error parsing duration when converting json to literal. String duration: [%s] Err: %v", str, err)
-						return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("error parsing duration when converting json to literal"))
+						return nil, connect.Errorf(connect.CodeInvalidArgument, "error parsing duration when converting json to literal")
 					}
 
 					dtn = &durationpb.Duration{
@@ -1676,7 +1676,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 				}
 			} else {
 				logger.Errorf(ctx, "error parsing duration type. Only string or float64 are supported.")
-				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid type for literal type: %v", reflect.TypeOf(value)))
+				return nil, connect.Errorf(connect.CodeInvalidArgument, "invalid type for literal type: %v", reflect.TypeOf(value))
 			}
 
 			return &core.Literal{
@@ -1698,7 +1698,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 				t, err := time.Parse(time.RFC3339, str)
 				if err != nil {
 					logger.Errorf(ctx, "error parsing datetime when converting json to literal. String time: [%s] Err: %v", str, err)
-					return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("error parsing datetime when converting json to literal"))
+					return nil, connect.Errorf(connect.CodeInvalidArgument, "error parsing datetime when converting json to literal")
 				}
 				ts := timestamppb.New(t)
 				return &core.Literal{
@@ -1723,7 +1723,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 				itemLiteral, err := jsonValueToLiteral(ctx, item, t.CollectionType)
 				if err != nil {
 					logger.Errorf(ctx, "error converting array item to literal. Item: [%+v] Err: %v", item, err)
-					return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("error converting array item to literal"))
+					return nil, connect.Errorf(connect.CodeInvalidArgument, "error converting array item to literal")
 				}
 				// Only append non-nil literals
 				if itemLiteral != nil {
@@ -1745,7 +1745,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 				itemLiteral, err := jsonValueToLiteral(ctx, item, t.MapValueType)
 				if err != nil {
 					logger.Errorf(ctx, "error converting map value to literal. Key: %s, Item: [%+v] Err: %v", key, item, err)
-					return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("error converting map value to literal for key %s: %v", key, err))
+					return nil, connect.Errorf(connect.CodeInvalidArgument, "error converting map value to literal for key %s: %v", key, err)
 				}
 				// Only add non-nil literals to the map
 				if itemLiteral != nil {
@@ -1761,7 +1761,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 			}, nil
 		}
 		logger.Errorf(ctx, "invalid map value type: %T, value: %v", value, value)
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid map value type: %T, expected map[string]any", value))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "invalid map value type: %T, expected map[string]any", value)
 	case *core.LiteralType_StructuredDatasetType:
 		if m, ok := value.(map[string]any); ok {
 			// Extract URI and format from the map
@@ -1787,7 +1787,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 			}
 			// If URI or format is missing, return an empty literal
 			logger.Errorf(ctx, "missing required fields for StructuredDataset type. URI: %v, Format: %v", hasURI, hasFormat)
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("missing required fields for StructuredDataset type"))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "missing required fields for StructuredDataset type")
 		}
 
 	case *core.LiteralType_Blob:
@@ -1812,7 +1812,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 						dimInt, err := strconv.ParseInt(v, 10, 32)
 						if err != nil {
 							logger.Errorf(ctx, "error parsing dimensionality string: %v", err)
-							return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid dimensionality value: %v (expected SINGLE, MULTIPART, 0, or 1)", v))
+							return nil, connect.Errorf(connect.CodeInvalidArgument, "invalid dimensionality value: %v (expected SINGLE, MULTIPART, 0, or 1)", v)
 						}
 						dimensionality = core.BlobType_BlobDimensionality(int32(dimInt))
 					}
@@ -1826,7 +1826,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 					dimensionality = core.BlobType_BlobDimensionality(int32(v))
 				default:
 					logger.Errorf(ctx, "invalid dimensionality type: %T", v)
-					return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid dimensionality type: %T", v))
+					return nil, connect.Errorf(connect.CodeInvalidArgument, "invalid dimensionality type: %T", v)
 				}
 				return &core.Literal{
 					Value: &core.Literal_Scalar{
@@ -1848,7 +1848,7 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 			}
 			// If URI, format, or dimensionality is missing, return an empty literal
 			logger.Errorf(ctx, "missing required fields for Blob type. URI: %v, Format: %v, Dimensionality: %v", hasURI, hasFormat, hasDimensionality)
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("missing required fields for Blob type"))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "missing required fields for Blob type")
 		}
 	case *core.LiteralType_UnionType:
 		// For union types, we need to determine which variant matches the input value
@@ -1907,23 +1907,23 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 				}
 			}
 			if fieldName != "" {
-				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("field '%s': enum value '%s' is not in allowed values: %v", fieldName, str, enumValues))
+				return nil, connect.Errorf(connect.CodeInvalidArgument, "field '%s': enum value '%s' is not in allowed values: %v", fieldName, str, enumValues)
 			}
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("enum value '%s' is not in allowed values: %v", str, enumValues))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "enum value '%s' is not in allowed values: %v", str, enumValues)
 		}
 		if fieldName != "" {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("field '%s': invalid enum value type: %T, expected string", fieldName, value))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "field '%s': invalid enum value type: %T, expected string", fieldName, value)
 		}
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid enum value type: %T, expected string", value))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "invalid enum value type: %T, expected string", value)
 	case *core.LiteralType_Schema: // raise error
 		if fieldName != "" {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("field '%s': schema is deprecated and cannot be converted to a literal", fieldName))
+			return nil, connect.Errorf(connect.CodeInvalidArgument, "field '%s': schema is deprecated and cannot be converted to a literal", fieldName)
 		}
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("schema is deprecated and cannot be converted to a literal"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "schema is deprecated and cannot be converted to a literal")
 	}
 
 	if fieldName != "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("field '%s': unsupported literal type: %v", fieldName, literalType))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "field '%s': unsupported literal type: %v", fieldName, literalType)
 	}
-	return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unsupported literal type: %v", literalType))
+	return nil, connect.Errorf(connect.CodeInvalidArgument, "unsupported literal type: %v", literalType)
 }
