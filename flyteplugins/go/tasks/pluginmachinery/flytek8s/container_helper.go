@@ -160,25 +160,25 @@ func renameResource(resources *v1.ResourceRequirements, from, to v1.ResourceName
 }
 
 // acceleratorPlatformResources returns the platform resources to apply to the accelerator
-// resource name. A per-partition resource without platform values of its own uses the values
-// configured for its device class's resource name, so a platform GPU limit also caps the
-// number of partitions a task can request.
+// resource name. For a per-partition resource, the request and the limit are each taken from
+// the platform values for that resource when set, and otherwise from the values configured for
+// its device class's resource name, so a platform GPU limit also caps the number of partitions a
+// task can request.
 func acceleratorPlatformResources(name v1.ResourceName, platformResources v1.ResourceRequirements) v1.ResourceRequirements {
 	base, ok := acceleratorBaseResourceName(name)
 	if !ok || base == name {
 		return platformResources
 	}
-	_, hasRequest := platformResources.Requests[name]
-	_, hasLimit := platformResources.Limits[name]
-	if hasRequest || hasLimit {
-		return platformResources
-	}
 
 	out := v1.ResourceRequirements{Requests: v1.ResourceList{}, Limits: v1.ResourceList{}}
-	if q, found := platformResources.Requests[base]; found {
+	if q, found := platformResources.Requests[name]; found {
+		out.Requests[name] = q
+	} else if q, found := platformResources.Requests[base]; found {
 		out.Requests[name] = q
 	}
-	if q, found := platformResources.Limits[base]; found {
+	if q, found := platformResources.Limits[name]; found {
+		out.Limits[name] = q
+	} else if q, found := platformResources.Limits[base]; found {
 		out.Limits[name] = q
 	}
 	return out

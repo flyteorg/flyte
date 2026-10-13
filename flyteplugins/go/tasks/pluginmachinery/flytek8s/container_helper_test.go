@@ -1137,6 +1137,16 @@ func TestApplyResourceOverridesMIGPartitionResource(t *testing.T) {
 		assert.Equal(t, resource.MustParse("3"), out.Limits[migResource])
 	})
 
+	t.Run("partition request does not hide the platform GPU limit", func(t *testing.T) {
+		out := ApplyResourceOverrides(v1.ResourceRequirements{
+			Limits: v1.ResourceList{migResource: resource.MustParse("4")},
+		}, v1.ResourceRequirements{
+			Requests: v1.ResourceList{migResource: resource.MustParse("1")},
+			Limits:   v1.ResourceList{ResourceNvidiaGPU: resource.MustParse("2")},
+		}, assignIfUnset)
+		assert.Equal(t, resource.MustParse("2"), out.Limits[migResource])
+	})
+
 	t.Run("whole GPUs keep the platform GPU limit", func(t *testing.T) {
 		out := ApplyResourceOverrides(v1.ResourceRequirements{
 			Limits: v1.ResourceList{ResourceNvidiaGPU: resource.MustParse("4")},
