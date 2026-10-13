@@ -164,6 +164,10 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 		}
 
 		if err := c.k8sClient.Create(ctx, taskAction); err != nil {
+			if apierrors.IsAlreadyExists(err) {
+				logger.Infof(ctx, "TaskAction CR %s already exists, skipping create", taskAction.Name)
+				return nil
+			}
 			return fmt.Errorf("failed to create TaskAction CR %s: %w", taskAction.Name, err)
 		}
 
