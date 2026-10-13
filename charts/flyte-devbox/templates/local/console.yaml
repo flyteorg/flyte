@@ -23,6 +23,11 @@ spec:
             - name: http
               containerPort: {{ .Values.sandbox.console.containerPort }}
               protocol: TCP
+          {{- if not (dig "telemetry" "enabled" true (index .Values "flyte-binary" | default dict)) }}
+          env:
+            - name: FLYTE_DISABLE_TELEMETRY
+              value: "true"
+          {{- end }}
           readinessProbe:
             httpGet:
               path: {{ .Values.sandbox.console.basePath }}

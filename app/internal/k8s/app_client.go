@@ -28,6 +28,7 @@ import (
 	secretUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/telemetry"
 	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	flytecore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -606,6 +607,17 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 			corev1.EnvVar{Name: "FLYTE_INTERNAL_EXECUTION_PROJECT", Value: appID.GetProject()},
 			corev1.EnvVar{Name: "FLYTE_INTERNAL_EXECUTION_DOMAIN", Value: appID.GetDomain()},
 		)
+		// A deployment that opted out of telemetry opts out its apps too. Last,
+		// replacing any value the app's own env set, so it cannot undo it.
+		if telemetry.Disabled() {
+			env := podSpec.Containers[0].Env[:0]
+			for _, ev := range podSpec.Containers[0].Env {
+				if ev.Name != telemetry.DisableEnvVar {
+					env = append(env, ev)
+				}
+			}
+			podSpec.Containers[0].Env = append(env, corev1.EnvVar{Name: telemetry.DisableEnvVar, Value: "true"})
+		}
 	}
 
 	templateAnnotations := buildAutoscalingAnnotations(spec, c.cfg)

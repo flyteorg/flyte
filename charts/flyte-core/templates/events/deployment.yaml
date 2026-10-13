@@ -102,6 +102,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            {{- if include "flyte-core.telemetryDisabled" $ }}
+            - name: FLYTE_DISABLE_TELEMETRY
+              value: "true"
+            {{- end }}
             {{- with $component.extraEnv }}
             {{- tpl (toYaml .) $ | nindent 12 }}
             {{- end }}

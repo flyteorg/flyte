@@ -44,8 +44,15 @@ spec:
             - name: http
               containerPort: {{ .Values.console.containerPort }}
               protocol: TCP
-          {{- with .Values.console.env }}
-          env: {{- toYaml . | nindent 12 }}
+          {{- if or .Values.console.env (include "flyte-binary.telemetryDisabled" .) }}
+          env:
+            {{- if include "flyte-binary.telemetryDisabled" . }}
+            - name: FLYTE_DISABLE_TELEMETRY
+              value: "true"
+            {{- end }}
+            {{- with .Values.console.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
           livenessProbe:
             httpGet:

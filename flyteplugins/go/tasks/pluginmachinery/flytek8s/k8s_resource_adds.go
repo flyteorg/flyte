@@ -14,6 +14,7 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/telemetry"
 )
 
 const (
@@ -169,6 +170,11 @@ func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, envFroms []v1.Env
 	for k, envVarName := range config.GetK8sPluginConfig().DefaultEnvVarsFromEnv {
 		value := os.Getenv(envVarName)
 		envVars = append(envVars, v1.EnvVar{Name: k, Value: value})
+	}
+	// A deployment that opted out of telemetry opts out its task pods too, so
+	// the SDK inside them stays quiet. Last, so the task env cannot undo it.
+	if telemetry.Disabled() {
+		envVars = append(envVars, v1.EnvVar{Name: telemetry.DisableEnvVar, Value: "true"})
 	}
 
 	for _, secretName := range config.GetK8sPluginConfig().DefaultEnvFromSecrets {
