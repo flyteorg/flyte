@@ -71,10 +71,9 @@ type ActionsClient struct {
 
 	// Watch management
 	mu sync.RWMutex
-	// Map parent action name to subscriber channels.
+	// Map parent action name to subscriptions, keyed by the channel Subscribe returned.
 	// Multiple callers may watch the same parent action concurrently.
-	// TODO: add a prometheus counter for dropped updates when metrics are wired up
-	subscribers map[string]map[chan *ActionUpdate]struct{}
+	subscribers map[string]map[chan *ActionUpdate]*subscription
 	stopCh      chan struct{}
 	watching    bool
 
@@ -113,7 +112,7 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, n
 		bufferSize:  bufferSize,
 		numWorkers:  numWorkers,
 		runClient:   runClient,
-		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+		subscribers: make(map[string]map[chan *ActionUpdate]*subscription),
 	}
 
 	// The dedup filter is mandatory: notifyRunService records on every event type
@@ -485,23 +484,26 @@ func (c *ActionsClient) Subscribe(runName, parentActionName string) chan *Action
 	defer c.mu.Unlock()
 
 	key := subscriberKey(runName, parentActionName)
-	ch := make(chan *ActionUpdate, c.bufferSize)
+	sub := newSubscription(c.bufferSize)
 	if c.subscribers[key] == nil {
-		c.subscribers[key] = make(map[chan *ActionUpdate]struct{})
+		c.subscribers[key] = make(map[chan *ActionUpdate]*subscription)
 	}
-	c.subscribers[key][ch] = struct{}{}
-	return ch
+	c.subscribers[key][sub.out] = sub
+	return sub.out
 }
 
-// Unsubscribe removes the given channel from the subscription list for the (run, parent action)
+// Unsubscribe removes the given channel from the subscription list for the (run, parent action).
+// The channel is closed by the subscription's pump once it stops.
 func (c *ActionsClient) Unsubscribe(runName, parentActionName string, ch chan *ActionUpdate) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	key := subscriberKey(runName, parentActionName)
 	if channels, ok := c.subscribers[key]; ok {
-		delete(channels, ch)
-		close(ch)
+		if sub, ok := channels[ch]; ok {
+			delete(channels, ch)
+			sub.close()
+		}
 		if len(channels) == 0 {
 			delete(c.subscribers, key)
 		}
@@ -798,18 +800,14 @@ func (c *ActionsClient) shouldSkipTaskAction(taskAction *executorv1.TaskAction) 
 	return taskAction.GetLabels()[labelTerminalStatusRecorded] == "true"
 }
 
-// notifySubscribers sends an update to all subscribers
+// notifySubscribers sends an update to all subscribers without blocking or dropping it.
 func (c *ActionsClient) notifySubscribers(ctx context.Context, update *ActionUpdate) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
 	key := subscriberKey(update.ActionID.GetRun().GetName(), update.ParentActionName)
-	for ch := range c.subscribers[key] {
-		select {
-		case ch <- update:
-		default:
-			logger.Warnf(ctx, "subscriber channel full, dropping update for parent action: %s", update.ParentActionName)
-		}
+	for _, sub := range c.subscribers[key] {
+		sub.notify(update)
 	}
 }
 
