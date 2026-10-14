@@ -37,17 +37,26 @@ type Downloader struct {
 
 // TODO add timeout and rate limit
 // TODO use chunk to download
-// inBlobDir reports whether a listed item is inside the multipart blob whose key is basePrefix,
-// rather than a sibling whose key merely starts with it. HTTP(S) items are kept as listed.
-func inBlobDir(item storage.DataReference, basePrefix string) bool {
-	if strings.HasPrefix(string(item), "http") {
+// inBlobDir reports whether a listed item is inside the multipart blob at baseContainer/basePrefix,
+// rather than a sibling whose key merely starts with it (object stores list by raw key prefix).
+// Items listed as http(s) URLs (stow's S3 backend reports https://<host>/<bucket>/<key>) are
+// matched on their path, as handleBlob derives their relative path.
+func inBlobDir(item storage.DataReference, baseContainer, basePrefix string) bool {
+	if basePrefix == "" {
 		return true
 	}
 	_, _, key, err := item.Split()
 	if err != nil {
 		return true // let the download report the bad reference
 	}
-	return basePrefix == "" || strings.HasPrefix(key, basePrefix+"/")
+	if strings.HasPrefix(string(item), "http") {
+		if strings.HasPrefix(key, baseContainer+"/") {
+			key = strings.TrimPrefix(key, baseContainer+"/")
+		} else if idx := strings.Index(key, basePrefix); idx >= 0 {
+			key = key[idx:]
+		}
+	}
+	return strings.HasPrefix(key, basePrefix+"/")
 }
 
 func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath string) (interface{}, error) {
@@ -100,7 +109,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				return nil, err
 			}
 			for _, item := range items {
-				if !inBlobDir(item, basePrefix) {
+				if !inBlobDir(item, baseContainer, basePrefix) {
 					// Object stores list by key prefix, so a listing of ".../dir" also
 					// returns siblings such as ".../dir_info.json". Keep only the blob's own parts.
 					logger.Debugf(ctx, "Skipping [%s]: not under multipart blob [%s]", item, blobRef)

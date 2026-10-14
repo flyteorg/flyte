@@ -648,3 +648,33 @@ func TestHandleScalar(t *testing.T) {
 		assert.Equal(t, scalar, resultScalar)
 	})
 }
+
+func TestHandleBlobMultipartHTTPListingSkipsPrefixSibling(t *testing.T) {
+	// S3 lists by raw key prefix and reports items as https://<host>/<bucket>/<key>:
+	// the sibling ".../index_info.json" must still be left out.
+	ctx := context.Background()
+	mem, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+	for _, key := range []string{"sm/run-n0-0/index/part.bin", "sm/run-n0-0/index_info.json"} {
+		err = mem.WriteRaw(ctx, storage.DataReference("mem://container/"+key), 0, storage.Options{}, bytes.NewReader([]byte(key)))
+		assert.NoError(t, err)
+	}
+	listing := httpListingStore{ComposedProtobufStore: rawPrefixListStore{mem.ComposedProtobufStore}, host: "https://s3-us-east-2.amazonaws.com"}
+	d := Downloader{store: storage.NewCompositeDataStore(mem.ReferenceConstructor, listing)}
+	blob := &core.Blob{
+		Uri:      "mem://container/sm/run-n0-0/index",
+		Metadata: &core.BlobMetadata{Type: &core.BlobType{Dimensionality: core.BlobType_MULTIPART}},
+	}
+
+	toPath := filepath.Join(t.TempDir(), "inputs", "index")
+	_, err = d.handleBlob(ctx, blob, toPath)
+	assert.NoError(t, err)
+
+	entries, err := os.ReadDir(toPath)
+	assert.NoError(t, err)
+	var names []string
+	for _, e := range entries {
+		names = append(names, e.Name())
+	}
+	assert.Equal(t, []string{"part.bin"}, names)
+}
