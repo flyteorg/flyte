@@ -4770,8 +4770,8 @@ func TestToK8sPodSpecMIGMixedStrategy(t *testing.T) {
 			res := p.Containers[0].Resources
 			assert.Equal(t, resource.MustParse("2"), res.Requests[migResource])
 			assert.Equal(t, resource.MustParse("2"), res.Limits[migResource])
-			assert.NotContains(t, res.Requests, ResourceNvidiaGPU)
-			assert.NotContains(t, res.Limits, ResourceNvidiaGPU)
+			assert.NotContains(t, res.Requests, v1.ResourceName(ResourceNvidiaGPU))
+			assert.NotContains(t, res.Limits, v1.ResourceName(ResourceNvidiaGPU))
 			assert.NotContains(t, res.Limits, v1.ResourceName(resourceGPU))
 
 			assert.Equal(t,
@@ -4823,4 +4823,58 @@ func TestToK8sPodSpecMIGMixedStrategy(t *testing.T) {
 			}}},
 			p.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
 	})
+
+	// PodTemplates merge after the task's resources are customized, so a template that gives
+	// the primary container whole GPUs must not leave them next to the MIG resource.
+	eightGPUs := v1.ResourceList{ResourceNvidiaGPU: resource.MustParse("8")}
+	gpuTemplateSpec := v1.PodSpec{Containers: []v1.Container{{
+		Name:      "primary",
+		Resources: v1.ResourceRequirements{Requests: eightGPUs, Limits: eightGPUs},
+	}}}
+	templates := map[string]func(t *testing.T, taskTemplate *core.TaskTemplate){
+		"device class": func(t *testing.T, _ *core.TaskTemplate) {
+			cfg := config.GetK8sPluginConfig()
+			deviceClass := cfg.AcceleratorDeviceClasses[core.GPUAccelerator_NVIDIA_GPU.String()]
+			deviceClass.PodTemplate = &v1.PodTemplate{Template: v1.PodTemplateSpec{Spec: *gpuTemplateSpec.DeepCopy()}}
+			cfg.AcceleratorDeviceClasses[core.GPUAccelerator_NVIDIA_GPU.String()] = deviceClass
+		},
+		"base": func(t *testing.T, taskTemplate *core.TaskTemplate) {
+			podTemplate := &v1.PodTemplate{
+				ObjectMeta: metav1.ObjectMeta{Name: "mig-base", Namespace: "test-namespace"},
+				Template:   v1.PodTemplateSpec{Spec: *gpuTemplateSpec.DeepCopy()},
+			}
+			DefaultPodTemplateStore.Store(podTemplate)
+			t.Cleanup(func() { DefaultPodTemplateStore.Delete(podTemplate) })
+			taskTemplate.Metadata = &core.TaskMetadata{PodTemplateName: "mig-base"}
+		},
+	}
+	for templateKind, applyTemplate := range templates {
+		for _, tc := range []struct {
+			name      string
+			requested v1.ResourceList
+			want      string
+		}{
+			{"task GPUs replace the template GPUs", v1.ResourceList{resourceGPU: resource.MustParse("2")}, "2"},
+			{"template GPUs become partitions", v1.ResourceList{}, "8"},
+		} {
+			t.Run(fmt.Sprintf("%s pod template: %s", templateKind, tc.name), func(t *testing.T) {
+				migMixedConfig(t, "nvidia.com/mig-{partition}")
+				taskTemplate := dummyTaskTemplate()
+				taskTemplate.ExtendedResources = &core.ExtendedResources{GpuAccelerator: partitioned}
+				applyTemplate(t, taskTemplate)
+				taskContext := dummyExecContext(taskTemplate, &v1.ResourceRequirements{
+					Requests: tc.requested.DeepCopy(),
+					Limits:   tc.requested.DeepCopy(),
+				}, nil, "", nil)
+				p, _, _, err := ToK8sPodSpec(context.TODO(), taskContext)
+				assert.NoError(t, err)
+
+				res := p.Containers[0].Resources
+				assert.Equal(t, resource.MustParse(tc.want), res.Requests[migResource])
+				assert.Equal(t, resource.MustParse(tc.want), res.Limits[migResource])
+				assert.NotContains(t, res.Requests, v1.ResourceName(ResourceNvidiaGPU))
+				assert.NotContains(t, res.Limits, v1.ResourceName(ResourceNvidiaGPU))
+			})
+		}
+	}
 }

@@ -783,6 +783,7 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 
 	// GPU accelerator
 	if extendedResources.GetGpuAccelerator() != nil {
+		ApplyPartitionResourceName(podSpec, extendedResources.GetGpuAccelerator())
 		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
 		if ps, ok := extendedResources.GetGpuAccelerator().GetPartitionSizeValue().(*core.GPUAccelerator_PartitionSize); ok {
 			if slices := parseMigSlices(ps.PartitionSize); slices != "" {

@@ -1115,7 +1115,7 @@ func TestApplyResourceOverridesMIGPartitionResource(t *testing.T) {
 		}, assignIfUnset)
 		assert.Equal(t, resource.MustParse("2"), out.Requests[migResource])
 		assert.Equal(t, resource.MustParse("2"), out.Limits[migResource])
-		assert.NotContains(t, out.Limits, ResourceNvidiaGPU)
+		assert.NotContains(t, out.Limits, v1.ResourceName(ResourceNvidiaGPU))
 	})
 
 	t.Run("limit only is mirrored to the request", func(t *testing.T) {

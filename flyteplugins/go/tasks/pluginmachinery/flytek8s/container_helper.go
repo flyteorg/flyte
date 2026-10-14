@@ -159,6 +159,32 @@ func renameResource(resources *v1.ResourceRequirements, from, to v1.ResourceName
 	}
 }
 
+// ApplyPartitionResourceName moves the device class's ResourceName to the rendered per-partition
+// resource in every container of the pod spec when the accelerator asks for a partition and its
+// device class sets PartitionResourceName. It covers resources that PodTemplates merge in after
+// the task's own resources were sanitized. A container that already requests the per-partition
+// resource keeps its value, and the device class's ResourceName is dropped.
+func ApplyPartitionResourceName(podSpec *v1.PodSpec, accelerator *core.GPUAccelerator) {
+	accelConfig := getAcceleratorConfig(accelerator)
+	partitionName, ok := partitionResourceName(accelConfig, accelerator)
+	if !ok || partitionName == accelConfig.ResourceName {
+		return
+	}
+
+	for _, containers := range [][]v1.Container{podSpec.Containers, podSpec.InitContainers} {
+		for i := range containers {
+			for _, list := range []v1.ResourceList{containers[i].Resources.Requests, containers[i].Resources.Limits} {
+				if q, found := list[accelConfig.ResourceName]; found {
+					if _, exists := list[partitionName]; !exists {
+						list[partitionName] = q
+					}
+					delete(list, accelConfig.ResourceName)
+				}
+			}
+		}
+	}
+}
+
 // acceleratorPlatformResources returns the platform resources to apply to the accelerator
 // resource name. For a per-partition resource, the request and the limit are each taken from
 // the platform values for that resource when set, and otherwise from the values configured for
