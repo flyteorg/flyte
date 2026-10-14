@@ -97,6 +97,7 @@ func workerPod(opts workerPodOpts) *v1.Pod {
 			UID:       opts.uid,
 			Labels:    podLabels,
 		},
+		Spec:   v1.PodSpec{NodeName: testNodeName},
 		Status: v1.PodStatus{Phase: opts.phase},
 	}
 	if !opts.finishedAt.IsZero() {
@@ -728,4 +729,16 @@ func TestChildPodFailureTimeBoundsAZeroFailureTime(t *testing.T) {
 	future := metav1.NewTime(time.Now().Add(30 * time.Minute))
 	pod.DeletionTimestamp = &future
 	assert.WithinDuration(t, time.Now(), childPodFailureTime(pod, time.Time{}), time.Minute)
+}
+
+func TestChildPodGpuFaultRequiresOwnReportingNode(t *testing.T) {
+	observed := time.Now().Add(-time.Minute)
+	event := gpuFaultEventFor(79, gpufault.SeverityCritical, observed, observed, "worker-uid")
+	event.ReportingNode = otherNodeName
+	pm := childPodManager(t, childPodPlugin{}, map[watchedObjectKey][]*eventInfo{
+		podEventKey("worker"): {event},
+	}, workerPod(workerPodOpts{name: "worker", uid: "worker-uid", finishedAt: observed}))
+	got := pm.classifyGpuFailure(context.Background(), childPodTaskContext(t, attemptLabels()), trackedJobSet(), crdFailure())
+	require.NotNil(t, got.Err())
+	assert.Nil(t, got.Err().GetGpuFault())
 }
