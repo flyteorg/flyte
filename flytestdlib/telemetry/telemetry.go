@@ -1,5 +1,5 @@
 // Package telemetry holds the single opt-out for everything Flyte sends to
-// third parties. DO_NOT_TRACK=1 (https://consoledonottrack.com) turns it off in
+// third parties. DO_NOT_TRACK=1 (https://donottrack.sh) turns it off in
 // the SDK, the backend and the console alike; a backend with it set also passes
 // it on to the task and app pods it creates.
 package telemetry
