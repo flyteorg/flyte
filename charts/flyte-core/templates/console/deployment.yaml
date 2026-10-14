@@ -8,7 +8,9 @@ metadata:
     {{- include "flyte-core.labels" . | nindent 4 }}
     app.kubernetes.io/component: console
 spec:
+  {{- if not .Values.console.autoscaling.enabled }}
   replicas: {{ .Values.console.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "flyte-core.name" . }}

@@ -895,6 +895,141 @@ var _ interface {
 	ErrorName() string
 } = QuantitySettingValidationError{}
 
+// Validate checks the field values on AcceleratorSetting with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AcceleratorSetting) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AcceleratorSetting with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AcceleratorSettingMultiError, or nil if none found.
+func (m *AcceleratorSetting) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AcceleratorSetting) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for State
+
+	if all {
+		switch v := interface{}(m.GetAcceleratorValue()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AcceleratorSettingValidationError{
+					field:  "AcceleratorValue",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AcceleratorSettingValidationError{
+					field:  "AcceleratorValue",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAcceleratorValue()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AcceleratorSettingValidationError{
+				field:  "AcceleratorValue",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for ScopeLevel
+
+	if len(errors) > 0 {
+		return AcceleratorSettingMultiError(errors)
+	}
+
+	return nil
+}
+
+// AcceleratorSettingMultiError is an error wrapping multiple validation errors
+// returned by AcceleratorSetting.ValidateAll() if the designated constraints
+// aren't met.
+type AcceleratorSettingMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AcceleratorSettingMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AcceleratorSettingMultiError) AllErrors() []error { return m }
+
+// AcceleratorSettingValidationError is the validation error returned by
+// AcceleratorSetting.Validate if the designated constraints aren't met.
+type AcceleratorSettingValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AcceleratorSettingValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AcceleratorSettingValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AcceleratorSettingValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AcceleratorSettingValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AcceleratorSettingValidationError) ErrorName() string {
+	return "AcceleratorSettingValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AcceleratorSettingValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAcceleratorSetting.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AcceleratorSettingValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AcceleratorSettingValidationError{}
+
 // Validate checks the field values on RunSettings with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -1660,6 +1795,35 @@ func (m *TaskResourceSettings) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return TaskResourceSettingsValidationError{
 				field:  "MirrorLimitsRequest",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetDefaultAccelerator()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskResourceSettingsValidationError{
+					field:  "DefaultAccelerator",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskResourceSettingsValidationError{
+					field:  "DefaultAccelerator",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDefaultAccelerator()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskResourceSettingsValidationError{
+				field:  "DefaultAccelerator",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

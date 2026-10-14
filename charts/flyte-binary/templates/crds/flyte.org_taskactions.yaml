@@ -346,6 +346,13 @@ spec:
                   maximum, the TaskAction is converted to a permanent failure.
                 format: int32
                 type: integer
+              systemRetries:
+                description: |-
+                  SystemRetries counts the times this TaskAction was relaunched in place after a
+                  system-retryable failure. Unlike SystemFailures it is never reset, so it gives
+                  each system-retry event a version no earlier one used.
+                format: int32
+                type: integer
               timeoutAt:
                 description: |-
                   TimeoutAt is the max-runtime deadline for an expired current attempt.

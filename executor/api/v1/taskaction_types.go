@@ -322,6 +322,12 @@ type TaskActionStatus struct {
 	// +optional
 	SystemFailures uint32 `json:"systemFailures,omitempty"`
 
+	// SystemRetries counts the times this TaskAction was relaunched in place after a
+	// system-retryable failure. Unlike SystemFailures it is never reset, so it gives
+	// each system-retry event a version no earlier one used.
+	// +optional
+	SystemRetries uint32 `json:"systemRetries,omitempty"`
+
 	// CacheStatus is the latest observed cache lookup result for this action.
 	// +optional
 	CacheStatus core.CatalogCacheStatus `json:"cacheStatus,omitempty"`

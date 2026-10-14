@@ -4621,3 +4621,93 @@ func TestApplyPodSpecMutators(t *testing.T) {
 		assert.Equal(t, map[string]string{"mutated-for": primaryContainerName}, p.NodeSelector)
 	})
 }
+
+// A pod an external controller such as Kueue stopped says so on its TerminationTarget
+// condition, and that verdict outranks whatever the container exit codes would have said.
+func TestDemystifyFailureExternalTermination(t *testing.T) {
+	ctx := context.TODO()
+	const kueueMessage = "Preempted to accommodate a workload (UID: 1234, JobUID: 5678) due to prioritization in the ClusterQueue"
+	preempted := v1.PodCondition{
+		Type:    TerminationTargetCondition,
+		Status:  v1.ConditionTrue,
+		Reason:  "WorkloadEvictedDueToPreempted",
+		Message: kueueMessage,
+	}
+	sigkilled := v1.ContainerStatus{
+		Name: "primary",
+		State: v1.ContainerState{
+			Terminated: &v1.ContainerStateTerminated{Reason: "Error", ExitCode: SIGKILL},
+		},
+	}
+
+	t.Run("the controller's reason is the code and its message the explanation", func(t *testing.T) {
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Conditions:        []v1.PodCondition{preempted},
+			ContainerStatuses: []v1.ContainerStatus{sigkilled},
+		}, pluginsCore.TaskInfo{}, "primary")
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Equal(t, "WorkloadEvictedDueToPreempted", phaseInfo.Err().GetCode())
+		assert.Contains(t, phaseInfo.Err().GetMessage(), "Pod was terminated by an external controller: "+kueueMessage)
+		// The exit code still adds detail below the controller's explanation.
+		assert.Contains(t, phaseInfo.Err().GetMessage(), "[primary] terminated with exit code (137)")
+	})
+
+	t.Run("an OOM kill does not rename the failure either", func(t *testing.T) {
+		oomKilled := sigkilled
+		oomKilled.State.Terminated = &v1.ContainerStateTerminated{Reason: OOMKilled, ExitCode: SIGKILL}
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Conditions:        []v1.PodCondition{preempted},
+			ContainerStatuses: []v1.ContainerStatus{oomKilled},
+		}, pluginsCore.TaskInfo{}, "primary")
+		assert.NoError(t, err)
+		assert.Equal(t, "WorkloadEvictedDueToPreempted", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Contains(t, phaseInfo.Err().GetMessage(), "Reason [OOMKilled]")
+	})
+
+	t.Run("a condition that is not true is ignored", func(t *testing.T) {
+		notTrue := preempted
+		notTrue.Status = v1.ConditionFalse
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Conditions:        []v1.PodCondition{notTrue},
+			ContainerStatuses: []v1.ContainerStatus{sigkilled},
+		}, pluginsCore.TaskInfo{}, "primary")
+		assert.NoError(t, err)
+		assert.Equal(t, Interrupted, phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+	})
+
+	t.Run("a reasonless condition still names the condition", func(t *testing.T) {
+		bare := v1.PodCondition{Type: TerminationTargetCondition, Status: v1.ConditionTrue}
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Conditions: []v1.PodCondition{bare},
+		}, pluginsCore.TaskInfo{}, "")
+		assert.NoError(t, err)
+		assert.Equal(t, "TerminationTarget", phaseInfo.Err().GetCode())
+		assert.Equal(t, "Pod was terminated by an external controller", phaseInfo.Err().GetMessage())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+	})
+}
+
+func TestGetTerminationTarget(t *testing.T) {
+	assert.Nil(t, GetTerminationTarget(v1.PodStatus{}))
+	assert.Nil(t, GetTerminationTarget(v1.PodStatus{Conditions: []v1.PodCondition{
+		{Type: v1.PodScheduled, Status: v1.ConditionTrue},
+		{Type: TerminationTargetCondition, Status: v1.ConditionFalse, Reason: "NotAdmitted"},
+	}}))
+
+	got := GetTerminationTarget(v1.PodStatus{Conditions: []v1.PodCondition{
+		{Type: v1.PodReady, Status: v1.ConditionFalse},
+		{Type: TerminationTargetCondition, Status: v1.ConditionTrue, Reason: "StoppedByKueue", Message: "Workload is deleted"},
+	}})
+	if assert.NotNil(t, got) {
+		assert.Equal(t, "StoppedByKueue", got.Reason)
+		assert.Equal(t, "Workload is deleted", got.Message)
+	}
+	assert.Equal(t, "StoppedByKueue", ExternalTerminationCode(got))
+	assert.Equal(t, "Pod was terminated by an external controller: Workload is deleted", ExternalTerminationMessage(got))
+	assert.Equal(t, "Pod was terminated by an external controller (NotAdmitted)",
+		ExternalTerminationMessage(&v1.PodCondition{Reason: "NotAdmitted"}))
+}

@@ -1002,3 +1002,147 @@ func TestEmbeddedSecretManagerInjector_InvalidateCache_ClearsAllCascadeScopes(t 
 	injector.InvalidateCache(ctx, org, domain, project, name)
 	assert.ElementsMatch(t, wantKeys, deleted)
 }
+
+// Per-cluster secrets (the eager API key) are stored under a cluster-qualified name so clusters
+// sharing one secret backend don't overwrite each other's copy. The pod-facing key, and so the
+// injected env var name, must stay the same; only the storage name differs.
+func TestEmbeddedSecretManagerInjector_InjectClusterScopedSecret(t *testing.T) {
+	ctx := context.Background()
+	const (
+		org         = "o-apple"
+		clusterName = "dp-gcp-default"
+		legacyCred  = "legacy-cred"
+	)
+	// Storage names are org-scoped (empty domain/project); only the name component of the
+	// cluster-scoped key is qualified. This must match what the provisioner writes.
+	clusterScopedID := "u__org__o-apple__domain____project____key__EAGER_API_KEY-dp-gcp-default"
+	legacyID := "u__org__o-apple__domain____project____key__EAGER_API_KEY"
+	assert.Equal(t, clusterScopedID, EncodeSecretName(org, "", "", ClusterScopedSecretName(EagerSecretKey, clusterName)))
+
+	newPod := func() *corev1.Pod {
+		return &corev1.Pod{
+			Spec: corev1.PodSpec{Containers: []corev1.Container{{}}},
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: testPodNamespace,
+				Labels: map[string]string{
+					"organization": org,
+					"domain":       "d-cherry",
+					"project":      "p-banana",
+				},
+			},
+		}
+	}
+
+	newInjector := func(clusterCfg string, secrets map[string]SecretValue) SecretsInjector {
+		mockClient := &mocks.MockableControllerRuntimeClient{}
+		for id := range secrets {
+			expectStoredSecret(mockClient, id, testPodNamespace)
+		}
+		return NewEmbeddedSecretManagerInjector(
+			config.EmbeddedSecretManagerConfig{
+				Type:        config.EmbeddedSecretManagerTypeK8s,
+				K8sConfig:   config.K8sConfig{Namespace: testPodNamespace},
+				ClusterName: clusterCfg,
+			},
+			[]SecretFetcher{secretFetcherMock{Secrets: secrets}},
+			mockClient, testReferenceNamespace, newAlwaysMissCache(t),
+			&config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
+	}
+
+	t.Run("prefers the cluster-scoped storage name", func(t *testing.T) {
+		injector := newInjector(clusterName, map[string]SecretValue{
+			clusterScopedID: {StringValue: "cluster-cred"},
+			legacyID:        {StringValue: legacyCred},
+		})
+		pod, injected, err := injector.Inject(ctx, &core.Secret{Key: EagerSecretKey}, newPod())
+		assert.NoError(t, err)
+		assert.True(t, injected)
+		assert.True(t, podHasSecretInjected(pod, EagerSecretKey, clusterScopedID, ""))
+	})
+
+	t.Run("falls back to the unqualified name when the cluster-scoped one is absent", func(t *testing.T) {
+		injector := newInjector(clusterName, map[string]SecretValue{
+			legacyID: {StringValue: legacyCred},
+		})
+		pod, injected, err := injector.Inject(ctx, &core.Secret{Key: EagerSecretKey}, newPod())
+		assert.NoError(t, err)
+		assert.True(t, injected)
+		assert.True(t, podHasSecretInjected(pod, EagerSecretKey, legacyID, ""))
+	})
+
+	t.Run("no cluster name configured uses the unqualified name", func(t *testing.T) {
+		injector := newInjector("", map[string]SecretValue{
+			clusterScopedID: {StringValue: "cluster-cred"},
+			legacyID:        {StringValue: legacyCred},
+		})
+		pod, injected, err := injector.Inject(ctx, &core.Secret{Key: EagerSecretKey}, newPod())
+		assert.NoError(t, err)
+		assert.True(t, injected)
+		assert.True(t, podHasSecretInjected(pod, EagerSecretKey, legacyID, ""))
+	})
+
+	t.Run("other keys are never cluster-scoped", func(t *testing.T) {
+		otherID := "u__org__o-apple__domain____project____key__secret1"
+		injector := newInjector(clusterName, map[string]SecretValue{
+			otherID: {StringValue: "fruits"},
+			"u__org__o-apple__domain____project____key__secret1-dp-gcp-default": {StringValue: "wrong"},
+		})
+		pod, injected, err := injector.Inject(ctx, &core.Secret{Key: "secret1"}, newPod())
+		assert.NoError(t, err)
+		assert.True(t, injected)
+		assert.True(t, podHasSecretInjected(pod, "secret1", otherID, ""))
+	})
+
+	t.Run("a non-NotFound error on the cluster-scoped name is not masked by the fallback", func(t *testing.T) {
+		injector := NewEmbeddedSecretManagerInjector(
+			config.EmbeddedSecretManagerConfig{
+				Type:        config.EmbeddedSecretManagerTypeK8s,
+				K8sConfig:   config.K8sConfig{Namespace: testPodNamespace},
+				ClusterName: clusterName,
+			},
+			[]SecretFetcher{failingSecretFetcher{}},
+			&mocks.MockableControllerRuntimeClient{}, testReferenceNamespace, newAlwaysMissCache(t),
+			&config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
+		_, injected, err := injector.Inject(ctx, &core.Secret{Key: EagerSecretKey}, newPod())
+		assert.Error(t, err)
+		assert.False(t, injected)
+		assert.True(t, stdlibErrors.IsCausedBy(err, ErrCodeSecretReadFailure))
+	})
+}
+
+type failingSecretFetcher struct{}
+
+func (failingSecretFetcher) GetSecretValue(_ context.Context, secretID string) (*SecretValue, error) {
+	return nil, stdlibErrors.Errorf(ErrCodeSecretReadFailure, "secret %q failed to read", secretID)
+}
+
+// Invalidating a cluster-scoped key must also drop its cluster-qualified cache entries, since
+// those are what the lookup resolves first.
+func TestEmbeddedSecretManagerInjector_InvalidateCache_ClusterScopedKey(t *testing.T) {
+	ctx := context.Background()
+	org, domain, project := "o-apple", "d-cherry", "p-banana"
+	scoped := ClusterScopedSecretName(EagerSecretKey, "c1")
+	names := []string{EagerSecretKey, scoped}
+	wantKeys := make([]string, 0, 3*len(names))
+	for _, name := range names {
+		wantKeys = append(wantKeys,
+			EncodeSecretName(org, domain, project, name),
+			EncodeSecretName(org, domain, EmptySecretScope, name),
+			EncodeSecretName(org, EmptySecretScope, EmptySecretScope, name))
+	}
+
+	var deleted []string
+	secretCache := cacheMocks.NewCacheInterface[SecretValue](t)
+	secretCache.EXPECT().Delete(mock.Anything, mock.Anything).
+		Run(func(_ context.Context, key any) { deleted = append(deleted, key.(string)) }).
+		Return(nil).Times(len(wantKeys))
+
+	injector := NewEmbeddedSecretManagerInjector(
+		config.EmbeddedSecretManagerConfig{ClusterName: "c1"}, nil,
+		&mocks.MockableControllerRuntimeClient{}, testReferenceNamespace, secretCache,
+		&config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix},
+	)
+
+	injector.InvalidateCache(ctx, org, domain, project, EagerSecretKey)
+	assert.ElementsMatch(t, wantKeys, deleted)
+}

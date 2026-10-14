@@ -139,12 +139,14 @@ class DefaultSettings(_message.Message):
     def __init__(self, pod_template_name: _Optional[str] = ..., task_resource_defaults: _Optional[_Union[TaskResourceDefaults, _Mapping]] = ...) -> None: ...
 
 class TaskResourceDefaults(_message.Message):
-    __slots__ = ["requests", "max"]
+    __slots__ = ["requests", "max", "default_accelerator"]
     REQUESTS_FIELD_NUMBER: _ClassVar[int]
     MAX_FIELD_NUMBER: _ClassVar[int]
+    DEFAULT_ACCELERATOR_FIELD_NUMBER: _ClassVar[int]
     requests: _containers.RepeatedCompositeFieldContainer[_tasks_pb2.Resources.ResourceEntry]
     max: _containers.RepeatedCompositeFieldContainer[_tasks_pb2.Resources.ResourceEntry]
-    def __init__(self, requests: _Optional[_Iterable[_Union[_tasks_pb2.Resources.ResourceEntry, _Mapping]]] = ..., max: _Optional[_Iterable[_Union[_tasks_pb2.Resources.ResourceEntry, _Mapping]]] = ...) -> None: ...
+    default_accelerator: _tasks_pb2.GPUAccelerator
+    def __init__(self, requests: _Optional[_Iterable[_Union[_tasks_pb2.Resources.ResourceEntry, _Mapping]]] = ..., max: _Optional[_Iterable[_Union[_tasks_pb2.Resources.ResourceEntry, _Mapping]]] = ..., default_accelerator: _Optional[_Union[_tasks_pb2.GPUAccelerator, _Mapping]] = ...) -> None: ...
 
 class InlineRuleList(_message.Message):
     __slots__ = ["rules"]
