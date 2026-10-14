@@ -10,6 +10,11 @@ commonAnnotations: {}
 # imagePullSecrets are attached to all Flyte core pods.
 imagePullSecrets: []
 
+# telemetry Crash reports and usage counts Flyte sends to its maintainers, and the console's analytics tags.
+telemetry:
+  # -- Set to false to opt out. Sets DO_NOT_TRACK=1 (https://donottrack.sh) on the backend and the console; the backend passes it on to the task and app pods it creates.
+  enabled: true
+
 # components configures each independently scalable Flyte service.
 components:
   runs:
