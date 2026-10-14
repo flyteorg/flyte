@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -179,7 +179,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 		// Validate the declared type at enqueue time so bad specs fail fast
 		// instead of becoming unsignalable CRs.
 		if err := validateConditionDeclaredType(cond); err != nil {
-			return connect.NewError(connect.CodeInvalidArgument, err)
+			return connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 		}
 		if err := k8sutil.EnsureNamespaceExists(ctx, c.k8sClient, c.namespace); err != nil {
 			return fmt.Errorf("failed to ensure namespace %s: %w", c.namespace, err)
@@ -226,7 +226,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 				Trace: action.GetTrace(),
 			},
 		}
-		_, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq))
+		_, err := c.runClient.RecordAction(ctx, recordReq)
 		if err != nil {
 			return err
 		}
@@ -305,8 +305,8 @@ func (c *ActionsClient) PutStatus(ctx context.Context, actionID *common.ActionId
 func (c *ActionsClient) Signal(ctx context.Context, actionID *common.ActionIdentifier, value *core.Literal, signalledBy string) error {
 	kind, ok := literalPrimitiveKind(value)
 	if !ok {
-		return connect.NewError(connect.CodeInvalidArgument,
-			fmt.Errorf("signal value must be a concrete bool/int/float/str literal"))
+		return connect.Errorf(connect.CodeInvalidArgument,
+			"signal value must be a concrete bool/int/float/str literal")
 	}
 	valueBytes, err := proto.Marshal(value)
 	if err != nil {
@@ -318,24 +318,24 @@ func (c *ActionsClient) Signal(ctx context.Context, actionID *common.ActionIdent
 		taskAction := &executorv1.TaskAction{}
 		if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: taskActionName, Namespace: c.namespace}, taskAction); err != nil {
 			if apierrors.IsNotFound(err) {
-				return connect.NewError(connect.CodeNotFound, fmt.Errorf("condition action %s not found", taskActionName))
+				return connect.Errorf(connect.CodeNotFound, "condition action %s not found", taskActionName)
 			}
 			return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 		}
 		if taskAction.Spec.ActionType != executorv1.ActionTypeCondition {
-			return connect.NewError(connect.CodeFailedPrecondition,
-				fmt.Errorf("action %s is not a condition", taskActionName))
+			return connect.Errorf(connect.CodeFailedPrecondition,
+				"action %s is not a condition", taskActionName)
 		}
 		if existing := SignalValueFromStatus(ctx, taskAction); existing != nil {
 			if proto.Equal(existing, value) {
 				return nil // idempotent retry of the same signal
 			}
-			return connect.NewError(connect.CodeFailedPrecondition,
-				fmt.Errorf("condition %s already signalled with a different value", taskActionName))
+			return connect.Errorf(connect.CodeFailedPrecondition,
+				"condition %s already signalled with a different value", taskActionName)
 		}
 		if isTerminalPhase(GetPhaseFromConditions(taskAction)) {
-			return connect.NewError(connect.CodeFailedPrecondition,
-				fmt.Errorf("condition %s already completed", taskActionName))
+			return connect.Errorf(connect.CodeFailedPrecondition,
+				"condition %s already completed", taskActionName)
 		}
 
 		condSpec := &workflow.ConditionAction{}
@@ -343,8 +343,8 @@ func (c *ActionsClient) Signal(ctx context.Context, actionID *common.ActionIdent
 			return fmt.Errorf("failed to unmarshal condition spec for %s: %w", taskActionName, err)
 		}
 		if declared := condSpec.GetType().GetSimple(); declared != kind {
-			return connect.NewError(connect.CodeInvalidArgument,
-				fmt.Errorf("signal value type %s does not match declared condition type %s", kind, declared))
+			return connect.Errorf(connect.CodeInvalidArgument,
+				"signal value type %s does not match declared condition type %s", kind, declared)
 		}
 
 		now := metav1.Now()
@@ -788,7 +788,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Task: ta,
 			}
 		}
-		if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {
+		if _, err := c.runClient.RecordAction(ctx, recordReq); err != nil {
 			logger.Warnf(ctx, "Failed to record action in run service for %s: %v", update.ActionID.Name, err)
 		} else {
 			c.recordedFilter.Add(ctx, actionKey)
@@ -809,11 +809,11 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Phase: common.ActionPhase_ACTION_PHASE_RUNNING,
 			},
 		}
-		if resp, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(parentStatusReq)); err != nil {
+		if resp, err := c.runClient.UpdateActionStatus(ctx, parentStatusReq); err != nil {
 			logger.Warnf(ctx, "Failed to promote parent action %s to RUNNING: %v", update.ParentActionName, err)
-		} else if code := resp.Msg.GetStatus().GetCode(); code != 0 {
+		} else if code := resp.GetStatus().GetCode(); code != 0 {
 			logger.Warnf(ctx, "Run service rejected promoting parent action %s to RUNNING: code=%d message=%s",
-				update.ParentActionName, code, resp.Msg.GetStatus().GetMessage())
+				update.ParentActionName, code, resp.GetStatus().GetMessage())
 		}
 	}
 
@@ -846,11 +846,11 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				}
 			}
 		}
-		if resp, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(statusReq)); err != nil {
+		if resp, err := c.runClient.UpdateActionStatus(ctx, statusReq); err != nil {
 			logger.Warnf(ctx, "Failed to update action status in run service for %s: %v", update.ActionID.Name, err)
-		} else if code := resp.Msg.GetStatus().GetCode(); code != 0 {
+		} else if code := resp.GetStatus().GetCode(); code != 0 {
 			logger.Warnf(ctx, "Run service rejected action status update for %s: code=%d message=%s",
-				update.ActionID.Name, code, resp.Msg.GetStatus().GetMessage())
+				update.ActionID.Name, code, resp.GetStatus().GetMessage())
 		} else if isTerminalPhase(update.Phase) && !update.IsDeleted {
 			// Skip label patching for deleted CRs — the patch would always fail
 			// with "not found" since the object is already gone.

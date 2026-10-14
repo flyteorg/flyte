@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"math"
 
-	"connectrpc.com/connect"
-	"github.com/flyteorg/flyte/v2/runs/repository/models"
+	"connectrpc.com/connect/v2"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -16,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings/settingsconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
+	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
 type SettingsService struct {
@@ -31,40 +31,40 @@ func NewSettingsService(settingsRepo interfaces.SettingsRepo) *SettingsService {
 // GetSettings returns resolved, merged settings.
 func (s *SettingsService) GetSettings(
 	ctx context.Context,
-	req *connect.Request[settings.GetSettingsRequest],
-) (*connect.Response[settings.GetSettingsResponse], error) {
-	key := req.Msg.GetKey()
+	req *settings.GetSettingsRequest,
+) (*settings.GetSettingsResponse, error) {
+	key := req.GetKey()
 	if err := validateSettingsKey(key); err != nil {
 		return nil, err
 	}
 
 	resolved, err := resolveSettings(ctx, s.settingsRepo, key)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
 	// Merged settings do not correspond to a stored row, so the record carries no
 	// version. Clients that need one for an update use GetSettingsForEdit.
-	return connect.NewResponse(&settings.GetSettingsResponse{
+	return &settings.GetSettingsResponse{
 		SettingsRecord: &settings.SettingsRecord{
 			Key:      key,
 			Settings: resolved,
 		},
-	}), nil
+	}, nil
 }
 
 func (s *SettingsService) GetSettingsForEdit(
 	ctx context.Context,
-	req *connect.Request[settings.GetSettingsForEditRequest],
-) (*connect.Response[settings.GetSettingsForEditResponse], error) {
-	key := req.Msg.GetKey()
+	req *settings.GetSettingsForEditRequest,
+) (*settings.GetSettingsForEditResponse, error) {
+	key := req.GetKey()
 	if err := validateSettingsKey(key); err != nil {
 		return nil, err
 	}
 
 	levelKeys, rows, err := fetchLevels(ctx, s.settingsRepo, key)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
 	levels := make([]*settings.SettingsRecord, 0, len(levelKeys))
@@ -75,7 +75,7 @@ func (s *SettingsService) GetSettingsForEdit(
 		if row := rows[i]; row != nil {
 			stored, err := decodeStored(row)
 			if err != nil {
-				return nil, connect.NewError(connect.CodeInternal, err)
+				return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 			}
 			record.Settings = stored
 			record.Version = row.Version
@@ -83,31 +83,31 @@ func (s *SettingsService) GetSettingsForEdit(
 		levels = append(levels, record)
 	}
 
-	return connect.NewResponse(&settings.GetSettingsForEditResponse{
+	return &settings.GetSettingsForEditResponse{
 		RequestedKey: key,
 		Levels:       levels,
-	}), nil
+	}, nil
 }
 
 func (s *SettingsService) CreateSettings(
 	ctx context.Context,
-	req *connect.Request[settings.CreateSettingsRequest],
-) (*connect.Response[settings.CreateSettingsResponse], error) {
-	key := req.Msg.GetKey()
+	req *settings.CreateSettingsRequest,
+) (*settings.CreateSettingsResponse, error) {
+	key := req.GetKey()
 	if err := validateSettingsKey(key); err != nil {
 		return nil, err
 	}
-	if req.Msg.GetSettings() == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("settings is required"))
+	if req.GetSettings() == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, "settings is required")
 	}
-	if err := validateSettings(req.Msg.GetSettings()); err != nil {
+	if err := validateSettings(req.GetSettings()); err != nil {
 		return nil, err
 	}
 
-	pruneSettings(req.Msg.GetSettings())
-	data, err := protojson.Marshal(req.Msg.GetSettings())
+	pruneSettings(req.GetSettings())
+	data, err := protojson.Marshal(req.GetSettings())
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
 
 	model := &models.Settings{
@@ -117,69 +117,69 @@ func (s *SettingsService) CreateSettings(
 
 	if err := s.settingsRepo.CreateSettings(ctx, model); err != nil {
 		if errors.Is(err, interfaces.ErrSettingsAlreadyExists) {
-			return nil, connect.NewError(connect.CodeAlreadyExists, err)
+			return nil, connect.NewError(connect.CodeAlreadyExists, err.Error()).WithCause(err)
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
-	return connect.NewResponse(&settings.CreateSettingsResponse{
+	return &settings.CreateSettingsResponse{
 		SettingsRecord: &settings.SettingsRecord{
 			Key:      key,
-			Settings: req.Msg.GetSettings(),
+			Settings: req.GetSettings(),
 			Version:  model.Version,
 		},
-	}), nil
+	}, nil
 }
 
 func (s *SettingsService) UpdateSettings(
 	ctx context.Context,
-	req *connect.Request[settings.UpdateSettingsRequest],
-) (*connect.Response[settings.UpdateSettingsResponse], error) {
-	key := req.Msg.GetKey()
+	req *settings.UpdateSettingsRequest,
+) (*settings.UpdateSettingsResponse, error) {
+	key := req.GetKey()
 	if err := validateSettingsKey(key); err != nil {
 		return nil, err
 	}
-	if req.Msg.GetSettings() == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("settings is required"))
+	if req.GetSettings() == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, "settings is required")
 	}
-	if err := validateSettings(req.Msg.GetSettings()); err != nil {
+	if err := validateSettings(req.GetSettings()); err != nil {
 		return nil, err
 	}
-	if req.Msg.GetVersion() == 0 {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("a version is required; use CreateSettings for a new record"))
+	if req.GetVersion() == 0 {
+		return nil, connect.NewError(connect.CodeInvalidArgument, "a version is required; use CreateSettings for a new record")
 	}
 
-	pruneSettings(req.Msg.GetSettings())
-	data, err := protojson.Marshal(req.Msg.GetSettings())
+	pruneSettings(req.GetSettings())
+	data, err := protojson.Marshal(req.GetSettings())
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
 
 	model := &models.Settings{
 		Key:     models.EncodeSettingsKey(key.GetDomain(), key.GetProject()),
 		Data:    data,
-		Version: req.Msg.GetVersion(),
+		Version: req.GetVersion(),
 	}
 
 	// Pure update, not upsert: a missing record returns NotFound (use
 	// CreateSettings), a stale version returns FailedPrecondition.
 	if err := s.settingsRepo.UpdateSettings(ctx, model); err != nil {
 		if errors.Is(err, interfaces.ErrSettingsNotFound) {
-			return nil, connect.NewError(connect.CodeNotFound, err)
+			return nil, connect.NewError(connect.CodeNotFound, err.Error()).WithCause(err)
 		}
 		if errors.Is(err, interfaces.ErrSettingsVersionConflict) {
-			return nil, connect.NewError(connect.CodeFailedPrecondition, err)
+			return nil, connect.NewError(connect.CodeFailedPrecondition, err.Error()).WithCause(err)
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
-	return connect.NewResponse(&settings.UpdateSettingsResponse{
+	return &settings.UpdateSettingsResponse{
 		SettingsRecord: &settings.SettingsRecord{
 			Key:      key,
-			Settings: req.Msg.GetSettings(),
+			Settings: req.GetSettings(),
 			Version:  model.Version,
 		},
-	}), nil
+	}, nil
 }
 
 // validateSettingsKey checks the key shape by hand: the buf.validate annotations on
@@ -187,10 +187,10 @@ func (s *SettingsService) UpdateSettings(
 // rules are checked here instead.
 func validateSettingsKey(key *settings.SettingsKey) error {
 	if key == nil {
-		return connect.NewError(connect.CodeInvalidArgument, errors.New("key is required"))
+		return connect.NewError(connect.CodeInvalidArgument, "key is required")
 	}
 	if key.GetProject() != "" && key.GetDomain() == "" {
-		return connect.NewError(connect.CodeInvalidArgument, errors.New("a project-scope key requires a domain"))
+		return connect.NewError(connect.CodeInvalidArgument, "a project-scope key requires a domain")
 	}
 	return nil
 }
@@ -203,7 +203,7 @@ func validateMaxActionConcurrency(setting *settings.Int64Setting) error {
 		return nil
 	}
 	if v := setting.GetIntValue(); v < 0 || v == 1 || v > math.MaxUint32 {
-		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid max_action_concurrency %d: must be 0 (unlimited) or between 2 and %d", v, math.MaxUint32))
+		return connect.Errorf(connect.CodeInvalidArgument, "invalid max_action_concurrency %d: must be 0 (unlimited) or between 2 and %d", v, math.MaxUint32)
 	}
 	return nil
 }
@@ -215,7 +215,7 @@ func validateQuantity(name string, setting *settings.QuantitySetting) error {
 		return nil
 	}
 	if _, err := resource.ParseQuantity(setting.GetQuantityValue()); err != nil {
-		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid %s %q: %w", name, setting.GetQuantityValue(), err))
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid %s %q: %w", name, setting.GetQuantityValue(), err).Error())
 	}
 	return nil
 }
@@ -257,8 +257,8 @@ func validateDefaultAccelerator(setting *settings.AcceleratorSetting) error {
 	}
 	device := setting.GetAcceleratorValue().GetDevice()
 	if !canonicalAcceleratorNames[device] {
-		return connect.NewError(connect.CodeInvalidArgument,
-			fmt.Errorf("invalid task_resource.default_accelerator device %q: must be one of the flyteidl2.core.AcceleratorModel accelerator_name values", device))
+		return connect.Errorf(connect.CodeInvalidArgument,
+			"invalid task_resource.default_accelerator device %q: must be one of the flyteidl2.core.AcceleratorModel accelerator_name values", device)
 	}
 	return nil
 }

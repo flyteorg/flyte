@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"connectrpc.com/connect"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
@@ -22,16 +21,16 @@ func TestResolveSettings(t *testing.T) {
 	repo := impl.NewSettingsRepo(testDB)
 	svc := NewSettingsService(repo)
 
-	_, err := svc.CreateSettings(ctx, connect.NewRequest(&settings.CreateSettingsRequest{
+	_, err := svc.CreateSettings(ctx, &settings.CreateSettingsRequest{
 		Key:      &settings.SettingsKey{Org: "acme"},
 		Settings: envSettings("LOG_LEVEL", "info"),
-	}))
+	})
 	require.NoError(t, err)
 
-	_, err = svc.CreateSettings(ctx, connect.NewRequest(&settings.CreateSettingsRequest{
+	_, err = svc.CreateSettings(ctx, &settings.CreateSettingsRequest{
 		Key:      &settings.SettingsKey{Org: "acme", Domain: "production", Project: "analytics"},
 		Settings: envSettings("LOG_LEVEL", "debug"),
-	}))
+	})
 	require.NoError(t, err)
 
 	resolved, err := resolveSettings(ctx, repo, &settings.SettingsKey{
@@ -62,10 +61,10 @@ func TestResolveSettings_IgnoresOrg(t *testing.T) {
 
 	// Written the way the CLI writes it, under an org derived from the endpoint.
 	_, err := svc.CreateSettings(ctx,
-		connect.NewRequest(&settings.CreateSettingsRequest{
+		&settings.CreateSettingsRequest{
 			Key:      &settings.SettingsKey{Org: "acme"},
 			Settings: envSettings("LOG_LEVEL", "info"),
-		}))
+		})
 	require.NoError(t, err)
 
 	// An instance-level resolve reports SCOPE_LEVEL_ORG, the enum zero value.

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -121,9 +121,9 @@ func TestDeployTask(t *testing.T) {
 
 	mockRepo.EXPECT().TaskRepo().Return(mockTaskRepo)
 	mockTaskRepo.EXPECT().CreateTask(ctx, mock.AnythingOfType("*models.Task"), mock.Anything).Return(nil)
-	mockProjectClient.EXPECT().GetProject(ctx, mock.MatchedBy(func(req *connect.Request[project.GetProjectRequest]) bool {
-		return req.Msg.GetId() == "test-project"
-	})).Return(connect.NewResponse(&project.GetProjectResponse{}), nil)
+	mockProjectClient.EXPECT().GetProject(ctx, mock.MatchedBy(func(req *project.GetProjectRequest) bool {
+		return req.GetId() == "test-project"
+	})).Return(&project.GetProjectResponse{}, nil)
 
 	service := NewTaskService(mockRepo, mockProjectClient)
 
@@ -142,7 +142,7 @@ func TestDeployTask(t *testing.T) {
 		},
 	}
 
-	resp, err := service.DeployTask(ctx, connect.NewRequest(req))
+	resp, err := service.DeployTask(ctx, req)
 	require.NoError(t, err)
 	assert.NotNil(t, resp)
 }
@@ -185,11 +185,11 @@ func TestGetTaskDetails(t *testing.T) {
 		},
 	}
 
-	resp, err := service.GetTaskDetails(ctx, connect.NewRequest(req))
+	resp, err := service.GetTaskDetails(ctx, req)
 	require.NoError(t, err)
 	assert.NotNil(t, resp)
-	assert.NotNil(t, resp.Msg.Details)
-	assert.Equal(t, "", resp.Msg.Details.TaskId.Org)
+	assert.NotNil(t, resp.Details)
+	assert.Equal(t, "", resp.Details.TaskId.Org)
 }
 
 func TestListTasks(t *testing.T) {
@@ -230,12 +230,12 @@ func TestListTasks(t *testing.T) {
 		},
 	}
 
-	resp, err := service.ListTasks(ctx, connect.NewRequest(req))
+	resp, err := service.ListTasks(ctx, req)
 	require.NoError(t, err)
 	assert.NotNil(t, resp)
-	assert.Len(t, resp.Msg.Tasks, 1)
-	assert.NotNil(t, resp.Msg.Metadata)
-	assert.Equal(t, uint32(1), resp.Msg.Metadata.Total)
+	assert.Len(t, resp.Tasks, 1)
+	assert.NotNil(t, resp.Metadata)
+	assert.Equal(t, uint32(1), resp.Metadata.Total)
 }
 
 func TestListVersions(t *testing.T) {
@@ -272,10 +272,10 @@ func TestListVersions(t *testing.T) {
 		},
 	}
 
-	resp, err := service.ListVersions(ctx, connect.NewRequest(req))
+	resp, err := service.ListVersions(ctx, req)
 	require.NoError(t, err)
 	assert.NotNil(t, resp)
-	assert.Len(t, resp.Msg.Versions, 2)
-	assert.Equal(t, "v1", resp.Msg.Versions[0].Version)
-	assert.Equal(t, "v2", resp.Msg.Versions[1].Version)
+	assert.Len(t, resp.Versions, 2)
+	assert.Equal(t, "v1", resp.Versions[0].Version)
+	assert.Equal(t, "v2", resp.Versions[1].Version)
 }

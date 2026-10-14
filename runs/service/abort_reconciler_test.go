@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
@@ -71,7 +71,7 @@ func TestAbortReconciler_SuccessOnFirstAttempt(t *testing.T) {
 	actionRepo.On("GetAction", mock.Anything, mock.Anything).Return(abortTestAction(actionID), nil).Maybe()
 	actionRepo.On("MarkAbortAttempt", mock.Anything, mock.Anything).Return(1, nil).Once()
 	actionsClient.On("Abort", mock.Anything, mock.Anything).
-		Return(connect.NewResponse(&actions.AbortResponse{}), nil).Once()
+		Return(&actions.AbortResponse{}, nil).Once()
 	actionRepo.On("ClearAbortRequest", mock.Anything, mock.Anything).
 		Run(func(_ mock.Arguments) { cleared.Store(true) }).
 		Return(nil).Once()
@@ -100,7 +100,7 @@ func TestAbortReconciler_RetriesOnFailure(t *testing.T) {
 
 	actionRepo.On("MarkAbortAttempt", mock.Anything, mock.Anything).Return(3, nil).Once()
 	actionsClient.On("Abort", mock.Anything, mock.Anything).
-		Return(connect.NewResponse(&actions.AbortResponse{}), nil).Once()
+		Return(&actions.AbortResponse{}, nil).Once()
 	actionRepo.On("ClearAbortRequest", mock.Anything, mock.Anything).
 		Run(func(_ mock.Arguments) { cleared.Store(true) }).
 		Return(nil).Once()
@@ -148,7 +148,7 @@ func TestAbortReconciler_DeduplicatesQueue(t *testing.T) {
 	actionRepo.On("MarkAbortAttempt", mock.Anything, mock.Anything).Return(1, nil).Once()
 	actionsClient.On("Abort", mock.Anything, mock.Anything).
 		Run(func(_ mock.Arguments) { time.Sleep(20 * time.Millisecond) }).
-		Return(connect.NewResponse(&actions.AbortResponse{}), nil).Once()
+		Return(&actions.AbortResponse{}, nil).Once()
 	actionRepo.On("ClearAbortRequest", mock.Anything, mock.Anything).
 		Run(func(_ mock.Arguments) { cleared.Store(true) }).
 		Return(nil).Once()
@@ -192,9 +192,9 @@ func TestAbortReconciler_StartupScanPicksUpPending(t *testing.T) {
 		actionRepo.On("MarkAbortAttempt", mock.Anything, mock.MatchedBy(func(a *common.ActionIdentifier) bool {
 			return a.Name == id.Name
 		})).Return(1, nil).Once()
-		actionsClient.On("Abort", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.AbortRequest]) bool {
-			return req.Msg.ActionId.Name == id.Name
-		})).Return(connect.NewResponse(&actions.AbortResponse{}), nil).Once()
+		actionsClient.On("Abort", mock.Anything, mock.MatchedBy(func(req *actions.AbortRequest) bool {
+			return req.ActionId.Name == id.Name
+		})).Return(&actions.AbortResponse{}, nil).Once()
 		actionRepo.On("ClearAbortRequest", mock.Anything, mock.MatchedBy(func(a *common.ActionIdentifier) bool {
 			return a.Name == id.Name
 		})).Run(func(_ mock.Arguments) { count.Add(1) }).Return(nil).Once()
@@ -216,7 +216,7 @@ func TestAbortReconciler_NotFoundTreatedAsSuccess(t *testing.T) {
 	actionRepo.On("ListPendingAborts", mock.Anything).Return([]*models.Action{abortTestAction(actionID)}, nil).Once()
 	actionRepo.On("GetAction", mock.Anything, mock.Anything).Return(abortTestAction(actionID), nil).Maybe()
 	actionRepo.On("MarkAbortAttempt", mock.Anything, mock.Anything).Return(1, nil).Once()
-	notFoundErr := connect.NewError(connect.CodeNotFound, errors.New("action not found"))
+	notFoundErr := connect.NewError(connect.CodeNotFound, "action not found")
 	actionsClient.On("Abort", mock.Anything, mock.Anything).Return(nil, notFoundErr).Once()
 	actionRepo.On("ClearAbortRequest", mock.Anything, mock.Anything).
 		Run(func(_ mock.Arguments) { cleared.Store(true) }).

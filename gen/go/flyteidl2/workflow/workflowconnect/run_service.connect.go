@@ -5,644 +5,921 @@
 package workflowconnect
 
 import (
-	connect "connectrpc.com/connect"
+	connect "connectrpc.com/connect/v2"
 	context "context"
-	errors "errors"
 	workflow "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
-	http "net/http"
-	strings "strings"
+	sync "sync"
 )
-
-// This is a compile-time assertion to ensure that this generated file and the connect package are
-// compatible. If you get a compiler error that this constant is not defined, this code was
-// generated with a version of connect newer than the one compiled into your binary. You can fix the
-// problem by either regenerating this code with an older version of connect or updating the connect
-// version compiled into your binary.
-const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// RunServiceName is the fully-qualified name of the RunService service.
 	RunServiceName = "flyteidl2.workflow.RunService"
 )
 
-// These constants are the fully-qualified names of the RPCs defined in this package. They're
-// exposed at runtime as Spec.Procedure and as the final two segments of the HTTP route.
+// These constants are the procedure names of the RPCs defined in this package. They're exposed at
+// runtime as Spec.Procedure and as the final two segments of the HTTP route.
 //
 // Note that these are different from the fully-qualified method names used by
 // google.golang.org/protobuf/reflect/protoreflect. To convert from these constants to
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// RunServiceCreateRunProcedure is the fully-qualified name of the RunService's CreateRun RPC.
+	// RunServiceCreateRunProcedure is the procedure name of the RunService's CreateRun RPC.
 	RunServiceCreateRunProcedure = "/flyteidl2.workflow.RunService/CreateRun"
-	// RunServiceAbortRunProcedure is the fully-qualified name of the RunService's AbortRun RPC.
+	// RunServiceAbortRunProcedure is the procedure name of the RunService's AbortRun RPC.
 	RunServiceAbortRunProcedure = "/flyteidl2.workflow.RunService/AbortRun"
-	// RunServiceGetRunDetailsProcedure is the fully-qualified name of the RunService's GetRunDetails
-	// RPC.
+	// RunServiceGetRunDetailsProcedure is the procedure name of the RunService's GetRunDetails RPC.
 	RunServiceGetRunDetailsProcedure = "/flyteidl2.workflow.RunService/GetRunDetails"
-	// RunServiceWatchRunDetailsProcedure is the fully-qualified name of the RunService's
-	// WatchRunDetails RPC.
+	// RunServiceWatchRunDetailsProcedure is the procedure name of the RunService's WatchRunDetails RPC.
 	RunServiceWatchRunDetailsProcedure = "/flyteidl2.workflow.RunService/WatchRunDetails"
-	// RunServiceGetActionDetailsProcedure is the fully-qualified name of the RunService's
-	// GetActionDetails RPC.
+	// RunServiceGetActionDetailsProcedure is the procedure name of the RunService's GetActionDetails
+	// RPC.
 	RunServiceGetActionDetailsProcedure = "/flyteidl2.workflow.RunService/GetActionDetails"
-	// RunServiceWatchActionDetailsProcedure is the fully-qualified name of the RunService's
+	// RunServiceWatchActionDetailsProcedure is the procedure name of the RunService's
 	// WatchActionDetails RPC.
 	RunServiceWatchActionDetailsProcedure = "/flyteidl2.workflow.RunService/WatchActionDetails"
-	// RunServiceGetActionDataProcedure is the fully-qualified name of the RunService's GetActionData
-	// RPC.
+	// RunServiceGetActionDataProcedure is the procedure name of the RunService's GetActionData RPC.
 	RunServiceGetActionDataProcedure = "/flyteidl2.workflow.RunService/GetActionData"
-	// RunServiceListRunsProcedure is the fully-qualified name of the RunService's ListRuns RPC.
+	// RunServiceListRunsProcedure is the procedure name of the RunService's ListRuns RPC.
 	RunServiceListRunsProcedure = "/flyteidl2.workflow.RunService/ListRuns"
-	// RunServiceWatchRunsProcedure is the fully-qualified name of the RunService's WatchRuns RPC.
+	// RunServiceWatchRunsProcedure is the procedure name of the RunService's WatchRuns RPC.
 	RunServiceWatchRunsProcedure = "/flyteidl2.workflow.RunService/WatchRuns"
-	// RunServiceListActionsProcedure is the fully-qualified name of the RunService's ListActions RPC.
+	// RunServiceListActionsProcedure is the procedure name of the RunService's ListActions RPC.
 	RunServiceListActionsProcedure = "/flyteidl2.workflow.RunService/ListActions"
-	// RunServiceWatchActionsProcedure is the fully-qualified name of the RunService's WatchActions RPC.
+	// RunServiceWatchActionsProcedure is the procedure name of the RunService's WatchActions RPC.
 	RunServiceWatchActionsProcedure = "/flyteidl2.workflow.RunService/WatchActions"
-	// RunServiceWatchClusterEventsProcedure is the fully-qualified name of the RunService's
+	// RunServiceWatchClusterEventsProcedure is the procedure name of the RunService's
 	// WatchClusterEvents RPC.
 	RunServiceWatchClusterEventsProcedure = "/flyteidl2.workflow.RunService/WatchClusterEvents"
-	// RunServiceAbortActionProcedure is the fully-qualified name of the RunService's AbortAction RPC.
+	// RunServiceAbortActionProcedure is the procedure name of the RunService's AbortAction RPC.
 	RunServiceAbortActionProcedure = "/flyteidl2.workflow.RunService/AbortAction"
-	// RunServiceSignalEventProcedure is the fully-qualified name of the RunService's SignalEvent RPC.
+	// RunServiceSignalEventProcedure is the procedure name of the RunService's SignalEvent RPC.
 	RunServiceSignalEventProcedure = "/flyteidl2.workflow.RunService/SignalEvent"
-	// RunServiceWatchGroupsProcedure is the fully-qualified name of the RunService's WatchGroups RPC.
+	// RunServiceWatchGroupsProcedure is the procedure name of the RunService's WatchGroups RPC.
 	RunServiceWatchGroupsProcedure = "/flyteidl2.workflow.RunService/WatchGroups"
-	// RunServiceGetActionDataURIsProcedure is the fully-qualified name of the RunService's
-	// GetActionDataURIs RPC.
+	// RunServiceGetActionDataURIsProcedure is the procedure name of the RunService's GetActionDataURIs
+	// RPC.
 	RunServiceGetActionDataURIsProcedure = "/flyteidl2.workflow.RunService/GetActionDataURIs"
-	// RunServiceGetActionLogContextProcedure is the fully-qualified name of the RunService's
+	// RunServiceGetActionLogContextProcedure is the procedure name of the RunService's
 	// GetActionLogContext RPC.
 	RunServiceGetActionLogContextProcedure = "/flyteidl2.workflow.RunService/GetActionLogContext"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	runServiceServiceDescriptor                   = workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService")
-	runServiceCreateRunMethodDescriptor           = runServiceServiceDescriptor.Methods().ByName("CreateRun")
-	runServiceAbortRunMethodDescriptor            = runServiceServiceDescriptor.Methods().ByName("AbortRun")
-	runServiceGetRunDetailsMethodDescriptor       = runServiceServiceDescriptor.Methods().ByName("GetRunDetails")
-	runServiceWatchRunDetailsMethodDescriptor     = runServiceServiceDescriptor.Methods().ByName("WatchRunDetails")
-	runServiceGetActionDetailsMethodDescriptor    = runServiceServiceDescriptor.Methods().ByName("GetActionDetails")
-	runServiceWatchActionDetailsMethodDescriptor  = runServiceServiceDescriptor.Methods().ByName("WatchActionDetails")
-	runServiceGetActionDataMethodDescriptor       = runServiceServiceDescriptor.Methods().ByName("GetActionData")
-	runServiceListRunsMethodDescriptor            = runServiceServiceDescriptor.Methods().ByName("ListRuns")
-	runServiceWatchRunsMethodDescriptor           = runServiceServiceDescriptor.Methods().ByName("WatchRuns")
-	runServiceListActionsMethodDescriptor         = runServiceServiceDescriptor.Methods().ByName("ListActions")
-	runServiceWatchActionsMethodDescriptor        = runServiceServiceDescriptor.Methods().ByName("WatchActions")
-	runServiceWatchClusterEventsMethodDescriptor  = runServiceServiceDescriptor.Methods().ByName("WatchClusterEvents")
-	runServiceAbortActionMethodDescriptor         = runServiceServiceDescriptor.Methods().ByName("AbortAction")
-	runServiceSignalEventMethodDescriptor         = runServiceServiceDescriptor.Methods().ByName("SignalEvent")
-	runServiceWatchGroupsMethodDescriptor         = runServiceServiceDescriptor.Methods().ByName("WatchGroups")
-	runServiceGetActionDataURIsMethodDescriptor   = runServiceServiceDescriptor.Methods().ByName("GetActionDataURIs")
-	runServiceGetActionLogContextMethodDescriptor = runServiceServiceDescriptor.Methods().ByName("GetActionLogContext")
+	runServiceCreateRunSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("CreateRun"),
+			Procedure:  RunServiceCreateRunProcedure,
+		}
+	})
+	runServiceAbortRunSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("AbortRun"),
+			Procedure:  RunServiceAbortRunProcedure,
+		}
+	})
+	runServiceGetRunDetailsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("GetRunDetails"),
+			Procedure:        RunServiceGetRunDetailsProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	runServiceWatchRunDetailsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeServer,
+			Schema:     workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("WatchRunDetails"),
+			Procedure:  RunServiceWatchRunDetailsProcedure,
+		}
+	})
+	runServiceGetActionDetailsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("GetActionDetails"),
+			Procedure:        RunServiceGetActionDetailsProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	runServiceWatchActionDetailsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeServer,
+			Schema:     workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("WatchActionDetails"),
+			Procedure:  RunServiceWatchActionDetailsProcedure,
+		}
+	})
+	runServiceGetActionDataSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("GetActionData"),
+			Procedure:        RunServiceGetActionDataProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	runServiceListRunsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("ListRuns"),
+			Procedure:        RunServiceListRunsProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	runServiceWatchRunsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeServer,
+			Schema:     workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("WatchRuns"),
+			Procedure:  RunServiceWatchRunsProcedure,
+		}
+	})
+	runServiceListActionsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("ListActions"),
+			Procedure:        RunServiceListActionsProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	runServiceWatchActionsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeServer,
+			Schema:     workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("WatchActions"),
+			Procedure:  RunServiceWatchActionsProcedure,
+		}
+	})
+	runServiceWatchClusterEventsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeServer,
+			Schema:     workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("WatchClusterEvents"),
+			Procedure:  RunServiceWatchClusterEventsProcedure,
+		}
+	})
+	runServiceAbortActionSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("AbortAction"),
+			Procedure:  RunServiceAbortActionProcedure,
+		}
+	})
+	runServiceSignalEventSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("SignalEvent"),
+			Procedure:  RunServiceSignalEventProcedure,
+		}
+	})
+	runServiceWatchGroupsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeServer,
+			Schema:     workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("WatchGroups"),
+			Procedure:  RunServiceWatchGroupsProcedure,
+		}
+	})
+	runServiceGetActionDataURIsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("GetActionDataURIs"),
+			Procedure:        RunServiceGetActionDataURIsProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	runServiceGetActionLogContextSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           workflow.File_flyteidl2_workflow_run_service_proto.Services().ByName("RunService").Methods().ByName("GetActionLogContext"),
+			Procedure:        RunServiceGetActionLogContextProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
 )
 
 // RunServiceClient is a client for the flyteidl2.workflow.RunService service.
 type RunServiceClient interface {
 	// Create a new run of the given task.
-	CreateRun(context.Context, *connect.Request[workflow.CreateRunRequest]) (*connect.Response[workflow.CreateRunResponse], error)
+	CreateRun(context.Context, *workflow.CreateRunRequest) (*workflow.CreateRunResponse, error)
 	// Abort a run.
-	AbortRun(context.Context, *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error)
+	AbortRun(context.Context, *workflow.AbortRunRequest) (*workflow.AbortRunResponse, error)
 	// Get detailed information about a run.
-	GetRunDetails(context.Context, *connect.Request[workflow.GetRunDetailsRequest]) (*connect.Response[workflow.GetRunDetailsResponse], error)
+	GetRunDetails(context.Context, *workflow.GetRunDetailsRequest) (*workflow.GetRunDetailsResponse, error)
 	// Stream detailed information updates about a run. The call will terminate when the run reaches a terminal phase.
-	WatchRunDetails(context.Context, *connect.Request[workflow.WatchRunDetailsRequest]) (*connect.ServerStreamForClient[workflow.WatchRunDetailsResponse], error)
+	WatchRunDetails(context.Context, *workflow.WatchRunDetailsRequest) (RunServiceWatchRunDetailsClientStream, error)
 	// Get detailed information about an action.
-	GetActionDetails(context.Context, *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error)
+	GetActionDetails(context.Context, *workflow.GetActionDetailsRequest) (*workflow.GetActionDetailsResponse, error)
 	// Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
-	WatchActionDetails(context.Context, *connect.Request[workflow.WatchActionDetailsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionDetailsResponse], error)
+	WatchActionDetails(context.Context, *workflow.WatchActionDetailsRequest) (RunServiceWatchActionDetailsClientStream, error)
 	// Deprecated: Use DataProxyService.GetActionData instead.
 	//
 	// Deprecated: do not use.
-	GetActionData(context.Context, *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error)
+	GetActionData(context.Context, *workflow.GetActionDataRequest) (*workflow.GetActionDataResponse, error)
 	// List runs based on the provided filter criteria.
-	ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error)
+	ListRuns(context.Context, *workflow.ListRunsRequest) (*workflow.ListRunsResponse, error)
 	// Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
 	// runs or updates to existing ones from the point of invocation.
-	WatchRuns(context.Context, *connect.Request[workflow.WatchRunsRequest]) (*connect.ServerStreamForClient[workflow.WatchRunsResponse], error)
+	WatchRuns(context.Context, *workflow.WatchRunsRequest) (RunServiceWatchRunsClientStream, error)
 	// List all actions for a given run.
-	ListActions(context.Context, *connect.Request[workflow.ListActionsRequest]) (*connect.Response[workflow.ListActionsResponse], error)
+	ListActions(context.Context, *workflow.ListActionsRequest) (*workflow.ListActionsResponse, error)
 	// Stream updates for actions given a run. Responses may include newly discovered nested runs or updates
 	// to  existing ones from the point of invocation.
-	WatchActions(context.Context, *connect.Request[workflow.WatchActionsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionsResponse], error)
+	WatchActions(context.Context, *workflow.WatchActionsRequest) (RunServiceWatchActionsClientStream, error)
 	// Stream of k8s cluster events in human readable form
-	WatchClusterEvents(context.Context, *connect.Request[workflow.WatchClusterEventsRequest]) (*connect.ServerStreamForClient[workflow.WatchClusterEventsResponse], error)
+	WatchClusterEvents(context.Context, *workflow.WatchClusterEventsRequest) (RunServiceWatchClusterEventsClientStream, error)
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
-	AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error)
+	AbortAction(context.Context, *workflow.AbortActionRequest) (*workflow.AbortActionResponse, error)
 	// SignalEvent resolves a paused condition action by supplying its value.
 	// It converts the user-facing EventPayload to a core.Literal and delegates
 	// to ActionsService.Signal, resolving the condition's parent action for
 	// routing.
-	SignalEvent(context.Context, *connect.Request[workflow.SignalEventRequest]) (*connect.Response[workflow.SignalEventResponse], error)
+	SignalEvent(context.Context, *workflow.SignalEventRequest) (*workflow.SignalEventResponse, error)
 	// Stream updates for task groups based on the provided filter criteria.
-	WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest]) (*connect.ServerStreamForClient[workflow.WatchGroupsResponse], error)
+	WatchGroups(context.Context, *workflow.WatchGroupsRequest) (RunServiceWatchGroupsClientStream, error)
 	// Get the storage URIs for an action's input and output data.
-	GetActionDataURIs(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error)
+	GetActionDataURIs(context.Context, *workflow.GetActionDataURIsRequest) (*workflow.GetActionDataURIsResponse, error)
 	// Get the logging context (pod name, namespace, cluster) for an action attempt.
-	GetActionLogContext(context.Context, *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error)
+	GetActionLogContext(context.Context, *workflow.GetActionLogContextRequest) (*workflow.GetActionLogContextResponse, error)
 }
 
-// NewRunServiceClient constructs a client for the flyteidl2.workflow.RunService service. By
-// default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
-// and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
-// connect.WithGRPC() or connect.WithGRPCWeb() options.
-//
-// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
-// http://api.acme.com or https://acme.com/grpc).
-func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) RunServiceClient {
-	baseURL = strings.TrimRight(baseURL, "/")
-	return &runServiceClient{
-		createRun: connect.NewClient[workflow.CreateRunRequest, workflow.CreateRunResponse](
-			httpClient,
-			baseURL+RunServiceCreateRunProcedure,
-			connect.WithSchema(runServiceCreateRunMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		abortRun: connect.NewClient[workflow.AbortRunRequest, workflow.AbortRunResponse](
-			httpClient,
-			baseURL+RunServiceAbortRunProcedure,
-			connect.WithSchema(runServiceAbortRunMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		getRunDetails: connect.NewClient[workflow.GetRunDetailsRequest, workflow.GetRunDetailsResponse](
-			httpClient,
-			baseURL+RunServiceGetRunDetailsProcedure,
-			connect.WithSchema(runServiceGetRunDetailsMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		watchRunDetails: connect.NewClient[workflow.WatchRunDetailsRequest, workflow.WatchRunDetailsResponse](
-			httpClient,
-			baseURL+RunServiceWatchRunDetailsProcedure,
-			connect.WithSchema(runServiceWatchRunDetailsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		getActionDetails: connect.NewClient[workflow.GetActionDetailsRequest, workflow.GetActionDetailsResponse](
-			httpClient,
-			baseURL+RunServiceGetActionDetailsProcedure,
-			connect.WithSchema(runServiceGetActionDetailsMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		watchActionDetails: connect.NewClient[workflow.WatchActionDetailsRequest, workflow.WatchActionDetailsResponse](
-			httpClient,
-			baseURL+RunServiceWatchActionDetailsProcedure,
-			connect.WithSchema(runServiceWatchActionDetailsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		getActionData: connect.NewClient[workflow.GetActionDataRequest, workflow.GetActionDataResponse](
-			httpClient,
-			baseURL+RunServiceGetActionDataProcedure,
-			connect.WithSchema(runServiceGetActionDataMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		listRuns: connect.NewClient[workflow.ListRunsRequest, workflow.ListRunsResponse](
-			httpClient,
-			baseURL+RunServiceListRunsProcedure,
-			connect.WithSchema(runServiceListRunsMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		watchRuns: connect.NewClient[workflow.WatchRunsRequest, workflow.WatchRunsResponse](
-			httpClient,
-			baseURL+RunServiceWatchRunsProcedure,
-			connect.WithSchema(runServiceWatchRunsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		listActions: connect.NewClient[workflow.ListActionsRequest, workflow.ListActionsResponse](
-			httpClient,
-			baseURL+RunServiceListActionsProcedure,
-			connect.WithSchema(runServiceListActionsMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		watchActions: connect.NewClient[workflow.WatchActionsRequest, workflow.WatchActionsResponse](
-			httpClient,
-			baseURL+RunServiceWatchActionsProcedure,
-			connect.WithSchema(runServiceWatchActionsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		watchClusterEvents: connect.NewClient[workflow.WatchClusterEventsRequest, workflow.WatchClusterEventsResponse](
-			httpClient,
-			baseURL+RunServiceWatchClusterEventsProcedure,
-			connect.WithSchema(runServiceWatchClusterEventsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		abortAction: connect.NewClient[workflow.AbortActionRequest, workflow.AbortActionResponse](
-			httpClient,
-			baseURL+RunServiceAbortActionProcedure,
-			connect.WithSchema(runServiceAbortActionMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		signalEvent: connect.NewClient[workflow.SignalEventRequest, workflow.SignalEventResponse](
-			httpClient,
-			baseURL+RunServiceSignalEventProcedure,
-			connect.WithSchema(runServiceSignalEventMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		watchGroups: connect.NewClient[workflow.WatchGroupsRequest, workflow.WatchGroupsResponse](
-			httpClient,
-			baseURL+RunServiceWatchGroupsProcedure,
-			connect.WithSchema(runServiceWatchGroupsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		getActionDataURIs: connect.NewClient[workflow.GetActionDataURIsRequest, workflow.GetActionDataURIsResponse](
-			httpClient,
-			baseURL+RunServiceGetActionDataURIsProcedure,
-			connect.WithSchema(runServiceGetActionDataURIsMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		getActionLogContext: connect.NewClient[workflow.GetActionLogContextRequest, workflow.GetActionLogContextResponse](
-			httpClient,
-			baseURL+RunServiceGetActionLogContextProcedure,
-			connect.WithSchema(runServiceGetActionLogContextMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
+// NewRunServiceClient constructs a client for the flyteidl2.workflow.RunService service. Multiple
+// service clients may share a single connect.Client.
+func NewRunServiceClient(client *connect.Client) RunServiceClient {
+	return &runServiceClient{client: client}
+}
+
+// RunServiceWatchRunDetailsClientStream is the client stream for the RunService's WatchRunDetails
+// RPC.
+type RunServiceWatchRunDetailsClientStream struct {
+	stream connect.ClientStream
+}
+
+// Receive returns the next response message from the server.
+func (s RunServiceWatchRunDetailsClientStream) Receive() (*workflow.WatchRunDetailsResponse, error) {
+	var res workflow.WatchRunDetailsResponse
+	if err := s.stream.Receive(&res); err != nil {
+		return nil, err
 	}
+	return &res, nil
 }
 
-// runServiceClient implements RunServiceClient.
-type runServiceClient struct {
-	createRun           *connect.Client[workflow.CreateRunRequest, workflow.CreateRunResponse]
-	abortRun            *connect.Client[workflow.AbortRunRequest, workflow.AbortRunResponse]
-	getRunDetails       *connect.Client[workflow.GetRunDetailsRequest, workflow.GetRunDetailsResponse]
-	watchRunDetails     *connect.Client[workflow.WatchRunDetailsRequest, workflow.WatchRunDetailsResponse]
-	getActionDetails    *connect.Client[workflow.GetActionDetailsRequest, workflow.GetActionDetailsResponse]
-	watchActionDetails  *connect.Client[workflow.WatchActionDetailsRequest, workflow.WatchActionDetailsResponse]
-	getActionData       *connect.Client[workflow.GetActionDataRequest, workflow.GetActionDataResponse]
-	listRuns            *connect.Client[workflow.ListRunsRequest, workflow.ListRunsResponse]
-	watchRuns           *connect.Client[workflow.WatchRunsRequest, workflow.WatchRunsResponse]
-	listActions         *connect.Client[workflow.ListActionsRequest, workflow.ListActionsResponse]
-	watchActions        *connect.Client[workflow.WatchActionsRequest, workflow.WatchActionsResponse]
-	watchClusterEvents  *connect.Client[workflow.WatchClusterEventsRequest, workflow.WatchClusterEventsResponse]
-	abortAction         *connect.Client[workflow.AbortActionRequest, workflow.AbortActionResponse]
-	signalEvent         *connect.Client[workflow.SignalEventRequest, workflow.SignalEventResponse]
-	watchGroups         *connect.Client[workflow.WatchGroupsRequest, workflow.WatchGroupsResponse]
-	getActionDataURIs   *connect.Client[workflow.GetActionDataURIsRequest, workflow.GetActionDataURIsResponse]
-	getActionLogContext *connect.Client[workflow.GetActionLogContextRequest, workflow.GetActionLogContextResponse]
+// Close releases the stream's resources. It is idempotent and is typically deferred to clean up a
+// stream abandoned before io.EOF.
+func (s RunServiceWatchRunDetailsClientStream) Close() error {
+	return s.stream.Close()
 }
 
-// CreateRun calls flyteidl2.workflow.RunService.CreateRun.
-func (c *runServiceClient) CreateRun(ctx context.Context, req *connect.Request[workflow.CreateRunRequest]) (*connect.Response[workflow.CreateRunResponse], error) {
-	return c.createRun.CallUnary(ctx, req)
+// RunServiceWatchActionDetailsClientStream is the client stream for the RunService's
+// WatchActionDetails RPC.
+type RunServiceWatchActionDetailsClientStream struct {
+	stream connect.ClientStream
 }
 
-// AbortRun calls flyteidl2.workflow.RunService.AbortRun.
-func (c *runServiceClient) AbortRun(ctx context.Context, req *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error) {
-	return c.abortRun.CallUnary(ctx, req)
+// Receive returns the next response message from the server.
+func (s RunServiceWatchActionDetailsClientStream) Receive() (*workflow.WatchActionDetailsResponse, error) {
+	var res workflow.WatchActionDetailsResponse
+	if err := s.stream.Receive(&res); err != nil {
+		return nil, err
+	}
+	return &res, nil
 }
 
-// GetRunDetails calls flyteidl2.workflow.RunService.GetRunDetails.
-func (c *runServiceClient) GetRunDetails(ctx context.Context, req *connect.Request[workflow.GetRunDetailsRequest]) (*connect.Response[workflow.GetRunDetailsResponse], error) {
-	return c.getRunDetails.CallUnary(ctx, req)
+// Close releases the stream's resources. It is idempotent and is typically deferred to clean up a
+// stream abandoned before io.EOF.
+func (s RunServiceWatchActionDetailsClientStream) Close() error {
+	return s.stream.Close()
 }
 
-// WatchRunDetails calls flyteidl2.workflow.RunService.WatchRunDetails.
-func (c *runServiceClient) WatchRunDetails(ctx context.Context, req *connect.Request[workflow.WatchRunDetailsRequest]) (*connect.ServerStreamForClient[workflow.WatchRunDetailsResponse], error) {
-	return c.watchRunDetails.CallServerStream(ctx, req)
+// RunServiceWatchRunsClientStream is the client stream for the RunService's WatchRuns RPC.
+type RunServiceWatchRunsClientStream struct {
+	stream connect.ClientStream
 }
 
-// GetActionDetails calls flyteidl2.workflow.RunService.GetActionDetails.
-func (c *runServiceClient) GetActionDetails(ctx context.Context, req *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error) {
-	return c.getActionDetails.CallUnary(ctx, req)
+// Receive returns the next response message from the server.
+func (s RunServiceWatchRunsClientStream) Receive() (*workflow.WatchRunsResponse, error) {
+	var res workflow.WatchRunsResponse
+	if err := s.stream.Receive(&res); err != nil {
+		return nil, err
+	}
+	return &res, nil
 }
 
-// WatchActionDetails calls flyteidl2.workflow.RunService.WatchActionDetails.
-func (c *runServiceClient) WatchActionDetails(ctx context.Context, req *connect.Request[workflow.WatchActionDetailsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionDetailsResponse], error) {
-	return c.watchActionDetails.CallServerStream(ctx, req)
+// Close releases the stream's resources. It is idempotent and is typically deferred to clean up a
+// stream abandoned before io.EOF.
+func (s RunServiceWatchRunsClientStream) Close() error {
+	return s.stream.Close()
 }
 
-// GetActionData calls flyteidl2.workflow.RunService.GetActionData.
-//
-// Deprecated: do not use.
-func (c *runServiceClient) GetActionData(ctx context.Context, req *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error) {
-	return c.getActionData.CallUnary(ctx, req)
+// RunServiceWatchActionsClientStream is the client stream for the RunService's WatchActions RPC.
+type RunServiceWatchActionsClientStream struct {
+	stream connect.ClientStream
 }
 
-// ListRuns calls flyteidl2.workflow.RunService.ListRuns.
-func (c *runServiceClient) ListRuns(ctx context.Context, req *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error) {
-	return c.listRuns.CallUnary(ctx, req)
+// Receive returns the next response message from the server.
+func (s RunServiceWatchActionsClientStream) Receive() (*workflow.WatchActionsResponse, error) {
+	var res workflow.WatchActionsResponse
+	if err := s.stream.Receive(&res); err != nil {
+		return nil, err
+	}
+	return &res, nil
 }
 
-// WatchRuns calls flyteidl2.workflow.RunService.WatchRuns.
-func (c *runServiceClient) WatchRuns(ctx context.Context, req *connect.Request[workflow.WatchRunsRequest]) (*connect.ServerStreamForClient[workflow.WatchRunsResponse], error) {
-	return c.watchRuns.CallServerStream(ctx, req)
+// Close releases the stream's resources. It is idempotent and is typically deferred to clean up a
+// stream abandoned before io.EOF.
+func (s RunServiceWatchActionsClientStream) Close() error {
+	return s.stream.Close()
 }
 
-// ListActions calls flyteidl2.workflow.RunService.ListActions.
-func (c *runServiceClient) ListActions(ctx context.Context, req *connect.Request[workflow.ListActionsRequest]) (*connect.Response[workflow.ListActionsResponse], error) {
-	return c.listActions.CallUnary(ctx, req)
+// RunServiceWatchClusterEventsClientStream is the client stream for the RunService's
+// WatchClusterEvents RPC.
+type RunServiceWatchClusterEventsClientStream struct {
+	stream connect.ClientStream
 }
 
-// WatchActions calls flyteidl2.workflow.RunService.WatchActions.
-func (c *runServiceClient) WatchActions(ctx context.Context, req *connect.Request[workflow.WatchActionsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionsResponse], error) {
-	return c.watchActions.CallServerStream(ctx, req)
+// Receive returns the next response message from the server.
+func (s RunServiceWatchClusterEventsClientStream) Receive() (*workflow.WatchClusterEventsResponse, error) {
+	var res workflow.WatchClusterEventsResponse
+	if err := s.stream.Receive(&res); err != nil {
+		return nil, err
+	}
+	return &res, nil
 }
 
-// WatchClusterEvents calls flyteidl2.workflow.RunService.WatchClusterEvents.
-func (c *runServiceClient) WatchClusterEvents(ctx context.Context, req *connect.Request[workflow.WatchClusterEventsRequest]) (*connect.ServerStreamForClient[workflow.WatchClusterEventsResponse], error) {
-	return c.watchClusterEvents.CallServerStream(ctx, req)
+// Close releases the stream's resources. It is idempotent and is typically deferred to clean up a
+// stream abandoned before io.EOF.
+func (s RunServiceWatchClusterEventsClientStream) Close() error {
+	return s.stream.Close()
 }
 
-// AbortAction calls flyteidl2.workflow.RunService.AbortAction.
-func (c *runServiceClient) AbortAction(ctx context.Context, req *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error) {
-	return c.abortAction.CallUnary(ctx, req)
+// RunServiceWatchGroupsClientStream is the client stream for the RunService's WatchGroups RPC.
+type RunServiceWatchGroupsClientStream struct {
+	stream connect.ClientStream
 }
 
-// SignalEvent calls flyteidl2.workflow.RunService.SignalEvent.
-func (c *runServiceClient) SignalEvent(ctx context.Context, req *connect.Request[workflow.SignalEventRequest]) (*connect.Response[workflow.SignalEventResponse], error) {
-	return c.signalEvent.CallUnary(ctx, req)
+// Receive returns the next response message from the server.
+func (s RunServiceWatchGroupsClientStream) Receive() (*workflow.WatchGroupsResponse, error) {
+	var res workflow.WatchGroupsResponse
+	if err := s.stream.Receive(&res); err != nil {
+		return nil, err
+	}
+	return &res, nil
 }
 
-// WatchGroups calls flyteidl2.workflow.RunService.WatchGroups.
-func (c *runServiceClient) WatchGroups(ctx context.Context, req *connect.Request[workflow.WatchGroupsRequest]) (*connect.ServerStreamForClient[workflow.WatchGroupsResponse], error) {
-	return c.watchGroups.CallServerStream(ctx, req)
-}
-
-// GetActionDataURIs calls flyteidl2.workflow.RunService.GetActionDataURIs.
-func (c *runServiceClient) GetActionDataURIs(ctx context.Context, req *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error) {
-	return c.getActionDataURIs.CallUnary(ctx, req)
-}
-
-// GetActionLogContext calls flyteidl2.workflow.RunService.GetActionLogContext.
-func (c *runServiceClient) GetActionLogContext(ctx context.Context, req *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error) {
-	return c.getActionLogContext.CallUnary(ctx, req)
+// Close releases the stream's resources. It is idempotent and is typically deferred to clean up a
+// stream abandoned before io.EOF.
+func (s RunServiceWatchGroupsClientStream) Close() error {
+	return s.stream.Close()
 }
 
 // RunServiceHandler is an implementation of the flyteidl2.workflow.RunService service.
 type RunServiceHandler interface {
 	// Create a new run of the given task.
-	CreateRun(context.Context, *connect.Request[workflow.CreateRunRequest]) (*connect.Response[workflow.CreateRunResponse], error)
+	CreateRun(context.Context, *workflow.CreateRunRequest) (*workflow.CreateRunResponse, error)
 	// Abort a run.
-	AbortRun(context.Context, *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error)
+	AbortRun(context.Context, *workflow.AbortRunRequest) (*workflow.AbortRunResponse, error)
 	// Get detailed information about a run.
-	GetRunDetails(context.Context, *connect.Request[workflow.GetRunDetailsRequest]) (*connect.Response[workflow.GetRunDetailsResponse], error)
+	GetRunDetails(context.Context, *workflow.GetRunDetailsRequest) (*workflow.GetRunDetailsResponse, error)
 	// Stream detailed information updates about a run. The call will terminate when the run reaches a terminal phase.
-	WatchRunDetails(context.Context, *connect.Request[workflow.WatchRunDetailsRequest], *connect.ServerStream[workflow.WatchRunDetailsResponse]) error
+	WatchRunDetails(context.Context, *workflow.WatchRunDetailsRequest, RunServiceWatchRunDetailsServerStream) error
 	// Get detailed information about an action.
-	GetActionDetails(context.Context, *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error)
+	GetActionDetails(context.Context, *workflow.GetActionDetailsRequest) (*workflow.GetActionDetailsResponse, error)
 	// Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
-	WatchActionDetails(context.Context, *connect.Request[workflow.WatchActionDetailsRequest], *connect.ServerStream[workflow.WatchActionDetailsResponse]) error
+	WatchActionDetails(context.Context, *workflow.WatchActionDetailsRequest, RunServiceWatchActionDetailsServerStream) error
 	// Deprecated: Use DataProxyService.GetActionData instead.
 	//
 	// Deprecated: do not use.
-	GetActionData(context.Context, *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error)
+	GetActionData(context.Context, *workflow.GetActionDataRequest) (*workflow.GetActionDataResponse, error)
 	// List runs based on the provided filter criteria.
-	ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error)
+	ListRuns(context.Context, *workflow.ListRunsRequest) (*workflow.ListRunsResponse, error)
 	// Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
 	// runs or updates to existing ones from the point of invocation.
-	WatchRuns(context.Context, *connect.Request[workflow.WatchRunsRequest], *connect.ServerStream[workflow.WatchRunsResponse]) error
+	WatchRuns(context.Context, *workflow.WatchRunsRequest, RunServiceWatchRunsServerStream) error
 	// List all actions for a given run.
-	ListActions(context.Context, *connect.Request[workflow.ListActionsRequest]) (*connect.Response[workflow.ListActionsResponse], error)
+	ListActions(context.Context, *workflow.ListActionsRequest) (*workflow.ListActionsResponse, error)
 	// Stream updates for actions given a run. Responses may include newly discovered nested runs or updates
 	// to  existing ones from the point of invocation.
-	WatchActions(context.Context, *connect.Request[workflow.WatchActionsRequest], *connect.ServerStream[workflow.WatchActionsResponse]) error
+	WatchActions(context.Context, *workflow.WatchActionsRequest, RunServiceWatchActionsServerStream) error
 	// Stream of k8s cluster events in human readable form
-	WatchClusterEvents(context.Context, *connect.Request[workflow.WatchClusterEventsRequest], *connect.ServerStream[workflow.WatchClusterEventsResponse]) error
+	WatchClusterEvents(context.Context, *workflow.WatchClusterEventsRequest, RunServiceWatchClusterEventsServerStream) error
 	// AbortAction aborts a single action that was previously created or is currently being processed by a worker.
-	AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error)
+	AbortAction(context.Context, *workflow.AbortActionRequest) (*workflow.AbortActionResponse, error)
 	// SignalEvent resolves a paused condition action by supplying its value.
 	// It converts the user-facing EventPayload to a core.Literal and delegates
 	// to ActionsService.Signal, resolving the condition's parent action for
 	// routing.
-	SignalEvent(context.Context, *connect.Request[workflow.SignalEventRequest]) (*connect.Response[workflow.SignalEventResponse], error)
+	SignalEvent(context.Context, *workflow.SignalEventRequest) (*workflow.SignalEventResponse, error)
 	// Stream updates for task groups based on the provided filter criteria.
-	WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest], *connect.ServerStream[workflow.WatchGroupsResponse]) error
+	WatchGroups(context.Context, *workflow.WatchGroupsRequest, RunServiceWatchGroupsServerStream) error
 	// Get the storage URIs for an action's input and output data.
-	GetActionDataURIs(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error)
+	GetActionDataURIs(context.Context, *workflow.GetActionDataURIsRequest) (*workflow.GetActionDataURIsResponse, error)
 	// Get the logging context (pod name, namespace, cluster) for an action attempt.
-	GetActionLogContext(context.Context, *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error)
+	GetActionLogContext(context.Context, *workflow.GetActionLogContextRequest) (*workflow.GetActionLogContextResponse, error)
 }
 
-// NewRunServiceHandler builds an HTTP handler from the service implementation. It returns the path
-// on which to mount the handler and the handler itself.
-//
-// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
-// and JSON codecs. They also support gzip compression.
-func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	runServiceCreateRunHandler := connect.NewUnaryHandler(
-		RunServiceCreateRunProcedure,
-		svc.CreateRun,
-		connect.WithSchema(runServiceCreateRunMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
+// RegisterRunServiceHandler registers svc as the flyteidl2.workflow.RunService implementation on
+// server.
+func RegisterRunServiceHandler(server *connect.Server, svc RunServiceHandler) {
+	adapter := runServiceHandler{svc: svc}
+	server.Register(
+		connect.Method{Spec: runServiceCreateRunSpec(), Handler: adapter.createRun},
+		connect.Method{Spec: runServiceAbortRunSpec(), Handler: adapter.abortRun},
+		connect.Method{Spec: runServiceGetRunDetailsSpec(), Handler: adapter.getRunDetails},
+		connect.Method{Spec: runServiceWatchRunDetailsSpec(), Handler: adapter.watchRunDetails},
+		connect.Method{Spec: runServiceGetActionDetailsSpec(), Handler: adapter.getActionDetails},
+		connect.Method{Spec: runServiceWatchActionDetailsSpec(), Handler: adapter.watchActionDetails},
+		connect.Method{Spec: runServiceGetActionDataSpec(), Handler: adapter.getActionData},
+		connect.Method{Spec: runServiceListRunsSpec(), Handler: adapter.listRuns},
+		connect.Method{Spec: runServiceWatchRunsSpec(), Handler: adapter.watchRuns},
+		connect.Method{Spec: runServiceListActionsSpec(), Handler: adapter.listActions},
+		connect.Method{Spec: runServiceWatchActionsSpec(), Handler: adapter.watchActions},
+		connect.Method{Spec: runServiceWatchClusterEventsSpec(), Handler: adapter.watchClusterEvents},
+		connect.Method{Spec: runServiceAbortActionSpec(), Handler: adapter.abortAction},
+		connect.Method{Spec: runServiceSignalEventSpec(), Handler: adapter.signalEvent},
+		connect.Method{Spec: runServiceWatchGroupsSpec(), Handler: adapter.watchGroups},
+		connect.Method{Spec: runServiceGetActionDataURIsSpec(), Handler: adapter.getActionDataURIs},
+		connect.Method{Spec: runServiceGetActionLogContextSpec(), Handler: adapter.getActionLogContext},
 	)
-	runServiceAbortRunHandler := connect.NewUnaryHandler(
-		RunServiceAbortRunProcedure,
-		svc.AbortRun,
-		connect.WithSchema(runServiceAbortRunMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	runServiceGetRunDetailsHandler := connect.NewUnaryHandler(
-		RunServiceGetRunDetailsProcedure,
-		svc.GetRunDetails,
-		connect.WithSchema(runServiceGetRunDetailsMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	runServiceWatchRunDetailsHandler := connect.NewServerStreamHandler(
-		RunServiceWatchRunDetailsProcedure,
-		svc.WatchRunDetails,
-		connect.WithSchema(runServiceWatchRunDetailsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	runServiceGetActionDetailsHandler := connect.NewUnaryHandler(
-		RunServiceGetActionDetailsProcedure,
-		svc.GetActionDetails,
-		connect.WithSchema(runServiceGetActionDetailsMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	runServiceWatchActionDetailsHandler := connect.NewServerStreamHandler(
-		RunServiceWatchActionDetailsProcedure,
-		svc.WatchActionDetails,
-		connect.WithSchema(runServiceWatchActionDetailsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	runServiceGetActionDataHandler := connect.NewUnaryHandler(
-		RunServiceGetActionDataProcedure,
-		svc.GetActionData,
-		connect.WithSchema(runServiceGetActionDataMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	runServiceListRunsHandler := connect.NewUnaryHandler(
-		RunServiceListRunsProcedure,
-		svc.ListRuns,
-		connect.WithSchema(runServiceListRunsMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	runServiceWatchRunsHandler := connect.NewServerStreamHandler(
-		RunServiceWatchRunsProcedure,
-		svc.WatchRuns,
-		connect.WithSchema(runServiceWatchRunsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	runServiceListActionsHandler := connect.NewUnaryHandler(
-		RunServiceListActionsProcedure,
-		svc.ListActions,
-		connect.WithSchema(runServiceListActionsMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	runServiceWatchActionsHandler := connect.NewServerStreamHandler(
-		RunServiceWatchActionsProcedure,
-		svc.WatchActions,
-		connect.WithSchema(runServiceWatchActionsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	runServiceWatchClusterEventsHandler := connect.NewServerStreamHandler(
-		RunServiceWatchClusterEventsProcedure,
-		svc.WatchClusterEvents,
-		connect.WithSchema(runServiceWatchClusterEventsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	runServiceAbortActionHandler := connect.NewUnaryHandler(
-		RunServiceAbortActionProcedure,
-		svc.AbortAction,
-		connect.WithSchema(runServiceAbortActionMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	runServiceSignalEventHandler := connect.NewUnaryHandler(
-		RunServiceSignalEventProcedure,
-		svc.SignalEvent,
-		connect.WithSchema(runServiceSignalEventMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	runServiceWatchGroupsHandler := connect.NewServerStreamHandler(
-		RunServiceWatchGroupsProcedure,
-		svc.WatchGroups,
-		connect.WithSchema(runServiceWatchGroupsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	runServiceGetActionDataURIsHandler := connect.NewUnaryHandler(
-		RunServiceGetActionDataURIsProcedure,
-		svc.GetActionDataURIs,
-		connect.WithSchema(runServiceGetActionDataURIsMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	runServiceGetActionLogContextHandler := connect.NewUnaryHandler(
-		RunServiceGetActionLogContextProcedure,
-		svc.GetActionLogContext,
-		connect.WithSchema(runServiceGetActionLogContextMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	return "/flyteidl2.workflow.RunService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case RunServiceCreateRunProcedure:
-			runServiceCreateRunHandler.ServeHTTP(w, r)
-		case RunServiceAbortRunProcedure:
-			runServiceAbortRunHandler.ServeHTTP(w, r)
-		case RunServiceGetRunDetailsProcedure:
-			runServiceGetRunDetailsHandler.ServeHTTP(w, r)
-		case RunServiceWatchRunDetailsProcedure:
-			runServiceWatchRunDetailsHandler.ServeHTTP(w, r)
-		case RunServiceGetActionDetailsProcedure:
-			runServiceGetActionDetailsHandler.ServeHTTP(w, r)
-		case RunServiceWatchActionDetailsProcedure:
-			runServiceWatchActionDetailsHandler.ServeHTTP(w, r)
-		case RunServiceGetActionDataProcedure:
-			runServiceGetActionDataHandler.ServeHTTP(w, r)
-		case RunServiceListRunsProcedure:
-			runServiceListRunsHandler.ServeHTTP(w, r)
-		case RunServiceWatchRunsProcedure:
-			runServiceWatchRunsHandler.ServeHTTP(w, r)
-		case RunServiceListActionsProcedure:
-			runServiceListActionsHandler.ServeHTTP(w, r)
-		case RunServiceWatchActionsProcedure:
-			runServiceWatchActionsHandler.ServeHTTP(w, r)
-		case RunServiceWatchClusterEventsProcedure:
-			runServiceWatchClusterEventsHandler.ServeHTTP(w, r)
-		case RunServiceAbortActionProcedure:
-			runServiceAbortActionHandler.ServeHTTP(w, r)
-		case RunServiceSignalEventProcedure:
-			runServiceSignalEventHandler.ServeHTTP(w, r)
-		case RunServiceWatchGroupsProcedure:
-			runServiceWatchGroupsHandler.ServeHTTP(w, r)
-		case RunServiceGetActionDataURIsProcedure:
-			runServiceGetActionDataURIsHandler.ServeHTTP(w, r)
-		case RunServiceGetActionLogContextProcedure:
-			runServiceGetActionLogContextHandler.ServeHTTP(w, r)
-		default:
-			http.NotFound(w, r)
-		}
-	})
+}
+
+// RunServiceWatchRunDetailsServerStream is the server stream for the RunService's WatchRunDetails
+// RPC.
+type RunServiceWatchRunDetailsServerStream struct {
+	stream connect.ServerStream
+}
+
+// SendHeaders flushes the response headers without a message. The first Send does this implicitly.
+func (s RunServiceWatchRunDetailsServerStream) SendHeaders() error {
+	return s.stream.SendHeaders()
+}
+
+// Send sends a response message to the client.
+func (s RunServiceWatchRunDetailsServerStream) Send(res *workflow.WatchRunDetailsResponse) error {
+	return s.stream.Send(res)
+}
+
+// RunServiceWatchActionDetailsServerStream is the server stream for the RunService's
+// WatchActionDetails RPC.
+type RunServiceWatchActionDetailsServerStream struct {
+	stream connect.ServerStream
+}
+
+// SendHeaders flushes the response headers without a message. The first Send does this implicitly.
+func (s RunServiceWatchActionDetailsServerStream) SendHeaders() error {
+	return s.stream.SendHeaders()
+}
+
+// Send sends a response message to the client.
+func (s RunServiceWatchActionDetailsServerStream) Send(res *workflow.WatchActionDetailsResponse) error {
+	return s.stream.Send(res)
+}
+
+// RunServiceWatchRunsServerStream is the server stream for the RunService's WatchRuns RPC.
+type RunServiceWatchRunsServerStream struct {
+	stream connect.ServerStream
+}
+
+// SendHeaders flushes the response headers without a message. The first Send does this implicitly.
+func (s RunServiceWatchRunsServerStream) SendHeaders() error {
+	return s.stream.SendHeaders()
+}
+
+// Send sends a response message to the client.
+func (s RunServiceWatchRunsServerStream) Send(res *workflow.WatchRunsResponse) error {
+	return s.stream.Send(res)
+}
+
+// RunServiceWatchActionsServerStream is the server stream for the RunService's WatchActions RPC.
+type RunServiceWatchActionsServerStream struct {
+	stream connect.ServerStream
+}
+
+// SendHeaders flushes the response headers without a message. The first Send does this implicitly.
+func (s RunServiceWatchActionsServerStream) SendHeaders() error {
+	return s.stream.SendHeaders()
+}
+
+// Send sends a response message to the client.
+func (s RunServiceWatchActionsServerStream) Send(res *workflow.WatchActionsResponse) error {
+	return s.stream.Send(res)
+}
+
+// RunServiceWatchClusterEventsServerStream is the server stream for the RunService's
+// WatchClusterEvents RPC.
+type RunServiceWatchClusterEventsServerStream struct {
+	stream connect.ServerStream
+}
+
+// SendHeaders flushes the response headers without a message. The first Send does this implicitly.
+func (s RunServiceWatchClusterEventsServerStream) SendHeaders() error {
+	return s.stream.SendHeaders()
+}
+
+// Send sends a response message to the client.
+func (s RunServiceWatchClusterEventsServerStream) Send(res *workflow.WatchClusterEventsResponse) error {
+	return s.stream.Send(res)
+}
+
+// RunServiceWatchGroupsServerStream is the server stream for the RunService's WatchGroups RPC.
+type RunServiceWatchGroupsServerStream struct {
+	stream connect.ServerStream
+}
+
+// SendHeaders flushes the response headers without a message. The first Send does this implicitly.
+func (s RunServiceWatchGroupsServerStream) SendHeaders() error {
+	return s.stream.SendHeaders()
+}
+
+// Send sends a response message to the client.
+func (s RunServiceWatchGroupsServerStream) Send(res *workflow.WatchGroupsResponse) error {
+	return s.stream.Send(res)
 }
 
 // UnimplementedRunServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedRunServiceHandler struct{}
 
-func (UnimplementedRunServiceHandler) CreateRun(context.Context, *connect.Request[workflow.CreateRunRequest]) (*connect.Response[workflow.CreateRunResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.CreateRun is not implemented"))
+func (UnimplementedRunServiceHandler) CreateRun(context.Context, *workflow.CreateRunRequest) (*workflow.CreateRunResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.CreateRun is not implemented")
 }
 
-func (UnimplementedRunServiceHandler) AbortRun(context.Context, *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.AbortRun is not implemented"))
+func (UnimplementedRunServiceHandler) AbortRun(context.Context, *workflow.AbortRunRequest) (*workflow.AbortRunResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.AbortRun is not implemented")
 }
 
-func (UnimplementedRunServiceHandler) GetRunDetails(context.Context, *connect.Request[workflow.GetRunDetailsRequest]) (*connect.Response[workflow.GetRunDetailsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.GetRunDetails is not implemented"))
+func (UnimplementedRunServiceHandler) GetRunDetails(context.Context, *workflow.GetRunDetailsRequest) (*workflow.GetRunDetailsResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.GetRunDetails is not implemented")
 }
 
-func (UnimplementedRunServiceHandler) WatchRunDetails(context.Context, *connect.Request[workflow.WatchRunDetailsRequest], *connect.ServerStream[workflow.WatchRunDetailsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.WatchRunDetails is not implemented"))
+func (UnimplementedRunServiceHandler) WatchRunDetails(context.Context, *workflow.WatchRunDetailsRequest, RunServiceWatchRunDetailsServerStream) error {
+	return connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.WatchRunDetails is not implemented")
 }
 
-func (UnimplementedRunServiceHandler) GetActionDetails(context.Context, *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.GetActionDetails is not implemented"))
+func (UnimplementedRunServiceHandler) GetActionDetails(context.Context, *workflow.GetActionDetailsRequest) (*workflow.GetActionDetailsResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.GetActionDetails is not implemented")
 }
 
-func (UnimplementedRunServiceHandler) WatchActionDetails(context.Context, *connect.Request[workflow.WatchActionDetailsRequest], *connect.ServerStream[workflow.WatchActionDetailsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.WatchActionDetails is not implemented"))
+func (UnimplementedRunServiceHandler) WatchActionDetails(context.Context, *workflow.WatchActionDetailsRequest, RunServiceWatchActionDetailsServerStream) error {
+	return connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.WatchActionDetails is not implemented")
 }
 
-func (UnimplementedRunServiceHandler) GetActionData(context.Context, *connect.Request[workflow.GetActionDataRequest]) (*connect.Response[workflow.GetActionDataResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.GetActionData is not implemented"))
+func (UnimplementedRunServiceHandler) GetActionData(context.Context, *workflow.GetActionDataRequest) (*workflow.GetActionDataResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.GetActionData is not implemented")
 }
 
-func (UnimplementedRunServiceHandler) ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.ListRuns is not implemented"))
+func (UnimplementedRunServiceHandler) ListRuns(context.Context, *workflow.ListRunsRequest) (*workflow.ListRunsResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.ListRuns is not implemented")
 }
 
-func (UnimplementedRunServiceHandler) WatchRuns(context.Context, *connect.Request[workflow.WatchRunsRequest], *connect.ServerStream[workflow.WatchRunsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.WatchRuns is not implemented"))
+func (UnimplementedRunServiceHandler) WatchRuns(context.Context, *workflow.WatchRunsRequest, RunServiceWatchRunsServerStream) error {
+	return connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.WatchRuns is not implemented")
 }
 
-func (UnimplementedRunServiceHandler) ListActions(context.Context, *connect.Request[workflow.ListActionsRequest]) (*connect.Response[workflow.ListActionsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.ListActions is not implemented"))
+func (UnimplementedRunServiceHandler) ListActions(context.Context, *workflow.ListActionsRequest) (*workflow.ListActionsResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.ListActions is not implemented")
 }
 
-func (UnimplementedRunServiceHandler) WatchActions(context.Context, *connect.Request[workflow.WatchActionsRequest], *connect.ServerStream[workflow.WatchActionsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.WatchActions is not implemented"))
+func (UnimplementedRunServiceHandler) WatchActions(context.Context, *workflow.WatchActionsRequest, RunServiceWatchActionsServerStream) error {
+	return connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.WatchActions is not implemented")
 }
 
-func (UnimplementedRunServiceHandler) WatchClusterEvents(context.Context, *connect.Request[workflow.WatchClusterEventsRequest], *connect.ServerStream[workflow.WatchClusterEventsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.WatchClusterEvents is not implemented"))
+func (UnimplementedRunServiceHandler) WatchClusterEvents(context.Context, *workflow.WatchClusterEventsRequest, RunServiceWatchClusterEventsServerStream) error {
+	return connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.WatchClusterEvents is not implemented")
 }
 
-func (UnimplementedRunServiceHandler) AbortAction(context.Context, *connect.Request[workflow.AbortActionRequest]) (*connect.Response[workflow.AbortActionResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.AbortAction is not implemented"))
+func (UnimplementedRunServiceHandler) AbortAction(context.Context, *workflow.AbortActionRequest) (*workflow.AbortActionResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.AbortAction is not implemented")
 }
 
-func (UnimplementedRunServiceHandler) SignalEvent(context.Context, *connect.Request[workflow.SignalEventRequest]) (*connect.Response[workflow.SignalEventResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.SignalEvent is not implemented"))
+func (UnimplementedRunServiceHandler) SignalEvent(context.Context, *workflow.SignalEventRequest) (*workflow.SignalEventResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.SignalEvent is not implemented")
 }
 
-func (UnimplementedRunServiceHandler) WatchGroups(context.Context, *connect.Request[workflow.WatchGroupsRequest], *connect.ServerStream[workflow.WatchGroupsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.WatchGroups is not implemented"))
+func (UnimplementedRunServiceHandler) WatchGroups(context.Context, *workflow.WatchGroupsRequest, RunServiceWatchGroupsServerStream) error {
+	return connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.WatchGroups is not implemented")
 }
 
-func (UnimplementedRunServiceHandler) GetActionDataURIs(context.Context, *connect.Request[workflow.GetActionDataURIsRequest]) (*connect.Response[workflow.GetActionDataURIsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.GetActionDataURIs is not implemented"))
+func (UnimplementedRunServiceHandler) GetActionDataURIs(context.Context, *workflow.GetActionDataURIsRequest) (*workflow.GetActionDataURIsResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.GetActionDataURIs is not implemented")
 }
 
-func (UnimplementedRunServiceHandler) GetActionLogContext(context.Context, *connect.Request[workflow.GetActionLogContextRequest]) (*connect.Response[workflow.GetActionLogContextResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.RunService.GetActionLogContext is not implemented"))
+func (UnimplementedRunServiceHandler) GetActionLogContext(context.Context, *workflow.GetActionLogContextRequest) (*workflow.GetActionLogContextResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.RunService.GetActionLogContext is not implemented")
+}
+
+type runServiceClient struct {
+	client *connect.Client
+}
+
+func (c *runServiceClient) CreateRun(ctx context.Context, req *workflow.CreateRunRequest) (*workflow.CreateRunResponse, error) {
+	var res workflow.CreateRunResponse
+	if err := c.client.CallUnary(ctx, runServiceCreateRunSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *runServiceClient) AbortRun(ctx context.Context, req *workflow.AbortRunRequest) (*workflow.AbortRunResponse, error) {
+	var res workflow.AbortRunResponse
+	if err := c.client.CallUnary(ctx, runServiceAbortRunSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *runServiceClient) GetRunDetails(ctx context.Context, req *workflow.GetRunDetailsRequest) (*workflow.GetRunDetailsResponse, error) {
+	var res workflow.GetRunDetailsResponse
+	if err := c.client.CallUnary(ctx, runServiceGetRunDetailsSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *runServiceClient) WatchRunDetails(ctx context.Context, req *workflow.WatchRunDetailsRequest) (RunServiceWatchRunDetailsClientStream, error) {
+	stream, err := c.client.CallServerStream(ctx, runServiceWatchRunDetailsSpec(), req)
+	if err != nil {
+		return RunServiceWatchRunDetailsClientStream{}, err
+	}
+	return RunServiceWatchRunDetailsClientStream{stream: stream}, nil
+}
+
+func (c *runServiceClient) GetActionDetails(ctx context.Context, req *workflow.GetActionDetailsRequest) (*workflow.GetActionDetailsResponse, error) {
+	var res workflow.GetActionDetailsResponse
+	if err := c.client.CallUnary(ctx, runServiceGetActionDetailsSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *runServiceClient) WatchActionDetails(ctx context.Context, req *workflow.WatchActionDetailsRequest) (RunServiceWatchActionDetailsClientStream, error) {
+	stream, err := c.client.CallServerStream(ctx, runServiceWatchActionDetailsSpec(), req)
+	if err != nil {
+		return RunServiceWatchActionDetailsClientStream{}, err
+	}
+	return RunServiceWatchActionDetailsClientStream{stream: stream}, nil
+}
+
+func (c *runServiceClient) GetActionData(ctx context.Context, req *workflow.GetActionDataRequest) (*workflow.GetActionDataResponse, error) {
+	var res workflow.GetActionDataResponse
+	if err := c.client.CallUnary(ctx, runServiceGetActionDataSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *runServiceClient) ListRuns(ctx context.Context, req *workflow.ListRunsRequest) (*workflow.ListRunsResponse, error) {
+	var res workflow.ListRunsResponse
+	if err := c.client.CallUnary(ctx, runServiceListRunsSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *runServiceClient) WatchRuns(ctx context.Context, req *workflow.WatchRunsRequest) (RunServiceWatchRunsClientStream, error) {
+	stream, err := c.client.CallServerStream(ctx, runServiceWatchRunsSpec(), req)
+	if err != nil {
+		return RunServiceWatchRunsClientStream{}, err
+	}
+	return RunServiceWatchRunsClientStream{stream: stream}, nil
+}
+
+func (c *runServiceClient) ListActions(ctx context.Context, req *workflow.ListActionsRequest) (*workflow.ListActionsResponse, error) {
+	var res workflow.ListActionsResponse
+	if err := c.client.CallUnary(ctx, runServiceListActionsSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *runServiceClient) WatchActions(ctx context.Context, req *workflow.WatchActionsRequest) (RunServiceWatchActionsClientStream, error) {
+	stream, err := c.client.CallServerStream(ctx, runServiceWatchActionsSpec(), req)
+	if err != nil {
+		return RunServiceWatchActionsClientStream{}, err
+	}
+	return RunServiceWatchActionsClientStream{stream: stream}, nil
+}
+
+func (c *runServiceClient) WatchClusterEvents(ctx context.Context, req *workflow.WatchClusterEventsRequest) (RunServiceWatchClusterEventsClientStream, error) {
+	stream, err := c.client.CallServerStream(ctx, runServiceWatchClusterEventsSpec(), req)
+	if err != nil {
+		return RunServiceWatchClusterEventsClientStream{}, err
+	}
+	return RunServiceWatchClusterEventsClientStream{stream: stream}, nil
+}
+
+func (c *runServiceClient) AbortAction(ctx context.Context, req *workflow.AbortActionRequest) (*workflow.AbortActionResponse, error) {
+	var res workflow.AbortActionResponse
+	if err := c.client.CallUnary(ctx, runServiceAbortActionSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *runServiceClient) SignalEvent(ctx context.Context, req *workflow.SignalEventRequest) (*workflow.SignalEventResponse, error) {
+	var res workflow.SignalEventResponse
+	if err := c.client.CallUnary(ctx, runServiceSignalEventSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *runServiceClient) WatchGroups(ctx context.Context, req *workflow.WatchGroupsRequest) (RunServiceWatchGroupsClientStream, error) {
+	stream, err := c.client.CallServerStream(ctx, runServiceWatchGroupsSpec(), req)
+	if err != nil {
+		return RunServiceWatchGroupsClientStream{}, err
+	}
+	return RunServiceWatchGroupsClientStream{stream: stream}, nil
+}
+
+func (c *runServiceClient) GetActionDataURIs(ctx context.Context, req *workflow.GetActionDataURIsRequest) (*workflow.GetActionDataURIsResponse, error) {
+	var res workflow.GetActionDataURIsResponse
+	if err := c.client.CallUnary(ctx, runServiceGetActionDataURIsSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *runServiceClient) GetActionLogContext(ctx context.Context, req *workflow.GetActionLogContextRequest) (*workflow.GetActionLogContextResponse, error) {
+	var res workflow.GetActionLogContextResponse
+	if err := c.client.CallUnary(ctx, runServiceGetActionLogContextSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+type runServiceHandler struct{ svc RunServiceHandler }
+
+func (h runServiceHandler) createRun(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.CreateRunRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.CreateRun(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h runServiceHandler) abortRun(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.AbortRunRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.AbortRun(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h runServiceHandler) getRunDetails(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.GetRunDetailsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.GetRunDetails(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h runServiceHandler) watchRunDetails(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.WatchRunDetailsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	return h.svc.WatchRunDetails(ctx, &req, RunServiceWatchRunDetailsServerStream{stream: stream})
+}
+
+func (h runServiceHandler) getActionDetails(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.GetActionDetailsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.GetActionDetails(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h runServiceHandler) watchActionDetails(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.WatchActionDetailsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	return h.svc.WatchActionDetails(ctx, &req, RunServiceWatchActionDetailsServerStream{stream: stream})
+}
+
+func (h runServiceHandler) getActionData(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.GetActionDataRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.GetActionData(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h runServiceHandler) listRuns(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.ListRunsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.ListRuns(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h runServiceHandler) watchRuns(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.WatchRunsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	return h.svc.WatchRuns(ctx, &req, RunServiceWatchRunsServerStream{stream: stream})
+}
+
+func (h runServiceHandler) listActions(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.ListActionsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.ListActions(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h runServiceHandler) watchActions(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.WatchActionsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	return h.svc.WatchActions(ctx, &req, RunServiceWatchActionsServerStream{stream: stream})
+}
+
+func (h runServiceHandler) watchClusterEvents(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.WatchClusterEventsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	return h.svc.WatchClusterEvents(ctx, &req, RunServiceWatchClusterEventsServerStream{stream: stream})
+}
+
+func (h runServiceHandler) abortAction(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.AbortActionRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.AbortAction(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h runServiceHandler) signalEvent(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.SignalEventRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.SignalEvent(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h runServiceHandler) watchGroups(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.WatchGroupsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	return h.svc.WatchGroups(ctx, &req, RunServiceWatchGroupsServerStream{stream: stream})
+}
+
+func (h runServiceHandler) getActionDataURIs(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.GetActionDataURIsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.GetActionDataURIs(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h runServiceHandler) getActionLogContext(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.GetActionLogContextRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.GetActionLogContext(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
 }

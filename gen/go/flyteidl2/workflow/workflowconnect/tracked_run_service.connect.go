@@ -5,269 +5,263 @@
 package workflowconnect
 
 import (
-	connect "connectrpc.com/connect"
+	connect "connectrpc.com/connect/v2"
 	context "context"
-	errors "errors"
 	workflow "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
-	http "net/http"
-	strings "strings"
+	sync "sync"
 )
-
-// This is a compile-time assertion to ensure that this generated file and the connect package are
-// compatible. If you get a compiler error that this constant is not defined, this code was
-// generated with a version of connect newer than the one compiled into your binary. You can fix the
-// problem by either regenerating this code with an older version of connect or updating the connect
-// version compiled into your binary.
-const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// TrackedRunServiceName is the fully-qualified name of the TrackedRunService service.
 	TrackedRunServiceName = "flyteidl2.workflow.TrackedRunService"
 )
 
-// These constants are the fully-qualified names of the RPCs defined in this package. They're
-// exposed at runtime as Spec.Procedure and as the final two segments of the HTTP route.
+// These constants are the procedure names of the RPCs defined in this package. They're exposed at
+// runtime as Spec.Procedure and as the final two segments of the HTTP route.
 //
 // Note that these are different from the fully-qualified method names used by
 // google.golang.org/protobuf/reflect/protoreflect. To convert from these constants to
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// TrackedRunServiceCreateRunProcedure is the fully-qualified name of the TrackedRunService's
-	// CreateRun RPC.
+	// TrackedRunServiceCreateRunProcedure is the procedure name of the TrackedRunService's CreateRun
+	// RPC.
 	TrackedRunServiceCreateRunProcedure = "/flyteidl2.workflow.TrackedRunService/CreateRun"
-	// TrackedRunServiceReportActionsProcedure is the fully-qualified name of the TrackedRunService's
+	// TrackedRunServiceReportActionsProcedure is the procedure name of the TrackedRunService's
 	// ReportActions RPC.
 	TrackedRunServiceReportActionsProcedure = "/flyteidl2.workflow.TrackedRunService/ReportActions"
-	// TrackedRunServiceGetRunDetailsProcedure is the fully-qualified name of the TrackedRunService's
+	// TrackedRunServiceGetRunDetailsProcedure is the procedure name of the TrackedRunService's
 	// GetRunDetails RPC.
 	TrackedRunServiceGetRunDetailsProcedure = "/flyteidl2.workflow.TrackedRunService/GetRunDetails"
-	// TrackedRunServiceWatchRunDetailsProcedure is the fully-qualified name of the TrackedRunService's
+	// TrackedRunServiceWatchRunDetailsProcedure is the procedure name of the TrackedRunService's
 	// WatchRunDetails RPC.
 	TrackedRunServiceWatchRunDetailsProcedure = "/flyteidl2.workflow.TrackedRunService/WatchRunDetails"
-	// TrackedRunServiceGetActionDetailsProcedure is the fully-qualified name of the TrackedRunService's
+	// TrackedRunServiceGetActionDetailsProcedure is the procedure name of the TrackedRunService's
 	// GetActionDetails RPC.
 	TrackedRunServiceGetActionDetailsProcedure = "/flyteidl2.workflow.TrackedRunService/GetActionDetails"
-	// TrackedRunServiceWatchActionDetailsProcedure is the fully-qualified name of the
-	// TrackedRunService's WatchActionDetails RPC.
+	// TrackedRunServiceWatchActionDetailsProcedure is the procedure name of the TrackedRunService's
+	// WatchActionDetails RPC.
 	TrackedRunServiceWatchActionDetailsProcedure = "/flyteidl2.workflow.TrackedRunService/WatchActionDetails"
-	// TrackedRunServiceListRunsProcedure is the fully-qualified name of the TrackedRunService's
-	// ListRuns RPC.
+	// TrackedRunServiceListRunsProcedure is the procedure name of the TrackedRunService's ListRuns RPC.
 	TrackedRunServiceListRunsProcedure = "/flyteidl2.workflow.TrackedRunService/ListRuns"
-	// TrackedRunServiceWatchRunsProcedure is the fully-qualified name of the TrackedRunService's
-	// WatchRuns RPC.
+	// TrackedRunServiceWatchRunsProcedure is the procedure name of the TrackedRunService's WatchRuns
+	// RPC.
 	TrackedRunServiceWatchRunsProcedure = "/flyteidl2.workflow.TrackedRunService/WatchRuns"
-	// TrackedRunServiceListActionsProcedure is the fully-qualified name of the TrackedRunService's
+	// TrackedRunServiceListActionsProcedure is the procedure name of the TrackedRunService's
 	// ListActions RPC.
 	TrackedRunServiceListActionsProcedure = "/flyteidl2.workflow.TrackedRunService/ListActions"
-	// TrackedRunServiceWatchActionsProcedure is the fully-qualified name of the TrackedRunService's
+	// TrackedRunServiceWatchActionsProcedure is the procedure name of the TrackedRunService's
 	// WatchActions RPC.
 	TrackedRunServiceWatchActionsProcedure = "/flyteidl2.workflow.TrackedRunService/WatchActions"
-	// TrackedRunServiceAbortRunProcedure is the fully-qualified name of the TrackedRunService's
-	// AbortRun RPC.
+	// TrackedRunServiceAbortRunProcedure is the procedure name of the TrackedRunService's AbortRun RPC.
 	TrackedRunServiceAbortRunProcedure = "/flyteidl2.workflow.TrackedRunService/AbortRun"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	trackedRunServiceServiceDescriptor                  = workflow.File_flyteidl2_workflow_tracked_run_service_proto.Services().ByName("TrackedRunService")
-	trackedRunServiceCreateRunMethodDescriptor          = trackedRunServiceServiceDescriptor.Methods().ByName("CreateRun")
-	trackedRunServiceReportActionsMethodDescriptor      = trackedRunServiceServiceDescriptor.Methods().ByName("ReportActions")
-	trackedRunServiceGetRunDetailsMethodDescriptor      = trackedRunServiceServiceDescriptor.Methods().ByName("GetRunDetails")
-	trackedRunServiceWatchRunDetailsMethodDescriptor    = trackedRunServiceServiceDescriptor.Methods().ByName("WatchRunDetails")
-	trackedRunServiceGetActionDetailsMethodDescriptor   = trackedRunServiceServiceDescriptor.Methods().ByName("GetActionDetails")
-	trackedRunServiceWatchActionDetailsMethodDescriptor = trackedRunServiceServiceDescriptor.Methods().ByName("WatchActionDetails")
-	trackedRunServiceListRunsMethodDescriptor           = trackedRunServiceServiceDescriptor.Methods().ByName("ListRuns")
-	trackedRunServiceWatchRunsMethodDescriptor          = trackedRunServiceServiceDescriptor.Methods().ByName("WatchRuns")
-	trackedRunServiceListActionsMethodDescriptor        = trackedRunServiceServiceDescriptor.Methods().ByName("ListActions")
-	trackedRunServiceWatchActionsMethodDescriptor       = trackedRunServiceServiceDescriptor.Methods().ByName("WatchActions")
-	trackedRunServiceAbortRunMethodDescriptor           = trackedRunServiceServiceDescriptor.Methods().ByName("AbortRun")
+	trackedRunServiceCreateRunSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     workflow.File_flyteidl2_workflow_tracked_run_service_proto.Services().ByName("TrackedRunService").Methods().ByName("CreateRun"),
+			Procedure:  TrackedRunServiceCreateRunProcedure,
+		}
+	})
+	trackedRunServiceReportActionsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     workflow.File_flyteidl2_workflow_tracked_run_service_proto.Services().ByName("TrackedRunService").Methods().ByName("ReportActions"),
+			Procedure:  TrackedRunServiceReportActionsProcedure,
+		}
+	})
+	trackedRunServiceGetRunDetailsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           workflow.File_flyteidl2_workflow_tracked_run_service_proto.Services().ByName("TrackedRunService").Methods().ByName("GetRunDetails"),
+			Procedure:        TrackedRunServiceGetRunDetailsProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	trackedRunServiceWatchRunDetailsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeServer,
+			Schema:     workflow.File_flyteidl2_workflow_tracked_run_service_proto.Services().ByName("TrackedRunService").Methods().ByName("WatchRunDetails"),
+			Procedure:  TrackedRunServiceWatchRunDetailsProcedure,
+		}
+	})
+	trackedRunServiceGetActionDetailsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           workflow.File_flyteidl2_workflow_tracked_run_service_proto.Services().ByName("TrackedRunService").Methods().ByName("GetActionDetails"),
+			Procedure:        TrackedRunServiceGetActionDetailsProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	trackedRunServiceWatchActionDetailsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeServer,
+			Schema:     workflow.File_flyteidl2_workflow_tracked_run_service_proto.Services().ByName("TrackedRunService").Methods().ByName("WatchActionDetails"),
+			Procedure:  TrackedRunServiceWatchActionDetailsProcedure,
+		}
+	})
+	trackedRunServiceListRunsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           workflow.File_flyteidl2_workflow_tracked_run_service_proto.Services().ByName("TrackedRunService").Methods().ByName("ListRuns"),
+			Procedure:        TrackedRunServiceListRunsProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	trackedRunServiceWatchRunsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeServer,
+			Schema:     workflow.File_flyteidl2_workflow_tracked_run_service_proto.Services().ByName("TrackedRunService").Methods().ByName("WatchRuns"),
+			Procedure:  TrackedRunServiceWatchRunsProcedure,
+		}
+	})
+	trackedRunServiceListActionsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           workflow.File_flyteidl2_workflow_tracked_run_service_proto.Services().ByName("TrackedRunService").Methods().ByName("ListActions"),
+			Procedure:        TrackedRunServiceListActionsProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	trackedRunServiceWatchActionsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeServer,
+			Schema:     workflow.File_flyteidl2_workflow_tracked_run_service_proto.Services().ByName("TrackedRunService").Methods().ByName("WatchActions"),
+			Procedure:  TrackedRunServiceWatchActionsProcedure,
+		}
+	})
+	trackedRunServiceAbortRunSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     workflow.File_flyteidl2_workflow_tracked_run_service_proto.Services().ByName("TrackedRunService").Methods().ByName("AbortRun"),
+			Procedure:  TrackedRunServiceAbortRunProcedure,
+		}
+	})
 )
 
 // TrackedRunServiceClient is a client for the flyteidl2.workflow.TrackedRunService service.
 type TrackedRunServiceClient interface {
 	// Register a new tracked run. The server creates the root action ("a0") in the reported state and
 	// returns the resolved run. If a run name is not provided, the server generates one.
-	CreateRun(context.Context, *connect.Request[workflow.CreateTrackedRunRequest]) (*connect.Response[workflow.CreateRunResponse], error)
+	CreateRun(context.Context, *workflow.CreateTrackedRunRequest) (*workflow.CreateRunResponse, error)
 	// Report state for one or more actions of a tracked run. Creates actions on first report and
 	// updates them on subsequent reports. Reports are idempotent: an event with an
 	// (attempt, version, phase) tuple that was already recorded is acknowledged as success.
-	ReportActions(context.Context, *connect.Request[workflow.ReportTrackedActionsRequest]) (*connect.Response[workflow.ReportTrackedActionsResponse], error)
+	ReportActions(context.Context, *workflow.ReportTrackedActionsRequest) (*workflow.ReportTrackedActionsResponse, error)
 	// Get detailed information about a tracked run.
-	GetRunDetails(context.Context, *connect.Request[workflow.GetRunDetailsRequest]) (*connect.Response[workflow.GetRunDetailsResponse], error)
+	GetRunDetails(context.Context, *workflow.GetRunDetailsRequest) (*workflow.GetRunDetailsResponse, error)
 	// Stream detailed information updates about a tracked run. The call will terminate when the run
 	// reaches a terminal phase.
-	WatchRunDetails(context.Context, *connect.Request[workflow.WatchRunDetailsRequest]) (*connect.ServerStreamForClient[workflow.WatchRunDetailsResponse], error)
+	WatchRunDetails(context.Context, *workflow.WatchRunDetailsRequest) (TrackedRunServiceWatchRunDetailsClientStream, error)
 	// Get detailed information about an action of a tracked run.
-	GetActionDetails(context.Context, *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error)
+	GetActionDetails(context.Context, *workflow.GetActionDetailsRequest) (*workflow.GetActionDetailsResponse, error)
 	// Stream detailed information updates about an action of a tracked run. The call will terminate
 	// when the action reaches a terminal phase.
-	WatchActionDetails(context.Context, *connect.Request[workflow.WatchActionDetailsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionDetailsResponse], error)
+	WatchActionDetails(context.Context, *workflow.WatchActionDetailsRequest) (TrackedRunServiceWatchActionDetailsClientStream, error)
 	// List tracked runs based on the provided filter criteria.
-	ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error)
+	ListRuns(context.Context, *workflow.ListRunsRequest) (*workflow.ListRunsResponse, error)
 	// Stream updates for tracked runs based on the provided filter criteria.
-	WatchRuns(context.Context, *connect.Request[workflow.WatchRunsRequest]) (*connect.ServerStreamForClient[workflow.WatchRunsResponse], error)
+	WatchRuns(context.Context, *workflow.WatchRunsRequest) (TrackedRunServiceWatchRunsClientStream, error)
 	// List all actions for a given tracked run.
-	ListActions(context.Context, *connect.Request[workflow.ListActionsRequest]) (*connect.Response[workflow.ListActionsResponse], error)
+	ListActions(context.Context, *workflow.ListActionsRequest) (*workflow.ListActionsResponse, error)
 	// Stream updates for actions of a given tracked run.
-	WatchActions(context.Context, *connect.Request[workflow.WatchActionsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionsResponse], error)
+	WatchActions(context.Context, *workflow.WatchActionsRequest) (TrackedRunServiceWatchActionsClientStream, error)
 	// Abort a tracked run: mark the run and all of its non-terminal actions ABORTED on the server.
 	// The platform cannot stop the client that owns the run; subsequent reports against aborted actions
 	// are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
-	AbortRun(context.Context, *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error)
+	AbortRun(context.Context, *workflow.AbortRunRequest) (*workflow.AbortRunResponse, error)
 }
 
 // NewTrackedRunServiceClient constructs a client for the flyteidl2.workflow.TrackedRunService
-// service. By default, it uses the Connect protocol with the binary Protobuf Codec, asks for
-// gzipped responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply
-// the connect.WithGRPC() or connect.WithGRPCWeb() options.
-//
-// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
-// http://api.acme.com or https://acme.com/grpc).
-func NewTrackedRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) TrackedRunServiceClient {
-	baseURL = strings.TrimRight(baseURL, "/")
-	return &trackedRunServiceClient{
-		createRun: connect.NewClient[workflow.CreateTrackedRunRequest, workflow.CreateRunResponse](
-			httpClient,
-			baseURL+TrackedRunServiceCreateRunProcedure,
-			connect.WithSchema(trackedRunServiceCreateRunMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		reportActions: connect.NewClient[workflow.ReportTrackedActionsRequest, workflow.ReportTrackedActionsResponse](
-			httpClient,
-			baseURL+TrackedRunServiceReportActionsProcedure,
-			connect.WithSchema(trackedRunServiceReportActionsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		getRunDetails: connect.NewClient[workflow.GetRunDetailsRequest, workflow.GetRunDetailsResponse](
-			httpClient,
-			baseURL+TrackedRunServiceGetRunDetailsProcedure,
-			connect.WithSchema(trackedRunServiceGetRunDetailsMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		watchRunDetails: connect.NewClient[workflow.WatchRunDetailsRequest, workflow.WatchRunDetailsResponse](
-			httpClient,
-			baseURL+TrackedRunServiceWatchRunDetailsProcedure,
-			connect.WithSchema(trackedRunServiceWatchRunDetailsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		getActionDetails: connect.NewClient[workflow.GetActionDetailsRequest, workflow.GetActionDetailsResponse](
-			httpClient,
-			baseURL+TrackedRunServiceGetActionDetailsProcedure,
-			connect.WithSchema(trackedRunServiceGetActionDetailsMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		watchActionDetails: connect.NewClient[workflow.WatchActionDetailsRequest, workflow.WatchActionDetailsResponse](
-			httpClient,
-			baseURL+TrackedRunServiceWatchActionDetailsProcedure,
-			connect.WithSchema(trackedRunServiceWatchActionDetailsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		listRuns: connect.NewClient[workflow.ListRunsRequest, workflow.ListRunsResponse](
-			httpClient,
-			baseURL+TrackedRunServiceListRunsProcedure,
-			connect.WithSchema(trackedRunServiceListRunsMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		watchRuns: connect.NewClient[workflow.WatchRunsRequest, workflow.WatchRunsResponse](
-			httpClient,
-			baseURL+TrackedRunServiceWatchRunsProcedure,
-			connect.WithSchema(trackedRunServiceWatchRunsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		listActions: connect.NewClient[workflow.ListActionsRequest, workflow.ListActionsResponse](
-			httpClient,
-			baseURL+TrackedRunServiceListActionsProcedure,
-			connect.WithSchema(trackedRunServiceListActionsMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		watchActions: connect.NewClient[workflow.WatchActionsRequest, workflow.WatchActionsResponse](
-			httpClient,
-			baseURL+TrackedRunServiceWatchActionsProcedure,
-			connect.WithSchema(trackedRunServiceWatchActionsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		abortRun: connect.NewClient[workflow.AbortRunRequest, workflow.AbortRunResponse](
-			httpClient,
-			baseURL+TrackedRunServiceAbortRunProcedure,
-			connect.WithSchema(trackedRunServiceAbortRunMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
+// service. Multiple service clients may share a single connect.Client.
+func NewTrackedRunServiceClient(client *connect.Client) TrackedRunServiceClient {
+	return &trackedRunServiceClient{client: client}
+}
+
+// TrackedRunServiceWatchRunDetailsClientStream is the client stream for the TrackedRunService's
+// WatchRunDetails RPC.
+type TrackedRunServiceWatchRunDetailsClientStream struct {
+	stream connect.ClientStream
+}
+
+// Receive returns the next response message from the server.
+func (s TrackedRunServiceWatchRunDetailsClientStream) Receive() (*workflow.WatchRunDetailsResponse, error) {
+	var res workflow.WatchRunDetailsResponse
+	if err := s.stream.Receive(&res); err != nil {
+		return nil, err
 	}
+	return &res, nil
 }
 
-// trackedRunServiceClient implements TrackedRunServiceClient.
-type trackedRunServiceClient struct {
-	createRun          *connect.Client[workflow.CreateTrackedRunRequest, workflow.CreateRunResponse]
-	reportActions      *connect.Client[workflow.ReportTrackedActionsRequest, workflow.ReportTrackedActionsResponse]
-	getRunDetails      *connect.Client[workflow.GetRunDetailsRequest, workflow.GetRunDetailsResponse]
-	watchRunDetails    *connect.Client[workflow.WatchRunDetailsRequest, workflow.WatchRunDetailsResponse]
-	getActionDetails   *connect.Client[workflow.GetActionDetailsRequest, workflow.GetActionDetailsResponse]
-	watchActionDetails *connect.Client[workflow.WatchActionDetailsRequest, workflow.WatchActionDetailsResponse]
-	listRuns           *connect.Client[workflow.ListRunsRequest, workflow.ListRunsResponse]
-	watchRuns          *connect.Client[workflow.WatchRunsRequest, workflow.WatchRunsResponse]
-	listActions        *connect.Client[workflow.ListActionsRequest, workflow.ListActionsResponse]
-	watchActions       *connect.Client[workflow.WatchActionsRequest, workflow.WatchActionsResponse]
-	abortRun           *connect.Client[workflow.AbortRunRequest, workflow.AbortRunResponse]
+// Close releases the stream's resources. It is idempotent and is typically deferred to clean up a
+// stream abandoned before io.EOF.
+func (s TrackedRunServiceWatchRunDetailsClientStream) Close() error {
+	return s.stream.Close()
 }
 
-// CreateRun calls flyteidl2.workflow.TrackedRunService.CreateRun.
-func (c *trackedRunServiceClient) CreateRun(ctx context.Context, req *connect.Request[workflow.CreateTrackedRunRequest]) (*connect.Response[workflow.CreateRunResponse], error) {
-	return c.createRun.CallUnary(ctx, req)
+// TrackedRunServiceWatchActionDetailsClientStream is the client stream for the TrackedRunService's
+// WatchActionDetails RPC.
+type TrackedRunServiceWatchActionDetailsClientStream struct {
+	stream connect.ClientStream
 }
 
-// ReportActions calls flyteidl2.workflow.TrackedRunService.ReportActions.
-func (c *trackedRunServiceClient) ReportActions(ctx context.Context, req *connect.Request[workflow.ReportTrackedActionsRequest]) (*connect.Response[workflow.ReportTrackedActionsResponse], error) {
-	return c.reportActions.CallUnary(ctx, req)
+// Receive returns the next response message from the server.
+func (s TrackedRunServiceWatchActionDetailsClientStream) Receive() (*workflow.WatchActionDetailsResponse, error) {
+	var res workflow.WatchActionDetailsResponse
+	if err := s.stream.Receive(&res); err != nil {
+		return nil, err
+	}
+	return &res, nil
 }
 
-// GetRunDetails calls flyteidl2.workflow.TrackedRunService.GetRunDetails.
-func (c *trackedRunServiceClient) GetRunDetails(ctx context.Context, req *connect.Request[workflow.GetRunDetailsRequest]) (*connect.Response[workflow.GetRunDetailsResponse], error) {
-	return c.getRunDetails.CallUnary(ctx, req)
+// Close releases the stream's resources. It is idempotent and is typically deferred to clean up a
+// stream abandoned before io.EOF.
+func (s TrackedRunServiceWatchActionDetailsClientStream) Close() error {
+	return s.stream.Close()
 }
 
-// WatchRunDetails calls flyteidl2.workflow.TrackedRunService.WatchRunDetails.
-func (c *trackedRunServiceClient) WatchRunDetails(ctx context.Context, req *connect.Request[workflow.WatchRunDetailsRequest]) (*connect.ServerStreamForClient[workflow.WatchRunDetailsResponse], error) {
-	return c.watchRunDetails.CallServerStream(ctx, req)
+// TrackedRunServiceWatchRunsClientStream is the client stream for the TrackedRunService's WatchRuns
+// RPC.
+type TrackedRunServiceWatchRunsClientStream struct {
+	stream connect.ClientStream
 }
 
-// GetActionDetails calls flyteidl2.workflow.TrackedRunService.GetActionDetails.
-func (c *trackedRunServiceClient) GetActionDetails(ctx context.Context, req *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error) {
-	return c.getActionDetails.CallUnary(ctx, req)
+// Receive returns the next response message from the server.
+func (s TrackedRunServiceWatchRunsClientStream) Receive() (*workflow.WatchRunsResponse, error) {
+	var res workflow.WatchRunsResponse
+	if err := s.stream.Receive(&res); err != nil {
+		return nil, err
+	}
+	return &res, nil
 }
 
-// WatchActionDetails calls flyteidl2.workflow.TrackedRunService.WatchActionDetails.
-func (c *trackedRunServiceClient) WatchActionDetails(ctx context.Context, req *connect.Request[workflow.WatchActionDetailsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionDetailsResponse], error) {
-	return c.watchActionDetails.CallServerStream(ctx, req)
+// Close releases the stream's resources. It is idempotent and is typically deferred to clean up a
+// stream abandoned before io.EOF.
+func (s TrackedRunServiceWatchRunsClientStream) Close() error {
+	return s.stream.Close()
 }
 
-// ListRuns calls flyteidl2.workflow.TrackedRunService.ListRuns.
-func (c *trackedRunServiceClient) ListRuns(ctx context.Context, req *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error) {
-	return c.listRuns.CallUnary(ctx, req)
+// TrackedRunServiceWatchActionsClientStream is the client stream for the TrackedRunService's
+// WatchActions RPC.
+type TrackedRunServiceWatchActionsClientStream struct {
+	stream connect.ClientStream
 }
 
-// WatchRuns calls flyteidl2.workflow.TrackedRunService.WatchRuns.
-func (c *trackedRunServiceClient) WatchRuns(ctx context.Context, req *connect.Request[workflow.WatchRunsRequest]) (*connect.ServerStreamForClient[workflow.WatchRunsResponse], error) {
-	return c.watchRuns.CallServerStream(ctx, req)
+// Receive returns the next response message from the server.
+func (s TrackedRunServiceWatchActionsClientStream) Receive() (*workflow.WatchActionsResponse, error) {
+	var res workflow.WatchActionsResponse
+	if err := s.stream.Receive(&res); err != nil {
+		return nil, err
+	}
+	return &res, nil
 }
 
-// ListActions calls flyteidl2.workflow.TrackedRunService.ListActions.
-func (c *trackedRunServiceClient) ListActions(ctx context.Context, req *connect.Request[workflow.ListActionsRequest]) (*connect.Response[workflow.ListActionsResponse], error) {
-	return c.listActions.CallUnary(ctx, req)
-}
-
-// WatchActions calls flyteidl2.workflow.TrackedRunService.WatchActions.
-func (c *trackedRunServiceClient) WatchActions(ctx context.Context, req *connect.Request[workflow.WatchActionsRequest]) (*connect.ServerStreamForClient[workflow.WatchActionsResponse], error) {
-	return c.watchActions.CallServerStream(ctx, req)
-}
-
-// AbortRun calls flyteidl2.workflow.TrackedRunService.AbortRun.
-func (c *trackedRunServiceClient) AbortRun(ctx context.Context, req *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error) {
-	return c.abortRun.CallUnary(ctx, req)
+// Close releases the stream's resources. It is idempotent and is typically deferred to clean up a
+// stream abandoned before io.EOF.
+func (s TrackedRunServiceWatchActionsClientStream) Close() error {
+	return s.stream.Close()
 }
 
 // TrackedRunServiceHandler is an implementation of the flyteidl2.workflow.TrackedRunService
@@ -275,184 +269,371 @@ func (c *trackedRunServiceClient) AbortRun(ctx context.Context, req *connect.Req
 type TrackedRunServiceHandler interface {
 	// Register a new tracked run. The server creates the root action ("a0") in the reported state and
 	// returns the resolved run. If a run name is not provided, the server generates one.
-	CreateRun(context.Context, *connect.Request[workflow.CreateTrackedRunRequest]) (*connect.Response[workflow.CreateRunResponse], error)
+	CreateRun(context.Context, *workflow.CreateTrackedRunRequest) (*workflow.CreateRunResponse, error)
 	// Report state for one or more actions of a tracked run. Creates actions on first report and
 	// updates them on subsequent reports. Reports are idempotent: an event with an
 	// (attempt, version, phase) tuple that was already recorded is acknowledged as success.
-	ReportActions(context.Context, *connect.Request[workflow.ReportTrackedActionsRequest]) (*connect.Response[workflow.ReportTrackedActionsResponse], error)
+	ReportActions(context.Context, *workflow.ReportTrackedActionsRequest) (*workflow.ReportTrackedActionsResponse, error)
 	// Get detailed information about a tracked run.
-	GetRunDetails(context.Context, *connect.Request[workflow.GetRunDetailsRequest]) (*connect.Response[workflow.GetRunDetailsResponse], error)
+	GetRunDetails(context.Context, *workflow.GetRunDetailsRequest) (*workflow.GetRunDetailsResponse, error)
 	// Stream detailed information updates about a tracked run. The call will terminate when the run
 	// reaches a terminal phase.
-	WatchRunDetails(context.Context, *connect.Request[workflow.WatchRunDetailsRequest], *connect.ServerStream[workflow.WatchRunDetailsResponse]) error
+	WatchRunDetails(context.Context, *workflow.WatchRunDetailsRequest, TrackedRunServiceWatchRunDetailsServerStream) error
 	// Get detailed information about an action of a tracked run.
-	GetActionDetails(context.Context, *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error)
+	GetActionDetails(context.Context, *workflow.GetActionDetailsRequest) (*workflow.GetActionDetailsResponse, error)
 	// Stream detailed information updates about an action of a tracked run. The call will terminate
 	// when the action reaches a terminal phase.
-	WatchActionDetails(context.Context, *connect.Request[workflow.WatchActionDetailsRequest], *connect.ServerStream[workflow.WatchActionDetailsResponse]) error
+	WatchActionDetails(context.Context, *workflow.WatchActionDetailsRequest, TrackedRunServiceWatchActionDetailsServerStream) error
 	// List tracked runs based on the provided filter criteria.
-	ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error)
+	ListRuns(context.Context, *workflow.ListRunsRequest) (*workflow.ListRunsResponse, error)
 	// Stream updates for tracked runs based on the provided filter criteria.
-	WatchRuns(context.Context, *connect.Request[workflow.WatchRunsRequest], *connect.ServerStream[workflow.WatchRunsResponse]) error
+	WatchRuns(context.Context, *workflow.WatchRunsRequest, TrackedRunServiceWatchRunsServerStream) error
 	// List all actions for a given tracked run.
-	ListActions(context.Context, *connect.Request[workflow.ListActionsRequest]) (*connect.Response[workflow.ListActionsResponse], error)
+	ListActions(context.Context, *workflow.ListActionsRequest) (*workflow.ListActionsResponse, error)
 	// Stream updates for actions of a given tracked run.
-	WatchActions(context.Context, *connect.Request[workflow.WatchActionsRequest], *connect.ServerStream[workflow.WatchActionsResponse]) error
+	WatchActions(context.Context, *workflow.WatchActionsRequest, TrackedRunServiceWatchActionsServerStream) error
 	// Abort a tracked run: mark the run and all of its non-terminal actions ABORTED on the server.
 	// The platform cannot stop the client that owns the run; subsequent reports against aborted actions
 	// are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
-	AbortRun(context.Context, *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error)
+	AbortRun(context.Context, *workflow.AbortRunRequest) (*workflow.AbortRunResponse, error)
 }
 
-// NewTrackedRunServiceHandler builds an HTTP handler from the service implementation. It returns
-// the path on which to mount the handler and the handler itself.
-//
-// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
-// and JSON codecs. They also support gzip compression.
-func NewTrackedRunServiceHandler(svc TrackedRunServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	trackedRunServiceCreateRunHandler := connect.NewUnaryHandler(
-		TrackedRunServiceCreateRunProcedure,
-		svc.CreateRun,
-		connect.WithSchema(trackedRunServiceCreateRunMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
+// RegisterTrackedRunServiceHandler registers svc as the flyteidl2.workflow.TrackedRunService
+// implementation on server.
+func RegisterTrackedRunServiceHandler(server *connect.Server, svc TrackedRunServiceHandler) {
+	adapter := trackedRunServiceHandler{svc: svc}
+	server.Register(
+		connect.Method{Spec: trackedRunServiceCreateRunSpec(), Handler: adapter.createRun},
+		connect.Method{Spec: trackedRunServiceReportActionsSpec(), Handler: adapter.reportActions},
+		connect.Method{Spec: trackedRunServiceGetRunDetailsSpec(), Handler: adapter.getRunDetails},
+		connect.Method{Spec: trackedRunServiceWatchRunDetailsSpec(), Handler: adapter.watchRunDetails},
+		connect.Method{Spec: trackedRunServiceGetActionDetailsSpec(), Handler: adapter.getActionDetails},
+		connect.Method{Spec: trackedRunServiceWatchActionDetailsSpec(), Handler: adapter.watchActionDetails},
+		connect.Method{Spec: trackedRunServiceListRunsSpec(), Handler: adapter.listRuns},
+		connect.Method{Spec: trackedRunServiceWatchRunsSpec(), Handler: adapter.watchRuns},
+		connect.Method{Spec: trackedRunServiceListActionsSpec(), Handler: adapter.listActions},
+		connect.Method{Spec: trackedRunServiceWatchActionsSpec(), Handler: adapter.watchActions},
+		connect.Method{Spec: trackedRunServiceAbortRunSpec(), Handler: adapter.abortRun},
 	)
-	trackedRunServiceReportActionsHandler := connect.NewUnaryHandler(
-		TrackedRunServiceReportActionsProcedure,
-		svc.ReportActions,
-		connect.WithSchema(trackedRunServiceReportActionsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	trackedRunServiceGetRunDetailsHandler := connect.NewUnaryHandler(
-		TrackedRunServiceGetRunDetailsProcedure,
-		svc.GetRunDetails,
-		connect.WithSchema(trackedRunServiceGetRunDetailsMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	trackedRunServiceWatchRunDetailsHandler := connect.NewServerStreamHandler(
-		TrackedRunServiceWatchRunDetailsProcedure,
-		svc.WatchRunDetails,
-		connect.WithSchema(trackedRunServiceWatchRunDetailsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	trackedRunServiceGetActionDetailsHandler := connect.NewUnaryHandler(
-		TrackedRunServiceGetActionDetailsProcedure,
-		svc.GetActionDetails,
-		connect.WithSchema(trackedRunServiceGetActionDetailsMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	trackedRunServiceWatchActionDetailsHandler := connect.NewServerStreamHandler(
-		TrackedRunServiceWatchActionDetailsProcedure,
-		svc.WatchActionDetails,
-		connect.WithSchema(trackedRunServiceWatchActionDetailsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	trackedRunServiceListRunsHandler := connect.NewUnaryHandler(
-		TrackedRunServiceListRunsProcedure,
-		svc.ListRuns,
-		connect.WithSchema(trackedRunServiceListRunsMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	trackedRunServiceWatchRunsHandler := connect.NewServerStreamHandler(
-		TrackedRunServiceWatchRunsProcedure,
-		svc.WatchRuns,
-		connect.WithSchema(trackedRunServiceWatchRunsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	trackedRunServiceListActionsHandler := connect.NewUnaryHandler(
-		TrackedRunServiceListActionsProcedure,
-		svc.ListActions,
-		connect.WithSchema(trackedRunServiceListActionsMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	trackedRunServiceWatchActionsHandler := connect.NewServerStreamHandler(
-		TrackedRunServiceWatchActionsProcedure,
-		svc.WatchActions,
-		connect.WithSchema(trackedRunServiceWatchActionsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	trackedRunServiceAbortRunHandler := connect.NewUnaryHandler(
-		TrackedRunServiceAbortRunProcedure,
-		svc.AbortRun,
-		connect.WithSchema(trackedRunServiceAbortRunMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	return "/flyteidl2.workflow.TrackedRunService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case TrackedRunServiceCreateRunProcedure:
-			trackedRunServiceCreateRunHandler.ServeHTTP(w, r)
-		case TrackedRunServiceReportActionsProcedure:
-			trackedRunServiceReportActionsHandler.ServeHTTP(w, r)
-		case TrackedRunServiceGetRunDetailsProcedure:
-			trackedRunServiceGetRunDetailsHandler.ServeHTTP(w, r)
-		case TrackedRunServiceWatchRunDetailsProcedure:
-			trackedRunServiceWatchRunDetailsHandler.ServeHTTP(w, r)
-		case TrackedRunServiceGetActionDetailsProcedure:
-			trackedRunServiceGetActionDetailsHandler.ServeHTTP(w, r)
-		case TrackedRunServiceWatchActionDetailsProcedure:
-			trackedRunServiceWatchActionDetailsHandler.ServeHTTP(w, r)
-		case TrackedRunServiceListRunsProcedure:
-			trackedRunServiceListRunsHandler.ServeHTTP(w, r)
-		case TrackedRunServiceWatchRunsProcedure:
-			trackedRunServiceWatchRunsHandler.ServeHTTP(w, r)
-		case TrackedRunServiceListActionsProcedure:
-			trackedRunServiceListActionsHandler.ServeHTTP(w, r)
-		case TrackedRunServiceWatchActionsProcedure:
-			trackedRunServiceWatchActionsHandler.ServeHTTP(w, r)
-		case TrackedRunServiceAbortRunProcedure:
-			trackedRunServiceAbortRunHandler.ServeHTTP(w, r)
-		default:
-			http.NotFound(w, r)
-		}
-	})
+}
+
+// TrackedRunServiceWatchRunDetailsServerStream is the server stream for the TrackedRunService's
+// WatchRunDetails RPC.
+type TrackedRunServiceWatchRunDetailsServerStream struct {
+	stream connect.ServerStream
+}
+
+// SendHeaders flushes the response headers without a message. The first Send does this implicitly.
+func (s TrackedRunServiceWatchRunDetailsServerStream) SendHeaders() error {
+	return s.stream.SendHeaders()
+}
+
+// Send sends a response message to the client.
+func (s TrackedRunServiceWatchRunDetailsServerStream) Send(res *workflow.WatchRunDetailsResponse) error {
+	return s.stream.Send(res)
+}
+
+// TrackedRunServiceWatchActionDetailsServerStream is the server stream for the TrackedRunService's
+// WatchActionDetails RPC.
+type TrackedRunServiceWatchActionDetailsServerStream struct {
+	stream connect.ServerStream
+}
+
+// SendHeaders flushes the response headers without a message. The first Send does this implicitly.
+func (s TrackedRunServiceWatchActionDetailsServerStream) SendHeaders() error {
+	return s.stream.SendHeaders()
+}
+
+// Send sends a response message to the client.
+func (s TrackedRunServiceWatchActionDetailsServerStream) Send(res *workflow.WatchActionDetailsResponse) error {
+	return s.stream.Send(res)
+}
+
+// TrackedRunServiceWatchRunsServerStream is the server stream for the TrackedRunService's WatchRuns
+// RPC.
+type TrackedRunServiceWatchRunsServerStream struct {
+	stream connect.ServerStream
+}
+
+// SendHeaders flushes the response headers without a message. The first Send does this implicitly.
+func (s TrackedRunServiceWatchRunsServerStream) SendHeaders() error {
+	return s.stream.SendHeaders()
+}
+
+// Send sends a response message to the client.
+func (s TrackedRunServiceWatchRunsServerStream) Send(res *workflow.WatchRunsResponse) error {
+	return s.stream.Send(res)
+}
+
+// TrackedRunServiceWatchActionsServerStream is the server stream for the TrackedRunService's
+// WatchActions RPC.
+type TrackedRunServiceWatchActionsServerStream struct {
+	stream connect.ServerStream
+}
+
+// SendHeaders flushes the response headers without a message. The first Send does this implicitly.
+func (s TrackedRunServiceWatchActionsServerStream) SendHeaders() error {
+	return s.stream.SendHeaders()
+}
+
+// Send sends a response message to the client.
+func (s TrackedRunServiceWatchActionsServerStream) Send(res *workflow.WatchActionsResponse) error {
+	return s.stream.Send(res)
 }
 
 // UnimplementedTrackedRunServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedTrackedRunServiceHandler struct{}
 
-func (UnimplementedTrackedRunServiceHandler) CreateRun(context.Context, *connect.Request[workflow.CreateTrackedRunRequest]) (*connect.Response[workflow.CreateRunResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TrackedRunService.CreateRun is not implemented"))
+func (UnimplementedTrackedRunServiceHandler) CreateRun(context.Context, *workflow.CreateTrackedRunRequest) (*workflow.CreateRunResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.TrackedRunService.CreateRun is not implemented")
 }
 
-func (UnimplementedTrackedRunServiceHandler) ReportActions(context.Context, *connect.Request[workflow.ReportTrackedActionsRequest]) (*connect.Response[workflow.ReportTrackedActionsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TrackedRunService.ReportActions is not implemented"))
+func (UnimplementedTrackedRunServiceHandler) ReportActions(context.Context, *workflow.ReportTrackedActionsRequest) (*workflow.ReportTrackedActionsResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.TrackedRunService.ReportActions is not implemented")
 }
 
-func (UnimplementedTrackedRunServiceHandler) GetRunDetails(context.Context, *connect.Request[workflow.GetRunDetailsRequest]) (*connect.Response[workflow.GetRunDetailsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TrackedRunService.GetRunDetails is not implemented"))
+func (UnimplementedTrackedRunServiceHandler) GetRunDetails(context.Context, *workflow.GetRunDetailsRequest) (*workflow.GetRunDetailsResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.TrackedRunService.GetRunDetails is not implemented")
 }
 
-func (UnimplementedTrackedRunServiceHandler) WatchRunDetails(context.Context, *connect.Request[workflow.WatchRunDetailsRequest], *connect.ServerStream[workflow.WatchRunDetailsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TrackedRunService.WatchRunDetails is not implemented"))
+func (UnimplementedTrackedRunServiceHandler) WatchRunDetails(context.Context, *workflow.WatchRunDetailsRequest, TrackedRunServiceWatchRunDetailsServerStream) error {
+	return connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.TrackedRunService.WatchRunDetails is not implemented")
 }
 
-func (UnimplementedTrackedRunServiceHandler) GetActionDetails(context.Context, *connect.Request[workflow.GetActionDetailsRequest]) (*connect.Response[workflow.GetActionDetailsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TrackedRunService.GetActionDetails is not implemented"))
+func (UnimplementedTrackedRunServiceHandler) GetActionDetails(context.Context, *workflow.GetActionDetailsRequest) (*workflow.GetActionDetailsResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.TrackedRunService.GetActionDetails is not implemented")
 }
 
-func (UnimplementedTrackedRunServiceHandler) WatchActionDetails(context.Context, *connect.Request[workflow.WatchActionDetailsRequest], *connect.ServerStream[workflow.WatchActionDetailsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TrackedRunService.WatchActionDetails is not implemented"))
+func (UnimplementedTrackedRunServiceHandler) WatchActionDetails(context.Context, *workflow.WatchActionDetailsRequest, TrackedRunServiceWatchActionDetailsServerStream) error {
+	return connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.TrackedRunService.WatchActionDetails is not implemented")
 }
 
-func (UnimplementedTrackedRunServiceHandler) ListRuns(context.Context, *connect.Request[workflow.ListRunsRequest]) (*connect.Response[workflow.ListRunsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TrackedRunService.ListRuns is not implemented"))
+func (UnimplementedTrackedRunServiceHandler) ListRuns(context.Context, *workflow.ListRunsRequest) (*workflow.ListRunsResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.TrackedRunService.ListRuns is not implemented")
 }
 
-func (UnimplementedTrackedRunServiceHandler) WatchRuns(context.Context, *connect.Request[workflow.WatchRunsRequest], *connect.ServerStream[workflow.WatchRunsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TrackedRunService.WatchRuns is not implemented"))
+func (UnimplementedTrackedRunServiceHandler) WatchRuns(context.Context, *workflow.WatchRunsRequest, TrackedRunServiceWatchRunsServerStream) error {
+	return connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.TrackedRunService.WatchRuns is not implemented")
 }
 
-func (UnimplementedTrackedRunServiceHandler) ListActions(context.Context, *connect.Request[workflow.ListActionsRequest]) (*connect.Response[workflow.ListActionsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TrackedRunService.ListActions is not implemented"))
+func (UnimplementedTrackedRunServiceHandler) ListActions(context.Context, *workflow.ListActionsRequest) (*workflow.ListActionsResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.TrackedRunService.ListActions is not implemented")
 }
 
-func (UnimplementedTrackedRunServiceHandler) WatchActions(context.Context, *connect.Request[workflow.WatchActionsRequest], *connect.ServerStream[workflow.WatchActionsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TrackedRunService.WatchActions is not implemented"))
+func (UnimplementedTrackedRunServiceHandler) WatchActions(context.Context, *workflow.WatchActionsRequest, TrackedRunServiceWatchActionsServerStream) error {
+	return connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.TrackedRunService.WatchActions is not implemented")
 }
 
-func (UnimplementedTrackedRunServiceHandler) AbortRun(context.Context, *connect.Request[workflow.AbortRunRequest]) (*connect.Response[workflow.AbortRunResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.workflow.TrackedRunService.AbortRun is not implemented"))
+func (UnimplementedTrackedRunServiceHandler) AbortRun(context.Context, *workflow.AbortRunRequest) (*workflow.AbortRunResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.workflow.TrackedRunService.AbortRun is not implemented")
+}
+
+type trackedRunServiceClient struct {
+	client *connect.Client
+}
+
+func (c *trackedRunServiceClient) CreateRun(ctx context.Context, req *workflow.CreateTrackedRunRequest) (*workflow.CreateRunResponse, error) {
+	var res workflow.CreateRunResponse
+	if err := c.client.CallUnary(ctx, trackedRunServiceCreateRunSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *trackedRunServiceClient) ReportActions(ctx context.Context, req *workflow.ReportTrackedActionsRequest) (*workflow.ReportTrackedActionsResponse, error) {
+	var res workflow.ReportTrackedActionsResponse
+	if err := c.client.CallUnary(ctx, trackedRunServiceReportActionsSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *trackedRunServiceClient) GetRunDetails(ctx context.Context, req *workflow.GetRunDetailsRequest) (*workflow.GetRunDetailsResponse, error) {
+	var res workflow.GetRunDetailsResponse
+	if err := c.client.CallUnary(ctx, trackedRunServiceGetRunDetailsSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *trackedRunServiceClient) WatchRunDetails(ctx context.Context, req *workflow.WatchRunDetailsRequest) (TrackedRunServiceWatchRunDetailsClientStream, error) {
+	stream, err := c.client.CallServerStream(ctx, trackedRunServiceWatchRunDetailsSpec(), req)
+	if err != nil {
+		return TrackedRunServiceWatchRunDetailsClientStream{}, err
+	}
+	return TrackedRunServiceWatchRunDetailsClientStream{stream: stream}, nil
+}
+
+func (c *trackedRunServiceClient) GetActionDetails(ctx context.Context, req *workflow.GetActionDetailsRequest) (*workflow.GetActionDetailsResponse, error) {
+	var res workflow.GetActionDetailsResponse
+	if err := c.client.CallUnary(ctx, trackedRunServiceGetActionDetailsSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *trackedRunServiceClient) WatchActionDetails(ctx context.Context, req *workflow.WatchActionDetailsRequest) (TrackedRunServiceWatchActionDetailsClientStream, error) {
+	stream, err := c.client.CallServerStream(ctx, trackedRunServiceWatchActionDetailsSpec(), req)
+	if err != nil {
+		return TrackedRunServiceWatchActionDetailsClientStream{}, err
+	}
+	return TrackedRunServiceWatchActionDetailsClientStream{stream: stream}, nil
+}
+
+func (c *trackedRunServiceClient) ListRuns(ctx context.Context, req *workflow.ListRunsRequest) (*workflow.ListRunsResponse, error) {
+	var res workflow.ListRunsResponse
+	if err := c.client.CallUnary(ctx, trackedRunServiceListRunsSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *trackedRunServiceClient) WatchRuns(ctx context.Context, req *workflow.WatchRunsRequest) (TrackedRunServiceWatchRunsClientStream, error) {
+	stream, err := c.client.CallServerStream(ctx, trackedRunServiceWatchRunsSpec(), req)
+	if err != nil {
+		return TrackedRunServiceWatchRunsClientStream{}, err
+	}
+	return TrackedRunServiceWatchRunsClientStream{stream: stream}, nil
+}
+
+func (c *trackedRunServiceClient) ListActions(ctx context.Context, req *workflow.ListActionsRequest) (*workflow.ListActionsResponse, error) {
+	var res workflow.ListActionsResponse
+	if err := c.client.CallUnary(ctx, trackedRunServiceListActionsSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *trackedRunServiceClient) WatchActions(ctx context.Context, req *workflow.WatchActionsRequest) (TrackedRunServiceWatchActionsClientStream, error) {
+	stream, err := c.client.CallServerStream(ctx, trackedRunServiceWatchActionsSpec(), req)
+	if err != nil {
+		return TrackedRunServiceWatchActionsClientStream{}, err
+	}
+	return TrackedRunServiceWatchActionsClientStream{stream: stream}, nil
+}
+
+func (c *trackedRunServiceClient) AbortRun(ctx context.Context, req *workflow.AbortRunRequest) (*workflow.AbortRunResponse, error) {
+	var res workflow.AbortRunResponse
+	if err := c.client.CallUnary(ctx, trackedRunServiceAbortRunSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+type trackedRunServiceHandler struct{ svc TrackedRunServiceHandler }
+
+func (h trackedRunServiceHandler) createRun(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.CreateTrackedRunRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.CreateRun(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h trackedRunServiceHandler) reportActions(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.ReportTrackedActionsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.ReportActions(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h trackedRunServiceHandler) getRunDetails(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.GetRunDetailsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.GetRunDetails(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h trackedRunServiceHandler) watchRunDetails(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.WatchRunDetailsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	return h.svc.WatchRunDetails(ctx, &req, TrackedRunServiceWatchRunDetailsServerStream{stream: stream})
+}
+
+func (h trackedRunServiceHandler) getActionDetails(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.GetActionDetailsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.GetActionDetails(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h trackedRunServiceHandler) watchActionDetails(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.WatchActionDetailsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	return h.svc.WatchActionDetails(ctx, &req, TrackedRunServiceWatchActionDetailsServerStream{stream: stream})
+}
+
+func (h trackedRunServiceHandler) listRuns(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.ListRunsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.ListRuns(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h trackedRunServiceHandler) watchRuns(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.WatchRunsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	return h.svc.WatchRuns(ctx, &req, TrackedRunServiceWatchRunsServerStream{stream: stream})
+}
+
+func (h trackedRunServiceHandler) listActions(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.ListActionsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.ListActions(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h trackedRunServiceHandler) watchActions(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.WatchActionsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	return h.svc.WatchActions(ctx, &req, TrackedRunServiceWatchActionsServerStream{stream: stream})
+}
+
+func (h trackedRunServiceHandler) abortRun(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req workflow.AbortRunRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.AbortRun(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
 }

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -136,12 +136,12 @@ const runNameMaxLength = 30
 // be a valid DNS-1035 label. Server-generated names always satisfy this.
 func validateRunName(name string) error {
 	if len(name) > runNameMaxLength {
-		return connect.NewError(connect.CodeInvalidArgument,
-			fmt.Errorf("invalid run name %q: must be no more than %d characters", name, runNameMaxLength))
+		return connect.Errorf(connect.CodeInvalidArgument,
+			"invalid run name %q: must be no more than %d characters", name, runNameMaxLength)
 	}
 	if errs := validation.IsDNS1035Label(name); len(errs) > 0 {
-		return connect.NewError(connect.CodeInvalidArgument,
-			fmt.Errorf("invalid run name %q: %s", name, strings.Join(errs, "; ")))
+		return connect.Errorf(connect.CodeInvalidArgument,
+			"invalid run name %q: %s", name, strings.Join(errs, "; "))
 	}
 	return nil
 }
@@ -155,7 +155,7 @@ func validatePodTemplateName(name string) error {
 	}
 
 	if errs := validation.IsDNS1123Subdomain(name); len(errs) > 0 {
-		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid pod template name %q: %s", name, strings.Join(errs, "; ")))
+		return connect.Errorf(connect.CodeInvalidArgument, "invalid pod template name %q: %s", name, strings.Join(errs, "; "))
 	}
 
 	return nil
@@ -163,14 +163,14 @@ func validatePodTemplateName(name string) error {
 
 // validateProjectExists checks that the given project ID exists by calling the ProjectService.
 func validateProjectExists(ctx context.Context, projectClient projectconnect.ProjectServiceClient, projectID string) error {
-	if _, err := projectClient.GetProject(ctx, connect.NewRequest(&project.GetProjectRequest{
+	if _, err := projectClient.GetProject(ctx, &project.GetProjectRequest{
 		Id: projectID,
-	})); err != nil {
+	}); err != nil {
 		if connect.CodeOf(err) == connect.CodeNotFound {
-			return connect.NewError(connect.CodeNotFound, fmt.Errorf("project %q not found", projectID))
+			return connect.Errorf(connect.CodeNotFound, "project %q not found", projectID)
 		}
 		logger.Errorf(ctx, "Failed to validate project %q: %v", projectID, err)
-		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to validate project: %w", err))
+		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to validate project: %w", err).Error())
 	}
 	return nil
 }

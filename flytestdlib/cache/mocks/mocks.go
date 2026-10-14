@@ -18,10 +18,19 @@ func NewAutoRefresh(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *AutoRefresh {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &AutoRefresh{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -63,7 +72,7 @@ type AutoRefresh_DeleteDelayed_Call struct {
 
 // DeleteDelayed is a helper method to define mock.On call
 //   - id cache.ItemID
-func (_e *AutoRefresh_Expecter) DeleteDelayed(id interface{}) *AutoRefresh_DeleteDelayed_Call {
+func (_e *AutoRefresh_Expecter) DeleteDelayed(id any) *AutoRefresh_DeleteDelayed_Call {
 	return &AutoRefresh_DeleteDelayed_Call{Call: _e.mock.On("DeleteDelayed", id)}
 }
 
@@ -125,7 +134,7 @@ type AutoRefresh_Get_Call struct {
 
 // Get is a helper method to define mock.On call
 //   - id cache.ItemID
-func (_e *AutoRefresh_Expecter) Get(id interface{}) *AutoRefresh_Get_Call {
+func (_e *AutoRefresh_Expecter) Get(id any) *AutoRefresh_Get_Call {
 	return &AutoRefresh_Get_Call{Call: _e.mock.On("Get", id)}
 }
 
@@ -188,7 +197,7 @@ type AutoRefresh_GetOrCreate_Call struct {
 // GetOrCreate is a helper method to define mock.On call
 //   - id cache.ItemID
 //   - item cache.Item
-func (_e *AutoRefresh_Expecter) GetOrCreate(id interface{}, item interface{}) *AutoRefresh_GetOrCreate_Call {
+func (_e *AutoRefresh_Expecter) GetOrCreate(id any, item any) *AutoRefresh_GetOrCreate_Call {
 	return &AutoRefresh_GetOrCreate_Call{Call: _e.mock.On("GetOrCreate", id, item)}
 }
 
@@ -244,7 +253,7 @@ type AutoRefresh_Start_Call struct {
 
 // Start is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *AutoRefresh_Expecter) Start(ctx interface{}) *AutoRefresh_Start_Call {
+func (_e *AutoRefresh_Expecter) Start(ctx any) *AutoRefresh_Start_Call {
 	return &AutoRefresh_Start_Call{Call: _e.mock.On("Start", ctx)}
 }
 
@@ -277,10 +286,19 @@ func NewItem(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *Item {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &Item{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -348,10 +366,19 @@ func NewItemWrapper(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *ItemWrapper {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &ItemWrapper{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -403,8 +430,8 @@ func (_c *ItemWrapper_GetID_Call) Run(run func()) *ItemWrapper_GetID_Call {
 	return _c
 }
 
-func (_c *ItemWrapper_GetID_Call) Return(v cache.ItemID) *ItemWrapper_GetID_Call {
-	_c.Call.Return(v)
+func (_c *ItemWrapper_GetID_Call) Return(itemID cache.ItemID) *ItemWrapper_GetID_Call {
+	_c.Call.Return(itemID)
 	return _c
 }
 
@@ -465,10 +492,19 @@ func NewStringCache(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *StringCache {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &StringCache{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -510,7 +546,7 @@ type StringCache_Clear_Call struct {
 
 // Clear is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *StringCache_Expecter) Clear(ctx interface{}) *StringCache_Clear_Call {
+func (_e *StringCache_Expecter) Clear(ctx any) *StringCache_Clear_Call {
 	return &StringCache_Clear_Call{Call: _e.mock.On("Clear", ctx)}
 }
 
@@ -562,7 +598,7 @@ type StringCache_Delete_Call struct {
 // Delete is a helper method to define mock.On call
 //   - ctx context.Context
 //   - key any
-func (_e *StringCache_Expecter) Delete(ctx interface{}, key interface{}) *StringCache_Delete_Call {
+func (_e *StringCache_Expecter) Delete(ctx any, key any) *StringCache_Delete_Call {
 	return &StringCache_Delete_Call{Call: _e.mock.On("Delete", ctx, key)}
 }
 
@@ -628,7 +664,7 @@ type StringCache_Get_Call struct {
 // Get is a helper method to define mock.On call
 //   - ctx context.Context
 //   - key any
-func (_e *StringCache_Expecter) Get(ctx interface{}, key interface{}) *StringCache_Get_Call {
+func (_e *StringCache_Expecter) Get(ctx any, key any) *StringCache_Get_Call {
 	return &StringCache_Get_Call{Call: _e.mock.On("Get", ctx, key)}
 }
 
@@ -707,11 +743,11 @@ func (_c *StringCache_GetType_Call) RunAndReturn(run func() string) *StringCache
 // Invalidate provides a mock function for the type StringCache
 func (_mock *StringCache) Invalidate(ctx context.Context, options ...store.InvalidateOption) error {
 	// store.InvalidateOption
-	_va := make([]interface{}, len(options))
+	_va := make([]any, len(options))
 	for _i := range options {
 		_va[_i] = options[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -737,9 +773,9 @@ type StringCache_Invalidate_Call struct {
 // Invalidate is a helper method to define mock.On call
 //   - ctx context.Context
 //   - options ...store.InvalidateOption
-func (_e *StringCache_Expecter) Invalidate(ctx interface{}, options ...interface{}) *StringCache_Invalidate_Call {
+func (_e *StringCache_Expecter) Invalidate(ctx any, options ...any) *StringCache_Invalidate_Call {
 	return &StringCache_Invalidate_Call{Call: _e.mock.On("Invalidate",
-		append([]interface{}{ctx}, options...)...)}
+		append([]any{ctx}, options...)...)}
 }
 
 func (_c *StringCache_Invalidate_Call) Run(run func(ctx context.Context, options ...store.InvalidateOption)) *StringCache_Invalidate_Call {
@@ -777,11 +813,11 @@ func (_c *StringCache_Invalidate_Call) RunAndReturn(run func(ctx context.Context
 // Set provides a mock function for the type StringCache
 func (_mock *StringCache) Set(ctx context.Context, key any, object string, options ...store.Option) error {
 	// store.Option
-	_va := make([]interface{}, len(options))
+	_va := make([]any, len(options))
 	for _i := range options {
 		_va[_i] = options[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, key, object)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -809,9 +845,9 @@ type StringCache_Set_Call struct {
 //   - key any
 //   - object string
 //   - options ...store.Option
-func (_e *StringCache_Expecter) Set(ctx interface{}, key interface{}, object interface{}, options ...interface{}) *StringCache_Set_Call {
+func (_e *StringCache_Expecter) Set(ctx any, key any, object any, options ...any) *StringCache_Set_Call {
 	return &StringCache_Set_Call{Call: _e.mock.On("Set",
-		append([]interface{}{ctx, key, object}, options...)...)}
+		append([]any{ctx, key, object}, options...)...)}
 }
 
 func (_c *StringCache_Set_Call) Run(run func(ctx context.Context, key any, object string, options ...store.Option)) *StringCache_Set_Call {
@@ -862,10 +898,19 @@ func NewUInt64Cache(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *UInt64Cache {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &UInt64Cache{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -907,7 +952,7 @@ type UInt64Cache_Clear_Call struct {
 
 // Clear is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *UInt64Cache_Expecter) Clear(ctx interface{}) *UInt64Cache_Clear_Call {
+func (_e *UInt64Cache_Expecter) Clear(ctx any) *UInt64Cache_Clear_Call {
 	return &UInt64Cache_Clear_Call{Call: _e.mock.On("Clear", ctx)}
 }
 
@@ -959,7 +1004,7 @@ type UInt64Cache_Delete_Call struct {
 // Delete is a helper method to define mock.On call
 //   - ctx context.Context
 //   - key any
-func (_e *UInt64Cache_Expecter) Delete(ctx interface{}, key interface{}) *UInt64Cache_Delete_Call {
+func (_e *UInt64Cache_Expecter) Delete(ctx any, key any) *UInt64Cache_Delete_Call {
 	return &UInt64Cache_Delete_Call{Call: _e.mock.On("Delete", ctx, key)}
 }
 
@@ -1025,7 +1070,7 @@ type UInt64Cache_Get_Call struct {
 // Get is a helper method to define mock.On call
 //   - ctx context.Context
 //   - key any
-func (_e *UInt64Cache_Expecter) Get(ctx interface{}, key interface{}) *UInt64Cache_Get_Call {
+func (_e *UInt64Cache_Expecter) Get(ctx any, key any) *UInt64Cache_Get_Call {
 	return &UInt64Cache_Get_Call{Call: _e.mock.On("Get", ctx, key)}
 }
 
@@ -1104,11 +1149,11 @@ func (_c *UInt64Cache_GetType_Call) RunAndReturn(run func() string) *UInt64Cache
 // Invalidate provides a mock function for the type UInt64Cache
 func (_mock *UInt64Cache) Invalidate(ctx context.Context, options ...store.InvalidateOption) error {
 	// store.InvalidateOption
-	_va := make([]interface{}, len(options))
+	_va := make([]any, len(options))
 	for _i := range options {
 		_va[_i] = options[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -1134,9 +1179,9 @@ type UInt64Cache_Invalidate_Call struct {
 // Invalidate is a helper method to define mock.On call
 //   - ctx context.Context
 //   - options ...store.InvalidateOption
-func (_e *UInt64Cache_Expecter) Invalidate(ctx interface{}, options ...interface{}) *UInt64Cache_Invalidate_Call {
+func (_e *UInt64Cache_Expecter) Invalidate(ctx any, options ...any) *UInt64Cache_Invalidate_Call {
 	return &UInt64Cache_Invalidate_Call{Call: _e.mock.On("Invalidate",
-		append([]interface{}{ctx}, options...)...)}
+		append([]any{ctx}, options...)...)}
 }
 
 func (_c *UInt64Cache_Invalidate_Call) Run(run func(ctx context.Context, options ...store.InvalidateOption)) *UInt64Cache_Invalidate_Call {
@@ -1174,11 +1219,11 @@ func (_c *UInt64Cache_Invalidate_Call) RunAndReturn(run func(ctx context.Context
 // Set provides a mock function for the type UInt64Cache
 func (_mock *UInt64Cache) Set(ctx context.Context, key any, object uint64, options ...store.Option) error {
 	// store.Option
-	_va := make([]interface{}, len(options))
+	_va := make([]any, len(options))
 	for _i := range options {
 		_va[_i] = options[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, key, object)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -1206,9 +1251,9 @@ type UInt64Cache_Set_Call struct {
 //   - key any
 //   - object uint64
 //   - options ...store.Option
-func (_e *UInt64Cache_Expecter) Set(ctx interface{}, key interface{}, object interface{}, options ...interface{}) *UInt64Cache_Set_Call {
+func (_e *UInt64Cache_Expecter) Set(ctx any, key any, object any, options ...any) *UInt64Cache_Set_Call {
 	return &UInt64Cache_Set_Call{Call: _e.mock.On("Set",
-		append([]interface{}{ctx, key, object}, options...)...)}
+		append([]any{ctx, key, object}, options...)...)}
 }
 
 func (_c *UInt64Cache_Set_Call) Run(run func(ctx context.Context, key any, object uint64, options ...store.Option)) *UInt64Cache_Set_Call {
@@ -1259,10 +1304,19 @@ func NewSecretManager(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *SecretManager {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &SecretManager{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -1314,7 +1368,7 @@ type SecretManager_Get_Call struct {
 // Get is a helper method to define mock.On call
 //   - ctx context.Context
 //   - key string
-func (_e *SecretManager_Expecter) Get(ctx interface{}, key interface{}) *SecretManager_Get_Call {
+func (_e *SecretManager_Expecter) Get(ctx any, key any) *SecretManager_Get_Call {
 	return &SecretManager_Get_Call{Call: _e.mock.On("Get", ctx, key)}
 }
 

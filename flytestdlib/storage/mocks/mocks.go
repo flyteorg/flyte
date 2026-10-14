@@ -19,10 +19,19 @@ func NewMetadata(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *Metadata {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &Metadata{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -222,10 +231,19 @@ func NewRawStore(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *RawStore {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &RawStore{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -270,7 +288,7 @@ type RawStore_CopyRaw_Call struct {
 //   - source storage.DataReference
 //   - destination storage.DataReference
 //   - opts storage.Options
-func (_e *RawStore_Expecter) CopyRaw(ctx interface{}, source interface{}, destination interface{}, opts interface{}) *RawStore_CopyRaw_Call {
+func (_e *RawStore_Expecter) CopyRaw(ctx any, source any, destination any, opts any) *RawStore_CopyRaw_Call {
 	return &RawStore_CopyRaw_Call{Call: _e.mock.On("CopyRaw", ctx, source, destination, opts)}
 }
 
@@ -347,7 +365,7 @@ type RawStore_CreateSignedURL_Call struct {
 //   - ctx context.Context
 //   - reference storage.DataReference
 //   - properties storage.SignedURLProperties
-func (_e *RawStore_Expecter) CreateSignedURL(ctx interface{}, reference interface{}, properties interface{}) *RawStore_CreateSignedURL_Call {
+func (_e *RawStore_Expecter) CreateSignedURL(ctx any, reference any, properties any) *RawStore_CreateSignedURL_Call {
 	return &RawStore_CreateSignedURL_Call{Call: _e.mock.On("CreateSignedURL", ctx, reference, properties)}
 }
 
@@ -409,7 +427,7 @@ type RawStore_Delete_Call struct {
 // Delete is a helper method to define mock.On call
 //   - ctx context.Context
 //   - reference storage.DataReference
-func (_e *RawStore_Expecter) Delete(ctx interface{}, reference interface{}) *RawStore_Delete_Call {
+func (_e *RawStore_Expecter) Delete(ctx any, reference any) *RawStore_Delete_Call {
 	return &RawStore_Delete_Call{Call: _e.mock.On("Delete", ctx, reference)}
 }
 
@@ -465,7 +483,7 @@ type RawStore_GetBaseContainerFQN_Call struct {
 
 // GetBaseContainerFQN is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *RawStore_Expecter) GetBaseContainerFQN(ctx interface{}) *RawStore_GetBaseContainerFQN_Call {
+func (_e *RawStore_Expecter) GetBaseContainerFQN(ctx any) *RawStore_GetBaseContainerFQN_Call {
 	return &RawStore_GetBaseContainerFQN_Call{Call: _e.mock.On("GetBaseContainerFQN", ctx)}
 }
 
@@ -528,7 +546,7 @@ type RawStore_Head_Call struct {
 // Head is a helper method to define mock.On call
 //   - ctx context.Context
 //   - reference storage.DataReference
-func (_e *RawStore_Expecter) Head(ctx interface{}, reference interface{}) *RawStore_Head_Call {
+func (_e *RawStore_Expecter) Head(ctx any, reference any) *RawStore_Head_Call {
 	return &RawStore_Head_Call{Call: _e.mock.On("Head", ctx, reference)}
 }
 
@@ -604,7 +622,7 @@ type RawStore_List_Call struct {
 //   - reference storage.DataReference
 //   - maxItems int
 //   - cursor storage.Cursor
-func (_e *RawStore_Expecter) List(ctx interface{}, reference interface{}, maxItems interface{}, cursor interface{}) *RawStore_List_Call {
+func (_e *RawStore_Expecter) List(ctx any, reference any, maxItems any, cursor any) *RawStore_List_Call {
 	return &RawStore_List_Call{Call: _e.mock.On("List", ctx, reference, maxItems, cursor)}
 }
 
@@ -682,7 +700,7 @@ type RawStore_ReadRaw_Call struct {
 // ReadRaw is a helper method to define mock.On call
 //   - ctx context.Context
 //   - reference storage.DataReference
-func (_e *RawStore_Expecter) ReadRaw(ctx interface{}, reference interface{}) *RawStore_ReadRaw_Call {
+func (_e *RawStore_Expecter) ReadRaw(ctx any, reference any) *RawStore_ReadRaw_Call {
 	return &RawStore_ReadRaw_Call{Call: _e.mock.On("ReadRaw", ctx, reference)}
 }
 
@@ -742,7 +760,7 @@ type RawStore_WriteRaw_Call struct {
 //   - size int64
 //   - opts storage.Options
 //   - raw io.Reader
-func (_e *RawStore_Expecter) WriteRaw(ctx interface{}, reference interface{}, size interface{}, opts interface{}, raw interface{}) *RawStore_WriteRaw_Call {
+func (_e *RawStore_Expecter) WriteRaw(ctx any, reference any, size any, opts any, raw any) *RawStore_WriteRaw_Call {
 	return &RawStore_WriteRaw_Call{Call: _e.mock.On("WriteRaw", ctx, reference, size, opts, raw)}
 }
 
@@ -795,10 +813,19 @@ func NewReferenceConstructor(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *ReferenceConstructor {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &ReferenceConstructor{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -819,11 +846,11 @@ func (_m *ReferenceConstructor) EXPECT() *ReferenceConstructor_Expecter {
 // ConstructReference provides a mock function for the type ReferenceConstructor
 func (_mock *ReferenceConstructor) ConstructReference(ctx context.Context, reference storage.DataReference, nestedKeys ...string) (storage.DataReference, error) {
 	// string
-	_va := make([]interface{}, len(nestedKeys))
+	_va := make([]any, len(nestedKeys))
 	for _i := range nestedKeys {
 		_va[_i] = nestedKeys[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, ctx, reference)
 	_ca = append(_ca, _va...)
 	ret := _mock.Called(_ca...)
@@ -859,9 +886,9 @@ type ReferenceConstructor_ConstructReference_Call struct {
 //   - ctx context.Context
 //   - reference storage.DataReference
 //   - nestedKeys ...string
-func (_e *ReferenceConstructor_Expecter) ConstructReference(ctx interface{}, reference interface{}, nestedKeys ...interface{}) *ReferenceConstructor_ConstructReference_Call {
+func (_e *ReferenceConstructor_Expecter) ConstructReference(ctx any, reference any, nestedKeys ...any) *ReferenceConstructor_ConstructReference_Call {
 	return &ReferenceConstructor_ConstructReference_Call{Call: _e.mock.On("ConstructReference",
-		append([]interface{}{ctx, reference}, nestedKeys...)...)}
+		append([]any{ctx, reference}, nestedKeys...)...)}
 }
 
 func (_c *ReferenceConstructor_ConstructReference_Call) Run(run func(ctx context.Context, reference storage.DataReference, nestedKeys ...string)) *ReferenceConstructor_ConstructReference_Call {
@@ -907,10 +934,19 @@ func NewComposedProtobufStore(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *ComposedProtobufStore {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &ComposedProtobufStore{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -955,7 +991,7 @@ type ComposedProtobufStore_CopyRaw_Call struct {
 //   - source storage.DataReference
 //   - destination storage.DataReference
 //   - opts storage.Options
-func (_e *ComposedProtobufStore_Expecter) CopyRaw(ctx interface{}, source interface{}, destination interface{}, opts interface{}) *ComposedProtobufStore_CopyRaw_Call {
+func (_e *ComposedProtobufStore_Expecter) CopyRaw(ctx any, source any, destination any, opts any) *ComposedProtobufStore_CopyRaw_Call {
 	return &ComposedProtobufStore_CopyRaw_Call{Call: _e.mock.On("CopyRaw", ctx, source, destination, opts)}
 }
 
@@ -1032,7 +1068,7 @@ type ComposedProtobufStore_CreateSignedURL_Call struct {
 //   - ctx context.Context
 //   - reference storage.DataReference
 //   - properties storage.SignedURLProperties
-func (_e *ComposedProtobufStore_Expecter) CreateSignedURL(ctx interface{}, reference interface{}, properties interface{}) *ComposedProtobufStore_CreateSignedURL_Call {
+func (_e *ComposedProtobufStore_Expecter) CreateSignedURL(ctx any, reference any, properties any) *ComposedProtobufStore_CreateSignedURL_Call {
 	return &ComposedProtobufStore_CreateSignedURL_Call{Call: _e.mock.On("CreateSignedURL", ctx, reference, properties)}
 }
 
@@ -1094,7 +1130,7 @@ type ComposedProtobufStore_Delete_Call struct {
 // Delete is a helper method to define mock.On call
 //   - ctx context.Context
 //   - reference storage.DataReference
-func (_e *ComposedProtobufStore_Expecter) Delete(ctx interface{}, reference interface{}) *ComposedProtobufStore_Delete_Call {
+func (_e *ComposedProtobufStore_Expecter) Delete(ctx any, reference any) *ComposedProtobufStore_Delete_Call {
 	return &ComposedProtobufStore_Delete_Call{Call: _e.mock.On("Delete", ctx, reference)}
 }
 
@@ -1150,7 +1186,7 @@ type ComposedProtobufStore_GetBaseContainerFQN_Call struct {
 
 // GetBaseContainerFQN is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *ComposedProtobufStore_Expecter) GetBaseContainerFQN(ctx interface{}) *ComposedProtobufStore_GetBaseContainerFQN_Call {
+func (_e *ComposedProtobufStore_Expecter) GetBaseContainerFQN(ctx any) *ComposedProtobufStore_GetBaseContainerFQN_Call {
 	return &ComposedProtobufStore_GetBaseContainerFQN_Call{Call: _e.mock.On("GetBaseContainerFQN", ctx)}
 }
 
@@ -1213,7 +1249,7 @@ type ComposedProtobufStore_Head_Call struct {
 // Head is a helper method to define mock.On call
 //   - ctx context.Context
 //   - reference storage.DataReference
-func (_e *ComposedProtobufStore_Expecter) Head(ctx interface{}, reference interface{}) *ComposedProtobufStore_Head_Call {
+func (_e *ComposedProtobufStore_Expecter) Head(ctx any, reference any) *ComposedProtobufStore_Head_Call {
 	return &ComposedProtobufStore_Head_Call{Call: _e.mock.On("Head", ctx, reference)}
 }
 
@@ -1289,7 +1325,7 @@ type ComposedProtobufStore_List_Call struct {
 //   - reference storage.DataReference
 //   - maxItems int
 //   - cursor storage.Cursor
-func (_e *ComposedProtobufStore_Expecter) List(ctx interface{}, reference interface{}, maxItems interface{}, cursor interface{}) *ComposedProtobufStore_List_Call {
+func (_e *ComposedProtobufStore_Expecter) List(ctx any, reference any, maxItems any, cursor any) *ComposedProtobufStore_List_Call {
 	return &ComposedProtobufStore_List_Call{Call: _e.mock.On("List", ctx, reference, maxItems, cursor)}
 }
 
@@ -1357,7 +1393,7 @@ type ComposedProtobufStore_ReadProtobuf_Call struct {
 //   - ctx context.Context
 //   - reference storage.DataReference
 //   - msg proto.Message
-func (_e *ComposedProtobufStore_Expecter) ReadProtobuf(ctx interface{}, reference interface{}, msg interface{}) *ComposedProtobufStore_ReadProtobuf_Call {
+func (_e *ComposedProtobufStore_Expecter) ReadProtobuf(ctx any, reference any, msg any) *ComposedProtobufStore_ReadProtobuf_Call {
 	return &ComposedProtobufStore_ReadProtobuf_Call{Call: _e.mock.On("ReadProtobuf", ctx, reference, msg)}
 }
 
@@ -1430,7 +1466,7 @@ type ComposedProtobufStore_ReadRaw_Call struct {
 // ReadRaw is a helper method to define mock.On call
 //   - ctx context.Context
 //   - reference storage.DataReference
-func (_e *ComposedProtobufStore_Expecter) ReadRaw(ctx interface{}, reference interface{}) *ComposedProtobufStore_ReadRaw_Call {
+func (_e *ComposedProtobufStore_Expecter) ReadRaw(ctx any, reference any) *ComposedProtobufStore_ReadRaw_Call {
 	return &ComposedProtobufStore_ReadRaw_Call{Call: _e.mock.On("ReadRaw", ctx, reference)}
 }
 
@@ -1489,7 +1525,7 @@ type ComposedProtobufStore_WriteProtobuf_Call struct {
 //   - reference storage.DataReference
 //   - opts storage.Options
 //   - msg proto.Message
-func (_e *ComposedProtobufStore_Expecter) WriteProtobuf(ctx interface{}, reference interface{}, opts interface{}, msg interface{}) *ComposedProtobufStore_WriteProtobuf_Call {
+func (_e *ComposedProtobufStore_Expecter) WriteProtobuf(ctx any, reference any, opts any, msg any) *ComposedProtobufStore_WriteProtobuf_Call {
 	return &ComposedProtobufStore_WriteProtobuf_Call{Call: _e.mock.On("WriteProtobuf", ctx, reference, opts, msg)}
 }
 
@@ -1559,7 +1595,7 @@ type ComposedProtobufStore_WriteRaw_Call struct {
 //   - size int64
 //   - opts storage.Options
 //   - raw io.Reader
-func (_e *ComposedProtobufStore_Expecter) WriteRaw(ctx interface{}, reference interface{}, size interface{}, opts interface{}, raw interface{}) *ComposedProtobufStore_WriteRaw_Call {
+func (_e *ComposedProtobufStore_Expecter) WriteRaw(ctx any, reference any, size any, opts any, raw any) *ComposedProtobufStore_WriteRaw_Call {
 	return &ComposedProtobufStore_WriteRaw_Call{Call: _e.mock.On("WriteRaw", ctx, reference, size, opts, raw)}
 }
 

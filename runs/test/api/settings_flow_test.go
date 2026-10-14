@@ -4,7 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
@@ -36,7 +37,7 @@ func TestSettingsCustomerFlow(t *testing.T) {
 	ctx := context.Background()
 	cleanupTestDB(t)
 
-	client := settingsconnect.NewSettingsServiceClient(newClient(), endpoint)
+	client := settingsconnect.NewSettingsServiceClient(connect.NewClient(connecthttp.NewTransport(newClient(), endpoint, connecthttp.WithReadMaxBytes(0))))
 
 	// --- Starting state: seed the two rows from the doc's Database table ---
 	seedOrg := &settings.CreateSettingsRequest{}
@@ -48,7 +49,7 @@ func TestSettingsCustomerFlow(t *testing.T) {
 	    "environmentVariables": { "state": "SETTING_STATE_VALUE", "mapValue": { "entries": { "LOG_LEVEL": "info", "REGION": "us-east-1" } } }
 	  }
 	}`, seedOrg)
-	_, err := client.CreateSettings(ctx, connect.NewRequest(seedOrg))
+	_, err := client.CreateSettings(ctx, seedOrg)
 	require.NoError(t, err)
 
 	seedProject := &settings.CreateSettingsRequest{}
@@ -58,14 +59,14 @@ func TestSettingsCustomerFlow(t *testing.T) {
 	    "taskResource": { "min": { "cpu": { "state": "SETTING_STATE_VALUE", "quantityValue": "1000m" } } }
 	  }
 	}`, seedProject)
-	_, err = client.CreateSettings(ctx, connect.NewRequest(seedProject))
+	_, err = client.CreateSettings(ctx, seedProject)
 	require.NoError(t, err)
 
 	// --- Step 1: GetSettings at org scope ---
 	step1Req := &settings.GetSettingsRequest{}
 	mustJSON(t, `{ "key": { "org": "acme" } }`, step1Req)
 	step1, err := client.GetSettings(ctx,
-		connect.NewRequest(step1Req))
+		step1Req)
 	require.NoError(t, err)
 
 	step1Want := &settings.GetSettingsResponse{}
@@ -79,12 +80,12 @@ func TestSettingsCustomerFlow(t *testing.T) {
 	    }
 	  }
 	}`, step1Want)
-	expectEqual(t, "step 1", step1Want, step1.Msg)
+	expectEqual(t, "step 1", step1Want, step1)
 
 	// --- Step 2a: GetSettingsForEdit at project scope ---
 	step2aReq := &settings.GetSettingsForEditRequest{}
 	mustJSON(t, `{ "key": { "org": "acme", "domain": "production", "project": "analytics" } }`, step2aReq)
-	step2a, err := client.GetSettingsForEdit(ctx, connect.NewRequest(step2aReq))
+	step2a, err := client.GetSettingsForEdit(ctx, step2aReq)
 	require.NoError(t, err)
 
 	step2aWant := &settings.GetSettingsForEditResponse{}
@@ -113,7 +114,7 @@ func TestSettingsCustomerFlow(t *testing.T) {
 	    }
 	  ]
 	}`, step2aWant)
-	expectEqual(t, "step 2a", step2aWant, step2a.Msg)
+	expectEqual(t, "step 2a", step2aWant, step2a)
 
 	// --- Step 2b: UpdateSettings at project scope ---
 	step2bReq := &settings.UpdateSettingsRequest{}
@@ -126,7 +127,7 @@ func TestSettingsCustomerFlow(t *testing.T) {
 	  },
 	  "version": "1"
 	}`, step2bReq)
-	step2b, err := client.UpdateSettings(ctx, connect.NewRequest(step2bReq))
+	step2b, err := client.UpdateSettings(ctx, step2bReq)
 	require.NoError(t, err)
 
 	step2bWant := &settings.UpdateSettingsResponse{}
@@ -140,12 +141,12 @@ func TestSettingsCustomerFlow(t *testing.T) {
 	    "version": "2"
 	  }
 	}`, step2bWant)
-	expectEqual(t, "step 2b", step2bWant, step2b.Msg)
+	expectEqual(t, "step 2b", step2bWant, step2b)
 
 	// --- Step 3: GetSettings at project scope ---
 	step3Req := &settings.GetSettingsRequest{}
 	mustJSON(t, `{ "key": { "org": "acme", "domain": "production", "project": "analytics" } }`, step3Req)
-	step3, err := client.GetSettings(ctx, connect.NewRequest(step3Req))
+	step3, err := client.GetSettings(ctx, step3Req)
 	require.NoError(t, err)
 
 	step3Want := &settings.GetSettingsResponse{}
@@ -159,7 +160,7 @@ func TestSettingsCustomerFlow(t *testing.T) {
 	    }
 	  }
 	}`, step3Want)
-	expectEqual(t, "step 3", step3Want, step3.Msg)
+	expectEqual(t, "step 3", step3Want, step3)
 
 	// --- Step 4: CreateSettings at domain scope ---
 	step4Req := &settings.CreateSettingsRequest{}
@@ -171,7 +172,7 @@ func TestSettingsCustomerFlow(t *testing.T) {
 	    "environmentVariables": {}
 	  }
 	}`, step4Req)
-	step4, err := client.CreateSettings(ctx, connect.NewRequest(step4Req))
+	step4, err := client.CreateSettings(ctx, step4Req)
 	require.NoError(t, err)
 
 	step4Want := &settings.CreateSettingsResponse{}
@@ -184,10 +185,10 @@ func TestSettingsCustomerFlow(t *testing.T) {
 	    "version": "1"
 	  }
 	}`, step4Want)
-	expectEqual(t, "step 4", step4Want, step4.Msg)
+	expectEqual(t, "step 4", step4Want, step4)
 
 	// --- Step 5: GetSettings at project scope, after the domain exists ---
-	step5, err := client.GetSettings(ctx, connect.NewRequest(step3Req))
+	step5, err := client.GetSettings(ctx, step3Req)
 	require.NoError(t, err)
 
 	step5Want := &settings.GetSettingsResponse{}
@@ -201,5 +202,5 @@ func TestSettingsCustomerFlow(t *testing.T) {
 	    }
 	  }
 	}`, step5Want)
-	expectEqual(t, "step 5", step5Want, step5.Msg)
+	expectEqual(t, "step 5", step5Want, step5)
 }

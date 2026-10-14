@@ -4,12 +4,16 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"net/http"
 	"strings"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/runs/config"
 )
+
+// identityHeader accepts HTTP headers and Connect call metadata.
+type identityHeader interface {
+	Get(string) string
+}
 
 const (
 	// authorizationHeader carries the Bearer token on the JWT-validation path
@@ -32,7 +36,7 @@ type oidcClaims struct {
 // for oauth2-proxy/Traefik when configured). Auth is enforced upstream, so the claims
 // are trusted and only decoded here — not re-verified. Returns nil when no
 // authenticated identity is present.
-func identityFromHeaders(h http.Header, cfg config.IdentityHeadersConfig) *common.EnrichedIdentity {
+func identityFromHeaders(h identityHeader, cfg config.IdentityHeadersConfig) *common.EnrichedIdentity {
 	// Proxy that forwards full claims in a JWT (ALB authenticate-oidc data header).
 	if cfg.ClaimsJWTHeader != "" {
 		if id := identityFromJWT(h.Get(cfg.ClaimsJWTHeader)); id != nil {
@@ -65,7 +69,7 @@ func identityFromHeaders(h http.Header, cfg config.IdentityHeadersConfig) *commo
 // identity, enrichment is skipped: the forwarded access token may be expired or
 // belong to a different principal, and userinfo's subject would override the
 // proxy-verified one. Returns nil when no authenticated identity is present.
-func resolveIdentity(ctx context.Context, h http.Header, cfg config.IdentityHeadersConfig, enricher *identityEnricher) *common.EnrichedIdentity {
+func resolveIdentity(ctx context.Context, h identityHeader, cfg config.IdentityHeadersConfig, enricher *identityEnricher) *common.EnrichedIdentity {
 	id := identityFromHeaders(h, cfg)
 	if id == nil {
 		return nil
@@ -84,7 +88,7 @@ func resolveIdentity(ctx context.Context, h http.Header, cfg config.IdentityHead
 }
 
 // bearerToken returns the value of an Authorization: Bearer <token> header, or "".
-func bearerToken(h http.Header) string {
+func bearerToken(h identityHeader) string {
 	authz := h.Get(authorizationHeader)
 	if len(authz) > len(bearerPrefix) && strings.EqualFold(authz[:len(bearerPrefix)], bearerPrefix) {
 		return strings.TrimSpace(authz[len(bearerPrefix):])

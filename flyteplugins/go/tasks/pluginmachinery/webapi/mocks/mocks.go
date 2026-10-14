@@ -21,10 +21,19 @@ func NewPluginSetupContext(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *PluginSetupContext {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &PluginSetupContext{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -94,10 +103,19 @@ func NewTaskExecutionContextReader(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *TaskExecutionContextReader {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &TaskExecutionContextReader{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -351,10 +369,19 @@ func NewTaskExecutionContext(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *TaskExecutionContext {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &TaskExecutionContext{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -654,10 +681,19 @@ func NewGetContext(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *GetContext {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &GetContext{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -711,8 +747,8 @@ func (_c *GetContext_ResourceMeta_Call) Run(run func()) *GetContext_ResourceMeta
 	return _c
 }
 
-func (_c *GetContext_ResourceMeta_Call) Return(v webapi.ResourceMeta) *GetContext_ResourceMeta_Call {
-	_c.Call.Return(v)
+func (_c *GetContext_ResourceMeta_Call) Return(resourceMeta webapi.ResourceMeta) *GetContext_ResourceMeta_Call {
+	_c.Call.Return(resourceMeta)
 	return _c
 }
 
@@ -727,10 +763,19 @@ func NewDeleteContext(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *DeleteContext {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &DeleteContext{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -828,8 +873,8 @@ func (_c *DeleteContext_ResourceMeta_Call) Run(run func()) *DeleteContext_Resour
 	return _c
 }
 
-func (_c *DeleteContext_ResourceMeta_Call) Return(v webapi.ResourceMeta) *DeleteContext_ResourceMeta_Call {
-	_c.Call.Return(v)
+func (_c *DeleteContext_ResourceMeta_Call) Return(resourceMeta webapi.ResourceMeta) *DeleteContext_ResourceMeta_Call {
+	_c.Call.Return(resourceMeta)
 	return _c
 }
 
@@ -844,10 +889,19 @@ func NewStatusContext(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *StatusContext {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &StatusContext{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -1039,8 +1093,8 @@ func (_c *StatusContext_Resource_Call) Run(run func()) *StatusContext_Resource_C
 	return _c
 }
 
-func (_c *StatusContext_Resource_Call) Return(v webapi.Resource) *StatusContext_Resource_Call {
-	_c.Call.Return(v)
+func (_c *StatusContext_Resource_Call) Return(resource webapi.Resource) *StatusContext_Resource_Call {
+	_c.Call.Return(resource)
 	return _c
 }
 
@@ -1085,8 +1139,8 @@ func (_c *StatusContext_ResourceMeta_Call) Run(run func()) *StatusContext_Resour
 	return _c
 }
 
-func (_c *StatusContext_ResourceMeta_Call) Return(v webapi.ResourceMeta) *StatusContext_ResourceMeta_Call {
-	_c.Call.Return(v)
+func (_c *StatusContext_ResourceMeta_Call) Return(resourceMeta webapi.ResourceMeta) *StatusContext_ResourceMeta_Call {
+	_c.Call.Return(resourceMeta)
 	return _c
 }
 
@@ -1239,10 +1293,19 @@ func NewAsyncPlugin(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *AsyncPlugin {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &AsyncPlugin{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -1304,7 +1367,7 @@ type AsyncPlugin_Create_Call struct {
 // Create is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx webapi.TaskExecutionContextReader
-func (_e *AsyncPlugin_Expecter) Create(ctx interface{}, tCtx interface{}) *AsyncPlugin_Create_Call {
+func (_e *AsyncPlugin_Expecter) Create(ctx any, tCtx any) *AsyncPlugin_Create_Call {
 	return &AsyncPlugin_Create_Call{Call: _e.mock.On("Create", ctx, tCtx)}
 }
 
@@ -1361,7 +1424,7 @@ type AsyncPlugin_Delete_Call struct {
 // Delete is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx webapi.DeleteContext
-func (_e *AsyncPlugin_Expecter) Delete(ctx interface{}, tCtx interface{}) *AsyncPlugin_Delete_Call {
+func (_e *AsyncPlugin_Expecter) Delete(ctx any, tCtx any) *AsyncPlugin_Delete_Call {
 	return &AsyncPlugin_Delete_Call{Call: _e.mock.On("Delete", ctx, tCtx)}
 }
 
@@ -1429,7 +1492,7 @@ type AsyncPlugin_Get_Call struct {
 // Get is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx webapi.GetContext
-func (_e *AsyncPlugin_Expecter) Get(ctx interface{}, tCtx interface{}) *AsyncPlugin_Get_Call {
+func (_e *AsyncPlugin_Expecter) Get(ctx any, tCtx any) *AsyncPlugin_Get_Call {
 	return &AsyncPlugin_Get_Call{Call: _e.mock.On("Get", ctx, tCtx)}
 }
 
@@ -1545,7 +1608,7 @@ type AsyncPlugin_ResourceRequirements_Call struct {
 // ResourceRequirements is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx webapi.TaskExecutionContextReader
-func (_e *AsyncPlugin_Expecter) ResourceRequirements(ctx interface{}, tCtx interface{}) *AsyncPlugin_ResourceRequirements_Call {
+func (_e *AsyncPlugin_Expecter) ResourceRequirements(ctx any, tCtx any) *AsyncPlugin_ResourceRequirements_Call {
 	return &AsyncPlugin_ResourceRequirements_Call{Call: _e.mock.On("ResourceRequirements", ctx, tCtx)}
 }
 
@@ -1611,7 +1674,7 @@ type AsyncPlugin_Status_Call struct {
 // Status is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx webapi.StatusContext
-func (_e *AsyncPlugin_Expecter) Status(ctx interface{}, tCtx interface{}) *AsyncPlugin_Status_Call {
+func (_e *AsyncPlugin_Expecter) Status(ctx any, tCtx any) *AsyncPlugin_Status_Call {
 	return &AsyncPlugin_Status_Call{Call: _e.mock.On("Status", ctx, tCtx)}
 }
 
@@ -1649,10 +1712,19 @@ func NewSyncPlugin(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *SyncPlugin {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &SyncPlugin{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -1704,7 +1776,7 @@ type SyncPlugin_Do_Call struct {
 // Do is a helper method to define mock.On call
 //   - ctx context.Context
 //   - tCtx webapi.TaskExecutionContext
-func (_e *SyncPlugin_Expecter) Do(ctx interface{}, tCtx interface{}) *SyncPlugin_Do_Call {
+func (_e *SyncPlugin_Expecter) Do(ctx any, tCtx any) *SyncPlugin_Do_Call {
 	return &SyncPlugin_Do_Call{Call: _e.mock.On("Do", ctx, tCtx)}
 }
 

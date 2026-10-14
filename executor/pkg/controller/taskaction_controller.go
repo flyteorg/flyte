@@ -25,18 +25,16 @@ import (
 	"strings"
 	"time"
 
-	"k8s.io/client-go/tools/events"
-	"k8s.io/client-go/util/retry"
-
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"go.opentelemetry.io/otel/metric"
 	"google.golang.org/protobuf/proto"
-
-	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/events"
+	"k8s.io/client-go/util/retry"
 	"k8s.io/utils/clock"
 	ctrl "sigs.k8s.io/controller-runtime"
 	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
@@ -51,13 +49,13 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -126,14 +124,14 @@ type TaskActionReconciler struct {
 // when no batcher is set (unit tests).
 func (r *TaskActionReconciler) recordEvent(ctx context.Context, event *workflow.ActionEvent) error {
 	if err := event.Validate(); err != nil {
-		return connect.NewError(connect.CodeInvalidArgument, err)
+		return connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
 	if r.eventBatcher != nil {
 		return r.eventBatcher.Record(ctx, event)
 	}
-	_, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
+	_, err := r.eventsClient.Record(ctx, &workflow.RecordRequest{
 		Events: []*workflow.ActionEvent{event},
-	}))
+	})
 	return err
 }
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -14,6 +14,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/k8s/podlogs"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/logs/dataplane"
 )
 
@@ -37,10 +38,10 @@ func NewK8sLogStreamer(k8sConfig *rest.Config) (*K8sLogStreamer, error) {
 }
 
 // TailLogs streams log lines for the given LogContext from a Kubernetes pod.
-func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogContext, stream *connect.ServerStream[dataproxy.TailLogsResponse]) error {
+func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogContext, stream dataproxyconnect.DataProxyServiceTailLogsServerStream) error {
 	pod, container, err := GetPrimaryPodAndContainer(logContext)
 	if err != nil {
-		return connect.NewError(connect.CodeNotFound, err)
+		return connect.NewError(connect.CodeNotFound, err.Error()).WithCause(err)
 	}
 
 	tailLines := defaultInitialLines
@@ -65,9 +66,9 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 	podObj, err := s.clientset.CoreV1().Pods(pod.GetNamespace()).Get(ctx, pod.GetPodName(), metav1.GetOptions{})
 	if err != nil {
 		if k8serrors.IsNotFound(err) {
-			return connect.NewError(connect.CodeNotFound, fmt.Errorf("pod %s not found in namespace %s", pod.GetPodName(), pod.GetNamespace()))
+			return connect.Errorf(connect.CodeNotFound, "pod %s not found in namespace %s", pod.GetPodName(), pod.GetNamespace())
 		}
-		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get pod: %w", err))
+		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get pod: %w", err).Error())
 	}
 	opts.Follow = podObj.Status.Phase == corev1.PodRunning
 
@@ -81,7 +82,7 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 
 	logStream, err := s.clientset.CoreV1().Pods(pod.GetNamespace()).GetLogs(pod.GetPodName(), opts).Stream(streamCtx)
 	if err != nil {
-		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to stream pod logs: %w", err))
+		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to stream pod logs: %w", err).Error())
 	}
 	defer logStream.Close() //nolint:errcheck
 
@@ -91,7 +92,7 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 		})
 	})
 	if err != nil {
-		return connect.NewError(connect.CodeInternal, fmt.Errorf("error reading log stream: %w", err))
+		return connect.NewError(connect.CodeInternal, fmt.Errorf("error reading log stream: %w", err).Error())
 	}
 	return nil
 }

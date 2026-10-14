@@ -17,10 +17,19 @@ func NewAutoRefresh(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *AutoRefresh {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &AutoRefresh{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -62,7 +71,7 @@ type AutoRefresh_DeleteDelayed_Call struct {
 
 // DeleteDelayed is a helper method to define mock.On call
 //   - id autorefreshcache.ItemID
-func (_e *AutoRefresh_Expecter) DeleteDelayed(id interface{}) *AutoRefresh_DeleteDelayed_Call {
+func (_e *AutoRefresh_Expecter) DeleteDelayed(id any) *AutoRefresh_DeleteDelayed_Call {
 	return &AutoRefresh_DeleteDelayed_Call{Call: _e.mock.On("DeleteDelayed", id)}
 }
 
@@ -124,7 +133,7 @@ type AutoRefresh_Get_Call struct {
 
 // Get is a helper method to define mock.On call
 //   - id autorefreshcache.ItemID
-func (_e *AutoRefresh_Expecter) Get(id interface{}) *AutoRefresh_Get_Call {
+func (_e *AutoRefresh_Expecter) Get(id any) *AutoRefresh_Get_Call {
 	return &AutoRefresh_Get_Call{Call: _e.mock.On("Get", id)}
 }
 
@@ -187,7 +196,7 @@ type AutoRefresh_GetOrCreate_Call struct {
 // GetOrCreate is a helper method to define mock.On call
 //   - id autorefreshcache.ItemID
 //   - item autorefreshcache.Item
-func (_e *AutoRefresh_Expecter) GetOrCreate(id interface{}, item interface{}) *AutoRefresh_GetOrCreate_Call {
+func (_e *AutoRefresh_Expecter) GetOrCreate(id any, item any) *AutoRefresh_GetOrCreate_Call {
 	return &AutoRefresh_GetOrCreate_Call{Call: _e.mock.On("GetOrCreate", id, item)}
 }
 
@@ -243,7 +252,7 @@ type AutoRefresh_Start_Call struct {
 
 // Start is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *AutoRefresh_Expecter) Start(ctx interface{}) *AutoRefresh_Start_Call {
+func (_e *AutoRefresh_Expecter) Start(ctx any) *AutoRefresh_Start_Call {
 	return &AutoRefresh_Start_Call{Call: _e.mock.On("Start", ctx)}
 }
 
@@ -276,10 +285,19 @@ func NewAutoRefreshWithUpdate(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *AutoRefreshWithUpdate {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &AutoRefreshWithUpdate{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -321,7 +339,7 @@ type AutoRefreshWithUpdate_DeleteDelayed_Call struct {
 
 // DeleteDelayed is a helper method to define mock.On call
 //   - id autorefreshcache.ItemID
-func (_e *AutoRefreshWithUpdate_Expecter) DeleteDelayed(id interface{}) *AutoRefreshWithUpdate_DeleteDelayed_Call {
+func (_e *AutoRefreshWithUpdate_Expecter) DeleteDelayed(id any) *AutoRefreshWithUpdate_DeleteDelayed_Call {
 	return &AutoRefreshWithUpdate_DeleteDelayed_Call{Call: _e.mock.On("DeleteDelayed", id)}
 }
 
@@ -383,7 +401,7 @@ type AutoRefreshWithUpdate_Get_Call struct {
 
 // Get is a helper method to define mock.On call
 //   - id autorefreshcache.ItemID
-func (_e *AutoRefreshWithUpdate_Expecter) Get(id interface{}) *AutoRefreshWithUpdate_Get_Call {
+func (_e *AutoRefreshWithUpdate_Expecter) Get(id any) *AutoRefreshWithUpdate_Get_Call {
 	return &AutoRefreshWithUpdate_Get_Call{Call: _e.mock.On("Get", id)}
 }
 
@@ -446,7 +464,7 @@ type AutoRefreshWithUpdate_GetOrCreate_Call struct {
 // GetOrCreate is a helper method to define mock.On call
 //   - id autorefreshcache.ItemID
 //   - item autorefreshcache.Item
-func (_e *AutoRefreshWithUpdate_Expecter) GetOrCreate(id interface{}, item interface{}) *AutoRefreshWithUpdate_GetOrCreate_Call {
+func (_e *AutoRefreshWithUpdate_Expecter) GetOrCreate(id any, item any) *AutoRefreshWithUpdate_GetOrCreate_Call {
 	return &AutoRefreshWithUpdate_GetOrCreate_Call{Call: _e.mock.On("GetOrCreate", id, item)}
 }
 
@@ -502,7 +520,7 @@ type AutoRefreshWithUpdate_Start_Call struct {
 
 // Start is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *AutoRefreshWithUpdate_Expecter) Start(ctx interface{}) *AutoRefreshWithUpdate_Start_Call {
+func (_e *AutoRefreshWithUpdate_Expecter) Start(ctx any) *AutoRefreshWithUpdate_Start_Call {
 	return &AutoRefreshWithUpdate_Start_Call{Call: _e.mock.On("Start", ctx)}
 }
 
@@ -554,7 +572,7 @@ type AutoRefreshWithUpdate_Update_Call struct {
 // Update is a helper method to define mock.On call
 //   - id autorefreshcache.ItemID
 //   - item autorefreshcache.Item
-func (_e *AutoRefreshWithUpdate_Expecter) Update(id interface{}, item interface{}) *AutoRefreshWithUpdate_Update_Call {
+func (_e *AutoRefreshWithUpdate_Expecter) Update(id any, item any) *AutoRefreshWithUpdate_Update_Call {
 	return &AutoRefreshWithUpdate_Update_Call{Call: _e.mock.On("Update", id, item)}
 }
 
@@ -592,10 +610,19 @@ func NewItem(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *Item {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &Item{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -663,10 +690,19 @@ func NewItemWrapper(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *ItemWrapper {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &ItemWrapper{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -718,8 +754,8 @@ func (_c *ItemWrapper_GetID_Call) Run(run func()) *ItemWrapper_GetID_Call {
 	return _c
 }
 
-func (_c *ItemWrapper_GetID_Call) Return(v autorefreshcache.ItemID) *ItemWrapper_GetID_Call {
-	_c.Call.Return(v)
+func (_c *ItemWrapper_GetID_Call) Return(itemID autorefreshcache.ItemID) *ItemWrapper_GetID_Call {
+	_c.Call.Return(itemID)
 	return _c
 }
 

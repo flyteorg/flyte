@@ -8,7 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"connectrpc.com/otelconnect"
 	"google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
@@ -45,21 +46,21 @@ type Client struct {
 
 var _ catalog.Client = (*Client)(nil)
 
-func NewClient(httpClient connect.HTTPClient, store *storage.DataStore, baseURL string, maxCacheAge time.Duration, opts ...connect.ClientOption) *Client {
+func NewClient(httpClient connecthttp.HTTPClient, store *storage.DataStore, baseURL string, maxCacheAge time.Duration, opts ...connect.ClientInterceptor) *Client {
 	if len(opts) == 0 {
-		if otelInterceptor, err := otelconnect.NewInterceptor(); err == nil {
-			opts = []connect.ClientOption{connect.WithInterceptors(otelInterceptor)}
+		if otelInterceptor, err := otelconnect.NewClientInterceptor(); err == nil {
+			opts = []connect.ClientInterceptor{otelInterceptor}
 		}
 	}
 
 	return &Client{
-		service:     v2connect.NewCacheServiceClient(httpClient, baseURL, opts...),
+		service:     v2connect.NewCacheServiceClient(connect.NewClient(connecthttp.NewTransport(httpClient, baseURL, connecthttp.WithReadMaxBytes(0)), opts...)),
 		store:       store,
 		maxCacheAge: maxCacheAge,
 	}
 }
 
-func NewHTTPClient(store *storage.DataStore, baseURL string, maxCacheAge time.Duration, opts ...connect.ClientOption) *Client {
+func NewHTTPClient(store *storage.DataStore, baseURL string, maxCacheAge time.Duration, opts ...connect.ClientInterceptor) *Client {
 	return NewClient(http.DefaultClient, store, baseURL, maxCacheAge, opts...)
 }
 
@@ -77,10 +78,10 @@ func (c *Client) Get(ctx context.Context, key catalog.Key) (catalog.Entry, error
 		return catalog.NewFailedCatalogEntry(catalog.NewStatus(corepb.CatalogCacheStatus_CACHE_LOOKUP_FAILURE, nil)), err
 	}
 
-	resp, err := c.service.Get(ctx, connect.NewRequest(&cacheservicev2.GetCacheRequest{
+	resp, err := c.service.Get(ctx, &cacheservicev2.GetCacheRequest{
 		BaseRequest: &cacheservicepb.GetCacheRequest{Key: cacheKey},
 		Identifier:  newIdentifier(key.Identifier),
-	}))
+	})
 	if err != nil {
 		if connect.CodeOf(err) == connect.CodeNotFound {
 			return catalog.Entry{}, grpcstatus.Error(codes.NotFound, err.Error())
@@ -88,7 +89,7 @@ func (c *Client) Get(ctx context.Context, key catalog.Key) (catalog.Entry, error
 		return catalog.NewFailedCatalogEntry(catalog.NewStatus(corepb.CatalogCacheStatus_CACHE_LOOKUP_FAILURE, nil)), err
 	}
 
-	output := resp.Msg.GetOutput()
+	output := resp.GetOutput()
 	if output == nil || output.GetOutput() == nil || output.GetMetadata() == nil {
 		return catalog.Entry{}, grpcstatus.Error(codes.Internal, "received malformed response from cache service")
 	}
@@ -123,19 +124,19 @@ func (c *Client) GetOrExtendReservation(ctx context.Context, key catalog.Key, ow
 		return nil, err
 	}
 
-	resp, err := c.service.GetOrExtendReservation(ctx, connect.NewRequest(&cacheservicev2.GetOrExtendReservationRequest{
+	resp, err := c.service.GetOrExtendReservation(ctx, &cacheservicev2.GetOrExtendReservationRequest{
 		BaseRequest: &cacheservicepb.GetOrExtendReservationRequest{
 			Key:               cacheKey,
 			OwnerId:           ownerID,
 			HeartbeatInterval: durationpb.New(heartbeatInterval),
 		},
 		Identifier: newIdentifier(key.Identifier),
-	}))
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	return resp.Msg.GetReservation(), nil
+	return resp.GetReservation(), nil
 }
 
 func (c *Client) Put(ctx context.Context, key catalog.Key, reader io.OutputReader, metadata catalog.Metadata) (catalog.Status, error) {
@@ -152,13 +153,13 @@ func (c *Client) ReleaseReservation(ctx context.Context, key catalog.Key, ownerI
 		return err
 	}
 
-	_, err = c.service.ReleaseReservation(ctx, connect.NewRequest(&cacheservicev2.ReleaseReservationRequest{
+	_, err = c.service.ReleaseReservation(ctx, &cacheservicev2.ReleaseReservationRequest{
 		BaseRequest: &cacheservicepb.ReleaseReservationRequest{
 			Key:     cacheKey,
 			OwnerId: ownerID,
 		},
 		Identifier: newIdentifier(key.Identifier),
-	}))
+	})
 	return err
 }
 
@@ -199,7 +200,7 @@ func (c *Client) put(ctx context.Context, key catalog.Key, reader io.OutputReade
 		return catalog.NewPutFailureStatus(&key), err
 	}
 
-	_, err = c.service.Put(ctx, connect.NewRequest(&cacheservicev2.PutCacheRequest{
+	_, err = c.service.Put(ctx, &cacheservicev2.PutCacheRequest{
 		BaseRequest: &cacheservicepb.PutCacheRequest{
 			Key: cacheKey,
 			Output: &cacheservicepb.CachedOutput{
@@ -211,7 +212,7 @@ func (c *Client) put(ctx context.Context, key catalog.Key, reader io.OutputReade
 			},
 		},
 		Identifier: newIdentifier(key.Identifier),
-	}))
+	})
 	if err != nil {
 		return catalog.NewPutFailureStatus(&key), err
 	}

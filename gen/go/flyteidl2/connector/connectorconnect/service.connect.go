@@ -5,20 +5,11 @@
 package connectorconnect
 
 import (
-	connect "connectrpc.com/connect"
+	connect "connectrpc.com/connect/v2"
 	context "context"
-	errors "errors"
 	connector "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/connector"
-	http "net/http"
-	strings "strings"
+	sync "sync"
 )
-
-// This is a compile-time assertion to ensure that this generated file and the connect package are
-// compatible. If you get a compiler error that this constant is not defined, this code was
-// generated with a version of connect newer than the one compiled into your binary. You can fix the
-// problem by either regenerating this code with an older version of connect or updating the connect
-// version compiled into your binary.
-const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// AsyncConnectorServiceName is the fully-qualified name of the AsyncConnectorService service.
@@ -27,339 +18,402 @@ const (
 	ConnectorMetadataServiceName = "flyteidl2.connector.ConnectorMetadataService"
 )
 
-// These constants are the fully-qualified names of the RPCs defined in this package. They're
-// exposed at runtime as Spec.Procedure and as the final two segments of the HTTP route.
+// These constants are the procedure names of the RPCs defined in this package. They're exposed at
+// runtime as Spec.Procedure and as the final two segments of the HTTP route.
 //
 // Note that these are different from the fully-qualified method names used by
 // google.golang.org/protobuf/reflect/protoreflect. To convert from these constants to
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// AsyncConnectorServiceCreateTaskProcedure is the fully-qualified name of the
-	// AsyncConnectorService's CreateTask RPC.
+	// AsyncConnectorServiceCreateTaskProcedure is the procedure name of the AsyncConnectorService's
+	// CreateTask RPC.
 	AsyncConnectorServiceCreateTaskProcedure = "/flyteidl2.connector.AsyncConnectorService/CreateTask"
-	// AsyncConnectorServiceGetTaskProcedure is the fully-qualified name of the AsyncConnectorService's
+	// AsyncConnectorServiceGetTaskProcedure is the procedure name of the AsyncConnectorService's
 	// GetTask RPC.
 	AsyncConnectorServiceGetTaskProcedure = "/flyteidl2.connector.AsyncConnectorService/GetTask"
-	// AsyncConnectorServiceDeleteTaskProcedure is the fully-qualified name of the
-	// AsyncConnectorService's DeleteTask RPC.
+	// AsyncConnectorServiceDeleteTaskProcedure is the procedure name of the AsyncConnectorService's
+	// DeleteTask RPC.
 	AsyncConnectorServiceDeleteTaskProcedure = "/flyteidl2.connector.AsyncConnectorService/DeleteTask"
-	// AsyncConnectorServiceGetTaskMetricsProcedure is the fully-qualified name of the
-	// AsyncConnectorService's GetTaskMetrics RPC.
+	// AsyncConnectorServiceGetTaskMetricsProcedure is the procedure name of the AsyncConnectorService's
+	// GetTaskMetrics RPC.
 	AsyncConnectorServiceGetTaskMetricsProcedure = "/flyteidl2.connector.AsyncConnectorService/GetTaskMetrics"
-	// AsyncConnectorServiceGetTaskLogsProcedure is the fully-qualified name of the
-	// AsyncConnectorService's GetTaskLogs RPC.
+	// AsyncConnectorServiceGetTaskLogsProcedure is the procedure name of the AsyncConnectorService's
+	// GetTaskLogs RPC.
 	AsyncConnectorServiceGetTaskLogsProcedure = "/flyteidl2.connector.AsyncConnectorService/GetTaskLogs"
-	// ConnectorMetadataServiceGetConnectorProcedure is the fully-qualified name of the
+	// ConnectorMetadataServiceGetConnectorProcedure is the procedure name of the
 	// ConnectorMetadataService's GetConnector RPC.
 	ConnectorMetadataServiceGetConnectorProcedure = "/flyteidl2.connector.ConnectorMetadataService/GetConnector"
-	// ConnectorMetadataServiceListConnectorsProcedure is the fully-qualified name of the
+	// ConnectorMetadataServiceListConnectorsProcedure is the procedure name of the
 	// ConnectorMetadataService's ListConnectors RPC.
 	ConnectorMetadataServiceListConnectorsProcedure = "/flyteidl2.connector.ConnectorMetadataService/ListConnectors"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	asyncConnectorServiceServiceDescriptor                 = connector.File_flyteidl2_connector_service_proto.Services().ByName("AsyncConnectorService")
-	asyncConnectorServiceCreateTaskMethodDescriptor        = asyncConnectorServiceServiceDescriptor.Methods().ByName("CreateTask")
-	asyncConnectorServiceGetTaskMethodDescriptor           = asyncConnectorServiceServiceDescriptor.Methods().ByName("GetTask")
-	asyncConnectorServiceDeleteTaskMethodDescriptor        = asyncConnectorServiceServiceDescriptor.Methods().ByName("DeleteTask")
-	asyncConnectorServiceGetTaskMetricsMethodDescriptor    = asyncConnectorServiceServiceDescriptor.Methods().ByName("GetTaskMetrics")
-	asyncConnectorServiceGetTaskLogsMethodDescriptor       = asyncConnectorServiceServiceDescriptor.Methods().ByName("GetTaskLogs")
-	connectorMetadataServiceServiceDescriptor              = connector.File_flyteidl2_connector_service_proto.Services().ByName("ConnectorMetadataService")
-	connectorMetadataServiceGetConnectorMethodDescriptor   = connectorMetadataServiceServiceDescriptor.Methods().ByName("GetConnector")
-	connectorMetadataServiceListConnectorsMethodDescriptor = connectorMetadataServiceServiceDescriptor.Methods().ByName("ListConnectors")
+	asyncConnectorServiceCreateTaskSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     connector.File_flyteidl2_connector_service_proto.Services().ByName("AsyncConnectorService").Methods().ByName("CreateTask"),
+			Procedure:  AsyncConnectorServiceCreateTaskProcedure,
+		}
+	})
+	asyncConnectorServiceGetTaskSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     connector.File_flyteidl2_connector_service_proto.Services().ByName("AsyncConnectorService").Methods().ByName("GetTask"),
+			Procedure:  AsyncConnectorServiceGetTaskProcedure,
+		}
+	})
+	asyncConnectorServiceDeleteTaskSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     connector.File_flyteidl2_connector_service_proto.Services().ByName("AsyncConnectorService").Methods().ByName("DeleteTask"),
+			Procedure:  AsyncConnectorServiceDeleteTaskProcedure,
+		}
+	})
+	asyncConnectorServiceGetTaskMetricsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     connector.File_flyteidl2_connector_service_proto.Services().ByName("AsyncConnectorService").Methods().ByName("GetTaskMetrics"),
+			Procedure:  AsyncConnectorServiceGetTaskMetricsProcedure,
+		}
+	})
+	asyncConnectorServiceGetTaskLogsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeServer,
+			Schema:     connector.File_flyteidl2_connector_service_proto.Services().ByName("AsyncConnectorService").Methods().ByName("GetTaskLogs"),
+			Procedure:  AsyncConnectorServiceGetTaskLogsProcedure,
+		}
+	})
 )
 
 // AsyncConnectorServiceClient is a client for the flyteidl2.connector.AsyncConnectorService
 // service.
 type AsyncConnectorServiceClient interface {
 	// CreateTask sends a task create request to the connector service.
-	CreateTask(context.Context, *connect.Request[connector.CreateTaskRequest]) (*connect.Response[connector.CreateTaskResponse], error)
+	CreateTask(context.Context, *connector.CreateTaskRequest) (*connector.CreateTaskResponse, error)
 	// Get job status.
-	GetTask(context.Context, *connect.Request[connector.GetTaskRequest]) (*connect.Response[connector.GetTaskResponse], error)
+	GetTask(context.Context, *connector.GetTaskRequest) (*connector.GetTaskResponse, error)
 	// Delete the task resource.
-	DeleteTask(context.Context, *connect.Request[connector.DeleteTaskRequest]) (*connect.Response[connector.DeleteTaskResponse], error)
+	DeleteTask(context.Context, *connector.DeleteTaskRequest) (*connector.DeleteTaskResponse, error)
 	// GetTaskMetrics returns one or more task execution metrics, if available.
 	//
 	// Errors include
-	//   - OutOfRange if metrics are not available for the specified task time range
-	//   - various other errors
-	GetTaskMetrics(context.Context, *connect.Request[connector.GetTaskMetricsRequest]) (*connect.Response[connector.GetTaskMetricsResponse], error)
+	//  * OutOfRange if metrics are not available for the specified task time range
+	//  * various other errors
+	GetTaskMetrics(context.Context, *connector.GetTaskMetricsRequest) (*connector.GetTaskMetricsResponse, error)
 	// GetTaskLogs returns task execution logs, if available.
-	GetTaskLogs(context.Context, *connect.Request[connector.GetTaskLogsRequest]) (*connect.ServerStreamForClient[connector.GetTaskLogsResponse], error)
+	GetTaskLogs(context.Context, *connector.GetTaskLogsRequest) (AsyncConnectorServiceGetTaskLogsClientStream, error)
 }
 
 // NewAsyncConnectorServiceClient constructs a client for the
-// flyteidl2.connector.AsyncConnectorService service. By default, it uses the Connect protocol with
-// the binary Protobuf Codec, asks for gzipped responses, and sends uncompressed requests. To use
-// the gRPC or gRPC-Web protocols, supply the connect.WithGRPC() or connect.WithGRPCWeb() options.
-//
-// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
-// http://api.acme.com or https://acme.com/grpc).
-func NewAsyncConnectorServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) AsyncConnectorServiceClient {
-	baseURL = strings.TrimRight(baseURL, "/")
-	return &asyncConnectorServiceClient{
-		createTask: connect.NewClient[connector.CreateTaskRequest, connector.CreateTaskResponse](
-			httpClient,
-			baseURL+AsyncConnectorServiceCreateTaskProcedure,
-			connect.WithSchema(asyncConnectorServiceCreateTaskMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		getTask: connect.NewClient[connector.GetTaskRequest, connector.GetTaskResponse](
-			httpClient,
-			baseURL+AsyncConnectorServiceGetTaskProcedure,
-			connect.WithSchema(asyncConnectorServiceGetTaskMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		deleteTask: connect.NewClient[connector.DeleteTaskRequest, connector.DeleteTaskResponse](
-			httpClient,
-			baseURL+AsyncConnectorServiceDeleteTaskProcedure,
-			connect.WithSchema(asyncConnectorServiceDeleteTaskMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		getTaskMetrics: connect.NewClient[connector.GetTaskMetricsRequest, connector.GetTaskMetricsResponse](
-			httpClient,
-			baseURL+AsyncConnectorServiceGetTaskMetricsProcedure,
-			connect.WithSchema(asyncConnectorServiceGetTaskMetricsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		getTaskLogs: connect.NewClient[connector.GetTaskLogsRequest, connector.GetTaskLogsResponse](
-			httpClient,
-			baseURL+AsyncConnectorServiceGetTaskLogsProcedure,
-			connect.WithSchema(asyncConnectorServiceGetTaskLogsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
+// flyteidl2.connector.AsyncConnectorService service. Multiple service clients may share a single
+// connect.Client.
+func NewAsyncConnectorServiceClient(client *connect.Client) AsyncConnectorServiceClient {
+	return &asyncConnectorServiceClient{client: client}
+}
+
+// AsyncConnectorServiceGetTaskLogsClientStream is the client stream for the AsyncConnectorService's
+// GetTaskLogs RPC.
+type AsyncConnectorServiceGetTaskLogsClientStream struct {
+	stream connect.ClientStream
+}
+
+// Receive returns the next response message from the server.
+func (s AsyncConnectorServiceGetTaskLogsClientStream) Receive() (*connector.GetTaskLogsResponse, error) {
+	var res connector.GetTaskLogsResponse
+	if err := s.stream.Receive(&res); err != nil {
+		return nil, err
 	}
+	return &res, nil
 }
 
-// asyncConnectorServiceClient implements AsyncConnectorServiceClient.
-type asyncConnectorServiceClient struct {
-	createTask     *connect.Client[connector.CreateTaskRequest, connector.CreateTaskResponse]
-	getTask        *connect.Client[connector.GetTaskRequest, connector.GetTaskResponse]
-	deleteTask     *connect.Client[connector.DeleteTaskRequest, connector.DeleteTaskResponse]
-	getTaskMetrics *connect.Client[connector.GetTaskMetricsRequest, connector.GetTaskMetricsResponse]
-	getTaskLogs    *connect.Client[connector.GetTaskLogsRequest, connector.GetTaskLogsResponse]
-}
-
-// CreateTask calls flyteidl2.connector.AsyncConnectorService.CreateTask.
-func (c *asyncConnectorServiceClient) CreateTask(ctx context.Context, req *connect.Request[connector.CreateTaskRequest]) (*connect.Response[connector.CreateTaskResponse], error) {
-	return c.createTask.CallUnary(ctx, req)
-}
-
-// GetTask calls flyteidl2.connector.AsyncConnectorService.GetTask.
-func (c *asyncConnectorServiceClient) GetTask(ctx context.Context, req *connect.Request[connector.GetTaskRequest]) (*connect.Response[connector.GetTaskResponse], error) {
-	return c.getTask.CallUnary(ctx, req)
-}
-
-// DeleteTask calls flyteidl2.connector.AsyncConnectorService.DeleteTask.
-func (c *asyncConnectorServiceClient) DeleteTask(ctx context.Context, req *connect.Request[connector.DeleteTaskRequest]) (*connect.Response[connector.DeleteTaskResponse], error) {
-	return c.deleteTask.CallUnary(ctx, req)
-}
-
-// GetTaskMetrics calls flyteidl2.connector.AsyncConnectorService.GetTaskMetrics.
-func (c *asyncConnectorServiceClient) GetTaskMetrics(ctx context.Context, req *connect.Request[connector.GetTaskMetricsRequest]) (*connect.Response[connector.GetTaskMetricsResponse], error) {
-	return c.getTaskMetrics.CallUnary(ctx, req)
-}
-
-// GetTaskLogs calls flyteidl2.connector.AsyncConnectorService.GetTaskLogs.
-func (c *asyncConnectorServiceClient) GetTaskLogs(ctx context.Context, req *connect.Request[connector.GetTaskLogsRequest]) (*connect.ServerStreamForClient[connector.GetTaskLogsResponse], error) {
-	return c.getTaskLogs.CallServerStream(ctx, req)
+// Close releases the stream's resources. It is idempotent and is typically deferred to clean up a
+// stream abandoned before io.EOF.
+func (s AsyncConnectorServiceGetTaskLogsClientStream) Close() error {
+	return s.stream.Close()
 }
 
 // AsyncConnectorServiceHandler is an implementation of the
 // flyteidl2.connector.AsyncConnectorService service.
 type AsyncConnectorServiceHandler interface {
 	// CreateTask sends a task create request to the connector service.
-	CreateTask(context.Context, *connect.Request[connector.CreateTaskRequest]) (*connect.Response[connector.CreateTaskResponse], error)
+	CreateTask(context.Context, *connector.CreateTaskRequest) (*connector.CreateTaskResponse, error)
 	// Get job status.
-	GetTask(context.Context, *connect.Request[connector.GetTaskRequest]) (*connect.Response[connector.GetTaskResponse], error)
+	GetTask(context.Context, *connector.GetTaskRequest) (*connector.GetTaskResponse, error)
 	// Delete the task resource.
-	DeleteTask(context.Context, *connect.Request[connector.DeleteTaskRequest]) (*connect.Response[connector.DeleteTaskResponse], error)
+	DeleteTask(context.Context, *connector.DeleteTaskRequest) (*connector.DeleteTaskResponse, error)
 	// GetTaskMetrics returns one or more task execution metrics, if available.
 	//
 	// Errors include
-	//   - OutOfRange if metrics are not available for the specified task time range
-	//   - various other errors
-	GetTaskMetrics(context.Context, *connect.Request[connector.GetTaskMetricsRequest]) (*connect.Response[connector.GetTaskMetricsResponse], error)
+	//  * OutOfRange if metrics are not available for the specified task time range
+	//  * various other errors
+	GetTaskMetrics(context.Context, *connector.GetTaskMetricsRequest) (*connector.GetTaskMetricsResponse, error)
 	// GetTaskLogs returns task execution logs, if available.
-	GetTaskLogs(context.Context, *connect.Request[connector.GetTaskLogsRequest], *connect.ServerStream[connector.GetTaskLogsResponse]) error
+	GetTaskLogs(context.Context, *connector.GetTaskLogsRequest, AsyncConnectorServiceGetTaskLogsServerStream) error
 }
 
-// NewAsyncConnectorServiceHandler builds an HTTP handler from the service implementation. It
-// returns the path on which to mount the handler and the handler itself.
-//
-// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
-// and JSON codecs. They also support gzip compression.
-func NewAsyncConnectorServiceHandler(svc AsyncConnectorServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	asyncConnectorServiceCreateTaskHandler := connect.NewUnaryHandler(
-		AsyncConnectorServiceCreateTaskProcedure,
-		svc.CreateTask,
-		connect.WithSchema(asyncConnectorServiceCreateTaskMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
+// RegisterAsyncConnectorServiceHandler registers svc as the
+// flyteidl2.connector.AsyncConnectorService implementation on server.
+func RegisterAsyncConnectorServiceHandler(server *connect.Server, svc AsyncConnectorServiceHandler) {
+	adapter := asyncConnectorServiceHandler{svc: svc}
+	server.Register(
+		connect.Method{Spec: asyncConnectorServiceCreateTaskSpec(), Handler: adapter.createTask},
+		connect.Method{Spec: asyncConnectorServiceGetTaskSpec(), Handler: adapter.getTask},
+		connect.Method{Spec: asyncConnectorServiceDeleteTaskSpec(), Handler: adapter.deleteTask},
+		connect.Method{Spec: asyncConnectorServiceGetTaskMetricsSpec(), Handler: adapter.getTaskMetrics},
+		connect.Method{Spec: asyncConnectorServiceGetTaskLogsSpec(), Handler: adapter.getTaskLogs},
 	)
-	asyncConnectorServiceGetTaskHandler := connect.NewUnaryHandler(
-		AsyncConnectorServiceGetTaskProcedure,
-		svc.GetTask,
-		connect.WithSchema(asyncConnectorServiceGetTaskMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	asyncConnectorServiceDeleteTaskHandler := connect.NewUnaryHandler(
-		AsyncConnectorServiceDeleteTaskProcedure,
-		svc.DeleteTask,
-		connect.WithSchema(asyncConnectorServiceDeleteTaskMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	asyncConnectorServiceGetTaskMetricsHandler := connect.NewUnaryHandler(
-		AsyncConnectorServiceGetTaskMetricsProcedure,
-		svc.GetTaskMetrics,
-		connect.WithSchema(asyncConnectorServiceGetTaskMetricsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	asyncConnectorServiceGetTaskLogsHandler := connect.NewServerStreamHandler(
-		AsyncConnectorServiceGetTaskLogsProcedure,
-		svc.GetTaskLogs,
-		connect.WithSchema(asyncConnectorServiceGetTaskLogsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	return "/flyteidl2.connector.AsyncConnectorService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case AsyncConnectorServiceCreateTaskProcedure:
-			asyncConnectorServiceCreateTaskHandler.ServeHTTP(w, r)
-		case AsyncConnectorServiceGetTaskProcedure:
-			asyncConnectorServiceGetTaskHandler.ServeHTTP(w, r)
-		case AsyncConnectorServiceDeleteTaskProcedure:
-			asyncConnectorServiceDeleteTaskHandler.ServeHTTP(w, r)
-		case AsyncConnectorServiceGetTaskMetricsProcedure:
-			asyncConnectorServiceGetTaskMetricsHandler.ServeHTTP(w, r)
-		case AsyncConnectorServiceGetTaskLogsProcedure:
-			asyncConnectorServiceGetTaskLogsHandler.ServeHTTP(w, r)
-		default:
-			http.NotFound(w, r)
-		}
-	})
+}
+
+// AsyncConnectorServiceGetTaskLogsServerStream is the server stream for the AsyncConnectorService's
+// GetTaskLogs RPC.
+type AsyncConnectorServiceGetTaskLogsServerStream struct {
+	stream connect.ServerStream
+}
+
+// SendHeaders flushes the response headers without a message. The first Send does this implicitly.
+func (s AsyncConnectorServiceGetTaskLogsServerStream) SendHeaders() error {
+	return s.stream.SendHeaders()
+}
+
+// Send sends a response message to the client.
+func (s AsyncConnectorServiceGetTaskLogsServerStream) Send(res *connector.GetTaskLogsResponse) error {
+	return s.stream.Send(res)
 }
 
 // UnimplementedAsyncConnectorServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedAsyncConnectorServiceHandler struct{}
 
-func (UnimplementedAsyncConnectorServiceHandler) CreateTask(context.Context, *connect.Request[connector.CreateTaskRequest]) (*connect.Response[connector.CreateTaskResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.connector.AsyncConnectorService.CreateTask is not implemented"))
+func (UnimplementedAsyncConnectorServiceHandler) CreateTask(context.Context, *connector.CreateTaskRequest) (*connector.CreateTaskResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.connector.AsyncConnectorService.CreateTask is not implemented")
 }
 
-func (UnimplementedAsyncConnectorServiceHandler) GetTask(context.Context, *connect.Request[connector.GetTaskRequest]) (*connect.Response[connector.GetTaskResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.connector.AsyncConnectorService.GetTask is not implemented"))
+func (UnimplementedAsyncConnectorServiceHandler) GetTask(context.Context, *connector.GetTaskRequest) (*connector.GetTaskResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.connector.AsyncConnectorService.GetTask is not implemented")
 }
 
-func (UnimplementedAsyncConnectorServiceHandler) DeleteTask(context.Context, *connect.Request[connector.DeleteTaskRequest]) (*connect.Response[connector.DeleteTaskResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.connector.AsyncConnectorService.DeleteTask is not implemented"))
+func (UnimplementedAsyncConnectorServiceHandler) DeleteTask(context.Context, *connector.DeleteTaskRequest) (*connector.DeleteTaskResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.connector.AsyncConnectorService.DeleteTask is not implemented")
 }
 
-func (UnimplementedAsyncConnectorServiceHandler) GetTaskMetrics(context.Context, *connect.Request[connector.GetTaskMetricsRequest]) (*connect.Response[connector.GetTaskMetricsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.connector.AsyncConnectorService.GetTaskMetrics is not implemented"))
+func (UnimplementedAsyncConnectorServiceHandler) GetTaskMetrics(context.Context, *connector.GetTaskMetricsRequest) (*connector.GetTaskMetricsResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.connector.AsyncConnectorService.GetTaskMetrics is not implemented")
 }
 
-func (UnimplementedAsyncConnectorServiceHandler) GetTaskLogs(context.Context, *connect.Request[connector.GetTaskLogsRequest], *connect.ServerStream[connector.GetTaskLogsResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.connector.AsyncConnectorService.GetTaskLogs is not implemented"))
+func (UnimplementedAsyncConnectorServiceHandler) GetTaskLogs(context.Context, *connector.GetTaskLogsRequest, AsyncConnectorServiceGetTaskLogsServerStream) error {
+	return connect.NewError(connect.CodeUnimplemented, "flyteidl2.connector.AsyncConnectorService.GetTaskLogs is not implemented")
 }
+
+type asyncConnectorServiceClient struct {
+	client *connect.Client
+}
+
+func (c *asyncConnectorServiceClient) CreateTask(ctx context.Context, req *connector.CreateTaskRequest) (*connector.CreateTaskResponse, error) {
+	var res connector.CreateTaskResponse
+	if err := c.client.CallUnary(ctx, asyncConnectorServiceCreateTaskSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *asyncConnectorServiceClient) GetTask(ctx context.Context, req *connector.GetTaskRequest) (*connector.GetTaskResponse, error) {
+	var res connector.GetTaskResponse
+	if err := c.client.CallUnary(ctx, asyncConnectorServiceGetTaskSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *asyncConnectorServiceClient) DeleteTask(ctx context.Context, req *connector.DeleteTaskRequest) (*connector.DeleteTaskResponse, error) {
+	var res connector.DeleteTaskResponse
+	if err := c.client.CallUnary(ctx, asyncConnectorServiceDeleteTaskSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *asyncConnectorServiceClient) GetTaskMetrics(ctx context.Context, req *connector.GetTaskMetricsRequest) (*connector.GetTaskMetricsResponse, error) {
+	var res connector.GetTaskMetricsResponse
+	if err := c.client.CallUnary(ctx, asyncConnectorServiceGetTaskMetricsSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *asyncConnectorServiceClient) GetTaskLogs(ctx context.Context, req *connector.GetTaskLogsRequest) (AsyncConnectorServiceGetTaskLogsClientStream, error) {
+	stream, err := c.client.CallServerStream(ctx, asyncConnectorServiceGetTaskLogsSpec(), req)
+	if err != nil {
+		return AsyncConnectorServiceGetTaskLogsClientStream{}, err
+	}
+	return AsyncConnectorServiceGetTaskLogsClientStream{stream: stream}, nil
+}
+
+type asyncConnectorServiceHandler struct{ svc AsyncConnectorServiceHandler }
+
+func (h asyncConnectorServiceHandler) createTask(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req connector.CreateTaskRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.CreateTask(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h asyncConnectorServiceHandler) getTask(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req connector.GetTaskRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.GetTask(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h asyncConnectorServiceHandler) deleteTask(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req connector.DeleteTaskRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.DeleteTask(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h asyncConnectorServiceHandler) getTaskMetrics(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req connector.GetTaskMetricsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.GetTaskMetrics(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h asyncConnectorServiceHandler) getTaskLogs(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req connector.GetTaskLogsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	return h.svc.GetTaskLogs(ctx, &req, AsyncConnectorServiceGetTaskLogsServerStream{stream: stream})
+}
+
+var (
+	connectorMetadataServiceGetConnectorSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     connector.File_flyteidl2_connector_service_proto.Services().ByName("ConnectorMetadataService").Methods().ByName("GetConnector"),
+			Procedure:  ConnectorMetadataServiceGetConnectorProcedure,
+		}
+	})
+	connectorMetadataServiceListConnectorsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     connector.File_flyteidl2_connector_service_proto.Services().ByName("ConnectorMetadataService").Methods().ByName("ListConnectors"),
+			Procedure:  ConnectorMetadataServiceListConnectorsProcedure,
+		}
+	})
+)
 
 // ConnectorMetadataServiceClient is a client for the flyteidl2.connector.ConnectorMetadataService
 // service.
 type ConnectorMetadataServiceClient interface {
 	// Fetch a :ref:`ref_flyteidl2.plugins.Connector` definition.
-	GetConnector(context.Context, *connect.Request[connector.GetConnectorRequest]) (*connect.Response[connector.GetConnectorResponse], error)
+	GetConnector(context.Context, *connector.GetConnectorRequest) (*connector.GetConnectorResponse, error)
 	// Fetch a list of :ref:`ref_flyteidl2.plugins.Connector` definitions.
-	ListConnectors(context.Context, *connect.Request[connector.ListConnectorsRequest]) (*connect.Response[connector.ListConnectorsResponse], error)
+	ListConnectors(context.Context, *connector.ListConnectorsRequest) (*connector.ListConnectorsResponse, error)
 }
 
 // NewConnectorMetadataServiceClient constructs a client for the
-// flyteidl2.connector.ConnectorMetadataService service. By default, it uses the Connect protocol
-// with the binary Protobuf Codec, asks for gzipped responses, and sends uncompressed requests. To
-// use the gRPC or gRPC-Web protocols, supply the connect.WithGRPC() or connect.WithGRPCWeb()
-// options.
-//
-// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
-// http://api.acme.com or https://acme.com/grpc).
-func NewConnectorMetadataServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ConnectorMetadataServiceClient {
-	baseURL = strings.TrimRight(baseURL, "/")
-	return &connectorMetadataServiceClient{
-		getConnector: connect.NewClient[connector.GetConnectorRequest, connector.GetConnectorResponse](
-			httpClient,
-			baseURL+ConnectorMetadataServiceGetConnectorProcedure,
-			connect.WithSchema(connectorMetadataServiceGetConnectorMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		listConnectors: connect.NewClient[connector.ListConnectorsRequest, connector.ListConnectorsResponse](
-			httpClient,
-			baseURL+ConnectorMetadataServiceListConnectorsProcedure,
-			connect.WithSchema(connectorMetadataServiceListConnectorsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-	}
-}
-
-// connectorMetadataServiceClient implements ConnectorMetadataServiceClient.
-type connectorMetadataServiceClient struct {
-	getConnector   *connect.Client[connector.GetConnectorRequest, connector.GetConnectorResponse]
-	listConnectors *connect.Client[connector.ListConnectorsRequest, connector.ListConnectorsResponse]
-}
-
-// GetConnector calls flyteidl2.connector.ConnectorMetadataService.GetConnector.
-func (c *connectorMetadataServiceClient) GetConnector(ctx context.Context, req *connect.Request[connector.GetConnectorRequest]) (*connect.Response[connector.GetConnectorResponse], error) {
-	return c.getConnector.CallUnary(ctx, req)
-}
-
-// ListConnectors calls flyteidl2.connector.ConnectorMetadataService.ListConnectors.
-func (c *connectorMetadataServiceClient) ListConnectors(ctx context.Context, req *connect.Request[connector.ListConnectorsRequest]) (*connect.Response[connector.ListConnectorsResponse], error) {
-	return c.listConnectors.CallUnary(ctx, req)
+// flyteidl2.connector.ConnectorMetadataService service. Multiple service clients may share a single
+// connect.Client.
+func NewConnectorMetadataServiceClient(client *connect.Client) ConnectorMetadataServiceClient {
+	return &connectorMetadataServiceClient{client: client}
 }
 
 // ConnectorMetadataServiceHandler is an implementation of the
 // flyteidl2.connector.ConnectorMetadataService service.
 type ConnectorMetadataServiceHandler interface {
 	// Fetch a :ref:`ref_flyteidl2.plugins.Connector` definition.
-	GetConnector(context.Context, *connect.Request[connector.GetConnectorRequest]) (*connect.Response[connector.GetConnectorResponse], error)
+	GetConnector(context.Context, *connector.GetConnectorRequest) (*connector.GetConnectorResponse, error)
 	// Fetch a list of :ref:`ref_flyteidl2.plugins.Connector` definitions.
-	ListConnectors(context.Context, *connect.Request[connector.ListConnectorsRequest]) (*connect.Response[connector.ListConnectorsResponse], error)
+	ListConnectors(context.Context, *connector.ListConnectorsRequest) (*connector.ListConnectorsResponse, error)
 }
 
-// NewConnectorMetadataServiceHandler builds an HTTP handler from the service implementation. It
-// returns the path on which to mount the handler and the handler itself.
-//
-// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
-// and JSON codecs. They also support gzip compression.
-func NewConnectorMetadataServiceHandler(svc ConnectorMetadataServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	connectorMetadataServiceGetConnectorHandler := connect.NewUnaryHandler(
-		ConnectorMetadataServiceGetConnectorProcedure,
-		svc.GetConnector,
-		connect.WithSchema(connectorMetadataServiceGetConnectorMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
+// RegisterConnectorMetadataServiceHandler registers svc as the
+// flyteidl2.connector.ConnectorMetadataService implementation on server.
+func RegisterConnectorMetadataServiceHandler(server *connect.Server, svc ConnectorMetadataServiceHandler) {
+	adapter := connectorMetadataServiceHandler{svc: svc}
+	server.Register(
+		connect.Method{Spec: connectorMetadataServiceGetConnectorSpec(), Handler: adapter.getConnector},
+		connect.Method{Spec: connectorMetadataServiceListConnectorsSpec(), Handler: adapter.listConnectors},
 	)
-	connectorMetadataServiceListConnectorsHandler := connect.NewUnaryHandler(
-		ConnectorMetadataServiceListConnectorsProcedure,
-		svc.ListConnectors,
-		connect.WithSchema(connectorMetadataServiceListConnectorsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	return "/flyteidl2.connector.ConnectorMetadataService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case ConnectorMetadataServiceGetConnectorProcedure:
-			connectorMetadataServiceGetConnectorHandler.ServeHTTP(w, r)
-		case ConnectorMetadataServiceListConnectorsProcedure:
-			connectorMetadataServiceListConnectorsHandler.ServeHTTP(w, r)
-		default:
-			http.NotFound(w, r)
-		}
-	})
 }
 
 // UnimplementedConnectorMetadataServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedConnectorMetadataServiceHandler struct{}
 
-func (UnimplementedConnectorMetadataServiceHandler) GetConnector(context.Context, *connect.Request[connector.GetConnectorRequest]) (*connect.Response[connector.GetConnectorResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.connector.ConnectorMetadataService.GetConnector is not implemented"))
+func (UnimplementedConnectorMetadataServiceHandler) GetConnector(context.Context, *connector.GetConnectorRequest) (*connector.GetConnectorResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.connector.ConnectorMetadataService.GetConnector is not implemented")
 }
 
-func (UnimplementedConnectorMetadataServiceHandler) ListConnectors(context.Context, *connect.Request[connector.ListConnectorsRequest]) (*connect.Response[connector.ListConnectorsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.connector.ConnectorMetadataService.ListConnectors is not implemented"))
+func (UnimplementedConnectorMetadataServiceHandler) ListConnectors(context.Context, *connector.ListConnectorsRequest) (*connector.ListConnectorsResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.connector.ConnectorMetadataService.ListConnectors is not implemented")
+}
+
+type connectorMetadataServiceClient struct {
+	client *connect.Client
+}
+
+func (c *connectorMetadataServiceClient) GetConnector(ctx context.Context, req *connector.GetConnectorRequest) (*connector.GetConnectorResponse, error) {
+	var res connector.GetConnectorResponse
+	if err := c.client.CallUnary(ctx, connectorMetadataServiceGetConnectorSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *connectorMetadataServiceClient) ListConnectors(ctx context.Context, req *connector.ListConnectorsRequest) (*connector.ListConnectorsResponse, error) {
+	var res connector.ListConnectorsResponse
+	if err := c.client.CallUnary(ctx, connectorMetadataServiceListConnectorsSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+type connectorMetadataServiceHandler struct {
+	svc ConnectorMetadataServiceHandler
+}
+
+func (h connectorMetadataServiceHandler) getConnector(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req connector.GetConnectorRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.GetConnector(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h connectorMetadataServiceHandler) listConnectors(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req connector.ListConnectorsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.ListConnectors(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
 }

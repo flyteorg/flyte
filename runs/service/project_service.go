@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -31,118 +31,118 @@ func NewProjectService(projectRepo interfaces.ProjectRepo, domains []*project.Do
 
 func (s *ProjectService) CreateProject(
 	ctx context.Context,
-	req *connect.Request[project.CreateProjectRequest],
-) (*connect.Response[project.CreateProjectResponse], error) {
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	req *project.CreateProjectRequest,
+) (*project.CreateProjectResponse, error) {
+	if err := req.Validate(); err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
 
-	projectProto := req.Msg.GetProject()
+	projectProto := req.GetProject()
 	if projectProto == nil || projectProto.GetId() == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("project.id is required"))
+		return nil, connect.NewError(connect.CodeInvalidArgument, "project.id is required")
 	}
 
 	model, err := transformers.NewProjectModel(projectProto)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
 
 	if err := s.projectRepo.CreateProject(ctx, model); err != nil {
 		if errors.Is(err, interfaces.ErrProjectAlreadyExists) {
 			logger.Warnf(ctx, "Project already exists, identifier: %s, name: %s", model.Identifier, model.Name)
-			return nil, connect.NewError(connect.CodeAlreadyExists, err)
+			return nil, connect.NewError(connect.CodeAlreadyExists, err.Error()).WithCause(err)
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
-	return connect.NewResponse(&project.CreateProjectResponse{}), nil
+	return &project.CreateProjectResponse{}, nil
 }
 
 func (s *ProjectService) UpdateProject(
 	ctx context.Context,
-	req *connect.Request[project.UpdateProjectRequest],
-) (*connect.Response[project.UpdateProjectResponse], error) {
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	req *project.UpdateProjectRequest,
+) (*project.UpdateProjectResponse, error) {
+	if err := req.Validate(); err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
 
-	projectProto := req.Msg.GetProject()
+	projectProto := req.GetProject()
 	if projectProto == nil || projectProto.GetId() == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("project.id is required"))
+		return nil, connect.NewError(connect.CodeInvalidArgument, "project.id is required")
 	}
 
 	model, err := transformers.NewProjectModel(projectProto)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
 
 	if err := s.projectRepo.UpdateProject(ctx, model); err != nil {
 		if errors.Is(err, interfaces.ErrProjectNotFound) {
-			return nil, connect.NewError(connect.CodeNotFound, err)
+			return nil, connect.NewError(connect.CodeNotFound, err.Error()).WithCause(err)
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
-	return connect.NewResponse(&project.UpdateProjectResponse{}), nil
+	return &project.UpdateProjectResponse{}, nil
 }
 
 func (s *ProjectService) GetProject(
 	ctx context.Context,
-	req *connect.Request[project.GetProjectRequest],
-) (*connect.Response[project.GetProjectResponse], error) {
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	req *project.GetProjectRequest,
+) (*project.GetProjectResponse, error) {
+	if err := req.Validate(); err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
-	if req.Msg.GetId() == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("id is required"))
+	if req.GetId() == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument, "id is required")
 	}
 
-	model, err := s.projectRepo.GetProject(ctx, req.Msg.GetId())
+	model, err := s.projectRepo.GetProject(ctx, req.GetId())
 	if err != nil {
 		if errors.Is(err, interfaces.ErrProjectNotFound) {
-			return nil, connect.NewError(connect.CodeNotFound, err)
+			return nil, connect.NewError(connect.CodeNotFound, err.Error()).WithCause(err)
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
 	projectProto, err := transformers.ProjectModelToProject(model, s.domains)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
-	return connect.NewResponse(&project.GetProjectResponse{
+	return &project.GetProjectResponse{
 		Project: projectProto,
-	}), nil
+	}, nil
 }
 
 func (s *ProjectService) ListProjects(
 	ctx context.Context,
-	req *connect.Request[project.ListProjectsRequest],
-) (*connect.Response[project.ListProjectsResponse], error) {
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	req *project.ListProjectsRequest,
+) (*project.ListProjectsResponse, error) {
+	if err := req.Validate(); err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
 
-	listInput, err := listResourceInputFromProjectListRequest(req.Msg)
+	listInput, err := listResourceInputFromProjectListRequest(req)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
 
 	// If no filters are supplied, hide archived (deleted) projects.
-	if req.Msg.GetFilters() == "" {
+	if req.GetFilters() == "" {
 		listInput.Filter = impl.NewNotEqualFilter("state", int32(project.ProjectState_PROJECT_STATE_ARCHIVED))
 	}
 
 	projects, err := s.projectRepo.ListProjects(ctx, listInput)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
 	projectProtos := make([]*project.Project, 0, len(projects))
 	for _, p := range projects {
 		projectProto, convErr := transformers.ProjectModelToProject(p, s.domains)
 		if convErr != nil {
-			return nil, connect.NewError(connect.CodeInternal, convErr)
+			return nil, connect.NewError(connect.CodeInternal, convErr.Error()).WithCause(convErr)
 		}
 		projectProtos = append(projectProtos, projectProto)
 	}
@@ -152,12 +152,12 @@ func (s *ProjectService) ListProjects(
 		token = fmt.Sprintf("%d", listInput.Offset+listInput.Limit)
 	}
 
-	return connect.NewResponse(&project.ListProjectsResponse{
+	return &project.ListProjectsResponse{
 		Projects: &project.Projects{
 			Projects: projectProtos,
 			Token:    token,
 		},
-	}), nil
+	}, nil
 }
 
 func listResourceInputFromProjectListRequest(req *project.ListProjectsRequest) (interfaces.ListResourceInput, error) {

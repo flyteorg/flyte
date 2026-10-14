@@ -5,251 +5,297 @@
 package actionsconnect
 
 import (
-	connect "connectrpc.com/connect"
+	connect "connectrpc.com/connect/v2"
 	context "context"
-	errors "errors"
 	actions "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
-	http "net/http"
-	strings "strings"
+	sync "sync"
 )
-
-// This is a compile-time assertion to ensure that this generated file and the connect package are
-// compatible. If you get a compiler error that this constant is not defined, this code was
-// generated with a version of connect newer than the one compiled into your binary. You can fix the
-// problem by either regenerating this code with an older version of connect or updating the connect
-// version compiled into your binary.
-const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// ActionsServiceName is the fully-qualified name of the ActionsService service.
 	ActionsServiceName = "flyteidl2.actions.ActionsService"
 )
 
-// These constants are the fully-qualified names of the RPCs defined in this package. They're
-// exposed at runtime as Spec.Procedure and as the final two segments of the HTTP route.
+// These constants are the procedure names of the RPCs defined in this package. They're exposed at
+// runtime as Spec.Procedure and as the final two segments of the HTTP route.
 //
 // Note that these are different from the fully-qualified method names used by
 // google.golang.org/protobuf/reflect/protoreflect. To convert from these constants to
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// ActionsServiceEnqueueProcedure is the fully-qualified name of the ActionsService's Enqueue RPC.
+	// ActionsServiceEnqueueProcedure is the procedure name of the ActionsService's Enqueue RPC.
 	ActionsServiceEnqueueProcedure = "/flyteidl2.actions.ActionsService/Enqueue"
-	// ActionsServiceWatchForUpdatesProcedure is the fully-qualified name of the ActionsService's
+	// ActionsServiceWatchForUpdatesProcedure is the procedure name of the ActionsService's
 	// WatchForUpdates RPC.
 	ActionsServiceWatchForUpdatesProcedure = "/flyteidl2.actions.ActionsService/WatchForUpdates"
-	// ActionsServiceUpdateProcedure is the fully-qualified name of the ActionsService's Update RPC.
+	// ActionsServiceUpdateProcedure is the procedure name of the ActionsService's Update RPC.
 	ActionsServiceUpdateProcedure = "/flyteidl2.actions.ActionsService/Update"
-	// ActionsServiceAbortProcedure is the fully-qualified name of the ActionsService's Abort RPC.
+	// ActionsServiceAbortProcedure is the procedure name of the ActionsService's Abort RPC.
 	ActionsServiceAbortProcedure = "/flyteidl2.actions.ActionsService/Abort"
-	// ActionsServiceSignalProcedure is the fully-qualified name of the ActionsService's Signal RPC.
+	// ActionsServiceSignalProcedure is the procedure name of the ActionsService's Signal RPC.
 	ActionsServiceSignalProcedure = "/flyteidl2.actions.ActionsService/Signal"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	actionsServiceServiceDescriptor               = actions.File_flyteidl2_actions_actions_service_proto.Services().ByName("ActionsService")
-	actionsServiceEnqueueMethodDescriptor         = actionsServiceServiceDescriptor.Methods().ByName("Enqueue")
-	actionsServiceWatchForUpdatesMethodDescriptor = actionsServiceServiceDescriptor.Methods().ByName("WatchForUpdates")
-	actionsServiceUpdateMethodDescriptor          = actionsServiceServiceDescriptor.Methods().ByName("Update")
-	actionsServiceAbortMethodDescriptor           = actionsServiceServiceDescriptor.Methods().ByName("Abort")
-	actionsServiceSignalMethodDescriptor          = actionsServiceServiceDescriptor.Methods().ByName("Signal")
+	actionsServiceEnqueueSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     actions.File_flyteidl2_actions_actions_service_proto.Services().ByName("ActionsService").Methods().ByName("Enqueue"),
+			Procedure:  ActionsServiceEnqueueProcedure,
+		}
+	})
+	actionsServiceWatchForUpdatesSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeServer,
+			Schema:     actions.File_flyteidl2_actions_actions_service_proto.Services().ByName("ActionsService").Methods().ByName("WatchForUpdates"),
+			Procedure:  ActionsServiceWatchForUpdatesProcedure,
+		}
+	})
+	actionsServiceUpdateSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     actions.File_flyteidl2_actions_actions_service_proto.Services().ByName("ActionsService").Methods().ByName("Update"),
+			Procedure:  ActionsServiceUpdateProcedure,
+		}
+	})
+	actionsServiceAbortSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     actions.File_flyteidl2_actions_actions_service_proto.Services().ByName("ActionsService").Methods().ByName("Abort"),
+			Procedure:  ActionsServiceAbortProcedure,
+		}
+	})
+	actionsServiceSignalSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     actions.File_flyteidl2_actions_actions_service_proto.Services().ByName("ActionsService").Methods().ByName("Signal"),
+			Procedure:  ActionsServiceSignalProcedure,
+		}
+	})
 )
 
 // ActionsServiceClient is a client for the flyteidl2.actions.ActionsService service.
 type ActionsServiceClient interface {
 	// Enqueue queues a new action for execution.
-	Enqueue(context.Context, *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error)
+	Enqueue(context.Context, *actions.EnqueueRequest) (*actions.EnqueueResponse, error)
 	// WatchForUpdates watches for updates to the state of actions.
 	// This API guarantees at-least-once delivery semantics.
-	WatchForUpdates(context.Context, *connect.Request[actions.WatchForUpdatesRequest]) (*connect.ServerStreamForClient[actions.WatchForUpdatesResponse], error)
+	WatchForUpdates(context.Context, *actions.WatchForUpdatesRequest) (ActionsServiceWatchForUpdatesClientStream, error)
 	// Update updates the status of an action and saves serialized NodeStatus.
 	// This deprecates Put in the current StateService.
-	Update(context.Context, *connect.Request[actions.UpdateRequest]) (*connect.Response[actions.UpdateResponse], error)
+	Update(context.Context, *actions.UpdateRequest) (*actions.UpdateResponse, error)
 	// Abort aborts a single action that was previously queued or is currently being processed by a worker.
 	// Note that this will cascade aborts to all descendant actions of the specified action.
-	Abort(context.Context, *connect.Request[actions.AbortRequest]) (*connect.Response[actions.AbortResponse], error)
+	Abort(context.Context, *actions.AbortRequest) (*actions.AbortResponse, error)
 	// Signal resolves a ConditionAction by providing its signal value.
 	// On success, transitions the condition to SUCCEEDED with the provided
 	// value as its output.
 	// Returns FAILED_PRECONDITION if the action is not a condition or is
 	// already terminal. Returns NOT_FOUND if the action does not exist.
 	// Returns ABORTED if the action has a write in-flight (retry).
-	Signal(context.Context, *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error)
+	Signal(context.Context, *actions.SignalRequest) (*actions.SignalResponse, error)
 }
 
-// NewActionsServiceClient constructs a client for the flyteidl2.actions.ActionsService service. By
-// default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
-// and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
-// connect.WithGRPC() or connect.WithGRPCWeb() options.
-//
-// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
-// http://api.acme.com or https://acme.com/grpc).
-func NewActionsServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ActionsServiceClient {
-	baseURL = strings.TrimRight(baseURL, "/")
-	return &actionsServiceClient{
-		enqueue: connect.NewClient[actions.EnqueueRequest, actions.EnqueueResponse](
-			httpClient,
-			baseURL+ActionsServiceEnqueueProcedure,
-			connect.WithSchema(actionsServiceEnqueueMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		watchForUpdates: connect.NewClient[actions.WatchForUpdatesRequest, actions.WatchForUpdatesResponse](
-			httpClient,
-			baseURL+ActionsServiceWatchForUpdatesProcedure,
-			connect.WithSchema(actionsServiceWatchForUpdatesMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		update: connect.NewClient[actions.UpdateRequest, actions.UpdateResponse](
-			httpClient,
-			baseURL+ActionsServiceUpdateProcedure,
-			connect.WithSchema(actionsServiceUpdateMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		abort: connect.NewClient[actions.AbortRequest, actions.AbortResponse](
-			httpClient,
-			baseURL+ActionsServiceAbortProcedure,
-			connect.WithSchema(actionsServiceAbortMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		signal: connect.NewClient[actions.SignalRequest, actions.SignalResponse](
-			httpClient,
-			baseURL+ActionsServiceSignalProcedure,
-			connect.WithSchema(actionsServiceSignalMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
+// NewActionsServiceClient constructs a client for the flyteidl2.actions.ActionsService service.
+// Multiple service clients may share a single connect.Client.
+func NewActionsServiceClient(client *connect.Client) ActionsServiceClient {
+	return &actionsServiceClient{client: client}
+}
+
+// ActionsServiceWatchForUpdatesClientStream is the client stream for the ActionsService's
+// WatchForUpdates RPC.
+type ActionsServiceWatchForUpdatesClientStream struct {
+	stream connect.ClientStream
+}
+
+// Receive returns the next response message from the server.
+func (s ActionsServiceWatchForUpdatesClientStream) Receive() (*actions.WatchForUpdatesResponse, error) {
+	var res actions.WatchForUpdatesResponse
+	if err := s.stream.Receive(&res); err != nil {
+		return nil, err
 	}
+	return &res, nil
 }
 
-// actionsServiceClient implements ActionsServiceClient.
-type actionsServiceClient struct {
-	enqueue         *connect.Client[actions.EnqueueRequest, actions.EnqueueResponse]
-	watchForUpdates *connect.Client[actions.WatchForUpdatesRequest, actions.WatchForUpdatesResponse]
-	update          *connect.Client[actions.UpdateRequest, actions.UpdateResponse]
-	abort           *connect.Client[actions.AbortRequest, actions.AbortResponse]
-	signal          *connect.Client[actions.SignalRequest, actions.SignalResponse]
-}
-
-// Enqueue calls flyteidl2.actions.ActionsService.Enqueue.
-func (c *actionsServiceClient) Enqueue(ctx context.Context, req *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error) {
-	return c.enqueue.CallUnary(ctx, req)
-}
-
-// WatchForUpdates calls flyteidl2.actions.ActionsService.WatchForUpdates.
-func (c *actionsServiceClient) WatchForUpdates(ctx context.Context, req *connect.Request[actions.WatchForUpdatesRequest]) (*connect.ServerStreamForClient[actions.WatchForUpdatesResponse], error) {
-	return c.watchForUpdates.CallServerStream(ctx, req)
-}
-
-// Update calls flyteidl2.actions.ActionsService.Update.
-func (c *actionsServiceClient) Update(ctx context.Context, req *connect.Request[actions.UpdateRequest]) (*connect.Response[actions.UpdateResponse], error) {
-	return c.update.CallUnary(ctx, req)
-}
-
-// Abort calls flyteidl2.actions.ActionsService.Abort.
-func (c *actionsServiceClient) Abort(ctx context.Context, req *connect.Request[actions.AbortRequest]) (*connect.Response[actions.AbortResponse], error) {
-	return c.abort.CallUnary(ctx, req)
-}
-
-// Signal calls flyteidl2.actions.ActionsService.Signal.
-func (c *actionsServiceClient) Signal(ctx context.Context, req *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error) {
-	return c.signal.CallUnary(ctx, req)
+// Close releases the stream's resources. It is idempotent and is typically deferred to clean up a
+// stream abandoned before io.EOF.
+func (s ActionsServiceWatchForUpdatesClientStream) Close() error {
+	return s.stream.Close()
 }
 
 // ActionsServiceHandler is an implementation of the flyteidl2.actions.ActionsService service.
 type ActionsServiceHandler interface {
 	// Enqueue queues a new action for execution.
-	Enqueue(context.Context, *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error)
+	Enqueue(context.Context, *actions.EnqueueRequest) (*actions.EnqueueResponse, error)
 	// WatchForUpdates watches for updates to the state of actions.
 	// This API guarantees at-least-once delivery semantics.
-	WatchForUpdates(context.Context, *connect.Request[actions.WatchForUpdatesRequest], *connect.ServerStream[actions.WatchForUpdatesResponse]) error
+	WatchForUpdates(context.Context, *actions.WatchForUpdatesRequest, ActionsServiceWatchForUpdatesServerStream) error
 	// Update updates the status of an action and saves serialized NodeStatus.
 	// This deprecates Put in the current StateService.
-	Update(context.Context, *connect.Request[actions.UpdateRequest]) (*connect.Response[actions.UpdateResponse], error)
+	Update(context.Context, *actions.UpdateRequest) (*actions.UpdateResponse, error)
 	// Abort aborts a single action that was previously queued or is currently being processed by a worker.
 	// Note that this will cascade aborts to all descendant actions of the specified action.
-	Abort(context.Context, *connect.Request[actions.AbortRequest]) (*connect.Response[actions.AbortResponse], error)
+	Abort(context.Context, *actions.AbortRequest) (*actions.AbortResponse, error)
 	// Signal resolves a ConditionAction by providing its signal value.
 	// On success, transitions the condition to SUCCEEDED with the provided
 	// value as its output.
 	// Returns FAILED_PRECONDITION if the action is not a condition or is
 	// already terminal. Returns NOT_FOUND if the action does not exist.
 	// Returns ABORTED if the action has a write in-flight (retry).
-	Signal(context.Context, *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error)
+	Signal(context.Context, *actions.SignalRequest) (*actions.SignalResponse, error)
 }
 
-// NewActionsServiceHandler builds an HTTP handler from the service implementation. It returns the
-// path on which to mount the handler and the handler itself.
-//
-// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
-// and JSON codecs. They also support gzip compression.
-func NewActionsServiceHandler(svc ActionsServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	actionsServiceEnqueueHandler := connect.NewUnaryHandler(
-		ActionsServiceEnqueueProcedure,
-		svc.Enqueue,
-		connect.WithSchema(actionsServiceEnqueueMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
+// RegisterActionsServiceHandler registers svc as the flyteidl2.actions.ActionsService
+// implementation on server.
+func RegisterActionsServiceHandler(server *connect.Server, svc ActionsServiceHandler) {
+	adapter := actionsServiceHandler{svc: svc}
+	server.Register(
+		connect.Method{Spec: actionsServiceEnqueueSpec(), Handler: adapter.enqueue},
+		connect.Method{Spec: actionsServiceWatchForUpdatesSpec(), Handler: adapter.watchForUpdates},
+		connect.Method{Spec: actionsServiceUpdateSpec(), Handler: adapter.update},
+		connect.Method{Spec: actionsServiceAbortSpec(), Handler: adapter.abort},
+		connect.Method{Spec: actionsServiceSignalSpec(), Handler: adapter.signal},
 	)
-	actionsServiceWatchForUpdatesHandler := connect.NewServerStreamHandler(
-		ActionsServiceWatchForUpdatesProcedure,
-		svc.WatchForUpdates,
-		connect.WithSchema(actionsServiceWatchForUpdatesMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	actionsServiceUpdateHandler := connect.NewUnaryHandler(
-		ActionsServiceUpdateProcedure,
-		svc.Update,
-		connect.WithSchema(actionsServiceUpdateMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	actionsServiceAbortHandler := connect.NewUnaryHandler(
-		ActionsServiceAbortProcedure,
-		svc.Abort,
-		connect.WithSchema(actionsServiceAbortMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	actionsServiceSignalHandler := connect.NewUnaryHandler(
-		ActionsServiceSignalProcedure,
-		svc.Signal,
-		connect.WithSchema(actionsServiceSignalMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	return "/flyteidl2.actions.ActionsService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case ActionsServiceEnqueueProcedure:
-			actionsServiceEnqueueHandler.ServeHTTP(w, r)
-		case ActionsServiceWatchForUpdatesProcedure:
-			actionsServiceWatchForUpdatesHandler.ServeHTTP(w, r)
-		case ActionsServiceUpdateProcedure:
-			actionsServiceUpdateHandler.ServeHTTP(w, r)
-		case ActionsServiceAbortProcedure:
-			actionsServiceAbortHandler.ServeHTTP(w, r)
-		case ActionsServiceSignalProcedure:
-			actionsServiceSignalHandler.ServeHTTP(w, r)
-		default:
-			http.NotFound(w, r)
-		}
-	})
+}
+
+// ActionsServiceWatchForUpdatesServerStream is the server stream for the ActionsService's
+// WatchForUpdates RPC.
+type ActionsServiceWatchForUpdatesServerStream struct {
+	stream connect.ServerStream
+}
+
+// SendHeaders flushes the response headers without a message. The first Send does this implicitly.
+func (s ActionsServiceWatchForUpdatesServerStream) SendHeaders() error {
+	return s.stream.SendHeaders()
+}
+
+// Send sends a response message to the client.
+func (s ActionsServiceWatchForUpdatesServerStream) Send(res *actions.WatchForUpdatesResponse) error {
+	return s.stream.Send(res)
 }
 
 // UnimplementedActionsServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedActionsServiceHandler struct{}
 
-func (UnimplementedActionsServiceHandler) Enqueue(context.Context, *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.actions.ActionsService.Enqueue is not implemented"))
+func (UnimplementedActionsServiceHandler) Enqueue(context.Context, *actions.EnqueueRequest) (*actions.EnqueueResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.actions.ActionsService.Enqueue is not implemented")
 }
 
-func (UnimplementedActionsServiceHandler) WatchForUpdates(context.Context, *connect.Request[actions.WatchForUpdatesRequest], *connect.ServerStream[actions.WatchForUpdatesResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.actions.ActionsService.WatchForUpdates is not implemented"))
+func (UnimplementedActionsServiceHandler) WatchForUpdates(context.Context, *actions.WatchForUpdatesRequest, ActionsServiceWatchForUpdatesServerStream) error {
+	return connect.NewError(connect.CodeUnimplemented, "flyteidl2.actions.ActionsService.WatchForUpdates is not implemented")
 }
 
-func (UnimplementedActionsServiceHandler) Update(context.Context, *connect.Request[actions.UpdateRequest]) (*connect.Response[actions.UpdateResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.actions.ActionsService.Update is not implemented"))
+func (UnimplementedActionsServiceHandler) Update(context.Context, *actions.UpdateRequest) (*actions.UpdateResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.actions.ActionsService.Update is not implemented")
 }
 
-func (UnimplementedActionsServiceHandler) Abort(context.Context, *connect.Request[actions.AbortRequest]) (*connect.Response[actions.AbortResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.actions.ActionsService.Abort is not implemented"))
+func (UnimplementedActionsServiceHandler) Abort(context.Context, *actions.AbortRequest) (*actions.AbortResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.actions.ActionsService.Abort is not implemented")
 }
 
-func (UnimplementedActionsServiceHandler) Signal(context.Context, *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.actions.ActionsService.Signal is not implemented"))
+func (UnimplementedActionsServiceHandler) Signal(context.Context, *actions.SignalRequest) (*actions.SignalResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.actions.ActionsService.Signal is not implemented")
+}
+
+type actionsServiceClient struct {
+	client *connect.Client
+}
+
+func (c *actionsServiceClient) Enqueue(ctx context.Context, req *actions.EnqueueRequest) (*actions.EnqueueResponse, error) {
+	var res actions.EnqueueResponse
+	if err := c.client.CallUnary(ctx, actionsServiceEnqueueSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *actionsServiceClient) WatchForUpdates(ctx context.Context, req *actions.WatchForUpdatesRequest) (ActionsServiceWatchForUpdatesClientStream, error) {
+	stream, err := c.client.CallServerStream(ctx, actionsServiceWatchForUpdatesSpec(), req)
+	if err != nil {
+		return ActionsServiceWatchForUpdatesClientStream{}, err
+	}
+	return ActionsServiceWatchForUpdatesClientStream{stream: stream}, nil
+}
+
+func (c *actionsServiceClient) Update(ctx context.Context, req *actions.UpdateRequest) (*actions.UpdateResponse, error) {
+	var res actions.UpdateResponse
+	if err := c.client.CallUnary(ctx, actionsServiceUpdateSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *actionsServiceClient) Abort(ctx context.Context, req *actions.AbortRequest) (*actions.AbortResponse, error) {
+	var res actions.AbortResponse
+	if err := c.client.CallUnary(ctx, actionsServiceAbortSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *actionsServiceClient) Signal(ctx context.Context, req *actions.SignalRequest) (*actions.SignalResponse, error) {
+	var res actions.SignalResponse
+	if err := c.client.CallUnary(ctx, actionsServiceSignalSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+type actionsServiceHandler struct{ svc ActionsServiceHandler }
+
+func (h actionsServiceHandler) enqueue(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req actions.EnqueueRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.Enqueue(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h actionsServiceHandler) watchForUpdates(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req actions.WatchForUpdatesRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	return h.svc.WatchForUpdates(ctx, &req, ActionsServiceWatchForUpdatesServerStream{stream: stream})
+}
+
+func (h actionsServiceHandler) update(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req actions.UpdateRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.Update(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h actionsServiceHandler) abort(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req actions.AbortRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.Abort(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h actionsServiceHandler) signal(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req actions.SignalRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.Signal(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"connectrpc.com/connect"
 	"go.opentelemetry.io/otel/attribute"
 	otelcodes "go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
@@ -126,9 +125,9 @@ func (b *eventBatcher) flush(batch []*eventReq) {
 	ctx, span := b.tracer.Start(ctx, "eventBatcher.flush",
 		trace.WithLinks(links...),
 		trace.WithAttributes(attribute.Int("events.batch_size", len(batch))))
-	_, err := b.client.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
+	_, err := b.client.Record(ctx, &workflow.RecordRequest{
 		Events: events,
-	}))
+	})
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(otelcodes.Error, err.Error())

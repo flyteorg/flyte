@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -19,7 +19,7 @@ import (
 
 func TestGetOAuth2Metadata_NotConfigured(t *testing.T) {
 	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{})
-	_, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
+	_, err := svc.GetOAuth2Metadata(context.Background(), &auth.GetOAuth2MetadataRequest{})
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeUnimplemented, connect.CodeOf(err))
 }
@@ -45,12 +45,12 @@ func TestGetOAuth2Metadata_External(t *testing.T) {
 	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{
 		ExternalAuthServerBaseURL: srv.URL + "/oauth2/default",
 	})
-	resp, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
+	resp, err := svc.GetOAuth2Metadata(context.Background(), &auth.GetOAuth2MetadataRequest{})
 	require.NoError(t, err)
-	assert.Equal(t, "https://idp.example.com/oauth2/default", resp.Msg.Issuer)
-	assert.Equal(t, "https://idp.example.com/oauth2/default/v1/authorize", resp.Msg.AuthorizationEndpoint)
-	assert.Equal(t, "https://idp.example.com/oauth2/default/v1/token", resp.Msg.TokenEndpoint)
-	assert.Equal(t, "https://idp.example.com/oauth2/default/v1/keys", resp.Msg.JwksUri)
+	assert.Equal(t, "https://idp.example.com/oauth2/default", resp.Issuer)
+	assert.Equal(t, "https://idp.example.com/oauth2/default/v1/authorize", resp.AuthorizationEndpoint)
+	assert.Equal(t, "https://idp.example.com/oauth2/default/v1/token", resp.TokenEndpoint)
+	assert.Equal(t, "https://idp.example.com/oauth2/default/v1/keys", resp.JwksUri)
 }
 
 func TestGetOAuth2Metadata_ExternalCustomMetadataURL(t *testing.T) {
@@ -65,9 +65,9 @@ func TestGetOAuth2Metadata_ExternalCustomMetadataURL(t *testing.T) {
 		ExternalAuthServerBaseURL: srv.URL,
 		ExternalMetadataURL:       "custom/metadata",
 	})
-	resp, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
+	resp, err := svc.GetOAuth2Metadata(context.Background(), &auth.GetOAuth2MetadataRequest{})
 	require.NoError(t, err)
-	assert.Equal(t, "https://idp.example.com", resp.Msg.Issuer)
+	assert.Equal(t, "https://idp.example.com", resp.Issuer)
 }
 
 func TestGetOAuth2Metadata_ExternalUnavailable(t *testing.T) {
@@ -81,7 +81,7 @@ func TestGetOAuth2Metadata_ExternalUnavailable(t *testing.T) {
 		RetryAttempts:             1,
 		RetryDelay:                stdlibconfig.Duration{Duration: time.Millisecond},
 	})
-	_, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
+	_, err := svc.GetOAuth2Metadata(context.Background(), &auth.GetOAuth2MetadataRequest{})
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err))
 }
@@ -127,24 +127,24 @@ func TestGetPublicClientConfig(t *testing.T) {
 			Audience:    "https://api.example.com",
 		},
 	})
-	resp, err := svc.GetPublicClientConfig(context.Background(), connect.NewRequest(&auth.GetPublicClientConfigRequest{}))
+	resp, err := svc.GetPublicClientConfig(context.Background(), &auth.GetPublicClientConfigRequest{})
 	require.NoError(t, err)
-	assert.Equal(t, "flytectl", resp.Msg.ClientId)
-	assert.Equal(t, "http://localhost:53593/callback", resp.Msg.RedirectUri)
-	assert.Equal(t, []string{"offline_access", "profile"}, resp.Msg.Scopes)
-	assert.Equal(t, "https://api.example.com", resp.Msg.Audience)
-	assert.Equal(t, "flyte-authorization", resp.Msg.AuthorizationMetadataKey)
-	assert.Equal(t, "dataplane.example.com", resp.Msg.DataplaneDomain)
+	assert.Equal(t, "flytectl", resp.ClientId)
+	assert.Equal(t, "http://localhost:53593/callback", resp.RedirectUri)
+	assert.Equal(t, []string{"offline_access", "profile"}, resp.Scopes)
+	assert.Equal(t, "https://api.example.com", resp.Audience)
+	assert.Equal(t, "flyte-authorization", resp.AuthorizationMetadataKey)
+	assert.Equal(t, "dataplane.example.com", resp.DataplaneDomain)
 }
 
 func TestGetPublicClientConfig_DefaultAuthMetadataKey(t *testing.T) {
 	// Empty AuthorizationMetadataKey defaults to the standard "authorization"
 	// header (which upstream JWT validators like ALB inspect).
 	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{})
-	resp, err := svc.GetPublicClientConfig(context.Background(), connect.NewRequest(&auth.GetPublicClientConfigRequest{}))
+	resp, err := svc.GetPublicClientConfig(context.Background(), &auth.GetPublicClientConfigRequest{})
 	require.NoError(t, err)
-	assert.Equal(t, "authorization", resp.Msg.AuthorizationMetadataKey)
-	assert.Empty(t, resp.Msg.ClientId)
+	assert.Equal(t, "authorization", resp.AuthorizationMetadataKey)
+	assert.Empty(t, resp.ClientId)
 }
 
 func TestGetOAuth2Metadata_CachesSuccessfulFetch(t *testing.T) {
@@ -158,9 +158,9 @@ func TestGetOAuth2Metadata_CachesSuccessfulFetch(t *testing.T) {
 
 	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{ExternalAuthServerBaseURL: srv.URL})
 	for i := 0; i < 3; i++ {
-		resp, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
+		resp, err := svc.GetOAuth2Metadata(context.Background(), &auth.GetOAuth2MetadataRequest{})
 		require.NoError(t, err)
-		assert.Equal(t, "https://idp.example.com", resp.Msg.Issuer)
+		assert.Equal(t, "https://idp.example.com", resp.Issuer)
 	}
 	assert.Equal(t, 1, hits, "fresh cache should serve repeat calls without refetching")
 }
@@ -179,7 +179,7 @@ func TestGetOAuth2Metadata_BodySizeLimit(t *testing.T) {
 	defer srv.Close()
 
 	svc := NewAuthMetadataService("example.com", config.AuthMetadataConfig{ExternalAuthServerBaseURL: srv.URL})
-	_, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
+	_, err := svc.GetOAuth2Metadata(context.Background(), &auth.GetOAuth2MetadataRequest{})
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
 }
@@ -195,7 +195,7 @@ func TestGetOAuth2Metadata_Upstream4xxIsInternal(t *testing.T) {
 		RetryAttempts:             1,
 		RetryDelay:                stdlibconfig.Duration{Duration: time.Millisecond},
 	})
-	_, err := svc.GetOAuth2Metadata(context.Background(), connect.NewRequest(&auth.GetOAuth2MetadataRequest{}))
+	_, err := svc.GetOAuth2Metadata(context.Background(), &auth.GetOAuth2MetadataRequest{})
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeInternal, connect.CodeOf(err), "non-retryable 4xx should be Internal, not Unavailable")
 }

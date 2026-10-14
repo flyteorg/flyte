@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"github.com/getsentry/sentry-go"
 	"github.com/getsentry/sentry-go/attribute"
 
@@ -69,13 +69,13 @@ func Count(ctx context.Context, operation string, n int64) {
 // (keyed by procedure, valued by operation name) and reports server-side
 // failures as exceptions. Client-caused errors (invalid argument, not found,
 // ...) are intentionally not reported as exceptions.
-func Interceptor(operations map[string]string) connect.UnaryInterceptorFunc {
-	return func(next connect.UnaryFunc) connect.UnaryFunc {
-		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-			resp, err := next(ctx, req)
-			operation, ok := operations[req.Spec().Procedure]
+func Interceptor(operations map[string]string) connect.ServerInterceptor {
+	return func(next connect.ServerFunc) connect.ServerFunc {
+		return func(ctx context.Context, spec connect.Spec, stream connect.ServerStream) error {
+			err := next(ctx, spec, stream)
+			operation, ok := operations[spec.Procedure]
 			if !ok {
-				return resp, err
+				return err
 			}
 			attrs := []attribute.Builder{attribute.String("operation", operation)}
 			if err != nil {
@@ -86,14 +86,14 @@ func Interceptor(operations map[string]string) connect.UnaryInterceptorFunc {
 				switch connect.CodeOf(err) {
 				case connect.CodeInternal, connect.CodeUnknown, connect.CodeDataLoss:
 					hub := sentry.CurrentHub().Clone()
-					hub.Scope().SetTag("procedure", req.Spec().Procedure)
+					hub.Scope().SetTag("procedure", spec.Procedure)
 					hub.CaptureException(err)
 				}
 			} else {
 				attrs = append(attrs, attribute.String("status", "success"))
 			}
 			sentry.NewMeter(ctx).Count(operationMetric, 1, sentry.WithAttributes(attrs...))
-			return resp, err
+			return err
 		}
 	}
 }

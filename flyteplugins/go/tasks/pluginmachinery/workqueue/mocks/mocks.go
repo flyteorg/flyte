@@ -17,10 +17,19 @@ func NewWorkItem(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *WorkItem {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &WorkItem{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -44,10 +53,19 @@ func NewWorkItemInfo(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *WorkItemInfo {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &WorkItemInfo{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -143,8 +161,8 @@ func (_c *WorkItemInfo_ID_Call) Run(run func()) *WorkItemInfo_ID_Call {
 	return _c
 }
 
-func (_c *WorkItemInfo_ID_Call) Return(v workqueue.WorkItemID) *WorkItemInfo_ID_Call {
-	_c.Call.Return(v)
+func (_c *WorkItemInfo_ID_Call) Return(workItemID workqueue.WorkItemID) *WorkItemInfo_ID_Call {
+	_c.Call.Return(workItemID)
 	return _c
 }
 
@@ -249,10 +267,19 @@ func NewIndexedWorkQueue(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *IndexedWorkQueue {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &IndexedWorkQueue{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -311,7 +338,7 @@ type IndexedWorkQueue_Get_Call struct {
 
 // Get is a helper method to define mock.On call
 //   - id workqueue.WorkItemID
-func (_e *IndexedWorkQueue_Expecter) Get(id interface{}) *IndexedWorkQueue_Get_Call {
+func (_e *IndexedWorkQueue_Expecter) Get(id any) *IndexedWorkQueue_Get_Call {
 	return &IndexedWorkQueue_Get_Call{Call: _e.mock.On("Get", id)}
 }
 
@@ -364,7 +391,7 @@ type IndexedWorkQueue_Queue_Call struct {
 //   - ctx context.Context
 //   - id workqueue.WorkItemID
 //   - once workqueue.WorkItem
-func (_e *IndexedWorkQueue_Expecter) Queue(ctx interface{}, id interface{}, once interface{}) *IndexedWorkQueue_Queue_Call {
+func (_e *IndexedWorkQueue_Expecter) Queue(ctx any, id any, once any) *IndexedWorkQueue_Queue_Call {
 	return &IndexedWorkQueue_Queue_Call{Call: _e.mock.On("Queue", ctx, id, once)}
 }
 
@@ -425,7 +452,7 @@ type IndexedWorkQueue_Start_Call struct {
 
 // Start is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *IndexedWorkQueue_Expecter) Start(ctx interface{}) *IndexedWorkQueue_Start_Call {
+func (_e *IndexedWorkQueue_Expecter) Start(ctx any) *IndexedWorkQueue_Start_Call {
 	return &IndexedWorkQueue_Start_Call{Call: _e.mock.On("Start", ctx)}
 }
 
@@ -458,10 +485,19 @@ func NewProcessor(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *Processor {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &Processor{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -513,7 +549,7 @@ type Processor_Process_Call struct {
 // Process is a helper method to define mock.On call
 //   - ctx context.Context
 //   - workItem workqueue.WorkItem
-func (_e *Processor_Expecter) Process(ctx interface{}, workItem interface{}) *Processor_Process_Call {
+func (_e *Processor_Expecter) Process(ctx any, workItem any) *Processor_Process_Call {
 	return &Processor_Process_Call{Call: _e.mock.On("Process", ctx, workItem)}
 }
 

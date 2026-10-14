@@ -6,14 +6,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
 
-	"connectrpc.com/connect"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -29,6 +30,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	projectMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect/mocks"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
@@ -74,7 +76,7 @@ func settingsWithQueue(t *testing.T, queue string) *repoMocks.SettingsRepo {
 func newMockProjectClientAlwaysOK(t *testing.T) *projectMocks.ProjectServiceClient {
 	pc := projectMocks.NewProjectServiceClient(t)
 	pc.EXPECT().GetProject(mock.Anything, mock.Anything).
-		Return(connect.NewResponse(&project.GetProjectResponse{}), nil).Maybe()
+		Return(&project.GetProjectResponse{}, nil).Maybe()
 	return pc
 }
 
@@ -110,14 +112,18 @@ func matchRunID(expected *common.RunIdentifier) interface{} {
 }
 
 func newRunServiceTestClient(t *testing.T, svc *RunService) workflowconnect.RunServiceClient {
-	path, handler := workflowconnect.NewRunServiceHandler(svc)
+	handlerServer := connect.NewServer()
+	workflowconnect.RegisterRunServiceHandler(handlerServer, svc)
+	path := "/" + workflowconnect.RunServiceName + "/"
+	handler := http.NewServeMux()
+	connecthttp.Mount(handler, handlerServer, connecthttp.WithReadMaxBytes(0))
 
 	mux := http.NewServeMux()
 	mux.Handle(path, handler)
 	server := httptest.NewServer(mux)
 	t.Cleanup(server.Close)
 
-	return workflowconnect.NewRunServiceClient(http.DefaultClient, server.URL)
+	return workflowconnect.NewRunServiceClient(connect.NewClient(connecthttp.NewTransport(http.DefaultClient, server.URL, connecthttp.WithReadMaxBytes(0))))
 }
 
 func TestGetRunDetails_WithTaskSpec(t *testing.T) {
@@ -175,14 +181,14 @@ func TestGetRunDetails_WithTaskSpec(t *testing.T) {
 	}, nil)
 	actionRepo.On("ListEvents", mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil)
 
-	resp, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
+	resp, err := svc.GetRunDetails(context.Background(), &workflow.GetRunDetailsRequest{
 		RunId: runID,
-	}))
+	})
 	require.NoError(t, err)
-	require.NotNil(t, resp.Msg.Details)
-	require.NotNil(t, resp.Msg.Details.Action)
-	require.NotNil(t, resp.Msg.Details.Action.GetTask())
-	assert.Equal(t, "python", resp.Msg.Details.Action.GetTask().GetTaskTemplate().GetType())
+	require.NotNil(t, resp.Details)
+	require.NotNil(t, resp.Details.Action)
+	require.NotNil(t, resp.Details.Action.GetTask())
+	assert.Equal(t, "python", resp.Details.Action.GetTask().GetTaskTemplate().GetType())
 }
 
 func TestWatchClusterEvents_UsesPersistedClusterEvents(t *testing.T) {
@@ -233,19 +239,21 @@ func TestWatchClusterEvents_UsesPersistedClusterEvents(t *testing.T) {
 	actionRepo.On("ListEventsSince", mock.Anything, matchActionID(actionID), uint32(0), time.Time{}, 0, 500).
 		Return([]*models.ActionEvent{eventModel}, nil).Once()
 
-	stream, err := client.WatchClusterEvents(context.Background(), connect.NewRequest(&workflow.WatchClusterEventsRequest{
+	stream, err := client.WatchClusterEvents(context.Background(), &workflow.WatchClusterEventsRequest{
 		Id:      actionID,
 		Attempt: 0,
-	}))
+	})
 	require.NoError(t, err)
-	require.True(t, stream.Receive())
+	streamMsg1, streamErr1 := stream.Receive()
+	require.NoError(t, streamErr1)
 
-	resp := stream.Msg()
+	resp := streamMsg1
 	require.Len(t, resp.GetClusterEvents(), 1)
 	assert.Equal(t, "Pod scheduled on node-a", resp.GetClusterEvents()[0].GetMessage())
 
-	assert.False(t, stream.Receive())
-	assert.NoError(t, stream.Err())
+	streamMsg2, streamErr2 := stream.Receive()
+	_ = streamMsg2
+	assert.ErrorIs(t, streamErr2, io.EOF)
 }
 
 func TestWatchClusterEvents_StreamsNewPersistedClusterEventsWithoutReplay(t *testing.T) {
@@ -317,24 +325,27 @@ func TestWatchClusterEvents_StreamsNewPersistedClusterEventsWithoutReplay(t *tes
 	actionRepo.On("ListEventsSince", mock.Anything, matchActionID(actionID), uint32(0), event1.UpdatedAt, 0, 500).
 		Return([]*models.ActionEvent{event2}, nil).Once()
 
-	stream, err := client.WatchClusterEvents(context.Background(), connect.NewRequest(&workflow.WatchClusterEventsRequest{
+	stream, err := client.WatchClusterEvents(context.Background(), &workflow.WatchClusterEventsRequest{
 		Id:      actionID,
 		Attempt: 0,
-	}))
+	})
 	require.NoError(t, err)
 
-	require.True(t, stream.Receive())
-	first := stream.Msg()
+	streamMsg3, streamErr3 := stream.Receive()
+	require.NoError(t, streamErr3)
+	first := streamMsg3
 	require.Len(t, first.GetClusterEvents(), 1)
 	assert.Equal(t, "Pod created", first.GetClusterEvents()[0].GetMessage())
 
-	require.True(t, stream.Receive())
-	second := stream.Msg()
+	streamMsg4, streamErr4 := stream.Receive()
+	require.NoError(t, streamErr4)
+	second := streamMsg4
 	require.Len(t, second.GetClusterEvents(), 1)
 	assert.Equal(t, "Pulled container image", second.GetClusterEvents()[0].GetMessage())
 
-	assert.False(t, stream.Receive())
-	assert.NoError(t, stream.Err())
+	streamMsg5, streamErr5 := stream.Receive()
+	_ = streamMsg5
+	assert.ErrorIs(t, streamErr5, io.EOF)
 }
 
 func TestGetRunDetails_ReturnsRunSpecEnvVars(t *testing.T) {
@@ -385,15 +396,15 @@ func TestGetRunDetails_ReturnsRunSpecEnvVars(t *testing.T) {
 	actionRepo.On("GetRun", mock.Anything, runID).Return(runModel, nil)
 	actionRepo.On("ListEvents", mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil)
 
-	resp, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
+	resp, err := svc.GetRunDetails(context.Background(), &workflow.GetRunDetailsRequest{
 		RunId: runID,
-	}))
+	})
 	require.NoError(t, err)
-	require.NotNil(t, resp.Msg.Details)
-	require.NotNil(t, resp.Msg.Details.GetRunSpec())
+	require.NotNil(t, resp.Details)
+	require.NotNil(t, resp.Details.GetRunSpec())
 
 	gotEnv := map[string]string{}
-	for _, kv := range resp.Msg.Details.GetRunSpec().GetEnvs().GetValues() {
+	for _, kv := range resp.Details.GetRunSpec().GetEnvs().GetValues() {
 		gotEnv[kv.GetKey()] = kv.GetValue()
 	}
 	assert.Equal(t, "boo", gotEnv["foo"])
@@ -449,12 +460,12 @@ func TestGetRunDetails_UsesActionCacheStatus(t *testing.T) {
 	actionRepo.On("GetRun", mock.Anything, runID).Return(runModel, nil)
 	actionRepo.On("ListEvents", mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{eventModel}, nil)
 
-	resp, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
+	resp, err := svc.GetRunDetails(context.Background(), &workflow.GetRunDetailsRequest{
 		RunId: runID,
-	}))
+	})
 	require.NoError(t, err)
-	require.NotNil(t, resp.Msg.Details)
-	assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT, resp.Msg.Details.Action.Status.GetCacheStatus())
+	require.NotNil(t, resp.Details)
+	assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT, resp.Details.Action.Status.GetCacheStatus())
 }
 
 func TestGetRunDetails_TaskSpecLookupFails(t *testing.T) {
@@ -497,9 +508,9 @@ func TestGetRunDetails_TaskSpecLookupFails(t *testing.T) {
 	taskRepo.On("GetTaskSpec", mock.Anything, "bad-digest").Return(nil, errors.New("not found"))
 	actionRepo.On("ListEvents", mock.Anything, matchActionID(&common.ActionIdentifier{Run: runID, Name: runID.Name}), 500).Return([]*models.ActionEvent{}, nil)
 
-	_, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
+	_, err := svc.GetRunDetails(context.Background(), &workflow.GetRunDetailsRequest{
 		RunId: runID,
-	}))
+	})
 	assert.Error(t, err)
 }
 
@@ -610,25 +621,25 @@ func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
 		}, nil).Once()
 
 	actionsClient.On("Enqueue", mock.Anything, mock.Anything).
-		Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+		Return(&actions.EnqueueResponse{}, nil).Once()
 
-	resp, err := svc.CreateRun(context.Background(), connect.NewRequest(&workflow.CreateRunRequest{
+	resp, err := svc.CreateRun(context.Background(), &workflow.CreateRunRequest{
 		Id: &workflow.CreateRunRequest_RunId{
 			RunId: runID,
 		},
 		Task: &workflow.CreateRunRequest_TaskSpec{
 			TaskSpec: &task.TaskSpec{},
 		},
-	}))
+	})
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
-	assert.NotNil(t, resp.Msg.GetRun())
-	assert.NotNil(t, resp.Msg.GetRun().GetAction())
-	assert.NotNil(t, resp.Msg.GetRun().GetAction().GetId())
-	assert.Equal(t, runID.Name, resp.Msg.GetRun().GetAction().GetId().GetName())
-	assert.NotNil(t, resp.Msg.GetRun().GetAction().GetMetadata())
+	assert.NotNil(t, resp.GetRun())
+	assert.NotNil(t, resp.GetRun().GetAction())
+	assert.NotNil(t, resp.GetRun().GetAction().GetId())
+	assert.Equal(t, runID.Name, resp.GetRun().GetAction().GetId().GetName())
+	assert.NotNil(t, resp.GetRun().GetAction().GetMetadata())
 
-	status := resp.Msg.GetRun().GetAction().GetStatus()
+	status := resp.GetRun().GetAction().GetStatus()
 	assert.NotNil(t, status)
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_QUEUED, status.GetPhase())
 	assert.NotNil(t, status.GetStartTime())
@@ -658,7 +669,7 @@ func TestAbortRun(t *testing.T) {
 
 		actionRepo.On("AbortRun", mock.Anything, runID, "User requested abort", (*common.EnrichedIdentity)(nil)).Return(nil)
 
-		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID}))
+		_, err := svc.AbortRun(context.Background(), &workflow.AbortRunRequest{RunId: runID})
 		assert.NoError(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
 	})
@@ -669,7 +680,7 @@ func TestAbortRun(t *testing.T) {
 
 		actionRepo.On("AbortRun", mock.Anything, runID, reason, (*common.EnrichedIdentity)(nil)).Return(nil)
 
-		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID, Reason: &reason}))
+		_, err := svc.AbortRun(context.Background(), &workflow.AbortRunRequest{RunId: runID, Reason: &reason})
 		assert.NoError(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
 	})
@@ -679,7 +690,7 @@ func TestAbortRun(t *testing.T) {
 
 		actionRepo.On("AbortRun", mock.Anything, runID, mock.Anything, mock.Anything).Return(errors.New("db unavailable"))
 
-		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID}))
+		_, err := svc.AbortRun(context.Background(), &workflow.AbortRunRequest{RunId: runID})
 		assert.Error(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
 	})
@@ -701,7 +712,7 @@ func TestAbortAction(t *testing.T) {
 
 		actionRepo.On("AbortAction", mock.Anything, actionID, "User requested abort", (*common.EnrichedIdentity)(nil)).Return(nil)
 
-		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID}))
+		_, err := svc.AbortAction(context.Background(), &workflow.AbortActionRequest{ActionId: actionID})
 		assert.NoError(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
 	})
@@ -712,7 +723,7 @@ func TestAbortAction(t *testing.T) {
 
 		actionRepo.On("AbortAction", mock.Anything, actionID, reason, (*common.EnrichedIdentity)(nil)).Return(nil)
 
-		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID, Reason: reason}))
+		_, err := svc.AbortAction(context.Background(), &workflow.AbortActionRequest{ActionId: actionID, Reason: reason})
 		assert.NoError(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
 	})
@@ -722,7 +733,7 @@ func TestAbortAction(t *testing.T) {
 
 		actionRepo.On("AbortAction", mock.Anything, actionID, mock.Anything, mock.Anything).Return(errors.New("db unavailable"))
 
-		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID}))
+		_, err := svc.AbortAction(context.Background(), &workflow.AbortActionRequest{ActionId: actionID})
 		assert.Error(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
 	})
@@ -816,16 +827,16 @@ func TestListRuns(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			req := connect.NewRequest(&workflow.ListRunsRequest{Request: tc.req})
+			req := &workflow.ListRunsRequest{Request: tc.req}
 			// Assert the incoming token was decoded into listInput.Offset.
 			actionRepo.On("ListActions", mock.Anything, mock.MatchedBy(func(input interfaces.ListResourceInput) bool {
 				return input.Offset == tc.expectOffset
 			})).Return(tc.mockRes.runs, tc.mockRes.err).Once()
 			got, err := svc.ListRuns(context.Background(), req)
 			assert.NoError(t, err)
-			assert.Equal(t, len(tc.expect.Runs), len(got.Msg.Runs))
-			assert.Equal(t, tc.expect.Runs, got.Msg.Runs)
-			assert.Equal(t, tc.expect.Token, got.Msg.Token)
+			assert.Equal(t, len(tc.expect.Runs), len(got.Runs))
+			assert.Equal(t, tc.expect.Runs, got.Runs)
+			assert.Equal(t, tc.expect.Token, got.Token)
 		})
 	}
 }
@@ -850,10 +861,10 @@ func TestListRuns_SearchFilter(t *testing.T) {
 			{Field: "phase", Function: common.Filter_EQUAL, Values: []string{"2"}},
 		},
 	}
-	_, err := svc.ListRuns(context.Background(), connect.NewRequest(&workflow.ListRunsRequest{
+	_, err := svc.ListRuns(context.Background(), &workflow.ListRunsRequest{
 		ScopeBy: &workflow.ListRunsRequest_ProjectId{ProjectId: &common.ProjectIdentifier{Name: "p", Domain: "d"}},
 		Request: listReq,
-	}))
+	})
 	require.NoError(t, err)
 
 	require.NotNil(t, captured.Filter)
@@ -879,13 +890,13 @@ func TestListRuns_RejectsBadSearchFilter(t *testing.T) {
 	svc := &RunService{repo: repo}
 	t.Cleanup(func() { actionRepo.AssertExpectations(t) })
 
-	_, err := svc.ListRuns(context.Background(), connect.NewRequest(&workflow.ListRunsRequest{
+	_, err := svc.ListRuns(context.Background(), &workflow.ListRunsRequest{
 		ScopeBy: &workflow.ListRunsRequest_ProjectId{ProjectId: &common.ProjectIdentifier{Name: "p", Domain: "d"}},
 		Request: &common.ListRequest{
 			Limit:   10,
 			Filters: []*common.Filter{{Field: "search", Function: common.Filter_GREATER_THAN, Values: []string{"abc"}}},
 		},
-	}))
+	})
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 }
@@ -910,7 +921,7 @@ func TestListAndSendAllActionsUsesAscendingSort(t *testing.T) {
 	rsm, err := newRunStateManager(nil)
 	require.NoError(t, err)
 
-	err = svc.listAndSendAllActions(context.Background(), runID, rsm, nil)
+	err = svc.listAndSendAllActions(context.Background(), runID, rsm, workflowconnect.RunServiceWatchActionsServerStream{})
 	require.NoError(t, err)
 
 	require.Len(t, captured.SortParameters, 2)
@@ -1198,9 +1209,9 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).Return(expectedRun, nil).Once()
 
 	actionsClient.On("Enqueue", mock.Anything, mock.Anything).
-		Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+		Return(&actions.EnqueueResponse{}, nil).Once()
 
-	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	_, err := svc.CreateRun(context.Background(), req)
 	assert.NoError(t, err)
 
 	repo.AssertExpectations(t)
@@ -1254,12 +1265,12 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
 	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).Return(expectedRun, nil).Once()
-	actionsClient.On("Enqueue", mock.Anything, mock.Anything).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+	actionsClient.On("Enqueue", mock.Anything, mock.Anything).Return(&actions.EnqueueResponse{}, nil).Once()
 
-	resp, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	resp, err := svc.CreateRun(context.Background(), req)
 	require.NoError(t, err)
 
-	run := resp.Msg.Run
+	run := resp.Run
 	assert.Equal(t, "", run.Action.Id.Run.Org)
 	assert.Equal(t, "myproj", run.Action.Id.Run.Project)
 	assert.Equal(t, "production", run.Action.Id.Run.Domain)
@@ -1337,7 +1348,7 @@ func TestCreateRun_TriggerFire_CarriesRunSpecEnvVars(t *testing.T) {
 
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
 	actionsClient.On("Enqueue", mock.Anything, mock.Anything).
-		Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+		Return(&actions.EnqueueResponse{}, nil).Once()
 
 	req := &workflow.CreateRunRequest{
 		Id: &workflow.CreateRunRequest_RunId{
@@ -1358,7 +1369,7 @@ func TestCreateRun_TriggerFire_CarriesRunSpecEnvVars(t *testing.T) {
 		Source: workflow.RunSource_RUN_SOURCE_SCHEDULE_TRIGGER,
 	}
 
-	_, err = svc.CreateRun(context.Background(), connect.NewRequest(req))
+	_, err = svc.CreateRun(context.Background(), req)
 	require.NoError(t, err)
 
 	require.NotNil(t, persisted, "CreateAction should have been called")
@@ -1412,12 +1423,12 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 		Return(&models.Run{Project: "proj", Domain: "dev", RunName: "rmy-run-123", Name: "a0"}, nil).Once()
 
 	// Verify the enqueue request uses "a0" as the action name and the run name in the run identifier
-	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
-		return req.Msg.Action.ActionId.Name == "a0" &&
-			req.Msg.Action.ActionId.Run.Name == "rmy-run-123"
-	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *actions.EnqueueRequest) bool {
+		return req.Action.ActionId.Name == "a0" &&
+			req.Action.ActionId.Run.Name == "rmy-run-123"
+	})).Return(&actions.EnqueueResponse{}, nil).Once()
 
-	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	_, err := svc.CreateRun(context.Background(), req)
 	assert.NoError(t, err)
 
 	actionsClient.AssertExpectations(t)
@@ -1456,7 +1467,7 @@ func TestCreateRun_RejectsInvalidRunName(t *testing.T) {
 				},
 			}
 
-			_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+			_, err := svc.CreateRun(context.Background(), req)
 			require.Error(t, err)
 			assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 		})
@@ -1488,7 +1499,7 @@ func TestCreateRun_RejectsInvalidPodTemplateName(t *testing.T) {
 		},
 	}
 
-	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	_, err := svc.CreateRun(context.Background(), req)
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 	assert.ErrorContains(t, err, "pod template name")
@@ -1557,11 +1568,11 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 		Name:    "rctx-123",
 	}, nil).Once()
 
-	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
-		return req.Msg.GetRunSpec().GetRawDataStorage().GetRawDataPrefix() == "s3://custom-raw"
-	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *actions.EnqueueRequest) bool {
+		return req.GetRunSpec().GetRawDataStorage().GetRawDataPrefix() == "s3://custom-raw"
+	})).Return(&actions.EnqueueResponse{}, nil).Once()
 
-	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	_, err := svc.CreateRun(context.Background(), req)
 	require.NoError(t, err)
 }
 
@@ -1616,11 +1627,11 @@ func TestCreateRun_AppliesSettingsQueue(t *testing.T) {
 		Name:    "rq-123",
 	}, nil).Once()
 
-	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
-		return req.Msg.GetRunSpec().GetQueue() == "fast-queue"
-	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *actions.EnqueueRequest) bool {
+		return req.GetRunSpec().GetQueue() == "fast-queue"
+	})).Return(&actions.EnqueueResponse{}, nil).Once()
 
-	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	_, err := svc.CreateRun(context.Background(), req)
 	require.NoError(t, err)
 }
 
@@ -1681,14 +1692,14 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 		_ = proto.Unmarshal(m.DetailedInfo, &info)
 		return info.InputsUri == offloadedURI+"/inputs.pb"
 	}), mock.Anything).Return(expectedRun, nil).Once()
-	actionsClient.On("Enqueue", mock.MatchedBy(func(_ context.Context) bool { return true }), mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
-		return req.Msg.Action.InputUri == offloadedURI
-	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+	actionsClient.On("Enqueue", mock.MatchedBy(func(_ context.Context) bool { return true }), mock.MatchedBy(func(req *actions.EnqueueRequest) bool {
+		return req.Action.InputUri == offloadedURI
+	})).Return(&actions.EnqueueResponse{}, nil).Once()
 
-	resp, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	resp, err := svc.CreateRun(context.Background(), req)
 	require.NoError(t, err)
 
-	run := resp.Msg.Run
+	run := resp.Run
 	assert.Equal(t, "", run.Action.Id.Run.Org)
 	assert.Equal(t, "testproject", run.Action.Id.Run.Project)
 	assert.Equal(t, "rtest-offloaded", run.Action.Id.Run.Name)
@@ -1722,9 +1733,9 @@ func TestGetActionDataURIs(t *testing.T) {
 		actionRepo, _, svc := newTestService(t)
 		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(nil, errors.New("missing"))
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		assert.Nil(t, resp)
 		assert.Error(t, err)
@@ -1738,9 +1749,9 @@ func TestGetActionDataURIs(t *testing.T) {
 			DetailedInfo: nil,
 		}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		assert.Nil(t, resp)
 		assert.Error(t, err)
@@ -1758,13 +1769,13 @@ func TestGetActionDataURIs(t *testing.T) {
 			}),
 		}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		require.NoError(t, err)
-		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
-		assert.Empty(t, resp.Msg.GetOutputsUri())
+		assert.Equal(t, "s3://bucket/inputs", resp.GetInputsUri())
+		assert.Empty(t, resp.GetOutputsUri())
 	})
 
 	t.Run("trace action returns outputs uri from RunInfo", func(t *testing.T) {
@@ -1778,13 +1789,13 @@ func TestGetActionDataURIs(t *testing.T) {
 			}),
 		}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		require.NoError(t, err)
-		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
-		assert.Equal(t, "s3://bucket/trace-outputs", resp.Msg.GetOutputsUri())
+		assert.Equal(t, "s3://bucket/inputs", resp.GetInputsUri())
+		assert.Equal(t, "s3://bucket/trace-outputs", resp.GetOutputsUri())
 	})
 
 	t.Run("succeeded task returns outputs from latest attempt", func(t *testing.T) {
@@ -1809,13 +1820,13 @@ func TestGetActionDataURIs(t *testing.T) {
 			{Attempt: 0, Phase: int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED), Info: eventBytes},
 		}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		require.NoError(t, err)
-		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
-		assert.Equal(t, "s3://bucket/outputs/0/outputs.pb", resp.Msg.GetOutputsUri())
+		assert.Equal(t, "s3://bucket/inputs", resp.GetInputsUri())
+		assert.Equal(t, "s3://bucket/outputs/0/outputs.pb", resp.GetOutputsUri())
 	})
 
 	t.Run("recovered trace action returns outputs uri from RunInfo", func(t *testing.T) {
@@ -1829,13 +1840,13 @@ func TestGetActionDataURIs(t *testing.T) {
 			}),
 		}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		require.NoError(t, err)
-		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
-		assert.Equal(t, "s3://bucket/trace-outputs", resp.Msg.GetOutputsUri())
+		assert.Equal(t, "s3://bucket/inputs", resp.GetInputsUri())
+		assert.Equal(t, "s3://bucket/trace-outputs", resp.GetOutputsUri())
 	})
 
 	t.Run("recovered task returns outputs from latest attempt", func(t *testing.T) {
@@ -1860,13 +1871,13 @@ func TestGetActionDataURIs(t *testing.T) {
 			{Attempt: 0, Phase: int32(common.ActionPhase_ACTION_PHASE_RECOVERED), Info: eventBytes},
 		}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		require.NoError(t, err)
-		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
-		assert.Equal(t, "s3://bucket/outputs/0/outputs.pb", resp.Msg.GetOutputsUri())
+		assert.Equal(t, "s3://bucket/inputs", resp.GetInputsUri())
+		assert.Equal(t, "s3://bucket/outputs/0/outputs.pb", resp.GetOutputsUri())
 	})
 
 	t.Run("succeeded task with no attempts returns NotFound", func(t *testing.T) {
@@ -1880,9 +1891,9 @@ func TestGetActionDataURIs(t *testing.T) {
 		}, nil)
 		actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		assert.Nil(t, resp)
 		assert.Error(t, err)
@@ -1908,9 +1919,9 @@ func TestGetActionDataURIs(t *testing.T) {
 			{Attempt: 0, Phase: int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED), Info: eventBytes},
 		}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		assert.Nil(t, resp)
 		assert.Error(t, err)
@@ -1943,12 +1954,12 @@ func TestGetActionDataURIs(t *testing.T) {
 			{Attempt: 1, Info: event1},
 		}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		require.NoError(t, err)
-		assert.Equal(t, "s3://bucket/outputs/1/outputs.pb", resp.Msg.GetOutputsUri())
+		assert.Equal(t, "s3://bucket/outputs/1/outputs.pb", resp.GetOutputsUri())
 	})
 }
 
@@ -1984,24 +1995,24 @@ func TestGetActionLogContext(t *testing.T) {
 			}),
 		}, nil)
 
-		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+		resp, err := svc.GetActionLogContext(context.Background(), &workflow.GetActionLogContextRequest{
 			ActionId: actionID,
 			Attempt:  1,
-		}))
+		})
 
 		require.NoError(t, err)
-		assert.Equal(t, "c1", resp.Msg.GetCluster())
-		assert.Equal(t, "my-pod", resp.Msg.GetLogContext().GetPrimaryPodName())
+		assert.Equal(t, "c1", resp.GetCluster())
+		assert.Equal(t, "my-pod", resp.GetLogContext().GetPrimaryPodName())
 	})
 
 	t.Run("no event found returns NotFound", func(t *testing.T) {
 		actionRepo, _, svc := newTestService(t)
 		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(nil, sql.ErrNoRows)
 
-		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+		resp, err := svc.GetActionLogContext(context.Background(), &workflow.GetActionLogContextRequest{
 			ActionId: actionID,
 			Attempt:  1,
-		}))
+		})
 
 		assert.Nil(t, resp)
 		assert.Error(t, err)
@@ -2012,10 +2023,10 @@ func TestGetActionLogContext(t *testing.T) {
 		actionRepo, _, svc := newTestService(t)
 		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(nil, errors.New("db blew up"))
 
-		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+		resp, err := svc.GetActionLogContext(context.Background(), &workflow.GetActionLogContextRequest{
 			ActionId: actionID,
 			Attempt:  1,
-		}))
+		})
 
 		assert.Nil(t, resp)
 		assert.Error(t, err)
@@ -2032,10 +2043,10 @@ func TestGetActionLogContext(t *testing.T) {
 			}),
 		}, nil)
 
-		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+		resp, err := svc.GetActionLogContext(context.Background(), &workflow.GetActionLogContextRequest{
 			ActionId: actionID,
 			Attempt:  1,
-		}))
+		})
 
 		assert.Nil(t, resp)
 		assert.Error(t, err)
@@ -2048,10 +2059,10 @@ func TestGetActionLogContext(t *testing.T) {
 			Info: []byte("not-a-proto"),
 		}, nil)
 
-		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+		resp, err := svc.GetActionLogContext(context.Background(), &workflow.GetActionLogContextRequest{
 			ActionId: actionID,
 			Attempt:  1,
-		}))
+		})
 
 		assert.Nil(t, resp)
 		assert.Error(t, err)

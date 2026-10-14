@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	"connectrpc.com/connect"
-	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"connectrpc.com/connect/v2"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cluster/clusterconnect"
 )
@@ -31,9 +31,14 @@ var _ clusterconnect.ClusterServiceHandler = (*ClusterService)(nil)
 
 func (s *ClusterService) SelectCluster(
 	ctx context.Context,
-	req *connect.Request[cluster.SelectClusterRequest],
-) (*connect.Response[cluster.SelectClusterResponse], error) {
-	requestHost := req.Header().Get("Host")
+	req *cluster.SelectClusterRequest,
+) (*cluster.SelectClusterResponse, error) {
+	info, _ := connect.CallInfoForServerContext(ctx)
+	headers := &connect.Header{}
+	if info != nil {
+		headers = info.RequestHeader()
+	}
+	requestHost := headers.Get("Host")
 	logger.Debugf(ctx, "Request Host: %s", requestHost)
 
 	// Return a scheme-qualified base URL, not a bare host. Clients (the console) use
@@ -46,7 +51,7 @@ func (s *ClusterService) SelectCluster(
 	host := strings.TrimSpace(requestHost)
 	if host != "" {
 		scheme := schemeHTTP
-		if proto := req.Header().Get(headerXForwardedProto); proto != "" {
+		if proto := headers.Get(headerXForwardedProto); proto != "" {
 			// X-Forwarded-Proto may be a comma-separated list (proxy chain); the first value
 			// is the scheme the client used.
 			candidate := strings.ToLower(strings.TrimSpace(strings.Split(proto, ",")[0]))
@@ -57,7 +62,7 @@ func (s *ClusterService) SelectCluster(
 		endpoint = scheme + "://" + host
 	}
 
-	return connect.NewResponse(&cluster.SelectClusterResponse{
+	return &cluster.SelectClusterResponse{
 		ClusterEndpoint: endpoint,
-	}), nil
+	}, nil
 }

@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -329,7 +329,7 @@ func validateAndTransformFilters(filters []*common.Filter) (map[common.ActionPha
 			continue
 		}
 		if !isSupportedFilterFunction(filter) {
-			return nil, "", connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("function %s is not supported for filter %s", filter.GetFunction(), filter.GetField()))
+			return nil, "", connect.Errorf(connect.CodeInvalidArgument, "function %s is not supported for filter %s", filter.GetFunction(), filter.GetField())
 		}
 
 		switch filter.GetField() {
@@ -337,7 +337,7 @@ func validateAndTransformFilters(filters []*common.Filter) (map[common.ActionPha
 			for _, value := range filter.GetValues() {
 				phaseInt, err := strconv.Atoi(value)
 				if err != nil {
-					return nil, "", connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid phase value: %s", value))
+					return nil, "", connect.Errorf(connect.CodeInvalidArgument, "invalid phase value: %s", value)
 				}
 				phaseFilters[common.ActionPhase(phaseInt)] = struct{}{}
 			}
@@ -347,7 +347,7 @@ func validateAndTransformFilters(filters []*common.Filter) (map[common.ActionPha
 			}
 			nameFilter = strings.ToLower(filter.GetValues()[0])
 		default:
-			return nil, "", connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unsupported filter field: %s", filter.GetField()))
+			return nil, "", connect.Errorf(connect.CodeInvalidArgument, "unsupported filter field: %s", filter.GetField())
 		}
 	}
 

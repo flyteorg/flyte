@@ -7,7 +7,7 @@ require (
 	github.com/flyteorg/flyte/flytestdlib v1.11.0
 	github.com/golangci/golangci-lint/v2 v2.14.0
 	github.com/pseudomuto/protoc-gen-doc v1.4.1
-	github.com/vektra/mockery/v3 v3.7.0
+	github.com/vektra/mockery/v3 v3.8.1
 )
 
 require (
@@ -309,7 +309,7 @@ require (
 	golang.org/x/term v0.46.0 // indirect
 	golang.org/x/text v0.42.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
-	golang.org/x/tools v0.50.0 // indirect
+	golang.org/x/tools v0.51.0 // indirect
 	google.golang.org/api v0.293.0 // indirect
 	google.golang.org/genproto v0.0.0-20260715232425-e75dac1f907d // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260715232425-e75dac1f907d // indirect

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strings"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth/authconnect"
@@ -54,22 +54,23 @@ var _ authconnect.IdentityServiceHandler = (*IdentityService)(nil)
 // `flyte whoami` reports not-logged-in rather than printing an empty record.
 func (s *IdentityService) UserInfo(
 	ctx context.Context,
-	req *connect.Request[auth.UserInfoRequest],
-) (*connect.Response[auth.UserInfoResponse], error) {
-	if !s.trustHeaders {
-		return nil, connect.NewError(connect.CodeUnauthenticated, errNoIdentity)
+	req *auth.UserInfoRequest,
+) (*auth.UserInfoResponse, error) {
+	info, _ := connect.CallInfoForServerContext(ctx)
+	if !s.trustHeaders || info == nil {
+		return nil, connect.NewError(connect.CodeUnauthenticated, errNoIdentity.Error()).WithCause(errNoIdentity)
 	}
 
-	id := resolveIdentity(ctx, req.Header(), s.identityHeaders, s.enricher)
+	id := resolveIdentity(ctx, info.RequestHeader(), s.identityHeaders, s.enricher)
 	if id == nil {
-		return nil, connect.NewError(connect.CodeUnauthenticated, errNoIdentity)
+		return nil, connect.NewError(connect.CodeUnauthenticated, errNoIdentity.Error()).WithCause(errNoIdentity)
 	}
 
 	user := id.GetUser()
 	if user == nil {
-		return nil, connect.NewError(connect.CodeUnauthenticated, errNoIdentity)
+		return nil, connect.NewError(connect.CodeUnauthenticated, errNoIdentity.Error()).WithCause(errNoIdentity)
 	}
-	return connect.NewResponse(userInfoFromUser(user)), nil
+	return userInfoFromUser(user), nil
 }
 
 // userInfoFromUser maps the internal identity onto the OIDC-shaped UserInfoResponse.

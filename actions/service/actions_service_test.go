@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -52,9 +52,9 @@ func TestEnqueue(t *testing.T) {
 
 		m.EXPECT().Enqueue(mock.Anything, testAction, (*task.RunSpec)(nil)).Return(nil)
 
-		resp, err := svc.Enqueue(context.Background(), connect.NewRequest(&actions.EnqueueRequest{
+		resp, err := svc.Enqueue(context.Background(), &actions.EnqueueRequest{
 			Action: testAction,
-		}))
+		})
 
 		assert.NoError(t, err)
 		assert.NotNil(t, resp)
@@ -66,9 +66,9 @@ func TestEnqueue(t *testing.T) {
 
 		m.EXPECT().Enqueue(mock.Anything, testAction, (*task.RunSpec)(nil)).Return(errors.New("k8s error"))
 
-		_, err := svc.Enqueue(context.Background(), connect.NewRequest(&actions.EnqueueRequest{
+		_, err := svc.Enqueue(context.Background(), &actions.EnqueueRequest{
 			Action: testAction,
-		}))
+		})
 
 		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
 	})
@@ -96,11 +96,11 @@ func TestUpdate(t *testing.T) {
 		status := &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED}
 		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status).Return(nil)
 
-		resp, err := svc.Update(context.Background(), connect.NewRequest(&actions.UpdateRequest{
+		resp, err := svc.Update(context.Background(), &actions.UpdateRequest{
 			ActionId: testActionID,
 			Attempt:  1,
 			Status:   status,
-		}))
+		})
 
 		assert.NoError(t, err)
 		assert.NotNil(t, resp)
@@ -113,11 +113,11 @@ func TestUpdate(t *testing.T) {
 		status := &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_RUNNING}
 		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status).Return(errors.New("write failed"))
 
-		_, err := svc.Update(context.Background(), connect.NewRequest(&actions.UpdateRequest{
+		_, err := svc.Update(context.Background(), &actions.UpdateRequest{
 			ActionId: testActionID,
 			Attempt:  1,
 			Status:   status,
-		}))
+		})
 
 		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
 	})
@@ -131,10 +131,10 @@ func TestAbort(t *testing.T) {
 		reason := "user requested"
 		m.EXPECT().AbortAction(mock.Anything, testActionID, &reason).Return(nil)
 
-		resp, err := svc.Abort(context.Background(), connect.NewRequest(&actions.AbortRequest{
+		resp, err := svc.Abort(context.Background(), &actions.AbortRequest{
 			ActionId: testActionID,
 			Reason:   &reason,
-		}))
+		})
 
 		assert.NoError(t, err)
 		assert.NotNil(t, resp)
@@ -146,9 +146,9 @@ func TestAbort(t *testing.T) {
 
 		m.EXPECT().AbortAction(mock.Anything, testActionID, (*string)(nil)).Return(errors.New("delete failed"))
 
-		_, err := svc.Abort(context.Background(), connect.NewRequest(&actions.AbortRequest{
+		_, err := svc.Abort(context.Background(), &actions.AbortRequest{
 			ActionId: testActionID,
-		}))
+		})
 
 		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
 	})
@@ -174,11 +174,11 @@ func TestSignal(t *testing.T) {
 
 		m.EXPECT().Signal(mock.Anything, testActionID, value, "user@example.com").Return(nil)
 
-		resp, err := svc.Signal(context.Background(), connect.NewRequest(&actions.SignalRequest{
+		resp, err := svc.Signal(context.Background(), &actions.SignalRequest{
 			ActionId:    testActionID,
 			Value:       value,
 			SignalledBy: signalledBy,
-		}))
+		})
 
 		assert.NoError(t, err)
 		assert.NotNil(t, resp)
@@ -189,12 +189,12 @@ func TestSignal(t *testing.T) {
 		svc := NewActionsService(m)
 
 		m.EXPECT().Signal(mock.Anything, testActionID, value, "").
-			Return(connect.NewError(connect.CodeNotFound, errors.New("not found")))
+			Return(connect.NewError(connect.CodeNotFound, "not found"))
 
-		_, err := svc.Signal(context.Background(), connect.NewRequest(&actions.SignalRequest{
+		_, err := svc.Signal(context.Background(), &actions.SignalRequest{
 			ActionId: testActionID,
 			Value:    value,
-		}))
+		})
 
 		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
 	})
@@ -205,10 +205,10 @@ func TestSignal(t *testing.T) {
 
 		m.EXPECT().Signal(mock.Anything, testActionID, value, "").Return(errors.New("k8s down"))
 
-		_, err := svc.Signal(context.Background(), connect.NewRequest(&actions.SignalRequest{
+		_, err := svc.Signal(context.Background(), &actions.SignalRequest{
 			ActionId: testActionID,
 			Value:    value,
-		}))
+		})
 
 		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
 	})
