@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -109,13 +110,24 @@ func TestEnqueueCondition_InvalidDeclaredType(t *testing.T) {
 	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 }
 
-func TestEnqueueCondition_AlreadyExistsIsIdempotent(t *testing.T) {
+// A restarted parent re-enqueues the same condition; the second Enqueue must
+// return AlreadyExists and leave the existing CR untouched.
+func TestEnqueueCondition_AlreadyExists(t *testing.T) {
 	ctx := context.Background()
 	c := newConditionClient(t)
 	action := newConditionAction(core.SimpleType_BOOLEAN)
 
 	require.NoError(t, c.Enqueue(ctx, action, nil))
-	assert.NoError(t, c.Enqueue(ctx, action, nil))
+	created, err := c.GetTaskAction(ctx, action.ActionId)
+	require.NoError(t, err)
+
+	err = c.Enqueue(ctx, action, nil)
+	assert.Equal(t, connect.CodeAlreadyExists, connect.CodeOf(err))
+	assert.True(t, apierrors.IsAlreadyExists(err), "expected wrapped AlreadyExists error, got %v", err)
+
+	existing, err := c.GetTaskAction(ctx, action.ActionId)
+	require.NoError(t, err)
+	assert.Equal(t, created.ResourceVersion, existing.ResourceVersion)
 }
 
 func TestBuildActionUpdate_SignalValue(t *testing.T) {
