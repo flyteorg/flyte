@@ -63,7 +63,10 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	objectMeta.Labels = utils.UnionMaps(cfg.DefaultLabels, objectMeta.Labels,
 		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 	objectMeta.Annotations = utils.UnionMaps(cfg.DefaultAnnotations, objectMeta.Annotations,
-		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
+		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()),
+		// Applied last, naming the container doing the task's own work on every child pod,
+		// so a reader can tell it from an injected sidecar that may outlive it.
+		map[string]string{flytek8s.PrimaryContainerKey: primaryContainerName})
 
 	// The SDK is responsible for setting container.Command to the entrypoint module
 	// (python -m flyte.distributed._entrypoint) at serde time. The plugin stays
