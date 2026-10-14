@@ -2,8 +2,10 @@ package k8s
 
 import (
 	"context"
+	"errors"
 	"testing"
 
+	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
@@ -67,8 +69,9 @@ func newChildTaskAction() *actions.Action {
 }
 
 // A restarted parent re-enqueues children with the same deterministic action
-// IDs; the second Enqueue must succeed and leave the existing CR untouched.
-func TestEnqueueTask_AlreadyExistsIsIdempotent(t *testing.T) {
+// IDs; the second Enqueue must return AlreadyExists and leave the existing CR
+// untouched.
+func TestEnqueueTask_AlreadyExists(t *testing.T) {
 	ctx := context.Background()
 	c := newTaskClient(t, nil)
 	action := newChildTaskAction()
@@ -77,7 +80,8 @@ func TestEnqueueTask_AlreadyExistsIsIdempotent(t *testing.T) {
 	created, err := c.GetTaskAction(ctx, action.ActionId)
 	require.NoError(t, err)
 
-	assert.NoError(t, c.Enqueue(ctx, action, nil))
+	err = c.Enqueue(ctx, action, nil)
+	assert.Equal(t, connect.CodeAlreadyExists, connect.CodeOf(err))
 
 	existing, err := c.GetTaskAction(ctx, action.ActionId)
 	require.NoError(t, err)
@@ -90,10 +94,25 @@ func TestEnqueueTask_CreateError(t *testing.T) {
 	for _, tc := range []struct {
 		name      string
 		createErr error
-		wantErr   bool
+		check     func(t *testing.T, err error)
 	}{
-		{name: "already exists is ignored", createErr: apierrors.NewAlreadyExists(gr, "run1-a1")},
-		{name: "other errors are returned", createErr: apierrors.NewForbidden(gr, "run1-a1", nil), wantErr: true},
+		{
+			name:      "already exists maps to CodeAlreadyExists",
+			createErr: apierrors.NewAlreadyExists(gr, "run1-a1"),
+			check: func(t *testing.T, err error) {
+				assert.Equal(t, connect.CodeAlreadyExists, connect.CodeOf(err))
+				assert.True(t, apierrors.IsAlreadyExists(err), "expected wrapped AlreadyExists error, got %v", err)
+			},
+		},
+		{
+			name:      "other errors are returned unmapped",
+			createErr: apierrors.NewForbidden(gr, "run1-a1", nil),
+			check: func(t *testing.T, err error) {
+				var connectErr *connect.Error
+				assert.False(t, errors.As(err, &connectErr), "expected non-connect error, got %v", err)
+				assert.True(t, apierrors.IsForbidden(err), "expected wrapped Forbidden error, got %v", err)
+			},
+		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			c := newTaskClient(t, &interceptor.Funcs{
@@ -106,12 +125,8 @@ func TestEnqueueTask_CreateError(t *testing.T) {
 			})
 
 			err := c.Enqueue(context.Background(), newChildTaskAction(), nil)
-			if !tc.wantErr {
-				assert.NoError(t, err)
-				return
-			}
 			require.Error(t, err)
-			assert.True(t, apierrors.IsForbidden(err), "expected wrapped Forbidden error, got %v", err)
+			tc.check(t, err)
 		})
 	}
 }
