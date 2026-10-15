@@ -242,17 +242,11 @@ func buildTaskTemplateBytesWithTimeoutAndRetries(
 	return data
 }
 
-func buildTaskTemplateBytesWithQueuedTimeoutAndRetries(
-	taskType, image string,
-	queuedTimeout time.Duration,
-	retries uint32,
-) []byte {
+func buildTaskTemplateBytesWithQueuedTimeoutAndRetries(retries uint32) []byte {
 	tmpl := &core.TaskTemplate{}
-	Expect(proto.Unmarshal(buildTaskTemplateBytes(taskType, image), tmpl)).To(Succeed())
-	if queuedTimeout >= 0 {
-		tmpl.Metadata.Timeouts = &core.TimeoutStrategy{
-			QueuedTimeout: durationpb.New(queuedTimeout),
-		}
+	Expect(proto.Unmarshal(buildTaskTemplateBytes("timeout-test", "busybox"), tmpl)).To(Succeed())
+	tmpl.Metadata.Timeouts = &core.TimeoutStrategy{
+		QueuedTimeout: durationpb.New(2 * time.Second),
 	}
 	tmpl.Metadata.Retries = &core.RetryStrategy{Retries: retries}
 	data, err := proto.Marshal(tmpl)
@@ -734,7 +728,7 @@ var _ = Describe("TaskAction Controller", func() {
 			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
 			nn := createTaskAction(
 				"queued-timeout-missing",
-				buildTaskTemplateBytesWithQueuedTimeoutAndRetries("timeout-test", "busybox", queuedTimeout, 0),
+				buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0),
 			)
 			fakeClock.SetTime(getTaskAction(nn).CreationTimestamp.Time)
 			request := reconcile.Request{NamespacedName: nn}
@@ -768,7 +762,7 @@ var _ = Describe("TaskAction Controller", func() {
 
 		It("preserves a running attempt after its queued event fails to advance", func() {
 			nn := createTaskAction("queued-timeout-event-outage",
-				buildTaskTemplateBytesWithQueuedTimeoutAndRetries("timeout-test", "busybox", 2*time.Second, 0))
+				buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
 			base := getTaskAction(nn).CreationTimestamp.Time
 			fakeClock := testingclock.NewFakeClock(base)
 			fake := &fakePlugin{id: "timeout-plugin", transitions: []pluginsCore.Transition{
@@ -804,8 +798,7 @@ var _ = Describe("TaskAction Controller", func() {
 			for _, failure := range []string{"queued", lookupFailure, runtimeFailure, userFailure} {
 				for _, backoff := range []time.Duration{0, 10 * time.Second} {
 					template := &core.TaskTemplate{}
-					Expect(proto.Unmarshal(buildTaskTemplateBytesWithQueuedTimeoutAndRetries(
-						"timeout-test", "busybox", budget, 1), template)).To(Succeed())
+					Expect(proto.Unmarshal(buildTaskTemplateBytesWithQueuedTimeoutAndRetries(1), template)).To(Succeed())
 					template.Metadata.Retries.Backoff = &core.Backoff{Base: durationpb.New(backoff)}
 					if failure == runtimeFailure {
 						template.Metadata.Timeout = durationpb.New(time.Second)
@@ -887,8 +880,7 @@ var _ = Describe("TaskAction Controller", func() {
 		DescribeTable("waits for current plugin state when queued timeout recovery encounters an outage",
 			func(outage string) {
 				template := &core.TaskTemplate{}
-				Expect(proto.Unmarshal(buildTaskTemplateBytesWithQueuedTimeoutAndRetries(
-					"timeout-test", "busybox", 2*time.Second, 0), template)).To(Succeed())
+				Expect(proto.Unmarshal(buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0), template)).To(Succeed())
 				template.Id = &core.Identifier{
 					ResourceType: core.ResourceType_TASK,
 					Name:         "queued-timeout-test",
