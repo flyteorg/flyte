@@ -25,6 +25,8 @@ import (
 	"connectrpc.com/connect"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"google.golang.org/grpc/codes"
+	grpcstatus "google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -39,8 +41,10 @@ import (
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	executorplugin "github.com/flyteorg/flyte/v2/executor/pkg/plugin"
 	pluginserrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	k8sPlugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
@@ -231,6 +235,18 @@ func buildTaskTemplateBytesWithTimeoutAndRetries(
 	Expect(proto.Unmarshal(buildTaskTemplateBytes(taskType, image), tmpl)).To(Succeed())
 	if timeout > 0 {
 		tmpl.Metadata.Timeout = durationpb.New(timeout)
+	}
+	tmpl.Metadata.Retries = &core.RetryStrategy{Retries: retries}
+	data, err := proto.Marshal(tmpl)
+	Expect(err).NotTo(HaveOccurred())
+	return data
+}
+
+func buildTaskTemplateBytesWithQueuedTimeoutAndRetries(retries uint32) []byte {
+	tmpl := &core.TaskTemplate{}
+	Expect(proto.Unmarshal(buildTaskTemplateBytes("timeout-test", "busybox"), tmpl)).To(Succeed())
+	tmpl.Metadata.Timeouts = &core.TimeoutStrategy{
+		QueuedTimeout: durationpb.New(2 * time.Second),
 	}
 	tmpl.Metadata.Retries = &core.RetryStrategy{Retries: retries}
 	data, err := proto.Marshal(tmpl)
@@ -526,7 +542,7 @@ var _ = Describe("TaskAction Controller", func() {
 			original := ta.DeepCopy()
 			startingAttempts := ta.Status.Attempts
 
-			res, err := r.recordSystemError(ctx, ta, original, "pod", errFakeWebhookDenied, 0)
+			res, err := r.recordSystemError(ctx, ta, original, "pod", errFakeWebhookDenied, 0, 0)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(res.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
 			Expect(ta.Status.SystemFailures).To(Equal(uint32(1)))
@@ -553,7 +569,7 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(k8sClient.Get(ctx, nn, ta)).To(Succeed())
 			original := ta.DeepCopy()
 
-			res, err := r.recordSystemError(ctx, ta, original, "pod", errFakeWebhookDenied, 0)
+			res, err := r.recordSystemError(ctx, ta, original, "pod", errFakeWebhookDenied, 0, 0)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(res.RequeueAfter).To(BeZero(), "terminal — should not requeue")
 			Expect(ta.Status.SystemFailures).To(Equal(uint32(3)))
@@ -579,7 +595,7 @@ var _ = Describe("TaskAction Controller", func() {
 
 			handleErr := pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "invalid ray submission mode %q", "HttpMode")
 
-			res, err := r.recordSystemError(ctx, ta, original, "ray", handleErr, 0)
+			res, err := r.recordSystemError(ctx, ta, original, "ray", handleErr, 0, 0)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(res.RequeueAfter).To(BeZero(), "terminal - should not requeue")
 			Expect(ta.Status.SystemFailures).To(BeZero(), "a deterministic failure must not consume system attempts")
@@ -694,6 +710,235 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(fake.abortCalls).To(BeZero())
 			Expect(isTerminal(getTaskAction(nn))).To(BeFalse())
 		})
+
+		It("times out a queued task after queued_timeout elapses", func() {
+			const queuedTimeout = 2 * time.Second
+			base := time.Date(2026, time.August, 25, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			fake := &fakePlugin{
+				id: "timeout-plugin",
+				transitions: []pluginsCore.Transition{
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(
+						base,
+						pluginsCore.DefaultPhaseVersion,
+						"queued",
+					)),
+				},
+			}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			nn := createTaskAction(
+				"queued-timeout-missing",
+				buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0),
+			)
+			fakeClock.SetTime(getTaskAction(nn).CreationTimestamp.Time)
+			request := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(getTaskAction(nn).Status.Conditions).To(ContainElement(And(
+				HaveField("Type", string(flyteorgv1.ConditionTypeProgressing)),
+				HaveField("Reason", string(flyteorgv1.ConditionReasonQueued)),
+			)))
+
+			fakeClock.Step(queuedTimeout)
+			_, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.ErrorState).To(Equal(&flyteorgv1.ErrorState{
+				Code:    TaskExecutionTimedOutCode,
+				Kind:    "USER",
+				Message: "task attempt 1 exceeded its queued timeout of 2s",
+			}))
+			Expect(persisted.Status.Conditions).To(ContainElement(And(
+				HaveField("Type", string(flyteorgv1.ConditionTypeFailed)),
+				HaveField("Status", metav1.ConditionTrue),
+				HaveField("Reason", string(flyteorgv1.ConditionReasonTimedOut)),
+			)))
+			Expect(fake.abortCalls).To(Equal(1))
+			Expect(fake.finalizeCalls).To(Equal(1))
+		})
+
+		It("preserves a running attempt after its queued event fails to advance", func() {
+			nn := createTaskAction("queued-timeout-event-outage",
+				buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
+			base := getTaskAction(nn).CreationTimestamp.Time
+			fakeClock := testingclock.NewFakeClock(base)
+			fake := &fakePlugin{id: "timeout-plugin", transitions: []pluginsCore.Transition{
+				pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(base, pluginsCore.DefaultPhaseVersion, "queued")),
+				runningTransition(base.Add(time.Second)),
+			}}
+			recorded := &failingEventsClient{}
+			r := newReconciler(fake, fakeClock, recorded, nil)
+			req := reconcile.Request{NamespacedName: nn}
+			_, err := r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			fakeClock.Step(time.Second)
+			recorded.failures = 1
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).To(MatchError("events unavailable"))
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseQueued.String()))
+			Expect(persisted.Status.AttemptStartedAt).NotTo(BeNil())
+			fakeClock.Step(2 * time.Second)
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			persisted = getTaskAction(nn)
+			Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseRunning.String()))
+			Expect(persisted.Status.TimeoutAt).To(BeNil())
+			Expect(fake.abortCalls).To(BeZero())
+		})
+
+		It("gives retries a fresh queued timeout after their backoff", func() {
+			const budget = 2 * time.Second
+			const lookupFailure = "lookup"
+			const runtimeFailure = "runtime"
+			const userFailure = "user"
+			for _, failure := range []string{"queued", lookupFailure, runtimeFailure, userFailure} {
+				for _, backoff := range []time.Duration{0, 10 * time.Second} {
+					template := &core.TaskTemplate{}
+					Expect(proto.Unmarshal(buildTaskTemplateBytesWithQueuedTimeoutAndRetries(1), template)).To(Succeed())
+					template.Metadata.Retries.Backoff = &core.Backoff{Base: durationpb.New(backoff)}
+					if failure == runtimeFailure {
+						template.Metadata.Timeout = durationpb.New(time.Second)
+					}
+					data, err := proto.Marshal(template)
+					Expect(err).NotTo(HaveOccurred())
+					nn := createTaskAction("queued-retry-"+failure+"-"+backoff.String(), data)
+					base := getTaskAction(nn).CreationTimestamp.Time
+					fakeClock := testingclock.NewFakeClock(base)
+					queued := pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(base, pluginsCore.DefaultPhaseVersion, "queued"))
+					fake := &fakePlugin{id: "timeout-plugin", transitions: []pluginsCore.Transition{queued, queued, queued}}
+					step := budget
+					switch failure {
+					case runtimeFailure:
+						fake.transitions[0], fake.transitions[1] = runningTransition(base), runningTransition(base)
+						step = time.Second
+					case userFailure:
+						fake.transitions[1] = pluginsCore.DoTransition(
+							pluginsCore.PhaseInfoRetryableFailure("UserError", "task failed", nil))
+						step = time.Second
+					case lookupFailure:
+						fake.handleErrors = []error{nil, stderrors.New("temporary lookup failure")}
+					}
+					recorded := &recordingEventsClient{}
+					r := newReconciler(fake, fakeClock, recorded, nil)
+					req := reconcile.Request{NamespacedName: nn}
+					_, err = r.Reconcile(ctx, req)
+					Expect(err).NotTo(HaveOccurred())
+					fakeClock.Step(step)
+					_, err = r.Reconcile(ctx, req)
+					Expect(err).NotTo(HaveOccurred())
+					if failure == lookupFailure {
+						_, err = r.Reconcile(ctx, req)
+						Expect(err).NotTo(HaveOccurred())
+					}
+					retryAt := fakeClock.Now().Add(backoff)
+					persisted := getTaskAction(nn)
+					Expect(persisted.Status.Attempts).To(Equal(uint32(2)))
+					Expect(persisted.Status.AttemptQueuedAt).NotTo(BeNil())
+					Expect(persisted.Status.AttemptQueuedAt.Time).To(BeTemporally("==", retryAt))
+					if backoff > 0 {
+						handled := fake.handleCalls
+						fakeClock.Step(backoff - time.Second)
+						result, reconcileErr := r.Reconcile(ctx, req)
+						Expect(reconcileErr).NotTo(HaveOccurred())
+						Expect(result.RequeueAfter).To(Equal(time.Second))
+						Expect(fake.handleCalls).To(Equal(handled))
+					}
+					fakeClock.SetTime(retryAt)
+					result, err := r.Reconcile(ctx, req)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(result.RequeueAfter).To(Equal(budget))
+					Expect(isTerminal(getTaskAction(nn))).To(BeFalse())
+					fakeClock.Step(budget - time.Nanosecond)
+					result, err = r.Reconcile(ctx, req)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(result.RequeueAfter).To(Equal(time.Nanosecond))
+					fakeClock.Step(time.Nanosecond)
+					_, err = r.Reconcile(ctx, req)
+					Expect(err).NotTo(HaveOccurred())
+					persisted = getTaskAction(nn)
+					Expect(isTerminal(persisted)).To(BeTrue())
+					Expect(persisted.Status.ErrorState.Message).To(ContainSubstring("queued timeout"))
+					var timedOut []uint32
+					for _, event := range recorded.RecordedEvents() {
+						if event.GetPhase() == common.ActionPhase_ACTION_PHASE_TIMED_OUT {
+							timedOut = append(timedOut, event.GetAttempt())
+						}
+					}
+					if failure == userFailure {
+						Expect(timedOut).To(Equal([]uint32{2}))
+					} else {
+						Expect(timedOut).To(Equal([]uint32{1, 2}))
+					}
+				}
+			}
+		})
+
+		DescribeTable("waits for current plugin state when queued timeout recovery encounters an outage",
+			func(outage string) {
+				template := &core.TaskTemplate{}
+				Expect(proto.Unmarshal(buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0), template)).To(Succeed())
+				template.Id = &core.Identifier{
+					ResourceType: core.ResourceType_TASK,
+					Name:         "queued-timeout-test",
+					Project:      "timeout-project",
+					Domain:       "timeout-domain",
+					Version:      "v1",
+				}
+				template.Metadata.Discoverable, template.Metadata.CacheSerializable = true, true
+				data, err := proto.Marshal(template)
+				Expect(err).NotTo(HaveOccurred())
+				nn := createTaskAction("queued-outage-"+outage, data)
+				base := getTaskAction(nn).CreationTimestamp.Time
+				startedAt := base.Add(time.Second)
+				fakeClock := testingclock.NewFakeClock(base)
+				fake := &fakePlugin{id: "timeout-plugin", transitions: []pluginsCore.Transition{
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(base, pluginsCore.DefaultPhaseVersion, "queued")),
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoInitializing(
+						startedAt, pluginsCore.DefaultPhaseVersion, "initializing", &pluginsCore.TaskInfo{OccurredAt: &startedAt})),
+				}}
+				unavailable := false
+				r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+				r.Catalog = &stubCatalogClient{
+					getFunc: func(context.Context, catalog.Key) (catalog.Entry, error) {
+						return catalog.Entry{}, grpcstatus.Error(codes.NotFound, "miss")
+					},
+					getOrExtendReservationFunc: func(
+						_ context.Context, _ catalog.Key, owner string, _ time.Duration,
+					) (*cacheservice.Reservation, error) {
+						if unavailable {
+							return nil, stderrors.New("catalog unavailable")
+						}
+						return &cacheservice.Reservation{OwnerId: owner}, nil
+					},
+					releaseReservationFunc: func(context.Context, catalog.Key, string) error { return nil },
+				}
+				req := reconcile.Request{NamespacedName: nn}
+				_, err = r.Reconcile(ctx, req)
+				Expect(err).NotTo(HaveOccurred())
+				if outage == "plugin" {
+					fake.handleErrors = []error{nil, stderrors.New("plugin unavailable")}
+				} else {
+					unavailable = true
+				}
+				fakeClock.Step(3 * time.Second)
+				result, err := r.Reconcile(ctx, req)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(isTerminal(getTaskAction(nn))).To(BeFalse())
+				Expect(fake.abortCalls).To(BeZero())
+				Expect(result.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
+				unavailable = false
+				_, err = r.Reconcile(ctx, req)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(getTaskAction(nn).Status.PluginPhase).To(Equal(pluginsCore.PhaseInitializing.String()))
+				Expect(getTaskAction(nn).Status.TimeoutAt).To(BeNil())
+			},
+			Entry("plugin", "plugin"),
+			Entry("catalog", "catalog"),
+		)
 
 		It("leaves a valid zero max runtime unlimited", func() {
 			startedAt := time.Date(2026, time.August, 25, 0, 0, 0, 0, time.UTC)
