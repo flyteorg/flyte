@@ -24,6 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/v2/app/internal/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
 	secretUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/v2/flytestdlib/k8s"
@@ -577,6 +578,13 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	if err != nil {
 		return nil, err
 	}
+	// Apple Silicon apps run their ML work on the devbox host's Metal GPU via the Apple Silicon
+	// bridge; on any backend without one this fails the deploy with APPLE_SILICON_NOT_AVAILABLE.
+	if flytek8s.IsAppleSilicon(spec.GetExtendedResources().GetGpuAccelerator()) && len(podSpec.Containers) > 0 {
+		if err := flytek8s.ApplyAppleSiliconBridge(&podSpec, primaryContainerName(spec, podSpec), "app-"+name); err != nil {
+			return nil, err
+		}
+	}
 	if sa := spec.GetSecurityContext().GetRunAs().GetK8SServiceAccount(); sa != "" {
 		podSpec.ServiceAccountName = sa
 	} else if c.cfg.DefaultServiceAccount != "" {
@@ -732,6 +740,15 @@ func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 	default:
 		return corev1.PodSpec{}, fmt.Errorf("app spec has no payload (container or pod required)")
 	}
+}
+
+// primaryContainerName returns the app's serving container: the one a K8sPod payload names, or
+// the first container otherwise.
+func primaryContainerName(spec *flyteapp.Spec, podSpec corev1.PodSpec) string {
+	if name := spec.GetPod().GetPrimaryContainerName(); name != "" {
+		return name
+	}
+	return podSpec.Containers[0].Name
 }
 
 // buildResourceRequirements maps flyteidl2 Resources to corev1.ResourceRequirements.

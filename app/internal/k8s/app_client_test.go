@@ -24,6 +24,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/flyteorg/flyte/v2/app/internal/config"
+	pluginserrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	k8sconfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	flytecoreapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -1158,4 +1162,55 @@ func TestDeploy_TelemetryOptOutReachesApps(t *testing.T) {
 			}
 		})
 	}
+}
+
+// setK8sConfig swaps in cfg for the rest of the test and restores the previous plugin config after.
+func setK8sConfig(t *testing.T, cfg *k8sconfig.K8sPluginConfig) {
+	t.Helper()
+	previous := *k8sconfig.GetK8sPluginConfig()
+	t.Cleanup(func() { require.NoError(t, k8sconfig.SetK8sPluginConfig(&previous)) })
+	require.NoError(t, k8sconfig.SetK8sPluginConfig(cfg))
+}
+
+func appleSiliconApp() *flyteapp.App {
+	app := testApp("proj", "dev", "llm", "ghcr.io/example/llm:latest")
+	app.Spec.ExtendedResources = &flytecoreapp.ExtendedResources{
+		GpuAccelerator: &flytecoreapp.GPUAccelerator{
+			Device:      "AppleSilicon",
+			DeviceClass: flytecoreapp.GPUAccelerator_APPLE_SILICON,
+		},
+	}
+	return app
+}
+
+func TestDeploy_AppleSiliconInjectsBridge(t *testing.T) {
+	setK8sConfig(t, &k8sconfig.K8sPluginConfig{
+		AppleSiliconBridge: k8sconfig.AppleSiliconBridgeConfig{
+			Endpoint: "http://192.168.65.254:30090", TokenSecret: "s3cret",
+		},
+	})
+
+	c := testClient(t)
+	require.NoError(t, c.Deploy(context.Background(), appleSiliconApp()))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "llm-proj-dev", Namespace: AppNamespace}, ksvc))
+	env := map[string]string{}
+	for _, e := range ksvc.Spec.Template.Spec.Containers[0].Env {
+		env[e.Name] = e.Value
+	}
+	assert.Equal(t, "http://192.168.65.254:30090/v1", env[flytek8s.OpenAIBaseURLEnvVar])
+	assert.Equal(t, "app-llm-proj-dev", env[flytek8s.AppleSiliconWorkloadEnvVar])
+	assert.Equal(t, flytek8s.MintAppleSiliconToken("s3cret", "app-llm-proj-dev"), env[flytek8s.AppleSiliconTokenEnvVar])
+}
+
+func TestDeploy_AppleSiliconWithoutBridgeFails(t *testing.T) {
+	setK8sConfig(t, &k8sconfig.K8sPluginConfig{})
+
+	c := testClient(t)
+	err := c.Deploy(context.Background(), appleSiliconApp())
+	require.Error(t, err)
+	assert.True(t, stdErrors.IsCausedBy(err, pluginserrors.AppleSiliconNotAvailable))
+	assert.Contains(t, err.Error(), "requires an Apple Silicon devbox")
 }

@@ -673,6 +673,7 @@ func (r *TaskActionReconciler) recordSystemRetry(
 var nonRetryableErrorCodes = []stdErrors.ErrorCode{
 	pluginserrors.BadTaskSpecification,
 	pluginserrors.MetadataTooLarge,
+	pluginserrors.AppleSiliconNotAvailable,
 }
 
 // nonRetryableCode reports the first non-retryable code found in err's cause chain.

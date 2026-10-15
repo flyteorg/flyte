@@ -6865,6 +6865,12 @@ spec:
                 maxLength: 30
                 minLength: 1
                 type: string
+              podTemplateName:
+                description: |-
+                  PodTemplateName is the run-scoped pod template name projected from RunSpec.DefaultSettings.
+                  Stamped onto tasks that do not name one themselves.
+                maxLength: 253
+                type: string
               project:
                 description: Project this action belongs to
                 maxLength: 63
@@ -7796,6 +7802,7 @@ data:
         maxSize: 100Mi
         storagePrefix: uploads
     runs:
+      notificationBufferLimit: 65000
       server:
         host: 0.0.0.0
         port: 8090
@@ -7891,6 +7898,10 @@ data:
       scheme: http
     plugins:
       k8s:
+        apple-silicon-bridge:
+          endpoint: '%{APPLE_SILICON_BRIDGE_ENDPOINT}%'
+          host-platform: '%{DEVBOX_HOST_PLATFORM}%'
+          token-secret: '%{APPLE_SILICON_BRIDGE_TOKEN_SECRET}%'
         default-env-vars:
         - FLYTE_AWS_ENDPOINT: http://rustfs-svc.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: rustfs
@@ -8729,7 +8740,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 21a742d07793d02ffa71b00e29bf0ac75148c13c48a68838f9ffb85af7f6bc82
+        checksum/configuration: a0401c9392460d1e527456d213b4ab1bda9b9bf2731750f219ef262f147efdbb
         checksum/configuration-secret: ff95a9986cc42dff0a114449c9b8e9a95c781b7bdd9832b31ca461423ae0b678
       labels:
         app.kubernetes.io/component: flyte-binary

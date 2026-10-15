@@ -8,6 +8,8 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
 	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
+	pluginserrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
@@ -46,7 +48,7 @@ func (s *InternalAppService) Create(
 
 	if err := s.k8s.Deploy(ctx, app); err != nil {
 		logger.Errorf(ctx, "Failed to deploy app %s: %v", app.GetMetadata().GetId().GetName(), err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(deployErrorCode(err), err)
 	}
 
 	app.Status = &flyteapp.Status{
@@ -112,7 +114,7 @@ func (s *InternalAppService) Update(
 		// UNSPECIFIED, STARTED, ACTIVE — deploy/redeploy the spec.
 		if err := s.k8s.Deploy(ctx, app); err != nil {
 			logger.Errorf(ctx, "Failed to update app %s: %v", appID.GetName(), err)
-			return nil, connect.NewError(connect.CodeInternal, err)
+			return nil, connect.NewError(deployErrorCode(err), err)
 		}
 	}
 
@@ -226,4 +228,13 @@ func (s *InternalAppService) Watch(
 			}
 		}
 	}
+}
+
+// deployErrorCode classifies a Deploy failure. An app asking for an accelerator this backend
+// cannot provide is the caller's problem, not an internal error.
+func deployErrorCode(err error) connect.Code {
+	if stdErrors.IsCausedBy(err, pluginserrors.AppleSiliconNotAvailable) {
+		return connect.CodeFailedPrecondition
+	}
+	return connect.CodeInternal
 }
