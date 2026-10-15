@@ -29,6 +29,7 @@ import (
 const (
 	rootActionName                                   = "a0"
 	defaultNotificationBufferSize                    = 256
+	defaultWatchBufferSize                           = 100
 	notifyRetryMinBackoff                            = 50 * time.Millisecond
 	notifyRetryMaxBackoff                            = 5 * time.Second
 	notificationMeterName                            = "runs-repository"
@@ -44,6 +45,9 @@ type NotificationConfig struct {
 	bufferLimit     int
 	retryMinBackoff time.Duration
 	retryMaxBackoff time.Duration
+	// watchBufferSize is the capacity of each watch subscriber's notification channel. A notification for a
+	// subscriber whose channel is full is dropped.
+	watchBufferSize int
 }
 
 type notificationMetrics struct {
@@ -77,7 +81,7 @@ func (m *notificationMetrics) recordDeleted(ctx context.Context, bufferFrom noti
 }
 
 // NewNotificationConfig creates a notification config, normalizing invalid values.
-func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff time.Duration) NotificationConfig {
+func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff time.Duration, watchBufferSize int) NotificationConfig {
 	if bufferLimit < defaultNotificationBufferSize {
 		bufferLimit = defaultNotificationBufferSize
 	}
@@ -91,11 +95,15 @@ func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff tim
 		retryMinBackoff = notifyRetryMinBackoff
 		retryMaxBackoff = notifyRetryMaxBackoff
 	}
+	if watchBufferSize <= 0 {
+		watchBufferSize = defaultWatchBufferSize
+	}
 
 	return NotificationConfig{
 		bufferLimit:     bufferLimit,
 		retryMinBackoff: retryMinBackoff,
 		retryMaxBackoff: retryMaxBackoff,
+		watchBufferSize: watchBufferSize,
 	}
 }
 
@@ -765,7 +773,7 @@ func (r *actionRepo) WatchStateUpdates(ctx context.Context, updates chan<- *comm
 // WatchRunUpdates watches for run updates via LISTEN/NOTIFY
 func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Run, errs chan<- error) {
 	runKey := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
-	notifCh := make(chan string, 100)
+	notifCh := make(chan string, r.notificationConfig.watchBufferSize)
 
 	r.mu.Lock()
 	r.runSubscribers[notifCh] = true
@@ -804,7 +812,7 @@ func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdent
 
 // WatchAllRunUpdates watches for all run updates via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error) {
-	notifCh := make(chan string, 100)
+	notifCh := make(chan string, r.notificationConfig.watchBufferSize)
 
 	r.mu.Lock()
 	r.runSubscribers[notifCh] = true
@@ -857,7 +865,7 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 // WatchAllActionUpdates watches for all action updates for a run via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	runPrefix := fmt.Sprintf("%s/%s/%s/", runID.Project, runID.Domain, runID.Name)
-	notifCh := make(chan string, 100)
+	notifCh := make(chan string, r.notificationConfig.watchBufferSize)
 
 	r.mu.Lock()
 	r.actionSubscribers[notifCh] = true
@@ -925,7 +933,7 @@ func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.Ru
 func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.ActionIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	targetPayload := fmt.Sprintf("%s/%s/%s/%s",
 		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
-	notifCh := make(chan string, 100)
+	notifCh := make(chan string, r.notificationConfig.watchBufferSize)
 
 	r.mu.Lock()
 	r.actionSubscribers[notifCh] = true

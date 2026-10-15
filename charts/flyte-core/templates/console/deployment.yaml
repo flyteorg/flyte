@@ -8,7 +8,9 @@ metadata:
     {{- include "flyte-core.labels" . | nindent 4 }}
     app.kubernetes.io/component: console
 spec:
+  {{- if not .Values.console.autoscaling.enabled }}
   replicas: {{ .Values.console.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "flyte-core.name" . }}
@@ -48,9 +50,15 @@ spec:
             - name: http
               containerPort: {{ .Values.console.containerPort }}
               protocol: TCP
-          {{- with .Values.console.env }}
+          {{- if or .Values.console.env (include "flyte-core.telemetryDisabled" .) }}
           env:
+            {{- if include "flyte-core.telemetryDisabled" . }}
+            - name: DO_NOT_TRACK
+              value: "1"
+            {{- end }}
+            {{- with .Values.console.env }}
             {{- tpl (toYaml .) $ | nindent 12 }}
+            {{- end }}
           {{- end }}
           livenessProbe:
             httpGet:

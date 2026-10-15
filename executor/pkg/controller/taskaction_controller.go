@@ -21,6 +21,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"reflect"
 	"strings"
 	"time"
@@ -257,6 +258,99 @@ func queuedTimeoutFromTaskTemplate(data []byte) (time.Duration, error) {
 	return queuedTimeout, nil
 }
 
+// retryBackoffFromTaskTemplate reads TaskMetadata.retries.backoff — the pacing between user retries.
+func retryBackoffFromTaskTemplate(data []byte) (*core.Backoff, error) {
+	if len(data) == 0 {
+		return nil, nil
+	}
+
+	taskTemplate := &core.TaskTemplate{}
+	if err := proto.Unmarshal(data, taskTemplate); err != nil {
+		return nil, fmt.Errorf("unmarshal task template: %w", err)
+	}
+	return taskTemplate.GetMetadata().GetRetries().GetBackoff(), nil
+}
+
+// validateRetryBackoff enforces the Backoff contract from flyteidl2/core/literals.proto:
+// non-negative durations, a finite factor >= 1, and a cap whenever factor > 1.
+func validateRetryBackoff(backoff *core.Backoff) error {
+	if backoff == nil {
+		return nil
+	}
+	if base := backoff.GetBase(); base != nil && (base.CheckValid() != nil || base.AsDuration() < 0) {
+		return fmt.Errorf("invalid retry backoff: base must be a non-negative duration, got %v", base)
+	}
+	if limit := backoff.GetCap(); limit != nil && (limit.CheckValid() != nil || limit.AsDuration() < 0) {
+		return fmt.Errorf("invalid retry backoff: cap must be a non-negative duration, got %v", limit)
+	}
+	if backoff.Factor != nil {
+		factor := backoff.GetFactor()
+		if math.IsNaN(factor) || math.IsInf(factor, 0) || factor < 1 {
+			return fmt.Errorf("invalid retry backoff: factor must be a finite number >= 1, got %v", factor)
+		}
+		if factor > 1 && backoff.GetCap() == nil {
+			return fmt.Errorf("invalid retry backoff: cap is required when factor > 1")
+		}
+	}
+	return nil
+}
+
+// retryBackoffDelay is how long the retry-th user retry (0-indexed) waits before it
+// launches: min(base * factor**retry, cap), the formula the SDKs document for
+// Backoff. A factor at or below 1 (or none) keeps the delay constant. The backoff has
+// already passed validateRetryBackoff, so a growing delay always has a cap.
+func retryBackoffDelay(backoff *core.Backoff, retry uint32) time.Duration {
+	base := backoff.GetBase()
+	if base == nil || base.CheckValid() != nil || base.AsDuration() <= 0 {
+		return 0
+	}
+	seconds := base.AsDuration().Seconds()
+	if factor := backoff.GetFactor(); factor > 1 {
+		seconds *= math.Pow(factor, float64(retry))
+	}
+	if limit := backoff.GetCap(); limit != nil && limit.CheckValid() == nil {
+		seconds = math.Min(seconds, limit.AsDuration().Seconds())
+	}
+	return time.Duration(seconds * float64(time.Second))
+}
+
+// scheduleNextAttempt stamps Status.NextAttemptAt for the retry replacing a failed
+// attempt, per the task's retry backoff. failedAttempts is how many attempts have
+// failed so far, so the retry being scheduled is the (failedAttempts-1)-th, 0-indexed.
+// Without a backoff, or with one the proto contract rejects, the retry launches at
+// once: an executor upgrade must not fail an in-flight action over its pacing.
+func (r *TaskActionReconciler) scheduleNextAttempt(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	failedAttempts uint32,
+) {
+	taskAction.Status.NextAttemptAt = nil
+	queuedAt := metav1.NewTime(r.now())
+	taskAction.Status.AttemptQueuedAt = &queuedAt
+	backoff, err := retryBackoffFromTaskTemplate(taskAction.Spec.TaskTemplate)
+	if err == nil {
+		err = validateRetryBackoff(backoff)
+	}
+	if err != nil {
+		log.FromContext(ctx).Error(err, "ignoring the retry backoff, retrying without delay")
+		return
+	}
+	if delay := retryBackoffDelay(backoff, failedAttempts-1); delay > 0 {
+		nextAttemptAt := metav1.NewTime(queuedAt.Add(delay))
+		taskAction.Status.NextAttemptAt = &nextAttemptAt
+		// The queue budget starts when this retry may launch, after its backoff.
+		taskAction.Status.AttemptQueuedAt = &nextAttemptAt
+	}
+}
+
+// backoffRemaining is how long a retried attempt still has to wait before it may launch.
+func (r *TaskActionReconciler) backoffRemaining(taskAction *flyteorgv1.TaskAction) time.Duration {
+	if taskAction.Status.NextAttemptAt == nil {
+		return 0
+	}
+	return taskAction.Status.NextAttemptAt.Sub(r.now())
+}
+
 // taskAttemptDeadline return the deadline of current attempt
 func taskAttemptDeadline(taskAction *flyteorgv1.TaskAction, maxRuntime time.Duration) (time.Time, bool) {
 	if maxRuntime <= 0 || taskAction.Status.AttemptStartedAt == nil {
@@ -266,7 +360,8 @@ func taskAttemptDeadline(taskAction *flyteorgv1.TaskAction, maxRuntime time.Dura
 }
 
 func taskAttemptQueuedDeadline(taskAction *flyteorgv1.TaskAction, queuedTimeout time.Duration) (time.Time, bool) {
-	if queuedTimeout <= 0 || taskAction.Status.AttemptQueuedAt == nil {
+	if queuedTimeout <= 0 || taskAction.Status.AttemptQueuedAt == nil ||
+		taskAction.Status.AttemptStartedAt != nil || !isQueuedPluginPhase(taskAction.Status.PluginPhase) {
 		return time.Time{}, false
 	}
 	return taskAction.Status.AttemptQueuedAt.Add(queuedTimeout), true
@@ -315,6 +410,10 @@ func (r *TaskActionReconciler) timeoutAwareRequeue(
 	queuedTimeout time.Duration,
 ) ctrl.Result {
 	requeueAfter := r.requeueDuration()
+	// Nothing happens while a retry waits out its backoff, so come back when it ends.
+	if remaining := r.backoffRemaining(taskAction); remaining > 0 {
+		requeueAfter = remaining
+	}
 	if deadline, ok := taskAttemptDeadline(taskAction, maxRuntime); ok {
 		untilDeadline := deadline.Sub(r.now())
 		if untilDeadline <= 0 {
@@ -424,6 +523,9 @@ func (r *TaskActionReconciler) ensureAttemptQueuedAt(
 	queuedAt, ok := getPhaseLastTransitionTime(taskAction, flyteorgv1.ConditionReasonQueued)
 	if !ok {
 		queuedAt = r.now()
+		if observedAttempts(taskAction) == 1 && !taskAction.CreationTimestamp.IsZero() {
+			queuedAt = taskAction.CreationTimestamp.Time
+		}
 	}
 	return r.persistAttemptQueuedAt(ctx, taskAction, queuedAt)
 }
@@ -599,14 +701,16 @@ func (r *TaskActionReconciler) reconcileTimedOutAttempt(
 		taskAction.Status.TimeoutAt = nil
 		taskAction.Status.PluginState = nil
 		taskAction.Status.PluginStateVersion = 0
+		r.scheduleNextAttempt(ctx, taskAction, currentAttempts)
 		// Same rule as the ordinary reconcile tail: a fresh attempt does not
 		// inherit the previous one's consecutive system-failure count.
 		taskAction.Status.SystemFailures = 0
 		taskAction.Status.CacheStatus = observedCacheStatus(phaseInfo.Info())
-		queuedAt := metav1.NewTime(r.now())
-		taskAction.Status.AttemptQueuedAt = &queuedAt
 		if err := r.applyTimeoutPhase(ctx, taskAction, original, phaseInfo); err != nil {
 			return ctrl.Result{}, err
+		}
+		if remaining := r.backoffRemaining(taskAction); remaining > 0 {
+			return ctrl.Result{RequeueAfter: remaining}, nil
 		}
 		return ctrl.Result{Requeue: true}, nil
 	}
@@ -916,6 +1020,12 @@ func (r *TaskActionReconciler) reconcileTask(
 		return ctrl.Result{}, nil
 	}
 
+	// A retried attempt waits out its retry backoff before the plugin launches it.
+	if remaining := r.backoffRemaining(taskAction); remaining > 0 {
+		return ctrl.Result{RequeueAfter: remaining}, nil
+	}
+	taskAction.Status.NextAttemptAt = nil
+
 	// Build PluginStateManager from persisted state
 	stateMgr := plugin.NewPluginStateManager(
 		taskAction.Status.PluginState,
@@ -954,9 +1064,6 @@ func (r *TaskActionReconciler) reconcileTask(
 		)
 	}
 	alreadyRunning := taskAction.Status.PluginPhase == pluginsCore.PhaseRunning.String()
-	if deadline, ok := taskAttemptQueuedDeadline(taskAction, queuedTimeout); ok && isQueuedPluginPhase(taskAction.Status.PluginPhase) && !r.now().Before(deadline) {
-		return r.setAttemptTimeout(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, maxRuntime, queuedTimeout, deadline)
-	}
 
 	// cacheShortCircuited is true when cache handling already decided the outcome,
 	// either via cache hit or waiting on the reservation owner.
@@ -970,7 +1077,9 @@ func (r *TaskActionReconciler) reconcileTask(
 		if hasDeadline && !r.now().Before(deadline) {
 			return r.setAttemptTimeout(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, maxRuntime, queuedTimeout, deadline)
 		}
-		return r.timeoutAwareRequeue(taskAction, maxRuntime, queuedTimeout), nil
+		// A cache error cannot establish whether the resource has left the queue.
+		// Retry without using a stale queued phase to expire its deadline.
+		return r.timeoutAwareRequeue(taskAction, maxRuntime, 0), nil
 	}
 	// Even when cache handling short-circuits execution, we still continue through the
 	// shared reconcile tail below so the derived transition updates conditions, status,
@@ -991,7 +1100,9 @@ func (r *TaskActionReconciler) reconcileTask(
 		}
 	}
 
-	if deadline, ok := taskAttemptQueuedDeadline(taskAction, queuedTimeout); ok {
+	if deadline, ok := taskAttemptQueuedDeadline(taskAction, queuedTimeout); ok && handleErr == nil {
+		// A persisted queued phase can lag behind the resource after downtime
+		// or a failed event publication. Check the plugin before ending the attempt.
 		if isQueuedPhase(transition.Info().Phase()) && !r.now().Before(deadline) {
 			return r.setAttemptTimeout(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, maxRuntime, queuedTimeout, deadline)
 		}
@@ -1010,7 +1121,10 @@ func (r *TaskActionReconciler) reconcileTask(
 	}
 
 	if handleErr != nil {
-		return r.recordSystemError(ctx, taskAction, originalTaskActionInstance, p.GetID(), handleErr, maxRuntime, queuedTimeout)
+		// The plugin could not report its current phase. Keep the system-error
+		// retry cadence instead of requeueing on an unconfirmed queued deadline.
+		return r.recordSystemError(
+			ctx, taskAction, originalTaskActionInstance, p.GetID(), handleErr, maxRuntime, 0)
 	}
 
 	if transition, err = r.finalizeCacheAfterExecution(ctx, taskAction, tCtx, transition, cacheShortCircuited); err != nil {
@@ -1053,6 +1167,10 @@ func (r *TaskActionReconciler) reconcileTask(
 	// toward the permanent-failure threshold.
 	taskAction.Status.SystemFailures = 0
 
+	// Whether the plugin asked for its resource to be deleted if this failure ends the task.
+	// Read it before the retry block below, which rebuilds a final failure without the flag.
+	cleanupOnFailure := phaseInfo.CleanupOnFailure()
+
 	// In-place task restart on USER-kind retryable failure: bump Status.Attempts
 	// and relaunch the pod under the same TaskAction.
 	var restartAttempts uint32
@@ -1068,7 +1186,9 @@ func (r *TaskActionReconciler) reconcileTask(
 			}
 			// Track the new attempt count; applied to Status.Attempts after the stateMgr block.
 			restartAttempts = currentAttempts + 1
-			logger.Info("restarting task in-place", "attempt", currentAttempts+1, "maxAttempts", maxAttempts)
+			r.scheduleNextAttempt(ctx, taskAction, currentAttempts)
+			logger.Info("restarting task in-place",
+				"attempt", currentAttempts+1, "maxAttempts", maxAttempts, "nextAttemptAt", taskAction.Status.NextAttemptAt)
 			// Override the transition to Queued so the TaskAction stays non-terminal.
 			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(r.now(), pluginsCore.DefaultPhaseVersion, "restarting task"))
 			phaseInfo = transition.Info()
@@ -1086,6 +1206,16 @@ func (r *TaskActionReconciler) reconcileTask(
 			phaseInfo = transition.Info()
 		}
 	}
+	// A task that fails for good keeps its resource until the TaskAction is garbage collected.
+	// A plugin asks for cleanup when that resource would otherwise keep going: a gang an admission
+	// gate took back is re-admitted by the gate and would run again for a task that has already
+	// failed. Delete it now, as a retry above already does.
+	if !cacheShortCircuited && cleanupOnFailure && phaseInfo.Phase() == pluginsCore.PhasePermanentFailure {
+		if abortErr := p.Abort(ctx, tCtx); abortErr != nil {
+			logger.Error(abortErr, "failed to clean up the resource of a failed task")
+		}
+	}
+
 	mapPhaseToConditions(taskAction, phaseInfo)
 
 	// Update StateJSON for observability
@@ -1106,7 +1236,6 @@ func (r *TaskActionReconciler) reconcileTask(
 		taskAction.Status.Attempts = restartAttempts
 		taskAction.Status.PluginState = nil
 		taskAction.Status.PluginStateVersion = 0
-		taskAction.Status.AttemptQueuedAt = nil
 		taskAction.Status.AttemptStartedAt = nil
 		taskAction.Status.TimeoutAt = nil
 	}
@@ -1519,7 +1648,8 @@ func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) b
 		oldStatus.CacheStatus != newStatus.CacheStatus ||
 		!oldStatus.AttemptQueuedAt.Equal(newStatus.AttemptQueuedAt) ||
 		!oldStatus.AttemptStartedAt.Equal(newStatus.AttemptStartedAt) ||
-		!oldStatus.TimeoutAt.Equal(newStatus.TimeoutAt) {
+		!oldStatus.TimeoutAt.Equal(newStatus.TimeoutAt) ||
+		!oldStatus.NextAttemptAt.Equal(newStatus.NextAttemptAt) {
 		return true
 	}
 
@@ -1722,7 +1852,6 @@ func validateTaskAction(taskAction *flyteorgv1.TaskAction, registry pluginResolv
 	if err != nil {
 		return nil, 0, 0, flyteorgv1.ConditionReasonInvalidSpec, err
 	}
-
 	p, err := registry.ResolvePlugin(taskAction.Spec.TaskType)
 	if err != nil {
 		return nil, 0, 0, flyteorgv1.ConditionReasonPluginNotFound,

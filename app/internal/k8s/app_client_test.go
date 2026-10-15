@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"testing"
 	"time"
 
@@ -1125,4 +1126,36 @@ func TestBuildPodSpec_NoPayload(t *testing.T) {
 	_, err := buildPodSpec(spec)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "app spec has no payload")
+}
+
+func TestDeploy_TelemetryOptOutReachesApps(t *testing.T) {
+	for _, disabled := range []bool{true, false} {
+		t.Run(fmt.Sprintf("disabled=%v", disabled), func(t *testing.T) {
+			for _, name := range []string{"FLYTE_DISABLE_TELEMETRY", "DO_NOT_TRACK", "FLYTE_DISABLE_SENTRY"} {
+				t.Setenv(name, "")
+			}
+			if disabled {
+				t.Setenv("DO_NOT_TRACK", "1")
+			}
+			c := testClient(t)
+			app := testApp("proj", "dev", "myapp", "nginx:latest")
+			require.NoError(t, c.Deploy(context.Background(), app))
+
+			ksvc := &servingv1.Service{}
+			require.NoError(t, c.k8sClient.Get(context.Background(),
+				client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+			var got []string
+			for _, e := range ksvc.Spec.Template.Spec.Containers[0].Env {
+				if e.Name == "DO_NOT_TRACK" {
+					got = append(got, e.Value)
+				}
+			}
+			if disabled {
+				assert.Equal(t, []string{"1"}, got)
+			} else {
+				assert.Empty(t, got)
+			}
+		})
+	}
 }

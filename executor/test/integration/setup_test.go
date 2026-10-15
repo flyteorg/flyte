@@ -58,6 +58,7 @@ var (
 	ctx           context.Context
 	testEnv       *envtest.Environment
 	k8sClient     client.WithWatch
+	pluginClient  client.Client
 	reconciler    *controller.TaskActionReconciler
 	actionsClient *actionsk8s.ActionsClient
 	runClient     *recordingRunClient
@@ -124,6 +125,7 @@ func TestMain(m *testing.M) {
 		log.Printf("Cache failed to sync")
 		return
 	}
+	pluginClient = mgr.GetClient()
 
 	labeled.SetMetricKeys(
 		contextutils.ProjectKey,

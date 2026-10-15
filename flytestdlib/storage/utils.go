@@ -2,9 +2,9 @@ package storage
 
 import (
 	"context"
+	"errors"
 	"os"
 
-	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -24,7 +24,8 @@ const (
 
 // IsNotFound gets a value indicating whether the underlying error is a Not Found error.
 func IsNotFound(err error) bool {
-	if root := errors.Cause(err); os.IsNotExist(root) {
+	// errors.Is follows both pkg/errors and %w wrapping, errors.Cause only follows the former.
+	if errors.Is(err, os.ErrNotExist) {
 		return true
 	}
 
@@ -41,11 +42,7 @@ func IsNotFound(err error) bool {
 
 // IsExists gets a value indicating whether the underlying error is "already exists" error.
 func IsExists(err error) bool {
-	if root := errors.Cause(err); os.IsExist(root) {
-		return true
-	}
-
-	return false
+	return errors.Is(err, os.ErrExist)
 }
 
 // IsExceedsLimit gets a value indicating whether the root cause of error is a "limit exceeded" error.
