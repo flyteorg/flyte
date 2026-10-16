@@ -214,6 +214,11 @@ func setupExecutor(ctx context.Context, sc *stdlibapp.SetupContext) error {
 }
 
 func setupAll(ctx context.Context, sc *stdlibapp.SetupContext) error {
+	runsAuth := runsconfig.GetConfig().Authorization
+	proxyAuth := dataproxyconfig.GetConfig().Authorization
+	if runsAuth.Enabled != proxyAuth.Enabled || (runsAuth.Enabled && runsAuth != proxyAuth) {
+		return fmt.Errorf("unified mode requires matching Runs and DataProxy authorization configuration")
+	}
 	serverCfg := runsconfig.GetConfig().Server
 	k8sCfg := actionsconfig.GetConfig().Kubernetes
 	sc.Host = serverCfg.Host
