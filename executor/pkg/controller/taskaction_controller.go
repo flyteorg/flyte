@@ -328,12 +328,14 @@ func (r *TaskActionReconciler) emitK8sEvent(
 		return
 	}
 	if level == EventLevelTerminal {
-		ev, err := buildActionEventK8s(taskAction, event, r.reportingInstance)
-		if err == nil {
-			err = r.Create(ctx, ev)
+		logger := log.FromContext(ctx).WithValues("action", event.GetId().GetName())
+		ev, buildErr := buildActionEventK8s(taskAction, event, r.reportingInstance)
+		if buildErr != nil {
+			logger.Error(buildErr, "failed to build action k8s event")
+			return
 		}
-		if err != nil {
-			log.FromContext(ctx).Error(err, "failed to emit action k8s event", "action", event.GetId().GetName())
+		if createErr := r.Create(ctx, ev); createErr != nil {
+			logger.Error(createErr, "failed to create action k8s event")
 		}
 		return
 	}
