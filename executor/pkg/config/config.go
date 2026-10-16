@@ -28,7 +28,7 @@ var (
 		MaxSystemFailures:       3,
 		MaxConcurrentReconciles: 512,
 		RequeueDuration:         stdconfig.Duration{Duration: 10 * time.Second},
-		K8sEventLevel:           "off",
+		K8sEventLevel:           "info",
 		GC: GCConfig{
 			Interval: stdconfig.Duration{Duration: 30 * time.Minute},
 			MaxTTL:   stdconfig.Duration{Duration: 1 * time.Hour},
@@ -104,7 +104,7 @@ type Config struct {
 
 	// K8sEventLevel selects which action events are also emitted as Kubernetes Events
 	// on their TaskAction: off, terminal, info or debug. Every action event is still
-	// recorded to the events service. Unknown values fail executor startup.
+	// recorded to the events service. Defaults to info. Unknown values fail executor startup.
 	K8sEventLevel string `json:"k8sEventLevel" pflag:",Action events to emit as k8s Events: off, terminal, info or debug"`
 
 	// GC configures the garbage collector for terminal TaskActions.
