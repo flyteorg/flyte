@@ -323,10 +323,17 @@ func TestEmitK8sEvent(t *testing.T) {
 			createdReason: string(ReasonActionSucceeded),
 		},
 		{
-			name:      "phase change at info goes through the recorder",
-			level:     EventLevelInfo,
+			name:          "phase change at info is created through the client",
+			level:         EventLevelInfo,
+			phase:         common.ActionPhase_ACTION_PHASE_RUNNING,
+			prevPhase:     common.ActionPhase_ACTION_PHASE_QUEUED,
+			createdReason: string(ReasonActionRunning),
+		},
+		{
+			name:      "version bump at debug goes through the recorder",
+			level:     EventLevelDebug,
 			phase:     common.ActionPhase_ACTION_PHASE_RUNNING,
-			prevPhase: common.ActionPhase_ACTION_PHASE_QUEUED,
+			prevPhase: common.ActionPhase_ACTION_PHASE_RUNNING,
 			recorded:  "Normal ActionRunning action a0 attempt 1 running",
 		},
 		{
