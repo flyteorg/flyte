@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/authorization"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	storageMocks "github.com/flyteorg/flyte/v2/flytestdlib/storage/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -286,4 +287,19 @@ func TestLiteralsToLaunchFormJson_OffloadedURI_Mismatch(t *testing.T) {
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 	assert.Contains(t, err.Error(), "does not match any data URI")
+}
+
+func TestTranslatorAuthorizationBeforeReads(t *testing.T) {
+	svc := NewTranslatorService(nil, nil, nil)
+	svc.EnableAuthorization()
+	ctx := authorization.WithScopes(context.Background(), []authorization.Scope{{Domain: "prod", Project: "payments"}})
+	for _, req := range []*workflow.LiteralsToLaunchFormJsonRequest{
+		{Owner: &workflow.LiteralsToLaunchFormJsonRequest_ActionId{ActionId: &common.ActionIdentifier{Run: &common.RunIdentifier{Domain: "prod", Project: "other", Name: "run"}, Name: "action"}}, LiteralsUri: "s3://bucket/inputs.pb"},
+		{Owner: &workflow.LiteralsToLaunchFormJsonRequest_TriggerId{TriggerId: &common.TriggerIdentifier{Name: &common.TriggerName{Domain: "prod", Project: "other", Name: "trigger"}, Revision: 1}}},
+	} {
+		_, err := svc.LiteralsToLaunchFormJson(ctx, connect.NewRequest(req))
+		require.Equal(t, connect.CodePermissionDenied, connect.CodeOf(err))
+	}
+	_, err := svc.LiteralsToLaunchFormJson(context.Background(), connect.NewRequest(&workflow.LiteralsToLaunchFormJsonRequest{}))
+	require.Equal(t, connect.CodePermissionDenied, connect.CodeOf(err))
 }

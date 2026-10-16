@@ -17,6 +17,7 @@ import (
 )
 
 type projectRepo struct {
+	authorizationGuard
 	db *sqlx.DB
 }
 
@@ -27,6 +28,10 @@ func NewProjectRepo(db *sqlx.DB) interfaces.ProjectRepo {
 }
 
 func (r *projectRepo) CreateProject(ctx context.Context, project *models.Project) error {
+	if err := r.Check(ctx, "*", project.Identifier); err != nil {
+		return err
+	}
+
 	now := time.Now().UTC()
 	project.CreatedAt = now
 	project.UpdatedAt = now
@@ -53,6 +58,10 @@ func (r *projectRepo) CreateProject(ctx context.Context, project *models.Project
 }
 
 func (r *projectRepo) GetProject(ctx context.Context, identifier string) (*models.Project, error) {
+	if err := r.CheckProjectRead(ctx, identifier); err != nil {
+		return nil, err
+	}
+
 	var project models.Project
 	err := sqlx.GetContext(ctx, r.db, &project, "SELECT * FROM projects WHERE identifier = $1", identifier)
 	if err != nil {
@@ -67,6 +76,10 @@ func (r *projectRepo) GetProject(ctx context.Context, identifier string) (*model
 }
 
 func (r *projectRepo) UpdateProject(ctx context.Context, project *models.Project) error {
+	if err := r.Check(ctx, "*", project.Identifier); err != nil {
+		return err
+	}
+
 	now := time.Now().UTC()
 
 	result, err := r.db.ExecContext(ctx,
@@ -89,6 +102,12 @@ func (r *projectRepo) UpdateProject(ctx context.Context, project *models.Project
 }
 
 func (r *projectRepo) ListProjects(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Project, error) {
+	var err error
+	input.Filter, err = r.andAuthorization(input.Filter, ctx, true)
+	if err != nil {
+		return nil, err
+	}
+
 	var queryBuilder strings.Builder
 	var args []interface{}
 	argIdx := 1
@@ -102,7 +121,7 @@ func (r *projectRepo) ListProjects(ctx context.Context, input interfaces.ListRes
 		}
 		rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, argIdx)
 		queryBuilder.WriteString(" WHERE ")
-		queryBuilder.WriteString(rewritten)
+		queryBuilder.WriteString("(" + rewritten + ")")
 		args = append(args, rewrittenArgs...)
 		argIdx += len(rewrittenArgs)
 	}

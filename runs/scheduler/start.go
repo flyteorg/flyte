@@ -31,6 +31,15 @@ func Start(
 		ClientOpts: clientOpts,
 	})
 
+	return start(triggerRepo, cfg, exec)
+}
+
+// StartWithRunClient preserves the caller context for in-process scheduling.
+func StartWithRunClient(triggerRepo interfaces.TriggerRepo, cfg config.TriggerSchedulerConfig, client executor.RunCreator) func(context.Context) error {
+	return start(triggerRepo, cfg, executor.NewTriggerExecutor(executor.TriggerExecutorConfig{RunClient: client, QPS: cfg.ExecutionQPS, Burst: cfg.ExecutionBurst}))
+}
+
+func start(triggerRepo interfaces.TriggerRepo, cfg config.TriggerSchedulerConfig, exec *executor.TriggerExecutor) func(context.Context) error {
 	sched := core.NewGoCronScheduler(exec)
 	sched.Start()
 

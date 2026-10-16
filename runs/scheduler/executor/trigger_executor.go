@@ -21,14 +21,19 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
+type RunCreator interface {
+	CreateRun(context.Context, *connect.Request[workflow.CreateRunRequest]) (*connect.Response[workflow.CreateRunResponse], error)
+}
+
 // TriggerExecutor fires a CreateRun call for a scheduled trigger execution.
 type TriggerExecutor struct {
-	runClient workflowconnect.RunServiceClient
+	runClient RunCreator
 	limiter   *rate.Limiter
 }
 
 // TriggerExecutorConfig holds tunables for the executor.
 type TriggerExecutorConfig struct {
+	RunClient RunCreator
 	// BaseURL is the URL of the runs service (e.g. "http://localhost:8090").
 	BaseURL string
 	// HTTPClient is the client used for outbound RunService calls.
@@ -47,8 +52,12 @@ func NewTriggerExecutor(cfg TriggerExecutorConfig) *TriggerExecutor {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
+	runClient := cfg.RunClient
+	if runClient == nil {
+		runClient = workflowconnect.NewRunServiceClient(httpClient, cfg.BaseURL, cfg.ClientOpts...)
+	}
 	return &TriggerExecutor{
-		runClient: workflowconnect.NewRunServiceClient(httpClient, cfg.BaseURL, cfg.ClientOpts...),
+		runClient: runClient,
 		limiter:   rate.NewLimiter(rate.Limit(cfg.QPS), cfg.Burst),
 	}
 }

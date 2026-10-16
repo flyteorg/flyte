@@ -22,6 +22,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/flytestdlib/authorization"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
@@ -109,6 +110,7 @@ func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff tim
 
 // actionRepo implements actionRepo interface using PostgreSQL
 type actionRepo struct {
+	authorizationGuard
 	db       *sqlx.DB
 	dsn      string // stored for pq.Listener
 	listener *pq.Listener
@@ -172,6 +174,10 @@ func NewActionRepo(
 
 // GetRun retrieves a run by identifier
 func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*models.Run, error) {
+	if err := r.Check(ctx, runID.GetDomain(), runID.GetProject()); err != nil {
+		return nil, err
+	}
+
 	var run models.Run
 	err := sqlx.GetContext(ctx, r.db, &run,
 		"SELECT * FROM actions WHERE project = $1 AND domain = $2 AND run_name = $3 AND parent_action_name IS NULL",
@@ -192,6 +198,10 @@ func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*
 // K8s cascades CRD deletion to child actions via OwnerReferences; the action service
 // informer handles marking them ABORTED in DB when their CRDs are deleted.
 func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
+	if err := r.Check(ctx, runID.GetDomain(), runID.GetProject()); err != nil {
+		return err
+	}
+
 	now := time.Now()
 
 	var rootName string
@@ -221,6 +231,15 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 
 // InsertEvents inserts a batch of action events, ignoring duplicates (same PK = idempotent).
 func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEvent) error {
+	if err := r.RequireAuthorizationContext(ctx); err != nil {
+		return err
+	}
+	for _, e := range events {
+		if err := authorization.Check(ctx, e.Domain, e.Project); err != nil {
+			return err
+		}
+	}
+
 	if len(events) == 0 {
 		return nil
 	}
@@ -273,6 +292,10 @@ func (r *actionRepo) InsertEvents(ctx context.Context, events []*models.ActionEv
 
 // ListEvents lists action events for a given action identifier.
 func (r *actionRepo) ListEvents(ctx context.Context, actionID *common.ActionIdentifier, limit int) ([]*models.ActionEvent, error) {
+	if err := r.Check(ctx, actionID.GetRun().GetDomain(), actionID.GetRun().GetProject()); err != nil {
+		return nil, err
+	}
+
 	var events []*models.ActionEvent
 	err := sqlx.SelectContext(ctx, r.db, &events,
 		`SELECT * FROM action_events
@@ -294,6 +317,10 @@ func (r *actionRepo) ListEventsSince(
 	since time.Time,
 	offset, limit int,
 ) ([]*models.ActionEvent, error) {
+	if err := r.Check(ctx, actionID.GetRun().GetDomain(), actionID.GetRun().GetProject()); err != nil {
+		return nil, err
+	}
+
 	var events []*models.ActionEvent
 	err := sqlx.SelectContext(ctx, r.db, &events,
 		`SELECT * FROM action_events
@@ -311,6 +338,10 @@ func (r *actionRepo) ListEventsSince(
 // GetLatestEventByAttempt returns the most recent event for a given attempt,
 // ordered by version descending, without deserializing all events.
 func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32) (*models.ActionEvent, error) {
+	if err := r.Check(ctx, actionID.GetRun().GetDomain(), actionID.GetRun().GetProject()); err != nil {
+		return nil, err
+	}
+
 	var event models.ActionEvent
 	err := sqlx.GetContext(ctx, r.db, &event,
 		`SELECT * FROM action_events
@@ -331,6 +362,10 @@ func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *comm
 // When updateTriggeredAt is true and the action has a TriggerName set, triggered_at on the
 // corresponding trigger row is updated to now() in the same transaction.
 func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, updateTriggeredAt bool) (*models.Action, error) {
+	if err := r.Check(ctx, action.Domain, action.Project); err != nil {
+		return nil, err
+	}
+
 	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to begin tx: %w", err)
@@ -404,6 +439,10 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, up
 
 // GetAction retrieves an action by identifier
 func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdentifier) (*models.Action, error) {
+	if err := r.Check(ctx, actionID.GetRun().GetDomain(), actionID.GetRun().GetProject()); err != nil {
+		return nil, err
+	}
+
 	var action models.Action
 	err := sqlx.GetContext(ctx, r.db, &action,
 		"SELECT * FROM actions WHERE project = $1 AND domain = $2 AND run_name = $3 AND name = $4",
@@ -421,6 +460,12 @@ func (r *actionRepo) GetAction(ctx context.Context, actionID *common.ActionIdent
 
 // ListActions lists actions matching the given input filter, sort, and pagination.
 func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Action, error) {
+	var err error
+	input.Filter, err = r.andAuthorization(input.Filter, ctx, false)
+	if err != nil {
+		return nil, err
+	}
+
 	// ListActions supports two mutually-exclusive pagination modes: keyset (KeysetAfter,
 	// the ascending (created_at, name) keyset used by the WatchActions snapshot) and offset
 	// (Offset, used by the ListRuns/ListActions RPC — the page token is the running offset).
@@ -461,7 +506,7 @@ func (r *actionRepo) ListActions(ctx context.Context, input interfaces.ListResou
 			return nil, fmt.Errorf("failed to build filter expression: %w", err)
 		}
 		queryBuilder.WriteString(" WHERE ")
-		queryBuilder.WriteString(expr.Query)
+		queryBuilder.WriteString("(" + expr.Query + ")")
 		args = append(args, expr.Args...)
 	}
 
@@ -541,6 +586,10 @@ func (r *actionRepo) UpdateActionPhase(
 	endTime *time.Time,
 	startTime *time.Time,
 ) error {
+	if err := r.Check(ctx, actionID.GetRun().GetDomain(), actionID.GetRun().GetProject()); err != nil {
+		return err
+	}
+
 	now := time.Now()
 	retryablePhases := []int32{
 		int32(common.ActionPhase_ACTION_PHASE_FAILED),
@@ -609,6 +658,10 @@ func (r *actionRepo) UpdateActionPhase(
 
 // UpdateActionDetailedInfo replaces the serialized RunInfo (detailed_info column).
 func (r *actionRepo) UpdateActionDetailedInfo(ctx context.Context, actionID *common.ActionIdentifier, detailedInfo []byte) error {
+	if err := r.Check(ctx, actionID.GetRun().GetDomain(), actionID.GetRun().GetProject()); err != nil {
+		return err
+	}
+
 	result, err := r.db.ExecContext(ctx,
 		`UPDATE actions SET detailed_info = $1, updated_at = $2
 		 WHERE project = $3 AND domain = $4 AND run_name = $5 AND name = $6`,
@@ -632,6 +685,10 @@ func (r *actionRepo) UpdateActionDetailedInfo(ctx context.Context, actionID *com
 // K8s cascades CRD deletion to descendants via OwnerReferences; the action service
 // informer handles marking them ABORTED in DB when their CRDs are deleted.
 func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason string, abortedBy *common.EnrichedIdentity) error {
+	if err := r.Check(ctx, actionID.GetRun().GetDomain(), actionID.GetRun().GetProject()); err != nil {
+		return err
+	}
+
 	now := time.Now()
 
 	result, err := r.db.ExecContext(ctx,
@@ -656,9 +713,22 @@ func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIde
 
 // ListPendingAborts returns all actions that have abort_requested_at set (i.e. awaiting pod termination).
 func (r *actionRepo) ListPendingAborts(ctx context.Context) ([]*models.Action, error) {
+	filter, err := r.authorizationFilter(ctx, false)
+	if err != nil {
+		return nil, err
+	}
+
+	predicate := interfaces.QueryExpr{Query: "TRUE"}
+	if filter != nil {
+		predicate, err = filter.QueryExpression("")
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	var actions []*models.Action
-	err := sqlx.SelectContext(ctx, r.db, &actions,
-		"SELECT * FROM actions WHERE abort_requested_at IS NOT NULL")
+	err = sqlx.SelectContext(ctx, r.db, &actions,
+		sqlx.Rebind(sqlx.DOLLAR, "SELECT * FROM actions WHERE abort_requested_at IS NOT NULL AND ("+predicate.Query+")"), predicate.Args...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list pending aborts: %w", err)
 	}
@@ -668,6 +738,10 @@ func (r *actionRepo) ListPendingAborts(ctx context.Context) ([]*models.Action, e
 // MarkAbortAttempt increments abort_attempt_count and returns the new value.
 // Called by the reconciler before each actionsClient.Abort call.
 func (r *actionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.ActionIdentifier) (int, error) {
+	if err := r.Check(ctx, actionID.GetRun().GetDomain(), actionID.GetRun().GetProject()); err != nil {
+		return 0, err
+	}
+
 	var abortAttemptCount int
 	err := r.db.QueryRowxContext(ctx,
 		`UPDATE actions SET abort_attempt_count = abort_attempt_count + 1, updated_at = $1
@@ -683,6 +757,10 @@ func (r *actionRepo) MarkAbortAttempt(ctx context.Context, actionID *common.Acti
 
 // ClearAbortRequest clears abort_requested_at (and resets counters) once the pod is confirmed terminated.
 func (r *actionRepo) ClearAbortRequest(ctx context.Context, actionID *common.ActionIdentifier) error {
+	if err := r.Check(ctx, actionID.GetRun().GetDomain(), actionID.GetRun().GetProject()); err != nil {
+		return err
+	}
+
 	_, err := r.db.ExecContext(ctx,
 		`UPDATE actions SET abort_requested_at = NULL, abort_attempt_count = 0, updated_at = $1
 		 WHERE project = $2 AND domain = $3 AND run_name = $4 AND name = $5`,
@@ -695,6 +773,10 @@ func (r *actionRepo) ClearAbortRequest(ctx context.Context, actionID *common.Act
 
 // UpdateActionState updates the state of an action
 func (r *actionRepo) UpdateActionState(ctx context.Context, actionID *common.ActionIdentifier, state string) error {
+	if err := r.Check(ctx, actionID.GetRun().GetDomain(), actionID.GetRun().GetProject()); err != nil {
+		return err
+	}
+
 	// Parse the state JSON to extract the phase
 	var stateObj map[string]interface{}
 	if err := json.Unmarshal([]byte(state), &stateObj); err != nil {
@@ -744,6 +826,10 @@ func (r *actionRepo) UpdateActionState(ctx context.Context, actionID *common.Act
 
 // GetActionState retrieves the state of an action
 func (r *actionRepo) GetActionState(ctx context.Context, actionID *common.ActionIdentifier) (string, error) {
+	if err := r.Check(ctx, actionID.GetRun().GetDomain(), actionID.GetRun().GetProject()); err != nil {
+		return "", err
+	}
+
 	var actionDetails []byte
 	err := r.db.QueryRowContext(ctx,
 		"SELECT action_details FROM actions WHERE project = $1 AND domain = $2 AND run_name = $3 AND name = $4",
@@ -758,6 +844,10 @@ func (r *actionRepo) GetActionState(ctx context.Context, actionID *common.Action
 
 // NotifyStateUpdate sends a notification about a state update
 func (r *actionRepo) NotifyStateUpdate(ctx context.Context, actionID *common.ActionIdentifier) error {
+	if err := r.Check(ctx, actionID.GetRun().GetDomain(), actionID.GetRun().GetProject()); err != nil {
+		return err
+	}
+
 	// This is already handled by notifyActionUpdate
 	r.notifyActionUpdate(ctx, actionID)
 	return nil
@@ -765,6 +855,14 @@ func (r *actionRepo) NotifyStateUpdate(ctx context.Context, actionID *common.Act
 
 // WatchStateUpdates watches for state updates (simplified implementation)
 func (r *actionRepo) WatchStateUpdates(ctx context.Context, updates chan<- *common.ActionIdentifier, errs chan<- error) {
+	if err := r.RequireAuthorizationContext(ctx); err != nil {
+		select {
+		case errs <- err:
+		case <-ctx.Done():
+		}
+		return
+	}
+
 	// For now, just block until context is cancelled
 	// In a full implementation, this would listen for state notifications
 	<-ctx.Done()
@@ -772,6 +870,14 @@ func (r *actionRepo) WatchStateUpdates(ctx context.Context, updates chan<- *comm
 
 // WatchRunUpdates watches for run updates via LISTEN/NOTIFY
 func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Run, errs chan<- error) {
+	if err := r.Check(ctx, runID.GetDomain(), runID.GetProject()); err != nil {
+		select {
+		case errs <- err:
+		case <-ctx.Done():
+		}
+		return
+	}
+
 	runKey := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
 	notifCh := make(chan string, r.notificationConfig.watchBufferSize)
 
@@ -812,6 +918,14 @@ func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdent
 
 // WatchAllRunUpdates watches for all run updates via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error) {
+	if err := r.RequireAuthorizationContext(ctx); err != nil {
+		select {
+		case errs <- err:
+		case <-ctx.Done():
+		}
+		return
+	}
+
 	notifCh := make(chan string, r.notificationConfig.watchBufferSize)
 
 	r.mu.Lock()
@@ -842,6 +956,10 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 				Name:    parts[2],
 			}
 
+			if authorization.Check(ctx, runID.Domain, runID.Project) != nil {
+				continue
+			}
+
 			if ctx.Err() != nil {
 				return
 			}
@@ -864,6 +982,14 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 
 // WatchAllActionUpdates watches for all action updates for a run via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
+	if err := r.Check(ctx, runID.GetDomain(), runID.GetProject()); err != nil {
+		select {
+		case errs <- err:
+		case <-ctx.Done():
+		}
+		return
+	}
+
 	runPrefix := fmt.Sprintf("%s/%s/%s/", runID.Project, runID.Domain, runID.Name)
 	notifCh := make(chan string, r.notificationConfig.watchBufferSize)
 
@@ -931,6 +1057,14 @@ func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.Ru
 
 // WatchActionUpdates watches the current action update via LISTEN/NOTIFY
 func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.ActionIdentifier, updates chan<- *models.Action, errs chan<- error) {
+	if err := r.Check(ctx, actionID.GetRun().GetDomain(), actionID.GetRun().GetProject()); err != nil {
+		select {
+		case errs <- err:
+		case <-ctx.Done():
+		}
+		return
+	}
+
 	targetPayload := fmt.Sprintf("%s/%s/%s/%s",
 		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 	notifCh := make(chan string, r.notificationConfig.watchBufferSize)
@@ -1158,11 +1292,27 @@ func enqueuePending(
 
 // ListRootActions lists root actions (runs) matching scope and date filters.
 func (r *actionRepo) ListRootActions(ctx context.Context, project, domain string, startDate, endDate *time.Time, limit int) ([]*models.Action, error) {
+	filter, err := r.authorizationFilter(ctx, false)
+	if err != nil {
+		return nil, err
+	}
+
 	var queryBuilder strings.Builder
 	var args []interface{}
 	argIdx := 1
 
 	queryBuilder.WriteString("SELECT * FROM actions WHERE parent_action_name IS NULL")
+
+	if filter != nil {
+		expr, err := filter.QueryExpression("")
+		if err != nil {
+			return nil, err
+		}
+		query, values := rewritePlaceholders(expr.Query, expr.Args, argIdx)
+		queryBuilder.WriteString(" AND (" + query + ")")
+		args = append(args, values...)
+		argIdx += len(values)
+	}
 
 	if project != "" {
 		queryBuilder.WriteString(fmt.Sprintf(" AND project = $%d", argIdx)) //nolint: staticcheck

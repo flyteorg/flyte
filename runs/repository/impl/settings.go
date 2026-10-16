@@ -11,11 +11,13 @@ import (
 	"github.com/lib/pq"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
+	"github.com/flyteorg/flyte/v2/flytestdlib/authorization"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
 type settingsRepo struct {
+	authorizationGuard
 	db *sqlx.DB
 }
 
@@ -25,6 +27,10 @@ func NewSettingsRepo(db *sqlx.DB) interfaces.SettingsRepo {
 }
 
 func (r *settingsRepo) CreateSettings(ctx context.Context, settings *models.Settings) error {
+	if err := r.CheckSettings(ctx, settings.Key, true); err != nil {
+		return err
+	}
+
 	if len(settings.Data) == 0 {
 		return fmt.Errorf("settings data is required: %s", settings.Key)
 	}
@@ -57,6 +63,10 @@ func (r *settingsRepo) CreateSettings(ctx context.Context, settings *models.Sett
 }
 
 func (r *settingsRepo) GetSettings(ctx context.Context, key string) (*models.Settings, error) {
+	if err := r.CheckSettings(ctx, key, false); err != nil {
+		return nil, err
+	}
+
 	var settings models.Settings
 	err := sqlx.GetContext(ctx, r.db, &settings, "SELECT * FROM settings WHERE key = $1", key)
 	if err != nil {
@@ -69,6 +79,15 @@ func (r *settingsRepo) GetSettings(ctx context.Context, key string) (*models.Set
 }
 
 func (r *settingsRepo) GetSettingsByKeys(ctx context.Context, keys []string) ([]*models.Settings, error) {
+	if err := r.RequireAuthorizationContext(ctx); err != nil {
+		return nil, err
+	}
+	for _, key := range keys {
+		if err := authorization.CheckSettings(ctx, key, false); err != nil {
+			return nil, err
+		}
+	}
+
 	var settings []*models.Settings
 	if err := sqlx.SelectContext(ctx, r.db, &settings, "SELECT * FROM settings WHERE key = ANY($1)", pq.Array(keys)); err != nil {
 		return nil, fmt.Errorf("failed to get settings by keys: %w", err)
@@ -77,6 +96,10 @@ func (r *settingsRepo) GetSettingsByKeys(ctx context.Context, keys []string) ([]
 }
 
 func (r *settingsRepo) UpdateSettings(ctx context.Context, settings *models.Settings) error {
+	if err := r.CheckSettings(ctx, settings.Key, true); err != nil {
+		return err
+	}
+
 	if len(settings.Data) == 0 {
 		return fmt.Errorf("settings data is required: %s", settings.Key)
 	}
