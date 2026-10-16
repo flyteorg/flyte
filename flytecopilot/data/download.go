@@ -37,6 +37,28 @@ type Downloader struct {
 
 // TODO add timeout and rate limit
 // TODO use chunk to download
+// inBlobDir reports whether a listed item is inside the multipart blob at baseContainer/basePrefix,
+// rather than a sibling whose key merely starts with it (object stores list by raw key prefix).
+// Items listed as http(s) URLs (stow's S3 backend reports https://<host>/<bucket>/<key>) are
+// matched on their path, as handleBlob derives their relative path.
+func inBlobDir(item storage.DataReference, baseContainer, basePrefix string) bool {
+	if basePrefix == "" {
+		return true
+	}
+	_, _, key, err := item.Split()
+	if err != nil {
+		return true // let the download report the bad reference
+	}
+	if strings.HasPrefix(string(item), "http") {
+		if strings.HasPrefix(key, baseContainer+"/") {
+			key = strings.TrimPrefix(key, baseContainer+"/")
+		} else if idx := strings.Index(key, basePrefix); idx >= 0 {
+			key = key[idx:]
+		}
+	}
+	return strings.HasPrefix(key, basePrefix+"/")
+}
+
 func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath string) (interface{}, error) {
 	/*
 			   handleBlob handles the retrieval and local storage of blob data, including support for both single and multipart blob types.
@@ -87,11 +109,20 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				return nil, err
 			}
 			for _, item := range items {
+				if !inBlobDir(item, baseContainer, basePrefix) {
+					// Object stores list by key prefix, so a listing of ".../dir" also
+					// returns siblings such as ".../dir_info.json". Keep only the blob's own parts.
+					logger.Debugf(ctx, "Skipping [%s]: not under multipart blob [%s]", item, blobRef)
+					continue
+				}
 				absPaths = append(absPaths, item.String())
 			}
 			if storage.IsCursorEnd(cursor) {
 				break
 			}
+		}
+		if len(absPaths) == 0 {
+			return nil, errors.Errorf("no items under multipart blob [%s]", blobRef)
 		}
 
 		// Track the count of successful downloads and the total number of items
@@ -457,8 +488,12 @@ func (d Downloader) handleLiteral(ctx context.Context, lit *core.Literal, filePa
 }
 
 // singleBlob returns the Blob of a single-dimensional Blob literal, or nil if
-// the literal is not a single Blob.
+// the literal is not a single Blob. A union literal (e.g. an Optional[File]
+// input that is set) is unwrapped to its value, so it stages like a plain File.
 func singleBlob(lit *core.Literal) *core.Blob {
+	if u := lit.GetScalar().GetUnion(); u != nil {
+		return singleBlob(u.GetValue())
+	}
 	b := lit.GetScalar().GetBlob()
 	if b == nil || b.GetMetadata().GetType().GetDimensionality() != core.BlobType_SINGLE {
 		return nil

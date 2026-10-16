@@ -164,6 +164,12 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 		}
 
 		if err := c.k8sClient.Create(ctx, taskAction); err != nil {
+			// Surface AlreadyExists so callers can treat a re-enqueue (e.g. from
+			// a restarted parent) as already launched.
+			if apierrors.IsAlreadyExists(err) {
+				return connect.NewError(connect.CodeAlreadyExists,
+					fmt.Errorf("TaskAction CR %s already exists: %w", taskAction.Name, err))
+			}
 			return fmt.Errorf("failed to create TaskAction CR %s: %w", taskAction.Name, err)
 		}
 
@@ -201,8 +207,8 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 
 		if err := c.k8sClient.Create(ctx, taskAction); err != nil {
 			if apierrors.IsAlreadyExists(err) {
-				logger.Infof(ctx, "TaskAction CR %s already exists, skipping create", taskAction.Name)
-				return nil
+				return connect.NewError(connect.CodeAlreadyExists,
+					fmt.Errorf("condition TaskAction CR %s already exists: %w", taskAction.Name, err))
 			}
 			return fmt.Errorf("failed to create condition TaskAction CR %s: %w", taskAction.Name, err)
 		}

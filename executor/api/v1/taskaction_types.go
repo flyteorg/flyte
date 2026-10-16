@@ -314,6 +314,12 @@ type TaskActionStatus struct {
 	// +optional
 	TimeoutAt *metav1.Time `json:"timeoutAt,omitempty"`
 
+	// NextAttemptAt is the earliest time the next user attempt may launch, set when a
+	// failed attempt is retried under a RetryStrategy with a backoff. While it lies in
+	// the future the plugin is not handled; it is cleared when the attempt launches.
+	// +optional
+	NextAttemptAt *metav1.Time `json:"nextAttemptAt,omitempty"`
+
 	// SystemFailures counts system-level failures observed during reconciliation —
 	// either Go errors returned from Plugin.Handle (e.g. transient k8s API errors,
 	// admission webhook denials) or plugin transitions reporting a system-retryable

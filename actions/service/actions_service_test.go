@@ -72,6 +72,20 @@ func TestEnqueue(t *testing.T) {
 
 		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
 	})
+
+	t.Run("already exists is preserved", func(t *testing.T) {
+		m := mocks.NewActionsClientInterface(t)
+		svc := NewActionsService(m)
+
+		m.EXPECT().Enqueue(mock.Anything, testAction, (*task.RunSpec)(nil)).
+			Return(connect.NewError(connect.CodeAlreadyExists, errors.New("already exists")))
+
+		_, err := svc.Enqueue(context.Background(), connect.NewRequest(&actions.EnqueueRequest{
+			Action: testAction,
+		}))
+
+		assert.Equal(t, connect.CodeAlreadyExists, connect.CodeOf(err))
+	})
 }
 
 func TestUpdate(t *testing.T) {
