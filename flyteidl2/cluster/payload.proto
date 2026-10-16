@@ -42,6 +42,11 @@ message SelectClusterRequest {
     // server answers with its own endpoint and serves these from control-plane storage.
     OPERATION_TRACKED_RUN_DATA = 11;
     OPERATION_GET_CLUSTER_CONFIG = 12;
+    // Short-lived, prefix-scoped object-store credentials for data in a
+    // project/domain. Routes like OPERATION_CREATE_UPLOAD_LOCATION: the
+    // credentials are minted by whichever side owns the store, so the answer
+    // has to come from the side the data lives on.
+    OPERATION_GET_CLOUD_CREDENTIALS = 13;
   }
 
   Operation operation = 8 [(buf.validate.field).enum = {

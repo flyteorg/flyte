@@ -95,6 +95,7 @@ require (
 require (
 	github.com/Masterminds/semver/v3 v3.5.0
 	github.com/alicebob/miniredis/v2 v2.39.0
+	github.com/aws/aws-sdk-go-v2/service/sts v1.51.0
 	github.com/fatih/structtag v1.2.0
 	github.com/getsentry/sentry-go v0.49.0
 	github.com/kubeflow/spark-operator/v2 v2.5.2
@@ -130,7 +131,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/signin v1.10.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.38.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.43.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.51.0 // indirect
 	github.com/aws/smithy-go v1.28.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect

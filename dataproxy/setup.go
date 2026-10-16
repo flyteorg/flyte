@@ -65,7 +65,13 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		}
 	}
 
-	svc := service.NewService(*cfg, sc.DataStore, taskClient, triggerClient, runClient, projectClient, logStreamer)
+	// Credential vending is enabled by what this process IS, not by a flag:
+	// GetCloudCredentials narrows this pod's own identity, so it works exactly
+	// where there is an identity to narrow and answers Unimplemented where
+	// there is not. NewSTSMinter returns nil in that case, which is a normal
+	// state rather than a misconfiguration.
+	svc := service.NewService(*cfg, sc.DataStore, taskClient, triggerClient, runClient, projectClient, logStreamer,
+		service.WithCredentialMinter(service.NewSTSMinter(ctx)))
 
 	path, handler := dataproxyconnect.NewDataProxyServiceHandler(svc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(path, handler)

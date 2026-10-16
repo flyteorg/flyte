@@ -24,6 +24,7 @@ const (
 	DataProxyService_CreateDownloadLink_FullMethodName   = "/flyteidl2.dataproxy.DataProxyService/CreateDownloadLink"
 	DataProxyService_GetActionData_FullMethodName        = "/flyteidl2.dataproxy.DataProxyService/GetActionData"
 	DataProxyService_TailLogs_FullMethodName             = "/flyteidl2.dataproxy.DataProxyService/TailLogs"
+	DataProxyService_GetCloudCredentials_FullMethodName  = "/flyteidl2.dataproxy.DataProxyService/GetCloudCredentials"
 )
 
 // DataProxyServiceClient is the client API for DataProxyService service.
@@ -39,6 +40,21 @@ type DataProxyServiceClient interface {
 	GetActionData(ctx context.Context, in *GetActionDataRequest, opts ...grpc.CallOption) (*GetActionDataResponse, error)
 	// Stream logs for an action attempt.
 	TailLogs(ctx context.Context, in *TailLogsRequest, opts ...grpc.CallOption) (DataProxyService_TailLogsClient, error)
+	// GetCloudCredentials vends short-lived, prefix-scoped object-store credentials
+	// for one resource inside the caller's project/domain.
+	//
+	// This is the capability form of CreateUploadLocation. A signed URL is a
+	// capability for ONE object with conditions attached; these credentials are a
+	// capability over a PREFIX, for as long as they last. Which to use is a
+	// per-call-site choice and both are supported:
+	//
+	//   - Credentials when a client touches many objects it discovers as it goes
+	//     -- a mounted Volume reads and writes thousands of chunk keys, so a
+	//     signed URL per object is not a workable shape.
+	//   - A signed URL when the platform must constrain the write (it binds
+	//     content_md5 and a size, which credentials cannot), or when the consumer
+	//     is a browser with no cloud SDK (see CreateDownloadLink).
+	GetCloudCredentials(ctx context.Context, in *GetCloudCredentialsRequest, opts ...grpc.CallOption) (*GetCloudCredentialsResponse, error)
 }
 
 type dataProxyServiceClient struct {
@@ -117,6 +133,15 @@ func (x *dataProxyServiceTailLogsClient) Recv() (*TailLogsResponse, error) {
 	return m, nil
 }
 
+func (c *dataProxyServiceClient) GetCloudCredentials(ctx context.Context, in *GetCloudCredentialsRequest, opts ...grpc.CallOption) (*GetCloudCredentialsResponse, error) {
+	out := new(GetCloudCredentialsResponse)
+	err := c.cc.Invoke(ctx, DataProxyService_GetCloudCredentials_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DataProxyServiceServer is the server API for DataProxyService service.
 // All implementations should embed UnimplementedDataProxyServiceServer
 // for forward compatibility
@@ -130,6 +155,21 @@ type DataProxyServiceServer interface {
 	GetActionData(context.Context, *GetActionDataRequest) (*GetActionDataResponse, error)
 	// Stream logs for an action attempt.
 	TailLogs(*TailLogsRequest, DataProxyService_TailLogsServer) error
+	// GetCloudCredentials vends short-lived, prefix-scoped object-store credentials
+	// for one resource inside the caller's project/domain.
+	//
+	// This is the capability form of CreateUploadLocation. A signed URL is a
+	// capability for ONE object with conditions attached; these credentials are a
+	// capability over a PREFIX, for as long as they last. Which to use is a
+	// per-call-site choice and both are supported:
+	//
+	//   - Credentials when a client touches many objects it discovers as it goes
+	//     -- a mounted Volume reads and writes thousands of chunk keys, so a
+	//     signed URL per object is not a workable shape.
+	//   - A signed URL when the platform must constrain the write (it binds
+	//     content_md5 and a size, which credentials cannot), or when the consumer
+	//     is a browser with no cloud SDK (see CreateDownloadLink).
+	GetCloudCredentials(context.Context, *GetCloudCredentialsRequest) (*GetCloudCredentialsResponse, error)
 }
 
 // UnimplementedDataProxyServiceServer should be embedded to have forward compatible implementations.
@@ -150,6 +190,9 @@ func (UnimplementedDataProxyServiceServer) GetActionData(context.Context, *GetAc
 }
 func (UnimplementedDataProxyServiceServer) TailLogs(*TailLogsRequest, DataProxyService_TailLogsServer) error {
 	return status.Errorf(codes.Unimplemented, "method TailLogs not implemented")
+}
+func (UnimplementedDataProxyServiceServer) GetCloudCredentials(context.Context, *GetCloudCredentialsRequest) (*GetCloudCredentialsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCloudCredentials not implemented")
 }
 
 // UnsafeDataProxyServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -256,6 +299,24 @@ func (x *dataProxyServiceTailLogsServer) Send(m *TailLogsResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _DataProxyService_GetCloudCredentials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCloudCredentialsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataProxyServiceServer).GetCloudCredentials(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DataProxyService_GetCloudCredentials_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataProxyServiceServer).GetCloudCredentials(ctx, req.(*GetCloudCredentialsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DataProxyService_ServiceDesc is the grpc.ServiceDesc for DataProxyService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -278,6 +339,10 @@ var DataProxyService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetActionData",
 			Handler:    _DataProxyService_GetActionData_Handler,
+		},
+		{
+			MethodName: "GetCloudCredentials",
+			Handler:    _DataProxyService_GetCloudCredentials_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
