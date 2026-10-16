@@ -315,8 +315,9 @@ func getPhaseLastTransitionTime(
 }
 
 // emitK8sEvent emits event as Kubernetes Event on taskAction when its level is
-// enabled. Terminal events carry the payload in annotation, so they are created
-// directly and bypass the recorder's aggregation. Failures are only logged.
+// enabled. Terminal and info events carry the payload in annotation, so they are
+// created directly and bypass the recorder's aggregation. Debug events go through
+// the recorder. Failures are only logged.
 func (r *TaskActionReconciler) emitK8sEvent(
 	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
@@ -327,7 +328,7 @@ func (r *TaskActionReconciler) emitK8sEvent(
 	if r.K8sEventLevel == EventLevelOff || level > r.K8sEventLevel {
 		return
 	}
-	if level == EventLevelTerminal {
+	if level <= EventLevelInfo {
 		logger := log.FromContext(ctx).WithValues("action", event.GetId().GetName())
 		ev, buildErr := buildActionEventK8s(taskAction, event, r.reportingInstance)
 		if buildErr != nil {
