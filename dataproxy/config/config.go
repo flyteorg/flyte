@@ -1,8 +1,6 @@
 package config
 
 import (
-	"time"
-
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -27,10 +25,6 @@ var defaultConfig = &DataProxyConfig{
 		MaxExpiresIn: config.Duration{Duration: 3600000000000}, // 1 hour
 	},
 	RunService: serviceclient.ServiceConfig{URL: "http://localhost:8090"},
-	Credentials: DataProxyCredentialsConfig{
-		DefaultDuration: config.Duration{Duration: time.Hour},
-		MaxDuration:     config.Duration{Duration: 12 * time.Hour},
-	},
 }
 
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
@@ -45,22 +39,6 @@ type DataProxyConfig struct {
 	// RunService configures the Runs service client. The Runs component also
 	// hosts the Task, Trigger, and Project APIs used by dataproxy.
 	RunService serviceclient.ServiceConfig `json:"runService" pflag:",Runs service client configuration."`
-
-	Credentials DataProxyCredentialsConfig `json:"credentials" pflag:",Defines object-store credential vending configuration."`
-}
-
-// DataProxyCredentialsConfig bounds GetCloudCredentials.
-//
-// Both durations matter more than they look. A vended session cannot be
-// revoked before it expires, so its lifetime IS the window in which a
-// withdrawn permission still works -- and because clients refresh through a
-// provider that re-fetches automatically, a short default costs them nothing.
-type DataProxyCredentialsConfig struct {
-	// What a request that names no duration gets.
-	DefaultDuration config.Duration `json:"defaultDuration" pflag:",Lifetime of a vended session when the request does not ask for one."`
-	// The ceiling a request cannot exceed. AWS additionally caps it at the
-	// role's own MaxSessionDuration.
-	MaxDuration config.Duration `json:"maxDuration" pflag:",Maximum lifetime of a vended session."`
 }
 
 // ServerConfig holds HTTP server configuration.

@@ -16,7 +16,6 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.47.1
 	github.com/aws/aws-sdk-go-v2/config v1.33.7
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.50.1
-	github.com/aws/aws-sdk-go-v2/service/sts v1.51.2
 	github.com/aws/smithy-go v1.28.2
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
 	github.com/coocood/freecache v1.2.7
@@ -137,6 +136,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/signin v1.10.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.38.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.43.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.51.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/blendle/zapdriver v1.3.1 // indirect

@@ -46,37 +46,11 @@ type Service struct {
 	runClient     workflowconnect.RunServiceClient
 	projectClient projectconnect.ProjectServiceClient
 	logStreamer   logs.LogStreamer
-
-	// credentialMinter turns a resolved resource into short-lived, scoped
-	// object-store credentials. nil is a normal state -- a data proxy with no
-	// identity to narrow, or a storage backend with no downscoping primitive,
-	// simply cannot vend, and GetCloudCredentials answers Unimplemented
-	// rather than pretending.
-	credentialMinter CredentialMinter
-}
-
-// Option customises a Service. Options rather than more constructor
-// parameters: NewService already takes seven, and a credential minter is
-// absent in most deployments.
-type Option func(*Service)
-
-// WithCredentialMinter enables GetCloudCredentials.
-//
-// A nil minter is accepted and leaves vending disabled: the constructors that
-// produce one return nil where this process has no identity to narrow, and
-// making every caller branch on that would only move the check.
-func WithCredentialMinter(m CredentialMinter) Option {
-	return func(s *Service) {
-		if m == nil {
-			return
-		}
-		s.credentialMinter = m
-	}
 }
 
 // NewService creates a new DataProxyService instance.
-func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient, runClient workflowconnect.RunServiceClient, projectClient projectconnect.ProjectServiceClient, logStreamer logs.LogStreamer, opts ...Option) *Service {
-	svc := &Service{
+func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient, runClient workflowconnect.RunServiceClient, projectClient projectconnect.ProjectServiceClient, logStreamer logs.LogStreamer) *Service {
+	return &Service{
 		cfg:           cfg,
 		dataStore:     dataStore,
 		taskClient:    taskClient,
@@ -85,47 +59,6 @@ func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskCl
 		projectClient: projectClient,
 		logStreamer:   logStreamer,
 	}
-	for _, opt := range opts {
-		opt(svc)
-	}
-	return svc
-}
-
-// storeBucket is the bucket (or container) the data store is configured
-// against, which is the only one credentials are ever vended for.
-func (s *Service) storeBucket(ctx context.Context) (string, error) {
-	base := s.dataStore.GetBaseContainerFQN(ctx).String()
-	bucket := bucketOf(base)
-	if bucket == "" {
-		return "", fmt.Errorf("the data store reports no base container (%q), so there is no bucket to scope to", base)
-	}
-	return bucket, nil
-}
-
-// storageKind names the storage backend, for the message a caller gets when
-// this deployment cannot vend credentials.
-func (s *Service) storageKind() string {
-	return string(storage.GetConfig().Type)
-}
-
-// clientBucketURI is the bucket as a client should be told about it:
-// region-qualified for S3, because a client given a bare bucket name may ask
-// the store where it is, and a scoped session is not permitted that call (it
-// is a bucket-level action the base role may not even have). Other schemes
-// pass through.
-func (s *Service) clientBucketURI(bucket string) string {
-	cfg := storage.GetConfig()
-	if cfg.Type != storage.TypeS3 && cfg.Type != storage.TypeMinio && cfg.Stow.Kind != "s3" {
-		return s.dataStore.GetBaseContainerFQN(context.Background()).String()
-	}
-	if endpoint := cfg.Stow.Config["endpoint"]; endpoint != "" {
-		return strings.TrimSuffix(endpoint, "/") + "/" + bucket
-	}
-	region := cfg.Stow.Config["region"]
-	if region == "" {
-		region = "us-east-1"
-	}
-	return fmt.Sprintf("https://s3.%s.amazonaws.com/%s", region, bucket)
 }
 
 // CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
