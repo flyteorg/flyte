@@ -590,6 +590,33 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(ta.Status.ErrorState.Message).To(ContainSubstring("invalid ray submission mode"))
 			Expect(isTerminal(ta)).To(BeTrue())
 		})
+
+		It("fails an Apple Silicon task immediately when the backend has no bridge", func() {
+			r := &TaskActionReconciler{
+				Client:            k8sClient,
+				Scheme:            k8sClient.Scheme(),
+				Recorder:          events.NewFakeRecorder(10),
+				eventsClient:      &fakeEventsClient{},
+				MaxSystemFailures: 3,
+			}
+			ta := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, ta)).To(Succeed())
+			original := ta.DeepCopy()
+			startingAttempts := ta.Status.Attempts
+
+			handleErr := pluginserrors.Errorf(pluginserrors.AppleSiliconNotAvailable,
+				"gpu='AppleSilicon' requires an Apple Silicon devbox; this backend has no Apple Silicon bridge.")
+
+			res, err := r.recordSystemError(ctx, ta, original, "container", handleErr, 0)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(res.RequeueAfter).To(BeZero(), "terminal - should not requeue")
+			Expect(ta.Status.SystemFailures).To(BeZero(), "retrying cannot conjure a bridge")
+			Expect(ta.Status.Attempts).To(Equal(startingAttempts))
+			Expect(ta.Status.ErrorState).NotTo(BeNil())
+			Expect(ta.Status.ErrorState.Code).To(Equal(pluginserrors.AppleSiliconNotAvailable))
+			Expect(ta.Status.ErrorState.Kind).To(Equal("USER"))
+			Expect(isTerminal(ta)).To(BeTrue())
+		})
 	})
 
 	Context("task max runtime", func() {

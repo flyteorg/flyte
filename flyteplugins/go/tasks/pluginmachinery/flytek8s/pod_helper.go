@@ -774,7 +774,12 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	// GPU accelerator
-	if extendedResources.GetGpuAccelerator() != nil {
+	if IsAppleSilicon(extendedResources.GetGpuAccelerator()) {
+		workloadID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+		if err := ApplyAppleSiliconBridge(podSpec, primaryContainerName, workloadID); err != nil {
+			return nil, nil, err
+		}
+	} else if extendedResources.GetGpuAccelerator() != nil {
 		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
 		if ps, ok := extendedResources.GetGpuAccelerator().GetPartitionSizeValue().(*core.GPUAccelerator_PartitionSize); ok {
 			if slices := parseMigSlices(ps.PartitionSize); slices != "" {

@@ -225,6 +225,9 @@ var (
 			core.GPUAccelerator_HABANA_GAUDI.String(): {
 				ResourceName: "habana.ai/gaudi",
 			},
+			// No resource name: the Apple Silicon GPU is reached through the devbox's host
+			// Apple Silicon bridge (see AppleSiliconBridge), never through a device plugin.
+			core.GPUAccelerator_APPLE_SILICON.String(): {},
 		},
 		DefaultPodTemplateResync: config2.Duration{
 			Duration: 30 * time.Second,
@@ -400,6 +403,25 @@ type K8sPluginConfig struct {
 
 	// DisableInjectOwnerReferences is a boolean flag that indicates if owner references should be injected into the k8s resources.
 	DisableInjectOwnerReferences bool `json:"disable-inject-owner-references" pflag:",Override to not set owner references on k8s resources. This is useful for V2 node execution"`
+
+	// AppleSiliconBridge configures the devbox-local Apple Silicon accelerator. It is only
+	// set by a devbox running on an Apple Silicon host; everywhere else it stays empty and a
+	// workload requesting the APPLE_SILICON device class fails with APPLE_SILICON_NOT_AVAILABLE.
+	AppleSiliconBridge AppleSiliconBridgeConfig `json:"apple-silicon-bridge" pflag:"-,Devbox-local Apple Silicon bridge configuration."`
+}
+
+// AppleSiliconBridgeConfig points Apple Silicon workloads at the host-side Apple Silicon bridge a devbox runs on an
+// Apple Silicon Mac. Pods cannot reach the host's Metal GPU, so instead of scheduling against a
+// device plugin they are handed the bridge's OpenAI-compatible endpoint and a per-workload token.
+type AppleSiliconBridgeConfig struct {
+	// Endpoint is the bridge's base URL as reachable from pods, e.g. http://192.168.65.254:30090.
+	// Empty means this backend has no Apple Silicon bridge.
+	Endpoint string `json:"endpoint"`
+	// TokenSecret is the HMAC key shared with the bridge, used to mint each workload's credential.
+	TokenSecret string `json:"token-secret"`
+	// HostPlatform is the devbox host's os/arch (e.g. darwin/arm64, linux/amd64), quoted in the
+	// APPLE_SILICON_NOT_AVAILABLE message so the user sees why their host cannot provide Apple Silicon.
+	HostPlatform string `json:"host-platform"`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers

@@ -116,6 +116,11 @@ enum AcceleratorModel {
 
   // HABANA_GAUDI
   HABANA_GAUDI1 = 400 [(accelerator_name) = "habana-gaudi1"];
+
+  // APPLE_SILICON
+  // The Metal GPU of an Apple Silicon (M-series) host, reached through the
+  // devbox's host-side Apple Silicon bridge. Devbox-local: never cluster-schedulable.
+  APPLE_SILICON_GPU = 500 [(accelerator_name) = "apple-silicon"];
 }
 
 // Metadata associated with the GPU accelerator to allocate to a task. Contains
@@ -134,6 +139,10 @@ message GPUAccelerator {
     AMD_GPU = 3;
     // Habana Gaudi devices
     HABANA_GAUDI = 4;
+    // Apple Silicon (M-series) Metal GPU, served by a host-side MLX daemon on
+    // a local devbox. Not schedulable on a cluster: a backend without an Apple Silicon
+    // bridge configured rejects it with APPLE_SILICON_NOT_AVAILABLE.
+    APPLE_SILICON = 5;
   }
 
   // This can be any arbitrary string, and should be informed by the labels or taints
