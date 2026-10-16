@@ -229,6 +229,17 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.readinessProbe | string | `"exec:\n  command: [ \"sh\", \"-c\", \"reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \\\"$reply\\\" -lt 200 -o \\\"$reply\\\" -ge 400 ]; then exit 1; fi;\",\"grpc_health_probe\", \"-addr=:8089\"]\ninitialDelaySeconds: 15"` | Default readinessProbe and livenessProbe for Flyteadmin deployment |
 | flyteadmin.replicaCount | int | `1` | Replicas count for Flyteadmin deployment |
 | flyteadmin.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flyteadmin deployment |
+| flyteadmin.retention.activeDeadlineSeconds | int | `1500` |  |
+| flyteadmin.retention.age | string | `"2160h"` |  |
+| flyteadmin.retention.backoffLimit | int | `1` |  |
+| flyteadmin.retention.batchSize | int | `100` |  |
+| flyteadmin.retention.dryRun | bool | `true` |  |
+| flyteadmin.retention.enabled | bool | `false` |  |
+| flyteadmin.retention.maxRuntime | string | `"20m"` |  |
+| flyteadmin.retention.resources | object | `{}` |  |
+| flyteadmin.retention.schedule | string | `"0 3 * * *"` |  |
+| flyteadmin.retention.suspend | bool | `false` |  |
+| flyteadmin.retention.timeZone | string | `"Etc/UTC"` |  |
 | flyteadmin.secrets | object | `{}` |  |
 | flyteadmin.securityContext | object | `{"fsGroup":65534,"fsGroupChangePolicy":"Always","runAsNonRoot":true,"runAsUser":1001,"seLinuxOptions":{"type":"spc_t"}}` | Sets securityContext for flyteadmin pod(s). |
 | flyteadmin.service | object | `{"additionalPorts":[],"annotations":{},"appProtocols":{"enabled":false},"loadBalancerSourceRanges":[],"type":"ClusterIP"}` | Service settings for Flyteadmin |
