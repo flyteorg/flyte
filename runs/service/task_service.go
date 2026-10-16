@@ -8,7 +8,6 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	commonpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
@@ -21,10 +20,10 @@ import (
 type taskService struct {
 	taskconnect.UnimplementedTaskServiceHandler
 	db            interfaces.Repository
-	projectClient projectconnect.ProjectServiceClient
+	projectClient ProjectGetter
 }
 
-func NewTaskService(repo interfaces.Repository, projectClient projectconnect.ProjectServiceClient) taskconnect.TaskServiceHandler {
+func NewTaskService(repo interfaces.Repository, projectClient ProjectGetter) taskconnect.TaskServiceHandler {
 	return &taskService{
 		db:            repo,
 		projectClient: projectClient,

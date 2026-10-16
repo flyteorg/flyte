@@ -12,11 +12,13 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/authorization"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
 type triggerRepo struct {
+	authorizationGuard
 	db *sqlx.DB
 }
 
@@ -25,6 +27,10 @@ func NewTriggerRepo(db *sqlx.DB) interfaces.TriggerRepo {
 }
 
 func (r *triggerRepo) SaveTrigger(ctx context.Context, trigger *models.Trigger, expectedRevision uint64) (*models.Trigger, error) {
+	if err := r.Check(ctx, trigger.Domain, trigger.Project); err != nil {
+		return nil, err
+	}
+
 	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to begin tx: %w", err)
@@ -106,6 +112,10 @@ func upsertTrigger(ctx context.Context, tx *sqlx.Tx, trigger *models.Trigger, ex
 }
 
 func (r *triggerRepo) GetTrigger(ctx context.Context, key interfaces.TriggerNameKey) (*models.Trigger, error) {
+	if err := r.Check(ctx, key.Domain, key.Project); err != nil {
+		return nil, err
+	}
+
 	var t models.Trigger
 	var err error
 	if key.TaskName != "" {
@@ -129,6 +139,10 @@ func (r *triggerRepo) GetTrigger(ctx context.Context, key interfaces.TriggerName
 }
 
 func (r *triggerRepo) GetTriggerRevision(ctx context.Context, project, domain, taskName, name string, revision uint64) (*models.TriggerRevision, error) {
+	if err := r.Check(ctx, domain, project); err != nil {
+		return nil, err
+	}
+
 	var rev models.TriggerRevision
 	err := sqlx.GetContext(ctx, r.db, &rev,
 		`SELECT * FROM trigger_revisions
@@ -144,6 +158,12 @@ func (r *triggerRepo) GetTriggerRevision(ctx context.Context, project, domain, t
 }
 
 func (r *triggerRepo) ListTriggers(ctx context.Context, input interfaces.ListResourceInput) ([]*models.Trigger, error) {
+	var err error
+	input.Filter, err = r.andAuthorization(input.Filter, ctx, false)
+	if err != nil {
+		return nil, err
+	}
+
 	var queryBuilder strings.Builder
 	var args []interface{}
 	argIdx := 1
@@ -157,7 +177,7 @@ func (r *triggerRepo) ListTriggers(ctx context.Context, input interfaces.ListRes
 		}
 		rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, argIdx)
 		queryBuilder.WriteString(" AND ")
-		queryBuilder.WriteString(rewritten)
+		queryBuilder.WriteString("(" + rewritten + ")")
 		args = append(args, rewrittenArgs...)
 		argIdx += len(rewrittenArgs)
 	}
@@ -168,7 +188,7 @@ func (r *triggerRepo) ListTriggers(ctx context.Context, input interfaces.ListRes
 		}
 		rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, argIdx)
 		queryBuilder.WriteString(" AND ")
-		queryBuilder.WriteString(rewritten)
+		queryBuilder.WriteString("(" + rewritten + ")")
 		args = append(args, rewrittenArgs...)
 		argIdx += len(rewrittenArgs)
 	}
@@ -196,6 +216,10 @@ func (r *triggerRepo) ListTriggers(ctx context.Context, input interfaces.ListRes
 }
 
 func (r *triggerRepo) ListTriggerRevisions(ctx context.Context, project, domain, taskName, name string, input interfaces.ListResourceInput) ([]*models.TriggerRevision, error) {
+	if err := r.Check(ctx, domain, project); err != nil {
+		return nil, err
+	}
+
 	var revisions []*models.TriggerRevision
 	err := sqlx.SelectContext(ctx, r.db, &revisions,
 		`SELECT * FROM trigger_revisions
@@ -210,6 +234,15 @@ func (r *triggerRepo) ListTriggerRevisions(ctx context.Context, project, domain,
 }
 
 func (r *triggerRepo) UpdateTriggers(ctx context.Context, keys []interfaces.TriggerNameKey, active bool) error {
+	if err := r.RequireAuthorizationContext(ctx); err != nil {
+		return err
+	}
+	for _, key := range keys {
+		if err := authorization.Check(ctx, key.Domain, key.Project); err != nil {
+			return err
+		}
+	}
+
 	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("failed to begin tx: %w", err)
@@ -256,6 +289,15 @@ func (r *triggerRepo) UpdateTriggers(ctx context.Context, keys []interfaces.Trig
 }
 
 func (r *triggerRepo) DeleteTriggers(ctx context.Context, keys []interfaces.TriggerNameKey) error {
+	if err := r.RequireAuthorizationContext(ctx); err != nil {
+		return err
+	}
+	for _, key := range keys {
+		if err := authorization.Check(ctx, key.Domain, key.Project); err != nil {
+			return err
+		}
+	}
+
 	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("failed to begin tx: %w", err)

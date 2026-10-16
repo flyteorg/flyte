@@ -1,8 +1,10 @@
 package service
 
 import (
+	"connectrpc.com/connect"
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/flyteorg/flyte/v2/dataproxy/config"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
@@ -35,5 +37,19 @@ func validateUploadRequest(ctx context.Context, req *dataproxy.CreateUploadLocat
 		}
 	}
 
+	return nil
+}
+
+// validateStoragePath prevents request path components from escaping a scoped
+// prefix when storage backends normalize paths or decode URI escapes.
+func validateStoragePath(value string, nested bool) error {
+	if strings.HasPrefix(value, "/") || strings.ContainsAny(value, "\\%?#:\x00") || (!nested && strings.Contains(value, "/")) {
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid upload path component"))
+	}
+	for _, part := range strings.Split(value, "/") {
+		if part == "." || part == ".." {
+			return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("upload path traversal is not allowed"))
+		}
+	}
 	return nil
 }

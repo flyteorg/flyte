@@ -24,6 +24,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/flytestdlib/authorization"
 	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/migrations"
 	"github.com/flyteorg/flyte/v2/runs/repository"
@@ -65,6 +66,14 @@ func deployTriggerInterceptor() connect.UnaryInterceptorFunc {
 // Requires sc.DB and sc.DataStore to be set.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
+	var authInterceptor *authorization.Interceptor
+	if cfg.Authorization.Enabled {
+		var err error
+		authInterceptor, err = authorization.NewInterceptor(cfg.Authorization, cfg.TrustForwardedIdentityHeaders)
+		if err != nil {
+			return fmt.Errorf("runs: authorization: %w", err)
+		}
+	}
 	if err := migrations.RunMigrations(ctx, sc.DB); err != nil {
 		return fmt.Errorf("runs: failed to run migrations: %w", err)
 	}
@@ -83,6 +92,9 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	interceptors := []connect.Interceptor{otelInterceptor}
+	if authInterceptor != nil {
+		interceptors = append(interceptors, authInterceptor)
+	}
 	if sentryutils.Init(ctx, otelServiceName) {
 		interceptors = append(interceptors, sentryutils.Interceptor(sentryOperations), deployTriggerInterceptor())
 		sc.AddWorker("sentry-flush", func(ctx context.Context) error {
@@ -108,6 +120,12 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	settingsRepo := impl.NewSettingsRepo(sc.DB)
+	projectRepo := impl.NewProjectRepo(sc.DB)
+	if cfg.Authorization.Enabled {
+		for _, repository := range []any{repo.ActionRepo(), repo.TaskRepo(), repo.TriggerRepo(), settingsRepo, projectRepo} {
+			impl.EnableAuthorization(repository)
+		}
+	}
 
 	// In unified mode, intra-service calls go through the same mux.
 	actionsServiceCfg := cfg.ActionsService
@@ -124,12 +142,6 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		connect.WithInterceptors(otelInterceptor),
 	)
 
-	runsServiceURL := fmt.Sprintf("http://localhost:%d", cfg.Server.Port)
-	projectClient := projectconnect.NewProjectServiceClient(
-		http.DefaultClient,
-		runsServiceURL,
-		connect.WithInterceptors(otelInterceptor),
-	)
 	abortReconciler := service.NewAbortReconciler(repo, actionsClient, service.AbortReconcilerConfig{
 		Workers:      5,
 		MaxAttempts:  10,
@@ -138,17 +150,25 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		MaxDelay:     5 * time.Minute,
 	})
 	sc.AddWorker("abort-reconciler", func(ctx context.Context) error {
-		return abortReconciler.Run(ctx)
+		return abortReconciler.Run(authorization.WithSystem(ctx))
 	})
 
-	runsSvc := service.NewRunService(repo, settingsRepo, actionsClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
-	taskSvc := service.NewTaskService(repo, projectClient)
+	domains := make([]*projectpb.Domain, 0, len(cfg.Domains))
+	for _, d := range cfg.Domains {
+		domains = append(domains, &projectpb.Domain{
+			Id:   d.ID,
+			Name: d.Name,
+		})
+	}
+	projectSvc := service.NewProjectService(projectRepo, domains)
+	runsSvc := service.NewRunService(repo, settingsRepo, actionsClient, projectSvc, cfg.StoragePrefix, sc.DataStore, abortReconciler, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
+	taskSvc := service.NewTaskService(repo, projectSvc)
 
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc, connect.WithInterceptors(interceptors...))
 	sc.Mux.Handle(runsPath, runsHandler)
 	logger.Infof(ctx, "Mounted RunService at %s", runsPath)
 
-	internalRunsPath, internalRunsHandler := workflowconnect.NewInternalRunServiceHandler(runsSvc, connect.WithInterceptors(otelInterceptor))
+	internalRunsPath, internalRunsHandler := workflowconnect.NewInternalRunServiceHandler(runsSvc, connect.WithInterceptors(interceptors...))
 	sc.Mux.Handle(internalRunsPath, internalRunsHandler)
 	logger.Infof(ctx, "Mounted InternalRunService at %s", internalRunsPath)
 
@@ -178,30 +198,22 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(triggerPath, triggerHandler)
 	logger.Infof(ctx, "Mounted TriggerService at %s", triggerPath)
 
-	domains := make([]*projectpb.Domain, 0, len(cfg.Domains))
-	for _, d := range cfg.Domains {
-		domains = append(domains, &projectpb.Domain{
-			Id:   d.ID,
-			Name: d.Name,
-		})
-	}
-	projectSvc := service.NewProjectService(impl.NewProjectRepo(sc.DB), domains)
-	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(projectSvc, connect.WithInterceptors(otelInterceptor))
+	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(projectSvc, connect.WithInterceptors(interceptors...))
 	sc.Mux.Handle(projectPath, projectHandler)
 	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
 
 	settingsSvc := service.NewSettingsService(settingsRepo)
-	settingsPath, settingsHandler := settingsconnect.NewSettingsServiceHandler(settingsSvc, connect.WithInterceptors(otelInterceptor))
+	settingsPath, settingsHandler := settingsconnect.NewSettingsServiceHandler(settingsSvc, connect.WithInterceptors(interceptors...))
 	sc.Mux.Handle(settingsPath, settingsHandler)
 	logger.Infof(ctx, "Mounted SettingsService at %s", settingsPath)
 
-	if err := seedProjects(ctx, impl.NewProjectRepo(sc.DB), cfg.SeedProjects); err != nil {
+	if err := seedProjects(authorization.WithSystem(ctx), projectRepo, cfg.SeedProjects); err != nil {
 		return fmt.Errorf("runs: failed to seed projects: %w", err)
 	}
 
 	if cfg.TriggerScheduler.Enabled {
-		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, http.DefaultClient, runsServiceURL, connect.WithInterceptors(otelInterceptor))
-		sc.AddWorker("trigger-scheduler", worker)
+		worker := scheduler.StartWithRunClient(repo.TriggerRepo(), cfg.TriggerScheduler, runsSvc)
+		sc.AddWorker("trigger-scheduler", func(ctx context.Context) error { return worker(authorization.WithSystem(ctx)) })
 		logger.Infof(ctx, "Registered trigger-scheduler worker")
 	}
 

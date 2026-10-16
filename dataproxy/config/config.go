@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/flyteorg/flyte/v2/flytestdlib/authorization"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -30,6 +31,11 @@ var defaultConfig = &DataProxyConfig{
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
 
 type DataProxyConfig struct {
+	// Authorization is configured in the config file, alongside the Runs policy.
+	Authorization authorization.Config `json:"authorization" pflag:"-"`
+	// Requires a proxy that authenticates and overwrites the selected claims header.
+	TrustForwardedIdentityHeaders bool `json:"trustForwardedIdentityHeaders" pflag:"-"`
+
 	// Server configures the standalone DataProxy service HTTP listener.
 	Server ServerConfig `json:"server"`
 

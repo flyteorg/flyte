@@ -11,6 +11,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
+	"github.com/flyteorg/flyte/v2/flytestdlib/authorization"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -105,7 +106,7 @@ func (s *ProjectService) GetProject(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	projectProto, err := transformers.ProjectModelToProject(model, s.domains)
+	projectProto, err := transformers.ProjectModelToProject(model, s.authorizedDomains(ctx, model.Identifier))
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -140,7 +141,7 @@ func (s *ProjectService) ListProjects(
 
 	projectProtos := make([]*project.Project, 0, len(projects))
 	for _, p := range projects {
-		projectProto, convErr := transformers.ProjectModelToProject(p, s.domains)
+		projectProto, convErr := transformers.ProjectModelToProject(p, s.authorizedDomains(ctx, p.Identifier))
 		if convErr != nil {
 			return nil, connect.NewError(connect.CodeInternal, convErr)
 		}
@@ -203,3 +204,13 @@ func listResourceInputFromProjectListRequest(req *project.ListProjectsRequest) (
 }
 
 var _ projectconnect.ProjectServiceHandler = (*ProjectService)(nil)
+
+func (s *ProjectService) authorizedDomains(ctx context.Context, id string) []*project.Domain {
+	var domains []*project.Domain
+	for _, d := range s.domains {
+		if authorization.Check(ctx, d.Id, id) == nil {
+			domains = append(domains, d)
+		}
+	}
+	return domains
+}

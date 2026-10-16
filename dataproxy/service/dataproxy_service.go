@@ -20,6 +20,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/dataproxy/config"
 	"github.com/flyteorg/flyte/v2/dataproxy/logs"
+	"github.com/flyteorg/flyte/v2/flytestdlib/authorization"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -37,6 +38,7 @@ import (
 )
 
 type Service struct {
+	authorization.Guard
 	dataproxyconnect.UnimplementedDataProxyServiceHandler
 
 	cfg           config.DataProxyConfig
@@ -50,7 +52,7 @@ type Service struct {
 
 // NewService creates a new DataProxyService instance.
 func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskClient taskconnect.TaskServiceClient, triggerClient triggerconnect.TriggerServiceClient, runClient workflowconnect.RunServiceClient, projectClient projectconnect.ProjectServiceClient, logStreamer logs.LogStreamer) *Service {
-	return &Service{
+	svc := &Service{
 		cfg:           cfg,
 		dataStore:     dataStore,
 		taskClient:    taskClient,
@@ -59,6 +61,10 @@ func NewService(cfg config.DataProxyConfig, dataStore *storage.DataStore, taskCl
 		projectClient: projectClient,
 		logStreamer:   logStreamer,
 	}
+	if cfg.Authorization.Enabled {
+		svc.EnableAuthorization()
+	}
+	return svc
 }
 
 // CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
@@ -69,6 +75,21 @@ func (s *Service) CreateUploadLocation(
 	logger.Infof(ctx, "CreateUploadLocation request for project=%s, domain=%s, filename=%s",
 		req.Msg.Project, req.Msg.Domain, req.Msg.Filename)
 
+	if err := s.checkScope(ctx, req.Msg.GetDomain(), req.Msg.GetProject()); err != nil {
+		return nil, err
+	}
+	if s.cfg.Authorization.Enabled {
+		for _, value := range []string{req.Msg.GetProject(), req.Msg.GetDomain()} {
+			if err := validateStoragePath(value, false); err != nil {
+				return nil, err
+			}
+		}
+		for _, value := range []string{req.Msg.GetFilenameRoot(), req.Msg.GetFilename()} {
+			if err := validateStoragePath(value, true); err != nil {
+				return nil, err
+			}
+		}
+	}
 	// Validation on request
 	if err := req.Msg.Validate(); err != nil {
 		logger.Errorf(ctx, "Invalid CreateUploadLocation request: %v", err)
@@ -137,6 +158,9 @@ func (s *Service) validateProjectExists(ctx context.Context, projectID string) e
 	})); err != nil {
 		if connect.CodeOf(err) == connect.CodeNotFound {
 			return connect.NewError(connect.CodeNotFound, fmt.Errorf("project %q not found", projectID))
+		}
+		if code := connect.CodeOf(err); code == connect.CodePermissionDenied || code == connect.CodeUnauthenticated {
+			return err
 		}
 		logger.Errorf(ctx, "Failed to validate project %q: %v", projectID, err)
 		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to validate project: %w", err))
@@ -247,6 +271,22 @@ func (s *Service) UploadInputs(
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("id is required"))
 	}
 
+	if err := s.checkScope(ctx, domain, project); err != nil {
+		return nil, err
+	}
+	if s.cfg.Authorization.Enabled {
+		for _, value := range []string{org, project, domain} {
+			if err := validateStoragePath(value, false); err != nil {
+				return nil, err
+			}
+		}
+		// Arbitrary base directories are an instance-wide storage capability.
+		if req.Msg.GetBaseDir() != "" {
+			if err := s.checkScope(ctx, "*", "*"); err != nil {
+				return nil, err
+			}
+		}
+	}
 	if err := s.validateProjectExists(ctx, project); err != nil {
 		return nil, err
 	}
@@ -323,6 +363,9 @@ func (s *Service) CreateDownloadLink(
 	ctx context.Context,
 	req *connect.Request[dataproxy.CreateDownloadLinkRequest],
 ) (*connect.Response[dataproxy.CreateDownloadLinkResponse], error) {
+	if err := s.checkScope(ctx, req.Msg.GetActionAttemptId().GetActionId().GetRun().GetDomain(), req.Msg.GetActionAttemptId().GetActionId().GetRun().GetProject()); err != nil {
+		return nil, err
+	}
 	logger.Infof(ctx, "CreateDownloadLink request received")
 
 	if err := req.Msg.Validate(); err != nil {
@@ -390,6 +433,9 @@ func (s *Service) resolveArtifactURL(ctx context.Context, req *dataproxy.CreateD
 		ActionId: attemptID.GetActionId(),
 	}))
 	if err != nil {
+		if code := connect.CodeOf(err); code == connect.CodePermissionDenied || code == connect.CodeUnauthenticated {
+			return "", err
+		}
 		logger.Errorf(ctx, "Failed to get action details for %v: %v", attemptID.GetActionId(), err)
 		return "", connect.NewError(connect.CodeNotFound,
 			fmt.Errorf("failed to get action details: %w", err))
@@ -428,19 +474,31 @@ func (s *Service) resolveTaskTemplate(ctx context.Context, req *dataproxy.Upload
 	case *dataproxy.UploadInputsRequest_TaskSpec:
 		return t.TaskSpec.GetTaskTemplate(), nil
 	case *dataproxy.UploadInputsRequest_TaskId:
+		if err := s.checkScope(ctx, t.TaskId.GetDomain(), t.TaskId.GetProject()); err != nil {
+			return nil, err
+		}
 		resp, err := s.taskClient.GetTaskDetails(ctx, connect.NewRequest(&task.GetTaskDetailsRequest{
 			TaskId: t.TaskId,
 		}))
 		if err != nil {
+			if code := connect.CodeOf(err); code == connect.CodePermissionDenied || code == connect.CodeUnauthenticated {
+				return nil, err
+			}
 			logger.Errorf(ctx, "Failed to get task details for %v: %v", t.TaskId, err)
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("failed to get task: %w", err))
 		}
 		return resp.Msg.GetDetails().GetSpec().GetTaskTemplate(), nil
 	case *dataproxy.UploadInputsRequest_TriggerName:
+		if err := s.checkScope(ctx, t.TriggerName.GetDomain(), t.TriggerName.GetProject()); err != nil {
+			return nil, err
+		}
 		triggerResp, err := s.triggerClient.GetTriggerDetails(ctx, connect.NewRequest(&trigger.GetTriggerDetailsRequest{
 			Name: t.TriggerName,
 		}))
 		if err != nil {
+			if code := connect.CodeOf(err); code == connect.CodePermissionDenied || code == connect.CodeUnauthenticated {
+				return nil, err
+			}
 			logger.Errorf(ctx, "Failed to get trigger details for %v: %v", t.TriggerName, err)
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("failed to get trigger: %w", err))
 		}
@@ -456,6 +514,9 @@ func (s *Service) resolveTaskTemplate(ctx context.Context, req *dataproxy.Upload
 			TaskId: taskID,
 		}))
 		if err != nil {
+			if code := connect.CodeOf(err); code == connect.CodePermissionDenied || code == connect.CodeUnauthenticated {
+				return nil, err
+			}
 			logger.Errorf(ctx, "Failed to get task details for trigger %v: %v", t.TriggerName, err)
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("failed to get task for trigger: %w", err))
 		}
@@ -490,6 +551,9 @@ func (s *Service) GetActionData(
 	}
 
 	actionId := req.Msg.GetActionId()
+	if err := s.checkScope(ctx, actionId.GetRun().GetDomain(), actionId.GetRun().GetProject()); err != nil {
+		return nil, err
+	}
 
 	urisResp, err := s.runClient.GetActionDataURIs(ctx, connect.NewRequest(&workflow.GetActionDataURIsRequest{
 		ActionId: actionId,
@@ -553,6 +617,9 @@ func (s *Service) GetActionData(
 
 // TailLogs streams logs for an action attempt.
 func (s *Service) TailLogs(ctx context.Context, req *connect.Request[dataproxy.TailLogsRequest], stream *connect.ServerStream[dataproxy.TailLogsResponse]) error {
+	if err := s.checkScope(ctx, req.Msg.GetActionId().GetRun().GetDomain(), req.Msg.GetActionId().GetRun().GetProject()); err != nil {
+		return err
+	}
 	// Get log context from RunService
 	logCtxResp, err := s.runClient.GetActionLogContext(ctx, connect.NewRequest(&workflow.GetActionLogContextRequest{
 		ActionId: req.Msg.GetActionId(),
@@ -580,4 +647,11 @@ func hashInputsProto(inputs proto.Message) (string, error) {
 	h := fnv.New64a()
 	_, _ = h.Write(data)
 	return base64.RawURLEncoding.EncodeToString(h.Sum(nil)), nil
+}
+
+func (s *Service) checkScope(ctx context.Context, domain, project string) error {
+	if err := s.Check(ctx, domain, project); err != nil {
+		return connect.NewError(connect.CodePermissionDenied, err)
+	}
+	return nil
 }

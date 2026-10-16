@@ -11,11 +11,13 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/authorization"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
 type tasksRepo struct {
+	authorizationGuard
 	db *sqlx.DB
 }
 
@@ -31,6 +33,15 @@ func NewTaskRepo(db *sqlx.DB) interfaces.TaskRepo {
 // set of triggers via refreshTaskTriggerMeta, so they are intentionally NOT
 // set by the task upsert itself.
 func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task, triggers []*models.Trigger) error {
+	if err := r.Check(ctx, newTask.Domain, newTask.Project); err != nil {
+		return err
+	}
+	for _, t := range triggers {
+		if err := authorization.Check(ctx, t.Domain, t.Project); err != nil {
+			return err
+		}
+	}
+
 	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("failed to begin tx: %w", err)
@@ -115,6 +126,10 @@ func (r *tasksRepo) CreateTask(ctx context.Context, newTask *models.Task, trigge
 }
 
 func (r *tasksRepo) GetTask(ctx context.Context, key models.TaskKey) (*models.Task, error) {
+	if err := r.Check(ctx, key.Domain, key.Project); err != nil {
+		return nil, err
+	}
+
 	var task models.Task
 	err := sqlx.GetContext(ctx, r.db, &task,
 		"SELECT * FROM tasks WHERE project = $1 AND domain = $2 AND name = $3 AND version = $4",
@@ -132,6 +147,13 @@ func (r *tasksRepo) GetTask(ctx context.Context, key models.TaskKey) (*models.Ta
 }
 
 func (r *tasksRepo) CreateTaskSpec(ctx context.Context, taskSpec *models.TaskSpec) error {
+	if scopes, restricted := authorization.Scopes(ctx); restricted && len(scopes) == 0 {
+		return authorization.ErrDenied
+	}
+	if err := r.RequireAuthorizationContext(ctx); err != nil {
+		return err
+	}
+
 	_, err := r.db.ExecContext(ctx,
 		`INSERT INTO task_specs (digest, spec) VALUES ($1, $2) ON CONFLICT (digest) DO NOTHING`,
 		taskSpec.Digest, taskSpec.Spec)
@@ -145,6 +167,10 @@ func (r *tasksRepo) CreateTaskSpec(ctx context.Context, taskSpec *models.TaskSpe
 }
 
 func (r *tasksRepo) GetTaskSpec(ctx context.Context, digest string) (*models.TaskSpec, error) {
+	if err := r.CheckTaskSpec(ctx, digest); err != nil {
+		return nil, err
+	}
+
 	var taskSpec models.TaskSpec
 	err := sqlx.GetContext(ctx, r.db, &taskSpec,
 		"SELECT * FROM task_specs WHERE digest = $1", digest)
@@ -164,6 +190,12 @@ func (r *tasksRepo) GetTaskSpec(ctx context.Context, digest string) (*models.Tas
 // A CTE with ROW_NUMBER() partitioned by (project, domain, name) and ordered by
 // created_at DESC is used so that only rn=1 rows (the latest version) are returned.
 func (r *tasksRepo) ListTasks(ctx context.Context, input interfaces.ListResourceInput) (*models.TaskListResult, error) {
+	var err error
+	input.ScopeByFilter, err = r.andAuthorization(input.ScopeByFilter, ctx, false)
+	if err != nil {
+		return nil, err
+	}
+
 	// allArgs accumulates all bind parameters in the order they appear in the query.
 	var allArgs []interface{}
 	argIdx := 1
@@ -176,7 +208,7 @@ func (r *tasksRepo) ListTasks(ctx context.Context, input interfaces.ListResource
 			return nil, fmt.Errorf("failed to build filter: %w", err)
 		}
 		rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, argIdx)
-		filteredWhereClauses = append(filteredWhereClauses, rewritten)
+		filteredWhereClauses = append(filteredWhereClauses, "("+rewritten+")")
 		allArgs = append(allArgs, rewrittenArgs...)
 		argIdx += len(rewrittenArgs)
 	}
@@ -186,7 +218,7 @@ func (r *tasksRepo) ListTasks(ctx context.Context, input interfaces.ListResource
 			return nil, fmt.Errorf("failed to build scope filter: %w", err)
 		}
 		rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, argIdx)
-		filteredWhereClauses = append(filteredWhereClauses, rewritten)
+		filteredWhereClauses = append(filteredWhereClauses, "("+rewritten+")")
 		allArgs = append(allArgs, rewrittenArgs...)
 		argIdx += len(rewrittenArgs)
 	}
@@ -203,7 +235,7 @@ func (r *tasksRepo) ListTasks(ctx context.Context, input interfaces.ListResource
 			return nil, fmt.Errorf("failed to build scope filter: %w", err)
 		}
 		rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, argIdx)
-		unfilteredWhere = "WHERE " + rewritten
+		unfilteredWhere = "WHERE (" + rewritten + ")"
 		allArgs = append(allArgs, rewrittenArgs...)
 		argIdx += len(rewrittenArgs)
 	}
@@ -273,6 +305,12 @@ LIMIT $%d OFFSET $%d`, filteredWhere, unfilteredWhere, orderBy, argIdx, argIdx+1
 }
 
 func (r *tasksRepo) ListVersions(ctx context.Context, input interfaces.ListResourceInput) ([]*models.TaskVersion, error) {
+	var err error
+	input.Filter, err = r.andAuthorization(input.Filter, ctx, false)
+	if err != nil {
+		return nil, err
+	}
+
 	var queryBuilder strings.Builder
 	var args []interface{}
 	argIdx := 1
@@ -287,7 +325,7 @@ func (r *tasksRepo) ListVersions(ctx context.Context, input interfaces.ListResou
 		}
 		rewritten, rewrittenArgs := rewritePlaceholders(expr.Query, expr.Args, argIdx)
 		queryBuilder.WriteString(" WHERE ")
-		queryBuilder.WriteString(rewritten)
+		queryBuilder.WriteString("(" + rewritten + ")")
 		args = append(args, rewrittenArgs...)
 		argIdx += len(rewrittenArgs)
 	}
