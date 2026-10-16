@@ -275,11 +275,6 @@ func (pm *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCor
 		return pluginsCore.DoTransition(p), nil
 	}
 
-	if !p.Phase().IsTerminal() && o.GetDeletionTimestamp() != nil {
-		failureReason := fmt.Sprintf("object [%s] terminated unexpectedly in the background", nsName.String())
-		return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(codeUnexpectedObjectDeletion, failureReason, nil)), nil
-	}
-
 	return pluginsCore.DoTransition(p), nil
 }
 
