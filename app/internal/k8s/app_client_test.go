@@ -1201,8 +1201,24 @@ func TestDeploy_AppleSiliconInjectsBridge(t *testing.T) {
 		env[e.Name] = e.Value
 	}
 	assert.Equal(t, "http://192.168.65.254:30090/v1", env[flytek8s.OpenAIBaseURLEnvVar])
-	assert.Equal(t, "app-llm-proj-dev", env[flytek8s.AppleSiliconWorkloadEnvVar])
-	assert.Equal(t, flytek8s.MintAppleSiliconToken("s3cret", "app-llm-proj-dev"), env[flytek8s.AppleSiliconTokenEnvVar])
+	workload := AppleSiliconWorkloadID("llm-proj-dev", ksvc.Annotations[annotationSpecSHA])
+	assert.Equal(t, workload, env[flytek8s.AppleSiliconWorkloadEnvVar])
+	assert.Equal(t, flytek8s.MintAppleSiliconToken("s3cret", workload), env[flytek8s.AppleSiliconTokenEnvVar])
+
+	// A new revision gets its own host workload, so a rollout's old pods can't share or tear down the new one's.
+	updated := appleSiliconApp()
+	updated.Spec.GetContainer().Image = "ghcr.io/example/llm:v2"
+	require.NoError(t, c.Deploy(context.Background(), updated))
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "llm-proj-dev", Namespace: AppNamespace}, ksvc))
+	next := ""
+	for _, e := range ksvc.Spec.Template.Spec.Containers[0].Env {
+		if e.Name == flytek8s.AppleSiliconWorkloadEnvVar {
+			next = e.Value
+		}
+	}
+	assert.NotEqual(t, workload, next)
+	assert.Equal(t, AppleSiliconWorkloadID("llm-proj-dev", ksvc.Annotations[annotationSpecSHA]), next)
 }
 
 func TestDeploy_AppleSiliconWithoutBridgeFails(t *testing.T) {

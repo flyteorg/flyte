@@ -561,6 +561,13 @@ func specSHA(specBytes []byte) string {
 	return hex.EncodeToString(sum[:8]) // 8 bytes = 16 hex chars, enough for change detection
 }
 
+// AppleSiliconWorkloadID scopes an Apple Silicon app's host workload to one revision of its spec. During a
+// rollout the new revision's pods then get their own host process instead of the old revision's, and an old
+// pod shutting down can't tear down the new revision's. Replicas of one revision share the host process.
+func AppleSiliconWorkloadID(name, specSHA string) string {
+	return "app-" + name + "-" + specSHA
+}
+
 // buildKService constructs a Knative Service manifest from an App proto.
 func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, error) {
 	appID := app.GetMetadata().GetId()
@@ -581,7 +588,7 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	// Apple Silicon apps run their ML work on the devbox host's Metal GPU via the Apple Silicon
 	// bridge; on any backend without one this fails the deploy with APPLE_SILICON_NOT_AVAILABLE.
 	if flytek8s.IsAppleSilicon(spec.GetExtendedResources().GetGpuAccelerator()) && len(podSpec.Containers) > 0 {
-		if err := flytek8s.ApplyAppleSiliconBridge(&podSpec, primaryContainerName(spec, podSpec), "app-"+name); err != nil {
+		if err := flytek8s.ApplyAppleSiliconBridge(&podSpec, primaryContainerName(spec, podSpec), AppleSiliconWorkloadID(name, sha)); err != nil {
 			return nil, err
 		}
 	}

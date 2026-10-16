@@ -67,10 +67,24 @@ func appleSiliconNotAvailable(hostPlatform string) error {
 // ValidateAppleSiliconBridge fails fast with APPLE_SILICON_NOT_AVAILABLE when this backend cannot serve Apple Silicon.
 func ValidateAppleSiliconBridge() error {
 	cfg := config.GetK8sPluginConfig().AppleSiliconBridge
-	if cfg.Endpoint == "" || cfg.TokenSecret == "" {
-		return appleSiliconNotAvailable(cfg.HostPlatform)
+	if !configured(cfg.Endpoint) || !configured(cfg.TokenSecret) {
+		return appleSiliconNotAvailable(renderedOrEmpty(cfg.HostPlatform))
 	}
 	return nil
+}
+
+// configured reports whether a bridge config value was actually set. The devbox chart ships
+// `%{...}%` placeholders that its bootstrap renders; a config used without that pass still carries
+// the literal placeholder, which must not count as a bridge.
+func configured(value string) bool {
+	return value != "" && !strings.Contains(value, "%{")
+}
+
+func renderedOrEmpty(value string) string {
+	if configured(value) {
+		return value
+	}
+	return ""
 }
 
 // stripAcceleratorResources drops every accelerator resource from the container. An Apple Silicon workload
@@ -85,13 +99,19 @@ func stripAcceleratorResources(resources *v1.ResourceRequirements) {
 	}
 }
 
-func setEnvIfUnset(container *v1.Container, name, value string) {
+func hasEnv(container *v1.Container, name string) bool {
 	for _, e := range container.Env {
 		if e.Name == name {
-			return
+			return true
 		}
 	}
-	container.Env = append(container.Env, v1.EnvVar{Name: name, Value: value})
+	return false
+}
+
+func setEnvIfUnset(container *v1.Container, name, value string) {
+	if !hasEnv(container, name) {
+		container.Env = append(container.Env, v1.EnvVar{Name: name, Value: value})
+	}
 }
 
 // ApplyAppleSiliconBridge rewires a pod that requests the APPLE_SILICON accelerator onto the
@@ -124,7 +144,12 @@ func ApplyAppleSiliconBridge(podSpec *v1.PodSpec, primaryContainerName, workload
 	setEnvIfUnset(primary, AppleSiliconEndpointEnvVar, endpoint)
 	setEnvIfUnset(primary, AppleSiliconWorkloadEnvVar, workloadID)
 	setEnvIfUnset(primary, AppleSiliconTokenEnvVar, token)
-	setEnvIfUnset(primary, OpenAIBaseURLEnvVar, endpoint+"/v1")
-	setEnvIfUnset(primary, OpenAIAPIKeyEnvVar, token)
+	// The OpenAI pair goes in together or not at all: setting only one would send the bridge token to the
+	// user's own OPENAI_BASE_URL, or the user's own key to the bridge.
+	if !hasEnv(primary, OpenAIBaseURLEnvVar) && !hasEnv(primary, OpenAIAPIKeyEnvVar) {
+		primary.Env = append(primary.Env,
+			v1.EnvVar{Name: OpenAIBaseURLEnvVar, Value: endpoint + "/v1"},
+			v1.EnvVar{Name: OpenAIAPIKeyEnvVar, Value: token})
+	}
 	return nil
 }

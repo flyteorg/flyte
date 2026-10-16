@@ -74,6 +74,20 @@ func TestValidateAppleSiliconBridge(t *testing.T) {
 		assert.Contains(t, err.Error(), "flyte start devbox --apple-silicon")
 	})
 
+	t.Run("unrendered chart placeholders are not a bridge", func(t *testing.T) {
+		setK8sConfig(t, &config.K8sPluginConfig{
+			AppleSiliconBridge: config.AppleSiliconBridgeConfig{
+				Endpoint:     "%{APPLE_SILICON_BRIDGE_ENDPOINT}%",
+				TokenSecret:  "%{APPLE_SILICON_BRIDGE_TOKEN_SECRET}%",
+				HostPlatform: "%{DEVBOX_HOST_PLATFORM}%",
+			},
+		})
+		err := ValidateAppleSiliconBridge()
+		require.Error(t, err)
+		assert.True(t, stdErrors.IsCausedBy(err, pluginserrors.AppleSiliconNotAvailable))
+		assert.NotContains(t, err.Error(), "%{")
+	})
+
 	t.Run("devbox with a bridge", func(t *testing.T) {
 		setK8sConfig(t, &config.K8sPluginConfig{
 			AppleSiliconBridge: config.AppleSiliconBridgeConfig{
@@ -119,10 +133,26 @@ func TestApplyAppleSiliconBridge(t *testing.T) {
 	assert.Equal(t, "http://192.168.65.254:30090", env[AppleSiliconEndpointEnvVar])
 	assert.Equal(t, "abc-123", env[AppleSiliconWorkloadEnvVar])
 	assert.Equal(t, token, env[AppleSiliconTokenEnvVar])
-	assert.Equal(t, token, env[OpenAIAPIKeyEnvVar])
-	// A value the user set explicitly wins over the bridge default.
+	// The user pointed OPENAI_BASE_URL elsewhere: the bridge token must not be sent there as their API key.
 	assert.Equal(t, "http://user-choice/v1", env[OpenAIBaseURLEnvVar])
+	assert.NotContains(t, env, OpenAIAPIKeyEnvVar)
 	assert.Empty(t, podSpec.Containers[1].Env, "only the primary container talks to the bridge")
+
+	t.Run("the OpenAI pair goes in together when neither is set", func(t *testing.T) {
+		spec := &v1.PodSpec{Containers: []v1.Container{{Name: "primary"}}}
+		require.NoError(t, ApplyAppleSiliconBridge(spec, "primary", "abc-123"))
+		env := envMap(spec.Containers[0])
+		assert.Equal(t, "http://192.168.65.254:30090/v1", env[OpenAIBaseURLEnvVar])
+		assert.Equal(t, token, env[OpenAIAPIKeyEnvVar])
+	})
+
+	t.Run("a user's own OpenAI key is left alone, and no bridge URL is added next to it", func(t *testing.T) {
+		spec := &v1.PodSpec{Containers: []v1.Container{{Name: "primary", Env: []v1.EnvVar{{Name: OpenAIAPIKeyEnvVar, Value: "sk-user"}}}}}
+		require.NoError(t, ApplyAppleSiliconBridge(spec, "primary", "abc-123"))
+		env := envMap(spec.Containers[0])
+		assert.Equal(t, "sk-user", env[OpenAIAPIKeyEnvVar])
+		assert.NotContains(t, env, OpenAIBaseURLEnvVar)
+	})
 
 	assert.Error(t, ApplyAppleSiliconBridge(&v1.PodSpec{Containers: []v1.Container{{Name: "x"}}}, "primary", "w"))
 }
