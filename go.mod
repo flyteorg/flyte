@@ -18,6 +18,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.50.4
 	github.com/aws/smithy-go v1.28.5
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
+	github.com/cedar-policy/cedar-go v1.8.0
 	github.com/coocood/freecache v1.2.7
 	github.com/dask/dask-kubernetes/v2023 v2023.0.0-20230626103304-abd02cd17b26
 	github.com/eko/gocache/lib/v4 v4.4.0

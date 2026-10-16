@@ -1,0 +1,72 @@
+// Flyte authorization model v1. Scope IDs are "project/domain".
+namespace Flyte {
+    entity Group;
+    entity Principal in [Group] { issuer: String };
+    entity Deployment;
+    entity Project in [Deployment] { project: String };
+    entity Scope in [Project, Deployment] { project: String, domain: String };
+
+    action "ClusterRead" appliesTo {
+        principal: [Principal], resource: [Deployment], context: {}
+    };
+    action "DataRead" appliesTo {
+        principal: [Principal], resource: [Scope], context: {}
+    };
+    action "DataWrite" appliesTo {
+        principal: [Principal], resource: [Scope], context: {}
+    };
+    action "LogsRead" appliesTo {
+        principal: [Principal], resource: [Scope], context: {}
+    };
+    action "ProjectRead" appliesTo {
+        principal: [Principal], resource: [Project, Deployment], context: {}
+    };
+    action "ProjectWrite" appliesTo {
+        principal: [Principal], resource: [Project], context: {}
+    };
+    action "RunAbort" appliesTo {
+        principal: [Principal], resource: [Scope], context: {}
+    };
+    action "RunCreate" appliesTo {
+        principal: [Principal], resource: [Scope], context: {}
+    };
+    action "RunRead" appliesTo {
+        principal: [Principal], resource: [Scope, Deployment], context: {}
+    };
+    action "RunSignal" appliesTo {
+        principal: [Principal], resource: [Scope], context: {}
+    };
+    action "RuntimeWrite" appliesTo {
+        principal: [Principal], resource: [Deployment], context: {}
+    };
+    action "SettingsRead" appliesTo {
+        principal: [Principal], resource: [Deployment], context: {}
+    };
+    action "SettingsWrite" appliesTo {
+        principal: [Principal], resource: [Deployment], context: {}
+    };
+    action "StorageOverride" appliesTo {
+        principal: [Principal], resource: [Deployment], context: {}
+    };
+    action "TaskDeploy" appliesTo {
+        principal: [Principal], resource: [Scope], context: {}
+    };
+    action "TaskExecute" appliesTo {
+        principal: [Principal], resource: [Scope], context: {}
+    };
+    action "TaskRead" appliesTo {
+        principal: [Principal], resource: [Scope, Deployment], context: {}
+    };
+    action "Translate" appliesTo {
+        principal: [Principal], resource: [Deployment], context: {}
+    };
+    action "TriggerExecute" appliesTo {
+        principal: [Principal], resource: [Scope], context: {}
+    };
+    action "TriggerRead" appliesTo {
+        principal: [Principal], resource: [Scope, Deployment], context: {}
+    };
+    action "TriggerWrite" appliesTo {
+        principal: [Principal], resource: [Scope], context: {}
+    };
+}

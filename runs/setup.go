@@ -11,6 +11,8 @@ import (
 	"connectrpc.com/otelconnect"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/authorization"
+	flyteauth "github.com/flyteorg/flyte/v2/flytestdlib/authorization/flyte"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/sentryutils"
@@ -65,6 +67,17 @@ func deployTriggerInterceptor() connect.UnaryInterceptorFunc {
 // Requires sc.DB and sc.DataStore to be set.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
+	var authInterceptor *authorization.Interceptor
+	if cfg.Authorization.Enabled {
+		var err error
+		authInterceptor, err = authorization.New(cfg.Authorization, flyteauth.Resolve)
+		if err != nil {
+			return fmt.Errorf("runs authorization: %w", err)
+		}
+		if cfg.TriggerScheduler.Enabled && (cfg.SchedulerService.URL == "" || cfg.SchedulerService.Auth.Type == serviceclient.AuthTypeNone) {
+			return fmt.Errorf("Cedar requires an authenticated schedulerService or a disabled trigger scheduler")
+		}
+	}
 	if err := migrations.RunMigrations(ctx, sc.DB); err != nil {
 		return fmt.Errorf("runs: failed to run migrations: %w", err)
 	}
@@ -83,6 +96,13 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	interceptors := []connect.Interceptor{otelInterceptor}
+	protectedInterceptors := []connect.Interceptor{otelInterceptor}
+	projectInterceptors := []connect.Interceptor{otelInterceptor}
+	if authInterceptor != nil {
+		interceptors = append(interceptors, authInterceptor)
+		protectedInterceptors = append(protectedInterceptors, authInterceptor)
+		projectInterceptors = append(projectInterceptors, authorization.ForwardClaims())
+	}
 	if sentryutils.Init(ctx, otelServiceName) {
 		interceptors = append(interceptors, sentryutils.Interceptor(sentryOperations), deployTriggerInterceptor())
 		sc.AddWorker("sentry-flush", func(ctx context.Context) error {
@@ -128,7 +148,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	projectClient := projectconnect.NewProjectServiceClient(
 		http.DefaultClient,
 		runsServiceURL,
-		connect.WithInterceptors(otelInterceptor),
+		connect.WithInterceptors(projectInterceptors...),
 	)
 	abortReconciler := service.NewAbortReconciler(repo, actionsClient, service.AbortReconcilerConfig{
 		Workers:      5,
@@ -148,7 +168,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(runsPath, runsHandler)
 	logger.Infof(ctx, "Mounted RunService at %s", runsPath)
 
-	internalRunsPath, internalRunsHandler := workflowconnect.NewInternalRunServiceHandler(runsSvc, connect.WithInterceptors(otelInterceptor))
+	internalRunsPath, internalRunsHandler := workflowconnect.NewInternalRunServiceHandler(runsSvc, connect.WithInterceptors(protectedInterceptors...))
 	sc.Mux.Handle(internalRunsPath, internalRunsHandler)
 	logger.Infof(ctx, "Mounted InternalRunService at %s", internalRunsPath)
 
@@ -186,12 +206,12 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		})
 	}
 	projectSvc := service.NewProjectService(impl.NewProjectRepo(sc.DB), domains)
-	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(projectSvc, connect.WithInterceptors(otelInterceptor))
+	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(projectSvc, connect.WithInterceptors(protectedInterceptors...))
 	sc.Mux.Handle(projectPath, projectHandler)
 	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
 
 	settingsSvc := service.NewSettingsService(settingsRepo)
-	settingsPath, settingsHandler := settingsconnect.NewSettingsServiceHandler(settingsSvc, connect.WithInterceptors(otelInterceptor))
+	settingsPath, settingsHandler := settingsconnect.NewSettingsServiceHandler(settingsSvc, connect.WithInterceptors(protectedInterceptors...))
 	sc.Mux.Handle(settingsPath, settingsHandler)
 	logger.Infof(ctx, "Mounted SettingsService at %s", settingsPath)
 
@@ -200,7 +220,17 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	if cfg.TriggerScheduler.Enabled {
-		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, http.DefaultClient, runsServiceURL, connect.WithInterceptors(otelInterceptor))
+		schedulerClient := http.DefaultClient
+		schedulerURL := runsServiceURL
+		if cfg.SchedulerService.URL != "" {
+			var err error
+			schedulerClient, err = serviceclient.NewHTTPClient(ctx, http.DefaultClient, cfg.SchedulerService)
+			if err != nil {
+				return fmt.Errorf("runs scheduler client: %w", err)
+			}
+			schedulerURL = cfg.SchedulerService.URL
+		}
+		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, schedulerClient, schedulerURL, connect.WithInterceptors(otelInterceptor))
 		sc.AddWorker("trigger-scheduler", worker)
 		logger.Infof(ctx, "Registered trigger-scheduler worker")
 	}
