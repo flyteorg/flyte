@@ -7,6 +7,7 @@ import (
 
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -25,6 +26,10 @@ type tensorflowOperatorResourceHandler struct {
 
 // Sanity test that the plugin implements method of k8s.Plugin
 var _ k8s.Plugin = tensorflowOperatorResourceHandler{}
+
+// The job's replica pods are where a node daemon records what the hardware did, so the
+// framework has to be able to find them from the CR this plugin tracks.
+var _ k8s.ChildPodDiscovery = tensorflowOperatorResourceHandler{}
 
 func (tensorflowOperatorResourceHandler) GetProperties() k8s.PluginProperties {
 	return k8s.PluginProperties{}
@@ -212,6 +217,20 @@ func (tensorflowOperatorResourceHandler) IsTerminal(_ context.Context, resource 
 		}
 	}
 	return false, nil
+}
+
+// ChildPods implements k8s.ChildPodDiscovery. The pods that run the task are the replica
+// pods the training operator expands from the templates this plugin built, which the
+// framework tracks nothing of, since it tracks the TFJob.
+func (tensorflowOperatorResourceHandler) ChildPods(
+	ctx context.Context,
+	taskCtx pluginsCore.TaskExecutionMetadata,
+	resource client.Object,
+) (labels.Selector, error) {
+	if _, ok := resource.(*kubeflowv1.TFJob); !ok {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "expected a TFJob, got %T", resource)
+	}
+	return common.ChildPods(ctx, taskCtx, resource)
 }
 
 // GetCompletionTime returns the completion time of the TFJob
