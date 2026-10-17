@@ -1279,6 +1279,1847 @@ var _ interface {
 	ErrorName() string
 } = ListVersionsResponseValidationError{}
 
+// Validate checks the field values on TaskAliasName with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *TaskAliasName) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TaskAliasName with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in TaskAliasNameMultiError, or
+// nil if none found.
+func (m *TaskAliasName) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TaskAliasName) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetTaskName()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskAliasNameValidationError{
+					field:  "TaskName",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskAliasNameValidationError{
+					field:  "TaskName",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTaskName()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskAliasNameValidationError{
+				field:  "TaskName",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Alias
+
+	if len(errors) > 0 {
+		return TaskAliasNameMultiError(errors)
+	}
+
+	return nil
+}
+
+// TaskAliasNameMultiError is an error wrapping multiple validation errors
+// returned by TaskAliasName.ValidateAll() if the designated constraints
+// aren't met.
+type TaskAliasNameMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TaskAliasNameMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TaskAliasNameMultiError) AllErrors() []error { return m }
+
+// TaskAliasNameValidationError is the validation error returned by
+// TaskAliasName.Validate if the designated constraints aren't met.
+type TaskAliasNameValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TaskAliasNameValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TaskAliasNameValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TaskAliasNameValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TaskAliasNameValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TaskAliasNameValidationError) ErrorName() string { return "TaskAliasNameValidationError" }
+
+// Error satisfies the builtin error interface
+func (e TaskAliasNameValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTaskAliasName.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TaskAliasNameValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TaskAliasNameValidationError{}
+
+// Validate checks the field values on TaskAlias with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *TaskAlias) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TaskAlias with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in TaskAliasMultiError, or nil
+// if none found.
+func (m *TaskAlias) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TaskAlias) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetName()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskAliasValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskAliasValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetName()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskAliasValidationError{
+				field:  "Name",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Version
+
+	if all {
+		switch v := interface{}(m.GetSetBy()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskAliasValidationError{
+					field:  "SetBy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskAliasValidationError{
+					field:  "SetBy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSetBy()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskAliasValidationError{
+				field:  "SetBy",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetSetAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskAliasValidationError{
+					field:  "SetAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskAliasValidationError{
+					field:  "SetAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSetAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskAliasValidationError{
+				field:  "SetAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return TaskAliasMultiError(errors)
+	}
+
+	return nil
+}
+
+// TaskAliasMultiError is an error wrapping multiple validation errors returned
+// by TaskAlias.ValidateAll() if the designated constraints aren't met.
+type TaskAliasMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TaskAliasMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TaskAliasMultiError) AllErrors() []error { return m }
+
+// TaskAliasValidationError is the validation error returned by
+// TaskAlias.Validate if the designated constraints aren't met.
+type TaskAliasValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TaskAliasValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TaskAliasValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TaskAliasValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TaskAliasValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TaskAliasValidationError) ErrorName() string { return "TaskAliasValidationError" }
+
+// Error satisfies the builtin error interface
+func (e TaskAliasValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTaskAlias.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TaskAliasValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TaskAliasValidationError{}
+
+// Validate checks the field values on TaskAliasRevision with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *TaskAliasRevision) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TaskAliasRevision with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TaskAliasRevisionMultiError, or nil if none found.
+func (m *TaskAliasRevision) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TaskAliasRevision) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for FromVersion
+
+	// no validation rules for ToVersion
+
+	if all {
+		switch v := interface{}(m.GetChangedBy()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskAliasRevisionValidationError{
+					field:  "ChangedBy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskAliasRevisionValidationError{
+					field:  "ChangedBy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetChangedBy()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskAliasRevisionValidationError{
+				field:  "ChangedBy",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetChangedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskAliasRevisionValidationError{
+					field:  "ChangedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskAliasRevisionValidationError{
+					field:  "ChangedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetChangedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskAliasRevisionValidationError{
+				field:  "ChangedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return TaskAliasRevisionMultiError(errors)
+	}
+
+	return nil
+}
+
+// TaskAliasRevisionMultiError is an error wrapping multiple validation errors
+// returned by TaskAliasRevision.ValidateAll() if the designated constraints
+// aren't met.
+type TaskAliasRevisionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TaskAliasRevisionMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TaskAliasRevisionMultiError) AllErrors() []error { return m }
+
+// TaskAliasRevisionValidationError is the validation error returned by
+// TaskAliasRevision.Validate if the designated constraints aren't met.
+type TaskAliasRevisionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TaskAliasRevisionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TaskAliasRevisionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TaskAliasRevisionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TaskAliasRevisionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TaskAliasRevisionValidationError) ErrorName() string {
+	return "TaskAliasRevisionValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TaskAliasRevisionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTaskAliasRevision.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TaskAliasRevisionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TaskAliasRevisionValidationError{}
+
+// Validate checks the field values on SetTaskAliasRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SetTaskAliasRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SetTaskAliasRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SetTaskAliasRequestMultiError, or nil if none found.
+func (m *SetTaskAliasRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SetTaskAliasRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetName()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SetTaskAliasRequestValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SetTaskAliasRequestValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetName()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SetTaskAliasRequestValidationError{
+				field:  "Name",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Version
+
+	if len(errors) > 0 {
+		return SetTaskAliasRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// SetTaskAliasRequestMultiError is an error wrapping multiple validation
+// errors returned by SetTaskAliasRequest.ValidateAll() if the designated
+// constraints aren't met.
+type SetTaskAliasRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SetTaskAliasRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SetTaskAliasRequestMultiError) AllErrors() []error { return m }
+
+// SetTaskAliasRequestValidationError is the validation error returned by
+// SetTaskAliasRequest.Validate if the designated constraints aren't met.
+type SetTaskAliasRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SetTaskAliasRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SetTaskAliasRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SetTaskAliasRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SetTaskAliasRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SetTaskAliasRequestValidationError) ErrorName() string {
+	return "SetTaskAliasRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SetTaskAliasRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSetTaskAliasRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SetTaskAliasRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SetTaskAliasRequestValidationError{}
+
+// Validate checks the field values on SetTaskAliasResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SetTaskAliasResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SetTaskAliasResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SetTaskAliasResponseMultiError, or nil if none found.
+func (m *SetTaskAliasResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SetTaskAliasResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetAlias()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SetTaskAliasResponseValidationError{
+					field:  "Alias",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SetTaskAliasResponseValidationError{
+					field:  "Alias",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAlias()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SetTaskAliasResponseValidationError{
+				field:  "Alias",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for PreviousVersion
+
+	if len(errors) > 0 {
+		return SetTaskAliasResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// SetTaskAliasResponseMultiError is an error wrapping multiple validation
+// errors returned by SetTaskAliasResponse.ValidateAll() if the designated
+// constraints aren't met.
+type SetTaskAliasResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SetTaskAliasResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SetTaskAliasResponseMultiError) AllErrors() []error { return m }
+
+// SetTaskAliasResponseValidationError is the validation error returned by
+// SetTaskAliasResponse.Validate if the designated constraints aren't met.
+type SetTaskAliasResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SetTaskAliasResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SetTaskAliasResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SetTaskAliasResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SetTaskAliasResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SetTaskAliasResponseValidationError) ErrorName() string {
+	return "SetTaskAliasResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SetTaskAliasResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSetTaskAliasResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SetTaskAliasResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SetTaskAliasResponseValidationError{}
+
+// Validate checks the field values on GetTaskAliasRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetTaskAliasRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetTaskAliasRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetTaskAliasRequestMultiError, or nil if none found.
+func (m *GetTaskAliasRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetTaskAliasRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetName()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetTaskAliasRequestValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetTaskAliasRequestValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetName()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetTaskAliasRequestValidationError{
+				field:  "Name",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetTaskAliasRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetTaskAliasRequestMultiError is an error wrapping multiple validation
+// errors returned by GetTaskAliasRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetTaskAliasRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetTaskAliasRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetTaskAliasRequestMultiError) AllErrors() []error { return m }
+
+// GetTaskAliasRequestValidationError is the validation error returned by
+// GetTaskAliasRequest.Validate if the designated constraints aren't met.
+type GetTaskAliasRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetTaskAliasRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetTaskAliasRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetTaskAliasRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetTaskAliasRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetTaskAliasRequestValidationError) ErrorName() string {
+	return "GetTaskAliasRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetTaskAliasRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetTaskAliasRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetTaskAliasRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetTaskAliasRequestValidationError{}
+
+// Validate checks the field values on GetTaskAliasResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetTaskAliasResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetTaskAliasResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetTaskAliasResponseMultiError, or nil if none found.
+func (m *GetTaskAliasResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetTaskAliasResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetAlias()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetTaskAliasResponseValidationError{
+					field:  "Alias",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetTaskAliasResponseValidationError{
+					field:  "Alias",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAlias()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetTaskAliasResponseValidationError{
+				field:  "Alias",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetTaskAliasResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetTaskAliasResponseMultiError is an error wrapping multiple validation
+// errors returned by GetTaskAliasResponse.ValidateAll() if the designated
+// constraints aren't met.
+type GetTaskAliasResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetTaskAliasResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetTaskAliasResponseMultiError) AllErrors() []error { return m }
+
+// GetTaskAliasResponseValidationError is the validation error returned by
+// GetTaskAliasResponse.Validate if the designated constraints aren't met.
+type GetTaskAliasResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetTaskAliasResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetTaskAliasResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetTaskAliasResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetTaskAliasResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetTaskAliasResponseValidationError) ErrorName() string {
+	return "GetTaskAliasResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetTaskAliasResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetTaskAliasResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetTaskAliasResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetTaskAliasResponseValidationError{}
+
+// Validate checks the field values on ListTaskAliasesRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListTaskAliasesRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListTaskAliasesRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListTaskAliasesRequestMultiError, or nil if none found.
+func (m *ListTaskAliasesRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListTaskAliasesRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetTaskName()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListTaskAliasesRequestValidationError{
+					field:  "TaskName",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListTaskAliasesRequestValidationError{
+					field:  "TaskName",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTaskName()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListTaskAliasesRequestValidationError{
+				field:  "TaskName",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetRequest()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListTaskAliasesRequestValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListTaskAliasesRequestValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRequest()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListTaskAliasesRequestValidationError{
+				field:  "Request",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ListTaskAliasesRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListTaskAliasesRequestMultiError is an error wrapping multiple validation
+// errors returned by ListTaskAliasesRequest.ValidateAll() if the designated
+// constraints aren't met.
+type ListTaskAliasesRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListTaskAliasesRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListTaskAliasesRequestMultiError) AllErrors() []error { return m }
+
+// ListTaskAliasesRequestValidationError is the validation error returned by
+// ListTaskAliasesRequest.Validate if the designated constraints aren't met.
+type ListTaskAliasesRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListTaskAliasesRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListTaskAliasesRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListTaskAliasesRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListTaskAliasesRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListTaskAliasesRequestValidationError) ErrorName() string {
+	return "ListTaskAliasesRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListTaskAliasesRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListTaskAliasesRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListTaskAliasesRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListTaskAliasesRequestValidationError{}
+
+// Validate checks the field values on ListTaskAliasesResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListTaskAliasesResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListTaskAliasesResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListTaskAliasesResponseMultiError, or nil if none found.
+func (m *ListTaskAliasesResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListTaskAliasesResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetAliases() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListTaskAliasesResponseValidationError{
+						field:  fmt.Sprintf("Aliases[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListTaskAliasesResponseValidationError{
+						field:  fmt.Sprintf("Aliases[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListTaskAliasesResponseValidationError{
+					field:  fmt.Sprintf("Aliases[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for Token
+
+	if len(errors) > 0 {
+		return ListTaskAliasesResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListTaskAliasesResponseMultiError is an error wrapping multiple validation
+// errors returned by ListTaskAliasesResponse.ValidateAll() if the designated
+// constraints aren't met.
+type ListTaskAliasesResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListTaskAliasesResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListTaskAliasesResponseMultiError) AllErrors() []error { return m }
+
+// ListTaskAliasesResponseValidationError is the validation error returned by
+// ListTaskAliasesResponse.Validate if the designated constraints aren't met.
+type ListTaskAliasesResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListTaskAliasesResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListTaskAliasesResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListTaskAliasesResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListTaskAliasesResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListTaskAliasesResponseValidationError) ErrorName() string {
+	return "ListTaskAliasesResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListTaskAliasesResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListTaskAliasesResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListTaskAliasesResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListTaskAliasesResponseValidationError{}
+
+// Validate checks the field values on DeleteTaskAliasRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeleteTaskAliasRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteTaskAliasRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeleteTaskAliasRequestMultiError, or nil if none found.
+func (m *DeleteTaskAliasRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteTaskAliasRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetName()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DeleteTaskAliasRequestValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DeleteTaskAliasRequestValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetName()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DeleteTaskAliasRequestValidationError{
+				field:  "Name",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DeleteTaskAliasRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeleteTaskAliasRequestMultiError is an error wrapping multiple validation
+// errors returned by DeleteTaskAliasRequest.ValidateAll() if the designated
+// constraints aren't met.
+type DeleteTaskAliasRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteTaskAliasRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteTaskAliasRequestMultiError) AllErrors() []error { return m }
+
+// DeleteTaskAliasRequestValidationError is the validation error returned by
+// DeleteTaskAliasRequest.Validate if the designated constraints aren't met.
+type DeleteTaskAliasRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteTaskAliasRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteTaskAliasRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteTaskAliasRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteTaskAliasRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteTaskAliasRequestValidationError) ErrorName() string {
+	return "DeleteTaskAliasRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteTaskAliasRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteTaskAliasRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteTaskAliasRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteTaskAliasRequestValidationError{}
+
+// Validate checks the field values on DeleteTaskAliasResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeleteTaskAliasResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteTaskAliasResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeleteTaskAliasResponseMultiError, or nil if none found.
+func (m *DeleteTaskAliasResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteTaskAliasResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DeleteTaskAliasResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeleteTaskAliasResponseMultiError is an error wrapping multiple validation
+// errors returned by DeleteTaskAliasResponse.ValidateAll() if the designated
+// constraints aren't met.
+type DeleteTaskAliasResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteTaskAliasResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteTaskAliasResponseMultiError) AllErrors() []error { return m }
+
+// DeleteTaskAliasResponseValidationError is the validation error returned by
+// DeleteTaskAliasResponse.Validate if the designated constraints aren't met.
+type DeleteTaskAliasResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteTaskAliasResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteTaskAliasResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteTaskAliasResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteTaskAliasResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteTaskAliasResponseValidationError) ErrorName() string {
+	return "DeleteTaskAliasResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteTaskAliasResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteTaskAliasResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteTaskAliasResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteTaskAliasResponseValidationError{}
+
+// Validate checks the field values on GetTaskAliasHistoryRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetTaskAliasHistoryRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetTaskAliasHistoryRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetTaskAliasHistoryRequestMultiError, or nil if none found.
+func (m *GetTaskAliasHistoryRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetTaskAliasHistoryRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetName()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetTaskAliasHistoryRequestValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetTaskAliasHistoryRequestValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetName()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetTaskAliasHistoryRequestValidationError{
+				field:  "Name",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetRequest()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetTaskAliasHistoryRequestValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetTaskAliasHistoryRequestValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRequest()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetTaskAliasHistoryRequestValidationError{
+				field:  "Request",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetTaskAliasHistoryRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetTaskAliasHistoryRequestMultiError is an error wrapping multiple
+// validation errors returned by GetTaskAliasHistoryRequest.ValidateAll() if
+// the designated constraints aren't met.
+type GetTaskAliasHistoryRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetTaskAliasHistoryRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetTaskAliasHistoryRequestMultiError) AllErrors() []error { return m }
+
+// GetTaskAliasHistoryRequestValidationError is the validation error returned
+// by GetTaskAliasHistoryRequest.Validate if the designated constraints aren't met.
+type GetTaskAliasHistoryRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetTaskAliasHistoryRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetTaskAliasHistoryRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetTaskAliasHistoryRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetTaskAliasHistoryRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetTaskAliasHistoryRequestValidationError) ErrorName() string {
+	return "GetTaskAliasHistoryRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetTaskAliasHistoryRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetTaskAliasHistoryRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetTaskAliasHistoryRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetTaskAliasHistoryRequestValidationError{}
+
+// Validate checks the field values on GetTaskAliasHistoryResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetTaskAliasHistoryResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetTaskAliasHistoryResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetTaskAliasHistoryResponseMultiError, or nil if none found.
+func (m *GetTaskAliasHistoryResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetTaskAliasHistoryResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetRevisions() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetTaskAliasHistoryResponseValidationError{
+						field:  fmt.Sprintf("Revisions[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetTaskAliasHistoryResponseValidationError{
+						field:  fmt.Sprintf("Revisions[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetTaskAliasHistoryResponseValidationError{
+					field:  fmt.Sprintf("Revisions[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for Token
+
+	if len(errors) > 0 {
+		return GetTaskAliasHistoryResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetTaskAliasHistoryResponseMultiError is an error wrapping multiple
+// validation errors returned by GetTaskAliasHistoryResponse.ValidateAll() if
+// the designated constraints aren't met.
+type GetTaskAliasHistoryResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetTaskAliasHistoryResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetTaskAliasHistoryResponseMultiError) AllErrors() []error { return m }
+
+// GetTaskAliasHistoryResponseValidationError is the validation error returned
+// by GetTaskAliasHistoryResponse.Validate if the designated constraints
+// aren't met.
+type GetTaskAliasHistoryResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetTaskAliasHistoryResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetTaskAliasHistoryResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetTaskAliasHistoryResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetTaskAliasHistoryResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetTaskAliasHistoryResponseValidationError) ErrorName() string {
+	return "GetTaskAliasHistoryResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetTaskAliasHistoryResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetTaskAliasHistoryResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetTaskAliasHistoryResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetTaskAliasHistoryResponseValidationError{}
+
 // Validate checks the field values on ListTasksRequest_KnownFilter with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.

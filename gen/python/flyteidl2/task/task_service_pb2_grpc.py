@@ -35,6 +35,31 @@ class TaskServiceStub(object):
                 request_serializer=flyteidl2_dot_task_dot_task__service__pb2.ListVersionsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_task_dot_task__service__pb2.ListVersionsResponse.FromString,
                 )
+        self.SetTaskAlias = channel.unary_unary(
+                '/flyteidl2.task.TaskService/SetTaskAlias',
+                request_serializer=flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasResponse.FromString,
+                )
+        self.GetTaskAlias = channel.unary_unary(
+                '/flyteidl2.task.TaskService/GetTaskAlias',
+                request_serializer=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasResponse.FromString,
+                )
+        self.ListTaskAliases = channel.unary_unary(
+                '/flyteidl2.task.TaskService/ListTaskAliases',
+                request_serializer=flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesResponse.FromString,
+                )
+        self.DeleteTaskAlias = channel.unary_unary(
+                '/flyteidl2.task.TaskService/DeleteTaskAlias',
+                request_serializer=flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasResponse.FromString,
+                )
+        self.GetTaskAliasHistory = channel.unary_unary(
+                '/flyteidl2.task.TaskService/GetTaskAliasHistory',
+                request_serializer=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryResponse.FromString,
+                )
 
 
 class TaskServiceServicer(object):
@@ -69,6 +94,44 @@ class TaskServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SetTaskAlias(self, request, context):
+        """Create an alias, or move an existing one to a different version. This is the
+        promote/rollback operation: deliberate, audited, and never a side effect of
+        deploying. Carries its own authz action so "may promote, may not deploy" is
+        expressible.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetTaskAlias(self, request, context):
+        """Resolve an alias to its current version, with who moved it there and when.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ListTaskAliases(self, request, context):
+        """List every alias defined for a task.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeleteTaskAlias(self, request, context):
+        """Remove an alias. The versions it pointed at are unaffected.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetTaskAliasHistory(self, request, context):
+        """Full move history for one alias: every from -> to, who, when.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_TaskServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -91,6 +154,31 @@ def add_TaskServiceServicer_to_server(servicer, server):
                     servicer.ListVersions,
                     request_deserializer=flyteidl2_dot_task_dot_task__service__pb2.ListVersionsRequest.FromString,
                     response_serializer=flyteidl2_dot_task_dot_task__service__pb2.ListVersionsResponse.SerializeToString,
+            ),
+            'SetTaskAlias': grpc.unary_unary_rpc_method_handler(
+                    servicer.SetTaskAlias,
+                    request_deserializer=flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasRequest.FromString,
+                    response_serializer=flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasResponse.SerializeToString,
+            ),
+            'GetTaskAlias': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTaskAlias,
+                    request_deserializer=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasRequest.FromString,
+                    response_serializer=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasResponse.SerializeToString,
+            ),
+            'ListTaskAliases': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListTaskAliases,
+                    request_deserializer=flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesRequest.FromString,
+                    response_serializer=flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesResponse.SerializeToString,
+            ),
+            'DeleteTaskAlias': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteTaskAlias,
+                    request_deserializer=flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasRequest.FromString,
+                    response_serializer=flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasResponse.SerializeToString,
+            ),
+            'GetTaskAliasHistory': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTaskAliasHistory,
+                    request_deserializer=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryRequest.FromString,
+                    response_serializer=flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -168,5 +256,90 @@ class TaskService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.task.TaskService/ListVersions',
             flyteidl2_dot_task_dot_task__service__pb2.ListVersionsRequest.SerializeToString,
             flyteidl2_dot_task_dot_task__service__pb2.ListVersionsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SetTaskAlias(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.task.TaskService/SetTaskAlias',
+            flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasRequest.SerializeToString,
+            flyteidl2_dot_task_dot_task__service__pb2.SetTaskAliasResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetTaskAlias(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.task.TaskService/GetTaskAlias',
+            flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasRequest.SerializeToString,
+            flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ListTaskAliases(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.task.TaskService/ListTaskAliases',
+            flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesRequest.SerializeToString,
+            flyteidl2_dot_task_dot_task__service__pb2.ListTaskAliasesResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def DeleteTaskAlias(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.task.TaskService/DeleteTaskAlias',
+            flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasRequest.SerializeToString,
+            flyteidl2_dot_task_dot_task__service__pb2.DeleteTaskAliasResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetTaskAliasHistory(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.task.TaskService/GetTaskAliasHistory',
+            flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryRequest.SerializeToString,
+            flyteidl2_dot_task_dot_task__service__pb2.GetTaskAliasHistoryResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
