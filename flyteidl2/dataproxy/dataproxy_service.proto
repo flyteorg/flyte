@@ -41,6 +41,123 @@ service DataProxyService {
 
   // Stream logs for an action attempt.
   rpc TailLogs(TailLogsRequest) returns (stream TailLogsResponse) {}
+
+  // GetCloudCredentials vends short-lived, prefix-scoped object-store credentials
+  // for one resource inside the caller's project/domain.
+  //
+  // This is the capability form of CreateUploadLocation. A signed URL is a
+  // capability for ONE object with conditions attached; these credentials are a
+  // capability over a PREFIX, for as long as they last. Which to use is a
+  // per-call-site choice and both are supported:
+  //
+  //   * Credentials when a client touches many objects it discovers as it goes
+  //     -- a mounted Volume reads and writes thousands of chunk keys, so a
+  //     signed URL per object is not a workable shape.
+  //   * A signed URL when the platform must constrain the write (it binds
+  //     content_md5 and a size, which credentials cannot), or when the consumer
+  //     is a browser with no cloud SDK (see CreateDownloadLink).
+  rpc GetCloudCredentials(GetCloudCredentialsRequest) returns (GetCloudCredentialsResponse) {}
+}
+
+// CredentialAccess is what the caller intends to do with the data. The verbs
+// each access implies are decided by the server: a request that could name its
+// own actions (or carry its own policy) would be a request that could ask for
+// more than its resource.
+enum CredentialAccess {
+  CREDENTIAL_ACCESS_UNSPECIFIED = 0;
+  CREDENTIAL_ACCESS_READ = 1;
+  CREDENTIAL_ACCESS_READ_WRITE = 2;
+}
+
+// CredentialKind says what shape the returned credentials are, because that is
+// not the same across clouds. A client that cannot use a given kind must fail
+// rather than assume: an Azure SAS put into an AWS key field would be used to
+// sign a request with an empty secret.
+enum CredentialKind {
+  CREDENTIAL_KIND_UNSPECIFIED = 0;
+  // An AWS SigV4 triple: access key, secret and session token.
+  CREDENTIAL_KIND_AWS_SIGV4 = 1;
+  // A GCP OAuth2 access token, downscoped with a Credential Access Boundary,
+  // in session_token.
+  CREDENTIAL_KIND_GCP_ACCESS_TOKEN = 2;
+  // An Azure user-delegation SAS query string in session_token.
+  CREDENTIAL_KIND_AZURE_SAS = 3;
+}
+
+// ProjectDataArea names the project/domain's own data area -- the same place
+// CreateUploadLocation writes to. A marker message rather than a bare bool so
+// it can grow a field without a breaking change.
+message ProjectDataArea {}
+
+// VolumeData names one Volume by its locator.
+message VolumeData {
+  // The object-store URI of the volume version's metadata object, as
+  // Volume.locator reports it. It must resolve inside the request's scope:
+  // a locator is a path, and paths are not authorization.
+  // +required
+  string locator = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// GetCloudCredentialsRequest asks for credentials for a resource, never for a
+// path.
+//
+// "Credentials for s3://bucket/path" is the tempting shape and the wrong one:
+// the server would have to decide whether this identity may touch that path,
+// which means inventing a path->resource->authorization mapping and keeping it
+// correct forever. Keyed by a resource inside a scope, authorization is the
+// question the platform already answers, and the path is an OUTPUT.
+message GetCloudCredentialsRequest {
+  // The project/domain this is for. Authorization is answered here, and it is
+  // also the boundary: every prefix the response grants lives inside it.
+  // +required
+  common.ProjectIdentifier scope = 1;
+
+  // Which resource inside the scope.
+  oneof resource {
+    option (buf.validate.oneof).required = true;
+
+    ProjectDataArea project_data = 2;
+    VolumeData volume = 3;
+  }
+
+  // +optional. Unspecified reads as READ, which is the safe direction for a
+  // caller that forgot to say.
+  CredentialAccess access = 4;
+
+  // Narrowing WITHIN the resolved resource, relative to its prefix. Safe to
+  // accept from a client because narrowing cannot widen: a caller that needs
+  // one key says so and gets a session that can reach one key.
+  // +optional
+  repeated string subpaths = 5;
+
+  // +optional. Clamped to the server's configured maximum; the default comes
+  // from configuration.
+  google.protobuf.Duration duration = 6;
+}
+
+// GetCloudCredentialsResponse carries credentials. Every field but kind,
+// expiration, bucket_uri and granted_prefixes is a secret: do not log it.
+message GetCloudCredentialsResponse {
+  CredentialKind kind = 1;
+
+  string access_key_id = 2;
+  string secret_access_key = 3;
+  // The AWS session token, or -- for the other kinds -- the OAuth2 access
+  // token or the SAS query string.
+  string session_token = 4;
+
+  // When these stop working. A client that cannot parse this cannot refresh,
+  // so it is always set.
+  google.protobuf.Timestamp expiration = 5;
+
+  // Where the data is, resolved, so the client works none of it out. For S3
+  // this is region-qualified on purpose: a client given a bare bucket may ask
+  // the store for its location, and a scoped session is not permitted that
+  // call.
+  string bucket_uri = 6;
+
+  // The prefixes these credentials can actually reach, relative to the bucket.
+  repeated string granted_prefixes = 7;
 }
 
 // CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.
