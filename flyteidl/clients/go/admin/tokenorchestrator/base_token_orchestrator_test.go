@@ -2,6 +2,8 @@ package tokenorchestrator
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -114,4 +116,34 @@ func TestFetchFromCache(t *testing.T) {
 		assert.NotNil(t, refreshedToken)
 		mockTokenCacheProvider.AssertNotCalled(t, "SaveToken")
 	})
+}
+
+func TestRefreshTheTokenWithIDToken(t *testing.T) {
+	ctx := context.Background()
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.NoError(t, r.ParseForm())
+		assert.Equal(t, "refresh_token", r.Form.Get("grant_type"))
+		assert.Equal(t, "old-refresh", r.Form.Get("refresh_token"))
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"access_token": "new-access", "refresh_token": "new-refresh", "token_type": "bearer", "expires_in": 3600, "id_token": "new-id"}`))
+	}))
+	defer server.Close()
+
+	tokenCacheProvider := cache.NewTokenCacheInMemoryProvider()
+	orchestrator := BaseTokenOrchestrator{
+		ClientConfig: &oauth.Config{
+			Config:    &oauth2.Config{ClientID: "flytectl", Endpoint: oauth2.Endpoint{TokenURL: server.URL}},
+			TokenType: oauth.TokenTypeIDToken,
+		},
+		TokenCache: tokenCacheProvider,
+	}
+	expired := &oauth2.Token{AccessToken: "old-id", RefreshToken: "old-refresh", TokenType: oauth.TokenTypeIDToken, Expiry: time.Now().Add(-time.Hour)}
+	refreshed, err := orchestrator.RefreshToken(ctx, expired)
+	assert.NoError(t, err)
+	assert.Equal(t, "new-id", refreshed.AccessToken)
+	assert.Equal(t, "new-refresh", refreshed.RefreshToken)
+	assert.Equal(t, oauth.TokenTypeIDToken, refreshed.Type())
+	cached, err := tokenCacheProvider.GetToken()
+	assert.NoError(t, err)
+	assert.Equal(t, "new-id", cached.AccessToken)
 }

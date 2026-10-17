@@ -123,3 +123,72 @@ func TestFetchFromAuthFlow(t *testing.T) {
 		assert.True(t, authToken.Expiry.After(time.Now().Add(time.Second*200)))
 	})
 }
+
+func TestFetchFromAuthFlowWithIDToken(t *testing.T) {
+	ctx := context.Background()
+	newServer := func(t *testing.T, tokenResponse string) *httptest.Server {
+		return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			body, err := io.ReadAll(r.Body)
+			assert.Nil(t, err)
+			if strings.Contains(string(body), deviceCode) {
+				_, err = w.Write([]byte(tokenResponse))
+				assert.Nil(t, err)
+				return
+			}
+			dar := DeviceAuthorizationResponse{DeviceCode: "device-code", UserCode: "USER-CODE", VerificationURI: "https://idp/device", Interval: 1}
+			darBytes, err := json.Marshal(dar)
+			assert.Nil(t, err)
+			_, err = w.Write(darBytes)
+			assert.Nil(t, err)
+		}))
+	}
+	newOrchestrator := func(t *testing.T, server *httptest.Server, tokenType string) TokenOrchestrator {
+		orchestrator, err := NewDeviceFlowTokenOrchestrator(tokenorchestrator.BaseTokenOrchestrator{
+			ClientConfig: &oauth.Config{
+				Config: &oauth2.Config{
+					ClientID: clientID,
+					Scopes:   []string{"openid", "offline_access"},
+					Endpoint: oauth2.Endpoint{TokenURL: server.URL},
+				},
+				DeviceEndpoint: server.URL,
+				TokenType:      tokenType,
+			},
+			TokenCache: cache.NewTokenCacheInMemoryProvider(),
+		}, Config{Timeout: config.Duration{Duration: 1 * time.Minute}})
+		assert.NoError(t, err)
+		return orchestrator
+	}
+
+	t.Run("id token is sent as IDToken", func(t *testing.T) {
+		server := newServer(t, `{"access_token": "access", "refresh_token": "refresh", "token_type": "bearer", "expires_in": 300, "id_token": "id"}`)
+		defer server.Close()
+		orchestrator := newOrchestrator(t, server, oauth.TokenTypeIDToken)
+		authToken, err := orchestrator.FetchTokenFromAuthFlow(ctx)
+		assert.NoError(t, err)
+		assert.Equal(t, "id", authToken.AccessToken)
+		assert.Equal(t, "refresh", authToken.RefreshToken)
+		assert.Equal(t, oauth.TokenTypeIDToken, authToken.Type())
+		cached, err := orchestrator.TokenCache.GetToken()
+		assert.NoError(t, err)
+		assert.Equal(t, "id", cached.AccessToken)
+	})
+
+	t.Run("bearer keeps the access token", func(t *testing.T) {
+		server := newServer(t, `{"access_token": "access", "token_type": "bearer", "expires_in": 300, "id_token": "id"}`)
+		defer server.Close()
+		orchestrator := newOrchestrator(t, server, oauth.TokenTypeBearer)
+		authToken, err := orchestrator.FetchTokenFromAuthFlow(ctx)
+		assert.NoError(t, err)
+		assert.Equal(t, "access", authToken.AccessToken)
+		assert.Equal(t, "Bearer", authToken.Type())
+	})
+
+	t.Run("id token missing", func(t *testing.T) {
+		server := newServer(t, `{"access_token": "access", "token_type": "bearer", "expires_in": 300}`)
+		defer server.Close()
+		orchestrator := newOrchestrator(t, server, oauth.TokenTypeIDToken)
+		authToken, err := orchestrator.FetchTokenFromAuthFlow(ctx)
+		assert.Error(t, err)
+		assert.Nil(t, authToken)
+	})
+}
