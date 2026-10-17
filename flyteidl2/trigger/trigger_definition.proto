@@ -72,6 +72,7 @@ enum TriggerRevisionAction {
   TRIGGER_REVISION_ACTION_ACTIVATE = 2;
   TRIGGER_REVISION_ACTION_DEACTIVATE = 3;
   TRIGGER_REVISION_ACTION_DELETE = 4;
+  TRIGGER_REVISION_ACTION_PROMOTE = 5;
 }
 
 // Light-weight information about a single trigger revision
@@ -86,6 +87,9 @@ message TriggerRevision {
 
   // Timestamp at which given revision was created.
   google.protobuf.Timestamp created_at = 5;
+
+  // Task version the trigger pointed at in this revision.
+  string task_version = 6;
 }
 
 // Full details about a trigger stored in DB
@@ -103,6 +107,10 @@ message TriggerDetails {
 
   // Trigger description
   optional string description = 6 [(buf.validate.field).string.max_len = 255];
+
+  // Whether the trigger was promoted to spec.task_version. A pinned trigger is not moved by
+  // deploying its task; an unpinned one follows every deploy.
+  bool task_version_pinned = 7;
 }
 
 // Light-weight information about trigger for a list view

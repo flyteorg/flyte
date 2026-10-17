@@ -770,6 +770,8 @@ func (m *TriggerRevision) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for TaskVersion
+
 	if len(errors) > 0 {
 		return TriggerRevisionMultiError(errors)
 	}
@@ -1014,6 +1016,8 @@ func (m *TriggerDetails) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for TaskVersionPinned
 
 	if m.Description != nil {
 		// no validation rules for Description
