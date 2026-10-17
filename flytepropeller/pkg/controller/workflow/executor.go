@@ -494,22 +494,36 @@ func (c *workflowExecutor) HandleAbortedWorkflow(ctx context.Context, w *v1alpha
 			return err
 		}
 
-		if w.Status.FailedAttempts > maxRetries {
+		if w.Status.FailedAttempts >= maxRetries {
+			if err != nil {
+				logger.Warningf(ctx, "Discarding cleanup error because system retries are exhausted: %v", err)
+			}
 			err = errors.Errorf(errors.RuntimeExecutionError, w.GetID(), "max number of system retry attempts [%d/%d] exhausted. Last known status message: %v", w.Status.FailedAttempts, maxRetries, w.Status.Message)
 		}
 
 		var status Status
-		if err != nil {
-			// This workflow failed, record that phase and corresponding error message.
-			status = StatusFailed(&core.ExecutionError{
-				Code:    "Workflow abort failed",
+		if w.GetDeletionTimestamp() != nil {
+			// Explicit deletion: abort without running failure node.
+			if err != nil {
+				status = StatusFailed(&core.ExecutionError{
+					Code:    "Workflow abort failed",
+					Message: err.Error(),
+					Kind:    core.ExecutionError_SYSTEM,
+				})
+			} else {
+				status = Status{TransitionToPhase: v1alpha1.WorkflowPhaseAborted}
+			}
+		} else {
+			// Max system retries exhausted: give on_failure a chance to run.
+			execErr := &core.ExecutionError{
+				Code:    errors.RuntimeExecutionError.String(),
 				Message: err.Error(),
 				Kind:    core.ExecutionError_SYSTEM,
-			})
-		} else {
-			// Otherwise, this workflow is aborted.
-			status = Status{
-				TransitionToPhase: v1alpha1.WorkflowPhaseAborted,
+			}
+			if failureNode := w.GetOnFailureNode(); failureNode != nil {
+				status = StatusFailureNode(execErr)
+			} else {
+				status = StatusFailed(execErr)
 			}
 		}
 		if err := c.TransitionToPhase(ctx, w.ExecutionID.WorkflowExecutionIdentifier, w.GetExecutionStatus(), status); err != nil {
