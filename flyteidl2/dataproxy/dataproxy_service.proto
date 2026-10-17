@@ -91,6 +91,13 @@ message CreateUploadLocationRequest {
   // This is validated against the platform's maximum upload size if provided.
   // +optional
   int64 content_length = 9;
+
+  // Queue is the name of the queue the run that consumes this upload will be placed on,
+  // resolved in the project/domain scope like RunSpec.queue. When set, the upload location
+  // is created in the object store of that queue's cluster pool; when empty, the
+  // project/domain default queue's pool is used. Single-cluster deployments may ignore it.
+  // +optional
+  string queue = 10;
 }
 
 // CreateUploadLocationResponse specifies the response for the CreateUploadLocation API.
@@ -143,6 +150,12 @@ message UploadInputsRequest {
   // When empty, the server resolves the base from org/project/domain settings,
   // then the dataplane cluster default.
   string base_dir = 7;
+
+  // Optional name of the queue the run will be placed on, resolved in the run's
+  // project/domain scope like RunSpec.queue. When set, the inputs are written to
+  // the object store of that queue's cluster pool; when empty, the project/domain
+  // default queue's pool is used. Single-cluster deployments may ignore it.
+  string queue = 8;
 }
 
 message UploadInputsResponse {
