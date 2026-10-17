@@ -55,14 +55,32 @@ const maxUserExitCode = 127
 // place that reason survives: to the kubelet the deletion looks like any other.
 const TerminationTargetCondition v1.PodConditionType = "TerminationTarget"
 
+// disruptionTargetReasons are the reasons of the Kubernetes DisruptionTarget condition that mark a
+// pod the cluster removed: preempted by a scheduler (kube-scheduler, or KAI with
+// --update-pod-eviction-condition), evicted through the eviction API (a drain), deleted by the
+// taint manager or the pod garbage collector. TerminationByKubelet is left out: it also marks a
+// node-pressure eviction, which the task's own memory use can cause.
+var disruptionTargetReasons = sets.NewString(
+	v1.PodReasonPreemptionByScheduler,
+	// Set by Kubernetes components, but not exported by k8s.io/api.
+	"EvictionByEvictionAPI",
+	"DeletionByTaintManager",
+	"DeletionByPodGC",
+)
+
 // GetTerminationTarget returns the TerminationTarget condition when an external controller marked
-// the pod for termination, nil otherwise. Only the condition type is matched: the reason Kueue
-// writes there has changed across its releases (StoppedByKueue, WorkloadEvicted,
+// the pod for termination, or the DisruptionTarget condition when the cluster removed it for one of
+// disruptionTargetReasons, nil otherwise. For TerminationTarget only the condition type is matched:
+// the reason Kueue writes there has changed across its releases (StoppedByKueue, WorkloadEvicted,
 // WorkloadEvictedDueToPreempted) and is reported as it is.
 func GetTerminationTarget(status v1.PodStatus) *v1.PodCondition {
 	for i := range status.Conditions {
 		c := &status.Conditions[i]
-		if c.Type == TerminationTargetCondition && c.Status == v1.ConditionTrue {
+		if c.Status != v1.ConditionTrue {
+			continue
+		}
+		if c.Type == TerminationTargetCondition ||
+			(c.Type == v1.DisruptionTarget && disruptionTargetReasons.Has(c.Reason)) {
 			return c
 		}
 	}

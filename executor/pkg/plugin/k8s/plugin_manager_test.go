@@ -950,6 +950,23 @@ func TestClassifyExternalTermination(t *testing.T) {
 			wantInfo:    deletedInfo,
 		},
 		{
+			name: "a pod a scheduler preempted reports the preemption",
+			resource: func() *v1.Pod {
+				pod := failedPod()
+				pod.Status.Conditions = []v1.PodCondition{{
+					Type:    v1.DisruptionTarget,
+					Status:  v1.ConditionTrue,
+					Reason:  v1.PodReasonPreemptionByScheduler,
+					Message: "Pod ns/pod was preempted by higher priority workload ns/other",
+				}}
+				return pod
+			}(),
+			phaseInfo:   deleted(),
+			wantCode:    v1.PodReasonPreemptionByScheduler,
+			wantMessage: "Pod was terminated by an external controller: Pod ns/pod was preempted by higher priority workload ns/other",
+			wantInfo:    deletedInfo,
+		},
+		{
 			name:      "a pod mid-deletion without the condition is left alone",
 			resource:  failedPod(),
 			phaseInfo: deleted(),
