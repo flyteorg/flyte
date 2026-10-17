@@ -46,17 +46,18 @@ func IsFileReadable(fpath string, ignoreExtension bool) (string, os.FileInfo, er
 
 // Uploads a file to the data store.
 func UploadFileToStorage(ctx context.Context, filePath string, toPath storage.DataReference, size int64, store *storage.DataStore) error {
-	f, err := os.Open(filePath)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		err := f.Close()
+	return retryOnSpecificErrors(ctx, uploadFileRetryMaxAttemptIndex, uploadFileRetryDelay, func() error {
+		f, err := os.Open(filePath)
 		if err != nil {
-			logger.Errorf(ctx, "failed to close blob file at path [%s]", filePath)
+			return err
 		}
-	}()
-	return store.WriteRaw(ctx, toPath, size, storage.Options{}, f)
+		defer func() {
+			if cerr := f.Close(); cerr != nil {
+				logger.Errorf(ctx, "failed to close blob file at path [%s]", filePath)
+			}
+		}()
+		return store.WriteRaw(ctx, toPath, size, storage.Options{}, f)
+	}, retryOnAllErrors)
 }
 
 func DownloadFileFromStorage(ctx context.Context, ref storage.DataReference, store *storage.DataStore) (io.ReadCloser, error) {
