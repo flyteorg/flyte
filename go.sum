@@ -385,10 +385,10 @@ github.com/prometheus/procfs v0.22.0 h1:6q9+/JL9IKAPbCmBrv9n5O5Ty3NKnciV5X7YGw0o
 github.com/prometheus/procfs v0.22.0/go.mod h1:CvmFr/GVhIjIvWJZW3tgkODBQMRIf0EyWMQLHCHab58=
 github.com/ray-project/kuberay/ray-operator v1.6.2 h1:XUckRswLMyk71D00L62d2Vanh0fVkNqu56+IF/rr+O0=
 github.com/ray-project/kuberay/ray-operator v1.6.2/go.mod h1:7vBLj6LNKuqbgERKugX3tsYm7uYRFwoE5BpQBUADeK0=
-github.com/redis/go-redis/extra/rediscmd/v9 v9.22.0 h1:MQPzEEnpD0BMPufBLABnMYLJVwM7xi7vZ+srO8Nr0s8=
-github.com/redis/go-redis/extra/rediscmd/v9 v9.22.0/go.mod h1:eve0JFcLRwFVj3RA85rrrV5+UJ+K9LDyU7kf2UdSueM=
-github.com/redis/go-redis/extra/redisotel/v9 v9.22.0 h1:t5ul1Gl0o1rYQj5f5bK12G9xcg1niq2ON4yZFjvy1kA=
-github.com/redis/go-redis/extra/redisotel/v9 v9.22.0/go.mod h1:hcS9L2RBBjYXkrfSOF26ZGejgo+yOC+28ZD2fkk3sGs=
+github.com/redis/go-redis/extra/rediscmd/v9 v9.23.0 h1:YOQCtePRR/cBrxtZB5u2ueYei3zGJm1n0KB2tvth0k0=
+github.com/redis/go-redis/extra/rediscmd/v9 v9.23.0/go.mod h1:BzBb5fEjIwijUn8VVkXfQUwFTGyk2vGIVU19zv2GhsM=
+github.com/redis/go-redis/extra/redisotel/v9 v9.23.0 h1:EBQ01zUjwarZZ4IoSTQNU9EEc223eB9tpSun6n5EaUU=
+github.com/redis/go-redis/extra/redisotel/v9 v9.23.0/go.mod h1:4xBZ7QF+cd90pc58g+cXH1aLJBgOGd4Gp5BBQvNtPn0=
 github.com/redis/go-redis/extra/redisprometheus/v9 v9.23.0 h1:CmyhTsNbG1SpF3ECWIY27hPT6VXghWphO7xLPxqkSv8=
 github.com/redis/go-redis/extra/redisprometheus/v9 v9.23.0/go.mod h1:aeYwZ9++CPOjmbGY6Mc3fTWCerm9E5j3oRxDwWGE9WA=
 github.com/redis/go-redis/v9 v9.23.0 h1:/TTVdJa8BRNsybwwGGnmiYktHNlUXtbOQxlWpHBPL3s=
