@@ -83,8 +83,6 @@ func truncateAllTablesForTestingOnly() {
 	TruncateResources := fmt.Sprintf("TRUNCATE TABLE resources;")
 	TruncateSchedulableEntities := fmt.Sprintf("TRUNCATE TABLE schedulable_entities;")
 	TruncateSchedulableEntitiesSnapshots := fmt.Sprintf("TRUNCATE TABLE schedule_entities_snapshots;")
-	TruncateAdminTags := fmt.Sprintf("TRUNCATE TABLE admin_tags;")
-	TruncateExecutionAdminTags := fmt.Sprintf("TRUNCATE TABLE execution_admin_tags;")
 	TruncateExecutionTags := fmt.Sprintf("TRUNCATE TABLE execution_tags;")
 	ctx := context.Background()
 	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
@@ -114,8 +112,6 @@ func truncateAllTablesForTestingOnly() {
 	db.Exec(TruncateResources)
 	db.Exec(TruncateSchedulableEntities)
 	db.Exec(TruncateSchedulableEntitiesSnapshots)
-	db.Exec(TruncateAdminTags)
-	db.Exec(TruncateExecutionAdminTags)
 	db.Exec(TruncateExecutionTags)
 }
 

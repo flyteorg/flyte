@@ -228,6 +228,48 @@ func TestAddTerminalState_DeckURIInFailedExecution(t *testing.T) {
 	assert.Equal(t, DeckURI, closure.GetDeckUri())
 }
 
+func TestAddTerminalState_PreservesExistingDeckUriWhenEventDeckUriEmpty(t *testing.T) {
+	request := admin.NodeExecutionEventRequest{
+		Event: &event.NodeExecutionEvent{
+			Phase:      core.NodeExecution_ABORTED,
+			OccurredAt: occurredAtProto,
+			// DeckUri is empty in abort events
+		},
+	}
+	startedAt := occurredAt.Add(-time.Minute)
+	startedAtProto, _ := ptypes.TimestampProto(startedAt)
+	nodeExecutionModel := models.NodeExecution{
+		StartedAt: &startedAt,
+	}
+	closure := admin.NodeExecutionClosure{
+		StartedAt: startedAtProto,
+		DeckUri:   DeckURI,
+	}
+	err := addTerminalState(context.TODO(), &request, &nodeExecutionModel, &closure,
+		interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
+	assert.Nil(t, err)
+	assert.Equal(t, DeckURI, closure.GetDeckUri())
+}
+
+func TestAddNodeRunningState_PreservesExistingDeckUriWhenEventDeckUriEmpty(t *testing.T) {
+	var startedAt = time.Now().UTC()
+	var startedAtProto, _ = ptypes.TimestampProto(startedAt)
+	request := admin.NodeExecutionEventRequest{
+		Event: &event.NodeExecutionEvent{
+			Phase:      core.NodeExecution_RUNNING,
+			OccurredAt: startedAtProto,
+			// DeckUri is empty
+		},
+	}
+	nodeExecutionModel := models.NodeExecution{}
+	closure := admin.NodeExecutionClosure{
+		DeckUri: DeckURI,
+	}
+	err := addNodeRunningState(&request, &nodeExecutionModel, &closure)
+	assert.Nil(t, err)
+	assert.Equal(t, DeckURI, closure.GetDeckUri())
+}
+
 func TestCreateNodeExecutionModel(t *testing.T) {
 	parentTaskExecID := uint(8)
 	request := &admin.NodeExecutionEventRequest{
@@ -522,6 +564,42 @@ func TestUpdateNodeExecutionModel(t *testing.T) {
 			interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
 		assert.Nil(t, err)
 		assert.Equal(t, nodeExecutionModel.InputURI, testInputURI)
+	})
+	t.Run("preserve deck uri on abort", func(t *testing.T) {
+		initialClosure := &admin.NodeExecutionClosure{
+			Phase:     core.NodeExecution_RUNNING,
+			StartedAt: occurredAtProto,
+			UpdatedAt: occurredAtProto,
+			DeckUri:   DeckURI,
+		}
+		initialClosureBytes, err := proto.Marshal(initialClosure)
+		assert.NoError(t, err)
+
+		startedAt := occurredAt.Add(-time.Minute)
+		nodeExecutionModel := models.NodeExecution{
+			Phase:     core.NodeExecution_RUNNING.String(),
+			Closure:   initialClosureBytes,
+			StartedAt: &startedAt,
+		}
+
+		abortRequest := admin.NodeExecutionEventRequest{
+			Event: &event.NodeExecutionEvent{
+				Id:         sampleNodeExecID,
+				Phase:      core.NodeExecution_ABORTED,
+				OccurredAt: occurredAtProto,
+				// DeckUri is omitted / empty on abort
+			},
+		}
+
+		err = UpdateNodeExecutionModel(context.TODO(), &abortRequest, &nodeExecutionModel, childExecutionID, dynamicWorkflowClosureRef,
+			interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
+		assert.NoError(t, err)
+		assert.Equal(t, core.NodeExecution_ABORTED.String(), nodeExecutionModel.Phase)
+
+		var updatedClosure admin.NodeExecutionClosure
+		err = proto.Unmarshal(nodeExecutionModel.Closure, &updatedClosure)
+		assert.NoError(t, err)
+		assert.Equal(t, DeckURI, updatedClosure.GetDeckUri())
 	})
 }
 

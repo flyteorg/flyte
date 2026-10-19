@@ -156,8 +156,11 @@ Once the prerequisites are in place, follow the instructions in this section to 
            - name: http-metrics
              protocol: TCP
              port: 10254
+         serviceMonitor:
+           enabled: true
 
       The above configuration enables the ``serviceMonitor`` that Prometheus can then use to automatically discover services and scrape metrics from them.
+      If your Prometheus only selects ``ServiceMonitor`` objects with specific labels, add them under ``serviceMonitor.labels``.
        
 .. note::
 
