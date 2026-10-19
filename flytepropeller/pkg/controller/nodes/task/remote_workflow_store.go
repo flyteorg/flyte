@@ -33,7 +33,12 @@ func (r RemoteFileWorkflowStore) PutFlyteWorkflowCRD(ctx context.Context, wf *v1
 		return err
 	}
 
-	return r.store.WriteRaw(ctx, target, int64(len(raw)), storage.Options{}, bytes.NewReader(raw))
+	err = r.store.WriteRaw(ctx, target, int64(len(raw)), storage.Options{}, bytes.NewReader(raw))
+	if err != nil && !storage.IsFailedWriteToCache(err) {
+		return err
+	}
+
+	return nil
 }
 
 func (r RemoteFileWorkflowStore) PutCompiledFlyteWorkflow(ctx context.Context, workflow *core.CompiledWorkflowClosure, target storage.DataReference) error {
@@ -43,8 +48,12 @@ func (r RemoteFileWorkflowStore) PutCompiledFlyteWorkflow(ctx context.Context, w
 func (r RemoteFileWorkflowStore) getRawBytes(ctx context.Context, source storage.DataReference) ([]byte, error) {
 
 	rawReader, err := r.store.ReadRaw(ctx, source)
-	if err != nil {
+	if err != nil && !storage.IsFailedWriteToCache(err) {
 		return nil, err
+	}
+
+	if rawReader == nil {
+		return nil, errors.Errorf("Failed to read [%v], no data returned.", source)
 	}
 
 	buf := bytes.NewBuffer(nil)
