@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.actions;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/common/address.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/identity.proto";
 import "flyteidl2/core/literals.proto";
@@ -113,6 +114,12 @@ message UpdateRequest {
 
   reserved 4;
   reserved "state";
+
+  // Where the running action can be reached, once it is ready to serve (e.g. an interactive sandbox
+  // session). It is delivered to watchers on `ActionUpdate.address` without waiting for the action
+  // to finish. It holds for the rest of the attempt: an update without an address keeps it, and a
+  // new attempt or a terminal phase clears it. Watchers are notified when it changes.
+  flyteidl2.common.ActionAddress address = 5;
 }
 
 // UpdateResponse is the response message for updating the status of an action.

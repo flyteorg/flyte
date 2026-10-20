@@ -421,6 +421,11 @@ enum WorkerKind {
   // Runs sandboxed orchestrator source in an interpreter, with no container
   // (flyte.sandbox.orchestrator).
   WORKER_KIND_SANDBOX = 1;
+
+  // Runs each task in its own microVM, such as an interactive sandbox session, with no pod.
+  // Needs nodes with hardware virtualization. A task of this kind is never retried: a retry
+  // would start a fresh VM at a new address while callers still hold the old one.
+  WORKER_KIND_MICROVM = 2;
 }
 
 // ----------------- First class Plugins

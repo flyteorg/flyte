@@ -241,6 +241,39 @@ func (in *TaskActionSpec) SetActionSpec(spec *workflow.ActionSpec) error {
 // ErrorState captures the structured error returned by the plugin for a
 // failed/aborted attempt. Persisted on TaskAction status so it can be
 // surfaced as a full core.ExecutionError on the ActionUpdate (and reach
+// ActionAddress is where a running action can be reached. Callers use URL when it is set, and
+// otherwise Pod and Path.
+type ActionAddress struct {
+	// Pod is the pod serving the action: its own, or that of a worker serving many actions.
+	// +optional
+	Pod *PodAddress `json:"pod,omitempty"`
+	// Path is the path on Pod that reaches this action (e.g. /s/<session>); empty when the whole
+	// pod serves it.
+	// +optional
+	Path string `json:"path,omitempty"`
+	// URL is an endpoint that cannot be derived from Pod (a gateway or tunnel); it takes
+	// precedence when set.
+	// +optional
+	URL string `json:"url,omitempty"`
+	// Cluster is the cluster the action runs in.
+	// +optional
+	Cluster string `json:"cluster,omitempty"`
+}
+
+// PodAddress locates a pod that serves an action.
+type PodAddress struct {
+	// +optional
+	Namespace string `json:"namespace,omitempty"`
+	// +optional
+	Name string `json:"name,omitempty"`
+	// IP is the pod's IP, reachable from inside the cluster.
+	// +optional
+	IP string `json:"ip,omitempty"`
+	// Port is the port the action serves on.
+	// +optional
+	Port uint32 `json:"port,omitempty"`
+}
+
 // the SDK with its Code intact, e.g. "OOMKilled").
 type ErrorState struct {
 	// Code is the plugin-defined error code (e.g. "OOMKilled",
@@ -369,6 +402,13 @@ type TaskActionStatus struct {
 	// Only meaningful for condition actions.
 	// +optional
 	SignalValue []byte `json:"signalValue,omitempty"`
+
+	// Address is where the running task can be reached, as reported by its worker with
+	// actions.UpdateRequest.address (e.g. an interactive sandbox session). Watchers of the parent
+	// receive it on ActionUpdate.address while the task runs. It is replaced by a later address
+	// and cleared on a new attempt; it is not delivered once the task is terminal.
+	// +optional
+	Address *ActionAddress `json:"address,omitempty"`
 
 	// SignalledBy identifies the principal that signalled the condition.
 	// +optional

@@ -94,7 +94,7 @@ func TestUpdate(t *testing.T) {
 		svc := NewActionsService(m)
 
 		status := &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED}
-		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status).Return(nil)
+		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status, (*common.ActionAddress)(nil)).Return(nil)
 
 		resp, err := svc.Update(context.Background(), connect.NewRequest(&actions.UpdateRequest{
 			ActionId: testActionID,
@@ -106,12 +106,33 @@ func TestUpdate(t *testing.T) {
 		assert.NotNil(t, resp)
 	})
 
+	t.Run("passes the address through", func(t *testing.T) {
+		m := mocks.NewActionsClientInterface(t)
+		svc := NewActionsService(m)
+
+		status := &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_RUNNING}
+		address := &common.ActionAddress{
+			Pod:     &common.PodAddress{Namespace: "ns", Name: "agent-0", Ip: "10.0.0.7", Port: 8080},
+			Path:    "/s/x",
+			Cluster: "c1",
+		}
+		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status, address).Return(nil)
+
+		_, err := svc.Update(context.Background(), connect.NewRequest(&actions.UpdateRequest{
+			ActionId: testActionID,
+			Attempt:  1,
+			Status:   status,
+			Address:  address,
+		}))
+		assert.NoError(t, err)
+	})
+
 	t.Run("client error returns internal", func(t *testing.T) {
 		m := mocks.NewActionsClientInterface(t)
 		svc := NewActionsService(m)
 
 		status := &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_RUNNING}
-		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status).Return(errors.New("write failed"))
+		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status, (*common.ActionAddress)(nil)).Return(errors.New("write failed"))
 
 		_, err := svc.Update(context.Background(), connect.NewRequest(&actions.UpdateRequest{
 			ActionId: testActionID,

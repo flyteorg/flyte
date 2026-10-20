@@ -6912,6 +6912,44 @@ spec:
           status:
             description: status defines the observed state of TaskAction
             properties:
+              address:
+                description: |-
+                  Address is where the running task can be reached, as reported by its worker with
+                  actions.UpdateRequest.address (e.g. an interactive sandbox session). Watchers of the parent
+                  receive it on ActionUpdate.address while the task runs. It is replaced by a later address
+                  and cleared on a new attempt; it is not delivered once the task is terminal.
+                properties:
+                  cluster:
+                    description: Cluster is the cluster the action runs in.
+                    type: string
+                  path:
+                    description: |-
+                      Path is the path on Pod that reaches this action (e.g. /s/<session>); empty when the whole
+                      pod serves it.
+                    type: string
+                  pod:
+                    description: 'Pod is the pod serving the action: its own, or that
+                      of a worker serving many actions.'
+                    properties:
+                      ip:
+                        description: IP is the pod's IP, reachable from inside the
+                          cluster.
+                        type: string
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                      port:
+                        description: Port is the port the action serves on.
+                        format: int32
+                        type: integer
+                    type: object
+                  url:
+                    description: |-
+                      URL is an endpoint that cannot be derived from Pod (a gateway or tunnel); it takes
+                      precedence when set.
+                    type: string
+                type: object
               attemptStartedAt:
                 description: |-
                   AttemptStartedAt is when the current user attempt first entered the Running phase.
