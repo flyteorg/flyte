@@ -202,3 +202,97 @@ func TestWatchActionDetails_GetActionNotFound(t *testing.T) {
 	assert.False(t, stream.Receive())
 	assert.Error(t, stream.Err())
 }
+
+// TestWatchActionDetails_StaysOpenAcrossTimeoutRetry covers the #7910 review
+// finding: a timed-out attempt emits a terminal TIMED_OUT event for attempt N
+// before the action restarts as attempt N+1, and the stream must survive that
+// window. Writes below follow the executor's ordering exactly — terminal event
+// first, actions row second — and the stream must only close on the terminal
+// attempt that is also the action's current attempt.
+func TestWatchActionDetails_StaysOpenAcrossTimeoutRetry(t *testing.T) {
+	t.Cleanup(func() { cleanupTestDB(t) })
+
+	ctx := context.Background()
+	httpClient := newClient()
+	runClient := workflowconnect.NewRunServiceClient(httpClient, endpoint)
+	internalClient := workflowconnect.NewInternalRunServiceClient(httpClient, endpoint)
+
+	runID := &common.RunIdentifier{
+		Org:     testOrg,
+		Project: testProject,
+		Domain:  testDomain,
+		Name:    "r" + uniqueString(),
+	}
+	actionName := "action-1"
+	actionID := &common.ActionIdentifier{Run: runID, Name: actionName}
+
+	createTestAction(t, ctx, internalClient, runID, actionName, nil)
+
+	updateStatus := func(phase common.ActionPhase, attempts uint32) {
+		t.Helper()
+		_, err := internalClient.UpdateActionStatus(ctx, connect.NewRequest(&workflow.UpdateActionStatusRequest{
+			ActionId: actionID,
+			Status: &workflow.ActionStatus{
+				Phase:    phase,
+				Attempts: attempts,
+			},
+		}))
+		require.NoError(t, err)
+	}
+
+	event := func(attempt uint32, phase common.ActionPhase) {
+		t.Helper()
+		recordActionEvent(t, ctx, internalClient, &workflow.ActionEvent{
+			Id:          actionID,
+			Attempt:     attempt,
+			Phase:       phase,
+			Version:     0,
+			UpdatedTime: timestamppb.New(time.Now()),
+		})
+	}
+
+	// Attempt 1 is running.
+	updateStatus(common.ActionPhase_ACTION_PHASE_RUNNING, 1)
+	event(1, common.ActionPhase_ACTION_PHASE_RUNNING)
+
+	watchCtx, cancel := context.WithTimeout(ctx, 20*time.Second)
+	defer cancel()
+	stream, err := runClient.WatchActionDetails(watchCtx, connect.NewRequest(&workflow.WatchActionDetailsRequest{
+		ActionId: actionID,
+	}))
+	require.NoError(t, err)
+	defer stream.Close()
+
+	require.True(t, stream.Receive(), "initial state: %v", stream.Err())
+
+	// Attempt 1 times out and the action retries — event first, row second, the
+	// executor's ordering. The terminal TIMED_OUT event for attempt 1 lands while
+	// the row still says RUNNING/1; the old attempt-only predicate closed here.
+	event(1, common.ActionPhase_ACTION_PHASE_TIMED_OUT)
+	updateStatus(common.ActionPhase_ACTION_PHASE_QUEUED, 2)
+	event(2, common.ActionPhase_ACTION_PHASE_QUEUED)
+
+	// Attempt 2 exhausts retries: terminal for the attempt AND the action.
+	event(2, common.ActionPhase_ACTION_PHASE_TIMED_OUT)
+	updateStatus(common.ActionPhase_ACTION_PHASE_TIMED_OUT, 2)
+
+	// Drain until the server closes the stream. Notifications may coalesce, so
+	// assert on what must be true of the whole: the stream survived past the
+	// mid-retry terminal event (we observe attempt 2 at all), and the final
+	// message is the terminal attempt 2.
+	var last *workflow.ActionDetails
+	sawAttempt2 := false
+	for stream.Receive() {
+		last = stream.Msg().Details
+		for _, a := range last.GetAttempts() {
+			if a.GetAttempt() == 2 {
+				sawAttempt2 = true
+			}
+		}
+	}
+	require.NoError(t, stream.Err(), "stream must close cleanly, not on ctx timeout")
+	require.NotNil(t, last, "expected at least one update after the mid-retry timeout")
+	assert.True(t, sawAttempt2, "stream closed before the retry attempt was ever delivered")
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_TIMED_OUT, last.GetStatus().GetPhase())
+	assert.Equal(t, uint32(2), last.GetStatus().GetAttempts())
+}

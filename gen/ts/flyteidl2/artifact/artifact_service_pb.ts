@@ -5,19 +5,23 @@
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
-import type { Artifact, ArtifactIdentifier, ArtifactName, ArtifactSpec } from "./artifact_pb.ts";
+import type { Artifact, ArtifactIdentifier, ArtifactName, ArtifactPartitionSchema, ArtifactSpec } from "./artifact_pb.ts";
 import { file_flyteidl2_artifact_artifact } from "./artifact_pb.ts";
 import type { ProjectIdentifier } from "../common/identifier_pb.ts";
 import { file_flyteidl2_common_identifier } from "../common/identifier_pb.ts";
 import type { ListRequest } from "../common/list_pb.ts";
 import { file_flyteidl2_common_list } from "../common/list_pb.ts";
+import type { Partitions } from "../core/artifact_id_pb.ts";
+import { file_flyteidl2_core_artifact_id } from "../core/artifact_id_pb.ts";
+import type { Timestamp } from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file flyteidl2/artifact/artifact_service.proto.
  */
 export const file_flyteidl2_artifact_artifact_service: GenFile = /*@__PURE__*/
-  fileDesc("CilmbHl0ZWlkbDIvYXJ0aWZhY3QvYXJ0aWZhY3Rfc2VydmljZS5wcm90bxISZmx5dGVpZGwyLmFydGlmYWN0IpQBChVDcmVhdGVBcnRpZmFjdFJlcXVlc3QSQwoLYXJ0aWZhY3RfaWQYASABKAsyJi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RJZGVudGlmaWVyQga6SAPIAQESNgoEc3BlYxgCIAEoCzIgLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdFNwZWNCBrpIA8gBASJIChZDcmVhdGVBcnRpZmFjdFJlc3BvbnNlEi4KCGFydGlmYWN0GAEgASgLMhwuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0IngKEkdldEFydGlmYWN0UmVxdWVzdBI2CgRuYW1lGAEgASgLMiAuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0TmFtZUIGukgDyAEBEh4KB3ZlcnNpb24YAiABKAlCCLpIBXIDGP8BSACIAQFCCgoIX3ZlcnNpb24iRQoTR2V0QXJ0aWZhY3RSZXNwb25zZRIuCghhcnRpZmFjdBgBIAEoCzIcLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdCKtAQoUTGlzdEFydGlmYWN0c1JlcXVlc3QSLgoHcmVxdWVzdBgBIAEoCzIdLmZseXRlaWRsMi5jb21tb24uTGlzdFJlcXVlc3QSPwoKcHJvamVjdF9pZBgCIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJCBrpIA8gBARIbCgRuYW1lGAMgASgJQgi6SAVyAxj/AUgAiAEBQgcKBV9uYW1lIlcKFUxpc3RBcnRpZmFjdHNSZXNwb25zZRIvCglhcnRpZmFjdHMYASADKAsyHC5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3QSDQoFdG9rZW4YAiABKAkiiwEKGExpc3RBcnRpZmFjdE5hbWVzUmVxdWVzdBIuCgdyZXF1ZXN0GAEgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5MaXN0UmVxdWVzdBI/Cgpwcm9qZWN0X2lkGAIgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckIGukgDyAEBIk8KDUFydGlmYWN0R3JvdXASLAoGbGF0ZXN0GAEgASgLMhwuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0EhAKCHZlcnNpb25zGAIgASgEIl0KGUxpc3RBcnRpZmFjdE5hbWVzUmVzcG9uc2USMQoGZ3JvdXBzGAEgAygLMiEuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0R3JvdXASDQoFdG9rZW4YAiABKAkiYgofTGlzdEFydGlmYWN0TWV0YWRhdGFLZXlzUmVxdWVzdBI/Cgpwcm9qZWN0X2lkGAEgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckIGukgDyAEBIjAKIExpc3RBcnRpZmFjdE1ldGFkYXRhS2V5c1Jlc3BvbnNlEgwKBGtleXMYASADKAky0AQKD0FydGlmYWN0U2VydmljZRJpCg5DcmVhdGVBcnRpZmFjdBIpLmZseXRlaWRsMi5hcnRpZmFjdC5DcmVhdGVBcnRpZmFjdFJlcXVlc3QaKi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQ3JlYXRlQXJ0aWZhY3RSZXNwb25zZSIAEmMKC0dldEFydGlmYWN0EiYuZmx5dGVpZGwyLmFydGlmYWN0LkdldEFydGlmYWN0UmVxdWVzdBonLmZseXRlaWRsMi5hcnRpZmFjdC5HZXRBcnRpZmFjdFJlc3BvbnNlIgOQAgESaQoNTGlzdEFydGlmYWN0cxIoLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RzUmVxdWVzdBopLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RzUmVzcG9uc2UiA5ACARJ1ChFMaXN0QXJ0aWZhY3ROYW1lcxIsLmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3ROYW1lc1JlcXVlc3QaLS5mbHl0ZWlkbDIuYXJ0aWZhY3QuTGlzdEFydGlmYWN0TmFtZXNSZXNwb25zZSIDkAIBEooBChhMaXN0QXJ0aWZhY3RNZXRhZGF0YUtleXMSMy5mbHl0ZWlkbDIuYXJ0aWZhY3QuTGlzdEFydGlmYWN0TWV0YWRhdGFLZXlzUmVxdWVzdBo0LmZseXRlaWRsMi5hcnRpZmFjdC5MaXN0QXJ0aWZhY3RNZXRhZGF0YUtleXNSZXNwb25zZSIDkAIBQtEBChZjb20uZmx5dGVpZGwyLmFydGlmYWN0QhRBcnRpZmFjdFNlcnZpY2VQcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9hcnRpZmFjdKICA0ZBWKoCEkZseXRlaWRsMi5BcnRpZmFjdMoCEkZseXRlaWRsMlxBcnRpZmFjdOICHkZseXRlaWRsMlxBcnRpZmFjdFxHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6QXJ0aWZhY3RiBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_artifact_artifact, file_flyteidl2_common_identifier, file_flyteidl2_common_list]);
+  fileDesc("CilmbHl0ZWlkbDIvYXJ0aWZhY3QvYXJ0aWZhY3Rfc2VydmljZS5wcm90bxISZmx5dGVpZGwyLmFydGlmYWN0IpQBChVDcmVhdGVBcnRpZmFjdFJlcXVlc3QSQwoLYXJ0aWZhY3RfaWQYASABKAsyJi5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RJZGVudGlmaWVyQga6SAPIAQESNgoEc3BlYxgCIAEoCzIgLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdFNwZWNCBrpIA8gBASJIChZDcmVhdGVBcnRpZmFjdFJlc3BvbnNlEi4KCGFydGlmYWN0GAEgASgLMhwuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0IngKEkdldEFydGlmYWN0UmVxdWVzdBI2CgRuYW1lGAEgASgLMiAuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0TmFtZUIGukgDyAEBEh4KB3ZlcnNpb24YAiABKAlCCLpIBXIDGP8BSACIAQFCCgoIX3ZlcnNpb24iRQoTR2V0QXJ0aWZhY3RSZXNwb25zZRIuCghhcnRpZmFjdBgBIAEoCzIcLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdCLLAQoUTGlzdEFydGlmYWN0c1JlcXVlc3QSLgoHcmVxdWVzdBgBIAEoCzIdLmZseXRlaWRsMi5jb21tb24uTGlzdFJlcXVlc3QSPwoKcHJvamVjdF9pZBgCIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJCBrpIA8gBARIbCgRuYW1lGAMgASgJQgi6SAVyAxj/AUgAiAEBEhwKFGxhdGVzdF9wZXJfcGFydGl0aW9uGAQgASgIQgcKBV9uYW1lIlcKFUxpc3RBcnRpZmFjdHNSZXNwb25zZRIvCglhcnRpZmFjdHMYASADKAsyHC5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3QSDQoFdG9rZW4YAiABKAkiiwEKGExpc3RBcnRpZmFjdE5hbWVzUmVxdWVzdBIuCgdyZXF1ZXN0GAEgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5MaXN0UmVxdWVzdBI/Cgpwcm9qZWN0X2lkGAIgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckIGukgDyAEBIogCCg1BcnRpZmFjdEdyb3VwEiwKBmxhdGVzdBgBIAEoCzIcLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdBIQCgh2ZXJzaW9ucxgCIAEoBBJFChBwYXJ0aXRpb25fc2NoZW1hGAMgASgLMisuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0UGFydGl0aW9uU2NoZW1hEjkKFWxhdGVzdF90aW1lX3BhcnRpdGlvbhgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASNQoRbGF0ZXN0X3BhcnRpdGlvbnMYBSADKAsyGi5mbHl0ZWlkbDIuY29yZS5QYXJ0aXRpb25zIl0KGUxpc3RBcnRpZmFjdE5hbWVzUmVzcG9uc2USMQoGZ3JvdXBzGAEgAygLMiEuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0R3JvdXASDQoFdG9rZW4YAiABKAkiiAEKH0xpc3RBcnRpZmFjdE1ldGFkYXRhS2V5c1JlcXVlc3QSPwoKcHJvamVjdF9pZBgBIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJCBrpIA8gBARIbCgRuYW1lGAIgASgJQgi6SAVyAxj/AUgAiAEBQgcKBV9uYW1lIjAKIExpc3RBcnRpZmFjdE1ldGFkYXRhS2V5c1Jlc3BvbnNlEgwKBGtleXMYASADKAkinwEKFkRlY2xhcmVBcnRpZmFjdFJlcXVlc3QSNgoEbmFtZRgBIAEoCzIgLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdE5hbWVCBrpIA8gBARJNChBwYXJ0aXRpb25fc2NoZW1hGAIgASgLMisuZmx5dGVpZGwyLmFydGlmYWN0LkFydGlmYWN0UGFydGl0aW9uU2NoZW1hQga6SAPIAQEiYAoXRGVjbGFyZUFydGlmYWN0UmVzcG9uc2USRQoQcGFydGl0aW9uX3NjaGVtYRgBIAEoCzIrLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdFBhcnRpdGlvblNjaGVtYSJSChhHZXRBcnRpZmFjdFNjaGVtYVJlcXVlc3QSNgoEbmFtZRgBIAEoCzIgLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdE5hbWVCBrpIA8gBASJ0ChlHZXRBcnRpZmFjdFNjaGVtYVJlc3BvbnNlEkUKEHBhcnRpdGlvbl9zY2hlbWEYASABKAsyKy5mbHl0ZWlkbDIuYXJ0aWZhY3QuQXJ0aWZhY3RQYXJ0aXRpb25TY2hlbWESEAoIZGVjbGFyZWQYAiABKAgivwEKGkxpc3RQYXJ0aXRpb25WYWx1ZXNSZXF1ZXN0Ei4KB3JlcXVlc3QYASABKAsyHS5mbHl0ZWlkbDIuY29tbW9uLkxpc3RSZXF1ZXN0Ej8KCnByb2plY3RfaWQYAiABKAsyIy5mbHl0ZWlkbDIuY29tbW9uLlByb2plY3RJZGVudGlmaWVyQga6SAPIAQESGAoEbmFtZRgDIAEoCUIKukgHcgUQARj/ARIWCgNrZXkYBCABKAlCCbpIBnIEEAEYQCItChtMaXN0UGFydGl0aW9uVmFsdWVzUmVzcG9uc2USDgoGdmFsdWVzGAEgAygJIlwKFURlbGV0ZUFydGlmYWN0UmVxdWVzdBJDCgthcnRpZmFjdF9pZBgBIAEoCzImLmZseXRlaWRsMi5hcnRpZmFjdC5BcnRpZmFjdElkZW50aWZpZXJCBrpIA8gBASIYChZEZWxldGVBcnRpZmFjdFJlc3BvbnNlMqMICg9BcnRpZmFjdFNlcnZpY2USaQoOQ3JlYXRlQXJ0aWZhY3QSKS5mbHl0ZWlkbDIuYXJ0aWZhY3QuQ3JlYXRlQXJ0aWZhY3RSZXF1ZXN0GiouZmx5dGVpZGwyLmFydGlmYWN0LkNyZWF0ZUFydGlmYWN0UmVzcG9uc2UiABJjCgtHZXRBcnRpZmFjdBImLmZseXRlaWRsMi5hcnRpZmFjdC5HZXRBcnRpZmFjdFJlcXVlc3QaJy5mbHl0ZWlkbDIuYXJ0aWZhY3QuR2V0QXJ0aWZhY3RSZXNwb25zZSIDkAIBEmkKDUxpc3RBcnRpZmFjdHMSKC5mbHl0ZWlkbDIuYXJ0aWZhY3QuTGlzdEFydGlmYWN0c1JlcXVlc3QaKS5mbHl0ZWlkbDIuYXJ0aWZhY3QuTGlzdEFydGlmYWN0c1Jlc3BvbnNlIgOQAgESdQoRTGlzdEFydGlmYWN0TmFtZXMSLC5mbHl0ZWlkbDIuYXJ0aWZhY3QuTGlzdEFydGlmYWN0TmFtZXNSZXF1ZXN0Gi0uZmx5dGVpZGwyLmFydGlmYWN0Lkxpc3RBcnRpZmFjdE5hbWVzUmVzcG9uc2UiA5ACARKKAQoYTGlzdEFydGlmYWN0TWV0YWRhdGFLZXlzEjMuZmx5dGVpZGwyLmFydGlmYWN0Lkxpc3RBcnRpZmFjdE1ldGFkYXRhS2V5c1JlcXVlc3QaNC5mbHl0ZWlkbDIuYXJ0aWZhY3QuTGlzdEFydGlmYWN0TWV0YWRhdGFLZXlzUmVzcG9uc2UiA5ACARJsCg5EZWxldGVBcnRpZmFjdBIpLmZseXRlaWRsMi5hcnRpZmFjdC5EZWxldGVBcnRpZmFjdFJlcXVlc3QaKi5mbHl0ZWlkbDIuYXJ0aWZhY3QuRGVsZXRlQXJ0aWZhY3RSZXNwb25zZSIDkAICEm8KD0RlY2xhcmVBcnRpZmFjdBIqLmZseXRlaWRsMi5hcnRpZmFjdC5EZWNsYXJlQXJ0aWZhY3RSZXF1ZXN0GisuZmx5dGVpZGwyLmFydGlmYWN0LkRlY2xhcmVBcnRpZmFjdFJlc3BvbnNlIgOQAgISdQoRR2V0QXJ0aWZhY3RTY2hlbWESLC5mbHl0ZWlkbDIuYXJ0aWZhY3QuR2V0QXJ0aWZhY3RTY2hlbWFSZXF1ZXN0Gi0uZmx5dGVpZGwyLmFydGlmYWN0LkdldEFydGlmYWN0U2NoZW1hUmVzcG9uc2UiA5ACARJ7ChNMaXN0UGFydGl0aW9uVmFsdWVzEi4uZmx5dGVpZGwyLmFydGlmYWN0Lkxpc3RQYXJ0aXRpb25WYWx1ZXNSZXF1ZXN0Gi8uZmx5dGVpZGwyLmFydGlmYWN0Lkxpc3RQYXJ0aXRpb25WYWx1ZXNSZXNwb25zZSIDkAIBQtEBChZjb20uZmx5dGVpZGwyLmFydGlmYWN0QhRBcnRpZmFjdFNlcnZpY2VQcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9hcnRpZmFjdKICA0ZBWKoCEkZseXRlaWRsMi5BcnRpZmFjdMoCEkZseXRlaWRsMlxBcnRpZmFjdOICHkZseXRlaWRsMlxBcnRpZmFjdFxHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6QXJ0aWZhY3RiBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_artifact_artifact, file_flyteidl2_common_identifier, file_flyteidl2_common_list, file_flyteidl2_core_artifact_id, file_google_protobuf_timestamp]);
 
 /**
  * request message for creating an artifact.
@@ -123,14 +127,26 @@ export const GetArtifactResponseSchema: GenMessage<GetArtifactResponse> = /*@__P
  */
 export type ListArtifactsRequest = Message<"flyteidl2.artifact.ListArtifactsRequest"> & {
   /**
-   * Common list request parameters (limit, token, filters).
+   * Common list request parameters (limit, token, filters, sort).
+   * Supported sort keys (sort_by_fields, at most one): "created_at",
+   * "version" and "created_by"; the default is created_at, newest first.
    * Supported filters: field "name" with CONTAINS,
    * field "created_at" with GREATER_THAN (RFC3339 timestamp value),
+   * field "created_by" with EQUAL or VALUE_IN (creator subjects, ORed),
+   * fields "source_run", "source_action" and "source_external_ref" with EQUAL,
    * and the pair "parent_name" + "parent_version", each with EQUAL and always
    * together, which lists the versions (of any name in the project) that
-   * declare the given artifact version as their parent — the downward
-   * direction of lineage, which the stored pointer alone cannot be followed
-   * in.
+   * declare the given artifact version among their parents. This serves the
+   * downward direction of lineage: the stored parent pointers only walk
+   * upwards, so finding a version's children requires this filter.
+   *
+   * Partition filters: field "partition.<key>" with EQUAL, NOT_EQUAL, VALUE_IN
+   * or VALUE_NOT_IN on a string partition; field "time_partition" with EQUAL,
+   * GREATER_THAN, GREATER_THAN_OR_EQUAL, LESS_THAN or LESS_THAN_OR_EQUAL and an
+   * RFC3339 value, so a range is two filters; field "schema_mismatch" with
+   * EQUAL "true" or "false". Any partition filter, like latest_per_partition,
+   * only considers versions whose partition keys match the artifact's schema.
+   * "time_partition" is also a sort key.
    *
    * @generated from field: flyteidl2.common.ListRequest request = 1;
    */
@@ -150,6 +166,16 @@ export type ListArtifactsRequest = Message<"flyteidl2.artifact.ListArtifactsRequ
    * @generated from field: optional string name = 3;
    */
   name?: string;
+
+  /**
+   * When set, return only the newest version of each distinct partition among
+   * the matches, so a range over the time partition yields one version per
+   * partition. Versions with a partition schema mismatch are excluded. Requires
+   * name to be set.
+   *
+   * @generated from field: bool latest_per_partition = 4;
+   */
+  latestPerPartition: boolean;
 };
 
 /**
@@ -192,7 +218,10 @@ export const ListArtifactsResponseSchema: GenMessage<ListArtifactsResponse> = /*
  */
 export type ListArtifactNamesRequest = Message<"flyteidl2.artifact.ListArtifactNamesRequest"> & {
   /**
-   * Common list request parameters (limit, token, filters).
+   * Common list request parameters (limit, token, filters, sort).
+   * Supported sort keys (sort_by_fields, at most one): "created_at" (the
+   * latest version's creation time), "name" and "created_by"; the default is
+   * created_at, newest first.
    * Supported filters: field "name" with CONTAINS.
    *
    * @generated from field: flyteidl2.common.ListRequest request = 1;
@@ -234,6 +263,30 @@ export type ArtifactGroup = Message<"flyteidl2.artifact.ArtifactGroup"> & {
    * @generated from field: uint64 versions = 2;
    */
   versions: bigint;
+
+  /**
+   * The artifact's partition keys; unset when the artifact has none.
+   *
+   * @generated from field: flyteidl2.artifact.ArtifactPartitionSchema partition_schema = 3;
+   */
+  partitionSchema?: ArtifactPartitionSchema;
+
+  /**
+   * The newest time partition among the artifact's addressable versions;
+   * unset when the artifact has no time partition.
+   *
+   * @generated from field: google.protobuf.Timestamp latest_time_partition = 4;
+   */
+  latestTimePartition?: Timestamp;
+
+  /**
+   * The distinct string partitions present at latest_time_partition (or, for
+   * an artifact without a time partition, across all addressable versions),
+   * capped at 32.
+   *
+   * @generated from field: repeated flyteidl2.core.Partitions latest_partitions = 5;
+   */
+  latestPartitions: Partitions[];
 };
 
 /**
@@ -281,6 +334,14 @@ export type ListArtifactMetadataKeysRequest = Message<"flyteidl2.artifact.ListAr
    * @generated from field: flyteidl2.common.ProjectIdentifier project_id = 1;
    */
   projectId?: ProjectIdentifier;
+
+  /**
+   * Optional exact artifact name; when set, only keys present on that
+   * artifact's versions are returned.
+   *
+   * @generated from field: optional string name = 2;
+   */
+  name?: string;
 };
 
 /**
@@ -311,6 +372,209 @@ export type ListArtifactMetadataKeysResponse = Message<"flyteidl2.artifact.ListA
  */
 export const ListArtifactMetadataKeysResponseSchema: GenMessage<ListArtifactMetadataKeysResponse> = /*@__PURE__*/
   messageDesc(file_flyteidl2_artifact_artifact_service, 10);
+
+/**
+ * request message for declaring an artifact's partition schema.
+ *
+ * @generated from message flyteidl2.artifact.DeclareArtifactRequest
+ */
+export type DeclareArtifactRequest = Message<"flyteidl2.artifact.DeclareArtifactRequest"> & {
+  /**
+   * Name of the artifact. org is stamped by the server.
+   *
+   * @generated from field: flyteidl2.artifact.ArtifactName name = 1;
+   */
+  name?: ArtifactName;
+
+  /**
+   * The partition keys to fix for the name.
+   *
+   * @generated from field: flyteidl2.artifact.ArtifactPartitionSchema partition_schema = 2;
+   */
+  partitionSchema?: ArtifactPartitionSchema;
+};
+
+/**
+ * Describes the message flyteidl2.artifact.DeclareArtifactRequest.
+ * Use `create(DeclareArtifactRequestSchema)` to create a new message.
+ */
+export const DeclareArtifactRequestSchema: GenMessage<DeclareArtifactRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact_service, 11);
+
+/**
+ * response message for declaring an artifact's partition schema.
+ *
+ * @generated from message flyteidl2.artifact.DeclareArtifactResponse
+ */
+export type DeclareArtifactResponse = Message<"flyteidl2.artifact.DeclareArtifactResponse"> & {
+  /**
+   * The schema as stored.
+   *
+   * @generated from field: flyteidl2.artifact.ArtifactPartitionSchema partition_schema = 1;
+   */
+  partitionSchema?: ArtifactPartitionSchema;
+};
+
+/**
+ * Describes the message flyteidl2.artifact.DeclareArtifactResponse.
+ * Use `create(DeclareArtifactResponseSchema)` to create a new message.
+ */
+export const DeclareArtifactResponseSchema: GenMessage<DeclareArtifactResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact_service, 12);
+
+/**
+ * request message for getting an artifact's partition schema.
+ *
+ * @generated from message flyteidl2.artifact.GetArtifactSchemaRequest
+ */
+export type GetArtifactSchemaRequest = Message<"flyteidl2.artifact.GetArtifactSchemaRequest"> & {
+  /**
+   * Name of the artifact. org is stamped by the server.
+   *
+   * @generated from field: flyteidl2.artifact.ArtifactName name = 1;
+   */
+  name?: ArtifactName;
+};
+
+/**
+ * Describes the message flyteidl2.artifact.GetArtifactSchemaRequest.
+ * Use `create(GetArtifactSchemaRequestSchema)` to create a new message.
+ */
+export const GetArtifactSchemaRequestSchema: GenMessage<GetArtifactSchemaRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact_service, 13);
+
+/**
+ * response message for getting an artifact's partition schema.
+ *
+ * @generated from message flyteidl2.artifact.GetArtifactSchemaResponse
+ */
+export type GetArtifactSchemaResponse = Message<"flyteidl2.artifact.GetArtifactSchemaResponse"> & {
+  /**
+   * The partition keys. An empty schema (no time partition, no keys) means the
+   * artifact exists and is not partitioned.
+   *
+   * @generated from field: flyteidl2.artifact.ArtifactPartitionSchema partition_schema = 1;
+   */
+  partitionSchema?: ArtifactPartitionSchema;
+
+  /**
+   * Whether the schema was fixed by a first partitioned version (false) or by an explicit
+   * declaration (true).
+   *
+   * @generated from field: bool declared = 2;
+   */
+  declared: boolean;
+};
+
+/**
+ * Describes the message flyteidl2.artifact.GetArtifactSchemaResponse.
+ * Use `create(GetArtifactSchemaResponseSchema)` to create a new message.
+ */
+export const GetArtifactSchemaResponseSchema: GenMessage<GetArtifactSchemaResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact_service, 14);
+
+/**
+ * request message for listing the values of one partition key.
+ *
+ * @generated from message flyteidl2.artifact.ListPartitionValuesRequest
+ */
+export type ListPartitionValuesRequest = Message<"flyteidl2.artifact.ListPartitionValuesRequest"> & {
+  /**
+   * limit (default 100, max 1000) and filters. Supported filters are the
+   * partition filters of ListArtifactsRequest: "partition.<key>" and
+   * "time_partition", which scope the versions whose values are listed.
+   *
+   * @generated from field: flyteidl2.common.ListRequest request = 1;
+   */
+  request?: ListRequest;
+
+  /**
+   * Project scope. organization is stamped by the server.
+   *
+   * @generated from field: flyteidl2.common.ProjectIdentifier project_id = 2;
+   */
+  projectId?: ProjectIdentifier;
+
+  /**
+   * Name of the artifact.
+   *
+   * @generated from field: string name = 3;
+   */
+  name: string;
+
+  /**
+   * The partition key to list: a string partition key, or the time partition
+   * key, whose values are returned as RFC3339 timestamps.
+   *
+   * @generated from field: string key = 4;
+   */
+  key: string;
+};
+
+/**
+ * Describes the message flyteidl2.artifact.ListPartitionValuesRequest.
+ * Use `create(ListPartitionValuesRequestSchema)` to create a new message.
+ */
+export const ListPartitionValuesRequestSchema: GenMessage<ListPartitionValuesRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact_service, 15);
+
+/**
+ * response message for listing the values of one partition key.
+ *
+ * @generated from message flyteidl2.artifact.ListPartitionValuesResponse
+ */
+export type ListPartitionValuesResponse = Message<"flyteidl2.artifact.ListPartitionValuesResponse"> & {
+  /**
+   * Distinct values, sorted ascending. Time partition values are RFC3339.
+   *
+   * @generated from field: repeated string values = 1;
+   */
+  values: string[];
+};
+
+/**
+ * Describes the message flyteidl2.artifact.ListPartitionValuesResponse.
+ * Use `create(ListPartitionValuesResponseSchema)` to create a new message.
+ */
+export const ListPartitionValuesResponseSchema: GenMessage<ListPartitionValuesResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact_service, 16);
+
+/**
+ * request message for deleting one artifact version.
+ *
+ * @generated from message flyteidl2.artifact.DeleteArtifactRequest
+ */
+export type DeleteArtifactRequest = Message<"flyteidl2.artifact.DeleteArtifactRequest"> & {
+  /**
+   * Fully qualified id (name + version) of the version to delete. The
+   * version must be explicit; "latest" is rejected.
+   *
+   * @generated from field: flyteidl2.artifact.ArtifactIdentifier artifact_id = 1;
+   */
+  artifactId?: ArtifactIdentifier;
+};
+
+/**
+ * Describes the message flyteidl2.artifact.DeleteArtifactRequest.
+ * Use `create(DeleteArtifactRequestSchema)` to create a new message.
+ */
+export const DeleteArtifactRequestSchema: GenMessage<DeleteArtifactRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact_service, 17);
+
+/**
+ * response message for deleting an artifact version.
+ *
+ * @generated from message flyteidl2.artifact.DeleteArtifactResponse
+ */
+export type DeleteArtifactResponse = Message<"flyteidl2.artifact.DeleteArtifactResponse"> & {
+};
+
+/**
+ * Describes the message flyteidl2.artifact.DeleteArtifactResponse.
+ * Use `create(DeleteArtifactResponseSchema)` to create a new message.
+ */
+export const DeleteArtifactResponseSchema: GenMessage<DeleteArtifactResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_artifact_artifact_service, 18);
 
 /**
  * ArtifactService provides a minimal interface for publishing and retrieving
@@ -372,6 +636,55 @@ export const ArtifactService: GenService<{
     methodKind: "unary";
     input: typeof ListArtifactMetadataKeysRequestSchema;
     output: typeof ListArtifactMetadataKeysResponseSchema;
+  },
+  /**
+   * Delete one artifact version. The version is required and must be
+   * explicit: the "latest" alias is rejected so a caller can never delete a
+   * version other than the one it named. Returns NOT_FOUND when the version
+   * does not exist. Deleting the last version removes the artifact name from
+   * the listings. Offloaded data the value references is not touched.
+   *
+   * @generated from rpc flyteidl2.artifact.ArtifactService.DeleteArtifact
+   */
+  deleteArtifact: {
+    methodKind: "unary";
+    input: typeof DeleteArtifactRequestSchema;
+    output: typeof DeleteArtifactResponseSchema;
+  },
+  /**
+   * Declare an artifact name's partition schema ahead of any version. Succeeds
+   * when the name has no schema yet or an equal one; FAILED_PRECONDITION when a
+   * different schema is already fixed (by an earlier declaration or a first
+   * version). Changing the keys is a new artifact name.
+   *
+   * @generated from rpc flyteidl2.artifact.ArtifactService.DeclareArtifact
+   */
+  declareArtifact: {
+    methodKind: "unary";
+    input: typeof DeclareArtifactRequestSchema;
+    output: typeof DeclareArtifactResponseSchema;
+  },
+  /**
+   * Get an artifact name's partition schema. NOT_FOUND when the name has
+   * neither a declaration nor a version.
+   *
+   * @generated from rpc flyteidl2.artifact.ArtifactService.GetArtifactSchema
+   */
+  getArtifactSchema: {
+    methodKind: "unary";
+    input: typeof GetArtifactSchemaRequestSchema;
+    output: typeof GetArtifactSchemaResponseSchema;
+  },
+  /**
+   * List the distinct values one partition key has among an artifact's
+   * addressable versions, optionally scoped by partition filters, sorted.
+   *
+   * @generated from rpc flyteidl2.artifact.ArtifactService.ListPartitionValues
+   */
+  listPartitionValues: {
+    methodKind: "unary";
+    input: typeof ListPartitionValuesRequestSchema;
+    output: typeof ListPartitionValuesResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_flyteidl2_artifact_artifact_service, 0);

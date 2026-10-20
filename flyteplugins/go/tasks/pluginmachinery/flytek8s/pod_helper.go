@@ -49,6 +49,48 @@ const ContainerFailed = "ContainerFailed"
 // send SIGTERM first, which surfaces as 143.
 const maxUserExitCode = 127
 
+// TerminationTargetCondition is the pod status condition an external controller sets, with the
+// reason and the message of its decision, right before it deletes a pod it manages. Kueue stamps
+// it on every pod it stops (the Workload was preempted, evicted or deactivated), and it is the only
+// place that reason survives: to the kubelet the deletion looks like any other.
+const TerminationTargetCondition v1.PodConditionType = "TerminationTarget"
+
+// GetTerminationTarget returns the TerminationTarget condition when an external controller marked
+// the pod for termination, nil otherwise. Only the condition type is matched: the reason Kueue
+// writes there has changed across its releases (StoppedByKueue, WorkloadEvicted,
+// WorkloadEvictedDueToPreempted) and is reported as it is.
+func GetTerminationTarget(status v1.PodStatus) *v1.PodCondition {
+	for i := range status.Conditions {
+		c := &status.Conditions[i]
+		if c.Type == TerminationTargetCondition && c.Status == v1.ConditionTrue {
+			return c
+		}
+	}
+	return nil
+}
+
+// ExternalTerminationCode is the error code for a pod an external controller terminated: the
+// controller's own reason, so that a Kueue preemption reads as such rather than as an interruption.
+func ExternalTerminationCode(c *v1.PodCondition) string {
+	if c.Reason != "" {
+		return c.Reason
+	}
+	return string(TerminationTargetCondition)
+}
+
+// ExternalTerminationMessage explains a pod's termination in the words of the controller that
+// decided it, for example why Kueue preempted the Workload.
+func ExternalTerminationMessage(c *v1.PodCondition) string {
+	message := "Pod was terminated by an external controller"
+	if c.Message != "" {
+		return message + ": " + c.Message
+	}
+	if c.Reason != "" {
+		return message + " (" + c.Reason + ")"
+	}
+	return message
+}
+
 const defaultContainerTemplateName = "default"
 const defaultInitContainerTemplateName = "default-init"
 const primaryContainerTemplateName = "primary"
@@ -732,7 +774,12 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	// GPU accelerator
-	if extendedResources.GetGpuAccelerator() != nil {
+	if IsAppleSilicon(extendedResources.GetGpuAccelerator()) {
+		workloadID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+		if err := ApplyAppleSiliconBridge(podSpec, primaryContainerName, workloadID); err != nil {
+			return nil, nil, err
+		}
+	} else if extendedResources.GetGpuAccelerator() != nil {
 		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
 		if ps, ok := extendedResources.GetGpuAccelerator().GetPartitionSizeValue().(*core.GPUAccelerator_PartitionSize); ok {
 			if slices := parseMigSlices(ps.PartitionSize); slices != "" {
@@ -1578,6 +1625,15 @@ func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore
 	//
 
 	var isSystemError bool
+	// A controller that stopped the pod on purpose, such as Kueue preempting its Workload, says
+	// so on the pod itself. Its reason is the code and its message the explanation; the container
+	// exit codes below still add detail, but do not get to rename the failure.
+	terminationTarget := GetTerminationTarget(status)
+	if terminationTarget != nil {
+		code = ExternalTerminationCode(terminationTarget)
+		message = ExternalTerminationMessage(terminationTarget)
+		isSystemError = true
+	}
 	// In some versions of GKE the reason can also be "Terminated" or "NodeShutdown"
 	if retryableStatusReasons.Has(code) {
 		isSystemError = true
@@ -1595,9 +1651,12 @@ func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore
 			containerState = c.State
 		}
 		if containerState.Terminated != nil {
-			if strings.Contains(containerState.Terminated.Reason, OOMKilled) {
+			switch {
+			case terminationTarget != nil:
+				// The controller's reason stands; the exit code below is only detail.
+			case strings.Contains(containerState.Terminated.Reason, OOMKilled):
 				code = OOMKilled
-			} else if isTerminatedWithSigKill(containerState) {
+			case isTerminatedWithSigKill(containerState):
 				// in some setups, node termination sends SIGKILL to all the containers running on that node. Capturing and
 				// tagging that correctly.
 				code = Interrupted
@@ -1683,6 +1742,49 @@ func GetLastTransitionOccurredAt(pod *v1.Pod) metav1.Time {
 	}
 
 	return lastTransitionTime
+}
+
+// PodFailureTime is the time a pod's own trouble is anchored on, which is what a GPU
+// fault's relevance is measured against (see gpufault.RelevantToFailure).
+//
+// A container's termination is stamped by the kubelet on the same node and clock as the
+// fault events, so it is the closest thing to the moment a fault would have to explain. A
+// pod on its way out without a terminated container is anchored on its deletion, which is
+// what an eviction leaves behind.
+//
+// Only then does the time the caller already had stand in, and it is the last resort on
+// purpose. Callers typically get it from GetLastTransitionOccurredAt above, which for a
+// pod that failed while its containers were still running reports the time the container
+// started, not the time anything went wrong. Anchoring a long-running task on its own
+// start would put every real fault outside the window and quietly find nothing. Pass the
+// zero time when there is no such time to offer, and the current time is used instead.
+//
+// Init containers are not eligible, which is where this parts company with
+// GetLastTransitionOccurredAt. They finish before the workload starts, and a native
+// sidecar declared among them is reaped after everything else, so either would anchor on
+// a moment that has nothing to do with when the work died.
+func PodFailureTime(pod *v1.Pod, occurredAt time.Time) time.Time {
+	latest := time.Time{}
+	for _, status := range pod.Status.ContainerStatuses {
+		terminated := status.State.Terminated
+		if terminated == nil || terminated.FinishedAt.IsZero() {
+			continue
+		}
+		if terminated.FinishedAt.After(latest) {
+			latest = terminated.FinishedAt.Time
+		}
+	}
+
+	switch {
+	case !latest.IsZero():
+		return latest
+	case pod.DeletionTimestamp != nil && !pod.DeletionTimestamp.IsZero():
+		return pod.DeletionTimestamp.Time
+	case !occurredAt.IsZero():
+		return occurredAt
+	default:
+		return time.Now()
+	}
 }
 
 func GetReportedAt(pod *v1.Pod) metav1.Time {

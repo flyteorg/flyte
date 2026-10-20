@@ -308,6 +308,12 @@ func TestDecorateEnvVars(t *testing.T) {
 	expectedOffloaded = append(expectedOffloaded, v12.EnvVar{Name: "_F_L_MAX_SIZE_MB", Value: "42"})
 
 	aggregated := append(expected, v12.EnvVar{Name: "k", Value: "v"})
+	// A name present in the template and again in the execution metadata collapses to one entry:
+	// the template's position, the execution metadata's value.
+	collided := append([]v12.EnvVar{{Name: "x", Value: "y"}, {Name: "k", Value: "v"}}, GetContextEnvVars(ctx)...)
+	collided = append(collided, GetExecutionEnvVars(mockTaskExecutionIdentifier{}, "")...)
+	withinTemplate := append([]v12.EnvVar{{Name: "k", Value: "last"}}, GetContextEnvVars(ctx)...)
+	withinTemplate = append(withinTemplate, GetExecutionEnvVars(mockTaskExecutionIdentifier{}, "")...)
 	type args struct {
 		envVars []v12.EnvVar
 		id      pluginsCore.TaskExecutionID
@@ -379,6 +385,30 @@ func TestDecorateEnvVars(t *testing.T) {
 			"",
 			aggregated,
 		},
+		{
+			// CRD-backed resources reject duplicate env names; the run-level value must win, as
+			// kubelet would resolve it for a Pod.
+			"template-and-execution-collision",
+			args{envVars: []v12.EnvVar{{Name: "x", Value: "y"}, {Name: "k", Value: "template"}}, id: mockTaskExecutionIdentifier{}},
+			emptyEnvVar,
+			emptyEnvVar,
+			false,
+			emptyEnvVar,
+			additionalEnv,
+			"",
+			collided,
+		},
+		{
+			"duplicate-within-template",
+			args{envVars: []v12.EnvVar{{Name: "k", Value: "first"}, {Name: "k", Value: "last"}}, id: mockTaskExecutionIdentifier{}},
+			emptyEnvVar,
+			emptyEnvVar,
+			false,
+			emptyEnvVar,
+			emptyEnvVar,
+			"",
+			withinTemplate,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -399,4 +429,36 @@ func TestDecorateEnvVars(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestDecorateEnvVars_TelemetryOptOut(t *testing.T) {
+	telemetryEnv := func(envVars []v12.EnvVar) []string {
+		var got []string
+		for _, e := range envVars {
+			if e.Name == "DO_NOT_TRACK" {
+				got = append(got, e.Value)
+			}
+		}
+		return got
+	}
+	for _, name := range []string{"FLYTE_DISABLE_TELEMETRY", "DO_NOT_TRACK", "FLYTE_DISABLE_SENTRY"} {
+		t.Setenv(name, "")
+	}
+	// The task's own env cannot re-enable telemetry the deployment turned off.
+	taskEnv := map[string]string{"DO_NOT_TRACK": "0"}
+
+	t.Run("enabled", func(t *testing.T) {
+		envVars, _ := DecorateEnvVars(context.Background(), nil, nil, nil, mockTaskExecutionIdentifier{}, "")
+		assert.Empty(t, telemetryEnv(envVars))
+	})
+	t.Run("disabled", func(t *testing.T) {
+		t.Setenv("DO_NOT_TRACK", "1")
+		envVars, _ := DecorateEnvVars(context.Background(), nil, nil, taskEnv, mockTaskExecutionIdentifier{}, "")
+		assert.Equal(t, []string{"1"}, telemetryEnv(envVars))
+	})
+	t.Run("disabled-via-flyte-alias", func(t *testing.T) {
+		t.Setenv("FLYTE_DISABLE_TELEMETRY", "true")
+		envVars, _ := DecorateEnvVars(context.Background(), nil, nil, nil, mockTaskExecutionIdentifier{}, "")
+		assert.Equal(t, []string{"1"}, telemetryEnv(envVars))
+	})
 }

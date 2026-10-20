@@ -21,6 +21,9 @@ Distributed Flyte 2 core services
 | components.actions.args[1] | string | `"actions"` |  |
 | components.actions.args[2] | string | `"--config"` |  |
 | components.actions.args[3] | string | `"/etc/flyte/config.d/*.yaml"` |  |
+| components.actions.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
+| components.actions.autoscaling.behavior | object | `{}` | Optional autoscaling/v2 scaleUp and scaleDown policies. |
+| components.actions.autoscaling.metrics | list | `[]` | Additional autoscaling/v2 metrics (Pods, Object, External, or Resource). |
 | components.actions.command[0] | string | `"/usr/bin/tini"` |  |
 | components.actions.command[1] | string | `"-g"` |  |
 | components.actions.command[2] | string | `"--"` |  |
@@ -38,6 +41,10 @@ Distributed Flyte 2 core services
 | components.actions.livenessProbe | object | `{}` |  |
 | components.actions.nodeSelector | object | `{}` |  |
 | components.actions.podAnnotations | object | `{}` |  |
+| components.actions.podDisruptionBudget.enabled | bool | `false` |  |
+| components.actions.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| components.actions.podDisruptionBudget.minAvailable | string | `nil` |  |
+| components.actions.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | components.actions.podLabels | object | `{}` |  |
 | components.actions.podSecurityContext | object | `{}` |  |
 | components.actions.priorityClassName | string | `""` |  |
@@ -61,6 +68,9 @@ Distributed Flyte 2 core services
 | components.app.args[1] | string | `"app"` |  |
 | components.app.args[2] | string | `"--config"` |  |
 | components.app.args[3] | string | `"/etc/flyte/config.d/*.yaml"` |  |
+| components.app.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
+| components.app.autoscaling.behavior | object | `{}` | Optional autoscaling/v2 scaleUp and scaleDown policies. |
+| components.app.autoscaling.metrics | list | `[]` | Additional autoscaling/v2 metrics (Pods, Object, External, or Resource). |
 | components.app.command[0] | string | `"/usr/bin/tini"` |  |
 | components.app.command[1] | string | `"-g"` |  |
 | components.app.command[2] | string | `"--"` |  |
@@ -78,6 +88,10 @@ Distributed Flyte 2 core services
 | components.app.livenessProbe | object | `{}` |  |
 | components.app.nodeSelector | object | `{}` |  |
 | components.app.podAnnotations | object | `{}` |  |
+| components.app.podDisruptionBudget.enabled | bool | `false` |  |
+| components.app.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| components.app.podDisruptionBudget.minAvailable | string | `nil` |  |
+| components.app.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | components.app.podLabels | object | `{}` |  |
 | components.app.podSecurityContext | object | `{}` |  |
 | components.app.priorityClassName | string | `""` |  |
@@ -101,6 +115,9 @@ Distributed Flyte 2 core services
 | components.cache.args[1] | string | `"cache"` |  |
 | components.cache.args[2] | string | `"--config"` |  |
 | components.cache.args[3] | string | `"/etc/flyte/config.d/*.yaml"` |  |
+| components.cache.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
+| components.cache.autoscaling.behavior | object | `{}` | Optional autoscaling/v2 scaleUp and scaleDown policies. |
+| components.cache.autoscaling.metrics | list | `[]` | Additional autoscaling/v2 metrics (Pods, Object, External, or Resource). |
 | components.cache.command[0] | string | `"/usr/bin/tini"` |  |
 | components.cache.command[1] | string | `"-g"` |  |
 | components.cache.command[2] | string | `"--"` |  |
@@ -118,6 +135,10 @@ Distributed Flyte 2 core services
 | components.cache.livenessProbe | object | `{}` |  |
 | components.cache.nodeSelector | object | `{}` |  |
 | components.cache.podAnnotations | object | `{}` |  |
+| components.cache.podDisruptionBudget.enabled | bool | `false` |  |
+| components.cache.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| components.cache.podDisruptionBudget.minAvailable | string | `nil` |  |
+| components.cache.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | components.cache.podLabels | object | `{}` |  |
 | components.cache.podSecurityContext | object | `{}` |  |
 | components.cache.priorityClassName | string | `""` |  |
@@ -141,6 +162,9 @@ Distributed Flyte 2 core services
 | components.dataproxy.args[1] | string | `"dataproxy"` |  |
 | components.dataproxy.args[2] | string | `"--config"` |  |
 | components.dataproxy.args[3] | string | `"/etc/flyte/config.d/*.yaml"` |  |
+| components.dataproxy.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
+| components.dataproxy.autoscaling.behavior | object | `{}` | Optional autoscaling/v2 scaleUp and scaleDown policies. |
+| components.dataproxy.autoscaling.metrics | list | `[]` | Additional autoscaling/v2 metrics (Pods, Object, External, or Resource). |
 | components.dataproxy.command[0] | string | `"/usr/bin/tini"` |  |
 | components.dataproxy.command[1] | string | `"-g"` |  |
 | components.dataproxy.command[2] | string | `"--"` |  |
@@ -158,6 +182,10 @@ Distributed Flyte 2 core services
 | components.dataproxy.livenessProbe | object | `{}` |  |
 | components.dataproxy.nodeSelector | object | `{}` |  |
 | components.dataproxy.podAnnotations | object | `{}` |  |
+| components.dataproxy.podDisruptionBudget.enabled | bool | `false` |  |
+| components.dataproxy.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| components.dataproxy.podDisruptionBudget.minAvailable | string | `nil` |  |
+| components.dataproxy.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | components.dataproxy.podLabels | object | `{}` |  |
 | components.dataproxy.podSecurityContext | object | `{}` |  |
 | components.dataproxy.priorityClassName | string | `""` |  |
@@ -181,6 +209,9 @@ Distributed Flyte 2 core services
 | components.events.args[1] | string | `"events"` |  |
 | components.events.args[2] | string | `"--config"` |  |
 | components.events.args[3] | string | `"/etc/flyte/config.d/*.yaml"` |  |
+| components.events.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
+| components.events.autoscaling.behavior | object | `{}` | Optional autoscaling/v2 scaleUp and scaleDown policies. |
+| components.events.autoscaling.metrics | list | `[]` | Additional autoscaling/v2 metrics (Pods, Object, External, or Resource). |
 | components.events.command[0] | string | `"/usr/bin/tini"` |  |
 | components.events.command[1] | string | `"-g"` |  |
 | components.events.command[2] | string | `"--"` |  |
@@ -198,6 +229,10 @@ Distributed Flyte 2 core services
 | components.events.livenessProbe | object | `{}` |  |
 | components.events.nodeSelector | object | `{}` |  |
 | components.events.podAnnotations | object | `{}` |  |
+| components.events.podDisruptionBudget.enabled | bool | `false` |  |
+| components.events.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| components.events.podDisruptionBudget.minAvailable | string | `nil` |  |
+| components.events.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | components.events.podLabels | object | `{}` |  |
 | components.events.podSecurityContext | object | `{}` |  |
 | components.events.priorityClassName | string | `""` |  |
@@ -238,6 +273,10 @@ Distributed Flyte 2 core services
 | components.executor.livenessProbe | object | `{}` |  |
 | components.executor.nodeSelector | object | `{}` |  |
 | components.executor.podAnnotations | object | `{}` |  |
+| components.executor.podDisruptionBudget.enabled | bool | `false` |  |
+| components.executor.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| components.executor.podDisruptionBudget.minAvailable | string | `nil` |  |
+| components.executor.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | components.executor.podLabels | object | `{}` |  |
 | components.executor.podSecurityContext | object | `{}` |  |
 | components.executor.priorityClassName | string | `""` |  |
@@ -260,6 +299,9 @@ Distributed Flyte 2 core services
 | components.runs.args[1] | string | `"runs"` |  |
 | components.runs.args[2] | string | `"--config"` |  |
 | components.runs.args[3] | string | `"/etc/flyte/config.d/*.yaml"` |  |
+| components.runs.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
+| components.runs.autoscaling.behavior | object | `{}` | Optional autoscaling/v2 scaleUp and scaleDown policies. |
+| components.runs.autoscaling.metrics | list | `[]` | Additional autoscaling/v2 metrics (Pods, Object, External, or Resource). |
 | components.runs.command[0] | string | `"/usr/bin/tini"` |  |
 | components.runs.command[1] | string | `"-g"` |  |
 | components.runs.command[2] | string | `"--"` |  |
@@ -277,6 +319,10 @@ Distributed Flyte 2 core services
 | components.runs.livenessProbe | object | `{}` |  |
 | components.runs.nodeSelector | object | `{}` |  |
 | components.runs.podAnnotations | object | `{}` |  |
+| components.runs.podDisruptionBudget.enabled | bool | `false` |  |
+| components.runs.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| components.runs.podDisruptionBudget.minAvailable | string | `nil` |  |
+| components.runs.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | components.runs.podLabels | object | `{}` |  |
 | components.runs.podSecurityContext | object | `{}` |  |
 | components.runs.priorityClassName | string | `""` |  |
@@ -300,6 +346,9 @@ Distributed Flyte 2 core services
 | components.secret.args[1] | string | `"secret"` |  |
 | components.secret.args[2] | string | `"--config"` |  |
 | components.secret.args[3] | string | `"/etc/flyte/config.d/*.yaml"` |  |
+| components.secret.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
+| components.secret.autoscaling.behavior | object | `{}` | Optional autoscaling/v2 scaleUp and scaleDown policies. |
+| components.secret.autoscaling.metrics | list | `[]` | Additional autoscaling/v2 metrics (Pods, Object, External, or Resource). |
 | components.secret.command[0] | string | `"/usr/bin/tini"` |  |
 | components.secret.command[1] | string | `"-g"` |  |
 | components.secret.command[2] | string | `"--"` |  |
@@ -317,6 +366,10 @@ Distributed Flyte 2 core services
 | components.secret.livenessProbe | object | `{}` |  |
 | components.secret.nodeSelector | object | `{}` |  |
 | components.secret.podAnnotations | object | `{}` |  |
+| components.secret.podDisruptionBudget.enabled | bool | `false` |  |
+| components.secret.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| components.secret.podDisruptionBudget.minAvailable | string | `nil` |  |
+| components.secret.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | components.secret.podLabels | object | `{}` |  |
 | components.secret.podSecurityContext | object | `{}` |  |
 | components.secret.priorityClassName | string | `""` |  |
@@ -426,6 +479,9 @@ Distributed Flyte 2 core services
 | configuration.runs.identityHeaders.claimsJwtHeader | string | `"X-Amzn-Oidc-Data"` |  |
 | configuration.runs.identityHeaders.emailHeader | string | `""` |  |
 | configuration.runs.identityHeaders.subjectHeader | string | `"X-Amzn-Oidc-Identity"` |  |
+| configuration.runs.notificationBufferLimit | int | `65000` |  |
+| configuration.runs.notifyRetryMaxBackoff | string | `"5s"` |  |
+| configuration.runs.notifyRetryMinBackoff | string | `"50ms"` |  |
 | configuration.runs.seedProjects[0] | string | `"flytesnacks"` |  |
 | configuration.runs.server.host | string | `"0.0.0.0"` |  |
 | configuration.runs.server.port | int | `8080` |  |
@@ -459,6 +515,9 @@ Distributed Flyte 2 core services
 | configuration.webhook.listenPort | int | `9443` |  |
 | configuration.webhook.webhookTimeout | int | `30` |  |
 | console.affinity | object | `{}` |  |
+| console.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
+| console.autoscaling.behavior | object | `{}` | Optional autoscaling/v2 scaleUp and scaleDown policies. |
+| console.autoscaling.metrics | list | `[]` | Additional autoscaling/v2 metrics (Pods, Object, External, or Resource). |
 | console.basePath | string | `"/v2"` |  |
 | console.containerPort | int | `8080` |  |
 | console.enabled | bool | `true` |  |
@@ -469,6 +528,10 @@ Distributed Flyte 2 core services
 | console.imagePullSecrets | list | `[]` |  |
 | console.nodeSelector | object | `{}` |  |
 | console.podAnnotations | object | `{}` |  |
+| console.podDisruptionBudget.enabled | bool | `false` |  |
+| console.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| console.podDisruptionBudget.minAvailable | string | `nil` |  |
+| console.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `""` | Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default. |
 | console.podLabels | object | `{}` |  |
 | console.replicaCount | int | `1` |  |
 | console.resources | object | `{}` |  |
@@ -513,6 +576,7 @@ Distributed Flyte 2 core services
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.labels | object | `{}` |  |
 | serviceAccount.name | string | `""` |  |
+| telemetry.enabled | bool | `true` | Set to false to opt out. Sets DO_NOT_TRACK=1 (https://donottrack.sh) on the backend and the console; the backend passes it on to the task and app pods it creates. |
 | waitForDatabase.args | list | `[]` |  |
 | waitForDatabase.command | list | `[]` |  |
 | waitForDatabase.enabled | bool | `true` |  |

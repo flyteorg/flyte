@@ -13,6 +13,7 @@ import (
 	"connectrpc.com/connect"
 	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 	"github.com/jmoiron/sqlx"
+	metricnoop "go.opentelemetry.io/otel/metric/noop"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
@@ -98,6 +99,7 @@ func TestMain(m *testing.M) {
 		return
 	}
 	log.Println("Database initialized")
+	runsConfig := config.GetConfig()
 
 	// Run migrations
 	if err := migrations.RunMigrations(ctx, testDB); err != nil {
@@ -108,12 +110,25 @@ func TestMain(m *testing.M) {
 	log.Println("Database migrations completed")
 
 	// Create repository and services
-	repo, err := repository.NewRepository(testDB, *dbConfig)
+	repo, err := repository.NewRepository(
+		testDB,
+		*dbConfig,
+		repository.NewNotificationConfig(
+			runsConfig.NotificationBufferLimit,
+			runsConfig.NotifyRetryMinBackoff.Duration,
+			runsConfig.NotifyRetryMaxBackoff.Duration,
+			runsConfig.WatchBufferSize,
+		),
+		metricnoop.NewMeterProvider(),
+	)
 	if err != nil {
 		log.Printf("Failed to create repository: %v", err)
 		exitCode = 1
 		return
 	}
+
+	settingsRepo := impl.NewSettingsRepo(testDB)
+
 	// Services validate project existence through the ProjectService client, so mount a
 	// real ProjectService on the same mux (mirrors production unified mode in setup.go).
 	endpointURL := fmt.Sprintf("http://localhost:%d", testPort)
@@ -123,7 +138,7 @@ func TestMain(m *testing.M) {
 
 	// Create RunService with a no-op actions client (points at test server; not used by watch tests)
 	actionsClient := actionsconnect.NewActionsServiceClient(http.DefaultClient, endpointURL)
-	runSvc := service.NewRunService(repo, actionsClient, projectClient, "", nil, nil, "", true, config.GetConfig().IdentityHeaders)
+	runSvc := service.NewRunService(repo, settingsRepo, actionsClient, projectClient, "", nil, nil, "", true, runsConfig.IdentityHeaders)
 
 	// Setup HTTP server
 	mux := http.NewServeMux()
@@ -139,7 +154,7 @@ func TestMain(m *testing.M) {
 	internalRunPath, internalRunHandler := workflowconnect.NewInternalRunServiceHandler(runSvc)
 	mux.Handle(internalRunPath, internalRunHandler)
 
-	settingsSvc := service.NewSettingsService(impl.NewSettingsRepo(testDB))
+	settingsSvc := service.NewSettingsService(settingsRepo)
 	settingsPath, settingsHandler := settingsconnect.NewSettingsServiceHandler(settingsSvc)
 	mux.Handle(settingsPath, settingsHandler)
 

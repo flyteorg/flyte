@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -14,6 +15,7 @@ import (
 
 	"connectrpc.com/connect"
 	semver "github.com/Masterminds/semver/v3"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -40,6 +42,7 @@ import (
 // RunService implements the RunServiceHandler interface
 type RunService struct {
 	repo            interfaces.Repository
+	settingsRepo    interfaces.SettingsRepo
 	actionsClient   actionsconnect.ActionsServiceClient
 	projectClient   projectconnect.ProjectServiceClient
 	storagePrefix   string
@@ -143,6 +146,7 @@ func (s *RunService) WatchGroups(ctx context.Context, req *connect.Request[workf
 // NewRunService creates a new RunService instance
 func NewRunService(
 	repo interfaces.Repository,
+	settingsRepo interfaces.SettingsRepo,
 	actionsClient actionsconnect.ActionsServiceClient,
 	projectClient projectconnect.ProjectServiceClient,
 	storagePrefix string,
@@ -154,6 +158,7 @@ func NewRunService(
 ) *RunService {
 	return &RunService{
 		repo:            repo,
+		settingsRepo:    settingsRepo,
 		actionsClient:   actionsClient,
 		projectClient:   projectClient,
 		storagePrefix:   storagePrefix,
@@ -275,6 +280,21 @@ func (s *RunService) CreateRun(
 		runSpec = &task.RunSpec{}
 	}
 	request.RunSpec = runSpec
+
+	// Settings sit between an explicit request value and the static config defaults
+	// applied below.
+	resolveSettings, err := resolveSettings(ctx, s.settingsRepo, &settings.SettingsKey{
+		Org:     runId.GetOrg(),
+		Domain:  runId.GetDomain(),
+		Project: runId.GetProject(),
+	})
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	applyRunSettings(runSpec, resolveSettings)
+	if err := validatePodTemplateName(runSpec.GetDefaultSettings().GetPodTemplateName()); err != nil {
+		return nil, err
+	}
 
 	// Check if this is a recovery run and validate it if yes
 	if runSpec.GetRelation().GetRelationType() == common.RelationType_RELATION_TYPE_RECOVER {
@@ -700,9 +720,10 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 	action.Attempts = attempts
 
 	switch action.GetStatus().GetPhase() {
-	case common.ActionPhase_ACTION_PHASE_FAILED:
+	case common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_TIMED_OUT:
 		// Get action error from last attempt. Events are eventually consistent, so we may not have
-		// information from the latest attempt yet.
+		// information from the latest attempt yet. A timed-out action carries its
+		// error the same way a failed one does, so it resolves through this path too.
 		numAttempts := len(action.GetAttempts())
 		if numAttempts > 0 && action.GetAttempts()[numAttempts-1].GetAttempt() == action.GetStatus().GetAttempts() {
 			action.Result = &workflow.ActionDetails_ErrorInfo{
@@ -778,8 +799,7 @@ func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.Actio
 	reportURI := ""
 	lastEvent := events[len(events)-1]
 	var logContext *core.LogContext
-	for i := len(events) - 1; i >= 0; i-- {
-		event := events[i]
+	for _, event := range slices.Backward(events) {
 		if event.GetLogContext() != nil && logContext == nil {
 			logContext = event.GetLogContext()
 			streamingLogsAvailable = true
@@ -793,9 +813,9 @@ func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.Actio
 		if reportURI == "" && event.GetOutputs().GetReportUri() != "" {
 			reportURI = event.GetOutputs().GetReportUri()
 		}
-		phase := events[i].GetPhase()
+		phase := event.GetPhase()
 		if IsTerminalPhase(phase) {
-			lastEvent = events[i]
+			lastEvent = event
 		}
 	}
 
@@ -875,20 +895,28 @@ func IsTerminalPhase(phase common.ActionPhase) bool {
 		phase == common.ActionPhase_ACTION_PHASE_RECOVERED
 }
 
-// lastAttemptIsTerminal returns true when the highest-numbered attempt has reached a
-// terminal phase. Used by WatchActionDetails to close the stream only after action_events
-// reflects the terminal transition, not just the actions table.
-func lastAttemptIsTerminal(attempts []*workflow.ActionAttempt) bool {
+func IsFailedPhase(phase common.ActionPhase) bool {
+	return phase == common.ActionPhase_ACTION_PHASE_FAILED ||
+		phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT
+}
+
+func actionStreamComplete(details *workflow.ActionDetails) bool {
+	attempts := details.GetAttempts()
 	if len(attempts) == 0 {
 		return false
 	}
-	var last *workflow.ActionAttempt
+
+	// Get the last attempt
+	last := attempts[0]
 	for _, a := range attempts {
-		if last == nil || a.GetAttempt() > last.GetAttempt() {
+		if a.GetAttempt() > last.GetAttempt() {
 			last = a
 		}
 	}
-	return IsTerminalPhase(last.GetPhase())
+	status := details.GetStatus()
+	return IsTerminalPhase(status.GetPhase()) && // Make sure the action's retries are all completed
+		IsTerminalPhase(last.GetPhase()) && // Make sure the last attempt is in terminal phase
+		last.GetAttempt() == status.GetAttempts()
 }
 
 // GetActionData is deprecated and no longer implemented. Clients should use
@@ -932,8 +960,24 @@ func (s *RunService) ListRuns(
 		scopeFilter = scopeFilter.And(impl.NewHasPausedActionFilter())
 	}
 
+	// The console's run search box arrives as a filter on the synthetic "search" field
+	// (run name OR task name). Resolve it here and AND it onto the scope filter: the
+	// generic parser below validates fields against the action column allow-list and
+	// would reject it.
+	listReq := req.Msg.Request
+	searchFilter, remainingFilters, err := impl.SplitSearchFilters(listReq.GetFilters())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+	if searchFilter != nil {
+		scopeFilter = scopeFilter.And(searchFilter)
+		// Clone so the caller's request is not mutated when the search filter is stripped.
+		listReq = proto.Clone(listReq).(*common.ListRequest)
+		listReq.Filters = remainingFilters
+	}
+
 	// Parse pagination, sort, and user-supplied filters from the common ListRequest.
-	listInput, err := impl.NewListResourceInputFromProto(req.Msg.Request, models.ActionColumnsSet)
+	listInput, err := impl.NewListResourceInputFromProto(listReq, models.ActionColumnsSet)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
@@ -1250,8 +1294,9 @@ func (s *RunService) WatchActionDetails(
 		return err
 	}
 
-	// Close only once action_events reflects the terminal phase, not just actions table.
-	if lastAttemptIsTerminal(details.GetAttempts()) {
+	// Close only once the action is terminal AND action_events reflects it — a
+	// terminal event for a retrying attempt must not end the stream.
+	if actionStreamComplete(details) {
 		return nil
 	}
 
@@ -1279,8 +1324,8 @@ func (s *RunService) WatchActionDetails(
 			}); err != nil {
 				return err
 			}
-			// Close once action_events reflects the terminal phase.
-			if lastAttemptIsTerminal(details.GetAttempts()) {
+			// Close once the action is terminal and action_events reflects it.
+			if actionStreamComplete(details) {
 				return nil
 			}
 		}
@@ -2078,7 +2123,8 @@ func (s *RunService) buildTaskGroups(ctx context.Context, req *workflow.WatchGro
 
 		phase := common.ActionPhase(action.Phase)
 		g.phaseCounts[phase]++
-		if phase == common.ActionPhase_ACTION_PHASE_FAILED {
+
+		if IsFailedPhase(phase) {
 			g.failCount++
 		}
 

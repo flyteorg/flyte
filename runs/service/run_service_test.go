@@ -13,10 +13,12 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
@@ -35,6 +37,38 @@ import (
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
+
+// noSettings returns a settings repo reporting no stored rows, so run creation
+// resolves to empty settings and the applier changes nothing.
+func noSettings(t *testing.T) *repoMocks.SettingsRepo {
+	m := &repoMocks.SettingsRepo{}
+	m.On("GetSettingsByKeys", mock.Anything, mock.Anything).Return(nil, nil)
+	return m
+}
+
+// settingsRepoWith returns a settings repo holding one org-level row with the given
+// settings. The row key must match what fetchLevels asks for, or the lookup aligns
+// to nothing.
+func settingsRepoWith(t *testing.T, s *settings.Settings) *repoMocks.SettingsRepo {
+	t.Helper()
+	data, err := protojson.Marshal(s)
+	require.NoError(t, err)
+
+	m := &repoMocks.SettingsRepo{}
+	m.On("GetSettingsByKeys", mock.Anything, mock.Anything).
+		Return([]*models.Settings{{Key: models.EncodeSettingsKey("", ""), Data: data, Version: 1}}, nil)
+	return m
+}
+
+// settingsWithQueue returns a settings repo whose one row sets the default queue.
+func settingsWithQueue(t *testing.T, queue string) *repoMocks.SettingsRepo {
+	t.Helper()
+	return settingsRepoWith(t, &settings.Settings{
+		Run: &settings.RunSettings{
+			DefaultQueue: &settings.StringSetting{State: stateValue, StringValue: queue},
+		},
+	})
+}
 
 // newMockProjectClientAlwaysOK returns a mock ProjectServiceClient whose GetProject always succeeds.
 func newMockProjectClientAlwaysOK(t *testing.T) *projectMocks.ProjectServiceClient {
@@ -546,6 +580,7 @@ func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
+		settingsRepo:  noSettings(t),
 		actionsClient: actionsClient,
 		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
@@ -793,6 +828,66 @@ func TestListRuns(t *testing.T) {
 			assert.Equal(t, tc.expect.Token, got.Msg.Token)
 		})
 	}
+}
+
+// TestListRuns_SearchFilter verifies the console's synthetic "search" filter is resolved
+// into the run-name-or-task-name predicate before the allow-list parser sees the request,
+// that plain column filters still pass through alongside it, and that the caller's request
+// is not mutated.
+func TestListRuns_SearchFilter(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+
+	var captured interfaces.ListResourceInput
+	actionRepo.On("ListActions", mock.Anything, mock.MatchedBy(func(input interfaces.ListResourceInput) bool {
+		captured = input
+		return true
+	})).Return([]*models.Run{}, nil).Once()
+
+	listReq := &common.ListRequest{
+		Limit: 10,
+		Filters: []*common.Filter{
+			{Field: "search", Function: common.Filter_CONTAINS_CASE_INSENSITIVE, Values: []string{"abc"}},
+			{Field: "phase", Function: common.Filter_EQUAL, Values: []string{"2"}},
+		},
+	}
+	_, err := svc.ListRuns(context.Background(), connect.NewRequest(&workflow.ListRunsRequest{
+		ScopeBy: &workflow.ListRunsRequest_ProjectId{ProjectId: &common.ProjectIdentifier{Name: "p", Domain: "d"}},
+		Request: listReq,
+	}))
+	require.NoError(t, err)
+
+	require.NotNil(t, captured.Filter)
+	expr, err := captured.Filter.QueryExpression("")
+	require.NoError(t, err)
+	assert.Contains(t, expr.Query, "(LOWER(run_name) LIKE LOWER(?)) OR (LOWER(task_name) LIKE LOWER(?))")
+	assert.Contains(t, expr.Query, "phase = ?")
+	assert.Contains(t, expr.Args, "%abc%")
+
+	// The request handed in by the caller still carries the search filter.
+	require.Len(t, listReq.Filters, 2)
+	assert.Equal(t, "search", listReq.Filters[0].GetField())
+}
+
+// TestListRuns_RejectsBadSearchFilter verifies a search filter with an unsupported operator
+// is an InvalidArgument and never reaches the repository. The service is built inline
+// because newTestService requires the repository accessor to be used, and this path must
+// fail before it is.
+func TestListRuns_RejectsBadSearchFilter(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{} // no expectations: any ListActions call fails the test
+	repo := &repoMocks.Repository{}
+	repo.On("ActionRepo").Maybe().Return(actionRepo)
+	svc := &RunService{repo: repo}
+	t.Cleanup(func() { actionRepo.AssertExpectations(t) })
+
+	_, err := svc.ListRuns(context.Background(), connect.NewRequest(&workflow.ListRunsRequest{
+		ScopeBy: &workflow.ListRunsRequest_ProjectId{ProjectId: &common.ProjectIdentifier{Name: "p", Domain: "d"}},
+		Request: &common.ListRequest{
+			Limit:   10,
+			Filters: []*common.Filter{{Field: "search", Function: common.Filter_GREATER_THAN, Values: []string{"abc"}}},
+		},
+	}))
+	require.Error(t, err)
+	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 }
 
 // TestListAndSendAllActionsUsesAscendingSort guards against regressing the
@@ -1068,6 +1163,7 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
+		settingsRepo:  noSettings(t),
 		actionsClient: actionsClient,
 		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
@@ -1126,6 +1222,7 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
+		settingsRepo:  noSettings(t),
 		actionsClient: actionsClient,
 		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
@@ -1190,6 +1287,7 @@ func TestCreateRun_TriggerFire_CarriesRunSpecEnvVars(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
+		settingsRepo:  noSettings(t),
 		actionsClient: actionsClient,
 		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
@@ -1287,6 +1385,7 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
+		settingsRepo:  noSettings(t),
 		actionsClient: actionsClient,
 		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
@@ -1364,6 +1463,37 @@ func TestCreateRun_RejectsInvalidRunName(t *testing.T) {
 	}
 }
 
+func TestCreateRun_RejectsInvalidPodTemplateName(t *testing.T) {
+	// Only the settings and project lookups run before the check. Everything else stays
+	// nil on purpose: were the check missing, the write path would panic and fail the test.
+	svc := &RunService{
+		settingsRepo: settingsRepoWith(t, &settings.Settings{
+			PodTemplateName: &settings.StringSetting{State: stateValue, StringValue: "GPU Template"},
+		}),
+		projectClient: newMockProjectClientAlwaysOK(t),
+	}
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{
+				Org:     "org",
+				Project: "proj",
+				Domain:  "dev",
+				Name:    "rq-123",
+			},
+		},
+		InputWrapper: &workflow.CreateRunRequest_Inputs{Inputs: &task.Inputs{}},
+		Task: &workflow.CreateRunRequest_TaskSpec{
+			TaskSpec: &task.TaskSpec{},
+		},
+	}
+
+	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	require.Error(t, err)
+	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+	assert.ErrorContains(t, err, "pod template name")
+}
+
 func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
@@ -1377,6 +1507,7 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
+		settingsRepo:  noSettings(t),
 		actionsClient: actionsClient,
 		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",
@@ -1393,7 +1524,7 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 			},
 		},
 		InputWrapper: &workflow.CreateRunRequest_Inputs{
-			&task.Inputs{
+			Inputs: &task.Inputs{
 				Context: []*core.KeyValuePair{
 					{Key: "trace_id", Value: "root-abc"},
 				},
@@ -1434,6 +1565,65 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 	require.NoError(t, err)
 }
 
+// TestCreateRun_AppliesSettingsQueue proves the applier is actually wired into run
+// creation: the request names no queue, and the value stored on the run comes from
+// the org's settings row.
+func TestCreateRun_AppliesSettingsQueue(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(taskRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		settingsRepo:  settingsWithQueue(t, "fast-queue"),
+		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{
+				Org:     "org",
+				Project: "proj",
+				Domain:  "dev",
+				Name:    "rq-123",
+			},
+		},
+		InputWrapper: &workflow.CreateRunRequest_Inputs{Inputs: &task.Inputs{}},
+		Task: &workflow.CreateRunRequest_TaskSpec{
+			TaskSpec: &task.TaskSpec{},
+		},
+	}
+
+	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+
+	actionRepo.On("CreateAction", mock.Anything, mock.MatchedBy(func(m *models.Run) bool {
+		var rs task.RunSpec
+		_ = proto.Unmarshal(m.RunSpec, &rs)
+		return rs.GetQueue() == "fast-queue"
+	}), mock.Anything).Return(&models.Run{
+		Project: "proj",
+		Domain:  "dev",
+		Name:    "rq-123",
+	}, nil).Once()
+
+	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
+		return req.Msg.GetRunSpec().GetQueue() == "fast-queue"
+	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	require.NoError(t, err)
+}
+
 func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
@@ -1447,6 +1637,7 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
+		settingsRepo:  noSettings(t),
 		actionsClient: actionsClient,
 		projectClient: newMockProjectClientAlwaysOK(t),
 		storagePrefix: "s3://flyte-data",

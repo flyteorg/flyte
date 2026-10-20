@@ -18,7 +18,12 @@ const (
 	deploymentName             = "flyte-binary"
 	devModeEnvVar              = "FLYTE_DEV"
 	dockerHost                 = "host.docker.internal"
-	namespace                  = "flyte"
+
+	// Set by `flyte start devbox` when it runs the host-side Apple Silicon bridge (Apple Silicon only).
+	appleSiliconBridgePortEnvVar        = "FLYTE_DEVBOX_APPLE_SILICON_PORT"
+	appleSiliconBridgeTokenSecretEnvVar = "FLYTE_DEVBOX_APPLE_SILICON_TOKEN_SECRET"
+	hostPlatformEnvVar                  = "FLYTE_DEVBOX_HOST_PLATFORM"
+	namespace                           = "flyte"
 
 	// Template paths
 	devTemplatePath      = "/var/lib/rancher/k3s/server/manifests-staging/dev.yaml"
@@ -55,6 +60,29 @@ func getFirstNonLoopbackIP() (string, error) {
 	return "", fmt.Errorf("no suitable IP address found")
 }
 
+func lookupHostGatewayIP() (string, error) {
+	addrs, err := net.LookupHost(dockerHost)
+	if err != nil {
+		return "", err
+	}
+	return addrs[0], nil
+}
+
+// appleSiliconBridgeEndpoint is the host Apple Silicon bridge's URL as seen from pods, or "" when the devbox was
+// started without one. Pods cannot resolve host.docker.internal (CoreDNS does not read the
+// node's /etc/hosts), so the endpoint uses the host gateway IP directly.
+func appleSiliconBridgeEndpoint(lookupIP func() (string, error)) (string, error) {
+	port := os.Getenv(appleSiliconBridgePortEnvVar)
+	if port == "" {
+		return "", nil
+	}
+	ip, err := lookupIP()
+	if err != nil {
+		return "", err
+	}
+	return "http://" + net.JoinHostPort(ip, port), nil
+}
+
 func main() {
 	var tmplPath string
 	var tPlugins []transform.Plugin
@@ -81,12 +109,15 @@ func main() {
 
 	// Replace template variables
 	v := vars.NewVars(map[string]vars.ValueGetter{
-		"%{HOST_GATEWAY_IP}%": func() (string, error) {
-			addrs, err := net.LookupHost(dockerHost)
-			if err != nil {
-				return "", err
-			}
-			return addrs[0], nil
+		"%{HOST_GATEWAY_IP}%": lookupHostGatewayIP,
+		"%{APPLE_SILICON_BRIDGE_ENDPOINT}%": func() (string, error) {
+			return appleSiliconBridgeEndpoint(lookupHostGatewayIP)
+		},
+		"%{APPLE_SILICON_BRIDGE_TOKEN_SECRET}%": func() (string, error) {
+			return os.Getenv(appleSiliconBridgeTokenSecretEnvVar), nil
+		},
+		"%{DEVBOX_HOST_PLATFORM}%": func() (string, error) {
+			return os.Getenv(hostPlatformEnvVar), nil
 		},
 		"%{NODE_IP}%": func() (string, error) {
 			return getNodeIP()

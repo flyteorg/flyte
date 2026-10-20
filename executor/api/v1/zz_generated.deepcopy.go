@@ -220,6 +220,18 @@ func (in *TaskActionStatus) DeepCopyInto(out *TaskActionStatus) {
 		*out = make([]byte, len(*in))
 		copy(*out, *in)
 	}
+	if in.AttemptStartedAt != nil {
+		in, out := &in.AttemptStartedAt, &out.AttemptStartedAt
+		*out = (*in).DeepCopy()
+	}
+	if in.TimeoutAt != nil {
+		in, out := &in.TimeoutAt, &out.TimeoutAt
+		*out = (*in).DeepCopy()
+	}
+	if in.NextAttemptAt != nil {
+		in, out := &in.NextAttemptAt, &out.NextAttemptAt
+		*out = (*in).DeepCopy()
+	}
 	if in.Conditions != nil {
 		in, out := &in.Conditions, &out.Conditions
 		*out = make([]metav1.Condition, len(*in))

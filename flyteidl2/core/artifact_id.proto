@@ -8,11 +8,20 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core";
 
 message ArtifactKey {
-  // Project and domain and suffix needs to be unique across a given artifact store.
-  string project = 1;
-  string domain = 2;
-  string name = 3;
-  string org = 4;
+  // Identifies one artifact within an artifact store: the (org, project,
+  // domain, name) tuple must be unique. Length bounds match
+  // artifact.ArtifactName; fields stay optional because an empty field means
+  // "inherit from context" in several uses (e.g.
+  // artifact.ArtifactSpec.parent_artifacts).
+  string project = 1 [(buf.validate.field).string.max_len = 64];
+  string domain = 2 [(buf.validate.field).string.max_len = 64];
+  // Characters are restricted so a (name, version) pair can be encoded
+  // unambiguously into one scalar — see ArtifactVersionId.version.
+  string name = 3 [
+    (buf.validate.field).string.max_len = 255,
+    (buf.validate.field).string.pattern = "^[A-Za-z0-9._-]*$"
+  ];
+  string org = 4 [(buf.validate.field).string.max_len = 63];
 }
 
 // Identity of one artifact version. Unlike the legacy ArtifactID below, this
@@ -20,7 +29,16 @@ message ArtifactKey {
 // values (core.Literal.artifact_id) and referenced by v2 artifact APIs.
 message ArtifactVersionId {
   ArtifactKey key = 1;
-  string version = 2;
+  // A (name, version) pair identifies a parent in
+  // artifact.ArtifactSpec.parent_artifacts, and storage encodes that pair
+  // into a single scalar to index it. Restricting the character set is what
+  // makes that encoding injective: without it, name="a@v1"/version="b" and
+  // name="a"/version="v1@b" collide and a lineage query returns the wrong
+  // children. Empty is still allowed (it means "inherit").
+  string version = 2 [
+    (buf.validate.field).string.max_len = 255,
+    (buf.validate.field).string.pattern = "^[A-Za-z0-9._-]*$"
+  ];
 }
 
 // Reference to a previously uploaded card (model/data card) describing an
@@ -70,6 +88,7 @@ enum Granularity {
   HOUR = 2;
   DAY = 3; // default
   MONTH = 4;
+  WEEK = 5;
 }
 
 enum Operator {
@@ -108,6 +127,12 @@ message Partitions {
 message TimePartition {
   LabelValue value = 1;
   Granularity granularity = 2;
+
+  // Name of the time dimension, e.g. "date". When empty on an artifact
+  // version, the artifact service defaults it from the granularity: "hour"
+  // for HOUR, "date" otherwise, so artifacts agree on the name without
+  // coordination.
+  string key = 3 [(buf.validate.field).string.max_len = 64];
 }
 
 message ArtifactID {

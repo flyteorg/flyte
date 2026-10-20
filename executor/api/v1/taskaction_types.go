@@ -88,7 +88,9 @@ const (
 	// ConditionReasonSignaled indicates a condition action received its signal (Succeeded=True)
 	ConditionReasonSignaled TaskActionConditionReason = "Signaled"
 
-	// ConditionReasonTimedOut indicates a condition action passed its deadline unsignalled (Failed=True)
+	// ConditionReasonTimedOut indicates the action reached its deadline (Failed=True).
+	// This applies to both condition actions that were not signalled in time and to
+	// task actions whose per-attempt max-runtime was exhausted.
 	ConditionReasonTimedOut TaskActionConditionReason = "TimedOut"
 
 	// ConditionReasonRecovered indicates the action reused a prior run's result and never
@@ -189,6 +191,12 @@ type TaskActionSpec struct {
 	// Interruptible is the run-scoped interruptibility override projected from RunSpec.
 	// +optional
 	Interruptible *bool `json:"interruptible,omitempty"`
+
+	// PodTemplateName is the run-scoped pod template name projected from RunSpec.DefaultSettings.
+	// Stamped onto tasks that do not name one themselves.
+	// +optional
+	// +kubebuilder:validation:MaxLength=253
+	PodTemplateName string `json:"podTemplateName,omitempty"`
 
 	// Group is the group this action belongs to, if applicable.
 	// +optional
@@ -347,6 +355,24 @@ type TaskActionStatus struct {
 	// +optional
 	Attempts uint32 `json:"attempts,omitempty"`
 
+	// AttemptStartedAt is when the current user attempt first entered the Running phase.
+	// It is persisted independently from ActionEvent publication so max-runtime
+	// enforcement survives controller and event-service outages.
+	// +optional
+	AttemptStartedAt *metav1.Time `json:"attemptStartedAt,omitempty"`
+
+	// TimeoutAt is the max-runtime deadline for an expired current attempt.
+	// While set on a non-terminal action, timeout cleanup is pending and the
+	// plugin resource must not be handled or recreated.
+	// +optional
+	TimeoutAt *metav1.Time `json:"timeoutAt,omitempty"`
+
+	// NextAttemptAt is the earliest time the next user attempt may launch, set when a
+	// failed attempt is retried under a RetryStrategy with a backoff. While it lies in
+	// the future the plugin is not handled; it is cleared when the attempt launches.
+	// +optional
+	NextAttemptAt *metav1.Time `json:"nextAttemptAt,omitempty"`
+
 	// SystemFailures counts system-level failures observed during reconciliation —
 	// either Go errors returned from Plugin.Handle (e.g. transient k8s API errors,
 	// admission webhook denials) or plugin transitions reporting a system-retryable
@@ -354,6 +380,12 @@ type TaskActionStatus struct {
 	// maximum, the TaskAction is converted to a permanent failure.
 	// +optional
 	SystemFailures uint32 `json:"systemFailures,omitempty"`
+
+	// SystemRetries counts the times this TaskAction was relaunched in place after a
+	// system-retryable failure. Unlike SystemFailures it is never reset, so it gives
+	// each system-retry event a version no earlier one used.
+	// +optional
+	SystemRetries uint32 `json:"systemRetries,omitempty"`
 
 	// CacheStatus is the latest observed cache lookup result for this action.
 	// +optional

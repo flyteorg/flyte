@@ -72,6 +72,20 @@ func TestEnqueue(t *testing.T) {
 
 		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
 	})
+
+	t.Run("already exists is preserved", func(t *testing.T) {
+		m := mocks.NewActionsClientInterface(t)
+		svc := NewActionsService(m)
+
+		m.EXPECT().Enqueue(mock.Anything, testAction, (*task.RunSpec)(nil)).
+			Return(connect.NewError(connect.CodeAlreadyExists, errors.New("already exists")))
+
+		_, err := svc.Enqueue(context.Background(), connect.NewRequest(&actions.EnqueueRequest{
+			Action: testAction,
+		}))
+
+		assert.Equal(t, connect.CodeAlreadyExists, connect.CodeOf(err))
+	})
 }
 
 func TestUpdate(t *testing.T) {
@@ -246,6 +260,36 @@ func TestTaskActionToUpdate_PopulatesErrorOnFailure(t *testing.T) {
 		assert.Equal(t, "OOMKilled", upd.Error.Code)
 		assert.Equal(t, core.ExecutionError_USER, upd.Error.Kind)
 		assert.Equal(t, "container oom", upd.Error.Message)
+	}
+}
+
+func TestTaskActionToUpdate_PopulatesErrorOnTimeout(t *testing.T) {
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Project: "flytesnacks", Domain: "development", RunName: "r1", ActionName: "a0",
+			RunOutputBase: "s3://bucket/run",
+		},
+		Status: executorv1.TaskActionStatus{
+			Conditions: []metav1.Condition{
+				{
+					Type:   string(executorv1.ConditionTypeFailed),
+					Status: metav1.ConditionTrue,
+					Reason: string(executorv1.ConditionReasonTimedOut),
+				},
+			},
+			ErrorState: &executorv1.ErrorState{
+				Code: "TaskExecutionTimedOut", Kind: "USER", Message: "max runtime exceeded",
+			},
+		},
+	}
+
+	upd := taskActionToUpdate(context.Background(), ta)
+
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_TIMED_OUT, upd.Phase)
+	if assert.NotNil(t, upd.Error) {
+		assert.Equal(t, "TaskExecutionTimedOut", upd.Error.Code)
+		assert.Equal(t, core.ExecutionError_USER, upd.Error.Kind)
+		assert.Equal(t, "max runtime exceeded", upd.Error.Message)
 	}
 }
 

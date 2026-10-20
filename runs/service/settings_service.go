@@ -9,8 +9,10 @@ import (
 	"connectrpc.com/connect"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/api/resource"
 
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings/settingsconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
@@ -26,40 +28,6 @@ func NewSettingsService(settingsRepo interfaces.SettingsRepo) *SettingsService {
 	return &SettingsService{settingsRepo: settingsRepo}
 }
 
-// fetchLevels returns the scope levels covered by key, broadest first, together with
-// the stored row for each. The two slices align by position, and a nil row means no
-// record exists at that level. Order comes from the key ladder; the repo returns rows
-// unordered.
-func (s *SettingsService) fetchLevels(ctx context.Context, key *settings.SettingsKey) ([]*settings.SettingsKey, []*models.Settings, error) {
-	levelKeys := []*settings.SettingsKey{{Org: key.GetOrg()}}
-	if key.GetDomain() != "" {
-		levelKeys = append(levelKeys, &settings.SettingsKey{Org: key.GetOrg(), Domain: key.GetDomain()})
-	}
-	if key.GetProject() != "" {
-		levelKeys = append(levelKeys, &settings.SettingsKey{Org: key.GetOrg(), Domain: key.GetDomain(), Project: key.GetProject()})
-	}
-
-	storageKeys := make([]string, 0, len(levelKeys))
-	for _, lk := range levelKeys {
-		storageKeys = append(storageKeys, models.EncodeSettingsKey(lk.GetOrg(), lk.GetDomain(), lk.GetProject()))
-	}
-
-	rows, err := s.settingsRepo.GetSettingsByKeys(ctx, storageKeys)
-	if err != nil {
-		return nil, nil, err
-	}
-	rowsByKey := make(map[string]*models.Settings, len(rows))
-	for _, row := range rows {
-		rowsByKey[row.Key] = row
-	}
-
-	aligned := make([]*models.Settings, len(levelKeys))
-	for i := range levelKeys {
-		aligned[i] = rowsByKey[storageKeys[i]]
-	}
-	return levelKeys, aligned, nil
-}
-
 // GetSettings returns resolved, merged settings.
 func (s *SettingsService) GetSettings(
 	ctx context.Context,
@@ -70,28 +38,17 @@ func (s *SettingsService) GetSettings(
 		return nil, err
 	}
 
-	_, rows, err := s.fetchLevels(ctx, key)
+	resolved, err := resolveSettings(ctx, s.settingsRepo, key)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	levels := make([]*settings.Settings, len(rows))
-	for i, row := range rows {
-		if row == nil {
-			continue
-		}
-		stored := &settings.Settings{}
-		if err := (protojson.UnmarshalOptions{DiscardUnknown: true}).Unmarshal(row.Data, stored); err != nil {
-			return nil, connect.NewError(connect.CodeInternal, err)
-		}
-		levels[i] = stored
-	}
 	// Merged settings do not correspond to a stored row, so the record carries no
 	// version. Clients that need one for an update use GetSettingsForEdit.
 	return connect.NewResponse(&settings.GetSettingsResponse{
 		SettingsRecord: &settings.SettingsRecord{
 			Key:      key,
-			Settings: mergeSettings(levels),
+			Settings: resolved,
 		},
 	}), nil
 }
@@ -105,7 +62,7 @@ func (s *SettingsService) GetSettingsForEdit(
 		return nil, err
 	}
 
-	levelKeys, rows, err := s.fetchLevels(ctx, key)
+	levelKeys, rows, err := fetchLevels(ctx, s.settingsRepo, key)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -116,8 +73,8 @@ func (s *SettingsService) GetSettingsForEdit(
 		// CreateSettings there (see SettingsRecord in the proto).
 		record := &settings.SettingsRecord{Key: lk, Settings: &settings.Settings{}}
 		if row := rows[i]; row != nil {
-			stored := &settings.Settings{}
-			if err := (protojson.UnmarshalOptions{DiscardUnknown: true}).Unmarshal(row.Data, stored); err != nil {
+			stored, err := decodeStored(row)
+			if err != nil {
 				return nil, connect.NewError(connect.CodeInternal, err)
 			}
 			record.Settings = stored
@@ -154,7 +111,7 @@ func (s *SettingsService) CreateSettings(
 	}
 
 	model := &models.Settings{
-		Key:  models.EncodeSettingsKey(key.GetOrg(), key.GetDomain(), key.GetProject()),
+		Key:  models.EncodeSettingsKey(key.GetDomain(), key.GetProject()),
 		Data: data,
 	}
 
@@ -199,7 +156,7 @@ func (s *SettingsService) UpdateSettings(
 	}
 
 	model := &models.Settings{
-		Key:     models.EncodeSettingsKey(key.GetOrg(), key.GetDomain(), key.GetProject()),
+		Key:     models.EncodeSettingsKey(key.GetDomain(), key.GetProject()),
 		Data:    data,
 		Version: req.Msg.GetVersion(),
 	}
@@ -276,6 +233,36 @@ func validateTaskResourceDefaults(bound string, d *settings.TaskResourceDefaults
 	return validateQuantity(bound+".storage", d.GetStorage())
 }
 
+// canonicalAcceleratorNames is every accelerator_name string declared on
+// core.AcceleratorModel, read once from the enum's descriptor.
+var canonicalAcceleratorNames = func() map[string]bool {
+	names := map[string]bool{}
+	values := core.AcceleratorModel(0).Descriptor().Values()
+	for i := 0; i < values.Len(); i++ {
+		if name, ok := proto.GetExtension(values.Get(i).Options(), core.E_AcceleratorName).(string); ok && name != "" {
+			names[name] = true
+		}
+	}
+	return names
+}()
+
+// validateDefaultAccelerator requires a default accelerator in VALUE state to
+// name a device from the canonical list (core.AcceleratorModel's
+// accelerator_name strings). Unlike a task's own gpu_accelerator, which keeps
+// accepting every spelling an SDK has ever written, a setting is new and so
+// only takes canonical values.
+func validateDefaultAccelerator(setting *settings.AcceleratorSetting) error {
+	if setting.GetState() != settings.SettingState_SETTING_STATE_VALUE {
+		return nil
+	}
+	device := setting.GetAcceleratorValue().GetDevice()
+	if !canonicalAcceleratorNames[device] {
+		return connect.NewError(connect.CodeInvalidArgument,
+			fmt.Errorf("invalid task_resource.default_accelerator device %q: must be one of the flyteidl2.core.AcceleratorModel accelerator_name values", device))
+	}
+	return nil
+}
+
 func validateSettings(s *settings.Settings) error {
 	if err := validateMaxActionConcurrency(s.GetRun().GetMaxActionConcurrency()); err != nil {
 		return err
@@ -283,7 +270,10 @@ func validateSettings(s *settings.Settings) error {
 	if err := validateTaskResourceDefaults("task_resource.min", s.GetTaskResource().GetMin()); err != nil {
 		return err
 	}
-	return validateTaskResourceDefaults("task_resource.max", s.GetTaskResource().GetMax())
+	if err := validateTaskResourceDefaults("task_resource.max", s.GetTaskResource().GetMax()); err != nil {
+		return err
+	}
+	return validateDefaultAccelerator(s.GetTaskResource().GetDefaultAccelerator())
 }
 
 var _ settingsconnect.SettingsServiceHandler = (*SettingsService)(nil)

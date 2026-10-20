@@ -158,6 +158,12 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 		}
 
 		if err := c.k8sClient.Create(ctx, taskAction); err != nil {
+			// Surface AlreadyExists so callers can treat a re-enqueue (e.g. from
+			// a restarted parent) as already launched.
+			if apierrors.IsAlreadyExists(err) {
+				return connect.NewError(connect.CodeAlreadyExists,
+					fmt.Errorf("TaskAction CR %s already exists: %w", taskAction.Name, err))
+			}
 			return fmt.Errorf("failed to create TaskAction CR %s: %w", taskAction.Name, err)
 		}
 
@@ -194,8 +200,8 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 
 		if err := c.k8sClient.Create(ctx, taskAction); err != nil {
 			if apierrors.IsAlreadyExists(err) {
-				logger.Infof(ctx, "TaskAction CR %s already exists, skipping create", taskAction.Name)
-				return nil
+				return connect.NewError(connect.CodeAlreadyExists,
+					fmt.Errorf("condition TaskAction CR %s already exists: %w", taskAction.Name, err))
 			}
 			return fmt.Errorf("failed to create condition TaskAction CR %s: %w", taskAction.Name, err)
 		}
@@ -1085,6 +1091,7 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 	if runSpec == nil {
 		taskAction.Spec.EnvVars = nil
 		taskAction.Spec.Interruptible = nil
+		taskAction.Spec.PodTemplateName = ""
 		taskAction.Spec.RecoveryContext = nil
 		return nil
 	}
@@ -1096,6 +1103,7 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 	taskAction.Spec.RecoveryContext = recoveryContext
 
 	taskAction.Spec.EnvVars = keyValuePairsToMap(runSpec.GetEnvs().GetValues())
+	taskAction.Spec.PodTemplateName = runSpec.GetDefaultSettings().GetPodTemplateName()
 	if runSpec.GetInterruptible() != nil {
 		value := runSpec.GetInterruptible().GetValue()
 		taskAction.Spec.Interruptible = &value
@@ -1127,6 +1135,7 @@ func inheritRunContextFromParentTaskAction(taskAction *executorv1.TaskAction, pa
 	}
 	taskAction.Spec.RecoveryContext = parentTaskAction.Spec.RecoveryContext.DeepCopy()
 	taskAction.Spec.EnvVars = cloneStringMap(parentTaskAction.Spec.EnvVars)
+	taskAction.Spec.PodTemplateName = parentTaskAction.Spec.PodTemplateName
 	if len(parentTaskAction.Annotations) > 0 {
 		if taskAction.Annotations == nil {
 			taskAction.Annotations = map[string]string{}
@@ -1216,6 +1225,7 @@ func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction
 	taskAction.Spec.ShortName = taskSpec.Task.Spec.ShortName
 
 	tmpl = substituteRunStartTime(tmpl, runSpec.GetRunStartTime())
+	tmpl = applyPodTemplateName(tmpl, taskAction.Spec.PodTemplateName)
 
 	data, err := proto.Marshal(tmpl)
 	if err != nil {
@@ -1242,6 +1252,26 @@ func substituteRunStartTime(tmpl *core.TaskTemplate, ts *timestamppb.Timestamp) 
 	for i, arg := range args {
 		args[i] = strings.ReplaceAll(arg, runStartTimeTemplateVar, value)
 	}
+	return cloned
+}
+
+// applyPodTemplateName returns a TaskTemplate whose metadata names the given pod template.
+// It returns the input unchanged when the name is empty or the task already named one itself,
+// so an explicit choice always wins. The template is cloned before mutation so the caller's
+// proto - which may be persisted separately as the registered task spec - is not affected.
+func applyPodTemplateName(tmpl *core.TaskTemplate, name string) *core.TaskTemplate {
+	if name == "" {
+		return tmpl
+	}
+	if tmpl.GetMetadata().GetPodTemplateName() != "" {
+		return tmpl
+	}
+
+	cloned := proto.Clone(tmpl).(*core.TaskTemplate)
+	if cloned.Metadata == nil {
+		cloned.Metadata = &core.TaskMetadata{}
+	}
+	cloned.Metadata.PodTemplateName = name
 	return cloned
 }
 

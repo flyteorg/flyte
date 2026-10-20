@@ -11,7 +11,7 @@
 CMD_PATH ?= ./cmd
 BIN_DIR ?= bin
 BIN_NAME ?= $(SERVICE_NAME)
-GOLANGCI_LINT_VERSION ?= v2.12.2
+GOLANGCI_LINT_VERSION ?= v2.14.0
 LOCALBIN ?= $(shell pwd)/bin
 
 # ANSI color codes for prettier output

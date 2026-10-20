@@ -9,6 +9,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"google.golang.org/protobuf/proto"
 	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -18,6 +19,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/gpufault"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
@@ -27,6 +29,21 @@ import (
 )
 
 const pluginStateVersion = 1
+
+const (
+	// codeResourceDeletedExternally is the failure reported when the plugin's resource is
+	// gone from the cluster before the plugin saw it end.
+	codeResourceDeletedExternally = "ResourceDeletedExternally"
+	// codeUnexpectedObjectDeletion is the failure reported when the plugin's resource is
+	// being deleted while the plugin still considers it running.
+	codeUnexpectedObjectDeletion = "UnexpectedObjectDeletion"
+	// codePreviousResourceStuckTerminating is the failure reported when a launch has waited
+	// too long for the previous incarnation of its resource to finish terminating.
+	codePreviousResourceStuckTerminating = "PreviousResourceStuckTerminating"
+	// stoppedEventReason is the reason of the event Kueue's job framework records on a pod
+	// it stops, carrying the same message it puts on the pod's TerminationTarget condition.
+	stoppedEventReason = "Stopped"
+)
 
 // PluginPhase tracks the high-level phase of the PluginManager's state machine.
 type PluginPhase uint8
@@ -114,6 +131,25 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 	logger.Infof(ctx, "Creating Object: Type:[%v], Object:[%v/%v]", o.GetObjectKind().GroupVersionKind(), o.GetNamespace(), o.GetName())
 
 	err = pm.kubeClient.GetClient().Create(ctx, o)
+	if k8serrors.IsAlreadyExists(err) && !pm.canAdoptExisting(ctx, o) {
+		// The name is taken by the previous incarnation of this resource, still draining
+		// its grace period after a system retry aborted it. It is not this launch's
+		// resource: adopting it would only rediscover its deletion next round, abort and
+		// reset again, and land back here, once per reconcile until it is gone, reporting
+		// the same failure to the user each time. Wait for the name to free up instead,
+		// but not forever: a resource stuck terminating well past its grace period (an
+		// unreachable node, a finalizer that never clears) may never free it, so fail the
+		// launch and let the system-retry budget bound it.
+		if stuckFor, stuck := stuckTerminating(o, config.GetK8sPluginConfig().TerminatingResourceGracePeriod.Duration); stuck {
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(
+				codePreviousResourceStuckTerminating,
+				fmt.Sprintf("previous resource [%s] is still terminating %s past its deletion grace period",
+					client.ObjectKeyFromObject(o), stuckFor.Round(time.Second)),
+				nil)), nil
+		}
+		return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResources(
+			time.Now(), pluginsCore.DefaultPhaseVersion, "waiting for the previous resource to be deleted")), nil
+	}
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
 		if k8serrors.IsForbidden(err) {
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil)), nil
@@ -142,6 +178,30 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 	return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "task submitted to K8s")), nil
 }
 
+// canAdoptExisting reports whether the resource a launch collided with can stand in for
+// the one it meant to create: it is there and not being deleted. That is the resource of
+// a launch whose state did not persist. A resource on its way out is not, and neither is
+// one that cannot be read; the next round can tell. o is overwritten with what the
+// cluster holds under its name.
+func (pm *PluginManager) canAdoptExisting(ctx context.Context, o client.Object) bool {
+	if err := pm.kubeClient.GetClient().Get(ctx, client.ObjectKeyFromObject(o), o); err != nil {
+		return false
+	}
+	return o.GetDeletionTimestamp() == nil
+}
+
+// stuckTerminating reports how long o has been terminating past the end of its deletion
+// grace period, and whether that exceeds gracePeriod. A resource that could not be read
+// carries no deletion timestamp and is never stuck; a zero gracePeriod disables the bound.
+func stuckTerminating(o client.Object, gracePeriod time.Duration) (time.Duration, bool) {
+	deletion := o.GetDeletionTimestamp()
+	if gracePeriod <= 0 || deletion == nil {
+		return 0, false
+	}
+	stuckFor := time.Since(deletion.Time)
+	return stuckFor, stuckFor > gracePeriod
+}
+
 func (pm *PluginManager) getResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
 	o, err := pm.plugin.BuildIdentityResource(ctx, tCtx.TaskExecutionMetadata())
 	if err != nil {
@@ -160,7 +220,7 @@ func (pm *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCor
 		if k8serrors.IsNotFound(err) || k8serrors.IsGone(err) || k8serrors.IsResourceExpired(err) {
 			logger.Warningf(ctx, "Failed to find the Resource with name: %v. Error: %v", nsName, err)
 			failureReason := fmt.Sprintf("resource not found, name [%s]. reason: %s", nsName.String(), err.Error())
-			return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure("ResourceDeletedExternally", failureReason, nil)), nil
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(codeResourceDeletedExternally, failureReason, nil)), nil
 		}
 		logger.Warningf(ctx, "Failed to retrieve Resource Details with name: %v. Error: %v", nsName, err)
 		return pluginsCore.UnknownTransition, err
@@ -215,11 +275,6 @@ func (pm *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCor
 		return pluginsCore.DoTransition(p), nil
 	}
 
-	if !p.Phase().IsTerminal() && o.GetDeletionTimestamp() != nil {
-		failureReason := fmt.Sprintf("object [%s] terminated unexpectedly in the background", nsName.String())
-		return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure("UnexpectedObjectDeletion", failureReason, nil)), nil
-	}
-
 	return pluginsCore.DoTransition(p), nil
 }
 
@@ -272,6 +327,7 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 			lastEventUpdate,
 			lastEventRecordedAt,
 		)
+		phaseInfo = pm.classifyExternalTermination(resource, phaseInfo)
 		phaseInfo = pm.classifyGpuFailure(resource, phaseInfo)
 		transition.SetInfo(phaseInfo)
 	}
@@ -363,32 +419,6 @@ func objectKeyFor(resource client.Object) watchedObjectKey {
 	}
 }
 
-// gpuFaultRelevanceWindow bounds how long before a failure a fault can still explain
-// it. Which pod a fault belongs to is settled by the UID when the pod's UID is known
-// (see classifyGpuFailure for the one case it is not); the window only separates the
-// fault that explains this failure from one the node saw much earlier. It is measured
-// from the failure's own time, not from when classification runs, so a slow reconcile
-// cannot age a fault out. Thirty minutes spans the slow paths between a fault and the
-// failure it causes: a container left wedged after a bus fault until the kubelet gives
-// up on it, and a node going NotReady with its pods evicted only after the
-// node-monitor grace period and eviction timeout.
-//
-// A fault that was still firing inside the window counts even if it started before it,
-// because what the window bounds is how stale a fault's last sign of life may be, not how
-// old the fault is. See faultOverlapsFailure.
-const gpuFaultRelevanceWindow = 30 * time.Minute
-
-// gpuFaultAfterFailureSlack is how far past the failure a fault may first be recorded and
-// still count. The kernel line and the container's termination are stamped by different
-// processes on the same node and the daemon reads the kernel log with a small lag, so a
-// fault can first be recorded moments after the failure it caused; a fault that only
-// started later than that cannot have caused it.
-//
-// It bounds when a fault started, not when it stopped. Hardware that keeps faulting after
-// the container died goes on being observed for as long as it goes on faulting, and that
-// says nothing about whether it caused the failure. See faultOverlapsFailure.
-const gpuFaultAfterFailureSlack = 2 * time.Minute
-
 // classifyGpuFailure folds the GPU faults recorded against a failed attempt's pod into
 // the failure the plugin reported, so that a fault the node saw becomes the code and
 // the message the user reads. Anything that is not a failed pod is left alone.
@@ -407,7 +437,7 @@ func (pm *PluginManager) classifyGpuFailure(
 	// Xid that killed the task is usually recorded rounds before the pod's status
 	// catches up with it, and by then the watermark has moved past it. What bounds the
 	// search is the identity and the recency of each event, checked below.
-	failureAt := podFailureTime(resource.(*v1.Pod), phaseInfoOccurredAt(phaseInfo))
+	failureAt := flytek8s.PodFailureTime(resource.(*v1.Pod), phaseInfoOccurredAt(phaseInfo))
 
 	events := pm.eventWatcher.List(objectKeyFor(resource), time.Time{}, time.Time{})
 	if len(events) == 0 {
@@ -436,7 +466,7 @@ func (pm *PluginManager) classifyGpuFailure(
 		if resource.GetUID() != "" && event.RegardingUID != resource.GetUID() {
 			continue
 		}
-		if !faultOverlapsFailure(event, failureAt) {
+		if !gpufault.RelevantToFailure(event.CreatedAt, event.LastObservedAt, failureAt) {
 			logger.Debugf(context.TODO(),
 				"ignoring GPU fault event %q on %s: active %s to %s, which does not reach the failure at %s",
 				event.Reason, objectKeyFor(resource).Name, event.CreatedAt, event.LastObservedAt, failureAt)
@@ -450,41 +480,75 @@ func (pm *PluginManager) classifyGpuFailure(
 	return gpufault.ClassifyFailure(phaseInfo, faults)
 }
 
-// faultOverlapsFailure reports whether a fault event was active close enough to the
-// failure to explain it.
+// classifyExternalTermination folds what an external controller left behind on a pod it
+// stopped into the failure this manager reported for the pod's disappearance, so the user
+// reads that controller's reason (for Kueue, why the Workload was preempted) instead of a
+// bare deletion. Only the two failures the manager reports without looking at the pod are
+// touched; a pod the plugin itself classified is left alone, and so is anything that is
+// not a failed pod.
 //
-// A fault that keeps repeating is aggregated into a single event whose last observation
-// moves with every repeat, so an event describes an interval and not a moment: it was
-// first recorded at CreatedAt and was still firing at LastObservedAt. The failure has an
-// interval of its own, the window before it in which a fault could have caused it and the
-// small slack after it in which a fault it caused could still be recorded. The event
-// counts when those two intervals overlap.
-//
-// Testing the last observation alone, as this used to, drops the fault that matters most:
-// hardware that keeps faulting after the container died has a last observation well past
-// the failure, so the longer it goes on the more certainly it was discarded. Testing the
-// creation alone drops the opposite case, a fault that started before the window opened
-// and was still firing when the task died. Overlap keeps both and still rejects a fault
-// that only started after the failure, or one that had stopped firing before the window
-// opened.
-func faultOverlapsFailure(event *eventInfo, failureAt time.Time) bool {
-	activeFrom, activeUntil := event.CreatedAt, event.LastObservedAt
-	if activeFrom.IsZero() {
-		activeFrom = activeUntil
+// A pod caught on its way out still carries the reason as its TerminationTarget
+// condition. A pod that is already gone left only its events behind, cached under a name
+// a replacement pod reuses, so its Stopped event is credited only when the event's
+// regarding UID is the pod's, or when the pod's UID is unknown because it vanished before
+// this round reached it (the same trade classifyGpuFailure makes).
+func (pm *PluginManager) classifyExternalTermination(
+	resource client.Object,
+	phaseInfo pluginsCore.PhaseInfo,
+) pluginsCore.PhaseInfo {
+	if resource == nil || !phaseInfo.Phase().IsFailure() || phaseInfo.Err() == nil {
+		return phaseInfo
 	}
-	if activeUntil.IsZero() {
-		activeUntil = activeFrom
-	}
-	if activeFrom.IsZero() || activeUntil.Before(activeFrom) {
-		// No usable time at all, or a last observation older than the creation, which no
-		// honest recorder produces. Nothing can be concluded, so it does not explain.
-		return false
+	pod, isPod := resource.(*v1.Pod)
+	if !isPod {
+		return phaseInfo
 	}
 
-	relevantFrom := failureAt.Add(-gpuFaultRelevanceWindow)
-	relevantUntil := failureAt.Add(gpuFaultAfterFailureSlack)
+	switch phaseInfo.Err().GetCode() {
+	case codeUnexpectedObjectDeletion:
+		c := flytek8s.GetTerminationTarget(pod.Status)
+		if c == nil {
+			return phaseInfo
+		}
+		return pluginsCore.PhaseInfoSystemRetryableFailure(
+			flytek8s.ExternalTerminationCode(c),
+			flytek8s.ExternalTerminationMessage(c),
+			phaseInfo.Info(),
+		)
+	case codeResourceDeletedExternally:
+		message, found := pm.stoppedEventMessage(pod)
+		if !found {
+			return phaseInfo
+		}
+		execErr := proto.Clone(phaseInfo.Err()).(*core.ExecutionError)
+		execErr.Message = fmt.Sprintf("%s; last event [%s]: %s", execErr.GetMessage(), stoppedEventReason, message)
+		return pluginsCore.PhaseInfoFailed(phaseInfo.Phase(), execErr, phaseInfo.Info())
+	}
+	return phaseInfo
+}
 
-	return !activeFrom.After(relevantUntil) && !activeUntil.Before(relevantFrom)
+// stoppedEventMessage is the message of the latest Stopped event recorded against the pod,
+// when there is one that can be credited to this pod.
+func (pm *PluginManager) stoppedEventMessage(pod *v1.Pod) (string, bool) {
+	if pm.eventWatcher == nil {
+		return "", false
+	}
+	var latest *eventInfo
+	for _, event := range pm.eventWatcher.List(objectKeyFor(pod), time.Time{}, time.Time{}) {
+		if event.Reason != stoppedEventReason || event.RegardingUID == "" {
+			continue
+		}
+		if pod.GetUID() != "" && event.RegardingUID != pod.GetUID() {
+			continue
+		}
+		if latest == nil || event.CreatedAt.After(latest.CreatedAt) {
+			latest = event
+		}
+	}
+	if latest == nil {
+		return "", false
+	}
+	return latest.Message, true
 }
 
 // phaseInfoOccurredAt is the time the plugin put on the failure, or the zero time when it
@@ -494,47 +558,6 @@ func phaseInfoOccurredAt(phaseInfo pluginsCore.PhaseInfo) time.Time {
 		return *info.OccurredAt
 	}
 	return time.Time{}
-}
-
-// podFailureTime is the time a pod's own trouble is anchored on, which is what the fault
-// relevance interval is centred on.
-//
-// A container's termination is stamped by the kubelet on the same node and clock as the
-// fault events, so it is the closest thing to the moment a fault would have to explain. A
-// pod on its way out without a terminated container is anchored on its deletion, which is
-// what an eviction leaves behind.
-//
-// Only then does the plugin's own reported time stand in, and it is the last resort on
-// purpose. It comes from GetLastTransitionOccurredAt, which for a pod that failed while
-// its containers were still running is the time the container started, not the time
-// anything went wrong. Anchoring a long-running task on its own start would put every real
-// fault outside the window and quietly classify nothing.
-//
-// Init containers are not eligible. They finish before the workload starts, and a native
-// sidecar declared among them is reaped after everything else, so either would anchor on a
-// moment that has nothing to do with when the work died.
-func podFailureTime(pod *v1.Pod, occurredAt time.Time) time.Time {
-	latest := time.Time{}
-	for _, status := range pod.Status.ContainerStatuses {
-		terminated := status.State.Terminated
-		if terminated == nil || terminated.FinishedAt.IsZero() {
-			continue
-		}
-		if terminated.FinishedAt.After(latest) {
-			latest = terminated.FinishedAt.Time
-		}
-	}
-
-	switch {
-	case !latest.IsZero():
-		return latest
-	case pod.DeletionTimestamp != nil && !pod.DeletionTimestamp.IsZero():
-		return pod.DeletionTimestamp.Time
-	case !occurredAt.IsZero():
-		return occurredAt
-	default:
-		return time.Now()
-	}
 }
 
 // Abort implements pluginsCore.Plugin. Called when the task should be killed/aborted.

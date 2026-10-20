@@ -1,0 +1,54 @@
+{{- $name := "dataproxy" -}}
+{{- $component := $.Values.components.dataproxy -}}
+{{- $autoscaling := default dict $component.autoscaling }}
+{{- if and $component.enabled $autoscaling.enabled }}
+{{- if or (lt (int $autoscaling.minReplicas) 1) (lt (int $autoscaling.maxReplicas) (int $autoscaling.minReplicas)) }}
+{{- fail (printf "%s.autoscaling: require 1 <= minReplicas <= maxReplicas" $name) }}
+{{- end }}
+{{- if not (or $autoscaling.targetCPUUtilizationPercentage $autoscaling.targetMemoryUtilizationPercentage $autoscaling.metrics) }}
+{{- fail (printf "%s.autoscaling: configure at least one metric" $name) }}
+{{- end }}
+{{- $resourceName := include "flyte-core.componentName" (dict "root" $ "component" $name) }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ $resourceName }}
+  namespace: {{ $.Release.Namespace | quote }}
+  labels:
+    {{- include "flyte-core.componentLabels" (dict "root" $ "component" $name) | nindent 4 }}
+  {{- with $.Values.commonAnnotations }}
+  annotations:
+    {{- tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ $resourceName }}
+  minReplicas: {{ $autoscaling.minReplicas }}
+  maxReplicas: {{ $autoscaling.maxReplicas }}
+  {{- with $autoscaling.behavior }}
+  behavior:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  metrics:
+    {{- with $autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ . }}
+    {{- end }}
+    {{- with $autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ . }}
+    {{- end }}
+    {{- with $autoscaling.metrics }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}

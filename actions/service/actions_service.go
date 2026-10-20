@@ -154,7 +154,9 @@ func (s *ActionsService) WatchForUpdates(
 				OutputUri: update.OutputUri,
 				Value:     update.SignalValue,
 			}
-			if update.Phase == common.ActionPhase_ACTION_PHASE_FAILED && update.ErrorState != nil {
+			if (update.Phase == common.ActionPhase_ACTION_PHASE_FAILED ||
+				update.Phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT) &&
+				update.ErrorState != nil {
 				au.Error = errorStateToExecutionError(update.ErrorState)
 			}
 			resp := &actions.WatchForUpdatesResponse{
@@ -228,7 +230,9 @@ func taskActionToUpdate(ctx context.Context, action *executorv1.TaskAction) *wor
 		OutputUri: k8s.BuildOutputUri(ctx, action),
 		Value:     k8s.SignalValueFromStatus(ctx, action),
 	}
-	if phase == common.ActionPhase_ACTION_PHASE_FAILED && action.Status.ErrorState != nil {
+	if (phase == common.ActionPhase_ACTION_PHASE_FAILED ||
+		phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT) &&
+		action.Status.ErrorState != nil {
 		update.Error = errorStateToExecutionError(action.Status.ErrorState)
 	}
 	return update

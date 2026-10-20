@@ -73,10 +73,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
+	meterProvider := otelutils.GetMeterProvider(otelServiceName)
 	otelInterceptor, err := otelconnect.NewInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
-		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
-		otelconnect.WithoutServerPeerAttributes(),
+		otelconnect.WithMeterProvider(meterProvider),
 	)
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
@@ -92,10 +92,22 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		})
 	}
 
-	repo, err := repository.NewRepository(sc.DB, cfg.Database)
+	repo, err := repository.NewRepository(
+		sc.DB,
+		cfg.Database,
+		repository.NewNotificationConfig(
+			cfg.NotificationBufferLimit,
+			cfg.NotifyRetryMinBackoff.Duration,
+			cfg.NotifyRetryMaxBackoff.Duration,
+			cfg.WatchBufferSize,
+		),
+		meterProvider,
+	)
 	if err != nil {
 		return fmt.Errorf("runs: failed to create repository: %w", err)
 	}
+
+	settingsRepo := impl.NewSettingsRepo(sc.DB)
 
 	// In unified mode, intra-service calls go through the same mux.
 	actionsServiceCfg := cfg.ActionsService
@@ -129,7 +141,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return abortReconciler.Run(ctx)
 	})
 
-	runsSvc := service.NewRunService(repo, actionsClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
+	runsSvc := service.NewRunService(repo, settingsRepo, actionsClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
 	taskSvc := service.NewTaskService(repo, projectClient)
 
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc, connect.WithInterceptors(interceptors...))
@@ -178,7 +190,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(projectPath, projectHandler)
 	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
 
-	settingsSvc := service.NewSettingsService(impl.NewSettingsRepo(sc.DB))
+	settingsSvc := service.NewSettingsService(settingsRepo)
 	settingsPath, settingsHandler := settingsconnect.NewSettingsServiceHandler(settingsSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(settingsPath, settingsHandler)
 	logger.Infof(ctx, "Mounted SettingsService at %s", settingsPath)

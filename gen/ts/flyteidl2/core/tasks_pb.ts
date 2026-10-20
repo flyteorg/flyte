@@ -2,8 +2,8 @@
 // @generated from file flyteidl2/core/tasks.proto (package flyteidl2.core, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
-import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
+import type { GenEnum, GenExtension, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
+import { enumDesc, extDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
 import type { RunIdentifier } from "../common/identifier_pb.ts";
 import { file_flyteidl2_common_identifier } from "../common/identifier_pb.ts";
@@ -17,15 +17,15 @@ import type { KeyValuePair, RetryStrategy, TimeoutStrategy } from "./literals_pb
 import { file_flyteidl2_core_literals } from "./literals_pb.ts";
 import type { SecurityContext } from "./security_pb.ts";
 import { file_flyteidl2_core_security } from "./security_pb.ts";
-import type { Duration } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_duration, file_google_protobuf_struct, file_google_protobuf_wrappers } from "@bufbuild/protobuf/wkt";
+import type { Duration, EnumValueOptions } from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_descriptor, file_google_protobuf_duration, file_google_protobuf_struct, file_google_protobuf_wrappers } from "@bufbuild/protobuf/wkt";
 import type { JsonObject, Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file flyteidl2/core/tasks.proto.
  */
 export const file_flyteidl2_core_tasks: GenFile = /*@__PURE__*/
-  fileDesc("ChpmbHl0ZWlkbDIvY29yZS90YXNrcy5wcm90bxIOZmx5dGVpZGwyLmNvcmUitAIKCVJlc291cmNlcxI5CghyZXF1ZXN0cxgBIAMoCzInLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcy5SZXNvdXJjZUVudHJ5EjcKBmxpbWl0cxgCIAMoCzInLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcy5SZXNvdXJjZUVudHJ5GlQKDVJlc291cmNlRW50cnkSNAoEbmFtZRgBIAEoDjImLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcy5SZXNvdXJjZU5hbWUSDQoFdmFsdWUYAiABKAkiXQoMUmVzb3VyY2VOYW1lEgsKB1VOS05PV04QABIHCgNDUFUQARIHCgNHUFUQAhIKCgZNRU1PUlkQAxILCgdTVE9SQUdFEAQSFQoRRVBIRU1FUkFMX1NUT1JBR0UQBSKOAgoOR1BVQWNjZWxlcmF0b3ISDgoGZGV2aWNlGAEgASgJEhcKDXVucGFydGl0aW9uZWQYAiABKAhIABIYCg5wYXJ0aXRpb25fc2l6ZRgDIAEoCUgAEkAKDGRldmljZV9jbGFzcxgEIAEoDjIqLmZseXRlaWRsMi5jb3JlLkdQVUFjY2VsZXJhdG9yLkRldmljZUNsYXNzIl8KC0RldmljZUNsYXNzEg4KCk5WSURJQV9HUFUQABIOCgpHT09HTEVfVFBVEAESEQoNQU1BWk9OX05FVVJPThACEgsKB0FNRF9HUFUQAxIQCgxIQUJBTkFfR0FVREkQBEIWChRwYXJ0aXRpb25fc2l6ZV92YWx1ZSJKCgxTaGFyZWRNZW1vcnkSEgoKbW91bnRfcGF0aBgBIAEoCRISCgptb3VudF9uYW1lGAIgASgJEhIKCnNpemVfbGltaXQYAyABKAkigQEKEUV4dGVuZGVkUmVzb3VyY2VzEjcKD2dwdV9hY2NlbGVyYXRvchgBIAEoCzIeLmZseXRlaWRsMi5jb3JlLkdQVUFjY2VsZXJhdG9yEjMKDXNoYXJlZF9tZW1vcnkYAiABKAsyHC5mbHl0ZWlkbDIuY29yZS5TaGFyZWRNZW1vcnkilgEKD1J1bnRpbWVNZXRhZGF0YRI5CgR0eXBlGAEgASgOMisuZmx5dGVpZGwyLmNvcmUuUnVudGltZU1ldGFkYXRhLlJ1bnRpbWVUeXBlEg8KB3ZlcnNpb24YAiABKAkSDgoGZmxhdm9yGAMgASgJIicKC1J1bnRpbWVUeXBlEgkKBU9USEVSEAASDQoJRkxZVEVfU0RLEAEikAcKDFRhc2tNZXRhZGF0YRIUCgxkaXNjb3ZlcmFibGUYASABKAgSMAoHcnVudGltZRgCIAEoCzIfLmZseXRlaWRsMi5jb3JlLlJ1bnRpbWVNZXRhZGF0YRIqCgd0aW1lb3V0GAQgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEi4KB3JldHJpZXMYBSABKAsyHS5mbHl0ZWlkbDIuY29yZS5SZXRyeVN0cmF0ZWd5EhkKEWRpc2NvdmVyeV92ZXJzaW9uGAYgASgJEiAKGGRlcHJlY2F0ZWRfZXJyb3JfbWVzc2FnZRgHIAEoCRIXCg1pbnRlcnJ1cHRpYmxlGAggASgISAASGgoSY2FjaGVfc2VyaWFsaXphYmxlGAkgASgIEjQKBHRhZ3MYCyADKAsyJi5mbHl0ZWlkbDIuY29yZS5UYXNrTWV0YWRhdGEuVGFnc0VudHJ5EhkKEXBvZF90ZW1wbGF0ZV9uYW1lGAwgASgJEh8KF2NhY2hlX2lnbm9yZV9pbnB1dF92YXJzGA0gAygJEhAKCGlzX2VhZ2VyGA4gASgIEjIKDmdlbmVyYXRlc19kZWNrGA8gASgLMhouZ29vZ2xlLnByb3RvYnVmLkJvb2xWYWx1ZRIzCghtZXRhZGF0YRgQIAEoCzIhLmZseXRlaWRsMi5jb3JlLks4c09iamVjdE1ldGFkYXRhEhIKCmRlYnVnZ2FibGUYESABKAgSKgoJbG9nX2xpbmtzGBIgAygLMhcuZmx5dGVpZGwyLmNvcmUuVGFza0xvZxI4Cg9pbWFnZV9idWlsZF9ydW4YEyABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXISFQoNaXNfZW50cnlwb2ludBgUIAEoCBIXCg9jb2RlX2J1bmRsZV91cmkYFSABKAkSMQoIdGltZW91dHMYFiABKAsyHy5mbHl0ZWlkbDIuY29yZS5UaW1lb3V0U3RyYXRlZ3kSGgoScHJvZHVjZXNfYXJ0aWZhY3RzGBcgASgIEjoKDWNhY2hlX21heF9hZ2UYGCABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CCLpIBaoBAjIAGisKCVRhZ3NFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBQhUKE2ludGVycnVwdGlibGVfdmFsdWVKBAgKEAsiqAMKC1JldXNlUG9saWN5Eh0KDG1pbl9yZXBsaWNhcxgBIAEoBUIHukgEGgIoABIdCgxtYXhfcmVwbGljYXMYAiABKAVCB7pIBBoCKAESHAoLY29uY3VycmVuY3kYAyABKAVCB7pIBBoCKAESNQoIaWRsZV90dGwYBCABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CCLpIBaoBAjIAEjoKDXNjYWxlZG93bl90dGwYBSABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CCLpIBaoBAjIAEjoKBXNjb3BlGAYgASgOMiEuZmx5dGVpZGwyLmNvcmUuUmV1c2VQb2xpY3kuU2NvcGVCCLpIBYIBAhABIhwKBVNjb3BlEgoKBkdMT0JBTBAAEgcKA1JVThABOnC6SG0aawobcmV1c2VfcG9saWN5LnJlcGxpY2FfYm91bmRzEiRtYXhfcmVwbGljYXMgbXVzdCBiZSA+PSBtaW5fcmVwbGljYXMaJnRoaXMubWF4X3JlcGxpY2FzID49IHRoaXMubWluX3JlcGxpY2FzIooFCgxUYXNrVGVtcGxhdGUSJgoCaWQYASABKAsyGi5mbHl0ZWlkbDIuY29yZS5JZGVudGlmaWVyEgwKBHR5cGUYAiABKAkSLgoIbWV0YWRhdGEYAyABKAsyHC5mbHl0ZWlkbDIuY29yZS5UYXNrTWV0YWRhdGESMQoJaW50ZXJmYWNlGAQgASgLMh4uZmx5dGVpZGwyLmNvcmUuVHlwZWRJbnRlcmZhY2USJwoGY3VzdG9tGAUgASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdBIuCgljb250YWluZXIYBiABKAsyGS5mbHl0ZWlkbDIuY29yZS5Db250YWluZXJIABIpCgdrOHNfcG9kGBEgASgLMhYuZmx5dGVpZGwyLmNvcmUuSzhzUG9kSAASIgoDc3FsGBIgASgLMhMuZmx5dGVpZGwyLmNvcmUuU3FsSAASGQoRdGFza190eXBlX3ZlcnNpb24YByABKAUSOQoQc2VjdXJpdHlfY29udGV4dBgIIAEoCzIfLmZseXRlaWRsMi5jb3JlLlNlY3VyaXR5Q29udGV4dBI9ChJleHRlbmRlZF9yZXNvdXJjZXMYCSABKAsyIS5mbHl0ZWlkbDIuY29yZS5FeHRlbmRlZFJlc291cmNlcxI4CgZjb25maWcYECADKAsyKC5mbHl0ZWlkbDIuY29yZS5UYXNrVGVtcGxhdGUuQ29uZmlnRW50cnkSMQoMcmV1c2VfcG9saWN5GBMgASgLMhsuZmx5dGVpZGwyLmNvcmUuUmV1c2VQb2xpY3kaLQoLQ29uZmlnRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4AUIICgZ0YXJnZXQiNQoNQ29udGFpbmVyUG9ydBIWCg5jb250YWluZXJfcG9ydBgBIAEoDRIMCgRuYW1lGAIgASgJIrMDCglDb250YWluZXISDQoFaW1hZ2UYASABKAkSDwoHY29tbWFuZBgCIAMoCRIMCgRhcmdzGAMgAygJEiwKCXJlc291cmNlcxgEIAEoCzIZLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcxIpCgNlbnYYBSADKAsyHC5mbHl0ZWlkbDIuY29yZS5LZXlWYWx1ZVBhaXISMAoGY29uZmlnGAYgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyQgIYARIsCgVwb3J0cxgHIAMoCzIdLmZseXRlaWRsMi5jb3JlLkNvbnRhaW5lclBvcnQSNgoLZGF0YV9jb25maWcYCSABKAsyIS5mbHl0ZWlkbDIuY29yZS5EYXRhTG9hZGluZ0NvbmZpZxI8CgxhcmNoaXRlY3R1cmUYCiABKA4yJi5mbHl0ZWlkbDIuY29yZS5Db250YWluZXIuQXJjaGl0ZWN0dXJlIkkKDEFyY2hpdGVjdHVyZRILCgdVTktOT1dOEAASCQoFQU1ENjQQARIJCgVBUk02NBACEgoKBkFSTV9WNhADEgoKBkFSTV9WNxAEIp0CCgpJT1N0cmF0ZWd5Ej4KDWRvd25sb2FkX21vZGUYASABKA4yJy5mbHl0ZWlkbDIuY29yZS5JT1N0cmF0ZWd5LkRvd25sb2FkTW9kZRI6Cgt1cGxvYWRfbW9kZRgCIAEoDjIlLmZseXRlaWRsMi5jb3JlLklPU3RyYXRlZ3kuVXBsb2FkTW9kZSJMCgxEb3dubG9hZE1vZGUSEgoORE9XTkxPQURfRUFHRVIQABITCg9ET1dOTE9BRF9TVFJFQU0QARITCg9ET19OT1RfRE9XTkxPQUQQAiJFCgpVcGxvYWRNb2RlEhIKDlVQTE9BRF9PTl9FWElUEAASEAoMVVBMT0FEX0VBR0VSEAESEQoNRE9fTk9UX1VQTE9BRBACIvECChFEYXRhTG9hZGluZ0NvbmZpZxIPCgdlbmFibGVkGAEgASgIEhIKCmlucHV0X3BhdGgYAiABKAkSEwoLb3V0cHV0X3BhdGgYAyABKAkSQgoGZm9ybWF0GAQgASgOMjIuZmx5dGVpZGwyLmNvcmUuRGF0YUxvYWRpbmdDb25maWcuTGl0ZXJhbE1hcEZvcm1hdBIvCgtpb19zdHJhdGVneRgFIAEoCzIaLmZseXRlaWRsMi5jb3JlLklPU3RyYXRlZ3kSTAoRZmlsZV9pbnB1dF9sYXlvdXQYBiABKA4yMS5mbHl0ZWlkbDIuY29yZS5EYXRhTG9hZGluZ0NvbmZpZy5GaWxlSW5wdXRMYXlvdXQiMQoQTGl0ZXJhbE1hcEZvcm1hdBIICgRKU09OEAASCAoEWUFNTBABEgkKBVBST1RPEAIiLAoPRmlsZUlucHV0TGF5b3V0EgoKBkRJUkVDVBAAEg0KCU5BTUVEX0RJUhABIsABCgZLOHNQb2QSMwoIbWV0YWRhdGEYASABKAsyIS5mbHl0ZWlkbDIuY29yZS5LOHNPYmplY3RNZXRhZGF0YRIpCghwb2Rfc3BlYxgCIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3QSNgoLZGF0YV9jb25maWcYAyABKAsyIS5mbHl0ZWlkbDIuY29yZS5EYXRhTG9hZGluZ0NvbmZpZxIeChZwcmltYXJ5X2NvbnRhaW5lcl9uYW1lGAQgASgJIv4BChFLOHNPYmplY3RNZXRhZGF0YRI9CgZsYWJlbHMYASADKAsyLS5mbHl0ZWlkbDIuY29yZS5LOHNPYmplY3RNZXRhZGF0YS5MYWJlbHNFbnRyeRJHCgthbm5vdGF0aW9ucxgCIAMoCzIyLmZseXRlaWRsMi5jb3JlLks4c09iamVjdE1ldGFkYXRhLkFubm90YXRpb25zRW50cnkaLQoLTGFiZWxzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ARoyChBBbm5vdGF0aW9uc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEifwoDU3FsEhEKCXN0YXRlbWVudBgBIAEoCRIsCgdkaWFsZWN0GAIgASgOMhsuZmx5dGVpZGwyLmNvcmUuU3FsLkRpYWxlY3QiNwoHRGlhbGVjdBINCglVTkRFRklORUQQABIICgRBTlNJEAESCAoESElWRRACEgkKBU9USEVSEANCrwEKEmNvbS5mbHl0ZWlkbDIuY29yZUIKVGFza3NQcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9jb3JlogIDRkNYqgIORmx5dGVpZGwyLkNvcmXKAg5GbHl0ZWlkbDJcQ29yZeICGkZseXRlaWRsMlxDb3JlXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpDb3JlYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_core_execution, file_flyteidl2_core_identifier, file_flyteidl2_core_interface, file_flyteidl2_core_literals, file_flyteidl2_core_security, file_google_protobuf_duration, file_google_protobuf_struct, file_google_protobuf_wrappers]);
+  fileDesc("ChpmbHl0ZWlkbDIvY29yZS90YXNrcy5wcm90bxIOZmx5dGVpZGwyLmNvcmUitAIKCVJlc291cmNlcxI5CghyZXF1ZXN0cxgBIAMoCzInLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcy5SZXNvdXJjZUVudHJ5EjcKBmxpbWl0cxgCIAMoCzInLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcy5SZXNvdXJjZUVudHJ5GlQKDVJlc291cmNlRW50cnkSNAoEbmFtZRgBIAEoDjImLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcy5SZXNvdXJjZU5hbWUSDQoFdmFsdWUYAiABKAkiXQoMUmVzb3VyY2VOYW1lEgsKB1VOS05PV04QABIHCgNDUFUQARIHCgNHUFUQAhIKCgZNRU1PUlkQAxILCgdTVE9SQUdFEAQSFQoRRVBIRU1FUkFMX1NUT1JBR0UQBSLeAgoOR1BVQWNjZWxlcmF0b3ISDgoGZGV2aWNlGAEgASgJEhcKDXVucGFydGl0aW9uZWQYAiABKAhIABIYCg5wYXJ0aXRpb25fc2l6ZRgDIAEoCUgAEkAKDGRldmljZV9jbGFzcxgEIAEoDjIqLmZseXRlaWRsMi5jb3JlLkdQVUFjY2VsZXJhdG9yLkRldmljZUNsYXNzEjsKEWFjY2VsZXJhdG9yX21vZGVsGAUgASgOMiAuZmx5dGVpZGwyLmNvcmUuQWNjZWxlcmF0b3JNb2RlbCJyCgtEZXZpY2VDbGFzcxIOCgpOVklESUFfR1BVEAASDgoKR09PR0xFX1RQVRABEhEKDUFNQVpPTl9ORVVST04QAhILCgdBTURfR1BVEAMSEAoMSEFCQU5BX0dBVURJEAQSEQoNQVBQTEVfU0lMSUNPThAFQhYKFHBhcnRpdGlvbl9zaXplX3ZhbHVlIkoKDFNoYXJlZE1lbW9yeRISCgptb3VudF9wYXRoGAEgASgJEhIKCm1vdW50X25hbWUYAiABKAkSEgoKc2l6ZV9saW1pdBgDIAEoCSKBAQoRRXh0ZW5kZWRSZXNvdXJjZXMSNwoPZ3B1X2FjY2VsZXJhdG9yGAEgASgLMh4uZmx5dGVpZGwyLmNvcmUuR1BVQWNjZWxlcmF0b3ISMwoNc2hhcmVkX21lbW9yeRgCIAEoCzIcLmZseXRlaWRsMi5jb3JlLlNoYXJlZE1lbW9yeSKWAQoPUnVudGltZU1ldGFkYXRhEjkKBHR5cGUYASABKA4yKy5mbHl0ZWlkbDIuY29yZS5SdW50aW1lTWV0YWRhdGEuUnVudGltZVR5cGUSDwoHdmVyc2lvbhgCIAEoCRIOCgZmbGF2b3IYAyABKAkiJwoLUnVudGltZVR5cGUSCQoFT1RIRVIQABINCglGTFlURV9TREsQASKQBwoMVGFza01ldGFkYXRhEhQKDGRpc2NvdmVyYWJsZRgBIAEoCBIwCgdydW50aW1lGAIgASgLMh8uZmx5dGVpZGwyLmNvcmUuUnVudGltZU1ldGFkYXRhEioKB3RpbWVvdXQYBCABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SLgoHcmV0cmllcxgFIAEoCzIdLmZseXRlaWRsMi5jb3JlLlJldHJ5U3RyYXRlZ3kSGQoRZGlzY292ZXJ5X3ZlcnNpb24YBiABKAkSIAoYZGVwcmVjYXRlZF9lcnJvcl9tZXNzYWdlGAcgASgJEhcKDWludGVycnVwdGlibGUYCCABKAhIABIaChJjYWNoZV9zZXJpYWxpemFibGUYCSABKAgSNAoEdGFncxgLIAMoCzImLmZseXRlaWRsMi5jb3JlLlRhc2tNZXRhZGF0YS5UYWdzRW50cnkSGQoRcG9kX3RlbXBsYXRlX25hbWUYDCABKAkSHwoXY2FjaGVfaWdub3JlX2lucHV0X3ZhcnMYDSADKAkSEAoIaXNfZWFnZXIYDiABKAgSMgoOZ2VuZXJhdGVzX2RlY2sYDyABKAsyGi5nb29nbGUucHJvdG9idWYuQm9vbFZhbHVlEjMKCG1ldGFkYXRhGBAgASgLMiEuZmx5dGVpZGwyLmNvcmUuSzhzT2JqZWN0TWV0YWRhdGESEgoKZGVidWdnYWJsZRgRIAEoCBIqCglsb2dfbGlua3MYEiADKAsyFy5mbHl0ZWlkbDIuY29yZS5UYXNrTG9nEjgKD2ltYWdlX2J1aWxkX3J1bhgTIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllchIVCg1pc19lbnRyeXBvaW50GBQgASgIEhcKD2NvZGVfYnVuZGxlX3VyaRgVIAEoCRIxCgh0aW1lb3V0cxgWIAEoCzIfLmZseXRlaWRsMi5jb3JlLlRpbWVvdXRTdHJhdGVneRIaChJwcm9kdWNlc19hcnRpZmFjdHMYFyABKAgSOgoNY2FjaGVfbWF4X2FnZRgYIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIIukgFqgECMgAaKwoJVGFnc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAFCFQoTaW50ZXJydXB0aWJsZV92YWx1ZUoECAoQCyKoAwoLUmV1c2VQb2xpY3kSHQoMbWluX3JlcGxpY2FzGAEgASgFQge6SAQaAigAEh0KDG1heF9yZXBsaWNhcxgCIAEoBUIHukgEGgIoARIcCgtjb25jdXJyZW5jeRgDIAEoBUIHukgEGgIoARI1CghpZGxlX3R0bBgEIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIIukgFqgECMgASOgoNc2NhbGVkb3duX3R0bBgFIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIIukgFqgECMgASOgoFc2NvcGUYBiABKA4yIS5mbHl0ZWlkbDIuY29yZS5SZXVzZVBvbGljeS5TY29wZUIIukgFggECEAEiHAoFU2NvcGUSCgoGR0xPQkFMEAASBwoDUlVOEAE6cLpIbRprChtyZXVzZV9wb2xpY3kucmVwbGljYV9ib3VuZHMSJG1heF9yZXBsaWNhcyBtdXN0IGJlID49IG1pbl9yZXBsaWNhcxomdGhpcy5tYXhfcmVwbGljYXMgPj0gdGhpcy5taW5fcmVwbGljYXMiuwUKDFRhc2tUZW1wbGF0ZRImCgJpZBgBIAEoCzIaLmZseXRlaWRsMi5jb3JlLklkZW50aWZpZXISDAoEdHlwZRgCIAEoCRIuCghtZXRhZGF0YRgDIAEoCzIcLmZseXRlaWRsMi5jb3JlLlRhc2tNZXRhZGF0YRIxCglpbnRlcmZhY2UYBCABKAsyHi5mbHl0ZWlkbDIuY29yZS5UeXBlZEludGVyZmFjZRInCgZjdXN0b20YBSABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0Ei4KCWNvbnRhaW5lchgGIAEoCzIZLmZseXRlaWRsMi5jb3JlLkNvbnRhaW5lckgAEikKB2s4c19wb2QYESABKAsyFi5mbHl0ZWlkbDIuY29yZS5LOHNQb2RIABIiCgNzcWwYEiABKAsyEy5mbHl0ZWlkbDIuY29yZS5TcWxIABIZChF0YXNrX3R5cGVfdmVyc2lvbhgHIAEoBRI5ChBzZWN1cml0eV9jb250ZXh0GAggASgLMh8uZmx5dGVpZGwyLmNvcmUuU2VjdXJpdHlDb250ZXh0Ej0KEmV4dGVuZGVkX3Jlc291cmNlcxgJIAEoCzIhLmZseXRlaWRsMi5jb3JlLkV4dGVuZGVkUmVzb3VyY2VzEjgKBmNvbmZpZxgQIAMoCzIoLmZseXRlaWRsMi5jb3JlLlRhc2tUZW1wbGF0ZS5Db25maWdFbnRyeRIxCgxyZXVzZV9wb2xpY3kYEyABKAsyGy5mbHl0ZWlkbDIuY29yZS5SZXVzZVBvbGljeRIvCgt3b3JrZXJfa2luZBgUIAEoDjIaLmZseXRlaWRsMi5jb3JlLldvcmtlcktpbmQaLQoLQ29uZmlnRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4AUIICgZ0YXJnZXQiNQoNQ29udGFpbmVyUG9ydBIWCg5jb250YWluZXJfcG9ydBgBIAEoDRIMCgRuYW1lGAIgASgJIrMDCglDb250YWluZXISDQoFaW1hZ2UYASABKAkSDwoHY29tbWFuZBgCIAMoCRIMCgRhcmdzGAMgAygJEiwKCXJlc291cmNlcxgEIAEoCzIZLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcxIpCgNlbnYYBSADKAsyHC5mbHl0ZWlkbDIuY29yZS5LZXlWYWx1ZVBhaXISMAoGY29uZmlnGAYgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyQgIYARIsCgVwb3J0cxgHIAMoCzIdLmZseXRlaWRsMi5jb3JlLkNvbnRhaW5lclBvcnQSNgoLZGF0YV9jb25maWcYCSABKAsyIS5mbHl0ZWlkbDIuY29yZS5EYXRhTG9hZGluZ0NvbmZpZxI8CgxhcmNoaXRlY3R1cmUYCiABKA4yJi5mbHl0ZWlkbDIuY29yZS5Db250YWluZXIuQXJjaGl0ZWN0dXJlIkkKDEFyY2hpdGVjdHVyZRILCgdVTktOT1dOEAASCQoFQU1ENjQQARIJCgVBUk02NBACEgoKBkFSTV9WNhADEgoKBkFSTV9WNxAEIp0CCgpJT1N0cmF0ZWd5Ej4KDWRvd25sb2FkX21vZGUYASABKA4yJy5mbHl0ZWlkbDIuY29yZS5JT1N0cmF0ZWd5LkRvd25sb2FkTW9kZRI6Cgt1cGxvYWRfbW9kZRgCIAEoDjIlLmZseXRlaWRsMi5jb3JlLklPU3RyYXRlZ3kuVXBsb2FkTW9kZSJMCgxEb3dubG9hZE1vZGUSEgoORE9XTkxPQURfRUFHRVIQABITCg9ET1dOTE9BRF9TVFJFQU0QARITCg9ET19OT1RfRE9XTkxPQUQQAiJFCgpVcGxvYWRNb2RlEhIKDlVQTE9BRF9PTl9FWElUEAASEAoMVVBMT0FEX0VBR0VSEAESEQoNRE9fTk9UX1VQTE9BRBACIvECChFEYXRhTG9hZGluZ0NvbmZpZxIPCgdlbmFibGVkGAEgASgIEhIKCmlucHV0X3BhdGgYAiABKAkSEwoLb3V0cHV0X3BhdGgYAyABKAkSQgoGZm9ybWF0GAQgASgOMjIuZmx5dGVpZGwyLmNvcmUuRGF0YUxvYWRpbmdDb25maWcuTGl0ZXJhbE1hcEZvcm1hdBIvCgtpb19zdHJhdGVneRgFIAEoCzIaLmZseXRlaWRsMi5jb3JlLklPU3RyYXRlZ3kSTAoRZmlsZV9pbnB1dF9sYXlvdXQYBiABKA4yMS5mbHl0ZWlkbDIuY29yZS5EYXRhTG9hZGluZ0NvbmZpZy5GaWxlSW5wdXRMYXlvdXQiMQoQTGl0ZXJhbE1hcEZvcm1hdBIICgRKU09OEAASCAoEWUFNTBABEgkKBVBST1RPEAIiLAoPRmlsZUlucHV0TGF5b3V0EgoKBkRJUkVDVBAAEg0KCU5BTUVEX0RJUhABIsABCgZLOHNQb2QSMwoIbWV0YWRhdGEYASABKAsyIS5mbHl0ZWlkbDIuY29yZS5LOHNPYmplY3RNZXRhZGF0YRIpCghwb2Rfc3BlYxgCIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3QSNgoLZGF0YV9jb25maWcYAyABKAsyIS5mbHl0ZWlkbDIuY29yZS5EYXRhTG9hZGluZ0NvbmZpZxIeChZwcmltYXJ5X2NvbnRhaW5lcl9uYW1lGAQgASgJIv4BChFLOHNPYmplY3RNZXRhZGF0YRI9CgZsYWJlbHMYASADKAsyLS5mbHl0ZWlkbDIuY29yZS5LOHNPYmplY3RNZXRhZGF0YS5MYWJlbHNFbnRyeRJHCgthbm5vdGF0aW9ucxgCIAMoCzIyLmZseXRlaWRsMi5jb3JlLks4c09iamVjdE1ldGFkYXRhLkFubm90YXRpb25zRW50cnkaLQoLTGFiZWxzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ARoyChBBbm5vdGF0aW9uc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEifwoDU3FsEhEKCXN0YXRlbWVudBgBIAEoCRIsCgdkaWFsZWN0GAIgASgOMhsuZmx5dGVpZGwyLmNvcmUuU3FsLkRpYWxlY3QiNwoHRGlhbGVjdBINCglVTkRFRklORUQQABIICgRBTlNJEAESCAoESElWRRACEgkKBU9USEVSEAMqlAsKEEFjY2VsZXJhdG9yTW9kZWwSIQodQUNDRUxFUkFUT1JfTU9ERUxfVU5TUEVDSUZJRUQQABIdCgpOVklESUFfSzgwEAEaDapVCm52aWRpYS1rODASHQoKTlZJRElBX002MBACGg2qVQpudmlkaWEtbTYwEhsKCU5WSURJQV9QNBADGgyqVQludmlkaWEtcDQSHwoLTlZJRElBX1AxMDAQBBoOqlULbnZpZGlhLXAxMDASHwoLTlZJRElBX1YxMDAQBRoOqlULbnZpZGlhLXYxMDASGwoJTlZJRElBX1Q0EAYaDKpVCW52aWRpYS10NBIdCgpOVklESUFfQTEwEAcaDapVCm52aWRpYS1hMTASHwoLTlZJRElBX0ExMEcQCBoOqlULbnZpZGlhLWExMGcSHwoLTlZJRElBX0ExMDAQCRoOqlULbnZpZGlhLWExMDASKQoQTlZJRElBX0ExMDBfODBHQhAKGhOqVRBudmlkaWEtYTEwMC04MGdiEhsKCU5WSURJQV9MNBALGgyqVQludmlkaWEtbDQSHwoLTlZJRElBX0w0MFMQDBoOqlULbnZpZGlhLWw0MHMSHwoLTlZJRElBX0gxMDAQDRoOqlULbnZpZGlhLWgxMDASMwoVTlZJRElBX0gxMDBfTUVHQV84MEdCEA4aGKpVFW52aWRpYS1oMTAwLW1lZ2EtODBnYhIfCgtOVklESUFfSDIwMBAPGg6qVQtudmlkaWEtaDIwMBIfCgtOVklESUFfQjIwMBAQGg6qVQtudmlkaWEtYjIwMBIhCgxOVklESUFfR0IyMDAQERoPqlUMbnZpZGlhLWdiMjAwEh8KC05WSURJQV9HQjEwEBIaDqpVC252aWRpYS1nYjEwEi8KE05WSURJQV9SVFhfUFJPXzYwMDAQExoWqlUTbnZpZGlhLXJ0eC1wcm8tNjAwMBIvChNOVklESUFfUlRYX1BST180NTAwEBQaFqpVE252aWRpYS1ydHgtcHJvLTQ1MDASJQoOR09PR0xFX1RQVV9WNUUQZBoRqlUOZ29vZ2xlLXRwdS12NWUSJQoOR09PR0xFX1RQVV9WNVAQZRoRqlUOZ29vZ2xlLXRwdS12NXASJQoOR09PR0xFX1RQVV9WNkUQZhoRqlUOZ29vZ2xlLXRwdS12NmUSHQoLQU1BWk9OX0lORjEQyAEaC6pVCGF3cy1pbmYxEh0KC0FNQVpPTl9JTkYyEMkBGguqVQhhd3MtaW5mMhIdCgtBTUFaT05fVFJOMRDKARoLqlUIYXdzLXRybjESHwoMQU1BWk9OX1RSTjFOEMsBGgyqVQlhd3MtdHJuMW4SHQoLQU1BWk9OX1RSTjIQzAEaC6pVCGF3cy10cm4yEh8KDEFNQVpPTl9UUk4yVRDNARoMqlUJYXdzLXRybjJ1EhwKCUFNRF9NSTEwMBCsAhoMqlUJYW1kLW1pMTAwEhwKCUFNRF9NSTIxMBCtAhoMqlUJYW1kLW1pMjEwEhwKCUFNRF9NSTI1MBCuAhoMqlUJYW1kLW1pMjUwEh4KCkFNRF9NSTI1MFgQrwIaDapVCmFtZC1taTI1MHgSHgoKQU1EX01JMzAwQRCwAhoNqlUKYW1kLW1pMzAwYRIeCgpBTURfTUkzMDBYELECGg2qVQphbWQtbWkzMDB4Eh4KCkFNRF9NSTMyNVgQsgIaDapVCmFtZC1taTMyNXgSHgoKQU1EX01JMzUwWBCzAhoNqlUKYW1kLW1pMzUweBIeCgpBTURfTUkzNTVYELQCGg2qVQphbWQtbWkzNTV4EiQKDUhBQkFOQV9HQVVESTEQkAMaEKpVDWhhYmFuYS1nYXVkaTESKAoRQVBQTEVfU0lMSUNPTl9HUFUQ9AMaEKpVDWFwcGxlLXNpbGljb24qQgoKV29ya2VyS2luZBIbChdXT1JLRVJfS0lORF9VTlNQRUNJRklFRBAAEhcKE1dPUktFUl9LSU5EX1NBTkRCT1gQATpNChBhY2NlbGVyYXRvcl9uYW1lEiEuZ29vZ2xlLnByb3RvYnVmLkVudW1WYWx1ZU9wdGlvbnMY1QogASgJUg9hY2NlbGVyYXRvck5hbWVCrwEKEmNvbS5mbHl0ZWlkbDIuY29yZUIKVGFza3NQcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9jb3JlogIDRkNYqgIORmx5dGVpZGwyLkNvcmXKAg5GbHl0ZWlkbDJcQ29yZeICGkZseXRlaWRsMlxDb3JlXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpDb3JlYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_core_execution, file_flyteidl2_core_identifier, file_flyteidl2_core_interface, file_flyteidl2_core_literals, file_flyteidl2_core_security, file_google_protobuf_descriptor, file_google_protobuf_duration, file_google_protobuf_struct, file_google_protobuf_wrappers]);
 
 /**
  * A customizable interface to convey resources requested for a container. This can be interpreted differently for different
@@ -175,6 +175,15 @@ export type GPUAccelerator = Message<"flyteidl2.core.GPUAccelerator"> & {
    * @generated from field: flyteidl2.core.GPUAccelerator.DeviceClass device_class = 4;
    */
   deviceClass: GPUAccelerator_DeviceClass;
+
+  /**
+   * The accelerator as a value of the canonical list. When set, readers use
+   * it instead of device; device stays for SDKs and stored tasks that predate
+   * this field.
+   *
+   * @generated from field: flyteidl2.core.AcceleratorModel accelerator_model = 5;
+   */
+  acceleratorModel: AcceleratorModel;
 };
 
 /**
@@ -224,6 +233,15 @@ export enum GPUAccelerator_DeviceClass {
    * @generated from enum value: HABANA_GAUDI = 4;
    */
   HABANA_GAUDI = 4,
+
+  /**
+   * Apple Silicon (M-series) Metal GPU, served by a host-side MLX daemon on
+   * a local devbox. Not schedulable on a cluster: a backend without an Apple Silicon
+   * bridge configured rejects it with APPLE_SILICON_NOT_AVAILABLE.
+   *
+   * @generated from enum value: APPLE_SILICON = 5;
+   */
+  APPLE_SILICON = 5,
 }
 
 /**
@@ -751,6 +769,15 @@ export type TaskTemplate = Message<"flyteidl2.core.TaskTemplate"> & {
    * @generated from field: flyteidl2.core.ReusePolicy reuse_policy = 19;
    */
   reusePolicy?: ReusePolicy;
+
+  /**
+   * The kind of worker that runs this task. The scheduler sends the task only to workers of
+   * this kind; while none has room it waits. Unspecified is the default worker, which runs
+   * containers and plugin tasks.
+   *
+   * @generated from field: flyteidl2.core.WorkerKind worker_kind = 20;
+   */
+  workerKind: WorkerKind;
 };
 
 /**
@@ -1285,4 +1312,284 @@ export enum Sql_Dialect {
  */
 export const Sql_DialectSchema: GenEnum<Sql_Dialect> = /*@__PURE__*/
   enumDesc(file_flyteidl2_core_tasks, 14, 0);
+
+/**
+ * The canonical list of accelerators. One value per concrete device,
+ * matched by exact equality: NVIDIA_A100 (40GB) and NVIDIA_A100_80GB are
+ * two devices. Strings are lower-case, vendor first, dashes only:
+ * <vendor>-<model>[-<memory>][-<variant>]. Numbered in blocks of 100 per
+ * DeviceClass so each block can grow.
+ *
+ * @generated from enum flyteidl2.core.AcceleratorModel
+ */
+export enum AcceleratorModel {
+  /**
+   * @generated from enum value: ACCELERATOR_MODEL_UNSPECIFIED = 0;
+   */
+  ACCELERATOR_MODEL_UNSPECIFIED = 0,
+
+  /**
+   * NVIDIA_GPU
+   *
+   * @generated from enum value: NVIDIA_K80 = 1;
+   */
+  NVIDIA_K80 = 1,
+
+  /**
+   * @generated from enum value: NVIDIA_M60 = 2;
+   */
+  NVIDIA_M60 = 2,
+
+  /**
+   * @generated from enum value: NVIDIA_P4 = 3;
+   */
+  NVIDIA_P4 = 3,
+
+  /**
+   * @generated from enum value: NVIDIA_P100 = 4;
+   */
+  NVIDIA_P100 = 4,
+
+  /**
+   * @generated from enum value: NVIDIA_V100 = 5;
+   */
+  NVIDIA_V100 = 5,
+
+  /**
+   * @generated from enum value: NVIDIA_T4 = 6;
+   */
+  NVIDIA_T4 = 6,
+
+  /**
+   * @generated from enum value: NVIDIA_A10 = 7;
+   */
+  NVIDIA_A10 = 7,
+
+  /**
+   * @generated from enum value: NVIDIA_A10G = 8;
+   */
+  NVIDIA_A10G = 8,
+
+  /**
+   * @generated from enum value: NVIDIA_A100 = 9;
+   */
+  NVIDIA_A100 = 9,
+
+  /**
+   * @generated from enum value: NVIDIA_A100_80GB = 10;
+   */
+  NVIDIA_A100_80GB = 10,
+
+  /**
+   * @generated from enum value: NVIDIA_L4 = 11;
+   */
+  NVIDIA_L4 = 11,
+
+  /**
+   * @generated from enum value: NVIDIA_L40S = 12;
+   */
+  NVIDIA_L40S = 12,
+
+  /**
+   * @generated from enum value: NVIDIA_H100 = 13;
+   */
+  NVIDIA_H100 = 13,
+
+  /**
+   * @generated from enum value: NVIDIA_H100_MEGA_80GB = 14;
+   */
+  NVIDIA_H100_MEGA_80GB = 14,
+
+  /**
+   * @generated from enum value: NVIDIA_H200 = 15;
+   */
+  NVIDIA_H200 = 15,
+
+  /**
+   * @generated from enum value: NVIDIA_B200 = 16;
+   */
+  NVIDIA_B200 = 16,
+
+  /**
+   * @generated from enum value: NVIDIA_GB200 = 17;
+   */
+  NVIDIA_GB200 = 17,
+
+  /**
+   * @generated from enum value: NVIDIA_GB10 = 18;
+   */
+  NVIDIA_GB10 = 18,
+
+  /**
+   * @generated from enum value: NVIDIA_RTX_PRO_6000 = 19;
+   */
+  NVIDIA_RTX_PRO_6000 = 19,
+
+  /**
+   * @generated from enum value: NVIDIA_RTX_PRO_4500 = 20;
+   */
+  NVIDIA_RTX_PRO_4500 = 20,
+
+  /**
+   * GOOGLE_TPU
+   *
+   * @generated from enum value: GOOGLE_TPU_V5E = 100;
+   */
+  GOOGLE_TPU_V5E = 100,
+
+  /**
+   * @generated from enum value: GOOGLE_TPU_V5P = 101;
+   */
+  GOOGLE_TPU_V5P = 101,
+
+  /**
+   * @generated from enum value: GOOGLE_TPU_V6E = 102;
+   */
+  GOOGLE_TPU_V6E = 102,
+
+  /**
+   * AMAZON_NEURON
+   *
+   * @generated from enum value: AMAZON_INF1 = 200;
+   */
+  AMAZON_INF1 = 200,
+
+  /**
+   * @generated from enum value: AMAZON_INF2 = 201;
+   */
+  AMAZON_INF2 = 201,
+
+  /**
+   * @generated from enum value: AMAZON_TRN1 = 202;
+   */
+  AMAZON_TRN1 = 202,
+
+  /**
+   * @generated from enum value: AMAZON_TRN1N = 203;
+   */
+  AMAZON_TRN1N = 203,
+
+  /**
+   * @generated from enum value: AMAZON_TRN2 = 204;
+   */
+  AMAZON_TRN2 = 204,
+
+  /**
+   * @generated from enum value: AMAZON_TRN2U = 205;
+   */
+  AMAZON_TRN2U = 205,
+
+  /**
+   * AMD_GPU
+   *
+   * @generated from enum value: AMD_MI100 = 300;
+   */
+  AMD_MI100 = 300,
+
+  /**
+   * @generated from enum value: AMD_MI210 = 301;
+   */
+  AMD_MI210 = 301,
+
+  /**
+   * @generated from enum value: AMD_MI250 = 302;
+   */
+  AMD_MI250 = 302,
+
+  /**
+   * @generated from enum value: AMD_MI250X = 303;
+   */
+  AMD_MI250X = 303,
+
+  /**
+   * @generated from enum value: AMD_MI300A = 304;
+   */
+  AMD_MI300A = 304,
+
+  /**
+   * @generated from enum value: AMD_MI300X = 305;
+   */
+  AMD_MI300X = 305,
+
+  /**
+   * @generated from enum value: AMD_MI325X = 306;
+   */
+  AMD_MI325X = 306,
+
+  /**
+   * @generated from enum value: AMD_MI350X = 307;
+   */
+  AMD_MI350X = 307,
+
+  /**
+   * @generated from enum value: AMD_MI355X = 308;
+   */
+  AMD_MI355X = 308,
+
+  /**
+   * HABANA_GAUDI
+   *
+   * @generated from enum value: HABANA_GAUDI1 = 400;
+   */
+  HABANA_GAUDI1 = 400,
+
+  /**
+   * APPLE_SILICON
+   * The Metal GPU of an Apple Silicon (M-series) host, reached through the
+   * devbox's host-side Apple Silicon bridge. Devbox-local: never cluster-schedulable.
+   *
+   * @generated from enum value: APPLE_SILICON_GPU = 500;
+   */
+  APPLE_SILICON_GPU = 500,
+}
+
+/**
+ * Describes the enum flyteidl2.core.AcceleratorModel.
+ */
+export const AcceleratorModelSchema: GenEnum<AcceleratorModel> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_core_tasks, 0);
+
+/**
+ * The kinds of worker that run tasks. A worker of a kind may further limit itself to some task
+ * types and versions of that kind.
+ *
+ * @generated from enum flyteidl2.core.WorkerKind
+ */
+export enum WorkerKind {
+  /**
+   * The default worker: runs containers, and plugin and connector tasks.
+   *
+   * @generated from enum value: WORKER_KIND_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * Runs sandboxed orchestrator source in an interpreter, with no container
+   * (flyte.sandbox.orchestrator).
+   *
+   * @generated from enum value: WORKER_KIND_SANDBOX = 1;
+   */
+  SANDBOX = 1,
+}
+
+/**
+ * Describes the enum flyteidl2.core.WorkerKind.
+ */
+export const WorkerKindSchema: GenEnum<WorkerKind> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_core_tasks, 1);
+
+/**
+ * The canonical string for an AcceleratorModel value: what the SDK writes
+ * into GPUAccelerator.device, what the control plane stores and compares,
+ * and what a dataplane maps to its cloud's node label.
+ *
+ * 1365 is from the block 1364-1373 registered for Flyte in the protobuf
+ * global extension registry (protocolbuffers/protobuf#29013); 1364 is
+ * settings.desc. Never use 50000-99999 here: flyteidl2 is published, and
+ * that range collides with other published schemas (#7776).
+ *
+ * @generated from extension: string accelerator_name = 1365;
+ */
+export const accelerator_name: GenExtension<EnumValueOptions, string> = /*@__PURE__*/
+  extDesc(file_flyteidl2_core_tasks, 0);
 

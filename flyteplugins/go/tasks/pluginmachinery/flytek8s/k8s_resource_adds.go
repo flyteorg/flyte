@@ -14,6 +14,7 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/telemetry"
 )
 
 const (
@@ -170,6 +171,11 @@ func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, envFroms []v1.Env
 		value := os.Getenv(envVarName)
 		envVars = append(envVars, v1.EnvVar{Name: k, Value: value})
 	}
+	// A deployment that opted out of telemetry opts out its task pods too, so
+	// the SDK inside them stays quiet. Last, so the task env cannot undo it.
+	if telemetry.Disabled() {
+		envVars = append(envVars, v1.EnvVar{Name: telemetry.DisableEnvVar, Value: "1"})
+	}
 
 	for _, secretName := range config.GetK8sPluginConfig().DefaultEnvFromSecrets {
 		optional := true
@@ -183,7 +189,30 @@ func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, envFroms []v1.Env
 		envFroms = append(envFroms, v1.EnvFromSource{ConfigMapRef: &cmRef})
 	}
 
-	return envVars, envFroms
+	return dedupeEnvVars(envVars), envFroms
+}
+
+// dedupeEnvVars collapses repeated env var names, keeping the first occurrence's position and the
+// last occurrence's value — the value kubelet resolves for a Pod, where duplicates are tolerated.
+// CRD-backed resources (JobSet, RayJob, SparkApplication, ...) declare container `env` as a
+// listType=map keyed by name, so the API server rejects a duplicate outright. A task-spec env var
+// that also arrives through the execution metadata — e.g. _F_SYS_PATH, baked in at deploy time and
+// re-sent on the run spec — must therefore not reach them twice.
+func dedupeEnvVars(envVars []v1.EnvVar) []v1.EnvVar {
+	if len(envVars) == 0 {
+		return envVars
+	}
+	out := make([]v1.EnvVar, 0, len(envVars))
+	index := make(map[string]int, len(envVars))
+	for _, ev := range envVars {
+		if i, seen := index[ev.Name]; seen {
+			out[i] = ev
+			continue
+		}
+		index[ev.Name] = len(out)
+		out = append(out, ev)
+	}
+	return out
 }
 
 func GetPodTolerations(interruptible bool, resourceRequirements ...v1.ResourceRequirements) []v1.Toleration {

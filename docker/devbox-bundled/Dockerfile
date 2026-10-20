@@ -12,7 +12,7 @@ ARG CACHEBUST=0
 RUN echo "cachebust=${CACHEBUST}" && ./preload manifest.txt
 
 
-FROM --platform=${BUILDPLATFORM} golang:1.26.5-bookworm AS bootstrap
+FROM --platform=${BUILDPLATFORM} golang:1.27.2-bookworm AS bootstrap
 
 ARG TARGETARCH
 ENV CGO_ENABLED 0
@@ -100,4 +100,11 @@ VOLUME /var/lib/flyte/storage
 ENV SSL_CERT_DIR /var/lib/flyte/config/ca-certificates
 
 ENTRYPOINT [ "/bin/k3d-entrypoint.sh" ]
-CMD [ "server", "--disable=servicelb", "--disable=metrics-server" ]
+CMD [ "server", "--cluster-init", "--disable=servicelb", "--disable=metrics-server", \
+      #"--kubelet-arg=system-reserved=cpu=1500m,memory=3Gi", \
+      #"--kubelet-arg=kube-reserved=cpu=500m,memory=1Gi", \
+      "--kube-apiserver-arg=max-requests-inflight=3000", \
+      "--kube-apiserver-arg=max-mutating-requests-inflight=3000", \
+      "--kube-controller-manager-arg=kube-api-burst=3000", \
+      "--kube-controller-manager-arg=kube-api-qps=3000" \
+    ]

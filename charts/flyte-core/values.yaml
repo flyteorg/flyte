@@ -10,11 +10,27 @@ commonAnnotations: {}
 # imagePullSecrets are attached to all Flyte core pods.
 imagePullSecrets: []
 
+# telemetry Crash reports and usage counts Flyte sends to its maintainers, and the console's analytics tags.
+telemetry:
+  # -- Set to false to opt out. Sets DO_NOT_TRACK=1 (https://donottrack.sh) on the backend and the console; the backend passes it on to the task and app pods it creates.
+  enabled: true
+
 # components configures each independently scalable Flyte service.
 components:
   runs:
     enabled: true
     replicaCount: 1
+    # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: null
+      # -- Additional autoscaling/v2 metrics (Pods, Object, External, or Resource).
+      metrics: []
+      # -- Optional autoscaling/v2 scaleUp and scaleDown policies.
+      behavior: {}
     image:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2
       tag: latest  # FLYTE_TAG
@@ -24,6 +40,13 @@ components:
     extraEnv: []
     envFrom: []
     resources: {}
+    # Opt-in protection against voluntary evictions. Set exactly one budget.
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: null
+      maxUnavailable: 1
+      # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+      unhealthyPodEvictionPolicy: ""
     podLabels: {}
     podAnnotations: {}
     nodeSelector: {}
@@ -54,6 +77,17 @@ components:
   actions:
     enabled: true
     replicaCount: 1
+    # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: null
+      # -- Additional autoscaling/v2 metrics (Pods, Object, External, or Resource).
+      metrics: []
+      # -- Optional autoscaling/v2 scaleUp and scaleDown policies.
+      behavior: {}
     image:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2
       tag: latest  # FLYTE_TAG
@@ -63,6 +97,13 @@ components:
     extraEnv: []
     envFrom: []
     resources: {}
+    # Opt-in protection against voluntary evictions. Set exactly one budget.
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: null
+      maxUnavailable: 1
+      # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+      unhealthyPodEvictionPolicy: ""
     podLabels: {}
     podAnnotations: {}
     nodeSelector: {}
@@ -93,6 +134,17 @@ components:
   events:
     enabled: true
     replicaCount: 1
+    # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: null
+      # -- Additional autoscaling/v2 metrics (Pods, Object, External, or Resource).
+      metrics: []
+      # -- Optional autoscaling/v2 scaleUp and scaleDown policies.
+      behavior: {}
     image:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2
       tag: latest  # FLYTE_TAG
@@ -102,6 +154,13 @@ components:
     extraEnv: []
     envFrom: []
     resources: {}
+    # Opt-in protection against voluntary evictions. Set exactly one budget.
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: null
+      maxUnavailable: 1
+      # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+      unhealthyPodEvictionPolicy: ""
     podLabels: {}
     podAnnotations: {}
     nodeSelector: {}
@@ -132,6 +191,17 @@ components:
   secret:
     enabled: true
     replicaCount: 1
+    # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: null
+      # -- Additional autoscaling/v2 metrics (Pods, Object, External, or Resource).
+      metrics: []
+      # -- Optional autoscaling/v2 scaleUp and scaleDown policies.
+      behavior: {}
     image:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2
       tag: latest  # FLYTE_TAG
@@ -141,6 +211,13 @@ components:
     extraEnv: []
     envFrom: []
     resources: {}
+    # Opt-in protection against voluntary evictions. Set exactly one budget.
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: null
+      maxUnavailable: 1
+      # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+      unhealthyPodEvictionPolicy: ""
     podLabels: {}
     podAnnotations: {}
     nodeSelector: {}
@@ -171,6 +248,17 @@ components:
   cache:
     enabled: true
     replicaCount: 1
+    # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: null
+      # -- Additional autoscaling/v2 metrics (Pods, Object, External, or Resource).
+      metrics: []
+      # -- Optional autoscaling/v2 scaleUp and scaleDown policies.
+      behavior: {}
     image:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2
       tag: latest  # FLYTE_TAG
@@ -180,6 +268,13 @@ components:
     extraEnv: []
     envFrom: []
     resources: {}
+    # Opt-in protection against voluntary evictions. Set exactly one budget.
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: null
+      maxUnavailable: 1
+      # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+      unhealthyPodEvictionPolicy: ""
     podLabels: {}
     podAnnotations: {}
     nodeSelector: {}
@@ -211,6 +306,17 @@ components:
     # Apps require Knative Serving to be installed in the cluster.
     enabled: false
     replicaCount: 1
+    # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: null
+      # -- Additional autoscaling/v2 metrics (Pods, Object, External, or Resource).
+      metrics: []
+      # -- Optional autoscaling/v2 scaleUp and scaleDown policies.
+      behavior: {}
     image:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2
       tag: latest  # FLYTE_TAG
@@ -220,6 +326,13 @@ components:
     extraEnv: []
     envFrom: []
     resources: {}
+    # Opt-in protection against voluntary evictions. Set exactly one budget.
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: null
+      maxUnavailable: 1
+      # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+      unhealthyPodEvictionPolicy: ""
     podLabels: {}
     podAnnotations: {}
     nodeSelector: {}
@@ -250,6 +363,17 @@ components:
   dataproxy:
     enabled: true
     replicaCount: 1
+    # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: null
+      # -- Additional autoscaling/v2 metrics (Pods, Object, External, or Resource).
+      metrics: []
+      # -- Optional autoscaling/v2 scaleUp and scaleDown policies.
+      behavior: {}
     image:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2
       tag: latest  # FLYTE_TAG
@@ -259,6 +383,13 @@ components:
     extraEnv: []
     envFrom: []
     resources: {}
+    # Opt-in protection against voluntary evictions. Set exactly one budget.
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: null
+      maxUnavailable: 1
+      # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+      unhealthyPodEvictionPolicy: ""
     podLabels: {}
     podAnnotations: {}
     nodeSelector: {}
@@ -297,6 +428,13 @@ components:
     extraEnv: []
     envFrom: []
     resources: {}
+    # Opt-in protection against voluntary evictions. Set exactly one budget.
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: null
+      maxUnavailable: 1
+      # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+      unhealthyPodEvictionPolicy: ""
     podLabels: {}
     podAnnotations: {}
     nodeSelector: {}
@@ -407,6 +545,9 @@ configuration:
       host: 0.0.0.0
       port: 8080
     watchBufferSize: 100
+    notificationBufferLimit: 65000
+    notifyRetryMinBackoff: 50ms
+    notifyRetryMaxBackoff: 5s
     storagePrefix: s3://flyte-data
     seedProjects:
       - flytesnacks
@@ -578,6 +719,24 @@ ingress:
 console:
   enabled: true
   replicaCount: 1
+  # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: null
+    # -- Additional autoscaling/v2 metrics (Pods, Object, External, or Resource).
+    metrics: []
+    # -- Optional autoscaling/v2 scaleUp and scaleDown policies.
+    behavior: {}
+  # Opt-in protection against voluntary evictions. Set exactly one budget.
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: null
+    maxUnavailable: 1
+    # -- Unhealthy pod eviction policy: IfHealthyBudget or AlwaysAllow. Empty uses the Kubernetes default.
+    unhealthyPodEvictionPolicy: ""
   image:
     repository: ghcr.io/unionai-oss/flyteconsole-v2 # FLYTECONSOLE_IMAGE
     tag: latest # FLYTECONSOLE_TAG
