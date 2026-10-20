@@ -15,6 +15,39 @@ The executor uses conditions to track task progress:
 - `Succeeded`: Task completed successfully
 - `Failed`: Task execution failed
 
+## Resource Quota Admission
+
+When Kubernetes rejects resource creation with `Forbidden: exceeded quota`, the
+executor reports `WAITING_FOR_RESOURCES` and retries creation on reconciliation.
+The default reconciliation interval is 10 seconds, configured through
+`executor.requeueDuration`. No pod exists during this wait, and neither user nor
+system retries are consumed. The execution-timeout clock starts only once the
+task runs. Other Forbidden responses, including RBAC and webhook denials, retain
+their existing failure handling.
+
+Quota waiting defaults to one hour. Configure the executor's runtime settings:
+
+```yaml
+plugins:
+    k8s:
+        quota-wait-timeout: 1h
+```
+
+For Helm deployments, put these settings under `configuration.inline` in the
+chart values. A nonpositive timeout disables the bound. The wait start time is
+persisted in the existing plugin state, survives executor restarts, and requires
+no CRD schema change. Continued quota rejection after the deadline fails the
+action permanently with `QuotaWaitTimeout` and the Kubernetes diagnostic. A
+successful admission clears the wait clock; cancellation uses normal cleanup
+even if no pod was created. Failed create calls are retried periodically, not
+through a separate quota-reservation check.
+
+This is admission backpressure, not FIFO scheduling or a capacity reservation.
+Requests that cannot fit the hard quota eventually time out. Parent task pods
+still consume quota while awaiting children, so leave enough headroom for child
+tasks and cleanup; admission waiting cannot resolve parent/child resource
+deadlocks. Already-terminal actions are not revived by an executor upgrade.
+
 
 ## Getting Started
 

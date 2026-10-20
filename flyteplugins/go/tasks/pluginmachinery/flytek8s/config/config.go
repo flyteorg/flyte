@@ -65,6 +65,9 @@ var (
 		PodPendingTimeout: config2.Duration{
 			Duration: 0,
 		},
+		QuotaWaitTimeout: config2.Duration{
+			Duration: time.Hour,
+		},
 		TerminatingResourceGracePeriod: config2.Duration{
 			Duration: time.Minute * 5,
 		},
@@ -348,6 +351,8 @@ type K8sPluginConfig struct {
 	// pending phase past this timeout, it will be inferred to be a permanent
 	// issue, and the corresponding task marked as failed
 	PodPendingTimeout config2.Duration `json:"pod-pending-timeout" pflag:"-,Time to wait while pod is stuck in pending."`
+
+	QuotaWaitTimeout config2.Duration `json:"quota-wait-timeout" pflag:"-,Maximum time to wait while resource quota admission is rejected. Nonpositive values wait indefinitely."`
 
 	// Time a relaunch waits, past the end of its deletion grace period, for a previous
 	// incarnation of the resource still holding its name to go away. A resource stuck

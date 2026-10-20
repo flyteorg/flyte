@@ -2,8 +2,10 @@ package k8s
 
 import (
 	"context"
+	stderrors "errors"
 	"fmt"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -60,6 +62,7 @@ type PluginState struct {
 	K8sPluginState      k8s.PluginState
 	LastEventUpdate     time.Time
 	LastEventRecordedAt time.Time
+	QuotaWaitStartedAt  time.Time
 }
 
 var _ pluginsCore.Plugin = &PluginManager{}
@@ -122,7 +125,7 @@ func (pm *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMeta
 	}
 }
 
-func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, quotaWaitStartedAt *time.Time) (pluginsCore.Transition, error) {
 	o, err := pm.plugin.BuildResource(ctx, tCtx)
 	if err != nil {
 		return pluginsCore.UnknownTransition, err
@@ -153,6 +156,19 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 	}
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
 		if k8serrors.IsForbidden(err) {
+			if isQuotaExceeded(err) {
+				now := time.Now()
+				if quotaWaitStartedAt.IsZero() {
+					*quotaWaitStartedAt = now
+				}
+				waitTimeout := config.GetK8sPluginConfig().QuotaWaitTimeout.Duration
+				if waitTimeout > 0 && now.Sub(*quotaWaitStartedAt) >= waitTimeout {
+					return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("QuotaWaitTimeout",
+						fmt.Sprintf("resource quota admission timed out after %s: %v", waitTimeout, err), nil)), nil
+				}
+				return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResources(
+					*quotaWaitStartedAt, pluginsCore.DefaultPhaseVersion, err.Error())), nil
+			}
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil)), nil
 		}
 		if k8serrors.IsRequestEntityTooLargeError(err) {
@@ -176,7 +192,17 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 		return pluginsCore.UnknownTransition, errors.Wrapf(stdErrors.ErrorCode(reason), err, "failed to create resource")
 	}
 
+	*quotaWaitStartedAt = time.Time{}
 	return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "task submitted to K8s")), nil
+}
+
+func isQuotaExceeded(err error) bool {
+	var status k8serrors.APIStatus
+	if !k8serrors.IsForbidden(err) || !stderrors.As(err, &status) {
+		return false
+	}
+	_, reason, found := strings.Cut(status.Status().Message, " is forbidden: ")
+	return found && strings.HasPrefix(reason, "exceeded quota: ")
 }
 
 // canAdoptExisting reports whether the resource a launch collided with can stand in for
@@ -295,10 +321,11 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 	var err error
 	var transition pluginsCore.Transition
 	pluginPhase := pluginState.Phase
+	quotaWaitStartedAt := pluginState.QuotaWaitStartedAt
 	var resource client.Object
 
 	if pluginState.Phase == PluginPhaseNotStarted {
-		transition, err = pm.launchResource(ctx, tCtx)
+		transition, err = pm.launchResource(ctx, tCtx, &quotaWaitStartedAt)
 		if err == nil && transition.Info().Phase() == pluginsCore.PhaseQueued {
 			pluginPhase = PluginPhaseStarted
 		}
@@ -342,6 +369,7 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 		},
 		LastEventUpdate:     lastEventUpdate,
 		LastEventRecordedAt: lastEventRecordedAt,
+		QuotaWaitStartedAt:  quotaWaitStartedAt,
 	}
 	if pluginState != newPluginState {
 		if err := tCtx.PluginStateWriter().Put(pluginStateVersion, &newPluginState); err != nil {

@@ -1,7 +1,9 @@
 package k8s
 
 import (
+	"bytes"
 	"context"
+	"encoding/gob"
 	"fmt"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"k8s.io/apimachinery/pkg/labels"
@@ -166,7 +168,7 @@ func TestLaunchResource_InvalidCreateFastFails(t *testing.T) {
 
 	pm := NewPluginManager("test", plugin, kubeClient)
 
-	transition, err := pm.launchResource(context.Background(), tCtx)
+	transition, err := pm.launchResource(context.Background(), tCtx, &time.Time{})
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhasePermanentFailure, transition.Info().Phase())
 	assert.Equal(t, "InvalidResource", transition.Info().Err().GetCode())
@@ -211,8 +213,24 @@ func TestLaunchResourceErrors(t *testing.T) {
 			wantCode:  "InvalidResource",
 		},
 		{
-			name:      "forbidden retries",
-			createErr: k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("exceeded quota")),
+			name:      "quota exhaustion waits",
+			createErr: k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("exceeded quota: tasks, requested: requests.memory=3Gi, used: requests.memory=14Gi, limited: requests.memory=16Gi")),
+			wantPhase: pluginsCore.PhaseWaitingForResources,
+		},
+		{
+			name:      "permission denial still fails",
+			createErr: k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("User executor cannot create resource pods in namespace ns")),
+			wantPhase: pluginsCore.PhaseRetryableFailure,
+			wantCode:  "RuntimeFailure",
+		},
+		{
+			name:      "wrapped quota exhaustion waits",
+			createErr: fmt.Errorf("create: %w", k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("exceeded quota: tasks, requested: pods=1, used: pods=10, limited: pods=10"))),
+			wantPhase: pluginsCore.PhaseWaitingForResources,
+		},
+		{
+			name:      "webhook quota message still fails",
+			createErr: k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf(`admission webhook "validate.example.com" denied the request: exceeded quota: policy`)),
 			wantPhase: pluginsCore.PhaseRetryableFailure,
 			wantCode:  "RuntimeFailure",
 		},
@@ -246,7 +264,7 @@ func TestLaunchResourceErrors(t *testing.T) {
 
 			pm := NewPluginManager("test", plugin, kubeClient)
 
-			transition, err := pm.launchResource(context.Background(), tCtx)
+			transition, err := pm.launchResource(context.Background(), tCtx, &time.Time{})
 			if tt.wantErr {
 				assert.Error(t, err)
 				assert.Equal(t, pluginsCore.UnknownTransition, transition)
@@ -255,7 +273,11 @@ func TestLaunchResourceErrors(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, tt.wantPhase, transition.Info().Phase())
 			assert.Equal(t, tt.wantCode, transition.Info().Err().GetCode())
-			assert.Equal(t, core.ExecutionError_USER, transition.Info().Err().GetKind())
+			if tt.wantCode != "" {
+				assert.Equal(t, core.ExecutionError_USER, transition.Info().Err().GetKind())
+			} else {
+				assert.Nil(t, transition.Info().Err())
+			}
 		})
 	}
 }
@@ -322,7 +344,7 @@ func TestLaunchResource_AlreadyExists(t *testing.T) {
 
 			pm := NewPluginManager("test", plugin, kubeClient)
 
-			transition, err := pm.launchResource(context.Background(), tCtx)
+			transition, err := pm.launchResource(context.Background(), tCtx, &time.Time{})
 			assert.NoError(t, err)
 			assert.Equal(t, tt.wantPhase, transition.Info().Phase())
 			assert.Equal(t, tt.wantCode, transition.Info().Err().GetCode())
@@ -395,6 +417,167 @@ func TestHandle_WaitsForPreviousResourceToDrain(t *testing.T) {
 	assert.Equal(t, pluginsCore.PhaseWaitingForResources, transition.Info().Phase())
 	assert.Equal(t, PluginPhaseNotStarted, written.Phase)
 	assert.Equal(t, pluginsCore.PhaseWaitingForResources, written.K8sPluginState.Phase)
+}
+
+func TestHandle_QuotaWaitSurvivesRestartAndAdmits(t *testing.T) {
+	quotaErr := k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name",
+		fmt.Errorf("exceeded quota: tasks, requested: requests.memory=3Gi, used: requests.memory=14Gi, limited: requests.memory=16Gi"))
+	createCalls := 0
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).
+		WithInterceptorFuncs(interceptor.Funcs{
+			Create: func(ctx context.Context, underlying client.WithWatch, resource client.Object, options ...client.CreateOption) error {
+				createCalls++
+				if createCalls <= 2 {
+					return quotaErr
+				}
+				return underlying.Create(ctx, resource, options...)
+			},
+		}).Build()
+	kubeClient := pluginsCoreMock.NewKubeClient(t)
+	kubeClient.EXPECT().GetClient().Return(fakeClient)
+	plugin := k8sMocks.NewPlugin(t)
+	plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+	plugin.EXPECT().BuildResource(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+
+	var stateBytes []byte
+	stateReader := pluginsCoreMock.NewPluginStateReader(t)
+	stateReader.EXPECT().Get(mock.Anything).RunAndReturn(func(destination interface{}) (uint8, error) {
+		if len(stateBytes) == 0 {
+			return 0, nil
+		}
+		return pluginStateVersion, gob.NewDecoder(bytes.NewReader(stateBytes)).Decode(destination)
+	})
+	stateWriter := pluginsCoreMock.NewPluginStateWriter(t)
+	stateWriter.EXPECT().Put(uint8(pluginStateVersion), mock.Anything).RunAndReturn(func(_ uint8, value interface{}) error {
+		var encoded bytes.Buffer
+		if err := gob.NewEncoder(&encoded).Encode(value); err != nil {
+			return err
+		}
+		stateBytes = encoded.Bytes()
+		return nil
+	})
+	tCtx := pluginsCoreMock.NewTaskExecutionContext(t)
+	tCtx.EXPECT().PluginStateReader().Return(stateReader)
+	tCtx.EXPECT().PluginStateWriter().Return(stateWriter)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("name"))
+
+	var waitStartedAt time.Time
+	for round := 0; round < 3; round++ {
+		manager := NewPluginManager("test", plugin, kubeClient)
+		transition, err := manager.Handle(context.Background(), tCtx)
+		require.NoError(t, err)
+		require.Nil(t, transition.Info().Err())
+		var persisted PluginState
+		require.NoError(t, gob.NewDecoder(bytes.NewReader(stateBytes)).Decode(&persisted))
+		if round < 2 {
+			assert.Equal(t, pluginsCore.PhaseWaitingForResources, transition.Info().Phase())
+			assert.Equal(t, PluginPhaseNotStarted, persisted.Phase)
+			assert.Equal(t, pluginsCore.PhaseWaitingForResources, persisted.K8sPluginState.Phase)
+			assert.Contains(t, persisted.K8sPluginState.Reason, "exceeded quota: tasks")
+			require.False(t, persisted.QuotaWaitStartedAt.IsZero())
+			if round == 0 {
+				waitStartedAt = persisted.QuotaWaitStartedAt
+			}
+			assert.True(t, waitStartedAt.Equal(persisted.QuotaWaitStartedAt))
+			err = fakeClient.Get(context.Background(), client.ObjectKey{Namespace: "ns", Name: "name"}, &v1.Pod{})
+			assert.True(t, k8serrors.IsNotFound(err))
+		} else {
+			assert.Equal(t, pluginsCore.PhaseQueued, transition.Info().Phase())
+			assert.Equal(t, PluginPhaseStarted, persisted.Phase)
+			assert.True(t, persisted.QuotaWaitStartedAt.IsZero())
+			require.NoError(t, fakeClient.Get(context.Background(), client.ObjectKey{Namespace: "ns", Name: "name"}, &v1.Pod{}))
+		}
+	}
+	assert.Equal(t, 3, createCalls)
+}
+
+func TestLaunchResource_QuotaWaitTimeout(t *testing.T) {
+	for _, test := range []struct {
+		name      string
+		timeout   time.Duration
+		waited    time.Duration
+		wantPhase pluginsCore.Phase
+	}{
+		{name: "deadline expired", timeout: time.Hour, waited: 2 * time.Hour, wantPhase: pluginsCore.PhasePermanentFailure},
+		{name: "within deadline", timeout: time.Hour, waited: time.Minute, wantPhase: pluginsCore.PhaseWaitingForResources},
+		{name: "deadline disabled", waited: 2 * time.Hour, wantPhase: pluginsCore.PhaseWaitingForResources},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			original := *config.GetK8sPluginConfig()
+			cfg := original
+			cfg.QuotaWaitTimeout.Duration = test.timeout
+			require.NoError(t, config.SetK8sPluginConfig(&cfg))
+			t.Cleanup(func() { require.NoError(t, config.SetK8sPluginConfig(&original)) })
+			quotaErr := k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("exceeded quota: tasks"))
+			fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).
+				WithInterceptorFuncs(interceptor.Funcs{
+					Create: func(context.Context, client.WithWatch, client.Object, ...client.CreateOption) error { return quotaErr },
+				}).Build()
+			kubeClient := pluginsCoreMock.NewKubeClient(t)
+			kubeClient.EXPECT().GetClient().Return(fakeClient)
+			plugin := k8sMocks.NewPlugin(t)
+			plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+			plugin.EXPECT().BuildResource(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+			tCtx := pluginsCoreMock.NewTaskExecutionContext(t)
+			tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("name"))
+			quotaWaitStartedAt := time.Now().Add(-test.waited)
+			waitStartedAt := quotaWaitStartedAt
+
+			transition, err := NewPluginManager("test", plugin, kubeClient).launchResource(context.Background(), tCtx, &quotaWaitStartedAt)
+			require.NoError(t, err)
+			assert.Equal(t, test.wantPhase, transition.Info().Phase())
+			assert.True(t, waitStartedAt.Equal(quotaWaitStartedAt))
+			if test.wantPhase.IsFailure() {
+				assert.Equal(t, "QuotaWaitTimeout", transition.Info().Err().GetCode())
+				assert.Contains(t, transition.Info().Err().GetMessage(), quotaErr.Error())
+			} else {
+				assert.Nil(t, transition.Info().Err())
+			}
+		})
+	}
+}
+
+func TestAbort_QuotaWaitWithoutPod(t *testing.T) {
+	deleteCalls := 0
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).
+		WithInterceptorFuncs(interceptor.Funcs{
+			Delete: func(ctx context.Context, underlying client.WithWatch, resource client.Object, options ...client.DeleteOption) error {
+				deleteCalls++
+				return underlying.Delete(ctx, resource, options...)
+			},
+		}).Build()
+	kubeClient := pluginsCoreMock.NewKubeClient(t)
+	kubeClient.EXPECT().GetClient().Return(fakeClient)
+	plugin := k8sMocks.NewPlugin(t)
+	plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+	plugin.EXPECT().BuildIdentityResource(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+	tCtx := pluginsCoreMock.NewTaskExecutionContext(t)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("name"))
+
+	require.NoError(t, NewPluginManager("test", plugin, kubeClient).Abort(context.Background(), tCtx))
+	require.Equal(t, 1, deleteCalls)
+}
+
+func TestPluginState_QuotaWaitBackwardCompatibility(t *testing.T) {
+	previous := struct {
+		Phase               PluginPhase
+		K8sPluginState      k8s.PluginState
+		LastEventUpdate     time.Time
+		LastEventRecordedAt time.Time
+	}{Phase: PluginPhaseStarted, K8sPluginState: k8s.PluginState{Phase: pluginsCore.PhaseRunning}}
+	var encoded bytes.Buffer
+	require.NoError(t, gob.NewEncoder(&encoded).Encode(previous))
+	var current PluginState
+	require.NoError(t, gob.NewDecoder(&encoded).Decode(&current))
+	require.Equal(t, PluginPhaseStarted, current.Phase)
+	require.Equal(t, pluginsCore.PhaseRunning, current.K8sPluginState.Phase)
+	require.True(t, current.QuotaWaitStartedAt.IsZero())
+
+	current.QuotaWaitStartedAt = time.Now()
+	require.NoError(t, gob.NewEncoder(&encoded).Encode(current))
+	require.NoError(t, gob.NewDecoder(&encoded).Decode(&previous))
+	require.Equal(t, PluginPhaseStarted, previous.Phase)
+	require.Equal(t, pluginsCore.PhaseRunning, previous.K8sPluginState.Phase)
 }
 
 func TestHandle_CorruptedPluginStateFailsPermanently(t *testing.T) {
