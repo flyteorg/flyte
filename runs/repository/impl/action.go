@@ -36,6 +36,7 @@ const (
 	notificationMeterName                            = "runs-repository"
 	notificationDeletedMetricName                    = "runs.notification.evictions"
 	notificationDroppedMetricName                    = "runs.notification.subscriber_drops"
+	notificationSentMetricName                       = "runs.notification.sent"
 	notificationBufferAction      notificationBuffer = "action"
 	notificationBufferRun         notificationBuffer = "run"
 )
@@ -55,6 +56,7 @@ type NotificationConfig struct {
 type notificationMetrics struct {
 	notifyDeletedCount           metric.Int64Counter
 	subscriberDroppedNotifyCount metric.Int64Counter
+	notifySentCount              metric.Int64Counter
 }
 
 func newNotificationMetrics(provider metric.MeterProvider) (*notificationMetrics, error) {
@@ -81,9 +83,18 @@ func newNotificationMetrics(provider metric.MeterProvider) (*notificationMetrics
 		return nil, err
 	}
 
+	notifySentCount, err := provider.Meter(notificationMeterName).Int64Counter(
+		notificationSentMetricName,
+		metric.WithDescription("Notifications successfully sent by batched pg_notify"),
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	return &notificationMetrics{
 		notifyDeletedCount:           notifyDeletedCount,
 		subscriberDroppedNotifyCount: subscriberDroppedNotifyCount,
+		notifySentCount:              notifySentCount,
 	}, nil
 }
 
@@ -99,6 +110,13 @@ func (m *notificationMetrics) recordSubscriberDropped(ctx context.Context, buffe
 		return
 	}
 	m.subscriberDroppedNotifyCount.Add(ctx, count, metric.WithAttributes(attribute.String("buffer_from", string(bufferFrom))))
+}
+
+func (m *notificationMetrics) recordSent(ctx context.Context, bufferFrom notificationBuffer, count int64) {
+	if m == nil || m.notifySentCount == nil || count == 0 {
+		return
+	}
+	m.notifySentCount.Add(ctx, count, metric.WithAttributes(attribute.String("buffer_from", string(bufferFrom))))
 }
 
 // NewNotificationConfig creates a notification config, normalizing invalid values.
@@ -1294,7 +1312,7 @@ func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql
 		return true
 	}
 
-	emit := func(channel string, payloads []string) []string {
+	emit := func(channel string, bufferFrom notificationBuffer, payloads []string) []string {
 		for start := 0; start < len(payloads); start += notifyBatchSize {
 			chunk := payloads[start:min(start+notifyBatchSize, len(payloads))]
 			var query strings.Builder
@@ -1311,6 +1329,7 @@ func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql
 			if !execNotify(channel, query.String(), args) {
 				return payloads[start:]
 			}
+			r.notificationMetrics.recordSent(ctx, bufferFrom, int64(len(chunk)))
 		}
 		return nil
 	}
@@ -1324,8 +1343,8 @@ func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql
 		}
 
 		actions, runs := r.takePendingNotifications()
-		retryActions := emit("action_updates", actions)
-		retryRuns := emit("run_updates", runs)
+		retryActions := emit("action_updates", notificationBufferAction, actions)
+		retryRuns := emit("run_updates", notificationBufferRun, runs)
 
 		if len(retryActions) == 0 && len(retryRuns) == 0 {
 			backoff = r.notificationConfig.retryMinBackoff
