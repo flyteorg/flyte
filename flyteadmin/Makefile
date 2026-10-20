@@ -61,6 +61,7 @@ linux_compile: export CGO_ENABLED ?= 0
 linux_compile: export GOOS ?= linux
 linux_compile:
 	go build -o /artifacts/flyteadmin -ldflags=$(LD_FLAGS) ./cmd/
+	go build -o /artifacts/flyteadmin-retention -ldflags=$(LD_FLAGS) ./cmd/retention/
 
 .PHONY: linux_compile_scheduler
 linux_compile_scheduler: export CGO_ENABLED ?= 0
@@ -85,3 +86,8 @@ seed_projects:
 	go run cmd/main.go migrate seed-projects project admintests flytekit --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
 
 all: compile
+
+.PHONY: compile_retention
+compile_retention:
+	mkdir -p ./bin
+	go build -o bin/flyteadmin-retention -ldflags=$(LD_FLAGS) ./cmd/retention/
