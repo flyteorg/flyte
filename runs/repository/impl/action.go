@@ -32,7 +32,8 @@ const (
 	defaultWatchBufferSize                           = 100
 	notifyRetryMinBackoff                            = 50 * time.Millisecond
 	notifyRetryMaxBackoff                            = 5 * time.Second
-	notifyBatchSize                                  = 100
+	defaultNotifyBatchSize                           = 100
+	maxNotifyBatchSize                               = 10_000
 	notificationMeterName                            = "runs-repository"
 	notificationDeletedMetricName                    = "runs.notification.evictions"
 	notificationDroppedMetricName                    = "runs.notification.subscriber_drops"
@@ -51,6 +52,8 @@ type NotificationConfig struct {
 	// watchBufferSize is the capacity of each watch subscriber's notification channel. A notification for a
 	// subscriber whose channel is full is dropped.
 	watchBufferSize int
+	// batchSize is the maximum number of notifications sent in one pg_notify statement.
+	batchSize int
 }
 
 type notificationMetrics struct {
@@ -120,7 +123,7 @@ func (m *notificationMetrics) recordSent(ctx context.Context, bufferFrom notific
 }
 
 // NewNotificationConfig creates a notification config, normalizing invalid values.
-func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff time.Duration, watchBufferSize int) NotificationConfig {
+func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff time.Duration, watchBufferSize, batchSize int) NotificationConfig {
 	if bufferLimit < defaultNotificationBufferSize {
 		bufferLimit = defaultNotificationBufferSize
 	}
@@ -137,12 +140,19 @@ func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff tim
 	if watchBufferSize <= 0 {
 		watchBufferSize = defaultWatchBufferSize
 	}
+	if batchSize <= 0 {
+		batchSize = defaultNotifyBatchSize
+	}
+	if batchSize > maxNotifyBatchSize {
+		batchSize = maxNotifyBatchSize
+	}
 
 	return NotificationConfig{
 		bufferLimit:     bufferLimit,
 		retryMinBackoff: retryMinBackoff,
 		retryMaxBackoff: retryMaxBackoff,
 		watchBufferSize: watchBufferSize,
+		batchSize:       batchSize,
 	}
 }
 
@@ -1313,8 +1323,9 @@ func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql
 	}
 
 	emit := func(channel string, bufferFrom notificationBuffer, payloads []string) []string {
-		for start := 0; start < len(payloads); start += notifyBatchSize {
-			chunk := payloads[start:min(start+notifyBatchSize, len(payloads))]
+		batchSize := r.notificationConfig.batchSize
+		for start := 0; start < len(payloads); start += batchSize {
+			chunk := payloads[start:min(start+batchSize, len(payloads))]
 			var query strings.Builder
 			query.WriteString("SELECT ")
 			args := make([]any, 0, len(chunk)+1)

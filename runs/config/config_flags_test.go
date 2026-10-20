@@ -354,6 +354,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_notifyBatchSize", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("notifyBatchSize", testValue)
+			if vInt, err := cmdFlags.GetInt("notifyBatchSize"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.NotifyBatchSize)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_actionsService.url", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
