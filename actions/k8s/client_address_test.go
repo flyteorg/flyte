@@ -64,14 +64,55 @@ func TestPutStatus_Address(t *testing.T) {
 
 	// A new attempt clears it.
 	require.NoError(t, c.PutStatus(ctx, rootActionID, 2, running(2), nil))
-	assert.Nil(t, getRoot(t, c).Status.Address)
+	assert.Nil(t, AddressFromStatus(getRoot(t, c)))
 }
 
-func TestPutStatus_AddressDoesNotTouchSignalValue(t *testing.T) {
+// The address belongs to the attempt and pod that reported it (review of #8201, point 2).
+func TestAddress_TiedToTheReportingAttemptAndPod(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("a retry the controller starts hides it", func(t *testing.T) {
+		c := newConditionClient(t)
+		require.NoError(t, c.PutStatus(ctx, rootActionID, 1, running(1), sessionAddress("/s/attempt1")))
+		ta := getRoot(t, c)
+		ta.Status.Attempts = 2 // the controller's in-place or max-runtime restart
+		require.NoError(t, c.k8sClient.Status().Update(ctx, ta))
+		// The worker's next update for the new attempt, with no address yet.
+		require.NoError(t, c.PutStatus(ctx, rootActionID, 2, running(2), nil))
+		assert.Nil(t, AddressFromStatus(getRoot(t, c)), "attempt 1's address must not reach watchers")
+	})
+
+	t.Run("a late report from an older attempt is ignored", func(t *testing.T) {
+		c := newConditionClient(t)
+		require.NoError(t, c.PutStatus(ctx, rootActionID, 2, running(2), sessionAddress("/s/attempt2")))
+		require.NoError(t, c.PutStatus(ctx, rootActionID, 1, running(1), sessionAddress("/s/attempt1")))
+		ta := getRoot(t, c)
+		assert.Equal(t, uint32(2), ta.Status.Attempts, "a stale report does not move attempts back")
+		assert.Equal(t, "/s/attempt2", AddressFromStatus(ta).GetPath())
+	})
+
+	t.Run("a system-retry relaunch hides it", func(t *testing.T) {
+		c := newConditionClient(t)
+		require.NoError(t, c.PutStatus(ctx, rootActionID, 1, running(1), sessionAddress("/s/pod1")))
+		ta := getRoot(t, c)
+		ta.Status.SystemRetries++ // the controller relaunches the pod in place
+		require.NoError(t, c.k8sClient.Status().Update(ctx, ta))
+		assert.Nil(t, AddressFromStatus(getRoot(t, c)), "the old pod's address must not reach watchers")
+		// The relaunched pod reports its own.
+		require.NoError(t, c.PutStatus(ctx, rootActionID, 1, running(1), sessionAddress("/s/pod2")))
+		assert.Equal(t, "/s/pod2", AddressFromStatus(getRoot(t, c)).GetPath())
+	})
+}
+
+// An empty address withdraws the held one (review of #8201, point 4).
+func TestPutStatus_EmptyAddressWithdraws(t *testing.T) {
 	ctx := context.Background()
 	c := newConditionClient(t)
-	require.NoError(t, c.PutStatus(ctx, rootActionID, 1, running(1), sessionAddress("x")))
-	assert.Empty(t, getRoot(t, c).Status.SignalValue, "an address must never complete the action")
+	require.NoError(t, c.PutStatus(ctx, rootActionID, 1, running(1), sessionAddress("/s/x")))
+	require.NoError(t, c.PutStatus(ctx, rootActionID, 1, running(1), &common.ActionAddress{}))
+	ta := getRoot(t, c)
+	assert.Nil(t, ta.Status.Address)
+	assert.Nil(t, AddressFromStatus(ta))
 }
 
 func TestBuildActionUpdate_Address(t *testing.T) {
