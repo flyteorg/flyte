@@ -1217,6 +1217,7 @@ func TestCheckResourcePhase_GracefulDeleteIsNotUnexpectedDeletion(t *testing.T) 
 	pm := NewPluginManager("test-plugin", plugin, kubeClient)
 
 	tCtx := &pluginsCoreMock.TaskExecutionContext{}
+	tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock(pod.Name))
 	queryObj := &v1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: pod.Namespace, Name: pod.Name}}
 	k8sState := &k8s.PluginState{}
 
@@ -1224,4 +1225,77 @@ func TestCheckResourcePhase_GracefulDeleteIsNotUnexpectedDeletion(t *testing.T) 
 	require.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, transition.Info().Phase())
 	assert.NotEqual(t, "UnexpectedObjectDeletion", transition.Info().Err().GetCode())
+}
+
+// A plugin's reader lists only its namespace and, for pods, only this attempt's, on top of
+// whatever labels the plugin selects by itself.
+func TestCheckResourcePhase_PluginReaderIsScopedToTheAttempt(t *testing.T) {
+	attemptLabels := func(attempt string) map[string]string {
+		return map[string]string{
+			flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue,
+			flytek8s.RunLabel:        "run",
+			flytek8s.ActionLabel:     "a0",
+			flytek8s.AttemptLabel:    attempt,
+		}
+	}
+	pod := func(namespace, name, attempt, app string) *v1.Pod {
+		labels := attemptLabels(attempt)
+		labels["app"] = app
+		return &v1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: namespace, Name: name, Labels: labels}}
+	}
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(
+		pod("ns", "head", "2", "job"),
+		pod("ns", "worker", "2", "other"),
+		pod("ns", "head-attempt-1", "1", "job"),
+		pod("other-ns", "head", "2", "job"),
+		&v1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "unlabelled"}},
+	).Build()
+
+	tests := []struct {
+		name       string
+		taskLabels map[string]string
+		wantPods   []string
+	}{
+		{name: "attempt labels", taskLabels: attemptLabels("2"), wantPods: []string{"ns/head"}},
+		{name: "missing attempt labels", taskLabels: nil, wantPods: []string{"ns/head", "ns/head-attempt-1"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			kubeClient := &pluginsCoreMock.KubeClient{}
+			kubeClient.EXPECT().GetClient().Return(fakeClient)
+			meta := &pluginsCoreMock.TaskExecutionMetadata{}
+			meta.EXPECT().GetLabels().Return(tt.taskLabels)
+			tCtx := &pluginsCoreMock.TaskExecutionContext{}
+			tCtx.EXPECT().TaskExecutionMetadata().Return(meta)
+
+			var pods, configMaps []string
+			plugin := &k8sMocks.Plugin{}
+			plugin.EXPECT().GetTaskPhase(mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+				func(ctx context.Context, pCtx k8s.PluginContext, _ client.Object) (pluginsCore.PhaseInfo, error) {
+					podList := &v1.PodList{}
+					if err := pCtx.K8sReader().List(ctx, podList, client.MatchingLabels{"app": "job"}); err != nil {
+						return pluginsCore.PhaseInfoUndefined, err
+					}
+					for _, p := range podList.Items {
+						pods = append(pods, p.Namespace+"/"+p.Name)
+					}
+					cmList := &v1.ConfigMapList{}
+					if err := pCtx.K8sReader().List(ctx, cmList); err != nil {
+						return pluginsCore.PhaseInfoUndefined, err
+					}
+					for _, c := range cmList.Items {
+						configMaps = append(configMaps, c.Namespace+"/"+c.Name)
+					}
+					return pluginsCore.PhaseInfoRunning(0, nil), nil
+				})
+
+			pm := NewPluginManager("test-plugin", plugin, kubeClient)
+
+			queryObj := &v1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "head"}}
+			_, err := pm.checkResourcePhase(context.Background(), tCtx, queryObj, &k8s.PluginState{})
+			require.NoError(t, err)
+			assert.ElementsMatch(t, tt.wantPods, pods)
+			assert.Equal(t, []string{"ns/unlabelled"}, configMaps)
+		})
+	}
 }
