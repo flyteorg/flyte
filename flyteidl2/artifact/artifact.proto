@@ -33,7 +33,8 @@ message ArtifactName {
   // Unique name of the artifact within org/project/domain.
   string name = 4 [
     (buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len = 255
+    (buf.validate.field).string.max_len = 255,
+    (buf.validate.field).string.pattern = "^[A-Za-z0-9._-]+$"
   ];
 }
 

@@ -315,7 +315,7 @@ func TestLiteralsToJsonSchema(t *testing.T) {
 		testDatetimeField := properties["test_datetime"].(map[string]any)
 		assert.Equal(t, "string", testDatetimeField["type"])
 		assert.Equal(t, "datetime", testDatetimeField["format"])
-		assert.Equal(t, now.UTC().Format(time.RFC3339), testDatetimeField["default"])
+		assert.Equal(t, now.UTC().Format(time.RFC3339Nano), testDatetimeField["default"])
 		assert.Equal(t, "A test datetime", testDatetimeField["description"])
 
 		jsonToLiteralsResult, err := LaunchFormJsonToLiterals(context.Background(), literalsToJsonResult)
@@ -328,7 +328,7 @@ func TestLiteralsToJsonSchema(t *testing.T) {
 		assert.Equal(t, "test_datetime", jsonToLiteralsResult[0].GetName())
 		assert.NotNil(t, jsonToLiteralsResult[0].GetValue())
 		resultTime := jsonToLiteralsResult[0].GetValue().GetScalar().GetPrimitive().GetDatetime().AsTime()
-		assert.Equal(t, now.UTC().Format(time.RFC3339), resultTime.UTC().Format(time.RFC3339))
+		assert.Equal(t, now.UTC().Format(time.RFC3339Nano), resultTime.UTC().Format(time.RFC3339Nano))
 	})
 
 	t.Run("duration literal", func(t *testing.T) {
@@ -676,4 +676,29 @@ func TestMsgpackBinaryLiteralToJson(t *testing.T) {
 		raw := []byte{0xc1, 0xc1, 0xc1}
 		assert.Equal(t, base64.StdEncoding.EncodeToString(raw), defaultValue(t, binaryLiteral(raw)))
 	})
+}
+
+func TestDatetimeLiteralKeepsSubSecondPrecision(t *testing.T) {
+	ts := time.Date(2024, 5, 6, 7, 8, 9, 123456000, time.UTC)
+	literals := []*task.NamedLiteral{
+		{
+			Name: "dt",
+			Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{
+				Primitive: &core.Primitive{Value: &core.Primitive_Datetime{Datetime: timestamppb.New(ts)}},
+			}}}},
+		},
+	}
+	variableMap := makeVariableMap(map[string]*core.Variable{
+		"dt": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_DATETIME}}},
+	})
+
+	schema, err := LiteralsToLaunchFormJson(context.Background(), literals, variableMap)
+	require.NoError(t, err)
+	properties := schema.AsMap()["properties"].(map[string]any)
+	assert.Equal(t, "2024-05-06T07:08:09.123456Z", properties["dt"].(map[string]any)["default"])
+
+	roundTripped, err := LaunchFormJsonToLiterals(context.Background(), schema)
+	require.NoError(t, err)
+	require.Len(t, roundTripped, 1)
+	assert.True(t, ts.Equal(roundTripped[0].GetValue().GetScalar().GetPrimitive().GetDatetime().AsTime()))
 }

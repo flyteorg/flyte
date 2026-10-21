@@ -120,6 +120,35 @@ func (f *failingEventsClient) Record(ctx context.Context, req *connect.Request[w
 	return f.recordingEventsClient.Record(ctx, req)
 }
 
+// retryEventRejectingClient records every event but the ones a system retry publishes,
+// standing in for a store that cannot accept those (an unencodable version, say).
+type retryEventRejectingClient struct {
+	recordingEventsClient
+	rejected int
+}
+
+func (c *retryEventRejectingClient) Record(ctx context.Context, req *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
+	for _, e := range req.Msg.GetEvents() {
+		if e.GetVersion() >= systemRetryEventVersionBase {
+			c.rejected++
+			return nil, stderrors.New("unable to encode version")
+		}
+	}
+	return c.recordingEventsClient.Record(ctx, req)
+}
+
+// systemRetryEvents picks out the events a system retry published, which are the only
+// ones versioned from systemRetryEventVersionBase.
+func systemRetryEvents(events []*workflow.ActionEvent) []*workflow.ActionEvent {
+	var out []*workflow.ActionEvent
+	for _, e := range events {
+		if e.GetVersion() >= systemRetryEventVersionBase {
+			out = append(out, e)
+		}
+	}
+	return out
+}
+
 type failingStatusClient struct {
 	client.Client
 	failUpdates bool
@@ -204,6 +233,15 @@ func buildTaskTemplateBytesWithTimeoutAndRetries(
 		tmpl.Metadata.Timeout = durationpb.New(timeout)
 	}
 	tmpl.Metadata.Retries = &core.RetryStrategy{Retries: retries}
+	data, err := proto.Marshal(tmpl)
+	Expect(err).NotTo(HaveOccurred())
+	return data
+}
+
+func withRetryBackoff(template []byte, backoff *core.Backoff) []byte {
+	tmpl := &core.TaskTemplate{}
+	Expect(proto.Unmarshal(template, tmpl)).To(Succeed())
+	tmpl.Metadata.Retries.Backoff = backoff
 	data, err := proto.Marshal(tmpl)
 	Expect(err).NotTo(HaveOccurred())
 	return data
@@ -550,6 +588,33 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(ta.Status.ErrorState.Code).To(Equal(pluginserrors.BadTaskSpecification))
 			Expect(ta.Status.ErrorState.Kind).To(Equal("USER"))
 			Expect(ta.Status.ErrorState.Message).To(ContainSubstring("invalid ray submission mode"))
+			Expect(isTerminal(ta)).To(BeTrue())
+		})
+
+		It("fails an Apple Silicon task immediately when the backend has no bridge", func() {
+			r := &TaskActionReconciler{
+				Client:            k8sClient,
+				Scheme:            k8sClient.Scheme(),
+				Recorder:          events.NewFakeRecorder(10),
+				eventsClient:      &fakeEventsClient{},
+				MaxSystemFailures: 3,
+			}
+			ta := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, ta)).To(Succeed())
+			original := ta.DeepCopy()
+			startingAttempts := ta.Status.Attempts
+
+			handleErr := pluginserrors.Errorf(pluginserrors.AppleSiliconNotAvailable,
+				"gpu='AppleSilicon' requires an Apple Silicon devbox; this backend has no Apple Silicon bridge.")
+
+			res, err := r.recordSystemError(ctx, ta, original, "container", handleErr, 0)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(res.RequeueAfter).To(BeZero(), "terminal - should not requeue")
+			Expect(ta.Status.SystemFailures).To(BeZero(), "retrying cannot conjure a bridge")
+			Expect(ta.Status.Attempts).To(Equal(startingAttempts))
+			Expect(ta.Status.ErrorState).NotTo(BeNil())
+			Expect(ta.Status.ErrorState.Code).To(Equal(pluginserrors.AppleSiliconNotAvailable))
+			Expect(ta.Status.ErrorState.Kind).To(Equal("USER"))
 			Expect(isTerminal(ta)).To(BeTrue())
 		})
 	})
@@ -1267,6 +1332,108 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(fake.abortCalls).To(Equal(1))
 		})
 
+		It("waits out the retry backoff before relaunching a failed attempt", func() {
+			base := time.Date(2026, time.August, 25, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			failed := pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("UserError", "task raised", nil))
+			fake := &fakePlugin{id: "timeout-plugin", transitions: []pluginsCore.Transition{failed}}
+			r := newReconciler(fake, fakeClock, &fakeEventsClient{}, nil)
+			backoff := &core.Backoff{
+				Base:   durationpb.New(10 * time.Second),
+				Factor: proto.Float64(2),
+				Cap:    durationpb.New(10 * time.Minute),
+			}
+			nn := createTaskAction(
+				"retry-backoff",
+				withRetryBackoff(buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", 0, 2), backoff),
+			)
+			request := reconcile.Request{NamespacedName: nn}
+
+			// The first attempt fails: its retry is due in 10s and the plugin stays untouched until then.
+			result, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.RequeueAfter).To(Equal(10 * time.Second))
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.Attempts).To(Equal(uint32(2)))
+			Expect(persisted.Status.NextAttemptAt.Time).To(BeTemporally("==", base.Add(10*time.Second)))
+			Expect(fake.handleCalls).To(Equal(1))
+
+			fakeClock.Step(4 * time.Second)
+			result, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.RequeueAfter).To(Equal(6 * time.Second))
+			Expect(fake.handleCalls).To(Equal(1))
+
+			// Once due, the retry launches; its own failure waits twice as long.
+			fakeClock.Step(6 * time.Second)
+			result, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(fake.handleCalls).To(Equal(2))
+			Expect(result.RequeueAfter).To(Equal(20 * time.Second))
+			persisted = getTaskAction(nn)
+			Expect(persisted.Status.Attempts).To(Equal(uint32(3)))
+			Expect(persisted.Status.NextAttemptAt.Time).To(BeTemporally("==", base.Add(30*time.Second)))
+
+			// The last attempt exhausts the retries: terminal, with nothing left to schedule.
+			fakeClock.Step(20 * time.Second)
+			_, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(fake.handleCalls).To(Equal(3))
+			persisted = getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.NextAttemptAt).To(BeNil())
+		})
+
+		It("waits out the retry backoff after a max-runtime timeout", func() {
+			const timeout = time.Second
+			base := time.Date(2026, time.August, 25, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			fake := &fakePlugin{id: "timeout-plugin", transitions: []pluginsCore.Transition{runningTransition(base)}}
+			r := newReconciler(fake, fakeClock, &fakeEventsClient{}, nil)
+			backoff := &core.Backoff{
+				Base:   durationpb.New(10 * time.Second),
+				Factor: proto.Float64(2),
+				Cap:    durationpb.New(10 * time.Minute),
+			}
+			nn := createTaskAction(
+				"timeout-retry-backoff",
+				withRetryBackoff(buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", timeout, 1), backoff),
+			)
+			request := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(fake.handleCalls).To(Equal(1))
+			running := getTaskAction(nn)
+			Expect(running.Status.AttemptStartedAt.Time).To(BeTemporally("==", base))
+			Expect(running.Status.NextAttemptAt).To(BeNil())
+
+			// The attempt times out and is retried: the retry is due 10s after the timeout reconcile.
+			fakeClock.Step(timeout)
+			result, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.RequeueAfter).To(Equal(10 * time.Second))
+			retrying := getTaskAction(nn)
+			Expect(retrying.Status.Attempts).To(Equal(uint32(2)))
+			Expect(retrying.Status.TimeoutAt).To(BeNil())
+			Expect(retrying.Status.NextAttemptAt.Time).To(BeTemporally("==", fakeClock.Now().Add(10*time.Second)))
+			Expect(fake.abortCalls).To(Equal(1))
+			// The timeout reconcile handled the plugin once more before enforcing the deadline.
+			handled := fake.handleCalls
+
+			fakeClock.Step(4 * time.Second)
+			result, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.RequeueAfter).To(Equal(6 * time.Second))
+			Expect(fake.handleCalls).To(Equal(handled))
+
+			fakeClock.Step(6 * time.Second)
+			_, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(fake.handleCalls).To(Equal(handled + 1))
+			Expect(getTaskAction(nn).Status.NextAttemptAt).To(BeNil())
+		})
+
 		It("retains the timeout deadline when retry event publication fails", func() {
 			const timeout = time.Second
 			base := time.Date(2026, time.August, 25, 0, 0, 0, 0, time.UTC)
@@ -1416,6 +1583,294 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(persisted.Status.TimeoutAt).To(BeNil())
 			Expect(isTerminal(persisted)).To(BeFalse())
 			Expect(fake.abortCalls).To(Equal(1))
+		})
+
+		It("reports the system failure before relaunching the attempt in place", func() {
+			base := time.Date(2026, time.September, 18, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			preemptedAt := base.Add(time.Minute)
+			const code = "WorkloadEvictedDueToPreempted"
+			const message = "Pod was terminated by an external controller: Preempted to accommodate a workload"
+			fake := &fakePlugin{
+				id: "kueue-plugin",
+				transitions: []pluginsCore.Transition{
+					runningTransition(base),
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(
+						code,
+						message,
+						&pluginsCore.TaskInfo{OccurredAt: &preemptedAt},
+					)),
+				},
+			}
+			recorded := &recordingEventsClient{}
+			r := newReconciler(fake, fakeClock, recorded, nil)
+			nn := createTaskAction(
+				"system-retry-reported",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+			request := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			fakeClock.Step(time.Minute)
+			_, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+
+			events := recorded.RecordedEvents()
+			Expect(len(events)).To(BeNumerically(">=", 2))
+			Expect(events[len(events)-2].GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_RUNNING))
+			retry := events[len(events)-1]
+			Expect(retry.GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_QUEUED))
+			Expect(retry.GetAttempt()).To(Equal(uint32(1)))
+			// Events are stored under (action, attempt, phase, version) and a duplicate key
+			// is dropped, so this event must not reuse a version the launch events of the
+			// same attempt already spent in the same phase. Plugins count up from zero.
+			Expect(retry.GetVersion()).To(Equal(systemRetryEventVersionBase))
+			Expect(retry.GetVersion()).To(BeNumerically(">", 1000))
+			// The store keeps this column in a signed 32-bit integer.
+			Expect(retry.GetVersion()).To(BeNumerically("<", uint32(1)<<31))
+			Expect(retry.GetErrorInfo()).To(BeNil())
+			Expect(retry.GetClusterEvents()).To(HaveLen(2))
+			Expect(retry.GetClusterEvents()[0].GetMessage()).To(Equal(systemRetryReason))
+			warning := retry.GetClusterEvents()[1]
+			Expect(warning.GetType()).To(Equal(workflow.ClusterEvent_TYPE_WARNING))
+			Expect(warning.GetReason()).To(Equal(code))
+			Expect(warning.GetMessage()).To(Equal("[" + code + "] " + message))
+			Expect(warning.GetOccurredAt().AsTime()).To(BeTemporally("==", preemptedAt))
+
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.SystemFailures).To(Equal(uint32(1)))
+			Expect(persisted.Status.SystemRetries).To(Equal(uint32(1)))
+			Expect(persisted.Status.PluginState).To(BeNil())
+			Expect(isTerminal(persisted)).To(BeFalse())
+			Expect(fake.abortCalls).To(Equal(1))
+		})
+
+		It("gives every system retry of an attempt its own event version", func() {
+			base := time.Date(2026, time.September, 21, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			preempted := func(at time.Time) pluginsCore.Transition {
+				return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(
+					"WorkloadEvictedDueToPreempted",
+					"preempted",
+					&pluginsCore.TaskInfo{OccurredAt: &at},
+				))
+			}
+			// Preempted, relaunched and running again, then preempted a second time: the
+			// progress in between puts the consecutive failure count back to zero.
+			fake := &fakePlugin{
+				id: "kueue-plugin",
+				transitions: []pluginsCore.Transition{
+					runningTransition(base),
+					preempted(base.Add(time.Minute)),
+					runningTransition(base.Add(2 * time.Minute)),
+					preempted(base.Add(3 * time.Minute)),
+				},
+			}
+			recorded := &recordingEventsClient{}
+			r := newReconciler(fake, fakeClock, recorded, nil)
+			nn := createTaskAction(
+				"system-retry-twice",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+			request := reconcile.Request{NamespacedName: nn}
+
+			for i := 0; i < len(fake.transitions); i++ {
+				_, err := r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				fakeClock.Step(time.Minute)
+			}
+
+			// Both retries belong to attempt 1 and report Queued, so the version is all
+			// that keeps the store from dropping the second as a duplicate of the first.
+			retries := systemRetryEvents(recorded.RecordedEvents())
+			Expect(retries).To(HaveLen(2))
+			for _, retry := range retries {
+				Expect(retry.GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_QUEUED))
+				Expect(retry.GetAttempt()).To(Equal(uint32(1)))
+			}
+			Expect(retries[0].GetVersion()).To(Equal(systemRetryEventVersionBase))
+			Expect(retries[1].GetVersion()).To(Equal(systemRetryEventVersionBase + 1))
+
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.Attempts).To(Equal(uint32(1)))
+			Expect(persisted.Status.SystemFailures).To(Equal(uint32(1)), "the failures were not consecutive")
+			Expect(persisted.Status.SystemRetries).To(Equal(uint32(2)))
+			Expect(isTerminal(persisted)).To(BeFalse())
+		})
+
+		It("republishes a system retry under the same version until it is persisted", func() {
+			base := time.Date(2026, time.September, 21, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			preemptedAt := base.Add(time.Minute)
+			fake := &fakePlugin{
+				id: "kueue-plugin",
+				transitions: []pluginsCore.Transition{
+					runningTransition(base),
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(
+						"WorkloadEvictedDueToPreempted",
+						"preempted",
+						&pluginsCore.TaskInfo{OccurredAt: &preemptedAt},
+					)),
+				},
+			}
+			recorded := &recordingEventsClient{}
+			failingClient := &failingStatusClient{Client: k8sClient}
+			r := newReconciler(fake, fakeClock, recorded, failingClient)
+			nn := createTaskAction(
+				"system-retry-republished",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+			request := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+
+			// The event goes out but the status does not, so the next reconcile meets the
+			// same failure with the same counters and publishes it again.
+			fakeClock.Step(time.Minute)
+			failingClient.failUpdates = true
+			_, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(getTaskAction(nn).Status.SystemRetries).To(BeZero())
+
+			fakeClock.Step(time.Minute)
+			failingClient.failUpdates = false
+			_, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+
+			retries := systemRetryEvents(recorded.RecordedEvents())
+			Expect(retries).To(HaveLen(2))
+			Expect(retries[0].GetVersion()).To(Equal(systemRetryEventVersionBase))
+			Expect(retries[1].GetVersion()).To(Equal(systemRetryEventVersionBase), "the store drops it as a duplicate")
+			Expect(getTaskAction(nn).Status.SystemRetries).To(Equal(uint32(1)))
+		})
+
+		It("retries even when the system retry event cannot be published", func() {
+			base := time.Date(2026, time.September, 18, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			failedAt := base.Add(time.Minute)
+			fake := &fakePlugin{
+				id: "kueue-plugin",
+				transitions: []pluginsCore.Transition{
+					runningTransition(base),
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(
+						"WorkloadEvictedDueToPreempted",
+						"preempted",
+						&pluginsCore.TaskInfo{OccurredAt: &failedAt},
+					)),
+				},
+			}
+			// The event store rejects the retry event, as it does when its version cannot
+			// be encoded. The attempt must still be retried rather than held back.
+			rejecting := &retryEventRejectingClient{}
+			r := newReconciler(fake, fakeClock, rejecting, nil)
+			nn := createTaskAction(
+				"system-retry-event-unavailable",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+			request := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			fakeClock.Step(time.Minute)
+			_, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(rejecting.rejected).To(BeNumerically(">=", 1), "the retry event was rejected")
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.SystemFailures).To(Equal(uint32(1)), "the retry proceeded")
+			Expect(persisted.Status.PluginState).To(BeNil(), "the plugin resource was reset")
+			Expect(isTerminal(persisted)).To(BeFalse())
+			Expect(fake.abortCalls).To(Equal(1))
+		})
+
+		const cleanupPluginID = "cleanup-plugin"
+
+		It("cleans up the resource when a retryable failure with cleanup has no retries left", func() {
+			base := time.Date(2026, time.October, 7, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			evictedAt := base.Add(time.Minute)
+			fake := &fakePlugin{
+				id: cleanupPluginID,
+				transitions: []pluginsCore.Transition{
+					runningTransition(base),
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailureWithCleanup(
+						"GangEvicted", "gang evicted by kueue (Preempted)", &pluginsCore.TaskInfo{OccurredAt: &evictedAt},
+					)),
+				},
+			}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			nn := createTaskAction(
+				"cleanup-no-retries-left",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 0),
+			)
+			request := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			fakeClock.Step(time.Minute)
+			_, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.ErrorState.Code).To(Equal("GangEvicted"))
+			Expect(fake.abortCalls).To(Equal(1), "the resource is deleted so it cannot run again")
+		})
+
+		It("cleans up the resource when the plugin reports a permanent failure with cleanup", func() {
+			base := time.Date(2026, time.October, 7, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			failedAt := base.Add(time.Minute)
+			fake := &fakePlugin{
+				id: cleanupPluginID,
+				transitions: []pluginsCore.Transition{
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoFailed(
+						pluginsCore.PhasePermanentFailure,
+						&core.ExecutionError{Kind: core.ExecutionError_USER, Code: "KueueLocalQueueNotFound", Message: "no such queue"},
+						&pluginsCore.TaskInfo{OccurredAt: &failedAt},
+					).WithCleanupOnFailure()),
+				},
+			}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			nn := createTaskAction(
+				"cleanup-permanent-failure",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+
+			_, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			Expect(err).NotTo(HaveOccurred())
+
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.ErrorState.Code).To(Equal("KueueLocalQueueNotFound"))
+			Expect(persisted.Status.Attempts).To(Equal(uint32(1)), "a permanent failure is not retried")
+			Expect(fake.abortCalls).To(Equal(1))
+		})
+
+		It("leaves the resource alone for a permanent failure without cleanup", func() {
+			base := time.Date(2026, time.October, 7, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			failedAt := base.Add(time.Minute)
+			fake := &fakePlugin{
+				id: cleanupPluginID,
+				transitions: []pluginsCore.Transition{
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure(
+						"OrdinaryFailure", "ordinary failure", &pluginsCore.TaskInfo{OccurredAt: &failedAt},
+					)),
+				},
+			}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			nn := createTaskAction(
+				"no-cleanup-permanent-failure",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+
+			_, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(isTerminal(getTaskAction(nn))).To(BeTrue())
+			Expect(fake.abortCalls).To(BeZero())
 		})
 	})
 
@@ -1606,6 +2061,65 @@ var _ = Describe("TaskAction Controller", func() {
 				phases[i] = e.GetPhase()
 			}
 			Expect(phases).To(ContainElement(common.ActionPhase_ACTION_PHASE_ABORTED))
+		})
+
+		It("should finalize a terminal TaskAction without aborting it or emitting ACTION_PHASE_ABORTED", func() {
+			fake := &fakePlugin{id: "timeout-plugin"}
+			terminalResource := &flyteorgv1.TaskAction{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:       "abort-terminal-resource",
+					Namespace:  "default",
+					Finalizers: []string{taskActionFinalizer},
+				},
+				Spec: flyteorgv1.TaskActionSpec{
+					RunName:       "terminal-run",
+					Project:       "terminal-project",
+					Domain:        "terminal-domain",
+					ActionName:    "terminal-action",
+					InputURI:      "/tmp/input",
+					RunOutputBase: "/tmp/output",
+					TaskType:      "timeout-test",
+					TaskTemplate:  buildTaskTemplateBytes("timeout-test", "busybox"),
+				},
+			}
+			Expect(k8sClient.Create(ctx, terminalResource)).To(Succeed())
+			terminalResource.Status.Conditions = []metav1.Condition{{
+				Type:               string(flyteorgv1.ConditionTypeSucceeded),
+				Status:             metav1.ConditionTrue,
+				Reason:             string(flyteorgv1.ConditionReasonCompleted),
+				Message:            "TaskAction completed successfully",
+				LastTransitionTime: metav1.Now(),
+			}}
+			Expect(k8sClient.Status().Update(ctx, terminalResource)).To(Succeed())
+			Expect(k8sClient.Delete(ctx, terminalResource)).To(Succeed())
+
+			recorder := &recordingEventsClient{}
+			reconciler := &TaskActionReconciler{
+				Client:         k8sClient,
+				Scheme:         k8sClient.Scheme(),
+				Recorder:       events.NewFakeRecorder(10),
+				PluginRegistry: newFakePluginRegistry(fake),
+				DataStore:      dataStore,
+				eventsClient:   recorder,
+			}
+
+			result, err := reconciler.Reconcile(ctx, reconcile.Request{
+				NamespacedName: types.NamespacedName{Name: "abort-terminal-resource", Namespace: "default"},
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.RequeueAfter).To(BeZero())
+			Expect(fake.abortCalls).To(BeZero())
+			Expect(fake.finalizeCalls).To(Equal(1))
+
+			deleted := &flyteorgv1.TaskAction{}
+			Expect(errors.IsNotFound(k8sClient.Get(ctx, types.NamespacedName{Name: "abort-terminal-resource", Namespace: "default"}, deleted))).To(BeTrue())
+
+			recorded := recorder.RecordedEvents()
+			phases := make([]interface{}, 0, len(recorded))
+			for _, e := range recorded {
+				phases = append(phases, e.GetPhase())
+			}
+			Expect(phases).NotTo(ContainElement(common.ActionPhase_ACTION_PHASE_ABORTED))
 		})
 	})
 

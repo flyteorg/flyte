@@ -53,6 +53,48 @@ const maxUserExitCode = 127
 // when it cannot reach the container's log to read it. The accompanying exit code is fabricated.
 const terminationMessageReadFailure = "Error on reading termination message from logs"
 
+// TerminationTargetCondition is the pod status condition an external controller sets, with the
+// reason and the message of its decision, right before it deletes a pod it manages. Kueue stamps
+// it on every pod it stops (the Workload was preempted, evicted or deactivated), and it is the only
+// place that reason survives: to the kubelet the deletion looks like any other.
+const TerminationTargetCondition v1.PodConditionType = "TerminationTarget"
+
+// GetTerminationTarget returns the TerminationTarget condition when an external controller marked
+// the pod for termination, nil otherwise. Only the condition type is matched: the reason Kueue
+// writes there has changed across its releases (StoppedByKueue, WorkloadEvicted,
+// WorkloadEvictedDueToPreempted) and is reported as it is.
+func GetTerminationTarget(status v1.PodStatus) *v1.PodCondition {
+	for i := range status.Conditions {
+		c := &status.Conditions[i]
+		if c.Type == TerminationTargetCondition && c.Status == v1.ConditionTrue {
+			return c
+		}
+	}
+	return nil
+}
+
+// ExternalTerminationCode is the error code for a pod an external controller terminated: the
+// controller's own reason, so that a Kueue preemption reads as such rather than as an interruption.
+func ExternalTerminationCode(c *v1.PodCondition) string {
+	if c.Reason != "" {
+		return c.Reason
+	}
+	return string(TerminationTargetCondition)
+}
+
+// ExternalTerminationMessage explains a pod's termination in the words of the controller that
+// decided it, for example why Kueue preempted the Workload.
+func ExternalTerminationMessage(c *v1.PodCondition) string {
+	message := "Pod was terminated by an external controller"
+	if c.Message != "" {
+		return message + ": " + c.Message
+	}
+	if c.Reason != "" {
+		return message + " (" + c.Reason + ")"
+	}
+	return message
+}
+
 const defaultContainerTemplateName = "default"
 const defaultInitContainerTemplateName = "default-init"
 const primaryContainerTemplateName = "primary"
@@ -736,7 +778,12 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	// GPU accelerator
-	if extendedResources.GetGpuAccelerator() != nil {
+	if IsAppleSilicon(extendedResources.GetGpuAccelerator()) {
+		workloadID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+		if err := ApplyAppleSiliconBridge(podSpec, primaryContainerName, workloadID); err != nil {
+			return nil, nil, err
+		}
+	} else if extendedResources.GetGpuAccelerator() != nil {
 		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
 		if ps, ok := extendedResources.GetGpuAccelerator().GetPartitionSizeValue().(*core.GPUAccelerator_PartitionSize); ok {
 			if slices := parseMigSlices(ps.PartitionSize); slices != "" {
@@ -1582,6 +1629,15 @@ func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore
 	//
 
 	var isSystemError bool
+	// A controller that stopped the pod on purpose, such as Kueue preempting its Workload, says
+	// so on the pod itself. Its reason is the code and its message the explanation; the container
+	// exit codes below still add detail, but do not get to rename the failure.
+	terminationTarget := GetTerminationTarget(status)
+	if terminationTarget != nil {
+		code = ExternalTerminationCode(terminationTarget)
+		message = ExternalTerminationMessage(terminationTarget)
+		isSystemError = true
+	}
 	// In some versions of GKE the reason can also be "Terminated" or "NodeShutdown"
 	if retryableStatusReasons.Has(code) {
 		isSystemError = true
@@ -1599,9 +1655,12 @@ func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore
 			containerState = c.State
 		}
 		if containerState.Terminated != nil {
-			if strings.Contains(containerState.Terminated.Reason, OOMKilled) {
+			switch {
+			case terminationTarget != nil:
+				// The controller's reason stands; the exit code below is only detail.
+			case strings.Contains(containerState.Terminated.Reason, OOMKilled):
 				code = OOMKilled
-			} else if isTerminatedWithSigKill(containerState) {
+			case isTerminatedWithSigKill(containerState):
 				// in some setups, node termination sends SIGKILL to all the containers running on that node. Capturing and
 				// tagging that correctly.
 				code = Interrupted

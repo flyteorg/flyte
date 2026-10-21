@@ -88,6 +88,7 @@ enum AcceleratorModel {
   NVIDIA_GB200 = 17 [(accelerator_name) = "nvidia-gb200"];
   NVIDIA_GB10 = 18 [(accelerator_name) = "nvidia-gb10"];
   NVIDIA_RTX_PRO_6000 = 19 [(accelerator_name) = "nvidia-rtx-pro-6000"];
+  NVIDIA_RTX_PRO_4500 = 20 [(accelerator_name) = "nvidia-rtx-pro-4500"];
 
   // GOOGLE_TPU
   GOOGLE_TPU_V5E = 100 [(accelerator_name) = "google-tpu-v5e"];
@@ -115,6 +116,11 @@ enum AcceleratorModel {
 
   // HABANA_GAUDI
   HABANA_GAUDI1 = 400 [(accelerator_name) = "habana-gaudi1"];
+
+  // APPLE_SILICON
+  // The Metal GPU of an Apple Silicon (M-series) host, reached through the
+  // devbox's host-side Apple Silicon bridge. Devbox-local: never cluster-schedulable.
+  APPLE_SILICON_GPU = 500 [(accelerator_name) = "apple-silicon"];
 }
 
 // Metadata associated with the GPU accelerator to allocate to a task. Contains
@@ -133,6 +139,10 @@ message GPUAccelerator {
     AMD_GPU = 3;
     // Habana Gaudi devices
     HABANA_GAUDI = 4;
+    // Apple Silicon (M-series) Metal GPU, served by a host-side MLX daemon on
+    // a local devbox. Not schedulable on a cluster: a backend without an Apple Silicon
+    // bridge configured rejects it with APPLE_SILICON_NOT_AVAILABLE.
+    APPLE_SILICON = 5;
   }
 
   // This can be any arbitrary string, and should be informed by the labels or taints
@@ -395,6 +405,28 @@ message TaskTemplate {
   // Reuse policy for the task's execution environment (a warm container pool, or a shared,
   // long-lived cluster for cluster-backed plugins like Ray). When unset, no reuse is configured.
   ReusePolicy reuse_policy = 19;
+
+  // The kind of worker that runs this task. The scheduler sends the task only to workers of
+  // this kind; while none has room it waits. Unspecified is the default worker, which runs
+  // containers and plugin tasks.
+  WorkerKind worker_kind = 20;
+}
+
+// The kinds of worker that run tasks. A worker of a kind may further limit itself to some task
+// types and versions of that kind.
+enum WorkerKind {
+  // The default worker: runs containers, and plugin and connector tasks.
+  WORKER_KIND_UNSPECIFIED = 0;
+
+  // Runs sandboxed orchestrator source in an interpreter, with no container
+  // (flyte.sandbox.orchestrator).
+  WORKER_KIND_SANDBOX = 1;
+
+  // Runs each task in its own microVM, such as an interactive sandbox session, rather than a pod.
+  // It needs a scheduler and workers that support this kind; the open-source executor does not
+  // treat it specially. Schedulers that support it should not retry such a task: a retry would
+  // start a fresh VM at a new address while callers still hold the old one.
+  WORKER_KIND_MICROVM = 2;
 }
 
 // ----------------- First class Plugins

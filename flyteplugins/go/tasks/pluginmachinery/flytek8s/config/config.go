@@ -64,6 +64,9 @@ var (
 		PodPendingTimeout: config2.Duration{
 			Duration: 0,
 		},
+		TerminatingResourceGracePeriod: config2.Duration{
+			Duration: time.Minute * 5,
+		},
 		GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
 		GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
 		GpuResourceName:           ResourceNvidiaGPU,
@@ -88,6 +91,7 @@ var (
 			"M60":           "nvidia-tesla-m60",
 			"P4":            "nvidia-tesla-p4",
 			"P100":          "nvidia-tesla-p100",
+			"RTX PRO 4500":  "nvidia-rtx-pro-4500",
 			"RTX PRO 6000":  "nvidia-rtx-pro-6000",
 			"T4":            "nvidia-tesla-t4",
 			"V100":          "nvidia-tesla-v100",
@@ -162,6 +166,8 @@ var (
 			"nvidia-gb10":           "GB10",
 			"NVIDIA-RTX-PRO-6000":   "nvidia-rtx-pro-6000",
 			"nvidia-rtx-pro-6000":   "nvidia-rtx-pro-6000",
+			"NVIDIA-RTX-PRO-4500":   "nvidia-rtx-pro-4500",
+			"nvidia-rtx-pro-4500":   "nvidia-rtx-pro-4500",
 			"GOOGLE-TPU-V5E":        "tpu-v5-lite-podslice",
 			"google-tpu-v5e":        "tpu-v5-lite-podslice",
 			"GOOGLE-TPU-V5P":        "tpu-v5p-slice",
@@ -219,6 +225,9 @@ var (
 			core.GPUAccelerator_HABANA_GAUDI.String(): {
 				ResourceName: "habana.ai/gaudi",
 			},
+			// No resource name: the Apple Silicon GPU is reached through the devbox's host
+			// Apple Silicon bridge (see AppleSiliconBridge), never through a device plugin.
+			core.GPUAccelerator_APPLE_SILICON.String(): {},
 		},
 		DefaultPodTemplateResync: config2.Duration{
 			Duration: 30 * time.Second,
@@ -326,6 +335,13 @@ type K8sPluginConfig struct {
 	// issue, and the corresponding task marked as failed
 	PodPendingTimeout config2.Duration `json:"pod-pending-timeout" pflag:"-,Time to wait while pod is stuck in pending."`
 
+	// Time a relaunch waits, past the end of its deletion grace period, for a previous
+	// incarnation of the resource still holding its name to go away. A resource stuck
+	// terminating longer than this (an unreachable node, a finalizer that never clears)
+	// fails the launch with a system-retryable error instead of waiting forever. Zero
+	// waits indefinitely.
+	TerminatingResourceGracePeriod config2.Duration `json:"terminating-resource-grace-period" pflag:"-,Time to wait past its deletion grace period for a previous resource stuck terminating before failing the launch."`
+
 	// The node label that specifies the attached GPU device.
 	GpuDeviceNodeLabel string `json:"gpu-device-node-label" pflag:"-,The node label that specifies the attached GPU device."`
 
@@ -387,6 +403,25 @@ type K8sPluginConfig struct {
 
 	// DisableInjectOwnerReferences is a boolean flag that indicates if owner references should be injected into the k8s resources.
 	DisableInjectOwnerReferences bool `json:"disable-inject-owner-references" pflag:",Override to not set owner references on k8s resources. This is useful for V2 node execution"`
+
+	// AppleSiliconBridge configures the devbox-local Apple Silicon accelerator. It is only
+	// set by a devbox running on an Apple Silicon host; everywhere else it stays empty and a
+	// workload requesting the APPLE_SILICON device class fails with APPLE_SILICON_NOT_AVAILABLE.
+	AppleSiliconBridge AppleSiliconBridgeConfig `json:"apple-silicon-bridge" pflag:"-,Devbox-local Apple Silicon bridge configuration."`
+}
+
+// AppleSiliconBridgeConfig points Apple Silicon workloads at the host-side Apple Silicon bridge a devbox runs on an
+// Apple Silicon Mac. Pods cannot reach the host's Metal GPU, so instead of scheduling against a
+// device plugin they are handed the bridge's OpenAI-compatible endpoint and a per-workload token.
+type AppleSiliconBridgeConfig struct {
+	// Endpoint is the bridge's base URL as reachable from pods, e.g. http://192.168.65.254:30090.
+	// Empty means this backend has no Apple Silicon bridge.
+	Endpoint string `json:"endpoint"`
+	// TokenSecret is the HMAC key shared with the bridge, used to mint each workload's credential.
+	TokenSecret string `json:"token-secret"`
+	// HostPlatform is the devbox host's os/arch (e.g. darwin/arm64, linux/amd64), quoted in the
+	// APPLE_SILICON_NOT_AVAILABLE message so the user sees why their host cannot provide Apple Silicon.
+	HostPlatform string `json:"host-platform"`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers

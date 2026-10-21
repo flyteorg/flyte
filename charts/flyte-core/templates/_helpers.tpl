@@ -202,3 +202,10 @@ storage:
     - /.well-known/oauth-authorization-server
     - /flyteidl2.auth.AuthMetadataService
 {{- end -}}
+
+{{/*
+Non-empty when telemetry.enabled is false: the deployment opted out of telemetry.
+*/}}
+{{- define "flyte-core.telemetryDisabled" -}}
+{{- if not (dig "enabled" true (.Values.telemetry | default dict)) }}true{{- end }}
+{{- end -}}

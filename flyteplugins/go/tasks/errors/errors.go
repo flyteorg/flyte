@@ -18,6 +18,9 @@ const (
 	CorruptedPluginState       errors.ErrorCode = "CorruptedPluginState"
 	ResourceManagerFailure     errors.ErrorCode = "ResourceManagerFailure"
 	BackOffError               errors.ErrorCode = "BackOffError"
+	// AppleSiliconNotAvailable marks a workload that requests the Apple Silicon accelerator on a
+	// backend with no Apple Silicon bridge: anything but a devbox running on an Apple Silicon host.
+	AppleSiliconNotAvailable errors.ErrorCode = "APPLE_SILICON_NOT_AVAILABLE"
 )
 
 func Errorf(errorCode errors.ErrorCode, msgFmt string, args ...interface{}) error {
