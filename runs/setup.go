@@ -99,6 +99,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 			cfg.NotificationBufferLimit,
 			cfg.NotifyRetryMinBackoff.Duration,
 			cfg.NotifyRetryMaxBackoff.Duration,
+			cfg.WatchBufferSize,
 		),
 		meterProvider,
 	)

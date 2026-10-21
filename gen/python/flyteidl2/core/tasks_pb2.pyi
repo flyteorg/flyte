@@ -59,11 +59,13 @@ class AcceleratorModel(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     AMD_MI350X: _ClassVar[AcceleratorModel]
     AMD_MI355X: _ClassVar[AcceleratorModel]
     HABANA_GAUDI1: _ClassVar[AcceleratorModel]
+    APPLE_SILICON_GPU: _ClassVar[AcceleratorModel]
 
 class WorkerKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
     WORKER_KIND_UNSPECIFIED: _ClassVar[WorkerKind]
     WORKER_KIND_SANDBOX: _ClassVar[WorkerKind]
+    WORKER_KIND_MICROVM: _ClassVar[WorkerKind]
 ACCELERATOR_MODEL_UNSPECIFIED: AcceleratorModel
 NVIDIA_K80: AcceleratorModel
 NVIDIA_M60: AcceleratorModel
@@ -104,8 +106,10 @@ AMD_MI325X: AcceleratorModel
 AMD_MI350X: AcceleratorModel
 AMD_MI355X: AcceleratorModel
 HABANA_GAUDI1: AcceleratorModel
+APPLE_SILICON_GPU: AcceleratorModel
 WORKER_KIND_UNSPECIFIED: WorkerKind
 WORKER_KIND_SANDBOX: WorkerKind
+WORKER_KIND_MICROVM: WorkerKind
 ACCELERATOR_NAME_FIELD_NUMBER: _ClassVar[int]
 accelerator_name: _descriptor.FieldDescriptor
 
@@ -147,11 +151,13 @@ class GPUAccelerator(_message.Message):
         AMAZON_NEURON: _ClassVar[GPUAccelerator.DeviceClass]
         AMD_GPU: _ClassVar[GPUAccelerator.DeviceClass]
         HABANA_GAUDI: _ClassVar[GPUAccelerator.DeviceClass]
+        APPLE_SILICON: _ClassVar[GPUAccelerator.DeviceClass]
     NVIDIA_GPU: GPUAccelerator.DeviceClass
     GOOGLE_TPU: GPUAccelerator.DeviceClass
     AMAZON_NEURON: GPUAccelerator.DeviceClass
     AMD_GPU: GPUAccelerator.DeviceClass
     HABANA_GAUDI: GPUAccelerator.DeviceClass
+    APPLE_SILICON: GPUAccelerator.DeviceClass
     DEVICE_FIELD_NUMBER: _ClassVar[int]
     UNPARTITIONED_FIELD_NUMBER: _ClassVar[int]
     PARTITION_SIZE_FIELD_NUMBER: _ClassVar[int]

@@ -135,6 +135,14 @@ func adjustResourceRequirement(resourceName v1.ResourceName, resourceRequirement
 // desired name is the rendered per-partition resource, and requirements already expressed in the
 // device class's ResourceName are moved to it as well, keeping the same count.
 func SanitizeGPUResourceRequirements(resources *v1.ResourceRequirements, accelerator *core.GPUAccelerator) {
+	// The Apple Silicon GPU is reached through the devbox's host bridge, not a device plugin, so
+	// there is no k8s resource to translate the request into. This keeps the primary container clean
+	// early; ApplyAppleSiliconBridge strips every container again after pod templates merge, and that
+	// pass is the authoritative one (it also covers apps, which don't come through here).
+	if IsAppleSilicon(accelerator) {
+		stripAcceleratorResources(resources)
+		return
+	}
 	resourceName := config.GetK8sPluginConfig().GpuResourceName //nolint: staticcheck
 	if accelerator != nil {
 		resourceName = getAcceleratorResourceName(accelerator)

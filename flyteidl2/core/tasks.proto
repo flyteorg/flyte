@@ -116,6 +116,11 @@ enum AcceleratorModel {
 
   // HABANA_GAUDI
   HABANA_GAUDI1 = 400 [(accelerator_name) = "habana-gaudi1"];
+
+  // APPLE_SILICON
+  // The Metal GPU of an Apple Silicon (M-series) host, reached through the
+  // devbox's host-side Apple Silicon bridge. Devbox-local: never cluster-schedulable.
+  APPLE_SILICON_GPU = 500 [(accelerator_name) = "apple-silicon"];
 }
 
 // Metadata associated with the GPU accelerator to allocate to a task. Contains
@@ -134,6 +139,10 @@ message GPUAccelerator {
     AMD_GPU = 3;
     // Habana Gaudi devices
     HABANA_GAUDI = 4;
+    // Apple Silicon (M-series) Metal GPU, served by a host-side MLX daemon on
+    // a local devbox. Not schedulable on a cluster: a backend without an Apple Silicon
+    // bridge configured rejects it with APPLE_SILICON_NOT_AVAILABLE.
+    APPLE_SILICON = 5;
   }
 
   // This can be any arbitrary string, and should be informed by the labels or taints
@@ -412,6 +421,12 @@ enum WorkerKind {
   // Runs sandboxed orchestrator source in an interpreter, with no container
   // (flyte.sandbox.orchestrator).
   WORKER_KIND_SANDBOX = 1;
+
+  // Runs each task in its own microVM, such as an interactive sandbox session, rather than a pod.
+  // It needs a scheduler and workers that support this kind; the open-source executor does not
+  // treat it specially. Schedulers that support it should not retry such a task: a retry would
+  // start a fresh VM at a new address while callers still hold the old one.
+  WORKER_KIND_MICROVM = 2;
 }
 
 // ----------------- First class Plugins

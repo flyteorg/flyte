@@ -61,7 +61,8 @@ type Config struct {
 	// Database configuration
 	Database database.DbConfig `json:"database"`
 
-	// Watch/streaming settings
+	// WatchBufferSize is the capacity of each watch stream's notification channel. A notification for a stream
+	// whose channel is full is dropped, so a client watching many busy actions needs it larger.
 	WatchBufferSize int `json:"watchBufferSize" pflag:",Buffer size for watch streams"`
 
 	// NotificationBufferLimit is the maximum number of pending entries in each action or run queue.

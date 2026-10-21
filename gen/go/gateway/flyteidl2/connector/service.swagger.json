@@ -457,10 +457,11 @@
         "GOOGLE_TPU",
         "AMAZON_NEURON",
         "AMD_GPU",
-        "HABANA_GAUDI"
+        "HABANA_GAUDI",
+        "APPLE_SILICON"
       ],
       "default": "NVIDIA_GPU",
-      "description": "Specifies the class of accelerator device.\n\n - NVIDIA_GPU: NVIDIA GPU devices (default for backward compatibility)\n - GOOGLE_TPU: Google TPU devices\n - AMAZON_NEURON: Amazon Neuron devices\n - AMD_GPU: AMD GPU devices\n - HABANA_GAUDI: Habana Gaudi devices"
+      "description": "Specifies the class of accelerator device.\n\n - NVIDIA_GPU: NVIDIA GPU devices (default for backward compatibility)\n - GOOGLE_TPU: Google TPU devices\n - AMAZON_NEURON: Amazon Neuron devices\n - AMD_GPU: AMD GPU devices\n - HABANA_GAUDI: Habana Gaudi devices\n - APPLE_SILICON: Apple Silicon (M-series) Metal GPU, served by a host-side MLX daemon on\na local devbox. Not schedulable on a cluster: a backend without an Apple Silicon\nbridge configured rejects it with APPLE_SILICON_NOT_AVAILABLE."
     },
     "IOStrategyDownloadMode": {
       "type": "string",
@@ -821,10 +822,11 @@
         "AMD_MI325X",
         "AMD_MI350X",
         "AMD_MI355X",
-        "HABANA_GAUDI1"
+        "HABANA_GAUDI1",
+        "APPLE_SILICON_GPU"
       ],
       "default": "ACCELERATOR_MODEL_UNSPECIFIED",
-      "description": "The canonical list of accelerators. One value per concrete device,\nmatched by exact equality: NVIDIA_A100 (40GB) and NVIDIA_A100_80GB are\ntwo devices. Strings are lower-case, vendor first, dashes only:\n\u003cvendor\u003e-\u003cmodel\u003e[-\u003cmemory\u003e][-\u003cvariant\u003e]. Numbered in blocks of 100 per\nDeviceClass so each block can grow.\n\n - NVIDIA_K80: NVIDIA_GPU\n - GOOGLE_TPU_V5E: GOOGLE_TPU\n - AMAZON_INF1: AMAZON_NEURON\n - AMD_MI100: AMD_GPU\n - HABANA_GAUDI1: HABANA_GAUDI"
+      "description": "The canonical list of accelerators. One value per concrete device,\nmatched by exact equality: NVIDIA_A100 (40GB) and NVIDIA_A100_80GB are\ntwo devices. Strings are lower-case, vendor first, dashes only:\n\u003cvendor\u003e-\u003cmodel\u003e[-\u003cmemory\u003e][-\u003cvariant\u003e]. Numbered in blocks of 100 per\nDeviceClass so each block can grow.\n\n - NVIDIA_K80: NVIDIA_GPU\n - GOOGLE_TPU_V5E: GOOGLE_TPU\n - AMAZON_INF1: AMAZON_NEURON\n - AMD_MI100: AMD_GPU\n - HABANA_GAUDI1: HABANA_GAUDI\n - APPLE_SILICON_GPU: APPLE_SILICON\nThe Metal GPU of an Apple Silicon (M-series) host, reached through the\ndevbox's host-side Apple Silicon bridge. Devbox-local: never cluster-schedulable."
     },
     "coreArtifactBindingData": {
       "type": "object",
@@ -2078,10 +2080,11 @@
       "type": "string",
       "enum": [
         "WORKER_KIND_UNSPECIFIED",
-        "WORKER_KIND_SANDBOX"
+        "WORKER_KIND_SANDBOX",
+        "WORKER_KIND_MICROVM"
       ],
       "default": "WORKER_KIND_UNSPECIFIED",
-      "description": "The kinds of worker that run tasks. A worker of a kind may further limit itself to some task\ntypes and versions of that kind.\n\n - WORKER_KIND_UNSPECIFIED: The default worker: runs containers, and plugin and connector tasks.\n - WORKER_KIND_SANDBOX: Runs sandboxed orchestrator source in an interpreter, with no container\n(flyte.sandbox.orchestrator)."
+      "description": "The kinds of worker that run tasks. A worker of a kind may further limit itself to some task\ntypes and versions of that kind.\n\n - WORKER_KIND_UNSPECIFIED: The default worker: runs containers, and plugin and connector tasks.\n - WORKER_KIND_SANDBOX: Runs sandboxed orchestrator source in an interpreter, with no container\n(flyte.sandbox.orchestrator).\n - WORKER_KIND_MICROVM: Runs each task in its own microVM, such as an interactive sandbox session, rather than a pod.\nIt needs a scheduler and workers that support this kind; the open-source executor does not\ntreat it specially. Schedulers that support it should not retry such a task: a retry would\nstart a fresh VM at a new address while callers still hold the old one."
     },
     "coreWorkflowExecutionIdentifier": {
       "type": "object",
