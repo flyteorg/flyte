@@ -124,7 +124,7 @@ func (c *ActionsClient) resolveRecoveredFrom(
 	}
 
 	switch {
-	case !isRecoverablePhase(resp.Msg.GetPhase()):
+	case !isConditionResultPhase(resp.Msg.GetPhase()):
 		c.recoveryMetrics.fresh(rerunReasonNonFinal)
 		return nil
 	case resp.Msg.GetOutputUri() == "" && resp.Msg.GetOutput() == nil:
@@ -157,13 +157,6 @@ func (c *ActionsClient) resolveRecoveredFrom(
 		Attempts:      resp.Msg.GetAttempts(),
 		CacheStatus:   int32(resp.Msg.GetCacheStatus()),
 	}
-}
-
-// RECOVERED counts: recovering a recovery run is the ordinary way a run survives repeated
-// intermittent failures, and its output URI is already fully resolved.
-func isRecoverablePhase(phase common.ActionPhase) bool {
-	return phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED ||
-		phase == common.ActionPhase_ACTION_PHASE_RECOVERED
 }
 
 // isConditionResultPhase reports the terminal phases in which a condition action carries a
