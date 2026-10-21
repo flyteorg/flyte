@@ -176,8 +176,8 @@ func TestWatchPropagation(t *testing.T) {
 
 	// Subscribe before enqueueing so no update can be missed. Root actions
 	// have an empty parent action name.
-	ch := actionsClient.Subscribe(runID.Name, "")
-	defer actionsClient.Unsubscribe(runID.Name, "", ch)
+	ch := actionsClient.Subscribe(runID, "")
+	defer actionsClient.Unsubscribe(runID, "", ch)
 
 	require.NoError(t, actionsClient.Enqueue(ctx, newRootTaskAction(runID), nil))
 
@@ -231,6 +231,9 @@ func TestDeletingTerminalTaskActionDoesNotEmitAborted(t *testing.T) {
 			Name:       name,
 			Namespace:  "default",
 			Finalizers: []string{"flyte.org/plugin-finalizer"},
+			// Marked as already recorded, so the suite's actions watcher leaves it alone
+			// instead of labelling it while the reconciler below is updating it.
+			Labels: map[string]string{"flyte.org/terminal-status-recorded": "true"},
 		},
 		Spec: flyteorgv1.TaskActionSpec{
 			RunName:       name,
