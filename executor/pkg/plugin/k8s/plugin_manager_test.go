@@ -1225,3 +1225,36 @@ func TestCheckResourcePhase_GracefulDeleteIsNotUnexpectedDeletion(t *testing.T) 
 	assert.Equal(t, pluginsCore.PhaseRunning, transition.Info().Phase())
 	assert.NotEqual(t, "UnexpectedObjectDeletion", transition.Info().Err().GetCode())
 }
+
+// Plugins find their pods by the job's name, which a job in another namespace can share, so
+// the reader a plugin gets lists only the namespace of the resource it watches.
+func TestCheckResourcePhase_PluginListsOnlyItsNamespace(t *testing.T) {
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(
+		&v1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "job"}},
+		&v1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "job-worker-0"}},
+		&v1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: "other-ns", Name: "job-worker-0"}},
+	).Build()
+	kubeClient := &pluginsCoreMock.KubeClient{}
+	kubeClient.EXPECT().GetClient().Return(fakeClient)
+
+	var listed []string
+	plugin := &k8sMocks.Plugin{}
+	plugin.EXPECT().GetTaskPhase(mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, pCtx k8s.PluginContext, _ client.Object) (pluginsCore.PhaseInfo, error) {
+			pods := &v1.PodList{}
+			if err := pCtx.K8sReader().List(ctx, pods); err != nil {
+				return pluginsCore.PhaseInfoUndefined, err
+			}
+			for _, p := range pods.Items {
+				listed = append(listed, p.Namespace+"/"+p.Name)
+			}
+			return pluginsCore.PhaseInfoRunning(0, nil), nil
+		})
+
+	pm := NewPluginManager("test-plugin", plugin, kubeClient)
+
+	queryObj := &v1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "job"}}
+	_, err := pm.checkResourcePhase(context.Background(), &pluginsCoreMock.TaskExecutionContext{}, queryObj, &k8s.PluginState{})
+	require.NoError(t, err)
+	assert.ElementsMatch(t, []string{"ns/job", "ns/job-worker-0"}, listed)
+}

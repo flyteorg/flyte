@@ -14,6 +14,7 @@ import (
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
 	"github.com/samber/lo"
 	"gopkg.in/yaml.v2"
+	batchv1 "k8s.io/api/batch/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -840,10 +841,17 @@ func getEventInfoForRayJob(ctx context.Context, logConfig logs.LogConfig, plugin
 	var taskLogs []*core.TaskLog
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 	podList := &v1.PodList{}
-	err = pluginContext.K8sReader().List(ctx, podList)
+	err = pluginContext.K8sReader().List(ctx, podList, client.MatchingLabels{rayClusterLabelKey: rayJob.Status.RayClusterName})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list node execution pods. Error: %w", err)
 	}
+	// In K8sJobMode the driver's output is in the submitter pod, run by a Job named after the RayJob.
+	submitterPods := &v1.PodList{}
+	err = pluginContext.K8sReader().List(ctx, submitterPods, client.MatchingLabels{batchv1.JobNameLabel: rayJob.Name})
+	if err != nil {
+		return nil, fmt.Errorf("failed to list RayJob submitter pods. Error: %w", err)
+	}
+	podList.Items = append(podList.Items, submitterPods.Items...)
 	var enableVscode bool
 	if rayJob.Spec.RayClusterSpec != nil &&
 		rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Containers != nil &&
@@ -937,9 +945,9 @@ func UpdateLinkReadiness(phaseInfo *pluginsCore.PhaseInfo, ready bool) {
 	}
 }
 
-func isRayHeadReady(ctx context.Context, rayJobName string, pluginContext k8s.PluginContext) (bool, error) {
+func isRayHeadReady(ctx context.Context, rayJobName, rayClusterName string, pluginContext k8s.PluginContext) (bool, error) {
 	podList := &v1.PodList{}
-	err := pluginContext.K8sReader().List(ctx, podList)
+	err := pluginContext.K8sReader().List(ctx, podList, client.MatchingLabels{rayClusterLabelKey: rayClusterName})
 	if err != nil {
 		return false, fmt.Errorf("failed to list node execution pods. Error: %w", err)
 	}
@@ -1035,7 +1043,7 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		phaseInfo, err = pluginsCore.PhaseInfoUndefined, fmt.Errorf("unknown job deployment status: %s", rayJob.Status.JobDeploymentStatus)
 	}
 
-	if ready, err := isRayHeadReady(ctx, rayJob.Name, pluginContext); err != nil {
+	if ready, err := isRayHeadReady(ctx, rayJob.Name, rayJob.Status.RayClusterName, pluginContext); err != nil {
 		logger.Warnf(ctx, "Failed to determine Ray dashboard readiness. Error: %v", err)
 	} else {
 		UpdateLinkReadiness(&phaseInfo, ready)

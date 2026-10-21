@@ -11,6 +11,7 @@ import (
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -758,7 +759,11 @@ func TestGetTaskPhase(t *testing.T) {
 			Status:     corev1.PodStatus{Phase: corev1.PodPending},
 		},
 		&corev1.Pod{
-			ObjectMeta: v1.ObjectMeta{Namespace: "ns", Name: "test"},
+			ObjectMeta: v1.ObjectMeta{
+				Namespace: "ns",
+				Name:      "test",
+				Labels:    map[string]string{kubeflowv1.JobNameLabel: jobName},
+			},
 			Spec: corev1.PodSpec{
 				Containers: []corev1.Container{
 					{Name: "test-work-0"},
@@ -778,6 +783,15 @@ func TestGetTaskPhase(t *testing.T) {
 					},
 				},
 			},
+		},
+		// A running pod of another job in the same namespace.
+		&corev1.Pod{
+			ObjectMeta: v1.ObjectMeta{
+				Namespace: "ns",
+				Name:      "other-job-worker-0",
+				Labels:    map[string]string{kubeflowv1.JobNameLabel: "other-job"},
+			},
+			Status: corev1.PodStatus{Phase: corev1.PodRunning},
 		},
 	}
 	reader := fake.NewFakeClient(podList...)
@@ -810,6 +824,7 @@ func TestGetTaskPhase(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
+	require.Len(t, taskPhase.Info().LogContext.Pods, 1)
 	assert.Equal(t, taskPhase.Info().LogContext.Pods[0].PodName, "test")
 	assert.Nil(t, err)
 }

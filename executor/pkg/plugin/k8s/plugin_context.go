@@ -50,6 +50,17 @@ func newPluginContext(tCtx pluginsCore.TaskExecutionContext, k8sPluginState *k8s
 	}
 }
 
+// namespacedReader limits a plugin's List calls to the namespace of the resource it watches.
+// Plugins find their pods by the job's name, which is only unique within a namespace.
+type namespacedReader struct {
+	client.Reader
+	namespace string
+}
+
+func (r namespacedReader) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
+	return r.Reader.List(ctx, list, append(opts, client.InNamespace(r.namespace))...)
+}
+
 // pluginStateReader is a specialized PluginStateReader that returns a pre-assigned k8s.PluginState.
 // This allows the PluginManager to encapsulate state persistence and only expose Phase/PhaseVersion/Reason
 // to k8s plugins.
