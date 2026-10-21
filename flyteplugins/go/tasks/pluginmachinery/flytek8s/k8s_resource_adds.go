@@ -228,6 +228,15 @@ func GetPodTolerations(interruptible bool, resourceRequirements ...v1.ResourceRe
 		}
 	}
 
+	// A per-partition accelerator resource such as nvidia.com/mig-1g.5gb also picks up the
+	// tolerations of its device class's resource name, since the partitioned nodes are tainted
+	// like any other node of that class.
+	for _, r := range resourceNames.UnsortedList() {
+		if base, ok := acceleratorBaseResourceName(v1.ResourceName(r)); ok {
+			resourceNames.Insert(base.String())
+		}
+	}
+
 	resourceTols := config.GetK8sPluginConfig().ResourceTolerations
 	for _, r := range resourceNames.UnsortedList() {
 		if v, ok := resourceTols[v1.ResourceName(r)]; ok {
