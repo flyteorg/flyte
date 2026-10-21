@@ -468,6 +468,8 @@ Distributed Flyte 2 core services
 | configuration.kubernetes.timeout | string | `"30s"` |  |
 | configuration.logging.level | int | `1` |  |
 | configuration.logging.showSource | bool | `true` |  |
+| configuration.namespaceMapping.createNamespaces | bool | `true` |  |
+| configuration.namespaceMapping.template | string | `""` |  |
 | configuration.runs.actionsService.url | string | `"{{ include \"flyte-core.componentServiceURL\" (dict \"root\" . \"component\" \"actions\") }}"` |  |
 | configuration.runs.authMetadata | object | `{}` |  |
 | configuration.runs.domains[0].id | string | `"development"` |  |

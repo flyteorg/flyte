@@ -1268,6 +1268,110 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_QUEUED, run.Action.Status.Phase)
 }
 
+// A run whose root action cannot be enqueued (for example, its namespace does not
+// exist) is recorded failed with the reason instead of staying queued forever.
+func TestCreateRun_EnqueueFailureFailsRun(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(taskRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		settingsRepo:  noSettings(t),
+		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	runID := &common.RunIdentifier{Project: "myproj", Domain: "production", Name: "rtest99999"}
+	rootID := &common.ActionIdentifier{Run: runID, Name: RootActionName}
+	req := &workflow.CreateRunRequest{
+		Id:   &workflow.CreateRunRequest_RunId{RunId: runID},
+		Task: &workflow.CreateRunRequest_TaskSpec{TaskSpec: &task.TaskSpec{}},
+	}
+
+	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).Return(&models.Run{
+		Project: "myproj", Domain: "production", RunName: "rtest99999", Name: RootActionName,
+		Phase: int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+	}, nil).Once()
+	actionsClient.On("Enqueue", mock.Anything, mock.Anything).Return(nil,
+		connect.NewError(connect.CodeFailedPrecondition, errors.New(`namespace "myproj-production" does not exist`))).Once()
+
+	actionRepo.On("InsertEvents", mock.Anything, mock.MatchedBy(func(events []*models.ActionEvent) bool {
+		if len(events) != 1 || events[0].Phase != int32(common.ActionPhase_ACTION_PHASE_FAILED) {
+			return false
+		}
+		event := &workflow.ActionEvent{}
+		if err := proto.Unmarshal(events[0].Info, event); err != nil {
+			return false
+		}
+		return event.GetErrorInfo().GetMessage() == `failed to start: namespace "myproj-production" does not exist`
+	})).Return(nil).Once()
+	actionRepo.On("UpdateActionPhase", mock.Anything, mock.MatchedBy(func(id *common.ActionIdentifier) bool {
+		return proto.Equal(id, rootID)
+	}), common.ActionPhase_ACTION_PHASE_FAILED, uint32(1), mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+
+	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	require.NoError(t, err)
+	actionRepo.AssertExpectations(t)
+}
+
+// An enqueue error that does not rule out a launch, such as AlreadyExists when the
+// scheduler fires the same run again, must not fail a run that may be running.
+func TestCreateRun_EnqueueErrorThatMayHaveLaunchedKeepsRun(t *testing.T) {
+	for _, code := range []connect.Code{connect.CodeAlreadyExists, connect.CodeDeadlineExceeded} {
+		t.Run(code.String(), func(t *testing.T) {
+			actionRepo := &repoMocks.ActionRepo{}
+			taskRepo := &repoMocks.TaskRepo{}
+			actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+			repo := &repoMocks.Repository{}
+			store := &storageMocks.ComposedProtobufStore{}
+
+			repo.On("ActionRepo").Return(actionRepo)
+			repo.On("TaskRepo").Return(taskRepo)
+
+			svc := &RunService{
+				repo:          repo,
+				settingsRepo:  noSettings(t),
+				actionsClient: actionsClient,
+				projectClient: newMockProjectClientAlwaysOK(t),
+				storagePrefix: "s3://flyte-data",
+				dataStore:     &storage.DataStore{ComposedProtobufStore: store},
+			}
+
+			runID := &common.RunIdentifier{Project: "myproj", Domain: "production", Name: "rtest99999"}
+			req := &workflow.CreateRunRequest{
+				Id:   &workflow.CreateRunRequest_RunId{RunId: runID},
+				Task: &workflow.CreateRunRequest_TaskSpec{TaskSpec: &task.TaskSpec{}},
+			}
+
+			store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+			taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+			actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).Return(&models.Run{
+				Project: "myproj", Domain: "production", RunName: "rtest99999", Name: RootActionName,
+				Phase: int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+			}, nil).Once()
+			actionsClient.On("Enqueue", mock.Anything, mock.Anything).Return(nil,
+				connect.NewError(code, errors.New("enqueue error"))).Once()
+
+			resp, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+			require.NoError(t, err)
+			assert.Equal(t, common.ActionPhase_ACTION_PHASE_RUNNING, resp.Msg.Run.Action.Status.Phase)
+			actionRepo.AssertNotCalled(t, "InsertEvents", mock.Anything, mock.Anything)
+			actionRepo.AssertNotCalled(t, "UpdateActionPhase", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+		})
+	}
+}
+
 // TestCreateRun_TriggerFire_CarriesRunSpecEnvVars locks in that a run fired from a trigger
 // carries the run-level env vars captured in the trigger's stored run spec. The scheduler fires
 // with only a TriggerName (no run spec), so CreateRun must restore the run spec from the trigger
@@ -1461,6 +1565,23 @@ func TestCreateRun_RejectsInvalidRunName(t *testing.T) {
 			assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 		})
 	}
+}
+
+func TestCreateRun_RejectsInvalidMappedNamespace(t *testing.T) {
+	// Rejected before any repo or project access, so no mocks are needed.
+	svc := &RunService{namespaceTemplate: "{{ project }}-{{ domain }}"}
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{Project: "My_Project", Domain: "development", Name: "rtest1"},
+		},
+		Task: &workflow.CreateRunRequest_TaskSpec{TaskSpec: &task.TaskSpec{}},
+	}
+
+	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	require.Error(t, err)
+	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+	assert.ErrorContains(t, err, "not a valid Kubernetes namespace name")
 }
 
 func TestCreateRun_RejectsInvalidPodTemplateName(t *testing.T) {

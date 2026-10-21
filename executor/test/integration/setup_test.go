@@ -33,6 +33,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/events"
 	ctrl "sigs.k8s.io/controller-runtime"
+	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -58,6 +59,7 @@ var (
 	ctx            context.Context
 	testEnv        *envtest.Environment
 	k8sClient      client.WithWatch
+	sharedCache    ctrlcache.Cache
 	reconciler     *controller.TaskActionReconciler
 	actionsClient  *actionsk8s.ActionsClient
 	runClient      *recordingRunClient
@@ -126,6 +128,7 @@ func TestMain(m *testing.M) {
 		log.Printf("Cache failed to sync")
 		return
 	}
+	sharedCache = mgr.GetCache()
 
 	labeled.SetMetricKeys(
 		contextutils.ProjectKey,
@@ -161,7 +164,7 @@ func TestMain(m *testing.M) {
 	// Actions half: the client that Enqueues CRs and watches them back.
 	runClient = &recordingRunClient{}
 	var acErr error
-	actionsClient, acErr = actionsk8s.NewActionsClient(k8sClient, mgr.GetCache(), "flyte", 32, 1, runClient, 1024, promutils.NewScope("integration_actions"))
+	actionsClient, acErr = actionsk8s.NewActionsClient(k8sClient, mgr.GetCache(), "flyte", 32, 1, runClient, 1024, promutils.NewScope("integration_actions"), "", true)
 	if acErr != nil {
 		log.Printf("Failed to create actions client: %v", acErr)
 		return
