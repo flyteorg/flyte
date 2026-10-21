@@ -33,6 +33,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/events"
 	ctrl "sigs.k8s.io/controller-runtime"
+	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -58,6 +59,7 @@ var (
 	ctx            context.Context
 	testEnv        *envtest.Environment
 	k8sClient      client.WithWatch
+	sharedCache    ctrlcache.Cache
 	reconciler     *controller.TaskActionReconciler
 	actionsClient  *actionsk8s.ActionsClient
 	runClient      *recordingRunClient
@@ -126,6 +128,7 @@ func TestMain(m *testing.M) {
 		log.Printf("Cache failed to sync")
 		return
 	}
+	sharedCache = mgr.GetCache()
 
 	labeled.SetMetricKeys(
 		contextutils.ProjectKey,

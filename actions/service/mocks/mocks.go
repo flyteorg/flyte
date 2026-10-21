@@ -467,16 +467,16 @@ func (_c *ActionsClientInterface_StopWatching_Call) RunAndReturn(run func()) *Ac
 }
 
 // Subscribe provides a mock function for the type ActionsClientInterface
-func (_mock *ActionsClientInterface) Subscribe(runName string, parentActionName string) chan *k8s.ActionUpdate {
-	ret := _mock.Called(runName, parentActionName)
+func (_mock *ActionsClientInterface) Subscribe(runID *common.RunIdentifier, parentActionName string) chan *k8s.ActionUpdate {
+	ret := _mock.Called(runID, parentActionName)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Subscribe")
 	}
 
 	var r0 chan *k8s.ActionUpdate
-	if returnFunc, ok := ret.Get(0).(func(string, string) chan *k8s.ActionUpdate); ok {
-		r0 = returnFunc(runName, parentActionName)
+	if returnFunc, ok := ret.Get(0).(func(*common.RunIdentifier, string) chan *k8s.ActionUpdate); ok {
+		r0 = returnFunc(runID, parentActionName)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(chan *k8s.ActionUpdate)
@@ -491,17 +491,17 @@ type ActionsClientInterface_Subscribe_Call struct {
 }
 
 // Subscribe is a helper method to define mock.On call
-//   - runName string
+//   - runID *common.RunIdentifier
 //   - parentActionName string
-func (_e *ActionsClientInterface_Expecter) Subscribe(runName interface{}, parentActionName interface{}) *ActionsClientInterface_Subscribe_Call {
-	return &ActionsClientInterface_Subscribe_Call{Call: _e.mock.On("Subscribe", runName, parentActionName)}
+func (_e *ActionsClientInterface_Expecter) Subscribe(runID interface{}, parentActionName interface{}) *ActionsClientInterface_Subscribe_Call {
+	return &ActionsClientInterface_Subscribe_Call{Call: _e.mock.On("Subscribe", runID, parentActionName)}
 }
 
-func (_c *ActionsClientInterface_Subscribe_Call) Run(run func(runName string, parentActionName string)) *ActionsClientInterface_Subscribe_Call {
+func (_c *ActionsClientInterface_Subscribe_Call) Run(run func(runID *common.RunIdentifier, parentActionName string)) *ActionsClientInterface_Subscribe_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 string
+		var arg0 *common.RunIdentifier
 		if args[0] != nil {
-			arg0 = args[0].(string)
+			arg0 = args[0].(*common.RunIdentifier)
 		}
 		var arg1 string
 		if args[1] != nil {
@@ -520,14 +520,14 @@ func (_c *ActionsClientInterface_Subscribe_Call) Return(actionUpdateCh chan *k8s
 	return _c
 }
 
-func (_c *ActionsClientInterface_Subscribe_Call) RunAndReturn(run func(runName string, parentActionName string) chan *k8s.ActionUpdate) *ActionsClientInterface_Subscribe_Call {
+func (_c *ActionsClientInterface_Subscribe_Call) RunAndReturn(run func(runID *common.RunIdentifier, parentActionName string) chan *k8s.ActionUpdate) *ActionsClientInterface_Subscribe_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Unsubscribe provides a mock function for the type ActionsClientInterface
-func (_mock *ActionsClientInterface) Unsubscribe(runName string, parentActionName string, ch chan *k8s.ActionUpdate) {
-	_mock.Called(runName, parentActionName, ch)
+func (_mock *ActionsClientInterface) Unsubscribe(runID *common.RunIdentifier, parentActionName string, ch chan *k8s.ActionUpdate) {
+	_mock.Called(runID, parentActionName, ch)
 	return
 }
 
@@ -537,18 +537,18 @@ type ActionsClientInterface_Unsubscribe_Call struct {
 }
 
 // Unsubscribe is a helper method to define mock.On call
-//   - runName string
+//   - runID *common.RunIdentifier
 //   - parentActionName string
 //   - ch chan *k8s.ActionUpdate
-func (_e *ActionsClientInterface_Expecter) Unsubscribe(runName interface{}, parentActionName interface{}, ch interface{}) *ActionsClientInterface_Unsubscribe_Call {
-	return &ActionsClientInterface_Unsubscribe_Call{Call: _e.mock.On("Unsubscribe", runName, parentActionName, ch)}
+func (_e *ActionsClientInterface_Expecter) Unsubscribe(runID interface{}, parentActionName interface{}, ch interface{}) *ActionsClientInterface_Unsubscribe_Call {
+	return &ActionsClientInterface_Unsubscribe_Call{Call: _e.mock.On("Unsubscribe", runID, parentActionName, ch)}
 }
 
-func (_c *ActionsClientInterface_Unsubscribe_Call) Run(run func(runName string, parentActionName string, ch chan *k8s.ActionUpdate)) *ActionsClientInterface_Unsubscribe_Call {
+func (_c *ActionsClientInterface_Unsubscribe_Call) Run(run func(runID *common.RunIdentifier, parentActionName string, ch chan *k8s.ActionUpdate)) *ActionsClientInterface_Unsubscribe_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 string
+		var arg0 *common.RunIdentifier
 		if args[0] != nil {
-			arg0 = args[0].(string)
+			arg0 = args[0].(*common.RunIdentifier)
 		}
 		var arg1 string
 		if args[1] != nil {
@@ -572,7 +572,7 @@ func (_c *ActionsClientInterface_Unsubscribe_Call) Return() *ActionsClientInterf
 	return _c
 }
 
-func (_c *ActionsClientInterface_Unsubscribe_Call) RunAndReturn(run func(runName string, parentActionName string, ch chan *k8s.ActionUpdate)) *ActionsClientInterface_Unsubscribe_Call {
+func (_c *ActionsClientInterface_Unsubscribe_Call) RunAndReturn(run func(runID *common.RunIdentifier, parentActionName string, ch chan *k8s.ActionUpdate)) *ActionsClientInterface_Unsubscribe_Call {
 	_c.Run(run)
 	return _c
 }

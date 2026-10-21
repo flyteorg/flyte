@@ -636,8 +636,7 @@ func TestNotifyRunService_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testi
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
 
 	// Action should now be in the bloom filter
-	actionKey := []byte(buildTaskActionName(update.ActionID))
-	assert.True(t, filter.Contains(ctx, actionKey))
+	assert.True(t, filter.Contains(ctx, recordedFilterKey(ta)))
 
 	// Second ADDED event (reconnect, in bloom filter): should skip RecordAction
 	// but still call UpdateActionStatus.
@@ -834,10 +833,24 @@ func TestDispatchEvent_CoalescesUpdatesForSameKey(t *testing.T) {
 	// After the item is drained (dispatched marker cleared), a new update dispatches again.
 	<-c.workerChs[0]
 	c.dispatchedActionsMu.Lock()
-	delete(c.dispatchedActions, ta.Name)
+	delete(c.dispatchedActions, client.ObjectKeyFromObject(ta).String())
 	c.dispatchedActionsMu.Unlock()
 	c.dispatchEvent(ta, watch.Modified)
 	assert.Equal(t, 1, len(c.workerChs[0]), "a fresh update after drain must enqueue again")
+}
+
+// The same TaskAction name can exist in two namespaces; their events must not coalesce.
+func TestDispatchEvent_SameNameInTwoNamespaces(t *testing.T) {
+	c := newWorkerTestClient(1, 10)
+	inA := newTaskAction("run1-a0")
+	inA.Namespace = "proj-a-development"
+	inB := newTaskAction("run1-a0")
+	inB.Namespace = "proj-b-development"
+
+	c.dispatchEvent(inA, watch.Modified)
+	c.dispatchEvent(inB, watch.Modified)
+
+	assert.Equal(t, 2, len(c.workerChs[0]), "events for different namespaces must both be queued")
 }
 
 func succeededTaskAction(name string) *executorv1.TaskAction {
@@ -874,11 +887,11 @@ func TestHandleWatchEvent_CoalescedReadsLatestPhase(t *testing.T) {
 		runClient:         mockClient,
 		recordedFilter:    filter,
 		subscribers:       make(map[string]map[chan *ActionUpdate]struct{}),
-		dispatchedActions: map[string]struct{}{"a3": {}}, // an event for a3 is already dispatched
+		dispatchedActions: map[string]struct{}{client.ObjectKey{Name: "a3"}.String(): {}}, // an event for a3 is already dispatched
 	}
 	// The executor advanced the CRD to SUCCEEDED before the worker ran.
-	c.getLatest = func(_ context.Context, name string) (*executorv1.TaskAction, bool, error) {
-		return succeededTaskAction(name), true, nil
+	c.getLatest = func(_ context.Context, key client.ObjectKey) (*executorv1.TaskAction, bool, error) {
+		return succeededTaskAction(key.Name), true, nil
 	}
 
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
@@ -911,11 +924,11 @@ func TestHandleWatchEvent_CreateThenDeleteStillRecords(t *testing.T) {
 		runClient:         mockClient,
 		recordedFilter:    filter,
 		subscribers:       make(map[string]map[chan *ActionUpdate]struct{}),
-		dispatchedActions: map[string]struct{}{"d1": {}},
+		dispatchedActions: map[string]struct{}{client.ObjectKey{Name: "d1"}.String(): {}},
 	}
 	// The CR was deleted before the worker reached the coalesced ADDED, so the cache
 	// no longer has it.
-	c.getLatest = func(_ context.Context, _ string) (*executorv1.TaskAction, bool, error) {
+	c.getLatest = func(_ context.Context, _ client.ObjectKey) (*executorv1.TaskAction, bool, error) {
 		return nil, false, nil
 	}
 
@@ -953,10 +966,7 @@ func TestHandleWatchEvent_DeleteAfterRecordDoesNotDoubleRecord(t *testing.T) {
 		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 	// Pre-mark the action as already recorded (normal ADDED/MODIFIED lifecycle).
-	c.recordedFilter.Add(ctx, []byte(buildTaskActionName(&common.ActionIdentifier{
-		Run:  &common.RunIdentifier{Project: "p", Domain: "d", Name: "run1"},
-		Name: "d2",
-	})))
+	c.recordedFilter.Add(ctx, recordedFilterKey(runningTaskAction("d2")))
 
 	// Only the terminal update is expected; no second RecordAction.
 	mockClient.On("UpdateActionStatus", mock.Anything, mock.Anything).

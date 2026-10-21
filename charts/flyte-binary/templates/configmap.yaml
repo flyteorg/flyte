@@ -36,6 +36,11 @@ data:
         k8sConfig:
           namespace: {{ .Release.Namespace }}
 {{ tpl ( index .Values "flyte-core-components" | toYaml ) . | nindent 4 }}
+    {{- /* Not passed through tpl: the template's {{ project }} placeholders are Flyte's, not Helm's. */}}
+    {{- with .Values.configuration.namespaceMapping }}
+    namespaceMapping:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
   001-plugins.yaml: |
     tasks:
       {{- .Values.enabled_plugins.tasks | toYaml | nindent 6 }}
