@@ -31,6 +31,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	mocks4 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	gatemocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/gate/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
@@ -1526,9 +1527,11 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 			mockNode.On("GetInputBindings").Return([]*v1alpha1.Binding{})
 			mockNode.On("GetActiveDeadline").Return(&tt.activeDeadline)
 			mockNode.On("GetExecutionDeadline").Return(&tt.executionDeadline)
-			mockNode.EXPECT().GetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &tt.retries})
+			mockNode.On("GetRetryStrategy").Return(&v1alpha1.RetryStrategy{MinAttempts: &tt.retries})
+			tr := &nodemocks.TaskReader{}
+			tr.On("Read", mock.Anything).Return(nil, nil)
 
-			nCtx := &nodeExecContext{node: mockNode, nsm: &nodeStateManager{nodeStatus: ns}}
+			nCtx := &nodeExecContext{node: mockNode, nsm: &nodeStateManager{nodeStatus: ns}, tr: tr}
 			phaseInfo, err := c.execute(context.TODO(), h, nCtx, ns)
 
 			if tt.err != nil {
@@ -2858,5 +2861,435 @@ func TestNodeExecutor_IsEligibleForRetry(t *testing.T) {
 			assert.Equal(t, test.expectedEligibility, isEligible)
 		})
 	}
+}
 
+func TestNodeExecutor_VisitedNodesTracking(t *testing.T) {
+	ctx := context.Background()
+	enQWf := func(workflowID v1alpha1.WorkflowID) {}
+	mockEventSink := eventMocks.NewMockEventSink()
+	store := createInmemoryDataStore(t, promutils.NewTestScope())
+
+	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
+	hf := &nodemocks.HandlerFactory{}
+	hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+	execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
+		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+	assert.NoError(t, err)
+	exec := execIface.(*recursiveNodeExecutor)
+
+	createWorkflowNodeWf := func(nodeID string, nodePhase v1alpha1.NodePhase, nodeKind v1alpha1.NodeKind) (v1alpha1.ExecutableWorkflow, v1alpha1.ExecutableNode, v1alpha1.ExecutableNodeStatus) {
+		n := &v1alpha1.NodeSpec{
+			ID:   nodeID,
+			Kind: nodeKind,
+		}
+
+		ns := &v1alpha1.NodeStatus{
+			Phase:                nodePhase,
+			LastAttemptStartedAt: &v1.Time{},
+		}
+
+		startNode := &v1alpha1.NodeSpec{
+			Kind: v1alpha1.NodeKindStart,
+			ID:   v1alpha1.StartNodeID,
+		}
+
+		wf := &v1alpha1.FlyteWorkflow{
+			Status: v1alpha1.WorkflowStatus{
+				NodeStatus: map[v1alpha1.NodeID]*v1alpha1.NodeStatus{
+					nodeID: ns,
+					v1alpha1.StartNodeID: {
+						Phase: v1alpha1.NodePhaseSucceeded,
+					},
+				},
+				DataDir: "data",
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				ID: "wf",
+				Nodes: map[v1alpha1.NodeID]*v1alpha1.NodeSpec{
+					nodeID:               n,
+					v1alpha1.StartNodeID: startNode,
+				},
+				Connections: v1alpha1.Connections{
+					Upstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+						nodeID: {v1alpha1.StartNodeID},
+					},
+					Downstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+						v1alpha1.StartNodeID: {nodeID},
+					},
+				},
+			},
+			DataReferenceConstructor: store,
+			RawOutputDataConfig: v1alpha1.RawOutputDataConfig{
+				RawOutputDataConfig: &admin.RawOutputDataConfig{OutputLocationPrefix: ""},
+			},
+		}
+		return wf, n, ns
+	}
+
+	t.Run("workflow-node-not-visited", func(t *testing.T) {
+		mockWf, mockNode, _ := createWorkflowNodeWf("wf-node-1", v1alpha1.NodePhaseQueued, v1alpha1.NodeKindWorkflow)
+		cf := executors.InitializeControlFlow()
+		eCtx := executors.NewExecutionContext(mockWf, mockWf, mockWf, nil, cf)
+
+		h := &nodemocks.NodeHandler{}
+		h.On("Handle",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(o interfaces.NodeExecutionContext) bool { return true }),
+		).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil)
+		h.On("FinalizeRequired").Return(false)
+
+		hf := &nodemocks.HandlerFactory{}
+		hf.On("GetHandler", v1alpha1.NodeKindWorkflow).Return(h, nil)
+		exec.nodeHandlerFactory = hf
+
+		// Node should not be in visited set initially
+		uniqueID, err := common.GenerateUniqueID(eCtx.GetParentInfo(), mockNode.GetID())
+		assert.NoError(t, err)
+		assert.False(t, eCtx.VisitedNodes().Contains(uniqueID))
+
+		s, err := exec.RecursiveNodeHandler(ctx, eCtx, mockWf, mockWf, mockNode)
+		assert.NoError(t, err)
+		assert.Equal(t, interfaces.NodePhaseSuccess, s.NodePhase)
+
+		// Node should be added to visited set after execution
+		assert.True(t, eCtx.VisitedNodes().Contains(uniqueID))
+	})
+
+	t.Run("workflow-node-already-visited", func(t *testing.T) {
+		mockWf, mockNode, _ := createWorkflowNodeWf("wf-node-2", v1alpha1.NodePhaseRunning, v1alpha1.NodeKindWorkflow)
+		cf := executors.InitializeControlFlow()
+		eCtx := executors.NewExecutionContext(mockWf, mockWf, mockWf, nil, cf)
+
+		// Pre-add the node to visited set
+		uniqueID, err := common.GenerateUniqueID(eCtx.GetParentInfo(), mockNode.GetID())
+		assert.NoError(t, err)
+		eCtx.VisitedNodes().Add(uniqueID)
+
+		// Handler should not be called for already visited nodes
+		h := &nodemocks.NodeHandler{}
+		h.AssertNotCalled(t, "Handle")
+
+		hf := &nodemocks.HandlerFactory{}
+		exec.nodeHandlerFactory = hf
+
+		s, err := exec.RecursiveNodeHandler(ctx, eCtx, mockWf, mockWf, mockNode)
+		assert.NoError(t, err)
+		assert.Equal(t, interfaces.NodePhaseRunning, s.NodePhase)
+	})
+
+	t.Run("non-workflow-node-not-tracked", func(t *testing.T) {
+		// Create a task node to verify it's not tracked in visited set
+		tID := taskID
+		n := &v1alpha1.NodeSpec{
+			ID:      "task-node-1",
+			TaskRef: &tID,
+			Kind:    v1alpha1.NodeKindTask,
+		}
+		ns := &v1alpha1.NodeStatus{
+			Phase:                v1alpha1.NodePhaseQueued,
+			LastAttemptStartedAt: &v1.Time{},
+		}
+		startNode := &v1alpha1.NodeSpec{
+			Kind: v1alpha1.NodeKindStart,
+			ID:   v1alpha1.StartNodeID,
+		}
+		mockWf := &v1alpha1.FlyteWorkflow{
+			Tasks: map[v1alpha1.TaskID]*v1alpha1.TaskSpec{
+				taskID: {TaskTemplate: &core.TaskTemplate{}},
+			},
+			Status: v1alpha1.WorkflowStatus{
+				NodeStatus: map[v1alpha1.NodeID]*v1alpha1.NodeStatus{
+					"task-node-1": ns,
+					v1alpha1.StartNodeID: {
+						Phase: v1alpha1.NodePhaseSucceeded,
+					},
+				},
+				DataDir: "data",
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				ID: "wf",
+				Nodes: map[v1alpha1.NodeID]*v1alpha1.NodeSpec{
+					"task-node-1":        n,
+					v1alpha1.StartNodeID: startNode,
+				},
+				Connections: v1alpha1.Connections{
+					Upstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+						"task-node-1": {v1alpha1.StartNodeID},
+					},
+					Downstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+						v1alpha1.StartNodeID: {"task-node-1"},
+					},
+				},
+			},
+			DataReferenceConstructor: store,
+			RawOutputDataConfig: v1alpha1.RawOutputDataConfig{
+				RawOutputDataConfig: &admin.RawOutputDataConfig{OutputLocationPrefix: ""},
+			},
+		}
+
+		cf := executors.InitializeControlFlow()
+		eCtx := executors.NewExecutionContext(mockWf, mockWf, mockWf, nil, cf)
+
+		h := &nodemocks.NodeHandler{}
+		h.On("Handle",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(o interfaces.NodeExecutionContext) bool { return true }),
+		).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil)
+		h.On("FinalizeRequired").Return(false)
+
+		hf := &nodemocks.HandlerFactory{}
+		hf.On("GetHandler", v1alpha1.NodeKindTask).Return(h, nil)
+		exec.nodeHandlerFactory = hf
+
+		uniqueID, err := common.GenerateUniqueID(eCtx.GetParentInfo(), n.GetID())
+		assert.NoError(t, err)
+
+		s, err := exec.RecursiveNodeHandler(ctx, eCtx, mockWf, mockWf, n)
+		assert.NoError(t, err)
+		assert.Equal(t, interfaces.NodePhaseSuccess, s.NodePhase)
+
+		// Task nodes should not be added to visited set
+		assert.False(t, eCtx.VisitedNodes().Contains(uniqueID))
+	})
+}
+
+func TestNodeExecutor_ParallelismBypassForWorkflowNodes(t *testing.T) {
+	ctx := context.Background()
+	enQWf := func(workflowID v1alpha1.WorkflowID) {}
+	mockEventSink := eventMocks.NewMockEventSink()
+	store := createInmemoryDataStore(t, promutils.NewTestScope())
+
+	createWorkflowNodeWf := func(nodeID string, nodePhase v1alpha1.NodePhase, maxParallelism uint32) (v1alpha1.ExecutableWorkflow, v1alpha1.ExecutableNode, v1alpha1.ExecutableNodeStatus) {
+		lpID := "lp1"
+		n := &v1alpha1.NodeSpec{
+			ID:   nodeID,
+			Kind: v1alpha1.NodeKindWorkflow,
+			WorkflowNode: &v1alpha1.WorkflowNodeSpec{
+				LaunchPlanRefID: &v1alpha1.Identifier{
+					Identifier: &core.Identifier{
+						ResourceType: core.ResourceType_LAUNCH_PLAN,
+						Name:         lpID,
+					},
+				},
+			},
+		}
+
+		ns := &v1alpha1.NodeStatus{
+			Phase:                nodePhase,
+			LastAttemptStartedAt: &v1.Time{},
+		}
+
+		startNode := &v1alpha1.NodeSpec{
+			Kind: v1alpha1.NodeKindStart,
+			ID:   v1alpha1.StartNodeID,
+		}
+
+		wf := &v1alpha1.FlyteWorkflow{
+			ExecutionConfig: v1alpha1.ExecutionConfig{
+				MaxParallelism: maxParallelism,
+			},
+			Status: v1alpha1.WorkflowStatus{
+				NodeStatus: map[v1alpha1.NodeID]*v1alpha1.NodeStatus{
+					nodeID: ns,
+					v1alpha1.StartNodeID: {
+						Phase: v1alpha1.NodePhaseSucceeded,
+					},
+				},
+				DataDir: "data",
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				ID: "wf",
+				Nodes: map[v1alpha1.NodeID]*v1alpha1.NodeSpec{
+					nodeID:               n,
+					v1alpha1.StartNodeID: startNode,
+				},
+				Connections: v1alpha1.Connections{
+					Upstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+						nodeID: {v1alpha1.StartNodeID},
+					},
+					Downstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+						v1alpha1.StartNodeID: {nodeID},
+					},
+				},
+			},
+			DataReferenceConstructor: store,
+			RawOutputDataConfig: v1alpha1.RawOutputDataConfig{
+				RawOutputDataConfig: &admin.RawOutputDataConfig{OutputLocationPrefix: ""},
+			},
+		}
+		return wf, n, ns
+	}
+
+	t.Run("bypass-enabled-running-workflow-node", func(t *testing.T) {
+		// Enable bypass config on the global config
+		originalBypass := config.GetConfig().NodeConfig.BypassParallelismCheckForWorkflowNodes
+		config.GetConfig().NodeConfig.BypassParallelismCheckForWorkflowNodes = true
+		defer func() {
+			config.GetConfig().NodeConfig.BypassParallelismCheckForWorkflowNodes = originalBypass
+		}()
+
+		adminClient := launchplan.NewFailFastLaunchPlanExecutor()
+
+		h := &nodemocks.NodeHandler{}
+		h.On("Handle",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(o interfaces.NodeExecutionContext) bool { return true }),
+		).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil)
+		h.On("FinalizeRequired").Return(false)
+
+		hf := &nodemocks.HandlerFactory{}
+		hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		hf.On("GetHandler", v1alpha1.NodeKindWorkflow).Return(h, nil)
+
+		execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
+			"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		assert.NoError(t, err)
+		exec := execIface.(*recursiveNodeExecutor)
+
+		mockWf, mockNode, _ := createWorkflowNodeWf("wf-node-1", v1alpha1.NodePhaseRunning, 1)
+		cf := executors.InitializeControlFlow()
+		cf.IncrementParallelism() // Exceed parallelism limit
+		eCtx := executors.NewExecutionContext(mockWf, mockWf, mockWf, nil, cf)
+
+		// Should bypass parallelism check and execute the node
+		s, err := exec.RecursiveNodeHandler(ctx, eCtx, mockWf, mockWf, mockNode)
+		assert.NoError(t, err)
+		assert.Equal(t, interfaces.NodePhaseSuccess, s.NodePhase)
+	})
+
+	t.Run("bypass-enabled-not-yet-started-workflow-node-blocked", func(t *testing.T) {
+		// Enable bypass config on the global config
+		originalBypass := config.GetConfig().NodeConfig.BypassParallelismCheckForWorkflowNodes
+		config.GetConfig().NodeConfig.BypassParallelismCheckForWorkflowNodes = true
+		defer func() {
+			config.GetConfig().NodeConfig.BypassParallelismCheckForWorkflowNodes = originalBypass
+		}()
+
+		adminClient := launchplan.NewFailFastLaunchPlanExecutor()
+		hf := &nodemocks.HandlerFactory{}
+		hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+		execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
+			"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		assert.NoError(t, err)
+		exec := execIface.(*recursiveNodeExecutor)
+
+		mockWf, mockNode, _ := createWorkflowNodeWf("wf-node-2", v1alpha1.NodePhaseNotYetStarted, 1)
+		cf := executors.InitializeControlFlow()
+		cf.IncrementParallelism() // Exceed parallelism limit
+		eCtx := executors.NewExecutionContext(mockWf, mockWf, mockWf, nil, cf)
+
+		// Should NOT bypass for NotYetStarted nodes
+		s, err := exec.RecursiveNodeHandler(ctx, eCtx, mockWf, mockWf, mockNode)
+		assert.NoError(t, err)
+		assert.Equal(t, interfaces.NodePhaseRunning, s.NodePhase) // Blocked due to parallelism
+	})
+
+	t.Run("bypass-disabled-workflow-node-blocked", func(t *testing.T) {
+		// Disable bypass config on the global config (default)
+		originalBypass := config.GetConfig().NodeConfig.BypassParallelismCheckForWorkflowNodes
+		config.GetConfig().NodeConfig.BypassParallelismCheckForWorkflowNodes = false
+		defer func() {
+			config.GetConfig().NodeConfig.BypassParallelismCheckForWorkflowNodes = originalBypass
+		}()
+
+		adminClient := launchplan.NewFailFastLaunchPlanExecutor()
+		hf := &nodemocks.HandlerFactory{}
+		hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+		execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
+			"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		assert.NoError(t, err)
+		exec := execIface.(*recursiveNodeExecutor)
+
+		mockWf, mockNode, _ := createWorkflowNodeWf("wf-node-3", v1alpha1.NodePhaseRunning, 1)
+		cf := executors.InitializeControlFlow()
+		cf.IncrementParallelism() // Exceed parallelism limit
+		eCtx := executors.NewExecutionContext(mockWf, mockWf, mockWf, nil, cf)
+
+		// Should be blocked by parallelism check when bypass is disabled
+		s, err := exec.RecursiveNodeHandler(ctx, eCtx, mockWf, mockWf, mockNode)
+		assert.NoError(t, err)
+		assert.Equal(t, interfaces.NodePhaseRunning, s.NodePhase) // Blocked due to parallelism
+	})
+
+	t.Run("bypass-enabled-task-node-still-blocked", func(t *testing.T) {
+		// Enable bypass config on the global config
+		originalBypass := config.GetConfig().NodeConfig.BypassParallelismCheckForWorkflowNodes
+		config.GetConfig().NodeConfig.BypassParallelismCheckForWorkflowNodes = true
+		defer func() {
+			config.GetConfig().NodeConfig.BypassParallelismCheckForWorkflowNodes = originalBypass
+		}()
+
+		adminClient := launchplan.NewFailFastLaunchPlanExecutor()
+		hf := &nodemocks.HandlerFactory{}
+		hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+		execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
+			"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		assert.NoError(t, err)
+		exec := execIface.(*recursiveNodeExecutor)
+
+		// Create a task node instead of workflow node
+		tID := taskID
+		n := &v1alpha1.NodeSpec{
+			ID:      "task-node-1",
+			TaskRef: &tID,
+			Kind:    v1alpha1.NodeKindTask,
+		}
+		ns := &v1alpha1.NodeStatus{
+			Phase:                v1alpha1.NodePhaseQueued,
+			LastAttemptStartedAt: &v1.Time{},
+		}
+		startNode := &v1alpha1.NodeSpec{
+			Kind: v1alpha1.NodeKindStart,
+			ID:   v1alpha1.StartNodeID,
+		}
+		mockWf := &v1alpha1.FlyteWorkflow{
+			Tasks: map[v1alpha1.TaskID]*v1alpha1.TaskSpec{
+				taskID: {TaskTemplate: &core.TaskTemplate{}},
+			},
+			ExecutionConfig: v1alpha1.ExecutionConfig{
+				MaxParallelism: 1,
+			},
+			Status: v1alpha1.WorkflowStatus{
+				NodeStatus: map[v1alpha1.NodeID]*v1alpha1.NodeStatus{
+					"task-node-1": ns,
+					v1alpha1.StartNodeID: {
+						Phase: v1alpha1.NodePhaseSucceeded,
+					},
+				},
+				DataDir: "data",
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				ID: "wf",
+				Nodes: map[v1alpha1.NodeID]*v1alpha1.NodeSpec{
+					"task-node-1":        n,
+					v1alpha1.StartNodeID: startNode,
+				},
+				Connections: v1alpha1.Connections{
+					Upstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+						"task-node-1": {v1alpha1.StartNodeID},
+					},
+					Downstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+						v1alpha1.StartNodeID: {"task-node-1"},
+					},
+				},
+			},
+			DataReferenceConstructor: store,
+			RawOutputDataConfig: v1alpha1.RawOutputDataConfig{
+				RawOutputDataConfig: &admin.RawOutputDataConfig{OutputLocationPrefix: ""},
+			},
+		}
+
+		cf := executors.InitializeControlFlow()
+		cf.IncrementParallelism() // Exceed parallelism limit
+		eCtx := executors.NewExecutionContext(mockWf, mockWf, mockWf, nil, cf)
+
+		// Task nodes should still be blocked even when bypass is enabled
+		s, err := exec.RecursiveNodeHandler(ctx, eCtx, mockWf, mockWf, n)
+		assert.NoError(t, err)
+		assert.Equal(t, interfaces.NodePhaseRunning, s.NodePhase) // Blocked due to parallelism
+	})
 }
