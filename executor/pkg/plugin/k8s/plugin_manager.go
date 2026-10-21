@@ -15,6 +15,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8stypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/validation"
@@ -157,6 +158,10 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
 		if k8serrors.IsForbidden(err) {
 			if isQuotaExceeded(err) {
+				if quotaRequestExceedsHardLimit(err) {
+					return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("QuotaRequestExceedsHardLimit",
+						fmt.Sprintf("resource request exceeds a hard quota limit and cannot fit even without other usage: %v", err), nil)), nil
+				}
 				now := time.Now()
 				if quotaWaitStartedAt.IsZero() {
 					*quotaWaitStartedAt = now
@@ -203,6 +208,59 @@ func isQuotaExceeded(err error) bool {
 	}
 	_, reason, found := strings.Cut(status.Status().Message, " is forbidden: ")
 	return found && strings.HasPrefix(reason, "exceeded quota: ")
+}
+
+func quotaRequestExceedsHardLimit(err error) bool {
+	var status k8serrors.APIStatus
+	if !stderrors.As(err, &status) {
+		return false
+	}
+	_, usage, found := strings.Cut(status.Status().Message, ", requested: ")
+	if !found {
+		return false
+	}
+	requested, usage, found := strings.Cut(usage, ", used: ")
+	if !found {
+		return false
+	}
+	_, limited, found := strings.Cut(usage, ", limited: ")
+	if !found {
+		return false
+	}
+	requests, valid := parseQuotaResources(requested)
+	if !valid {
+		return false
+	}
+	limits, valid := parseQuotaResources(limited)
+	if !valid {
+		return false
+	}
+	for name, request := range requests {
+		if limit, exists := limits[name]; exists && request.Cmp(limit) > 0 {
+			return true
+		}
+	}
+	return false
+}
+
+func parseQuotaResources(value string) (v1.ResourceList, bool) {
+	resources := make(v1.ResourceList)
+	for _, entry := range strings.Split(value, ",") {
+		name, amount, found := strings.Cut(strings.TrimSpace(entry), "=")
+		if !found || name == "" {
+			return nil, false
+		}
+		quantity, err := resource.ParseQuantity(amount)
+		if err != nil || quantity.Sign() < 0 {
+			return nil, false
+		}
+		key := v1.ResourceName(name)
+		if _, exists := resources[key]; exists {
+			return nil, false
+		}
+		resources[key] = quantity
+	}
+	return resources, true
 }
 
 // canAdoptExisting reports whether the resource a launch collided with can stand in for

@@ -18,14 +18,17 @@ The executor uses conditions to track task progress:
 ## Resource Quota Admission
 
 When Kubernetes rejects resource creation with `Forbidden: exceeded quota`, the
-executor reports `WAITING_FOR_RESOURCES` and retries creation on reconciliation.
-The default reconciliation interval is 10 seconds, configured through
-`executor.requeueDuration`. No pod exists during this wait, and neither user nor
-system retries are consumed. The execution-timeout clock starts only once the
-task runs. Other Forbidden responses, including RBAC and webhook denials, retain
-their existing failure handling.
+executor fails permanently with `QuotaRequestExceedsHardLimit` if a reported
+request or limit exceeds its hard quota. Otherwise, it reports
+`WAITING_FOR_RESOURCES` and retries admission on reconciliation (every 10 seconds
+by default). Neither path consumes user/system retries, and admission waiting
+does not start the execution-timeout clock. Kubernetes diagnostics are preserved;
+other Forbidden responses retain their existing handling.
 
-Quota waiting defaults to one hour. Configure the executor's runtime settings:
+Quota waiting defaults to one hour and survives executor restarts. Continued
+rejection after the deadline fails permanently with `QuotaWaitTimeout`.
+Configure the timeout below, or set it to zero or negative to wait indefinitely.
+For Helm deployments, place it under `configuration.inline`:
 
 ```yaml
 plugins:
@@ -33,21 +36,24 @@ plugins:
         quota-wait-timeout: 1h
 ```
 
-For Helm deployments, put these settings under `configuration.inline` in the
-chart values. A nonpositive timeout disables the bound. The wait start time is
-persisted in the existing plugin state, survives executor restarts, and requires
-no CRD schema change. Continued quota rejection after the deadline fails the
-action permanently with `QuotaWaitTimeout` and the Kubernetes diagnostic. A
-successful admission clears the wait clock; cancellation uses normal cleanup
-even if no pod was created. Failed create calls are retried periodically, not
-through a separate quota-reservation check.
+Only quantities reported by admission are compared; missing or malformed values
+fall back to waiting. Requests equal to a hard limit can also wait. This does not
+reserve capacity or change node scheduling. Leave quota headroom for child tasks:
+parent pods still consume resources while waiting for them.
 
-This is admission backpressure, not FIFO scheduling or a capacity reservation.
-Requests that cannot fit the hard quota eventually time out. Parent task pods
-still consume quota while awaiting children, so leave enough headroom for child
-tasks and cleanup; admission waiting cannot resolve parent/child resource
-deadlocks. Already-terminal actions are not revived by an executor upgrade.
+### Resource-Pressure Regression Tests
 
+From the repository root, run the admission, scheduling and configuration tests.
+Controller tests additionally require local envtest binaries:
+
+```sh
+go test ./executor/pkg/plugin/... ./flyteplugins/go/tasks/pluginmachinery/flytek8s/... -count=1
+KUBEBUILDER_ASSETS=/path/to/envtest go test ./executor/pkg/controller -run '^TestControllers$' -ginkgo.focus='quota admission' -count=1
+```
+
+Coverage includes hard-cap failures, temporary contention, parsing, persisted
+waiting, timeout, recovery and cancellation. Scheduling cases are synthetic;
+no shared cluster or quota changes are required.
 
 ## Getting Started
 

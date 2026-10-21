@@ -740,6 +740,36 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(getTaskAction(nn).Status.Attempts).To(Equal(uint32(1)))
 		})
 
+		It("fails impossible quota admission without consuming retry budgets", func() {
+			fakeClock := testingclock.NewFakeClock(time.Now())
+			fake := &fakePlugin{
+				id: "quota-plugin",
+				transitions: []pluginsCore.Transition{
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure(
+						"QuotaRequestExceedsHardLimit", "requested memory exceeds the hard quota", nil)),
+				},
+			}
+			recordedEvents := &recordingEventsClient{}
+			reconciler := newReconciler(fake, fakeClock, recordedEvents, nil)
+			nn := createTaskAction("quota-admission-impossible", buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Minute, 5))
+			request := reconcile.Request{NamespacedName: nn}
+
+			for round := 0; round < 3; round++ {
+				_, err := reconciler.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				persisted := getTaskAction(nn)
+				Expect(isTerminal(persisted)).To(BeTrue())
+				Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhasePermanentFailure.String()))
+				Expect(persisted.Status.ErrorState.Code).To(Equal("QuotaRequestExceedsHardLimit"))
+				Expect(persisted.Status.Attempts).To(Equal(uint32(1)))
+				Expect(persisted.Status.SystemFailures).To(BeZero())
+				Expect(persisted.Status.SystemRetries).To(BeZero())
+				fakeClock.Step(time.Hour)
+			}
+			Expect(fake.handleCalls).To(Equal(1))
+			Expect(recordedEvents.RecordedEvents()).To(ContainElement(HaveField("Phase", common.ActionPhase_ACTION_PHASE_FAILED)))
+		})
+
 		It("cancels quota admission waiting without handling the plugin again", func() {
 			fakeClock := testingclock.NewFakeClock(time.Now())
 			fake := &fakePlugin{

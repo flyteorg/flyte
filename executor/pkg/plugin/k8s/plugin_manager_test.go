@@ -218,6 +218,39 @@ func TestLaunchResourceErrors(t *testing.T) {
 			wantPhase: pluginsCore.PhaseWaitingForResources,
 		},
 		{
+			name:      "request above hard memory quota fails immediately",
+			createErr: k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("exceeded quota: tasks, requested: requests.memory=20Gi, used: requests.memory=0, limited: requests.memory=16Gi")),
+			wantPhase: pluginsCore.PhasePermanentFailure,
+			wantCode:  "QuotaRequestExceedsHardLimit",
+		},
+		{
+			name:      "limit above hard memory quota fails immediately",
+			createErr: k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("exceeded quota: tasks, requested: limits.memory=40Gi, used: limits.memory=0, limited: limits.memory=32Gi")),
+			wantPhase: pluginsCore.PhasePermanentFailure,
+			wantCode:  "QuotaRequestExceedsHardLimit",
+		},
+		{
+			name:      "request equal to hard quota waits behind existing usage",
+			createErr: k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("exceeded quota: tasks, requested: requests.memory=16Gi, used: requests.memory=1Gi, limited: requests.memory=16Gi")),
+			wantPhase: pluginsCore.PhaseWaitingForResources,
+		},
+		{
+			name:      "request above hard CPU quota fails immediately",
+			createErr: k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("exceeded quota: tasks, requested: requests.cpu=17, used: requests.cpu=0, limited: requests.cpu=16")),
+			wantPhase: pluginsCore.PhasePermanentFailure,
+			wantCode:  "QuotaRequestExceedsHardLimit",
+		},
+		{
+			name:      "request against zero GPU quota fails immediately",
+			createErr: k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("exceeded quota: tasks, requested: requests.nvidia.com/gpu=1, used: requests.nvidia.com/gpu=0, limited: requests.nvidia.com/gpu=0")),
+			wantPhase: pluginsCore.PhasePermanentFailure,
+			wantCode:  "QuotaRequestExceedsHardLimit",
+		},
+		{
+			name:      "successful admission queues the task",
+			wantPhase: pluginsCore.PhaseQueued,
+		},
+		{
 			name:      "permission denial still fails",
 			createErr: k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("User executor cannot create resource pods in namespace ns")),
 			wantPhase: pluginsCore.PhaseRetryableFailure,
@@ -226,6 +259,22 @@ func TestLaunchResourceErrors(t *testing.T) {
 		{
 			name:      "wrapped quota exhaustion waits",
 			createErr: fmt.Errorf("create: %w", k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("exceeded quota: tasks, requested: pods=1, used: pods=10, limited: pods=10"))),
+			wantPhase: pluginsCore.PhaseWaitingForResources,
+		},
+		{
+			name:      "wrapped impossible quota request fails immediately",
+			createErr: fmt.Errorf("create: %w", k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("exceeded quota: tasks, requested: requests.cpu=17000m, used: requests.cpu=1, limited: requests.cpu=16"))),
+			wantPhase: pluginsCore.PhasePermanentFailure,
+			wantCode:  "QuotaRequestExceedsHardLimit",
+		},
+		{
+			name:      "incomplete quota diagnostic still waits",
+			createErr: k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("exceeded quota: tasks, requested: requests.memory=20Gi, limited: requests.memory=16Gi")),
+			wantPhase: pluginsCore.PhaseWaitingForResources,
+		},
+		{
+			name:      "malformed quota quantity still waits",
+			createErr: k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("exceeded quota: tasks, requested: requests.memory=20Gi, used: requests.memory=0, limited: requests.memory=unknown")),
 			wantPhase: pluginsCore.PhaseWaitingForResources,
 		},
 		{
@@ -264,7 +313,8 @@ func TestLaunchResourceErrors(t *testing.T) {
 
 			pm := NewPluginManager("test", plugin, kubeClient)
 
-			transition, err := pm.launchResource(context.Background(), tCtx, &time.Time{})
+			var waitStartedAt time.Time
+			transition, err := pm.launchResource(context.Background(), tCtx, &waitStartedAt)
 			if tt.wantErr {
 				assert.Error(t, err)
 				assert.Equal(t, pluginsCore.UnknownTransition, transition)
@@ -275,9 +325,49 @@ func TestLaunchResourceErrors(t *testing.T) {
 			assert.Equal(t, tt.wantCode, transition.Info().Err().GetCode())
 			if tt.wantCode != "" {
 				assert.Equal(t, core.ExecutionError_USER, transition.Info().Err().GetKind())
+				assert.Contains(t, transition.Info().Err().GetMessage(), tt.createErr.Error())
 			} else {
 				assert.Nil(t, transition.Info().Err())
 			}
+			if tt.wantPhase == pluginsCore.PhaseWaitingForResources {
+				assert.False(t, waitStartedAt.IsZero())
+				assert.Contains(t, transition.Info().Reason(), tt.createErr.Error())
+			} else {
+				assert.True(t, waitStartedAt.IsZero())
+			}
+		})
+	}
+}
+
+func TestQuotaRequestExceedsHardLimit(t *testing.T) {
+	tests := []struct {
+		name      string
+		requested string
+		limited   string
+		want      bool
+	}{
+		{name: "memory unit conversion", requested: "requests.memory=2048Mi", limited: "requests.memory=1Gi", want: true},
+		{name: "equivalent memory units", requested: "requests.memory=1024Mi", limited: "requests.memory=1Gi"},
+		{name: "CPU millicores", requested: "requests.cpu=17000m", limited: "requests.cpu=16", want: true},
+		{name: "equivalent CPU units", requested: "requests.cpu=1000m", limited: "requests.cpu=1"},
+		{name: "CPU limit", requested: "limits.cpu=33", limited: "limits.cpu=32", want: true},
+		{name: "zero pod quota", requested: "pods=1", limited: "pods=0", want: true},
+		{name: "mixed resources", requested: "requests.cpu=1,requests.memory=20Gi", limited: "requests.memory=16Gi,requests.cpu=16", want: true},
+		{name: "different resource names", requested: "requests.memory=20Gi", limited: "limits.memory=16Gi"},
+		{name: "malformed request", requested: "requests.memory=invalid", limited: "requests.memory=16Gi"},
+		{name: "malformed limit", requested: "requests.memory=20Gi", limited: "requests.memory=invalid"},
+		{name: "empty request", limited: "requests.memory=16Gi"},
+		{name: "empty limit", requested: "requests.memory=20Gi"},
+		{name: "negative limit", requested: "requests.memory=20Gi", limited: "requests.memory=-1Gi"},
+		{name: "duplicate limit", requested: "requests.memory=20Gi", limited: "requests.memory=16Gi,requests.memory=32Gi"},
+		{name: "duplicate request", requested: "requests.memory=20Gi,requests.memory=1Gi", limited: "requests.memory=16Gi"},
+		{name: "partially malformed request", requested: "requests.memory=20Gi,requests.cpu=bad", limited: "requests.memory=16Gi,requests.cpu=16"},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err := k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name",
+				fmt.Errorf("exceeded quota: tasks, requested: %s, used: requests.memory=0, limited: %s", test.requested, test.limited))
+			assert.Equal(t, test.want, quotaRequestExceedsHardLimit(err))
 		})
 	}
 }
@@ -493,14 +583,21 @@ func TestHandle_QuotaWaitSurvivesRestartAndAdmits(t *testing.T) {
 
 func TestLaunchResource_QuotaWaitTimeout(t *testing.T) {
 	for _, test := range []struct {
-		name      string
-		timeout   time.Duration
-		waited    time.Duration
-		wantPhase pluginsCore.Phase
+		name        string
+		timeout     time.Duration
+		waited      time.Duration
+		wantPhase   pluginsCore.Phase
+		quotaReason string
+		wantCode    string
 	}{
 		{name: "deadline expired", timeout: time.Hour, waited: 2 * time.Hour, wantPhase: pluginsCore.PhasePermanentFailure},
 		{name: "within deadline", timeout: time.Hour, waited: time.Minute, wantPhase: pluginsCore.PhaseWaitingForResources},
 		{name: "deadline disabled", waited: 2 * time.Hour, wantPhase: pluginsCore.PhaseWaitingForResources},
+		{name: "negative deadline disables bound", timeout: -time.Minute, waited: 2 * time.Hour, wantPhase: pluginsCore.PhaseWaitingForResources},
+		{name: "hard cap overrides expired wait", timeout: time.Hour, waited: 2 * time.Hour, wantPhase: pluginsCore.PhasePermanentFailure,
+			quotaReason: "exceeded quota: tasks, requested: requests.memory=20Gi, used: requests.memory=0, limited: requests.memory=16Gi", wantCode: "QuotaRequestExceedsHardLimit"},
+		{name: "hard cap fails with wait bound disabled", waited: time.Minute, wantPhase: pluginsCore.PhasePermanentFailure,
+			quotaReason: "exceeded quota: tasks, requested: requests.memory=20Gi, used: requests.memory=0, limited: requests.memory=16Gi", wantCode: "QuotaRequestExceedsHardLimit"},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			original := *config.GetK8sPluginConfig()
@@ -508,7 +605,11 @@ func TestLaunchResource_QuotaWaitTimeout(t *testing.T) {
 			cfg.QuotaWaitTimeout.Duration = test.timeout
 			require.NoError(t, config.SetK8sPluginConfig(&cfg))
 			t.Cleanup(func() { require.NoError(t, config.SetK8sPluginConfig(&original)) })
-			quotaErr := k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("exceeded quota: tasks"))
+			quotaReason := test.quotaReason
+			if quotaReason == "" {
+				quotaReason = "exceeded quota: tasks"
+			}
+			quotaErr := k8serrors.NewForbidden(schema.GroupResource{Resource: "pods"}, "name", fmt.Errorf("%s", quotaReason))
 			fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).
 				WithInterceptorFuncs(interceptor.Funcs{
 					Create: func(context.Context, client.WithWatch, client.Object, ...client.CreateOption) error { return quotaErr },
@@ -528,7 +629,11 @@ func TestLaunchResource_QuotaWaitTimeout(t *testing.T) {
 			assert.Equal(t, test.wantPhase, transition.Info().Phase())
 			assert.True(t, waitStartedAt.Equal(quotaWaitStartedAt))
 			if test.wantPhase.IsFailure() {
-				assert.Equal(t, "QuotaWaitTimeout", transition.Info().Err().GetCode())
+				wantCode := test.wantCode
+				if wantCode == "" {
+					wantCode = "QuotaWaitTimeout"
+				}
+				assert.Equal(t, wantCode, transition.Info().Err().GetCode())
 				assert.Contains(t, transition.Info().Err().GetMessage(), quotaErr.Error())
 			} else {
 				assert.Nil(t, transition.Info().Err())
