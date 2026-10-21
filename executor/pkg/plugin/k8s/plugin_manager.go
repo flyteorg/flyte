@@ -401,11 +401,18 @@ func (pm *PluginManager) attachRecentObjectEvents(
 		return phaseInfo, lastEventUpdate, lastEventRecordedAt
 	}
 
+	// A reason carries its GPU fault as data only when the event passes the same trust
+	// rule classification applies, so nobody downstream has to read it out of the text.
+	pod, isPod := gpuFaultPod(resource)
 	for _, event := range recentEvents {
-		info.AdditionalReasons = append(info.AdditionalReasons, pluginsCore.ReasonInfo{
+		reason := pluginsCore.ReasonInfo{
 			Reason:     event.Message,
 			OccurredAt: &event.CreatedAt,
-		})
+		}
+		if isPod {
+			reason.GpuFault = gpufault.FromPodEvent(asPodEvent(event), pod)
+		}
+		info.AdditionalReasons = append(info.AdditionalReasons, reason)
 		lastEventUpdate = event.CreatedAt
 		lastEventRecordedAt = event.RecordedAt
 	}
@@ -473,7 +480,7 @@ func (pm *PluginManager) classifyGpuFailure(
 	namesTheFaultingPod := false
 	if pod, isPod := resource.(*v1.Pod); isPod {
 		observed = pm.faultsOnPod(
-			ctx, objectKeyFor(resource), resource.GetUID(), flytek8s.PodFailureTime(pod, attemptFailedAt))
+			ctx, objectKeyFor(resource), gpufault.Pod{UID: string(pod.UID), NodeName: pod.Spec.NodeName}, flytek8s.PodFailureTime(pod, attemptFailedAt))
 	} else {
 		observed = pm.faultsOnChildPods(ctx, tCtx, resource, attemptFailedAt)
 		namesTheFaultingPod = true
@@ -620,7 +627,7 @@ func (pm *PluginManager) faultsOnChildPods(
 			continue
 		}
 		podKey := watchedObjectKey{Namespace: pod.Namespace, Name: pod.Name, Kind: "Pod"}
-		observed = append(observed, pm.faultsOnPod(ctx, podKey, pod.UID, childPodFailureTime(pod, failureAt))...)
+		observed = append(observed, pm.faultsOnPod(ctx, podKey, gpufault.Pod{UID: string(pod.UID), NodeName: pod.Spec.NodeName}, childPodFailureTime(pod, failureAt))...)
 	}
 	return observed
 }
@@ -704,7 +711,7 @@ func childPodFailureTime(pod *v1.Pod, failureAt time.Time) time.Time {
 func (pm *PluginManager) faultsOnPod(
 	ctx context.Context,
 	podKey watchedObjectKey,
-	podUID k8stypes.UID,
+	pod gpufault.Pod,
 	failureAt time.Time,
 ) []observedFault {
 	events := pm.eventWatcher.List(podKey, time.Time{}, time.Time{})
@@ -715,25 +722,21 @@ func (pm *PluginManager) faultsOnPod(
 	observed := make([]observedFault, 0, len(events))
 	for _, event := range events {
 		// Only events the GPU fault emitter wrote, recognized by their reason, are
-		// parsed; the message prefix alone is free text anyone can put in an event.
-		if event.Reason != gpufault.EventReasonXid && event.Reason != gpufault.EventReasonSXid {
+		// considered; the message prefix alone is free text anyone can put in an event.
+		if !gpufault.IsFaultReason(event.Reason) {
 			continue
 		}
 		// Events are cached under the pod's namespace and name, which a recreated pod
-		// reuses, so the fault has to have been recorded against this very pod.
-		// Identity is the event's regarding UID against the pod's. An event without one
-		// is rejected: the API server does not fill that field, so its absence is a
-		// client that did not say which object it meant. The pod's own UID is unknown
-		// when the pod was deleted before this round reached it; the name match the
-		// cache is keyed on is then all there is, and it is used knowingly: a same-name
-		// replacement pod's faults could be credited here, a deliberate trade against
-		// losing every fault on the path where the hardware most clearly failed. A child
-		// pod always arrives with its UID, because it was read out of the cache as an
-		// object rather than named from the task, so it never takes that trade.
-		if event.RegardingUID == "" {
-			continue
-		}
-		if podUID != "" && event.RegardingUID != podUID {
+		// reuses, so the fault has to have been recorded against this very pod, and
+		// from the node the pod ran on. FromPodEvent is where those checks live, along
+		// with what is accepted when the pod is gone and its UID and node are unknown.
+		fault := gpufault.FromPodEvent(asPodEvent(event), pod)
+		if fault == nil {
+			if pod.NodeName != "" && event.ReportingNode != pod.NodeName {
+				logger.Debugf(context.TODO(),
+					"ignoring GPU fault event %q on %s: reported from node %q, not the pod's node %q",
+					event.Reason, podKey.Name, event.ReportingNode, pod.NodeName)
+			}
 			continue
 		}
 		if !gpufault.RelevantToFailure(event.CreatedAt, event.LastObservedAt, failureAt) {
@@ -742,14 +745,30 @@ func (pm *PluginManager) faultsOnPod(
 				event.Reason, podKey.Name, event.CreatedAt, event.LastObservedAt, failureAt)
 			continue
 		}
-		if fault := gpufault.FromEventMessage(event.Message); fault != nil {
-			// The last observation decided relevance above; what orders the fault against
-			// the others is when it was first recorded, which is when it happened.
-			observed = append(observed, observedFault{fault: fault, createdAt: event.CreatedAt, podName: podKey.Name})
-		}
+		observed = append(observed, observedFault{fault: fault, createdAt: event.CreatedAt, podName: podKey.Name})
 	}
 
 	return observed
+}
+
+// gpuFaultPod is the pod a GPU fault event would be credited to, as gpufault needs it.
+// It reports false for anything that is not a pod, which never has faults of its own.
+func gpuFaultPod(resource client.Object) (gpufault.Pod, bool) {
+	pod, isPod := resource.(*v1.Pod)
+	if !isPod {
+		return gpufault.Pod{}, false
+	}
+	return gpufault.Pod{UID: string(pod.GetUID()), NodeName: pod.Spec.NodeName}, true
+}
+
+// asPodEvent is the part of a cached event the GPU fault trust rule reads.
+func asPodEvent(event *eventInfo) gpufault.PodEvent {
+	return gpufault.PodEvent{
+		Reason:        event.Reason,
+		Message:       event.Message,
+		RegardingUID:  string(event.RegardingUID),
+		ReportingNode: event.ReportingNode,
+	}
 }
 
 // classifyExternalTermination folds what an external controller left behind on a pod it
@@ -763,7 +782,7 @@ func (pm *PluginManager) faultsOnPod(
 // condition. A pod that is already gone left only its events behind, cached under a name
 // a replacement pod reuses, so its Stopped event is credited only when the event's
 // regarding UID is the pod's, or when the pod's UID is unknown because it vanished before
-// this round reached it (the same trade classifyGpuFailure makes).
+// this round reached it (the same trade gpufault.FromPodEvent makes for a fault).
 func (pm *PluginManager) classifyExternalTermination(
 	resource client.Object,
 	phaseInfo pluginsCore.PhaseInfo,
