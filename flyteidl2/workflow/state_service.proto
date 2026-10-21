@@ -111,6 +111,7 @@ message ActionUpdate {
   optional flyteidl2.core.Literal value = 5;
 
   // Where the running action can be reached, as reported by its worker (`UpdateRequest.address`).
-  // Set while the action serves traffic; cleared on a new attempt or a terminal phase.
+  // Set while the current attempt serves traffic; absent once a newer attempt starts, the action's
+  // pod is relaunched, or the action is terminal.
   flyteidl2.common.ActionAddress address = 6;
 }

@@ -269,8 +269,11 @@ func (c *ActionsClient) AbortAction(ctx context.Context, actionID *common.Action
 
 // PutStatus updates the latest attempt metadata for a TaskAction, and where the
 // running task can be reached (UpdateRequest.address). An address replaces the
-// current one, a nil address keeps it within the same attempt, and a new
-// attempt clears it.
+// current one, a nil address keeps it within the same attempt, an empty one
+// withdraws it, and a new attempt clears it. The address is recorded with the
+// reporting attempt and the TaskAction's system-retry count, and is delivered
+// only while both are current (AddressFromStatus). A report from an attempt
+// older than the current one changes neither the attempts nor the address.
 func (c *ActionsClient) PutStatus(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus, address *common.ActionAddress) error {
 	taskActionName := buildTaskActionName(actionID)
 
@@ -287,16 +290,23 @@ func (c *ActionsClient) PutStatus(ctx context.Context, actionID *common.ActionId
 		return nil
 	}
 
-	next := nextAddress(taskAction.Status.Address, taskAction.Status.Attempts, status.GetAttempts(), address)
+	attempts := status.GetAttempts()
+	next := taskAction.Status.Address
+	if stale := attempt != 0 && attempt < taskAction.Status.Attempts; stale {
+		// A late report from an older attempt: keep the current attempt and address.
+		attempts = taskAction.Status.Attempts
+	} else {
+		next = nextAddress(taskAction.Status.Address, taskAction.Status.Attempts, attempts, taskAction.Status.SystemRetries, address)
+	}
 
 	// Skip update if the attempts, cache status and address do not change
-	if taskAction.Status.Attempts == status.GetAttempts() &&
+	if taskAction.Status.Attempts == attempts &&
 		taskAction.Status.CacheStatus == status.GetCacheStatus() &&
 		equality.Semantic.DeepEqual(taskAction.Status.Address, next) {
 		return nil
 	}
 
-	taskAction.Status.Attempts = status.GetAttempts()
+	taskAction.Status.Attempts = attempts
 	taskAction.Status.CacheStatus = status.GetCacheStatus()
 	taskAction.Status.Address = next
 
@@ -714,12 +724,16 @@ func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, e
 	}
 }
 
-// nextAddress returns the address a task holds after an update: a new address
-// replaces the held one, none keeps it within the attempt, and a new attempt
-// clears it.
-func nextAddress(held *executorv1.ActionAddress, heldAttempts, attempts uint32, address *common.ActionAddress) *executorv1.ActionAddress {
+// nextAddress returns the address a task holds after an update for attempt
+// `attempts`: a new address replaces the held one (recorded with the attempt and
+// the TaskAction's system-retry count), an empty one withdraws it, none keeps it
+// within the attempt, and a new attempt clears it.
+func nextAddress(held *executorv1.ActionAddress, heldAttempts, attempts, systemRetries uint32, address *common.ActionAddress) *executorv1.ActionAddress {
 	if address != nil {
-		return addressToStatus(address)
+		if isEmptyAddress(address) {
+			return nil
+		}
+		return addressToStatus(address, attempts, systemRetries)
 	}
 	if attempts != heldAttempts {
 		return nil
@@ -727,8 +741,18 @@ func nextAddress(held *executorv1.ActionAddress, heldAttempts, attempts uint32, 
 	return held
 }
 
-func addressToStatus(a *common.ActionAddress) *executorv1.ActionAddress {
-	out := &executorv1.ActionAddress{Path: a.GetPath(), URL: a.GetUrl(), Cluster: a.GetCluster()}
+// isEmptyAddress reports an address with nothing set: a withdrawal.
+func isEmptyAddress(a *common.ActionAddress) bool {
+	p := a.GetPod()
+	return a.GetPath() == "" && a.GetUrl() == "" && a.GetCluster() == "" &&
+		(p == nil || (p.GetNamespace() == "" && p.GetName() == "" && p.GetIp() == "" && p.GetPort() == 0))
+}
+
+func addressToStatus(a *common.ActionAddress, attempt, systemRetries uint32) *executorv1.ActionAddress {
+	out := &executorv1.ActionAddress{
+		Path: a.GetPath(), URL: a.GetUrl(), Cluster: a.GetCluster(),
+		Attempt: attempt, SystemRetries: systemRetries,
+	}
 	if p := a.GetPod(); p != nil {
 		out.Pod = &executorv1.PodAddress{Namespace: p.GetNamespace(), Name: p.GetName(), IP: p.GetIp(), Port: p.GetPort()}
 	}
@@ -736,10 +760,14 @@ func addressToStatus(a *common.ActionAddress) *executorv1.ActionAddress {
 }
 
 // AddressFromStatus is where the running task can be reached, or nil when it
-// reported none or is terminal.
+// reported none, is terminal, or has moved on from the attempt or pod that
+// reported it (a retry, or a system-retry relaunch, the controller started).
 func AddressFromStatus(taskAction *executorv1.TaskAction) *common.ActionAddress {
 	a := taskAction.Status.Address
 	if a == nil || isTerminalPhase(GetPhaseFromConditions(taskAction)) {
+		return nil
+	}
+	if a.Attempt != taskAction.Status.Attempts || a.SystemRetries != taskAction.Status.SystemRetries {
 		return nil
 	}
 	out := &common.ActionAddress{Path: a.Path, Url: a.URL, Cluster: a.Cluster}

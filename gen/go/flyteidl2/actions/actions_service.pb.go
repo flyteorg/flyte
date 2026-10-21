@@ -301,8 +301,10 @@ type UpdateRequest struct {
 	Status *workflow.ActionStatus `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
 	// Where the running action can be reached, once it is ready to serve (e.g. an interactive sandbox
 	// session). It is delivered to watchers on `ActionUpdate.address` without waiting for the action
-	// to finish. It holds for the rest of the attempt: an update without an address keeps it, and a
-	// new attempt or a terminal phase clears it. Watchers are notified when it changes.
+	// to finish. It belongs to the attempt in `attempt`: an update without an address keeps it, an
+	// empty address withdraws it, and it is no longer delivered once a newer attempt starts, the
+	// action's pod is relaunched (a system retry), or the action is terminal. An address reported
+	// for an attempt older than the current one is ignored. Watchers are notified when it changes.
 	Address *common.ActionAddress `protobuf:"bytes,5,opt,name=address,proto3" json:"address,omitempty"`
 }
 

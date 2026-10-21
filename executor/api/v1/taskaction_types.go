@@ -238,9 +238,6 @@ func (in *TaskActionSpec) SetActionSpec(spec *workflow.ActionSpec) error {
 	return nil
 }
 
-// ErrorState captures the structured error returned by the plugin for a
-// failed/aborted attempt. Persisted on TaskAction status so it can be
-// surfaced as a full core.ExecutionError on the ActionUpdate (and reach
 // ActionAddress is where a running action can be reached. Callers use URL when it is set, and
 // otherwise Pod and Path.
 type ActionAddress struct {
@@ -258,6 +255,13 @@ type ActionAddress struct {
 	// Cluster is the cluster the action runs in.
 	// +optional
 	Cluster string `json:"cluster,omitempty"`
+	// Attempt is the attempt that reported the address, and SystemRetries the TaskAction's
+	// system-retry count when it did. The address is delivered only while both are still the
+	// TaskAction's own, so a new attempt or an in-place relaunch never exposes a dead pod.
+	// +optional
+	Attempt uint32 `json:"attempt,omitempty"`
+	// +optional
+	SystemRetries uint32 `json:"systemRetries,omitempty"`
 }
 
 // PodAddress locates a pod that serves an action.
@@ -274,6 +278,9 @@ type PodAddress struct {
 	Port uint32 `json:"port,omitempty"`
 }
 
+// ErrorState captures the structured error returned by the plugin for a
+// failed/aborted attempt. Persisted on TaskAction status so it can be
+// surfaced as a full core.ExecutionError on the ActionUpdate (and reach
 // the SDK with its Code intact, e.g. "OOMKilled").
 type ErrorState struct {
 	// Code is the plugin-defined error code (e.g. "OOMKilled",
@@ -405,8 +412,10 @@ type TaskActionStatus struct {
 
 	// Address is where the running task can be reached, as reported by its worker with
 	// actions.UpdateRequest.address (e.g. an interactive sandbox session). Watchers of the parent
-	// receive it on ActionUpdate.address while the task runs. It is replaced by a later address
-	// and cleared on a new attempt; it is not delivered once the task is terminal.
+	// receive it on ActionUpdate.address while the task runs. The actions service owns it: the
+	// reconciler keeps it when persisting status. A later address replaces it and an empty one
+	// withdraws it; it is not delivered once Attempts or SystemRetries move past the ones it was
+	// reported for, or once the task is terminal.
 	// +optional
 	Address *ActionAddress `json:"address,omitempty"`
 

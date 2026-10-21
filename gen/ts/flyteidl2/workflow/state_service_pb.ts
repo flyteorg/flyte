@@ -274,7 +274,8 @@ export type ActionUpdate = Message<"flyteidl2.workflow.ActionUpdate"> & {
 
   /**
    * Where the running action can be reached, as reported by its worker (`UpdateRequest.address`).
-   * Set while the action serves traffic; cleared on a new attempt or a terminal phase.
+   * Set while the current attempt serves traffic; absent once a newer attempt starts, the action's
+   * pod is relaunched, or the action is terminal.
    *
    * @generated from field: flyteidl2.common.ActionAddress address = 6;
    */

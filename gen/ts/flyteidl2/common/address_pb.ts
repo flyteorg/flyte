@@ -4,13 +4,14 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
+import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file flyteidl2/common/address.proto.
  */
 export const file_flyteidl2_common_address: GenFile = /*@__PURE__*/
-  fileDesc("Ch5mbHl0ZWlkbDIvY29tbW9uL2FkZHJlc3MucHJvdG8SEGZseXRlaWRsMi5jb21tb24iZgoNQWN0aW9uQWRkcmVzcxIpCgNwb2QYASABKAsyHC5mbHl0ZWlkbDIuY29tbW9uLlBvZEFkZHJlc3MSDAoEcGF0aBgCIAEoCRILCgN1cmwYAyABKAkSDwoHY2x1c3RlchgEIAEoCSJHCgpQb2RBZGRyZXNzEhEKCW5hbWVzcGFjZRgBIAEoCRIMCgRuYW1lGAIgASgJEgoKAmlwGAMgASgJEgwKBHBvcnQYBCABKA1CvQEKFGNvbS5mbHl0ZWlkbDIuY29tbW9uQgxBZGRyZXNzUHJvdG9IAlABWjRnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvY29tbW9uogIDRkNYqgIQRmx5dGVpZGwyLkNvbW1vbsoCEEZseXRlaWRsMlxDb21tb27iAhxGbHl0ZWlkbDJcQ29tbW9uXEdQQk1ldGFkYXRh6gIRRmx5dGVpZGwyOjpDb21tb25iBnByb3RvMw");
+  fileDesc("Ch5mbHl0ZWlkbDIvY29tbW9uL2FkZHJlc3MucHJvdG8SEGZseXRlaWRsMi5jb21tb24icwoNQWN0aW9uQWRkcmVzcxIpCgNwb2QYASABKAsyHC5mbHl0ZWlkbDIuY29tbW9uLlBvZEFkZHJlc3MSDAoEcGF0aBgCIAEoCRIYCgN1cmwYAyABKAlCC7pICNgBAXIDiAEBEg8KB2NsdXN0ZXIYBCABKAkiUgoKUG9kQWRkcmVzcxIRCgluYW1lc3BhY2UYASABKAkSDAoEbmFtZRgCIAEoCRIKCgJpcBgDIAEoCRIXCgRwb3J0GAQgASgNQgm6SAYqBBj//wNCvQEKFGNvbS5mbHl0ZWlkbDIuY29tbW9uQgxBZGRyZXNzUHJvdG9IAlABWjRnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvY29tbW9uogIDRkNYqgIQRmx5dGVpZGwyLkNvbW1vbsoCEEZseXRlaWRsMlxDb21tb27iAhxGbHl0ZWlkbDJcQ29tbW9uXEdQQk1ldGFkYXRh6gIRRmx5dGVpZGwyOjpDb21tb25iBnByb3RvMw", [file_buf_validate_validate]);
 
 /**
  * ActionAddress is where a running action can be reached while it serves traffic, for example an
@@ -21,6 +22,8 @@ export const file_flyteidl2_common_address: GenFile = /*@__PURE__*/
  *   2. Otherwise the pod, from inside the cluster: `http://{pod.ip}:{pod.port}{path}`.
  *   3. Later, for callers outside the cluster (such as a user's laptop), the data proxy's pod route:
  *      `/dataplane/pod/v1/{pod.namespace}/{pod.name}{path}`.
+ *
+ * An address with none of its fields set withdraws the one the action reported before.
  *
  * @generated from message flyteidl2.common.ActionAddress
  */

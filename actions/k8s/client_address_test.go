@@ -120,10 +120,12 @@ func TestBuildActionUpdate_Address(t *testing.T) {
 	ta, _ := newTestActionUpdate("session1")
 	assert.Nil(t, buildActionUpdate(ctx, ta, watch.Modified).Address)
 
+	ta.Status.Attempts = 1
 	ta.Status.Address = &executorv1.ActionAddress{
 		Pod:     &executorv1.PodAddress{Namespace: "ns", Name: "agent-0", IP: "10.0.0.7", Port: 8080},
 		Path:    "/s/session1",
 		Cluster: "c1",
+		Attempt: 1,
 	}
 	ta.Status.Conditions = []metav1.Condition{{
 		Type: string(executorv1.ConditionTypeProgressing), Status: "True", Reason: string(executorv1.ConditionReasonExecuting),
@@ -141,8 +143,11 @@ func TestBuildActionUpdate_Address(t *testing.T) {
 }
 
 func TestNextAddress(t *testing.T) {
-	held := &executorv1.ActionAddress{Path: "/a"}
-	assert.Equal(t, "/b", nextAddress(held, 1, 1, &common.ActionAddress{Path: "/b"}).Path, "replaced")
-	assert.Same(t, held, nextAddress(held, 1, 1, nil), "kept within the attempt")
-	assert.Nil(t, nextAddress(held, 1, 2, nil), "cleared by a new attempt")
+	held := &executorv1.ActionAddress{Path: "/a", Attempt: 1}
+	next := nextAddress(held, 1, 1, 0, &common.ActionAddress{Path: "/b"})
+	assert.Equal(t, "/b", next.Path, "replaced")
+	assert.Equal(t, uint32(1), next.Attempt, "recorded with the reporting attempt")
+	assert.Same(t, held, nextAddress(held, 1, 1, 0, nil), "kept within the attempt")
+	assert.Nil(t, nextAddress(held, 1, 2, 0, nil), "cleared by a new attempt")
+	assert.Nil(t, nextAddress(held, 1, 1, 0, &common.ActionAddress{}), "withdrawn by an empty address")
 }

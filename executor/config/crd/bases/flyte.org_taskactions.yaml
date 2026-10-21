@@ -174,9 +174,18 @@ spec:
                 description: |-
                   Address is where the running task can be reached, as reported by its worker with
                   actions.UpdateRequest.address (e.g. an interactive sandbox session). Watchers of the parent
-                  receive it on ActionUpdate.address while the task runs. It is replaced by a later address
-                  and cleared on a new attempt; it is not delivered once the task is terminal.
+                  receive it on ActionUpdate.address while the task runs. The actions service owns it: the
+                  reconciler keeps it when persisting status. A later address replaces it and an empty one
+                  withdraws it; it is not delivered once Attempts or SystemRetries move past the ones it was
+                  reported for, or once the task is terminal.
                 properties:
+                  attempt:
+                    description: |-
+                      Attempt is the attempt that reported the address, and SystemRetries the TaskAction's
+                      system-retry count when it did. The address is delivered only while both are still the
+                      TaskAction's own, so a new attempt or an in-place relaunch never exposes a dead pod.
+                    format: int32
+                    type: integer
                   cluster:
                     description: Cluster is the cluster the action runs in.
                     type: string
@@ -202,6 +211,9 @@ spec:
                         format: int32
                         type: integer
                     type: object
+                  systemRetries:
+                    format: int32
+                    type: integer
                   url:
                     description: |-
                       URL is an endpoint that cannot be derived from Pod (a gateway or tunnel); it takes

@@ -1572,9 +1572,10 @@ export enum WorkerKind {
   SANDBOX = 1,
 
   /**
-   * Runs each task in its own microVM, such as an interactive sandbox session, with no pod.
-   * Needs nodes with hardware virtualization. A task of this kind is never retried: a retry
-   * would start a fresh VM at a new address while callers still hold the old one.
+   * Runs each task in its own microVM, such as an interactive sandbox session, rather than a pod.
+   * It needs a scheduler and workers that support this kind; the open-source executor does not
+   * treat it specially. Schedulers that support it should not retry such a task: a retry would
+   * start a fresh VM at a new address while callers still hold the old one.
    *
    * @generated from enum value: WORKER_KIND_MICROVM = 2;
    */

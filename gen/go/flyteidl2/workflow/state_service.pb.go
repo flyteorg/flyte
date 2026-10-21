@@ -490,7 +490,8 @@ type ActionUpdate struct {
 	// The value literal for the action (used by condition actions).
 	Value *core.Literal `protobuf:"bytes,5,opt,name=value,proto3,oneof" json:"value,omitempty"`
 	// Where the running action can be reached, as reported by its worker (`UpdateRequest.address`).
-	// Set while the action serves traffic; cleared on a new attempt or a terminal phase.
+	// Set while the current attempt serves traffic; absent once a newer attempt starts, the action's
+	// pod is relaunched, or the action is terminal.
 	Address *common.ActionAddress `protobuf:"bytes,6,opt,name=address,proto3" json:"address,omitempty"`
 }
 

@@ -351,3 +351,36 @@ func TestTaskActionToUpdate_FailedWithoutErrorState(t *testing.T) {
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_FAILED, upd.Phase)
 	assert.Nil(t, upd.Error, "no ErrorState on CR should leave ActionUpdate.Error nil")
 }
+
+// The initial watch snapshot carries a running task's address, and drops it
+// once the task is terminal or has moved to another attempt.
+func TestTaskActionToUpdate_Address(t *testing.T) {
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Project: "p", Domain: "d", RunName: "r", ActionName: "session",
+		},
+		Status: executorv1.TaskActionStatus{
+			Attempts: 1,
+			Conditions: []metav1.Condition{{
+				Type: string(executorv1.ConditionTypeProgressing), Status: metav1.ConditionTrue,
+				Reason: string(executorv1.ConditionReasonExecuting),
+			}},
+			Address: &executorv1.ActionAddress{
+				Pod:     &executorv1.PodAddress{Namespace: "ns", Name: "agent-0", IP: "10.0.0.7", Port: 8080},
+				Path:    "/s/session",
+				Attempt: 1,
+			},
+		},
+	}
+
+	upd := taskActionToUpdate(context.Background(), ta)
+	assert.Equal(t, "/s/session", upd.GetAddress().GetPath(), "running: delivered")
+	assert.Equal(t, "10.0.0.7", upd.GetAddress().GetPod().GetIp())
+
+	ta.Status.Attempts = 2
+	assert.Nil(t, taskActionToUpdate(context.Background(), ta).GetAddress(), "a newer attempt: dropped")
+
+	ta.Status.Attempts = 1
+	ta.Status.Conditions = []metav1.Condition{{Type: string(executorv1.ConditionTypeSucceeded), Status: metav1.ConditionTrue}}
+	assert.Nil(t, taskActionToUpdate(context.Background(), ta).GetAddress(), "terminal: dropped")
+}
