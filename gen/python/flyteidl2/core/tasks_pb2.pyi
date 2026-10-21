@@ -65,6 +65,7 @@ class WorkerKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
     WORKER_KIND_UNSPECIFIED: _ClassVar[WorkerKind]
     WORKER_KIND_SANDBOX: _ClassVar[WorkerKind]
+    WORKER_KIND_MICROVM: _ClassVar[WorkerKind]
 ACCELERATOR_MODEL_UNSPECIFIED: AcceleratorModel
 NVIDIA_K80: AcceleratorModel
 NVIDIA_M60: AcceleratorModel
@@ -108,6 +109,7 @@ HABANA_GAUDI1: AcceleratorModel
 APPLE_SILICON_GPU: AcceleratorModel
 WORKER_KIND_UNSPECIFIED: WorkerKind
 WORKER_KIND_SANDBOX: WorkerKind
+WORKER_KIND_MICROVM: WorkerKind
 ACCELERATOR_NAME_FIELD_NUMBER: _ClassVar[int]
 accelerator_name: _descriptor.FieldDescriptor
 

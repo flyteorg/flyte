@@ -153,6 +153,7 @@ func (s *ActionsService) WatchForUpdates(
 				Phase:     update.Phase,
 				OutputUri: update.OutputUri,
 				Value:     update.SignalValue,
+				Address:   update.Address,
 			}
 			if (update.Phase == common.ActionPhase_ACTION_PHASE_FAILED ||
 				update.Phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT) &&
@@ -184,7 +185,7 @@ func (s *ActionsService) Update(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	if err := s.client.PutStatus(ctx, req.Msg.ActionId, req.Msg.Attempt, req.Msg.Status); err != nil {
+	if err := s.client.PutStatus(ctx, req.Msg.ActionId, req.Msg.Attempt, req.Msg.Status, req.Msg.GetAddress()); err != nil {
 		logger.Errorf(ctx, "Failed to update action: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -229,6 +230,7 @@ func taskActionToUpdate(ctx context.Context, action *executorv1.TaskAction) *wor
 		Phase:     phase,
 		OutputUri: k8s.BuildOutputUri(ctx, action),
 		Value:     k8s.SignalValueFromStatus(ctx, action),
+		Address:   k8s.AddressFromStatus(action),
 	}
 	if (phase == common.ActionPhase_ACTION_PHASE_FAILED ||
 		phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT) &&

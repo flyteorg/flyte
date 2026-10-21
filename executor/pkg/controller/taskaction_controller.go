@@ -1234,13 +1234,25 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	}
 
 	if err := r.persistStatusWithRetry(ctx, newTaskAction, func(latest *flyteorgv1.TaskAction) {
-		latest.Status = newTaskAction.Status
+		applyReconciledStatus(latest, newTaskAction)
 	}); err != nil {
 		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
 		return err
 	}
 
 	return nil
+}
+
+// applyReconciledStatus writes the reconciled status onto the re-fetched
+// TaskAction, keeping the fields the actions service owns: the address its
+// worker reported may land after this reconcile read the TaskAction, and
+// copying the whole status would erase it. The controller never clears the
+// address itself; a retry or relaunch hides it by moving Attempts or
+// SystemRetries past the ones it was reported for.
+func applyReconciledStatus(latest, reconciled *flyteorgv1.TaskAction) {
+	address := latest.Status.Address
+	latest.Status = reconciled.Status
+	latest.Status.Address = address
 }
 
 // persistStatusWithRetry re-fetches the TaskAction and applies the status
