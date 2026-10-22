@@ -321,23 +321,21 @@ message WatchRunsResponse {
 
 // Request message for listing actions.
 message ListActionsRequest {
-  option (buf.validate.message).cel = {
-    id: "list_actions.exactly_one_scope"
-    message: "exactly one of run_id or queue_id is required"
-    expression: "has(this.run_id) != has(this.queue_id)"
-  };
-
   // Common list request parameters.
   common.ListRequest request = 1;
 
-  // List all actions belonging to this run. Mutually exclusive with queue_id.
-  common.RunIdentifier run_id = 2;
+  oneof scope_by {
+    option (buf.validate.oneof).required = true;
 
-  // List QUEUED task actions assigned to this queue across runs. Mutually exclusive
-  // with run_id. Services that do not implement queue-scoped listing return
-  // UNIMPLEMENTED. Queue scope restricts the matching actions' project/domain.
-  // The synthetic "search" filter matches action, run, task and project/domain names.
-  common.QueueIdentifier queue_id = 3;
+    // List all actions belonging to this run. Mutually exclusive with queue_id.
+    common.RunIdentifier run_id = 2;
+
+    // List QUEUED task actions assigned to this queue across runs. Mutually exclusive
+    // with run_id. Services that do not implement queue-scoped listing return
+    // UNIMPLEMENTED. Queue scope restricts the matching actions' project/domain.
+    // The synthetic "search" filter matches action, run, task and project/domain names.
+    common.QueueIdentifier queue_id = 3;
+  }
 }
 
 // Response message for listing actions.
