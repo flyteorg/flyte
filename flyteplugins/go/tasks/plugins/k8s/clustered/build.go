@@ -56,9 +56,10 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	// Propagate the node-execution labels/annotations onto the pod template. The plugin
 	// manager's addObjectMetadata only stamps these (incl. execution-id/node-id) on the
 	// top-level JobSet, and the JobSet controller does not copy arbitrary parent labels
-	// down to child pods. Without this, child pods lack execution-id/node-id and the
-	// node-execution-scoped K8sReader.List in getLogContext returns nothing, so no
-	// LogContext reaches the UI. Mirrors ray's buildWorkerPodTemplate.
+	// down to child pods. Without this, child pods lack the flyte.org/managed label the
+	// executor's pod cache is filtered on, so the K8sReader.List calls in getLogContext
+	// and listWorkerPods never see them and no LogContext reaches the UI. Mirrors ray's
+	// buildWorkerPodTemplate.
 	cfg := config.GetK8sPluginConfig()
 	objectMeta.Labels = utils.UnionMaps(cfg.DefaultLabels, objectMeta.Labels,
 		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))

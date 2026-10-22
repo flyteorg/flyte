@@ -6,6 +6,7 @@ import (
 	"time"
 
 	v1 "k8s.io/api/core/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
@@ -87,13 +88,19 @@ func getTaskLogs(ctx context.Context, pluginContext k8s.PluginContext, jobSet *j
 // pods — actual names (including the Job-assigned random suffix), namespace, primary
 // container, and per-container names + process timestamps — so the console can fetch
 // logs natively regardless
-// of log-template config. Best-effort: returns nil on list error or when no pods are
-// ready yet, leaving the templated Logs path as the fallback.
+// of log-template config. Best-effort: returns nil on list error or when none of this
+// JobSet's pods are past Pending yet, leaving the templated Logs path as the fallback.
 func getLogContext(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet) *core.LogContext {
-	// The plugin's K8sReader already scopes List calls to this node execution's
-	// namespace and execution-id/node-id labels, so no extra filters are needed.
+	// K8sReader is NOT scoped to this execution: the executor hands plugins its
+	// cluster-wide cached client, whose cache holds every flyte-managed pod from every
+	// run. Filter explicitly to this JobSet's child pods (the JobSet controller stamps
+	// the jobset-name label on every pod it creates); otherwise an unrelated run's pod
+	// can end up in this action's LogContext.
 	podList := &v1.PodList{}
-	if err := pluginContext.K8sReader().List(ctx, podList); err != nil {
+	if err := pluginContext.K8sReader().List(ctx, podList,
+		client.InNamespace(jobSet.Namespace),
+		client.MatchingLabels{jobsetv1alpha2.JobSetNameKey: jobSet.Name},
+	); err != nil {
 		logger.Warnf(ctx, "failed to list pods for JobSet %s/%s log context: %v", jobSet.Namespace, jobSet.Name, err)
 		return nil
 	}
@@ -122,7 +129,8 @@ func getLogContext(ctx context.Context, pluginContext k8s.PluginContext, jobSet 
 		return nil
 	}
 	// Guarantee PrimaryPodName references a pod in Pods: if rank-0 was pending/absent,
-	// fall back to the first included pod so downstream log streaming can resolve it.
+	// fall back to the first included pod (another rank of this same JobSet, given the
+	// scoped List above) so downstream log streaming can resolve it.
 	if logCtx.PrimaryPodName == "" {
 		logCtx.PrimaryPodName = logCtx.Pods[0].GetPodName()
 	}

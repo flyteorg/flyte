@@ -27,6 +27,7 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	coreMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	pluginIOMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	plugink8s "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	k8smocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
@@ -1465,6 +1466,24 @@ func TestGetTaskPhase_LogContext(t *testing.T) {
 	rank1 := testJobName + "-workers-0-1-a9b8c"
 	rank2 := testJobName + "-workers-0-2-pppp"
 
+	// unrelatedPods returns Running, flyte-managed pods that the executor's cluster-wide
+	// pod cache also holds but that are not children of this JobSet: a plain task pod
+	// from another run and another run's JobSet pod (both in the same namespace, named to
+	// sort ahead of this JobSet's pods), plus a same-named JobSet's rank-0 pod in a
+	// different namespace.
+	unrelatedPods := func() []client.Object {
+		plain := mkPod("a1b2c3d4e5-n0-0", corev1.PodRunning)
+		plain.Labels = map[string]string{flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue}
+		otherJobSet := mkPod("a-other-workers-0-0-qqqqq", corev1.PodRunning)
+		otherJobSet.Labels = map[string]string{
+			flytek8s.ManagedLabelKey:     flytek8s.ManagedLabelValue,
+			jobsetv1alpha2.JobSetNameKey: "a-other",
+		}
+		otherNamespace := mkPod(rank0PodName(testJobName)+"-n5n5n", corev1.PodRunning)
+		otherNamespace.Namespace = "other-namespace"
+		return []client.Object{plain, otherJobSet, otherNamespace}
+	}
+
 	t.Run("primary pod and container resolved from live pods", func(t *testing.T) {
 		js := makeRunningJobSet()
 		fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).
@@ -1501,11 +1520,11 @@ func TestGetTaskPhase_LogContext(t *testing.T) {
 
 	t.Run("primary falls back when rank-0 pod is pending", func(t *testing.T) {
 		js := makeRunningJobSet()
-		fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).
-			WithObjects(
-				mkPod(rank0, corev1.PodPending),
-				mkPod(rank1, corev1.PodRunning),
-			).Build()
+		objs := append([]client.Object{
+			mkPod(rank0, corev1.PodPending),
+			mkPod(rank1, corev1.PodRunning),
+		}, unrelatedPods()...)
+		fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(objs...).Build()
 
 		spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
 		pCtx := dummyPluginCtx(buildTaskTemplate(spec), fakeClient)
@@ -1517,10 +1536,29 @@ func TestGetTaskPhase_LogContext(t *testing.T) {
 		lc := phase.Info().LogContext
 		assert.NotNil(t, lc)
 		// rank-0 is pending and excluded → PrimaryPodName must still reference an
-		// included pod so downstream log streaming can resolve it.
+		// included pod so downstream log streaming can resolve it, and that pod must be
+		// another rank of this JobSet, never an unrelated pod.
 		assert.Len(t, lc.Pods, 1)
 		assert.Equal(t, rank1, lc.PrimaryPodName)
 		assert.Equal(t, lc.Pods[0].GetPodName(), lc.PrimaryPodName)
+	})
+
+	t.Run("no log context from unrelated pods when rank-0 is pending", func(t *testing.T) {
+		// Regression: the pod List used to be unscoped, so with this JobSet's only pod
+		// Pending, the LogContext was built from other runs' pods and PrimaryPodName
+		// pointed at one of them. It must be absent instead.
+		js := makeRunningJobSet()
+		objs := append([]client.Object{mkPod(rank0, corev1.PodPending)}, unrelatedPods()...)
+		fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(objs...).Build()
+
+		spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
+		pCtx := dummyPluginCtx(buildTaskTemplate(spec), fakeClient)
+
+		handler := clusteredResourceHandler{}
+		phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+		assert.Nil(t, phase.Info().LogContext)
 	})
 }
 
