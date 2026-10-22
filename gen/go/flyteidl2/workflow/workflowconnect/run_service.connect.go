@@ -122,7 +122,8 @@ type RunServiceClient interface {
 	// Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
 	// runs or updates to existing ones from the point of invocation.
 	WatchRuns(context.Context, *connect.Request[workflow.WatchRunsRequest]) (*connect.ServerStreamForClient[workflow.WatchRunsResponse], error)
-	// List actions for a run, or queued task actions for a queue when supported.
+	// List actions for a run, or live pending and in-flight task actions for a queue
+	// when supported. Phase filters in the list request select the returned phases.
 	ListActions(context.Context, *connect.Request[workflow.ListActionsRequest]) (*connect.Response[workflow.ListActionsResponse], error)
 	// Stream updates for actions given a run. Responses may include newly discovered nested runs or updates
 	// to  existing ones from the point of invocation.
@@ -397,7 +398,8 @@ type RunServiceHandler interface {
 	// Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
 	// runs or updates to existing ones from the point of invocation.
 	WatchRuns(context.Context, *connect.Request[workflow.WatchRunsRequest], *connect.ServerStream[workflow.WatchRunsResponse]) error
-	// List actions for a run, or queued task actions for a queue when supported.
+	// List actions for a run, or live pending and in-flight task actions for a queue
+	// when supported. Phase filters in the list request select the returned phases.
 	ListActions(context.Context, *connect.Request[workflow.ListActionsRequest]) (*connect.Response[workflow.ListActionsResponse], error)
 	// Stream updates for actions given a run. Responses may include newly discovered nested runs or updates
 	// to  existing ones from the point of invocation.

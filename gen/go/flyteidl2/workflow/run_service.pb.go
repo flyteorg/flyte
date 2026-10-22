@@ -1638,10 +1638,14 @@ type ListActionsRequest_RunId struct {
 }
 
 type ListActionsRequest_QueueId struct {
-	// List QUEUED task actions assigned to this queue across runs. Mutually exclusive
-	// with run_id. Services that do not implement queue-scoped listing return
-	// UNIMPLEMENTED. Queue scope restricts the matching actions' project/domain.
-	// The synthetic "search" filter matches action, run, task and project/domain names.
+	// List live nonterminal task actions assigned to this queue across runs, including
+	// pending and in-flight actions. The "phase" filter in ListRequest.filters selects
+	// the returned phases. Assigned actions whose current execution phase has not
+	// been reported use ACTION_PHASE_UNSPECIFIED until their phase is known.
+	// Mutually exclusive with run_id. Services that do not implement queue-scoped
+	// listing return UNIMPLEMENTED. Queue scope restricts the matching actions'
+	// project/domain. The synthetic "search" filter matches action, run, task and
+	// project/domain names.
 	QueueId *common.QueueIdentifier `protobuf:"bytes,3,opt,name=queue_id,json=queueId,proto3,oneof"`
 }
 

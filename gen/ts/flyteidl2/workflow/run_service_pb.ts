@@ -739,10 +739,14 @@ export type ListActionsRequest = Message<"flyteidl2.workflow.ListActionsRequest"
     case: "runId";
   } | {
     /**
-     * List QUEUED task actions assigned to this queue across runs. Mutually exclusive
-     * with run_id. Services that do not implement queue-scoped listing return
-     * UNIMPLEMENTED. Queue scope restricts the matching actions' project/domain.
-     * The synthetic "search" filter matches action, run, task and project/domain names.
+     * List live nonterminal task actions assigned to this queue across runs, including
+     * pending and in-flight actions. The "phase" filter in ListRequest.filters selects
+     * the returned phases. Assigned actions whose current execution phase has not
+     * been reported use ACTION_PHASE_UNSPECIFIED until their phase is known.
+     * Mutually exclusive with run_id. Services that do not implement queue-scoped
+     * listing return UNIMPLEMENTED. Queue scope restricts the matching actions'
+     * project/domain. The synthetic "search" filter matches action, run, task and
+     * project/domain names.
      *
      * @generated from field: flyteidl2.common.QueueIdentifier queue_id = 3;
      */
@@ -1776,7 +1780,8 @@ export const RunService: GenService<{
     output: typeof WatchRunsResponseSchema;
   },
   /**
-   * List actions for a run, or queued task actions for a queue when supported.
+   * List actions for a run, or live pending and in-flight task actions for a queue
+   * when supported. Phase filters in the list request select the returned phases.
    *
    * @generated from rpc flyteidl2.workflow.RunService.ListActions
    */
