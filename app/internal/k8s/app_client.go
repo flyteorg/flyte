@@ -61,7 +61,8 @@ const (
 	// maxKServiceNameLen is the Kubernetes DNS label limit.
 	maxKServiceNameLen = 63
 
-	defaultAppPort = int32(8080)
+	defaultAppPort     = int32(8080)
+	defaultAppPortName = "http-app"
 )
 
 // AppK8sClientInterface defines the App Deployment/Service lifecycle operations for the App service.
@@ -166,6 +167,10 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 	} else if err != nil {
 		return fmt.Errorf("failed to get Service %s: %w", name, err)
 	} else {
+		if isLegacyOrExternalService(existingSvc) {
+			return fmt.Errorf("refusing to overwrite legacy Knative or ExternalName Service %s/%s; delete the legacy resource before deploying", ns, name)
+		}
+		existingSvc.Spec.Type = corev1.ServiceTypeClusterIP
 		existingSvc.Spec.Ports = svc.Spec.Ports
 		existingSvc.Spec.Selector = svc.Spec.Selector
 		if existingSvc.Labels == nil {
@@ -203,11 +208,11 @@ func (c *AppK8sClient) Deploy(ctx context.Context, app *flyteapp.App) error {
 	if existing.Labels == nil {
 		existing.Labels = make(map[string]string)
 	}
+	delete(existing.Labels, labelAppStopped)
+	delete(existing.Labels, labelKnativeVisibility)
 	for k, v := range deploy.Labels {
 		existing.Labels[k] = v
 	}
-	delete(existing.Labels, labelAppStopped)
-	delete(existing.Labels, labelKnativeVisibility)
 	if existing.Annotations == nil {
 		existing.Annotations = make(map[string]string)
 	}
@@ -529,7 +534,11 @@ func (c *AppK8sClient) PublicIngress(id *flyteapp.Identifier) *flyteapp.Ingress 
 	ksvcName := KServiceName(id)
 	if strings.Contains(c.cfg.BaseDomain, "/") {
 		base := strings.TrimRight(c.cfg.BaseDomain, "/")
-		return &flyteapp.Ingress{PublicUrl: fmt.Sprintf("%s://%s/%s/", scheme, base, ksvcName)}
+		host, pathPrefix, _ := strings.Cut(base, "/")
+		if c.cfg.IngressAppsPort != 0 && !strings.Contains(host, ":") {
+			host = fmt.Sprintf("%s:%d", host, c.cfg.IngressAppsPort)
+		}
+		return &flyteapp.Ingress{PublicUrl: fmt.Sprintf("%s://%s/%s/%s/", scheme, host, pathPrefix, ksvcName)}
 	}
 	host := strings.ToLower(fmt.Sprintf("%s.%s", ksvcName, c.cfg.BaseDomain))
 	url := scheme + "://" + host
@@ -580,15 +589,177 @@ func specSHA(specBytes []byte) string {
 	return hex.EncodeToString(sum[:8])
 }
 
-func primaryAppPort(podSpec *corev1.PodSpec) int32 {
-	for _, c := range podSpec.Containers {
+func primaryContainerIndex(spec *flyteapp.Spec, podSpec *corev1.PodSpec) int {
+	targetName := primaryContainerName(spec, *podSpec)
+	for i, c := range podSpec.Containers {
+		if c.Name == targetName {
+			return i
+		}
+	}
+	for i, c := range podSpec.Containers {
 		for _, p := range c.Ports {
 			if p.ContainerPort > 0 {
-				return p.ContainerPort
+				return i
 			}
 		}
 	}
+	return 0
+}
+
+func primaryAppPort(spec *flyteapp.Spec, podSpec *corev1.PodSpec) int32 {
+	if len(podSpec.Containers) == 0 {
+		return defaultAppPort
+	}
+	idx := primaryContainerIndex(spec, podSpec)
+	for _, p := range podSpec.Containers[idx].Ports {
+		if p.ContainerPort > 0 {
+			return p.ContainerPort
+		}
+	}
 	return defaultAppPort
+}
+
+func isLegacyOrExternalService(svc *corev1.Service) bool {
+	if svc.Spec.Type == corev1.ServiceTypeExternalName {
+		return true
+	}
+	for _, ref := range svc.OwnerReferences {
+		if strings.Contains(ref.APIVersion, "knative.dev") {
+			return true
+		}
+	}
+	return false
+}
+
+func rewriteHandlerPortRef(h *corev1.ProbeHandler, oldName string, replacement intstr.IntOrString) {
+	if h == nil || oldName == "" {
+		return
+	}
+	if h.HTTPGet != nil && h.HTTPGet.Port.Type == intstr.String && h.HTTPGet.Port.StrVal == oldName {
+		httpGetCopy := *h.HTTPGet
+		httpGetCopy.Port = replacement
+		h.HTTPGet = &httpGetCopy
+	}
+	if h.TCPSocket != nil && h.TCPSocket.Port.Type == intstr.String && h.TCPSocket.Port.StrVal == oldName {
+		tcpCopy := *h.TCPSocket
+		tcpCopy.Port = replacement
+		h.TCPSocket = &tcpCopy
+	}
+}
+
+func rewriteLifecycleHandlerPortRef(h *corev1.LifecycleHandler, oldName string, replacement intstr.IntOrString) {
+	if h == nil || oldName == "" {
+		return
+	}
+	if h.HTTPGet != nil && h.HTTPGet.Port.Type == intstr.String && h.HTTPGet.Port.StrVal == oldName {
+		httpGetCopy := *h.HTTPGet
+		httpGetCopy.Port = replacement
+		h.HTTPGet = &httpGetCopy
+	}
+	if h.TCPSocket != nil && h.TCPSocket.Port.Type == intstr.String && h.TCPSocket.Port.StrVal == oldName {
+		tcpCopy := *h.TCPSocket
+		tcpCopy.Port = replacement
+		h.TCPSocket = &tcpCopy
+	}
+}
+
+func rewriteContainerPortRefs(c *corev1.Container, oldName string, replacement intstr.IntOrString) {
+	if oldName == "" {
+		return
+	}
+	if c.LivenessProbe != nil {
+		probeCopy := *c.LivenessProbe
+		rewriteHandlerPortRef(&probeCopy.ProbeHandler, oldName, replacement)
+		c.LivenessProbe = &probeCopy
+	}
+	if c.ReadinessProbe != nil {
+		probeCopy := *c.ReadinessProbe
+		rewriteHandlerPortRef(&probeCopy.ProbeHandler, oldName, replacement)
+		c.ReadinessProbe = &probeCopy
+	}
+	if c.StartupProbe != nil {
+		probeCopy := *c.StartupProbe
+		rewriteHandlerPortRef(&probeCopy.ProbeHandler, oldName, replacement)
+		c.StartupProbe = &probeCopy
+	}
+	if c.Lifecycle != nil {
+		lcCopy := *c.Lifecycle
+		if lcCopy.PostStart != nil {
+			psCopy := *lcCopy.PostStart
+			rewriteLifecycleHandlerPortRef(&psCopy, oldName, replacement)
+			lcCopy.PostStart = &psCopy
+		}
+		if lcCopy.PreStop != nil {
+			psCopy := *lcCopy.PreStop
+			rewriteLifecycleHandlerPortRef(&psCopy, oldName, replacement)
+			lcCopy.PreStop = &psCopy
+		}
+		c.Lifecycle = &lcCopy
+	}
+}
+
+// ensurePrimaryServingPort guarantees that the primary serving container declares a stable
+// named port (defaultAppPortName) and a default readiness probe targeting that named port.
+// Using a stable named targetPort on the Service prevents port-changing updates from sending
+// traffic to the new numeric port on old pods while a rolling update is in progress.
+func ensurePrimaryServingPort(spec *flyteapp.Spec, podSpec *corev1.PodSpec) int32 {
+	appPort := primaryAppPort(spec, podSpec)
+	if len(podSpec.Containers) == 0 {
+		return appPort
+	}
+	primaryIdx := primaryContainerIndex(spec, podSpec)
+	for i := range podSpec.Containers {
+		if len(podSpec.Containers[i].Ports) > 0 {
+			podSpec.Containers[i].Ports = append([]corev1.ContainerPort(nil), podSpec.Containers[i].Ports...)
+		}
+		if i != primaryIdx {
+			for j := range podSpec.Containers[i].Ports {
+				if podSpec.Containers[i].Ports[j].Name == defaultAppPortName {
+					rewriteContainerPortRefs(&podSpec.Containers[i], defaultAppPortName, intstr.FromInt32(podSpec.Containers[i].Ports[j].ContainerPort))
+					podSpec.Containers[i].Ports[j].Name = ""
+				}
+			}
+		}
+	}
+
+	primary := &podSpec.Containers[primaryIdx]
+	primaryPortIdx := -1
+	for j := range primary.Ports {
+		if primary.Ports[j].ContainerPort > 0 {
+			primaryPortIdx = j
+			break
+		}
+	}
+	for j := range primary.Ports {
+		if j != primaryPortIdx && primary.Ports[j].Name == defaultAppPortName {
+			rewriteContainerPortRefs(primary, defaultAppPortName, intstr.FromInt32(primary.Ports[j].ContainerPort))
+			primary.Ports[j].Name = ""
+		}
+	}
+	if primaryPortIdx >= 0 {
+		oldName := primary.Ports[primaryPortIdx].Name
+		primary.Ports[primaryPortIdx].Name = defaultAppPortName
+		if oldName != "" && oldName != defaultAppPortName {
+			rewriteContainerPortRefs(primary, oldName, intstr.FromString(defaultAppPortName))
+		}
+	} else {
+		primary.Ports = append(primary.Ports, corev1.ContainerPort{
+			Name:          defaultAppPortName,
+			ContainerPort: appPort,
+			Protocol:      corev1.ProtocolTCP,
+		})
+	}
+	if primary.ReadinessProbe == nil {
+		primary.ReadinessProbe = &corev1.Probe{
+			ProbeHandler: corev1.ProbeHandler{
+				TCPSocket: &corev1.TCPSocketAction{
+					Port: intstr.FromString(defaultAppPortName),
+				},
+			},
+			PeriodSeconds: 5,
+		}
+	}
+	return appPort
 }
 
 // AppleSiliconWorkloadID scopes an Apple Silicon app's host workload to one revision of its spec. During a
@@ -599,12 +770,26 @@ func AppleSiliconWorkloadID(name, specSHA string) string {
 }
 
 func resolveRawOutputDataPrefix(appID *flyteapp.Identifier, podSpec *corev1.PodSpec, cfg *config.InternalAppConfig) string {
+	var artifactsBucket, primaryBucket string
 	for _, c := range podSpec.Containers {
 		for _, e := range c.Env {
-			if (e.Name == "DUNE_ARTIFACTS_BUCKET" || e.Name == "DUNE_PRIMARY_BUCKET") && e.Value != "" {
-				return fmt.Sprintf("gs://%s/flyte-apps/%s/%s/%s", e.Value, appID.GetProject(), appID.GetDomain(), appID.GetName())
+			if e.Value == "" {
+				continue
+			}
+			switch e.Name {
+			case "DUNE_ARTIFACTS_BUCKET":
+				artifactsBucket = e.Value
+			case "DUNE_PRIMARY_BUCKET":
+				primaryBucket = e.Value
 			}
 		}
+	}
+	bucket := artifactsBucket
+	if bucket == "" {
+		bucket = primaryBucket
+	}
+	if bucket != "" {
+		return fmt.Sprintf("gs://%s/flyte-apps/%s/%s/%s", bucket, appID.GetProject(), appID.GetDomain(), appID.GetName())
 	}
 	if cfg != nil && cfg.DefaultEnvVars != nil {
 		if base := cfg.DefaultEnvVars["RAW_OUTPUT_DATA_PREFIX"]; base != "" {
@@ -746,6 +931,8 @@ func (c *AppK8sClient) buildAppResources(app *flyteapp.App) (*appsv1.Deployment,
 		objLabels[labelKnativeVisibility] = visibilityClusterLocal
 	}
 
+	appPort := ensurePrimaryServingPort(spec, &podSpec)
+
 	deploy := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
@@ -775,18 +962,18 @@ func (c *AppK8sClient) buildAppResources(app *flyteapp.App) (*appsv1.Deployment,
 		},
 	}
 
-	appPort := primaryAppPort(&podSpec)
+	targetPort := intstr.FromString(defaultAppPortName)
 	svcPorts := []corev1.ServicePort{
 		{
 			Name:       "http",
 			Port:       80,
-			TargetPort: intstr.FromInt32(appPort),
+			TargetPort: targetPort,
 			Protocol:   corev1.ProtocolTCP,
 		},
 		{
 			Name:       "http-app",
 			Port:       8080,
-			TargetPort: intstr.FromInt32(appPort),
+			TargetPort: targetPort,
 			Protocol:   corev1.ProtocolTCP,
 		},
 	}
@@ -794,7 +981,7 @@ func (c *AppK8sClient) buildAppResources(app *flyteapp.App) (*appsv1.Deployment,
 		svcPorts = append(svcPorts, corev1.ServicePort{
 			Name:       "http-custom",
 			Port:       appPort,
-			TargetPort: intstr.FromInt32(appPort),
+			TargetPort: targetPort,
 			Protocol:   corev1.ProtocolTCP,
 		})
 	}
@@ -831,8 +1018,8 @@ func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 		container := corev1.Container{
 			Name:    "app",
 			Image:   c.GetImage(),
-			Command: c.GetCommand(),
-			Args:    c.GetArgs(),
+			Command: append([]string(nil), c.GetCommand()...),
+			Args:    append([]string(nil), c.GetArgs()...),
 		}
 		for _, e := range c.GetEnv() {
 			container.Env = append(container.Env, corev1.EnvVar{
@@ -981,8 +1168,18 @@ func (c *AppK8sClient) deploymentToStatus(ctx context.Context, deploy *appsv1.De
 		}
 	}
 
-	serviceReady := (availableCond != nil && availableCond.Status == corev1.ConditionTrue) || deploy.Status.ReadyReplicas > 0
-	serviceFailed := (failureCond != nil && failureCond.Status == corev1.ConditionTrue) || (progressingCond != nil && progressingCond.Status == corev1.ConditionFalse)
+	generationStale := deploy.Generation > 0 && deploy.Status.ObservedGeneration < deploy.Generation
+	desiredReplicas := int32(0)
+	if deploy.Spec.Replicas != nil {
+		desiredReplicas = *deploy.Spec.Replicas
+	}
+	rolloutIncomplete := desiredReplicas > 0 && (deploy.Generation > 0 || deploy.Status.UpdatedReplicas > 0) &&
+		(deploy.Status.UpdatedReplicas < desiredReplicas || deploy.Status.AvailableReplicas < desiredReplicas)
+
+	serviceReady := !generationStale && !rolloutIncomplete &&
+		((availableCond != nil && availableCond.Status == corev1.ConditionTrue) || deploy.Status.ReadyReplicas > 0)
+	serviceFailed := !generationStale &&
+		((failureCond != nil && failureCond.Status == corev1.ConditionTrue) || (progressingCond != nil && progressingCond.Status == corev1.ConditionFalse))
 
 	var conditions []*flyteapp.Condition
 	if serviceFailed {

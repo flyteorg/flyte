@@ -18,6 +18,7 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	k8swatch "k8s.io/apimachinery/pkg/watch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -105,6 +106,52 @@ func TestDeploy_Create(t *testing.T) {
 	assert.Equal(t, "myapp-proj-dev", svc.Spec.Selector[labelKnativeService])
 }
 
+func TestDeploy_ServiceUsesNamedTargetPortAcrossPortUpdate(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:1.0")
+	app.Spec.GetContainer().Ports = []*flytecoreapp.ContainerPort{
+		{ContainerPort: 8080, Name: "web"},
+	}
+
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	deploy := &appsv1.Deployment{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, deploy))
+	require.Len(t, deploy.Spec.Template.Spec.Containers[0].Ports, 1)
+	assert.Equal(t, int32(8080), deploy.Spec.Template.Spec.Containers[0].Ports[0].ContainerPort)
+	assert.Equal(t, defaultAppPortName, deploy.Spec.Template.Spec.Containers[0].Ports[0].Name)
+	require.NotNil(t, deploy.Spec.Template.Spec.Containers[0].ReadinessProbe)
+	assert.Equal(t, intstr.FromString(defaultAppPortName),
+		deploy.Spec.Template.Spec.Containers[0].ReadinessProbe.TCPSocket.Port)
+
+	svc := &corev1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, svc))
+	for _, p := range svc.Spec.Ports {
+		assert.Equal(t, intstr.FromString(defaultAppPortName), p.TargetPort)
+	}
+
+	// Update listening port from 8080 -> 9090; Service targetPort stays the named port "http-app".
+	app.Spec.GetContainer().Ports = []*flytecoreapp.ContainerPort{
+		{ContainerPort: 9090, Name: "web-v2"},
+	}
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, deploy))
+	require.Len(t, deploy.Spec.Template.Spec.Containers[0].Ports, 1)
+	assert.Equal(t, int32(9090), deploy.Spec.Template.Spec.Containers[0].Ports[0].ContainerPort)
+	assert.Equal(t, defaultAppPortName, deploy.Spec.Template.Spec.Containers[0].Ports[0].Name)
+
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, svc))
+	require.Len(t, svc.Spec.Ports, 3)
+	for _, p := range svc.Spec.Ports {
+		assert.Equal(t, intstr.FromString(defaultAppPortName), p.TargetPort)
+	}
+}
+
 func TestDeploy_PodTemplateMetadataAndRawOutputDataPrefix(t *testing.T) {
 	c := testClient(t)
 	podSpecMap := map[string]interface{}{
@@ -168,11 +215,122 @@ func TestPublicIngress_PathPrefixAndSubdomain(t *testing.T) {
 		c.PublicIngress(id).GetPublicUrl(),
 	)
 
+	c.cfg.Scheme = "http"
+	c.cfg.BaseDomain = "example.com/apps"
+	c.cfg.IngressAppsPort = 30080
+	assert.Equal(t,
+		"http://example.com:30080/apps/one-rf-explorer-ds-all-development/",
+		c.PublicIngress(id).GetPublicUrl(),
+	)
+
+	c.cfg.Scheme = ""
+	c.cfg.IngressAppsPort = 0
 	c.cfg.BaseDomain = "example.com"
 	assert.Equal(t,
 		"https://one-rf-explorer-ds-all-development.example.com",
 		c.PublicIngress(id).GetPublicUrl(),
 	)
+}
+
+func TestDeploy_RejectsLegacyKnativeOrExternalNameService(t *testing.T) {
+	legacySvc := &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "myapp-proj-dev",
+			Namespace: AppNamespace,
+			OwnerReferences: []metav1.OwnerReference{
+				{
+					APIVersion: "serving.knative.dev/v1",
+					Kind:       "Route",
+					Name:       "myapp-proj-dev",
+				},
+			},
+		},
+		Spec: corev1.ServiceSpec{
+			Type:         corev1.ServiceTypeExternalName,
+			ExternalName: "kourier-internal.kourier-system.svc.cluster.local",
+		},
+	}
+	c := testClient(t, legacySvc)
+	err := c.Deploy(context.Background(), testApp("proj", "dev", "myapp", "nginx:latest"))
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "refusing to overwrite legacy Knative or ExternalName Service")
+}
+
+func TestDeploy_PreservesNamedPortReferencesInProbesAndSidecars(t *testing.T) {
+	c := testClient(t)
+	podSpecMap := map[string]interface{}{
+		"containers": []map[string]interface{}{
+			{
+				"name":  "app",
+				"image": "my-image:v1",
+				"ports": []map[string]interface{}{
+					{"containerPort": float64(8080), "name": "web"},
+					{"containerPort": float64(9090), "name": defaultAppPortName},
+				},
+				"readinessProbe": map[string]interface{}{
+					"httpGet": map[string]interface{}{
+						"path": "/healthz",
+						"port": "web",
+					},
+				},
+				"livenessProbe": map[string]interface{}{
+					"httpGet": map[string]interface{}{
+						"path": "/metrics",
+						"port": defaultAppPortName,
+					},
+				},
+				"lifecycle": map[string]interface{}{
+					"preStop": map[string]interface{}{
+						"httpGet": map[string]interface{}{
+							"path": "/drain",
+							"port": "web",
+						},
+					},
+				},
+			},
+			{
+				"name":  "metrics",
+				"image": "prom/exporter:v1",
+				"ports": []map[string]interface{}{
+					{"containerPort": float64(9091), "name": defaultAppPortName},
+				},
+				"livenessProbe": map[string]interface{}{
+					"tcpSocket": map[string]interface{}{
+						"port": defaultAppPortName,
+					},
+				},
+			},
+		},
+	}
+	app := &flyteapp.App{
+		Metadata: &flyteapp.Meta{
+			Id: &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"},
+		},
+		Spec: &flyteapp.Spec{
+			AppPayload: &flyteapp.Spec_Pod{
+				Pod: &flytecoreapp.K8SPod{
+					PrimaryContainerName: "app",
+					PodSpec:              transformStructToStructPB(t, podSpecMap),
+				},
+			},
+		},
+	}
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	deploy := &appsv1.Deployment{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, deploy))
+
+	primary := deploy.Spec.Template.Spec.Containers[0]
+	assert.Equal(t, defaultAppPortName, primary.Ports[0].Name)
+	assert.Empty(t, primary.Ports[1].Name)
+	assert.Equal(t, intstr.FromString(defaultAppPortName), primary.ReadinessProbe.HTTPGet.Port)
+	assert.Equal(t, intstr.FromInt32(9090), primary.LivenessProbe.HTTPGet.Port)
+	assert.Equal(t, intstr.FromString(defaultAppPortName), primary.Lifecycle.PreStop.HTTPGet.Port)
+
+	sidecar := deploy.Spec.Template.Spec.Containers[1]
+	assert.Empty(t, sidecar.Ports[0].Name)
+	assert.Equal(t, intstr.FromInt32(9091), sidecar.LivenessProbe.TCPSocket.Port)
 }
 
 func TestDeploy_InjectsInternalAppEndpointPattern(t *testing.T) {
@@ -346,6 +504,37 @@ func TestDeploy_AfterStop_ClearsStoppedLabels(t *testing.T) {
 	assert.False(t, stopped, "app-stopped label must be cleared after Deploy following a Stop")
 	_, visibility := deploy.Labels[labelKnativeVisibility]
 	assert.False(t, visibility, "visibility label must be cleared after Deploy following a Stop")
+}
+
+func TestDeploy_RedeployStoppedSpecRetainsStoppedLabel(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:1.0")
+	app.Spec.DesiredState = flyteapp.Spec_DESIRED_STATE_STOPPED
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	// Redeploy the same STOPPED spec and an updated STOPPED spec.
+	require.NoError(t, c.Deploy(context.Background(), app))
+	app.Spec.GetContainer().Image = "nginx:2.0"
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	deploy := &appsv1.Deployment{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, deploy))
+	assert.Equal(t, "true", deploy.Labels[labelAppStopped], "app-stopped label must be retained when redeploying STOPPED spec")
+	require.NotNil(t, deploy.Spec.Replicas)
+	assert.Equal(t, int32(0), *deploy.Spec.Replicas)
+
+	// Simulate Kubernetes setting Available=True on a zero-replica Deployment.
+	deploy.Status.Conditions = []appsv1.DeploymentCondition{{
+		Type:   appsv1.DeploymentAvailable,
+		Status: corev1.ConditionTrue,
+	}}
+	require.NoError(t, c.k8sClient.Status().Update(context.Background(), deploy))
+
+	got, err := c.GetApp(context.Background(), app.Metadata.Id)
+	require.NoError(t, err)
+	require.Len(t, got.Status.Conditions, 1)
+	assert.Equal(t, flyteapp.Status_DEPLOYMENT_STATUS_STOPPED, got.Status.Conditions[0].DeploymentStatus)
 }
 
 func TestStop(t *testing.T) {

@@ -46,8 +46,11 @@ rules:
     resources: ["configmaps", "leases"]
     verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
   {{- if .Values.components.app.enabled }}
-  - apiGroups: ["serving.knative.dev"]
-    resources: ["services", "revisions", "configurations", "routes"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+  - apiGroups: [""]
+    resources: ["services"]
     verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
   {{- end }}
   {{- with .Values.rbac.extraRules }}

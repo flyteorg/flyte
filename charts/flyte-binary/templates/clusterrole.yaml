@@ -105,17 +105,25 @@ rules:
       - update
       - watch
   {{- if dig "inline" "internalApps" "enabled" false (.Values.configuration | default dict) }}
-  # Knative Serving access for the data-plane app controller, added automatically
-  # when apps are enabled (configuration.inline.internalApps.enabled) so operators
-  # don't have to hand-maintain rbac.extraRules. The controller creates and watches
-  # KServices and deletes their Revisions when an app is stopped.
+  # Native Kubernetes Deployment and Service access for the data-plane app controller,
+  # added automatically when apps are enabled (configuration.inline.internalApps.enabled)
+  # so operators don't have to hand-maintain rbac.extraRules.
   - apiGroups:
-      - serving.knative.dev
+      - apps
+    resources:
+      - deployments
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
     resources:
       - services
-      - revisions
-      - configurations
-      - routes
     verbs:
       - create
       - delete
