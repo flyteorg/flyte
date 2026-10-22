@@ -134,6 +134,19 @@ class Inputs(_message.Message):
     context: _containers.RepeatedCompositeFieldContainer[_literals_pb2.KeyValuePair]
     def __init__(self, literals: _Optional[_Iterable[_Union[NamedLiteral, _Mapping]]] = ..., context: _Optional[_Iterable[_Union[_literals_pb2.KeyValuePair, _Mapping]]] = ...) -> None: ...
 
+class ActionInputOverridesData(_message.Message):
+    __slots__ = ["overrides"]
+    class OverridesEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: Inputs
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[Inputs, _Mapping]] = ...) -> None: ...
+    OVERRIDES_FIELD_NUMBER: _ClassVar[int]
+    overrides: _containers.MessageMap[str, Inputs]
+    def __init__(self, overrides: _Optional[_Mapping[str, Inputs]] = ...) -> None: ...
+
 class ProducedArtifact(_message.Message):
     __slots__ = ["output", "name", "version", "info", "type", "parent_artifacts", "partitions", "time_partition"]
     OUTPUT_FIELD_NUMBER: _ClassVar[int]

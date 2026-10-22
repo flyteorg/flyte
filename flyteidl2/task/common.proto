@@ -138,6 +138,14 @@ message Inputs {
   repeated flyteidl2.core.KeyValuePair context = 2;
 }
 
+// ActionInputOverridesData is the file referenced by ActionInputOverrides.uri. The
+// controller of each overridden action's parent overlays these values, by input
+// name, on the inputs it computes for that action.
+message ActionInputOverridesData {
+  // Action name in the run being recovered -> partial inputs.
+  map<string, Inputs> overrides = 1;
+}
+
 // Declares that a named output of the producing action is a new artifact
 // version. The output's literal (in Outputs.literals) is the artifact's value;
 // org/project/domain come from the producing action's scope at registration.

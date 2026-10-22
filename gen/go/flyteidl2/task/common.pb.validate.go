@@ -1301,6 +1301,154 @@ var _ interface {
 	ErrorName() string
 } = InputsValidationError{}
 
+// Validate checks the field values on ActionInputOverridesData with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ActionInputOverridesData) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ActionInputOverridesData with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ActionInputOverridesDataMultiError, or nil if none found.
+func (m *ActionInputOverridesData) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ActionInputOverridesData) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	{
+		sorted_keys := make([]string, len(m.GetOverrides()))
+		i := 0
+		for key := range m.GetOverrides() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetOverrides()[key]
+			_ = val
+
+			// no validation rules for Overrides[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, ActionInputOverridesDataValidationError{
+							field:  fmt.Sprintf("Overrides[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, ActionInputOverridesDataValidationError{
+							field:  fmt.Sprintf("Overrides[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return ActionInputOverridesDataValidationError{
+						field:  fmt.Sprintf("Overrides[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
+	if len(errors) > 0 {
+		return ActionInputOverridesDataMultiError(errors)
+	}
+
+	return nil
+}
+
+// ActionInputOverridesDataMultiError is an error wrapping multiple validation
+// errors returned by ActionInputOverridesData.ValidateAll() if the designated
+// constraints aren't met.
+type ActionInputOverridesDataMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ActionInputOverridesDataMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ActionInputOverridesDataMultiError) AllErrors() []error { return m }
+
+// ActionInputOverridesDataValidationError is the validation error returned by
+// ActionInputOverridesData.Validate if the designated constraints aren't met.
+type ActionInputOverridesDataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ActionInputOverridesDataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ActionInputOverridesDataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ActionInputOverridesDataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ActionInputOverridesDataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ActionInputOverridesDataValidationError) ErrorName() string {
+	return "ActionInputOverridesDataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ActionInputOverridesDataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sActionInputOverridesData.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ActionInputOverridesDataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ActionInputOverridesDataValidationError{}
+
 // Validate checks the field values on ProducedArtifact with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.

@@ -27,7 +27,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/task/run.proto.
  */
 export const file_flyteidl2_task_run: GenFile = /*@__PURE__*/
-  fileDesc("ChhmbHl0ZWlkbDIvdGFzay9ydW4ucHJvdG8SDmZseXRlaWRsMi50YXNrImsKBkxhYmVscxIyCgZ2YWx1ZXMYASADKAsyIi5mbHl0ZWlkbDIudGFzay5MYWJlbHMuVmFsdWVzRW50cnkaLQoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJ1CgtBbm5vdGF0aW9ucxI3CgZ2YWx1ZXMYASADKAsyJy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucy5WYWx1ZXNFbnRyeRotCgtWYWx1ZXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIjQKBEVudnMSLAoGdmFsdWVzGAEgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyIikKDlJhd0RhdGFTdG9yYWdlEhcKD3Jhd19kYXRhX3ByZWZpeBgBIAEoCSJkCgtDYWNoZUNvbmZpZxIXCg9vdmVyd3JpdGVfY2FjaGUYASABKAgSPAoSY2FjaGVfbG9va3VwX3Njb3BlGAIgASgOMiAuZmx5dGVpZGwyLnRhc2suQ2FjaGVMb29rdXBTY29wZSI0CgdSZWNvdmVyEikKE2ZvcmNlX3JlcnVuX2FjdGlvbnMYASADKAlCDLpICZIBBiIEcgIQASKWBwoHUnVuU3BlYxImCgZsYWJlbHMYASABKAsyFi5mbHl0ZWlkbDIudGFzay5MYWJlbHMSMAoLYW5ub3RhdGlvbnMYAiABKAsyGy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucxIiCgRlbnZzGAMgASgLMhQuZmx5dGVpZGwyLnRhc2suRW52cxIxCg1pbnRlcnJ1cHRpYmxlGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLkJvb2xWYWx1ZRIbCg9vdmVyd3JpdGVfY2FjaGUYBSABKAhCAhgBEg0KBXF1ZXVlGAYgASgJEjgKEHJhd19kYXRhX3N0b3JhZ2UYByABKAsyHi5mbHl0ZWlkbDIudGFzay5SYXdEYXRhU3RvcmFnZRI5ChBzZWN1cml0eV9jb250ZXh0GAggASgLMh8uZmx5dGVpZGwyLmNvcmUuU2VjdXJpdHlDb250ZXh0EjEKDGNhY2hlX2NvbmZpZxgJIAEoCzIbLmZseXRlaWRsMi50YXNrLkNhY2hlQ29uZmlnEiAKFm5vdGlmaWNhdGlvbl9ydWxlX25hbWUYCiABKAlIABI8ChJub3RpZmljYXRpb25fcnVsZXMYCyABKAsyHi5mbHl0ZWlkbDIudGFzay5JbmxpbmVSdWxlTGlzdEgAEjIKDnJ1bl9zdGFydF90aW1lGAwgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIeChZtYXhfYWN0aW9uX2NvbmN1cnJlbmN5GA0gASgNEhQKDHJ1bl9iYXNlX2RpchgOIAEoCRI3CgpyZWxhdGVkX3RvGA8gASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQgIYARIUCgxjbHVzdGVyX3Bvb2wYECABKAkSOAoQdGFza19zcGVjX3NvdXJjZRgRIAEoDjIeLmZseXRlaWRsMi50YXNrLlRhc2tTcGVjU291cmNlEiwKCHJlbGF0aW9uGBIgASgLMhouZmx5dGVpZGwyLmNvbW1vbi5SZWxhdGlvbhIoCgdyZWNvdmVyGBMgASgLMhcuZmx5dGVpZGwyLnRhc2suUmVjb3ZlchI5ChBkZWZhdWx0X3NldHRpbmdzGBQgASgLMh8uZmx5dGVpZGwyLnRhc2suRGVmYXVsdFNldHRpbmdzQhcKFW5vdGlmaWNhdGlvbl9zZXR0aW5nc1IHY2x1c3RlciJyCg9EZWZhdWx0U2V0dGluZ3MSGQoRcG9kX3RlbXBsYXRlX25hbWUYASABKAkSRAoWdGFza19yZXNvdXJjZV9kZWZhdWx0cxgCIAEoCzIkLmZseXRlaWRsMi50YXNrLlRhc2tSZXNvdXJjZURlZmF1bHRzIsQBChRUYXNrUmVzb3VyY2VEZWZhdWx0cxI5CghyZXF1ZXN0cxgBIAMoCzInLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcy5SZXNvdXJjZUVudHJ5EjQKA21heBgCIAMoCzInLmZseXRlaWRsMi5jb3JlLlJlc291cmNlcy5SZXNvdXJjZUVudHJ5EjsKE2RlZmF1bHRfYWNjZWxlcmF0b3IYAyABKAsyHi5mbHl0ZWlkbDIuY29yZS5HUFVBY2NlbGVyYXRvciJFCg5JbmxpbmVSdWxlTGlzdBIzCgVydWxlcxgBIAMoCzIaLmZseXRlaWRsMi50YXNrLklubGluZVJ1bGVCCLpIBZIBAggBIq0DCgpJbmxpbmVSdWxlEksKCW9uX3BoYXNlcxgBIAMoDjIdLmZseXRlaWRsMi5jb21tb24uQWN0aW9uUGhhc2VCGbpIFpIBEwgBGAEiDYIBChgFGAYYBxgIGAkSHgoUZGVsaXZlcnlfY29uZmlnX25hbWUYAiABKAlIABJLChFkZWxpdmVyeV90ZW1wbGF0ZRgDIAEoCzIuLmZseXRlaWRsMi5ub3RpZmljYXRpb24uRGVsaXZlcnlDb25maWdUZW1wbGF0ZUgAOtEBukjNARrKAQoVcGF1c2VkX3J1bGVfZXhjbHVzaXZlEkxhIHJ1bGUgc3Vic2NyaWJpbmcgdG8gQUNUSU9OX1BIQVNFX1BBVVNFRCBtdXN0IG5vdCBzdWJzY3JpYmUgdG8gb3RoZXIgcGhhc2VzGmMhKGZseXRlaWRsMi5jb21tb24uQWN0aW9uUGhhc2UuQUNUSU9OX1BIQVNFX1BBVVNFRCBpbiB0aGlzLm9uX3BoYXNlcykgfHwgdGhpcy5vbl9waGFzZXMuc2l6ZSgpID09IDFCEQoIZGVsaXZlcnkSBbpIAggBKnwKEENhY2hlTG9va3VwU2NvcGUSIgoeQ0FDSEVfTE9PS1VQX1NDT1BFX1VOU1BFQ0lGSUVEEAASHQoZQ0FDSEVfTE9PS1VQX1NDT1BFX0dMT0JBTBABEiUKIUNBQ0hFX0xPT0tVUF9TQ09QRV9QUk9KRUNUX0RPTUFJThACKnEKDlRhc2tTcGVjU291cmNlEiAKHFRBU0tfU1BFQ19TT1VSQ0VfVU5TUEVDSUZJRUQQABIdChlUQVNLX1NQRUNfU09VUkNFX0RFUExPWUVEEAESHgoaVEFTS19TUEVDX1NPVVJDRV9FUEhFTUVSQUwQAkKtAQoSY29tLmZseXRlaWRsMi50YXNrQghSdW5Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi90YXNrogIDRlRYqgIORmx5dGVpZGwyLlRhc2vKAg5GbHl0ZWlkbDJcVGFza+ICGkZseXRlaWRsMlxUYXNrXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpUYXNrYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_phase, file_flyteidl2_common_run, file_flyteidl2_core_literals, file_flyteidl2_core_security, file_flyteidl2_core_tasks, file_flyteidl2_notification_definition, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("ChhmbHl0ZWlkbDIvdGFzay9ydW4ucHJvdG8SDmZseXRlaWRsMi50YXNrImsKBkxhYmVscxIyCgZ2YWx1ZXMYASADKAsyIi5mbHl0ZWlkbDIudGFzay5MYWJlbHMuVmFsdWVzRW50cnkaLQoLVmFsdWVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJ1CgtBbm5vdGF0aW9ucxI3CgZ2YWx1ZXMYASADKAsyJy5mbHl0ZWlkbDIudGFzay5Bbm5vdGF0aW9ucy5WYWx1ZXNFbnRyeRotCgtWYWx1ZXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIjQKBEVudnMSLAoGdmFsdWVzGAEgAygLMhwuZmx5dGVpZGwyLmNvcmUuS2V5VmFsdWVQYWlyIikKDlJhd0RhdGFTdG9yYWdlEhcKD3Jhd19kYXRhX3ByZWZpeBgBIAEoCSJkCgtDYWNoZUNvbmZpZxIXCg9vdmVyd3JpdGVfY2FjaGUYASABKAgSPAoSY2FjaGVfbG9va3VwX3Njb3BlGAIgASgOMiAuZmx5dGVpZGwyLnRhc2suQ2FjaGVMb29rdXBTY29wZSKZAQoHUmVjb3ZlchIpChNmb3JjZV9yZXJ1bl9hY3Rpb25zGAEgAygJQgy6SAmSAQYiBHICEAESRAoWYWN0aW9uX2lucHV0X292ZXJyaWRlcxgCIAEoCzIkLmZseXRlaWRsMi50YXNrLkFjdGlvbklucHV0T3ZlcnJpZGVzEh0KFWltcGxpZWRfcmVydW5fYWN0aW9ucxgDIAMoCSJHChRBY3Rpb25JbnB1dE92ZXJyaWRlcxIiCgxhY3Rpb25fbmFtZXMYASADKAlCDLpICZIBBiIEcgIQARILCgN1cmkYAiABKAkilgcKB1J1blNwZWMSJgoGbGFiZWxzGAEgASgLMhYuZmx5dGVpZGwyLnRhc2suTGFiZWxzEjAKC2Fubm90YXRpb25zGAIgASgLMhsuZmx5dGVpZGwyLnRhc2suQW5ub3RhdGlvbnMSIgoEZW52cxgDIAEoCzIULmZseXRlaWRsMi50YXNrLkVudnMSMQoNaW50ZXJydXB0aWJsZRgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5Cb29sVmFsdWUSGwoPb3ZlcndyaXRlX2NhY2hlGAUgASgIQgIYARINCgVxdWV1ZRgGIAEoCRI4ChByYXdfZGF0YV9zdG9yYWdlGAcgASgLMh4uZmx5dGVpZGwyLnRhc2suUmF3RGF0YVN0b3JhZ2USOQoQc2VjdXJpdHlfY29udGV4dBgIIAEoCzIfLmZseXRlaWRsMi5jb3JlLlNlY3VyaXR5Q29udGV4dBIxCgxjYWNoZV9jb25maWcYCSABKAsyGy5mbHl0ZWlkbDIudGFzay5DYWNoZUNvbmZpZxIgChZub3RpZmljYXRpb25fcnVsZV9uYW1lGAogASgJSAASPAoSbm90aWZpY2F0aW9uX3J1bGVzGAsgASgLMh4uZmx5dGVpZGwyLnRhc2suSW5saW5lUnVsZUxpc3RIABIyCg5ydW5fc3RhcnRfdGltZRgMIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASHgoWbWF4X2FjdGlvbl9jb25jdXJyZW5jeRgNIAEoDRIUCgxydW5fYmFzZV9kaXIYDiABKAkSNwoKcmVsYXRlZF90bxgPIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckICGAESFAoMY2x1c3Rlcl9wb29sGBAgASgJEjgKEHRhc2tfc3BlY19zb3VyY2UYESABKA4yHi5mbHl0ZWlkbDIudGFzay5UYXNrU3BlY1NvdXJjZRIsCghyZWxhdGlvbhgSIAEoCzIaLmZseXRlaWRsMi5jb21tb24uUmVsYXRpb24SKAoHcmVjb3ZlchgTIAEoCzIXLmZseXRlaWRsMi50YXNrLlJlY292ZXISOQoQZGVmYXVsdF9zZXR0aW5ncxgUIAEoCzIfLmZseXRlaWRsMi50YXNrLkRlZmF1bHRTZXR0aW5nc0IXChVub3RpZmljYXRpb25fc2V0dGluZ3NSB2NsdXN0ZXIicgoPRGVmYXVsdFNldHRpbmdzEhkKEXBvZF90ZW1wbGF0ZV9uYW1lGAEgASgJEkQKFnRhc2tfcmVzb3VyY2VfZGVmYXVsdHMYAiABKAsyJC5mbHl0ZWlkbDIudGFzay5UYXNrUmVzb3VyY2VEZWZhdWx0cyLEAQoUVGFza1Jlc291cmNlRGVmYXVsdHMSOQoIcmVxdWVzdHMYASADKAsyJy5mbHl0ZWlkbDIuY29yZS5SZXNvdXJjZXMuUmVzb3VyY2VFbnRyeRI0CgNtYXgYAiADKAsyJy5mbHl0ZWlkbDIuY29yZS5SZXNvdXJjZXMuUmVzb3VyY2VFbnRyeRI7ChNkZWZhdWx0X2FjY2VsZXJhdG9yGAMgASgLMh4uZmx5dGVpZGwyLmNvcmUuR1BVQWNjZWxlcmF0b3IiRQoOSW5saW5lUnVsZUxpc3QSMwoFcnVsZXMYASADKAsyGi5mbHl0ZWlkbDIudGFzay5JbmxpbmVSdWxlQgi6SAWSAQIIASKtAwoKSW5saW5lUnVsZRJLCglvbl9waGFzZXMYASADKA4yHS5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvblBoYXNlQhm6SBaSARMIARgBIg2CAQoYBRgGGAcYCBgJEh4KFGRlbGl2ZXJ5X2NvbmZpZ19uYW1lGAIgASgJSAASSwoRZGVsaXZlcnlfdGVtcGxhdGUYAyABKAsyLi5mbHl0ZWlkbDIubm90aWZpY2F0aW9uLkRlbGl2ZXJ5Q29uZmlnVGVtcGxhdGVIADrRAbpIzQEaygEKFXBhdXNlZF9ydWxlX2V4Y2x1c2l2ZRJMYSBydWxlIHN1YnNjcmliaW5nIHRvIEFDVElPTl9QSEFTRV9QQVVTRUQgbXVzdCBub3Qgc3Vic2NyaWJlIHRvIG90aGVyIHBoYXNlcxpjIShmbHl0ZWlkbDIuY29tbW9uLkFjdGlvblBoYXNlLkFDVElPTl9QSEFTRV9QQVVTRUQgaW4gdGhpcy5vbl9waGFzZXMpIHx8IHRoaXMub25fcGhhc2VzLnNpemUoKSA9PSAxQhEKCGRlbGl2ZXJ5EgW6SAIIASp8ChBDYWNoZUxvb2t1cFNjb3BlEiIKHkNBQ0hFX0xPT0tVUF9TQ09QRV9VTlNQRUNJRklFRBAAEh0KGUNBQ0hFX0xPT0tVUF9TQ09QRV9HTE9CQUwQARIlCiFDQUNIRV9MT09LVVBfU0NPUEVfUFJPSkVDVF9ET01BSU4QAipxCg5UYXNrU3BlY1NvdXJjZRIgChxUQVNLX1NQRUNfU09VUkNFX1VOU1BFQ0lGSUVEEAASHQoZVEFTS19TUEVDX1NPVVJDRV9ERVBMT1lFRBABEh4KGlRBU0tfU1BFQ19TT1VSQ0VfRVBIRU1FUkFMEAJCrQEKEmNvbS5mbHl0ZWlkbDIudGFza0IIUnVuUHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvdGFza6ICA0ZUWKoCDkZseXRlaWRsMi5UYXNrygIORmx5dGVpZGwyXFRhc2viAhpGbHl0ZWlkbDJcVGFza1xHUEJNZXRhZGF0YeoCD0ZseXRlaWRsMjo6VGFza2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_common_phase, file_flyteidl2_common_run, file_flyteidl2_core_literals, file_flyteidl2_core_security, file_flyteidl2_core_tasks, file_flyteidl2_notification_definition, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
 
 /**
  * Label values to be applied to an execution resource.
@@ -168,6 +168,24 @@ export type Recover = Message<"flyteidl2.task.Recover"> & {
    * @generated from field: repeated string force_rerun_actions = 1;
    */
   forceRerunActions: string[];
+
+  /**
+   * Input overrides for task actions of the run being recovered. Set by the client.
+   * Only the action names and the location of the values travel in the RunSpec; the
+   * values live in the data plane (see ActionInputOverridesData).
+   *
+   * @generated from field: flyteidl2.task.ActionInputOverrides action_input_overrides = 2;
+   */
+  actionInputOverrides?: ActionInputOverrides;
+
+  /**
+   * Ancestors of the actions named in action_input_overrides, up to (excluding) a0.
+   * Set by the server at run creation and ignored if sent by a client: an ancestor
+   * must re-execute for the overridden action to be enqueued again.
+   *
+   * @generated from field: repeated string implied_rerun_actions = 3;
+   */
+  impliedRerunActions: string[];
 };
 
 /**
@@ -176,6 +194,36 @@ export type Recover = Message<"flyteidl2.task.Recover"> & {
  */
 export const RecoverSchema: GenMessage<Recover> = /*@__PURE__*/
   messageDesc(file_flyteidl2_task_run, 5);
+
+/**
+ * ActionInputOverrides names the task actions whose inputs a recovery run overrides
+ * and where the override values are stored.
+ *
+ * @generated from message flyteidl2.task.ActionInputOverrides
+ */
+export type ActionInputOverrides = Message<"flyteidl2.task.ActionInputOverrides"> & {
+  /**
+   * Names of task actions in the run being recovered. Must not include the root
+   * action a0: root input changes are carried as the run's own inputs.
+   *
+   * @generated from field: repeated string action_names = 1;
+   */
+  actionNames: string[];
+
+  /**
+   * Location of a serialized ActionInputOverridesData in the data plane.
+   *
+   * @generated from field: string uri = 2;
+   */
+  uri: string;
+};
+
+/**
+ * Describes the message flyteidl2.task.ActionInputOverrides.
+ * Use `create(ActionInputOverridesSchema)` to create a new message.
+ */
+export const ActionInputOverridesSchema: GenMessage<ActionInputOverrides> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_run, 6);
 
 /**
  * @generated from message flyteidl2.task.RunSpec
@@ -362,7 +410,7 @@ export type RunSpec = Message<"flyteidl2.task.RunSpec"> & {
  * Use `create(RunSpecSchema)` to create a new message.
  */
 export const RunSpecSchema: GenMessage<RunSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_run, 6);
+  messageDesc(file_flyteidl2_task_run, 7);
 
 /**
  * DefaultSettings holds run-scoped defaults applied to tasks in a run. Each field
@@ -393,7 +441,7 @@ export type DefaultSettings = Message<"flyteidl2.task.DefaultSettings"> & {
  * Use `create(DefaultSettingsSchema)` to create a new message.
  */
 export const DefaultSettingsSchema: GenMessage<DefaultSettings> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_run, 7);
+  messageDesc(file_flyteidl2_task_run, 8);
 
 /**
  * Resolved task_resource settings for a run: what a task pod gets when its template is silent, and the ceiling
@@ -433,7 +481,7 @@ export type TaskResourceDefaults = Message<"flyteidl2.task.TaskResourceDefaults"
  * Use `create(TaskResourceDefaultsSchema)` to create a new message.
  */
 export const TaskResourceDefaultsSchema: GenMessage<TaskResourceDefaults> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_run, 8);
+  messageDesc(file_flyteidl2_task_run, 9);
 
 /**
  * @generated from message flyteidl2.task.InlineRuleList
@@ -450,7 +498,7 @@ export type InlineRuleList = Message<"flyteidl2.task.InlineRuleList"> & {
  * Use `create(InlineRuleListSchema)` to create a new message.
  */
 export const InlineRuleListSchema: GenMessage<InlineRuleList> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_run, 9);
+  messageDesc(file_flyteidl2_task_run, 10);
 
 /**
  * @generated from message flyteidl2.task.InlineRule
@@ -489,7 +537,7 @@ export type InlineRule = Message<"flyteidl2.task.InlineRule"> & {
  * Use `create(InlineRuleSchema)` to create a new message.
  */
 export const InlineRuleSchema: GenMessage<InlineRule> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_run, 10);
+  messageDesc(file_flyteidl2_task_run, 11);
 
 /**
  * @generated from enum flyteidl2.task.CacheLookupScope
