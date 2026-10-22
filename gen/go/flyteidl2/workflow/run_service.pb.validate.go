@@ -3668,6 +3668,35 @@ func (m *ListActionsRequest) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetQueueId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListActionsRequestValidationError{
+					field:  "QueueId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListActionsRequestValidationError{
+					field:  "QueueId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetQueueId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListActionsRequestValidationError{
+				field:  "QueueId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return ListActionsRequestMultiError(errors)
 	}
@@ -3805,6 +3834,10 @@ func (m *ListActionsResponse) validate(all bool) error {
 	}
 
 	// no validation rules for Token
+
+	if m.TotalCount != nil {
+		// no validation rules for TotalCount
+	}
 
 	if len(errors) > 0 {
 		return ListActionsResponseMultiError(errors)

@@ -1011,6 +1011,12 @@ func (s *RunService) ListActions(
 	ctx context.Context,
 	req *connect.Request[workflow.ListActionsRequest],
 ) (*connect.Response[workflow.ListActionsResponse], error) {
+	if (req.Msg.GetRunId() == nil) == (req.Msg.GetQueueId() == nil) {
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("exactly one of run_id or queue_id is required"))
+	}
+	if req.Msg.GetQueueId() != nil {
+		return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("queue-scoped action listing is not supported by this service"))
+	}
 	logger.Infof(ctx, "Received ListActions request")
 
 	if err := req.Msg.Validate(); err != nil {

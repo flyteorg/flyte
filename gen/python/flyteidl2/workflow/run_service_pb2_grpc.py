@@ -171,7 +171,7 @@ class RunServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def ListActions(self, request, context):
-        """List all actions for a given run.
+        """List actions for a run, or queued task actions for a queue when supported.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
