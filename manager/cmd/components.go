@@ -27,8 +27,8 @@ import (
 	runsconfig "github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/secret"
 	secretconfig "github.com/flyteorg/flyte/v2/secret/config"
+	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/client-go/kubernetes/scheme"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
 const componentAll = "all"
@@ -229,8 +229,8 @@ func setupAll(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	}
 	sc.DB = db
 
-	if err := servingv1.AddToScheme(executor.Scheme()); err != nil {
-		return fmt.Errorf("failed to register Knative scheme: %w", err)
+	if err := appsv1.AddToScheme(executor.Scheme()); err != nil {
+		return fmt.Errorf("failed to register apps/v1 scheme: %w", err)
 	}
 	k8sClient, k8sConfig, err := stdlibapp.InitKubernetesClient(ctx, k8sCfg, executor.Scheme())
 	if err != nil {
