@@ -32,8 +32,12 @@ const (
 	defaultWatchBufferSize                           = 100
 	notifyRetryMinBackoff                            = 50 * time.Millisecond
 	notifyRetryMaxBackoff                            = 5 * time.Second
+	defaultNotifyBatchSize                           = 100
+	maxNotifyBatchSize                               = 10_000
 	notificationMeterName                            = "runs-repository"
 	notificationDeletedMetricName                    = "runs.notification.evictions"
+	notificationDroppedMetricName                    = "runs.notification.subscriber_drops"
+	notificationSentMetricName                       = "runs.notification.sent"
 	notificationBufferAction      notificationBuffer = "action"
 	notificationBufferRun         notificationBuffer = "run"
 )
@@ -54,10 +58,14 @@ type NotificationConfig struct {
 	// watchBufferSize is the capacity of each watch subscriber's notification channel. A notification for a
 	// subscriber whose channel is full is dropped.
 	watchBufferSize int
+	// batchSize is the maximum number of notifications sent in one pg_notify statement.
+	batchSize int
 }
 
 type notificationMetrics struct {
-	notifyDeletedCount metric.Int64Counter
+	notifyDeletedCount           metric.Int64Counter
+	subscriberDroppedNotifyCount metric.Int64Counter
+	notifySentCount              metric.Int64Counter
 }
 
 func newNotificationMetrics(provider metric.MeterProvider) (*notificationMetrics, error) {
@@ -76,7 +84,27 @@ func newNotificationMetrics(provider metric.MeterProvider) (*notificationMetrics
 		return nil, err
 	}
 
-	return &notificationMetrics{notifyDeletedCount: notifyDeletedCount}, nil
+	subscriberDroppedNotifyCount, err := provider.Meter(notificationMeterName).Int64Counter(
+		notificationDroppedMetricName,
+		metric.WithDescription("Notifications dropped because a subscriber channel was full"),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	notifySentCount, err := provider.Meter(notificationMeterName).Int64Counter(
+		notificationSentMetricName,
+		metric.WithDescription("Notifications successfully sent by batched pg_notify"),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &notificationMetrics{
+		notifyDeletedCount:           notifyDeletedCount,
+		subscriberDroppedNotifyCount: subscriberDroppedNotifyCount,
+		notifySentCount:              notifySentCount,
+	}, nil
 }
 
 func (m *notificationMetrics) recordDeleted(ctx context.Context, bufferFrom notificationBuffer, count int64) {
@@ -86,8 +114,22 @@ func (m *notificationMetrics) recordDeleted(ctx context.Context, bufferFrom noti
 	m.notifyDeletedCount.Add(ctx, count, metric.WithAttributes(attribute.String("buffer_from", string(bufferFrom))))
 }
 
+func (m *notificationMetrics) recordSubscriberDropped(ctx context.Context, bufferFrom notificationBuffer, count int64) {
+	if m == nil || m.subscriberDroppedNotifyCount == nil || count == 0 {
+		return
+	}
+	m.subscriberDroppedNotifyCount.Add(ctx, count, metric.WithAttributes(attribute.String("buffer_from", string(bufferFrom))))
+}
+
+func (m *notificationMetrics) recordSent(ctx context.Context, bufferFrom notificationBuffer, count int64) {
+	if m == nil || m.notifySentCount == nil || count == 0 {
+		return
+	}
+	m.notifySentCount.Add(ctx, count, metric.WithAttributes(attribute.String("buffer_from", string(bufferFrom))))
+}
+
 // NewNotificationConfig creates a notification config, normalizing invalid values.
-func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff time.Duration, watchBufferSize int) NotificationConfig {
+func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff time.Duration, watchBufferSize, batchSize int) NotificationConfig {
 	if bufferLimit < defaultNotificationBufferSize {
 		bufferLimit = defaultNotificationBufferSize
 	}
@@ -104,12 +146,19 @@ func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff tim
 	if watchBufferSize <= 0 {
 		watchBufferSize = defaultWatchBufferSize
 	}
+	if batchSize <= 0 {
+		batchSize = defaultNotifyBatchSize
+	}
+	if batchSize > maxNotifyBatchSize {
+		batchSize = maxNotifyBatchSize
+	}
 
 	return NotificationConfig{
 		bufferLimit:     bufferLimit,
 		retryMinBackoff: retryMinBackoff,
 		retryMaxBackoff: retryMaxBackoff,
 		watchBufferSize: watchBufferSize,
+		batchSize:       batchSize,
 	}
 }
 
@@ -1060,6 +1109,7 @@ func (r *actionRepo) processNotifications() {
 					default:
 						// Channel full, skip this subscriber
 						logger.Warnf(context.Background(), "Run subscriber channel full, dropping notification")
+						r.notificationMetrics.recordSubscriberDropped(context.Background(), notificationBufferRun, 1)
 					}
 				}
 				r.mu.RUnlock()
@@ -1072,6 +1122,7 @@ func (r *actionRepo) processNotifications() {
 					case ch <- notif.Extra:
 					default:
 						logger.Warnf(context.Background(), "Action subscriber channel full, dropping notification payload=%s", notif.Extra)
+						r.notificationMetrics.recordSubscriberDropped(context.Background(), notificationBufferAction, 1)
 					}
 				}
 				r.mu.RUnlock()
@@ -1279,16 +1330,16 @@ func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql
 		}
 	}
 
-	execNotify := func(channel, payload string) bool {
+	execNotify := func(channel, query string, args []any) bool {
 		if conn == nil {
 			reconnect()
 		}
 		if conn == nil {
-			logger.Errorf(ctx, "No NOTIFY connection available, keeping %s notification pending", channel)
+			logger.Errorf(ctx, "No NOTIFY connection available, keeping %s notifications pending", channel)
 			return false
 		}
-		if _, err := conn.ExecContext(ctx, "SELECT pg_notify($1, $2)", channel, payload); err != nil {
-			logger.Errorf(ctx, "Failed to NOTIFY %s: %v", channel, err)
+		if _, err := conn.ExecContext(ctx, query, args...); err != nil {
+			logger.Errorf(ctx, "Failed to NOTIFY %s notifications: %v", channel, err)
 			if isConnError(err) {
 				reconnect()
 			}
@@ -1297,11 +1348,25 @@ func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql
 		return true
 	}
 
-	emit := func(channel string, payloads []string) []string {
-		for i, payload := range payloads {
-			if !execNotify(channel, payload) {
-				return payloads[i:]
+	emit := func(channel string, bufferFrom notificationBuffer, payloads []string) []string {
+		batchSize := r.notificationConfig.batchSize
+		for start := 0; start < len(payloads); start += batchSize {
+			chunk := payloads[start:min(start+batchSize, len(payloads))]
+			var query strings.Builder
+			query.WriteString("SELECT ")
+			args := make([]any, 0, len(chunk)+1)
+			args = append(args, channel)
+			for i, payload := range chunk {
+				if i > 0 {
+					query.WriteString(", ")
+				}
+				fmt.Fprintf(&query, "pg_notify($1, $%d)", i+2)
+				args = append(args, payload)
 			}
+			if !execNotify(channel, query.String(), args) {
+				return payloads[start:]
+			}
+			r.notificationMetrics.recordSent(ctx, bufferFrom, int64(len(chunk)))
 		}
 		return nil
 	}
@@ -1315,8 +1380,8 @@ func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql
 		}
 
 		actions, runs := r.takePendingNotifications()
-		retryActions := emit("action_updates", actions)
-		retryRuns := emit("run_updates", runs)
+		retryActions := emit("action_updates", notificationBufferAction, actions)
+		retryRuns := emit("run_updates", notificationBufferRun, runs)
 
 		if len(retryActions) == 0 && len(retryRuns) == 0 {
 			backoff = r.notificationConfig.retryMinBackoff

@@ -548,6 +548,7 @@ configuration:
     notificationBufferLimit: 65000
     notifyRetryMinBackoff: 50ms
     notifyRetryMaxBackoff: 5s
+    notifyBatchSize: 100
     storagePrefix: s3://flyte-data
     seedProjects:
       - flytesnacks
