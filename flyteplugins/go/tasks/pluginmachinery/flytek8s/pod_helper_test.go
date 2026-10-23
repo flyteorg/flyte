@@ -3031,6 +3031,51 @@ func TestDemystifyFailure(t *testing.T) {
 		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
 	})
 
+	// The pod was torn down before the container finished, so the kubelet could not read the
+	// termination log and fabricated an exit code. Attributing that to the application would
+	// spend a user retry on a platform disruption.
+	t.Run("unreadable termination status", func(t *testing.T) {
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					State: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason:   "Error",
+							ExitCode: 2,
+							Message:  "Error on reading termination message from logs: failed to try resolving symlinks in path \"/var/log/pods/x/0.log\": no such file or directory",
+						},
+					},
+				},
+			},
+		}, pluginsCore.TaskInfo{}, "")
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, Interrupted, phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
+	})
+
+	// The same exit code with a readable termination message is the application's own answer and
+	// stays attributed to the user.
+	t.Run("readable termination status with the same exit code", func(t *testing.T) {
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					State: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason:   "Error",
+							ExitCode: 2,
+							Message:  "Traceback (most recent call last): ValueError",
+						},
+					},
+				},
+			},
+		}, pluginsCore.TaskInfo{}, "")
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "Error", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+	})
+
 	t.Run("OOMKilled", func(t *testing.T) {
 		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
 			ContainerStatuses: []v1.ContainerStatus{
