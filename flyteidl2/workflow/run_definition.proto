@@ -234,6 +234,11 @@ message ActionStatus {
 
   // Duration of the action in milliseconds.
   optional uint64 duration_ms = 6;
+
+  // Time the currently queued attempt entered the queue, when known. Only set
+  // while QUEUED. Omitted when the queue-entry time was not recorded, for
+  // example by older servers.
+  google.protobuf.Timestamp queued_at = 7;
 }
 
 // Lightweight representation of an action.
