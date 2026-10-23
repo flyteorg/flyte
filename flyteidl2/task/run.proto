@@ -94,6 +94,13 @@ message Recover {
   // Set by the server at run creation and ignored if sent by a client: an ancestor
   // must re-execute for the overridden action to be enqueued again.
   repeated string implied_rerun_actions = 3;
+
+  // Marks this recovery run as a fork: it reuses the run being recovered but runs
+  // changed code or inputs, rather than retrying it unchanged. Set by the client
+  // that creates the fork (for example a code-only fork); the server also sets it
+  // whenever action_input_overrides is present, and clears it on a run that is not
+  // a recovery. Informational: it does not change how the run is recovered.
+  bool fork = 4;
 }
 
 // ActionInputOverrides names the task actions whose inputs a recovery run overrides

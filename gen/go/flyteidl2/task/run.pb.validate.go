@@ -627,6 +627,8 @@ func (m *Recover) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for Fork
+
 	if len(errors) > 0 {
 		return RecoverMultiError(errors)
 	}

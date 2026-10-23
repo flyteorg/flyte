@@ -81,14 +81,16 @@ class CacheConfig(_message.Message):
     def __init__(self, overwrite_cache: bool = ..., cache_lookup_scope: _Optional[_Union[CacheLookupScope, str]] = ...) -> None: ...
 
 class Recover(_message.Message):
-    __slots__ = ["force_rerun_actions", "action_input_overrides", "implied_rerun_actions"]
+    __slots__ = ["force_rerun_actions", "action_input_overrides", "implied_rerun_actions", "fork"]
     FORCE_RERUN_ACTIONS_FIELD_NUMBER: _ClassVar[int]
     ACTION_INPUT_OVERRIDES_FIELD_NUMBER: _ClassVar[int]
     IMPLIED_RERUN_ACTIONS_FIELD_NUMBER: _ClassVar[int]
+    FORK_FIELD_NUMBER: _ClassVar[int]
     force_rerun_actions: _containers.RepeatedScalarFieldContainer[str]
     action_input_overrides: ActionInputOverrides
     implied_rerun_actions: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, force_rerun_actions: _Optional[_Iterable[str]] = ..., action_input_overrides: _Optional[_Union[ActionInputOverrides, _Mapping]] = ..., implied_rerun_actions: _Optional[_Iterable[str]] = ...) -> None: ...
+    fork: bool
+    def __init__(self, force_rerun_actions: _Optional[_Iterable[str]] = ..., action_input_overrides: _Optional[_Union[ActionInputOverrides, _Mapping]] = ..., implied_rerun_actions: _Optional[_Iterable[str]] = ..., fork: bool = ...) -> None: ...
 
 class ActionInputOverrides(_message.Message):
     __slots__ = ["action_names", "uri"]
