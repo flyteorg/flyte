@@ -4679,6 +4679,28 @@ func TestDemystifyFailureExternalTermination(t *testing.T) {
 		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
 	})
 
+	t.Run("a scheduler preemption is reported the same way", func(t *testing.T) {
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Conditions: []v1.PodCondition{{
+				Type:    v1.DisruptionTarget,
+				Status:  v1.ConditionTrue,
+				Reason:  v1.PodReasonPreemptionByScheduler,
+				Message: "Pod flyte/p was preempted by higher priority workload flyte/q",
+			}},
+			ContainerStatuses: []v1.ContainerStatus{{
+				Name: "primary",
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{Reason: "Error", ExitCode: 143},
+				},
+			}},
+		}, pluginsCore.TaskInfo{}, "primary")
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Equal(t, v1.PodReasonPreemptionByScheduler, phaseInfo.Err().GetCode())
+		assert.Contains(t, phaseInfo.Err().GetMessage(), "preempted by higher priority workload flyte/q")
+	})
+
 	t.Run("a reasonless condition still names the condition", func(t *testing.T) {
 		bare := v1.PodCondition{Type: TerminationTargetCondition, Status: v1.ConditionTrue}
 		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
@@ -4707,6 +4729,17 @@ func TestGetTerminationTarget(t *testing.T) {
 		assert.Equal(t, "Workload is deleted", got.Message)
 	}
 	assert.Equal(t, "StoppedByKueue", ExternalTerminationCode(got))
+
+	preempted := GetTerminationTarget(v1.PodStatus{Conditions: []v1.PodCondition{
+		{Type: v1.DisruptionTarget, Status: v1.ConditionTrue, Reason: v1.PodReasonPreemptionByScheduler},
+	}})
+	if assert.NotNil(t, preempted) {
+		assert.Equal(t, v1.PodReasonPreemptionByScheduler, ExternalTerminationCode(preempted))
+	}
+	// A node-pressure eviction can be the task's own doing, so it is not treated as one.
+	assert.Nil(t, GetTerminationTarget(v1.PodStatus{Conditions: []v1.PodCondition{
+		{Type: v1.DisruptionTarget, Status: v1.ConditionTrue, Reason: v1.PodReasonTerminationByKubelet},
+	}}))
 	assert.Equal(t, "Pod was terminated by an external controller: Workload is deleted", ExternalTerminationMessage(got))
 	assert.Equal(t, "Pod was terminated by an external controller (NotAdmitted)",
 		ExternalTerminationMessage(&v1.PodCondition{Reason: "NotAdmitted"}))
