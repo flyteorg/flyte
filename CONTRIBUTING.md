@@ -58,13 +58,13 @@ From the repo root:
 make devbox-build
 
 # Start the devbox cluster in dev mode (required for running the manager locally)
-make devbox-run FLYTE_DEV=true
+make devbox-run FLYTE_DEV=True
 
 # Stop the devbox when you're done
 make devbox-stop
 ```
 
-`FLYTE_DEV=true` is required when you intend to run the manager locally — it disables the in-cluster manager so your local process can take over. `make devbox-run` writes a kubeconfig pointing at the devbox cluster in global kubeconfig, so `kubectl` will target it automatically.
+`FLYTE_DEV=True` is required when you intend to run the manager locally — it disables the in-cluster manager so your local process can take over. The value is case-sensitive: `FLYTE_DEV=true` leaves the in-cluster manager running alongside yours. `make devbox-run` writes a kubeconfig pointing at the devbox cluster in global kubeconfig, so `kubectl` will target it automatically.
 
 ### Build and Run the Manager
 
