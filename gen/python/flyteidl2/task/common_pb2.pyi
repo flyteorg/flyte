@@ -135,7 +135,7 @@ class Inputs(_message.Message):
     def __init__(self, literals: _Optional[_Iterable[_Union[NamedLiteral, _Mapping]]] = ..., context: _Optional[_Iterable[_Union[_literals_pb2.KeyValuePair, _Mapping]]] = ...) -> None: ...
 
 class ActionInputOverridesData(_message.Message):
-    __slots__ = ["overrides"]
+    __slots__ = ["overrides", "code_bundles"]
     class OverridesEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -143,9 +143,26 @@ class ActionInputOverridesData(_message.Message):
         key: str
         value: Inputs
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[Inputs, _Mapping]] = ...) -> None: ...
+    class CodeBundlesEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: ActionCodeBundle
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[ActionCodeBundle, _Mapping]] = ...) -> None: ...
     OVERRIDES_FIELD_NUMBER: _ClassVar[int]
+    CODE_BUNDLES_FIELD_NUMBER: _ClassVar[int]
     overrides: _containers.MessageMap[str, Inputs]
-    def __init__(self, overrides: _Optional[_Mapping[str, Inputs]] = ...) -> None: ...
+    code_bundles: _containers.MessageMap[str, ActionCodeBundle]
+    def __init__(self, overrides: _Optional[_Mapping[str, Inputs]] = ..., code_bundles: _Optional[_Mapping[str, ActionCodeBundle]] = ...) -> None: ...
+
+class ActionCodeBundle(_message.Message):
+    __slots__ = ["tgz", "version"]
+    TGZ_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    tgz: str
+    version: str
+    def __init__(self, tgz: _Optional[str] = ..., version: _Optional[str] = ...) -> None: ...
 
 class ProducedArtifact(_message.Message):
     __slots__ = ["output", "name", "version", "info", "type", "parent_artifacts", "partitions", "time_partition"]

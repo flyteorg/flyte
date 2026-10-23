@@ -85,9 +85,9 @@ message Recover {
   // Unknown names are ignored.
   repeated string force_rerun_actions = 1 [(buf.validate.field).repeated.items.string.min_len = 1];
 
-  // Input overrides for task actions of the run being recovered. Set by the client.
-  // Only the action names and the location of the values travel in the RunSpec; the
-  // values live in the data plane (see ActionInputOverridesData).
+  // Input and code overrides for task actions of the run being recovered. Set by the
+  // client. Only the action names and the location of the overrides travel in the
+  // RunSpec; the values and code live in the data plane (see ActionInputOverridesData).
   ActionInputOverrides action_input_overrides = 2;
 
   // Ancestors of the actions named in action_input_overrides, up to (excluding) a0.
@@ -103,8 +103,8 @@ message Recover {
   bool fork = 4;
 }
 
-// ActionInputOverrides names the task actions whose inputs a recovery run overrides
-// and where the override values are stored.
+// ActionInputOverrides names the task actions whose inputs or code a recovery run
+// overrides and where the overrides are stored.
 message ActionInputOverrides {
   // Names of task actions in the run being recovered. Must not include the root
   // action a0: root input changes are carried as the run's own inputs.

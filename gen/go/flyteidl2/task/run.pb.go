@@ -415,9 +415,9 @@ type Recover struct {
 	// subtree). A listed condition action re-pauses and waits for a new signal.
 	// Unknown names are ignored.
 	ForceRerunActions []string `protobuf:"bytes,1,rep,name=force_rerun_actions,json=forceRerunActions,proto3" json:"force_rerun_actions,omitempty"`
-	// Input overrides for task actions of the run being recovered. Set by the client.
-	// Only the action names and the location of the values travel in the RunSpec; the
-	// values live in the data plane (see ActionInputOverridesData).
+	// Input and code overrides for task actions of the run being recovered. Set by the
+	// client. Only the action names and the location of the overrides travel in the
+	// RunSpec; the values and code live in the data plane (see ActionInputOverridesData).
 	ActionInputOverrides *ActionInputOverrides `protobuf:"bytes,2,opt,name=action_input_overrides,json=actionInputOverrides,proto3" json:"action_input_overrides,omitempty"`
 	// Ancestors of the actions named in action_input_overrides, up to (excluding) a0.
 	// Set by the server at run creation and ignored if sent by a client: an ancestor
@@ -491,8 +491,8 @@ func (x *Recover) GetFork() bool {
 	return false
 }
 
-// ActionInputOverrides names the task actions whose inputs a recovery run overrides
-// and where the override values are stored.
+// ActionInputOverrides names the task actions whose inputs or code a recovery run
+// overrides and where the overrides are stored.
 type ActionInputOverrides struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

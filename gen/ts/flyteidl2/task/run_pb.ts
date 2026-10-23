@@ -170,9 +170,9 @@ export type Recover = Message<"flyteidl2.task.Recover"> & {
   forceRerunActions: string[];
 
   /**
-   * Input overrides for task actions of the run being recovered. Set by the client.
-   * Only the action names and the location of the values travel in the RunSpec; the
-   * values live in the data plane (see ActionInputOverridesData).
+   * Input and code overrides for task actions of the run being recovered. Set by the
+   * client. Only the action names and the location of the overrides travel in the
+   * RunSpec; the values and code live in the data plane (see ActionInputOverridesData).
    *
    * @generated from field: flyteidl2.task.ActionInputOverrides action_input_overrides = 2;
    */
@@ -207,8 +207,8 @@ export const RecoverSchema: GenMessage<Recover> = /*@__PURE__*/
   messageDesc(file_flyteidl2_task_run, 5);
 
 /**
- * ActionInputOverrides names the task actions whose inputs a recovery run overrides
- * and where the override values are stored.
+ * ActionInputOverrides names the task actions whose inputs or code a recovery run
+ * overrides and where the overrides are stored.
  *
  * @generated from message flyteidl2.task.ActionInputOverrides
  */
