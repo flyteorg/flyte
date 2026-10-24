@@ -56,6 +56,21 @@ func (t *taskExecutionContext) TaskExecutionMetadata() pluginsCore.TaskExecution
 func (t *taskExecutionContext) OutputWriter() io.OutputWriter { return t.outputWriter }
 func (t *taskExecutionContext) Catalog() catalog.AsyncClient  { return t.catalogClient }
 
+// OutputsFileName is the outputs proto written under an action's output directory. The SDK
+// joins it onto the directory itself, so the two forms are not interchangeable: the watch
+// stream carries the directory, ActionEvent.outputs carries the file.
+const OutputsFileName = "outputs.pb"
+
+// OutputsFileURI is where the outputs proto lives under an output directory.
+func OutputsFileURI(outputPrefix string) string {
+	return strings.TrimRight(outputPrefix, "/") + "/" + OutputsFileName
+}
+
+// OutputPrefixOf inverts OutputsFileURI, returning the URI unchanged if it names something else.
+func OutputPrefixOf(outputsFileURI string) string {
+	return strings.TrimSuffix(strings.TrimRight(outputsFileURI, "/"), "/"+OutputsFileName)
+}
+
 // ComputeActionOutputPath constructs the full output directory for a task action:
 //
 //	<scheme>://<bucket>/<shard>/<rest-of-runOutputBase>/<actionName>/<attempt>

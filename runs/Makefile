@@ -4,7 +4,7 @@
 # Service configuration
 SERVICE_NAME := runs-service
 BIN_NAME := runs-service
-CMD_PATH := cmd/main.go
+CMD_PATH := ./cmd
 RUN_ARGS ?= --config config.yaml
 
 # Include common Go targets

@@ -977,6 +977,36 @@ pub mod internal_run_service_client {
                 );
             self.inner.streaming(req, path, codec).await
         }
+        pub async fn lookup_action(
+            &mut self,
+            request: impl tonic::IntoRequest<super::LookupActionRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::LookupActionResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl2.workflow.InternalRunService/LookupAction",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "flyteidl2.workflow.InternalRunService",
+                        "LookupAction",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -1057,6 +1087,13 @@ pub mod internal_run_service_server {
             >,
         ) -> std::result::Result<
             tonic::Response<Self::RecordActionEventStreamStream>,
+            tonic::Status,
+        >;
+        async fn lookup_action(
+            &self,
+            request: tonic::Request<super::LookupActionRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::LookupActionResponse>,
             tonic::Status,
         >;
     }
@@ -1436,6 +1473,52 @@ pub mod internal_run_service_server {
                                 max_encoding_message_size,
                             );
                         let res = grpc.streaming(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl2.workflow.InternalRunService/LookupAction" => {
+                    #[allow(non_camel_case_types)]
+                    struct LookupActionSvc<T: InternalRunService>(pub Arc<T>);
+                    impl<
+                        T: InternalRunService,
+                    > tonic::server::UnaryService<super::LookupActionRequest>
+                    for LookupActionSvc<T> {
+                        type Response = super::LookupActionResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::LookupActionRequest>,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as InternalRunService>::lookup_action(&inner, request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let method = LookupActionSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)

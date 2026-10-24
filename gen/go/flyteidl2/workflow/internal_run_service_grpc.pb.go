@@ -25,6 +25,7 @@ const (
 	InternalRunService_UpdateActionStatusStream_FullMethodName = "/flyteidl2.workflow.InternalRunService/UpdateActionStatusStream"
 	InternalRunService_RecordActionEvents_FullMethodName       = "/flyteidl2.workflow.InternalRunService/RecordActionEvents"
 	InternalRunService_RecordActionEventStream_FullMethodName  = "/flyteidl2.workflow.InternalRunService/RecordActionEventStream"
+	InternalRunService_LookupAction_FullMethodName             = "/flyteidl2.workflow.InternalRunService/LookupAction"
 )
 
 // InternalRunServiceClient is the client API for InternalRunService service.
@@ -43,6 +44,8 @@ type InternalRunServiceClient interface {
 	RecordActionEvents(ctx context.Context, in *RecordActionEventsRequest, opts ...grpc.CallOption) (*RecordActionEventsResponse, error)
 	// Record a new action event (streaming implementation).
 	RecordActionEventStream(ctx context.Context, opts ...grpc.CallOption) (InternalRunService_RecordActionEventStreamClient, error)
+	// Look up a single action of a prior run, for the enqueue-time recovery decision.
+	LookupAction(ctx context.Context, in *LookupActionRequest, opts ...grpc.CallOption) (*LookupActionResponse, error)
 }
 
 type internalRunServiceClient struct {
@@ -173,6 +176,15 @@ func (x *internalRunServiceRecordActionEventStreamClient) Recv() (*RecordActionE
 	return m, nil
 }
 
+func (c *internalRunServiceClient) LookupAction(ctx context.Context, in *LookupActionRequest, opts ...grpc.CallOption) (*LookupActionResponse, error) {
+	out := new(LookupActionResponse)
+	err := c.cc.Invoke(ctx, InternalRunService_LookupAction_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // InternalRunServiceServer is the server API for InternalRunService service.
 // All implementations should embed UnimplementedInternalRunServiceServer
 // for forward compatibility
@@ -189,6 +201,8 @@ type InternalRunServiceServer interface {
 	RecordActionEvents(context.Context, *RecordActionEventsRequest) (*RecordActionEventsResponse, error)
 	// Record a new action event (streaming implementation).
 	RecordActionEventStream(InternalRunService_RecordActionEventStreamServer) error
+	// Look up a single action of a prior run, for the enqueue-time recovery decision.
+	LookupAction(context.Context, *LookupActionRequest) (*LookupActionResponse, error)
 }
 
 // UnimplementedInternalRunServiceServer should be embedded to have forward compatible implementations.
@@ -212,6 +226,9 @@ func (UnimplementedInternalRunServiceServer) RecordActionEvents(context.Context,
 }
 func (UnimplementedInternalRunServiceServer) RecordActionEventStream(InternalRunService_RecordActionEventStreamServer) error {
 	return status.Errorf(codes.Unimplemented, "method RecordActionEventStream not implemented")
+}
+func (UnimplementedInternalRunServiceServer) LookupAction(context.Context, *LookupActionRequest) (*LookupActionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LookupAction not implemented")
 }
 
 // UnsafeInternalRunServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -357,6 +374,24 @@ func (x *internalRunServiceRecordActionEventStreamServer) Recv() (*RecordActionE
 	return m, nil
 }
 
+func _InternalRunService_LookupAction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LookupActionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InternalRunServiceServer).LookupAction(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InternalRunService_LookupAction_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InternalRunServiceServer).LookupAction(ctx, req.(*LookupActionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // InternalRunService_ServiceDesc is the grpc.ServiceDesc for InternalRunService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -375,6 +410,10 @@ var InternalRunService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RecordActionEvents",
 			Handler:    _InternalRunService_RecordActionEvents_Handler,
+		},
+		{
+			MethodName: "LookupAction",
+			Handler:    _InternalRunService_LookupAction_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
