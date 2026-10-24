@@ -1335,6 +1335,48 @@ func TestProcessNotifications_ResyncsSubscribersOnReconnect(t *testing.T) {
 	assert.Len(t, actionSub.resync, 1, "a full notify buffer must not drop the resync")
 }
 
+func TestWatchAllUpdates_SendNilOnResync(t *testing.T) {
+	r := &actionRepo{
+		runSubscribers:     make(map[*subscription]struct{}),
+		actionSubscribers:  make(map[*subscription]struct{}),
+		notificationConfig: testNotificationConfig,
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	runs := make(chan *models.Run, 1)
+	actions := make(chan *models.Action, 1)
+	go r.WatchAllRunUpdates(ctx, runs, make(chan error, 1))
+	go r.WatchAllActionUpdates(ctx, notifyTestActionID("a1").Run, actions, make(chan error, 1))
+	require.Eventually(t, func() bool {
+		r.mu.RLock()
+		defer r.mu.RUnlock()
+		return len(r.runSubscribers) == 1 && len(r.actionSubscribers) == 1
+	}, 5*time.Second, 10*time.Millisecond)
+
+	r.mu.RLock()
+	for sub := range r.runSubscribers {
+		sub.requestResync()
+	}
+	for sub := range r.actionSubscribers {
+		sub.requestResync()
+	}
+	r.mu.RUnlock()
+
+	select {
+	case got := <-runs:
+		assert.Nil(t, got)
+	case <-time.After(5 * time.Second):
+		t.Fatal("WatchAllRunUpdates must send nil on resync")
+	}
+	select {
+	case got := <-actions:
+		assert.Nil(t, got)
+	case <-time.After(5 * time.Second):
+		t.Fatal("WatchAllActionUpdates must send nil on resync")
+	}
+}
+
 func TestWatchActionUpdates_ResyncSendsCurrentState(t *testing.T) {
 	db := setupActionDB(t)
 	repoIface, err := NewActionRepo(db, testDbConfig, testNotificationConfig)

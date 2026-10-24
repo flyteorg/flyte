@@ -848,7 +848,6 @@ func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdent
 
 // WatchAllRunUpdates watches for all run updates via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error) {
-	// TODO(#8193): resync after a listener reconnect.
 	sub := r.subscribe(r.runSubscribers)
 	defer r.unsubscribe(r.runSubscribers, sub)
 
@@ -856,6 +855,12 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 		select {
 		case <-ctx.Done():
 			return
+		case <-sub.resync:
+			select {
+			case updates <- nil:
+			case <-ctx.Done():
+				return
+			}
 		case notifPayload := <-sub.notify:
 			parts := strings.Split(notifPayload, "/")
 			if len(parts) != 3 {
@@ -892,7 +897,6 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 // WatchAllActionUpdates watches for all action updates for a run via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	runPrefix := fmt.Sprintf("%s/%s/%s/", runID.Project, runID.Domain, runID.Name)
-	// TODO(#8193): resync after a listener reconnect.
 	sub := r.subscribe(r.actionSubscribers)
 	defer r.unsubscribe(r.actionSubscribers, sub)
 
@@ -900,6 +904,12 @@ func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.Ru
 		select {
 		case <-ctx.Done():
 			return
+		case <-sub.resync:
+			select {
+			case updates <- nil:
+			case <-ctx.Done():
+				return
+			}
 		case notifPayload := <-sub.notify:
 			// Collect this notification plus any others already queued,
 			// deduplicating by action name so we only query the DB once
