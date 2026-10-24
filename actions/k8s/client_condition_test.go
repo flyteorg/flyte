@@ -262,7 +262,7 @@ func TestNotifyRunService_Condition(t *testing.T) {
 		filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
 		require.NoError(t, err)
 		c.recordedFilter = filter
-		c.recordedFilter.Add(ctx, []byte(buildTaskActionName(update.ActionID)))
+		c.recordedFilter.Add(ctx, recordedFilterKey(ta))
 
 		mockClient.EXPECT().UpdateActionStatus(mock.Anything, mock.MatchedBy(func(r *connect.Request[workflow.UpdateActionStatusRequest]) bool {
 			return proto.Equal(r.Msg.GetOutput(), boolLiteral(true)) &&

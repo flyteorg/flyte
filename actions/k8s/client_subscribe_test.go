@@ -19,10 +19,14 @@ func newSubscribeTestClient() *ActionsClient {
 	}
 }
 
-func childUpdate(runName, childName, parentName string) *ActionUpdate {
+func runID(project, runName string) *common.RunIdentifier {
+	return &common.RunIdentifier{Project: project, Domain: "development", Name: runName}
+}
+
+func childUpdate(run *common.RunIdentifier, childName, parentName string) *ActionUpdate {
 	return &ActionUpdate{
 		ActionID: &common.ActionIdentifier{
-			Run:  &common.RunIdentifier{Name: runName},
+			Run:  run,
 			Name: childName,
 		},
 		ParentActionName: parentName,
@@ -36,11 +40,11 @@ func childUpdate(runName, childName, parentName string) *ActionUpdate {
 func TestSubscribeIsScopedByRun(t *testing.T) {
 	c := newSubscribeTestClient()
 
-	chA := c.Subscribe("runA", "a0")
-	chB := c.Subscribe("runB", "a0")
+	chA := c.Subscribe(runID("p", "runA"), "a0")
+	chB := c.Subscribe(runID("p", "runB"), "a0")
 
 	// An update for runA's child must reach only runA's subscriber.
-	c.notifySubscribers(context.Background(), childUpdate("runA", "child1", "a0"))
+	c.notifySubscribers(context.Background(), childUpdate(runID("p", "runA"), "child1", "a0"))
 
 	select {
 	case got := <-chA:
@@ -60,14 +64,38 @@ func TestSubscribeIsScopedByRun(t *testing.T) {
 func TestUnsubscribeScopedByRun(t *testing.T) {
 	c := newSubscribeTestClient()
 
-	ch := c.Subscribe("runA", "a0")
-	c.Unsubscribe("runA", "a0", ch)
+	ch := c.Subscribe(runID("p", "runA"), "a0")
+	c.Unsubscribe(runID("p", "runA"), "a0", ch)
 
 	// Unsubscribing the only subscriber should drop the key entirely.
-	if _, ok := c.subscribers[subscriberKey("runA", "a0")]; ok {
+	if _, ok := c.subscribers[subscriberKey(runID("p", "runA"), "a0")]; ok {
 		t.Fatal("subscriber key not cleaned up after Unsubscribe")
 	}
 
 	// Notifying after unsubscribe must not panic or deliver.
-	c.notifySubscribers(context.Background(), childUpdate("runA", "child1", "a0"))
+	c.notifySubscribers(context.Background(), childUpdate(runID("p", "runA"), "child1", "a0"))
+}
+
+// Run names are only unique within a project and domain, so two projects can each
+// have a run with the same name. Their watch streams must stay separate.
+func TestSubscribeIsScopedByProject(t *testing.T) {
+	c := newSubscribeTestClient()
+
+	chA := c.Subscribe(runID("projA", "r1"), "a0")
+	chB := c.Subscribe(runID("projB", "r1"), "a0")
+
+	c.notifySubscribers(context.Background(), childUpdate(runID("projA", "r1"), "child1", "a0"))
+
+	select {
+	case got := <-chA:
+		assert.Equal(t, "projA", got.ActionID.GetRun().GetProject())
+	default:
+		t.Fatal("projA subscriber did not receive its own update")
+	}
+
+	select {
+	case leaked := <-chB:
+		t.Fatalf("projB subscriber leaked a projA update: %+v", leaked)
+	default:
+	}
 }

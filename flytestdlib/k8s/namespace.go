@@ -31,6 +31,10 @@ func EnsureNamespaceExists(ctx context.Context, k8sClient client.Client, name st
 		ObjectMeta: metav1.ObjectMeta{Name: name},
 	}
 	if err := k8sClient.Create(ctx, ns); err != nil {
+		// Another replica created it first.
+		if apierrors.IsAlreadyExists(err) {
+			return nil
+		}
 		return fmt.Errorf("failed to create namespace: %w", err)
 	}
 
