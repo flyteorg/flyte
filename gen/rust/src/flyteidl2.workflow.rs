@@ -172,7 +172,7 @@ pub struct ActionMetadata {
     pub environment_name: ::prost::alloc::string::String,
     /// Function name
     #[prost(string, tag="13")]
-    pub funtion_name: ::prost::alloc::string::String,
+    pub function_name: ::prost::alloc::string::String,
     /// Trigger name
     #[prost(string, tag="14")]
     pub trigger_name: ::prost::alloc::string::String,
