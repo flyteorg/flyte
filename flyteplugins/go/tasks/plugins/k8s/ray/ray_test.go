@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -2216,7 +2217,11 @@ func rayPluginContextWithErrorDoc(pluginState k8s.PluginState, errorDoc *core.Er
 			Status:     corev1.PodStatus{Phase: corev1.PodPending},
 		},
 		&corev1.Pod{
-			ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: podName},
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "ns",
+				Name:      podName,
+				Labels:    map[string]string{rayClusterLabelKey: "ray-clust"},
+			},
 			Spec: corev1.PodSpec{
 				Containers: []corev1.Container{
 					{Name: contName},
@@ -2414,6 +2419,85 @@ func TestGetTaskPhaseContainerNameConstant(t *testing.T) {
 	assert.Equal(t, RayHeadContainerName, headPodLogContext.PrimaryContainerName)
 	assert.Equal(t, 1, len(headPodLogContext.Containers))
 	assert.Equal(t, RayHeadContainerName, headPodLogContext.Containers[0].ContainerName)
+}
+
+// A RayJob's pods are its RayCluster's plus, in K8sJobMode, the submitter pod that has the
+// driver's output. Another job's pods are ignored even when their names start with this job's.
+func TestGetTaskPhaseSelectsOnlyThisJobsPods(t *testing.T) {
+	ctx := context.Background()
+	rayJobName := "test-rayjob"
+	rayClusterName := rayJobName + "-abcde"
+	headPodName := rayClusterName + "-head-xyz12"
+	submitterPodName := rayJobName + "-qwert"
+
+	mkHeadPod := func(clusterName, podName string, ready bool) *corev1.Pod {
+		return &corev1.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      podName,
+				Namespace: "ns",
+				Labels:    map[string]string{rayClusterLabelKey: clusterName},
+			},
+			Spec: corev1.PodSpec{Containers: []corev1.Container{{Name: RayHeadContainerName}}},
+			Status: corev1.PodStatus{
+				Phase: corev1.PodRunning,
+				ContainerStatuses: []corev1.ContainerStatus{{
+					Name:  RayHeadContainerName,
+					Ready: ready,
+					State: corev1.ContainerState{Running: &corev1.ContainerStateRunning{}},
+				}},
+			},
+		}
+	}
+	mkSubmitterPod := func(jobName, podName string) *corev1.Pod {
+		return &corev1.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      podName,
+				Namespace: "ns",
+				Labels:    map[string]string{batchv1.JobNameLabel: jobName},
+			},
+			Status: corev1.PodStatus{Phase: corev1.PodRunning},
+		}
+	}
+	pluginCtx := rayPluginContextWithPods(k8s.PluginState{},
+		mkHeadPod(rayClusterName, headPodName, true),
+		mkSubmitterPod(rayJobName, submitterPodName),
+		mkHeadPod(rayJobName+"-2-fghij", rayJobName+"-2-fghij-head-uvw34", false),
+		mkSubmitterPod(rayJobName+"-2", rayJobName+"-2-asdfg"),
+	)
+	wireErrorFile(pluginCtx, nil)
+
+	ready, err := isRayHeadReady(ctx, rayJobName, rayClusterName, pluginCtx)
+	assert.NoError(t, err)
+	assert.True(t, ready)
+
+	startTime := metav1.NewTime(time.Now())
+	rayObject := &rayv1.RayJob{
+		ObjectMeta: metav1.ObjectMeta{Name: rayJobName, Namespace: "ns"},
+		Spec: rayv1.RayJobSpec{
+			RayClusterSpec: &rayv1.RayClusterSpec{
+				HeadGroupSpec: rayv1.HeadGroupSpec{
+					Template: corev1.PodTemplateSpec{
+						Spec: corev1.PodSpec{Containers: []corev1.Container{{Name: RayHeadContainerName}}},
+					},
+				},
+			},
+		},
+		Status: rayv1.RayJobStatus{
+			JobDeploymentStatus: rayv1.JobDeploymentStatusRunning,
+			RayClusterName:      rayClusterName,
+			StartTime:           &startTime,
+		},
+	}
+	phaseInfo, err := rayJobResourceHandler{}.GetTaskPhase(ctx, pluginCtx, rayObject)
+	assert.NoError(t, err)
+	require.NotNil(t, phaseInfo.Info())
+	logCtx := phaseInfo.Info().LogContext
+	var podNames []string
+	for _, p := range logCtx.GetPods() {
+		podNames = append(podNames, p.GetPodName())
+	}
+	assert.ElementsMatch(t, []string{headPodName, submitterPodName}, podNames)
+	assert.Equal(t, headPodName, logCtx.GetPrimaryPodName())
 }
 
 func TestIsTerminal(t *testing.T) {

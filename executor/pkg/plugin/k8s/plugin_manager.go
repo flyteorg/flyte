@@ -227,7 +227,7 @@ func (pm *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCor
 		return pluginsCore.UnknownTransition, err
 	}
 
-	pCtx := newPluginContext(tCtx, k8sPluginState, pm.kubeClient.GetClient())
+	pCtx := newPluginContext(tCtx, k8sPluginState, namespacedReader{Reader: pm.kubeClient.GetClient(), namespace: o.GetNamespace()})
 	p, err := pm.plugin.GetTaskPhase(ctx, pCtx, o)
 	if err != nil {
 		logger.Warnf(ctx, "failed to check status of resource in plugin [%s], with error: %s", pm.GetID(), err.Error())
