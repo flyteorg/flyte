@@ -2105,3 +2105,68 @@ func TestConvertNodeUpdateToEnrichedProto_ConditionMetadata(t *testing.T) {
 	// type check before signaling.
 	assert.Equal(t, core.SimpleType_STRING, condMeta.GetType().GetSimple())
 }
+
+func TestWatchRuns_RelistsOnResync(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+	client := newRunServiceTestClient(t, svc)
+
+	run := func(phase common.ActionPhase) *models.Run {
+		return &models.Run{Project: "p", Domain: "d", RunName: "r1", Name: "a0", Phase: int32(phase)}
+	}
+	actionRepo.On("WatchAllRunUpdates", mock.Anything, mock.Anything, mock.Anything).
+		Run(func(args mock.Arguments) {
+			args.Get(1).(chan<- *models.Run) <- nil
+			<-args.Get(0).(context.Context).Done()
+		}).Once()
+	actionRepo.On("ListActions", mock.Anything, mock.Anything).
+		Return([]*models.Run{run(common.ActionPhase_ACTION_PHASE_RUNNING)}, nil).Once()
+	actionRepo.On("ListActions", mock.Anything, mock.Anything).
+		Return([]*models.Run{run(common.ActionPhase_ACTION_PHASE_SUCCEEDED)}, nil).Once()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	stream, err := client.WatchRuns(ctx, connect.NewRequest(&workflow.WatchRunsRequest{}))
+	require.NoError(t, err)
+
+	require.True(t, stream.Receive())
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_RUNNING, stream.Msg().GetRuns()[0].GetAction().GetStatus().GetPhase())
+	require.True(t, stream.Receive())
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, stream.Msg().GetRuns()[0].GetAction().GetStatus().GetPhase())
+}
+
+func TestWatchActions_RelistsOnResync(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+	client := newRunServiceTestClient(t, svc)
+
+	runID := &common.RunIdentifier{Project: "p", Domain: "d", Name: "r1"}
+	root := func(phase common.ActionPhase, updatedAt time.Time) *models.Action {
+		return &models.Action{Project: "p", Domain: "d", RunName: "r1", Name: "a0", Phase: int32(phase), UpdatedAt: updatedAt}
+	}
+	child := &models.Action{
+		Project: "p", Domain: "d", RunName: "r1", Name: "a1",
+		ParentActionName: sql.NullString{String: "a0", Valid: true},
+		Phase:            int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+		UpdatedAt:        time.Unix(100, 0),
+	}
+	actionRepo.On("WatchAllActionUpdates", mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
+		Run(func(args mock.Arguments) {
+			args.Get(2).(chan<- *models.Action) <- nil
+			<-args.Get(0).(context.Context).Done()
+		}).Once()
+	actionRepo.On("ListActions", mock.Anything, mock.Anything).
+		Return([]*models.Action{root(common.ActionPhase_ACTION_PHASE_RUNNING, time.Unix(100, 0)), child}, nil).Once()
+	actionRepo.On("ListActions", mock.Anything, mock.Anything).
+		Return([]*models.Action{root(common.ActionPhase_ACTION_PHASE_SUCCEEDED, time.Unix(200, 0)), child}, nil).Once()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	stream, err := client.WatchActions(ctx, connect.NewRequest(&workflow.WatchActionsRequest{RunId: runID}))
+	require.NoError(t, err)
+
+	require.True(t, stream.Receive())
+	assert.Len(t, stream.Msg().GetEnrichedActions(), 2)
+	require.True(t, stream.Receive())
+	resent := stream.Msg().GetEnrichedActions()
+	require.Len(t, resent, 1, "the unchanged child must not be sent again")
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, resent[0].GetAction().GetStatus().GetPhase())
+}

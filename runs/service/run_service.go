@@ -1338,22 +1338,26 @@ func (s *RunService) WatchRuns(
 
 	// Step 2: Send existing runs that match filter
 	listInput := s.convertWatchRequestToListInput(req.Msg)
-
-	runs, err := s.repo.ActionRepo().ListActions(ctx, listInput)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to list runs: %v", err)
-		// Continue even if list fails - still watch for new updates
-	} else if len(runs) > 0 {
+	sendRuns := func() error {
+		runs, err := s.repo.ActionRepo().ListActions(ctx, listInput)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to list runs: %v", err)
+			// Continue even if list fails - still watch for new updates
+			return nil
+		}
+		if len(runs) == 0 {
+			return nil
+		}
 		protoRuns := make([]*workflow.Run, len(runs))
 		for i, run := range runs {
 			protoRuns[i] = s.convertRunToProto(run)
 		}
-
-		if err := stream.Send(&workflow.WatchRunsResponse{
+		return stream.Send(&workflow.WatchRunsResponse{
 			Runs: protoRuns,
-		}); err != nil {
-			return err
-		}
+		})
+	}
+	if err := sendRuns(); err != nil {
+		return err
 	}
 
 	for {
@@ -1364,6 +1368,13 @@ func (s *RunService) WatchRuns(
 			logger.Errorf(ctx, "Error watching runs: %v", err)
 			return err
 		case run := <-updatesCh:
+			if run == nil {
+				// Updates may have been lost; send the list again.
+				if err := sendRuns(); err != nil {
+					return err
+				}
+				continue
+			}
 			// Filter the run based on the watch request criteria
 			if !s.runMatchesFilter(run, req.Msg) {
 				continue
@@ -1413,6 +1424,13 @@ func (s *RunService) WatchActions(
 		case updated, ok := <-updatesCh:
 			if !ok {
 				return nil
+			}
+			if updated == nil {
+				// Updates may have been lost; re-list the run.
+				if err := s.listAndSendAllActions(ctx, runID, rsm, stream); err != nil {
+					logger.Errorf(ctx, "Failed to re-list actions: %v", err)
+				}
+				continue
 			}
 			updates, err := rsm.upsertActions(ctx, []*models.Action{updated})
 			if err != nil {
@@ -1468,7 +1486,15 @@ func (s *RunService) listAndSendAllActions(
 			batch = batch[:pageSize]
 		}
 
-		updates, err := rsm.upsertActions(ctx, batch)
+		// On a re-list, skip actions the stream already has: upserting an existing one marks it
+		// and its ancestors as changed even when nothing differs.
+		fresh := make([]*models.Action, 0, len(batch))
+		for _, action := range batch {
+			if known := rsm.GetActionTreeNodeByName(action.Name); known == nil || !known.Action.UpdatedAt.Equal(action.UpdatedAt) {
+				fresh = append(fresh, action)
+			}
+		}
+		updates, err := rsm.upsertActions(ctx, fresh)
 		if err != nil {
 			return err
 		}

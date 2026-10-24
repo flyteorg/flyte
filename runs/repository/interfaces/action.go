@@ -40,6 +40,7 @@ type ActionRepo interface {
 
 	// Watch operations (for streaming)
 	WatchRunUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Run, errs chan<- error)
+	// The WatchAll* watchers send nil when updates may have been lost; the caller should re-list.
 	WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error)
 	WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error)
 	WatchActionUpdates(ctx context.Context, actionID *common.ActionIdentifier, updates chan<- *models.Action, errs chan<- error)

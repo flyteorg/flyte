@@ -84,8 +84,8 @@ func newNotifyRepoWithDB(t *testing.T) (*actionRepo, *sql.DB, *sql.Conn) {
 	r := &actionRepo{
 		db:                 db,
 		dsn:                database.GetPostgresDsn(context.Background(), testDbConfig.Postgres),
-		runSubscribers:     make(map[chan string]bool),
-		actionSubscribers:  make(map[chan string]bool),
+		runSubscribers:     make(map[*subscription]struct{}),
+		actionSubscribers:  make(map[*subscription]struct{}),
 		pendingActions:     make(map[string]struct{}, defaultNotificationBufferSize),
 		pendingActionQueue: make([]string, 0, defaultNotificationBufferSize),
 		pendingRuns:        make(map[string]struct{}, defaultNotificationBufferSize),
@@ -1246,6 +1246,32 @@ func TestRunNotifyLoop_RetriesUndeliveredPayloads(t *testing.T) {
 }
 
 // A listener ping that fails during a Postgres outage must not stop notification delivery once pq reconnects.
+// dropListenerConnection keeps new connections to the test database refused and terminates the
+// connection named appName. The returned func lets connections back in.
+func dropListenerConnection(ctx context.Context, t *testing.T, appName string) (restore func()) {
+	t.Helper()
+	// A database cannot disallow its own connections, so run the outage SQL from the maintenance database.
+	adminCfg := testDbConfig.Postgres
+	adminCfg.DbName = "postgres"
+	admin, err := sql.Open("postgres", database.GetPostgresDsn(ctx, adminCfg))
+	require.NoError(t, err)
+	t.Cleanup(func() { admin.Close() }) //nolint:errcheck
+	allow := func(allowed bool) error {
+		_, err := admin.ExecContext(ctx, fmt.Sprintf("ALTER DATABASE %q WITH ALLOW_CONNECTIONS %t", testDbConfig.Postgres.DbName, allowed))
+		return err
+	}
+
+	require.NoError(t, allow(false))
+	t.Cleanup(func() { _ = allow(true) })
+	var terminated int
+	require.NoError(t, admin.QueryRowContext(ctx,
+		"SELECT count(*) FROM (SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE application_name = $1) t",
+		appName).Scan(&terminated))
+	require.Equal(t, 1, terminated, "expected to terminate exactly the listener connection")
+
+	return func() { require.NoError(t, allow(true)) }
+}
+
 func TestProcessNotifications_SurvivesPingFailureDuringOutage(t *testing.T) {
 	const appName = "flyte_listener_outage_test"
 	db := setupActionDB(t)
@@ -1256,37 +1282,17 @@ func TestProcessNotifications_SurvivesPingFailureDuringOutage(t *testing.T) {
 		dsn:                          database.GetPostgresDsn(ctx, testDbConfig.Postgres) + " application_name=" + appName,
 		listenerPingInterval:         100 * time.Millisecond,
 		listenerMinReconnectInterval: 100 * time.Millisecond,
-		runSubscribers:               make(map[chan string]bool),
-		actionSubscribers:            make(map[chan string]bool),
+		runSubscribers:               make(map[*subscription]struct{}),
+		actionSubscribers:            make(map[*subscription]struct{}),
 	}
 	require.NoError(t, r.startPostgresListener())
 	t.Cleanup(func() { r.listener.Close() }) //nolint:errcheck
 	updates := subscribeActions(t, r, 16)
 
-	// A database cannot disallow its own connections, so run the outage SQL from the maintenance database.
-	adminCfg := testDbConfig.Postgres
-	adminCfg.DbName = "postgres"
-	admin, err := sql.Open("postgres", database.GetPostgresDsn(ctx, adminCfg))
-	require.NoError(t, err)
-	t.Cleanup(func() { admin.Close() }) //nolint:errcheck
-	dbName := testDbConfig.Postgres.DbName
-
-	// Keep pq's reconnect attempts failing, then drop the LISTEN connection.
-	_, err = admin.ExecContext(ctx, fmt.Sprintf("ALTER DATABASE %q WITH ALLOW_CONNECTIONS false", dbName))
-	require.NoError(t, err)
-	t.Cleanup(func() {
-		_, _ = admin.ExecContext(ctx, fmt.Sprintf("ALTER DATABASE %q WITH ALLOW_CONNECTIONS true", dbName))
-	})
-	var terminated int
-	require.NoError(t, admin.QueryRowContext(ctx,
-		"SELECT count(*) FROM (SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE application_name = $1) t",
-		appName).Scan(&terminated))
-	require.Equal(t, 1, terminated, "expected to terminate exactly the listener connection")
-
+	restore := dropListenerConnection(ctx, t, appName)
 	// Hold the outage across several ping ticks so Ping fails while pq has no connection.
 	time.Sleep(10 * r.listenerPingInterval)
-	_, err = admin.ExecContext(ctx, fmt.Sprintf("ALTER DATABASE %q WITH ALLOW_CONNECTIONS true", dbName))
-	require.NoError(t, err)
+	restore()
 
 	// pq retries with backoff; keep notifying until the reader forwards one.
 	require.Eventually(t, func() bool {
@@ -1301,19 +1307,193 @@ func TestProcessNotifications_SurvivesPingFailureDuringOutage(t *testing.T) {
 	}, 10*time.Second, 100*time.Millisecond, "notifications must reach subscribers after the listener reconnects")
 }
 
+// A nil notification (pq reconnected) must reach every subscriber, even one with a full buffer.
+func TestProcessNotifications_ResyncsSubscribersOnReconnect(t *testing.T) {
+	notify := make(chan *pq.Notification)
+	r := &actionRepo{
+		listener:             &pq.Listener{Notify: notify},
+		listenerPingInterval: time.Hour,
+		runSubscribers:       make(map[*subscription]struct{}),
+		actionSubscribers:    make(map[*subscription]struct{}),
+		notificationConfig:   NewNotificationConfig(testNotificationBufferLimit, notifyRetryMinBackoff, notifyRetryMaxBackoff, 1),
+	}
+	runSub := r.subscribe(r.runSubscribers)
+	actionSub := r.subscribe(r.actionSubscribers)
+	actionSub.notify <- "fills-the-buffer"
+
+	done := make(chan struct{})
+	go func() {
+		r.processNotifications()
+		close(done)
+	}()
+	notify <- nil
+	notify <- nil
+	close(notify)
+	<-done
+
+	assert.Len(t, runSub.resync, 1, "run subscriber must be asked to resync")
+	assert.Len(t, actionSub.resync, 1, "a full notify buffer must not drop the resync")
+}
+
+func TestWatchAllUpdates_SendNilOnResync(t *testing.T) {
+	r := &actionRepo{
+		runSubscribers:     make(map[*subscription]struct{}),
+		actionSubscribers:  make(map[*subscription]struct{}),
+		notificationConfig: testNotificationConfig,
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	runs := make(chan *models.Run, 1)
+	actions := make(chan *models.Action, 1)
+	go r.WatchAllRunUpdates(ctx, runs, make(chan error, 1))
+	go r.WatchAllActionUpdates(ctx, notifyTestActionID("a1").Run, actions, make(chan error, 1))
+	require.Eventually(t, func() bool {
+		r.mu.RLock()
+		defer r.mu.RUnlock()
+		return len(r.runSubscribers) == 1 && len(r.actionSubscribers) == 1
+	}, 5*time.Second, 10*time.Millisecond)
+
+	r.mu.RLock()
+	for sub := range r.runSubscribers {
+		sub.requestResync()
+	}
+	for sub := range r.actionSubscribers {
+		sub.requestResync()
+	}
+	r.mu.RUnlock()
+
+	select {
+	case got := <-runs:
+		assert.Nil(t, got)
+	case <-time.After(5 * time.Second):
+		t.Fatal("WatchAllRunUpdates must send nil on resync")
+	}
+	select {
+	case got := <-actions:
+		assert.Nil(t, got)
+	case <-time.After(5 * time.Second):
+		t.Fatal("WatchAllActionUpdates must send nil on resync")
+	}
+}
+
+func TestWatchActionUpdates_ResyncSendsCurrentState(t *testing.T) {
+	db := setupActionDB(t)
+	repoIface, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	r := repoIface.(*actionRepo)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	actionID := notifyTestActionID("resync-direct")
+	_, err = r.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	updates := make(chan *models.Action, 1)
+	go r.WatchActionUpdates(ctx, actionID, updates, make(chan error, 1))
+	require.Eventually(t, func() bool {
+		r.mu.RLock()
+		defer r.mu.RUnlock()
+		return len(r.actionSubscribers) == 1
+	}, 5*time.Second, 10*time.Millisecond)
+
+	r.mu.RLock()
+	for sub := range r.actionSubscribers {
+		sub.requestResync()
+	}
+	r.mu.RUnlock()
+
+	select {
+	case got := <-updates:
+		assert.Equal(t, actionID.Name, got.Name)
+	case <-time.After(5 * time.Second):
+		t.Fatal("resync must re-read the action and send it")
+	}
+}
+
+// An update whose NOTIFY is lost while the listener is down must still reach the watcher.
+func TestWatchActionUpdates_RecoversNotificationLostDuringOutage(t *testing.T) {
+	const appName = "flyte_listener_resync_test"
+	db := setupActionDB(t)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	r := &actionRepo{
+		db:                           db,
+		dsn:                          database.GetPostgresDsn(ctx, testDbConfig.Postgres) + " application_name=" + appName,
+		listenerPingInterval:         100 * time.Millisecond,
+		listenerMinReconnectInterval: 100 * time.Millisecond,
+		runSubscribers:               make(map[*subscription]struct{}),
+		actionSubscribers:            make(map[*subscription]struct{}),
+		pendingActions:               make(map[string]struct{}, defaultNotificationBufferSize),
+		pendingActionQueue:           make([]string, 0, defaultNotificationBufferSize),
+		pendingRuns:                  make(map[string]struct{}, defaultNotificationBufferSize),
+		pendingRunQueue:              make([]string, 0, defaultNotificationBufferSize),
+		pendingCh:                    make(chan struct{}, 1),
+		notificationConfig:           testNotificationConfig,
+	}
+	actionID := notifyTestActionID("resync-outage")
+	_, err := r.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	require.NoError(t, r.startPostgresListener())
+	t.Cleanup(func() { r.listener.Close() }) //nolint:errcheck
+
+	updates := make(chan *models.Action, 16)
+	go r.WatchActionUpdates(ctx, actionID, updates, make(chan error, 1))
+	require.Eventually(t, func() bool {
+		r.mu.RLock()
+		defer r.mu.RUnlock()
+		return len(r.actionSubscribers) == 1
+	}, 5*time.Second, 10*time.Millisecond)
+
+	// Hold a pooled connection so the update below still works while new connections are refused.
+	writer, err := db.Conn(ctx)
+	require.NoError(t, err)
+	t.Cleanup(func() { writer.Close() }) //nolint:errcheck
+
+	restore := dropListenerConnection(ctx, t, appName)
+
+	// Update the action and notify while nobody is listening: this NOTIFY is lost.
+	succeeded := int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED)
+	_, err = writer.ExecContext(ctx,
+		"UPDATE actions SET phase = $1 WHERE project = $2 AND domain = $3 AND run_name = $4 AND name = $5",
+		succeeded, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+	require.NoError(t, err)
+	payload := fmt.Sprintf("%s/%s/%s/%s", actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+	_, err = writer.ExecContext(ctx, "SELECT pg_notify('action_updates', $1)", payload)
+	require.NoError(t, err)
+
+	time.Sleep(5 * r.listenerPingInterval)
+	restore()
+
+	// No further NOTIFY is sent: only the reconnect resync can deliver the new phase.
+	deadline := time.After(15 * time.Second)
+	for {
+		select {
+		case got := <-updates:
+			if got.Phase == succeeded {
+				return
+			}
+		case <-deadline:
+			t.Fatal("the watcher must see the update made while the listener was down")
+		}
+	}
+}
+
 // subscribeActions registers a raw subscriber the way WatchActionUpdates does.
 func subscribeActions(t *testing.T, r *actionRepo, size int) chan string {
 	t.Helper()
-	ch := make(chan string, size)
+	sub := &subscription{notify: make(chan string, size), resync: make(chan struct{}, 1)}
 	r.mu.Lock()
-	r.actionSubscribers[ch] = true
+	r.actionSubscribers[sub] = struct{}{}
 	r.mu.Unlock()
 	t.Cleanup(func() {
 		r.mu.Lock()
-		delete(r.actionSubscribers, ch)
+		delete(r.actionSubscribers, sub)
 		r.mu.Unlock()
 	})
-	return ch
+	return sub.notify
 }
 
 func notifyTestActionID(name string) *common.ActionIdentifier {
@@ -1435,15 +1615,7 @@ func TestNotifyPump_ConcurrentWritersDeliverEveryAction(t *testing.T) {
 
 	// Subscribe the way WatchActionUpdates does, so we observe what actually
 	// came back through pg_notify and the listener.
-	delivered := make(chan string, 4*total)
-	repo.mu.Lock()
-	repo.actionSubscribers[delivered] = true
-	repo.mu.Unlock()
-	defer func() {
-		repo.mu.Lock()
-		delete(repo.actionSubscribers, delivered)
-		repo.mu.Unlock()
-	}()
+	delivered := subscribeActions(t, repo, 4*total)
 
 	ctx := context.Background()
 	var wg sync.WaitGroup
