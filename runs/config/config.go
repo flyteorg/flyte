@@ -6,6 +6,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
+	"github.com/flyteorg/flyte/v2/flytestdlib/authorization"
 )
 
 const configSectionKey = "runs"
@@ -55,6 +56,8 @@ var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
 
 // Config holds the configuration for the Runs service
 type Config struct {
+	// Authorization configures RPC permissions and domain:project isolation. File-only.
+	Authorization authorization.Config `json:"authorization" pflag:"-"`
 	// HTTP server configuration
 	Server ServerConfig `json:"server"`
 
@@ -102,9 +105,8 @@ type Config struct {
 	// the service sits behind a trusted proxy/LB that validates tokens and strips any
 	// client-supplied copies of these headers. Set to false if the service can be
 	// reached directly or through an untrusted proxy, in which case executed_by is left
-	// unset rather than risk a spoofed identity. (Note: the runs service performs no
-	// authorization itself, so a direct caller can already act unauthenticated — this
-	// flag only governs whether to trust the forwarded identity for attribution.)
+	// unset rather than risk a spoofed identity. Authorization also requires this
+	// trust boundary when enabled.
 	TrustForwardedIdentityHeaders bool `json:"trustForwardedIdentityHeaders" pflag:",Derive executed_by from proxy-forwarded auth headers (requires a trusted proxy)"`
 
 	// IdentityHeaders names the request headers run attribution (executed_by) is read

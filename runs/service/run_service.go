@@ -28,10 +28,10 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/flytestdlib/authorization"
 	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
@@ -44,7 +44,7 @@ type RunService struct {
 	repo            interfaces.Repository
 	settingsRepo    interfaces.SettingsRepo
 	actionsClient   actionsconnect.ActionsServiceClient
-	projectClient   projectconnect.ProjectServiceClient
+	projectClient   ProjectGetter
 	storagePrefix   string
 	dataStore       *storage.DataStore
 	abortReconciler *AbortReconciler
@@ -148,7 +148,7 @@ func NewRunService(
 	repo interfaces.Repository,
 	settingsRepo interfaces.SettingsRepo,
 	actionsClient actionsconnect.ActionsServiceClient,
-	projectClient projectconnect.ProjectServiceClient,
+	projectClient ProjectGetter,
 	storagePrefix string,
 	dataStore *storage.DataStore,
 	reconciler *AbortReconciler,
@@ -208,6 +208,10 @@ func (s *RunService) CreateRun(
 		}
 	default:
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid run ID type"))
+	}
+
+	if err := authorization.Check(ctx, runId.GetDomain(), runId.GetProject()); err != nil {
+		return nil, connect.NewError(connect.CodePermissionDenied, err)
 	}
 
 	if err := validateProjectExists(ctx, s.projectClient, runId.GetProject()); err != nil {
@@ -635,7 +639,7 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 
 		// Get task spec by digest if available
 		if info.GetTaskSpecDigest() != "" {
-			specModel, err := s.repo.TaskRepo().GetTaskSpec(ctx, info.GetTaskSpecDigest())
+			specModel, err := s.repo.TaskRepo().GetTaskSpec(authorization.WithTaskSpec(ctx, info.GetTaskSpecDigest()), info.GetTaskSpecDigest())
 			if err != nil {
 				if ctx.Err() == nil {
 					logger.Errorf(ctx, "failed to get task spec for action %v: %v", actionId, err)
@@ -1160,7 +1164,14 @@ func (s *RunService) SignalEvent(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	// Record whoever the auth middleware says is calling; no authz gate (devbox).
+	// Signal forwards directly to the actions service, so check its target before
+	// the external side effect (there is no repository mutation on this path).
+	id := req.Msg.GetActionId().GetRun()
+	if err := authorization.Check(ctx, id.GetDomain(), id.GetProject()); err != nil {
+		return nil, connect.NewError(connect.CodePermissionDenied, err)
+	}
+
+	// Record the caller from trusted identity headers.
 	var signalledBy *common.EnrichedIdentity
 	if s.trustHeaders {
 		signalledBy = identityFromHeaders(req.Header(), s.identityHeaders)

@@ -19,9 +19,13 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 )
+
+// ProjectGetter supports in-process project validation, preserving authorization context.
+type ProjectGetter interface {
+	GetProject(context.Context, *connect.Request[project.GetProjectRequest]) (*connect.Response[project.GetProjectResponse], error)
+}
 
 // TruncateShortDescription truncates the short description to 255 characters if it exceeds the maximum length.
 func truncateShortDescription(description string) string {
@@ -162,7 +166,7 @@ func validatePodTemplateName(name string) error {
 }
 
 // validateProjectExists checks that the given project ID exists by calling the ProjectService.
-func validateProjectExists(ctx context.Context, projectClient projectconnect.ProjectServiceClient, projectID string) error {
+func validateProjectExists(ctx context.Context, projectClient ProjectGetter, projectID string) error {
 	if _, err := projectClient.GetProject(ctx, connect.NewRequest(&project.GetProjectRequest{
 		Id: projectID,
 	})); err != nil {
