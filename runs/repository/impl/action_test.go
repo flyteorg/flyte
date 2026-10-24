@@ -84,8 +84,8 @@ func newNotifyRepoWithDB(t *testing.T) (*actionRepo, *sql.DB, *sql.Conn) {
 	r := &actionRepo{
 		db:                 db,
 		dsn:                database.GetPostgresDsn(context.Background(), testDbConfig.Postgres),
-		runSubscribers:     make(map[chan string]bool),
-		actionSubscribers:  make(map[chan string]bool),
+		runSubscribers:     make(map[*subscription]struct{}),
+		actionSubscribers:  make(map[*subscription]struct{}),
 		pendingActions:     make(map[string]struct{}, defaultNotificationBufferSize),
 		pendingActionQueue: make([]string, 0, defaultNotificationBufferSize),
 		pendingRuns:        make(map[string]struct{}, defaultNotificationBufferSize),
@@ -1256,8 +1256,8 @@ func TestProcessNotifications_SurvivesPingFailureDuringOutage(t *testing.T) {
 		dsn:                          database.GetPostgresDsn(ctx, testDbConfig.Postgres) + " application_name=" + appName,
 		listenerPingInterval:         100 * time.Millisecond,
 		listenerMinReconnectInterval: 100 * time.Millisecond,
-		runSubscribers:               make(map[chan string]bool),
-		actionSubscribers:            make(map[chan string]bool),
+		runSubscribers:               make(map[*subscription]struct{}),
+		actionSubscribers:            make(map[*subscription]struct{}),
 	}
 	require.NoError(t, r.startPostgresListener())
 	t.Cleanup(func() { r.listener.Close() }) //nolint:errcheck
@@ -1304,16 +1304,16 @@ func TestProcessNotifications_SurvivesPingFailureDuringOutage(t *testing.T) {
 // subscribeActions registers a raw subscriber the way WatchActionUpdates does.
 func subscribeActions(t *testing.T, r *actionRepo, size int) chan string {
 	t.Helper()
-	ch := make(chan string, size)
+	sub := &subscription{notify: make(chan string, size)}
 	r.mu.Lock()
-	r.actionSubscribers[ch] = true
+	r.actionSubscribers[sub] = struct{}{}
 	r.mu.Unlock()
 	t.Cleanup(func() {
 		r.mu.Lock()
-		delete(r.actionSubscribers, ch)
+		delete(r.actionSubscribers, sub)
 		r.mu.Unlock()
 	})
-	return ch
+	return sub.notify
 }
 
 func notifyTestActionID(name string) *common.ActionIdentifier {
@@ -1435,15 +1435,7 @@ func TestNotifyPump_ConcurrentWritersDeliverEveryAction(t *testing.T) {
 
 	// Subscribe the way WatchActionUpdates does, so we observe what actually
 	// came back through pg_notify and the listener.
-	delivered := make(chan string, 4*total)
-	repo.mu.Lock()
-	repo.actionSubscribers[delivered] = true
-	repo.mu.Unlock()
-	defer func() {
-		repo.mu.Lock()
-		delete(repo.actionSubscribers, delivered)
-		repo.mu.Unlock()
-	}()
+	delivered := subscribeActions(t, repo, 4*total)
 
 	ctx := context.Background()
 	var wg sync.WaitGroup
