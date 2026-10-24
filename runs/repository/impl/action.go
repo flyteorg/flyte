@@ -783,10 +783,23 @@ func (r *actionRepo) WatchStateUpdates(ctx context.Context, updates chan<- *comm
 // subscription is one Watch* subscriber.
 type subscription struct {
 	notify chan string
+	// resync asks the subscriber to re-read its state from the DB after the listener reconnects.
+	resync chan struct{}
+}
+
+// requestResync never blocks, and repeated requests coalesce into one re-read.
+func (s *subscription) requestResync() {
+	select {
+	case s.resync <- struct{}{}:
+	default:
+	}
 }
 
 func (r *actionRepo) subscribe(subs map[*subscription]struct{}) *subscription {
-	sub := &subscription{notify: make(chan string, r.notificationConfig.watchBufferSize)}
+	sub := &subscription{
+		notify: make(chan string, r.notificationConfig.watchBufferSize),
+		resync: make(chan struct{}, 1),
+	}
 	r.mu.Lock()
 	subs[sub] = struct{}{}
 	r.mu.Unlock()
@@ -810,28 +823,32 @@ func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdent
 		select {
 		case <-ctx.Done():
 			return
+		case <-sub.resync:
 		case notifPayload := <-sub.notify:
-			if notifPayload == runKey {
-				run, err := r.GetRun(ctx, runID)
-				if err != nil {
-					if ctx.Err() != nil {
-						return
-					}
-					errs <- err
-					return
-				}
-				select {
-				case updates <- run:
-				case <-ctx.Done():
-					return
-				}
+			if notifPayload != runKey {
+				continue
 			}
+		}
+
+		run, err := r.GetRun(ctx, runID)
+		if err != nil {
+			if ctx.Err() != nil {
+				return
+			}
+			errs <- err
+			return
+		}
+		select {
+		case updates <- run:
+		case <-ctx.Done():
+			return
 		}
 	}
 }
 
 // WatchAllRunUpdates watches for all run updates via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error) {
+	// TODO(#8193): resync after a listener reconnect.
 	sub := r.subscribe(r.runSubscribers)
 	defer r.unsubscribe(r.runSubscribers, sub)
 
@@ -875,6 +892,7 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 // WatchAllActionUpdates watches for all action updates for a run via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	runPrefix := fmt.Sprintf("%s/%s/%s/", runID.Project, runID.Domain, runID.Name)
+	// TODO(#8193): resync after a listener reconnect.
 	sub := r.subscribe(r.actionSubscribers)
 	defer r.unsubscribe(r.actionSubscribers, sub)
 
@@ -940,6 +958,7 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.Ac
 		select {
 		case <-ctx.Done():
 			return
+		case <-sub.resync:
 		case notifPayload := <-sub.notify:
 			if notifPayload != targetPayload {
 				continue
@@ -957,21 +976,21 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.Ac
 					break drain
 				}
 			}
+		}
 
-			action, err := r.GetAction(ctx, actionID)
-			if err != nil {
-				if ctx.Err() != nil {
-					return
-				}
-				logger.Errorf(ctx, "Failed to get action from notification: %v", err)
-				continue
-			}
-
-			select {
-			case updates <- action:
-			case <-ctx.Done():
+		action, err := r.GetAction(ctx, actionID)
+		if err != nil {
+			if ctx.Err() != nil {
 				return
 			}
+			logger.Errorf(ctx, "Failed to get action from notification: %v", err)
+			continue
+		}
+
+		select {
+		case updates <- action:
+		case <-ctx.Done():
+			return
 		}
 	}
 }
@@ -1027,6 +1046,15 @@ func (r *actionRepo) processNotifications() {
 			}
 			if notif == nil {
 				// pq sends nil after it reconnects; notifications sent while it was down may be lost.
+				logger.Infof(context.Background(), "PostgreSQL listener reconnected, resyncing subscribers")
+				r.mu.RLock()
+				for sub := range r.runSubscribers {
+					sub.requestResync()
+				}
+				for sub := range r.actionSubscribers {
+					sub.requestResync()
+				}
+				r.mu.RUnlock()
 				continue
 			}
 
