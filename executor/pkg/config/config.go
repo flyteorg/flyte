@@ -87,10 +87,10 @@ type Config struct {
 	// assigns the `default` ServiceAccount of the pod's own namespace.
 	DefaultK8sServiceAccount string `json:"defaultK8sServiceAccount" pflag:",Default Kubernetes service account for task pods when the task does not set one"`
 
-	// MaxSystemFailures bounds consecutive system-level failures (Plugin.Handle Go
-	// errors and plugin-reported system-retryable failures) before a TaskAction is
-	// converted to a permanent failure.
-	MaxSystemFailures int32 `json:"maxSystemFailures" pflag:",Max consecutive system-level failures before forcing permanent failure"`
+	// MaxSystemFailures bounds the system-level failures (Plugin.Handle Go errors and
+	// plugin-reported system-retryable failures) one attempt may take before the
+	// TaskAction is converted to a permanent failure.
+	MaxSystemFailures int32 `json:"maxSystemFailures" pflag:",Max system-level failures per attempt before forcing permanent failure"`
 
 	// MaxConcurrentReconciles is the maximum number of concurrent reconcile loops for TaskActions.
 	MaxConcurrentReconciles int `json:"maxConcurrentReconciles" pflag:",Max concurrent reconcile loops for TaskActions"`
