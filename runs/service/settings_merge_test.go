@@ -312,6 +312,54 @@ func TestMergeTaskResourceSettings_DefaultAccelerator(t *testing.T) {
 	})
 }
 
+func TestMergeAppSettings_AppDnsStrategy(t *testing.T) {
+	t.Run("a group holding only the DNS strategy is not dropped", func(t *testing.T) {
+		got := mergeAppSettings([]*settings.AppSettings{
+			{AppDnsStrategy: str(stateValue, "dataplane_specific")},
+		})
+		require.NotNil(t, got)
+		assert.Equal(t, "dataplane_specific", got.GetAppDnsStrategy().GetStringValue())
+		assert.Equal(t, levelOrg, got.GetAppDnsStrategy().GetScopeLevel())
+	})
+
+	t.Run("inherited from the org next to a disallow_anonymous set on the project", func(t *testing.T) {
+		got := mergeAppSettings([]*settings.AppSettings{
+			{AppDnsStrategy: str(stateValue, "dataplane_specific")},
+			nil,
+			{DisallowAnonymous: &settings.BoolSetting{State: stateValue, BoolValue: true}},
+		})
+		assert.Equal(t, "dataplane_specific", got.GetAppDnsStrategy().GetStringValue())
+		assert.Equal(t, levelOrg, got.GetAppDnsStrategy().GetScopeLevel())
+		assert.True(t, got.GetDisallowAnonymous().GetBoolValue())
+		assert.Equal(t, levelProject, got.GetDisallowAnonymous().GetScopeLevel())
+	})
+
+	t.Run("UNSET below blocks a value set above", func(t *testing.T) {
+		got := mergeAppSettings([]*settings.AppSettings{
+			{AppDnsStrategy: str(stateValue, "dataplane_specific")},
+			{AppDnsStrategy: str(settings.SettingState_SETTING_STATE_UNSET, "")},
+		})
+		assert.Equal(t, settings.SettingState_SETTING_STATE_UNSET, got.GetAppDnsStrategy().GetState())
+		assert.Empty(t, got.GetAppDnsStrategy().GetStringValue())
+	})
+}
+
+// TestMergeAppSettingsHandlesEveryField fails when a field is added to AppSettings
+// without being handled in mergeAppSettings.
+func TestMergeAppSettingsHandlesEveryField(t *testing.T) {
+	handled := map[string]bool{
+		"disallow_anonymous": true,
+		"app_dns_strategy":   true,
+	}
+
+	fields := (&settings.AppSettings{}).ProtoReflect().Descriptor().Fields()
+	for i := 0; i < fields.Len(); i++ {
+		name := string(fields.Get(i).Name())
+		assert.Truef(t, handled[name],
+			"AppSettings field %q is not handled by mergeAppSettings; add it there, then add it to this list", name)
+	}
+}
+
 // TestMergeTaskResourceSettingsHandlesEveryField fails when a field is added to
 // TaskResourceSettings without being handled in mergeTaskResourceSettings.
 func TestMergeTaskResourceSettingsHandlesEveryField(t *testing.T) {
