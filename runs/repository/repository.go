@@ -16,8 +16,8 @@ import (
 type NotificationConfig = impl.NotificationConfig
 
 // NewNotificationConfig creates a normalized notification configuration.
-func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff time.Duration) NotificationConfig {
-	return impl.NewNotificationConfig(bufferLimit, retryMinBackoff, retryMaxBackoff)
+func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff time.Duration, watchBufferSize int) NotificationConfig {
+	return impl.NewNotificationConfig(bufferLimit, retryMinBackoff, retryMaxBackoff, watchBufferSize)
 }
 
 // repository implements the Repository interface

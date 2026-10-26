@@ -14,6 +14,7 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/telemetry"
 )
 
 const (
@@ -170,6 +171,11 @@ func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, envFroms []v1.Env
 		value := os.Getenv(envVarName)
 		envVars = append(envVars, v1.EnvVar{Name: k, Value: value})
 	}
+	// A deployment that opted out of telemetry opts out its task pods too, so
+	// the SDK inside them stays quiet. Last, so the task env cannot undo it.
+	if telemetry.Disabled() {
+		envVars = append(envVars, v1.EnvVar{Name: telemetry.DisableEnvVar, Value: "1"})
+	}
 
 	for _, secretName := range config.GetK8sPluginConfig().DefaultEnvFromSecrets {
 		optional := true
@@ -219,6 +225,15 @@ func GetPodTolerations(interruptible bool, resourceRequirements ...v1.ResourceRe
 		}
 		for r := range resources.Requests {
 			resourceNames.Insert(r.String())
+		}
+	}
+
+	// A per-partition accelerator resource such as nvidia.com/mig-1g.5gb also picks up the
+	// tolerations of its device class's resource name, since the partitioned nodes are tainted
+	// like any other node of that class.
+	for _, r := range resourceNames.UnsortedList() {
+		if base, ok := acceleratorBaseResourceName(v1.ResourceName(r)); ok {
+			resourceNames.Insert(base.String())
 		}
 	}
 

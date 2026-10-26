@@ -1,12 +1,11 @@
 // Package sentryutils reports Flyte operation counts and server-side failures
 // to Sentry. The DSN is hardcoded and is not user configuration;
-// FLYTE_DISABLE_SENTRY=true opts out.
+// DO_NOT_TRACK=1 opts out (FLYTE_DISABLE_TELEMETRY=true and the legacy
+// FLYTE_DISABLE_SENTRY=true are honored too).
 package sentryutils
 
 import (
 	"context"
-	"os"
-	"strconv"
 	"sync"
 	"time"
 
@@ -15,6 +14,7 @@ import (
 	"github.com/getsentry/sentry-go/attribute"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/telemetry"
 )
 
 // dsn is hardcoded and is not user configuration
@@ -28,10 +28,9 @@ var (
 	enabled  bool
 )
 
-// Disabled honors FLYTE_DISABLE_SENTRY, unset or unparsable means enabled.
+// Disabled honors the shared telemetry opt-out (DO_NOT_TRACK).
 func Disabled() bool {
-	disabled, _ := strconv.ParseBool(os.Getenv("FLYTE_DISABLE_SENTRY"))
-	return disabled
+	return telemetry.Disabled()
 }
 
 // Init initializes the process-wide Sentry client and reports whether

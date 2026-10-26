@@ -72,6 +72,20 @@ func TestEnqueue(t *testing.T) {
 
 		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
 	})
+
+	t.Run("already exists is preserved", func(t *testing.T) {
+		m := mocks.NewActionsClientInterface(t)
+		svc := NewActionsService(m)
+
+		m.EXPECT().Enqueue(mock.Anything, testAction, (*task.RunSpec)(nil)).
+			Return(connect.NewError(connect.CodeAlreadyExists, errors.New("already exists")))
+
+		_, err := svc.Enqueue(context.Background(), connect.NewRequest(&actions.EnqueueRequest{
+			Action: testAction,
+		}))
+
+		assert.Equal(t, connect.CodeAlreadyExists, connect.CodeOf(err))
+	})
 }
 
 func TestUpdate(t *testing.T) {
@@ -80,7 +94,7 @@ func TestUpdate(t *testing.T) {
 		svc := NewActionsService(m)
 
 		status := &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_SUCCEEDED}
-		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status).Return(nil)
+		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status, (*common.ActionAddress)(nil)).Return(nil)
 
 		resp, err := svc.Update(context.Background(), connect.NewRequest(&actions.UpdateRequest{
 			ActionId: testActionID,
@@ -92,12 +106,33 @@ func TestUpdate(t *testing.T) {
 		assert.NotNil(t, resp)
 	})
 
+	t.Run("passes the address through", func(t *testing.T) {
+		m := mocks.NewActionsClientInterface(t)
+		svc := NewActionsService(m)
+
+		status := &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_RUNNING}
+		address := &common.ActionAddress{
+			Pod:     &common.PodAddress{Namespace: "ns", Name: "agent-0", Ip: "10.0.0.7", Port: 8080},
+			Path:    "/s/x",
+			Cluster: "c1",
+		}
+		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status, address).Return(nil)
+
+		_, err := svc.Update(context.Background(), connect.NewRequest(&actions.UpdateRequest{
+			ActionId: testActionID,
+			Attempt:  1,
+			Status:   status,
+			Address:  address,
+		}))
+		assert.NoError(t, err)
+	})
+
 	t.Run("client error returns internal", func(t *testing.T) {
 		m := mocks.NewActionsClientInterface(t)
 		svc := NewActionsService(m)
 
 		status := &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_RUNNING}
-		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status).Return(errors.New("write failed"))
+		m.EXPECT().PutStatus(mock.Anything, testActionID, uint32(1), status, (*common.ActionAddress)(nil)).Return(errors.New("write failed"))
 
 		_, err := svc.Update(context.Background(), connect.NewRequest(&actions.UpdateRequest{
 			ActionId: testActionID,
@@ -315,4 +350,37 @@ func TestTaskActionToUpdate_FailedWithoutErrorState(t *testing.T) {
 
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_FAILED, upd.Phase)
 	assert.Nil(t, upd.Error, "no ErrorState on CR should leave ActionUpdate.Error nil")
+}
+
+// The initial watch snapshot carries a running task's address, and drops it
+// once the task is terminal or has moved to another attempt.
+func TestTaskActionToUpdate_Address(t *testing.T) {
+	ta := &executorv1.TaskAction{
+		Spec: executorv1.TaskActionSpec{
+			Project: "p", Domain: "d", RunName: "r", ActionName: "session",
+		},
+		Status: executorv1.TaskActionStatus{
+			Attempts: 1,
+			Conditions: []metav1.Condition{{
+				Type: string(executorv1.ConditionTypeProgressing), Status: metav1.ConditionTrue,
+				Reason: string(executorv1.ConditionReasonExecuting),
+			}},
+			Address: &executorv1.ActionAddress{
+				Pod:     &executorv1.PodAddress{Namespace: "ns", Name: "agent-0", IP: "10.0.0.7", Port: 8080},
+				Path:    "/s/session",
+				Attempt: 1,
+			},
+		},
+	}
+
+	upd := taskActionToUpdate(context.Background(), ta)
+	assert.Equal(t, "/s/session", upd.GetAddress().GetPath(), "running: delivered")
+	assert.Equal(t, "10.0.0.7", upd.GetAddress().GetPod().GetIp())
+
+	ta.Status.Attempts = 2
+	assert.Nil(t, taskActionToUpdate(context.Background(), ta).GetAddress(), "a newer attempt: dropped")
+
+	ta.Status.Attempts = 1
+	ta.Status.Conditions = []metav1.Condition{{Type: string(executorv1.ConditionTypeSucceeded), Status: metav1.ConditionTrue}}
+	assert.Nil(t, taskActionToUpdate(context.Background(), ta).GetAddress(), "terminal: dropped")
 }

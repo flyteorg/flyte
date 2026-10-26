@@ -91,6 +91,10 @@ message CreateUploadLocationRequest {
   // This is validated against the platform's maximum upload size if provided.
   // +optional
   int64 content_length = 9;
+
+  // Queue whose cluster pool must hold this upload. Empty uses the project's
+  // default queue for compatibility with older clients.
+  string queue = 10;
 }
 
 // CreateUploadLocationResponse specifies the response for the CreateUploadLocation API.

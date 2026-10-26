@@ -141,6 +141,54 @@ func TestPutUsesOutputURI(t *testing.T) {
 	assert.Equal(t, "mem://bucket/prefix/outputs.pb", got.GetBaseRequest().GetOutput().GetOutputUri())
 }
 
+func TestPutSendsMaxCacheAge(t *testing.T) {
+	tests := []struct {
+		name        string
+		maxCacheAge time.Duration
+		overwrite   bool
+	}{
+		{name: "put without max age", maxCacheAge: 0},
+		{name: "put with max age", maxCacheAge: time.Hour},
+		{name: "update without max age", maxCacheAge: 0, overwrite: true},
+		{name: "update with max age", maxCacheAge: 2 * time.Hour, overwrite: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+			store := newTestDataStore(t)
+			var got *cacheservicepb.OverwriteOutput
+
+			client := NewWithServiceClient(&stubCacheService{
+				putFunc: func(
+					_ context.Context, req *connect.Request[cacheservicev2.PutCacheRequest],
+				) (*connect.Response[cacheservicepb.PutCacheResponse], error) {
+					got = req.Msg.GetBaseRequest().GetOverwrite()
+					return connect.NewResponse(&cacheservicepb.PutCacheResponse{}), nil
+				},
+			}, store, tt.maxCacheAge)
+
+			outputPrefix := mem.DataReference("mem://bucket/prefix")
+			paths := ioutils.NewReadOnlyOutputFilePaths(ctx, store, outputPrefix)
+			reader := ioutils.NewRemoteFileOutputReader(ctx, store, paths, 0)
+			outputs := mem.DataReference("mem://bucket/prefix/outputs.pb")
+			require.NoError(t, store.WriteProtobuf(ctx, outputs, mem.Options{}, &corepb.LiteralMap{}))
+
+			write := client.Put
+			if tt.overwrite {
+				write = client.Update
+			}
+			_, err := write(ctx, newCatalogKey(t), reader, catalog.Metadata{CreatedAt: timestamppb.Now()})
+			require.NoError(t, err)
+			require.NotNil(t, got)
+			assert.Equal(t, tt.overwrite, got.GetOverwrite())
+			// The cache service only replaces an existing entry when the request carries max_age,
+			// so an entry older than maxCacheAge is never refreshed without it.
+			assert.Equal(t, tt.maxCacheAge > 0, got.GetMaxAge() != nil)
+			assert.Equal(t, tt.maxCacheAge, got.GetMaxAge().AsDuration())
+		})
+	}
+}
+
 func TestGetOrExtendReservationPassesHeartbeat(t *testing.T) {
 	store := newTestDataStore(t)
 	client := NewWithServiceClient(&stubCacheService{
