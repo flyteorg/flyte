@@ -1747,6 +1747,10 @@ func (m *ActionMetadata) validate(all bool) error {
 		_ = v // ensures v is used
 	}
 
+	if m.Queue != nil {
+		// no validation rules for Queue
+	}
+
 	if len(errors) > 0 {
 		return ActionMetadataMultiError(errors)
 	}
