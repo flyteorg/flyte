@@ -381,6 +381,8 @@ github.com/prometheus/client_model v0.6.3 h1:O0jaTVAYNxTHYInEPFJt5I3+sN8zqBtVMPT
 github.com/prometheus/client_model v0.6.3/go.mod h1:gpN5P9S7Rr6Yr92PiQ+Ixvhf6JZEkF1dnxsYL2aPBEM=
 github.com/prometheus/common v0.72.1 h1:ZAiQed/nk8IIcsdzb2TlJu23NEUDyDLQ9TXTN2WRK6Y=
 github.com/prometheus/common v0.72.1/go.mod h1:1IoBY4IRaJnhs2ESjNzjilP1cJ/P8pimGoomq7zRXrA=
+github.com/prometheus/otlptranslator v1.0.0 h1:s0LJW/iN9dkIH+EnhiD3BlkkP5QVIUVEoIwkU+A6qos=
+github.com/prometheus/otlptranslator v1.0.0/go.mod h1:vRYWnXvI6aWGpsdY/mOT/cbeVRBlPWtBNDb7kGR3uKM=
 github.com/prometheus/procfs v0.22.0 h1:6q9+/JL9IKAPbCmBrv9n5O5Ty3NKnciV5X7YGw0oics=
 github.com/prometheus/procfs v0.22.0/go.mod h1:CvmFr/GVhIjIvWJZW3tgkODBQMRIf0EyWMQLHCHab58=
 github.com/ray-project/kuberay/ray-operator v1.6.2 h1:XUckRswLMyk71D00L62d2Vanh0fVkNqu56+IF/rr+O0=
@@ -474,6 +476,8 @@ go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.47.0 h1:UFpxO
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.47.0/go.mod h1:YBGjxe3lt0jtXoEXxGrGhv/jM7oUBUDVK7zhAvNyEjc=
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.47.0 h1:aXZXsZ012wOgVkqaiQv+Z/d8V0xKjmg70F6m4CE94lc=
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.47.0/go.mod h1:ziu1gUIJhAaxM3EV1e3Ralk5AAyL1UOYz3lJJ4VSI38=
+go.opentelemetry.io/otel/exporters/prometheus v0.69.0 h1:LQVBTGnHvzrfGJpDoCSVTY7eaLZArvaTSq5l84Skxew=
+go.opentelemetry.io/otel/exporters/prometheus v0.69.0/go.mod h1:moif0nlgj/M16NRT8lDZVt8MC52+EOAJfR8EKRJ8LyU=
 go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.47.0 h1:ww5DYBpMKcqLdxjWrhGUIh6O+ZfvZUaMk4niVyNQPEQ=
 go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.47.0/go.mod h1:Av5t+Ezx5S/Ks2dsEfWhny+GK+wrZ1K7NZ6aHSWnX3U=
 go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.47.0 h1:N3YQCxjxQ/bMjyc3heladfRm9t9RTksGQH8z4w6yU/0=

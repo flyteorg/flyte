@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger" // nolint:staticcheck
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	otelprom "go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	rawmetric "go.opentelemetry.io/otel/metric"
@@ -36,9 +38,47 @@ var meterProviders = make(map[string]*sdkmetric.MeterProvider)
 var noopTracerProvider = noop.NewTracerProvider()
 var noopMeterProvider = metricnoop.NewMeterProvider()
 
+// ProviderOption customizes telemetry provider registration.
+type ProviderOption func(*providerOptions)
+
+type providerOptions struct {
+	prometheusRegisterer prometheus.Registerer
+}
+
+// WithPrometheusRegisterer selects the registry served by the caller's metrics
+// endpoint. By default, Prometheus exporters use prometheus.DefaultRegisterer.
+func WithPrometheusRegisterer(registerer prometheus.Registerer) ProviderOption {
+	return func(options *providerOptions) { options.prometheusRegisterer = registerer }
+}
+
 // RegisterProvidersWithContext registers a tracer & metric provider for the given service name.
-func RegisterProvidersWithContext(ctx context.Context, serviceName string, config *Config) error {
+func RegisterProvidersWithContext(ctx context.Context, serviceName string, config *Config, options ...ProviderOption) error {
 	if config == nil {
+		return nil
+	}
+
+	opts := providerOptions{prometheusRegisterer: prometheus.DefaultRegisterer}
+	for _, option := range options {
+		option(&opts)
+	}
+
+	// Prometheus is a pull-based metric reader, not a periodic push exporter.
+	// This mode intentionally leaves tracing disabled.
+	if config.ExporterType == PrometheusExporter {
+		// The service label distinguishes instruments in unified mode. Target
+		// info already contains service_name, so omit it to avoid duplicate labels.
+		reader, err := otelprom.New(
+			otelprom.WithoutTargetInfo(),
+			otelprom.WithRegisterer(prometheus.WrapRegistererWith(
+				prometheus.Labels{"service_name": serviceName}, opts.prometheusRegisterer)),
+		)
+		if err != nil {
+			return fmt.Errorf("create Prometheus exporter: %w", err)
+		}
+		meterProviders[serviceName] = sdkmetric.NewMeterProvider(
+			sdkmetric.WithResource(newTelemetryResource(serviceName)),
+			sdkmetric.WithReader(reader),
+		)
 		return nil
 	}
 

@@ -14,11 +14,12 @@ const configSectionKey = "otel"
 type ExporterType = string
 
 const (
-	NoopExporter     ExporterType = "noop"
-	FileExporter     ExporterType = "file"
-	JaegerExporter   ExporterType = "jaeger"
-	OtlpGrpcExporter ExporterType = "otlpgrpc"
-	OtlpHttpExporter ExporterType = "otlphttp" // nolint:golint
+	PrometheusExporter ExporterType = "prometheus"
+	NoopExporter       ExporterType = "noop"
+	FileExporter       ExporterType = "file"
+	JaegerExporter     ExporterType = "jaeger"
+	OtlpGrpcExporter   ExporterType = "otlpgrpc"
+	OtlpHttpExporter   ExporterType = "otlphttp" // nolint:golint
 )
 
 type SamplerType = string
@@ -52,7 +53,7 @@ var (
 )
 
 type Config struct {
-	ExporterType   ExporterType   `json:"type" pflag:",Sets the type of exporter to configure [noop/file/jaeger/otlpgrpc/otlphttp]."`
+	ExporterType   ExporterType   `json:"type" pflag:",Sets the type of exporter to configure [noop/file/jaeger/otlpgrpc/otlphttp/prometheus]."`
 	FileConfig     FileConfig     `json:"file" pflag:",Configuration for exporting telemetry traces to a file"`
 	JaegerConfig   JaegerConfig   `json:"jaeger" pflag:",Configuration for exporting telemetry traces to a jaeger"`
 	OtlpGrpcConfig OtlpGrpcConfig `json:"otlpgrpc" pflag:",Configuration for exporting telemetry traces to an OTLP gRPC collector"`

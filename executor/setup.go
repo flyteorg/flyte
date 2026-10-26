@@ -23,6 +23,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	ctrlmetrics "sigs.k8s.io/controller-runtime/pkg/metrics"
 	"sigs.k8s.io/controller-runtime/pkg/metrics/filters"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
@@ -211,7 +212,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	otelCfg := otelutils.GetConfig()
-	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
+	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg, otelutils.WithPrometheusRegisterer(ctrlmetrics.Registry)); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
 	otelInterceptor, err := otelconnect.NewInterceptor(

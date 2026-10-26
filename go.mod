@@ -70,6 +70,7 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.47.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.47.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.47.0
+	go.opentelemetry.io/otel/exporters/prometheus v0.69.0
 	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.47.0
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.47.0
 	go.opentelemetry.io/otel/metric v1.47.0
@@ -203,6 +204,7 @@ require (
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_model v0.6.3 // indirect
+	github.com/prometheus/otlptranslator v1.0.0 // indirect
 	github.com/prometheus/procfs v0.22.0 // indirect
 	github.com/redis/go-redis/extra/rediscmd/v9 v9.23.0 // indirect
 	github.com/sagikazarmark/locafero v0.11.0 // indirect
