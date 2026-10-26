@@ -40,6 +40,30 @@ func TestNewCachedStore(t *testing.T) {
 	})
 }
 
+func TestCachedRawStore_OverwriteTooBigForCache(t *testing.T) {
+	ctx := context.TODO()
+	cfg := &Config{Cache: CachingConfig{MaxSizeMegabytes: 1}}
+	store, err := NewInMemoryRawStore(ctx, cfg, metrics)
+	assert.NoError(t, err)
+	cStore := newCachedRawStore(cfg, store, metrics.cacheMetrics)
+
+	ref := DataReference("outputs.pb")
+	small := []byte("abc")
+	big := bytes.Repeat([]byte("x"), 4096)
+	assert.NoError(t, cStore.WriteRaw(ctx, ref, int64(len(small)), Options{}, bytes.NewReader(small)))
+	assert.True(t, IsFailedWriteToCache(cStore.WriteRaw(ctx, ref, int64(len(big)), Options{}, bytes.NewReader(big))))
+
+	o, err := cStore.ReadRaw(ctx, ref)
+	assert.True(t, IsFailedWriteToCache(err))
+	b, err := io.ReadAll(o)
+	assert.NoError(t, err)
+	assert.Equal(t, big, b)
+
+	m, err := cStore.Head(ctx, ref)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(len(big)), m.Size())
+}
+
 func dummyCacheStore(t *testing.T, store RawStore, metrics *cacheMetrics) *cachedRawStore {
 	cfg := &Config{
 		Cache: CachingConfig{

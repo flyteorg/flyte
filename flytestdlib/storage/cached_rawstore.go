@@ -100,9 +100,12 @@ func (s *cachedRawStore) WriteRaw(ctx context.Context, reference DataReference, 
 		return err
 	}
 
-	err = s.cache.Set([]byte(reference), buf.Bytes(), neverExpire)
+	key := []byte(reference)
+	err = s.cache.Set(key, buf.Bytes(), neverExpire)
 	if err != nil {
 		s.metrics.CacheWriteError.Inc()
+		// freecache keeps the previous entry when Set fails, and it no longer matches the store.
+		s.cache.Del(key)
 		err = errors.Wrapf(ErrFailedToWriteCache, err, "Failed to Cache the metadata")
 	}
 
