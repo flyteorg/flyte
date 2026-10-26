@@ -239,6 +239,20 @@ message ActionStatus {
   // while QUEUED. Omitted when the queue-entry time was not recorded, for
   // example by older servers.
   google.protobuf.Timestamp queued_at = 7;
+
+  // Time the current attempt entered the queue, when recorded by the queue
+  // service. Retained after assignment and while running. Primarily available
+  // in queue-scoped ListActions responses. Omitted for older attempts without
+  // a recorded queue-entry time; never inferred from action creation time.
+  google.protobuf.Timestamp queue_wait_started_at = 8;
+
+  // Time worker assignment committed for the current attempt, when recorded.
+  // Together with queue_wait_started_at, this fixes queue wait at assignment,
+  // excluding later resource waits or initialization. Primarily available in
+  // queue-scoped ListActions responses. Omitted for older assignments without
+  // a recorded assignment time; never inferred from action creation or other
+  // timestamps.
+  google.protobuf.Timestamp worker_assigned_at = 9;
 }
 
 // Lightweight representation of an action.
