@@ -58,6 +58,10 @@ Distributed Flyte 2 core services
 | components.actions.service.labels | object | `{}` |  |
 | components.actions.service.type | string | `"ClusterIP"` |  |
 | components.actions.serviceAccountName | string | `""` |  |
+| components.actions.serviceMonitor | object | `{"enabled":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image. |
+| components.actions.serviceMonitor.interval | string | `"60s"` | Interval at which Prometheus scrapes metrics. |
+| components.actions.serviceMonitor.labels | object | `{}` | Labels used by Prometheus to discover this monitor. |
+| components.actions.serviceMonitor.scrapeTimeout | string | `"30s"` | Timeout for each metrics scrape. |
 | components.actions.sidecars | list | `[]` |  |
 | components.actions.startupProbe | object | `{}` |  |
 | components.actions.strategy | object | `{}` |  |
@@ -105,6 +109,10 @@ Distributed Flyte 2 core services
 | components.app.service.labels | object | `{}` |  |
 | components.app.service.type | string | `"ClusterIP"` |  |
 | components.app.serviceAccountName | string | `""` |  |
+| components.app.serviceMonitor | object | `{"enabled":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image. |
+| components.app.serviceMonitor.interval | string | `"60s"` | Interval at which Prometheus scrapes metrics. |
+| components.app.serviceMonitor.labels | object | `{}` | Labels used by Prometheus to discover this monitor. |
+| components.app.serviceMonitor.scrapeTimeout | string | `"30s"` | Timeout for each metrics scrape. |
 | components.app.sidecars | list | `[]` |  |
 | components.app.startupProbe | object | `{}` |  |
 | components.app.strategy | object | `{}` |  |
@@ -152,6 +160,10 @@ Distributed Flyte 2 core services
 | components.cache.service.labels | object | `{}` |  |
 | components.cache.service.type | string | `"ClusterIP"` |  |
 | components.cache.serviceAccountName | string | `""` |  |
+| components.cache.serviceMonitor | object | `{"enabled":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image. |
+| components.cache.serviceMonitor.interval | string | `"60s"` | Interval at which Prometheus scrapes metrics. |
+| components.cache.serviceMonitor.labels | object | `{}` | Labels used by Prometheus to discover this monitor. |
+| components.cache.serviceMonitor.scrapeTimeout | string | `"30s"` | Timeout for each metrics scrape. |
 | components.cache.sidecars | list | `[]` |  |
 | components.cache.startupProbe | object | `{}` |  |
 | components.cache.strategy | object | `{}` |  |
@@ -199,6 +211,10 @@ Distributed Flyte 2 core services
 | components.dataproxy.service.labels | object | `{}` |  |
 | components.dataproxy.service.type | string | `"ClusterIP"` |  |
 | components.dataproxy.serviceAccountName | string | `""` |  |
+| components.dataproxy.serviceMonitor | object | `{"enabled":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image. |
+| components.dataproxy.serviceMonitor.interval | string | `"60s"` | Interval at which Prometheus scrapes metrics. |
+| components.dataproxy.serviceMonitor.labels | object | `{}` | Labels used by Prometheus to discover this monitor. |
+| components.dataproxy.serviceMonitor.scrapeTimeout | string | `"30s"` | Timeout for each metrics scrape. |
 | components.dataproxy.sidecars | list | `[]` |  |
 | components.dataproxy.startupProbe | object | `{}` |  |
 | components.dataproxy.strategy | object | `{}` |  |
@@ -246,6 +262,10 @@ Distributed Flyte 2 core services
 | components.events.service.labels | object | `{}` |  |
 | components.events.service.type | string | `"ClusterIP"` |  |
 | components.events.serviceAccountName | string | `""` |  |
+| components.events.serviceMonitor | object | `{"enabled":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image. |
+| components.events.serviceMonitor.interval | string | `"60s"` | Interval at which Prometheus scrapes metrics. |
+| components.events.serviceMonitor.labels | object | `{}` | Labels used by Prometheus to discover this monitor. |
+| components.events.serviceMonitor.scrapeTimeout | string | `"30s"` | Timeout for each metrics scrape. |
 | components.events.sidecars | list | `[]` |  |
 | components.events.startupProbe | object | `{}` |  |
 | components.events.strategy | object | `{}` |  |
@@ -289,6 +309,10 @@ Distributed Flyte 2 core services
 | components.executor.service.labels | object | `{}` |  |
 | components.executor.service.type | string | `"ClusterIP"` |  |
 | components.executor.serviceAccountName | string | `""` |  |
+| components.executor.serviceMonitor | object | `{"enabled":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image. |
+| components.executor.serviceMonitor.interval | string | `"60s"` | Interval at which Prometheus scrapes metrics. |
+| components.executor.serviceMonitor.labels | object | `{}` | Labels used by Prometheus to discover this monitor. |
+| components.executor.serviceMonitor.scrapeTimeout | string | `"30s"` | Timeout for each metrics scrape. |
 | components.executor.sidecars | list | `[]` |  |
 | components.executor.startupProbe | object | `{}` |  |
 | components.executor.strategy | object | `{}` |  |
@@ -336,6 +360,10 @@ Distributed Flyte 2 core services
 | components.runs.service.labels | object | `{}` |  |
 | components.runs.service.type | string | `"ClusterIP"` |  |
 | components.runs.serviceAccountName | string | `""` |  |
+| components.runs.serviceMonitor | object | `{"enabled":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image. |
+| components.runs.serviceMonitor.interval | string | `"60s"` | Interval at which Prometheus scrapes metrics. |
+| components.runs.serviceMonitor.labels | object | `{}` | Labels used by Prometheus to discover this monitor. |
+| components.runs.serviceMonitor.scrapeTimeout | string | `"30s"` | Timeout for each metrics scrape. |
 | components.runs.sidecars | list | `[]` |  |
 | components.runs.startupProbe | object | `{}` |  |
 | components.runs.strategy | object | `{}` |  |
@@ -383,6 +411,10 @@ Distributed Flyte 2 core services
 | components.secret.service.labels | object | `{}` |  |
 | components.secret.service.type | string | `"ClusterIP"` |  |
 | components.secret.serviceAccountName | string | `""` |  |
+| components.secret.serviceMonitor | object | `{"enabled":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image. |
+| components.secret.serviceMonitor.interval | string | `"60s"` | Interval at which Prometheus scrapes metrics. |
+| components.secret.serviceMonitor.labels | object | `{}` | Labels used by Prometheus to discover this monitor. |
+| components.secret.serviceMonitor.scrapeTimeout | string | `"30s"` | Timeout for each metrics scrape. |
 | components.secret.sidecars | list | `[]` |  |
 | components.secret.startupProbe | object | `{}` |  |
 | components.secret.strategy | object | `{}` |  |
@@ -539,6 +571,10 @@ Distributed Flyte 2 core services
 | console.service.annotations | object | `{}` |  |
 | console.service.port | int | `80` |  |
 | console.service.type | string | `"ClusterIP"` |  |
+| console.serviceMonitor | object | `{"enabled":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image. |
+| console.serviceMonitor.interval | string | `"60s"` | Interval at which Prometheus scrapes metrics. |
+| console.serviceMonitor.labels | object | `{}` | Labels used by Prometheus to discover this monitor. |
+| console.serviceMonitor.scrapeTimeout | string | `"30s"` | Timeout for each metrics scrape. |
 | console.tolerations | list | `[]` |  |
 | enabledPlugins.tasks.task-plugins.default-for-task-types.container | string | `"container"` |  |
 | enabledPlugins.tasks.task-plugins.default-for-task-types.container_array | string | `"k8s-array"` |  |
