@@ -135,14 +135,14 @@ class Inputs(_message.Message):
     def __init__(self, literals: _Optional[_Iterable[_Union[NamedLiteral, _Mapping]]] = ..., context: _Optional[_Iterable[_Union[_literals_pb2.KeyValuePair, _Mapping]]] = ...) -> None: ...
 
 class ActionInputOverridesData(_message.Message):
-    __slots__ = ["overrides", "code_bundles"]
-    class OverridesEntry(_message.Message):
+    __slots__ = ["input_uris", "code_bundles"]
+    class InputUrisEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
-        value: Inputs
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[Inputs, _Mapping]] = ...) -> None: ...
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     class CodeBundlesEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -150,11 +150,11 @@ class ActionInputOverridesData(_message.Message):
         key: str
         value: ActionCodeBundle
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[ActionCodeBundle, _Mapping]] = ...) -> None: ...
-    OVERRIDES_FIELD_NUMBER: _ClassVar[int]
+    INPUT_URIS_FIELD_NUMBER: _ClassVar[int]
     CODE_BUNDLES_FIELD_NUMBER: _ClassVar[int]
-    overrides: _containers.MessageMap[str, Inputs]
+    input_uris: _containers.ScalarMap[str, str]
     code_bundles: _containers.MessageMap[str, ActionCodeBundle]
-    def __init__(self, overrides: _Optional[_Mapping[str, Inputs]] = ..., code_bundles: _Optional[_Mapping[str, ActionCodeBundle]] = ...) -> None: ...
+    def __init__(self, input_uris: _Optional[_Mapping[str, str]] = ..., code_bundles: _Optional[_Mapping[str, ActionCodeBundle]] = ...) -> None: ...
 
 class ActionCodeBundle(_message.Message):
     __slots__ = ["tgz", "version"]

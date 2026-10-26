@@ -139,13 +139,16 @@ message Inputs {
 }
 
 // ActionInputOverridesData is the file referenced by ActionInputOverrides.uri. The
-// controller of each overridden action's parent overlays these values, by input
-// name, on the inputs it computes for that action, and runs that action from its
-// replacement code bundle, if any. Every key of either map is also listed in
-// ActionInputOverrides.action_names.
+// controller of each overridden action's parent reads that action's override
+// inputs from their path, overlays them, by input name, on the inputs it computes
+// for that action, and runs that action from its replacement code bundle, if any.
+// Every key of either map is also listed in ActionInputOverrides.action_names.
 message ActionInputOverridesData {
-  // Action name in the run being recovered -> partial inputs.
-  map<string, Inputs> overrides = 1;
+  // Action name in the run being recovered -> URI of a serialized Inputs in the
+  // data plane holding the inputs that change (partial inputs). Like an action's
+  // input_uri, the values stay in the data plane and are only read by the parent
+  // that launches the action.
+  map<string, string> input_uris = 1;
 
   // Action name in the run being recovered -> the code bundle that action runs
   // instead of the one its parent passes down. Only that action, and the actions
