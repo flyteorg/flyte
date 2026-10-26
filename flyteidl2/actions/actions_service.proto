@@ -80,6 +80,11 @@ message Action {
   // identifies the source action (source run id + action name) whose result was reused.
   // never set by clients on enqueue.
   flyteidl2.common.ActionIdentifier recovered_from = 10;
+
+  // set by the parent's controller when this action's inputs were overridden from
+  // RunSpec.recover.action_input_overrides. The server rejects an enqueue of an
+  // overridden action name without this flag (a runtime that cannot apply overrides).
+  bool input_override_applied = 11;
 }
 
 // ============================================================================
