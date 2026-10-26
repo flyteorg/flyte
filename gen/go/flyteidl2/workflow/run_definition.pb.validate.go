@@ -1526,7 +1526,7 @@ func (m *ActionMetadata) validate(all bool) error {
 
 	// no validation rules for EnvironmentName
 
-	// no validation rules for FuntionName
+	// no validation rules for FunctionName
 
 	// no validation rules for TriggerName
 
