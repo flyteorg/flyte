@@ -1200,6 +1200,10 @@ func (m *ReusePolicy) validate(all bool) error {
 
 	// no validation rules for Scope
 
+	// no validation rules for Name
+
+	// no validation rules for Version
+
 	if len(errors) > 0 {
 		return ReusePolicyMultiError(errors)
 	}

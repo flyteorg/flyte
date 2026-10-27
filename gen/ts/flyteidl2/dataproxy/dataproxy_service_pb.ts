@@ -119,11 +119,8 @@ export type CreateUploadLocationRequest = Message<"flyteidl2.dataproxy.CreateUpl
   contentLength: bigint;
 
   /**
-   * Queue is the name of the queue the run that consumes this upload will be placed on,
-   * resolved in the project/domain scope like RunSpec.queue. When set, the upload location
-   * is created in the object store of that queue's cluster pool; when empty, the
-   * project/domain default queue's pool is used. Single-cluster deployments may ignore it.
-   * +optional
+   * Queue whose cluster pool must hold this upload. Empty uses the project's
+   * default queue for compatibility with older clients.
    *
    * @generated from field: string queue = 10;
    */

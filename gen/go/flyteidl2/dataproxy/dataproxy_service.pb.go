@@ -124,11 +124,8 @@ type CreateUploadLocationRequest struct {
 	// This is validated against the platform's maximum upload size if provided.
 	// +optional
 	ContentLength int64 `protobuf:"varint,9,opt,name=content_length,json=contentLength,proto3" json:"content_length,omitempty"`
-	// Queue is the name of the queue the run that consumes this upload will be placed on,
-	// resolved in the project/domain scope like RunSpec.queue. When set, the upload location
-	// is created in the object store of that queue's cluster pool; when empty, the
-	// project/domain default queue's pool is used. Single-cluster deployments may ignore it.
-	// +optional
+	// Queue whose cluster pool must hold this upload. Empty uses the project's
+	// default queue for compatibility with older clients.
 	Queue string `protobuf:"bytes,10,opt,name=queue,proto3" json:"queue,omitempty"`
 }
 

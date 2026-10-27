@@ -13,7 +13,6 @@ import (
 
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/gang"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
@@ -81,9 +80,16 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 	// 2. Has the whole gang ever been up?
 	var phaseInfo pluginsCore.PhaseInfo
 	if started {
-		phaseInfo = afterStart(ctx, jobSet, condition, suspended, pods, maxRestarts, &taskInfo)
+		phaseInfo = afterStart(ctx, pluginContext, jobSet, condition, suspended, pods, maxRestarts, &taskInfo)
 	} else {
-		phaseInfo = beforeStart(ctx, jobSet, condition, suspended, pods, maxRestarts, pluginState, &taskInfo)
+		phaseInfo = beforeStart(ctx, pluginContext, jobSet, condition, suspended, pods, maxRestarts, pluginState, &taskInfo)
+	}
+
+	// The tree is built so that a non-terminal phase never moves backwards: downstream drops
+	// a lower phase and its reason. If one ever does, say so instead of losing it silently.
+	if !phaseInfo.Phase().IsTerminal() && !pluginState.Phase.IsTerminal() && phaseInfo.Phase() < pluginState.Phase {
+		logger.Warnf(ctx, "JobSet %s/%s: computed phase %s is behind the reported phase %s (%s); it will be dropped",
+			jobSet.Namespace, jobSet.Name, phaseInfo.Phase(), pluginState.Phase, phaseInfo.Reason())
 	}
 
 	// A new reason within the same phase needs a new version, or its event is dropped
@@ -100,6 +106,7 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 // stays at Initializing and carries the new reason instead.
 func beforeStart(
 	ctx context.Context,
+	pluginContext k8s.PluginContext,
 	jobSet *jobsetv1alpha2.JobSet,
 	condition *metav1.Condition,
 	suspended bool,
@@ -119,6 +126,9 @@ func beforeStart(
 
 	// Not admitted yet: the gate holds the JobSet and no pods exist.
 	if suspended {
+		if phase, ok := queueNotFound(ctx, pluginContext, jobSet, taskInfo); ok {
+			return phase
+		}
 		reason := "waiting for gang admission"
 		if reachedInitializing {
 			reason = "released by admission gate before all workers were ready; waiting for re-admission"
@@ -142,6 +152,7 @@ func beforeStart(
 // afterStart reports a gang that has been fully up at least once in this attempt.
 func afterStart(
 	ctx context.Context,
+	pluginContext k8s.PluginContext,
 	jobSet *jobsetv1alpha2.JobSet,
 	condition *metav1.Condition,
 	suspended bool,
@@ -151,7 +162,7 @@ func afterStart(
 ) pluginsCore.PhaseInfo {
 	// The gate took the gang back: the JobSet is re-suspended and its pods are gone.
 	if suspended {
-		return evictedPhaseInfo(condition, taskInfo)
+		return evictedPhaseInfo(ctx, pluginContext, jobSet, taskInfo)
 	}
 
 	if conditionType(condition) == jobsetv1alpha2.JobSetRestarting {
@@ -177,35 +188,85 @@ func runningPhaseInfo(taskInfo *pluginsCore.TaskInfo, reason string) pluginsCore
 	return phaseInfo
 }
 
-// evictionSource names the admission gate that flips spec.suspend on our JobSets.
-// Only Kueue's JobSet integration does that today; the plugin itself sets suspend
-// only at creation, and only when Kueue is enabled.
+// evictionSource names the admission gate that suspends JobSets: Kueue's JobSet integration,
+// which suspends a JobSet labelled with a queue when it is created and again when it takes
+// the gang back. The plugin never suspends a JobSet itself.
 const evictionSource = "kueue"
 
-// evictionPolicy decides how a post-start eviction is reported. Plugin config
-// (plugins.clustered.kueue.evict-as-system-retry) takes this over once it exists.
-var evictionPolicy = gang.Policy{AsSystemRetry: true}
-
-// evictedPhaseInfo reports a gang the gate revoked after it had fully started. The
-// attempt is over: the policy decides whether it is charged as a system or a user
-// retry. The JobSet's Suspended condition only carries the JobSet controller's own
-// message, so the gate's reason is unknown here; the executors add it from the
-// gate's event on the JobSet.
-func evictedPhaseInfo(condition *metav1.Condition, taskInfo *pluginsCore.TaskInfo) pluginsCore.PhaseInfo {
-	message := "JobSet suspended after the gang had started; admission was revoked"
-	if condition != nil && condition.Message != "" {
-		message += " (" + condition.Message + ")"
+// evictedPhaseInfo reports a gang the gate took back after it had fully started. The attempt
+// is over and the JobSet is cleaned up. Kueue's Workload says why: a cause the user owns
+// (preemption in the queue they chose, the maximum execution time they set) is a user retry
+// that uses one of the task's retries; any other cause, or a Workload that cannot be read, is
+// a system retry that does not. The message says which, and how many retries are left.
+func evictedPhaseInfo(
+	ctx context.Context,
+	pluginContext k8s.PluginContext,
+	jobSet *jobsetv1alpha2.JobSet,
+	taskInfo *pluginsCore.TaskInfo,
+) pluginsCore.PhaseInfo {
+	wl, err := workloadForJobSet(ctx, pluginContext.K8sReader(), jobSet)
+	if err != nil {
+		logger.Warnf(ctx, "failed to read the Kueue Workload of JobSet %s/%s; reporting its eviction as a system retry: %v",
+			jobSet.Namespace, jobSet.Name, err)
 	}
-
-	execErr := gang.Eviction{
-		Source:  evictionSource,
-		Reason:  gang.ReasonUnknown,
-		Message: message,
-	}.ExecutionError(evictionPolicy)
-	if execErr.GetKind() == core.ExecutionError_SYSTEM {
-		return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(execErr.GetCode(), execErr.GetMessage(), taskInfo)
+	eviction := classifyEviction(wl)
+	if eviction.UserCaused {
+		eviction.RetriesLeft = retriesRemaining(pluginContext)
 	}
-	return pluginsCore.PhaseInfoRetryableFailureWithCleanup(execErr.GetCode(), execErr.GetMessage(), taskInfo)
+	execErr := eviction.ExecutionError()
+	if eviction.UserCaused {
+		return pluginsCore.PhaseInfoRetryableFailureWithCleanup(execErr.GetCode(), execErr.GetMessage(), taskInfo)
+	}
+	return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(execErr.GetCode(), execErr.GetMessage(), taskInfo)
+}
+
+// retriesRemaining is how many of the task's retries are still available for the attempt that
+// just failed to use: the attempts the task may make, less the ones it has made, this one
+// included.
+func retriesRemaining(pluginContext k8s.PluginContext) uint32 {
+	meta := pluginContext.TaskExecutionMetadata()
+	if meta == nil {
+		return 0
+	}
+	used := meta.GetTaskExecutionID().GetID().GetRetryAttempt() + 1
+	if maxAttempts := meta.GetMaxAttempts(); maxAttempts > used {
+		return maxAttempts - used
+	}
+	return 0
+}
+
+// codeQueueNotFound is the user error for a task whose Kueue queue label names a LocalQueue
+// that does not exist.
+const codeQueueNotFound = "KueueLocalQueueNotFound"
+
+// queueNotFound fails a held JobSet whose queue label names a LocalQueue that does not exist:
+// Kueue can never admit it, so waiting would only run out the clock. It is the user's error
+// and is not retried. The JobSet is cleaned up.
+func queueNotFound(
+	ctx context.Context,
+	pluginContext k8s.PluginContext,
+	jobSet *jobsetv1alpha2.JobSet,
+	taskInfo *pluginsCore.TaskInfo,
+) (pluginsCore.PhaseInfo, bool) {
+	if jobSet.Labels[kueueQueueNameLabel] == "" {
+		return pluginsCore.PhaseInfoUndefined, false
+	}
+	wl, err := workloadForJobSet(ctx, pluginContext.K8sReader(), jobSet)
+	if err != nil {
+		logger.Warnf(ctx, "failed to read the Kueue Workload of JobSet %s/%s: %v", jobSet.Namespace, jobSet.Name, err)
+		return pluginsCore.PhaseInfoUndefined, false
+	}
+	queue, missing := missingLocalQueue(jobSet, wl)
+	if !missing {
+		return pluginsCore.PhaseInfoUndefined, false
+	}
+	execErr := &core.ExecutionError{
+		Kind: core.ExecutionError_USER,
+		Code: codeQueueNotFound,
+		Message: fmt.Sprintf("the Kueue queue %q set by the %s label does not exist in namespace %q; "+
+			"use one of the queues your platform provides", queue, kueueQueueNameLabel, jobSet.Namespace),
+	}
+	return pluginsCore.PhaseInfoFailed(pluginsCore.PhasePermanentFailure, execErr, taskInfo).WithCleanupOnFailure(), true
 }
 
 // isSuspended reports whether an admission gate is holding the JobSet. spec.suspend

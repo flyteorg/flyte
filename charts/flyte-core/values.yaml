@@ -10,11 +10,27 @@ commonAnnotations: {}
 # imagePullSecrets are attached to all Flyte core pods.
 imagePullSecrets: []
 
+# telemetry Crash reports and usage counts Flyte sends to its maintainers, and the console's analytics tags.
+telemetry:
+  # -- Set to false to opt out. Sets DO_NOT_TRACK=1 (https://donottrack.sh) on the backend and the console; the backend passes it on to the task and app pods it creates.
+  enabled: true
+
 # components configures each independently scalable Flyte service.
 components:
   runs:
     enabled: true
     replicaCount: 1
+    # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: null
+      # -- Additional autoscaling/v2 metrics (Pods, Object, External, or Resource).
+      metrics: []
+      # -- Optional autoscaling/v2 scaleUp and scaleDown policies.
+      behavior: {}
     image:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2
       tag: latest  # FLYTE_TAG
@@ -61,6 +77,17 @@ components:
   actions:
     enabled: true
     replicaCount: 1
+    # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: null
+      # -- Additional autoscaling/v2 metrics (Pods, Object, External, or Resource).
+      metrics: []
+      # -- Optional autoscaling/v2 scaleUp and scaleDown policies.
+      behavior: {}
     image:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2
       tag: latest  # FLYTE_TAG
@@ -107,6 +134,17 @@ components:
   events:
     enabled: true
     replicaCount: 1
+    # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: null
+      # -- Additional autoscaling/v2 metrics (Pods, Object, External, or Resource).
+      metrics: []
+      # -- Optional autoscaling/v2 scaleUp and scaleDown policies.
+      behavior: {}
     image:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2
       tag: latest  # FLYTE_TAG
@@ -153,6 +191,17 @@ components:
   secret:
     enabled: true
     replicaCount: 1
+    # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: null
+      # -- Additional autoscaling/v2 metrics (Pods, Object, External, or Resource).
+      metrics: []
+      # -- Optional autoscaling/v2 scaleUp and scaleDown policies.
+      behavior: {}
     image:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2
       tag: latest  # FLYTE_TAG
@@ -199,6 +248,17 @@ components:
   cache:
     enabled: true
     replicaCount: 1
+    # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: null
+      # -- Additional autoscaling/v2 metrics (Pods, Object, External, or Resource).
+      metrics: []
+      # -- Optional autoscaling/v2 scaleUp and scaleDown policies.
+      behavior: {}
     image:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2
       tag: latest  # FLYTE_TAG
@@ -246,6 +306,17 @@ components:
     # Apps require Knative Serving to be installed in the cluster.
     enabled: false
     replicaCount: 1
+    # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: null
+      # -- Additional autoscaling/v2 metrics (Pods, Object, External, or Resource).
+      metrics: []
+      # -- Optional autoscaling/v2 scaleUp and scaleDown policies.
+      behavior: {}
     image:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2
       tag: latest  # FLYTE_TAG
@@ -292,6 +363,17 @@ components:
   dataproxy:
     enabled: true
     replicaCount: 1
+    # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: null
+      # -- Additional autoscaling/v2 metrics (Pods, Object, External, or Resource).
+      metrics: []
+      # -- Optional autoscaling/v2 scaleUp and scaleDown policies.
+      behavior: {}
     image:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2
       tag: latest  # FLYTE_TAG
@@ -637,6 +719,17 @@ ingress:
 console:
   enabled: true
   replicaCount: 1
+  # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: null
+    # -- Additional autoscaling/v2 metrics (Pods, Object, External, or Resource).
+    metrics: []
+    # -- Optional autoscaling/v2 scaleUp and scaleDown policies.
+    behavior: {}
   # Opt-in protection against voluntary evictions. Set exactly one budget.
   podDisruptionBudget:
     enabled: false

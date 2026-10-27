@@ -14,7 +14,9 @@ metadata:
     {{- tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
 spec:
+  {{- if not $component.autoscaling.enabled }}
   replicas: {{ $component.replicaCount }}
+  {{- end }}
   {{- with $component.strategy }}
   strategy:
     {{- toYaml . | nindent 4 }}
@@ -136,6 +138,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            {{- if include "flyte-core.telemetryDisabled" $ }}
+            - name: DO_NOT_TRACK
+              value: "1"
+            {{- end }}
             {{- with $component.extraEnv }}
             {{- tpl (toYaml .) $ | nindent 12 }}
             {{- end }}

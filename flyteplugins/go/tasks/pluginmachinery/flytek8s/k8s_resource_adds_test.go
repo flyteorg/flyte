@@ -430,3 +430,51 @@ func TestDecorateEnvVars(t *testing.T) {
 		})
 	}
 }
+
+func TestGetPodTolerationsMIGPartitionResource(t *testing.T) {
+	migMixedConfig(t, "nvidia.com/mig-{partition}")
+	gpuTol := v12.Toleration{Key: "flyte/gpu", Value: "dedicated", Operator: v12.TolerationOpEqual, Effect: v12.TaintEffectNoSchedule}
+
+	tols := GetPodTolerations(false, v12.ResourceRequirements{
+		Limits: v12.ResourceList{"nvidia.com/mig-1g.5gb": resource.MustParse("1")},
+	})
+	assert.Equal(t, []v12.Toleration{gpuTol}, tols)
+
+	// A resource that only looks like a partition of an unconfigured template gets nothing.
+	tols = GetPodTolerations(false, v12.ResourceRequirements{
+		Limits: v12.ResourceList{"amd.com/mig-1g.5gb": resource.MustParse("1")},
+	})
+	assert.Empty(t, tols)
+}
+
+func TestDecorateEnvVars_TelemetryOptOut(t *testing.T) {
+	telemetryEnv := func(envVars []v12.EnvVar) []string {
+		var got []string
+		for _, e := range envVars {
+			if e.Name == "DO_NOT_TRACK" {
+				got = append(got, e.Value)
+			}
+		}
+		return got
+	}
+	for _, name := range []string{"FLYTE_DISABLE_TELEMETRY", "DO_NOT_TRACK", "FLYTE_DISABLE_SENTRY"} {
+		t.Setenv(name, "")
+	}
+	// The task's own env cannot re-enable telemetry the deployment turned off.
+	taskEnv := map[string]string{"DO_NOT_TRACK": "0"}
+
+	t.Run("enabled", func(t *testing.T) {
+		envVars, _ := DecorateEnvVars(context.Background(), nil, nil, nil, mockTaskExecutionIdentifier{}, "")
+		assert.Empty(t, telemetryEnv(envVars))
+	})
+	t.Run("disabled", func(t *testing.T) {
+		t.Setenv("DO_NOT_TRACK", "1")
+		envVars, _ := DecorateEnvVars(context.Background(), nil, nil, taskEnv, mockTaskExecutionIdentifier{}, "")
+		assert.Equal(t, []string{"1"}, telemetryEnv(envVars))
+	})
+	t.Run("disabled-via-flyte-alias", func(t *testing.T) {
+		t.Setenv("FLYTE_DISABLE_TELEMETRY", "true")
+		envVars, _ := DecorateEnvVars(context.Background(), nil, nil, nil, mockTaskExecutionIdentifier{}, "")
+		assert.Equal(t, []string{"1"}, telemetryEnv(envVars))
+	})
+}

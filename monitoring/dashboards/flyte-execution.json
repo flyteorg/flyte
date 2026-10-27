@@ -24,7 +24,7 @@
           "uid": "prometheus"
         },
         "query": {
-          "query": "label_values(rpc_server_duration_milliseconds_count, service_name)",
+          "query": "label_values(rpc_server_call_duration_seconds_count, service_name)",
           "refId": "SVQ"
         },
         "refresh": 2,
@@ -45,7 +45,7 @@
           "uid": "prometheus"
         },
         "query": {
-          "query": "label_values(rpc_server_duration_milliseconds_count, rpc_method)",
+          "query": "label_values(rpc_server_call_duration_seconds_count, rpc_method)",
           "refId": "SVQ"
         },
         "refresh": 2,
@@ -53,8 +53,8 @@
         "multi": false,
         "sort": 1,
         "current": {
-          "text": "ListProjects",
-          "value": "ListProjects"
+          "text": "flyteidl2.project.ProjectService/ListProjects",
+          "value": "flyteidl2.project.ProjectService/ListProjects"
         }
       }
     ]
@@ -112,7 +112,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(rate(rpc_server_duration_milliseconds_count[5m]))",
+          "expr": "sum(rate(rpc_server_call_duration_seconds_count[5m]))",
           "legendFormat": "throughput",
           "refId": "A"
         }
@@ -170,7 +170,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(rate(rpc_server_duration_milliseconds_count{rpc_connect_rpc_error_code!=\"\"}[5m]))",
+          "expr": "sum(rate(rpc_server_call_duration_seconds_count{error_type!=\"\"}[5m]))",
           "legendFormat": "errors",
           "refId": "A"
         }
@@ -228,7 +228,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "count(count by (service_name)(rpc_server_duration_milliseconds_count))",
+          "expr": "count(count by (service_name)(rpc_server_call_duration_seconds_count))",
           "legendFormat": "services",
           "refId": "A"
         }
@@ -303,7 +303,7 @@
       "id": 5,
       "type": "heatmap",
       "title": "Inbound latency heatmap \u2014 $method",
-      "description": "rpc.server.duration distribution for the selected $method.",
+      "description": "rpc.server.call.duration distribution for the selected $method.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -320,7 +320,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(rate(rpc_server_duration_milliseconds_bucket{rpc_method=\"$method\"}[5m])) by (le)",
+          "expr": "sum(rate(rpc_server_call_duration_seconds_bucket{rpc_method=\"$method\"}[5m])) by (le)",
           "legendFormat": "{{le}}",
           "refId": "A",
           "format": "heatmap"
@@ -336,7 +336,7 @@
           "reverse": false
         },
         "yAxis": {
-          "unit": "ms",
+          "unit": "s",
           "axisPlacement": "left"
         },
         "tooltip": {
@@ -727,7 +727,7 @@
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "ms",
+          "unit": "s",
           "custom": {
             "drawStyle": "line",
             "lineWidth": 1,
@@ -760,7 +760,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "histogram_quantile(0.50, sum by (le)(rate(rpc_client_duration_milliseconds_bucket{service_name=\"executor\", rpc_method=\"Record\"}[5m])))",
+          "expr": "histogram_quantile(0.50, sum by (le)(rate(rpc_client_call_duration_seconds_bucket{service_name=\"executor\", rpc_method=\"flyteidl2.workflow.EventsProxyService/Record\"}[5m])))",
           "legendFormat": "p50",
           "refId": "A"
         },
@@ -769,7 +769,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum by (le)(rate(rpc_client_duration_milliseconds_bucket{service_name=\"executor\", rpc_method=\"Record\"}[5m])))",
+          "expr": "histogram_quantile(0.95, sum by (le)(rate(rpc_client_call_duration_seconds_bucket{service_name=\"executor\", rpc_method=\"flyteidl2.workflow.EventsProxyService/Record\"}[5m])))",
           "legendFormat": "p95",
           "refId": "B"
         },
@@ -778,7 +778,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "histogram_quantile(0.99, sum by (le)(rate(rpc_client_duration_milliseconds_bucket{service_name=\"executor\", rpc_method=\"Record\"}[5m])))",
+          "expr": "histogram_quantile(0.99, sum by (le)(rate(rpc_client_call_duration_seconds_bucket{service_name=\"executor\", rpc_method=\"flyteidl2.workflow.EventsProxyService/Record\"}[5m])))",
           "legendFormat": "p99",
           "refId": "C"
         }
@@ -1253,7 +1253,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by (rpc_method)(rate(rpc_server_duration_milliseconds_count{service_name=\"$service\"}[5m]))",
+          "expr": "sum by (rpc_method)(rate(rpc_server_call_duration_seconds_count{service_name=\"$service\"}[5m]))",
           "legendFormat": "{{rpc_method}}",
           "refId": "A"
         }
@@ -1263,7 +1263,7 @@
       "id": 19,
       "type": "timeseries",
       "title": "p95 latency by method \u2014 $service",
-      "description": "p95 rpc.server.duration per method.",
+      "description": "p95 rpc.server.call.duration per method.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -1276,7 +1276,7 @@
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "ms",
+          "unit": "s",
           "custom": {
             "drawStyle": "line",
             "lineWidth": 1,
@@ -1309,7 +1309,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum by (le, rpc_method)(rate(rpc_server_duration_milliseconds_bucket{service_name=\"$service\"}[5m])))",
+          "expr": "histogram_quantile(0.95, sum by (le, rpc_method)(rate(rpc_server_call_duration_seconds_bucket{service_name=\"$service\"}[5m])))",
           "legendFormat": "{{rpc_method}}",
           "refId": "A"
         }
@@ -1319,7 +1319,7 @@
       "id": 20,
       "type": "timeseries",
       "title": "Error rate by method \u2014 $service",
-      "description": "Errored calls/sec per method (rpc_connect_rpc_error_code present).",
+      "description": "Errored calls/sec per method (error_type present).",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -1365,7 +1365,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by (rpc_method)(rate(rpc_server_duration_milliseconds_count{service_name=\"$service\", rpc_connect_rpc_error_code!=\"\"}[5m]))",
+          "expr": "sum by (rpc_method)(rate(rpc_server_call_duration_seconds_count{service_name=\"$service\", error_type!=\"\"}[5m]))",
           "legendFormat": "{{rpc_method}}",
           "refId": "A"
         }

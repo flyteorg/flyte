@@ -122,6 +122,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            {{- if include "flyte-binary.telemetryDisabled" . }}
+            - name: DO_NOT_TRACK
+              value: "1"
+            {{- end }}
             {{- if .Values.deployment.extraEnvVars }}
             {{- tpl ( .Values.deployment.extraEnvVars | toYaml ) . | nindent 12 }}
             {{- end }}

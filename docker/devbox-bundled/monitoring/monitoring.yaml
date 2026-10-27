@@ -19,9 +19,9 @@ data:
             max_recv_msg_size_mib: 64
     processors:
       batch: {}
-      # otelconnect tags server metrics with net.peer.port (ephemeral client
-      # port); without collapsing it every series is a one-shot and rate()
-      # reads zero everywhere.
+      # Preserve the otelconnect v0.10.0 RPC dimensions, including error.type
+      # for dashboard error rates. Collapse client server.address/server.port
+      # so endpoint changes do not create separate latency series.
       metricstransform:
         transforms:
           - include: ^rpc\..*
@@ -29,7 +29,7 @@ data:
             action: update
             operations:
               - action: aggregate_labels
-                label_set: [service.name, rpc.method, rpc.service, rpc.system, rpc.connect_rpc.error_code]
+                label_set: [service.name, rpc.method, rpc.system.name, rpc.response.status_code, error.type]
                 aggregation_type: sum
     exporters:
       prometheus:
