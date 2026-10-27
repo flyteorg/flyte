@@ -21,6 +21,20 @@ type FeatureGates struct {
 	EnableArtifacts bool `json:"enableArtifacts" pflag:",Enable artifacts feature."`
 }
 
+// TerminateAuthzConfig restricts who may terminate an execution.
+type TerminateAuthzConfig struct {
+	Enabled bool `json:"enabled" pflag:",Restrict TerminateExecution to the user who launched the execution."`
+	// Matched against the caller's user id, app id, and email.
+	AdminIdentities []string `json:"adminIdentities"`
+	// Matched against the GroupsClaim claim. Ignored when GroupsClaim is empty.
+	AdminGroups []string `json:"adminGroups"`
+	GroupsClaim string   `json:"groupsClaim"`
+	// Launchers whose executions anyone may terminate.
+	ExemptLaunchers []string `json:"exemptLaunchers"`
+	// Identities allowed to terminate child executions, such as flytepropeller.
+	SystemIdentities []string `json:"systemIdentities"`
+}
+
 // ApplicationConfig is the base configuration to start admin
 type ApplicationConfig struct {
 	// The RoleName key inserted as an annotation (https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
@@ -82,6 +96,8 @@ type ApplicationConfig struct {
 	InjectIdentityAnnotations bool     `json:"injectIdentityAnnotations"`
 	IdentityAnnotationPrefix  string   `json:"identityAnnotationPrefix"`
 	IdentityAnnotationKeys    []string `json:"identityAnnotationKeys"`
+
+	TerminateAuthz TerminateAuthzConfig `json:"terminateAuthz"`
 }
 
 func (a *ApplicationConfig) GetRoleNameKey() string {
@@ -169,6 +185,10 @@ func (a *ApplicationConfig) GetEnvs() *admin.Envs {
 
 func (a *ApplicationConfig) GetInjectIdentityAnnotations() bool {
 	return a.InjectIdentityAnnotations
+}
+
+func (a *ApplicationConfig) GetTerminateAuthz() TerminateAuthzConfig {
+	return a.TerminateAuthz
 }
 
 func (a *ApplicationConfig) GetIdentityAnnotationPrefix() string {
