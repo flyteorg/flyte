@@ -542,6 +542,55 @@ func TestEmbedTaskTemplate_StampsPodTemplateName(t *testing.T) {
 	})
 }
 
+func TestEmbedTaskTemplate_StampsRunServiceAccount(t *testing.T) {
+	newAction := func(sc *core.SecurityContext) *actions.Action {
+		return &actions.Action{
+			Spec: &actions.Action_Task{
+				Task: &workflow.TaskAction{
+					Spec: &task.TaskSpec{
+						TaskTemplate: &core.TaskTemplate{Type: "python", SecurityContext: sc},
+					},
+				},
+			},
+		}
+	}
+	runSpec := &task.RunSpec{
+		SecurityContext: &core.SecurityContext{RunAs: &core.Identity{K8SServiceAccount: "run-sa"}},
+	}
+
+	embedded := func(action *actions.Action, rs *task.RunSpec) *core.TaskTemplate {
+		ta := &executorv1.TaskAction{}
+		require.NoError(t, embedTaskTemplate(action, ta, rs))
+		out := &core.TaskTemplate{}
+		require.NoError(t, proto.Unmarshal(ta.Spec.TaskTemplate, out))
+		return out
+	}
+
+	t.Run("stamps the run service account onto a task that sets none", func(t *testing.T) {
+		action := newAction(nil)
+		out := embedded(action, runSpec)
+		assert.Equal(t, "run-sa", out.GetSecurityContext().GetRunAs().GetK8SServiceAccount())
+		// The caller's proto must be left untouched (it is persisted separately as the task spec).
+		assert.Nil(t, action.GetSpec().(*actions.Action_Task).Task.Spec.TaskTemplate.GetSecurityContext())
+	})
+
+	t.Run("keeps the rest of the task's security context", func(t *testing.T) {
+		out := embedded(newAction(&core.SecurityContext{RunAs: &core.Identity{IamRole: "arn:role"}}), runSpec)
+		assert.Equal(t, "run-sa", out.GetSecurityContext().GetRunAs().GetK8SServiceAccount())
+		assert.Equal(t, "arn:role", out.GetSecurityContext().GetRunAs().GetIamRole())
+	})
+
+	t.Run("a service account set on the task wins", func(t *testing.T) {
+		out := embedded(newAction(&core.SecurityContext{RunAs: &core.Identity{K8SServiceAccount: "task-sa"}}), runSpec)
+		assert.Equal(t, "task-sa", out.GetSecurityContext().GetRunAs().GetK8SServiceAccount())
+	})
+
+	t.Run("no-op when the run sets none", func(t *testing.T) {
+		out := embedded(newAction(nil), &task.RunSpec{})
+		assert.Nil(t, out.GetSecurityContext())
+	})
+}
+
 func TestNotifyRunService_ChildAddedPromotesParentToRunning(t *testing.T) {
 	ctx := context.Background()
 

@@ -1253,6 +1253,7 @@ func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction
 
 	tmpl = substituteRunStartTime(tmpl, runSpec.GetRunStartTime())
 	tmpl = applyPodTemplateName(tmpl, taskAction.Spec.PodTemplateName)
+	tmpl = applyRunServiceAccount(tmpl, runSpec.GetSecurityContext().GetRunAs().GetK8SServiceAccount())
 
 	data, err := proto.Marshal(tmpl)
 	if err != nil {
@@ -1299,6 +1300,30 @@ func applyPodTemplateName(tmpl *core.TaskTemplate, name string) *core.TaskTempla
 		cloned.Metadata = &core.TaskMetadata{}
 	}
 	cloned.Metadata.PodTemplateName = name
+	return cloned
+}
+
+// applyRunServiceAccount returns a TaskTemplate whose security context runs as the given
+// Kubernetes service account. It returns the input unchanged when the name is empty or the
+// task already set a service account itself, so an explicit choice always wins. The template
+// is cloned before mutation so the caller's proto - which may be persisted separately as the
+// registered task spec - is not affected.
+func applyRunServiceAccount(tmpl *core.TaskTemplate, serviceAccount string) *core.TaskTemplate {
+	if serviceAccount == "" {
+		return tmpl
+	}
+	if tmpl.GetSecurityContext().GetRunAs().GetK8SServiceAccount() != "" {
+		return tmpl
+	}
+
+	cloned := proto.Clone(tmpl).(*core.TaskTemplate)
+	if cloned.SecurityContext == nil {
+		cloned.SecurityContext = &core.SecurityContext{}
+	}
+	if cloned.SecurityContext.RunAs == nil {
+		cloned.SecurityContext.RunAs = &core.Identity{}
+	}
+	cloned.SecurityContext.RunAs.K8SServiceAccount = serviceAccount
 	return cloned
 }
 
