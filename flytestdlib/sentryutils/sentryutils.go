@@ -64,6 +64,12 @@ func Count(ctx context.Context, operation string, n int64) {
 	))
 }
 
+// Gauge records the current value of the metric name. Unlike Count, each
+// gauge is its own metric with no attributes.
+func Gauge(ctx context.Context, name string, value float64) {
+	sentry.NewMeter(ctx).Gauge(name, value)
+}
+
 // Interceptor counts one operation per call for each procedure in operations
 // (keyed by procedure, valued by operation name) and reports server-side
 // failures as exceptions. Client-caused errors (invalid argument, not found,
