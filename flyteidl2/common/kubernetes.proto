@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package flyteidl2.common;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
+
+// K8sMetadata contains server-owned Kubernetes placement metadata.
+message K8sMetadata {
+  // Namespace is selected by the server. An empty value preserves legacy
+  // namespace resolution behavior.
+  string namespace = 1 [(buf.validate.field).string.min_len = 1];
+}
