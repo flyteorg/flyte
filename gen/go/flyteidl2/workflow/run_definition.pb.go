@@ -1152,6 +1152,19 @@ type ActionStatus struct {
 	CacheStatus core.CatalogCacheStatus `protobuf:"varint,5,opt,name=cache_status,json=cacheStatus,proto3,enum=flyteidl2.core.CatalogCacheStatus" json:"cache_status,omitempty"`
 	// Duration of the action in milliseconds.
 	DurationMs *uint64 `protobuf:"varint,6,opt,name=duration_ms,json=durationMs,proto3,oneof" json:"duration_ms,omitempty"`
+	// Time the current attempt entered the queue, when recorded by the queue
+	// service. Retained after assignment and while running; cleared or replaced
+	// when a new attempt starts. Primarily available in queue-scoped ListActions
+	// responses. Omitted when the queue-entry time was not recorded, for example
+	// by older servers; never inferred from action creation or other timestamps.
+	QueuedAt *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=queued_at,json=queuedAt,proto3" json:"queued_at,omitempty"`
+	// Time worker assignment committed for the current attempt, when recorded.
+	// Together with queued_at, this fixes queue wait at assignment,
+	// excluding later resource waits or initialization. Primarily available in
+	// queue-scoped ListActions responses. Omitted for older assignments without
+	// a recorded assignment time; never inferred from action creation or other
+	// timestamps.
+	WorkerAssignedAt *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=worker_assigned_at,json=workerAssignedAt,proto3" json:"worker_assigned_at,omitempty"`
 }
 
 func (x *ActionStatus) Reset() {
@@ -1226,6 +1239,20 @@ func (x *ActionStatus) GetDurationMs() uint64 {
 		return *x.DurationMs
 	}
 	return 0
+}
+
+func (x *ActionStatus) GetQueuedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.QueuedAt
+	}
+	return nil
+}
+
+func (x *ActionStatus) GetWorkerAssignedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.WorkerAssignedAt
+	}
+	return nil
 }
 
 // Lightweight representation of an action.
@@ -2970,8 +2997,8 @@ var file_flyteidl2_workflow_run_definition_proto_rawDesc = []byte{
 	0x01, 0x28, 0x0b, 0x32, 0x22, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e,
 	0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x65,
 	0x6e, 0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x52, 0x0d, 0x72, 0x65, 0x63, 0x6f, 0x76, 0x65, 0x72,
-	0x65, 0x64, 0x46, 0x72, 0x6f, 0x6d, 0x42, 0x06, 0x0a, 0x04, 0x73, 0x70, 0x65, 0x63, 0x22, 0xe9,
-	0x02, 0x0a, 0x0c, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12,
+	0x65, 0x64, 0x46, 0x72, 0x6f, 0x6d, 0x42, 0x06, 0x0a, 0x04, 0x73, 0x70, 0x65, 0x63, 0x22, 0x89,
+	0x04, 0x0a, 0x0c, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12,
 	0x33, 0x0a, 0x05, 0x70, 0x68, 0x61, 0x73, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1d,
 	0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f,
 	0x6e, 0x2e, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x68, 0x61, 0x73, 0x65, 0x52, 0x05, 0x70,
@@ -2991,9 +3018,19 @@ var file_flyteidl2_workflow_run_definition_proto_rawDesc = []byte{
 	0x61, 0x63, 0x68, 0x65, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x0b, 0x63, 0x61, 0x63, 0x68,
 	0x65, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x24, 0x0a, 0x0b, 0x64, 0x75, 0x72, 0x61, 0x74,
 	0x69, 0x6f, 0x6e, 0x5f, 0x6d, 0x73, 0x18, 0x06, 0x20, 0x01, 0x28, 0x04, 0x48, 0x01, 0x52, 0x0a,
-	0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x4d, 0x73, 0x88, 0x01, 0x01, 0x42, 0x0b, 0x0a,
-	0x09, 0x5f, 0x65, 0x6e, 0x64, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x42, 0x0e, 0x0a, 0x0c, 0x5f, 0x64,
-	0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x6d, 0x73, 0x22, 0xb6, 0x01, 0x0a, 0x06, 0x41,
+	0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x4d, 0x73, 0x88, 0x01, 0x01, 0x12, 0x37, 0x0a,
+	0x09, 0x71, 0x75, 0x65, 0x75, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
+	0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x08, 0x71, 0x75,
+	0x65, 0x75, 0x65, 0x64, 0x41, 0x74, 0x12, 0x48, 0x0a, 0x12, 0x77, 0x6f, 0x72, 0x6b, 0x65, 0x72,
+	0x5f, 0x61, 0x73, 0x73, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x09, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x10,
+	0x77, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x41, 0x73, 0x73, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x41, 0x74,
+	0x42, 0x0b, 0x0a, 0x09, 0x5f, 0x65, 0x6e, 0x64, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x42, 0x0e, 0x0a,
+	0x0c, 0x5f, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x6d, 0x73, 0x4a, 0x04, 0x08,
+	0x08, 0x10, 0x09, 0x52, 0x15, 0x71, 0x75, 0x65, 0x75, 0x65, 0x5f, 0x77, 0x61, 0x69, 0x74, 0x5f,
+	0x73, 0x74, 0x61, 0x72, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x22, 0xb6, 0x01, 0x0a, 0x06, 0x41,
 	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x32, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x0b, 0x32, 0x22, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x63, 0x6f,
 	0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x65, 0x6e, 0x74,
@@ -3461,109 +3498,111 @@ var file_flyteidl2_workflow_run_definition_proto_goTypes = []interface{}{
 	(*common.CacheMetadata)(nil),       // 54: flyteidl2.common.CacheMetadata
 }
 var file_flyteidl2_workflow_run_definition_proto_depIdxs = []int32{
-	16, // 0: flyteidl2.workflow.Run.action:type_name -> flyteidl2.workflow.Action
-	28, // 1: flyteidl2.workflow.Run.labels:type_name -> flyteidl2.workflow.Run.LabelsEntry
-	33, // 2: flyteidl2.workflow.RunDetails.run_spec:type_name -> flyteidl2.task.RunSpec
-	21, // 3: flyteidl2.workflow.RunDetails.action:type_name -> flyteidl2.workflow.ActionDetails
-	34, // 4: flyteidl2.workflow.TaskAction.id:type_name -> flyteidl2.task.TaskIdentifier
-	35, // 5: flyteidl2.workflow.TaskAction.spec:type_name -> flyteidl2.task.TaskSpec
-	36, // 6: flyteidl2.workflow.TaskAction.cache_key:type_name -> google.protobuf.StringValue
-	37, // 7: flyteidl2.workflow.TraceAction.phase:type_name -> flyteidl2.common.ActionPhase
-	38, // 8: flyteidl2.workflow.TraceAction.start_time:type_name -> google.protobuf.Timestamp
-	38, // 9: flyteidl2.workflow.TraceAction.end_time:type_name -> google.protobuf.Timestamp
-	39, // 10: flyteidl2.workflow.TraceAction.outputs:type_name -> flyteidl2.task.OutputReferences
-	40, // 11: flyteidl2.workflow.TraceAction.spec:type_name -> flyteidl2.task.TraceSpec
-	41, // 12: flyteidl2.workflow.ConditionAction.type:type_name -> flyteidl2.core.LiteralType
-	0,  // 13: flyteidl2.workflow.ConditionAction.prompt_type:type_name -> flyteidl2.workflow.ConditionPromptType
-	42, // 14: flyteidl2.workflow.ConditionAction.timeout:type_name -> google.protobuf.Duration
-	10, // 15: flyteidl2.workflow.ConditionAction.webhook:type_name -> flyteidl2.workflow.ConditionWebhook
-	43, // 16: flyteidl2.workflow.ConditionWebhook.payload:type_name -> google.protobuf.Struct
-	34, // 17: flyteidl2.workflow.TaskActionMetadata.id:type_name -> flyteidl2.task.TaskIdentifier
-	41, // 18: flyteidl2.workflow.ConditionActionMetadata.type:type_name -> flyteidl2.core.LiteralType
-	44, // 19: flyteidl2.workflow.ActionMetadata.executed_by:type_name -> flyteidl2.common.EnrichedIdentity
-	11, // 20: flyteidl2.workflow.ActionMetadata.task:type_name -> flyteidl2.workflow.TaskActionMetadata
-	12, // 21: flyteidl2.workflow.ActionMetadata.trace:type_name -> flyteidl2.workflow.TraceActionMetadata
-	13, // 22: flyteidl2.workflow.ActionMetadata.condition:type_name -> flyteidl2.workflow.ConditionActionMetadata
-	1,  // 23: flyteidl2.workflow.ActionMetadata.action_type:type_name -> flyteidl2.workflow.ActionType
-	45, // 24: flyteidl2.workflow.ActionMetadata.trigger_id:type_name -> flyteidl2.common.TriggerIdentifier
-	46, // 25: flyteidl2.workflow.ActionMetadata.trigger_type:type_name -> flyteidl2.task.TriggerAutomationSpec
-	2,  // 26: flyteidl2.workflow.ActionMetadata.source:type_name -> flyteidl2.workflow.RunSource
-	47, // 27: flyteidl2.workflow.ActionMetadata.relation:type_name -> flyteidl2.common.Relation
-	48, // 28: flyteidl2.workflow.ActionMetadata.recovered_from:type_name -> flyteidl2.common.ActionIdentifier
-	37, // 29: flyteidl2.workflow.ActionStatus.phase:type_name -> flyteidl2.common.ActionPhase
-	38, // 30: flyteidl2.workflow.ActionStatus.start_time:type_name -> google.protobuf.Timestamp
-	38, // 31: flyteidl2.workflow.ActionStatus.end_time:type_name -> google.protobuf.Timestamp
-	49, // 32: flyteidl2.workflow.ActionStatus.cache_status:type_name -> flyteidl2.core.CatalogCacheStatus
-	48, // 33: flyteidl2.workflow.Action.id:type_name -> flyteidl2.common.ActionIdentifier
-	14, // 34: flyteidl2.workflow.Action.metadata:type_name -> flyteidl2.workflow.ActionMetadata
-	15, // 35: flyteidl2.workflow.Action.status:type_name -> flyteidl2.workflow.ActionStatus
-	16, // 36: flyteidl2.workflow.EnrichedAction.action:type_name -> flyteidl2.workflow.Action
-	29, // 37: flyteidl2.workflow.EnrichedAction.children_phase_counts:type_name -> flyteidl2.workflow.EnrichedAction.ChildrenPhaseCountsEntry
-	3,  // 38: flyteidl2.workflow.ErrorInfo.kind:type_name -> flyteidl2.workflow.ErrorInfo.Kind
-	50, // 39: flyteidl2.workflow.ErrorInfo.gpu_fault:type_name -> flyteidl2.core.GpuFault
-	44, // 40: flyteidl2.workflow.AbortInfo.aborted_by:type_name -> flyteidl2.common.EnrichedIdentity
-	44, // 41: flyteidl2.workflow.SignalInfo.signalled_by:type_name -> flyteidl2.common.EnrichedIdentity
-	51, // 42: flyteidl2.workflow.SignalInfo.output:type_name -> flyteidl2.core.Literal
-	48, // 43: flyteidl2.workflow.ActionDetails.id:type_name -> flyteidl2.common.ActionIdentifier
-	14, // 44: flyteidl2.workflow.ActionDetails.metadata:type_name -> flyteidl2.workflow.ActionMetadata
-	15, // 45: flyteidl2.workflow.ActionDetails.status:type_name -> flyteidl2.workflow.ActionStatus
-	18, // 46: flyteidl2.workflow.ActionDetails.error_info:type_name -> flyteidl2.workflow.ErrorInfo
-	19, // 47: flyteidl2.workflow.ActionDetails.abort_info:type_name -> flyteidl2.workflow.AbortInfo
-	20, // 48: flyteidl2.workflow.ActionDetails.signal_info:type_name -> flyteidl2.workflow.SignalInfo
-	35, // 49: flyteidl2.workflow.ActionDetails.task:type_name -> flyteidl2.task.TaskSpec
-	40, // 50: flyteidl2.workflow.ActionDetails.trace:type_name -> flyteidl2.task.TraceSpec
-	9,  // 51: flyteidl2.workflow.ActionDetails.condition:type_name -> flyteidl2.workflow.ConditionAction
-	22, // 52: flyteidl2.workflow.ActionDetails.attempts:type_name -> flyteidl2.workflow.ActionAttempt
-	37, // 53: flyteidl2.workflow.ActionAttempt.phase:type_name -> flyteidl2.common.ActionPhase
-	38, // 54: flyteidl2.workflow.ActionAttempt.start_time:type_name -> google.protobuf.Timestamp
-	38, // 55: flyteidl2.workflow.ActionAttempt.end_time:type_name -> google.protobuf.Timestamp
-	18, // 56: flyteidl2.workflow.ActionAttempt.error_info:type_name -> flyteidl2.workflow.ErrorInfo
-	52, // 57: flyteidl2.workflow.ActionAttempt.log_info:type_name -> flyteidl2.core.TaskLog
-	39, // 58: flyteidl2.workflow.ActionAttempt.outputs:type_name -> flyteidl2.task.OutputReferences
-	49, // 59: flyteidl2.workflow.ActionAttempt.cache_status:type_name -> flyteidl2.core.CatalogCacheStatus
-	23, // 60: flyteidl2.workflow.ActionAttempt.cluster_events:type_name -> flyteidl2.workflow.ClusterEvent
-	24, // 61: flyteidl2.workflow.ActionAttempt.phase_transitions:type_name -> flyteidl2.workflow.PhaseTransition
-	53, // 62: flyteidl2.workflow.ActionAttempt.log_context:type_name -> flyteidl2.core.LogContext
-	54, // 63: flyteidl2.workflow.ActionAttempt.cache_metadata:type_name -> flyteidl2.common.CacheMetadata
-	38, // 64: flyteidl2.workflow.ClusterEvent.occurred_at:type_name -> google.protobuf.Timestamp
-	4,  // 65: flyteidl2.workflow.ClusterEvent.type:type_name -> flyteidl2.workflow.ClusterEvent.Type
-	50, // 66: flyteidl2.workflow.ClusterEvent.gpu_fault:type_name -> flyteidl2.core.GpuFault
-	37, // 67: flyteidl2.workflow.PhaseTransition.phase:type_name -> flyteidl2.common.ActionPhase
-	38, // 68: flyteidl2.workflow.PhaseTransition.start_time:type_name -> google.protobuf.Timestamp
-	38, // 69: flyteidl2.workflow.PhaseTransition.end_time:type_name -> google.protobuf.Timestamp
-	48, // 70: flyteidl2.workflow.ActionEvent.id:type_name -> flyteidl2.common.ActionIdentifier
-	37, // 71: flyteidl2.workflow.ActionEvent.phase:type_name -> flyteidl2.common.ActionPhase
-	38, // 72: flyteidl2.workflow.ActionEvent.start_time:type_name -> google.protobuf.Timestamp
-	38, // 73: flyteidl2.workflow.ActionEvent.updated_time:type_name -> google.protobuf.Timestamp
-	38, // 74: flyteidl2.workflow.ActionEvent.end_time:type_name -> google.protobuf.Timestamp
-	18, // 75: flyteidl2.workflow.ActionEvent.error_info:type_name -> flyteidl2.workflow.ErrorInfo
-	52, // 76: flyteidl2.workflow.ActionEvent.log_info:type_name -> flyteidl2.core.TaskLog
-	53, // 77: flyteidl2.workflow.ActionEvent.log_context:type_name -> flyteidl2.core.LogContext
-	39, // 78: flyteidl2.workflow.ActionEvent.outputs:type_name -> flyteidl2.task.OutputReferences
-	49, // 79: flyteidl2.workflow.ActionEvent.cache_status:type_name -> flyteidl2.core.CatalogCacheStatus
-	23, // 80: flyteidl2.workflow.ActionEvent.cluster_events:type_name -> flyteidl2.workflow.ClusterEvent
-	38, // 81: flyteidl2.workflow.ActionEvent.reported_time:type_name -> google.protobuf.Timestamp
-	54, // 82: flyteidl2.workflow.ActionEvent.cache_metadata:type_name -> flyteidl2.common.CacheMetadata
-	48, // 83: flyteidl2.workflow.ActionSpec.action_id:type_name -> flyteidl2.common.ActionIdentifier
-	33, // 84: flyteidl2.workflow.ActionSpec.run_spec:type_name -> flyteidl2.task.RunSpec
-	7,  // 85: flyteidl2.workflow.ActionSpec.task:type_name -> flyteidl2.workflow.TaskAction
-	9,  // 86: flyteidl2.workflow.ActionSpec.condition:type_name -> flyteidl2.workflow.ConditionAction
-	8,  // 87: flyteidl2.workflow.ActionSpec.trace:type_name -> flyteidl2.workflow.TraceAction
-	38, // 88: flyteidl2.workflow.TaskGroup.latest_run_time:type_name -> google.protobuf.Timestamp
-	30, // 89: flyteidl2.workflow.TaskGroup.recent_statuses:type_name -> flyteidl2.workflow.TaskGroup.RecentStatus
-	42, // 90: flyteidl2.workflow.TaskGroup.average_duration:type_name -> google.protobuf.Duration
-	38, // 91: flyteidl2.workflow.TaskGroup.latest_finished_time:type_name -> google.protobuf.Timestamp
-	44, // 92: flyteidl2.workflow.TaskGroup.created_by:type_name -> flyteidl2.common.EnrichedIdentity
-	31, // 93: flyteidl2.workflow.TaskGroup.error_counts:type_name -> flyteidl2.workflow.TaskGroup.ErrorCounts
-	32, // 94: flyteidl2.workflow.TaskGroup.phase_counts:type_name -> flyteidl2.workflow.TaskGroup.PhaseCounts
-	42, // 95: flyteidl2.workflow.TaskGroup.average_time_to_running:type_name -> google.protobuf.Duration
-	37, // 96: flyteidl2.workflow.TaskGroup.RecentStatus.phase:type_name -> flyteidl2.common.ActionPhase
-	37, // 97: flyteidl2.workflow.TaskGroup.PhaseCounts.phase:type_name -> flyteidl2.common.ActionPhase
-	98, // [98:98] is the sub-list for method output_type
-	98, // [98:98] is the sub-list for method input_type
-	98, // [98:98] is the sub-list for extension type_name
-	98, // [98:98] is the sub-list for extension extendee
-	0,  // [0:98] is the sub-list for field type_name
+	16,  // 0: flyteidl2.workflow.Run.action:type_name -> flyteidl2.workflow.Action
+	28,  // 1: flyteidl2.workflow.Run.labels:type_name -> flyteidl2.workflow.Run.LabelsEntry
+	33,  // 2: flyteidl2.workflow.RunDetails.run_spec:type_name -> flyteidl2.task.RunSpec
+	21,  // 3: flyteidl2.workflow.RunDetails.action:type_name -> flyteidl2.workflow.ActionDetails
+	34,  // 4: flyteidl2.workflow.TaskAction.id:type_name -> flyteidl2.task.TaskIdentifier
+	35,  // 5: flyteidl2.workflow.TaskAction.spec:type_name -> flyteidl2.task.TaskSpec
+	36,  // 6: flyteidl2.workflow.TaskAction.cache_key:type_name -> google.protobuf.StringValue
+	37,  // 7: flyteidl2.workflow.TraceAction.phase:type_name -> flyteidl2.common.ActionPhase
+	38,  // 8: flyteidl2.workflow.TraceAction.start_time:type_name -> google.protobuf.Timestamp
+	38,  // 9: flyteidl2.workflow.TraceAction.end_time:type_name -> google.protobuf.Timestamp
+	39,  // 10: flyteidl2.workflow.TraceAction.outputs:type_name -> flyteidl2.task.OutputReferences
+	40,  // 11: flyteidl2.workflow.TraceAction.spec:type_name -> flyteidl2.task.TraceSpec
+	41,  // 12: flyteidl2.workflow.ConditionAction.type:type_name -> flyteidl2.core.LiteralType
+	0,   // 13: flyteidl2.workflow.ConditionAction.prompt_type:type_name -> flyteidl2.workflow.ConditionPromptType
+	42,  // 14: flyteidl2.workflow.ConditionAction.timeout:type_name -> google.protobuf.Duration
+	10,  // 15: flyteidl2.workflow.ConditionAction.webhook:type_name -> flyteidl2.workflow.ConditionWebhook
+	43,  // 16: flyteidl2.workflow.ConditionWebhook.payload:type_name -> google.protobuf.Struct
+	34,  // 17: flyteidl2.workflow.TaskActionMetadata.id:type_name -> flyteidl2.task.TaskIdentifier
+	41,  // 18: flyteidl2.workflow.ConditionActionMetadata.type:type_name -> flyteidl2.core.LiteralType
+	44,  // 19: flyteidl2.workflow.ActionMetadata.executed_by:type_name -> flyteidl2.common.EnrichedIdentity
+	11,  // 20: flyteidl2.workflow.ActionMetadata.task:type_name -> flyteidl2.workflow.TaskActionMetadata
+	12,  // 21: flyteidl2.workflow.ActionMetadata.trace:type_name -> flyteidl2.workflow.TraceActionMetadata
+	13,  // 22: flyteidl2.workflow.ActionMetadata.condition:type_name -> flyteidl2.workflow.ConditionActionMetadata
+	1,   // 23: flyteidl2.workflow.ActionMetadata.action_type:type_name -> flyteidl2.workflow.ActionType
+	45,  // 24: flyteidl2.workflow.ActionMetadata.trigger_id:type_name -> flyteidl2.common.TriggerIdentifier
+	46,  // 25: flyteidl2.workflow.ActionMetadata.trigger_type:type_name -> flyteidl2.task.TriggerAutomationSpec
+	2,   // 26: flyteidl2.workflow.ActionMetadata.source:type_name -> flyteidl2.workflow.RunSource
+	47,  // 27: flyteidl2.workflow.ActionMetadata.relation:type_name -> flyteidl2.common.Relation
+	48,  // 28: flyteidl2.workflow.ActionMetadata.recovered_from:type_name -> flyteidl2.common.ActionIdentifier
+	37,  // 29: flyteidl2.workflow.ActionStatus.phase:type_name -> flyteidl2.common.ActionPhase
+	38,  // 30: flyteidl2.workflow.ActionStatus.start_time:type_name -> google.protobuf.Timestamp
+	38,  // 31: flyteidl2.workflow.ActionStatus.end_time:type_name -> google.protobuf.Timestamp
+	49,  // 32: flyteidl2.workflow.ActionStatus.cache_status:type_name -> flyteidl2.core.CatalogCacheStatus
+	38,  // 33: flyteidl2.workflow.ActionStatus.queued_at:type_name -> google.protobuf.Timestamp
+	38,  // 34: flyteidl2.workflow.ActionStatus.worker_assigned_at:type_name -> google.protobuf.Timestamp
+	48,  // 35: flyteidl2.workflow.Action.id:type_name -> flyteidl2.common.ActionIdentifier
+	14,  // 36: flyteidl2.workflow.Action.metadata:type_name -> flyteidl2.workflow.ActionMetadata
+	15,  // 37: flyteidl2.workflow.Action.status:type_name -> flyteidl2.workflow.ActionStatus
+	16,  // 38: flyteidl2.workflow.EnrichedAction.action:type_name -> flyteidl2.workflow.Action
+	29,  // 39: flyteidl2.workflow.EnrichedAction.children_phase_counts:type_name -> flyteidl2.workflow.EnrichedAction.ChildrenPhaseCountsEntry
+	3,   // 40: flyteidl2.workflow.ErrorInfo.kind:type_name -> flyteidl2.workflow.ErrorInfo.Kind
+	50,  // 41: flyteidl2.workflow.ErrorInfo.gpu_fault:type_name -> flyteidl2.core.GpuFault
+	44,  // 42: flyteidl2.workflow.AbortInfo.aborted_by:type_name -> flyteidl2.common.EnrichedIdentity
+	44,  // 43: flyteidl2.workflow.SignalInfo.signalled_by:type_name -> flyteidl2.common.EnrichedIdentity
+	51,  // 44: flyteidl2.workflow.SignalInfo.output:type_name -> flyteidl2.core.Literal
+	48,  // 45: flyteidl2.workflow.ActionDetails.id:type_name -> flyteidl2.common.ActionIdentifier
+	14,  // 46: flyteidl2.workflow.ActionDetails.metadata:type_name -> flyteidl2.workflow.ActionMetadata
+	15,  // 47: flyteidl2.workflow.ActionDetails.status:type_name -> flyteidl2.workflow.ActionStatus
+	18,  // 48: flyteidl2.workflow.ActionDetails.error_info:type_name -> flyteidl2.workflow.ErrorInfo
+	19,  // 49: flyteidl2.workflow.ActionDetails.abort_info:type_name -> flyteidl2.workflow.AbortInfo
+	20,  // 50: flyteidl2.workflow.ActionDetails.signal_info:type_name -> flyteidl2.workflow.SignalInfo
+	35,  // 51: flyteidl2.workflow.ActionDetails.task:type_name -> flyteidl2.task.TaskSpec
+	40,  // 52: flyteidl2.workflow.ActionDetails.trace:type_name -> flyteidl2.task.TraceSpec
+	9,   // 53: flyteidl2.workflow.ActionDetails.condition:type_name -> flyteidl2.workflow.ConditionAction
+	22,  // 54: flyteidl2.workflow.ActionDetails.attempts:type_name -> flyteidl2.workflow.ActionAttempt
+	37,  // 55: flyteidl2.workflow.ActionAttempt.phase:type_name -> flyteidl2.common.ActionPhase
+	38,  // 56: flyteidl2.workflow.ActionAttempt.start_time:type_name -> google.protobuf.Timestamp
+	38,  // 57: flyteidl2.workflow.ActionAttempt.end_time:type_name -> google.protobuf.Timestamp
+	18,  // 58: flyteidl2.workflow.ActionAttempt.error_info:type_name -> flyteidl2.workflow.ErrorInfo
+	52,  // 59: flyteidl2.workflow.ActionAttempt.log_info:type_name -> flyteidl2.core.TaskLog
+	39,  // 60: flyteidl2.workflow.ActionAttempt.outputs:type_name -> flyteidl2.task.OutputReferences
+	49,  // 61: flyteidl2.workflow.ActionAttempt.cache_status:type_name -> flyteidl2.core.CatalogCacheStatus
+	23,  // 62: flyteidl2.workflow.ActionAttempt.cluster_events:type_name -> flyteidl2.workflow.ClusterEvent
+	24,  // 63: flyteidl2.workflow.ActionAttempt.phase_transitions:type_name -> flyteidl2.workflow.PhaseTransition
+	53,  // 64: flyteidl2.workflow.ActionAttempt.log_context:type_name -> flyteidl2.core.LogContext
+	54,  // 65: flyteidl2.workflow.ActionAttempt.cache_metadata:type_name -> flyteidl2.common.CacheMetadata
+	38,  // 66: flyteidl2.workflow.ClusterEvent.occurred_at:type_name -> google.protobuf.Timestamp
+	4,   // 67: flyteidl2.workflow.ClusterEvent.type:type_name -> flyteidl2.workflow.ClusterEvent.Type
+	50,  // 68: flyteidl2.workflow.ClusterEvent.gpu_fault:type_name -> flyteidl2.core.GpuFault
+	37,  // 69: flyteidl2.workflow.PhaseTransition.phase:type_name -> flyteidl2.common.ActionPhase
+	38,  // 70: flyteidl2.workflow.PhaseTransition.start_time:type_name -> google.protobuf.Timestamp
+	38,  // 71: flyteidl2.workflow.PhaseTransition.end_time:type_name -> google.protobuf.Timestamp
+	48,  // 72: flyteidl2.workflow.ActionEvent.id:type_name -> flyteidl2.common.ActionIdentifier
+	37,  // 73: flyteidl2.workflow.ActionEvent.phase:type_name -> flyteidl2.common.ActionPhase
+	38,  // 74: flyteidl2.workflow.ActionEvent.start_time:type_name -> google.protobuf.Timestamp
+	38,  // 75: flyteidl2.workflow.ActionEvent.updated_time:type_name -> google.protobuf.Timestamp
+	38,  // 76: flyteidl2.workflow.ActionEvent.end_time:type_name -> google.protobuf.Timestamp
+	18,  // 77: flyteidl2.workflow.ActionEvent.error_info:type_name -> flyteidl2.workflow.ErrorInfo
+	52,  // 78: flyteidl2.workflow.ActionEvent.log_info:type_name -> flyteidl2.core.TaskLog
+	53,  // 79: flyteidl2.workflow.ActionEvent.log_context:type_name -> flyteidl2.core.LogContext
+	39,  // 80: flyteidl2.workflow.ActionEvent.outputs:type_name -> flyteidl2.task.OutputReferences
+	49,  // 81: flyteidl2.workflow.ActionEvent.cache_status:type_name -> flyteidl2.core.CatalogCacheStatus
+	23,  // 82: flyteidl2.workflow.ActionEvent.cluster_events:type_name -> flyteidl2.workflow.ClusterEvent
+	38,  // 83: flyteidl2.workflow.ActionEvent.reported_time:type_name -> google.protobuf.Timestamp
+	54,  // 84: flyteidl2.workflow.ActionEvent.cache_metadata:type_name -> flyteidl2.common.CacheMetadata
+	48,  // 85: flyteidl2.workflow.ActionSpec.action_id:type_name -> flyteidl2.common.ActionIdentifier
+	33,  // 86: flyteidl2.workflow.ActionSpec.run_spec:type_name -> flyteidl2.task.RunSpec
+	7,   // 87: flyteidl2.workflow.ActionSpec.task:type_name -> flyteidl2.workflow.TaskAction
+	9,   // 88: flyteidl2.workflow.ActionSpec.condition:type_name -> flyteidl2.workflow.ConditionAction
+	8,   // 89: flyteidl2.workflow.ActionSpec.trace:type_name -> flyteidl2.workflow.TraceAction
+	38,  // 90: flyteidl2.workflow.TaskGroup.latest_run_time:type_name -> google.protobuf.Timestamp
+	30,  // 91: flyteidl2.workflow.TaskGroup.recent_statuses:type_name -> flyteidl2.workflow.TaskGroup.RecentStatus
+	42,  // 92: flyteidl2.workflow.TaskGroup.average_duration:type_name -> google.protobuf.Duration
+	38,  // 93: flyteidl2.workflow.TaskGroup.latest_finished_time:type_name -> google.protobuf.Timestamp
+	44,  // 94: flyteidl2.workflow.TaskGroup.created_by:type_name -> flyteidl2.common.EnrichedIdentity
+	31,  // 95: flyteidl2.workflow.TaskGroup.error_counts:type_name -> flyteidl2.workflow.TaskGroup.ErrorCounts
+	32,  // 96: flyteidl2.workflow.TaskGroup.phase_counts:type_name -> flyteidl2.workflow.TaskGroup.PhaseCounts
+	42,  // 97: flyteidl2.workflow.TaskGroup.average_time_to_running:type_name -> google.protobuf.Duration
+	37,  // 98: flyteidl2.workflow.TaskGroup.RecentStatus.phase:type_name -> flyteidl2.common.ActionPhase
+	37,  // 99: flyteidl2.workflow.TaskGroup.PhaseCounts.phase:type_name -> flyteidl2.common.ActionPhase
+	100, // [100:100] is the sub-list for method output_type
+	100, // [100:100] is the sub-list for method input_type
+	100, // [100:100] is the sub-list for extension type_name
+	100, // [100:100] is the sub-list for extension extendee
+	0,   // [0:100] is the sub-list for field type_name
 }
 
 func init() { file_flyteidl2_workflow_run_definition_proto_init() }
