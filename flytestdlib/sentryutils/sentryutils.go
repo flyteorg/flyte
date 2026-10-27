@@ -6,6 +6,7 @@ package sentryutils
 
 import (
 	"context"
+	"math"
 	"sync"
 	"time"
 
@@ -65,8 +66,14 @@ func Count(ctx context.Context, operation string, n int64) {
 }
 
 // Gauge records the current value of the metric name. Unlike Count, each
-// gauge is its own metric with no attributes.
+// gauge is its own metric with no attributes. An empty name or a NaN or
+// infinite value is dropped with a warning.
 func Gauge(ctx context.Context, name string, value float64) {
+	if name == "" || math.IsNaN(value) || math.IsInf(value, 0) {
+		logger.Warnf(ctx, "sentry gauge %q dropped: invalid value %v", name, value)
+		return
+	}
+
 	sentry.NewMeter(ctx).Gauge(name, value)
 }
 

@@ -2,6 +2,7 @@ package sentryutils
 
 import (
 	"context"
+	"math"
 	"testing"
 
 	"github.com/getsentry/sentry-go"
@@ -43,6 +44,36 @@ func TestGauge(t *testing.T) {
 		assert.NotContains(t, m.Attributes, "operation")
 		assert.NotContains(t, m.Attributes, "status")
 	})
+
+	t.Run("keeps a fractional value", func(t *testing.T) {
+		ctx, metrics := captureMetrics(t)
+
+		Gauge(ctx, "flyte.active_runs", 2.5)
+
+		require.Len(t, *metrics, 1)
+		value, ok := (*metrics)[0].Value.Float64()
+		require.True(t, ok)
+		assert.Equal(t, 2.5, value)
+	})
+
+	for _, tc := range []struct {
+		desc  string
+		name  string
+		value float64
+	}{
+		{"empty name", "", 3},
+		{"NaN", "flyte.active_runs", math.NaN()},
+		{"positive infinity", "flyte.active_runs", math.Inf(1)},
+		{"negative infinity", "flyte.active_runs", math.Inf(-1)},
+	} {
+		t.Run("drops "+tc.desc, func(t *testing.T) {
+			ctx, metrics := captureMetrics(t)
+
+			Gauge(ctx, tc.name, tc.value)
+
+			assert.Empty(t, *metrics)
+		})
+	}
 
 	t.Run("no-op without a Sentry client", func(t *testing.T) {
 		ctx := sentry.SetHubOnContext(context.Background(), sentry.NewHub(nil, sentry.NewScope()))
