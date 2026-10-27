@@ -32,6 +32,26 @@ func TestGetFirstNonLoopbackIP(t *testing.T) {
 	assert.False(t, parsed.IsLoopback(), "should not be a loopback address")
 }
 
+func TestIsDevMode(t *testing.T) {
+	for _, tc := range []struct {
+		value string
+		want  bool
+	}{
+		{"True", true},
+		{"true", true},
+		{"TRUE", true},
+		{"False", false},
+		{"false", false},
+		{"", false},
+		{"1", false},
+	} {
+		t.Run(tc.value, func(t *testing.T) {
+			t.Setenv(devModeEnvVar, tc.value)
+			assert.Equal(t, tc.want, isDevMode())
+		})
+	}
+}
+
 func TestAppleSiliconBridgeEndpoint(t *testing.T) {
 	gateway := func() (string, error) { return "192.168.65.254", nil }
 

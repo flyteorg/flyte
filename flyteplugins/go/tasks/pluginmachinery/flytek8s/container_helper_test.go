@@ -1101,3 +1101,82 @@ func TestAddFlyteCustomizationsToContainer_ValidateEnvFrom(t *testing.T) {
 	assert.Equal(t, container.EnvFrom[0], configMapSource)
 	assert.Equal(t, container.EnvFrom[1], secretSource)
 }
+
+func TestApplyResourceOverridesMIGPartitionResource(t *testing.T) {
+	const migResource = v1.ResourceName("nvidia.com/mig-1g.5gb")
+	migMixedConfig(t, "nvidia.com/mig-{partition}")
+
+	t.Run("platform GPU limit caps the partition count", func(t *testing.T) {
+		out := ApplyResourceOverrides(v1.ResourceRequirements{
+			Requests: v1.ResourceList{migResource: resource.MustParse("4")},
+			Limits:   v1.ResourceList{migResource: resource.MustParse("4")},
+		}, v1.ResourceRequirements{
+			Limits: v1.ResourceList{ResourceNvidiaGPU: resource.MustParse("2")},
+		}, assignIfUnset)
+		assert.Equal(t, resource.MustParse("2"), out.Requests[migResource])
+		assert.Equal(t, resource.MustParse("2"), out.Limits[migResource])
+		assert.NotContains(t, out.Limits, v1.ResourceName(ResourceNvidiaGPU))
+	})
+
+	t.Run("limit only is mirrored to the request", func(t *testing.T) {
+		out := ApplyResourceOverrides(v1.ResourceRequirements{
+			Limits: v1.ResourceList{migResource: resource.MustParse("1")},
+		}, v1.ResourceRequirements{}, assignIfUnset)
+		assert.Equal(t, resource.MustParse("1"), out.Requests[migResource])
+	})
+
+	t.Run("platform limit for the partition resource wins", func(t *testing.T) {
+		out := ApplyResourceOverrides(v1.ResourceRequirements{
+			Limits: v1.ResourceList{migResource: resource.MustParse("4")},
+		}, v1.ResourceRequirements{
+			Limits: v1.ResourceList{
+				ResourceNvidiaGPU: resource.MustParse("2"),
+				migResource:       resource.MustParse("3"),
+			},
+		}, assignIfUnset)
+		assert.Equal(t, resource.MustParse("3"), out.Limits[migResource])
+	})
+
+	t.Run("partition request does not hide the platform GPU limit", func(t *testing.T) {
+		out := ApplyResourceOverrides(v1.ResourceRequirements{
+			Limits: v1.ResourceList{migResource: resource.MustParse("4")},
+		}, v1.ResourceRequirements{
+			Requests: v1.ResourceList{migResource: resource.MustParse("1")},
+			Limits:   v1.ResourceList{ResourceNvidiaGPU: resource.MustParse("2")},
+		}, assignIfUnset)
+		assert.Equal(t, resource.MustParse("2"), out.Limits[migResource])
+	})
+
+	t.Run("whole GPUs keep the platform GPU limit", func(t *testing.T) {
+		out := ApplyResourceOverrides(v1.ResourceRequirements{
+			Limits: v1.ResourceList{ResourceNvidiaGPU: resource.MustParse("4")},
+		}, v1.ResourceRequirements{
+			Limits: v1.ResourceList{ResourceNvidiaGPU: resource.MustParse("2")},
+		}, assignIfUnset)
+		assert.Equal(t, resource.MustParse("2"), out.Limits[ResourceNvidiaGPU])
+	})
+}
+
+func TestSanitizeGPUResourceRequirementsMIGPartitionResource(t *testing.T) {
+	const migResource = v1.ResourceName("nvidia.com/mig-3g.20gb")
+	migMixedConfig(t, "nvidia.com/mig-{partition}")
+	partitioned := &core.GPUAccelerator{
+		PartitionSizeValue: &core.GPUAccelerator_PartitionSize{PartitionSize: "3g.20gb"},
+	}
+
+	resources := v1.ResourceRequirements{
+		Requests: v1.ResourceList{resourceGPU: resource.MustParse("1")},
+		Limits:   v1.ResourceList{ResourceNvidiaGPU: resource.MustParse("1")},
+	}
+	SanitizeGPUResourceRequirements(&resources, partitioned)
+	assert.Equal(t, v1.ResourceList{migResource: resource.MustParse("1")}, resources.Requests)
+	assert.Equal(t, v1.ResourceList{migResource: resource.MustParse("1")}, resources.Limits)
+
+	resources = v1.ResourceRequirements{
+		Requests: v1.ResourceList{resourceGPU: resource.MustParse("1")},
+		Limits:   v1.ResourceList{resourceGPU: resource.MustParse("1")},
+	}
+	SanitizeGPUResourceRequirements(&resources, &core.GPUAccelerator{Device: "a100"})
+	assert.Equal(t, v1.ResourceList{ResourceNvidiaGPU: resource.MustParse("1")}, resources.Requests)
+	assert.Equal(t, v1.ResourceList{ResourceNvidiaGPU: resource.MustParse("1")}, resources.Limits)
+}

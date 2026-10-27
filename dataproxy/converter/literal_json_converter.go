@@ -1134,7 +1134,7 @@ func literalToJsonValues(ctx context.Context, literal *core.Literal) (any, error
 				return p.Boolean, nil
 			case *core.Primitive_Datetime:
 				if p.Datetime != nil {
-					return p.Datetime.AsTime().Format(time.RFC3339), nil
+					return p.Datetime.AsTime().Format(time.RFC3339Nano), nil
 				}
 				logger.Errorf(ctx, "datetime cannot be nil")
 				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("datetime cannot be nil"))

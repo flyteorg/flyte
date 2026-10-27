@@ -180,6 +180,10 @@ pub struct TaskActionMetadata {
     /// The short name for this task.
     #[prost(string, tag="3")]
     pub short_name: ::prost::alloc::string::String,
+    /// Effective target queue for this task action, including the run default when
+    /// no action-level queue override was specified. Unset when the queue is unknown.
+    #[prost(string, optional, tag="4")]
+    pub queue: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[pyo3::pyclass(dict, get_all, set_all)]
 #[allow(clippy::derive_partial_eq_without_eq)]

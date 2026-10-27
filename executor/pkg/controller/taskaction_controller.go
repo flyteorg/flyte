@@ -1013,6 +1013,7 @@ func (r *TaskActionReconciler) reconcileTask(
 		maxAttempts := tCtx.TaskExecutionMetadata().GetMaxAttempts()
 
 		if currentAttempts < maxAttempts {
+			restartedAt := r.now()
 			// Abort (delete) the current pod before incrementing attempts.
 			// tCtx was built with the current attempt number so Abort targets the right pod.
 			if abortErr := p.Abort(ctx, tCtx); abortErr != nil {
@@ -1024,7 +1025,7 @@ func (r *TaskActionReconciler) reconcileTask(
 			logger.Info("restarting task in-place",
 				"attempt", currentAttempts+1, "maxAttempts", maxAttempts, "nextAttemptAt", taskAction.Status.NextAttemptAt)
 			// Override the transition to Queued so the TaskAction stays non-terminal.
-			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(r.now(), pluginsCore.DefaultPhaseVersion, "restarting task"))
+			transition = pluginsCore.DoTransition(queuedForInPlaceRestart(phaseInfo, restartedAt))
 			phaseInfo = transition.Info()
 		} else {
 			// All retries exhausted — convert to a permanent (terminal) failure.
@@ -1422,6 +1423,23 @@ func isTaskExecutionTimedOut(info pluginsCore.PhaseInfo) bool {
 	return info.Err() != nil && info.Err().GetCode() == TaskExecutionTimedOutCode
 }
 
+// queuedForInPlaceRestart turns the failure an attempt reported into the Queued phase the
+// in-place restart continues from.
+//
+// The reasons the failed attempt accumulated come along. They are the only account of what
+// happened to it that reaches the user on this path, because the failure itself is being
+// replaced here and never reported: for a GPU fault that is the line naming which worker
+// the hardware failed on, and losing it leaves the user with a task that silently restarted.
+// The rest of the failed attempt's task info is deliberately left behind, since its logs
+// and custom info describe the pod that just went away rather than the one being queued.
+func queuedForInPlaceRestart(failed pluginsCore.PhaseInfo, at time.Time) pluginsCore.PhaseInfo {
+	info := &pluginsCore.TaskInfo{OccurredAt: &at}
+	if failedInfo := failed.Info(); failedInfo != nil {
+		info.AdditionalReasons = failedInfo.AdditionalReasons
+	}
+	return pluginsCore.PhaseInfoQueuedWithTaskInfo(at, pluginsCore.DefaultPhaseVersion, "restarting task", info)
+}
+
 func toClusterEvents(phaseInfo pluginsCore.PhaseInfo, fallbackTime *timestamppb.Timestamp) []*workflow.ClusterEvent {
 	info := phaseInfo.Info()
 	if phaseInfo.Reason() == "" && (info == nil || len(info.AdditionalReasons) == 0) {
@@ -1460,6 +1478,9 @@ func toClusterEvents(phaseInfo pluginsCore.PhaseInfo, fallbackTime *timestamppb.
 			e.SourceComponent = k8sEvent.SourceComponent
 			e.Count = k8sEvent.Count
 		}
+		// The fault is carried over as the plugin attached it, which it does only for an
+		// event it trusts. The message is never parsed for one here.
+		e.GpuFault = reason.GpuFault
 		out = append(out, e)
 	}
 	return out
