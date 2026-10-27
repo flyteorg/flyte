@@ -136,6 +136,10 @@ message TaskActionMetadata {
 
   // The short name for this task.
   string short_name = 3;
+
+  // Effective target queue for this task action, including the run default when
+  // no action-level queue override was specified. Unset when the queue is unknown.
+  optional string queue = 4;
 }
 
 message TraceActionMetadata {
@@ -206,11 +210,6 @@ message ActionMetadata {
   // Set only when this action was recovered from a prior run instead of executed
   // here: the source action (source run id + action name) whose result was reused.
   common.ActionIdentifier recovered_from = 18;
-
-  // Effective target queue for this task action, including the run default when
-  // no action-level queue override was specified. Unset when the queue is unknown
-  // or the action type does not use a task queue.
-  optional string queue = 19;
 }
 
 enum ActionType {

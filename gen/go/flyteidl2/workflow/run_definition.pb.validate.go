@@ -1121,6 +1121,10 @@ func (m *TaskActionMetadata) validate(all bool) error {
 
 	// no validation rules for ShortName
 
+	if m.Queue != nil {
+		// no validation rules for Queue
+	}
+
 	if len(errors) > 0 {
 		return TaskActionMetadataMultiError(errors)
 	}
@@ -1745,10 +1749,6 @@ func (m *ActionMetadata) validate(all bool) error {
 
 	default:
 		_ = v // ensures v is used
-	}
-
-	if m.Queue != nil {
-		// no validation rules for Queue
 	}
 
 	if len(errors) > 0 {
