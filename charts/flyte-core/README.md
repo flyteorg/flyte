@@ -281,6 +281,7 @@ Distributed Flyte 2 core services
 | components.executor.podSecurityContext | object | `{}` |  |
 | components.executor.priorityClassName | string | `""` |  |
 | components.executor.readinessProbe | object | `{}` |  |
+| components.executor.replicaCount | int | `1` | Replicas above 1 need configuration.executor.leaderElect: one replica reconciles at a time and the rest stand by. |
 | components.executor.resources | object | `{}` |  |
 | components.executor.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | components.executor.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
