@@ -9,6 +9,7 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
+	"github.com/XSAM/otelsql"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
 
@@ -66,9 +67,9 @@ func getPostgresReadDsn(ctx context.Context, pgConfig PostgresConfig) string {
 }
 
 // CreatePostgresDbIfNotExists creates DB if it doesn't exist for the passed in config
-func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig) (*sqlx.DB, error) {
+func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig, options ...otelsql.Option) (*sqlx.DB, error) {
 	dsn := GetPostgresDsn(ctx, pgConfig)
-	db, err := sqlx.Open("pgx", dsn)
+	db, err := openPostgres(dsn, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +92,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig) (
 	defaultDbPgConfig := pgConfig
 	defaultDbPgConfig.DbName = defaultDB
 	defaultDsn := GetPostgresDsn(ctx, defaultDbPgConfig)
-	defaultDb, err := sqlx.Open("pgx", defaultDsn)
+	defaultDb, err := openPostgres(defaultDsn, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +117,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig) (
 	}
 
 	// Now try connecting to the db again
-	db, err = sqlx.Open("pgx", dsn)
+	db, err = openPostgres(dsn, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -130,9 +131,9 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig) (
 }
 
 // CreatePostgresReadOnlyDbConnection creates readonly DB connection and returns the sqlx.DB object and error
-func CreatePostgresReadOnlyDbConnection(ctx context.Context, pgConfig PostgresConfig) (*sqlx.DB, error) {
+func CreatePostgresReadOnlyDbConnection(ctx context.Context, pgConfig PostgresConfig, options ...otelsql.Option) (*sqlx.DB, error) {
 	dsn := getPostgresReadDsn(ctx, pgConfig)
-	db, err := sqlx.Open("pgx", dsn)
+	db, err := openPostgres(dsn, options...)
 	if err != nil {
 		return nil, err
 	}

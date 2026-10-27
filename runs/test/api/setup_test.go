@@ -92,7 +92,7 @@ func TestMain(m *testing.M) {
 		MaxOpenConnections: 100,
 	}
 	var err error
-	testDB, err = database.GetDB(ctx, dbConfig)
+	testDB, err = database.GetDB(ctx, dbConfig, "runs-service-test")
 	if err != nil {
 		log.Printf("Failed to initialize database: %v", err)
 		exitCode = 1
