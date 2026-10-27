@@ -136,6 +136,10 @@ message TaskActionMetadata {
 
   // The short name for this task.
   string short_name = 3;
+
+  // Effective target queue for this task action, including the run default when
+  // no action-level queue override was specified. Unset when the queue is unknown.
+  optional string queue = 4;
 }
 
 message TraceActionMetadata {
