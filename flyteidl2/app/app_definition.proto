@@ -331,6 +331,11 @@ message Spec {
 
   // Timeout configuration for the app.
   TimeoutConfig timeouts = 15;
+
+  // Kubernetes namespace selected by the server for this app. The value is
+  // immutable after creation and remains stable across app updates. An empty
+  // value preserves the legacy namespace resolution behavior.
+  string namespace = 17;
 }
 
 // Represents a link to an external resource (Arize project link, W&B dashboard, etc)
