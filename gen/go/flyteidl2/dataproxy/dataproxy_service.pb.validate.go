@@ -380,6 +380,8 @@ func (m *UploadInputsRequest) validate(all bool) error {
 
 	// no validation rules for BaseDir
 
+	// no validation rules for Queue
+
 	switch v := m.Id.(type) {
 	case *UploadInputsRequest_RunId:
 		if v == nil {

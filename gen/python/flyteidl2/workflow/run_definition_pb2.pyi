@@ -136,14 +136,16 @@ class ConditionWebhook(_message.Message):
     def __init__(self, url: _Optional[str] = ..., payload: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
 
 class TaskActionMetadata(_message.Message):
-    __slots__ = ["id", "task_type", "short_name"]
+    __slots__ = ["id", "task_type", "short_name", "queue"]
     ID_FIELD_NUMBER: _ClassVar[int]
     TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
     SHORT_NAME_FIELD_NUMBER: _ClassVar[int]
+    QUEUE_FIELD_NUMBER: _ClassVar[int]
     id: _task_definition_pb2.TaskIdentifier
     task_type: str
     short_name: str
-    def __init__(self, id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., task_type: _Optional[str] = ..., short_name: _Optional[str] = ...) -> None: ...
+    queue: str
+    def __init__(self, id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., task_type: _Optional[str] = ..., short_name: _Optional[str] = ..., queue: _Optional[str] = ...) -> None: ...
 
 class TraceActionMetadata(_message.Message):
     __slots__ = ["name"]
