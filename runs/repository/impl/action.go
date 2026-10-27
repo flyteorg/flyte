@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -43,6 +44,27 @@ const (
 	defaultListenerPingInterval         = 90 * time.Second
 	defaultListenerMinReconnectInterval = 10 * time.Second
 )
+
+// terminalPhases are the phases an action ends in. FAILED and TIMED_OUT can
+// still move on when the action is retried (see UpdateActionPhase).
+var terminalPhases = []int32{
+	int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+	int32(common.ActionPhase_ACTION_PHASE_FAILED),
+	int32(common.ActionPhase_ACTION_PHASE_ABORTED),
+	int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
+	int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
+}
+
+// nonTerminalPhases is every ActionPhase not in terminalPhases.
+var nonTerminalPhases = func() []int32 {
+	var phases []int32
+	for phase := range common.ActionPhase_name {
+		if !slices.Contains(terminalPhases, phase) {
+			phases = append(phases, phase)
+		}
+	}
+	return phases
+}()
 
 type notificationBuffer string
 
@@ -555,13 +577,6 @@ func (r *actionRepo) UpdateActionPhase(
 	retryablePhases := []int32{
 		int32(common.ActionPhase_ACTION_PHASE_FAILED),
 		int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
-	}
-	terminalPhases := []int32{
-		int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
-		int32(common.ActionPhase_ACTION_PHASE_FAILED),
-		int32(common.ActionPhase_ACTION_PHASE_ABORTED),
-		int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
-		int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
 	}
 
 	var queryBuilder strings.Builder
@@ -1222,6 +1237,28 @@ func (r *actionRepo) ListRootActions(ctx context.Context, project, domain string
 		return nil, fmt.Errorf("failed to list root actions: %w", err)
 	}
 	return actions, nil
+}
+
+// CountActionsByPhase counts the actions in a non-terminal phase, split by
+// phase and by whether the action is a root (a run).
+func (r *actionRepo) CountActionsByPhase(ctx context.Context) (map[interfaces.PhaseKey]int64, error) {
+	var rows []struct {
+		Phase  int32 `db:"phase"`
+		IsRoot bool  `db:"is_root"`
+		Count  int64 `db:"count"`
+	}
+	err := sqlx.SelectContext(ctx, r.db, &rows,
+		`SELECT phase, parent_action_name IS NULL AS is_root, COUNT(*) AS count
+		FROM actions WHERE phase = ANY($1) GROUP BY 1, 2`,
+		pq.Array(nonTerminalPhases))
+	if err != nil {
+		return nil, fmt.Errorf("failed to count actions by phase: %w", err)
+	}
+	counts := make(map[interfaces.PhaseKey]int64, len(rows))
+	for _, row := range rows {
+		counts[interfaces.PhaseKey{Phase: row.Phase, IsRoot: row.IsRoot}] = row.Count
+	}
+	return counts, nil
 }
 
 // startNotifyLoop acquires a dedicated DB connection for NOTIFY commands and

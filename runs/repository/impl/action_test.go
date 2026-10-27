@@ -545,6 +545,82 @@ func TestListRuns_HasPausedActionFilter(t *testing.T) {
 	assert.False(t, runs[0].ParentActionName.Valid, "only the root action should be returned")
 }
 
+func TestCountActionsByPhase(t *testing.T) {
+	db := setupActionDB(t)
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	t.Run("empty table", func(t *testing.T) {
+		counts, err := actionRepo.CountActionsByPhase(ctx)
+		require.NoError(t, err)
+		assert.Empty(t, counts)
+	})
+
+	t.Run("counts only non-terminal actions", func(t *testing.T) {
+		root := func(run string, phase common.ActionPhase) *models.Action {
+			return &models.Action{Project: "proj1", Domain: "domain1", RunName: run, Name: rootActionName,
+				Phase: int32(phase)}
+		}
+		child := func(run, name string, phase common.ActionPhase) *models.Action {
+			return &models.Action{Project: "proj1", Domain: "domain1", RunName: run, Name: name,
+				ParentActionName: sql.NullString{String: rootActionName, Valid: true},
+				Phase:            int32(phase)}
+		}
+		for _, a := range []*models.Action{
+			// r1: a live run with children in live and terminal phases.
+			root("r1", common.ActionPhase_ACTION_PHASE_RUNNING),
+			child("r1", "c1", common.ActionPhase_ACTION_PHASE_QUEUED),
+			child("r1", "c2", common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES),
+			child("r1", "c3", common.ActionPhase_ACTION_PHASE_INITIALIZING),
+			child("r1", "c4", common.ActionPhase_ACTION_PHASE_RUNNING),
+			child("r1", "c5", common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			child("r1", "c6", common.ActionPhase_ACTION_PHASE_FAILED),
+			// r2: a paused run is still live.
+			root("r2", common.ActionPhase_ACTION_PHASE_PAUSED),
+			// r3-r7: one run in each terminal phase; none are counted.
+			root("r3", common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			child("r3", "c1", common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			root("r4", common.ActionPhase_ACTION_PHASE_FAILED),
+			root("r5", common.ActionPhase_ACTION_PHASE_ABORTED),
+			child("r5", "c1", common.ActionPhase_ACTION_PHASE_ABORTED),
+			root("r6", common.ActionPhase_ACTION_PHASE_TIMED_OUT),
+			root("r7", common.ActionPhase_ACTION_PHASE_RECOVERED),
+		} {
+			_, err := actionRepo.CreateAction(ctx, a, false)
+			require.NoError(t, err)
+		}
+
+		counts, err := actionRepo.CountActionsByPhase(ctx)
+		require.NoError(t, err)
+		key := func(phase common.ActionPhase, isRoot bool) interfaces.PhaseKey {
+			return interfaces.PhaseKey{Phase: int32(phase), IsRoot: isRoot}
+		}
+		assert.Equal(t, map[interfaces.PhaseKey]int64{
+			key(common.ActionPhase_ACTION_PHASE_RUNNING, true):                1, // r1
+			key(common.ActionPhase_ACTION_PHASE_PAUSED, true):                 1, // r2
+			key(common.ActionPhase_ACTION_PHASE_QUEUED, false):                1,
+			key(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, false): 1,
+			key(common.ActionPhase_ACTION_PHASE_INITIALIZING, false):          1,
+			key(common.ActionPhase_ACTION_PHASE_RUNNING, false):               1,
+		}, counts)
+	})
+}
+
+func TestNonTerminalPhases(t *testing.T) {
+	assert.ElementsMatch(t, []int32{
+		int32(common.ActionPhase_ACTION_PHASE_UNSPECIFIED),
+		int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		int32(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES),
+		int32(common.ActionPhase_ACTION_PHASE_INITIALIZING),
+		int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+		int32(common.ActionPhase_ACTION_PHASE_PAUSED),
+	}, nonTerminalPhases)
+
+	// Every phase is exactly one of terminal or non-terminal.
+	assert.Len(t, common.ActionPhase_name, len(terminalPhases)+len(nonTerminalPhases))
+}
+
 // TestListRuns_SearchFilter runs the console's run search predicate against a real
 // database: one term must match either the run name or the task name, case-insensitively,
 // and EQUAL on a full run name must select exactly that run.
