@@ -4,6 +4,7 @@ package flyteidl2.task;
 
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/kubernetes.proto";
 import "flyteidl2/common/phase.proto";
 import "flyteidl2/common/run.proto";
 import "flyteidl2/core/literals.proto";
@@ -189,7 +190,7 @@ message RunSpec {
   // Kubernetes namespace selected by the server for this run. The value is
   // immutable after creation and is propagated to every action and finalizer.
   // An empty value preserves the legacy namespace resolution behavior.
-  string namespace = 21;
+  flyteidl2.common.K8sMetadata k8s_metadata = 21;
 }
 
 // DefaultSettings holds run-scoped defaults applied to tasks in a run. Each field
