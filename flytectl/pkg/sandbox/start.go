@@ -419,14 +419,17 @@ func StartDemoCluster(ctx context.Context, args []string, sandboxConfig *sandbox
 
 func StartSandboxCluster(ctx context.Context, args []string, sandboxConfig *sandboxCmdConfig.Config) error {
 	demoImagePrefix := "dind"
-	exposedPorts, portBindings, err := docker.GetSandboxPorts()
+
+	exposedPorts, portBindings, err := docker.GetSandboxPorts(sandboxConfig.Ports)
 	if err != nil {
 		return err
 	}
+
 	err = StartClusterForSandbox(ctx, args, sandboxConfig, sandboxImageName, demoImagePrefix, exposedPorts, portBindings, util.SandBoxConsolePort)
 	if err != nil {
 		return err
 	}
+
 	util.PrintSandboxStartMessage(util.SandBoxConsolePort, docker.SandboxKubeconfig, sandboxConfig.DryRun)
 	return nil
 }
