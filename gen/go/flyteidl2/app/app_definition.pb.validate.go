@@ -1741,6 +1741,8 @@ func (m *Spec) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for Namespace
+
 	switch v := m.AppPayload.(type) {
 	case *Spec_Container:
 		if v == nil {
