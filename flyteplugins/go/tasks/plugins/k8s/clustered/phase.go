@@ -8,6 +8,7 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
@@ -30,7 +31,8 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("unexpected resource type %T", resource)
 	}
 
-	// Read spec for failure-policy flags (restart_on_host_maintenance).
+	// Read spec for the failure policy (max_restarts, restart_on_host_maintenance,
+	// resume_after_preemption).
 	var spec clusteredpb.ClusteredTaskSpec
 	if taskTemplate, err := pluginContext.TaskReader().Read(ctx); err == nil && taskTemplate != nil {
 		if err := utils.UnmarshalStructToPb(taskTemplate.GetCustom(), &spec); err != nil {
@@ -62,6 +64,7 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 	started := hasJobSetStarted(jobSet, pluginState)
 	pods := currentRestartPods(jobSet, listWorkerPods(ctx, pluginContext, jobSet))
 	maxRestarts := getMaxRestarts(jobSet, &spec)
+	resumeAfterPreemption := spec.GetFailurePolicy().GetResumeAfterPreemption()
 
 	// 1. Is it over? A suspended JobSet is never terminal.
 	switch conditionType(condition) {
@@ -80,7 +83,8 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 	// 2. Has the whole gang ever been up?
 	var phaseInfo pluginsCore.PhaseInfo
 	if started {
-		phaseInfo = afterStart(ctx, pluginContext, jobSet, condition, suspended, pods, maxRestarts, &taskInfo)
+		phaseInfo = afterStart(ctx, pluginContext, jobSet, condition, suspended, pods, maxRestarts,
+			resumeAfterPreemption, &taskInfo)
 	} else {
 		phaseInfo = beforeStart(ctx, pluginContext, jobSet, condition, suspended, pods, maxRestarts, pluginState, &taskInfo)
 	}
@@ -158,11 +162,21 @@ func afterStart(
 	suspended bool,
 	pods []v1.Pod,
 	maxRestarts int32,
+	resumeAfterPreemption bool,
 	taskInfo *pluginsCore.TaskInfo,
 ) pluginsCore.PhaseInfo {
 	// The gate took the gang back: the JobSet is re-suspended and its pods are gone.
 	if suspended {
-		return evictedPhaseInfo(ctx, pluginContext, jobSet, taskInfo)
+		wl, err := workloadForJobSet(ctx, pluginContext.K8sReader(), jobSet)
+		if err != nil {
+			logger.Warnf(ctx, "failed to read the Kueue Workload of JobSet %s/%s; ending the attempt: %v",
+				jobSet.Namespace, jobSet.Name, err)
+		}
+		if resumeAfterPreemption && awaitsReadmission(wl) {
+			// Phases never move backwards within an attempt, so the wait is reported as Running.
+			return runningPhaseInfo(taskInfo, classifyEviction(wl).Summary()+"; waiting for re-admission")
+		}
+		return evictedPhaseInfo(pluginContext, wl, taskInfo)
 	}
 
 	if conditionType(condition) == jobsetv1alpha2.JobSetRestarting {
@@ -193,22 +207,16 @@ func runningPhaseInfo(taskInfo *pluginsCore.TaskInfo, reason string) pluginsCore
 // the gang back. The plugin never suspends a JobSet itself.
 const evictionSource = "kueue"
 
-// evictedPhaseInfo reports a gang the gate took back after it had fully started. The attempt
-// is over and the JobSet is cleaned up. Kueue's Workload says why: a cause the user owns
+// evictedPhaseInfo reports a gang the gate took back after it had fully started, ending the
+// attempt and cleaning up the JobSet. Kueue's Workload says why: a cause the user owns
 // (preemption in the queue they chose, the maximum execution time they set) is a user retry
 // that uses one of the task's retries; any other cause, or a Workload that cannot be read, is
 // a system retry that does not. The message says which, and how many retries are left.
 func evictedPhaseInfo(
-	ctx context.Context,
 	pluginContext k8s.PluginContext,
-	jobSet *jobsetv1alpha2.JobSet,
+	wl *unstructured.Unstructured,
 	taskInfo *pluginsCore.TaskInfo,
 ) pluginsCore.PhaseInfo {
-	wl, err := workloadForJobSet(ctx, pluginContext.K8sReader(), jobSet)
-	if err != nil {
-		logger.Warnf(ctx, "failed to read the Kueue Workload of JobSet %s/%s; reporting its eviction as a system retry: %v",
-			jobSet.Namespace, jobSet.Name, err)
-	}
 	eviction := classifyEviction(wl)
 	if eviction.UserCaused {
 		eviction.RetriesLeft = retriesRemaining(pluginContext)
