@@ -261,16 +261,19 @@ func mergeStorageSettings(levels []*settings.StorageSettings) *settings.StorageS
 // group mergers it holds no rules of its own. Returns nil when nothing resolved.
 func mergeAppSettings(levels []*settings.AppSettings) *settings.AppSettings {
 	disallowAnonymous := make([]*settings.BoolSetting, len(levels))
+	dnsStrategy := make([]*settings.StringSetting, len(levels))
 
 	for i, l := range levels {
 		disallowAnonymous[i] = l.GetDisallowAnonymous()
+		dnsStrategy[i] = l.GetAppDnsStrategy()
 	}
 
 	out := &settings.AppSettings{
 		DisallowAnonymous: mergeBoolSettings(disallowAnonymous),
+		AppDnsStrategy:    mergeStringSettings(dnsStrategy),
 	}
 
-	if out.DisallowAnonymous == nil {
+	if out.DisallowAnonymous == nil && out.AppDnsStrategy == nil {
 		return nil
 	}
 	return out

@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/flyteorg/flyte/docker/devbox-bundled/bootstrap/internal/transform"
 	"github.com/flyteorg/flyte/docker/devbox-bundled/bootstrap/internal/transform/plugins/config"
@@ -83,11 +84,17 @@ func appleSiliconBridgeEndpoint(lookupIP func() (string, error)) (string, error)
 	return "http://" + net.JoinHostPort(ip, port), nil
 }
 
+// isDevMode reports whether FLYTE_DEV enables dev mode. The value is matched
+// case-insensitively, the same way `flyte start devbox` reads it back.
+func isDevMode() bool {
+	return strings.EqualFold(os.Getenv(devModeEnvVar), "true")
+}
+
 func main() {
 	var tmplPath string
 	var tPlugins []transform.Plugin
 
-	if os.Getenv(devModeEnvVar) == "True" {
+	if isDevMode() {
 		tmplPath = devTemplatePath
 	} else {
 		// If we are not running in dev mode, look for user-specified configuration

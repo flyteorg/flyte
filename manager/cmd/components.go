@@ -20,8 +20,10 @@ import (
 	stdlibapp "github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/v2/flytestdlib/redis"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/runs"
 	runsconfig "github.com/flyteorg/flyte/v2/runs/config"
@@ -214,6 +216,16 @@ func setupExecutor(ctx context.Context, sc *stdlibapp.SetupContext) error {
 }
 
 func setupAll(ctx context.Context, sc *stdlibapp.SetupContext) error {
+	// Native Redis metrics are process-wide, so select the shared provider before
+	// any component or storage setup can create a Redis client.
+	const serviceName = "flyte"
+	if err := otelutils.RegisterProvidersWithContext(ctx, serviceName, otelutils.GetConfig()); err != nil {
+		return fmt.Errorf("failed to initialize shared telemetry: %w", err)
+	}
+	if err := redis.InitMetrics(otelutils.GetMeterProvider(serviceName)); err != nil {
+		return fmt.Errorf("failed to initialize Redis metrics: %w", err)
+	}
+
 	serverCfg := runsconfig.GetConfig().Server
 	k8sCfg := actionsconfig.GetConfig().Kubernetes
 	sc.Host = serverCfg.Host

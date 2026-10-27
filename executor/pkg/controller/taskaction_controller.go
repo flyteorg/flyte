@@ -65,8 +65,8 @@ const (
 	TaskActionDefaultRequeueDuration = 10 * time.Second
 	taskActionFinalizer              = "flyte.org/plugin-finalizer"
 
-	// DefaultMaxSystemFailures bounds consecutive system errors before the
-	// TaskAction is forced to PermanentFailure.
+	// DefaultMaxSystemFailures bounds the system errors one attempt may take
+	// before the TaskAction is forced to PermanentFailure.
 	DefaultMaxSystemFailures uint32 = 3
 
 	// MaxSystemFailuresExceededCode is the ExecutionError.Code stamped on
@@ -561,8 +561,8 @@ func (r *TaskActionReconciler) reconcileTimedOutAttempt(
 		taskAction.Status.PluginState = nil
 		taskAction.Status.PluginStateVersion = 0
 		r.scheduleNextAttempt(ctx, taskAction, currentAttempts)
-		// Same rule as the ordinary reconcile tail: a fresh attempt does not
-		// inherit the previous one's consecutive system-failure count.
+		// Same rule as an in-place restart: a fresh attempt does not inherit
+		// the previous one's system-failure count.
 		taskAction.Status.SystemFailures = 0
 		taskAction.Status.CacheStatus = observedCacheStatus(phaseInfo.Info())
 		if err := r.applyTimeoutPhase(ctx, taskAction, original, phaseInfo); err != nil {
@@ -658,8 +658,8 @@ func (r *TaskActionReconciler) recordSystemRetry(
 	// The system-retry count places this retry within the reserved range: it holds until
 	// the retry is persisted, so republishing after a failed status update lands on the
 	// same row and stays idempotent, and it moves on with every retry after that. The
-	// consecutive system-failure count would not do: it goes back to zero as soon as the
-	// relaunched attempt makes progress, and the next failure would reuse a spent version.
+	// system-failure count would not do: it also counts Plugin.Handle errors, which publish
+	// no event, and goes back to zero on a new attempt.
 	version := systemRetryEventVersionBase + taskAction.Status.SystemRetries
 	queued := pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, version, systemRetryReason, info)
 	return r.recordEvent(ctx, r.buildActionEvent(ctx, taskAction, queued))
@@ -996,11 +996,6 @@ func (r *TaskActionReconciler) reconcileTask(
 		)
 	}
 
-	// Reset the consecutive system-failure counter on any non-system-error
-	// transition so transient blips earlier in the lifecycle don't accumulate
-	// toward the permanent-failure threshold.
-	taskAction.Status.SystemFailures = 0
-
 	// Whether the plugin asked for its resource to be deleted if this failure ends the task.
 	// Read it before the retry block below, which rebuilds a final failure without the flag.
 	cleanupOnFailure := phaseInfo.CleanupOnFailure()
@@ -1021,6 +1016,9 @@ func (r *TaskActionReconciler) reconcileTask(
 			}
 			// Track the new attempt count; applied to Status.Attempts after the stateMgr block.
 			restartAttempts = currentAttempts + 1
+			// Not a system failure (those returned above), so the new attempt starts with a
+			// clean system-failure count.
+			taskAction.Status.SystemFailures = 0
 			r.scheduleNextAttempt(ctx, taskAction, currentAttempts)
 			logger.Info("restarting task in-place",
 				"attempt", currentAttempts+1, "maxAttempts", maxAttempts, "nextAttemptAt", taskAction.Status.NextAttemptAt)

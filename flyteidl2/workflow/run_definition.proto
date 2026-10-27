@@ -159,6 +159,10 @@ message TaskActionMetadata {
 
   // The short name for this task.
   string short_name = 3;
+
+  // Effective target queue for this task action, including the run default when
+  // no action-level queue override was specified. Unset when the queue is unknown.
+  optional string queue = 4;
 }
 
 message TraceActionMetadata {
@@ -261,6 +265,21 @@ message ActionStatus {
 
   // Duration of the action in milliseconds.
   optional uint64 duration_ms = 6;
+
+  // Time the current attempt entered the queue, when recorded by the queue
+  // service. Retained after assignment and while running; cleared or replaced
+  // when a new attempt starts. Primarily available in queue-scoped ListActions
+  // responses. Omitted when the queue-entry time was not recorded, for example
+  // by older servers; never inferred from action creation or other timestamps.
+  google.protobuf.Timestamp queued_at = 7;
+
+  // Time worker assignment committed for the current attempt, when recorded.
+  // Together with queued_at, this fixes queue wait at assignment,
+  // excluding later resource waits or initialization. Primarily available in
+  // queue-scoped ListActions responses. Omitted for older assignments without
+  // a recorded assignment time; never inferred from action creation or other
+  // timestamps.
+  google.protobuf.Timestamp worker_assigned_at = 9;
 }
 
 // Lightweight representation of an action.

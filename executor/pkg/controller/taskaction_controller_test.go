@@ -1656,8 +1656,9 @@ var _ = Describe("TaskAction Controller", func() {
 					&pluginsCore.TaskInfo{OccurredAt: &at},
 				))
 			}
-			// Preempted, relaunched and running again, then preempted a second time: the
-			// progress in between puts the consecutive failure count back to zero.
+			// Preempted, relaunched and running again, then preempted a second time. Both
+			// failures belong to the same attempt, so the progress in between does not
+			// reset the system-failure count.
 			fake := &fakePlugin{
 				id: "kueue-plugin",
 				transitions: []pluginsCore.Transition{
@@ -1694,8 +1695,93 @@ var _ = Describe("TaskAction Controller", func() {
 
 			persisted := getTaskAction(nn)
 			Expect(persisted.Status.Attempts).To(Equal(uint32(1)))
-			Expect(persisted.Status.SystemFailures).To(Equal(uint32(1)), "the failures were not consecutive")
+			Expect(persisted.Status.SystemFailures).To(Equal(uint32(2)), "both failures count against the attempt")
 			Expect(persisted.Status.SystemRetries).To(Equal(uint32(2)))
+			Expect(isTerminal(persisted)).To(BeFalse())
+		})
+
+		It("fails the TaskAction once an attempt is relaunched past the system-failure limit", func() {
+			base := time.Date(2026, time.October, 24, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			deleted := func(at time.Time) pluginsCore.Transition {
+				return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(
+					"ResourceDeletedExternally",
+					"pod deleted",
+					&pluginsCore.TaskInfo{OccurredAt: &at},
+				))
+			}
+			// The pod is deleted every time it starts running. Each relaunch reports
+			// Running again, which must not reset the count, or the pod would be
+			// relaunched forever.
+			var transitions []pluginsCore.Transition
+			for i := 0; i <= int(DefaultMaxSystemFailures); i++ {
+				transitions = append(transitions,
+					runningTransition(base.Add(time.Duration(2*i)*time.Minute)),
+					deleted(base.Add(time.Duration(2*i+1)*time.Minute)),
+				)
+			}
+			fake := &fakePlugin{id: "k8s-plugin", transitions: transitions}
+			r := newReconciler(fake, fakeClock, &fakeEventsClient{}, nil)
+			nn := createTaskAction(
+				"system-retry-limit",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+			request := reconcile.Request{NamespacedName: nn}
+
+			for i := 0; i < len(transitions); i++ {
+				_, err := r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				fakeClock.Step(time.Minute)
+				if i < len(transitions)-1 {
+					Expect(isTerminal(getTaskAction(nn))).To(BeFalse(), "reconcile %d", i)
+				}
+			}
+
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.ErrorState).NotTo(BeNil())
+			Expect(persisted.Status.ErrorState.Code).To(Equal(MaxSystemFailuresExceededCode))
+			Expect(persisted.Status.SystemFailures).To(Equal(DefaultMaxSystemFailures + 1))
+			Expect(persisted.Status.Attempts).To(Equal(uint32(1)), "system failures do not consume user retries")
+		})
+
+		It("resets the system-failure count when a user failure starts a new attempt", func() {
+			base := time.Date(2026, time.October, 24, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			preemptedAt := base.Add(time.Minute)
+			fake := &fakePlugin{
+				id: "k8s-plugin",
+				transitions: []pluginsCore.Transition{
+					runningTransition(base),
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(
+						"WorkloadEvictedDueToPreempted",
+						"preempted",
+						&pluginsCore.TaskInfo{OccurredAt: &preemptedAt},
+					)),
+					runningTransition(base.Add(2 * time.Minute)),
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("UserError", "task raised", nil)),
+				},
+			}
+			r := newReconciler(fake, fakeClock, &fakeEventsClient{}, nil)
+			nn := createTaskAction(
+				"system-failures-new-attempt",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+			request := reconcile.Request{NamespacedName: nn}
+
+			for i := 0; i < 3; i++ {
+				_, err := r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				fakeClock.Step(time.Minute)
+			}
+			Expect(getTaskAction(nn).Status.SystemFailures).To(Equal(uint32(1)), "running again does not reset the count")
+
+			_, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.Attempts).To(Equal(uint32(2)))
+			Expect(persisted.Status.SystemFailures).To(BeZero(), "the new attempt starts with a clean count")
+			Expect(persisted.Status.SystemRetries).To(Equal(uint32(1)))
 			Expect(isTerminal(persisted)).To(BeFalse())
 		})
 

@@ -56,7 +56,8 @@ service RunService {
   // runs or updates to existing ones from the point of invocation.
   rpc WatchRuns(WatchRunsRequest) returns (stream WatchRunsResponse) {}
 
-  // List all actions for a given run.
+  // List actions for a run, or live pending and in-flight task actions for a queue
+  // when supported. Phase filters in the list request select the returned phases.
   rpc ListActions(ListActionsRequest) returns (ListActionsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
@@ -327,8 +328,22 @@ message ListActionsRequest {
   // Common list request parameters.
   common.ListRequest request = 1;
 
-  // Run identifier for filtering actions.
-  common.RunIdentifier run_id = 2 [(buf.validate.field).required = true];
+  oneof scope_by {
+    option (buf.validate.oneof).required = true;
+
+    // List all actions belonging to this run. Mutually exclusive with queue_id.
+    common.RunIdentifier run_id = 2;
+
+    // List live nonterminal task actions assigned to this queue across runs, including
+    // pending and in-flight actions. The "phase" filter in ListRequest.filters selects
+    // the returned phases. Assigned actions whose current execution phase has not
+    // been reported use ACTION_PHASE_UNSPECIFIED until their phase is known.
+    // Mutually exclusive with run_id. Services that do not implement queue-scoped
+    // listing return UNIMPLEMENTED. Queue scope restricts the matching actions'
+    // project/domain. The synthetic "search" filter matches action, run, task and
+    // project/domain names.
+    common.QueueIdentifier queue_id = 3;
+  }
 }
 
 // Response message for listing actions.
@@ -338,6 +353,10 @@ message ListActionsResponse {
 
   // Token for fetching the next page of results, if any.
   string token = 2;
+
+  // Number of matching actions before pagination. Present for queue-scoped lists;
+  // omitted for run-scoped lists and by servers that do not support queue listing.
+  optional uint64 total_count = 3;
 
   // Note: This response does not include the enriched actions.
   // The enriched actions are only available in the WatchActionsResponse.

@@ -203,20 +203,24 @@ class WatchRunsResponse(_message.Message):
     def __init__(self, runs: _Optional[_Iterable[_Union[_run_definition_pb2.Run, _Mapping]]] = ...) -> None: ...
 
 class ListActionsRequest(_message.Message):
-    __slots__ = ["request", "run_id"]
+    __slots__ = ["request", "run_id", "queue_id"]
     REQUEST_FIELD_NUMBER: _ClassVar[int]
     RUN_ID_FIELD_NUMBER: _ClassVar[int]
+    QUEUE_ID_FIELD_NUMBER: _ClassVar[int]
     request: _list_pb2.ListRequest
     run_id: _identifier_pb2.RunIdentifier
-    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ...) -> None: ...
+    queue_id: _identifier_pb2.QueueIdentifier
+    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., queue_id: _Optional[_Union[_identifier_pb2.QueueIdentifier, _Mapping]] = ...) -> None: ...
 
 class ListActionsResponse(_message.Message):
-    __slots__ = ["actions", "token"]
+    __slots__ = ["actions", "token", "total_count"]
     ACTIONS_FIELD_NUMBER: _ClassVar[int]
     TOKEN_FIELD_NUMBER: _ClassVar[int]
+    TOTAL_COUNT_FIELD_NUMBER: _ClassVar[int]
     actions: _containers.RepeatedCompositeFieldContainer[_run_definition_pb2.Action]
     token: str
-    def __init__(self, actions: _Optional[_Iterable[_Union[_run_definition_pb2.Action, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
+    total_count: int
+    def __init__(self, actions: _Optional[_Iterable[_Union[_run_definition_pb2.Action, _Mapping]]] = ..., token: _Optional[str] = ..., total_count: _Optional[int] = ...) -> None: ...
 
 class WatchActionsRequest(_message.Message):
     __slots__ = ["run_id", "filter", "enable_run_store"]
