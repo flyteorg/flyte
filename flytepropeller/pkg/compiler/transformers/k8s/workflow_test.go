@@ -11,6 +11,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
@@ -249,6 +250,47 @@ func TestBuildFlyteWorkflow_withUnionInputs(t *testing.T) {
 	assert.Equal(t, 2, len(wf.Inputs.Literals))
 	assert.Equal(t, 1.0, wf.Inputs.Literals["x"].GetScalar().GetUnion().GetValue().GetScalar().GetPrimitive().GetFloatValue())
 	assert.Equal(t, "hello", wf.Inputs.Literals["y"].GetScalar().GetUnion().GetValue().GetScalar().GetPrimitive().GetStringValue())
+}
+
+func TestBuildFlyteWorkflow_setWorkflowCRNameHashLength(t *testing.T) {
+	for name, tt := range map[string]struct {
+		useSuffix bool
+		expected  string
+	}{
+		"default does not use hash as workflow CR name": {
+			useSuffix: false,
+			expected:  "",
+		},
+		"use hash as workflow CR name": {
+			useSuffix: true,
+			expected:  "-x6m7gswrdl",
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			flyteConfig := config.GetConfig()
+			flyteConfig.UseWorkflowCRNameSuffix = tt.useSuffix
+
+			w := createSampleMockWorkflow()
+
+			errors.SetConfig(errors.Config{IncludeSource: true})
+			wf, err := BuildFlyteWorkflow(
+				&core.CompiledWorkflowClosure{
+					Primary: w.GetCoreWorkflow(),
+					Tasks: []*core.CompiledTask{
+						{
+							Template: &core.TaskTemplate{
+								Id: &core.Identifier{Name: "ref_1"},
+							},
+						},
+					},
+				},
+				nil, nil, "")
+			assert.Equal(t, tt.expected, wf.ObjectMeta.Name)
+			assert.NoError(t, err)
+			assert.NotNil(t, wf)
+			errors.SetConfig(errors.Config{})
+		})
+	}
 }
 
 func TestGenerateName(t *testing.T) {
