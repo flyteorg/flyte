@@ -550,6 +550,7 @@ Distributed Flyte 2 core services
 | ingress.apiJwtIngress.enabled | bool | `false` |  |
 | ingress.apiJwtIngress.host | string | `""` |  |
 | ingress.apiJwtIngress.ingressClassName | string | `""` |  |
+| ingress.apiJwtIngress.keepHttpRoutes | bool | `false` | Also serve the API routes on the http ingress, for requests without a bearer token (e.g. console calls behind cookie auth). The controller must send bearer requests to this ingress first, e.g. with an ALB Authorization header condition. |
 | ingress.apiJwtIngress.tls | list | `[]` |  |
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |
