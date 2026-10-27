@@ -185,6 +185,11 @@ message RunSpec {
   // Run-scoped defaults, projected onto every task in the run that does not
   // set the corresponding value itself. Set by the server from settings.
   DefaultSettings default_settings = 20;
+
+  // Kubernetes namespace selected by the server for this run. The value is
+  // immutable after creation and is propagated to every action and finalizer.
+  // An empty value preserves the legacy namespace resolution behavior.
+  string namespace = 21;
 }
 
 // DefaultSettings holds run-scoped defaults applied to tasks in a run. Each field
