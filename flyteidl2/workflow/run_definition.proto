@@ -221,10 +221,6 @@ enum ActionType {
 
 // Lightweight status of an action. For more detailed status see ActionDetails.
 message ActionStatus {
-  // Used by an earlier queue timing snapshot; do not reuse.
-  reserved 8;
-  reserved "queue_wait_started_at";
-
   // Last known phase.
   common.ActionPhase phase = 1;
 
