@@ -4,6 +4,7 @@ package flyteidl2.app;
 
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identity.proto";
+import "flyteidl2/common/kubernetes.proto";
 import "flyteidl2/common/runtime_version.proto";
 import "flyteidl2/core/artifact_id.proto";
 import "flyteidl2/core/security.proto";
@@ -331,6 +332,11 @@ message Spec {
 
   // Timeout configuration for the app.
   TimeoutConfig timeouts = 15;
+
+  // Kubernetes namespace selected by the server for this app. The value is
+  // immutable after creation and remains stable across app updates. An empty
+  // value preserves the legacy namespace resolution behavior.
+  flyteidl2.common.K8sMetadata k8s_metadata = 17;
 }
 
 // Represents a link to an external resource (Arize project link, W&B dashboard, etc)
