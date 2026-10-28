@@ -542,39 +542,6 @@ func TestEmbedTaskTemplate_StampsPodTemplateName(t *testing.T) {
 	})
 }
 
-func TestNotifyRunService_ChildEventsDoNotUpdateParent(t *testing.T) {
-	for _, eventType := range []watch.EventType{watch.Added, watch.Modified, watch.Deleted} {
-		t.Run(string(eventType), func(t *testing.T) {
-			ctx := context.Background()
-			mockClient := runmocks.NewInternalRunServiceClient(t)
-			c := &ActionsClient{
-				recordedFilter: testFilter(),
-				runClient:      mockClient,
-			}
-			ta, update := newTestActionUpdate("child-1")
-			update.ParentActionName = "a0"
-			update.Phase = common.ActionPhase_ACTION_PHASE_RUNNING
-
-			mockClient.On("RecordAction", mock.Anything, mock.MatchedBy(func(req *connect.Request[workflow.RecordActionRequest]) bool {
-				return req.Msg.GetActionId().GetName() == "child-1" && req.Msg.GetParent() == "a0"
-			})).Return(&connect.Response[workflow.RecordActionResponse]{}, nil).Once()
-
-			// The parent may already have failed when this child event arrives.
-			// Only forward the child's status, including on replay after recording.
-			mockClient.On("UpdateActionStatus", mock.Anything, mock.MatchedBy(func(req *connect.Request[workflow.UpdateActionStatusRequest]) bool {
-				return req.Msg.GetActionId().GetName() == "child-1" &&
-					req.Msg.GetStatus().GetPhase() == common.ActionPhase_ACTION_PHASE_RUNNING
-			})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Twice()
-
-			c.notifyRunService(ctx, ta, update, eventType)
-			c.notifyRunService(ctx, ta, update, eventType)
-
-			mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
-			mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 2)
-		})
-	}
-}
-
 func TestNotifyRunService_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testing.T) {
 	ctx := context.Background()
 

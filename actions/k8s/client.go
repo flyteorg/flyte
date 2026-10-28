@@ -870,10 +870,6 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		}
 	}
 
-	// RecordAction promotes eligible parents atomically in the runs DB.
-	// Do not send an unconditional parent status update here: child events can
-	// arrive after the parent has finished.
-
 	if update.Phase != common.ActionPhase_ACTION_PHASE_UNSPECIFIED {
 		status := &workflow.ActionStatus{
 			Phase:       update.Phase,
