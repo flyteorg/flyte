@@ -2,6 +2,9 @@
 {{- $component := .Values.components.executor }}
 {{- if $component.enabled }}
 {{- $image := $component.image }}
+{{- if and (gt (int $component.replicaCount) 1) (not $.Values.configuration.executor.leaderElect) }}
+{{- fail "components.executor.replicaCount above 1 requires configuration.executor.leaderElect" }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,7 +17,7 @@ metadata:
     {{- tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
 spec:
-  replicas: 1
+  replicas: {{ $component.replicaCount }}
   {{- with $component.strategy }}
   strategy:
     {{- toYaml . | nindent 4 }}

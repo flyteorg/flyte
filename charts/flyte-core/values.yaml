@@ -419,6 +419,8 @@ components:
       clusterIP: ""
   executor:
     enabled: true
+    # -- Replicas above 1 need configuration.executor.leaderElect: one replica reconciles at a time and the rest stand by.
+    replicaCount: 1
     image:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2
       tag: latest  # FLYTE_TAG
