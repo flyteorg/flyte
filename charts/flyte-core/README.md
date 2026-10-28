@@ -513,7 +513,9 @@ Distributed Flyte 2 core services
 | configuration.storage.providerConfig.s3.secretKeyPath | string | `""` |  |
 | configuration.storage.providerConfig.s3.v2Signing | bool | `false` |  |
 | configuration.webhook.cacheInvalidationPort | int | `9444` |  |
+| configuration.webhook.certDir | string | `"/var/run/flyte/certs"` | Directory the webhook serves its TLS certs from. |
 | configuration.webhook.listenPort | int | `9443` |  |
+| configuration.webhook.localCert | bool | `true` | Whether to copy the webhook TLS certs from their Secret into certDir at startup. |
 | configuration.webhook.webhookTimeout | int | `30` |  |
 | console.affinity | object | `{}` |  |
 | console.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |

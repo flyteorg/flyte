@@ -656,6 +656,10 @@ configuration:
     defaultEnvVars: {}
 
   webhook:
+    # -- Whether to copy the webhook TLS certs from their Secret into certDir at startup.
+    localCert: true
+    # -- Directory the webhook serves its TLS certs from.
+    certDir: /var/run/flyte/certs
     listenPort: 9443
     cacheInvalidationPort: 9444
     webhookTimeout: 30

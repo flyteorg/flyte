@@ -164,7 +164,7 @@ spec:
               mountPath: /etc/flyte/config.d
               readOnly: true
             - name: webhook-certs
-              mountPath: /var/run/flyte/certs
+              mountPath: {{ $.Values.configuration.webhook.certDir }}
             {{- with $component.extraVolumeMounts }}
             {{- tpl (toYaml .) $ | nindent 12 }}
             {{- end }}
