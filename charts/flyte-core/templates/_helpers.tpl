@@ -172,6 +172,7 @@ storage:
     - /flyteidl2.trigger.TriggerService
     - /flyteidl2.project.ProjectService
     - /flyteidl2.auth.IdentityService
+    - /flyteidl2.settings.SettingsService
 - component: actions
   paths:
     - /flyteidl2.actions.ActionsService
