@@ -24,9 +24,6 @@ data:
       {{- tpl (toYaml .) $ | nindent 6 }}
       {{- end }}
     webhook:
-      localCert: true
-      # The webhook-certs emptyDir; the default /etc/webhook/certs needs a root container.
-      certDir: /var/run/flyte/certs
       secretName: {{ include "flyte-core.webhookSecretName" . }}
       serviceName: {{ include "flyte-core.componentName" (dict "root" . "component" "executor") }}
       servicePort: {{ .Values.configuration.webhook.listenPort }}
