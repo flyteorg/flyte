@@ -656,9 +656,9 @@ configuration:
     defaultEnvVars: {}
 
   webhook:
+    # -- Whether to copy the webhook TLS certs from their Secret into certDir at startup.
     localCert: true
-    # certDir is where the executor mounts the webhook-certs emptyDir. The binary's
-    # /etc/webhook/certs default needs a root container.
+    # -- Directory the webhook serves its TLS certs from.
     certDir: /var/run/flyte/certs
     listenPort: 9443
     cacheInvalidationPort: 9444
