@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -73,10 +74,10 @@ type ActionsClient struct {
 	mu sync.RWMutex
 	// Map parent action name to subscriber channels.
 	// Multiple callers may watch the same parent action concurrently.
-	// TODO: add a prometheus counter for dropped updates when metrics are wired up
-	subscribers map[string]map[chan *ActionUpdate]struct{}
-	stopCh      chan struct{}
-	watching    bool
+	subscribers              map[string]map[chan *ActionUpdate]struct{}
+	droppedSubscriberUpdates prometheus.Counter
+	stopCh                   chan struct{}
+	watching                 bool
 
 	// Worker pool: numWorkers goroutines each own one channel.
 	// Events are sharded by the TaskAction name, so per-resource ordering is preserved.
@@ -115,6 +116,10 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, n
 		runClient:   runClient,
 		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
 	}
+	c.droppedSubscriberUpdates = scope.MustNewCounter(
+		"dropped_subscriber_updates",
+		"Number of action updates dropped because a subscriber channel was full.",
+	)
 
 	// The dedup filter is mandatory: notifyRunService records on every event type
 	// and relies on the filter to keep RecordAction idempotent.
@@ -808,6 +813,9 @@ func (c *ActionsClient) notifySubscribers(ctx context.Context, update *ActionUpd
 		select {
 		case ch <- update:
 		default:
+			if c.droppedSubscriberUpdates != nil {
+				c.droppedSubscriberUpdates.Inc()
+			}
 			logger.Warnf(ctx, "subscriber channel full, dropping update for parent action: %s", update.ParentActionName)
 		}
 	}
