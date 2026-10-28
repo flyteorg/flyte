@@ -55,7 +55,7 @@ type ActionRepo interface {
 	// Aggregation operations
 	ListRootActions(ctx context.Context, project, domain string, startDate, endDate *time.Time, limit int) ([]*models.Action, error)
 
-	// CountActionsByPhase counts the actions in a non-terminal phase, split by
+	// CountActionsByPhase counts the actions in an active phase, split by
 	// phase and by whether the action is a root (a run).
 	CountActionsByPhase(ctx context.Context) (counts map[PhaseKey]int64, err error)
 }

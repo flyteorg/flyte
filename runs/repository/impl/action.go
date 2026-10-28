@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -55,16 +54,15 @@ var terminalPhases = []int32{
 	int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
 }
 
-// nonTerminalPhases is every ActionPhase not in terminalPhases.
-var nonTerminalPhases = func() []int32 {
-	var phases []int32
-	for phase := range common.ActionPhase_name {
-		if !slices.Contains(terminalPhases, phase) {
-			phases = append(phases, phase)
-		}
-	}
-	return phases
-}()
+// activePhases is every ActionPhase not in terminalPhases.
+var activePhases = []int32{
+	int32(common.ActionPhase_ACTION_PHASE_UNSPECIFIED),
+	int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+	int32(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES),
+	int32(common.ActionPhase_ACTION_PHASE_INITIALIZING),
+	int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+	int32(common.ActionPhase_ACTION_PHASE_PAUSED),
+}
 
 type notificationBuffer string
 
@@ -1239,8 +1237,8 @@ func (r *actionRepo) ListRootActions(ctx context.Context, project, domain string
 	return actions, nil
 }
 
-// CountActionsByPhase counts the actions in a non-terminal phase, split by
-// phase and by whether the action is a root (a run).
+// CountActionsByPhase counts the actions in an active phase, split by phase
+// and by whether the action is a root (a run).
 func (r *actionRepo) CountActionsByPhase(ctx context.Context) (map[interfaces.PhaseKey]int64, error) {
 	var rows []struct {
 		Phase  int32 `db:"phase"`
@@ -1250,7 +1248,7 @@ func (r *actionRepo) CountActionsByPhase(ctx context.Context) (map[interfaces.Ph
 	err := sqlx.SelectContext(ctx, r.db, &rows,
 		`SELECT phase, parent_action_name IS NULL AS is_root, COUNT(*) AS count
 		FROM actions WHERE phase = ANY($1) GROUP BY 1, 2`,
-		pq.Array(nonTerminalPhases))
+		pq.Array(activePhases))
 	if err != nil {
 		return nil, fmt.Errorf("failed to count actions by phase: %w", err)
 	}

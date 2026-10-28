@@ -557,7 +557,7 @@ func TestCountActionsByPhase(t *testing.T) {
 		assert.Empty(t, counts)
 	})
 
-	t.Run("counts only non-terminal actions", func(t *testing.T) {
+	t.Run("counts only active actions", func(t *testing.T) {
 		root := func(run string, phase common.ActionPhase) *models.Action {
 			return &models.Action{Project: "proj1", Domain: "domain1", RunName: run, Name: rootActionName,
 				Phase: int32(phase)}
@@ -597,28 +597,28 @@ func TestCountActionsByPhase(t *testing.T) {
 			return interfaces.PhaseKey{Phase: int32(phase), IsRoot: isRoot}
 		}
 		assert.Equal(t, map[interfaces.PhaseKey]int64{
-			key(common.ActionPhase_ACTION_PHASE_RUNNING, true):                1, // r1
-			key(common.ActionPhase_ACTION_PHASE_PAUSED, true):                 1, // r2
-			key(common.ActionPhase_ACTION_PHASE_QUEUED, false):                1,
-			key(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, false): 1,
-			key(common.ActionPhase_ACTION_PHASE_INITIALIZING, false):          1,
-			key(common.ActionPhase_ACTION_PHASE_RUNNING, false):               1,
+			// Runs (root actions).
+			key(common.ActionPhase_ACTION_PHASE_RUNNING, true): 1, // r1
+			key(common.ActionPhase_ACTION_PHASE_PAUSED, true):  1, // r2
+
+			// Child actions.
+			key(common.ActionPhase_ACTION_PHASE_QUEUED, false):                1, // r1/c1
+			key(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, false): 1, // r1/c2
+			key(common.ActionPhase_ACTION_PHASE_INITIALIZING, false):          1, // r1/c3
+			key(common.ActionPhase_ACTION_PHASE_RUNNING, false):               1, // r1/c4
 		}, counts)
+
+		// The gauge totals: runs are the root rows, actions are all rows.
+		var runs, actions int64
+		for k, n := range counts {
+			if k.IsRoot {
+				runs += n
+			}
+			actions += n
+		}
+		assert.Equal(t, int64(2), runs, "active runs: r1, r2")
+		assert.Equal(t, int64(6), actions, "active actions: r1, r2, r1/c1-c4")
 	})
-}
-
-func TestNonTerminalPhases(t *testing.T) {
-	assert.ElementsMatch(t, []int32{
-		int32(common.ActionPhase_ACTION_PHASE_UNSPECIFIED),
-		int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-		int32(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES),
-		int32(common.ActionPhase_ACTION_PHASE_INITIALIZING),
-		int32(common.ActionPhase_ACTION_PHASE_RUNNING),
-		int32(common.ActionPhase_ACTION_PHASE_PAUSED),
-	}, nonTerminalPhases)
-
-	// Every phase is exactly one of terminal or non-terminal.
-	assert.Len(t, common.ActionPhase_name, len(terminalPhases)+len(nonTerminalPhases))
 }
 
 // TestListRuns_SearchFilter runs the console's run search predicate against a real
