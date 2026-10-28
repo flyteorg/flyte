@@ -142,6 +142,9 @@ message CreateRunRequest {
 // Response message for creating a run.
 message CreateRunResponse {
   Run run = 1;
+
+  // Non-fatal issues found while creating the run, for the client to show the user.
+  repeated string warnings = 2;
 }
 
 // Request message for aborting a run.

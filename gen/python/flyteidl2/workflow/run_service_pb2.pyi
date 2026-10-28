@@ -43,10 +43,12 @@ class CreateRunRequest(_message.Message):
     def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., task_spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., offloaded_input_data: _Optional[_Union[_run_pb2.OffloadedInputData, _Mapping]] = ..., run_spec: _Optional[_Union[_run_pb2_1.RunSpec, _Mapping]] = ..., source: _Optional[_Union[_run_definition_pb2.RunSource, str]] = ..., run_start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class CreateRunResponse(_message.Message):
-    __slots__ = ["run"]
+    __slots__ = ["run", "warnings"]
     RUN_FIELD_NUMBER: _ClassVar[int]
+    WARNINGS_FIELD_NUMBER: _ClassVar[int]
     run: _run_definition_pb2.Run
-    def __init__(self, run: _Optional[_Union[_run_definition_pb2.Run, _Mapping]] = ...) -> None: ...
+    warnings: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, run: _Optional[_Union[_run_definition_pb2.Run, _Mapping]] = ..., warnings: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class AbortRunRequest(_message.Message):
     __slots__ = ["run_id", "reason"]

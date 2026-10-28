@@ -84,6 +84,34 @@ message Recover {
   // subtree). A listed condition action re-pauses and waits for a new signal.
   // Unknown names are ignored.
   repeated string force_rerun_actions = 1 [(buf.validate.field).repeated.items.string.min_len = 1];
+
+  // Input and code overrides for task actions of the run being recovered. Set by the
+  // client. Only the action names and the location of the overrides travel in the
+  // RunSpec; the values and code live in the data plane (see ActionInputOverridesData).
+  ActionInputOverrides action_input_overrides = 2;
+
+  // Ancestors of the actions named in action_input_overrides, up to (excluding) a0.
+  // Set by the server at run creation and ignored if sent by a client: an ancestor
+  // must re-execute for the overridden action to be enqueued again.
+  repeated string implied_rerun_actions = 3;
+
+  // Marks this recovery run as a fork: it reuses the run being recovered but runs
+  // changed code or inputs, rather than retrying it unchanged. Set by the client
+  // that creates the fork (for example a code-only fork); the server also sets it
+  // whenever action_input_overrides is present, and clears it on a run that is not
+  // a recovery. Informational: it does not change how the run is recovered.
+  bool fork = 4;
+}
+
+// ActionInputOverrides names the task actions whose inputs or code a recovery run
+// overrides and where the overrides are stored.
+message ActionInputOverrides {
+  // Names of task actions in the run being recovered. Must not include the root
+  // action a0: root input changes are carried as the run's own inputs.
+  repeated string action_names = 1 [(buf.validate.field).repeated.items.string.min_len = 1];
+
+  // Location of a serialized ActionInputOverridesData in the data plane.
+  string uri = 2;
 }
 
 // TaskSpecSource records how a run's task spec was provided at creation time, so

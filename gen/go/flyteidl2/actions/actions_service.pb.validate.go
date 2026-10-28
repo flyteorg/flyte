@@ -122,6 +122,8 @@ func (m *Action) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for InputOverrideApplied
+
 	switch v := m.Spec.(type) {
 	case *Action_Task:
 		if v == nil {

@@ -74,12 +74,32 @@ class Run(_message.Message):
     def __init__(self, action: _Optional[_Union[Action, _Mapping]] = ..., labels: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class RunDetails(_message.Message):
-    __slots__ = ["run_spec", "action"]
+    __slots__ = ["run_spec", "action", "action_input_override_status"]
     RUN_SPEC_FIELD_NUMBER: _ClassVar[int]
     ACTION_FIELD_NUMBER: _ClassVar[int]
+    ACTION_INPUT_OVERRIDE_STATUS_FIELD_NUMBER: _ClassVar[int]
     run_spec: _run_pb2_1.RunSpec
     action: ActionDetails
-    def __init__(self, run_spec: _Optional[_Union[_run_pb2_1.RunSpec, _Mapping]] = ..., action: _Optional[_Union[ActionDetails, _Mapping]] = ...) -> None: ...
+    action_input_override_status: _containers.RepeatedCompositeFieldContainer[ActionInputOverrideStatus]
+    def __init__(self, run_spec: _Optional[_Union[_run_pb2_1.RunSpec, _Mapping]] = ..., action: _Optional[_Union[ActionDetails, _Mapping]] = ..., action_input_override_status: _Optional[_Iterable[_Union[ActionInputOverrideStatus, _Mapping]]] = ...) -> None: ...
+
+class ActionInputOverrideStatus(_message.Message):
+    __slots__ = ["action_name", "state"]
+    class State(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        STATE_UNSPECIFIED: _ClassVar[ActionInputOverrideStatus.State]
+        STATE_PENDING: _ClassVar[ActionInputOverrideStatus.State]
+        STATE_APPLIED: _ClassVar[ActionInputOverrideStatus.State]
+        STATE_UNAPPLIED: _ClassVar[ActionInputOverrideStatus.State]
+    STATE_UNSPECIFIED: ActionInputOverrideStatus.State
+    STATE_PENDING: ActionInputOverrideStatus.State
+    STATE_APPLIED: ActionInputOverrideStatus.State
+    STATE_UNAPPLIED: ActionInputOverrideStatus.State
+    ACTION_NAME_FIELD_NUMBER: _ClassVar[int]
+    STATE_FIELD_NUMBER: _ClassVar[int]
+    action_name: str
+    state: ActionInputOverrideStatus.State
+    def __init__(self, action_name: _Optional[str] = ..., state: _Optional[_Union[ActionInputOverrideStatus.State, str]] = ...) -> None: ...
 
 class TaskAction(_message.Message):
     __slots__ = ["id", "spec", "cache_key", "queue"]
@@ -162,7 +182,7 @@ class ConditionActionMetadata(_message.Message):
     def __init__(self, name: _Optional[str] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ...) -> None: ...
 
 class ActionMetadata(_message.Message):
-    __slots__ = ["parent", "group", "executed_by", "task", "trace", "condition", "action_type", "trigger_id", "environment_name", "funtion_name", "trigger_name", "trigger_type", "source", "relation", "recovered_from"]
+    __slots__ = ["parent", "group", "executed_by", "task", "trace", "condition", "action_type", "trigger_id", "environment_name", "funtion_name", "trigger_name", "trigger_type", "source", "relation", "recovered_from", "input_override_applied"]
     PARENT_FIELD_NUMBER: _ClassVar[int]
     GROUP_FIELD_NUMBER: _ClassVar[int]
     EXECUTED_BY_FIELD_NUMBER: _ClassVar[int]
@@ -178,6 +198,7 @@ class ActionMetadata(_message.Message):
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     RELATION_FIELD_NUMBER: _ClassVar[int]
     RECOVERED_FROM_FIELD_NUMBER: _ClassVar[int]
+    INPUT_OVERRIDE_APPLIED_FIELD_NUMBER: _ClassVar[int]
     parent: str
     group: str
     executed_by: _identity_pb2.EnrichedIdentity
@@ -193,7 +214,8 @@ class ActionMetadata(_message.Message):
     source: RunSource
     relation: _run_pb2.Relation
     recovered_from: _identifier_pb2.ActionIdentifier
-    def __init__(self, parent: _Optional[str] = ..., group: _Optional[str] = ..., executed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., task: _Optional[_Union[TaskActionMetadata, _Mapping]] = ..., trace: _Optional[_Union[TraceActionMetadata, _Mapping]] = ..., condition: _Optional[_Union[ConditionActionMetadata, _Mapping]] = ..., action_type: _Optional[_Union[ActionType, str]] = ..., trigger_id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ..., environment_name: _Optional[str] = ..., funtion_name: _Optional[str] = ..., trigger_name: _Optional[str] = ..., trigger_type: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ..., source: _Optional[_Union[RunSource, str]] = ..., relation: _Optional[_Union[_run_pb2.Relation, _Mapping]] = ..., recovered_from: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ...) -> None: ...
+    input_override_applied: bool
+    def __init__(self, parent: _Optional[str] = ..., group: _Optional[str] = ..., executed_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., task: _Optional[_Union[TaskActionMetadata, _Mapping]] = ..., trace: _Optional[_Union[TraceActionMetadata, _Mapping]] = ..., condition: _Optional[_Union[ConditionActionMetadata, _Mapping]] = ..., action_type: _Optional[_Union[ActionType, str]] = ..., trigger_id: _Optional[_Union[_identifier_pb2.TriggerIdentifier, _Mapping]] = ..., environment_name: _Optional[str] = ..., funtion_name: _Optional[str] = ..., trigger_name: _Optional[str] = ..., trigger_type: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ..., source: _Optional[_Union[RunSource, str]] = ..., relation: _Optional[_Union[_run_pb2.Relation, _Mapping]] = ..., recovered_from: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., input_override_applied: bool = ...) -> None: ...
 
 class ActionStatus(_message.Message):
     __slots__ = ["phase", "start_time", "end_time", "attempts", "cache_status", "duration_ms", "queued_at", "worker_assigned_at"]

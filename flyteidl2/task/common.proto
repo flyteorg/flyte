@@ -138,6 +138,35 @@ message Inputs {
   repeated flyteidl2.core.KeyValuePair context = 2;
 }
 
+// ActionInputOverridesData is the file referenced by ActionInputOverrides.uri. The
+// controller of each overridden action's parent reads that action's override
+// inputs from their path, overlays them, by input name, on the inputs it computes
+// for that action, and runs that action from its replacement code bundle, if any.
+// Every key of either map is also listed in ActionInputOverrides.action_names.
+message ActionInputOverridesData {
+  // Action name in the run being recovered -> URI of a serialized Inputs in the
+  // data plane holding the inputs that change (partial inputs). Like an action's
+  // input_uri, the values stay in the data plane and are only read by the parent
+  // that launches the action.
+  map<string, string> input_uris = 1;
+
+  // Action name in the run being recovered -> the code bundle that action runs
+  // instead of the one its parent passes down. Only that action, and the actions
+  // it launches, run the replacement code; the rest of the run keeps its own.
+  map<string, ActionCodeBundle> code_bundles = 2;
+}
+
+// ActionCodeBundle is a code bundle archive (.tar.gz) in the data plane that one
+// action of a fork runs in place of its parent's.
+message ActionCodeBundle {
+  // URI of the archive.
+  string tgz = 1 [(buf.validate.field).string.min_len = 1];
+
+  // Version of the archive's contents (for example its MD5 digest), recorded as
+  // the action's code bundle version.
+  string version = 2;
+}
+
 // Declares that a named output of the producing action is a new artifact
 // version. The output's literal (in Outputs.literals) is the artifact's value;
 // org/project/domain come from the producing action's scope at registration.
