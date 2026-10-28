@@ -1570,3 +1570,32 @@ func convertListToLiterals(values []int64) *idlcore.Literal {
 		},
 	}
 }
+
+func TestDeltaTimestampSeconds(t *testing.T) {
+	// default MaxDeltaTimestamp of 3 days needs 18 bits, so the largest storable value is 2^18 - 1
+	deltaTimestamps, err := bitarray.NewCompactArray(1, bitarray.Item((3 * 24 * time.Hour).Seconds()))
+	assert.NoError(t, err)
+	maxValue := uint64(1)<<deltaTimestamps.ItemSize - 1
+
+	startedAt := time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)
+	tests := []struct {
+		name             string
+		subNodeStartedAt time.Time
+		expected         uint64
+	}{
+		{name: "SameTime", subNodeStartedAt: startedAt, expected: 0},
+		{name: "WithinRange", subNodeStartedAt: startedAt.Add(90*time.Minute + 500*time.Millisecond), expected: 5400},
+		{name: "LargestStorableValue", subNodeStartedAt: startedAt.Add(time.Duration(maxValue) * time.Second), expected: maxValue}, // #nosec G115
+		{name: "BeyondRange", subNodeStartedAt: startedAt.Add(time.Duration(267605) * time.Second), expected: maxValue},
+		{name: "SubNodeStartedBeforeArrayNode", subNodeStartedAt: startedAt.Add(-time.Hour), expected: 0},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			delta := deltaTimestampSeconds(startedAt, test.subNodeStartedAt, deltaTimestamps.ItemSize)
+			assert.Equal(t, test.expected, delta)
+			assert.NotPanics(t, func() { deltaTimestamps.SetItem(0, delta) })
+			assert.Equal(t, test.expected, deltaTimestamps.GetItem(0))
+		})
+	}
+}
