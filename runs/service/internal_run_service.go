@@ -17,6 +17,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/flytestdlib/authorization"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
@@ -63,6 +64,9 @@ func (s *RunService) recordAction(ctx context.Context, req *workflow.RecordActio
 
 func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.RecordActionRequest) error {
 	actionID := req.GetActionId()
+	if err := authorization.Check(ctx, actionID.GetRun().GetDomain(), actionID.GetRun().GetProject()); err != nil {
+		return err
+	}
 
 	// Build the base action model with fields common to all action types.
 	action := models.NewActionModel(actionID)
@@ -369,6 +373,9 @@ func (s *RunService) recordEvents(ctx context.Context, events []*workflow.Action
 func statusFromError(err error) *grpcstatus.Status {
 	if err == nil {
 		return &grpcstatus.Status{}
+	}
+	if errors.Is(err, authorization.ErrDenied) {
+		return &grpcstatus.Status{Code: int32(connect.CodePermissionDenied), Message: authorization.ErrDenied.Error()}
 	}
 	// Unwrap connect errors to get the gRPC code.
 	var connectErr *connect.Error

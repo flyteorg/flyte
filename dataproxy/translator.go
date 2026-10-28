@@ -9,6 +9,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/dataproxy/converter"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/authorization"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
@@ -22,6 +23,7 @@ import (
 // between Flyte literals and JSON representations. It is served from the dataproxy
 // binary so that translation requests do not transit the control plane.
 type TranslatorService struct {
+	authorization.Guard
 	workflowconnect.UnimplementedTranslatorServiceHandler
 
 	dataStore     *storage.DataStore
@@ -43,6 +45,9 @@ func (s *TranslatorService) LiteralsToLaunchFormJson(
 	ctx context.Context,
 	req *connect.Request[workflow.LiteralsToLaunchFormJsonRequest],
 ) (*connect.Response[workflow.LiteralsToLaunchFormJsonResponse], error) {
+	if err := s.RequireAuthorizationContext(ctx); err != nil {
+		return nil, connect.NewError(connect.CodePermissionDenied, err)
+	}
 	literals := req.Msg.GetLiterals()
 	switch {
 	case req.Msg.GetTriggerId() != nil:
@@ -78,6 +83,9 @@ func (s *TranslatorService) readOffloadedLiterals(
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("action_id is required when literals_uri is set"))
 	}
 
+	if err := s.Check(ctx, actionID.GetRun().GetDomain(), actionID.GetRun().GetProject()); err != nil {
+		return nil, connect.NewError(connect.CodePermissionDenied, err)
+	}
 	urisResp, err := s.runClient.GetActionDataURIs(ctx, connect.NewRequest(&workflow.GetActionDataURIsRequest{
 		ActionId: actionID,
 	}))
@@ -106,6 +114,9 @@ func (s *TranslatorService) readTriggerLiterals(
 	ctx context.Context,
 	triggerID *common.TriggerIdentifier,
 ) ([]*task.NamedLiteral, error) {
+	if err := s.Check(ctx, triggerID.GetName().GetDomain(), triggerID.GetName().GetProject()); err != nil {
+		return nil, connect.NewError(connect.CodePermissionDenied, err)
+	}
 	resp, err := s.triggerClient.GetTriggerRevisionDetails(ctx, connect.NewRequest(&trigger.GetTriggerRevisionDetailsRequest{
 		Id: triggerID,
 	}))
@@ -141,6 +152,9 @@ func (s *TranslatorService) LaunchFormJsonToLiterals(
 	ctx context.Context,
 	req *connect.Request[workflow.LaunchFormJsonToLiteralsRequest],
 ) (*connect.Response[workflow.LaunchFormJsonToLiteralsResponse], error) {
+	if err := s.RequireAuthorizationContext(ctx); err != nil {
+		return nil, connect.NewError(connect.CodePermissionDenied, err)
+	}
 	literals, err := converter.LaunchFormJsonToLiterals(ctx, req.Msg.GetJson())
 	if err != nil {
 		return nil, err
@@ -152,6 +166,9 @@ func (s *TranslatorService) TaskSpecToLaunchFormJson(
 	ctx context.Context,
 	req *connect.Request[workflow.TaskSpecToLaunchFormJsonRequest],
 ) (*connect.Response[workflow.TaskSpecToLaunchFormJsonResponse], error) {
+	if err := s.RequireAuthorizationContext(ctx); err != nil {
+		return nil, connect.NewError(connect.CodePermissionDenied, err)
+	}
 	schema, err := converter.TaskSpecToLaunchFormJson(ctx, req.Msg.GetTaskSpec())
 	if err != nil {
 		return nil, err
@@ -163,6 +180,9 @@ func (s *TranslatorService) JsonValuesToLiterals(
 	ctx context.Context,
 	req *connect.Request[workflow.JsonValuesToLiteralsRequest],
 ) (*connect.Response[workflow.JsonValuesToLiteralsResponse], error) {
+	if err := s.RequireAuthorizationContext(ctx); err != nil {
+		return nil, connect.NewError(connect.CodePermissionDenied, err)
+	}
 	literals, err := converter.JSONValuesToLiterals(ctx, req.Msg.GetVariables(), req.Msg.GetValues())
 	if err != nil {
 		return nil, err
