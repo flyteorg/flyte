@@ -191,13 +191,20 @@ func TestNotifyRunService_InternalFailureAllowsRetry(t *testing.T) {
 			Message: "failed to create action: transient database error",
 		},
 	})
+	calls := 0
+	answered := func(result string) func(mock.Arguments) {
+		return func(mock.Arguments) {
+			calls++
+			t.Logf("call %d: run service answered %s", calls, result)
+		}
+	}
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(failed, nil).Twice()
+		Return(failed, nil).Run(answered("INTERNAL")).Twice()
 	mockClient.On("RecordAction", mock.Anything, mock.Anything).
 		Return(connect.NewResponse(&workflow.RecordActionResponse{
 			ActionId: update.ActionID,
 			Status:   &status.Status{Code: int32(code.Code_OK)},
-		}), nil).Once()
+		}), nil).Run(answered("OK")).Once()
 
 	// First event fails, so the action must stay retryable.
 	c.notifyRunService(ctx, ta, update, watch.Added)
