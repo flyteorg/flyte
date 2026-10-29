@@ -89,13 +89,63 @@ enum CredentialKind {
 // it can grow a field without a breaking change.
 message ProjectDataArea {}
 
-// VolumeData names one Volume by its locator.
+// VolumeData names one Volume the way the platform names it, never by path.
+//
+// A locator would be the tempting field and is the wrong one: it is a path the
+// caller supplies, so accepting it means deciding whether this identity may
+// touch that path -- the path->resource->authorization mapping this request
+// exists to avoid. Worse, it cannot be rescued by validating that the locator
+// sits inside `scope`, because a Volume's chunks do NOT: they live at
+// `<bucket root>/<Format.Name>/chunks/...`, since JuiceFS discards any path in
+// the bucket URI. A locator "inside the scope" still yields a grant outside it.
+//
+// So the server resolves the identity below to the version's metadata object,
+// reads it, and takes BOTH halves from the record:
+//
+//   * the authorization subject -- `produced_by`, an ACTION, carrying
+//     org/project/domain. Authorizing an action is a question the platform
+//     already answers, and it must agree with `scope`.
+//   * the prefixes -- `chunk_prefix` (the format name) and `metadata_prefix`,
+//     as recorded. NOT derived from the volume's name: a fork keeps its
+//     ancestor's format name, so a name-derived prefix authenticates perfectly
+//     and then fails every chunk read.
+//
+// What this gives up on purpose: a caller holding only a locator cannot get
+// credentials. That is the confused-deputy case, and such a caller keeps
+// working the way it does today -- with its own object-store access.
 message VolumeData {
-  // The object-store URI of the volume version's metadata object, as
-  // Volume.locator reports it. It must resolve inside the request's scope:
-  // a locator is a path, and paths are not authorization.
+  oneof identity {
+    option (buf.validate.oneof).required = true;
+
+    ActionOutput action_output = 1;
+    ArtifactVersion artifact_version = 2;
+  }
+}
+
+// ActionOutput names the Volume a task execution returned. project/domain come
+// from the request's scope; this is the rest of what ActionRef records on every
+// published version, which is also how `flyte mount volume --run/--action` and
+// `flyte explore volume` already name one.
+message ActionOutput {
   // +required
-  string locator = 1 [(buf.validate.field).string.min_len = 1];
+  string run_name = 1 [(buf.validate.field).string.min_len = 1];
+
+  // +optional. Defaults to the run's root action.
+  string action_name = 2;
+
+  // +optional. With none, the action's outputs are searched for a Volume and
+  // then its inputs, as the CLI does.
+  string output_name = 3;
+}
+
+// ArtifactVersion names a Volume published to the artifact registry. The
+// handle a reader would normally type.
+message ArtifactVersion {
+  // +required
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+
+  // +optional. Defaults to the artifact's latest version.
+  string version = 2;
 }
 
 // GetCloudCredentialsRequest asks for credentials for a resource, never for a
@@ -107,8 +157,15 @@ message VolumeData {
 // correct forever. Keyed by a resource inside a scope, authorization is the
 // question the platform already answers, and the path is an OUTPUT.
 message GetCloudCredentialsRequest {
-  // The project/domain this is for. Authorization is answered here, and it is
-  // also the boundary: every prefix the response grants lives inside it.
+  // The project/domain this is for: where authorization is answered.
+  //
+  // It is NOT, for every resource, a containment boundary. A ProjectDataArea's
+  // prefix is inside it. A Volume's chunk prefix is not and cannot be made so
+  // for an existing volume -- see VolumeData. What bounds a Volume grant
+  // instead is that the server has verified, from the version's own metadata,
+  // that the family was produced inside this scope: the grant reaches one
+  // family's chunk prefix and one metadata prefix, and nothing else in the
+  // store.
   // +required
   common.ProjectIdentifier scope = 1;
 
@@ -157,6 +214,18 @@ message GetCloudCredentialsResponse {
   string bucket_uri = 6;
 
   // The prefixes these credentials can actually reach, relative to the bucket.
+  //
+  // Plural because a Volume's are not one prefix and not derivable: its chunks
+  // sit under the format name at the bucket root while its metadata sits under
+  // the version prefix, and a fork shares its ancestor's format name.
+  //
+  // Read them rather than assuming them. For a Volume, READ reaches the whole
+  // FAMILY's chunk prefix, which is wider than the one version asked for and
+  // is inherent: a branch's reads require its ancestors' chunks, forks share
+  // one format name, and chunk keys are slice-id-derived rather than
+  // per-branch. READ_WRITE need not be that wide -- a writer only creates keys
+  // in its own slice-id range -- so the two accesses may return different
+  // prefixes for the same resource.
   repeated string granted_prefixes = 7;
 }
 

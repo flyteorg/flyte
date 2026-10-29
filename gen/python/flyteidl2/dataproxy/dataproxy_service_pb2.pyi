@@ -50,10 +50,30 @@ class ProjectDataArea(_message.Message):
     def __init__(self) -> None: ...
 
 class VolumeData(_message.Message):
-    __slots__ = ["locator"]
-    LOCATOR_FIELD_NUMBER: _ClassVar[int]
-    locator: str
-    def __init__(self, locator: _Optional[str] = ...) -> None: ...
+    __slots__ = ["action_output", "artifact_version"]
+    ACTION_OUTPUT_FIELD_NUMBER: _ClassVar[int]
+    ARTIFACT_VERSION_FIELD_NUMBER: _ClassVar[int]
+    action_output: ActionOutput
+    artifact_version: ArtifactVersion
+    def __init__(self, action_output: _Optional[_Union[ActionOutput, _Mapping]] = ..., artifact_version: _Optional[_Union[ArtifactVersion, _Mapping]] = ...) -> None: ...
+
+class ActionOutput(_message.Message):
+    __slots__ = ["run_name", "action_name", "output_name"]
+    RUN_NAME_FIELD_NUMBER: _ClassVar[int]
+    ACTION_NAME_FIELD_NUMBER: _ClassVar[int]
+    OUTPUT_NAME_FIELD_NUMBER: _ClassVar[int]
+    run_name: str
+    action_name: str
+    output_name: str
+    def __init__(self, run_name: _Optional[str] = ..., action_name: _Optional[str] = ..., output_name: _Optional[str] = ...) -> None: ...
+
+class ArtifactVersion(_message.Message):
+    __slots__ = ["name", "version"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    version: str
+    def __init__(self, name: _Optional[str] = ..., version: _Optional[str] = ...) -> None: ...
 
 class GetCloudCredentialsRequest(_message.Message):
     __slots__ = ["scope", "project_data", "volume", "access", "subpaths", "duration"]
