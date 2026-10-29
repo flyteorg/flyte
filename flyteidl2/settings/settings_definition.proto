@@ -133,6 +133,17 @@ message StringMapSetting {
   ScopeLevel scope_level = 3;
 }
 
+// A setting that holds a list of strings.
+// Merge behavior: the whole list comes from the most specific scope that sets
+// one; lists from different scopes are not concatenated. UNSET clears a list
+// set at a parent scope.
+message StringListSetting {
+  SettingState state = 1;
+  // Meaningful only when state = VALUE.
+  StringValues list_value = 2;
+  ScopeLevel scope_level = 3;
+}
+
 // A setting that holds a Kubernetes resource quantity string
 // (e.g. "500m", "128Mi", "2").
 // The service validates values with resource.ParseQuantity.
@@ -212,6 +223,15 @@ message AppSettings {
   StringSetting app_dns_strategy = 2 [(flyteidl2.settings.desc) = "App public-URL DNS strategy: 'shared' (default) or 'dataplane_specific'"];
 }
 
+// NetworkSettings controls network access to an organization's data planes.
+message NetworkSettings {
+  // Source CIDRs allowed to reach the org's data plane endpoints, including
+  // apps. Entries are IPv4 or IPv6 CIDRs; a bare IP address is read as a single
+  // host (/32 or /128). UNSET means no restriction, and a VALUE must list at
+  // least one entry. Control plane access is not affected.
+  StringListSetting dataplane_ingress_allowed_cidrs = 1 [(flyteidl2.settings.desc) = "Source CIDRs allowed to reach the org's data plane endpoints, including apps. Unset means no restriction. Control plane access is not affected."];
+}
+
 // Settings holds all configurable settings for a scope.
 message Settings {
   RunSettings run = 1;
@@ -223,4 +243,5 @@ message Settings {
   StringMapSetting environment_variables = 7 [(flyteidl2.settings.desc) = "Environment variables injected into task pods. Child overrides parent on key conflict."];
   AppSettings app = 8 [(flyteidl2.settings.desc) = "Union Apps auth policy"];
   StringSetting pod_template_name = 9 [(flyteidl2.settings.desc) = "Name of the Kubernetes PodTemplate used as the base for task pods"];
+  NetworkSettings network = 10 [(flyteidl2.settings.desc) = "Network access policy"];
 }

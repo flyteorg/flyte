@@ -484,6 +484,103 @@ func TestValidateQuantity(t *testing.T) {
 	}
 }
 
+func TestValidateDataplaneIngressAllowedCIDRs(t *testing.T) {
+	tests := []struct {
+		name    string
+		setting *settings.StringListSetting
+		wantBad []string // entries the error must name; nil means the list is valid
+		wantMsg string   // a fragment the error must contain
+	}{
+		{name: "nil leaf", setting: nil},
+		{name: "inherit ignores its value", setting: strList(stateInherit, "not-a-cidr")},
+		{name: "unset ignores its value", setting: strList(stateUnset, "not-a-cidr")},
+		{
+			name:    "a state outside the enum is rejected",
+			setting: strList(settings.SettingState(3)),
+			wantMsg: "unknown state 3",
+		},
+		{name: "IPv4 CIDR", setting: strList(stateValue, "10.0.0.0/8")},
+		{name: "IPv6 CIDR", setting: strList(stateValue, "2001:db8::/32")},
+		{name: "bare IPv4 address", setting: strList(stateValue, "192.0.2.7")},
+		{name: "bare IPv6 address", setting: strList(stateValue, "2001:db8::1")},
+		{name: "prefix with host bits set is stored as written", setting: strList(stateValue, "10.0.0.1/24")},
+		{
+			name:    "prefix length past the family's width",
+			setting: strList(stateValue, "10.0.0.0/8", "10.0.0.0/33"),
+			wantBad: []string{"10.0.0.0/33"},
+		},
+		{
+			name:    "every bad entry is named",
+			setting: strList(stateValue, "not-a-cidr", "10.0.0.0/8", "10.0.0.0/33"),
+			wantBad: []string{"not-a-cidr", "10.0.0.0/33"},
+		},
+		{
+			name:    "IPv6 zone has no CIDR form",
+			setting: strList(stateValue, "fe80::1%eth0", "2001:db8::1%eth0/129"),
+			wantBad: []string{"fe80::1%eth0", "2001:db8::1%eth0/129"},
+		},
+		{
+			name:    "an empty VALUE is rejected",
+			setting: strList(stateValue),
+			wantMsg: "use UNSET for no restriction",
+		},
+		{
+			name:    "a present but empty list is rejected",
+			setting: &settings.StringListSetting{State: stateValue, ListValue: &settings.StringValues{}},
+			wantMsg: "use UNSET for no restriction",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateDataplaneIngressAllowedCIDRs(tt.setting)
+			if tt.wantBad == nil && tt.wantMsg == "" {
+				assert.NoError(t, err)
+				return
+			}
+			require.Error(t, err)
+			assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+			assert.Contains(t, err.Error(), "network.dataplane_ingress_allowed_cidrs")
+			for _, entry := range tt.wantBad {
+				assert.Contains(t, err.Error(), `"`+entry+`"`)
+			}
+			assert.Contains(t, err.Error(), tt.wantMsg)
+		})
+	}
+}
+
+// Open source treats the CIDR list like any other hierarchical setting, so
+// every scope validates it the same way.
+func TestCreateSettings_RejectsInvalidDataplaneIngressAllowedCIDRsAtEveryScope(t *testing.T) {
+	ctx := context.Background()
+	svc := setupSettingsService(t)
+
+	keys := map[string]*settings.SettingsKey{
+		"org":     {Org: "acme"},
+		"domain":  {Org: "acme", Domain: "development"},
+		"project": {Org: "acme", Domain: "development", Project: "recsys"},
+	}
+	lists := map[string]*settings.StringListSetting{
+		"bad entry":   strList(stateValue, "not-a-cidr"),
+		"empty VALUE": strList(stateValue),
+	}
+
+	for scope, key := range keys {
+		for kind, list := range lists {
+			t.Run(scope+" "+kind, func(t *testing.T) {
+				resp, err := svc.CreateSettings(ctx, connect.NewRequest(&settings.CreateSettingsRequest{
+					Key:      key,
+					Settings: &settings.Settings{Network: &settings.NetworkSettings{DataplaneIngressAllowedCidrs: list}},
+				}))
+				assert.Nil(t, resp)
+				require.Error(t, err)
+				assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+				assert.Contains(t, err.Error(), "network.dataplane_ingress_allowed_cidrs")
+			})
+		}
+	}
+}
+
 func TestValidateTaskResourceDefaults(t *testing.T) {
 	t.Run("nil defaults has nothing to check", func(t *testing.T) {
 		assert.NoError(t, validateTaskResourceDefaults("task_resource.max", nil))
@@ -571,6 +668,13 @@ func TestValidateSettings(t *testing.T) {
 				MaxActionConcurrency: concurrency(stateValue, 1),
 			}},
 			wantPath: "max_action_concurrency",
+		},
+		{
+			name: "bad ingress CIDR names its path",
+			input: &settings.Settings{Network: &settings.NetworkSettings{
+				DataplaneIngressAllowedCidrs: strList(stateValue, "not-a-cidr"),
+			}},
+			wantPath: "network.dataplane_ingress_allowed_cidrs",
 		},
 	}
 

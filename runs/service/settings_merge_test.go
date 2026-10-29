@@ -253,6 +253,7 @@ func TestMergeSettingsHandlesEveryField(t *testing.T) {
 		"environment_variables": true,
 		"app":                   true,
 		"pod_template_name":     true,
+		"network":               true,
 	}
 
 	fields := (&settings.Settings{}).ProtoReflect().Descriptor().Fields()
@@ -342,6 +343,69 @@ func TestMergeAppSettings_AppDnsStrategy(t *testing.T) {
 		assert.Equal(t, settings.SettingState_SETTING_STATE_UNSET, got.GetAppDnsStrategy().GetState())
 		assert.Empty(t, got.GetAppDnsStrategy().GetStringValue())
 	})
+}
+
+func strList(state settings.SettingState, values ...string) *settings.StringListSetting {
+	l := &settings.StringListSetting{State: state}
+	if values != nil {
+		l.ListValue = &settings.StringValues{Values: values}
+	}
+	return l
+}
+
+func TestMergeNetworkSettings(t *testing.T) {
+	t.Run("nothing set anywhere", func(t *testing.T) {
+		assert.Nil(t, mergeNetworkSettings([]*settings.NetworkSettings{nil, nil, nil}))
+		assert.Nil(t, mergeNetworkSettings([]*settings.NetworkSettings{
+			{DataplaneIngressAllowedCidrs: strList(stateInherit)},
+		}))
+	})
+
+	t.Run("the most specific list wins whole, without concatenation", func(t *testing.T) {
+		got := mergeNetworkSettings([]*settings.NetworkSettings{
+			{DataplaneIngressAllowedCidrs: strList(stateValue, "10.0.0.0/8")},
+			{DataplaneIngressAllowedCidrs: strList(stateValue, "2001:db8::/32", "192.0.2.0/24")},
+		})
+		want := strList(stateValue, "2001:db8::/32", "192.0.2.0/24")
+		want.ScopeLevel = levelDomain
+		assert.Truef(t, proto.Equal(want, got.GetDataplaneIngressAllowedCidrs()), "want %v, got %v", want, got.GetDataplaneIngressAllowedCidrs())
+	})
+
+	t.Run("inherited from the org", func(t *testing.T) {
+		got := mergeNetworkSettings([]*settings.NetworkSettings{
+			{DataplaneIngressAllowedCidrs: strList(stateValue, "10.0.0.0/8")},
+			nil,
+			{DataplaneIngressAllowedCidrs: strList(stateInherit)},
+		})
+		assert.Equal(t, []string{"10.0.0.0/8"}, got.GetDataplaneIngressAllowedCidrs().GetListValue().GetValues())
+		assert.Equal(t, levelOrg, got.GetDataplaneIngressAllowedCidrs().GetScopeLevel())
+	})
+
+	t.Run("UNSET below blocks a list set above", func(t *testing.T) {
+		got := mergeNetworkSettings([]*settings.NetworkSettings{
+			{DataplaneIngressAllowedCidrs: strList(stateValue, "10.0.0.0/8")},
+			{DataplaneIngressAllowedCidrs: strList(settings.SettingState_SETTING_STATE_UNSET)},
+		})
+		assert.Equal(t, settings.SettingState_SETTING_STATE_UNSET, got.GetDataplaneIngressAllowedCidrs().GetState())
+		assert.Empty(t, got.GetDataplaneIngressAllowedCidrs().GetListValue().GetValues())
+	})
+
+	t.Run("the merged list does not alias the stored one", func(t *testing.T) {
+		stored := strList(stateValue, "10.0.0.0/8")
+		got := mergeNetworkSettings([]*settings.NetworkSettings{{DataplaneIngressAllowedCidrs: stored}})
+		got.GetDataplaneIngressAllowedCidrs().GetListValue().Values[0] = "changed"
+		assert.Equal(t, "10.0.0.0/8", stored.GetListValue().GetValues()[0])
+	})
+}
+
+func TestMergeSettings_Network(t *testing.T) {
+	got := mergeSettings([]*settings.Settings{
+		{Network: &settings.NetworkSettings{DataplaneIngressAllowedCidrs: strList(stateValue, "10.0.0.0/8")}},
+		nil,
+		nil,
+	})
+	require.NotNil(t, got.GetNetwork())
+	assert.Equal(t, []string{"10.0.0.0/8"}, got.GetNetwork().GetDataplaneIngressAllowedCidrs().GetListValue().GetValues())
 }
 
 // TestMergeAppSettingsHandlesEveryField fails when a field is added to AppSettings
