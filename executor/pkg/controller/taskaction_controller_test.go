@@ -1116,6 +1116,35 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(fake.abortCalls).To(BeZero())
 		})
 
+		It("ends an attempt still waiting for resources past its budget when the plugin saves state each poll", func() {
+			nn := createTaskAction("qt-wait-every-poll",
+				buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
+			base := getTaskAction(nn).CreationTimestamp.Time
+			fakeClock := testingclock.NewFakeClock(base)
+			fake := &fakePlugin{id: "timeout-plugin"}
+			fake.handleFunc = func(_ context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+				if err := tCtx.PluginStateWriter().Put(1, &fakeLaunchState{Waiting: true}); err != nil {
+					return pluginsCore.UnknownTransition, err
+				}
+				return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResourcesInfo(
+					fakeClock.Now(), pluginsCore.DefaultPhaseVersion, "waiting for resources", nil)), nil
+			}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			req := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(getTaskAction(nn).Status.PluginPhase).To(Equal(pluginsCore.PhaseWaitingForResources.String()))
+
+			fakeClock.Step(10 * time.Second)
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.TimeoutAt).NotTo(BeNil())
+			Expect(fake.abortCalls).To(Equal(1))
+		})
+
 		It("keeps an attempt seen initializing in time when that event never publishes", func() {
 			nn := createTaskAction("qt-initialized-in-time",
 				buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))

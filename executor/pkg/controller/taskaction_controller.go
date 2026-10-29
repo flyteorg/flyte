@@ -1144,10 +1144,11 @@ func (r *TaskActionReconciler) reconcileTask(
 	if !cacheShortCircuited {
 		transition, handleErr = p.Handle(ctx, tCtx)
 	}
-	// A plugin's first report only says that it launched or adopted its resource. An adopted
+	// A plugin's first Queued report only says that it launched or adopted its resource. An adopted
 	// resource may have been running since before the deadline, so wait for the next poll.
 	_, _, wroteState := stateMgr.GetNewState()
-	firstReport := !cacheShortCircuited && !launched && wroteState
+	firstReport := !cacheShortCircuited && !launched && wroteState &&
+		transition.Info().Phase() == pluginsCore.PhaseQueued
 
 	if handleErr == nil {
 		if err := r.recordAttemptQueuedFromPhase(ctx, taskAction, transition.Info()); err != nil {
