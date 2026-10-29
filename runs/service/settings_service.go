@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"net/netip"
 
 	"connectrpc.com/connect"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -220,6 +221,35 @@ func validateQuantity(name string, setting *settings.QuantitySetting) error {
 	return nil
 }
 
+// validateDataplaneIngressAllowedCIDRs requires a CIDR list in VALUE state to hold
+// at least one entry, each an IPv4 or IPv6 CIDR or a bare address. Entries are
+// stored as written, the way quantities are, so a prefix with host bits set is
+// accepted. UNSET, not an empty list, is how to say "no restriction".
+func validateDataplaneIngressAllowedCIDRs(setting *settings.StringListSetting) error {
+	const name = "network.dataplane_ingress_allowed_cidrs"
+	if setting.GetState() != settings.SettingState_SETTING_STATE_VALUE {
+		return nil
+	}
+	entries := setting.GetListValue().GetValues()
+	if len(entries) == 0 {
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid %s: a VALUE must list at least one entry; use UNSET for no restriction", name))
+	}
+	var bad []string
+	for _, entry := range entries {
+		if _, err := netip.ParsePrefix(entry); err == nil {
+			continue
+		}
+		if _, err := netip.ParseAddr(entry); err == nil {
+			continue
+		}
+		bad = append(bad, entry)
+	}
+	if len(bad) > 0 {
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid %s %q: each entry must be an IPv4 or IPv6 CIDR or address", name, bad))
+	}
+	return nil
+}
+
 func validateTaskResourceDefaults(bound string, d *settings.TaskResourceDefaults) error {
 	if err := validateQuantity(bound+".cpu", d.GetCpu()); err != nil {
 		return err
@@ -273,7 +303,10 @@ func validateSettings(s *settings.Settings) error {
 	if err := validateTaskResourceDefaults("task_resource.max", s.GetTaskResource().GetMax()); err != nil {
 		return err
 	}
-	return validateDefaultAccelerator(s.GetTaskResource().GetDefaultAccelerator())
+	if err := validateDefaultAccelerator(s.GetTaskResource().GetDefaultAccelerator()); err != nil {
+		return err
+	}
+	return validateDataplaneIngressAllowedCIDRs(s.GetNetwork().GetDataplaneIngressAllowedCidrs())
 }
 
 var _ settingsconnect.SettingsServiceHandler = (*SettingsService)(nil)

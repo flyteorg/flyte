@@ -1141,8 +1141,8 @@ type NetworkSettings struct {
 
 	// Source CIDRs allowed to reach the org's data plane endpoints, including
 	// apps. Entries are IPv4 or IPv6 CIDRs; a bare IP address is read as a single
-	// host (/32 or /128). Unset, or a VALUE with an empty list, means no
-	// restriction. Control plane access is not affected.
+	// host (/32 or /128). UNSET means no restriction, and a VALUE must list at
+	// least one entry. Control plane access is not affected.
 	DataplaneIngressAllowedCidrs *StringListSetting `protobuf:"bytes,1,opt,name=dataplane_ingress_allowed_cidrs,json=dataplaneIngressAllowedCidrs,proto3" json:"dataplane_ingress_allowed_cidrs,omitempty"`
 }
 
