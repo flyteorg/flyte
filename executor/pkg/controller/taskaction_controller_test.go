@@ -257,6 +257,52 @@ func buildTaskTemplateBytesWithQueuedTimeoutAndRetries(retries uint32) []byte {
 	return data
 }
 
+func buildSerializedCacheTemplateBytesWithQueuedTimeout() []byte {
+	tmpl := &core.TaskTemplate{}
+	Expect(proto.Unmarshal(buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0), tmpl)).To(Succeed())
+	tmpl.Id = &core.Identifier{
+		ResourceType: core.ResourceType_TASK,
+		Name:         "queued-timeout-test",
+		Project:      "timeout-project",
+		Domain:       "timeout-domain",
+		Version:      "v1",
+	}
+	tmpl.Metadata.Discoverable, tmpl.Metadata.CacheSerializable = true, true
+	data, err := proto.Marshal(tmpl)
+	Expect(err).NotTo(HaveOccurred())
+	return data
+}
+
+// launchThenPoll fakes a plugin that manages a resource the way the K8s plugin does: a call with no saved
+// state launches or adopts the resource and can only report it Queued, and later calls read the resource.
+func launchThenPoll(
+	now func() time.Time,
+	poll func() pluginsCore.Transition,
+) func(context.Context, pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+	return func(_ context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+		state := fakeLaunchState{}
+		if _, err := tCtx.PluginStateReader().Get(&state); err != nil {
+			return pluginsCore.UnknownTransition, err
+		}
+		if state.Launched {
+			return poll(), nil
+		}
+		if err := tCtx.PluginStateWriter().Put(1, &fakeLaunchState{Launched: true}); err != nil {
+			return pluginsCore.UnknownTransition, err
+		}
+		return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(
+			now(), pluginsCore.DefaultPhaseVersion, "task submitted")), nil
+	}
+}
+
+func recordedPhases(recorded []*workflow.ActionEvent) []common.ActionPhase {
+	phases := make([]common.ActionPhase, 0, len(recorded))
+	for _, event := range recorded {
+		phases = append(phases, event.GetPhase())
+	}
+	return phases
+}
+
 func withRetryBackoff(template []byte, backoff *core.Backoff) []byte {
 	tmpl := &core.TaskTemplate{}
 	Expect(proto.Unmarshal(template, tmpl)).To(Succeed())
@@ -909,19 +955,7 @@ var _ = Describe("TaskAction Controller", func() {
 
 		DescribeTable("waits for current plugin state when queued timeout recovery encounters an outage",
 			func(outage string) {
-				template := &core.TaskTemplate{}
-				Expect(proto.Unmarshal(buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0), template)).To(Succeed())
-				template.Id = &core.Identifier{
-					ResourceType: core.ResourceType_TASK,
-					Name:         "queued-timeout-test",
-					Project:      "timeout-project",
-					Domain:       "timeout-domain",
-					Version:      "v1",
-				}
-				template.Metadata.Discoverable, template.Metadata.CacheSerializable = true, true
-				data, err := proto.Marshal(template)
-				Expect(err).NotTo(HaveOccurred())
-				nn := createTaskAction("queued-outage-"+outage, data)
+				nn := createTaskAction("queued-outage-"+outage, buildSerializedCacheTemplateBytesWithQueuedTimeout())
 				base := getTaskAction(nn).CreationTimestamp.Time
 				startedAt := base.Add(time.Second)
 				fakeClock := testingclock.NewFakeClock(base)
@@ -947,7 +981,7 @@ var _ = Describe("TaskAction Controller", func() {
 					releaseReservationFunc: func(context.Context, catalog.Key, string) error { return nil },
 				}
 				req := reconcile.Request{NamespacedName: nn}
-				_, err = r.Reconcile(ctx, req)
+				_, err := r.Reconcile(ctx, req)
 				Expect(err).NotTo(HaveOccurred())
 				if outage == "plugin" {
 					fake.handleErrors = []error{nil, stderrors.New("plugin unavailable")}
@@ -1020,10 +1054,17 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(isTerminal(getTaskAction(nn))).To(BeTrue())
 		})
 
-		It("does not end an attempt on the Queued report that launched or adopted its resource", func() {
+		It("does not end a retried attempt on the Queued report that launched or adopted its resource", func() {
 			nn := createTaskAction("qt-first-report",
-				buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
+				buildTaskTemplateBytesWithQueuedTimeoutAndRetries(1))
 			base := getTaskAction(nn).CreationTimestamp.Time
+			// The retry was queued before the controller went away, so it is not fresh work: its
+			// first call may find the resource of a launch whose state was never saved.
+			retried := getTaskAction(nn)
+			retried.Status.Attempts = 2
+			retried.Status.PluginPhase = pluginsCore.PhaseQueued.String()
+			retried.Status.AttemptQueuedAt = &metav1.Time{Time: base}
+			Expect(k8sClient.Status().Update(ctx, retried)).To(Succeed())
 			fakeClock := testingclock.NewFakeClock(base)
 			fake := &fakePlugin{id: "timeout-plugin"}
 			fake.handleFunc = func(_ context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
@@ -1185,6 +1226,267 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(persisted.Status.AttemptInitializedAt).NotTo(BeNil())
 			Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseInitializing.String()))
 			Expect(fake.abortCalls).To(BeZero())
+		})
+
+		DescribeTable("keeps an attempt that initialized while the controller was away unless the plugin proves it was late",
+			func(name string, initializing func(polledAt, queuedAt time.Time) pluginsCore.PhaseInfo, wantTimedOut bool) {
+				nn := createTaskAction(name, buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
+				// A controller clock an hour behind the wall clock: a plugin that leaves the stamp to the
+				// framework gets the wall time, which is after the poll just as it is in production.
+				queuedAt := time.Now().Add(-time.Hour).Truncate(time.Second)
+				polledAt := queuedAt.Add(10 * time.Second) // five budgets after the attempt was queued
+				seeded := getTaskAction(nn)
+				seeded.Status.PluginPhase = pluginsCore.PhaseQueued.String()
+				seeded.Status.AttemptQueuedAt = &metav1.Time{Time: queuedAt}
+				Expect(k8sClient.Status().Update(ctx, seeded)).To(Succeed())
+				fake := &fakePlugin{id: "timeout-plugin"}
+				fake.handleFunc = func(context.Context, pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+					return pluginsCore.DoTransition(initializing(polledAt, queuedAt)), nil
+				}
+				r := newReconciler(fake, testingclock.NewFakeClock(polledAt), &recordingEventsClient{}, nil)
+
+				_, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+				Expect(err).NotTo(HaveOccurred())
+				persisted := getTaskAction(nn)
+				if wantTimedOut {
+					Expect(isTerminal(persisted)).To(BeTrue())
+					Expect(persisted.Status.ErrorState.Message).To(ContainSubstring("queued timeout"))
+					return
+				}
+				Expect(isTerminal(persisted)).To(BeFalse())
+				Expect(persisted.Status.TimeoutAt).To(BeNil())
+				Expect(persisted.Status.AttemptInitializedAt).NotTo(BeNil())
+				Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseInitializing.String()))
+				Expect(fake.abortCalls).To(BeZero())
+			},
+			// Dask, Ray, Spark and the clustered plugin stamp the poll, not the resource's own transition:
+			// dask.go and clustered/phase.go set time.Now() themselves, ray.go does the same in its task
+			// info and passes the cluster's creation time to a constructor that ignores it, and spark.go
+			// sets nothing, which leaves phaseInfo in pluginmachinery/core/phase.go to stamp time.Now().
+			Entry("dask stamps the poll", "qt-recovery-dask",
+				func(polledAt, _ time.Time) pluginsCore.PhaseInfo {
+					return pluginsCore.PhaseInfoInitializing(polledAt, pluginsCore.DefaultPhaseVersion, "job created",
+						&pluginsCore.TaskInfo{OccurredAt: &polledAt})
+				}, false),
+			Entry("ray stamps the poll and ignores the creation time", "qt-recovery-ray",
+				func(polledAt, queuedAt time.Time) pluginsCore.PhaseInfo {
+					return pluginsCore.PhaseInfoInitializing(queuedAt, pluginsCore.DefaultPhaseVersion, "cluster is creating",
+						&pluginsCore.TaskInfo{OccurredAt: &polledAt})
+				}, false),
+			Entry("spark leaves the stamp to the framework", "qt-recovery-spark",
+				func(polledAt, _ time.Time) pluginsCore.PhaseInfo {
+					return pluginsCore.PhaseInfoInitializing(polledAt, pluginsCore.DefaultPhaseVersion, "job submitted",
+						&pluginsCore.TaskInfo{})
+				}, false),
+			// The pod plugin reports when the pod itself changed, which can prove the attempt late or in time.
+			Entry("a pod that changed inside the budget", "qt-recovery-pod-early",
+				func(_, queuedAt time.Time) pluginsCore.PhaseInfo {
+					at := queuedAt.Add(time.Second)
+					return pluginsCore.PhaseInfoInitializing(at, pluginsCore.DefaultPhaseVersion, "pod initializing",
+						&pluginsCore.TaskInfo{OccurredAt: &at})
+				}, false),
+			Entry("a pod that changed after the budget", "qt-recovery-pod-late",
+				func(_, queuedAt time.Time) pluginsCore.PhaseInfo {
+					at := queuedAt.Add(5 * time.Second)
+					return pluginsCore.PhaseInfoInitializing(at, pluginsCore.DefaultPhaseVersion, "pod initializing",
+						&pluginsCore.TaskInfo{OccurredAt: &at})
+				}, true),
+		)
+
+		It("ends an attempt whose queue budget ran out before its first reconcile without launching it", func() {
+			nn := createTaskAction("qt-late-first-reconcile",
+				buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
+			base := getTaskAction(nn).CreationTimestamp.Time
+			// The controller was away for longer than the 2s budget.
+			fakeClock := testingclock.NewFakeClock(base.Add(3 * time.Second))
+			// Like core-sleep, the plugin reports Running from its first call.
+			fake := &fakePlugin{id: "timeout-plugin", transitions: []pluginsCore.Transition{
+				runningTransition(base.Add(3 * time.Second)),
+			}}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+
+			_, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			Expect(err).NotTo(HaveOccurred())
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.ErrorState.Message).To(Equal("task attempt 1 exceeded its queued timeout of 2s"))
+			Expect(persisted.Status.TimeoutAt.Time).To(BeTemporally("==", base.Add(2*time.Second)))
+			Expect(fake.handleCalls).To(BeZero(), "nothing is launched for an attempt that has no budget left")
+		})
+
+		It("keeps an attempt that started inside its queue budget when a later reconcile is late", func() {
+			nn := createTaskAction("qt-started-then-late",
+				buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
+			base := getTaskAction(nn).CreationTimestamp.Time
+			fakeClock := testingclock.NewFakeClock(base.Add(time.Second))
+			fake := &fakePlugin{id: "timeout-plugin", transitions: []pluginsCore.Transition{
+				runningTransition(base.Add(time.Second)),
+			}}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			req := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(getTaskAction(nn).Status.AttemptStartedAt).NotTo(BeNil())
+
+			fakeClock.Step(10 * time.Second)
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeFalse())
+			Expect(persisted.Status.TimeoutAt).To(BeNil())
+			Expect(fake.handleCalls).To(Equal(2))
+			Expect(fake.abortCalls).To(BeZero())
+		})
+
+		It("keeps a launched attempt whose serialized cache reservation moved to another owner", func() {
+			nn := createTaskAction("qt-cache-moved-reservation", buildSerializedCacheTemplateBytesWithQueuedTimeout())
+			base := getTaskAction(nn).CreationTimestamp.Time
+			fakeClock := testingclock.NewFakeClock(base)
+			owner := nn.String()
+			fake := &fakePlugin{id: "timeout-plugin"}
+			fake.handleFunc = launchThenPoll(fakeClock.Now, func() pluginsCore.Transition {
+				return runningTransition(base.Add(time.Second))
+			})
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			r.Catalog = &stubCatalogClient{
+				getFunc: func(context.Context, catalog.Key) (catalog.Entry, error) {
+					return catalog.Entry{}, grpcstatus.Error(codes.NotFound, "miss")
+				},
+				getOrExtendReservationFunc: func(
+					context.Context, catalog.Key, string, time.Duration,
+				) (*cacheservice.Reservation, error) {
+					return &cacheservice.Reservation{OwnerId: owner}, nil
+				},
+				releaseReservationFunc: func(context.Context, catalog.Key, string) error { return nil },
+			}
+			req := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, req) // launches the resource inside the budget
+			Expect(err).NotTo(HaveOccurred())
+			Expect(getTaskAction(nn).Status.PluginState).NotTo(BeEmpty())
+
+			// The controller was away long enough for the reservation to lapse. A cache wait says
+			// nothing about a resource that already exists, so it cannot show that one is still queued.
+			owner = "default/another-action"
+			fakeClock.Step(10 * time.Second)
+			result, err := r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeFalse())
+			Expect(persisted.Status.TimeoutAt).To(BeNil())
+			Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseWaitingForCache.String()))
+			Expect(fake.abortCalls).To(BeZero())
+			Expect(result).To(Equal(reconcile.Result{RequeueAfter: TaskActionDefaultRequeueDuration}),
+				"an expired deadline that cannot be enforced must not spin the queue")
+
+			owner = nn.String()
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			persisted = getTaskAction(nn)
+			Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseRunning.String()))
+			Expect(persisted.Status.AttemptStartedAt).NotTo(BeNil())
+			Expect(fake.abortCalls).To(BeZero())
+		})
+
+		It("ends a cache waiter that never launched when its queue budget runs out", func() {
+			nn := createTaskAction("qt-cache-waiter", buildSerializedCacheTemplateBytesWithQueuedTimeout())
+			base := getTaskAction(nn).CreationTimestamp.Time
+			fakeClock := testingclock.NewFakeClock(base)
+			fake := &fakePlugin{id: "timeout-plugin"}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			r.Catalog = &stubCatalogClient{
+				getFunc: func(context.Context, catalog.Key) (catalog.Entry, error) {
+					return catalog.Entry{}, grpcstatus.Error(codes.NotFound, "miss")
+				},
+				getOrExtendReservationFunc: func(
+					context.Context, catalog.Key, string, time.Duration,
+				) (*cacheservice.Reservation, error) {
+					return &cacheservice.Reservation{OwnerId: "default/another-action"}, nil
+				},
+				releaseReservationFunc: func(context.Context, catalog.Key, string) error { return nil },
+			}
+			req := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(getTaskAction(nn).Status.PluginPhase).To(Equal(pluginsCore.PhaseWaitingForCache.String()))
+
+			fakeClock.Step(10 * time.Second)
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.ErrorState.Message).To(ContainSubstring("queued timeout"))
+			Expect(fake.handleCalls).To(BeZero(), "a task blocked on the cache is never launched")
+		})
+
+		DescribeTable("judges a launched attempt on its next poll while its events keep failing",
+			func(name string, poll func(time.Time) pluginsCore.Transition, wantTimedOut bool) {
+				nn := createTaskAction(name, buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
+				base := getTaskAction(nn).CreationTimestamp.Time
+				fakeClock := testingclock.NewFakeClock(base)
+				fake := &fakePlugin{id: "timeout-plugin"}
+				fake.handleFunc = launchThenPoll(fakeClock.Now, func() pluginsCore.Transition { return poll(base) })
+				recorded := &failingEventsClient{failures: 1000}
+				r := newReconciler(fake, fakeClock, recorded, nil)
+				req := reconcile.Request{NamespacedName: nn}
+
+				_, err := r.Reconcile(ctx, req) // launches inside the budget, but its Queued event cannot be published
+				Expect(err).To(MatchError("events unavailable"))
+
+				fakeClock.Step(10 * time.Second) // the budget runs out while the events service is still away
+				_, err = r.Reconcile(ctx, req)
+				Expect(err).To(MatchError("events unavailable"))
+				persisted := getTaskAction(nn)
+				if wantTimedOut {
+					Expect(persisted.Status.TimeoutAt).NotTo(BeNil())
+					Expect(fake.abortCalls).To(Equal(1))
+				} else {
+					Expect(persisted.Status.TimeoutAt).To(BeNil())
+					Expect(persisted.Status.AttemptStartedAt).NotTo(BeNil())
+					Expect(fake.abortCalls).To(BeZero())
+				}
+				Expect(persisted.Status.PluginState).NotTo(BeEmpty(), "the launch must not be forgotten")
+
+				recorded.failures = 0
+				_, err = r.Reconcile(ctx, req)
+				Expect(err).NotTo(HaveOccurred())
+				persisted = getTaskAction(nn)
+				Expect(isTerminal(persisted)).To(Equal(wantTimedOut))
+				if wantTimedOut {
+					Expect(recordedPhases(recorded.RecordedEvents())).To(ContainElement(common.ActionPhase_ACTION_PHASE_TIMED_OUT))
+				}
+			},
+			Entry("still queued", "qt-events-down-queued",
+				func(at time.Time) pluginsCore.Transition {
+					return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(at, pluginsCore.DefaultPhaseVersion, "scheduling"))
+				}, true),
+			Entry("already running", "qt-events-down-running",
+				func(at time.Time) pluginsCore.Transition { return runningTransition(at.Add(time.Second)) }, false),
+		)
+
+		It("still publishes the Queued event of a launch whose first publication failed", func() {
+			nn := createTaskAction("qt-launch-event-retried", buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
+			base := getTaskAction(nn).CreationTimestamp.Time
+			fakeClock := testingclock.NewFakeClock(base)
+			fake := &fakePlugin{id: "timeout-plugin"}
+			fake.handleFunc = launchThenPoll(fakeClock.Now, func() pluginsCore.Transition {
+				return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(base, pluginsCore.DefaultPhaseVersion, "scheduling"))
+			})
+			recorded := &failingEventsClient{failures: 1}
+			r := newReconciler(fake, fakeClock, recorded, nil)
+			req := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, req)
+			Expect(err).To(MatchError("events unavailable"))
+			Expect(recorded.RecordedEvents()).To(BeEmpty())
+
+			fakeClock.Step(time.Second)
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(recordedPhases(recorded.RecordedEvents())).To(ContainElement(common.ActionPhase_ACTION_PHASE_QUEUED))
+			Expect(getTaskAction(nn).Status.PluginPhase).To(Equal(pluginsCore.PhaseQueued.String()))
 		})
 
 		It("leaves a valid zero max runtime unlimited", func() {
