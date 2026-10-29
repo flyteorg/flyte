@@ -1798,3 +1798,56 @@ func TestUpdateActionDetailedInfo_NotifiesWatchers(t *testing.T) {
 		t.Fatal("timed out waiting for detailed_info notification")
 	}
 }
+
+func TestCreateActionPromotesOnlyPendingParent(t *testing.T) {
+	db := setupActionDB(t)
+	repo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	for value, name := range common.ActionPhase_name {
+		t.Run(name, func(t *testing.T) {
+			parentID := &common.ActionIdentifier{
+				Run:  &common.RunIdentifier{Project: "parent-project", Domain: "dev", Name: name},
+				Name: "a0",
+			}
+			parent := models.NewActionModel(parentID)
+			parent.Phase = value
+			parent.Attempts = 3
+			parent.CacheStatus = core.CatalogCacheStatus_CACHE_MISS
+			terminal := value == int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_FAILED) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_ABORTED) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_RECOVERED)
+			if terminal {
+				parent.EndedAt = sql.NullTime{Time: time.Now(), Valid: true}
+			}
+			promote := value == int32(common.ActionPhase_ACTION_PHASE_QUEUED) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_INITIALIZING) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES)
+			before, err := repo.CreateAction(ctx, parent, false)
+			require.NoError(t, err)
+
+			childID := &common.ActionIdentifier{Run: parentID.Run, Name: "child"}
+			child := models.NewActionModel(childID)
+			child.ParentActionName = sql.NullString{String: "a0", Valid: true}
+			for i := 0; i < 2; i++ { // Initial recording and duplicate delivery.
+				_, err := repo.CreateAction(ctx, child, false)
+				require.NoError(t, err)
+				after, err := repo.GetAction(ctx, parentID)
+				require.NoError(t, err)
+				if !promote {
+					assert.Equal(t, before, after, "ineligible parent must remain untouched")
+				} else {
+					assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_RUNNING), after.Phase)
+					assert.Equal(t, before.Attempts, after.Attempts)
+					assert.Equal(t, before.CacheStatus, after.CacheStatus)
+					assert.Equal(t, before.CreatedAt, after.CreatedAt)
+					assert.Equal(t, before.EndedAt, after.EndedAt)
+					assert.Equal(t, before.DurationMs, after.DurationMs)
+				}
+			}
+		})
+	}
+}

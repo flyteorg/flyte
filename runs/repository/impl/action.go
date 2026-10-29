@@ -337,7 +337,8 @@ func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *comm
 	return &event, nil
 }
 
-// CreateAction inserts an Action model into the database.
+// CreateAction inserts an Action model and promotes its parent to RUNNING in the
+// same transaction only from QUEUED, INITIALIZING, or WAITING_FOR_RESOURCES.
 // When updateTriggeredAt is true and the action has a TriggerName set, triggered_at on the
 // corresponding trigger row is updated to now() in the same transaction.
 func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, updateTriggeredAt bool) (*models.Action, error) {
@@ -376,6 +377,32 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, up
 		}
 	}
 
+	// Creating a child proves its parent started executing. Check and update
+	// the parent in one statement so a concurrent terminal update cannot be
+	// overwritten by this inferred RUNNING status.
+	var parentUpdated bool
+	if rowsAffected > 0 && action.ParentActionName.Valid && action.ParentActionName.String != "" {
+		result, err := tx.ExecContext(ctx,
+			`UPDATE actions SET phase = $5, updated_at = NOW()
+			 WHERE project = $1 AND domain = $2 AND run_name = $3 AND name = $4
+			 AND phase = ANY($6)`,
+			action.Project, action.Domain, action.RunName, action.ParentActionName.String,
+			int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+			pq.Array([]int32{
+				int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+				int32(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES),
+				int32(common.ActionPhase_ACTION_PHASE_INITIALIZING),
+			}))
+		if err != nil {
+			return nil, fmt.Errorf("failed to promote parent action: %w", err)
+		}
+		updated, err := result.RowsAffected()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get parent update count: %w", err)
+		}
+		parentUpdated = updated > 0
+	}
+
 	if err := tx.Commit(); err != nil {
 		return nil, fmt.Errorf("failed to commit tx: %w", err)
 	}
@@ -387,6 +414,12 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, up
 			Domain:  action.Domain,
 			Name:    action.RunName,
 		},
+	}
+
+	if parentUpdated {
+		r.notifyActionUpdate(ctx, &common.ActionIdentifier{
+			Run: actionID.Run, Name: action.ParentActionName.String,
+		})
 	}
 
 	// If no rows were affected, the action already exists — fetch and return it.

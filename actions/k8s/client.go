@@ -870,28 +870,6 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		}
 	}
 
-	// When a child action first appears, the parent must already be running (it
-	// created the child). Promote the parent to RUNNING so the UI doesn't
-	// stay stuck on INITIALIZING while children are executing.
-	if !isDuplicate && eventType != watch.Deleted && update.ParentActionName != "" {
-		parentID := &common.ActionIdentifier{
-			Run:  update.ActionID.Run,
-			Name: update.ParentActionName,
-		}
-		parentStatusReq := &workflow.UpdateActionStatusRequest{
-			ActionId: parentID,
-			Status: &workflow.ActionStatus{
-				Phase: common.ActionPhase_ACTION_PHASE_RUNNING,
-			},
-		}
-		if resp, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(parentStatusReq)); err != nil {
-			logger.Warnf(ctx, "Failed to promote parent action %s to RUNNING: %v", update.ParentActionName, err)
-		} else if code := resp.Msg.GetStatus().GetCode(); code != 0 {
-			logger.Warnf(ctx, "Run service rejected promoting parent action %s to RUNNING: code=%d message=%s",
-				update.ParentActionName, code, resp.Msg.GetStatus().GetMessage())
-		}
-	}
-
 	if update.Phase != common.ActionPhase_ACTION_PHASE_UNSPECIFIED {
 		status := &workflow.ActionStatus{
 			Phase:       update.Phase,
