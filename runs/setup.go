@@ -77,7 +77,6 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	otelInterceptor, err := otelconnect.NewInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
 		otelconnect.WithMeterProvider(meterProvider),
-		otelconnect.WithoutServerPeerAttributes(),
 	)
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
@@ -100,6 +99,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 			cfg.NotificationBufferLimit,
 			cfg.NotifyRetryMinBackoff.Duration,
 			cfg.NotifyRetryMaxBackoff.Duration,
+			cfg.WatchBufferSize,
 		),
 		meterProvider,
 	)

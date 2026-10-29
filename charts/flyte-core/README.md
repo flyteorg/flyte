@@ -21,6 +21,9 @@ Distributed Flyte 2 core services
 | components.actions.args[1] | string | `"actions"` |  |
 | components.actions.args[2] | string | `"--config"` |  |
 | components.actions.args[3] | string | `"/etc/flyte/config.d/*.yaml"` |  |
+| components.actions.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
+| components.actions.autoscaling.behavior | object | `{}` | Optional autoscaling/v2 scaleUp and scaleDown policies. |
+| components.actions.autoscaling.metrics | list | `[]` | Additional autoscaling/v2 metrics (Pods, Object, External, or Resource). |
 | components.actions.command[0] | string | `"/usr/bin/tini"` |  |
 | components.actions.command[1] | string | `"-g"` |  |
 | components.actions.command[2] | string | `"--"` |  |
@@ -65,6 +68,9 @@ Distributed Flyte 2 core services
 | components.app.args[1] | string | `"app"` |  |
 | components.app.args[2] | string | `"--config"` |  |
 | components.app.args[3] | string | `"/etc/flyte/config.d/*.yaml"` |  |
+| components.app.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
+| components.app.autoscaling.behavior | object | `{}` | Optional autoscaling/v2 scaleUp and scaleDown policies. |
+| components.app.autoscaling.metrics | list | `[]` | Additional autoscaling/v2 metrics (Pods, Object, External, or Resource). |
 | components.app.command[0] | string | `"/usr/bin/tini"` |  |
 | components.app.command[1] | string | `"-g"` |  |
 | components.app.command[2] | string | `"--"` |  |
@@ -109,6 +115,9 @@ Distributed Flyte 2 core services
 | components.cache.args[1] | string | `"cache"` |  |
 | components.cache.args[2] | string | `"--config"` |  |
 | components.cache.args[3] | string | `"/etc/flyte/config.d/*.yaml"` |  |
+| components.cache.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
+| components.cache.autoscaling.behavior | object | `{}` | Optional autoscaling/v2 scaleUp and scaleDown policies. |
+| components.cache.autoscaling.metrics | list | `[]` | Additional autoscaling/v2 metrics (Pods, Object, External, or Resource). |
 | components.cache.command[0] | string | `"/usr/bin/tini"` |  |
 | components.cache.command[1] | string | `"-g"` |  |
 | components.cache.command[2] | string | `"--"` |  |
@@ -153,6 +162,9 @@ Distributed Flyte 2 core services
 | components.dataproxy.args[1] | string | `"dataproxy"` |  |
 | components.dataproxy.args[2] | string | `"--config"` |  |
 | components.dataproxy.args[3] | string | `"/etc/flyte/config.d/*.yaml"` |  |
+| components.dataproxy.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
+| components.dataproxy.autoscaling.behavior | object | `{}` | Optional autoscaling/v2 scaleUp and scaleDown policies. |
+| components.dataproxy.autoscaling.metrics | list | `[]` | Additional autoscaling/v2 metrics (Pods, Object, External, or Resource). |
 | components.dataproxy.command[0] | string | `"/usr/bin/tini"` |  |
 | components.dataproxy.command[1] | string | `"-g"` |  |
 | components.dataproxy.command[2] | string | `"--"` |  |
@@ -197,6 +209,9 @@ Distributed Flyte 2 core services
 | components.events.args[1] | string | `"events"` |  |
 | components.events.args[2] | string | `"--config"` |  |
 | components.events.args[3] | string | `"/etc/flyte/config.d/*.yaml"` |  |
+| components.events.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
+| components.events.autoscaling.behavior | object | `{}` | Optional autoscaling/v2 scaleUp and scaleDown policies. |
+| components.events.autoscaling.metrics | list | `[]` | Additional autoscaling/v2 metrics (Pods, Object, External, or Resource). |
 | components.events.command[0] | string | `"/usr/bin/tini"` |  |
 | components.events.command[1] | string | `"-g"` |  |
 | components.events.command[2] | string | `"--"` |  |
@@ -266,6 +281,7 @@ Distributed Flyte 2 core services
 | components.executor.podSecurityContext | object | `{}` |  |
 | components.executor.priorityClassName | string | `""` |  |
 | components.executor.readinessProbe | object | `{}` |  |
+| components.executor.replicaCount | int | `1` | Replicas above 1 need configuration.executor.leaderElect: one replica reconciles at a time and the rest stand by. |
 | components.executor.resources | object | `{}` |  |
 | components.executor.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | components.executor.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
@@ -284,6 +300,9 @@ Distributed Flyte 2 core services
 | components.runs.args[1] | string | `"runs"` |  |
 | components.runs.args[2] | string | `"--config"` |  |
 | components.runs.args[3] | string | `"/etc/flyte/config.d/*.yaml"` |  |
+| components.runs.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
+| components.runs.autoscaling.behavior | object | `{}` | Optional autoscaling/v2 scaleUp and scaleDown policies. |
+| components.runs.autoscaling.metrics | list | `[]` | Additional autoscaling/v2 metrics (Pods, Object, External, or Resource). |
 | components.runs.command[0] | string | `"/usr/bin/tini"` |  |
 | components.runs.command[1] | string | `"-g"` |  |
 | components.runs.command[2] | string | `"--"` |  |
@@ -328,6 +347,9 @@ Distributed Flyte 2 core services
 | components.secret.args[1] | string | `"secret"` |  |
 | components.secret.args[2] | string | `"--config"` |  |
 | components.secret.args[3] | string | `"/etc/flyte/config.d/*.yaml"` |  |
+| components.secret.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
+| components.secret.autoscaling.behavior | object | `{}` | Optional autoscaling/v2 scaleUp and scaleDown policies. |
+| components.secret.autoscaling.metrics | list | `[]` | Additional autoscaling/v2 metrics (Pods, Object, External, or Resource). |
 | components.secret.command[0] | string | `"/usr/bin/tini"` |  |
 | components.secret.command[1] | string | `"-g"` |  |
 | components.secret.command[2] | string | `"--"` |  |
@@ -491,9 +513,14 @@ Distributed Flyte 2 core services
 | configuration.storage.providerConfig.s3.secretKeyPath | string | `""` |  |
 | configuration.storage.providerConfig.s3.v2Signing | bool | `false` |  |
 | configuration.webhook.cacheInvalidationPort | int | `9444` |  |
+| configuration.webhook.certDir | string | `"/var/run/flyte/certs"` | Directory the webhook serves its TLS certs from. |
 | configuration.webhook.listenPort | int | `9443` |  |
+| configuration.webhook.localCert | bool | `true` | Whether to copy the webhook TLS certs from their Secret into certDir at startup. |
 | configuration.webhook.webhookTimeout | int | `30` |  |
 | console.affinity | object | `{}` |  |
+| console.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
+| console.autoscaling.behavior | object | `{}` | Optional autoscaling/v2 scaleUp and scaleDown policies. |
+| console.autoscaling.metrics | list | `[]` | Additional autoscaling/v2 metrics (Pods, Object, External, or Resource). |
 | console.basePath | string | `"/v2"` |  |
 | console.containerPort | int | `8080` |  |
 | console.enabled | bool | `true` |  |
@@ -526,6 +553,7 @@ Distributed Flyte 2 core services
 | ingress.apiJwtIngress.enabled | bool | `false` |  |
 | ingress.apiJwtIngress.host | string | `""` |  |
 | ingress.apiJwtIngress.ingressClassName | string | `""` |  |
+| ingress.apiJwtIngress.keepHttpRoutes | bool | `false` | Also serve the API routes on the http ingress, for requests without a bearer token (e.g. console calls behind cookie auth). The controller must send bearer requests to this ingress first, e.g. with an ALB Authorization header condition. |
 | ingress.apiJwtIngress.tls | list | `[]` |  |
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |
@@ -552,6 +580,7 @@ Distributed Flyte 2 core services
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.labels | object | `{}` |  |
 | serviceAccount.name | string | `""` |  |
+| telemetry.enabled | bool | `true` | Set to false to opt out. Sets DO_NOT_TRACK=1 (https://donottrack.sh) on the backend and the console; the backend passes it on to the task and app pods it creates. |
 | waitForDatabase.args | list | `[]` |  |
 | waitForDatabase.command | list | `[]` |  |
 | waitForDatabase.enabled | bool | `true` |  |

@@ -29,12 +29,19 @@ import (
 const (
 	rootActionName                                   = "a0"
 	defaultNotificationBufferSize                    = 256
+	defaultWatchBufferSize                           = 100
 	notifyRetryMinBackoff                            = 50 * time.Millisecond
 	notifyRetryMaxBackoff                            = 5 * time.Second
 	notificationMeterName                            = "runs-repository"
 	notificationDeletedMetricName                    = "runs.notification.evictions"
 	notificationBufferAction      notificationBuffer = "action"
 	notificationBufferRun         notificationBuffer = "run"
+)
+
+// Defaults for the pq.Listener behind LISTEN/NOTIFY.
+const (
+	defaultListenerPingInterval         = 90 * time.Second
+	defaultListenerMinReconnectInterval = 10 * time.Second
 )
 
 type notificationBuffer string
@@ -44,6 +51,9 @@ type NotificationConfig struct {
 	bufferLimit     int
 	retryMinBackoff time.Duration
 	retryMaxBackoff time.Duration
+	// watchBufferSize is the capacity of each watch subscriber's notification channel. A notification for a
+	// subscriber whose channel is full is dropped.
+	watchBufferSize int
 }
 
 type notificationMetrics struct {
@@ -77,7 +87,7 @@ func (m *notificationMetrics) recordDeleted(ctx context.Context, bufferFrom noti
 }
 
 // NewNotificationConfig creates a notification config, normalizing invalid values.
-func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff time.Duration) NotificationConfig {
+func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff time.Duration, watchBufferSize int) NotificationConfig {
 	if bufferLimit < defaultNotificationBufferSize {
 		bufferLimit = defaultNotificationBufferSize
 	}
@@ -91,11 +101,15 @@ func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff tim
 		retryMinBackoff = notifyRetryMinBackoff
 		retryMaxBackoff = notifyRetryMaxBackoff
 	}
+	if watchBufferSize <= 0 {
+		watchBufferSize = defaultWatchBufferSize
+	}
 
 	return NotificationConfig{
 		bufferLimit:     bufferLimit,
 		retryMinBackoff: retryMinBackoff,
 		retryMaxBackoff: retryMaxBackoff,
+		watchBufferSize: watchBufferSize,
 	}
 }
 
@@ -104,6 +118,10 @@ type actionRepo struct {
 	db       *sqlx.DB
 	dsn      string // stored for pq.Listener
 	listener *pq.Listener
+
+	// Idle ping interval and pq's first reconnect delay; zero means the defaults above.
+	listenerPingInterval         time.Duration
+	listenerMinReconnectInterval time.Duration
 
 	// Subscriber management for LISTEN/NOTIFY
 	runSubscribers    map[chan string]bool
@@ -765,7 +783,7 @@ func (r *actionRepo) WatchStateUpdates(ctx context.Context, updates chan<- *comm
 // WatchRunUpdates watches for run updates via LISTEN/NOTIFY
 func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Run, errs chan<- error) {
 	runKey := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
-	notifCh := make(chan string, 100)
+	notifCh := make(chan string, r.notificationConfig.watchBufferSize)
 
 	r.mu.Lock()
 	r.runSubscribers[notifCh] = true
@@ -804,7 +822,7 @@ func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdent
 
 // WatchAllRunUpdates watches for all run updates via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error) {
-	notifCh := make(chan string, 100)
+	notifCh := make(chan string, r.notificationConfig.watchBufferSize)
 
 	r.mu.Lock()
 	r.runSubscribers[notifCh] = true
@@ -857,7 +875,7 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 // WatchAllActionUpdates watches for all action updates for a run via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	runPrefix := fmt.Sprintf("%s/%s/%s/", runID.Project, runID.Domain, runID.Name)
-	notifCh := make(chan string, 100)
+	notifCh := make(chan string, r.notificationConfig.watchBufferSize)
 
 	r.mu.Lock()
 	r.actionSubscribers[notifCh] = true
@@ -925,7 +943,7 @@ func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.Ru
 func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.ActionIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	targetPayload := fmt.Sprintf("%s/%s/%s/%s",
 		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
-	notifCh := make(chan string, 100)
+	notifCh := make(chan string, r.notificationConfig.watchBufferSize)
 
 	r.mu.Lock()
 	r.actionSubscribers[notifCh] = true
@@ -983,7 +1001,12 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.Ac
 func (r *actionRepo) startPostgresListener() error {
 	connStr := r.dsn
 
-	r.listener = pq.NewListener(connStr, 10*time.Second, time.Minute, func(ev pq.ListenerEventType, err error) {
+	minReconnectInterval := r.listenerMinReconnectInterval
+	if minReconnectInterval <= 0 {
+		minReconnectInterval = defaultListenerMinReconnectInterval
+	}
+
+	r.listener = pq.NewListener(connStr, minReconnectInterval, time.Minute, func(ev pq.ListenerEventType, err error) {
 		if err != nil {
 			logger.Errorf(context.Background(), "Listener error: %v", err)
 		}
@@ -1008,11 +1031,22 @@ func (r *actionRepo) startPostgresListener() error {
 func (r *actionRepo) processNotifications() {
 	logger.Infof(context.Background(), "PostgreSQL LISTEN/NOTIFY started")
 
+	pingInterval := r.listenerPingInterval
+	if pingInterval <= 0 {
+		pingInterval = defaultListenerPingInterval
+	}
+
 	// Process notifications
 	for {
 		select {
-		case notif := <-r.listener.Notify:
+		case notif, ok := <-r.listener.Notify:
+			if !ok {
+				// pq closes Notify only after Listener.Close().
+				logger.Infof(context.Background(), "PostgreSQL listener closed, stopping notification processing")
+				return
+			}
 			if notif == nil {
+				// pq sends nil after it reconnects; notifications sent while it was down may be lost.
 				continue
 			}
 
@@ -1044,11 +1078,11 @@ func (r *actionRepo) processNotifications() {
 
 			}
 
-		case <-time.After(90 * time.Second):
-			// Ping to keep connection alive
+		case <-time.After(pingInterval):
+			// Ping to keep connection alive. Ping fails while pq is reconnecting in the background, so keep
+			// reading Notify instead of returning; nothing would restart this goroutine.
 			if err := r.listener.Ping(); err != nil {
-				logger.Errorf(context.Background(), "Listener ping failed: %v", err)
-				return
+				logger.Warnf(context.Background(), "Listener ping failed, waiting for reconnect: %v", err)
 			}
 		}
 	}

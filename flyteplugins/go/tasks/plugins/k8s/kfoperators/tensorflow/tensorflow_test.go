@@ -47,8 +47,15 @@ var (
 	dummyAnnotations = map[string]string{
 		"annotation-key": "annotation-value",
 	}
+	// The attempt labels are what NewTaskExecutionMetadata stamps on every task, and what
+	// the framework selects on to find the replica pods the operator derives from these
+	// templates, so the fixture carries them alongside a plain user label.
 	dummyLabels = map[string]string{
-		"label-key": "label-value",
+		"label-key":              "label-value",
+		flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue,
+		flytek8s.RunLabel:        "run-abc",
+		flytek8s.ActionLabel:     "a0",
+		flytek8s.AttemptLabel:    "1",
 	}
 
 	resourceRequirements = &corev1.ResourceRequirements{
@@ -320,6 +327,18 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 			Time: now.Add(3 * time.Minute),
 		},
 	}
+	jobSuspended := kubeflowv1.JobCondition{
+		Type:    kubeflowv1.JobSuspended,
+		Status:  corev1.ConditionTrue,
+		Reason:  "TensorFlowJobSuspended",
+		Message: "TensorFlowJob the-job is suspended.",
+		LastUpdateTime: v1.Time{
+			Time: now.Add(time.Minute),
+		},
+		LastTransitionTime: v1.Time{
+			Time: now.Add(time.Minute),
+		},
+	}
 
 	switch conditionType {
 	case kubeflowv1.JobCreated:
@@ -349,6 +368,11 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 			jobRunningInactive,
 			jobFailed,
 			jobRestarting,
+		}
+	case kubeflowv1.JobSuspended:
+		jobConditions = []kubeflowv1.JobCondition{
+			jobCreated,
+			jobSuspended,
 		}
 	}
 
@@ -655,6 +679,46 @@ func TestGetTaskPhase(t *testing.T) {
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
+
+	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, pluginContext, dummyTensorFlowJobResourceCreator(kubeflowv1.JobSuspended))
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
+	assert.Equal(t, "Suspended", taskPhase.Reason())
+	assert.NotNil(t, taskPhase.Info())
+	assert.Nil(t, err)
+
+	// Resume-from-suspended lifecycle: Created -> Suspended -> Running.
+	resumedTFJob := dummyTensorFlowJobResourceCreator(kubeflowv1.JobSuspended)
+	resumedTFJob.Status.Conditions = append(resumedTFJob.Status.Conditions, kubeflowv1.JobCondition{
+		Type:               kubeflowv1.JobRunning,
+		Status:             corev1.ConditionTrue,
+		Reason:             "TensorFlowJobRunning",
+		Message:            "TensorFlowJob the-job is running.",
+		LastTransitionTime: v1.Time{Time: time.Now().Add(time.Minute)},
+	})
+	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, pluginContext, resumedTFJob)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
+	assert.NotNil(t, taskPhase.Info())
+
+	// Training operator did not modify the job even though it is not suspended
+	tfJob := dummyTensorFlowJobResourceCreator(kubeflowv1.JobCreated)
+	tfJob.CreationTimestamp = v1.Time{Time: time.Now().Add(-time.Hour)}
+	tfJob.Status.StartTime = nil
+	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, pluginContext, tfJob)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "kubeflow operator hasn't updated")
+	assert.Equal(t, pluginsCore.PhaseInfoUndefined, taskPhase)
+
+	// Training operator did not modify the job because it is suspended
+	tfJobSuspended := dummyTensorFlowJobResourceCreator(kubeflowv1.JobCreated)
+	tfJobSuspended.CreationTimestamp = v1.Time{Time: time.Now().Add(-time.Hour)}
+	tfJobSuspended.Status.StartTime = nil
+	suspend := true
+	tfJobSuspended.Spec.RunPolicy.Suspend = &suspend
+	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, pluginContext, tfJobSuspended)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
 }
 
 func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {

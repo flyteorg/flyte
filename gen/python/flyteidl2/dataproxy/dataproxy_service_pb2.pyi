@@ -26,7 +26,7 @@ ARTIFACT_TYPE_REPORT: ArtifactType
 ARTIFACT_TYPE_CODE_BUNDLE: ArtifactType
 
 class CreateUploadLocationRequest(_message.Message):
-    __slots__ = ["project", "domain", "filename", "expires_in", "content_md5", "filename_root", "add_content_md5_metadata", "org", "content_length"]
+    __slots__ = ["project", "domain", "filename", "expires_in", "content_md5", "filename_root", "add_content_md5_metadata", "org", "content_length", "queue"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     FILENAME_FIELD_NUMBER: _ClassVar[int]
@@ -36,6 +36,7 @@ class CreateUploadLocationRequest(_message.Message):
     ADD_CONTENT_MD5_METADATA_FIELD_NUMBER: _ClassVar[int]
     ORG_FIELD_NUMBER: _ClassVar[int]
     CONTENT_LENGTH_FIELD_NUMBER: _ClassVar[int]
+    QUEUE_FIELD_NUMBER: _ClassVar[int]
     project: str
     domain: str
     filename: str
@@ -45,7 +46,8 @@ class CreateUploadLocationRequest(_message.Message):
     add_content_md5_metadata: bool
     org: str
     content_length: int
-    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., filename: _Optional[str] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., content_md5: _Optional[bytes] = ..., filename_root: _Optional[str] = ..., add_content_md5_metadata: bool = ..., org: _Optional[str] = ..., content_length: _Optional[int] = ...) -> None: ...
+    queue: str
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., filename: _Optional[str] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., content_md5: _Optional[bytes] = ..., filename_root: _Optional[str] = ..., add_content_md5_metadata: bool = ..., org: _Optional[str] = ..., content_length: _Optional[int] = ..., queue: _Optional[str] = ...) -> None: ...
 
 class CreateUploadLocationResponse(_message.Message):
     __slots__ = ["signed_url", "native_url", "expires_at", "headers"]
@@ -67,7 +69,7 @@ class CreateUploadLocationResponse(_message.Message):
     def __init__(self, signed_url: _Optional[str] = ..., native_url: _Optional[str] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., headers: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class UploadInputsRequest(_message.Message):
-    __slots__ = ["run_id", "project_id", "task_id", "task_spec", "trigger_name", "inputs", "base_dir"]
+    __slots__ = ["run_id", "project_id", "task_id", "task_spec", "trigger_name", "inputs", "base_dir", "queue"]
     RUN_ID_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
     TASK_ID_FIELD_NUMBER: _ClassVar[int]
@@ -75,6 +77,7 @@ class UploadInputsRequest(_message.Message):
     TRIGGER_NAME_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     BASE_DIR_FIELD_NUMBER: _ClassVar[int]
+    QUEUE_FIELD_NUMBER: _ClassVar[int]
     run_id: _identifier_pb2.RunIdentifier
     project_id: _identifier_pb2.ProjectIdentifier
     task_id: _task_definition_pb2.TaskIdentifier
@@ -82,7 +85,8 @@ class UploadInputsRequest(_message.Message):
     trigger_name: _identifier_pb2.TriggerName
     inputs: _common_pb2.Inputs
     base_dir: str
-    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., task_spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., base_dir: _Optional[str] = ...) -> None: ...
+    queue: str
+    def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., task_spec: _Optional[_Union[_task_definition_pb2.TaskSpec, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., base_dir: _Optional[str] = ..., queue: _Optional[str] = ...) -> None: ...
 
 class UploadInputsResponse(_message.Message):
     __slots__ = ["offloaded_input_data"]

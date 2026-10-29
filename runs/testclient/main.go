@@ -140,12 +140,12 @@ func main() {
 	// Test 5: List actions for a run
 	fmt.Println("Test 5: Listing actions for the run...")
 	listActionsReq := &workflow.ListActionsRequest{
-		RunId: &common.RunIdentifier{
+		ScopeBy: &workflow.ListActionsRequest_RunId{RunId: &common.RunIdentifier{
 			Org:     "my-org",
 			Project: "my-project",
 			Domain:  "development",
 			Name:    "test-run-001",
-		},
+		}},
 		Request: &common.ListRequest{
 			Limit: 10,
 		},
